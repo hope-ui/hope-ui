@@ -1,22 +1,8 @@
 import { createStitches, defaultThemeMap } from "@stitches/core";
 
 import { media } from "./media";
+import { defaultTheme } from "./theme";
 import { utils } from "./utils";
-import {
-  borderStyles,
-  borderWidths,
-  radii,
-  colors,
-  shadows,
-  sizes,
-  space,
-  fonts,
-  fontSizes,
-  fontWeights,
-  lineHeights,
-  letterSpacings,
-  zIndices
-} from "./theme";
 
 export const {
   css,
@@ -29,22 +15,7 @@ export const {
 } = createStitches({
   prefix: "uipiece",
   themeMap: defaultThemeMap,
-  theme: {
-    colors,
-    space,
-    sizes,
-    fontSizes,
-    fonts,
-    fontWeights,
-    lineHeights,
-    letterSpacings,
-    borderWidths,
-    borderStyles,
-    radii,
-    shadows,
-    zIndices,
-    transitions: {}
-  },
+  theme: defaultTheme,
   media,
   utils
 });

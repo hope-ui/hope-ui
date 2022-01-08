@@ -1,13 +1,31 @@
-export { borderStyles, borderWidths, radii } from "./border";
-export { colors } from "./colors";
-export { shadows } from "./shadows";
-export { sizes } from "./sizes";
-export { space } from "./space";
-export {
+import { borderStyles, borderWidths, radii } from "./border";
+import { colors } from "./colors";
+import { shadows } from "./shadows";
+import { sizes } from "./sizes";
+import { space } from "./space";
+import { transitions } from "./transitions";
+import {
   fonts,
   fontSizes,
   fontWeights,
   lineHeights,
   letterSpacings
 } from "./typography";
-export { zIndices } from "./zIndices";
+import { zIndices } from "./zIndices";
+
+export const defaultTheme = {
+  colors,
+  space,
+  sizes,
+  fontSizes,
+  fonts,
+  fontWeights,
+  lineHeights,
+  letterSpacings,
+  borderWidths,
+  borderStyles,
+  radii,
+  shadows,
+  zIndices,
+  transitions
+};
