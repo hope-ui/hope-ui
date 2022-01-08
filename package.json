@@ -1,20 +1,22 @@
 {
-  "name": "vite-template-solid",
-  "version": "0.0.0",
-  "description": "",
+  "name": "uipiece",
+  "version": "0.0.1",
+  "description": "UI Pieces for your SolidJS Applications",
   "scripts": {
-    "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
   "license": "MIT",
   "devDependencies": {
+    "@stitches/core": "^1.2.6",
+    "solid-js": "^1.3.1",
     "typescript": "^4.5.4",
     "vite": "^2.7.10",
     "vite-plugin-solid": "^2.2.1"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "@stitches/core": "^1.2.6",
     "solid-js": "^1.3.1"
   }
 }
