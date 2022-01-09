@@ -1,7 +1,7 @@
 import { createMemo, mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType, StyledComponent } from "../components/types";
+import type { ElementType, StyledComponent } from "../components/types";
 import { css, SystemStyleObject } from "./stitches.config";
 
 export function styled<T extends ElementType>(element: T, styles: SystemStyleObject = {}) {
