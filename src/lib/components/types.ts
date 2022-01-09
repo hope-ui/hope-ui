@@ -1,20 +1,16 @@
 import { Component, ComponentProps, JSX } from "solid-js";
 
-import { SystemStyleObject } from "../stitches/stitches.config";
-
 /**
  * Represent any HTML element or SolidJS component.
  */
 export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
 
 /**
- * Take the props of the passed HTML element, component or styledComponent and returns its type.
+ * Take the props of the passed HTML element or component and returns its type.
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-type PropsOf<C extends ElementType> = C extends StyledComponent<infer P>
-  ? JSX.LibraryManagedAttributes<P, ComponentProps<P>>
-  : JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
+type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
  * The `as` props is an override of the default HTML tag.
@@ -50,19 +46,3 @@ type PolymorphicComponentProps<C extends ElementType, Props = {}> = InheritableE
   C,
   Props & AsProp<C>
 >;
-
-/**
- * A more sophisticated version of `PolymorphicComponentProps` where
- * the passed in `css` prop will apply stitches styles
- */
-type StyledComponentProps<C extends ElementType, Props = {}> = PolymorphicComponentProps<
-  C,
-  Props & { css?: SystemStyleObject }
->;
-
-/**
- * A component return by the `styled` function.
- */
-export type StyledComponent<C extends ElementType> = <OverrideElement extends ElementType = C>(
-  props: StyledComponentProps<OverrideElement>
-) => JSX.Element;

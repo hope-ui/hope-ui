@@ -9,15 +9,16 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@stitches/core": "^1.2.6",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
     "prettier": "^2.5.1",
+    "sass": "^1.47.0",
     "solid-js": "^1.3.1",
     "typescript": "^4.5.4",
     "vite": "^2.7.10",
     "vite-plugin-solid": "^2.2.1"
   },
   "peerDependencies": {
-    "@stitches/core": "^1.2.6",
     "solid-js": "^1.3.1"
   }
 }
