@@ -1,10 +1,12 @@
-import { styled } from "./core/stitches/styled";
+import { ComponentProps } from "solid-js";
+import { styled } from "./lib/stitches/styled";
+
+function Card(props: { title: string }) {
+  return <div>Card</div>;
+}
 
 const Link = styled("a");
-
-const Button = styled("button", {
-  bg: "$danger500",
-});
+const Button = styled("button", { bg: "$danger500" });
 
 export default function App() {
   return (
