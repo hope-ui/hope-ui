@@ -1,6 +1,5 @@
 @use "sass:color";
 
-@use "../../theme/colors";
 @use "../../theme/radii";
 @use "../../theme/typography";
 @use "../../theme/spaces";
@@ -13,7 +12,7 @@
   justify-content: center;
   align-items: center;
 
-  border-radius: radii.$ui-radii-base;
+  border-radius: radii.$ui-radii-sm;
   font-weight: typography.$ui-font-weight-semibold;
   line-height: typography.$ui-line-height-none;
   text-decoration: none;
@@ -28,14 +27,14 @@
   }
 
   &:focus-visible {
-    outline: colors.$ui-color-primary-600 solid 2px;
+    outline: var(--ui-color-primary-600) solid 2px;
     outline-offset: 2px;
   }
 
   &:not(.btn--loading):disabled {
     border: 1px solid transparent;
-    background-color: colors.$ui-color-neutral-200;
-    color: colors.$ui-color-neutral-500;
+    background-color: var(--ui-color-neutral-100);
+    color: var(--ui-color-neutral-300);
     cursor: not-allowed;
   }
 
@@ -120,14 +119,7 @@
 }
 
 .btn--md {
-  @include btn-size(
-    42px,
-    0 22px,
-    typography.$ui-font-size-base,
-    30px,
-    0 10px,
-    spaces.$ui-space-1-5
-  );
+  @include btn-size(42px, 0 22px, typography.$ui-font-size-md, 30px, 0 10px, spaces.$ui-space-1-5);
 }
 
 .btn--lg {
@@ -138,28 +130,59 @@
   @include btn-size(60px, 0 32px, typography.$ui-font-size-xl, 40px, 0 14px, spaces.$ui-space-2);
 }
 
+/* Radius
+ * ------------------------------------------*/
+
+.btn--radius-none {
+  border-radius: radii.$ui-radii-none;
+}
+
+.btn--radius-xs {
+  border-radius: radii.$ui-radii-xs;
+}
+
+.btn--radius-sm {
+  border-radius: radii.$ui-radii-sm;
+}
+
+.btn--radius-md {
+  border-radius: radii.$ui-radii-md;
+}
+
+.btn--radius-lg {
+  border-radius: radii.$ui-radii-lg;
+}
+
+.btn--radius-xl {
+  border-radius: radii.$ui-radii-xl;
+}
+
+.btn--radius-full {
+  border-radius: radii.$ui-radii-full;
+}
+
 /* Variant : Default
  * ------------------------------------------*/
 
 .btn--default {
-  border: 1px solid colors.$ui-color-neutral-400;
+  border: 1px solid var(--ui-color-neutral-400);
   background-color: white;
-  color: colors.$ui-color-dark-900;
+  color: var(--ui-color-dark-900);
 
   &:not(:disabled):hover {
-    background-color: colors.$ui-color-neutral-50;
+    background-color: var(--ui-color-neutral-50);
   }
 }
 
 /* Variant : Filled
  * ------------------------------------------*/
 
-@mixin btn-filled-color($color-name, $bg-color, $bg-color-hover) {
+@mixin btn-filled-color($color-name) {
   &.btn--#{$color-name} {
-    background-color: $bg-color;
+    background-color: var(--ui-color-#{$color-name}-500);
 
     &:not(:disabled):hover {
-      background-color: $bg-color-hover;
+      background-color: var(--ui-color-#{$color-name}-600);
     }
   }
 }
@@ -168,26 +191,26 @@
   border: 1px solid transparent;
   color: white;
 
-  @include btn-filled-color("primary", colors.$ui-color-primary-600, colors.$ui-color-primary-700);
-  @include btn-filled-color("dark", colors.$ui-color-dark-600, colors.$ui-color-dark-700);
-  @include btn-filled-color("neutral", colors.$ui-color-neutral-600, colors.$ui-color-neutral-700);
-  @include btn-filled-color("success", colors.$ui-color-success-600, colors.$ui-color-success-700);
-  @include btn-filled-color("info", colors.$ui-color-info-600, colors.$ui-color-info-700);
-  @include btn-filled-color("warning", colors.$ui-color-warning-600, colors.$ui-color-warning-700);
-  @include btn-filled-color("danger", colors.$ui-color-danger-600, colors.$ui-color-danger-700);
+  @include btn-filled-color("primary");
+  @include btn-filled-color("dark");
+  @include btn-filled-color("neutral");
+  @include btn-filled-color("success");
+  @include btn-filled-color("info");
+  @include btn-filled-color("warning");
+  @include btn-filled-color("danger");
 }
 
 /* Variant : Light
  * ------------------------------------------*/
 
-@mixin btn-light-color($color-name, $text-color, $bg-color, $bg-color-hover) {
+@mixin btn-light-color($color-name) {
   &.btn--#{$color-name} {
-    background-color: $bg-color;
-    color: $text-color;
+    background-color: var(--ui-color-#{$color-name}-50);
+    color: var(--ui-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: color.rgba($bg-color-hover, 0.65);
-      background-color: color.adjust($bg-color-hover, $alpha: -0.35);
+      //background-color: color.rgba(var(--ui-color-#{$color-name}-100), 0.65);
+      background-color: var(--ui-color-#{$color-name}-100);
     }
   }
 }
@@ -195,68 +218,27 @@
 .btn--light {
   border: 1px solid transparent;
 
-  @include btn-light-color(
-    "primary",
-    colors.$ui-color-primary-700,
-    colors.$ui-color-primary-50,
-    colors.$ui-color-primary-100
-  );
-
-  @include btn-light-color(
-    "dark",
-    colors.$ui-color-dark-900,
-    colors.$ui-color-dark-50,
-    colors.$ui-color-dark-100
-  );
-
-  @include btn-light-color(
-    "neutral",
-    colors.$ui-color-neutral-700,
-    colors.$ui-color-neutral-50,
-    colors.$ui-color-neutral-100
-  );
-
-  @include btn-light-color(
-    "success",
-    colors.$ui-color-success-700,
-    colors.$ui-color-success-50,
-    colors.$ui-color-success-100
-  );
-
-  @include btn-light-color(
-    "info",
-    colors.$ui-color-info-700,
-    colors.$ui-color-info-50,
-    colors.$ui-color-info-100
-  );
-
-  @include btn-light-color(
-    "warning",
-    colors.$ui-color-warning-700,
-    colors.$ui-color-warning-50,
-    colors.$ui-color-warning-100
-  );
-
-  @include btn-light-color(
-    "danger",
-    colors.$ui-color-danger-700,
-    colors.$ui-color-danger-50,
-    colors.$ui-color-danger-100
-  );
+  @include btn-light-color("primary");
+  @include btn-light-color("dark");
+  @include btn-light-color("neutral");
+  @include btn-light-color("success");
+  @include btn-light-color("info");
+  @include btn-light-color("warning");
+  @include btn-light-color("danger");
 }
 
 /* Variant : Outline & Dashed
  * ------------------------------------------*/
 
-@mixin btn-outline-color($color-name, $text-bg-color, $bg-color-hover) {
+@mixin btn-outline-color($color-name) {
   &.btn--#{$color-name} {
-    //border-color: color.rgba($text-bg-color, 0.75);
-    border-color: color.adjust($text-bg-color, $alpha: -0.25);
-    color: $text-bg-color;
+    //border-color: rgba(var(--ui-color-#{$color-name}-700), 0.75);
+    border-color: var(--ui-color-#{$color-name}-600);
+    color: var(--ui-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: color.rgba($bg-color-hover, 0.35);
-      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+      //background-color: rgba(var(--ui-color-#{$color-name}-50), 0.35);
+      background-color: var(--ui-color-#{$color-name}-50);
     }
   }
 }
@@ -274,25 +256,25 @@
   border-width: 1px;
   background-color: transparent;
 
-  @include btn-outline-color("primary", colors.$ui-color-primary-700, colors.$ui-color-primary-50);
-  @include btn-outline-color("dark", colors.$ui-color-dark-700, colors.$ui-color-dark-50);
-  @include btn-outline-color("neutral", colors.$ui-color-neutral-700, colors.$ui-color-neutral-50);
-  @include btn-outline-color("success", colors.$ui-color-success-700, colors.$ui-color-success-50);
-  @include btn-outline-color("info", colors.$ui-color-info-700, colors.$ui-color-info-50);
-  @include btn-outline-color("warning", colors.$ui-color-warning-700, colors.$ui-color-warning-50);
-  @include btn-outline-color("danger", colors.$ui-color-danger-700, colors.$ui-color-danger-50);
+  @include btn-outline-color("primary");
+  @include btn-outline-color("dark");
+  @include btn-outline-color("neutral");
+  @include btn-outline-color("success");
+  @include btn-outline-color("info");
+  @include btn-outline-color("warning");
+  @include btn-outline-color("danger");
 }
 
 /* Variant : Text
  * ------------------------------------------*/
 
-@mixin btn-text-color($color-name, $text-color, $bg-color-hover) {
+@mixin btn-text-color($color-name) {
   &.btn--#{$color-name} {
-    color: $text-color;
+    color: var(--ui-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: color.rgba($bg-color-hover, 0.35);
-      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+      //background-color: rgba(var(--ui-color-#{$color-name}-50), 0.35);
+      background-color: var(--ui-color-#{$color-name}-50);
     }
   }
 }
@@ -301,11 +283,11 @@
   border: 1px solid transparent;
   background-color: transparent;
 
-  @include btn-text-color("primary", colors.$ui-color-primary-700, colors.$ui-color-primary-50);
-  @include btn-text-color("dark", colors.$ui-color-dark-700, colors.$ui-color-dark-50);
-  @include btn-text-color("neutral", colors.$ui-color-neutral-700, colors.$ui-color-neutral-50);
-  @include btn-text-color("success", colors.$ui-color-success-700, colors.$ui-color-success-50);
-  @include btn-text-color("info", colors.$ui-color-info-700, colors.$ui-color-info-50);
-  @include btn-text-color("warning", colors.$ui-color-warning-700, colors.$ui-color-warning-50);
-  @include btn-text-color("danger", colors.$ui-color-danger-700, colors.$ui-color-danger-50);
+  @include btn-text-color("primary");
+  @include btn-text-color("dark");
+  @include btn-text-color("neutral");
+  @include btn-text-color("success");
+  @include btn-text-color("info");
+  @include btn-text-color("warning");
+  @include btn-text-color("danger");
 }

@@ -1,4 +1,3 @@
-@use "./colors";
 @use "./typography";
 
 /* Credits : https://www.joshwcomeau.com/css/custom-css-reset/ & https://tailwindcss.com/docs/preflight. */
@@ -23,7 +22,7 @@ body {
 
 /* Use theme `sans` font-family, line-height & dark color for text. */
 html {
-  color: colors.$ui-color-dark-900;
+  color: var(--ui-color-dark-900);
   font-family: typography.$ui-font-sans;
   line-height: typography.$ui-line-height-base;
   font-size: 16px;
@@ -72,9 +71,6 @@ ul {
 
 /* Improve media defaults. */
 img,
-picture,
-video,
-canvas,
 svg {
   display: block;
   max-width: 100%;
