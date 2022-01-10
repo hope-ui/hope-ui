@@ -13,6 +13,15 @@ export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
 type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
+ * All SolidJS props that apply css classes.
+ */
+type ClassProps = {
+  class?: string;
+  className?: string;
+  classList?: { [key: string]: boolean };
+};
+
+/**
  * The `as` props is an override of the default HTML tag.
  * Can also be another SolidJS component.
  */
@@ -25,24 +34,26 @@ type AsProp<C extends ElementType> = {
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps &
-  Omit<ExtendedProps, keyof OverrideProps>;
+type ExtendableProps<
+  ExtendedProps = Record<string, unknown>,
+  OverrideProps = Record<string, unknown>
+> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
 
 /**
  * Allows for inheriting the props from the specified element type so that
  * props like children, className & style work, as well as element-specific
  * attributes like aria roles. The component (`C`) must be passed in.
  */
-type InheritableElementProps<C extends ElementType, Props = {}> = ExtendableProps<
-  PropsOf<C>,
-  Props
->;
+type InheritableElementProps<
+  C extends ElementType,
+  Props = Record<string, unknown>
+> = ExtendableProps<PropsOf<C>, Props>;
 
 /**
  * A more sophisticated version of `InheritableElementProps` where
  * the passed in `as` prop will determine which props can be included
  */
-type PolymorphicComponentProps<C extends ElementType, Props = {}> = InheritableElementProps<
-  C,
-  Props & AsProp<C>
->;
+export type PolymorphicComponentProps<
+  C extends ElementType,
+  Props = Record<string, unknown>
+> = InheritableElementProps<C, Props & AsProp<C> & ClassProps>;

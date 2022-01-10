@@ -1,0 +1,311 @@
+@use "sass:color";
+
+@use "../../theme/colors";
+@use "../../theme/radii";
+@use "../../theme/typography";
+@use "../../theme/spaces";
+
+.btn {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: radii.$ui-radii-base;
+  font-weight: typography.$ui-font-weight-semibold;
+  line-height: typography.$ui-line-height-none;
+  text-decoration: none;
+
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: color 250ms, background-color 250ms;
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: colors.$ui-color-primary-600 solid 2px;
+    outline-offset: 2px;
+  }
+
+  &:not(.btn--loading):disabled {
+    border: 1px solid transparent;
+    background-color: colors.$ui-color-neutral-200;
+    color: colors.$ui-color-neutral-500;
+    cursor: not-allowed;
+  }
+
+  &.btn--loading:disabled {
+    opacity: 0.75;
+    cursor: default;
+  }
+}
+
+/* Content
+ * ------------------------------------------*/
+
+.btn__content {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  &.btn__content--hidden {
+    opacity: 0;
+  }
+
+  & svg {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
+.btn--compact .btn__content svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Loading state
+ * ------------------------------------------*/
+
+.btn__loading-content {
+  position: absolute;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  & svg {
+    width: 1.5em;
+    height: 1.5em;
+  }
+}
+
+.btn--compact .btn__loading-content svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* Sizes
+ * ------------------------------------------*/
+
+@mixin btn-size($height, $padding, $font-size, $compact-height, $compact-padding, $spacing) {
+  height: $height;
+  padding: $padding;
+  font-size: $font-size;
+
+  &.btn--compact {
+    height: $compact-height;
+    padding: $compact-padding;
+  }
+
+  & .btn__content > * + *,
+  & .btn__loading-content > * + * {
+    margin-left: $spacing;
+  }
+}
+
+.btn--xs {
+  @include btn-size(30px, 0 14px, typography.$ui-font-size-xs, 22px, 0 7px, spaces.$ui-space-1);
+}
+
+.btn--sm {
+  @include btn-size(36px, 0 18px, typography.$ui-font-size-sm, 26px, 0 8px, spaces.$ui-space-1-5);
+}
+
+.btn--md {
+  @include btn-size(
+    42px,
+    0 22px,
+    typography.$ui-font-size-base,
+    30px,
+    0 10px,
+    spaces.$ui-space-1-5
+  );
+}
+
+.btn--lg {
+  @include btn-size(50px, 0 26px, typography.$ui-font-size-lg, 34px, 0 12px, spaces.$ui-space-2);
+}
+
+.btn--xl {
+  @include btn-size(60px, 0 32px, typography.$ui-font-size-xl, 40px, 0 14px, spaces.$ui-space-2);
+}
+
+/* Variant : Default
+ * ------------------------------------------*/
+
+.btn--default {
+  border: 1px solid colors.$ui-color-neutral-400;
+  background-color: white;
+  color: colors.$ui-color-dark-900;
+
+  &:not(:disabled):hover {
+    background-color: colors.$ui-color-neutral-50;
+  }
+}
+
+/* Variant : Filled
+ * ------------------------------------------*/
+
+@mixin btn-filled-color($color-name, $bg-color, $bg-color-hover) {
+  &.btn--#{$color-name} {
+    background-color: $bg-color;
+
+    &:not(:disabled):hover {
+      background-color: $bg-color-hover;
+    }
+  }
+}
+
+.btn--filled {
+  border: 1px solid transparent;
+  color: white;
+
+  @include btn-filled-color("primary", colors.$ui-color-primary-600, colors.$ui-color-primary-700);
+  @include btn-filled-color("dark", colors.$ui-color-dark-600, colors.$ui-color-dark-700);
+  @include btn-filled-color("neutral", colors.$ui-color-neutral-600, colors.$ui-color-neutral-700);
+  @include btn-filled-color("success", colors.$ui-color-success-600, colors.$ui-color-success-700);
+  @include btn-filled-color("info", colors.$ui-color-info-600, colors.$ui-color-info-700);
+  @include btn-filled-color("warning", colors.$ui-color-warning-600, colors.$ui-color-warning-700);
+  @include btn-filled-color("danger", colors.$ui-color-danger-600, colors.$ui-color-danger-700);
+}
+
+/* Variant : Light
+ * ------------------------------------------*/
+
+@mixin btn-light-color($color-name, $text-color, $bg-color, $bg-color-hover) {
+  &.btn--#{$color-name} {
+    background-color: $bg-color;
+    color: $text-color;
+
+    &:not(:disabled):hover {
+      //background-color: color.rgba($bg-color-hover, 0.65);
+      background-color: color.adjust($bg-color-hover, $alpha: -0.35);
+    }
+  }
+}
+
+.btn--light {
+  border: 1px solid transparent;
+
+  @include btn-light-color(
+    "primary",
+    colors.$ui-color-primary-700,
+    colors.$ui-color-primary-50,
+    colors.$ui-color-primary-100
+  );
+
+  @include btn-light-color(
+    "dark",
+    colors.$ui-color-dark-900,
+    colors.$ui-color-dark-50,
+    colors.$ui-color-dark-100
+  );
+
+  @include btn-light-color(
+    "neutral",
+    colors.$ui-color-neutral-700,
+    colors.$ui-color-neutral-50,
+    colors.$ui-color-neutral-100
+  );
+
+  @include btn-light-color(
+    "success",
+    colors.$ui-color-success-700,
+    colors.$ui-color-success-50,
+    colors.$ui-color-success-100
+  );
+
+  @include btn-light-color(
+    "info",
+    colors.$ui-color-info-700,
+    colors.$ui-color-info-50,
+    colors.$ui-color-info-100
+  );
+
+  @include btn-light-color(
+    "warning",
+    colors.$ui-color-warning-700,
+    colors.$ui-color-warning-50,
+    colors.$ui-color-warning-100
+  );
+
+  @include btn-light-color(
+    "danger",
+    colors.$ui-color-danger-700,
+    colors.$ui-color-danger-50,
+    colors.$ui-color-danger-100
+  );
+}
+
+/* Variant : Outline & Dashed
+ * ------------------------------------------*/
+
+@mixin btn-outline-color($color-name, $text-bg-color, $bg-color-hover) {
+  &.btn--#{$color-name} {
+    //border-color: color.rgba($text-bg-color, 0.75);
+    border-color: color.adjust($text-bg-color, $alpha: -0.25);
+    color: $text-bg-color;
+
+    &:not(:disabled):hover {
+      //background-color: color.rgba($bg-color-hover, 0.35);
+      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+    }
+  }
+}
+
+.btn--outline {
+  border-style: solid;
+}
+
+.btn--dashed {
+  border-style: dashed;
+}
+
+.btn--outline,
+.btn--dashed {
+  border-width: 1px;
+  background-color: transparent;
+
+  @include btn-outline-color("primary", colors.$ui-color-primary-700, colors.$ui-color-primary-50);
+  @include btn-outline-color("dark", colors.$ui-color-dark-700, colors.$ui-color-dark-50);
+  @include btn-outline-color("neutral", colors.$ui-color-neutral-700, colors.$ui-color-neutral-50);
+  @include btn-outline-color("success", colors.$ui-color-success-700, colors.$ui-color-success-50);
+  @include btn-outline-color("info", colors.$ui-color-info-700, colors.$ui-color-info-50);
+  @include btn-outline-color("warning", colors.$ui-color-warning-700, colors.$ui-color-warning-50);
+  @include btn-outline-color("danger", colors.$ui-color-danger-700, colors.$ui-color-danger-50);
+}
+
+/* Variant : Text
+ * ------------------------------------------*/
+
+@mixin btn-text-color($color-name, $text-color, $bg-color-hover) {
+  &.btn--#{$color-name} {
+    color: $text-color;
+
+    &:not(:disabled):hover {
+      //background-color: color.rgba($bg-color-hover, 0.35);
+      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+    }
+  }
+}
+
+.btn--text {
+  border: 1px solid transparent;
+  background-color: transparent;
+
+  @include btn-text-color("primary", colors.$ui-color-primary-700, colors.$ui-color-primary-50);
+  @include btn-text-color("dark", colors.$ui-color-dark-700, colors.$ui-color-dark-50);
+  @include btn-text-color("neutral", colors.$ui-color-neutral-700, colors.$ui-color-neutral-50);
+  @include btn-text-color("success", colors.$ui-color-success-700, colors.$ui-color-success-50);
+  @include btn-text-color("info", colors.$ui-color-info-700, colors.$ui-color-info-50);
+  @include btn-text-color("warning", colors.$ui-color-warning-700, colors.$ui-color-warning-50);
+  @include btn-text-color("danger", colors.$ui-color-danger-700, colors.$ui-color-danger-50);
+}
