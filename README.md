@@ -1,3 +1,3 @@
-# uipiece-solid
+# hope-ui-solid
 
-UI Pieces for your SolidJS Applications.
+The utopic component library for your SolidJS Applications.

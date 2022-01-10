@@ -1,16 +1,17 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useTheme } from "@/lib/contexts/UIPieceContext";
-import type { ElementType, PolymorphicComponentProps, UIColor, UISize } from "@/lib/utils/types";
+import { useTheme } from "@/lib/contexts/HopeContext";
+import type { SemanticColor, SemanticSize } from "@/lib/theme/theme";
+import type { ElementType, PolymorphicComponentProps } from "@/lib/utils/types";
 
-import type { UIButtonVariant } from "./types";
+export type ButtonVariant = "filled" | "light" | "outline" | "dashed" | "text" | "default";
 
 export type ThemableButtonOptions = {
-  variant?: UIButtonVariant;
-  color?: UIColor;
-  size?: UISize;
-  radius?: UISize | "none" | "full";
+  variant?: ButtonVariant;
+  color?: SemanticColor;
+  size?: SemanticSize;
+  radius?: SemanticSize | "none" | "full";
   compact?: boolean;
 };
 
@@ -23,18 +24,18 @@ export type ButtonOptions = ThemableButtonOptions & {
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
 
 export default function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useTheme();
+  const buttonTheme = useTheme().components?.Button;
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",
     class: "",
     className: "",
     classList: {},
-    variant: theme.components?.Button?.variant ?? "filled",
-    color: theme.components?.Button?.color ?? "primary",
-    size: theme.components?.Button?.size ?? "sm",
-    radius: theme.components?.Button?.radius ?? "sm",
-    compact: theme.components?.Button?.compact ?? false,
+    variant: buttonTheme?.variant ?? "filled",
+    color: buttonTheme?.color ?? "primary",
+    size: buttonTheme?.size ?? "sm",
+    radius: buttonTheme?.radius ?? "sm",
+    compact: buttonTheme?.compact ?? false,
     loading: false,
     disabled: false,
   };

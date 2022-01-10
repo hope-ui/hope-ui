@@ -3,26 +3,26 @@ import { createStore } from "solid-js/store";
 
 import { defaultTheme, setColorsCSSVariables, Theme } from "../theme/theme";
 
-export interface UIPieceContextValue {
+interface HopeContextValue {
   theme: Theme;
 }
 
-export const UIPieceContext = createContext<UIPieceContextValue>({ theme: defaultTheme });
+const HopeContext = createContext<HopeContextValue>({ theme: defaultTheme });
 
-export type UIPieceProviderProps = {
+export type HopeProviderProps = {
   theme?: Theme;
   children: JSX.Element;
 };
 
-export function UIPieceProvider(props: UIPieceProviderProps) {
+export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
   const [state] = createStore({ theme: propsWithDefault.theme });
 
   setColorsCSSVariables(state.theme.colors);
 
-  return <UIPieceContext.Provider value={state}>{props.children}</UIPieceContext.Provider>;
+  return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }
 
 export function useTheme() {
-  return useContext(UIPieceContext).theme;
+  return useContext(HopeContext).theme;
 }

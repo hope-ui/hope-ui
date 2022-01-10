@@ -1,12 +1,12 @@
 import Button from "./lib/components/Button/Button";
-import { UIPieceProvider } from "./lib/contexts/UIPieceContext";
+import { HopeProvider } from "./lib/contexts/HopeContext";
 import { extendTheme } from "./lib/theme/theme";
 
 const customTheme = extendTheme({});
 
 export default function App() {
   return (
-    <UIPieceProvider theme={customTheme}>
+    <HopeProvider theme={customTheme}>
       <div>
         <Button color="primary" variant="filled">
           Button
@@ -128,6 +128,6 @@ export default function App() {
       </div>
 
       <Button disabled>Button</Button>
-    </UIPieceProvider>
+    </HopeProvider>
   );
 }

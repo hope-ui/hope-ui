@@ -2,7 +2,7 @@ import merge from "lodash.merge";
 
 import { ThemableButtonOptions } from "../components/Button/Button";
 
-export interface ThemableColor {
+export interface ColorPalette {
   50: string;
   100: string;
   200: string;
@@ -15,14 +15,14 @@ export interface ThemableColor {
   900: string;
 }
 
-export interface ThemableColorPalette {
-  primary?: ThemableColor;
-  dark?: ThemableColor;
-  neutral?: ThemableColor;
-  success?: ThemableColor;
-  info?: ThemableColor;
-  warning?: ThemableColor;
-  danger?: ThemableColor;
+export interface ThemableColors {
+  primary?: ColorPalette;
+  dark?: ColorPalette;
+  neutral?: ColorPalette;
+  success?: ColorPalette;
+  info?: ColorPalette;
+  warning?: ColorPalette;
+  danger?: ColorPalette;
 }
 
 export interface ThemableComponents {
@@ -30,11 +30,15 @@ export interface ThemableComponents {
 }
 
 export interface Theme {
-  colors?: ThemableColorPalette;
+  colors?: ThemableColors;
   components?: ThemableComponents;
 }
 
-const defaultColorPalette: Required<ThemableColorPalette> = {
+export type SemanticColor = keyof ThemableColors;
+
+export type SemanticSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+const defaultColors: Required<ThemableColors> = {
   primary: {
     50: "#eef2ff",
     100: "#e0e7ff",
@@ -122,18 +126,18 @@ const defaultColorPalette: Required<ThemableColorPalette> = {
 };
 
 export const defaultTheme: Theme = {
-  colors: defaultColorPalette,
+  colors: defaultColors,
 };
 
 export function extendTheme(themeOverride: Theme): Theme {
   return merge(defaultTheme, themeOverride);
 }
 
-export function setColorsCSSVariables(colors: ThemableColorPalette = defaultColorPalette) {
+export function setColorsCSSVariables(colors: ThemableColors = defaultColors) {
   const root = document.documentElement;
 
   for (const [colorKey, colorValue] of Object.entries(colors)) {
-    for (const [key, value] of Object.entries(colorValue as ThemableColor)) {
+    for (const [key, value] of Object.entries(colorValue as ColorPalette)) {
       root.style.setProperty(`--ui-color-${colorKey}-${key}`, value);
     }
   }

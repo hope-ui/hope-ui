@@ -1,7 +1,7 @@
 {
-  "name": "uipiece",
+  "name": "hope-ui-solid",
   "version": "0.0.1",
-  "description": "UI Pieces for your SolidJS Applications",
+  "description": "The utopic component library for your SolidJS Applications.",
   "license": "MIT",
   "scripts": {
     "build": "npm run typecheck && vite build",

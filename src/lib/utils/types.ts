@@ -57,10 +57,3 @@ export type PolymorphicComponentProps<
   C extends ElementType,
   Props = Record<string, unknown>
 > = InheritableElementProps<C, Props & AsProp<C> & ClassProps>;
-
-/*
- * UI specific types
- * ----------------------------------------- */
-
-export type UIColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
-export type UISize = "xs" | "sm" | "md" | "lg" | "xl";
