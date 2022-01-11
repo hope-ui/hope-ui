@@ -29,7 +29,8 @@
     }
   },
   "dependencies": {
-    "lodash.merge": "^4.6.2"
+    "lodash.merge": "^4.6.2",
+    "modern-normalize": "^1.1.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
