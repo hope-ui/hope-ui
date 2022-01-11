@@ -1,9 +1,25 @@
 import merge from "lodash.merge";
 
-import type { Theme } from "./types";
+import type { ThemeableButtonOptions } from "../components/Button/Button";
 
-export const defaultTheme: Theme = {};
+export type HopeColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
 
-export function extendTheme(themeOverride: Theme): Theme {
+export type HopeSize = "xs" | "sm" | "md" | "lg" | "xl";
+
+export type HopeXPosition = "left" | "right";
+
+export type HopeYPosition = "top" | "bottom";
+
+export interface ComponentsDefaultProps {
+  Button?: ThemeableButtonOptions;
+}
+
+export interface HopeTheme {
+  components?: ComponentsDefaultProps;
+}
+
+export const defaultTheme: HopeTheme = {};
+
+export function extendTheme(themeOverride: HopeTheme): HopeTheme {
   return merge(defaultTheme, themeOverride);
 }
