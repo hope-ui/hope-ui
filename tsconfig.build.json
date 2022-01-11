@@ -8,5 +8,5 @@
     "declarationDir": "dist"
   },
   "include": ["src/**/*", "src/**/*.tsx"],
-  "exclude": ["**/*.spec.ts", "**/*.stories.ts", "src/playground/**/*"]
+  "exclude": ["**/*.spec.ts", "**/*.stories.ts"]
 }

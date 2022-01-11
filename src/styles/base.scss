@@ -1,14 +1,8 @@
 @use "modern-normalize/modern-normalize.css";
 
 /* Theme variables */
-@use "./variables/breakpoints";
 @use "./variables/colors";
-@use "./variables/radii";
-@use "./variables/shadows";
-@use "./variables/sizes";
-@use "./variables/spaces";
 @use "./variables/typography";
-@use "./variables/z-indices";
 
 /* Common utilities */
 @use "./common/animations";

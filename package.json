@@ -22,8 +22,7 @@
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
   "sideEffects": [
-    "*.scss",
-    "*.css"
+    "*.scss"
   ],
   "exports": {
     ".": {
@@ -41,11 +40,9 @@
   "scripts": {
     "build": "vite build",
     "commit": "git-cz",
-    "dev": "vite",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",
-    "serve": "npm run build && vite preview --port 3000",
     "typecheck": "tsc"
   },
   "lint-staged": {
