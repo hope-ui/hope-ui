@@ -1,8 +1,8 @@
 import { createSignal, JSX } from "solid-js";
 
-import Button from "./lib/components/Button/Button";
-import { HopeProvider } from "./lib/contexts/HopeContext";
-import { extendTheme } from "./lib/theme";
+import { Button } from "../components/Button/Button";
+import { HopeProvider } from "../contexts/HopeContext";
+import { extendTheme } from "../theme";
 
 const customTheme = extendTheme({
   components: {

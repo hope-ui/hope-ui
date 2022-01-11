@@ -4,11 +4,11 @@ import { createStore } from "solid-js/store";
 import { defaultTheme } from "../theme";
 import type { Theme } from "../theme/types";
 
-interface HopeContextValue {
+export interface HopeContextValue {
   theme: Theme;
 }
 
-const HopeContext = createContext<HopeContextValue>({ theme: defaultTheme });
+export const HopeContext = createContext<HopeContextValue>({ theme: defaultTheme });
 
 export type HopeProviderProps = {
   theme?: Theme;

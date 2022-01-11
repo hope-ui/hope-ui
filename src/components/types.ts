@@ -10,12 +10,12 @@ export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
+export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
  * All SolidJS props that apply css classes.
  */
-type ClassProps = {
+export type ClassProps = {
   class?: string;
   className?: string;
   classList?: { [key: string]: boolean };
@@ -25,7 +25,7 @@ type ClassProps = {
  * The `as` props is an override of the default HTML tag.
  * Can also be another SolidJS component.
  */
-type AsProp<C extends ElementType> = {
+export type AsProp<C extends ElementType> = {
   as?: C;
 };
 
@@ -34,7 +34,7 @@ type AsProp<C extends ElementType> = {
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-type ExtendableProps<
+export type ExtendableProps<
   ExtendedProps = Record<string, unknown>,
   OverrideProps = Record<string, unknown>
 > = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
@@ -44,7 +44,7 @@ type ExtendableProps<
  * props like children, className & style work, as well as element-specific
  * attributes like aria roles. The component (`C`) must be passed in.
  */
-type InheritableElementProps<
+export type InheritableElementProps<
   C extends ElementType,
   Props = Record<string, unknown>
 > = ExtendableProps<PropsOf<C>, Props>;

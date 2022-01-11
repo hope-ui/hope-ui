@@ -1,6 +1,6 @@
 // Font famillies
 $font-sans: (
-  sans-serif,
+  ui-sans-serif,
   system-ui,
   -apple-system,
   BlinkMacSystemFont,
@@ -16,10 +16,10 @@ $font-sans: (
   "Noto Color Emoji"
 ) !default;
 
-$font-serif: (serif, Georgia, Cambria, "Times New Roman", Times, serif) !default;
+$font-serif: (ui-serif, Georgia, Cambria, "Times New Roman", Times, serif) !default;
 
 $font-mono: (
-  monospace,
+  ui-monospace,
   SFMono-Regular,
   Menlo,
   Monaco,

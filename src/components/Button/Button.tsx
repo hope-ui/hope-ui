@@ -1,9 +1,9 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useTheme } from "@/lib/contexts/HopeContext";
-import { IconSpinner } from "@/lib/icons/IconSpinner";
-import type { SemanticColor, SemanticPosition, SemanticSize } from "@/lib/theme/types";
+import { useTheme } from "@/contexts/HopeContext";
+import { IconSpinner } from "@/icons/IconSpinner";
+import type { SemanticColor, SemanticPosition, SemanticSize } from "@/theme/types";
 
 import type { ElementType, PolymorphicComponentProps } from "../types";
 
@@ -29,7 +29,7 @@ export type ButtonOptions = ThemeableButtonOptions & {
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
 
-export default function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
+export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
   const buttonTheme = useTheme().components?.Button;
 
   const defaultProps: ButtonProps<"button"> = {
