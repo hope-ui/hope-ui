@@ -2,22 +2,28 @@ import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useTheme } from "@/lib/contexts/HopeContext";
-import type { SemanticColor, SemanticSize } from "@/lib/theme/theme";
-import type { ElementType, PolymorphicComponentProps } from "@/lib/utils/types";
+import { IconSpinner } from "@/lib/icons/IconSpinner";
+import type { SemanticColor, SemanticPosition, SemanticSize } from "@/lib/theme/types";
+
+import type { ElementType, PolymorphicComponentProps } from "../types";
 
 export type ButtonVariant = "filled" | "light" | "outline" | "dashed" | "text" | "default";
 
-export type ThemableButtonOptions = {
+export type ThemeableButtonOptions = {
   variant?: ButtonVariant;
   color?: SemanticColor;
   size?: SemanticSize;
   radius?: SemanticSize | "none" | "full";
+  loaderPosition?: SemanticPosition;
   compact?: boolean;
+  uppercase?: boolean;
 };
 
-export type ButtonOptions = ThemableButtonOptions & {
+export type ButtonOptions = ThemeableButtonOptions & {
   loading?: boolean;
   disabled?: boolean;
+  leftIcon?: JSX.Element;
+  rightIcon?: JSX.Element;
   children?: JSX.Element;
 };
 
@@ -35,7 +41,9 @@ export default function Button<C extends ElementType = "button">(props: ButtonPr
     color: buttonTheme?.color ?? "primary",
     size: buttonTheme?.size ?? "sm",
     radius: buttonTheme?.radius ?? "sm",
+    loaderPosition: buttonTheme?.loaderPosition ?? "left",
     compact: buttonTheme?.compact ?? false,
+    uppercase: buttonTheme?.uppercase ?? false,
     loading: false,
     disabled: false,
   };
@@ -44,43 +52,75 @@ export default function Button<C extends ElementType = "button">(props: ButtonPr
   const [local, others] = splitProps(propsWithDefault, [
     "as",
     "class",
-    "classList",
     "className",
+    "classList",
     "variant",
     "color",
     "size",
     "radius",
+    "loaderPosition",
     "compact",
+    "uppercase",
     "loading",
-    "children",
     "disabled",
+    "leftIcon",
+    "rightIcon",
+    "children",
   ]);
 
   const rootClassList = () => ({
-    btn: true,
-    "btn--compact": local.compact,
-    "btn--loading": local.loading,
-    [`btn--${local.variant}`]: true,
-    [`btn--${local.size}`]: true,
-    [`btn--radius-${local.radius}`]: true,
-    [`btn--${local.color}`]: !local.disabled && local.variant !== "default",
+    "h-btn": true,
+    "h-btn--compact": local.compact,
+    "h-btn--loading": local.loading,
+    "h-btn--uppercase": local.uppercase,
+    [`h-btn--${local.variant}`]: true,
+    [`h-btn--${local.size}`]: true,
+    [`h-btn--radius-${local.radius}`]: true,
+    [`h-btn--${local.color}`]: !local.disabled && local.variant !== "default",
     [local.class || ""]: true,
     [local.className || ""]: true,
     ...local.classList,
   });
 
+  const loadingSpinnerClassName = "h-btn__loading-icon";
+
+  const isLeftIconVisible = () => {
+    return local.leftIcon && (!local.loading || local.loaderPosition === "right");
+  };
+
+  const isRightIconVisible = () => {
+    return local.rightIcon && (!local.loading || local.loaderPosition === "left");
+  };
+
+  const isLoadingSpinnerLeftVisible = () => {
+    return local.loading && !local.disabled && local.loaderPosition === "left";
+  };
+
+  const isLoadingSpinnerRightVisible = () => {
+    return local.loading && !local.disabled && local.loaderPosition === "right";
+  };
+
+  const shouldWrapChildrenInSpan = () => {
+    return local.leftIcon || local.rightIcon || local.loading;
+  };
+
   return (
-    <Dynamic {...others} component={local.as} classList={rootClassList()} disabled={local.disabled}>
-      <div
-        classList={{
-          btn__content: true,
-          "btn__content--hidden": local.loading && !local.disabled,
-        }}
-      >
-        {local.children}
-      </div>
-      <Show when={local.loading && !local.disabled}>
-        <div className="btn__loading-content">Loading</div>
+    <Dynamic
+      component={local.as}
+      classList={rootClassList()}
+      disabled={local.disabled || local.loading}
+      {...others}
+    >
+      <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
+      <Show when={isLoadingSpinnerLeftVisible()}>
+        <IconSpinner className={loadingSpinnerClassName} />
+      </Show>
+      <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
+        <span>{local.children}</span>
+      </Show>
+      <Show when={isRightIconVisible()}>{local.rightIcon}</Show>
+      <Show when={isLoadingSpinnerRightVisible()}>
+        <IconSpinner className={loadingSpinnerClassName} />
       </Show>
     </Dynamic>
   );

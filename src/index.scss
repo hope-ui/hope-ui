@@ -1,5 +1,5 @@
 /* Base styles */
-@use "./lib/theme/base";
+@use "./lib/styles/base";
 
-// Components: In real usage this will be imported on demand
-@use "./lib/components/Button/Button";
+/* Components: In real usage this will be imported on demand */
+@use "./lib/styles/button";

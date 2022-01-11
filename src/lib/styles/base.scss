@@ -1,0 +1,117 @@
+/* Theme variables */
+@use "./variables/breakpoints";
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/shadows";
+@use "./variables/sizes";
+@use "./variables/spaces";
+@use "./variables/typography";
+@use "./variables/z-indices";
+
+/* Animations */
+@use "./animations";
+
+/*
+ * Reset
+ */
+/*! hope-ui | MIT License | https://github.com/fabien-ml/hope-ui-solid */
+/*! tailwindcss | MIT License | https://tailwindcss.com */
+/*! joshwcomeau | MIT License | https://www.joshwcomeau.com/css/custom-css-reset */
+
+/* Use a more-intuitive box-sizing model. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin. */
+* {
+  margin: 0;
+}
+
+/* Allow percentage-based heights in the application. */
+html,
+body {
+  height: 100%;
+}
+
+/* 
+  1. Use theme dark color for text. 
+  2. Use theme `sans` font-family.
+  3. Use theme base line height.
+  4. Prevent adjustments of font size after orientation changes in iOS.
+*/
+html {
+  color: colors.$color-dark-900; /* 1 */
+  font-family: typography.$font-sans; /* 2 */
+  line-height: typography.$line-height-base; /* 3 */
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%; /* 4 */
+}
+
+/* Improve text rendering. */
+body {
+  font-family: inherit;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings are unstyled. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Avoid text overflows. */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 
+  Lists are unstyled.
+  Unstyled lists are not announced as lists by VoiceOver.
+  If your content is truly a list add a “list” role to the element. 
+*/
+ol,
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Improve media defaults. */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Remove built-in form typography styles. */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.5;
+}
+
+/* Buttons have a default outline */
+button:focus-visible {
+  outline: 1px dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+}

@@ -1,0 +1,313 @@
+@use "sass:color";
+
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/spaces";
+@use "./variables/typography";
+
+.h-btn {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: typography.$font-weight-semibold;
+  line-height: typography.$line-height-none;
+  text-decoration: none;
+
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: color 250ms, background-color 250ms;
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: colors.$color-primary-600 solid 2px;
+    outline-offset: 2px;
+  }
+
+  &:not(.h-btn--loading):disabled {
+    border: 1px solid transparent;
+    background-color: colors.$color-neutral-100;
+    color: colors.$color-neutral-300;
+    cursor: not-allowed;
+  }
+
+  &.h-btn--loading:disabled {
+    opacity: 0.75;
+    cursor: progress;
+  }
+
+  & svg {
+    width: 1.2em;
+    height: 1.2em;
+  }
+
+  & .h-btn__loading-icon {
+    width: 1.5em;
+    height: 1.5em;
+
+    animation: 1000ms linear infinite spin;
+  }
+}
+
+.h-btn--uppercase {
+  text-transform: uppercase;
+}
+
+/* Compact mode
+ * ------------------------------------------*/
+
+.h-btn--compact {
+  & svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  & .h-btn__loading-icon {
+    width: 1.3em;
+    height: 1.3em;
+  }
+}
+
+/* Sizes
+ * ------------------------------------------*/
+
+@mixin btn-size($height, $padding, $font-size, $compact-height, $compact-padding, $spacing) {
+  height: $height;
+  padding: $padding;
+  font-size: $font-size;
+
+  &.h-btn--compact {
+    height: $compact-height;
+    padding: $compact-padding;
+  }
+
+  & > * + * {
+    margin-left: $spacing;
+  }
+}
+
+.h-btn--xs {
+  @include btn-size(30px, 0 14px, typography.$font-size-xs, 22px, 0 7px, spaces.$space-1-5);
+}
+
+.h-btn--sm {
+  @include btn-size(36px, 0 18px, typography.$font-size-sm, 26px, 0 8px, spaces.$space-2);
+}
+
+.h-btn--md {
+  @include btn-size(42px, 0 22px, typography.$font-size-md, 30px, 0 10px, spaces.$space-2);
+}
+
+.h-btn--lg {
+  @include btn-size(50px, 0 26px, typography.$font-size-lg, 34px, 0 12px, spaces.$space-2-5);
+}
+
+.h-btn--xl {
+  @include btn-size(60px, 0 32px, typography.$font-size-xl, 40px, 0 14px, spaces.$space-2-5);
+}
+
+/* Radius
+ * ------------------------------------------*/
+
+.h-btn--radius-none {
+  border-radius: radii.$radii-none;
+}
+
+.h-btn--radius-xs {
+  border-radius: radii.$radii-xs;
+}
+
+.h-btn--radius-sm {
+  border-radius: radii.$radii-sm;
+}
+
+.h-btn--radius-md {
+  border-radius: radii.$radii-md;
+}
+
+.h-btn--radius-lg {
+  border-radius: radii.$radii-lg;
+}
+
+.h-btn--radius-xl {
+  border-radius: radii.$radii-xl;
+}
+
+.h-btn--radius-full {
+  border-radius: radii.$radii-full;
+}
+
+/* Variant : Default
+ * ------------------------------------------*/
+
+.h-btn--default {
+  border: 1px solid colors.$color-neutral-400;
+  background-color: white;
+  color: colors.$color-dark-900;
+
+  &:not(:disabled):hover {
+    background-color: colors.$color-neutral-50;
+  }
+}
+
+/* Variant : Filled
+ * ------------------------------------------*/
+
+@mixin btn-filled-color($color-name, $bg-color, $bg-color-hover) {
+  &.h-btn--#{$color-name} {
+    background-color: $bg-color;
+
+    &:not(:disabled):hover {
+      background-color: $bg-color-hover;
+    }
+  }
+}
+
+.h-btn--filled {
+  border: 1px solid transparent;
+  color: white;
+
+  @include btn-filled-color("primary", colors.$color-primary-500, colors.$color-primary-600);
+  @include btn-filled-color("dark", colors.$color-dark-500, colors.$color-dark-800);
+  @include btn-filled-color("neutral", colors.$color-neutral-500, colors.$color-neutral-600);
+  @include btn-filled-color("success", colors.$color-success-500, colors.$color-success-600);
+  @include btn-filled-color("info", colors.$color-info-500, colors.$color-info-600);
+  @include btn-filled-color("warning", colors.$color-warning-500, colors.$color-warning-600);
+  @include btn-filled-color("danger", colors.$color-danger-500, colors.$color-danger-600);
+}
+
+/* Variant : Light
+ * ------------------------------------------*/
+
+@mixin btn-light-color($color-name, $text-color, $bg-color, $bg-color-hover) {
+  &.h-btn--#{$color-name} {
+    background-color: $bg-color;
+    color: $text-color;
+
+    &:not(:disabled):hover {
+      background-color: color.adjust($bg-color-hover, $alpha: -0.25);
+    }
+  }
+}
+
+.h-btn--light {
+  border: 1px solid transparent;
+
+  @include btn-light-color(
+    "primary",
+    colors.$color-primary-600,
+    colors.$color-primary-50,
+    colors.$color-primary-100
+  );
+
+  @include btn-light-color(
+    "dark",
+    colors.$color-dark-600,
+    colors.$color-dark-50,
+    colors.$color-dark-100
+  );
+
+  @include btn-light-color(
+    "neutral",
+    colors.$color-neutral-600,
+    colors.$color-neutral-50,
+    colors.$color-neutral-100
+  );
+
+  @include btn-light-color(
+    "success",
+    colors.$color-success-600,
+    colors.$color-success-50,
+    colors.$color-success-100
+  );
+
+  @include btn-light-color(
+    "info",
+    colors.$color-info-600,
+    colors.$color-info-50,
+    colors.$color-info-100
+  );
+
+  @include btn-light-color(
+    "warning",
+    colors.$color-warning-600,
+    colors.$color-warning-50,
+    colors.$color-warning-100
+  );
+
+  @include btn-light-color(
+    "danger",
+    colors.$color-danger-600,
+    colors.$color-danger-50,
+    colors.$color-danger-100
+  );
+}
+
+/* Variant : Outline & Dashed
+ * ------------------------------------------*/
+
+@mixin btn-outline-color($color-name, $text-color, $bg-color-hover) {
+  &.h-btn--#{$color-name} {
+    border-color: color.adjust($text-color, $alpha: -0.25);
+    color: $text-color;
+
+    &:not(:disabled):hover {
+      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+    }
+  }
+}
+
+.h-btn--outline {
+  border-style: solid;
+}
+
+.h-btn--dashed {
+  border-style: dashed;
+}
+
+.h-btn--outline,
+.h-btn--dashed {
+  border-width: 1px;
+  background-color: transparent;
+
+  @include btn-outline-color("primary", colors.$color-primary-600, colors.$color-primary-50);
+  @include btn-outline-color("dark", colors.$color-dark-600, colors.$color-dark-50);
+  @include btn-outline-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
+  @include btn-outline-color("success", colors.$color-success-600, colors.$color-success-50);
+  @include btn-outline-color("info", colors.$color-info-600, colors.$color-info-50);
+  @include btn-outline-color("warning", colors.$color-warning-600, colors.$color-warning-50);
+  @include btn-outline-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+}
+
+/* Variant : Text
+ * ------------------------------------------*/
+
+@mixin btn-text-color($color-name, $text-color, $bg-color-hover) {
+  &.h-btn--#{$color-name} {
+    color: $text-color;
+
+    &:not(:disabled):hover {
+      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+    }
+  }
+}
+
+.h-btn--text {
+  border: 1px solid transparent;
+  background-color: transparent;
+
+  @include btn-text-color("primary", colors.$color-primary-600, colors.$color-primary-50);
+  @include btn-text-color("dark", colors.$color-dark-600, colors.$color-dark-50);
+  @include btn-text-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
+  @include btn-text-color("success", colors.$color-success-600, colors.$color-success-50);
+  @include btn-text-color("info", colors.$color-info-600, colors.$color-info-50);
+  @include btn-text-color("warning", colors.$color-warning-600, colors.$color-warning-50);
+  @include btn-text-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+}
