@@ -22,9 +22,9 @@ body {
 
 /* Use theme `sans` font-family, line-height & dark color for text. */
 html {
-  color: var(--ui-color-dark-900);
-  font-family: typography.$ui-font-sans;
-  line-height: typography.$ui-line-height-base;
+  color: var(--hope-color-dark-900);
+  font-family: typography.$font-sans;
+  line-height: typography.$line-height-base;
   font-size: 16px;
 }
 

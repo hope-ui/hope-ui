@@ -12,9 +12,9 @@
   justify-content: center;
   align-items: center;
 
-  border-radius: radii.$ui-radii-sm;
-  font-weight: typography.$ui-font-weight-semibold;
-  line-height: typography.$ui-line-height-none;
+  border-radius: radii.$radii-sm;
+  font-weight: typography.$font-weight-semibold;
+  line-height: typography.$line-height-none;
   text-decoration: none;
 
   cursor: pointer;
@@ -27,14 +27,14 @@
   }
 
   &:focus-visible {
-    outline: var(--ui-color-primary-600) solid 2px;
+    outline: var(--hope-color-primary-600) solid 2px;
     outline-offset: 2px;
   }
 
   &:not(.btn--loading):disabled {
     border: 1px solid transparent;
-    background-color: var(--ui-color-neutral-100);
-    color: var(--ui-color-neutral-300);
+    background-color: var(--hope-color-neutral-100);
+    color: var(--hope-color-neutral-300);
     cursor: not-allowed;
   }
 
@@ -111,66 +111,66 @@
 }
 
 .btn--xs {
-  @include btn-size(30px, 0 14px, typography.$ui-font-size-xs, 22px, 0 7px, spaces.$ui-space-1);
+  @include btn-size(30px, 0 14px, typography.$font-size-xs, 22px, 0 7px, spaces.$space-1);
 }
 
 .btn--sm {
-  @include btn-size(36px, 0 18px, typography.$ui-font-size-sm, 26px, 0 8px, spaces.$ui-space-1-5);
+  @include btn-size(36px, 0 18px, typography.$font-size-sm, 26px, 0 8px, spaces.$space-1-5);
 }
 
 .btn--md {
-  @include btn-size(42px, 0 22px, typography.$ui-font-size-md, 30px, 0 10px, spaces.$ui-space-1-5);
+  @include btn-size(42px, 0 22px, typography.$font-size-md, 30px, 0 10px, spaces.$space-1-5);
 }
 
 .btn--lg {
-  @include btn-size(50px, 0 26px, typography.$ui-font-size-lg, 34px, 0 12px, spaces.$ui-space-2);
+  @include btn-size(50px, 0 26px, typography.$font-size-lg, 34px, 0 12px, spaces.$space-2);
 }
 
 .btn--xl {
-  @include btn-size(60px, 0 32px, typography.$ui-font-size-xl, 40px, 0 14px, spaces.$ui-space-2);
+  @include btn-size(60px, 0 32px, typography.$font-size-xl, 40px, 0 14px, spaces.$space-2);
 }
 
 /* Radius
  * ------------------------------------------*/
 
 .btn--radius-none {
-  border-radius: radii.$ui-radii-none;
+  border-radius: radii.$radii-none;
 }
 
 .btn--radius-xs {
-  border-radius: radii.$ui-radii-xs;
+  border-radius: radii.$radii-xs;
 }
 
 .btn--radius-sm {
-  border-radius: radii.$ui-radii-sm;
+  border-radius: radii.$radii-sm;
 }
 
 .btn--radius-md {
-  border-radius: radii.$ui-radii-md;
+  border-radius: radii.$radii-md;
 }
 
 .btn--radius-lg {
-  border-radius: radii.$ui-radii-lg;
+  border-radius: radii.$radii-lg;
 }
 
 .btn--radius-xl {
-  border-radius: radii.$ui-radii-xl;
+  border-radius: radii.$radii-xl;
 }
 
 .btn--radius-full {
-  border-radius: radii.$ui-radii-full;
+  border-radius: radii.$radii-full;
 }
 
 /* Variant : Default
  * ------------------------------------------*/
 
 .btn--default {
-  border: 1px solid var(--ui-color-neutral-400);
+  border: 1px solid var(--hope-color-neutral-400);
   background-color: white;
-  color: var(--ui-color-dark-900);
+  color: var(--hope-color-dark-900);
 
   &:not(:disabled):hover {
-    background-color: var(--ui-color-neutral-50);
+    background-color: var(--hope-color-neutral-50);
   }
 }
 
@@ -179,10 +179,10 @@
 
 @mixin btn-filled-color($color-name) {
   &.btn--#{$color-name} {
-    background-color: var(--ui-color-#{$color-name}-500);
+    background-color: var(--hope-color-#{$color-name}-500);
 
     &:not(:disabled):hover {
-      background-color: var(--ui-color-#{$color-name}-600);
+      background-color: var(--hope-color-#{$color-name}-600);
     }
   }
 }
@@ -205,12 +205,12 @@
 
 @mixin btn-light-color($color-name) {
   &.btn--#{$color-name} {
-    background-color: var(--ui-color-#{$color-name}-50);
-    color: var(--ui-color-#{$color-name}-600);
+    background-color: var(--hope-color-#{$color-name}-50);
+    color: var(--hope-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: color.rgba(var(--ui-color-#{$color-name}-100), 0.65);
-      background-color: var(--ui-color-#{$color-name}-100);
+      //background-color: color.rgba(var(--hope-color-#{$color-name}-100), 0.65);
+      background-color: var(--hope-color-#{$color-name}-100);
     }
   }
 }
@@ -232,13 +232,13 @@
 
 @mixin btn-outline-color($color-name) {
   &.btn--#{$color-name} {
-    //border-color: rgba(var(--ui-color-#{$color-name}-700), 0.75);
-    border-color: var(--ui-color-#{$color-name}-600);
-    color: var(--ui-color-#{$color-name}-600);
+    //border-color: rgba(var(--hope-color-#{$color-name}-700), 0.75);
+    border-color: var(--hope-color-#{$color-name}-600);
+    color: var(--hope-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: rgba(var(--ui-color-#{$color-name}-50), 0.35);
-      background-color: var(--ui-color-#{$color-name}-50);
+      //background-color: rgba(var(--hope-color-#{$color-name}-50), 0.35);
+      background-color: var(--hope-color-#{$color-name}-50);
     }
   }
 }
@@ -270,11 +270,11 @@
 
 @mixin btn-text-color($color-name) {
   &.btn--#{$color-name} {
-    color: var(--ui-color-#{$color-name}-600);
+    color: var(--hope-color-#{$color-name}-600);
 
     &:not(:disabled):hover {
-      //background-color: rgba(var(--ui-color-#{$color-name}-50), 0.35);
-      background-color: var(--ui-color-#{$color-name}-50);
+      //background-color: rgba(var(--hope-color-#{$color-name}-50), 0.35);
+      background-color: var(--hope-color-#{$color-name}-50);
     }
   }
 }

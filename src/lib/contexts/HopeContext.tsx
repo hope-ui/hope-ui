@@ -1,7 +1,7 @@
 import { createContext, JSX, mergeProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { defaultTheme, setColorsCSSVariables, Theme } from "../theme/theme";
+import { addColorCSSVariablesToStyleSheet, defaultTheme, Theme } from "../theme/theme";
 
 interface HopeContextValue {
   theme: Theme;
@@ -18,7 +18,7 @@ export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
   const [state] = createStore({ theme: propsWithDefault.theme });
 
-  setColorsCSSVariables(state.theme.colors);
+  addColorCSSVariablesToStyleSheet(state.theme.colors);
 
   return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }

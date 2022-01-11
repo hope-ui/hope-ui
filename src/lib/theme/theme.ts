@@ -40,16 +40,16 @@ export type SemanticSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 const defaultColors: Required<ThemableColors> = {
   primary: {
-    50: "#eef2ff",
-    100: "#e0e7ff",
-    200: "#c7d2fe",
-    300: "#a5b4fc",
-    400: "#818cf8",
-    500: "#6366f1",
-    600: "#4f46e5",
-    700: "#4338ca",
-    800: "#3730a3",
-    900: "#312e81",
+    50: "#ecfdf5",
+    100: "#d1fae5",
+    200: "#a7f3d0",
+    300: "#6ee7b7",
+    400: "#34d399",
+    500: "#10b981",
+    600: "#059669",
+    700: "#047857",
+    800: "#065f46",
+    900: "#064e3b",
   },
   dark: {
     50: "#c1c2c5",
@@ -133,12 +133,18 @@ export function extendTheme(themeOverride: Theme): Theme {
   return merge(defaultTheme, themeOverride);
 }
 
-export function setColorsCSSVariables(colors: ThemableColors = defaultColors) {
-  const root = document.documentElement;
+export function addColorCSSVariablesToStyleSheet(colors: ThemableColors = defaultColors) {
+  const sheet = document.styleSheets[0];
+
+  const rules: string[] = [];
 
   for (const [colorKey, colorValue] of Object.entries(colors)) {
     for (const [key, value] of Object.entries(colorValue as ColorPalette)) {
-      root.style.setProperty(`--ui-color-${colorKey}-${key}`, value);
+      // Push all css variables in the array
+      rules.push(`--hope-color-${colorKey}-${key}:${value}`);
     }
   }
+
+  // Add all rules from the array separated by a `;`
+  sheet.insertRule(`:root {${rules.join(";")}}`, 0);
 }
