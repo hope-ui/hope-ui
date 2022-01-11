@@ -1,3 +1,17 @@
+/* Overrides Sass variables */
+@forward "./lib/styles/variables/colors" with (
+  $color-primary-50: #fdf2f8,
+  $color-primary-100: #fce7f3,
+  $color-primary-200: #fbcfe8,
+  $color-primary-300: #f9a8d4,
+  $color-primary-400: #f472b6,
+  $color-primary-500: #ec4899,
+  $color-primary-600: #db2777,
+  $color-primary-700: #be185d,
+  $color-primary-800: #9d174d,
+  $color-primary-900: #831843
+);
+
 /* Base styles */
 @use "./lib/styles/base";
 
