@@ -1,0 +1,12 @@
+@use "./styles/base";
+
+@use "./styles/button";
+@use "./styles/container";
+
+#root {
+  height: 100%;
+}
+
+.red-box {
+  background: red;
+}

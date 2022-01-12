@@ -23,5 +23,11 @@ export function HopeProvider(props: HopeProviderProps) {
 }
 
 export function useHopeTheme() {
-  return useContext(HopeContext).theme;
+  const context = useContext(HopeContext);
+
+  if (!context.theme) {
+    console.warn("[Hope UI]: no HopeTheme found, did you wrap your components with HopeProvider ?");
+  }
+
+  return context.theme;
 }

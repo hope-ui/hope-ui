@@ -13,6 +13,13 @@ export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
 export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
+ * The children prop allow passing others HTML element or components between a component tag
+ */
+export type ChildrenProp = {
+  children?: JSX.Element;
+};
+
+/**
  * All SolidJS props that apply css classes.
  */
 export type ClassProps = {

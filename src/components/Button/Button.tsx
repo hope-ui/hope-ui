@@ -12,9 +12,6 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",
-    class: "",
-    className: "",
-    classList: {},
     variant: buttonTheme?.variant ?? "filled",
     color: buttonTheme?.color ?? "primary",
     size: buttonTheme?.size ?? "sm",
