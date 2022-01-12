@@ -22,6 +22,6 @@ export function HopeProvider(props: HopeProviderProps) {
   return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }
 
-export function useTheme() {
+export function useHopeTheme() {
   return useContext(HopeContext).theme;
 }

@@ -1,14 +1,14 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useTheme } from "@/contexts/HopeContext";
+import { useHopeTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 
 import type { ElementType } from "../polymorphism";
 import type { ButtonProps } from "./types";
 
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const buttonTheme = useTheme().components?.Button;
+  const buttonTheme = useHopeTheme().components?.Button;
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",

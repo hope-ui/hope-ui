@@ -5,6 +5,8 @@
 @use "./variables/spaces";
 @use "./variables/typography";
 
+@use "./common/animations";
+
 .h-btn {
   appearance: none;
   position: relative;
@@ -102,7 +104,7 @@
 }
 
 .h-btn--md {
-  @include btn-size(42px, 0 22px, typography.$font-size-md, 30px, 0 10px, spaces.$space-2);
+  @include btn-size(42px, 0 22px, typography.$font-size-base, 30px, 0 10px, spaces.$space-2);
 }
 
 .h-btn--lg {

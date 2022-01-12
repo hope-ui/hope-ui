@@ -1,4 +1,4 @@
-export * from "./theme";
+export * from "./components";
 export * from "./contexts";
 export * from "./icons";
-export * from "./components";
+export * from "./theme";
