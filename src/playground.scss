@@ -1,12 +1,12 @@
 @use "./styles/base";
 
+@use "./styles/variables/colors";
+
 @use "./styles/button";
 @use "./styles/container";
+@use "./styles/paper";
 
 #root {
   height: 100%;
-}
-
-.red-box {
-  background: red;
+  background-color: colors.$color-neutral-50;
 }

@@ -13,6 +13,7 @@ export type ThemeableButtonOptions = {
   loaderPosition?: HopeXPosition;
   compact?: boolean;
   uppercase?: boolean;
+  fullWidth?: boolean;
 };
 
 export type ButtonOptions = ThemeableButtonOptions &
