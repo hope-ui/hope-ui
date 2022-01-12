@@ -1,18 +1,13 @@
 {
   "root": true,
   "extends": [
-    "eslint:recommended", // Eslint recommended configuration by eslint.
-    "plugin:import/recommended", // Linting of ES2015+ import/export syntax.
-    "plugin:jsx-a11y/recommended", // Turns on a11y rules for JSX.
-    "plugin:@typescript-eslint/recommended", // Turns on rules from TypeScript-specific plugin.
-    "plugin:prettier/recommended" // Turns off all rules that are unnecessary or might conflict with Prettier.
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
   ],
-  "plugins": [
-    "jsx-a11y",
-    "@typescript-eslint",
-    "import",
-    "simple-import-sort" // Plugin for sorting imports in file.
-  ],
+  "plugins": ["jsx-a11y", "@typescript-eslint", "import", "simple-import-sort"],
   "rules": {
     "import/first": "warn",
     "import/newline-after-import": "warn",
@@ -22,26 +17,26 @@
     "simple-import-sort/exports": "warn"
   },
   "env": {
-    "es6": true, // enable ES2015 features.
-    "browser": true, // enable use of global browser variables like `windows`.
-    "node": true // enable use of global node variables like `process`.
+    "es6": true,
+    "browser": true,
+    "node": true
   },
-  "parser": "@typescript-eslint/parser", // Allows Eslint to understand TypeScript syntax.
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json", // Specify where to find the root tsconfig file of your project.
-    "ecmaVersion": 2021, // ECMAScript version supported in the project.
-    "sourceType": "module", // set to `module` because we ue ECMAScript modules.
+    "project": "./tsconfig.json",
+    "ecmaVersion": 2021,
+    "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true // enable jsx for SolidJS.
+      "jsx": true
     }
   },
   "settings": {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"] // use typescript-eslint parser for .ts|tsx files.
+      "@typescript-eslint/parser": [".ts", ".tsx"]
     },
     "import/resolver": {
       "typescript": {
-        "alwaysTryTypes": true // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`.
+        "alwaysTryTypes": true
       }
     }
   }

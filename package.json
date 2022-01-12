@@ -1,5 +1,5 @@
 {
-  "name": "hope-ui-solid",
+  "name": "@hope-ui/solid",
   "version": "0.0.1",
   "private": false,
   "description": "The utopic component library for your SolidJS Applications.",
@@ -11,13 +11,13 @@
     "frontend",
     "components"
   ],
-  "homepage": "https://github.com/fabien-ml/hope-ui-solid#readme",
+  "homepage": "https://github.com/fabien-ml/hope-ui#readme",
   "bugs": {
-    "url": "https://github.com/fabien-ml/hope-ui-solid/issues"
+    "url": "https://github.com/fabien-ml/hope-ui/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fabien-ml/hope-ui-solid.git"
+    "url": "git+https://github.com/fabien-ml/hope-ui.git"
   },
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",

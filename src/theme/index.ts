@@ -1,6 +1,6 @@
 import merge from "lodash.merge";
 
-import type { ThemeableButtonOptions } from "../components/Button";
+import type { ThemeableButtonOptions } from "@/components";
 
 export type HopeColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
 

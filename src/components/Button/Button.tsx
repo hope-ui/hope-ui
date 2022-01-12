@@ -1,10 +1,10 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
-import { IconSpinner } from "@/icons/IconSpinner";
+import type { ElementType } from "@/components";
+import { useHopeTheme } from "@/contexts";
+import { IconSpinner } from "@/icons";
 
-import type { ElementType } from "../polymorphism";
 import type { ButtonProps } from "./types";
 
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {

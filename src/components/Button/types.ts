@@ -1,8 +1,7 @@
 import type { JSX } from "solid-js";
 
+import type { ElementType, PolymorphicComponentProps } from "@/components";
 import type { HopeColor, HopeSize, HopeXPosition } from "@/theme";
-
-import type { ElementType, PolymorphicComponentProps } from "../polymorphism";
 
 export type ButtonVariant = "filled" | "light" | "outline" | "dashed" | "text" | "default";
 
