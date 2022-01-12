@@ -1,0 +1,60 @@
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/shadows";
+@use "./variables/space";
+
+.h-paper {
+  background-color: white;
+
+  &--with-border {
+    border: 1px solid colors.$color-neutral-200;
+  }
+}
+
+/* Padding
+ * ------------------------------------------*/
+
+@mixin paper-padding($size-name, $value) {
+  .h-paper--padding-#{$size-name} {
+    padding: $value;
+  }
+}
+
+@include paper-padding("none", space.$space-none);
+@include paper-padding("xs", space.$space-2);
+@include paper-padding("sm", space.$space-3);
+@include paper-padding("md", space.$space-4);
+@include paper-padding("lg", space.$space-5);
+@include paper-padding("xl", space.$space-6);
+
+/* Radius
+ * ------------------------------------------*/
+
+@mixin paper-radius($size-name, $value) {
+  .h-paper--radius-#{$size-name} {
+    border-radius: $value;
+  }
+}
+
+@include paper-radius("none", radii.$radii-none);
+@include paper-radius("xs", radii.$radii-xs);
+@include paper-radius("sm", radii.$radii-sm);
+@include paper-radius("md", radii.$radii-md);
+@include paper-radius("lg", radii.$radii-lg);
+@include paper-radius("xl", radii.$radii-xl);
+
+/* Shadow
+ * ------------------------------------------*/
+
+@mixin paper-shadow($size-name, $value) {
+  .h-paper--shadow-#{$size-name} {
+    box-shadow: $value;
+  }
+}
+
+@include paper-shadow("none", shadows.$shadow-none);
+@include paper-shadow("xs", shadows.$shadow-sm);
+@include paper-shadow("sm", shadows.$shadow-md);
+@include paper-shadow("md", shadows.$shadow-lg);
+@include paper-shadow("lg", shadows.$shadow-xl);
+@include paper-shadow("xl", shadows.$shadow-2xl);
