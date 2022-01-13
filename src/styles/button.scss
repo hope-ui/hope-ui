@@ -45,18 +45,13 @@
     cursor: progress;
   }
 
-  & svg {
-    width: 1.3em;
-    height: 1.3em;
-  }
-
   & .h-btn__loading-icon {
-    width: 1.5em;
-    height: 1.5em;
-
     animation: 1000ms linear infinite spin;
   }
 }
+
+/* Miscellaneous
+ * ------------------------------------------*/
 
 .h-btn--uppercase {
   text-transform: uppercase;
@@ -72,9 +67,10 @@
 
 @mixin btn-size(
   $size-name,
+  $font-size,
+  $icon-size,
   $height,
   $padding,
-  $font-size,
   $compact-height,
   $compact-padding,
   $spacing
@@ -84,22 +80,55 @@
     padding: $padding;
     font-size: $font-size;
 
-    &.h-btn--compact {
-      height: $compact-height;
-      padding: $compact-padding;
+    &.h-btn--icon-button {
+      width: $height;
+      padding: 0;
+    }
+
+    & svg {
+      width: $icon-size;
+      height: $icon-size;
     }
 
     & > * + * {
       margin-left: $spacing;
     }
   }
+
+  .h-btn--size-#{$size-name}.h-btn--compact {
+    height: $compact-height;
+    padding: $compact-padding;
+
+    &.h-btn--icon-button {
+      width: $compact-height;
+      padding: 0;
+    }
+  }
 }
 
-@include btn-size("xs", 30px, 0 14px, typography.$font-size-xs, 22px, 0 7px, space.$space-1-5);
-@include btn-size("sm", 36px, 0 18px, typography.$font-size-sm, 26px, 0 8px, space.$space-2);
-@include btn-size("md", 42px, 0 22px, typography.$font-size-base, 30px, 0 10px, space.$space-2);
-@include btn-size("lg", 50px, 0 26px, typography.$font-size-lg, 34px, 0 12px, space.$space-2-5);
-@include btn-size("xl", 60px, 0 32px, typography.$font-size-xl, 40px, 0 14px, space.$space-2-5);
+@include btn-size("xs", typography.$font-size-xs, 18px, 30px, 0 14px, 22px, 0 7px, space.$space-1);
+@include btn-size(
+  "sm",
+  typography.$font-size-sm,
+  20px,
+  36px,
+  0 18px,
+  26px,
+  0 8px,
+  space.$space-1-5
+);
+@include btn-size(
+  "md",
+  typography.$font-size-base,
+  24px,
+  42px,
+  0 22px,
+  30px,
+  0 10px,
+  space.$space-1-5
+);
+@include btn-size("lg", typography.$font-size-lg, 26px, 50px, 0 26px, 34px, 0 12px, space.$space-2);
+@include btn-size("xl", typography.$font-size-xl, 30px, 60px, 0 32px, 40px, 0 14px, space.$space-2);
 
 /* Radius
  * ------------------------------------------*/
