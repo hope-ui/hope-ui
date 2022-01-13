@@ -1,12 +1,14 @@
 import { HopeProvider } from "@/contexts";
-import { IconInfoCircle } from "@/icons";
+import { IconCross, IconInfoCircle } from "@/icons";
 
 import { Tag } from "./Tag";
+import { IconButton } from "@/components";
+import { TagCloseButton } from "@/components/Tag/TagCloseButton";
 
 export default {
   title: "Data display/Tag",
   component: Tag,
-  parameters: { layout: "centered" },
+  parameters: { layout: "centered", backgrounds: { default: "white" } },
   decorators: [
     (Story: any) => (
       <HopeProvider>
@@ -59,3 +61,6 @@ WithLeftSection.args = { children: "Informations" };
 export const WithRightSection = (args: any) => <Tag rightSection={<IconInfoCircle />} {...args} />;
 WithRightSection.storyName = "With right section";
 WithRightSection.args = { children: "Informations" };
+
+export const Closable = (args: any) => <Tag rightSection={<TagCloseButton />} {...args} />;
+Closable.args = { children: "Delete me" };

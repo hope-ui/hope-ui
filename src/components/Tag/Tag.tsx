@@ -37,6 +37,8 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const rootClassList = () => ({
     "h-tag": true,
     "h-tag--full-width": local.fullWidth,
+    "h-tag--with-left-section": local.leftSection,
+    "h-tag--with-right-section": local.rightSection,
     [`h-tag--variant-${local.variant}`]: true,
     [`h-tag--size-${local.size}`]: true,
     [`h-tag--radius-${local.radius}`]: true,

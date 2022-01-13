@@ -9,11 +9,13 @@
   appearance: none;
   position: relative;
 
+  overflow: hidden;
+
   display: inline-flex;
   justify-content: center;
   align-items: center;
 
-  font-weight: typography.$font-weight-semibold;
+  font-weight: typography.$font-weight-bold;
   line-height: typography.$line-height-none;
   text-decoration: none;
 }
@@ -29,11 +31,27 @@
 /* Sizes
  * ------------------------------------------*/
 
-@mixin tag-size($size-name, $font-size, $icon-size, $height, $padding, $spacing) {
+@mixin tag-size(
+  $size-name,
+  $font-size,
+  $icon-size,
+  $height,
+  $padding,
+  $padding-for-section,
+  $spacing
+) {
   .h-tag--size-#{$size-name} {
     height: $height;
     padding: $padding;
     font-size: $font-size;
+
+    &.h-tag--with-left-section {
+      padding-left: $padding-for-section;
+    }
+
+    &.h-tag--with-right-section {
+      padding-right: $padding-for-section;
+    }
 
     & svg {
       width: $icon-size;
@@ -46,11 +64,11 @@
   }
 }
 
-@include tag-size("xs", typography.$font-size-2xs, 14px, 16px, 0 6px, space.$space-1);
-@include tag-size("sm", typography.$font-size-xs, 16px, 20px, 0 10px, space.$space-1-5);
-@include tag-size("md", typography.$font-size-sm, 20px, 24px, 0 12px, space.$space-1-5);
-@include tag-size("lg", typography.$font-size-base, 24px, 32px, 0 16px, space.$space-2);
-@include tag-size("xl", typography.$font-size-lg, 32px, 40px, 0 20px, space.$space-2);
+@include tag-size("xs", typography.$font-size-2xs, 14px, 16px, 0 6px, 1px, space.$space-0-5);
+@include tag-size("sm", typography.$font-size-xs, 16px, 20px, 0 10px, 2px, space.$space-1);
+@include tag-size("md", typography.$font-size-sm, 20px, 24px, 0 12px, 2px, space.$space-1);
+@include tag-size("lg", typography.$font-size-base, 24px, 32px, 0 16px, 4px, space.$space-1-5);
+@include tag-size("xl", typography.$font-size-lg, 32px, 40px, 0 20px, 4px, space.$space-1-5);
 
 /* Radius
  * ------------------------------------------*/
@@ -154,7 +172,7 @@
 
 @mixin tag-dot-color($color-name, $dot-color) {
   &.h-tag--color-#{$color-name} {
-    color: colors.$color-dark-400;
+    color: colors.$color-neutral-600;
 
     &.h-tag--size-xs {
       @include tag-dot(6px, $dot-color);

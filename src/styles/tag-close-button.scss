@@ -1,0 +1,60 @@
+@use "sass:color";
+
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/space";
+@use "./variables/typography";
+
+.h-tag-close-button {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  line-height: typography.$line-height-none;
+  text-decoration: none;
+
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: color 250ms, background-color 250ms;
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 4px;
+  }
+
+  &:disabled {
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: colors.$color-neutral-300;
+    cursor: not-allowed;
+  }
+}
+
+/* Sizes
+ * ------------------------------------------*/
+
+@mixin tag-close-button-size($size-name, $icon-size, $height, $padding) {
+  .h-tag-close-button--size-#{$size-name} {
+    height: $height;
+    padding: $padding;
+
+    & svg {
+      width: $icon-size;
+      height: $icon-size;
+    }
+  }
+}
+
+@include tag-close-button-size("xs", 14px, 16px, 0 6px);
+@include tag-close-button-size("sm", 16px, 20px, 0 10px);
+@include tag-close-button-size("md", 20px, 24px, 0 12px);
+@include tag-close-button-size("lg", 24px, 32px, 0 16px);
+@include tag-close-button-size("xl", 32px, 40px, 0 20px);
