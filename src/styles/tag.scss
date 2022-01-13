@@ -1,0 +1,188 @@
+@use "sass:color";
+
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/space";
+@use "./variables/typography";
+
+.h-tag {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  font-weight: typography.$font-weight-semibold;
+  line-height: typography.$line-height-none;
+  text-decoration: none;
+}
+
+/* Miscellaneous
+ * ------------------------------------------*/
+
+.h-tag--full-width {
+  display: flex;
+  width: 100%;
+}
+
+/* Sizes
+ * ------------------------------------------*/
+
+@mixin tag-size($size-name, $font-size, $icon-size, $height, $padding, $spacing) {
+  .h-tag--size-#{$size-name} {
+    height: $height;
+    padding: $padding;
+    font-size: $font-size;
+
+    & svg {
+      width: $icon-size;
+      height: $icon-size;
+    }
+
+    & > * + * {
+      margin-left: $spacing;
+    }
+  }
+}
+
+@include tag-size("xs", typography.$font-size-2xs, 14px, 16px, 0 6px, space.$space-1);
+@include tag-size("sm", typography.$font-size-xs, 16px, 20px, 0 10px, space.$space-1-5);
+@include tag-size("md", typography.$font-size-sm, 20px, 24px, 0 12px, space.$space-1-5);
+@include tag-size("lg", typography.$font-size-base, 24px, 32px, 0 16px, space.$space-2);
+@include tag-size("xl", typography.$font-size-lg, 32px, 40px, 0 20px, space.$space-2);
+
+/* Radius
+ * ------------------------------------------*/
+
+@mixin tag-radius($size-name, $value) {
+  .h-tag--radius-#{$size-name} {
+    border-radius: $value;
+  }
+}
+
+@include tag-radius("none", radii.$radii-none);
+@include tag-radius("xs", radii.$radii-xs);
+@include tag-radius("sm", radii.$radii-sm);
+@include tag-radius("md", radii.$radii-md);
+@include tag-radius("lg", radii.$radii-lg);
+@include tag-radius("xl", radii.$radii-xl);
+@include tag-radius("full", radii.$radii-full);
+
+/* Variant : Filled
+ * ------------------------------------------*/
+
+@mixin tag-filled-color($color-name, $bg-color) {
+  &.h-tag--color-#{$color-name} {
+    background-color: $bg-color;
+  }
+}
+
+.h-tag--variant-filled {
+  border: 1px solid transparent;
+  color: white;
+
+  @include tag-filled-color("primary", colors.$color-primary-500);
+  @include tag-filled-color("dark", colors.$color-dark-500);
+  @include tag-filled-color("neutral", colors.$color-neutral-500);
+  @include tag-filled-color("success", colors.$color-success-500);
+  @include tag-filled-color("info", colors.$color-info-500);
+  @include tag-filled-color("warning", colors.$color-warning-500);
+  @include tag-filled-color("danger", colors.$color-danger-500);
+}
+
+/* Variant : Light
+ * ------------------------------------------*/
+
+@mixin tag-light-color($color-name, $text-color, $bg-color) {
+  &.h-tag--color-#{$color-name} {
+    background-color: $bg-color;
+    color: $text-color;
+  }
+}
+
+.h-tag--variant-light {
+  border: 1px solid transparent;
+
+  @include tag-light-color("primary", colors.$color-primary-600, colors.$color-primary-50);
+  @include tag-light-color("dark", colors.$color-dark-800, colors.$color-dark-50);
+  @include tag-light-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
+  @include tag-light-color("success", colors.$color-success-600, colors.$color-success-50);
+  @include tag-light-color("info", colors.$color-info-600, colors.$color-info-50);
+  @include tag-light-color("warning", colors.$color-warning-600, colors.$color-warning-50);
+  @include tag-light-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+}
+
+/* Variant : Outline
+ * ------------------------------------------*/
+
+@mixin tag-outline-color($color-name, $text-color) {
+  &.h-tag--color-#{$color-name} {
+    border-color: color.adjust($text-color, $alpha: -0.25);
+    color: $text-color;
+  }
+}
+
+.h-tag--variant-outline {
+  border-style: solid;
+  border-width: 1px;
+  background-color: transparent;
+
+  @include tag-outline-color("primary", colors.$color-primary-600);
+  @include tag-outline-color("dark", colors.$color-dark-600);
+  @include tag-outline-color("neutral", colors.$color-neutral-600);
+  @include tag-outline-color("success", colors.$color-success-600);
+  @include tag-outline-color("info", colors.$color-info-600);
+  @include tag-outline-color("warning", colors.$color-warning-600);
+  @include tag-outline-color("danger", colors.$color-danger-600);
+}
+
+/* Variant : Dot
+ * ------------------------------------------*/
+
+@mixin tag-dot($size, $dot-color) {
+  &::before {
+    content: "";
+    display: block;
+    width: $size;
+    height: $size;
+    border-radius: $size;
+    margin-right: $size;
+    background-color: $dot-color;
+  }
+}
+
+@mixin tag-dot-color($color-name, $dot-color) {
+  &.h-tag--color-#{$color-name} {
+    color: colors.$color-dark-400;
+
+    &.h-tag--size-xs {
+      @include tag-dot(6px, $dot-color);
+    }
+    &.h-tag--size-sm {
+      @include tag-dot(6px, $dot-color);
+    }
+    &.h-tag--size-md {
+      @include tag-dot(8px, $dot-color);
+    }
+    &.h-tag--size-lg {
+      @include tag-dot(10px, $dot-color);
+    }
+    &.h-tag--size-xl {
+      @include tag-dot(12px, $dot-color);
+    }
+  }
+}
+
+.h-tag--variant-dot {
+  border: 1px solid colors.$color-neutral-300;
+  background-color: transparent;
+
+  @include tag-dot-color("primary", colors.$color-primary-500);
+  @include tag-dot-color("dark", colors.$color-dark-500);
+  @include tag-dot-color("neutral", colors.$color-neutral-500);
+  @include tag-dot-color("success", colors.$color-success-500);
+  @include tag-dot-color("info", colors.$color-info-500);
+  @include tag-dot-color("warning", colors.$color-warning-500);
+  @include tag-dot-color("danger", colors.$color-danger-500);
+}

@@ -4,6 +4,7 @@ import {
   ThemeableButtonOptions,
   ThemeableContainerOptions,
   ThemeablePaperOptions,
+  ThemeableTagOptions,
 } from "@/components";
 import { ThemeableIconButtonOptions } from "@/components/IconButton";
 
@@ -20,6 +21,7 @@ export interface ComponentsDefaultProps {
   Container?: ThemeableContainerOptions;
   IconButton?: ThemeableIconButtonOptions;
   Paper?: ThemeablePaperOptions;
+  Tag?: ThemeableTagOptions;
 }
 
 export interface HopeTheme {
