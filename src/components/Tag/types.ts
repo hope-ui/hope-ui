@@ -8,9 +8,8 @@ export type TagVariant = "filled" | "light" | "outline" | "dot";
 export type ThemeableTagOptions = {
   variant?: TagVariant;
   color?: HopeColor;
-  size?: HopeSize;
+  size?: Omit<HopeSize, "xs" | "xl">;
   radius?: HopeSize | "none" | "full";
-  fullWidth?: boolean;
 };
 
 export type TagOptions = ThemeableTagOptions &

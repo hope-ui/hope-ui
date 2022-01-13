@@ -12,9 +12,7 @@ export default {
   decorators: [
     (Story: any) => (
       <HopeProvider>
-        <div style={{ display: "flex", "justify-content": "center", width: "90vw" }}>
-          <Story />
-        </div>
+        <Story />
       </HopeProvider>
     ),
   ],
@@ -29,14 +27,11 @@ export default {
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg", "xl"],
+      options: ["sm", "md", "lg"],
     },
     radius: {
       control: { type: "select" },
       options: ["none", "xs", "sm", "md", "lg", "xl", "full"],
-    },
-    fullWidth: {
-      control: { type: "boolean" },
     },
     children: {
       control: "text",
@@ -47,7 +42,6 @@ export default {
     color: "primary",
     size: "sm",
     radius: "full",
-    fullWidth: false,
     children: "Tag",
   },
 };
@@ -56,11 +50,15 @@ export const Default = (args: any) => <Tag {...args} />;
 
 export const WithLeftSection = (args: any) => <Tag leftSection={<IconInfoCircle />} {...args} />;
 WithLeftSection.storyName = "With left section";
-WithLeftSection.args = { children: "Informations" };
 
 export const WithRightSection = (args: any) => <Tag rightSection={<IconInfoCircle />} {...args} />;
 WithRightSection.storyName = "With right section";
-WithRightSection.args = { children: "Informations" };
 
-export const Closable = (args: any) => <Tag rightSection={<TagCloseButton />} {...args} />;
-Closable.args = { children: "Delete me" };
+export const WithBothSection = (args: any) => (
+  <Tag leftSection={<IconInfoCircle />} rightSection={<IconInfoCircle />} {...args} />
+);
+WithBothSection.storyName = "With both section";
+WithBothSection.args = { children: "Please don't do that..." };
+
+//export const Closable = (args: any) => <Tag rightSection={<TagCloseButton />} {...args} />;
+//Closable.args = { children: "Delete me" };

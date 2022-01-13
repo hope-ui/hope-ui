@@ -2,6 +2,7 @@
 
 @use "./variables/colors";
 @use "./variables/radii";
+@use "./variables/sizes";
 @use "./variables/space";
 @use "./variables/typography";
 
@@ -15,17 +16,9 @@
   justify-content: center;
   align-items: center;
 
-  font-weight: typography.$font-weight-bold;
+  font-weight: typography.$font-weight-semibold;
   line-height: typography.$line-height-none;
   text-decoration: none;
-}
-
-/* Miscellaneous
- * ------------------------------------------*/
-
-.h-tag--full-width {
-  display: flex;
-  width: 100%;
 }
 
 /* Sizes
@@ -36,21 +29,21 @@
   $font-size,
   $icon-size,
   $height,
-  $padding,
-  $padding-for-section,
+  $padding-x,
+  $padding-when-section,
   $spacing
 ) {
   .h-tag--size-#{$size-name} {
     height: $height;
-    padding: $padding;
+    padding: 0 $padding-x;
     font-size: $font-size;
 
     &.h-tag--with-left-section {
-      padding-left: $padding-for-section;
+      padding-left: $padding-when-section;
     }
 
     &.h-tag--with-right-section {
-      padding-right: $padding-for-section;
+      padding-right: $padding-when-section;
     }
 
     & svg {
@@ -64,11 +57,35 @@
   }
 }
 
-@include tag-size("xs", typography.$font-size-2xs, 14px, 16px, 0 6px, 1px, space.$space-0-5);
-@include tag-size("sm", typography.$font-size-xs, 16px, 20px, 0 10px, 2px, space.$space-1);
-@include tag-size("md", typography.$font-size-sm, 20px, 24px, 0 12px, 2px, space.$space-1);
-@include tag-size("lg", typography.$font-size-base, 24px, 32px, 0 16px, 4px, space.$space-1-5);
-@include tag-size("xl", typography.$font-size-lg, 32px, 40px, 0 20px, 4px, space.$space-1-5);
+@include tag-size(
+  "sm",
+  typography.$font-size-xs,
+  sizes.$size-4,
+  sizes.$size-5,
+  space.$space-2,
+  space.$space-0-5,
+  space.$space-1
+);
+
+@include tag-size(
+  "md",
+  typography.$font-size-sm,
+  sizes.$size-5,
+  sizes.$size-6,
+  space.$space-2,
+  space.$space-0-5,
+  space.$space-1-5
+);
+
+@include tag-size(
+  "lg",
+  typography.$font-size-base,
+  sizes.$size-7,
+  sizes.$size-8,
+  space.$space-3,
+  space.$space-0_5,
+  space.$space-2
+);
 
 /* Radius
  * ------------------------------------------*/
@@ -158,36 +175,28 @@
 /* Variant : Dot
  * ------------------------------------------*/
 
-@mixin tag-dot($size, $dot-color) {
-  &::before {
-    content: "";
-    display: block;
+@mixin tag-dot-size($size) {
+  &::before,
+  &::after {
     width: $size;
     height: $size;
     border-radius: $size;
+  }
+
+  &::before {
     margin-right: $size;
-    background-color: $dot-color;
+  }
+
+  &::after {
+    margin-left: $size;
   }
 }
 
 @mixin tag-dot-color($color-name, $dot-color) {
   &.h-tag--color-#{$color-name} {
-    color: colors.$color-neutral-600;
-
-    &.h-tag--size-xs {
-      @include tag-dot(6px, $dot-color);
-    }
-    &.h-tag--size-sm {
-      @include tag-dot(6px, $dot-color);
-    }
-    &.h-tag--size-md {
-      @include tag-dot(8px, $dot-color);
-    }
-    &.h-tag--size-lg {
-      @include tag-dot(10px, $dot-color);
-    }
-    &.h-tag--size-xl {
-      @include tag-dot(12px, $dot-color);
+    &::before,
+    &::after {
+      background-color: $dot-color;
     }
   }
 }
@@ -195,6 +204,45 @@
 .h-tag--variant-dot {
   border: 1px solid colors.$color-neutral-300;
   background-color: transparent;
+  color: colors.$color-neutral-600;
+
+  &::before,
+  &::after {
+    content: "";
+  }
+
+  &::before {
+    display: block;
+  }
+
+  &::after {
+    display: none;
+  }
+
+  &.h-tag--with-left-section::before {
+    display: none;
+  }
+
+  &.h-tag--with-left-section::after {
+    display: block;
+  }
+
+  &.h-tag--with-left-section.h-tag--with-right-section::before,
+  &.h-tag--with-left-section.h-tag--with-right-section::after {
+    display: none;
+  }
+
+  &.h-tag--size-sm {
+    @include tag-dot-size(sizes.$size-1-5);
+  }
+
+  &.h-tag--size-md {
+    @include tag-dot-size(sizes.$size-2);
+  }
+
+  &.h-tag--size-lg {
+    @include tag-dot-size(sizes.$size-2-5);
+  }
 
   @include tag-dot-color("primary", colors.$color-primary-500);
   @include tag-dot-color("dark", colors.$color-dark-500);

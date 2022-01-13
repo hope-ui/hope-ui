@@ -75,8 +75,6 @@ export const Default = (args: any) => <Button {...args} />;
 
 export const WithLeftIcon = (args: any) => <Button leftIcon={<IconInfoCircle />} {...args} />;
 WithLeftIcon.storyName = "With left icon";
-WithLeftIcon.args = { children: "Informations" };
 
 export const WithRightIcon = (args: any) => <Button rightIcon={<IconInfoCircle />} {...args} />;
 WithRightIcon.storyName = "With right icon";
-WithRightIcon.args = { children: "Informations" };

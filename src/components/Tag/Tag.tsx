@@ -15,7 +15,6 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
     color: tagTheme?.color ?? "primary",
     size: tagTheme?.size ?? "sm",
     radius: tagTheme?.radius ?? "full",
-    fullWidth: tagTheme?.fullWidth ?? false,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
@@ -28,7 +27,6 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
     "color",
     "size",
     "radius",
-    "fullWidth",
     "leftSection",
     "rightSection",
     "children",
@@ -36,7 +34,6 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 
   const rootClassList = () => ({
     "h-tag": true,
-    "h-tag--full-width": local.fullWidth,
     "h-tag--with-left-section": local.leftSection,
     "h-tag--with-right-section": local.rightSection,
     [`h-tag--variant-${local.variant}`]: true,

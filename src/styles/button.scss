@@ -2,6 +2,7 @@
 
 @use "./variables/colors";
 @use "./variables/radii";
+@use "./variables/sizes";
 @use "./variables/space";
 @use "./variables/typography";
 
@@ -70,14 +71,14 @@
   $font-size,
   $icon-size,
   $height,
-  $padding,
+  $padding-x,
   $compact-height,
-  $compact-padding,
+  $compact-padding-x,
   $spacing
 ) {
   .h-btn--size-#{$size-name} {
     height: $height;
-    padding: $padding;
+    padding: 0 $padding-x;
     font-size: $font-size;
 
     &.h-btn--icon-button {
@@ -97,7 +98,7 @@
 
   .h-btn--size-#{$size-name}.h-btn--compact {
     height: $compact-height;
-    padding: $compact-padding;
+    padding: 0 $compact-padding-x;
 
     &.h-btn--icon-button {
       width: $compact-height;
@@ -106,29 +107,60 @@
   }
 }
 
-@include btn-size("xs", typography.$font-size-xs, 18px, 30px, 0 14px, 22px, 0 7px, space.$space-1);
+@include btn-size(
+  "xs",
+  typography.$font-size-xs,
+  sizes.$size-3-5,
+  sizes.$size-6,
+  space.$space-2,
+  sizes.$size-5,
+  space.$space-1,
+  space.$space-1
+);
+
 @include btn-size(
   "sm",
   typography.$font-size-sm,
-  20px,
-  36px,
-  0 18px,
-  26px,
-  0 8px,
+  sizes.$size-4,
+  sizes.$size-8,
+  space.$space-3,
+  sizes.$size-6,
+  space.$space-1-5,
   space.$space-1-5
 );
+
 @include btn-size(
   "md",
   typography.$font-size-base,
-  24px,
-  42px,
-  0 22px,
-  30px,
-  0 10px,
+  sizes.$size-5,
+  sizes.$size-10,
+  space.$space-4,
+  sizes.$size-7,
+  space.$space-1-5,
   space.$space-1-5
 );
-@include btn-size("lg", typography.$font-size-lg, 26px, 50px, 0 26px, 34px, 0 12px, space.$space-2);
-@include btn-size("xl", typography.$font-size-xl, 30px, 60px, 0 32px, 40px, 0 14px, space.$space-2);
+
+@include btn-size(
+  "lg",
+  typography.$font-size-lg,
+  sizes.$size-6,
+  sizes.$size-12,
+  space.$space-6,
+  sizes.$size-8,
+  space.$space-1-5,
+  space.$space-2
+);
+
+@include btn-size(
+  "xl",
+  typography.$font-size-xl,
+  sizes.$size-7,
+  sizes.$size-14,
+  space.$space-8,
+  sizes.$size-9,
+  space.$space-2,
+  space.$space-2
+);
 
 /* Radius
  * ------------------------------------------*/
