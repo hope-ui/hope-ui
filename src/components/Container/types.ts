@@ -1,4 +1,4 @@
-import type { ElementType, PolymorphicComponentProps } from "@/components";
+import { ElementType, PolymorphicComponentProps } from "@/components";
 
 export type ThemeableContainerOptions = {
   centered?: boolean;

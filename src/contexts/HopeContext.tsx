@@ -1,8 +1,7 @@
 import { createContext, JSX, mergeProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { HopeTheme } from "@/theme";
-import { defaultTheme } from "@/theme";
+import { defaultTheme, HopeTheme } from "@/theme";
 
 export interface HopeContextValue {
   theme: HopeTheme;

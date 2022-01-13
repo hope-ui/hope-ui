@@ -1,4 +1,4 @@
-import type { Component, ComponentProps, JSX } from "solid-js";
+import { Component, ComponentProps, JSX } from "solid-js";
 
 /**
  * Represent any HTML element or SolidJS component.
