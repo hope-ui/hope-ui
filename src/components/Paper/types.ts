@@ -1,5 +1,5 @@
-import type { ElementType, PolymorphicComponentProps } from "@/components";
-import type { HopeSize } from "@/theme";
+import { ElementType, PolymorphicComponentProps } from "@/components";
+import { HopeSize } from "@/theme";
 
 export type ThemeablePaperOptions = {
   padding?: HopeSize | "none";

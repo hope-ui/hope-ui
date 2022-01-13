@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import { JSX } from "solid-js";
 
 export function IconSpinner(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (

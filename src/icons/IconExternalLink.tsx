@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import { JSX } from "solid-js";
 
 export function IconExternalLink(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
@@ -8,14 +8,16 @@ export function IconExternalLink(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
       preserveAspectRatio="xMidYMid meet"
       width="1em"
       height="1em"
-      viewBox="0 0 15 15"
+      viewBox="0 0 20 20"
       {...props}
     >
       <g fill="none">
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M3 2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V8.5a.5.5 0 0 0-1 0V12H3V3h3.5a.5.5 0 0 0 0-1H3zm9.854.146a.5.5 0 0 1 .146.351V5.5a.5.5 0 0 1-1 0V3.707L6.854 8.854a.5.5 0 1 1-.708-.708L11.293 3H9.5a.5.5 0 0 1 0-1h3a.499.499 0 0 1 .354.146z"
+          d="M11 3a1 1 0 1 0 0 2h2.586l-6.293 6.293a1 1 0 1 0 1.414 1.414L15 6.414V9a1 1 0 1 0 2 0V4a1 1 0 0 0-1-1h-5z"
+          fill="currentColor"
+        />
+        <path
+          d="M5 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3a1 1 0 1 0-2 0v3H5V7h3a1 1 0 0 0 0-2H5z"
           fill="currentColor"
         />
       </g>

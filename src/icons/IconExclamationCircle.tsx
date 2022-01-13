@@ -1,7 +1,6 @@
 import { JSX } from "solid-js";
 
-// heroicons-solid-x
-export function IconCross(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
+export function IconExclamationCircle(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +15,7 @@ export function IconCross(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
-          d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10L4.293 5.707a1 1 0 0 1 0-1.414z"
+          d="M18 10a8 8 0 1 1-16 0a8 8 0 0 1 16 0zm-7 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0zm-1-9a1 1 0 0 0-1 1v4a1 1 0 1 0 2 0V6a1 1 0 0 0-1-1z"
           fill="currentColor"
         />
       </g>

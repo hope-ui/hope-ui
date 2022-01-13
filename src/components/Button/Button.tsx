@@ -1,11 +1,11 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import type { ElementType } from "@/components";
+import { ElementType } from "@/components";
 import { useHopeTheme } from "@/contexts";
 import { IconSpinner } from "@/icons";
 
-import type { ButtonProps } from "./types";
+import { ButtonProps } from "./types";
 
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
   const buttonTheme = useHopeTheme().components?.Button;
@@ -22,6 +22,8 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     fullWidth: buttonTheme?.fullWidth ?? false,
     loading: false,
     disabled: false,
+    type: "button",
+    role: "button",
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);

@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import { JSX } from "solid-js";
 
 export function IconEyeOpen(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
@@ -8,14 +8,15 @@ export function IconEyeOpen(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
       preserveAspectRatio="xMidYMid meet"
       width="1em"
       height="1em"
-      viewBox="0 0 15 15"
+      viewBox="0 0 20 20"
       {...props}
     >
       <g fill="none">
+        <path d="M10 12a2 2 0 1 0 0-4a2 2 0 0 0 0 4z" fill="currentColor" />
         <path
           fill-rule="evenodd"
           clip-rule="evenodd"
-          d="M7.5 11c-2.697 0-4.97-1.378-6.404-3.5C2.53 5.378 4.803 4 7.5 4s4.97 1.378 6.404 3.5C12.47 9.622 10.197 11 7.5 11zm0-8C4.308 3 1.656 4.706.076 7.235a.5.5 0 0 0 0 .53C1.656 10.294 4.308 12 7.5 12s5.844-1.706 7.424-4.235a.5.5 0 0 0 0-.53C13.344 4.706 10.692 3 7.5 3zm0 6.5a2 2 0 1 0 0-4a2 2 0 0 0 0 4z"
+          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 1 1-8 0a4 4 0 0 1 8 0z"
           fill="currentColor"
         />
       </g>

@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "importsNotUsedAsValues": "error", // force using `import type {} from "x"
+    //"importsNotUsedAsValues": "error", // force using `import type {} from "x"
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "moduleResolution": "Node",
