@@ -1,6 +1,6 @@
 # @hope-ui/solid (WIP)
 
-The utopic component library for your SolidJS Applications.
+🤞 The hoped component library for your SolidJS applications.
 
 ## Components
 

@@ -5,6 +5,7 @@ import {
   ThemeableContainerOptions,
   ThemeablePaperOptions,
 } from "@/components";
+import { ThemeableIconButtonOptions } from "@/components/IconButton";
 
 export type HopeColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
 
@@ -17,6 +18,7 @@ export type HopeYPosition = "top" | "bottom";
 export interface ComponentsDefaultProps {
   Button?: ThemeableButtonOptions;
   Container?: ThemeableContainerOptions;
+  IconButton?: ThemeableIconButtonOptions;
   Paper?: ThemeablePaperOptions;
 }
 

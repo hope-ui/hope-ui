@@ -1,11 +1,28 @@
-import { HopeProvider } from "@/contexts";
-import { IconInfoCircle } from "@/icons";
+import { JSX } from "solid-js";
 
-import { Button } from "./Button";
+import { HopeProvider } from "@/contexts";
+
+import { IconButton } from "./IconButton";
+
+function IconTrash(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
+  return (
+    <svg width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+      <g fill="none">
+        <path
+          d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
 
 export default {
-  title: "General/Button",
-  component: Button,
+  title: "General/IconButton",
+  component: IconButton,
   parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
@@ -33,17 +50,7 @@ export default {
       control: { type: "select" },
       options: ["none", "xs", "sm", "md", "lg", "xl", "full"],
     },
-    loaderPosition: {
-      control: { type: "inline-radio" },
-      options: ["left", "right"],
-    },
     compact: {
-      control: { type: "boolean" },
-    },
-    uppercase: {
-      control: { type: "boolean" },
-    },
-    fullWidth: {
       control: { type: "boolean" },
     },
     loading: {
@@ -52,7 +59,7 @@ export default {
     disabled: {
       control: { type: "boolean" },
     },
-    children: {
+    "aria-label": {
       control: "text",
     },
   },
@@ -61,22 +68,12 @@ export default {
     color: "primary",
     size: "sm",
     radius: "sm",
-    loaderPosition: "left",
     compact: false,
-    uppercase: false,
-    fullWidth: false,
     loading: false,
     disabled: false,
-    children: "Button",
+    "aria-label": "Delete",
   },
 };
 
-export const Default = (args: any) => <Button {...args} />;
-
-export const WithLeftIcon = (args: any) => <Button leftIcon={<IconInfoCircle />} {...args} />;
-WithLeftIcon.storyName = "With left icon";
-WithLeftIcon.args = { children: "Informations" };
-
-export const WithRightIcon = (args: any) => <Button rightIcon={<IconInfoCircle />} {...args} />;
-WithRightIcon.storyName = "With right icon";
-WithRightIcon.args = { children: "Informations" };
+export const Default = (args: any) => <IconButton icon={<IconTrash />} {...args} />;
+Default.storyName = "IconButton";
