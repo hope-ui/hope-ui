@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType, PolymorphicComponentProps, ThemeableTagOptions } from "@/components";
+import { ElementType, PolymorphicComponentProps } from "@/components";
 import { useTagContext } from "@/components/Tag/TagContext";
 import { IconCross } from "@/icons";
 

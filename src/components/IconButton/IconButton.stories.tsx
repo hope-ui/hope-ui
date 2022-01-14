@@ -1,3 +1,4 @@
+import { action } from "@storybook/addon-actions";
 import { JSX } from "solid-js";
 
 import { HopeProvider } from "@/contexts";
@@ -75,5 +76,7 @@ export default {
   },
 };
 
-export const Default = (args: any) => <IconButton icon={<IconTrash />} {...args} />;
+export const Default = (args: any) => (
+  <IconButton icon={<IconTrash />} onClick={action("clicked")} {...args} />
+);
 Default.storyName = "IconButton";

@@ -92,7 +92,7 @@
 
 .h-tag-close-btn--variant-filled {
   @include tag-close-btn-filled-color("primary", colors.$color-primary-600);
-  @include tag-close-btn-filled-color("dark", colors.$color-dark-600);
+  @include tag-close-btn-filled-color("dark", colors.$color-dark-800);
   @include tag-close-btn-filled-color("neutral", colors.$color-neutral-600);
   @include tag-close-btn-filled-color("success", colors.$color-success-600);
   @include tag-close-btn-filled-color("info", colors.$color-info-600);
@@ -105,14 +105,14 @@
 
 @mixin tag-close-btn-light-color($color-name, $bg-color-hover) {
   &.h-tag-close-btn--color-#{$color-name}:not(:disabled):hover {
-    background-color: color.adjust($bg-color-hover, $alpha: -0.25);
+    background-color: $bg-color-hover;
   }
 }
 
 .h-tag-close-btn--variant-light {
   @include tag-close-btn-light-color("primary", colors.$color-primary-100);
   @include tag-close-btn-light-color("dark", colors.$color-dark-100);
-  @include tag-close-btn-light-color("neutral", colors.$color-neutral-100);
+  @include tag-close-btn-light-color("neutral", colors.$color-neutral-200);
   @include tag-close-btn-light-color("success", colors.$color-success-100);
   @include tag-close-btn-light-color("info", colors.$color-info-100);
   @include tag-close-btn-light-color("warning", colors.$color-warning-100);
@@ -129,18 +129,18 @@
 }
 
 .h-tag-close-btn--variant-outline {
-  @include tag-close-btn-outline-color("primary", colors.$color-primary-50);
+  @include tag-close-btn-outline-color("primary", colors.$color-primary-100);
   @include tag-close-btn-outline-color("dark", colors.$color-dark-50);
-  @include tag-close-btn-outline-color("neutral", colors.$color-neutral-100);
-  @include tag-close-btn-outline-color("success", colors.$color-success-50);
-  @include tag-close-btn-outline-color("info", colors.$color-info-50);
-  @include tag-close-btn-outline-color("warning", colors.$color-warning-50);
-  @include tag-close-btn-outline-color("danger", colors.$color-danger-50);
+  @include tag-close-btn-outline-color("neutral", colors.$color-neutral-200);
+  @include tag-close-btn-outline-color("success", colors.$color-success-100);
+  @include tag-close-btn-outline-color("info", colors.$color-info-100);
+  @include tag-close-btn-outline-color("warning", colors.$color-warning-100);
+  @include tag-close-btn-outline-color("danger", colors.$color-danger-100);
 }
 
 /* Variant : Dot
  * ------------------------------------------*/
 
 .h-tag-close-btn--variant-dot:not(:disabled):hover {
-  background-color: colors.$color-neutral-100;
+  background-color: colors.$color-neutral-200;
 }

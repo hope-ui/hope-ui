@@ -40,7 +40,7 @@
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | ----------- | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
-| Avatar    |             |            |       |           |      |
+| Avatar    | 🚧          |            |       |           |      |
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |

@@ -5,7 +5,7 @@ export const defaultTheme: HopeTheme = {
     Button: {
       variant: "filled",
       color: "primary",
-      size: "sm",
+      size: "md",
       radius: "sm",
       loaderPosition: "left",
       compact: false,

@@ -158,7 +158,7 @@
   typography.$font-size-xl,
   sizes.$size-7,
   sizes.$size-14,
-  space.$space-8,
+  space.$space-10,
   sizes.$size-9,
   space.$space-2,
   space.$space-2
@@ -229,7 +229,7 @@
     color: $text-color;
 
     &:not(:disabled):hover {
-      background-color: color.adjust($bg-color-hover, $alpha: -0.25);
+      background-color: color.adjust($bg-color-hover, $alpha: -0.15);
     }
   }
 }
@@ -254,8 +254,8 @@
   @include btn-light-color(
     "neutral",
     colors.$color-neutral-600,
-    colors.$color-neutral-50,
-    colors.$color-neutral-100
+    colors.$color-neutral-100,
+    colors.$color-neutral-200
   );
 
   @include btn-light-color(
@@ -296,7 +296,7 @@
     color: $text-color;
 
     &:not(:disabled):hover {
-      background-color: $bg-color-hover;
+      background-color: color.adjust($bg-color-hover, $alpha: -0.55);
     }
   }
 }
@@ -314,13 +314,13 @@
   border-width: 1px;
   background-color: transparent;
 
-  @include btn-outline-color("primary", colors.$color-primary-600, colors.$color-primary-50);
+  @include btn-outline-color("primary", colors.$color-primary-600, colors.$color-primary-100);
   @include btn-outline-color("dark", colors.$color-dark-600, colors.$color-dark-50);
-  @include btn-outline-color("neutral", colors.$color-neutral-600, colors.$color-neutral-100);
-  @include btn-outline-color("success", colors.$color-success-600, colors.$color-success-50);
-  @include btn-outline-color("info", colors.$color-info-600, colors.$color-info-50);
-  @include btn-outline-color("warning", colors.$color-warning-600, colors.$color-warning-50);
-  @include btn-outline-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+  @include btn-outline-color("neutral", colors.$color-neutral-600, colors.$color-neutral-200);
+  @include btn-outline-color("success", colors.$color-success-600, colors.$color-success-100);
+  @include btn-outline-color("info", colors.$color-info-600, colors.$color-info-100);
+  @include btn-outline-color("warning", colors.$color-warning-600, colors.$color-warning-100);
+  @include btn-outline-color("danger", colors.$color-danger-600, colors.$color-danger-100);
 }
 
 /* Variant : Text
@@ -331,7 +331,7 @@
     color: $text-color;
 
     &:not(:disabled):hover {
-      background-color: $bg-color-hover;
+      background-color: color.adjust($bg-color-hover, $alpha: -0.55);
     }
   }
 }
@@ -340,11 +340,11 @@
   border: 1px solid transparent;
   background-color: transparent;
 
-  @include btn-text-color("primary", colors.$color-primary-600, colors.$color-primary-50);
+  @include btn-text-color("primary", colors.$color-primary-600, colors.$color-primary-100);
   @include btn-text-color("dark", colors.$color-dark-600, colors.$color-dark-50);
-  @include btn-text-color("neutral", colors.$color-neutral-600, colors.$color-neutral-100);
-  @include btn-text-color("success", colors.$color-success-600, colors.$color-success-50);
-  @include btn-text-color("info", colors.$color-info-600, colors.$color-info-50);
-  @include btn-text-color("warning", colors.$color-warning-600, colors.$color-warning-50);
-  @include btn-text-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+  @include btn-text-color("neutral", colors.$color-neutral-600, colors.$color-neutral-200);
+  @include btn-text-color("success", colors.$color-success-600, colors.$color-success-100);
+  @include btn-text-color("info", colors.$color-info-600, colors.$color-info-100);
+  @include btn-text-color("warning", colors.$color-warning-600, colors.$color-warning-100);
+  @include btn-text-color("danger", colors.$color-danger-600, colors.$color-danger-100);
 }
