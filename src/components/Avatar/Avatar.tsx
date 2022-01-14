@@ -6,15 +6,6 @@ import { useHopeTheme } from "@/contexts";
 import { AvatarType, ElementType } from "..";
 import { AvatarProps } from ".";
 
-function getInitials(name: string) {
-  return (
-    name
-      .match(/\b(\w)/g)
-      ?.slice(0, 2)
-      .join("") ?? ""
-  );
-}
-
 export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   const theme = useHopeTheme().components.Avatar;
 
@@ -25,6 +16,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     size: theme.size,
     radius: theme.radius,
     icon: theme.icon,
+    getInitials: theme.getInitials,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
@@ -38,6 +30,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     "size",
     "radius",
     "icon",
+    "getInitials",
     "src",
     "name",
     "children",
@@ -82,9 +75,8 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
             onError={onFailLoadImageSource}
           />
         </Match>
-        <Match when={avatarType() === "name"}>{getInitials(local.name ?? "")}</Match>
+        <Match when={avatarType() === "name"}>{local.getInitials?.(local.name ?? "")}</Match>
       </Switch>
-      <div className="h-avatar__badge"></div>
     </Dynamic>
   );
 }

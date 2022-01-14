@@ -14,6 +14,7 @@ export type ThemeableAvatarOptions = {
   size?: HopeSize;
   radius?: HopeSize | "none" | "full";
   icon?: Component<any>;
+  getInitials?: (name: string) => string;
 };
 
 export type AvatarOptions = ThemeableAvatarOptions & {

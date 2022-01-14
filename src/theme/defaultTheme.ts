@@ -1,5 +1,6 @@
 import { IconUser } from "@/icons/IconUser";
 import { HopeTheme } from "@/theme/index";
+import { getInitials } from "@/utils/getInitials";
 
 export const defaultTheme: HopeTheme = {
   components: {
@@ -9,6 +10,7 @@ export const defaultTheme: HopeTheme = {
       size: "md",
       radius: "full",
       icon: IconUser,
+      getInitials,
     },
     Button: {
       variant: "filled",
