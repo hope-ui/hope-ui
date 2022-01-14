@@ -60,11 +60,11 @@
   }
 }
 
-@include avatar-size("xs", sizes.$size-6, typography.$font-size-xs);
-@include avatar-size("sm", sizes.$size-8, typography.$font-size-base);
-@include avatar-size("md", sizes.$size-12, typography.$font-size-2xl);
-@include avatar-size("lg", sizes.$size-16, typography.$font-size-3xl);
-@include avatar-size("xl", sizes.$size-24, typography.$font-size-5xl);
+@include avatar-size("xs", sizes.$size-6, 0.6rem);
+@include avatar-size("sm", sizes.$size-8, 0.8rem);
+@include avatar-size("md", sizes.$size-12, 1.2rem);
+@include avatar-size("lg", sizes.$size-16, 1.6rem);
+@include avatar-size("xl", sizes.$size-24, 2.4rem);
 
 /* Radius
  * ------------------------------------------*/
@@ -126,26 +126,4 @@
   @include avatar-light-color("info", colors.$color-info-500, colors.$color-info-100);
   @include avatar-light-color("warning", colors.$color-warning-500, colors.$color-warning-100);
   @include avatar-light-color("danger", colors.$color-danger-500, colors.$color-danger-100);
-}
-
-/* Avatar badge
- * ------------------------------------------*/
-//TODO
-.h-avatar__badge {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: 24px;
-  width: 24px;
-
-  border: 2px solid papayawhip;
-  border-radius: 999px;
-  background: tomato;
-
-  transform: translate(25%, 25%);
 }

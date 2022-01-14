@@ -1,0 +1,38 @@
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/sizes";
+
+.h-avatar-badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 1.25em;
+  width: 1.25em;
+
+  border-radius: radii.$radii-full;
+
+  transform: translate(25%, 25%);
+}
+
+/* Colors
+ * ------------------------------------------*/
+
+@mixin avatar-badge-color($color-name, $bg-color, $border-color) {
+  .h-avatar-badge--color-#{$color-name} {
+    background-color: $bg-color;
+    border: 0.2em solid $border-color;
+  }
+}
+
+@include avatar-badge-color("primary", colors.$color-primary-500, colors.$color-primary-100);
+@include avatar-badge-color("dark", colors.$color-dark-400, colors.$color-dark-50);
+@include avatar-badge-color("neutral", colors.$color-neutral-500, colors.$color-neutral-200);
+@include avatar-badge-color("success", colors.$color-success-500, colors.$color-success-100);
+@include avatar-badge-color("info", colors.$color-info-500, colors.$color-info-100);
+@include avatar-badge-color("warning", colors.$color-warning-500, colors.$color-warning-100);
+@include avatar-badge-color("danger", colors.$color-danger-500, colors.$color-danger-100);

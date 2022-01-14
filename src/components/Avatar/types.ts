@@ -20,6 +20,8 @@ export type ThemeableAvatarOptions = {
 export type AvatarOptions = ThemeableAvatarOptions & {
   src?: string;
   name?: string;
+  withBadge?: boolean;
+  badgeColor?: HopeColor;
 };
 
 export type AvatarProps<C extends ElementType> = PolymorphicComponentProps<C, AvatarOptions>;

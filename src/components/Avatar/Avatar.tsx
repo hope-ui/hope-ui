@@ -1,4 +1,4 @@
-import { createSignal, Match, mergeProps, splitProps, Switch } from "solid-js";
+import { createSignal, Match, mergeProps, Show, splitProps, Switch } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts";
@@ -17,9 +17,11 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     radius: theme.radius,
     icon: theme.icon,
     getInitials: theme.getInitials,
+    badgeColor: "neutral",
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
+
   const [local, others] = splitProps(propsWithDefault, [
     "as",
     "class",
@@ -33,6 +35,8 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     "getInitials",
     "src",
     "name",
+    "withBadge",
+    "badgeColor",
     "children",
   ]);
 
@@ -75,8 +79,16 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
             onError={onFailLoadImageSource}
           />
         </Match>
-        <Match when={avatarType() === "name"}>{local.getInitials?.(local.name ?? "")}</Match>
+        <Match when={avatarType() === "name"}>{local.getInitials?.(local.name)}</Match>
       </Switch>
+      <Show when={local.withBadge}>
+        <div
+          classList={{
+            "h-avatar-badge": true,
+            [`h-avatar-badge--color-${local.badgeColor}`]: true,
+          }}
+        />
+      </Show>
     </Dynamic>
   );
 }
