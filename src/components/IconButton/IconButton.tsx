@@ -8,15 +8,15 @@ import { IconSpinner } from "@/icons";
 import { IconButtonProps } from "./types";
 
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const iconButtonTheme = useHopeTheme().components?.IconButton;
+  const iconButtonTheme = useHopeTheme().components.IconButton;
 
   const defaultProps: IconButtonProps<"button"> = {
     as: "button",
-    variant: iconButtonTheme?.variant ?? "filled",
-    color: iconButtonTheme?.color ?? "primary",
-    size: iconButtonTheme?.size ?? "sm",
-    radius: iconButtonTheme?.radius ?? "sm",
-    compact: iconButtonTheme?.compact ?? false,
+    variant: iconButtonTheme.variant,
+    color: iconButtonTheme.color,
+    size: iconButtonTheme.size,
+    radius: iconButtonTheme.radius,
+    compact: iconButtonTheme.compact,
     loading: false,
     disabled: false,
     type: "button",

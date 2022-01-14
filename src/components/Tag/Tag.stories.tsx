@@ -1,9 +1,8 @@
+import { TagCloseButton } from "@/components/Tag/TagCloseButton";
 import { HopeProvider } from "@/contexts";
-import { IconCross, IconInfoCircle } from "@/icons";
+import { IconInfoCircle } from "@/icons";
 
 import { Tag } from "./Tag";
-import { IconButton } from "@/components";
-import { TagCloseButton } from "@/components/Tag/TagCloseButton";
 
 export default {
   title: "Data display/Tag",
@@ -60,5 +59,8 @@ export const WithBothSection = (args: any) => (
 WithBothSection.storyName = "With both section";
 WithBothSection.args = { children: "Please don't do that..." };
 
-//export const Closable = (args: any) => <Tag rightSection={<TagCloseButton />} {...args} />;
-//Closable.args = { children: "Delete me" };
+export const WithCloseButton = (args: any) => (
+  <Tag rightSection={<TagCloseButton aria-label="Close" />} {...args} />
+);
+WithCloseButton.storyName = "With close button";
+WithCloseButton.args = { children: "Close" };

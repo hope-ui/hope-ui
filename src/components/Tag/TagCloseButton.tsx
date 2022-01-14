@@ -1,7 +1,8 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType, PolymorphicComponentProps } from "@/components";
+import { ElementType, PolymorphicComponentProps, ThemeableTagOptions } from "@/components";
+import { useTagContext } from "@/components/Tag/TagContext";
 import { IconCross } from "@/icons";
 
 export type TagCloseButtonOptions = {
@@ -14,6 +15,8 @@ export type TagCloseButtonProps<C extends ElementType> = PolymorphicComponentPro
 >;
 
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
+  const tagContext = useTagContext();
+
   const defaultProps: TagCloseButtonProps<"button"> = {
     as: "button",
     type: "button",
@@ -32,6 +35,10 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   const rootClassList = () => ({
     "h-tag-close-btn": true,
+    [`h-tag-close-btn--variant-${tagContext.variant}`]: true,
+    [`h-tag-close-btn--size-${tagContext.size}`]: true,
+    [`h-tag-close-btn--radius-${tagContext.radius}`]: true,
+    [`h-tag-close-btn--color-${tagContext.color}`]: true,
     [local.class || ""]: true,
     [local.className || ""]: true,
     ...local.classList,
@@ -39,7 +46,7 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   return (
     <Dynamic component={local.as} classList={rootClassList()} {...others}>
-      <IconCross />
+      <IconCross className="h-tag-close-btn--icon" />
     </Dynamic>
   );
 }

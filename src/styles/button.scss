@@ -16,6 +16,8 @@
   justify-content: center;
   align-items: center;
 
+  padding: 0;
+
   font-weight: typography.$font-weight-semibold;
   line-height: typography.$line-height-none;
   text-decoration: none;
@@ -188,7 +190,7 @@
   color: colors.$color-dark-600;
 
   &:not(:disabled):hover {
-    background-color: colors.$color-neutral-50;
+    background-color: colors.$color-neutral-100;
   }
 }
 
@@ -294,7 +296,7 @@
     color: $text-color;
 
     &:not(:disabled):hover {
-      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+      background-color: $bg-color-hover;
     }
   }
 }
@@ -314,7 +316,7 @@
 
   @include btn-outline-color("primary", colors.$color-primary-600, colors.$color-primary-50);
   @include btn-outline-color("dark", colors.$color-dark-600, colors.$color-dark-50);
-  @include btn-outline-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
+  @include btn-outline-color("neutral", colors.$color-neutral-600, colors.$color-neutral-100);
   @include btn-outline-color("success", colors.$color-success-600, colors.$color-success-50);
   @include btn-outline-color("info", colors.$color-info-600, colors.$color-info-50);
   @include btn-outline-color("warning", colors.$color-warning-600, colors.$color-warning-50);
@@ -329,7 +331,7 @@
     color: $text-color;
 
     &:not(:disabled):hover {
-      background-color: color.adjust($bg-color-hover, $alpha: -0.65);
+      background-color: $bg-color-hover;
     }
   }
 }
@@ -340,7 +342,7 @@
 
   @include btn-text-color("primary", colors.$color-primary-600, colors.$color-primary-50);
   @include btn-text-color("dark", colors.$color-dark-600, colors.$color-dark-50);
-  @include btn-text-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
+  @include btn-text-color("neutral", colors.$color-neutral-600, colors.$color-neutral-100);
   @include btn-text-color("success", colors.$color-success-600, colors.$color-success-50);
   @include btn-text-color("info", colors.$color-info-600, colors.$color-info-50);
   @include btn-text-color("warning", colors.$color-warning-600, colors.$color-warning-50);
