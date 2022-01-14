@@ -1,3 +1,5 @@
+import { action } from "@storybook/addon-actions";
+
 import { HopeProvider } from "@/contexts";
 import { IconInfoCircle } from "@/icons";
 
@@ -59,7 +61,7 @@ export default {
   args: {
     variant: "filled",
     color: "primary",
-    size: "sm",
+    size: "md",
     radius: "sm",
     loaderPosition: "left",
     compact: false,
@@ -71,10 +73,14 @@ export default {
   },
 };
 
-export const Default = (args: any) => <Button {...args} />;
+export const Default = (args: any) => <Button {...args} onClick={action("clicked")} />;
 
-export const WithLeftIcon = (args: any) => <Button leftIcon={<IconInfoCircle />} {...args} />;
+export const WithLeftIcon = (args: any) => (
+  <Button leftIcon={<IconInfoCircle />} onClick={action("clicked")} {...args} />
+);
 WithLeftIcon.storyName = "With left icon";
 
-export const WithRightIcon = (args: any) => <Button rightIcon={<IconInfoCircle />} {...args} />;
+export const WithRightIcon = (args: any) => (
+  <Button rightIcon={<IconInfoCircle />} onClick={action("clicked")} {...args} />
+);
 WithRightIcon.storyName = "With right icon";

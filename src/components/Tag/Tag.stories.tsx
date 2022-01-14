@@ -1,3 +1,5 @@
+import { action } from "@storybook/addon-actions";
+
 import { TagCloseButton } from "@/components/Tag/TagCloseButton";
 import { HopeProvider } from "@/contexts";
 import { IconInfoCircle } from "@/icons";
@@ -60,7 +62,10 @@ WithBothSection.storyName = "With both section";
 WithBothSection.args = { children: "Please don't do that..." };
 
 export const WithCloseButton = (args: any) => (
-  <Tag rightSection={<TagCloseButton aria-label="Close" />} {...args} />
+  <Tag
+    leftSection={<TagCloseButton aria-label="Close" onClick={action("clicked close button")} />}
+    {...args}
+  />
 );
 WithCloseButton.storyName = "With close button";
 WithCloseButton.args = { children: "Close" };
