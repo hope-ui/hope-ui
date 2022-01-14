@@ -34,7 +34,7 @@
 
   &:focus-visible {
     outline: 2px solid #2563eb;
-    outline-offset: 0px;
+    outline-offset: 0;
   }
 
   &:disabled {
@@ -48,7 +48,7 @@
 /* Sizes
  * ------------------------------------------*/
 
-@mixin tag-close-btn-size($size-name, $icon-size, $size) {
+@mixin tag-close-btn-size($size-name, $size, $icon-size) {
   .h-tag .h-tag-close-btn--size-#{$size-name} {
     height: $size;
     width: $size;
@@ -60,9 +60,9 @@
   }
 }
 
-@include tag-close-btn-size("sm", sizes.$size-3-5, sizes.$size-4);
-@include tag-close-btn-size("md", sizes.$size-4, sizes.$size-5);
-@include tag-close-btn-size("lg", sizes.$size-5, sizes.$size-7);
+@include tag-close-btn-size("sm", sizes.$size-4, sizes.$size-3-5);
+@include tag-close-btn-size("md", sizes.$size-5, sizes.$size-4);
+@include tag-close-btn-size("lg", sizes.$size-7, sizes.$size-5);
 
 /* Radius
  * ------------------------------------------*/

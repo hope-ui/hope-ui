@@ -1,0 +1,151 @@
+@use "sass:color";
+
+@use "./variables/colors";
+@use "./variables/radii";
+@use "./variables/sizes";
+@use "./variables/shadows";
+@use "./variables/space";
+@use "./variables/typography";
+@use "./variables/z-indices";
+
+.h-avatar {
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+
+  padding: 0;
+
+  line-height: typography.$line-height-none;
+  font-weight: typography.$font-weight-medium;
+  text-transform: uppercase;
+  text-align: center;
+
+  &.h-avatar--with-image::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: z-indices.$z-indice-docked;
+    display: block;
+    height: 100%;
+    width: 100%;
+    box-shadow: shadows.$shadow-inner;
+    border-radius: radii.$radii-full;
+  }
+
+  & .h-avatar--image {
+    display: block;
+    max-width: 100%;
+    border-style: none;
+    object-fit: cover;
+  }
+}
+
+/* Sizes
+ * ------------------------------------------*/
+
+@mixin avatar-size($size-name, $size, $font-size) {
+  .h-avatar--size-#{$size-name} {
+    height: $size;
+    width: $size;
+    font-size: $font-size;
+
+    & svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+@include avatar-size("xs", sizes.$size-6, typography.$font-size-xs);
+@include avatar-size("sm", sizes.$size-8, typography.$font-size-base);
+@include avatar-size("md", sizes.$size-12, typography.$font-size-2xl);
+@include avatar-size("lg", sizes.$size-16, typography.$font-size-3xl);
+@include avatar-size("xl", sizes.$size-24, typography.$font-size-5xl);
+
+/* Radius
+ * ------------------------------------------*/
+
+@mixin avatar-radius($size-name, $value) {
+  .h-avatar--radius-#{$size-name} {
+    border-radius: $value;
+
+    & .h-avatar--image {
+      border-radius: $value;
+    }
+  }
+}
+
+@include avatar-radius("none", radii.$radii-none);
+@include avatar-radius("xs", radii.$radii-xs);
+@include avatar-radius("sm", radii.$radii-sm);
+@include avatar-radius("md", radii.$radii-md);
+@include avatar-radius("lg", radii.$radii-lg);
+@include avatar-radius("xl", radii.$radii-xl);
+@include avatar-radius("full", radii.$radii-full);
+
+/* Variant : Filled
+ * ------------------------------------------*/
+
+@mixin avatar-filled-color($color-name, $bg-color) {
+  &.h-avatar--color-#{$color-name} {
+    background-color: $bg-color;
+  }
+}
+
+.h-avatar--variant-filled {
+  color: white;
+
+  @include avatar-filled-color("primary", colors.$color-primary-500);
+  @include avatar-filled-color("dark", colors.$color-dark-500);
+  @include avatar-filled-color("neutral", colors.$color-neutral-500);
+  @include avatar-filled-color("success", colors.$color-success-500);
+  @include avatar-filled-color("info", colors.$color-info-500);
+  @include avatar-filled-color("warning", colors.$color-warning-500);
+  @include avatar-filled-color("danger", colors.$color-danger-500);
+}
+
+/* Variant : Light
+ * ------------------------------------------*/
+
+@mixin avatar-light-color($color-name, $text-color, $bg-color) {
+  &.h-avatar--color-#{$color-name} {
+    background-color: $bg-color;
+    color: $text-color;
+  }
+}
+
+.h-avatar--variant-light {
+  @include avatar-light-color("primary", colors.$color-primary-500, colors.$color-primary-100);
+  @include avatar-light-color("dark", colors.$color-dark-500, colors.$color-dark-50);
+  @include avatar-light-color("neutral", colors.$color-neutral-500, colors.$color-neutral-200);
+  @include avatar-light-color("success", colors.$color-success-500, colors.$color-success-100);
+  @include avatar-light-color("info", colors.$color-info-500, colors.$color-info-100);
+  @include avatar-light-color("warning", colors.$color-warning-500, colors.$color-warning-100);
+  @include avatar-light-color("danger", colors.$color-danger-500, colors.$color-danger-100);
+}
+
+/* Avatar badge
+ * ------------------------------------------*/
+//TODO
+.h-avatar__badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 24px;
+  width: 24px;
+
+  border: 2px solid papayawhip;
+  border-radius: 999px;
+  background: tomato;
+
+  transform: translate(25%, 25%);
+}

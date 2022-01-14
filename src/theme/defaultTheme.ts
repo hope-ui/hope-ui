@@ -1,7 +1,15 @@
+import { IconUser } from "@/icons/IconUser";
 import { HopeTheme } from "@/theme/index";
 
 export const defaultTheme: HopeTheme = {
   components: {
+    Avatar: {
+      variant: "filled",
+      color: "primary",
+      size: "md",
+      radius: "full",
+      icon: IconUser,
+    },
     Button: {
       variant: "filled",
       color: "primary",

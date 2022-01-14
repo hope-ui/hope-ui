@@ -8,14 +8,14 @@ import { useHopeTheme } from "@/contexts";
 import { TagProps } from "./types";
 
 export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
-  const tagTheme = useHopeTheme().components.Tag;
+  const theme = useHopeTheme().components.Tag;
 
   const defaultProps: TagProps<"span"> = {
     as: "span",
-    variant: tagTheme.variant,
-    color: tagTheme.color,
-    size: tagTheme.size,
-    radius: tagTheme.radius,
+    variant: theme.variant,
+    color: theme.color,
+    size: theme.size,
+    radius: theme.radius,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
@@ -51,10 +51,10 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   };
 
   const tagContextValue: TagContextValue = {
-    variant: local.variant ?? tagTheme.variant,
-    color: local.color ?? tagTheme.color,
-    size: local.size ?? tagTheme.size,
-    radius: local.radius ?? tagTheme.radius,
+    variant: local.variant ?? theme.variant,
+    color: local.color ?? theme.color,
+    size: local.size ?? theme.size,
+    radius: local.radius ?? theme.radius,
   };
 
   return (

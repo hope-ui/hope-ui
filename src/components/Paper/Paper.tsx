@@ -5,14 +5,14 @@ import { ElementType, PaperProps } from "@/components";
 import { useHopeTheme } from "@/contexts";
 
 export function Paper<C extends ElementType = "div">(props: PaperProps<C>) {
-  const paperTheme = useHopeTheme().components.Paper;
+  const theme = useHopeTheme().components.Paper;
 
   const defaultProps: PaperProps<"div"> = {
     as: "div",
-    padding: paperTheme.padding,
-    radius: paperTheme.radius,
-    shadow: paperTheme.shadow,
-    withBorder: paperTheme.withBorder,
+    padding: theme.padding,
+    radius: theme.radius,
+    shadow: theme.shadow,
+    withBorder: theme.withBorder,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
