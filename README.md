@@ -27,6 +27,7 @@ npm install -D sass # or yarn or pnpm
 ### Provider setup
 
 After installing Hope UI, you need to set up the `HopeProvider` at the root of your application.
+
 This can be either in your `index.jsx` or `index.tsx`
 
 ```jsx
@@ -48,6 +49,7 @@ function App() {
 #### Globally set default components props
 
 If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `@hope-ui/solid`.
+
 Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
 
 ```jsx
@@ -77,6 +79,7 @@ function App() {
 #### Customizing Sass variables
 
 Hope UI uses Sass for all it's design tokens e.g. colors, shadows, breapoints, etc...
+
 If you intend to customise the default `theme` to match your design requirements, you can override all Sass variables.
 
 For example to override the primary color palette :
@@ -100,10 +103,9 @@ For example to override the primary color palette :
 );
 ```
 
-2. Configure your build tool to import this `variables.scss` at the top of all `.scss` files.
-   The below example are using [Vite](https://vitejs.dev/).
+2. Configure your build tool to import this `variables.scss` at the top of all `.scss` files, the below example are using [Vite](https://vitejs.dev/).
 
-Important : Do not add any css rule in this file as it will be duplicated in all others Sass files.
+> :warning: **Warning :** Do not add any css rule in this file as it will be duplicated in all others Sass files where it's imported.
 
 ```ts
 // vite.config.js|ts
@@ -123,7 +125,7 @@ export default defineConfig({
 
 ### Import style on demand
 
-To reduce the bundle size styles should be loaded on demand, using vite you can use the [vite-plugin-style-import](https://github.com/vbenjs/vite-plugin-style-import) plugin to do that.
+To reduce the bundle size, styles should be loaded on demand, using vite you can use the [vite-plugin-style-import](https://github.com/vbenjs/vite-plugin-style-import) plugin to do that.
 
 1. First install the plugin as a dev dependency.
 
