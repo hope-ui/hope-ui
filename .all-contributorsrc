@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "fabien-ml",
+      "name": "Fabien MARIE-LOUISE",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2832351?v=4",
+      "profile": "https://github.com/fabien-ml",
+      "contributions": [
+        "design",
+        "code",
+        "doc",
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "hope-ui",
+  "projectOwner": "fabien-ml",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
