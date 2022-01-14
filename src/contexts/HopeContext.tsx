@@ -1,17 +1,17 @@
-import { createContext, JSX, mergeProps, useContext } from "solid-js";
+import { createContext, mergeProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { ChildrenProp } from "@/components";
 import { defaultTheme, HopeTheme } from "@/theme";
 
 export interface HopeContextValue {
   theme: HopeTheme;
 }
 
-export const HopeContext = createContext({} as HopeContextValue);
+export const HopeContext = createContext<HopeContextValue>();
 
-export type HopeProviderProps = {
+export type HopeProviderProps = ChildrenProp & {
   theme?: HopeTheme;
-  children: JSX.Element;
 };
 
 export function HopeProvider(props: HopeProviderProps) {
@@ -24,8 +24,10 @@ export function HopeProvider(props: HopeProviderProps) {
 export function useHopeTheme() {
   const context = useContext(HopeContext);
 
-  if (!context.theme) {
-    console.warn("[Hope UI]: no HopeTheme found, did you wrap your components with HopeProvider ?");
+  if (!context) {
+    throw new Error(
+      "[Hope UI]: no HopeTheme found, did you wrap your components with HopeProvider ?"
+    );
   }
 
   return context.theme;

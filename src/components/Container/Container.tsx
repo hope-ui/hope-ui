@@ -5,11 +5,11 @@ import { ContainerProps, ElementType } from "@/components";
 import { useHopeTheme } from "@/contexts";
 
 export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
-  const containerTheme = useHopeTheme().components?.Container;
+  const containerTheme = useHopeTheme().components.Container;
 
   const defaultProps: ContainerProps<"div"> = {
     as: "div",
-    centered: containerTheme?.centered ?? true,
+    centered: containerTheme.centered,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);

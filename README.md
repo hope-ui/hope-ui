@@ -8,9 +8,9 @@
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Button    |     ✅      |            |       |    ✅     |      |
-| Container |     ✅      |            |       |    ✅     |      |
-| Paper     |     ✅      |            |       |    ✅     |      |
+| Button    |     ✅      |     ✅     |       |    ✅     |      |
+| Container |     ✅      |     ✅     |       |    ✅     |      |
+| Paper     |     ✅      |     ✅     |       |    ✅     |      |
 
 ### Data entry
 
@@ -44,7 +44,7 @@
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |
-| Tag       |             |            |       |           |      |
+| Tag       | ✅          |     ✅     |       |    ✅     |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation
@@ -76,3 +76,15 @@
 | Modal   |             |            |       |           |      |
 | Popover |             |            |       |           |      |
 | Tooltip |             |            |       |           |      |
+
+## Acknowledgment
+
+This project would not have been possible without the inspiration of these amazing open source projects :
+
+- [Chakra UI](https://chakra-ui.com/)
+- [Mantine](https://mantine.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+## License
+
+This project is licensed under the MIT License.
