@@ -26,16 +26,15 @@ export const Default = (args: any) => (
     <p>All elements inside Center are centered</p>
   </Center>
 );
-Default.storyName = "Center";
 
 export const Inline = (args: any) => (
   <div style={{ width: "600px", background: "#3b82f6" }}>
-    <a href="https://solidjs.com">
+    <span>
       <Center style={{ background: "#93c5fd" }} {...args}>
         <IconChevronLeft />
         <span>Inline will prevent center to take full width</span>
       </Center>
-    </a>
+    </span>
   </div>
 );
 Inline.args = { inline: true };
