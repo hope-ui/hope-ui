@@ -5,7 +5,10 @@
 
 🤞 The hoped component library for your SolidJS applications.
 
-## Components
+## Getting started
+Todo
+
+## Components roadmap
 
 ### General
 
@@ -18,7 +21,7 @@
 ### Data entry
 
 |               | Development | A11y check | Tests | Storybook | Docs |
-| ------------- | ----------- | :--------: | :---: | :-------: | :--: |
+| ------------- | :-----------: | :--------: | :---: | :-------: | :--: |
 | AutoComplete  |             |            |       |           |      |
 | Checkbox      |             |            |       |           |      |
 | DatePicker    |             |            |       |           |      |
@@ -41,7 +44,7 @@
 ### Data display
 
 |           | Development | A11y check | Tests | Storybook | Docs |
-| --------- | ----------- | :--------: | :---: | :-------: | :--: |
+| --------- | :-----------: | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
 | Avatar    | 🚧          |            |       |           |      |
 | Badge     |             |            |       |           |      |
@@ -53,7 +56,7 @@
 ### Navigation
 
 |             | Development | A11y check | Tests | Storybook | Docs |
-| ----------- | ----------- | :--------: | :---: | :-------: | :--: |
+| ----------- | :-----------: | :--------: | :---: | :-------: | :--: |
 | Anchor      |             |            |       |           |      |
 | Breadcrumbs |             |            |       |           |      |
 | Pagination  |             |            |       |           |      |
@@ -63,7 +66,7 @@
 ### Feedback
 
 |              | Development | A11y check | Tests | Storybook | Docs |
-| ------------ | ----------- | :--------: | :---: | :-------: | :--: |
+| ------------ | :-----------: | :--------: | :---: | :-------: | :--: |
 | Alert        |             |            |       |           |      |
 | Loader       |             |            |       |           |      |
 | Notification |             |            |       |           |      |
@@ -73,7 +76,7 @@
 ### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
-| ------- | ----------- | :--------: | :---: | :-------: | :--: |
+| ------- | :-----------: | :--------: | :---: | :-------: | :--: |
 | Drawer  |             |            |       |           |      |
 | Menu    |             |            |       |           |      |
 | Modal   |             |            |       |           |      |
@@ -87,10 +90,6 @@ This project would not have been possible without the inspiration of these amazi
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
-
-## License
-
-This project is licensed under the MIT License.
 
 ## Contributors ✨
 
@@ -111,3 +110,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## License
+
+This project is licensed under the MIT License.
