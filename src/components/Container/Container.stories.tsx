@@ -3,7 +3,7 @@ import { HopeProvider } from "@/contexts";
 import { Container } from "./Container";
 
 export default {
-  title: "General/Container",
+  title: "Layout/Container",
   component: Container,
   decorators: [
     (Story: any) => (
