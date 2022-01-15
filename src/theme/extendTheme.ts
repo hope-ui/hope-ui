@@ -1,8 +1,19 @@
 import merge from "lodash.merge";
 
-import { DeepPartial, defaultTheme, HopeTheme } from "@/theme";
+import { createTheme } from "@/stitches/stitches.config";
 
-export function extendTheme(themeOverride: DeepPartial<HopeTheme>): HopeTheme {
-  const defaultThemeCopy = merge({}, defaultTheme);
-  return merge(defaultThemeCopy, themeOverride);
+import { HopeTheme, HopeThemeOverride } from ".";
+import { defaultHopeTheme } from "./defaultHopeTheme";
+
+export function extendTheme(themeOverride: HopeThemeOverride): HopeTheme {
+  // create a copy to not mutate the original theme
+  const customTheme = merge({}, defaultHopeTheme);
+
+  if (themeOverride.tokens) {
+    merge(customTheme.stitchesTheme, createTheme(themeOverride.tokens));
+  }
+
+  merge(customTheme.components, themeOverride.components);
+
+  return customTheme;
 }

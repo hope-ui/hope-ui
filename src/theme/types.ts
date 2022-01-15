@@ -1,33 +1,38 @@
-import {
-  ThemeableButtonOptions,
-  ThemeableContainerOptions,
-  ThemeableIconButtonOptions,
-  ThemeablePaperOptions,
-  ThemeableTagOptions,
-} from "@/components";
-import { ThemeableAvatarOptions } from "@/components/Avatar";
+import { StitchesTheme } from "@/stitches/stitches.config";
+import { DefaultThemeTokens } from "@/stitches/tokens";
 
-export type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>;
+/**
+ * Interface of the default Hope UI design tokens.
+ */
+export type HopeThemeTokens = {
+  [Scale in keyof DefaultThemeTokens]?: {
+    [Token in keyof DefaultThemeTokens[Scale]]?: boolean | number | string;
+  };
+} & {
+  [scale in string]: {
+    [token in number | string]: boolean | number | string;
+  };
 };
 
-export type HopeColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
-
-export type HopeSize = "xs" | "sm" | "md" | "lg" | "xl";
-
-export type HopeXPosition = "left" | "right";
-
-export type HopeYPosition = "top" | "bottom";
-
-export interface ComponentsDefaultProps {
-  Avatar: Required<ThemeableAvatarOptions>;
-  Button: Required<ThemeableButtonOptions>;
-  Container: Required<ThemeableContainerOptions>;
-  IconButton: Required<ThemeableIconButtonOptions>;
-  Paper: Required<ThemeablePaperOptions>;
-  Tag: Required<ThemeableTagOptions>;
+/**
+ * Globally set default props for Hope UI components.
+ */
+export interface HopeComponentsDefaultProps {
+  Button?: string; //Omit<ButtonVariantProps, "loading">;
 }
 
+/**
+ * The Hope UI theme interface.
+ */
 export interface HopeTheme {
-  components: ComponentsDefaultProps;
+  stitchesTheme: StitchesTheme;
+  components: HopeComponentsDefaultProps;
+}
+
+/**
+ * The Hope UI theme override interface.
+ */
+export interface HopeThemeOverride {
+  tokens?: HopeThemeTokens;
+  components?: HopeComponentsDefaultProps;
 }

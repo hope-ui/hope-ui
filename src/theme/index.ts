@@ -1,3 +1,3 @@
-export * from "./defaultTheme";
+export * from "./defaultHopeTheme";
 export * from "./extendTheme";
 export * from "./types";

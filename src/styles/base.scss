@@ -22,9 +22,9 @@ body {
 }
 
 /* 
-  1. Use theme dark color for text. 
-  2. Use theme `sans` font-family.
-  3. Use theme base line height.
+  1. Use tokens dark color for text.
+  2. Use tokens `sans` font-family.
+  3. Use tokens base line height.
 */
 html {
   color: colors.$color-dark-900; /* 1 */

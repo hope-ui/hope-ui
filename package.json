@@ -21,15 +21,12 @@
   },
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
-  "sideEffects": [
-    "*.scss"
-  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
-    },
-    "./styles/": "./dist/styles/"
+    }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -64,8 +61,7 @@
     }
   },
   "dependencies": {
-    "lodash.merge": "4.6.2",
-    "modern-normalize": "1.1.0"
+    "lodash.merge": "4.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.16.7",
@@ -73,6 +69,7 @@
     "@commitlint/cli": "16.0.2",
     "@commitlint/config-conventional": "16.0.0",
     "@commitlint/cz-commitlint": "16.0.0",
+    "@stitches/core": "1.2.6",
     "@storybook/addon-a11y": "6.4.12",
     "@storybook/addon-actions": "6.4.12",
     "@storybook/addon-essentials": "6.4.12",
@@ -87,7 +84,7 @@
     "babel-loader": "8.2.3",
     "babel-preset-solid": "1.3.2",
     "commitizen": "4.2.4",
-    "css-loader": "6.5.1",
+    "csstype": "^3.0.10",
     "eslint": "8.6.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-import-resolver-typescript": "2.5.0",
@@ -98,18 +95,15 @@
     "husky": "7.0.4",
     "lint-staged": "12.1.7",
     "prettier": "2.5.1",
-    "rollup-plugin-copy": "3.4.0",
-    "sass": "1.48.0",
-    "sass-loader": "12.4.0",
     "solid-js": "1.3.3",
     "sort-package-json": "1.53.1",
-    "style-loader": "3.3.1",
     "typescript": "4.5.4",
     "vite": "2.7.11",
     "vite-plugin-dts": "0.9.9",
     "vite-plugin-solid": "2.2.2"
   },
   "peerDependencies": {
+    "@stitches/core": "^1.2.6",
     "solid-js": "^1.3.3"
   }
 }

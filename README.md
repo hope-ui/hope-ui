@@ -56,7 +56,7 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "@hope-ui/solid";
 
-// 2. Extend the theme to globally set default components props
+// 2. Extend the tokens to globally set default components props
 const theme = extendTheme({
   components: {
     Button: {
@@ -66,7 +66,7 @@ const theme = extendTheme({
   },
 });
 
-// 3. Pass the `theme` prop to the `HopeProvider`
+// 3. Pass the `tokens` prop to the `HopeProvider`
 function App() {
   return (
     <HopeProvider theme={theme}>

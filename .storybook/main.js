@@ -12,25 +12,6 @@ module.exports = {
     presets: ["@babel/preset-typescript", "solid"],
   }),
   webpackFinal: async config => {
-    config.module.rules.push({
-      test: /\.scss$/,
-      use: [
-        "style-loader",
-        "css-loader",
-        {
-          loader: "sass-loader",
-          options: {
-            webpackImporter: false,
-            sassOptions: {
-              includePaths: ["node_modules"],
-            },
-            implementation: require.resolve("sass"),
-          },
-        },
-      ],
-      include: path.resolve(__dirname, "./"),
-    });
-
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": path.resolve(__dirname, "../src"),

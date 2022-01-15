@@ -2,7 +2,8 @@ import { createContext, mergeProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { ChildrenProp } from "@/components";
-import { defaultTheme, HopeTheme } from "@/theme";
+import { applyGlobalBaseStyles } from "@/stitches/baseStyles/applyGlobalBaseStyles";
+import { defaultHopeTheme, HopeTheme } from "@/theme";
 
 export interface HopeContextValue {
   theme: HopeTheme;
@@ -15,8 +16,13 @@ export type HopeProviderProps = ChildrenProp & {
 };
 
 export function HopeProvider(props: HopeProviderProps) {
-  const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
+  const propsWithDefault = mergeProps({ theme: defaultHopeTheme }, props);
   const [state] = createStore({ theme: propsWithDefault.theme });
+
+  // Apply the customized stitches theme
+  document.body.classList.add(state.theme.stitchesTheme);
+
+  applyGlobalBaseStyles(state.theme.stitchesTheme);
 
   return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }
@@ -26,7 +32,7 @@ export function useHopeTheme() {
 
   if (!context) {
     throw new Error(
-      "[Hope UI]: no HopeTheme found, did you wrap your components with HopeProvider ?"
+      "[Hope UI]: no HopeTheme found, did you wrap your component with HopeProvider ?"
     );
   }
 
