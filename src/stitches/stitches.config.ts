@@ -17,6 +17,8 @@ export const { css, globalCss, keyframes, getCssText, theme, createTheme, config
 
 export type StitchesTheme = typeof theme;
 
+export type SystemMedia = typeof config.media;
+
 /**
  * Style interface based on the stitches theme configuration.
  */
