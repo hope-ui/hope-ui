@@ -1,6 +1,8 @@
 import type { CSS } from "@stitches/core";
 
-export const pseudo = {
+import { objectKeys } from "@/utils/object";
+
+export const pseudoSelectors = {
   _hover: (value: CSS) => ({
     "&:hover, &[data-hover]": value,
   }),
@@ -122,3 +124,5 @@ export const pseudo = {
     "&::selection": value,
   }),
 };
+
+export type Pseudos = typeof pseudoSelectors;

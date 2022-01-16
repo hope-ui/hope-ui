@@ -1,11 +1,11 @@
-import { createGlobalStyles, StitchesTheme } from "../stitches.config";
+import { globalCss, StitchesTheme } from "../stitches.config";
 import { modernNormalizeCSS } from "./modernNormalizeCSS";
 
 /**
  * Apply modern-normalize css reset and Hope UI global base styles
  */
 export function applyGlobalBaseStyles(stitchesTheme: StitchesTheme) {
-  const baseStyles = createGlobalStyles({
+  const baseStyles = globalCss({
     /* Remove default margin. */
     "*": {
       margin: 0,

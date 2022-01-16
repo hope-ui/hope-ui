@@ -28,5 +28,3 @@ export const defaultThemeTokens = {
   zIndices,
   transitions,
 };
-
-export type DefaultThemeTokens = typeof defaultThemeTokens;

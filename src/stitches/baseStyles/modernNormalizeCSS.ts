@@ -1,7 +1,7 @@
-import { createGlobalStyles } from "../stitches.config";
+import { globalCss } from "../stitches.config";
 
 /*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
-export const modernNormalizeCSS = createGlobalStyles({
+export const modernNormalizeCSS = globalCss({
   /*
   Document
   ========

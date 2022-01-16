@@ -7,11 +7,3 @@ export type ShadowProps = Partial<{
   shadow: Property.BoxShadow | ShadowTokens;
   boxShadow: Property.BoxShadow | ShadowTokens;
 }>;
-
-export type ShadowPropsKeys = keyof ShadowProps;
-
-/**
- * Array based on the `ShadowProps`.
- * Used to splitProps in SolidJS components
- */
-export const shadowPropsKeys: ShadowPropsKeys[] = ["textShadow", "shadow", "boxShadow"];

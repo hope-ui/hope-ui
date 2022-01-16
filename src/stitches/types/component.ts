@@ -1,4 +1,9 @@
+import type { StyledComponentProps } from "@stitches/core/types/styled-component";
+import type * as Util from "@stitches/core/types/util";
 import { Component, ComponentProps, JSX } from "solid-js";
+
+import { SystemStyleObject } from "..";
+import { PseudoProps, StyleProps } from ".";
 
 /**
  * Represent any HTML element or SolidJS component.
@@ -29,6 +34,14 @@ export type ClassProps = {
 };
 
 /**
+ * The `sx` props allow you to overriding styles easily.
+ * It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
+ */
+export type SxProp = {
+  sx?: SystemStyleObject;
+};
+
+/**
  * The `as` props is an override of the default HTML tag.
  * Can also be another SolidJS component.
  */
@@ -51,7 +64,25 @@ export type ExtendableProps<
  * props like children, className & style work, as well as element-specific
  * attributes like aria roles. The component (`C`) must be passed in.
  */
-export type PolymorphicComponentProps<
+export type InheritableElementProps<
   C extends ElementType,
   Props = Record<string, unknown>
-> = ExtendableProps<PropsOf<C>, Props & AsProp<C> & ClassProps>;
+> = ExtendableProps<PropsOf<C>, Props>;
+
+/**
+ * Props of an Hope UI component
+ */
+type HopeComponentProps<C extends ElementType> = InheritableElementProps<
+  C,
+  ChildrenProp & ClassProps & StyleProps & PseudoProps & SxProp
+>;
+
+/**
+ * Props of a styled Hope UI component
+ */
+export type HopeStyledComponentProps<
+  C extends ElementType,
+  Composers extends (string | Util.Function | { [name: string]: unknown })[]
+> = StyledComponentProps<Composers> &
+  Omit<HopeComponentProps<C>, keyof StyledComponentProps<Composers>> &
+  AsProp<C>;

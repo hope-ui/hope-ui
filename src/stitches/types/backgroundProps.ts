@@ -21,29 +21,3 @@ export type BackgroundProps = Partial<{
   bgAttachment: Property.BackgroundAttachment;
   backgroundAttachment: Property.BackgroundAttachment;
 }>;
-
-export type BackgroundPropsKeys = keyof BackgroundProps;
-
-/**
- * Array based on the `BackgroundProps`.
- * Used to splitProps in SolidJS components
- */
-export const backgroundPropsKeys: BackgroundPropsKeys[] = [
-  "bg",
-  "background",
-  "bgColor",
-  "backgroundColor",
-  "bgGradient",
-  "bgClip",
-  "backgroundClip",
-  "bgImage",
-  "backgroundImage",
-  "bgSize",
-  "backgroundSize",
-  "bgPosition",
-  "backgroundPosition",
-  "bgRepeat",
-  "backgroundRepeat",
-  "bgAttachment",
-  "backgroundAttachment",
-];

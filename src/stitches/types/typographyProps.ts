@@ -10,7 +10,7 @@ import {
 
 export type TypographyProps = Partial<{
   fontFamily: Property.FontFamily | FontTokens;
-  fontSize: Property.FontSize<FontSizeTokens>;
+  fontSize: Property.FontSize<FontSizeTokens> | number;
   fontWeight: Property.FontWeight | FontWeightTokens;
   lineHeight: Property.LineHeight<LineHeightTokens>;
   letterSpacing: Property.LetterSpacing<LetterSpacingTokens>;
@@ -19,21 +19,3 @@ export type TypographyProps = Partial<{
   textTransform: Property.TextTransform;
   textDecoration: Property.TextDecoration;
 }>;
-
-export type TypographyPropsKeys = keyof TypographyProps;
-
-/**
- * Array based on the `TypographyProps`.
- * Used to splitProps in SolidJS components
- */
-export const typographyPropsKeys: TypographyPropsKeys[] = [
-  "fontFamily",
-  "fontSize",
-  "fontWeight",
-  "lineHeight",
-  "letterSpacing",
-  "textAlign",
-  "fontStyle",
-  "textTransform",
-  "textDecoration",
-];

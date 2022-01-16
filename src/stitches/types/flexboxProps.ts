@@ -15,25 +15,3 @@ export type FlexboxProps = Partial<{
   alignSelf: Property.AlignSelf;
   order: Property.Order;
 }>;
-
-export type FlexboxPropsKeys = keyof FlexboxProps;
-
-/**
- * Array based on the `FlexboxProps`.
- * Used to splitProps in SolidJS components
- */
-export const flexboxPropsKeys: FlexboxPropsKeys[] = [
-  "alignItems",
-  "alignContent",
-  "justifyItems",
-  "justifyContent",
-  "flexWrap",
-  "flexDirection",
-  "flex",
-  "flexGrow",
-  "flexShrink",
-  "flexBasis",
-  "justifySelf",
-  "alignSelf",
-  "order",
-];

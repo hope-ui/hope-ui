@@ -1,5 +1,5 @@
 import { StitchesTheme } from "@/stitches/stitches.config";
-import { DefaultThemeTokens } from "@/stitches/tokens";
+import { DefaultThemeTokens } from "@/stitches/types";
 
 /**
  * Interface of the default Hope UI design tokens.

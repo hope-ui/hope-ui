@@ -25,33 +25,3 @@ export type OtherCSSProps = Partial<{
   stroke: Property.Stroke | ColorTokens;
   outline: Property.Outline;
 }>;
-
-export type OtherCSSPropsKeys = keyof OtherCSSProps;
-
-/**
- * Array based on the `OtherCSSProps`.
- * Used to splitProps in SolidJS components
- */
-export const otherCSSPropsKeys: OtherCSSPropsKeys[] = [
-  "animation",
-  "appearance",
-  "transform",
-  "transformOrigin",
-  "visibility",
-  "whiteSpace",
-  "userSelect",
-  "pointerEvents",
-  "wordBreak",
-  "overflowWrap",
-  "textOverflow",
-  "boxSizing",
-  "cursor",
-  "resize",
-  "transition",
-  "objectFit",
-  "objectPosition",
-  "float",
-  "fill",
-  "stroke",
-  "outline",
-];
