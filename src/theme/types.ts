@@ -5,6 +5,7 @@ import {
   ThemeablePaperOptions,
   ThemeableTagOptions,
 } from "@/components";
+import { ThemeableAvatarOptions } from "@/components/Avatar";
 
 export type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
@@ -19,6 +20,7 @@ export type HopeXPosition = "left" | "right";
 export type HopeYPosition = "top" | "bottom";
 
 export interface ComponentsDefaultProps {
+  Avatar: Required<ThemeableAvatarOptions>;
   Button: Required<ThemeableButtonOptions>;
   Container: Required<ThemeableContainerOptions>;
   IconButton: Required<ThemeableIconButtonOptions>;

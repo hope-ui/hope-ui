@@ -51,16 +51,7 @@ export type ExtendableProps<
  * props like children, className & style work, as well as element-specific
  * attributes like aria roles. The component (`C`) must be passed in.
  */
-export type InheritableElementProps<
-  C extends ElementType,
-  Props = Record<string, unknown>
-> = ExtendableProps<PropsOf<C>, Props>;
-
-/**
- * A more sophisticated version of `InheritableElementProps` where
- * the passed in `as` prop will determine which props can be included
- */
 export type PolymorphicComponentProps<
   C extends ElementType,
   Props = Record<string, unknown>
-> = InheritableElementProps<C, Props & AsProp<C> & ClassProps>;
+> = ExtendableProps<PropsOf<C>, Props & AsProp<C> & ClassProps>;

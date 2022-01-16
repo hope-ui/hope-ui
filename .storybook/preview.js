@@ -23,6 +23,19 @@ export const decorators = [
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
   decorators,
+  options: {
+    storySort: {
+      order: [
+        "General",
+        "Layout",
+        "Data entry",
+        "Data display",
+        "Navigation",
+        "Feedback",
+        "Overlay",
+      ],
+    },
+  },
   backgrounds: {
     default: "neutral-50",
     values: [

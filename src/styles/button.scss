@@ -70,11 +70,11 @@
 
 @mixin btn-size(
   $size-name,
-  $font-size,
-  $icon-size,
   $height,
-  $padding-x,
   $compact-height,
+  $icon-size,
+  $font-size,
+  $padding-x,
   $compact-padding-x,
   $spacing
 ) {
@@ -111,55 +111,55 @@
 
 @include btn-size(
   "xs",
-  typography.$font-size-xs,
-  sizes.$size-3-5,
   sizes.$size-6,
-  space.$space-2,
   sizes.$size-5,
+  sizes.$size-3-5,
+  typography.$font-size-xs,
+  space.$space-2,
   space.$space-1,
   space.$space-1
 );
 
 @include btn-size(
   "sm",
-  typography.$font-size-sm,
-  sizes.$size-4,
   sizes.$size-8,
-  space.$space-3,
   sizes.$size-6,
+  sizes.$size-4,
+  typography.$font-size-sm,
+  space.$space-3,
   space.$space-1-5,
   space.$space-1-5
 );
 
 @include btn-size(
   "md",
-  typography.$font-size-base,
-  sizes.$size-5,
   sizes.$size-10,
-  space.$space-4,
   sizes.$size-7,
+  sizes.$size-5,
+  typography.$font-size-base,
+  space.$space-4,
   space.$space-1-5,
   space.$space-1-5
 );
 
 @include btn-size(
   "lg",
-  typography.$font-size-lg,
-  sizes.$size-6,
   sizes.$size-12,
-  space.$space-6,
   sizes.$size-8,
+  sizes.$size-6,
+  typography.$font-size-lg,
+  space.$space-6,
   space.$space-1-5,
   space.$space-2
 );
 
 @include btn-size(
   "xl",
-  typography.$font-size-xl,
-  sizes.$size-7,
   sizes.$size-14,
-  space.$space-10,
   sizes.$size-9,
+  sizes.$size-7,
+  typography.$font-size-xl,
+  space.$space-10,
   space.$space-2,
   space.$space-2
 );

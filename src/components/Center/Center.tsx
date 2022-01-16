@@ -1,15 +1,12 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ContainerProps, ElementType } from "@/components";
-import { useHopeTheme } from "@/contexts";
+import { CenterProps, ElementType } from "@/components";
 
-export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
-  const theme = useHopeTheme().components.Container;
-
-  const defaultProps: ContainerProps<"div"> = {
+export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
+  const defaultProps: CenterProps<"div"> = {
     as: "div",
-    centered: theme.centered,
+    inline: false,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
@@ -18,12 +15,12 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
     "class",
     "className",
     "classList",
-    "centered",
+    "inline",
   ]);
 
   const rootClassList = () => ({
-    "h-container": true,
-    "h-container--centered": local.centered,
+    "h-center": true,
+    "h-center--inline": local.inline,
     [local.class || ""]: true,
     [local.className || ""]: true,
     ...local.classList,

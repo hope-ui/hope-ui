@@ -2,7 +2,7 @@
   "name": "@hope-ui/solid",
   "version": "0.0.1",
   "private": false,
-  "description": "The utopic component library for your SolidJS Applications.",
+  "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
     "solid",
     "solidjs",
