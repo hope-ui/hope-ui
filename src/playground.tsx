@@ -3,11 +3,11 @@ import { render } from "solid-js/web";
 import { HopeProvider, styled } from ".";
 
 const BaseButton = styled("button", {
-  // base styles
-
   variants: {
     size: {
-      small: {},
+      small: {
+        color: "blue",
+      },
       large: {
         color: "red",
       },
@@ -16,16 +16,34 @@ const BaseButton = styled("button", {
 });
 
 const CheckoutButton = styled(BaseButton, {
-  // checkout styles
+  variants: {
+    color: {
+      red: {},
+      blue: {},
+    },
+  },
 });
 
 function App() {
   return (
     <HopeProvider>
-      <BaseButton size="small">Base button</BaseButton>
-      <CheckoutButton size="small">Checkout button</CheckoutButton>
       <BaseButton size="large">Base button</BaseButton>
-      <CheckoutButton size="large">Checkout button</CheckoutButton>
+      <CheckoutButton
+        bg={{
+          "@initial": "$danger300",
+          "@lg": "$success300",
+        }}
+        _hover={{
+          "@initial": {
+            bg: "$danger600",
+          },
+          "@lg": {
+            bg: "$success600",
+          },
+        }}
+      >
+        Checkout button
+      </CheckoutButton>
     </HopeProvider>
   );
 }

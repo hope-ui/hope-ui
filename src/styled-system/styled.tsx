@@ -1,9 +1,19 @@
+import { StyledComponentProps, TransformProps } from "@stitches/core/types/styled-component";
 import type * as Util from "@stitches/core/types/util";
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType, HopeStyledComponentProps, stitches, systemPropNames } from ".";
-import { CSSComposer } from "./types";
+import { ElementType, stitches, systemPropNames } from ".";
+import { PseudoProps, StyleProps } from "./props";
+import {
+  AsProp,
+  ChildrenProp,
+  ClassProps,
+  CSSComposer,
+  PropsOf,
+  SxProp,
+  SystemMedia,
+} from "./types";
 
 export function styled<
   C extends ElementType,
@@ -12,7 +22,10 @@ export function styled<
   const cssComponent = stitches.css(...(composers as any));
 
   const styledComponent = <T extends ElementType = C>(
-    props: HopeStyledComponentProps<T, Composers>
+    props: Util.Assign<
+      PropsOf<T> & AsProp<T> & ChildrenProp & ClassProps & SxProp,
+      TransformProps<StyledComponentProps<Composers> & StyleProps & PseudoProps, SystemMedia>
+    >
   ) => {
     const propsWithDefault = mergeProps({ as: component, sx: {} }, props);
     const baseStitchesClass = cssComponent(propsWithDefault);
