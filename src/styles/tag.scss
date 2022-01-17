@@ -1,5 +1,3 @@
-@use "sass:color";
-
 @use "./variables/colors";
 @use "./variables/radii";
 @use "./variables/sizes";
@@ -151,7 +149,7 @@
 
 @mixin tag-outline-color($color-name, $text-color) {
   &.h-tag--color-#{$color-name} {
-    border-color: color.adjust($text-color, $alpha: -0.25);
+    border-color: $text-color;
     color: $text-color;
   }
 }
