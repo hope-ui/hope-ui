@@ -50,17 +50,11 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "@hope-ui/solid";
 
-// 2. Extend the theme to include custom colors, fonts, default component props etc
+// 2. Extend the theme to include custom colors, fonts etc
 const theme = extendTheme({
   tokens: {
     colors: {
       primary500: "salmon",
-    },
-  },
-  components: {
-    Button: {
-      variant: "outline",
-      radius: "full",
     },
   },
 });
@@ -79,11 +73,21 @@ function App() {
 
 ### General
 
-|           | Development | A11y check | Tests | Storybook | Docs |
-| --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Button    |     ✅      |     ✅     |       |    ✅     |      |
-| Container |     ✅      |     ✅     |       |    ✅     |      |
-| Paper     |     ✅      |     ✅     |       |    ✅     |      |
+|        | Development | A11y check | Tests | Storybook | Docs |
+| ------ | :---------: | :--------: | :---: | :-------: | :--: |
+| Button |             |            |       |           |      |
+
+### Layout
+
+|            | Development | A11y check | Tests | Storybook | Docs |
+| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Box        |             |            |       |           |      |
+| Center     |             |            |       |           |      |
+| Container  |             |            |       |           |      |
+| Flex       |             |            |       |           |      |
+| Grid       |             |            |       |           |      |
+| SimpleGrid |             |            |       |           |      |
+| Stack      |             |            |       |           |      |
 
 ### Data entry
 
@@ -113,11 +117,11 @@ function App() {
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
-| Avatar    |     🚧      |            |       |           |      |
+| Avatar    |             |            |       |           |      |
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |
-| Tag       |     ✅      |     ✅     |       |    ✅     |      |
+| Tag       |             |            |       |           |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation

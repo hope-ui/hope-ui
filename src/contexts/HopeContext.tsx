@@ -1,9 +1,7 @@
 import { createContext, mergeProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { ChildrenProp } from "@/components";
-import { applyGlobalBaseStyles } from "@/stitches/baseStyles/applyGlobalBaseStyles";
-import { defaultHopeTheme, HopeTheme } from "@/theme";
+import { applyGlobalBaseStyles, ChildrenProp, defaultTheme, HopeTheme } from "@/styled-system";
 
 export interface HopeContextValue {
   theme: HopeTheme;
@@ -16,13 +14,13 @@ export type HopeProviderProps = ChildrenProp & {
 };
 
 export function HopeProvider(props: HopeProviderProps) {
-  const propsWithDefault = mergeProps({ theme: defaultHopeTheme }, props);
+  const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
   const [state] = createStore({ theme: propsWithDefault.theme });
 
   // Apply the customized stitches theme
-  document.body.classList.add(state.theme.stitchesTheme);
+  document.body.classList.add(state.theme.tokens);
 
-  applyGlobalBaseStyles(state.theme.stitchesTheme);
+  applyGlobalBaseStyles(state.theme.tokens);
 
   return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }
