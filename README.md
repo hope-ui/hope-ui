@@ -76,51 +76,29 @@ function App() {
 }
 ```
 
-#### Customizing Sass variables
+#### Customizing CSS variables
 
-Hope UI uses Sass for all it's design tokens e.g. colors, shadows, breapoints, etc...
+Hope UI uses CSS variables for all it's design tokens e.g. colors, shadows, breapoints, etc...
 
-If you intend to customise the default `theme` to match your design requirements, you can override all Sass variables.
+If you intend to customise the default `theme` to match your design requirements, you can override all css variables.
 
 For example to override the primary color palette :
 
-1. Create a `.scss` file that will contains all your variables overrides.
+```css
+// variables.css
 
-```scss
-// variables.scss
-
-@forward "@hope-ui/solid/styles/variables/colors" with (
-  $color-primary-50: #fdf2f8,
-  $color-primary-100: #fce7f3,
-  $color-primary-200: #fbcfe8,
-  $color-primary-300: #f9a8d4,
-  $color-primary-400: #f472b6,
-  $color-primary-500: #ec4899,
-  $color-primary-600: #db2777,
-  $color-primary-700: #be185d,
-  $color-primary-800: #9d174d,
-  $color-primary-900: #831843
-);
-```
-
-2. Configure your build tool to import this `variables.scss` at the top of all `.scss` files, the below example are using [Vite](https://vitejs.dev/).
-
-> :warning: **Warning :** Do not add any css rule in this file as it will be duplicated in all others Sass files where it's imported.
-
-```ts
-// vite.config.js|ts
-
-export default defineConfig({
-  //...
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: "@use './src/variables.scss';",
-      },
-    },
-  },
-  //...
-});
+:root {
+  --hope-color-primary-50: #fdf2f8,
+  --hope-color-primary-100: #fce7f3,
+  --hope-color-primary-200: #fbcfe8,
+  --hope-color-primary-300: #f9a8d4,
+  --hope-color-primary-400: #f472b6,
+  --hope-color-primary-500: #ec4899,
+  --hope-color-primary-600: #db2777,
+  --hope-color-primary-700: #be185d,
+  --hope-color-primary-800: #9d174d,
+  --hope-color-primary-900: #831843
+}
 ```
 
 ### Import style on demand
