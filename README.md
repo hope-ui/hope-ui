@@ -52,10 +52,8 @@ import { extendTheme, HopeProvider } from "hope-ui-solid";
 
 // 2. Extend the theme to include custom colors, fonts etc
 const theme = extendTheme({
-  tokens: {
-    colors: {
-      primary500: "salmon",
-    },
+  colors: {
+    primary500: "salmon",
   },
 });
 
