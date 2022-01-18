@@ -15,7 +15,7 @@
 First install Hope UI as a dependency in your project.
 
 ```bash
-npm install hope-ui # or yarn or pnpm
+npm install hope-ui-solid # or yarn or pnpm
 ```
 
 Since Hope UI is build with Sass and chip `.scss` files you need to install `sass` as a dev dependency.
@@ -32,7 +32,7 @@ This can be either in your `index.jsx` or `index.tsx`
 
 ```jsx
 // 1. import `HopeProvider` component
-import { HopeProvider } from "hope-ui";
+import { HopeProvider } from "hope-ui-solid";
 
 function App() {
   // 2. Wrap HopeProvider at the root of your app
@@ -54,7 +54,7 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 
 ```jsx
 // 1. Import the extendTheme function
-import { extendTheme, HopeProvider } from "hope-ui";
+import { extendTheme, HopeProvider } from "hope-ui-solid";
 
 // 2. Extend the theme to globally set default components props
 const theme = extendTheme({
@@ -118,7 +118,7 @@ npm install -D vite-plugin-style-import # or yarn or pnpm
 ```ts
 // 1. Import the vite plugin and the Hope UI resolver
 import styleImport from "vite-plugin-style-import";
-import { HopeUIResolve } from "hope-ui";
+import { HopeUIResolve } from "hope-ui-solid";
 
 export default defineConfig({
   plugins: [
@@ -137,12 +137,12 @@ export default defineConfig({
 This plugin will automaticaly do this :
 
 ```js
-import { Button } from 'hope-ui';
+import { Button } from 'hope-ui-solid';
 
         ↓ ↓ ↓ ↓ ↓ ↓
 
-import { Button } from 'hope-ui';
-import 'hope-ui/dist/styles/button.scss';
+import { Button } from 'hope-ui-solid';
+import 'hope-ui-solid/dist/styles/button.scss';
 ```
 
 ## Components roadmap
