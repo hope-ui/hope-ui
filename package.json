@@ -1,5 +1,5 @@
 {
-  "name": "@hope-ui/solid",
+  "name": "hope-ui",
   "version": "0.0.1",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
