@@ -9,7 +9,7 @@ export function extendTheme(themeOverride: HopeThemeOverride): HopeTheme {
   // create a copy to not mutate the original theme
   const customTheme = merge({}, defaultTheme);
 
-  merge(customTheme, stitches.createTheme(themeOverride));
+  merge(customTheme.tokens, stitches.createTheme(themeOverride));
 
   return customTheme;
 }
