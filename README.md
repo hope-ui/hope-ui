@@ -116,17 +116,23 @@ npm install -D vite-plugin-style-import # or yarn or pnpm
 2. Update your `vite.config.js|ts`.
 
 ```ts
-// 1. Import the vite plugin and the Hope UI resolver
+// 1. Import the vite plugin
 import styleImport from "vite-plugin-style-import";
-import { HopeUIResolve } from "hope-ui-solid";
 
 export default defineConfig({
   plugins: [
     solidPlugin(),
     styleImport({
-      resolves: [
-        // 2. Add the Hope UI resolver
-        HopeUIResolve(),
+      // 2. Add the Hope UI resolver
+      libs: [
+        {
+          libraryName: "hope-ui-solid",
+          ensureStyleFile: true,
+          esModule: true,
+          libraryNameChangeCase: "paramCase",
+          resolveStyle: (name: string) => `hope-ui-solid/dist/styles/${name}.scss`,
+          base: "hope-ui-solid/styles/base.scss",
+        },
       ],
     }),
   ],
