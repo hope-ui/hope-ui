@@ -1,6 +1,6 @@
 {
-  "name": "@hope-ui/solid",
-  "version": "0.0.1",
+  "name": "hope-ui-solid",
+  "version": "0.0.4",
   "private": false,
   "description": "The utopic component library for your SolidJS Applications.",
   "keywords": [
@@ -92,6 +92,7 @@
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-simple-import-sort": "7.0.0",
+    "eslint-plugin-solid": "0.4.0",
     "husky": "7.0.4",
     "lint-staged": "12.1.7",
     "prettier": "2.5.1",

@@ -15,12 +15,11 @@ export type HopeProviderProps = ChildrenProp & {
 
 export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
-  const [state] = createStore({ theme: propsWithDefault.theme });
+  const [state] = createStore({ theme: propsWithDefault.theme }); //eslint-disable-line
 
-  // Apply the customized stitches theme
-  document.body.classList.add(state.theme.tokens);
-
-  applyGlobalBaseStyles(state.theme.tokens);
+  // Apply the customized stitches theme and css reset
+  document.body.classList.add(state.theme.tokens); //eslint-disable-line
+  applyGlobalBaseStyles(state.theme.tokens); //eslint-disable-line
 
   return <HopeContext.Provider value={state}>{props.children}</HopeContext.Provider>;
 }

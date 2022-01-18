@@ -1,4 +1,4 @@
-# @hope-ui/solid (WIP)
+# hope-ui-solid (WIP)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
@@ -15,7 +15,7 @@
 First install Hope UI and Stitches as a dependency in your project.
 
 ```bash
-npm install @hope-ui/solid @stitches/core # or yarn add or pnpm add
+npm install hope-ui-solid @stitches/core # or yarn add or pnpm add
 ```
 
 ### Provider setup
@@ -26,7 +26,7 @@ This can be either in your `index.jsx` or `index.tsx`
 
 ```jsx
 // 1. import `HopeProvider` component
-import { HopeProvider } from "@hope-ui/solid";
+import { HopeProvider } from "hope-ui-solid";
 
 function App() {
   // 2. Wrap HopeProvider at the root of your app
@@ -42,13 +42,13 @@ function App() {
 
 #### Customizing Theme
 
-If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `@hope-ui/solid`.
+If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
 
 Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
 
 ```jsx
 // 1. Import the extendTheme function
-import { extendTheme, HopeProvider } from "@hope-ui/solid";
+import { extendTheme, HopeProvider } from "hope-ui-solid";
 
 // 2. Extend the theme to include custom colors, fonts etc
 const theme = extendTheme({
