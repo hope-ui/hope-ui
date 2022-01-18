@@ -33,7 +33,12 @@ export default defineConfig({
           hook: "writeBundle",
         }),
       ],
-      external: [...Object.keys(pkg.dependencies), ...Object.keys(pkg.peerDependencies)],
+      external: [
+        ...Object.keys(pkg.dependencies),
+        ...Object.keys(pkg.peerDependencies),
+        "solid-js/web",
+        "solid-js/store",
+      ],
     },
   },
 });
