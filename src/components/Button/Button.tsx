@@ -1,9 +1,9 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType } from "@/components";
 import { useHopeTheme } from "@/contexts";
 import { IconSpinner } from "@/icons";
+import { ElementType } from "@/utils";
 
 import { ButtonProps } from "./types";
 
@@ -51,6 +51,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     "h-btn": true,
     "h-btn--compact": local.compact,
     "h-btn--loading": local.loading,
+    "h-btn--disabled": local.disabled,
     "h-btn--uppercase": local.uppercase,
     "h-btn--full-width": local.fullWidth,
     [`h-btn--variant-${local.variant}`]: true,

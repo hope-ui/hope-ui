@@ -63,7 +63,7 @@ WithBothSection.args = { children: "Please don't do that..." };
 
 export const WithCloseButton = (args: any) => (
   <Tag
-    leftSection={<TagCloseButton aria-label="Close" onClick={action("clicked close button")} />}
+    rightSection={<TagCloseButton aria-label="Close" onClick={action("clicked close button")} />}
     {...args}
   />
 );

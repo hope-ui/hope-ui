@@ -1,8 +1,4 @@
-@use "./variables/colors";
-@use "./variables/radii";
-@use "./variables/sizes";
-@use "./variables/space";
-@use "./variables/typography";
+@use "./common/variables" as *;
 
 .h-tag {
   appearance: none;
@@ -12,9 +8,48 @@
   justify-content: center;
   align-items: center;
 
-  font-weight: typography.$font-weight-semibold;
-  line-height: typography.$line-height-none;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-none;
   text-decoration: none;
+}
+
+.h-tag__close-btn {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid transparent;
+  background-color: transparent;
+
+  padding: 0;
+
+  line-height: $line-height-none;
+  text-decoration: none;
+  color: inherit;
+
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: color 250ms, background-color 250ms;
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 0;
+  }
+
+  &:disabled {
+    border: 1px solid transparent;
+    background-color: transparent;
+    color: var(--hope-color-neutral-300);
+    cursor: not-allowed;
+  }
 }
 
 /* Sizes
@@ -53,35 +88,25 @@
   }
 }
 
-@include tag-size(
-  "sm",
-  sizes.$size-5,
-  sizes.$size-4,
-  typography.$font-size-xs,
-  space.$space-2,
-  space.$space-0-5,
-  space.$space-1
-);
+@include tag-size("sm", $size-5, $size-4, $font-size-xs, $size-2, $size-0-5, $size-1);
+@include tag-size("md", $size-6, $size-5, $font-size-sm, $size-2, $size-0-5, $size-1-5);
+@include tag-size("lg", $size-8, $size-7, $font-size-base, $size-3, $size-0_5, $size-2);
 
-@include tag-size(
-  "md",
-  sizes.$size-6,
-  sizes.$size-5,
-  typography.$font-size-sm,
-  space.$space-2,
-  space.$space-0-5,
-  space.$space-1-5
-);
+@mixin tag-close-btn-size($size-name, $size, $icon-size) {
+  .h-tag--size-#{$size-name} .h-tag__close-btn {
+    height: $size;
+    width: $size;
 
-@include tag-size(
-  "lg",
-  sizes.$size-8,
-  sizes.$size-7,
-  typography.$font-size-base,
-  space.$space-3,
-  space.$space-0_5,
-  space.$space-2
-);
+    & .h-tag__close-btn__icon {
+      height: $icon-size;
+      width: $icon-size;
+    }
+  }
+}
+
+@include tag-close-btn-size("sm", $size-4, $size-3-5);
+@include tag-close-btn-size("md", $size-5, $size-4);
+@include tag-close-btn-size("lg", $size-7, $size-5);
 
 /* Radius
  * ------------------------------------------*/
@@ -92,13 +117,27 @@
   }
 }
 
-@include tag-radius("none", radii.$radii-none);
-@include tag-radius("xs", radii.$radii-xs);
-@include tag-radius("sm", radii.$radii-sm);
-@include tag-radius("md", radii.$radii-md);
-@include tag-radius("lg", radii.$radii-lg);
-@include tag-radius("xl", radii.$radii-xl);
-@include tag-radius("full", radii.$radii-full);
+@include tag-radius("none", $radii-none);
+@include tag-radius("xs", $radii-xs);
+@include tag-radius("sm", $radii-sm);
+@include tag-radius("md", $radii-md);
+@include tag-radius("lg", $radii-lg);
+@include tag-radius("xl", $radii-xl);
+@include tag-radius("full", $radii-full);
+
+@mixin tag-close-btn-radius($size-name, $value) {
+  .h-tag--radius-#{$size-name} .h-tag__close-btn {
+    border-radius: $value;
+  }
+}
+
+@include tag-close-btn-radius("none", $radii-none);
+@include tag-close-btn-radius("xs", $radii-xs);
+@include tag-close-btn-radius("sm", $radii-sm);
+@include tag-close-btn-radius("md", $radii-md);
+@include tag-close-btn-radius("lg", $radii-lg);
+@include tag-close-btn-radius("xl", $radii-xl);
+@include tag-close-btn-radius("full", $radii-full);
 
 /* Variant : Filled
  * ------------------------------------------*/
@@ -109,17 +148,31 @@
   }
 }
 
+@mixin tag-close-btn-filled-color($color-name, $bg-color-hover) {
+  &.h-tag--color-#{$color-name} .h-tag__close-btn:not(:disabled):hover {
+    background-color: $bg-color-hover;
+  }
+}
+
 .h-tag--variant-filled {
   border: 1px solid transparent;
   color: white;
 
-  @include tag-filled-color("primary", colors.$color-primary-500);
-  @include tag-filled-color("dark", colors.$color-dark-500);
-  @include tag-filled-color("neutral", colors.$color-neutral-500);
-  @include tag-filled-color("success", colors.$color-success-500);
-  @include tag-filled-color("info", colors.$color-info-500);
-  @include tag-filled-color("warning", colors.$color-warning-500);
-  @include tag-filled-color("danger", colors.$color-danger-500);
+  @include tag-filled-color("primary", var(--hope-color-primary-500));
+  @include tag-filled-color("dark", var(--hope-color-dark-500));
+  @include tag-filled-color("neutral", var(--hope-color-neutral-500));
+  @include tag-filled-color("success", var(--hope-color-success-500));
+  @include tag-filled-color("info", var(--hope-color-info-500));
+  @include tag-filled-color("warning", var(--hope-color-warning-500));
+  @include tag-filled-color("danger", var(--hope-color-danger-500));
+
+  @include tag-close-btn-filled-color("primary", var(--hope-color-primary-600));
+  @include tag-close-btn-filled-color("dark", var(--hope-color-dark-800));
+  @include tag-close-btn-filled-color("neutral", var(--hope-color-neutral-600));
+  @include tag-close-btn-filled-color("success", var(--hope-color-success-600));
+  @include tag-close-btn-filled-color("info", var(--hope-color-info-600));
+  @include tag-close-btn-filled-color("warning", var(--hope-color-warning-600));
+  @include tag-close-btn-filled-color("danger", var(--hope-color-danger-600));
 }
 
 /* Variant : Light
@@ -132,16 +185,30 @@
   }
 }
 
+@mixin tag-close-btn-light-color($color-name, $bg-color-hover) {
+  &.h-tag--color-#{$color-name} .h-tag__close-btn:not(:disabled):hover {
+    background-color: $bg-color-hover;
+  }
+}
+
 .h-tag--variant-light {
   border: 1px solid transparent;
 
-  @include tag-light-color("primary", colors.$color-primary-600, colors.$color-primary-50);
-  @include tag-light-color("dark", colors.$color-dark-800, colors.$color-dark-50);
-  @include tag-light-color("neutral", colors.$color-neutral-600, colors.$color-neutral-50);
-  @include tag-light-color("success", colors.$color-success-600, colors.$color-success-50);
-  @include tag-light-color("info", colors.$color-info-600, colors.$color-info-50);
-  @include tag-light-color("warning", colors.$color-warning-600, colors.$color-warning-50);
-  @include tag-light-color("danger", colors.$color-danger-600, colors.$color-danger-50);
+  @include tag-light-color("primary", var(--hope-color-primary-600), var(--hope-color-primary-50));
+  @include tag-light-color("dark", var(--hope-color-dark-800), var(--hope-color-dark-50));
+  @include tag-light-color("neutral", var(--hope-color-neutral-600), var(--hope-color-neutral-50));
+  @include tag-light-color("success", var(--hope-color-success-600), var(--hope-color-success-50));
+  @include tag-light-color("info", var(--hope-color-info-600), var(--hope-color-info-50));
+  @include tag-light-color("warning", var(--hope-color-warning-600), var(--hope-color-warning-50));
+  @include tag-light-color("danger", var(--hope-color-danger-600), var(--hope-color-danger-50));
+
+  @include tag-close-btn-light-color("primary", var(--hope-color-primary-100));
+  @include tag-close-btn-light-color("dark", var(--hope-color-dark-100));
+  @include tag-close-btn-light-color("neutral", var(--hope-color-neutral-200));
+  @include tag-close-btn-light-color("success", var(--hope-color-success-100));
+  @include tag-close-btn-light-color("info", var(--hope-color-info-100));
+  @include tag-close-btn-light-color("warning", var(--hope-color-warning-100));
+  @include tag-close-btn-light-color("danger", var(--hope-color-danger-100));
 }
 
 /* Variant : Outline
@@ -154,18 +221,32 @@
   }
 }
 
+@mixin tag-close-btn-outline-color($color-name, $bg-color-hover) {
+  &.h-tag--color-#{$color-name} .h-tag__close-btn:not(:disabled):hover {
+    background-color: $bg-color-hover;
+  }
+}
+
 .h-tag--variant-outline {
   border-style: solid;
   border-width: 1px;
   background-color: transparent;
 
-  @include tag-outline-color("primary", colors.$color-primary-600);
-  @include tag-outline-color("dark", colors.$color-dark-600);
-  @include tag-outline-color("neutral", colors.$color-neutral-600);
-  @include tag-outline-color("success", colors.$color-success-600);
-  @include tag-outline-color("info", colors.$color-info-600);
-  @include tag-outline-color("warning", colors.$color-warning-600);
-  @include tag-outline-color("danger", colors.$color-danger-600);
+  @include tag-outline-color("primary", var(--hope-color-primary-600));
+  @include tag-outline-color("dark", var(--hope-color-dark-600));
+  @include tag-outline-color("neutral", var(--hope-color-neutral-600));
+  @include tag-outline-color("success", var(--hope-color-success-600));
+  @include tag-outline-color("info", var(--hope-color-info-600));
+  @include tag-outline-color("warning", var(--hope-color-warning-600));
+  @include tag-outline-color("danger", var(--hope-color-danger-600));
+
+  @include tag-close-btn-outline-color("primary", var(--hope-color-primary-100));
+  @include tag-close-btn-outline-color("dark", var(--hope-color-dark-50));
+  @include tag-close-btn-outline-color("neutral", var(--hope-color-neutral-200));
+  @include tag-close-btn-outline-color("success", var(--hope-color-success-100));
+  @include tag-close-btn-outline-color("info", var(--hope-color-info-100));
+  @include tag-close-btn-outline-color("warning", var(--hope-color-warning-100));
+  @include tag-close-btn-outline-color("danger", var(--hope-color-danger-100));
 }
 
 /* Variant : Dot
@@ -198,9 +279,9 @@
 }
 
 .h-tag--variant-dot {
-  border: 1px solid colors.$color-neutral-300;
+  border: 1px solid var(--hope-color-neutral-300);
   background-color: transparent;
-  color: colors.$color-neutral-600;
+  color: var(--hope-color-neutral-600);
 
   &::before,
   &::after {
@@ -229,22 +310,26 @@
   }
 
   &.h-tag--size-sm {
-    @include tag-dot-size(sizes.$size-1-5);
+    @include tag-dot-size($size-1-5);
   }
 
   &.h-tag--size-md {
-    @include tag-dot-size(sizes.$size-2);
+    @include tag-dot-size($size-2);
   }
 
   &.h-tag--size-lg {
-    @include tag-dot-size(sizes.$size-2-5);
+    @include tag-dot-size($size-2-5);
   }
 
-  @include tag-dot-color("primary", colors.$color-primary-500);
-  @include tag-dot-color("dark", colors.$color-dark-500);
-  @include tag-dot-color("neutral", colors.$color-neutral-500);
-  @include tag-dot-color("success", colors.$color-success-500);
-  @include tag-dot-color("info", colors.$color-info-500);
-  @include tag-dot-color("warning", colors.$color-warning-500);
-  @include tag-dot-color("danger", colors.$color-danger-500);
+  & .h-tag__close-btn:not(:disabled):hover {
+    background-color: var(--hope-color-neutral-200);
+  }
+
+  @include tag-dot-color("primary", var(--hope-color-primary-500));
+  @include tag-dot-color("dark", var(--hope-color-dark-500));
+  @include tag-dot-color("neutral", var(--hope-color-neutral-500));
+  @include tag-dot-color("success", var(--hope-color-success-500));
+  @include tag-dot-color("info", var(--hope-color-info-500));
+  @include tag-dot-color("warning", var(--hope-color-warning-500));
+  @include tag-dot-color("danger", var(--hope-color-danger-500));
 }

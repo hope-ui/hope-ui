@@ -1,8 +1,9 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ContainerProps, ElementType } from "@/components";
+import { ContainerProps } from "@/components";
 import { useHopeTheme } from "@/contexts";
+import { ElementType } from "@/utils";
 
 export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
   const theme = useHopeTheme().components.Container;

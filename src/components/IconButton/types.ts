@@ -1,6 +1,8 @@
 import { JSX } from "solid-js";
 
-import { ElementType, PolymorphicComponentProps, ThemeableButtonOptions } from "@/components";
+import { ElementType, PolymorphicComponentProps } from "@/utils";
+
+import { ThemeableButtonOptions } from "..";
 
 export type ThemeableIconButtonOptions = Omit<
   ThemeableButtonOptions,

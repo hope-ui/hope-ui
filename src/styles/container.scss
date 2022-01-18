@@ -1,5 +1,3 @@
-@use "./variables/breakpoints";
-
 @mixin max-with-breakpoint($breakpoint) {
   @media (min-width: $breakpoint) {
     max-width: $breakpoint;
@@ -9,11 +7,11 @@
 .h-container {
   width: 100%;
 
-  @include max-with-breakpoint(breakpoints.$breakpoint-sm);
-  @include max-with-breakpoint(breakpoints.$breakpoint-md);
-  @include max-with-breakpoint(breakpoints.$breakpoint-lg);
-  @include max-with-breakpoint(breakpoints.$breakpoint-xl);
-  @include max-with-breakpoint(breakpoints.$breakpoint-2xl);
+  @include max-with-breakpoint(var(--hope-breakpoint-sm));
+  @include max-with-breakpoint(var(--hope-breakpoint-md));
+  @include max-with-breakpoint(var(--hope-breakpoint-lg));
+  @include max-with-breakpoint(var(--hope-breakpoint-xl));
+  @include max-with-breakpoint(var(--hope-breakpoint-2xl));
 
   &--centered {
     margin: 0 auto;

@@ -2,8 +2,9 @@ import { createSignal, Match, mergeProps, Show, splitProps, Switch } from "solid
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts";
+import { ElementType } from "@/utils";
 
-import { AvatarType, ElementType } from "..";
+import { AvatarType } from "..";
 import { AvatarProps } from ".";
 
 export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
@@ -54,7 +55,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
 
   const rootClassList = () => ({
     "h-avatar": true,
-    "h-avatar--with-image": avatarType() === "image",
+    "h-avatar--with-inner-shadow": avatarType() === "image",
     [`h-avatar--variant-${local.variant}`]: true,
     [`h-avatar--size-${local.size}`]: true,
     [`h-avatar--radius-${local.radius}`]: true,

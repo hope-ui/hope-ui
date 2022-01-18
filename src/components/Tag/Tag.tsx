@@ -1,9 +1,8 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementType } from "@/components";
-import { TagContextValue, TagProvider } from "@/components/Tag/TagContext";
 import { useHopeTheme } from "@/contexts";
+import { ElementType } from "@/utils";
 
 import { TagProps } from "./types";
 
@@ -50,22 +49,13 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
     return local.leftSection || local.rightSection;
   };
 
-  const tagContextValue: TagContextValue = {
-    variant: local.variant ?? theme.variant,
-    color: local.color ?? theme.color,
-    size: local.size ?? theme.size,
-    radius: local.radius ?? theme.radius,
-  };
-
   return (
-    <TagProvider tagContextValue={tagContextValue}>
-      <Dynamic component={local.as} classList={rootClassList()} {...others}>
-        <Show when={local.leftSection}>{local.leftSection}</Show>
-        <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
-          <span>{local.children}</span>
-        </Show>
-        <Show when={local.rightSection}>{local.rightSection}</Show>
-      </Dynamic>
-    </TagProvider>
+    <Dynamic component={local.as} classList={rootClassList()} {...others}>
+      <Show when={local.leftSection}>{local.leftSection}</Show>
+      <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
+        <span>{local.children}</span>
+      </Show>
+      <Show when={local.rightSection}>{local.rightSection}</Show>
+    </Dynamic>
   );
 }
