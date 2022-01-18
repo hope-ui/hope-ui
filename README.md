@@ -90,16 +90,16 @@ For example to override the primary color palette :
 // variables.css
 
 :root {
-  --hope-color-primary-50: #fdf2f8,
-  --hope-color-primary-100: #fce7f3,
-  --hope-color-primary-200: #fbcfe8,
-  --hope-color-primary-300: #f9a8d4,
-  --hope-color-primary-400: #f472b6,
-  --hope-color-primary-500: #ec4899,
-  --hope-color-primary-600: #db2777,
-  --hope-color-primary-700: #be185d,
-  --hope-color-primary-800: #9d174d,
-  --hope-color-primary-900: #831843
+  --hope-color-primary-50: #fdf2f8;
+  --hope-color-primary-100: #fce7f3;
+  --hope-color-primary-200: #fbcfe8;
+  --hope-color-primary-300: #f9a8d4;
+  --hope-color-primary-400: #f472b6;
+  --hope-color-primary-500: #ec4899;
+  --hope-color-primary-600: #db2777;
+  --hope-color-primary-700: #be185d;
+  --hope-color-primary-800: #9d174d;
+  --hope-color-primary-900: #831843;
 }
 ```
 
@@ -116,17 +116,23 @@ npm install -D vite-plugin-style-import # or yarn or pnpm
 2. Update your `vite.config.js|ts`.
 
 ```ts
-// 1. Import the vite plugin and the Hope UI resolver
+// 1. Import the vite plugin
 import styleImport from "vite-plugin-style-import";
-import { HopeUIResolve } from "hope-ui-solid";
 
 export default defineConfig({
   plugins: [
     solidPlugin(),
     styleImport({
-      resolves: [
-        // 2. Add the Hope UI resolver
-        HopeUIResolve(),
+      // 2. Add the Hope UI resolver
+      libs: [
+        {
+          libraryName: "hope-ui-solid",
+          ensureStyleFile: true,
+          esModule: true,
+          libraryNameChangeCase: "paramCase",
+          resolveStyle: (name: string) => `hope-ui-solid/dist/styles/${name}.scss`,
+          base: "hope-ui-solid/styles/base.scss",
+        },
       ],
     }),
   ],
