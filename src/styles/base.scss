@@ -1,7 +1,5 @@
 @use "modern-normalize/modern-normalize.css";
-
-@use "./variables/colors";
-@use "./variables/typography";
+@use "./theme";
 
 /*
  * Reset
@@ -24,12 +22,11 @@ body {
 /* 
   1. Use theme dark color for text. 
   2. Use theme `sans` font-family.
-  3. Use theme base line height.
 */
 html {
-  color: colors.$color-dark-900; /* 1 */
-  font-family: typography.$font-sans; /* 2 */
-  line-height: typography.$line-height-base; /* 3 */
+  color: var(--hope-color-dark-900); /* 1 */
+  font-family: var(--hope-font-familly); /* 2 */
+  line-height: 1.5;
   font-size: 16px;
 }
 

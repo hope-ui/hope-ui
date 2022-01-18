@@ -1,10 +1,4 @@
-@use "./variables/colors";
-@use "./variables/radii";
-@use "./variables/sizes";
-@use "./variables/shadows";
-@use "./variables/space";
-@use "./variables/typography";
-@use "./variables/z-indices";
+@use "./common/variables" as *;
 
 .h-avatar {
   position: relative;
@@ -16,22 +10,22 @@
 
   padding: 0;
 
-  line-height: typography.$line-height-none;
-  font-weight: typography.$font-weight-medium;
+  line-height: $line-height-none;
+  font-weight: $font-weight-medium;
   text-transform: uppercase;
   text-align: center;
 
-  &.h-avatar--with-image::before {
+  &.h-avatar--with-inner-shadow::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
-    z-index: z-indices.$z-indice-docked;
+    z-index: $z-indice-docked;
     display: block;
     height: 100%;
     width: 100%;
-    box-shadow: shadows.$shadow-inner;
-    border-radius: radii.$radii-full;
+    box-shadow: $shadow-inner;
+    border-radius: $radii-full;
   }
 
   & .h-avatar--image {
@@ -58,11 +52,11 @@
   }
 }
 
-@include avatar-size("xs", sizes.$size-6, 0.6rem);
-@include avatar-size("sm", sizes.$size-8, 0.8rem);
-@include avatar-size("md", sizes.$size-12, 1.2rem);
-@include avatar-size("lg", sizes.$size-16, 1.6rem);
-@include avatar-size("xl", sizes.$size-24, 2.4rem);
+@include avatar-size("xs", $size-6, 0.6rem);
+@include avatar-size("sm", $size-8, 0.8rem);
+@include avatar-size("md", $size-12, 1.2rem);
+@include avatar-size("lg", $size-16, 1.6rem);
+@include avatar-size("xl", $size-24, 2.4rem);
 
 /* Radius
  * ------------------------------------------*/
@@ -77,13 +71,13 @@
   }
 }
 
-@include avatar-radius("none", radii.$radii-none);
-@include avatar-radius("xs", radii.$radii-xs);
-@include avatar-radius("sm", radii.$radii-sm);
-@include avatar-radius("md", radii.$radii-md);
-@include avatar-radius("lg", radii.$radii-lg);
-@include avatar-radius("xl", radii.$radii-xl);
-@include avatar-radius("full", radii.$radii-full);
+@include avatar-radius("none", $radii-none);
+@include avatar-radius("xs", $radii-xs);
+@include avatar-radius("sm", $radii-sm);
+@include avatar-radius("md", $radii-md);
+@include avatar-radius("lg", $radii-lg);
+@include avatar-radius("xl", $radii-xl);
+@include avatar-radius("full", $radii-full);
 
 /* Variant : Filled
  * ------------------------------------------*/
@@ -97,13 +91,13 @@
 .h-avatar--variant-filled {
   color: white;
 
-  @include avatar-filled-color("primary", colors.$color-primary-500);
-  @include avatar-filled-color("dark", colors.$color-dark-500);
-  @include avatar-filled-color("neutral", colors.$color-neutral-500);
-  @include avatar-filled-color("success", colors.$color-success-500);
-  @include avatar-filled-color("info", colors.$color-info-500);
-  @include avatar-filled-color("warning", colors.$color-warning-500);
-  @include avatar-filled-color("danger", colors.$color-danger-500);
+  @include avatar-filled-color("primary", var(--hope-color-primary-500));
+  @include avatar-filled-color("dark", var(--hope-color-dark-500));
+  @include avatar-filled-color("neutral", var(--hope-color-neutral-500));
+  @include avatar-filled-color("success", var(--hope-color-success-500));
+  @include avatar-filled-color("info", var(--hope-color-info-500));
+  @include avatar-filled-color("warning", var(--hope-color-warning-500));
+  @include avatar-filled-color("danger", var(--hope-color-danger-500));
 }
 
 /* Variant : Light
@@ -117,11 +111,33 @@
 }
 
 .h-avatar--variant-light {
-  @include avatar-light-color("primary", colors.$color-primary-500, colors.$color-primary-100);
-  @include avatar-light-color("dark", colors.$color-dark-500, colors.$color-dark-50);
-  @include avatar-light-color("neutral", colors.$color-neutral-500, colors.$color-neutral-200);
-  @include avatar-light-color("success", colors.$color-success-500, colors.$color-success-100);
-  @include avatar-light-color("info", colors.$color-info-500, colors.$color-info-100);
-  @include avatar-light-color("warning", colors.$color-warning-500, colors.$color-warning-100);
-  @include avatar-light-color("danger", colors.$color-danger-500, colors.$color-danger-100);
+  @include avatar-light-color(
+    "primary",
+    var(--hope-color-primary-500),
+    var(--hope-color-primary-100)
+  );
+
+  @include avatar-light-color("dark", var(--hope-color-dark-500), var(--hope-color-dark-50));
+
+  @include avatar-light-color(
+    "neutral",
+    var(--hope-color-neutral-500),
+    var(--hope-color-neutral-200)
+  );
+
+  @include avatar-light-color(
+    "success",
+    var(--hope-color-success-500),
+    var(--hope-color-success-100)
+  );
+
+  @include avatar-light-color("info", var(--hope-color-info-500), var(--hope-color-info-100));
+
+  @include avatar-light-color(
+    "warning",
+    var(--hope-color-warning-500),
+    var(--hope-color-warning-100)
+  );
+
+  @include avatar-light-color("danger", var(--hope-color-danger-500), var(--hope-color-danger-100));
 }

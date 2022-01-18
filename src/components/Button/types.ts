@@ -1,7 +1,7 @@
 import { JSX } from "solid-js";
 
-import { ChildrenProp, ElementType, PolymorphicComponentProps } from "@/components";
 import { HopeColor, HopeSize, HopeXPosition } from "@/theme";
+import { ElementType, PolymorphicComponentProps } from "@/utils";
 
 export type ButtonVariant = "filled" | "light" | "outline" | "dashed" | "text" | "default";
 
@@ -16,12 +16,11 @@ export type ThemeableButtonOptions = {
   fullWidth?: boolean;
 };
 
-export type ButtonOptions = ThemeableButtonOptions &
-  ChildrenProp & {
-    loading?: boolean;
-    disabled?: boolean;
-    leftIcon?: JSX.Element;
-    rightIcon?: JSX.Element;
-  };
+export type ButtonOptions = ThemeableButtonOptions & {
+  loading?: boolean;
+  disabled?: boolean;
+  leftIcon?: JSX.Element;
+  rightIcon?: JSX.Element;
+};
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;

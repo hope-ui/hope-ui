@@ -1,4 +1,4 @@
-import { Component, ComponentProps, JSX } from "solid-js";
+import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
 /**
  * Represent any HTML element or SolidJS component.
@@ -10,19 +10,12 @@ export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
-
-/**
- * The children prop allow passing others HTML element or components between a component tag
- */
-export type ChildrenProp = {
-  children?: JSX.Element;
-};
+type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
  * All SolidJS props that apply css classes.
  */
-export type ClassProps = {
+type ClassProps = {
   class?: string;
   className?: string;
   classList?: { [key: string]: boolean };
@@ -32,7 +25,7 @@ export type ClassProps = {
  * The `as` props is an override of the default HTML tag.
  * Can also be another SolidJS component.
  */
-export type AsProp<C extends ElementType> = {
+type AsProp<C extends ElementType> = {
   as?: C;
 };
 
@@ -41,7 +34,7 @@ export type AsProp<C extends ElementType> = {
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-export type ExtendableProps<
+type ExtendableProps<
   ExtendedProps = Record<string, unknown>,
   OverrideProps = Record<string, unknown>
 > = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
@@ -54,4 +47,4 @@ export type ExtendableProps<
 export type PolymorphicComponentProps<
   C extends ElementType,
   Props = Record<string, unknown>
-> = ExtendableProps<PropsOf<C>, Props & AsProp<C> & ClassProps>;
+> = ExtendableProps<PropsOf<C>, PropsWithChildren<Props & AsProp<C> & ClassProps>>;

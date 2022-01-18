@@ -1,7 +1,6 @@
-import { createContext, mergeProps, useContext } from "solid-js";
+import { createContext, mergeProps, PropsWithChildren, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { ChildrenProp } from "@/components";
 import { defaultTheme, HopeTheme } from "@/theme";
 
 export interface HopeContextValue {
@@ -10,9 +9,9 @@ export interface HopeContextValue {
 
 export const HopeContext = createContext<HopeContextValue>();
 
-export type HopeProviderProps = ChildrenProp & {
+export type HopeProviderProps = PropsWithChildren<{
   theme?: HopeTheme;
-};
+}>;
 
 export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
@@ -25,9 +24,7 @@ export function useHopeTheme() {
   const context = useContext(HopeContext);
 
   if (!context) {
-    throw new Error(
-      "[Hope UI]: no HopeTheme found, did you wrap your components with HopeProvider ?"
-    );
+    throw new Error("[Hope UI]: no HopeTheme found, did you wrap your App with HopeProvider ?");
   }
 
   return context.theme;

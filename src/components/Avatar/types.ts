@@ -1,8 +1,7 @@
 import { Component } from "solid-js";
 
 import { HopeColor, HopeSize } from "@/theme";
-
-import { ElementType, PolymorphicComponentProps } from "..";
+import { ElementType, PolymorphicComponentProps } from "@/utils";
 
 export type AvatarType = "image" | "name" | "icon";
 

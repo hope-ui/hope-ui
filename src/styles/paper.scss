@@ -1,13 +1,10 @@
-@use "./variables/colors";
-@use "./variables/radii";
-@use "./variables/shadows";
-@use "./variables/space";
+@use "./common/variables" as *;
 
 .h-paper {
   background-color: white;
 
   &--with-border {
-    border: 1px solid colors.$color-neutral-200;
+    border: 1px solid var(--hope-color-neutral-200);
   }
 }
 
@@ -20,12 +17,12 @@
   }
 }
 
-@include paper-padding("none", space.$space-none);
-@include paper-padding("xs", space.$space-2);
-@include paper-padding("sm", space.$space-3);
-@include paper-padding("md", space.$space-4);
-@include paper-padding("lg", space.$space-5);
-@include paper-padding("xl", space.$space-6);
+@include paper-padding("none", $size-none);
+@include paper-padding("xs", $size-2);
+@include paper-padding("sm", $size-3);
+@include paper-padding("md", $size-4);
+@include paper-padding("lg", $size-5);
+@include paper-padding("xl", $size-6);
 
 /* Radius
  * ------------------------------------------*/
@@ -36,12 +33,12 @@
   }
 }
 
-@include paper-radius("none", radii.$radii-none);
-@include paper-radius("xs", radii.$radii-xs);
-@include paper-radius("sm", radii.$radii-sm);
-@include paper-radius("md", radii.$radii-md);
-@include paper-radius("lg", radii.$radii-lg);
-@include paper-radius("xl", radii.$radii-xl);
+@include paper-radius("none", $radii-none);
+@include paper-radius("xs", $radii-xs);
+@include paper-radius("sm", $radii-sm);
+@include paper-radius("md", $radii-md);
+@include paper-radius("lg", $radii-lg);
+@include paper-radius("xl", $radii-xl);
 
 /* Shadow
  * ------------------------------------------*/
@@ -52,9 +49,9 @@
   }
 }
 
-@include paper-shadow("none", shadows.$shadow-none);
-@include paper-shadow("xs", shadows.$shadow-sm);
-@include paper-shadow("sm", shadows.$shadow-md);
-@include paper-shadow("md", shadows.$shadow-lg);
-@include paper-shadow("lg", shadows.$shadow-xl);
-@include paper-shadow("xl", shadows.$shadow-2xl);
+@include paper-shadow("none", $shadow-none);
+@include paper-shadow("xs", $shadow-sm);
+@include paper-shadow("sm", $shadow-md);
+@include paper-shadow("md", $shadow-lg);
+@include paper-shadow("lg", $shadow-xl);
+@include paper-shadow("xl", $shadow-2xl);

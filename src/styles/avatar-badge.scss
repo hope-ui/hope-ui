@@ -1,6 +1,4 @@
-@use "./variables/colors";
-@use "./variables/radii";
-@use "./variables/sizes";
+@use "./common/variables" as *;
 
 .h-avatar-badge {
   position: absolute;
@@ -14,7 +12,7 @@
   height: 1.25em;
   width: 1.25em;
 
-  border-radius: radii.$radii-full;
+  border-radius: $radii-full;
 
   transform: translate(25%, 25%);
 }
@@ -29,10 +27,32 @@
   }
 }
 
-@include avatar-badge-color("primary", colors.$color-primary-500, colors.$color-primary-100);
-@include avatar-badge-color("dark", colors.$color-dark-400, colors.$color-dark-50);
-@include avatar-badge-color("neutral", colors.$color-neutral-500, colors.$color-neutral-200);
-@include avatar-badge-color("success", colors.$color-success-500, colors.$color-success-100);
-@include avatar-badge-color("info", colors.$color-info-500, colors.$color-info-100);
-@include avatar-badge-color("warning", colors.$color-warning-500, colors.$color-warning-100);
-@include avatar-badge-color("danger", colors.$color-danger-500, colors.$color-danger-100);
+@include avatar-badge-color(
+  "primary",
+  var(--hope-color-primary-500),
+  var(--hope-color-primary-100)
+);
+
+@include avatar-badge-color("dark", var(--hope-color-dark-400), var(--hope-color-dark-50));
+
+@include avatar-badge-color(
+  "neutral",
+  var(--hope-color-neutral-500),
+  var(--hope-color-neutral-200)
+);
+
+@include avatar-badge-color(
+  "success",
+  var(--hope-color-success-500),
+  var(--hope-color-success-100)
+);
+
+@include avatar-badge-color("info", var(--hope-color-info-500), var(--hope-color-info-100));
+
+@include avatar-badge-color(
+  "warning",
+  var(--hope-color-warning-500),
+  var(--hope-color-warning-100)
+);
+
+@include avatar-badge-color("danger", var(--hope-color-danger-500), var(--hope-color-danger-100));
