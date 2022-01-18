@@ -1,5 +1,6 @@
-import { SystemTokens } from "..";
-import { defaulThemeTokens } from "../tokens";
+import { defaulThemeTokens } from "@/stitches/tokens";
+
+import { SystemTokens } from "./stitches";
 
 /**
  * The Hope UI theme interface.
@@ -24,6 +25,4 @@ export type ThemeTokensOverride = {
 /**
  * The Hope UI theme override interface.
  */
-export interface HopeThemeOverride {
-  tokens?: ThemeTokensOverride;
-}
+export type HopeThemeOverride = Pick<ThemeTokensOverride, "colors" | "fonts">;
