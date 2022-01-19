@@ -192,6 +192,22 @@ export const pseudoPropConfig: PropConfig<PseudoProps> = {
   _groupDisabled: true,
 };
 
+export const stylePropsConfig = {
+  ...layoutPropConfig,
+  ...colorPropConfig,
+  ...borderPropConfig,
+  ...shadowPropConfig,
+  ...marginPropConfig,
+  ...paddingPropConfig,
+  ...positionPropConfig,
+  ...pseudoPropConfig,
+  ...sizePropConfig,
+  ...flexboxPropConfig,
+  ...gridPropConfig,
+  ...commonFlexboxAndGridPropConfig,
+  ...typographyPropConfig,
+};
+
 /**
  * Get the common keys between two objects
  * @param obj The object to check if it contains some keys of the reference object.

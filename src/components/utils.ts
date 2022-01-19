@@ -7,8 +7,6 @@ import { AsProp, ClassProps } from ".";
  */
 export const commonPropNames: Array<keyof (AsProp<any> & ClassProps & CSSProp)> = [
   "as",
-  "class",
   "className",
-  "classList",
   "css",
 ];

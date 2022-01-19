@@ -1,12 +1,34 @@
 import { render } from "solid-js/web";
 
 import { Box, Center, HopeProvider } from ".";
+import { hope } from "./components/factory";
+
+const Box2 = hope("div");
+const Center2 = hope(
+  "div",
+  {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  {
+    color: "$success600",
+    variants: {
+      chien: {
+        true: {},
+      },
+    },
+  }
+);
+
+const Center3 = hope(Center2, {});
 
 function App() {
   return (
     <HopeProvider>
-      <Center boxSize="200px" bg="$primary500" role="group">
-        <Box
+      <Center3>Center 3</Center3>
+      <Center2 boxSize="200px" bg="$primary100" role="group">
+        <Box2
           as="button"
           borderRadius="$md"
           bg="tomato"
@@ -23,9 +45,10 @@ function App() {
           }}
         >
           Button
-        </Box>
-      </Center>
-      <Box
+        </Box2>
+        Chien
+      </Center2>
+      <Box2
         as="button"
         borderRadius="$md"
         bg="tomato"
@@ -42,7 +65,10 @@ function App() {
         }}
       >
         Button
-      </Box>
+      </Box2>
+      <hope.a href="/" color="$success600" css={{ textTransform: "uppercase" }}>
+        Hello
+      </hope.a>
     </HopeProvider>
   );
 }
