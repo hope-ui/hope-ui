@@ -215,7 +215,7 @@ Hope UI lets you build custom UI components with constraint-based style props ba
 | \_groupHover    | \[role=group]:hover &, \[role=group]\[data-hover] &      | none        |
 | \_groupActive   | \[role=group]:active &, \[role=group]\[data-active] &    | none        |
 | \_groupFocus    | \[role=group]:focus &, \[role=group]\[data-focus] &      | none        |
-| \_groupDisabled | \role=group]:disabled &, \[role=group]\[data-disabled] & | none        |
+| \_groupDisabled | \[role=group]:disabled &, \[role=group]\[data-disabled] & | none        |
 
 ### The `css` prop
 
