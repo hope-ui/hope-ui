@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-
-# hope-ui (WIP)
-
-=======
-
 # hope-ui-solid (WIP)
-
-> > > > > > > stitches-no-styled-system
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
@@ -20,29 +12,33 @@
 
 ### Installation
 
-First install Hope UI and Stitches as a dependency in your project.
+First install Hope UI and Stitches as a dependency.
+
+npm :
 
 ```bash
-<<<<<<< HEAD
-npm install hope-ui-solid # or yarn or pnpm
+npm install hope-ui-solid @stitches/core
 ```
 
-Since Hope UI is build with Sass and chip `.scss` files you need to install `sass` as a dev dependency.
+Yarn :
 
 ```bash
-npm install -D sass # or yarn or pnpm
-=======
-npm install hope-ui-solid @stitches/core # or yarn add or pnpm add
->>>>>>> stitches-no-styled-system
+yarn add hope-ui-solid @stitches/core
+```
+
+pnpm :
+
+```bash
+pnpm add hope-ui-solid @stitches/core
 ```
 
 ### Provider setup
 
 After installing Hope UI, you need to set up the `HopeProvider` at the root of your application.
 
-This can be either in your `index.jsx` or `index.tsx`
+This can be either in your `index.jsx`, `index.tsx` or your App component.
 
-```jsx
+```tsx
 // 1. import `HopeProvider` component
 import { HopeProvider } from "hope-ui-solid";
 
@@ -70,8 +66,10 @@ import { extendTheme, HopeProvider } from "hope-ui-solid";
 
 // 2. Extend the theme to include custom colors, fonts etc
 const theme = extendTheme({
-  colors: {
-    primary500: "salmon",
+  tokens: {
+    colors: {
+      primary500: "salmon",
+    },
   },
 });
 
@@ -79,7 +77,7 @@ const theme = extendTheme({
 function App() {
   return (
     <HopeProvider theme={theme}>
-      <App />
+      <MyApp />
     </HopeProvider>
   );
 }
