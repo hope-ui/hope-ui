@@ -1,7 +1,9 @@
+import { sizes } from "./tokens/sizes";
+
 export const media = {
-  sm: `(min-width: 640px)`,
-  md: `(min-width: 768px)`,
-  lg: `(min-width: 1024px)`,
-  xl: `(min-width: 1280px)`,
-  "2xl": `(min-width: 1536px)`,
+  sm: `(min-width: ${sizes.containerSm})`,
+  md: `(min-width: ${sizes.containerMd})`,
+  lg: `(min-width: ${sizes.containerLg})`,
+  xl: `(min-width: ${sizes.containerXl})`,
+  "2xl": `(min-width: ${sizes.container2xl})`,
 };

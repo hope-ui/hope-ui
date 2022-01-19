@@ -1,7 +1,5 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
-import { CSSProp } from "./stitches";
-
 /**
  * Represent any HTML element or SolidJS component.
  */
@@ -49,4 +47,4 @@ type ExtendableProps<
 export type PolymorphicComponentProps<
   C extends ElementType,
   Props = Record<string, unknown>
-> = ExtendableProps<PropsOf<C>, PropsWithChildren<Props & AsProp<C> & ClassProps & CSSProp>>;
+> = ExtendableProps<PropsOf<C>, PropsWithChildren<Props & AsProp<C> & ClassProps>>;

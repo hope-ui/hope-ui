@@ -1,6 +1,5 @@
-import { SystemTokens } from "@/types/stitches";
-
 import { stitches } from "../stitches.config";
+import { SystemTokens } from "../types";
 import { modernNormalizeCSS } from "./modernNormalizeCSS";
 
 /**

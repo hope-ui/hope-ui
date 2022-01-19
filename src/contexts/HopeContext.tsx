@@ -1,9 +1,9 @@
 import { createContext, mergeProps, PropsWithChildren, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { applyGlobalBaseStyles } from "@/stitches";
-import { defaultTheme } from "@/theme";
-import { HopeTheme } from "@/types";
+import { applyGlobalBaseStyles } from "@/stitches/baseStyles/applyGlobalBaseStyles";
+import { defaultTheme } from "@/theme/defaultTheme";
+import { HopeTheme } from "@/theme/types";
 
 export interface HopeContextValue {
   theme: HopeTheme;

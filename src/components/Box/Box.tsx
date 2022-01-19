@@ -1,18 +1,52 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { stitches } from "@/stitches";
-import { ElementType, PolymorphicComponentProps } from "@/types";
+import {
+  CommonStyleProps,
+  CSSProp,
+  FlexboxAndGridProps,
+  FlexboxProps,
+  GridProps,
+} from "@/stitches/props/styleProps";
+import {
+  commonStylePropConfig,
+  flexboxAndGridPropConfig,
+  flexboxPropConfig,
+  getIntersectionKeys,
+  gridPropConfig,
+} from "@/stitches/props/stylePropsConfig";
+import { stitches } from "@/stitches/stitches.config";
 
-export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C>;
+import { ElementType, PolymorphicComponentProps } from "../types";
+
+export type BoxProps<C extends ElementType> = PolymorphicComponentProps<
+  C,
+  CommonStyleProps & FlexboxProps & GridProps & FlexboxAndGridProps & CSSProp
+>;
 
 const box = stitches.css();
 
 export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
-  const [local, others] = splitProps(props, ["as", "class", "className", "classList", "css"]);
+  const usedStylePropNames = getIntersectionKeys(props, {
+    ...commonStylePropConfig,
+    ...flexboxPropConfig,
+    ...gridPropConfig,
+    ...flexboxAndGridPropConfig,
+  });
+
+  const [local, styleProps, others] = splitProps(
+    props,
+    ["as", "class", "className", "classList", "css"],
+    usedStylePropNames
+  );
 
   const classList = () => {
-    const boxWithCSSOverride = box({ css: local.css });
+    const boxWithCSSOverride = box({
+      css: {
+        ...styleProps,
+        ...local.css,
+      },
+    });
 
     return {
       [boxWithCSSOverride]: true,

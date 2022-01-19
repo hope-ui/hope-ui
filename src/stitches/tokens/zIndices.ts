@@ -1,12 +1,9 @@
 export const zIndices = {
   docked: 10,
   dropdown: 1000,
-  sticky: 1100,
-  banner: 1200,
-  overlay: 1300,
-  modal: 1400,
-  popover: 1500,
-  skipLink: 1600,
-  toast: 1700,
-  tooltip: 1800,
+  overlay: 1100,
+  modal: 1200,
+  popover: 1300,
+  toast: 1400,
+  tooltip: 1500,
 };
