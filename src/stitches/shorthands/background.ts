@@ -1,6 +1,6 @@
 import type { PropertyValue } from "@stitches/core";
 
-import { ColorProps } from "../props/styleProps";
+import { ColorProps } from "../props/colorProps";
 
 export const background: Pick<Record<keyof ColorProps, any>, "bg"> = {
   /**

@@ -1,73 +1,76 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { BorderProps } from "@/stitches/props/borderProps";
+import { ColorProps } from "@/stitches/props/colorProps";
+import { CommonFlexboxAndGridProps } from "@/stitches/props/commonFlexboxAndGridProps";
+import { CSSProp } from "@/stitches/props/cssProp";
+import { FlexboxProps } from "@/stitches/props/flexboxProps";
+import { GridProps } from "@/stitches/props/gridProps";
+import { LayoutProps } from "@/stitches/props/layoutProps";
+import { MarginProps } from "@/stitches/props/marginProps";
+import { PaddingProps } from "@/stitches/props/paddingProps";
+import { PositionProps } from "@/stitches/props/positionProps";
+import { ShadowProps } from "@/stitches/props/shadowProps";
+import { SizeProps } from "@/stitches/props/sizeProps";
 import {
-  BorderRadiusProps,
-  ColorProps,
-  CSSProp,
-  DisplayProps,
-  FlexboxAndGridProps,
-  FlexboxProps,
-  GridProps,
-  MarginProps,
-  PaddingProps,
-  ShadowProps,
-  SizeProps,
-} from "@/stitches/props/styleProps";
-import {
-  borderRadiusPropConfig,
+  borderPropConfig,
   colorPropConfig,
-  displayPropConfig,
-  flexboxAndGridPropConfig,
+  commonFlexboxAndGridPropConfig,
   flexboxPropConfig,
   getIntersectionKeys,
   gridPropConfig,
+  layoutPropConfig,
   marginPropConfig,
   paddingPropConfig,
+  positionPropConfig,
   shadowPropConfig,
   sizePropConfig,
+  typographyPropConfig,
 } from "@/stitches/props/stylePropsConfig";
+import { TypographyProps } from "@/stitches/props/typographyProps";
 import { stitches } from "@/stitches/stitches.config";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
+import { commonPropNames } from "../utils";
 
-type BoxOptions = DisplayProps &
+type BoxOptions = LayoutProps &
   ColorProps &
-  BorderRadiusProps &
+  BorderProps &
   ShadowProps &
   MarginProps &
   PaddingProps &
+  PositionProps &
   SizeProps &
   FlexboxProps &
   GridProps &
-  FlexboxAndGridProps &
+  CommonFlexboxAndGridProps &
+  TypographyProps &
   CSSProp;
 
 export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C, BoxOptions>;
 
 const boxStylePropConfig = {
-  ...displayPropConfig,
+  ...layoutPropConfig,
   ...colorPropConfig,
-  ...borderRadiusPropConfig,
+  ...borderPropConfig,
   ...shadowPropConfig,
   ...marginPropConfig,
   ...paddingPropConfig,
+  ...positionPropConfig,
   ...sizePropConfig,
   ...flexboxPropConfig,
   ...gridPropConfig,
-  ...flexboxAndGridPropConfig,
+  ...commonFlexboxAndGridPropConfig,
+  ...typographyPropConfig,
 };
 
 const box = stitches.css();
 
 export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
-  const usedStylePropNames = getIntersectionKeys(props, boxStylePropConfig);
+  const stylePropNames = getIntersectionKeys(props, boxStylePropConfig);
 
-  const [local, styleProps, others] = splitProps(
-    props,
-    ["as", "class", "className", "classList", "css"],
-    usedStylePropNames
-  );
+  const [local, styleProps, others] = splitProps(props, commonPropNames, stylePropNames);
 
   const classList = () => {
     const boxWithOverrides = box({

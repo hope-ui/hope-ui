@@ -1,6 +1,6 @@
 import type { PropertyValue } from "@stitches/core";
 
-import { MarginProps } from "../props/styleProps";
+import { MarginProps } from "../props/marginProps";
 
 export const margin: Record<keyof MarginProps, any> = {
   /**

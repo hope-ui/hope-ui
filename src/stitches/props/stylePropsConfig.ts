@@ -1,15 +1,15 @@
-import {
-  ColorProps,
-  DisplayProps,
-  FlexboxAndGridProps,
-  FlexboxProps,
-  GridProps,
-  MarginProps,
-  PaddingProps,
-  BorderRadiusProps,
-  ShadowProps,
-  SizeProps,
-} from "./styleProps";
+import { BorderProps } from "./borderProps";
+import { ColorProps } from "./colorProps";
+import { CommonFlexboxAndGridProps } from "./commonFlexboxAndGridProps";
+import { FlexboxProps } from "./flexboxProps";
+import { GridProps } from "./gridProps";
+import { LayoutProps } from "./layoutProps";
+import { MarginProps } from "./marginProps";
+import { PaddingProps } from "./paddingProps";
+import { PositionProps } from "./positionProps";
+import { ShadowProps } from "./shadowProps";
+import { SizeProps } from "./sizeProps";
+import { TypographyProps } from "./typographyProps";
 
 /*
  * Hack to get all styles prop names in sync with they related prop types.
@@ -20,11 +20,14 @@ import {
 type PropConfig<T> = Record<keyof T, true>;
 
 /**
- * Style prop names for display property
+ * Style prop names for layour related properties
  */
-export const displayPropConfig: PropConfig<DisplayProps> = {
-  // Display
+export const layoutPropConfig: PropConfig<LayoutProps> = {
   display: true,
+  verticalAlign: true,
+  overflow: true,
+  overflowX: true,
+  overflowY: true,
 };
 
 /**
@@ -33,12 +36,17 @@ export const displayPropConfig: PropConfig<DisplayProps> = {
 export const colorPropConfig: PropConfig<ColorProps> = {
   color: true,
   bg: true,
+  opacity: true,
 };
 
 /**
- * Style prop names for border-radius properties
+ * Style prop names for border properties
  */
-export const borderRadiusPropConfig: PropConfig<BorderRadiusProps> = {
+export const borderPropConfig: PropConfig<BorderProps> = {
+  border: true,
+  borderWidth: true,
+  borderStyle: true,
+  borderColor: true,
   borderRadius: true,
 };
 
@@ -76,6 +84,18 @@ export const paddingPropConfig: PropConfig<PaddingProps> = {
 };
 
 /**
+ * Style prop names for position realted properties
+ */
+export const positionPropConfig: PropConfig<PositionProps> = {
+  position: true,
+  zIndex: true,
+  top: true,
+  right: true,
+  bottom: true,
+  left: true,
+};
+
+/**
  * Style prop names for sizes properties
  */
 export const sizePropConfig: PropConfig<SizeProps> = {
@@ -92,10 +112,7 @@ export const sizePropConfig: PropConfig<SizeProps> = {
  * Style prop names used in flexbox based components
  */
 export const flexboxPropConfig: PropConfig<FlexboxProps> = {
-  alignItems: true,
-  alignContent: true,
   justifyItems: true,
-  justifyContent: true,
   flexWrap: true,
   flexDirection: true,
   flex: true,
@@ -104,7 +121,6 @@ export const flexboxPropConfig: PropConfig<FlexboxProps> = {
   flexBasis: true,
   justifySelf: true,
   alignSelf: true,
-  order: true,
 };
 
 /**
@@ -130,13 +146,33 @@ export const gridPropConfig: PropConfig<GridProps> = {
 /**
  * Style prop names used in flexbox and CSS grid based components
  */
-export const flexboxAndGridPropConfig: PropConfig<FlexboxAndGridProps> = {
+export const commonFlexboxAndGridPropConfig: PropConfig<CommonFlexboxAndGridProps> = {
+  alignItems: true,
+  alignContent: true,
+  justifyContent: true,
   gap: true,
   rowGap: true,
   columnGap: true,
   placeContent: true,
   placeItems: true,
   placeSelf: true,
+  order: true,
+};
+
+/**
+ * Style prop names used in typography properties
+ */
+export const typographyPropConfig: PropConfig<TypographyProps> = {
+  fontFamily: true,
+  fontSize: true,
+  fontWeight: true,
+  lineClamp: true,
+  lineHeight: true,
+  letterSpacing: true,
+  textAlign: true,
+  fontStyle: true,
+  textTransform: true,
+  textDecoration: true,
 };
 
 /**
