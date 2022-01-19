@@ -2,37 +2,66 @@ import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import {
-  CommonStyleProps,
+  BorderRadiusProps,
+  ColorProps,
   CSSProp,
+  DisplayProps,
   FlexboxAndGridProps,
   FlexboxProps,
   GridProps,
+  MarginProps,
+  PaddingProps,
+  ShadowProps,
+  SizeProps,
 } from "@/stitches/props/styleProps";
 import {
-  commonStylePropConfig,
+  borderRadiusPropConfig,
+  colorPropConfig,
+  displayPropConfig,
   flexboxAndGridPropConfig,
   flexboxPropConfig,
   getIntersectionKeys,
   gridPropConfig,
+  marginPropConfig,
+  paddingPropConfig,
+  shadowPropConfig,
+  sizePropConfig,
 } from "@/stitches/props/stylePropsConfig";
 import { stitches } from "@/stitches/stitches.config";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
 
-export type BoxProps<C extends ElementType> = PolymorphicComponentProps<
-  C,
-  CommonStyleProps & FlexboxProps & GridProps & FlexboxAndGridProps & CSSProp
->;
+type BoxOptions = DisplayProps &
+  ColorProps &
+  BorderRadiusProps &
+  ShadowProps &
+  MarginProps &
+  PaddingProps &
+  SizeProps &
+  FlexboxProps &
+  GridProps &
+  FlexboxAndGridProps &
+  CSSProp;
+
+export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C, BoxOptions>;
+
+const boxStylePropConfig = {
+  ...displayPropConfig,
+  ...colorPropConfig,
+  ...borderRadiusPropConfig,
+  ...shadowPropConfig,
+  ...marginPropConfig,
+  ...paddingPropConfig,
+  ...sizePropConfig,
+  ...flexboxPropConfig,
+  ...gridPropConfig,
+  ...flexboxAndGridPropConfig,
+};
 
 const box = stitches.css();
 
 export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
-  const usedStylePropNames = getIntersectionKeys(props, {
-    ...commonStylePropConfig,
-    ...flexboxPropConfig,
-    ...gridPropConfig,
-    ...flexboxAndGridPropConfig,
-  });
+  const usedStylePropNames = getIntersectionKeys(props, boxStylePropConfig);
 
   const [local, styleProps, others] = splitProps(
     props,
@@ -41,7 +70,7 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
   );
 
   const classList = () => {
-    const boxWithCSSOverride = box({
+    const boxWithOverrides = box({
       css: {
         ...styleProps,
         ...local.css,
@@ -49,7 +78,7 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
     });
 
     return {
-      [boxWithCSSOverride]: true,
+      [boxWithOverrides]: true,
       [local.class || ""]: true,
       [local.className || ""]: true,
       ...local.classList,

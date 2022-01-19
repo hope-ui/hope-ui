@@ -117,7 +117,7 @@ export type PaddingProps = {
 /**
  * Utility props for setting component border radius
  */
-export type RadiusProps = {
+export type BorderRadiusProps = {
   /**
    * The CSS `border-radius` property
    */
@@ -527,14 +527,3 @@ export type FlexboxAndGridProps = {
 export type CSSProp = {
   css?: SystemStyleObject;
 };
-
-/**
- * Utility props for components styling features
- */
-export type CommonStyleProps = DisplayProps &
-  ColorProps &
-  MarginProps &
-  PaddingProps &
-  RadiusProps &
-  ShadowProps &
-  SizeProps;

@@ -1,4 +1,15 @@
-import { CommonStyleProps, FlexboxAndGridProps, FlexboxProps, GridProps } from "./styleProps";
+import {
+  ColorProps,
+  DisplayProps,
+  FlexboxAndGridProps,
+  FlexboxProps,
+  GridProps,
+  MarginProps,
+  PaddingProps,
+  BorderRadiusProps,
+  ShadowProps,
+  SizeProps,
+} from "./styleProps";
 
 /*
  * Hack to get all styles prop names in sync with they related prop types.
@@ -9,17 +20,39 @@ import { CommonStyleProps, FlexboxAndGridProps, FlexboxProps, GridProps } from "
 type PropConfig<T> = Record<keyof T, true>;
 
 /**
- * Common style prop names used in all components
+ * Style prop names for display property
  */
-export const commonStylePropConfig: PropConfig<CommonStyleProps> = {
+export const displayPropConfig: PropConfig<DisplayProps> = {
   // Display
   display: true,
+};
 
-  // Color
+/**
+ * Style prop names for color related properties
+ */
+export const colorPropConfig: PropConfig<ColorProps> = {
   color: true,
   bg: true,
+};
 
-  // Margin
+/**
+ * Style prop names for border-radius properties
+ */
+export const borderRadiusPropConfig: PropConfig<BorderRadiusProps> = {
+  borderRadius: true,
+};
+
+/**
+ * Style prop names for shadows properties
+ */
+export const shadowPropConfig: PropConfig<ShadowProps> = {
+  boxShadow: true,
+};
+
+/**
+ * Style prop names for margin properties
+ */
+export const marginPropConfig: PropConfig<MarginProps> = {
   m: true,
   mx: true,
   my: true,
@@ -27,8 +60,12 @@ export const commonStylePropConfig: PropConfig<CommonStyleProps> = {
   mr: true,
   mb: true,
   ml: true,
+};
 
-  // Padding
+/**
+ * Style prop names for padding properties
+ */
+export const paddingPropConfig: PropConfig<PaddingProps> = {
   p: true,
   px: true,
   py: true,
@@ -36,14 +73,12 @@ export const commonStylePropConfig: PropConfig<CommonStyleProps> = {
   pr: true,
   pb: true,
   pl: true,
+};
 
-  // Border radius
-  borderRadius: true,
-
-  // Box shadow
-  boxShadow: true,
-
-  // Size
+/**
+ * Style prop names for sizes properties
+ */
+export const sizePropConfig: PropConfig<SizeProps> = {
   w: true,
   minW: true,
   maxW: true,
