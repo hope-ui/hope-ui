@@ -67,6 +67,16 @@ const boxStylePropConfig = {
 
 const box = stitches.css();
 
+/**
+ * Box is the most abstract component of Hope UI.
+ *
+ * Box allows you to use style props with any element or component.
+ * Box itself does not include any styles.
+ *
+ * By default, it renders a div element.
+ *
+ * @param props {@link BoxProps}
+ */
 export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
   const stylePropNames = getIntersectionKeys(props, boxStylePropConfig);
 

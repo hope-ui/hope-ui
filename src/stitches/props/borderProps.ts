@@ -9,7 +9,7 @@ export type BorderProps = Partial<{
   /**
    * The CSS `border` property
    */
-  border: Property.Border | ColorTokens;
+  border: Property.Border;
 
   /**
    * The CSS `border-width` property

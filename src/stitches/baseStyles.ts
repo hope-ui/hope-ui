@@ -6,9 +6,14 @@ import { SystemTokens } from "./types";
  */
 export function applyGlobalBaseStyles(tokens: SystemTokens) {
   const baseStyles = stitches.globalCss({
-    /* Use a more-intuitive box-sizing model. */
+    /* 
+     1. Use a more-intuitive box-sizing model. 
+     2. Override the default border in order to make it easy to add a border by simply adding the `border` prop 
+    */
     "*, ::before, ::after": {
-      boxSizing: "border-box",
+      boxSizing: "border-box" /* 1 */,
+      borderWidth: 0 /* 2 */,
+      borderStyle: "solid" /* 2 */,
     },
 
     /* Remove default margin. */
