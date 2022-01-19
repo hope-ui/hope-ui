@@ -65,7 +65,7 @@ const boxStylePropConfig = {
   ...typographyPropConfig,
 };
 
-const box = stitches.css();
+const boxCssComponent = stitches.css();
 
 /**
  * Box is the most abstract component of Hope UI.
@@ -83,7 +83,7 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
   const [local, styleProps, others] = splitProps(props, commonPropNames, stylePropNames);
 
   const classList = () => {
-    const boxWithOverrides = box({
+    const boxWithOverrides = boxCssComponent({
       css: {
         ...styleProps,
         ...local.css,
@@ -100,3 +100,6 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
 
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
+
+Box.className = boxCssComponent.className;
+Box.toString = () => boxCssComponent.selector;

@@ -52,6 +52,261 @@ function App() {
 }
 ```
 
+## The style system
+
+Hope UI lets you build custom UI components with constraint-based style props based on scales defined in your theme.
+
+### Available props
+
+#### Color
+
+| Prop    | CSS property | Theme token |
+| ------- | ------------ | ----------- |
+| color   | color        | `colors`    |
+| bg      | background   | `colors`    |
+| opacity | opacity      | none        |
+
+#### Margin
+
+| Prop | CSS property                            | Theme token |
+| ---- | --------------------------------------- | ----------- |
+| m    | margin                                  | `space`     |
+| mx   | margin-inline-start + margin-inline-end | `space`     |
+| my   | margin-top + margin-bottom              | `space`     |
+| mt   | margin-top                              | `space`     |
+| mr   | margin-right                            | `space`     |
+| mb   | margin-bottom                           | `space`     |
+| ml   | margin-left                             | `space`     |
+
+#### Padding
+
+| Prop | CSS property                              | Theme token |
+| ---- | ----------------------------------------- | ----------- |
+| p    | padding                                   | `space`     |
+| px   | padding-inline-start + padding-inline-end | `space`     |
+| py   | padding-top + padding-bottom              | `space`     |
+| pt   | padding-top                               | `space`     |
+| pr   | padding-right                             | `space`     |
+| pb   | padding-bottom                            | `space`     |
+| pl   | padding-left                              | `space`     |
+
+#### Typography
+
+| Prop           | CSS property                    | Theme token      |
+| -------------- | ------------------------------- | ---------------- |
+| fontFamily     | font-family                     | `fonts`          |
+| fontSize       | font-size                       | `fontSizes`      |
+| fontWeight     | font-weight                     | `fontWeights`    |
+| lineHeight     | line-height                     | `lineHeights`    |
+| letterSpacing  | letter-spacing                  | `letterSpacings` |
+| textAlign      | text-align                      | none             |
+| fontStyle      | font-style                      | none             |
+| textTransform  | text-transform                  | none             |
+| textDecoration | text-decoration                 | none             |
+| lineClamp      | custom utility to truncate text | none             |
+
+#### Layout
+
+| Prop          | CSS property   | Theme token |
+| ------------- | -------------- | ----------- |
+| display       | display        | none        |
+| verticalAlign | vertical-align | none        |
+| overflow      | overflow       | none        |
+| overflowX     | overflow-x     | none        |
+| overflowY     | overflow-y     | none        |
+
+#### Size
+
+| Prop    | CSS property   | Theme token |
+| ------- | -------------- | ----------- |
+| w       | width          | `sizes`     |
+| minW    | min-width      | `sizes`     |
+| maxW    | max-width      | `sizes`     |
+| h       | height         | `sizes`     |
+| minH    | min-height     | `sizes`     |
+| maxH    | max-height     | `sizes`     |
+| boxSize | width + height | `sizes`     |
+
+#### Flexbox
+
+| Prop          | CSS property   | Theme token |
+| ------------- | -------------- | ----------- |
+| justifyItems  | justify-items  | none        |
+| flexWrap      | flex-wrap      | none        |
+| flexDirection | flex-direction | none        |
+| flex          | flex           | none        |
+| flexGrow      | flex-grow      | none        |
+| flexShrink    | flex-shrink    | none        |
+| flexBasis     | flex-basis     | none        |
+| justifySelf   | justify-self   | none        |
+| alignSelf     | align-self     | none        |
+
+#### Grid
+
+| Prop                | CSS property         | Theme token |
+| ------------------- | -------------------- | ----------- |
+| gridColumn          | grid-column          | none        |
+| gridColumnStart     | grid-column-start    | none        |
+| gridColumnEnd       | grid-column-end      | none        |
+| gridRow             | grid-row             | none        |
+| gridRowStart        | grid-row-start       | none        |
+| gridRowEnd          | grid-row-end         | none        |
+| gridAutoFlow        | grid-auto-flow       | none        |
+| gridAutoColumns     | grid-auto-columns    | none        |
+| gridAutoRows        | grid-auto-rows       | none        |
+| gridTemplate        | grid-template        | none        |
+| gridTemplateColumns | grid-template-column | none        |
+| gridTemplateRows    | grid-template-rows   | none        |
+| gridTemplateAreas   | grid-template-areas  | none        |
+| gridArea            | grid-area            | none        |
+
+#### Common to Flexbox and Grid
+
+| Prop           | CSS property    | Theme token |
+| -------------- | --------------- | ----------- |
+| gap            | gap             | `space`     |
+| rowGap         | row-gap         | `space`     |
+| columnGap      | column-gap      | `space`     |
+| alignItems     | align-items     | none        |
+| alignContent   | align-content   | none        |
+| justifyContent | justify-content | none        |
+| placeItems     | place-items     | none        |
+| placeContent   | place-content   | none        |
+| placeSelf      | place-self      | none        |
+| order          | order           | none        |
+
+#### Border
+
+| Prop         | CSS property  | Theme token |
+| ------------ | ------------- | ----------- |
+| border       | border        | none        |
+| borderWidth  | border-width  | none        |
+| borderStyle  | border-style  | none        |
+| borderColor  | border-color  | `colors`    |
+| borderRadius | border-radius | `radii`     |
+
+#### Position
+
+| Prop     | CSS property | Theme token |
+| -------- | ------------ | ----------- |
+| position | position     |             |
+| zIndex   | z-index      | `zIndices`  |
+| top      | top          | `space`     |
+| right    | right        | `space`     |
+| left     | left         | `space`     |
+| bottom   | bottom       | `space`     |
+
+#### Shadow
+
+| Prop      | CSS property | Theme token |
+| --------- | ------------ | ----------- |
+| boxShadow | box-shadow   | `shadows`   |
+
+### The `css` prop
+
+All Hope UI components provides a `css` prop for overriding styles easily.
+
+It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
+
+```jsx
+<Box
+  css={{
+    borderRadius: "0",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "$primary500",
+    },
+  }}
+>
+  Box
+</Box>
+```
+
+#### Responsive styles
+
+Hope UI provide five breakpoints.
+
+| Prop | CSS property               |
+| ---- | -------------------------- |
+| sm   | @media (min-width: 640px)  |
+| md   | @media (min-width: 768px)  |
+| lg   | @media (min-width: 1024px) |
+| xl   | @media (min-width: 1280px) |
+| 2xl  | @media (min-width: 1536px) |
+
+At the moment Hope UI doesn't support responsive styles at props level.
+
+If you want to set responsive styles you should use the `css` prop.
+
+The system works as described in the [Stitches docs](https://stitches.dev/docs/breakpoints#using-breakpoints-in-the-style-objects).
+
+Each breakpoint is a key on the css object prefixed by the `@`symbol.
+
+The `@initial` key represents no breakpoint (min-width: 0px).
+
+```jsx
+<Box
+  css={{
+    "@initial": {
+      backgroundColor: "$primary500",
+    },
+    "@sm": {
+      backgroundColor: "$success500",
+    },
+    "@xl": {
+      backgroundColor: "$info500",
+    },
+  }}
+>
+  Box
+</Box>
+```
+
+#### Targeting other Hope UI components
+
+Inside the `css` props you can target other Hope UI components using string interpolation in the selector.
+
+```jsx
+<Center boxSize="200px" bg="$primary500">
+  <Box
+    as="button"
+    css={{
+      [`${Center} &`]: {
+        background: "red",
+      },
+    }}
+  >
+    Button
+  </Box>
+</Center>
+```
+
+#### Targeting other SolidJS components
+
+Inside the `css` props you can target other SolidJS components using string interpolation in the selector.
+
+```jsx
+function Button() {
+  return <button className="my-button">Button</button>;
+}
+
+// Add a `toString` method which map to a css selector inside your component
+// Here we use the underlying button class name
+Button.toString = () => ".my-button";
+
+<Center
+  boxSize="200px"
+  bg="$primary500"
+  css={{
+    [`& ${Button}`]: {
+      background: "red",
+    },
+  }}
+>
+  <Button />
+</Center>;
+```
+
 ## Using Hope UI theme tokens in style props
 
 Many style props are mapped to values from the Hope UI theme tokens, it uses [Stitches](https://stitches.dev) under the hood.
@@ -67,6 +322,7 @@ To apply a token you need to prefix it with a `$` sign.
   Box with token-aware style props
 </Box>
 ```
+
 > Note that `color` just use the basic css white color.
 
 ### Available tokens
@@ -335,6 +591,30 @@ function App() {
     </HopeProvider>
   );
 }
+```
+
+## The `as` props
+
+All Hope UI components are polymorphic, meaning you can use the `as` prop to change the rendered element.
+
+If you are using TypeScript you will get proper auto-completion based on the value of the `as` prop.
+
+```jsx
+<Box as="a" href="https://www.solidjs.com/" bg="$primary500" p="$4" color="white">
+  I'm an anchor tag
+</Box>
+```
+
+And it works with SolidJS components too :
+
+```jsx
+import { Link } from "solid-app-router";
+
+//...
+
+<Box as={Link} href="/" bg="$primary500" p="$4" color="white">
+  I'm a solid-app-router link
+</Box>;
 ```
 
 ## Acknowledgment

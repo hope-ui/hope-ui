@@ -17,10 +17,37 @@ function App() {
   return (
     <HopeProvider>
       <Center boxSize="200px" bg="$primary500">
-        <Box as="button" borderRadius="$md" bg="tomato" color="white" px="$4" h="$8">
+        <Box
+          as="button"
+          borderRadius="$md"
+          bg="tomato"
+          color="white"
+          px="$4"
+          h="$8"
+          css={{
+            [`${Center} &`]: {
+              background: "red",
+            },
+          }}
+        >
           Button
         </Box>
       </Center>
+      <Box
+        as="button"
+        borderRadius="$md"
+        bg="tomato"
+        color="white"
+        px="$4"
+        h="$8"
+        css={{
+          [`${Center} &`]: {
+            bg: "green",
+          },
+        }}
+      >
+        Button
+      </Box>
     </HopeProvider>
   );
 }
