@@ -6,6 +6,8 @@ import { radii } from "./tokens/radii";
 import { shadows } from "./tokens/shadows";
 import { sizes } from "./tokens/sizes";
 import { space } from "./tokens/space";
+import { fonts, fontSizes, fontWeights, letterSpacings, lineHeights } from "./tokens/typography";
+import { zIndices } from "./tokens/zIndices";
 
 /**
  * Design tokens interface based on the stitches configuration.
@@ -52,3 +54,33 @@ export type SizeTokens = AddStitchesTokenPrefix<keyof typeof sizes>;
  * All available token value for the Space scale.
  * */
 export type SpaceTokens = AddStitchesTokenPrefix<keyof typeof space>;
+
+/**
+ * All available token value for the Font scale.
+ * */
+export type FontTokens = AddStitchesTokenPrefix<keyof typeof fonts>;
+
+/**
+ * All available token value for the Font size scale.
+ * */
+export type FontSizeTokens = AddStitchesTokenPrefix<keyof typeof fontSizes>;
+
+/**
+ * All available token value for the Font weight scale.
+ * */
+export type FontWeightTokens = AddStitchesTokenPrefix<keyof typeof fontWeights>;
+
+/**
+ * All available token value for the Line height scale.
+ * */
+export type LineHeightTokens = AddStitchesTokenPrefix<keyof typeof lineHeights>;
+
+/**
+ * All available token value for the Letter spacing scale.
+ * */
+export type LetterSpacingTokens = AddStitchesTokenPrefix<keyof typeof letterSpacings>;
+
+/**
+ * All available token value for the Z indices scale.
+ * */
+export type ZIndiceTokens = AddStitchesTokenPrefix<keyof typeof zIndices>;
