@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { SpaceTokens } from "../types";
 
 /**
- * Utility props for setting component padding
+ * Types for padding CSS properties
  */
 export type PaddingProps = Partial<{
   /**

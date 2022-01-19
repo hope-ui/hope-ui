@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { SizeTokens } from "../types";
 
 /**
- * Utility props for setting component width and height
+ * Types for size related CSS properties
  */
 export type SizeProps = Partial<{
   /**

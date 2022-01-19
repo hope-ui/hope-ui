@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { SpaceTokens } from "../types";
 
 /**
- * Utility props for flexbox and CSS grid based components
+ * Types for flexbox and grid CSS properties
  */
 export type CommonFlexboxAndGridProps = Partial<{
   /**

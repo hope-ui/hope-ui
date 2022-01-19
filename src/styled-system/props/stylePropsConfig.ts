@@ -7,6 +7,7 @@ import { LayoutProps } from "./layoutProps";
 import { MarginProps } from "./marginProps";
 import { PaddingProps } from "./paddingProps";
 import { PositionProps } from "./positionProps";
+import { PseudoProps } from "./pseudoProps";
 import { ShadowProps } from "./shadowProps";
 import { SizeProps } from "./sizeProps";
 import { TypographyProps } from "./typographyProps";
@@ -173,6 +174,22 @@ export const typographyPropConfig: PropConfig<TypographyProps> = {
   fontStyle: true,
   textTransform: true,
   textDecoration: true,
+};
+
+/**
+ * Pseudo selector prop names
+ */
+export const pseudoPropConfig: PropConfig<PseudoProps> = {
+  _hover: true,
+  _active: true,
+  _focus: true,
+  _focusWithin: true,
+  _focusVisible: true,
+  _disabled: true,
+  _groupHover: true,
+  _groupActive: true,
+  _groupFocus: true,
+  _groupDisabled: true,
 };
 
 /**

@@ -189,7 +189,7 @@ Hope UI lets you build custom UI components with constraint-based style props ba
 
 | Prop     | CSS property | Theme token |
 | -------- | ------------ | ----------- |
-| position | position     |             |
+| position | position     | none        |
 | zIndex   | z-index      | `zIndices`  |
 | top      | top          | `space`     |
 | right    | right        | `space`     |
@@ -201,6 +201,21 @@ Hope UI lets you build custom UI components with constraint-based style props ba
 | Prop      | CSS property | Theme token |
 | --------- | ------------ | ----------- |
 | boxShadow | box-shadow   | `shadows`   |
+
+#### Pseudo selectors
+
+| Prop            | CSS selector                                             | Theme token |
+| --------------- | -------------------------------------------------------- | ----------- |
+| \_hover         | &:hover, &\[data-hover]                                  | none        |
+| \_active        | &:active, &\[data-active]                                | none        |
+| \_focus         | &:focus, &\[data-focus]                                  | none        |
+| \_focusWithin   | &:focus-within                                           | none        |
+| \_focusVisible  | &:focus-visible                                          | none        |
+| \_disabled      | &\[disabled], &\[aria-disabled=true], &\[data-disabled]  | none        |
+| \_groupHover    | \[role=group]:hover &, \[role=group]\[data-hover] &      | none        |
+| \_groupActive   | \[role=group]:active &, \[role=group]\[data-active] &    | none        |
+| \_groupFocus    | \[role=group]:focus &, \[role=group]\[data-focus] &      | none        |
+| \_groupDisabled | \role=group]:disabled &, \[role=group]\[data-disabled] & | none        |
 
 ### The `css` prop
 

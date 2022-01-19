@@ -1,8 +1,6 @@
 import type { PropertyValue } from "@stitches/core";
 
-import { SizeProps } from "../props/sizeProps";
-
-export const size: Record<keyof SizeProps, any> = {
+export const size = {
   /**
    * The CSS `width` property
    */

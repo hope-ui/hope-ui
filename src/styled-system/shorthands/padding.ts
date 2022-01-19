@@ -1,8 +1,6 @@
 import type { PropertyValue } from "@stitches/core";
 
-import { PaddingProps } from "../props/paddingProps";
-
-export const padding: Record<keyof PaddingProps, any> = {
+export const padding = {
   /**
    * Padding on top, left, bottom and right
    */

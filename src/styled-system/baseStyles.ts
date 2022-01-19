@@ -1,11 +1,11 @@
-import { stitches } from "./stitches.config";
+import { globalCss } from "./stitches.config";
 import { SystemTokens } from "./types";
 
 /**
  * Apply Hope UI global base styles
  */
 export function applyGlobalBaseStyles(tokens: SystemTokens) {
-  const baseStyles = stitches.globalCss({
+  const baseStyles = globalCss({
     /* 
      1. Use a more-intuitive box-sizing model. 
      2. Override the default border in order to make it easy to add a border by simply adding the `border` prop 

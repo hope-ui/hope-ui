@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { ShadowTokens } from "../types";
 
 /**
- * Utility props for setting component box shadow
+ * Types for shadow CSS properties
  */
 export type ShadowProps = Partial<{
   /**

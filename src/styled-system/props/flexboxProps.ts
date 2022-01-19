@@ -1,7 +1,7 @@
 import { Property } from "csstype";
 
 /**
- * Utility props for flexbox based components
+ * Types for flexbox CSS properties
  */
 export type FlexboxProps = Partial<{
   /**

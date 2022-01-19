@@ -1,6 +1,6 @@
 import { CSS } from "@stitches/core";
 
-import { stitches } from "./stitches.config";
+import { config, theme } from "./stitches.config";
 import { colors } from "./tokens/colors";
 import { radii } from "./tokens/radii";
 import { shadows } from "./tokens/shadows";
@@ -12,17 +12,17 @@ import { zIndices } from "./tokens/zIndices";
 /**
  * Design tokens interface based on the stitches configuration.
  */
-export type SystemTokens = typeof stitches.theme;
+export type SystemTokens = typeof theme;
 
 /**
  * Media at-rules interface based on the stitches configuration.
  */
-export type SystemMedia = typeof stitches.config.media;
+export type SystemMedia = typeof config.media;
 
 /**
  * Style interface based on the stitches configuration.
  */
-export type SystemStyleObject = CSS<typeof stitches.config>;
+export type SystemStyleObject = CSS<typeof config>;
 
 /**
  * Takes in an existing TKey and adds a the Stitches token prefix `$` to it, if TKey extends the type string or number.

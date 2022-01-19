@@ -1,7 +1,7 @@
 import { Property } from "csstype";
 
 /**
- * Utility props for CSS grid based components
+ * Types for grid CSS properties
  */
 export type GridProps = Partial<{
   /**

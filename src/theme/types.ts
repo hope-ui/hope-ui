@@ -1,5 +1,5 @@
-import { defaulThemeTokens } from "../stitches/tokens";
-import { SystemTokens } from "../stitches/types";
+import { defaulThemeTokens } from "../styled-system/tokens";
+import { SystemTokens } from "../styled-system/types";
 
 /**
  * The Hope UI theme interface.

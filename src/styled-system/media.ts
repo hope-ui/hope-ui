@@ -6,4 +6,6 @@ export const media = {
   lg: `(min-width: ${sizes.containerLg})`,
   xl: `(min-width: ${sizes.containerXl})`,
   "2xl": `(min-width: ${sizes.container2xl})`,
+  dark: "(prefers-color-scheme: dark)",
+  light: "(prefers-color-scheme: light)",
 };

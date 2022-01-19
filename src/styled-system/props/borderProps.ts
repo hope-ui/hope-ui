@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { ColorTokens, RadiiTokens } from "../types";
 
 /**
- * Utility props for setting component border
+ * Types for border CSS properties
  */
 export type BorderProps = Partial<{
   /**

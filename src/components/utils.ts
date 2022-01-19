@@ -1,4 +1,4 @@
-import { CSSProp } from "@/stitches/props/cssProp";
+import { CSSProp } from "@/styled-system/props/cssProp";
 
 import { AsProp, ClassProps } from ".";
 

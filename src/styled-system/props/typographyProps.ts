@@ -9,7 +9,7 @@ import {
 } from "../types";
 
 /**
- * Utility props for typography
+ * Types for typography related CSS properties
  */
 export type TypographyProps = Partial<{
   /**
@@ -26,11 +26,6 @@ export type TypographyProps = Partial<{
    * The CSS `font-weight` property
    */
   fontWeight: Property.FontWeight | FontWeightTokens | number;
-
-  /**
-   * Shorthand for truncating text
-   */
-  lineClamp: number;
 
   /**
    * The CSS `line-height` property
@@ -61,4 +56,9 @@ export type TypographyProps = Partial<{
    * The CSS `text-decoration` property
    */
   textDecoration: Property.TextDecoration;
+
+  /**
+   * Utility to visually truncating text after a fixed number of lines.
+   */
+  lineClamp: number;
 }>;

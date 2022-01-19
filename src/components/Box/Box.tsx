@@ -1,18 +1,19 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { BorderProps } from "@/stitches/props/borderProps";
-import { ColorProps } from "@/stitches/props/colorProps";
-import { CommonFlexboxAndGridProps } from "@/stitches/props/commonFlexboxAndGridProps";
-import { CSSProp } from "@/stitches/props/cssProp";
-import { FlexboxProps } from "@/stitches/props/flexboxProps";
-import { GridProps } from "@/stitches/props/gridProps";
-import { LayoutProps } from "@/stitches/props/layoutProps";
-import { MarginProps } from "@/stitches/props/marginProps";
-import { PaddingProps } from "@/stitches/props/paddingProps";
-import { PositionProps } from "@/stitches/props/positionProps";
-import { ShadowProps } from "@/stitches/props/shadowProps";
-import { SizeProps } from "@/stitches/props/sizeProps";
+import { BorderProps } from "@/styled-system/props/borderProps";
+import { ColorProps } from "@/styled-system/props/colorProps";
+import { CommonFlexboxAndGridProps } from "@/styled-system/props/commonFlexboxAndGridProps";
+import { CSSProp } from "@/styled-system/props/cssProp";
+import { FlexboxProps } from "@/styled-system/props/flexboxProps";
+import { GridProps } from "@/styled-system/props/gridProps";
+import { LayoutProps } from "@/styled-system/props/layoutProps";
+import { MarginProps } from "@/styled-system/props/marginProps";
+import { PaddingProps } from "@/styled-system/props/paddingProps";
+import { PositionProps } from "@/styled-system/props/positionProps";
+import { PseudoProps } from "@/styled-system/props/pseudoProps";
+import { ShadowProps } from "@/styled-system/props/shadowProps";
+import { SizeProps } from "@/styled-system/props/sizeProps";
 import {
   borderPropConfig,
   colorPropConfig,
@@ -24,12 +25,13 @@ import {
   marginPropConfig,
   paddingPropConfig,
   positionPropConfig,
+  pseudoPropConfig,
   shadowPropConfig,
   sizePropConfig,
   typographyPropConfig,
-} from "@/stitches/props/stylePropsConfig";
-import { TypographyProps } from "@/stitches/props/typographyProps";
-import { stitches } from "@/stitches/stitches.config";
+} from "@/styled-system/props/stylePropsConfig";
+import { TypographyProps } from "@/styled-system/props/typographyProps";
+import { css } from "@/styled-system/stitches.config";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonPropNames } from "../utils";
@@ -41,6 +43,7 @@ type BoxOptions = LayoutProps &
   MarginProps &
   PaddingProps &
   PositionProps &
+  PseudoProps &
   SizeProps &
   FlexboxProps &
   GridProps &
@@ -58,6 +61,7 @@ const boxStylePropConfig = {
   ...marginPropConfig,
   ...paddingPropConfig,
   ...positionPropConfig,
+  ...pseudoPropConfig,
   ...sizePropConfig,
   ...flexboxPropConfig,
   ...gridPropConfig,
@@ -65,7 +69,7 @@ const boxStylePropConfig = {
   ...typographyPropConfig,
 };
 
-const boxCssComponent = stitches.css();
+const boxCssComponent = css();
 
 /**
  * Box is the most abstract component of Hope UI.

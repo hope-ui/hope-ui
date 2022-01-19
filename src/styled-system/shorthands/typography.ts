@@ -1,6 +1,7 @@
-import { TypographyProps } from "../props/typographyProps";
-
-export const typography: Pick<Record<keyof TypographyProps, any>, "lineClamp"> = {
+export const typography = {
+  /**
+   * Utility to visually truncating text after a fixed number of lines.
+   */
   lineClamp: (value: number) => ({
     overflow: "hidden",
     display: "-webkit-box",

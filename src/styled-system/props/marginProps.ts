@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { SpaceTokens } from "../types";
 
 /**
- * Utility props for setting component margin
+ * Types for margin CSS properties
  */
 export type MarginProps = Partial<{
   /**

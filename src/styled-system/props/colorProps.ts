@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { ColorTokens } from "../types";
 
 /**
- * Utility props for setting color related styles
+ * Types for color related CSS properties
  */
 export type ColorProps = Partial<{
   /**

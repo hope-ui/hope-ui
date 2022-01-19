@@ -1,7 +1,7 @@
 import { Property } from "csstype";
 
 /**
- * Utility props for setting layout related styles
+ * Types for layout related CSS properties
  */
 export type LayoutProps = Partial<{
   /**
