@@ -1,33 +1,29 @@
-import {
-  ThemeableButtonOptions,
-  ThemeableContainerOptions,
-  ThemeableIconButtonOptions,
-  ThemeablePaperOptions,
-  ThemeableTagOptions,
-} from "@/components";
-import { ThemeableAvatarOptions } from "@/components/Avatar";
+import { defaulThemeTokens } from "../stitches/tokens";
+import { SystemTokens } from "../stitches/types";
 
-export type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>;
-};
-
-export type HopeColor = "primary" | "dark" | "neutral" | "success" | "info" | "warning" | "danger";
-
-export type HopeSize = "xs" | "sm" | "md" | "lg" | "xl";
-
-export type HopeXPosition = "left" | "right";
-
-export type HopeYPosition = "top" | "bottom";
-
-export interface ComponentsDefaultProps {
-  Avatar: Required<ThemeableAvatarOptions>;
-  Button: Required<ThemeableButtonOptions>;
-  Container: Required<ThemeableContainerOptions>;
-  IconButton: Required<ThemeableIconButtonOptions>;
-  Paper: Required<ThemeablePaperOptions>;
-  Tag: Required<ThemeableTagOptions>;
+/**
+ * The Hope UI theme interface.
+ */
+export interface HopeTheme {
+  tokens: SystemTokens;
 }
 
-export interface HopeTheme {
-  components: ComponentsDefaultProps;
+/**
+ * The Hope UI theme tokens override interface.
+ */
+export type ThemeTokensOverride = {
+  [Scale in keyof typeof defaulThemeTokens]?: {
+    [Token in keyof typeof defaulThemeTokens[Scale]]?: boolean | number | string;
+  };
+} & {
+  [scale in string]: {
+    [token in number | string]: boolean | number | string;
+  };
+};
+
+/**
+ * The Hope UI theme override interface.
+ */
+export interface HopeThemeOverride {
+  tokens?: Pick<ThemeTokensOverride, "colors" | "fonts">;
 }

@@ -1,4 +1,12 @@
+<<<<<<< HEAD
+
 # hope-ui (WIP)
+
+=======
+
+# hope-ui-solid (WIP)
+
+> > > > > > > stitches-no-styled-system
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
@@ -12,9 +20,10 @@
 
 ### Installation
 
-First install Hope UI as a dependency in your project.
+First install Hope UI and Stitches as a dependency in your project.
 
 ```bash
+<<<<<<< HEAD
 npm install hope-ui-solid # or yarn or pnpm
 ```
 
@@ -22,6 +31,9 @@ Since Hope UI is build with Sass and chip `.scss` files you need to install `sas
 
 ```bash
 npm install -D sass # or yarn or pnpm
+=======
+npm install hope-ui-solid @stitches/core # or yarn add or pnpm add
+>>>>>>> stitches-no-styled-system
 ```
 
 ### Provider setup
@@ -38,7 +50,7 @@ function App() {
   // 2. Wrap HopeProvider at the root of your app
   return (
     <HopeProvider>
-      <App />
+      <MyApp />
     </HopeProvider>
   );
 }
@@ -46,9 +58,9 @@ function App() {
 
 ### Optional setup
 
-#### Globally set default components props
+#### Customizing Theme
 
-If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui`.
+If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
 
 Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
 
@@ -56,13 +68,10 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "hope-ui-solid";
 
-// 2. Extend the theme to globally set default components props
+// 2. Extend the theme to include custom colors, fonts etc
 const theme = extendTheme({
-  components: {
-    Button: {
-      variant: "outline",
-      radius: "full",
-    },
+  colors: {
+    primary500: "salmon",
   },
 });
 
@@ -76,90 +85,25 @@ function App() {
 }
 ```
 
-#### Customizing CSS variables
-
-Hope UI uses CSS variables for all it's design tokens e.g. colors, shadows, breapoints, etc...
-
-If you intend to customise the default `theme` to match your design requirements, you can override all css variables.
-
-The list of available css variables can be found in `src/styles/_theme.scss`.
-
-For example to override the primary color palette :
-
-```css
-// variables.css
-
-:root {
-  --hope-color-primary-50: #fdf2f8;
-  --hope-color-primary-100: #fce7f3;
-  --hope-color-primary-200: #fbcfe8;
-  --hope-color-primary-300: #f9a8d4;
-  --hope-color-primary-400: #f472b6;
-  --hope-color-primary-500: #ec4899;
-  --hope-color-primary-600: #db2777;
-  --hope-color-primary-700: #be185d;
-  --hope-color-primary-800: #9d174d;
-  --hope-color-primary-900: #831843;
-}
-```
-
-### Import style on demand
-
-To reduce the bundle size, styles should be loaded on demand, using vite you can use the [vite-plugin-style-import](https://github.com/vbenjs/vite-plugin-style-import) plugin to do that.
-
-1. First install the plugin as a dev dependency.
-
-```bash
-npm install -D vite-plugin-style-import # or yarn or pnpm
-```
-
-2. Update your `vite.config.js|ts`.
-
-```ts
-// 1. Import the vite plugin
-import styleImport from "vite-plugin-style-import";
-
-export default defineConfig({
-  plugins: [
-    solidPlugin(),
-    styleImport({
-      // 2. Add the Hope UI resolver
-      libs: [
-        {
-          libraryName: "hope-ui-solid",
-          ensureStyleFile: true,
-          esModule: true,
-          libraryNameChangeCase: "paramCase",
-          resolveStyle: (name: string) => `hope-ui-solid/dist/styles/${name}.scss`,
-          base: "hope-ui-solid/styles/base.scss",
-        },
-      ],
-    }),
-  ],
-  //...
-});
-```
-
-This plugin will automaticaly do this :
-
-```js
-import { Button } from 'hope-ui-solid';
-
-        ↓ ↓ ↓ ↓ ↓ ↓
-
-import { Button } from 'hope-ui-solid';
-import 'hope-ui-solid/dist/styles/button.scss';
-```
-
 ## Components roadmap
 
 ### General
 
-|           | Development | A11y check | Tests | Storybook | Docs |
-| --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Button    |     ✅      |     ✅     |       |    ✅     |      |
-| Container |     ✅      |     ✅     |       |    ✅     |      |
-| Paper     |     ✅      |     ✅     |       |    ✅     |      |
+|        | Development | A11y check | Tests | Storybook | Docs |
+| ------ | :---------: | :--------: | :---: | :-------: | :--: |
+| Button |             |            |       |           |      |
+
+### Layout
+
+|            | Development | A11y check | Tests | Storybook | Docs |
+| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Box        |             |            |       |           |      |
+| Center     |             |            |       |           |      |
+| Container  |             |            |       |           |      |
+| Flex       |             |            |       |           |      |
+| Grid       |             |            |       |           |      |
+| SimpleGrid |             |            |       |           |      |
+| Stack      |             |            |       |           |      |
 
 ### Data entry
 
@@ -189,11 +133,11 @@ import 'hope-ui-solid/dist/styles/button.scss';
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
-| Avatar    |     🚧      |            |       |           |      |
+| Avatar    |             |            |       |           |      |
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |
-| Tag       |     ✅      |     ✅     |       |    ✅     |      |
+| Tag       |             |            |       |           |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation

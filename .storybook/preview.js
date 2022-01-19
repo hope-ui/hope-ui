@@ -1,5 +1,3 @@
-import "./storybook.scss";
-
 import { render } from "solid-js/web";
 
 let disposeStory;

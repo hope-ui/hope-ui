@@ -1,5 +1,4 @@
 import path from "path";
-import copy from "rollup-plugin-copy";
 import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
@@ -27,12 +26,6 @@ export default defineConfig({
       fileName: format => (format === "es" ? "index.mjs" : "index.cjs"),
     },
     rollupOptions: {
-      plugins: [
-        copy({
-          targets: [{ src: "src/styles", dest: "dist" }],
-          hook: "writeBundle",
-        }),
-      ],
       external: [
         ...Object.keys(pkg.dependencies),
         ...Object.keys(pkg.peerDependencies),
