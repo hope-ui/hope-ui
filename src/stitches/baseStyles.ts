@@ -1,12 +1,16 @@
-import { stitches } from "../stitches.config";
-import { SystemTokens } from "../types";
-import { modernNormalizeCSS } from "./modernNormalizeCSS";
+import { stitches } from "./stitches.config";
+import { SystemTokens } from "./types";
 
 /**
- * Apply modern-normalize css reset and Hope UI global base styles
+ * Apply Hope UI global base styles
  */
 export function applyGlobalBaseStyles(tokens: SystemTokens) {
   const baseStyles = stitches.globalCss({
+    /* Use a more-intuitive box-sizing model. */
+    "*, ::before, ::after": {
+      boxSizing: "border-box",
+    },
+
     /* Remove default margin. */
     "*": {
       margin: 0,
@@ -18,10 +22,10 @@ export function applyGlobalBaseStyles(tokens: SystemTokens) {
     },
 
     /* 
-    1. Use theme dark color for text.
-    2. Use theme `sans` font-family.
-    3. Use theme base line height.
-  */
+      1. Use theme dark color for text.
+      2. Use theme `sans` font-family.
+      3. Use theme base line height.
+    */
     html: {
       color: tokens.colors.dark900 /* 1 */,
       fontFamily: tokens.fonts.sans /* 2 */,
@@ -48,20 +52,15 @@ export function applyGlobalBaseStyles(tokens: SystemTokens) {
       overflowWrap: "break-word",
     },
 
-    /* Lists are unstyled.
-     Unstyled lists are not announced as lists by VoiceOver.
-     If your content is truly a list add a “list” role to the element. 
-  */
-    "ol, ul": {
-      listStyle: "none",
-      margin: 0,
-      padding: 0,
-    },
-
     /* Improve media defaults. */
-    "img, svg": {
+    "img, picture, video, canvas, svg": {
       display: "block",
       maxWidth: "100%",
+    },
+
+    /* Remove built-in form typography styles */
+    "input, button, textarea, select": {
+      font: "inherit",
     },
 
     /* Buttons have a default outline */
@@ -70,6 +69,5 @@ export function applyGlobalBaseStyles(tokens: SystemTokens) {
     },
   });
 
-  modernNormalizeCSS();
   baseStyles();
 }
