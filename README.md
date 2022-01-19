@@ -52,54 +52,24 @@ function App() {
 }
 ```
 
-### Optional setup
+## Using Hope UI theme tokens in style props
 
-#### Customizing Theme
+Many style props are mapped to values from the Hope UI theme tokens, it uses [Stitches](https://stitches.dev) under the hood.
 
-If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
-
-Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
-
-```jsx
-// 1. Import the extendTheme function
-import { extendTheme, HopeProvider } from "hope-ui-solid";
-
-// 2. Extend the theme to include custom colors, fonts etc
-const theme = extendTheme({
-  tokens: {
-    colors: {
-      primary500: "salmon",
-    },
-  },
-});
-
-// 3. Pass the `theme` prop to the `HopeProvider`
-function App() {
-  return (
-    <HopeProvider theme={theme}>
-      <MyApp />
-    </HopeProvider>
-  );
-}
-```
-
-## Using theme tokens in style props
-
-Since Hope UI is built with Stitches all style props can use the token values from the Stitches theme.
+You can view the props/token mapping on the [Stitches docs](https://stitches.dev/docs/tokens#property-mapping)
 
 ### Usage
 
-To apply a token you need to prefix it with a $ sign.
+To apply a token you need to prefix it with a `$` sign.
 
 ```jsx
 <Box bg="$primary500" w="$full" p="$4" color="white">
   Box with token-aware style props
 </Box>
 ```
+> Note that `color` just use the basic css white color.
 
 ### Available tokens
-
-Here is the list of all available tokens in the Hope UI theme.
 
 #### Colors
 
@@ -338,10 +308,41 @@ export default {
 };
 ```
 
+### Customizing Theme
+
+If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
+
+Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
+
+```jsx
+// 1. Import the extendTheme function
+import { extendTheme, HopeProvider } from "hope-ui-solid";
+
+// 2. Extend the theme to include custom colors, fonts etc
+const theme = extendTheme({
+  tokens: {
+    colors: {
+      primary500: "salmon",
+    },
+  },
+});
+
+// 3. Pass the `theme` prop to the `HopeProvider`
+function App() {
+  return (
+    <HopeProvider theme={theme}>
+      <MyApp />
+    </HopeProvider>
+  );
+}
+```
+
 ## Acknowledgment
 
-This project would not have been possible without the inspiration of these open source projects :
+This project would not have been possible without these open source projects :
 
+- [SolidJS](https://www.solidjs.com/)
+- [Stitches](https://stitches.dev/)
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
