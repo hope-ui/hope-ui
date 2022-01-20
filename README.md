@@ -620,13 +620,14 @@ If you are using TypeScript you will get proper auto-completion based on the val
 And it works with SolidJS components too :
 
 ```jsx
-import { Link } from "solid-app-router";
+import { Router, Link } from "solid-app-router";
 
 //...
-
-<Box as={Link} href="/" bg="$primary500" p="$4" color="white">
-  I'm a solid-app-router link
-</Box>;
+<Router>
+  <Box as={Link} href="/" bg="$primary500" p="$4" color="white">
+    I'm a solid-app-router link
+  </Box>
+</Router>
 ```
 
 ## The Hope factory
@@ -664,12 +665,18 @@ The function will infer the prop types from the wrapped component and also add h
 
 ```jsx
 import { hope } from "hope-ui-solid";
-import { Link } from "solid-app-router";
+import { Router, Link } from "solid-app-router";
 
 const StyledLink = hope(Link);
 
 function Example() {
-  return <StyledLink bg="$danger600" fontSize="12px" href="/" />;
+  return (
+    <Router>
+      <StyledLink bg="$danger600" fontSize="12px" href="/">
+        Styled solid-app-router link
+      </StyledLink>
+    </Router>
+  );
 }
 ```
 
@@ -735,7 +742,7 @@ const Card = hope("div", {
 });
 
 //...
-<Card elevation="md">Content<Card/>
+<Card elevation="md">Content</Card>
 ```
 
 Or if you have some really specific requirement use the `css()` method provided by Stitches.
