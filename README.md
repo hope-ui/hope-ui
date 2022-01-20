@@ -226,10 +226,11 @@ It’s like the style attribute, but it supports tokens, media queries, nesting 
 ```jsx
 <Box
   css={{
+    bg: "$primary500",
     borderRadius: "0",
     color: "white",
     "&:hover": {
-      backgroundColor: "$primary500",
+      bg: "$primary600",
     },
   }}
 >
