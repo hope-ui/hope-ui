@@ -38,12 +38,10 @@ function styled<
     return <Dynamic component={local.as ?? component} className={className()} {...others} />;
   };
 
-  const toString = () => cssComponent.selector;
-
   styledComponent.className = cssComponent.className;
   styledComponent.displayName = `Styled.${component}`;
   styledComponent.selector = cssComponent.selector;
-  styledComponent.toString = toString;
+  styledComponent.toString = () => cssComponent.selector;
 
   return styledComponent;
 }

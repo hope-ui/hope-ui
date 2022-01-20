@@ -1,4 +1,4 @@
-import { hope, HopeComponentProps } from "..";
+import { hope } from "..";
 
 /**
  * Box is the most abstract component of Hope UI.
