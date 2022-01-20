@@ -254,14 +254,12 @@ At the moment Hope UI doesn't support responsive styles at props level.
 
 If you want to set responsive styles you should use the `css` prop. The system works as described in the [Stitches docs](https://stitches.dev/docs/breakpoints#using-breakpoints-in-the-style-objects).
 
-Each breakpoint is a key on the css object prefixed by the `@`symbol. The `@initial` key represents no breakpoint (min-width: 0px).
+Each breakpoint is a key on the css object prefixed by the `@`symbol.
 
 ```jsx
 <Box
   css={{
-    "@initial": {
-      backgroundColor: "$primary500",
-    },
+    backgroundColor: "$primary500",
     "@sm": {
       backgroundColor: "$success500",
     },
@@ -316,7 +314,7 @@ Button.toString = () => ".my-button";
   }}
 >
   <Button />
-</Center>;
+</Center>
 ```
 
 ## Using Hope UI theme tokens in style props
@@ -599,7 +597,9 @@ const theme = extendTheme({
 function App() {
   return (
     <HopeProvider theme={theme}>
-      <MyApp />
+      <Box bg="$primary500" w="$full" p="$4" color="white">
+        Box with custom primary500 bg color
+      </Box>
     </HopeProvider>
   );
 }
