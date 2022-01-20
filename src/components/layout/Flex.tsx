@@ -3,7 +3,8 @@ import { splitProps } from "solid-js";
 
 import { StyleProps } from "@/styled-system/props/styleProps";
 
-import { ElementType, hope, PolymorphicComponentProps } from "..";
+import { hope } from "../factory";
+import { ElementType, PolymorphicComponentProps } from "../types";
 
 export type FlexOptions = Partial<{
   /**

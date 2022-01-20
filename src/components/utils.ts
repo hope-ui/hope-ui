@@ -1,6 +1,6 @@
 import { CSSProp } from "@/styled-system/props/cssProp";
 
-import { AsProp, ClassProps } from ".";
+import { AsProp, ClassProps } from "./types";
 
 /**
  * Array of always splited prop names to local props with SolidJS `spliProps()` method.

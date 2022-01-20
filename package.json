@@ -1,6 +1,6 @@
 {
   "name": "hope-ui-solid",
-  "version": "0.0.8",
+  "version": "0.0.11",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [

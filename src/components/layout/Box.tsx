@@ -1,4 +1,4 @@
-import { hope } from "..";
+import { hope } from "../factory";
 
 /**
  * Box is the most abstract component of Hope UI.

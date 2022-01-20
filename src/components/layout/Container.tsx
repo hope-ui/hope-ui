@@ -1,4 +1,4 @@
-import { hope } from "..";
+import { hope } from "../factory";
 
 /**
  * Layout component used to wrap app or website content

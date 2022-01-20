@@ -1,4 +1,4 @@
-import { hope } from "..";
+import { hope } from "../factory";
 
 /**
  * A flexible flex spacer that expands along the major axis of its containing flex layout.
