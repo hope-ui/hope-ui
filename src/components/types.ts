@@ -63,7 +63,15 @@ export type HopeComponentProps<
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
 > = PolymorphicComponentProps<
   C,
-  StyleProps & TransformProps<StyledComponentProps<Composers>, SystemMedia>
+  /**
+   * Override StyleProps with Stitches variant props that have same name.
+   *
+   * Order of priority/override for props that has same name is :
+   * 1. Stitches variant props
+   * 2. Style props
+   * 3. Component props
+   * */
+  ExtendableProps<StyleProps, TransformProps<StyledComponentProps<Composers>, SystemMedia>>
 >;
 
 /**

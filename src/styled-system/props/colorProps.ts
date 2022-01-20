@@ -9,7 +9,7 @@ export type ColorProps = Partial<{
   /**
    * The CSS `color` property
    */
-  color: Property.Background<ColorTokens>;
+  color: Property.Color | ColorTokens;
 
   /**
    * The CSS `background` property

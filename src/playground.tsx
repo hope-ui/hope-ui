@@ -1,13 +1,38 @@
+import "./playground.css";
+
 import { render } from "solid-js/web";
 
-import { Box, HopeProvider } from ".";
+import { hope, HopeProvider } from ".";
 
-function App() {
+const Card = hope("div", {
+  borderRadius: "$lg",
+  bg: "white",
+
+  variants: {
+    color: {
+      primary: {
+        color: "$primary600",
+      },
+      danger: {
+        color: "$danger600",
+      },
+    },
+  },
+});
+
+export function App() {
   return (
     <HopeProvider>
-      <Box bg="$primary500" w="$full" p="$4" color="white">
-        Box with token-aware style props
-      </Box>
+      <Card
+        boxSize={40}
+        color="primary"
+        bg="salmon"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        Content
+      </Card>
     </HopeProvider>
   );
 }
