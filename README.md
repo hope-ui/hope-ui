@@ -395,7 +395,7 @@ export default {
     success800: "#065f46",
     success900: "#064e3b",
 
-    // Success (TailwindCSS Sky)
+    // Info (TailwindCSS Sky)
     info50: "#f0f9ff",
     info100: "#e0f2fe",
     info200: "#bae6fd",
@@ -407,7 +407,7 @@ export default {
     info800: "#075985",
     info900: "#0c4a6e",
 
-    // Success (TailwindCSS Amber)
+    // Warning (TailwindCSS Amber)
     warning50: "#fffbeb",
     warning100: "#fef3c7",
     warning200: "#fde68a",
@@ -419,7 +419,7 @@ export default {
     warning800: "#92400e",
     warning900: "#78350f",
 
-    // Success (TailwindCSS Red)
+    // Danger (TailwindCSS Red)
     danger50: "#fef2f2",
     danger100: "#fee2e2",
     danger200: "#fecaca",
@@ -634,7 +634,7 @@ import { Link } from "solid-app-router";
 
 ## The Hope factory
 
-Hope factory serves as an object of hope enabled JSX elements, and also a function that can be used to enable custom component receive hope's style props.
+Hope factory serves as an **object of hope enabled JSX elements**, and also a **function that can be used to enable custom component** receive hope's style props.
 
 ```js
 import { hope } from "hope-ui-solid";
@@ -653,7 +653,7 @@ For example, if you want a plain html button with ability to pass hope styles, y
 
 This reduces the need to create custom component wrappers and name them.
 This syntax is available for common html elements.
-See the reference for the full [list of elements](https://github.com/fabien-ml/hope-ui/tree/main/src/styled-system/utils.ts) supported.
+See the reference for the full [list of elements](https://github.com/fabien-ml/hope-ui/tree/main/src/styled-system/utils.ts#L7) supported.
 
 ### Hope factory function
 
