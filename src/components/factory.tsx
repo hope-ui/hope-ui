@@ -23,9 +23,8 @@ function styled<
    * Get an array of all stitches variant name related to that component creation.
    * This run only once when calling `hope("tag", {})`.
    */
-  const variantPropNames = composers.flatMap(composer =>
-    composer.variants ? Object.keys(composer.variants) : []
-  );
+  const variantPropNames: string[] = [];
+  composers.forEach(c => c.variants && variantPropNames.push(...Object.keys(c.variants)));
 
   /**
    * The Generated styled component function that is style props aware.
