@@ -1,4 +1,4 @@
-import { hope } from "..";
+import { hope } from "../factory";
 
 /**
  * Center is a layout component that centers its child within itself.

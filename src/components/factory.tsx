@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { getIntersectionKeys, stylePropsConfig } from "@/styled-system/props/stylePropsConfig";
+import { css } from "@/styled-system/stitches.config";
 import { CSSComposer } from "@/styled-system/types";
 import { domElements } from "@/styled-system/utils";
 
-import { css } from "..";
 import { ElementType, HopeComponent, HopeComponentProps, HopeFactory } from "./types";
 import { commonPropNames } from "./utils";
 
@@ -38,12 +38,10 @@ function styled<
     return <Dynamic component={local.as ?? component} className={className()} {...others} />;
   };
 
-  const toString = () => cssComponent.selector;
-
   styledComponent.className = cssComponent.className;
   styledComponent.displayName = `Styled.${component}`;
   styledComponent.selector = cssComponent.selector;
-  styledComponent.toString = toString;
+  styledComponent.toString = () => cssComponent.selector;
 
   return styledComponent;
 }
