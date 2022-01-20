@@ -52,7 +52,7 @@ function App() {
 }
 ```
 
-## The style system
+## The style props
 
 Hope UI lets you build custom UI components with constraint-based style props based on scales defined in your theme.
 
@@ -700,7 +700,7 @@ Since the Hope factory function is a simple abstraction over Stitches `css()` me
 
 This is due to a wrong type definition on my part that i can't figure out.
 
-However the Developer experience will be better when Stitches will support SolidJS out of the box, you can track the issue on [Sitches repo](https://github.com/modulz/stitches/pull/819)
+However the developer experience will be better when Stitches will support SolidJS out of the box, you can track the issue on [Sitches repo](https://github.com/modulz/stitches/pull/819)
 
 ## Acknowledgment
 
