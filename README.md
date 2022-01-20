@@ -333,7 +333,7 @@ To apply a token you need to prefix it with a `$` sign.
 </Box>
 ```
 
-> Note that `color` just use the basic css white color.
+> Note that in this example `color` just use the basic css white color not a value from the theme.
 
 ### Available tokens
 
