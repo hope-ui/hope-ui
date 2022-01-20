@@ -1,4 +1,3 @@
-export * from "./Box";
-export * from "./Center";
 export * from "./factory";
+export * from "./layout";
 export * from "./types";
