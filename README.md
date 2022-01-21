@@ -52,11 +52,17 @@ function App() {
 }
 ```
 
+## Component documentation
+
+At the moment, all component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs) and you can try them in the [Storybook](https://hope-ui-storybook.vercel.app/).
+
 ## The style props
 
-Hope UI lets you build custom UI components with constraint-based style props based on scales defined in your theme.
+Style props are a way to alter the style of a component by simply passing props to it. It helps to save time by providing helpful shorthand ways to style components.
 
 ### Available props
+
+The following table shows a list of every style prop and the properties within each group.
 
 #### Color
 
@@ -92,18 +98,18 @@ Hope UI lets you build custom UI components with constraint-based style props ba
 
 #### Typography
 
-| Prop           | CSS property                    | Theme token      |
-| -------------- | ------------------------------- | ---------------- |
-| fontFamily     | font-family                     | `fonts`          |
-| fontSize       | font-size                       | `fontSizes`      |
-| fontWeight     | font-weight                     | `fontWeights`    |
-| lineHeight     | line-height                     | `lineHeights`    |
-| letterSpacing  | letter-spacing                  | `letterSpacings` |
-| textAlign      | text-align                      | none             |
-| fontStyle      | font-style                      | none             |
-| textTransform  | text-transform                  | none             |
-| textDecoration | text-decoration                 | none             |
-| lineClamp      | custom utility to truncate text | none             |
+| Prop           | CSS property                                               | Theme token      |
+| -------------- | ---------------------------------------------------------- | ---------------- |
+| fontFamily     | font-family                                                | `fonts`          |
+| fontSize       | font-size                                                  | `fontSizes`      |
+| fontWeight     | font-weight                                                | `fontWeights`    |
+| lineHeight     | line-height                                                | `lineHeights`    |
+| letterSpacing  | letter-spacing                                             | `letterSpacings` |
+| textAlign      | text-align                                                 | none             |
+| fontStyle      | font-style                                                 | none             |
+| textTransform  | text-transform                                             | none             |
+| textDecoration | text-decoration                                            | none             |
+| lineClamp      | custom utility to truncate text to a given number of lines | none             |
 
 #### Layout
 
@@ -202,124 +208,9 @@ Hope UI lets you build custom UI components with constraint-based style props ba
 | --------- | ------------ | ----------- |
 | boxShadow | box-shadow   | `shadows`   |
 
-#### Pseudo selectors
-
-| Prop            | CSS selector                                              | Theme token |
-| --------------- | --------------------------------------------------------- | ----------- |
-| \_hover         | &:hover, &\[data-hover]                                   | none        |
-| \_active        | &:active, &\[data-active]                                 | none        |
-| \_focus         | &:focus, &\[data-focus]                                   | none        |
-| \_focusWithin   | &:focus-within                                            | none        |
-| \_focusVisible  | &:focus-visible                                           | none        |
-| \_disabled      | &\[disabled], &\[aria-disabled=true], &\[data-disabled]   | none        |
-| \_groupHover    | \[role=group]:hover &, \[role=group]\[data-hover] &       | none        |
-| \_groupActive   | \[role=group]:active &, \[role=group]\[data-active] &     | none        |
-| \_groupFocus    | \[role=group]:focus &, \[role=group]\[data-focus] &       | none        |
-| \_groupDisabled | \[role=group]:disabled &, \[role=group]\[data-disabled] & | none        |
-
-### The `css` prop
-
-All Hope UI components provides a `css` prop for overriding styles easily.
-
-It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
-
-```jsx
-<Box
-  css={{
-    bg: "$primary500",
-    borderRadius: "0",
-    color: "white",
-    "&:hover": {
-      bg: "$primary600",
-    },
-  }}
->
-  Box
-</Box>
-```
-
-#### Responsive styles
-
-Hope UI provide five breakpoints.
-
-| Prop | CSS property               |
-| ---- | -------------------------- |
-| sm   | @media (min-width: 640px)  |
-| md   | @media (min-width: 768px)  |
-| lg   | @media (min-width: 1024px) |
-| xl   | @media (min-width: 1280px) |
-| 2xl  | @media (min-width: 1536px) |
-
-At the moment Hope UI doesn't support responsive styles at props level.
-
-If you want to set responsive styles you should use the `css` prop. The system works as described in the [Stitches docs](https://stitches.dev/docs/breakpoints#using-breakpoints-in-the-style-objects).
-
-Each breakpoint is a key on the css object prefixed by the `@`symbol.
-
-```jsx
-<Box
-  css={{
-    backgroundColor: "$primary500",
-    "@sm": {
-      backgroundColor: "$success500",
-    },
-    "@xl": {
-      backgroundColor: "$info500",
-    },
-  }}
->
-  Box
-</Box>
-```
-
-#### Targeting other Hope UI components
-
-Inside the `css` props you can target other Hope UI components using string interpolation in the selector.
-
-```jsx
-<Center boxSize="200px" bg="$primary500">
-  <Box
-    as="button"
-    css={{
-      [`${Center} &`]: {
-        background: "red",
-      },
-    }}
-  >
-    Button
-  </Box>
-</Center>
-```
-
-#### Targeting other SolidJS components
-
-Inside the `css` props you can target other SolidJS components using string interpolation in the selector.
-
-```jsx
-function Button() {
-  return <button className="my-button">Button</button>;
-}
-
-// Add a `toString` method which map to a css selector inside your component
-// Here we use the underlying button class name
-Button.toString = () => ".my-button";
-
-<Center
-  boxSize="200px"
-  bg="$primary500"
-  css={{
-    [`& ${Button}`]: {
-      background: "red",
-    },
-  }}
->
-  <Button />
-</Center>
-```
-
 ## Using Hope UI theme tokens in style props
 
-Many style props are mapped to values from the Hope UI theme tokens, it uses [Stitches](https://stitches.dev) under the hood.
+Many style props are mapped to scale from the Hope UI theme tokens, meaning you can set they value based on the Hope UI theme.
 
 You can view the props/token mapping on the [Stitches docs](https://stitches.dev/docs/tokens#property-mapping)
 
@@ -532,11 +423,11 @@ export default {
     md: "28rem",
     lg: "32rem",
     xl: "36rem",
-    containerSm: "640px",
-    containerMd: "768px",
-    containerLg: "1024px",
-    containerXl: "1280px",
-    container2xl: "1536px",
+    "2xl": "40rem",
+    "3xl": "48rem",
+    "4xl": "64rem",
+    "5xl": "80rem",
+    "6xl": "96rem",
   },
 };
 ```
@@ -574,7 +465,7 @@ export default {
 };
 ```
 
-### Customizing Theme
+## Customizing Theme
 
 If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
 
@@ -605,6 +496,72 @@ function App() {
 }
 ```
 
+## The `css` prop
+
+All Hope UI components provides a `css` prop for overriding styles easily.
+
+It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
+
+```jsx
+<Box
+  css={{
+    bg: "$primary500",
+    borderRadius: "0",
+    color: "white",
+    "&:hover": {
+      bg: "$primary600",
+    },
+  }}
+>
+  Box
+</Box>
+```
+
+### Targeting other Hope UI components
+
+Inside the `css` props you can target other Hope UI components using string interpolation in the selector.
+
+```jsx
+<Center boxSize="200px" bg="$primary500">
+  <Box
+    as="button"
+    css={{
+      [`${Center} &`]: {
+        background: "red",
+      },
+    }}
+  >
+    Button
+  </Box>
+</Center>
+```
+
+### Targeting other SolidJS components
+
+Inside the `css` props you can target other SolidJS components using string interpolation in the selector.
+
+```jsx
+function Button() {
+  return <button className="my-button">Button</button>;
+}
+
+// Add a `toString` method which map to a css selector inside your component
+// Here we use the underlying button class name
+Button.toString = () => ".my-button";
+
+<Center
+  boxSize="200px"
+  bg="$primary500"
+  css={{
+    [`& ${Button}`]: {
+      background: "red",
+    },
+  }}
+>
+  <Button />
+</Center>;
+```
+
 ## The `as` props
 
 All Hope UI components are polymorphic, meaning you can use the `as` prop to change the rendered element.
@@ -627,7 +584,7 @@ import { Router, Link } from "solid-app-router";
   <Box as={Link} href="/" bg="$primary500" p="$4" color="white">
     I'm a solid-app-router link
   </Box>
-</Router>
+</Router>;
 ```
 
 ## The Hope factory
@@ -644,7 +601,7 @@ Create base html elements with theme-aware style props using `hope.<element>` no
 For example, if you want a plain html button with ability to pass hope styles, you can write `<hope.button />`.
 
 ```jsx
-<hope.button px="$3" py="$2" bg="$primary500" borderRadius="$md" _hover={{ bg: "$primary600" }}>
+<hope.button px="$3" py="$2" bg="$primary500" borderRadius="$md">
   Click me
 </hope.button>
 ```
@@ -655,9 +612,9 @@ See the reference for the full [list of elements](https://github.com/fabien-ml/h
 
 ### Hope factory function
 
-This is a function that converts non-hope components or jsx element to hope-enabled components so you can pass style props to them.
+This is a function that converts non-hope components or jsx element to hope-enabled components, so you can pass style props to them.
 
-It's basically a wrapper arround Stitches `css()` method, you can find more about it in the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
+It's basically a wrapper around Stitches `css()` method, you can find more about it in the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
 
 Consider the `Link` component of the `solid-app-router` package, let's use the hope factory function to make possible to pass style props.
 
@@ -688,7 +645,7 @@ In some instances, you might need to attach specific styles to the component wra
 
 For that the Hope factory allow you to pass a second argument that will let you apply specific styles.
 
-It's basically a wrapper arround Stitches `css()` method, for the usage please refer to the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
+It's basically a wrapper around Stitches `css()` method, for the usage please refer to the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
 
 ```jsx
 import { hope } from "hope-ui-solid";
@@ -702,25 +659,128 @@ const Card = hope("div", {
 
 #### ⚠️ Caveats ⚠️
 
-Since the Hope factory function is a simple abstraction over Stitches `css()` method, they are some caveats that you need to know :
+At the moment variant inheritance doesn't work with the current implementation of Hope factory method, meaning you can't do that :
 
-- Props generated by variant inheritance are not auto-completed by Typescript
+```jsx
+import { hope } from "hope-ui-solid";
 
-This is due to a wrong type definition on my part that i can't figure out 😣.
+const SmallButton = hope("button", {
+  //...
+  variants: {
+    kind: {
+      primary: {
+        backgroundColor: "blue",
+      },
+      //...
+    },
+  },
+});
 
-However the developer experience will be better when Stitches will support SolidJS out of the box, and i will replace my custom implementation.
+const LargeButton = hope(SmallButton, {
+  //...
+});
 
-You can track the issue on the [Sitches repo](https://github.com/modulz/stitches/pull/819)
+//...
+<LargeButton
+  kind="primary" // <- This doesn't work
+>
+  Large Button
+</LargeButton>;
+```
+
+Plan is to use to the official implementation of the `styled` method when Stitches will support SolidJS out of the box.
+
+You can track the issue on the [Stitches repo](https://github.com/modulz/stitches/pull/819)
+
+## Responsive styles
+
+Hope UI provide five breakpoints.
+
+| Prop | CSS property               |
+| ---- | -------------------------- |
+| sm   | @media (min-width: 640px)  |
+| md   | @media (min-width: 768px)  |
+| lg   | @media (min-width: 1024px) |
+| xl   | @media (min-width: 1280px) |
+| 2xl  | @media (min-width: 1536px) |
+
+### Usage with the Hope factory method
+
+Variant created with the `hope` method support responsive styles at props level.
+
+Each breakpoint is a key on the css object prefixed by the `@`symbol.
+
+You must use the `@initial` breakpoint to declare the initial variant before any breakpoints are applied.
+
+For more in dept explanation please refer to the [Stitches docs](https://stitches.dev/docs/breakpoints).
+
+```jsx
+import { hope } from "hope-ui-solid";
+
+const Card = hope("div", {
+  borderRadius: "$lg",
+  backgroundColor: "white",
+
+  variants: {
+    elevation: {
+      sm: {
+        boxShadow: "$sm",
+      },
+      md: {
+        boxShadow: "$md",
+      },
+    },
+  },
+});
+
+//...
+<Card
+  elevation={{
+    "@initial": "sm", // <- initial value, no breakpoint
+    "@lg": "md", // <- value at breakpoint "lg"
+  }}
+>
+  Content
+</Card>;
+```
+
+### Usage with the `css` prop
+
+When using responsive styles with the `css` prop each breakpoint is a key on the css object prefixed by the `@` symbol.
+
+Here you don't need the `@initial` breakpoint.
+
+For more in dept explanation please refer to the [Stitches docs](https://stitches.dev/docs/breakpoints#using-breakpoints-in-the-style-objects).
+
+```jsx
+<Button
+  css={{
+    backgroundColor: "$primary500",
+    "@sm": {
+      backgroundColor: "$success500",
+    },
+    "@xl": {
+      backgroundColor: "$info500",
+    },
+  }}
+>
+  Box
+</Button>
+```
+
+### Usage with style props
+
+At the moment Hope UI doesn't support responsive style on style props.
 
 ## Styling recommendation
 
-Even if the style props is convinient to use it should not be the primary way of styling your application.
+### The Hope factory
 
-Style props are just syntactic sugar on top of the [Stitches `css` prop](https://stitches.dev/docs/framework-agnostic#overrides) which was primarly built for overriding styles.
+The Hope factory is great to build components that need to support a wide variety of contexts.
 
-So css generated by style props will be hard to override (it's technically possible using the `css` prop provided by all Hope UI components).
+These components are used in many parts of the application and support different combinations of props.
 
-For styling your components it's better to use the Hope factory function, things like variants etc works out of the box.
+Stitches features like variants and responsive styles works out of the box.
 
 ```jsx
 import { hope } from "hope-ui-solid";
@@ -732,22 +792,33 @@ const Card = hope("div", {
   variants: {
     elevation: {
       sm: {
-        boxShadow: "$sm"
+        boxShadow: "$sm",
       },
       md: {
-        boxShadow: "$md"
-      }
-    }
-  }
+        boxShadow: "$md",
+      },
+    },
+  },
 });
 
 //...
-<Card elevation="md">Content</Card>
+<Card
+  elevation={{
+    "@initial": "sm",
+    "@lg": "md",
+  }}
+>
+  Content
+</Card>;
 ```
 
-Or if you have some really specific requirement use the `css()` method provided by Stitches.
+### Stitches `css` method
 
-This is just normal Stitches code with no extra layer, you can find the documentation [here](https://stitches.dev/docs/framework-agnostic). For convinience Hope UI re-export it configured with it's default theme.
+If you have some really specific requirement use the `css()` method provided by Stitches.
+
+It's the core Stitches API with no extra layer, you can find the documentation [here](https://stitches.dev/docs/framework-agnostic).
+
+For convenience Hope UI re-export it configured with its default theme.
 
 ```jsx
 import { css } from "hope-ui-solid";
@@ -767,19 +838,23 @@ function Button() {
 }
 ```
 
+### Style props
+
+The style props API is great to apply one-off styles. Think of it as "utility" styles.
+
+```jsx
+<Button mb="$4">Button</Button>
+```
+
 ## SSR
 
-I don't know that much about this topic 😞, but Stitches has a section on it on they [docs](https://stitches.dev/docs/server-side-rendering)
+Stitches have a section about SSR on their [docs](https://stitches.dev/docs/server-side-rendering)
 
-For convinience Hope UI re-export the `getCssText()` method from Stitches configured with it's default theme.
+For convenience Hope UI re-export the `getCssText()` method from Stitches configured with its default theme.
 
 ```js
 import { getCssText } from "hope-ui-solid";
 ```
-
-## Documentation
-
-For now, all components documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs)
 
 ## Acknowledgment
 

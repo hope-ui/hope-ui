@@ -8,7 +8,6 @@ import { CSSComposer } from "@/styled-system/types";
 import { domElements } from "@/styled-system/utils";
 
 import { ElementType, HopeComponent, HopeComponentProps, HopeFactory } from "./types";
-import { commonPropNames } from "./utils";
 
 /**
  * Function that can be used to enable custom component receive hope's style props.
@@ -40,9 +39,9 @@ function styled<
 
     const [local, variantProps, styleProps, others] = splitProps(
       props,
-      commonPropNames,
-      variantPropNames,
-      usedStylePropNames
+      ["as", "className", "css"],
+      variantPropNames as any,
+      usedStylePropNames as any
     );
 
     const className = () => {

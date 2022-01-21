@@ -7,7 +7,6 @@ import { LayoutProps } from "./layoutProps";
 import { MarginProps } from "./marginProps";
 import { PaddingProps } from "./paddingProps";
 import { PositionProps } from "./positionProps";
-import { PseudoProps } from "./pseudoProps";
 import { ShadowProps } from "./shadowProps";
 import { SizeProps } from "./sizeProps";
 import { TypographyProps } from "./typographyProps";
@@ -21,7 +20,7 @@ import { TypographyProps } from "./typographyProps";
 type PropConfig<T> = Record<keyof T, true>;
 
 /**
- * Style prop names for layour related properties
+ * Style prop names for layout related properties
  */
 export const layoutPropConfig: PropConfig<LayoutProps> = {
   display: true,
@@ -176,22 +175,6 @@ export const typographyPropConfig: PropConfig<TypographyProps> = {
   textDecoration: true,
 };
 
-/**
- * Pseudo selector prop names
- */
-export const pseudoPropConfig: PropConfig<PseudoProps> = {
-  _hover: true,
-  _active: true,
-  _focus: true,
-  _focusWithin: true,
-  _focusVisible: true,
-  _disabled: true,
-  _groupHover: true,
-  _groupActive: true,
-  _groupFocus: true,
-  _groupDisabled: true,
-};
-
 export const stylePropsConfig = {
   ...layoutPropConfig,
   ...colorPropConfig,
@@ -200,7 +183,6 @@ export const stylePropsConfig = {
   ...marginPropConfig,
   ...paddingPropConfig,
   ...positionPropConfig,
-  ...pseudoPropConfig,
   ...sizePropConfig,
   ...flexboxPropConfig,
   ...gridPropConfig,
@@ -218,5 +200,5 @@ export function getIntersectionKeys<R = Record<string, unknown>>(
   obj: Record<string, unknown>,
   reference: R
 ) {
-  return Object.keys(obj).filter(key => key in reference) as Array<keyof R>;
+  return Object.keys(obj).filter(key => key in reference);
 }
