@@ -10,11 +10,11 @@ import { hope } from "../factory";
 export const Container = hope("div", {
   width: "100%",
 
-  "@sm": { maxWidth: "$containerSm" },
-  "@md": { maxWidth: "$containerMd" },
-  "@lg": { maxWidth: "$containerLg" },
-  "@xl": { maxWidth: "$containerXl" },
-  "@2xl": { maxWidth: "$container2xl" },
+  "@sm": { maxWidth: "$2xl" },
+  "@md": { maxWidth: "$3xl" },
+  "@lg": { maxWidth: "$4xl" },
+  "@xl": { maxWidth: "$5xl" },
+  "@2xl": { maxWidth: "$6xl" },
 
   variants: {
     /**

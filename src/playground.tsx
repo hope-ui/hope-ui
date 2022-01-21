@@ -4,35 +4,29 @@ import { render } from "solid-js/web";
 
 import { hope, HopeProvider } from ".";
 
-const Card = hope("div", {
-  borderRadius: "$lg",
-  bg: "white",
+const SmallButton = hope("a", {
+  p: "$4",
+  color: "$success600",
 
   variants: {
-    color: {
+    kind: {
       primary: {
-        color: "$primary600",
-      },
-      danger: {
-        color: "$danger600",
+        backgroundColor: "blue",
       },
     },
   },
 });
 
+const LargeButton = hope(SmallButton, {
+  //...
+});
+
 export function App() {
   return (
     <HopeProvider>
-      <Card
-        boxSize={40}
-        color="primary"
-        bg="salmon"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-      >
-        Content
-      </Card>
+      <LargeButton>Large Button</LargeButton>
+      <LargeButton kind="primary">Large Button</LargeButton>
+      <hope.div></hope.div>
     </HopeProvider>
   );
 }

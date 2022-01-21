@@ -1,22 +1,26 @@
+import { StyledComponentProps } from "@stitches/core/types/styled-component";
 import type * as Util from "@stitches/core/types/util";
 import { splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { Dynamic, isServer, ssr, ssrSpread } from "solid-js/web";
 
 import { getIntersectionKeys, stylePropsConfig } from "@/styled-system/props/stylePropsConfig";
 import { css } from "@/styled-system/stitches.config";
-import { CSSComposer } from "@/styled-system/types";
+import { CSSComposer, SystemMedia, SystemStyleObject } from "@/styled-system/types";
 import { domElements } from "@/styled-system/utils";
 
-import { ElementType, HopeComponent, HopeComponentProps, HopeFactory } from "./types";
-import { commonPropNames } from "./utils";
+import { HopeComponentProps } from ".";
+import { ElementType, HopeComponent, HopeFactory } from "./types";
 
 /**
  * Function that can be used to enable custom component receive hope's style props.
  */
 function styled<
-  C extends ElementType,
+  Type extends ElementType | Util.Function,
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
->(component: C, ...composers: CSSComposer<Composers>): HopeComponent<C, Composers> {
+>(
+  type: Type,
+  ...composers: CSSComposer<Composers>
+): HopeComponent<Type, StyledComponentProps<Composers>, SystemMedia, SystemStyleObject> {
   const cssComponent = css(...(composers as CSSComposer<Composers> & string));
 
   /**
@@ -29,7 +33,27 @@ function styled<
   /**
    * The Generated styled component function that is style props aware.
    */
-  const styledComponent = <T extends ElementType = C>(props: HopeComponentProps<T, Composers>) => {
+  //const styledComponent = <T extends ElementType = C>(props: HopeComponentProps<T, Composers>) => {
+  const styledComponent: any = (
+    props: HopeComponentProps<Type, StyledComponentProps<Composers>, SystemMedia, SystemStyleObject>
+  ) => {
+    const Type = props.as || type;
+
+    if (typeof Type === "function") {
+      const forwardProps = cssComponent(props).props as any;
+      delete forwardProps.as;
+      return Type(forwardProps);
+    }
+
+    if (isServer) {
+      const forwardProps = cssComponent(props).props as any;
+      delete forwardProps.as;
+      const [local, others] = splitProps(forwardProps, ["children"]);
+      const args = [[`<${Type} `, ">", `</${Type}>`], ssrSpread(others), local.children || ""];
+      const result = ssr(args);
+      return result;
+    }
+
     /**
      * Get an array of prop names that are only used style props and doesn't have same name as a variant props.
      * This will ensure we pass the small array possible to `splitProps()`
@@ -40,9 +64,9 @@ function styled<
 
     const [local, variantProps, styleProps, others] = splitProps(
       props,
-      commonPropNames,
-      variantPropNames,
-      usedStylePropNames
+      ["as", "className", "css"],
+      variantPropNames as any,
+      usedStylePropNames as any
     );
 
     const className = () => {
@@ -57,11 +81,11 @@ function styled<
       return `${cssComponentClassName} ${local.className ?? ""}`.trim();
     };
 
-    return <Dynamic component={local.as ?? component} className={className()} {...others} />;
+    return <Dynamic component={local.as ?? type} className={className()} {...others} />;
   };
 
   styledComponent.className = cssComponent.className;
-  styledComponent.displayName = `Styled.${component}`;
+  styledComponent.displayName = `Styled.${type}`;
   styledComponent.selector = cssComponent.selector;
   styledComponent.toString = () => cssComponent.selector;
 
@@ -75,5 +99,5 @@ function styled<
 export const hope = styled as HopeFactory;
 
 domElements.forEach(tag => {
-  hope[tag] = hope(tag);
+  hope[tag] = hope(tag) as any;
 });

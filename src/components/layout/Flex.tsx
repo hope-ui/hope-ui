@@ -1,62 +1,67 @@
 import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
-import { StyleProps } from "@/styled-system/props/styleProps";
-
 import { hope } from "../factory";
-import { ElementType, PolymorphicComponentProps } from "../types";
+import { ElementType, HopeComponentProps } from "../types";
 
 export type FlexOptions = Partial<{
   /**
    * Shorthand for `display: inline-flex`
    */
-  inline?: boolean;
+  inlineFlex: boolean;
   /**
    * Shorthand for `alignItems` style prop
    */
-  align?: Property.AlignItems;
+  align: Property.AlignItems;
 
   /**
    * Shorthand for `justifyContent` style prop
    */
-  justify?: Property.JustifyContent;
+  justify: Property.JustifyContent;
 
   /**
    * Shorthand for `flexWrap` style prop
    */
-  wrap?: Property.FlexWrap;
+  wrap: Property.FlexWrap;
 
   /**
    * Shorthand for `flexDirection` style prop
    */
-  direction?: Property.FlexDirection;
+  direction: Property.FlexDirection;
 
   /**
    * Shorthand for `flexBasis` style prop
    */
-  basis?: Property.FlexBasis;
+  basis: Property.FlexBasis;
 
   /**
    * Shorthand for `flexGrow` style prop
    */
-  grow?: Property.FlexGrow;
+  grow: Property.FlexGrow;
 
   /**
    * Shorthand for `flexShrink` style prop
    */
-  shrink?: Property.FlexShrink;
+  shrink: Property.FlexShrink;
 }>;
 
-export type FlexProps<C extends ElementType> = PolymorphicComponentProps<
-  C,
-  FlexOptions & StyleProps
->;
+export type FlexProps<C extends ElementType> = HopeComponentProps<C> & FlexOptions;
 
-const BaseFlex = hope("div");
+const BaseFlex = hope("div", {
+  display: "flex",
+
+  variants: {
+    inlineFlex: {
+      true: {
+        display: "inline-flex",
+      },
+    },
+  },
+});
 
 export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
-  const [flexOptions, others] = splitProps(props, [
-    "inline",
+  const [local, others] = splitProps(props, [
+    "inlineFlex",
     "align",
     "justify",
     "wrap",
@@ -68,14 +73,14 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
 
   return (
     <BaseFlex
-      display={flexOptions.inline ? "inline-flex" : "flex"}
-      alignItems={flexOptions.align}
-      justifyContent={flexOptions.justify}
-      flexWrap={flexOptions.wrap}
-      flexDirection={flexOptions.direction}
-      flexBasis={flexOptions.basis}
-      flexGrow={flexOptions.grow}
-      flexShrink={flexOptions.shrink}
+      inlineFlex={local.inlineFlex}
+      alignItems={local.align}
+      justifyContent={local.justify}
+      flexWrap={local.wrap}
+      flexDirection={local.direction}
+      flexBasis={local.basis}
+      flexGrow={local.grow}
+      flexShrink={local.shrink}
       {...others}
     />
   );
