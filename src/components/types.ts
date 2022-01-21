@@ -8,7 +8,6 @@ import {
 import type * as Util from "@stitches/core/types/util";
 import { Component, ComponentProps, JSX } from "solid-js";
 
-import { CSSProp } from "@/styled-system/props/cssProp";
 import { StyleProps } from "@/styled-system/props/styleProps";
 import { CSSComposer, SystemMedia, SystemStyleObject } from "@/styled-system/types";
 import { DOMElements } from "@/styled-system/utils";
@@ -35,14 +34,6 @@ type ClassProps = {
 };
 
 /**
- * The `as` props is an override of the default HTML tag.
- * Can also be another SolidJS component.
- */
-type AsProp<C extends ElementType> = {
-  as?: C;
-};
-
-/**
  * Allows for extending a set of props (`ExtendedProps`) by an overriding set of props
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
@@ -55,47 +46,12 @@ type ExtendableProps<
 /**
  * Props of a Hope UI component created with the Hope factory
  */
-/*
 export type HopeComponentProps<
-  C extends ElementType,
-  Composers extends (string | Util.Function | { [name: string]: unknown })[]
-> = PropsWithChildren<
-  ExtendableProps<
-    PropsOf<C>,
-    /**
-     * Override StyleProps with Stitches variant props that have same name.
-     *
-     * Order of priority/override for props that has same name is :
-     * 1. Stitches variant props
-     * 2. Style props
-     * 3. Component props
-     * */
-/*
-    ExtendableProps<StyleProps, TransformProps<StyledComponentProps<Composers>, SystemMedia>>
-  >
-> &
-  CSSProp &
-  ClassProps &
-  AsProp<C>;
-    */
-
-/**
- * A Hope UI component created with the Hope factory
- */
-/*
-export type HopeComponent<
-  C extends ElementType,
-  Composers extends (string | Util.Function | { [name: string]: unknown })[]
-> = {
-  <T extends ElementType = C>(props: HopeComponentProps<T, Composers>): JSX.Element;
-  className: string;
-  displayName: string;
-  selector: string;
-  toString: () => string;
-};
-*/
-
-export type HopeComponentProps<Type = "div", Props = {}, Media = {}, CSS = {}> = ExtendableProps<
+  Type = "div",
+  Props = Record<string, unknown>,
+  Media = Record<string, unknown>,
+  CSS = Record<string, unknown>
+> = ExtendableProps<
   Type extends ElementType ? PropsOf<Type> : never,
   ExtendableProps<StyleProps, TransformProps<Props, Media>> &
     ClassProps & {
@@ -104,8 +60,15 @@ export type HopeComponentProps<Type = "div", Props = {}, Media = {}, CSS = {}> =
     }
 >;
 
-export interface HopeComponent<Type = "div", Props = {}, Media = {}, CSS = {}>
-  extends Component<HopeComponentProps<Type, Props, Media, CSS>> {
+/**
+ * A Hope UI component created with the Hope factory
+ */
+export interface HopeComponent<
+  Type = "div",
+  Props = Record<string, unknown>,
+  Media = Record<string, unknown>,
+  CSS = Record<string, unknown>
+> extends Component<HopeComponentProps<Type, Props, Media, CSS>> {
   (
     props: ExtendableProps<
       Type extends ElementType ? PropsOf<Type> : never,
@@ -153,5 +116,5 @@ export type HopeFactory = {
     ...composers: CSSComposer<Composers>
   ): HopeComponent<Type, StyledComponentProps<Composers>, Media, CSS>;
 } & {
-  [Tag in DOMElements]: HopeComponent<Tag, {}, SystemMedia, SystemStyleObject>;
+  [Tag in DOMElements]: HopeComponent<Tag, Record<string, unknown>, SystemMedia, SystemStyleObject>;
 };

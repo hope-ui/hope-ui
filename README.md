@@ -657,41 +657,6 @@ const Card = hope("div", {
 });
 ```
 
-#### ⚠️ Caveats ⚠️
-
-At the moment variant inheritance doesn't work with the current implementation of Hope factory method, meaning you can't do that :
-
-```jsx
-import { hope } from "hope-ui-solid";
-
-const SmallButton = hope("button", {
-  //...
-  variants: {
-    kind: {
-      primary: {
-        backgroundColor: "blue",
-      },
-      //...
-    },
-  },
-});
-
-const LargeButton = hope(SmallButton, {
-  //...
-});
-
-//...
-<LargeButton
-  kind="primary" // <- This doesn't work
->
-  Large Button
-</LargeButton>;
-```
-
-Plan is to use to the official implementation of the `styled` method when Stitches will support SolidJS out of the box.
-
-You can track the issue on the [Stitches repo](https://github.com/modulz/stitches/pull/819)
-
 ## Responsive styles
 
 Hope UI provide five breakpoints.

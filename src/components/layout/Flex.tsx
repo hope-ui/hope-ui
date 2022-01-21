@@ -45,7 +45,7 @@ export type FlexOptions = Partial<{
   shrink: Property.FlexShrink;
 }>;
 
-export type FlexProps<C extends ElementType> = HopeComponentProps<C, []> & FlexOptions;
+export type FlexProps<C extends ElementType> = HopeComponentProps<C> & FlexOptions;
 
 const BaseFlex = hope("div", {
   display: "flex",

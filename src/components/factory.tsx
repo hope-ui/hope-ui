@@ -40,17 +40,17 @@ function styled<
     const Type = props.as || type;
 
     if (typeof Type === "function") {
-      const forwardProps = cssComponent(props).props;
+      const forwardProps = cssComponent(props).props as any;
       delete forwardProps.as;
       return Type(forwardProps);
     }
 
     if (isServer) {
-      const forwardProps = cssComponent(props).props;
+      const forwardProps = cssComponent(props).props as any;
       delete forwardProps.as;
       const [local, others] = splitProps(forwardProps, ["children"]);
       const args = [[`<${Type} `, ">", `</${Type}>`], ssrSpread(others), local.children || ""];
-      const result = ssr(...args);
+      const result = ssr(args);
       return result;
     }
 
@@ -99,5 +99,5 @@ function styled<
 export const hope = styled as HopeFactory;
 
 domElements.forEach(tag => {
-  hope[tag] = hope(tag);
+  hope[tag] = hope(tag) as any;
 });
