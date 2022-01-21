@@ -1,10 +1,16 @@
-import { StyledComponentProps, TransformProps } from "@stitches/core/types/styled-component";
+import {
+  $$StyledComponentMedia,
+  $$StyledComponentProps,
+  $$StyledComponentType,
+  StyledComponentProps,
+  TransformProps,
+} from "@stitches/core/types/styled-component";
 import type * as Util from "@stitches/core/types/util";
-import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
+import { Component, ComponentProps, JSX } from "solid-js";
 
 import { CSSProp } from "@/styled-system/props/cssProp";
 import { StyleProps } from "@/styled-system/props/styleProps";
-import { CSSComposer, SystemMedia } from "@/styled-system/types";
+import { CSSComposer, SystemMedia, SystemStyleObject } from "@/styled-system/types";
 import { DOMElements } from "@/styled-system/utils";
 
 /**
@@ -17,7 +23,7 @@ export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
+export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
  * All SolidJS props that apply css classes.
@@ -49,6 +55,7 @@ type ExtendableProps<
 /**
  * Props of a Hope UI component created with the Hope factory
  */
+/*
 export type HopeComponentProps<
   C extends ElementType,
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
@@ -63,16 +70,19 @@ export type HopeComponentProps<
      * 2. Style props
      * 3. Component props
      * */
+/*
     ExtendableProps<StyleProps, TransformProps<StyledComponentProps<Composers>, SystemMedia>>
   >
 > &
   CSSProp &
   ClassProps &
   AsProp<C>;
+    */
 
 /**
  * A Hope UI component created with the Hope factory
  */
+/*
 export type HopeComponent<
   C extends ElementType,
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
@@ -83,6 +93,50 @@ export type HopeComponent<
   selector: string;
   toString: () => string;
 };
+*/
+
+export type HopeComponentProps<Type = "div", Props = {}, Media = {}, CSS = {}> = ExtendableProps<
+  Type extends ElementType ? PropsOf<Type> : never,
+  ExtendableProps<StyleProps, TransformProps<Props, Media>> &
+    ClassProps & {
+      as?: Type extends string | ElementType ? Type : never;
+      css?: CSS;
+    }
+>;
+
+export interface HopeComponent<Type = "div", Props = {}, Media = {}, CSS = {}>
+  extends Component<HopeComponentProps<Type, Props, Media, CSS>> {
+  (
+    props: ExtendableProps<
+      Type extends ElementType ? PropsOf<Type> : never,
+      ExtendableProps<StyleProps, TransformProps<Props, Media>> &
+        ClassProps & {
+          as?: never;
+          css?: CSS;
+        }
+    >
+  ): JSX.Element | null;
+
+  <As extends string | ElementType = Type extends string | ElementType ? Type : never>(
+    props: ExtendableProps<
+      Type extends ElementType ? PropsOf<Type> : never,
+      ExtendableProps<StyleProps, TransformProps<Props, Media>> &
+        ClassProps & {
+          as?: As;
+          css?: CSS;
+        }
+    >
+  ): Component | null;
+
+  className: string;
+  displayName: string;
+  selector: string;
+  toString: () => string;
+
+  [$$StyledComponentType]: Type;
+  [$$StyledComponentProps]: Props;
+  [$$StyledComponentMedia]: Media;
+}
 
 /**
  * Hope factory serves as an object of hope enabled JSX elements,
@@ -90,12 +144,14 @@ export type HopeComponent<
  */
 export type HopeFactory = {
   <
-    C extends ElementType,
-    Composers extends (string | Util.Function | { [name: string]: unknown })[]
+    Type extends ElementType | Util.Function,
+    Composers extends (string | Util.Function | { [name: string]: unknown })[],
+    Media = SystemMedia,
+    CSS = SystemStyleObject
   >(
-    component: C,
+    type: Type,
     ...composers: CSSComposer<Composers>
-  ): HopeComponent<C, Composers>;
+  ): HopeComponent<Type, StyledComponentProps<Composers>, Media, CSS>;
 } & {
-  [Tag in DOMElements]: HopeComponent<Tag, []>;
+  [Tag in DOMElements]: HopeComponent<Tag, {}, SystemMedia, SystemStyleObject>;
 };
