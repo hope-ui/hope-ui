@@ -1,5 +1,7 @@
+import { StyleProps } from "@/styled-system/props/styleProps";
 import { Property } from "csstype";
 import { splitProps } from "solid-js";
+import { ExtendableProps } from "..";
 
 import { hope } from "../factory";
 import { ElementType, HopeComponentProps } from "../types";
@@ -45,7 +47,7 @@ export type FlexOptions = Partial<{
   shrink: Property.FlexShrink;
 }>;
 
-export type FlexProps<C extends ElementType> = HopeComponentProps<C> & FlexOptions;
+export type FlexProps<C extends ElementType> = ExtendableProps<HopeComponentProps<C>, FlexOptions>;
 
 const BaseFlex = hope("div", {
   display: "flex",
