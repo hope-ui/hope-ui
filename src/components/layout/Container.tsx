@@ -12,9 +12,9 @@ export const Container = hope("div", {
 
   "@sm": { maxWidth: "$2xl" },
   "@md": { maxWidth: "$3xl" },
-  "@lg": { maxWidth: "$4xl" },
-  "@xl": { maxWidth: "$5xl" },
-  "@2xl": { maxWidth: "$6xl" },
+  "@lg": { maxWidth: "$5xl" },
+  "@xl": { maxWidth: "$7xl" },
+  "@2xl": { maxWidth: "$8xl" },
 
   variants: {
     /**

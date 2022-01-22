@@ -59,6 +59,12 @@ const BaseFlex = hope("div", {
   },
 });
 
+/**
+ * Component used to create flexbox layouts.
+ *
+ * It renders a `div` with `display: flex` and
+ * comes with helpful style shorthand.
+ */
 export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
   const [local, others] = splitProps(props, [
     "inlineFlex",

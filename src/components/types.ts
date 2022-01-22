@@ -107,7 +107,7 @@ export interface HopeComponent<
  */
 export type HopeFactory = {
   <
-    Type extends ElementType | Util.Function,
+    Type extends ElementType,
     Composers extends (string | Util.Function | { [name: string]: unknown })[],
     Media = SystemMedia,
     CSS = SystemStyleObject

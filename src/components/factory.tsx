@@ -1,7 +1,7 @@
 import { StyledComponentProps } from "@stitches/core/types/styled-component";
 import type * as Util from "@stitches/core/types/util";
 import { splitProps } from "solid-js";
-import { Dynamic, isServer, ssr, ssrSpread } from "solid-js/web";
+import { Dynamic } from "solid-js/web";
 
 import { getIntersectionKeys, stylePropsConfig } from "@/styled-system/props/stylePropsConfig";
 import { css } from "@/styled-system/stitches.config";
@@ -15,7 +15,7 @@ import { ElementType, HopeComponent, HopeFactory } from "./types";
  * Function that can be used to enable custom component receive hope's style props.
  */
 function styled<
-  Type extends ElementType | Util.Function,
+  Type extends ElementType,
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
 >(
   type: Type,
@@ -33,27 +33,14 @@ function styled<
   /**
    * The Generated styled component function that is style props aware.
    */
-  //const styledComponent = <T extends ElementType = C>(props: HopeComponentProps<T, Composers>) => {
-  const styledComponent: any = (
-    props: HopeComponentProps<Type, StyledComponentProps<Composers>, SystemMedia, SystemStyleObject>
+  const styledComponent: any = <NewType extends ElementType = Type>(
+    props: HopeComponentProps<
+      NewType,
+      StyledComponentProps<Composers>,
+      SystemMedia,
+      SystemStyleObject
+    >
   ) => {
-    const Type = props.as || type;
-
-    if (typeof Type === "function") {
-      const forwardProps = cssComponent(props).props as any;
-      delete forwardProps.as;
-      return Type(forwardProps);
-    }
-
-    if (isServer) {
-      const forwardProps = cssComponent(props).props as any;
-      delete forwardProps.as;
-      const [local, others] = splitProps(forwardProps, ["children"]);
-      const args = [[`<${Type} `, ">", `</${Type}>`], ssrSpread(others), local.children || ""];
-      const result = ssr(args);
-      return result;
-    }
-
     /**
      * Get an array of prop names that are only used style props and doesn't have same name as a variant props.
      * This will ensure we pass the small array possible to `splitProps()`

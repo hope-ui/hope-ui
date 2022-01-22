@@ -8,6 +8,34 @@
 
 🤞 The hoped component library for your SolidJS applications.
 
+## What is Hope UI ?
+
+Hope UI is a component library built for allowing developers to build SolidJS applications quickly with a good looking (it's objective obviously) and accessible UI.
+
+Target audience is developers or company that don't have time, skills or ressources allocated to design and just want to "get things done".
+
+Typical use case is :
+
+1. Install Hope UI
+2. Change theme color to fit your brand
+3. Move on, build stuff
+
+### What about customization ?
+
+Hope UI tends to be a design system more than a fully customizable component library.
+
+Its built with [Stitches](https://stitches.dev/) that is designed with design system in mind too.
+
+That means the surface of customization is kept small by design, **only the color palette and fonts are customizable.**
+
+Other theme tokens like **sizes** and **space** should cover the most variety of use cases.
+
+Try to follow the design system as much as possible and use the `css` prop (described below) when you want to "break the rules".
+
+### What if I have a totally different design language than Hope UI ?
+
+My recommendation is **don't use Hope UI** and build your own design system with a headless UI library, because with Hope UI you will spend most of your time fighting with the tool, which is not cool 😅.
+
 ## Getting started
 
 ### Installation
@@ -224,7 +252,7 @@ To apply a token you need to prefix it with a `$` sign.
 </Box>
 ```
 
-> Note that in this example `color` just use the basic css white color not a value from the theme.
+> Note that in this example `color` just use the basic css white color, not a value from the theme.
 
 ### Available tokens
 
@@ -383,7 +411,7 @@ export default {
 };
 ```
 
-#### Spacing
+#### Space
 
 ```js
 export default {
@@ -407,6 +435,19 @@ export default {
     16: "4rem",
     20: "5rem",
     24: "6rem",
+    28: "7rem",
+    32: "8rem",
+    36: "9rem",
+    40: "10rem",
+    44: "11rem",
+    48: "12rem",
+    52: "13rem",
+    56: "14rem",
+    60: "15rem",
+    64: "16rem",
+    72: "18rem",
+    80: "20rem",
+    96: "24rem",
   },
 };
 ```
@@ -425,9 +466,11 @@ export default {
     xl: "36rem",
     "2xl": "40rem",
     "3xl": "48rem",
-    "4xl": "64rem",
-    "5xl": "80rem",
-    "6xl": "96rem",
+    "4xl": "56rem",
+    "5xl": "64rem",
+    "6xl": "72rem",
+    "7xl": "80rem",
+    "8xl": "96rem",
   },
 };
 ```
@@ -475,11 +518,14 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "hope-ui-solid";
 
-// 2. Extend the theme to include custom colors, fonts etc
+// 2. Extend the theme to include custom colors and fonts.
 const theme = extendTheme({
   tokens: {
     colors: {
       primary500: "salmon",
+    },
+    fonts: {
+      sans: "Inter, sans-serif",
     },
   },
 });
@@ -488,7 +534,7 @@ const theme = extendTheme({
 function App() {
   return (
     <HopeProvider theme={theme}>
-      <Box bg="$primary500" w="$full" p="$4" color="white">
+      <Box bg="$primary500" w="$full" p="$4" color="white" fontFamily="$sans">
         Box with custom primary500 bg color
       </Box>
     </HopeProvider>
@@ -659,15 +705,18 @@ const Card = hope("div", {
 
 ## Responsive styles
 
-Hope UI provide five breakpoints.
+Hope UI provide the follow media queries.
 
-| Prop | CSS property               |
-| ---- | -------------------------- |
-| sm   | @media (min-width: 640px)  |
-| md   | @media (min-width: 768px)  |
-| lg   | @media (min-width: 1024px) |
-| xl   | @media (min-width: 1280px) |
-| 2xl  | @media (min-width: 1536px) |
+| Prop          | CSS property                            |
+| ------------- | --------------------------------------- |
+| sm            | @media (min-width: 640px)               |
+| md            | @media (min-width: 768px)               |
+| lg            | @media (min-width: 1024px)              |
+| xl            | @media (min-width: 1280px)              |
+| 2xl           | @media (min-width: 1536px)              |
+| reduce-motion | @media (prefers-reduced-motion: reduce) |
+| light         | @media (prefers-color-scheme: light)    |
+| dark          | @media (prefers-color-scheme: dark)     |
 
 ### Usage with the Hope factory method
 
