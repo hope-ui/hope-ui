@@ -3,7 +3,7 @@ import { JSX } from "solid-js";
 
 import { HopeXPosition } from "@/theme/types";
 
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, ExtendableProps, HopeComponentProps } from "../types";
 import { BaseButton } from "./Button";
 
 type ButtonVariants = VariantProps<typeof BaseButton>;
@@ -20,4 +20,7 @@ export type ThemeableButtonOptions = Omit<
   "loading" | "disabled" | "leftIcon" | "rightIcon"
 >;
 
-export type ButtonProps<C extends ElementType> = HopeComponentProps<C> & ButtonOptions;
+export type ButtonProps<C extends ElementType> = ExtendableProps<
+  HopeComponentProps<C>,
+  ButtonOptions
+>;

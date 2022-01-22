@@ -38,19 +38,17 @@ type ClassProps = {
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-type ExtendableProps<
-  ExtendedProps = Record<string, unknown>,
-  OverrideProps = Record<string, unknown>
-> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
+export type ExtendableProps<ExtendedProps = unknown, OverrideProps = unknown> = OverrideProps &
+  Omit<ExtendedProps, keyof OverrideProps>;
 
 /**
  * Props of a Hope UI component created with the Hope factory
  */
 export type HopeComponentProps<
   Type = "div",
-  Props = Record<string, unknown>,
-  Media = Record<string, unknown>,
-  CSS = Record<string, unknown>
+  Props = unknown,
+  Media = SystemMedia,
+  CSS = SystemStyleObject
 > = ExtendableProps<
   Type extends ElementType ? PropsOf<Type> : never,
   ExtendableProps<StyleProps, TransformProps<Props, Media>> &
@@ -65,9 +63,9 @@ export type HopeComponentProps<
  */
 export interface HopeComponent<
   Type = "div",
-  Props = Record<string, unknown>,
-  Media = Record<string, unknown>,
-  CSS = Record<string, unknown>
+  Props = unknown,
+  Media = SystemMedia,
+  CSS = SystemStyleObject
 > extends Component<HopeComponentProps<Type, Props, Media, CSS>> {
   (
     props: ExtendableProps<
@@ -116,5 +114,5 @@ export type HopeFactory = {
     ...composers: CSSComposer<Composers>
   ): HopeComponent<Type, StyledComponentProps<Composers>, Media, CSS>;
 } & {
-  [Tag in DOMElements]: HopeComponent<Tag, Record<string, unknown>, SystemMedia, SystemStyleObject>;
+  [Tag in DOMElements]: HopeComponent<Tag, unknown, SystemMedia, SystemStyleObject>;
 };
