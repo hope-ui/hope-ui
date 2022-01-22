@@ -25,5 +25,5 @@ export type ThemeTokensOverride = {
  * The Hope UI theme override interface.
  */
 export interface HopeThemeOverride {
-  tokens?: ThemeTokensOverride;
+  tokens?: Pick<ThemeTokensOverride, "colors" | "fonts">;
 }
