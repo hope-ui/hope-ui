@@ -15,7 +15,7 @@ import { ElementType, HopeComponent, HopeFactory } from "./types";
  * Function that can be used to enable custom component receive hope's style props.
  */
 function styled<
-  Type extends ElementType | Util.Function,
+  Type extends ElementType,
   Composers extends (string | Util.Function | { [name: string]: unknown })[]
 >(
   type: Type,
@@ -33,9 +33,13 @@ function styled<
   /**
    * The Generated styled component function that is style props aware.
    */
-  //const styledComponent = <T extends ElementType = C>(props: HopeComponentProps<T, Composers>) => {
-  const styledComponent: any = (
-    props: HopeComponentProps<Type, StyledComponentProps<Composers>, SystemMedia, SystemStyleObject>
+  const styledComponent: any = <NewType extends ElementType = Type>(
+    props: HopeComponentProps<
+      NewType,
+      StyledComponentProps<Composers>,
+      SystemMedia,
+      SystemStyleObject
+    >
   ) => {
     /**
      * Get an array of prop names that are only used style props and doesn't have same name as a variant props.
