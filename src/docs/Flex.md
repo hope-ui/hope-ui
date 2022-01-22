@@ -28,14 +28,14 @@ While you can pass the verbose props, using the shorthand can save you some time
 ```jsx
 <Flex color="white">
   <Center w="100px" bg="$success500">
-    <Text>Box 1</Text>
+    <span>Box 1</span>
   </Center>
-  <Box bg="$info500" boxSize="150px">
-    <Text>Box 2</Text>
-  </Box>
-  <Box flex="1" bg="$danger500">
-    <Text>Box 3</Text>
-  </Box>
+  <Center bg="$info500" boxSize="150px">
+    <span>Box 2</span>
+  </Center>
+  <Center flex="1" bg="$danger500">
+    <span>Box 3</span>
+  </Center>
 </Flex>
 ```
 
@@ -45,13 +45,13 @@ As an alternative to `Stack`, you can combine `Flex` and `Spacer` to create stac
 
 ```jsx
 <Flex>
-  <Box p="$4" bg="$danger500">
+  <Center p="$4" bg="$danger500">
     Box 1
-  </Box>
+  </Center>
   <Spacer />
-  <Box p="$4" bg="$success500">
+  <Center p="$4" bg="$success500">
     Box 2
-  </Box>
+  </Center>
 </Flex>
 ```
 
