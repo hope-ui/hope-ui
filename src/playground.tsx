@@ -2,31 +2,20 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { hope, HopeProvider } from ".";
-
-const SmallButton = hope("a", {
-  p: "$4",
-  color: "$success600",
-
-  variants: {
-    kind: {
-      primary: {
-        backgroundColor: "blue",
-      },
-    },
-  },
-});
-
-const LargeButton = hope(SmallButton, {
-  //...
-});
+import { Box, Center, Container, Flex, HopeProvider, Spacer } from ".";
 
 export function App() {
   return (
     <HopeProvider>
-      <LargeButton>Large Button</LargeButton>
-      <LargeButton kind="primary">Large Button</LargeButton>
-      <hope.div></hope.div>
+      <Flex>
+        <Center p="$4" bg="$danger500">
+          Box 1
+        </Center>
+        <Spacer />
+        <Center p="$4" bg="$success500">
+          Box 2
+        </Center>
+      </Flex>
     </HopeProvider>
   );
 }
