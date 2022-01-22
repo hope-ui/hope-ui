@@ -82,7 +82,7 @@ function App() {
 
 ## Component documentation
 
-At the moment, all component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs) and you can try them in the [Storybook](https://hope-ui-storybook.vercel.app/).
+At the moment, all component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs).
 
 ## The style props
 
