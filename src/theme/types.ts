@@ -1,11 +1,22 @@
+import { ThemeableButtonOptions } from "@/components/button/types";
+
 import { defaulThemeTokens } from "../styled-system/tokens";
 import { SystemTokens } from "../styled-system/types";
+
+export type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>;
+};
+
+export interface ComponentsDefaultProps {
+  Button: Required<ThemeableButtonOptions>;
+}
 
 /**
  * The Hope UI theme interface.
  */
 export interface HopeTheme {
   tokens: SystemTokens;
+  components: ComponentsDefaultProps;
 }
 
 /**
@@ -26,4 +37,9 @@ export type ThemeTokensOverride = {
  */
 export interface HopeThemeOverride {
   tokens?: Pick<ThemeTokensOverride, "colors" | "fonts">;
+  components?: DeepPartial<ComponentsDefaultProps>;
 }
+
+export type HopeXPosition = "left" | "right";
+
+export type HopeYPosition = "top" | "bottom";

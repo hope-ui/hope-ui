@@ -416,13 +416,13 @@ export default {
 ```js
 export default {
   space: {
-    0.5: "0.125rem",
+    0-5: "0.125rem",
     1: "0.25rem",
-    1.5: "0.375rem",
+    1-5: "0.375rem",
     2: "0.5rem",
-    2.5: "0.625rem",
+    2-5: "0.625rem",
     3: "0.75rem",
-    3.5: "0.875rem",
+    3-5: "0.875rem",
     4: "1rem",
     5: "1.25rem",
     6: "1.5rem",
@@ -518,7 +518,7 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "hope-ui-solid";
 
-// 2. Extend the theme to include custom colors and fonts.
+// 2. Extend the theme to include custom colors, fonts and default component props.
 const theme = extendTheme({
   tokens: {
     colors: {
@@ -526,6 +526,13 @@ const theme = extendTheme({
     },
     fonts: {
       sans: "Inter, sans-serif",
+    },
+  },
+  components: {
+    Button: {
+      variant: "outline",
+      radius: "full",
+      uppercase: true,
     },
   },
 });
