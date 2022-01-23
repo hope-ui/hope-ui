@@ -6,8 +6,8 @@ import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 
 import { hope } from "../factory";
-import { ElementType } from "../types";
-import { ButtonProps } from ".";
+import { ElementType, ExtendableProps } from "../types";
+import { ButtonProps, ThemeableButtonOptions } from "./types";
 
 const buttonLoadingIcon = css({
   animation: `1000ms linear infinite ${spin}`,
@@ -691,7 +691,7 @@ export const BaseButton = hope("button", {
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
   const theme = useHopeTheme().components.Button;
 
-  const defaultProps: ButtonProps<"button"> = {
+  const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
     variant: theme.variant,
     color: theme.color,
