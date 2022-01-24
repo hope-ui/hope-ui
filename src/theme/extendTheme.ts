@@ -1,6 +1,6 @@
 import merge from "lodash.merge";
 
-import { createTheme } from "../styled-system/stitches.config";
+import { createTheme } from "../stitches/stitches.config";
 import { defaultTheme } from "./defaultTheme";
 import { HopeTheme, HopeThemeOverride } from "./types";
 
@@ -10,6 +10,10 @@ export function extendTheme(themeOverride: HopeThemeOverride): HopeTheme {
 
   if (themeOverride.tokens) {
     merge(customTheme.tokens, createTheme(themeOverride.tokens));
+  }
+
+  if (themeOverride.components) {
+    merge(customTheme.components, themeOverride.components);
   }
 
   return customTheme;

@@ -3,7 +3,7 @@ import { radii } from "./radii";
 import { shadows } from "./shadows";
 import { sizes } from "./sizes";
 import { space } from "./space";
-import { fonts, fontSizes, fontWeights, lineHeights } from "./typography";
+import { fonts, fontSizes, fontWeights, letterSpacings, lineHeights } from "./typography";
 import { zIndices } from "./zIndices";
 
 /**
@@ -16,6 +16,7 @@ export const defaulThemeTokens = {
   fonts,
   fontSizes,
   fontWeights,
+  letterSpacings,
   lineHeights,
   radii,
   shadows,

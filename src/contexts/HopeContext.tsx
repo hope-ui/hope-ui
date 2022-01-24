@@ -1,7 +1,7 @@
 import { createContext, mergeProps, PropsWithChildren, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { applyGlobalBaseStyles } from "@/styled-system/baseStyles";
+import { applyGlobalBaseStyles } from "@/stitches/baseStyles";
 import { defaultTheme } from "@/theme/defaultTheme";
 import { HopeTheme } from "@/theme/types";
 
