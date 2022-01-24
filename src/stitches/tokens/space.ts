@@ -1,11 +1,12 @@
-export const baseSpace = {
-  "0-5": "0.125rem",
+export const space = {
+  px: "1px",
+  "0_5": "0.125rem",
   1: "0.25rem",
-  "1-5": "0.375rem",
+  "1_5": "0.375rem",
   2: "0.5rem",
-  "2-5": "0.625rem",
+  "2_5": "0.625rem",
   3: "0.75rem",
-  "3-5": "0.875rem",
+  "3_5": "0.875rem",
   4: "1rem",
   5: "1.25rem",
   6: "1.5rem",
@@ -29,10 +30,6 @@ export const baseSpace = {
   60: "15rem",
   64: "16rem",
   72: "18rem",
-};
-
-export const space = {
-  ...baseSpace,
   80: "20rem",
   96: "24rem",
 };

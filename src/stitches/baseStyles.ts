@@ -6,14 +6,9 @@ import { SystemTokens } from "./types";
  */
 export function applyGlobalBaseStyles(tokens: SystemTokens) {
   const baseStyles = globalCss({
-    /* 
-     1. Use a more-intuitive box-sizing model. 
-     2. Override the default border in order to make it easy to add a border by simply adding the `border` prop 
-    */
+    /* Use a more-intuitive box-sizing model. */
     "*, ::before, ::after": {
-      boxSizing: "border-box" /* 1 */,
-      borderWidth: 0 /* 2 */,
-      borderStyle: "solid" /* 2 */,
+      boxSizing: "border-box",
     },
 
     /* Remove default margin. */

@@ -2,20 +2,19 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Center, Container, Flex, HopeProvider, Spacer } from ".";
+import { css, HopeProvider } from ".";
+
+const chien = css({
+  display: "inline-block",
+  width: "$1_5",
+  height: "$1_5",
+  backgroundColor: "$danger300",
+});
 
 export function App() {
   return (
     <HopeProvider>
-      <Flex>
-        <Center p="$4" bg="$danger500">
-          Box 1
-        </Center>
-        <Spacer />
-        <Center p="$4" bg="$success500">
-          Box 2
-        </Center>
-      </Flex>
+      <div class={chien()}>Box</div>
     </HopeProvider>
   );
 }

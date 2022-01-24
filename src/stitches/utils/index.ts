@@ -1,11 +1,9 @@
 import { background } from "./background";
-import { margin } from "./margin";
-import { padding } from "./padding";
 import { size } from "./size";
-import { spacing } from "./spacing";
+import { margin, padding, spacing } from "./spacing";
 import { typography } from "./typography";
 
-export const shorthands = {
+export const utils = {
   ...background,
   ...margin,
   ...padding,

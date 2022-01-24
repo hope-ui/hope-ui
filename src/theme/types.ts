@@ -1,14 +1,12 @@
-import { ThemeableButtonOptions } from "@/components/button/types";
-
-import { defaulThemeTokens } from "../styled-system/tokens";
-import { SystemTokens } from "../styled-system/types";
+import { defaulThemeTokens } from "../stitches/tokens";
+import { SystemTokens } from "../stitches/types";
 
 export type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
 export interface ComponentsDefaultProps {
-  Button: Required<ThemeableButtonOptions>;
+  Button: any; //Required<ThemeableButtonOptions>;
 }
 
 /**
