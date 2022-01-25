@@ -36,7 +36,7 @@
   ],
   "scripts": {
     "build": "vite build",
-    "build-storybook": "build-storybook",
+    "build:storybook": "build-storybook",
     "commit": "git-cz",
     "dev": "vite",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
