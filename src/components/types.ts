@@ -17,7 +17,7 @@ type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentP
 /**
  * All SolidJS props that apply css classes.
  */
-type ClassProps = {
+export type ClassProps = {
   class?: string;
   className?: string;
   classList?: { [key: string]: boolean };
@@ -27,7 +27,7 @@ type ClassProps = {
  * The `css` prop allow you to override styles easily.
  * It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
  */
-type CSSProp = {
+export type CSSProp = {
   css?: SystemStyleObject;
 };
 
@@ -35,7 +35,7 @@ type CSSProp = {
  * The `as` props is an override of the default HTML tag.
  * Can also be another SolidJS component.
  */
-type AsProp<C extends ElementType> = {
+export type AsProp<C extends ElementType> = {
   as?: C;
 };
 

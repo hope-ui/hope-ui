@@ -3,15 +3,15 @@ import { Dynamic } from "solid-js/web";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps } from "../utils";
-import { textStyles, TextVariants } from "./Text.styles";
+import { headingStyles, HeadingVariants } from "./Heading.styles";
 
-export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, TextVariants>;
+export type HeadingProps<C extends ElementType> = PolymorphicComponentProps<C, HeadingVariants>;
 
 /**
- * Text component is the used to render text and paragraphs within an interface.
- * It renders a <p> tag by default.
+ * Headings are used for rendering headlines.
+ * It renders an <h2> tag by default.
  */
-export function Text<C extends ElementType = "p">(props: TextProps<C>) {
+export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const [local, variantProps, others] = splitProps(props, commonProps, [
     "size",
     "weight",
@@ -22,7 +22,7 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
   ]);
 
   const classList = () => {
-    const textClass = textStyles({
+    const textClass = headingStyles({
       ...variantProps,
       css: local.css,
     });
@@ -35,5 +35,5 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
     };
   };
 
-  return <Dynamic component={local.as ?? "p"} classList={classList()} {...others} />;
+  return <Dynamic component={local.as ?? "h2"} classList={classList()} {...others} />;
 }

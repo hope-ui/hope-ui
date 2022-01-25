@@ -1,12 +1,13 @@
+import { VariantProps } from "@stitches/core";
+
 import { css } from "@/stitches/stitches.config";
 
-export const text = css({
+export const textStyles = css({
+  // Reset
+  margin: 0,
+  padding: 0,
+
   variants: {
-    font: {
-      sans: { fontFamily: "$sans" },
-      serif: { fontFamily: "$serif" },
-      mono: { fontFamily: "$mono" },
-    },
     size: {
       xs: {
         fontSize: "$xs",
@@ -62,15 +63,11 @@ export const text = css({
       },
     },
     weight: {
-      hairline: { fontWeight: "$hairline" },
-      thin: { fontWeight: "$thin" },
       light: { fontWeight: "$light" },
       normal: { fontWeight: "$normal" },
       medium: { fontWeight: "$medium" },
       semibold: { fontWeight: "$semibold" },
       bold: { fontWeight: "$bold" },
-      extrabold: { fontWeight: "$extrabold" },
-      black: { fontWeight: "$black" },
     },
     color: {
       primary: { color: "$primary700" },
@@ -81,6 +78,12 @@ export const text = css({
       warning: { color: "$warning700" },
       danger: { color: "$danger700" },
     },
+    align: {
+      left: { textAlign: "left" },
+      right: { textAlign: "right" },
+      center: { textAlign: "center" },
+      justify: { textAlign: "justify" },
+    },
     lineClamp: {
       1: { noOfLines: 1 },
       2: { noOfLines: 2 },
@@ -88,17 +91,7 @@ export const text = css({
       4: { noOfLines: 4 },
       5: { noOfLines: 5 },
     },
-    align: {
-      left: { textAlign: "left" },
-      right: { textAlign: "right" },
-      center: { textAlign: "center" },
-      justify: { textAlign: "justify" },
-    },
-    capitalize: { true: { textTransform: "capitalize" } },
-    uppercase: { true: { textTransform: "uppercase" } },
-    lowercase: { true: { textTransform: "lowercase" } },
     secondary: { true: {} },
-    tertiary: { true: {} },
   },
   compoundVariants: [
     /* Secondary text
@@ -106,7 +99,7 @@ export const text = css({
     {
       color: "primary",
       secondary: "true",
-      css: { color: "$primary500" },
+      css: { color: "$primary600" },
     },
     {
       color: "dark",
@@ -116,70 +109,34 @@ export const text = css({
     {
       color: "neutral",
       secondary: "true",
-      css: { color: "$neutral500" },
+      css: { color: "$neutral600" },
     },
     {
       color: "success",
       secondary: "true",
-      css: { color: "$success500" },
+      css: { color: "$success600" },
     },
     {
       color: "info",
       secondary: "true",
-      css: { color: "$info500" },
+      css: { color: "$info600" },
     },
     {
       color: "warning",
       secondary: "true",
-      css: { color: "$warning500" },
+      css: { color: "$warning600" },
     },
     {
       color: "danger",
       secondary: "true",
-      css: { color: "$danger500" },
-    },
-    /* Tertiary text
-     **********************/
-    {
-      color: "primary",
-      tertiary: "true",
-      css: { color: "$primary300" },
-    },
-    {
-      color: "dark",
-      tertiary: "true",
-      css: { color: "$dark500" },
-    },
-    {
-      color: "neutral",
-      tertiary: "true",
-      css: { color: "$neutral300" },
-    },
-    {
-      color: "success",
-      tertiary: "true",
-      css: { color: "$success300" },
-    },
-    {
-      color: "info",
-      tertiary: "true",
-      css: { color: "$info300" },
-    },
-    {
-      color: "warning",
-      tertiary: "true",
-      css: { color: "$warning300" },
-    },
-    {
-      color: "danger",
-      tertiary: "true",
-      css: { color: "$danger300" },
+      css: { color: "$danger600" },
     },
   ],
   defaultVariants: {
-    font: "sans",
     size: "base",
     weight: "normal",
     color: "dark",
   },
 });
+
+export type TextVariants = VariantProps<typeof textStyles>;

@@ -10,17 +10,9 @@
 
 ## What is Hope UI ?
 
-Hope UI is a component library built for allowing developers to build SolidJS applications quickly with a good looking (it's objective obviously) and accessible UI.
+Hope UI is a component library built for allowing developers to build SolidJS applications quickly with good looking and accessible UI.
 
-Target audience is developers or company that don't have time, skills or ressources allocated to design and just want to "get things done".
-
-Typical use case is :
-
-1. Install Hope UI
-2. Change theme color to fit your brand
-3. Move on, build stuff
-
-### What about customization ?
+### Note about customization
 
 Hope UI tends to be a design system more than a fully customizable component library.
 
@@ -30,7 +22,7 @@ That means the surface of customization is kept small by design, **only the colo
 
 Other theme tokens like **sizes** and **space** should cover the most variety of use cases.
 
-Try to follow the design system as much as possible and use the `css` prop (described below) when you want to "break the rules".
+You can use the `css` prop (described below) when you want to "break the rules".
 
 ### What if I have a totally different design language than Hope UI ?
 
@@ -84,161 +76,35 @@ function App() {
 
 At the moment, all component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs).
 
-## The style props
+## Creating styles
 
-Style props are a way to alter the style of a component by simply passing props to it. It helps to save time by providing helpful shorthand ways to style components.
+To create custom styles use the `css()` method provided by Stitches.
 
-### Available props
+It's the core Stitches API with no extra layer, you can find the documentation [here](https://stitches.dev/docs/framework-agnostic).
 
-The following table shows a list of every style prop and the properties within each group.
+For convenience Hope UI re-export it configured with its default theme.
 
-#### Color
+```jsx
+import { css } from "hope-ui-solid";
 
-| Prop    | CSS property | Theme token |
-| ------- | ------------ | ----------- |
-| color   | color        | `colors`    |
-| bg      | background   | `colors`    |
-| opacity | opacity      | none        |
+const buttonStyles = css({
+  backgroundColor: "red",
+  borderRadius: "16px",
+  fontSize: "16px",
+  padding: "8px 16px",
+  "&:hover": {
+    backgroundColor: "orange",
+  },
+});
 
-#### Margin
+function Button() {
+  return <button className={buttonStyles()}>Button</button>;
+}
+```
 
-| Prop | CSS property                            | Theme token |
-| ---- | --------------------------------------- | ----------- |
-| m    | margin                                  | `space`     |
-| mx   | margin-inline-start + margin-inline-end | `space`     |
-| my   | margin-top + margin-bottom              | `space`     |
-| mt   | margin-top                              | `space`     |
-| mr   | margin-right                            | `space`     |
-| mb   | margin-bottom                           | `space`     |
-| ml   | margin-left                             | `space`     |
+## Using Hope UI theme tokens
 
-#### Padding
-
-| Prop | CSS property                              | Theme token |
-| ---- | ----------------------------------------- | ----------- |
-| p    | padding                                   | `space`     |
-| px   | padding-inline-start + padding-inline-end | `space`     |
-| py   | padding-top + padding-bottom              | `space`     |
-| pt   | padding-top                               | `space`     |
-| pr   | padding-right                             | `space`     |
-| pb   | padding-bottom                            | `space`     |
-| pl   | padding-left                              | `space`     |
-
-#### Typography
-
-| Prop           | CSS property                                               | Theme token      |
-| -------------- | ---------------------------------------------------------- | ---------------- |
-| fontFamily     | font-family                                                | `fonts`          |
-| fontSize       | font-size                                                  | `fontSizes`      |
-| fontWeight     | font-weight                                                | `fontWeights`    |
-| lineHeight     | line-height                                                | `lineHeights`    |
-| letterSpacing  | letter-spacing                                             | `letterSpacings` |
-| textAlign      | text-align                                                 | none             |
-| fontStyle      | font-style                                                 | none             |
-| textTransform  | text-transform                                             | none             |
-| textDecoration | text-decoration                                            | none             |
-| lineClamp      | custom utility to truncate text to a given number of lines | none             |
-
-#### Layout
-
-| Prop          | CSS property   | Theme token |
-| ------------- | -------------- | ----------- |
-| display       | display        | none        |
-| verticalAlign | vertical-align | none        |
-| overflow      | overflow       | none        |
-| overflowX     | overflow-x     | none        |
-| overflowY     | overflow-y     | none        |
-
-#### Size
-
-| Prop    | CSS property   | Theme token |
-| ------- | -------------- | ----------- |
-| w       | width          | `sizes`     |
-| minW    | min-width      | `sizes`     |
-| maxW    | max-width      | `sizes`     |
-| h       | height         | `sizes`     |
-| minH    | min-height     | `sizes`     |
-| maxH    | max-height     | `sizes`     |
-| boxSize | width + height | `sizes`     |
-
-#### Flexbox
-
-| Prop          | CSS property   | Theme token |
-| ------------- | -------------- | ----------- |
-| justifyItems  | justify-items  | none        |
-| flexWrap      | flex-wrap      | none        |
-| flexDirection | flex-direction | none        |
-| flex          | flex           | none        |
-| flexGrow      | flex-grow      | none        |
-| flexShrink    | flex-shrink    | none        |
-| flexBasis     | flex-basis     | none        |
-| justifySelf   | justify-self   | none        |
-| alignSelf     | align-self     | none        |
-
-#### Grid
-
-| Prop                | CSS property         | Theme token |
-| ------------------- | -------------------- | ----------- |
-| gridColumn          | grid-column          | none        |
-| gridColumnStart     | grid-column-start    | none        |
-| gridColumnEnd       | grid-column-end      | none        |
-| gridRow             | grid-row             | none        |
-| gridRowStart        | grid-row-start       | none        |
-| gridRowEnd          | grid-row-end         | none        |
-| gridAutoFlow        | grid-auto-flow       | none        |
-| gridAutoColumns     | grid-auto-columns    | none        |
-| gridAutoRows        | grid-auto-rows       | none        |
-| gridTemplate        | grid-template        | none        |
-| gridTemplateColumns | grid-template-column | none        |
-| gridTemplateRows    | grid-template-rows   | none        |
-| gridTemplateAreas   | grid-template-areas  | none        |
-| gridArea            | grid-area            | none        |
-
-#### Common to Flexbox and Grid
-
-| Prop           | CSS property    | Theme token |
-| -------------- | --------------- | ----------- |
-| gap            | gap             | `space`     |
-| rowGap         | row-gap         | `space`     |
-| columnGap      | column-gap      | `space`     |
-| alignItems     | align-items     | none        |
-| alignContent   | align-content   | none        |
-| justifyContent | justify-content | none        |
-| placeItems     | place-items     | none        |
-| placeContent   | place-content   | none        |
-| placeSelf      | place-self      | none        |
-| order          | order           | none        |
-
-#### Border
-
-| Prop         | CSS property  | Theme token |
-| ------------ | ------------- | ----------- |
-| border       | border        | none        |
-| borderWidth  | border-width  | none        |
-| borderStyle  | border-style  | none        |
-| borderColor  | border-color  | `colors`    |
-| borderRadius | border-radius | `radii`     |
-
-#### Position
-
-| Prop     | CSS property | Theme token |
-| -------- | ------------ | ----------- |
-| position | position     | none        |
-| zIndex   | z-index      | `zIndices`  |
-| top      | top          | `space`     |
-| right    | right        | `space`     |
-| left     | left         | `space`     |
-| bottom   | bottom       | `space`     |
-
-#### Shadow
-
-| Prop      | CSS property | Theme token |
-| --------- | ------------ | ----------- |
-| boxShadow | box-shadow   | `shadows`   |
-
-## Using Hope UI theme tokens in style props
-
-Many style props are mapped to scale from the Hope UI theme tokens, meaning you can set they value based on the Hope UI theme.
+Many css propeties of Stitches `css` method and `css` prop are mapped to scale from the Hope UI theme tokens, meaning you can set they value based on the Hope UI theme.
 
 You can view the props/token mapping on the [Stitches docs](https://stitches.dev/docs/tokens#property-mapping)
 
@@ -247,12 +113,22 @@ You can view the props/token mapping on the [Stitches docs](https://stitches.dev
 To apply a token you need to prefix it with a `$` sign.
 
 ```jsx
-<Box bg="$primary500" w="$full" p="$4" color="white">
-  Box with token-aware style props
-</Box>
-```
+import { css } from "hope-ui-solid";
 
-> Note that in this example `color` just use the basic css white color, not a value from the theme.
+const buttonStyles = css({
+  backgroundColor: "$primary500",
+  borderRadius: "$full",
+  fontSize: "$base",
+  padding: "$4 $8",
+  "&:hover": {
+    backgroundColor: "$primary600",
+  },
+});
+
+function Button() {
+  return <button className={buttonStyles()}>Button</button>;
+}
+```
 
 ### Available tokens
 
@@ -416,13 +292,14 @@ export default {
 ```js
 export default {
   space: {
-    0-5: "0.125rem",
+    px: "1px",
+    0_5: "0.125rem",
     1: "0.25rem",
-    1-5: "0.375rem",
+    1_5: "0.375rem",
     2: "0.5rem",
-    2-5: "0.625rem",
+    2_5: "0.625rem",
     3: "0.75rem",
-    3-5: "0.875rem",
+    3_5: "0.875rem",
     4: "1rem",
     5: "1.25rem",
     6: "1.5rem",
@@ -541,9 +418,7 @@ const theme = extendTheme({
 function App() {
   return (
     <HopeProvider theme={theme}>
-      <Box bg="$primary500" w="$full" p="$4" color="white" fontFamily="$sans">
-        Box with custom primary500 bg color
-      </Box>
+      <MyApp />
     </HopeProvider>
   );
 }
@@ -556,7 +431,7 @@ All Hope UI components provides a `css` prop for overriding styles easily.
 It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
 
 ```jsx
-<Box
+<Button
   css={{
     bg: "$primary500",
     borderRadius: "0",
@@ -566,8 +441,8 @@ It’s like the style attribute, but it supports tokens, media queries, nesting 
     },
   }}
 >
-  Box
-</Box>
+  Button
+</Button>
 ```
 
 ### Targeting other Hope UI components
@@ -575,9 +450,8 @@ It’s like the style attribute, but it supports tokens, media queries, nesting 
 Inside the `css` props you can target other Hope UI components using string interpolation in the selector.
 
 ```jsx
-<Center boxSize="200px" bg="$primary500">
-  <Box
-    as="button"
+<Center>
+  <Button
     css={{
       [`${Center} &`]: {
         background: "red",
@@ -585,7 +459,7 @@ Inside the `css` props you can target other Hope UI components using string inte
     }}
   >
     Button
-  </Box>
+  </Button>
 </Center>
 ```
 
@@ -603,8 +477,6 @@ function Button() {
 Button.toString = () => ".my-button";
 
 <Center
-  boxSize="200px"
-  bg="$primary500"
   css={{
     [`& ${Button}`]: {
       background: "red",
@@ -622,92 +494,22 @@ All Hope UI components are polymorphic, meaning you can use the `as` prop to cha
 If you are using TypeScript you will get proper auto-completion based on the value of the `as` prop.
 
 ```jsx
-<Box as="a" href="https://www.solidjs.com/" bg="$primary500" p="$4" color="white">
+<Button as="a" href="https://www.solidjs.com/">
   I'm an anchor tag
-</Box>
+</Button>
 ```
 
-And it works with SolidJS components too :
+And it works with SolidJS components too.
 
 ```jsx
 import { Router, Link } from "solid-app-router";
 
 //...
 <Router>
-  <Box as={Link} href="/" bg="$primary500" p="$4" color="white">
+  <Button as={Link} href="/">
     I'm a solid-app-router link
-  </Box>
+  </Button>
 </Router>;
-```
-
-## The Hope factory
-
-Hope factory serves as an **object of hope enabled JSX elements**, and also a **function that can be used to enable custom component** receive hope's style props.
-
-```js
-import { hope } from "hope-ui-solid";
-```
-
-### Hope JSX Elements
-
-Create base html elements with theme-aware style props using `hope.<element>` notation.
-For example, if you want a plain html button with ability to pass hope styles, you can write `<hope.button />`.
-
-```jsx
-<hope.button px="$3" py="$2" bg="$primary500" borderRadius="$md">
-  Click me
-</hope.button>
-```
-
-This reduces the need to create custom component wrappers and name them.
-This syntax is available for common html elements.
-See the reference for the full [list of elements](https://github.com/fabien-ml/hope-ui/tree/main/src/styled-system/utils.ts#L7) supported.
-
-### Hope factory function
-
-This is a function that converts non-hope components or jsx element to hope-enabled components, so you can pass style props to them.
-
-It's basically a wrapper around Stitches `css()` method, you can find more about it in the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
-
-Consider the `Link` component of the `solid-app-router` package, let's use the hope factory function to make possible to pass style props.
-
-The function will infer the prop types from the wrapped component and also add hope style props.
-
-```jsx
-import { hope } from "hope-ui-solid";
-import { Router, Link } from "solid-app-router";
-
-const StyledLink = hope(Link);
-
-function Example() {
-  return (
-    <Router>
-      <StyledLink bg="$danger600" fontSize="12px" href="/">
-        Styled solid-app-router link
-      </StyledLink>
-    </Router>
-  );
-}
-```
-
-> ⚠️ Considering that Hope UI uses stitches under the hood to apply css classes, ensure the non-hope component accepts className as props for this to work correctly.
-
-#### Attaching styles
-
-In some instances, you might need to attach specific styles to the component wrapped in the hope factory.
-
-For that the Hope factory allow you to pass a second argument that will let you apply specific styles.
-
-It's basically a wrapper around Stitches `css()` method, for the usage please refer to the [Stitches docs](https://stitches.dev/docs/framework-agnostic#styling)
-
-```jsx
-import { hope } from "hope-ui-solid";
-
-const Card = hope("div", {
-  boxShadow: "$lg",
-  borderRadius: "$lg",
-  bg: "white",
-});
 ```
 
 ## Responsive styles
@@ -725,20 +527,20 @@ Hope UI provide the follow media queries.
 | light         | @media (prefers-color-scheme: light)    |
 | dark          | @media (prefers-color-scheme: dark)     |
 
-### Usage with the Hope factory method
+### Usage with Stitches `css` method
 
-Variant created with the `hope` method support responsive styles at props level.
+Variant created with Stitches `css` method support responsive styles.
 
-Each breakpoint is a key on the css object prefixed by the `@`symbol.
+Each breakpoint is a key on the object prefixed by the `@`symbol.
 
 You must use the `@initial` breakpoint to declare the initial variant before any breakpoints are applied.
 
 For more in dept explanation please refer to the [Stitches docs](https://stitches.dev/docs/breakpoints).
 
 ```jsx
-import { hope } from "hope-ui-solid";
+import { css } from "hope-ui-solid";
 
-const Card = hope("div", {
+const cardStyles = css({
   borderRadius: "$lg",
   backgroundColor: "white",
 
@@ -755,14 +557,12 @@ const Card = hope("div", {
 });
 
 //...
-<Card
-  elevation={{
+cardStyles({
+  elevation: {
     "@initial": "sm", // <- initial value, no breakpoint
     "@lg": "md", // <- value at breakpoint "lg"
-  }}
->
-  Content
-</Card>;
+  },
+});
 ```
 
 ### Usage with the `css` prop
@@ -787,84 +587,6 @@ For more in dept explanation please refer to the [Stitches docs](https://stitche
 >
   Box
 </Button>
-```
-
-### Usage with style props
-
-At the moment Hope UI doesn't support responsive style on style props.
-
-## Styling recommendation
-
-### The Hope factory
-
-The Hope factory is great to build components that need to support a wide variety of contexts.
-
-These components are used in many parts of the application and support different combinations of props.
-
-Stitches features like variants and responsive styles works out of the box.
-
-```jsx
-import { hope } from "hope-ui-solid";
-
-const Card = hope("div", {
-  borderRadius: "$lg",
-  bg: "white",
-
-  variants: {
-    elevation: {
-      sm: {
-        boxShadow: "$sm",
-      },
-      md: {
-        boxShadow: "$md",
-      },
-    },
-  },
-});
-
-//...
-<Card
-  elevation={{
-    "@initial": "sm",
-    "@lg": "md",
-  }}
->
-  Content
-</Card>;
-```
-
-### Stitches `css` method
-
-If you have some really specific requirement use the `css()` method provided by Stitches.
-
-It's the core Stitches API with no extra layer, you can find the documentation [here](https://stitches.dev/docs/framework-agnostic).
-
-For convenience Hope UI re-export it configured with its default theme.
-
-```jsx
-import { css } from "hope-ui-solid";
-
-const button = css({
-  backgroundColor: "$primary500",
-  borderRadius: "$full",
-  fontSize: "$base",
-  padding: "$4 $8",
-  "&:hover": {
-    backgroundColor: "$primary600",
-  },
-});
-
-function Button() {
-  return <button className={button()}>Button</button>;
-}
-```
-
-### Style props
-
-The style props API is great to apply one-off styles. Think of it as "utility" styles.
-
-```jsx
-<Button mb="$4">Button</Button>
 ```
 
 ## SSR
