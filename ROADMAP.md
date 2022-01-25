@@ -6,11 +6,17 @@
 | ------ | :---------: | :--------: | :---: | :-------: | :--: |
 | Button |             |            |       |           |      |
 
+## Typography
+
+|         | Development | A11y check | Tests | Storybook | Docs |
+| ------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Text    |     ✅      |            |       |           |  ✅  |
+| Heading |     ✅      |            |       |           |  ✅  |
+
 ## Layout
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Box        |     ✅      |            |       |           |  ✅  |
 | Center     |     ✅      |            |       |           |  ✅  |
 | Container  |     ✅      |            |       |           |  ✅  |
 | Flex       |             |            |       |           |      |

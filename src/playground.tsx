@@ -2,19 +2,17 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { css, HopeProvider } from ".";
-
-const chien = css({
-  display: "inline-block",
-  width: "$1_5",
-  height: "$1_5",
-  backgroundColor: "$danger300",
-});
+import { Heading, HopeProvider, Text } from ".";
 
 export function App() {
   return (
     <HopeProvider>
-      <div class={chien()}>Box</div>
+      <Heading>Free and open source</Heading>
+      <Text as="span" secondary color="neutral">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae reprehenderit, fuga
+        eaque perspiciatis beatae ad? Minima debitis, ullam dolore porro repellendus numquam
+        distinctio veritatis ex quae libero, reprehenderit quam nostrum?
+      </Text>
     </HopeProvider>
   );
 }
