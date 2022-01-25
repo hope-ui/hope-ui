@@ -2,17 +2,21 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Heading, HopeProvider, Text } from ".";
+import { Button, HopeProvider, IconButton, IconCheckCircle, IconChevronDown } from ".";
+import { iconButtonStyles } from "./components/Button/Button.styles";
 
 export function App() {
   return (
     <HopeProvider>
-      <Heading>Free and open source</Heading>
-      <Text as="span" secondary color="neutral">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae reprehenderit, fuga
-        eaque perspiciatis beatae ad? Minima debitis, ullam dolore porro repellendus numquam
-        distinctio veritatis ex quae libero, reprehenderit quam nostrum?
-      </Text>
+      <Button loader={<IconCheckCircle style={{ color: "yellow" }} />} loading>
+        Button
+      </Button>
+      <Button loader={IconChevronDown} loading>
+        Button
+      </Button>
+      <Button loading></Button>
+      <Button className={iconButtonStyles()} leftIcon={IconChevronDown}></Button>
+      <IconButton aria-label="Chevron down" icon={IconChevronDown} />
     </HopeProvider>
   );
 }

@@ -6,7 +6,9 @@ import { textStyles } from "../Text/Text.styles";
 
 export const headingStyles = css(textStyles, {
   defaultVariants: {
+    size: "base",
     weight: "semibold",
+    color: "dark",
   },
 });
 

@@ -104,12 +104,12 @@ export const textStyles = css({
     {
       color: "dark",
       secondary: "true",
-      css: { color: "$dark700" },
+      css: { color: "$dark400" },
     },
     {
       color: "neutral",
       secondary: "true",
-      css: { color: "$neutral600" },
+      css: { color: "$neutral500" },
     },
     {
       color: "success",

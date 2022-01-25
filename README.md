@@ -12,21 +12,21 @@
 
 Hope UI is a component library built for allowing developers to build SolidJS applications quickly with good looking and accessible UI.
 
-### Note about customization
+### Quick note about customization
 
 Hope UI tends to be a design system more than a fully customizable component library.
 
-Its built with [Stitches](https://stitches.dev/) that is designed with design system in mind too.
-
-That means the surface of customization is kept small by design, **only the color palette and fonts are customizable.**
+That means the surface of customization is kept small by design, **only the color palette, fonts and shadows are customizable.**
 
 Other theme tokens like **sizes** and **space** should cover the most variety of use cases.
 
 You can use the `css` prop (described below) when you want to "break the rules".
 
-### What if I have a totally different design language than Hope UI ?
+#### What if I have a totally different design language than Hope UI ?
 
-My recommendation is **don't use Hope UI** and build your own design system with a headless UI library, because with Hope UI you will spend most of your time fighting with the tool, which is not cool 😅.
+You should probably build your own design system with a headless UI library.
+
+If Hope UI design language is too different than yours you will spend most of your time fighting with the tool.
 
 ## Getting started
 
@@ -335,19 +335,26 @@ export default {
 export default {
   sizes: {
     ...space,
+    max: "max-content",
+    min: "min-content",
     full: "100%",
     xs: "20rem",
     sm: "24rem",
     md: "28rem",
     lg: "32rem",
     xl: "36rem",
-    "2xl": "40rem",
+    "2xl": "42rem",
     "3xl": "48rem",
     "4xl": "56rem",
     "5xl": "64rem",
     "6xl": "72rem",
     "7xl": "80rem",
-    "8xl": "96rem",
+    "8xl": "90rem",
+    containerSm: "640px",
+    containerMd: "768px",
+    containerLg: "1024px",
+    containerXl: "1280px",
+    container2xl: "1536px",
   },
 };
 ```
@@ -357,6 +364,7 @@ export default {
 ```js
 export default {
   radii: {
+    none: "0",
     xs: "0.125rem",
     sm: "0.25rem",
     md: "0.375rem",
@@ -369,18 +377,42 @@ export default {
 };
 ```
 
+#### Shadows
+
+```js
+export default {
+  shadows: {
+    none: "0 0 #0000",
+    xs: "0 0 0 1px rgb(0 0 0 / 0.05)",
+    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    md: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    lg: "0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    xl: "0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    "2xl": "0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "3xl": "0 25px 50px -12px rgb(0 0 0 / 0.23)",
+    inner: "inset 0 3px 6px 0 rgb(0 0 0 / 0.3)",
+  },
+};
+```
+
 #### Z-index values
 
 ```js
 export default {
   zIndices: {
+    hide: -1,
+    auto: "auto",
+    base: 0,
     docked: 10,
     dropdown: 1000,
-    overlay: 1100,
-    modal: 1200,
-    popover: 1300,
-    toast: 1400,
-    tooltip: 1500,
+    sticky: 1100,
+    banner: 1200,
+    overlay: 1300,
+    modal: 1400,
+    popover: 1500,
+    skipLink: 1600,
+    toast: 1700,
+    tooltip: 1800,
   },
 };
 ```

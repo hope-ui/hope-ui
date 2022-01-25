@@ -44,7 +44,7 @@ export type AsProp<C extends ElementType> = {
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-type ExtendableProps<ExtendedProps = unknown, OverrideProps = unknown> = OverrideProps &
+export type ExtendableProps<ExtendedProps = unknown, OverrideProps = unknown> = OverrideProps &
   Omit<ExtendedProps, keyof OverrideProps>;
 
 /**
