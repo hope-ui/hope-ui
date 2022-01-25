@@ -1,4 +1,6 @@
-import { theme } from "../stitches/stitches.config";
+import { IconSpinner } from "@/icons/IconSpinner";
+import { theme } from "@/stitches/stitches.config";
+
 import { HopeTheme } from "./types";
 
 export const defaultTheme: HopeTheme = {
@@ -7,12 +9,21 @@ export const defaultTheme: HopeTheme = {
     Button: {
       variant: "filled",
       color: "primary",
-      size: "sm",
+      size: "md",
       radius: "sm",
+      loader: IconSpinner,
       loaderPosition: "left",
       compact: false,
       uppercase: false,
       fullWidth: false,
+    },
+    IconButton: {
+      variant: "filled",
+      color: "primary",
+      size: "md",
+      radius: "sm",
+      loader: IconSpinner,
+      compact: false,
     },
   },
 };

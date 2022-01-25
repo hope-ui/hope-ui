@@ -1,3 +1,6 @@
+import { ThemeableButtonOptions } from "@/components/Button/Button";
+import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
+
 import { defaulThemeTokens } from "../stitches/tokens";
 import { SystemTokens } from "../stitches/types";
 
@@ -6,7 +9,8 @@ export type DeepPartial<T> = {
 };
 
 export interface ComponentsDefaultProps {
-  Button: any; //Required<ThemeableButtonOptions>;
+  Button: Required<ThemeableButtonOptions>;
+  IconButton: Required<ThemeableIconButtonOptions>;
 }
 
 /**
@@ -34,7 +38,7 @@ export type ThemeTokensOverride = {
  * The Hope UI theme override interface.
  */
 export interface HopeThemeOverride {
-  tokens?: Pick<ThemeTokensOverride, "colors" | "fonts">;
+  tokens?: Pick<ThemeTokensOverride, "colors" | "fonts" | "shadows">;
   components?: DeepPartial<ComponentsDefaultProps>;
 }
 
