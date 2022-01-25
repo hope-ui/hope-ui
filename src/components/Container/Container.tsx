@@ -3,23 +3,26 @@ import { Dynamic } from "solid-js/web";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps } from "../utils";
-import { centerStyles, CenterVariants } from "./Center.styles";
+import { containerStyles, ContainerVariants } from "./Container.styles";
 
-export type CenterProps<C extends ElementType> = PolymorphicComponentProps<C, CenterVariants>;
+export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C, ContainerVariants>;
 
 /**
- * Center is a layout component that centers its child within itself.
+ * Layout component used to wrap app or website content
+ *
+ * By default it sets `margin-left` and `margin-right` to `auto`,
+ * to keep its content centered.
+ *
  */
-export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
+export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
   const [local, styleProps, others] = splitProps(props, commonProps, [
     "css",
-    "fullWidth",
-    "fullHeight",
-    "fullSize",
+    "centered",
+    "centerContent",
   ]);
 
   const classList = () => {
-    const baseClass = centerStyles(styleProps);
+    const baseClass = containerStyles(styleProps);
 
     return {
       [baseClass]: true,

@@ -48,39 +48,17 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    ...commonProps,
-    "variant",
-    "color",
-    "size",
-    "radius",
-    "compact",
-    "uppercase",
-    "fullWidth",
-    "loading",
-    "loader",
-    "loaderPosition",
-    "disabled",
-    "leftIcon",
-    "rightIcon",
-    "children",
-  ]);
+  const [local, styleProps, others] = splitProps(
+    propsWithDefault,
+    [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
+    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
+  );
 
   const classList = () => {
-    const buttonClass = buttonStyles({
-      variant: local.variant,
-      color: local.color,
-      size: local.size,
-      radius: local.radius,
-      loading: local.loading,
-      compact: local.compact,
-      uppercase: local.uppercase,
-      fullWidth: local.fullWidth,
-      css: local.css,
-    });
+    const baseClass = buttonStyles(styleProps);
 
     return {
-      [buttonClass]: true,
+      [baseClass]: true,
       [local.class ?? ""]: true,
       [local.className ?? ""]: true,
       ...local.classList,
@@ -88,23 +66,23 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   const isLeftIconVisible = () => {
-    return local.leftIcon && (!local.loading || local.loaderPosition === "right");
+    return local.leftIcon && (!styleProps.loading || local.loaderPosition === "right");
   };
 
   const isRightIconVisible = () => {
-    return local.rightIcon && (!local.loading || local.loaderPosition === "left");
+    return local.rightIcon && (!styleProps.loading || local.loaderPosition === "left");
   };
 
   const isLeftLoaderVisible = () => {
-    return local.loading && !local.disabled && local.loaderPosition === "left";
+    return styleProps.loading && !local.disabled && local.loaderPosition === "left";
   };
 
   const isRightLoaderVisible = () => {
-    return local.loading && !local.disabled && local.loaderPosition === "right";
+    return styleProps.loading && !local.disabled && local.loaderPosition === "right";
   };
 
   const shouldWrapChildrenInSpan = () => {
-    return local.leftIcon || local.rightIcon || local.loading;
+    return styleProps.loading || local.leftIcon || local.rightIcon;
   };
 
   return (

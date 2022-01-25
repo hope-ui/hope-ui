@@ -12,7 +12,8 @@ export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, Text
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
-  const [local, variantProps, others] = splitProps(props, commonProps, [
+  const [local, styleProps, others] = splitProps(props, commonProps, [
+    "css",
     "size",
     "weight",
     "color",
@@ -22,13 +23,10 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
   ]);
 
   const classList = () => {
-    const textClass = textStyles({
-      ...variantProps,
-      css: local.css,
-    });
+    const baseClass = textStyles(styleProps);
 
     return {
-      [textClass]: true,
+      [baseClass]: true,
       [local.class ?? ""]: true,
       [local.className ?? ""]: true,
       ...local.classList,
