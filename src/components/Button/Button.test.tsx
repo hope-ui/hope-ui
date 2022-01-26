@@ -4,7 +4,7 @@ import { renderWithHopeProvider } from "@/test/utils";
 import { defaultTheme } from "@/theme/defaultTheme";
 
 import { Button } from "./Button";
-import { buttonStyles } from "./Button.styles";
+import { buttonStyles, ButtonVariants } from "./Button.styles";
 
 describe("Button", () => {
   afterEach(cleanup);
@@ -102,12 +102,34 @@ describe("Button", () => {
     expect(button).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated button class with default variants from theme", () => {
+  it("should have stitches generated class from Button theme by default", () => {
     // arrange
     const buttonClass = buttonStyles(defaultTheme.components.Button);
 
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
+    const button = screen.getByTestId("hope-button");
+
+    // assert
+    expect(button).toHaveClass(buttonClass.className);
+  });
+
+  it("should have stitches generated class from variants prop", () => {
+    // arrange
+    const variantProps: ButtonVariants = {
+      variant: "light",
+      color: "success",
+      size: "lg",
+      radius: "md",
+      uppercase: true,
+      compact: true,
+      loading: false,
+      fullWidth: false,
+    };
+    const buttonClass = buttonStyles(variantProps);
+
+    // act
+    renderWithHopeProvider(() => <Button {...variantProps}>Button</Button>);
     const button = screen.getByTestId("hope-button");
 
     // assert
