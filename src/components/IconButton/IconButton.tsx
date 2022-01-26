@@ -1,11 +1,12 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
-import { css } from "@/stitches/stitches.config";
+import { IconSpinner } from "@/icons/IconSpinner";
 
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
+import { classPropNames, generateClassList } from "../utils";
 
 export type IconButtonOptions = Omit<
   ButtonOptions,
@@ -32,29 +33,28 @@ export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
   const theme = useHopeTheme().components.IconButton;
 
-  const propsWithDefault = mergeProps(theme.defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "className",
-    "classList",
-    "children",
-    "icon",
-  ]);
+  const defaultProps: Required<ThemeableIconButtonOptions> = {
+    variant: theme?.defaultProps?.variant ?? "filled",
+    color: theme?.defaultProps?.color ?? "primary",
+    size: theme?.defaultProps?.size ?? "md",
+    radius: theme?.defaultProps?.radius ?? "sm",
+    loader: theme?.defaultProps?.loader ?? IconSpinner,
+    compact: theme?.defaultProps?.compact ?? false,
+  };
 
-  // Create theme base styles if provided
-  const themeBaseStyles = theme.baseStyle && css(theme.baseStyle);
+  const propsWithDefault = mergeProps(defaultProps, props);
+  const [local, classProps, others] = splitProps(
+    propsWithDefault,
+    ["children", "icon"],
+    classPropNames
+  );
 
   const classList = () => {
-    const baseClass = iconButtonStyles();
-    const themeBaseClass = themeBaseStyles?.() ?? ""; // Should be called after to override buttonStyles(), seem css are appened in the order they are called.
-
-    return {
-      [baseClass]: true,
-      [themeBaseClass]: true,
-      [local.class ?? ""]: true,
-      [local.className ?? ""]: true,
-      ...local.classList,
-    };
+    return generateClassList({
+      baseClass: iconButtonStyles(),
+      themeBaseStyle: theme?.baseStyle,
+      ...classProps,
+    });
   };
 
   return <Button classList={classList()} leftIcon={local.icon} {...others} />;

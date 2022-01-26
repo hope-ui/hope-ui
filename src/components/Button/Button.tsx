@@ -2,11 +2,11 @@ import { Component, JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
-import { css } from "@/stitches/stitches.config";
+import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps } from "../utils";
+import { classPropNames, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export type ButtonOptions = ButtonVariants & {
@@ -34,8 +34,16 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const theme = useHopeTheme().components.Button;
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
-    ...theme.defaultProps,
     as: "button",
+    variant: theme?.defaultProps?.variant ?? "filled",
+    color: theme?.defaultProps?.color ?? "primary",
+    size: theme?.defaultProps?.size ?? "md",
+    radius: theme?.defaultProps?.radius ?? "sm",
+    loader: theme?.defaultProps?.loader ?? IconSpinner,
+    loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
+    compact: theme?.defaultProps?.compact ?? false,
+    uppercase: theme?.defaultProps?.uppercase ?? false,
+    fullWidth: theme?.defaultProps?.fullWidth ?? false,
     loading: false,
     disabled: false,
     type: "button",
@@ -43,26 +51,19 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(
+  const [local, styleProps, classProps, others] = splitProps(
     propsWithDefault,
-    [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
+    ["as", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
+    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"],
+    classPropNames
   );
 
-  // Create theme base styles if provided
-  const themeBaseStyles = theme.baseStyle && css(theme.baseStyle);
-
   const classList = () => {
-    const baseClass = buttonStyles(styleProps);
-    const themeBaseClass = themeBaseStyles?.() ?? ""; // Should be called after to override buttonStyles(), seem css are appened in the order they are called.
-
-    return {
-      [baseClass]: true,
-      [themeBaseClass]: true,
-      [local.class ?? ""]: true,
-      [local.className ?? ""]: true,
-      ...local.classList,
-    };
+    return generateClassList({
+      baseClass: buttonStyles(styleProps),
+      themeBaseStyle: theme?.baseStyle,
+      ...classProps,
+    });
   };
 
   const loaderClass = buttonLoadingIconStyles();

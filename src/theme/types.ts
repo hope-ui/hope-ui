@@ -1,16 +1,9 @@
 import { ThemeableButtonOptions } from "@/components/Button/Button";
 import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
-import { ThemeableTextOptions } from "..";
 
+import { ThemeableTextOptions } from "..";
 import { defaulThemeTokens } from "../stitches/tokens";
 import { SystemStyleObject, SystemTokens } from "../stitches/types";
-
-/**
- * Utility type to deeply apply the Partial type.
- */
-export type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>;
-};
 
 /**
  * Theme configuration for Hope UI component.
@@ -23,16 +16,17 @@ export interface ComponentThemeConfig<Props> {
   /**
    * Default props passed to the component.
    */
-  defaultProps: Required<Props>;
+  defaultProps?: Props;
 }
 
 /**
  * Theme configuration for all Hope UI components.
  */
-export interface ComponentsThemes {
-  Button: ComponentThemeConfig<ThemeableButtonOptions>;
-  IconButton: ComponentThemeConfig<ThemeableIconButtonOptions>;
-  Text: ComponentThemeConfig<ThemeableTextOptions>;
+export interface ComponentThemes {
+  Button?: ComponentThemeConfig<ThemeableButtonOptions>;
+  IconButton?: ComponentThemeConfig<ThemeableIconButtonOptions>;
+  Heading?: ComponentThemeConfig<ThemeableTextOptions>;
+  Text?: ComponentThemeConfig<ThemeableTextOptions>;
 }
 
 /**
@@ -40,7 +34,7 @@ export interface ComponentsThemes {
  */
 export interface HopeTheme {
   tokens: SystemTokens;
-  components: ComponentsThemes;
+  components: ComponentThemes;
 }
 
 /**
@@ -67,7 +61,7 @@ export interface HopeThemeOverride {
   /**
    * Custom Hope UI components themes configs.
    */
-  components?: DeepPartial<ComponentsThemes>;
+  components?: ComponentThemes;
 }
 
 export type HopeXPosition = "left" | "right";
