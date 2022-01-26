@@ -2,16 +2,17 @@
 
 ## General
 
-|        | Development | A11y check | Tests | Storybook | Docs |
-| ------ | :---------: | :--------: | :---: | :-------: | :--: |
-| Button |             |            |       |           |      |
+|            | Development | A11y check | Tests | Storybook | Docs |
+| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Button     |     ✅      |     ✅     |       |    ✅     |      |
+| IconButton |     ✅      |     ✅     |       |    ✅     |      |
 
 ## Typography
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |            |       |           |  ✅  |
-| Heading |     ✅      |            |       |           |  ✅  |
+| Text    |     ✅      |            |       |    ✅     |  ✅  |
+| Heading |     ✅      |            |       |    ✅     |  ✅  |
 
 ## Layout
 
@@ -26,26 +27,28 @@
 
 ## Data entry
 
-|               | Development | A11y check | Tests | Storybook | Docs |
-| ------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| AutoComplete  |             |            |       |           |      |
-| Checkbox      |             |            |       |           |      |
-| DatePicker    |             |            |       |           |      |
-| Form          |             |            |       |           |      |
-| Input         |             |            |       |           |      |
-| InputWrapper  |             |            |       |           |      |
-| TextInput     |             |            |       |           |      |
-| NumberInput   |             |            |       |           |      |
-| PasswordInput |             |            |       |           |      |
-| RadioGroup    |             |            |       |           |      |
-| Radio         |             |            |       |           |      |
-| Select        |             |            |       |           |      |
-| MultiSelect   |             |            |       |           |      |
-| Slider        |             |            |       |           |      |
-| Switch        |             |            |       |           |      |
-| Textarea      |             |            |       |           |      |
-| TimePicker    |             |            |       |           |      |
-| UploadInput   |             |            |       |           |      |
+|                  | Development | A11y check | Tests | Storybook | Docs |
+| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| AutoComplete     |             |            |       |           |      |
+| Checkbox         |             |            |       |           |      |
+| DatePicker       |             |            |       |           |      |
+| Form             |             |            |       |           |      |
+| FormControl      |             |            |       |           |      |
+| FormLabel        |             |            |       |           |      |
+| FormHelperText   |             |            |       |           |      |
+| FormErrorMessage |             |            |       |           |      |
+| Input (Text)     |             |            |       |           |      |
+| NumberInput      |             |            |       |           |      |
+| PasswordInput    |             |            |       |           |      |
+| RadioGroup       |             |            |       |           |      |
+| Radio            |             |            |       |           |      |
+| Select           |             |            |       |           |      |
+| MultiSelect      |             |            |       |           |      |
+| Slider           |             |            |       |           |      |
+| Switch           |             |            |       |           |      |
+| Textarea         |             |            |       |           |      |
+| TimePicker       |             |            |       |           |      |
+| UploadInput      |             |            |       |           |      |
 
 ## Data display
 

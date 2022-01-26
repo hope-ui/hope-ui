@@ -2,23 +2,26 @@ import { Component, JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
+import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps } from "../utils";
+import { classPropNames, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export type ButtonOptions = ButtonVariants & {
   disabled?: boolean;
-  loader?: Component | JSX.Element;
   loaderPosition?: HopeXPosition;
-  leftIcon?: Component | JSX.Element;
-  rightIcon?: Component | JSX.Element;
+  loader?: Component | JSX.Element;
+  leftIcon?: JSX.Element;
+  rightIcon?: JSX.Element;
 };
+
+export type CommonOmitableButtonOptions = "disabled" | "loading";
 
 export type ThemeableButtonOptions = Omit<
   ButtonOptions,
-  "loading" | "disabled" | "leftIcon" | "rightIcon"
+  CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
 >;
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
@@ -32,15 +35,15 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
-    variant: theme.variant,
-    color: theme.color,
-    size: theme.size,
-    radius: theme.radius,
-    loader: theme.loader,
-    loaderPosition: theme.loaderPosition,
-    compact: theme.compact,
-    uppercase: theme.uppercase,
-    fullWidth: theme.fullWidth,
+    variant: theme?.defaultProps?.variant ?? "filled",
+    color: theme?.defaultProps?.color ?? "primary",
+    size: theme?.defaultProps?.size ?? "md",
+    radius: theme?.defaultProps?.radius ?? "sm",
+    loader: theme?.defaultProps?.loader ?? IconSpinner,
+    loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
+    compact: theme?.defaultProps?.compact ?? false,
+    uppercase: theme?.defaultProps?.uppercase ?? false,
+    fullWidth: theme?.defaultProps?.fullWidth ?? false,
     loading: false,
     disabled: false,
     type: "button",
@@ -48,70 +51,48 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    ...commonProps,
-    "variant",
-    "color",
-    "size",
-    "radius",
-    "compact",
-    "uppercase",
-    "fullWidth",
-    "loading",
-    "loader",
-    "loaderPosition",
-    "disabled",
-    "leftIcon",
-    "rightIcon",
-    "children",
-  ]);
+  const [local, styleProps, classProps, others] = splitProps(
+    propsWithDefault,
+    ["as", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
+    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"],
+    classPropNames
+  );
 
   const classList = () => {
-    const buttonClass = buttonStyles({
-      variant: local.variant,
-      color: local.color,
-      size: local.size,
-      radius: local.radius,
-      loading: local.loading,
-      compact: local.compact,
-      uppercase: local.uppercase,
-      fullWidth: local.fullWidth,
-      css: local.css,
+    return generateClassList({
+      baseClass: buttonStyles(styleProps),
+      themeBaseStyle: theme?.baseStyle,
+      ...classProps,
     });
-
-    return {
-      [buttonClass]: true,
-      [local.class ?? ""]: true,
-      [local.className ?? ""]: true,
-      ...local.classList,
-    };
   };
 
+  const loaderClass = buttonLoadingIconStyles();
+
   const isLeftIconVisible = () => {
-    return local.leftIcon && (!local.loading || local.loaderPosition === "right");
+    return local.leftIcon && (!styleProps.loading || local.loaderPosition === "right");
   };
 
   const isRightIconVisible = () => {
-    return local.rightIcon && (!local.loading || local.loaderPosition === "left");
+    return local.rightIcon && (!styleProps.loading || local.loaderPosition === "left");
   };
 
   const isLeftLoaderVisible = () => {
-    return local.loading && !local.disabled && local.loaderPosition === "left";
+    return styleProps.loading && !local.disabled && local.loaderPosition === "left";
   };
 
   const isRightLoaderVisible = () => {
-    return local.loading && !local.disabled && local.loaderPosition === "right";
+    return styleProps.loading && !local.disabled && local.loaderPosition === "right";
   };
 
   const shouldWrapChildrenInSpan = () => {
-    return local.leftIcon || local.rightIcon || local.loading;
+    return styleProps.loading || local.leftIcon || local.rightIcon;
   };
 
   return (
     <Dynamic component={local.as} classList={classList()} disabled={local.disabled} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
-        <span className={buttonLoadingIconStyles()}>{local.loader}</span>
+        <span className={loaderClass}>{local.loader}</span>
       </Show>
       <Show when={local.children}>
         <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
@@ -120,7 +101,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       </Show>
       <Show when={isRightIconVisible()}>{local.rightIcon}</Show>
       <Show when={isRightLoaderVisible()}>
-        <span className={buttonLoadingIconStyles()}>{local.loader}</span>
+        <span className={loaderClass}>{local.loader}</span>
       </Show>
     </Dynamic>
   );

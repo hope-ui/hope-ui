@@ -4,12 +4,6 @@ import { spin } from "@/stitches/keyframes";
 import { css } from "@/stitches/stitches.config";
 import { SystemStyleObject } from "@/stitches/types";
 
-export const buttonLoadingIconStyles = css({
-  animation: `1000ms linear infinite ${spin}`,
-});
-
-export const iconButtonStyles = css({});
-
 interface SizeVariantConfig {
   height: string;
   paddingX: string;
@@ -117,6 +111,12 @@ function createTextCompoundVariant(config: TextCompoundVariantConfig): SystemSty
   };
 }
 
+export const buttonLoadingIconStyles = css({
+  animation: `1000ms linear infinite ${spin}`,
+});
+
+export const iconButtonStyles = css({});
+
 export const buttonStyles = css({
   appearance: "none",
   position: "relative",
@@ -127,7 +127,7 @@ export const buttonStyles = css({
 
   padding: "0",
 
-  fontWeight: "$semibold",
+  fontWeight: "$medium",
   lineHeight: "$none",
   textDecoration: "none",
 

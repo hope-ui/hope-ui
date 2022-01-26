@@ -1,39 +1,37 @@
-import { splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { mergeProps, splitProps } from "solid-js";
 
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps } from "../utils";
-import { headingStyles, HeadingVariants } from "./Heading.styles";
+import { useHopeTheme } from "@/contexts/HopeContext";
 
-export type HeadingProps<C extends ElementType> = PolymorphicComponentProps<C, HeadingVariants>;
+import { Text, TextProps } from "../Text";
+import { ElementType } from "../types";
+import { classPropNames, generateClassList } from "../utils";
 
 /**
  * Headings are used for rendering headlines.
  * It renders an <h2> tag by default.
  */
-export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
-  const [local, variantProps, others] = splitProps(props, commonProps, [
-    "size",
-    "weight",
-    "color",
-    "align",
-    "lineClamp",
-    "secondary",
-  ]);
+export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
+  const theme = useHopeTheme().components.Heading;
 
-  const classList = () => {
-    const textClass = headingStyles({
-      ...variantProps,
-      css: local.css,
-    });
-
-    return {
-      [textClass]: true,
-      [local.class ?? ""]: true,
-      [local.className ?? ""]: true,
-      ...local.classList,
-    };
+  const defaultProps: TextProps<"h2"> = {
+    as: "h2",
+    size: theme?.defaultProps?.size ?? "base",
+    weight: theme?.defaultProps?.weight ?? "semibold",
+    align: theme?.defaultProps?.align ?? "left",
+    color: theme?.defaultProps?.color ?? "dark",
+    secondary: theme?.defaultProps?.secondary ?? false,
   };
 
-  return <Dynamic component={local.as ?? "h2"} classList={classList()} {...others} />;
+  const propsWithDefault = mergeProps(defaultProps, props);
+  const [local, classProps, others] = splitProps(propsWithDefault, ["as"], classPropNames);
+
+  const classList = () => {
+    return generateClassList({
+      baseClass: "",
+      themeBaseStyle: theme?.baseStyle,
+      ...classProps,
+    });
+  };
+
+  return <Text as={local.as as any} classList={classList()} {...others} />;
 }

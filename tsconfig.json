@@ -17,11 +17,11 @@
     "skipLibCheck": true,
     "strict": true,
     "sourceMap": true,
-    "types": ["vite/client", "node"],
+    "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"],
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["vite.config.*", "src/**/*", "src/**/*.tsx"]
+  "include": ["vite.config.*", "jest.setup.ts", "src/**/*", "src/**/*.tsx"]
 }

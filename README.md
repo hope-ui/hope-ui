@@ -8,26 +8,6 @@
 
 🤞 The hoped component library for your SolidJS applications.
 
-## What is Hope UI ?
-
-Hope UI is a component library built for allowing developers to build SolidJS applications quickly with good looking and accessible UI.
-
-### Quick note about customization
-
-Hope UI tends to be a design system more than a fully customizable component library.
-
-That means the surface of customization is kept small by design, **only the color palette, fonts and shadows are customizable.**
-
-Other theme tokens like **sizes** and **space** should cover the most variety of use cases.
-
-You can use the `css` prop (described below) when you want to "break the rules".
-
-#### What if I have a totally different design language than Hope UI ?
-
-You should probably build your own design system with a headless UI library.
-
-If Hope UI design language is too different than yours you will spend most of your time fighting with the tool.
-
 ## Getting started
 
 ### Installation
