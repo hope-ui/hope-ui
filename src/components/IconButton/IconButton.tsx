@@ -1,6 +1,7 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
+import { css } from "@/stitches/stitches.config";
 
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
@@ -31,16 +32,30 @@ export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
   const theme = useHopeTheme().components.IconButton;
 
-  const defaultProps: Required<ThemeableIconButtonOptions> = {
-    variant: theme.variant,
-    color: theme.color,
-    size: theme.size,
-    radius: theme.radius,
-    compact: theme.compact,
+  const propsWithDefault = mergeProps(theme.defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "className",
+    "classList",
+    "children",
+    "icon",
+  ]);
+
+  // Create theme base styles if provided
+  const themeBaseStyles = theme.baseStyle && css(theme.baseStyle);
+
+  const classList = () => {
+    const baseClass = iconButtonStyles();
+    const themeBaseClass = themeBaseStyles?.() ?? ""; // Should be called after to override buttonStyles(), seem css are appened in the order they are called.
+
+    return {
+      [baseClass]: true,
+      [themeBaseClass]: true,
+      [local.class ?? ""]: true,
+      [local.className ?? ""]: true,
+      ...local.classList,
+    };
   };
 
-  const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["children", "icon"]);
-
-  return <Button className={iconButtonStyles()} leftIcon={local.icon} {...others} />;
+  return <Button classList={classList()} leftIcon={local.icon} {...others} />;
 }

@@ -1,9 +1,13 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { useHopeTheme } from "@/contexts/HopeContext";
+
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps } from "../utils";
 import { textStyles, TextVariants } from "./Text.styles";
+
+export type ThemeableTextOptions = Omit<TextVariants, "lineClamp">;
 
 export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, TextVariants>;
 
@@ -12,6 +16,8 @@ export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, Text
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
+  const theme = useHopeTheme().components.Text;
+
   const [local, styleProps, others] = splitProps(props, commonProps, [
     "css",
     "size",

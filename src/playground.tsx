@@ -18,7 +18,10 @@ export function App() {
       <Button loader={<IconCheckCircle style={{ color: "yellow" }} />} loading>
         Button
       </Button>
-      <Button loading></Button>
+      <Button loader={IconCheckCircle} loading>
+        Button
+      </Button>
+      <Button loading>Button</Button>
       <IconButton aria-label="Chevron down" icon={<IconChevronDown />} />
       <Heading>Heading</Heading>
       <Text>Text</Text>

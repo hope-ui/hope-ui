@@ -1,8 +1,8 @@
-import { JSX, mergeProps, Show, splitProps } from "solid-js";
+import { Component, JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
-import { IconSpinner } from "@/icons";
+import { css } from "@/stitches/stitches.config";
 import { HopeXPosition } from "@/theme/types";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
@@ -12,12 +12,12 @@ import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.
 export type ButtonOptions = ButtonVariants & {
   disabled?: boolean;
   loaderPosition?: HopeXPosition;
-  loader?: JSX.Element;
+  loader?: Component | JSX.Element;
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
 };
 
-export type CommonOmitableButtonOptions = "disabled" | "loading" | "loader";
+export type CommonOmitableButtonOptions = "disabled" | "loading";
 
 export type ThemeableButtonOptions = Omit<
   ButtonOptions,
@@ -34,16 +34,8 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const theme = useHopeTheme().components.Button;
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
+    ...theme.defaultProps,
     as: "button",
-    variant: theme.variant,
-    color: theme.color,
-    size: theme.size,
-    radius: theme.radius,
-    compact: theme.compact,
-    uppercase: theme.uppercase,
-    fullWidth: theme.fullWidth,
-    loaderPosition: theme.loaderPosition,
-    loader: <IconSpinner />,
     loading: false,
     disabled: false,
     type: "button",
@@ -57,11 +49,16 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
   );
 
+  // Create theme base styles if provided
+  const themeBaseStyles = theme.baseStyle && css(theme.baseStyle);
+
   const classList = () => {
     const baseClass = buttonStyles(styleProps);
+    const themeBaseClass = themeBaseStyles?.() ?? ""; // Should be called after to override buttonStyles(), seem css are appened in the order they are called.
 
     return {
       [baseClass]: true,
+      [themeBaseClass]: true,
       [local.class ?? ""]: true,
       [local.className ?? ""]: true,
       ...local.classList,
@@ -91,13 +88,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   return (
-    <Dynamic
-      data-testid="hope-button"
-      component={local.as}
-      classList={classList()}
-      disabled={local.disabled}
-      {...others}
-    >
+    <Dynamic component={local.as} classList={classList()} disabled={local.disabled} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
         <span className={loaderClass}>{local.loader}</span>

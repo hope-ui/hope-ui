@@ -12,7 +12,7 @@ describe("Button", () => {
   it("should render", () => {
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe("Button", () => {
   it("should render <button> tag by default", () => {
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toBeInstanceOf(HTMLButtonElement);
@@ -30,7 +30,7 @@ describe("Button", () => {
   it("should render tag provided with as prop", () => {
     // act
     renderWithHopeProvider(() => <Button as="a">Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toBeInstanceOf(HTMLAnchorElement);
@@ -42,7 +42,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button as="a">{children}</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveTextContent(children);
@@ -51,7 +51,7 @@ describe("Button", () => {
   it("should have type=button", () => {
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveAttribute("type", "button");
@@ -60,7 +60,7 @@ describe("Button", () => {
   it("should have role=button", () => {
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveAttribute("role", "button");
@@ -72,7 +72,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button class={stubClass}>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(stubClass);
@@ -84,7 +84,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button className={stubClass}>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(stubClass);
@@ -96,7 +96,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button classList={{ [stubClass]: true }}>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(stubClass);
@@ -108,7 +108,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(buttonClass.className);
@@ -130,7 +130,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button {...variantProps}>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(buttonClass.className);
@@ -143,7 +143,7 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button css={customCSS}>Button</Button>);
-    const button = screen.getByTestId("hope-button");
+    const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(buttonClass.className);
