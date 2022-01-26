@@ -11,7 +11,6 @@ import {
   IconChevronDown,
   Text,
 } from ".";
-import { iconButtonStyles } from "./components/Button/Button.styles";
 
 export function App() {
   return (
@@ -19,12 +18,8 @@ export function App() {
       <Button loader={<IconCheckCircle style={{ color: "yellow" }} />} loading>
         Button
       </Button>
-      <Button loader={IconChevronDown} loading>
-        Button
-      </Button>
       <Button loading></Button>
-      <Button className={iconButtonStyles()} leftIcon={IconChevronDown}></Button>
-      <IconButton aria-label="Chevron down" icon={IconChevronDown} />
+      <IconButton aria-label="Chevron down" icon={<IconChevronDown />} />
       <Heading>Heading</Heading>
       <Text>Text</Text>
     </HopeProvider>

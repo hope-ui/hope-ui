@@ -1,5 +1,6 @@
-import { css } from "@/stitches/stitches.config";
 import { VariantProps } from "@stitches/core";
+
+import { css } from "@/stitches/stitches.config";
 
 export const centerStyles = css({
   display: "flex",

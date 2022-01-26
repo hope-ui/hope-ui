@@ -1,8 +1,8 @@
-import { Component, JSX, mergeProps, splitProps } from "solid-js";
+import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
 
-import { Button, ButtonOptions } from "../Button/Button";
+import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 
@@ -11,12 +11,12 @@ export type IconButtonOptions = Omit<
   "leftIcon" | "rightIcon" | "loaderPosition" | "uppercase" | "fullWidth"
 > & {
   "aria-label": string;
-  icon?: Component | JSX.Element;
+  icon?: JSX.Element;
 };
 
 export type ThemeableIconButtonOptions = Omit<
   IconButtonOptions,
-  "loading" | "disabled" | "aria-label" | "icon"
+  CommonOmitableButtonOptions | "aria-label" | "icon"
 >;
 
 export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
@@ -36,7 +36,6 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     color: theme.color,
     size: theme.size,
     radius: theme.radius,
-    loader: theme.loader,
     compact: theme.compact,
   };
 

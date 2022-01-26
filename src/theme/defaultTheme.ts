@@ -1,4 +1,3 @@
-import { IconSpinner } from "@/icons/IconSpinner";
 import { theme } from "@/stitches/stitches.config";
 
 import { HopeTheme } from "./types";
@@ -11,7 +10,6 @@ export const defaultTheme: HopeTheme = {
       color: "primary",
       size: "md",
       radius: "sm",
-      loader: IconSpinner,
       loaderPosition: "left",
       compact: false,
       uppercase: false,
@@ -22,7 +20,6 @@ export const defaultTheme: HopeTheme = {
       color: "primary",
       size: "md",
       radius: "sm",
-      loader: IconSpinner,
       compact: false,
     },
   },
