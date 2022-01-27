@@ -1,19 +1,18 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
-import { IconSpinner } from "@/icons/IconSpinner";
 
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { classPropNames, generateClassList } from "../utils";
+import { commonProps, generateClassList } from "../utils";
 
 export type IconButtonOptions = Omit<
   ButtonOptions,
   "leftIcon" | "rightIcon" | "loaderPosition" | "uppercase" | "fullWidth"
 > & {
+  icon: JSX.Element;
   "aria-label": string;
-  icon?: JSX.Element;
 };
 
 export type ThemeableIconButtonOptions = Omit<
@@ -38,24 +37,27 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     color: theme?.defaultProps?.color ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
     radius: theme?.defaultProps?.radius ?? "sm",
-    loader: theme?.defaultProps?.loader ?? IconSpinner,
     compact: theme?.defaultProps?.compact ?? false,
   };
 
-  const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, classProps, others] = splitProps(
-    propsWithDefault,
-    ["children", "icon"],
-    classPropNames
-  );
+  props = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(props, [...commonProps, "children", "icon"]);
 
   const classList = () => {
     return generateClassList({
       baseClass: iconButtonStyles(),
-      themeBaseStyle: theme?.baseStyle,
-      ...classProps,
+      class: local.class,
+      className: local.className,
+      classList: local.classList,
     });
   };
 
-  return <Button classList={classList()} leftIcon={local.icon} {...others} />;
+  return (
+    <Button
+      as={local.as as ElementType}
+      classList={classList()}
+      leftIcon={local.icon}
+      {...others}
+    />
+  );
 }

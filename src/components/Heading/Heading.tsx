@@ -4,7 +4,7 @@ import { useHopeTheme } from "@/contexts/HopeContext";
 
 import { Text, TextProps } from "../Text";
 import { ElementType } from "../types";
-import { classPropNames, generateClassList } from "../utils";
+import { commonProps, generateClassList } from "../utils";
 
 /**
  * Headings are used for rendering headlines.
@@ -22,16 +22,16 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
     secondary: theme?.defaultProps?.secondary ?? false,
   };
 
-  const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, classProps, others] = splitProps(propsWithDefault, ["as"], classPropNames);
+  props = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(props, commonProps);
 
   const classList = () => {
     return generateClassList({
-      baseClass: "",
-      themeBaseStyle: theme?.baseStyle,
-      ...classProps,
+      class: local.class,
+      className: local.className,
+      classList: local.classList,
     });
   };
 
-  return <Text as={local.as as any} classList={classList()} {...others} />;
+  return <Text as={local.as as ElementType} classList={classList()} {...others} />;
 }

@@ -3,7 +3,7 @@ import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
 
 import { ThemeableTextOptions } from "..";
 import { defaulThemeTokens } from "../stitches/tokens";
-import { SystemStyleObject, SystemTokens } from "../stitches/types";
+import { SystemTokens } from "../stitches/types";
 
 /**
  * Theme configuration for Hope UI component.
@@ -12,7 +12,7 @@ export interface ComponentThemeConfig<Props> {
   /**
    * Base style passed to the component.
    */
-  baseStyle?: SystemStyleObject;
+  //baseStyle?: SystemStyleObject;
   /**
    * Default props passed to the component.
    */

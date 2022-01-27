@@ -4,7 +4,7 @@ import { Dynamic } from "solid-js/web";
 import { useHopeTheme } from "@/contexts/HopeContext";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { classPropNames, generateClassList } from "../utils";
+import { commonProps, generateClassList } from "../utils";
 import { textStyles, TextVariants } from "./Text.styles";
 
 export type ThemeableTextOptions = Omit<TextVariants, "lineClamp">;
@@ -27,19 +27,23 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
     secondary: theme?.defaultProps?.secondary ?? false,
   };
 
-  const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, styleProps, classProps, others] = splitProps(
-    propsWithDefault,
-    ["as"],
-    ["css", "size", "weight", "color", "align", "lineClamp", "secondary"],
-    classPropNames
-  );
+  props = mergeProps(defaultProps, props);
+  const [local, styleProps, others] = splitProps(props, commonProps, [
+    "css",
+    "size",
+    "weight",
+    "color",
+    "align",
+    "lineClamp",
+    "secondary",
+  ]);
 
   const classList = () => {
     return generateClassList({
       baseClass: textStyles(styleProps),
-      themeBaseStyle: theme?.baseStyle,
-      ...classProps,
+      class: local.class,
+      className: local.className,
+      classList: local.classList,
     });
   };
 

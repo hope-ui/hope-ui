@@ -1,5 +1,6 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -11,7 +12,6 @@ import {
   IconChevronDown,
   Text,
 } from ".";
-import { createSignal } from "solid-js";
 
 export function App() {
   const [color, setColor] = createSignal("success");
@@ -21,9 +21,7 @@ export function App() {
       <Button loader={<IconCheckCircle style={{ color: "yellow" }} />} loading>
         Button
       </Button>
-      <Button loader={IconCheckCircle} loading color={color() as any}>
-        Button
-      </Button>
+
       <Button onClick={() => setColor("danger")}>Button</Button>
       <IconButton color={color() as any} aria-label="Chevron down" icon={<IconChevronDown />} />
       <Heading>Heading</Heading>
