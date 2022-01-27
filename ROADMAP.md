@@ -4,22 +4,22 @@
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Button     |     ✅      |     ✅     |       |    ✅     |      |
-| IconButton |     ✅      |     ✅     |       |    ✅     |      |
+| Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
 
 ## Typography
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |            |       |    ✅     |  ✅  |
-| Heading |     ✅      |            |       |    ✅     |  ✅  |
+| Text    |     ✅      |     ✅     |       |    ✅     |  ✅  |
+| Heading |     ✅      |     ✅     |       |    ✅     |  ✅  |
 
 ## Layout
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Center     |     ✅      |            |       |           |  ✅  |
-| Container  |     ✅      |            |       |           |  ✅  |
+| Center     |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
+| Container  |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
 | Flex       |             |            |       |           |      |
 | Grid       |             |            |       |           |      |
 | SimpleGrid |             |            |       |           |      |
