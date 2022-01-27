@@ -3,6 +3,7 @@ import { VariantProps } from "@stitches/core";
 import { spin } from "@/theme/keyframes";
 import { css } from "@/theme/stitches.config";
 import { SystemStyleObject } from "@/theme/types";
+import { utilityStyles } from "@/theme/utilityStyles";
 
 export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
@@ -117,7 +118,7 @@ function createTextCompoundVariant(config: TextCompoundVariantConfig): SystemSty
   };
 }
 
-export const buttonStyles = css({
+export const buttonStyles = css(utilityStyles, {
   appearance: "none",
   position: "relative",
 

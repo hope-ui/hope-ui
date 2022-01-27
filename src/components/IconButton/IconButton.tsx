@@ -1,11 +1,12 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/contexts/HopeContext";
+import { UtilityVariants } from "@/theme/utilityStyles";
 
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 
 export type IconButtonOptions = Omit<
   ButtonOptions,
@@ -17,7 +18,7 @@ export type IconButtonOptions = Omit<
 
 export type ThemeableIconButtonOptions = Omit<
   IconButtonOptions,
-  CommonOmitableButtonOptions | "aria-label" | "icon"
+  keyof UtilityVariants | CommonOmitableButtonOptions | "aria-label" | "icon"
 >;
 
 export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
@@ -25,12 +26,14 @@ export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
   IconButtonOptions
 >;
 
+const hopeIconButtonClass = "hope-icon-button";
+
 /**
  * IconButton composes the Button component except that it renders only an icon.
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const theme = useHopeTheme().components.IconButton;
+  const theme = useTheme().components.IconButton;
 
   const defaultProps: Required<ThemeableIconButtonOptions> = {
     variant: theme?.defaultProps?.variant ?? "filled",
@@ -45,6 +48,7 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeIconButtonClass,
       baseClass: iconButtonStyles(),
       class: local.class,
       className: local.className,
@@ -62,4 +66,4 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
   );
 }
 
-IconButton.toString = () => iconButtonStyles.selector;
+IconButton.toString = () => createCssSelector(hopeIconButtonClass);

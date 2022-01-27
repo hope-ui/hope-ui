@@ -51,6 +51,19 @@ describe("Container", () => {
     expect(container).toHaveTextContent(children);
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <Container data-testid="container">Container</Container>);
+    const container = screen.getByTestId("container");
+
+    // assert
+    expect(container).toHaveClass("hope-container");
+  });
+
+  it("should return semantic hope class as css selector when calling toString()", () => {
+    expect(Container.toString()).toBe(".hope-container");
+  });
+
   it("should have class from class prop", () => {
     // arrange
     const stubClass = "stub";

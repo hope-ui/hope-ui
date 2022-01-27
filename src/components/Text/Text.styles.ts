@@ -1,8 +1,22 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/theme/stitches.config";
+import { css, theme } from "@/theme/stitches.config";
+import { SystemStyleObject } from "@/theme/types";
+import { utilityStyles } from "@/theme/utilityStyles";
 
-export const textStyles = css({
+type ColorVariants = Record<keyof typeof theme.colors, SystemStyleObject>;
+
+function createColorVariants(): ColorVariants {
+  return Object.keys(theme.colors).reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: { color: `$${key}` } as SystemStyleObject,
+    }),
+    {} as ColorVariants
+  );
+}
+
+export const textStyles = css(utilityStyles, {
   // Reset
   margin: 0,
   padding: 0,
@@ -73,15 +87,7 @@ export const textStyles = css({
       extrabold: { fontWeight: "$extrabold" },
       black: { fontWeight: "$black" },
     },
-    color: {
-      primary: { color: "$primary700" },
-      dark: { color: "$dark900" },
-      neutral: { color: "$neutral700" },
-      success: { color: "$success700" },
-      info: { color: "$info700" },
-      warning: { color: "$warning700" },
-      danger: { color: "$danger700" },
-    },
+    color: createColorVariants(),
     align: {
       left: { textAlign: "left" },
       right: { textAlign: "right" },
@@ -95,51 +101,11 @@ export const textStyles = css({
       4: { noOfLines: 4 },
       5: { noOfLines: 5 },
     },
-    secondary: { true: {} },
   },
-  compoundVariants: [
-    /* Secondary text
-     **********************/
-    {
-      color: "primary",
-      secondary: "true",
-      css: { color: "$primary600" },
-    },
-    {
-      color: "dark",
-      secondary: "true",
-      css: { color: "$dark400" },
-    },
-    {
-      color: "neutral",
-      secondary: "true",
-      css: { color: "$neutral500" },
-    },
-    {
-      color: "success",
-      secondary: "true",
-      css: { color: "$success600" },
-    },
-    {
-      color: "info",
-      secondary: "true",
-      css: { color: "$info600" },
-    },
-    {
-      color: "warning",
-      secondary: "true",
-      css: { color: "$warning600" },
-    },
-    {
-      color: "danger",
-      secondary: "true",
-      css: { color: "$danger600" },
-    },
-  ],
   defaultVariants: {
     size: "base",
     weight: "normal",
-    color: "dark",
+    color: "dark900",
   },
 });
 

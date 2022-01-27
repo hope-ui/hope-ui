@@ -66,6 +66,19 @@ describe("Button", () => {
     expect(button).toHaveAttribute("role", "button");
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <Button>Button</Button>);
+    const button = screen.getByRole("button");
+
+    // assert
+    expect(button).toHaveClass("hope-button");
+  });
+
+  it("should return semantic hope class as css selector when calling toString()", () => {
+    expect(Button.toString()).toBe(".hope-button");
+  });
+
   it("should have class from class prop", () => {
     // arrange
     const stubClass = "stub";

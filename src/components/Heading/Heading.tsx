@@ -1,28 +1,26 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
-import { css } from "@/theme/stitches.config";
+import { useTheme } from "@/contexts/HopeContext";
 
 import { Text, TextProps } from "../Text";
 import { ElementType } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 
-const headingStyles = css();
+const hopeHeadingClass = "hope-heading";
 
 /**
  * Headings are used for rendering headlines.
  * It renders an <h2> tag by default.
  */
 export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
-  const theme = useHopeTheme().components.Heading;
+  const theme = useTheme().components.Heading;
 
   const defaultProps: TextProps<"h2"> = {
     as: "h2",
     size: theme?.defaultProps?.size ?? "base",
     weight: theme?.defaultProps?.weight ?? "semibold",
     align: theme?.defaultProps?.align ?? "left",
-    color: theme?.defaultProps?.color ?? "dark",
-    secondary: theme?.defaultProps?.secondary ?? false,
+    color: theme?.defaultProps?.color ?? "dark900",
   };
 
   props = mergeProps(defaultProps, props);
@@ -30,7 +28,8 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
 
   const classList = () => {
     return generateClassList({
-      baseClass: headingStyles(),
+      hopeClass: hopeHeadingClass,
+      baseClass: "",
       class: local.class,
       className: local.className,
       classList: local.classList,
@@ -40,4 +39,4 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
   return <Text as={local.as as ElementType} classList={classList()} {...others} />;
 }
 
-Heading.toString = () => headingStyles.selector;
+Heading.toString = () => createCssSelector(hopeHeadingClass);

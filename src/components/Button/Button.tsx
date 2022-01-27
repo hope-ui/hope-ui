@@ -1,12 +1,13 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
+import { UtilityVariants } from "@/theme/utilityStyles";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export type ButtonOptions = ButtonVariants & {
@@ -21,17 +22,19 @@ export type CommonOmitableButtonOptions = "disabled" | "loading" | "loader";
 
 export type ThemeableButtonOptions = Omit<
   ButtonOptions,
-  CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
+  keyof UtilityVariants | CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
 >;
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
+
+const hopeButtonClass = "hope-button";
 
 /**
  * The Button component is used to trigger an action or event,
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useHopeTheme().components.Button;
+  const theme = useTheme().components.Button;
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
@@ -54,11 +57,23 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const [local, styleProps, others] = splitProps(
     props,
     [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
+    [
+      ...utilityStyleProps,
+      "css",
+      "variant",
+      "color",
+      "size",
+      "radius",
+      "loading",
+      "compact",
+      "uppercase",
+      "fullWidth",
+    ]
   );
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeButtonClass,
       baseClass: buttonStyles(styleProps),
       class: local.class,
       className: local.className,
@@ -107,4 +122,4 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   );
 }
 
-Button.toString = () => buttonStyles.selector;
+Button.toString = () => createCssSelector(hopeButtonClass);

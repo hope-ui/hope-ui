@@ -51,6 +51,19 @@ describe("Center", () => {
     expect(center).toHaveTextContent(children);
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <Center data-testid="center">Center</Center>);
+    const center = screen.getByTestId("center");
+
+    // assert
+    expect(center).toHaveClass("hope-center");
+  });
+
+  it("should return semantic hope class as css selector when calling toString()", () => {
+    expect(Center.toString()).toBe(".hope-center");
+  });
+
   it("should have class from class prop", () => {
     // arrange
     const stubClass = "stub";

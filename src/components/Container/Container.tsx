@@ -2,10 +2,12 @@ import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
 import { containerStyles, ContainerVariants } from "./Container.styles";
 
 export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C, ContainerVariants>;
+
+const hopeContainerClass = "hope-container";
 
 /**
  * Layout component used to wrap app or website content
@@ -16,6 +18,7 @@ export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C,
  */
 export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
   const [local, styleProps, others] = splitProps(props, commonProps, [
+    ...utilityStyleProps,
     "css",
     "centered",
     "centerContent",
@@ -23,6 +26,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeContainerClass,
       baseClass: containerStyles(styleProps),
       class: local.class,
       className: local.className,
@@ -33,4 +37,4 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
 
-Container.toString = () => containerStyles.selector;
+Container.toString = () => createCssSelector(hopeContainerClass);

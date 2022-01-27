@@ -1,8 +1,9 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "@/theme/stitches.config";
+import { utilityStyles } from "@/theme/utilityStyles";
 
-export const containerStyles = css({
+export const containerStyles = css(utilityStyles, {
   width: "100%",
 
   "@sm": { maxWidth: "$containerSm" },

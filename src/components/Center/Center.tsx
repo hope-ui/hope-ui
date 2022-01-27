@@ -2,16 +2,19 @@ import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
 import { centerStyles, CenterVariants } from "./Center.styles";
 
 export type CenterProps<C extends ElementType> = PolymorphicComponentProps<C, CenterVariants>;
+
+const hopeCenterClass = "hope-center";
 
 /**
  * Center is a layout component that centers its child within itself.
  */
 export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
   const [local, styleProps, others] = splitProps(props, commonProps, [
+    ...utilityStyleProps,
     "css",
     "fullWidth",
     "fullHeight",
@@ -20,6 +23,7 @@ export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeCenterClass,
       baseClass: centerStyles(styleProps),
       class: local.class,
       className: local.className,
@@ -30,4 +34,4 @@ export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
 
-Center.toString = () => centerStyles.selector;
+Center.toString = () => createCssSelector(hopeCenterClass);
