@@ -1,20 +1,20 @@
 # Components roadmap
 
-## General
+### General
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
 
-## Typography
+### Typography
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Text    |     ✅      |     ✅     |       |    ✅     |  ✅  |
 | Heading |     ✅      |     ✅     |       |    ✅     |  ✅  |
 
-## Layout
+### Layout
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -25,7 +25,7 @@
 | SimpleGrid |             |            |       |           |      |
 | Stack      |             |            |       |           |      |
 
-## Data entry
+### Data entry
 
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -50,7 +50,7 @@
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |
 
-## Data display
+### Data display
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -62,7 +62,7 @@
 | Tag       |             |            |       |           |      |
 | Timeline  |             |            |       |           |      |
 
-## Navigation
+### Navigation
 
 |             | Development | A11y check | Tests | Storybook | Docs |
 | ----------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -72,7 +72,7 @@
 | Stepper     |             |            |       |           |      |
 | Tabs        |             |            |       |           |      |
 
-## Feedback
+### Feedback
 
 |              | Development | A11y check | Tests | Storybook | Docs |
 | ------------ | :---------: | :--------: | :---: | :-------: | :--: |
@@ -82,7 +82,7 @@
 | Progress     |             |            |       |           |      |
 | RingProgress |             |            |       |           |      |
 
-## Overlay
+### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |

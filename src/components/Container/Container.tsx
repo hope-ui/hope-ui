@@ -32,3 +32,5 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
 
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
+
+Container.toString = () => containerStyles.selector;

@@ -61,3 +61,5 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     />
   );
 }
+
+IconButton.toString = () => iconButtonStyles.selector;

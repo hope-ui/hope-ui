@@ -1,10 +1,13 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
+import { css } from "@/stitches/stitches.config";
 
 import { Text, TextProps } from "../Text";
 import { ElementType } from "../types";
 import { commonProps, generateClassList } from "../utils";
+
+const headingStyles = css();
 
 /**
  * Headings are used for rendering headlines.
@@ -27,6 +30,7 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
 
   const classList = () => {
     return generateClassList({
+      baseClass: headingStyles(),
       class: local.class,
       className: local.className,
       classList: local.classList,
@@ -35,3 +39,5 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
 
   return <Text as={local.as as ElementType} classList={classList()} {...others} />;
 }
+
+Heading.toString = () => headingStyles.selector;

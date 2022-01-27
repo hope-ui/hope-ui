@@ -501,7 +501,7 @@ Button.toString = () => ".my-button";
 </Center>;
 ```
 
-## The `as` props
+## The `as` prop
 
 All Hope UI components are polymorphic, meaning you can use the `as` prop to change the rendered element.
 

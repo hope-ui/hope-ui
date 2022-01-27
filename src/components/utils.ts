@@ -4,7 +4,7 @@ import { SystemStyleObject } from "@/stitches/types";
 import { AsProp, ClassProps } from "./types";
 
 export interface ClassConfig extends ClassProps {
-  baseClass?: string;
+  baseClass: string;
   //themeBaseStyle?: SystemStyleObject;
 }
 

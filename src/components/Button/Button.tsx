@@ -106,3 +106,5 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     </Dynamic>
   );
 }
+
+Button.toString = () => buttonStyles.selector;

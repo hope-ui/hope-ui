@@ -29,3 +29,5 @@ export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
 
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
+
+Center.toString = () => centerStyles.selector;

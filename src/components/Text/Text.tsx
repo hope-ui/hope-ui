@@ -49,3 +49,5 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   return <Dynamic component={local.as} classList={classList()} {...others} />;
 }
+
+Text.toString = () => textStyles.selector;
