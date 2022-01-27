@@ -1,10 +1,8 @@
 # hope-ui-solid (WIP)
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui 'MIT License')](LICENSE.md)
+[![npm - hope-ui-solid](https://badgen.net/npm/v/hope-ui-solid 'hope-ui-solid npm')](https://www.npmjs.com/package/hope-ui-solid)
 
 🤞 The hoped component library for your SolidJS applications.
 
@@ -501,7 +499,7 @@ Button.toString = () => ".my-button";
 </Center>;
 ```
 
-## The `as` props
+## The `as` prop
 
 All Hope UI components are polymorphic, meaning you can use the `as` prop to change the rendered element.
 
