@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/stitches/stitches.config";
+import { css } from "@/theme/stitches.config";
 
 export const textStyles = css({
   // Reset
@@ -63,11 +63,15 @@ export const textStyles = css({
       },
     },
     weight: {
+      hairline: { fontWeight: "$hairline" },
+      thin: { fontWeight: "$thin" },
       light: { fontWeight: "$light" },
       normal: { fontWeight: "$normal" },
       medium: { fontWeight: "$medium" },
       semibold: { fontWeight: "$semibold" },
       bold: { fontWeight: "$bold" },
+      extrabold: { fontWeight: "$extrabold" },
+      black: { fontWeight: "$black" },
     },
     color: {
       primary: { color: "$primary700" },

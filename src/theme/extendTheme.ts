@@ -1,7 +1,7 @@
 import merge from "lodash.merge";
 
-import { createTheme } from "../stitches/stitches.config";
 import { defaultTheme } from "./defaultTheme";
+import { createTheme } from "./stitches.config";
 import { HopeTheme, HopeThemeOverride } from "./types";
 
 export function extendTheme(themeOverride: HopeThemeOverride): HopeTheme {

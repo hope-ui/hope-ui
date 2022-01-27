@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/stitches/stitches.config";
+import { css } from "@/theme/stitches.config";
 
 export const containerStyles = css({
   width: "100%",

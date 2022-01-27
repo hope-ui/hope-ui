@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/test/utils";
+import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Center } from "./Center";
 import { centerStyles, CenterVariants } from "./Center.styles";

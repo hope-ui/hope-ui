@@ -1,14 +1,7 @@
-import {
-  createContext,
-  createSignal,
-  mergeProps,
-  onMount,
-  PropsWithChildren,
-  useContext,
-} from "solid-js";
+import { createContext, createSignal, mergeProps, PropsWithChildren, useContext } from "solid-js";
 
-import { applyGlobalBaseStyles } from "@/stitches/baseStyles";
 import { defaultTheme } from "@/theme/defaultTheme";
+import { resetStyles } from "@/theme/reset";
 import { HopeTheme } from "@/theme/types";
 
 export interface HopeContextValue {
@@ -25,11 +18,9 @@ export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
   const [theme] = createSignal(propsWithDefault.theme);
 
-  onMount(() => {
-    // Apply the customized stitches theme and css reset
-    document.body.classList.add(theme().tokens);
-    applyGlobalBaseStyles(theme().tokens);
-  });
+  // Apply css reset and the customized stitches theme
+  resetStyles();
+  document.documentElement.classList.add(theme().tokens);
 
   return <HopeContext.Provider value={{ theme: theme() }}>{props.children}</HopeContext.Provider>;
 }

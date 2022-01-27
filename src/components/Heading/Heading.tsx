@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
-import { css } from "@/stitches/stitches.config";
+import { css } from "@/theme/stitches.config";
 
 import { Text, TextProps } from "../Text";
 import { ElementType } from "../types";

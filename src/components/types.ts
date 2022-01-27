@@ -1,6 +1,6 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
-import { SystemStyleObject } from "@/stitches/types";
+import { SystemStyleObject } from "@/theme/types";
 
 /**
  * Represent any HTML element or SolidJS component.

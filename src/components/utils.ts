@@ -1,6 +1,3 @@
-import { css } from "@/stitches/stitches.config";
-import { SystemStyleObject } from "@/stitches/types";
-
 import { AsProp, ClassProps } from "./types";
 
 export interface ClassConfig extends ClassProps {

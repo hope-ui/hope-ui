@@ -1,8 +1,8 @@
 import { VariantProps } from "@stitches/core";
 
-import { spin } from "@/stitches/keyframes";
-import { css } from "@/stitches/stitches.config";
-import { SystemStyleObject } from "@/stitches/types";
+import { spin } from "@/theme/keyframes";
+import { css } from "@/theme/stitches.config";
+import { SystemStyleObject } from "@/theme/types";
 
 export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
