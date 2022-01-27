@@ -1,4 +1,4 @@
-import { Component, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useHopeTheme } from "@/contexts/HopeContext";
@@ -6,18 +6,18 @@ import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { classPropNames, generateClassList } from "../utils";
+import { commonProps, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export type ButtonOptions = ButtonVariants & {
   disabled?: boolean;
   loaderPosition?: HopeXPosition;
-  loader?: Component | JSX.Element;
+  loader?: JSX.Element;
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
 };
 
-export type CommonOmitableButtonOptions = "disabled" | "loading";
+export type CommonOmitableButtonOptions = "disabled" | "loading" | "loader";
 
 export type ThemeableButtonOptions = Omit<
   ButtonOptions,
@@ -39,30 +39,30 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     color: theme?.defaultProps?.color ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
     radius: theme?.defaultProps?.radius ?? "sm",
-    loader: theme?.defaultProps?.loader ?? IconSpinner,
     loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     compact: theme?.defaultProps?.compact ?? false,
     uppercase: theme?.defaultProps?.uppercase ?? false,
     fullWidth: theme?.defaultProps?.fullWidth ?? false,
+    loader: <IconSpinner />,
     loading: false,
     disabled: false,
     type: "button",
     role: "button",
   };
 
-  const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, styleProps, classProps, others] = splitProps(
-    propsWithDefault,
-    ["as", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"],
-    classPropNames
+  props = mergeProps(defaultProps, props);
+  const [local, styleProps, others] = splitProps(
+    props,
+    [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
+    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
   );
 
   const classList = () => {
     return generateClassList({
       baseClass: buttonStyles(styleProps),
-      themeBaseStyle: theme?.baseStyle,
-      ...classProps,
+      class: local.class,
+      className: local.className,
+      classList: local.classList,
     });
   };
 

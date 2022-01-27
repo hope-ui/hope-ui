@@ -407,7 +407,7 @@ Hope UI provides an `extendTheme` function that deep merges the default theme wi
 // 1. Import the extendTheme function
 import { extendTheme, HopeProvider } from "hope-ui-solid";
 
-// 2. Extend the theme to include custom colors, fonts and default component props.
+// 2. Extend the theme to include custom colors, fonts, default component styles and props.
 const theme = extendTheme({
   tokens: {
     colors: {
@@ -419,9 +419,11 @@ const theme = extendTheme({
   },
   components: {
     Button: {
-      variant: "outline",
-      radius: "full",
-      uppercase: true,
+      defaultProps: {
+        variant: "outline",
+        radius: "full",
+        uppercase: true,
+      },
     },
   },
 });
@@ -446,7 +448,7 @@ It’s like the style attribute, but it supports tokens, media queries, nesting 
 <Button
   css={{
     bg: "$primary500",
-    borderRadius: "0",
+    borderRadius: "$none",
     color: "white",
     "&:hover": {
       bg: "$primary600",

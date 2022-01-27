@@ -2,7 +2,7 @@ import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { classPropNames, generateClassList } from "../utils";
+import { commonProps, generateClassList } from "../utils";
 import { containerStyles, ContainerVariants } from "./Container.styles";
 
 export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C, ContainerVariants>;
@@ -15,17 +15,18 @@ export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C,
  *
  */
 export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
-  const [local, styleProps, classProps, others] = splitProps(
-    props,
-    ["as"],
-    ["css", "centered", "centerContent"],
-    classPropNames
-  );
+  const [local, styleProps, others] = splitProps(props, commonProps, [
+    "css",
+    "centered",
+    "centerContent",
+  ]);
 
   const classList = () => {
     return generateClassList({
       baseClass: containerStyles(styleProps),
-      ...classProps,
+      class: local.class,
+      className: local.className,
+      classList: local.classList,
     });
   };
 

@@ -1,17 +1,19 @@
 import { cleanup, screen } from "solid-testing-library";
 
+import { IconUser } from "@/icons/IconUser";
 import { renderWithHopeProvider } from "@/test/utils";
 import { defaultTheme } from "@/theme/defaultTheme";
 
-import { Button } from "./Button";
-import { buttonStyles, ButtonVariants } from "./Button.styles";
+import { buttonStyles, iconButtonStyles } from "../Button/Button.styles";
+import { IconButtonOptions } from ".";
+import { IconButton } from "./IconButton";
 
-describe("Button", () => {
+describe("IconButton", () => {
   afterEach(cleanup);
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <Button>Button</Button>);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -20,7 +22,7 @@ describe("Button", () => {
 
   it("should render <button> tag by default", () => {
     // act
-    renderWithHopeProvider(() => <Button>Button</Button>);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -29,28 +31,16 @@ describe("Button", () => {
 
   it("should render tag provided with the as prop", () => {
     // act
-    renderWithHopeProvider(() => <Button as="a">Button</Button>);
+    renderWithHopeProvider(() => <IconButton as="a" aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
     expect(button).toBeInstanceOf(HTMLAnchorElement);
   });
 
-  it("should render children", () => {
-    // arrange
-    const children = "Button";
-
-    // act
-    renderWithHopeProvider(() => <Button>{children}</Button>);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveTextContent(children);
-  });
-
   it("should have type=button", () => {
     // act
-    renderWithHopeProvider(() => <Button>Button</Button>);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -59,7 +49,7 @@ describe("Button", () => {
 
   it("should have role=button", () => {
     // act
-    renderWithHopeProvider(() => <Button>Button</Button>);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -71,7 +61,9 @@ describe("Button", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Button class={stubClass}>Button</Button>);
+    renderWithHopeProvider(() => (
+      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
@@ -83,7 +75,9 @@ describe("Button", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Button className={stubClass}>Button</Button>);
+    renderWithHopeProvider(() => (
+      <IconButton className={stubClass} aria-label="User" icon={<IconUser />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
@@ -95,11 +89,25 @@ describe("Button", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Button classList={{ [stubClass]: true }}>Button</Button>);
+    renderWithHopeProvider(() => (
+      <IconButton classList={{ [stubClass]: true }} aria-label="User" icon={<IconUser />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
     expect(button).toHaveClass(stubClass);
+  });
+
+  it("should have stitches generated class from iconButtonStyles", () => {
+    // arrange
+    const iconButtonClass = iconButtonStyles();
+
+    // act
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    const button = screen.getByRole("button");
+
+    // assert
+    expect(button).toHaveClass(iconButtonClass.className);
   });
 
   it("should have stitches generated class from Button theme by default", () => {
@@ -107,7 +115,7 @@ describe("Button", () => {
     const buttonClass = buttonStyles(defaultTheme.components.Button);
 
     // act
-    renderWithHopeProvider(() => <Button>Button</Button>);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -116,20 +124,20 @@ describe("Button", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: ButtonVariants = {
+    const variantProps: Omit<IconButtonOptions, "aria-label" | "icon"> = {
       variant: "light",
       color: "success",
       size: "lg",
       radius: "md",
-      uppercase: true,
       compact: true,
       loading: false,
-      fullWidth: false,
     };
     const buttonClass = buttonStyles(variantProps);
 
     // act
-    renderWithHopeProvider(() => <Button {...variantProps}>Button</Button>);
+    renderWithHopeProvider(() => (
+      <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
@@ -142,7 +150,9 @@ describe("Button", () => {
     const buttonClass = buttonStyles({ css: customCSS });
 
     // act
-    renderWithHopeProvider(() => <Button css={customCSS}>Button</Button>);
+    renderWithHopeProvider(() => (
+      <IconButton css={customCSS} aria-label="User" icon={<IconUser />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
