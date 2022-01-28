@@ -1,8 +1,8 @@
 import { css, VariantProps } from "@stitches/core";
 
-import { utilityStyles } from "@/theme/utilityStyles";
+import { boxStyles } from "../Box/Box.styles";
 
-export const spacerStyles = css(utilityStyles, {
+export const spacerStyles = css(boxStyles, {
   flex: 1,
   justifySelf: "stretch",
   alignSelf: "stretch",

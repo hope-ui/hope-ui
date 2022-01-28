@@ -47,7 +47,7 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg", "xl"],
     },
-    rounded: {
+    borderRadius: {
       control: { type: "select" },
       options: ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "full"],
     },
@@ -68,7 +68,7 @@ export default {
     variant: "filled",
     colorScheme: "primary",
     size: "md",
-    rounded: "sm",
+    borderRadius: "sm",
     compact: false,
     loading: false,
     disabled: false,

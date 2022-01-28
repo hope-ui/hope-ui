@@ -31,7 +31,7 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg", "xl"],
     },
-    rounded: {
+    borderRadius: {
       control: { type: "select" },
       options: ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "full"],
     },
@@ -40,9 +40,6 @@ export default {
       options: ["left", "right"],
     },
     compact: {
-      control: { type: "boolean" },
-    },
-    uppercase: {
       control: { type: "boolean" },
     },
     fullWidth: {
@@ -62,10 +59,9 @@ export default {
     variant: "filled",
     colorScheme: "primary",
     size: "md",
-    rounded: "sm",
+    borderRadius: "sm",
     loaderPosition: "left",
     compact: false,
-    uppercase: false,
     fullWidth: false,
     loading: false,
     disabled: false,

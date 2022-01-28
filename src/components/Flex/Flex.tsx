@@ -1,13 +1,17 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { utilityStyleProps } from "@/theme/utilityStyles";
-
+import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
-import { flexStyleProps, flexStyles, FlexVariants } from "./Flex.styles";
+import { flexStyles, FlexVariants } from "./Flex.styles";
 
-export type FlexProps<C extends ElementType> = PolymorphicComponentProps<C, FlexVariants>;
+export type FlexOptions = FlexVariants & {
+  direction?: FlexVariants["flexDirection"];
+  wrap?: FlexVariants["flexWrap"];
+};
+
+export type FlexProps<C extends ElementType> = PolymorphicComponentProps<C, FlexOptions>;
 
 const hopeFlexClass = "hope-flex";
 
@@ -26,15 +30,20 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
 
   props = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...utilityStyleProps,
-    ...flexStyleProps,
+    ...boxPropNames,
     "css",
+    "direction",
+    "wrap",
   ]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeFlexClass,
-      baseClass: flexStyles(styleProps),
+      baseClass: flexStyles({
+        ...styleProps,
+        flexDirection: styleProps.direction,
+        flexWrap: styleProps.wrap,
+      }),
       class: local.class,
       className: local.className,
       classList: local.classList,

@@ -9,7 +9,7 @@ import { commonProps, createCssSelector, generateClassList } from "../utils";
 
 export type IconButtonOptions = Omit<
   ButtonOptions,
-  "leftIcon" | "rightIcon" | "loaderPosition" | "uppercase" | "fullWidth"
+  "leftIcon" | "rightIcon" | "loaderPosition" | "textTransform" | "fullWidth"
 > & {
   icon: JSX.Element;
   "aria-label": string;

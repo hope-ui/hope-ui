@@ -1,6 +1,5 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { defaultTheme } from "@/theme/defaultTheme";
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Button } from "./Button";
@@ -134,7 +133,6 @@ describe("Button", () => {
       colorScheme: "success",
       size: "lg",
       borderRadius: "md",
-      uppercase: true,
       compact: true,
       loading: false,
       fullWidth: false,

@@ -1,8 +1,7 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { utilityStyleProps } from "@/theme/utilityStyles";
-
+import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { spacerStyles, SpacerVariants } from "./Spacer.styles";
@@ -16,7 +15,7 @@ const hopeSpacerClass = "hope-spacer";
  * It renders a `div` by default, and takes up any available space.
  */
 export function Spacer<C extends ElementType = "div">(props: SpacerProps<C>) {
-  const [local, styleProps, others] = splitProps(props, commonProps, [...utilityStyleProps, "css"]);
+  const [local, styleProps, others] = splitProps(props, commonProps, [...boxPropNames, "css"]);
 
   const classList = () => {
     return generateClassList({

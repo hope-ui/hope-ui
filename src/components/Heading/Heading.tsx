@@ -2,14 +2,14 @@ import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useTheme } from "@/contexts/HopeContext";
-import { utilityStyleProps } from "@/theme/utilityStyles";
 
-import { TextOptions, TextProps, textStyleProps } from "../Text";
+import { boxPropNames } from "../Box/Box.styles";
+import { TextOptions, TextProps } from "../Text";
 import { textStyles } from "../Text/Text.styles";
 import { ElementType } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 
-export type ThemeableHeadingOptions = Pick<TextOptions, "weight">;
+export type ThemeableHeadingOptions = Pick<TextOptions, "fontWeight">;
 
 const hopeHeadingClass = "hope-heading";
 
@@ -22,14 +22,14 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
 
   const defaultProps: TextProps<"h2"> = {
     as: "h2",
-    weight: theme?.defaultProps?.weight ?? "semibold",
+    fontWeight: theme?.defaultProps?.fontWeight ?? "semibold",
   };
 
   props = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...utilityStyleProps,
-    ...textStyleProps,
+    ...boxPropNames,
     "css",
+    "size",
   ]);
 
   const classList = () => {
@@ -38,8 +38,6 @@ export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
       baseClass: textStyles({
         ...styleProps,
         fontSize: styleProps.size,
-        fontFamily: styleProps.font,
-        fontWeight: styleProps.weight,
       }),
       class: local.class,
       className: local.className,

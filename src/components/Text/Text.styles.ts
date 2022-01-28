@@ -1,11 +1,12 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "@/theme/stitches.config";
-import { utilityStyles } from "@/theme/utilityStyles";
 
-export const baseTextStyles = css({
+import { boxStyles } from "../Box/Box.styles";
+
+export const textStyles = css(boxStyles, {
   variants: {
-    fontSize: {
+    size: {
       xs: {
         fontSize: "$xs",
         lineHeight: "$4",
@@ -59,74 +60,7 @@ export const baseTextStyles = css({
         lineHeight: "$none",
       },
     },
-    fontFamily: {
-      sans: { fontFamily: "$sans" },
-      serif: { fontFamily: "$serif" },
-      mono: { fontFamily: "$mono" },
-    },
-    fontWeight: {
-      hairline: { fontWeight: "$hairline" },
-      thin: { fontWeight: "$thin" },
-      light: { fontWeight: "$light" },
-      normal: { fontWeight: "$normal" },
-      medium: { fontWeight: "$medium" },
-      semibold: { fontWeight: "$semibold" },
-      bold: { fontWeight: "$bold" },
-      extrabold: { fontWeight: "$extrabold" },
-      black: { fontWeight: "$black" },
-    },
-    letterSpacing: {
-      tighter: { letterSpacing: "$tighter" },
-      tight: { letterSpacing: "$tight" },
-      normal: { letterSpacing: "$normal" },
-      wide: { letterSpacing: "$wide" },
-      wider: { letterSpacing: "$wider" },
-      widest: { letterSpacing: "$widest" },
-    },
-    textAlign: {
-      left: { textAlign: "left" },
-      right: { textAlign: "right" },
-      center: { textAlign: "center" },
-      justify: { textAlign: "justify" },
-    },
-    textTransform: {
-      capitalize: { textTransform: "capitalize" },
-      uppercase: { textTransform: "uppercase" },
-      lowercase: { textTransform: "lowercase" },
-    },
-    lineClamp: {
-      1: { noOfLines: 1 },
-      2: { noOfLines: 2 },
-      3: { noOfLines: 3 },
-      4: { noOfLines: 4 },
-      5: { noOfLines: 5 },
-    },
   },
 });
 
-export const textStyles = css(utilityStyles, baseTextStyles, {
-  // Reset
-  margin: 0,
-  padding: 0,
-});
-
-export type BaseTextVariants = VariantProps<typeof baseTextStyles>;
-
 export type TextVariants = VariantProps<typeof textStyles>;
-
-/**
- * Used to splitProps in <Text/> and <Heading/> component.
- */
-export const commonTextStyleProps: Array<
-  keyof Pick<BaseTextVariants, "letterSpacing" | "textAlign" | "textTransform" | "lineClamp">
-> = ["letterSpacing", "textAlign", "textTransform", "lineClamp"];
-
-/**
- * Used to splitProps in <Box/> component.
- */
-export const baseTextStyleProps: Array<keyof BaseTextVariants> = [
-  ...commonTextStyleProps,
-  "fontSize",
-  "fontFamily",
-  "fontWeight",
-];

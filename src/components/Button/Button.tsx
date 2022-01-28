@@ -4,8 +4,8 @@ import { Dynamic } from "solid-js/web";
 import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
-import { utilityStyleProps, UtilityVariants } from "@/theme/utilityStyles";
 
+import { boxPropNames, BoxVariants } from "../Box/Box.styles";
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
@@ -19,7 +19,7 @@ export type ButtonOptions = ButtonVariants & {
 };
 
 export type CommonOmitableButtonOptions =
-  | keyof Omit<UtilityVariants, "borderRadius">
+  | keyof Omit<BoxVariants, "borderRadius" | "textTransform">
   | "disabled"
   | "loading"
   | "loader";
@@ -48,7 +48,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
     loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     compact: theme?.defaultProps?.compact ?? false,
-    uppercase: theme?.defaultProps?.uppercase ?? false,
+    textTransform: theme?.defaultProps?.textTransform ?? "none",
     fullWidth: theme?.defaultProps?.fullWidth ?? false,
     loader: <IconSpinner />,
     loading: false,
@@ -61,17 +61,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const [local, styleProps, others] = splitProps(
     props,
     [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    [
-      ...utilityStyleProps,
-      "css",
-      "variant",
-      "colorScheme",
-      "size",
-      "loading",
-      "compact",
-      "uppercase",
-      "fullWidth",
-    ]
+    [...boxPropNames, "css", "variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
 
   const classList = () => {

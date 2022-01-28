@@ -1,8 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { utilityStyleProps } from "@/theme/utilityStyles";
-
+import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { containerStyles, ContainerVariants } from "./Container.styles";
@@ -27,7 +26,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
 
   props = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...utilityStyleProps,
+    ...boxPropNames,
     "css",
     "centered",
     "centerContent",

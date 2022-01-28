@@ -2,9 +2,9 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { Text } from "./Text";
-import { textStyles, TextVariants } from "./Text.styles";
 import { TextOptions } from ".";
+import { Text } from "./Text";
+import { textStyles } from "./Text.styles";
 
 describe("Text", () => {
   afterEach(cleanup);
@@ -130,8 +130,8 @@ describe("Text", () => {
     const props: TextOptions = {
       color: "primary500",
       size: "4xl",
-      font: "serif",
-      weight: "light",
+      fontFamily: "serif",
+      fontWeight: "light",
       textAlign: "justify",
       lineClamp: 3,
     };
@@ -139,8 +139,6 @@ describe("Text", () => {
     const textClass = textStyles({
       ...props,
       fontSize: props.size,
-      fontFamily: props.font,
-      fontWeight: props.weight,
     });
 
     // act

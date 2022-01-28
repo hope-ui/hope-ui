@@ -1,13 +1,9 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { utilityStyleProps } from "@/theme/utilityStyles";
-
-import { baseFlexStyleProps, commonFlexboxAndGridStyleProps } from "../Flex/Flex.styles";
-import { baseTextStyleProps } from "../Text/Text.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
-import { boxStyles, BoxVariants } from "./Box.styles";
+import { boxPropNames, boxStyles, BoxVariants } from "./Box.styles";
 
 export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C, BoxVariants>;
 
@@ -18,14 +14,7 @@ const hopeBoxClass = "hope-box";
  * By default, it renders a div element.
  */
 export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...utilityStyleProps,
-    ...commonFlexboxAndGridStyleProps,
-    ...baseFlexStyleProps,
-    ...baseTextStyleProps,
-    "css",
-    "display",
-  ]);
+  const [local, styleProps, others] = splitProps(props, commonProps, [...boxPropNames, "css"]);
 
   const classList = () => {
     return generateClassList({
