@@ -1,16 +1,29 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useTheme } from "@/contexts/HopeContext";
 import { utilityStyleProps } from "@/theme/utilityStyles";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
-import { textStyles, TextVariants } from "./Text.styles";
+import { commonTextStyleProps, textStyles, TextVariants } from "./Text.styles";
 
-export type ThemeableTextOptions = Omit<TextVariants, "lineClamp">;
+export type TextOptions = Omit<TextVariants, "fontSize" | "fontFamily" | "fontWeight"> & {
+  size?: TextVariants["fontSize"];
+  font?: TextVariants["fontFamily"];
+  weight?: TextVariants["fontWeight"];
+};
 
-export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, TextVariants>;
+export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, TextOptions>;
+
+/**
+ * Used to splitProps in <Text/> and <Heading/> component.
+ */
+export const textStyleProps: Array<keyof TextOptions> = [
+  ...commonTextStyleProps,
+  "size",
+  "font",
+  "weight",
+];
 
 const hopeTextClass = "hope-text";
 
@@ -19,42 +32,28 @@ const hopeTextClass = "hope-text";
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
-  const theme = useTheme().components.Text;
-
-  const defaultProps: TextProps<"p"> = {
-    as: "p",
-    color: theme?.defaultProps?.color ?? "dark900",
-    size: theme?.defaultProps?.size ?? "base",
-    weight: theme?.defaultProps?.weight ?? "normal",
-    align: theme?.defaultProps?.align ?? "left",
-  };
-
-  props = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(props, commonProps, [
     ...utilityStyleProps,
+    ...textStyleProps,
     "css",
-    "size",
-    "font",
-    "weight",
-    "letterSpacing",
-    "align",
-    "capitalized",
-    "uppercased",
-    "lowercased",
-    "lineClamp",
   ]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeTextClass,
-      baseClass: textStyles(styleProps),
+      baseClass: textStyles({
+        ...styleProps,
+        fontSize: styleProps.size,
+        fontFamily: styleProps.font,
+        fontWeight: styleProps.weight,
+      }),
       class: local.class,
       className: local.className,
       classList: local.classList,
     });
   };
 
-  return <Dynamic component={local.as} classList={classList()} {...others} />;
+  return <Dynamic component={local.as ?? "p"} classList={classList()} {...others} />;
 }
 
 Text.toString = () => createCssSelector(hopeTextClass);

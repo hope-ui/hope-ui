@@ -25,8 +25,8 @@ To contain any piece of content, wrap it in the `Container` component.
 In some cases, the width of the content can be smaller than the container's width, you can use the `centerContent` prop to center the content.
 
 ```jsx
-<Container centerContent css={{ bg: "$neutral200" }}>
-  <Box css={{ p: "$4", bg: "$neutral100", maxW: "$xl" }}>
+<Container centerContent bg="neutral200">
+  <Box p="4" bg="neutral100" maxW="xl">
     There are many benefits to a joint design and development system. Not only does it bring
     benefits to the design team.
   </Box>

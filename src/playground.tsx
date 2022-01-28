@@ -2,14 +2,23 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { HopeProvider, Text } from ".";
+import { Box, Button, Center, Flex, Heading, HopeProvider, Spacer, Text } from ".";
 
 export function App() {
   return (
     <HopeProvider>
-      <Text uppercased color="info500">
-        Hope UI
-      </Text>
+      <Flex>
+        <Box p="2">
+          <Heading size="base">Chakra App</Heading>
+        </Box>
+        <Spacer />
+        <Box>
+          <Button colorScheme="primary" mr="4">
+            Sign Up
+          </Button>
+          <Button colorScheme="primary">Log in</Button>
+        </Box>
+      </Flex>
     </HopeProvider>
   );
 }

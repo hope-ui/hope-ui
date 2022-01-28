@@ -128,9 +128,9 @@ describe("Heading", () => {
     // arrange
     const variantProps: TextVariants = {
       color: "primary500",
-      align: "justify",
-      weight: "light",
-      size: "4xl",
+      fontSize: "4xl",
+      fontWeight: "light",
+      textAlign: "justify",
       lineClamp: 3,
     };
     const textClass = textStyles(variantProps);

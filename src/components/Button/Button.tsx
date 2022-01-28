@@ -19,7 +19,7 @@ export type ButtonOptions = ButtonVariants & {
 };
 
 export type CommonOmitableButtonOptions =
-  | keyof Omit<UtilityVariants, "rounded">
+  | keyof Omit<UtilityVariants, "borderRadius">
   | "disabled"
   | "loading"
   | "loader";
@@ -45,7 +45,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     variant: theme?.defaultProps?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    rounded: theme?.defaultProps?.rounded ?? "sm",
+    borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
     loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     compact: theme?.defaultProps?.compact ?? false,
     uppercase: theme?.defaultProps?.uppercase ?? false,

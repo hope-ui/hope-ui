@@ -38,7 +38,7 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     variant: theme?.defaultProps?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    rounded: theme?.defaultProps?.rounded ?? "sm",
+    borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
     compact: theme?.defaultProps?.compact ?? false,
   };
 

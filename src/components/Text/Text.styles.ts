@@ -3,13 +3,9 @@ import { VariantProps } from "@stitches/core";
 import { css } from "@/theme/stitches.config";
 import { utilityStyles } from "@/theme/utilityStyles";
 
-export const textStyles = css(utilityStyles, {
-  // Reset
-  margin: 0,
-  padding: 0,
-
+export const baseTextStyles = css({
   variants: {
-    size: {
+    fontSize: {
       xs: {
         fontSize: "$xs",
         lineHeight: "$4",
@@ -63,12 +59,12 @@ export const textStyles = css(utilityStyles, {
         lineHeight: "$none",
       },
     },
-    font: {
+    fontFamily: {
       sans: { fontFamily: "$sans" },
       serif: { fontFamily: "$serif" },
       mono: { fontFamily: "$mono" },
     },
-    weight: {
+    fontWeight: {
       hairline: { fontWeight: "$hairline" },
       thin: { fontWeight: "$thin" },
       light: { fontWeight: "$light" },
@@ -87,20 +83,16 @@ export const textStyles = css(utilityStyles, {
       wider: { letterSpacing: "$wider" },
       widest: { letterSpacing: "$widest" },
     },
-    align: {
+    textAlign: {
       left: { textAlign: "left" },
       right: { textAlign: "right" },
       center: { textAlign: "center" },
       justify: { textAlign: "justify" },
     },
-    capitalized: {
-      true: { textTransform: "capitalize" },
-    },
-    uppercased: {
-      true: { textTransform: "uppercase" },
-    },
-    lowercased: {
-      true: { textTransform: "lowercase" },
+    textTransform: {
+      capitalize: { textTransform: "capitalize" },
+      uppercase: { textTransform: "uppercase" },
+      lowercase: { textTransform: "lowercase" },
     },
     lineClamp: {
       1: { noOfLines: 1 },
@@ -112,4 +104,29 @@ export const textStyles = css(utilityStyles, {
   },
 });
 
+export const textStyles = css(utilityStyles, baseTextStyles, {
+  // Reset
+  margin: 0,
+  padding: 0,
+});
+
+export type BaseTextVariants = VariantProps<typeof baseTextStyles>;
+
 export type TextVariants = VariantProps<typeof textStyles>;
+
+/**
+ * Used to splitProps in <Text/> and <Heading/> component.
+ */
+export const commonTextStyleProps: Array<
+  keyof Pick<BaseTextVariants, "letterSpacing" | "textAlign" | "textTransform" | "lineClamp">
+> = ["letterSpacing", "textAlign", "textTransform", "lineClamp"];
+
+/**
+ * Used to splitProps in <Box/> component.
+ */
+export const baseTextStyleProps: Array<keyof BaseTextVariants> = [
+  ...commonTextStyleProps,
+  "fontSize",
+  "fontFamily",
+  "fontWeight",
+];

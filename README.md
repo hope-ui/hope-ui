@@ -448,7 +448,7 @@ All Hope UI components provides some utility style props that are mapped to a th
 
 Style props are a way to alter the style of a component by simply passing props to it. It helps to save time by providing helpful shorthand ways to style components.
 
-You can only put theme scale values in style props.
+> ⚠️ You can't put arbitrary values in style props.
 
 ### Usage
 

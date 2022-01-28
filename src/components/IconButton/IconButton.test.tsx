@@ -141,7 +141,7 @@ describe("IconButton", () => {
       variant: "light",
       colorScheme: "success",
       size: "lg",
-      rounded: "md",
+      borderRadius: "md",
       compact: true,
       loading: false,
     };

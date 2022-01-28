@@ -133,7 +133,7 @@ describe("Button", () => {
       variant: "light",
       colorScheme: "success",
       size: "lg",
-      rounded: "md",
+      borderRadius: "md",
       uppercase: true,
       compact: true,
       loading: false,

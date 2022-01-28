@@ -4,9 +4,14 @@ import { globalCss } from "./stitches.config";
  * Hope UI css reset
  */
 export const resetStyles = globalCss({
-  /* Use a more-intuitive box-sizing model. */
+  /* 
+    1. Use a more-intuitive box-sizing model. 
+    2. Set default border width and style to apply border props easily  
+  */
   "*, ::before, ::after": {
-    boxSizing: "border-box",
+    boxSizing: "border-box" /* 1 */,
+    borderWidth: "0" /* 2  */,
+    borderStyle: "solid" /* 2  */,
   },
 
   /* Remove default margin. */

@@ -45,3 +45,13 @@ export function generateClassList(config: ClassConfig) {
 export function createCssSelector(hopeClass: string) {
   return `.${hopeClass}`;
 }
+
+// /**
+//  * Get the used props keys from a props object and a reference string array.
+//  * @param obj The props object to check if it contains some keys of the reference array.
+//  * @param reference The reference array to look for.
+//  * @returns An array of the common keys.
+//  */
+// export function getUsedPropsKeys<T>(props: T, reference: string[]) {
+//   return Object.keys(props).filter(key => reference.includes(key)) as Array<keyof T>;
+// }
