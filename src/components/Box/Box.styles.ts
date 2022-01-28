@@ -317,14 +317,14 @@ function createFlexboxUtilityVariants() {
   return {
     flexDirection: {
       row: { flexDirection: "row" } as SystemStyleObject,
-      rowReverse: { flexDirection: "row-reverse" } as SystemStyleObject,
+      "row-reverse": { flexDirection: "row-reverse" } as SystemStyleObject,
       column: { flexDirection: "column" } as SystemStyleObject,
-      columnReverse: { flexDirection: "column-reverse" } as SystemStyleObject,
+      "column-reverse": { flexDirection: "column-reverse" } as SystemStyleObject,
     },
     flexWrap: {
-      noWrap: { flexWrap: "nowrap" } as SystemStyleObject,
+      "no-wrap": { flexWrap: "nowrap" } as SystemStyleObject,
       wrap: { flexWrap: "wrap" } as SystemStyleObject,
-      wrapReverse: { flexWrap: "wrap-reverse" } as SystemStyleObject,
+      "wrap-reverse": { flexWrap: "wrap-reverse" } as SystemStyleObject,
     },
   };
 }
@@ -347,9 +347,9 @@ function createGridUtilityVariants() {
   return {
     gridAutoFlow: {
       row: { gridAutoFlow: "row" } as SystemStyleObject,
-      rowDense: { gridAutoFlow: "row dense" } as SystemStyleObject,
+      "row-dense": { gridAutoFlow: "row dense" } as SystemStyleObject,
       column: { gridAutoFlow: "column" } as SystemStyleObject,
-      columnDense: { gridAutoFlow: "column dense" } as SystemStyleObject,
+      "column-dense": { gridAutoFlow: "column dense" } as SystemStyleObject,
     },
     gridAutoColumns: {
       auto: { gridAutoColumns: "auto" } as SystemStyleObject,

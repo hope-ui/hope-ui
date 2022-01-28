@@ -6,5 +6,6 @@ export * from "./Flex";
 export * from "./Heading";
 export * from "./IconButton";
 export * from "./Spacer";
+export * from "./Stack";
 export * from "./Text";
 export * from "./types";
