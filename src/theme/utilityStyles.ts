@@ -183,13 +183,6 @@ function createFlexboxAndGridItemVariants(): FlexboxAndGridItemUtilityVariants {
       first: { order: "-9999" },
       last: { order: "9999" },
     },
-    justifySelf: {
-      auto: { justifySelf: "auto" },
-      start: { justifySelf: "start" },
-      end: { justifySelf: "end" },
-      center: { justifySelf: "center" },
-      stretch: { justifySelf: "stretch" },
-    },
     alignSelf: {
       auto: { alignSelf: "auto" },
       start: { alignSelf: "flex-start" },
@@ -197,6 +190,13 @@ function createFlexboxAndGridItemVariants(): FlexboxAndGridItemUtilityVariants {
       center: { alignSelf: "center" },
       stretch: { alignSelf: "stretch" },
       baseline: { alignSelf: "baseline" },
+    },
+    justifySelf: {
+      auto: { justifySelf: "auto" },
+      start: { justifySelf: "start" },
+      end: { justifySelf: "end" },
+      center: { justifySelf: "center" },
+      stretch: { justifySelf: "stretch" },
     },
     placeSelf: {
       auto: { placeSelf: "auto" },
@@ -274,7 +274,7 @@ export const utilityStyleProps: Array<keyof UtilityVariants> = [
   "grow",
   "shrink",
   "order",
-  "justifySelf",
   "alignSelf",
+  "justifySelf",
   "placeSelf",
 ];

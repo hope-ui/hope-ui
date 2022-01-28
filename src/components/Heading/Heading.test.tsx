@@ -4,6 +4,7 @@ import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { textStyles, TextVariants } from "../Text/Text.styles";
 import { Heading } from "./Heading";
+import { TextOptions } from "../Text/Text";
 
 describe("Heading", () => {
   afterEach(cleanup);
@@ -126,18 +127,25 @@ describe("Heading", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: TextVariants = {
+    const props: TextOptions = {
       color: "primary500",
-      fontSize: "4xl",
-      fontWeight: "light",
+      size: "4xl",
+      font: "serif",
+      weight: "light",
       textAlign: "justify",
       lineClamp: 3,
     };
-    const textClass = textStyles(variantProps);
+
+    const textClass = textStyles({
+      ...props,
+      fontSize: props.size,
+      fontFamily: props.font,
+      fontWeight: props.weight,
+    });
 
     // act
     renderWithHopeProvider(() => (
-      <Heading data-testid="heading" {...variantProps}>
+      <Heading data-testid="heading" {...props}>
         Heading
       </Heading>
     ));

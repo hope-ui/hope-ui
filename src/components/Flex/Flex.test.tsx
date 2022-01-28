@@ -127,12 +127,11 @@ describe("Flex", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: FlexVariants = {
+      flexDirection: "columnReverse",
+      flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
       gap: "6",
-      direction: "columnReverse",
-      inlineFlex: true,
-      wrap: "wrap",
     };
     const flexClass = flexStyles(variantProps);
 

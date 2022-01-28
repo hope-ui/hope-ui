@@ -505,17 +505,32 @@ The following table shows a list of every style prop and the properties within e
 | maxH    | max-height     | `sizes`     |
 | boxSize | width + height | `sizes`     |
 
-#### Border radius
+#### Flexbox adn Grid
 
-| Prop    | CSS property  | Theme token |
-| ------- | ------------- | ----------- |
-| rounded | border-radius | `radii`     |
+| Prop        | CSS property | Theme token |
+| ----------- | ------------ | ----------- |
+| flex        | flex         | none        |
+| grow        | flex-grow    | none        |
+| shrink      | flex-shrink  | none        |
+| order       | order        | none        |
+| alignSelf   | align-self   | none        |
+| justifySelf | justify-self | none        |
+| placeSelf   | place-self   | none        |
+
+#### Border
+
+| Prop         | CSS property  | Theme token |
+| ------------ | ------------- | ----------- |
+| border       | border-width  | none        |
+| borderStyle  | border-style  | none        |
+| borderColor  | border-color  | `colors`    |
+| borderRadius | border-radius | `radii`     |
 
 #### Shadow
 
-| Prop   | CSS property | Theme token |
-| ------ | ------------ | ----------- |
-| shadow | box-shadow   | `shadows`   |
+| Prop      | CSS property | Theme token |
+| --------- | ------------ | ----------- |
+| boxShadow | box-shadow   | `shadows`   |
 
 ## The `css` prop
 

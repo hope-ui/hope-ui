@@ -4,6 +4,7 @@ import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Text } from "./Text";
 import { textStyles, TextVariants } from "./Text.styles";
+import { TextOptions } from ".";
 
 describe("Text", () => {
   afterEach(cleanup);
@@ -126,18 +127,25 @@ describe("Text", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: TextVariants = {
+    const props: TextOptions = {
       color: "primary500",
-      fontSize: "4xl",
-      fontWeight: "light",
+      size: "4xl",
+      font: "serif",
+      weight: "light",
       textAlign: "justify",
       lineClamp: 3,
     };
-    const textClass = textStyles(variantProps);
+
+    const textClass = textStyles({
+      ...props,
+      fontSize: props.size,
+      fontFamily: props.font,
+      fontWeight: props.weight,
+    });
 
     // act
     renderWithHopeProvider(() => (
-      <Text data-testid="text" {...variantProps}>
+      <Text data-testid="text" {...props}>
         Text
       </Text>
     ));
