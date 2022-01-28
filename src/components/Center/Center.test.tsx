@@ -127,9 +127,7 @@ describe("Center", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: CenterVariants = {
-      fullHeight: true,
-      fullWidth: true,
-      fullSize: true,
+      boxSize: "full",
     };
     const centerClass = centerStyles(variantProps);
 

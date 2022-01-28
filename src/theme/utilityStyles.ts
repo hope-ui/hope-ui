@@ -3,10 +3,26 @@ import { VariantProps } from "@stitches/core";
 import { css, theme } from "./stitches.config";
 import { SystemStyleObject } from "./types";
 
+type ColorsVariant = Record<keyof typeof theme.colors, SystemStyleObject>;
+type RadiiVariant = Record<keyof typeof theme.radii, SystemStyleObject>;
+type ShadowsVariant = Record<keyof typeof theme.shadows, SystemStyleObject>;
 type SpaceVariant = Record<keyof typeof theme.space, SystemStyleObject>;
 type SizesVariant = Record<keyof typeof theme.sizes, SystemStyleObject>;
 
-interface SpacingUtilityVariants {
+interface ColorUtilityVariants {
+  color: ColorsVariant;
+  bg: ColorsVariant;
+}
+
+interface RadiiUtilityVariants {
+  rounded: RadiiVariant;
+}
+
+interface ShadowUtilityVariants {
+  shadow: ShadowsVariant;
+}
+
+interface SpaceUtilityVariants {
   // Margin
   m: SpaceVariant;
   mx: SpaceVariant;
@@ -26,7 +42,45 @@ interface SpacingUtilityVariants {
   pl: SpaceVariant;
 }
 
-function createSpacingVariants(): SpacingUtilityVariants {
+interface SizeUtilityVariants {
+  w: SizesVariant;
+  minW: SizesVariant;
+  maxW: SizesVariant;
+  h: SizesVariant;
+  minH: SizesVariant;
+  maxH: SizesVariant;
+  boxSize: SizesVariant;
+}
+
+function createColorVariants(): ColorUtilityVariants {
+  return Object.keys(theme.colors).reduce(
+    (acc, key) => ({
+      color: { ...acc.color, [key]: { color: `$${key}` } as SystemStyleObject },
+      bg: { ...acc.bg, [key]: { bg: `$${key}` } as SystemStyleObject },
+    }),
+    {} as ColorUtilityVariants
+  );
+}
+
+function createRadiiVariants(): RadiiUtilityVariants {
+  return Object.keys(theme.radii).reduce(
+    (acc, key) => ({
+      rounded: { ...acc.rounded, [key]: { borderRadius: `$${key}` } as SystemStyleObject },
+    }),
+    {} as RadiiUtilityVariants
+  );
+}
+
+function createShadowVariants(): ShadowUtilityVariants {
+  return Object.keys(theme.shadows).reduce(
+    (acc, key) => ({
+      shadow: { ...acc.shadow, [key]: { boxShadow: `$${key}` } as SystemStyleObject },
+    }),
+    {} as ShadowUtilityVariants
+  );
+}
+
+function createSpaceVariants(): SpaceUtilityVariants {
   return Object.keys(theme.space).reduce(
     (acc, key) => ({
       m: { ...acc.m, [key]: { m: `$${key}` } as SystemStyleObject },
@@ -45,21 +99,11 @@ function createSpacingVariants(): SpacingUtilityVariants {
       pb: { ...acc.pb, [key]: { pb: `$${key}` } as SystemStyleObject },
       pl: { ...acc.pl, [key]: { pl: `$${key}` } as SystemStyleObject },
     }),
-    {} as SpacingUtilityVariants
+    {} as SpaceUtilityVariants
   );
 }
 
-interface SizeUtilityVariants {
-  w: SizesVariant;
-  minW: SizesVariant;
-  maxW: SizesVariant;
-  h: SizesVariant;
-  minH: SizesVariant;
-  maxH: SizesVariant;
-  boxSize: SizesVariant;
-}
-
-function createSizesVariants(): SizeUtilityVariants {
+function createSizeVariants(): SizeUtilityVariants {
   return Object.keys(theme.sizes).reduce(
     (acc, key) => ({
       w: { ...acc.w, [key]: { w: `$${key}` } as SystemStyleObject },
@@ -79,9 +123,52 @@ function createSizesVariants(): SizeUtilityVariants {
  */
 export const utilityStyles = css({
   variants: {
-    ...createSpacingVariants(),
-    ...createSizesVariants(),
+    ...createColorVariants(),
+    ...createRadiiVariants(),
+    ...createShadowVariants(),
+    ...createSpaceVariants(),
+    ...createSizeVariants(),
   },
 });
 
 export type UtilityVariants = VariantProps<typeof utilityStyles>;
+
+/**
+ * Array of utilityStyles props that are commonly splited with SolidJS `splitProps` method.
+ */
+export const utilityStyleProps: Array<keyof UtilityVariants> = [
+  // Color
+  "color",
+  "bg",
+
+  // Radii
+  "rounded",
+
+  // Shadows
+  "shadow",
+
+  // Space
+  "m",
+  "mx",
+  "my",
+  "mt",
+  "mr",
+  "mb",
+  "ml",
+  "p",
+  "px",
+  "py",
+  "pt",
+  "pr",
+  "pb",
+  "pl",
+
+  // Size
+  "w",
+  "minW",
+  "maxW",
+  "h",
+  "minH",
+  "maxH",
+  "boxSize",
+];

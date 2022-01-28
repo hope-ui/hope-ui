@@ -186,7 +186,7 @@ export const buttonStyles = css(utilityStyles, {
         backgroundColor: "transparent",
       },
     },
-    color: {
+    colorScheme: {
       primary: {},
       dark: {},
       neutral: {},
@@ -232,17 +232,6 @@ export const buttonStyles = css(utilityStyles, {
         spacing: "$2",
       }),
     },
-    radius: {
-      none: { borderRadius: "0" },
-      xs: { borderRadius: "$xs" },
-      sm: { borderRadius: "$sm" },
-      md: { borderRadius: "$md" },
-      lg: { borderRadius: "$lg" },
-      xl: { borderRadius: "$xl" },
-      "2xl": { borderRadius: "$2xl" },
-      "3xl": { borderRadius: "$3xl" },
-      full: { borderRadius: "$full" },
-    },
     compact: { true: {} },
     uppercase: {
       true: { textTransform: "uppercase" },
@@ -268,37 +257,37 @@ export const buttonStyles = css(utilityStyles, {
      ******************************/
     {
       variant: "filled",
-      color: "primary",
+      colorScheme: "primary",
       css: createFilledCompoundVariant({ bgColor: "$primary500", bgColorHover: "$primary600" }),
     },
     {
       variant: "filled",
-      color: "dark",
+      colorScheme: "dark",
       css: createFilledCompoundVariant({ bgColor: "$dark500", bgColorHover: "$dark800" }),
     },
     {
       variant: "filled",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createFilledCompoundVariant({ bgColor: "$neutral500", bgColorHover: "$neutral600" }),
     },
     {
       variant: "filled",
-      color: "success",
+      colorScheme: "success",
       css: createFilledCompoundVariant({ bgColor: "$success500", bgColorHover: "$success600" }),
     },
     {
       variant: "filled",
-      color: "info",
+      colorScheme: "info",
       css: createFilledCompoundVariant({ bgColor: "$info500", bgColorHover: "$info600" }),
     },
     {
       variant: "filled",
-      color: "warning",
+      colorScheme: "warning",
       css: createFilledCompoundVariant({ bgColor: "$warning500", bgColorHover: "$warning600" }),
     },
     {
       variant: "filled",
-      color: "danger",
+      colorScheme: "danger",
       css: createFilledCompoundVariant({ bgColor: "$danger500", bgColorHover: "$danger600" }),
     },
     /**
@@ -306,7 +295,7 @@ export const buttonStyles = css(utilityStyles, {
      ******************************/
     {
       variant: "light",
-      color: "primary",
+      colorScheme: "primary",
       css: createLightCompoundVariant({
         color: "$primary600",
         bgColor: "$primary50",
@@ -315,7 +304,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "dark",
+      colorScheme: "dark",
       css: createLightCompoundVariant({
         color: "$dark800",
         bgColor: "$dark50",
@@ -324,7 +313,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createLightCompoundVariant({
         color: "$neutral600",
         bgColor: "$neutral100",
@@ -333,7 +322,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "success",
+      colorScheme: "success",
       css: createLightCompoundVariant({
         color: "$success600",
         bgColor: "$success50",
@@ -342,7 +331,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "info",
+      colorScheme: "info",
       css: createLightCompoundVariant({
         color: "$info600",
         bgColor: "$info50",
@@ -351,7 +340,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "warning",
+      colorScheme: "warning",
       css: createLightCompoundVariant({
         color: "$warning600",
         bgColor: "$warning50",
@@ -360,7 +349,7 @@ export const buttonStyles = css(utilityStyles, {
     },
     {
       variant: "light",
-      color: "danger",
+      colorScheme: "danger",
       css: createLightCompoundVariant({
         color: "$danger600",
         bgColor: "$danger50",
@@ -372,37 +361,37 @@ export const buttonStyles = css(utilityStyles, {
      ******************************/
     {
       variant: "outline",
-      color: "primary",
+      colorScheme: "primary",
       css: createOutlineCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
       variant: "outline",
-      color: "dark",
+      colorScheme: "dark",
       css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "outline",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
       variant: "outline",
-      color: "success",
+      colorScheme: "success",
       css: createOutlineCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
       variant: "outline",
-      color: "info",
+      colorScheme: "info",
       css: createOutlineCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
       variant: "outline",
-      color: "warning",
+      colorScheme: "warning",
       css: createOutlineCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
       variant: "outline",
-      color: "danger",
+      colorScheme: "danger",
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
@@ -410,37 +399,37 @@ export const buttonStyles = css(utilityStyles, {
      ******************************/
     {
       variant: "dashed",
-      color: "primary",
+      colorScheme: "primary",
       css: createOutlineCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
       variant: "dashed",
-      color: "dark",
+      colorScheme: "dark",
       css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "dashed",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
       variant: "dashed",
-      color: "success",
+      colorScheme: "success",
       css: createOutlineCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
       variant: "dashed",
-      color: "info",
+      colorScheme: "info",
       css: createOutlineCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
       variant: "dashed",
-      color: "warning",
+      colorScheme: "warning",
       css: createOutlineCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
       variant: "dashed",
-      color: "danger",
+      colorScheme: "danger",
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
@@ -448,37 +437,37 @@ export const buttonStyles = css(utilityStyles, {
      ******************************/
     {
       variant: "text",
-      color: "primary",
+      colorScheme: "primary",
       css: createTextCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
       variant: "text",
-      color: "dark",
+      colorScheme: "dark",
       css: createTextCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "text",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createTextCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
       variant: "text",
-      color: "success",
+      colorScheme: "success",
       css: createTextCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
       variant: "text",
-      color: "info",
+      colorScheme: "info",
       css: createTextCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
       variant: "text",
-      color: "warning",
+      colorScheme: "warning",
       css: createTextCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
       variant: "text",
-      color: "danger",
+      colorScheme: "danger",
       css: createTextCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**

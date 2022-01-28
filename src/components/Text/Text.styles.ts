@@ -1,20 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
-import { css, theme } from "@/theme/stitches.config";
-import { SystemStyleObject } from "@/theme/types";
+import { css } from "@/theme/stitches.config";
 import { utilityStyles } from "@/theme/utilityStyles";
-
-type ColorVariants = Record<keyof typeof theme.colors, SystemStyleObject>;
-
-function createColorVariants(): ColorVariants {
-  return Object.keys(theme.colors).reduce(
-    (acc, key) => ({
-      ...acc,
-      [key]: { color: `$${key}` } as SystemStyleObject,
-    }),
-    {} as ColorVariants
-  );
-}
 
 export const textStyles = css(utilityStyles, {
   // Reset
@@ -76,6 +63,11 @@ export const textStyles = css(utilityStyles, {
         lineHeight: "$none",
       },
     },
+    font: {
+      sans: { fontFamily: "$sans" },
+      serif: { fontFamily: "$serif" },
+      mono: { fontFamily: "$mono" },
+    },
     weight: {
       hairline: { fontWeight: "$hairline" },
       thin: { fontWeight: "$thin" },
@@ -87,12 +79,28 @@ export const textStyles = css(utilityStyles, {
       extrabold: { fontWeight: "$extrabold" },
       black: { fontWeight: "$black" },
     },
-    color: createColorVariants(),
+    letterSpacing: {
+      tighter: { letterSpacing: "$tighter" },
+      tight: { letterSpacing: "$tight" },
+      normal: { letterSpacing: "$normal" },
+      wide: { letterSpacing: "$wide" },
+      wider: { letterSpacing: "$wider" },
+      widest: { letterSpacing: "$widest" },
+    },
     align: {
       left: { textAlign: "left" },
       right: { textAlign: "right" },
       center: { textAlign: "center" },
       justify: { textAlign: "justify" },
+    },
+    capitalized: {
+      true: { textTransform: "capitalize" },
+    },
+    uppercased: {
+      true: { textTransform: "uppercase" },
+    },
+    lowercased: {
+      true: { textTransform: "lowercase" },
     },
     lineClamp: {
       1: { noOfLines: 1 },
@@ -101,11 +109,6 @@ export const textStyles = css(utilityStyles, {
       4: { noOfLines: 4 },
       5: { noOfLines: 5 },
     },
-  },
-  defaultVariants: {
-    size: "base",
-    weight: "normal",
-    color: "dark900",
   },
 });
 

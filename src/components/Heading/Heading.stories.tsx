@@ -16,6 +16,9 @@ export default {
     ),
   ],
   argTypes: {
+    color: {
+      control: "text",
+    },
     size: {
       control: { type: "select" },
       options: [
@@ -34,6 +37,10 @@ export default {
         "9xl",
       ],
     },
+    font: {
+      control: { type: "select" },
+      options: ["sans", "serif", "mono"],
+    },
     weight: {
       control: { type: "select" },
       options: [
@@ -48,12 +55,22 @@ export default {
         "black",
       ],
     },
-    color: {
-      control: "text",
+    letterSpacing: {
+      control: { type: "select" },
+      options: ["tighter", "tight", "normal", "wide", "wider", "widest"],
     },
     align: {
       control: { type: "select" },
       options: ["left", "right", "center", "justify"],
+    },
+    capitalized: {
+      control: "boolean",
+    },
+    uppercased: {
+      control: "boolean",
+    },
+    lowercased: {
+      control: "boolean",
     },
     lineClamp: {
       control: { type: "select" },
@@ -64,10 +81,16 @@ export default {
     },
   },
   args: {
-    size: "base",
-    weight: "semibold",
     color: "dark900",
+    size: "base",
+    font: "sans",
+    weight: "normal",
+    letterSpacing: "normal",
     align: "left",
+    capitalized: false,
+    uppercased: false,
+    lowercased: false,
+    lineClamp: "none",
     children:
       'Monkey D. Luffy, also known as "Straw Hat Luffy" and commonly as "Straw Hat", is the main protagonist of the manga and anime, One Piece. He is the founder and captain of the increasingly infamous and powerful Straw Hat Pirates, as well as one of its top fighters. His lifelong dream is to become the Pirate King by finding the legendary treasure left behind by the late Gol D. Roger. He believes that being the Pirate King means having the most freedom in the world.',
   },

@@ -33,11 +33,6 @@ export const containerStyles = css(utilityStyles, {
       },
     },
   },
-
-  defaultVariants: {
-    centered: true,
-    centerContent: false,
-  },
 });
 
 export type ContainerVariants = VariantProps<typeof containerStyles>;

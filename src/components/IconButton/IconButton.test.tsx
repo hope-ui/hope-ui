@@ -123,9 +123,9 @@ describe("IconButton", () => {
     expect(button).toHaveClass(iconButtonClass.className);
   });
 
-  it("should have stitches generated class from Button theme by default", () => {
+  it("should have stitches generated class from buttonStyles", () => {
     // arrange
-    const buttonClass = buttonStyles(defaultTheme.components.Button);
+    const buttonClass = buttonStyles();
 
     // act
     renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
@@ -139,9 +139,9 @@ describe("IconButton", () => {
     // arrange
     const variantProps: Omit<IconButtonOptions, "aria-label" | "icon"> = {
       variant: "light",
-      color: "success",
+      colorScheme: "success",
       size: "lg",
-      radius: "md",
+      rounded: "md",
       compact: true,
       loading: false,
     };

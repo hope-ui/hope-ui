@@ -115,9 +115,9 @@ describe("Button", () => {
     expect(button).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from Button theme by default", () => {
+  it("should have stitches generated class from buttonStyles", () => {
     // arrange
-    const buttonClass = buttonStyles(defaultTheme.components.Button);
+    const buttonClass = buttonStyles();
 
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
@@ -131,9 +131,9 @@ describe("Button", () => {
     // arrange
     const variantProps: ButtonVariants = {
       variant: "light",
-      color: "success",
+      colorScheme: "success",
       size: "lg",
-      radius: "md",
+      rounded: "md",
       uppercase: true,
       compact: true,
       loading: false,

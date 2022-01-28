@@ -1,8 +1,10 @@
-import { splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { utilityStyleProps } from "@/theme/utilityStyles";
+
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { containerStyles, ContainerVariants } from "./Container.styles";
 
 export type ContainerProps<C extends ElementType> = PolymorphicComponentProps<C, ContainerVariants>;
@@ -17,6 +19,13 @@ const hopeContainerClass = "hope-container";
  *
  */
 export function Container<C extends ElementType = "div">(props: ContainerProps<C>) {
+  const defaultProps: ContainerProps<"div"> = {
+    as: "div",
+    centered: true,
+    centerContent: false,
+  };
+
+  props = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(props, commonProps, [
     ...utilityStyleProps,
     "css",
@@ -34,7 +43,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
     });
   };
 
-  return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
+  return <Dynamic component={local.as} classList={classList()} {...others} />;
 }
 
 Container.toString = () => createCssSelector(hopeContainerClass);

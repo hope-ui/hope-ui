@@ -4,10 +4,10 @@ import { Dynamic } from "solid-js/web";
 import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
-import { UtilityVariants } from "@/theme/utilityStyles";
+import { utilityStyleProps, UtilityVariants } from "@/theme/utilityStyles";
 
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export type ButtonOptions = ButtonVariants & {
@@ -18,11 +18,15 @@ export type ButtonOptions = ButtonVariants & {
   rightIcon?: JSX.Element;
 };
 
-export type CommonOmitableButtonOptions = "disabled" | "loading" | "loader";
+export type CommonOmitableButtonOptions =
+  | keyof Omit<UtilityVariants, "rounded">
+  | "disabled"
+  | "loading"
+  | "loader";
 
 export type ThemeableButtonOptions = Omit<
   ButtonOptions,
-  keyof UtilityVariants | CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
+  CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
 >;
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
@@ -39,9 +43,9 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
     variant: theme?.defaultProps?.variant ?? "filled",
-    color: theme?.defaultProps?.color ?? "primary",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    radius: theme?.defaultProps?.radius ?? "sm",
+    rounded: theme?.defaultProps?.rounded ?? "sm",
     loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     compact: theme?.defaultProps?.compact ?? false,
     uppercase: theme?.defaultProps?.uppercase ?? false,
@@ -61,9 +65,8 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       ...utilityStyleProps,
       "css",
       "variant",
-      "color",
+      "colorScheme",
       "size",
-      "radius",
       "loading",
       "compact",
       "uppercase",

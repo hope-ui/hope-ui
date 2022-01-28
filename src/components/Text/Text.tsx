@@ -2,9 +2,10 @@ import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { useTheme } from "@/contexts/HopeContext";
+import { utilityStyleProps } from "@/theme/utilityStyles";
 
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList, utilityStyleProps } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { textStyles, TextVariants } from "./Text.styles";
 
 export type ThemeableTextOptions = Omit<TextVariants, "lineClamp">;
@@ -22,10 +23,10 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   const defaultProps: TextProps<"p"> = {
     as: "p",
+    color: theme?.defaultProps?.color ?? "dark900",
     size: theme?.defaultProps?.size ?? "base",
     weight: theme?.defaultProps?.weight ?? "normal",
     align: theme?.defaultProps?.align ?? "left",
-    color: theme?.defaultProps?.color ?? "dark900",
   };
 
   props = mergeProps(defaultProps, props);
@@ -33,9 +34,13 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
     ...utilityStyleProps,
     "css",
     "size",
+    "font",
     "weight",
-    "color",
+    "letterSpacing",
     "align",
+    "capitalized",
+    "uppercased",
+    "lowercased",
     "lineClamp",
   ]);
 

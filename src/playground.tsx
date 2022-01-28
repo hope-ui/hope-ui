@@ -7,7 +7,9 @@ import { HopeProvider, Text } from ".";
 export function App() {
   return (
     <HopeProvider>
-      <Text color="info500">Hope UI</Text>
+      <Text uppercased color="info500">
+        Hope UI
+      </Text>
     </HopeProvider>
   );
 }

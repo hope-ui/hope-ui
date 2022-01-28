@@ -1,5 +1,3 @@
-import { UtilityVariants } from "@/theme/utilityStyles";
-
 import { AsProp, ClassProps } from "./types";
 
 export interface ClassConfig extends ClassProps {
@@ -23,33 +21,6 @@ export const commonProps: Array<keyof (AsProp<any> & ClassProps)> = [
   "class",
   "className",
   "classList",
-];
-
-/**
- * Array of utilityStyles props that are commonly splited with SolidJS `splitProps` method.
- */
-export const utilityStyleProps: Array<keyof UtilityVariants> = [
-  "m",
-  "mx",
-  "my",
-  "mt",
-  "mr",
-  "mb",
-  "ml",
-  "p",
-  "px",
-  "py",
-  "pt",
-  "pr",
-  "pb",
-  "pl",
-  "w",
-  "minW",
-  "maxW",
-  "h",
-  "minH",
-  "maxH",
-  "boxSize",
 ];
 
 /**

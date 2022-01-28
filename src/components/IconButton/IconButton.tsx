@@ -1,7 +1,6 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/contexts/HopeContext";
-import { UtilityVariants } from "@/theme/utilityStyles";
 
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
@@ -18,7 +17,7 @@ export type IconButtonOptions = Omit<
 
 export type ThemeableIconButtonOptions = Omit<
   IconButtonOptions,
-  keyof UtilityVariants | CommonOmitableButtonOptions | "aria-label" | "icon"
+  CommonOmitableButtonOptions | "aria-label" | "icon"
 >;
 
 export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
@@ -37,9 +36,9 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
 
   const defaultProps: Required<ThemeableIconButtonOptions> = {
     variant: theme?.defaultProps?.variant ?? "filled",
-    color: theme?.defaultProps?.color ?? "primary",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    radius: theme?.defaultProps?.radius ?? "sm",
+    rounded: theme?.defaultProps?.rounded ?? "sm",
     compact: theme?.defaultProps?.compact ?? false,
   };
 
