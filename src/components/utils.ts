@@ -20,9 +20,9 @@ export function generateClassList(config: ClassConfig) {
     [config.hopeClass]: true,
     [config.baseClass]: true,
     //[themeBaseClass]: true,
-    [config.class ?? ""]: true,
-    [config.className ?? ""]: true,
-    ...config.classList,
+    [config.classProps.class ?? ""]: true,
+    [config.classProps.className ?? ""]: true,
+    ...config.classProps.classList,
   };
 }
 

@@ -20,9 +20,7 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
     return generateClassList({
       hopeClass: hopeBoxClass,
       baseClass: boxStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

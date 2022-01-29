@@ -5,7 +5,7 @@ import { useTheme } from "@/contexts/HopeContext";
 import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
+import { createCssSelector, generateClassList } from "../utils";
 
 export interface IconButtonOptions
   extends Omit<
@@ -43,27 +43,24 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     compact: theme?.defaultProps?.compact ?? false,
   };
 
-  props = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(props, [...commonProps, "children", "icon"]);
+  const propsWithDefault: IconButtonProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "className",
+    "classList",
+    "children",
+    "icon",
+  ]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeIconButtonClass,
       baseClass: iconButtonStyles(),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 
-  return (
-    <Button
-      as={local.as as ElementType}
-      classList={classList()}
-      leftIcon={local.icon}
-      {...others}
-    />
-  );
+  return <Button classList={classList()} leftIcon={local.icon} {...others} />;
 }
 
 IconButton.toString = () => createCssSelector(hopeIconButtonClass);

@@ -4,7 +4,7 @@ import { css } from "@/theme/stitches.config";
 
 import { boxStyles } from "../Box/Box.styles";
 
-export const textStyles = css(boxStyles, {
+export const baseTextStyles = css(boxStyles, {
   variants: {
     size: {
       xs: {
@@ -63,4 +63,4 @@ export const textStyles = css(boxStyles, {
   },
 });
 
-export type TextVariants = VariantProps<typeof textStyles>;
+export type BaseTextVariants = VariantProps<typeof baseTextStyles>;

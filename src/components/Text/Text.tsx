@@ -1,24 +1,21 @@
-import { splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
-import { textStyles, TextVariants } from "./Text.styles";
+import { baseTextStyles, BaseTextVariants } from "./Text.styles";
 
-export type TextOptions = TextVariants & {
-  size?: TextVariants["fontSize"];
+export type BaseTextOptions = BaseTextVariants & {
+  size?: BaseTextVariants["fontSize"];
 };
 
-export type TextProps<C extends ElementType> = PolymorphicComponentProps<C, TextOptions>;
-
-const hopeTextClass = "hope-text";
+export type BaseTextProps<C extends ElementType> = PolymorphicComponentProps<C, BaseTextOptions>;
 
 /**
- * Text component is the used to render text and paragraphs within an interface.
- * It renders a <p> tag by default.
+ * [Internal] Foundation of <Text /> and <Heading /> components.
  */
-export function Text<C extends ElementType = "p">(props: TextProps<C>) {
+export function BaseText<C extends ElementType = "p">(props: BaseTextProps<C>) {
   const [local, styleProps, others] = splitProps(props, commonProps, [
     ...boxPropNames,
     "css",
@@ -27,18 +24,44 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   const classList = () => {
     return generateClassList({
-      hopeClass: hopeTextClass,
-      baseClass: textStyles({
-        ...styleProps,
-        fontSize: styleProps.size,
-      }),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      hopeClass: "",
+      baseClass: baseTextStyles(styleProps),
+      classProps: local,
     });
   };
 
   return <Dynamic component={local.as ?? "p"} classList={classList()} {...others} />;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Text
+ * -----------------------------------------------------------------------------------------------*/
+
+export type TextProps<C extends ElementType> = BaseTextProps<C>;
+
+const hopeTextClass = "hope-text";
+
+/**
+ * Text component is the used to render text and paragraphs within an interface.
+ * It renders a <p> tag by default.
+ */
+export function Text<C extends ElementType = "p">(props: TextProps<C>) {
+  const defaultProps: TextProps<"p"> = {
+    as: "p",
+  };
+
+  const propsWithDefault: TextProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
+
+  const classList = () => {
+    return generateClassList({
+      hopeClass: hopeTextClass,
+      baseClass: "",
+      classProps: local,
+    });
+  };
+
+  return <BaseText classList={classList()} {...others} />;
 }
 
 Text.toString = () => createCssSelector(hopeTextClass);

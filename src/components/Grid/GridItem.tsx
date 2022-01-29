@@ -27,9 +27,9 @@ export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>)
     as: "div",
   };
 
-  props = mergeProps(defaultProps, props);
+  const propsWithDefault: GridItemProps<C> = mergeProps(defaultProps, props);
   const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    props,
+    propsWithDefault,
     commonProps,
     [...boxPropNames, "css"],
     ["colSpan", "colStart", "colEnd", "rowSpan", "rowStart", "rowEnd"]
@@ -47,9 +47,7 @@ export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>)
         gridRowEnd: shorthandStyleProps.rowEnd,
         ...styleProps, // longhand props if provided will override the short ones
       }),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

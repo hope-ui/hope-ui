@@ -2,8 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { Flex, FlexOptions } from "./Flex";
-import { flexStyles } from "./Flex.styles";
+import { BaseFlexOptions, Flex } from "./Flex";
+import { baseFlexStyles } from "./Flex.styles";
 
 describe("Flex", () => {
   afterEach(cleanup);
@@ -86,7 +86,7 @@ describe("Flex", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Flex data-testid="flex" className={stubClass}>
+      <Flex data-testid="flex" class={stubClass}>
         Flex
       </Flex>
     ));
@@ -114,7 +114,7 @@ describe("Flex", () => {
 
   it("should have stitches generated class from flexStyles", () => {
     // arrange
-    const flexClass = flexStyles();
+    const flexClass = baseFlexStyles();
 
     // act
     renderWithHopeProvider(() => <Flex data-testid="flex">Flex</Flex>);
@@ -126,14 +126,14 @@ describe("Flex", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: FlexOptions = {
+    const variantProps: BaseFlexOptions = {
       direction: "column-reverse",
       wrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
       gap: "6",
     };
-    const flexClass = flexStyles({
+    const flexClass = baseFlexStyles({
       ...variantProps,
       flexDirection: variantProps.direction,
       flexWrap: variantProps.wrap,
@@ -154,7 +154,7 @@ describe("Flex", () => {
   it("should have stitches generated class from css prop", () => {
     // arrange
     const customCSS = { bg: "red" };
-    const flexClass = flexStyles({ css: customCSS });
+    const flexClass = baseFlexStyles({ css: customCSS });
 
     // act
     renderWithHopeProvider(() => (

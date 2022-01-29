@@ -1,6 +1,6 @@
 {
   "name": "hope-ui-solid",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
@@ -85,6 +85,7 @@
     "@types/jest": "^27.4.0",
     "@types/lodash.merge": "4.6.6",
     "@types/node": "17.0.8",
+    "@types/prismjs": "^1.26.0",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
     "babel-loader": "8.2.3",

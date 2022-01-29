@@ -21,9 +21,7 @@ export function Spacer<C extends ElementType = "div">(props: SpacerProps<C>) {
     return generateClassList({
       hopeClass: hopeSpacerClass,
       baseClass: spacerStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

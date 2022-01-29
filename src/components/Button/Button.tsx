@@ -57,9 +57,9 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     role: "button",
   };
 
-  props = mergeProps(defaultProps, props);
+  const propsWithDefault: ButtonProps<C> = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(
-    props,
+    propsWithDefault,
     [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
     [...boxPropNames, "css", "variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
@@ -68,9 +68,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     return generateClassList({
       hopeClass: hopeButtonClass,
       baseClass: buttonStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 
@@ -100,7 +98,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     <Dynamic component={local.as} classList={classList()} disabled={local.disabled} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
-        <span className={loaderClass}>{local.loader}</span>
+        <span class={loaderClass}>{local.loader}</span>
       </Show>
       <Show when={local.children}>
         <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
@@ -109,7 +107,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       </Show>
       <Show when={isRightIconVisible()}>{local.rightIcon}</Show>
       <Show when={isRightLoaderVisible()}>
-        <span className={loaderClass}>{local.loader}</span>
+        <span class={loaderClass}>{local.loader}</span>
       </Show>
     </Dynamic>
   );

@@ -24,8 +24,8 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
     centerContent: false,
   };
 
-  props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
+  const propsWithDefault: ContainerProps<C> = mergeProps(defaultProps, props);
+  const [local, styleProps, others] = splitProps(propsWithDefault, commonProps, [
     ...boxPropNames,
     "css",
     "centered",
@@ -36,9 +36,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
     return generateClassList({
       hopeClass: hopeContainerClass,
       baseClass: containerStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

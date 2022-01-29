@@ -2,8 +2,9 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { HStack, HStackOptions, Stack, StackOptions, VStack, VStackOptions } from "./Stack";
-import { stackStyles } from "./Stack.styles";
+import { BaseFlexOptions } from "../Flex/Flex";
+import { baseFlexStyles } from "../Flex/Flex.styles";
+import { HStack, HStackOptions, Stack, VStack, VStackOptions } from "./Stack";
 
 describe("Stack", () => {
   afterEach(cleanup);
@@ -86,7 +87,7 @@ describe("Stack", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Stack data-testid="stack" className={stubClass}>
+      <Stack data-testid="stack" class={stubClass}>
         Stack
       </Stack>
     ));
@@ -112,9 +113,9 @@ describe("Stack", () => {
     expect(stack).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from stackStyles", () => {
+  it("should have stitches generated class from baseFlexStyles", () => {
     // arrange
-    const stackClass = stackStyles();
+    const stackClass = baseFlexStyles();
 
     // act
     renderWithHopeProvider(() => <Stack data-testid="stack">Stack</Stack>);
@@ -126,7 +127,7 @@ describe("Stack", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: StackOptions = {
+    const variantProps: BaseFlexOptions = {
       direction: "column-reverse",
       wrap: "wrap",
       alignItems: "center",
@@ -134,7 +135,7 @@ describe("Stack", () => {
       gap: "6",
     };
 
-    const stackClass = stackStyles({
+    const stackClass = baseFlexStyles({
       ...variantProps,
       flexDirection: variantProps.direction,
       flexWrap: variantProps.wrap,
@@ -155,7 +156,7 @@ describe("Stack", () => {
   it("should have stitches generated class from css prop", () => {
     // arrange
     const customCSS = { bg: "red" };
-    const stackClass = stackStyles({ css: customCSS });
+    const stackClass = baseFlexStyles({ css: customCSS });
 
     // act
     renderWithHopeProvider(() => (
@@ -176,7 +177,7 @@ describe("VStack", () => {
   it("should have flexDirection set to column", () => {
     // arrange
 
-    const stackClass = stackStyles({
+    const stackClass = baseFlexStyles({
       flexDirection: "column",
     });
 
@@ -194,7 +195,7 @@ describe("VStack", () => {
       spacing: "4",
     };
 
-    const stackClass = stackStyles({
+    const stackClass = baseFlexStyles({
       rowGap: variantProps.spacing,
     });
 
@@ -217,7 +218,7 @@ describe("HStack", () => {
   it("should have flexDirection set to row", () => {
     // arrange
 
-    const stackClass = stackStyles({
+    const stackClass = baseFlexStyles({
       flexDirection: "row",
     });
 
@@ -235,7 +236,7 @@ describe("HStack", () => {
       spacing: "4",
     };
 
-    const stackClass = stackStyles({
+    const stackClass = baseFlexStyles({
       columnGap: variantProps.spacing,
     });
 

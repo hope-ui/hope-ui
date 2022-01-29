@@ -2,8 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { TextOptions } from "../Text/Text";
-import { textStyles } from "../Text/Text.styles";
+import { BaseTextOptions } from "../Text/Text";
+import { baseTextStyles } from "../Text/Text.styles";
 import { Heading } from "./Heading";
 
 describe("Heading", () => {
@@ -87,7 +87,7 @@ describe("Heading", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Heading data-testid="heading" className={stubClass}>
+      <Heading data-testid="heading" class={stubClass}>
         Heading
       </Heading>
     ));
@@ -115,7 +115,7 @@ describe("Heading", () => {
 
   it("should have stitches generated class from textStyles", () => {
     // arrange
-    const textClass = textStyles();
+    const textClass = baseTextStyles();
 
     // act
     renderWithHopeProvider(() => <Heading data-testid="heading">Heading</Heading>);
@@ -127,7 +127,7 @@ describe("Heading", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const props: TextOptions = {
+    const props: BaseTextOptions = {
       color: "primary500",
       size: "4xl",
       fontFamily: "serif",
@@ -136,10 +136,7 @@ describe("Heading", () => {
       lineClamp: 3,
     };
 
-    const textClass = textStyles({
-      ...props,
-      fontSize: props.size,
-    });
+    const textClass = baseTextStyles(props);
 
     // act
     renderWithHopeProvider(() => (
@@ -156,7 +153,7 @@ describe("Heading", () => {
   it("should have stitches generated class from css prop", () => {
     // arrange
     const customCSS = { bg: "red" };
-    const textClass = textStyles({ css: customCSS });
+    const textClass = baseTextStyles({ css: customCSS });
 
     // act
     renderWithHopeProvider(() => (

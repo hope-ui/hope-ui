@@ -27,9 +27,9 @@ export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
     as: "div",
   };
 
-  props = mergeProps(defaultProps, props);
+  const propsWithDefault: GridProps<C> = mergeProps(defaultProps, props);
   const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    props,
+    propsWithDefault,
     commonProps,
     [...boxPropNames, "css"],
     ["autoFlow", "autoColumns", "autoRows", "columns", "rows"]
@@ -46,9 +46,7 @@ export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
         gridTemplateRows: shorthandStyleProps.rows,
         ...styleProps, // longhand props if provided will override the short ones
       }),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

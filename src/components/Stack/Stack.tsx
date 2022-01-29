@@ -1,20 +1,16 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
-import { stackStyles, StackVariants } from "./Stack.styles";
+import { BaseFlex, BaseFlexOptions, BaseFlexProps } from "../Flex/Flex";
+import { ElementType } from "../types";
+import { createCssSelector, generateClassList } from "../utils";
 
-export interface StackOptions extends StackVariants {
-  direction?: StackVariants["flexDirection"];
-  wrap?: StackVariants["flexWrap"];
-}
-
-export type StackProps<C extends ElementType> = PolymorphicComponentProps<C, StackOptions>;
+export type StackProps<C extends ElementType> = BaseFlexProps<C>;
 
 const hopeStackClass = "hope-stack";
 
+/**
+ * [Internal] Foundation of <VStack /> and <HStack /> components.
+ */
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const defaultProps: StackProps<"div"> = {
     as: "div",
@@ -24,29 +20,18 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
     wrap: "nowrap",
   };
 
-  props = mergeProps(defaultProps, props);
-  const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    props,
-    commonProps,
-    [...boxPropNames, "css"],
-    ["direction", "wrap"]
-  );
+  const propsWithDefault: StackProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeStackClass,
-      baseClass: stackStyles({
-        flexDirection: shorthandStyleProps.direction,
-        flexWrap: shorthandStyleProps.wrap,
-        ...styleProps, // longhand props if provided will override the short ones
-      }),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      baseClass: "",
+      classProps: local,
     });
   };
 
-  return <Dynamic component={local.as} classList={classList()} {...others} />;
+  return <BaseFlex classList={classList()} {...others} />;
 }
 
 Stack.toString = () => createCssSelector(hopeStackClass);
@@ -55,8 +40,8 @@ Stack.toString = () => createCssSelector(hopeStackClass);
  * VStack
  * -----------------------------------------------------------------------------------------------*/
 
-export interface VStackOptions extends StackOptions {
-  spacing?: StackVariants["rowGap"];
+export interface VStackOptions extends BaseFlexOptions {
+  spacing?: BaseFlexOptions["rowGap"];
 }
 
 export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
@@ -70,8 +55,8 @@ export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
  * HStack
  * -----------------------------------------------------------------------------------------------*/
 
-export interface HStackOptions extends StackOptions {
-  spacing?: StackVariants["columnGap"];
+export interface HStackOptions extends BaseFlexOptions {
+  spacing?: BaseFlexOptions["columnGap"];
 }
 
 export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;

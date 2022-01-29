@@ -20,9 +20,7 @@ export function Center<C extends ElementType = "div">(props: CenterProps<C>) {
     return generateClassList({
       hopeClass: hopeCenterClass,
       baseClass: centerStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 

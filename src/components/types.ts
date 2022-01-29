@@ -57,7 +57,7 @@ export type PolymorphicComponentProps<C extends ElementType, Props = unknown> = 
   PropsWithChildren<Props & ClassProps & CSSProp & AsProp<C>>
 >;
 
-export interface ClassConfig extends ClassProps {
+export interface ClassConfig {
   /**
    * Semantic human readable css class used to override styles by end user.
    */
@@ -67,5 +67,11 @@ export interface ClassConfig extends ClassProps {
    * Base style class of the component.
    */
   baseClass: string;
+
+  /**
+   * All SolidJS props that apply css classes.
+   */
+  classProps: ClassProps;
+
   //themeBaseStyle?: SystemStyleObject;
 }

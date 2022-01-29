@@ -1,15 +1,14 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
 import { useTheme } from "@/contexts/HopeContext";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { TextOptions, TextProps } from "../Text";
-import { textStyles } from "../Text/Text.styles";
+import { BaseText, BaseTextOptions, BaseTextProps } from "../Text";
 import { ElementType } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
+import { createCssSelector, generateClassList } from "../utils";
 
-export type ThemeableHeadingOptions = Pick<TextOptions, "fontWeight">;
+export type ThemeableHeadingOptions = Pick<BaseTextOptions, "fontWeight">;
+
+export type HeadingProps<C extends ElementType> = BaseTextProps<C>;
 
 const hopeHeadingClass = "hope-heading";
 
@@ -17,35 +16,26 @@ const hopeHeadingClass = "hope-heading";
  * Headings are used for rendering headlines.
  * It renders an <h2> tag by default.
  */
-export function Heading<C extends ElementType = "h2">(props: TextProps<C>) {
+export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const theme = useTheme().components.Heading;
 
-  const defaultProps: TextProps<"h2"> = {
+  const defaultProps: HeadingProps<"h2"> = {
     as: "h2",
     fontWeight: theme?.defaultProps?.fontWeight ?? "semibold",
   };
 
-  props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "size",
-  ]);
+  const propsWithDefault: HeadingProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeHeadingClass,
-      baseClass: textStyles({
-        ...styleProps,
-        fontSize: styleProps.size,
-      }),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      baseClass: "",
+      classProps: local,
     });
   };
 
-  return <Dynamic component={local.as} classList={classList()} {...others} />;
+  return <BaseText classList={classList()} {...others} />;
 }
 
 Heading.toString = () => createCssSelector(hopeHeadingClass);
