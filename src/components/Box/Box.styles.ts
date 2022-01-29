@@ -362,18 +362,28 @@ function createFlexboxUtilityVariants() {
  * CSS Grid utilities
  * -----------------------------------------------------------------------------------------------*/
 
-const oneToSix = [1, 2, 3, 4, 5, 6] as const;
-const oneToSeven = [...oneToSix, 7] as const;
-const oneToTwelve = [...oneToSeven, 8, 9, 10, 11, 12] as const;
+const oneToTwelve = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 const oneToThirteen = [...oneToTwelve, 13] as const;
 
-type OneToSixRange = typeof oneToSix[number];
-type OneToSevenRange = typeof oneToSeven[number];
 type OneToTwelveRange = typeof oneToTwelve[number];
 type OneToThirteenRange = typeof oneToThirteen[number];
 
+interface GridTemplateAndSpanUtilityVariants {
+  gridTemplateColumns: UtilityVariant<OneToTwelveRange | "none">;
+  gridTemplateRows: UtilityVariant<OneToTwelveRange | "none">;
+  gridColumnSpan: UtilityVariant<OneToTwelveRange | "auto" | "full">;
+  gridRowSpan: UtilityVariant<OneToTwelveRange | "auto" | "full">;
+}
+
+interface GridStartAndEndUtilityVariants {
+  gridColumnStart: UtilityVariant<OneToThirteenRange | "auto">;
+  gridColumnEnd: UtilityVariant<OneToThirteenRange | "auto">;
+  gridRowStart: UtilityVariant<OneToThirteenRange | "auto">;
+  gridRowEnd: UtilityVariant<OneToThirteenRange | "auto">;
+}
+
 function createGridUtilityVariants() {
-  return {
+  const gridUtilities = {
     gridAutoFlow: {
       row: { gridAutoFlow: "row" } as SystemStyleObject,
       "row-dense": { gridAutoFlow: "row dense" } as SystemStyleObject,
@@ -392,89 +402,66 @@ function createGridUtilityVariants() {
       max: { gridAutoRows: "max-content" } as SystemStyleObject,
       fr: { gridAutoRows: " minmax(0, 1fr)" } as SystemStyleObject,
     },
-    gridTemplateColumns: {
-      none: { gridTemplateColumns: "none" } as SystemStyleObject,
-      ...oneToTwelve.reduce(
-        (acc, val) => ({
-          ...acc,
+    ...oneToTwelve.reduce(
+      (acc, val) => ({
+        gridTemplateColumns: {
+          ...acc.gridTemplateColumns,
           [val]: { gridTemplateColumns: `repeat(${val}, minmax(0, 1fr))` } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToTwelveRange>
-      ),
-    },
-    gridTemplateRows: {
-      none: { gridTemplateRows: "none" } as SystemStyleObject,
-      ...oneToSix.reduce(
-        (acc, val) => ({
-          ...acc,
+        },
+        gridTemplateRows: {
+          ...acc.gridTemplateRows,
           [val]: { gridTemplateRows: `repeat(${val}, minmax(0, 1fr))` } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToSixRange>
-      ),
-    },
-    gridColumnSpan: {
-      auto: { gridColumn: "auto" } as SystemStyleObject,
-      full: { gridColumn: "1 / -1" } as SystemStyleObject,
-      ...oneToTwelve.reduce(
-        (acc, val) => ({
-          ...acc,
+        },
+        gridColumnSpan: {
+          ...acc.gridColumnSpan,
           [val]: { gridColumn: `span ${val} / span ${val}` } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToTwelveRange>
-      ),
-    },
-    gridColumnStart: {
-      auto: { gridColumnStart: "auto" } as SystemStyleObject,
-      ...oneToThirteen.reduce(
-        (acc, val) => ({
-          ...acc,
-          [val]: { gridColumnStart: val } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToThirteenRange>
-      ),
-    },
-    gridColumnEnd: {
-      auto: { gridColumnEnd: "auto" } as SystemStyleObject,
-      ...oneToThirteen.reduce(
-        (acc, val) => ({
-          ...acc,
-          [val]: { gridColumnEnd: val } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToThirteenRange>
-      ),
-    },
-    gridRowSpan: {
-      auto: { gridRow: "auto" } as SystemStyleObject,
-      full: { gridRow: "1 / -1" } as SystemStyleObject,
-      ...oneToSix.reduce(
-        (acc, val) => ({
-          ...acc,
+        },
+        gridRowSpan: {
+          ...acc.gridRowSpan,
           [val]: { gridRow: `span ${val} / span ${val}` } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToSixRange>
-      ),
-    },
-    gridRowStart: {
-      auto: { gridRowStart: "auto" } as SystemStyleObject,
-      ...oneToSeven.reduce(
-        (acc, val) => ({
-          ...acc,
-          [val]: { gridRowStart: val } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToSevenRange>
-      ),
-    },
-    gridRowEnd: {
-      auto: { gridRowEnd: "auto" } as SystemStyleObject,
-      ...oneToSeven.reduce(
-        (acc, val) => ({
-          ...acc,
+        },
+      }),
+      {} as GridTemplateAndSpanUtilityVariants
+    ),
+    ...oneToThirteen.reduce(
+      (acc, val) => ({
+        gridColumnStart: {
+          ...acc.gridColumnStart,
+          [val]: { gridColumnStart: val } as SystemStyleObject,
+        },
+        gridColumnEnd: {
+          ...acc.gridColumnEnd,
+          [val]: { gridColumnEnd: val } as SystemStyleObject,
+        },
+        gridRowStart: {
+          ...acc.gridRowStart,
           [val]: { gridRowEnd: val } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToSevenRange>
-      ),
-    },
+        },
+        gridRowEnd: {
+          ...acc.gridRowEnd,
+          [val]: { gridRowEnd: val } as SystemStyleObject,
+        },
+      }),
+      {} as GridStartAndEndUtilityVariants
+    ),
   };
+
+  gridUtilities.gridTemplateColumns.none = { gridTemplateColumns: "none" } as SystemStyleObject;
+  gridUtilities.gridTemplateRows.none = { gridTemplateRows: "none" } as SystemStyleObject;
+
+  gridUtilities.gridColumnSpan.auto = { gridColumn: "auto" } as SystemStyleObject;
+  gridUtilities.gridColumnSpan.full = { gridColumn: "1 / -1" } as SystemStyleObject;
+
+  gridUtilities.gridRowSpan.auto = { gridRow: "auto" } as SystemStyleObject;
+  gridUtilities.gridRowSpan.full = { gridRow: "1 / -1" } as SystemStyleObject;
+
+  gridUtilities.gridColumnStart.auto = { gridColumnStart: "auto" } as SystemStyleObject;
+  gridUtilities.gridColumnEnd.auto = { gridColumnEnd: "auto" } as SystemStyleObject;
+
+  gridUtilities.gridRowStart.auto = { gridRowStart: "auto" } as SystemStyleObject;
+  gridUtilities.gridRowEnd.auto = { gridRowEnd: "auto" } as SystemStyleObject;
+
+  return gridUtilities;
 }
 
 /* -------------------------------------------------------------------------------------------------

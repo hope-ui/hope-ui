@@ -1,17 +1,4 @@
-import { AsProp, ClassProps } from "./types";
-
-export interface ClassConfig extends ClassProps {
-  /**
-   * Semantic human readable css class used to override styles by end user.
-   */
-  hopeClass: string;
-
-  /**
-   * Base style class of the component.
-   */
-  baseClass: string;
-  //themeBaseStyle?: SystemStyleObject;
-}
+import { AsProp, ClassConfig, ClassProps } from "./types";
 
 /**
  * Array of common props that are commonly splited with SolidJS `splitProps` method.

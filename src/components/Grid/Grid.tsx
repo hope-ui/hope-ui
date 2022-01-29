@@ -6,13 +6,13 @@ import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { gridStyles, GridVariants } from "./Grid.styles";
 
-export type GridOptions = GridVariants & {
+export interface GridOptions extends GridVariants {
   autoFlow?: GridVariants["gridAutoFlow"];
   autoColumns?: GridVariants["gridAutoColumns"];
   autoRows?: GridVariants["gridAutoRows"];
   columns?: GridVariants["gridTemplateColumns"];
   rows?: GridVariants["gridTemplateRows"];
-};
+}
 
 export type GridProps<C extends ElementType> = PolymorphicComponentProps<C, GridOptions>;
 
@@ -28,26 +28,23 @@ export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
   };
 
   props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "autoFlow",
-    "autoColumns",
-    "autoRows",
-    "columns",
-    "rows",
-  ]);
+  const [local, styleProps, shorthandStyleProps, others] = splitProps(
+    props,
+    commonProps,
+    [...boxPropNames, "css"],
+    ["autoFlow", "autoColumns", "autoRows", "columns", "rows"]
+  );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeGridClass,
       baseClass: gridStyles({
-        ...styleProps,
-        gridAutoFlow: styleProps.autoFlow,
-        gridAutoColumns: styleProps.autoColumns,
-        gridAutoRows: styleProps.autoRows,
-        gridTemplateColumns: styleProps.columns,
-        gridTemplateRows: styleProps.rows,
+        gridAutoFlow: shorthandStyleProps.autoFlow,
+        gridAutoColumns: shorthandStyleProps.autoColumns,
+        gridAutoRows: shorthandStyleProps.autoRows,
+        gridTemplateColumns: shorthandStyleProps.columns,
+        gridTemplateRows: shorthandStyleProps.rows,
+        ...styleProps, // longhand props if provided will override the short ones
       }),
       class: local.class,
       className: local.className,

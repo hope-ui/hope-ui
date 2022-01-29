@@ -6,10 +6,10 @@ import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { flexStyles, FlexVariants } from "./Flex.styles";
 
-export type FlexOptions = FlexVariants & {
+export interface FlexOptions extends FlexVariants {
   direction?: FlexVariants["flexDirection"];
   wrap?: FlexVariants["flexWrap"];
-};
+}
 
 export type FlexProps<C extends ElementType> = PolymorphicComponentProps<C, FlexOptions>;
 
@@ -42,7 +42,7 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
       baseClass: flexStyles({
         flexDirection: shorthandStyleProps.direction,
         flexWrap: shorthandStyleProps.wrap,
-        ...styleProps, // flexDirection and flexWrap from styleProps will override the shorthand props if defined
+        ...styleProps, // longhand props if provided will override the short ones
       }),
       class: local.class,
       className: local.className,

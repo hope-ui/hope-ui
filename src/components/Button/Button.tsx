@@ -10,13 +10,13 @@ import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../type
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
-export type ButtonOptions = ButtonVariants & {
+export interface ButtonOptions extends ButtonVariants {
   disabled?: boolean;
   loaderPosition?: HopeXPosition;
   loader?: JSX.Element;
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
-};
+}
 
 export type CommonOmitableButtonOptions =
   | keyof Omit<BoxVariants, "borderRadius" | "textTransform">

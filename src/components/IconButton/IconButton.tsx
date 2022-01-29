@@ -7,13 +7,14 @@ import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 
-export type IconButtonOptions = Omit<
-  ButtonOptions,
-  "leftIcon" | "rightIcon" | "loaderPosition" | "textTransform" | "fullWidth"
-> & {
+export interface IconButtonOptions
+  extends Omit<
+    ButtonOptions,
+    "leftIcon" | "rightIcon" | "loaderPosition" | "textTransform" | "fullWidth"
+  > {
   icon: JSX.Element;
   "aria-label": string;
-};
+}
 
 export type ThemeableIconButtonOptions = Omit<
   IconButtonOptions,

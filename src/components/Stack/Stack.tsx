@@ -6,10 +6,10 @@ import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { stackStyles, StackVariants } from "./Stack.styles";
 
-export type StackOptions = StackVariants & {
+export interface StackOptions extends StackVariants {
   direction?: StackVariants["flexDirection"];
   wrap?: StackVariants["flexWrap"];
-};
+}
 
 export type StackProps<C extends ElementType> = PolymorphicComponentProps<C, StackOptions>;
 
@@ -38,7 +38,7 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
       baseClass: stackStyles({
         flexDirection: shorthandStyleProps.direction,
         flexWrap: shorthandStyleProps.wrap,
-        ...styleProps, // flexDirection and flexWrap from styleProps will override the shorthand props if defined
+        ...styleProps, // longhand props if provided will override the short ones
       }),
       class: local.class,
       className: local.className,
@@ -55,9 +55,9 @@ Stack.toString = () => createCssSelector(hopeStackClass);
  * VStack
  * -----------------------------------------------------------------------------------------------*/
 
-export type VStackOptions = StackOptions & {
+export interface VStackOptions extends StackOptions {
   spacing?: StackVariants["rowGap"];
-};
+}
 
 export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
 
@@ -70,9 +70,9 @@ export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
  * HStack
  * -----------------------------------------------------------------------------------------------*/
 
-export type HStackOptions = StackOptions & {
+export interface HStackOptions extends StackOptions {
   spacing?: StackVariants["columnGap"];
-};
+}
 
 export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;
 

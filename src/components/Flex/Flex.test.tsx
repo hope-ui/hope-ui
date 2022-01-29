@@ -2,9 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { Flex } from "./Flex";
-import { flexStyles, FlexVariants } from "./Flex.styles";
-import { FlexOptions } from ".";
+import { Flex, FlexOptions } from "./Flex";
+import { flexStyles } from "./Flex.styles";
 
 describe("Flex", () => {
   afterEach(cleanup);

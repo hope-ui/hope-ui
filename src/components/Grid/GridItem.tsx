@@ -6,14 +6,14 @@ import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { gridItemStyles, GridItemVariants } from "./Grid.styles";
 
-export type GridItemOptions = GridItemVariants & {
+export interface GridItemOptions extends GridItemVariants {
   colSpan?: GridItemVariants["gridColumnSpan"];
   colStart?: GridItemVariants["gridColumnStart"];
   colEnd?: GridItemVariants["gridColumnEnd"];
   rowSpan?: GridItemVariants["gridRowSpan"];
   rowStart?: GridItemVariants["gridRowStart"];
   rowEnd?: GridItemVariants["gridRowEnd"];
-};
+}
 
 export type GridItemProps<C extends ElementType> = PolymorphicComponentProps<C, GridItemOptions>;
 
@@ -28,28 +28,24 @@ export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>)
   };
 
   props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "colSpan",
-    "colStart",
-    "colEnd",
-    "rowSpan",
-    "rowStart",
-    "rowEnd",
-  ]);
+  const [local, styleProps, shorthandStyleProps, others] = splitProps(
+    props,
+    commonProps,
+    [...boxPropNames, "css"],
+    ["colSpan", "colStart", "colEnd", "rowSpan", "rowStart", "rowEnd"]
+  );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeGridItemClass,
       baseClass: gridItemStyles({
-        ...styleProps,
-        gridColumnSpan: styleProps.colSpan,
-        gridColumnStart: styleProps.colStart,
-        gridColumnEnd: styleProps.colEnd,
-        gridRowSpan: styleProps.rowSpan,
-        gridRowStart: styleProps.rowStart,
-        gridRowEnd: styleProps.rowEnd,
+        gridColumnSpan: shorthandStyleProps.colSpan,
+        gridColumnStart: shorthandStyleProps.colStart,
+        gridColumnEnd: shorthandStyleProps.colEnd,
+        gridRowSpan: shorthandStyleProps.rowSpan,
+        gridRowStart: shorthandStyleProps.rowStart,
+        gridRowEnd: shorthandStyleProps.rowEnd,
+        ...styleProps, // longhand props if provided will override the short ones
       }),
       class: local.class,
       className: local.className,
