@@ -25,6 +25,25 @@ function createDisplayUtilityVariants() {
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * Vertical alignment utilities
+ * -----------------------------------------------------------------------------------------------*/
+
+function createVerticalAlignUtilityVariants() {
+  return {
+    verticalAlign: {
+      baseline: { verticalAlign: "baseline" } as SystemStyleObject,
+      top: { verticalAlign: "top" } as SystemStyleObject,
+      middle: { verticalAlign: "middle" } as SystemStyleObject,
+      bottom: { verticalAlign: "bottom" } as SystemStyleObject,
+      "text-top": { verticalAlign: "text-top" } as SystemStyleObject,
+      "text-bottom": { verticalAlign: "text-bottom" } as SystemStyleObject,
+      sub: { verticalAlign: "sub" } as SystemStyleObject,
+      super: { verticalAlign: "super" } as SystemStyleObject,
+    },
+  };
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Overflow utilities
  * -----------------------------------------------------------------------------------------------*/
 
@@ -130,7 +149,7 @@ function createTypographyUtilityVariants() {
 
 function createBorderUtilityVariants() {
   return {
-    border: {
+    borderWidth: {
       0: { borderWidth: "0" } as SystemStyleObject,
       1: { borderWidth: "1px" } as SystemStyleObject,
       2: { borderWidth: "2px" } as SystemStyleObject,
@@ -172,41 +191,26 @@ function createPositionUtilityVariants() {
  * Radii utilities
  * -----------------------------------------------------------------------------------------------*/
 
-type RadiiVariant = UtilityVariant<keyof typeof theme.radii>;
-
-interface RadiiUtilityVariants {
-  borderRadius: RadiiVariant;
-}
-
-function createRadiiUtilityVariants(): RadiiUtilityVariants {
-  return Object.keys(theme.radii).reduce(
-    (acc, key) => ({
-      borderRadius: {
-        ...acc.borderRadius,
-        [key]: { borderRadius: `$${key}` } as SystemStyleObject,
-      },
-    }),
-    {} as RadiiUtilityVariants
-  );
+function createRadiiUtilityVariants() {
+  return {
+    borderRadius: Object.keys(theme.radii).reduce(
+      (acc, key) => ({ ...acc, [key]: { borderRadius: `$${key}` } as SystemStyleObject }),
+      {} as UtilityVariant<keyof typeof theme.radii>
+    ),
+  };
 }
 
 /* -------------------------------------------------------------------------------------------------
  * Shadow utilities
  * -----------------------------------------------------------------------------------------------*/
 
-type ShadowsVariant = UtilityVariant<keyof typeof theme.shadows>;
-
-interface ShadowUtilityVariants {
-  boxShadow: ShadowsVariant;
-}
-
-function createShadowUtilityVariants(): ShadowUtilityVariants {
-  return Object.keys(theme.shadows).reduce(
-    (acc, key) => ({
-      boxShadow: { ...acc.boxShadow, [key]: { boxShadow: `$${key}` } as SystemStyleObject },
-    }),
-    {} as ShadowUtilityVariants
-  );
+function createShadowUtilityVariants() {
+  return {
+    boxShadow: Object.keys(theme.shadows).reduce(
+      (acc, key) => ({ ...acc, [key]: { boxShadow: `$${key}` } as SystemStyleObject }),
+      {} as UtilityVariant<keyof typeof theme.shadows>
+    ),
+  };
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -214,40 +218,41 @@ function createShadowUtilityVariants(): ShadowUtilityVariants {
  * -----------------------------------------------------------------------------------------------*/
 
 type SpaceVariant = UtilityVariant<keyof typeof theme.space>;
+type SpaceVariantWithAuto = UtilityVariant<keyof typeof theme.space | "auto">;
 
 interface SpaceUtilityVariants {
   // Margin
-  m: SpaceVariant;
-  mx: SpaceVariant;
-  my: SpaceVariant;
-  mt: SpaceVariant;
-  mr: SpaceVariant;
-  mb: SpaceVariant;
-  ml: SpaceVariant;
+  m: SpaceVariantWithAuto;
+  mx: SpaceVariantWithAuto;
+  my: SpaceVariantWithAuto;
+  mt: SpaceVariantWithAuto;
+  mr: SpaceVariantWithAuto;
+  mb: SpaceVariantWithAuto;
+  ml: SpaceVariantWithAuto;
 
   // Padding
-  p: SpaceVariant;
-  px: SpaceVariant;
-  py: SpaceVariant;
-  pt: SpaceVariant;
-  pr: SpaceVariant;
-  pb: SpaceVariant;
-  pl: SpaceVariant;
-
-  // Flexbox and CSS Grid gap
-  gap: SpaceVariant;
-  gapX: SpaceVariant;
-  gapY: SpaceVariant;
+  p: SpaceVariantWithAuto;
+  px: SpaceVariantWithAuto;
+  py: SpaceVariantWithAuto;
+  pt: SpaceVariantWithAuto;
+  pr: SpaceVariantWithAuto;
+  pb: SpaceVariantWithAuto;
+  pl: SpaceVariantWithAuto;
 
   // Position
   top: SpaceVariant;
   right: SpaceVariant;
   bottom: SpaceVariant;
   left: SpaceVariant;
+
+  // Flexbox and CSS Grid gap
+  gap: SpaceVariant;
+  rowGap: SpaceVariant;
+  columnGap: SpaceVariant;
 }
 
 function createSpaceUtilityVariants(): SpaceUtilityVariants {
-  return Object.keys(theme.space).reduce(
+  const spaceUtilities = Object.keys(theme.space).reduce(
     (acc, key) => ({
       m: { ...acc.m, [key]: { m: `$${key}` } as SystemStyleObject },
       mx: { ...acc.mx, [key]: { mx: `$${key}` } as SystemStyleObject },
@@ -265,17 +270,41 @@ function createSpaceUtilityVariants(): SpaceUtilityVariants {
       pb: { ...acc.pb, [key]: { pb: `$${key}` } as SystemStyleObject },
       pl: { ...acc.pl, [key]: { pl: `$${key}` } as SystemStyleObject },
 
-      gap: { ...acc.gap, [key]: { gap: `$${key}` } as SystemStyleObject },
-      gapX: { ...acc.gapX, [key]: { columnGap: `$${key}` } as SystemStyleObject },
-      gapY: { ...acc.gapY, [key]: { rowGap: `$${key}` } as SystemStyleObject },
-
       top: { ...acc.top, [key]: { top: `$${key}` } as SystemStyleObject },
       right: { ...acc.right, [key]: { right: `$${key}` } as SystemStyleObject },
       bottom: { ...acc.bottom, [key]: { bottom: `$${key}` } as SystemStyleObject },
-      left: { ...acc.gapY, [key]: { left: `$${key}` } as SystemStyleObject },
+      left: { ...acc.left, [key]: { left: `$${key}` } as SystemStyleObject },
+
+      gap: { ...acc.gap, [key]: { gap: `$${key}` } as SystemStyleObject },
+      rowGap: { ...acc.rowGap, [key]: { rowGap: `$${key}` } as SystemStyleObject },
+      columnGap: { ...acc.columnGap, [key]: { columnGap: `$${key}` } as SystemStyleObject },
     }),
     {} as SpaceUtilityVariants
   );
+
+  // Add the 'auto' variant
+  const marginAndPadding = [
+    "m",
+    "my",
+    "mx",
+    "mt",
+    "mr",
+    "mb",
+    "ml",
+    "p",
+    "py",
+    "px",
+    "pt",
+    "pr",
+    "pb",
+    "pl",
+  ] as const;
+
+  marginAndPadding.forEach(item => {
+    spaceUtilities[item].auto = { [item]: "auto" } as SystemStyleObject;
+  });
+
+  return spaceUtilities;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -322,7 +351,7 @@ function createFlexboxUtilityVariants() {
       "column-reverse": { flexDirection: "column-reverse" } as SystemStyleObject,
     },
     flexWrap: {
-      "no-wrap": { flexWrap: "nowrap" } as SystemStyleObject,
+      nowrap: { flexWrap: "nowrap" } as SystemStyleObject,
       wrap: { flexWrap: "wrap" } as SystemStyleObject,
       "wrap-reverse": { flexWrap: "wrap-reverse" } as SystemStyleObject,
     },
@@ -563,6 +592,7 @@ export const boxStyles = css({
     ...createSpaceUtilityVariants(),
     ...createSizeUtilityVariants(),
     ...createTypographyUtilityVariants(),
+    ...createVerticalAlignUtilityVariants(),
   },
 });
 
@@ -570,12 +600,13 @@ export type BoxVariants = VariantProps<typeof boxStyles>;
 
 const boxPropKeys: Record<keyof BoxVariants, true> = {
   display: true,
+  verticalAlign: true,
   overflow: true,
   overflowX: true,
   overflowY: true,
   color: true,
   bg: true,
-  border: true,
+  borderWidth: true,
   borderStyle: true,
   borderColor: true,
   borderRadius: true,
@@ -603,8 +634,8 @@ const boxPropKeys: Record<keyof BoxVariants, true> = {
   pb: true,
   pl: true,
   gap: true,
-  gapX: true,
-  gapY: true,
+  rowGap: true,
+  columnGap: true,
   w: true,
   minW: true,
   maxW: true,
@@ -648,6 +679,6 @@ const boxPropKeys: Record<keyof BoxVariants, true> = {
 };
 
 /**
- * Array of boxStyles props that are commonly splited with SolidJS `splitProps` method.
+ * Array of boxStyles props that are commonly split with SolidJS `splitProps` method.
  */
 export const boxPropNames = Object.keys(boxPropKeys) as Array<keyof BoxVariants>;

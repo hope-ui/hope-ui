@@ -2,33 +2,22 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, Center, Flex, Heading, HopeProvider, HStack, Spacer, Text, VStack } from ".";
+import { Box, Center, Grid, GridItem, HopeProvider } from ".";
 
 export function App() {
   return (
     <HopeProvider>
-      <Flex>
-        <Box boxSize="16" bg="danger500" />
-        <Spacer />
-        <Box boxSize="40" bg="danger500" />
-        <Spacer />
-        <Box boxSize="44" bg="danger500" />
-      </Flex>
-      <Box display="grid" gridTemplateColumns="3" gap="6">
-        <Box boxSize="16" bg="info500" />
-        <Box boxSize="40" bg="info500" />
-        <Box boxSize="44" bg="info500" />
+      <Box bg="white" borderRadius="md" boxShadow="md" w="full" maxW="sm" p="4" mx="auto">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero sed, error necessitatibus
+        architecto ipsam rem non alias quod. Qui rem reprehenderit expedita veritatis laborum,
+        rerum, hic pariatur quibusdam iure ipsa fugit dolor delectus nesciunt. Eos illo ad iure
+        beatae magnam praesentium, sapiente modi repellendus ipsam molestiae natus ducimus. Velit
+        sunt animi atque. Totam, illo! Suscipit aut repellendus tempore, omnis veniam cupiditate
+        provident tenetur, aperiam sapiente minima eaque nesciunt. Inventore animi obcaecati qui
+        neque veniam aperiam dolor quas quidem fuga. Corporis quae dolore quas similique delectus
+        esse ipsam maiores aliquid natus veritatis est officiis, maxime eius fugit illum voluptate
+        tempore quos.
       </Box>
-      <HStack spacing="1_5">
-        <Box boxSize="16" bg="success500" />
-        <Box boxSize="40" bg="success500" />
-        <Box boxSize="44" bg="success500" />
-      </HStack>
-      <VStack spacing="1_5">
-        <Box boxSize="16" bg="warning500" />
-        <Box boxSize="40" bg="warning500" />
-        <Box boxSize="44" bg="warning500" />
-      </VStack>
     </HopeProvider>
   );
 }

@@ -25,7 +25,7 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
     flexDirection: "row",
     alignItems: "stretch",
     justifyContent: "start",
-    flexWrap: "no-wrap",
+    flexWrap: "nowrap",
   };
 
   props = mergeProps(defaultProps, props);

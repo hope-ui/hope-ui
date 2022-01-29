@@ -19,7 +19,7 @@ function Stack<C extends ElementType = "div">(props: StackProps<C>) {
     as: "div",
     alignItems: "center",
     justifyContent: "start",
-    flexWrap: "no-wrap",
+    flexWrap: "nowrap",
   };
 
   props = mergeProps(defaultProps, props);
@@ -52,14 +52,14 @@ Stack.toString = () => createCssSelector(hopeStackClass);
  * -----------------------------------------------------------------------------------------------*/
 
 export type VStackOptions = StackOptions & {
-  spacing?: StackVariants["gapY"];
+  spacing?: StackVariants["rowGap"];
 };
 
 export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
 
 export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
-  return <Stack flexDirection="column" gapY={local.spacing} {...others} />;
+  return <Stack flexDirection="column" rowGap={local.spacing} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -67,12 +67,12 @@ export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
  * -----------------------------------------------------------------------------------------------*/
 
 export type HStackOptions = StackOptions & {
-  spacing?: StackVariants["gapX"];
+  spacing?: StackVariants["columnGap"];
 };
 
 export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;
 
 export function HStack<C extends ElementType = "div">(props: HStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
-  return <Stack flexDirection="row" gapX={local.spacing} {...others} />;
+  return <Stack flexDirection="row" columnGap={local.spacing} {...others} />;
 }
