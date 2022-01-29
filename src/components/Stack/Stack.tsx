@@ -6,35 +6,39 @@ import { ElementType, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { stackStyles, StackVariants } from "./Stack.styles";
 
-type StackOptions = StackVariants & {
+export type StackOptions = StackVariants & {
+  direction?: StackVariants["flexDirection"];
   wrap?: StackVariants["flexWrap"];
 };
 
-type StackProps<C extends ElementType> = PolymorphicComponentProps<C, StackOptions>;
+export type StackProps<C extends ElementType> = PolymorphicComponentProps<C, StackOptions>;
 
 const hopeStackClass = "hope-stack";
 
-function Stack<C extends ElementType = "div">(props: StackProps<C>) {
+export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const defaultProps: StackProps<"div"> = {
     as: "div",
+    direction: "row",
     alignItems: "center",
     justifyContent: "start",
-    flexWrap: "nowrap",
+    wrap: "nowrap",
   };
 
   props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "wrap",
-  ]);
+  const [local, styleProps, shorthandStyleProps, others] = splitProps(
+    props,
+    commonProps,
+    [...boxPropNames, "css"],
+    ["direction", "wrap"]
+  );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeStackClass,
       baseClass: stackStyles({
-        ...styleProps,
-        flexWrap: styleProps.wrap,
+        flexDirection: shorthandStyleProps.direction,
+        flexWrap: shorthandStyleProps.wrap,
+        ...styleProps, // flexDirection and flexWrap from styleProps will override the shorthand props if defined
       }),
       class: local.class,
       className: local.className,
@@ -59,7 +63,7 @@ export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
 
 export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
-  return <Stack flexDirection="column" rowGap={local.spacing} {...others} />;
+  return <Stack direction="column" rowGap={local.spacing} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -74,5 +78,5 @@ export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;
 
 export function HStack<C extends ElementType = "div">(props: HStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
-  return <Stack flexDirection="row" columnGap={local.spacing} {...others} />;
+  return <Stack direction="row" columnGap={local.spacing} {...others} />;
 }

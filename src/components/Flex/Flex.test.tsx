@@ -4,6 +4,7 @@ import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Flex } from "./Flex";
 import { flexStyles, FlexVariants } from "./Flex.styles";
+import { FlexOptions } from ".";
 
 describe("Flex", () => {
   afterEach(cleanup);
@@ -126,14 +127,18 @@ describe("Flex", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: FlexVariants = {
-      flexDirection: "column-reverse",
-      flexWrap: "wrap",
+    const variantProps: FlexOptions = {
+      direction: "column-reverse",
+      wrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
       gap: "6",
     };
-    const flexClass = flexStyles(variantProps);
+    const flexClass = flexStyles({
+      ...variantProps,
+      flexDirection: variantProps.direction,
+      flexWrap: variantProps.wrap,
+    });
 
     // act
     renderWithHopeProvider(() => (

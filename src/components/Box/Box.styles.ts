@@ -402,6 +402,16 @@ function createGridUtilityVariants() {
         {} as UtilityVariant<OneToTwelveRange>
       ),
     },
+    gridTemplateRows: {
+      none: { gridTemplateRows: "none" } as SystemStyleObject,
+      ...oneToSix.reduce(
+        (acc, val) => ({
+          ...acc,
+          [val]: { gridTemplateRows: `repeat(${val}, minmax(0, 1fr))` } as SystemStyleObject,
+        }),
+        {} as UtilityVariant<OneToSixRange>
+      ),
+    },
     gridColumnSpan: {
       auto: { gridColumn: "auto" } as SystemStyleObject,
       full: { gridColumn: "1 / -1" } as SystemStyleObject,
@@ -431,16 +441,6 @@ function createGridUtilityVariants() {
           [val]: { gridColumnEnd: val } as SystemStyleObject,
         }),
         {} as UtilityVariant<OneToThirteenRange>
-      ),
-    },
-    gridTemplateRows: {
-      none: { gridTemplateRows: "none" } as SystemStyleObject,
-      ...oneToSix.reduce(
-        (acc, val) => ({
-          ...acc,
-          [val]: { gridTemplateRows: `repeat(${val}, minmax(0, 1fr))` } as SystemStyleObject,
-        }),
-        {} as UtilityVariant<OneToSixRange>
       ),
     },
     gridRowSpan: {
@@ -669,10 +669,10 @@ const boxPropKeys: Record<keyof BoxVariants, true> = {
   gridAutoColumns: true,
   gridAutoRows: true,
   gridTemplateColumns: true,
+  gridTemplateRows: true,
   gridColumnSpan: true,
   gridColumnStart: true,
   gridColumnEnd: true,
-  gridTemplateRows: true,
   gridRowSpan: true,
   gridRowStart: true,
   gridRowEnd: true,

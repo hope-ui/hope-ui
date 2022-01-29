@@ -22,27 +22,27 @@ const hopeFlexClass = "hope-flex";
 export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
   const defaultProps: FlexProps<"div"> = {
     as: "div",
-    flexDirection: "row",
+    direction: "row",
     alignItems: "stretch",
     justifyContent: "start",
-    flexWrap: "nowrap",
+    wrap: "nowrap",
   };
 
   props = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "direction",
-    "wrap",
-  ]);
+  const [local, styleProps, shorthandStyleProps, others] = splitProps(
+    props,
+    commonProps,
+    [...boxPropNames, "css"],
+    ["direction", "wrap"]
+  );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeFlexClass,
       baseClass: flexStyles({
-        ...styleProps,
-        flexDirection: styleProps.direction,
-        flexWrap: styleProps.wrap,
+        flexDirection: shorthandStyleProps.direction,
+        flexWrap: shorthandStyleProps.wrap,
+        ...styleProps, // flexDirection and flexWrap from styleProps will override the shorthand props if defined
       }),
       class: local.class,
       className: local.className,

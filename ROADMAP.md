@@ -11,19 +11,19 @@
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |     ✅     |       |    ✅     |  ✅  |
-| Heading |     ✅      |     ✅     |       |    ✅     |  ✅  |
+| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
+| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
 
 ### Layout
 
-|            | Development | A11y check | Tests | Storybook | Docs |
-| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Center     |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
-| Container  |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
-| Flex       |             |            |       |           |      |
-| Grid       |             |            |       |           |      |
-| SimpleGrid |             |            |       |           |      |
-| Stack      |             |            |       |           |      |
+|           | Development | A11y check | Tests | Storybook | Docs |
+| --------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Box       |     ✅      |    n/a     |  ✅   |    n/a    |      |
+| Center    |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Container |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Flex      |     ✅      |    n/a     |  ✅   |           |      |
+| Grid      |     ✅      |    n/a     |  ✅   |           |      |
+| Stack     |     ✅      |    n/a     |  ✅   |           |      |
 
 ### Data entry
 
