@@ -47,7 +47,7 @@ function createVerticalAlignUtilityVariants() {
  * Overflow utilities
  * -----------------------------------------------------------------------------------------------*/
 
-const overflowValues = ["auto", "hidden", "clip", "visible", "scoll"] as const;
+const overflowValues = ["auto", "hidden", "clip", "visible", "scroll"] as const;
 
 type OverflowValue = typeof overflowValues[number];
 
