@@ -4,18 +4,20 @@ import { defaultTheme } from "@/theme/defaultTheme";
 import { resetStyles } from "@/theme/reset";
 import { HopeTheme } from "@/theme/types";
 
-export interface HopeContextValue {
-  theme: HopeTheme;
-}
+import { ColorModeProvider } from "./ColorModeContext";
 
-export const HopeContext = createContext<HopeContextValue>();
+export const HopeContext = createContext<HopeTheme>();
 
 export type HopeProviderProps = PropsWithChildren<{
   theme?: HopeTheme;
 }>;
 
 export function HopeProvider(props: HopeProviderProps) {
-  const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
+  const defaultProps: Required<Pick<HopeProviderProps, "theme">> = {
+    theme: defaultTheme,
+  };
+
+  const propsWithDefault = mergeProps(defaultProps, props);
 
   // eslint-disable-next-line solid/reactivity
   const [theme] = createSignal(propsWithDefault.theme);
@@ -25,17 +27,23 @@ export function HopeProvider(props: HopeProviderProps) {
 
   // Apply the customized stitches theme
   // eslint-disable-next-line solid/reactivity
-  document.documentElement.classList.add(theme().tokens);
+  document.body.classList.add(theme().tokens);
 
-  return <HopeContext.Provider value={{ theme: theme() }}>{props.children}</HopeContext.Provider>;
+  return (
+    <HopeContext.Provider value={theme()}>
+      <ColorModeProvider initialColorMode={theme().initialColorMode}>
+        {propsWithDefault.children}
+      </ColorModeProvider>
+    </HopeContext.Provider>
+  );
 }
 
 export function useTheme() {
   const context = useContext(HopeContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: HopeTheme not found, did you wrap your App with HopeProvider ?");
+    throw new Error("[Hope UI]: useTheme must be used within a HopeProvider");
   }
 
-  return context.theme;
+  return context;
 }

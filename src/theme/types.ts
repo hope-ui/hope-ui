@@ -24,6 +24,11 @@ export type SystemMedia = typeof config.media;
 export type SystemStyleObject = CSS<typeof config>;
 
 /**
+ * Available color mode
+ */
+export type ColorMode = "light" | "dark" | "system";
+
+/**
  * Theme configuration for Hope UI component.
  */
 export interface ComponentThemeConfig<Props> {
@@ -51,6 +56,7 @@ export interface ComponentThemes {
  * The Hope UI theme interface.
  */
 export interface HopeTheme {
+  initialColorMode: ColorMode;
   tokens: SystemTokens;
   components: ComponentThemes;
 }
@@ -72,6 +78,11 @@ export type ThemeTokensOverride = {
  * The Hope UI theme override interface.
  */
 export interface HopeThemeOverride {
+  /**
+   * Override default color mode.
+   */
+  initialColorMode?: ColorMode;
+
   /**
    * Override Hope UI design tokens.
    */

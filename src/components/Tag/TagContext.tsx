@@ -23,9 +23,7 @@ export function useTagContext() {
   const context = useContext(TagContext);
 
   if (!context) {
-    throw new Error(
-      "[Hope UI]: TagContext not found, did you wrap your component within TagContextProvider ?"
-    );
+    throw new Error("[Hope UI]: useTagContext must be used within a TagContextProvider");
   }
 
   return context;

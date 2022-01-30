@@ -1,3 +1,14 @@
 #root {
   height: 100%;
+  transition: color 250ms, background-color 250ms;
+}
+
+.hope-ui-light #root {
+  background-color: var(--hope-colors-white);
+  color: var(--hope-colors-neutral700);
+}
+
+.hope-ui-dark #root {
+  background-color: var(--hope-colors-neutral800);
+  color: var(--hope-colors-whiteAlpha900);
 }

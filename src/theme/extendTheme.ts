@@ -8,6 +8,11 @@ export function extendTheme(themeOverride: HopeThemeOverride): HopeTheme {
   // create a copy to not mutate the original theme
   const customTheme = merge({}, defaultTheme);
 
+  if (themeOverride.initialColorMode) {
+    customTheme.initialColorMode = themeOverride.initialColorMode;
+  }
+
+  // Create a stitches theme
   if (themeOverride.tokens) {
     merge(customTheme.tokens, createTheme(themeOverride.tokens));
   }
