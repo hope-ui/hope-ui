@@ -1,13 +1,14 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
+import { useTheme } from "@/theme/HopeProvider";
 import { XPosition } from "@/theme/types";
+import { createCssSelector, generateClassList } from "@/utils/function";
+import { commonProps } from "@/utils/object";
 
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export interface ButtonOptions extends ButtonVariants {

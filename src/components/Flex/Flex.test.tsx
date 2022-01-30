@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { BaseFlexOptions, Flex } from "./Flex";
 import { baseFlexStyles } from "./Flex.styles";

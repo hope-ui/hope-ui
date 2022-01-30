@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { gridItemStyles } from "./Grid.styles";
 import { GridItem, GridItemOptions } from "./GridItem";
@@ -86,7 +86,7 @@ describe("GridItem", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <GridItem data-testid="grid-item" className={stubClass}>
+      <GridItem data-testid="grid-item" class={stubClass}>
         GridItem
       </GridItem>
     ));

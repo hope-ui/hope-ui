@@ -2,16 +2,17 @@ import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { IconCross } from "@/icons";
+import { createCssSelector, generateClassList } from "@/utils/function";
+import { commonProps } from "@/utils/object";
 
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
 import {
   tagCloseButtonIconStyles,
   tagCloseButtonStyles,
   TagCloseButtonVariants,
 } from "./Tag.styles";
-import { useTagContext } from "./TagContext";
+import { useTag } from "./TagProvider";
 
 export interface TagCloseButtonOptions extends TagCloseButtonVariants {
   "aria-label": string;
@@ -25,7 +26,7 @@ export type TagCloseButtonProps<C extends ElementType> = PolymorphicComponentPro
 const hopeTagCloseButtonClass = "hope-tag-close-button";
 
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
-  const tagContext = useTagContext();
+  const tagContext = useTag();
 
   const defaultProps: TagCloseButtonProps<"button"> = {
     as: "button",

@@ -1,7 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
 import { IconUser } from "@/icons/IconUser";
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { buttonStyles, iconButtonStyles } from "../Button/Button.styles";
 import { IconButton, IconButtonOptions } from "./IconButton";

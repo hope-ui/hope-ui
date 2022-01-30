@@ -1,15 +1,15 @@
 import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { tagCloseButtonStyles } from "./Tag.styles";
 import { TagCloseButton, TagCloseButtonOptions } from "./TagCloseButton";
-import { TagContextProvider } from "./TagContext";
+import { TagProvider } from "./TagProvider";
 
 function renderWithTagContextProvider(callback: () => JSX.Element) {
   return renderWithHopeProvider(() => (
-    <TagContextProvider contextValue={{ borderRadius: "md" }}>{callback}</TagContextProvider>
+    <TagProvider contextValue={{ borderRadius: "md" }}>{callback}</TagProvider>
   ));
 }
 describe("TagCloseButton", () => {

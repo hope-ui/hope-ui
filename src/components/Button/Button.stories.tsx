@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 
-import { HopeProvider } from "@/contexts/HopeContext";
 import { IconInfoCircle } from "@/icons";
+import { HopeProvider } from "@/theme/HopeProvider";
 
 import { Button } from "./Button";
 
@@ -25,7 +25,7 @@ export default {
     },
     colorScheme: {
       control: { type: "select" },
-      options: ["primary", "dark", "neutral", "success", "info", "warning", "danger"],
+      options: ["primary", "neutral", "success", "info", "warning", "danger"],
     },
     size: {
       control: { type: "select" },

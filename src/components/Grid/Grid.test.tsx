@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { Grid, GridOptions } from "./Grid";
 import { gridStyles } from "./Grid.styles";
@@ -86,7 +86,7 @@ describe("Grid", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Grid data-testid="grid" className={stubClass}>
+      <Grid data-testid="grid" class={stubClass}>
         Grid
       </Grid>
     ));

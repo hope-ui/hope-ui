@@ -1,8 +1,9 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { createCssSelector, generateClassList } from "@/utils/function";
+
 import { BaseFlex, BaseFlexOptions, BaseFlexProps } from "../Flex/Flex";
 import { ElementType } from "../types";
-import { createCssSelector, generateClassList } from "../utils";
 
 export type StackProps<C extends ElementType> = BaseFlexProps<C>;
 

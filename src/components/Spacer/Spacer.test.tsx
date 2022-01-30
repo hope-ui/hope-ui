@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { Spacer } from "./Spacer";
 import { spacerStyles, SpacerVariants } from "./Spacer.styles";
@@ -86,7 +86,7 @@ describe("Spacer", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Spacer data-testid="spacer" className={stubClass}>
+      <Spacer data-testid="spacer" class={stubClass}>
         Spacer
       </Spacer>
     ));

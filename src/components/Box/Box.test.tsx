@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { Box } from "./Box";
 import { boxStyles, BoxVariants } from "./Box.styles";
@@ -86,7 +86,7 @@ describe("Box", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Box data-testid="box" className={stubClass}>
+      <Box data-testid="box" class={stubClass}>
         Box
       </Box>
     ));

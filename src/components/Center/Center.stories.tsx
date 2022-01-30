@@ -1,6 +1,7 @@
-import { HopeProvider } from "@/contexts/HopeContext";
+import { HopeProvider } from "@/theme/HopeProvider";
 
 import { Center } from "./Center";
+
 export default {
   title: "Layout/Center",
   component: Center,

@@ -4,7 +4,7 @@ import { defaultTheme } from "@/theme/defaultTheme";
 import { resetStyles } from "@/theme/reset";
 import { HopeTheme } from "@/theme/types";
 
-import { ColorModeProvider } from "./ColorModeContext";
+import { ColorModeProvider } from "../color-mode/ColorModeProvider";
 
 export const HopeContext = createContext<HopeTheme>();
 

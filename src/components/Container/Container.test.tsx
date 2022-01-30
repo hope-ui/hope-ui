@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { Container } from "./Container";
 import { containerStyles, ContainerVariants } from "./Container.styles";
@@ -86,7 +86,7 @@ describe("Container", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Container data-testid="container" className={stubClass}>
+      <Container data-testid="container" class={stubClass}>
         Container
       </Container>
     ));

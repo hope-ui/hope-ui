@@ -5,7 +5,7 @@
 
 .hope-ui-light #root {
   background-color: var(--hope-colors-white);
-  color: var(--hope-colors-neutral700);
+  color: var(--hope-colors-neutral900);
 }
 
 .hope-ui-dark #root {

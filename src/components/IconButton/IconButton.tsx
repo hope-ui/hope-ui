@@ -1,11 +1,11 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/theme/HopeProvider";
+import { createCssSelector, generateClassList } from "@/utils/function";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { createCssSelector, generateClassList } from "../utils";
 
 export interface IconButtonOptions
   extends Omit<

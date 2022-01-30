@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
+import { renderWithHopeProvider } from "@/utils/test";
 
 import { Center } from "./Center";
 import { centerStyles, CenterVariants } from "./Center.styles";
@@ -86,7 +86,7 @@ describe("Center", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Center data-testid="center" className={stubClass}>
+      <Center data-testid="center" class={stubClass}>
         Center
       </Center>
     ));

@@ -1,9 +1,11 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { createCssSelector, generateClassList } from "@/utils/function";
+import { commonProps } from "@/utils/object";
+
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { gridItemStyles, GridItemVariants } from "./Grid.styles";
 
 export interface GridItemOptions extends GridItemVariants {

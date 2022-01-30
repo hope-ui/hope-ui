@@ -1,13 +1,14 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 import { Dynamic, Show } from "solid-js/web";
 
-import { useTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/theme/HopeProvider";
+import { createCssSelector, generateClassList } from "@/utils/function";
+import { commonProps } from "@/utils/object";
 
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { tagStyles, TagVariants } from "./Tag.styles";
-import { TagContextProvider, TagContextValue } from "./TagContext";
+import { TagContextValue, TagProvider } from "./TagProvider";
 
 export interface TagOptions extends Omit<TagVariants, "withLeftSection" | "withRightSection"> {
   leftSection?: JSX.Element;
@@ -66,7 +67,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   });
 
   return (
-    <TagContextProvider contextValue={tagContextValue()}>
+    <TagProvider contextValue={tagContextValue()}>
       <Dynamic component={local.as} classList={classList()} {...others}>
         <Show when={local.leftSection}>{local.leftSection}</Show>
         <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
@@ -74,7 +75,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
         </Show>
         <Show when={local.rightSection}>{local.rightSection}</Show>
       </Dynamic>
-    </TagContextProvider>
+    </TagProvider>
   );
 }
 

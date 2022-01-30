@@ -1,8 +1,8 @@
 import { action } from "@storybook/addon-actions";
 
 import { TagCloseButton } from "@/components/Tag/TagCloseButton";
-import { HopeProvider } from "@/contexts/HopeContext";
 import { IconInfoCircle } from "@/icons";
+import { HopeProvider } from "@/theme/HopeProvider";
 
 import { Tag } from "./Tag";
 
@@ -24,7 +24,7 @@ export default {
     },
     colorScheme: {
       control: { type: "select" },
-      options: ["primary", "dark", "neutral", "success", "info", "warning", "danger"],
+      options: ["primary", "neutral", "success", "info", "warning", "danger"],
     },
     size: {
       control: { type: "select" },

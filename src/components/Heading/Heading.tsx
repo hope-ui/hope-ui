@@ -1,10 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/theme/HopeProvider";
+import { createCssSelector, generateClassList } from "@/utils/function";
 
 import { BaseText, BaseTextOptions, BaseTextProps } from "../Text";
 import { ElementType } from "../types";
-import { createCssSelector, generateClassList } from "../utils";
 
 export type ThemeableHeadingOptions = Pick<BaseTextOptions, "fontWeight">;
 

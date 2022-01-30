@@ -190,7 +190,6 @@ export const buttonStyles = css(boxStyles, {
     },
     colorScheme: {
       primary: {},
-      dark: {},
       neutral: {},
       success: {},
       info: {},
@@ -261,11 +260,6 @@ export const buttonStyles = css(boxStyles, {
     },
     {
       variant: "solid",
-      colorScheme: "dark",
-      css: createSolidCompoundVariant({ bgColor: "$dark500", bgColorHover: "$dark800" }),
-    },
-    {
-      variant: "solid",
       colorScheme: "neutral",
       css: createSolidCompoundVariant({ bgColor: "$neutral500", bgColorHover: "$neutral600" }),
     },
@@ -299,15 +293,6 @@ export const buttonStyles = css(boxStyles, {
         color: "$primary600",
         bgColor: "$primary50",
         bgColorHover: "$primary100",
-      }),
-    },
-    {
-      variant: "subtle",
-      colorScheme: "dark",
-      css: createSubtleCompoundVariant({
-        color: "$dark800",
-        bgColor: "$dark50",
-        bgColorHover: "$dark100",
       }),
     },
     {
@@ -365,11 +350,6 @@ export const buttonStyles = css(boxStyles, {
     },
     {
       variant: "outline",
-      colorScheme: "dark",
-      css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
-    },
-    {
-      variant: "outline",
       colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
@@ -403,11 +383,6 @@ export const buttonStyles = css(boxStyles, {
     },
     {
       variant: "dashed",
-      colorScheme: "dark",
-      css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
-    },
-    {
-      variant: "dashed",
       colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
@@ -438,11 +413,6 @@ export const buttonStyles = css(boxStyles, {
       variant: "ghost",
       colorScheme: "primary",
       css: createGhostCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
-    },
-    {
-      variant: "ghost",
-      colorScheme: "dark",
-      css: createGhostCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "ghost",

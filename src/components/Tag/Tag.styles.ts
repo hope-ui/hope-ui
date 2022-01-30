@@ -208,7 +208,6 @@ export const tagStyles = css(boxStyles, {
     },
     colorScheme: {
       primary: {},
-      dark: {},
       neutral: {},
       success: {},
       info: {},
@@ -261,14 +260,6 @@ export const tagStyles = css(boxStyles, {
     },
     {
       variant: "solid",
-      colorScheme: "dark",
-      css: createTagSolidCompoundVariant({
-        bgColor: "$dark500",
-        closeButtonBgColorHover: "$dark300",
-      }),
-    },
-    {
-      variant: "solid",
       colorScheme: "neutral",
       css: createTagSolidCompoundVariant({
         bgColor: "$neutral500",
@@ -317,15 +308,6 @@ export const tagStyles = css(boxStyles, {
         bgColor: "$primary50",
         color: "$primary600",
         closeButtonBgColorHover: "$primary100",
-      }),
-    },
-    {
-      variant: "subtle",
-      colorScheme: "dark",
-      css: createTagSubtleCompoundVariant({
-        bgColor: "$dark50",
-        color: "$dark800",
-        closeButtonBgColorHover: "$dark100",
       }),
     },
     {
@@ -386,14 +368,6 @@ export const tagStyles = css(boxStyles, {
     },
     {
       variant: "outline",
-      colorScheme: "dark",
-      css: createTagOutlineCompoundVariant({
-        color: "$dark600",
-        closeButtonBgColorHover: "$dark50",
-      }),
-    },
-    {
-      variant: "outline",
       colorScheme: "neutral",
       css: createTagOutlineCompoundVariant({
         color: "$neutral600",
@@ -441,15 +415,6 @@ export const tagStyles = css(boxStyles, {
       css: {
         "&::before, &::after": {
           backgroundColor: "$primary500",
-        },
-      },
-    },
-    {
-      variant: "dot",
-      colorScheme: "dark",
-      css: {
-        "&::before, &::after": {
-          backgroundColor: "$dark500",
         },
       },
     },

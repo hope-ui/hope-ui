@@ -1,8 +1,10 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { createCssSelector, generateClassList } from "@/utils/function";
+import { commonProps } from "@/utils/object";
+
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { boxPropNames, boxStyles, BoxVariants } from "./Box.styles";
 
 export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C, BoxVariants>;

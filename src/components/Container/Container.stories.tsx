@@ -1,4 +1,4 @@
-import { HopeProvider } from "@/contexts/HopeContext";
+import { HopeProvider } from "@/theme/HopeProvider";
 
 import { Container } from "./Container";
 
