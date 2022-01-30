@@ -127,6 +127,8 @@ export const buttonStyles = css(boxStyles, {
   justifyContent: "center",
   alignItems: "center",
 
+  outline: "none",
+
   padding: "0",
 
   fontWeight: "$medium",
@@ -135,7 +137,6 @@ export const buttonStyles = css(boxStyles, {
 
   cursor: "pointer",
   userSelect: "none",
-  outline: "none",
   transition: "color 250ms, background-color 250ms",
 
   "&:active": {
