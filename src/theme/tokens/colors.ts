@@ -1,7 +1,34 @@
 const common = {
+  transparent: "transparent",
+  current: "currentColor",
   white: "#ffffff",
   black: "#000000",
-  transparent: "transparent",
+};
+
+const whiteAlpha = {
+  whiteAlpha50: "rgba(255, 255, 255, 0.04)",
+  whiteAlpha100: "rgba(255, 255, 255, 0.06)",
+  whiteAlpha200: "rgba(255, 255, 255, 0.08)",
+  whiteAlpha300: "rgba(255, 255, 255, 0.16)",
+  whiteAlpha400: "rgba(255, 255, 255, 0.24)",
+  whiteAlpha500: "rgba(255, 255, 255, 0.36)",
+  whiteAlpha600: "rgba(255, 255, 255, 0.48)",
+  whiteAlpha700: "rgba(255, 255, 255, 0.64)",
+  whiteAlpha800: "rgba(255, 255, 255, 0.80)",
+  whiteAlpha900: "rgba(255, 255, 255, 0.92)",
+};
+
+const blackAlpha = {
+  blackAlpha50: "rgba(0, 0, 0, 0.04)",
+  blackAlpha100: "rgba(0, 0, 0, 0.06)",
+  blackAlpha200: "rgba(0, 0, 0, 0.08)",
+  blackAlpha300: "rgba(0, 0, 0, 0.16)",
+  blackAlpha400: "rgba(0, 0, 0, 0.24)",
+  blackAlpha500: "rgba(0, 0, 0, 0.36)",
+  blackAlpha600: "rgba(0, 0, 0, 0.48)",
+  blackAlpha700: "rgba(0, 0, 0, 0.64)",
+  blackAlpha800: "rgba(0, 0, 0, 0.80)",
+  blackAlpha900: "rgba(0, 0, 0, 0.92)",
 };
 
 const primary = {
@@ -18,14 +45,14 @@ const primary = {
 };
 
 const dark = {
-  dark50: "#c1c2c5",
-  dark100: "#a6a7ab",
+  dark50: "#c1c3c5",
+  dark100: "#a6a8ab",
   dark200: "#909296",
-  dark300: "#5c5f66",
+  dark300: "#5c6066",
   dark400: "#373a40",
-  dark500: "#2c2e33",
-  dark600: "#25262b",
-  dark700: "#1a1b1e",
+  dark500: "#2c2f33",
+  dark600: "#25272b",
+  dark700: "#1a1c1e",
   dark800: "#141517",
   dark900: "#101113",
 };
@@ -97,6 +124,8 @@ const danger = {
 
 export const colors = {
   ...common,
+  ...whiteAlpha,
+  ...blackAlpha,
   ...primary,
   ...dark,
   ...neutral,
