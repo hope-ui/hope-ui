@@ -93,6 +93,17 @@ export interface HopeThemeOverride {
   components?: ComponentThemes;
 }
 
-export type HopeXPosition = "left" | "right";
+export type ColorsToken = keyof SystemTokens["colors"];
+export type SpaceToken = keyof SystemTokens["space"];
+export type SizesToken = keyof SystemTokens["sizes"];
+export type FontsToken = keyof SystemTokens["fonts"];
+export type FontSizesToken = keyof SystemTokens["fontSizes"];
+export type FontWeightsToken = keyof SystemTokens["fontWeights"];
+export type LetterSpacingsToken = keyof SystemTokens["letterSpacings"];
+export type LineHeightsToken = keyof SystemTokens["lineHeights"];
+export type RadiiToken = keyof SystemTokens["radii"];
+export type ShadowsToken = keyof SystemTokens["shadows"];
+export type ZIndicesToken = keyof SystemTokens["zIndices"];
 
-export type HopeYPosition = "top" | "bottom";
+export type XPositionToken = "left" | "right";
+export type YPositionToken = "top" | "bottom";

@@ -5,6 +5,7 @@ import { render } from "solid-js/web";
 
 import { Box, Button, extendTheme, HopeProvider, IconMoon, IconSun, Text } from ".";
 import { useColorMode, useColorModeValue } from "./contexts/ColorModeContext";
+import { ColorsToken } from "./theme/types";
 
 const customTheme = extendTheme({
   initialColorMode: "system",
@@ -12,7 +13,7 @@ const customTheme = extendTheme({
 
 export function App() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const textColor = useColorModeValue("success600", "danger600");
+  const textColor = useColorModeValue<ColorsToken, ColorsToken>("success600", "danger600");
 
   return (
     <div>

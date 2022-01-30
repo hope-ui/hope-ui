@@ -3,7 +3,7 @@ import { Dynamic } from "solid-js/web";
 
 import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
-import { HopeXPosition } from "@/theme/types";
+import { XPositionToken } from "@/theme/types";
 
 import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
@@ -12,7 +12,7 @@ import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.
 
 export interface ButtonOptions extends ButtonVariants {
   disabled?: boolean;
-  loaderPosition?: HopeXPosition;
+  loaderPosition?: XPositionToken;
   loader?: JSX.Element;
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
