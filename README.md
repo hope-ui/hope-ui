@@ -52,7 +52,7 @@ function App() {
 
 ## Component documentation
 
-At the moment, all component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs).
+All component's documentation can be found [here](https://github.com/fabien-ml/hope-ui/tree/main/src/docs) and you can try them in the [Storybook](https://hope-ui-storybook.vercel.app/).
 
 ## Creating styles
 
@@ -115,6 +115,10 @@ function Button() {
 ```js
 export default {
   colors: {
+    white: "#ffffff",
+    black: "#000000",
+    transparent: "transparent",
+
     // Primary (TailwindCSS Blue)
     primary50: "#eff6ff",
     primary100: "#dbeafe",
@@ -270,6 +274,7 @@ export default {
 ```js
 export default {
   space: {
+    0: "0",
     px: "1px",
     0_5: "0.125rem",
     1: "0.25rem",
@@ -361,14 +366,13 @@ export default {
 export default {
   shadows: {
     none: "0 0 #0000",
-    xs: "0 0 0 1px rgb(0 0 0 / 0.05)",
-    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-    md: "0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-    lg: "0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    xl: "0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    "2xl": "0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "3xl": "0 25px 50px -12px rgb(0 0 0 / 0.23)",
-    inner: "inset 0 3px 6px 0 rgb(0 0 0 / 0.3)",
+    xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    sm: "0 1px 3px 0 rgb(0 0 0 / 0.09), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    md: "0 4px 6px -1px rgb(0 0 0 / 0.09), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    lg: "0 10px 15px -3px rgb(0 0 0 / 0.09), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    xl: "0 20px 25px -5px rgb(0 0 0 / 0.09), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.24)",
+    inner: "inset 0 3px 6px 0 rgb(0 0 0 / 0.4)",
   },
 };
 ```
@@ -435,6 +439,160 @@ function App() {
   );
 }
 ```
+
+## The style props
+
+All Hope UI components provides some utility style props that are mapped to a theme scale.
+
+Style props are a way to alter the style of a component by simply passing props to it. It helps to save time by providing helpful shorthand ways to style components.
+
+> ⚠️ You can't put arbitrary values in style props.
+
+### Usage
+
+```jsx
+<Center color="white" bg="info500" w="40" h="24">
+  This is the Center.
+</Center>
+```
+
+### Available props
+
+The following table shows a list of every style prop and the properties within each group.
+
+#### Color
+
+| Prop  | CSS property | Theme token |
+| ----- | ------------ | ----------- |
+| color | color        | `colors`    |
+| bg    | background   | `colors`    |
+
+#### Margin
+
+| Prop | CSS property                            | Theme token |
+| ---- | --------------------------------------- | ----------- |
+| m    | margin                                  | `space`     |
+| mx   | margin-inline-start + margin-inline-end | `space`     |
+| my   | margin-top + margin-bottom              | `space`     |
+| mt   | margin-top                              | `space`     |
+| mr   | margin-right                            | `space`     |
+| mb   | margin-bottom                           | `space`     |
+| ml   | margin-left                             | `space`     |
+
+#### Padding
+
+| Prop | CSS property                              | Theme token |
+| ---- | ----------------------------------------- | ----------- |
+| p    | padding                                   | `space`     |
+| px   | padding-inline-start + padding-inline-end | `space`     |
+| py   | padding-top + padding-bottom              | `space`     |
+| pt   | padding-top                               | `space`     |
+| pr   | padding-right                             | `space`     |
+| pb   | padding-bottom                            | `space`     |
+| pl   | padding-left                              | `space`     |
+
+#### Typography
+
+| Prop          | CSS property                                               | Theme token      |
+| ------------- | ---------------------------------------------------------- | ---------------- |
+| fontFamily    | font-family                                                | `fonts`          |
+| fontSize      | font-size                                                  | `fontSizes`      |
+| fontWeight    | font-weight                                                | `fontWeights`    |
+| lineHeight    | line-height                                                | `lineHeights`    |
+| letterSpacing | letter-spacing                                             | `letterSpacings` |
+| textAlign     | text-align                                                 | none             |
+| fontStyle     | font-style                                                 | none             |
+| textTransform | text-transform                                             | none             |
+| lineClamp     | custom utility to truncate text to a given number of lines | none             |
+
+#### Layout
+
+| Prop          | CSS property   | Theme token |
+| ------------- | -------------- | ----------- |
+| display       | display        | none        |
+| verticalAlign | vertical-align | none        |
+| overflow      | overflow       | none        |
+| overflowX     | overflow-x     | none        |
+| overflowY     | overflow-y     | none        |
+
+#### Size
+
+| Prop    | CSS property   | Theme token |
+| ------- | -------------- | ----------- |
+| w       | width          | `sizes`     |
+| minW    | min-width      | `sizes`     |
+| maxW    | max-width      | `sizes`     |
+| h       | height         | `sizes`     |
+| minH    | min-height     | `sizes`     |
+| maxH    | max-height     | `sizes`     |
+| boxSize | width + height | `sizes`     |
+
+#### Flexbox
+
+| Prop                       | CSS property    | Theme token |
+| -------------------------- | --------------- | ----------- |
+| alignItems                 | align-items     | none        |
+| alignContent               | align-content   | none        |
+| justifyItems               | justify-items   | none        |
+| justifyContent             | justify-content | none        |
+| flexWrap, wrap\*           | flex-wrap       | none        |
+| flexDirection, direction\* | flex-direction  | none        |
+| flex                       | flex            | none        |
+| grow                       | flex-grow       | none        |
+| shrink                     | flex-shrink     | none        |
+| justifySelf                | justify-self    | none        |
+| alignSelf                  | align-self      | none        |
+| order                      | order           | none        |
+
+> Note: Props in \* will only work if you use the Flex component.
+
+#### Grid
+
+| Prop                | CSS property         | Theme token |
+| ------------------- | -------------------- | ----------- |
+| gap                 | gap                  | `space`     |
+| rowGap              | row-gap              | `space`     |
+| columnGap           | column-gap           | `space`     |
+| gridColumnSpan      | grid-column          | none        |
+| gridColumnStart     | grid-column-start    | none        |
+| gridColumnEnd       | grid-column-end      | none        |
+| gridRowSpan         | grid-row             | none        |
+| gridRowStart        | grid-row-start       | none        |
+| gridRowEnd          | grid-row-end         | none        |
+| gridAutoFlow        | grid-auto-flow       | none        |
+| gridAutoColumns     | grid-auto-columns    | none        |
+| gridAutoRows        | grid-auto-rows       | none        |
+| gridTemplateColumns | grid-template-column | none        |
+| gridTemplateRows    | grid-template-rows   | none        |
+| placeItems          | place-items          | none        |
+| placeContent        | place-content        | none        |
+| placeSelf           | place-self           | none        |
+
+#### Border
+
+| Prop         | CSS property  | Theme token |
+| ------------ | ------------- | ----------- |
+| borderWidth  | border-width  | none        |
+| borderStyle  | border-style  | none        |
+| borderColor  | border-color  | `colors`    |
+| borderRadius | border-radius | `radii`     |
+
+#### Position
+
+| Prop     | CSS property | Theme token |
+| -------- | ------------ | ----------- |
+| position | position     | none        |
+| zIndex   | z-index      | `zIndices`  |
+| top      | top          | `space`     |
+| right    | right        | `space`     |
+| left     | left         | `space`     |
+| bottom   | bottom       | `space`     |
+
+#### Shadow
+
+| Prop      | CSS property | Theme token |
+| --------- | ------------ | ----------- |
+| boxShadow | box-shadow   | `shadows`   |
 
 ## The `css` prop
 

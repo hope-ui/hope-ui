@@ -1,5 +1,4 @@
-import { IconSpinner } from "@/icons/IconSpinner";
-import { theme } from "@/stitches/stitches.config";
+import { theme } from "@/theme/stitches.config";
 
 import { HopeTheme } from "./types";
 

@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/test/utils";
-import { defaultTheme } from "@/theme/defaultTheme";
+import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Button } from "./Button";
 import { buttonStyles, ButtonVariants } from "./Button.styles";
@@ -66,6 +65,19 @@ describe("Button", () => {
     expect(button).toHaveAttribute("role", "button");
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <Button>Button</Button>);
+    const button = screen.getByRole("button");
+
+    // assert
+    expect(button).toHaveClass("hope-button");
+  });
+
+  it("should return semantic hope class as css selector when calling toString()", () => {
+    expect(Button.toString()).toBe(".hope-button");
+  });
+
   it("should have class from class prop", () => {
     // arrange
     const stubClass = "stub";
@@ -83,7 +95,7 @@ describe("Button", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Button className={stubClass}>Button</Button>);
+    renderWithHopeProvider(() => <Button class={stubClass}>Button</Button>);
     const button = screen.getByRole("button");
 
     // assert
@@ -102,9 +114,9 @@ describe("Button", () => {
     expect(button).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from Button theme by default", () => {
+  it("should have stitches generated class from buttonStyles", () => {
     // arrange
-    const buttonClass = buttonStyles(defaultTheme.components.Button);
+    const buttonClass = buttonStyles();
 
     // act
     renderWithHopeProvider(() => <Button>Button</Button>);
@@ -117,11 +129,10 @@ describe("Button", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: ButtonVariants = {
-      variant: "light",
-      color: "success",
+      variant: "subtle",
+      colorScheme: "success",
       size: "lg",
-      radius: "md",
-      uppercase: true,
+      borderRadius: "md",
       compact: true,
       loading: false,
       fullWidth: false,

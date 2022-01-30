@@ -1,12 +1,4 @@
-import { css } from "@/stitches/stitches.config";
-import { SystemStyleObject } from "@/stitches/types";
-
-import { AsProp, ClassProps } from "./types";
-
-export interface ClassConfig extends ClassProps {
-  baseClass?: string;
-  //themeBaseStyle?: SystemStyleObject;
-}
+import { AsProp, ClassConfig, ClassProps } from "./types";
 
 /**
  * Array of common props that are commonly splited with SolidJS `splitProps` method.
@@ -25,10 +17,28 @@ export function generateClassList(config: ClassConfig) {
   //const themeBaseClass = config.themeBaseStyle ? css(config.themeBaseStyle)() : "";
 
   return {
-    [config.baseClass ?? ""]: true,
+    [config.hopeClass]: true,
+    [config.baseClass]: true,
     //[themeBaseClass]: true,
-    [config.class ?? ""]: true,
-    [config.className ?? ""]: true,
-    ...config.classList,
+    [config.classProps.class ?? ""]: true,
+    [config.classProps.className ?? ""]: true,
+    ...config.classProps.classList,
   };
 }
+
+/**
+ * Return a CSS selector based on the provided class.
+ */
+export function createCssSelector(hopeClass: string) {
+  return `.${hopeClass}`;
+}
+
+// /**
+//  * Get the used props keys from a props object and a reference string array.
+//  * @param obj The props object to check if it contains some keys of the reference array.
+//  * @param reference The reference array to look for.
+//  * @returns An array of the common keys.
+//  */
+// export function getUsedPropsKeys<T>(props: T, reference: string[]) {
+//   return Object.keys(props).filter(key => reference.includes(key)) as Array<keyof T>;
+// }

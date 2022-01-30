@@ -1,23 +1,13 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/stitches/stitches.config";
+import { css } from "@/theme/stitches.config";
 
-export const centerStyles = css({
+import { boxStyles } from "../Box/Box.styles";
+
+export const centerStyles = css(boxStyles, {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-
-  variants: {
-    fullWidth: {
-      true: { width: "$full" },
-    },
-    fullHeight: {
-      true: { height: "$full" },
-    },
-    fullSize: {
-      true: { boxSize: "$full" },
-    },
-  },
 });
 
 export type CenterVariants = VariantProps<typeof centerStyles>;

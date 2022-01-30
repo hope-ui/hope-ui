@@ -1,8 +1,10 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/stitches/stitches.config";
+import { css } from "@/theme/stitches.config";
 
-export const containerStyles = css({
+import { boxStyles } from "../Box/Box.styles";
+
+export const containerStyles = css(boxStyles, {
   width: "100%",
 
   "@sm": { maxWidth: "$containerSm" },
@@ -31,11 +33,6 @@ export const containerStyles = css({
         alignItems: "center",
       },
     },
-  },
-
-  defaultVariants: {
-    centered: true,
-    centerContent: false,
   },
 });
 

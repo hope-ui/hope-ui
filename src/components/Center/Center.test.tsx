@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/test/utils";
+import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
 import { Center } from "./Center";
 import { centerStyles, CenterVariants } from "./Center.styles";
@@ -49,6 +49,19 @@ describe("Center", () => {
 
     // assert
     expect(center).toHaveTextContent(children);
+  });
+
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <Center data-testid="center">Center</Center>);
+    const center = screen.getByTestId("center");
+
+    // assert
+    expect(center).toHaveClass("hope-center");
+  });
+
+  it("should return semantic hope class as css selector when calling toString()", () => {
+    expect(Center.toString()).toBe(".hope-center");
   });
 
   it("should have class from class prop", () => {
@@ -114,9 +127,7 @@ describe("Center", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: CenterVariants = {
-      fullHeight: true,
-      fullWidth: true,
-      fullSize: true,
+      boxSize: "full",
     };
     const centerClass = centerStyles(variantProps);
 

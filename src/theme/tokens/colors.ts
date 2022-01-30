@@ -1,3 +1,9 @@
+const common = {
+  white: "#ffffff",
+  black: "#000000",
+  transparent: "transparent",
+};
+
 const primary = {
   primary50: "#eff6ff",
   primary100: "#dbeafe",
@@ -90,6 +96,7 @@ const danger = {
 };
 
 export const colors = {
+  ...common,
   ...primary,
   ...dark,
   ...neutral,

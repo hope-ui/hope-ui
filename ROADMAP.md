@@ -1,31 +1,31 @@
 # Components roadmap
 
-## General
+### General
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
 
-## Typography
+### Typography
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |     ✅     |       |    ✅     |  ✅  |
-| Heading |     ✅      |     ✅     |       |    ✅     |  ✅  |
+| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
+| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
 
-## Layout
+### Layout
 
-|            | Development | A11y check | Tests | Storybook | Docs |
-| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Center     |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
-| Container  |     ✅      |    n/a     |  ✅   |    ✅     |  ✅  |
-| Flex       |             |            |       |           |      |
-| Grid       |             |            |       |           |      |
-| SimpleGrid |             |            |       |           |      |
-| Stack      |             |            |       |           |      |
+|           | Development | A11y check | Tests | Storybook | Docs |
+| --------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Box       |     ✅      |    n/a     |  ✅   |    n/a    |      |
+| Center    |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Container |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Flex      |     ✅      |    n/a     |  ✅   |           |      |
+| Grid      |     ✅      |    n/a     |  ✅   |           |      |
+| Stack     |     ✅      |    n/a     |  ✅   |           |      |
 
-## Data entry
+### Data entry
 
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -50,7 +50,7 @@
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |
 
-## Data display
+### Data display
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -59,10 +59,10 @@
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |
-| Tag       |             |            |       |           |      |
+| Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
 
-## Navigation
+### Navigation
 
 |             | Development | A11y check | Tests | Storybook | Docs |
 | ----------- | :---------: | :--------: | :---: | :-------: | :--: |
@@ -72,7 +72,7 @@
 | Stepper     |             |            |       |           |      |
 | Tabs        |             |            |       |           |      |
 
-## Feedback
+### Feedback
 
 |              | Development | A11y check | Tests | Storybook | Docs |
 | ------------ | :---------: | :--------: | :---: | :-------: | :--: |
@@ -82,7 +82,7 @@
 | Progress     |             |            |       |           |      |
 | RingProgress |             |            |       |           |      |
 
-## Overlay
+### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |

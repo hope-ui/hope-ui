@@ -1,8 +1,16 @@
 import { VariantProps } from "@stitches/core";
 
-import { spin } from "@/stitches/keyframes";
-import { css } from "@/stitches/stitches.config";
-import { SystemStyleObject } from "@/stitches/types";
+import { spin } from "@/theme/keyframes";
+import { css } from "@/theme/stitches.config";
+import { SystemStyleObject } from "@/theme/types";
+
+import { boxStyles } from "../Box/Box.styles";
+
+export const buttonLoadingIconStyles = css({
+  animation: `1000ms linear infinite ${spin}`,
+});
+
+export const iconButtonStyles = css();
 
 interface SizeVariantConfig {
   height: string;
@@ -52,12 +60,12 @@ function createCompactSizeCompoundVariant(config: CompactSizeVariantConfig): Sys
   };
 }
 
-interface FilledCompoundVariantConfig {
+interface SolidCompoundVariantConfig {
   bgColor: string;
   bgColorHover: string;
 }
 
-function createFilledCompoundVariant(config: FilledCompoundVariantConfig): SystemStyleObject {
+function createSolidCompoundVariant(config: SolidCompoundVariantConfig): SystemStyleObject {
   return {
     backgroundColor: config.bgColor,
     "&:not(:disabled):hover": {
@@ -66,13 +74,13 @@ function createFilledCompoundVariant(config: FilledCompoundVariantConfig): Syste
   };
 }
 
-interface LightCompoundVariantConfig {
+interface SubtleCompoundVariantConfig {
   color: string;
   bgColor: string;
   bgColorHover: string;
 }
 
-function createLightCompoundVariant(config: LightCompoundVariantConfig): SystemStyleObject {
+function createSubtleCompoundVariant(config: SubtleCompoundVariantConfig): SystemStyleObject {
   return {
     backgroundColor: config.bgColor,
     color: config.color,
@@ -97,12 +105,12 @@ function createOutlineCompoundVariant(config: OutlineCompoundVariantConfig): Sys
   };
 }
 
-interface TextCompoundVariantConfig {
+interface GhostCompoundVariantConfig {
   color: string;
   bgColorHover: string;
 }
 
-function createTextCompoundVariant(config: TextCompoundVariantConfig): SystemStyleObject {
+function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemStyleObject {
   return {
     color: config.color,
     "&:not(:disabled):hover": {
@@ -111,19 +119,15 @@ function createTextCompoundVariant(config: TextCompoundVariantConfig): SystemSty
   };
 }
 
-export const buttonLoadingIconStyles = css({
-  animation: `1000ms linear infinite ${spin}`,
-});
-
-export const iconButtonStyles = css({});
-
-export const buttonStyles = css({
+export const buttonStyles = css(boxStyles, {
   appearance: "none",
   position: "relative",
 
   display: "inline-flex",
   justifyContent: "center",
   alignItems: "center",
+
+  outline: "none",
 
   padding: "0",
 
@@ -133,7 +137,6 @@ export const buttonStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  outline: "none",
   transition: "color 250ms, background-color 250ms",
 
   "&:active": {
@@ -163,11 +166,11 @@ export const buttonStyles = css({
           backgroundColor: "$neutral100",
         },
       },
-      filled: {
+      solid: {
         border: "1px solid transparent",
         color: "white",
       },
-      light: {
+      subtle: {
         border: "1px solid transparent",
       },
       outline: {
@@ -180,12 +183,12 @@ export const buttonStyles = css({
         borderWidth: "1px",
         backgroundColor: "transparent",
       },
-      text: {
+      ghost: {
         border: "1px solid transparent",
         backgroundColor: "transparent",
       },
     },
-    color: {
+    colorScheme: {
       primary: {},
       dark: {},
       neutral: {},
@@ -231,21 +234,7 @@ export const buttonStyles = css({
         spacing: "$2",
       }),
     },
-    radius: {
-      none: { borderRadius: "0" },
-      xs: { borderRadius: "$xs" },
-      sm: { borderRadius: "$sm" },
-      md: { borderRadius: "$md" },
-      lg: { borderRadius: "$lg" },
-      xl: { borderRadius: "$xl" },
-      "2xl": { borderRadius: "$2xl" },
-      "3xl": { borderRadius: "$3xl" },
-      full: { borderRadius: "$full" },
-    },
     compact: { true: {} },
-    uppercase: {
-      true: { textTransform: "uppercase" },
-    },
     fullWidth: {
       true: {
         display: "flex",
@@ -263,104 +252,104 @@ export const buttonStyles = css({
 
   compoundVariants: [
     /**
-     * Variant filled
+     * Variant solid
      ******************************/
     {
-      variant: "filled",
-      color: "primary",
-      css: createFilledCompoundVariant({ bgColor: "$primary500", bgColorHover: "$primary600" }),
+      variant: "solid",
+      colorScheme: "primary",
+      css: createSolidCompoundVariant({ bgColor: "$primary500", bgColorHover: "$primary600" }),
     },
     {
-      variant: "filled",
-      color: "dark",
-      css: createFilledCompoundVariant({ bgColor: "$dark500", bgColorHover: "$dark800" }),
+      variant: "solid",
+      colorScheme: "dark",
+      css: createSolidCompoundVariant({ bgColor: "$dark500", bgColorHover: "$dark800" }),
     },
     {
-      variant: "filled",
-      color: "neutral",
-      css: createFilledCompoundVariant({ bgColor: "$neutral500", bgColorHover: "$neutral600" }),
+      variant: "solid",
+      colorScheme: "neutral",
+      css: createSolidCompoundVariant({ bgColor: "$neutral500", bgColorHover: "$neutral600" }),
     },
     {
-      variant: "filled",
-      color: "success",
-      css: createFilledCompoundVariant({ bgColor: "$success500", bgColorHover: "$success600" }),
+      variant: "solid",
+      colorScheme: "success",
+      css: createSolidCompoundVariant({ bgColor: "$success500", bgColorHover: "$success600" }),
     },
     {
-      variant: "filled",
-      color: "info",
-      css: createFilledCompoundVariant({ bgColor: "$info500", bgColorHover: "$info600" }),
+      variant: "solid",
+      colorScheme: "info",
+      css: createSolidCompoundVariant({ bgColor: "$info500", bgColorHover: "$info600" }),
     },
     {
-      variant: "filled",
-      color: "warning",
-      css: createFilledCompoundVariant({ bgColor: "$warning500", bgColorHover: "$warning600" }),
+      variant: "solid",
+      colorScheme: "warning",
+      css: createSolidCompoundVariant({ bgColor: "$warning500", bgColorHover: "$warning600" }),
     },
     {
-      variant: "filled",
-      color: "danger",
-      css: createFilledCompoundVariant({ bgColor: "$danger500", bgColorHover: "$danger600" }),
+      variant: "solid",
+      colorScheme: "danger",
+      css: createSolidCompoundVariant({ bgColor: "$danger500", bgColorHover: "$danger600" }),
     },
     /**
-     * Variant light
+     * Variant subtle
      ******************************/
     {
-      variant: "light",
-      color: "primary",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "primary",
+      css: createSubtleCompoundVariant({
         color: "$primary600",
         bgColor: "$primary50",
         bgColorHover: "$primary100",
       }),
     },
     {
-      variant: "light",
-      color: "dark",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "dark",
+      css: createSubtleCompoundVariant({
         color: "$dark800",
         bgColor: "$dark50",
         bgColorHover: "$dark100",
       }),
     },
     {
-      variant: "light",
-      color: "neutral",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "neutral",
+      css: createSubtleCompoundVariant({
         color: "$neutral600",
         bgColor: "$neutral100",
         bgColorHover: "$neutral200",
       }),
     },
     {
-      variant: "light",
-      color: "success",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "success",
+      css: createSubtleCompoundVariant({
         color: "$success600",
         bgColor: "$success50",
         bgColorHover: "$success100",
       }),
     },
     {
-      variant: "light",
-      color: "info",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "info",
+      css: createSubtleCompoundVariant({
         color: "$info600",
         bgColor: "$info50",
         bgColorHover: "$info100",
       }),
     },
     {
-      variant: "light",
-      color: "warning",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "warning",
+      css: createSubtleCompoundVariant({
         color: "$warning600",
         bgColor: "$warning50",
         bgColorHover: "$warning100",
       }),
     },
     {
-      variant: "light",
-      color: "danger",
-      css: createLightCompoundVariant({
+      variant: "subtle",
+      colorScheme: "danger",
+      css: createSubtleCompoundVariant({
         color: "$danger600",
         bgColor: "$danger50",
         bgColorHover: "$danger100",
@@ -371,37 +360,37 @@ export const buttonStyles = css({
      ******************************/
     {
       variant: "outline",
-      color: "primary",
+      colorScheme: "primary",
       css: createOutlineCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
       variant: "outline",
-      color: "dark",
+      colorScheme: "dark",
       css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "outline",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
       variant: "outline",
-      color: "success",
+      colorScheme: "success",
       css: createOutlineCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
       variant: "outline",
-      color: "info",
+      colorScheme: "info",
       css: createOutlineCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
       variant: "outline",
-      color: "warning",
+      colorScheme: "warning",
       css: createOutlineCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
       variant: "outline",
-      color: "danger",
+      colorScheme: "danger",
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
@@ -409,76 +398,76 @@ export const buttonStyles = css({
      ******************************/
     {
       variant: "dashed",
-      color: "primary",
+      colorScheme: "primary",
       css: createOutlineCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
       variant: "dashed",
-      color: "dark",
+      colorScheme: "dark",
       css: createOutlineCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
       variant: "dashed",
-      color: "neutral",
+      colorScheme: "neutral",
       css: createOutlineCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
       variant: "dashed",
-      color: "success",
+      colorScheme: "success",
       css: createOutlineCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
       variant: "dashed",
-      color: "info",
+      colorScheme: "info",
       css: createOutlineCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
       variant: "dashed",
-      color: "warning",
+      colorScheme: "warning",
       css: createOutlineCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
       variant: "dashed",
-      color: "danger",
+      colorScheme: "danger",
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
-     * Variant text
+     * Variant ghost
      ******************************/
     {
-      variant: "text",
-      color: "primary",
-      css: createTextCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
+      variant: "ghost",
+      colorScheme: "primary",
+      css: createGhostCompoundVariant({ color: "$primary600", bgColorHover: "$primary50" }),
     },
     {
-      variant: "text",
-      color: "dark",
-      css: createTextCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
+      variant: "ghost",
+      colorScheme: "dark",
+      css: createGhostCompoundVariant({ color: "$dark600", bgColorHover: "$dark50" }),
     },
     {
-      variant: "text",
-      color: "neutral",
-      css: createTextCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
+      variant: "ghost",
+      colorScheme: "neutral",
+      css: createGhostCompoundVariant({ color: "$neutral600", bgColorHover: "$neutral100" }),
     },
     {
-      variant: "text",
-      color: "success",
-      css: createTextCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
+      variant: "ghost",
+      colorScheme: "success",
+      css: createGhostCompoundVariant({ color: "$success600", bgColorHover: "$success50" }),
     },
     {
-      variant: "text",
-      color: "info",
-      css: createTextCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
+      variant: "ghost",
+      colorScheme: "info",
+      css: createGhostCompoundVariant({ color: "$info600", bgColorHover: "$info50" }),
     },
     {
-      variant: "text",
-      color: "warning",
-      css: createTextCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
+      variant: "ghost",
+      colorScheme: "warning",
+      css: createGhostCompoundVariant({ color: "$warning600", bgColorHover: "$warning50" }),
     },
     {
-      variant: "text",
-      color: "danger",
-      css: createTextCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
+      variant: "ghost",
+      colorScheme: "danger",
+      css: createGhostCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
      * Compact sizes

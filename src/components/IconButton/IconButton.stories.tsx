@@ -37,9 +37,9 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["filled", "light", "outline", "dashed", "text", "default"],
+      options: ["solid", "subtle", "outline", "dashed", "ghost", "default"],
     },
-    color: {
+    colorScheme: {
       control: { type: "select" },
       options: ["primary", "dark", "neutral", "success", "info", "warning", "danger"],
     },
@@ -47,7 +47,7 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg", "xl"],
     },
-    radius: {
+    borderRadius: {
       control: { type: "select" },
       options: ["none", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "full"],
     },
@@ -65,10 +65,10 @@ export default {
     },
   },
   args: {
-    variant: "filled",
-    color: "primary",
+    variant: "solid",
+    colorScheme: "primary",
     size: "md",
-    radius: "sm",
+    borderRadius: "sm",
     compact: false,
     loading: false,
     disabled: false,

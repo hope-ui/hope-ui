@@ -1,23 +1,24 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/contexts/HopeContext";
 
-import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
+import { Button, ButtonOptions, ThemeableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { createCssSelector, generateClassList } from "../utils";
 
-export type IconButtonOptions = Omit<
-  ButtonOptions,
-  "leftIcon" | "rightIcon" | "loaderPosition" | "uppercase" | "fullWidth"
-> & {
+export interface IconButtonOptions
+  extends Omit<
+    ButtonOptions,
+    "leftIcon" | "rightIcon" | "loaderPosition" | "textTransform" | "fullWidth"
+  > {
   icon: JSX.Element;
   "aria-label": string;
-};
+}
 
-export type ThemeableIconButtonOptions = Omit<
-  IconButtonOptions,
-  CommonOmitableButtonOptions | "aria-label" | "icon"
+export type ThemeableIconButtonOptions = Pick<
+  ThemeableButtonOptions,
+  "variant" | "colorScheme" | "size" | "borderRadius" | "compact"
 >;
 
 export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
@@ -25,39 +26,41 @@ export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
   IconButtonOptions
 >;
 
+const hopeIconButtonClass = "hope-icon-button";
+
 /**
  * IconButton composes the Button component except that it renders only an icon.
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const theme = useHopeTheme().components.IconButton;
+  const theme = useTheme().components.IconButton;
 
   const defaultProps: Required<ThemeableIconButtonOptions> = {
-    variant: theme?.defaultProps?.variant ?? "filled",
-    color: theme?.defaultProps?.color ?? "primary",
+    variant: theme?.defaultProps?.variant ?? "solid",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    radius: theme?.defaultProps?.radius ?? "sm",
+    borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
     compact: theme?.defaultProps?.compact ?? false,
   };
 
-  props = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(props, [...commonProps, "children", "icon"]);
+  const propsWithDefault: IconButtonProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "className",
+    "classList",
+    "children",
+    "icon",
+  ]);
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeIconButtonClass,
       baseClass: iconButtonStyles(),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 
-  return (
-    <Button
-      as={local.as as ElementType}
-      classList={classList()}
-      leftIcon={local.icon}
-      {...others}
-    />
-  );
+  return <Button classList={classList()} leftIcon={local.icon} {...others} />;
 }
+
+IconButton.toString = () => createCssSelector(hopeIconButtonClass);

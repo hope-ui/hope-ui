@@ -1,9 +1,27 @@
-import { ThemeableButtonOptions } from "@/components/Button/Button";
-import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
+import { CSS } from "@stitches/core";
 
-import { ThemeableTextOptions } from "..";
-import { defaulThemeTokens } from "../stitches/tokens";
-import { SystemTokens } from "../stitches/types";
+import { ThemeableButtonOptions } from "@/components/Button/Button";
+import { ThemeableHeadingOptions } from "@/components/Heading/Heading";
+import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
+import { ThemeableTagOptions } from "@/components/Tag/Tag";
+
+import { config, theme } from "./stitches.config";
+import { defaulThemeTokens } from "./tokens";
+
+/**
+ * Design tokens interface based on the stitches theme.
+ */
+export type SystemTokens = typeof theme;
+
+/**
+ * Media at-rules interface based on the stitches media.
+ */
+export type SystemMedia = typeof config.media;
+
+/**
+ * Style interface based on the stitches configuration.
+ */
+export type SystemStyleObject = CSS<typeof config>;
 
 /**
  * Theme configuration for Hope UI component.
@@ -25,8 +43,8 @@ export interface ComponentThemeConfig<Props> {
 export interface ComponentThemes {
   Button?: ComponentThemeConfig<ThemeableButtonOptions>;
   IconButton?: ComponentThemeConfig<ThemeableIconButtonOptions>;
-  Heading?: ComponentThemeConfig<ThemeableTextOptions>;
-  Text?: ComponentThemeConfig<ThemeableTextOptions>;
+  Heading?: ComponentThemeConfig<ThemeableHeadingOptions>;
+  Tag?: ComponentThemeConfig<ThemeableTagOptions>;
 }
 
 /**

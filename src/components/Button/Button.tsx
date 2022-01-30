@@ -1,47 +1,55 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useHopeTheme } from "@/contexts/HopeContext";
+import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
 
+import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
-import { commonProps, generateClassList } from "../utils";
+import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
-export type ButtonOptions = ButtonVariants & {
+export interface ButtonOptions extends ButtonVariants {
   disabled?: boolean;
   loaderPosition?: HopeXPosition;
   loader?: JSX.Element;
   leftIcon?: JSX.Element;
   rightIcon?: JSX.Element;
-};
+}
 
-export type CommonOmitableButtonOptions = "disabled" | "loading" | "loader";
-
-export type ThemeableButtonOptions = Omit<
+export type ThemeableButtonOptions = Pick<
   ButtonOptions,
-  CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
+  | "variant"
+  | "colorScheme"
+  | "size"
+  | "loaderPosition"
+  | "compact"
+  | "fullWidth"
+  | "borderRadius"
+  | "textTransform"
 >;
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
+
+const hopeButtonClass = "hope-button";
 
 /**
  * The Button component is used to trigger an action or event,
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useHopeTheme().components.Button;
+  const theme = useTheme().components.Button;
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
-    variant: theme?.defaultProps?.variant ?? "filled",
-    color: theme?.defaultProps?.color ?? "primary",
+    variant: theme?.defaultProps?.variant ?? "solid",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    radius: theme?.defaultProps?.radius ?? "sm",
+    borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
     loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     compact: theme?.defaultProps?.compact ?? false,
-    uppercase: theme?.defaultProps?.uppercase ?? false,
+    textTransform: theme?.defaultProps?.textTransform ?? "none",
     fullWidth: theme?.defaultProps?.fullWidth ?? false,
     loader: <IconSpinner />,
     loading: false,
@@ -50,19 +58,18 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     role: "button",
   };
 
-  props = mergeProps(defaultProps, props);
+  const propsWithDefault: ButtonProps<C> = mergeProps(defaultProps, props);
   const [local, styleProps, others] = splitProps(
-    props,
+    propsWithDefault,
     [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    ["css", "variant", "color", "size", "radius", "loading", "compact", "uppercase", "fullWidth"]
+    [...boxPropNames, "css", "variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
 
   const classList = () => {
     return generateClassList({
+      hopeClass: hopeButtonClass,
       baseClass: buttonStyles(styleProps),
-      class: local.class,
-      className: local.className,
-      classList: local.classList,
+      classProps: local,
     });
   };
 
@@ -92,7 +99,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     <Dynamic component={local.as} classList={classList()} disabled={local.disabled} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
-        <span className={loaderClass}>{local.loader}</span>
+        <span class={loaderClass}>{local.loader}</span>
       </Show>
       <Show when={local.children}>
         <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
@@ -101,8 +108,10 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       </Show>
       <Show when={isRightIconVisible()}>{local.rightIcon}</Show>
       <Show when={isRightLoaderVisible()}>
-        <span className={loaderClass}>{local.loader}</span>
+        <span class={loaderClass}>{local.loader}</span>
       </Show>
     </Dynamic>
   );
 }
+
+Button.toString = () => createCssSelector(hopeButtonClass);
