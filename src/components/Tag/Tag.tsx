@@ -32,8 +32,8 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 
   const defaultProps: TagProps<"span"> = {
     as: "span",
-    variant: theme?.defaultProps?.variant ?? "light",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
+    variant: theme?.defaultProps?.variant ?? "subtle",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "neutral",
     size: theme?.defaultProps?.size ?? "md",
     borderRadius: theme?.defaultProps?.borderRadius ?? "full",
   };

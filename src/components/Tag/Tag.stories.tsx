@@ -20,7 +20,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["filled", "light", "outline", "dot"],
+      options: ["solid", "subtle", "outline", "dot"],
     },
     colorScheme: {
       control: { type: "select" },
@@ -39,7 +39,7 @@ export default {
     },
   },
   args: {
-    variant: "light",
+    variant: "subtle",
     colorScheme: "primary",
     size: "sm",
     borderRadius: "full",

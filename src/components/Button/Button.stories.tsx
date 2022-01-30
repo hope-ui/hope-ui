@@ -21,7 +21,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["filled", "light", "outline", "dashed", "text", "default"],
+      options: ["solid", "subtle", "outline", "dashed", "ghost", "default"],
     },
     colorScheme: {
       control: { type: "select" },
@@ -56,7 +56,7 @@ export default {
     },
   },
   args: {
-    variant: "filled",
+    variant: "solid",
     colorScheme: "primary",
     size: "md",
     borderRadius: "sm",

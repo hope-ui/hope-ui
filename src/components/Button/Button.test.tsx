@@ -129,7 +129,7 @@ describe("Button", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: ButtonVariants = {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "success",
       size: "lg",
       borderRadius: "md",

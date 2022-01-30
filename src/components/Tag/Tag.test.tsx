@@ -127,7 +127,7 @@ describe("Tag", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const variantProps: TagOptions = {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "success",
       size: "lg",
       borderRadius: "md",

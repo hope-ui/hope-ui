@@ -36,7 +36,7 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
   const theme = useTheme().components.IconButton;
 
   const defaultProps: Required<ThemeableIconButtonOptions> = {
-    variant: theme?.defaultProps?.variant ?? "filled",
+    variant: theme?.defaultProps?.variant ?? "solid",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
     borderRadius: theme?.defaultProps?.borderRadius ?? "sm",

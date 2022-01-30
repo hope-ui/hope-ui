@@ -92,12 +92,12 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
   };
 }
 
-interface TagFilledCompoundVariantConfig {
+interface TagSolidCompoundVariantConfig {
   bgColor: string;
   closeButtonBgColorHover: string;
 }
 
-function createTagFilledCompoundVariant(config: TagFilledCompoundVariantConfig): SystemStyleObject {
+function createTagSolidCompoundVariant(config: TagSolidCompoundVariantConfig): SystemStyleObject {
   return {
     backgroundColor: config.bgColor,
     [`& .${tagCloseButtonStyles}:not(:disabled):hover`]: {
@@ -106,13 +106,13 @@ function createTagFilledCompoundVariant(config: TagFilledCompoundVariantConfig):
   };
 }
 
-interface TagLightCompoundVariantConfig {
+interface TagSubtleCompoundVariantConfig {
   bgColor: string;
   color: string;
   closeButtonBgColorHover: string;
 }
 
-function createTagLightCompoundVariant(config: TagLightCompoundVariantConfig): SystemStyleObject {
+function createTagSubtleCompoundVariant(config: TagSubtleCompoundVariantConfig): SystemStyleObject {
   return {
     backgroundColor: config.bgColor,
     color: config.color,
@@ -171,11 +171,11 @@ export const tagStyles = css(boxStyles, {
 
   variants: {
     variant: {
-      filled: {
+      solid: {
         border: "1px solid transparent",
         color: "white",
       },
-      light: {
+      subtle: {
         border: "1px solid transparent",
       },
       outline: {
@@ -249,125 +249,125 @@ export const tagStyles = css(boxStyles, {
   },
   compoundVariants: [
     /**
-     * Variant filled + color
+     * Variant solid + color
      ******************************/
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "primary",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$primary500",
         closeButtonBgColorHover: "$primary600",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "dark",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$dark500",
         closeButtonBgColorHover: "$dark300",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "neutral",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$neutral500",
         closeButtonBgColorHover: "$neutral600",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "success",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$success500",
         closeButtonBgColorHover: "$success600",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "info",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$info500",
         closeButtonBgColorHover: "$info600",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "warning",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$warning500",
         closeButtonBgColorHover: "$warning600",
       }),
     },
     {
-      variant: "filled",
+      variant: "solid",
       colorScheme: "danger",
-      css: createTagFilledCompoundVariant({
+      css: createTagSolidCompoundVariant({
         bgColor: "$danger500",
         closeButtonBgColorHover: "$danger600",
       }),
     },
     /**
-     * Variant light + color
+     * Variant subtle + color
      ******************************/
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "primary",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$primary50",
         color: "$primary600",
         closeButtonBgColorHover: "$primary100",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "dark",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$dark50",
         color: "$dark800",
         closeButtonBgColorHover: "$dark100",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "neutral",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$neutral100",
         color: "$neutral600",
         closeButtonBgColorHover: "$neutral200",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "success",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$success50",
         color: "$success600",
         closeButtonBgColorHover: "$success100",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "info",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$info50",
         color: "$info600",
         closeButtonBgColorHover: "$info100",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "warning",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$warning50",
         color: "$warning600",
         closeButtonBgColorHover: "$warning100",
       }),
     },
     {
-      variant: "light",
+      variant: "subtle",
       colorScheme: "danger",
-      css: createTagLightCompoundVariant({
+      css: createTagSubtleCompoundVariant({
         bgColor: "$danger50",
         color: "$danger600",
         closeButtonBgColorHover: "$danger100",

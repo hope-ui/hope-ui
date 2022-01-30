@@ -43,7 +43,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
-    variant: theme?.defaultProps?.variant ?? "filled",
+    variant: theme?.defaultProps?.variant ?? "solid",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
     borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
