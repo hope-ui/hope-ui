@@ -276,6 +276,7 @@ export default {
 ```js
 export default {
   space: {
+    0: "0",
     px: "1px",
     0_5: "0.125rem",
     1: "0.25rem",

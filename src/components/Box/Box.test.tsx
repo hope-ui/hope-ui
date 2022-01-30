@@ -131,7 +131,7 @@ describe("Box", () => {
       verticalAlign: "baseline",
       overflow: "auto",
       overflowX: "clip",
-      overflowY: "scoll",
+      overflowY: "scroll",
       color: "white",
       bg: "success500",
       borderWidth: "4",
