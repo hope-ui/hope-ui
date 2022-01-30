@@ -3,9 +3,9 @@ import "./playground.css";
 import { Show } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, extendTheme, HopeProvider, IconMoon, IconSun, Text } from ".";
+import { Box, Button, extendTheme, HopeProvider, IconButton, IconMoon, IconSun, Text } from ".";
 import { useColorMode, useColorModeValue } from "./contexts/ColorModeContext";
-import { ColorsToken } from "./theme/types";
+import { ColorToken } from "./theme/types";
 
 const customTheme = extendTheme({
   initialColorMode: "system",
@@ -13,20 +13,19 @@ const customTheme = extendTheme({
 
 export function App() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const textColor = useColorModeValue<ColorsToken, ColorsToken>("success600", "danger600");
+  const textColor = useColorModeValue<ColorToken, ColorToken>("success600", "danger600");
+  const icon = useColorModeValue(<IconMoon />, <IconSun />);
 
   return (
     <div>
-      <Button
-        leftIcon={
-          <Show when={colorMode() === "light"} fallback={<IconMoon />}>
-            <IconSun />
-          </Show>
-        }
+      <IconButton
+        variant="ghost"
+        colorScheme="neutral"
+        aria-label="Toggle color mode"
+        icon={icon}
         onClick={toggleColorMode}
-      >
-        Current mode : {colorMode()}
-      </Button>
+      />
+      <Text>Current mode : {colorMode()}</Text>
       <Box bg="danger400" w="full" p={4} color="white">
         Always white
       </Box>

@@ -24,9 +24,19 @@ export type SystemMedia = typeof config.media;
 export type SystemStyleObject = CSS<typeof config>;
 
 /**
- * Available color mode
+ * Hope UI color mode.
  */
 export type ColorMode = "light" | "dark" | "system";
+
+/**
+ * Hope UI x-position.
+ */
+export type XPosition = "left" | "right";
+
+/**
+ * Hope UI y-position.
+ */
+export type YPosition = "top" | "bottom";
 
 /**
  * Theme configuration for Hope UI component.
@@ -93,17 +103,57 @@ export interface HopeThemeOverride {
   components?: ComponentThemes;
 }
 
-export type ColorsToken = keyof SystemTokens["colors"];
-export type SpaceToken = keyof SystemTokens["space"];
-export type SizesToken = keyof SystemTokens["sizes"];
-export type FontsToken = keyof SystemTokens["fonts"];
-export type FontSizesToken = keyof SystemTokens["fontSizes"];
-export type FontWeightsToken = keyof SystemTokens["fontWeights"];
-export type LetterSpacingsToken = keyof SystemTokens["letterSpacings"];
-export type LineHeightsToken = keyof SystemTokens["lineHeights"];
-export type RadiiToken = keyof SystemTokens["radii"];
-export type ShadowsToken = keyof SystemTokens["shadows"];
-export type ZIndicesToken = keyof SystemTokens["zIndices"];
+/**
+ * Hope UI theme `colors` value type.
+ */
+export type ColorToken = keyof SystemTokens["colors"];
 
-export type XPositionToken = "left" | "right";
-export type YPositionToken = "top" | "bottom";
+/**
+ * Hope UI theme `space` value type.
+ */
+export type SpaceToken = keyof SystemTokens["space"];
+
+/**
+ * Hope UI theme `sizes` value type.
+ */
+export type SizeToken = keyof SystemTokens["sizes"];
+
+/**
+ * Hope UI theme `fonts` value type.
+ */
+export type FontToken = keyof SystemTokens["fonts"];
+
+/**
+ * Hope UI theme `fontSizes` value type.
+ */
+export type FontSizeToken = keyof SystemTokens["fontSizes"];
+
+/**
+ * Hope UI theme `fontWeights` value type.
+ */
+export type FontWeightToken = keyof SystemTokens["fontWeights"];
+
+/**
+ * Hope UI theme `letterSpacings` value type.
+ */
+export type LetterSpacingToken = keyof SystemTokens["letterSpacings"];
+
+/**
+ * Hope UI theme `lineHeights` value type.
+ */
+export type LineHeightToken = keyof SystemTokens["lineHeights"];
+
+/**
+ * Hope UI theme `radii` value type.
+ */
+export type RadiiToken = keyof SystemTokens["radii"];
+
+/**
+ * Hope UI theme `shadows` value type.
+ */
+export type ShadowToken = keyof SystemTokens["shadows"];
+
+/**
+ * Hope UI theme `zIndices` value type.
+ */
+export type ZIndiceToken = keyof SystemTokens["zIndices"];
