@@ -95,7 +95,7 @@ describe("Button", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Button className={stubClass}>Button</Button>);
+    renderWithHopeProvider(() => <Button class={stubClass}>Button</Button>);
     const button = screen.getByRole("button");
 
     // assert

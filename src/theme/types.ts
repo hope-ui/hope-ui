@@ -3,6 +3,7 @@ import { CSS } from "@stitches/core";
 import { ThemeableButtonOptions } from "@/components/Button/Button";
 import { ThemeableHeadingOptions } from "@/components/Heading/Heading";
 import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
+import { ThemeableTagOptions } from "@/components/Tag/Tag";
 
 import { config, theme } from "./stitches.config";
 import { defaulThemeTokens } from "./tokens";
@@ -43,6 +44,7 @@ export interface ComponentThemes {
   Button?: ComponentThemeConfig<ThemeableButtonOptions>;
   IconButton?: ComponentThemeConfig<ThemeableIconButtonOptions>;
   Heading?: ComponentThemeConfig<ThemeableHeadingOptions>;
+  Tag?: ComponentThemeConfig<ThemeableTagOptions>;
 }
 
 /**

@@ -16,10 +16,15 @@ export type HopeProviderProps = PropsWithChildren<{
 
 export function HopeProvider(props: HopeProviderProps) {
   const propsWithDefault = mergeProps({ theme: defaultTheme }, props);
+
+  // eslint-disable-next-line solid/reactivity
   const [theme] = createSignal(propsWithDefault.theme);
 
-  // Apply css reset and the customized stitches theme
+  // Apply css reset
   resetStyles();
+
+  // Apply the customized stitches theme
+  // eslint-disable-next-line solid/reactivity
   document.documentElement.classList.add(theme().tokens);
 
   return <HopeContext.Provider value={{ theme: theme() }}>{props.children}</HopeContext.Provider>;

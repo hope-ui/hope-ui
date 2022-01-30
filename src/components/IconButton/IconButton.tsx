@@ -2,7 +2,7 @@ import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/contexts/HopeContext";
 
-import { Button, ButtonOptions, CommonOmitableButtonOptions } from "../Button/Button";
+import { Button, ButtonOptions, ThemeableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
 import { ElementType, PolymorphicComponentProps } from "../types";
 import { createCssSelector, generateClassList } from "../utils";
@@ -16,9 +16,9 @@ export interface IconButtonOptions
   "aria-label": string;
 }
 
-export type ThemeableIconButtonOptions = Omit<
-  IconButtonOptions,
-  CommonOmitableButtonOptions | "aria-label" | "icon"
+export type ThemeableIconButtonOptions = Pick<
+  ThemeableButtonOptions,
+  "variant" | "colorScheme" | "size" | "borderRadius" | "compact"
 >;
 
 export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<

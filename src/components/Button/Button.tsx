@@ -5,7 +5,7 @@ import { useTheme } from "@/contexts/HopeContext";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { HopeXPosition } from "@/theme/types";
 
-import { boxPropNames, BoxVariants } from "../Box/Box.styles";
+import { boxPropNames } from "../Box/Box.styles";
 import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
 import { commonProps, createCssSelector, generateClassList } from "../utils";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
@@ -18,15 +18,16 @@ export interface ButtonOptions extends ButtonVariants {
   rightIcon?: JSX.Element;
 }
 
-export type CommonOmitableButtonOptions =
-  | keyof Omit<BoxVariants, "borderRadius" | "textTransform">
-  | "disabled"
-  | "loading"
-  | "loader";
-
-export type ThemeableButtonOptions = Omit<
+export type ThemeableButtonOptions = Pick<
   ButtonOptions,
-  CommonOmitableButtonOptions | "leftIcon" | "rightIcon"
+  | "variant"
+  | "colorScheme"
+  | "size"
+  | "loaderPosition"
+  | "compact"
+  | "fullWidth"
+  | "borderRadius"
+  | "textTransform"
 >;
 
 export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;

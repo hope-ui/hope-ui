@@ -59,7 +59,7 @@
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
 | Table     |             |            |       |           |      |
-| Tag       |             |            |       |           |      |
+| Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation

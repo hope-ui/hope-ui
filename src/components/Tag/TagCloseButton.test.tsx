@@ -1,17 +1,23 @@
+import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
-import { IconUser } from "@/icons/IconUser";
 import { renderWithHopeProvider } from "@/utils/renderWithHopeProvider";
 
-import { buttonStyles, iconButtonStyles } from "../Button/Button.styles";
-import { IconButton, IconButtonOptions } from "./IconButton";
+import { tagCloseButtonStyles } from "./Tag.styles";
+import { TagCloseButton, TagCloseButtonOptions } from "./TagCloseButton";
+import { TagContextProvider } from "./TagContext";
 
-describe("IconButton", () => {
+function renderWithTagContextProvider(callback: () => JSX.Element) {
+  return renderWithHopeProvider(() => (
+    <TagContextProvider contextValue={{ borderRadius: "md" }}>{callback}</TagContextProvider>
+  ));
+}
+describe("TagCloseButton", () => {
   afterEach(cleanup);
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -20,7 +26,7 @@ describe("IconButton", () => {
 
   it("should render <button> tag by default", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -29,7 +35,7 @@ describe("IconButton", () => {
 
   it("should render tag provided with the as prop", () => {
     // act
-    renderWithHopeProvider(() => <IconButton as="a" aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton as="a" aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -38,7 +44,7 @@ describe("IconButton", () => {
 
   it("should have type=button", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -47,7 +53,7 @@ describe("IconButton", () => {
 
   it("should have role=button", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -56,15 +62,15 @@ describe("IconButton", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
-    expect(button).toHaveClass("hope-icon-button");
+    expect(button).toHaveClass("hope-tag-close-button");
   });
 
   it("should return semantic hope class as css selector when calling toString()", () => {
-    expect(IconButton.toString()).toBe(".hope-icon-button");
+    expect(TagCloseButton.toString()).toBe(".hope-tag-close-button");
   });
 
   it("should have class from class prop", () => {
@@ -72,9 +78,7 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithTagContextProvider(() => <TagCloseButton class={stubClass} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -86,9 +90,7 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithTagContextProvider(() => <TagCloseButton class={stubClass} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -100,8 +102,8 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton classList={{ [stubClass]: true }} aria-label="User" icon={<IconUser />} />
+    renderWithTagContextProvider(() => (
+      <TagCloseButton classList={{ [stubClass]: true }} aria-label="Close" />
     ));
     const button = screen.getByRole("button");
 
@@ -109,24 +111,24 @@ describe("IconButton", () => {
     expect(button).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from iconButtonStyles", () => {
+  it("should have stitches generated class from tagCloseButtonStyles", () => {
     // arrange
-    const iconButtonClass = iconButtonStyles();
+    const tagCloseButtonClass = tagCloseButtonStyles();
 
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
-    expect(button).toHaveClass(iconButtonClass.className);
+    expect(button).toHaveClass(tagCloseButtonClass.className);
   });
 
   it("should have stitches generated class from buttonStyles", () => {
     // arrange
-    const buttonClass = buttonStyles();
+    const buttonClass = tagCloseButtonStyles();
 
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -135,20 +137,13 @@ describe("IconButton", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: Omit<IconButtonOptions, "aria-label" | "icon"> = {
-      variant: "light",
-      colorScheme: "success",
-      size: "lg",
+    const variantProps: Omit<TagCloseButtonOptions, "aria-label"> = {
       borderRadius: "md",
-      compact: true,
-      loading: false,
     };
-    const buttonClass = buttonStyles(variantProps);
+    const buttonClass = tagCloseButtonStyles(variantProps);
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithTagContextProvider(() => <TagCloseButton {...variantProps} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -158,12 +153,10 @@ describe("IconButton", () => {
   it("should have stitches generated class from css prop", () => {
     // arrange
     const customCSS = { bg: "red" };
-    const buttonClass = buttonStyles({ css: customCSS });
+    const buttonClass = tagCloseButtonStyles({ css: customCSS });
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton css={customCSS} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithTagContextProvider(() => <TagCloseButton css={customCSS} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert

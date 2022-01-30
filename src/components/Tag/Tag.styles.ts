@@ -5,6 +5,10 @@ import { SystemStyleObject } from "@/theme/types";
 
 import { boxStyles } from "../Box/Box.styles";
 
+/* -------------------------------------------------------------------------------------------------
+ * TagCloseButton
+ * -----------------------------------------------------------------------------------------------*/
+
 export const tagCloseButtonIconStyles = css();
 
 export const tagCloseButtonStyles = css(boxStyles, {
@@ -48,6 +52,10 @@ export const tagCloseButtonStyles = css(boxStyles, {
 });
 
 export type TagCloseButtonVariants = VariantProps<typeof tagCloseButtonStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Tag
+ * -----------------------------------------------------------------------------------------------*/
 
 interface TagSizeVariantConfig {
   height: string;
@@ -136,9 +144,7 @@ function createTagOutlineCompoundVariant(
 function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
   return {
     "&::before,  &::after": {
-      width: size,
-      height: size,
-      borderRadius: size,
+      boxSize: size,
     },
 
     "&::before": {
@@ -183,7 +189,8 @@ export const tagStyles = css(boxStyles, {
         color: "$neutral600",
 
         "&::before,  &::after": {
-          content: "",
+          content: "''",
+          borderRadius: "$full",
         },
 
         "&::before": {
@@ -257,7 +264,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "dark",
       css: createTagFilledCompoundVariant({
         bgColor: "$dark500",
-        closeButtonBgColorHover: "$dark800",
+        closeButtonBgColorHover: "$dark300",
       }),
     },
     {
@@ -308,7 +315,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "primary",
       css: createTagLightCompoundVariant({
         bgColor: "$primary50",
-        color: "primary600",
+        color: "$primary600",
         closeButtonBgColorHover: "$primary100",
       }),
     },
@@ -317,7 +324,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "dark",
       css: createTagLightCompoundVariant({
         bgColor: "$dark50",
-        color: "dark800",
+        color: "$dark800",
         closeButtonBgColorHover: "$dark100",
       }),
     },
@@ -326,7 +333,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "neutral",
       css: createTagLightCompoundVariant({
         bgColor: "$neutral100",
-        color: "neutral600",
+        color: "$neutral600",
         closeButtonBgColorHover: "$neutral200",
       }),
     },
@@ -335,7 +342,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "success",
       css: createTagLightCompoundVariant({
         bgColor: "$success50",
-        color: "success600",
+        color: "$success600",
         closeButtonBgColorHover: "$success100",
       }),
     },
@@ -344,7 +351,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "info",
       css: createTagLightCompoundVariant({
         bgColor: "$info50",
-        color: "info600",
+        color: "$info600",
         closeButtonBgColorHover: "$info100",
       }),
     },
@@ -353,7 +360,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "warning",
       css: createTagLightCompoundVariant({
         bgColor: "$warning50",
-        color: "warning600",
+        color: "$warning600",
         closeButtonBgColorHover: "$warning100",
       }),
     },
@@ -362,7 +369,7 @@ export const tagStyles = css(boxStyles, {
       colorScheme: "danger",
       css: createTagLightCompoundVariant({
         bgColor: "$danger50",
-        color: "danger600",
+        color: "$danger600",
         closeButtonBgColorHover: "$danger100",
       }),
     },
