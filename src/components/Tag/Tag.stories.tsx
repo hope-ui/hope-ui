@@ -2,19 +2,19 @@ import { action } from "@storybook/addon-actions";
 
 import { TagCloseButton } from "@/components/Tag/TagCloseButton";
 import { IconInfoCircle } from "@/icons";
-import { HopeProvider } from "@/theme/HopeProvider";
+import { HopeWrapper } from "@/utils/storybookUtils";
 
 import { Tag } from "./Tag";
 
 export default {
   title: "Data display/Tag",
   component: Tag,
-  parameters: { layout: "centered", backgrounds: { default: "white" } },
+  parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
-      <HopeProvider>
+      <HopeWrapper>
         <Story />
-      </HopeProvider>
+      </HopeWrapper>
     ),
   ],
   argTypes: {

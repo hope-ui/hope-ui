@@ -34,18 +34,18 @@ const hopeButtonClass = "hope-button";
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useTheme().components.Button;
+  const defaultButtonProps = useTheme().components.Button?.defaultProps;
 
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
-    variant: theme?.defaultProps?.variant ?? "solid",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
-    borderRadius: theme?.defaultProps?.borderRadius ?? "sm",
-    loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
-    compact: theme?.defaultProps?.compact ?? false,
-    textTransform: theme?.defaultProps?.textTransform ?? "none",
-    fullWidth: theme?.defaultProps?.fullWidth ?? false,
+    variant: defaultButtonProps?.variant ?? "solid",
+    colorScheme: defaultButtonProps?.colorScheme ?? "primary",
+    size: defaultButtonProps?.size ?? "md",
+    borderRadius: defaultButtonProps?.borderRadius ?? "sm",
+    loaderPosition: defaultButtonProps?.loaderPosition ?? "left",
+    compact: defaultButtonProps?.compact ?? false,
+    textTransform: defaultButtonProps?.textTransform ?? "none",
+    fullWidth: defaultButtonProps?.fullWidth ?? false,
     loader: <IconSpinner />,
     loading: false,
     disabled: false,

@@ -1,3 +1,5 @@
+import { themes } from "@storybook/theming";
+
 import { render } from "solid-js/web";
 
 let disposeStory;
@@ -34,22 +36,9 @@ export const parameters = {
       ],
     },
   },
-  backgrounds: {
-    default: "neutral-50",
-    values: [
-      {
-        name: "white",
-        value: "#fff",
-      },
-      {
-        name: "neutral-50",
-        value: "#f8f9fa",
-      },
-      {
-        name: "neutral-700",
-        value: "#1a121e",
-      },
-    ],
+  darkMode: {
+    dark: { ...themes.dark, appBg: "#1A202C" },
+    light: { ...themes.normal, appBg: "white" },
   },
   controls: {
     matchers: {

@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 
 import { IconInfoCircle } from "@/icons";
-import { HopeProvider } from "@/theme/HopeProvider";
+import { HopeWrapper } from "@/utils/storybookUtils";
 
 import { Button } from "./Button";
 
@@ -11,11 +11,11 @@ export default {
   parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
-      <HopeProvider>
+      <HopeWrapper>
         <div style={{ display: "flex", "justify-content": "center", width: "90vw" }}>
           <Story />
         </div>
-      </HopeProvider>
+      </HopeWrapper>
     ),
   ],
   argTypes: {

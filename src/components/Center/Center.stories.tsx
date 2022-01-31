@@ -1,4 +1,4 @@
-import { HopeProvider } from "@/theme/HopeProvider";
+import { HopeWrapper } from "@/utils/storybookUtils";
 
 import { Center } from "./Center";
 
@@ -8,9 +8,9 @@ export default {
   parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
-      <HopeProvider>
+      <HopeWrapper>
         <Story />
-      </HopeProvider>
+      </HopeWrapper>
     ),
   ],
 };

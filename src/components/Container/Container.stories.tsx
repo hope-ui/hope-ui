@@ -1,4 +1,4 @@
-import { HopeProvider } from "@/theme/HopeProvider";
+import { HopeWrapper } from "@/utils/storybookUtils";
 
 import { Container } from "./Container";
 
@@ -7,9 +7,9 @@ export default {
   component: Container,
   decorators: [
     (Story: any) => (
-      <HopeProvider>
+      <HopeWrapper>
         <Story />
-      </HopeProvider>
+      </HopeWrapper>
     ),
   ],
   argTypes: {
