@@ -1,8 +1,9 @@
-import { SystemStyleObject, theme } from "@/theme";
+import { baseTheme } from "@/theme/stitches.config";
+import { SizeToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
 
-type SizesVariant = UtilityVariant<keyof typeof theme.sizes>;
+type SizesVariant = UtilityVariant<SizeToken>;
 
 interface SizeUtilityVariants {
   w: SizesVariant;
@@ -15,15 +16,15 @@ interface SizeUtilityVariants {
 }
 
 export function createSizeUtilityVariants(): SizeUtilityVariants {
-  return Object.keys(theme.sizes).reduce(
+  return Object.keys(baseTheme.sizes).reduce(
     (acc, key) => ({
-      w: { ...acc.w, [key]: { w: `$${key}` } as SystemStyleObject },
-      minW: { ...acc.minW, [key]: { minW: `$${key}` } as SystemStyleObject },
-      maxW: { ...acc.maxW, [key]: { maxW: `$${key}` } as SystemStyleObject },
-      h: { ...acc.h, [key]: { h: `$${key}` } as SystemStyleObject },
-      minH: { ...acc.minH, [key]: { minH: `$${key}` } as SystemStyleObject },
-      maxH: { ...acc.maxH, [key]: { maxH: `$${key}` } as SystemStyleObject },
-      boxSize: { ...acc.boxSize, [key]: { boxSize: `$${key}` } as SystemStyleObject },
+      w: { ...acc.w, [key]: { w: `$${key}` } as ThemeStyleObject },
+      minW: { ...acc.minW, [key]: { minW: `$${key}` } as ThemeStyleObject },
+      maxW: { ...acc.maxW, [key]: { maxW: `$${key}` } as ThemeStyleObject },
+      h: { ...acc.h, [key]: { h: `$${key}` } as ThemeStyleObject },
+      minH: { ...acc.minH, [key]: { minH: `$${key}` } as ThemeStyleObject },
+      maxH: { ...acc.maxH, [key]: { maxH: `$${key}` } as ThemeStyleObject },
+      boxSize: { ...acc.boxSize, [key]: { boxSize: `$${key}` } as ThemeStyleObject },
     }),
     {} as SizeUtilityVariants
   );

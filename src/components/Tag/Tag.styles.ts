@@ -1,7 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "@/theme/stitches.config";
-import { SystemStyleObject } from "@/theme/types";
+import { ThemeStyleObject } from "@/theme/types";
 
 /* -------------------------------------------------------------------------------------------------
  * TagCloseButton
@@ -63,7 +63,7 @@ interface TagSizeVariantConfig {
   spacing: string;
 }
 
-function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
+function createTagSizeVariant(config: TagSizeVariantConfig): ThemeStyleObject {
   return {
     height: config.height,
     py: 0,
@@ -93,7 +93,7 @@ interface TagSolidCompoundVariantConfig {
   closeButtonBgColorHover: string;
 }
 
-function createTagSolidCompoundVariant(config: TagSolidCompoundVariantConfig): SystemStyleObject {
+function createTagSolidCompoundVariant(config: TagSolidCompoundVariantConfig): ThemeStyleObject {
   return {
     backgroundColor: config.bgColor,
     [`& .${tagCloseButtonStyles}:not(:disabled):hover`]: {
@@ -108,7 +108,7 @@ interface TagSubtleCompoundVariantConfig {
   closeButtonBgColorHover: string;
 }
 
-function createTagSubtleCompoundVariant(config: TagSubtleCompoundVariantConfig): SystemStyleObject {
+function createTagSubtleCompoundVariant(config: TagSubtleCompoundVariantConfig): ThemeStyleObject {
   return {
     backgroundColor: config.bgColor,
     color: config.color,
@@ -126,7 +126,7 @@ interface TagOutlineCompoundVariantConfig {
 
 function createTagOutlineCompoundVariant(
   config: TagOutlineCompoundVariantConfig
-): SystemStyleObject {
+): ThemeStyleObject {
   return {
     borderColor: config.color,
     color: config.color,
@@ -137,7 +137,7 @@ function createTagOutlineCompoundVariant(
   };
 }
 
-function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
+function createTagDotAndSizeCompoundVariant(size: string): ThemeStyleObject {
   return {
     "&::before,  &::after": {
       boxSize: size,

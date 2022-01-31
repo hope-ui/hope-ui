@@ -1,7 +1,7 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
 import { StyledSystemVariants } from "@/styled-system/system.styles";
-import { SystemStyleObject } from "@/theme/types";
+import { ThemeStyleObject } from "@/theme/types";
 
 /**
  * Represent any HTML element or SolidJS component.
@@ -29,7 +29,7 @@ export interface ClassProps {
  * It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
  */
 export interface CSSProp {
-  css?: SystemStyleObject;
+  css?: ThemeStyleObject;
 }
 
 /**

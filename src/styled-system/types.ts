@@ -1,3 +1,3 @@
-import { SystemStyleObject } from "@/theme/types";
+import { ThemeStyleObject } from "@/theme/types";
 
-export type UtilityVariant<T extends string | number | symbol> = Record<T, SystemStyleObject>;
+export type UtilityVariant<T extends string | number | symbol> = Record<T, ThemeStyleObject>;

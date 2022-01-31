@@ -1,4 +1,4 @@
-import { SystemStyleObject } from "@/theme";
+import { ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
 
@@ -15,30 +15,30 @@ interface OverflowUtilityVariants {
 export function createLayoutUtilityVariants() {
   return {
     display: {
-      none: { display: "none" } as SystemStyleObject,
-      inline: { display: "inline" } as SystemStyleObject,
-      block: { display: "block" } as SystemStyleObject,
-      "inline-block": { display: "inline-block" } as SystemStyleObject,
-      flex: { display: "flex" } as SystemStyleObject,
-      "inline-flex": { display: "inline-flex" } as SystemStyleObject,
-      grid: { display: "grid" } as SystemStyleObject,
-      "inline-grid": { display: "inline-grid" } as SystemStyleObject,
+      none: { display: "none" } as ThemeStyleObject,
+      inline: { display: "inline" } as ThemeStyleObject,
+      block: { display: "block" } as ThemeStyleObject,
+      "inline-block": { display: "inline-block" } as ThemeStyleObject,
+      flex: { display: "flex" } as ThemeStyleObject,
+      "inline-flex": { display: "inline-flex" } as ThemeStyleObject,
+      grid: { display: "grid" } as ThemeStyleObject,
+      "inline-grid": { display: "inline-grid" } as ThemeStyleObject,
     },
     verticalAlign: {
-      baseline: { verticalAlign: "baseline" } as SystemStyleObject,
-      top: { verticalAlign: "top" } as SystemStyleObject,
-      middle: { verticalAlign: "middle" } as SystemStyleObject,
-      bottom: { verticalAlign: "bottom" } as SystemStyleObject,
-      "text-top": { verticalAlign: "text-top" } as SystemStyleObject,
-      "text-bottom": { verticalAlign: "text-bottom" } as SystemStyleObject,
-      sub: { verticalAlign: "sub" } as SystemStyleObject,
-      super: { verticalAlign: "super" } as SystemStyleObject,
+      baseline: { verticalAlign: "baseline" } as ThemeStyleObject,
+      top: { verticalAlign: "top" } as ThemeStyleObject,
+      middle: { verticalAlign: "middle" } as ThemeStyleObject,
+      bottom: { verticalAlign: "bottom" } as ThemeStyleObject,
+      "text-top": { verticalAlign: "text-top" } as ThemeStyleObject,
+      "text-bottom": { verticalAlign: "text-bottom" } as ThemeStyleObject,
+      sub: { verticalAlign: "sub" } as ThemeStyleObject,
+      super: { verticalAlign: "super" } as ThemeStyleObject,
     },
     ...overflowValues.reduce(
       (acc, val) => ({
-        overflow: { ...acc.overflow, [val]: { overflow: val } as SystemStyleObject },
-        overflowX: { ...acc.overflowX, [val]: { overflowX: val } as SystemStyleObject },
-        overflowY: { ...acc.overflowY, [val]: { overflowY: val } as SystemStyleObject },
+        overflow: { ...acc.overflow, [val]: { overflow: val } as ThemeStyleObject },
+        overflowX: { ...acc.overflowX, [val]: { overflowX: val } as ThemeStyleObject },
+        overflowY: { ...acc.overflowY, [val]: { overflowY: val } as ThemeStyleObject },
       }),
       {} as OverflowUtilityVariants
     ),

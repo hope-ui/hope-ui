@@ -1,12 +1,10 @@
-import { createContext, createSignal, mergeProps, PropsWithChildren, useContext } from "solid-js";
-import { isServer } from "solid-js/web";
+import { createContext, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { defaultTheme } from "@/theme/defaultTheme";
 import { resetStyles } from "@/theme/reset";
 import { HopeTheme } from "@/theme/types";
-import { mockBody } from "@/utils/object";
 
 import { ColorModeProvider } from "../color-mode/ColorModeProvider";
+import { createDefaultTheme } from "./stitches.config";
 
 export const HopeContext = createContext<HopeTheme>();
 
@@ -15,20 +13,8 @@ export type HopeProviderProps = PropsWithChildren<{
 }>;
 
 export function HopeProvider(props: HopeProviderProps) {
-  const defaultProps: Required<Pick<HopeProviderProps, "theme">> = {
-    theme: defaultTheme,
-  };
-
-  const propsWithDefault = mergeProps(defaultProps, props);
-
   // eslint-disable-next-line solid/reactivity
-  const [theme] = createSignal(propsWithDefault.theme);
-
-  const body = isServer ? mockBody : document.body;
-
-  // Apply stitches theme, `tokens` is the stitches theme object
-  // eslint-disable-next-line solid/reactivity
-  body.classList.add(theme().tokens);
+  const [theme] = createSignal(props.theme ?? createDefaultTheme());
 
   // Apply css reset
   resetStyles();
@@ -36,7 +22,7 @@ export function HopeProvider(props: HopeProviderProps) {
   return (
     <HopeContext.Provider value={theme()}>
       <ColorModeProvider initialColorMode={theme().initialColorMode}>
-        {propsWithDefault.children}
+        {props.children}
       </ColorModeProvider>
     </HopeContext.Provider>
   );

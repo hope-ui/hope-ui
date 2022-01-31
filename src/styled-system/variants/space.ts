@@ -1,9 +1,10 @@
-import { SystemStyleObject, theme } from "@/theme";
+import { baseTheme } from "@/theme/stitches.config";
+import { SpaceToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
 
-type SpaceVariant = UtilityVariant<keyof typeof theme.space>;
-type SpaceVariantWithAuto = UtilityVariant<keyof typeof theme.space | "auto">;
+type SpaceVariant = UtilityVariant<SpaceToken>;
+type SpaceVariantWithAuto = UtilityVariant<SpaceToken | "auto">;
 
 interface SpaceUtilityVariants {
   // Margin
@@ -37,32 +38,32 @@ interface SpaceUtilityVariants {
 }
 
 export function createSpaceUtilityVariants(): SpaceUtilityVariants {
-  const spaceUtilities = Object.keys(theme.space).reduce(
+  const spaceUtilities = Object.keys(baseTheme.space).reduce(
     (acc, key) => ({
-      m: { ...acc.m, [key]: { m: `$${key}` } as SystemStyleObject },
-      mx: { ...acc.mx, [key]: { mx: `$${key}` } as SystemStyleObject },
-      my: { ...acc.my, [key]: { my: `$${key}` } as SystemStyleObject },
-      mt: { ...acc.mt, [key]: { mt: `$${key}` } as SystemStyleObject },
-      mr: { ...acc.mr, [key]: { mr: `$${key}` } as SystemStyleObject },
-      mb: { ...acc.mb, [key]: { mb: `$${key}` } as SystemStyleObject },
-      ml: { ...acc.ml, [key]: { ml: `$${key}` } as SystemStyleObject },
+      m: { ...acc.m, [key]: { m: `$${key}` } as ThemeStyleObject },
+      mx: { ...acc.mx, [key]: { mx: `$${key}` } as ThemeStyleObject },
+      my: { ...acc.my, [key]: { my: `$${key}` } as ThemeStyleObject },
+      mt: { ...acc.mt, [key]: { mt: `$${key}` } as ThemeStyleObject },
+      mr: { ...acc.mr, [key]: { mr: `$${key}` } as ThemeStyleObject },
+      mb: { ...acc.mb, [key]: { mb: `$${key}` } as ThemeStyleObject },
+      ml: { ...acc.ml, [key]: { ml: `$${key}` } as ThemeStyleObject },
 
-      p: { ...acc.p, [key]: { p: `$${key}` } as SystemStyleObject },
-      px: { ...acc.px, [key]: { px: `$${key}` } as SystemStyleObject },
-      py: { ...acc.py, [key]: { py: `$${key}` } as SystemStyleObject },
-      pt: { ...acc.pt, [key]: { pt: `$${key}` } as SystemStyleObject },
-      pr: { ...acc.pr, [key]: { pr: `$${key}` } as SystemStyleObject },
-      pb: { ...acc.pb, [key]: { pb: `$${key}` } as SystemStyleObject },
-      pl: { ...acc.pl, [key]: { pl: `$${key}` } as SystemStyleObject },
+      p: { ...acc.p, [key]: { p: `$${key}` } as ThemeStyleObject },
+      px: { ...acc.px, [key]: { px: `$${key}` } as ThemeStyleObject },
+      py: { ...acc.py, [key]: { py: `$${key}` } as ThemeStyleObject },
+      pt: { ...acc.pt, [key]: { pt: `$${key}` } as ThemeStyleObject },
+      pr: { ...acc.pr, [key]: { pr: `$${key}` } as ThemeStyleObject },
+      pb: { ...acc.pb, [key]: { pb: `$${key}` } as ThemeStyleObject },
+      pl: { ...acc.pl, [key]: { pl: `$${key}` } as ThemeStyleObject },
 
-      top: { ...acc.top, [key]: { top: `$${key}` } as SystemStyleObject },
-      right: { ...acc.right, [key]: { right: `$${key}` } as SystemStyleObject },
-      bottom: { ...acc.bottom, [key]: { bottom: `$${key}` } as SystemStyleObject },
-      left: { ...acc.left, [key]: { left: `$${key}` } as SystemStyleObject },
+      top: { ...acc.top, [key]: { top: `$${key}` } as ThemeStyleObject },
+      right: { ...acc.right, [key]: { right: `$${key}` } as ThemeStyleObject },
+      bottom: { ...acc.bottom, [key]: { bottom: `$${key}` } as ThemeStyleObject },
+      left: { ...acc.left, [key]: { left: `$${key}` } as ThemeStyleObject },
 
-      gap: { ...acc.gap, [key]: { gap: `$${key}` } as SystemStyleObject },
-      rowGap: { ...acc.rowGap, [key]: { rowGap: `$${key}` } as SystemStyleObject },
-      columnGap: { ...acc.columnGap, [key]: { columnGap: `$${key}` } as SystemStyleObject },
+      gap: { ...acc.gap, [key]: { gap: `$${key}` } as ThemeStyleObject },
+      rowGap: { ...acc.rowGap, [key]: { rowGap: `$${key}` } as ThemeStyleObject },
+      columnGap: { ...acc.columnGap, [key]: { columnGap: `$${key}` } as ThemeStyleObject },
     }),
     {} as SpaceUtilityVariants
   );
@@ -86,7 +87,7 @@ export function createSpaceUtilityVariants(): SpaceUtilityVariants {
   ] as const;
 
   marginAndPadding.forEach(item => {
-    spaceUtilities[item].auto = { [item]: "auto" } as SystemStyleObject;
+    spaceUtilities[item].auto = { [item]: "auto" } as ThemeStyleObject;
   });
 
   return spaceUtilities;

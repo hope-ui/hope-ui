@@ -5,23 +5,77 @@ import { ThemeableHeadingOptions } from "@/components/Heading/Heading";
 import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
 import { ThemeableTagOptions } from "@/components/Tag/Tag";
 
-import { config, theme } from "./stitches.config";
-import { defaulThemeTokens } from "./tokens";
+import { baseTheme, config } from "./stitches.config";
 
 /**
- * Design tokens interface based on the stitches theme.
+ * Hope UI design tokens based on the stitches theme.
  */
-export type SystemTokens = typeof theme;
+export type ThemeTokens = typeof baseTheme;
 
 /**
  * Media at-rules interface based on the stitches media.
  */
-export type SystemMedia = typeof config.media;
+export type ThemeMedia = typeof config.media;
 
 /**
  * Style interface based on the stitches configuration.
  */
-export type SystemStyleObject = CSS<typeof config>;
+export type ThemeStyleObject = CSS<typeof config>;
+
+/**
+ * Hope UI theme `colors` value type.
+ */
+export type ColorToken = keyof ThemeTokens["colors"];
+
+/**
+ * Hope UI theme `space` value type.
+ */
+export type SpaceToken = keyof ThemeTokens["space"];
+
+/**
+ * Hope UI theme `sizes` value type.
+ */
+export type SizeToken = keyof ThemeTokens["sizes"];
+
+/**
+ * Hope UI theme `fonts` value type.
+ */
+export type FontToken = keyof ThemeTokens["fonts"];
+
+/**
+ * Hope UI theme `fontSizes` value type.
+ */
+export type FontSizeToken = keyof ThemeTokens["fontSizes"];
+
+/**
+ * Hope UI theme `fontWeights` value type.
+ */
+export type FontWeightToken = keyof ThemeTokens["fontWeights"];
+
+/**
+ * Hope UI theme `letterSpacings` value type.
+ */
+export type LetterSpacingToken = keyof ThemeTokens["letterSpacings"];
+
+/**
+ * Hope UI theme `lineHeights` value type.
+ */
+export type LineHeightToken = keyof ThemeTokens["lineHeights"];
+
+/**
+ * Hope UI theme `radii` value type.
+ */
+export type RadiiToken = keyof ThemeTokens["radii"];
+
+/**
+ * Hope UI theme `shadows` value type.
+ */
+export type ShadowToken = keyof ThemeTokens["shadows"];
+
+/**
+ * Hope UI theme `zIndices` value type.
+ */
+export type ZIndiceToken = keyof ThemeTokens["zIndices"];
 
 /**
  * Hope UI color mode.
@@ -55,7 +109,7 @@ export interface ComponentThemeConfig<Props> {
 /**
  * Theme configuration for all Hope UI components.
  */
-export interface ComponentThemes {
+export interface ComponentThemeConfigs {
   Button?: ComponentThemeConfig<ThemeableButtonOptions>;
   IconButton?: ComponentThemeConfig<ThemeableIconButtonOptions>;
   Heading?: ComponentThemeConfig<ThemeableHeadingOptions>;
@@ -67,16 +121,17 @@ export interface ComponentThemes {
  */
 export interface HopeTheme {
   initialColorMode: ColorMode;
-  tokens: SystemTokens;
-  components: ComponentThemes;
+  light: string;
+  dark: string;
+  components: ComponentThemeConfigs;
 }
 
 /**
  * The Hope UI theme tokens override interface.
  */
 export type ThemeTokensOverride = {
-  [Scale in keyof typeof defaulThemeTokens]?: {
-    [Token in keyof typeof defaulThemeTokens[Scale]]?: boolean | number | string;
+  [Scale in keyof ThemeTokens]?: {
+    [Token in keyof ThemeTokens[Scale]]?: boolean | number | string;
   };
 } & {
   [scale in string]: {
@@ -89,71 +144,22 @@ export type ThemeTokensOverride = {
  */
 export interface HopeThemeOverride {
   /**
-   * Override default color mode.
+   * Override initial color mode.
    */
   initialColorMode?: ColorMode;
 
   /**
-   * Override Hope UI design tokens.
+   * Override Hope UI light theme.
    */
-  tokens?: ThemeTokensOverride;
+  light?: ThemeTokensOverride;
+
   /**
-   * Custom Hope UI components themes configs.
+   * Override Hope UI dark theme.
    */
-  components?: ComponentThemes;
+  dark?: ThemeTokensOverride;
+
+  /**
+   * Override Hope UI components theme config.
+   */
+  components?: ComponentThemeConfigs;
 }
-
-/**
- * Hope UI theme `colors` value type.
- */
-export type ColorToken = keyof SystemTokens["colors"];
-
-/**
- * Hope UI theme `space` value type.
- */
-export type SpaceToken = keyof SystemTokens["space"];
-
-/**
- * Hope UI theme `sizes` value type.
- */
-export type SizeToken = keyof SystemTokens["sizes"];
-
-/**
- * Hope UI theme `fonts` value type.
- */
-export type FontToken = keyof SystemTokens["fonts"];
-
-/**
- * Hope UI theme `fontSizes` value type.
- */
-export type FontSizeToken = keyof SystemTokens["fontSizes"];
-
-/**
- * Hope UI theme `fontWeights` value type.
- */
-export type FontWeightToken = keyof SystemTokens["fontWeights"];
-
-/**
- * Hope UI theme `letterSpacings` value type.
- */
-export type LetterSpacingToken = keyof SystemTokens["letterSpacings"];
-
-/**
- * Hope UI theme `lineHeights` value type.
- */
-export type LineHeightToken = keyof SystemTokens["lineHeights"];
-
-/**
- * Hope UI theme `radii` value type.
- */
-export type RadiiToken = keyof SystemTokens["radii"];
-
-/**
- * Hope UI theme `shadows` value type.
- */
-export type ShadowToken = keyof SystemTokens["shadows"];
-
-/**
- * Hope UI theme `zIndices` value type.
- */
-export type ZIndiceToken = keyof SystemTokens["zIndices"];

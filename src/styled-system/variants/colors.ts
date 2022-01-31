@@ -1,8 +1,9 @@
-import { SystemStyleObject, theme } from "@/theme";
+import { baseTheme } from "@/theme/stitches.config";
+import { ColorToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
 
-type ColorsVariant = UtilityVariant<keyof typeof theme.colors>;
+type ColorsVariant = UtilityVariant<ColorToken>;
 
 interface ColorUtilityVariants {
   color: ColorsVariant;
@@ -11,11 +12,11 @@ interface ColorUtilityVariants {
 }
 
 export function createColorUtilityVariants(): ColorUtilityVariants {
-  return Object.keys(theme.colors).reduce(
+  return Object.keys(baseTheme.colors).reduce(
     (acc, key) => ({
-      color: { ...acc.color, [key]: { color: `$${key}` } as SystemStyleObject },
-      bg: { ...acc.bg, [key]: { bg: `$${key}` } as SystemStyleObject },
-      borderColor: { ...acc.borderColor, [key]: { borderColor: `$${key}` } as SystemStyleObject },
+      color: { ...acc.color, [key]: { color: `$${key}` } as ThemeStyleObject },
+      bg: { ...acc.bg, [key]: { bg: `$${key}` } as ThemeStyleObject },
+      borderColor: { ...acc.borderColor, [key]: { borderColor: `$${key}` } as ThemeStyleObject },
     }),
     {} as ColorUtilityVariants
   );

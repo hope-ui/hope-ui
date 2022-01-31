@@ -1,5 +1,6 @@
 import { isServer } from "solid-js/web";
 
+import { themeClassNames } from "@/theme/stitches.config";
 import { ColorMode } from "@/theme/types";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
@@ -7,11 +8,6 @@ import { mockBody } from "@/utils/object";
 const hasLocalStorageSupport = () => typeof Storage !== "undefined";
 
 const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
-
-const classNames = {
-  light: "hope-ui-light",
-  dark: "hope-ui-dark",
-};
 
 function getColorModeFromLocalStorage() {
   if (!hasLocalStorageSupport()) {
@@ -66,6 +62,6 @@ export function getDefaultColorMode(initialValue: ColorMode) {
 export function syncBodyColorModeClassName(isDark: boolean) {
   const body = isServer ? mockBody : document.body;
 
-  body.classList.add(isDark ? classNames.dark : classNames.light);
-  body.classList.remove(isDark ? classNames.light : classNames.dark);
+  body.classList.add(isDark ? themeClassNames.dark : themeClassNames.light);
+  body.classList.remove(isDark ? themeClassNames.light : themeClassNames.dark);
 }

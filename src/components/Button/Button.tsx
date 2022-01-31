@@ -1,6 +1,5 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useColorMode } from "@/color-mode/ColorModeProvider";
 import { IconSpinner } from "@/icons/IconSpinner";
 import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { useTheme } from "@/theme/HopeProvider";
@@ -37,8 +36,6 @@ const hopeButtonClass = "hope-button";
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
   const defaultButtonProps = useTheme().components.Button?.defaultProps;
 
-  const { colorMode } = useColorMode();
-
   const defaultProps: ExtendableProps<ButtonProps<"button">, Required<ThemeableButtonOptions>> = {
     as: "button",
     variant: defaultButtonProps?.variant ?? "solid",
@@ -74,10 +71,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeButtonClass,
-      baseClass: buttonStyles({
-        darkMode: colorMode() === "dark",
-        ...variantProps,
-      }),
+      baseClass: buttonStyles(variantProps),
       classProps: local,
     });
   };
