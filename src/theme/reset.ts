@@ -25,12 +25,12 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme `neutral` color for text.
+    1. Use theme `dark` color for text.
     2. Use theme `sans` font-family.
     3. Use theme `base` line height.
   */
   html: {
-    color: "$neutral900" /* 1 */,
+    color: "$dark900" /* 1 */,
     fontFamily: "$sans" /* 2 */,
     lineHeight: "$base" /* 3 */,
     fontSize: "16px",

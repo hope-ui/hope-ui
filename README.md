@@ -158,17 +158,29 @@ export default {
     primary800: "#1e40af",
     primary900: "#1e3a8a",
 
-    // Neutral (Chakra UI - Gray)
-    neutral50: "#F7FAFC",
-    neutral100: "#EDF2F7",
-    neutral200: "#E2E8F0",
-    neutral300: "#CBD5E0",
-    neutral400: "#A0AEC0",
-    neutral500: "#718096",
-    neutral600: "#4A5568",
-    neutral700: "#2D3748",
-    neutral800: "#1A202C",
-    neutral900: "#171923",
+    // Dark (Adapted Mantine - Dark)
+    dark50: "#c1c3c5",
+    dark100: "#a6a8ab",
+    dark200: "#909296",
+    dark300: "#5c6066",
+    dark400: "#373a40",
+    dark500: "#2c2f33",
+    dark600: "#25272b",
+    dark700: "#1a1c1e",
+    dark800: "#141517",
+    dark900: "#101113",
+
+    // Neutral (TailwindCSS - Gray)
+    neutral50: "#f9fafb",
+    neutral100: "#f3f4f6",
+    neutral200: "#e5e7eb",
+    neutral300: "#d1d5db",
+    neutral400: "#9ca3af",
+    neutral500: "#6b7280",
+    neutral600: "#4b5563",
+    neutral700: "#374151",
+    neutral800: "#1f2937",
+    neutral900: "#111827",
 
     // Success (TailwindCSS - Emerald)
     success50: "#ecfdf5",

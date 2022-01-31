@@ -10,6 +10,10 @@ export const buttonLoadingIconStyles = css({
 
 export const iconButtonStyles = css();
 
+/* -------------------------------------------------------------------------------------------------
+ * Size
+ * -----------------------------------------------------------------------------------------------*/
+
 interface SizeVariantConfig {
   height: string;
   paddingX: string;
@@ -58,7 +62,12 @@ function createCompactSizeCompoundVariant(config: CompactSizeVariantConfig): Sys
   };
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Variant - solid
+ * -----------------------------------------------------------------------------------------------*/
+
 interface SolidCompoundVariantConfig {
+  color: string;
   bgColor: string;
   bgColorHover: string;
 }
@@ -66,11 +75,17 @@ interface SolidCompoundVariantConfig {
 function createSolidCompoundVariant(config: SolidCompoundVariantConfig): SystemStyleObject {
   return {
     backgroundColor: config.bgColor,
+    color: config.color,
+
     "&:not(:disabled):hover": {
       backgroundColor: config.bgColorHover,
     },
   };
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Variant - subtle
+ * -----------------------------------------------------------------------------------------------*/
 
 interface SubtleCompoundVariantConfig {
   color: string;
@@ -82,11 +97,16 @@ function createSubtleCompoundVariant(config: SubtleCompoundVariantConfig): Syste
   return {
     backgroundColor: config.bgColor,
     color: config.color,
+
     "&:not(:disabled):hover": {
       backgroundColor: config.bgColorHover,
     },
   };
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Variant - outline
+ * -----------------------------------------------------------------------------------------------*/
 
 interface OutlineCompoundVariantConfig {
   color: string;
@@ -97,11 +117,16 @@ function createOutlineCompoundVariant(config: OutlineCompoundVariantConfig): Sys
   return {
     borderColor: config.color,
     color: config.color,
+
     "&:not(:disabled):hover": {
       backgroundColor: config.bgColorHover,
     },
   };
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Variant - ghost
+ * -----------------------------------------------------------------------------------------------*/
 
 interface GhostCompoundVariantConfig {
   color: string;
@@ -111,11 +136,16 @@ interface GhostCompoundVariantConfig {
 function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemStyleObject {
   return {
     color: config.color,
+
     "&:not(:disabled):hover": {
       backgroundColor: config.bgColorHover,
     },
   };
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Styles
+ * -----------------------------------------------------------------------------------------------*/
 
 export const buttonStyles = css({
   appearance: "none",
@@ -129,7 +159,7 @@ export const buttonStyles = css({
 
   padding: "0",
 
-  fontWeight: "$medium",
+  fontWeight: "$semibold",
   lineHeight: "$none",
   textDecoration: "none",
 
@@ -154,19 +184,11 @@ export const buttonStyles = css({
   },
 
   variants: {
+    darkMode: { true: {} },
     variant: {
-      default: {
-        border: "1px solid $neutral400",
-        backgroundColor: "white",
-        color: "$dark600",
-
-        "&:not(:disabled):hover": {
-          backgroundColor: "$neutral100",
-        },
-      },
+      default: {},
       solid: {
         border: "1px solid transparent",
-        color: "white",
       },
       subtle: {
         border: "1px solid transparent",
@@ -249,40 +271,159 @@ export const buttonStyles = css({
 
   compoundVariants: [
     /**
-     * Variant solid
+     * Variant default - light mode
+     ******************************/
+    {
+      variant: "default",
+      darkMode: false,
+      css: {
+        border: "1px solid $neutral400",
+        backgroundColor: "$white",
+        color: "$dark600",
+
+        "&:not(:disabled):hover": {
+          backgroundColor: "$neutral100",
+        },
+      },
+    },
+    /**
+     * Variant default - dark mode
+     ******************************/
+    {
+      variant: "default",
+      darkMode: true,
+      css: {
+        border: "1px solid $dark500",
+        backgroundColor: "$dark500",
+        color: "$whiteAlpha900",
+
+        "&:not(:disabled):hover": {
+          backgroundColor: "$dark400",
+        },
+      },
+    },
+    /**
+     * Variant solid - light mode
      ******************************/
     {
       variant: "solid",
       colorScheme: "primary",
-      css: createSolidCompoundVariant({ bgColor: "$primary500", bgColorHover: "$primary600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$primary500",
+        bgColorHover: "$primary600",
+      }),
     },
     {
       variant: "solid",
       colorScheme: "neutral",
-      css: createSolidCompoundVariant({ bgColor: "$neutral500", bgColorHover: "$neutral600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$neutral500",
+        bgColorHover: "$neutral600",
+      }),
     },
     {
       variant: "solid",
       colorScheme: "success",
-      css: createSolidCompoundVariant({ bgColor: "$success500", bgColorHover: "$success600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$success500",
+        bgColorHover: "$success600",
+      }),
     },
     {
       variant: "solid",
       colorScheme: "info",
-      css: createSolidCompoundVariant({ bgColor: "$info500", bgColorHover: "$info600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$info500",
+        bgColorHover: "$info600",
+      }),
     },
     {
       variant: "solid",
       colorScheme: "warning",
-      css: createSolidCompoundVariant({ bgColor: "$warning500", bgColorHover: "$warning600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$warning500",
+        bgColorHover: "$warning600",
+      }),
     },
     {
       variant: "solid",
       colorScheme: "danger",
-      css: createSolidCompoundVariant({ bgColor: "$danger500", bgColorHover: "$danger600" }),
+      css: createSolidCompoundVariant({
+        color: "$white",
+        bgColor: "$danger500",
+        bgColorHover: "$danger600",
+      }),
     },
     /**
-     * Variant subtle
+     * Variant solid - dark mode
+     ******************************/
+    {
+      variant: "solid",
+      colorScheme: "primary",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$primary700",
+        bgColorHover: "$primary600",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "neutral",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$neutral700",
+        bgColorHover: "$neutral600",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "success",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$success700",
+        bgColorHover: "$success600",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "info",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$info700",
+        bgColorHover: "$info600",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "warning",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$warning700",
+        bgColorHover: "$warning600",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "danger",
+      darkMode: true,
+      css: createSolidCompoundVariant({
+        color: "$whiteAlpha900",
+        bgColor: "$danger700",
+        bgColorHover: "$danger600",
+      }),
+    },
+    /**
+     * Variant subtle - light mode
      ******************************/
     {
       variant: "subtle",
@@ -339,7 +480,70 @@ export const buttonStyles = css({
       }),
     },
     /**
-     * Variant outline
+     * Variant subtle - dark mode
+     ******************************/
+    {
+      variant: "subtle",
+      colorScheme: "primary",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$primary200",
+        bgColor: "$primary900",
+        bgColorHover: "$primary800",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "neutral",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$neutral300",
+        bgColor: "$neutral800",
+        bgColorHover: "$neutral700",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "success",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$success200",
+        bgColor: "$success900",
+        bgColorHover: "$success800",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "info",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$info200",
+        bgColor: "$info900",
+        bgColorHover: "$info800",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "warning",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$warning200",
+        bgColor: "$warning900",
+        bgColorHover: "$warning800",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "danger",
+      darkMode: true,
+      css: createSubtleCompoundVariant({
+        color: "$danger200",
+        bgColor: "$danger900",
+        bgColorHover: "$danger800",
+      }),
+    },
+    /**
+     * Variant outline - light mode
      ******************************/
     {
       variant: "outline",
@@ -372,7 +576,46 @@ export const buttonStyles = css({
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
-     * Variant dashed
+     * Variant outline - dark mode
+     ******************************/
+    {
+      variant: "outline",
+      colorScheme: "primary",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$primary700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "neutral",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$neutral500", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "success",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$success700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "info",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$info700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "warning",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$warning700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "danger",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$danger700", bgColorHover: "$whiteAlpha50" }),
+    },
+    /**
+     * Variant dashed - light mode
      ******************************/
     {
       variant: "dashed",
@@ -405,7 +648,46 @@ export const buttonStyles = css({
       css: createOutlineCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
     },
     /**
-     * Variant ghost
+     * Variant dashed - dark mode
+     ******************************/
+    {
+      variant: "dashed",
+      colorScheme: "primary",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$primary700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "dashed",
+      colorScheme: "neutral",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$neutral500", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "dashed",
+      colorScheme: "success",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$success700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "dashed",
+      colorScheme: "info",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$info700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "dashed",
+      colorScheme: "warning",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$warning700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "dashed",
+      colorScheme: "danger",
+      darkMode: true,
+      css: createOutlineCompoundVariant({ color: "$danger700", bgColorHover: "$whiteAlpha50" }),
+    },
+    /**
+     * Variant ghost - light mode
      ******************************/
     {
       variant: "ghost",
@@ -436,6 +718,45 @@ export const buttonStyles = css({
       variant: "ghost",
       colorScheme: "danger",
       css: createGhostCompoundVariant({ color: "$danger600", bgColorHover: "$danger50" }),
+    },
+    /**
+     * Variant ghost - dark mode
+     ******************************/
+    {
+      variant: "ghost",
+      colorScheme: "primary",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$primary700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "neutral",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$neutral500", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "success",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$success700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "info",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$info700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "warning",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$warning700", bgColorHover: "$whiteAlpha50" }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "danger",
+      darkMode: true,
+      css: createGhostCompoundVariant({ color: "$danger700", bgColorHover: "$whiteAlpha50" }),
     },
     /**
      * Compact sizes
