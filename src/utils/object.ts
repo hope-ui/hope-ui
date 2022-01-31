@@ -1,4 +1,4 @@
-import { AsProp, ClassProps } from "@/components/types";
+import { ClassProps } from "@/components/types";
 
 import { noop } from "./function";
 
@@ -10,11 +10,6 @@ export const mockBody = {
 };
 
 /**
- * Array of common props that are commonly splited with SolidJS `splitProps` method.
+ * Array of css class props that are commonly splited with SolidJS `splitProps` method.
  */
-export const commonProps: Array<keyof (AsProp<any> & ClassProps)> = [
-  "as",
-  "class",
-  "className",
-  "classList",
-];
+export const classPropsKeys: Array<keyof ClassProps> = ["class", "className", "classList"];

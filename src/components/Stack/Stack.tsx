@@ -1,8 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { createCssSelector, generateClassList } from "@/utils/function";
+import { classPropsKeys } from "@/utils/object";
 
-import { BaseFlex, BaseFlexOptions, BaseFlexProps } from "../Flex/Flex";
+import { BaseFlex, BaseFlexProps } from "../Flex/Flex";
 import { ElementType } from "../types";
 
 export type StackProps<C extends ElementType> = BaseFlexProps<C>;
@@ -14,7 +16,6 @@ const hopeStackClass = "hope-stack";
  */
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const defaultProps: StackProps<"div"> = {
-    as: "div",
     direction: "row",
     alignItems: "center",
     justifyContent: "start",
@@ -22,7 +23,7 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   };
 
   const propsWithDefault: StackProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
+  const [local, others] = splitProps(propsWithDefault, classPropsKeys);
 
   const classList = () => {
     return generateClassList({
@@ -41,8 +42,8 @@ Stack.toString = () => createCssSelector(hopeStackClass);
  * VStack
  * -----------------------------------------------------------------------------------------------*/
 
-export interface VStackOptions extends BaseFlexOptions {
-  spacing?: BaseFlexOptions["rowGap"];
+export interface VStackOptions {
+  spacing?: StyledSystemVariants["rowGap"];
 }
 
 export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
@@ -56,8 +57,8 @@ export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
  * HStack
  * -----------------------------------------------------------------------------------------------*/
 
-export interface HStackOptions extends BaseFlexOptions {
-  spacing?: BaseFlexOptions["columnGap"];
+export interface HStackOptions {
+  spacing?: StyledSystemVariants["columnGap"];
 }
 
 export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;

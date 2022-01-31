@@ -1,9 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Spacer } from "./Spacer";
-import { spacerStyles, SpacerVariants } from "./Spacer.styles";
+import { spacerStyles } from "./Spacer.styles";
 
 describe("Spacer", () => {
   afterEach(cleanup);
@@ -118,42 +118,6 @@ describe("Spacer", () => {
 
     // act
     renderWithHopeProvider(() => <Spacer data-testid="spacer">Spacer</Spacer>);
-    const spacer = screen.getByTestId("spacer");
-
-    // assert
-    expect(spacer).toHaveClass(spacerClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: SpacerVariants = {
-      bg: "primary500",
-    };
-    const spacerClass = spacerStyles(variantProps);
-
-    // act
-    renderWithHopeProvider(() => (
-      <Spacer data-testid="spacer" {...variantProps}>
-        Spacer
-      </Spacer>
-    ));
-    const spacer = screen.getByTestId("spacer");
-
-    // assert
-    expect(spacer).toHaveClass(spacerClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const spacerClass = spacerStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Spacer data-testid="spacer" css={customCSS}>
-        Spacer
-      </Spacer>
-    ));
     const spacer = screen.getByTestId("spacer");
 
     // assert

@@ -1,22 +1,21 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { gridStyles, GridVariants } from "./Grid.styles";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
 
-export interface GridOptions extends GridVariants {
-  autoFlow?: GridVariants["gridAutoFlow"];
-  autoColumns?: GridVariants["gridAutoColumns"];
-  autoRows?: GridVariants["gridAutoRows"];
-  columns?: GridVariants["gridTemplateColumns"];
-  rows?: GridVariants["gridTemplateRows"];
+export interface GridOptions {
+  autoFlow?: StyledSystemVariants["gridAutoFlow"];
+  autoColumns?: StyledSystemVariants["gridAutoColumns"];
+  autoRows?: StyledSystemVariants["gridAutoRows"];
+  columns?: StyledSystemVariants["gridTemplateColumns"];
+  rows?: StyledSystemVariants["gridTemplateRows"];
 }
 
-export type GridProps<C extends ElementType> = PolymorphicComponentProps<C, GridOptions>;
+export type GridProps<C extends ElementType> = HopeComponentProps<C, GridOptions>;
 
 const hopeGridClass = "hope-grid";
 
@@ -26,33 +25,38 @@ const hopeGridClass = "hope-grid";
  */
 export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
   const defaultProps: GridProps<"div"> = {
-    as: "div",
+    display: "grid",
   };
 
   const propsWithDefault: GridProps<C> = mergeProps(defaultProps, props);
-  const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    propsWithDefault,
-    commonProps,
-    [...boxPropNames, "css"],
-    ["autoFlow", "autoColumns", "autoRows", "columns", "rows"]
-  );
+  const [local, others] = splitProps(propsWithDefault, [
+    ...classPropsKeys,
+    "autoFlow",
+    "autoColumns",
+    "autoRows",
+    "columns",
+    "rows",
+  ]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeGridClass,
-      baseClass: gridStyles({
-        gridAutoFlow: shorthandStyleProps.autoFlow,
-        gridAutoColumns: shorthandStyleProps.autoColumns,
-        gridAutoRows: shorthandStyleProps.autoRows,
-        gridTemplateColumns: shorthandStyleProps.columns,
-        gridTemplateRows: shorthandStyleProps.rows,
-        ...styleProps, // longhand props if provided will override the short ones
-      }),
+      baseClass: "",
       classProps: local,
     });
   };
 
-  return <Dynamic component={local.as} classList={classList()} {...others} />;
+  return (
+    <Box
+      classList={classList()}
+      gridAutoFlow={local.autoFlow}
+      gridAutoColumns={local.autoColumns}
+      gridAutoRows={local.autoRows}
+      gridTemplateColumns={local.columns}
+      gridTemplateRows={local.rows}
+      {...others}
+    />
+  );
 }
 
 Grid.toString = () => createCssSelector(hopeGridClass);

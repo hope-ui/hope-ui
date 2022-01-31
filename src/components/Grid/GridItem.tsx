@@ -1,23 +1,22 @@
-import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { splitProps } from "solid-js";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { gridItemStyles, GridItemVariants } from "./Grid.styles";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
 
-export interface GridItemOptions extends GridItemVariants {
-  colSpan?: GridItemVariants["gridColumnSpan"];
-  colStart?: GridItemVariants["gridColumnStart"];
-  colEnd?: GridItemVariants["gridColumnEnd"];
-  rowSpan?: GridItemVariants["gridRowSpan"];
-  rowStart?: GridItemVariants["gridRowStart"];
-  rowEnd?: GridItemVariants["gridRowEnd"];
+export interface GridItemOptions {
+  colSpan?: StyledSystemVariants["gridColumnSpan"];
+  colStart?: StyledSystemVariants["gridColumnStart"];
+  colEnd?: StyledSystemVariants["gridColumnEnd"];
+  rowSpan?: StyledSystemVariants["gridRowSpan"];
+  rowStart?: StyledSystemVariants["gridRowStart"];
+  rowEnd?: StyledSystemVariants["gridRowEnd"];
 }
 
-export type GridItemProps<C extends ElementType> = PolymorphicComponentProps<C, GridItemOptions>;
+export type GridItemProps<C extends ElementType> = HopeComponentProps<C, GridItemOptions>;
 
 const hopeGridItemClass = "hope-grid-item";
 
@@ -25,35 +24,36 @@ const hopeGridItemClass = "hope-grid-item";
  * Component used as a child of Grid to control the span, and start positions within the grid
  */
 export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>) {
-  const defaultProps: GridItemProps<"div"> = {
-    as: "div",
-  };
-
-  const propsWithDefault: GridItemProps<C> = mergeProps(defaultProps, props);
-  const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    propsWithDefault,
-    commonProps,
-    [...boxPropNames, "css"],
-    ["colSpan", "colStart", "colEnd", "rowSpan", "rowStart", "rowEnd"]
-  );
+  const [local, others] = splitProps(props, [
+    ...classPropsKeys,
+    "colSpan",
+    "colStart",
+    "colEnd",
+    "rowSpan",
+    "rowStart",
+    "rowEnd",
+  ]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeGridItemClass,
-      baseClass: gridItemStyles({
-        gridColumnSpan: shorthandStyleProps.colSpan,
-        gridColumnStart: shorthandStyleProps.colStart,
-        gridColumnEnd: shorthandStyleProps.colEnd,
-        gridRowSpan: shorthandStyleProps.rowSpan,
-        gridRowStart: shorthandStyleProps.rowStart,
-        gridRowEnd: shorthandStyleProps.rowEnd,
-        ...styleProps, // longhand props if provided will override the short ones
-      }),
+      baseClass: "",
       classProps: local,
     });
   };
 
-  return <Dynamic component={local.as} classList={classList()} {...others} />;
+  return (
+    <Box
+      classList={classList()}
+      gridColumnSpan={local.colSpan}
+      gridColumnStart={local.colStart}
+      gridColumnEnd={local.colEnd}
+      gridRowSpan={local.rowSpan}
+      gridRowStart={local.rowStart}
+      gridRowEnd={local.rowEnd}
+      {...others}
+    />
+  );
 }
 
 GridItem.toString = () => createCssSelector(hopeGridItemClass);

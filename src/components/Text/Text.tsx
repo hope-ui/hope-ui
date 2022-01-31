@@ -1,38 +1,39 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
 import { baseTextStyles, BaseTextVariants } from "./Text.styles";
 
 export type BaseTextOptions = BaseTextVariants & {
-  size?: BaseTextVariants["fontSize"];
+  size?: StyledSystemVariants["fontSize"];
 };
 
-export type BaseTextProps<C extends ElementType> = PolymorphicComponentProps<C, BaseTextOptions>;
+export type BaseTextProps<C extends ElementType> = HopeComponentProps<C, BaseTextOptions>;
 
 /**
  * [Internal] Foundation of <Text /> and <Heading /> components.
  */
 export function BaseText<C extends ElementType = "p">(props: BaseTextProps<C>) {
-  const [local, styleProps, others] = splitProps(props, commonProps, [
-    ...boxPropNames,
-    "css",
-    "size",
-  ]);
+  const defaultProps: BaseTextProps<"p"> = {
+    as: "p",
+  };
+
+  const propsWithDefault: BaseTextProps<C> = mergeProps(defaultProps, props);
+  const [local, variantProps, others] = splitProps(propsWithDefault, classPropsKeys, ["size"]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: "",
-      baseClass: baseTextStyles(styleProps),
+      baseClass: baseTextStyles(variantProps),
       classProps: local,
     });
   };
 
-  return <Dynamic component={local.as ?? "p"} classList={classList()} {...others} />;
+  return <Box classList={classList()} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -48,12 +49,7 @@ const hopeTextClass = "hope-text";
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
-  const defaultProps: TextProps<"p"> = {
-    as: "p",
-  };
-
-  const propsWithDefault: TextProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
+  const [local, others] = splitProps(props, classPropsKeys);
 
   const classList = () => {
     return generateClassList({

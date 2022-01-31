@@ -4,8 +4,6 @@ import { spin } from "@/theme/keyframes";
 import { css } from "@/theme/stitches.config";
 import { SystemStyleObject } from "@/theme/types";
 
-import { boxStyles } from "../Box/Box.styles";
-
 export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
 });
@@ -119,7 +117,7 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
   };
 }
 
-export const buttonStyles = css(boxStyles, {
+export const buttonStyles = css({
   appearance: "none",
   position: "relative",
 

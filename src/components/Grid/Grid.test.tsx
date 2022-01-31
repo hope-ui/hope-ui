@@ -1,9 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Grid, GridOptions } from "./Grid";
-import { gridStyles } from "./Grid.styles";
 
 describe("Grid", () => {
   afterEach(cleanup);
@@ -112,62 +112,32 @@ describe("Grid", () => {
     expect(grid).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from gridStyles", () => {
+  it("should have stitches generated class from shorthand props", () => {
     // arrange
-    const gridClass = gridStyles();
-
-    // act
-    renderWithHopeProvider(() => <Grid data-testid="grid">Grid</Grid>);
-    const grid = screen.getByTestId("grid");
-
-    // assert
-    expect(grid).toHaveClass(gridClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: GridOptions = {
+    const shorthandProps: GridOptions = {
       autoFlow: "column",
       autoColumns: "fr",
       autoRows: "max",
       rows: "4",
       columns: "12",
     };
-    const gridClass = gridStyles({
-      ...variantProps,
-      gridAutoFlow: variantProps.autoFlow,
-      gridAutoColumns: variantProps.autoColumns,
-      gridAutoRows: variantProps.autoRows,
-      gridTemplateColumns: variantProps.columns,
-      gridTemplateRows: variantProps.rows,
+    const styledSystemClass = styledSystemStyles({
+      gridAutoFlow: shorthandProps.autoFlow,
+      gridAutoColumns: shorthandProps.autoColumns,
+      gridAutoRows: shorthandProps.autoRows,
+      gridTemplateColumns: shorthandProps.columns,
+      gridTemplateRows: shorthandProps.rows,
     });
 
     // act
     renderWithHopeProvider(() => (
-      <Grid data-testid="grid" {...variantProps}>
+      <Grid data-testid="grid" {...shorthandProps}>
         Grid
       </Grid>
     ));
     const grid = screen.getByTestId("grid");
 
     // assert
-    expect(grid).toHaveClass(gridClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const gridClass = gridStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Grid data-testid="grid" css={customCSS}>
-        Grid
-      </Grid>
-    ));
-    const grid = screen.getByTestId("grid");
-
-    // assert
-    expect(grid).toHaveClass(gridClass.className);
+    expect(grid).toHaveClass(styledSystemClass.className);
   });
 });

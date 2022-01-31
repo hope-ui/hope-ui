@@ -1,14 +1,14 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
 import { IconSpinner } from "@/icons/IconSpinner";
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { useTheme } from "@/theme/HopeProvider";
 import { XPosition } from "@/theme/types";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, ExtendableProps, PolymorphicComponentProps } from "../types";
+import { Box } from "../Box/Box";
+import { ElementType, ExtendableProps, HopeComponentProps } from "../types";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./Button.styles";
 
 export interface ButtonOptions extends ButtonVariants {
@@ -21,17 +21,11 @@ export interface ButtonOptions extends ButtonVariants {
 
 export type ThemeableButtonOptions = Pick<
   ButtonOptions,
-  | "variant"
-  | "colorScheme"
-  | "size"
-  | "loaderPosition"
-  | "compact"
-  | "fullWidth"
-  | "borderRadius"
-  | "textTransform"
->;
+  "variant" | "colorScheme" | "size" | "loaderPosition" | "compact" | "fullWidth"
+> &
+  Pick<StyledSystemVariants, "borderRadius" | "textTransform">;
 
-export type ButtonProps<C extends ElementType> = PolymorphicComponentProps<C, ButtonOptions>;
+export type ButtonProps<C extends ElementType> = HopeComponentProps<C, ButtonOptions>;
 
 const hopeButtonClass = "hope-button";
 
@@ -60,16 +54,24 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   const propsWithDefault: ButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(
+  const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    [...commonProps, "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    [...boxPropNames, "css", "variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
+    [
+      ...classPropsKeys,
+      "loader",
+      "loaderPosition",
+      "disabled",
+      "leftIcon",
+      "rightIcon",
+      "children",
+    ],
+    ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeButtonClass,
-      baseClass: buttonStyles(styleProps),
+      baseClass: buttonStyles(variantProps),
       classProps: local,
     });
   };
@@ -77,27 +79,27 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const loaderClass = buttonLoadingIconStyles();
 
   const isLeftIconVisible = () => {
-    return local.leftIcon && (!styleProps.loading || local.loaderPosition === "right");
+    return local.leftIcon && (!variantProps.loading || local.loaderPosition === "right");
   };
 
   const isRightIconVisible = () => {
-    return local.rightIcon && (!styleProps.loading || local.loaderPosition === "left");
+    return local.rightIcon && (!variantProps.loading || local.loaderPosition === "left");
   };
 
   const isLeftLoaderVisible = () => {
-    return styleProps.loading && !local.disabled && local.loaderPosition === "left";
+    return variantProps.loading && !local.disabled && local.loaderPosition === "left";
   };
 
   const isRightLoaderVisible = () => {
-    return styleProps.loading && !local.disabled && local.loaderPosition === "right";
+    return variantProps.loading && !local.disabled && local.loaderPosition === "right";
   };
 
   const shouldWrapChildrenInSpan = () => {
-    return styleProps.loading || local.leftIcon || local.rightIcon;
+    return variantProps.loading || local.leftIcon || local.rightIcon;
   };
 
   return (
-    <Dynamic component={local.as} classList={classList()} disabled={local.disabled} {...others}>
+    <Box classList={classList()} disabled={local.disabled} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
         <span class={loaderClass}>{local.loader}</span>
@@ -111,7 +113,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       <Show when={isRightLoaderVisible()}>
         <span class={loaderClass}>{local.loader}</span>
       </Show>
-    </Dynamic>
+    </Box>
   );
 }
 

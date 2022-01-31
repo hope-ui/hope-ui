@@ -1,7 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
 import { IconUser } from "@/icons/IconUser";
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { buttonStyles, iconButtonStyles } from "../Button/Button.styles";
 import { IconButton, IconButtonOptions } from "./IconButton";
@@ -139,7 +139,6 @@ describe("IconButton", () => {
       variant: "subtle",
       colorScheme: "success",
       size: "lg",
-      borderRadius: "md",
       compact: true,
       loading: false,
     };
@@ -148,21 +147,6 @@ describe("IconButton", () => {
     // act
     renderWithHopeProvider(() => (
       <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />
-    ));
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(buttonClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const buttonClass = buttonStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <IconButton css={customCSS} aria-label="User" icon={<IconUser />} />
     ));
     const button = screen.getByRole("button");
 

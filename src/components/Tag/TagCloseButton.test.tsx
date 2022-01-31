@@ -1,10 +1,10 @@
 import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { tagCloseButtonStyles } from "./Tag.styles";
-import { TagCloseButton, TagCloseButtonOptions } from "./TagCloseButton";
+import { TagCloseButton } from "./TagCloseButton";
 import { TagProvider } from "./TagProvider";
 
 function renderWithTagContextProvider(callback: () => JSX.Element) {
@@ -121,45 +121,5 @@ describe("TagCloseButton", () => {
 
     // assert
     expect(button).toHaveClass(tagCloseButtonClass.className);
-  });
-
-  it("should have stitches generated class from buttonStyles", () => {
-    // arrange
-    const buttonClass = tagCloseButtonStyles();
-
-    // act
-    renderWithTagContextProvider(() => <TagCloseButton aria-label="Close" />);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(buttonClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: Omit<TagCloseButtonOptions, "aria-label"> = {
-      borderRadius: "md",
-    };
-    const buttonClass = tagCloseButtonStyles(variantProps);
-
-    // act
-    renderWithTagContextProvider(() => <TagCloseButton {...variantProps} aria-label="Close" />);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(buttonClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const buttonClass = tagCloseButtonStyles({ css: customCSS });
-
-    // act
-    renderWithTagContextProvider(() => <TagCloseButton css={customCSS} aria-label="Close" />);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(buttonClass.className);
   });
 });

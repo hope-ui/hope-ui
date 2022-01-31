@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Container } from "./Container";
 import { containerStyles, ContainerVariants } from "./Container.styles";
@@ -135,23 +135,6 @@ describe("Container", () => {
     // act
     renderWithHopeProvider(() => (
       <Container data-testid="container" {...variantProps}>
-        Container
-      </Container>
-    ));
-    const container = screen.getByTestId("container");
-
-    // assert
-    expect(container).toHaveClass(containerClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const containerClass = containerStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Container data-testid="container" css={customCSS}>
         Container
       </Container>
     ));

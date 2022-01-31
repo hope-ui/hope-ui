@@ -1,9 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { BaseFlexOptions, Flex } from "./Flex";
-import { baseFlexStyles } from "./Flex.styles";
 
 describe("Flex", () => {
   afterEach(cleanup);
@@ -112,59 +112,27 @@ describe("Flex", () => {
     expect(flex).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from flexStyles", () => {
+  it("should have stitches generated class from shorthand props", () => {
     // arrange
-    const flexClass = baseFlexStyles();
-
-    // act
-    renderWithHopeProvider(() => <Flex data-testid="flex">Flex</Flex>);
-    const flex = screen.getByTestId("flex");
-
-    // assert
-    expect(flex).toHaveClass(flexClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: BaseFlexOptions = {
+    const shorthandProps: BaseFlexOptions = {
       direction: "column-reverse",
       wrap: "wrap",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "6",
     };
-    const flexClass = baseFlexStyles({
-      ...variantProps,
-      flexDirection: variantProps.direction,
-      flexWrap: variantProps.wrap,
+
+    const styledSystemClass = styledSystemStyles({
+      flexDirection: shorthandProps.direction,
+      flexWrap: shorthandProps.wrap,
     });
 
     // act
     renderWithHopeProvider(() => (
-      <Flex data-testid="flex" {...variantProps}>
+      <Flex data-testid="flex" {...shorthandProps}>
         Flex
       </Flex>
     ));
     const flex = screen.getByTestId("flex");
 
     // assert
-    expect(flex).toHaveClass(flexClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const flexClass = baseFlexStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Flex data-testid="flex" css={customCSS}>
-        Flex
-      </Flex>
-    ));
-    const flex = screen.getByTestId("flex");
-
-    // assert
-    expect(flex).toHaveClass(flexClass.className);
+    expect(flex).toHaveClass(styledSystemClass.className);
   });
 });

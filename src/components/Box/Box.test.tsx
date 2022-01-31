@@ -1,9 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles, StyledSystemVariants } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Box } from "./Box";
-import { boxStyles, BoxVariants } from "./Box.styles";
 
 describe("Box", () => {
   afterEach(cleanup);
@@ -49,19 +49,6 @@ describe("Box", () => {
 
     // assert
     expect(box).toHaveTextContent(children);
-  });
-
-  it("should have semantic hope class", () => {
-    // act
-    renderWithHopeProvider(() => <Box data-testid="box">Box</Box>);
-    const box = screen.getByTestId("box");
-
-    // assert
-    expect(box).toHaveClass("hope-box");
-  });
-
-  it("should return semantic hope class as css selector when calling toString()", () => {
-    expect(Box.toString()).toBe(".hope-box");
   });
 
   it("should have class from class prop", () => {
@@ -114,7 +101,7 @@ describe("Box", () => {
 
   it("should have stitches generated class from boxStyles", () => {
     // arrange
-    const boxClass = boxStyles();
+    const boxClass = styledSystemStyles();
 
     // act
     renderWithHopeProvider(() => <Box data-testid="box">Box</Box>);
@@ -126,7 +113,7 @@ describe("Box", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: Required<BoxVariants> = {
+    const variantProps: Required<StyledSystemVariants> = {
       display: "block",
       verticalAlign: "baseline",
       overflow: "auto",
@@ -181,8 +168,8 @@ describe("Box", () => {
       flex: "auto",
       flexDirection: "column",
       flexWrap: "wrap",
-      grow: "false",
-      shrink: "true",
+      flexGrow: "0",
+      flexShrink: "1",
       order: "first",
       alignItems: "center",
       alignContent: "center",
@@ -205,7 +192,7 @@ describe("Box", () => {
       gridRowStart: "4",
       gridRowEnd: "4",
     };
-    const boxClass = boxStyles(variantProps);
+    const boxClass = styledSystemStyles(variantProps);
 
     // act
     renderWithHopeProvider(() => (
@@ -222,7 +209,7 @@ describe("Box", () => {
   it("should have stitches generated class from css prop", () => {
     // arrange
     const customCSS = { bg: "red" };
-    const boxClass = boxStyles({ css: customCSS });
+    const boxClass = styledSystemStyles({ css: customCSS });
 
     // act
     renderWithHopeProvider(() => (

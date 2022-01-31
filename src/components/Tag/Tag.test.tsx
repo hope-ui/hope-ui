@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Tag, TagOptions } from "./Tag";
 import { tagStyles } from "./Tag.styles";
@@ -130,30 +130,12 @@ describe("Tag", () => {
       variant: "subtle",
       colorScheme: "success",
       size: "lg",
-      borderRadius: "md",
     };
     const tagClass = tagStyles(variantProps);
 
     // act
     renderWithHopeProvider(() => (
       <Tag data-testid="tag" {...variantProps}>
-        Tag
-      </Tag>
-    ));
-    const tag = screen.getByTestId("tag");
-
-    // assert
-    expect(tag).toHaveClass(tagClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const tagClass = tagStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Tag data-testid="tag" css={customCSS}>
         Tag
       </Tag>
     ));

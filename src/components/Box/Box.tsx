@@ -1,32 +1,38 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import {
+  styledSystemStyles,
+  StyledSystemVariants,
+  styledSystemVariantsKeys,
+} from "@/styled-system/system.styles";
+import { generateClassList } from "@/utils/function";
+import { classPropsKeys } from "@/utils/object";
 
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { boxPropNames, boxStyles, BoxVariants } from "./Box.styles";
-
-export type BoxProps<C extends ElementType> = PolymorphicComponentProps<C, BoxVariants>;
-
-const hopeBoxClass = "hope-box";
+import { ElementType, HopeComponentProps } from "../types";
 
 /**
  * Box is the most abstract component of Hope UI.
  * By default, it renders a div element.
  */
-export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
-  const [local, styleProps, others] = splitProps(props, commonProps, [...boxPropNames, "css"]);
+export function Box<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+  const variantPropsKeys = Object.keys(props).filter(
+    key => key in styledSystemVariantsKeys
+  ) as Array<keyof StyledSystemVariants>;
+
+  const [local, variantProps, others] = splitProps(
+    props,
+    [...classPropsKeys, "as"],
+    [...variantPropsKeys, "css"]
+  );
 
   const classList = () => {
     return generateClassList({
-      hopeClass: hopeBoxClass,
-      baseClass: boxStyles(styleProps),
+      hopeClass: "", // No semantic class because it will be added to all components
+      baseClass: styledSystemStyles(variantProps),
       classProps: local,
     });
   };
 
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
-
-Box.toString = () => createCssSelector(hopeBoxClass);

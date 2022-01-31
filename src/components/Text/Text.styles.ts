@@ -2,9 +2,7 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/theme/stitches.config";
 
-import { boxStyles } from "../Box/Box.styles";
-
-export const baseTextStyles = css(boxStyles, {
+export const baseTextStyles = css({
   variants: {
     size: {
       xs: {

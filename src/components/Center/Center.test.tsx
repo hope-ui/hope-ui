@@ -1,9 +1,10 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Center } from "./Center";
-import { centerStyles, CenterVariants } from "./Center.styles";
+import { centerStyles } from "./Center.styles";
 
 describe("Center", () => {
   afterEach(cleanup);
@@ -124,39 +125,15 @@ describe("Center", () => {
     expect(center).toHaveClass(centerClass.className);
   });
 
-  it("should have stitches generated class from variants prop", () => {
+  it("should have stitches generated class from styledSystemStyles", () => {
     // arrange
-    const variantProps: CenterVariants = {
-      boxSize: "full",
-    };
-    const centerClass = centerStyles(variantProps);
+    const styledSystemClass = styledSystemStyles();
 
     // act
-    renderWithHopeProvider(() => (
-      <Center data-testid="center" {...variantProps}>
-        Center
-      </Center>
-    ));
+    renderWithHopeProvider(() => <Center data-testid="center">Center</Center>);
     const center = screen.getByTestId("center");
 
     // assert
-    expect(center).toHaveClass(centerClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const centerClass = centerStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Center data-testid="center" css={customCSS}>
-        Center
-      </Center>
-    ));
-    const center = screen.getByTestId("center");
-
-    // assert
-    expect(center).toHaveClass(centerClass.className);
+    expect(center).toHaveClass(styledSystemClass.className);
   });
 });

@@ -1,26 +1,17 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
 import { IconCross } from "@/icons";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import {
-  tagCloseButtonIconStyles,
-  tagCloseButtonStyles,
-  TagCloseButtonVariants,
-} from "./Tag.styles";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
+import { tagCloseButtonIconStyles, tagCloseButtonStyles } from "./Tag.styles";
 import { useTag } from "./TagProvider";
 
-export interface TagCloseButtonOptions extends TagCloseButtonVariants {
-  "aria-label": string;
-}
-
-export type TagCloseButtonProps<C extends ElementType> = PolymorphicComponentProps<
+export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
   C,
-  TagCloseButtonOptions
+  { "aria-label": string }
 >;
 
 const hopeTagCloseButtonClass = "hope-tag-close-button";
@@ -37,24 +28,20 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
   };
 
   const propsWithDefault: TagCloseButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(
-    propsWithDefault,
-    [...commonProps, "children"],
-    [...boxPropNames, "css"]
-  );
+  const [local, others] = splitProps(propsWithDefault, [...classPropsKeys, "children"]);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeTagCloseButtonClass,
-      baseClass: tagCloseButtonStyles(styleProps),
+      baseClass: tagCloseButtonStyles(),
       classProps: local,
     });
   };
 
   return (
-    <Dynamic component={local.as} classList={classList()} {...others}>
+    <Box classList={classList()} {...others}>
       <IconCross class={tagCloseButtonIconStyles()} />
-    </Dynamic>
+    </Box>
   );
 }
 

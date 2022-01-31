@@ -2,10 +2,11 @@ import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/HopeProvider";
 import { createCssSelector, generateClassList } from "@/utils/function";
+import { classPropsKeys } from "@/utils/object";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../Button/Button";
 import { iconButtonStyles } from "../Button/Button.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
+import { ElementType, HopeComponentProps } from "../types";
 
 export interface IconButtonOptions
   extends Omit<
@@ -21,10 +22,7 @@ export type ThemeableIconButtonOptions = Pick<
   "variant" | "colorScheme" | "size" | "borderRadius" | "compact"
 >;
 
-export type IconButtonProps<C extends ElementType> = PolymorphicComponentProps<
-  C,
-  IconButtonOptions
->;
+export type IconButtonProps<C extends ElementType> = HopeComponentProps<C, IconButtonOptions>;
 
 const hopeIconButtonClass = "hope-icon-button";
 
@@ -44,13 +42,7 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
   };
 
   const propsWithDefault: IconButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "className",
-    "classList",
-    "children",
-    "icon",
-  ]);
+  const [local, others] = splitProps(propsWithDefault, [...classPropsKeys, "children", "icon"]);
 
   const classList = () => {
     return generateClassList({

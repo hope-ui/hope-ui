@@ -1,44 +1,31 @@
 import { mergeProps, splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { baseFlexStyles, BaseFlexVariants } from "./Flex.styles";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
 
-export interface BaseFlexOptions extends BaseFlexVariants {
-  direction?: BaseFlexVariants["flexDirection"];
-  wrap?: BaseFlexVariants["flexWrap"];
+export interface BaseFlexOptions {
+  direction?: StyledSystemVariants["flexDirection"];
+  wrap?: StyledSystemVariants["flexWrap"];
 }
 
-export type BaseFlexProps<C extends ElementType> = PolymorphicComponentProps<C, BaseFlexOptions>;
+export type BaseFlexProps<C extends ElementType> = HopeComponentProps<C, BaseFlexOptions>;
 
 /**
  * [Internal] Foundation of <Flex /> and <Stack /> components.
  */
 export function BaseFlex<C extends ElementType = "div">(props: BaseFlexProps<C>) {
-  const [local, styleProps, shorthandStyleProps, others] = splitProps(
-    props,
-    commonProps,
-    [...boxPropNames, "css"],
-    ["direction", "wrap"]
-  );
-
-  const classList = () => {
-    return generateClassList({
-      hopeClass: "",
-      baseClass: baseFlexStyles({
-        flexDirection: shorthandStyleProps.direction,
-        flexWrap: shorthandStyleProps.wrap,
-        ...styleProps, // longhand props if provided will override the short ones
-      }),
-      classProps: local,
-    });
+  const defaultProps: BaseFlexProps<"div"> = {
+    display: "flex",
   };
 
-  return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
+  const propsWithDefault: BaseFlexProps<C> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["direction", "wrap"]);
+
+  return <Box flexDirection={local.direction} flexWrap={local.wrap} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -55,7 +42,6 @@ const hopeFlexClass = "hope-flex";
  */
 export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
   const defaultProps: FlexProps<"div"> = {
-    as: "div",
     direction: "row",
     alignItems: "stretch",
     justifyContent: "start",
@@ -63,7 +49,7 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
   };
 
   const propsWithDefault: FlexProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
+  const [local, others] = splitProps(propsWithDefault, classPropsKeys);
 
   const classList = () => {
     return generateClassList({

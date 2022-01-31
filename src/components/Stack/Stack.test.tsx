@@ -1,9 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { BaseFlexOptions } from "../Flex/Flex";
-import { baseFlexStyles } from "../Flex/Flex.styles";
 import { HStack, HStackOptions, Stack, VStack, VStackOptions } from "./Stack";
 
 describe("Stack", () => {
@@ -113,61 +113,28 @@ describe("Stack", () => {
     expect(stack).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from baseFlexStyles", () => {
+  it("should have stitches generated class from shorthand props", () => {
     // arrange
-    const stackClass = baseFlexStyles();
-
-    // act
-    renderWithHopeProvider(() => <Stack data-testid="stack">Stack</Stack>);
-    const stack = screen.getByTestId("stack");
-
-    // assert
-    expect(stack).toHaveClass(stackClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: BaseFlexOptions = {
+    const shorthandProps: BaseFlexOptions = {
       direction: "column-reverse",
       wrap: "wrap",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "6",
     };
 
-    const stackClass = baseFlexStyles({
-      ...variantProps,
-      flexDirection: variantProps.direction,
-      flexWrap: variantProps.wrap,
+    const styledSystemClass = styledSystemStyles({
+      flexDirection: shorthandProps.direction,
+      flexWrap: shorthandProps.wrap,
     });
 
     // act
     renderWithHopeProvider(() => (
-      <Stack data-testid="stack" {...variantProps}>
+      <Stack data-testid="stack" {...shorthandProps}>
         Stack
       </Stack>
     ));
     const stack = screen.getByTestId("stack");
 
     // assert
-    expect(stack).toHaveClass(stackClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const stackClass = baseFlexStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Stack data-testid="stack" css={customCSS}>
-        Stack
-      </Stack>
-    ));
-    const stack = screen.getByTestId("stack");
-
-    // assert
-    expect(stack).toHaveClass(stackClass.className);
+    expect(stack).toHaveClass(styledSystemClass.className);
   });
 });
 
@@ -177,7 +144,7 @@ describe("VStack", () => {
   it("should have flexDirection set to column", () => {
     // arrange
 
-    const stackClass = baseFlexStyles({
+    const styledSystemClass = styledSystemStyles({
       flexDirection: "column",
     });
 
@@ -186,7 +153,7 @@ describe("VStack", () => {
     const vStack = screen.getByTestId("v-stack");
 
     // assert
-    expect(vStack).toHaveClass(stackClass.className);
+    expect(vStack).toHaveClass(styledSystemClass.className);
   });
 
   it("should pass spacing prop to <Stack /> rowGap prop", () => {
@@ -195,7 +162,7 @@ describe("VStack", () => {
       spacing: "4",
     };
 
-    const stackClass = baseFlexStyles({
+    const styledSystemClass = styledSystemStyles({
       rowGap: variantProps.spacing,
     });
 
@@ -208,7 +175,7 @@ describe("VStack", () => {
     const vStack = screen.getByTestId("v-stack");
 
     // assert
-    expect(vStack).toHaveClass(stackClass.className);
+    expect(vStack).toHaveClass(styledSystemClass.className);
   });
 });
 
@@ -218,7 +185,7 @@ describe("HStack", () => {
   it("should have flexDirection set to row", () => {
     // arrange
 
-    const stackClass = baseFlexStyles({
+    const styledSystemClass = styledSystemStyles({
       flexDirection: "row",
     });
 
@@ -227,7 +194,7 @@ describe("HStack", () => {
     const hStack = screen.getByTestId("h-stack");
 
     // assert
-    expect(hStack).toHaveClass(stackClass.className);
+    expect(hStack).toHaveClass(styledSystemClass.className);
   });
 
   it("should pass spacing prop to <Stack /> columnGap prop", () => {
@@ -236,7 +203,7 @@ describe("HStack", () => {
       spacing: "4",
     };
 
-    const stackClass = baseFlexStyles({
+    const styledSystemClass = styledSystemStyles({
       columnGap: variantProps.spacing,
     });
 
@@ -249,6 +216,6 @@ describe("HStack", () => {
     const hStack = screen.getByTestId("h-stack");
 
     // assert
-    expect(hStack).toHaveClass(stackClass.className);
+    expect(hStack).toHaveClass(styledSystemClass.className);
   });
 });

@@ -1,12 +1,14 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { StyledSystemVariants } from "@/styled-system";
 import { useTheme } from "@/theme/HopeProvider";
 import { createCssSelector, generateClassList } from "@/utils/function";
+import { classPropsKeys } from "@/utils/object";
 
-import { BaseText, BaseTextOptions, BaseTextProps } from "../Text";
+import { BaseText, BaseTextProps } from "../Text";
 import { ElementType } from "../types";
 
-export type ThemeableHeadingOptions = Pick<BaseTextOptions, "fontWeight">;
+export type ThemeableHeadingOptions = Pick<StyledSystemVariants, "fontWeight">;
 
 export type HeadingProps<C extends ElementType> = BaseTextProps<C>;
 
@@ -25,7 +27,7 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   };
 
   const propsWithDefault: HeadingProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "className", "classList"]);
+  const [local, others] = splitProps(propsWithDefault, classPropsKeys);
 
   const classList = () => {
     return generateClassList({

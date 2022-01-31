@@ -1,12 +1,13 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
-import { Dynamic, Show } from "solid-js/web";
+import { Show } from "solid-js/web";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { useTheme } from "@/theme/HopeProvider";
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
 import { tagStyles, TagVariants } from "./Tag.styles";
 import { TagContextValue, TagProvider } from "./TagProvider";
 
@@ -15,12 +16,10 @@ export interface TagOptions extends Omit<TagVariants, "withLeftSection" | "withR
   rightSection?: JSX.Element;
 }
 
-export type ThemeableTagOptions = Pick<
-  TagOptions,
-  "variant" | "colorScheme" | "size" | "borderRadius"
->;
+export type ThemeableTagOptions = Pick<TagOptions, "variant" | "colorScheme" | "size"> &
+  Pick<StyledSystemVariants, "borderRadius">;
 
-export type TagProps<C extends ElementType = "span"> = PolymorphicComponentProps<C, TagOptions>;
+export type TagProps<C extends ElementType> = HopeComponentProps<C, TagOptions>;
 
 const hopeTagClass = "hope-tag";
 
@@ -40,17 +39,17 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   };
 
   const propsWithDefault: TagProps<C> = mergeProps(defaultProps, props);
-  const [local, styleProps, others] = splitProps(
+  const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    [...commonProps, "leftSection", "rightSection", "children"],
-    [...boxPropNames, "css", "variant", "colorScheme", "size"]
+    [...classPropsKeys, "leftSection", "rightSection", "children"],
+    ["variant", "colorScheme", "size"]
   );
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeTagClass,
       baseClass: tagStyles({
-        ...styleProps,
+        ...variantProps,
         withLeftSection: !!local.leftSection,
         withRightSection: !!local.rightSection,
       }),
@@ -63,18 +62,18 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   };
 
   const tagContextValue: () => TagContextValue = () => ({
-    borderRadius: styleProps.borderRadius ?? defaultProps.borderRadius,
+    borderRadius: others.borderRadius ?? defaultProps.borderRadius,
   });
 
   return (
     <TagProvider contextValue={tagContextValue()}>
-      <Dynamic component={local.as} classList={classList()} {...others}>
+      <Box classList={classList()} {...others}>
         <Show when={local.leftSection}>{local.leftSection}</Show>
         <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
           <span>{local.children}</span>
         </Show>
         <Show when={local.rightSection}>{local.rightSection}</Show>
-      </Dynamic>
+      </Box>
     </TagProvider>
   );
 }

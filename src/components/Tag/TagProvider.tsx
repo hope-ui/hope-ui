@@ -1,9 +1,9 @@
 import { createContext, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { TagVariants } from "./Tag.styles";
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 
 export interface TagContextValue {
-  borderRadius: TagVariants["borderRadius"];
+  borderRadius: StyledSystemVariants["borderRadius"];
 }
 
 export const TagContext = createContext<TagContextValue>();

@@ -1,11 +1,12 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
+import { StyledSystemVariants } from "@/styled-system/system.styles";
 import { SystemStyleObject } from "@/theme/types";
 
 /**
  * Represent any HTML element or SolidJS component.
  */
-export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
+export type ElementType = keyof JSX.IntrinsicElements | Component<unknown>;
 
 /**
  * Take the props of the passed HTML element or component and returns its type.
@@ -48,18 +49,16 @@ export type ExtendableProps<ExtendedProps = unknown, OverrideProps = unknown> = 
   Omit<ExtendedProps, keyof OverrideProps>;
 
 /**
- * Allows for inheriting the props from the specified element type so that
- * props like children, className & style work, as well as element-specific
- * attributes like aria roles. The component (`C`) must be passed in.
+ * Props of a Hope UI component
  */
-export type PolymorphicComponentProps<C extends ElementType, Props = unknown> = ExtendableProps<
+export type HopeComponentProps<C extends ElementType, Props = unknown> = ExtendableProps<
   PropsOf<C>,
-  PropsWithChildren<Props & ClassProps & CSSProp & AsProp<C>>
+  PropsWithChildren<Props & ClassProps & CSSProp & StyledSystemVariants & AsProp<C>>
 >;
 
 export interface ClassConfig {
   /**
-   * Semantic human readable css class used to override styles by end user.
+   * Semantic human-readable css class used to override styles by end user.
    */
   hopeClass: string;
 

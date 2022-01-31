@@ -39,7 +39,7 @@ export function App() {
       <Box bg="danger400" w="full" p="4" color="white">
         Always white
       </Box>
-      <Box bg="danger400" w="full" p={4}>
+      <Box bg="danger400" w="full" p="4">
         Color mode adapted
       </Box>
       <Box bg="danger400" w="full" p={4} color="white">

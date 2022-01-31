@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { Button } from "./Button";
 import { buttonStyles, ButtonVariants } from "./Button.styles";
@@ -132,7 +132,6 @@ describe("Button", () => {
       variant: "subtle",
       colorScheme: "success",
       size: "lg",
-      borderRadius: "md",
       compact: true,
       loading: false,
       fullWidth: false,
@@ -141,19 +140,6 @@ describe("Button", () => {
 
     // act
     renderWithHopeProvider(() => <Button {...variantProps}>Button</Button>);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(buttonClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const buttonClass = buttonStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => <Button css={customCSS}>Button</Button>);
     const button = screen.getByRole("button");
 
     // assert

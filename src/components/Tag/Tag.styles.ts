@@ -3,15 +3,13 @@ import { VariantProps } from "@stitches/core";
 import { css } from "@/theme/stitches.config";
 import { SystemStyleObject } from "@/theme/types";
 
-import { boxStyles } from "../Box/Box.styles";
-
 /* -------------------------------------------------------------------------------------------------
  * TagCloseButton
  * -----------------------------------------------------------------------------------------------*/
 
 export const tagCloseButtonIconStyles = css();
 
-export const tagCloseButtonStyles = css(boxStyles, {
+export const tagCloseButtonStyles = css({
   appearance: "none",
   position: "relative",
 
@@ -50,8 +48,6 @@ export const tagCloseButtonStyles = css(boxStyles, {
     cursor: "not-allowed",
   },
 });
-
-export type TagCloseButtonVariants = VariantProps<typeof tagCloseButtonStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Tag
@@ -157,7 +153,7 @@ function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
   };
 }
 
-export const tagStyles = css(boxStyles, {
+export const tagStyles = css({
   appearance: "none",
   position: "relative",
 

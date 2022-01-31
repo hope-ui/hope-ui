@@ -1,14 +1,13 @@
 import { splitProps } from "solid-js";
-import { Dynamic } from "solid-js/web";
 
 import { createCssSelector, generateClassList } from "@/utils/function";
-import { commonProps } from "@/utils/object";
+import { classPropsKeys } from "@/utils/object";
 
-import { boxPropNames } from "../Box/Box.styles";
-import { ElementType, PolymorphicComponentProps } from "../types";
-import { spacerStyles, SpacerVariants } from "./Spacer.styles";
+import { Box } from "../Box/Box";
+import { ElementType, HopeComponentProps } from "../types";
+import { spacerStyles } from "./Spacer.styles";
 
-export type SpacerProps<C extends ElementType> = PolymorphicComponentProps<C, SpacerVariants>;
+export type SpacerProps<C extends ElementType> = HopeComponentProps<C>;
 
 const hopeSpacerClass = "hope-spacer";
 
@@ -17,17 +16,17 @@ const hopeSpacerClass = "hope-spacer";
  * It renders a `div` by default, and takes up any available space.
  */
 export function Spacer<C extends ElementType = "div">(props: SpacerProps<C>) {
-  const [local, styleProps, others] = splitProps(props, commonProps, [...boxPropNames, "css"]);
+  const [local, others] = splitProps(props, classPropsKeys);
 
   const classList = () => {
     return generateClassList({
       hopeClass: hopeSpacerClass,
-      baseClass: spacerStyles(styleProps),
+      baseClass: spacerStyles(),
       classProps: local,
     });
   };
 
-  return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
+  return <Box classList={classList()} {...others} />;
 }
 
 Spacer.toString = () => createCssSelector(hopeSpacerClass);

@@ -1,8 +1,8 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { styledSystemStyles } from "@/styled-system";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
-import { gridItemStyles } from "./Grid.styles";
 import { GridItem, GridItemOptions } from "./GridItem";
 
 describe("GridItem", () => {
@@ -112,64 +112,34 @@ describe("GridItem", () => {
     expect(gridItem).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from gridItemStyles", () => {
+  it("should have stitches generated class from shorthand props", () => {
     // arrange
-    const gridItemClass = gridItemStyles();
-
-    // act
-    renderWithHopeProvider(() => <GridItem data-testid="grid-item">GridItem</GridItem>);
-    const gridItem = screen.getByTestId("grid-item");
-
-    // assert
-    expect(gridItem).toHaveClass(gridItemClass.className);
-  });
-
-  it("should have stitches generated class from variants prop", () => {
-    // arrange
-    const variantProps: GridItemOptions = {
-      gridColumnSpan: "4",
-      gridColumnStart: "1",
-      gridColumnEnd: "5",
-      gridRowSpan: "4",
-      gridRowStart: "1",
-      gridRowEnd: "5",
+    const shorthandProps: GridItemOptions = {
+      colSpan: "4",
+      colStart: "1",
+      colEnd: "5",
+      rowSpan: "4",
+      rowStart: "1",
+      rowEnd: "5",
     };
-    const gridItemClass = gridItemStyles({
-      ...variantProps,
-      gridColumnSpan: variantProps.colSpan,
-      gridColumnStart: variantProps.colStart,
-      gridColumnEnd: variantProps.colEnd,
-      gridRowSpan: variantProps.rowSpan,
-      gridRowStart: variantProps.rowStart,
-      gridRowEnd: variantProps.rowEnd,
+    const styledSystemClass = styledSystemStyles({
+      gridColumnSpan: shorthandProps.colSpan,
+      gridColumnStart: shorthandProps.colStart,
+      gridColumnEnd: shorthandProps.colEnd,
+      gridRowSpan: shorthandProps.rowSpan,
+      gridRowStart: shorthandProps.rowStart,
+      gridRowEnd: shorthandProps.rowEnd,
     });
 
     // act
     renderWithHopeProvider(() => (
-      <GridItem data-testid="grid-item" {...variantProps}>
+      <GridItem data-testid="grid-item" {...shorthandProps}>
         GridItem
       </GridItem>
     ));
     const gridItem = screen.getByTestId("grid-item");
 
     // assert
-    expect(gridItem).toHaveClass(gridItemClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const gridItemClass = gridItemStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <GridItem data-testid="grid-item" css={customCSS}>
-        GridItem
-      </GridItem>
-    ));
-    const gridItem = screen.getByTestId("grid-item");
-
-    // assert
-    expect(gridItem).toHaveClass(gridItemClass.className);
+    expect(gridItem).toHaveClass(styledSystemClass.className);
   });
 });

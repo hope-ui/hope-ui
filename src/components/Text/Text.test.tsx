@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { BaseTextOptions, Text } from "./Text";
 import { baseTextStyles } from "./Text.styles";
@@ -127,12 +127,7 @@ describe("Text", () => {
   it("should have stitches generated class from variants prop", () => {
     // arrange
     const props: BaseTextOptions = {
-      color: "primary500",
       size: "4xl",
-      fontFamily: "serif",
-      fontWeight: "light",
-      textAlign: "justify",
-      lineClamp: 3,
     };
 
     const textClass = baseTextStyles(props);
@@ -140,23 +135,6 @@ describe("Text", () => {
     // act
     renderWithHopeProvider(() => (
       <Text data-testid="text" {...props}>
-        Text
-      </Text>
-    ));
-    const text = screen.getByTestId("text");
-
-    // assert
-    expect(text).toHaveClass(textClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const textClass = baseTextStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Text data-testid="text" css={customCSS}>
         Text
       </Text>
     ));

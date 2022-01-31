@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test";
+import { renderWithHopeProvider } from "@/utils/testUtils";
 
 import { BaseTextOptions } from "../Text/Text";
 import { baseTextStyles } from "../Text/Text.styles";
@@ -127,37 +127,15 @@ describe("Heading", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const props: BaseTextOptions = {
-      color: "primary500",
+    const variantProps: BaseTextOptions = {
       size: "4xl",
-      fontFamily: "serif",
-      fontWeight: "light",
-      textAlign: "justify",
-      lineClamp: 3,
     };
 
-    const textClass = baseTextStyles(props);
+    const textClass = baseTextStyles(variantProps);
 
     // act
     renderWithHopeProvider(() => (
-      <Heading data-testid="heading" {...props}>
-        Heading
-      </Heading>
-    ));
-    const heading = screen.getByTestId("heading");
-
-    // assert
-    expect(heading).toHaveClass(textClass.className);
-  });
-
-  it("should have stitches generated class from css prop", () => {
-    // arrange
-    const customCSS = { bg: "red" };
-    const textClass = baseTextStyles({ css: customCSS });
-
-    // act
-    renderWithHopeProvider(() => (
-      <Heading data-testid="heading" css={customCSS}>
+      <Heading data-testid="heading" {...variantProps}>
         Heading
       </Heading>
     ));
