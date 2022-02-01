@@ -1,4 +1,4 @@
-import { baseTheme } from "@/theme/stitches.config";
+import { theme } from "@/theme/stitches.config";
 import { ColorToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
@@ -12,7 +12,7 @@ interface ColorUtilityVariants {
 }
 
 export function createColorUtilityVariants(): ColorUtilityVariants {
-  return Object.keys(baseTheme.colors).reduce(
+  return Object.keys(theme.colors).reduce(
     (acc, key) => ({
       color: { ...acc.color, [key]: { color: `$${key}` } as ThemeStyleObject },
       bg: { ...acc.bg, [key]: { bg: `$${key}` } as ThemeStyleObject },

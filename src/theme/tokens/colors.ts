@@ -432,10 +432,6 @@ const dangerDarkAlpha = {
 };
 
 export const darkColors = {
-  // ...common,
-  // ...blackAlpha,
-  // ...whiteAlpha,
-
   ...primaryDark,
   ...primaryDarkAlpha,
 
