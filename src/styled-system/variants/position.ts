@@ -1,4 +1,4 @@
-import { baseTheme } from "@/theme/stitches.config";
+import { theme } from "@/theme/stitches.config";
 import { ThemeStyleObject, ZIndiceToken } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
@@ -12,7 +12,7 @@ export function createPositionUtilityVariants() {
       relative: { position: "relative" } as ThemeStyleObject,
       sticky: { position: "sticky" } as ThemeStyleObject,
     },
-    zIndex: Object.keys(baseTheme.zIndices).reduce(
+    zIndex: Object.keys(theme.zIndices).reduce(
       (acc, key) => ({ ...acc, [key]: { zIndex: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<ZIndiceToken>
     ),

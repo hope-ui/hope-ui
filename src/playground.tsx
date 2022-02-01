@@ -2,7 +2,7 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, HopeThemeContextConfig, HopeProvider, useColorMode, useTheme } from ".";
+import { Box, HopeProvider, HopeThemeContextConfig, useColorMode, useTheme } from ".";
 
 /*
 const customTheme: HopeThemeContextConfig = {

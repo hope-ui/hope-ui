@@ -1,4 +1,4 @@
-import { baseTheme } from "@/theme/stitches.config";
+import { theme } from "@/theme/stitches.config";
 import { SizeToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
@@ -16,7 +16,7 @@ interface SizeUtilityVariants {
 }
 
 export function createSizeUtilityVariants(): SizeUtilityVariants {
-  return Object.keys(baseTheme.sizes).reduce(
+  return Object.keys(theme.sizes).reduce(
     (acc, key) => ({
       w: { ...acc.w, [key]: { w: `$${key}` } as ThemeStyleObject },
       minW: { ...acc.minW, [key]: { minW: `$${key}` } as ThemeStyleObject },

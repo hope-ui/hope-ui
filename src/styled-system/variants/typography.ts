@@ -1,4 +1,4 @@
-import { baseTheme } from "@/theme/stitches.config";
+import { theme } from "@/theme/stitches.config";
 import {
   FontSizeToken,
   FontToken,
@@ -12,23 +12,23 @@ import { UtilityVariant } from "../types";
 
 export function createTypographyUtilityVariants() {
   return {
-    fontFamily: Object.keys(baseTheme.fonts).reduce(
+    fontFamily: Object.keys(theme.fonts).reduce(
       (acc, key) => ({ ...acc, [key]: { fontFamily: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<FontToken>
     ),
-    fontSize: Object.keys(baseTheme.fontSizes).reduce(
+    fontSize: Object.keys(theme.fontSizes).reduce(
       (acc, key) => ({ ...acc, [key]: { fontSize: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<FontSizeToken>
     ),
-    fontWeight: Object.keys(baseTheme.fontWeights).reduce(
+    fontWeight: Object.keys(theme.fontWeights).reduce(
       (acc, key) => ({ ...acc, [key]: { fontWeight: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<FontWeightToken>
     ),
-    lineHeight: Object.keys(baseTheme.lineHeights).reduce(
+    lineHeight: Object.keys(theme.lineHeights).reduce(
       (acc, key) => ({ ...acc, [key]: { lineHeight: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<LineHeightToken>
     ),
-    letterSpacing: Object.keys(baseTheme.letterSpacings).reduce(
+    letterSpacing: Object.keys(theme.letterSpacings).reduce(
       (acc, key) => ({ ...acc, [key]: { letterSpacing: `$${key}` } as ThemeStyleObject }),
       {} as UtilityVariant<LetterSpacingToken>
     ),

@@ -1,4 +1,4 @@
-import { baseTheme } from "@/theme/stitches.config";
+import { theme } from "@/theme/stitches.config";
 import { SpaceToken, ThemeStyleObject } from "@/theme/types";
 
 import { UtilityVariant } from "../types";
@@ -38,7 +38,7 @@ interface SpaceUtilityVariants {
 }
 
 export function createSpaceUtilityVariants(): SpaceUtilityVariants {
-  const spaceUtilities = Object.keys(baseTheme.space).reduce(
+  const spaceUtilities = Object.keys(theme.space).reduce(
     (acc, key) => ({
       m: { ...acc.m, [key]: { m: `$${key}` } as ThemeStyleObject },
       mx: { ...acc.mx, [key]: { mx: `$${key}` } as ThemeStyleObject },
