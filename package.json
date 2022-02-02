@@ -65,7 +65,8 @@
   },
   "dependencies": {
     "csstype": "3.0.10",
-    "lodash.merge": "4.6.2"
+    "lodash.merge": "4.6.2",
+    "lodash.mergewith": "^4.6.2"
   },
   "devDependencies": {
     "@babel/core": "7.16.7",
@@ -84,6 +85,7 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@types/jest": "^27.4.0",
     "@types/lodash.merge": "4.6.6",
+    "@types/lodash.mergewith": "^4.6.6",
     "@types/node": "17.0.8",
     "@types/prismjs": "^1.26.0",
     "@typescript-eslint/eslint-plugin": "5.9.1",

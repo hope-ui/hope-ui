@@ -1,13 +1,6 @@
 /* -------------------------------------------------------------------------------------------------
- * Common light and dark palette
+ * Common to light and dark palette
  * -----------------------------------------------------------------------------------------------*/
-
-const common = {
-  transparent: "transparent",
-  current: "currentColor",
-  black: "hsl(0 0% 0%)",
-  white: "hsl(0 0% 100%)",
-};
 
 const blackAlpha = {
   blackAlpha1: "hsl(0 0% 0% / 0.012)",
@@ -37,6 +30,15 @@ const whiteAlpha = {
   whiteAlpha10: "hsl(0 0% 100% / 0.446)",
   whiteAlpha11: "hsl(0 0% 100% / 0.592)",
   whiteAlpha12: "hsl(0 0% 100% / 0.923)",
+};
+
+export const commonColors = {
+  transparent: "transparent",
+  current: "currentColor",
+  black: "hsl(0 0% 0%)",
+  white: "hsl(0 0% 100%)",
+  ...blackAlpha,
+  ...whiteAlpha,
 };
 
 /* -------------------------------------------------------------------------------------------------
@@ -224,10 +226,6 @@ const dangerAlpha = {
 };
 
 export const lightColors = {
-  ...common,
-  ...blackAlpha,
-  ...whiteAlpha,
-
   ...primary,
   ...primaryAlpha,
 
