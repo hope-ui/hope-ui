@@ -1,21 +1,40 @@
+import merge from "lodash.merge";
 import { isServer } from "solid-js/web";
 
+import { createTheme, theme } from "@/styled-system/stitches.config";
+import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
 
-import { ColorMode } from "./types";
-
-const hasLocalStorageSupport = () => typeof Storage !== "undefined";
-
-const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
+import { ColorMode, HopeTheme, ThemeConfig } from "./types";
 
 /**
- * CSS class names added to `document.body` when color mode changes.
+ * Theme CSS class name added to `document.body` based on color mode.
  */
 const classNames = {
   light: "hope-ui-light",
   dark: "hope-ui-dark",
 };
+
+/**
+ * [Internal]
+ * Create new stitches dark or light theme.
+ * @return a merged theme object containing the base stitches theme and the overrided values.
+ */
+export function extendBaseTheme(themeConfig: ThemeConfig, isDark: boolean): HopeTheme {
+  const className = isDark ? classNames.dark : classNames.light;
+
+  // If dark theme, we need to add base dark theme tokens which is not present in the base theme.
+  const finalConfig = isDark ? merge({}, baseDarkThemeTokens, themeConfig) : themeConfig;
+
+  const customTheme = createTheme(className, finalConfig);
+
+  return merge({}, theme, customTheme);
+}
+
+const hasLocalStorageSupport = () => typeof Storage !== "undefined";
+
+const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
 
 function getColorModeFromLocalStorage() {
   if (!hasLocalStorageSupport()) {

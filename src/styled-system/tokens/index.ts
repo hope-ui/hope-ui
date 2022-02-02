@@ -1,4 +1,4 @@
-import { commonColors, lightColors } from "./colors";
+import { commonColors, darkColors, lightColors } from "./colors";
 import { radii } from "./radii";
 import { shadows } from "./shadows";
 import { sizes } from "./sizes";
@@ -24,4 +24,11 @@ export const baseThemeTokens = {
   radii,
   shadows,
   zIndices,
+};
+
+/**
+ * Base stitches theme tokens - dark mode
+ */
+export const baseDarkThemeTokens = {
+  colors: darkColors,
 };

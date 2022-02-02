@@ -1,8 +1,8 @@
+/* eslint-disable solid/reactivity */
 import { addons } from "@storybook/addons";
 import { JSX, onCleanup, onMount } from "solid-js";
 
-import { useColorMode } from "@/color-mode/provider";
-import { HopeProvider } from "@/theme/provider";
+import { HopeProvider, useColorMode } from "@/theme/provider";
 
 const channel = addons.getChannel();
 
@@ -22,7 +22,6 @@ function ColorModeWrapper(props: { children?: JSX.Element }) {
     channel.off("DARK_MODE", listener);
   });
 
-  // eslint-disable-next-line solid/reactivity
   return props.children;
 }
 

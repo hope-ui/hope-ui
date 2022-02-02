@@ -1,10 +1,33 @@
 import "./playground.css";
 
+import { createEffect } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, HopeProvider } from ".";
+import { Box, HopeProvider, useColorMode, useColorModeValue, useTheme, extendTheme } from ".";
+
+const customTheme = extendTheme({
+  initialColorMode: "dark",
+  lightTheme: {
+    colors: {
+      primary9: "salmon",
+    },
+  },
+  darkTheme: {
+    colors: {
+      primary9: "tomato",
+    },
+  },
+});
 
 export function App() {
+  const theme = useTheme();
+  const { colorMode, toggleColorMode } = useColorMode();
+  const color = useColorModeValue("cyan", "magenta");
+
+  createEffect(() => {
+    console.dir(theme());
+  });
+
   return (
     <div>
       <Box
@@ -14,16 +37,17 @@ export function App() {
         }}
         w="$96"
         h={40}
-        bgColor="tomato"
-        color="white"
+        bgColor="yellow"
+        color={color()}
         d="flex"
         alignItems="center"
         justifyContent="center"
         _hover={{
           bgColor: "red",
         }}
+        onClick={toggleColorMode}
       >
-        This is the Box.
+        This is the Box - {colorMode()} - {theme().toString()}
       </Box>
     </div>
   );
@@ -31,7 +55,7 @@ export function App() {
 
 render(
   () => (
-    <HopeProvider>
+    <HopeProvider theme={customTheme}>
       <App />
     </HopeProvider>
   ),
