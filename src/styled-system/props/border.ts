@@ -1,8 +1,6 @@
 import { Property } from "csstype";
 
-import { ColorScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { ColorScaleValue, KeysOf } from "../types";
 
 /**
  * Types for border CSS properties

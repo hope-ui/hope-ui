@@ -1,8 +1,6 @@
 import { Property } from "csstype";
 
-import { ShadowScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, ShadowScaleValue } from "../types";
 
 /**
  * Types for shadow CSS properties

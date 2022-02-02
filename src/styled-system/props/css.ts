@@ -1,6 +1,4 @@
-import { SystemStyleObject } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, SystemStyleObject } from "../types";
 
 /**
  * The `css` prop allow you to override styles easily.

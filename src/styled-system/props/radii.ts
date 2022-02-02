@@ -1,8 +1,6 @@
 import { Property } from "csstype";
 
-import { RadiiScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, RadiiScaleValue } from "../types";
 
 /**
  * Types for radii related CSS properties

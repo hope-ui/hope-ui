@@ -12,23 +12,26 @@ import { radiiPropNames, RadiiProps } from "./props/radii";
 import { shadowPropNames, ShadowProps } from "./props/shadow";
 import { sizePropNames, SizeProps } from "./props/size";
 import { typographyPropNames, TypographyProps } from "./props/typography";
+import { KeysOf, ResponsiveProps } from "./types";
 
-export type StyleProps = BorderProps &
-  ColorProps &
-  FlexboxProps &
-  GridProps &
-  LayoutProps &
-  MarginProps &
-  PaddingProps &
-  PositionProps &
-  RadiiProps &
-  ShadowProps &
-  SizeProps &
-  TypographyProps &
-  PseudoSelectorProps &
+export type StyleProps = ResponsiveProps<
+  BorderProps &
+    ColorProps &
+    FlexboxProps &
+    GridProps &
+    LayoutProps &
+    MarginProps &
+    PaddingProps &
+    PositionProps &
+    RadiiProps &
+    ShadowProps &
+    SizeProps &
+    TypographyProps &
+    PseudoSelectorProps
+> &
   CSSProp;
 
-export const stylePropNames = {
+export const stylePropNames: KeysOf<StyleProps> = {
   ...borderPropNames,
   ...colorPropNames,
   ...flexboxPropNames,

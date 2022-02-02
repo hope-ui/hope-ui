@@ -4,11 +4,10 @@ import {
   FontScaleValue,
   FontSizeScaleValue,
   FontWeightScaleValue,
+  KeysOf,
   LetterSpacingScaleValue,
   LineHeightScaleValue,
-} from "@/theme/types";
-
-import { KeysOf } from "../types";
+} from "../types";
 
 /**
  * Types for typography related CSS properties

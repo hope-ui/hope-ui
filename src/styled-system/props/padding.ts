@@ -1,58 +1,86 @@
 import { Property } from "csstype";
 
-import { SpaceScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, SpaceScaleValue } from "../types";
 
 /**
  * Types for padding CSS properties
  */
 export type PaddingProps = Partial<{
   /**
-   * Padding on top, left, bottom and right
+   * The CSS `padding` property
+   */
+  padding: Property.Padding<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding` property
    */
   p: Property.Padding<SpaceScaleValue> | number;
 
   /**
-   * Padding on left and right
+   * The CSS `padding-top` property
    */
-  px: Property.PaddingInlineStart<SpaceScaleValue> | number;
+  paddingTop: Property.PaddingTop<SpaceScaleValue> | number;
 
   /**
-   * Padding on top and bottom
-   */
-  py: Property.PaddingTop<SpaceScaleValue> | number;
-
-  /**
-   * Padding on top
+   * The CSS `padding-top` property
    */
   pt: Property.PaddingTop<SpaceScaleValue> | number;
 
   /**
-   * Padding on right
+   * The CSS `padding-right` property
+   */
+  paddingRight: Property.PaddingRight<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-right` property
    */
   pr: Property.PaddingRight<SpaceScaleValue> | number;
 
   /**
-   * Padding on bottom
+   * The CSS `padding-bottom` property
+   */
+  paddingBottom: Property.PaddingBottom<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-bottom` property
    */
   pb: Property.PaddingBottom<SpaceScaleValue> | number;
 
   /**
-   * Padding on left
+   * The CSS `padding-left`  property
+   */
+  paddingLeft: Property.PaddingLeft<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-left`  property
    */
   pl: Property.PaddingLeft<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-inline-start` and `padding-inline-end` property
+   */
+  px: Property.PaddingInlineStart<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-top` and `padding-bottom` property
+   */
+  py: Property.PaddingTop<SpaceScaleValue> | number;
 }>;
 
 /**
  * Style prop names for padding properties
  */
 export const paddingPropNames: KeysOf<PaddingProps> = {
+  padding: true,
   p: true,
+  paddingTop: true,
+  pt: true,
+  paddingRight: true,
+  pr: true,
+  paddingBottom: true,
+  pb: true,
+  paddingLeft: true,
+  pl: true,
   px: true,
   py: true,
-  pt: true,
-  pr: true,
-  pb: true,
-  pl: true,
 };

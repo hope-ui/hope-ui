@@ -1,8 +1,6 @@
 import { Property } from "csstype";
 
-import { SpaceScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, SpaceScaleValue } from "../types";
 
 /**
  * Types for CSS grid properties

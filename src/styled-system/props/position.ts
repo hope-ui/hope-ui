@@ -1,8 +1,6 @@
 import { Property } from "csstype";
 
-import { SpaceScaleValue, ZIndiceScaleValue } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { KeysOf, SpaceScaleValue, ZIndiceScaleValue } from "../types";
 
 /**
  * Types for position CSS properties

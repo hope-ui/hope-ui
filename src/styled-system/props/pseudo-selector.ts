@@ -1,7 +1,5 @@
-import { PseudoSelector } from "@/theme/stitches-utils/pseudo-selector";
-import { SystemStyleObject } from "@/theme/types";
-
-import { KeysOf } from "../types";
+import { PseudoSelector } from "../stitches-utils/pseudo-selector";
+import { KeysOf, SystemStyleObject } from "../types";
 
 /**
  * Types for common CSS pseudo selectors
