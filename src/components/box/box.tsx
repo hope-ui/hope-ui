@@ -4,12 +4,12 @@ import { Dynamic } from "solid-js/web";
 import { css } from "@/styled-system/stitches.config";
 import { getUsedStylePropNames } from "@/styled-system/system";
 import { toCss } from "@/styled-system/utils";
-import { classPropNames, toClassList } from "@/utils/style";
+import { classPropNames, toClassList } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
 import { HopeComponentProps } from "../types";
 
-const boxStyles = css();
+export const boxStyles = css({});
 
 /**
  * Box is the most abstract component of Hope UI.
@@ -24,10 +24,7 @@ export function Box<C extends ElementType = "div">(props: HopeComponentProps<C>)
     usedStylePropNames
   );
 
-  const classList = () => {
-    const boxClass = boxStyles({ css: toCss(styleProps) });
-    return toClassList(local, boxClass);
-  };
+  const classList = () => toClassList(local, boxStyles({ css: toCss(styleProps) }));
 
   return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
 }
