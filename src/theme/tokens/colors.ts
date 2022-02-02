@@ -45,6 +45,7 @@ export const commonColors = {
  * Light palette
  * -----------------------------------------------------------------------------------------------*/
 
+// Radix - Indigo
 const primary = {
   primary1: "hsl(255 65.0% 99.4%)",
   primary2: "hsl(252 100% 99.0%)",
@@ -75,36 +76,38 @@ const primaryAlpha = {
   primaryAlpha12: "hsl(254 99.5% 11.9% / 0.926)",
 };
 
+// Radix - Slate
 const neutral = {
-  neutral1: "hsl(0 0% 99.0%)",
-  neutral2: "hsl(0 0% 97.3%)",
-  neutral3: "hsl(0 0% 95.1%)",
-  neutral4: "hsl(0 0% 93.0%)",
-  neutral5: "hsl(0 0% 90.9%)",
-  neutral6: "hsl(0 0% 88.7%)",
-  neutral7: "hsl(0 0% 85.8%)",
-  neutral8: "hsl(0 0% 78.0%)",
-  neutral9: "hsl(0 0% 56.1%)",
-  neutral10: "hsl(0 0% 52.3%)",
-  neutral11: "hsl(0 0% 43.5%)",
-  neutral12: "hsl(0 0% 9.0%)",
+  neutral1: "hsl(206 30.0% 98.8%)",
+  neutral2: "hsl(210 16.7% 97.6%)",
+  neutral3: "hsl(209 13.3% 95.3%)",
+  neutral4: "hsl(209 12.2% 93.2%)",
+  neutral5: "hsl(208 11.7% 91.1%)",
+  neutral6: "hsl(208 11.3% 88.9%)",
+  neutral7: "hsl(207 11.1% 85.9%)",
+  neutral8: "hsl(205 10.7% 78.0%)",
+  neutral9: "hsl(206 6.0% 56.1%)",
+  neutral10: "hsl(206 5.8% 52.3%)",
+  neutral11: "hsl(206 6.0% 43.5%)",
+  neutral12: "hsl(206 24.0% 9.0%)",
 };
 
 const neutralAlpha = {
-  neutralAlpha1: "hsl(0 0% 0% / 0.012)",
-  neutralAlpha2: "hsl(0 0% 0% / 0.027)",
-  neutralAlpha3: "hsl(0 0% 0% / 0.047)",
-  neutralAlpha4: "hsl(0 0% 0% / 0.071)",
-  neutralAlpha5: "hsl(0 0% 0% / 0.090)",
-  neutralAlpha6: "hsl(0 0% 0% / 0.114)",
-  neutralAlpha7: "hsl(0 0% 0% / 0.141)",
-  neutralAlpha8: "hsl(0 0% 0% / 0.220)",
-  neutralAlpha9: "hsl(0 0% 0% / 0.439)",
-  neutralAlpha10: "hsl(0 0% 0% / 0.478)",
-  neutralAlpha11: "hsl(0 0% 0% / 0.565)",
-  neutralAlpha12: "hsl(0 0% 0% / 0.910)",
+  neutralAlpha1: "hsl(210 92.6% 26.5% / 0.016)",
+  neutralAlpha2: "hsl(210 87.7% 16.0% / 0.028)",
+  neutralAlpha3: "hsl(210 98.8% 14.4% / 0.055)",
+  neutralAlpha4: "hsl(210 94.1% 11.1% / 0.075)",
+  neutralAlpha5: "hsl(216 91.1% 10.9% / 0.099)",
+  neutralAlpha6: "hsl(206 96.4% 11.3% / 0.126)",
+  neutralAlpha7: "hsl(210 99.1% 10.1% / 0.157)",
+  neutralAlpha8: "hsl(205 96.5% 10.0% / 0.244)",
+  neutralAlpha9: "hsl(206 98.8% 5.9% / 0.467)",
+  neutralAlpha10: "hsl(206 99.6% 5.4% / 0.506)",
+  neutralAlpha11: "hsl(206 97.0% 4.8% / 0.593)",
+  neutralAlpha12: "hsl(202 97.0% 2.4% / 0.934)",
 };
 
+// Radix - Green
 const success = {
   success1: "hsl(136 50.0% 98.9%)",
   success2: "hsl(138 62.5% 96.9%)",
@@ -135,6 +138,7 @@ const successAlpha = {
   successAlpha12: "hsl(155 99.4% 6.2% / 0.918)",
 };
 
+// Radix - Blue
 const info = {
   info1: "hsl(206 100% 99.2%)",
   info2: "hsl(210 100% 98.0%)",
@@ -165,36 +169,38 @@ const infoAlpha = {
   infoAlpha12: "hsl(213 100% 14.4% / 0.980)",
 };
 
+// Radix - Yellow
 const warning = {
-  warning1: "hsl(39 70.0% 99.0%)",
-  warning2: "hsl(40 100% 96.5%)",
-  warning3: "hsl(44 100% 91.7%)",
-  warning4: "hsl(43 100% 86.8%)",
-  warning5: "hsl(42 100% 81.8%)",
-  warning6: "hsl(38 99.7% 76.3%)",
-  warning7: "hsl(36 86.1% 67.1%)",
-  warning8: "hsl(35 85.2% 55.1%)",
-  warning9: "hsl(39 100% 57.0%)",
-  warning10: "hsl(35 100% 55.5%)",
-  warning11: "hsl(30 100% 34.0%)",
-  warning12: "hsl(20 80.0% 17.0%)",
+  warning1: "hsl(60 54.0% 98.5%)",
+  warning2: "hsl(52 100% 95.5%)",
+  warning3: "hsl(55 100% 90.9%)",
+  warning4: "hsl(54 100% 86.6%)",
+  warning5: "hsl(52 97.9% 82.0%)",
+  warning6: "hsl(50 89.4% 76.1%)",
+  warning7: "hsl(47 80.4% 68.0%)",
+  warning8: "hsl(48 100% 46.1%)",
+  warning9: "hsl(53 92.0% 50.0%)",
+  warning10: "hsl(50 100% 48.5%)",
+  warning11: "hsl(42 100% 29.0%)",
+  warning12: "hsl(40 55.0% 13.5%)",
 };
 
 const warningAlpha = {
-  warningAlpha1: "hsl(40 94.9% 38.7% / 0.016)",
-  warningAlpha2: "hsl(40 100% 50.3% / 0.071)",
-  warningAlpha3: "hsl(44 100% 50.1% / 0.165)",
-  warningAlpha4: "hsl(43 100% 50.0% / 0.263)",
-  warningAlpha5: "hsl(42 100% 50.0% / 0.365)",
-  warningAlpha6: "hsl(38 100% 50.1% / 0.475)",
-  warningAlpha7: "hsl(36 99.9% 46.2% / 0.612)",
-  warningAlpha8: "hsl(35 99.8% 46.0% / 0.832)",
-  warningAlpha9: "hsl(39 100% 50.0% / 0.859)",
-  warningAlpha10: "hsl(35 100% 50.0% / 0.891)",
-  warningAlpha11: "hsl(29 100% 33.6% / 0.980)",
-  warningAlpha12: "hsl(20 99.8% 14.1% / 0.965)",
+  warningAlpha1: "hsl(60 94.3% 34.6% / 0.024)",
+  warningAlpha2: "hsl(52 100% 50.4% / 0.091)",
+  warningAlpha3: "hsl(55 100% 50.2% / 0.181)",
+  warningAlpha4: "hsl(54 100% 50.1% / 0.267)",
+  warningAlpha5: "hsl(52 99.9% 49.5% / 0.357)",
+  warningAlpha6: "hsl(50 100% 47.4% / 0.451)",
+  warningAlpha7: "hsl(47 99.8% 44.6% / 0.577)",
+  warningAlpha8: "hsl(48 100% 46.0% / 0.980)",
+  warningAlpha9: "hsl(53 100% 48.0% / 0.961)",
+  warningAlpha10: "hsl(50 100% 48.4% / 0.980)",
+  warningAlpha11: "hsl(42 100% 28.6% / 0.980)",
+  warningAlpha12: "hsl(41 98.9% 8.0% / 0.942)",
 };
 
+// Radix - Red
 const danger = {
   danger1: "hsl(359 100% 99.4%)",
   danger2: "hsl(359 100% 98.6%)",
@@ -249,6 +255,7 @@ export const lightColors = {
  * Dark palette
  * -----------------------------------------------------------------------------------------------*/
 
+// Radix - Indigo dark
 const primaryDark = {
   primary1: "hsl(250 20.0% 10.2%)",
   primary2: "hsl(255 30.3% 12.9%)",
@@ -279,36 +286,38 @@ const primaryDarkAlpha = {
   primaryAlpha12: "hsl(254 100% 97.5% / 0.980)",
 };
 
+// Radix - Slate dark
 const neutralDark = {
-  neutral1: "hsl(0 0% 8.5%)",
-  neutral2: "hsl(0 0% 11.0%)",
-  neutral3: "hsl(0 0% 13.6%)",
-  neutral4: "hsl(0 0% 15.8%)",
-  neutral5: "hsl(0 0% 17.9%)",
-  neutral6: "hsl(0 0% 20.5%)",
-  neutral7: "hsl(0 0% 24.3%)",
-  neutral8: "hsl(0 0% 31.2%)",
-  neutral9: "hsl(0 0% 43.9%)",
-  neutral10: "hsl(0 0% 49.4%)",
-  neutral11: "hsl(0 0% 62.8%)",
-  neutral12: "hsl(0 0% 93.0%)",
+  neutral1: "hsl(200 7.0% 8.8%)",
+  neutral2: "hsl(195 7.1% 11.0%)",
+  neutral3: "hsl(197 6.8% 13.6%)",
+  neutral4: "hsl(198 6.6% 15.8%)",
+  neutral5: "hsl(199 6.4% 17.9%)",
+  neutral6: "hsl(201 6.2% 20.5%)",
+  neutral7: "hsl(203 6.0% 24.3%)",
+  neutral8: "hsl(207 5.6% 31.6%)",
+  neutral9: "hsl(206 6.0% 43.9%)",
+  neutral10: "hsl(206 5.2% 49.5%)",
+  neutral11: "hsl(206 6.0% 63.0%)",
+  neutral12: "hsl(210 6.0% 93.0%)",
 };
 
 const neutralDarkAlpha = {
-  neutralAlpha1: "hsl(0 0% 100% / 0)",
-  neutralAlpha2: "hsl(0 0% 100% / 0.026)",
-  neutralAlpha3: "hsl(0 0% 100% / 0.056)",
-  neutralAlpha4: "hsl(0 0% 100% / 0.077)",
-  neutralAlpha5: "hsl(0 0% 100% / 0.103)",
-  neutralAlpha6: "hsl(0 0% 100% / 0.129)",
-  neutralAlpha7: "hsl(0 0% 100% / 0.172)",
-  neutralAlpha8: "hsl(0 0% 100% / 0.249)",
-  neutralAlpha9: "hsl(0 0% 100% / 0.386)",
-  neutralAlpha10: "hsl(0 0% 100% / 0.446)",
-  neutralAlpha11: "hsl(0 0% 100% / 0.592)",
-  neutralAlpha12: "hsl(0 0% 100% / 0.923)",
+  neutralAlpha1: "hsl(0 0% 0% / 0)",
+  neutralAlpha2: "hsl(181 98.9% 91.8% / 0.026)",
+  neutralAlpha3: "hsl(182 86.7% 91.4% / 0.057)",
+  neutralAlpha4: "hsl(209 86.7% 93.9% / 0.083)",
+  neutralAlpha5: "hsl(200 90.3% 93.4% / 0.109)",
+  neutralAlpha6: "hsl(209 95.3% 93.5% / 0.139)",
+  neutralAlpha7: "hsl(204 98.5% 93.9% / 0.182)",
+  neutralAlpha8: "hsl(209 94.0% 94.7% / 0.265)",
+  neutralAlpha9: "hsl(207 97.3% 94.0% / 0.412)",
+  neutralAlpha10: "hsl(209 99.4% 95.2% / 0.472)",
+  neutralAlpha11: "hsl(208 98.7% 96.8% / 0.615)",
+  neutralAlpha12: "hsl(211 86.7% 99.6% / 0.927)",
 };
 
+// Radix - Green dark
 const successDark = {
   success1: "hsl(146 30.0% 7.4%)",
   success2: "hsl(155 44.2% 8.4%)",
@@ -339,6 +348,7 @@ const successDarkAlpha = {
   successAlpha12: "hsl(137 100% 95.8% / 0.980)",
 };
 
+// Radix - Blue dark
 const infoDark = {
   info1: "hsl(212 35.0% 9.2%)",
   info2: "hsl(216 50.0% 11.8%)",
@@ -369,36 +379,38 @@ const infoDarkAlpha = {
   infoAlpha12: "hsl(196 100% 96.8% / 0.980)",
 };
 
+// Radix - Yellow dark
 const warningDark = {
-  warning1: "hsl(36 100% 6.1%)",
-  warning2: "hsl(35 100% 7.6%)",
-  warning3: "hsl(32 100% 10.2%)",
-  warning4: "hsl(32 100% 12.4%)",
-  warning5: "hsl(33 100% 14.6%)",
-  warning6: "hsl(35 100% 17.1%)",
-  warning7: "hsl(35 91.0% 21.6%)",
-  warning8: "hsl(36 100% 25.5%)",
-  warning9: "hsl(39 100% 57.0%)",
-  warning10: "hsl(43 100% 64.0%)",
-  warning11: "hsl(39 90.0% 49.8%)",
-  warning12: "hsl(39 97.0% 93.2%)",
+  warning1: "hsl(45 100% 5.5%)",
+  warning2: "hsl(46 100% 6.7%)",
+  warning3: "hsl(45 100% 8.7%)",
+  warning4: "hsl(45 100% 10.4%)",
+  warning5: "hsl(47 100% 12.1%)",
+  warning6: "hsl(49 100% 14.3%)",
+  warning7: "hsl(49 90.3% 18.4%)",
+  warning8: "hsl(50 100% 22.0%)",
+  warning9: "hsl(53 92.0% 50.0%)",
+  warning10: "hsl(54 100% 68.0%)",
+  warning11: "hsl(48 100% 47.0%)",
+  warning12: "hsl(53 100% 91.0%)",
 };
 
 const warningDarkAlpha = {
   warningAlpha1: "hsl(0 0% 0% / 0)",
-  warningAlpha2: "hsl(31 100% 49.7% / 0.036)",
-  warningAlpha3: "hsl(27 100% 49.9% / 0.094)",
-  warningAlpha4: "hsl(29 100% 50.0% / 0.143)",
-  warningAlpha5: "hsl(31 100% 50.0% / 0.192)",
-  warningAlpha6: "hsl(35 100% 50.0% / 0.250)",
-  warningAlpha7: "hsl(34 99.6% 52.9% / 0.331)",
-  warningAlpha8: "hsl(36 100% 50.0% / 0.442)",
-  warningAlpha9: "hsl(40 100% 57.2% / 0.980)",
-  warningAlpha10: "hsl(44 100% 64.2% / 0.980)",
-  warningAlpha11: "hsl(39 99.9% 52.7% / 0.938)",
-  warningAlpha12: "hsl(45 100% 94.2% / 0.980)",
+  warningAlpha2: "hsl(49 100% 49.1% / 0.027)",
+  warningAlpha3: "hsl(45 100% 49.7% / 0.071)",
+  warningAlpha4: "hsl(46 100% 49.7% / 0.111)",
+  warningAlpha5: "hsl(47 100% 49.9% / 0.150)",
+  warningAlpha6: "hsl(51 100% 49.8% / 0.199)",
+  warningAlpha7: "hsl(51 99.8% 53.6% / 0.269)",
+  warningAlpha8: "hsl(51 100% 49.9% / 0.371)",
+  warningAlpha9: "hsl(53 100% 52.0% / 0.956)",
+  warningAlpha10: "hsl(56 100% 68.4% / 0.980)",
+  warningAlpha11: "hsl(48 100% 50.0% / 0.934)",
+  warningAlpha12: "hsl(60 100% 91.8% / 0.980)",
 };
 
+// Radix - Red dark
 const dangerDark = {
   danger1: "hsl(353 23.0% 9.8%)",
   danger2: "hsl(357 34.4% 12.0%)",

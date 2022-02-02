@@ -7,7 +7,7 @@ import { shadows } from "./tokens/shadows";
 import { sizes } from "./tokens/sizes";
 import { space } from "./tokens/space";
 import { fonts, fontSizes, fontWeights, letterSpacings, lineHeights } from "./tokens/typography";
-import { zIndices } from "./tokens/zIndices";
+import { zIndices } from "./tokens/z-indices";
 import { utils } from "./utils";
 
 export const { config, createTheme, css, getCssText, globalCss, keyframes, theme } = createStitches(
