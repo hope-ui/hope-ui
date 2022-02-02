@@ -9,6 +9,9 @@ const hasLocalStorageSupport = () => typeof Storage !== "undefined";
 
 const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
 
+/**
+ * CSS class names added to `document.body` when color mode changes.
+ */
 const classNames = {
   light: "hope-ui-light",
   dark: "hope-ui-dark",
@@ -45,24 +48,24 @@ export function saveColorModeToLocalStorage(value: ColorMode) {
 
 /**
  * Get the default color mode based on system preference or from local storage.
- * @param initialValue Initial color mode value, if not `system` it will be the fallback color mode.
+ * @param fallbackValue Fallback color mode value, if `system` it will be the system color mode.
  * @returns The default color mode to use.
  */
-export function getDefaultColorMode(initialValue: ColorMode) {
+export function getDefaultColorMode(fallbackValue: ColorMode) {
   const persistedPreference = getColorModeFromLocalStorage();
 
   if (persistedPreference) {
     return persistedPreference;
-  } else if (initialValue === "system") {
+  } else if (fallbackValue === "system") {
     const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     return isSystemDark ? "dark" : "light";
   } else {
-    return initialValue;
+    return fallbackValue;
   }
 }
 
 /**
- * Function to add/remove class from `body` based on color mode.
+ * Function to add/remove class from `document.body` based on color mode.
  */
 export function syncBodyColorModeClassName(isDark: boolean) {
   const body = isServer ? mockBody : document.body;

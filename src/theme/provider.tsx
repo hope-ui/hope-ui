@@ -1,4 +1,11 @@
-import { createContext, createSignal, JSX, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createSignal,
+  JSX,
+  PropsWithChildren,
+  useContext,
+} from "solid-js";
 
 import { ColorMode } from "@/color-mode/types";
 
@@ -6,21 +13,29 @@ import { ColorModeProvider } from "../color-mode/provider";
 import { resetStyles } from "./reset";
 
 interface HopeContextValue {
-  initialColorMode: ColorMode;
+  theme: Accessor<string>;
 }
 
 export const HopeContext = createContext<HopeContextValue>();
 
-export function HopeProvider(props: { children?: JSX.Element }) {
+export type HopeProviderProps = PropsWithChildren<{
+  initialColorMode?: ColorMode;
+}>;
+
+export function HopeProvider(props: HopeProviderProps) {
   // eslint-disable-next-line solid/reactivity
-  const [context] = createSignal<HopeContextValue>({ initialColorMode: "light" });
+  const [theme] = createSignal("theme");
 
   // Apply css reset
   resetStyles();
 
+  const context: HopeContextValue = {
+    theme,
+  };
+
   return (
-    <HopeContext.Provider value={context()}>
-      <ColorModeProvider initialColorMode={context().initialColorMode}>
+    <HopeContext.Provider value={context}>
+      <ColorModeProvider initialColorMode={props.initialColorMode}>
         {props.children}
       </ColorModeProvider>
     </HopeContext.Provider>

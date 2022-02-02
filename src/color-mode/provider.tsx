@@ -23,12 +23,12 @@ export interface ColorModeContextValue {
 export const ColorModeContext = createContext<ColorModeContextValue>();
 
 export type ColorModeProviderProps = PropsWithChildren<{
-  initialColorMode: ColorMode;
+  initialColorMode?: ColorMode;
 }>;
 
 export function ColorModeProvider(props: ColorModeProviderProps) {
   // eslint-disable-next-line solid/reactivity
-  const defaultColorMode = getDefaultColorMode(props.initialColorMode);
+  const defaultColorMode = getDefaultColorMode(props.initialColorMode ?? "light");
 
   const [colorMode, rawSetColorMode] = createSignal(defaultColorMode);
 
