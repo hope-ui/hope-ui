@@ -1,6 +1,5 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { createStyledSystemClass, StyleProps } from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { Container } from "./container";
@@ -131,29 +130,5 @@ describe("Container", () => {
 
     // assert
     expect(container).toHaveClass(containerClass.className);
-  });
-
-  it("should have stitches generated class from style props", () => {
-    // arrange
-    const styleProps: StyleProps = {
-      p: "$4",
-      color: "white",
-      bg: "tomato",
-      css: {
-        transition: "all 300ms ease-in",
-      },
-    };
-    const className = createStyledSystemClass(styleProps).className;
-
-    // act
-    renderWithHopeProvider(() => (
-      <Container data-testid="container" {...styleProps}>
-        Container
-      </Container>
-    ));
-    const container = screen.getByTestId("container");
-
-    // assert
-    expect(container).toHaveClass(className);
   });
 });

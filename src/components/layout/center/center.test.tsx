@@ -1,7 +1,5 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { StyleProps } from "@/styled-system";
-import { createStyledSystemClass } from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { Center } from "./center";
@@ -124,29 +122,5 @@ describe("Center", () => {
 
     // assert
     expect(center).toHaveClass(centerClass.className);
-  });
-
-  it("should have stitches generated class from style props", () => {
-    // arrange
-    const styleProps: StyleProps = {
-      p: "$4",
-      color: "white",
-      bg: "tomato",
-      css: {
-        transition: "all 300ms ease-in",
-      },
-    };
-    const className = createStyledSystemClass(styleProps).className;
-
-    // act
-    renderWithHopeProvider(() => (
-      <Center data-testid="center" {...styleProps}>
-        Center
-      </Center>
-    ));
-    const center = screen.getByTestId("center");
-
-    // assert
-    expect(center).toHaveClass(className);
   });
 });
