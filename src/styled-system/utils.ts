@@ -28,7 +28,7 @@ export function toCssObject(props: StyleProps) {
   };
 
   Object.entries(props).forEach(([prop, value]) => {
-    // don't add `prop: undefined / null` style props
+    // don't add null or undefined style props
     if (value === null || value === undefined) {
       return;
     }

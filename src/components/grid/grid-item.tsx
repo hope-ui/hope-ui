@@ -27,6 +27,10 @@ export type GridItemProps<C extends ElementType> = HopeComponentProps<C, GridIte
  * Utility function to apply a column or row span to the GridItem.
  */
 function spanFn(span?: ResponsiveValue<GridSpanValue>) {
+  if (span === null || span === undefined) {
+    return;
+  }
+
   return mapKeys(span, value => {
     switch (value) {
       case "auto":

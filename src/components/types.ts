@@ -8,6 +8,5 @@ import { AsProp, ClassProps, ElementType, ExtendableProps, PropsOf } from "@/uti
  */
 export type HopeComponentProps<C extends ElementType, Props = unknown> = ExtendableProps<
   PropsOf<C>,
-  // `type` Props override StyleProps with same name
-  PropsWithChildren<ExtendableProps<StyleProps, Props> & ClassProps & AsProp<C>>
+  PropsWithChildren<Props & StyleProps & ClassProps & AsProp<C>>
 >;

@@ -5,6 +5,7 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 import { BaseTextProps } from "../text";
 import { baseTextStyles } from "../text/text.styles";
 import { Heading } from "./heading";
+import { headingStyles } from "./heading.styles";
 
 describe("Heading", () => {
   afterEach(cleanup);
@@ -113,7 +114,7 @@ describe("Heading", () => {
     expect(heading).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from textStyles", () => {
+  it("should have stitches generated class from baseTextStyles", () => {
     // arrange
     const textClass = baseTextStyles();
 
@@ -123,6 +124,18 @@ describe("Heading", () => {
 
     // assert
     expect(heading).toHaveClass(textClass.className);
+  });
+
+  it("should have stitches generated class from headingStyles", () => {
+    // arrange
+    const headingClass = headingStyles();
+
+    // act
+    renderWithHopeProvider(() => <Heading data-testid="heading">Heading</Heading>);
+    const heading = screen.getByTestId("heading");
+
+    // assert
+    expect(heading).toHaveClass(headingClass.className);
   });
 
   it("should have stitches generated class from variants prop", () => {
