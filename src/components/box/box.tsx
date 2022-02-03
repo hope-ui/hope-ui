@@ -5,7 +5,7 @@ import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/
 import { classNames } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
-import { HopeComponentProps } from "../../types";
+import { HopeComponentProps } from "../types";
 
 /**
  * Box is the most abstract component on top of which all other Hope UI components are built.

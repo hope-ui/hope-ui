@@ -86,7 +86,8 @@ describe("Container", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Container data-testid="container" class={stubClass}>
+      // eslint-disable-next-line solid/no-react-specific-props
+      <Container data-testid="container" className={stubClass}>
         Container
       </Container>
     ));

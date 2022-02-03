@@ -86,7 +86,8 @@ describe("Center", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Center data-testid="center" class={stubClass}>
+      // eslint-disable-next-line solid/no-react-specific-props
+      <Center data-testid="center" className={stubClass}>
         Center
       </Center>
     ));

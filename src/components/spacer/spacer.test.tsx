@@ -86,7 +86,8 @@ describe("Spacer", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Spacer data-testid="spacer" class={stubClass}>
+      // eslint-disable-next-line solid/no-react-specific-props
+      <Spacer data-testid="spacer" className={stubClass}>
         Spacer
       </Spacer>
     ));

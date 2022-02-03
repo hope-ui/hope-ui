@@ -87,7 +87,8 @@ describe("Flex", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Flex data-testid="flex" class={stubClass}>
+      // eslint-disable-next-line solid/no-react-specific-props
+      <Flex data-testid="flex" className={stubClass}>
         Flex
       </Flex>
     ));

@@ -37,8 +37,6 @@ export function App() {
     console.dir(theme());
   });
 
-  const areas = ``;
-
   return (
     <div>
       <Box

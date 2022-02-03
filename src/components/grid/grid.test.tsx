@@ -87,7 +87,8 @@ describe("Grid", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <Grid data-testid="grid" class={stubClass}>
+      // eslint-disable-next-line solid/no-react-specific-props
+      <Grid data-testid="grid" className={stubClass}>
         Grid
       </Grid>
     ));
