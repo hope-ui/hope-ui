@@ -1,17 +1,11 @@
 import { splitProps } from "solid-js";
 
 import { HopeComponentProps } from "@/components";
-import { css } from "@/styled-system/stitches.config";
 import { classNames, createCssSelector } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
 import { Box } from "../box";
-
-export const centerStyles = css({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-});
+import { centerStyles } from "./center.styles";
 
 const hopeCenterClass = "hope-center";
 

@@ -4,7 +4,8 @@ import { StyleProps } from "@/styled-system";
 import { createStyledSystemClass } from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { Center, centerStyles } from "./center";
+import { Center } from "./center";
+import { centerStyles } from "./center.styles";
 
 describe("Center", () => {
   afterEach(cleanup);
