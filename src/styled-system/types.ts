@@ -113,6 +113,15 @@ export type ResponsiveProps<Props> = {
 };
 
 /**
+ * Utility type to convert a given value type to a stitches responsive variant-like type.
+ */
+export type ResponsiveValue<T> =
+  | T
+  | {
+      [KMedia in "@initial" | SystemMediaCssSelector]?: T;
+    };
+
+/**
  * All style props types.
  */
 export type StyleProps = ResponsiveProps<

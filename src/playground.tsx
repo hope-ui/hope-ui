@@ -3,7 +3,16 @@ import "./playground.css";
 import { createEffect } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, extendTheme, HopeProvider, useColorMode, useColorModeValue, useTheme } from ".";
+import {
+  Box,
+  extendTheme,
+  Grid,
+  GridItem,
+  HopeProvider,
+  useColorMode,
+  useColorModeValue,
+  useTheme,
+} from ".";
 
 const customTheme = extendTheme({
   initialColorMode: "dark",
@@ -28,6 +37,8 @@ export function App() {
     console.dir(theme());
   });
 
+  const areas = ``;
+
   return (
     <div>
       <Box
@@ -49,6 +60,18 @@ export function App() {
       >
         This is the Box - {colorMode()} - {theme().toString()}
       </Box>
+      <Grid h="200px" templateAreas="'a b b c c''a d d d d'" gap="$4">
+        <GridItem area="a" bg="tomato" />
+        <GridItem area="b" bg="papayawhip" />
+        <GridItem area="c" bg="papayawhip" />
+        <GridItem area="d" bg="tomato" />
+      </Grid>
+      <Grid h="200px" templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap="$4">
+        <GridItem rowSpan={2} bg="tomato" />
+        <GridItem colSpan={2} bg="papayawhip" />
+        <GridItem colSpan={2} bg="papayawhip" />
+        <GridItem colSpan={4} bg="tomato" />
+      </Grid>
     </div>
   );
 }

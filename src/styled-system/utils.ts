@@ -1,15 +1,8 @@
 /* eslint-disable solid/reactivity */
+import { isObject } from "@/utils/assertion";
+
 import { StyleProps } from "./system";
 import { SystemMediaCssSelector, SystemStyleObject } from "./types";
-
-export function isArray<T>(value: unknown): value is Array<T> {
-  return Array.isArray(value);
-}
-
-export function isObject(value: unknown): value is Record<string, unknown> {
-  const type = typeof value;
-  return value != null && (type === "object" || type === "function") && !isArray(value);
-}
 
 /**
  * Return a valid Stitches CSS object based on the given style props
@@ -35,9 +28,16 @@ export function toCssObject(props: StyleProps) {
   };
 
   Object.entries(props).forEach(([prop, value]) => {
+    // don't add `prop: undefined / null` style props
+    if (value === null || value === undefined) {
+      return;
+    }
+
     if (prop === "css") {
       return;
-    } else if (prop.startsWith("_")) {
+    }
+
+    if (prop.startsWith("_")) {
       // entry is a pseudo prop
       styleObject[prop] = value;
     } else if (isObject(value)) {
