@@ -3,7 +3,7 @@ import "./playground.css";
 import { createEffect } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, HopeProvider, useColorMode, useColorModeValue, useTheme, extendTheme } from ".";
+import { Box, extendTheme, HopeProvider, useColorMode, useColorModeValue, useTheme } from ".";
 
 const customTheme = extendTheme({
   initialColorMode: "dark",
@@ -36,7 +36,7 @@ export function App() {
           fontWeight: "$black",
         }}
         w="$96"
-        h={40}
+        h="40"
         bgColor="yellow"
         color={color()}
         d="flex"

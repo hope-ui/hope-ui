@@ -61,7 +61,7 @@ export type TypographyProps = Partial<{
   /**
    * Utility to visually truncating text after a fixed number of lines.
    */
-  lineClamp: number;
+  noOfLines: number;
 }>;
 
 /**
@@ -77,5 +77,5 @@ export const typographyPropNames: KeysOf<TypographyProps> = {
   fontStyle: true,
   textTransform: true,
   textDecoration: true,
-  lineClamp: true,
+  noOfLines: true,
 };

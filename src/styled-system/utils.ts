@@ -1,11 +1,6 @@
 /* eslint-disable solid/reactivity */
 import { StyleProps } from "./system";
-import {
-  ResponsiveObject,
-  SystemMediaCssSelector,
-  SystemMediaCssSelectorWithoutInitalSelector,
-  SystemStyleObject,
-} from "./types";
+import { SystemMediaCssSelector, SystemStyleObject } from "./types";
 
 export function isArray<T>(value: unknown): value is Array<T> {
   return Array.isArray(value);
@@ -28,10 +23,7 @@ export function toCss(props: StyleProps) {
   /**
    * Object containing all responsive styles grouped by `@media` rule.
    */
-  const responsiveStyleObject: Record<
-    SystemMediaCssSelectorWithoutInitalSelector,
-    SystemStyleObject
-  > = {
+  const responsiveStyleObject: Record<SystemMediaCssSelector, SystemStyleObject> = {
     "@sm": {},
     "@md": {},
     "@lg": {},
@@ -46,24 +38,26 @@ export function toCss(props: StyleProps) {
     if (prop === "css") {
       return;
     } else if (prop.startsWith("_")) {
-      // prop is a pseudo prop
+      // entry is a pseudo prop
       styleObject[prop] = value;
     } else if (isObject(value)) {
-      // prop is a responsive prop
+      // entry is a responsive prop
       Object.keys(value).forEach(key => {
         if (key === "@initial") {
-          // no `@initial` prop in the stitches `css` prop, just the plain css key/value pair.
-          styleObject[prop] = (value as ResponsiveObject)[key];
+          // `@initial` prop is replaced by the normal css property declaration in the stitches `css` object.
+          styleObject[prop] = value[key];
         } else if (key in responsiveStyleObject) {
-          // group all prop with the same `@media` key in the same object like the stitches `css` prop does.
-          responsiveStyleObject[key as SystemMediaCssSelectorWithoutInitalSelector] = {
-            ...responsiveStyleObject[key as SystemMediaCssSelectorWithoutInitalSelector],
-            [prop]: (value as ResponsiveObject)[key as SystemMediaCssSelector],
+          const atMediaRule = key as SystemMediaCssSelector;
+
+          // group all prop with the same `@media` key in the same object as in the stitches `css` object.
+          responsiveStyleObject[atMediaRule] = {
+            ...responsiveStyleObject[atMediaRule],
+            [prop]: value[atMediaRule],
           };
         }
       });
     } else {
-      // normal style prop (ex: color: value)
+      // entry is a normal css property declaration (ex: `color: value`)
       styleObject[prop] = value;
     }
   });
@@ -73,20 +67,22 @@ export function toCss(props: StyleProps) {
     Object.entries(props.css).forEach(([key, value]) => {
       if (isObject(value)) {
         if (key in responsiveStyleObject) {
-          // key is a responsive style (ex: '@sm': {})
-          responsiveStyleObject[key as SystemMediaCssSelectorWithoutInitalSelector] = {
-            ...responsiveStyleObject[key as SystemMediaCssSelectorWithoutInitalSelector],
+          // entry is a responsive css rule (ex: '@sm': {})
+          const atMediaRule = key as SystemMediaCssSelector;
+
+          responsiveStyleObject[atMediaRule] = {
+            ...responsiveStyleObject[atMediaRule],
             ...value,
           };
         } else {
-          // key is a normal style object (ex: `_hover: {}` or `&:hover : {}` selectors)
+          // entry is a normal css rule (ex: `.my-class: {}`, `&:hover: {}` or `_hover: {}`)
           styleObject[key] = {
             ...(styleObject[key] as SystemStyleObject),
             ...value,
           };
         }
       } else {
-        // key is a normal style prop (ex: color: value)
+        // entry is a normal css property declaration (ex: `color: value`)
         styleObject[key] = value;
       }
     });

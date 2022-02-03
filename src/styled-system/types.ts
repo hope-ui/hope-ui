@@ -92,13 +92,23 @@ export type ZIndiceScaleValue = ScaleValue<"zIndices", SystemConfig>;
 export type KeysOf<T> = Record<keyof T, true>;
 
 /**
- * Utility type to convert a given props to a stitches responsive variant-like type.
+ * Utility to prefix keys of a type.
+ */
+export type Prefixed<K extends string, T> = `${K}${Extract<T, boolean | number | string>}`;
+
+/**
+ * All system media css selectors
+ */
+export type SystemMediaCssSelector = Prefixed<"@", keyof SystemMedia>;
+
+/**
+ * Utility type to convert a given props type to a stitches responsive variant-like type.
  */
 export type ResponsiveProps<Props> = {
   [K in keyof Props]:
     | Props[K]
     | {
-        [KMedia in SystemMediaCssSelector]?: Props[K];
+        [KMedia in "@initial" | SystemMediaCssSelector]?: Props[K];
       };
 };
 
@@ -121,20 +131,3 @@ export type StyleProps = ResponsiveProps<
     PseudoSelectorProps
 > &
   CSSProp;
-
-/**
- * Utility to prefix keys of a type.
- */
-export type Prefixed<K extends string, T> = `${K}${Extract<T, boolean | number | string>}`;
-
-/**
- * All system media css selectors
- */
-export type SystemMediaCssSelector = Prefixed<"@", "initial" | keyof SystemMedia>;
-
-export type SystemMediaCssSelectorWithoutInitalSelector = Exclude<
-  SystemMediaCssSelector,
-  "@initial"
->;
-
-export type ResponsiveObject = Record<SystemMediaCssSelector, string | number | boolean>;

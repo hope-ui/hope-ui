@@ -19,7 +19,7 @@ const classNames = {
 /**
  * [Internal]
  * Create new stitches dark or light theme.
- * @return a merged theme object containing the base stitches theme and the overrided values.
+ * @return a merged theme object containing the base stitches theme and the override values.
  */
 export function extendBaseTheme(themeConfig: ThemeConfig, isDark: boolean): HopeTheme {
   const className = isDark ? classNames.dark : classNames.light;

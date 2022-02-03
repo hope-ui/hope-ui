@@ -72,6 +72,10 @@ export function HopeProvider(props: HopeProviderProps) {
   return <HopeContext.Provider value={context}>{props.children}</HopeContext.Provider>;
 }
 
+/**
+ * Custom hook that reads from `HopeProvider` context
+ * Returns the current used theme
+ */
 export function useTheme() {
   const context = useContext(HopeContext);
 
