@@ -1,3 +1,5 @@
+import { Accessor } from "solid-js";
+
 import { theme } from "@/styled-system/stitches.config";
 
 /**
@@ -27,4 +29,11 @@ export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
   lightTheme?: ThemeConfig;
   darkTheme?: ThemeConfig;
+}
+
+export interface HopeContextValue {
+  theme: Accessor<HopeTheme>;
+  colorMode: Accessor<ColorMode>;
+  setColorMode: (value: ColorMode) => void;
+  toggleColorMode: () => void;
 }

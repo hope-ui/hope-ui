@@ -1,10 +1,10 @@
 import { cleanup, screen } from "solid-testing-library";
 
+import { createStyledSystemClass } from "@/styled-system/system";
 import { StyleProps } from "@/styled-system/types";
-import { toCss } from "@/styled-system/utils";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { Box, boxStyles } from "./box";
+import { Box } from "./box";
 
 describe("Box", () => {
   afterEach(cleanup);
@@ -111,7 +111,7 @@ describe("Box", () => {
         transition: "all 300ms ease-in",
       },
     };
-    const boxClass = boxStyles({ css: toCss(styleProps) });
+    const className = createStyledSystemClass(styleProps).className;
 
     // act
     renderWithHopeProvider(() => (
@@ -122,6 +122,6 @@ describe("Box", () => {
     const box = screen.getByTestId("box");
 
     // assert
-    expect(box).toHaveClass(boxClass.className);
+    expect(box).toHaveClass(className);
   });
 });

@@ -1,28 +1,14 @@
 /* eslint-disable solid/reactivity */
-import {
-  Accessor,
-  createContext,
-  createEffect,
-  createSignal,
-  PropsWithChildren,
-  useContext,
-} from "solid-js";
+import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
 import { resetStyles } from "./reset";
-import { ColorMode, HopeTheme, HopeThemeConfig } from "./types";
+import { ColorMode, HopeContextValue, HopeThemeConfig } from "./types";
 import {
   extendBaseTheme,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
   syncBodyColorModeClassName,
 } from "./utils";
-
-interface HopeContextValue {
-  theme: Accessor<HopeTheme>;
-  colorMode: Accessor<ColorMode>;
-  setColorMode: (value: ColorMode) => void;
-  toggleColorMode: () => void;
-}
 
 export const HopeContext = createContext<HopeContextValue>();
 
@@ -39,6 +25,7 @@ export function HopeProvider(props: HopeProviderProps) {
   const defaultColorMode = getDefaultColorMode(props.theme?.initialColorMode ?? "light");
   const defaultTheme = defaultColorMode === "dark" ? darkTheme : lightTheme;
 
+  // Create context signals
   const [colorMode, rawSetColorMode] = createSignal(defaultColorMode);
   const [theme, setTheme] = createSignal(defaultTheme);
 
@@ -90,7 +77,7 @@ export function useTheme() {
  * Custom hook that reads from `HopeProvider` context
  * Returns the color mode and function to toggle it
  */
-export function useColorMode() {
+export function useColorMode(): Omit<HopeContextValue, "theme"> {
   const context = useContext(HopeContext);
 
   if (!context) {

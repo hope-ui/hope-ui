@@ -14,7 +14,7 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 /**
  * Return a valid Stitches CSS object based on the given style props
  */
-export function toCss(props: StyleProps) {
+export function toCssObject(props: StyleProps) {
   /**
    * Object containing all non-responsive styles.
    */

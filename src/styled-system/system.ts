@@ -1,3 +1,6 @@
+import { css } from "@/styled-system/stitches.config";
+import { toCssObject } from "@/styled-system/utils";
+
 import { borderPropNames, BorderProps } from "./props/border";
 import { colorPropNames, ColorProps } from "./props/color";
 import { CSSProp, cssPropName } from "./props/css";
@@ -47,6 +50,18 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...pseudoSelectorPropNames,
   ...cssPropName,
 };
+
+/**
+ * Base stitches css object of all Hope UI components.
+ */
+const styledSystemStyles = css({});
+
+/**
+ * Generate a css class based on style props.
+ */
+export function createStyledSystemClass(props: StyleProps) {
+  return styledSystemStyles({ css: toCssObject(props) });
+}
 
 /**
  * Take a props object and return only the keys that match a style prop.
