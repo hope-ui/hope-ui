@@ -20,7 +20,7 @@ export function Heading<C extends ElementType = "h2">(props: BaseTextProps<C>) {
     as: "h2",
   };
 
-  const propsWithDefault: BaseTextProps<C> = mergeProps(defaultProps, props);
+  const propsWithDefault: BaseTextProps<"h2"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["class"]);
 
   const classes = () => classNames(local.class, hopeHeadingClass, headingStyles());

@@ -22,7 +22,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
     centerContent: false,
   };
 
-  const propsWithDefault: ContainerProps<C> = mergeProps(defaultProps, props);
+  const propsWithDefault: ContainerProps<"div"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
     ["class"],

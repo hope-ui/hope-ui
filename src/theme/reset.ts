@@ -70,4 +70,11 @@ export const resetStyles = globalCss({
   "button:focus-visible": {
     outline: "5px auto -webkit-focus-ring-color",
   },
+
+  /* Anchor are unstyled */
+  a: {
+    backgroundColor: "transparent",
+    color: "inherit",
+    textCecoration: "inherit",
+  },
 });

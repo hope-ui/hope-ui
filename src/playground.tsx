@@ -1,95 +1,71 @@
 import "./playground.css";
 
-import { createEffect } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
-  extendTheme,
-  Grid,
-  GridItem,
-  Heading,
+  HopeComponentProps,
   HopeProvider,
+  HStack,
+  Stack,
+  Text,
   useColorMode,
   useColorModeValue,
-  useTheme,
 } from ".";
 
-const customTheme = extendTheme({
-  initialColorMode: "dark",
-  lightTheme: {
-    colors: {
-      primary9: "salmon",
-    },
-  },
-  darkTheme: {
-    colors: {
-      primary9: "tomato",
-    },
-  },
-  components: {
-    Heading: {
-      baseStyle: {
-        fontWeight: "$black",
-        color: "tomato",
-        fontSize: "$9xl",
-      },
-    },
-  },
-});
+function BannerLink(props: HopeComponentProps<"a">) {
+  return (
+    <Box
+      {...props}
+      as="a"
+      href="#"
+      px="$4"
+      py="$1_5"
+      textAlign="center"
+      textDecoration="none"
+      borderWidth="1px"
+      borderColor="whiteAlpha4"
+      fontWeight="$medium"
+      borderRadius="$md"
+      _hover={{ bg: "$whiteAlpha5" }}
+    />
+  );
+}
 
 export function App() {
-  const { theme } = useTheme();
-  const { colorMode, toggleColorMode } = useColorMode();
-  const color = useColorModeValue("cyan", "magenta");
-
-  createEffect(() => {
-    console.dir(theme());
-  });
-
+  const { toggleColorMode } = useColorMode();
   return (
-    <div>
-      <Heading color="lightblue" fontWeight="$hairline" fontSize="$xs">
-        heading
-      </Heading>
-      <Box
-        css={{
-          transition: "background-color 300ms",
-          fontWeight: "$black",
-        }}
-        w="$96"
-        h="40"
-        bgColor="yellow"
-        color={color()}
-        d="flex"
-        alignItems="center"
+    <Box as="section" pt="$8" pb="$12">
+      <Stack
+        direction={{ "@initial": "column", "@sm": "row" }}
         justifyContent="center"
-        _hover={{
-          bgColor: "red",
-        }}
-        onClick={toggleColorMode}
+        alignItems="center"
+        py="$3"
+        px={{ "@initial": "$3", "@md": "$6", "@lg": "$8" }}
+        color="white"
+        bg={useColorModeValue("$primary3", "$info3")()}
       >
-        This is the Box - {colorMode()} - {theme().toString()}
-      </Box>
-      <Grid h="200px" templateAreas="'a b b c c''a d d d d'" gap="$4">
-        <GridItem area="a" bg="tomato" />
-        <GridItem area="b" bg="papayawhip" />
-        <GridItem area="c" bg="papayawhip" />
-        <GridItem area="d" bg="tomato" />
-      </Grid>
-      <Grid h="200px" templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap="$4">
-        <GridItem rowSpan={2} colSpan="1" bg="tomato" />
-        <GridItem colSpan={2} bg="papayawhip" />
-        <GridItem colSpan={2} bg="papayawhip" />
-        <GridItem colSpan={4} bg="tomato" />
-      </Grid>
-    </div>
+        <HStack spacing="$3">
+          <Text fontWeight="$medium" mr="$2">
+            Confirm your email. Check your email. We&apos;ve send a message to{" "}
+            <b>sample@gmail.com</b>
+          </Text>
+        </HStack>
+        <BannerLink
+          onClick={toggleColorMode}
+          w={{ "@initial": "full", "@sm": "auto" }}
+          flexShrink={0}
+        >
+          Resend email
+        </BannerLink>
+      </Stack>
+    </Box>
   );
 }
 
 render(
   () => (
-    <HopeProvider theme={customTheme}>
+    <HopeProvider>
       <App />
     </HopeProvider>
   ),

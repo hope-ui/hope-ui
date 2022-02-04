@@ -7,7 +7,7 @@ import { RightJoinProps } from "@/utils/types";
 /**
  * Represent any HTML element or SolidJS component.
  */
-export type ElementType = keyof JSX.IntrinsicElements | Component;
+export type ElementType<Props = any> = keyof JSX.IntrinsicElements | Component<Props>;
 
 /**
  * Take the props of the passed HTML element or component and returns its type.
@@ -28,15 +28,10 @@ export interface ClassProps {
 /**
  * Props of a Hope UI component.
  */
-export type HopeComponentProps<
-  AsComponent extends ElementType,
-  AdditionalProps extends object = {}
-> = RightJoinProps<
-  PropsOf<AsComponent>,
-  PropsWithChildren<AdditionalProps> &
-    StyleProps &
-    ClassProps & {
-      as?: AsComponent;
-      __baseStyle?: SystemStyleObject;
-    }
->;
+export type HopeComponentProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
+  PropsOf<C>,
+  PropsWithChildren<AdditionalProps & StyleProps & ClassProps>
+> & {
+  as?: C;
+  __baseStyle?: SystemStyleObject;
+};

@@ -33,10 +33,10 @@ const whiteAlpha = {
 };
 
 export const commonColors = {
-  transparent: "transparent",
-  current: "currentColor",
-  black: "#000000",
-  white: "#ffffff",
+  // transparent: "transparent",
+  // current: "currentColor",
+  // black: "#000000",
+  // white: "#ffffff",
   ...blackAlpha,
   ...whiteAlpha,
 };
@@ -76,35 +76,35 @@ const primaryAlpha = {
   primaryAlpha12: "#000e3aef",
 };
 
-// Radix - Slate
+// Radix - Gray
 const neutral = {
-  neutral1: "#fbfcfd",
-  neutral2: "#f8f9fa",
-  neutral3: "#f1f3f5",
-  neutral4: "#eceef0",
-  neutral5: "#e6e8eb",
-  neutral6: "#dfe3e6",
-  neutral7: "#d7dbdf",
-  neutral8: "#c1c8cd",
-  neutral9: "#889096",
-  neutral10: "#7e868c",
-  neutral11: "#687076",
-  neutral12: "#11181c",
+  neutral1: "#fcfcfc",
+  neutral2: "#f8f8f8",
+  neutral3: "#f3f3f3",
+  neutral4: "#ededed",
+  neutral5: "#e8e8e8",
+  neutral6: "#e2e2e2",
+  neutral7: "#dbdbdb",
+  neutral8: "#c7c7c7",
+  neutral9: "#8f8f8f",
+  neutral10: "#858585",
+  neutral11: "#6f6f6f",
+  neutral12: "#171717",
 };
 
 const neutralAlpha = {
-  neutralAlpha1: "#05448204",
-  neutralAlpha2: "#05294d07",
-  neutralAlpha3: "#0025490e",
-  neutralAlpha4: "#021c3713",
-  neutralAlpha5: "#02173519",
-  neutralAlpha6: "#01213920",
-  neutralAlpha7: "#001a3328",
-  neutralAlpha8: "#011e323e",
-  neutralAlpha9: "#00111e77",
-  neutralAlpha10: "#00101b81",
-  neutralAlpha11: "#000e1897",
-  neutralAlpha12: "#00080cee",
+  neutralAlpha1: "#00000003",
+  neutralAlpha2: "#00000007",
+  neutralAlpha3: "#0000000c",
+  neutralAlpha4: "#00000012",
+  neutralAlpha5: "#00000017",
+  neutralAlpha6: "#0000001d",
+  neutralAlpha7: "#00000024",
+  neutralAlpha8: "#00000038",
+  neutralAlpha9: "#00000070",
+  neutralAlpha10: "#0000007a",
+  neutralAlpha11: "#00000090",
+  neutralAlpha12: "#000000e8",
 };
 
 // Radix - Green
@@ -231,6 +231,10 @@ const dangerAlpha = {
   dangerAlpha12: "#280003ec",
 };
 
+const semanticColors = {
+  defaultButtonBg: "white",
+};
+
 export const lightColors = {
   ...primary,
   ...primaryAlpha,
@@ -249,6 +253,8 @@ export const lightColors = {
 
   ...danger,
   ...dangerAlpha,
+
+  ...semanticColors,
 };
 
 /* -------------------------------------------------------------------------------------------------
@@ -286,35 +292,35 @@ const primaryDarkAlpha = {
   primaryAlpha12: "#f2f5fffa",
 };
 
-// Radix - Slate dark
+// Radix - Gray dark
 const neutralDark = {
-  neutral1: "#151718",
-  neutral2: "#1a1d1e",
-  neutral3: "#202425",
-  neutral4: "#26292b",
-  neutral5: "#2b2f31",
-  neutral6: "#313538",
-  neutral7: "#3a3f42",
-  neutral8: "#4c5155",
-  neutral9: "#697177",
-  neutral10: "#787f85",
-  neutral11: "#9ba1a6",
-  neutral12: "#ecedee",
+  neutral1: "#161616",
+  neutral2: "#1c1c1c",
+  neutral3: "#232323",
+  neutral4: "#282828",
+  neutral5: "#2e2e2e",
+  neutral6: "#343434",
+  neutral7: "#3e3e3e",
+  neutral8: "#505050",
+  neutral9: "#707070",
+  neutral10: "#7e7e7e",
+  neutral11: "#a0a0a0",
+  neutral12: "#ededed",
 };
 
 const neutralDarkAlpha = {
-  neutralAlpha1: "#00000000",
-  neutralAlpha2: "#d5feff07",
-  neutralAlpha3: "#d6fbfc0f",
-  neutralAlpha4: "#e2f0fd15",
-  neutralAlpha5: "#dff3fd1c",
-  neutralAlpha6: "#dfeffe23",
-  neutralAlpha7: "#e0f3ff2e",
-  neutralAlpha8: "#e5f2fe44",
-  neutralAlpha9: "#e1f1ff69",
-  neutralAlpha10: "#e7f3ff78",
-  neutralAlpha11: "#eff7ff9d",
-  neutralAlpha12: "#fdfeffec",
+  neutralAlpha1: "#ffffff00",
+  neutralAlpha2: "#ffffff07",
+  neutralAlpha3: "#ffffff0e",
+  neutralAlpha4: "#ffffff14",
+  neutralAlpha5: "#ffffff1a",
+  neutralAlpha6: "#ffffff21",
+  neutralAlpha7: "#ffffff2c",
+  neutralAlpha8: "#ffffff3f",
+  neutralAlpha9: "#ffffff62",
+  neutralAlpha10: "#ffffff72",
+  neutralAlpha11: "#ffffff97",
+  neutralAlpha12: "#ffffffeb",
 };
 
 // Radix - Green dark
@@ -441,7 +447,11 @@ const dangerDarkAlpha = {
   dangerAlpha12: "#fff0f2fa",
 };
 
-export const darkColors = {
+const semanticDarkColors = {
+  defaultButtonBg: "$neutral3",
+};
+
+export const darkColors: typeof lightColors = {
   ...primaryDark,
   ...primaryDarkAlpha,
 
@@ -459,4 +469,6 @@ export const darkColors = {
 
   ...dangerDark,
   ...dangerDarkAlpha,
+
+  ...semanticDarkColors,
 };

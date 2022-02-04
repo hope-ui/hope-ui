@@ -16,7 +16,7 @@ export function BaseText<C extends ElementType = "p">(props: BaseTextProps<C>) {
     as: "p",
   };
 
-  const propsWithDefault: BaseTextProps<C> = mergeProps(defaultProps, props);
+  const propsWithDefault: BaseTextProps<"p"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["size"]);
 
   const classes = () => classNames(local.class, baseTextStyles(variantProps));

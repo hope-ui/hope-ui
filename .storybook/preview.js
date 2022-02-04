@@ -37,7 +37,7 @@ export const parameters = {
     },
   },
   darkMode: {
-    dark: { ...themes.dark, appBg: "#141517", appContentBg: "#1a1b1e" },
+    dark: { ...themes.dark, appBg: "#1c1c1c", appContentBg: "#161616" },
     light: { ...themes.normal, appBg: "#f9fafb", appContentBg: "#ffffff" },
   },
   controls: {
