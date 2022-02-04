@@ -1,2 +1,2 @@
-export * from "./system.styles";
+export * from "./stitches.config";
 export * from "./types";

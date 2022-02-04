@@ -1,11 +1,11 @@
-import { CSS } from "@stitches/core";
+import { Accessor } from "solid-js";
 
-import { ThemeableButtonOptions } from "@/components/Button/Button";
-import { ThemeableHeadingOptions } from "@/components/Heading/Heading";
-import { ThemeableIconButtonOptions } from "@/components/IconButton/IconButton";
-import { ThemeableTagOptions } from "@/components/Tag/Tag";
+import { ThemeableButtonOptions } from "@/components/button/button";
+import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
+import { theme } from "@/styled-system/stitches.config";
+import { SystemStyleObject } from "@/styled-system/types";
 
-import { config, theme } from "./stitches.config";
+export type ColorMode = "light" | "dark" | "system";
 
 /**
  * Hope UI - Stitches theme interface.
@@ -26,114 +26,42 @@ export type ThemeConfig = {
 };
 
 /**
- * Style interface based on the stitches configuration.
- */
-export type ThemeStyleObject = CSS<typeof config>;
-
-/**
- * Hope UI theme `colors` value type.
- */
-export type ColorToken = keyof HopeTheme["colors"];
-
-/**
- * Hope UI theme `space` value type.
- */
-export type SpaceToken = keyof HopeTheme["space"];
-
-/**
- * Hope UI theme `sizes` value type.
- */
-export type SizeToken = keyof HopeTheme["sizes"];
-
-/**
- * Hope UI theme `fonts` value type.
- */
-export type FontToken = keyof HopeTheme["fonts"];
-
-/**
- * Hope UI theme `fontSizes` value type.
- */
-export type FontSizeToken = keyof HopeTheme["fontSizes"];
-
-/**
- * Hope UI theme `fontWeights` value type.
- */
-export type FontWeightToken = keyof HopeTheme["fontWeights"];
-
-/**
- * Hope UI theme `letterSpacings` value type.
- */
-export type LetterSpacingToken = keyof HopeTheme["letterSpacings"];
-
-/**
- * Hope UI theme `lineHeights` value type.
- */
-export type LineHeightToken = keyof HopeTheme["lineHeights"];
-
-/**
- * Hope UI theme `radii` value type.
- */
-export type RadiiToken = keyof HopeTheme["radii"];
-
-/**
- * Hope UI theme `shadows` value type.
- */
-export type ShadowToken = keyof HopeTheme["shadows"];
-
-/**
- * Hope UI theme `zIndices` value type.
- */
-export type ZIndiceToken = keyof HopeTheme["zIndices"];
-
-/**
- * Hope UI color mode.
- */
-export type ColorMode = "light" | "dark" | "system";
-
-/**
- * Hope UI x-position.
- */
-export type XPosition = "left" | "right";
-
-/**
- * Hope UI y-position.
- */
-export type YPosition = "top" | "bottom";
-
-/**
  * Theme configuration for Hope UI component.
  */
-export interface ComponentConfig<Props> {
-  //baseStyle?: SystemStyleObject;
+export interface ComponentStyle<Props> {
+  /**
+   * Style object for base or default style
+   */
+  baseStyle?: SystemStyleObject;
+
+  /**
+   * Default component props values.
+   */
   defaultProps?: Props;
 }
 
-/**
- * Theme configuration for all Hope UI components.
- */
-export interface ComponentConfigs {
-  Button?: ComponentConfig<ThemeableButtonOptions>;
-  IconButton?: ComponentConfig<ThemeableIconButtonOptions>;
-  Heading?: ComponentConfig<ThemeableHeadingOptions>;
-  Tag?: ComponentConfig<ThemeableTagOptions>;
+export interface ComponentsStyles {
+  Button?: ComponentStyle<ThemeableButtonOptions>;
+  IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
+  Heading?: ComponentStyle<void>;
+  Text?: ComponentStyle<void>;
+  // Tag?: ComponentStyle<ThemeableTagOptions>;
 }
 
 /**
- * Hope UI theme context interface.
+ * Hope UI theme override configuration.
  */
-export interface HopeThemeContext {
-  initialColorMode: ColorMode;
-  lightTheme: HopeTheme;
-  darkTheme: HopeTheme;
-  components: ComponentConfigs;
-}
-
-/**
- * The Hope UI theme override interface.
- */
-export interface HopeThemeContextConfig {
+export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
   lightTheme?: ThemeConfig;
   darkTheme?: ThemeConfig;
-  components?: ComponentConfigs;
+  components?: ComponentsStyles;
+}
+
+export interface HopeContextValue {
+  theme: Accessor<HopeTheme>;
+  components: ComponentsStyles;
+  colorMode: Accessor<ColorMode>;
+  setColorMode: (value: ColorMode) => void;
+  toggleColorMode: () => void;
 }
