@@ -1,5 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -35,11 +36,13 @@ const hopeTextClass = "hope-text";
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: BaseTextProps<C>) {
+  const baseStyle = useTheme().components.Text?.baseStyle;
+
   const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => classNames(local.class, hopeTextClass);
 
-  return <BaseText class={classes()} {...others} />;
+  return <BaseText class={classes()} __baseStyle={baseStyle} {...others} />;
 }
 
 Text.toString = () => createCssSelector(hopeTextClass);

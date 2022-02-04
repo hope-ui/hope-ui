@@ -3,7 +3,7 @@ import { JSX } from "solid-js";
 
 import { HopeWrapper } from "@/utils/storybook";
 
-import { Button } from "./button";
+import { IconButton } from "./icon-button";
 
 function IconCart(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
@@ -30,8 +30,8 @@ function IconCart(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
 }
 
 export default {
-  title: "General/Button",
-  component: Button,
+  title: "General/IconButton",
+  component: IconButton,
   parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
@@ -55,14 +55,7 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg", "xl"],
     },
-    loaderPosition: {
-      control: { type: "inline-radio" },
-      options: ["left", "right"],
-    },
     compact: {
-      control: { type: "boolean" },
-    },
-    fullWidth: {
       control: { type: "boolean" },
     },
     loading: {
@@ -71,7 +64,7 @@ export default {
     disabled: {
       control: { type: "boolean" },
     },
-    children: {
+    "aria-label": {
       control: "text",
     },
   },
@@ -79,23 +72,14 @@ export default {
     variant: "solid",
     colorScheme: "primary",
     size: "md",
-    loaderPosition: "left",
     compact: false,
-    fullWidth: false,
     loading: false,
     disabled: false,
-    children: "Button",
+    "aria-label": "Add to cart",
   },
 };
 
-export const Default = (args: any) => <Button {...args} onClick={action("clicked")} />;
-
-export const WithLeftIcon = (args: any) => (
-  <Button leftIcon={<IconCart />} onClick={action("clicked")} {...args} />
+export const Default = (args: any) => (
+  <IconButton icon={<IconCart />} onClick={action("clicked")} {...args} />
 );
-WithLeftIcon.storyName = "With left icon";
-
-export const WithRightIcon = (args: any) => (
-  <Button rightIcon={<IconCart />} onClick={action("clicked")} {...args} />
-);
-WithRightIcon.storyName = "With right icon";
+Default.storyName = "IconButton";

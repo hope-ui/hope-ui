@@ -30,14 +30,15 @@ const hopeButtonClass = "hope-button";
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const buttonTheme = useTheme().components.Button;
+  const theme = useTheme().components.Button;
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",
-    variant: buttonTheme?.defaultProps?.variant ?? "solid",
-    colorScheme: buttonTheme?.defaultProps?.colorScheme ?? "primary",
-    size: buttonTheme?.defaultProps?.size ?? "md",
-    loaderPosition: buttonTheme?.defaultProps?.loaderPosition ?? "left",
+    __baseStyle: theme?.baseStyle,
+    variant: theme?.defaultProps?.variant ?? "solid",
+    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
+    size: theme?.defaultProps?.size ?? "md",
+    loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
     loader: <IconSpinner />,
     loading: false,
     disabled: false,
@@ -48,7 +49,16 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    ["class", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
+    [
+      "class",
+      "__baseStyle",
+      "loader",
+      "loaderPosition",
+      "disabled",
+      "leftIcon",
+      "rightIcon",
+      "children",
+    ],
     ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
 
@@ -77,12 +87,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   return (
-    <Box
-      class={classes()}
-      disabled={local.disabled}
-      __baseStyle={buttonTheme?.baseStyle}
-      {...others}
-    >
+    <Box class={classes()} disabled={local.disabled} __baseStyle={local.__baseStyle} {...others}>
       <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
       <Show when={isLeftLoaderVisible()}>
         <span class={loaderClass}>{local.loader}</span>

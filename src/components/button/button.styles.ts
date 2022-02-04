@@ -197,8 +197,6 @@ export const buttonStyles = css({
   },
 
   "&:disabled": {
-    border: "1px solid transparent",
-    backgroundColor: "$neutral3",
     color: "$neutral7",
     cursor: "not-allowed",
   },
@@ -219,22 +217,43 @@ export const buttonStyles = css({
           borderColor: "$neutral8",
           backgroundColor: "$neutral5",
         },
+
+        "&:disabled": {
+          borderColor: "$neutral3",
+          backgroundColor: "$neutral3",
+        },
       },
       solid: {
         border: "1px solid transparent",
+
+        "&:disabled": {
+          backgroundColor: "$neutral3",
+        },
       },
       subtle: {
         border: "1px solid transparent",
+
+        "&:disabled": {
+          backgroundColor: "$neutral3",
+        },
       },
       outline: {
         borderStyle: "solid",
         borderWidth: "1px",
         backgroundColor: "transparent",
+
+        "&:disabled": {
+          borderColor: "$neutral3",
+        },
       },
       dashed: {
         borderStyle: "dashed",
         borderWidth: "1px",
         backgroundColor: "transparent",
+
+        "&:disabled": {
+          borderColor: "$neutral3",
+        },
       },
       ghost: {
         border: "1px solid transparent",
