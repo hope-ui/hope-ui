@@ -1,21 +1,19 @@
 import "./playground.css";
 
-import { createEffect, splitProps } from "solid-js";
+import { createEffect } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
-  ElementType,
   extendTheme,
   Grid,
   GridItem,
-  HopeComponentProps,
+  Heading,
   HopeProvider,
   useColorMode,
   useColorModeValue,
   useTheme,
 } from ".";
-import { classNames } from "./utils/css";
 
 const customTheme = extendTheme({
   initialColorMode: "dark",
@@ -27,6 +25,15 @@ const customTheme = extendTheme({
   darkTheme: {
     colors: {
       primary9: "tomato",
+    },
+  },
+  components: {
+    Heading: {
+      baseStyle: {
+        fontWeight: "$black",
+        color: "tomato",
+        fontSize: "$9xl",
+      },
     },
   },
 });
@@ -42,7 +49,9 @@ export function App() {
 
   return (
     <div>
-      <Box as="a"></Box>
+      <Heading color="lightblue" fontWeight="$hairline" fontSize="$xs">
+        heading
+      </Heading>
       <Box
         css={{
           transition: "background-color 300ms",

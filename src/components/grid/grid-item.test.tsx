@@ -142,7 +142,8 @@ describe("GridItem", () => {
         gridRow: `span ${shorthandProps.rowSpan} / span ${shorthandProps.rowSpan}`,
         gridRowStart: shorthandProps.rowStart,
         gridRowEnd: shorthandProps.rowEnd,
-      })
+      }),
+      undefined
     );
   });
 });

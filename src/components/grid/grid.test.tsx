@@ -141,7 +141,8 @@ describe("Grid", () => {
         gridTemplateAreas: shorthandProps.templateAreas,
         gridTemplateColumns: shorthandProps.templateColumns,
         gridTemplateRows: shorthandProps.templateRows,
-      })
+      }),
+      undefined
     );
   });
 });

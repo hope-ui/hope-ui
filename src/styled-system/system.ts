@@ -15,7 +15,7 @@ import { radiiPropNames, RadiiProps } from "./props/radii";
 import { shadowPropNames, ShadowProps } from "./props/shadow";
 import { sizePropNames, SizeProps } from "./props/size";
 import { typographyPropNames, TypographyProps } from "./props/typography";
-import { KeysOf, ResponsiveProps } from "./types";
+import { KeysOf, ResponsiveProps, SystemStyleObject } from "./types";
 
 export type StyleProps = ResponsiveProps<
   BorderProps &
@@ -57,10 +57,10 @@ export const stylePropNames: KeysOf<StyleProps> = {
 const styledSystemStyles = css({});
 
 /**
- * Generate a css class based on style props.
+ * Generate a css class based on style props and optional `baseStyle`.
  */
-export function createStyledSystemClass(props: StyleProps) {
-  return styledSystemStyles({ css: toCssObject(props) });
+export function createStyledSystemClass(props: StyleProps, baseStyle?: SystemStyleObject) {
+  return styledSystemStyles({ css: toCssObject(props, baseStyle) });
 }
 
 /**

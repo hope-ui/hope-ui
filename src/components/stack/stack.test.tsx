@@ -131,7 +131,8 @@ describe("VStack", () => {
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
       expect.objectContaining({
         flexDirection: "column",
-      })
+      }),
+      undefined
     );
   });
 
@@ -152,7 +153,8 @@ describe("VStack", () => {
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
       expect.objectContaining({
         rowGap: variantProps.spacing,
-      })
+      }),
+      undefined
     );
   });
 });
@@ -173,7 +175,8 @@ describe("HStack", () => {
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
       expect.objectContaining({
         flexDirection: "row",
-      })
+      }),
+      undefined
     );
   });
 
@@ -194,7 +197,8 @@ describe("HStack", () => {
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
       expect.objectContaining({
         columnGap: variantProps.spacing,
-      })
+      }),
+      undefined
     );
   });
 });

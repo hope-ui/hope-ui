@@ -15,12 +15,16 @@ export function Box<C extends ElementType = "div">(props: HopeComponentProps<C>)
 
   const [local, styleProps, others] = splitProps(
     props,
-    ["as", "class", "className", "classList"],
+    ["as", "class", "className", "classList", "__baseStyle"],
     usedStylePropNames
   );
 
   const classList = () => ({
-    [classNames(local.class, local.className, createStyledSystemClass(styleProps))]: true,
+    [classNames(
+      local.class,
+      local.className,
+      createStyledSystemClass(styleProps, local.__baseStyle)
+    )]: true,
     ...local.classList,
   });
 

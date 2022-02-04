@@ -127,7 +127,8 @@ describe("Flex", () => {
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
       expect.objectContaining({
         display: "flex",
-      })
+      }),
+      undefined
     );
   });
 
@@ -150,7 +151,8 @@ describe("Flex", () => {
       expect.objectContaining({
         flexDirection: shorthandProps.direction,
         flexWrap: shorthandProps.wrap,
-      })
+      }),
+      undefined
     );
   });
 });

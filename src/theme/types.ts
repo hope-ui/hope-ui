@@ -26,18 +26,22 @@ export type ThemeConfig = {
 /**
  * Theme configuration for Hope UI component.
  */
-export interface ComponentConfig<Props> {
+export interface ComponentStyle<Props> {
+  /**
+   * Style object for base or default style
+   */
   baseStyle?: SystemStyleObject;
+
+  /**
+   * Default component props values.
+   */
   defaultProps?: Props;
 }
 
-/**
- * Theme configuration for all Hope UI components.
- */
-export interface ComponentsConfigs {
+export interface ComponentsStyles {
   // Button?: ComponentConfig<ThemeableButtonOptions>;
   // IconButton?: ComponentConfig<ThemeableIconButtonOptions>;
-  Heading?: ComponentConfig<void>;
+  Heading?: ComponentStyle<void>;
   // Tag?: ComponentConfig<ThemeableTagOptions>;
 }
 
@@ -48,12 +52,12 @@ export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
   lightTheme?: ThemeConfig;
   darkTheme?: ThemeConfig;
-  components?: ComponentsConfigs;
+  components?: ComponentsStyles;
 }
 
 export interface HopeContextValue {
   theme: Accessor<HopeTheme>;
-  components: ComponentsConfigs;
+  components: ComponentsStyles;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;
   toggleColorMode: () => void;

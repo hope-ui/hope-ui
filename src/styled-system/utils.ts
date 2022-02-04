@@ -5,18 +5,51 @@ import { StyleProps } from "./system";
 import { SystemMediaCssSelector, SystemStyleObject } from "./types";
 
 /**
+ * Merge a source SystemStyleObject to both normal and responsive destination SystemStyleObject.
+ * This function mutate the `destination` objects.
+ */
+function mergeStyleObject(
+  sourceStyleObject: SystemStyleObject,
+  destStyleObject: SystemStyleObject,
+  destResponsiveStyleObject: Record<SystemMediaCssSelector, SystemStyleObject>
+) {
+  Object.entries(sourceStyleObject).forEach(([key, value]) => {
+    if (isObject(value)) {
+      if (key in destResponsiveStyleObject) {
+        // entry is a responsive css rule (ex: '@sm': {})
+        const atMediaRule = key as SystemMediaCssSelector;
+
+        destResponsiveStyleObject[atMediaRule] = {
+          ...destResponsiveStyleObject[atMediaRule],
+          ...value,
+        };
+      } else {
+        // entry is a normal css rule (ex: `.my-class: {}`, `&:hover: {}` or `_hover: {}`)
+        destStyleObject[key] = {
+          ...(destStyleObject[key] as SystemStyleObject),
+          ...value,
+        };
+      }
+    } else {
+      // entry is a normal css property declaration (ex: `color: value`)
+      destStyleObject[key] = value;
+    }
+  });
+}
+
+/**
  * Return a valid Stitches CSS object based on the given style props
  */
-export function toCssObject(props: StyleProps) {
+export function toCssObject(props: StyleProps, baseStyle?: SystemStyleObject) {
   /**
-   * Object containing all non-responsive styles.
+   * Destination object containing all non-responsive styles.
    */
-  const styleObject: SystemStyleObject = {};
+  const destStyleObject: SystemStyleObject = {};
 
   /**
-   * Object containing all responsive styles grouped by `@media` rule.
+   * Destination object containing all responsive styles grouped by `@media` rule.
    */
-  const responsiveStyleObject: Record<SystemMediaCssSelector, SystemStyleObject> = {
+  const destResponsiveStyleObject: Record<SystemMediaCssSelector, SystemStyleObject> = {
     "@sm": {},
     "@md": {},
     "@lg": {},
@@ -27,6 +60,10 @@ export function toCssObject(props: StyleProps) {
     "@dark": {},
   };
 
+  // Add content of the `baseStyle` first to ensure css override works correctly.
+  baseStyle && mergeStyleObject(baseStyle, destStyleObject, destResponsiveStyleObject);
+
+  // Add content of the `style props`
   Object.entries(props).forEach(([prop, value]) => {
     // don't add null or undefined style props
     if (value === null || value === undefined) {
@@ -39,54 +76,32 @@ export function toCssObject(props: StyleProps) {
 
     if (prop.startsWith("_")) {
       // entry is a pseudo prop
-      styleObject[prop] = value;
+      destStyleObject[prop] = value;
     } else if (isObject(value)) {
       // entry is a responsive prop
       Object.keys(value).forEach(key => {
         if (key === "@initial") {
           // `@initial` prop is replaced by the normal css property declaration in the stitches `css` object.
-          styleObject[prop] = (value as any)[key];
-        } else if (key in responsiveStyleObject) {
+          destStyleObject[prop] = (value as any)[key];
+        } else if (key in destResponsiveStyleObject) {
           const atMediaRule = key as SystemMediaCssSelector;
 
           // group all prop with the same `@media` key in the same object as in the stitches `css` object.
-          responsiveStyleObject[atMediaRule] = {
-            ...responsiveStyleObject[atMediaRule],
+          destResponsiveStyleObject[atMediaRule] = {
+            ...destResponsiveStyleObject[atMediaRule],
             [prop]: (value as any)[atMediaRule],
           };
         }
       });
     } else {
       // entry is a normal css property declaration (ex: `color: value`)
-      styleObject[prop] = value;
+      destStyleObject[prop] = value;
     }
   });
 
   // Add content of the `css` prop last to ensure css override works correctly.
-  props.css &&
-    Object.entries(props.css).forEach(([key, value]) => {
-      if (isObject(value)) {
-        if (key in responsiveStyleObject) {
-          // entry is a responsive css rule (ex: '@sm': {})
-          const atMediaRule = key as SystemMediaCssSelector;
+  props.css && mergeStyleObject(props.css, destStyleObject, destResponsiveStyleObject);
 
-          responsiveStyleObject[atMediaRule] = {
-            ...responsiveStyleObject[atMediaRule],
-            ...value,
-          };
-        } else {
-          // entry is a normal css rule (ex: `.my-class: {}`, `&:hover: {}` or `_hover: {}`)
-          styleObject[key] = {
-            ...(styleObject[key] as SystemStyleObject),
-            ...value,
-          };
-        }
-      } else {
-        // entry is a normal css property declaration (ex: `color: value`)
-        styleObject[key] = value;
-      }
-    });
-
-  // spread responsive values last
-  return { ...styleObject, ...responsiveStyleObject };
+  // spread responsive values last to ensure css override works correctly.
+  return { ...destStyleObject, ...destResponsiveStyleObject };
 }
