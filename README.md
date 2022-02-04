@@ -1,4 +1,4 @@
-# hope-ui-solid (WIP)
+# @hope-ui/solid (WIP)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
@@ -17,19 +17,19 @@ First install Hope UI and Stitches as a dependency.
 npm :
 
 ```bash
-npm install hope-ui-solid @stitches/core
+npm install @hope-ui/solid @stitches/core
 ```
 
 Yarn :
 
 ```bash
-yarn add hope-ui-solid @stitches/core
+yarn add @hope-ui/solid @stitches/core
 ```
 
 pnpm :
 
 ```bash
-pnpm add hope-ui-solid @stitches/core
+pnpm add @hope-ui/solid @stitches/core
 ```
 
 ### Provider setup
@@ -40,7 +40,7 @@ This can be either in your `index.jsx`, `index.tsx` or your App component.
 
 ```tsx
 // 1. import `HopeProvider` component
-import { HopeProvider } from "hope-ui-solid";
+import { HopeProvider } from "@hope-ui/solid";
 
 function App() {
   // 2. Wrap HopeProvider at the root of your app
@@ -65,7 +65,7 @@ It's the core Stitches API with no extra layer, you can find the documentation [
 For convenience Hope UI re-export it configured with its default theme.
 
 ```jsx
-import { css } from "hope-ui-solid";
+import { css } from "@hope-ui/solid";
 
 const buttonStyles = css({
   backgroundColor: "red",
@@ -93,7 +93,7 @@ You can view the props/token mapping on the [Stitches docs](https://stitches.dev
 To apply a token you need to prefix it with a `$` sign.
 
 ```jsx
-import { css } from "hope-ui-solid";
+import { css } from "@hope-ui/solid";
 
 const buttonStyles = css({
   backgroundColor: "$primary500",
@@ -428,13 +428,13 @@ export default {
 
 ## Customizing Theme
 
-If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `hope-ui-solid`.
+If you intend to customise the default `theme` object to match your design requirements, you can extend the theme from `@hope-ui/solid`.
 
 Hope UI provides an `extendTheme` function that deep merges the default theme with your customizations.
 
 ```jsx
 // 1. Import the extendTheme function
-import { extendTheme, HopeProvider } from "hope-ui-solid";
+import { extendTheme, HopeProvider } from "@hope-ui/solid";
 
 // 2. Extend the theme to include custom colors, fonts, default component styles and props.
 const theme = extendTheme({
@@ -735,7 +735,7 @@ You must use the `@initial` breakpoint to declare the initial variant before any
 For more in dept explanation please refer to the [Stitches docs](https://stitches.dev/docs/breakpoints).
 
 ```jsx
-import { css } from "hope-ui-solid";
+import { css } from "@hope-ui/solid";
 
 const cardStyles = css({
   borderRadius: "$lg",
@@ -793,7 +793,7 @@ Stitches have a section about SSR on their [docs](https://stitches.dev/docs/serv
 For convenience Hope UI re-export the `getCssText()` method from Stitches configured with its default theme.
 
 ```js
-import { getCssText } from "hope-ui-solid";
+import { getCssText } from "@hope-ui/solid";
 ```
 
 ## Acknowledgment
