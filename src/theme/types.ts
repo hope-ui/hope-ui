@@ -2,6 +2,7 @@ import { Accessor } from "solid-js";
 
 import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
+import { ThemeableTagOptions } from "@/components/tag/tag";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
@@ -45,7 +46,7 @@ export interface ComponentsStyles {
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Heading?: ComponentStyle<void>;
   Text?: ComponentStyle<void>;
-  // Tag?: ComponentStyle<ThemeableTagOptions>;
+  Tag?: ComponentStyle<ThemeableTagOptions>;
 }
 
 /**

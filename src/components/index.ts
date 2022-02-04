@@ -8,5 +8,6 @@ export * from "./heading";
 export * from "./icon-button";
 export * from "./spacer";
 export * from "./stack";
+export * from "./tag";
 export * from "./text";
 export * from "./types";
