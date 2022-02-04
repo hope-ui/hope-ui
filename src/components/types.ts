@@ -1,18 +1,20 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
-import { SystemStyleObject } from "@/theme/types";
+import { StyleProps } from "@/styled-system/system";
+import { SystemStyleObject } from "@/styled-system/types";
+import { RightJoinProps } from "@/utils/types";
 
 /**
  * Represent any HTML element or SolidJS component.
  */
-export type ElementType = keyof JSX.IntrinsicElements | Component<any>;
+export type ElementType<Props = any> = keyof JSX.IntrinsicElements | Component<Props>;
 
 /**
  * Take the props of the passed HTML element or component and returns its type.
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
+export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
 
 /**
  * All SolidJS props that apply css classes.
@@ -24,54 +26,12 @@ export interface ClassProps {
 }
 
 /**
- * The `css` prop allow you to override styles easily.
- * It’s like the style attribute, but it supports tokens, media queries, nesting and token-aware values.
+ * Props of a Hope UI component.
  */
-export interface CSSProp {
-  css?: SystemStyleObject;
-}
-
-/**
- * The `as` props is an override of the default HTML tag.
- * Can also be another SolidJS component.
- */
-export interface AsProp<C extends ElementType> {
-  as?: C;
-}
-
-/**
- * Allows for extending a set of props (`ExtendedProps`) by an overriding set of props
- * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
- * set of props.
- */
-export type ExtendableProps<ExtendedProps = unknown, OverrideProps = unknown> = OverrideProps &
-  Omit<ExtendedProps, keyof OverrideProps>;
-
-/**
- * Allows for inheriting the props from the specified element type so that
- * props like children, className & style work, as well as element-specific
- * attributes like aria roles. The component (`C`) must be passed in.
- */
-export type PolymorphicComponentProps<C extends ElementType, Props = unknown> = ExtendableProps<
+export type HopeComponentProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
   PropsOf<C>,
-  PropsWithChildren<Props & ClassProps & CSSProp & AsProp<C>>
->;
-
-export interface ClassConfig {
-  /**
-   * Semantic human readable css class used to override styles by end user.
-   */
-  hopeClass: string;
-
-  /**
-   * Base style class of the component.
-   */
-  baseClass: string;
-
-  /**
-   * All SolidJS props that apply css classes.
-   */
-  classProps: ClassProps;
-
-  //themeBaseStyle?: SystemStyleObject;
-}
+  PropsWithChildren<AdditionalProps & StyleProps & ClassProps>
+> & {
+  as?: C;
+  __baseStyle?: SystemStyleObject;
+};

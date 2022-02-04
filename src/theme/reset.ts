@@ -1,4 +1,4 @@
-import { globalCss } from "./stitches.config";
+import { globalCss } from "../styled-system/stitches.config";
 
 /**
  * Hope UI css reset
@@ -25,12 +25,12 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme dark color for text.
+    1. Use theme `neutral` color for text.
     2. Use theme `sans` font-family.
-    3. Use theme base line height.
+    3. Use theme `base` line height.
   */
   html: {
-    color: "$dark900" /* 1 */,
+    color: "$neutral12" /* 1 */,
     fontFamily: "$sans" /* 2 */,
     lineHeight: "$base" /* 3 */,
     fontSize: "16px",
@@ -69,5 +69,12 @@ export const resetStyles = globalCss({
   /* Buttons have a default outline */
   "button:focus-visible": {
     outline: "5px auto -webkit-focus-ring-color",
+  },
+
+  /* Anchor are unstyled */
+  a: {
+    backgroundColor: "transparent",
+    color: "inherit",
+    textCecoration: "inherit",
   },
 });

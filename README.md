@@ -115,11 +115,36 @@ function Button() {
 ```js
 export default {
   colors: {
+    transparent: "transparent",
+    current: "currentColor",
     white: "#ffffff",
     black: "#000000",
-    transparent: "transparent",
 
-    // Primary (TailwindCSS Blue)
+    // White alpha (Chakra UI - White alpha)
+    whiteAlpha50: "rgba(255, 255, 255, 0.04)",
+    whiteAlpha100: "rgba(255, 255, 255, 0.06)",
+    whiteAlpha200: "rgba(255, 255, 255, 0.08)",
+    whiteAlpha300: "rgba(255, 255, 255, 0.16)",
+    whiteAlpha400: "rgba(255, 255, 255, 0.24)",
+    whiteAlpha500: "rgba(255, 255, 255, 0.36)",
+    whiteAlpha600: "rgba(255, 255, 255, 0.48)",
+    whiteAlpha700: "rgba(255, 255, 255, 0.64)",
+    whiteAlpha800: "rgba(255, 255, 255, 0.80)",
+    whiteAlpha900: "rgba(255, 255, 255, 0.92)",
+
+    // Black alpha (Chakra UI - Black alpha)
+    blackAlpha50: "rgba(0, 0, 0, 0.04)",
+    blackAlpha100: "rgba(0, 0, 0, 0.06)",
+    blackAlpha200: "rgba(0, 0, 0, 0.08)",
+    blackAlpha300: "rgba(0, 0, 0, 0.16)",
+    blackAlpha400: "rgba(0, 0, 0, 0.24)",
+    blackAlpha500: "rgba(0, 0, 0, 0.36)",
+    blackAlpha600: "rgba(0, 0, 0, 0.48)",
+    blackAlpha700: "rgba(0, 0, 0, 0.64)",
+    blackAlpha800: "rgba(0, 0, 0, 0.80)",
+    blackAlpha900: "rgba(0, 0, 0, 0.92)",
+
+    // Primary (TailwindCSS - Blue)
     primary50: "#eff6ff",
     primary100: "#dbeafe",
     primary200: "#bfdbfe",
@@ -131,19 +156,19 @@ export default {
     primary800: "#1e40af",
     primary900: "#1e3a8a",
 
-    // Dark (Mantine Dark)
-    dark50: "#c1c2c5",
-    dark100: "#a6a7ab",
+    // Dark (Adapted Mantine - Dark)
+    dark50: "#c1c3c5",
+    dark100: "#a6a8ab",
     dark200: "#909296",
-    dark300: "#5c5f66",
+    dark300: "#5c6066",
     dark400: "#373a40",
-    dark500: "#2c2e33",
-    dark600: "#25262b",
-    dark700: "#1a1b1e",
+    dark500: "#2c2f33",
+    dark600: "#25272b",
+    dark700: "#1a1c1e",
     dark800: "#141517",
     dark900: "#101113",
 
-    // Neutral (TailwindCSS Gray)
+    // Neutral (TailwindCSS - Gray)
     neutral50: "#f9fafb",
     neutral100: "#f3f4f6",
     neutral200: "#e5e7eb",
@@ -155,7 +180,7 @@ export default {
     neutral800: "#1f2937",
     neutral900: "#111827",
 
-    // Success (TailwindCSS Emerald)
+    // Success (TailwindCSS - Emerald)
     success50: "#ecfdf5",
     success100: "#d1fae5",
     success200: "#a7f3d0",
@@ -167,7 +192,7 @@ export default {
     success800: "#065f46",
     success900: "#064e3b",
 
-    // Info (TailwindCSS Sky)
+    // Info (TailwindCSS - Sky)
     info50: "#f0f9ff",
     info100: "#e0f2fe",
     info200: "#bae6fd",
@@ -179,7 +204,7 @@ export default {
     info800: "#075985",
     info900: "#0c4a6e",
 
-    // Warning (TailwindCSS Amber)
+    // Warning (TailwindCSS - Amber)
     warning50: "#fffbeb",
     warning100: "#fef3c7",
     warning200: "#fde68a",
@@ -191,7 +216,7 @@ export default {
     warning800: "#92400e",
     warning900: "#78350f",
 
-    // Danger (TailwindCSS Red)
+    // Danger (TailwindCSS - Red)
     danger50: "#fef2f2",
     danger100: "#fee2e2",
     danger200: "#fecaca",
