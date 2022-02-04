@@ -1,10 +1,10 @@
-import { splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 
-import { Box } from "@/components/box";
 import { HopeComponentProps } from "@/components/types";
 import { classNames, createCssSelector } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
+import { Box } from "../box/box";
 import { baseTextStyles, BaseTextVariants } from "./text.styles";
 
 export type BaseTextProps<C extends ElementType> = HopeComponentProps<C, BaseTextVariants>;
@@ -13,11 +13,16 @@ export type BaseTextProps<C extends ElementType> = HopeComponentProps<C, BaseTex
  * [Internal] Foundation of <Text /> and <Heading /> components.
  */
 export function BaseText<C extends ElementType = "p">(props: BaseTextProps<C>) {
-  const [local, variantProps, others] = splitProps(props, ["class"], ["size"]);
+  const defaultProps: BaseTextProps<"p"> = {
+    as: "p",
+  };
+
+  const propsWithDefault: BaseTextProps<C> = mergeProps(defaultProps, props);
+  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["size"]);
 
   const classes = () => classNames(local.class, baseTextStyles(variantProps));
 
-  return <Box as="p" class={classes()} {...others} />;
+  return <Box class={classes()} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------

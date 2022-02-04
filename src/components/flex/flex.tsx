@@ -2,11 +2,11 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { HopeComponentProps } from "@/components/types";
-import { ResponsiveProps } from "@/styled-system";
+import { ResponsiveProps } from "@/styled-system/types";
 import { classNames, createCssSelector } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
-import { Box } from "../box";
+import { Box } from "../box/box";
 
 export type BaseFlexOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;

@@ -1,10 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { HopeComponentProps } from "@/components";
+import { HopeComponentProps } from "@/components/types";
 import { classNames, createCssSelector } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
-import { Box } from "../box";
+import { Box } from "../box/box";
 import { containerStyles, ContainerVariants } from "./container.styles";
 
 export type ContainerProps<C extends ElementType> = HopeComponentProps<C, ContainerVariants>;

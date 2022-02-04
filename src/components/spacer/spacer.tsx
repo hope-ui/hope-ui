@@ -4,7 +4,7 @@ import { HopeComponentProps } from "@/components/types";
 import { classNames, createCssSelector } from "@/utils/css";
 import { ElementType } from "@/utils/types";
 
-import { Box } from "../box";
+import { Box } from "../box/box";
 import { spacerStyles } from "./spacer.styles";
 
 const hopeSpacerClass = "hope-spacer";

@@ -2,12 +2,12 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { HopeComponentProps } from "@/components/types";
-import { ResponsiveProps, ResponsiveValue } from "@/styled-system";
+import { ResponsiveProps, ResponsiveValue } from "@/styled-system/types";
 import { classNames, createCssSelector } from "@/utils/css";
 import { mapKeys } from "@/utils/function";
 import { ElementType } from "@/utils/types";
 
-import { Box } from "../box";
+import { Box } from "../box/box";
 
 type GridSpanValue = string | number | "auto" | "full";
 
