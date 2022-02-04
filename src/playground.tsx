@@ -1,18 +1,21 @@
 import "./playground.css";
 
-import { createEffect } from "solid-js";
+import { createEffect, splitProps } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
+  ElementType,
   extendTheme,
   Grid,
   GridItem,
+  HopeComponentProps,
   HopeProvider,
   useColorMode,
   useColorModeValue,
   useTheme,
 } from ".";
+import { classNames } from "./utils/css";
 
 const customTheme = extendTheme({
   initialColorMode: "dark",
@@ -29,7 +32,7 @@ const customTheme = extendTheme({
 });
 
 export function App() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const { colorMode, toggleColorMode } = useColorMode();
   const color = useColorModeValue("cyan", "magenta");
 
@@ -39,6 +42,7 @@ export function App() {
 
   return (
     <div>
+      <Box as="a"></Box>
       <Box
         css={{
           transition: "background-color 300ms",

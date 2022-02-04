@@ -66,6 +66,6 @@ export function createStyledSystemClass(props: StyleProps) {
 /**
  * Take a props object and return only the keys that match a style prop.
  */
-export function getUsedStylePropNames(props: Record<string | number, unknown>) {
+export function getUsedStylePropNames(props: Record<string | number, any>) {
   return Object.keys(props).filter(key => key in stylePropNames) as Array<keyof StyleProps>;
 }

@@ -1,10 +1,9 @@
 import { splitProps } from "solid-js";
 
-import { HopeComponentProps } from "@/components/types";
 import { classNames, createCssSelector } from "@/utils/css";
-import { ElementType } from "@/utils/types";
 
 import { Box } from "../box/box";
+import { ElementType, HopeComponentProps } from "../types";
 import { centerStyles } from "./center.styles";
 
 const hopeCenterClass = "hope-center";

@@ -3,9 +3,9 @@ import { splitProps } from "solid-js";
 
 import { ResponsiveProps } from "@/styled-system/types";
 import { classNames, createCssSelector } from "@/utils/css";
-import { ElementType } from "@/utils/types";
 
 import { BaseFlex, BaseFlexProps } from "../flex/flex";
+import { ElementType } from "../types";
 
 export type StackProps<C extends ElementType> = BaseFlexProps<C>;
 

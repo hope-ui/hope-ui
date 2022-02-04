@@ -45,14 +45,14 @@ export function toCssObject(props: StyleProps) {
       Object.keys(value).forEach(key => {
         if (key === "@initial") {
           // `@initial` prop is replaced by the normal css property declaration in the stitches `css` object.
-          styleObject[prop] = value[key];
+          styleObject[prop] = (value as any)[key];
         } else if (key in responsiveStyleObject) {
           const atMediaRule = key as SystemMediaCssSelector;
 
           // group all prop with the same `@media` key in the same object as in the stitches `css` object.
           responsiveStyleObject[atMediaRule] = {
             ...responsiveStyleObject[atMediaRule],
-            [prop]: value[atMediaRule],
+            [prop]: (value as any)[atMediaRule],
           };
         }
       });

@@ -3,9 +3,8 @@ import { Dynamic } from "solid-js/web";
 
 import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
 import { classNames } from "@/utils/css";
-import { ElementType } from "@/utils/types";
 
-import { HopeComponentProps } from "../types";
+import { ElementType, HopeComponentProps } from "../types";
 
 /**
  * Box is the most abstract component on top of which all other Hope UI components are built.

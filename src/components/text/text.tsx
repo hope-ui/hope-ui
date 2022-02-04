@@ -1,10 +1,9 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { HopeComponentProps } from "@/components/types";
 import { classNames, createCssSelector } from "@/utils/css";
-import { ElementType } from "@/utils/types";
 
 import { Box } from "../box/box";
+import { ElementType, HopeComponentProps } from "../types";
 import { baseTextStyles, BaseTextVariants } from "./text.styles";
 
 export type BaseTextProps<C extends ElementType> = HopeComponentProps<C, BaseTextVariants>;

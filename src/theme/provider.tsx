@@ -105,7 +105,7 @@ export function useColorMode(): Pick<
  * @param dark the dark mode value
  * @return A derived signal based on the color mode.
  */
-export function useColorModeValue<T = unknown>(light: T, dark: T) {
+export function useColorModeValue<T = any>(light: T, dark: T) {
   const { colorMode } = useColorMode();
   return () => (colorMode() === "dark" ? dark : light);
 }

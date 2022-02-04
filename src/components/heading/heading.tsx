@@ -1,9 +1,9 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { classNames, createCssSelector } from "@/utils/css";
-import { ElementType } from "@/utils/types";
 
 import { BaseText, BaseTextProps } from "../text/text";
+import { ElementType } from "../types";
 import { headingStyles } from "./heading.styles";
 
 const hopeHeadingClass = "hope-heading";
