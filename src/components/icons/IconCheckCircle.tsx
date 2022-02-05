@@ -2,7 +2,7 @@ import { createIcon } from "../icon/create-icon";
 
 export const IconCheckCircle = createIcon({
   viewBox: "0 0 20 20",
-  path: (
+  path: () => (
     <g fill="none">
       <path
         fill-rule="evenodd"

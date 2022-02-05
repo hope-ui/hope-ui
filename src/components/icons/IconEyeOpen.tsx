@@ -2,7 +2,7 @@ import { createIcon } from "../icon/create-icon";
 
 export const IconEyeOpen = createIcon({
   viewBox: "0 0 20 20",
-  path: (
+  path: () => (
     <g fill="none">
       <path d="M10 12a2 2 0 1 0 0-4a2 2 0 0 0 0 4z" fill="currentColor" />
       <path

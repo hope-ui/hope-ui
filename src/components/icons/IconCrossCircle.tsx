@@ -3,7 +3,7 @@ import { createIcon } from "../icon/create-icon";
 // heroicons-solid-x-circle
 export const IconCrossCircle = createIcon({
   viewBox: "0 0 20 20",
-  path: (
+  path: () => (
     <g fill="none">
       <path
         fill-rule="evenodd"

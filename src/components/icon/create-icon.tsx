@@ -9,11 +9,13 @@ interface CreateIconOptions {
    */
   viewBox?: string;
 
+  // `path` needs to be a function that return JSX because in SolidJS JSX create real DOM element.
+  // So if `path` is just a JSX.Element, the same generated DOM element will be moved to the next call of the component that use it.
   /**
-   * The `svg` path or group element
-   * @type JSX.Element | JSX.Element[]
+   * A function that return the `svg` path or group element
+   * @type () => JSX.Element | JSX.Element[]
    */
-  path: JSX.Element | JSX.Element[];
+  path: () => JSX.Element | JSX.Element[];
 
   /**
    * Default props automatically passed to the component; overwriteable

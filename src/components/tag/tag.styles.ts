@@ -4,6 +4,15 @@ import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
+ * TagLabel
+ * -----------------------------------------------------------------------------------------------*/
+
+export const tagLabelStyles = css({
+  lineHeight: "$none",
+  noOfLines: 1,
+});
+
+/* -------------------------------------------------------------------------------------------------
  * TagCloseButton
  * -----------------------------------------------------------------------------------------------*/
 
@@ -269,8 +278,10 @@ export const tagStyles = css({
         spacing: "$2",
       }),
     },
-    withLeftSection: { true: {} },
-    withRightSection: { true: {} },
+    dotPosition: {
+      left: {},
+      right: {},
+    },
   },
   compoundVariants: [
     /* -------------------------------------------------------------------------------------------------
@@ -542,12 +553,12 @@ export const tagStyles = css({
     },
 
     /* -------------------------------------------------------------------------------------------------
-     * Variant - dot + side sections
+     * Variant - dot + dot position
      * -----------------------------------------------------------------------------------------------*/
 
     {
       variant: "dot",
-      withLeftSection: "true",
+      dotPosition: "right",
       css: {
         "&::before": {
           display: "none",
@@ -558,55 +569,19 @@ export const tagStyles = css({
         },
       },
     },
+
     {
       variant: "dot",
-      withLeftSection: "true",
-      withRightSection: "true",
+      dotPosition: "left",
       css: {
-        "&::before, &::after": {
+        "&::before": {
+          display: "block",
+        },
+
+        "&::after": {
           display: "none",
         },
       },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * Variant - left section + size
-     * -----------------------------------------------------------------------------------------------*/
-
-    {
-      withLeftSection: "true",
-      size: "sm",
-      css: { paddingLeft: "$0_5" },
-    },
-    {
-      size: "md",
-      withLeftSection: "true",
-      css: { paddingLeft: "$0_5" },
-    },
-    {
-      withLeftSection: "true",
-      size: "lg",
-      css: { paddingLeft: "$0_5" },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * Variant - right section + size
-     * -----------------------------------------------------------------------------------------------*/
-
-    {
-      withRightSection: "true",
-      size: "sm",
-      css: { paddingRight: "$0_5" },
-    },
-    {
-      size: "md",
-      withRightSection: "true",
-      css: { paddingRight: "$0_5" },
-    },
-    {
-      withRightSection: "true",
-      size: "lg",
-      css: { paddingRight: "$0_5" },
     },
   ],
 });

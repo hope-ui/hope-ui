@@ -61,7 +61,7 @@ export type TypographyProps = Partial<{
   /**
    * Utility to visually truncating text after a fixed number of lines.
    */
-  noOfLines: number;
+  noOfLines: number | string;
 }>;
 
 /**

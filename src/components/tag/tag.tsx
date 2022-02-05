@@ -1,5 +1,4 @@
-import { JSX, mergeProps, splitProps } from "solid-js";
-import { Show } from "solid-js/web";
+import { mergeProps, splitProps } from "solid-js";
 
 import { RadiiProps } from "@/styled-system/props/radii";
 import { ResponsiveValue } from "@/styled-system/types";
@@ -11,14 +10,9 @@ import { ElementType, HopeComponentProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
 import { TagProvider } from "./tag-provider";
 
-export interface TagOptions extends Omit<TagVariants, "withLeftSection" | "withRightSection"> {
-  leftSection?: JSX.Element;
-  rightSection?: JSX.Element;
-}
+export type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
 
-export type ThemeableTagOptions = Pick<TagOptions, "variant" | "colorScheme" | "size">;
-
-export type TagProps<C extends ElementType> = HopeComponentProps<C, TagOptions>;
+export type TagProps<C extends ElementType> = HopeComponentProps<C, TagVariants>;
 
 const hopeTagClass = "hope-tag";
 
@@ -39,24 +33,11 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const propsWithDefault: TagProps<"span"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    ["class", "leftSection", "rightSection", "children"],
-    ["variant", "colorScheme", "size"]
+    ["class"],
+    ["variant", "colorScheme", "size", "dotPosition"]
   );
 
-  const classes = () =>
-    classNames(
-      local.class,
-      hopeTagClass,
-      tagStyles({
-        ...variantProps,
-        withLeftSection: !!local.leftSection,
-        withRightSection: !!local.rightSection,
-      })
-    );
-
-  const shouldWrapChildrenInSpan = () => {
-    return !!local.leftSection || !!local.rightSection;
-  };
+  const classes = () => classNames(local.class, hopeTagClass, tagStyles(variantProps));
 
   const borderRadius = () =>
     others.borderRadius ??
@@ -64,13 +45,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 
   return (
     <TagProvider borderRadius={borderRadius()}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle} {...others}>
-        <Show when={local.leftSection}>{local.leftSection}</Show>
-        <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
-          <span>{local.children}</span>
-        </Show>
-        <Show when={local.rightSection}>{local.rightSection}</Show>
-      </Box>
+      <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />
     </TagProvider>
   );
 }
