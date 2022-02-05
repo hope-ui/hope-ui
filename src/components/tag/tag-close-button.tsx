@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { IconCross } from "@/icons";
+import { IconCross } from "@/components/icons/IconCross";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";

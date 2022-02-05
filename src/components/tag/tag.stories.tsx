@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 
+import { IconInfoCircle } from "@/components/icons/IconInfoCircle";
 import { TagCloseButton } from "@/components/tag/tag-close-button";
-import { IconInfoCircle } from "@/icons";
 import { HopeWrapper } from "@/utils/storybook";
 
 import { Tag } from "./tag";
