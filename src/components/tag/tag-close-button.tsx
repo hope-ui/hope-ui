@@ -10,7 +10,7 @@ import { useTag } from "./tag-provider";
 
 export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
   C,
-  { "aria-label": string }
+  { "aria-label"?: string }
 >;
 
 const hopeTagCloseButtonClass = "hope-tag-close-button";

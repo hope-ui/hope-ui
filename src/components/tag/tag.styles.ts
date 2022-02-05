@@ -67,9 +67,7 @@ interface TagSizeVariantConfig {
   height: string;
   paddingX: string;
   fontSize: string;
-  iconSize: string;
   closeButtonSize: string;
-  closeButtonIconSize: string;
   spacing: string;
 }
 
@@ -80,20 +78,13 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
     px: config.paddingX,
     fontSize: config.fontSize,
 
-    "& svg": {
-      boxSize: config.iconSize,
-    },
-
     "& > * + *": {
       marginLeft: config.spacing,
     },
 
-    [`& .${tagCloseButtonStyles}`]: {
+    [`& .${tagCloseButtonStyles}, 
+      & .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
       boxSize: config.closeButtonSize,
-    },
-
-    [`& .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
-      boxSize: config.closeButtonIconSize,
     },
   };
 }
@@ -254,27 +245,21 @@ export const tagStyles = css({
         height: "$5",
         paddingX: "$2",
         fontSize: "$xs",
-        iconSize: "$4",
         closeButtonSize: "$4",
-        closeButtonIconSize: "$3_5",
         spacing: "$1",
       }),
       md: createTagSizeVariant({
         height: "$6",
         paddingX: "$2",
         fontSize: "$sm",
-        iconSize: "$5",
         closeButtonSize: "$5",
-        closeButtonIconSize: "$4",
         spacing: "$1_5",
       }),
       lg: createTagSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$base",
-        iconSize: "$7",
-        closeButtonSize: "$7",
-        closeButtonIconSize: "$5",
+        closeButtonSize: "$6",
         spacing: "$2",
       }),
     },
