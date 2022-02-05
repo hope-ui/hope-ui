@@ -87,7 +87,8 @@ describe("IconButton", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
+      // eslint-disable-next-line solid/no-react-specific-props
+      <IconButton className={stubClass} aria-label="User" icon={<IconUser />} />
     ));
     const button = screen.getByRole("button");
 
