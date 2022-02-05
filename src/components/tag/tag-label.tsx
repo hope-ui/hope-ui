@@ -8,7 +8,7 @@ import { tagLabelStyles } from "./tag.styles";
 
 export type TagLabelProps<C extends ElementType> = HopeComponentProps<C>;
 
-const hopeTagLabelClass = "hope-talabel";
+const hopeTagLabelClass = "hope-tag-label";
 
 export function TagLabel<C extends ElementType = "span">(props: TagLabelProps<C>) {
   const defaultProps: TagLabelProps<"span"> = {

@@ -4,6 +4,18 @@ import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
+ * TagRightIcon & TagLeftIcon
+ * -----------------------------------------------------------------------------------------------*/
+
+export const tagRightIconStyles = css({
+  marginInlineStart: "$1",
+});
+
+export const tagLeftIconStyles = css({
+  marginInlineEnd: "$1",
+});
+
+/* -------------------------------------------------------------------------------------------------
  * TagLabel
  * -----------------------------------------------------------------------------------------------*/
 
@@ -25,6 +37,9 @@ export const tagCloseButtonStyles = css({
   display: "inline-flex",
   justifyContent: "center",
   alignItems: "center",
+
+  marginInlineStart: "$1",
+  marginInlineEnd: "-0.25rem",
 
   outline: "none",
   border: "1px solid transparent",
@@ -78,9 +93,9 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
     px: config.paddingX,
     fontSize: config.fontSize,
 
-    "& > * + *": {
-      marginLeft: config.spacing,
-    },
+    // "& > * + *": {
+    //   marginLeft: config.spacing,
+    // },
 
     [`& .${tagCloseButtonStyles}, 
       & .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
@@ -253,14 +268,14 @@ export const tagStyles = css({
         paddingX: "$2",
         fontSize: "$sm",
         closeButtonSize: "$5",
-        spacing: "$1_5",
+        spacing: "$1",
       }),
       lg: createTagSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$base",
-        closeButtonSize: "$6",
-        spacing: "$2",
+        closeButtonSize: "$5",
+        spacing: "$1_5",
       }),
     },
     dotPosition: {

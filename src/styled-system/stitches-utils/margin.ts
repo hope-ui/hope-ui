@@ -17,6 +17,11 @@ export const margin = {
   mr: (value: PropertyValue<"marginRight">) => ({ marginRight: value }),
 
   /**
+   * The CSS `margin-inline-start` property
+   */
+  ms: (value: PropertyValue<"marginInlineStart">) => ({ marginInlineStart: value }),
+
+  /**
    * The CSS `margin-bottom` property
    */
   mb: (value: PropertyValue<"marginBottom">) => ({ marginBottom: value }),
@@ -25,6 +30,11 @@ export const margin = {
    * The CSS `margin-left`  property
    */
   ml: (value: PropertyValue<"marginLeft">) => ({ marginLeft: value }),
+
+  /**
+   * The CSS `margin-inline-end` property
+   */
+  me: (value: PropertyValue<"marginInlineEnd">) => ({ marginInlineEnd: value }),
 
   /**
    * The CSS `margin-inline-start` and `margin-inline-end` property

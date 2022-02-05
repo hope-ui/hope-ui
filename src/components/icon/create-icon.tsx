@@ -1,5 +1,6 @@
 import { JSX } from "solid-js";
 
+import { ElementType } from "../types";
 import { Icon, IconProps } from "./icon";
 
 interface CreateIconOptions {
@@ -26,7 +27,7 @@ interface CreateIconOptions {
 export function createIcon(options: CreateIconOptions) {
   const { viewBox = "0 0 24 24", defaultProps = {} } = options;
 
-  const IconComponent = (props: IconProps<"svg">) => {
+  const IconComponent = <C extends ElementType = "svg">(props: IconProps<C>) => {
     return (
       <Icon viewBox={viewBox} {...defaultProps} {...props}>
         {options.path}

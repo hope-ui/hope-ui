@@ -37,6 +37,16 @@ export type MarginProps = Partial<{
   mr: Property.MarginRight<SpaceScaleValue> | number;
 
   /**
+   * The CSS `margin-inline-start`  property
+   */
+  marginStart: Property.MarginInlineStart<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `margin-inline-start`  property
+   */
+  ms: Property.MarginInlineStart<SpaceScaleValue> | number;
+
+  /**
    * The CSS `margin-bottom` property
    */
   marginBottom: Property.MarginBottom<SpaceScaleValue> | number;
@@ -55,6 +65,16 @@ export type MarginProps = Partial<{
    * The CSS `margin-left`  property
    */
   ml: Property.MarginLeft<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `margin-inline-end`  property
+   */
+  marginEnd: Property.MarginInlineEnd<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `margin-inline-end`  property
+   */
+  me: Property.MarginInlineEnd<SpaceScaleValue> | number;
 
   /**
    * The CSS `margin-inline-start` and `margin-inline-end` property
@@ -77,10 +97,14 @@ export const marginPropNames: KeysOf<MarginProps> = {
   mt: true,
   marginRight: true,
   mr: true,
+  marginStart: true,
+  ms: true,
   marginBottom: true,
   mb: true,
   marginLeft: true,
   ml: true,
+  marginEnd: true,
+  me: true,
   mx: true,
   my: true,
 };

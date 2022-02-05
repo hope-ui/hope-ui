@@ -15,6 +15,9 @@ export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
 
 const hopeTagCloseButtonClass = "hope-tag-close-button";
 
+/**
+ * TagCloseButton is used to close "remove" the tag
+ */
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
   const tagContext = useTag();
 
