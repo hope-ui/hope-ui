@@ -8,9 +8,7 @@ import { TagCloseButton } from "./tag-close-button";
 import { TagProvider } from "./tag-provider";
 
 function renderWithTagContextProvider(callback: () => JSX.Element) {
-  return renderWithHopeProvider(() => (
-    <TagProvider contextValue={{ borderRadius: "md" }}>{callback}</TagProvider>
-  ));
+  return renderWithHopeProvider(() => <TagProvider borderRadius="$md">{callback}</TagProvider>);
 }
 describe("TagCloseButton", () => {
   afterEach(cleanup);

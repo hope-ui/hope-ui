@@ -52,15 +52,15 @@ export interface ComponentsStyles {
 /**
  * Hope UI theme override configuration.
  */
-export interface HopeThemeConfig {
+export interface HopeThemeConfig<T extends ThemeConfig> {
   initialColorMode?: ColorMode;
-  lightTheme?: ThemeConfig;
-  darkTheme?: ThemeConfig;
+  lightTheme?: T;
+  darkTheme?: T;
   components?: ComponentsStyles;
 }
 
-export interface HopeContextValue {
-  theme: Accessor<HopeTheme>;
+export interface HopeContextValue<T extends HopeTheme = HopeTheme> {
+  theme: Accessor<T>;
   components: ComponentsStyles;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;

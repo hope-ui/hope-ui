@@ -2,43 +2,40 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  Center,
-  HopeComponentProps,
-  HopeProvider,
-  HStack,
-  Stack,
-  Tag,
-  TagCloseButton,
-  Text,
-  useColorMode,
-  useColorModeValue,
-} from ".";
-import { createSignal } from "solid-js";
+import { Box, extendTheme, HopeProvider, useColorMode, useTheme } from ".";
+
+const customTheme = extendTheme({
+  lightTheme: {
+    colors: {
+      text: "$primary9",
+    },
+  },
+  darkTheme: {
+    colors: {
+      text: "$success9",
+    },
+  },
+});
 
 export function App() {
+  const { theme } = useTheme();
   const { toggleColorMode } = useColorMode();
-  const [radius, setRadius] = createSignal("$md");
+
+  const changeTheme = () => {
+    toggleColorMode();
+    console.log(theme().colors.text);
+  };
+
   return (
-    <div>
-      <Tag
-        onClick={() => setRadius(radius() === "$none" ? "$lg" : "$none")}
-        borderRadius={radius()}
-        size="lg"
-        variant="solid"
-        colorScheme="primary"
-        rightSection={<TagCloseButton aria-label="Close" />}
-      >
-        Tag
-      </Tag>
-    </div>
+    <Box color="$text" onClick={changeTheme}>
+      This is the Box
+    </Box>
   );
 }
 
 render(
   () => (
-    <HopeProvider>
+    <HopeProvider theme={customTheme}>
       <App />
     </HopeProvider>
   ),
