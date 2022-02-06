@@ -2,7 +2,7 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 
-export const baseTextStyles = css({
+export const textStyles = css({
   variants: {
     size: {
       xs: {
@@ -61,4 +61,4 @@ export const baseTextStyles = css({
   },
 });
 
-export type BaseTextVariants = VariantProps<typeof baseTextStyles>;
+export type TextVariants = VariantProps<typeof textStyles>;

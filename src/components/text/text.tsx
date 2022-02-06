@@ -5,29 +5,9 @@ import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { baseTextStyles, BaseTextVariants } from "./text.styles";
+import { textStyles, TextVariants } from "./text.styles";
 
-export type BaseTextProps<C extends ElementType> = HopeComponentProps<C, BaseTextVariants>;
-
-/**
- * [Internal] Foundation of <Text /> and <Heading /> components.
- */
-export function BaseText<C extends ElementType = "p">(props: BaseTextProps<C>) {
-  const defaultProps: BaseTextProps<"p"> = {
-    as: "p",
-  };
-
-  const propsWithDefault: BaseTextProps<"p"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["size"]);
-
-  const classes = () => classNames(local.class, baseTextStyles(variantProps));
-
-  return <Box class={classes()} {...others} />;
-}
-
-/* -------------------------------------------------------------------------------------------------
- * Text
- * -----------------------------------------------------------------------------------------------*/
+export type TextProps<C extends ElementType> = HopeComponentProps<C, TextVariants>;
 
 const hopeTextClass = "hope-text";
 
@@ -35,14 +15,19 @@ const hopeTextClass = "hope-text";
  * Text component is the used to render text and paragraphs within an interface.
  * It renders a <p> tag by default.
  */
-export function Text<C extends ElementType = "p">(props: BaseTextProps<C>) {
+export function Text<C extends ElementType = "p">(props: TextProps<C>) {
   const baseStyle = useTheme().components.Text?.baseStyle;
 
-  const [local, others] = splitProps(props, ["class"]);
+  const defaultProps: TextProps<"p"> = {
+    as: "p",
+  };
 
-  const classes = () => classNames(local.class, hopeTextClass);
+  const propsWithDefault: TextProps<"p"> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "size"]);
 
-  return <BaseText class={classes()} __baseStyle={baseStyle} {...others} />;
+  const classes = () => classNames(local.class, hopeTextClass, textStyles({ size: local.size }));
+
+  return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
 }
 
 Text.toString = () => createCssSelector(hopeTextClass);
