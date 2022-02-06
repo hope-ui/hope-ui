@@ -3,13 +3,14 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { tagCloseButtonStyles } from "./tag.styles";
-import { TagCloseButton } from "./tag-close-button";
-import { TagProvider } from "./tag-provider";
+import { tagCloseButtonStyles } from "../tag.styles";
+import { TagCloseButton } from "../tag-close-button";
+import { TagProvider } from "../tag-provider";
 
 function renderWithTagContextProvider(callback: () => JSX.Element) {
   return renderWithHopeProvider(() => <TagProvider borderRadius="$md">{callback}</TagProvider>);
 }
+
 describe("TagCloseButton", () => {
   afterEach(cleanup);
 

@@ -25,7 +25,7 @@ export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const propsWithDefault: IconProps<"svg"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["as", "class"]);
 
-  const classes = () => classNames(local.class, alertIconStyles());
+  const classes = () => classNames(local.class, hopeAlertIconClass, alertIconStyles());
 
   const icon = () => {
     if (local.as) {

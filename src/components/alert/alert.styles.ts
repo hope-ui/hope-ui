@@ -19,9 +19,6 @@ export const alertIconStyles = css({
 
 export const alertTitleStyles = css(textStyles, {
   fontWeight: "$bold",
-  defaultVariants: {
-    size: "base",
-  },
 });
 
 export type AlertTitleVariants = VariantProps<typeof alertTitleStyles>;
@@ -31,10 +28,7 @@ export type AlertTitleVariants = VariantProps<typeof alertTitleStyles>;
  * -----------------------------------------------------------------------------------------------*/
 
 export const alertDescriptionStyles = css(textStyles, {
-  display: "inline",
-  defaultVariants: {
-    size: "base",
-  },
+  display: "inline-block",
 });
 
 export type AlertDescriptionVariants = VariantProps<typeof alertDescriptionStyles>;

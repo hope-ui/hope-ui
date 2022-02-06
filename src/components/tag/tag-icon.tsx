@@ -11,7 +11,7 @@ const hopeTagLeftIconClass = "hope-tag-left-icon";
 export function TagLeftIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, tagLeftIconStyles());
+  const classes = () => classNames(local.class, hopeTagLeftIconClass, tagLeftIconStyles());
 
   return <Icon class={classes()} {...others} />;
 }
@@ -23,7 +23,7 @@ const hopeTagRightIconClass = "hope-tag-right-icon";
 export function TagRightIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, tagRightIconStyles());
+  const classes = () => classNames(local.class, hopeTagRightIconClass, tagRightIconStyles());
 
   return <Icon class={classes()} {...others} />;
 }

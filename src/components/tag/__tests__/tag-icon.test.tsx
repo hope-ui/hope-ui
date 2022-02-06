@@ -2,9 +2,9 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { IconUser } from "../icons/IconUser";
-import { tagLeftIconStyles, tagRightIconStyles } from "./tag.styles";
-import { TagLeftIcon, TagRightIcon } from "./tag-icon";
+import { IconUser } from "../../icons/IconUser";
+import { tagLeftIconStyles, tagRightIconStyles } from "../tag.styles";
+import { TagLeftIcon, TagRightIcon } from "../tag-icon";
 
 describe("TagLeftIcon", () => {
   afterEach(cleanup);

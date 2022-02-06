@@ -2,8 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { TagLabel } from "./tag-label";
-import { tagLabelStyles } from "./tag.styles";
+import { tagLabelStyles } from "../tag.styles";
+import { TagLabel } from "../tag-label";
 
 describe("TagLabel", () => {
   afterEach(cleanup);

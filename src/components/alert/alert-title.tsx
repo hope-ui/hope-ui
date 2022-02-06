@@ -6,11 +6,11 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { alertTitleStyles, AlertTitleVariants } from "./alert.styles";
 
-export type AlertTitle<C extends ElementType> = HopeComponentProps<C, AlertTitleVariants>;
+export type AlertTitleProps<C extends ElementType> = HopeComponentProps<C, AlertTitleVariants>;
 
 const hopeAlertTitleClass = "hope-alert-title";
 
-export function AlertTitle<C extends ElementType = "div">(props: AlertTitle<C>) {
+export function AlertTitle<C extends ElementType = "div">(props: AlertTitleProps<C>) {
   const [local, others] = splitProps(props, ["class", "size"]);
 
   const classes = () =>
