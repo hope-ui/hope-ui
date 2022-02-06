@@ -17,6 +17,9 @@ import { sizePropNames, SizeProps } from "./props/size";
 import { typographyPropNames, TypographyProps } from "./props/typography";
 import { KeysOf, ResponsiveProps, SystemStyleObject } from "./types";
 
+/**
+ * All styled system props.
+ */
 export type StyleProps = ResponsiveProps<
   BorderProps &
     ColorProps &

@@ -2,10 +2,18 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { HopeProvider } from ".";
+import { FormControl, FormHelperText, FormLabel, HopeProvider, Input } from ".";
 
 export function App() {
-  return <div>Hope UI</div>;
+  return (
+    <div>
+      <FormControl>
+        <FormLabel>Email address</FormLabel>
+        <Input type="email" />
+        <FormHelperText>We'll never share your email.</FormHelperText>
+      </FormControl>
+    </div>
+  );
 }
 
 render(

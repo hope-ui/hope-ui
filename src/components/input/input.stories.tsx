@@ -16,7 +16,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["outline", "filled", "unstyled"],
+      options: ["outline", "filled", "flushed", "unstyled"],
     },
     size: {
       control: { type: "select" },
@@ -41,4 +41,4 @@ export default {
   },
 };
 
-export const Default = (args: any) => <Input {...args} />;
+export const Default = (args: any) => <Input {...args} aria-invalid={args.invalid} />;

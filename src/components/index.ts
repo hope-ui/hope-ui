@@ -5,6 +5,7 @@ export * from "./button";
 export * from "./center";
 export * from "./container";
 export * from "./flex";
+export * from "./form-control";
 export * from "./grid";
 export * from "./heading";
 export * from "./icon";
