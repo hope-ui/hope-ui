@@ -64,8 +64,9 @@ export const resetStyles = globalCss({
   },
 
   /* Remove built-in form typography styles */
-  "input, button, textarea, select": {
-    font: "inherit",
+  "button, input, textarea, select, optgroup": {
+    fontFamily: "inherit",
+    fontSize: "100%",
   },
 
   /* Buttons have a default outline */

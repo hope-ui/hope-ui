@@ -2,7 +2,7 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Alert, Anchor, HopeProvider, HStack, IconExternalLink, Text } from ".";
+import { HopeProvider } from ".";
 
 export function App() {
   return <div>Hope UI</div>;

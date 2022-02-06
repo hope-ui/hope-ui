@@ -3,6 +3,7 @@ import { Accessor } from "solid-js";
 import { ThemeableAlertOptions } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
+import { ThemeableInputOptions } from "@/components/input/input";
 import { ThemeableTagOptions } from "@/components/tag/tag";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
@@ -46,6 +47,7 @@ export interface ComponentsStyles {
   Alert?: ComponentStyle<ThemeableAlertOptions>;
   Button?: ComponentStyle<ThemeableButtonOptions>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
+  Input?: ComponentStyle<ThemeableInputOptions>;
   Heading?: ComponentStyle<void>;
   Text?: ComponentStyle<void>;
   Tag?: ComponentStyle<ThemeableTagOptions>;

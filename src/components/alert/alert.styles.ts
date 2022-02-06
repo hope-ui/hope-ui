@@ -49,7 +49,7 @@ export const alertStyles = css({
   py: "$3",
 
   fontSize: "$base",
-  lineHeight: "$6",
+  lineHeight: "$base",
 
   variants: {
     variant: {
