@@ -1,7 +1,7 @@
 import { createIcon } from "../icon/create-icon";
 
 // heroicons-solid-x
-export const IconCross = createIcon({
+export const IconClose = createIcon({
   viewBox: "0 0 20 20",
   path: () => (
     <g fill="none">

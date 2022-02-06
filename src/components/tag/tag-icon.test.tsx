@@ -27,8 +27,17 @@ describe("TagLeftIcon", () => {
     expect(tagLeftIcon).toBeInstanceOf(SVGElement);
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconUser} />);
+    const tagLeftIcon = screen.getByTestId("tag-left-icon");
+
+    // assert
+    expect(tagLeftIcon).toHaveClass("hope-tag-left-icon");
+  });
+
   it("should return semantic hope class of <Icon/> as css selector when calling toString()", () => {
-    expect(TagLeftIcon.toString()).toBe(".hope-icon");
+    expect(TagLeftIcon.toString()).toBe(".hope-tag-left-icon");
   });
 
   it("should have class from class prop", () => {
@@ -108,8 +117,17 @@ describe("TagRightIcon", () => {
     expect(tagRightIcon).toBeInstanceOf(SVGElement);
   });
 
+  it("should have semantic hope class", () => {
+    // act
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconUser} />);
+    const tagRightIcon = screen.getByTestId("tag-right-icon");
+
+    // assert
+    expect(tagRightIcon).toHaveClass("hope-tag-right-icon");
+  });
+
   it("should return semantic hope class of <Icon/> as css selector when calling toString()", () => {
-    expect(TagRightIcon.toString()).toBe(".hope-icon");
+    expect(TagRightIcon.toString()).toBe(".hope-tag-right-icon");
   });
 
   it("should have class from class prop", () => {

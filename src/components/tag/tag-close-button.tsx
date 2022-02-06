@@ -1,12 +1,12 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { IconCross } from "@/components/icons/IconCross";
+import { IconClose } from "@/components/icons/IconClose";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { tagCloseButtonIconStyles, tagCloseButtonStyles } from "./tag.styles";
-import { useTag } from "./tag-provider";
+import { useTagContext } from "./tag-provider";
 
 export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
   C,
@@ -19,7 +19,7 @@ const hopeTagCloseButtonClass = "hope-tag-close-button";
  * TagCloseButton is used to close "remove" the tag
  */
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
-  const tagContext = useTag();
+  const tagContext = useTagContext();
 
   const defaultProps: TagCloseButtonProps<"button"> = {
     as: "button",
@@ -37,7 +37,7 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   return (
     <Box class={classes()} borderRadius={borderRadius()} {...others}>
-      <IconCross class={tagCloseButtonIconStyles()} />
+      <IconClose class={tagCloseButtonIconStyles()} />
     </Box>
   );
 }

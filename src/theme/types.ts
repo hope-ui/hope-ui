@@ -1,5 +1,6 @@
 import { Accessor } from "solid-js";
 
+import { ThemeableAlertOptions } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
 import { ThemeableTagOptions } from "@/components/tag/tag";
@@ -42,6 +43,7 @@ export interface ComponentStyle<Props> {
 }
 
 export interface ComponentsStyles {
+  Alert?: ComponentStyle<ThemeableAlertOptions>;
   Button?: ComponentStyle<ThemeableButtonOptions>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Heading?: ComponentStyle<void>;

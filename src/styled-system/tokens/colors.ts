@@ -169,35 +169,35 @@ const infoAlpha = {
   infoAlpha12: "#002149fa",
 };
 
-// Radix - Yellow
+// Radix - Amber
 const warning = {
-  warning1: "#fdfdf9",
-  warning2: "#fffce8",
-  warning3: "#fffbd1",
-  warning4: "#fff8bb",
-  warning5: "#fef2a4",
-  warning6: "#f9e68c",
-  warning7: "#efd36c",
-  warning8: "#ebbc00",
-  warning9: "#f5d90a",
-  warning10: "#f7ce00",
-  warning11: "#946800",
-  warning12: "#35290f",
+  warning1: "#fefdfb",
+  warning2: "#fff9ed",
+  warning3: "#fff4d5",
+  warning4: "#ffecbc",
+  warning5: "#ffe3a2",
+  warning6: "#ffd386",
+  warning7: "#f3ba63",
+  warning8: "#ee9d2b",
+  warning9: "#ffb224",
+  warning10: "#ffa01c",
+  warning11: "#ad5700",
+  warning12: "#4e2009",
 };
 
 const warningAlpha = {
-  warningAlpha1: "#abab0506",
-  warningAlpha2: "#ffdd0217",
-  warningAlpha3: "#ffea012e",
-  warningAlpha4: "#ffe60144",
-  warningAlpha5: "#fcdb005b",
-  warningAlpha6: "#f2c90073",
-  warningAlpha7: "#e3b20093",
-  warningAlpha8: "#ebbc00fa",
-  warningAlpha9: "#f5d800f5",
-  warningAlpha10: "#f7ce00fa",
-  warningAlpha11: "#926600fa",
-  warningAlpha12: "#291c00f0",
+  warningAlpha1: "#c0820504",
+  warningAlpha2: "#ffab0212",
+  warningAlpha3: "#ffbb012a",
+  warningAlpha4: "#ffb70043",
+  warningAlpha5: "#ffb3005d",
+  warningAlpha6: "#ffa20179",
+  warningAlpha7: "#ec8d009c",
+  warningAlpha8: "#ea8900d4",
+  warningAlpha9: "#ffa600db",
+  warningAlpha10: "#ff9500e3",
+  warningAlpha11: "#ab5300fa",
+  warningAlpha12: "#481800f6",
 };
 
 // Radix - Red
@@ -385,35 +385,35 @@ const infoDarkAlpha = {
   infoAlpha12: "#effbfffa",
 };
 
-// Radix - Yellow dark
+// Radix - Amber dark
 const warningDark = {
-  warning1: "#1c1500",
-  warning2: "#221a00",
-  warning3: "#2c2100",
-  warning4: "#352800",
-  warning5: "#3e3000",
-  warning6: "#493c00",
-  warning7: "#594a05",
-  warning8: "#705e00",
-  warning9: "#f5d90a",
-  warning10: "#ffef5c",
-  warning11: "#f0c000",
-  warning12: "#fffad1",
+  warning1: "#1f1300",
+  warning2: "#271700",
+  warning3: "#341c00",
+  warning4: "#3f2200",
+  warning5: "#4a2900",
+  warning6: "#573300",
+  warning7: "#693f05",
+  warning8: "#824e00",
+  warning9: "#ffb224",
+  warning10: "#ffcb47",
+  warning11: "#f1a10d",
+  warning12: "#fef3dd",
 };
 
 const warningDarkAlpha = {
   warningAlpha1: "#00000000",
-  warningAlpha2: "#facd0007",
-  warningAlpha3: "#fdbe0012",
-  warningAlpha4: "#fdc2001c",
-  warningAlpha5: "#fec70026",
-  warningAlpha6: "#fed80033",
-  warningAlpha7: "#ffdb1345",
-  warningAlpha8: "#fed8005f",
-  warningAlpha9: "#ffe20af4",
-  warningAlpha10: "#fff45efa",
-  warningAlpha11: "#ffcc00ee",
-  warningAlpha12: "#ffffd5fa",
+  warningAlpha2: "#fd830009",
+  warningAlpha3: "#fe730018",
+  warningAlpha4: "#ff7b0024",
+  warningAlpha5: "#ff840031",
+  warningAlpha6: "#ff950040",
+  warningAlpha7: "#ff970f54",
+  warningAlpha8: "#ff990071",
+  warningAlpha9: "#ffb625fa",
+  warningAlpha10: "#ffce48fa",
+  warningAlpha11: "#ffab0eef",
+  warningAlpha12: "#fff8e1fa",
 };
 
 // Radix - Red dark

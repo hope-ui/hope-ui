@@ -1,7 +1,7 @@
 import { createIcon } from "../icon/create-icon";
 
 // heroicons-solid-x-circle
-export const IconCrossCircle = createIcon({
+export const IconCloseCircle = createIcon({
   viewBox: "0 0 20 20",
   path: () => (
     <g fill="none">

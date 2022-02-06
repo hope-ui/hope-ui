@@ -21,11 +21,11 @@ export function TagProvider(props: TagProviderProps) {
   return <TagContext.Provider value={context}>{props.children}</TagContext.Provider>;
 }
 
-export function useTag() {
+export function useTagContext() {
   const context = useContext(TagContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useTag must be used within a TagProvider");
+    throw new Error("[Hope UI]: useTagContext must be used within a Tag component");
   }
 
   return context;

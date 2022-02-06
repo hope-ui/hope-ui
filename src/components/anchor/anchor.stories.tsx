@@ -1,9 +1,7 @@
-import { action } from "@storybook/addon-actions";
-
 import { HopeWrapper } from "@/utils/storybook";
 
+import { Flex, IconExternalLink, Text } from "..";
 import { Anchor } from "./anchor";
-import { Flex, IconExternalLink, Text, VStack } from "..";
 
 export default {
   title: "Navigation/Anchor",
