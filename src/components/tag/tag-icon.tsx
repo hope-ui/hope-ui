@@ -1,8 +1,8 @@
 import { splitProps } from "solid-js";
 
-import { classNames } from "@/utils/css";
+import { classNames, createCssSelector } from "@/utils/css";
 
-import { Icon, IconProps } from "../icon/icon";
+import { hopeIconClass, Icon, IconProps } from "../icon/icon";
 import { ElementType } from "../types";
 import { tagLeftIconStyles, tagRightIconStyles } from "./tag.styles";
 
@@ -14,6 +14,8 @@ export function TagRightIcon<C extends ElementType = "svg">(props: IconProps<C>)
   return <Icon class={classes()} {...others} />;
 }
 
+TagRightIcon.toString = () => createCssSelector(hopeIconClass);
+
 export function TagLeftIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const [local, others] = splitProps(props, ["class"]);
 
@@ -21,3 +23,5 @@ export function TagLeftIcon<C extends ElementType = "svg">(props: IconProps<C>) 
 
   return <Icon class={classes()} {...others} />;
 }
+
+TagLeftIcon.toString = () => createCssSelector(hopeIconClass);

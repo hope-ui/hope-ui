@@ -2,8 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { Tag, TagOptions } from "./tag";
-import { tagStyles } from "./tag.styles";
+import { Tag } from "./tag";
+import { tagStyles, TagVariants } from "./tag.styles";
 
 describe("Tag", () => {
   afterEach(cleanup);
@@ -115,7 +115,7 @@ describe("Tag", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: TagOptions = {
+    const variantProps: TagVariants = {
       variant: "subtle",
       colorScheme: "success",
       size: "lg",

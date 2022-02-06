@@ -21,7 +21,7 @@ const fallbackIcon = {
   ),
 };
 
-const hopeIconClass = "hope-icon";
+export const hopeIconClass = "hope-icon";
 
 export type IconProps<C extends ElementType> = HopeComponentProps<C>;
 

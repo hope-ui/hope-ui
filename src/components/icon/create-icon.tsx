@@ -1,4 +1,6 @@
+import { createCssSelector } from "@/utils/css";
 import { JSX } from "solid-js";
+import { hopeIconClass } from ".";
 
 import { ElementType } from "../types";
 import { Icon, IconProps } from "./icon";
@@ -34,6 +36,8 @@ export function createIcon(options: CreateIconOptions) {
       </Icon>
     );
   };
+
+  IconComponent.toString = () => createCssSelector(hopeIconClass);
 
   return IconComponent;
 }

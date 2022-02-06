@@ -20,7 +20,6 @@ export const tagLeftIconStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const tagLabelStyles = css({
-  lineHeight: "$none",
   noOfLines: 1,
 });
 
@@ -82,8 +81,9 @@ interface TagSizeVariantConfig {
   height: string;
   paddingX: string;
   fontSize: string;
+  lineHeight: string;
   closeButtonSize: string;
-  spacing: string;
+  closeButtonIconSize: string;
 }
 
 function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
@@ -92,14 +92,14 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
     py: 0,
     px: config.paddingX,
     fontSize: config.fontSize,
+    lineHeight: config.lineHeight,
 
-    // "& > * + *": {
-    //   marginLeft: config.spacing,
-    // },
-
-    [`& .${tagCloseButtonStyles}, 
-      & .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
+    [`& .${tagCloseButtonStyles}`]: {
       boxSize: config.closeButtonSize,
+    },
+
+    [`& .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
+      boxSize: config.closeButtonIconSize,
     },
   };
 }
@@ -260,22 +260,25 @@ export const tagStyles = css({
         height: "$5",
         paddingX: "$2",
         fontSize: "$xs",
+        lineHeight: "$4",
         closeButtonSize: "$4",
-        spacing: "$1",
+        closeButtonIconSize: "$4",
       }),
       md: createTagSizeVariant({
         height: "$6",
         paddingX: "$2",
         fontSize: "$sm",
+        lineHeight: "$5",
         closeButtonSize: "$5",
-        spacing: "$1",
+        closeButtonIconSize: "$4",
       }),
       lg: createTagSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$base",
-        closeButtonSize: "$5",
-        spacing: "$1_5",
+        lineHeight: "$6",
+        closeButtonSize: "$7",
+        closeButtonIconSize: "$5",
       }),
     },
     dotPosition: {

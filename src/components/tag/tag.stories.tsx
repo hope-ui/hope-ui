@@ -1,10 +1,13 @@
 import { action } from "@storybook/addon-actions";
 
-import { IconInfoCircle } from "@/components/icons/IconInfoCircle";
 import { TagCloseButton } from "@/components/tag/tag-close-button";
 import { HopeWrapper } from "@/utils/storybook";
 
+import { IconInfoCircle } from "../icons/IconInfoCircle";
+import { HStack } from "../stack/stack";
 import { Tag } from "./tag";
+import { TagLeftIcon, TagRightIcon } from "./tag-icon";
+import { TagLabel } from "./tag-label";
 
 export default {
   title: "Data display/Tag",
@@ -44,23 +47,25 @@ export default {
 
 export const Default = (args: any) => <Tag {...args} />;
 
-export const WithLeftSection = (args: any) => <Tag leftSection={<IconInfoCircle />} {...args} />;
-WithLeftSection.storyName = "With left section";
-
-export const WithRightSection = (args: any) => <Tag rightSection={<IconInfoCircle />} {...args} />;
-WithRightSection.storyName = "With right section";
-
-export const WithBothSection = (args: any) => (
-  <Tag leftSection={<IconInfoCircle />} rightSection={<IconInfoCircle />} {...args} />
+export const WithIcon = (args: any) => (
+  <HStack spacing="$4">
+    <Tag {...args}>
+      <TagLeftIcon as={IconInfoCircle} />
+      <TagLabel>Tag</TagLabel>
+    </Tag>
+    <Tag {...args}>
+      <TagLabel>Tag</TagLabel>
+      <TagRightIcon as={IconInfoCircle} />
+    </Tag>
+  </HStack>
 );
-WithBothSection.storyName = "With both section";
-WithBothSection.args = { children: "Please don't do that..." };
+WithIcon.storyName = "With icon";
 
 export const WithCloseButton = (args: any) => (
-  <Tag
-    rightSection={<TagCloseButton aria-label="Close" onClick={action("clicked close button")} />}
-    {...args}
-  />
+  <Tag {...args}>
+    <TagLabel>Tag</TagLabel>
+    <TagCloseButton onClick={action("clicked close button")} />
+  </Tag>
 );
 WithCloseButton.storyName = "With close button";
 WithCloseButton.args = { children: "Close" };
