@@ -3,7 +3,6 @@ import { Accessor, JSX } from "solid-js";
 import { FormControlOptions, useFormControlContext } from "./form-control";
 
 export interface CreateFormControlProps<T extends HTMLElement> extends FormControlOptions {
-  id?: string;
   onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
   onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
   "aria-describedby"?: string;
@@ -36,7 +35,7 @@ export function createFormControl<T extends HTMLElement>(
 ): Accessor<FormControlProps<T>> {
   const formControl = useFormControlContext();
 
-  const id = () => props.id ?? formControl?.state.fieldId;
+  const id = () => props.id ?? formControl?.state.id;
   const required = () => props.required ?? formControl?.state.required;
   const disabled = () => props.disabled ?? formControl?.state.disabled;
   const readOnly = () => props.readOnly ?? formControl?.state.readOnly;

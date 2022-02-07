@@ -1,11 +1,4 @@
-import {
-  Accessor,
-  createContext,
-  createEffect,
-  createUniqueId,
-  splitProps,
-  useContext,
-} from "solid-js";
+import { Accessor, createContext, createUniqueId, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { classNames, createCssSelector } from "@/utils/css";
@@ -15,6 +8,15 @@ import { ElementType, HopeComponentProps } from "../types";
 import { formControlStyles } from "./form-control.styles";
 
 export interface FormControlOptions {
+  /**
+   * The custom `id` to use for the form control. This is passed directly to the form element (e.g, Input).
+   * - The form element (e.g Input) gets the `id`
+   * - The form label id: `${id}-label`
+   * - The form error text id: `${id}-error-message`
+   * - The form helper text id: `${id}-helper-text`
+   */
+  id?: string;
+
   /**
    * If `true`, the form control will be required. This has 2 side effects:
    * - The `FormLabel` will show a required indicator
@@ -43,11 +45,6 @@ export interface FormControlOptions {
 }
 
 export interface FormControlState extends FormControlOptions {
-  /**
-   * The custom `id` passed to the form element (e.g, Input).
-   */
-  fieldId: string;
-
   /**
    * The custom `id` passed to the form label (e.g, FormLabel).
    */
@@ -106,41 +103,46 @@ export type FormControlProps<C extends ElementType> = HopeComponentProps<C, Form
 const hopeFormControlClass = "hope-form-control";
 
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
-  const fieldId = `field-${createUniqueId()}`;
-  const labelId = `${fieldId}-label`;
-  const helperTextId = `${fieldId}-helper-text`;
-  const errorMessageId = `${fieldId}-error-message`;
+  const defaultId = `field-${createUniqueId()}`;
 
   const [state, setState] = createStore<FormControlState>({
-    fieldId,
-    labelId,
-    helperTextId,
-    errorMessageId,
-    required: false,
-    disabled: false,
-    invalid: false,
-    readOnly: false,
+    get id() {
+      return props.id || defaultId;
+    },
+    get labelId() {
+      return `${this.id}-label`;
+    },
+    get helperTextId() {
+      return `${this.id}-helper-text`;
+    },
+    get errorMessageId() {
+      return `${this.id}-error-message`;
+    },
+    get required() {
+      return props.required;
+    },
+    get disabled() {
+      return props.disabled;
+    },
+    get invalid() {
+      return props.invalid;
+    },
+    get readOnly() {
+      return props.readOnly;
+    },
     hasHelperText: false,
     hasErrorMessage: false,
     isFocused: false,
   });
 
   const [local, others] = splitProps(props, [
-    "class",
+    "id",
     "required",
     "disabled",
     "invalid",
     "readOnly",
+    "class",
   ]);
-
-  createEffect(() => {
-    setState({
-      required: local.required,
-      disabled: local.disabled,
-      invalid: local.invalid,
-      readOnly: local.readOnly,
-    });
-  });
 
   const setHasHelperText = (value: boolean) => setState("hasHelperText", value);
 
