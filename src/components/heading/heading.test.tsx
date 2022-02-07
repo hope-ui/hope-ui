@@ -2,9 +2,7 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { BaseTextProps } from "../text";
-import { baseTextStyles } from "../text/text.styles";
-import { Heading } from "./heading";
+import { Heading, HeadingProps } from "./heading";
 import { headingStyles } from "./heading.styles";
 
 describe("Heading", () => {
@@ -114,37 +112,13 @@ describe("Heading", () => {
     expect(heading).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from baseTextStyles", () => {
-    // arrange
-    const textClass = baseTextStyles();
-
-    // act
-    renderWithHopeProvider(() => <Heading data-testid="heading">Heading</Heading>);
-    const heading = screen.getByTestId("heading");
-
-    // assert
-    expect(heading).toHaveClass(textClass.className);
-  });
-
-  it("should have stitches generated class from headingStyles", () => {
-    // arrange
-    const headingClass = headingStyles();
-
-    // act
-    renderWithHopeProvider(() => <Heading data-testid="heading">Heading</Heading>);
-    const heading = screen.getByTestId("heading");
-
-    // assert
-    expect(heading).toHaveClass(headingClass.className);
-  });
-
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const variantProps: BaseTextProps<"h2"> = {
+    const variantProps: HeadingProps<"h2"> = {
       size: "4xl",
     };
 
-    const textClass = baseTextStyles(variantProps);
+    const headingClass = headingStyles(variantProps);
 
     // act
     renderWithHopeProvider(() => (
@@ -155,6 +129,6 @@ describe("Heading", () => {
     const heading = screen.getByTestId("heading");
 
     // assert
-    expect(heading).toHaveClass(textClass.className);
+    expect(heading).toHaveClass(headingClass.className);
   });
 });

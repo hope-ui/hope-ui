@@ -25,19 +25,21 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme `neutral` color for text.
-    2. Use theme `sans` font-family.
-    3. Use theme `base` line height.
+    1. Use theme `sans` font-family.
+    2. Use theme `base` line height.
   */
   html: {
-    color: "$neutral12" /* 1 */,
-    fontFamily: "$sans" /* 2 */,
-    lineHeight: "$base" /* 3 */,
+    fontFamily: "$sans" /* 1 */,
+    lineHeight: "$base" /* 2 */,
     fontSize: "16px",
   },
 
-  /* Improve text rendering. */
+  /* 
+    1. Use theme `neutral` color for text. 
+    2. Improve text rendering. 
+  */
   body: {
+    color: "$neutral12" /* 1 */,
     fontFamily: "inherit",
     lineHeight: "inherit",
     "-webkit-font-smoothing": "antialiased",
@@ -62,8 +64,9 @@ export const resetStyles = globalCss({
   },
 
   /* Remove built-in form typography styles */
-  "input, button, textarea, select": {
-    font: "inherit",
+  "button, input, textarea, select, optgroup": {
+    fontFamily: "inherit",
+    fontSize: "100%",
   },
 
   /* Buttons have a default outline */

@@ -9,6 +9,11 @@ export type RadiiProps = Partial<{
   /**
    * The CSS `border-radius` property
    */
+  rounded: Property.BorderRadius<RadiiScaleValue> | number;
+
+  /**
+   * The CSS `border-radius` property
+   */
   borderRadius: Property.BorderRadius<RadiiScaleValue> | number;
 
   /**
@@ -56,6 +61,7 @@ export type RadiiProps = Partial<{
  * Style prop names for radii related CSS properties
  */
 export const radiiPropNames: KeysOf<RadiiProps> = {
+  rounded: true,
   borderRadius: true,
   borderTopRightRadius: true,
   borderTopLeftRadius: true,

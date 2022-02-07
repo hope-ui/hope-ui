@@ -1,0 +1,97 @@
+import { Accessor, JSX } from "solid-js";
+
+import { FormControlOptions, useFormControlContext } from "./form-control";
+
+export interface CreateFormControlProps<T extends HTMLElement> extends FormControlOptions {
+  onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
+  onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
+  "aria-describedby"?: string;
+}
+
+export interface FormControlProps<T extends HTMLElement> {
+  id?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  "aria-invalid"?: boolean;
+  "aria-required"?: boolean;
+  "aria-readonly"?: boolean;
+  "aria-describedby"?: string;
+  onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
+  onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
+}
+
+/**
+ * Hook that provides the props that should be spread on to
+ * input fields (`input`, `select`, `textarea`, etc.).
+ *
+ * It provides a convenient way to control a form fields, validation
+ * and helper text.
+ *
+ * @internal
+ */
+export function createFormControl<T extends HTMLElement>(
+  props: CreateFormControlProps<T>
+): Accessor<FormControlProps<T>> {
+  const formControl = useFormControlContext();
+
+  const id = () => props.id ?? formControl?.state.id;
+  const required = () => props.required ?? formControl?.state.required;
+  const disabled = () => props.disabled ?? formControl?.state.disabled;
+  const readOnly = () => props.readOnly ?? formControl?.state.readOnly;
+  const ariaDescribedBy = () => {
+    const labelIds: string[] = props["aria-describedby"] ? [props["aria-describedby"]] : [];
+
+    // Error message must be described first in all scenarios.
+    if (formControl?.state.hasErrorMessage && formControl?.state.invalid) {
+      labelIds.push(formControl.state.errorMessageId);
+    }
+
+    if (formControl?.state.hasHelperText) {
+      labelIds.push(formControl.state.helperTextId);
+    }
+
+    return labelIds.join(" ") || undefined;
+  };
+
+  const onFocus: Accessor<JSX.EventHandlerUnion<T, FocusEvent>> = () => event => {
+    formControl?.setIsFocused(true);
+
+    if (props.onFocus) {
+      if (typeof props.onFocus === "function") {
+        props.onFocus(event);
+      } else {
+        props.onFocus[0](undefined, event);
+      }
+    }
+
+    return event.defaultPrevented;
+  };
+
+  const onBlur: Accessor<JSX.EventHandlerUnion<T, FocusEvent>> = () => event => {
+    formControl?.setIsFocused(false);
+
+    if (props.onBlur) {
+      if (typeof props.onBlur === "function") {
+        props.onBlur(event);
+      } else {
+        props.onBlur[0](undefined, event);
+      }
+    }
+
+    return event.defaultPrevented;
+  };
+
+  return () => ({
+    id: id(),
+    required: required(),
+    disabled: disabled(),
+    readOnly: readOnly(),
+    "aria-invalid": formControl?.state.invalid ? true : undefined,
+    "aria-required": required() ? true : undefined,
+    "aria-readonly": readOnly() ? true : undefined,
+    "aria-describedby": ariaDescribedBy(),
+    onFocus: onFocus(),
+    onBlur: onBlur(),
+  });
+}

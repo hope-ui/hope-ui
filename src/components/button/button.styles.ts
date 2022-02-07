@@ -173,9 +173,8 @@ export const buttonStyles = css({
   justifyContent: "center",
   alignItems: "center",
 
-  borderRadius: "$sm",
-
   outline: "none",
+  borderRadius: "$sm",
 
   padding: "0",
 

@@ -1,6 +1,6 @@
 import { sizes } from "./tokens/sizes";
 
-export const media = {
+export const baseMedia = {
   sm: `(min-width: ${sizes.containerSm})`,
   md: `(min-width: ${sizes.containerMd})`,
   lg: `(min-width: ${sizes.containerLg})`,

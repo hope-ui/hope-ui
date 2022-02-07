@@ -2,8 +2,8 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { BaseTextProps, Text } from "./text";
-import { baseTextStyles } from "./text.styles";
+import { Text, TextProps } from "./text";
+import { textStyles } from "./text.styles";
 
 describe("Text", () => {
   afterEach(cleanup);
@@ -115,11 +115,11 @@ describe("Text", () => {
 
   it("should have stitches generated class from variants prop", () => {
     // arrange
-    const props: BaseTextProps<"p"> = {
+    const props: TextProps<"p"> = {
       size: "4xl",
     };
 
-    const textClass = baseTextStyles(props);
+    const textClass = textStyles(props);
 
     // act
     renderWithHopeProvider(() => (

@@ -1,6 +1,6 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { IconSpinner } from "@/icons/IconSpinner";
+import { IconSpinner } from "@/components/icons/IconSpinner";
 import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 

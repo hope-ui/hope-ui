@@ -37,6 +37,16 @@ export type PaddingProps = Partial<{
   pr: Property.PaddingRight<SpaceScaleValue> | number;
 
   /**
+   * The CSS `padding-inline-start`  property
+   */
+  paddingStart: Property.PaddingInlineStart<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-inline-start`  property
+   */
+  ps: Property.PaddingInlineStart<SpaceScaleValue> | number;
+
+  /**
    * The CSS `padding-bottom` property
    */
   paddingBottom: Property.PaddingBottom<SpaceScaleValue> | number;
@@ -55,6 +65,16 @@ export type PaddingProps = Partial<{
    * The CSS `padding-left`  property
    */
   pl: Property.PaddingLeft<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-inline-end`  property
+   */
+  paddingEnd: Property.PaddingInlineEnd<SpaceScaleValue> | number;
+
+  /**
+   * The CSS `padding-inline-end`  property
+   */
+  pe: Property.PaddingInlineEnd<SpaceScaleValue> | number;
 
   /**
    * The CSS `padding-inline-start` and `padding-inline-end` property
@@ -77,10 +97,14 @@ export const paddingPropNames: KeysOf<PaddingProps> = {
   pt: true,
   paddingRight: true,
   pr: true,
+  paddingStart: true,
+  ps: true,
   paddingBottom: true,
   pb: true,
   paddingLeft: true,
   pl: true,
+  paddingEnd: true,
+  pe: true,
   px: true,
   py: true,
 };

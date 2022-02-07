@@ -2,6 +2,13 @@ import type { PropertyValue } from "@stitches/core";
 
 export const radii = {
   /**
+   * The CSS `border-radius` property
+   */
+  rounded: (value: PropertyValue<"borderRadius">) => ({
+    borderRadius: value,
+  }),
+
+  /**
    * The CSS `border-top-left-radius` and `border-top-right-radius` property
    */
   borderTopRadius: (value: PropertyValue<"borderTopLeftRadius">) => ({

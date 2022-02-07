@@ -1,7 +1,10 @@
 import { Accessor } from "solid-js";
 
+import { ThemeableAlertOptions } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
+import { ThemeableInputOptions } from "@/components/input/input";
+import { ThemeableTagOptions } from "@/components/tag/tag";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
@@ -41,25 +44,27 @@ export interface ComponentStyle<Props> {
 }
 
 export interface ComponentsStyles {
+  Alert?: ComponentStyle<ThemeableAlertOptions>;
   Button?: ComponentStyle<ThemeableButtonOptions>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
+  Input?: ComponentStyle<ThemeableInputOptions>;
   Heading?: ComponentStyle<void>;
   Text?: ComponentStyle<void>;
-  // Tag?: ComponentStyle<ThemeableTagOptions>;
+  Tag?: ComponentStyle<ThemeableTagOptions>;
 }
 
 /**
  * Hope UI theme override configuration.
  */
-export interface HopeThemeConfig {
+export interface HopeThemeConfig<T extends ThemeConfig> {
   initialColorMode?: ColorMode;
-  lightTheme?: ThemeConfig;
-  darkTheme?: ThemeConfig;
+  lightTheme?: T;
+  darkTheme?: T;
   components?: ComponentsStyles;
 }
 
-export interface HopeContextValue {
-  theme: Accessor<HopeTheme>;
+export interface HopeContextValue<T extends HopeTheme = HopeTheme> {
+  theme: Accessor<T>;
   components: ComponentsStyles;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;

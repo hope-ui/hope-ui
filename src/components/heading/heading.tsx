@@ -3,9 +3,11 @@ import { mergeProps, splitProps } from "solid-js";
 import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 
-import { BaseText, BaseTextProps } from "../text/text";
-import { ElementType } from "../types";
-import { headingStyles } from "./heading.styles";
+import { Box } from "../box/box";
+import { ElementType, HopeComponentProps } from "../types";
+import { headingStyles, HeadingVariants } from "./heading.styles";
+
+export type HeadingProps<C extends ElementType> = HopeComponentProps<C, HeadingVariants>;
 
 const hopeHeadingClass = "hope-heading";
 
@@ -13,19 +15,20 @@ const hopeHeadingClass = "hope-heading";
  * Headings are used for rendering headlines.
  * It renders an <h2> tag by default.
  */
-export function Heading<C extends ElementType = "h2">(props: BaseTextProps<C>) {
+export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const baseStyle = useTheme().components.Heading?.baseStyle;
 
-  const defaultProps: BaseTextProps<"h2"> = {
+  const defaultProps: HeadingProps<"h2"> = {
     as: "h2",
   };
 
-  const propsWithDefault: BaseTextProps<"h2"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class"]);
+  const propsWithDefault: HeadingProps<"h2"> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "size"]);
 
-  const classes = () => classNames(local.class, hopeHeadingClass, headingStyles());
+  const classes = () =>
+    classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
-  return <BaseText class={classes()} __baseStyle={baseStyle} {...others} />;
+  return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
 }
 
 Heading.toString = () => createCssSelector(hopeHeadingClass);

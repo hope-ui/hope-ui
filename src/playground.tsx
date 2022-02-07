@@ -1,65 +1,75 @@
 import "./playground.css";
 
+import { createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
-  Box,
-  HopeComponentProps,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
   HopeProvider,
   HStack,
-  Stack,
-  Text,
-  useColorMode,
-  useColorModeValue,
+  IconExclamationCircle,
+  Input,
 } from ".";
 
-function BannerLink(props: HopeComponentProps<"a">) {
-  return (
-    <Box
-      {...props}
-      as="a"
-      href="#"
-      px="$4"
-      py="$1_5"
-      textAlign="center"
-      textDecoration="none"
-      borderWidth="1px"
-      borderColor="whiteAlpha4"
-      fontWeight="$medium"
-      borderRadius="$md"
-      _hover={{ bg: "$whiteAlpha5" }}
-    />
-  );
-}
-
 export function App() {
-  const { toggleColorMode } = useColorMode();
+  const [required, setRequired] = createSignal(false);
+  const [disabled, setDisabled] = createSignal(false);
+  const [invalid, setInvalid] = createSignal(false);
+  const [readOnly, setReadOnly] = createSignal(false);
+
+  const focusHandler = (e: FocusEvent) => {
+    console.log("focused", e);
+  };
+
+  const blurHandler = (e: FocusEvent) => {
+    console.log("blured", e);
+  };
+
   return (
-    <Box as="section" pt="$8" pb="$12">
-      <Stack
-        direction={{ "@initial": "column", "@sm": "row" }}
-        justifyContent="center"
-        alignItems="center"
-        py="$3"
-        px={{ "@initial": "$3", "@md": "$6", "@lg": "$8" }}
-        color="white"
-        bg={useColorModeValue("$primary3", "$info3")()}
+    <div>
+      <HStack spacing="$4">
+        <Button onClick={() => setRequired(prev => !prev)}>
+          required : {required().toString()}
+        </Button>
+        <Button onClick={() => setDisabled(prev => !prev)}>
+          disabled : {disabled().toString()}
+        </Button>
+        <Button onClick={() => setInvalid(prev => !prev)}>invalid : {invalid().toString()}</Button>
+        <Button onClick={() => setReadOnly(prev => !prev)}>
+          readOnly : {readOnly().toString()}
+        </Button>
+      </HStack>
+      <FormControl
+        maxW="max-content"
+        required={required()}
+        invalid={invalid()}
+        disabled={disabled()}
+        readOnly={readOnly()}
       >
-        <HStack spacing="$3">
-          <Text fontWeight="$medium" mr="$2">
-            Confirm your email. Check your email. We&apos;ve send a message to{" "}
-            <b>sample@gmail.com</b>
-          </Text>
-        </HStack>
-        <BannerLink
-          onClick={toggleColorMode}
-          w={{ "@initial": "full", "@sm": "auto" }}
-          flexShrink={0}
+        <FormLabel
+          for="email"
+          _focus={{
+            color: "tomato",
+          }}
         >
-          Resend email
-        </BannerLink>
-      </Stack>
-    </Box>
+          Email address
+        </FormLabel>
+        <Input type="email" placeholder="Placeholder" onFocus={focusHandler} onBlur={blurHandler} />
+        <Show
+          when={invalid()}
+          fallback={<FormHelperText>We'll never share your email.</FormHelperText>}
+        >
+          <HStack as={FormErrorMessage} color="$danger9" spacing="$1">
+            <IconExclamationCircle />
+            <span>An error occured</span>
+          </HStack>
+        </Show>
+      </FormControl>
+    </div>
   );
 }
 

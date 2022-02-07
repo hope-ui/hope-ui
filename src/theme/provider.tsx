@@ -1,6 +1,7 @@
 /* eslint-disable solid/reactivity */
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
+import { ThemeConfig } from ".";
 import { resetStyles } from "./reset";
 import { ColorMode, HopeContextValue, HopeThemeConfig } from "./types";
 import {
@@ -12,14 +13,14 @@ import {
 
 export const HopeContext = createContext<HopeContextValue>();
 
-export type HopeProviderProps = PropsWithChildren<{
-  theme?: HopeThemeConfig;
+export type HopeProviderProps<T extends ThemeConfig> = PropsWithChildren<{
+  theme?: HopeThemeConfig<T>;
 }>;
 
-export function HopeProvider(props: HopeProviderProps) {
+export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>) {
   // Create themes
-  const lightTheme = extendBaseTheme(props.theme?.lightTheme ?? {}, false);
-  const darkTheme = extendBaseTheme(props.theme?.darkTheme ?? {}, true);
+  const lightTheme = extendBaseTheme("light", props.theme?.lightTheme ?? {});
+  const darkTheme = extendBaseTheme("dark", props.theme?.darkTheme ?? {});
 
   // Get default context values
   const defaultColorMode = getDefaultColorMode(props.theme?.initialColorMode ?? "light");
@@ -38,7 +39,7 @@ export function HopeProvider(props: HopeProviderProps) {
     setColorMode(colorMode() === "light" ? "dark" : "light");
   };
 
-  const context: HopeContextValue = {
+  const context: HopeContextValue<typeof lightTheme> = {
     theme,
     components: props.theme?.components ?? {},
     colorMode,

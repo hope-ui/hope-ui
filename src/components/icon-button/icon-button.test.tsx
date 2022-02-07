@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { IconUser } from "@/icons/IconUser";
+import { IconUser } from "@/components/icons/IconUser";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { buttonStyles, iconButtonStyles } from "../button/button.styles";
@@ -87,7 +87,8 @@ describe("IconButton", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
+      // eslint-disable-next-line solid/no-react-specific-props
+      <IconButton className={stubClass} aria-label="User" icon={<IconUser />} />
     ));
     const button = screen.getByRole("button");
 
