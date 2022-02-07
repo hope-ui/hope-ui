@@ -29,6 +29,14 @@ export function App() {
     console.log("blured", e);
   };
 
+  let helperText: any;
+  let errorMessage: any;
+
+  const logRefs = () => {
+    console.log("helper-text", helperText);
+    console.log("error-message", errorMessage);
+  };
+
   return (
     <div>
       <HStack spacing="$4">
@@ -42,6 +50,7 @@ export function App() {
         <Button onClick={() => setReadOnly(prev => !prev)}>
           readOnly : {readOnly().toString()}
         </Button>
+        <Button onClick={logRefs}>Log refs</Button>
       </HStack>
       <FormControl
         maxW="max-content"
@@ -62,9 +71,9 @@ export function App() {
         <Input type="email" placeholder="Placeholder" onFocus={focusHandler} onBlur={blurHandler} />
         <Show
           when={invalid()}
-          fallback={<FormHelperText>We'll never share your email.</FormHelperText>}
+          fallback={<FormHelperText ref={helperText}>We'll never share your email.</FormHelperText>}
         >
-          <HStack as={FormErrorMessage} color="$danger9" spacing="$1">
+          <HStack ref={errorMessage} as={FormErrorMessage} color="$danger9" spacing="$1">
             <IconExclamationCircle />
             <span>An error occured</span>
           </HStack>
