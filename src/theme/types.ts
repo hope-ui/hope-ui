@@ -2,6 +2,7 @@ import { Accessor } from "solid-js";
 
 import { ThemeableAlertOptions } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
+import { ThemeableFormLabelOptions } from "@/components/form-control/form-label";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
 import { ThemeableInputOptions } from "@/components/input/input";
 import { ThemeableTagOptions } from "@/components/tag/tag";
@@ -46,9 +47,10 @@ export interface ComponentStyle<Props> {
 export interface ComponentsStyles {
   Alert?: ComponentStyle<ThemeableAlertOptions>;
   Button?: ComponentStyle<ThemeableButtonOptions>;
+  FormLabel?: ComponentStyle<ThemeableFormLabelOptions>;
+  Heading?: ComponentStyle<void>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Input?: ComponentStyle<ThemeableInputOptions>;
-  Heading?: ComponentStyle<void>;
   Text?: ComponentStyle<void>;
   Tag?: ComponentStyle<ThemeableTagOptions>;
 }

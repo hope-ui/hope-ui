@@ -80,7 +80,7 @@ export const inputStyles = css(baseInputResetStyles, {
           cursor: "not-allowed",
         },
 
-        "&[aria-invalid=true], &[data-invalid]": {
+        _invalid: {
           borderColor: "$danger7",
         },
 
@@ -112,7 +112,7 @@ export const inputStyles = css(baseInputResetStyles, {
           cursor: "not-allowed",
         },
 
-        "&[aria-invalid=true], &[data-invalid]": {
+        _invalid: {
           borderColor: "$danger7",
         },
 
@@ -145,7 +145,7 @@ export const inputStyles = css(baseInputResetStyles, {
           cursor: "not-allowed",
         },
 
-        "&[aria-invalid=true], &[data-invalid]": {
+        _invalid: {
           borderColor: "$danger8",
         },
 
@@ -189,8 +189,17 @@ export const inputStyles = css(baseInputResetStyles, {
         paddingX: "$4",
       }),
     },
+    withLeftElement: {
+      true: {},
+    },
+    withRightElement: {
+      true: {},
+    },
   },
   compoundVariants: [
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - unstyled + size
+     * -----------------------------------------------------------------------------------------------*/
     {
       variant: "unstyled",
       size: "xs",
@@ -223,7 +232,151 @@ export const inputStyles = css(baseInputResetStyles, {
         height: "auto",
       },
     },
+
+    /* -------------------------------------------------------------------------------------------------
+     * With left element + size
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      withLeftElement: true,
+      size: "xs",
+      css: {
+        paddingInlineStart: "$6",
+      },
+    },
+    {
+      withLeftElement: true,
+      size: "sm",
+      css: {
+        paddingInlineStart: "$8",
+      },
+    },
+    {
+      withLeftElement: true,
+      size: "md",
+      css: {
+        paddingInlineStart: "$10",
+      },
+    },
+    {
+      withLeftElement: true,
+      size: "lg",
+      css: {
+        paddingInlineStart: "$12",
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * With right element + size
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      withRightElement: true,
+      size: "xs",
+      css: {
+        paddingInlineEnd: "$6",
+      },
+    },
+    {
+      withRightElement: true,
+      size: "sm",
+      css: {
+        paddingInlineEnd: "$8",
+      },
+    },
+    {
+      withRightElement: true,
+      size: "md",
+      css: {
+        paddingInlineEnd: "$10",
+      },
+    },
+    {
+      withRightElement: true,
+      size: "lg",
+      css: {
+        paddingInlineEnd: "$12",
+      },
+    },
   ],
 });
 
 export type InputVariants = VariantProps<typeof inputStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * InputGroup
+ * -----------------------------------------------------------------------------------------------*/
+
+export const inputGroupStyles = css({
+  position: "relative",
+  display: "flex",
+  width: "100%",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * InputAddon
+ * -----------------------------------------------------------------------------------------------*/
+
+export const inputAddonStyles = css({});
+
+/* -------------------------------------------------------------------------------------------------
+ * InputElement
+ * -----------------------------------------------------------------------------------------------*/
+
+interface InputElementSizeVariantConfig {
+  fontSize: string;
+  lineHeight: string;
+  size: string;
+}
+
+function creatInputElementSizeVariant(config: InputElementSizeVariantConfig): SystemStyleObject {
+  return {
+    boxSize: config.size,
+    fontSize: config.fontSize,
+    lineHeight: config.lineHeight,
+  };
+}
+
+export const inputElementStyles = css({
+  position: "absolute",
+  top: "0",
+
+  zIndex: 2,
+
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+
+  variants: {
+    placement: {
+      left: {
+        insetInlineStart: "0",
+      },
+      right: {
+        insetInlineEnd: "0",
+      },
+    },
+    size: {
+      xs: creatInputElementSizeVariant({
+        fontSize: "$xs",
+        lineHeight: "$4",
+        size: "$6",
+      }),
+      sm: creatInputElementSizeVariant({
+        fontSize: "$sm",
+        lineHeight: "$5",
+        size: "$8",
+      }),
+      md: creatInputElementSizeVariant({
+        fontSize: "$base",
+        lineHeight: "$6",
+        size: "$10",
+      }),
+      lg: creatInputElementSizeVariant({
+        fontSize: "$lg",
+        lineHeight: "$7",
+        size: "$12",
+      }),
+    },
+  },
+});
+
+export type InputElementVariants = VariantProps<typeof inputElementStyles>;

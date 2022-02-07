@@ -1,6 +1,10 @@
 import { HopeWrapper } from "@/utils/storybook";
 
+import { IconCheckCircle } from "..";
+import { VStack } from "../stack";
+import { InputLeftElement, InputRightElement } from ".";
 import { Input } from "./input";
+import { InputGroup } from "./input-group";
 
 export default {
   title: "Data entry/Input",
@@ -42,3 +46,52 @@ export default {
 };
 
 export const Default = (args: any) => <Input {...args} aria-invalid={args.invalid} />;
+
+export const WithElement = (args: any) => (
+  <VStack spacing="$4">
+    <InputGroup size={args.size}>
+      <InputLeftElement>
+        <IconCheckCircle />
+      </InputLeftElement>
+      <Input
+        variant={args.variant}
+        disabled={args.disabled}
+        placeholder={args.placeholder}
+        aria-invalid={args.invalid}
+      />
+    </InputGroup>
+    <InputGroup size={args.size}>
+      <Input
+        variant={args.variant}
+        disabled={args.disabled}
+        placeholder={args.placeholder}
+        aria-invalid={args.invalid}
+      />
+      <InputRightElement>
+        <IconCheckCircle />
+      </InputRightElement>
+    </InputGroup>
+    <InputGroup size={args.size}>
+      <InputLeftElement>
+        <IconCheckCircle />
+      </InputLeftElement>
+      <Input
+        variant={args.variant}
+        disabled={args.disabled}
+        placeholder={args.placeholder}
+        aria-invalid={args.invalid}
+      />
+      <InputRightElement>
+        <IconCheckCircle />
+      </InputRightElement>
+    </InputGroup>
+  </VStack>
+);
+WithElement.storyName = "With element";
+
+export const WithAddon = (args: any) => (
+  <InputGroup>
+    <Input />
+  </InputGroup>
+);
+WithAddon.storyName = "With addon";

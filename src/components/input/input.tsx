@@ -7,25 +7,29 @@ import { Box } from "../box/box";
 import { createFormControl } from "../form-control/create-form-control";
 import { ElementType, HopeComponentProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
+import { useInputGroupContext } from "./input-group";
 
-export type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
-
-export type InputProps<C extends ElementType> = HopeComponentProps<C, InputVariants> & {
+interface InputOptions extends Omit<InputVariants, "withElement"> {
   /**
    * The native HTML `size` attribute to be passed to the `input`
    */
   htmlSize?: string | number;
-};
+}
+
+export type ThemeableInputOptions = Pick<InputOptions, "variant" | "size">;
+
+export type InputProps<C extends ElementType> = HopeComponentProps<C, InputOptions>;
 
 const hopeInputClass = "hope-input";
 
 export function Input<C extends ElementType = "input">(props: InputProps<C>) {
   const theme = useTheme().components.Input;
+  const inputGroup = useInputGroupContext();
 
   const defaultProps: InputProps<"input"> = {
     as: "input",
     variant: theme?.defaultProps?.variant ?? "outline",
-    size: theme?.defaultProps?.size ?? "md",
+    size: inputGroup?.state.size ?? theme?.defaultProps?.size ?? "md",
   };
 
   const propsWithDefault: InputProps<"input"> = mergeProps(defaultProps, props);
@@ -38,7 +42,17 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
   // should be spread last in order to override same props from `others`
   const formControlProps = createFormControl<HTMLInputElement>(others);
 
-  const classes = () => classNames(local.class, hopeInputClass, inputStyles(variantProps));
+  const classes = () =>
+    classNames(
+      local.class,
+      hopeInputClass,
+      inputStyles({
+        variant: variantProps.variant,
+        size: inputGroup?.state.size ?? variantProps.size,
+        withLeftElement: inputGroup?.state.hasLeftElement ?? false,
+        withRightElement: inputGroup?.state.hasRightElement ?? false,
+      })
+    );
 
   return (
     <Box

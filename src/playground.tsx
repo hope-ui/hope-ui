@@ -1,6 +1,6 @@
 import "./playground.css";
 
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -45,6 +45,7 @@ export function App() {
       </HStack>
       <FormControl
         maxW="max-content"
+        id="email"
         required={required()}
         invalid={invalid()}
         disabled={disabled()}
