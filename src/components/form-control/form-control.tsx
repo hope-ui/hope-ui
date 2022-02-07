@@ -12,6 +12,7 @@ import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
+import { formControlStyles } from "./form-control.styles";
 
 export interface FormControlOptions {
   /**
@@ -154,7 +155,7 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
     setIsFocused,
   });
 
-  const classes = () => classNames(local.class, hopeFormControlClass);
+  const classes = () => classNames(local.class, hopeFormControlClass, formControlStyles());
 
   return (
     <FormControlContext.Provider value={context()}>

@@ -30,11 +30,7 @@ export const baseInputResetStyles = css({
   _readOnly: {
     boxShadow: "none !important",
     userSelect: "all",
-  },
-
-  _disabled: {
-    opacity: 0.5,
-    cursor: "not-allowed",
+    cursor: "default",
   },
 });
 
@@ -59,7 +55,6 @@ function creatInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObjec
 }
 
 export const inputStyles = css(baseInputResetStyles, {
-  // TODO: add to textarea too
   _placeholder: {
     color: "$neutral9",
     opacity: 1,
@@ -78,6 +73,11 @@ export const inputStyles = css(baseInputResetStyles, {
         _focus: {
           borderColor: "$primary8",
           boxShadow: "0 0 0 3px $colors$primary5",
+        },
+
+        _disabled: {
+          opacity: 0.4,
+          cursor: "not-allowed",
         },
 
         "&[aria-invalid=true], &[data-invalid]": {
@@ -107,6 +107,11 @@ export const inputStyles = css(baseInputResetStyles, {
           backgroundColor: "$neutral4",
         },
 
+        _disabled: {
+          opacity: 0.4,
+          cursor: "not-allowed",
+        },
+
         "&[aria-invalid=true], &[data-invalid]": {
           borderColor: "$danger7",
         },
@@ -133,6 +138,11 @@ export const inputStyles = css(baseInputResetStyles, {
         _focus: {
           borderColor: "$primary9",
           boxShadow: "0 1px 0 0 $colors$primary9",
+        },
+
+        _disabled: {
+          opacity: 0.4,
+          cursor: "not-allowed",
         },
 
         "&[aria-invalid=true], &[data-invalid]": {
@@ -164,13 +174,13 @@ export const inputStyles = css(baseInputResetStyles, {
         fontSize: "$sm",
         lineHeight: "$5",
         height: "$8",
-        paddingX: "$3",
+        paddingX: "$2_5",
       }),
       md: creatInputSizeVariant({
         fontSize: "$base",
         lineHeight: "$6",
         height: "$10",
-        paddingX: "$4",
+        paddingX: "$3",
       }),
       lg: creatInputSizeVariant({
         fontSize: "$lg",

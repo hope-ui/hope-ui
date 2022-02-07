@@ -5,6 +5,7 @@ import { classNames, createCssSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { useFormControlContext } from "./form-control";
+import { formLabelStyles } from "./form-control.styles";
 
 export type FormLabelProps<C extends ElementType> = HopeComponentProps<C>;
 
@@ -23,14 +24,14 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
   const id = () => local.id ?? formControl?.state.labelId;
   const htmlFor = () => local.for ?? local.htmlFor ?? formControl?.state.fieldId;
 
+  const classes = () => classNames(local.class, hopeFormLabelClass, formLabelStyles());
+
   const formControlDataAttrs = () => ({
     "data-focus": formControl?.state.isFocused ? "" : undefined,
     "data-disabled": formControl?.state.disabled ? "" : undefined,
     "data-invalid": formControl?.state.invalid ? "" : undefined,
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
   });
-
-  const classes = () => classNames(local.class, hopeFormLabelClass);
 
   return (
     <Box id={id()} for={htmlFor()} class={classes()} {...formControlDataAttrs()} {...others} />

@@ -5,6 +5,7 @@ import { classNames, createCssSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { useFormControlContext } from "./form-control";
+import { formHelperTextStyles } from "./form-control.styles";
 
 export type FormHelperTextProps<C extends ElementType> = HopeComponentProps<C>;
 
@@ -17,7 +18,12 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
 
   const id = () => local.id ?? formControl?.state.helperTextId;
 
-  const classes = () => classNames(local.class, hopeFormHelperTextClass);
+  const classes = () => classNames(local.class, hopeFormHelperTextClass, formHelperTextStyles());
+
+  const formControlDataAttrs = () => ({
+    "data-disabled": formControl?.state.disabled ? "" : undefined,
+    "data-readonly": formControl?.state.readOnly ? "" : undefined,
+  });
 
   onMount(() => {
     formControl?.setHasHelperText(true);
@@ -27,7 +33,7 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
     formControl?.setHasHelperText(false);
   });
 
-  return <Box id={id()} class={classes()} {...others} />;
+  return <Box id={id()} class={classes()} {...formControlDataAttrs()} {...others} />;
 }
 
 FormHelperText.toString = () => createCssSelector(hopeFormHelperTextClass);
