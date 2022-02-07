@@ -73,19 +73,29 @@ export interface FormControlState extends FormControlOptions {
    * We use this to append its id the the `aria-describedby` of the `input`.
    */
   hasErrorMessage: boolean;
+
+  /**
+   * Track whether the form element (e.g, `input`) has focus.
+   */
+  isFocused: boolean;
 }
 
 export interface FormControlContextValue {
   state: FormControlState;
   /**
-   * Action to change form control state `hasHelperText`;
+   * Action to change form control state `hasHelperText`.
    */
   setHasHelperText: (value: boolean) => void;
 
   /**
-   * Action to change form control state `hasErrorMessage`;
+   * Action to change form control state `hasErrorMessage`.
    */
   setHasErrorMessage: (value: boolean) => void;
+
+  /**
+   * Action to change form control state `isFocused`.
+   */
+  setIsFocused: (value: boolean) => void;
 }
 
 export const FormControlContext = createContext<FormControlContextValue>();
@@ -111,6 +121,7 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
     readOnly: false,
     hasHelperText: false,
     hasErrorMessage: false,
+    isFocused: false,
   });
 
   const [local, others] = splitProps(props, [
@@ -134,10 +145,13 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
 
   const setHasErrorMessage = (value: boolean) => setState("hasErrorMessage", value);
 
+  const setIsFocused = (value: boolean) => setState("isFocused", value);
+
   const context: Accessor<FormControlContextValue> = () => ({
     state,
     setHasHelperText,
     setHasErrorMessage,
+    setIsFocused,
   });
 
   const classes = () => classNames(local.class, hopeFormControlClass);

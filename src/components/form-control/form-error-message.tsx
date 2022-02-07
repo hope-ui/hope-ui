@@ -29,7 +29,7 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
 
   return (
     <Show when={formControl?.state.invalid}>
-      <Box aria-live="polite" id={id()} class={classes()} {...others} />
+      <Box id={id()} class={classes()} aria-live="polite" {...others} />
     </Show>
   );
 }

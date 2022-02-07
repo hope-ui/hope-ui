@@ -24,7 +24,7 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
   const htmlFor = () => local.for ?? local.htmlFor ?? formControl?.state.fieldId;
 
   const formControlDataAttrs = () => ({
-    //"data-focus": formControl.state.focused ? "" : undefined,
+    "data-focus": formControl?.state.isFocused ? "" : undefined,
     "data-disabled": formControl?.state.disabled ? "" : undefined,
     "data-invalid": formControl?.state.invalid ? "" : undefined,
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
@@ -32,7 +32,9 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
 
   const classes = () => classNames(local.class, hopeFormLabelClass);
 
-  return <Box id={id()} for={htmlFor()} class={classes()} {...formControlDataAttrs} {...others} />;
+  return (
+    <Box id={id()} for={htmlFor()} class={classes()} {...formControlDataAttrs()} {...others} />
+  );
 }
 
 FormLabel.toString = () => createCssSelector(hopeFormLabelClass);
