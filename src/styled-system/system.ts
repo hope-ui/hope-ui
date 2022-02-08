@@ -6,6 +6,7 @@ import { colorPropNames, ColorProps } from "./props/color";
 import { CSSProp, cssPropName } from "./props/css";
 import { flexboxPropNames, FlexboxProps } from "./props/flexbox";
 import { gridPropNames, GridProps } from "./props/grid";
+import { interactivityPropNames, InteractivityProps } from "./props/interactivity";
 import { layoutPropNames, LayoutProps } from "./props/layout";
 import { marginPropNames, MarginProps } from "./props/margin";
 import { paddingPropNames, PaddingProps } from "./props/padding";
@@ -25,6 +26,7 @@ export type StyleProps = ResponsiveProps<
     ColorProps &
     FlexboxProps &
     GridProps &
+    InteractivityProps &
     LayoutProps &
     MarginProps &
     PaddingProps &
@@ -42,6 +44,7 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...colorPropNames,
   ...flexboxPropNames,
   ...gridPropNames,
+  ...interactivityPropNames,
   ...layoutPropNames,
   ...marginPropNames,
   ...paddingPropNames,

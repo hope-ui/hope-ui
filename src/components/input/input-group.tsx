@@ -1,6 +1,7 @@
 import { Accessor, createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useTheme } from "@/theme";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -8,8 +9,8 @@ import { ElementType, HopeComponentProps } from "../types";
 import { inputGroupStyles, InputVariants } from "./input.styles";
 
 export interface InputGroupState {
+  variant: InputVariants["variant"];
   size: InputVariants["size"];
-
   hasLeftElement: boolean;
   hasRightElement: boolean;
   hasLeftAddon: boolean;
@@ -24,11 +25,11 @@ export interface InputGroupContextValue {
   setHasRightAddon: (value: boolean) => void;
 }
 
+export type ThemeableInputGroupOptions = Partial<Pick<InputGroupState, "variant" | "size">>;
+
 export type InputGroupProps<C extends ElementType> = HopeComponentProps<
   C,
-  {
-    size?: InputVariants["size"];
-  }
+  ThemeableInputGroupOptions
 >;
 
 const InputGroupContext = createContext<InputGroupContextValue>();
@@ -36,9 +37,14 @@ const InputGroupContext = createContext<InputGroupContextValue>();
 const hopeInputGroupClass = "hope-input-group";
 
 export function InputGroup<C extends ElementType = "div">(props: InputGroupProps<C>) {
+  const theme = useTheme().components.InputGroup;
+
   const [state, setState] = createStore<InputGroupState>({
+    get variant() {
+      return props.variant ?? theme?.defaultProps?.variant ?? "outline";
+    },
     get size() {
-      return props.size ?? "md"; // TODO use themeable option for that
+      return props.size ?? theme?.defaultProps?.size ?? "md";
     },
     hasLeftElement: false,
     hasRightElement: false,
@@ -46,7 +52,7 @@ export function InputGroup<C extends ElementType = "div">(props: InputGroupProps
     hasRightAddon: false,
   });
 
-  const [local, others] = splitProps(props, ["size", "class"]);
+  const [local, others] = splitProps(props, ["variant", "size", "class"]);
 
   const classes = () => classNames(local.class, hopeInputGroupClass, inputGroupStyles());
 
@@ -65,7 +71,7 @@ export function InputGroup<C extends ElementType = "div">(props: InputGroupProps
 
   return (
     <InputGroupContext.Provider value={context()}>
-      <Box class={classes()} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />
     </InputGroupContext.Provider>
   );
 }

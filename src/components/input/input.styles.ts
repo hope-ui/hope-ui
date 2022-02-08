@@ -21,6 +21,8 @@ export const baseInputResetStyles = css({
 
   backgroundColor: "transparent",
 
+  padding: 0,
+
   color: "$neutral12",
   fontSize: "$base",
   lineHeight: "$base",
@@ -42,16 +44,50 @@ interface InputSizeVariantConfig {
   fontSize: string;
   lineHeight: string;
   height: string;
-  paddingX: string;
 }
 
-function creatInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObject {
+function createInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObject {
   return {
     height: config.height,
-    px: config.paddingX,
     fontSize: config.fontSize,
     lineHeight: config.lineHeight,
   };
+}
+
+const inputSizes = {
+  xs: createInputSizeVariant({ fontSize: "$xs", lineHeight: "$4", height: "$6" }),
+  sm: createInputSizeVariant({ fontSize: "$sm", lineHeight: "$5", height: "$8" }),
+  md: createInputSizeVariant({ fontSize: "$base", lineHeight: "$6", height: "$10" }),
+  lg: createInputSizeVariant({ fontSize: "$lg", lineHeight: "$7", height: "$12" }),
+};
+
+interface VariantAndSizeCompoundVariantConfig {
+  variant: string;
+  size: string;
+  paddingX: string | number;
+  paddingWithElement: string | number;
+}
+
+function createVariantAndSizeCompoundVariant(config: VariantAndSizeCompoundVariantConfig) {
+  return [
+    {
+      variant: config.variant,
+      size: config.size,
+      css: { px: config.paddingX },
+    },
+    {
+      withLeftElement: true,
+      variant: config.variant,
+      size: config.size,
+      css: { paddingInlineStart: config.paddingWithElement },
+    },
+    {
+      withRightElement: true,
+      variant: config.variant,
+      size: config.size,
+      css: { paddingInlineEnd: config.paddingWithElement },
+    },
+  ];
 }
 
 export const inputStyles = css(baseInputResetStyles, {
@@ -125,69 +161,13 @@ export const inputStyles = css(baseInputResetStyles, {
           boxShadow: "0 0 0 3px $colors$danger5",
         },
       },
-      flushed: {
-        borderBottom: "1px solid $neutral7",
-        borderRadius: 0,
-        backgroundColor: "transparent",
-        px: "$px",
-
-        _hover: {
-          borderColor: "$neutral8",
-        },
-
-        _focus: {
-          borderColor: "$primary9",
-          boxShadow: "0 1px 0 0 $colors$primary9",
-        },
-
-        _disabled: {
-          opacity: 0.4,
-          cursor: "not-allowed",
-        },
-
-        _invalid: {
-          borderColor: "$danger8",
-        },
-
-        [`&[aria-invalid=true]:hover, &[data-invalid]:hover,
-          &[aria-invalid=true]:focus, &[data-invalid]:focus`]: {
-          borderColor: "$danger9",
-        },
-
-        "&[aria-invalid=true]:focus, &[data-invalid]:focus": {
-          boxShadow: "0 1px 0 $colors$danger9",
-        },
-      },
       unstyled: {
         border: "1px solid transparent",
         backgroundColor: "transparent",
       },
     },
     size: {
-      xs: creatInputSizeVariant({
-        fontSize: "$xs",
-        lineHeight: "$4",
-        height: "$6",
-        paddingX: "$2",
-      }),
-      sm: creatInputSizeVariant({
-        fontSize: "$sm",
-        lineHeight: "$5",
-        height: "$8",
-        paddingX: "$2_5",
-      }),
-      md: creatInputSizeVariant({
-        fontSize: "$base",
-        lineHeight: "$6",
-        height: "$10",
-        paddingX: "$3",
-      }),
-      lg: creatInputSizeVariant({
-        fontSize: "$lg",
-        lineHeight: "$7",
-        height: "$12",
-        paddingX: "$4",
-      }),
+      ...inputSizes,
     },
     withLeftElement: {
       true: {},
@@ -195,107 +175,103 @@ export const inputStyles = css(baseInputResetStyles, {
     withRightElement: {
       true: {},
     },
+    withLeftAddon: {
+      true: {
+        borderStartStartRadius: 0,
+        borderEndStartRadius: 0,
+      },
+    },
+    withRightAddon: {
+      true: {
+        borderStartEndRadius: 0,
+        borderEndEndRadius: 0,
+      },
+    },
   },
   compoundVariants: [
     /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + size
+     * -----------------------------------------------------------------------------------------------*/
+    ...createVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "xs",
+      paddingX: "$2",
+      paddingWithElement: "$6",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "sm",
+      paddingX: "$2_5",
+      paddingWithElement: "$8",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "md",
+      paddingX: "$3",
+      paddingWithElement: "$10",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "lg",
+      paddingX: "$4",
+      paddingWithElement: "$12",
+    }),
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - filled + size
+     * -----------------------------------------------------------------------------------------------*/
+    ...createVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "xs",
+      paddingX: "$2",
+      paddingWithElement: "$6",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "sm",
+      paddingX: "$2_5",
+      paddingWithElement: "$8",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "md",
+      paddingX: "$3",
+      paddingWithElement: "$10",
+    }),
+    ...createVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "lg",
+      paddingX: "$4",
+      paddingWithElement: "$12",
+    }),
+
+    /* -------------------------------------------------------------------------------------------------
      * Variant - unstyled + size
      * -----------------------------------------------------------------------------------------------*/
-    {
+    ...createVariantAndSizeCompoundVariant({
       variant: "unstyled",
       size: "xs",
-      css: {
-        px: 0,
-        height: "auto",
-      },
-    },
-    {
+      paddingX: 0,
+      paddingWithElement: "$6",
+    }),
+    ...createVariantAndSizeCompoundVariant({
       variant: "unstyled",
       size: "sm",
-      css: {
-        px: 0,
-        height: "auto",
-      },
-    },
-    {
+      paddingX: 0,
+      paddingWithElement: "$8",
+    }),
+    ...createVariantAndSizeCompoundVariant({
       variant: "unstyled",
       size: "md",
-      css: {
-        px: 0,
-        height: "auto",
-      },
-    },
-    {
+      paddingX: 0,
+      paddingWithElement: "$10",
+    }),
+    ...createVariantAndSizeCompoundVariant({
       variant: "unstyled",
       size: "lg",
-      css: {
-        px: 0,
-        height: "auto",
-      },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * With left element + size
-     * -----------------------------------------------------------------------------------------------*/
-    {
-      withLeftElement: true,
-      size: "xs",
-      css: {
-        paddingInlineStart: "$6",
-      },
-    },
-    {
-      withLeftElement: true,
-      size: "sm",
-      css: {
-        paddingInlineStart: "$8",
-      },
-    },
-    {
-      withLeftElement: true,
-      size: "md",
-      css: {
-        paddingInlineStart: "$10",
-      },
-    },
-    {
-      withLeftElement: true,
-      size: "lg",
-      css: {
-        paddingInlineStart: "$12",
-      },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * With right element + size
-     * -----------------------------------------------------------------------------------------------*/
-    {
-      withRightElement: true,
-      size: "xs",
-      css: {
-        paddingInlineEnd: "$6",
-      },
-    },
-    {
-      withRightElement: true,
-      size: "sm",
-      css: {
-        paddingInlineEnd: "$8",
-      },
-    },
-    {
-      withRightElement: true,
-      size: "md",
-      css: {
-        paddingInlineEnd: "$10",
-      },
-    },
-    {
-      withRightElement: true,
-      size: "lg",
-      css: {
-        paddingInlineEnd: "$12",
-      },
-    },
+      paddingX: 0,
+      paddingWithElement: "$12",
+    }),
   ],
 });
 
@@ -312,28 +288,8 @@ export const inputGroupStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * InputAddon
- * -----------------------------------------------------------------------------------------------*/
-
-export const inputAddonStyles = css({});
-
-/* -------------------------------------------------------------------------------------------------
  * InputElement
  * -----------------------------------------------------------------------------------------------*/
-
-interface InputElementSizeVariantConfig {
-  fontSize: string;
-  lineHeight: string;
-  size: string;
-}
-
-function creatInputElementSizeVariant(config: InputElementSizeVariantConfig): SystemStyleObject {
-  return {
-    boxSize: config.size,
-    fontSize: config.fontSize,
-    lineHeight: config.lineHeight,
-  };
-}
 
 export const inputElementStyles = css({
   position: "absolute",
@@ -347,36 +303,209 @@ export const inputElementStyles = css({
 
   variants: {
     placement: {
-      left: {
-        insetInlineStart: "0",
-      },
-      right: {
-        insetInlineEnd: "0",
-      },
+      left: { insetInlineStart: "0" },
+      right: { insetInlineEnd: "0" },
     },
     size: {
-      xs: creatInputElementSizeVariant({
-        fontSize: "$xs",
-        lineHeight: "$4",
-        size: "$6",
-      }),
-      sm: creatInputElementSizeVariant({
-        fontSize: "$sm",
-        lineHeight: "$5",
-        size: "$8",
-      }),
-      md: creatInputElementSizeVariant({
-        fontSize: "$base",
-        lineHeight: "$6",
-        size: "$10",
-      }),
-      lg: creatInputElementSizeVariant({
-        fontSize: "$lg",
-        lineHeight: "$7",
-        size: "$12",
-      }),
+      xs: {
+        ...inputSizes.xs,
+        width: inputSizes.xs.height,
+      },
+      sm: {
+        ...inputSizes.sm,
+        width: inputSizes.sm.height,
+      },
+      md: {
+        ...inputSizes.md,
+        width: inputSizes.md.height,
+      },
+      lg: {
+        ...inputSizes.lg,
+        width: inputSizes.lg.height,
+      },
     },
   },
 });
 
 export type InputElementVariants = VariantProps<typeof inputElementStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * InputAddon
+ * -----------------------------------------------------------------------------------------------*/
+
+interface InputAddonVariantAndSizeCompoundVariantConfig {
+  variant: string;
+  size: string;
+  paddingX: string | number;
+}
+
+function createInputAddonVariantAndSizeCompoundVariant(
+  config: InputAddonVariantAndSizeCompoundVariantConfig
+) {
+  return {
+    variant: config.variant,
+    size: config.size,
+    css: { px: config.paddingX },
+  };
+}
+
+export const inputAddonStyles = css({
+  display: "flex",
+  alignItems: "center",
+  flex: "0 0 auto",
+
+  width: "auto",
+
+  whiteSpace: "nowrap",
+
+  variants: {
+    placement: {
+      left: {
+        marginEnd: "-1px",
+      },
+      right: {
+        marginStart: "-1px",
+      },
+    },
+    variant: {
+      outline: {
+        borderRadius: "$sm",
+        border: "1px solid $neutral7",
+        backgroundColor: "$neutral3",
+        color: "$neutral12",
+      },
+      filled: {
+        borderRadius: "$sm",
+        border: "1px solid transparent",
+        backgroundColor: "$neutral3",
+        color: "$neutral12",
+      },
+      unstyled: {
+        border: "1px solid transparent",
+        backgroundColor: "transparent",
+      },
+    },
+    size: {
+      ...inputSizes,
+    },
+  },
+  compoundVariants: [
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + placement
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "outline",
+      placement: "left",
+      css: {
+        borderStartEndRadius: 0,
+        borderEndEndRadius: 0,
+        borderInlineEndColor: "transparent",
+      },
+    },
+    {
+      variant: "outline",
+      placement: "right",
+      css: {
+        borderStartStartRadius: 0,
+        borderEndStartRadius: 0,
+        borderInlineStartColor: "transparent",
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - filled + placement
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "filled",
+      placement: "left",
+      css: {
+        borderStartEndRadius: 0,
+        borderEndEndRadius: 0,
+        borderInlineEndColor: "transparent",
+      },
+    },
+    {
+      variant: "filled",
+      placement: "right",
+      css: {
+        borderStartStartRadius: 0,
+        borderEndStartRadius: 0,
+        borderInlineStartColor: "transparent",
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + size
+     * -----------------------------------------------------------------------------------------------*/
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "xs",
+      paddingX: "$2",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "sm",
+      paddingX: "$2_5",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "md",
+      paddingX: "$3",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "outline",
+      size: "lg",
+      paddingX: "$4",
+    }),
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - filled + size
+     * -----------------------------------------------------------------------------------------------*/
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "xs",
+      paddingX: "$2",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "sm",
+      paddingX: "$2_5",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "md",
+      paddingX: "$3",
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "filled",
+      size: "lg",
+      paddingX: "$4",
+    }),
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - unstyled + size
+     * -----------------------------------------------------------------------------------------------*/
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "unstyled",
+      size: "xs",
+      paddingX: 0,
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "unstyled",
+      size: "sm",
+      paddingX: 0,
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "unstyled",
+      size: "md",
+      paddingX: 0,
+    }),
+    createInputAddonVariantAndSizeCompoundVariant({
+      variant: "unstyled",
+      size: "lg",
+      paddingX: 0,
+    }),
+  ],
+});
+
+export type InputAddonVariants = VariantProps<typeof inputAddonStyles>;

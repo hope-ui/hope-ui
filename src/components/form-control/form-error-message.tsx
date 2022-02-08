@@ -1,7 +1,6 @@
-import { Show, splitProps } from "solid-js";
+import { onCleanup, onMount, Show, splitProps } from "solid-js";
 
 import { classNames, createCssSelector } from "@/utils/css";
-import { mergeRefs } from "@/utils/refs";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -27,22 +26,12 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
   });
 
-  /**
-   * Notify the field context when the error message is rendered on screen,
-   * so we can apply the correct `aria-describedby` to the field (e.g. input, textarea).
-   */
-  const refs = () => mergeRefs(local.ref, el => formControl?.setHasErrorMessage(!!el));
+  onMount(() => formControl?.setHasErrorMessage(true));
+  onCleanup(() => formControl?.setHasErrorMessage(false));
 
   return (
     <Show when={formControl?.state.invalid}>
-      <Box
-        ref={refs()}
-        id={id()}
-        class={classes()}
-        aria-live="polite"
-        {...formControlDataAttrs()}
-        {...others}
-      />
+      <Box id={id()} class={classes()} aria-live="polite" {...formControlDataAttrs()} {...others} />
     </Show>
   );
 }

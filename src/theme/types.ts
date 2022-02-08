@@ -5,6 +5,7 @@ import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableFormLabelOptions } from "@/components/form-control/form-label";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
 import { ThemeableInputOptions } from "@/components/input/input";
+import { ThemeableInputGroupOptions } from "@/components/input/input-group";
 import { ThemeableTagOptions } from "@/components/tag/tag";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
@@ -51,6 +52,7 @@ export interface ComponentsStyles {
   Heading?: ComponentStyle<void>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Input?: ComponentStyle<ThemeableInputOptions>;
+  InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
   Text?: ComponentStyle<void>;
   Tag?: ComponentStyle<ThemeableTagOptions>;
 }

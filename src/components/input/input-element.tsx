@@ -30,13 +30,8 @@ export function InputLeftElement<C extends ElementType = "div">(props: HopeCompo
 
   const classes = () => classNames(local.class, hopeInputLeftElementClass);
 
-  onMount(() => {
-    inputGroup?.setHasLeftElement(true);
-  });
-
-  onCleanup(() => {
-    inputGroup?.setHasLeftElement(false);
-  });
+  onMount(() => inputGroup?.setHasLeftElement(true));
+  onCleanup(() => inputGroup?.setHasLeftElement(false));
 
   return (
     <InputElement
@@ -63,13 +58,8 @@ export function InputRightElement<C extends ElementType = "div">(props: HopeComp
 
   const classes = () => classNames(local.class, hopeInputRightElementClass);
 
-  onMount(() => {
-    inputGroup?.setHasRightElement(true);
-  });
-
-  onCleanup(() => {
-    inputGroup?.setHasRightElement(false);
-  });
+  onMount(() => inputGroup?.setHasRightElement(true));
+  onCleanup(() => inputGroup?.setHasRightElement(false));
 
   return (
     <InputElement

@@ -2,7 +2,7 @@ import { Accessor, JSX } from "solid-js";
 
 import { FormControlOptions, useFormControlContext } from "./form-control";
 
-export interface CreateFormControlProps<T extends HTMLElement> extends FormControlOptions {
+export interface UseFormControlProps<T extends HTMLElement> extends FormControlOptions {
   onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
   onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
   "aria-describedby"?: string;
@@ -30,8 +30,8 @@ export interface FormControlProps<T extends HTMLElement> {
  *
  * @internal
  */
-export function createFormControl<T extends HTMLElement>(
-  props: CreateFormControlProps<T>
+export function useFormControl<T extends HTMLElement>(
+  props: UseFormControlProps<T>
 ): Accessor<FormControlProps<T>> {
   const formControl = useFormControlContext();
 

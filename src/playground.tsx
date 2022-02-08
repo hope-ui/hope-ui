@@ -20,6 +20,7 @@ export function App() {
   const [disabled, setDisabled] = createSignal(false);
   const [invalid, setInvalid] = createSignal(false);
   const [readOnly, setReadOnly] = createSignal(false);
+  const [showDiv, setShowDiv] = createSignal(false);
 
   const focusHandler = (e: FocusEvent) => {
     console.log("focused", e);
@@ -29,12 +30,15 @@ export function App() {
     console.log("blured", e);
   };
 
+  let myDiv: any;
   let helperText: any;
   let errorMessage: any;
 
   const logRefs = () => {
-    console.log("helper-text", helperText);
-    console.log("error-message", errorMessage);
+    console.log("my-div", myDiv);
+
+    // console.log("helper-text", helperText);
+    // console.log("error-message", errorMessage);
   };
 
   return (
@@ -50,8 +54,10 @@ export function App() {
         <Button onClick={() => setReadOnly(prev => !prev)}>
           readOnly : {readOnly().toString()}
         </Button>
+        <Button onClick={() => setShowDiv(prev => !prev)}>Show div : {showDiv().toString()}</Button>
         <Button onClick={logRefs}>Log refs</Button>
       </HStack>
+
       <FormControl
         maxW="max-content"
         id="email"
@@ -69,15 +75,11 @@ export function App() {
           Email address
         </FormLabel>
         <Input type="email" placeholder="Placeholder" onFocus={focusHandler} onBlur={blurHandler} />
-        <Show
-          when={invalid()}
-          fallback={<FormHelperText ref={helperText}>We'll never share your email.</FormHelperText>}
-        >
-          <HStack ref={errorMessage} as={FormErrorMessage} color="$danger9" spacing="$1">
-            <IconExclamationCircle />
-            <span>An error occured</span>
-          </HStack>
-        </Show>
+        <FormHelperText ref={helperText}>We'll never share your email.</FormHelperText>
+        <HStack ref={errorMessage} as={FormErrorMessage} color="$danger9" spacing="$1">
+          <IconExclamationCircle />
+          <span>An error occured</span>
+        </HStack>
       </FormControl>
     </div>
   );

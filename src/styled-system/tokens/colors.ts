@@ -62,19 +62,35 @@ const primary = {
 };
 
 // Radix - Gray
+// const neutral = {
+//   neutral1: "#fcfcfc",
+//   neutral2: "#f8f8f8",
+//   neutral3: "#f3f3f3",
+//   neutral4: "#ededed",
+//   neutral5: "#e8e8e8",
+//   neutral6: "#e2e2e2",
+//   neutral7: "#dbdbdb",
+//   neutral8: "#c7c7c7",
+//   neutral9: "#8f8f8f",
+//   neutral10: "#858585",
+//   neutral11: "#6f6f6f",
+//   neutral12: "#171717",
+// };
+
+// Radix - Slate
 const neutral = {
-  neutral1: "#fcfcfc",
-  neutral2: "#f8f8f8",
-  neutral3: "#f3f3f3",
-  neutral4: "#ededed",
-  neutral5: "#e8e8e8",
-  neutral6: "#e2e2e2",
-  neutral7: "#dbdbdb",
-  neutral8: "#c7c7c7",
-  neutral9: "#8f8f8f",
-  neutral10: "#858585",
-  neutral11: "#6f6f6f",
-  neutral12: "#171717",
+  neutral1: "#fbfcfd",
+  neutral2: "#f8f9fa",
+  neutral3: "#f1f3f5",
+  neutral4: "#eceef0",
+  neutral5: "#e6e8eb",
+  neutral6: "#dfe3e6",
+  neutral7: "#d7dbdf",
+  neutral8: "#c1c8cd",
+  neutral9: "#889096",
+  neutral10: "#7e868c",
+  neutral11: "#687076",
+  neutral12: "#11181c",
 };
 
 // Radix - Green
@@ -176,19 +192,35 @@ const primaryDark = {
 };
 
 // Radix - Gray dark
+// const neutralDark = {
+//   neutral1: "#161616",
+//   neutral2: "#1c1c1c",
+//   neutral3: "#232323",
+//   neutral4: "#282828",
+//   neutral5: "#2e2e2e",
+//   neutral6: "#343434",
+//   neutral7: "#3e3e3e",
+//   neutral8: "#505050",
+//   neutral9: "#707070",
+//   neutral10: "#7e7e7e",
+//   neutral11: "#a0a0a0",
+//   neutral12: "#ededed",
+// };
+
+// Radix - Slate dark
 const neutralDark = {
-  neutral1: "#161616",
-  neutral2: "#1c1c1c",
-  neutral3: "#232323",
-  neutral4: "#282828",
-  neutral5: "#2e2e2e",
-  neutral6: "#343434",
-  neutral7: "#3e3e3e",
-  neutral8: "#505050",
-  neutral9: "#707070",
-  neutral10: "#7e7e7e",
-  neutral11: "#a0a0a0",
-  neutral12: "#ededed",
+  neutral1: "#151718",
+  neutral2: "#1a1d1e",
+  neutral3: "#202425",
+  neutral4: "#26292b",
+  neutral5: "#2b2f31",
+  neutral6: "#313538",
+  neutral7: "#3a3f42",
+  neutral8: "#4c5155",
+  neutral9: "#697177",
+  neutral10: "#787f85",
+  neutral11: "#9ba1a6",
+  neutral12: "#ecedee",
 };
 
 // Radix - Green dark

@@ -1,7 +1,6 @@
-import { splitProps } from "solid-js";
+import { onCleanup, onMount, splitProps } from "solid-js";
 
 import { classNames, createCssSelector } from "@/utils/css";
-import { mergeRefs } from "@/utils/refs";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -26,13 +25,10 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
   });
 
-  /**
-   * Notify the field context when the help text is rendered on screen,
-   * so we can apply the correct `aria-describedby` to the field (e.g. input, textarea).
-   */
-  const refs = () => mergeRefs(local.ref, el => formControl?.setHasHelperText(!!el));
+  onMount(() => formControl?.setHasHelperText(true));
+  onCleanup(() => formControl?.setHasHelperText(false));
 
-  return <Box ref={refs()} id={id()} class={classes()} {...formControlDataAttrs()} {...others} />;
+  return <Box id={id()} class={classes()} {...formControlDataAttrs()} {...others} />;
 }
 
 FormHelperText.toString = () => createCssSelector(hopeFormHelperTextClass);
