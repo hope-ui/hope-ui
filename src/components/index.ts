@@ -16,4 +16,5 @@ export * from "./spacer";
 export * from "./stack";
 export * from "./tag";
 export * from "./text";
+export * from "./textarea";
 export * from "./types";

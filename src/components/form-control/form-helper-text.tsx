@@ -14,7 +14,7 @@ const hopeFormHelperTextClass = "hope-form-helper-text";
 export function FormHelperText<C extends ElementType = "div">(props: FormHelperTextProps<C>) {
   const formControl = useFormControlContext();
 
-  const [local, others] = splitProps(props as FormHelperTextProps<"div">, ["id", "class"]);
+  const [local, others] = splitProps(props as FormHelperTextProps<"div">, ["ref", "id", "class"]);
 
   const id = () => local.id ?? formControl?.state.helperTextId;
 
@@ -25,13 +25,8 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
   });
 
-  onMount(() => {
-    formControl?.setHasHelperText(true);
-  });
-
-  onCleanup(() => {
-    formControl?.setHasHelperText(false);
-  });
+  onMount(() => formControl?.setHasHelperText(true));
+  onCleanup(() => formControl?.setHasHelperText(false));
 
   return <Box id={id()} class={classes()} {...formControlDataAttrs()} {...others} />;
 }

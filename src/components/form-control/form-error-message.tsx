@@ -14,7 +14,7 @@ const hopeFormErrorMessageClass = "hope-form-error-message";
 export function FormErrorMessage<C extends ElementType = "div">(props: FormErrorMessageProps<C>) {
   const formControl = useFormControlContext();
 
-  const [local, others] = splitProps(props as FormErrorMessageProps<"div">, ["id", "class"]);
+  const [local, others] = splitProps(props as FormErrorMessageProps<"div">, ["ref", "id", "class"]);
 
   const id = () => local.id ?? formControl?.state.errorMessageId;
 
@@ -26,13 +26,8 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
     "data-readonly": formControl?.state.readOnly ? "" : undefined,
   });
 
-  onMount(() => {
-    formControl?.setHasErrorMessage(true);
-  });
-
-  onCleanup(() => {
-    formControl?.setHasErrorMessage(false);
-  });
+  onMount(() => formControl?.setHasErrorMessage(true));
+  onCleanup(() => formControl?.setHasErrorMessage(false));
 
   return (
     <Show when={formControl?.state.invalid}>

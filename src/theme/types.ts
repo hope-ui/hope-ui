@@ -2,9 +2,12 @@ import { Accessor } from "solid-js";
 
 import { ThemeableAlertOptions } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
+import { ThemeableFormLabelOptions } from "@/components/form-control/form-label";
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
 import { ThemeableInputOptions } from "@/components/input/input";
+import { ThemeableInputGroupOptions } from "@/components/input/input-group";
 import { ThemeableTagOptions } from "@/components/tag/tag";
+import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
@@ -46,10 +49,13 @@ export interface ComponentStyle<Props> {
 export interface ComponentsStyles {
   Alert?: ComponentStyle<ThemeableAlertOptions>;
   Button?: ComponentStyle<ThemeableButtonOptions>;
+  FormLabel?: ComponentStyle<ThemeableFormLabelOptions>;
+  Heading?: ComponentStyle<void>;
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Input?: ComponentStyle<ThemeableInputOptions>;
-  Heading?: ComponentStyle<void>;
+  InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
   Text?: ComponentStyle<void>;
+  Textarea?: ComponentStyle<ThemeableTextareaOptions>;
   Tag?: ComponentStyle<ThemeableTagOptions>;
 }
 

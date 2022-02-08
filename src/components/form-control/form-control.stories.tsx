@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { HopeWrapper } from "@/utils/storybook";
 
 import { Input } from "../input/input";
+import { Textarea } from "../textarea/textarea";
 import { FormControl } from "./form-control";
 import { FormErrorMessage } from "./form-error-message";
 import { FormHelperText } from "./form-helper-text";
@@ -41,7 +42,7 @@ export default {
   },
 };
 
-export const Default = (args: any) => (
+export const WithInput = (args: any) => (
   <FormControl maxW={300} {...args}>
     <FormLabel>Email address</FormLabel>
     <Input type="email" placeholder="Placeholder" />
@@ -53,4 +54,15 @@ export const Default = (args: any) => (
     </Show>
   </FormControl>
 );
-Default.storyName = "FormControl";
+WithInput.storyName = "With input";
+
+export const WithTextarea = (args: any) => (
+  <FormControl {...args}>
+    <FormLabel>Description</FormLabel>
+    <Textarea resize="vertical" placeholder="Placeholder" />
+    <Show when={args.invalid} fallback={<FormHelperText>Max 300 characters.</FormHelperText>}>
+      <FormErrorMessage>An error occured</FormErrorMessage>
+    </Show>
+  </FormControl>
+);
+WithTextarea.storyName = "With textarea";

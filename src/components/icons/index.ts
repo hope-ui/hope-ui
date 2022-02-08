@@ -14,6 +14,7 @@ export * from "./IconEyeClose";
 export * from "./IconEyeOpen";
 export * from "./IconInfoCircle";
 export * from "./IconMoon";
+export * from "./IconSearch";
 export * from "./IconSelector";
 export * from "./IconSpinner";
 export * from "./IconSun";

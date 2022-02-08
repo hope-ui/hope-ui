@@ -32,6 +32,12 @@ export const formLabelStyles = css({
   },
 });
 
+export const requiredIndicatorStyles = css({
+  marginInlineStart: "$1",
+  color: "$danger9",
+  fontSize: "$base",
+});
+
 /* -------------------------------------------------------------------------------------------------
  * FormHelperText
  * -----------------------------------------------------------------------------------------------*/
