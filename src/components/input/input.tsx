@@ -9,14 +9,19 @@ import { ElementType, HopeComponentProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
-interface InputOptions extends Omit<InputVariants, "withElement"> {
+export type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
+
+interface InputOptions extends ThemeableInputOptions {
+  /**
+   * If `true`, the input will have `aria-invalid` set to `true`
+   */
+  invalid?: boolean;
+
   /**
    * The native HTML `size` attribute to be passed to the `input`
    */
   htmlSize?: string | number;
 }
-
-export type ThemeableInputOptions = Pick<InputOptions, "variant" | "size">;
 
 export type InputProps<C extends ElementType> = HopeComponentProps<C, InputOptions>;
 
@@ -35,7 +40,7 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
   const propsWithDefault: InputProps<"input"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    ["class", "htmlSize"],
+    ["class", "invalid", "htmlSize"],
     ["variant", "size"]
   );
 
@@ -60,6 +65,7 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
     <Box
       class={classes()}
       size={local.htmlSize}
+      aria-invalid={local.invalid ? true : undefined}
       __baseStyle={theme?.baseStyle}
       {...others}
       {...formControlProps()}

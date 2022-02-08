@@ -3,8 +3,29 @@ import { VariantProps } from "@stitches/core";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
+interface InputSizeVariantConfig {
+  fontSize: string;
+  lineHeight: string;
+  height: string;
+}
+
+function createInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObject {
+  return {
+    height: config.height,
+    fontSize: config.fontSize,
+    lineHeight: config.lineHeight,
+  };
+}
+
+const inputSizes = {
+  xs: createInputSizeVariant({ fontSize: "$xs", lineHeight: "$4", height: "$6" }),
+  sm: createInputSizeVariant({ fontSize: "$sm", lineHeight: "$5", height: "$8" }),
+  md: createInputSizeVariant({ fontSize: "$base", lineHeight: "$6", height: "$10" }),
+  lg: createInputSizeVariant({ fontSize: "$lg", lineHeight: "$7", height: "$12" }),
+};
+
 /* -------------------------------------------------------------------------------------------------
- * CSS reset for text inputs, textarea and select
+ * CSS reset for text inputs, textarea and native-select
  * -----------------------------------------------------------------------------------------------*/
 
 export const baseInputResetStyles = css({
@@ -27,70 +48,14 @@ export const baseInputResetStyles = css({
   fontSize: "$base",
   lineHeight: "$base",
 
-  transition: "all 250ms",
+  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
   _readOnly: {
     boxShadow: "none !important",
     userSelect: "all",
     cursor: "default",
   },
-});
 
-/* -------------------------------------------------------------------------------------------------
- * Input
- * -----------------------------------------------------------------------------------------------*/
-
-interface InputSizeVariantConfig {
-  fontSize: string;
-  lineHeight: string;
-  height: string;
-}
-
-function createInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObject {
-  return {
-    height: config.height,
-    fontSize: config.fontSize,
-    lineHeight: config.lineHeight,
-  };
-}
-
-const inputSizes = {
-  xs: createInputSizeVariant({ fontSize: "$xs", lineHeight: "$4", height: "$6" }),
-  sm: createInputSizeVariant({ fontSize: "$sm", lineHeight: "$5", height: "$8" }),
-  md: createInputSizeVariant({ fontSize: "$base", lineHeight: "$6", height: "$10" }),
-  lg: createInputSizeVariant({ fontSize: "$lg", lineHeight: "$7", height: "$12" }),
-};
-
-interface VariantAndSizeCompoundVariantConfig {
-  variant: string;
-  size: string;
-  paddingX: string | number;
-  paddingWithElement: string | number;
-}
-
-function createVariantAndSizeCompoundVariant(config: VariantAndSizeCompoundVariantConfig) {
-  return [
-    {
-      variant: config.variant,
-      size: config.size,
-      css: { px: config.paddingX },
-    },
-    {
-      withLeftElement: true,
-      variant: config.variant,
-      size: config.size,
-      css: { paddingInlineStart: config.paddingWithElement },
-    },
-    {
-      withRightElement: true,
-      variant: config.variant,
-      size: config.size,
-      css: { paddingInlineEnd: config.paddingWithElement },
-    },
-  ];
-}
-
-export const inputStyles = css(baseInputResetStyles, {
   _placeholder: {
     color: "$neutral9",
     opacity: 1,
@@ -169,6 +134,46 @@ export const inputStyles = css(baseInputResetStyles, {
     size: {
       ...inputSizes,
     },
+  },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Input
+ * -----------------------------------------------------------------------------------------------*/
+
+interface VariantAndSizeCompoundVariantConfig {
+  variant: string;
+  size: string;
+  paddingX: string | number;
+  paddingWithElement: string | number;
+}
+
+function createVariantAndSizeCompoundVariant(config: VariantAndSizeCompoundVariantConfig) {
+  return [
+    {
+      variant: config.variant,
+      size: config.size,
+      css: { px: config.paddingX },
+    },
+    {
+      withLeftElement: true,
+      variant: config.variant,
+      size: config.size,
+      css: { paddingInlineStart: config.paddingWithElement },
+    },
+    {
+      withRightElement: true,
+      variant: config.variant,
+      size: config.size,
+      css: { paddingInlineEnd: config.paddingWithElement },
+    },
+  ];
+}
+
+export const inputStyles = css(baseInputResetStyles, {
+  transition: "all 250ms",
+
+  variants: {
     withLeftElement: {
       true: {},
     },

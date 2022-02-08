@@ -64,15 +64,7 @@ export default {
   },
 };
 
-export const Default = (args: any) => (
-  <Input
-    variant={args.variant}
-    size={args.size}
-    placeholder={args.placeholder}
-    disabled={args.disabled}
-    aria-invalid={args.invalid}
-  />
-);
+export const Default = (args: any) => <Input {...args} />;
 
 export const WithElement = (args: any) => (
   <VStack spacing="$4">
@@ -80,10 +72,10 @@ export const WithElement = (args: any) => (
       <InputLeftElement pointerEvents="none">
         <MdiPhoneIcon />
       </InputLeftElement>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
     </InputGroup>
     <InputGroup variant={args.variant} size={args.size}>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
       <InputRightElement pointerEvents="none">
         <MdiCheckIcon />
       </InputRightElement>
@@ -92,7 +84,7 @@ export const WithElement = (args: any) => (
       <InputLeftElement pointerEvents="none">
         <MdiPhoneIcon />
       </InputLeftElement>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
       <InputRightElement pointerEvents="none">
         <MdiCheckIcon />
       </InputRightElement>
@@ -105,17 +97,17 @@ export const WithAddon = (args: any) => (
   <VStack spacing="$4">
     <InputGroup variant={args.variant} size={args.size}>
       <InputLeftAddon>+33</InputLeftAddon>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
     </InputGroup>
     <InputGroup variant={args.variant} size={args.size}>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
       <InputRightAddon>
         <IconSearch />
       </InputRightAddon>
     </InputGroup>
     <InputGroup variant={args.variant} size={args.size}>
       <InputLeftAddon>http://</InputLeftAddon>
-      <Input placeholder={args.placeholder} disabled={args.disabled} aria-invalid={args.invalid} />
+      <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
       <InputRightAddon>.com</InputRightAddon>
     </InputGroup>
   </VStack>

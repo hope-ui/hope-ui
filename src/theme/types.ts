@@ -7,6 +7,7 @@ import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button
 import { ThemeableInputOptions } from "@/components/input/input";
 import { ThemeableInputGroupOptions } from "@/components/input/input-group";
 import { ThemeableTagOptions } from "@/components/tag/tag";
+import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
 import { theme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
@@ -54,6 +55,7 @@ export interface ComponentsStyles {
   Input?: ComponentStyle<ThemeableInputOptions>;
   InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
   Text?: ComponentStyle<void>;
+  Textarea?: ComponentStyle<ThemeableTextareaOptions>;
   Tag?: ComponentStyle<ThemeableTagOptions>;
 }
 
