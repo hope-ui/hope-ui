@@ -3,11 +3,11 @@ import { Show } from "solid-js";
 import { HopeWrapper } from "@/utils/storybook";
 
 import { Input } from "../input/input";
+import { Textarea } from "../textarea/textarea";
 import { FormControl } from "./form-control";
 import { FormErrorMessage } from "./form-error-message";
 import { FormHelperText } from "./form-helper-text";
 import { FormLabel } from "./form-label";
-import { Textarea } from "..";
 
 export default {
   title: "Data entry/FormControl",
