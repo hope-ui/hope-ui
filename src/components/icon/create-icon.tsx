@@ -1,9 +1,9 @@
-import { createCssSelector } from "@/utils/css";
 import { JSX } from "solid-js";
-import { hopeIconClass } from ".";
+
+import { createCssSelector } from "@/utils/css";
 
 import { ElementType } from "../types";
-import { Icon, IconProps } from "./icon";
+import { hopeIconClass, Icon, IconProps } from "./icon";
 
 interface CreateIconOptions {
   /**

@@ -1,13 +1,14 @@
 import { createIcon } from "../icon/create-icon";
 
 export const IconMoon = createIcon({
-  viewBox: "0 0 20 20",
   path: () => (
-    <g fill="none">
+    <g fill="none" stroke="currentColor">
       <path
-        d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"
-        fill="currentColor"
-      ></path>
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+      />
     </g>
   ),
 });

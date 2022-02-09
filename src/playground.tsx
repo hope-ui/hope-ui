@@ -11,6 +11,7 @@ import {
   FormLabel,
   HopeProvider,
   HStack,
+  Icon,
   IconExclamationCircle,
   Input,
 } from ".";
