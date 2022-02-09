@@ -18,6 +18,10 @@ export default {
       control: { type: "select" },
       options: ["outline", "filled"],
     },
+    colorScheme: {
+      control: { type: "select" },
+      options: ["primary", "neutral", "success", "info", "warning", "danger"],
+    },
     size: {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg"],
@@ -40,9 +44,13 @@ export default {
     readOnly: {
       control: { type: "boolean" },
     },
+    children: {
+      control: { type: "text" },
+    },
   },
   args: {
     variant: "outline",
+    colorScheme: "primary",
     size: "md",
     checked: false,
     indeterminate: false,
@@ -50,6 +58,7 @@ export default {
     disabled: false,
     required: false,
     readOnly: false,
+    children: "Checkbox",
   },
 };
 

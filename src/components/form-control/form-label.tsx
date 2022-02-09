@@ -56,7 +56,7 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
       for={htmlFor()}
       class={classes()}
       __baseStyle={theme?.baseStyle}
-      {...formControlDataAttrs()}
+      {...formControlDataAttrs}
       {...others}
     >
       {local.children}

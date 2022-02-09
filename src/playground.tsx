@@ -6,6 +6,7 @@ import { render } from "solid-js/web";
 import {
   Box,
   Button,
+  Checkbox,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -18,6 +19,8 @@ import {
 } from ".";
 
 export function App() {
+  const [checked, setChecked] = createSignal(false);
+  const [indeterminate, setIndeterminate] = createSignal(false);
   const [required, setRequired] = createSignal(false);
   const [disabled, setDisabled] = createSignal(false);
   const [invalid, setInvalid] = createSignal(false);
@@ -45,7 +48,11 @@ export function App() {
 
   return (
     <Box p="$4">
-      <HStack spacing="$4">
+      <HStack spacing="$4" wrap="wrap">
+        <Button onClick={() => setChecked(prev => !prev)}>checked : {checked().toString()}</Button>
+        <Button onClick={() => setIndeterminate(prev => !prev)}>
+          indeterminate : {indeterminate().toString()}
+        </Button>
         <Button onClick={() => setRequired(prev => !prev)}>
           required : {required().toString()}
         </Button>
@@ -84,6 +91,20 @@ export function App() {
           <span>An error occured</span>
         </HStack>
       </FormControl>
+
+      <Checkbox
+        checked={checked()}
+        indeterminate={indeterminate()}
+        required={required()}
+        invalid={invalid()}
+        disabled={disabled()}
+        readOnly={readOnly()}
+        onChange={e => setChecked(e.target.checked)}
+        onFocus={() => setShowDiv(prev => !prev)}
+        onBlur={() => setShowDiv(prev => !prev)}
+      >
+        Hello
+      </Checkbox>
     </Box>
   );
 }

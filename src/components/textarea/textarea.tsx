@@ -47,7 +47,7 @@ export function Textarea(props: TextareaProps) {
       as="textarea"
       class={classes()}
       __baseStyle={theme?.baseStyle}
-      {...formControlProps()}
+      {...formControlProps}
       {...others}
     />
   );

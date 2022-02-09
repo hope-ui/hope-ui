@@ -1,7 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
-import { SystemStyleObject } from "@/styled-system";
+import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
  * CSS reset for input [type=checkbox] and [type=radio]
@@ -19,46 +19,34 @@ export const baseCheckboxAndRadioResetStyles = css({
 
   padding: 0,
 
-  color: "$primary9",
   verticalAlign: "middle",
 
   colorAdjust: "exact",
   userSelect: "none",
 
   transition: "border-color 250ms, box-shadow 250ms",
-
-  variants: {
-    size: {
-      xs: {
-        boxSize: "$4",
-      },
-      sm: {
-        boxSize: "$5",
-      },
-      md: {
-        boxSize: "$6",
-      },
-      lg: {
-        boxSize: "$8",
-      },
-    },
-  },
 });
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox
  * -----------------------------------------------------------------------------------------------*/
 
-const commonOutlineAndFilledStyles: SystemStyleObject = {
-  "&:focus": {
-    boxShadow: "0 0 0 3px $colors$primary5",
-    borderColor: "$primary8",
-  },
+interface ColorVariantConfig {
+  color: string;
+  boxShadowColorFocus: string;
+  borderColorFocus: string;
+}
 
-  "&[aria-invalid=true]:focus": {
-    borderColor: "$danger8",
-  },
-};
+function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
+  return {
+    color: config.color,
+
+    "&:focus": {
+      boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
+      borderColor: config.borderColorFocus,
+    },
+  };
+}
 
 export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
   borderRadius: "$sm",
@@ -93,6 +81,7 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
 
   "&[aria-invalid=true]:focus": {
     boxShadow: "0 0 0 3px $colors$danger5",
+    borderColor: "$danger8",
   },
 
   [`&:checked:hover,
@@ -122,8 +111,6 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
         "&[aria-invalid=true]:hover": {
           borderColor: "$danger8",
         },
-
-        ...commonOutlineAndFilledStyles,
       },
       filled: {
         border: "2px solid transparent",
@@ -132,12 +119,52 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
         "&:hover, &:focus": {
           backgroundColor: "$neutral5",
         },
-
-        ...commonOutlineAndFilledStyles,
       },
     },
+    colorScheme: {
+      primary: createColorVariant({
+        color: "$primary9",
+        boxShadowColorFocus: "$primary5",
+        borderColorFocus: "$primary8",
+      }),
+      neutral: createColorVariant({
+        color: "$neutral9",
+        boxShadowColorFocus: "$neutral5",
+        borderColorFocus: "$neutral8",
+      }),
+      success: createColorVariant({
+        color: "$success9",
+        boxShadowColorFocus: "$success5",
+        borderColorFocus: "$success8",
+      }),
+      info: createColorVariant({
+        color: "$info9",
+        boxShadowColorFocus: "$info5",
+        borderColorFocus: "$info8",
+      }),
+      warning: createColorVariant({
+        color: "$warning9",
+        boxShadowColorFocus: "$warning5",
+        borderColorFocus: "$warning8",
+      }),
+      danger: createColorVariant({
+        color: "$danger9",
+        boxShadowColorFocus: "$danger5",
+        borderColorFocus: "$danger8",
+      }),
+    },
     size: {
+      xs: {
+        boxSize: "$4",
+      },
+      sm: {
+        boxSize: "$5",
+      },
+      md: {
+        boxSize: "$6",
+      },
       lg: {
+        boxSize: "$8",
         borderRadius: "$md",
       },
     },
@@ -145,3 +172,62 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
 });
 
 export type CheckboxVariants = VariantProps<typeof checkboxStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const checkboxLabelStyles = css({
+  position: "relative",
+  display: "inline-flex",
+  alignItems: "center",
+
+  cursor: "pointer",
+
+  "&[data-disabled]": {
+    opacity: "0.4",
+    cursor: "not-allowed",
+  },
+
+  variants: {
+    size: {
+      xs: {
+        fontSize: "$xs",
+        lineHeight: "$4",
+      },
+      sm: {
+        fontSize: "$sm",
+        lineHeight: "$5",
+      },
+      md: {
+        fontSize: "$base",
+        lineHeight: "$6",
+      },
+      lg: {
+        fontSize: "$lg",
+        lineHeight: "$7",
+      },
+    },
+  },
+});
+
+export type CheckboxLabelVariants = VariantProps<typeof checkboxLabelStyles>;
+
+export const checkboxSpanStyles = css({
+  variants: {
+    size: {
+      xs: {
+        marginInlineStart: "$1",
+      },
+      sm: {
+        marginInlineStart: "$1_5",
+      },
+      md: {
+        marginInlineStart: "$2",
+      },
+      lg: {
+        marginInlineStart: "$2_5",
+      },
+    },
+  },
+});

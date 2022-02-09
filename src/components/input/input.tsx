@@ -67,7 +67,7 @@ export function Input(props: InputProps) {
       class={classes()}
       size={local.htmlSize}
       __baseStyle={theme?.baseStyle}
-      {...formControlProps()}
+      {...formControlProps}
       {...others}
     />
   );
