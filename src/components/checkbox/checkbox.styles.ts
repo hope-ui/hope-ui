@@ -58,15 +58,13 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
 
   "&:checked": {
     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")`,
-    borderColor: "transparent",
-    backgroundColor: "currentColor",
-    backgroundSize: "100% 100%",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
   },
 
   "&:indeterminate": {
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3E%3C/svg%3E")`,
+  },
+
+  "&:checked, &:indeterminate": {
     borderColor: "transparent",
     backgroundColor: "currentColor",
     backgroundSize: "100% 100%",
@@ -179,7 +177,9 @@ export type CheckboxVariants = VariantProps<typeof checkboxStyles>;
 
 export const checkboxLabelStyles = css({
   position: "relative",
+
   display: "inline-flex",
+  flexDirection: "row",
   alignItems: "center",
 
   cursor: "pointer",
@@ -208,26 +208,54 @@ export const checkboxLabelStyles = css({
         lineHeight: "$7",
       },
     },
+    labelPosition: {
+      left: {
+        flexDirection: "row-reverse",
+      },
+    },
   },
 });
 
 export type CheckboxLabelVariants = VariantProps<typeof checkboxLabelStyles>;
 
+/* -------------------------------------------------------------------------------------------------
+ * Checkbox span text
+ * -----------------------------------------------------------------------------------------------*/
+
+function createSizeAndLabelPositionCompoundVariants() {
+  return Object.entries({
+    xs: "$1",
+    sm: "$1_5",
+    md: "$2",
+    lg: "$2_5",
+  }).flatMap(([key, value]) => [
+    {
+      labelPosition: "left",
+      size: key,
+      css: { marginInlineEnd: value },
+    },
+    {
+      labelPosition: "right",
+      size: key,
+      css: { marginInlineStart: value },
+    },
+  ]);
+}
+
 export const checkboxSpanStyles = css({
   variants: {
     size: {
-      xs: {
-        marginInlineStart: "$1",
-      },
-      sm: {
-        marginInlineStart: "$1_5",
-      },
-      md: {
-        marginInlineStart: "$2",
-      },
-      lg: {
-        marginInlineStart: "$2_5",
-      },
+      xs: {},
+      sm: {},
+      md: {},
+      lg: {},
+    },
+    labelPosition: {
+      left: {},
+      right: {},
     },
   },
+  compoundVariants: createSizeAndLabelPositionCompoundVariants(),
 });
+
+export type CheckboxSpanVariants = VariantProps<typeof checkboxSpanStyles>;

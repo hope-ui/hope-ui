@@ -26,6 +26,10 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg"],
     },
+    labelPosition: {
+      control: { type: "select" },
+      options: ["left", "right"],
+    },
     checked: {
       control: { type: "boolean" },
     },
@@ -52,6 +56,7 @@ export default {
     variant: "outline",
     colorScheme: "primary",
     size: "md",
+    labelPosition: "right",
     checked: false,
     indeterminate: false,
     invalid: false,

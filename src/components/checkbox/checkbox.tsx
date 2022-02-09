@@ -8,11 +8,12 @@ import { HopeComponentProps } from "../types";
 import {
   checkboxLabelStyles,
   checkboxSpanStyles,
+  CheckboxSpanVariants,
   checkboxStyles,
   CheckboxVariants,
 } from "./checkbox.styles";
 
-export type ThemeableCheckboxOptions = CheckboxVariants;
+export type ThemeableCheckboxOptions = CheckboxVariants & CheckboxSpanVariants;
 
 interface CheckboxOptions extends ThemeableCheckboxOptions {
   /**
@@ -88,6 +89,7 @@ export function Checkbox(props: CheckboxProps) {
     variant: theme?.defaultProps?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
+    labelPosition: theme?.defaultProps?.labelPosition ?? "right",
   };
 
   const propsWithDefaults: CheckboxProps = mergeProps(defaultProps, props);
@@ -111,17 +113,11 @@ export function Checkbox(props: CheckboxProps) {
       "onFocus",
       "onBlur",
     ],
-    ["variant", "colorScheme", "size"]
+    ["variant", "colorScheme", "size", "labelPosition"]
   );
 
   const labelClasses = () =>
-    classNames(
-      local.class,
-      hopeCheckboxClass,
-      checkboxLabelStyles({
-        size: variantProps.size,
-      })
-    );
+    classNames(local.class, hopeCheckboxClass, checkboxLabelStyles(variantProps));
 
   const dataAttrs = () => ({
     "data-checked": inputProps.checked ? "" : undefined,
@@ -155,7 +151,7 @@ export function Checkbox(props: CheckboxProps) {
         {...ariaAttrs}
       />
       <Show when={local.children}>
-        <Box as="span" class={checkboxSpanStyles({ size: variantProps.size })} {...dataAttrs}>
+        <Box as="span" class={checkboxSpanStyles(variantProps)} {...dataAttrs}>
           {local.children}
         </Box>
       </Show>
