@@ -4,7 +4,7 @@ import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { useFormControl } from "../form-control/use-form-control";
+import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
 import { ElementType, HopeComponentProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
@@ -38,14 +38,14 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
   };
 
   const propsWithDefault: InputProps<"input"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
+  const [local, variantProps, useFormControlProps, others] = splitProps(
     propsWithDefault,
-    ["class", "invalid", "htmlSize"],
-    ["variant", "size"]
+    ["class", "htmlSize"],
+    ["variant", "size"],
+    useFormControlPropNames
   );
 
-  // should be spread last in order to override same props from `others`
-  const formControlProps = useFormControl<HTMLInputElement>(others);
+  const formControlProps = useFormControl<HTMLInputElement>(useFormControlProps);
 
   const classes = () =>
     classNames(
@@ -53,7 +53,7 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
       hopeInputClass,
       inputStyles({
         variant: variantProps.variant,
-        size: inputGroup?.state.size ?? variantProps.size,
+        size: variantProps.size,
         withLeftElement: inputGroup?.state.hasLeftElement ?? false,
         withRightElement: inputGroup?.state.hasRightElement ?? false,
         withLeftAddon: inputGroup?.state.hasLeftAddon ?? false,
@@ -65,10 +65,9 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
     <Box
       class={classes()}
       size={local.htmlSize}
-      aria-invalid={local.invalid ? true : undefined}
       __baseStyle={theme?.baseStyle}
-      {...others}
       {...formControlProps()}
+      {...others}
     />
   );
 }

@@ -35,6 +35,8 @@ export default {
     },
   },
   args: {
+    variant: "outline",
+    size: "md",
     required: false,
     disabled: false,
     invalid: false,

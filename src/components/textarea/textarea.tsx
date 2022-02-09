@@ -4,7 +4,7 @@ import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { useFormControl } from "../form-control/use-form-control";
+import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
 import { ElementType, HopeComponentProps } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
@@ -31,25 +31,20 @@ export function Textarea<C extends ElementType = "textarea">(props: TextareaProp
   };
 
   const propsWithDefault: TextareaProps<"textarea"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
+
+  const [local, variantProps, useFormControlProps, others] = splitProps(
     propsWithDefault,
-    ["class", "invalid"],
-    ["variant", "size"]
+    ["class"],
+    ["variant", "size"],
+    useFormControlPropNames
   );
 
-  // should be spread last in order to override same props from `others`
-  const formControlProps = useFormControl<HTMLTextAreaElement>(others);
+  const formControlProps = useFormControl<HTMLTextAreaElement>(useFormControlProps);
 
   const classes = () => classNames(local.class, hopeTextareaClass, textareaStyles(variantProps));
 
   return (
-    <Box
-      class={classes()}
-      aria-invalid={local.invalid ? true : undefined}
-      __baseStyle={theme?.baseStyle}
-      {...others}
-      {...formControlProps()}
-    />
+    <Box class={classes()} __baseStyle={theme?.baseStyle} {...formControlProps()} {...others} />
   );
 }
 

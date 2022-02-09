@@ -8,10 +8,25 @@ export interface UseFormControlProps<T extends HTMLElement> extends FormControlO
   "aria-describedby"?: string;
 }
 
+/**
+ * Array of commonly splited props by component that use `useFormControl`.
+ */
+export const useFormControlPropNames: Array<keyof UseFormControlProps<HTMLElement>> = [
+  "id",
+  "required",
+  "disabled",
+  "invalid",
+  "readOnly",
+  "aria-describedby",
+  "onFocus",
+  "onBlur",
+];
+
 export interface FormControlProps<T extends HTMLElement> {
   id?: string;
   required?: boolean;
   disabled?: boolean;
+  invalid?: boolean;
   readOnly?: boolean;
   "aria-invalid"?: boolean;
   "aria-required"?: boolean;
@@ -38,6 +53,7 @@ export function useFormControl<T extends HTMLElement>(
   const id = () => props.id ?? formControl?.state.id;
   const required = () => props.required ?? formControl?.state.required;
   const disabled = () => props.disabled ?? formControl?.state.disabled;
+  const invalid = () => props.invalid ?? formControl?.state.invalid;
   const readOnly = () => props.readOnly ?? formControl?.state.readOnly;
   const ariaDescribedBy = () => {
     const labelIds: string[] = props["aria-describedby"] ? [props["aria-describedby"]] : [];
@@ -87,7 +103,7 @@ export function useFormControl<T extends HTMLElement>(
     required: required(),
     disabled: disabled(),
     readOnly: readOnly(),
-    "aria-invalid": formControl?.state.invalid ? true : undefined,
+    "aria-invalid": invalid() ? true : undefined,
     "aria-required": required() ? true : undefined,
     "aria-readonly": readOnly() ? true : undefined,
     "aria-describedby": ariaDescribedBy(),

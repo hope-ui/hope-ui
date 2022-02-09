@@ -5,7 +5,24 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { inputElementStyles, InputElementVariants } from "../input.styles";
 import { InputElement, InputLeftElement, InputRightElement } from "../input-element";
-import { InputGroup } from "../input-group";
+import * as inputGroupModule from "../input-group";
+
+const InputGroup = inputGroupModule.InputGroup;
+
+const inputGroupContextMock: inputGroupModule.InputGroupContextValue = {
+  state: {
+    variant: "outline",
+    size: "md",
+    hasLeftElement: false,
+    hasRightElement: false,
+    hasLeftAddon: false,
+    hasRightAddon: false,
+  },
+  setHasLeftElement: jest.fn(),
+  setHasRightElement: jest.fn(),
+  setHasLeftAddon: jest.fn(),
+  setHasRightAddon: jest.fn(),
+};
 
 describe("InputElement", () => {
   afterEach(cleanup);
@@ -182,6 +199,25 @@ describe("InputLeftElement", () => {
     expect(inputElement).toBeInstanceOf(HTMLSpanElement);
   });
 
+  it("should call inputGroupContext 'setHasLeftElement' on mount", () => {
+    // arrange
+    jest.spyOn(inputGroupModule, "useInputGroupContext").mockReturnValue(inputGroupContextMock);
+
+    const stubContext = inputGroupModule.useInputGroupContext();
+
+    // act
+    renderWithHopeProvider(() => (
+      <InputGroup>
+        <InputLeftElement>
+          <IconSearch />
+        </InputLeftElement>
+      </InputGroup>
+    ));
+
+    // assert
+    expect(stubContext?.setHasLeftElement).toHaveBeenCalledWith(true);
+  });
+
   it("should have semantic hope class", () => {
     // act
     renderWithHopeProvider(() => (
@@ -323,6 +359,25 @@ describe("InputRightElement", () => {
 
     // assert
     expect(inputElement).toBeInstanceOf(HTMLSpanElement);
+  });
+
+  it("should call inputGroupContext 'setHasRightElement' on mount", () => {
+    // arrange
+    jest.spyOn(inputGroupModule, "useInputGroupContext").mockReturnValue(inputGroupContextMock);
+
+    const stubContext = inputGroupModule.useInputGroupContext();
+
+    // act
+    renderWithHopeProvider(() => (
+      <InputGroup>
+        <InputRightElement>
+          <IconSearch />
+        </InputRightElement>
+      </InputGroup>
+    ));
+
+    // assert
+    expect(stubContext?.setHasRightElement).toHaveBeenCalledWith(true);
   });
 
   it("should have semantic hope class", () => {

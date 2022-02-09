@@ -28,6 +28,12 @@ export default {
     disabled: {
       control: { type: "boolean" },
     },
+    required: {
+      control: { type: "boolean" },
+    },
+    readOnly: {
+      control: { type: "boolean" },
+    },
     placeholder: {
       control: { type: "text" },
     },
