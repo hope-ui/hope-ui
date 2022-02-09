@@ -5,10 +5,10 @@ import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
-import { ElementType, HopeComponentProps } from "../types";
+import { HopeComponentProps } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
-export type ThemeableTextareaOptions = Pick<TextareaVariants, "variant" | "size">;
+export type ThemeableTextareaOptions = TextareaVariants;
 
 interface TextareaOptions extends ThemeableTextareaOptions {
   /**
@@ -17,20 +17,19 @@ interface TextareaOptions extends ThemeableTextareaOptions {
   invalid?: boolean;
 }
 
-export type TextareaProps<C extends ElementType> = HopeComponentProps<C, TextareaOptions>;
+export type TextareaProps = Omit<HopeComponentProps<"textarea", TextareaOptions>, "as">;
 
 const hopeTextareaClass = "hope-textarea";
 
-export function Textarea<C extends ElementType = "textarea">(props: TextareaProps<C>) {
+export function Textarea(props: TextareaProps) {
   const theme = useTheme().components.Textarea;
 
-  const defaultProps: TextareaProps<"textarea"> = {
-    as: "textarea",
+  const defaultProps: TextareaProps = {
     variant: theme?.defaultProps?.variant ?? "outline",
     size: theme?.defaultProps?.size ?? "md",
   };
 
-  const propsWithDefault: TextareaProps<"textarea"> = mergeProps(defaultProps, props);
+  const propsWithDefault: TextareaProps = mergeProps(defaultProps, props);
 
   const [local, variantProps, useFormControlProps, others] = splitProps(
     propsWithDefault,
@@ -44,7 +43,13 @@ export function Textarea<C extends ElementType = "textarea">(props: TextareaProp
   const classes = () => classNames(local.class, hopeTextareaClass, textareaStyles(variantProps));
 
   return (
-    <Box class={classes()} __baseStyle={theme?.baseStyle} {...formControlProps()} {...others} />
+    <Box
+      as="textarea"
+      class={classes()}
+      __baseStyle={theme?.baseStyle}
+      {...formControlProps()}
+      {...others}
+    />
   );
 }
 

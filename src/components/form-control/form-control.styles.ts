@@ -26,7 +26,7 @@ export const formLabelStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },
@@ -55,7 +55,7 @@ export const formHelperTextStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },
@@ -78,7 +78,7 @@ export const formErrorMessageStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },

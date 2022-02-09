@@ -61,22 +61,6 @@ const primary = {
   primary12: "#101d46",
 };
 
-// Radix - Gray
-// const neutral = {
-//   neutral1: "#fcfcfc",
-//   neutral2: "#f8f8f8",
-//   neutral3: "#f3f3f3",
-//   neutral4: "#ededed",
-//   neutral5: "#e8e8e8",
-//   neutral6: "#e2e2e2",
-//   neutral7: "#dbdbdb",
-//   neutral8: "#c7c7c7",
-//   neutral9: "#8f8f8f",
-//   neutral10: "#858585",
-//   neutral11: "#6f6f6f",
-//   neutral12: "#171717",
-// };
-
 // Radix - Slate
 const neutral = {
   neutral1: "#fbfcfd",
@@ -190,22 +174,6 @@ const primaryDark = {
   primary11: "#849dff",
   primary12: "#eef1fd",
 };
-
-// Radix - Gray dark
-// const neutralDark = {
-//   neutral1: "#161616",
-//   neutral2: "#1c1c1c",
-//   neutral3: "#232323",
-//   neutral4: "#282828",
-//   neutral5: "#2e2e2e",
-//   neutral6: "#343434",
-//   neutral7: "#3e3e3e",
-//   neutral8: "#505050",
-//   neutral9: "#707070",
-//   neutral10: "#7e7e7e",
-//   neutral11: "#a0a0a0",
-//   neutral12: "#ededed",
-// };
 
 // Radix - Slate dark
 const neutralDark = {

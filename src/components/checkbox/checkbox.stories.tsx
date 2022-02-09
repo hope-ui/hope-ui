@@ -1,10 +1,10 @@
 import { HopeWrapper } from "@/utils/storybook";
 
-import { Textarea } from "./textarea";
+import { Checkbox } from "./checkbox";
 
 export default {
-  title: "Data entry/Textarea",
-  component: Textarea,
+  title: "Data entry/Checkbox",
+  component: Checkbox,
   parameters: { layout: "centered" },
   decorators: [
     (Story: any) => (
@@ -16,11 +16,17 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["outline", "filled", "unstyled"],
+      options: ["outline", "filled"],
     },
     size: {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg"],
+    },
+    checked: {
+      control: { type: "boolean" },
+    },
+    indeterminate: {
+      control: { type: "boolean" },
     },
     invalid: {
       control: { type: "boolean" },
@@ -34,20 +40,18 @@ export default {
     readOnly: {
       control: { type: "boolean" },
     },
-    placeholder: {
-      control: { type: "text" },
-    },
   },
   args: {
     variant: "outline",
     size: "md",
+    checked: false,
+    indeterminate: false,
     invalid: false,
     disabled: false,
     required: false,
     readOnly: false,
-    placeholder: "Placeholder",
   },
 };
 
-export const Default = (args: any) => <Textarea {...args} />;
-Default.storyName = "Textarea";
+export const Default = (args: any) => <Checkbox {...args} />;
+Default.storyName = "Checkbox";

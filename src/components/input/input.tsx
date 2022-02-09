@@ -5,7 +5,7 @@ import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
-import { ElementType, HopeComponentProps } from "../types";
+import { HopeComponentProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
@@ -23,21 +23,21 @@ interface InputOptions extends ThemeableInputOptions {
   htmlSize?: string | number;
 }
 
-export type InputProps<C extends ElementType> = HopeComponentProps<C, InputOptions>;
+export type InputProps = Omit<HopeComponentProps<"input", InputOptions>, "as">;
 
 const hopeInputClass = "hope-input";
 
-export function Input<C extends ElementType = "input">(props: InputProps<C>) {
+export function Input(props: InputProps) {
   const inputGroup = useInputGroupContext();
   const theme = useTheme().components.Input;
 
-  const defaultProps: InputProps<"input"> = {
-    as: "input",
+  const defaultProps: InputProps = {
+    type: "text",
     variant: inputGroup?.state.variant ?? theme?.defaultProps?.variant ?? "outline",
     size: inputGroup?.state.size ?? theme?.defaultProps?.size ?? "md",
   };
 
-  const propsWithDefault: InputProps<"input"> = mergeProps(defaultProps, props);
+  const propsWithDefault: InputProps = mergeProps(defaultProps, props);
   const [local, variantProps, useFormControlProps, others] = splitProps(
     propsWithDefault,
     ["class", "htmlSize"],
@@ -63,6 +63,7 @@ export function Input<C extends ElementType = "input">(props: InputProps<C>) {
 
   return (
     <Box
+      as="input"
       class={classes()}
       size={local.htmlSize}
       __baseStyle={theme?.baseStyle}

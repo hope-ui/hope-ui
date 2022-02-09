@@ -4,6 +4,7 @@ import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
+  Box,
   Button,
   FormControl,
   FormErrorMessage,
@@ -43,7 +44,7 @@ export function App() {
   };
 
   return (
-    <div>
+    <Box p="$4">
       <HStack spacing="$4">
         <Button onClick={() => setRequired(prev => !prev)}>
           required : {required().toString()}
@@ -57,6 +58,7 @@ export function App() {
         </Button>
         <Button onClick={() => setShowDiv(prev => !prev)}>Show div : {showDiv().toString()}</Button>
         <Button onClick={logRefs}>Log refs</Button>
+        <Button loading>Loading</Button>
       </HStack>
 
       <FormControl
@@ -82,7 +84,7 @@ export function App() {
           <span>An error occured</span>
         </HStack>
       </FormControl>
-    </div>
+    </Box>
   );
 }
 
