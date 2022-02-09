@@ -177,9 +177,7 @@ export type CheckboxVariants = VariantProps<typeof checkboxStyles>;
 
 export const checkboxLabelStyles = css({
   position: "relative",
-
   display: "inline-flex",
-  flexDirection: "row",
   alignItems: "center",
 
   cursor: "pointer",
@@ -211,6 +209,9 @@ export const checkboxLabelStyles = css({
     labelPosition: {
       left: {
         flexDirection: "row-reverse",
+      },
+      right: {
+        flexDirection: "row",
       },
     },
   },
