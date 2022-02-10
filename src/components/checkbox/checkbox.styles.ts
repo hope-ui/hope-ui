@@ -152,18 +152,14 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
       }),
     },
     size: {
-      xs: {
-        boxSize: "$4",
-      },
       sm: {
-        boxSize: "$5",
+        boxSize: "$3",
       },
       md: {
-        boxSize: "$6",
+        boxSize: "$4",
       },
       lg: {
-        boxSize: "$8",
-        borderRadius: "$md",
+        boxSize: "$5",
       },
     },
   },
@@ -189,10 +185,6 @@ export const checkboxLabelStyles = css({
 
   variants: {
     size: {
-      xs: {
-        fontSize: "$xs",
-        lineHeight: "$4",
-      },
       sm: {
         fontSize: "$sm",
         lineHeight: "$5",
@@ -225,10 +217,9 @@ export type CheckboxLabelVariants = VariantProps<typeof checkboxLabelStyles>;
 
 function createSizeAndLabelPositionCompoundVariants() {
   return Object.entries({
-    xs: "$1",
     sm: "$1_5",
     md: "$2",
-    lg: "$2_5",
+    lg: "$2",
   }).flatMap(([key, value]) => [
     {
       labelPosition: "left",
@@ -246,7 +237,6 @@ function createSizeAndLabelPositionCompoundVariants() {
 export const checkboxSpanStyles = css({
   variants: {
     size: {
-      xs: {},
       sm: {},
       md: {},
       lg: {},

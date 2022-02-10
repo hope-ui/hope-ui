@@ -24,7 +24,7 @@ export default {
     },
     size: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg"],
+      options: ["sm", "md", "lg"],
     },
     labelPosition: {
       control: { type: "select" },

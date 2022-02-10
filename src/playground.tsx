@@ -16,6 +16,7 @@ import {
   Icon,
   IconExclamationCircle,
   Input,
+  Stack,
 } from ".";
 
 export function App() {
@@ -26,6 +27,11 @@ export function App() {
   const [invalid, setInvalid] = createSignal(false);
   const [readOnly, setReadOnly] = createSignal(false);
   const [showDiv, setShowDiv] = createSignal(false);
+
+  const [checkedItems, setCheckedItems] = createSignal([false, false]);
+
+  const allChecked = () => checkedItems().every(Boolean);
+  const isIndeterminate = () => checkedItems().some(Boolean) && !allChecked();
 
   const focusHandler = (e: FocusEvent) => {
     console.log("focused", e);
@@ -105,6 +111,27 @@ export function App() {
       >
         Hello
       </Checkbox>
+      <Checkbox
+        checked={allChecked()}
+        indeterminate={isIndeterminate()}
+        onChange={e => setCheckedItems([e.target.checked, e.target.checked])}
+      >
+        Parent Checkbox
+      </Checkbox>
+      <Stack pl="$6" mt="$1" rowGap="$1">
+        <Checkbox
+          checked={checkedItems()[0]}
+          onChange={e => setCheckedItems([e.target.checked, checkedItems()[1]])}
+        >
+          Child Checkbox 1
+        </Checkbox>
+        <Checkbox
+          checked={checkedItems()[1]}
+          onChange={e => setCheckedItems([checkedItems()[0], e.target.checked])}
+        >
+          Child Checkbox 2
+        </Checkbox>
+      </Stack>
     </Box>
   );
 }
