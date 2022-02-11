@@ -77,7 +77,7 @@ export function useFormControl<T extends HTMLElement>(
       if (typeof props.onFocus === "function") {
         props.onFocus(event);
       } else {
-        props.onFocus[0](undefined, event);
+        props.onFocus[0](props.onFocus[1], event);
       }
     }
 
@@ -91,7 +91,7 @@ export function useFormControl<T extends HTMLElement>(
       if (typeof props.onBlur === "function") {
         props.onBlur(event);
       } else {
-        props.onBlur[0](undefined, event);
+        props.onBlur[0](props.onBlur[1], event);
       }
     }
 

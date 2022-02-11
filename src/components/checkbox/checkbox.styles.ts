@@ -3,32 +3,74 @@ import { VariantProps } from "@stitches/core";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-/* -------------------------------------------------------------------------------------------------
- * CSS reset for input [type=checkbox] and [type=radio]
- * -----------------------------------------------------------------------------------------------*/
-
-export const baseCheckboxAndRadioResetStyles = css({
-  appearance: "none",
-
-  display: "inline-block",
-  flexShrink: 0,
-
-  outline: "none",
-
-  backgroundOrigin: "border-box",
-
-  padding: 0,
-
-  verticalAlign: "middle",
-
-  colorAdjust: "exact",
-  userSelect: "none",
-
-  transition: "border-color 250ms, box-shadow 250ms",
+/**
+ * Visually hide an element without hiding it from screen readers
+ */
+export const visuallyHiddenStyles = css({
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: "0",
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  borderWidth: "0",
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox
+ * Checkbox - input
+ * -----------------------------------------------------------------------------------------------*/
+
+export const checkboxInputStyles = css(visuallyHiddenStyles);
+
+/* -------------------------------------------------------------------------------------------------
+ * Checkbox - container
+ * -----------------------------------------------------------------------------------------------*/
+
+export const checkboxContainerStyles = css({
+  position: "relative",
+  display: "inline-flex",
+  alignItems: "center",
+
+  cursor: "pointer",
+  userSelect: "none",
+
+  "&[data-disabled]": {
+    opacity: "0.4",
+    cursor: "not-allowed",
+  },
+
+  variants: {
+    size: {
+      sm: {
+        fontSize: "$sm",
+        lineHeight: "$5",
+      },
+      md: {
+        fontSize: "$base",
+        lineHeight: "$6",
+      },
+      lg: {
+        fontSize: "$lg",
+        lineHeight: "$7",
+      },
+    },
+    labelPosition: {
+      left: {
+        flexDirection: "row-reverse",
+      },
+      right: {
+        flexDirection: "row",
+      },
+    },
+  },
+});
+
+export type CheckboxContainerVariants = VariantProps<typeof checkboxContainerStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Checkbox - control
  * -----------------------------------------------------------------------------------------------*/
 
 interface ColorVariantConfig {
@@ -41,65 +83,54 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   return {
     color: config.color,
 
-    "&:focus": {
+    [`.${checkboxInputStyles}:focus + &`]: {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
     },
   };
 }
 
-export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
+export const checkboxControlStyles = css({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+
+  height: "100%",
+
+  outline: "none",
+
   borderRadius: "$sm",
 
-  "&:disabled": {
-    opacity: 0.4,
+  padding: 0,
+
+  verticalAlign: "middle",
+  userSelect: "none",
+  transition: "border-color 250ms, box-shadow 250ms",
+
+  "& svg": {
+    color: "$checkboxIconColor",
+  },
+
+  "&[data-disabled]": {
+    opacity: "0.4",
     cursor: "not-allowed",
   },
 
-  "&:checked": {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")`,
-  },
-
-  ".hope-ui-dark &:checked": {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%23202425' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E")`,
-  },
-
-  "&:indeterminate": {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3E%3C/svg%3E")`,
-  },
-
-  ".hope-ui-dark &:indeterminate": {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='%23202425' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3E%3C/svg%3E")`,
-  },
-
-  "&:checked, &:indeterminate": {
-    borderColor: "transparent",
-    backgroundColor: "currentColor",
-    backgroundSize: "100% 100%",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  },
-
-  "&[aria-invalid=true]": {
+  "&[data-invalid]": {
     borderColor: "$danger8",
     color: "$danger9",
   },
 
-  "&[aria-invalid=true]:focus": {
+  [`.${checkboxInputStyles}:focus + &[data-invalid]`]: {
     boxShadow: "0 0 0 3px $colors$danger5",
     borderColor: "$danger8",
   },
 
-  [`&:checked:hover,
-    &:checked:focus,
-    &[aria-invalid=true]:checked,
-    &[aria-invalid=true]:checked:hover,
-    &[aria-invalid=true]:checked:focus,
-    &:indeterminate:hover,
-    &:indeterminate:focus,
-    &[aria-invalid=true]:indeterminate,
-    &[aria-invalid=true]:indeterminate:hover,
-    &[aria-invalid=true]:indeterminate:focus`]: {
+  [`&[data-checked],
+    .${checkboxInputStyles}:focus + &[data-checked],
+    &[data-indeterminate],
+    .${checkboxInputStyles}:focus + &[data-indeterminate]`]: {
     borderColor: "transparent",
     backgroundColor: "currentColor",
   },
@@ -107,24 +138,12 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
   variants: {
     variant: {
       outline: {
-        border: "2px solid $neutral7",
+        border: "1px solid $neutral8",
         backgroundColor: "transparent",
-
-        "&:hover": {
-          borderColor: "$neutral8",
-        },
-
-        "&[aria-invalid=true]:hover": {
-          borderColor: "$danger8",
-        },
       },
       filled: {
-        border: "2px solid transparent",
-        backgroundColor: "$neutral4",
-
-        "&:hover, &:focus": {
-          backgroundColor: "$neutral5",
-        },
+        border: "1px solid transparent",
+        backgroundColor: "$neutral5",
       },
     },
     colorScheme: {
@@ -173,54 +192,10 @@ export const checkboxStyles = css(baseCheckboxAndRadioResetStyles, {
   },
 });
 
-export type CheckboxVariants = VariantProps<typeof checkboxStyles>;
+export type CheckboxControlVariants = VariantProps<typeof checkboxControlStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Label
- * -----------------------------------------------------------------------------------------------*/
-
-export const checkboxLabelStyles = css({
-  position: "relative",
-  display: "inline-flex",
-  alignItems: "center",
-
-  cursor: "pointer",
-
-  "&[data-disabled]": {
-    opacity: "0.4",
-    cursor: "not-allowed",
-  },
-
-  variants: {
-    size: {
-      sm: {
-        fontSize: "$sm",
-        lineHeight: "$5",
-      },
-      md: {
-        fontSize: "$base",
-        lineHeight: "$6",
-      },
-      lg: {
-        fontSize: "$lg",
-        lineHeight: "$7",
-      },
-    },
-    labelPosition: {
-      left: {
-        flexDirection: "row-reverse",
-      },
-      right: {
-        flexDirection: "row",
-      },
-    },
-  },
-});
-
-export type CheckboxLabelVariants = VariantProps<typeof checkboxLabelStyles>;
-
-/* -------------------------------------------------------------------------------------------------
- * Checkbox span text
+ * Checkbox - span containing the text label
  * -----------------------------------------------------------------------------------------------*/
 
 function createSizeAndLabelPositionCompoundVariants() {
@@ -242,7 +217,7 @@ function createSizeAndLabelPositionCompoundVariants() {
   ]);
 }
 
-export const checkboxSpanStyles = css({
+export const checkboxLabelStyles = css({
   variants: {
     size: {
       sm: {},
@@ -256,5 +231,3 @@ export const checkboxSpanStyles = css({
   },
   compoundVariants: createSizeAndLabelPositionCompoundVariants(),
 });
-
-export type CheckboxSpanVariants = VariantProps<typeof checkboxSpanStyles>;

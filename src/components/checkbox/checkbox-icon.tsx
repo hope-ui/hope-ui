@@ -1,19 +1,9 @@
-import { css } from "@/styled-system";
-import { dash } from "@/styled-system/keyframes";
-
 import { Icon, IconProps } from "../icon/icon";
-
-const checkboxIconStyles = css({
-  strokeDasharray: 48,
-  strokeDashoffset: 48,
-  animation: `${dash} 250ms linear forwards`,
-});
 
 export const CheckIcon = (props: IconProps<"svg">) => (
   <Icon {...props}>
     <g fill="none">
       <path
-        class={checkboxIconStyles()}
         stroke="currentColor"
         stroke-width="4"
         stroke-linecap="round"
@@ -31,8 +21,8 @@ export const IndeterminateIcon = (props: IconProps<"svg">) => (
         stroke="currentColor"
         stroke-width="4"
         stroke-linecap="round"
-        x1="4"
-        x2="20"
+        x1="5"
+        x2="19"
         y1="12"
         y2="12"
       />

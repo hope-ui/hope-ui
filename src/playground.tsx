@@ -10,7 +10,6 @@ export function App() {
   const [indeterminate, setIndeterminate] = createSignal(false);
 
   const changeHandler = (e: Event) => {
-    e.stopPropagation();
     setChecked((e.target as HTMLInputElement).checked);
   };
 
@@ -25,6 +24,17 @@ export function App() {
           Controlled
         </Checkbox>
         <Checkbox indeterminate={indeterminate()}>Uncontrolled</Checkbox>
+        <Checkbox
+          invalid
+          checked={checked()}
+          indeterminate={indeterminate()}
+          onChange={changeHandler}
+        >
+          Controlled
+        </Checkbox>
+        <Checkbox invalid indeterminate={indeterminate()}>
+          Uncontrolled
+        </Checkbox>
       </HStack>
     </Box>
   );

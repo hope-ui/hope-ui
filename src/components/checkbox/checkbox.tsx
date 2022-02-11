@@ -1,21 +1,48 @@
-import { JSX, mergeProps, Show, splitProps } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  createUniqueId,
+  JSX,
+  Match,
+  mergeProps,
+  Show,
+  splitProps,
+  Switch,
+} from "solid-js";
 
 import { useTheme } from "@/theme";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { HopeComponentProps } from "../types";
+import { ElementType, HopeComponentProps } from "../types";
 import {
+  checkboxContainerStyles,
+  CheckboxContainerVariants,
+  checkboxControlStyles,
+  CheckboxControlVariants,
+  checkboxInputStyles,
   checkboxLabelStyles,
-  checkboxSpanStyles,
-  CheckboxSpanVariants,
-  checkboxStyles,
-  CheckboxVariants,
 } from "./checkbox.styles";
+import { CheckIcon, IndeterminateIcon } from "./checkbox-icon";
 
-export type ThemeableCheckboxOptions = CheckboxVariants & CheckboxSpanVariants;
+export type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
 
 interface CheckboxOptions extends ThemeableCheckboxOptions {
+  /**
+   * The ref to be passed to the internal <input> tag.
+   */
+  ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
+
+  /**
+   * The checked icon to use
+   */
+  iconChecked?: JSX.Element;
+
+  /**
+   * The indeterminate icon to use
+   */
+  iconIndeterminate?: JSX.Element;
+
   /**
    * The name of the input field in a checkbox
    * (Useful for form submission).
@@ -78,29 +105,39 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type CheckboxProps = Omit<HopeComponentProps<"label", CheckboxOptions>, "as">;
+export type CheckboxProps<C extends ElementType> = HopeComponentProps<C, CheckboxOptions>;
 
 const hopeCheckboxClass = "hope-checkbox";
+const hopeCheckboxInputClass = "hope-checkbox__input";
+const hopeCheckboxControlClass = "hope-checkbox__control";
+const hopeCheckboxLabelClass = "hope-checkbox__label";
 
-export function Checkbox(props: CheckboxProps) {
+export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const theme = useTheme().components.Checkbox;
 
-  const defaultProps: CheckboxProps = {
+  // eslint-disable-next-line solid/reactivity
+  const [checkedState, setCheckedState] = createSignal(!!props.checked, { equals: false });
+
+  const defaultProps: CheckboxProps<"label"> = {
+    as: "label",
+    id: createUniqueId(),
+    iconChecked: <CheckIcon />,
+    iconIndeterminate: <IndeterminateIcon />,
     variant: theme?.defaultProps?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
     labelPosition: theme?.defaultProps?.labelPosition ?? "right",
   };
 
-  const propsWithDefaults: CheckboxProps = mergeProps(defaultProps, props);
+  const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["invalid", "class", "children"],
+    ["iconChecked", "iconIndeterminate", "checked", "invalid", "onChange", "class", "children"],
     [
+      "ref",
       "id",
       "name",
       "value",
-      "checked",
       "indeterminate",
       "required",
       "disabled",
@@ -109,18 +146,16 @@ export function Checkbox(props: CheckboxProps) {
       "aria-labelledby",
       "aria-describedby",
       "tabIndex",
-      "onChange",
       "onFocus",
       "onBlur",
     ],
     ["variant", "colorScheme", "size", "labelPosition"]
   );
 
-  const labelClasses = () =>
-    classNames(local.class, hopeCheckboxClass, checkboxLabelStyles(variantProps));
+  // Input loose focus if this is placed in `dataAttrs()`
+  const dataChecked = () => (checkedState() ? "" : undefined);
 
   const dataAttrs = () => ({
-    "data-checked": inputProps.checked ? "" : undefined,
     "data-indeterminate": inputProps.indeterminate ? "" : undefined,
     "data-required": inputProps.required ? "" : undefined,
     "data-disabled": inputProps.disabled ? "" : undefined,
@@ -135,25 +170,72 @@ export function Checkbox(props: CheckboxProps) {
     "aria-readonly": inputProps.readOnly ? true : undefined,
   });
 
+  const containerClasses = () => {
+    return classNames(local.class, hopeCheckboxClass, checkboxContainerStyles(variantProps));
+  };
+
+  const inputClasses = () => classNames(hopeCheckboxInputClass, checkboxInputStyles());
+
+  const controlClasses = () => {
+    return classNames(hopeCheckboxControlClass, checkboxControlStyles(variantProps));
+  };
+
+  const labelClasses = () => classNames(hopeCheckboxLabelClass, checkboxLabelStyles(variantProps));
+
+  const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
+    if (inputProps.readOnly || inputProps.disabled) {
+      event.preventDefault();
+      return;
+    }
+
+    const target = event.target as HTMLInputElement;
+    setCheckedState(target.checked);
+
+    if (local.onChange) {
+      if (typeof local.onChange === "function") {
+        local.onChange(event);
+      } else {
+        local.onChange[0](local.onChange[1], event);
+      }
+    }
+
+    return event.defaultPrevented;
+  };
+
+  createEffect(() => {
+    if (local.checked !== undefined) {
+      setCheckedState(local.checked);
+    }
+  });
+
   return (
     <Box
       as="label"
-      class={labelClasses()}
       __baseStyle={theme?.baseStyle}
+      class={containerClasses()}
+      for={inputProps.id}
+      data-checked={dataChecked()}
       {...dataAttrs}
       {...others}
     >
-      <Box
-        as="input"
+      <input
         type="checkbox"
-        class={checkboxStyles(variantProps)}
+        class={inputClasses()}
+        checked={checkedState()}
+        onChange={onChange}
         {...inputProps}
         {...ariaAttrs}
       />
+      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs}>
+        <Switch>
+          <Match when={inputProps.indeterminate}>{local.iconIndeterminate}</Match>
+          <Match when={checkedState() && !inputProps.indeterminate}>{local.iconChecked}</Match>
+        </Switch>
+      </span>
       <Show when={local.children}>
-        <Box as="span" class={checkboxSpanStyles(variantProps)} {...dataAttrs}>
+        <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
           {local.children}
-        </Box>
+        </span>
       </Show>
     </Box>
   );
