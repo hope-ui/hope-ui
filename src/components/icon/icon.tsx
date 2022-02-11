@@ -22,7 +22,7 @@ const fallbackIcon = {
 
 export const hopeIconClass = "hope-icon";
 
-export type IconProps<C extends ElementType> = HopeComponentProps<C>;
+export type IconProps<C extends ElementType = "svg"> = HopeComponentProps<C>;
 
 export function Icon<C extends ElementType = "svg">(props: IconProps<C>) {
   const defaultProps: IconProps<"svg"> = {
