@@ -1,7 +1,7 @@
 import merge from "lodash.merge";
 import { isServer } from "solid-js/web";
 
-import { createTheme, theme } from "@/styled-system/stitches.config";
+import { createTheme, css, theme } from "@/styled-system/stitches.config";
 import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
@@ -94,3 +94,18 @@ export function syncBodyColorModeClassName(isDark: boolean) {
   body.classList.add(isDark ? classNames.dark : classNames.light);
   body.classList.remove(isDark ? classNames.light : classNames.dark);
 }
+
+/**
+ * Visually hide an element without hiding it from screen readers
+ */
+export const visuallyHiddenStyles = css({
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: "0",
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  borderWidth: "0",
+});

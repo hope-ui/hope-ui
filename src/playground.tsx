@@ -20,11 +20,12 @@ import {
   useColorMode,
   useColorModeValue,
   VStack,
+  Switch,
 } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const cardBg = useColorModeValue("white", "$neutral2");
+  const cardBg = useColorModeValue("white", "$neutral3");
   const icon = useColorModeValue(<IconMoon />, <IconSun />);
 
   return (
@@ -56,6 +57,7 @@ export function App() {
                   Forgot your password ?
                 </Anchor>
               </HStack>
+              <Switch variant="outline">Lorem ipsum</Switch>
               <Button fullWidth>Login</Button>
             </VStack>
           </Box>
@@ -75,6 +77,7 @@ export function App() {
                   Forgot your password ?
                 </Anchor>
               </HStack>
+              <Switch>Lorem ipsum</Switch>
               <Button fullWidth>Login</Button>
             </VStack>
           </Box>

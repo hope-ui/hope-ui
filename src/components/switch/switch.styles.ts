@@ -5,16 +5,16 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { visuallyHiddenStyles } from "@/theme/utils";
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - input
+ * Switch - input
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxInputStyles = css(visuallyHiddenStyles);
+export const switchInputStyles = css(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - container
+ * Switch - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxContainerStyles = css({
+export const switchContainerStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -55,10 +55,10 @@ export const checkboxContainerStyles = css({
   },
 });
 
-export type CheckboxContainerVariants = VariantProps<typeof checkboxContainerStyles>;
+export type SwitchContainerVariants = VariantProps<typeof switchContainerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - control
+ * Switch - control
  * -----------------------------------------------------------------------------------------------*/
 
 interface ColorVariantConfig {
@@ -71,35 +71,31 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   return {
     color: config.color,
 
-    [`.${checkboxInputStyles}:focus + &`]: {
+    [`.${switchInputStyles}:focus + &`]: {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
     },
   };
 }
 
-export const checkboxControlStyles = css({
+export const switchControlStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "start",
   flexShrink: 0,
 
   height: "100%",
 
   outline: "none",
 
-  borderRadius: "$sm",
+  borderRadius: "$full",
 
   padding: 0,
 
   verticalAlign: "middle",
   userSelect: "none",
-  transition: "border-color 250ms, box-shadow 250ms",
-
-  "& svg": {
-    color: "$checkboxIconColor",
-  },
+  transition: "background-color 250ms, border-color 250ms, box-shadow 250ms",
 
   "&[data-disabled]": {
     opacity: "0.4",
@@ -111,29 +107,70 @@ export const checkboxControlStyles = css({
     color: "$danger9",
   },
 
-  [`.${checkboxInputStyles}:focus + &[data-invalid]`]: {
+  [`.${switchInputStyles}:focus + &[data-invalid]`]: {
     boxShadow: "0 0 0 3px $colors$danger5",
     borderColor: "$danger8",
   },
 
-  [`&[data-checked],
-    .${checkboxInputStyles}:focus + &[data-checked],
-    &[data-indeterminate],
-    .${checkboxInputStyles}:focus + &[data-indeterminate]`]: {
+  [`&[data-checked], 
+    .${switchInputStyles}:focus + &[data-checked]`]: {
     borderColor: "transparent",
     backgroundColor: "currentColor",
   },
 
+  // Switch trackball
+  "&::before": {
+    content: "''",
+    position: "absolute",
+    top: "1px",
+    left: "1px",
+    zIndex: "1",
+    borderRadius: "$full",
+    transition: "250ms",
+  },
+
   variants: {
+    hasIconOn: {
+      true: {},
+    },
+    hasIconOff: {
+      true: {
+        justifyContent: "end",
+      },
+    },
     variant: {
       outline: {
         border: "1px solid",
         borderColor: "inherit", // allow passing borderColor style props to parent container
         backgroundColor: "transparent",
+
+        "& svg": {
+          color: "$neutral7",
+        },
+
+        "&[data-checked] svg": {
+          color: "$switchTrackBg",
+        },
+
+        "&::before": {
+          backgroundColor: "$neutral7",
+        },
+
+        "&[data-checked]::before": {
+          backgroundColor: "$switchTrackBg",
+        },
       },
       filled: {
         border: "1px solid transparent",
         backgroundColor: "$neutral7",
+
+        "& svg": {
+          color: "$switchTrackBg",
+        },
+
+        "&::before": {
+          backgroundColor: "$switchTrackBg",
+        },
       },
     },
     colorScheme: {
@@ -170,22 +207,70 @@ export const checkboxControlStyles = css({
     },
     size: {
       sm: {
-        boxSize: "$3",
+        height: "16px",
+        width: "28px",
+
+        "& svg": {
+          boxSize: "12px",
+        },
+
+        "&::before": {
+          boxSize: "12px",
+        },
+
+        "&[data-checked]::before": {
+          transform: "translateX(12px)",
+        },
       },
       md: {
-        boxSize: "$4",
+        columnGap: "2px",
+        height: "20px",
+        width: "36px",
+
+        "& svg": {
+          boxSize: "16px",
+        },
+
+        "&::before": {
+          boxSize: "16px",
+        },
+
+        "&[data-checked]::before": {
+          transform: "translateX(16px)",
+        },
       },
       lg: {
-        boxSize: "$5",
+        columnGap: "4px",
+        height: "28px",
+        width: "52px",
+
+        "& svg": {
+          boxSize: "24px",
+        },
+
+        "&::before": {
+          boxSize: "24px",
+        },
+
+        "&[data-checked]::before": {
+          transform: "translateX(24px)",
+        },
       },
     },
   },
+  compoundVariants: [
+    {
+      hasIconOn: true,
+      hasIconOff: true,
+      css: { justifyContent: "space-around" },
+    },
+  ],
 });
 
-export type CheckboxControlVariants = VariantProps<typeof checkboxControlStyles>;
+export type SwitchControlVariants = VariantProps<typeof switchControlStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - span containing the text label
+ * Switch - span containing the text label
  * -----------------------------------------------------------------------------------------------*/
 
 function createSizeAndLabelPositionCompoundVariants() {
@@ -207,7 +292,7 @@ function createSizeAndLabelPositionCompoundVariants() {
   ]);
 }
 
-export const checkboxLabelStyles = css({
+export const switchLabelStyles = css({
   variants: {
     size: {
       sm: {},

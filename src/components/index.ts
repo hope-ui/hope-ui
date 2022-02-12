@@ -15,6 +15,7 @@ export * from "./icons";
 export * from "./input";
 export * from "./spacer";
 export * from "./stack";
+export * from "./switch";
 export * from "./tag";
 export * from "./text";
 export * from "./textarea";
