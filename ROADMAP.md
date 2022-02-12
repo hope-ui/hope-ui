@@ -31,14 +31,14 @@
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
 | AutoComplete     |             |            |       |           |      |
-| Checkbox         |             |            |       |           |      |
+| Checkbox         |     ✅      |     ✅     |       |    ✅     |      |
 | DatePicker       |             |            |       |           |      |
 | Form             |             |            |       |           |      |
-| FormControl      |             |            |       |           |      |
-| FormLabel        |             |            |       |           |      |
-| FormHelperText   |             |            |       |           |      |
-| FormErrorMessage |             |            |       |           |      |
-| Input (Text)     |             |            |       |           |      |
+| FormControl      |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormLabel        |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormHelperText   |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormErrorMessage |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Input (Text)     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | NumberInput      |             |            |       |           |      |
 | PasswordInput    |             |            |       |           |      |
 | RadioGroup       |             |            |       |           |      |
@@ -47,7 +47,7 @@
 | MultiSelect      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
 | Switch           |             |            |       |           |      |
-| Textarea         |             |            |       |           |      |
+| Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |
 
@@ -67,7 +67,7 @@
 
 |             | Development | A11y check | Tests | Storybook | Docs |
 | ----------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Anchor      |             |            |       |           |      |
+| Anchor      |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Breadcrumbs |             |            |       |           |      |
 | Pagination  |             |            |       |           |      |
 | Stepper     |             |            |       |           |      |
@@ -77,7 +77,7 @@
 
 |              | Development | A11y check | Tests | Storybook | Docs |
 | ------------ | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert        |             |            |       |           |      |
+| Alert        |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Loader       |             |            |       |           |      |
 | Notification |             |            |       |           |      |
 | Progress     |             |            |       |           |      |

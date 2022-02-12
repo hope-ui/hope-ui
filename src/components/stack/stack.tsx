@@ -12,7 +12,9 @@ export type StackProps<C extends ElementType> = BaseFlexProps<C>;
 const hopeStackClass = "hope-stack";
 
 /**
- * [Internal] Foundation of <VStack /> and <HStack /> components.
+ * Stack is a layout component that makes it easy to stack elements together and apply a space between them.
+ *
+ * Foundation of <VStack /> and <HStack /> components.
  */
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const [local, others] = splitProps(props, ["class"]);

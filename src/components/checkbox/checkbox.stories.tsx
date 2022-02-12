@@ -2,8 +2,9 @@ import { createSignal } from "solid-js";
 
 import { HopeWrapper } from "@/utils/storybook";
 
-import { HStack } from "../stack/stack";
+import { HStack, VStack } from "../stack/stack";
 import { Checkbox } from "./checkbox";
+import { Button } from "..";
 
 export default {
   title: "Data entry/Checkbox",
@@ -33,6 +34,9 @@ export default {
       control: { type: "select" },
       options: ["left", "right"],
     },
+    checked: {
+      control: { type: "boolean" },
+    },
     indeterminate: {
       control: { type: "boolean" },
     },
@@ -54,6 +58,7 @@ export default {
     colorScheme: "primary",
     size: "md",
     labelPosition: "right",
+    checked: false,
     indeterminate: false,
     invalid: false,
     disabled: false,
@@ -70,12 +75,17 @@ export const Default = (args: any) => {
   };
 
   return (
-    <HStack spacing="$5">
-      <Checkbox checked={checked()} onChange={onChange} {...args}>
-        Controlled
-      </Checkbox>
-      <Checkbox {...args}>Uncontrolled</Checkbox>
-    </HStack>
+    <VStack spacing="$5">
+      <Button onClick={() => setChecked(prev => !prev)}>
+        Toggle controlled checkbox ({checked().toString()})
+      </Button>
+      <HStack spacing="$5">
+        <Checkbox {...args} checked={checked()} onChange={onChange}>
+          Controlled
+        </Checkbox>
+        <Checkbox {...args}>Uncontrolled</Checkbox>
+      </HStack>
+    </VStack>
   );
 };
 Default.storyName = "Checkbox";

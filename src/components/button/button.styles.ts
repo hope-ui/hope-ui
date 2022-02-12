@@ -186,9 +186,9 @@ export const buttonStyles = css({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",
 
-  "&:active": {
-    transform: "translateY(1px)",
-  },
+  // "&:active": {
+  //   transform: "translateY(1px)",
+  // },
 
   "&:focus-visible": {
     outline: "2px solid #2563eb",
