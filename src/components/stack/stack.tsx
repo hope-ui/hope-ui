@@ -1,13 +1,19 @@
 import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
-import { ResponsiveProps } from "@/styled-system/types";
+import { ResponsiveProps, SpaceScaleValue } from "@/styled-system/types";
 import { classNames, createCssSelector } from "@/utils/css";
 
-import { BaseFlex, BaseFlexProps } from "../flex/flex";
-import { ElementType } from "../types";
+import { Box } from "../box/box";
+import { ElementType, HopeComponentProps } from "../types";
 
-export type StackProps<C extends ElementType> = BaseFlexProps<C>;
+export type StackOptions = ResponsiveProps<{
+  direction?: Property.FlexDirection;
+  wrap?: Property.FlexWrap;
+  //spacing?: Property.Gap<SpaceScaleValue> | number;
+}>;
+
+export type StackProps<C extends ElementType> = HopeComponentProps<C, StackOptions>;
 
 const hopeStackClass = "hope-stack";
 
@@ -17,11 +23,20 @@ const hopeStackClass = "hope-stack";
  * Foundation of <VStack /> and <HStack /> components.
  */
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
-  const [local, others] = splitProps(props, ["class"]);
+  const [local, others] = splitProps(props, ["class", "direction", "wrap"]);
 
   const classes = () => classNames(local.class, hopeStackClass);
 
-  return <BaseFlex class={classes()} alignItems="center" {...others} />;
+  return (
+    <Box
+      class={classes()}
+      display="flex"
+      alignItems="center"
+      flexDirection={local.direction}
+      flexWrap={local.wrap}
+      {...others}
+    />
+  );
 }
 
 Stack.toString = () => createCssSelector(hopeStackClass);
@@ -31,7 +46,7 @@ Stack.toString = () => createCssSelector(hopeStackClass);
  * -----------------------------------------------------------------------------------------------*/
 
 export type VStackOptions = ResponsiveProps<{
-  spacing?: Property.RowGap;
+  spacing?: Property.RowGap<SpaceScaleValue> | number;
 }>;
 
 export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
@@ -47,7 +62,7 @@ export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
  * -----------------------------------------------------------------------------------------------*/
 
 export type HStackOptions = ResponsiveProps<{
-  spacing?: Property.ColumnGap;
+  spacing?: Property.ColumnGap<SpaceScaleValue> | number;
 }>;
 
 export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;
