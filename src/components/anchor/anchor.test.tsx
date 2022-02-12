@@ -2,7 +2,7 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { Anchor, AnchorProps } from "./anchor";
+import { Anchor } from "./anchor";
 import { anchorStyles } from "./anchor.styles";
 
 describe("Anchor", () => {
@@ -139,20 +139,12 @@ describe("Anchor", () => {
     expect(anchor).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from variants prop", () => {
+  it("should have stitches generated class from anchorStyles", () => {
     // arrange
-    const props: AnchorProps<"p"> = {
-      size: "4xl",
-    };
-
-    const anchorClass = anchorStyles(props);
+    const anchorClass = anchorStyles();
 
     // act
-    renderWithHopeProvider(() => (
-      <Anchor data-testid="anchor" {...props}>
-        Anchor
-      </Anchor>
-    ));
+    renderWithHopeProvider(() => <Anchor data-testid="anchor">Anchor</Anchor>);
     const anchor = screen.getByTestId("anchor");
 
     // assert

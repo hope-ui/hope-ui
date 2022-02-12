@@ -4,9 +4,9 @@ import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { anchorStyles, AnchorVariants } from "./anchor.styles";
+import { anchorStyles } from "./anchor.styles";
 
-interface AnchorOptions extends AnchorVariants {
+interface AnchorOptions {
   external?: boolean;
 }
 
@@ -24,13 +24,9 @@ export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
   };
 
   const propsWithDefault: AnchorProps<"a"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
-    propsWithDefault,
-    ["class", "external"],
-    ["size"]
-  );
+  const [local, others] = splitProps(propsWithDefault, ["class", "external"]);
 
-  const classes = () => classNames(local.class, hopeAnchorClass, anchorStyles(variantProps));
+  const classes = () => classNames(local.class, hopeAnchorClass, anchorStyles());
 
   return (
     <Box

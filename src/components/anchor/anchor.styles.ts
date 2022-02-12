@@ -1,10 +1,6 @@
-import { VariantProps } from "@stitches/core";
-
 import { css } from "@/styled-system/stitches.config";
 
-import { textStyles } from "../text/text.styles";
-
-export const anchorStyles = css(textStyles, {
+export const anchorStyles = css({
   position: "relative",
   outline: "none",
   backgroundColor: "transparent",
@@ -21,5 +17,3 @@ export const anchorStyles = css(textStyles, {
     outlineOffset: "4px",
   },
 });
-
-export type AnchorVariants = VariantProps<typeof anchorStyles>;
