@@ -33,6 +33,8 @@ export const checkboxContainerStyles = css({
   display: "inline-flex",
   alignItems: "center",
 
+  borderColor: "$neutral8",
+
   cursor: "pointer",
   userSelect: "none",
 
@@ -138,7 +140,8 @@ export const checkboxControlStyles = css({
   variants: {
     variant: {
       outline: {
-        border: "1px solid $neutral8",
+        border: "1px solid",
+        borderColor: "inherit", // allow passing borderColor style props to parent container
         backgroundColor: "transparent",
       },
       filled: {

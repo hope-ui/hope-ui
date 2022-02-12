@@ -116,7 +116,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const theme = useTheme().components.Checkbox;
 
   // eslint-disable-next-line solid/reactivity
-  const [checkedState, setCheckedState] = createSignal(!!props.checked, { equals: false });
+  const [checkedState, setCheckedState] = createSignal(!!props.checked);
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
