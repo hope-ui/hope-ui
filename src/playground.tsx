@@ -17,10 +17,10 @@ import {
   IconMoon,
   IconSun,
   Input,
+  Switch,
   useColorMode,
   useColorModeValue,
   VStack,
-  Switch,
 } from ".";
 
 export function App() {
