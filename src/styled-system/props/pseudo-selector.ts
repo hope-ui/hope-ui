@@ -29,7 +29,6 @@ export const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _loading: true,
   _selected: true,
   _hidden: true,
-  _autofill: true,
   _even: true,
   _odd: true,
   _first: true,

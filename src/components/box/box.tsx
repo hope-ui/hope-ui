@@ -15,18 +15,17 @@ export function Box<C extends ElementType = "div">(props: HopeComponentProps<C>)
 
   const [local, styleProps, others] = splitProps(
     props,
-    ["as", "class", "className", "classList", "__baseStyle"],
+    ["as", "class", "className", "__baseStyle"],
     usedStylePropNames
   );
 
-  const classList = () => ({
-    [classNames(
+  const classes = () => {
+    return classNames(
       local.class,
       local.className,
       createStyledSystemClass(styleProps, local.__baseStyle)
-    )]: true,
-    ...local.classList,
-  });
+    );
+  };
 
-  return <Dynamic component={local.as ?? "div"} classList={classList()} {...others} />;
+  return <Dynamic component={local.as ?? "div"} class={classes()} {...others} />;
 }
