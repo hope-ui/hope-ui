@@ -2,6 +2,7 @@ import { space } from "./space";
 
 export const sizes = {
   ...space,
+  prose: "65ch",
   max: "max-content",
   min: "min-content",
   full: "100%",

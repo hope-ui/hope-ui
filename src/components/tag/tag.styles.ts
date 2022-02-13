@@ -355,9 +355,9 @@ export const tagStyles = css({
       colorScheme: "primary",
       css: createTagSubtleCompoundVariant({
         color: "$primary11",
-        bgColor: "$primary3",
-        closeButtonBgColorHover: "$primary4",
-        closeButtonBgColorActive: "$primary5",
+        bgColor: "$primary4",
+        closeButtonBgColorHover: "$primary5",
+        closeButtonBgColorActive: "$primary6",
       }),
     },
     {
@@ -365,9 +365,9 @@ export const tagStyles = css({
       colorScheme: "neutral",
       css: createTagSubtleCompoundVariant({
         color: "$neutral12",
-        bgColor: "$neutral3",
-        closeButtonBgColorHover: "$neutral4",
-        closeButtonBgColorActive: "$neutral5",
+        bgColor: "$neutral4",
+        closeButtonBgColorHover: "$neutral5",
+        closeButtonBgColorActive: "$neutral6",
       }),
     },
     {
@@ -375,9 +375,9 @@ export const tagStyles = css({
       colorScheme: "success",
       css: createTagSubtleCompoundVariant({
         color: "$success11",
-        bgColor: "$success3",
-        closeButtonBgColorHover: "$success4",
-        closeButtonBgColorActive: "$success5",
+        bgColor: "$success4",
+        closeButtonBgColorHover: "$success5",
+        closeButtonBgColorActive: "$success6",
       }),
     },
     {
@@ -385,9 +385,9 @@ export const tagStyles = css({
       colorScheme: "info",
       css: createTagSubtleCompoundVariant({
         color: "$info11",
-        bgColor: "$info3",
-        closeButtonBgColorHover: "$info4",
-        closeButtonBgColorActive: "$info5",
+        bgColor: "$info4",
+        closeButtonBgColorHover: "$info5",
+        closeButtonBgColorActive: "$info6",
       }),
     },
     {
@@ -395,9 +395,9 @@ export const tagStyles = css({
       colorScheme: "warning",
       css: createTagSubtleCompoundVariant({
         color: "$warning11",
-        bgColor: "$warning3",
-        closeButtonBgColorHover: "$warning4",
-        closeButtonBgColorActive: "$warning5",
+        bgColor: "$warning4",
+        closeButtonBgColorHover: "$warning5",
+        closeButtonBgColorActive: "$warning6",
       }),
     },
     {
@@ -405,9 +405,9 @@ export const tagStyles = css({
       colorScheme: "danger",
       css: createTagSubtleCompoundVariant({
         color: "$danger11",
-        bgColor: "$danger3",
-        closeButtonBgColorHover: "$danger4",
-        closeButtonBgColorActive: "$danger5",
+        bgColor: "$danger4",
+        closeButtonBgColorHover: "$danger5",
+        closeButtonBgColorActive: "$danger6",
       }),
     },
 
