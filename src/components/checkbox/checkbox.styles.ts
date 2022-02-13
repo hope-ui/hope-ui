@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 import { visuallyHiddenStyles } from "@/theme/utils";
 
@@ -8,13 +8,13 @@ import { visuallyHiddenStyles } from "@/theme/utils";
  * Checkbox - input
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxInputStyles = css(visuallyHiddenStyles);
+export const checkboxInputStyles = createStyles(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxContainerStyles = css({
+export const checkboxContainerStyles = createStyles({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -78,7 +78,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const checkboxControlStyles = css({
+export const checkboxControlStyles = createStyles({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -207,7 +207,7 @@ function createSizeAndLabelPositionCompoundVariants() {
   ]);
 }
 
-export const checkboxLabelStyles = css({
+export const checkboxLabelStyles = createStyles({
   variants: {
     size: {
       sm: {},

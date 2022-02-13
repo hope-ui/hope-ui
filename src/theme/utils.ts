@@ -1,7 +1,7 @@
 import merge from "lodash.merge";
 import { isServer } from "solid-js/web";
 
-import { createTheme, css, theme } from "@/styled-system/stitches.config";
+import { baseTheme, createStyles, createTheme } from "@/styled-system/stitches.config";
 import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
@@ -31,7 +31,7 @@ export function extendBaseTheme<T extends ThemeConfig>(type: "light" | "dark", t
 
   const customTheme = createTheme(className, finalConfig);
 
-  return merge({}, theme, customTheme);
+  return merge({}, baseTheme, customTheme);
 }
 
 const hasLocalStorageSupport = () => typeof Storage !== "undefined";
@@ -98,7 +98,7 @@ export function syncBodyColorModeClassName(isDark: boolean) {
 /**
  * Visually hide an element without hiding it from screen readers
  */
-export const visuallyHiddenStyles = css({
+export const visuallyHiddenStyles = createStyles({
   position: "absolute",
   width: "1px",
   height: "1px",

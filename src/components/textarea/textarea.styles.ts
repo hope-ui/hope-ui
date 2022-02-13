@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 
 import { baseInputResetStyles } from "../input/input.styles";
 
@@ -17,7 +17,7 @@ function createVaraintAndSizeCompoundVariants(variant: string, paddingX?: string
   }));
 }
 
-export const textareaStyles = css(baseInputResetStyles, {
+export const textareaStyles = createStyles(baseInputResetStyles, {
   minHeight: "80px",
   py: "$2",
 

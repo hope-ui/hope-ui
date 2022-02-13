@@ -1,6 +1,6 @@
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 
-export const spacerStyles = css({
+export const spacerStyles = createStyles({
   flex: 1,
   justifySelf: "stretch",
   alignSelf: "stretch",

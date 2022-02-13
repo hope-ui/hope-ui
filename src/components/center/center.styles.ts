@@ -1,6 +1,6 @@
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 
-export const centerStyles = css({
+export const centerStyles = createStyles({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

@@ -10,7 +10,7 @@ import { ThemeableInputGroupOptions } from "@/components/input/input-group";
 import { ThemeableSwitchOptions } from "@/components/switch/switch";
 import { ThemeableTagOptions } from "@/components/tag/tag";
 import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
-import { theme } from "@/styled-system/stitches.config";
+import { baseTheme } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 export type ColorMode = "light" | "dark" | "system";
@@ -18,7 +18,7 @@ export type ColorMode = "light" | "dark" | "system";
 /**
  * Hope UI - Stitches theme interface.
  */
-export type HopeTheme = typeof theme;
+export type HopeTheme = typeof baseTheme;
 
 /**
  * Stitches theme config interface.

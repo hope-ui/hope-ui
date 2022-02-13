@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 import { visuallyHiddenStyles } from "@/theme/utils";
 
@@ -8,13 +8,13 @@ import { visuallyHiddenStyles } from "@/theme/utils";
  * Switch - input
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchInputStyles = css(visuallyHiddenStyles);
+export const switchInputStyles = createStyles(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchContainerStyles = css({
+export const switchContainerStyles = createStyles({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -78,7 +78,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const switchControlStyles = css({
+export const switchControlStyles = createStyles({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -292,7 +292,7 @@ function createSizeAndLabelPositionCompoundVariants() {
   ]);
 }
 
-export const switchLabelStyles = css({
+export const switchLabelStyles = createStyles({
   variants: {
     size: {
       sm: {},
