@@ -1,4 +1,4 @@
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import { toCssObject } from "@/styled-system/utils";
 
 import { borderPropNames, BorderProps } from "./props/border";
@@ -60,7 +60,7 @@ export const stylePropNames: KeysOf<StyleProps> = {
 /**
  * Base stitches css object of all Hope UI components.
  */
-const styledSystemStyles = css({});
+const styledSystemStyles = createStyles({});
 
 /**
  * Generate a css class based on style props and optional `baseStyle`.

@@ -3,7 +3,7 @@ import { cleanup, screen } from "solid-testing-library";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { alertDescriptionStyles } from "../alert.styles";
-import { AlertDescription, AlertDescriptionProps } from "../alert-description";
+import { AlertDescription } from "../alert-description";
 
 describe("AlertDescription", () => {
   afterEach(cleanup);
@@ -121,19 +121,13 @@ describe("AlertDescription", () => {
     expect(alertDescription).toHaveClass(stubClass);
   });
 
-  it("should have stitches generated class from variants prop", () => {
+  it("should have stitches generated class from alertDescriptionStyles", () => {
     // arrange
-    const props: AlertDescriptionProps<"div"> = {
-      size: "4xl",
-    };
-
     const alertDescriptionClass = alertDescriptionStyles();
 
     // act
     renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description" {...props}>
-        Text
-      </AlertDescription>
+      <AlertDescription data-testid="alert-description">Text</AlertDescription>
     ));
     const alertDescription = screen.getByTestId("alert-description");
 

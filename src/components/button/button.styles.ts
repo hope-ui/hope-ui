@@ -1,14 +1,14 @@
 import { VariantProps } from "@stitches/core";
 
 import { spin } from "@/styled-system/keyframes";
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-export const buttonLoadingIconStyles = css({
+export const buttonLoadingIconStyles = createStyles({
   animation: `1000ms linear infinite ${spin}`,
 });
 
-export const iconButtonStyles = css();
+export const iconButtonStyles = createStyles();
 
 /* -------------------------------------------------------------------------------------------------
  * Size
@@ -165,7 +165,7 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
  * Styles
  * -----------------------------------------------------------------------------------------------*/
 
-export const buttonStyles = css({
+export const buttonStyles = createStyles({
   appearance: "none",
   position: "relative",
 
@@ -186,9 +186,9 @@ export const buttonStyles = css({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",
 
-  "&:active": {
-    transform: "translateY(1px)",
-  },
+  // "&:active": {
+  //   transform: "translateY(1px)",
+  // },
 
   "&:focus-visible": {
     outline: "2px solid #2563eb",
@@ -298,7 +298,7 @@ export const buttonStyles = css({
       }),
       xl: createSizeVariant({
         height: "$16",
-        paddingX: "$8",
+        paddingX: "$10",
         fontSize: "$xl",
         iconSize: "$7",
         spacing: "$2",
@@ -661,12 +661,12 @@ export const buttonStyles = css({
     {
       size: "lg",
       compact: "true",
-      css: createCompactSizeCompoundVariant({ height: "$9", paddingX: "$2_5" }),
+      css: createCompactSizeCompoundVariant({ height: "$8", paddingX: "$2_5" }),
     },
     {
       size: "xl",
       compact: "true",
-      css: createCompactSizeCompoundVariant({ height: "$12", paddingX: "$3_5" }),
+      css: createCompactSizeCompoundVariant({ height: "$10", paddingX: "$3_5" }),
     },
   ],
 });

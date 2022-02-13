@@ -1,10 +1,10 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 
 import { textStyles } from "../text/text.styles";
 
-export const headingStyles = css(textStyles, {
+export const headingStyles = createStyles(textStyles, {
   fontWeight: "$semibold",
 });
 

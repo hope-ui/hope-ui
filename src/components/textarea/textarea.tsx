@@ -4,11 +4,11 @@ import { useTheme } from "@/theme/provider";
 import { classNames, createCssSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { useFormControl } from "../form-control/use-form-control";
-import { ElementType, HopeComponentProps } from "../types";
+import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
+import { HopeComponentProps } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
-export type ThemeableTextareaOptions = Pick<TextareaVariants, "variant" | "size">;
+export type ThemeableTextareaOptions = TextareaVariants;
 
 interface TextareaOptions extends ThemeableTextareaOptions {
   /**
@@ -17,38 +17,38 @@ interface TextareaOptions extends ThemeableTextareaOptions {
   invalid?: boolean;
 }
 
-export type TextareaProps<C extends ElementType> = HopeComponentProps<C, TextareaOptions>;
+export type TextareaProps = Omit<HopeComponentProps<"textarea", TextareaOptions>, "as">;
 
 const hopeTextareaClass = "hope-textarea";
 
-export function Textarea<C extends ElementType = "textarea">(props: TextareaProps<C>) {
+export function Textarea(props: TextareaProps) {
   const theme = useTheme().components.Textarea;
 
-  const defaultProps: TextareaProps<"textarea"> = {
-    as: "textarea",
+  const defaultProps: TextareaProps = {
     variant: theme?.defaultProps?.variant ?? "outline",
     size: theme?.defaultProps?.size ?? "md",
   };
 
-  const propsWithDefault: TextareaProps<"textarea"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
+  const propsWithDefault: TextareaProps = mergeProps(defaultProps, props);
+
+  const [local, variantProps, useFormControlProps, others] = splitProps(
     propsWithDefault,
-    ["class", "invalid"],
-    ["variant", "size"]
+    ["class"],
+    ["variant", "size"],
+    useFormControlPropNames
   );
 
-  // should be spread last in order to override same props from `others`
-  const formControlProps = useFormControl<HTMLTextAreaElement>(others);
+  const formControlProps = useFormControl<HTMLTextAreaElement>(useFormControlProps);
 
   const classes = () => classNames(local.class, hopeTextareaClass, textareaStyles(variantProps));
 
   return (
     <Box
+      as="textarea"
       class={classes()}
-      aria-invalid={local.invalid ? true : undefined}
       __baseStyle={theme?.baseStyle}
+      {...formControlProps}
       {...others}
-      {...formControlProps()}
     />
   );
 }

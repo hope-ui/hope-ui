@@ -1,10 +1,10 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { css } from "@/styled-system";
+import { createStyles } from "@/styled-system";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { BaseFlexOptions, Flex } from "./flex";
+import { Flex, FlexOptions } from "./flex";
 
 describe("Flex", () => {
   afterEach(cleanup);
@@ -116,7 +116,7 @@ describe("Flex", () => {
 
   it("should have display props to 'flex' by default", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -134,12 +134,12 @@ describe("Flex", () => {
 
   it("should renders all the allowed shorthand style props", () => {
     // arrange
-    const shorthandProps: BaseFlexOptions = {
+    const shorthandProps: FlexOptions = {
       direction: "column-reverse",
       wrap: "wrap",
     };
 
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

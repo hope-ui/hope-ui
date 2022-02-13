@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { css } from "@/styled-system";
+import { createStyles } from "@/styled-system";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
@@ -126,7 +126,7 @@ describe("GridItem", () => {
       rowEnd: "5",
     };
 
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 interface InputSizeVariantConfig {
@@ -28,7 +28,27 @@ const inputSizes = {
  * CSS reset for text inputs, textarea and native-select
  * -----------------------------------------------------------------------------------------------*/
 
-export const baseInputResetStyles = css({
+const commonOutlineAndFilledStyles: SystemStyleObject = {
+  "&:disabled": {
+    opacity: 0.4,
+    cursor: "not-allowed",
+  },
+
+  "&:focus": {
+    boxShadow: "0 0 0 3px $colors$primary5",
+    borderColor: "$primary8",
+  },
+
+  "&[aria-invalid=true]": {
+    borderColor: "$danger8",
+  },
+
+  "&[aria-invalid=true]:focus": {
+    boxShadow: "0 0 0 3px $colors$danger5",
+  },
+};
+
+export const baseInputResetStyles = createStyles({
   appearance: "none",
 
   position: "relative",
@@ -48,15 +68,15 @@ export const baseInputResetStyles = css({
   fontSize: "$base",
   lineHeight: "$base",
 
-  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+  transition: "color 250ms, border-color 250ms, background-color 250ms, box-shadow 250ms",
 
-  _readOnly: {
+  "&[readonly]": {
     boxShadow: "none !important",
     userSelect: "all",
     cursor: "default",
   },
 
-  _placeholder: {
+  "&::placeholder": {
     color: "$neutral9",
     opacity: 1,
   },
@@ -67,64 +87,21 @@ export const baseInputResetStyles = css({
         border: "1px solid $neutral7",
         backgroundColor: "transparent",
 
-        _hover: {
+        "&:hover": {
           borderColor: "$neutral8",
         },
 
-        _focus: {
-          borderColor: "$primary8",
-          boxShadow: "0 0 0 3px $colors$primary5",
-        },
-
-        _disabled: {
-          opacity: 0.4,
-          cursor: "not-allowed",
-        },
-
-        _invalid: {
-          borderColor: "$danger7",
-        },
-
-        [`&[aria-invalid=true]:hover, &[data-invalid]:hover,
-          &[aria-invalid=true]:focus, &[data-invalid]:focus`]: {
-          borderColor: "$danger8",
-        },
-
-        "&[aria-invalid=true]:focus, &[data-invalid]:focus": {
-          boxShadow: "0 0 0 3px $colors$danger5",
-        },
+        ...commonOutlineAndFilledStyles,
       },
       filled: {
         border: "1px solid transparent",
-        backgroundColor: "$neutral3",
+        backgroundColor: "$neutral4",
 
-        _hover: {
-          backgroundColor: "$neutral4",
+        "&:hover, &:focus": {
+          backgroundColor: "$neutral5",
         },
 
-        _focus: {
-          boxShadow: "0 0 0 3px $colors$primary5",
-          borderColor: "$primary8",
-          backgroundColor: "$neutral4",
-        },
-
-        _disabled: {
-          opacity: 0.4,
-          cursor: "not-allowed",
-        },
-
-        _invalid: {
-          borderColor: "$danger7",
-        },
-
-        [`&[aria-invalid=true]:hover, &[data-invalid]:hover,
-          &[aria-invalid=true]:focus, &[data-invalid]:focus`]: {
-          borderColor: "$danger8",
-        },
-
-        "&[aria-invalid=true]:focus, &[data-invalid]:focus": {
-          boxShadow: "0 0 0 3px $colors$danger5",
-        },
+        ...commonOutlineAndFilledStyles,
       },
       unstyled: {
         border: "1px solid transparent",
@@ -170,9 +147,7 @@ function createVariantAndSizeCompoundVariant(config: VariantAndSizeCompoundVaria
   ];
 }
 
-export const inputStyles = css(baseInputResetStyles, {
-  transition: "all 250ms",
-
+export const inputStyles = createStyles(baseInputResetStyles, {
   variants: {
     withLeftElement: {
       true: {},
@@ -286,7 +261,7 @@ export type InputVariants = VariantProps<typeof inputStyles>;
  * InputGroup
  * -----------------------------------------------------------------------------------------------*/
 
-export const inputGroupStyles = css({
+export const inputGroupStyles = createStyles({
   position: "relative",
   display: "flex",
   width: "100%",
@@ -296,7 +271,7 @@ export const inputGroupStyles = css({
  * InputElement
  * -----------------------------------------------------------------------------------------------*/
 
-export const inputElementStyles = css({
+export const inputElementStyles = createStyles({
   position: "absolute",
   top: "0",
 
@@ -354,7 +329,7 @@ function createInputAddonVariantAndSizeCompoundVariant(
   };
 }
 
-export const inputAddonStyles = css({
+export const inputAddonStyles = createStyles({
   display: "flex",
   alignItems: "center",
   flex: "0 0 auto",
@@ -382,7 +357,7 @@ export const inputAddonStyles = css({
       filled: {
         borderRadius: "$sm",
         border: "1px solid transparent",
-        backgroundColor: "$neutral3",
+        backgroundColor: "$neutral4",
         color: "$neutral12",
       },
       unstyled: {

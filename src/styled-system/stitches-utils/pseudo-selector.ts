@@ -168,13 +168,6 @@ export const pseudoSelectors = {
   }),
 
   /**
-   * Styles for CSS Selector `&:-webkit-autofill`
-   */
-  _autofill: (value: CSS) => ({
-    "&:-webkit-autofill": value,
-  }),
-
-  /**
    * Styles for CSS Selector `&:nth-child(even)`
    */
   _even: (value: CSS) => ({

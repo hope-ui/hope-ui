@@ -7,13 +7,6 @@
 | Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
 
-### Typography
-
-|         | Development | A11y check | Tests | Storybook | Docs |
-| ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
-| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
-
 ### Layout
 
 |            | Development | A11y check | Tests | Storybook | Docs |
@@ -26,19 +19,26 @@
 | SimpleGrid |             |    n/a     |       |           |      |
 | Stack      |     ✅      |    n/a     |  ✅   |           |      |
 
+### Typography
+
+|         | Development | A11y check | Tests | Storybook | Docs |
+| ------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
+| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
+
 ### Data entry
 
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
 | AutoComplete     |             |            |       |           |      |
-| Checkbox         |             |            |       |           |      |
+| Checkbox         |     ✅      |     ✅     |       |    ✅     |      |
 | DatePicker       |             |            |       |           |      |
 | Form             |             |            |       |           |      |
-| FormControl      |             |            |       |           |      |
-| FormLabel        |             |            |       |           |      |
-| FormHelperText   |             |            |       |           |      |
-| FormErrorMessage |             |            |       |           |      |
-| Input (Text)     |             |            |       |           |      |
+| FormControl      |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormLabel        |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormHelperText   |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| FormErrorMessage |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Input (Text)     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | NumberInput      |             |            |       |           |      |
 | PasswordInput    |             |            |       |           |      |
 | RadioGroup       |             |            |       |           |      |
@@ -46,8 +46,8 @@
 | Select           |             |            |       |           |      |
 | MultiSelect      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
-| Switch           |             |            |       |           |      |
-| Textarea         |             |            |       |           |      |
+| Switch           |     ✅      |     ✅     |       |    ✅     |      |
+| Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |
 
@@ -67,7 +67,7 @@
 
 |             | Development | A11y check | Tests | Storybook | Docs |
 | ----------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Anchor      |             |            |       |           |      |
+| Anchor      |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Breadcrumbs |             |            |       |           |      |
 | Pagination  |             |            |       |           |      |
 | Stepper     |             |            |       |           |      |
@@ -77,7 +77,7 @@
 
 |              | Development | A11y check | Tests | Storybook | Docs |
 | ------------ | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert        |             |            |       |           |      |
+| Alert        |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Loader       |             |            |       |           |      |
 | Notification |             |            |       |           |      |
 | Progress     |             |            |       |           |      |

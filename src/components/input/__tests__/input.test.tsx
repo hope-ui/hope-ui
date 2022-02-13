@@ -127,6 +127,44 @@ describe("Input", () => {
     expect(input).toHaveAttribute("aria-describedby", `${errorMessage.id} ${helperText.id}`);
   });
 
+  it("should have 'aria-required' and 'required' attribute when Input is required", () => {
+    // act
+    renderWithHopeProvider(() => <Input data-testid="input" required />);
+    const input = screen.getByTestId("input");
+
+    // assert
+    expect(input).toHaveAttribute("required");
+    expect(input).toHaveAttribute("aria-required", "true");
+  });
+
+  it("should have 'disabled' attribute when Input is disabled", () => {
+    // act
+    renderWithHopeProvider(() => <Input data-testid="input" disabled />);
+    const input = screen.getByTestId("input");
+
+    // assert
+    expect(input).toHaveAttribute("disabled");
+  });
+
+  it("should have 'aria-invalid' attribute when Input is invalid", () => {
+    // act
+    renderWithHopeProvider(() => <Input data-testid="input" invalid />);
+    const input = screen.getByTestId("input");
+
+    // assert
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("should have 'aria-readonly' and 'readOnly' attribute when Input is readOnly", () => {
+    // act
+    renderWithHopeProvider(() => <Input data-testid="input" readOnly />);
+    const input = screen.getByTestId("input");
+
+    // assert
+    expect(input).toHaveAttribute("readOnly");
+    expect(input).toHaveAttribute("aria-readonly", "true");
+  });
+
   it("should have semantic hope class", () => {
     // act
     renderWithHopeProvider(() => <Input data-testid="input" />);

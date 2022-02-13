@@ -1,14 +1,12 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
-
-import { textStyles } from "../text/text.styles";
+import { createStyles } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * AlertIcon
  * -----------------------------------------------------------------------------------------------*/
 
-export const alertIconStyles = css({
+export const alertIconStyles = createStyles({
   flexShrink: 0,
   marginInlineEnd: "$2_5",
 });
@@ -17,27 +15,23 @@ export const alertIconStyles = css({
  * AlertTitle
  * -----------------------------------------------------------------------------------------------*/
 
-export const alertTitleStyles = css(textStyles, {
+export const alertTitleStyles = createStyles({
   fontWeight: "$bold",
 });
-
-export type AlertTitleVariants = VariantProps<typeof alertTitleStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * AlertDescription
  * -----------------------------------------------------------------------------------------------*/
 
-export const alertDescriptionStyles = css(textStyles, {
+export const alertDescriptionStyles = createStyles({
   display: "inline-block",
 });
-
-export type AlertDescriptionVariants = VariantProps<typeof alertDescriptionStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Alert
  * -----------------------------------------------------------------------------------------------*/
 
-export const alertStyles = css({
+export const alertStyles = createStyles({
   position: "relative",
 
   display: "flex",

@@ -28,6 +28,12 @@ export default {
     disabled: {
       control: { type: "boolean" },
     },
+    required: {
+      control: { type: "boolean" },
+    },
+    readOnly: {
+      control: { type: "boolean" },
+    },
     placeholder: {
       control: { type: "text" },
     },
@@ -37,6 +43,8 @@ export default {
     size: "md",
     invalid: false,
     disabled: false,
+    required: false,
+    readOnly: false,
     placeholder: "Placeholder",
   },
 };

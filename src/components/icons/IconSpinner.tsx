@@ -1,7 +1,6 @@
 import { createIcon } from "../icon/create-icon";
 
 export const IconSpinner = createIcon({
-  viewBox: "0 0 24 24",
   path: () => (
     <g fill="none">
       <path

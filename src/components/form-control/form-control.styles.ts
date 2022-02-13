@@ -1,10 +1,10 @@
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * FormControl
  * -----------------------------------------------------------------------------------------------*/
 
-export const formControlStyles = css({
+export const formControlStyles = createStyles({
   position: "relative",
   width: "$full",
 });
@@ -13,7 +13,7 @@ export const formControlStyles = css({
  * FormLabel
  * -----------------------------------------------------------------------------------------------*/
 
-export const formLabelStyles = css({
+export const formLabelStyles = createStyles({
   display: "inline-block",
 
   marginBottom: "$1",
@@ -26,13 +26,13 @@ export const formLabelStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },
 });
 
-export const requiredIndicatorStyles = css({
+export const requiredIndicatorStyles = createStyles({
   marginInlineStart: "$1",
   color: "$danger9",
   fontSize: "$base",
@@ -42,7 +42,7 @@ export const requiredIndicatorStyles = css({
  * FormHelperText
  * -----------------------------------------------------------------------------------------------*/
 
-export const formHelperTextStyles = css({
+export const formHelperTextStyles = createStyles({
   display: "inline-block",
 
   marginTop: "$1",
@@ -55,7 +55,7 @@ export const formHelperTextStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },
@@ -65,7 +65,7 @@ export const formHelperTextStyles = css({
  * FormErrorMessage
  * -----------------------------------------------------------------------------------------------*/
 
-export const formErrorMessageStyles = css({
+export const formErrorMessageStyles = createStyles({
   display: "inline-block",
 
   marginTop: "$1",
@@ -78,7 +78,7 @@ export const formErrorMessageStyles = css({
 
   opacity: 1,
 
-  _disabled: {
+  "&[data-disabled]": {
     opacity: 0.4,
     cursor: "not-allowed",
   },

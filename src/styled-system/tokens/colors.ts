@@ -45,37 +45,21 @@ export const commonColors = {
  * Light palette
  * -----------------------------------------------------------------------------------------------*/
 
-// Radix - Indigo
+// Radix - Cyan
 const primary = {
-  primary1: "#fdfdfe",
-  primary2: "#f8faff",
-  primary3: "#f0f4ff",
-  primary4: "#e6edfe",
-  primary5: "#d9e2fc",
-  primary6: "#c6d4f9",
-  primary7: "#aec0f5",
-  primary8: "#8da4ef",
-  primary9: "#3e63dd",
-  primary10: "#3a5ccc",
-  primary11: "#3451b2",
-  primary12: "#101d46",
+  primary1: "#fafdfe",
+  primary2: "#f2fcfd",
+  primary3: "#e7f9fb",
+  primary4: "#d8f3f6",
+  primary5: "#c4eaef",
+  primary6: "#aadee6",
+  primary7: "#84cdda",
+  primary8: "#3db9cf",
+  primary9: "#05a2c2",
+  primary10: "#0894b3",
+  primary11: "#0c7792",
+  primary12: "#04313c",
 };
-
-// Radix - Gray
-// const neutral = {
-//   neutral1: "#fcfcfc",
-//   neutral2: "#f8f8f8",
-//   neutral3: "#f3f3f3",
-//   neutral4: "#ededed",
-//   neutral5: "#e8e8e8",
-//   neutral6: "#e2e2e2",
-//   neutral7: "#dbdbdb",
-//   neutral8: "#c7c7c7",
-//   neutral9: "#8f8f8f",
-//   neutral10: "#858585",
-//   neutral11: "#6f6f6f",
-//   neutral12: "#171717",
-// };
 
 // Radix - Slate
 const neutral = {
@@ -159,6 +143,8 @@ const danger = {
 
 const semanticColors = {
   defaultButtonBg: "white",
+  checkboxIconColor: "white",
+  switchTrackBg: "white",
 };
 
 export const lightColors = {
@@ -175,37 +161,21 @@ export const lightColors = {
  * Dark palette
  * -----------------------------------------------------------------------------------------------*/
 
-// Radix - Indigo dark
+// Radix - Cyan dark
 const primaryDark = {
-  primary1: "#131620",
-  primary2: "#15192d",
-  primary3: "#192140",
-  primary4: "#1c274f",
-  primary5: "#1f2c5c",
-  primary6: "#22346e",
-  primary7: "#273e89",
-  primary8: "#2f4eb2",
-  primary9: "#3e63dd",
-  primary10: "#5373e7",
-  primary11: "#849dff",
-  primary12: "#eef1fd",
+  primary1: "#07191d",
+  primary2: "#061e24",
+  primary3: "#072830",
+  primary4: "#07303b",
+  primary5: "#073844",
+  primary6: "#064150",
+  primary7: "#045063",
+  primary8: "#00647d",
+  primary9: "#05a2c2",
+  primary10: "#00b1cc",
+  primary11: "#00c2d7",
+  primary12: "#e1f8fa",
 };
-
-// Radix - Gray dark
-// const neutralDark = {
-//   neutral1: "#161616",
-//   neutral2: "#1c1c1c",
-//   neutral3: "#232323",
-//   neutral4: "#282828",
-//   neutral5: "#2e2e2e",
-//   neutral6: "#343434",
-//   neutral7: "#3e3e3e",
-//   neutral8: "#505050",
-//   neutral9: "#707070",
-//   neutral10: "#7e7e7e",
-//   neutral11: "#a0a0a0",
-//   neutral12: "#ededed",
-// };
 
 // Radix - Slate dark
 const neutralDark = {
@@ -289,6 +259,8 @@ const dangerDark = {
 
 const semanticDarkColors = {
   defaultButtonBg: "$neutral3",
+  checkboxIconColor: "$neutral3",
+  switchTrackBg: "$neutral3",
 };
 
 export const darkColors: typeof lightColors = {

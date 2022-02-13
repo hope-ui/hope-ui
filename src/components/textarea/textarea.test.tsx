@@ -128,6 +128,44 @@ describe("Textarea", () => {
     expect(textarea).toHaveAttribute("aria-describedby", `${errorMessage.id} ${helperText.id}`);
   });
 
+  it("should have 'aria-required' and 'required' attribute when Textarea is required", () => {
+    // act
+    renderWithHopeProvider(() => <Textarea data-testid="textarea" required />);
+    const textarea = screen.getByTestId("textarea");
+
+    // assert
+    expect(textarea).toHaveAttribute("required");
+    expect(textarea).toHaveAttribute("aria-required", "true");
+  });
+
+  it("should have 'disabled' attribute when Textarea is disabled", () => {
+    // act
+    renderWithHopeProvider(() => <Textarea data-testid="textarea" disabled />);
+    const textarea = screen.getByTestId("textarea");
+
+    // assert
+    expect(textarea).toHaveAttribute("disabled");
+  });
+
+  it("should have 'aria-invalid' attribute when Textarea is invalid", () => {
+    // act
+    renderWithHopeProvider(() => <Textarea data-testid="textarea" invalid />);
+    const textarea = screen.getByTestId("textarea");
+
+    // assert
+    expect(textarea).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("should have 'aria-readonly' and 'readOnly' attribute when Textarea is readOnly", () => {
+    // act
+    renderWithHopeProvider(() => <Textarea data-testid="textarea" readOnly />);
+    const textarea = screen.getByTestId("textarea");
+
+    // assert
+    expect(textarea).toHaveAttribute("readOnly");
+    expect(textarea).toHaveAttribute("aria-readonly", "true");
+  });
+
   it("should have semantic hope class", () => {
     // act
     renderWithHopeProvider(() => <Textarea data-testid="textarea" />);

@@ -28,7 +28,7 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
   onMount(() => formControl?.setHasHelperText(true));
   onCleanup(() => formControl?.setHasHelperText(false));
 
-  return <Box id={id()} class={classes()} {...formControlDataAttrs()} {...others} />;
+  return <Box id={id()} class={classes()} {...formControlDataAttrs} {...others} />;
 }
 
 FormHelperText.toString = () => createCssSelector(hopeFormHelperTextClass);

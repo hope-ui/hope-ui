@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { css } from "@/styled-system/stitches.config";
+import { createStyles } from "@/styled-system/stitches.config";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
@@ -120,7 +120,7 @@ describe("VStack", () => {
 
   it("should have flexDirection set to column", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -142,7 +142,7 @@ describe("VStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -164,7 +164,7 @@ describe("HStack", () => {
 
   it("should have flexDirection set to row", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -186,7 +186,7 @@ describe("HStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = createStyles()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
