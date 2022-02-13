@@ -7,13 +7,6 @@
 | Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
 
-### Typography
-
-|         | Development | A11y check | Tests | Storybook | Docs |
-| ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
-| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
-
 ### Layout
 
 |            | Development | A11y check | Tests | Storybook | Docs |
@@ -25,6 +18,13 @@
 | Grid       |     ✅      |    n/a     |  ✅   |           |      |
 | SimpleGrid |             |    n/a     |       |           |      |
 | Stack      |     ✅      |    n/a     |  ✅   |           |      |
+
+### Typography
+
+|         | Development | A11y check | Tests | Storybook | Docs |
+| ------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
+| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
 
 ### Data entry
 
@@ -46,7 +46,7 @@
 | Select           |             |            |       |           |      |
 | MultiSelect      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
-| Switch           |             |            |       |           |      |
+| Switch           |     ✅      |     ✅     |       |    ✅     |      |
 | Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |

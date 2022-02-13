@@ -45,20 +45,20 @@ export const commonColors = {
  * Light palette
  * -----------------------------------------------------------------------------------------------*/
 
-// Radix - Indigo
+// Radix - Cyan
 const primary = {
-  primary1: "#fdfdfe",
-  primary2: "#f8faff",
-  primary3: "#f0f4ff",
-  primary4: "#e6edfe",
-  primary5: "#d9e2fc",
-  primary6: "#c6d4f9",
-  primary7: "#aec0f5",
-  primary8: "#8da4ef",
-  primary9: "#3e63dd",
-  primary10: "#3a5ccc",
-  primary11: "#3451b2",
-  primary12: "#101d46",
+  primary1: "#fafdfe",
+  primary2: "#f2fcfd",
+  primary3: "#e7f9fb",
+  primary4: "#d8f3f6",
+  primary5: "#c4eaef",
+  primary6: "#aadee6",
+  primary7: "#84cdda",
+  primary8: "#3db9cf",
+  primary9: "#05a2c2",
+  primary10: "#0894b3",
+  primary11: "#0c7792",
+  primary12: "#04313c",
 };
 
 // Radix - Slate
@@ -161,20 +161,20 @@ export const lightColors = {
  * Dark palette
  * -----------------------------------------------------------------------------------------------*/
 
-// Radix - Indigo dark
+// Radix - Cyan dark
 const primaryDark = {
-  primary1: "#131620",
-  primary2: "#15192d",
-  primary3: "#192140",
-  primary4: "#1c274f",
-  primary5: "#1f2c5c",
-  primary6: "#22346e",
-  primary7: "#273e89",
-  primary8: "#2f4eb2",
-  primary9: "#3e63dd",
-  primary10: "#5373e7",
-  primary11: "#849dff",
-  primary12: "#eef1fd",
+  primary1: "#07191d",
+  primary2: "#061e24",
+  primary3: "#072830",
+  primary4: "#07303b",
+  primary5: "#073844",
+  primary6: "#064150",
+  primary7: "#045063",
+  primary8: "#00647d",
+  primary9: "#05a2c2",
+  primary10: "#00b1cc",
+  primary11: "#00c2d7",
+  primary12: "#e1f8fa",
 };
 
 // Radix - Slate dark
