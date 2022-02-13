@@ -27,6 +27,11 @@ export type InteractivityProps = Partial<{
   resize: Property.Resize;
 
   /**
+   * The CSS `transition` property
+   */
+  transition: Property.Transition;
+
+  /**
    * The CSS `cursor` property
    */
   cursor: Property.Cursor;
@@ -54,6 +59,7 @@ export const interactivityPropNames: KeysOf<InteractivityProps> = {
   appearance: true,
   userSelect: true,
   pointerEvents: true,
+  transition: true,
   resize: true,
   cursor: true,
   outline: true,
