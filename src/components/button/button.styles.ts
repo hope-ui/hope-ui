@@ -298,7 +298,7 @@ export const buttonStyles = css({
       }),
       xl: createSizeVariant({
         height: "$16",
-        paddingX: "$8",
+        paddingX: "$10",
         fontSize: "$xl",
         iconSize: "$7",
         spacing: "$2",
@@ -661,12 +661,12 @@ export const buttonStyles = css({
     {
       size: "lg",
       compact: "true",
-      css: createCompactSizeCompoundVariant({ height: "$9", paddingX: "$2_5" }),
+      css: createCompactSizeCompoundVariant({ height: "$8", paddingX: "$2_5" }),
     },
     {
       size: "xl",
       compact: "true",
-      css: createCompactSizeCompoundVariant({ height: "$12", paddingX: "$3_5" }),
+      css: createCompactSizeCompoundVariant({ height: "$10", paddingX: "$3_5" }),
     },
   ],
 });
