@@ -186,10 +186,6 @@ export const buttonStyles = createStyles({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",
 
-  // "&:active": {
-  //   transform: "translateY(1px)",
-  // },
-
   "&:focus-visible": {
     outline: "2px solid #2563eb",
     outlineOffset: "4px",
@@ -304,11 +300,18 @@ export const buttonStyles = createStyles({
         spacing: "$2",
       }),
     },
-    compact: { true: {} },
+    compact: {
+      true: {},
+      false: {},
+    },
     fullWidth: {
       true: {
         display: "flex",
         width: "100%",
+      },
+      false: {
+        display: "inline-flex",
+        width: "auto",
       },
     },
     loading: {
@@ -317,6 +320,7 @@ export const buttonStyles = createStyles({
         cursor: "default",
         pointerEvents: "none",
       },
+      false: {},
     },
   },
 

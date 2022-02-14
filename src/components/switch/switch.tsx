@@ -31,16 +31,6 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The icon to use when the switch is `on`
-   */
-  iconOn?: JSX.Element;
-
-  /**
-   * The icon to use when the switch is `off`
-   */
-  iconOff?: JSX.Element;
-
-  /**
    * The name of the input field in a switch
    * (Useful for form submission).
    */
@@ -120,7 +110,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const propsWithDefaults: SwitchProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["iconOn", "iconOff", "checked", "invalid", "onChange", "class", "children"],
+    ["checked", "invalid", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -163,14 +153,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const inputClasses = () => classNames(hopeSwitchInputClass, switchInputStyles());
 
   const controlClasses = () => {
-    return classNames(
-      hopeSwitchControlClass,
-      switchControlStyles({
-        ...variantProps,
-        hasIconOn: !!local.iconOn,
-        hasIconOff: !!local.iconOff,
-      })
-    );
+    return classNames(hopeSwitchControlClass, switchControlStyles(variantProps));
   };
 
   const labelClasses = () => classNames(hopeSwitchLabelClass, switchLabelStyles(variantProps));
@@ -220,10 +203,12 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         {...inputProps}
         {...ariaAttrs}
       />
-      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs}>
-        {local.iconOn}
-        {local.iconOff}
-      </span>
+      <span
+        aria-hidden={true}
+        class={controlClasses()}
+        data-checked={dataChecked()}
+        {...dataAttrs}
+      />
       <Show when={local.children}>
         <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
           {local.children}
