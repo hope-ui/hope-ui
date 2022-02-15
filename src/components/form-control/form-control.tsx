@@ -103,11 +103,11 @@ export type FormControlProps<C extends ElementType> = HopeComponentProps<C, Form
 const hopeFormControlClass = "hope-form-control";
 
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
-  const defaultId = `field-${createUniqueId()}`;
+  const defaultId = `hope-field-${createUniqueId().replace(":", "-")}`;
 
   const [state, setState] = createStore<FormControlState>({
     get id() {
-      return props.id || defaultId;
+      return props.id ?? defaultId;
     },
     get labelId() {
       return `${this.id}-label`;

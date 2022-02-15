@@ -1,8 +1,8 @@
 import { VariantProps } from "@stitches/core";
 
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 
-export const textStyles = createStyles({
+export const textStyles = css({
   variants: {
     size: {
       xs: {

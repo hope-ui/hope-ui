@@ -145,6 +145,7 @@ const semanticColors = {
   defaultButtonBg: "white",
   checkboxIconColor: "white",
   switchTrackBg: "white",
+  defaultModalContentBg: "white",
 };
 
 export const lightColors = {
@@ -261,6 +262,7 @@ const semanticDarkColors = {
   defaultButtonBg: "$neutral3",
   checkboxIconColor: "$neutral3",
   switchTrackBg: "$neutral3",
+  defaultModalContentBg: "$neutral3",
 };
 
 export const darkColors: typeof lightColors = {

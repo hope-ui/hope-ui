@@ -1,6 +1,6 @@
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 
-export const anchorStyles = createStyles({
+export const anchorStyles = css({
   position: "relative",
   outline: "none",
   backgroundColor: "transparent",

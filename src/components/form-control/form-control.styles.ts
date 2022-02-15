@@ -1,10 +1,10 @@
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * FormControl
  * -----------------------------------------------------------------------------------------------*/
 
-export const formControlStyles = createStyles({
+export const formControlStyles = css({
   position: "relative",
   width: "$full",
 });
@@ -13,7 +13,7 @@ export const formControlStyles = createStyles({
  * FormLabel
  * -----------------------------------------------------------------------------------------------*/
 
-export const formLabelStyles = createStyles({
+export const formLabelStyles = css({
   display: "inline-block",
 
   marginBottom: "$1",
@@ -32,7 +32,7 @@ export const formLabelStyles = createStyles({
   },
 });
 
-export const requiredIndicatorStyles = createStyles({
+export const requiredIndicatorStyles = css({
   marginInlineStart: "$1",
   color: "$danger9",
   fontSize: "$base",
@@ -42,7 +42,7 @@ export const requiredIndicatorStyles = createStyles({
  * FormHelperText
  * -----------------------------------------------------------------------------------------------*/
 
-export const formHelperTextStyles = createStyles({
+export const formHelperTextStyles = css({
   display: "inline-block",
 
   marginTop: "$1",
@@ -65,7 +65,7 @@ export const formHelperTextStyles = createStyles({
  * FormErrorMessage
  * -----------------------------------------------------------------------------------------------*/
 
-export const formErrorMessageStyles = createStyles({
+export const formErrorMessageStyles = css({
   display: "inline-block",
 
   marginTop: "$1",

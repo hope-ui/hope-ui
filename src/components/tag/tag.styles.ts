@@ -1,17 +1,17 @@
 import { VariantProps } from "@stitches/core";
 
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
  * TagRightIcon & TagLeftIcon
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagRightIconStyles = createStyles({
+export const tagRightIconStyles = css({
   marginInlineStart: "$1",
 });
 
-export const tagLeftIconStyles = createStyles({
+export const tagLeftIconStyles = css({
   marginInlineEnd: "$1",
 });
 
@@ -19,7 +19,7 @@ export const tagLeftIconStyles = createStyles({
  * TagLabel
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagLabelStyles = createStyles({
+export const tagLabelStyles = css({
   noOfLines: 1,
 });
 
@@ -27,9 +27,9 @@ export const tagLabelStyles = createStyles({
  * TagCloseButton
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagCloseButtonIconStyles = createStyles();
+export const tagCloseButtonIconStyles = css();
 
-export const tagCloseButtonStyles = createStyles({
+export const tagCloseButtonStyles = css({
   appearance: "none",
   position: "relative",
 
@@ -183,7 +183,7 @@ function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
   };
 }
 
-export const tagStyles = createStyles({
+export const tagStyles = css({
   appearance: "none",
   position: "relative",
 

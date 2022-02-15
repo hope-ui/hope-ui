@@ -100,7 +100,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",
-    id: createUniqueId(),
+    id: `hope-switch-${createUniqueId().replace(":", "-")}`,
     variant: theme?.defaultProps?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",

@@ -1,9 +1,9 @@
-import { createGlobalStyles } from "../styled-system/stitches.config";
+import { globalCss } from "../styled-system/stitches.config";
 
 /**
  * Hope UI css reset
  */
-export const resetStyles = createGlobalStyles({
+export const resetStyles = globalCss({
   /* 
     1. Use a more-intuitive box-sizing model. 
     2. Set default border width and style to apply border props easily  

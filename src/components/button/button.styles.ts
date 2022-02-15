@@ -1,14 +1,14 @@
 import { VariantProps } from "@stitches/core";
 
 import { spin } from "@/styled-system/keyframes";
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-export const buttonLoadingIconStyles = createStyles({
+export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
 });
 
-export const iconButtonStyles = createStyles();
+export const iconButtonStyles = css();
 
 /* -------------------------------------------------------------------------------------------------
  * Size
@@ -165,7 +165,7 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
  * Styles
  * -----------------------------------------------------------------------------------------------*/
 
-export const buttonStyles = createStyles({
+export const buttonStyles = css({
   appearance: "none",
   position: "relative",
 

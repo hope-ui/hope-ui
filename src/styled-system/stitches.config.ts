@@ -6,8 +6,8 @@ import { baseThemeTokens } from "./tokens";
 
 export const {
   theme: baseTheme,
-  css: createStyles,
-  globalCss: createGlobalStyles,
+  css,
+  globalCss,
   config,
   createTheme,
   getCssText,

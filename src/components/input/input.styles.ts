@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 interface InputSizeVariantConfig {
@@ -48,7 +48,7 @@ const commonOutlineAndFilledStyles: SystemStyleObject = {
   },
 };
 
-export const baseInputResetStyles = createStyles({
+export const baseInputResetStyles = css({
   appearance: "none",
 
   position: "relative",
@@ -147,7 +147,7 @@ function createVariantAndSizeCompoundVariant(config: VariantAndSizeCompoundVaria
   ];
 }
 
-export const inputStyles = createStyles(baseInputResetStyles, {
+export const inputStyles = css(baseInputResetStyles, {
   variants: {
     withLeftElement: {
       true: {},
@@ -261,7 +261,7 @@ export type InputVariants = VariantProps<typeof inputStyles>;
  * InputGroup
  * -----------------------------------------------------------------------------------------------*/
 
-export const inputGroupStyles = createStyles({
+export const inputGroupStyles = css({
   position: "relative",
   display: "flex",
   width: "100%",
@@ -271,7 +271,7 @@ export const inputGroupStyles = createStyles({
  * InputElement
  * -----------------------------------------------------------------------------------------------*/
 
-export const inputElementStyles = createStyles({
+export const inputElementStyles = css({
   position: "absolute",
   top: "0",
 
@@ -329,7 +329,7 @@ function createInputAddonVariantAndSizeCompoundVariant(
   };
 }
 
-export const inputAddonStyles = createStyles({
+export const inputAddonStyles = css({
   display: "flex",
   alignItems: "center",
   flex: "0 0 auto",

@@ -120,7 +120,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
-    id: createUniqueId(),
+    id: `hope-checkbox-${createUniqueId().replace(":", "-")}`,
     iconChecked: <CheckIcon />,
     iconIndeterminate: <IndeterminateIcon />,
     variant: theme?.defaultProps?.variant ?? "outline",

@@ -1,6 +1,6 @@
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 
-export const iconStyles = createStyles({
+export const iconStyles = css({
   display: "inline-block",
   flexShrink: 0,
   boxSize: "1em",
