@@ -70,7 +70,7 @@ export const resetStyles = globalCss({
   },
 
   /* Buttons have a default outline */
-  "button:focus-visible": {
+  "button:focus": {
     outline: "5px auto -webkit-focus-ring-color",
   },
 
