@@ -7,13 +7,51 @@ import { Box, Button, HopeProvider, Modal, ModalContent, ModalOverlay } from "."
 
 export function App() {
   const [isOpen, setIsOpen] = createSignal(false);
+
   return (
     <Box p="$4">
       <Button onClick={() => setIsOpen(true)}>Open modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
         <ModalOverlay />
         <ModalContent p="$4">
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quam, vero?
+          <p style={{ overflow: "auto" }}>
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ducimus, saepe. Saepe animi,
+            nobis, quod doloribus explicabo facere repellendus sit fugit modi earum hic aspernatur
+            assumenda rerum nam, consequatur consectetur! Beatae assumenda eius quod sequi fugiat
+            repellendus consequuntur eos totam. Quibusdam eum ducimus iste ut ex labore, nisi
+            provident adipisci! Modi cumque hic sequi consectetur veritatis amet veniam natus
+            obcaecati ut impedit facere sit voluptatem animi quia voluptates atque voluptate at id
+            dignissimos qui, possimus alias error necessitatibus ipsa. Nihil minus ratione incidunt
+            iste. Harum vitae dolores eos, maxime exercitationem quas quibusdam saepe maiores?
+            Fugiat aperiam beatae dolorum iste repudiandae ad! Totam voluptates illum ab reiciendis
+            unde tempore eaque voluptatibus fugiat, laboriosam in nobis maxime vel modi doloremque
+            inventore accusamus non. Dolorem quidem nostrum natus recusandae quo atque quae,
+            corporis iste architecto consequatur voluptates esse harum dolor minus suscipit,
+            accusamus minima, modi praesentium reprehenderit. A temporibus aspernatur mollitia
+            pariatur, dolorum porro dignissimos voluptates. Molestiae quia quod veritatis explicabo
+            eveniet iusto dicta quaerat laudantium fugit reiciendis iure quos adipisci qui
+            exercitationem ipsa numquam pariatur provident sunt illo aut, sit nulla sapiente
+            incidunt? Ipsum reprehenderit, possimus animi aperiam, ad minima nostrum error quis
+            illum provident obcaecati delectus dolores in eaque nam commodi! Ratione! Lorem ipsum
+            dolor sit, amet consectetur adipisicing elit. Ducimus, saepe. Saepe animi, nobis, quod
+            doloribus explicabo facere repellendus sit fugit modi earum hic aspernatur assumenda
+            rerum nam, consequatur consectetur! Beatae assumenda eius quod sequi fugiat repellendus
+            consequuntur eos totam. Quibusdam eum ducimus iste ut ex labore, nisi provident
+            adipisci! Modi cumque hic sequi consectetur veritatis amet veniam natus obcaecati ut
+            impedit facere sit voluptatem animi quia voluptates atque voluptate at id dignissimos
+            qui, possimus alias error necessitatibus ipsa. Nihil minus ratione incidunt iste. Harum
+            vitae dolores eos, maxime exercitationem quas quibusdam saepe maiores? Fugiat aperiam
+            beatae dolorum iste repudiandae ad! Totam voluptates illum ab reiciendis unde tempore
+            eaque voluptatibus fugiat, laboriosam in nobis maxime vel modi doloremque inventore
+            accusamus non. Dolorem quidem nostrum natus recusandae quo atque quae, corporis iste
+            architecto consequatur voluptates esse harum dolor minus suscipit, accusamus minima,
+            modi praesentium reprehenderit. A temporibus aspernatur mollitia pariatur, dolorum porro
+            dignissimos voluptates. Molestiae quia quod veritatis explicabo eveniet iusto dicta
+            quaerat laudantium fugit reiciendis iure quos adipisci qui exercitationem ipsa numquam
+            pariatur provident sunt illo aut, sit nulla sapiente incidunt? Ipsum reprehenderit,
+            possimus animi aperiam, ad minima nostrum error quis illum provident obcaecati delectus
+            dolores in eaque nam commodi! Ratione!
+          </p>
         </ModalContent>
       </Modal>
       <p>

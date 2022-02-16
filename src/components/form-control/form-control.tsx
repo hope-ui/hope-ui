@@ -1,7 +1,7 @@
 import { Accessor, createContext, createUniqueId, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -91,9 +91,14 @@ export interface FormControlContextValue {
   setHasErrorMessage: (value: boolean) => void;
 
   /**
-   * Action to change form control state `isFocused`.
+   * Trigger when the field is focused.
    */
-  setIsFocused: (value: boolean) => void;
+  onFocus: () => void;
+
+  /**
+   * Trigger when the field loose focus.
+   */
+  onBlur: () => void;
 }
 
 export const FormControlContext = createContext<FormControlContextValue>();
@@ -103,7 +108,7 @@ export type FormControlProps<C extends ElementType> = HopeComponentProps<C, Form
 const hopeFormControlClass = "hope-form-control";
 
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
-  const defaultId = `hope-field-${createUniqueId().replace(":", "-")}`;
+  const defaultId = `hope-field-${createUniqueId()}`;
 
   const [state, setState] = createStore<FormControlState>({
     get id() {
@@ -148,13 +153,16 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
 
   const setHasErrorMessage = (value: boolean) => setState("hasErrorMessage", value);
 
-  const setIsFocused = (value: boolean) => setState("isFocused", value);
+  const onFocus = () => setState("isFocused", true);
+
+  const onBlur = () => setState("isFocused", false);
 
   const context: Accessor<FormControlContextValue> = () => ({
     state,
     setHasHelperText,
     setHasErrorMessage,
-    setIsFocused,
+    onFocus,
+    onBlur,
   });
 
   const classes = () => classNames(local.class, hopeFormControlClass, formControlStyles());
@@ -166,7 +174,7 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
   );
 }
 
-FormControl.toString = () => createCssSelector(hopeFormControlClass);
+FormControl.toString = () => createClassSelector(hopeFormControlClass);
 
 export function useFormControlContext() {
   return useContext(FormControlContext);

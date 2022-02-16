@@ -9,7 +9,8 @@ import {
 } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -100,7 +101,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",
-    id: `hope-switch-${createUniqueId().replace(":", "-")}`,
+    id: `hope-switch-${createUniqueId()}`,
     variant: theme?.defaultProps?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
@@ -166,16 +167,6 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
-
-    if (local.onChange) {
-      if (typeof local.onChange === "function") {
-        local.onChange(event);
-      } else {
-        local.onChange[0](local.onChange[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
   };
 
   createEffect(() => {
@@ -199,7 +190,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         role="switch"
         class={inputClasses()}
         checked={checkedState()}
-        onChange={onChange}
+        onChange={e => callAllHandlers(onChange, local.onChange)(e)}
         {...inputProps}
         {...ariaAttrs}
       />
@@ -218,4 +209,4 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   );
 }
 
-Switch.toString = () => createCssSelector(hopeSwitchClass);
+Switch.toString = () => createClassSelector(hopeSwitchClass);

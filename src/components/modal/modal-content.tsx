@@ -1,95 +1,115 @@
 import { clearAllBodyScrollLocks, disableBodyScroll } from "body-scroll-lock";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import { onCleanup, onMount, splitProps } from "solid-js";
+import { JSX, mergeProps, onCleanup, onMount, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { useModalContext } from ".";
-import { modalContentContainerStyles, modalContentStyles } from "./modal.styles";
+import { useModalContext } from "./modal";
+import { modalContainerStyles, modalDialogStyles } from "./modal.styles";
 
-export type ModalContentProps<C extends ElementType> = HopeComponentProps<
-  C,
-  {
-    containerProps?: HopeComponentProps<"div">;
-  }
->;
+export type ModalContentProps<C extends ElementType> = HopeComponentProps<C>;
 
-const hopeModalContentContainerClass = "hope-modal__content-container";
+const hopeModalContainerClass = "hope-modal__content-container";
 const hopeModalContentClass = "hope-modal__content";
 
+/**
+ * Container for the modal dialog's content.
+ */
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
   const modalContext = useModalContext();
 
-  const [local, others] = splitProps(props, ["class", "containerProps"]);
+  const defaultProps: ModalContentProps<"section"> = {
+    as: "section",
+  };
 
-  let rootDiv: HTMLDivElement | undefined;
+  const propsWithDefault: ModalContentProps<"section"> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "role",
+    "aria-labelledby",
+    "aria-describedby",
+    "onClick",
+  ]);
+
+  let containerRef: HTMLDivElement | undefined;
   let focusTrap: FocusTrap | undefined;
 
-  const containerProps = () => ({
-    ...(local.containerProps ?? {}),
-    onClick: modalContext.onOverlayClick,
-    onMouseDown: modalContext.onMouseDown,
-    onKeyUp: modalContext.onKeyUp,
-  });
+  const containerClasses = () => {
+    const containerClass = modalContainerStyles({
+      centered: modalContext.state.centered,
+      scrollBehavior: modalContext.state.scrollBehavior,
+    });
 
-  const dialogProps = () => ({
-    id: modalContext.state.dialogId,
-    role: "dialog",
-    tabIndex: -1,
-    "aria-modal": true,
-    "aria-labelledby": modalContext.state.headerMounted ? modalContext.state.headerId : undefined,
-    "aria-describedby": modalContext.state.bodyMounted ? modalContext.state.bodyId : undefined,
-    onClick: (event: MouseEvent) => event.stopPropagation(),
-  });
+    return classNames(hopeModalContainerClass, containerClass);
+  };
 
-  const containerClasses = () =>
-    classNames(
-      hopeModalContentContainerClass,
-      modalContentContainerStyles({
-        centered: modalContext.state.centered,
-        scrollBehavior: modalContext.state.scrollBehavior,
-      })
-    );
+  const dialogClasses = () => {
+    const dialogClass = modalDialogStyles({
+      size: modalContext.state.size,
+      scrollBehavior: modalContext.state.scrollBehavior,
+    });
 
-  const contentClasses = () =>
-    classNames(
-      local.class,
-      hopeModalContentClass,
-      modalContentStyles({
-        size: modalContext.state.size,
-        scrollBehavior: modalContext.state.scrollBehavior,
-      })
-    );
+    return classNames(local.class, hopeModalContentClass, dialogClass);
+  };
+
+  const ariaLabelledBy = () =>
+    modalContext.state.headerMounted ? modalContext.state.headerId : local["aria-labelledby"];
+
+  const ariaDescribedBy = () =>
+    modalContext.state.bodyMounted ? modalContext.state.bodyId : local["aria-describedby"];
+
+  const onDialogClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
+    const allHandlers = callAllHandlers(local.onClick, event => event.stopPropagation());
+    allHandlers(event);
+  };
 
   onMount(() => {
-    if (!rootDiv) {
+    if (!containerRef) {
       return;
     }
 
-    focusTrap = createFocusTrap(rootDiv, {
+    focusTrap = createFocusTrap(containerRef, {
       initialFocus: modalContext.state.initialFocus,
-      fallbackFocus: `#${modalContext.state.dialogId}`,
+      fallbackFocus: `[id='${modalContext.state.dialogId}']`,
       allowOutsideClick: false,
     });
 
     focusTrap.activate();
-    disableBodyScroll(rootDiv);
+
+    disableBodyScroll(containerRef);
   });
 
   onCleanup(() => {
     focusTrap?.deactivate();
+
     clearAllBodyScrollLocks();
   });
 
   return (
-    <div ref={rootDiv}>
-      <Box class={containerClasses()} {...containerProps}>
-        <Box as="section" class={contentClasses()} {...dialogProps} {...others} />
-      </Box>
-    </div>
+    <Box
+      class={containerClasses()}
+      ref={containerRef}
+      tabIndex={-1}
+      onClick={modalContext.onOverlayClick}
+      onMouseDown={modalContext.onMouseDown}
+      onKeyUp={modalContext.onKeyUp}
+    >
+      <Box
+        class={dialogClasses()}
+        id={modalContext.state.dialogId}
+        role={local.role ?? "dialog"}
+        tabIndex={-1}
+        aria-modal={true}
+        aria-labelledby={ariaLabelledBy()}
+        aria-describedby={ariaDescribedBy()}
+        onClick={onDialogClick}
+        {...others}
+      />
+    </Box>
   );
 }
 
-ModalContent.toString = () => createCssSelector(hopeModalContentClass);
+ModalContent.toString = () => createClassSelector(hopeModalContentClass);

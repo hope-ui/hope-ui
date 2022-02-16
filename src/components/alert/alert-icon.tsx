@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
 import {
@@ -51,4 +51,4 @@ export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   return <Icon as={icon()} class={classes()} {...others} />;
 }
 
-AlertIcon.toString = () => createCssSelector(hopeAlertIconClass);
+AlertIcon.toString = () => createClassSelector(hopeAlertIconClass);

@@ -1,7 +1,7 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../button/button";
 import { iconButtonStyles } from "../button/button.styles";
@@ -45,4 +45,4 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
   );
 }
 
-IconButton.toString = () => createCssSelector(hopeIconButtonClass);
+IconButton.toString = () => createClassSelector(hopeIconButtonClass);

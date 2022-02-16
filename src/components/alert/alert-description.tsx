@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -19,4 +19,4 @@ export function AlertDescription<C extends ElementType = "div">(props: AlertDesc
   return <Box class={classes()} {...others} />;
 }
 
-AlertDescription.toString = () => createCssSelector(hopeAlertDescriptionClass);
+AlertDescription.toString = () => createClassSelector(hopeAlertDescriptionClass);

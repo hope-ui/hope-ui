@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -20,4 +20,4 @@ export function Spacer<C extends ElementType = "div">(props: HopeComponentProps<
   return <Box class={classes()} {...others} />;
 }
 
-Spacer.toString = () => createCssSelector(hopeSpacerClass);
+Spacer.toString = () => createClassSelector(hopeSpacerClass);

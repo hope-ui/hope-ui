@@ -20,10 +20,10 @@ export const modalOverlayStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Modal - content container
+ * Modal - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const modalContentContainerStyles = css({
+export const modalContainerStyles = css({
   zIndex: "$modal",
   position: "fixed",
   top: 0,
@@ -58,13 +58,13 @@ export const modalContentContainerStyles = css({
   },
 });
 
-export type ModalContentContainerVariants = VariantProps<typeof modalContentContainerStyles>;
+export type ModalContainerVariants = VariantProps<typeof modalContainerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Modal - content
+ * Modal - dialog (content)
  * -----------------------------------------------------------------------------------------------*/
 
-export const modalContentStyles = css({
+export const modalDialogStyles = css({
   zIndex: "$modal",
   position: "relative",
 
@@ -143,4 +143,4 @@ export const modalContentStyles = css({
   },
 });
 
-export type ModalContentVariants = VariantProps<typeof modalContentStyles>;
+export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;

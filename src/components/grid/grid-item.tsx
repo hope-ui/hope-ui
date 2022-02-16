@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveProps, ResponsiveValue } from "@/styled-system/types";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 import { mapKeys } from "@/utils/function";
 
 import { Box } from "../box/box";
@@ -76,4 +76,4 @@ export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>)
   );
 }
 
-GridItem.toString = () => createCssSelector(hopeGridItemClass);
+GridItem.toString = () => createClassSelector(hopeGridItemClass);

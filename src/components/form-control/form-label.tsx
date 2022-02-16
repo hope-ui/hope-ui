@@ -1,7 +1,7 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -69,4 +69,4 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
   );
 }
 
-FormLabel.toString = () => createCssSelector(hopeFormLabelClass);
+FormLabel.toString = () => createClassSelector(hopeFormLabelClass);

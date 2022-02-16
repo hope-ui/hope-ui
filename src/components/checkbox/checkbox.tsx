@@ -11,7 +11,8 @@ import {
 } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -120,7 +121,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
-    id: `hope-checkbox-${createUniqueId().replace(":", "-")}`,
+    id: `hope-checkbox-${createUniqueId()}`,
     iconChecked: <CheckIcon />,
     iconIndeterminate: <IndeterminateIcon />,
     variant: theme?.defaultProps?.variant ?? "outline",
@@ -190,16 +191,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
-
-    if (local.onChange) {
-      if (typeof local.onChange === "function") {
-        local.onChange(event);
-      } else {
-        local.onChange[0](local.onChange[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
   };
 
   createEffect(() => {
@@ -222,7 +213,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         type="checkbox"
         class={inputClasses()}
         checked={checkedState()}
-        onChange={onChange}
+        onChange={e => callAllHandlers(onChange, local.onChange)(e)}
         {...inputProps}
         {...ariaAttrs}
       />
@@ -241,4 +232,4 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   );
 }
 
-Checkbox.toString = () => createCssSelector(hopeCheckboxClass);
+Checkbox.toString = () => createClassSelector(hopeCheckboxClass);

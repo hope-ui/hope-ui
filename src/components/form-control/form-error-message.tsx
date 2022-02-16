@@ -1,6 +1,6 @@
 import { onCleanup, onMount, Show, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -36,4 +36,4 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
   );
 }
 
-FormErrorMessage.toString = () => createCssSelector(hopeFormErrorMessageClass);
+FormErrorMessage.toString = () => createClassSelector(hopeFormErrorMessageClass);

@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -37,4 +37,4 @@ export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
   );
 }
 
-Alert.toString = () => createCssSelector(hopeAlertClass);
+Alert.toString = () => createClassSelector(hopeAlertClass);

@@ -2,7 +2,7 @@ import { Accessor, createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -76,7 +76,7 @@ export function InputGroup<C extends ElementType = "div">(props: InputGroupProps
   );
 }
 
-InputGroup.toString = () => createCssSelector(hopeInputGroupClass);
+InputGroup.toString = () => createClassSelector(hopeInputGroupClass);
 
 export function useInputGroupContext() {
   return useContext(InputGroupContext);

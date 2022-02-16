@@ -1,6 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -43,7 +43,7 @@ export function InputLeftElement<C extends ElementType = "div">(props: HopeCompo
   );
 }
 
-InputLeftElement.toString = () => createCssSelector(hopeInputLeftElementClass);
+InputLeftElement.toString = () => createClassSelector(hopeInputLeftElementClass);
 
 /* -------------------------------------------------------------------------------------------------
  * InputRightElement
@@ -71,4 +71,4 @@ export function InputRightElement<C extends ElementType = "div">(props: HopeComp
   );
 }
 
-InputRightElement.toString = () => createCssSelector(hopeInputRightElementClass);
+InputRightElement.toString = () => createClassSelector(hopeInputRightElementClass);

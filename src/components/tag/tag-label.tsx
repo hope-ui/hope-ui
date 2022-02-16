@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -23,4 +23,4 @@ export function TagLabel<C extends ElementType = "span">(props: TagLabelProps<C>
   return <Box class={classes()} {...others} />;
 }
 
-TagLabel.toString = () => createCssSelector(hopeTagLabelClass);
+TagLabel.toString = () => createClassSelector(hopeTagLabelClass);

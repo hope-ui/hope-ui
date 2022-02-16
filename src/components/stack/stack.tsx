@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveProps, SpaceScaleValue } from "@/styled-system/types";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -39,7 +39,7 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   );
 }
 
-Stack.toString = () => createCssSelector(hopeStackClass);
+Stack.toString = () => createClassSelector(hopeStackClass);
 
 /* -------------------------------------------------------------------------------------------------
  * VStack

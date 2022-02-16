@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -30,4 +30,4 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
   return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
 }
 
-Text.toString = () => createCssSelector(hopeTextClass);
+Text.toString = () => createClassSelector(hopeTextClass);

@@ -2,21 +2,58 @@ import { createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
-import { ModalContentContainerVariants, ModalContentVariants } from "./modal.styles";
+import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 
 interface ModalState {
+  /**
+   * The `id` of the modal dialog
+   */
   dialogId: string;
+
+  /**
+   * The `id` of the modal dialog header
+   */
   headerId: string;
+
+  /**
+   * The `id` of the modal dialog body
+   */
   bodyId: string;
-  isOpen: boolean;
-  initialFocus?: string;
-  size: ModalContentVariants["size"];
-  centered: ModalContentContainerVariants["centered"];
-  scrollBehavior: ModalContentContainerVariants["scrollBehavior"];
+
+  /**
+   * The size of the modal dialog.
+   */
+  size: ModalDialogVariants["size"];
+
+  /**
+   * If `true`, the modal will be centered on screen.
+   */
+  centered: ModalContainerVariants["centered"];
+
+  /**
+   * Define the scrolling behavior of the modal if content overflows beyond the viewport.
+   */
+  scrollBehavior: ModalContainerVariants["scrollBehavior"];
+
+  /**
+   * If `true`, the modal will close when the overlay is clicked
+   */
   closeOnOverlayClick: boolean;
-  closeOnEsc: boolean;
+
+  /**
+   * If `true`, notify that the modal header component is rendered
+   */
   headerMounted: boolean;
+
+  /**
+   * If `true`, notify that the modal body component is rendered
+   */
   bodyMounted: boolean;
+
+  /**
+   * A query selector string targeting the element to receive focus when the modal opens.
+   */
+  initialFocus?: string;
 }
 
 interface ModalContextValue {
@@ -27,11 +64,20 @@ interface ModalContextValue {
    */
   onClose: () => void;
 
-  onOverlayClick: (event: MouseEvent) => void;
+  /**
+   * Callback invoked when a `mouseDown` is fired on the modal container.
+   */
+  onMouseDown: (event: MouseEvent) => void;
 
+  /**
+   * Callback invoked when a `keyUp` is fired on the modal container.
+   */
   onKeyUp: (event: KeyboardEvent) => void;
 
-  onMouseDown: (event: MouseEvent) => void;
+  /**
+   * Callback invoked when the overlay is clicked.
+   */
+  onOverlayClick: (event: MouseEvent) => void;
 
   /**
    * Callback function to set if the modal header is mounted
@@ -42,6 +88,54 @@ interface ModalContextValue {
    * Callback function to set if the modal body is mounted
    */
   setBodyMounted: (value: boolean) => void;
+}
+
+export interface ModalProps extends ModalContainerVariants, ModalDialogVariants {
+  /**
+   * If `true`, the modal will be open.
+   */
+  isOpen: boolean;
+
+  /**
+   * Callback invoked to close the modal.
+   */
+  onClose: () => void;
+
+  /**
+   * The `id` of the modal dialog
+   */
+  id?: string;
+
+  /**
+   * If `true`, the modal will close when the overlay is clicked
+   */
+  closeOnOverlayClick?: boolean;
+
+  /**
+   * If `true`, the modal will close when the `Esc` key is pressed
+   */
+  closeOnEsc?: boolean;
+
+  /**
+   * A query selector string targeting the element to receive focus when the modal opens.
+   */
+  initialFocus?: string;
+
+  /**
+   * Callback fired when the overlay is clicked.
+   */
+
+  onOverlayClick?: () => void;
+
+  /**
+   * Callback fired when the escape key is pressed and focus is within modal
+   */
+  onEsc?: () => void;
+
+  /**
+   * Children of the Modal
+   */
+  children?: JSX.Element;
 }
 
 const ModalContext = createContext<ModalContextValue>();
@@ -56,55 +150,6 @@ export function useModalContext() {
   return context;
 }
 
-export interface ModalProps extends ModalContentContainerVariants, ModalContentVariants {
-  /**
-   * If `true`, the modal will be open.
-   */
-  isOpen: boolean;
-
-  /**
-   * Callback invoked to close the modal.
-   */
-  onClose: () => void;
-
-  /**
-   * The `id` of the modal
-   */
-  id?: string;
-
-  /**
-   * If `true`, the modal will close when the overlay is clicked
-   * @default true
-   */
-  closeOnOverlayClick?: boolean;
-
-  /**
-   * If `true`, the modal will close when the `Esc` key is pressed
-   * @default true
-   */
-  closeOnEsc?: boolean;
-
-  /**
-   * A query selector string targeting the element to receive focus when the modal opens.
-   */
-  initialFocus?: string;
-
-  /**
-   * Callback fired when the overlay is clicked.
-   */
-
-  onOverlayClick?: () => void;
-  /**
-   * Callback fired when the escape key is pressed and focus is within modal
-   */
-  onEsc?: () => void;
-
-  /**
-   * Children of the Modal
-   */
-  children?: JSX.Element;
-}
-
 /**
  * Modal provides context, theming, and accessibility properties
  * to all other modal components.
@@ -112,7 +157,7 @@ export interface ModalProps extends ModalContentContainerVariants, ModalContentV
  * It doesn't render any DOM node.
  */
 export function Modal(props: ModalProps) {
-  const defaultDialogId = `hope-modal-${createUniqueId().replace(":", "-")}`;
+  const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
   const [state, setState] = createStore<ModalState>({
     get dialogId() {
@@ -123,9 +168,6 @@ export function Modal(props: ModalProps) {
     },
     get bodyId() {
       return `${this.dialogId}--body`;
-    },
-    get isOpen() {
-      return props.isOpen;
     },
     get initialFocus() {
       return props.initialFocus;
@@ -142,13 +184,11 @@ export function Modal(props: ModalProps) {
     get closeOnOverlayClick() {
       return props.closeOnOverlayClick ?? true;
     },
-    get closeOnEsc() {
-      return props.closeOnEsc ?? true;
-    },
     headerMounted: false,
     bodyMounted: false,
   });
 
+  const closeOnEsc = () => props.closeOnEsc ?? true;
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
   const setBodyMounted = (value: boolean) => setState("bodyMounted", value);
@@ -163,7 +203,7 @@ export function Modal(props: ModalProps) {
     if (event.key === "Escape") {
       event.stopPropagation();
 
-      if (state.closeOnEsc) {
+      if (closeOnEsc()) {
         onClose();
       }
 

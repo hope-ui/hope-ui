@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
@@ -73,4 +73,4 @@ export function Input(props: InputProps) {
   );
 }
 
-Input.toString = () => createCssSelector(hopeInputClass);
+Input.toString = () => createClassSelector(hopeInputClass);

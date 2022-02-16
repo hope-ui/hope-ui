@@ -1,5 +1,7 @@
 import { Accessor, JSX } from "solid-js";
 
+import { callAllHandlers } from "@/utils/function";
+
 import { FormControlOptions, useFormControlContext } from "./form-control";
 
 export interface UseFormControlProps<T extends HTMLElement> extends FormControlOptions {
@@ -70,34 +72,6 @@ export function useFormControl<T extends HTMLElement>(
     return labelIds.join(" ") || undefined;
   };
 
-  const onFocus: Accessor<JSX.EventHandlerUnion<T, FocusEvent>> = () => event => {
-    formControl?.setIsFocused(true);
-
-    if (props.onFocus) {
-      if (typeof props.onFocus === "function") {
-        props.onFocus(event);
-      } else {
-        props.onFocus[0](props.onFocus[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
-  };
-
-  const onBlur: Accessor<JSX.EventHandlerUnion<T, FocusEvent>> = () => event => {
-    formControl?.setIsFocused(false);
-
-    if (props.onBlur) {
-      if (typeof props.onBlur === "function") {
-        props.onBlur(event);
-      } else {
-        props.onBlur[0](props.onBlur[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
-  };
-
   return () => ({
     id: id(),
     required: required(),
@@ -107,7 +81,7 @@ export function useFormControl<T extends HTMLElement>(
     "aria-required": required() ? true : undefined,
     "aria-readonly": readOnly() ? true : undefined,
     "aria-describedby": ariaDescribedBy(),
-    onFocus: onFocus(),
-    onBlur: onBlur(),
+    onFocus: callAllHandlers(formControl?.onFocus, props.onFocus),
+    onBlur: callAllHandlers(formControl?.onBlur, props.onBlur),
   });
 }

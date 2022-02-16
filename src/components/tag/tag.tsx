@@ -3,7 +3,7 @@ import { mergeProps, splitProps } from "solid-js";
 import { RadiiProps } from "@/styled-system/props/radii";
 import { ResponsiveValue } from "@/styled-system/types";
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -50,4 +50,4 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   );
 }
 
-Tag.toString = () => createCssSelector(hopeTagClass);
+Tag.toString = () => createClassSelector(hopeTagClass);
