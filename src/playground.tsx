@@ -3,9 +3,19 @@ import "./playground.css";
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, Modal, ModalContent, ModalOverlay } from ".";
+import {
+  Box,
+  Button,
+  HopeProvider,
+  Modal,
+  ModalContent,
+  ModalOverlay,
+  useColorMode,
+  VStack,
+} from ".";
 
 export function App() {
+  const { toggleColorMode } = useColorMode();
   const [isOpen, setIsOpen] = createSignal(false);
 
   return (
@@ -21,8 +31,12 @@ export function App() {
             minima nostrum error quis illum provident obcaecati delectus dolores in eaque nam
             commodi! Ratione!
           </p>
-          <button data-autofocus>Hi mom</button>
-          <Button>Close</Button>
+          <VStack spacing="$4">
+            <button onClick={toggleColorMode}>toggleColorMode</button>
+            <Button data-autofocus onClick={() => setIsOpen(false)}>
+              Close
+            </Button>
+          </VStack>
         </ModalContent>
       </Modal>
     </Box>

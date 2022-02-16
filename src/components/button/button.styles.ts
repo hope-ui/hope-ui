@@ -184,11 +184,11 @@ export const buttonStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "color 250ms, background-color 250ms",
+  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "4px",
+  "&:focus": {
+    outline: "none",
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 
   "&:disabled": {

@@ -81,7 +81,7 @@ export const modalDialogStyles = css({
   boxShadow: "$lg",
 
   borderRadius: "$sm",
-  backgroundColor: "$defaultModalContentBg",
+  backgroundColor: "$modalDialogBg",
 
   color: "inherit",
 
