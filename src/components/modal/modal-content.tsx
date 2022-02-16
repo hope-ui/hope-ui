@@ -93,9 +93,9 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
       class={containerClasses()}
       ref={containerRef}
       tabIndex={-1}
-      onClick={modalContext.onOverlayClick}
       onMouseDown={modalContext.onMouseDown}
-      onKeyUp={modalContext.onKeyUp}
+      onKeyDown={modalContext.onKeyDown}
+      onClick={modalContext.onOverlayClick}
     >
       <Box
         class={dialogClasses()}

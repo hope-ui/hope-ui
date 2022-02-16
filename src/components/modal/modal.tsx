@@ -70,9 +70,9 @@ interface ModalContextValue {
   onMouseDown: (event: MouseEvent) => void;
 
   /**
-   * Callback invoked when a `keyUp` is fired on the modal container.
+   * Callback invoked when a `keyDown` is fired on the modal container.
    */
-  onKeyUp: (event: KeyboardEvent) => void;
+  onKeyDown: (event: KeyboardEvent) => void;
 
   /**
    * Callback invoked when the overlay is clicked.
@@ -199,7 +199,7 @@ export function Modal(props: ModalProps) {
     mouseDownTarget = event.target;
   };
 
-  const onKeyUp = (event: KeyboardEvent) => {
+  const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       event.stopPropagation();
 
@@ -229,9 +229,9 @@ export function Modal(props: ModalProps) {
   const context: ModalContextValue = {
     state,
     onClose,
-    onOverlayClick,
     onMouseDown,
-    onKeyUp,
+    onKeyDown,
+    onOverlayClick,
     setHeaderMounted,
     setBodyMounted,
   };
