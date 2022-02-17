@@ -86,32 +86,56 @@ export const resetStyles = globalCss({
    * -----------------------------------------------------------------------------------------------*/
 
   /* fade */
-  ".fade-enter, .fade-exit-to": {
+  ".hope-fade-enter, .hope-fade-exit-to": {
     opacity: 0,
   },
-  ".fade-enter-to, .fade-exit": {
+  ".hope-fade-enter-to, .hope-fade-exit": {
     opacity: 1,
   },
-  ".fade-enter-active": {
+  ".hope-fade-enter-active": {
     transition: "opacity 300ms ease-out",
   },
-  ".fade-exit-active": {
+  ".hope-fade-exit-active": {
     transition: "opacity 200ms ease-in",
   },
 
-  /* slide-up */
-  ".slide-up-enter, .slide-up-exit-to": {
+  /* fade-up */
+  ".hope-fade-up-enter, .hope-fade-up-exit-to": {
     opacity: 0,
     transform: "translateY(16px)",
   },
-  ".slide-up-enter-to, .slide-up-exit": {
+  ".hope-fade-up-enter-to, .hope-fade-up-exit": {
     opacity: 1,
     transform: "translateY(0)",
   },
-  ".slide-up-enter-active": {
-    transition: "all 300ms ease-out",
+  ".hope-fade-up-enter-active": {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "300ms",
+    transitionTimingFunction: "ease-out",
   },
-  ".slide-up-exit-active": {
-    transition: "all 200ms ease-in",
+  ".hope-fade-up-exit-active": {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-in",
+  },
+
+  /* scale */
+  ".hope-scale-enter, .hope-scale-exit-to": {
+    opacity: 0,
+    transform: "scale(0.95)",
+  },
+  ".hope-scale-enter-to, .hope-scale-exit": {
+    opacity: 1,
+    transform: "scale(1)",
+  },
+  ".hope-scale-enter-active": {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "300ms",
+    transitionTimingFunction: "ease-out",
+  },
+  ".hope-scale-exit-active": {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-in",
   },
 });

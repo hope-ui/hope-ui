@@ -1,8 +1,18 @@
-import { createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  JSX,
+  Show,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
 import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
+
+type ModalTransition = "fade-up" | "scale" | "none";
 
 interface ModalState {
   /**
@@ -24,6 +34,11 @@ interface ModalState {
    * The `id` of the modal dialog body
    */
   bodyId: string;
+
+  /**
+   * Modal opening/closing transition.
+   */
+  transition: ModalTransition;
 
   /**
    * The size of the modal dialog.
@@ -63,6 +78,11 @@ interface ModalState {
 
 interface ModalContextValue {
   state: ModalState;
+
+  /**
+   * Callback invoked to notify that modal's content exit transition is done.
+   */
+  onModalContentExitTransitionEnd: () => void;
 
   /**
    * Callback invoked to close the modal.
@@ -127,6 +147,16 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   initialFocus?: string;
 
   /**
+   * Modal opening/closing transition.
+   */
+  transition?: ModalTransition;
+
+  /**
+   * Children of the Modal
+   */
+  children?: JSX.Element;
+
+  /**
    * Callback fired when the overlay is clicked.
    */
 
@@ -136,11 +166,6 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
    * Callback fired when the escape key is pressed and focus is within modal
    */
   onEsc?: () => void;
-
-  /**
-   * Children of the Modal
-   */
-  children?: JSX.Element;
 }
 
 const ModalContext = createContext<ModalContextValue>();
@@ -180,6 +205,9 @@ export function Modal(props: ModalProps) {
     get initialFocus() {
       return props.initialFocus;
     },
+    get transition() {
+      return props.transition ?? "fade-up";
+    },
     get size() {
       return props.size ?? "md";
     },
@@ -195,6 +223,24 @@ export function Modal(props: ModalProps) {
     headerMounted: false,
     bodyMounted: false,
   });
+
+  /**
+   * Internal state to deal with modal transitions.
+   */
+  const [isMounted, setIsMounted] = createSignal(false);
+
+  createEffect(() => {
+    if (state.isOpen) {
+      // mount modal when state `isOpen` is true.
+      setIsMounted(true);
+    } else {
+      // unmount modal instantly when there is no modal transition.
+      state.transition === "none" && setIsMounted(false);
+    }
+  });
+
+  // unmount modal only after modal's content exit transition is done.
+  const onModalContentExitTransitionEnd = () => setIsMounted(false);
 
   const closeOnEsc = () => props.closeOnEsc ?? true;
   const onClose = () => props.onClose();
@@ -240,6 +286,7 @@ export function Modal(props: ModalProps) {
 
   const context: ModalContextValue = {
     state,
+    onModalContentExitTransitionEnd,
     onClose,
     onMouseDown,
     onKeyDown,
@@ -249,7 +296,7 @@ export function Modal(props: ModalProps) {
   };
 
   return (
-    <Show when={state.isOpen}>
+    <Show when={isMounted()}>
       <ModalContext.Provider value={context}>
         <Portal>{props.children}</Portal>
       </ModalContext.Provider>

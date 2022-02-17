@@ -80,7 +80,7 @@ export const modalDialogStyles = css({
 
   boxShadow: "$lg",
 
-  borderRadius: "$sm",
+  borderRadius: "$lg",
   backgroundColor: "$modalDialogBg",
 
   color: "inherit",
@@ -152,10 +152,10 @@ export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;
 
 export const modalHeaderStyles = css({
   flex: 0,
-  px: "$5",
-  pt: "$5",
-  fontSize: "$xl",
-  fontWeight: "$semibold",
+  px: "$6",
+  pt: "$6",
+  fontSize: "$lg",
+  fontWeight: "$medium",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ export const modalHeaderStyles = css({
 
 export const modalBodyStyles = css({
   flex: 1,
-  padding: "$5",
+  padding: "$6",
 
   variants: {
     scrollBehavior: {
@@ -186,8 +186,8 @@ export const modalFooterStyles = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  px: "$5",
-  pb: "$5",
+  px: "$6",
+  pb: "$6",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -196,6 +196,6 @@ export const modalFooterStyles = css({
 
 export const modalCloseButtonStyles = css({
   position: "absolute",
-  top: "$4",
-  insetInlineEnd: "$4",
+  top: "$5",
+  insetInlineEnd: "$5",
 });

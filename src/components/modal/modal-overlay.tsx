@@ -1,4 +1,4 @@
-import { createEffect, createSignal, Show, splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 import { classNames, createClassSelector } from "@/utils/css";
@@ -16,19 +16,17 @@ const hopeModalOverlayClass = "hope-modal__overlay";
 export function ModalOverlay<C extends ElementType = "div">(props: HopeComponentProps<C>) {
   const modalContext = useModalContext();
 
-  const [isOverlayVisible, setIsOverlayVisible] = createSignal(false);
-
-  createEffect(() => {
-    setIsOverlayVisible(modalContext.state.isOpen);
-  });
-
   const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => classNames(local.class, hopeModalOverlayClass, modalOverlayStyles());
 
+  const overlayTransitionName = () => {
+    return modalContext.state.transition === "none" ? "hope-none" : "hope-fade";
+  };
+
   return (
-    <Transition name="fade">
-      <Show when={isOverlayVisible()}>
+    <Transition name={overlayTransitionName()} appear>
+      <Show when={modalContext.state.isOpen}>
         <Box class={classes()} {...others} />
       </Show>
     </Transition>

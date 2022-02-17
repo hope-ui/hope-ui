@@ -169,11 +169,11 @@ export const buttonStyles = css({
   alignItems: "center",
 
   outline: "none",
-  borderRadius: "$sm",
+  borderRadius: "$md",
 
   padding: "0",
 
-  fontWeight: "$semibold",
+  fontWeight: "$medium",
   lineHeight: "$none",
   textDecoration: "none",
 

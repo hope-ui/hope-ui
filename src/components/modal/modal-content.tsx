@@ -1,15 +1,6 @@
 import { clearAllBodyScrollLocks, disableBodyScroll } from "body-scroll-lock";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import {
-  createEffect,
-  createSignal,
-  JSX,
-  mergeProps,
-  onCleanup,
-  onMount,
-  Show,
-  splitProps,
-} from "solid-js";
+import { JSX, mergeProps, onCleanup, onMount, Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 import { classNames, createClassSelector } from "@/utils/css";
@@ -30,12 +21,6 @@ const hopeModalContentClass = "hope-modal__content";
  */
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
   const modalContext = useModalContext();
-
-  const [isDialogVisible, setIsDialogVisible] = createSignal(false);
-
-  createEffect(() => {
-    setIsDialogVisible(modalContext.state.isOpen);
-  });
 
   const defaultProps: ModalContentProps<"section"> = {
     as: "section",
@@ -83,6 +68,8 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
     allHandlers(event);
   };
 
+  const modalTransitionName = () => `hope-${modalContext.state.transition}`;
+
   onMount(() => {
     if (!containerRef) {
       return;
@@ -104,8 +91,12 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   });
 
   return (
-    <Transition name="slide-up">
-      <Show when={isDialogVisible()}>
+    <Transition
+      name={modalTransitionName()}
+      appear
+      onAfterExit={modalContext.onModalContentExitTransitionEnd}
+    >
+      <Show when={modalContext.state.isOpen}>
         <Box
           ref={containerRef}
           class={containerClasses()}

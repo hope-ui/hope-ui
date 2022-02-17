@@ -11,11 +11,14 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
+  ModalFooter,
   ModalHeader,
   ModalOverlay,
+  useColorMode,
 } from ".";
 
 export function App() {
+  const { toggleColorMode } = useColorMode();
   const [isOpen, setIsOpen] = createSignal(false);
 
   const closeModal = () => setIsOpen(false);
@@ -24,12 +27,23 @@ export function App() {
   return (
     <Box p="$4">
       <Button onClick={openModal}>Open modal</Button>
-      <Modal isOpen={isOpen()} onClose={closeModal}>
+      <Modal isOpen={isOpen()} onClose={closeModal} centered transition="scale">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Modal Title</ModalHeader>
+          <ModalHeader>Deactivate account</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>Hi mom !</ModalBody>
+          <ModalBody>
+            Are you sure you want to deactivate your account? All of your data will be permanently
+            removed. This action cannot be undone.
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="default" mr="$4" onClick={toggleColorMode}>
+              Cancel
+            </Button>
+            <Button colorScheme="danger" onClick={closeModal}>
+              Deactivate
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </Box>
