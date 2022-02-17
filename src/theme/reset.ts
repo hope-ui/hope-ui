@@ -80,4 +80,38 @@ export const resetStyles = globalCss({
     color: "inherit",
     textCecoration: "inherit",
   },
+
+  /* -------------------------------------------------------------------------------------------------
+   * solid-transition-group classes
+   * -----------------------------------------------------------------------------------------------*/
+
+  /* fade */
+  ".fade-enter, .fade-exit-to": {
+    opacity: 0,
+  },
+  ".fade-enter-to, .fade-exit": {
+    opacity: 1,
+  },
+  ".fade-enter-active": {
+    transition: "opacity 300ms ease-out",
+  },
+  ".fade-exit-active": {
+    transition: "opacity 200ms ease-in",
+  },
+
+  /* slide-up */
+  ".slide-up-enter, .slide-up-exit-to": {
+    opacity: 0,
+    transform: "translateY(16px)",
+  },
+  ".slide-up-enter-to, .slide-up-exit": {
+    opacity: 1,
+    transform: "translateY(0)",
+  },
+  ".slide-up-enter-active": {
+    transition: "all 300ms ease-out",
+  },
+  ".slide-up-exit-active": {
+    transition: "all 200ms ease-in",
+  },
 });

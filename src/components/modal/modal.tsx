@@ -6,6 +6,11 @@ import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 
 interface ModalState {
   /**
+   * If `true`, the modal will be open.
+   */
+  isOpen: boolean;
+
+  /**
    * The `id` of the modal dialog
    */
   dialogId: string;
@@ -160,6 +165,9 @@ export function Modal(props: ModalProps) {
   const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
   const [state, setState] = createStore<ModalState>({
+    get isOpen() {
+      return props.isOpen;
+    },
     get dialogId() {
       return props.id ?? defaultDialogId;
     },
@@ -216,8 +224,12 @@ export function Modal(props: ModalProps) {
     /**
      * Prevent the modal from closing when user
      * start dragging from the content, and release drag outside the content.
+     *
+     * Because it is technically not a considered "click outside".
      */
-    if (mouseDownTarget !== event.target) return;
+    if (mouseDownTarget !== event.target) {
+      return;
+    }
 
     if (state.closeOnOverlayClick) {
       onClose();
@@ -237,7 +249,7 @@ export function Modal(props: ModalProps) {
   };
 
   return (
-    <Show when={props.isOpen}>
+    <Show when={state.isOpen}>
       <ModalContext.Provider value={context}>
         <Portal>{props.children}</Portal>
       </ModalContext.Provider>

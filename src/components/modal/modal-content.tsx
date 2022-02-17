@@ -1,6 +1,16 @@
 import { clearAllBodyScrollLocks, disableBodyScroll } from "body-scroll-lock";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import { JSX, mergeProps, onCleanup, onMount, splitProps } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  JSX,
+  mergeProps,
+  onCleanup,
+  onMount,
+  Show,
+  splitProps,
+} from "solid-js";
+import { Transition } from "solid-transition-group";
 
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
@@ -21,12 +31,19 @@ const hopeModalContentClass = "hope-modal__content";
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
   const modalContext = useModalContext();
 
+  const [isDialogVisible, setIsDialogVisible] = createSignal(false);
+
+  createEffect(() => {
+    setIsDialogVisible(modalContext.state.isOpen);
+  });
+
   const defaultProps: ModalContentProps<"section"> = {
     as: "section",
   };
 
   const propsWithDefault: ModalContentProps<"section"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, [
+    "ref",
     "class",
     "role",
     "aria-labelledby",
@@ -78,37 +95,39 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
     });
 
     focusTrap.activate();
-
     disableBodyScroll(containerRef);
   });
 
   onCleanup(() => {
     focusTrap?.deactivate();
-
     clearAllBodyScrollLocks();
   });
 
   return (
-    <Box
-      class={containerClasses()}
-      ref={containerRef}
-      tabIndex={-1}
-      onMouseDown={modalContext.onMouseDown}
-      onKeyDown={modalContext.onKeyDown}
-      onClick={modalContext.onOverlayClick}
-    >
-      <Box
-        class={dialogClasses()}
-        id={modalContext.state.dialogId}
-        role={local.role ?? "dialog"}
-        tabIndex={-1}
-        aria-modal={true}
-        aria-labelledby={ariaLabelledBy()}
-        aria-describedby={ariaDescribedBy()}
-        onClick={onDialogClick}
-        {...others}
-      />
-    </Box>
+    <Transition name="slide-up">
+      <Show when={isDialogVisible()}>
+        <Box
+          ref={containerRef}
+          class={containerClasses()}
+          tabIndex={-1}
+          onMouseDown={modalContext.onMouseDown}
+          onKeyDown={modalContext.onKeyDown}
+          onClick={modalContext.onOverlayClick}
+        >
+          <Box
+            class={dialogClasses()}
+            id={modalContext.state.dialogId}
+            role={local.role ?? "dialog"}
+            tabIndex={-1}
+            aria-modal={true}
+            aria-labelledby={ariaLabelledBy()}
+            aria-describedby={ariaDescribedBy()}
+            onClick={onDialogClick}
+            {...others}
+          />
+        </Box>
+      </Show>
+    </Transition>
   );
 }
 
