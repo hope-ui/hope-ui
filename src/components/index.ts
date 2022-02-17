@@ -4,6 +4,7 @@ export * from "./box";
 export * from "./button";
 export * from "./center";
 export * from "./checkbox";
+export * from "./close-button";
 export * from "./container";
 export * from "./flex";
 export * from "./form-control";

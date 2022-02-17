@@ -38,7 +38,7 @@ describe("Input", () => {
     const input = screen.getByTestId("input");
 
     // assert
-    expect(input).toHaveAttribute("id", expect.stringMatching(/^field-(.+)/));
+    expect(input).toHaveAttribute("id", expect.stringMatching(/^hope-field-(.+)/));
   });
 
   it("should have 'aria-required' and 'required' attribute when FormControl is required", () => {

@@ -18,7 +18,6 @@ interface SizeVariantConfig {
   height: string;
   paddingX: string;
   fontSize: string;
-  iconSize: string;
   spacing: string;
 }
 
@@ -28,10 +27,6 @@ function createSizeVariant(config: SizeVariantConfig): SystemStyleObject {
     py: 0,
     px: config.paddingX,
     fontSize: config.fontSize,
-
-    "& svg": {
-      boxSize: config.iconSize,
-    },
 
     "& > * + *": {
       marginLeft: config.spacing,
@@ -268,35 +263,30 @@ export const buttonStyles = css({
         height: "$6",
         paddingX: "$2",
         fontSize: "$xs",
-        iconSize: "$3_5",
         spacing: "$1",
       }),
       sm: createSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$sm",
-        iconSize: "$4",
         spacing: "$1_5",
       }),
       md: createSizeVariant({
         height: "$10",
         paddingX: "$4",
         fontSize: "$base",
-        iconSize: "$5",
         spacing: "$1_5",
       }),
       lg: createSizeVariant({
         height: "$12",
         paddingX: "$6",
         fontSize: "$lg",
-        iconSize: "$6",
         spacing: "$2",
       }),
       xl: createSizeVariant({
         height: "$16",
         paddingX: "$10",
         fontSize: "$xl",
-        iconSize: "$7",
         spacing: "$2",
       }),
     },

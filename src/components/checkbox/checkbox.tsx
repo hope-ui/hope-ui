@@ -191,6 +191,8 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
+
+    callAllHandlers(local.onChange)(event);
   };
 
   createEffect(() => {
@@ -213,7 +215,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         type="checkbox"
         class={inputClasses()}
         checked={checkedState()}
-        onChange={e => callAllHandlers(onChange, local.onChange)(e)}
+        onChange={onChange}
         {...inputProps}
         {...ariaAttrs}
       />

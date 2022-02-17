@@ -10,13 +10,13 @@ export const modalOverlayStyles = css({
   zIndex: "$modal",
 
   position: "fixed",
-  top: "0",
-  left: "0",
+  top: 0,
+  left: 0,
 
   w: "100vw",
   h: "100vh",
 
-  backgroundColor: "$blackAlpha11",
+  backgroundColor: "$blackAlpha10",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -130,6 +130,7 @@ export const modalDialogStyles = css({
           minHeight: "-webkit-fill-available",
         },
         my: 0,
+        borderRadius: "$none",
       },
     },
     scrollBehavior: {
@@ -144,3 +145,57 @@ export const modalDialogStyles = css({
 });
 
 export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Modal - header
+ * -----------------------------------------------------------------------------------------------*/
+
+export const modalHeaderStyles = css({
+  flex: 0,
+  px: "$5",
+  pt: "$5",
+  fontSize: "$xl",
+  fontWeight: "$semibold",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Modal - body
+ * -----------------------------------------------------------------------------------------------*/
+
+export const modalBodyStyles = css({
+  flex: 1,
+  padding: "$5",
+
+  variants: {
+    scrollBehavior: {
+      inside: {
+        overflow: "auto",
+      },
+      outside: {
+        overflow: undefined,
+      },
+    },
+  },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Modal - footer
+ * -----------------------------------------------------------------------------------------------*/
+
+export const modalFooterStyles = css({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  px: "$5",
+  pb: "$5",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Modal - close button
+ * -----------------------------------------------------------------------------------------------*/
+
+export const modalCloseButtonStyles = css({
+  position: "absolute",
+  top: "$4",
+  insetInlineEnd: "$4",
+});

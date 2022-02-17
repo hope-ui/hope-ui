@@ -39,7 +39,7 @@ describe("Textarea", () => {
     const textarea = screen.getByTestId("textarea");
 
     // assert
-    expect(textarea).toHaveAttribute("id", expect.stringMatching(/^field-(.+)/));
+    expect(textarea).toHaveAttribute("id", expect.stringMatching(/^hope-field-(.+)/));
   });
 
   it("should have 'aria-required' and 'required' attribute when FormControl is required", () => {

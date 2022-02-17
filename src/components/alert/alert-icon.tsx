@@ -4,10 +4,10 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
 import {
-  IconCheckCircle,
-  IconExclamationCircle,
-  IconExclamationTriangle,
-  IconInfoCircle,
+  IconCheckCircleSolid,
+  IconExclamationCircleSolid,
+  IconExclamationTriangleSolid,
+  IconInfoCircleSolid,
 } from "../icons";
 import { ElementType } from "../types";
 import { alertIconStyles } from "./alert.styles";
@@ -34,16 +34,16 @@ export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
 
     switch (status()) {
       case "success":
-        return IconCheckCircle;
+        return IconCheckCircleSolid;
         break;
       case "info":
-        return IconInfoCircle;
+        return IconInfoCircleSolid;
         break;
       case "warning":
-        return IconExclamationTriangle;
+        return IconExclamationTriangleSolid;
         break;
       case "danger":
-        return IconExclamationCircle;
+        return IconExclamationCircleSolid;
         break;
     }
   };

@@ -9,8 +9,8 @@ import { ElementType, HopeComponentProps } from "../types";
 
 export interface IconButtonOptions
   extends Omit<ButtonOptions, "leftIcon" | "rightIcon" | "loaderPosition" | "fullWidth"> {
-  icon: JSX.Element;
   "aria-label": string;
+  icon: JSX.Element;
 }
 
 export type ThemeableIconButtonOptions = Pick<

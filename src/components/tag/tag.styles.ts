@@ -27,8 +27,6 @@ export const tagLabelStyles = css({
  * TagCloseButton
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagCloseButtonIconStyles = css();
-
 export const tagCloseButtonStyles = css({
   appearance: "none",
   position: "relative",
@@ -48,6 +46,7 @@ export const tagCloseButtonStyles = css({
 
   padding: "0",
 
+  fontSize: "0.8em",
   lineHeight: "$none",
   textDecoration: "none",
   color: "inherit",
@@ -96,10 +95,6 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
 
     [`& .${tagCloseButtonStyles}`]: {
       boxSize: config.closeButtonSize,
-    },
-
-    [`& .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
-      boxSize: config.closeButtonIconSize,
     },
   };
 }

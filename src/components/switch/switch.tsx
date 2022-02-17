@@ -167,6 +167,8 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
+
+    callAllHandlers(local.onChange)(event);
   };
 
   createEffect(() => {
@@ -190,7 +192,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         role="switch"
         class={inputClasses()}
         checked={checkedState()}
-        onChange={e => callAllHandlers(onChange, local.onChange)(e)}
+        onChange={onChange}
         {...inputProps}
         {...ariaAttrs}
       />

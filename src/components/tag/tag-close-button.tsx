@@ -5,7 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { tagCloseButtonIconStyles, tagCloseButtonStyles } from "./tag.styles";
+import { tagCloseButtonStyles } from "./tag.styles";
 import { useTagContext } from "./tag-provider";
 
 export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
@@ -37,7 +37,7 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   return (
     <Box class={classes()} borderRadius={borderRadius()} {...others}>
-      <IconClose class={tagCloseButtonIconStyles()} />
+      <IconClose />
     </Box>
   );
 }

@@ -29,7 +29,6 @@ export function mapKeys(prop: any, mapper: (val: any) => any) {
 
 /**
  * Call all provided event handlers.
- * The call sequence will stop when an handler call `event.preventDefault` (following handlers will not be called).
  */
 export function callAllHandlers<T, E extends Event>(
   ...fns: Array<JSX.EventHandlerUnion<T, E> | undefined>

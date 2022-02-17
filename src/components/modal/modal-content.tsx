@@ -62,7 +62,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
     modalContext.state.bodyMounted ? modalContext.state.bodyId : local["aria-describedby"];
 
   const onDialogClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    const allHandlers = callAllHandlers(local.onClick, event => event.stopPropagation());
+    const allHandlers = callAllHandlers(local.onClick, e => e.stopPropagation());
     allHandlers(event);
   };
 
