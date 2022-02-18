@@ -59,7 +59,7 @@
 | Avatar    |             |            |       |           |      |
 | Badge     |             |            |       |           |      |
 | Card      |             |            |       |           |      |
-| Table     |             |            |       |           |      |
+| Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
 

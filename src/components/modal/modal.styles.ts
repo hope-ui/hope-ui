@@ -82,7 +82,7 @@ export const modalOverlayStyles = css({
   width: "100vw",
   height: "100vh",
 
-  backgroundColor: "$blackAlpha10",
+  backgroundColor: "$blackAlpha11",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -223,8 +223,8 @@ export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;
 
 export const modalHeaderStyles = css({
   flex: 0,
-  px: "$6",
-  pt: "$6",
+  px: "$5",
+  pt: "$5",
   fontSize: "$lg",
   fontWeight: "$medium",
 });
@@ -235,7 +235,7 @@ export const modalHeaderStyles = css({
 
 export const modalBodyStyles = css({
   flex: 1,
-  padding: "$6",
+  padding: "$5",
 
   variants: {
     scrollBehavior: {
@@ -257,8 +257,8 @@ export const modalFooterStyles = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  px: "$6",
-  pb: "$6",
+  px: "$5",
+  pb: "$5",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -267,6 +267,6 @@ export const modalFooterStyles = css({
 
 export const modalCloseButtonStyles = css({
   position: "absolute",
-  top: "$5",
-  insetInlineEnd: "$5",
+  top: "$4",
+  insetInlineEnd: "$4",
 });

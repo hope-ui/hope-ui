@@ -19,6 +19,7 @@ export * from "./modal";
 export * from "./spacer";
 export * from "./stack";
 export * from "./switch";
+export * from "./table";
 export * from "./tag";
 export * from "./text";
 export * from "./textarea";
