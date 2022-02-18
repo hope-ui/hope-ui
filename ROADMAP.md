@@ -87,8 +87,8 @@
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Drawer  |             |            |       |           |      |
+| Drawer  |     ✅      |     ✅     |       |           |      |
 | Menu    |             |            |       |           |      |
-| Modal   |             |            |       |           |      |
+| Modal   |     ✅      |     ✅     |       |           |      |
 | Popover |             |            |       |           |      |
 | Tooltip |             |            |       |           |      |

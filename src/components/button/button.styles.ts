@@ -179,7 +179,10 @@ export const buttonStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+  transition: "color 250ms, background-color 250ms",
+
+  // box-shadow transition on button focus f*cked up solid-transition-group
+  //transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
   "&:focus": {
     outline: "none",

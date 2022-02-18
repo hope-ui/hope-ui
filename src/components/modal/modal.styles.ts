@@ -1,20 +1,86 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { css, globalCss } from "@/styled-system/stitches.config";
+
+/* -------------------------------------------------------------------------------------------------
+ * Modal - solid-transition-group classes
+ * -----------------------------------------------------------------------------------------------*/
+
+export const modalTransitionName = {
+  fade: "hope-modal-fade-transition",
+  fadeInBottom: "hope-modal-fade-in-bottom-transition",
+  scale: "hope-modal-scale-transition",
+};
+
+export const modalTransitionStyles = globalCss({
+  /* fade */
+  [`.${modalTransitionName.fade}-enter, .${modalTransitionName.fade}-exit-to`]: {
+    opacity: 0,
+  },
+  [`.${modalTransitionName.fade}-enter-to, .${modalTransitionName.fade}-exit`]: {
+    opacity: 1,
+  },
+  [`.${modalTransitionName.fade}-enter-active`]: {
+    transition: "opacity 300ms ease-out",
+  },
+  [`.${modalTransitionName.fade}-exit-active`]: {
+    transition: "opacity 200ms ease-in",
+  },
+
+  /* fade-in-bottom */
+  [`.${modalTransitionName.fadeInBottom}-enter, .${modalTransitionName.fadeInBottom}-exit-to`]: {
+    opacity: 0,
+    transform: "translateY(16px)",
+  },
+  [`.${modalTransitionName.fadeInBottom}-enter-to, .${modalTransitionName.fadeInBottom}-exit`]: {
+    opacity: 1,
+    transform: "translateY(0)",
+  },
+  [`.${modalTransitionName.fadeInBottom}-enter-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "300ms",
+    transitionTimingFunction: "ease-out",
+  },
+  [`.${modalTransitionName.fadeInBottom}-exit-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-in",
+  },
+
+  /* scale */
+  [`.${modalTransitionName.scale}-enter, .${modalTransitionName.scale}-exit-to`]: {
+    opacity: 0,
+    transform: "scale(0.95)",
+  },
+  [`.${modalTransitionName.scale}-enter-to, .${modalTransitionName.scale}-exit`]: {
+    opacity: 1,
+    transform: "scale(1)",
+  },
+  [`.${modalTransitionName.scale}-enter-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "300ms",
+    transitionTimingFunction: "ease-out",
+  },
+  [`.${modalTransitionName.scale}-exit-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-in",
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Modal - overlay
  * -----------------------------------------------------------------------------------------------*/
 
 export const modalOverlayStyles = css({
-  zIndex: "$modal",
+  zIndex: "$overlay",
 
   position: "fixed",
   top: 0,
   left: 0,
 
-  w: "100vw",
-  h: "100vh",
+  width: "100vw",
+  height: "100vh",
 
   backgroundColor: "$blackAlpha10",
 });
@@ -23,20 +89,23 @@ export const modalOverlayStyles = css({
  * Modal - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const modalContainerStyles = css({
+export const baseModalContainerStyles = css({
   zIndex: "$modal",
   position: "fixed",
   top: 0,
   left: 0,
 
   display: "flex",
-  justifyContent: "center",
 
   width: "100vw",
   height: "100vh",
   "@supports(height: -webkit-fill-available)": {
     height: "-webkit-fill-available",
   },
+});
+
+export const modalContainerStyles = css(baseModalContainerStyles, {
+  justifyContent: "center",
 
   variants: {
     centered: {
@@ -64,26 +133,28 @@ export type ModalContainerVariants = VariantProps<typeof modalContainerStyles>;
  * Modal - dialog (content)
  * -----------------------------------------------------------------------------------------------*/
 
-export const modalDialogStyles = css({
+export const baseDialogStyles = css({
   zIndex: "$modal",
   position: "relative",
 
   display: "flex",
   flexDirection: "column",
-  justifyContent: "center",
 
   width: "100%",
 
   outline: 0,
 
-  my: "3.75rem",
-
   boxShadow: "$lg",
 
-  borderRadius: "$lg",
   backgroundColor: "$modalDialogBg",
 
   color: "inherit",
+});
+
+export const modalDialogStyles = css(baseDialogStyles, {
+  justifyContent: "center",
+  my: "3.75rem",
+  borderRadius: "$lg",
 
   variants: {
     size: {

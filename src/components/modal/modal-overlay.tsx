@@ -6,7 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { useModalContext } from "./modal";
-import { modalOverlayStyles } from "./modal.styles";
+import { modalOverlayStyles, modalTransitionName } from "./modal.styles";
 
 const hopeModalOverlayClass = "hope-modal__overlay";
 
@@ -20,12 +20,12 @@ export function ModalOverlay<C extends ElementType = "div">(props: HopeComponent
 
   const classes = () => classNames(local.class, hopeModalOverlayClass, modalOverlayStyles());
 
-  const overlayTransitionName = () => {
-    return modalContext.state.transition === "none" ? "hope-none" : "hope-fade";
+  const transitionName = () => {
+    return modalContext.state.transition === "none" ? "hope-none" : modalTransitionName.fade;
   };
 
   return (
-    <Transition name={overlayTransitionName()} appear>
+    <Transition name={transitionName()} appear>
       <Show when={modalContext.state.isOpen}>
         <Box class={classes()} {...others} />
       </Show>

@@ -10,9 +10,9 @@ import {
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
-import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
+import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
 
-type ModalTransition = "fade-up" | "scale" | "none";
+type ModalTransition = "fade-in-bottom" | "scale" | "none";
 
 interface ModalState {
   /**
@@ -206,7 +206,7 @@ export function Modal(props: ModalProps) {
       return props.initialFocus;
     },
     get transition() {
-      return props.transition ?? "fade-up";
+      return props.transition ?? "fade-in-bottom";
     },
     get size() {
       return props.size ?? "md";
@@ -294,6 +294,9 @@ export function Modal(props: ModalProps) {
     setHeaderMounted,
     setBodyMounted,
   };
+
+  // inject global css for transitions
+  modalTransitionStyles();
 
   return (
     <Show when={isMounted()}>

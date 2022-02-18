@@ -6,6 +6,7 @@ export * from "./center";
 export * from "./checkbox";
 export * from "./close-button";
 export * from "./container";
+export * from "./drawer";
 export * from "./flex";
 export * from "./form-control";
 export * from "./grid";

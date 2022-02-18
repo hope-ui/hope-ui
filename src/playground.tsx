@@ -6,6 +6,13 @@ import { render } from "solid-js/web";
 import {
   Box,
   Button,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   HopeProvider,
   Modal,
   ModalBody,
@@ -19,15 +26,18 @@ import {
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const [isOpen, setIsOpen] = createSignal(false);
+  const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => setIsModalOpen(true);
 
-  const closeModal = () => setIsOpen(false);
-  const openModal = () => setIsOpen(true);
+  const [isDrawerOpen, setIsDrawerOpen] = createSignal(false);
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const openDrawer = () => setIsDrawerOpen(true);
 
   return (
     <Box p="$4">
       <Button onClick={openModal}>Open modal</Button>
-      <Modal isOpen={isOpen()} onClose={closeModal} centered transition="scale">
+      <Modal isOpen={isModalOpen()} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Deactivate account</ModalHeader>
@@ -46,6 +56,26 @@ export function App() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <Button onClick={openDrawer}>Open drawer</Button>
+      <Drawer isOpen={isDrawerOpen()} onClose={closeDrawer}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerHeader>Deactivate account</DrawerHeader>
+          <DrawerCloseButton />
+          <DrawerBody>
+            Are you sure you want to deactivate your account? All of your data will be permanently
+            removed. This action cannot be undone.
+          </DrawerBody>
+          <DrawerFooter>
+            <Button variant="default" mr="$4" onClick={toggleColorMode}>
+              Cancel
+            </Button>
+            <Button colorScheme="danger" onClick={closeDrawer}>
+              Deactivate
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Box>
   );
 }

@@ -7,26 +7,28 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
+import { useModalContext } from "../modal/modal";
 import { ElementType, HopeComponentProps } from "../types";
-import { useModalContext } from "./modal";
-import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
+import { useDrawerContext } from "./drawer";
+import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
 
-export type ModalContentProps<C extends ElementType> = HopeComponentProps<C>;
+export type DrawerContentProps<C extends ElementType> = HopeComponentProps<C>;
 
-const hopeModalContainerClass = "hope-modal__content-container";
-const hopeModalContentClass = "hope-modal__content";
+const hopeDrawerContainerClass = "hope-drawer__content-container";
+const hopeDrawerContentClass = "hope-drawer__content";
 
 /**
- * Container for the modal dialog's content.
+ * Container for the drawer dialog's content.
  */
-export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
+export function DrawerContent<C extends ElementType = "section">(props: DrawerContentProps<C>) {
+  const drawerContext = useDrawerContext();
   const modalContext = useModalContext();
 
-  const defaultProps: ModalContentProps<"section"> = {
+  const defaultProps: DrawerContentProps<"section"> = {
     as: "section",
   };
 
-  const propsWithDefault: ModalContentProps<"section"> = mergeProps(defaultProps, props);
+  const propsWithDefault: DrawerContentProps<"section"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, [
     "ref",
     "class",
@@ -40,21 +42,22 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   let focusTrap: FocusTrap | undefined;
 
   const containerClasses = () => {
-    const containerClass = modalContainerStyles({
-      centered: modalContext.state.centered,
-      scrollBehavior: modalContext.state.scrollBehavior,
-    });
-
-    return classNames(hopeModalContainerClass, containerClass);
+    return classNames(
+      hopeDrawerContainerClass,
+      drawerContainerStyles({
+        placement: drawerContext.placement,
+      })
+    );
   };
 
   const dialogClasses = () => {
-    const dialogClass = modalDialogStyles({
-      size: modalContext.state.size,
-      scrollBehavior: modalContext.state.scrollBehavior,
+    const dialogClass = drawerDialogStyles({
+      size: drawerContext.size,
+      placement: drawerContext.placement,
+      fullHeight: drawerContext.fullHeight,
     });
 
-    return classNames(local.class, hopeModalContentClass, dialogClass);
+    return classNames(local.class, hopeDrawerContentClass, dialogClass);
   };
 
   const ariaLabelledBy = () => {
@@ -73,13 +76,19 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   };
 
   const transitionName = () => {
-    switch (modalContext.state.transition) {
-      case "fade-in-bottom":
-        return modalTransitionName.fadeInBottom;
-      case "scale":
-        return modalTransitionName.scale;
-      case "none":
-        return "hope-none";
+    if (drawerContext.disableTransition) {
+      return "hope-none";
+    }
+
+    switch (drawerContext.placement) {
+      case "top":
+        return drawerTransitionName.slideInTop;
+      case "right":
+        return drawerTransitionName.slideInRight;
+      case "bottom":
+        return drawerTransitionName.slideInBottom;
+      case "left":
+        return drawerTransitionName.slideInLeft;
     }
   };
 
@@ -137,4 +146,4 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   );
 }
 
-ModalContent.toString = () => createClassSelector(hopeModalContentClass);
+DrawerContent.toString = () => createClassSelector(hopeDrawerContentClass);
