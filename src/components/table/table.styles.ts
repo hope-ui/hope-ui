@@ -130,7 +130,7 @@ export const tableColumnHeaderStyles = css({
     dense: {
       true: {
         px: "$4",
-        py: "$1",
+        py: "$1_5",
       },
     },
     numeric: {
