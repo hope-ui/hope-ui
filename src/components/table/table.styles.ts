@@ -1,6 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
+import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
  * Table
@@ -49,29 +50,28 @@ export const tableCaptionStyles = css({
 export type TableCaptionVariants = VariantProps<typeof tableCaptionStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Table - thead
- * -----------------------------------------------------------------------------------------------*/
-
-export const tableHeadStyles = css({});
-
-/* -------------------------------------------------------------------------------------------------
  * Table - tbody
  * -----------------------------------------------------------------------------------------------*/
+
+function createStripedStyles(stripedRow: "odd" | "even"): SystemStyleObject {
+  return {
+    "& td": {
+      borderBottomWidth: 0,
+    },
+    "& tr:last-of-type td": {
+      borderBottomWidth: "1px",
+    },
+    [`& tr:nth-of-type(${stripedRow}) td`]: {
+      backgroundColor: "$neutral3",
+    },
+  };
+}
 
 export const tableBodyStyles = css({
   variants: {
     striped: {
-      true: {
-        "& td": {
-          borderBottomWidth: 0,
-        },
-        "& tr:last-of-type td": {
-          borderBottomWidth: "1px",
-        },
-        "& tr:nth-of-type(even) td": {
-          backgroundColor: "$neutral3",
-        },
-      },
+      odd: createStripedStyles("odd"),
+      even: createStripedStyles("even"),
     },
     highlightOnHover: {
       true: {
@@ -83,7 +83,16 @@ export const tableBodyStyles = css({
   },
   compoundVariants: [
     {
-      striped: true,
+      striped: "odd",
+      highlightOnHover: true,
+      css: {
+        "& tr:nth-of-type(odd):hover td": {
+          backgroundColor: "$neutral4",
+        },
+      },
+    },
+    {
+      striped: "even",
       highlightOnHover: true,
       css: {
         "& tr:nth-of-type(even):hover td": {

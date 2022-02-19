@@ -7,26 +7,26 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { tableStyles } from "./table.styles";
 
-export interface TableOptions {
+export interface TableContextValue {
   /**
-   * If `true` every even row of table will have neutral background color.
+   * Set a neutral background color on odd or even row of table.
    */
-  striped?: boolean;
+  striped?: "odd" | "even";
 
   /**
    * If `true`, row will have less padding.
    */
-  dense?: boolean;
+  dense: boolean;
 
   /**
    * If `true`, row will have hover color.
    */
-  highlightOnHover?: boolean;
+  highlightOnHover: boolean;
 }
 
-export type TableProps<C extends ElementType = "table"> = HopeComponentProps<C, TableOptions>;
+export type TableOptions = Partial<TableContextValue>;
 
-export type TableContextValue = Required<TableOptions>;
+export type TableProps<C extends ElementType = "table"> = HopeComponentProps<C, TableOptions>;
 
 const TableContext = createContext<TableContextValue>();
 
@@ -35,7 +35,7 @@ const hopeTableClass = "hope-table";
 export function Table<C extends ElementType = "table">(props: TableProps<C>) {
   const [state] = createStore<TableContextValue>({
     get striped() {
-      return props.striped ?? false;
+      return props.striped;
     },
     get dense() {
       return props.dense ?? false;

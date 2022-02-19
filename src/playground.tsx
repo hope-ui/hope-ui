@@ -118,7 +118,7 @@ export function App() {
           </Tr>
         </Tfoot>
       </Table>
-      <Table striped highlightOnHover>
+      <Table striped="odd" highlightOnHover>
         <TableCaption>Imperial to metric conversion factors</TableCaption>
         <Thead>
           <Tr>
