@@ -12,7 +12,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
 
-export type DrawerContentProps<C extends ElementType> = HopeComponentProps<C>;
+export type DrawerContentProps<C extends ElementType = "section"> = HopeComponentProps<C>;
 
 const hopeDrawerContainerClass = "hope-drawer__content-container";
 const hopeDrawerContentClass = "hope-drawer__content";

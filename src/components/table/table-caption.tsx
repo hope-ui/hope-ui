@@ -7,7 +7,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useTableContext } from "./table";
 import { tableCaptionStyles, TableCaptionVariants } from "./table.styles";
 
-export type TableCaptionProps<C extends ElementType> = HopeComponentProps<
+export type TableCaptionProps<C extends ElementType = "caption"> = HopeComponentProps<
   C,
   Omit<TableCaptionVariants, "dense">
 >;

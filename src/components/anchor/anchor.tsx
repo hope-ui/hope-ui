@@ -10,7 +10,7 @@ interface AnchorOptions {
   external?: boolean;
 }
 
-export type AnchorProps<C extends ElementType> = HopeComponentProps<C, AnchorOptions>;
+export type AnchorProps<C extends ElementType = "a"> = HopeComponentProps<C, AnchorOptions>;
 
 const hopeAnchorClass = "hope-anchor";
 

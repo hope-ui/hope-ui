@@ -13,9 +13,11 @@ import { ElementType } from "../types";
 import { alertIconStyles } from "./alert.styles";
 import { useAlertContext } from "./alert-provider";
 
+export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
+
 const hopeAlertIconClass = "hope-alert-icon";
 
-export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
+export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C>) {
   const { status } = useAlertContext();
 
   const defaultProps: IconProps<"svg"> = {

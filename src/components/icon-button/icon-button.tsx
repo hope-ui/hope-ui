@@ -18,7 +18,10 @@ export type ThemeableIconButtonOptions = Pick<
   "variant" | "colorScheme" | "size"
 >;
 
-export type IconButtonProps<C extends ElementType> = HopeComponentProps<C, IconButtonOptions>;
+export type IconButtonProps<C extends ElementType = "button"> = HopeComponentProps<
+  C,
+  IconButtonOptions
+>;
 
 const hopeIconButtonClass = "hope-icon-button";
 

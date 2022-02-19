@@ -6,7 +6,7 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { tagLabelStyles } from "./tag.styles";
 
-export type TagLabelProps<C extends ElementType> = HopeComponentProps<C>;
+export type TagLabelProps<C extends ElementType = "span"> = HopeComponentProps<C>;
 
 const hopeTagLabelClass = "hope-tag-label";
 

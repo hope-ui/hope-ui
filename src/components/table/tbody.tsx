@@ -7,9 +7,11 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useTableContext } from "./table";
 import { tableBodyStyles } from "./table.styles";
 
+export type TbodyProps<C extends ElementType = "tbody"> = HopeComponentProps<C>;
+
 const hopeTbodyClass = "hope-tbody";
 
-export function Tbody<C extends ElementType = "tbody">(props: HopeComponentProps<C>) {
+export function Tbody<C extends ElementType = "tbody">(props: TbodyProps<C>) {
   const tableContext = useTableContext();
 
   const [local, others] = splitProps(props, ["class"]);

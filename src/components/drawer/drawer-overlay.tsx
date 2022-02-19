@@ -10,12 +10,14 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerTransitionName } from "./drawer.styles";
 
+export type DrawerOverlayProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 const hopeDrawerOverlayClass = "hope-drawer__overlay";
 
 /**
  * DrawerOverlay renders a backdrop behind the drawer.
  */
-export function DrawerOverlay<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverlayProps<C>) {
   const drawerContext = useDrawerContext();
   const modalContext = useModalContext();
 

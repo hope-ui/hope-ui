@@ -11,7 +11,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
 
-export type ModalContentProps<C extends ElementType> = HopeComponentProps<C>;
+export type ModalContentProps<C extends ElementType = "section"> = HopeComponentProps<C>;
 
 const hopeModalContainerClass = "hope-modal__content-container";
 const hopeModalContentClass = "hope-modal__content";

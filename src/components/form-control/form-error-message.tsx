@@ -7,7 +7,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formErrorMessageStyles } from "./form-control.styles";
 
-export type FormErrorMessageProps<C extends ElementType> = HopeComponentProps<C>;
+export type FormErrorMessageProps<C extends ElementType = "div"> = HopeComponentProps<C>;
 
 const hopeFormErrorMessageClass = "hope-form-error-message";
 

@@ -7,7 +7,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useTableContext } from "./table";
 import { tableColumnHeaderStyles, TableColumnHeaderVariants } from "./table.styles";
 
-export type ThProps<C extends ElementType> = HopeComponentProps<
+export type ThProps<C extends ElementType = "th"> = HopeComponentProps<
   C,
   Pick<TableColumnHeaderVariants, "numeric">
 >;

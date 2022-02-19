@@ -8,7 +8,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { tagCloseButtonStyles } from "./tag.styles";
 import { useTagContext } from "./tag-provider";
 
-export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
+export type TagCloseButtonProps<C extends ElementType = "button"> = HopeComponentProps<
   C,
   { "aria-label"?: string }
 >;

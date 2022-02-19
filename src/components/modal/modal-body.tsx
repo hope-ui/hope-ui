@@ -7,12 +7,14 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalBodyStyles } from "./modal.styles";
 
+export type ModalBodyProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 const hopeModalBodyClass = "hope-modal__body";
 
 /**
  * ModalBody houses the main content of the modal.
  */
-export function ModalBody<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function ModalBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
   const modalContext = useModalContext();
 
   const [local, others] = splitProps(props, ["class"]);

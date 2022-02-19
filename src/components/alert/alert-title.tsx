@@ -6,7 +6,7 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { alertTitleStyles } from "./alert.styles";
 
-export type AlertTitleProps<C extends ElementType> = HopeComponentProps<C>;
+export type AlertTitleProps<C extends ElementType = "div"> = HopeComponentProps<C>;
 
 const hopeAlertTitleClass = "hope-alert-title";
 

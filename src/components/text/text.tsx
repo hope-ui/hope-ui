@@ -7,7 +7,7 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { textStyles, TextVariants } from "./text.styles";
 
-export type TextProps<C extends ElementType> = HopeComponentProps<C, TextVariants>;
+export type TextProps<C extends ElementType = "p"> = HopeComponentProps<C, TextVariants>;
 
 const hopeTextClass = "hope-text";
 

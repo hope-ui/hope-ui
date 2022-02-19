@@ -52,9 +52,7 @@ export type TableCaptionVariants = VariantProps<typeof tableCaptionStyles>;
  * Table - thead
  * -----------------------------------------------------------------------------------------------*/
 
-export const tableHeadStyles = css({
-  backgroundColor: "$neutral3",
-});
+export const tableHeadStyles = css({});
 
 /* -------------------------------------------------------------------------------------------------
  * Table - tbody
@@ -101,8 +99,6 @@ export const tableBodyStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const tableFootStyles = css({
-  backgroundColor: "$neutral3",
-
   "& tr:last-of-type th": {
     borderBottomWidth: 0,
   },
@@ -118,7 +114,6 @@ export const tableColumnHeaderStyles = css({
   px: "$6",
   py: "$3",
 
-  color: "$neutral11",
   fontSize: "$xs",
   fontWeight: "$semibold",
   lineHeight: "$4",

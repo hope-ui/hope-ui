@@ -24,7 +24,7 @@ export interface TableOptions {
   highlightOnHover?: boolean;
 }
 
-export type TableProps<C extends ElementType> = HopeComponentProps<C, TableOptions>;
+export type TableProps<C extends ElementType = "table"> = HopeComponentProps<C, TableOptions>;
 
 export type TableContextValue = Required<TableOptions>;
 

@@ -7,12 +7,14 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalHeaderStyles } from "./modal.styles";
 
+export type ModalHeaderProps<C extends ElementType = "header"> = HopeComponentProps<C>;
+
 const hopeModalHeaderClass = "hope-modal__header";
 
 /**
  * ModalHeader houses the title of the modal.
  */
-export function ModalHeader<C extends ElementType = "header">(props: HopeComponentProps<C>) {
+export function ModalHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
   const modalContext = useModalContext();
 
   const [local, others] = splitProps(props, ["class"]);

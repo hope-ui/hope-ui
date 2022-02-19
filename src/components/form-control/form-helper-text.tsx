@@ -7,7 +7,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formHelperTextStyles } from "./form-control.styles";
 
-export type FormHelperTextProps<C extends ElementType> = HopeComponentProps<C>;
+export type FormHelperTextProps<C extends ElementType = "div"> = HopeComponentProps<C>;
 
 const hopeFormHelperTextClass = "hope-form-helper-text";
 

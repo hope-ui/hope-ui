@@ -86,7 +86,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchProps<C extends ElementType> = HopeComponentProps<C, SwitchOptions>;
+export type SwitchProps<C extends ElementType = "label"> = HopeComponentProps<C, SwitchOptions>;
 
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";

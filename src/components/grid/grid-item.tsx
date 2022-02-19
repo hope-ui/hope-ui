@@ -20,7 +20,7 @@ export type GridItemOptions = ResponsiveProps<{
   rowEnd?: Property.GridRowEnd;
 }>;
 
-export type GridItemProps<C extends ElementType> = HopeComponentProps<C, GridItemOptions>;
+export type GridItemProps<C extends ElementType = "div"> = HopeComponentProps<C, GridItemOptions>;
 
 /**
  * Utility function to apply a column or row span to the GridItem.

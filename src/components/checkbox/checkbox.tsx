@@ -106,7 +106,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type CheckboxProps<C extends ElementType> = HopeComponentProps<C, CheckboxOptions>;
+export type CheckboxProps<C extends ElementType = "label"> = HopeComponentProps<C, CheckboxOptions>;
 
 const hopeCheckboxClass = "hope-checkbox";
 const hopeCheckboxInputClass = "hope-checkbox__input";

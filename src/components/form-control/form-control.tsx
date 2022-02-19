@@ -103,7 +103,10 @@ export interface FormControlContextValue {
 
 export const FormControlContext = createContext<FormControlContextValue>();
 
-export type FormControlProps<C extends ElementType> = HopeComponentProps<C, FormControlOptions>;
+export type FormControlProps<C extends ElementType = "div"> = HopeComponentProps<
+  C,
+  FormControlOptions
+>;
 
 const hopeFormControlClass = "hope-form-control";
 

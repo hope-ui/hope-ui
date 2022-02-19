@@ -12,7 +12,7 @@ export type FlexOptions = ResponsiveProps<{
   wrap?: Property.FlexWrap;
 }>;
 
-export type FlexProps<C extends ElementType> = HopeComponentProps<C, FlexOptions>;
+export type FlexProps<C extends ElementType = "div"> = HopeComponentProps<C, FlexOptions>;
 
 const hopeFlexClass = "hope-flex";
 

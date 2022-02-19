@@ -6,7 +6,10 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { containerStyles, ContainerVariants } from "./container.styles";
 
-export type ContainerProps<C extends ElementType> = HopeComponentProps<C, ContainerVariants>;
+export type ContainerProps<C extends ElementType = "div"> = HopeComponentProps<
+  C,
+  ContainerVariants
+>;
 
 const hopeContainerClass = "hope-container";
 

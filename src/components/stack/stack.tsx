@@ -13,7 +13,7 @@ export type StackOptions = ResponsiveProps<{
   //spacing?: Property.Gap<SpaceScaleValue> | number;
 }>;
 
-export type StackProps<C extends ElementType> = HopeComponentProps<C, StackOptions>;
+export type StackProps<C extends ElementType = "div"> = HopeComponentProps<C, StackOptions>;
 
 const hopeStackClass = "hope-stack";
 
@@ -49,7 +49,7 @@ export type VStackOptions = ResponsiveProps<{
   spacing?: Property.RowGap<SpaceScaleValue> | number;
 }>;
 
-export type VStackProps<C extends ElementType> = StackProps<C> & VStackOptions;
+export type VStackProps<C extends ElementType = "div"> = StackProps<C> & VStackOptions;
 
 export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
@@ -65,7 +65,7 @@ export type HStackOptions = ResponsiveProps<{
   spacing?: Property.ColumnGap<SpaceScaleValue> | number;
 }>;
 
-export type HStackProps<C extends ElementType> = StackProps<C> & HStackOptions;
+export type HStackProps<C extends ElementType = "div"> = StackProps<C> & HStackOptions;
 
 export function HStack<C extends ElementType = "div">(props: HStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);

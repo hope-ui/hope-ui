@@ -8,12 +8,14 @@ import { ElementType, HopeComponentProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalOverlayStyles, modalTransitionName } from "./modal.styles";
 
+export type ModalOverlayProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 const hopeModalOverlayClass = "hope-modal__overlay";
 
 /**
  * ModalOverlay renders a backdrop behind the modal.
  */
-export function ModalOverlay<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function ModalOverlay<C extends ElementType = "div">(props: ModalOverlayProps<C>) {
   const modalContext = useModalContext();
 
   const [local, others] = splitProps(props, ["class"]);

@@ -7,7 +7,10 @@ import { ElementType, HopeComponentProps } from "../types";
 import { inputAddonStyles, InputAddonVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
-export type InputAddonProps<C extends ElementType> = HopeComponentProps<C, InputAddonVariants>;
+export type InputAddonProps<C extends ElementType = "div"> = HopeComponentProps<
+  C,
+  InputAddonVariants
+>;
 
 export function InputAddon<C extends ElementType = "div">(props: InputAddonProps<C>) {
   const [local, variantProps, others] = splitProps(
@@ -25,9 +28,11 @@ export function InputAddon<C extends ElementType = "div">(props: InputAddonProps
  * InputLeftAddon
  * -----------------------------------------------------------------------------------------------*/
 
+export type InputLeftAddonProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 const hopeInputLeftAddonClass = "hope-input-left-addon";
 
-export function InputLeftAddon<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function InputLeftAddon<C extends ElementType = "div">(props: InputLeftAddonProps<C>) {
   const inputGroup = useInputGroupContext();
 
   const [local, others] = splitProps(props, ["class"]);
@@ -54,9 +59,11 @@ InputLeftAddon.toString = () => createClassSelector(hopeInputLeftAddonClass);
  * inputRightAddon
  * -----------------------------------------------------------------------------------------------*/
 
+export type InputRightAddonProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 const hopeInputRightAddonClass = "hope-input-right-addon";
 
-export function InputRightAddon<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function InputRightAddon<C extends ElementType = "div">(props: InputRightAddonProps<C>) {
   const inputGroup = useInputGroupContext();
 
   const [local, others] = splitProps(props, ["class"]);

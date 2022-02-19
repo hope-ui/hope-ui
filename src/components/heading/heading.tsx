@@ -7,7 +7,7 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";
 
-export type HeadingProps<C extends ElementType> = HopeComponentProps<C, HeadingVariants>;
+export type HeadingProps<C extends ElementType = "h2"> = HopeComponentProps<C, HeadingVariants>;
 
 const hopeHeadingClass = "hope-heading";
 

@@ -16,7 +16,7 @@ export type GridOptions = ResponsiveProps<{
   templateRows?: Property.GridTemplateRows;
 }>;
 
-export type GridProps<C extends ElementType> = HopeComponentProps<C, GridOptions>;
+export type GridProps<C extends ElementType = "div"> = HopeComponentProps<C, GridOptions>;
 
 const hopeGridClass = "hope-grid";
 

@@ -12,7 +12,7 @@ import { TagProvider } from "./tag-provider";
 
 export type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
 
-export type TagProps<C extends ElementType> = HopeComponentProps<C, TagVariants>;
+export type TagProps<C extends ElementType = "span"> = HopeComponentProps<C, TagVariants>;
 
 const hopeTagClass = "hope-tag";
 

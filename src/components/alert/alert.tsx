@@ -10,7 +10,7 @@ import { AlertProvider } from "./alert-provider";
 
 export type ThemeableAlertOptions = Pick<AlertVariants, "variant">;
 
-export type AlertProps<C extends ElementType> = HopeComponentProps<C, AlertVariants>;
+export type AlertProps<C extends ElementType = "div"> = HopeComponentProps<C, AlertVariants>;
 
 const hopeAlertClass = "hope-alert";
 
