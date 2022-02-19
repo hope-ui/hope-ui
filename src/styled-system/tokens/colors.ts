@@ -142,10 +142,7 @@ const danger = {
 };
 
 const semanticColors = {
-  defaultButtonBg: "white",
-  checkboxIcon: "white",
-  switchTrackBg: "white",
-  modalDialogBg: "white",
+  panelBg: "white",
   focusRing: "#96c7f2",
 };
 
@@ -260,10 +257,7 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
-  defaultButtonBg: "$neutral3",
-  checkboxIcon: "$neutral3",
-  switchTrackBg: "$neutral3",
-  modalDialogBg: "$neutral3",
+  panelBg: "$neutral3",
   focusRing: "#0a4481",
 };
 

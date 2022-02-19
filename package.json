@@ -1,9 +1,11 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
+    "solidhack",
+    "best_ecosystem",
     "solid",
     "solidjs",
     "ui",
@@ -11,7 +13,7 @@
     "frontend",
     "components"
   ],
-  "homepage": "https://github.com/fabien-ml/hope-ui#readme",
+  "homepage": "https://hope-ui.com",
   "bugs": {
     "url": "https://github.com/fabien-ml/hope-ui/issues"
   },
@@ -21,6 +23,12 @@
   },
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
+  "contributors": [
+    {
+      "name": "Fabien MARIE-LOUISE",
+      "email": "fabienml.dev@gmail.com"
+    }
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -122,5 +130,6 @@
     "@stitches/core": "^1.2.6",
     "solid-js": "^1.3.3",
     "solid-transition-group": "^0.0.8"
-  }
+  },
+  "info": "Hope UI is a composable and accessible component library for SolidJS with a style props API, theming, dark mode and following WAI ARIA 1.2 design patterns"
 }

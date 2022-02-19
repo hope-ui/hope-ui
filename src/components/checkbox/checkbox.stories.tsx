@@ -2,9 +2,9 @@ import { createSignal } from "solid-js";
 
 import { HopeWrapper } from "@/utils/storybook";
 
+import { Button } from "..";
 import { HStack, VStack } from "../stack/stack";
 import { Checkbox } from "./checkbox";
-import { Button } from "..";
 
 export default {
   title: "Data entry/Checkbox",

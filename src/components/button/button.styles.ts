@@ -198,7 +198,7 @@ export const buttonStyles = css({
     variant: {
       default: {
         border: "1px solid $neutral7",
-        backgroundColor: "$defaultButtonBg",
+        backgroundColor: "$panelBg",
         color: "$neutral12",
 
         "&:not(:disabled):hover": {

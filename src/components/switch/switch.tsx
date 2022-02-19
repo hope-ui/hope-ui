@@ -41,7 +41,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
    * The value to be used in the switch input.
    * This is the value that will be returned on form submission.
    */
-  value?: any;
+  value?: string | number;
 
   /**
    * If `true`, the switch will be checked.
@@ -71,7 +71,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   invalid?: boolean;
 
   /**
-   * The callback invoked when the on state of the `Switch` changes.
+   * The callback invoked when the checked state of the `Switch` changes.
    */
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
