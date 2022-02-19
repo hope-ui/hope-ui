@@ -69,7 +69,7 @@
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Anchor     |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Breadcrumb |             |            |       |           |      |
+| Breadcrumb |     ✅      |     ✅     |       |           |      |
 | Pagination |             |            |       |           |      |
 | Stepper    |             |            |       |           |      |
 | Tabs       |             |            |       |           |      |
