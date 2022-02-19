@@ -6,6 +6,7 @@ import { render } from "solid-js/web";
 import {
   Box,
   Button,
+  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -14,6 +15,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
   HopeProvider,
+  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,6 +23,8 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
+  Stack,
   Table,
   TableCaption,
   Tbody,
@@ -30,6 +34,7 @@ import {
   Thead,
   Tr,
   useColorMode,
+  VStack,
 } from ".";
 
 export function App() {
@@ -44,6 +49,26 @@ export function App() {
 
   return (
     <Box p="$4">
+      <Spinner />
+      <Spinner color="$danger9" />
+      <Stack direction="row" columnGap="$4">
+        <Spinner size="xs" />
+        <Spinner size="sm" />
+        <Spinner size="md" />
+        <Spinner size="lg" />
+        <Spinner size="xl" />
+      </Stack>
+      <Spinner thickness="4px" speed="0.65s" emptyColor="$neutral3" color="$info9" size="xl" />
+      <VStack spacing="$10">
+        <Divider />
+        <Divider color="$primary9" />
+        <Divider thickness="$12" />
+      </VStack>
+      <HStack height={50} justifyContent="space-between">
+        <Divider orientation="vertical" color="$neutral12" />
+        <Divider orientation="vertical" variant="dashed" color="$neutral12" />
+        <Divider orientation="vertical" variant="dotted" color="$neutral12" />
+      </HStack>
       <Button onClick={openModal}>Open modal</Button>
       <Modal isOpen={isModalOpen()} onClose={closeModal}>
         <ModalOverlay />

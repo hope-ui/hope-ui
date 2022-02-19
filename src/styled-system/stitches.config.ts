@@ -14,7 +14,14 @@ export const {
   keyframes,
 } = createStitches({
   prefix: "hope",
-  themeMap: defaultThemeMap,
+  themeMap: {
+    ...defaultThemeMap,
+    borderWidth: "sizes",
+    borderTopWidth: "sizes",
+    borderRightWidth: "sizes",
+    borderBottomWidth: "sizes",
+    borderLeftWidth: "sizes",
+  },
   theme: baseThemeTokens,
   media: baseMedia,
   utils,
