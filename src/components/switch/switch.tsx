@@ -9,7 +9,8 @@ import {
 } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -31,16 +32,6 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The icon to use when the switch is `on`
-   */
-  iconOn?: JSX.Element;
-
-  /**
-   * The icon to use when the switch is `off`
-   */
-  iconOff?: JSX.Element;
-
-  /**
    * The name of the input field in a switch
    * (Useful for form submission).
    */
@@ -50,7 +41,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
    * The value to be used in the switch input.
    * This is the value that will be returned on form submission.
    */
-  value?: any;
+  value?: string | number;
 
   /**
    * If `true`, the switch will be checked.
@@ -80,7 +71,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   invalid?: boolean;
 
   /**
-   * The callback invoked when the on state of the `Switch` changes.
+   * The callback invoked when the checked state of the `Switch` changes.
    */
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
@@ -95,7 +86,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchProps<C extends ElementType> = HopeComponentProps<C, SwitchOptions>;
+export type SwitchProps<C extends ElementType = "label"> = HopeComponentProps<C, SwitchOptions>;
 
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";
@@ -110,7 +101,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",
-    id: createUniqueId(),
+    id: `hope-switch-${createUniqueId()}`,
     variant: theme?.defaultProps?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
@@ -120,7 +111,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const propsWithDefaults: SwitchProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["iconOn", "iconOff", "checked", "invalid", "onChange", "class", "children"],
+    ["checked", "invalid", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -163,14 +154,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const inputClasses = () => classNames(hopeSwitchInputClass, switchInputStyles());
 
   const controlClasses = () => {
-    return classNames(
-      hopeSwitchControlClass,
-      switchControlStyles({
-        ...variantProps,
-        hasIconOn: !!local.iconOn,
-        hasIconOff: !!local.iconOff,
-      })
-    );
+    return classNames(hopeSwitchControlClass, switchControlStyles(variantProps));
   };
 
   const labelClasses = () => classNames(hopeSwitchLabelClass, switchLabelStyles(variantProps));
@@ -184,15 +168,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
 
-    if (local.onChange) {
-      if (typeof local.onChange === "function") {
-        local.onChange(event);
-      } else {
-        local.onChange[0](local.onChange[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
+    callAllHandlers(local.onChange)(event);
   };
 
   createEffect(() => {
@@ -220,10 +196,12 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         {...inputProps}
         {...ariaAttrs}
       />
-      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs}>
-        {local.iconOn}
-        {local.iconOff}
-      </span>
+      <span
+        aria-hidden={true}
+        class={controlClasses()}
+        data-checked={dataChecked()}
+        {...dataAttrs}
+      />
       <Show when={local.children}>
         <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
           {local.children}
@@ -233,4 +211,4 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   );
 }
 
-Switch.toString = () => createCssSelector(hopeSwitchClass);
+Switch.toString = () => createClassSelector(hopeSwitchClass);

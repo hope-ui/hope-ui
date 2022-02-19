@@ -1,6 +1,6 @@
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 
-export const anchorStyles = createStyles({
+export const anchorStyles = css({
   position: "relative",
   outline: "none",
   backgroundColor: "transparent",
@@ -12,8 +12,7 @@ export const anchorStyles = createStyles({
     textDecoration: "underline",
   },
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "4px",
+  "&:focus": {
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 });

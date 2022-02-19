@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveProps, ResponsiveValue } from "@/styled-system/types";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 import { mapKeys } from "@/utils/function";
 
 import { Box } from "../box/box";
@@ -20,7 +20,7 @@ export type GridItemOptions = ResponsiveProps<{
   rowEnd?: Property.GridRowEnd;
 }>;
 
-export type GridItemProps<C extends ElementType> = HopeComponentProps<C, GridItemOptions>;
+export type GridItemProps<C extends ElementType = "div"> = HopeComponentProps<C, GridItemOptions>;
 
 /**
  * Utility function to apply a column or row span to the GridItem.
@@ -76,4 +76,4 @@ export function GridItem<C extends ElementType = "div">(props: GridItemProps<C>)
   );
 }
 
-GridItem.toString = () => createCssSelector(hopeGridItemClass);
+GridItem.toString = () => createClassSelector(hopeGridItemClass);

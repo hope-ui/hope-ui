@@ -41,8 +41,9 @@
 | Input (Text)     |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | NumberInput      |             |            |       |           |      |
 | PasswordInput    |             |            |       |           |      |
-| RadioGroup       |             |            |       |           |      |
-| Radio            |             |            |       |           |      |
+| RadioGroup       |     ✅      |     ✅     |       |    ✅     |      |
+| Radio            |     ✅      |     ✅     |       |    ✅     |      |
+| NativeSelect     |             |            |       |           |      |
 | Select           |             |            |       |           |      |
 | MultiSelect      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
@@ -58,37 +59,37 @@
 | Accordion |             |            |       |           |      |
 | Avatar    |             |            |       |           |      |
 | Badge     |             |            |       |           |      |
-| Card      |             |            |       |           |      |
-| Table     |             |            |       |           |      |
+| Divider   |     ✅      |    n/a     |       |           |      |
+| Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation
 
-|             | Development | A11y check | Tests | Storybook | Docs |
-| ----------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Anchor      |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Breadcrumbs |             |            |       |           |      |
-| Pagination  |             |            |       |           |      |
-| Stepper     |             |            |       |           |      |
-| Tabs        |             |            |       |           |      |
+|            | Development | A11y check | Tests | Storybook | Docs |
+| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Anchor     |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Breadcrumb |     ✅      |     ✅     |       |           |      |
+| Pagination |             |            |       |           |      |
+| Stepper    |             |            |       |           |      |
+| Tabs       |             |            |       |           |      |
 
 ### Feedback
 
 |              | Development | A11y check | Tests | Storybook | Docs |
 | ------------ | :---------: | :--------: | :---: | :-------: | :--: |
 | Alert        |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Loader       |             |            |       |           |      |
 | Notification |             |            |       |           |      |
 | Progress     |             |            |       |           |      |
 | RingProgress |             |            |       |           |      |
+| Spinner      |     ✅      |     ✅     |       |           |      |
 
 ### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Drawer  |             |            |       |           |      |
+| Drawer  |     ✅      |     ✅     |       |           |      |
 | Menu    |             |            |       |           |      |
-| Modal   |             |            |       |           |      |
+| Modal   |     ✅      |     ✅     |       |           |      |
 | Popover |             |            |       |           |      |
 | Tooltip |             |            |       |           |      |

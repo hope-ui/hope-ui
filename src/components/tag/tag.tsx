@@ -3,7 +3,7 @@ import { mergeProps, splitProps } from "solid-js";
 import { RadiiProps } from "@/styled-system/props/radii";
 import { ResponsiveValue } from "@/styled-system/types";
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -12,7 +12,7 @@ import { TagProvider } from "./tag-provider";
 
 export type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
 
-export type TagProps<C extends ElementType> = HopeComponentProps<C, TagVariants>;
+export type TagProps<C extends ElementType = "span"> = HopeComponentProps<C, TagVariants>;
 
 const hopeTagClass = "hope-tag";
 
@@ -50,4 +50,4 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   );
 }
 
-Tag.toString = () => createCssSelector(hopeTagClass);
+Tag.toString = () => createClassSelector(hopeTagClass);

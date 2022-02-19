@@ -1,7 +1,7 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../button/button";
 import { iconButtonStyles } from "../button/button.styles";
@@ -9,8 +9,8 @@ import { ElementType, HopeComponentProps } from "../types";
 
 export interface IconButtonOptions
   extends Omit<ButtonOptions, "leftIcon" | "rightIcon" | "loaderPosition" | "fullWidth"> {
-  icon: JSX.Element;
   "aria-label": string;
+  icon: JSX.Element;
 }
 
 export type ThemeableIconButtonOptions = Pick<
@@ -18,7 +18,10 @@ export type ThemeableIconButtonOptions = Pick<
   "variant" | "colorScheme" | "size"
 >;
 
-export type IconButtonProps<C extends ElementType> = HopeComponentProps<C, IconButtonOptions>;
+export type IconButtonProps<C extends ElementType = "button"> = HopeComponentProps<
+  C,
+  IconButtonOptions
+>;
 
 const hopeIconButtonClass = "hope-icon-button";
 
@@ -45,4 +48,4 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
   );
 }
 
-IconButton.toString = () => createCssSelector(hopeIconButtonClass);
+IconButton.toString = () => createClassSelector(hopeIconButtonClass);

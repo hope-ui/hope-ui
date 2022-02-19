@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveProps } from "@/styled-system/types";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -12,7 +12,7 @@ export type FlexOptions = ResponsiveProps<{
   wrap?: Property.FlexWrap;
 }>;
 
-export type FlexProps<C extends ElementType> = HopeComponentProps<C, FlexOptions>;
+export type FlexProps<C extends ElementType = "div"> = HopeComponentProps<C, FlexOptions>;
 
 const hopeFlexClass = "hope-flex";
 
@@ -36,4 +36,4 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
   );
 }
 
-Flex.toString = () => createCssSelector(hopeFlexClass);
+Flex.toString = () => createClassSelector(hopeFlexClass);

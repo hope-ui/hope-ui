@@ -1,6 +1,6 @@
 import { commonColors, darkColors, lightColors } from "./colors";
 import { radii } from "./radii";
-import { shadows } from "./shadows";
+import { darkShadows, shadows } from "./shadows";
 import { sizes } from "./sizes";
 import { space } from "./space";
 import { fonts, fontSizes, fontWeights, letterSpacings, lineHeights } from "./typography";
@@ -31,4 +31,5 @@ export const baseThemeTokens = {
  */
 export const baseDarkThemeTokens = {
   colors: darkColors,
+  shadows: darkShadows,
 };

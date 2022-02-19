@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -10,7 +10,7 @@ interface AnchorOptions {
   external?: boolean;
 }
 
-export type AnchorProps<C extends ElementType> = HopeComponentProps<C, AnchorOptions>;
+export type AnchorProps<C extends ElementType = "a"> = HopeComponentProps<C, AnchorOptions>;
 
 const hopeAnchorClass = "hope-anchor";
 
@@ -38,4 +38,4 @@ export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
   );
 }
 
-Anchor.toString = () => createCssSelector(hopeAnchorClass);
+Anchor.toString = () => createClassSelector(hopeAnchorClass);

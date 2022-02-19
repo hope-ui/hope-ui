@@ -2,7 +2,7 @@ import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { IconSpinner } from "@/components/icons/IconSpinner";
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -21,7 +21,7 @@ export type ThemeableButtonOptions = Pick<
   "variant" | "colorScheme" | "size" | "loaderPosition"
 >;
 
-export type ButtonProps<C extends ElementType> = HopeComponentProps<C, ButtonOptions>;
+export type ButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, ButtonOptions>;
 
 const hopeButtonClass = "hope-button";
 
@@ -105,4 +105,4 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   );
 }
 
-Button.toString = () => createCssSelector(hopeButtonClass);
+Button.toString = () => createClassSelector(hopeButtonClass);

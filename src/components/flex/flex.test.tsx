@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { createStyles } from "@/styled-system";
+import { css } from "@/styled-system";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
@@ -116,7 +116,7 @@ describe("Flex", () => {
 
   it("should have display props to 'flex' by default", () => {
     // arrange
-    const stubClassName = createStyles()();
+    const stubClassName = css()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -139,7 +139,7 @@ describe("Flex", () => {
       wrap: "wrap",
     };
 
-    const stubClassName = createStyles()();
+    const stubClassName = css()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

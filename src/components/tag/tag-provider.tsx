@@ -25,7 +25,7 @@ export function useTagContext() {
   const context = useContext(TagContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useTagContext must be used within a Tag component");
+    throw new Error("[Hope UI]: useTagContext must be used within a `<Tag/>` component");
   }
 
   return context;

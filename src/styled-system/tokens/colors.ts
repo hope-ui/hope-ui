@@ -142,9 +142,8 @@ const danger = {
 };
 
 const semanticColors = {
-  defaultButtonBg: "white",
-  checkboxIconColor: "white",
-  switchTrackBg: "white",
+  panelBg: "white",
+  focusRing: "#96c7f2",
 };
 
 export const lightColors = {
@@ -258,9 +257,8 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
-  defaultButtonBg: "$neutral3",
-  checkboxIconColor: "$neutral3",
-  switchTrackBg: "$neutral3",
+  panelBg: "$neutral3",
+  focusRing: "#0a4481",
 };
 
 export const darkColors: typeof lightColors = {

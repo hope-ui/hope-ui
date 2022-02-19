@@ -1,17 +1,17 @@
 import { VariantProps } from "@stitches/core";
 
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
  * TagRightIcon & TagLeftIcon
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagRightIconStyles = createStyles({
+export const tagRightIconStyles = css({
   marginInlineStart: "$1",
 });
 
-export const tagLeftIconStyles = createStyles({
+export const tagLeftIconStyles = css({
   marginInlineEnd: "$1",
 });
 
@@ -19,7 +19,7 @@ export const tagLeftIconStyles = createStyles({
  * TagLabel
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagLabelStyles = createStyles({
+export const tagLabelStyles = css({
   noOfLines: 1,
 });
 
@@ -27,9 +27,7 @@ export const tagLabelStyles = createStyles({
  * TagCloseButton
  * -----------------------------------------------------------------------------------------------*/
 
-export const tagCloseButtonIconStyles = createStyles();
-
-export const tagCloseButtonStyles = createStyles({
+export const tagCloseButtonStyles = css({
   appearance: "none",
   position: "relative",
 
@@ -48,21 +46,21 @@ export const tagCloseButtonStyles = createStyles({
 
   padding: "0",
 
+  fontSize: "0.8em",
   lineHeight: "$none",
   textDecoration: "none",
   color: "inherit",
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "color 250ms, background-color 250ms, opacity 250ms",
+  transition: "color 250ms, background-color 250ms, opacity 250ms, box-shadow 250ms",
 
   "&:not(:disabled):active": {
     transform: "translateY(1px)",
   },
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "0",
+  "&:focus": {
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 
   "&:disabled": {
@@ -96,10 +94,6 @@ function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
 
     [`& .${tagCloseButtonStyles}`]: {
       boxSize: config.closeButtonSize,
-    },
-
-    [`& .${tagCloseButtonStyles} .${tagCloseButtonIconStyles}`]: {
-      boxSize: config.closeButtonIconSize,
     },
   };
 }
@@ -183,7 +177,7 @@ function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
   };
 }
 
-export const tagStyles = createStyles({
+export const tagStyles = css({
   appearance: "none",
   position: "relative",
 

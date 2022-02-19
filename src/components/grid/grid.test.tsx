@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { createStyles } from "@/styled-system";
+import { css } from "@/styled-system";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
@@ -125,7 +125,7 @@ describe("Grid", () => {
       templateRows: "repeat(4, 1fr)",
     };
 
-    const stubClassName = createStyles()();
+    const stubClassName = css()();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

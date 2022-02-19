@@ -1,7 +1,7 @@
 import merge from "lodash.merge";
 import { isServer } from "solid-js/web";
 
-import { baseTheme, createStyles, createTheme } from "@/styled-system/stitches.config";
+import { baseTheme, css, createTheme } from "@/styled-system/stitches.config";
 import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
@@ -98,7 +98,7 @@ export function syncBodyColorModeClassName(isDark: boolean) {
 /**
  * Visually hide an element without hiding it from screen readers
  */
-export const visuallyHiddenStyles = createStyles({
+export const visuallyHiddenStyles = css({
   position: "absolute",
   width: "1px",
   height: "1px",

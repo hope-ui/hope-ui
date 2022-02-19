@@ -1,21 +1,23 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
 import {
-  IconCheckCircle,
-  IconExclamationCircle,
-  IconExclamationTriangle,
-  IconInfoCircle,
+  IconCheckCircleSolid,
+  IconExclamationCircleSolid,
+  IconExclamationTriangleSolid,
+  IconInfoCircleSolid,
 } from "../icons";
 import { ElementType } from "../types";
 import { alertIconStyles } from "./alert.styles";
 import { useAlertContext } from "./alert-provider";
 
+export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
+
 const hopeAlertIconClass = "hope-alert-icon";
 
-export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
+export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C>) {
   const { status } = useAlertContext();
 
   const defaultProps: IconProps<"svg"> = {
@@ -34,16 +36,16 @@ export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
 
     switch (status()) {
       case "success":
-        return IconCheckCircle;
+        return IconCheckCircleSolid;
         break;
       case "info":
-        return IconInfoCircle;
+        return IconInfoCircleSolid;
         break;
       case "warning":
-        return IconExclamationTriangle;
+        return IconExclamationTriangleSolid;
         break;
       case "danger":
-        return IconExclamationCircle;
+        return IconExclamationCircleSolid;
         break;
     }
   };
@@ -51,4 +53,4 @@ export function AlertIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   return <Icon as={icon()} class={classes()} {...others} />;
 }
 
-AlertIcon.toString = () => createCssSelector(hopeAlertIconClass);
+AlertIcon.toString = () => createClassSelector(hopeAlertIconClass);

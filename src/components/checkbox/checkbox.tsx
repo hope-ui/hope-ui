@@ -11,7 +11,8 @@ import {
 } from "solid-js";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -53,7 +54,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
    * The value to be used in the checkbox input.
    * This is the value that will be returned on form submission.
    */
-  value?: any;
+  value?: string | number;
 
   /**
    * If `true`, the checkbox will be checked.
@@ -105,7 +106,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type CheckboxProps<C extends ElementType> = HopeComponentProps<C, CheckboxOptions>;
+export type CheckboxProps<C extends ElementType = "label"> = HopeComponentProps<C, CheckboxOptions>;
 
 const hopeCheckboxClass = "hope-checkbox";
 const hopeCheckboxInputClass = "hope-checkbox__input";
@@ -120,7 +121,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
-    id: createUniqueId(),
+    id: `hope-checkbox-${createUniqueId()}`,
     iconChecked: <CheckIcon />,
     iconIndeterminate: <IndeterminateIcon />,
     variant: theme?.defaultProps?.variant ?? "outline",
@@ -191,15 +192,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     const target = event.target as HTMLInputElement;
     setCheckedState(target.checked);
 
-    if (local.onChange) {
-      if (typeof local.onChange === "function") {
-        local.onChange(event);
-      } else {
-        local.onChange[0](local.onChange[1], event);
-      }
-    }
-
-    return event.defaultPrevented;
+    callAllHandlers(local.onChange)(event);
   };
 
   createEffect(() => {
@@ -241,4 +234,4 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   );
 }
 
-Checkbox.toString = () => createCssSelector(hopeCheckboxClass);
+Checkbox.toString = () => createClassSelector(hopeCheckboxClass);

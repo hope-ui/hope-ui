@@ -3,7 +3,7 @@ import { action } from "@storybook/addon-actions";
 import { TagCloseButton } from "@/components/tag/tag-close-button";
 import { HopeWrapper } from "@/utils/storybook";
 
-import { IconInfoCircle } from "../icons/IconInfoCircle";
+import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { HStack } from "../stack/stack";
 import { Tag } from "./tag";
 import { TagLeftIcon, TagRightIcon } from "./tag-icon";
@@ -50,12 +50,12 @@ export const Default = (args: any) => <Tag {...args} />;
 export const WithIcon = (args: any) => (
   <HStack spacing="$4">
     <Tag {...args}>
-      <TagLeftIcon as={IconInfoCircle} />
+      <TagLeftIcon as={IconInfoCircleSolid} />
       <TagLabel>Tag</TagLabel>
     </Tag>
     <Tag {...args}>
       <TagLabel>Tag</TagLabel>
-      <TagRightIcon as={IconInfoCircle} />
+      <TagRightIcon as={IconInfoCircleSolid} />
     </Tag>
   </HStack>
 );

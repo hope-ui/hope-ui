@@ -1,12 +1,15 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { containerStyles, ContainerVariants } from "./container.styles";
 
-export type ContainerProps<C extends ElementType> = HopeComponentProps<C, ContainerVariants>;
+export type ContainerProps<C extends ElementType = "div"> = HopeComponentProps<
+  C,
+  ContainerVariants
+>;
 
 const hopeContainerClass = "hope-container";
 
@@ -34,4 +37,4 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
   return <Box class={classes()} {...others} />;
 }
 
-Container.toString = () => createCssSelector(hopeContainerClass);
+Container.toString = () => createClassSelector(hopeContainerClass);

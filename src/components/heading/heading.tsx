@@ -1,13 +1,13 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme/provider";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";
 
-export type HeadingProps<C extends ElementType> = HopeComponentProps<C, HeadingVariants>;
+export type HeadingProps<C extends ElementType = "h2"> = HopeComponentProps<C, HeadingVariants>;
 
 const hopeHeadingClass = "hope-heading";
 
@@ -31,4 +31,4 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
 }
 
-Heading.toString = () => createCssSelector(hopeHeadingClass);
+Heading.toString = () => createClassSelector(hopeHeadingClass);

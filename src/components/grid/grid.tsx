@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveProps } from "@/styled-system/types";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -16,7 +16,7 @@ export type GridOptions = ResponsiveProps<{
   templateRows?: Property.GridTemplateRows;
 }>;
 
-export type GridProps<C extends ElementType> = HopeComponentProps<C, GridOptions>;
+export type GridProps<C extends ElementType = "div"> = HopeComponentProps<C, GridOptions>;
 
 const hopeGridClass = "hope-grid";
 
@@ -52,4 +52,4 @@ export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
   );
 }
 
-Grid.toString = () => createCssSelector(hopeGridClass);
+Grid.toString = () => createClassSelector(hopeGridClass);

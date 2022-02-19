@@ -1,8 +1,8 @@
-import { Accessor, createContext, splitProps, useContext } from "solid-js";
+import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useTheme } from "@/theme";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -27,12 +27,16 @@ export interface InputGroupContextValue {
 
 export type ThemeableInputGroupOptions = Partial<Pick<InputGroupState, "variant" | "size">>;
 
-export type InputGroupProps<C extends ElementType> = HopeComponentProps<
+export type InputGroupProps<C extends ElementType = "div"> = HopeComponentProps<
   C,
   ThemeableInputGroupOptions
 >;
 
 const InputGroupContext = createContext<InputGroupContextValue>();
+
+export function useInputGroupContext() {
+  return useContext(InputGroupContext);
+}
 
 const hopeInputGroupClass = "hope-input-group";
 
@@ -61,23 +65,19 @@ export function InputGroup<C extends ElementType = "div">(props: InputGroupProps
   const setHasLeftAddon = (value: boolean) => setState("hasLeftAddon", value);
   const setHasRightAddon = (value: boolean) => setState("hasRightAddon", value);
 
-  const context: Accessor<InputGroupContextValue> = () => ({
+  const context: InputGroupContextValue = {
     state,
     setHasLeftElement,
     setHasRightElement,
     setHasLeftAddon,
     setHasRightAddon,
-  });
+  };
 
   return (
-    <InputGroupContext.Provider value={context()}>
+    <InputGroupContext.Provider value={context}>
       <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />
     </InputGroupContext.Provider>
   );
 }
 
-InputGroup.toString = () => createCssSelector(hopeInputGroupClass);
-
-export function useInputGroupContext() {
-  return useContext(InputGroupContext);
-}
+InputGroup.toString = () => createClassSelector(hopeInputGroupClass);

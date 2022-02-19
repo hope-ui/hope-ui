@@ -1,6 +1,6 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
@@ -56,4 +56,4 @@ export function Icon<C extends ElementType = "svg">(props: IconProps<C>) {
   );
 }
 
-Icon.toString = () => createCssSelector(hopeIconClass);
+Icon.toString = () => createClassSelector(hopeIconClass);

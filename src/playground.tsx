@@ -1,87 +1,124 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
-  Anchor,
   Box,
+  Breadcrumb,
+  BreadcrumbLink,
   Button,
-  Center,
-  Checkbox,
-  FormControl,
-  FormLabel,
+  Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   HopeProvider,
   HStack,
-  IconButton,
-  IconMoon,
-  IconSun,
-  Input,
-  Switch,
+  IconChevronRight,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Spinner,
+  Stack,
+  Table,
+  TableCaption,
+  Tbody,
+  Td,
+  Tfoot,
+  Th,
+  Thead,
+  Tr,
   useColorMode,
-  useColorModeValue,
   VStack,
 } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const cardBg = useColorModeValue("white", "$neutral3");
-  const icon = useColorModeValue(<IconMoon />, <IconSun />);
+  const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => setIsModalOpen(true);
+
+  const [isDrawerOpen, setIsDrawerOpen] = createSignal(false);
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const openDrawer = () => setIsDrawerOpen(true);
 
   return (
     <Box p="$4">
-      <Center flexDirection="column" boxSize="$full">
-        <IconButton
-          aria-label="Toggle color mode"
-          icon={icon}
-          mb="$4"
-          size="sm"
-          colorScheme="neutral"
-          variant="subtle"
-          onClick={toggleColorMode}
-        />
-        <HStack spacing="$5">
-          <Box bg={cardBg()} p="$4" w="$sm" shadow="$sm" rounded="$sm">
-            <VStack as="form" spacing="$5">
-              <FormControl>
-                <FormLabel>Email</FormLabel>
-                <Input type="email" placeholder="email" />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Password</FormLabel>
-                <Input type="password" placeholder="password" />
-              </FormControl>
-              <HStack justifyContent="space-between" w="$full">
-                <Checkbox>Remember me</Checkbox>
-                <Anchor href="#" color="$primary9">
-                  Forgot your password ?
-                </Anchor>
-              </HStack>
-              <Switch variant="outline">Lorem ipsum</Switch>
-              <Button fullWidth>Login</Button>
-            </VStack>
-          </Box>
-          <Box bg={cardBg()} p="$4" w="$sm" shadow="$sm" rounded="$sm">
-            <VStack as="form" spacing="$5">
-              <FormControl>
-                <FormLabel>Email</FormLabel>
-                <Input variant="filled" type="email" placeholder="email" />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Password</FormLabel>
-                <Input variant="filled" type="password" placeholder="password" />
-              </FormControl>
-              <HStack justifyContent="space-between" w="$full">
-                <Checkbox variant="filled">Remember me</Checkbox>
-                <Anchor href="#" color="$primary9">
-                  Forgot your password ?
-                </Anchor>
-              </HStack>
-              <Switch>Lorem ipsum</Switch>
-              <Button fullWidth>Login</Button>
-            </VStack>
-          </Box>
-        </HStack>
-      </Center>
+      <VStack alignItems="flex-start" spacing="$6">
+        <Breadcrumb separator="-">
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+        </Breadcrumb>
+        <Breadcrumb>
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <BreadcrumbLink href="#">About</BreadcrumbLink>
+          <BreadcrumbLink href="#" currentPage>
+            Contact
+          </BreadcrumbLink>
+        </Breadcrumb>
+        <Breadcrumb separator="-">
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <BreadcrumbLink href="#">About</BreadcrumbLink>
+          <BreadcrumbLink href="#" currentPage>
+            Contact
+          </BreadcrumbLink>
+        </Breadcrumb>
+        <Breadcrumb spacing="8px" separator={<IconChevronRight color="$neutral9" />}>
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <BreadcrumbLink href="#">About</BreadcrumbLink>
+          <BreadcrumbLink href="#" currentPage>
+            Contact
+          </BreadcrumbLink>
+        </Breadcrumb>
+
+        <Button onClick={openModal}>Open modal</Button>
+        <Modal isOpen={isModalOpen()} onClose={closeModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Deactivate account</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              Are you sure you want to deactivate your account? All of your data will be permanently
+              removed. This action cannot be undone.
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="default" mr="$4" onClick={toggleColorMode}>
+                Cancel
+              </Button>
+              <Button colorScheme="danger" onClick={closeModal}>
+                Deactivate
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+        <Button onClick={openDrawer}>Open drawer</Button>
+        <Drawer isOpen={isDrawerOpen()} onClose={closeDrawer}>
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerHeader>Deactivate account</DrawerHeader>
+            <DrawerCloseButton />
+            <DrawerBody>
+              Are you sure you want to deactivate your account? All of your data will be permanently
+              removed. This action cannot be undone.
+            </DrawerBody>
+            <DrawerFooter>
+              <Button variant="default" mr="$4" onClick={toggleColorMode}>
+                Cancel
+              </Button>
+              <Button colorScheme="danger" onClick={closeDrawer}>
+                Deactivate
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </VStack>
     </Box>
   );
 }

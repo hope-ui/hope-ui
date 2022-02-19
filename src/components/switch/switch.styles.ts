@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 import { visuallyHiddenStyles } from "@/theme/utils";
 
@@ -8,13 +8,13 @@ import { visuallyHiddenStyles } from "@/theme/utils";
  * Switch - input
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchInputStyles = createStyles(visuallyHiddenStyles);
+export const switchInputStyles = css(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchContainerStyles = createStyles({
+export const switchContainerStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -78,11 +78,11 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const switchControlStyles = createStyles({
+export const switchControlStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
-  justifyContent: "start",
+  justifyContent: "center",
   flexShrink: 0,
 
   height: "100%",
@@ -126,50 +126,31 @@ export const switchControlStyles = createStyles({
     left: "1px",
     zIndex: "1",
     borderRadius: "$full",
+    boxShadow: "$sm",
     transition: "250ms",
   },
 
   variants: {
-    hasIconOn: {
-      true: {},
-    },
-    hasIconOff: {
-      true: {
-        justifyContent: "end",
-      },
-    },
     variant: {
       outline: {
         border: "1px solid",
         borderColor: "inherit", // allow passing borderColor style props to parent container
         backgroundColor: "transparent",
 
-        "& svg": {
-          color: "$neutral7",
-        },
-
-        "&[data-checked] svg": {
-          color: "$switchTrackBg",
-        },
-
         "&::before": {
           backgroundColor: "$neutral7",
         },
 
         "&[data-checked]::before": {
-          backgroundColor: "$switchTrackBg",
+          backgroundColor: "$panelBg",
         },
       },
       filled: {
         border: "1px solid transparent",
         backgroundColor: "$neutral7",
 
-        "& svg": {
-          color: "$switchTrackBg",
-        },
-
         "&::before": {
-          backgroundColor: "$switchTrackBg",
+          backgroundColor: "$panelBg",
         },
       },
     },
@@ -208,63 +189,44 @@ export const switchControlStyles = createStyles({
     size: {
       sm: {
         height: "16px",
-        width: "28px",
-
-        "& svg": {
-          boxSize: "12px",
-        },
+        width: "26px",
 
         "&::before": {
           boxSize: "12px",
         },
 
         "&[data-checked]::before": {
-          transform: "translateX(12px)",
+          transform: "translateX(10px)",
         },
       },
       md: {
         columnGap: "2px",
         height: "20px",
-        width: "36px",
-
-        "& svg": {
-          boxSize: "16px",
-        },
+        width: "34px",
 
         "&::before": {
           boxSize: "16px",
         },
 
         "&[data-checked]::before": {
-          transform: "translateX(16px)",
+          transform: "translateX(14px)",
         },
       },
       lg: {
         columnGap: "4px",
         height: "28px",
-        width: "52px",
-
-        "& svg": {
-          boxSize: "24px",
-        },
+        width: "50px",
 
         "&::before": {
           boxSize: "24px",
         },
 
         "&[data-checked]::before": {
-          transform: "translateX(24px)",
+          transform: "translateX(22px)",
         },
       },
     },
   },
-  compoundVariants: [
-    {
-      hasIconOn: true,
-      hasIconOff: true,
-      css: { justifyContent: "space-around" },
-    },
-  ],
 });
 
 export type SwitchControlVariants = VariantProps<typeof switchControlStyles>;
@@ -292,7 +254,7 @@ function createSizeAndLabelPositionCompoundVariants() {
   ]);
 }
 
-export const switchLabelStyles = createStyles({
+export const switchLabelStyles = css({
   variants: {
     size: {
       sm: {},

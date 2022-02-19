@@ -6,11 +6,13 @@ import { classNames } from "@/utils/css";
 
 import { ElementType, HopeComponentProps } from "../types";
 
+export type BoxProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+
 /**
  * Box is the most abstract component on top of which all other Hope UI components are built.
  * By default, it renders a div element.
  */
-export function Box<C extends ElementType = "div">(props: HopeComponentProps<C>) {
+export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
   const usedStylePropNames = getUsedStylePropNames(props);
 
   const [local, styleProps, others] = splitProps(

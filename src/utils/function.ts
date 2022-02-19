@@ -1,3 +1,5 @@
+import { JSX } from "solid-js";
+
 import { isObject } from "./assertion";
 
 /**
@@ -23,4 +25,30 @@ export function mapKeys(prop: any, mapper: (val: any) => any) {
   }
 
   return null;
+}
+
+/**
+ * Call all provided event handlers.
+ */
+export function callAllHandlers<T, E extends Event>(
+  ...fns: Array<JSX.EventHandlerUnion<T, E> | undefined>
+) {
+  return function (
+    event: E & {
+      currentTarget: T;
+      target: Element;
+    }
+  ) {
+    fns.some(fn => {
+      if (fn) {
+        if (typeof fn === "function") {
+          fn(event);
+        } else {
+          fn[0](fn[1], event);
+        }
+      }
+
+      return event?.defaultPrevented;
+    });
+  };
 }

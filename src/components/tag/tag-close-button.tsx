@@ -1,14 +1,14 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { IconClose } from "@/components/icons/IconClose";
-import { classNames, createCssSelector } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { tagCloseButtonIconStyles, tagCloseButtonStyles } from "./tag.styles";
+import { tagCloseButtonStyles } from "./tag.styles";
 import { useTagContext } from "./tag-provider";
 
-export type TagCloseButtonProps<C extends ElementType> = HopeComponentProps<
+export type TagCloseButtonProps<C extends ElementType = "button"> = HopeComponentProps<
   C,
   { "aria-label"?: string }
 >;
@@ -37,9 +37,9 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   return (
     <Box class={classes()} borderRadius={borderRadius()} {...others}>
-      <IconClose class={tagCloseButtonIconStyles()} />
+      <IconClose />
     </Box>
   );
 }
 
-TagCloseButton.toString = () => createCssSelector(hopeTagCloseButtonClass);
+TagCloseButton.toString = () => createClassSelector(hopeTagCloseButtonClass);

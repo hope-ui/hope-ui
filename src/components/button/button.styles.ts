@@ -1,14 +1,14 @@
 import { VariantProps } from "@stitches/core";
 
 import { spin } from "@/styled-system/keyframes";
-import { createStyles } from "@/styled-system/stitches.config";
+import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-export const buttonLoadingIconStyles = createStyles({
+export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
 });
 
-export const iconButtonStyles = createStyles();
+export const iconButtonStyles = css();
 
 /* -------------------------------------------------------------------------------------------------
  * Size
@@ -18,7 +18,6 @@ interface SizeVariantConfig {
   height: string;
   paddingX: string;
   fontSize: string;
-  iconSize: string;
   spacing: string;
 }
 
@@ -28,10 +27,6 @@ function createSizeVariant(config: SizeVariantConfig): SystemStyleObject {
     py: 0,
     px: config.paddingX,
     fontSize: config.fontSize,
-
-    "& svg": {
-      boxSize: config.iconSize,
-    },
 
     "& > * + *": {
       marginLeft: config.spacing,
@@ -165,7 +160,7 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
  * Styles
  * -----------------------------------------------------------------------------------------------*/
 
-export const buttonStyles = createStyles({
+export const buttonStyles = css({
   appearance: "none",
   position: "relative",
 
@@ -174,11 +169,11 @@ export const buttonStyles = createStyles({
   alignItems: "center",
 
   outline: "none",
-  borderRadius: "$sm",
+  borderRadius: "$md",
 
   padding: "0",
 
-  fontWeight: "$semibold",
+  fontWeight: "$medium",
   lineHeight: "$none",
   textDecoration: "none",
 
@@ -186,13 +181,12 @@ export const buttonStyles = createStyles({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",
 
-  // "&:active": {
-  //   transform: "translateY(1px)",
-  // },
+  // box-shadow transition on button focus f*cked up solid-transition-group
+  //transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "4px",
+  "&:focus": {
+    outline: "none",
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 
   "&:disabled": {
@@ -204,7 +198,7 @@ export const buttonStyles = createStyles({
     variant: {
       default: {
         border: "1px solid $neutral7",
-        backgroundColor: "$defaultButtonBg",
+        backgroundColor: "$panelBg",
         color: "$neutral12",
 
         "&:not(:disabled):hover": {
@@ -272,43 +266,45 @@ export const buttonStyles = createStyles({
         height: "$6",
         paddingX: "$2",
         fontSize: "$xs",
-        iconSize: "$3_5",
         spacing: "$1",
       }),
       sm: createSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$sm",
-        iconSize: "$4",
         spacing: "$1_5",
       }),
       md: createSizeVariant({
         height: "$10",
         paddingX: "$4",
         fontSize: "$base",
-        iconSize: "$5",
         spacing: "$1_5",
       }),
       lg: createSizeVariant({
         height: "$12",
         paddingX: "$6",
         fontSize: "$lg",
-        iconSize: "$6",
         spacing: "$2",
       }),
       xl: createSizeVariant({
         height: "$16",
         paddingX: "$10",
         fontSize: "$xl",
-        iconSize: "$7",
         spacing: "$2",
       }),
     },
-    compact: { true: {} },
+    compact: {
+      true: {},
+      false: {},
+    },
     fullWidth: {
       true: {
         display: "flex",
         width: "100%",
+      },
+      false: {
+        display: "inline-flex",
+        width: "auto",
       },
     },
     loading: {
@@ -317,6 +313,7 @@ export const buttonStyles = createStyles({
         cursor: "default",
         pointerEvents: "none",
       },
+      false: {},
     },
   },
 

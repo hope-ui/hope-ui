@@ -1,7 +1,7 @@
 /**
- * Return a CSS selector based on the provided class name.
+ * Return a CSS class selector based on the provided class name.
  */
-export function createCssSelector(className: string) {
+export function createClassSelector(className: string) {
   return `.${className}`;
 }
 

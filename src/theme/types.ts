@@ -7,6 +7,7 @@ import { ThemeableFormLabelOptions } from "@/components/form-control/form-label"
 import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
 import { ThemeableInputOptions } from "@/components/input/input";
 import { ThemeableInputGroupOptions } from "@/components/input/input-group";
+import { ThemeableRadioOptions } from "@/components/radio/radio";
 import { ThemeableSwitchOptions } from "@/components/switch/switch";
 import { ThemeableTagOptions } from "@/components/tag/tag";
 import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
@@ -57,6 +58,7 @@ export interface ComponentsStyles {
   IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
   Input?: ComponentStyle<ThemeableInputOptions>;
   InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
+  Radio?: ComponentStyle<ThemeableRadioOptions>;
   Switch?: ComponentStyle<ThemeableSwitchOptions>;
   Text?: ComponentStyle<void>;
   Textarea?: ComponentStyle<ThemeableTextareaOptions>;
