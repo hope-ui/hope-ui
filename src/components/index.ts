@@ -1,6 +1,7 @@
 export * from "./alert";
 export * from "./anchor";
 export * from "./box";
+export * from "./breadcrumb";
 export * from "./button";
 export * from "./center";
 export * from "./checkbox";

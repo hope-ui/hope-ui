@@ -53,15 +53,14 @@ export const tagCloseButtonStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "color 250ms, background-color 250ms, opacity 250ms",
+  transition: "color 250ms, background-color 250ms, opacity 250ms, box-shadow 250ms",
 
   "&:not(:disabled):active": {
     transform: "translateY(1px)",
   },
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "0",
+  "&:focus": {
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 
   "&:disabled": {

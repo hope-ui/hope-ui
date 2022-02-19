@@ -12,8 +12,7 @@ export const anchorStyles = css({
     textDecoration: "underline",
   },
 
-  "&:focus-visible": {
-    outline: "2px solid #2563eb",
-    outlineOffset: "4px",
+  "&:focus": {
+    boxShadow: "0 0 0 3px $colors$focusRing",
   },
 });
