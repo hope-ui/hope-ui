@@ -1,8 +1,8 @@
+import { css, globalCss } from "@/styled-system/stitches.config";
+
 /* -------------------------------------------------------------------------------------------------
  * Tooltip - solid-transition-group classes
  * -----------------------------------------------------------------------------------------------*/
-
-import { globalCss } from "@/styled-system/stitches.config";
 
 export const tooltipTransitionName = {
   scale: "hope-tooltip-scale-transition",
@@ -28,4 +28,31 @@ export const tooltipTransitionStyles = globalCss({
     transitionDuration: "150ms",
     transitionTimingFunction: "ease-in-out",
   },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Tooltip
+ * -----------------------------------------------------------------------------------------------*/
+
+export const tooltipStyles = css({
+  position: "absolute",
+  background: "#222",
+  color: "white",
+  fontWeight: "bold",
+  padding: "5px",
+  borderRadius: "4px",
+  fontSize: "90%",
+  pointerEvents: "none",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Tooltip - arrow
+ * -----------------------------------------------------------------------------------------------*/
+
+export const tooltipArrowStyles = css({
+  position: "absolute",
+  background: "#222",
+  width: "8px",
+  height: "8px",
+  transform: "rotate(45deg)",
 });
