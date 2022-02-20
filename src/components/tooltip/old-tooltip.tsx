@@ -75,6 +75,12 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     setIsTooltipVisible(false);
   };
 
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      hideTooltip();
+    }
+  };
+
   const addTriggerListeners = () => {
     const triggerElement = trigger();
 
@@ -102,11 +108,15 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
       return;
     }
 
+    document.addEventListener("keydown", onKeyDown);
+
     window.addEventListener("scroll", updateTooltipPosition);
     window.addEventListener("resize", updateTooltipPosition);
   };
 
   const onToolipExitTransitionEnd = () => {
+    document.removeEventListener("keydown", onKeyDown);
+
     window.removeEventListener("scroll", updateTooltipPosition);
     window.removeEventListener("resize", updateTooltipPosition);
 
