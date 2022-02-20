@@ -170,16 +170,6 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
 
 const ModalContext = createContext<ModalContextValue>();
 
-export function useModalContext() {
-  const context = useContext(ModalContext);
-
-  if (!context) {
-    throw new Error("[Hope UI]: useModalContext must be used within a `<Modal />` component");
-  }
-
-  return context;
-}
-
 /**
  * Modal provides context, theming, and accessibility properties
  * to all other modal components.
@@ -225,22 +215,23 @@ export function Modal(props: ModalProps) {
   });
 
   /**
-   * Internal state to deal with modal transitions.
+   * Internal state to handle modal portal `mounted` state.
+   * Dirty hack since solid-transition-group doesn't work with Portal.
    */
-  const [isMounted, setIsMounted] = createSignal(false);
+  const [isPortalMounted, setIsPortalMounted] = createSignal(false);
 
   createEffect(() => {
     if (state.isOpen) {
-      // mount modal when state `isOpen` is true.
-      setIsMounted(true);
+      // mount portal when state `isOpen` is true.
+      setIsPortalMounted(true);
     } else {
-      // unmount modal instantly when there is no modal transition.
-      state.transition === "none" && setIsMounted(false);
+      // unmount portal instantly when there is no modal transition.
+      state.transition === "none" && setIsPortalMounted(false);
     }
   });
 
-  // unmount modal only after modal's content exit transition is done.
-  const onModalContentExitTransitionEnd = () => setIsMounted(false);
+  // unmount portal only after modal's content exit transition is done.
+  const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
 
   const closeOnEsc = () => props.closeOnEsc ?? true;
   const onClose = () => props.onClose();
@@ -299,10 +290,20 @@ export function Modal(props: ModalProps) {
   modalTransitionStyles();
 
   return (
-    <Show when={isMounted()}>
+    <Show when={isPortalMounted()}>
       <ModalContext.Provider value={context}>
         <Portal>{props.children}</Portal>
       </ModalContext.Provider>
     </Show>
   );
+}
+
+export function useModalContext() {
+  const context = useContext(ModalContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useModalContext must be used within a `<Modal />` component");
+  }
+
+  return context;
 }
