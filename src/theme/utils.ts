@@ -1,7 +1,7 @@
 import merge from "lodash.merge";
 import { isServer } from "solid-js/web";
 
-import { baseTheme, css, createTheme } from "@/styled-system/stitches.config";
+import { baseTheme, createTheme, css } from "@/styled-system/stitches.config";
 import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
@@ -72,7 +72,7 @@ export function saveColorModeToLocalStorage(value: ColorMode) {
  * @param fallbackValue Fallback color mode value, if `system` it will be the system color mode.
  * @returns The default color mode to use.
  */
-export function getDefaultColorMode(fallbackValue: ColorMode) {
+export function getDefaultColorMode(fallbackValue: ColorMode): ColorMode {
   const persistedPreference = getColorModeFromLocalStorage();
 
   if (persistedPreference) {
@@ -93,6 +93,13 @@ export function syncBodyColorModeClassName(isDark: boolean) {
 
   body.classList.add(isDark ? classNames.dark : classNames.light);
   body.classList.remove(isDark ? classNames.light : classNames.dark);
+}
+
+/**
+ * Function to set `document` [data-theme] attribute based on color mode.
+ */
+export function setDocumentColorModeDataTheme(colorMode: ColorMode) {
+  document.documentElement.setAttribute("data-theme", colorMode);
 }
 
 /**

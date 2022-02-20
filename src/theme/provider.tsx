@@ -8,6 +8,7 @@ import {
   extendBaseTheme,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
+  setDocumentColorModeDataTheme,
   syncBodyColorModeClassName,
 } from "./utils";
 
@@ -52,6 +53,7 @@ export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>)
     const isDark = colorMode() === "dark";
 
     setTheme(isDark ? darkTheme : lightTheme);
+    setDocumentColorModeDataTheme(colorMode());
     syncBodyColorModeClassName(isDark);
   });
 
