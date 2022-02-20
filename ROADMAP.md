@@ -14,6 +14,7 @@
 | Box        |     ✅      |    n/a     |  ✅   |    n/a    |      |
 | Center     |     ✅      |    n/a     |  ✅   |    ✅     |      |
 | Container  |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Divider    |     ✅      |    n/a     |       |           |      |
 | Flex       |     ✅      |    n/a     |  ✅   |           |      |
 | Grid       |     ✅      |    n/a     |  ✅   |           |      |
 | SimpleGrid |             |    n/a     |       |           |      |
@@ -59,7 +60,7 @@
 | Accordion |             |            |       |           |      |
 | Avatar    |             |            |       |           |      |
 | Badge     |             |            |       |           |      |
-| Divider   |     ✅      |    n/a     |       |           |      |
+| Icon      |     ✅      |     ✅     |  ✅   |           |      |
 | Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |

@@ -8,7 +8,6 @@ import {
   Breadcrumb,
   BreadcrumbLink,
   Button,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -17,8 +16,8 @@ import {
   DrawerHeader,
   DrawerOverlay,
   HopeProvider,
-  HStack,
   IconChevronRight,
+  IconInfoCircleSolid,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -26,16 +25,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Spinner,
-  Stack,
-  Table,
-  TableCaption,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
   useColorMode,
   VStack,
 } from ".";
@@ -53,7 +42,7 @@ export function App() {
   return (
     <Box p="$4">
       <VStack alignItems="flex-start" spacing="$6">
-        <Breadcrumb separator="-">
+        <Breadcrumb>
           <BreadcrumbLink href="#">Home</BreadcrumbLink>
         </Breadcrumb>
         <Breadcrumb>
@@ -63,15 +52,20 @@ export function App() {
             Contact
           </BreadcrumbLink>
         </Breadcrumb>
-        <Breadcrumb separator="-">
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+        <Breadcrumb separator="-" fontSize={30}>
+          <BreadcrumbLink href="#">
+            <IconInfoCircleSolid />
+          </BreadcrumbLink>
           <BreadcrumbLink href="#">About</BreadcrumbLink>
           <BreadcrumbLink href="#" currentPage>
             Contact
           </BreadcrumbLink>
         </Breadcrumb>
-        <Breadcrumb spacing="8px" separator={<IconChevronRight color="$neutral9" />}>
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+        <Breadcrumb spacing="4px" separator={<IconChevronRight />}>
+          <BreadcrumbLink href="#">
+            <IconInfoCircleSolid />
+            Home
+          </BreadcrumbLink>
           <BreadcrumbLink href="#">About</BreadcrumbLink>
           <BreadcrumbLink href="#" currentPage>
             Contact

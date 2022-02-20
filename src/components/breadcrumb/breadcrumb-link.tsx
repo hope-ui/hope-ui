@@ -2,11 +2,11 @@ import { Show, splitProps } from "solid-js";
 
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { anchorStyles } from "../anchor/anchor.styles";
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
+import { breadcrumbLinkStyles } from "./breadcrumb.styles";
 
-interface BreadcrumbLinkOptions {
+export interface BreadcrumbLinkOptions {
   currentPage?: boolean;
 }
 
@@ -30,7 +30,12 @@ export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLin
     "href",
   ]);
 
-  const classes = () => classNames(local.class, hopeBreadcrumbLinkClass, anchorStyles());
+  const classes = () =>
+    classNames(
+      local.class,
+      hopeBreadcrumbLinkClass,
+      breadcrumbLinkStyles({ currentPage: local.currentPage })
+    );
 
   return (
     <Show
