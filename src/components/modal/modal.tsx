@@ -230,7 +230,7 @@ export function Modal(props: ModalProps) {
     }
   });
 
-  // unmount portal only after modal's content exit transition is done.
+  // For smooth transition, unmount portal only after modal's content exit transition is done.
   const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
 
   const closeOnEsc = () => props.closeOnEsc ?? true;

@@ -35,14 +35,21 @@ export const tooltipTransitionStyles = globalCss({
  * -----------------------------------------------------------------------------------------------*/
 
 export const tooltipStyles = css({
+  zIndex: "$tooltip",
   position: "absolute",
-  background: "#222",
-  color: "white",
-  fontWeight: "bold",
-  padding: "5px",
-  borderRadius: "4px",
-  fontSize: "90%",
-  pointerEvents: "none",
+
+  maxWidth: "$96",
+  boxShadow: "$md",
+  borderRadius: "$sm",
+  backgroundColor: "$neutral12",
+
+  px: "$2",
+  py: "$1",
+
+  color: "$neutral1",
+  fontSize: "$sm",
+  fontWeight: "$medium",
+  lineHeight: "$4",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -50,9 +57,9 @@ export const tooltipStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const tooltipArrowStyles = css({
+  zIndex: "$tooltip",
   position: "absolute",
-  background: "#222",
-  width: "8px",
-  height: "8px",
+  boxSize: "8px",
+  backgroundColor: "$neutral12",
   transform: "rotate(45deg)",
 });
