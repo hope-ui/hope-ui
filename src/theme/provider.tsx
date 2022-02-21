@@ -40,9 +40,9 @@ export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>)
     setColorMode(colorMode() === "light" ? "dark" : "light");
   };
 
-  const context: HopeContextValue<typeof lightTheme> = {
-    theme,
+  const context: HopeContextValue = {
     components: props.theme?.components ?? {},
+    theme,
     colorMode,
     setColorMode,
     toggleColorMode,
@@ -65,24 +65,35 @@ export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>)
 
 /**
  * Custom hook that reads from `HopeProvider` context
- * Returns the current used theme and components configs.
+ * Returns an accessor for the current used theme.
  */
-export function useTheme(): Pick<HopeContextValue, "theme" | "components"> {
+export function useTheme() {
   const context = useContext(HopeContext);
 
   if (!context) {
     throw new Error("[Hope UI]: useTheme must be used within a HopeProvider");
   }
 
-  return {
-    theme: context.theme,
-    components: context.components,
-  };
+  return context.theme;
 }
 
 /**
  * Custom hook that reads from `HopeProvider` context
- * Returns the color mode and function to toggle it
+ * Returns an accessor for the theme based components styles.
+ */
+export function useThemeComponentStyles() {
+  const context = useContext(HopeContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useThemeComponentStyles must be used within a HopeProvider");
+  }
+
+  return context.components;
+}
+
+/**
+ * Custom hook that reads from `HopeProvider` context
+ * Returns an accessor for the color mode and function to toggle it
  */
 export function useColorMode(): Pick<HopeContextValue, "colorMode" | "setColorMode" | "toggleColorMode"> {
   const context = useContext(HopeContext);

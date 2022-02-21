@@ -1,6 +1,6 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
@@ -94,7 +94,7 @@ const hopeRadioLabelClass = "hope-radio__label";
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const defaultId = `hope-radio-${createUniqueId()}`;
 
-  const theme = useTheme().components.Radio;
+  const theme = useThemeComponentStyles().Radio;
 
   const radioGroupContext = useRadioGroupContext();
 

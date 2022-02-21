@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme/provider";
+import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -16,7 +16,7 @@ const hopeTextClass = "hope-text";
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
-  const baseStyle = useTheme().components.Text?.baseStyle;
+  const baseStyle = useThemeComponentStyles().Text?.baseStyle;
 
   const defaultProps: TextProps<"p"> = {
     as: "p",

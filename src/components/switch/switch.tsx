@@ -1,6 +1,6 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
@@ -91,7 +91,7 @@ const hopeSwitchControlClass = "hope-switch__control";
 const hopeSwitchLabelClass = "hope-switch__label";
 
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
-  const theme = useTheme().components.Switch;
+  const theme = useThemeComponentStyles().Switch;
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",

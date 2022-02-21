@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -15,7 +15,7 @@ export type AlertProps<C extends ElementType = "div"> = HopeComponentProps<C, Al
 const hopeAlertClass = "hope-alert";
 
 export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
-  const theme = useTheme().components.Alert;
+  const theme = useThemeComponentStyles().Alert;
 
   const defaultProps: AlertProps<"div"> = {
     variant: theme?.defaultProps?.variant ?? "subtle",

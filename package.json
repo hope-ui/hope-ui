@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
@@ -54,7 +54,7 @@
     "test:unit": "jest --watch",
     "test:unit:ci": "jest",
     "test:unit:coverage": "jest --silent --watchAll=false --coverage",
-    "typecheck": "tsc"
+    "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
     "*.{scss,md,json}": [

@@ -1,7 +1,7 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { IconSpinner } from "@/components/icons/IconSpinner";
-import { useTheme } from "@/theme/provider";
+import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -27,7 +27,7 @@ const hopeButtonClass = "hope-button";
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useTheme().components.Button;
+  const theme = useThemeComponentStyles().Button;
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",
