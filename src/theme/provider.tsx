@@ -84,10 +84,7 @@ export function useTheme(): Pick<HopeContextValue, "theme" | "components"> {
  * Custom hook that reads from `HopeProvider` context
  * Returns the color mode and function to toggle it
  */
-export function useColorMode(): Pick<
-  HopeContextValue,
-  "colorMode" | "setColorMode" | "toggleColorMode"
-> {
+export function useColorMode(): Pick<HopeContextValue, "colorMode" | "setColorMode" | "toggleColorMode"> {
   const context = useContext(HopeContext);
 
   if (!context) {

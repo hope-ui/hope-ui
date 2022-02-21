@@ -12,10 +12,7 @@ export interface ThemeableFormLabelOptions {
   withRequiredIndicator?: boolean;
 }
 
-export type FormLabelProps<C extends ElementType = "label"> = HopeComponentProps<
-  C,
-  ThemeableFormLabelOptions
->;
+export type FormLabelProps<C extends ElementType = "label"> = HopeComponentProps<C, ThemeableFormLabelOptions>;
 
 const hopeFormLabelClass = "hope-form-label";
 

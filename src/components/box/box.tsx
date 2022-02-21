@@ -22,11 +22,7 @@ export function Box<C extends ElementType = "div">(props: BoxProps<C>) {
   );
 
   const classes = () => {
-    return classNames(
-      local.class,
-      local.className,
-      createStyledSystemClass(styleProps, local.__baseStyle)
-    );
+    return classNames(local.class, local.className, createStyledSystemClass(styleProps, local.__baseStyle));
   };
 
   return <Dynamic component={local.as ?? "div"} class={classes()} {...others} />;

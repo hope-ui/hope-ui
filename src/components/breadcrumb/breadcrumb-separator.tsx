@@ -25,9 +25,7 @@ const hopeBreadcrumbSeparatorClass = "hope-breadcrumb__separator";
 /**
  * Component that separates each breadcrumb link.
  */
-export function BreadcrumbSeparator<C extends ElementType = "span">(
-  props: BreadcrumbSeparatorProps<C>
-) {
+export function BreadcrumbSeparator<C extends ElementType = "span">(props: BreadcrumbSeparatorProps<C>) {
   const [local, others] = splitProps(props, ["class", "spacing"]);
 
   const classes = () => {

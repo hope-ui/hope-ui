@@ -79,7 +79,5 @@ export default {
   },
 };
 
-export const Default = (args: any) => (
-  <IconButton icon={<IconCart />} onClick={action("clicked")} {...args} />
-);
+export const Default = (args: any) => <IconButton icon={<IconCart />} onClick={action("clicked")} {...args} />;
 Default.storyName = "IconButton";

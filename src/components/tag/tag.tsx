@@ -40,8 +40,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const classes = () => classNames(local.class, hopeTagClass, tagStyles(variantProps));
 
   const borderRadius = () =>
-    others.borderRadius ??
-    (theme?.baseStyle?.borderRadius as ResponsiveValue<RadiiProps["borderRadius"]>);
+    others.borderRadius ?? (theme?.baseStyle?.borderRadius as ResponsiveValue<RadiiProps["borderRadius"]>);
 
   return (
     <TagProvider borderRadius={borderRadius()}>

@@ -7,10 +7,7 @@ import { ElementType, HopeComponentProps } from "../types";
 import { inputElementStyles, InputElementVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
-export type InputElementProps<C extends ElementType = "div"> = HopeComponentProps<
-  C,
-  InputElementVariants
->;
+export type InputElementProps<C extends ElementType = "div"> = HopeComponentProps<C, InputElementVariants>;
 
 export function InputElement<C extends ElementType = "div">(props: InputElementProps<C>) {
   const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "size"]);
@@ -38,14 +35,7 @@ export function InputLeftElement<C extends ElementType = "div">(props: InputLeft
   onMount(() => inputGroup?.setHasLeftElement(true));
   onCleanup(() => inputGroup?.setHasLeftElement(false));
 
-  return (
-    <InputElement
-      class={classes()}
-      placement="left"
-      size={inputGroup?.state.size ?? "md"}
-      {...others}
-    />
-  );
+  return <InputElement class={classes()} placement="left" size={inputGroup?.state.size ?? "md"} {...others} />;
 }
 
 InputLeftElement.toString = () => createClassSelector(hopeInputLeftElementClass);
@@ -68,14 +58,7 @@ export function InputRightElement<C extends ElementType = "div">(props: InputRig
   onMount(() => inputGroup?.setHasRightElement(true));
   onCleanup(() => inputGroup?.setHasRightElement(false));
 
-  return (
-    <InputElement
-      class={classes()}
-      placement="right"
-      size={inputGroup?.state.size ?? "md"}
-      {...others}
-    />
-  );
+  return <InputElement class={classes()} placement="right" size={inputGroup?.state.size ?? "md"} {...others} />;
 }
 
 InputRightElement.toString = () => createClassSelector(hopeInputRightElementClass);

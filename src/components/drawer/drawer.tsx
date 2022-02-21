@@ -20,10 +20,7 @@ interface DrawerOptions extends DrawerDialogVariants {
   disableTransition?: boolean;
 }
 
-export type DrawerProps = RightJoinProps<
-  Omit<ModalProps, "scrollBehavior" | "centered" | "transition">,
-  DrawerOptions
->;
+export type DrawerProps = RightJoinProps<Omit<ModalProps, "scrollBehavior" | "centered" | "transition">, DrawerOptions>;
 
 type DrawerContextValue = Required<DrawerOptions>;
 
@@ -40,12 +37,7 @@ export function useDrawerContext() {
 }
 
 export function Drawer(props: DrawerProps) {
-  const [, modalProps] = splitProps(props, [
-    "placement",
-    "size",
-    "fullHeight",
-    "disableTransition",
-  ]);
+  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableTransition"]);
 
   const [state] = createStore<DrawerContextValue>({
     get placement() {

@@ -13,8 +13,7 @@ const hopeAlertDescriptionClass = "hope-alert-description";
 export function AlertDescription<C extends ElementType = "div">(props: AlertDescriptionProps<C>) {
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () =>
-    classNames(local.class, hopeAlertDescriptionClass, alertDescriptionStyles());
+  const classes = () => classNames(local.class, hopeAlertDescriptionClass, alertDescriptionStyles());
 
   return <Box class={classes()} {...others} />;
 }

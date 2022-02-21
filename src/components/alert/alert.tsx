@@ -22,11 +22,7 @@ export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
   };
 
   const propsWithDefault: AlertProps<"div"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
-    propsWithDefault,
-    ["class"],
-    ["variant", "status"]
-  );
+  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["variant", "status"]);
 
   const classes = () => classNames(local.class, hopeAlertClass, alertStyles(variantProps));
 

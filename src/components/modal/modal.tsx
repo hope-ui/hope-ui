@@ -1,12 +1,4 @@
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  Show,
-  useContext,
-} from "solid-js";
+import { createContext, createEffect, createSignal, createUniqueId, JSX, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
@@ -18,7 +10,7 @@ interface ModalState {
   /**
    * If `true`, the modal will be open.
    */
-  isOpen: boolean;
+  opened: boolean;
 
   /**
    * The `id` of the modal dialog
@@ -119,7 +111,7 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   /**
    * If `true`, the modal will be open.
    */
-  isOpen: boolean;
+  opened: boolean;
 
   /**
    * Callback invoked to close the modal.
@@ -180,8 +172,8 @@ export function Modal(props: ModalProps) {
   const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
   const [state, setState] = createStore<ModalState>({
-    get isOpen() {
-      return props.isOpen;
+    get opened() {
+      return props.opened;
     },
     get dialogId() {
       return props.id ?? defaultDialogId;
@@ -221,8 +213,8 @@ export function Modal(props: ModalProps) {
   const [isPortalMounted, setIsPortalMounted] = createSignal(false);
 
   createEffect(() => {
-    if (state.isOpen) {
-      // mount portal when state `isOpen` is true.
+    if (state.opened) {
+      // mount portal when state `opened` is true.
       setIsPortalMounted(true);
     } else {
       // unmount portal instantly when there is no modal transition.

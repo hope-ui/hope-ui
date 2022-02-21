@@ -16,10 +16,7 @@ export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
   separator?: string | JSX.Element;
 }
 
-export type BreadcrumbProps<C extends ElementType = "nav"> = HopeComponentProps<
-  C,
-  BreadcrumbOptions
->;
+export type BreadcrumbProps<C extends ElementType = "nav"> = HopeComponentProps<C, BreadcrumbOptions>;
 
 const hopeBreadcrumbClass = "hope-breadcrumb";
 const hopeBreadcrumbListClass = "hope-breadcrumb__list";
@@ -36,12 +33,7 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
   };
 
   const propsWithDefault: BreadcrumbProps<"nav"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "children",
-    "separator",
-    "spacing",
-  ]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "children", "separator", "spacing"]);
 
   const rootClasses = () => classNames(local.class, hopeBreadcrumbClass, breadcrumbStyles());
 

@@ -15,9 +15,7 @@ export function App() {
     <Box p="$4">
       <VStack alignItems="start" spacing="$4">
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
-        <Button onClick={() => setIsOpen(prev => !prev)}>
-          Toggle tooltip: {isOpen().toString()}
-        </Button>
+        <Button onClick={() => setIsOpen(prev => !prev)}>Toggle tooltip: {isOpen().toString()}</Button>
         <Tooltip label="HI MOM !" hasArrow arrowSize={10} isOpen={isOpen()} placement="top">
           <Button>Hover me</Button>
         </Tooltip>

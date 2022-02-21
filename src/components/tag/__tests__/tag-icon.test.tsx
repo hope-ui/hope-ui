@@ -45,9 +45,7 @@ describe("TagLeftIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <TagLeftIcon data-testid="tag-left-icon" class={stubClass} as={IconUser} />
-    ));
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" class={stubClass} as={IconUser} />);
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -135,9 +133,7 @@ describe("TagRightIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <TagRightIcon data-testid="tag-right-icon" class={stubClass} as={IconUser} />
-    ));
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" class={stubClass} as={IconUser} />);
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert

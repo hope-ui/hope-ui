@@ -1,13 +1,5 @@
 import type { Placement as FloatingUIPlacement } from "@floating-ui/dom";
-import {
-  arrow,
-  computePosition,
-  flip,
-  getScrollParents,
-  inline,
-  offset,
-  shift,
-} from "@floating-ui/dom";
+import { arrow, computePosition, flip, getScrollParents, inline, offset, shift } from "@floating-ui/dom";
 import {
   children,
   createEffect,
@@ -28,12 +20,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import {
-  tooltipArrowStyles,
-  tooltipStyles,
-  tooltipTransitionName,
-  tooltipTransitionStyles,
-} from "./tooltip.styles";
+import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName, tooltipTransitionStyles } from "./tooltip.styles";
 
 export interface TooltipOptions {
   /**
@@ -54,18 +41,18 @@ export interface TooltipOptions {
   /**
    * If `true`, the tooltip will be shown (in controlled mode)
    */
-  isOpen?: boolean;
+  opened?: boolean;
 
   /**
    * If `true`, the tooltip will be initially shown
    */
-  defaultIsOpen?: boolean;
+  defaultOpened?: boolean;
 
   /**
    * If `true`, apply floating-ui `inline` middleware.
    * Useful for inline reference elements that span over multiple lines, such as hyperlinks or range selections.
    */
-  isInline?: boolean;
+  inline?: boolean;
 
   /**
    * The label of the tooltip.
@@ -89,7 +76,7 @@ export interface TooltipOptions {
   /**
    * If `true`, the tooltip will show an arrow tip
    */
-  hasArrow?: boolean;
+  withArrow?: boolean;
 
   /**
    * Size of the arrow.
@@ -160,13 +147,13 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     "children",
     "id",
     "label",
-    "isOpen",
-    "defaultIsOpen",
-    "isInline",
+    "opened",
+    "defaultOpened",
+    "inline",
     "disabled",
     "placement",
     "offset",
-    "hasArrow",
+    "withArrow",
     "arrowSize",
     "arrowPadding",
     "openDelay",
@@ -179,7 +166,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
   // Internal state for uncontrolled tooltip.
   // eslint-disable-next-line solid/reactivity
-  const [isOpenState, setIsOpenState] = createSignal(!!local.defaultIsOpen);
+  const [openedState, setOpenedState] = createSignal(!!local.defaultOpened);
 
   const [isPortalMounted, setIsPortalMounted] = createSignal(false);
 
@@ -189,8 +176,8 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   let enterTimeout: number | undefined;
   let exitTimeout: number | undefined;
 
-  const isControlled = () => local.isOpen !== undefined;
-  const isOpen = () => (isControlled() ? local.isOpen : isOpenState());
+  const isControlled = () => local.opened !== undefined;
+  const opened = () => (isControlled() ? local.opened : openedState());
 
   const tooltipClasses = () => classNames(local.class, hopeTooltipClass, tooltipStyles());
   const arrowClasses = () => classNames(hopeTooltipArrowClass, tooltipArrowStyles());
@@ -221,25 +208,21 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
     const middleware = [offset(local.offset)];
 
-    if (local.isInline) {
+    if (local.inline) {
       middleware.push(inline());
     }
 
     middleware.push(flip());
     middleware.push(shift());
 
-    if (local.hasArrow && arrowElement) {
+    if (local.withArrow && arrowElement) {
       middleware.push(arrow({ element: arrowElement, padding: local.arrowPadding }));
     }
 
-    const { x, y, placement, middlewareData } = await computePosition(
-      triggerElement,
-      tooltipElement,
-      {
-        placement: local.placement,
-        middleware,
-      }
-    );
+    const { x, y, placement, middlewareData } = await computePosition(triggerElement, tooltipElement, {
+      placement: local.placement,
+      middleware,
+    });
 
     if (!tooltipElement) {
       return;
@@ -278,7 +261,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
   const onOpen = () => {
     if (!isControlled()) {
-      setIsOpenState(true);
+      setOpenedState(true);
     }
 
     local.onOpen?.();
@@ -287,7 +270,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
   const onClose = () => {
     if (!isControlled()) {
-      setIsOpenState(false);
+      setOpenedState(false);
     }
 
     local.onClose?.();
@@ -320,7 +303,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (isOpen() && event.key === "Escape") {
+    if (opened() && event.key === "Escape") {
       closeWithDelay();
     }
   };
@@ -351,7 +334,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
   const beforeToolipEnterTransition = () => {
     if (isControlled()) {
-      // schedule a micro task so the tooltip appear with the right position.
+      // schedule a micro task so the tooltip appear in the right position.
       Promise.resolve().then(updateTooltipPosition);
     }
   };
@@ -393,7 +376,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   });
 
   createEffect(() => {
-    if (isOpen()) {
+    if (opened()) {
       // mount portal only when `isTooltipVisible` is true.
       setIsPortalMounted(true);
 
@@ -420,16 +403,10 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
             onAfterEnter={afterToolipEnterTransition}
             onAfterExit={afterToolipExitTransition}
           >
-            <Show when={isOpen()}>
-              <Box
-                ref={tooltipElement}
-                role="tooltip"
-                id={local.id}
-                class={tooltipClasses()}
-                {...others}
-              >
+            <Show when={opened()}>
+              <Box ref={tooltipElement} role="tooltip" id={local.id} class={tooltipClasses()} {...others}>
                 {local.label}
-                <Show when={local.hasArrow}>
+                <Show when={local.withArrow}>
                   <Box ref={arrowElement} class={arrowClasses()} boxSize={local.arrowSize} />
                 </Show>
               </Box>

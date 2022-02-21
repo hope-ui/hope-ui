@@ -99,9 +99,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <Icon classList={{ [stubClass]: true }} data-testid="icon" as={IconUser} />
-    ));
+    renderWithHopeProvider(() => <Icon classList={{ [stubClass]: true }} data-testid="icon" as={IconUser} />);
     const icon = screen.getByTestId("icon");
 
     // assert

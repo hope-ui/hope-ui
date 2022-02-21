@@ -8,7 +8,7 @@ import { visuallyHiddenStyles } from "@/theme/utils";
  * Radio - input
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioInputStyles = css();
+export const radioInputStyles = css(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - container

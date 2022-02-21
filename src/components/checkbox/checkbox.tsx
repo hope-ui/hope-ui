@@ -1,14 +1,4 @@
-import {
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  Match,
-  mergeProps,
-  Show,
-  splitProps,
-  Switch,
-} from "solid-js";
+import { createSignal, createUniqueId, JSX, Match, mergeProps, Show, splitProps, Switch } from "solid-js";
 
 import { useTheme } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -61,6 +51,11 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
    * You'll need to pass `onChange` to update its value (since it is now controlled)
    */
   checked?: boolean;
+
+  /**
+   * If `true`, the checkbox will be initially checked.
+   */
+  defaultChecked?: boolean;
 
   /**
    * If `true`, the checkbox will be indeterminate.
@@ -116,9 +111,6 @@ const hopeCheckboxLabelClass = "hope-checkbox__label";
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const theme = useTheme().components.Checkbox;
 
-  // eslint-disable-next-line solid/reactivity
-  const [checkedState, setCheckedState] = createSignal(!!props.checked);
-
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
     id: `hope-checkbox-${createUniqueId()}`,
@@ -133,7 +125,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["iconChecked", "iconIndeterminate", "checked", "invalid", "onChange", "class", "children"],
+    ["iconChecked", "iconIndeterminate", "checked", "defaultChecked", "invalid", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -153,8 +145,15 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     ["variant", "colorScheme", "size", "labelPosition"]
   );
 
+  // Internal state for uncontrolled checkbox.
+  // eslint-disable-next-line solid/reactivity
+  const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
+
+  const isControlled = () => local.checked !== undefined;
+  const checked = () => (isControlled() ? local.checked : checkedState());
+
   // Input loose focus if this is placed in `dataAttrs()`
-  const dataChecked = () => (checkedState() ? "" : undefined);
+  const dataChecked = () => (checked() ? "" : undefined);
 
   const dataAttrs = () => ({
     "data-indeterminate": inputProps.indeterminate ? "" : undefined,
@@ -189,17 +188,13 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       return;
     }
 
-    const target = event.target as HTMLInputElement;
-    setCheckedState(target.checked);
+    if (!isControlled()) {
+      const target = event.target as HTMLInputElement;
+      setCheckedState(target.checked);
+    }
 
     callAllHandlers(local.onChange)(event);
   };
-
-  createEffect(() => {
-    if (local.checked !== undefined) {
-      setCheckedState(local.checked);
-    }
-  });
 
   return (
     <Box
@@ -214,7 +209,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       <input
         type="checkbox"
         class={inputClasses()}
-        checked={checkedState()}
+        checked={checked()}
         onChange={onChange}
         {...inputProps}
         {...ariaAttrs}
@@ -222,7 +217,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs}>
         <Switch>
           <Match when={inputProps.indeterminate}>{local.iconIndeterminate}</Match>
-          <Match when={checkedState() && !inputProps.indeterminate}>{local.iconChecked}</Match>
+          <Match when={checked() && !inputProps.indeterminate}>{local.iconChecked}</Match>
         </Switch>
       </span>
       <Show when={local.children}>

@@ -28,7 +28,7 @@ export function ModalOverlay<C extends ElementType = "div">(props: ModalOverlayP
 
   return (
     <Transition name={transitionName()} appear>
-      <Show when={modalContext.state.isOpen}>
+      <Show when={modalContext.state.opened}>
         <Box class={classes()} {...others} />
       </Show>
     </Transition>

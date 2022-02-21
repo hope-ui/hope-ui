@@ -20,12 +20,7 @@ module.exports = {
   // Code coverage config
   // https://jestjs.io/docs/configuration#collectcoveragefrom-array
   coverageDirectory: "<rootDir>/coverage/",
-  collectCoverageFrom: [
-    "<rootDir>/src/**/*.{ts,tsx}",
-    "!**/__mocks__/**",
-    "!**/node_modules/**",
-    "!**/*.d.ts",
-  ],
+  collectCoverageFrom: ["<rootDir>/src/**/*.{ts,tsx}", "!**/__mocks__/**", "!**/node_modules/**", "!**/*.d.ts"],
 
   moduleNameMapper: {
     // SolidJS cannot detect browser mode here,

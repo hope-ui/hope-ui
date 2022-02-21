@@ -252,8 +252,7 @@ export const pseudoSelectors = {
    * Styles to apply when a sibling element with `.peer` or `data-peer` is hovered
    */
   _peerHover: (value: CSS) => ({
-    "[data-peer]:hover ~ &, [data-peer][data-hover] ~ &, .peer:hover ~ &, .peer[data-hover] ~ &":
-      value,
+    "[data-peer]:hover ~ &, [data-peer][data-hover] ~ &, .peer:hover ~ &, .peer[data-hover] ~ &": value,
   }),
 
   /**
@@ -268,8 +267,7 @@ export const pseudoSelectors = {
    * Styles to apply when a sibling element with `.peer` or `data-peer` is focused
    */
   _peerFocus: (value: CSS) => ({
-    "[data-peer]:focus ~ &, [data-peer][data-focus] ~ &, .peer:focus ~ &, .peer[data-focus] ~ &":
-      value,
+    "[data-peer]:focus ~ &, [data-peer][data-focus] ~ &, .peer:focus ~ &, .peer[data-focus] ~ &": value,
   }),
 
   /**
@@ -298,8 +296,7 @@ export const pseudoSelectors = {
    * Styles to apply when a sibling element with `.peer` or `data-peer` is active
    */
   _peerActive: (value: CSS) => ({
-    "[data-peer]:active ~ &, [data-peer][data-active] ~ &, .peer:active ~ &, .peer[data-active] ~ &":
-      value,
+    "[data-peer]:active ~ &, [data-peer][data-active] ~ &, .peer:active ~ &, .peer[data-active] ~ &": value,
   }),
 
   /**
@@ -314,8 +311,7 @@ export const pseudoSelectors = {
    *  Styles to apply when a sibling element with `.peer` or `data-peer` is disabled
    */
   _peerDisabled: (value: CSS) => ({
-    "[data-peer]:disabled ~ &, [data-peer][data-disabled] ~ &, .peer:disabled ~ &, .peer[data-disabled] ~ &":
-      value,
+    "[data-peer]:disabled ~ &, [data-peer][data-disabled] ~ &, .peer:disabled ~ &, .peer[data-disabled] ~ &": value,
   }),
 
   /**
@@ -330,8 +326,7 @@ export const pseudoSelectors = {
    *  Styles to apply when a sibling element with `.peer` or `data-peer` is invalid
    */
   _peerInvalid: (value: CSS) => ({
-    "[data-peer]:invalid ~ &, [data-peer][data-invalid] ~ &, .peer:invalid ~ &, .peer[data-invalid] ~ &":
-      value,
+    "[data-peer]:invalid ~ &, [data-peer][data-invalid] ~ &, .peer:invalid ~ &, .peer[data-invalid] ~ &": value,
   }),
 
   /**
@@ -346,8 +341,7 @@ export const pseudoSelectors = {
    * Styles to apply when a sibling element with `.peer` or `data-peer` is checked
    */
   _peerChecked: (value: CSS) => ({
-    "[data-peer]:checked ~ &, [data-peer][data-checked] ~ &, .peer:checked ~ &, .peer[data-checked] ~ &":
-      value,
+    "[data-peer]:checked ~ &, [data-peer][data-checked] ~ &, .peer:checked ~ &, .peer[data-checked] ~ &": value,
   }),
 
   /**

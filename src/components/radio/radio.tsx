@@ -1,12 +1,4 @@
-import {
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  mergeProps,
-  Show,
-  splitProps,
-} from "solid-js";
+import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { useTheme } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -49,6 +41,11 @@ interface RadioOptions extends ThemeableRadioOptions {
    * You'll need to pass `onChange` to update its value (since it is now controlled)
    */
   checked?: boolean;
+
+  /**
+   * If `true`, the radio will be initially checked.
+   */
+  defaultChecked?: boolean;
 
   /**
    * If `true`, the radio input is marked as required,
@@ -95,19 +92,19 @@ const hopeRadioControlClass = "hope-radio__control";
 const hopeRadioLabelClass = "hope-radio__label";
 
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
-  const theme = useTheme().components.Radio;
-  const radioGroupContext = useRadioGroupContext();
+  const defaultId = `hope-radio-${createUniqueId()}`;
 
-  // eslint-disable-next-line solid/reactivity
-  const [internalCheckedState, setInternalCheckedState] = createSignal(!!props.checked);
+  const theme = useTheme().components.Radio;
+
+  const radioGroupContext = useRadioGroupContext();
 
   const defaultProps: RadioProps<"label"> = {
     as: "label",
-    id: `hope-radio-${createUniqueId()}`,
-    variant: theme?.defaultProps?.variant ?? "outline",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
-    labelPosition: theme?.defaultProps?.labelPosition ?? "right",
+    id: defaultId,
+    variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.variant ?? "outline",
+    colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.colorScheme ?? "primary",
+    size: radioGroupContext?.state?.size ?? theme?.defaultProps?.size ?? "md",
+    labelPosition: radioGroupContext?.state?.labelPosition ?? theme?.defaultProps?.labelPosition ?? "right",
 
     name: radioGroupContext?.state.name,
     required: radioGroupContext?.state.required,
@@ -119,7 +116,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const propsWithDefaults: RadioProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["checked", "invalid", "onChange", "class", "children"],
+    ["checked", "defaultChecked", "invalid", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -138,16 +135,21 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     ["variant", "colorScheme", "size", "labelPosition"]
   );
 
-  const checkedState = () => {
-    if (radioGroupContext && inputProps.value != null) {
-      return inputProps.value === radioGroupContext.state.value;
+  // Internal state for uncontrolled radio.
+  // eslint-disable-next-line solid/reactivity
+  const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
+
+  const isControlled = () => local.checked !== undefined;
+  const checked = () => {
+    if (radioGroupContext?.state.value != null && inputProps?.value != null) {
+      return radioGroupContext.state.value === inputProps.value;
     }
 
-    return internalCheckedState();
+    return isControlled() ? local.checked : checkedState();
   };
 
   // Input loose focus if this is placed in `dataAttrs()`
-  const dataChecked = () => (checkedState() ? "" : undefined);
+  const dataChecked = () => (checked() ? "" : undefined);
 
   const dataAttrs = () => ({
     "data-required": inputProps.required ? "" : undefined,
@@ -181,17 +183,13 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return;
     }
 
-    const target = event.target as HTMLInputElement;
-    setInternalCheckedState(target.checked);
-
-    callAllHandlers(local.onChange, radioGroupContext?.onChange)(event);
-  };
-
-  createEffect(() => {
-    if (local.checked !== undefined) {
-      setInternalCheckedState(local.checked);
+    if (!isControlled()) {
+      const target = event.target as HTMLInputElement;
+      setCheckedState(target.checked);
     }
-  });
+
+    callAllHandlers(radioGroupContext?.onChange, local.onChange)(event);
+  };
 
   return (
     <Box
@@ -206,17 +204,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       <input
         type="radio"
         class={inputClasses()}
-        checked={checkedState()}
+        checked={checked()}
         onChange={onChange}
         {...inputProps}
         {...ariaAttrs}
       />
-      <span
-        aria-hidden={true}
-        class={controlClasses()}
-        data-checked={dataChecked()}
-        {...dataAttrs}
-      />
+      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs} />
       <Show when={local.children}>
         <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
           {local.children}

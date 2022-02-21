@@ -31,7 +31,7 @@ export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverla
 
   return (
     <Transition name={transitionName()} appear>
-      <Show when={modalContext.state.isOpen}>
+      <Show when={modalContext.state.opened}>
         <Box class={classes()} {...others} />
       </Show>
     </Transition>

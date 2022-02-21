@@ -27,10 +27,7 @@ export interface InputGroupContextValue {
 
 export type ThemeableInputGroupOptions = Partial<Pick<InputGroupState, "variant" | "size">>;
 
-export type InputGroupProps<C extends ElementType = "div"> = HopeComponentProps<
-  C,
-  ThemeableInputGroupOptions
->;
+export type InputGroupProps<C extends ElementType = "div"> = HopeComponentProps<C, ThemeableInputGroupOptions>;
 
 const InputGroupContext = createContext<InputGroupContextValue>();
 

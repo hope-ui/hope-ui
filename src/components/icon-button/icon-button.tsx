@@ -13,15 +13,9 @@ export interface IconButtonOptions
   icon: JSX.Element;
 }
 
-export type ThemeableIconButtonOptions = Pick<
-  ThemeableButtonOptions,
-  "variant" | "colorScheme" | "size"
->;
+export type ThemeableIconButtonOptions = Pick<ThemeableButtonOptions, "variant" | "colorScheme" | "size">;
 
-export type IconButtonProps<C extends ElementType = "button"> = HopeComponentProps<
-  C,
-  IconButtonOptions
->;
+export type IconButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, IconButtonOptions>;
 
 const hopeIconButtonClass = "hope-icon-button";
 
@@ -43,9 +37,7 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
 
   const classes = () => classNames(local.class, hopeIconButtonClass, iconButtonStyles());
 
-  return (
-    <Button class={classes()} __baseStyle={theme?.baseStyle} leftIcon={local.icon} {...others} />
-  );
+  return <Button class={classes()} __baseStyle={theme?.baseStyle} leftIcon={local.icon} {...others} />;
 }
 
 IconButton.toString = () => createClassSelector(hopeIconButtonClass);

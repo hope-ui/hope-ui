@@ -93,4 +93,4 @@
 | Menu    |             |            |       |           |      |
 | Modal   |     ✅      |     ✅     |       |           |      |
 | Popover |             |            |       |           |      |
-| Tooltip |             |            |       |           |      |
+| Tooltip |     ✅      |     ✅     |       |           |      |

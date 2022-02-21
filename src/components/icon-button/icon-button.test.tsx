@@ -72,9 +72,7 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithHopeProvider(() => <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -146,9 +144,7 @@ describe("IconButton", () => {
     const buttonClass = buttonStyles(variantProps);
 
     // act
-    renderWithHopeProvider(() => (
-      <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />
-    ));
+    renderWithHopeProvider(() => <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />);
     const button = screen.getByRole("button");
 
     // assert

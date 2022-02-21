@@ -104,9 +104,7 @@ describe("TagCloseButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithTagContextProvider(() => (
-      <TagCloseButton classList={{ [stubClass]: true }} aria-label="Close" />
-    ));
+    renderWithTagContextProvider(() => <TagCloseButton classList={{ [stubClass]: true }} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
