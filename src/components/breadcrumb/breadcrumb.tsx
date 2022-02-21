@@ -1,35 +1,25 @@
 import { children, For, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { MarginProps } from "@/styled-system/props/margin";
-import { ResponsiveValue } from "@/styled-system/types";
 import { isArray } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
-import { breadcrumbItemStyles, breadcrumbListStyles } from "./breadcrumb.styles";
+import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
+import { BreadcrumbItem } from "./breadcrumb-item";
+import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
 
-export interface BreadcrumbOptions {
+export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
   /**
    * The visual separator between each breadcrumb item
    */
   separator?: string | JSX.Element;
-
-  /**
-   * The left and right margin applied to the separator
-   */
-  spacing?: ResponsiveValue<MarginProps["mx"]>;
 }
 
-export type BreadcrumbProps<C extends ElementType = "nav"> = HopeComponentProps<
-  C,
-  BreadcrumbOptions
->;
+export type BreadcrumbProps<C extends ElementType = "nav"> = HopeComponentProps<C, BreadcrumbOptions>;
 
 const hopeBreadcrumbClass = "hope-breadcrumb";
 const hopeBreadcrumbListClass = "hope-breadcrumb__list";
-const hopeBreadcrumbItemClass = "hope-breadcrumb__list-item";
-const hopeBreadcrumbSeparatorClass = "hope-breadcrumb__separator";
 
 /**
  * Breadcrumb is used to render a breadcrumb navigation landmark.
@@ -43,18 +33,11 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
   };
 
   const propsWithDefault: BreadcrumbProps<"nav"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "children",
-    "separator",
-    "spacing",
-  ]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "children", "separator", "spacing"]);
 
-  const rootClasses = () => classNames(local.class, hopeBreadcrumbClass);
+  const rootClasses = () => classNames(local.class, hopeBreadcrumbClass, breadcrumbStyles());
 
   const listClasses = () => classNames(hopeBreadcrumbListClass, breadcrumbListStyles());
-
-  const itemClasses = () => classNames(hopeBreadcrumbItemClass, breadcrumbItemStyles());
 
   const links = () => {
     const items = children(() => local.children)();
@@ -70,19 +53,12 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
       <Box as="ol" class={listClasses()}>
         <For each={links()}>
           {(link, index) => (
-            <li class={itemClasses()}>
+            <BreadcrumbItem>
               {link}
               <Show when={!isLastLink(index())}>
-                <Box
-                  as="span"
-                  role="presentation"
-                  class={hopeBreadcrumbSeparatorClass}
-                  mx={local.spacing}
-                >
-                  {local.separator}
-                </Box>
+                <BreadcrumbSeparator spacing={local.spacing}>{local.separator}</BreadcrumbSeparator>
               </Show>
-            </li>
+            </BreadcrumbItem>
           )}
         </For>
       </Box>

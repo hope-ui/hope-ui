@@ -3,8 +3,5 @@
  * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-export type RightJoinProps<SourceProps = {}, OverrideProps = {}> = Omit<
-  SourceProps,
-  keyof OverrideProps
-> &
+export type RightJoinProps<SourceProps = {}, OverrideProps = {}> = Omit<SourceProps, keyof OverrideProps> &
   OverrideProps;

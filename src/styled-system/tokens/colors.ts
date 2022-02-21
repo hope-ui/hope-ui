@@ -142,6 +142,7 @@ const danger = {
 };
 
 const semanticColors = {
+  appBg: "white",
   panelBg: "white",
   focusRing: "#96c7f2",
 };
@@ -257,6 +258,7 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
+  appBg: "$neutral1",
   panelBg: "$neutral3",
   focusRing: "#0a4481",
 };

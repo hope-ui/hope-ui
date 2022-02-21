@@ -6,10 +6,7 @@ import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
 import { containerStyles, ContainerVariants } from "./container.styles";
 
-export type ContainerProps<C extends ElementType = "div"> = HopeComponentProps<
-  C,
-  ContainerVariants
->;
+export type ContainerProps<C extends ElementType = "div"> = HopeComponentProps<C, ContainerVariants>;
 
 const hopeContainerClass = "hope-container";
 
@@ -26,11 +23,7 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
   };
 
   const propsWithDefault: ContainerProps<"div"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
-    propsWithDefault,
-    ["class"],
-    ["centered", "centerContent"]
-  );
+  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["centered", "centerContent"]);
 
   const classes = () => classNames(local.class, hopeContainerClass, containerStyles(variantProps));
 

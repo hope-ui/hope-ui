@@ -90,12 +90,8 @@ export default {
 
 export const Default = (args: any) => <Button {...args} onClick={action("clicked")} />;
 
-export const WithLeftIcon = (args: any) => (
-  <Button leftIcon={<IconCart />} onClick={action("clicked")} {...args} />
-);
+export const WithLeftIcon = (args: any) => <Button leftIcon={<IconCart />} onClick={action("clicked")} {...args} />;
 WithLeftIcon.storyName = "With left icon";
 
-export const WithRightIcon = (args: any) => (
-  <Button rightIcon={<IconCart />} onClick={action("clicked")} {...args} />
-);
+export const WithRightIcon = (args: any) => <Button rightIcon={<IconCart />} onClick={action("clicked")} {...args} />;
 WithRightIcon.storyName = "With right icon";

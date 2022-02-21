@@ -47,9 +47,7 @@ export interface FormControlProps<T extends HTMLElement> {
  *
  * @internal
  */
-export function useFormControl<T extends HTMLElement>(
-  props: UseFormControlProps<T>
-): Accessor<FormControlProps<T>> {
+export function useFormControl<T extends HTMLElement>(props: UseFormControlProps<T>): Accessor<FormControlProps<T>> {
   const formControl = useFormControlContext();
 
   const id = () => props.id ?? formControl?.state.id;

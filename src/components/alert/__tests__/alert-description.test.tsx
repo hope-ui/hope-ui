@@ -10,9 +10,7 @@ describe("AlertDescription", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>
-    ));
+    renderWithHopeProvider(() => <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>);
     const alertDescription = screen.getByTestId("alert-description");
 
     // assert
@@ -21,9 +19,7 @@ describe("AlertDescription", () => {
 
   it("should render <div> tag by default", () => {
     // act
-    renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>
-    ));
+    renderWithHopeProvider(() => <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>);
     const alertDescription = screen.getByTestId("alert-description");
 
     // assert
@@ -48,9 +44,7 @@ describe("AlertDescription", () => {
     const children = "AlertDescription";
 
     // act
-    renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description">{children}</AlertDescription>
-    ));
+    renderWithHopeProvider(() => <AlertDescription data-testid="alert-description">{children}</AlertDescription>);
     const alertDescription = screen.getByTestId("alert-description");
 
     // assert
@@ -59,9 +53,7 @@ describe("AlertDescription", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>
-    ));
+    renderWithHopeProvider(() => <AlertDescription data-testid="alert-description">AlertDescription</AlertDescription>);
     const alertDescription = screen.getByTestId("alert-description");
 
     // assert
@@ -126,9 +118,7 @@ describe("AlertDescription", () => {
     const alertDescriptionClass = alertDescriptionStyles();
 
     // act
-    renderWithHopeProvider(() => (
-      <AlertDescription data-testid="alert-description">Text</AlertDescription>
-    ));
+    renderWithHopeProvider(() => <AlertDescription data-testid="alert-description">Text</AlertDescription>);
     const alertDescription = screen.getByTestId("alert-description");
 
     // assert

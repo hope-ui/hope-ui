@@ -26,8 +26,7 @@ export function ModalCloseButton(props: CloseButtonProps) {
   const propsWithDefaults = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefaults, ["class", "onClick"]);
 
-  const classes = () =>
-    classNames(local.class, hopeModalCloseButtonClass, modalCloseButtonStyles());
+  const classes = () => classNames(local.class, hopeModalCloseButtonClass, modalCloseButtonStyles());
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     const allHandlers = callAllHandlers(local.onClick, e => {

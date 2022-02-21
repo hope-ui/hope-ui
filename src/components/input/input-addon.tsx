@@ -7,17 +7,10 @@ import { ElementType, HopeComponentProps } from "../types";
 import { inputAddonStyles, InputAddonVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
-export type InputAddonProps<C extends ElementType = "div"> = HopeComponentProps<
-  C,
-  InputAddonVariants
->;
+export type InputAddonProps<C extends ElementType = "div"> = HopeComponentProps<C, InputAddonVariants>;
 
 export function InputAddon<C extends ElementType = "div">(props: InputAddonProps<C>) {
-  const [local, variantProps, others] = splitProps(
-    props,
-    ["class"],
-    ["placement", "variant", "size"]
-  );
+  const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "variant", "size"]);
 
   const classes = () => classNames(local.class, inputAddonStyles(variantProps));
 

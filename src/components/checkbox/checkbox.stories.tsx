@@ -34,9 +34,6 @@ export default {
       control: { type: "select" },
       options: ["left", "right"],
     },
-    checked: {
-      control: { type: "boolean" },
-    },
     indeterminate: {
       control: { type: "boolean" },
     },
@@ -58,7 +55,6 @@ export default {
     colorScheme: "primary",
     size: "md",
     labelPosition: "right",
-    checked: false,
     indeterminate: false,
     invalid: false,
     disabled: false,
@@ -76,9 +72,7 @@ export const Default = (args: any) => {
 
   return (
     <VStack spacing="$5">
-      <Button onClick={() => setChecked(prev => !prev)}>
-        Toggle controlled checkbox ({checked().toString()})
-      </Button>
+      <Button onClick={() => setChecked(prev => !prev)}>Toggle controlled checkbox ({checked().toString()})</Button>
       <HStack spacing="$5">
         <Checkbox {...args} checked={checked()} onChange={onChange}>
           Controlled

@@ -25,8 +25,7 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const propsWithDefault: HeadingProps<"h2"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["class", "size"]);
 
-  const classes = () =>
-    classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
+  const classes = () => classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
   return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
 }

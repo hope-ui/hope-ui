@@ -58,9 +58,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   };
 
   const ariaLabelledBy = () => {
-    return modalContext.state.headerMounted
-      ? modalContext.state.headerId
-      : local["aria-labelledby"];
+    return modalContext.state.headerMounted ? modalContext.state.headerId : local["aria-labelledby"];
   };
 
   const ariaDescribedBy = () => {
@@ -111,7 +109,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
       onBeforeExit={disableFocusTrapAndScrollLock}
       onAfterExit={modalContext.onModalContentExitTransitionEnd}
     >
-      <Show when={modalContext.state.isOpen}>
+      <Show when={modalContext.state.opened}>
         <Box
           ref={containerRef}
           class={containerClasses()}

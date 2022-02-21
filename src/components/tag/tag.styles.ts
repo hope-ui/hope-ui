@@ -144,9 +144,7 @@ interface TagOutlineCompoundVariantConfig {
   closeButtonBgColorActive: string;
 }
 
-function createTagOutlineCompoundVariant(
-  config: TagOutlineCompoundVariantConfig
-): SystemStyleObject {
+function createTagOutlineCompoundVariant(config: TagOutlineCompoundVariantConfig): SystemStyleObject {
   return {
     borderColor: config.borderColor,
     color: config.color,

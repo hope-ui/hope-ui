@@ -42,15 +42,7 @@ export function Textarea(props: TextareaProps) {
 
   const classes = () => classNames(local.class, hopeTextareaClass, textareaStyles(variantProps));
 
-  return (
-    <Box
-      as="textarea"
-      class={classes()}
-      __baseStyle={theme?.baseStyle}
-      {...formControlProps}
-      {...others}
-    />
-  );
+  return <Box as="textarea" class={classes()} __baseStyle={theme?.baseStyle} {...formControlProps} {...others} />;
 }
 
 Textarea.toString = () => createClassSelector(hopeTextareaClass);

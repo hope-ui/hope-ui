@@ -1,12 +1,13 @@
-import { createContext, createEffect, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HopeComponentProps } from "../types";
+import { ThemeableRadioOptions } from "./radio";
 
-interface RadioGroupOptions {
+interface RadioGroupOptions extends ThemeableRadioOptions {
   /**
    * The `name` attribute forwarded to each `radio` element
    */
@@ -14,8 +15,15 @@ interface RadioGroupOptions {
 
   /**
    * The value of the radio to be `checked`.
+   * (in controlled mode)
    */
   value?: string | number;
+
+  /**
+   * The value of the radio to be `checked` initially.
+   * (in uncontrolled mode)
+   */
+  defaultValue?: string | number;
 
   /**
    * If `true`, all wrapped radio inputs will be marked as required,
@@ -47,6 +55,8 @@ interface RadioGroupOptions {
 }
 
 type RadioGroupState = Omit<RadioGroupOptions, "name" | "onChange"> & {
+  valueState?: string | number;
+  isControlled: boolean;
   name: string;
 };
 
@@ -61,10 +71,7 @@ interface RadioGroupContextValue {
 
 const RadioGroupContext = createContext<RadioGroupContextValue>();
 
-export type RadioGroupProps<C extends ElementType = "div"> = HopeComponentProps<
-  C,
-  RadioGroupOptions
->;
+export type RadioGroupProps<C extends ElementType = "div"> = HopeComponentProps<C, RadioGroupOptions>;
 
 const hopeRadioGroupClass = "hope-radio-group";
 
@@ -72,6 +79,15 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
   const defaultName = `hope-radio-group-${createUniqueId()}`;
 
   const [state, setState] = createStore<RadioGroupState>({
+    // Internal state for uncontrolled radio-group.
+    // eslint-disable-next-line solid/reactivity
+    valueState: props.defaultValue,
+    get isControlled() {
+      return props.value !== undefined;
+    },
+    get value() {
+      return this.isControlled ? props.value : this.valueState;
+    },
     get name() {
       return props.name ?? defaultName;
     },
@@ -87,13 +103,24 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get invalid() {
       return props.invalid;
     },
-    // eslint-disable-next-line solid/reactivity
-    value: props.value,
+    get variant() {
+      return props.variant;
+    },
+    get colorScheme() {
+      return props.colorScheme;
+    },
+    get size() {
+      return props.size;
+    },
+    get labelPosition() {
+      return props.labelPosition;
+    },
   });
 
   const [local, others] = splitProps(props, [
     "class",
     "value",
+    "defaultValue",
     "name",
     "required",
     "disabled",
@@ -107,12 +134,12 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
-    setState("value", value);
+    if (!state.isControlled) {
+      setState("valueState", value);
+    }
 
     local.onChange?.(event, value);
   };
-
-  createEffect(() => setState("value", local.value));
 
   const context: RadioGroupContextValue = {
     state,

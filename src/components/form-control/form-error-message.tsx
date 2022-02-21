@@ -18,8 +18,7 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
 
   const id = () => local.id ?? formControl?.state.errorMessageId;
 
-  const classes = () =>
-    classNames(local.class, hopeFormErrorMessageClass, formErrorMessageStyles());
+  const classes = () => classNames(local.class, hopeFormErrorMessageClass, formErrorMessageStyles());
 
   const formControlDataAttrs = () => ({
     "data-disabled": formControl?.state.disabled ? "" : undefined,

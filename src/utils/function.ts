@@ -30,9 +30,7 @@ export function mapKeys(prop: any, mapper: (val: any) => any) {
 /**
  * Call all provided event handlers.
  */
-export function callAllHandlers<T, E extends Event>(
-  ...fns: Array<JSX.EventHandlerUnion<T, E> | undefined>
-) {
+export function callAllHandlers<T, E extends Event>(...fns: Array<JSX.EventHandlerUnion<T, E> | undefined>) {
   return function (
     event: E & {
       currentTarget: T;

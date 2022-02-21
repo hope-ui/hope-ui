@@ -16,10 +16,7 @@ export interface ButtonOptions extends ButtonVariants {
   rightIcon?: JSX.Element;
 }
 
-export type ThemeableButtonOptions = Pick<
-  ButtonOptions,
-  "variant" | "colorScheme" | "size" | "loaderPosition"
->;
+export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPosition">;
 
 export type ButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, ButtonOptions>;
 
@@ -49,16 +46,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
-    [
-      "class",
-      "__baseStyle",
-      "loader",
-      "loaderPosition",
-      "disabled",
-      "leftIcon",
-      "rightIcon",
-      "children",
-    ],
+    ["class", "__baseStyle", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
     ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
   );
 

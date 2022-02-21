@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.0.34",
+  "version": "0.0.36",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
@@ -72,6 +72,7 @@
     }
   },
   "dependencies": {
+    "@floating-ui/dom": "^0.2.0",
     "body-scroll-lock": "3.1.5",
     "csstype": "3.0.10",
     "focus-trap": "6.7.3",

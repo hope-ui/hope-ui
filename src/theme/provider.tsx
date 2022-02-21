@@ -8,6 +8,7 @@ import {
   extendBaseTheme,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
+  setDocumentColorModeDataTheme,
   syncBodyColorModeClassName,
 } from "./utils";
 
@@ -52,6 +53,7 @@ export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>)
     const isDark = colorMode() === "dark";
 
     setTheme(isDark ? darkTheme : lightTheme);
+    setDocumentColorModeDataTheme(colorMode());
     syncBodyColorModeClassName(isDark);
   });
 
@@ -82,10 +84,7 @@ export function useTheme(): Pick<HopeContextValue, "theme" | "components"> {
  * Custom hook that reads from `HopeProvider` context
  * Returns the color mode and function to toggle it
  */
-export function useColorMode(): Pick<
-  HopeContextValue,
-  "colorMode" | "setColorMode" | "toggleColorMode"
-> {
+export function useColorMode(): Pick<HopeContextValue, "colorMode" | "setColorMode" | "toggleColorMode"> {
   const context = useContext(HopeContext);
 
   if (!context) {

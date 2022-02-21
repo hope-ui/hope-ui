@@ -3,121 +3,32 @@ import "./playground.css";
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbLink,
-  Button,
-  Divider,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  HopeProvider,
-  HStack,
-  IconChevronRight,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Spinner,
-  Stack,
-  Table,
-  TableCaption,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-  useColorMode,
-  VStack,
-} from ".";
+import { Tooltip } from "@/components/tooltip/tooltip";
+
+import { Box, Button, HopeProvider, Text, useColorMode, VStack } from ".";
 
 export function App() {
+  const [isOpen, setIsOpen] = createSignal(false);
   const { toggleColorMode } = useColorMode();
-  const [isModalOpen, setIsModalOpen] = createSignal(false);
-  const closeModal = () => setIsModalOpen(false);
-  const openModal = () => setIsModalOpen(true);
-
-  const [isDrawerOpen, setIsDrawerOpen] = createSignal(false);
-  const closeDrawer = () => setIsDrawerOpen(false);
-  const openDrawer = () => setIsDrawerOpen(true);
 
   return (
     <Box p="$4">
-      <VStack alignItems="flex-start" spacing="$6">
-        <Breadcrumb separator="-">
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
-        </Breadcrumb>
-        <Breadcrumb>
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
-          <BreadcrumbLink href="#">About</BreadcrumbLink>
-          <BreadcrumbLink href="#" currentPage>
-            Contact
-          </BreadcrumbLink>
-        </Breadcrumb>
-        <Breadcrumb separator="-">
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
-          <BreadcrumbLink href="#">About</BreadcrumbLink>
-          <BreadcrumbLink href="#" currentPage>
-            Contact
-          </BreadcrumbLink>
-        </Breadcrumb>
-        <Breadcrumb spacing="8px" separator={<IconChevronRight color="$neutral9" />}>
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
-          <BreadcrumbLink href="#">About</BreadcrumbLink>
-          <BreadcrumbLink href="#" currentPage>
-            Contact
-          </BreadcrumbLink>
-        </Breadcrumb>
-
-        <Button onClick={openModal}>Open modal</Button>
-        <Modal isOpen={isModalOpen()} onClose={closeModal}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Deactivate account</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              Are you sure you want to deactivate your account? All of your data will be permanently
-              removed. This action cannot be undone.
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="default" mr="$4" onClick={toggleColorMode}>
-                Cancel
-              </Button>
-              <Button colorScheme="danger" onClick={closeModal}>
-                Deactivate
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-        <Button onClick={openDrawer}>Open drawer</Button>
-        <Drawer isOpen={isDrawerOpen()} onClose={closeDrawer}>
-          <DrawerOverlay />
-          <DrawerContent>
-            <DrawerHeader>Deactivate account</DrawerHeader>
-            <DrawerCloseButton />
-            <DrawerBody>
-              Are you sure you want to deactivate your account? All of your data will be permanently
-              removed. This action cannot be undone.
-            </DrawerBody>
-            <DrawerFooter>
-              <Button variant="default" mr="$4" onClick={toggleColorMode}>
-                Cancel
-              </Button>
-              <Button colorScheme="danger" onClick={closeDrawer}>
-                Deactivate
-              </Button>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+      <VStack alignItems="start" spacing="$4">
+        <Button onClick={toggleColorMode}>Toggle color mode</Button>
+        <Button onClick={() => setIsOpen(prev => !prev)}>Toggle tooltip: {isOpen().toString()}</Button>
+        <Tooltip label="HI MOM !" hasArrow arrowSize={10} isOpen={isOpen()} placement="top">
+          <Button>Hover me</Button>
+        </Tooltip>
+        <Tooltip label="HI MOM !" hasArrow arrowSize={20} placement="top">
+          <Button>Hover me 2</Button>
+        </Tooltip>
+        <Text>
+          Lorem ipsum dolor sit, amet consectetur adipisicing{" "}
+          <Tooltip label="the elit" isInline placement="top" hasArrow>
+            <strong>elit</strong>
+          </Tooltip>
+          . Saepe vitae non nulla placeat libero velit consectetur animi quam nesciunt blanditiis!
+        </Text>
       </VStack>
     </Box>
   );
