@@ -58,11 +58,24 @@ export type HTMLHopeComponents = {
   [Tag in DOMElements]: HopeComponent<Tag>;
 };
 
+export interface HopeFactoryStyleOptions<T extends ElementType> {
+  /**
+   * The CSS class to use when targeting the component in a css selector.
+   * This class will be applied to the rendered dom element of the component.
+   */
+  className?: string;
+
+  /**
+   * Base style applied to the component.
+   */
+  baseStyle?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject);
+}
+
 /**
  * Factory function that converts non-hope components or jsx element
  * to hope-enabled components so you can pass style props to them.
  */
 export type HopeFactory = <T extends ElementType>(
   component: T,
-  baseStyle?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
+  styleOptions?: HopeFactoryStyleOptions<T>
 ) => HopeComponent<T>;

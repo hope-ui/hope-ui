@@ -1,22 +1,23 @@
 import { mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { css } from "@/styled-system/stitches.config";
 import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
-import { SystemStyleObject } from "@/styled-system/types";
 import { isFunction } from "@/utils/assertion";
-import { classNames } from "@/utils/css";
+import { classNames, createClassSelector } from "@/utils/css";
 
-import { DOMElements, ElementType, HopeComponent, HopeFactory, HTMLHopeComponents, HTMLHopeProps } from "./types";
+import {
+  DOMElements,
+  ElementType,
+  HopeComponent,
+  HopeFactory,
+  HopeFactoryStyleOptions,
+  HTMLHopeComponents,
+  HTMLHopeProps,
+} from "./types";
 
 // TODO: add stitches variant support
 
-const styled: HopeFactory = <T extends ElementType>(
-  component: T,
-  baseStyle?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
-) => {
-  const cssComponent = css();
-
+const styled: HopeFactory = <T extends ElementType>(component: T, styleOptions?: HopeFactoryStyleOptions<T>) => {
   const hopeComponent: HopeComponent<T> = props => {
     const usedStylePropNames = getUsedStylePropNames(props);
 
@@ -29,7 +30,9 @@ const styled: HopeFactory = <T extends ElementType>(
     );
 
     const __baseStyles = () => {
-      const factoryBaseStyle = isFunction(baseStyle) ? baseStyle(props as any) : baseStyle;
+      const factoryBaseStyle = isFunction(styleOptions?.baseStyle)
+        ? styleOptions?.baseStyle(props as any)
+        : styleOptions?.baseStyle;
 
       // order is import for css override
       return [factoryBaseStyle, local.__baseStyle];
@@ -37,9 +40,9 @@ const styled: HopeFactory = <T extends ElementType>(
 
     const classes = () => {
       return classNames(
+        styleOptions?.className, // In order to target the component in stitches css method and prop, like any other Hope UI components.
         local.class,
         local.className,
-        cssComponent(),
         createStyledSystemClass(styleProps, __baseStyles())
       );
     };
@@ -48,7 +51,7 @@ const styled: HopeFactory = <T extends ElementType>(
   };
 
   // In order to target the component in stitches css method and prop, like any other Hope UI components.
-  hopeComponent.toString = () => cssComponent.selector;
+  hopeComponent.toString = () => (styleOptions?.className ? createClassSelector(styleOptions.className) : "");
 
   return hopeComponent;
 };
@@ -62,7 +65,7 @@ function factory() {
      * const Div = hope("div")
      * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType, SystemStyleObject]) {
+    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<ElementType>]) {
       return styled(...argArray);
     },
 

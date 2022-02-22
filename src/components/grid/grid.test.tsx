@@ -125,7 +125,7 @@ describe("Grid", () => {
       templateRows: "repeat(4, 1fr)",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

@@ -126,7 +126,7 @@ describe("GridItem", () => {
       rowEnd: "5",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

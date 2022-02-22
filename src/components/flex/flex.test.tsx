@@ -116,7 +116,7 @@ describe("Flex", () => {
 
   it("should have display props to 'flex' by default", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -139,7 +139,7 @@ describe("Flex", () => {
       wrap: "wrap",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 

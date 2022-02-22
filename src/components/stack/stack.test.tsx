@@ -120,7 +120,7 @@ describe("VStack", () => {
 
   it("should have flexDirection set to column", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -142,7 +142,7 @@ describe("VStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -164,7 +164,7 @@ describe("HStack", () => {
 
   it("should have flexDirection set to row", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -186,7 +186,7 @@ describe("HStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
