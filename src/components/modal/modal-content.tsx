@@ -7,11 +7,11 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
 
-export type ModalContentProps<C extends ElementType = "section"> = HopeComponentProps<C>;
+export type ModalContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
 const hopeModalContainerClass = "hope-modal__content-container";
 const hopeModalContentClass = "hope-modal__content";

@@ -4,9 +4,9 @@ import { Dynamic } from "solid-js/web";
 import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
 import { classNames } from "@/utils/css";
 
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
-export type BoxProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type BoxProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 /**
  * Box is the most abstract component on top of which all other Hope UI components are built.

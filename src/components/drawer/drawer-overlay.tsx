@@ -6,11 +6,11 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { useModalContext } from "../modal/modal";
 import { modalOverlayStyles } from "../modal/modal.styles";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerTransitionName } from "./drawer.styles";
 
-export type DrawerOverlayProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type DrawerOverlayProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeDrawerOverlayClass = "hope-drawer__overlay";
 

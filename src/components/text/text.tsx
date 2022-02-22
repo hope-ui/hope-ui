@@ -4,10 +4,10 @@ import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { textStyles, TextVariants } from "./text.styles";
 
-export type TextProps<C extends ElementType = "p"> = HopeComponentProps<C, TextVariants>;
+export type TextProps<C extends ElementType = "p"> = HTMLHopeProps<C, TextVariants>;
 
 const hopeTextClass = "hope-text";
 

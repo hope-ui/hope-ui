@@ -4,10 +4,10 @@ import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";
 
-export type HeadingProps<C extends ElementType = "h2"> = HopeComponentProps<C, HeadingVariants>;
+export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingVariants>;
 
 const hopeHeadingClass = "hope-heading";
 

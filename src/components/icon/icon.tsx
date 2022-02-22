@@ -3,7 +3,7 @@ import { mergeProps, Show, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { iconStyles } from "./icon.styles";
 
 const fallbackIcon = {
@@ -22,7 +22,7 @@ const fallbackIcon = {
 
 export const hopeIconClass = "hope-icon";
 
-export type IconProps<C extends ElementType = "svg"> = HopeComponentProps<C>;
+export type IconProps<C extends ElementType = "svg"> = HTMLHopeProps<C>;
 
 export function Icon<C extends ElementType = "svg">(props: IconProps<C>) {
   const defaultProps: IconProps<"svg"> = {

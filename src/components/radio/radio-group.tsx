@@ -4,7 +4,7 @@ import { createStore } from "solid-js/store";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { ThemeableRadioOptions } from "./radio";
 
 interface RadioGroupOptions extends ThemeableRadioOptions {
@@ -71,7 +71,7 @@ interface RadioGroupContextValue {
 
 const RadioGroupContext = createContext<RadioGroupContextValue>();
 
-export type RadioGroupProps<C extends ElementType = "div"> = HopeComponentProps<C, RadioGroupOptions>;
+export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, RadioGroupOptions>;
 
 const hopeRadioGroupClass = "hope-radio-group";
 

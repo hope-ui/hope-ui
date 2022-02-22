@@ -6,7 +6,7 @@ import { visuallyHiddenStyles } from "@/theme/utils";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { spinnerStyles, SpinnerVariants } from "./spinner.styles";
 
 interface SpinnerOptions extends SpinnerVariants {
@@ -45,7 +45,7 @@ interface SpinnerOptions extends SpinnerVariants {
   label?: string;
 }
 
-export type SpinnerProps<C extends ElementType = "div"> = HopeComponentProps<C, SpinnerOptions>;
+export type SpinnerProps<C extends ElementType = "div"> = HTMLHopeProps<C, SpinnerOptions>;
 
 const hopeSpinnerClass = "hope-spinner";
 

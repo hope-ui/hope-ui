@@ -5,7 +5,7 @@ import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./button.styles";
 
 export interface ButtonOptions extends ButtonVariants {
@@ -18,7 +18,7 @@ export interface ButtonOptions extends ButtonVariants {
 
 export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPosition">;
 
-export type ButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, ButtonOptions>;
+export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
 const hopeButtonClass = "hope-button";
 

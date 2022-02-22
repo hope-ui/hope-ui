@@ -3,11 +3,11 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableBodyStyles } from "./table.styles";
 
-export type TbodyProps<C extends ElementType = "tbody"> = HopeComponentProps<C>;
+export type TbodyProps<C extends ElementType = "tbody"> = HTMLHopeProps<C>;
 
 const hopeTbodyClass = "hope-tbody";
 

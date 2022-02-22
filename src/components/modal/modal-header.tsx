@@ -3,11 +3,11 @@ import { onCleanup, onMount, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalHeaderStyles } from "./modal.styles";
 
-export type ModalHeaderProps<C extends ElementType = "header"> = HopeComponentProps<C>;
+export type ModalHeaderProps<C extends ElementType = "header"> = HTMLHopeProps<C>;
 
 const hopeModalHeaderClass = "hope-modal__header";
 

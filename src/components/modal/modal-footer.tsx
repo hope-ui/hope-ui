@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { modalFooterStyles } from "./modal.styles";
 
-export type ModalFooterProps<C extends ElementType = "footer"> = HopeComponentProps<C>;
+export type ModalFooterProps<C extends ElementType = "footer"> = HTMLHopeProps<C>;
 
 const hopeModalFooterClass = "hope-modal__footer";
 

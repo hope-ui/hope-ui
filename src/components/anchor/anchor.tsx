@@ -3,14 +3,14 @@ import { mergeProps, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { anchorStyles } from "./anchor.styles";
 
 interface AnchorOptions {
   external?: boolean;
 }
 
-export type AnchorProps<C extends ElementType = "a"> = HopeComponentProps<C, AnchorOptions>;
+export type AnchorProps<C extends ElementType = "a"> = HTMLHopeProps<C, AnchorOptions>;
 
 const hopeAnchorClass = "hope-anchor";
 

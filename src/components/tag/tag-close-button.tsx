@@ -4,11 +4,11 @@ import { IconClose } from "@/components/icons/IconClose";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { tagCloseButtonStyles } from "./tag.styles";
 import { useTagContext } from "./tag-provider";
 
-export type TagCloseButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, { "aria-label"?: string }>;
+export type TagCloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, { "aria-label"?: string }>;
 
 const hopeTagCloseButtonClass = "hope-tag-close-button";
 

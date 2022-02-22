@@ -6,13 +6,13 @@ import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
 import { TagProvider } from "./tag-provider";
 
 export type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
 
-export type TagProps<C extends ElementType = "span"> = HopeComponentProps<C, TagVariants>;
+export type TagProps<C extends ElementType = "span"> = HTMLHopeProps<C, TagVariants>;
 
 const hopeTagClass = "hope-tag";
 

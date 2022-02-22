@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbItemStyles } from "./breadcrumb.styles";
 
-export type BreadcrumbItemProps<C extends ElementType = "li"> = HopeComponentProps<C>;
+export type BreadcrumbItemProps<C extends ElementType = "li"> = HTMLHopeProps<C>;
 
 const hopeBreadcrumbItemClass = "hope-breadcrumb__item";
 

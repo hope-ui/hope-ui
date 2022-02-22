@@ -4,7 +4,7 @@ import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formLabelStyles, requiredIndicatorStyles } from "./form-control.styles";
 
@@ -12,7 +12,7 @@ export interface ThemeableFormLabelOptions {
   withRequiredIndicator?: boolean;
 }
 
-export type FormLabelProps<C extends ElementType = "label"> = HopeComponentProps<C, ThemeableFormLabelOptions>;
+export type FormLabelProps<C extends ElementType = "label"> = HTMLHopeProps<C, ThemeableFormLabelOptions>;
 
 const hopeFormLabelClass = "hope-form-label";
 

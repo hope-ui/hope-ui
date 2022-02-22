@@ -5,7 +5,7 @@ import { ResponsiveProps } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 export type GridOptions = ResponsiveProps<{
   autoFlow?: Property.GridAutoFlow;
@@ -16,7 +16,7 @@ export type GridOptions = ResponsiveProps<{
   templateRows?: Property.GridTemplateRows;
 }>;
 
-export type GridProps<C extends ElementType = "div"> = HopeComponentProps<C, GridOptions>;
+export type GridProps<C extends ElementType = "div"> = HTMLHopeProps<C, GridOptions>;
 
 const hopeGridClass = "hope-grid";
 

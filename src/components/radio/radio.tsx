@@ -5,7 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import {
   radioContainerStyles,
   RadioContainerVariants,
@@ -84,7 +84,7 @@ interface RadioOptions extends ThemeableRadioOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type RadioProps<C extends ElementType = "label"> = HopeComponentProps<C, RadioOptions>;
+export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
 const hopeRadioClass = "hope-radio";
 const hopeRadioInputClass = "hope-radio__input";

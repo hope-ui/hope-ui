@@ -4,7 +4,7 @@ import { createStore } from "solid-js/store";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { tableStyles } from "./table.styles";
 
 export interface TableContextValue {
@@ -26,7 +26,7 @@ export interface TableContextValue {
 
 export type TableOptions = Partial<TableContextValue>;
 
-export type TableProps<C extends ElementType = "table"> = HopeComponentProps<C, TableOptions>;
+export type TableProps<C extends ElementType = "table"> = HTMLHopeProps<C, TableOptions>;
 
 const TableContext = createContext<TableContextValue>();
 

@@ -5,7 +5,7 @@ import { ResponsiveValue } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbSeparatorStyles } from "./breadcrumb.styles";
 
 export interface BreadcrumbSeparatorOptions {
@@ -15,10 +15,7 @@ export interface BreadcrumbSeparatorOptions {
   spacing?: ResponsiveValue<MarginProps["mx"]>;
 }
 
-export type BreadcrumbSeparatorProps<C extends ElementType = "span"> = HopeComponentProps<
-  C,
-  BreadcrumbSeparatorOptions
->;
+export type BreadcrumbSeparatorProps<C extends ElementType = "span"> = HTMLHopeProps<C, BreadcrumbSeparatorOptions>;
 
 const hopeBreadcrumbSeparatorClass = "hope-breadcrumb__separator";
 

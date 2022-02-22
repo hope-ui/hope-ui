@@ -4,13 +4,13 @@ import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
 import { AlertProvider } from "./alert-provider";
 
 export type ThemeableAlertOptions = Pick<AlertVariants, "variant">;
 
-export type AlertProps<C extends ElementType = "div"> = HopeComponentProps<C, AlertVariants>;
+export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 
 const hopeAlertClass = "hope-alert";
 

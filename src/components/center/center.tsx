@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { centerStyles } from "./center.styles";
 
-export type CenterProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type CenterProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeCenterClass = "hope-center";
 

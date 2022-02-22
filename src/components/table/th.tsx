@@ -3,11 +3,11 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableColumnHeaderStyles, TableColumnHeaderVariants } from "./table.styles";
 
-export type ThProps<C extends ElementType = "th"> = HopeComponentProps<C, Pick<TableColumnHeaderVariants, "numeric">>;
+export type ThProps<C extends ElementType = "th"> = HTMLHopeProps<C, Pick<TableColumnHeaderVariants, "numeric">>;
 
 const hopeThClass = "hope-th";
 

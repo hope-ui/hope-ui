@@ -8,11 +8,11 @@ import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { useModalContext } from "../modal/modal";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
 
-export type DrawerContentProps<C extends ElementType = "section"> = HopeComponentProps<C>;
+export type DrawerContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
 const hopeDrawerContainerClass = "hope-drawer__content-container";
 const hopeDrawerContentClass = "hope-drawer__content";

@@ -5,7 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../button/button";
 import { iconButtonStyles } from "../button/button.styles";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 export interface IconButtonOptions
   extends Omit<ButtonOptions, "leftIcon" | "rightIcon" | "loaderPosition" | "fullWidth"> {
@@ -15,7 +15,7 @@ export interface IconButtonOptions
 
 export type ThemeableIconButtonOptions = Pick<ThemeableButtonOptions, "variant" | "colorScheme" | "size">;
 
-export type IconButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, IconButtonOptions>;
+export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, IconButtonOptions>;
 
 const hopeIconButtonClass = "hope-icon-button";
 

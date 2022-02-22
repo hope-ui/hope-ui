@@ -3,14 +3,14 @@ import { Show, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbLinkStyles } from "./breadcrumb.styles";
 
 export interface BreadcrumbLinkOptions {
   currentPage?: boolean;
 }
 
-export type BreadcrumbLinkProps<C extends ElementType = "a"> = HopeComponentProps<C, BreadcrumbLinkOptions>;
+export type BreadcrumbLinkProps<C extends ElementType = "a"> = HTMLHopeProps<C, BreadcrumbLinkOptions>;
 
 const hopeBreadcrumbLinkClass = "hope-breadcrumb__link";
 

@@ -3,11 +3,11 @@ import { mergeProps, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableCaptionStyles, TableCaptionVariants } from "./table.styles";
 
-export type TableCaptionProps<C extends ElementType = "caption"> = HopeComponentProps<
+export type TableCaptionProps<C extends ElementType = "caption"> = HTMLHopeProps<
   C,
   Omit<TableCaptionVariants, "dense">
 >;

@@ -5,7 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import {
   switchContainerStyles,
   SwitchContainerVariants,
@@ -83,7 +83,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchProps<C extends ElementType = "label"> = HopeComponentProps<C, SwitchOptions>;
+export type SwitchProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchOptions>;
 
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";

@@ -10,6 +10,11 @@ import { RightJoinProps } from "@/utils/types";
 export type ElementType<Props = any> = keyof JSX.IntrinsicElements | Component<Props>;
 
 /**
+ * All HTML and SVG elements.
+ */
+export type DOMElements = keyof JSX.IntrinsicElements;
+
+/**
  * Take the props of the passed HTML element or component and returns its type.
  * It uses a more precise version of just ComponentProps on its own.
  * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
@@ -26,12 +31,35 @@ export interface ClassProps {
 }
 
 /**
- * Props of a Hope UI component.
+ * Hope UI specific props.
  */
-export type HopeComponentProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
+export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObject };
+
+/**
+ * Enhance props of a SolidJS component or jsx element with Hope UI specific props.
+ */
+export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
   PropsOf<C>,
-  PropsWithChildren<AdditionalProps & StyleProps & ClassProps>
-> & {
-  as?: C;
-  __baseStyle?: SystemStyleObject;
+  PropsWithChildren<HopeProps & AdditionalProps & { as?: C }>
+>;
+
+export type HopeComponent<T extends ElementType, P = {}> = <C extends ElementType = T>(
+  props: HTMLHopeProps<C, P>
+) => JSX.Element;
+
+/**
+ * All html and svg elements for hope components.
+ * This is mostly for `hope.<element>` syntax.
+ */
+export type HTMLHopeComponents = {
+  [Tag in DOMElements]: HopeComponent<Tag>;
 };
+
+/**
+ * Factory function that converts non-hope components or jsx element
+ * to hope-enabled components so you can pass style props to them.
+ */
+export type HopeFactory = <T extends ElementType>(
+  component: T,
+  baseStyles?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
+) => HopeComponent<T>;

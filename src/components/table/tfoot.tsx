@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { tableFootStyles } from "./table.styles";
 
-export type TfootProps<C extends ElementType = "tfoot"> = HopeComponentProps<C>;
+export type TfootProps<C extends ElementType = "tfoot"> = HTMLHopeProps<C>;
 
 const hopeTfootClass = "hope-tfoot";
 

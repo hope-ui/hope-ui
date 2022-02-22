@@ -4,7 +4,7 @@ import { isArray } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
 import { BreadcrumbItem } from "./breadcrumb-item";
 import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
@@ -16,7 +16,7 @@ export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
   separator?: string | JSX.Element;
 }
 
-export type BreadcrumbProps<C extends ElementType = "nav"> = HopeComponentProps<C, BreadcrumbOptions>;
+export type BreadcrumbProps<C extends ElementType = "nav"> = HTMLHopeProps<C, BreadcrumbOptions>;
 
 const hopeBreadcrumbClass = "hope-breadcrumb";
 const hopeBreadcrumbListClass = "hope-breadcrumb__list";
