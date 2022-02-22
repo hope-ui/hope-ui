@@ -63,10 +63,11 @@ export const stylePropNames: KeysOf<StyleProps> = {
 const styledSystemStyles = css({});
 
 /**
- * Generate a css class based on style props and optional `baseStyle`.
+ * Generate a css class based on style props and optional `baseStyles`.
+ * `baseStyles` objects should be declared in the order of desired style override.
  */
-export function createStyledSystemClass(props: StyleProps, baseStyle?: SystemStyleObject) {
-  return styledSystemStyles({ css: toCssObject(props, baseStyle) });
+export function createStyledSystemClass(props: StyleProps, baseStyles?: Array<SystemStyleObject | undefined>) {
+  return styledSystemStyles({ css: toCssObject(props, baseStyles) });
 }
 
 /**

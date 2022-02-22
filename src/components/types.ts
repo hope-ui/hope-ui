@@ -36,13 +36,16 @@ export interface ClassProps {
 export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObject };
 
 /**
- * Enhance props of a SolidJS component or jsx element with Hope UI specific props.
+ * Enhance props of a SolidJS component or jsx element with Hope UI props.
  */
 export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
   PropsOf<C>,
   PropsWithChildren<HopeProps & AdditionalProps & { as?: C }>
 >;
 
+/**
+ * A hope-enabled component that accept style props.
+ */
 export type HopeComponent<T extends ElementType, P = {}> = <C extends ElementType = T>(
   props: HTMLHopeProps<C, P>
 ) => JSX.Element;
@@ -61,5 +64,5 @@ export type HTMLHopeComponents = {
  */
 export type HopeFactory = <T extends ElementType>(
   component: T,
-  baseStyles?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
+  baseStyle?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
 ) => HopeComponent<T>;

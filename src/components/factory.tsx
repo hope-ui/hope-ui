@@ -1,33 +1,50 @@
 import { mergeProps, splitProps } from "solid-js";
+import { Dynamic } from "solid-js/web";
 
 import { css } from "@/styled-system/stitches.config";
+import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
 import { SystemStyleObject } from "@/styled-system/types";
 import { isFunction } from "@/utils/assertion";
 import { classNames } from "@/utils/css";
 
-import { Box } from "./box/box";
 import { DOMElements, ElementType, HopeComponent, HopeFactory, HTMLHopeComponents, HTMLHopeProps } from "./types";
 
 // TODO: add stitches variant support
 
 const styled: HopeFactory = <T extends ElementType>(
   component: T,
-  baseStyles?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
+  baseStyle?: SystemStyleObject | ((props: HTMLHopeProps<T>) => SystemStyleObject)
 ) => {
   const cssComponent = css();
 
   const hopeComponent: HopeComponent<T> = props => {
-    const propsWithDefault = mergeProps({ as: component }, props);
+    const usedStylePropNames = getUsedStylePropNames(props);
 
-    const [local, others] = splitProps(propsWithDefault, ["class"]);
+    const propsWithDefault: HTMLHopeProps<T> = mergeProps({ as: component }, props);
 
-    const classes = () => classNames(local.class, cssComponent());
+    const [local, styleProps, others] = splitProps(
+      propsWithDefault,
+      ["as", "class", "className", "__baseStyle"],
+      usedStylePropNames
+    );
 
     const __baseStyles = () => {
-      return baseStyles && isFunction(baseStyles) ? baseStyles(props as any) : baseStyles;
+      const factoryBaseStyle = isFunction(baseStyle) ? baseStyle(props as any) : baseStyle;
+
+      // order is import for css override
+      return [factoryBaseStyle, local.__baseStyle];
     };
 
-    return <Box class={classes()} __baseStyle={__baseStyles()} {...others} />;
+    const classes = () => {
+      return classNames(
+        local.class,
+        local.className,
+        cssComponent(),
+        createStyledSystemClass(styleProps, __baseStyles())
+      );
+    };
+
+    return <Dynamic component={local.as ?? "div"} class={classes()} {...others} />;
   };
 
   // In order to target the component in stitches css method and prop, like any other Hope UI components.

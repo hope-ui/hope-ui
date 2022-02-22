@@ -38,9 +38,10 @@ function mergeStyleObject(
 }
 
 /**
- * Return a valid Stitches CSS object based on the given style props
+ * Return a valid Stitches CSS object based on the given style props.
+ * `baseStyles` objects should be declared in the order of desired style override.
  */
-export function toCssObject(props: StyleProps, baseStyle?: SystemStyleObject) {
+export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObject | undefined>) {
   /**
    * Destination object containing all non-responsive styles.
    */
@@ -60,8 +61,8 @@ export function toCssObject(props: StyleProps, baseStyle?: SystemStyleObject) {
     "@dark": {},
   };
 
-  // Add content of the `baseStyle` first to ensure css override works correctly.
-  baseStyle && mergeStyleObject(baseStyle, destStyleObject, destResponsiveStyleObject);
+  // Add content of the `baseStyles` first to ensure css override works correctly.
+  baseStyles?.forEach(styles => styles && mergeStyleObject(styles, destStyleObject, destResponsiveStyleObject));
 
   // Add content of the `style props`
   Object.entries(props).forEach(([prop, value]) => {
