@@ -1,11 +1,11 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import {
   switchContainerStyles,
   SwitchContainerVariants,
@@ -83,7 +83,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchProps<C extends ElementType = "label"> = HopeComponentProps<C, SwitchOptions>;
+export type SwitchProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchOptions>;
 
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";
@@ -91,7 +91,7 @@ const hopeSwitchControlClass = "hope-switch__control";
 const hopeSwitchLabelClass = "hope-switch__label";
 
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
-  const theme = useTheme().components.Switch;
+  const theme = useThemeComponentStyles().Switch;
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",

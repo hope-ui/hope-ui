@@ -1,11 +1,11 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { IconSpinner } from "@/components/icons/IconSpinner";
-import { useTheme } from "@/theme/provider";
+import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./button.styles";
 
 export interface ButtonOptions extends ButtonVariants {
@@ -18,7 +18,7 @@ export interface ButtonOptions extends ButtonVariants {
 
 export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPosition">;
 
-export type ButtonProps<C extends ElementType = "button"> = HopeComponentProps<C, ButtonOptions>;
+export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
 const hopeButtonClass = "hope-button";
 
@@ -27,7 +27,7 @@ const hopeButtonClass = "hope-button";
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useTheme().components.Button;
+  const theme = useThemeComponentStyles().Button;
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",

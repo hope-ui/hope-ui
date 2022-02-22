@@ -19,7 +19,7 @@ import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName, tooltipTransitionStyles } from "./tooltip.styles";
 
 export interface TooltipOptions {
@@ -122,7 +122,7 @@ export interface TooltipOptions {
   onClose?(): void;
 }
 
-export type TooltipProps<C extends ElementType = "div"> = HopeComponentProps<C, TooltipOptions>;
+export type TooltipProps<C extends ElementType = "div"> = HTMLHopeProps<C, TooltipOptions>;
 
 const hopeTooltipClass = "hope-tooltip";
 const hopeTooltipArrowClass = "hope-tooltip__arrow";

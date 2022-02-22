@@ -125,7 +125,7 @@ describe("Grid", () => {
       templateRows: "repeat(4, 1fr)",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -142,7 +142,7 @@ describe("Grid", () => {
         gridTemplateColumns: shorthandProps.templateColumns,
         gridTemplateRows: shorthandProps.templateRows,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });

@@ -3,9 +3,9 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
-export type TrProps<C extends ElementType = "tr"> = HopeComponentProps<C>;
+export type TrProps<C extends ElementType = "tr"> = HTMLHopeProps<C>;
 
 const hopeTrClass = "hope-tr";
 

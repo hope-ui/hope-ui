@@ -6,7 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { mapKeys } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 type GridSpanValue = string | number | "auto" | "full";
 
@@ -20,7 +20,7 @@ export type GridItemOptions = ResponsiveProps<{
   rowEnd?: Property.GridRowEnd;
 }>;
 
-export type GridItemProps<C extends ElementType = "div"> = HopeComponentProps<C, GridItemOptions>;
+export type GridItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, GridItemOptions>;
 
 /**
  * Utility function to apply a column or row span to the GridItem.

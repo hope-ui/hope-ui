@@ -1,21 +1,21 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
 import { AlertProvider } from "./alert-provider";
 
 export type ThemeableAlertOptions = Pick<AlertVariants, "variant">;
 
-export type AlertProps<C extends ElementType = "div"> = HopeComponentProps<C, AlertVariants>;
+export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 
 const hopeAlertClass = "hope-alert";
 
 export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
-  const theme = useTheme().components.Alert;
+  const theme = useThemeComponentStyles().Alert;
 
   const defaultProps: AlertProps<"div"> = {
     variant: theme?.defaultProps?.variant ?? "subtle",

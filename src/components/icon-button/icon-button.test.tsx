@@ -3,7 +3,7 @@ import { cleanup, screen } from "solid-testing-library";
 import { IconUser } from "@/components/icons/IconUser";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { buttonStyles, iconButtonStyles } from "../button/button.styles";
+import { buttonStyles } from "../button/button.styles";
 import { IconButton, IconButtonOptions } from "./icon-button";
 
 describe("IconButton", () => {
@@ -106,18 +106,6 @@ describe("IconButton", () => {
 
     // assert
     expect(button).toHaveClass(stubClass);
-  });
-
-  it("should have stitches generated class from iconButtonStyles", () => {
-    // arrange
-    const iconButtonClass = iconButtonStyles();
-
-    // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
-    const button = screen.getByRole("button");
-
-    // assert
-    expect(button).toHaveClass(iconButtonClass.className);
   });
 
   it("should have stitches generated class from buttonStyles", () => {

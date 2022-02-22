@@ -8,7 +8,7 @@ export const buttonLoadingIconStyles = css({
   animation: `1000ms linear infinite ${spin}`,
 });
 
-export const iconButtonStyles = css();
+export const hopeIconButtonClass = "hope-icon-button";
 
 /* -------------------------------------------------------------------------------------------------
  * Size
@@ -32,7 +32,7 @@ function createSizeVariant(config: SizeVariantConfig): SystemStyleObject {
       marginLeft: config.spacing,
     },
 
-    [`&.${iconButtonStyles}`]: {
+    [`&.${hopeIconButtonClass}`]: {
       width: config.height,
       padding: "0",
     },
@@ -50,7 +50,7 @@ function createCompactSizeCompoundVariant(config: CompactSizeVariantConfig): Sys
     py: 0,
     px: config.paddingX,
 
-    [`&.${iconButtonStyles}`]: {
+    [`&.${hopeIconButtonClass}`]: {
       width: config.height,
       padding: "0",
     },

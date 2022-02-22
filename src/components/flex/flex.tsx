@@ -5,14 +5,14 @@ import { ResponsiveProps } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 export type FlexOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;
   wrap?: Property.FlexWrap;
 }>;
 
-export type FlexProps<C extends ElementType = "div"> = HopeComponentProps<C, FlexOptions>;
+export type FlexProps<C extends ElementType = "div"> = HTMLHopeProps<C, FlexOptions>;
 
 const hopeFlexClass = "hope-flex";
 

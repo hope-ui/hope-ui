@@ -1,11 +1,11 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import {
   radioContainerStyles,
   RadioContainerVariants,
@@ -84,7 +84,7 @@ interface RadioOptions extends ThemeableRadioOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type RadioProps<C extends ElementType = "label"> = HopeComponentProps<C, RadioOptions>;
+export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
 const hopeRadioClass = "hope-radio";
 const hopeRadioInputClass = "hope-radio__input";
@@ -94,7 +94,7 @@ const hopeRadioLabelClass = "hope-radio__label";
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const defaultId = `hope-radio-${createUniqueId()}`;
 
-  const theme = useTheme().components.Radio;
+  const theme = useThemeComponentStyles().Radio;
 
   const radioGroupContext = useRadioGroupContext();
 

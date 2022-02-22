@@ -1,19 +1,14 @@
 import { Property } from "csstype";
 import { mergeProps, splitProps } from "solid-js";
 
-import { ColorScaleValue, SizeScaleValue } from "@/styled-system/types";
+import { SizeScaleValue } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { dividerStyles, DividerVariants } from "./divider.styles";
 
-interface DividerOptions extends DividerVariants {
-  /**
-   * The color of the divider
-   */
-  color?: Property.Color | ColorScaleValue;
-
+export interface DividerOptions extends DividerVariants {
   /**
    * The thickness of the divider
    * @example
@@ -24,7 +19,7 @@ interface DividerOptions extends DividerVariants {
   thickness?: Property.BorderWidth<SizeScaleValue>;
 }
 
-export type DividerProps<C extends ElementType = "div"> = HopeComponentProps<C, DividerOptions>;
+export type DividerProps<C extends ElementType = "div"> = HTMLHopeProps<C, DividerOptions>;
 
 const hopeDividerClass = "hope-divider";
 
@@ -39,7 +34,7 @@ export function Divider<C extends ElementType = "div">(props: DividerProps<C>) {
 
   const propsWithDefault: DividerProps<"div"> = mergeProps(defaultProps, props);
 
-  const [local, others] = splitProps(propsWithDefault, ["class", "variant", "orientation", "color", "thickness"]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "variant", "orientation", "thickness"]);
 
   const classes = () =>
     classNames(
@@ -49,7 +44,6 @@ export function Divider<C extends ElementType = "div">(props: DividerProps<C>) {
         variant: local.variant,
         orientation: local.orientation,
         css: {
-          color: local.color,
           borderLeftWidth: local.orientation === "vertical" ? local.thickness : 0,
           borderBottomWidth: local.orientation === "horizontal" ? local.thickness : 0,
         },

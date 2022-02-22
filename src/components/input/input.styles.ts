@@ -95,10 +95,10 @@ export const baseInputResetStyles = css({
       },
       filled: {
         border: "1px solid transparent",
-        backgroundColor: "$neutral4",
+        backgroundColor: "$neutral3",
 
         "&:hover, &:focus": {
-          backgroundColor: "$neutral5",
+          backgroundColor: "$neutral4",
         },
 
         ...commonOutlineAndFilledStyles,
@@ -350,13 +350,13 @@ export const inputAddonStyles = css({
         borderRadius: "$sm",
         border: "1px solid $neutral7",
         backgroundColor: "$neutral3",
-        color: "$neutral12",
+        color: "$neutral11",
       },
       filled: {
         borderRadius: "$sm",
         border: "1px solid transparent",
-        backgroundColor: "$neutral4",
-        color: "$neutral12",
+        backgroundColor: "$neutral3",
+        color: "$neutral11",
       },
       unstyled: {
         border: "1px solid transparent",

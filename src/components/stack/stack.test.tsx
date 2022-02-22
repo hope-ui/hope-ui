@@ -120,7 +120,7 @@ describe("VStack", () => {
 
   it("should have flexDirection set to column", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -132,7 +132,7 @@ describe("VStack", () => {
       expect.objectContaining({
         flexDirection: "column",
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 
@@ -142,7 +142,7 @@ describe("VStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -154,7 +154,7 @@ describe("VStack", () => {
       expect.objectContaining({
         rowGap: variantProps.spacing,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });
@@ -164,7 +164,7 @@ describe("HStack", () => {
 
   it("should have flexDirection set to row", () => {
     // arrange
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -176,7 +176,7 @@ describe("HStack", () => {
       expect.objectContaining({
         flexDirection: "row",
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 
@@ -186,7 +186,7 @@ describe("HStack", () => {
       spacing: "4",
     };
 
-    const stubClassName = css()();
+    const stubClassName = css({})();
 
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
@@ -198,7 +198,7 @@ describe("HStack", () => {
       expect.objectContaining({
         columnGap: variantProps.spacing,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });

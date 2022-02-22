@@ -3,10 +3,10 @@ import { splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { alertDescriptionStyles } from "./alert.styles";
 
-export type AlertDescriptionProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type AlertDescriptionProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeAlertDescriptionClass = "hope-alert-description";
 

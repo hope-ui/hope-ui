@@ -74,7 +74,7 @@ export const Custom = (args: any) => (
     height="200px"
   >
     <AlertIcon boxSize="40px" mr={0} />
-    <AlertTitle mt="$4" mb="$1" size="lg">
+    <AlertTitle mt="$4" mb="$1" fontSize="$lg">
       Application submitted!
     </AlertTitle>
     <AlertDescription maxWidth="$sm">

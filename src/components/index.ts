@@ -9,6 +9,7 @@ export * from "./close-button";
 export * from "./container";
 export * from "./divider";
 export * from "./drawer";
+export * from "./factory";
 export * from "./flex";
 export * from "./form-control";
 export * from "./grid";

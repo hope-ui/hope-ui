@@ -3,11 +3,11 @@ import { onCleanup, onMount, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { inputAddonStyles, InputAddonVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
-export type InputAddonProps<C extends ElementType = "div"> = HopeComponentProps<C, InputAddonVariants>;
+export type InputAddonProps<C extends ElementType = "div"> = HTMLHopeProps<C, InputAddonVariants>;
 
 export function InputAddon<C extends ElementType = "div">(props: InputAddonProps<C>) {
   const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "variant", "size"]);
@@ -21,7 +21,7 @@ export function InputAddon<C extends ElementType = "div">(props: InputAddonProps
  * InputLeftAddon
  * -----------------------------------------------------------------------------------------------*/
 
-export type InputLeftAddonProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type InputLeftAddonProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeInputLeftAddonClass = "hope-input-left-addon";
 
@@ -52,7 +52,7 @@ InputLeftAddon.toString = () => createClassSelector(hopeInputLeftAddonClass);
  * inputRightAddon
  * -----------------------------------------------------------------------------------------------*/
 
-export type InputRightAddonProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type InputRightAddonProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeInputRightAddonClass = "hope-input-right-addon";
 

@@ -1,11 +1,11 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme/provider";
+import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
-import { HopeComponentProps } from "../types";
+import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
 import { useInputGroupContext } from "./input-group";
 
@@ -23,13 +23,13 @@ interface InputOptions extends ThemeableInputOptions {
   htmlSize?: string | number;
 }
 
-export type InputProps = Omit<HopeComponentProps<"input", InputOptions>, "as">;
+export type InputProps = Omit<HTMLHopeProps<"input", InputOptions>, "as">;
 
 const hopeInputClass = "hope-input";
 
 export function Input(props: InputProps) {
   const inputGroup = useInputGroupContext();
-  const theme = useTheme().components.Input;
+  const theme = useThemeComponentStyles().Input;
 
   const defaultProps: InputProps = {
     type: "text",

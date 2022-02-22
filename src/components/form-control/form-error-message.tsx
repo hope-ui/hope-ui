@@ -3,11 +3,11 @@ import { onCleanup, onMount, Show, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formErrorMessageStyles } from "./form-control.styles";
 
-export type FormErrorMessageProps<C extends ElementType = "div"> = HopeComponentProps<C>;
+export type FormErrorMessageProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeFormErrorMessageClass = "hope-form-error-message";
 

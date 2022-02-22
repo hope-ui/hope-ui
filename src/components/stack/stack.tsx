@@ -5,7 +5,7 @@ import { ResponsiveProps, SpaceScaleValue } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 export type StackOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;
@@ -13,7 +13,7 @@ export type StackOptions = ResponsiveProps<{
   //spacing?: Property.Gap<SpaceScaleValue> | number;
 }>;
 
-export type StackProps<C extends ElementType = "div"> = HopeComponentProps<C, StackOptions>;
+export type StackProps<C extends ElementType = "div"> = HTMLHopeProps<C, StackOptions>;
 
 const hopeStackClass = "hope-stack";
 

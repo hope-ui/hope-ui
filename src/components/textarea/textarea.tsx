@@ -1,11 +1,11 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useTheme } from "@/theme/provider";
+import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
-import { HopeComponentProps } from "../types";
+import { HTMLHopeProps } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
 export type ThemeableTextareaOptions = TextareaVariants;
@@ -17,12 +17,12 @@ interface TextareaOptions extends ThemeableTextareaOptions {
   invalid?: boolean;
 }
 
-export type TextareaProps = Omit<HopeComponentProps<"textarea", TextareaOptions>, "as">;
+export type TextareaProps = Omit<HTMLHopeProps<"textarea", TextareaOptions>, "as">;
 
 const hopeTextareaClass = "hope-textarea";
 
 export function Textarea(props: TextareaProps) {
-  const theme = useTheme().components.Textarea;
+  const theme = useThemeComponentStyles().Textarea;
 
   const defaultProps: TextareaProps = {
     variant: theme?.defaultProps?.variant ?? "outline",

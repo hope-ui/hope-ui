@@ -1,11 +1,11 @@
 import { createSignal, createUniqueId, JSX, Match, mergeProps, Show, splitProps, Switch } from "solid-js";
 
-import { useTheme } from "@/theme";
+import { useThemeComponentStyles } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { ElementType, HopeComponentProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import {
   checkboxContainerStyles,
   CheckboxContainerVariants,
@@ -101,7 +101,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type CheckboxProps<C extends ElementType = "label"> = HopeComponentProps<C, CheckboxOptions>;
+export type CheckboxProps<C extends ElementType = "label"> = HTMLHopeProps<C, CheckboxOptions>;
 
 const hopeCheckboxClass = "hope-checkbox";
 const hopeCheckboxInputClass = "hope-checkbox__input";
@@ -109,7 +109,7 @@ const hopeCheckboxControlClass = "hope-checkbox__control";
 const hopeCheckboxLabelClass = "hope-checkbox__label";
 
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
-  const theme = useTheme().components.Checkbox;
+  const theme = useThemeComponentStyles().Checkbox;
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",

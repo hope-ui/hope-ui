@@ -75,9 +75,10 @@ export interface HopeThemeConfig<T extends ThemeConfig> {
   components?: ComponentsStyles;
 }
 
-export interface HopeContextValue<T extends HopeTheme = HopeTheme> {
-  theme: Accessor<T>;
+// export interface HopeContextValue<T extends HopeTheme = HopeTheme> {
+export interface HopeContextValue {
   components: ComponentsStyles;
+  theme: Accessor<HopeTheme>;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;
   toggleColorMode: () => void;
