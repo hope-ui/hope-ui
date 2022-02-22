@@ -128,7 +128,7 @@ describe("Flex", () => {
       expect.objectContaining({
         display: "flex",
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 
@@ -152,7 +152,7 @@ describe("Flex", () => {
         flexDirection: shorthandProps.direction,
         flexWrap: shorthandProps.wrap,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });

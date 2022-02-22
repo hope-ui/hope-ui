@@ -132,7 +132,7 @@ describe("VStack", () => {
       expect.objectContaining({
         flexDirection: "column",
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 
@@ -154,7 +154,7 @@ describe("VStack", () => {
       expect.objectContaining({
         rowGap: variantProps.spacing,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });
@@ -176,7 +176,7 @@ describe("HStack", () => {
       expect.objectContaining({
         flexDirection: "row",
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 
@@ -198,7 +198,7 @@ describe("HStack", () => {
       expect.objectContaining({
         columnGap: variantProps.spacing,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });

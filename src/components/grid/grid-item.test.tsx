@@ -143,7 +143,7 @@ describe("GridItem", () => {
         gridRowStart: shorthandProps.rowStart,
         gridRowEnd: shorthandProps.rowEnd,
       }),
-      undefined
+      [undefined, undefined] // __baseStyles
     );
   });
 });
