@@ -6,126 +6,6 @@ import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } fr
 
 type ModalTransition = "fade-in-bottom" | "scale" | "none";
 
-interface ModalState {
-  /**
-   * If `true`, the modal will be open.
-   */
-  opened: boolean;
-
-  /**
-   * The `id` of the modal dialog
-   */
-  dialogId: string;
-
-  /**
-   * The `id` of the modal dialog header
-   */
-  headerId: string;
-
-  /**
-   * The `id` of the modal dialog body
-   */
-  bodyId: string;
-
-  /**
-   * Modal opening/closing transition.
-   */
-  transition: ModalTransition;
-
-  /**
-   * The size of the modal dialog.
-   */
-  size: ModalDialogVariants["size"];
-
-  /**
-   * If `true`, the modal will be centered on screen.
-   */
-  centered: ModalContainerVariants["centered"];
-
-  /**
-   * Define the scrolling behavior of the modal if content overflows beyond the viewport.
-   */
-  scrollBehavior: ModalContainerVariants["scrollBehavior"];
-
-  /**
-   * If `true`, the modal will close when the overlay is clicked
-   */
-  closeOnOverlayClick: boolean;
-
-  /**
-   * If `true`, notify that the modal header component is rendered
-   */
-  headerMounted: boolean;
-
-  /**
-   * If `true`, notify that the modal body component is rendered
-   */
-  bodyMounted: boolean;
-
-  /**
-   * If `false`, focus lock will be disabled completely.
-   */
-  trapFocus: boolean;
-
-  /**
-   * If `true`, scrolling will be disabled on the `body` when the modal opens.
-   */
-  blockScrollOnMount: boolean;
-
-  /**
-   * If `true`, a `padding-right` will be applied to the body element
-   * that's equal to the width of the scrollbar.
-   *
-   * This can help prevent some unpleasant flickering effect
-   * and content adjustment when the modal opens
-   */
-  preserveScrollBarGap: boolean;
-
-  /**
-   * A query selector string targeting the element to receive focus when the modal opens.
-   */
-  initialFocus?: string;
-}
-
-interface ModalContextValue {
-  state: ModalState;
-
-  /**
-   * Callback invoked to notify that modal's content exit transition is done.
-   */
-  onModalContentExitTransitionEnd: () => void;
-
-  /**
-   * Callback invoked to close the modal.
-   */
-  onClose: () => void;
-
-  /**
-   * Callback invoked when a `mouseDown` is fired on the modal container.
-   */
-  onMouseDown: (event: MouseEvent) => void;
-
-  /**
-   * Callback invoked when a `keyDown` is fired on the modal container.
-   */
-  onKeyDown: (event: KeyboardEvent) => void;
-
-  /**
-   * Callback invoked when the overlay is clicked.
-   */
-  onOverlayClick: (event: MouseEvent) => void;
-
-  /**
-   * Callback function to set if the modal header is mounted
-   */
-  setHeaderMounted: (value: boolean) => void;
-
-  /**
-   * Callback function to set if the modal body is mounted
-   */
-  setBodyMounted: (value: boolean) => void;
-}
-
 export interface ModalProps extends ModalContainerVariants, ModalDialogVariants {
   /**
    * If `true`, the modal will be open.
@@ -195,13 +75,92 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   /**
    * Callback fired when the overlay is clicked.
    */
-
   onOverlayClick?: () => void;
 
   /**
    * Callback fired when the escape key is pressed and focus is within modal
    */
   onEsc?: () => void;
+}
+
+type ModalState = Required<
+  Pick<
+    ModalProps,
+    | "opened"
+    | "transition"
+    | "size"
+    | "centered"
+    | "scrollBehavior"
+    | "closeOnOverlayClick"
+    | "trapFocus"
+    | "blockScrollOnMount"
+    | "preserveScrollBarGap"
+  >
+> &
+  Pick<ModalProps, "initialFocus"> & {
+    /**
+     * The `id` of the modal dialog
+     */
+    dialogId: string;
+
+    /**
+     * The `id` of the modal dialog header
+     */
+    headerId: string;
+
+    /**
+     * The `id` of the modal dialog body
+     */
+    bodyId: string;
+
+    /**
+     * If `true`, notify that the modal header component is rendered
+     */
+    headerMounted: boolean;
+
+    /**
+     * If `true`, notify that the modal body component is rendered
+     */
+    bodyMounted: boolean;
+  };
+
+interface ModalContextValue {
+  state: ModalState;
+
+  /**
+   * Callback invoked to close the modal.
+   */
+  onClose: () => void;
+
+  /**
+   * Callback invoked when the overlay is clicked.
+   */
+  onOverlayClick: (event: MouseEvent) => void;
+
+  /**
+   * Callback invoked when a `mouseDown` is fired on the modal container.
+   */
+  onMouseDown: (event: MouseEvent) => void;
+
+  /**
+   * Callback invoked when a `keyDown` is fired on the modal container.
+   */
+  onKeyDown: (event: KeyboardEvent) => void;
+
+  /**
+   * Callback invoked to notify that modal's content exit transition is done.
+   */
+  onModalContentExitTransitionEnd: () => void;
+
+  /**
+   * Callback function to set if the modal header is mounted
+   */
+  setHeaderMounted: (value: boolean) => void;
+
+  /**
+   * Callback function to set if the modal body is mounted
+   */
+  setBodyMounted: (value: boolean) => void;
 }
 
 const ModalContext = createContext<ModalContextValue>();
