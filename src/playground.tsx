@@ -32,25 +32,41 @@ export function App() {
           <ModalContent>
             <ModalHeader>Header</ModalHeader>
             <ModalCloseButton />
+            <Box h="300px" bg="tomato"></Box>
             <ModalBody>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quisquam, distinctio quos possimus quibusdam
-              iure commodi consequatur natus tempora nisi rem pariatur voluptas vitae, veritatis, dignissimos explicabo
-              fugiat rerum! Velit a, odio totam magnam officiis dolor quia dicta veritatis maiores libero tenetur quis
-              cum laborum non, sit voluptatem temporibus maxime debitis ullam hic, atque consectetur? Ex nihil, delectus
-              labore impedit dignissimos asperiores provident ipsa nulla minus accusamus et repellendus recusandae
-              facere exercitationem qui magni! Iure rerum dicta facilis placeat autem consequuntur commodi in
-              exercitationem nesciunt repudiandae praesentium quo quos, qui fugit perferendis reiciendis corrupti
-              quibusdam magnam labore! Molestias magnam deleniti tempore. Lorem ipsum dolor sit amet consectetur,
-              adipisicing elit. Quisquam, distinctio quos possimus quibusdam iure commodi consequatur natus tempora nisi
-              rem pariatur voluptas vitae, veritatis, dignissimos explicabo fugiat rerum! Velit a, odio totam magnam
-              officiis dolor quia dicta veritatis maiores libero tenetur quis cum laborum non, sit voluptatem temporibus
-              maxime debitis ullam hic, atque consectetur? Ex nihil, delectus labore impedit dignissimos asperiores
-              provident ipsa nulla minus accusamus et repellendus recusandae facere exercitationem qui magni! Iure rerum
-              dicta facilis placeat autem consequuntur commodi in exercitationem nesciunt repudiandae praesentium quo
-              quos, qui fugit perferendis reiciendis corrupti quibusdam magnam labore! Molestias magnam deleniti
-              tempore.
+              <div>
+                <div>
+                  <span>
+                    <div>
+                      <section>
+                        <div>
+                          <p>
+                            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quisquam, distinctio quos possimus
+                            quibusdam iure commodi consequatur natus tempora nisi rem pariatur voluptas vitae,
+                            veritatis, dignissimos explicabo fugiat rerum! Velit a, odio totam magnam officiis dolor
+                            quia dicta veritatis maiores libero tenetur quis cum laborum non, sit voluptatem temporibus
+                            maxime debitis ullam hic, atque consectetur? Ex nihil, delectus labore impedit dignissimos
+                            asperiores provident ipsa nulla minus accusamus et repellendus recusandae facere
+                            exercitationem qui magni! Iure rerum dicta facilis placeat autem consequuntur commodi in
+                            exercitationem nesciunt repudiandae praesentium quo quos, qui fugit perferendis reiciendis
+                            corrupti quibusdam magnam labore! Molestias magnam deleniti tempore. Lorem ipsum dolor sit
+                            amet consectetur, adipisicing elit. Quisquam, distinctio quos possimus quibusdam iure
+                            commodi consequatur natus tempora nisi rem pariatur voluptas vitae, veritatis, dignissimos
+                            explicabo fugiat rerum! Velit a, odio totam magnam officiis dolor quia dicta veritatis
+                            maiores libero tenetur quis cum laborum non, sit voluptatem temporibus maxime debitis ullam
+                            hic, atque consectetur? Ex nihil, delectus labore impedit dignissimos asperiores provident
+                            ipsa nulla minus accusamus et repellendus recusandae facere exercitationem qui magni! Iure
+                            rerum dicta facilis placeat autem consequuntur commodi in exercitationem nesciunt
+                            repudiandae praesentium quo quos, qui fugit perferendis reiciendis corrupti quibusdam magnam
+                            labore! Molestias magnam deleniti tempore.
+                          </p>
+                        </div>
+                      </section>
+                    </div>
+                  </span>
+                </div>
+              </div>
             </ModalBody>
-            <ModalFooter>Footer</ModalFooter>
           </ModalContent>
         </Modal>
         <p>

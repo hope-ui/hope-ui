@@ -6,7 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { buttonLoadingIconStyles, buttonStyles, ButtonVariants } from "./button.styles";
+import { buttonLoadingIconContainerStyles, buttonStyles, ButtonVariants } from "./button.styles";
 
 export interface ButtonOptions extends ButtonVariants {
   disabled?: boolean;
@@ -52,7 +52,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
 
   const classes = () => classNames(local.class, hopeButtonClass, buttonStyles(variantProps));
 
-  const loaderClass = buttonLoadingIconStyles();
+  const loaderClass = buttonLoadingIconContainerStyles();
 
   const isLeftIconVisible = () => {
     return local.leftIcon && (!variantProps.loading || local.loaderPosition === "right");
