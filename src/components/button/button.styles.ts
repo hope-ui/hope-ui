@@ -4,8 +4,12 @@ import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-export const buttonLoadingIconStyles = css({
-  animation: `1000ms linear infinite ${spin}`,
+export const buttonLoadingIconContainerStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1.3em",
+  animation: `1s linear infinite ${spin}`,
 });
 
 export const hopeIconButtonClass = "hope-icon-button";
