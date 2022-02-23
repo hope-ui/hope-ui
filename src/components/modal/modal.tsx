@@ -63,6 +63,25 @@ interface ModalState {
   bodyMounted: boolean;
 
   /**
+   * If `false`, focus lock will be disabled completely.
+   */
+  trapFocus: boolean;
+
+  /**
+   * If `true`, scrolling will be disabled on the `body` when the modal opens.
+   */
+  blockScrollOnMount: boolean;
+
+  /**
+   * If `true`, a `padding-right` will be applied to the body element
+   * that's equal to the width of the scrollbar.
+   *
+   * This can help prevent some unpleasant flickering effect
+   * and content adjustment when the modal opens
+   */
+  preserveScrollBarGap: boolean;
+
+  /**
    * A query selector string targeting the element to receive focus when the modal opens.
    */
   initialFocus?: string;
@@ -134,9 +153,34 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   closeOnEsc?: boolean;
 
   /**
+   * If `false`, focus lock will be disabled completely.
+   *
+   * This is useful in situations where you still need to interact with
+   * other surrounding elements.
+   *
+   * 🚨Warning: We don't recommend doing this because it hurts the
+   * accessibility of the modal, based on WAI-ARIA specifications.
+   */
+  trapFocus?: boolean;
+
+  /**
    * A query selector string targeting the element to receive focus when the modal opens.
    */
   initialFocus?: string;
+
+  /**
+   * If `true`, scrolling will be disabled on the `body` when the modal opens.
+   */
+  blockScrollOnMount?: boolean;
+
+  /**
+   * If `true`, a `padding-right` will be applied to the body element
+   * that's equal to the width of the scrollbar.
+   *
+   * This can help prevent some unpleasant flickering effect
+   * and content adjustment when the modal opens
+   */
+  preserveScrollBarGap?: boolean;
 
   /**
    * Modal opening/closing transition.
@@ -201,6 +245,15 @@ export function Modal(props: ModalProps) {
     },
     get closeOnOverlayClick() {
       return props.closeOnOverlayClick ?? true;
+    },
+    get trapFocus() {
+      return props.trapFocus ?? true;
+    },
+    get blockScrollOnMount() {
+      return props.blockScrollOnMount ?? true;
+    },
+    get preserveScrollBarGap() {
+      return props.preserveScrollBarGap ?? false;
     },
     headerMounted: false,
     bodyMounted: false,

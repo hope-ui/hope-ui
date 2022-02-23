@@ -46,7 +46,7 @@
     "build": "vite build",
     "build:storybook": "build-storybook",
     "commit": "git-cz",
-    "dev": "vite",
+    "dev": "vite --host",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",

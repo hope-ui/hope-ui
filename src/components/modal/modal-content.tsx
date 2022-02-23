@@ -86,14 +86,22 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
       return;
     }
 
-    focusTrap = createFocusTrap(containerRef, {
-      initialFocus: modalContext.state.initialFocus,
-      fallbackFocus: `[id='${modalContext.state.dialogId}']`,
-      allowOutsideClick: false,
-    });
+    if (modalContext.state.trapFocus) {
+      focusTrap = createFocusTrap(containerRef, {
+        initialFocus: modalContext.state.initialFocus,
+        fallbackFocus: `[id='${modalContext.state.dialogId}']`,
+        allowOutsideClick: false,
+      });
 
-    focusTrap.activate();
-    disableBodyScroll(containerRef);
+      focusTrap.activate();
+    }
+
+    if (modalContext.state.blockScrollOnMount) {
+      disableBodyScroll(containerRef, {
+        allowTouchMove: el => el.id === modalContext.state.bodyId,
+        reserveScrollBarGap: modalContext.state.preserveScrollBarGap,
+      });
+    }
   };
 
   const disableFocusTrapAndScrollLock = () => {
