@@ -1,13 +1,10 @@
-import { clearAllBodyScrollLocks, disableBodyScroll } from "body-scroll-lock";
-import { createFocusTrap, FocusTrap } from "focus-trap";
-import { JSX, mergeProps, Show, splitProps } from "solid-js";
+import { mergeProps, Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 import { classNames, createClassSelector } from "@/utils/css";
-import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
-import { useModalContext } from "../modal/modal";
+import { createModal } from "../modal/create-modal";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
@@ -22,7 +19,6 @@ const hopeDrawerContentClass = "hope-drawer__content";
  */
 export function DrawerContent<C extends ElementType = "section">(props: DrawerContentProps<C>) {
   const drawerContext = useDrawerContext();
-  const modalContext = useModalContext();
 
   const defaultProps: DrawerContentProps<"section"> = {
     as: "section",
@@ -38,8 +34,15 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
     "onClick",
   ]);
 
-  let containerRef: HTMLDivElement | undefined;
-  let focusTrap: FocusTrap | undefined;
+  const {
+    modalContext,
+    assignContainerRef,
+    ariaLabelledBy,
+    ariaDescribedBy,
+    onDialogClick,
+    enableFocusTrapAndScrollLock,
+    disableFocusTrapAndScrollLock,
+  } = createModal(local);
 
   const containerClasses = () => {
     return classNames(
@@ -60,19 +63,6 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
     return classNames(local.class, hopeDrawerContentClass, dialogClass);
   };
 
-  const ariaLabelledBy = () => {
-    return modalContext.state.headerMounted ? modalContext.state.headerId : local["aria-labelledby"];
-  };
-
-  const ariaDescribedBy = () => {
-    return modalContext.state.bodyMounted ? modalContext.state.bodyId : local["aria-describedby"];
-  };
-
-  const onDialogClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    const allHandlers = callAllHandlers(local.onClick, e => e.stopPropagation());
-    allHandlers(event);
-  };
-
   const transitionName = () => {
     if (drawerContext.disableTransition) {
       return "hope-none";
@@ -90,26 +80,6 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
     }
   };
 
-  const enableFocusTrapAndScrollLock = () => {
-    if (!containerRef) {
-      return;
-    }
-
-    focusTrap = createFocusTrap(containerRef, {
-      initialFocus: modalContext.state.initialFocus,
-      fallbackFocus: `[id='${modalContext.state.dialogId}']`,
-      allowOutsideClick: false,
-    });
-
-    focusTrap.activate();
-    disableBodyScroll(containerRef);
-  };
-
-  const disableFocusTrapAndScrollLock = () => {
-    focusTrap?.deactivate();
-    clearAllBodyScrollLocks();
-  };
-
   return (
     <Transition
       name={transitionName()}
@@ -120,7 +90,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
     >
       <Show when={modalContext.state.opened}>
         <Box
-          ref={containerRef}
+          ref={assignContainerRef}
           class={containerClasses()}
           tabIndex={-1}
           onMouseDown={modalContext.onMouseDown}

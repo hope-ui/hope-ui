@@ -26,16 +26,6 @@ type DrawerContextValue = Required<DrawerOptions>;
 
 const DrawerContext = createContext<DrawerContextValue>();
 
-export function useDrawerContext() {
-  const context = useContext(DrawerContext);
-
-  if (!context) {
-    throw new Error("[Hope UI]: useDrawerContext must be used within a `<Drawer />` component");
-  }
-
-  return context;
-}
-
 export function Drawer(props: DrawerProps) {
   const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableTransition"]);
 
@@ -62,6 +52,16 @@ export function Drawer(props: DrawerProps) {
       <Modal scrollBehavior="inside" {...modalProps} />
     </DrawerContext.Provider>
   );
+}
+
+export function useDrawerContext() {
+  const context = useContext(DrawerContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useDrawerContext must be used within a `<Drawer />` component");
+  }
+
+  return context;
 }
 
 export { ModalBody as DrawerBody } from "../modal/modal-body";

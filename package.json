@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
@@ -46,7 +46,7 @@
     "build": "vite build",
     "build:storybook": "build-storybook",
     "commit": "git-cz",
-    "dev": "vite",
+    "dev": "vite --host",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",
