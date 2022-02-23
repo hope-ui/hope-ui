@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.0.39",
+  "version": "0.0.41",
   "private": false,
   "description": "The hoped component library for your SolidJS applications.",
   "keywords": [
@@ -72,11 +72,11 @@
     }
   },
   "dependencies": {
-    "@floating-ui/dom": "^0.2.0",
-    "body-scroll-lock": "3.1.5",
+    "@floating-ui/dom": "0.2.0",
     "csstype": "3.0.10",
     "focus-trap": "6.7.3",
-    "lodash.merge": "4.6.2"
+    "lodash.merge": "4.6.2",
+    "scroll-lock": "2.1.5"
   },
   "devDependencies": {
     "@babel/core": "7.16.7",
@@ -99,6 +99,7 @@
     "@types/lodash.merge": "4.6.6",
     "@types/node": "17.0.8",
     "@types/prismjs": "1.26.0",
+    "@types/scroll-lock": "^2.1.0",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
     "babel-loader": "8.2.3",
