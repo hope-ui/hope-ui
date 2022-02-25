@@ -4,18 +4,51 @@ import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
-export const buttonLoadingIconContainerStyles = css({
+export const hopeIconButtonClass = "hope-icon-button";
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - icon
+ * -----------------------------------------------------------------------------------------------*/
+
+export const buttonIconStyles = css({
   display: "inline-flex",
+  alignSelf: "center",
+  flexShrink: 0,
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - loader
+ * -----------------------------------------------------------------------------------------------*/
+
+export const buttonLoaderStyles = css({
+  position: "absolute",
+
+  display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+
+  fontSize: "1em",
+  lineHeight: "$normal",
+
+  variants: {
+    withLoadingText: {
+      true: {
+        position: "relative",
+      },
+    },
+  },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - default icon spinner
+ * -----------------------------------------------------------------------------------------------*/
+
+export const buttonIconSpinnerStyles = css({
   fontSize: "1.3em",
   animation: `1s linear infinite ${spin}`,
 });
 
-export const hopeIconButtonClass = "hope-icon-button";
-
 /* -------------------------------------------------------------------------------------------------
- * Size
+ * Button - Size
  * -----------------------------------------------------------------------------------------------*/
 
 interface SizeVariantConfig {
@@ -32,9 +65,9 @@ function createSizeVariant(config: SizeVariantConfig): SystemStyleObject {
     px: config.paddingX,
     fontSize: config.fontSize,
 
-    "& > * + *": {
-      marginLeft: config.spacing,
-    },
+    // "& > * + *": {
+    //   marginLeft: config.spacing,
+    // },
 
     [`&.${hopeIconButtonClass}`]: {
       width: config.height,
@@ -62,7 +95,7 @@ function createCompactSizeCompoundVariant(config: CompactSizeVariantConfig): Sys
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Variant - solid
+ * Button - variant - solid
  * -----------------------------------------------------------------------------------------------*/
 
 interface SolidCompoundVariantConfig {
@@ -83,7 +116,7 @@ function createSolidCompoundVariant(config: SolidCompoundVariantConfig): SystemS
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Variant - subtle
+ * Button - variant - subtle
  * -----------------------------------------------------------------------------------------------*/
 
 interface SubtleCompoundVariantConfig {
@@ -109,7 +142,7 @@ function createSubtleCompoundVariant(config: SubtleCompoundVariantConfig): Syste
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Variant - outline
+ * Button - variant - outline
  * -----------------------------------------------------------------------------------------------*/
 
 interface OutlineCompoundVariantConfig {
@@ -137,7 +170,7 @@ function createOutlineCompoundVariant(config: OutlineCompoundVariantConfig): Sys
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Variant - ghost
+ * Button - variant - ghost
  * -----------------------------------------------------------------------------------------------*/
 
 interface GhostCompoundVariantConfig {
@@ -161,7 +194,7 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
 }
 
 /* -------------------------------------------------------------------------------------------------
- * Styles
+ * Button - styles
  * -----------------------------------------------------------------------------------------------*/
 
 export const buttonStyles = css({
@@ -183,6 +216,8 @@ export const buttonStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
+  whiteSpace: "nowrap",
+  verticalAlign: "middle",
   transition: "color 250ms, background-color 250ms",
 
   // box-shadow transition on button focus f*cked up solid-transition-group

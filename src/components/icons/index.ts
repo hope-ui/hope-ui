@@ -20,4 +20,3 @@ export * from "./IconInfoCircle";
 export * from "./IconInfoCircleSolid";
 export * from "./IconSearch";
 export * from "./IconSelector";
-export * from "./IconSpinner";

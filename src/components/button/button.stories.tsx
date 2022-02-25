@@ -9,8 +9,6 @@ function IconCart(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      class="iconify iconify--heroicons-solid"
       width="1em"
       height="1em"
       viewBox="0 0 20 20"
@@ -55,9 +53,9 @@ export default {
       control: { type: "select" },
       options: ["xs", "sm", "md", "lg", "xl"],
     },
-    loaderPosition: {
+    loaderPlacement: {
       control: { type: "inline-radio" },
-      options: ["left", "right"],
+      options: ["start", "end"],
     },
     compact: {
       control: { type: "boolean" },
@@ -71,6 +69,9 @@ export default {
     disabled: {
       control: { type: "boolean" },
     },
+    loadingText: {
+      control: "text",
+    },
     children: {
       control: "text",
     },
@@ -79,11 +80,12 @@ export default {
     variant: "solid",
     colorScheme: "primary",
     size: "md",
-    loaderPosition: "left",
+    loaderPlacement: "start",
     compact: false,
     fullWidth: false,
     loading: false,
     disabled: false,
+    loadingText: "",
     children: "Button",
   },
 };

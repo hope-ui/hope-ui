@@ -19,6 +19,11 @@ export const padding = {
   /**
    * The CSS `padding-inline-start` property
    */
+  paddingStart: (value: PropertyValue<"paddingInlineStart">) => ({ paddingInlineStart: value }),
+
+  /**
+   * The CSS `padding-inline-start` property
+   */
   ps: (value: PropertyValue<"paddingInlineStart">) => ({ paddingInlineStart: value }),
 
   /**
@@ -35,6 +40,11 @@ export const padding = {
    * The CSS `padding-inline-end` property
    */
   pe: (value: PropertyValue<"paddingInlineEnd">) => ({ paddingInlineEnd: value }),
+
+  /**
+   * The CSS `padding-inline-end` property
+   */
+  paddingEnd: (value: PropertyValue<"paddingInlineEnd">) => ({ paddingInlineEnd: value }),
 
   /**
    * The CSS `padding-inline-start` and `padding-inline-end` property

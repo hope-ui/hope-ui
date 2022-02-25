@@ -1,22 +1,55 @@
+import { Property } from "csstype";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { IconSpinner } from "@/components/icons/IconSpinner";
+import { SpaceScaleValue } from "@/styled-system";
 import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { buttonLoadingIconContainerStyles, buttonStyles, ButtonVariants } from "./button.styles";
+import { buttonStyles, ButtonVariants } from "./button.styles";
+import { ButtonIcon } from "./button-icon";
+import { ButtonLoader } from "./button-loader";
 
 export interface ButtonOptions extends ButtonVariants {
+  /**
+   * If `true`, the button will be disabled.
+   */
   disabled?: boolean;
-  loaderPosition?: "left" | "right";
+
+  /**
+   * The label to show in the button when `loading` is true
+   * If no text is passed, it only shows the loader
+   */
+  loadingText?: string;
+
+  /**
+   * Replace the loader component when `loading` is set to `true`
+   */
   loader?: JSX.Element;
+
+  /**
+   * It determines the placement of the loader when isLoading is true
+   */
+  loaderPlacement?: "start" | "end";
+
+  /**
+   * The space between the button icon and label.
+   */
+  iconSpacing?: Property.MarginRight<SpaceScaleValue>;
+
+  /**
+   * If added, the button will show an icon before the button's label.
+   */
   leftIcon?: JSX.Element;
+
+  /**
+   * If added, the button will show an icon after the button's label.
+   */
   rightIcon?: JSX.Element;
 }
 
-export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPosition">;
+export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">;
 
 export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
@@ -35,62 +68,78 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
     variant: theme?.defaultProps?.variant ?? "solid",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
-    loaderPosition: theme?.defaultProps?.loaderPosition ?? "left",
-    loader: <IconSpinner />,
+    loaderPlacement: theme?.defaultProps?.loaderPlacement ?? "start",
     loading: false,
     disabled: false,
+    iconSpacing: "0.5rem",
     type: "button",
     role: "button",
   };
 
   const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(
+  const [local, variantProps, contentProps, others] = splitProps(
     propsWithDefault,
-    ["class", "__baseStyle", "loader", "loaderPosition", "disabled", "leftIcon", "rightIcon", "children"],
-    ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"]
+    ["class", "__baseStyle", "disabled", "loadingText", "loader", "loaderPlacement"],
+    ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"],
+    ["children", "iconSpacing", "leftIcon", "rightIcon"]
   );
 
   const classes = () => classNames(local.class, hopeButtonClass, buttonStyles(variantProps));
 
-  const loaderClass = buttonLoadingIconContainerStyles();
-
-  const isLeftIconVisible = () => {
-    return local.leftIcon && (!variantProps.loading || local.loaderPosition === "right");
-  };
-
-  const isRightIconVisible = () => {
-    return local.rightIcon && (!variantProps.loading || local.loaderPosition === "left");
-  };
-
-  const isLeftLoaderVisible = () => {
-    return variantProps.loading && !local.disabled && local.loaderPosition === "left";
-  };
-
-  const isRightLoaderVisible = () => {
-    return variantProps.loading && !local.disabled && local.loaderPosition === "right";
-  };
-
-  const shouldWrapChildrenInSpan = () => {
-    return variantProps.loading || local.leftIcon || local.rightIcon;
-  };
-
   return (
-    <Box class={classes()} disabled={local.disabled} __baseStyle={local.__baseStyle} {...others}>
-      <Show when={isLeftIconVisible()}>{local.leftIcon}</Show>
-      <Show when={isLeftLoaderVisible()}>
-        <span class={loaderClass}>{local.loader}</span>
+    <hope.button class={classes()} disabled={local.disabled} __baseStyle={local.__baseStyle} {...others}>
+      <Show when={variantProps.loading && local.loaderPlacement === "start"}>
+        <ButtonLoader
+          class="hope-button__loader--start"
+          withLoadingText={!!local.loadingText}
+          placement="start"
+          spacing={contentProps.iconSpacing}
+        >
+          {local.loader}
+        </ButtonLoader>
       </Show>
-      <Show when={local.children}>
-        <Show when={shouldWrapChildrenInSpan()} fallback={local.children}>
-          <span>{local.children}</span>
+
+      <Show when={variantProps.loading} fallback={<ButtonContent {...contentProps} />}>
+        <Show
+          when={local.loadingText}
+          fallback={
+            <hope.span opacity={0}>
+              <ButtonContent {...contentProps} />
+            </hope.span>
+          }
+        >
+          {local.loadingText}
         </Show>
       </Show>
-      <Show when={isRightIconVisible()}>{local.rightIcon}</Show>
-      <Show when={isRightLoaderVisible()}>
-        <span class={loaderClass}>{local.loader}</span>
+
+      <Show when={variantProps.loading && local.loaderPlacement === "end"}>
+        <ButtonLoader
+          class="hope-button__loader--end"
+          withLoadingText={!!local.loadingText}
+          placement="end"
+          spacing={contentProps.iconSpacing}
+        >
+          {local.loader}
+        </ButtonLoader>
       </Show>
-    </Box>
+    </hope.button>
   );
 }
 
 Button.toString = () => createClassSelector(hopeButtonClass);
+
+type ButtonContentProps = Pick<ButtonProps, "iconSpacing" | "leftIcon" | "rightIcon" | "children">;
+
+function ButtonContent(props: ButtonContentProps) {
+  return (
+    <>
+      <Show when={props.leftIcon}>
+        <ButtonIcon marginEnd={props.iconSpacing}>{props.leftIcon}</ButtonIcon>
+      </Show>
+      {props.children}
+      <Show when={props.rightIcon}>
+        <ButtonIcon marginStart={props.iconSpacing}>{props.rightIcon}</ButtonIcon>
+      </Show>
+    </>
+  );
+}
