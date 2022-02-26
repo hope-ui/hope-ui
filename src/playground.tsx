@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   HopeProvider,
+  HopeThemeConfig,
   Modal,
   ModalBody,
   ModalCloseButton,

@@ -1,9 +1,8 @@
 # @hope-ui/solid (WIP)
 
-
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-[![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui 'MIT License')](LICENSE.md)
-[![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid '@hope-ui/solid npm')](https://www.npmjs.com/package/@hope-ui/solid)
+[![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui "MIT License")](LICENSE.md)
+[![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid "@hope-ui/solid npm")](https://www.npmjs.com/package/@hope-ui/solid)
 
 🤞 The hoped component library for your SolidJS applications.
 

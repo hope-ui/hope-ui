@@ -12,6 +12,7 @@ import { ThemeableSwitchOptions } from "@/components/switch/switch";
 import { ThemeableTagOptions } from "@/components/tag/tag";
 import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
 import { baseTheme } from "@/styled-system/stitches.config";
+import { baseThemeTokens } from "@/styled-system/tokens";
 import { SystemStyleObject } from "@/styled-system/types";
 
 export type ColorMode = "light" | "dark" | "system";
@@ -24,13 +25,17 @@ export type HopeTheme = typeof baseTheme;
 /**
  * Stitches theme config interface.
  */
-export type ThemeConfig = {
-  [Scale in keyof HopeTheme]?: {
-    [Token in keyof HopeTheme[Scale]]?: boolean | number | string;
+export type StitchesThemeConfig = {
+  [Scale in keyof typeof baseThemeTokens]?: {
+    [Token in keyof typeof baseThemeTokens[Scale]]?: boolean | number | string;
   };
 } & {
-  [scale in string]: {
-    [token in number | string]: boolean | number | string;
+  [Scale in keyof typeof baseThemeTokens]?: {
+    [Token in string]: boolean | number | string;
+  };
+} & {
+  [Scale in string]: {
+    [Token in string]: boolean | number | string;
   };
 };
 
@@ -68,14 +73,13 @@ export interface ComponentsStyles {
 /**
  * Hope UI theme override configuration.
  */
-export interface HopeThemeConfig<T extends ThemeConfig> {
+export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
-  lightTheme?: T;
-  darkTheme?: T;
+  lightTheme?: StitchesThemeConfig;
+  darkTheme?: StitchesThemeConfig;
   components?: ComponentsStyles;
 }
 
-// export interface HopeContextValue<T extends HopeTheme = HopeTheme> {
 export interface HopeContextValue {
   components: ComponentsStyles;
   theme: Accessor<HopeTheme>;

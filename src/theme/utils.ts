@@ -6,7 +6,7 @@ import { baseDarkThemeTokens } from "@/styled-system/tokens";
 import { __DEV__ } from "@/utils/assertion";
 import { mockBody } from "@/utils/object";
 
-import { ColorMode, ThemeConfig } from "./types";
+import { ColorMode, StitchesThemeConfig } from "./types";
 
 /**
  * Theme CSS class name added to `document.body` based on color mode.
@@ -21,7 +21,7 @@ const classNames = {
  * Create new stitches dark or light theme.
  * @return a merged theme object containing the base stitches theme and the override values.
  */
-export function extendBaseTheme<T extends ThemeConfig>(type: "light" | "dark", themeConfig: T) {
+export function extendBaseTheme<T extends StitchesThemeConfig>(type: "light" | "dark", themeConfig: T) {
   const isDark = type === "dark";
 
   const className = isDark ? classNames.dark : classNames.light;
