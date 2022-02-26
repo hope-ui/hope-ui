@@ -25,6 +25,7 @@ export const buttonLoaderStyles = css({
 
   display: "flex",
   alignItems: "center",
+  flexShrink: 0,
 
   fontSize: "1em",
   lineHeight: "$normal",
