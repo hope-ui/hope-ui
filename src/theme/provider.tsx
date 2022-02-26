@@ -1,7 +1,7 @@
 /* eslint-disable solid/reactivity */
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { ThemeConfig } from ".";
+import { StitchesThemeConfig } from ".";
 import { resetStyles } from "./reset";
 import { ColorMode, HopeContextValue, HopeThemeConfig } from "./types";
 import {
@@ -14,11 +14,11 @@ import {
 
 export const HopeContext = createContext<HopeContextValue>();
 
-export type HopeProviderProps<T extends ThemeConfig> = PropsWithChildren<{
+export type HopeProviderProps<T extends StitchesThemeConfig> = PropsWithChildren<{
   theme?: HopeThemeConfig<T>;
 }>;
 
-export function HopeProvider<T extends ThemeConfig>(props: HopeProviderProps<T>) {
+export function HopeProvider<T extends StitchesThemeConfig>(props: HopeProviderProps<T>) {
   // Create themes
   const lightTheme = extendBaseTheme("light", props.theme?.lightTheme ?? {});
   const darkTheme = extendBaseTheme("dark", props.theme?.darkTheme ?? {});

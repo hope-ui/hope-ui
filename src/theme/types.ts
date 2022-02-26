@@ -24,7 +24,7 @@ export type HopeTheme = typeof baseTheme;
 /**
  * Stitches theme config interface.
  */
-export type ThemeConfig = {
+export type StitchesThemeConfig = {
   [Scale in keyof HopeTheme]?: {
     [Token in keyof HopeTheme[Scale]]?: boolean | number | string;
   };
@@ -68,7 +68,7 @@ export interface ComponentsStyles {
 /**
  * Hope UI theme override configuration.
  */
-export interface HopeThemeConfig<T extends ThemeConfig> {
+export interface HopeThemeConfig<T extends StitchesThemeConfig = StitchesThemeConfig> {
   initialColorMode?: ColorMode;
   lightTheme?: T;
   darkTheme?: T;
