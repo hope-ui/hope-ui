@@ -1,4 +1,4 @@
-import { JSX, mergeProps, splitProps } from "solid-js";
+import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { useThemeComponentStyles } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -8,7 +8,10 @@ import { hopeIconButtonClass } from "../button/button.styles";
 import { ElementType, HTMLHopeProps } from "../types";
 
 export interface IconButtonOptions
-  extends Omit<ButtonOptions, "leftIcon" | "rightIcon" | "loaderPosition" | "fullWidth"> {
+  extends Omit<
+    ButtonOptions,
+    "loadingText" | "loaderPlacement" | "leftIcon" | "rightIcon" | "iconSpacing" | "fullWidth"
+  > {
   "aria-label": string;
   icon: JSX.Element;
 }
@@ -35,7 +38,13 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
 
   const classes = () => classNames(local.class, hopeIconButtonClass);
 
-  return <Button class={classes()} __baseStyle={theme?.baseStyle} leftIcon={local.icon} {...others} />;
+  return (
+    <Button class={classes()} __baseStyle={theme?.baseStyle} {...others}>
+      <Show when={local.icon} fallback={local.children}>
+        {local.icon}
+      </Show>
+    </Button>
+  );
 }
 
 IconButton.toString = () => createClassSelector(hopeIconButtonClass);

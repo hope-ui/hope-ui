@@ -9,8 +9,6 @@ function IconCart(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-      class="iconify iconify--heroicons-solid"
       width="1em"
       height="1em"
       viewBox="0 0 20 20"
