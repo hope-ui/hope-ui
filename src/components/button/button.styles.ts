@@ -3,6 +3,7 @@ import { VariantProps } from "@stitches/core";
 import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
+import { ModalContent } from "..";
 
 export const hopeIconButtonClass = "hope-icon-button";
 
@@ -219,10 +220,12 @@ export const buttonStyles = css({
   userSelect: "none",
   whiteSpace: "nowrap",
   verticalAlign: "middle",
-  transition: "color 250ms, background-color 250ms",
+  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
-  // box-shadow transition on button focus f*cked up solid-transition-group
-  //transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+  // box-shadow transition on button focus f*cked up solid-transition-group of modal and drawer
+  [`${ModalContent} &`]: {
+    transition: "color 250ms, background-color 250ms",
+  },
 
   "&:focus": {
     outline: "none",

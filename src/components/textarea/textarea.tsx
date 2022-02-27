@@ -1,5 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { SinglePartComponentStyleConfig } from "@/theme";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -8,9 +9,9 @@ import { useFormControl, useFormControlPropNames } from "../form-control/use-for
 import { HTMLHopeProps } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
-export type ThemeableTextareaOptions = TextareaVariants;
+export type TextareaStyleConfig = SinglePartComponentStyleConfig<TextareaVariants>;
 
-interface TextareaOptions extends ThemeableTextareaOptions {
+interface TextareaOptions extends TextareaVariants {
   /**
    * If `true`, the input will have `aria-invalid` set to `true`
    */

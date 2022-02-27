@@ -2,6 +2,7 @@ import { Property } from "csstype";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { SpaceScaleValue } from "@/styled-system";
+import { SinglePartComponentStyleConfig } from "@/theme";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -49,7 +50,9 @@ export interface ButtonOptions extends ButtonVariants {
   rightIcon?: JSX.Element;
 }
 
-export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">;
+export type ButtonStyleConfig = SinglePartComponentStyleConfig<
+  Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">
+>;
 
 export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
@@ -64,7 +67,6 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
 
   const defaultProps: ButtonProps<"button"> = {
     as: "button",
-    __baseStyle: theme?.baseStyle,
     variant: theme?.defaultProps?.variant ?? "solid",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",
@@ -79,7 +81,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
   const [local, variantProps, contentProps, others] = splitProps(
     propsWithDefault,
-    ["class", "__baseStyle", "disabled", "loadingText", "loader", "loaderPlacement"],
+    ["class", "disabled", "loadingText", "loader", "loaderPlacement"],
     ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"],
     ["children", "iconSpacing", "leftIcon", "rightIcon"]
   );
@@ -87,7 +89,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   const classes = () => classNames(local.class, hopeButtonClass, buttonStyles(variantProps));
 
   return (
-    <hope.button class={classes()} disabled={local.disabled} __baseStyle={local.__baseStyle} {...others}>
+    <hope.button class={classes()} disabled={local.disabled} __baseStyle={theme?.baseStyle} {...others}>
       <Show when={variantProps.loading && local.loaderPlacement === "start"}>
         <ButtonLoader
           class="hope-button__loader--start"

@@ -2,7 +2,11 @@ import { createContext, createEffect, createSignal, createUniqueId, JSX, Show, u
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
+
 import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
+import { CloseButtonProps } from "../close-button/close-button";
 
 type ModalTransition = "fade-in-bottom" | "scale" | "none";
 
@@ -92,6 +96,7 @@ type ModalState = Required<
     | "centered"
     | "scrollBehavior"
     | "closeOnOverlayClick"
+    | "closeOnEsc"
     | "trapFocus"
     | "blockScrollOnMount"
     | "preserveScrollBarGap"
@@ -163,6 +168,32 @@ interface ModalContextValue {
   setBodyMounted: (value: boolean) => void;
 }
 
+export interface ModalStyleConfig {
+  baseStyle?: {
+    overlay?: SystemStyleObject;
+    content?: SystemStyleObject;
+    closeButton?: SystemStyleObject;
+    header?: SystemStyleObject;
+    body?: SystemStyleObject;
+    footer?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: Pick<
+      ModalProps,
+      | "scrollBehavior"
+      | "centered"
+      | "transition"
+      | "size"
+      | "blockScrollOnMount"
+      | "closeOnEsc"
+      | "closeOnOverlayClick"
+      | "preserveScrollBarGap"
+      | "trapFocus"
+    >;
+    closeButton?: Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">;
+  };
+}
+
 const ModalContext = createContext<ModalContextValue>();
 
 /**
@@ -172,6 +203,8 @@ const ModalContext = createContext<ModalContextValue>();
  * It doesn't render any DOM node.
  */
 export function Modal(props: ModalProps) {
+  const theme = useComponentStyleConfigs().Modal;
+
   const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
   const [state, setState] = createStore<ModalState>({
@@ -191,28 +224,31 @@ export function Modal(props: ModalProps) {
       return props.initialFocus;
     },
     get transition() {
-      return props.transition ?? "fade-in-bottom";
+      return props.transition ?? theme?.defaultProps?.root?.transition ?? "fade-in-bottom";
     },
     get size() {
-      return props.size ?? "md";
+      return props.size ?? theme?.defaultProps?.root?.size ?? "md";
     },
     get centered() {
-      return props.centered ?? false;
+      return props.centered ?? theme?.defaultProps?.root?.centered ?? false;
     },
     get scrollBehavior() {
-      return props.scrollBehavior ?? "outside";
+      return props.scrollBehavior ?? theme?.defaultProps?.root?.scrollBehavior ?? "outside";
     },
     get closeOnOverlayClick() {
-      return props.closeOnOverlayClick ?? true;
+      return props.closeOnOverlayClick ?? theme?.defaultProps?.root?.closeOnOverlayClick ?? true;
+    },
+    get closeOnEsc() {
+      return props.closeOnEsc ?? theme?.defaultProps?.root?.closeOnEsc ?? true;
     },
     get trapFocus() {
-      return props.trapFocus ?? true;
+      return props.trapFocus ?? theme?.defaultProps?.root?.trapFocus ?? true;
     },
     get blockScrollOnMount() {
-      return props.blockScrollOnMount ?? true;
+      return props.blockScrollOnMount ?? theme?.defaultProps?.root?.blockScrollOnMount ?? true;
     },
     get preserveScrollBarGap() {
-      return props.preserveScrollBarGap ?? false;
+      return props.preserveScrollBarGap ?? theme?.defaultProps?.root?.preserveScrollBarGap ?? false;
     },
     headerMounted: false,
     bodyMounted: false,
@@ -237,7 +273,6 @@ export function Modal(props: ModalProps) {
   // For smooth transition, unmount portal only after modal's content exit transition is done.
   const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
 
-  const closeOnEsc = () => props.closeOnEsc ?? true;
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
   const setBodyMounted = (value: boolean) => setState("bodyMounted", value);
@@ -252,7 +287,7 @@ export function Modal(props: ModalProps) {
     if (event.key === "Escape") {
       event.stopPropagation();
 
-      if (closeOnEsc()) {
+      if (state.closeOnEsc) {
         onClose();
       }
 

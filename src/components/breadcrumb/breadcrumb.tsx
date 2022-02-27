@@ -1,5 +1,7 @@
 import { children, For, JSX, mergeProps, Show, splitProps } from "solid-js";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
 import { isArray } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -8,6 +10,18 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
 import { BreadcrumbItem } from "./breadcrumb-item";
 import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
+
+export interface BreadcrumbStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    item?: SystemStyleObject;
+    link?: SystemStyleObject;
+    separator?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: Pick<BreadcrumbOptions, "separator" | "spacing">;
+  };
+}
 
 export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
   /**
@@ -26,10 +40,12 @@ const hopeBreadcrumbListClass = "hope-breadcrumb__list";
  * It renders a `nav` element with `aria-label` set to `breadcrumb`
  */
 export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps<C>) {
+  const theme = useComponentStyleConfigs().Breadcrumb;
+
   const defaultProps: BreadcrumbProps<"nav"> = {
     as: "nav",
-    separator: "/",
-    spacing: "0.5rem",
+    separator: theme?.defaultProps?.root?.separator ?? "/",
+    spacing: theme?.defaultProps?.root?.spacing ?? "0.5rem",
   };
 
   const propsWithDefault: BreadcrumbProps<"nav"> = mergeProps(defaultProps, props);
@@ -49,7 +65,7 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
   };
 
   return (
-    <Box as="nav" aria-label="breadcrumb" class={rootClasses()} {...others}>
+    <Box as="nav" aria-label="breadcrumb" class={rootClasses()} __baseStyle={theme?.baseStyle?.root} {...others}>
       <Box as="ol" class={listClasses()}>
         <For each={links()}>
           {(link, index) => (

@@ -1,5 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -12,6 +13,8 @@ export type FormHelperTextProps<C extends ElementType = "div"> = HTMLHopeProps<C
 const hopeFormHelperTextClass = "hope-form-helper-text";
 
 export function FormHelperText<C extends ElementType = "div">(props: FormHelperTextProps<C>) {
+  const theme = useComponentStyleConfigs().FormControl;
+
   const formControl = useFormControlContext();
 
   const [local, others] = splitProps(props as FormHelperTextProps<"div">, ["ref", "id", "class"]);
@@ -28,7 +31,9 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
   onMount(() => formControl?.setHasHelperText(true));
   onCleanup(() => formControl?.setHasHelperText(false));
 
-  return <Box id={id()} class={classes()} {...formControlDataAttrs} {...others} />;
+  return (
+    <Box id={id()} class={classes()} __baseStyle={theme?.baseStyle?.helperText} {...formControlDataAttrs} {...others} />
+  );
 }
 
 FormHelperText.toString = () => createClassSelector(hopeFormHelperTextClass);

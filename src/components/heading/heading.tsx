@@ -1,6 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { SinglePartComponentStyleConfig } from "@/theme/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -9,6 +10,8 @@ import { headingStyles, HeadingVariants } from "./heading.styles";
 
 export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingVariants>;
 
+export type HeadingStyleConfig = SinglePartComponentStyleConfig<void>;
+
 const hopeHeadingClass = "hope-heading";
 
 /**
@@ -16,7 +19,7 @@ const hopeHeadingClass = "hope-heading";
  * It renders an <h2> tag by default.
  */
 export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
-  const baseStyle = useComponentStyleConfigs().Heading?.baseStyle;
+  const theme = useComponentStyleConfigs().Heading;
 
   const defaultProps: HeadingProps<"h2"> = {
     as: "h2",
@@ -27,7 +30,7 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
 
   const classes = () => classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
-  return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
+  return <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
 }
 
 Heading.toString = () => createClassSelector(hopeHeadingClass);

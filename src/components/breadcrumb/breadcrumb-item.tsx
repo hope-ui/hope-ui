@@ -1,5 +1,6 @@
 import { splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -15,13 +16,15 @@ const hopeBreadcrumbItemClass = "hope-breadcrumb__item";
  * It renders a `li` element to denote it belongs to an order list of links.
  */
 export function BreadcrumbItem<C extends ElementType = "li">(props: BreadcrumbItemProps<C>) {
+  const theme = useComponentStyleConfigs().Breadcrumb;
+
   const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => {
     return classNames(local.class, hopeBreadcrumbItemClass, breadcrumbItemStyles());
   };
 
-  return <Box as="li" class={classes()} {...others} />;
+  return <Box as="li" class={classes()} __baseStyle={theme?.baseStyle?.item} {...others} />;
 }
 
 BreadcrumbItem.toString = () => createClassSelector(hopeBreadcrumbItemClass);

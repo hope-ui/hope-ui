@@ -6,7 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagCloseButtonStyles } from "./tag.styles";
-import { useTagContext } from "./tag-provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type TagCloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, { "aria-label"?: string }>;
 
@@ -16,7 +16,7 @@ const hopeTagCloseButtonClass = "hope-tag-close-button";
  * TagCloseButton is used to close "remove" the tag
  */
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
-  const tagContext = useTagContext();
+  const theme = useComponentStyleConfigs().Tag;
 
   const defaultProps: TagCloseButtonProps<"button"> = {
     as: "button",
@@ -30,10 +30,8 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
 
   const classes = () => classNames(local.class, hopeTagCloseButtonClass, tagCloseButtonStyles());
 
-  const borderRadius = () => local.borderRadius ?? tagContext.borderRadius?.();
-
   return (
-    <Box class={classes()} borderRadius={borderRadius()} {...others}>
+    <Box class={classes()} __baseStyle={theme?.baseStyle?.closeButton} {...others}>
       <IconClose />
     </Box>
   );

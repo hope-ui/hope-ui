@@ -1,11 +1,14 @@
 import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tableStyles } from "./table.styles";
+import { ThemeableTableCaptionOptions } from "./table-caption";
 
 export interface TableContextValue {
   /**
@@ -28,20 +31,39 @@ export type TableOptions = Partial<TableContextValue>;
 
 export type TableProps<C extends ElementType = "table"> = HTMLHopeProps<C, TableOptions>;
 
+export interface TableStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    caption?: SystemStyleObject;
+    thead?: SystemStyleObject;
+    tbody?: SystemStyleObject;
+    tfoot?: SystemStyleObject;
+    tr?: SystemStyleObject;
+    th?: SystemStyleObject;
+    td?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: TableOptions;
+    caption?: ThemeableTableCaptionOptions;
+  };
+}
+
 const TableContext = createContext<TableContextValue>();
 
 const hopeTableClass = "hope-table";
 
 export function Table<C extends ElementType = "table">(props: TableProps<C>) {
+  const theme = useComponentStyleConfigs().Table;
+
   const [state] = createStore<TableContextValue>({
     get striped() {
-      return props.striped;
+      return props.striped ?? theme?.defaultProps?.root?.striped;
     },
     get dense() {
-      return props.dense ?? false;
+      return props.dense ?? theme?.defaultProps?.root?.dense ?? false;
     },
     get highlightOnHover() {
-      return props.highlightOnHover ?? false;
+      return props.highlightOnHover ?? theme?.defaultProps?.root?.highlightOnHover ?? false;
     },
   });
 
@@ -51,7 +73,7 @@ export function Table<C extends ElementType = "table">(props: TableProps<C>) {
 
   return (
     <TableContext.Provider value={state}>
-      <Box as="table" role="table" class={classes()} {...others} />
+      <Box as="table" role="table" class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
     </TableContext.Provider>
   );
 }

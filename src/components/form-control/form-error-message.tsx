@@ -1,5 +1,6 @@
 import { onCleanup, onMount, Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -12,6 +13,8 @@ export type FormErrorMessageProps<C extends ElementType = "div"> = HTMLHopeProps
 const hopeFormErrorMessageClass = "hope-form-error-message";
 
 export function FormErrorMessage<C extends ElementType = "div">(props: FormErrorMessageProps<C>) {
+  const theme = useComponentStyleConfigs().FormControl;
+
   const formControl = useFormControlContext();
 
   const [local, others] = splitProps(props as FormErrorMessageProps<"div">, ["ref", "id", "class"]);
@@ -30,7 +33,14 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
 
   return (
     <Show when={formControl?.state.invalid}>
-      <Box id={id()} class={classes()} aria-live="polite" {...formControlDataAttrs} {...others} />
+      <Box
+        aria-live="polite"
+        id={id()}
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.errorMessage}
+        {...formControlDataAttrs}
+        {...others}
+      />
     </Show>
   );
 }

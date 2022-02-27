@@ -1,5 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -10,11 +11,13 @@ import { useInputGroupContext } from "./input-group";
 export type InputElementProps<C extends ElementType = "div"> = HTMLHopeProps<C, InputElementVariants>;
 
 export function InputElement<C extends ElementType = "div">(props: InputElementProps<C>) {
+  const theme = useComponentStyleConfigs().Input;
+
   const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "size"]);
 
   const classes = () => classNames(local.class, inputElementStyles(variantProps));
 
-  return <Box class={classes()} {...others} />;
+  return <Box class={classes()} __baseStyle={theme?.baseStyle?.element} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------

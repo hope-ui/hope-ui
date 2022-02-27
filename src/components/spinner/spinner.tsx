@@ -2,6 +2,7 @@ import { Property } from "csstype";
 import { mergeProps, Show, splitProps } from "solid-js";
 
 import { ColorScaleValue, SizeScaleValue } from "@/styled-system";
+import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
 import { visuallyHiddenStyles } from "@/theme/utils";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -47,13 +48,21 @@ interface SpinnerOptions extends SpinnerVariants {
 
 export type SpinnerProps<C extends ElementType = "div"> = HTMLHopeProps<C, SpinnerOptions>;
 
+export type SpinnerStyleConfig = SinglePartComponentStyleConfig<SpinnerOptions>;
+
 const hopeSpinnerClass = "hope-spinner";
 
 export function Spinner<C extends ElementType = "div">(props: SpinnerProps<C>) {
+  const theme = useComponentStyleConfigs().Spinner;
+
   const defaultProps: SpinnerProps<"div"> = {
     as: "div",
-    label: "Loading...",
-    size: "md",
+    label: theme?.defaultProps?.label ?? "Loading...",
+    size: theme?.defaultProps?.size ?? "md",
+    emptyColor: theme?.defaultProps?.emptyColor,
+    color: theme?.defaultProps?.color,
+    thickness: theme?.defaultProps?.thickness,
+    speed: theme?.defaultProps?.speed,
   };
 
   const propsWithDefault: SpinnerProps<"div"> = mergeProps(defaultProps, props);

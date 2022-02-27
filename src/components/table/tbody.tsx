@@ -6,12 +6,15 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableBodyStyles } from "./table.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type TbodyProps<C extends ElementType = "tbody"> = HTMLHopeProps<C>;
 
 const hopeTbodyClass = "hope-tbody";
 
 export function Tbody<C extends ElementType = "tbody">(props: TbodyProps<C>) {
+  const theme = useComponentStyleConfigs().Table;
+
   const tableContext = useTableContext();
 
   const [local, others] = splitProps(props, ["class"]);
@@ -26,7 +29,7 @@ export function Tbody<C extends ElementType = "tbody">(props: TbodyProps<C>) {
       })
     );
 
-  return <Box as="tbody" role="rowgroup" class={classes()} {...others} />;
+  return <Box as="tbody" role="rowgroup" class={classes()} __baseStyle={theme?.baseStyle?.tbody} {...others} />;
 }
 
 Tbody.toString = () => createClassSelector(hopeTbodyClass);

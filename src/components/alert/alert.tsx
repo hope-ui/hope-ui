@@ -9,7 +9,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
 import { AlertProvider } from "./alert-provider";
 
-export type AlertStyleConfig = {
+export interface AlertStyleConfig {
   baseStyle?: {
     root?: SystemStyleObject;
     icon?: SystemStyleObject;
@@ -19,7 +19,7 @@ export type AlertStyleConfig = {
   defaultProps?: {
     root?: Pick<AlertVariants, "variant" | "status">;
   };
-};
+}
 
 export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 

@@ -6,6 +6,7 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalHeaderStyles } from "./modal.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type ModalHeaderProps<C extends ElementType = "header"> = HTMLHopeProps<C>;
 
@@ -15,6 +16,8 @@ const hopeModalHeaderClass = "hope-modal__header";
  * ModalHeader houses the title of the modal.
  */
 export function ModalHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
+  const theme = useComponentStyleConfigs().Modal;
+
   const modalContext = useModalContext();
 
   const [local, others] = splitProps(props, ["class"]);
@@ -28,7 +31,7 @@ export function ModalHeader<C extends ElementType = "header">(props: ModalHeader
   onMount(() => modalContext.setHeaderMounted(true));
   onCleanup(() => modalContext.setHeaderMounted(false));
 
-  return <Box class={classes()} id={modalContext.state.headerId} {...others} />;
+  return <Box class={classes()} id={modalContext.state.headerId} __baseStyle={theme?.baseStyle?.header} {...others} />;
 }
 
 ModalHeader.toString = () => createClassSelector(hopeModalHeaderClass);

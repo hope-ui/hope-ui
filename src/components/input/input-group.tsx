@@ -8,14 +8,14 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { inputGroupStyles, InputVariants } from "./input.styles";
 
-export interface InputGroupState {
-  variant: InputVariants["variant"];
-  size: InputVariants["size"];
+export type ThemeableInputGroupOptions = Pick<InputVariants, "variant" | "size">;
+
+export type InputGroupState = Required<ThemeableInputGroupOptions> & {
   hasLeftElement: boolean;
   hasRightElement: boolean;
   hasLeftAddon: boolean;
   hasRightAddon: boolean;
-}
+};
 
 export interface InputGroupContextValue {
   state: InputGroupState;
@@ -24,8 +24,6 @@ export interface InputGroupContextValue {
   setHasLeftAddon: (value: boolean) => void;
   setHasRightAddon: (value: boolean) => void;
 }
-
-export type ThemeableInputGroupOptions = Partial<Pick<InputGroupState, "variant" | "size">>;
 
 export type InputGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, ThemeableInputGroupOptions>;
 
@@ -38,14 +36,14 @@ export function useInputGroupContext() {
 const hopeInputGroupClass = "hope-input-group";
 
 export function InputGroup<C extends ElementType = "div">(props: InputGroupProps<C>) {
-  const theme = useComponentStyleConfigs().InputGroup;
+  const theme = useComponentStyleConfigs().Input;
 
   const [state, setState] = createStore<InputGroupState>({
     get variant() {
-      return props.variant ?? theme?.defaultProps?.variant ?? "outline";
+      return props.variant ?? theme?.defaultProps?.group?.variant ?? "outline";
     },
     get size() {
-      return props.size ?? theme?.defaultProps?.size ?? "md";
+      return props.size ?? theme?.defaultProps?.group?.size ?? "md";
     },
     hasLeftElement: false,
     hasRightElement: false,
@@ -72,7 +70,7 @@ export function InputGroup<C extends ElementType = "div">(props: InputGroupProps
 
   return (
     <InputGroupContext.Provider value={context}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.group} {...others} />
     </InputGroupContext.Provider>
   );
 }
