@@ -1,12 +1,11 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { SinglePartComponentStyleConfig } from "@/theme/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions } from "../button/button";
 import { hopeIconButtonClass } from "../button/button.styles";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 
 export interface IconButtonOptions
   extends Omit<

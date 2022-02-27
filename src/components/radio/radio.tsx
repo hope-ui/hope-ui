@@ -1,7 +1,7 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 

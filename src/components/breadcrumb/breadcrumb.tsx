@@ -1,7 +1,7 @@
 import { children, For, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system";
-import { useComponentStyleConfigs } from "@/theme";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isArray } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 

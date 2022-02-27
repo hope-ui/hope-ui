@@ -1,13 +1,13 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { createModal } from "./create-modal";
 import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type ModalContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 

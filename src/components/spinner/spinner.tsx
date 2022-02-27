@@ -1,13 +1,13 @@
 import { Property } from "csstype";
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { ColorScaleValue, SizeScaleValue } from "@/styled-system";
-import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
+import { ColorScaleValue, SizeScaleValue } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { spinnerStyles, SpinnerVariants } from "./spinner.styles";
 
 interface SpinnerOptions extends SpinnerVariants {

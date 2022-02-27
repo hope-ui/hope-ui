@@ -79,3 +79,18 @@ export type HopeFactory = <T extends ElementType>(
   component: T,
   styleOptions?: HopeFactoryStyleOptions<T>
 ) => HopeComponent<T>;
+
+/**
+ * Style configuration for Hope UI single-part component.
+ */
+export interface SinglePartComponentStyleConfig<Props> {
+  /**
+   * Style object for base or default style
+   */
+  baseStyle?: SystemStyleObject;
+
+  /**
+   * Default component props values.
+   */
+  defaultProps?: Props;
+}

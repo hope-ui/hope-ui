@@ -12,6 +12,9 @@ export default defineConfig({
     dts({
       tsConfigFilePath: "tsconfig.build.json",
       insertTypesEntry: true,
+      noEmitOnError: true,
+      skipDiagnostics: false,
+      logDiagnostics: true,
     }),
   ],
   resolve: {

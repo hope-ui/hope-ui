@@ -2,7 +2,8 @@ import { splitProps } from "solid-js";
 
 import { MarginProps } from "@/styled-system/props/margin";
 import { ResponsiveValue } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme";
+
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";

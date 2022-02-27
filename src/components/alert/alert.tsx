@@ -1,13 +1,15 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system";
-import { useComponentStyleConfigs } from "@/theme";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
 import { AlertProvider } from "./alert-provider";
+
+export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 
 export interface AlertStyleConfig {
   baseStyle?: {
@@ -20,8 +22,6 @@ export interface AlertStyleConfig {
     root?: Pick<AlertVariants, "variant" | "status">;
   };
 }
-
-export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 
 const hopeAlertClass = "hope-alert";
 

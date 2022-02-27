@@ -1,12 +1,11 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { SinglePartComponentStyleConfig } from "@/theme";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
-import { HTMLHopeProps } from "../types";
+import { HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
 export type TextareaStyleConfig = SinglePartComponentStyleConfig<TextareaVariants>;

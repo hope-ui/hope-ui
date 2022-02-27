@@ -22,7 +22,6 @@ import { TextareaStyleConfig } from "@/components/textarea/textarea";
 import { TooltipStyleConfig } from "@/components/tooltip/tooltip";
 import { baseTheme } from "@/styled-system/stitches.config";
 import { baseThemeTokens } from "@/styled-system/tokens";
-import { SystemStyleObject } from "@/styled-system/types";
 
 export type ColorMode = "light" | "dark" | "system";
 
@@ -48,22 +47,7 @@ export type StitchesThemeConfig = {
   };
 };
 
-/**
- * Style configuration for Hope UI single-part component.
- */
-export interface SinglePartComponentStyleConfig<Props> {
-  /**
-   * Style object for base or default style
-   */
-  baseStyle?: SystemStyleObject;
-
-  /**
-   * Default component props values.
-   */
-  defaultProps?: Props;
-}
-
-interface ComponentsStyleConfigs {
+export interface ComponentsStyleConfigs {
   Alert?: AlertStyleConfig;
   Anchor?: AnchorStyleConfig;
   Breadcrumb?: BreadcrumbStyleConfig;
