@@ -14,7 +14,7 @@ export function Thead<C extends ElementType = "thead">(props: TheadProps<C>) {
 
   const classes = () => classNames(local.class, hopeTheadClass);
 
-  return <Box as="thead" class={classes()} {...others} />;
+  return <Box as="thead" role="rowgroup" class={classes()} {...others} />;
 }
 
 Thead.toString = () => createClassSelector(hopeTheadClass);

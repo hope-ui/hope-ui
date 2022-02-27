@@ -26,7 +26,7 @@ export function Th<C extends ElementType = "th">(props: ThProps<C>) {
       })
     );
 
-  return <Box as="th" role="row" class={classes()} {...others} />;
+  return <Box as="th" role="columnheader" class={classes()} {...others} />;
 }
 
 Th.toString = () => createClassSelector(hopeThClass);

@@ -26,7 +26,7 @@ export function Td<C extends ElementType = "td">(props: TdProps<C>) {
       })
     );
 
-  return <Box as="td" role="gridcell" class={classes()} {...others} />;
+  return <Box as="td" role="cell" class={classes()} {...others} />;
 }
 
 Td.toString = () => createClassSelector(hopeTdClass);

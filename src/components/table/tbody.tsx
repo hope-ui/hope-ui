@@ -26,7 +26,7 @@ export function Tbody<C extends ElementType = "tbody">(props: TbodyProps<C>) {
       })
     );
 
-  return <Box as="tbody" class={classes()} {...others} />;
+  return <Box as="tbody" role="rowgroup" class={classes()} {...others} />;
 }
 
 Tbody.toString = () => createClassSelector(hopeTbodyClass);
