@@ -129,7 +129,7 @@ type ModalState = Required<
     bodyMounted: boolean;
   };
 
-interface ModalContextValue {
+export interface ModalContextValue {
   state: ModalState;
 
   /**

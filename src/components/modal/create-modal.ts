@@ -11,15 +11,25 @@ import { JSX } from "solid-js";
 
 import { callAllHandlers } from "@/utils/function";
 
-import { useModalContext } from "./modal";
+import { ModalContextValue, useModalContext } from "./modal";
 import { ModalContentProps } from "./modal-content";
 
 export type CreateModalProps = Pick<ModalContentProps, "onClick" | "aria-labelledby" | "aria-describedby">;
 
+interface CreateModalReturn {
+  modalContext: ModalContextValue;
+  assignContainerRef: (el: HTMLDivElement) => void;
+  ariaLabelledBy: () => string | undefined;
+  ariaDescribedBy: () => string | undefined;
+  onDialogClick: JSX.EventHandler<HTMLElement, MouseEvent>;
+  enableFocusTrapAndScrollLock: () => void;
+  disableFocusTrapAndScrollLock: () => void;
+}
+
 /**
  * Modal hook that manages all the logic for the modal dialog widget
  */
-export function createModal(props: CreateModalProps) {
+export function createModal(props: CreateModalProps): CreateModalReturn {
   const modalContext = useModalContext();
 
   let containerRef: HTMLDivElement | undefined;

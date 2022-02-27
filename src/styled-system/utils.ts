@@ -41,7 +41,7 @@ function mergeStyleObject(
  * Return a valid Stitches CSS object based on the given style props.
  * `baseStyles` objects should be declared in the order of desired style override.
  */
-export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObject | undefined>) {
+export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObject | undefined>): SystemStyleObject {
   /**
    * Destination object containing all non-responsive styles.
    */

@@ -2,7 +2,7 @@
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
 import { resetStyles } from "./reset";
-import { ColorMode, HopeContextValue, HopeThemeConfig } from "./types";
+import { ColorMode, ComponentsStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
 import {
   extendBaseTheme,
   getDefaultColorMode,
@@ -80,7 +80,7 @@ export function useTheme() {
  * Custom hook that reads from `HopeProvider` context
  * Returns an accessor for the theme based components style configs.
  */
-export function useComponentStyleConfigs() {
+export function useComponentStyleConfigs(): ComponentsStyleConfigs {
   const context = useContext(HopeContext);
 
   if (!context) {

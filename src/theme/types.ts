@@ -47,7 +47,7 @@ export type StitchesThemeConfig = {
   };
 };
 
-interface ComponentsStyleConfigs {
+export interface ComponentsStyleConfigs {
   Alert?: AlertStyleConfig;
   Anchor?: AnchorStyleConfig;
   Breadcrumb?: BreadcrumbStyleConfig;
