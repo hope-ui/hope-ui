@@ -1,10 +1,11 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { IconButton, IconButtonProps } from "../icon-button/icon-button";
 import { IconClose } from "../icons/IconClose";
+import { SinglePartComponentStyleConfig } from "../types";
 
 export type CloseButtonProps = Partial<IconButtonProps<"button">>;
 

@@ -4,9 +4,8 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { textStyles, TextVariants } from "./text.styles";
-import { SinglePartComponentStyleConfig } from "@/theme";
 
 export type TextProps<C extends ElementType = "p"> = HTMLHopeProps<C, TextVariants>;
 

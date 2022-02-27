@@ -1,7 +1,7 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";

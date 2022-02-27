@@ -1,10 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { anchorStyles } from "./anchor.styles";
 
 export type AnchorStyleConfig = SinglePartComponentStyleConfig<void>;

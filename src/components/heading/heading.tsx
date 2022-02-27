@@ -1,11 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { SinglePartComponentStyleConfig } from "@/theme/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";
 
 export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingVariants>;

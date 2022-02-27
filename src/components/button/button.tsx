@@ -1,13 +1,12 @@
 import { Property } from "csstype";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { SpaceScaleValue } from "@/styled-system";
-import { SinglePartComponentStyleConfig } from "@/theme";
+import { SpaceScaleValue } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { buttonStyles, ButtonVariants } from "./button.styles";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";

@@ -2,11 +2,11 @@ import { createContext, createEffect, createSignal, createUniqueId, JSX, Show, u
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
-import { SystemStyleObject } from "@/styled-system";
-import { useComponentStyleConfigs } from "@/theme";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
-import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
 import { CloseButtonProps } from "../close-button/close-button";
+import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
 
 type ModalTransition = "fade-in-bottom" | "scale" | "none";
 

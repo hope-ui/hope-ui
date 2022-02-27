@@ -15,12 +15,12 @@ import {
 import { isServer, Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName, tooltipTransitionStyles } from "./tooltip.styles";
 
 export interface TooltipOptions {

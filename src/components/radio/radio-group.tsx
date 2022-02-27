@@ -1,7 +1,7 @@
 import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
