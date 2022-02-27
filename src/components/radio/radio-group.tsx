@@ -1,6 +1,7 @@
 import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -76,6 +77,8 @@ export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, Ra
 const hopeRadioGroupClass = "hope-radio-group";
 
 export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps<C>) {
+  const theme = useComponentStyleConfigs().Radio;
+
   const defaultName = `hope-radio-group-${createUniqueId()}`;
 
   const [state, setState] = createStore<RadioGroupState>({
@@ -104,16 +107,16 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
       return props.invalid;
     },
     get variant() {
-      return props.variant;
+      return props.variant ?? theme?.defaultProps?.group?.variant;
     },
     get colorScheme() {
-      return props.colorScheme;
+      return props.colorScheme ?? theme?.defaultProps?.group?.colorScheme;
     },
     get size() {
-      return props.size;
+      return props.size ?? theme?.defaultProps?.group?.size;
     },
     get labelPosition() {
-      return props.labelPosition;
+      return props.labelPosition ?? theme?.defaultProps?.group?.labelPosition;
     },
   });
 
@@ -148,7 +151,7 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
 
   return (
     <RadioGroupContext.Provider value={context}>
-      <Box role="radiogroup" class={classes()} {...others} />
+      <Box role="radiogroup" class={classes()} __baseStyle={theme?.baseStyle?.group} {...others} />
     </RadioGroupContext.Provider>
   );
 }

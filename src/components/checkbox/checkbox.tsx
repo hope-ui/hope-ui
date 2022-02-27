@@ -1,10 +1,12 @@
 import { createSignal, createUniqueId, JSX, Match, mergeProps, Show, splitProps, Switch } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme";
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   checkboxContainerStyles,
@@ -16,7 +18,18 @@ import {
 } from "./checkbox.styles";
 import { CheckIcon, IndeterminateIcon } from "./checkbox-icon";
 
-export type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
+type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
+
+export interface CheckboxStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    control?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableCheckboxOptions;
+  };
+}
 
 interface CheckboxOptions extends ThemeableCheckboxOptions {
   /**
@@ -109,17 +122,17 @@ const hopeCheckboxControlClass = "hope-checkbox__control";
 const hopeCheckboxLabelClass = "hope-checkbox__label";
 
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
-  const theme = useThemeComponentStyles().Checkbox;
+  const theme = useComponentStyleConfigs().Checkbox;
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
     id: `hope-checkbox-${createUniqueId()}`,
     iconChecked: <CheckIcon />,
     iconIndeterminate: <IndeterminateIcon />,
-    variant: theme?.defaultProps?.variant ?? "outline",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
-    labelPosition: theme?.defaultProps?.labelPosition ?? "right",
+    variant: theme?.defaultProps?.root?.variant ?? "outline",
+    colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
+    size: theme?.defaultProps?.root?.size ?? "md",
+    labelPosition: theme?.defaultProps?.root?.labelPosition ?? "right",
   };
 
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
@@ -199,8 +212,8 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   return (
     <Box
       as="label"
-      __baseStyle={theme?.baseStyle}
       class={containerClasses()}
+      __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
       data-checked={dataChecked()}
       {...dataAttrs}
@@ -214,16 +227,27 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         {...inputProps}
         {...ariaAttrs}
       />
-      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs}>
+      <hope.span
+        aria-hidden={true}
+        class={controlClasses()}
+        __baseStyle={theme?.baseStyle?.control}
+        data-checked={dataChecked()}
+        {...dataAttrs}
+      >
         <Switch>
           <Match when={inputProps.indeterminate}>{local.iconIndeterminate}</Match>
           <Match when={checked() && !inputProps.indeterminate}>{local.iconChecked}</Match>
         </Switch>
-      </span>
+      </hope.span>
       <Show when={local.children}>
-        <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
+        <hope.span
+          class={labelClasses()}
+          __baseStyle={theme?.baseStyle?.label}
+          data-checked={dataChecked()}
+          {...dataAttrs}
+        >
           {local.children}
-        </span>
+        </hope.span>
       </Show>
     </Box>
   );

@@ -1,40 +1,55 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
 import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
-import { useInputGroupContext } from "./input-group";
+import { ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
 
-export type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
+type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
 
 interface InputOptions extends ThemeableInputOptions {
   /**
-   * If `true`, the input will have `aria-invalid` set to `true`
+   * If `true`, the input will have `aria-invalid` set to `true`.
    */
   invalid?: boolean;
 
   /**
-   * The native HTML `size` attribute to be passed to the `input`
+   * The native HTML `size` attribute to be passed to the `input`.
    */
   htmlSize?: string | number;
 }
 
 export type InputProps = Omit<HTMLHopeProps<"input", InputOptions>, "as">;
 
+export interface InputStyleConfig {
+  baseStyle?: {
+    input?: SystemStyleObject;
+    group?: SystemStyleObject;
+    element?: SystemStyleObject;
+    addon?: SystemStyleObject;
+  };
+  defaultProps?: {
+    input?: ThemeableInputOptions;
+    group?: ThemeableInputGroupOptions;
+  };
+}
+
 const hopeInputClass = "hope-input";
 
 export function Input(props: InputProps) {
+  const theme = useComponentStyleConfigs().Input;
+
   const inputGroup = useInputGroupContext();
-  const theme = useThemeComponentStyles().Input;
 
   const defaultProps: InputProps = {
     type: "text",
-    variant: inputGroup?.state.variant ?? theme?.defaultProps?.variant ?? "outline",
-    size: inputGroup?.state.size ?? theme?.defaultProps?.size ?? "md",
+    variant: inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
+    size: inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
   };
 
   const propsWithDefault: InputProps = mergeProps(defaultProps, props);
@@ -66,7 +81,7 @@ export function Input(props: InputProps) {
       as="input"
       class={classes()}
       size={local.htmlSize}
-      __baseStyle={theme?.baseStyle}
+      __baseStyle={theme?.baseStyle?.input}
       {...formControlProps}
       {...others}
     />

@@ -1,16 +1,26 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { RadiiProps } from "@/styled-system/props/radii";
-import { ResponsiveValue } from "@/styled-system/types";
-import { useThemeComponentStyles } from "@/theme/provider";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
-import { TagProvider } from "./tag-provider";
 
-export type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
+type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
+
+export interface TagStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    icon?: SystemStyleObject;
+    label?: SystemStyleObject;
+    closeButton?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableTagOptions;
+  };
+}
 
 export type TagProps<C extends ElementType = "span"> = HTMLHopeProps<C, TagVariants>;
 
@@ -21,13 +31,13 @@ const hopeTagClass = "hope-tag";
  * or organized using keywords that describe them.
  */
 export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
-  const theme = useThemeComponentStyles().Tag;
+  const theme = useComponentStyleConfigs().Tag;
 
   const defaultProps: TagProps<"span"> = {
     as: "span",
-    variant: theme?.defaultProps?.variant ?? "subtle",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "neutral",
-    size: theme?.defaultProps?.size ?? "md",
+    variant: theme?.defaultProps?.root?.variant ?? "subtle",
+    colorScheme: theme?.defaultProps?.root?.colorScheme ?? "neutral",
+    size: theme?.defaultProps?.root?.size ?? "md",
   };
 
   const propsWithDefault: TagProps<"span"> = mergeProps(defaultProps, props);
@@ -39,14 +49,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 
   const classes = () => classNames(local.class, hopeTagClass, tagStyles(variantProps));
 
-  const borderRadius = () =>
-    others.borderRadius ?? (theme?.baseStyle?.borderRadius as ResponsiveValue<RadiiProps["borderRadius"]>);
-
-  return (
-    <TagProvider borderRadius={borderRadius()}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />
-    </TagProvider>
-  );
+  return <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />;
 }
 
 Tag.toString = () => createClassSelector(hopeTagClass);

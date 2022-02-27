@@ -1,11 +1,14 @@
 import { Accessor, createContext, createUniqueId, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { formControlStyles } from "./form-control.styles";
+import { FormLabelOptions } from "./form-label";
 
 export interface FormControlOptions {
   /**
@@ -105,9 +108,23 @@ export const FormControlContext = createContext<FormControlContextValue>();
 
 export type FormControlProps<C extends ElementType = "div"> = HTMLHopeProps<C, FormControlOptions>;
 
+export interface FormControlStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    label?: SystemStyleObject;
+    helperText?: SystemStyleObject;
+    errorMessage?: SystemStyleObject;
+  };
+  defaultProps?: {
+    label?: FormLabelOptions;
+  };
+}
+
 const hopeFormControlClass = "hope-form-control";
 
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
+  const theme = useComponentStyleConfigs().FormControl;
+
   const defaultId = `hope-field-${createUniqueId()}`;
 
   const [state, setState] = createStore<FormControlState>({
@@ -162,7 +179,7 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
 
   return (
     <FormControlContext.Provider value={context()}>
-      <Box role="group" class={classes()} {...others} />
+      <Box role="group" class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
     </FormControlContext.Provider>
   );
 }

@@ -1,5 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -21,14 +22,19 @@ const hopeBreadcrumbLinkClass = "hope-breadcrumb__link";
  * Otherwise, it renders an anchor tag.
  */
 export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLinkProps<C>) {
+  const theme = useComponentStyleConfigs().Breadcrumb;
+
   const [local, others] = splitProps(props as BreadcrumbLinkProps<"a">, ["class", "currentPage", "href"]);
 
   const classes = () =>
     classNames(local.class, hopeBreadcrumbLinkClass, breadcrumbLinkStyles({ currentPage: local.currentPage }));
 
   return (
-    <Show when={local.currentPage} fallback={<Box as="a" href={local.href} class={classes()} {...others} />}>
-      <Box as="span" aria-current="page" class={classes()} {...others} />
+    <Show
+      when={local.currentPage}
+      fallback={<Box as="a" href={local.href} class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />}
+    >
+      <Box as="span" aria-current="page" class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />
     </Show>
   );
 }

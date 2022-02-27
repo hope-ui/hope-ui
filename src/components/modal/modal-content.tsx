@@ -7,6 +7,7 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { createModal } from "./create-modal";
 import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type ModalContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
@@ -17,6 +18,8 @@ const hopeModalContentClass = "hope-modal__content";
  * Container for the modal dialog's content.
  */
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
+  const theme = useComponentStyleConfigs().Modal;
+
   const defaultProps: ModalContentProps<"section"> = {
     as: "section",
   };
@@ -89,6 +92,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
         >
           <Box
             class={dialogClasses()}
+            __baseStyle={theme?.baseStyle?.content}
             id={modalContext.state.dialogId}
             role={local.role ?? "dialog"}
             tabIndex={-1}

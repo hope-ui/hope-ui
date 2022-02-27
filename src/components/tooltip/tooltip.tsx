@@ -15,6 +15,7 @@ import {
 import { isServer, Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
+import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -122,23 +123,43 @@ export interface TooltipOptions {
   onClose?(): void;
 }
 
+type ThemeableTooltipOptions = Pick<
+  TooltipOptions,
+  | "placement"
+  | "offset"
+  | "withArrow"
+  | "arrowSize"
+  | "arrowPadding"
+  | "openDelay"
+  | "closeDelay"
+  | "closeOnClick"
+  | "closeOnMouseDown"
+>;
+
+export type TooltipStyleConfig = SinglePartComponentStyleConfig<ThemeableTooltipOptions>;
+
 export type TooltipProps<C extends ElementType = "div"> = HTMLHopeProps<C, TooltipOptions>;
 
 const hopeTooltipClass = "hope-tooltip";
 const hopeTooltipArrowClass = "hope-tooltip__arrow";
 
 export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
+  const theme = useComponentStyleConfigs().Tooltip;
+
   const defaultId = `hope-tooltip-${createUniqueId()}`;
 
   const defaultProps: TooltipProps<"div"> = {
     as: "div",
     id: defaultId,
-    placement: "bottom",
-    offset: 8,
-    arrowPadding: 8,
-    openDelay: 0,
-    closeDelay: 0,
-    closeOnClick: true,
+    placement: theme?.defaultProps?.placement ?? "bottom",
+    offset: theme?.defaultProps?.offset ?? 8,
+    withArrow: theme?.defaultProps?.withArrow ?? true,
+    arrowSize: theme?.defaultProps?.arrowSize ?? 8,
+    arrowPadding: theme?.defaultProps?.arrowPadding ?? 8,
+    openDelay: theme?.defaultProps?.openDelay ?? 0,
+    closeDelay: theme?.defaultProps?.closeDelay ?? 0,
+    closeOnClick: theme?.defaultProps?.closeOnClick ?? true,
+    closeOnMouseDown: theme?.defaultProps?.closeOnMouseDown ?? false,
   };
 
   const propsWithDefault: TooltipProps<"div"> = mergeProps(defaultProps, props);
@@ -404,7 +425,14 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
             onAfterExit={afterToolipExitTransition}
           >
             <Show when={opened()}>
-              <Box ref={tooltipElement} role="tooltip" id={local.id} class={tooltipClasses()} {...others}>
+              <Box
+                ref={tooltipElement}
+                role="tooltip"
+                id={local.id}
+                class={tooltipClasses()}
+                __baseStyle={theme?.baseStyle}
+                {...others}
+              >
                 {local.label}
                 <Show when={local.withArrow}>
                   <Box ref={arrowElement} class={arrowClasses()} boxSize={local.arrowSize} />

@@ -1,10 +1,13 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { SinglePartComponentStyleConfig, useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { anchorStyles } from "./anchor.styles";
+
+export type AnchorStyleConfig = SinglePartComponentStyleConfig<void>;
 
 interface AnchorOptions {
   external?: boolean;
@@ -19,6 +22,8 @@ const hopeAnchorClass = "hope-anchor";
  * This component is styled to resemble a hyperlink and semantically renders an <a>.
  */
 export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
+  const theme = useComponentStyleConfigs().Anchor;
+
   const defaultProps: AnchorProps<"a"> = {
     as: "a",
   };
@@ -31,6 +36,7 @@ export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
   return (
     <Box
       class={classes()}
+      __baseStyle={theme?.baseStyle}
       target={local.external ? "_blank" : undefined}
       rel={local.external ? "noopener noreferrer" : undefined}
       {...others}

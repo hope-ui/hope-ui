@@ -1,13 +1,16 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { textStyles, TextVariants } from "./text.styles";
+import { SinglePartComponentStyleConfig } from "@/theme";
 
 export type TextProps<C extends ElementType = "p"> = HTMLHopeProps<C, TextVariants>;
+
+export type TextStyleConfig = SinglePartComponentStyleConfig<void>;
 
 const hopeTextClass = "hope-text";
 
@@ -16,7 +19,7 @@ const hopeTextClass = "hope-text";
  * It renders a <p> tag by default.
  */
 export function Text<C extends ElementType = "p">(props: TextProps<C>) {
-  const baseStyle = useThemeComponentStyles().Text?.baseStyle;
+  const theme = useComponentStyleConfigs().Text;
 
   const defaultProps: TextProps<"p"> = {
     as: "p",
@@ -27,7 +30,7 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   const classes = () => classNames(local.class, hopeTextClass, textStyles({ size: local.size }));
 
-  return <Box class={classes()} __baseStyle={baseStyle} {...others} />;
+  return <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
 }
 
 Text.toString = () => createClassSelector(hopeTextClass);

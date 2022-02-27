@@ -1,10 +1,12 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   radioContainerStyles,
@@ -86,6 +88,19 @@ interface RadioOptions extends ThemeableRadioOptions {
 
 export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
+export interface RadioStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    group?: SystemStyleObject;
+    control?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableRadioOptions;
+    group?: ThemeableRadioOptions;
+  };
+}
+
 const hopeRadioClass = "hope-radio";
 const hopeRadioInputClass = "hope-radio__input";
 const hopeRadioControlClass = "hope-radio__control";
@@ -94,17 +109,17 @@ const hopeRadioLabelClass = "hope-radio__label";
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const defaultId = `hope-radio-${createUniqueId()}`;
 
-  const theme = useThemeComponentStyles().Radio;
+  const theme = useComponentStyleConfigs().Radio;
 
   const radioGroupContext = useRadioGroupContext();
 
   const defaultProps: RadioProps<"label"> = {
     as: "label",
     id: defaultId,
-    variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.variant ?? "outline",
-    colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.colorScheme ?? "primary",
-    size: radioGroupContext?.state?.size ?? theme?.defaultProps?.size ?? "md",
-    labelPosition: radioGroupContext?.state?.labelPosition ?? theme?.defaultProps?.labelPosition ?? "right",
+    variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
+    colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
+    size: radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md",
+    labelPosition: radioGroupContext?.state?.labelPosition ?? theme?.defaultProps?.root?.labelPosition ?? "right",
 
     name: radioGroupContext?.state.name,
     required: radioGroupContext?.state.required,
@@ -194,8 +209,8 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   return (
     <Box
       as="label"
-      __baseStyle={theme?.baseStyle}
       class={containerClasses()}
+      __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
       data-checked={dataChecked()}
       {...dataAttrs}
@@ -209,11 +224,22 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
         {...inputProps}
         {...ariaAttrs}
       />
-      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs} />
+      <hope.span
+        aria-hidden={true}
+        class={controlClasses()}
+        __baseStyle={theme?.baseStyle?.control}
+        data-checked={dataChecked()}
+        {...dataAttrs}
+      />
       <Show when={local.children}>
-        <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
+        <hope.span
+          class={labelClasses()}
+          __baseStyle={theme?.baseStyle?.label}
+          data-checked={dataChecked()}
+          {...dataAttrs}
+        >
           {local.children}
-        </span>
+        </hope.span>
       </Show>
     </Box>
   );

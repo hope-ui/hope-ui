@@ -1,9 +1,10 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
+import { SinglePartComponentStyleConfig } from "@/theme/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Button, ButtonOptions, ThemeableButtonOptions } from "../button/button";
+import { Button, ButtonOptions } from "../button/button";
 import { hopeIconButtonClass } from "../button/button.styles";
 import { ElementType, HTMLHopeProps } from "../types";
 
@@ -16,7 +17,9 @@ export interface IconButtonOptions
   icon: JSX.Element;
 }
 
-export type ThemeableIconButtonOptions = Pick<ThemeableButtonOptions, "variant" | "colorScheme" | "size">;
+export type IconButtonStyleConfig = SinglePartComponentStyleConfig<
+  Pick<IconButtonOptions, "variant" | "colorScheme" | "size">
+>;
 
 export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, IconButtonOptions>;
 
@@ -25,9 +28,9 @@ export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C,
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const theme = useThemeComponentStyles().IconButton;
+  const theme = useComponentStyleConfigs().IconButton;
 
-  const defaultProps: Required<ThemeableIconButtonOptions> = {
+  const defaultProps: Partial<IconButtonProps<"button">> = {
     variant: theme?.defaultProps?.variant ?? "solid",
     colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
     size: theme?.defaultProps?.size ?? "md",

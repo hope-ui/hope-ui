@@ -1,6 +1,6 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -8,21 +8,22 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formLabelStyles, requiredIndicatorStyles } from "./form-control.styles";
 
-export interface ThemeableFormLabelOptions {
+export interface FormLabelOptions {
   withRequiredIndicator?: boolean;
 }
 
-export type FormLabelProps<C extends ElementType = "label"> = HTMLHopeProps<C, ThemeableFormLabelOptions>;
+export type FormLabelProps<C extends ElementType = "label"> = HTMLHopeProps<C, FormLabelOptions>;
 
 const hopeFormLabelClass = "hope-form-label";
 
 export function FormLabel<C extends ElementType = "label">(props: FormLabelProps<C>) {
-  const theme = useThemeComponentStyles().FormLabel;
+  const theme = useComponentStyleConfigs().FormControl;
+
   const formControl = useFormControlContext();
 
   const defaultProps: FormLabelProps<"label"> = {
     as: "label",
-    withRequiredIndicator: theme?.defaultProps?.withRequiredIndicator ?? true,
+    withRequiredIndicator: theme?.defaultProps?.label?.withRequiredIndicator ?? true,
   };
 
   const propsWithDefault: FormLabelProps<"label"> = mergeProps(defaultProps, props);
@@ -52,7 +53,7 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
       id={id()}
       for={htmlFor()}
       class={classes()}
-      __baseStyle={theme?.baseStyle}
+      __baseStyle={theme?.baseStyle?.label}
       {...formControlDataAttrs}
       {...others}
     >

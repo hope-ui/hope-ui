@@ -1,10 +1,12 @@
 import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme";
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   switchContainerStyles,
@@ -15,7 +17,7 @@ import {
   switchLabelStyles,
 } from "./switch.styles";
 
-export type ThemeableSwitchOptions = SwitchContainerVariants & SwitchControlVariants;
+type ThemeableSwitchOptions = SwitchContainerVariants & SwitchControlVariants;
 
 interface SwitchOptions extends ThemeableSwitchOptions {
   /**
@@ -85,21 +87,32 @@ interface SwitchOptions extends ThemeableSwitchOptions {
 
 export type SwitchProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchOptions>;
 
+export interface SwitchStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    control?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableSwitchOptions;
+  };
+}
+
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";
 const hopeSwitchControlClass = "hope-switch__control";
 const hopeSwitchLabelClass = "hope-switch__label";
 
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
-  const theme = useThemeComponentStyles().Switch;
+  const theme = useComponentStyleConfigs().Switch;
 
   const defaultProps: SwitchProps<"label"> = {
     as: "label",
     id: `hope-switch-${createUniqueId()}`,
-    variant: theme?.defaultProps?.variant ?? "filled",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
-    labelPosition: theme?.defaultProps?.labelPosition ?? "left",
+    variant: theme?.defaultProps?.root?.variant ?? "filled",
+    colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
+    size: theme?.defaultProps?.root?.size ?? "md",
+    labelPosition: theme?.defaultProps?.root?.labelPosition ?? "left",
   };
 
   const propsWithDefaults: SwitchProps<"label"> = mergeProps(defaultProps, props);
@@ -177,8 +190,8 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   return (
     <Box
       as="label"
-      __baseStyle={theme?.baseStyle}
       class={containerClasses()}
+      __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
       data-checked={dataChecked()}
       {...dataAttrs}
@@ -193,11 +206,22 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         {...inputProps}
         {...ariaAttrs}
       />
-      <span aria-hidden={true} class={controlClasses()} data-checked={dataChecked()} {...dataAttrs} />
+      <hope.span
+        aria-hidden={true}
+        class={controlClasses()}
+        __baseStyle={theme?.baseStyle?.control}
+        data-checked={dataChecked()}
+        {...dataAttrs}
+      />
       <Show when={local.children}>
-        <span class={labelClasses()} data-checked={dataChecked()} {...dataAttrs}>
+        <hope.span
+          class={labelClasses()}
+          __baseStyle={theme?.baseStyle?.label}
+          data-checked={dataChecked()}
+          {...dataAttrs}
+        >
           {local.children}
-        </span>
+        </hope.span>
       </Show>
     </Box>
   );

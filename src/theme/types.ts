@@ -1,16 +1,25 @@
 import { Accessor } from "solid-js";
 
-import { ThemeableAlertOptions } from "@/components/alert/alert";
-import { ThemeableButtonOptions } from "@/components/button/button";
-import { ThemeableCheckboxOptions } from "@/components/checkbox/checkbox";
-import { ThemeableFormLabelOptions } from "@/components/form-control/form-label";
-import { ThemeableIconButtonOptions } from "@/components/icon-button/icon-button";
-import { ThemeableInputOptions } from "@/components/input/input";
-import { ThemeableInputGroupOptions } from "@/components/input/input-group";
-import { ThemeableRadioOptions } from "@/components/radio/radio";
-import { ThemeableSwitchOptions } from "@/components/switch/switch";
-import { ThemeableTagOptions } from "@/components/tag/tag";
-import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
+import { AlertStyleConfig } from "@/components/alert/alert";
+import { AnchorStyleConfig } from "@/components/anchor/anchor";
+import { BreadcrumbStyleConfig } from "@/components/breadcrumb/breadcrumb";
+import { ButtonStyleConfig } from "@/components/button/button";
+import { CheckboxStyleConfig } from "@/components/checkbox/checkbox";
+import { CloseButtonStyleConfig } from "@/components/close-button/close-button";
+import { DrawerStyleConfig } from "@/components/drawer/drawer";
+import { FormControlStyleConfig } from "@/components/form-control/form-control";
+import { HeadingStyleConfig } from "@/components/heading/heading";
+import { IconButtonStyleConfig } from "@/components/icon-button/icon-button";
+import { InputStyleConfig } from "@/components/input/input";
+import { ModalStyleConfig } from "@/components/modal/modal";
+import { RadioStyleConfig } from "@/components/radio/radio";
+import { SpinnerStyleConfig } from "@/components/spinner/spinner";
+import { SwitchStyleConfig } from "@/components/switch/switch";
+import { TableStyleConfig } from "@/components/table/table";
+import { TagStyleConfig } from "@/components/tag/tag";
+import { TextStyleConfig } from "@/components/text/text";
+import { TextareaStyleConfig } from "@/components/textarea/textarea";
+import { TooltipStyleConfig } from "@/components/tooltip/tooltip";
 import { baseTheme } from "@/styled-system/stitches.config";
 import { baseThemeTokens } from "@/styled-system/tokens";
 import { SystemStyleObject } from "@/styled-system/types";
@@ -40,9 +49,9 @@ export type StitchesThemeConfig = {
 };
 
 /**
- * Theme configuration for Hope UI component.
+ * Style configuration for Hope UI single-part component.
  */
-export interface ComponentStyle<Props> {
+export interface SinglePartComponentStyleConfig<Props> {
   /**
    * Style object for base or default style
    */
@@ -54,20 +63,27 @@ export interface ComponentStyle<Props> {
   defaultProps?: Props;
 }
 
-export interface ComponentsStyles {
-  Alert?: ComponentStyle<ThemeableAlertOptions>;
-  Button?: ComponentStyle<ThemeableButtonOptions>;
-  Checkbox?: ComponentStyle<ThemeableCheckboxOptions>;
-  FormLabel?: ComponentStyle<ThemeableFormLabelOptions>;
-  Heading?: ComponentStyle<void>;
-  IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
-  Input?: ComponentStyle<ThemeableInputOptions>;
-  InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
-  Radio?: ComponentStyle<ThemeableRadioOptions>;
-  Switch?: ComponentStyle<ThemeableSwitchOptions>;
-  Text?: ComponentStyle<void>;
-  Textarea?: ComponentStyle<ThemeableTextareaOptions>;
-  Tag?: ComponentStyle<ThemeableTagOptions>;
+interface ComponentsStyleConfigs {
+  Alert?: AlertStyleConfig;
+  Anchor?: AnchorStyleConfig;
+  Breadcrumb?: BreadcrumbStyleConfig;
+  Button?: ButtonStyleConfig;
+  Checkbox?: CheckboxStyleConfig;
+  CloseButton?: CloseButtonStyleConfig;
+  Drawer?: DrawerStyleConfig;
+  FormControl?: FormControlStyleConfig;
+  Heading?: HeadingStyleConfig;
+  IconButton?: IconButtonStyleConfig;
+  Input?: InputStyleConfig;
+  Modal?: ModalStyleConfig;
+  Radio?: RadioStyleConfig;
+  Spinner?: SpinnerStyleConfig;
+  Switch?: SwitchStyleConfig;
+  Table?: TableStyleConfig;
+  Tag?: TagStyleConfig;
+  Text?: TextStyleConfig;
+  Textarea?: TextareaStyleConfig;
+  Tooltip?: TooltipStyleConfig;
 }
 
 /**
@@ -77,11 +93,11 @@ export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
   lightTheme?: StitchesThemeConfig;
   darkTheme?: StitchesThemeConfig;
-  components?: ComponentsStyles;
+  components?: ComponentsStyleConfigs;
 }
 
 export interface HopeContextValue {
-  components: ComponentsStyles;
+  components: ComponentsStyleConfigs;
   theme: Accessor<HopeTheme>;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;

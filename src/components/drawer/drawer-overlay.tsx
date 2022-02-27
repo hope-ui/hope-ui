@@ -1,6 +1,7 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -18,6 +19,8 @@ const hopeDrawerOverlayClass = "hope-drawer__overlay";
  * DrawerOverlay renders a backdrop behind the drawer.
  */
 export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverlayProps<C>) {
+  const theme = useComponentStyleConfigs().Drawer;
+
   const drawerContext = useDrawerContext();
   const modalContext = useModalContext();
 
@@ -32,7 +35,7 @@ export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverla
   return (
     <Transition name={transitionName()} appear>
       <Show when={modalContext.state.opened}>
-        <Box class={classes()} {...others} />
+        <Box class={classes()} __baseStyle={theme?.baseStyle?.overlay} {...others} />
       </Show>
     </Transition>
   );
