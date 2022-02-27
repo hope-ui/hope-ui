@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -29,7 +29,7 @@ const hopeInputClass = "hope-input";
 
 export function Input(props: InputProps) {
   const inputGroup = useInputGroupContext();
-  const theme = useThemeComponentStyles().Input;
+  const theme = useComponentStyleConfigs().Input;
 
   const defaultProps: InputProps = {
     type: "text",

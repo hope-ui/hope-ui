@@ -1,5 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
@@ -18,6 +19,7 @@ export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
 const hopeAlertIconClass = "hope-alert-icon";
 
 export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C>) {
+  const theme = useComponentStyleConfigs().Alert;
   const { status } = useAlertContext();
 
   const defaultProps: IconProps<"svg"> = {
@@ -50,7 +52,7 @@ export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C
     }
   };
 
-  return <Icon as={icon()} class={classes()} {...others} />;
+  return <Icon as={icon()} class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />;
 }
 
 AlertIcon.toString = () => createClassSelector(hopeAlertIconClass);

@@ -78,13 +78,13 @@ export function useTheme() {
 
 /**
  * Custom hook that reads from `HopeProvider` context
- * Returns an accessor for the theme based components styles.
+ * Returns an accessor for the theme based components style configs.
  */
-export function useThemeComponentStyles() {
+export function useComponentStyleConfigs() {
   const context = useContext(HopeContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useThemeComponentStyles must be used within a HopeProvider");
+    throw new Error("[Hope UI]: useComponentStyleConfigs must be used within a HopeProvider");
   }
 
   return context.components;

@@ -1,6 +1,6 @@
 import { Accessor } from "solid-js";
 
-import { ThemeableAlertOptions } from "@/components/alert/alert";
+import { AlertStyleConfig } from "@/components/alert/alert";
 import { ThemeableButtonOptions } from "@/components/button/button";
 import { ThemeableCheckboxOptions } from "@/components/checkbox/checkbox";
 import { ThemeableFormLabelOptions } from "@/components/form-control/form-label";
@@ -14,6 +14,7 @@ import { ThemeableTextareaOptions } from "@/components/textarea/textarea";
 import { baseTheme } from "@/styled-system/stitches.config";
 import { baseThemeTokens } from "@/styled-system/tokens";
 import { SystemStyleObject } from "@/styled-system/types";
+import { AnchorStyleConfig } from "@/components/anchor/anchor";
 
 export type ColorMode = "light" | "dark" | "system";
 
@@ -40,9 +41,9 @@ export type StitchesThemeConfig = {
 };
 
 /**
- * Theme configuration for Hope UI component.
+ * Style configuration for Hope UI single-part component.
  */
-export interface ComponentStyle<Props> {
+export interface SinglePartComponentStyleConfig<Props> {
   /**
    * Style object for base or default style
    */
@@ -54,20 +55,22 @@ export interface ComponentStyle<Props> {
   defaultProps?: Props;
 }
 
-export interface ComponentsStyles {
-  Alert?: ComponentStyle<ThemeableAlertOptions>;
-  Button?: ComponentStyle<ThemeableButtonOptions>;
-  Checkbox?: ComponentStyle<ThemeableCheckboxOptions>;
-  FormLabel?: ComponentStyle<ThemeableFormLabelOptions>;
-  Heading?: ComponentStyle<void>;
-  IconButton?: ComponentStyle<ThemeableIconButtonOptions>;
-  Input?: ComponentStyle<ThemeableInputOptions>;
-  InputGroup?: ComponentStyle<ThemeableInputGroupOptions>;
-  Radio?: ComponentStyle<ThemeableRadioOptions>;
-  Switch?: ComponentStyle<ThemeableSwitchOptions>;
-  Text?: ComponentStyle<void>;
-  Textarea?: ComponentStyle<ThemeableTextareaOptions>;
-  Tag?: ComponentStyle<ThemeableTagOptions>;
+interface ComponentsStyleConfigs {
+  Alert?: AlertStyleConfig;
+  Anchor?: AnchorStyleConfig;
+  // TODO: refactor style configs below
+  Button?: SinglePartComponentStyleConfig<ThemeableButtonOptions>;
+  Checkbox?: SinglePartComponentStyleConfig<ThemeableCheckboxOptions>;
+  FormLabel?: SinglePartComponentStyleConfig<ThemeableFormLabelOptions>;
+  Heading?: SinglePartComponentStyleConfig<void>;
+  IconButton?: SinglePartComponentStyleConfig<ThemeableIconButtonOptions>;
+  Input?: SinglePartComponentStyleConfig<ThemeableInputOptions>;
+  InputGroup?: SinglePartComponentStyleConfig<ThemeableInputGroupOptions>;
+  Radio?: SinglePartComponentStyleConfig<ThemeableRadioOptions>;
+  Switch?: SinglePartComponentStyleConfig<ThemeableSwitchOptions>;
+  Text?: SinglePartComponentStyleConfig<void>;
+  Textarea?: SinglePartComponentStyleConfig<ThemeableTextareaOptions>;
+  Tag?: SinglePartComponentStyleConfig<ThemeableTagOptions>;
 }
 
 /**
@@ -77,11 +80,11 @@ export interface HopeThemeConfig {
   initialColorMode?: ColorMode;
   lightTheme?: StitchesThemeConfig;
   darkTheme?: StitchesThemeConfig;
-  components?: ComponentsStyles;
+  components?: ComponentsStyleConfigs;
 }
 
 export interface HopeContextValue {
-  components: ComponentsStyles;
+  components: ComponentsStyleConfigs;
   theme: Accessor<HopeTheme>;
   colorMode: Accessor<ColorMode>;
   setColorMode: (value: ColorMode) => void;

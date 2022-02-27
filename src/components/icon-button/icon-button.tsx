@@ -1,6 +1,6 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions, ThemeableButtonOptions } from "../button/button";
@@ -25,7 +25,7 @@ export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C,
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const theme = useThemeComponentStyles().IconButton;
+  const theme = useComponentStyleConfigs().IconButton;
 
   const defaultProps: Required<ThemeableIconButtonOptions> = {
     variant: theme?.defaultProps?.variant ?? "solid",

@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -22,7 +22,7 @@ export type TextareaProps = Omit<HTMLHopeProps<"textarea", TextareaOptions>, "as
 const hopeTextareaClass = "hope-textarea";
 
 export function Textarea(props: TextareaProps) {
-  const theme = useThemeComponentStyles().Textarea;
+  const theme = useComponentStyleConfigs().Textarea;
 
   const defaultProps: TextareaProps = {
     variant: theme?.defaultProps?.variant ?? "outline",

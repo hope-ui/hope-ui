@@ -1,6 +1,6 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { useThemeComponentStyles } from "@/theme";
+import { useComponentStyleConfigs } from "@/theme";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -17,7 +17,7 @@ export type FormLabelProps<C extends ElementType = "label"> = HTMLHopeProps<C, T
 const hopeFormLabelClass = "hope-form-label";
 
 export function FormLabel<C extends ElementType = "label">(props: FormLabelProps<C>) {
-  const theme = useThemeComponentStyles().FormLabel;
+  const theme = useComponentStyleConfigs().FormLabel;
   const formControl = useFormControlContext();
 
   const defaultProps: FormLabelProps<"label"> = {

@@ -2,7 +2,7 @@ import { mergeProps, splitProps } from "solid-js";
 
 import { RadiiProps } from "@/styled-system/props/radii";
 import { ResponsiveValue } from "@/styled-system/types";
-import { useThemeComponentStyles } from "@/theme/provider";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -21,7 +21,7 @@ const hopeTagClass = "hope-tag";
  * or organized using keywords that describe them.
  */
 export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
-  const theme = useThemeComponentStyles().Tag;
+  const theme = useComponentStyleConfigs().Tag;
 
   const defaultProps: TagProps<"span"> = {
     as: "span",
