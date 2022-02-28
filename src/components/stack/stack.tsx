@@ -1,12 +1,11 @@
 import { Property } from "csstype";
-import { createMemo, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { ResponsiveProps, SpaceScaleValue } from "@/styled-system/types";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { getSpacingStyles } from "./stack.utils";
 
 export type StackOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;
@@ -28,8 +27,6 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
 
   const classes = () => classNames(local.class, hopeStackClass);
 
-  const spacingSyles = createMemo(() => getSpacingStyles(local.direction, local.spacing));
-
   return (
     <Box
       class={classes()}
@@ -37,7 +34,7 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
       alignItems="center"
       flexDirection={local.direction}
       flexWrap={local.wrap}
-      {...spacingSyles}
+      gap={local.spacing}
       {...others}
     />
   );
@@ -58,7 +55,7 @@ export type VStackProps<C extends ElementType = "div"> = StackProps<C> & VStackO
 export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
 
-  return <Stack direction="column" spacing={local.spacing} {...others} />;
+  return <Stack direction="column" rowGap={local.spacing} {...others} />;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -74,5 +71,5 @@ export type HStackProps<C extends ElementType = "div"> = StackProps<C> & HStackO
 export function HStack<C extends ElementType = "div">(props: HStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
 
-  return <Stack direction="row" spacing={local.spacing} {...others} />;
+  return <Stack direction="row" columnGap={local.spacing} {...others} />;
 }
