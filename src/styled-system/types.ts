@@ -102,6 +102,11 @@ export type Prefixed<K extends string, T> = `${K}${Extract<T, boolean | number |
 export type SystemMediaCssSelector = Prefixed<"@", keyof SystemMedia>;
 
 /**
+ * All breakpoint css selectors
+ */
+export type BreakpointCssSelector = "@initial" | Exclude<SystemMediaCssSelector, "@reduce-motion" | "@light" | "@dark">;
+
+/**
  * Utility type to convert a given props type to a stitches responsive variant-like type.
  */
 export type ResponsiveProps<Props> = {
