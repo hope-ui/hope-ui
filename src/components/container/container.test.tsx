@@ -6,7 +6,10 @@ import { Container } from "./container";
 import { containerStyles, ContainerVariants } from "./container.styles";
 
 describe("Container", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

@@ -7,7 +7,10 @@ import { formErrorMessageStyles } from "../form-control.styles";
 import { FormErrorMessage } from "../form-error-message";
 
 describe("FormErrorMessage", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should NOT render when FormControl is valid", () => {
     // act

@@ -7,7 +7,10 @@ import { inputGroupStyles } from "../input.styles";
 import { InputGroup } from "../input-group";
 
 describe("InputGroup", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

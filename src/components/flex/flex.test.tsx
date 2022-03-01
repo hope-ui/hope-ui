@@ -7,7 +7,10 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 import { Flex, FlexOptions } from "./flex";
 
 describe("Flex", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

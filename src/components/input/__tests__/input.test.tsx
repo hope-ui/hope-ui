@@ -8,7 +8,10 @@ import { Input } from "../input";
 import { baseInputResetStyles, inputStyles } from "../input.styles";
 
 describe("Input", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

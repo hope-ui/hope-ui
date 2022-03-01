@@ -7,7 +7,10 @@ import { formHelperTextStyles } from "../form-control.styles";
 import { FormHelperText } from "../form-helper-text";
 
 describe("FormHelperText", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

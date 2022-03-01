@@ -6,7 +6,10 @@ import { Tag } from "../tag";
 import { tagStyles, TagVariants } from "../tag.styles";
 
 describe("Tag", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

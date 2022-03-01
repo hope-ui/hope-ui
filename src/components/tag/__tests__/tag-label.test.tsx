@@ -6,7 +6,10 @@ import { tagLabelStyles } from "../tag.styles";
 import { TagLabel } from "../tag-label";
 
 describe("TagLabel", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

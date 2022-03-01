@@ -7,7 +7,10 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 import { Box } from "./box";
 
 describe("Box", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

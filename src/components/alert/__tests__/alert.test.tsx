@@ -6,7 +6,10 @@ import { Alert } from "../alert";
 import { alertStyles, AlertVariants } from "../alert.styles";
 
 describe("Alert", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

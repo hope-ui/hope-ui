@@ -1,9 +1,9 @@
 import { VariantProps } from "@stitches/core";
 
+import { ModalContent } from "@/components/modal/modal-content";
 import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
-import { ModalContent } from "..";
 
 export const hopeIconButtonClass = "hope-icon-button";
 

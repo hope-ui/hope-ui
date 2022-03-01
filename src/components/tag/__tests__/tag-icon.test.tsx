@@ -7,7 +7,10 @@ import { tagLeftIconStyles, tagRightIconStyles } from "../tag.styles";
 import { TagLeftIcon, TagRightIcon } from "../tag-icon";
 
 describe("TagLeftIcon", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act
@@ -95,7 +98,10 @@ describe("TagLeftIcon", () => {
 });
 
 describe("TagRightIcon", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

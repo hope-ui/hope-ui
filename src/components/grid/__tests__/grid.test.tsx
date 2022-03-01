@@ -4,10 +4,13 @@ import { css } from "@/styled-system";
 import * as styledSystem from "@/styled-system/system";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { Grid, GridOptions } from "./grid";
+import { Grid, GridOptions } from "../grid";
 
 describe("Grid", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

@@ -10,7 +10,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 export type StackOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;
   wrap?: Property.FlexWrap;
-  //spacing?: Property.Gap<SpaceScaleValue> | number;
+  spacing?: Property.Gap<SpaceScaleValue> | number;
 }>;
 
 export type StackProps<C extends ElementType = "div"> = HTMLHopeProps<C, StackOptions>;
@@ -23,7 +23,7 @@ const hopeStackClass = "hope-stack";
  * Foundation of <VStack /> and <HStack /> components.
  */
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
-  const [local, others] = splitProps(props, ["class", "direction", "wrap"]);
+  const [local, others] = splitProps(props, ["class", "direction", "wrap", "spacing"]);
 
   const classes = () => classNames(local.class, hopeStackClass);
 
@@ -34,6 +34,7 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
       alignItems="center"
       flexDirection={local.direction}
       flexWrap={local.wrap}
+      gap={local.spacing}
       {...others}
     />
   );

@@ -7,7 +7,10 @@ import { buttonStyles } from "../button/button.styles";
 import { IconButton, IconButtonOptions } from "./icon-button";
 
 describe("IconButton", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

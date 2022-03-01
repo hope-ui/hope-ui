@@ -7,7 +7,10 @@ import { Icon } from "./icon";
 import { iconStyles } from "./icon.styles";
 
 describe("Icon", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

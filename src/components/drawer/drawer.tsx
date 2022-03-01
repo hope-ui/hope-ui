@@ -108,6 +108,10 @@ export function useDrawerContext() {
   return context;
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Drawer parts is just Modal parts with drawer's theme baseStyle
+ * -----------------------------------------------------------------------------------------------*/
+
 export function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalBody __baseStyle={theme?.baseStyle?.body} {...props} />;

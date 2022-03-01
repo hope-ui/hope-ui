@@ -9,16 +9,17 @@
 
 ### Layout
 
-|            | Development | A11y check | Tests | Storybook | Docs |
-| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Box        |     ✅      |    n/a     |  ✅   |    n/a    |      |
-| Center     |     ✅      |    n/a     |  ✅   |    ✅     |      |
-| Container  |     ✅      |    n/a     |  ✅   |    ✅     |      |
-| Divider    |     ✅      |    n/a     |       |           |      |
-| Flex       |     ✅      |    n/a     |  ✅   |           |      |
-| Grid       |     ✅      |    n/a     |  ✅   |           |      |
-| SimpleGrid |             |    n/a     |       |           |      |
-| Stack      |     ✅      |    n/a     |  ✅   |           |      |
+|             | Development | A11y check | Tests | Storybook | Docs |
+| ----------- | :---------: | :--------: | :---: | :-------: | :--: |
+| AspectRatio |     ✅      |    n/a     |  ✅   |           |      |
+| Box         |     ✅      |    n/a     |  ✅   |    n/a    |      |
+| Center      |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Container   |     ✅      |    n/a     |  ✅   |    ✅     |      |
+| Divider     |     ✅      |    n/a     |       |           |      |
+| Flex        |     ✅      |    n/a     |  ✅   |           |      |
+| Grid        |     ✅      |    n/a     |  ✅   |           |      |
+| SimpleGrid  |     ✅      |    n/a     |  ✅   |           |      |
+| Stack       |     ✅      |    n/a     |  ✅   |           |      |
 
 ### Typography
 
