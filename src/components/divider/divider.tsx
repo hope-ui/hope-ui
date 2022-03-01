@@ -36,8 +36,8 @@ export function Divider<C extends ElementType = "div">(props: DividerProps<C>) {
 
   const [local, others] = splitProps(propsWithDefault, ["class", "variant", "orientation", "thickness"]);
 
-  const classes = () =>
-    classNames(
+  const classes = () => {
+    return classNames(
       local.class,
       hopeDividerClass,
       dividerStyles({
@@ -49,6 +49,7 @@ export function Divider<C extends ElementType = "div">(props: DividerProps<C>) {
         },
       })
     );
+  };
 
   return <Box class={classes()} {...others} />;
 }
