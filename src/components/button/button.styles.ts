@@ -1,6 +1,5 @@
 import { VariantProps } from "@stitches/core";
 
-import { ModalContent } from "@/components/modal/modal-content";
 import { spin } from "@/styled-system/keyframes";
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
@@ -66,10 +65,6 @@ function createSizeVariant(config: SizeVariantConfig): SystemStyleObject {
     py: 0,
     px: config.paddingX,
     fontSize: config.fontSize,
-
-    // "& > * + *": {
-    //   marginLeft: config.spacing,
-    // },
 
     [`&.${hopeIconButtonClass}`]: {
       width: config.height,
@@ -220,12 +215,10 @@ export const buttonStyles = css({
   userSelect: "none",
   whiteSpace: "nowrap",
   verticalAlign: "middle",
-  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+  transition: "color 250ms, background-color 250ms",
 
   // box-shadow transition on button focus f*cked up solid-transition-group of modal and drawer
-  [`${ModalContent} &`]: {
-    transition: "color 250ms, background-color 250ms",
-  },
+  //transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
   "&:focus": {
     outline: "none",
