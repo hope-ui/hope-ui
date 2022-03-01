@@ -6,7 +6,10 @@ import { Center } from "./center";
 import { centerStyles } from "./center.styles";
 
 describe("Center", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

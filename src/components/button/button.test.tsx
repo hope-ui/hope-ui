@@ -6,7 +6,10 @@ import { Button } from "./button";
 import { buttonStyles, ButtonVariants } from "./button.styles";
 
 describe("Button", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

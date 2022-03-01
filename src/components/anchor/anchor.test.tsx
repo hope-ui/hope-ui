@@ -6,7 +6,10 @@ import { Anchor } from "./anchor";
 import { anchorStyles } from "./anchor.styles";
 
 describe("Anchor", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

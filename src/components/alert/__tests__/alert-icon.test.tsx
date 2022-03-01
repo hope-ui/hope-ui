@@ -12,7 +12,10 @@ function renderWithAlertContextProvider(callback: () => JSX.Element) {
 }
 
 describe("AlertIcon", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

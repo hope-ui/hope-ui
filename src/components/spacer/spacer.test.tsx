@@ -6,7 +6,10 @@ import { Spacer } from "./spacer";
 import { spacerStyles } from "./spacer.styles";
 
 describe("Spacer", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

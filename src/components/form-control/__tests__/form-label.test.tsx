@@ -8,7 +8,10 @@ import { formLabelStyles } from "../form-control.styles";
 import { FormLabel } from "../form-label";
 
 describe("FormLabel", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

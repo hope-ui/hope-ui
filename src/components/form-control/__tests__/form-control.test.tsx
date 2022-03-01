@@ -10,7 +10,10 @@ import { FormHelperText } from "../form-helper-text";
 import { FormLabel } from "../form-label";
 
 describe("FormControl", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

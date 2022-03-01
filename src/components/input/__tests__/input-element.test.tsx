@@ -25,7 +25,10 @@ const inputGroupContextMock: inputGroupModule.InputGroupContextValue = {
 };
 
 describe("InputElement", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act
@@ -152,7 +155,10 @@ describe("InputElement", () => {
 });
 
 describe("InputLeftElement", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act
@@ -314,7 +320,10 @@ describe("InputLeftElement", () => {
 });
 
 describe("InputRightElement", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

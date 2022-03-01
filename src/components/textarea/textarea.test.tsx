@@ -9,7 +9,10 @@ import { Textarea } from "./textarea";
 import { textareaStyles } from "./textarea.styles";
 
 describe("Textarea", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

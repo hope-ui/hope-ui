@@ -6,7 +6,10 @@ import { tagCloseButtonStyles } from "../tag.styles";
 import { TagCloseButton } from "../tag-close-button";
 
 describe("TagCloseButton", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

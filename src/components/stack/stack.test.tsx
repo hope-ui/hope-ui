@@ -7,7 +7,10 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 import { HStack, HStackOptions, Stack, VStack, VStackOptions } from "./stack";
 
 describe("Stack", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act
@@ -116,7 +119,10 @@ describe("Stack", () => {
 });
 
 describe("VStack", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should have flexDirection set to column", () => {
     // arrange
@@ -160,7 +166,10 @@ describe("VStack", () => {
 });
 
 describe("HStack", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should have flexDirection set to row", () => {
     // arrange

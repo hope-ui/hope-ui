@@ -6,7 +6,10 @@ import { Heading, HeadingProps } from "./heading";
 import { headingStyles } from "./heading.styles";
 
 describe("Heading", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act

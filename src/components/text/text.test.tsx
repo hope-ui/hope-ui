@@ -6,7 +6,10 @@ import { Text, TextProps } from "./text";
 import { textStyles } from "./text.styles";
 
 describe("Text", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
+  });
 
   it("should render", () => {
     // act
