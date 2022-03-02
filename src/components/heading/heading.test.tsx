@@ -29,6 +29,19 @@ describe("Heading", () => {
     expect(heading).toBeInstanceOf(HTMLHeadingElement);
   });
 
+  it("should render <h> tag based on the level prop", () => {
+    // act
+    renderWithHopeProvider(() => (
+      <Heading data-testid="heading" level="3">
+        Heading
+      </Heading>
+    ));
+    const heading = screen.getByTestId("heading");
+
+    // assert
+    expect(heading).toBeInstanceOf(HTMLHeadingElement);
+  });
+
   it("should render tag provided with the as prop", () => {
     // act
     renderWithHopeProvider(() => (
