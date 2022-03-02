@@ -10,9 +10,11 @@ import {
   Heading,
   hope,
   HopeProvider,
+  HopeThemeConfig,
   HStack,
   SimpleGrid,
   Stack,
+  Text,
   useColorMode,
   VStack,
 } from ".";
@@ -24,29 +26,19 @@ export function App() {
     <Box p="$4">
       <VStack>
         <Heading>Heading</Heading>
-        <Heading level="1">Heading</Heading>
-        <Heading level="2">Heading</Heading>
-        <Heading level="3">Heading</Heading>
-        <Heading level="4">Heading</Heading>
-        <Heading level="5">Heading</Heading>
-        <Heading level="6">Heading</Heading>
-      </VStack>
-      <VStack>
-        <Heading>Heading</Heading>
-        <Heading level={1}>Heading</Heading>
-        <Heading level={2}>Heading</Heading>
-        <Heading level={3}>Heading</Heading>
-        <Heading level={4}>Heading</Heading>
-        <Heading level={5}>Heading</Heading>
-        <Heading level={6}>Heading</Heading>
+        <Text>Text</Text>
       </VStack>
     </Box>
   );
 }
 
+const config: HopeThemeConfig = {
+  components: {},
+};
+
 render(
   () => (
-    <HopeProvider>
+    <HopeProvider config={config}>
       <App />
     </HopeProvider>
   ),
