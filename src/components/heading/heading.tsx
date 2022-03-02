@@ -7,7 +7,16 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";
 
-export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingVariants>;
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6 | "1" | "2" | "3" | "4" | "5" | "6";
+
+interface HeadingOptions extends HeadingVariants {
+  /**
+   * The level of heading to be rendered. For example `3` will render an h3.
+   */
+  level?: HeadingLevel;
+}
+
+export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingOptions>;
 
 export type HeadingStyleConfig = SinglePartComponentStyleConfig<void>;
 
@@ -25,11 +34,14 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   };
 
   const propsWithDefault: HeadingProps<"h2"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "size"]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "as", "level", "size"]);
 
   const classes = () => classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
-  return <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
+  // create an `h` tag with the level or return the `as` prop
+  const asProp = () => (local.level ? (`h${local.level}` as ElementType<any>) : local.as);
+
+  return <Box as={asProp()} class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
 }
 
 Heading.toString = () => createClassSelector(hopeHeadingClass);
