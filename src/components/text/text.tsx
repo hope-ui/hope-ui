@@ -9,7 +9,7 @@ import { textStyles, TextVariants } from "./text.styles";
 
 export type TextProps<C extends ElementType = "p"> = HTMLHopeProps<C, TextVariants>;
 
-export type TextStyleConfig = SinglePartComponentStyleConfig<void>;
+export type TextStyleConfig = SinglePartComponentStyleConfig<TextVariants>;
 
 const hopeTextClass = "hope-text";
 
@@ -22,6 +22,7 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   const defaultProps: TextProps<"p"> = {
     as: "p",
+    size: theme?.defaultProps?.size,
   };
 
   const propsWithDefault: TextProps<"p"> = mergeProps(defaultProps, props);

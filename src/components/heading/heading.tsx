@@ -18,7 +18,7 @@ interface HeadingOptions extends HeadingVariants {
 
 export type HeadingProps<C extends ElementType = "h2"> = HTMLHopeProps<C, HeadingOptions>;
 
-export type HeadingStyleConfig = SinglePartComponentStyleConfig<void>;
+export type HeadingStyleConfig = SinglePartComponentStyleConfig<HeadingOptions>;
 
 const hopeHeadingClass = "hope-heading";
 
@@ -31,6 +31,8 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
 
   const defaultProps: HeadingProps<"h2"> = {
     as: "h2",
+    level: theme?.defaultProps?.level,
+    size: theme?.defaultProps?.size,
   };
 
   const propsWithDefault: HeadingProps<"h2"> = mergeProps(defaultProps, props);
@@ -39,7 +41,7 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const classes = () => classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
   // create an `h` tag with the level or return the `as` prop
-  const asProp = () => (local.level ? (`h${local.level}` as ElementType<any>) : local.as);
+  const asProp = () => (local.level ? (`h${local.level}` as ElementType) : local.as);
 
   return <Box as={asProp()} class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
 }
