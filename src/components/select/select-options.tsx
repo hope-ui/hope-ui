@@ -1,4 +1,5 @@
 import { mergeProps, Show, splitProps } from "solid-js";
+import { Portal } from "solid-js/web";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -6,7 +7,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
-import { selectOptionsListStyles } from "./select.styles";
+import { selectListboxStyles } from "./select.styles";
 
 export type SelectOptionsProps<C extends ElementType = "ul"> = HTMLHopeProps<C>;
 
@@ -22,10 +23,10 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
   const propsWithDefault: SelectOptionsProps<"ul"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["ref", "class"]);
 
-  const classes = () => classNames(local.class, hopeSelectOptionsClass, selectOptionsListStyles());
+  const classes = () => classNames(local.class, hopeSelectOptionsClass, selectListboxStyles());
 
-  const assignOptionsRef = (el: HTMLUListElement) => {
-    selectContext.assignOptionsRef(el);
+  const assignListboxRef = (el: HTMLUListElement) => {
+    selectContext.assignListboxRef(el);
 
     if (isFunction(local.ref)) {
       local.ref(el);
@@ -37,14 +38,16 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
 
   return (
     <Show when={selectContext.state.opened}>
-      <Box
-        ref={assignOptionsRef}
-        role="listbox"
-        tabindex="-1"
-        id={selectContext.state.optionsId}
-        class={classes()}
-        {...others}
-      />
+      <Portal>
+        <Box
+          ref={assignListboxRef}
+          role="listbox"
+          tabindex="-1"
+          id={selectContext.state.listboxId}
+          class={classes()}
+          {...others}
+        />
+      </Portal>
     </Show>
   );
 }

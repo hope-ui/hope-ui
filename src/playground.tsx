@@ -26,9 +26,9 @@ export function App() {
   const [selected, setSelected] = createSignal(fruits[0]);
 
   return (
-    <Box p="$4">
+    <Box p="$4" h={2000}>
       <Select value={selected()} onChange={setSelected} disabled={false}>
-        <SelectButton>
+        <SelectButton mt={1000} maxW="200px">
           {/* {({ opened, disabled }) => selected()} */}
           {selected()}
         </SelectButton>

@@ -42,6 +42,10 @@ export const selectButtonStyles = css(baseInputResetStyles, {
 
 export type SelectButtonVariants = VariantProps<typeof selectButtonStyles>;
 
+/* -------------------------------------------------------------------------------------------------
+ * Select - button text
+ * -----------------------------------------------------------------------------------------------*/
+
 export const selectButtonTextStyles = css({
   display: "block",
   flexGrow: 1,
@@ -70,13 +74,18 @@ export const selectButtonIconStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - options list
+ * Select - listbox (options list)
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectOptionsListStyles = css({
+export const selectListboxStyles = css({
   zIndex: "$dropdown",
-  overflow: "auto",
+  position: "absolute",
+  left: 0,
+  top: "100%",
+
+  overflowY: "scroll",
   maxHeight: "$60",
+  width: "100%",
 
   margin: 0,
 

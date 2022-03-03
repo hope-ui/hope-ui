@@ -1,3 +1,5 @@
+import type { Placement as FloatingUIPlacement } from "@floating-ui/dom";
+import { computePosition, flip, getScrollParents, offset, shift, size } from "@floating-ui/dom";
 import { createContext, createUniqueId, JSX, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
@@ -88,7 +90,7 @@ interface SelectState {
   /**
    * The `id` of the listbox list (`SelectOptions`).
    */
-  optionsId: string;
+  listboxId: string;
 
   /**
    * The prefix of the options (`SelectOption`) `id`.
@@ -132,7 +134,7 @@ interface SelectContextValue {
   /**
    * A reefrence to the listbox list (`SelectOptions`).
    */
-  optionsRef?: HTMLUListElement;
+  listboxRef?: HTMLUListElement;
 
   /**
    * Callback to assign the `SelectButton` ref.
@@ -142,7 +144,7 @@ interface SelectContextValue {
   /**
    * Callback to assign the listbox list (`SelectOptions`) ref.
    */
-  assignOptionsRef: (el: HTMLUListElement) => void;
+  assignListboxRef: (el: HTMLUListElement) => void;
 
   /**
    * Scroll to the active option.
@@ -208,8 +210,8 @@ export function Select(props: SelectProps) {
     get buttonId() {
       return `${this.baseId}-button`;
     },
-    get optionsId() {
-      return `${this.baseId}-options`;
+    get listboxId() {
+      return `${this.baseId}-listbox`;
     },
     get optionIdPrefix() {
       return `${this.baseId}-option`;
@@ -224,7 +226,50 @@ export function Select(props: SelectProps) {
 
   // element refs
   let buttonRef: HTMLButtonElement | undefined;
-  let optionsRef: HTMLUListElement | undefined;
+  let listboxRef: HTMLUListElement | undefined;
+
+  const buttonScrollParents = () => {
+    if (!buttonRef) {
+      return;
+    }
+
+    return getScrollParents(buttonRef);
+  };
+
+  async function updateListboxPosition() {
+    if (!buttonRef || !listboxRef) {
+      return;
+    }
+
+    const { x, y } = await computePosition(buttonRef, listboxRef, {
+      placement: "bottom",
+      middleware: [
+        offset(8),
+        flip(),
+        shift(),
+        size({
+          apply({ reference }) {
+            if (!listboxRef) {
+              return;
+            }
+
+            Object.assign(listboxRef.style, {
+              width: `${reference.width}px`,
+            });
+          },
+        }),
+      ],
+    });
+
+    if (!listboxRef) {
+      return;
+    }
+
+    Object.assign(listboxRef.style, {
+      left: `${x}px`,
+      top: `${y}px`,
+    });
+  }
 
   const getSearchString = function (char: string) {
     // reset typing timeout and start new timeout
@@ -335,6 +380,7 @@ export function Select(props: SelectProps) {
   };
 
   const onOptionClick = function (index: number) {
+    onOptionChange(index);
     selectOption(index);
     updateMenuState(false);
   };
@@ -352,6 +398,20 @@ export function Select(props: SelectProps) {
 
     setState("opened", opened);
 
+    if (state.opened) {
+      updateListboxPosition();
+
+      buttonScrollParents()?.forEach(el => {
+        el.addEventListener("scroll", updateListboxPosition);
+        el.addEventListener("resize", updateListboxPosition);
+      });
+    } else {
+      buttonScrollParents()?.forEach(el => {
+        el.removeEventListener("scroll", updateListboxPosition);
+        el.removeEventListener("resize", updateListboxPosition);
+      });
+    }
+
     // move focus back to the button, if needed
     callFocus && buttonRef?.focus();
   };
@@ -360,18 +420,18 @@ export function Select(props: SelectProps) {
     buttonRef = el;
   };
 
-  const assignOptionsRef = (el: HTMLUListElement) => {
-    optionsRef = el;
+  const assignListboxRef = (el: HTMLUListElement) => {
+    listboxRef = el;
   };
 
   const scrollToOption = (optionRef: HTMLLIElement) => {
-    if (!optionsRef) {
+    if (!listboxRef) {
       return;
     }
 
     // ensure the new option is in view
-    if (isScrollable(optionsRef)) {
-      maintainScrollVisibility(optionRef, optionsRef);
+    if (isScrollable(listboxRef)) {
+      maintainScrollVisibility(optionRef, listboxRef);
     }
 
     //ensure the new option is visible on screen
@@ -387,9 +447,9 @@ export function Select(props: SelectProps) {
 
   const context: SelectContextValue = {
     state,
-    optionsRef,
+    listboxRef,
     assignButtonRef,
-    assignOptionsRef,
+    assignListboxRef,
     setOptionMounted,
     scrollToOption,
     onButtonBlur,
