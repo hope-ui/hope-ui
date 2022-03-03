@@ -126,20 +126,6 @@ export function getUpdatedIndex(currentIndex: number, maxIndex: number, action: 
 }
 
 /**
- * Check if element is visible in browser view port
- */
-export function isElementInView(element: HTMLElement) {
-  const bounding = element.getBoundingClientRect();
-
-  return (
-    bounding.top >= 0 &&
-    bounding.left >= 0 &&
-    bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}
-
-/**
  * Check if an element is currently scrollable
  */
 export function isScrollable(element: HTMLElement) {

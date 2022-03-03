@@ -12,7 +12,7 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "moduleResolution": "Node",
-    "noFallthroughCasesInSwitch": true,
+    //"noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,

@@ -1,4 +1,3 @@
-import type { Placement as FloatingUIPlacement } from "@floating-ui/dom";
 import { computePosition, flip, getScrollParents, offset, shift, size } from "@floating-ui/dom";
 import { createContext, createUniqueId, JSX, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -8,7 +7,6 @@ import {
   getActionFromKey,
   getIndexByLetter,
   getUpdatedIndex,
-  isElementInView,
   isScrollable,
   maintainScrollVisibility,
   SelectActions,
@@ -333,7 +331,6 @@ export function Select(props: SelectProps) {
       case SelectActions.First:
         updateMenuState(true);
       // intentional fallthrough
-      // eslint-disable-next-line no-fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
       case SelectActions.PageUp:
@@ -345,7 +342,6 @@ export function Select(props: SelectProps) {
         event.preventDefault();
         selectOption(state.activeIndex);
       // intentional fallthrough
-      // eslint-disable-next-line no-fallthrough
       case SelectActions.Close:
         event.preventDefault();
         return updateMenuState(false);
@@ -436,12 +432,6 @@ export function Select(props: SelectProps) {
     if (isScrollable(listboxRef)) {
       maintainScrollVisibility(optionRef, listboxRef);
     }
-
-    //ensure the new option is visible on screen
-    // if (!isElementInView(optionRef)) {
-    //   console.log("fired");
-    //   optionRef.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    // }
   };
 
   const setOptionMounted = (option: string) => {

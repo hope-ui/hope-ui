@@ -35,7 +35,7 @@ export function App() {
         <SelectOptions>
           <For each={fruits}>
             {fruit => (
-              <SelectOption value={fruit} disabled={fruit === "Durian"}>
+              <SelectOption value={fruit} disabled={false}>
                 {/* {({ active, selected, disabled }) => <span>{person}</span>} */}
                 {fruit}
               </SelectOption>
