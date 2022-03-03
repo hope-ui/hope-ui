@@ -21,6 +21,7 @@ export * from "./icons";
 export * from "./input";
 export * from "./modal";
 export * from "./radio";
+export * from "./select";
 export * from "./spacer";
 export * from "./spinner";
 export * from "./stack";

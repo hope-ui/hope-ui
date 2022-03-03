@@ -25,7 +25,7 @@ const inputSizes = {
 };
 
 /* -------------------------------------------------------------------------------------------------
- * CSS reset for text inputs, textarea and native-select
+ * CSS reset for text inputs, textarea
  * -----------------------------------------------------------------------------------------------*/
 
 const commonOutlineAndFilledStyles: SystemStyleObject = {
