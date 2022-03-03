@@ -406,6 +406,9 @@ export function Select(props: SelectProps) {
         el.addEventListener("resize", updateListboxPosition);
       });
     } else {
+      // select closed, clear the options
+      setState("options", []);
+
       buttonScrollParents()?.forEach(el => {
         el.removeEventListener("scroll", updateListboxPosition);
         el.removeEventListener("resize", updateListboxPosition);
@@ -435,9 +438,10 @@ export function Select(props: SelectProps) {
     }
 
     //ensure the new option is visible on screen
-    if (!isElementInView(optionRef)) {
-      optionRef.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
+    // if (!isElementInView(optionRef)) {
+    //   console.log("fired");
+    //   optionRef.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // }
   };
 
   const setOptionMounted = (option: string) => {
