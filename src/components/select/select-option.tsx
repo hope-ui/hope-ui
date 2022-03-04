@@ -8,11 +8,11 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
 
-interface SelectOptionOptions {
+interface SelectOptionOptions<T> {
   /**
    * The value of the option.
    */
-  value: string;
+  value: T;
 
   /**
    * If `true`, the option will be disabled.
@@ -20,11 +20,11 @@ interface SelectOptionOptions {
   disabled?: boolean;
 }
 
-export type SelectOptionProps<C extends ElementType = "li"> = HTMLHopeProps<C, SelectOptionOptions>;
+export type SelectOptionProps<C extends ElementType = "li", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
 
 const hopeSelectOptionClass = "hope-select__option";
 
-export function SelectOption<C extends ElementType = "li">(props: SelectOptionProps<C>) {
+export function SelectOption<C extends ElementType = "li", T = any>(props: SelectOptionProps<C, T>) {
   const selectContext = useSelectContext();
 
   const [index, setIndex] = createSignal<number>(-1);
@@ -63,7 +63,13 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
     }
   };
 
-  const isSelected = () => local.value === selectContext.state.value;
+  const isSelected = () => {
+    if (selectContext.state.value == null) {
+      return;
+    }
+
+    return selectContext.state.compareFn(local.value, selectContext.state.value);
+  };
 
   const isActiveDescendant = () => index() === selectContext.state.activeIndex;
 

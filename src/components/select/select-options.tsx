@@ -1,7 +1,7 @@
 import { children, JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { useClickOutside } from "@/hooks/use-click-outside";
+import { useOutsideClick } from "@/hooks/use-outside-click";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -65,7 +65,7 @@ function ListboxWrapper(props: { children?: JSX.Element }) {
 
   const resolvedChildren = children(() => props.children);
 
-  useClickOutside({
+  useOutsideClick({
     element: () => resolvedChildren() as HTMLElement,
     handler: event => selectContext.onListboxOutsideClick(event.target as HTMLElement),
   });

@@ -21,14 +21,39 @@ const fruits = [
   "Huckleberry",
 ];
 
+interface Fruit {
+  id: number;
+  name: string;
+}
+
+const fruitsObject: Fruit[] = [
+  { id: 1, name: "Apple" },
+  { id: 2, name: "Banana" },
+  { id: 3, name: "Blueberry" },
+  { id: 4, name: "Boysenberry" },
+  { id: 5, name: "Cherry" },
+  { id: 6, name: "Cranberry" },
+  { id: 7, name: "Durian" },
+  { id: 8, name: "Eggplant" },
+  { id: 9, name: "Fig" },
+  { id: 10, name: "Grape" },
+  { id: 11, name: "Guava" },
+  { id: 12, name: "Huckleberry" },
+];
+
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const [selected, setSelected] = createSignal<string>();
+  const [selected, setSelected] = createSignal<string>("Durian");
+  const [selectedObject, setSelectedObject] = createSignal<Fruit>({ id: 7, name: "Durian" });
+
+  const compareFn = (a: Fruit, b: Fruit) => {
+    return a.id === b.id;
+  };
 
   return (
-    <Box p="$4" h={2000}>
+    <Box p="$4">
       <Select value={selected()} onChange={setSelected} disabled={false} placeholder="Choose a fruit">
-        <SelectButton mt={1000} maxW="200px">
+        <SelectButton maxW="300px">
           {/* {({ opened, disabled }) => selected()} */}
           {selected()}
         </SelectButton>
@@ -38,6 +63,24 @@ export function App() {
               <SelectOption value={fruit} disabled={false}>
                 {/* {({ active, selected, disabled }) => <span>{person}</span>} */}
                 {fruit}
+              </SelectOption>
+            )}
+          </For>
+        </SelectOptions>
+      </Select>
+      <Select
+        value={selectedObject()}
+        onChange={setSelectedObject}
+        disabled={false}
+        placeholder="Choose a fruit"
+        compareFn={compareFn}
+      >
+        <SelectButton maxW="300px">{selectedObject()?.name}</SelectButton>
+        <SelectOptions>
+          <For each={fruitsObject}>
+            {fruit => (
+              <SelectOption value={fruit} disabled={false}>
+                {fruit.name}
               </SelectOption>
             )}
           </For>

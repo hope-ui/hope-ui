@@ -12,7 +12,7 @@ import {
   SelectActions,
 } from "./select.utils";
 
-export interface SelectProps extends SelectButtonVariants {
+export interface SelectProps<T = any> extends SelectButtonVariants {
   /**
    * The `id` of the Select.
    */
@@ -27,13 +27,13 @@ export interface SelectProps extends SelectButtonVariants {
    * The value of the select to be `selected`.
    * (in controlled mode)
    */
-  value?: string;
+  value?: T;
 
   /**
    * The value of the select to be `selected` initially.
    * (in uncontrolled mode)
    */
-  defaultValue?: string;
+  defaultValue?: T;
 
   /**
    * The placeholder to show when no value is selected.
@@ -49,10 +49,15 @@ export interface SelectProps extends SelectButtonVariants {
    * Callback invoked when the selected value changes.
    * (in controlled mode)
    */
-  onChange?: (value: string) => void;
+  onChange?: (value: T) => void;
+
+  /**
+   * When using object as values, used to compare if an option is the selected one.
+   */
+  compareFn?: (value: T, selectedValue: T) => boolean;
 }
 
-interface SelectState {
+interface SelectState<T = any> {
   /**
    * The visual style of the select.
    */
@@ -67,13 +72,13 @@ interface SelectState {
    * The value of the select to be `selected`.
    * (in controlled mode)
    */
-  value?: string;
+  value?: T;
 
   /**
    * The value of the select to be `selected`.
    * (in uncontrolled mode)
    */
-  valueState?: string;
+  valueState?: T;
 
   /**
    * The placeholder to show when no value is selected.
@@ -108,7 +113,7 @@ interface SelectState {
   /**
    * The list of available `SelectOption` values.
    */
-  options: readonly string[];
+  options: readonly T[];
 
   /**
    * If `true`, the Select will be open.
@@ -134,10 +139,15 @@ interface SelectState {
    * The timeout id of the search functionnality.
    */
   searchTimeoutId?: number;
+
+  /**
+   * When using object as values, used to compare if an option is the selected one.
+   */
+  compareFn: (value: T, selectedValue: T) => boolean;
 }
 
-interface SelectContextValue {
-  state: SelectState;
+interface SelectContextValue<T = any> {
+  state: SelectState<T>;
 
   /**
    * A reefrence to the listbox list (`SelectOptions`).
@@ -163,7 +173,7 @@ interface SelectContextValue {
    * Callback to notify the context that a `SelectOption` is mounted and retrieve its `value`.
    * @return The index of the option.
    */
-  setOptionMounted: (option: string) => number;
+  setOptionMounted: (option: T) => number;
 
   /**
    * Callback invoked when the user click outside the listbox (`SelectOptions`).
@@ -201,6 +211,10 @@ const SelectContext = createContext<SelectContextValue>();
 export function Select(props: SelectProps) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
+  const defaultCompareFn = (value: any, selectedValue: any) => {
+    return value === selectedValue;
+  };
+
   const [state, setState] = createStore<SelectState>({
     // Internal state for uncontrolled select.
     // eslint-disable-next-line solid/reactivity
@@ -231,6 +245,9 @@ export function Select(props: SelectProps) {
     },
     get placeholder() {
       return props.placeholder;
+    },
+    get compareFn() {
+      return props.compareFn ?? defaultCompareFn;
     },
     options: [],
     opened: false,
@@ -466,7 +483,7 @@ export function Select(props: SelectProps) {
 
   const setOptionMounted = (option: string) => {
     setState("options", prevOptions => [...prevOptions, option]);
-    return state.options.indexOf(option);
+    return state.options.length - 1;
   };
 
   const context: SelectContextValue = {
