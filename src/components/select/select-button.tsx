@@ -1,4 +1,4 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -12,9 +12,14 @@ import {
   selectButtonStyles,
   selectButtonTextStyles,
 } from "./select.styles";
-import { SelectorIcon } from "./select-icon";
+import { SelectDropdownIcon } from "./select-icon";
 
-export type SelectButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
+export type SelectButtonProps<C extends ElementType = "button"> = HTMLHopeProps<
+  C,
+  {
+    children?: JSX.Element | (<T>(value: T) => JSX.Element);
+  }
+>;
 
 const hopeSelectButtonClass = "hope-select__button";
 
@@ -77,9 +82,11 @@ export function SelectButton<C extends ElementType = "button">(props: SelectButt
         when={selectContext.state.value != null}
         fallback={<span class={selectButtonPlaceholderStyles()}>{selectContext.state.placeholder}</span>}
       >
-        <span class={selectButtonTextStyles()}>{local.children}</span>
+        <span class={selectButtonTextStyles()}>
+          {isFunction(local.children) ? local.children(selectContext.state.value) : local.children}
+        </span>
       </Show>
-      <SelectorIcon class={selectButtonIconStyles()} color="$neutral11" />
+      <SelectDropdownIcon class={selectButtonIconStyles()} color="$neutral10" />
     </Box>
   );
 }

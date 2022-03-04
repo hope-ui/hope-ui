@@ -204,19 +204,19 @@ interface SelectContextValue<T = any> {
   onOptionClick: (index: number) => void;
 
   /**
-   * Callback invoked when the user cursor hover a `SelectOption`.
+   * Callback invoked when the user cursor move on a `SelectOption`.
    */
-  onOptionMouseEnter: (index: number) => void;
-
-  /**
-   * Callback invoked when the user cursor leave a `SelectOption`.
-   */
-  onOptionMouseLeave: () => void;
+  onOptionMouseMove: (index: number) => void;
 
   /**
    * Callback invoked when the user click on a `SelectOption`.
    */
   onOptionMouseDown: () => void;
+
+  /**
+   * Callback invoked when the user cursor leave the listbox `SelectOptions`.
+   */
+  onListboxMouseLeave: () => void;
 }
 
 const SelectContext = createContext<SelectContextValue>();
@@ -224,7 +224,7 @@ const SelectContext = createContext<SelectContextValue>();
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
-  const defaultCompareFn = (a: any, b: any) => {
+  const defaultCompareFn = (a: T, b: T) => {
     return a === b;
   };
 
@@ -236,7 +236,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return props.value !== undefined;
     },
     get value() {
-      return this.isControlled ? props.value : this.valueState;
+      return (this.isControlled ? props.value : this.valueState) as T | undefined;
     },
     get variant() {
       return props.variant ?? "outline";
@@ -290,7 +290,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, listboxRef, {
       placement: "bottom",
       middleware: [
-        offset(8),
+        offset(4),
         flip(),
         shift(),
         size({
@@ -336,18 +336,18 @@ export function Select<T = any>(props: SelectProps<T>) {
     return state.searchString;
   };
 
-  const selectOption = (index: number) => {
+  const onOptionChange = (index: number) => {
     setState("activeIndex", index);
+  };
+
+  const selectOption = (index: number) => {
+    onOptionChange(index);
 
     if (!state.isControlled) {
       setState("valueState", state.options[index].value);
     }
 
     props.onChange?.(state.options[index].value as T);
-  };
-
-  const onOptionChange = (index: number) => {
-    setState("activeIndex", index);
   };
 
   const onButtonBlur = function () {
@@ -358,7 +358,6 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      //selectOption(state.activeIndex);
       updateMenuState(false, false);
     }
   };
@@ -367,30 +366,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     updateMenuState(!state.opened, false);
   };
 
-  /**
-   * Return the updated index, ignoring "disabled" option.
-   */
-  const getValidUpdatedIndex = (currentIndex: number, maxIndex: number, action: SelectActions) => {
-    let nextIndex = getUpdatedIndex(currentIndex, maxIndex, action);
-    let optionData = state.options[nextIndex];
-
-    const moveDown = nextIndex > currentIndex;
-
-    // TODO: fix infinite loop
-    while (optionData.disabled) {
-      let nextAction = action;
-
-      if (moveDown && nextIndex >= maxIndex) {
-        nextAction = SelectActions.Previous;
-      } else if (!moveDown && nextIndex <= 0) {
-        nextAction = SelectActions.Next;
-      }
-
-      nextIndex = getUpdatedIndex(nextIndex, maxIndex, nextAction);
-      optionData = state.options[nextIndex];
-    }
-
-    return nextIndex;
+  const isOptionDisabledCallback = (index: number) => {
+    return state.options[index].disabled;
   };
 
   const onButtonKeyDown = function (event: KeyboardEvent) {
@@ -406,10 +383,15 @@ export function Select<T = any>(props: SelectProps<T>) {
       // intentional fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
-      case SelectActions.PageUp:
-      case SelectActions.PageDown:
         event.preventDefault();
-        return onOptionChange(getValidUpdatedIndex(state.activeIndex, max, action));
+        return onOptionChange(
+          getUpdatedIndex({
+            currentIndex: state.activeIndex,
+            maxIndex: max,
+            initialAction: action,
+            isOptionDisabled: isOptionDisabledCallback,
+          })
+        );
 
       case SelectActions.CloseSelect:
         event.preventDefault();
@@ -449,17 +431,17 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onOptionClick = function (index: number) {
-    onOptionChange(index);
     selectOption(index);
     updateMenuState(false);
   };
 
-  const onOptionMouseEnter = (index: number) => {
-    onOptionChange(index);
-  };
+  const onOptionMouseMove = (index: number) => {
+    // if index is already the active one, do nothing
+    if (state.activeIndex === index) {
+      return;
+    }
 
-  const onOptionMouseLeave = () => {
-    onOptionChange(-1);
+    onOptionChange(index);
   };
 
   const onOptionMouseDown = function () {
@@ -477,10 +459,8 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     // focus on selected value or the first one
     if (state.value != null) {
-      setState(
-        "activeIndex",
-        state.options.findIndex(item => state.compareFn(item.value as T, state.value as T))
-      );
+      const selectedOptionIndex = state.options.findIndex(item => state.compareFn(item.value as T, state.value as T));
+      setState("activeIndex", selectedOptionIndex);
     } else {
       setState("activeIndex", 0);
     }
@@ -504,6 +484,10 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     // move focus back to the button, if needed
     callFocus && buttonRef?.focus();
+  };
+
+  const onListboxMouseLeave = () => {
+    onOptionChange(-1);
   };
 
   const onListboxOutsideClick = (target: HTMLElement) => {
@@ -551,9 +535,9 @@ export function Select<T = any>(props: SelectProps<T>) {
     onButtonClick,
     onButtonKeyDown,
     onOptionClick,
-    onOptionMouseEnter,
-    onOptionMouseLeave,
+    onOptionMouseMove,
     onOptionMouseDown,
+    onListboxMouseLeave,
   };
 
   return <SelectContext.Provider value={context}>{props.children}</SelectContext.Provider>;

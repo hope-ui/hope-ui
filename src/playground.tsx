@@ -30,14 +30,14 @@ interface Fruit {
 const fruitsObject: Fruit[] = [
   { id: 1, name: "Apple", disabled: true },
   { id: 2, name: "Banana", disabled: true },
-  { id: 3, name: "Blueberry", disabled: false },
-  { id: 4, name: "Boysenberry", disabled: false },
+  { id: 3, name: "Blueberry", disabled: true },
+  { id: 4, name: "Boysenberry", disabled: true },
   { id: 5, name: "Cherry", disabled: false },
   { id: 6, name: "Cranberry", disabled: false },
   { id: 7, name: "Durian", disabled: true },
   { id: 8, name: "Eggplant", disabled: true },
-  { id: 9, name: "Fig", disabled: false },
-  { id: 10, name: "Grape", disabled: false },
+  { id: 9, name: "Fig", disabled: true },
+  { id: 10, name: "Grape", disabled: true },
   { id: 11, name: "Guava", disabled: true },
   { id: 12, name: "Huckleberry", disabled: true },
 ];
@@ -58,7 +58,7 @@ export function App() {
           <p>Controlled</p>
           <Select value={selected()} onChange={setSelected} disabled={false} placeholder="Choose a fruit">
             <SelectButton maxW="300px">
-              {/* {({ opened, disabled }) => selected()} */}
+              {/* {({ value, opened, disabled }) => selected()} */}
               {selected()}
             </SelectButton>
             <SelectOptions>
@@ -96,7 +96,7 @@ export function App() {
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
           <Select defaultValue="Cherry" disabled={false} placeholder="Choose a fruit">
-            <SelectButton maxW="300px">Hello</SelectButton>
+            <SelectButton maxW="300px">{value => value}</SelectButton>
             <SelectOptions>
               <For each={fruits}>
                 {fruit => (
@@ -113,7 +113,7 @@ export function App() {
             placeholder="Choose a fruit"
             compareFn={compareFn}
           >
-            <SelectButton maxW="300px">Hello</SelectButton>
+            <SelectButton maxW="300px">{value => `${value.id} - ${value.name}`}</SelectButton>
             <SelectOptions>
               <For each={fruitsObject}>
                 {fruit => (

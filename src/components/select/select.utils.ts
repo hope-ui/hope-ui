@@ -14,8 +14,6 @@ export enum SelectActions {
   Last,
   Next,
   Open,
-  PageDown,
-  PageUp,
   Previous,
   Select,
   Type,
@@ -75,10 +73,10 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
   }
 
   // home and end move the selected option when open or closed
-  if (key === "Home") {
+  if (key === "Home" || key === "PageUp") {
     return SelectActions.First;
   }
-  if (key === "End") {
+  if (key === "End" || key === "PageDown") {
     return SelectActions.Last;
   }
 
@@ -95,10 +93,6 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
       return SelectActions.Next;
     } else if (key === "ArrowUp") {
       return SelectActions.Previous;
-    } else if (key === "PageUp") {
-      return SelectActions.PageUp;
-    } else if (key === "PageDown") {
-      return SelectActions.PageDown;
     } else if (key === "Escape") {
       return SelectActions.Close;
     } else if (key === "Enter" || key === " ") {
@@ -110,9 +104,7 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
 /**
  * Get an updated option index after performing an action
  */
-export function getUpdatedIndex(currentIndex: number, maxIndex: number, action: SelectActions) {
-  const pageSize = 10; // used for pageup/pagedown
-
+function calculateActiveIndex(currentIndex: number, maxIndex: number, action: SelectActions) {
   switch (action) {
     case SelectActions.First:
       return 0;
@@ -122,13 +114,72 @@ export function getUpdatedIndex(currentIndex: number, maxIndex: number, action: 
       return Math.max(0, currentIndex - 1);
     case SelectActions.Next:
       return Math.min(maxIndex, currentIndex + 1);
-    case SelectActions.PageUp:
-      return Math.max(0, currentIndex - pageSize);
-    case SelectActions.PageDown:
-      return Math.min(maxIndex, currentIndex + pageSize);
     default:
       return currentIndex;
   }
+}
+
+interface GetUpdatedIndexParams {
+  /**
+   * The current active index.
+   */
+  currentIndex: number;
+
+  /**
+   * The index of the last option.
+   */
+  maxIndex: number;
+
+  /**
+   * The initialy performed action.
+   */
+  initialAction: SelectActions;
+
+  /**
+   * Callback invoked to check if an option at a given index is diabled or not.
+   */
+  isOptionDisabled: (index: number) => boolean;
+}
+
+/**
+ * Get an updated option index after performing an action, ignoring "disabled" option.
+ */
+export function getUpdatedIndex(params: GetUpdatedIndexParams) {
+  const { currentIndex, maxIndex, initialAction, isOptionDisabled } = params;
+
+  let nextIndex = calculateActiveIndex(currentIndex, maxIndex, initialAction);
+
+  while (isOptionDisabled(nextIndex)) {
+    let nextAction = initialAction;
+    const isNextIndexFirst = nextIndex === 0;
+    const isNextIndexLast = nextIndex === maxIndex;
+
+    // If first option is disabled move down until find an enabled option.
+    if (initialAction === SelectActions.First) {
+      nextAction = SelectActions.Next;
+    }
+
+    // If last option is disabled move up until find an enabled option.
+    if (initialAction === SelectActions.Last) {
+      nextAction = SelectActions.Previous;
+    }
+
+    // If all previous options are disabled, don't move.
+    if (initialAction === SelectActions.Previous && isNextIndexFirst) {
+      nextIndex = currentIndex;
+      break;
+    }
+
+    // If all next options are disabled, don't move.
+    if (initialAction === SelectActions.Next && isNextIndexLast) {
+      nextIndex = currentIndex;
+      break;
+    }
+
+    nextIndex = calculateActiveIndex(nextIndex, maxIndex, nextAction);
+  }
+
+  return nextIndex;
 }
 
 /**

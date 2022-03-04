@@ -97,7 +97,7 @@ export const selectButtonIconStyles = css({
 
   marginInlineStart: "$0_5",
 
-  fontSize: "1.3em",
+  fontSize: "1.2em",
 
   pointerEvents: "none",
 });
@@ -118,7 +118,7 @@ export const selectListboxStyles = css({
 
   margin: 0,
 
-  boxShadow: "$lg",
+  boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$md",
   backgroundColor: "$panelBg",
@@ -144,18 +144,15 @@ export const selectOptionStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "color 250ms, background-color 250ms",
 
   variants: {
     active: {
-      true: {
-        backgroundColor: "$neutral3",
-      },
+      true: {},
     },
     selected: {
       true: {
-        backgroundColor: "$primary3",
-        color: "$primary11",
+        backgroundColor: "$primary9",
+        color: "white",
         fontWeight: "$medium",
       },
     },
@@ -169,9 +166,10 @@ export const selectOptionStyles = css({
   compoundVariants: [
     {
       active: true,
-      selected: true,
+      selected: false,
       css: {
-        backgroundColor: "$primary4",
+        backgroundColor: "$primary3",
+        color: "$primary11",
       },
     },
   ],

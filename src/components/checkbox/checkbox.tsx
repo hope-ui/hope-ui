@@ -16,7 +16,7 @@ import {
   checkboxInputStyles,
   checkboxLabelStyles,
 } from "./checkbox.styles";
-import { CheckIcon, IndeterminateIcon } from "./checkbox-icon";
+import { CheckboxCheckIcon, CheckboxIndeterminateIcon } from "./checkbox-icon";
 
 type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
 
@@ -127,8 +127,8 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
     id: `hope-checkbox-${createUniqueId()}`,
-    iconChecked: <CheckIcon />,
-    iconIndeterminate: <IndeterminateIcon />,
+    iconChecked: <CheckboxCheckIcon />,
+    iconIndeterminate: <CheckboxIndeterminateIcon />,
     variant: theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",

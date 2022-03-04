@@ -47,6 +47,7 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
             tabindex="-1"
             id={selectContext.state.listboxId}
             class={classes()}
+            onMouseLeave={selectContext.onListboxMouseLeave}
             {...others}
           />
         </ListboxWrapper>
@@ -58,6 +59,7 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
 SelectOptions.toString = () => createClassSelector(hopeSelectOptionsClass);
 
 /**
+ * [Dirty hack]
  * Renderless component that manage outside click on the listbox (`SelectOptions`).
  */
 function ListboxWrapper(props: { children?: JSX.Element }) {

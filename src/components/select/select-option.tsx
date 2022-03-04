@@ -78,14 +78,14 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
     selectContext.onOptionClick(index());
   };
 
-  const onOptionMouseEnter = (event: MouseEvent) => {
-    if (local.disabled) {
+  const onOptionMouseMove = (event: MouseEvent) => {
+    if (isActiveDescendant() || local.disabled) {
       event.preventDefault();
       event.stopPropagation();
       return;
     }
 
-    selectContext.onOptionMouseEnter(index());
+    selectContext.onOptionMouseMove(index());
   };
 
   onMount(() => {
@@ -111,8 +111,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
       aria-selected={isSelected()}
       class={classes()}
       onClick={onOptionClick}
-      onMouseEnter={onOptionMouseEnter}
-      onMouseLeave={selectContext.onOptionMouseLeave}
+      onMouseMove={onOptionMouseMove}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
     />
