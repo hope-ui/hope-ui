@@ -144,13 +144,21 @@ export const selectOptionStyles = css({
 
   cursor: "pointer",
   userSelect: "none",
-  transition: "background-color 250ms",
+  transition: "color 250ms, background-color 250ms",
+
+  "&:hover": {
+    backgroundColor: "$neutral4",
+  },
 
   variants: {
     active: {
       true: {
         backgroundColor: "$primary3",
         color: "$primary11",
+
+        "&:hover": {
+          backgroundColor: "$primary4",
+        },
       },
     },
     selected: {

@@ -72,16 +72,6 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
     selectContext.onOptionClick(index());
   };
 
-  const onOptionMouseEnter = (event: MouseEvent) => {
-    //event.stopPropagation();
-    //selectContext.onOptionMouseEnter(index());
-  };
-
-  const onOptionMouseLeave = (event: MouseEvent) => {
-    //event.stopPropagation();
-    //selectContext.onOptionMouseLeave();
-  };
-
   onMount(() => {
     const optionIndex = selectContext.setOptionMounted(local.value);
     setIndex(optionIndex);
@@ -101,8 +91,6 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
       aria-selected={isSelected()}
       class={classes()}
       onClick={onOptionClick}
-      onMouseEnter={onOptionMouseEnter}
-      onMouseLeave={onOptionMouseLeave}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
     />

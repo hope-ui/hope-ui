@@ -191,16 +191,6 @@ interface SelectContextValue {
   onOptionClick: (index: number) => void;
 
   /**
-   * Callback invoked when the user hover a `SelectOption`.
-   */
-  onOptionMouseEnter: (index: number) => void;
-
-  /**
-   * Callback invoked when the user leave a `SelectOption`.
-   */
-  onOptionMouseLeave: () => void;
-
-  /**
    * Callback invoked when the user click on a `SelectOption`.
    */
   onOptionMouseDown: () => void;
@@ -408,14 +398,6 @@ export function Select(props: SelectProps) {
     updateMenuState(false);
   };
 
-  const onOptionMouseEnter = function (index: number) {
-    onOptionChange(index);
-  };
-
-  const onOptionMouseLeave = function () {
-    onOptionChange(-1);
-  };
-
   const onOptionMouseDown = function () {
     // Clicking an option will cause a blur event,
     // but we don't want to perform the default keyboard blur action
@@ -499,8 +481,6 @@ export function Select(props: SelectProps) {
     onButtonClick,
     onButtonKeyDown,
     onOptionClick,
-    onOptionMouseEnter,
-    onOptionMouseLeave,
     onOptionMouseDown,
   };
 
