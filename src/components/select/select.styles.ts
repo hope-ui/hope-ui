@@ -162,6 +162,7 @@ export const selectOptionStyles = css({
     disabled: {
       true: {
         color: "$neutral8",
+        cursor: "not-allowed",
       },
     },
   },

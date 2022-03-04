@@ -53,7 +53,8 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
   onChange?: (value: T) => void;
 
   /**
-   * When using object as values, used to compare if two option are equals.
+   * Callback used to compare if the values of two options are equal.
+   * Useful when the option value is an object because you can specify which object key makes two objects "equal".
    */
   compareFn?: (a: T, b: T) => boolean;
 }
@@ -142,7 +143,8 @@ interface SelectState<T = any> {
   searchTimeoutId?: number;
 
   /**
-   * When using object as values, used to compare if two option are equals.
+   * Callback used to compare if the values of two options are equal.
+   * Useful when the option value is an object because you can specify which object key makes two objects "equal".
    */
   compareFn: (a: T, b: T) => boolean;
 }
@@ -365,6 +367,32 @@ export function Select<T = any>(props: SelectProps<T>) {
     updateMenuState(!state.opened, false);
   };
 
+  /**
+   * Return the updated index, ignoring "disabled" option.
+   */
+  const getValidUpdatedIndex = (currentIndex: number, maxIndex: number, action: SelectActions) => {
+    let nextIndex = getUpdatedIndex(currentIndex, maxIndex, action);
+    let optionData = state.options[nextIndex];
+
+    const moveDown = nextIndex > currentIndex;
+
+    // TODO: fix infinite loop
+    while (optionData.disabled) {
+      let nextAction = action;
+
+      if (moveDown && nextIndex >= maxIndex) {
+        nextAction = SelectActions.Previous;
+      } else if (!moveDown && nextIndex <= 0) {
+        nextAction = SelectActions.Next;
+      }
+
+      nextIndex = getUpdatedIndex(nextIndex, maxIndex, nextAction);
+      optionData = state.options[nextIndex];
+    }
+
+    return nextIndex;
+  };
+
   const onButtonKeyDown = function (event: KeyboardEvent) {
     const { key } = event;
     const max = state.options.length - 1;
@@ -381,7 +409,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       case SelectActions.PageUp:
       case SelectActions.PageDown:
         event.preventDefault();
-        return onOptionChange(getUpdatedIndex(state.activeIndex, max, action));
+        return onOptionChange(getValidUpdatedIndex(state.activeIndex, max, action));
 
       case SelectActions.CloseSelect:
         event.preventDefault();

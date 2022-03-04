@@ -24,27 +24,28 @@ const fruits = [
 interface Fruit {
   id: number;
   name: string;
+  disabled: boolean;
 }
 
 const fruitsObject: Fruit[] = [
-  { id: 1, name: "Apple" },
-  { id: 2, name: "Banana" },
-  { id: 3, name: "Blueberry" },
-  { id: 4, name: "Boysenberry" },
-  { id: 5, name: "Cherry" },
-  { id: 6, name: "Cranberry" },
-  { id: 7, name: "Durian" },
-  { id: 8, name: "Eggplant" },
-  { id: 9, name: "Fig" },
-  { id: 10, name: "Grape" },
-  { id: 11, name: "Guava" },
-  { id: 12, name: "Huckleberry" },
+  { id: 1, name: "Apple", disabled: true },
+  { id: 2, name: "Banana", disabled: true },
+  { id: 3, name: "Blueberry", disabled: false },
+  { id: 4, name: "Boysenberry", disabled: false },
+  { id: 5, name: "Cherry", disabled: false },
+  { id: 6, name: "Cranberry", disabled: false },
+  { id: 7, name: "Durian", disabled: true },
+  { id: 8, name: "Eggplant", disabled: true },
+  { id: 9, name: "Fig", disabled: false },
+  { id: 10, name: "Grape", disabled: false },
+  { id: 11, name: "Guava", disabled: true },
+  { id: 12, name: "Huckleberry", disabled: true },
 ];
 
 export function App() {
   const { toggleColorMode } = useColorMode();
   const [selected, setSelected] = createSignal<string>("Cherry");
-  const [selectedObject, setSelectedObject] = createSignal<Fruit>({ id: 5, name: "Cherry" });
+  const [selectedObject, setSelectedObject] = createSignal<Fruit>({ id: 5, name: "Cherry", disabled: false });
 
   const compareFn = (a: Fruit, b: Fruit) => {
     return a.id === b.id;
@@ -63,7 +64,7 @@ export function App() {
             <SelectOptions>
               <For each={fruits}>
                 {fruit => (
-                  <SelectOption value={fruit} disabled={false}>
+                  <SelectOption value={fruit} disabled={fruit === "Durian"}>
                     {/* {({ active, selected, disabled }) => <span>{person}</span>} */}
                     {fruit}
                   </SelectOption>
@@ -84,7 +85,7 @@ export function App() {
             <SelectOptions>
               <For each={fruitsObject}>
                 {fruit => (
-                  <SelectOption value={fruit} disabled={false}>
+                  <SelectOption value={fruit} disabled={fruit.disabled}>
                     {fruit.name}
                   </SelectOption>
                 )}
@@ -99,7 +100,7 @@ export function App() {
             <SelectOptions>
               <For each={fruits}>
                 {fruit => (
-                  <SelectOption value={fruit} disabled={false}>
+                  <SelectOption value={fruit} disabled={fruit === "Durian"}>
                     {fruit}
                   </SelectOption>
                 )}
@@ -107,7 +108,7 @@ export function App() {
             </SelectOptions>
           </Select>
           <Select
-            defaultValue={{ id: 5, name: "Cherry" }}
+            defaultValue={{ id: 5, name: "Cherry", disabled: false }}
             disabled={false}
             placeholder="Choose a fruit"
             compareFn={compareFn}
@@ -116,7 +117,7 @@ export function App() {
             <SelectOptions>
               <For each={fruitsObject}>
                 {fruit => (
-                  <SelectOption value={fruit} disabled={false}>
+                  <SelectOption value={fruit} disabled={fruit.disabled}>
                     {fruit.name}
                   </SelectOption>
                 )}
