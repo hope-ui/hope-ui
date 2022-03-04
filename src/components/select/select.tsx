@@ -36,6 +36,11 @@ export interface SelectProps extends SelectButtonVariants {
   defaultValue?: string;
 
   /**
+   * The placeholder to show when no value is selected.
+   */
+  placeholder?: string;
+
+  /**
    * If `true`, the select will be disabled.
    */
   disabled?: boolean;
@@ -69,6 +74,11 @@ interface SelectState {
    * (in uncontrolled mode)
    */
   valueState?: string;
+
+  /**
+   * The placeholder to show when no value is selected.
+   */
+  placeholder?: string;
 
   /**
    * If `true`, the select is in controlled mode.
@@ -156,6 +166,11 @@ interface SelectContextValue {
   setOptionMounted: (option: string) => number;
 
   /**
+   * Callback invoked when the user click outside the listbox (`SelectOptions`).
+   */
+  onListboxOutsideClick: (target: HTMLElement) => void;
+
+  /**
    * Callback invoked when the `SelectButton` loose focus.
    */
   onButtonBlur: () => void;
@@ -174,6 +189,16 @@ interface SelectContextValue {
    * Callback invoked when the user click on a `SelectOption`.
    */
   onOptionClick: (index: number) => void;
+
+  /**
+   * Callback invoked when the user hover a `SelectOption`.
+   */
+  onOptionMouseEnter: (index: number) => void;
+
+  /**
+   * Callback invoked when the user leave a `SelectOption`.
+   */
+  onOptionMouseLeave: () => void;
 
   /**
    * Callback invoked when the user click on a `SelectOption`.
@@ -213,6 +238,9 @@ export function Select(props: SelectProps) {
     },
     get optionIdPrefix() {
       return `${this.baseId}-option`;
+    },
+    get placeholder() {
+      return props.placeholder;
     },
     options: [],
     opened: false,
@@ -309,9 +337,8 @@ export function Select(props: SelectProps) {
       return;
     }
 
-    // select current option and close
     if (state.opened) {
-      selectOption(state.activeIndex);
+      //selectOption(state.activeIndex);
       updateMenuState(false, false);
     }
   };
@@ -381,6 +408,14 @@ export function Select(props: SelectProps) {
     updateMenuState(false);
   };
 
+  const onOptionMouseEnter = function (index: number) {
+    onOptionChange(index);
+  };
+
+  const onOptionMouseLeave = function () {
+    onOptionChange(-1);
+  };
+
   const onOptionMouseDown = function () {
     // Clicking an option will cause a blur event,
     // but we don't want to perform the default keyboard blur action
@@ -393,6 +428,10 @@ export function Select(props: SelectProps) {
     }
 
     setState("opened", opened);
+
+    // focus on selected value or the first one
+    const activeIndex = state.value != null ? state.options.indexOf(state.value) : 0;
+    setState("activeIndex", activeIndex);
 
     if (state.opened) {
       updateListboxPosition();
@@ -413,6 +452,15 @@ export function Select(props: SelectProps) {
 
     // move focus back to the button, if needed
     callFocus && buttonRef?.focus();
+  };
+
+  const onListboxOutsideClick = (target: HTMLElement) => {
+    // clicking on the button is not considered an "outside click"
+    if (buttonRef && buttonRef.contains(target)) {
+      return;
+    }
+
+    updateMenuState(false, false);
   };
 
   const assignButtonRef = (el: HTMLButtonElement) => {
@@ -446,10 +494,13 @@ export function Select(props: SelectProps) {
     assignListboxRef,
     setOptionMounted,
     scrollToOption,
+    onListboxOutsideClick,
     onButtonBlur,
     onButtonClick,
     onButtonKeyDown,
     onOptionClick,
+    onOptionMouseEnter,
+    onOptionMouseLeave,
     onOptionMouseDown,
   };
 

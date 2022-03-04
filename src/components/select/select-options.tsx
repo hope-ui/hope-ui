@@ -1,6 +1,7 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { children, JSX, mergeProps, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
+import { useClickOutside } from "@/hooks/use-click-outside";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -39,17 +40,35 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
   return (
     <Show when={selectContext.state.opened}>
       <Portal>
-        <Box
-          ref={assignListboxRef}
-          role="listbox"
-          tabindex="-1"
-          id={selectContext.state.listboxId}
-          class={classes()}
-          {...others}
-        />
+        <ListboxWrapper>
+          <Box
+            ref={assignListboxRef}
+            role="listbox"
+            tabindex="-1"
+            id={selectContext.state.listboxId}
+            class={classes()}
+            {...others}
+          />
+        </ListboxWrapper>
       </Portal>
     </Show>
   );
 }
 
 SelectOptions.toString = () => createClassSelector(hopeSelectOptionsClass);
+
+/**
+ * Renderless component that manage outside click on the listbox (`SelectOptions`).
+ */
+function ListboxWrapper(props: { children?: JSX.Element }) {
+  const selectContext = useSelectContext();
+
+  const resolvedChildren = children(() => props.children);
+
+  useClickOutside({
+    element: () => resolvedChildren() as HTMLElement,
+    handler: event => selectContext.onListboxOutsideClick(event.target as HTMLElement),
+  });
+
+  return resolvedChildren;
+}

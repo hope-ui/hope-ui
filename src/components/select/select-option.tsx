@@ -52,6 +52,17 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
 
   const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
 
+  const assignOptionRef = (el: HTMLLIElement) => {
+    optionRef = el;
+
+    if (isFunction(local.ref)) {
+      local.ref(el);
+    } else {
+      // eslint-disable-next-line solid/reactivity
+      local.ref = el;
+    }
+  };
+
   const isSelected = () => local.value === selectContext.state.value;
 
   const isActiveDescendant = () => index() === selectContext.state.activeIndex;
@@ -59,6 +70,16 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
   const onOptionClick = (event: MouseEvent) => {
     event.stopPropagation();
     selectContext.onOptionClick(index());
+  };
+
+  const onOptionMouseEnter = (event: MouseEvent) => {
+    //event.stopPropagation();
+    //selectContext.onOptionMouseEnter(index());
+  };
+
+  const onOptionMouseLeave = (event: MouseEvent) => {
+    //event.stopPropagation();
+    //selectContext.onOptionMouseLeave();
   };
 
   onMount(() => {
@@ -72,17 +93,6 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
     }
   });
 
-  const assignOptionRef = (el: HTMLLIElement) => {
-    optionRef = el;
-
-    if (isFunction(local.ref)) {
-      local.ref(el);
-    } else {
-      // eslint-disable-next-line solid/reactivity
-      local.ref = el;
-    }
-  };
-
   return (
     <Box
       ref={assignOptionRef}
@@ -91,6 +101,8 @@ export function SelectOption<C extends ElementType = "li">(props: SelectOptionPr
       aria-selected={isSelected()}
       class={classes()}
       onClick={onOptionClick}
+      onMouseEnter={onOptionMouseEnter}
+      onMouseLeave={onOptionMouseLeave}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
     />

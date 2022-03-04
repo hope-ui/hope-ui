@@ -8,16 +8,35 @@ import { baseInputResetStyles } from "../input/input.styles";
  * Select - button
  * -----------------------------------------------------------------------------------------------*/
 
-function createVariantAndSizeCompoundVariants(variant: string, paddingX?: string | number) {
+function createVariantAndSizeCompoundVariants(
+  variant: string,
+  paddingStart?: string | number,
+  paddingEnd?: string | number
+) {
   return Object.entries({
-    xs: paddingX ?? "$2",
-    sm: paddingX ?? "$2_5",
-    md: paddingX ?? "$3",
-    lg: paddingX ?? "$4",
+    xs: {
+      start: paddingStart ?? "$2",
+      end: paddingEnd ?? "$1",
+    },
+    sm: {
+      start: paddingStart ?? "$2_5",
+      end: paddingEnd ?? "$1_5",
+    },
+    md: {
+      start: paddingStart ?? "$3",
+      end: paddingEnd ?? "$2",
+    },
+    lg: {
+      start: paddingStart ?? "$4",
+      end: paddingEnd ?? "$3",
+    },
   }).map(([key, value]) => ({
     variant: variant,
     size: key,
-    css: { px: value },
+    css: {
+      paddingInlineStart: value.start,
+      paddingInlineEnd: value.end,
+    },
   }));
 }
 
@@ -29,6 +48,8 @@ export const selectButtonStyles = css(baseInputResetStyles, {
 
   outline: "none",
 
+  cursor: "pointer",
+
   "&:focus": {
     outline: "none",
   },
@@ -36,7 +57,7 @@ export const selectButtonStyles = css(baseInputResetStyles, {
   compoundVariants: [
     ...createVariantAndSizeCompoundVariants("outline"),
     ...createVariantAndSizeCompoundVariants("filled"),
-    ...createVariantAndSizeCompoundVariants("unstyled", 0),
+    ...createVariantAndSizeCompoundVariants("unstyled", 0, 0),
   ],
 });
 
@@ -58,6 +79,15 @@ export const selectButtonTextStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
+ * Select - button placeholder
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectButtonPlaceholderStyles = css(selectButtonTextStyles, {
+  color: "$neutral9",
+  opacity: 1,
+});
+
+/* -------------------------------------------------------------------------------------------------
  * Select - button icon
  * -----------------------------------------------------------------------------------------------*/
 
@@ -67,7 +97,6 @@ export const selectButtonIconStyles = css({
 
   marginInlineStart: "$0_5",
 
-  color: "$neutral10",
   fontSize: "1.3em",
 
   pointerEvents: "none",
@@ -113,7 +142,7 @@ export const selectOptionStyles = css({
   color: "$neutral12",
   fontWeight: "$normal",
 
-  cursor: "default",
+  cursor: "pointer",
   userSelect: "none",
   transition: "background-color 250ms",
 
@@ -135,14 +164,4 @@ export const selectOptionStyles = css({
       },
     },
   },
-  compoundVariants: [
-    {
-      active: true,
-      disabled: true,
-      css: {
-        backgroundColor: "inherit",
-        color: "$neutral8",
-      },
-    },
-  ],
 });

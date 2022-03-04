@@ -4,9 +4,9 @@ import { createEffect, createSignal, For, onMount } from "solid-js";
 import { render } from "solid-js/web";
 
 import { Box, HopeProvider, HopeThemeConfig, Select, SelectButton, SelectOption, SelectOptions, useColorMode } from ".";
+import { Button } from "./components";
 
 const fruits = [
-  "Choose a Fruit",
   "Apple",
   "Banana",
   "Blueberry",
@@ -23,11 +23,11 @@ const fruits = [
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const [selected, setSelected] = createSignal(fruits[0]);
+  const [selected, setSelected] = createSignal<string>();
 
   return (
     <Box p="$4" h={2000}>
-      <Select value={selected()} onChange={setSelected} disabled={false}>
+      <Select value={selected()} onChange={setSelected} disabled={false} placeholder="Choose a fruit">
         <SelectButton mt={1000} maxW="200px">
           {/* {({ opened, disabled }) => selected()} */}
           {selected()}
