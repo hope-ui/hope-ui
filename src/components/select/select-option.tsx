@@ -79,7 +79,11 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   };
 
   onMount(() => {
-    const optionIndex = selectContext.setOptionMounted(local.value);
+    const optionIndex = selectContext.registerOption({
+      value: local.value,
+      disabled: !!local.disabled,
+      textValue: optionRef?.textContent?.toLowerCase() ?? "",
+    });
     setIndex(optionIndex);
   });
 
@@ -97,6 +101,8 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
       aria-selected={isSelected()}
       class={classes()}
       onClick={onOptionClick}
+      onMouseEnter={() => selectContext.onOptionMouseEnter(index())}
+      onMouseLeave={selectContext.onOptionMouseLeave}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
     />

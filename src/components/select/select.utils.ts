@@ -1,3 +1,9 @@
+export interface SelectOptionData<T = any> {
+  value: T;
+  disabled: boolean;
+  textValue: string;
+}
+
 /**
  * List of named combobox actions
  */
@@ -23,11 +29,37 @@ export enum SelectActions {
  * Filter an array of options against an input string.
  * @return an array of options that begin with the filter string, case-independent.
  */
-function filterOptions(options: string[] = [], filter: string, exclude: string[] = []) {
+function filterOptions(options: SelectOptionData[] = [], filter: string, exclude: string[] = []) {
   return options.filter(option => {
-    const matches = option.toLowerCase().indexOf(filter.toLowerCase()) === 0;
-    return matches && exclude.indexOf(option) < 0;
+    const matches = option.textValue.toLowerCase().indexOf(filter.toLowerCase()) === 0;
+    return matches && exclude.indexOf(option.textValue) < 0;
   });
+}
+
+/**
+ * Return the index of an option from an array of options, based on a search string
+ * if the filter is multiple iterations of the same letter (e.g "aaa"), then cycle through first-letter matches
+ */
+export function getIndexByLetter(options: SelectOptionData[], filter: string, startIndex = 0) {
+  const orderedOptions = [...options.slice(startIndex), ...options.slice(0, startIndex)];
+  const firstMatch = filterOptions(orderedOptions, filter)[0];
+  const allSameLetter = (array: string[]) => array.every(letter => letter === array[0]);
+
+  // first check if there is an exact match for the typed string
+  if (firstMatch) {
+    return options.indexOf(firstMatch);
+  }
+
+  // if the same letter is being repeated, cycle through first-letter matches
+  else if (allSameLetter(filter.split(""))) {
+    const matches = filterOptions(orderedOptions, filter[0]);
+    return options.indexOf(matches[0]);
+  }
+
+  // if no matches, return -1
+  else {
+    return -1;
+  }
 }
 
 /**
@@ -72,32 +104,6 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
     } else if (key === "Enter" || key === " ") {
       return SelectActions.CloseSelect;
     }
-  }
-}
-
-/**
- * Return the index of an option from an array of options, based on a search string
- * if the filter is multiple iterations of the same letter (e.g "aaa"), then cycle through first-letter matches
- */
-export function getIndexByLetter(options: string[], filter: string, startIndex = 0) {
-  const orderedOptions = [...options.slice(startIndex), ...options.slice(0, startIndex)];
-  const firstMatch = filterOptions(orderedOptions, filter)[0];
-  const allSameLetter = (array: string[]) => array.every(letter => letter === array[0]);
-
-  // first check if there is an exact match for the typed string
-  if (firstMatch) {
-    return options.indexOf(firstMatch);
-  }
-
-  // if the same letter is being repeated, cycle through first-letter matches
-  else if (allSameLetter(filter.split(""))) {
-    const matches = filterOptions(orderedOptions, filter[0]);
-    return options.indexOf(matches[0]);
-  }
-
-  // if no matches, return -1
-  else {
-    return -1;
   }
 }
 

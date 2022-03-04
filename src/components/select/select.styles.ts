@@ -146,23 +146,16 @@ export const selectOptionStyles = css({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",
 
-  "&:hover": {
-    backgroundColor: "$neutral4",
-  },
-
   variants: {
     active: {
       true: {
-        backgroundColor: "$primary3",
-        color: "$primary11",
-
-        "&:hover": {
-          backgroundColor: "$primary4",
-        },
+        backgroundColor: "$neutral3",
       },
     },
     selected: {
       true: {
+        backgroundColor: "$primary3",
+        color: "$primary11",
         fontWeight: "$medium",
       },
     },
@@ -172,4 +165,13 @@ export const selectOptionStyles = css({
       },
     },
   },
+  compoundVariants: [
+    {
+      active: true,
+      selected: true,
+      css: {
+        backgroundColor: "$primary4",
+      },
+    },
+  ],
 });

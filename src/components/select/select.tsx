@@ -10,6 +10,7 @@ import {
   isScrollable,
   maintainScrollVisibility,
   SelectActions,
+  SelectOptionData,
 } from "./select.utils";
 
 export interface SelectProps<T = any> extends SelectButtonVariants {
@@ -52,9 +53,9 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
   onChange?: (value: T) => void;
 
   /**
-   * When using object as values, used to compare if an option is the selected one.
+   * When using object as values, used to compare if two option are equals.
    */
-  compareFn?: (value: T, selectedValue: T) => boolean;
+  compareFn?: (a: T, b: T) => boolean;
 }
 
 interface SelectState<T = any> {
@@ -113,7 +114,7 @@ interface SelectState<T = any> {
   /**
    * The list of available `SelectOption` values.
    */
-  options: readonly T[];
+  options: readonly SelectOptionData<T>[];
 
   /**
    * If `true`, the Select will be open.
@@ -141,9 +142,9 @@ interface SelectState<T = any> {
   searchTimeoutId?: number;
 
   /**
-   * When using object as values, used to compare if an option is the selected one.
+   * When using object as values, used to compare if two option are equals.
    */
-  compareFn: (value: T, selectedValue: T) => boolean;
+  compareFn: (a: T, b: T) => boolean;
 }
 
 interface SelectContextValue<T = any> {
@@ -170,10 +171,10 @@ interface SelectContextValue<T = any> {
   scrollToOption: (optionRef: HTMLLIElement) => void;
 
   /**
-   * Callback to notify the context that a `SelectOption` is mounted and retrieve its `value`.
+   * Callback to notify the context that a `SelectOption` is mounted.
    * @return The index of the option.
    */
-  setOptionMounted: (option: T) => number;
+  registerOption: (optionData: SelectOptionData) => number;
 
   /**
    * Callback invoked when the user click outside the listbox (`SelectOptions`).
@@ -201,6 +202,16 @@ interface SelectContextValue<T = any> {
   onOptionClick: (index: number) => void;
 
   /**
+   * Callback invoked when the user cursor hover a `SelectOption`.
+   */
+  onOptionMouseEnter: (index: number) => void;
+
+  /**
+   * Callback invoked when the user cursor leave a `SelectOption`.
+   */
+  onOptionMouseLeave: () => void;
+
+  /**
    * Callback invoked when the user click on a `SelectOption`.
    */
   onOptionMouseDown: () => void;
@@ -208,14 +219,14 @@ interface SelectContextValue<T = any> {
 
 const SelectContext = createContext<SelectContextValue>();
 
-export function Select(props: SelectProps) {
+export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
-  const defaultCompareFn = (value: any, selectedValue: any) => {
-    return value === selectedValue;
+  const defaultCompareFn = (a: any, b: any) => {
+    return a === b;
   };
 
-  const [state, setState] = createStore<SelectState>({
+  const [state, setState] = createStore<SelectState<T>>({
     // Internal state for uncontrolled select.
     // eslint-disable-next-line solid/reactivity
     valueState: props.defaultValue,
@@ -327,10 +338,10 @@ export function Select(props: SelectProps) {
     setState("activeIndex", index);
 
     if (!state.isControlled) {
-      setState("valueState", state.options[index]);
+      setState("valueState", state.options[index].value);
     }
 
-    props.onChange?.(state.options[index]);
+    props.onChange?.(state.options[index].value as T);
   };
 
   const onOptionChange = (index: number) => {
@@ -415,6 +426,14 @@ export function Select(props: SelectProps) {
     updateMenuState(false);
   };
 
+  const onOptionMouseEnter = (index: number) => {
+    onOptionChange(index);
+  };
+
+  const onOptionMouseLeave = () => {
+    onOptionChange(-1);
+  };
+
   const onOptionMouseDown = function () {
     // Clicking an option will cause a blur event,
     // but we don't want to perform the default keyboard blur action
@@ -429,8 +448,14 @@ export function Select(props: SelectProps) {
     setState("opened", opened);
 
     // focus on selected value or the first one
-    const activeIndex = state.value != null ? state.options.indexOf(state.value) : 0;
-    setState("activeIndex", activeIndex);
+    if (state.value != null) {
+      setState(
+        "activeIndex",
+        state.options.findIndex(item => state.compareFn(item.value as T, state.value as T))
+      );
+    } else {
+      setState("activeIndex", 0);
+    }
 
     if (state.opened) {
       updateListboxPosition();
@@ -481,8 +506,8 @@ export function Select(props: SelectProps) {
     }
   };
 
-  const setOptionMounted = (option: string) => {
-    setState("options", prevOptions => [...prevOptions, option]);
+  const registerOption = (optionData: SelectOptionData) => {
+    setState("options", prev => [...prev, optionData]);
     return state.options.length - 1;
   };
 
@@ -491,13 +516,15 @@ export function Select(props: SelectProps) {
     listboxRef,
     assignButtonRef,
     assignListboxRef,
-    setOptionMounted,
+    registerOption,
     scrollToOption,
     onListboxOutsideClick,
     onButtonBlur,
     onButtonClick,
     onButtonKeyDown,
     onOptionClick,
+    onOptionMouseEnter,
+    onOptionMouseLeave,
     onOptionMouseDown,
   };
 
