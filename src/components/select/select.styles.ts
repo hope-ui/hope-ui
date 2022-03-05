@@ -5,7 +5,7 @@ import { css } from "@/styled-system/stitches.config";
 import { baseInputResetStyles } from "../input/input.styles";
 
 /* -------------------------------------------------------------------------------------------------
- * Select - button
+ * Select - trigger
  * -----------------------------------------------------------------------------------------------*/
 
 function createVariantAndSizeCompoundVariants(
@@ -40,7 +40,7 @@ function createVariantAndSizeCompoundVariants(
   }));
 }
 
-export const selectButtonStyles = css(baseInputResetStyles, {
+export const selectTriggerStyles = css(baseInputResetStyles, {
   appearance: "none",
 
   display: "inline-flex",
@@ -61,13 +61,13 @@ export const selectButtonStyles = css(baseInputResetStyles, {
   ],
 });
 
-export type SelectButtonVariants = VariantProps<typeof selectButtonStyles>;
+export type SelectTriggerVariants = VariantProps<typeof selectTriggerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Select - button text
+ * Select - trigger value
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectButtonTextStyles = css({
+export const selectValueStyles = css({
   display: "block",
   flexGrow: 1,
   flexShrink: 1,
@@ -79,46 +79,40 @@ export const selectButtonTextStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - button placeholder
+ * Select - trigger placeholder
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectButtonPlaceholderStyles = css(selectButtonTextStyles, {
+export const selectPlaceholderStyles = css(selectValueStyles, {
   color: "$neutral9",
   opacity: 1,
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - button icon container
+ * Select - trigger icon
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectButtonIconContainerStyles = css({
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
+export const selectIconStyles = css({
   flexGrow: 0,
   flexShrink: 0,
-
-  marginInlineStart: "$0_5",
-
-  color: "$neutral10",
   fontSize: "1.2em",
-
   pointerEvents: "none",
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - listbox (options list)
+ * Select - content (options list)
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectListboxStyles = css({
+export const selectContentStyles = css({
   zIndex: "$dropdown",
   position: "absolute",
   left: 0,
   top: "100%",
 
-  overflowY: "scroll",
+  display: "flex",
+  flexDirection: "column",
   maxHeight: "$60",
   width: "100%",
+  overflowY: "scroll",
 
   margin: 0,
 
@@ -149,32 +143,19 @@ export const selectOptionStyles = css({
   cursor: "pointer",
   userSelect: "none",
 
-  variants: {
-    active: {
-      true: {},
-    },
-    selected: {
-      true: {
-        backgroundColor: "$primary9",
-        color: "white",
-        fontWeight: "$medium",
-      },
-    },
-    disabled: {
-      true: {
-        color: "$neutral8",
-        cursor: "not-allowed",
-      },
-    },
+  "&[data-disabled]": {
+    color: "$neutral8",
+    cursor: "not-allowed",
   },
-  compoundVariants: [
-    {
-      active: true,
-      selected: false,
-      css: {
-        backgroundColor: "$primary3",
-        color: "$primary11",
-      },
-    },
-  ],
+
+  [`&[data-active]`]: {
+    backgroundColor: "$primary3",
+    color: "$primary11",
+  },
+
+  "&[aria-selected=true]": {
+    backgroundColor: "$primary9",
+    color: "white",
+    fontWeight: "$medium",
+  },
 });

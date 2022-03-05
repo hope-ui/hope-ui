@@ -2,7 +2,7 @@ import { computePosition, flip, getScrollParents, offset, shift, size } from "@f
 import { createContext, createUniqueId, JSX, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SelectButtonVariants } from "./select.styles";
+import { SelectTriggerVariants } from "./select.styles";
 import {
   getActionFromKey,
   getIndexByLetter,
@@ -14,7 +14,7 @@ import {
   SelectOptionData,
 } from "./select.utils";
 
-export interface SelectProps<T = any> extends SelectButtonVariants {
+export interface SelectProps<T = any> extends SelectTriggerVariants {
   /**
    * The `id` of the Select.
    */
@@ -24,6 +24,11 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
    * Children of the Select.
    */
   children?: JSX.Element;
+
+  /**
+   * Offset between the listbox and the reference (trigger) element.
+   */
+  offset?: number;
 
   /**
    * The value of the select to be `selected`.
@@ -38,11 +43,6 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
   defaultValue?: T;
 
   /**
-   * The placeholder to show when no value is selected.
-   */
-  placeholder?: string;
-
-  /**
    * If `true`, the select will be disabled.
    */
   disabled?: boolean;
@@ -55,7 +55,7 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
 
   /**
    * When using an object as an option value, the object key that represents the option label.
-   * Used in the search functionality.
+   * Used for typeahead purposes.
    */
   optionLabel?: string;
 
@@ -67,7 +67,7 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
 }
 
 type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "optionId" | "optionLabel">> &
-  Pick<SelectProps<T>, "value" | "placeholder" | "disabled"> & {
+  Pick<SelectProps<T>, "value" | "disabled"> & {
     /**
      * The value of the select to be `selected`.
      * (in uncontrolled mode)
@@ -85,12 +85,12 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     baseId: string;
 
     /**
-     * The `id` of the `SelectButton`.
+     * The `id` of the `SelectTrigger`.
      */
     buttonId: string;
 
     /**
-     * The `id` of the listbox list (`SelectOptions`).
+     * The `id` of the listbox list (`SelectContent`).
      */
     listboxId: string;
 
@@ -120,7 +120,7 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     ignoreBlur: boolean;
 
     /**
-     * The string to search for in the `SelectOptions`.
+     * The string to search for in the `SelectContent`.
      */
     searchString: string;
 
@@ -134,17 +134,17 @@ interface SelectContextValue<T = any> {
   state: SelectState<T>;
 
   /**
-   * A reefrence to the listbox list (`SelectOptions`).
+   * A reefrence to the listbox list (`SelectContent`).
    */
   listboxRef?: HTMLUListElement;
 
   /**
-   * Callback to assign the `SelectButton` ref.
+   * Callback to assign the `SelectTrigger` ref.
    */
   assignButtonRef: (el: HTMLButtonElement) => void;
 
   /**
-   * Callback to assign the listbox list (`SelectOptions`) ref.
+   * Callback to assign the listbox list (`SelectContent`) ref.
    */
   assignListboxRef: (el: HTMLUListElement) => void;
 
@@ -160,22 +160,22 @@ interface SelectContextValue<T = any> {
   registerOption: (optionData: SelectOptionData) => number;
 
   /**
-   * Callback invoked when the user click outside the listbox (`SelectOptions`).
+   * Callback invoked when the user click outside the listbox (`SelectContent`).
    */
   onListboxOutsideClick: (target: HTMLElement) => void;
 
   /**
-   * Callback invoked when the `SelectButton` loose focus.
+   * Callback invoked when the `SelectTrigger` loose focus.
    */
   onButtonBlur: () => void;
 
   /**
-   * Callback invoked when the user click on the `SelectButton`.
+   * Callback invoked when the user click on the `SelectTrigger`.
    */
   onButtonClick: () => void;
 
   /**
-   * Callback invoked when the user trigger the `SelectButton` with keyboard.
+   * Callback invoked when the user trigger the `SelectTrigger` with keyboard.
    */
   onButtonKeyDown: (event: KeyboardEvent) => void;
 
@@ -195,7 +195,7 @@ interface SelectContextValue<T = any> {
   onOptionMouseDown: () => void;
 
   /**
-   * Callback invoked when the user cursor leave the listbox `SelectOptions`.
+   * Callback invoked when the user cursor leave the listbox `SelectContent`.
    */
   onListboxMouseLeave: () => void;
 }
@@ -232,9 +232,6 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get optionIdPrefix() {
       return `${this.baseId}-option`;
-    },
-    get placeholder() {
-      return props.placeholder;
     },
     get disabled() {
       return props.disabled;
@@ -273,7 +270,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, listboxRef, {
       placement: "bottom",
       middleware: [
-        offset(4),
+        offset(props.offset ?? 4),
         flip(),
         shift(),
         size({
@@ -414,7 +411,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onOptionClick = function (index: number) {
-    // if option is disabled ensure to bring back focus to the `SelectButton` in order to keep keyboard navigation working.
+    // if option is disabled ensure to bring back focus to the `SelectTrigger` in order to keep keyboard navigation working.
     if (state.options[index].disabled) {
       buttonRef?.focus();
       return;

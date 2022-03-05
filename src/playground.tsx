@@ -9,15 +9,17 @@ import {
   HopeProvider,
   HopeThemeConfig,
   Select,
-  SelectButton,
-  SelectButtonRenderPropParams,
+  SelectTrigger,
+  SelectPlaceholder,
   SelectOption,
-  SelectOptions,
-  Button,
+  SelectContent,
   HStack,
   VStack,
   useColorMode,
+  SelectValue,
+  SelectIcon,
 } from ".";
+import { IconChevronDown } from "./components";
 
 const fruits = [
   "Apple",
@@ -65,9 +67,13 @@ export function App() {
       <HStack spacing="$5">
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
-          <Select value={selected()} onChange={setSelected} disabled={false} placeholder="Choose a fruit">
-            <SelectButton maxW="300px">{selected()}</SelectButton>
-            <SelectOptions>
+          <Select value={selected()} onChange={setSelected} disabled={false}>
+            <SelectTrigger maxW="300px">
+              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
+              <SelectValue>{selected().toUpperCase()}</SelectValue>
+              <SelectIcon />
+            </SelectTrigger>
+            <SelectContent>
               <For each={fruits}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit === "Durian"}>
@@ -75,21 +81,26 @@ export function App() {
                   </SelectOption>
                 )}
               </For>
-            </SelectOptions>
+            </SelectContent>
           </Select>
           <Select
             value={selectedObject()}
             onChange={setSelectedObject}
             disabled={false}
-            placeholder="Choose a fruit"
             optionId="identifier"
             optionLabel="name"
+            offset={12}
           >
-            <SelectButton maxW="300px">
-              {/* {({ value, opened, disabled }) => selected()} */}
-              {selectedObject()?.identifier} - {selectedObject()?.name}
-            </SelectButton>
-            <SelectOptions>
+            <SelectTrigger maxW="300px" rounded="$none">
+              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
+              <SelectValue>
+                {selectedObject()?.identifier} - {selectedObject()?.name}
+              </SelectValue>
+              <SelectIcon>
+                <IconChevronDown />
+              </SelectIcon>
+            </SelectTrigger>
+            <SelectContent rounded="$none" shadow="$2xl" border="none" maxH="$96" p="$4" rowGap="$4">
               <For each={fruitsObject}>
                 {fruit => (
                   <SelectOption
@@ -98,35 +109,43 @@ export function App() {
                     d="flex"
                     flexDirection="column"
                     alignItems="flex-start"
+                    rounded="$sm"
+                    data-group
+                    p="$4"
                   >
-                    {({ active, selected, disabled }) => (
-                      <>
-                        <hope.span fontWeight="$medium">
-                          {fruit.identifier} - {fruit.name}
-                        </hope.span>
-                        <hope.span
-                          fontSize="$sm"
-                          color={
-                            disabled ? "$neutral8" : selected ? "$whiteAlpha11" : active ? "$primary11" : "$neutral11"
-                          }
-                        >
-                          Lorem ipsum dolor sit.
-                        </hope.span>
-                      </>
-                    )}
+                    <hope.span fontWeight="$medium">
+                      {fruit.identifier} - {fruit.name}
+                    </hope.span>
+                    <hope.span
+                      fontSize="$sm"
+                      color="$neutral11"
+                      _groupDisabled={{
+                        color: "$neutral8",
+                      }}
+                      _groupActive={{
+                        color: "$primary11",
+                      }}
+                      _groupSelected={{
+                        color: "$whiteAlpha12",
+                      }}
+                    >
+                      Lorem ipsum dolor sit.
+                    </hope.span>
                   </SelectOption>
                 )}
               </For>
-            </SelectOptions>
+            </SelectContent>
           </Select>
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
-          <Select defaultValue="Cherry" disabled={false} placeholder="Choose a fruit">
-            <SelectButton maxW="300px">
-              {({ value, opened, disabled }: SelectButtonRenderPropParams<string>) => value}
-            </SelectButton>
-            <SelectOptions>
+          <Select disabled={false}>
+            <SelectTrigger maxW="300px">
+              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
+              <SelectValue />
+              <SelectIcon />
+            </SelectTrigger>
+            <SelectContent>
               <For each={fruits}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit === "Durian"}>
@@ -134,21 +153,20 @@ export function App() {
                   </SelectOption>
                 )}
               </For>
-            </SelectOptions>
+            </SelectContent>
           </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
             disabled={false}
-            placeholder="Choose a fruit"
             optionId="identifier"
             optionLabel="name"
           >
-            <SelectButton maxW="300px">
-              {({ value, opened, disabled }: SelectButtonRenderPropParams<Fruit>) =>
-                `${value?.identifier} - ${value?.name}`
-              }
-            </SelectButton>
-            <SelectOptions>
+            <SelectTrigger maxW="300px">
+              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
+              <SelectValue />
+              <SelectIcon />
+            </SelectTrigger>
+            <SelectContent>
               <For each={fruitsObject}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit.disabled}>
@@ -156,7 +174,7 @@ export function App() {
                   </SelectOption>
                 )}
               </For>
-            </SelectOptions>
+            </SelectContent>
           </Select>
         </VStack>
       </HStack>

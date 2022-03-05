@@ -9,23 +9,6 @@ import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
 import { getOptionLabel, isOptionEqual } from "./select.utils";
 
-interface SelectOptionRenderPropPrams {
-  /**
-   * Whether or not the option is the active/focused option.
-   */
-  active: boolean;
-
-  /**
-   * Whether or not the option is the selected option.
-   */
-  selected: boolean;
-
-  /**
-   * Whether or not the option is disabled.
-   */
-  disabled: boolean;
-}
-
 interface SelectOptionOptions<T> {
   /**
    * The value of the option.
@@ -36,8 +19,6 @@ interface SelectOptionOptions<T> {
    * If `true`, the option will be disabled.
    */
   disabled?: boolean;
-
-  children?: JSX.Element | ((params: SelectOptionRenderPropPrams) => JSX.Element);
 }
 
 export type SelectOptionProps<C extends ElementType = "li", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
@@ -56,7 +37,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   };
 
   const propsWithDefault: SelectOptionProps<"li"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "children", "value", "disabled"]);
+  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "value", "disabled"]);
 
   const classes = () => {
     return classNames(
@@ -134,20 +115,14 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
       role="option"
       id={id()}
       aria-selected={isSelected()}
+      data-active={isActiveDescendant() ? "" : undefined}
+      data-disabled={local.disabled ? "" : undefined}
       class={classes()}
       onClick={onOptionClick}
       onMouseMove={onOptionMouseMove}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
-    >
-      {isFunction(local.children)
-        ? local.children({
-            active: isActiveDescendant(),
-            selected: isSelected(),
-            disabled: !!local.disabled,
-          })
-        : local.children}
-    </Box>
+    />
   );
 }
 

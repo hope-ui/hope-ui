@@ -8,23 +8,26 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
-import { selectListboxStyles } from "./select.styles";
+import { selectContentStyles } from "./select.styles";
 
-export type SelectOptionsProps<C extends ElementType = "ul"> = HTMLHopeProps<C>;
+export type SelectContentProps<C extends ElementType = "ul"> = HTMLHopeProps<C>;
 
-const hopeSelectOptionsClass = "hope-select__options";
+const hopeSelectContentClass = "hope-select__content";
 
-export function SelectOptions<C extends ElementType = "ul">(props: SelectOptionsProps<C>) {
+/**
+ * The component that pops out when the select is open.
+ */
+export function SelectContent<C extends ElementType = "ul">(props: SelectContentProps<C>) {
   const selectContext = useSelectContext();
 
-  const defaultProps: SelectOptionsProps<"ul"> = {
+  const defaultProps: SelectContentProps<"ul"> = {
     as: "ul",
   };
 
-  const propsWithDefault: SelectOptionsProps<"ul"> = mergeProps(defaultProps, props);
+  const propsWithDefault: SelectContentProps<"ul"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["ref", "class"]);
 
-  const classes = () => classNames(local.class, hopeSelectOptionsClass, selectListboxStyles());
+  const classes = () => classNames(local.class, hopeSelectContentClass, selectContentStyles());
 
   const assignListboxRef = (el: HTMLUListElement) => {
     selectContext.assignListboxRef(el);
@@ -56,11 +59,11 @@ export function SelectOptions<C extends ElementType = "ul">(props: SelectOptions
   );
 }
 
-SelectOptions.toString = () => createClassSelector(hopeSelectOptionsClass);
+SelectContent.toString = () => createClassSelector(hopeSelectContentClass);
 
 /**
  * [Dirty hack]
- * Renderless component that manage outside click on the listbox (`SelectOptions`).
+ * Renderless component that manage outside click on the listbox (`SelectContent`).
  */
 function ListboxWrapper(props: { children?: JSX.Element }) {
   const selectContext = useSelectContext();
