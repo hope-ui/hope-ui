@@ -12,6 +12,11 @@ const hopeSelectValueClass = "hope-select__trigger__value";
 
 export type SelectValueProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
+/**
+ * The part that reflects the selected value.
+ * By default the selected option's value will be rendered (or the label if `optionLabel` is provided on the select).
+ * If you require more control, you can instead control the select and pass your own `children`.
+ */
 export function SelectValue<C extends ElementType = "span">(props: SelectValueProps<C>) {
   const selectContext = useSelectContext();
 

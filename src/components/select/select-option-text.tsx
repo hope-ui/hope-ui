@@ -10,6 +10,9 @@ const hopeSelectOptionTextClass = "hope-select__option__text";
 
 export type SelectOptionTextProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
+/**
+ * The textual part of the option.
+ */
 export function SelectOptionText<C extends ElementType = "span">(props: SelectOptionTextProps<C>) {
   const defaultProps: SelectOptionTextProps<"span"> = {
     as: "span",

@@ -17,7 +17,6 @@ export * from "./grid";
 export * from "./heading";
 export * from "./icon";
 export * from "./icon-button";
-export * from "./icons";
 export * from "./input";
 export * from "./modal";
 export * from "./radio";

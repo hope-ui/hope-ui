@@ -8,6 +8,9 @@ import { selectIconStyles } from "./select.styles";
 
 const hopeSelectIconClass = "hope-select__trigger__icon";
 
+/**
+ * A small icon often displayed next to the value as a visual affordance for the fact it can be open.
+ */
 export function SelectIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const [local, others] = splitProps(props, ["class", "children"]);
 

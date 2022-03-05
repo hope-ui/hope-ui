@@ -3,7 +3,7 @@ import { mergeProps, Show, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { createIcon } from "../icon/create-icon";
+import { IconCheck } from "../icons/IconCheck";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptionIndicatorStyles } from "./select.styles";
 import { useSelectOptionContext } from "./select-option";
@@ -12,14 +12,9 @@ const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
 
 export type SelectOptionIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
-const SelectOptionCheckIcon = createIcon({
-  path: () => (
-    <g fill="none" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-    </g>
-  ),
-});
-
+/**
+ * Visual indicator rendered when the option is selected.
+ */
 export function SelectOptionIndicator<C extends ElementType = "span">(props: SelectOptionIndicatorProps<C>) {
   const selectOptionContext = useSelectOptionContext();
 
@@ -35,7 +30,7 @@ export function SelectOptionIndicator<C extends ElementType = "span">(props: Sel
   return (
     <Show when={selectOptionContext().selected}>
       <Box class={classes()} {...others}>
-        <Show when={local.children} fallback={<SelectOptionCheckIcon aria-hidden="true" boxSize="$5" />}>
+        <Show when={local.children} fallback={<IconCheck aria-hidden="true" boxSize="$5" />}>
           {local.children}
         </Show>
       </Box>
