@@ -3,8 +3,21 @@ import "./playground.css";
 import { createEffect, createSignal, For, onMount } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, HopeProvider, HopeThemeConfig, Select, SelectButton, SelectOption, SelectOptions, useColorMode } from ".";
-import { Button, HStack, VStack } from "./components";
+import {
+  Box,
+  hope,
+  HopeProvider,
+  HopeThemeConfig,
+  Select,
+  SelectButton,
+  SelectButtonRenderPropParams,
+  SelectOption,
+  SelectOptions,
+  Button,
+  HStack,
+  VStack,
+  useColorMode,
+} from ".";
 
 const fruits = [
   "Apple",
@@ -22,34 +35,30 @@ const fruits = [
 ];
 
 interface Fruit {
-  id: number;
+  identifier: number;
   name: string;
   disabled: boolean;
 }
 
 const fruitsObject: Fruit[] = [
-  { id: 1, name: "Apple", disabled: true },
-  { id: 2, name: "Banana", disabled: true },
-  { id: 3, name: "Blueberry", disabled: true },
-  { id: 4, name: "Boysenberry", disabled: true },
-  { id: 5, name: "Cherry", disabled: false },
-  { id: 6, name: "Cranberry", disabled: false },
-  { id: 7, name: "Durian", disabled: true },
-  { id: 8, name: "Eggplant", disabled: true },
-  { id: 9, name: "Fig", disabled: true },
-  { id: 10, name: "Grape", disabled: true },
-  { id: 11, name: "Guava", disabled: true },
-  { id: 12, name: "Huckleberry", disabled: true },
+  { identifier: 1, name: "Apple", disabled: true },
+  { identifier: 2, name: "Banana", disabled: false },
+  { identifier: 3, name: "Blueberry", disabled: true },
+  { identifier: 4, name: "Boysenberry", disabled: false },
+  { identifier: 5, name: "Cherry", disabled: false },
+  { identifier: 6, name: "Cranberry", disabled: false },
+  { identifier: 7, name: "Durian", disabled: true },
+  { identifier: 8, name: "Eggplant", disabled: true },
+  { identifier: 9, name: "Fig", disabled: false },
+  { identifier: 10, name: "Grape", disabled: false },
+  { identifier: 11, name: "Guava", disabled: false },
+  { identifier: 12, name: "Huckleberry", disabled: true },
 ];
 
 export function App() {
   const { toggleColorMode } = useColorMode();
   const [selected, setSelected] = createSignal<string>("Cherry");
-  const [selectedObject, setSelectedObject] = createSignal<Fruit>({ id: 5, name: "Cherry", disabled: false });
-
-  const compareFn = (a: Fruit, b: Fruit) => {
-    return a.id === b.id;
-  };
+  const [selectedObject, setSelectedObject] = createSignal<Fruit>({ identifier: 5, name: "Cherry", disabled: false });
 
   return (
     <Box p="$4">
@@ -57,15 +66,11 @@ export function App() {
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
           <Select value={selected()} onChange={setSelected} disabled={false} placeholder="Choose a fruit">
-            <SelectButton maxW="300px">
-              {/* {({ value, opened, disabled }) => selected()} */}
-              {selected()}
-            </SelectButton>
+            <SelectButton maxW="300px">{selected()}</SelectButton>
             <SelectOptions>
               <For each={fruits}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit === "Durian"}>
-                    {/* {({ active, selected, disabled }) => <span>{person}</span>} */}
                     {fruit}
                   </SelectOption>
                 )}
@@ -77,16 +82,38 @@ export function App() {
             onChange={setSelectedObject}
             disabled={false}
             placeholder="Choose a fruit"
-            compareFn={compareFn}
+            optionId="identifier"
+            optionLabel="name"
           >
             <SelectButton maxW="300px">
-              {selectedObject()?.id} - {selectedObject()?.name}
+              {/* {({ value, opened, disabled }) => selected()} */}
+              {selectedObject()?.identifier} - {selectedObject()?.name}
             </SelectButton>
             <SelectOptions>
               <For each={fruitsObject}>
                 {fruit => (
-                  <SelectOption value={fruit} disabled={fruit.disabled}>
-                    {fruit.name}
+                  <SelectOption
+                    value={fruit}
+                    disabled={fruit.disabled}
+                    d="flex"
+                    flexDirection="column"
+                    alignItems="flex-start"
+                  >
+                    {({ active, selected, disabled }) => (
+                      <>
+                        <hope.span fontWeight="$medium">
+                          {fruit.identifier} - {fruit.name}
+                        </hope.span>
+                        <hope.span
+                          fontSize="$sm"
+                          color={
+                            disabled ? "$neutral8" : selected ? "$whiteAlpha11" : active ? "$primary11" : "$neutral11"
+                          }
+                        >
+                          Lorem ipsum dolor sit.
+                        </hope.span>
+                      </>
+                    )}
                   </SelectOption>
                 )}
               </For>
@@ -96,7 +123,9 @@ export function App() {
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
           <Select defaultValue="Cherry" disabled={false} placeholder="Choose a fruit">
-            <SelectButton maxW="300px">{value => value}</SelectButton>
+            <SelectButton maxW="300px">
+              {({ value, opened, disabled }: SelectButtonRenderPropParams<string>) => value}
+            </SelectButton>
             <SelectOptions>
               <For each={fruits}>
                 {fruit => (
@@ -108,12 +137,17 @@ export function App() {
             </SelectOptions>
           </Select>
           <Select
-            defaultValue={{ id: 5, name: "Cherry", disabled: false }}
+            defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
             disabled={false}
             placeholder="Choose a fruit"
-            compareFn={compareFn}
+            optionId="identifier"
+            optionLabel="name"
           >
-            <SelectButton maxW="300px">{value => `${value.id} - ${value.name}`}</SelectButton>
+            <SelectButton maxW="300px">
+              {({ value, opened, disabled }: SelectButtonRenderPropParams<Fruit>) =>
+                `${value?.identifier} - ${value?.name}`
+              }
+            </SelectButton>
             <SelectOptions>
               <For each={fruitsObject}>
                 {fruit => (

@@ -7,6 +7,7 @@ import {
   getActionFromKey,
   getIndexByLetter,
   getUpdatedIndex,
+  isOptionEqual,
   isScrollable,
   maintainScrollVisibility,
   SelectActions,
@@ -47,107 +48,87 @@ export interface SelectProps<T = any> extends SelectButtonVariants {
   disabled?: boolean;
 
   /**
+   * When using an object as an option value, the object key that uniquely identifies an option.
+   * Used to compare if two options are equal.
+   */
+  optionId?: string;
+
+  /**
+   * When using an object as an option value, the object key that represents the option label.
+   * Used in the search functionality.
+   */
+  optionLabel?: string;
+
+  /**
    * Callback invoked when the selected value changes.
    * (in controlled mode)
    */
   onChange?: (value: T) => void;
-
-  /**
-   * Callback used to compare if the values of two options are equal.
-   * Useful when the option value is an object because you can specify which object key makes two objects "equal".
-   */
-  compareFn?: (a: T, b: T) => boolean;
 }
 
-interface SelectState<T = any> {
-  /**
-   * The visual style of the select.
-   */
-  variant: SelectButtonVariants["variant"];
+type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "optionId" | "optionLabel">> &
+  Pick<SelectProps<T>, "value" | "placeholder" | "disabled"> & {
+    /**
+     * The value of the select to be `selected`.
+     * (in uncontrolled mode)
+     */
+    valueState?: T;
 
-  /**
-   * The size of the select.
-   */
-  size: SelectButtonVariants["size"];
+    /**
+     * If `true`, the select is in controlled mode.
+     */
+    isControlled: boolean;
 
-  /**
-   * The value of the select to be `selected`.
-   * (in controlled mode)
-   */
-  value?: T;
+    /**
+     * The base `id` used in other `Select` components.
+     */
+    baseId: string;
 
-  /**
-   * The value of the select to be `selected`.
-   * (in uncontrolled mode)
-   */
-  valueState?: T;
+    /**
+     * The `id` of the `SelectButton`.
+     */
+    buttonId: string;
 
-  /**
-   * The placeholder to show when no value is selected.
-   */
-  placeholder?: string;
+    /**
+     * The `id` of the listbox list (`SelectOptions`).
+     */
+    listboxId: string;
 
-  /**
-   * If `true`, the select is in controlled mode.
-   */
-  isControlled: boolean;
+    /**
+     * The prefix of the options (`SelectOption`) `id`.
+     */
+    optionIdPrefix: string;
 
-  /**
-   * The base `id` used in other `Select` components.
-   */
-  baseId: string;
+    /**
+     * The list of available `SelectOption` values.
+     */
+    options: readonly SelectOptionData<T>[];
 
-  /**
-   * The `id` of the `SelectButton`.
-   */
-  buttonId: string;
+    /**
+     * If `true`, the Select will be open.
+     */
+    opened: boolean;
 
-  /**
-   * The `id` of the listbox list (`SelectOptions`).
-   */
-  listboxId: string;
+    /**
+     * Index of the active `SelectOption`.
+     */
+    activeIndex: number;
 
-  /**
-   * The prefix of the options (`SelectOption`) `id`.
-   */
-  optionIdPrefix: string;
+    /**
+     * If `true`, prevent the blur event when clicking a `SelectOption`.
+     */
+    ignoreBlur: boolean;
 
-  /**
-   * The list of available `SelectOption` values.
-   */
-  options: readonly SelectOptionData<T>[];
+    /**
+     * The string to search for in the `SelectOptions`.
+     */
+    searchString: string;
 
-  /**
-   * If `true`, the Select will be open.
-   */
-  opened: boolean;
-
-  /**
-   * Index of the active `SelectOption`.
-   */
-  activeIndex: number;
-
-  /**
-   * If `true`, prevent the blur event when clicking a `SelectOption`.
-   */
-  ignoreBlur: boolean;
-
-  /**
-   * The string to search for in the `SelectOptions`.
-   */
-  searchString: string;
-
-  /**
-   * The timeout id of the search functionnality.
-   */
-  searchTimeoutId?: number;
-
-  /**
-   * Callback used to compare if the values of two options are equal.
-   * Useful when the option value is an object because you can specify which object key makes two objects "equal".
-   */
-  compareFn: (a: T, b: T) => boolean;
-}
+    /**
+     * The timeout id of the search functionnality.
+     */
+    searchTimeoutId?: number;
+  };
 
 interface SelectContextValue<T = any> {
   state: SelectState<T>;
@@ -224,10 +205,6 @@ const SelectContext = createContext<SelectContextValue>();
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
-  const defaultCompareFn = (a: T, b: T) => {
-    return a === b;
-  };
-
   const [state, setState] = createStore<SelectState<T>>({
     // Internal state for uncontrolled select.
     // eslint-disable-next-line solid/reactivity
@@ -259,8 +236,14 @@ export function Select<T = any>(props: SelectProps<T>) {
     get placeholder() {
       return props.placeholder;
     },
-    get compareFn() {
-      return props.compareFn ?? defaultCompareFn;
+    get disabled() {
+      return props.disabled;
+    },
+    get optionId() {
+      return props.optionId ?? "id";
+    },
+    get optionLabel() {
+      return props.optionLabel ?? "label";
     },
     options: [],
     opened: false,
@@ -416,7 +399,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
-    const searchIndex = getIndexByLetter([...state.options], searchString, state.activeIndex + 1);
+    const searchIndex = getIndexByLetter(state.options as SelectOptionData<T>[], searchString, state.activeIndex + 1);
 
     // if a match was found, go to it
     if (searchIndex >= 0) {
@@ -431,6 +414,12 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onOptionClick = function (index: number) {
+    // if option is disabled ensure to bring back focus to the `SelectButton` in order to keep keyboard navigation working.
+    if (state.options[index].disabled) {
+      buttonRef?.focus();
+      return;
+    }
+
     selectOption(index);
     updateMenuState(false);
   };
@@ -459,7 +448,9 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     // focus on selected value or the first one
     if (state.value != null) {
-      const selectedOptionIndex = state.options.findIndex(item => state.compareFn(item.value as T, state.value as T));
+      const selectedOptionIndex = state.options.findIndex(item => {
+        return isOptionEqual(item.value, state.value, state.optionId);
+      });
       setState("activeIndex", selectedOptionIndex);
     } else {
       setState("activeIndex", 0);

@@ -1,4 +1,4 @@
-import { createEffect, createSignal, mergeProps, onMount, splitProps } from "solid-js";
+import { createEffect, createSignal, JSX, mergeProps, onMount, splitProps } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -7,6 +7,24 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
+import { getOptionLabel, isOptionEqual } from "./select.utils";
+
+interface SelectOptionRenderPropPrams {
+  /**
+   * Whether or not the option is the active/focused option.
+   */
+  active: boolean;
+
+  /**
+   * Whether or not the option is the selected option.
+   */
+  selected: boolean;
+
+  /**
+   * Whether or not the option is disabled.
+   */
+  disabled: boolean;
+}
 
 interface SelectOptionOptions<T> {
   /**
@@ -18,6 +36,8 @@ interface SelectOptionOptions<T> {
    * If `true`, the option will be disabled.
    */
   disabled?: boolean;
+
+  children?: JSX.Element | ((params: SelectOptionRenderPropPrams) => JSX.Element);
 }
 
 export type SelectOptionProps<C extends ElementType = "li", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
@@ -36,7 +56,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   };
 
   const propsWithDefault: SelectOptionProps<"li"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "value", "disabled"]);
+  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "children", "value", "disabled"]);
 
   const classes = () => {
     return classNames(
@@ -65,10 +85,10 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
 
   const isSelected = () => {
     if (selectContext.state.value == null) {
-      return;
+      return false;
     }
 
-    return selectContext.state.compareFn(local.value, selectContext.state.value);
+    return isOptionEqual(local.value, selectContext.state.value, selectContext.state.optionId);
   };
 
   const isActiveDescendant = () => index() === selectContext.state.activeIndex;
@@ -79,6 +99,10 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   };
 
   const onOptionMouseMove = (event: MouseEvent) => {
+    if (local.disabled) {
+      selectContext.onOptionMouseMove(-1);
+    }
+
     if (isActiveDescendant() || local.disabled) {
       event.preventDefault();
       event.stopPropagation();
@@ -91,9 +115,10 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   onMount(() => {
     const optionIndex = selectContext.registerOption({
       value: local.value,
+      label: getOptionLabel(local.value, selectContext.state.optionLabel),
       disabled: !!local.disabled,
-      textValue: optionRef?.textContent?.toLowerCase() ?? "",
     });
+
     setIndex(optionIndex);
   });
 
@@ -114,7 +139,15 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
       onMouseMove={onOptionMouseMove}
       onMouseDown={selectContext.onOptionMouseDown}
       {...others}
-    />
+    >
+      {isFunction(local.children)
+        ? local.children({
+            active: isActiveDescendant(),
+            selected: isSelected(),
+            disabled: !!local.disabled,
+          })
+        : local.children}
+    </Box>
   );
 }
 

@@ -1,7 +1,42 @@
+import { isObject } from "@/utils/assertion";
+
 export interface SelectOptionData<T = any> {
+  /**
+   * The value to use when the option is selected.
+   */
   value: T;
+
+  /**
+   * The label to use when searching for an option.
+   */
+  label: string;
+
+  /**
+   * If `true`, the option will be disabled.
+   */
   disabled: boolean;
-  textValue: string;
+}
+
+interface GetUpdatedIndexParams {
+  /**
+   * The current active index.
+   */
+  currentIndex: number;
+
+  /**
+   * The index of the last option.
+   */
+  maxIndex: number;
+
+  /**
+   * The initialy performed action.
+   */
+  initialAction: SelectActions;
+
+  /**
+   * Callback invoked to check if an option at a given index is diabled or not.
+   */
+  isOptionDisabled: (index: number) => boolean;
 }
 
 /**
@@ -29,8 +64,12 @@ export enum SelectActions {
  */
 function filterOptions(options: SelectOptionData[] = [], filter: string, exclude: string[] = []) {
   return options.filter(option => {
-    const matches = option.textValue.toLowerCase().indexOf(filter.toLowerCase()) === 0;
-    return matches && exclude.indexOf(option.textValue) < 0;
+    if (option.disabled) {
+      return false;
+    }
+
+    const matches = option.label.toLowerCase().indexOf(filter.toLowerCase()) === 0;
+    return matches && exclude.indexOf(option.label) < 0;
   });
 }
 
@@ -119,28 +158,6 @@ function calculateActiveIndex(currentIndex: number, maxIndex: number, action: Se
   }
 }
 
-interface GetUpdatedIndexParams {
-  /**
-   * The current active index.
-   */
-  currentIndex: number;
-
-  /**
-   * The index of the last option.
-   */
-  maxIndex: number;
-
-  /**
-   * The initialy performed action.
-   */
-  initialAction: SelectActions;
-
-  /**
-   * Callback invoked to check if an option at a given index is diabled or not.
-   */
-  isOptionDisabled: (index: number) => boolean;
-}
-
 /**
  * Get an updated option index after performing an action, ignoring "disabled" option.
  */
@@ -180,6 +197,24 @@ export function getUpdatedIndex(params: GetUpdatedIndexParams) {
   }
 
   return nextIndex;
+}
+
+/**
+ * Check if two options value are equal.
+ */
+export function isOptionEqual(a: any, b: any, compareKey: string): boolean {
+  if (!isObject(a)) {
+    return a === b;
+  }
+
+  return a[compareKey] === b[compareKey];
+}
+
+/**
+ * Get the label of an option's value.
+ */
+export function getOptionLabel(optionValue: any, labelKey: string): string {
+  return isObject(optionValue) ? optionValue[labelKey] : optionValue;
 }
 
 /**

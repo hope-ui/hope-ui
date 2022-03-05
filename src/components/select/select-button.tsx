@@ -7,19 +7,40 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import {
-  selectButtonIconStyles,
+  selectButtonIconContainerStyles,
   selectButtonPlaceholderStyles,
   selectButtonStyles,
   selectButtonTextStyles,
 } from "./select.styles";
 import { SelectDropdownIcon } from "./select-icon";
 
-export type SelectButtonProps<C extends ElementType = "button"> = HTMLHopeProps<
-  C,
-  {
-    children?: JSX.Element | (<T>(value: T) => JSX.Element);
-  }
->;
+export interface SelectButtonRenderPropParams<T = any> {
+  /**
+   * The selected value.
+   */
+  value?: T;
+
+  /**
+   * Whether or not the `Select` listbox is open.
+   */
+  opened: boolean;
+
+  /**
+   * Whether or not the `Select` is disabled.
+   */
+  disabled: boolean;
+}
+
+interface SelectButtonOptions {
+  /**
+   * The dropdown icon.
+   */
+  icon?: JSX.Element;
+
+  children?: JSX.Element | ((params: SelectButtonRenderPropParams) => JSX.Element);
+}
+
+export type SelectButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, SelectButtonOptions>;
 
 const hopeSelectButtonClass = "hope-select__button";
 
@@ -28,10 +49,11 @@ export function SelectButton<C extends ElementType = "button">(props: SelectButt
 
   const defaultProps: SelectButtonProps<"button"> = {
     as: "button",
+    icon: <SelectDropdownIcon />,
   };
 
   const propsWithDefault: SelectButtonProps<"button"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "children"]);
+  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "children", "icon"]);
 
   const classes = () => {
     return classNames(
@@ -83,10 +105,16 @@ export function SelectButton<C extends ElementType = "button">(props: SelectButt
         fallback={<span class={selectButtonPlaceholderStyles()}>{selectContext.state.placeholder}</span>}
       >
         <span class={selectButtonTextStyles()}>
-          {isFunction(local.children) ? local.children(selectContext.state.value) : local.children}
+          {isFunction(local.children)
+            ? local.children({
+                value: selectContext.state.value,
+                opened: selectContext.state.opened,
+                disabled: !!selectContext.state.disabled,
+              })
+            : local.children}
         </span>
       </Show>
-      <SelectDropdownIcon class={selectButtonIconStyles()} color="$neutral10" />
+      <span class={selectButtonIconContainerStyles()}>{local.icon}</span>
     </Box>
   );
 }

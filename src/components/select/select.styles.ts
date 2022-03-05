@@ -88,15 +88,19 @@ export const selectButtonPlaceholderStyles = css(selectButtonTextStyles, {
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - button icon
+ * Select - button icon container
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectButtonIconStyles = css({
+export const selectButtonIconContainerStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexGrow: 0,
   flexShrink: 0,
 
   marginInlineStart: "$0_5",
 
+  color: "$neutral10",
   fontSize: "1.2em",
 
   pointerEvents: "none",
