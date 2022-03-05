@@ -99,7 +99,7 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     buttonId: string;
 
     /**
-     * The `id` of the listbox list (`SelectContent`).
+     * The `id` of the `SelectListbox`.
      */
     listboxId: string;
 
@@ -129,7 +129,7 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     ignoreBlur: boolean;
 
     /**
-     * The string to search for in the `SelectContent`.
+     * The string to search for in the `SelectListbox`.
      */
     searchString: string;
 
@@ -204,7 +204,7 @@ interface SelectContextValue<T = any> {
   onOptionMouseDown: () => void;
 
   /**
-   * Callback invoked when the user cursor leave the listbox `SelectContent`.
+   * Callback invoked when the user cursor leave the `SelectListbox`.
    */
   onListboxMouseLeave: () => void;
 }
@@ -555,12 +555,12 @@ export function useSelectContext() {
   return context;
 }
 
+Select.Trigger = SelectTrigger;
+Select.Placeholder = SelectPlaceholder;
+Select.Value = SelectValue;
+Select.Icon = SelectIcon;
 Select.Panel = SelectPanel;
 Select.Listbox = SelectListbox;
-Select.Icon = SelectIcon;
 Select.Option = SelectOption;
-Select.OptionIndicator = SelectOptionIndicator;
 Select.OptionText = SelectOptionText;
-Select.Placeholder = SelectPlaceholder;
-Select.Trigger = SelectTrigger;
-Select.Value = SelectValue;
+Select.OptionIndicator = SelectOptionIndicator;
