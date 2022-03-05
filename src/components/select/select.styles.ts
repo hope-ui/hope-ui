@@ -134,9 +134,6 @@ export const selectContentStyles = css({
 export const selectOptionStyles = css({
   position: "relative",
 
-  py: "$2",
-  px: "$4",
-
   color: "$neutral12",
   fontWeight: "$normal",
 
@@ -154,8 +151,37 @@ export const selectOptionStyles = css({
   },
 
   "&[aria-selected=true]": {
-    backgroundColor: "$primary9",
-    color: "white",
     fontWeight: "$medium",
   },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - option text
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectOptionTextStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+
+  py: "$2",
+  paddingInlineStart: "$4",
+  paddingInlineEnd: "$10",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - option indicator
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectOptionIndicatorStyles = css({
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  right: 0,
+
+  display: "flex",
+  alignItems: "center",
+
+  paddingInlineEnd: "$4",
+
+  color: "$primary11",
 });

@@ -1,4 +1,13 @@
-import { createEffect, createSignal, mergeProps, onMount, splitProps } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  mergeProps,
+  onMount,
+  splitProps,
+  useContext,
+} from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -22,6 +31,12 @@ interface SelectOptionOptions<T> {
 }
 
 export type SelectOptionProps<C extends ElementType = "li", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
+
+export interface SelectOptionContextValue {
+  selected: boolean;
+}
+
+const SelectOptionContext = createContext<Accessor<SelectOptionContextValue>>();
 
 const hopeSelectOptionClass = "hope-select__option";
 
@@ -74,6 +89,10 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
 
   const isActiveDescendant = () => index() === selectContext.state.activeIndex;
 
+  const context: Accessor<SelectOptionContextValue> = () => ({
+    selected: isSelected(),
+  });
+
   const onOptionClick = (event: MouseEvent) => {
     event.stopPropagation();
     selectContext.onOptionClick(index());
@@ -110,20 +129,32 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   });
 
   return (
-    <Box
-      ref={assignOptionRef}
-      role="option"
-      id={id()}
-      aria-selected={isSelected()}
-      data-active={isActiveDescendant() ? "" : undefined}
-      data-disabled={local.disabled ? "" : undefined}
-      class={classes()}
-      onClick={onOptionClick}
-      onMouseMove={onOptionMouseMove}
-      onMouseDown={selectContext.onOptionMouseDown}
-      {...others}
-    />
+    <SelectOptionContext.Provider value={context}>
+      <Box
+        ref={assignOptionRef}
+        role="option"
+        id={id()}
+        aria-selected={isSelected()}
+        data-active={isActiveDescendant() ? "" : undefined}
+        data-disabled={local.disabled ? "" : undefined}
+        class={classes()}
+        onClick={onOptionClick}
+        onMouseMove={onOptionMouseMove}
+        onMouseDown={selectContext.onOptionMouseDown}
+        {...others}
+      />
+    </SelectOptionContext.Provider>
   );
 }
 
 SelectOption.toString = () => createClassSelector(hopeSelectOptionClass);
+
+export function useSelectOptionContext() {
+  const context = useContext(SelectOptionContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useSelectOptionContext must be used within a `<SelectOption />` component");
+  }
+
+  return context;
+}

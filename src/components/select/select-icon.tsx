@@ -3,11 +3,12 @@ import { Show, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
+import { ElementType } from "../types";
 import { selectIconStyles } from "./select.styles";
 
 const hopeSelectIconClass = "hope-select__trigger__icon";
 
-export function SelectIcon(props: IconProps) {
+export function SelectIcon<C extends ElementType = "svg">(props: IconProps<C>) {
   const [local, others] = splitProps(props, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectIconClass, selectIconStyles());

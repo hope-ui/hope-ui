@@ -1,25 +1,28 @@
 import "./playground.css";
 
-import { createEffect, createSignal, For, onMount } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
-  hope,
   HopeProvider,
   HopeThemeConfig,
-  Select,
-  SelectTrigger,
-  SelectPlaceholder,
-  SelectOption,
-  SelectContent,
   HStack,
-  VStack,
-  useColorMode,
-  SelectValue,
+  Select,
+  SelectContent,
   SelectIcon,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPlaceholder,
+  SelectTrigger,
+  SelectValue,
+  useColorMode,
+  VStack,
+  IconButton,
+  IconCloseSmall,
+  IconClose,
 } from ".";
-import { IconChevronDown } from "./components";
 
 const fruits = [
   "Apple",
@@ -59,7 +62,7 @@ const fruitsObject: Fruit[] = [
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-  const [selected, setSelected] = createSignal<string>("Cherry");
+  const [selected, setSelected] = createSignal<string | null>("Cherry");
   const [selectedObject, setSelectedObject] = createSignal<Fruit>({ identifier: 5, name: "Cherry", disabled: false });
 
   return (
@@ -70,14 +73,15 @@ export function App() {
           <Select value={selected()} onChange={setSelected} disabled={false}>
             <SelectTrigger maxW="300px">
               <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
-              <SelectValue>{selected().toUpperCase()}</SelectValue>
+              <SelectValue>{selected()?.toUpperCase()}</SelectValue>
               <SelectIcon />
             </SelectTrigger>
             <SelectContent>
               <For each={fruits}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit === "Durian"}>
-                    {fruit}
+                    <SelectOptionText>{fruit}</SelectOptionText>
+                    <SelectOptionIndicator />
                   </SelectOption>
                 )}
               </For>
@@ -89,48 +93,20 @@ export function App() {
             disabled={false}
             optionId="identifier"
             optionLabel="name"
-            offset={12}
           >
-            <SelectTrigger maxW="300px" rounded="$none">
+            <SelectTrigger maxW="300px">
               <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
               <SelectValue>
                 {selectedObject()?.identifier} - {selectedObject()?.name}
               </SelectValue>
-              <SelectIcon>
-                <IconChevronDown />
-              </SelectIcon>
+              <SelectIcon />
             </SelectTrigger>
-            <SelectContent rounded="$none" shadow="$2xl" border="none" maxH="$96" p="$4" rowGap="$4">
+            <SelectContent>
               <For each={fruitsObject}>
                 {fruit => (
-                  <SelectOption
-                    value={fruit}
-                    disabled={fruit.disabled}
-                    d="flex"
-                    flexDirection="column"
-                    alignItems="flex-start"
-                    rounded="$sm"
-                    data-group
-                    p="$4"
-                  >
-                    <hope.span fontWeight="$medium">
-                      {fruit.identifier} - {fruit.name}
-                    </hope.span>
-                    <hope.span
-                      fontSize="$sm"
-                      color="$neutral11"
-                      _groupDisabled={{
-                        color: "$neutral8",
-                      }}
-                      _groupActive={{
-                        color: "$primary11",
-                      }}
-                      _groupSelected={{
-                        color: "$whiteAlpha12",
-                      }}
-                    >
-                      Lorem ipsum dolor sit.
-                    </hope.span>
+                  <SelectOption value={fruit} disabled={fruit.disabled}>
+                    <SelectOptionText>{fruit.name}</SelectOptionText>
+                    <SelectOptionIndicator />
                   </SelectOption>
                 )}
               </For>
@@ -149,7 +125,8 @@ export function App() {
               <For each={fruits}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit === "Durian"}>
-                    {fruit}
+                    <SelectOptionText>{fruit}</SelectOptionText>
+                    <SelectOptionIndicator />
                   </SelectOption>
                 )}
               </For>
@@ -170,7 +147,8 @@ export function App() {
               <For each={fruitsObject}>
                 {fruit => (
                   <SelectOption value={fruit} disabled={fruit.disabled}>
-                    {fruit.name}
+                    <SelectOptionText>{fruit.name}</SelectOptionText>
+                    <SelectOptionIndicator />
                   </SelectOption>
                 )}
               </For>
