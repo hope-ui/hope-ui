@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 import { HopeWrapper } from "@/utils/storybook";
 
@@ -8,6 +8,7 @@ import { FormControl } from "./form-control";
 import { FormErrorMessage } from "./form-error-message";
 import { FormHelperText } from "./form-helper-text";
 import { FormLabel } from "./form-label";
+import { Select } from "../select/select";
 
 export default {
   title: "Data entry/FormControl",
@@ -63,3 +64,32 @@ export const WithTextarea = (args: any) => (
   </FormControl>
 );
 WithTextarea.storyName = "With textarea";
+
+export const WithSelect = (args: any) => (
+  <FormControl {...args}>
+    <FormLabel>Framework</FormLabel>
+    <Select>
+      <Select.Trigger>
+        <Select.Placeholder>Choose a framework</Select.Placeholder>
+        <Select.Value />
+        <Select.Icon />
+      </Select.Trigger>
+      <Select.Panel>
+        <Select.Listbox>
+          <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+            {item => (
+              <Select.Option value={item}>
+                <Select.OptionText>{item}</Select.OptionText>
+                <Select.OptionIndicator />
+              </Select.Option>
+            )}
+          </For>
+        </Select.Listbox>
+      </Select.Panel>
+    </Select>
+    <Show when={args.invalid} fallback={<FormHelperText>Choose SolidJS.</FormHelperText>}>
+      <FormErrorMessage>An error occured</FormErrorMessage>
+    </Show>
+  </FormControl>
+);
+WithSelect.storyName = "With select";

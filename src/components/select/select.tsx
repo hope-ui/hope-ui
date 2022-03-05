@@ -1,7 +1,8 @@
 import { computePosition, flip, getScrollParents, offset, shift, size } from "@floating-ui/dom";
-import { createContext, createUniqueId, JSX, useContext } from "solid-js";
+import { Accessor, createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useFormControl, useFormControlPropNames, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {
   getActionFromKey,
@@ -52,9 +53,24 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
   defaultValue?: T;
 
   /**
+   * If `true`, the select will be required.
+   */
+  required?: boolean;
+
+  /**
    * If `true`, the select will be disabled.
    */
   disabled?: boolean;
+
+  /**
+   * If `true`, the select will have `aria-invalid` set to `true`.
+   */
+  invalid?: boolean;
+
+  /**
+   * If `true`, the select will be readonly.
+   */
+  readOnly?: boolean;
 
   /**
    * When using an object as an option value, the object key that uniquely identifies an option.
@@ -69,14 +85,29 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
   labelKey?: string;
 
   /**
+   * A11y: id of the element that provides additional description to the select.
+   */
+  "aria-describedby"?: string;
+
+  /**
    * Callback invoked when the selected value changes.
    * (in controlled mode)
    */
   onChange?: (value: T) => void;
+
+  /**
+   * Callback invoked when the select trigger gain focus.
+   */
+  onFocus?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
+
+  /**
+   * Callback invoked when the select trigger loose focus.
+   */
+  onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
 }
 
 type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey" | "labelKey">> &
-  Pick<SelectProps<T>, "value" | "disabled"> & {
+  Pick<SelectProps<T>, "value" | "invalid" | "disabled"> & {
     /**
      * The value of the select to be `selected`.
      * (in uncontrolled mode)
@@ -87,11 +118,6 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
      * If `true`, the select is in controlled mode.
      */
     isControlled: boolean;
-
-    /**
-     * The base `id` used in other `Select` components.
-     */
-    baseId: string;
 
     /**
      * The `id` of the `SelectTrigger`.
@@ -141,6 +167,11 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
 
 interface SelectContextValue<T = any> {
   state: SelectState<T>;
+
+  /**
+   * Props that should be spread on the select trigger to support embedding in `FormControl`.
+   */
+  formControlProps: Accessor<UseFormControlReturn<HTMLButtonElement>>;
 
   /**
    * Callback to assign the `SelectTrigger` ref.
@@ -214,6 +245,9 @@ const SelectContext = createContext<SelectContextValue>();
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
+  const [useFormControlProps] = splitProps(props, useFormControlPropNames);
+  const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
+
   const [state, setState] = createStore<SelectState<T>>({
     // Internal state for uncontrolled select.
     // eslint-disable-next-line solid/reactivity
@@ -230,17 +264,17 @@ export function Select<T = any>(props: SelectProps<T>) {
     get size() {
       return props.size ?? "md";
     },
-    get baseId() {
-      return props.id ?? defaultBaseId;
-    },
     get buttonId() {
-      return `${this.baseId}-button`;
+      return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
     },
     get listboxId() {
-      return `${this.baseId}-listbox`;
+      return `${defaultBaseId}-listbox`;
     },
     get optionIdPrefix() {
-      return `${this.baseId}-option`;
+      return `${defaultBaseId}-option`;
+    },
+    get invalid() {
+      return props.invalid;
     },
     get disabled() {
       return props.disabled;
@@ -340,6 +374,10 @@ export function Select<T = any>(props: SelectProps<T>) {
     props.onChange?.(state.options[index].value as T);
   };
 
+  const isOptionDisabledCallback = (index: number) => {
+    return state.options[index].disabled;
+  };
+
   const onButtonBlur = function () {
     // do not do blur action if ignoreBlur flag has been set
     if (state.ignoreBlur) {
@@ -353,14 +391,18 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onButtonClick = function () {
+    if (formControlProps().readOnly) {
+      return;
+    }
+
     updateMenuState(!state.opened, false);
   };
 
-  const isOptionDisabledCallback = (index: number) => {
-    return state.options[index].disabled;
-  };
-
   const onButtonKeyDown = function (event: KeyboardEvent) {
+    if (formControlProps().readOnly) {
+      return;
+    }
+
     const { key } = event;
     const max = state.options.length - 1;
 
@@ -401,6 +443,10 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onButtonType = function (letter: string) {
+    if (formControlProps().readOnly) {
+      return;
+    }
+
     // open the listbox if it is closed
     updateMenuState(true);
 
@@ -527,6 +573,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   const context: SelectContextValue = {
     state,
+    formControlProps,
     assignButtonRef,
     assignPanelRef,
     assignListboxRef,
