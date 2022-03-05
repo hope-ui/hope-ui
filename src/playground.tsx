@@ -1,28 +1,9 @@
 import "./playground.css";
 
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  HopeProvider,
-  HopeThemeConfig,
-  HStack,
-  Select,
-  SelectContent,
-  SelectIcon,
-  SelectOption,
-  SelectOptionIndicator,
-  SelectOptionText,
-  SelectPlaceholder,
-  SelectTrigger,
-  SelectValue,
-  useColorMode,
-  VStack,
-  IconButton,
-  IconCloseSmall,
-  IconClose,
-} from ".";
+import { Box, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
 
 const fruits = [
   "Apple",
@@ -71,21 +52,31 @@ export function App() {
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
           <Select value={selected()} onChange={setSelected} disabled={false}>
-            <SelectTrigger maxW="300px">
-              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
-              <SelectValue>{selected()?.toUpperCase()}</SelectValue>
-              <SelectIcon />
-            </SelectTrigger>
-            <SelectContent>
-              <For each={fruits}>
-                {fruit => (
-                  <SelectOption value={fruit} disabled={fruit === "Durian"}>
-                    <SelectOptionText>{fruit}</SelectOptionText>
-                    <SelectOptionIndicator />
-                  </SelectOption>
-                )}
-              </For>
-            </SelectContent>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a fruit</Select.Placeholder>
+              <Select.Value>{selected()?.toUpperCase()}</Select.Value>
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Box px="$4" py="$2">
+                Header
+              </Box>
+              <Divider />
+              <Select.Listbox>
+                <For each={fruits}>
+                  {fruit => (
+                    <Select.Option value={fruit} disabled={fruit === "Durian"}>
+                      <Select.OptionText>{fruit}</Select.OptionText>
+                      <Select.OptionIndicator />
+                    </Select.Option>
+                  )}
+                </For>
+              </Select.Listbox>
+              <Divider />
+              <Box px="$4" py="$2">
+                Footer
+              </Box>
+            </Select.Panel>
           </Select>
           <Select
             value={selectedObject()}
@@ -94,43 +85,47 @@ export function App() {
             optionId="identifier"
             optionLabel="name"
           >
-            <SelectTrigger maxW="300px">
-              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
-              <SelectValue>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a fruit</Select.Placeholder>
+              <Select.Value>
                 {selectedObject()?.identifier} - {selectedObject()?.name}
-              </SelectValue>
-              <SelectIcon />
-            </SelectTrigger>
-            <SelectContent>
-              <For each={fruitsObject}>
-                {fruit => (
-                  <SelectOption value={fruit} disabled={fruit.disabled}>
-                    <SelectOptionText>{fruit.name}</SelectOptionText>
-                    <SelectOptionIndicator />
-                  </SelectOption>
-                )}
-              </For>
-            </SelectContent>
+              </Select.Value>
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Select.Listbox>
+                <For each={fruitsObject}>
+                  {fruit => (
+                    <Select.Option value={fruit} disabled={fruit.disabled}>
+                      <Select.OptionText>{fruit.name}</Select.OptionText>
+                      <Select.OptionIndicator />
+                    </Select.Option>
+                  )}
+                </For>
+              </Select.Listbox>
+            </Select.Panel>
           </Select>
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
           <Select disabled={false}>
-            <SelectTrigger maxW="300px">
-              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
-              <SelectValue />
-              <SelectIcon />
-            </SelectTrigger>
-            <SelectContent>
-              <For each={fruits}>
-                {fruit => (
-                  <SelectOption value={fruit} disabled={fruit === "Durian"}>
-                    <SelectOptionText>{fruit}</SelectOptionText>
-                    <SelectOptionIndicator />
-                  </SelectOption>
-                )}
-              </For>
-            </SelectContent>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a fruit</Select.Placeholder>
+              <Select.Value />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Select.Listbox>
+                <For each={fruits}>
+                  {fruit => (
+                    <Select.Option value={fruit} disabled={fruit === "Durian"}>
+                      <Select.OptionText>{fruit}</Select.OptionText>
+                      <Select.OptionIndicator />
+                    </Select.Option>
+                  )}
+                </For>
+              </Select.Listbox>
+            </Select.Panel>
           </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
@@ -138,21 +133,23 @@ export function App() {
             optionId="identifier"
             optionLabel="name"
           >
-            <SelectTrigger maxW="300px">
-              <SelectPlaceholder>Choose a fruit</SelectPlaceholder>
-              <SelectValue />
-              <SelectIcon />
-            </SelectTrigger>
-            <SelectContent>
-              <For each={fruitsObject}>
-                {fruit => (
-                  <SelectOption value={fruit} disabled={fruit.disabled}>
-                    <SelectOptionText>{fruit.name}</SelectOptionText>
-                    <SelectOptionIndicator />
-                  </SelectOption>
-                )}
-              </For>
-            </SelectContent>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a fruit</Select.Placeholder>
+              <Select.Value />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Select.Listbox>
+                <For each={fruitsObject}>
+                  {fruit => (
+                    <Select.Option value={fruit} disabled={fruit.disabled}>
+                      <Select.OptionText>{fruit.name}</Select.OptionText>
+                      <Select.OptionIndicator />
+                    </Select.Option>
+                  )}
+                </For>
+              </Select.Listbox>
+            </Select.Panel>
           </Select>
         </VStack>
       </HStack>

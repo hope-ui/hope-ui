@@ -13,6 +13,15 @@ import {
   SelectActions,
   SelectOptionData,
 } from "./select.utils";
+import { SelectIcon } from "./select-icon";
+import { SelectListbox } from "./select-listbox";
+import { SelectOption } from "./select-option";
+import { SelectOptionIndicator } from "./select-option-indicator";
+import { SelectOptionText } from "./select-option-text";
+import { SelectPanel } from "./select-panel";
+import { SelectPlaceholder } from "./select-placeholder";
+import { SelectTrigger } from "./select-trigger";
+import { SelectValue } from "./select-value";
 
 export interface SelectProps<T = any> extends SelectTriggerVariants {
   /**
@@ -134,17 +143,17 @@ interface SelectContextValue<T = any> {
   state: SelectState<T>;
 
   /**
-   * A reefrence to the listbox list (`SelectContent`).
-   */
-  listboxRef?: HTMLUListElement;
-
-  /**
    * Callback to assign the `SelectTrigger` ref.
    */
   assignButtonRef: (el: HTMLButtonElement) => void;
 
   /**
-   * Callback to assign the listbox list (`SelectContent`) ref.
+   * Callback to assign the `SelectPanel` ref.
+   */
+  assignPanelRef: (el: HTMLDivElement) => void;
+
+  /**
+   * Callback to assign the `SelectListbox` ref.
    */
   assignListboxRef: (el: HTMLUListElement) => void;
 
@@ -160,9 +169,9 @@ interface SelectContextValue<T = any> {
   registerOption: (optionData: SelectOptionData) => number;
 
   /**
-   * Callback invoked when the user click outside the listbox (`SelectContent`).
+   * Callback invoked when the user click outside the `SelectPanel`.
    */
-  onListboxOutsideClick: (target: HTMLElement) => void;
+  onPanelOutsideClick: (target: HTMLElement) => void;
 
   /**
    * Callback invoked when the `SelectTrigger` loose focus.
@@ -252,6 +261,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   // element refs
   let buttonRef: HTMLButtonElement | undefined;
+  let panelRef: HTMLDivElement | undefined;
   let listboxRef: HTMLUListElement | undefined;
 
   const buttonScrollParents = () => {
@@ -262,12 +272,12 @@ export function Select<T = any>(props: SelectProps<T>) {
     return getScrollParents(buttonRef);
   };
 
-  async function updateListboxPosition() {
-    if (!buttonRef || !listboxRef) {
+  async function updateContentPosition() {
+    if (!buttonRef || !panelRef) {
       return;
     }
 
-    const { x, y } = await computePosition(buttonRef, listboxRef, {
+    const { x, y } = await computePosition(buttonRef, panelRef, {
       placement: "bottom",
       middleware: [
         offset(props.offset ?? 4),
@@ -275,11 +285,11 @@ export function Select<T = any>(props: SelectProps<T>) {
         shift(),
         size({
           apply({ reference }) {
-            if (!listboxRef) {
+            if (!panelRef) {
               return;
             }
 
-            Object.assign(listboxRef.style, {
+            Object.assign(panelRef.style, {
               width: `${reference.width}px`,
             });
           },
@@ -287,11 +297,11 @@ export function Select<T = any>(props: SelectProps<T>) {
       ],
     });
 
-    if (!listboxRef) {
+    if (!panelRef) {
       return;
     }
 
-    Object.assign(listboxRef.style, {
+    Object.assign(panelRef.style, {
       left: `${x}px`,
       top: `${y}px`,
     });
@@ -454,19 +464,19 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updateListboxPosition();
+      updateContentPosition();
 
       buttonScrollParents()?.forEach(el => {
-        el.addEventListener("scroll", updateListboxPosition);
-        el.addEventListener("resize", updateListboxPosition);
+        el.addEventListener("scroll", updateContentPosition);
+        el.addEventListener("resize", updateContentPosition);
       });
     } else {
       // select closed, clear the options
       setState("options", []);
 
       buttonScrollParents()?.forEach(el => {
-        el.removeEventListener("scroll", updateListboxPosition);
-        el.removeEventListener("resize", updateListboxPosition);
+        el.removeEventListener("scroll", updateContentPosition);
+        el.removeEventListener("resize", updateContentPosition);
       });
     }
 
@@ -478,7 +488,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     onOptionChange(-1);
   };
 
-  const onListboxOutsideClick = (target: HTMLElement) => {
+  const onPanelOutsideClick = (target: HTMLElement) => {
     // clicking on the button is not considered an "outside click"
     if (buttonRef && buttonRef.contains(target)) {
       return;
@@ -489,6 +499,10 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   const assignButtonRef = (el: HTMLButtonElement) => {
     buttonRef = el;
+  };
+
+  const assignPanelRef = (el: HTMLDivElement) => {
+    panelRef = el;
   };
 
   const assignListboxRef = (el: HTMLUListElement) => {
@@ -513,12 +527,12 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   const context: SelectContextValue = {
     state,
-    listboxRef,
     assignButtonRef,
+    assignPanelRef,
     assignListboxRef,
     registerOption,
     scrollToOption,
-    onListboxOutsideClick,
+    onPanelOutsideClick,
     onButtonBlur,
     onButtonClick,
     onButtonKeyDown,
@@ -540,3 +554,13 @@ export function useSelectContext() {
 
   return context;
 }
+
+Select.Panel = SelectPanel;
+Select.Listbox = SelectListbox;
+Select.Icon = SelectIcon;
+Select.Option = SelectOption;
+Select.OptionIndicator = SelectOptionIndicator;
+Select.OptionText = SelectOptionText;
+Select.Placeholder = SelectPlaceholder;
+Select.Trigger = SelectTrigger;
+Select.Value = SelectValue;

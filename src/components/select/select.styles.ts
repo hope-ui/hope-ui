@@ -99,10 +99,10 @@ export const selectIconStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - content (options list)
+ * Select - panel
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectContentStyles = css({
+export const selectPanelStyles = css({
   zIndex: "$dropdown",
   position: "absolute",
   left: 0,
@@ -110,9 +110,7 @@ export const selectContentStyles = css({
 
   display: "flex",
   flexDirection: "column",
-  maxHeight: "$60",
   width: "100%",
-  overflowY: "scroll",
 
   margin: 0,
 
@@ -121,8 +119,23 @@ export const selectContentStyles = css({
   borderRadius: "$md",
   backgroundColor: "$panelBg",
 
-  py: "$1",
-  px: 0,
+  padding: 0,
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - listbox
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectListboxStyles = css({
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  maxHeight: "$60",
+  width: "100%",
+  overflowY: "auto",
+
+  margin: 0,
+  padding: 0,
 
   listStyle: "none",
 });
