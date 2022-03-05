@@ -3,7 +3,7 @@ import "./playground.css";
 import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
+import { Box, Button, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
 
 const fruits = [
   "Apple",
@@ -49,6 +49,7 @@ export function App() {
   return (
     <Box p="$4">
       <HStack spacing="$5">
+        <Button onClick={toggleColorMode}>Toggle color mode</Button>
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
           <Select value={selected()} onChange={setSelected} disabled={false}>
@@ -82,8 +83,8 @@ export function App() {
             value={selectedObject()}
             onChange={setSelectedObject}
             disabled={false}
-            optionId="identifier"
-            optionLabel="name"
+            compareKey="identifier"
+            labelKey="name"
           >
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
@@ -130,8 +131,8 @@ export function App() {
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
             disabled={false}
-            optionId="identifier"
-            optionLabel="name"
+            compareKey="identifier"
+            labelKey="name"
           >
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>

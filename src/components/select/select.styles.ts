@@ -111,6 +111,7 @@ export const selectPanelStyles = css({
   display: "flex",
   flexDirection: "column",
   width: "100%",
+  overflow: "hidden",
 
   margin: 0,
 

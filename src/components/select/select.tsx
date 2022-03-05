@@ -60,13 +60,13 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
    * When using an object as an option value, the object key that uniquely identifies an option.
    * Used to compare if two options are equal.
    */
-  optionId?: string;
+  compareKey?: string;
 
   /**
    * When using an object as an option value, the object key that represents the option label.
    * Used for typeahead purposes.
    */
-  optionLabel?: string;
+  labelKey?: string;
 
   /**
    * Callback invoked when the selected value changes.
@@ -75,7 +75,7 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
   onChange?: (value: T) => void;
 }
 
-type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "optionId" | "optionLabel">> &
+type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey" | "labelKey">> &
   Pick<SelectProps<T>, "value" | "disabled"> & {
     /**
      * The value of the select to be `selected`.
@@ -245,11 +245,11 @@ export function Select<T = any>(props: SelectProps<T>) {
     get disabled() {
       return props.disabled;
     },
-    get optionId() {
-      return props.optionId ?? "id";
+    get compareKey() {
+      return props.compareKey ?? "id";
     },
-    get optionLabel() {
-      return props.optionLabel ?? "label";
+    get labelKey() {
+      return props.labelKey ?? "label";
     },
     options: [],
     opened: false,
@@ -456,7 +456,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     // focus on selected value or the first one
     if (state.value != null) {
       const selectedOptionIndex = state.options.findIndex(item => {
-        return isOptionEqual(item.value, state.value, state.optionId);
+        return isOptionEqual(item.value, state.value, state.compareKey);
       });
       setState("activeIndex", selectedOptionIndex);
     } else {

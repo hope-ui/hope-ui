@@ -84,7 +84,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
       return false;
     }
 
-    return isOptionEqual(local.value, selectContext.state.value, selectContext.state.optionId);
+    return isOptionEqual(local.value, selectContext.state.value, selectContext.state.compareKey);
   };
 
   const isActiveDescendant = () => index() === selectContext.state.activeIndex;
@@ -115,7 +115,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
   onMount(() => {
     const optionIndex = selectContext.registerOption({
       value: local.value,
-      label: getOptionLabel(local.value, selectContext.state.optionLabel),
+      label: getOptionLabel(local.value, selectContext.state.labelKey),
       disabled: !!local.disabled,
     });
 

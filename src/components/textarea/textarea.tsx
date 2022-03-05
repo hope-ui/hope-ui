@@ -12,7 +12,7 @@ export type TextareaStyleConfig = SinglePartComponentStyleConfig<TextareaVariant
 
 interface TextareaOptions extends TextareaVariants {
   /**
-   * If `true`, the input will have `aria-invalid` set to `true`
+   * If `true`, the textarea will have `aria-invalid` set to `true`
    */
   invalid?: boolean;
 }
