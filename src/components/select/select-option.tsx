@@ -1,4 +1,4 @@
-import { createEffect, createSignal, JSX, mergeProps, onMount, splitProps } from "solid-js";
+import { createEffect, createSignal, mergeProps, onMount, splitProps } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";

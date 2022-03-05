@@ -47,6 +47,8 @@ export const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _peerFocusVisible: true,
   _groupActive: true,
   _peerActive: true,
+  _groupSelected: true,
+  _peerSelected: true,
   _groupDisabled: true,
   _peerDisabled: true,
   _groupInvalid: true,
