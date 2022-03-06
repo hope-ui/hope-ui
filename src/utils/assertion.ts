@@ -20,3 +20,7 @@ export function isFunction<T extends Function = Function>(value: any): value is 
 export function isNull(value: any): value is null {
   return value == null;
 }
+
+export function isString(value: any): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
+}

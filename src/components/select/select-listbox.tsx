@@ -3,26 +3,29 @@ import { splitProps } from "solid-js";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { hope } from "../factory";
+import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectListboxStyles } from "./select.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
-export type SelectListboxProps<C extends ElementType = "ul"> = HTMLHopeProps<C>;
+export type SelectListboxProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeSelectListboxClass = "hope-select__listbox";
 
 /**
  * The scrolling viewport that contains all of the options.
  */
-export function SelectListbox<C extends ElementType = "ul">(props: SelectListboxProps<C>) {
+export function SelectListbox<C extends ElementType = "div">(props: SelectListboxProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectListboxProps<"ul">, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectListboxProps<"div">, ["ref", "class"]);
 
   const classes = () => classNames(local.class, hopeSelectListboxClass, selectListboxStyles());
 
-  const assignListboxRef = (el: HTMLUListElement) => {
+  const assignListboxRef = (el: HTMLDivElement) => {
     selectContext.assignListboxRef(el);
 
     if (isFunction(local.ref)) {
@@ -34,12 +37,13 @@ export function SelectListbox<C extends ElementType = "ul">(props: SelectListbox
   };
 
   return (
-    <hope.ul
+    <Box
       ref={assignListboxRef}
       role="listbox"
       tabindex="-1"
       id={selectContext.state.listboxId}
       class={classes()}
+      __baseStyle={theme?.baseStyle?.listbox}
       onMouseLeave={selectContext.onListboxMouseLeave}
       {...others}
     />

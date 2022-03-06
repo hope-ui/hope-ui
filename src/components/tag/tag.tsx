@@ -7,6 +7,9 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
+import { TagCloseButton } from "./tag-close-button";
+import { TagLeftIcon, TagRightIcon } from "./tag-icon";
+import { TagLabel } from "./tag-label";
 
 type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
 
@@ -53,3 +56,8 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 }
 
 Tag.toString = () => createClassSelector(hopeTagClass);
+
+Tag.CloseButton = TagCloseButton;
+Tag.LeftIcon = TagLeftIcon;
+Tag.RightIcon = TagRightIcon;
+Tag.Label = TagLabel;

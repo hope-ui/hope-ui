@@ -1,5 +1,6 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -18,6 +19,8 @@ export type SelectValueProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
  * If you require more control, you can instead control the select and pass your own `children`.
  */
 export function SelectValue<C extends ElementType = "span">(props: SelectValueProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
   const defaultProps: SelectValueProps<"span"> = {
@@ -37,7 +40,7 @@ export function SelectValue<C extends ElementType = "span">(props: SelectValuePr
 
   return (
     <Show when={showValue()}>
-      <Box class={classes()} {...others}>
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.value} {...others}>
         <Show when={local.children} fallback={selectedOptionLabel()}>
           {local.children}
         </Show>

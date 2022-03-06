@@ -2,6 +2,9 @@ import { computePosition, flip, getScrollParents, offset, shift, size } from "@f
 import { Accessor, createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
+
 import { useFormControl, useFormControlPropNames, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {
@@ -15,7 +18,9 @@ import {
   SelectOptionData,
 } from "./select.utils";
 import { SelectIcon } from "./select-icon";
+import { SelectLabel } from "./select-label";
 import { SelectListbox } from "./select-listbox";
+import { SelectOptGroup } from "./select-optgroup";
 import { SelectOption } from "./select-option";
 import { SelectOptionIndicator } from "./select-option-indicator";
 import { SelectOptionText } from "./select-option-text";
@@ -24,7 +29,26 @@ import { SelectPlaceholder } from "./select-placeholder";
 import { SelectTrigger } from "./select-trigger";
 import { SelectValue } from "./select-value";
 
-export interface SelectProps<T = any> extends SelectTriggerVariants {
+interface ThemeableSelectOptions extends SelectTriggerVariants {
+  /**
+   * Offset between the listbox and the reference (trigger) element.
+   */
+  offset?: number;
+
+  /**
+   * When using an object as an option value, the object key that uniquely identifies an option.
+   * Used to compare if two options are equal.
+   */
+  compareKey?: string;
+
+  /**
+   * When using an object as an option value, the object key that represents the option label.
+   * Used for typeahead purposes.
+   */
+  labelKey?: string;
+}
+
+export interface SelectProps<T = any> extends ThemeableSelectOptions {
   /**
    * The `id` of the Select.
    */
@@ -34,11 +58,6 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
    * Children of the Select.
    */
   children?: JSX.Element;
-
-  /**
-   * Offset between the listbox and the reference (trigger) element.
-   */
-  offset?: number;
 
   /**
    * The value of the select to be `selected`.
@@ -71,18 +90,6 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
    * If `true`, the select will be readonly.
    */
   readOnly?: boolean;
-
-  /**
-   * When using an object as an option value, the object key that uniquely identifies an option.
-   * Used to compare if two options are equal.
-   */
-  compareKey?: string;
-
-  /**
-   * When using an object as an option value, the object key that represents the option label.
-   * Used for typeahead purposes.
-   */
-  labelKey?: string;
 
   /**
    * A11y: id of the element that provides additional description to the select.
@@ -128,6 +135,11 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
      * The `id` of the `SelectListbox`.
      */
     listboxId: string;
+
+    /**
+     * The prefix of the group labels (`SelectLabel`) `id`.
+     */
+    labelIdPrefix: string;
 
     /**
      * The prefix of the options (`SelectOption`) `id`.
@@ -186,12 +198,12 @@ interface SelectContextValue<T = any> {
   /**
    * Callback to assign the `SelectListbox` ref.
    */
-  assignListboxRef: (el: HTMLUListElement) => void;
+  assignListboxRef: (el: HTMLDivElement) => void;
 
   /**
    * Scroll to the active option.
    */
-  scrollToOption: (optionRef: HTMLLIElement) => void;
+  scrollToOption: (optionRef: HTMLDivElement) => void;
 
   /**
    * Callback to notify the context that a `SelectOption` is mounted.
@@ -240,10 +252,31 @@ interface SelectContextValue<T = any> {
   onListboxMouseLeave: () => void;
 }
 
+export interface SelectStyleConfig {
+  baseStyle?: {
+    trigger?: SystemStyleObject;
+    placeholder?: SystemStyleObject;
+    value?: SystemStyleObject;
+    icon?: SystemStyleObject;
+    panel?: SystemStyleObject;
+    listbox?: SystemStyleObject;
+    optgroup?: SystemStyleObject;
+    label?: SystemStyleObject;
+    option?: SystemStyleObject;
+    optionText?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableSelectOptions;
+  };
+}
+
 const SelectContext = createContext<SelectContextValue>();
 
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
+
+  const theme = useComponentStyleConfigs().Select;
 
   const [useFormControlProps] = splitProps(props, useFormControlPropNames);
   const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
@@ -258,17 +291,14 @@ export function Select<T = any>(props: SelectProps<T>) {
     get value() {
       return (this.isControlled ? props.value : this.valueState) as T | undefined;
     },
-    get variant() {
-      return props.variant ?? "outline";
-    },
-    get size() {
-      return props.size ?? "md";
-    },
     get buttonId() {
       return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
     },
     get listboxId() {
       return `${defaultBaseId}-listbox`;
+    },
+    get labelIdPrefix() {
+      return `${defaultBaseId}-label`;
     },
     get optionIdPrefix() {
       return `${defaultBaseId}-option`;
@@ -279,11 +309,17 @@ export function Select<T = any>(props: SelectProps<T>) {
     get disabled() {
       return props.disabled;
     },
+    get variant() {
+      return props.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+    },
+    get size() {
+      return props.size ?? theme?.defaultProps?.root?.size ?? "md";
+    },
     get compareKey() {
-      return props.compareKey ?? "id";
+      return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
     },
     get labelKey() {
-      return props.labelKey ?? "label";
+      return props.labelKey ?? theme?.defaultProps?.root?.labelKey ?? "label";
     },
     options: [],
     opened: false,
@@ -296,7 +332,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   // element refs
   let buttonRef: HTMLButtonElement | undefined;
   let panelRef: HTMLDivElement | undefined;
-  let listboxRef: HTMLUListElement | undefined;
+  let listboxRef: HTMLDivElement | undefined;
 
   const buttonScrollParents = () => {
     if (!buttonRef) {
@@ -314,7 +350,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, panelRef, {
       placement: "bottom",
       middleware: [
-        offset(props.offset ?? 4),
+        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 4),
         flip(),
         shift(),
         size({
@@ -386,7 +422,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updateMenuState(false, false);
+      updatePanelState(false, false);
     }
   };
 
@@ -395,7 +431,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return;
     }
 
-    updateMenuState(!state.opened, false);
+    updatePanelState(!state.opened, false);
   };
 
   const onButtonKeyDown = function (event: KeyboardEvent) {
@@ -411,7 +447,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     switch (action) {
       case SelectActions.Last:
       case SelectActions.First:
-        updateMenuState(true);
+        updatePanelState(true);
       // intentional fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
@@ -428,17 +464,18 @@ export function Select<T = any>(props: SelectProps<T>) {
       case SelectActions.CloseSelect:
         event.preventDefault();
         selectOption(state.activeIndex);
-      // intentional fallthrough
+        return updatePanelState(false);
+
       case SelectActions.Close:
         event.preventDefault();
-        return updateMenuState(false);
+        return updatePanelState(false);
 
       case SelectActions.Type:
         return onButtonType(key);
 
       case SelectActions.Open:
         event.preventDefault();
-        return updateMenuState(true);
+        return updatePanelState(true);
     }
   };
 
@@ -448,7 +485,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     // open the listbox if it is closed
-    updateMenuState(true);
+    updatePanelState(true);
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
@@ -474,7 +511,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     selectOption(index);
-    updateMenuState(false);
+
+    updatePanelState(false);
   };
 
   const onOptionMouseMove = (index: number) => {
@@ -492,7 +530,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     setState("ignoreBlur", true);
   };
 
-  const updateMenuState = function (opened: boolean, callFocus = true) {
+  const updatePanelState = function (opened: boolean, callFocus = true) {
     if (state.opened === opened) {
       return;
     }
@@ -540,7 +578,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return;
     }
 
-    updateMenuState(false, false);
+    updatePanelState(false, false);
   };
 
   const assignButtonRef = (el: HTMLButtonElement) => {
@@ -551,11 +589,11 @@ export function Select<T = any>(props: SelectProps<T>) {
     panelRef = el;
   };
 
-  const assignListboxRef = (el: HTMLUListElement) => {
+  const assignListboxRef = (el: HTMLDivElement) => {
     listboxRef = el;
   };
 
-  const scrollToOption = (optionRef: HTMLLIElement) => {
+  const scrollToOption = (optionRef: HTMLDivElement) => {
     if (!listboxRef) {
       return;
     }
@@ -608,6 +646,8 @@ Select.Value = SelectValue;
 Select.Icon = SelectIcon;
 Select.Panel = SelectPanel;
 Select.Listbox = SelectListbox;
+Select.OptGroup = SelectOptGroup;
+Select.Label = SelectLabel;
 Select.Option = SelectOption;
 Select.OptionText = SelectOptionText;
 Select.OptionIndicator = SelectOptionIndicator;

@@ -115,9 +115,9 @@ export const selectPanelStyles = css({
 
   margin: 0,
 
-  boxShadow: "$md",
+  boxShadow: "$lg",
   border: "1px solid $colors$neutral7",
-  borderRadius: "$md",
+  borderRadius: "$sm",
   backgroundColor: "$panelBg",
 
   padding: 0,
@@ -142,6 +142,28 @@ export const selectListboxStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
+ * Select - optgroup
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectOptGroupStyles = css({});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectLabelStyles = css({
+  mt: "$5",
+  mb: "$1",
+  paddingInlineStart: "$4",
+  paddingInlineEnd: "$10",
+
+  color: "$neutral11",
+  fontSize: "$sm",
+  fontWeight: "$medium",
+  lineHeight: "$5",
+});
+
+/* -------------------------------------------------------------------------------------------------
  * Select - option
  * -----------------------------------------------------------------------------------------------*/
 
@@ -149,7 +171,9 @@ export const selectOptionStyles = css({
   position: "relative",
 
   color: "$neutral12",
+  fontSize: "$base",
   fontWeight: "$normal",
+  lineHeight: "$6",
 
   cursor: "pointer",
   userSelect: "none",

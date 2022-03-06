@@ -7,15 +7,18 @@ import { IconCheck } from "../icons/IconCheck";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptionIndicatorStyles } from "./select.styles";
 import { useSelectOptionContext } from "./select-option";
-
-const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type SelectOptionIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
+
+const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
 
 /**
  * Visual indicator rendered when the option is selected.
  */
 export function SelectOptionIndicator<C extends ElementType = "span">(props: SelectOptionIndicatorProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectOptionContext = useSelectOptionContext();
 
   const defaultProps: SelectOptionIndicatorProps<"span"> = {
@@ -29,7 +32,7 @@ export function SelectOptionIndicator<C extends ElementType = "span">(props: Sel
 
   return (
     <Show when={selectOptionContext().selected}>
-      <Box class={classes()} {...others}>
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.optionIndicator} {...others}>
         <Show when={local.children} fallback={<IconCheck aria-hidden="true" boxSize="$5" />}>
           {local.children}
         </Show>

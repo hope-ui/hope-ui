@@ -4,6 +4,7 @@ import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
 import { Box, Button, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
+import { IconChevronDown } from "./components/icons/IconChevronDown";
 
 const fruits = [
   "Apple",
@@ -52,7 +53,7 @@ export function App() {
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
-          <Select value={selected()} onChange={setSelected} disabled={false}>
+          <Select value={selected()} onChange={setSelected}>
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value>{selected()?.toUpperCase()}</Select.Value>
@@ -79,13 +80,7 @@ export function App() {
               </Box>
             </Select.Panel>
           </Select>
-          <Select
-            value={selectedObject()}
-            onChange={setSelectedObject}
-            disabled={false}
-            compareKey="identifier"
-            labelKey="name"
-          >
+          <Select value={selectedObject()} onChange={setSelectedObject} compareKey="identifier" labelKey="name">
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value>
@@ -109,7 +104,7 @@ export function App() {
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
-          <Select disabled={false}>
+          <Select>
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value />
@@ -130,7 +125,6 @@ export function App() {
           </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
-            disabled={false}
             compareKey="identifier"
             labelKey="name"
           >
@@ -149,6 +143,53 @@ export function App() {
                     </Select.Option>
                   )}
                 </For>
+              </Select.Listbox>
+            </Select.Panel>
+          </Select>
+        </VStack>
+        <VStack spacing="$5" flexGrow={1}>
+          <p>Group</p>
+          <Select>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a food</Select.Placeholder>
+              <Select.Value />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Select.Listbox>
+                <Select.OptGroup>
+                  <Select.Label>Fruits</Select.Label>
+                  <For each={["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"]}>
+                    {item => (
+                      <Select.Option value={item}>
+                        <Select.OptionText>{item}</Select.OptionText>
+                        <Select.OptionIndicator />
+                      </Select.Option>
+                    )}
+                  </For>
+                </Select.OptGroup>
+                <Select.OptGroup>
+                  <Select.Label>Vegetables</Select.Label>
+                  <For each={["Aubergine", "Broccoli", "Carrot", "Courgette", "Leek"]}>
+                    {item => (
+                      <Select.Option value={item} disabled={item === "Carrot"}>
+                        <Select.OptionText>{item}</Select.OptionText>
+                        <Select.OptionIndicator />
+                      </Select.Option>
+                    )}
+                  </For>
+                </Select.OptGroup>
+                <Select.OptGroup>
+                  <Select.Label>Meat</Select.Label>
+                  <For each={["Beef", "Chicken", "Lamb", "Pork", "Salmon"]}>
+                    {item => (
+                      <Select.Option value={item}>
+                        <Select.OptionText>{item}</Select.OptionText>
+                        <Select.OptionIndicator />
+                      </Select.Option>
+                    )}
+                  </For>
+                </Select.OptGroup>
               </Select.Listbox>
             </Select.Panel>
           </Select>

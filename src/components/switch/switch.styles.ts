@@ -122,8 +122,8 @@ export const switchControlStyles = css({
   "&::before": {
     content: "''",
     position: "absolute",
-    top: "1px",
-    left: "1px",
+    top: "2px",
+    left: "2px",
     zIndex: "1",
     borderRadius: "$full",
     boxShadow: "$sm",
@@ -192,7 +192,7 @@ export const switchControlStyles = css({
         width: "26px",
 
         "&::before": {
-          boxSize: "12px",
+          boxSize: "10px",
         },
 
         "&[data-checked]::before": {
@@ -205,7 +205,7 @@ export const switchControlStyles = css({
         width: "34px",
 
         "&::before": {
-          boxSize: "16px",
+          boxSize: "14px",
         },
 
         "&[data-checked]::before": {
@@ -218,7 +218,7 @@ export const switchControlStyles = css({
         width: "50px",
 
         "&::before": {
-          boxSize: "24px",
+          boxSize: "22px",
         },
 
         "&[data-checked]::before": {

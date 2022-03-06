@@ -13,6 +13,7 @@ import { IconButtonStyleConfig } from "@/components/icon-button/icon-button";
 import { InputStyleConfig } from "@/components/input/input";
 import { ModalStyleConfig } from "@/components/modal/modal";
 import { RadioStyleConfig } from "@/components/radio/radio";
+import { SelectStyleConfig } from "@/components/select/select";
 import { SpinnerStyleConfig } from "@/components/spinner/spinner";
 import { SwitchStyleConfig } from "@/components/switch/switch";
 import { TableStyleConfig } from "@/components/table/table";
@@ -61,6 +62,7 @@ export interface ComponentsStyleConfigs {
   Input?: InputStyleConfig;
   Modal?: ModalStyleConfig;
   Radio?: RadioStyleConfig;
+  Select?: SelectStyleConfig;
   Spinner?: SpinnerStyleConfig;
   Switch?: SwitchStyleConfig;
   Table?: TableStyleConfig;

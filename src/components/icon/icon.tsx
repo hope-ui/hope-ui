@@ -1,8 +1,10 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
+import { isString } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { iconStyles } from "./icon.styles";
 
@@ -38,17 +40,17 @@ export function Icon<C extends ElementType = "svg">(props: IconProps<C>) {
    * If you're using an icon library.
    * Note: anyone passing the `as` prop, should manage the `viewBox` from the external component
    */
-  const shouldRenderSvgComponent = () => local.as && typeof local.as !== "string";
+  const shouldRenderSvgComponent = () => local.as && !isString(local.as);
 
   return (
     <Show
       when={shouldRenderSvgComponent()}
       fallback={
-        <Box as="svg" class={classes()} viewBox={local.viewBox} verticalAlign="middle" {...others}>
+        <hope.svg class={classes()} viewBox={local.viewBox} verticalAlign="middle" {...others}>
           <Show when={local.children} fallback={fallbackIcon.path}>
             {local.children}
           </Show>
-        </Box>
+        </hope.svg>
       }
     >
       <Box as={local.as} class={classes()} {...others} />
