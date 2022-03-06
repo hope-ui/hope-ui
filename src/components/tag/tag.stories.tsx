@@ -2,7 +2,7 @@ import { action } from "@storybook/addon-actions";
 
 import { HopeWrapper } from "@/utils/storybook";
 
-import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
+import { IconInfoCircle } from "../icons/IconInfoCircle";
 import { HStack } from "../stack/stack";
 import { Tag } from "./tag";
 
@@ -47,12 +47,12 @@ export const Default = (args: any) => <Tag {...args} />;
 export const WithIcon = (args: any) => (
   <HStack spacing="$4">
     <Tag {...args}>
-      <Tag.LeftIcon as={IconInfoCircleSolid} />
+      <Tag.LeftIcon as={IconInfoCircle} />
       <Tag.Label>Tag</Tag.Label>
     </Tag>
     <Tag {...args}>
       <Tag.Label>Tag</Tag.Label>
-      <Tag.RightIcon as={IconInfoCircleSolid} />
+      <Tag.RightIcon as={IconInfoCircle} />
     </Tag>
   </HStack>
 );

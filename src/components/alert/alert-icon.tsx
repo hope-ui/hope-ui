@@ -4,10 +4,10 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
-import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
-import { IconExclamationCircleSolid } from "../icons/IconExclamationCircleSolid";
-import { IconExclamationTriangleSolid } from "../icons/IconExclamationTriangleSolid";
-import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
+import { IconCheckCircle } from "../icons/IconCheckCircle";
+import { IconCrossCircle } from "../icons/IconCrossCircle";
+import { IconExclamationTriangle } from "../icons/IconExclamationTriangle";
+import { IconInfoCircle } from "../icons/IconInfoCircle";
 import { ElementType } from "../types";
 import { alertIconStyles } from "./alert.styles";
 import { useAlertContext } from "./alert-provider";
@@ -36,16 +36,16 @@ export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C
 
     switch (status()) {
       case "success":
-        return IconCheckCircleSolid;
+        return IconCheckCircle;
         break;
       case "info":
-        return IconInfoCircleSolid;
+        return IconInfoCircle;
         break;
       case "warning":
-        return IconExclamationTriangleSolid;
+        return IconExclamationTriangle;
         break;
       case "danger":
-        return IconExclamationCircleSolid;
+        return IconCrossCircle;
         break;
     }
   };

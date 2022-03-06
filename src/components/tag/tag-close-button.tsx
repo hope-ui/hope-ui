@@ -1,10 +1,10 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { IconClose } from "@/components/icons/IconClose";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { IconCloseSmall } from "../icons/IconCloseSmall";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagCloseButtonStyles } from "./tag.styles";
 
@@ -26,13 +26,13 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
   };
 
   const propsWithDefault: TagCloseButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children", "borderRadius"]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeTagCloseButtonClass, tagCloseButtonStyles());
 
   return (
     <Box class={classes()} __baseStyle={theme?.baseStyle?.closeButton} {...others}>
-      <IconClose />
+      <IconCloseSmall />
     </Box>
   );
 }

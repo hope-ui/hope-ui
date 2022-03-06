@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { IconCheckCircleSolid } from "@/components/icons/IconCheckCircleSolid";
+import { IconCheckCircle } from "@/components/icons/IconCheckCircle";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { inputElementStyles, InputElementVariants } from "../input.styles";
@@ -35,7 +35,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -50,7 +50,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -65,7 +65,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element" as="span">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -83,7 +83,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element" class={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -102,7 +102,7 @@ describe("InputElement", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputElement data-testid="input-element" className={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -120,7 +120,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element" classList={{ [stubClass]: true }}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -143,7 +143,7 @@ describe("InputElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputElement data-testid="input-element" {...variantProps}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputElement>
       </InputGroup>
     ));
@@ -165,7 +165,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -180,7 +180,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -195,7 +195,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element" as="span">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -215,7 +215,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -229,7 +229,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -251,7 +251,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element" class={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -270,7 +270,7 @@ describe("InputLeftElement", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputLeftElement data-testid="input-element" className={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -288,7 +288,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element" classList={{ [stubClass]: true }}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -308,7 +308,7 @@ describe("InputLeftElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputLeftElement>
       </InputGroup>
     ));
@@ -330,7 +330,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -345,7 +345,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -360,7 +360,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element" as="span">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -380,7 +380,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -394,7 +394,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -416,7 +416,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element" class={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -435,7 +435,7 @@ describe("InputRightElement", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputRightElement data-testid="input-element" className={stubClass}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -453,7 +453,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element" classList={{ [stubClass]: true }}>
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));
@@ -473,7 +473,7 @@ describe("InputRightElement", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightElement data-testid="input-element">
-          <IconCheckCircleSolid />
+          <IconCheckCircle />
         </InputRightElement>
       </InputGroup>
     ));

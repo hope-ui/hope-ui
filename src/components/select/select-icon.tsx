@@ -1,5 +1,6 @@
 import { splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -7,7 +8,6 @@ import { IconProps } from "../icon/icon";
 import { IconSelector } from "../icons/IconSelector";
 import { ElementType } from "../types";
 import { selectIconStyles } from "./select.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 const hopeSelectIconClass = "hope-select__trigger__icon";
 
