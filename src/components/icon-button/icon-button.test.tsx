@@ -1,10 +1,10 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { IconUser } from "@/components/icons/IconUser";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { buttonStyles } from "../button/button.styles";
 import { IconButton, IconButtonOptions } from "./icon-button";
+import { IconCheckCircle } from "../icons/IconCheckCircle";
 
 describe("IconButton", () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe("IconButton", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -23,7 +23,7 @@ describe("IconButton", () => {
 
   it("should render <button> tag by default", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -32,7 +32,7 @@ describe("IconButton", () => {
 
   it("should render tag provided with the as prop", () => {
     // act
-    renderWithHopeProvider(() => <IconButton as="a" aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton as="a" aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -41,7 +41,7 @@ describe("IconButton", () => {
 
   it("should have type=button", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -50,7 +50,7 @@ describe("IconButton", () => {
 
   it("should have role=button", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -59,7 +59,7 @@ describe("IconButton", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -75,7 +75,7 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <IconButton class={stubClass} aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton class={stubClass} aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -89,7 +89,7 @@ describe("IconButton", () => {
     // act
     renderWithHopeProvider(() => (
       // eslint-disable-next-line solid/no-react-specific-props
-      <IconButton className={stubClass} aria-label="User" icon={<IconUser />} />
+      <IconButton className={stubClass} aria-label="User" icon={<IconCheckCircle />} />
     ));
     const button = screen.getByRole("button");
 
@@ -103,7 +103,7 @@ describe("IconButton", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <IconButton classList={{ [stubClass]: true }} aria-label="User" icon={<IconUser />} />
+      <IconButton classList={{ [stubClass]: true }} aria-label="User" icon={<IconCheckCircle />} />
     ));
     const button = screen.getByRole("button");
 
@@ -116,7 +116,7 @@ describe("IconButton", () => {
     const buttonClass = buttonStyles();
 
     // act
-    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert
@@ -135,7 +135,7 @@ describe("IconButton", () => {
     const buttonClass = buttonStyles(variantProps);
 
     // act
-    renderWithHopeProvider(() => <IconButton {...variantProps} aria-label="User" icon={<IconUser />} />);
+    renderWithHopeProvider(() => <IconButton {...variantProps} aria-label="User" icon={<IconCheckCircle />} />);
     const button = screen.getByRole("button");
 
     // assert

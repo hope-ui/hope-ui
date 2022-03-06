@@ -30,9 +30,9 @@ export default {
       control: { type: "select" },
       options: ["sm", "md", "lg"],
     },
-    labelPosition: {
+    labelPlacement: {
       control: { type: "select" },
-      options: ["left", "right"],
+      options: ["start", "end"],
     },
     indeterminate: {
       control: { type: "boolean" },
@@ -54,7 +54,7 @@ export default {
     variant: "outline",
     colorScheme: "primary",
     size: "md",
-    labelPosition: "right",
+    labelPlacement: "end",
     indeterminate: false,
     invalid: false,
     disabled: false,

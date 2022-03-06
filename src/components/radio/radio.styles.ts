@@ -44,11 +44,11 @@ export const radioContainerStyles = css({
         lineHeight: "$7",
       },
     },
-    labelPosition: {
-      left: {
+    labelPlacement: {
+      start: {
         flexDirection: "row-reverse",
       },
-      right: {
+      end: {
         flexDirection: "row",
       },
     },
@@ -202,12 +202,12 @@ function createSizeAndLabelPositionCompoundVariants() {
     lg: "$2",
   }).flatMap(([key, value]) => [
     {
-      labelPosition: "left",
+      labelPlacement: "start",
       size: key,
       css: { marginInlineEnd: value },
     },
     {
-      labelPosition: "right",
+      labelPlacement: "end",
       size: key,
       css: { marginInlineStart: value },
     },
@@ -221,9 +221,9 @@ export const radioLabelStyles = css({
       md: {},
       lg: {},
     },
-    labelPosition: {
-      left: {},
-      right: {},
+    labelPlacement: {
+      start: {},
+      end: {},
     },
   },
   compoundVariants: createSizeAndLabelPositionCompoundVariants(),

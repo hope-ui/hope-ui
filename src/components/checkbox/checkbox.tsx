@@ -162,7 +162,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     variant: theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
-    labelPosition: theme?.defaultProps?.root?.labelPosition ?? "right",
+    labelPlacement: theme?.defaultProps?.root?.labelPlacement ?? "end",
   };
 
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
@@ -185,7 +185,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       "onFocus",
       "onBlur",
     ],
-    ["variant", "colorScheme", "size", "labelPosition"]
+    ["variant", "colorScheme", "size", "labelPlacement"]
   );
 
   // Internal state for uncontrolled checkbox.

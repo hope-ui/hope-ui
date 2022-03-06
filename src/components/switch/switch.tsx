@@ -112,7 +112,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
     variant: theme?.defaultProps?.root?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
-    labelPosition: theme?.defaultProps?.root?.labelPosition ?? "left",
+    labelPlacement: theme?.defaultProps?.root?.labelPlacement ?? "start",
   };
 
   const propsWithDefaults: SwitchProps<"label"> = mergeProps(defaultProps, props);
@@ -134,7 +134,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
       "onFocus",
       "onBlur",
     ],
-    ["variant", "colorScheme", "size", "labelPosition"]
+    ["variant", "colorScheme", "size", "labelPlacement"]
   );
 
   // Internal state for uncontrolled switch.
