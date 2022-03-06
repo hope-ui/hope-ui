@@ -6,9 +6,9 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptionTextStyles } from "./select.styles";
 
-const hopeSelectOptionTextClass = "hope-select__option__text";
-
 export type SelectOptionTextProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
+
+const hopeSelectOptionTextClass = "hope-select__option__text";
 
 /**
  * The textual part of the option.

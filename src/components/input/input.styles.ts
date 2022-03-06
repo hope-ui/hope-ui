@@ -58,7 +58,7 @@ export const baseInputResetStyles = css({
 
   outline: "none",
 
-  borderRadius: "$md",
+  borderRadius: "$sm",
 
   backgroundColor: "transparent",
 

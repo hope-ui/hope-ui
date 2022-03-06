@@ -139,7 +139,7 @@ export function useSelectOptionContext() {
   const context = useContext(SelectOptionContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useSelectOptionContext must be used within a `<SelectOption />` component");
+    throw new Error("[Hope UI]: useSelectOptionContext must be used within a `<Select.Option />` component");
   }
 
   return context;

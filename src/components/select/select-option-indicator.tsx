@@ -8,9 +8,9 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptionIndicatorStyles } from "./select.styles";
 import { useSelectOptionContext } from "./select-option";
 
-const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
-
 export type SelectOptionIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
+
+const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
 
 /**
  * Visual indicator rendered when the option is selected.

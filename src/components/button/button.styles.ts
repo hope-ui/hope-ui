@@ -203,7 +203,7 @@ export const buttonStyles = css({
   alignItems: "center",
 
   outline: "none",
-  borderRadius: "$md",
+  borderRadius: "$sm",
 
   padding: "0",
 

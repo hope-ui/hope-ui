@@ -15,7 +15,9 @@ import {
   SelectOptionData,
 } from "./select.utils";
 import { SelectIcon } from "./select-icon";
+import { SelectLabel } from "./select-label";
 import { SelectListbox } from "./select-listbox";
+import { SelectOptGroup } from "./select-optgroup";
 import { SelectOption } from "./select-option";
 import { SelectOptionIndicator } from "./select-option-indicator";
 import { SelectOptionText } from "./select-option-text";
@@ -128,6 +130,11 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
      * The `id` of the `SelectListbox`.
      */
     listboxId: string;
+
+    /**
+     * The prefix of the group labels (`SelectLabel`) `id`.
+     */
+    labelIdPrefix: string;
 
     /**
      * The prefix of the options (`SelectOption`) `id`.
@@ -269,6 +276,9 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get listboxId() {
       return `${defaultBaseId}-listbox`;
+    },
+    get labelIdPrefix() {
+      return `${defaultBaseId}-label`;
     },
     get optionIdPrefix() {
       return `${defaultBaseId}-option`;
@@ -610,6 +620,8 @@ Select.Value = SelectValue;
 Select.Icon = SelectIcon;
 Select.Panel = SelectPanel;
 Select.Listbox = SelectListbox;
+Select.OptGroup = SelectOptGroup;
+Select.Label = SelectLabel;
 Select.Option = SelectOption;
 Select.OptionText = SelectOptionText;
 Select.OptionIndicator = SelectOptionIndicator;

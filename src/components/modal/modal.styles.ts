@@ -154,7 +154,7 @@ export const baseDialogStyles = css({
 export const modalDialogStyles = css(baseDialogStyles, {
   justifyContent: "center",
   my: "3.75rem",
-  borderRadius: "$lg",
+  borderRadius: "$sm",
 
   variants: {
     size: {
