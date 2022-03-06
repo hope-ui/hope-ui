@@ -157,8 +157,8 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
     id: `hope-checkbox-${createUniqueId()}`,
-    iconChecked: <CheckboxIconCheck boxSize="$full" />,
-    iconIndeterminate: <CheckboxIconIndeterminate boxSize="$full" />,
+    iconChecked: <CheckboxIconCheck />,
+    iconIndeterminate: <CheckboxIconIndeterminate />,
     variant: theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
