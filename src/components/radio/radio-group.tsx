@@ -115,8 +115,8 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
     },
-    get labelPosition() {
-      return props.labelPosition ?? theme?.defaultProps?.group?.labelPosition;
+    get labelPlacement() {
+      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
     },
   });
 

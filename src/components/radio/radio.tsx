@@ -119,7 +119,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md",
-    labelPosition: radioGroupContext?.state?.labelPosition ?? theme?.defaultProps?.root?.labelPosition ?? "right",
+    labelPlacement: radioGroupContext?.state?.labelPlacement ?? theme?.defaultProps?.root?.labelPlacement ?? "end",
 
     name: radioGroupContext?.state.name,
     required: radioGroupContext?.state.required,
@@ -147,7 +147,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       "onFocus",
       "onBlur",
     ],
-    ["variant", "colorScheme", "size", "labelPosition"]
+    ["variant", "colorScheme", "size", "labelPlacement"]
   );
 
   // Internal state for uncontrolled radio.
