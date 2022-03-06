@@ -8,7 +8,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tableStyles } from "./table.styles";
-import { ThemeableTableCaptionOptions } from "./table-caption";
+import { TableCaption, ThemeableTableCaptionOptions } from "./table-caption";
 
 export interface TableContextValue {
   /**
@@ -89,3 +89,5 @@ export function useTableContext() {
 
   return context;
 }
+
+Table.Caption = TableCaption;

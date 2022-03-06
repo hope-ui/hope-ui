@@ -10,6 +10,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
 import { BreadcrumbItem } from "./breadcrumb-item";
 import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
+import { BreadcrumbLink } from "./breadcrumb-link";
 
 export interface BreadcrumbStyleConfig {
   baseStyle?: {
@@ -83,3 +84,7 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
 }
 
 Breadcrumb.toString = () => createClassSelector(hopeBreadcrumbClass);
+
+Breadcrumb.Link = BreadcrumbLink;
+//Breadcrumb.Item = BreadcrumbItem;
+//Breadcrumb.Separator = BreadcrumbSeparator;

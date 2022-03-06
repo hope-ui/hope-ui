@@ -1,10 +1,9 @@
 import { HopeWrapper } from "@/utils/storybook";
 
-import { createIcon, Icon } from "..";
+import { createIcon } from "../icon/create-icon";
+import { Icon } from "../icon/icon";
 import { VStack } from "../stack";
-import { InputLeftAddon, InputLeftElement, InputRightAddon, InputRightElement } from ".";
 import { Input } from "./input";
-import { InputGroup } from "./input-group";
 
 const IconSearch = createIcon({
   path: () => (
@@ -89,48 +88,48 @@ export const Default = (args: any) => <Input {...args} />;
 
 export const WithElement = (args: any) => (
   <VStack spacing="$4">
-    <InputGroup variant={args.variant} size={args.size}>
-      <InputLeftElement pointerEvents="none">
+    <Input.Group variant={args.variant} size={args.size}>
+      <Input.LeftElement pointerEvents="none">
         <MdiPhoneIcon />
-      </InputLeftElement>
+      </Input.LeftElement>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-    </InputGroup>
-    <InputGroup variant={args.variant} size={args.size}>
+    </Input.Group>
+    <Input.Group variant={args.variant} size={args.size}>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-      <InputRightElement pointerEvents="none">
+      <Input.RightElement pointerEvents="none">
         <MdiCheckIcon />
-      </InputRightElement>
-    </InputGroup>
-    <InputGroup variant={args.variant} size={args.size}>
-      <InputLeftElement pointerEvents="none">
+      </Input.RightElement>
+    </Input.Group>
+    <Input.Group variant={args.variant} size={args.size}>
+      <Input.LeftElement pointerEvents="none">
         <MdiPhoneIcon />
-      </InputLeftElement>
+      </Input.LeftElement>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-      <InputRightElement pointerEvents="none">
+      <Input.RightElement pointerEvents="none">
         <MdiCheckIcon />
-      </InputRightElement>
-    </InputGroup>
+      </Input.RightElement>
+    </Input.Group>
   </VStack>
 );
 WithElement.storyName = "With element";
 
 export const WithAddon = (args: any) => (
   <VStack spacing="$4">
-    <InputGroup variant={args.variant} size={args.size}>
-      <InputLeftAddon>+33</InputLeftAddon>
+    <Input.Group variant={args.variant} size={args.size}>
+      <Input.LeftAddon>+33</Input.LeftAddon>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-    </InputGroup>
-    <InputGroup variant={args.variant} size={args.size}>
+    </Input.Group>
+    <Input.Group variant={args.variant} size={args.size}>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-      <InputRightAddon>
+      <Input.RightAddon>
         <IconSearch />
-      </InputRightAddon>
-    </InputGroup>
-    <InputGroup variant={args.variant} size={args.size}>
-      <InputLeftAddon>http://</InputLeftAddon>
+      </Input.RightAddon>
+    </Input.Group>
+    <Input.Group variant={args.variant} size={args.size}>
+      <Input.LeftAddon>http://</Input.LeftAddon>
       <Input placeholder={args.placeholder} disabled={args.disabled} invalid={args.invalid} />
-      <InputRightAddon>.com</InputRightAddon>
-    </InputGroup>
+      <Input.RightAddon>.com</Input.RightAddon>
+    </Input.Group>
   </VStack>
 );
 WithAddon.storyName = "With addon";

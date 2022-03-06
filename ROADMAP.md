@@ -46,7 +46,7 @@
 | RadioGroup       |     ✅      |     ✅     |       |    ✅     |      |
 | Radio            |     ✅      |     ✅     |       |    ✅     |      |
 | NativeSelect     |             |            |       |           |      |
-| Select           |             |            |       |           |      |
+| Select           |     ✅      |     ✅     |       |           |      |
 | MultiSelect      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
 | Switch           |     ✅      |     ✅     |       |    ✅     |      |
