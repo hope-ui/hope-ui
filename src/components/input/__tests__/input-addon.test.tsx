@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { IconSearch } from "@/components";
+import { IconInfoCircleSolid } from "@/components/icons/IconInfoCircleSolid";
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { inputAddonStyles, InputAddonVariants } from "../input.styles";
@@ -35,7 +35,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -50,7 +50,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -65,7 +65,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon" as="span">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -83,7 +83,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon" class={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -102,7 +102,7 @@ describe("InputAddon", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputAddon data-testid="input-addon" className={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -120,7 +120,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon" classList={{ [stubClass]: true }}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -144,7 +144,7 @@ describe("InputAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputAddon data-testid="input-addon" {...variantProps}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputAddon>
       </InputGroup>
     ));
@@ -166,7 +166,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -181,7 +181,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -196,7 +196,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon" as="span">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -216,7 +216,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -230,7 +230,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -252,7 +252,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon" class={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -271,7 +271,7 @@ describe("InputLeftAddon", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputLeftAddon data-testid="input-addon" className={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -289,7 +289,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon" classList={{ [stubClass]: true }}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -309,7 +309,7 @@ describe("InputLeftAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputLeftAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputLeftAddon>
       </InputGroup>
     ));
@@ -331,7 +331,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -346,7 +346,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -361,7 +361,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon" as="span">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -381,7 +381,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -395,7 +395,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -417,7 +417,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon" class={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -436,7 +436,7 @@ describe("InputRightAddon", () => {
       <InputGroup>
         {/* eslint-disable-next-line solid/no-react-specific-props */}
         <InputRightAddon data-testid="input-addon" className={stubClass}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -454,7 +454,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon" classList={{ [stubClass]: true }}>
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));
@@ -474,7 +474,7 @@ describe("InputRightAddon", () => {
     renderWithHopeProvider(() => (
       <InputGroup>
         <InputRightAddon data-testid="input-addon">
-          <IconSearch />
+          <IconInfoCircleSolid />
         </InputRightAddon>
       </InputGroup>
     ));

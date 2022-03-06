@@ -39,8 +39,8 @@ export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObj
  * Enhance props of a SolidJS component or jsx element with Hope UI props.
  */
 export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
-  PropsOf<C>,
-  PropsWithChildren<HopeProps & AdditionalProps & { as?: C }>
+  PropsWithChildren<PropsOf<C>>,
+  HopeProps & AdditionalProps & { as?: C }
 >;
 
 /**

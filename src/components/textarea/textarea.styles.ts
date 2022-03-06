@@ -4,7 +4,7 @@ import { css } from "@/styled-system/stitches.config";
 
 import { baseInputResetStyles } from "../input/input.styles";
 
-function createVaraintAndSizeCompoundVariants(variant: string, paddingX?: string | number) {
+function createVariantAndSizeCompoundVariants(variant: string, paddingX?: string | number) {
   return Object.entries({
     xs: paddingX ?? "$2",
     sm: paddingX ?? "$2_5",
@@ -22,9 +22,9 @@ export const textareaStyles = css(baseInputResetStyles, {
   py: "$2",
 
   compoundVariants: [
-    ...createVaraintAndSizeCompoundVariants("outline"),
-    ...createVaraintAndSizeCompoundVariants("filled"),
-    ...createVaraintAndSizeCompoundVariants("unstyled", 0),
+    ...createVariantAndSizeCompoundVariants("outline"),
+    ...createVariantAndSizeCompoundVariants("filled"),
+    ...createVariantAndSizeCompoundVariants("unstyled", 0),
   ],
 });
 

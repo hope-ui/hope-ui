@@ -1,5 +1,13 @@
 import type { CSS } from "@stitches/core";
 
+function createGroupSelector(...selectors: string[]): string {
+  return selectors.map(item => `[role=group]${item} &, [data-group]${item} &, .group${item} &`).join(", ");
+}
+
+function createPeerSelector(...selectors: string[]): string {
+  return selectors.map(item => `[data-peer]${item} ~ &, .peer${item} ~ &`).join(", ");
+}
+
 export const pseudoSelectors = {
   /**
    * Styles for CSS selector `&:hover`
@@ -244,125 +252,133 @@ export const pseudoSelectors = {
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is hovered
    */
   _groupHover: (value: CSS) => ({
-    "[role=group]:hover &, [role=group][data-hover] &, [data-group]:hover &, [data-group][data-hover] &, .group:hover &, .group[data-hover] &":
-      value,
+    [createGroupSelector(":hover", "[data-hover]")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer` or `data-peer` is hovered
    */
   _peerHover: (value: CSS) => ({
-    "[data-peer]:hover ~ &, [data-peer][data-hover] ~ &, .peer:hover ~ &, .peer[data-hover] ~ &": value,
+    [createPeerSelector(":hover", "[data-hover]")]: value,
   }),
 
   /**
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is focused
    */
   _groupFocus: (value: CSS) => ({
-    "[role=group]:focus &, [role=group][data-focus] &, [data-group]:focus &, [data-group][data-focus] &, .group:focus &, .group[data-focus] &":
-      value,
+    [createGroupSelector(":focus", "[data-focus]")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer` or `data-peer` is focused
    */
   _peerFocus: (value: CSS) => ({
-    "[data-peer]:focus ~ &, [data-peer][data-focus] ~ &, .peer:focus ~ &, .peer[data-focus] ~ &": value,
+    [createPeerSelector(":focus", "[data-focus]")]: value,
   }),
 
   /**
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` has visible focus
    */
   _groupFocusVisible: (value: CSS) => ({
-    "[role=group]:focus-visible &, [data-group]:focus-visible &, .group:focus-visible &": value,
+    [createGroupSelector(":focus-visible")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer`or `data-peer` has visible focus
    */
   _peerFocusVisible: (value: CSS) => ({
-    "[data-peer]:focus-visible ~ &, .peer:focus-visible ~ &": value,
+    [createPeerSelector(":focus-visible")]: value,
   }),
 
   /**
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is active
    */
   _groupActive: (value: CSS) => ({
-    "[role=group]:active &, [role=group][data-active] &, [data-group]:active &, [data-group][data-active] &, .group:active &, .group[data-active] &":
-      value,
+    [createGroupSelector(":active", "[data-active]")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer` or `data-peer` is active
    */
   _peerActive: (value: CSS) => ({
-    "[data-peer]:active ~ &, [data-peer][data-active] ~ &, .peer:active ~ &, .peer[data-active] ~ &": value,
+    [createPeerSelector(":active", "[data-active]")]: value,
+  }),
+
+  /**
+   * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is selected
+   */
+  _groupSelected: (value: CSS) => ({
+    [createGroupSelector("[aria-selected=true]", "[data-selected]")]: value,
+  }),
+
+  /**
+   * Styles to apply when a sibling element with `.peer` or `data-peer` is selected
+   */
+  _peerSelected: (value: CSS) => ({
+    [createPeerSelector("[aria-selected=true]", "[data-selected]")]: value,
   }),
 
   /**
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is disabled
    */
   _groupDisabled: (value: CSS) => ({
-    "[role=group]:disabled &, [role=group][data-disabled] &, [data-group]:disabled &, [data-group][data-disabled] &, .group:disabled &, .group[data-disabled] &":
-      value,
+    [createGroupSelector(":disabled", "[data-disabled]")]: value,
   }),
 
   /**
    *  Styles to apply when a sibling element with `.peer` or `data-peer` is disabled
    */
   _peerDisabled: (value: CSS) => ({
-    "[data-peer]:disabled ~ &, [data-peer][data-disabled] ~ &, .peer:disabled ~ &, .peer[data-disabled] ~ &": value,
+    [createPeerSelector(":disabled", "[data-disabled]")]: value,
   }),
 
   /**
    *  Styles to apply when a parent element with `.group`, `data-group` or `role=group` is invalid
    */
   _groupInvalid: (value: CSS) => ({
-    "[role=group]:invalid &, [role=group][data-invalid] &, [data-group]:invalid &, [data-group][data-invalid] &, .group:invalid &, .group[data-invalid] &":
-      value,
+    [createGroupSelector(":invalid", "[data-invalid]")]: value,
   }),
 
   /**
    *  Styles to apply when a sibling element with `.peer` or `data-peer` is invalid
    */
   _peerInvalid: (value: CSS) => ({
-    "[data-peer]:invalid ~ &, [data-peer][data-invalid] ~ &, .peer:invalid ~ &, .peer[data-invalid] ~ &": value,
+    [createPeerSelector(":invalid", "[data-invalid]")]: value,
   }),
 
   /**
    * Styles to apply when a parent element with `.group`, `data-group` or `role=group` is checked
    */
   _groupChecked: (value: CSS) => ({
-    "[role=group]:checked &, [role=group][data-checked] &, [data-group]:checked &, [data-group][data-checked] &, .group:checked &, .group[data-checked] &":
-      value,
+    [createGroupSelector(":checked", "[data-checked]")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer` or `data-peer` is checked
    */
   _peerChecked: (value: CSS) => ({
-    "[data-peer]:checked ~ &, [data-peer][data-checked] ~ &, .peer:checked ~ &, .peer[data-checked] ~ &": value,
+    [createPeerSelector(":checked", "[data-checked]")]: value,
   }),
 
   /**
    *  Styles to apply when a parent element with `.group`, `data-group` or `role=group` has focus within
    */
   _groupFocusWithin: (value: CSS) => ({
-    "[role=group]:focus-within &, [data-group]:focus-within &, .group:focus-within &": value,
+    [createGroupSelector(":focus-within")]: value,
   }),
 
   /**
    *  Styles to apply when a sibling element with `.peer` or `data-peer` has focus within
    */
   _peerFocusWithin: (value: CSS) => ({
-    "[data-peer]:focus-within ~ &, .peer:focus-within ~ &": value,
+    [createPeerSelector(":focus-within")]: value,
   }),
 
   /**
    * Styles to apply when a sibling element with `.peer` or `data-peer` has placeholder shown
    */
   _peerPlaceholderShown: (value: CSS) => ({
-    "[data-peer]:placeholder-shown ~ &, .peer:placeholder-shown ~ &": value,
+    [createPeerSelector(":placeholder-shown")]: value,
   }),
 
   /**

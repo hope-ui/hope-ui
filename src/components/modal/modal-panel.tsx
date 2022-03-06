@@ -5,29 +5,26 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { createModal } from "../modal/create-modal";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useDrawerContext } from "./drawer";
-import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
+import { createModal } from "./create-modal";
+import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
 
-export type DrawerContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
+export type ModalPanelProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
-const hopeDrawerContainerClass = "hope-drawer__content-container";
-const hopeDrawerContentClass = "hope-drawer__content";
+const hopeModalContainerClass = "hope-modal__panel-container";
+const hopeModalPanelClass = "hope-modal__panel";
 
 /**
- * Container for the drawer dialog's content.
+ * Container for the modal dialog's content.
  */
-export function DrawerContent<C extends ElementType = "section">(props: DrawerContentProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+export function ModalPanel<C extends ElementType = "section">(props: ModalPanelProps<C>) {
+  const theme = useComponentStyleConfigs().Modal;
 
-  const drawerContext = useDrawerContext();
-
-  const defaultProps: DrawerContentProps<"section"> = {
+  const defaultProps: ModalPanelProps<"section"> = {
     as: "section",
   };
 
-  const propsWithDefault: DrawerContentProps<"section"> = mergeProps(defaultProps, props);
+  const propsWithDefault: ModalPanelProps<"section"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, [
     "ref",
     "class",
@@ -48,38 +45,31 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
   } = createModal(local);
 
   const containerClasses = () => {
-    return classNames(
-      hopeDrawerContainerClass,
-      drawerContainerStyles({
-        placement: drawerContext.placement,
-      })
-    );
+    const containerClass = modalContainerStyles({
+      centered: modalContext.state.centered,
+      scrollBehavior: modalContext.state.scrollBehavior,
+    });
+
+    return classNames(hopeModalContainerClass, containerClass);
   };
 
   const dialogClasses = () => {
-    const dialogClass = drawerDialogStyles({
-      size: drawerContext.size,
-      placement: drawerContext.placement,
-      fullHeight: drawerContext.fullHeight,
+    const dialogClass = modalDialogStyles({
+      size: modalContext.state.size,
+      scrollBehavior: modalContext.state.scrollBehavior,
     });
 
-    return classNames(local.class, hopeDrawerContentClass, dialogClass);
+    return classNames(local.class, hopeModalPanelClass, dialogClass);
   };
 
   const transitionName = () => {
-    if (drawerContext.disableTransition) {
-      return "hope-none";
-    }
-
-    switch (drawerContext.placement) {
-      case "top":
-        return drawerTransitionName.slideInTop;
-      case "right":
-        return drawerTransitionName.slideInRight;
-      case "bottom":
-        return drawerTransitionName.slideInBottom;
-      case "left":
-        return drawerTransitionName.slideInLeft;
+    switch (modalContext.state.transition) {
+      case "fade-in-bottom":
+        return modalTransitionName.fadeInBottom;
+      case "scale":
+        return modalTransitionName.scale;
+      case "none":
+        return "hope-none";
     }
   };
 
@@ -89,7 +79,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
       appear
       onAfterEnter={enableFocusTrapAndScrollLock}
       onBeforeExit={disableFocusTrapAndScrollLock}
-      onAfterExit={modalContext.onModalContentExitTransitionEnd}
+      onAfterExit={modalContext.onModalPanelExitTransitionEnd}
     >
       <Show when={modalContext.state.opened}>
         <Box
@@ -102,7 +92,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
         >
           <Box
             class={dialogClasses()}
-            __baseStyle={theme?.baseStyle?.content}
+            __baseStyle={theme?.baseStyle?.panel}
             id={modalContext.state.dialogId}
             role={local.role ?? "dialog"}
             tabIndex={-1}
@@ -118,4 +108,4 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
   );
 }
 
-DrawerContent.toString = () => createClassSelector(hopeDrawerContentClass);
+ModalPanel.toString = () => createClassSelector(hopeModalPanelClass);

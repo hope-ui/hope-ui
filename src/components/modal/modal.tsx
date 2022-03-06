@@ -7,6 +7,12 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 
 import { CloseButtonProps } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
+import { ModalBody } from "./modal-body";
+import { ModalCloseButton } from "./modal-close-button";
+import { ModalFooter } from "./modal-footer";
+import { ModalHeader } from "./modal-header";
+import { ModalOverlay } from "./modal-overlay";
+import { ModalPanel } from "./modal-panel";
 
 type ModalTransition = "fade-in-bottom" | "scale" | "none";
 
@@ -155,7 +161,7 @@ export interface ModalContextValue {
   /**
    * Callback invoked to notify that modal's content exit transition is done.
    */
-  onModalContentExitTransitionEnd: () => void;
+  onModalPanelExitTransitionEnd: () => void;
 
   /**
    * Callback function to set if the modal header is mounted
@@ -171,7 +177,7 @@ export interface ModalContextValue {
 export interface ModalStyleConfig {
   baseStyle?: {
     overlay?: SystemStyleObject;
-    content?: SystemStyleObject;
+    panel?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;
@@ -271,7 +277,7 @@ export function Modal(props: ModalProps) {
   });
 
   // For smooth transition, unmount portal only after modal's content exit transition is done.
-  const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
+  const onModalPanelExitTransitionEnd = () => setIsPortalMounted(false);
 
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
@@ -316,7 +322,7 @@ export function Modal(props: ModalProps) {
 
   const context: ModalContextValue = {
     state,
-    onModalContentExitTransitionEnd,
+    onModalPanelExitTransitionEnd,
     onClose,
     onMouseDown,
     onKeyDown,
@@ -346,3 +352,10 @@ export function useModalContext() {
 
   return context;
 }
+
+Modal.Overlay = ModalOverlay;
+Modal.Panel = ModalPanel;
+Modal.CloseButton = ModalCloseButton;
+Modal.Header = ModalHeader;
+Modal.Body = ModalBody;
+Modal.Footer = ModalFooter;

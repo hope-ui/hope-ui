@@ -4,12 +4,10 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Icon, IconProps } from "../icon/icon";
-import {
-  IconCheckCircleSolid,
-  IconExclamationCircleSolid,
-  IconExclamationTriangleSolid,
-  IconInfoCircleSolid,
-} from "../icons";
+import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
+import { IconExclamationCircleSolid } from "../icons/IconExclamationCircleSolid";
+import { IconExclamationTriangleSolid } from "../icons/IconExclamationTriangleSolid";
+import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { ElementType } from "../types";
 import { alertIconStyles } from "./alert.styles";
 import { useAlertContext } from "./alert-provider";

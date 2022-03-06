@@ -1,6 +1,6 @@
 import { HopeWrapper } from "@/utils/storybook";
 
-import { Flex, IconExternalLink, Text } from "..";
+import { Flex, Text } from "..";
 import { Anchor } from "./anchor";
 
 export default {
@@ -20,7 +20,7 @@ export const Default = (args: any) => (
   <Flex direction="column" rowGap="$4">
     <Anchor>Hope UI</Anchor>
     <Anchor href="https://hope-ui-solid.vercel.app" external>
-      Hope Design system <IconExternalLink mx="2px" />
+      Hope Design system
     </Anchor>
     <Text>
       Did you know that{" "}

@@ -5,9 +5,9 @@ import { callAllHandlers } from "@/utils/function";
 import { FormControlOptions, useFormControlContext } from "./form-control";
 
 export interface UseFormControlProps<T extends HTMLElement> extends FormControlOptions {
+  "aria-describedby"?: string;
   onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
   onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
-  "aria-describedby"?: string;
 }
 
 /**
@@ -24,7 +24,7 @@ export const useFormControlPropNames: Array<keyof UseFormControlProps<HTMLElemen
   "onBlur",
 ];
 
-export interface FormControlProps<T extends HTMLElement> {
+export interface UseFormControlReturn<T extends HTMLElement> {
   id?: string;
   required?: boolean;
   disabled?: boolean;
@@ -47,7 +47,9 @@ export interface FormControlProps<T extends HTMLElement> {
  *
  * @internal
  */
-export function useFormControl<T extends HTMLElement>(props: UseFormControlProps<T>): Accessor<FormControlProps<T>> {
+export function useFormControl<T extends HTMLElement>(
+  props: UseFormControlProps<T>
+): Accessor<UseFormControlReturn<T>> {
   const formControl = useFormControlContext();
 
   const id = () => props.id ?? formControl?.state.id;

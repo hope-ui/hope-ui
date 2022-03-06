@@ -7,6 +7,8 @@ import { callAllHandlers } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { hope } from "../factory";
+import { createIcon } from "../icon/create-icon";
+import { IconCheckIndeterminate } from "../icons/IconCheckIndeterminate";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   checkboxContainerStyles,
@@ -16,7 +18,6 @@ import {
   checkboxInputStyles,
   checkboxLabelStyles,
 } from "./checkbox.styles";
-import { CheckIcon, IndeterminateIcon } from "./checkbox-icon";
 
 type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
 
@@ -121,14 +122,23 @@ const hopeCheckboxInputClass = "hope-checkbox__input";
 const hopeCheckboxControlClass = "hope-checkbox__control";
 const hopeCheckboxLabelClass = "hope-checkbox__label";
 
+// A thicker version of IconCheck
+const CheckboxIconCheck = createIcon({
+  path: () => (
+    <g fill="none" stroke="currentColor" stroke-width="4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </g>
+  ),
+});
+
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const theme = useComponentStyleConfigs().Checkbox;
 
   const defaultProps: CheckboxProps<"label"> = {
     as: "label",
     id: `hope-checkbox-${createUniqueId()}`,
-    iconChecked: <CheckIcon />,
-    iconIndeterminate: <IndeterminateIcon />,
+    iconChecked: <CheckboxIconCheck />,
+    iconIndeterminate: <IconCheckIndeterminate />,
     variant: theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
