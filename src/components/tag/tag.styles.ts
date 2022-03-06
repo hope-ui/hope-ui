@@ -46,7 +46,7 @@ export const tagCloseButtonStyles = css({
 
   padding: "0",
 
-  fontSize: "0.8em",
+  //fontSize: "1em",
   lineHeight: "$none",
   textDecoration: "none",
   color: "inherit",
@@ -55,11 +55,8 @@ export const tagCloseButtonStyles = css({
   userSelect: "none",
   transition: "color 250ms, background-color 250ms, opacity 250ms, box-shadow 250ms",
 
-  "&:not(:disabled):active": {
-    transform: "translateY(1px)",
-  },
-
   "&:focus": {
+    outline: "none",
     boxShadow: "0 0 0 3px $colors$focusRing",
   },
 
@@ -81,7 +78,6 @@ interface TagSizeVariantConfig {
   fontSize: string;
   lineHeight: string;
   closeButtonSize: string;
-  closeButtonIconSize: string;
 }
 
 function createTagSizeVariant(config: TagSizeVariantConfig): SystemStyleObject {
@@ -189,15 +185,6 @@ export const tagStyles = css({
   lineHeight: "$none",
   textDecoration: "none",
 
-  [`& .${tagCloseButtonStyles}`]: {
-    opacity: "0.7",
-  },
-
-  [`& .${tagCloseButtonStyles}:not(:disabled):hover, 
-    & .${tagCloseButtonStyles}:not(:disabled):active`]: {
-    opacity: 1,
-  },
-
   variants: {
     variant: {
       solid: {
@@ -254,7 +241,6 @@ export const tagStyles = css({
         fontSize: "$xs",
         lineHeight: "$4",
         closeButtonSize: "$4",
-        closeButtonIconSize: "$4",
       }),
       md: createTagSizeVariant({
         height: "$6",
@@ -262,15 +248,13 @@ export const tagStyles = css({
         fontSize: "$sm",
         lineHeight: "$5",
         closeButtonSize: "$5",
-        closeButtonIconSize: "$4",
       }),
       lg: createTagSizeVariant({
         height: "$8",
         paddingX: "$3",
         fontSize: "$base",
         lineHeight: "$6",
-        closeButtonSize: "$7",
-        closeButtonIconSize: "$5",
+        closeButtonSize: "$6",
       }),
     },
     dotPosition: {
