@@ -69,7 +69,7 @@ export const WithSelect = (args: any) => (
   <FormControl {...args}>
     <FormLabel>Framework</FormLabel>
     <Select>
-      <Select.Trigger>
+      <Select.Trigger maxW="300px">
         <Select.Placeholder>Choose a framework</Select.Placeholder>
         <Select.Value />
         <Select.Icon />
