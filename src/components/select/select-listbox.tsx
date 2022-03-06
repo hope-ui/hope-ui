@@ -7,6 +7,7 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectListboxStyles } from "./select.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type SelectListboxProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
@@ -16,6 +17,8 @@ const hopeSelectListboxClass = "hope-select__listbox";
  * The scrolling viewport that contains all of the options.
  */
 export function SelectListbox<C extends ElementType = "div">(props: SelectListboxProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
   const [local, others] = splitProps(props as SelectListboxProps<"div">, ["ref", "class"]);
@@ -40,6 +43,7 @@ export function SelectListbox<C extends ElementType = "div">(props: SelectListbo
       tabindex="-1"
       id={selectContext.state.listboxId}
       class={classes()}
+      __baseStyle={theme?.baseStyle?.listbox}
       onMouseLeave={selectContext.onListboxMouseLeave}
       {...others}
     />

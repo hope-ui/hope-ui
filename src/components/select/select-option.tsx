@@ -1,5 +1,6 @@
 import { Accessor, createContext, createEffect, createSignal, onMount, splitProps, useContext } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -32,6 +33,8 @@ export type SelectOptionProps<C extends ElementType = "div", T = any> = HTMLHope
 const hopeSelectOptionClass = "hope-select__option";
 
 export function SelectOption<C extends ElementType = "div", T = any>(props: SelectOptionProps<C, T>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
   const [index, setIndex] = createSignal<number>(-1);
@@ -124,6 +127,7 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
         data-active={isActiveDescendant() ? "" : undefined}
         data-disabled={local.disabled ? "" : undefined}
         class={classes()}
+        __baseStyle={theme?.baseStyle?.option}
         onClick={onOptionClick}
         onMouseMove={onOptionMouseMove}
         onMouseDown={selectContext.onOptionMouseDown}

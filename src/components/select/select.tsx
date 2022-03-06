@@ -2,6 +2,9 @@ import { computePosition, flip, getScrollParents, offset, shift, size } from "@f
 import { Accessor, createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme";
+
 import { useFormControl, useFormControlPropNames, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {
@@ -26,7 +29,26 @@ import { SelectPlaceholder } from "./select-placeholder";
 import { SelectTrigger } from "./select-trigger";
 import { SelectValue } from "./select-value";
 
-export interface SelectProps<T = any> extends SelectTriggerVariants {
+interface ThemeableSelectOptions extends SelectTriggerVariants {
+  /**
+   * Offset between the listbox and the reference (trigger) element.
+   */
+  offset?: number;
+
+  /**
+   * When using an object as an option value, the object key that uniquely identifies an option.
+   * Used to compare if two options are equal.
+   */
+  compareKey?: string;
+
+  /**
+   * When using an object as an option value, the object key that represents the option label.
+   * Used for typeahead purposes.
+   */
+  labelKey?: string;
+}
+
+export interface SelectProps<T = any> extends ThemeableSelectOptions {
   /**
    * The `id` of the Select.
    */
@@ -36,11 +58,6 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
    * Children of the Select.
    */
   children?: JSX.Element;
-
-  /**
-   * Offset between the listbox and the reference (trigger) element.
-   */
-  offset?: number;
 
   /**
    * The value of the select to be `selected`.
@@ -73,18 +90,6 @@ export interface SelectProps<T = any> extends SelectTriggerVariants {
    * If `true`, the select will be readonly.
    */
   readOnly?: boolean;
-
-  /**
-   * When using an object as an option value, the object key that uniquely identifies an option.
-   * Used to compare if two options are equal.
-   */
-  compareKey?: string;
-
-  /**
-   * When using an object as an option value, the object key that represents the option label.
-   * Used for typeahead purposes.
-   */
-  labelKey?: string;
 
   /**
    * A11y: id of the element that provides additional description to the select.
@@ -247,10 +252,31 @@ interface SelectContextValue<T = any> {
   onListboxMouseLeave: () => void;
 }
 
+export interface SelectStyleConfig {
+  baseStyle?: {
+    trigger?: SystemStyleObject;
+    placeholder?: SystemStyleObject;
+    value?: SystemStyleObject;
+    icon?: SystemStyleObject;
+    panel?: SystemStyleObject;
+    listbox?: SystemStyleObject;
+    optgroup?: SystemStyleObject;
+    label?: SystemStyleObject;
+    option?: SystemStyleObject;
+    optionText?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableSelectOptions;
+  };
+}
+
 const SelectContext = createContext<SelectContextValue>();
 
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
+
+  const theme = useComponentStyleConfigs().Select;
 
   const [useFormControlProps] = splitProps(props, useFormControlPropNames);
   const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
@@ -264,12 +290,6 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get value() {
       return (this.isControlled ? props.value : this.valueState) as T | undefined;
-    },
-    get variant() {
-      return props.variant ?? "outline";
-    },
-    get size() {
-      return props.size ?? "md";
     },
     get buttonId() {
       return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
@@ -289,11 +309,17 @@ export function Select<T = any>(props: SelectProps<T>) {
     get disabled() {
       return props.disabled;
     },
+    get variant() {
+      return props.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+    },
+    get size() {
+      return props.size ?? theme?.defaultProps?.root?.size ?? "md";
+    },
     get compareKey() {
-      return props.compareKey ?? "id";
+      return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
     },
     get labelKey() {
-      return props.labelKey ?? "label";
+      return props.labelKey ?? theme?.defaultProps?.root?.labelKey ?? "label";
     },
     options: [],
     opened: false,
@@ -324,7 +350,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, panelRef, {
       placement: "bottom",
       middleware: [
-        offset(props.offset ?? 4),
+        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 4),
         flip(),
         shift(),
         size({

@@ -7,6 +7,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectLabelStyles } from "./select.styles";
 import { useSelectOptGroupContext } from "./select-optgroup";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type SelectLabelProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
@@ -16,6 +17,8 @@ const hopeSelectLabelClass = "hope-select__label";
  * Component used to render the label of a group.
  */
 export function SelectLabel<C extends ElementType = "div">(props: SelectLabelProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
   const selectOptGroupContext = useSelectOptGroupContext();
 
@@ -31,7 +34,7 @@ export function SelectLabel<C extends ElementType = "div">(props: SelectLabelPro
     selectOptGroupContext.setAriaLabelledBy(id());
   });
 
-  return <Box id={id()} class={classes()} {...others} />;
+  return <Box id={id()} class={classes()} __baseStyle={theme?.baseStyle?.label} {...others} />;
 }
 
 SelectLabel.toString = () => createClassSelector(hopeSelectLabelClass);

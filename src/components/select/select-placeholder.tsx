@@ -1,5 +1,6 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -12,6 +13,8 @@ const hopeSelectPlaceholderClass = "hope-select__trigger__placeholder";
 export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 export function SelectPlaceholder<C extends ElementType = "span">(props: SelectPlaceholderProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
   const defaultProps: SelectPlaceholderProps<"span"> = {
@@ -27,7 +30,7 @@ export function SelectPlaceholder<C extends ElementType = "span">(props: SelectP
 
   return (
     <Show when={showPlaceholder()}>
-      <Box class={classes()} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.placeholder} {...others} />
     </Show>
   );
 }

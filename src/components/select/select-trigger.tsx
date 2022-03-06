@@ -1,5 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -13,6 +14,8 @@ export type SelectTriggerProps<C extends ElementType = "button"> = HTMLHopeProps
 const hopeSelectTriggerClass = "hope-select__trigger";
 
 export function SelectTrigger<C extends ElementType = "button">(props: SelectTriggerProps<C>) {
+  const theme = useComponentStyleConfigs().Select;
+
   const selectContext = useSelectContext();
 
   const defaultProps: SelectTriggerProps<"button"> = {
@@ -53,7 +56,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   return (
     <Box
       ref={assignButtonRef}
-      class={classes()}
+      id={selectContext.state.buttonId}
       type="button"
       role="combobox"
       tabindex="0"
@@ -61,7 +64,8 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       aria-activedescendant={activeDescendantId()}
       aria-controls={selectContext.state.listboxId}
       aria-expanded={selectContext.state.opened}
-      id={selectContext.state.buttonId}
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.trigger}
       onBlur={selectContext.onButtonBlur}
       onClick={selectContext.onButtonClick}
       onKeyDown={selectContext.onButtonKeyDown}
