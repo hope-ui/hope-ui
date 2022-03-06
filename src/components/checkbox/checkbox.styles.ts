@@ -25,7 +25,7 @@ export const checkboxContainerStyles = css({
   userSelect: "none",
 
   "&[data-disabled]": {
-    opacity: "0.4",
+    opacity: "0.5",
     cursor: "not-allowed",
   },
 
@@ -71,6 +71,10 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   return {
     color: config.color,
 
+    "&[data-disabled]": {
+      color: "$neutral10",
+    },
+
     [`.${checkboxInputStyles}:focus + &`]: {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
@@ -102,7 +106,7 @@ export const checkboxControlStyles = css({
   },
 
   "&[data-disabled]": {
-    opacity: "0.4",
+    opacity: "0.5",
     cursor: "not-allowed",
   },
 
