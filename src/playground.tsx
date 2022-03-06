@@ -52,7 +52,7 @@ export function App() {
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
         <VStack spacing="$5" flexGrow={1}>
           <p>Controlled</p>
-          <Select value={selected()} onChange={setSelected} disabled={false}>
+          <Select value={selected()} onChange={setSelected}>
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value>{selected()?.toUpperCase()}</Select.Value>
@@ -79,13 +79,7 @@ export function App() {
               </Box>
             </Select.Panel>
           </Select>
-          <Select
-            value={selectedObject()}
-            onChange={setSelectedObject}
-            disabled={false}
-            compareKey="identifier"
-            labelKey="name"
-          >
+          <Select value={selectedObject()} onChange={setSelectedObject} compareKey="identifier" labelKey="name">
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value>
@@ -109,7 +103,7 @@ export function App() {
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
-          <Select disabled={false}>
+          <Select>
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value />
@@ -130,7 +124,6 @@ export function App() {
           </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
-            disabled={false}
             compareKey="identifier"
             labelKey="name"
           >

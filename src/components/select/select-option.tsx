@@ -1,13 +1,4 @@
-import {
-  Accessor,
-  createContext,
-  createEffect,
-  createSignal,
-  mergeProps,
-  onMount,
-  splitProps,
-  useContext,
-} from "solid-js";
+import { Accessor, createContext, createEffect, createSignal, onMount, splitProps, useContext } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -17,6 +8,12 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
 import { getOptionLabel, isOptionEqual } from "./select.utils";
+
+export interface SelectOptionContextValue {
+  selected: boolean;
+}
+
+const SelectOptionContext = createContext<Accessor<SelectOptionContextValue>>();
 
 interface SelectOptionOptions<T> {
   /**
@@ -30,29 +27,18 @@ interface SelectOptionOptions<T> {
   disabled?: boolean;
 }
 
-export type SelectOptionProps<C extends ElementType = "li", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
-
-export interface SelectOptionContextValue {
-  selected: boolean;
-}
-
-const SelectOptionContext = createContext<Accessor<SelectOptionContextValue>>();
+export type SelectOptionProps<C extends ElementType = "div", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
 
 const hopeSelectOptionClass = "hope-select__option";
 
-export function SelectOption<C extends ElementType = "li", T = any>(props: SelectOptionProps<C, T>) {
+export function SelectOption<C extends ElementType = "div", T = any>(props: SelectOptionProps<C, T>) {
   const selectContext = useSelectContext();
 
   const [index, setIndex] = createSignal<number>(-1);
 
-  let optionRef: HTMLLIElement | undefined;
+  let optionRef: HTMLDivElement | undefined;
 
-  const defaultProps: Omit<SelectOptionProps<"li">, "value"> = {
-    as: "li",
-  };
-
-  const propsWithDefault: SelectOptionProps<"li"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["ref", "class", "value", "disabled"]);
+  const [local, others] = splitProps(props as SelectOptionProps<"div">, ["ref", "class", "value", "disabled"]);
 
   const classes = () => {
     return classNames(
@@ -68,7 +54,7 @@ export function SelectOption<C extends ElementType = "li", T = any>(props: Selec
 
   const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
 
-  const assignOptionRef = (el: HTMLLIElement) => {
+  const assignOptionRef = (el: HTMLDivElement) => {
     optionRef = el;
 
     if (isFunction(local.ref)) {

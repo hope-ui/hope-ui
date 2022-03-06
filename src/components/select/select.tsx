@@ -186,12 +186,12 @@ interface SelectContextValue<T = any> {
   /**
    * Callback to assign the `SelectListbox` ref.
    */
-  assignListboxRef: (el: HTMLUListElement) => void;
+  assignListboxRef: (el: HTMLDivElement) => void;
 
   /**
    * Scroll to the active option.
    */
-  scrollToOption: (optionRef: HTMLLIElement) => void;
+  scrollToOption: (optionRef: HTMLDivElement) => void;
 
   /**
    * Callback to notify the context that a `SelectOption` is mounted.
@@ -296,7 +296,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   // element refs
   let buttonRef: HTMLButtonElement | undefined;
   let panelRef: HTMLDivElement | undefined;
-  let listboxRef: HTMLUListElement | undefined;
+  let listboxRef: HTMLDivElement | undefined;
 
   const buttonScrollParents = () => {
     if (!buttonRef) {
@@ -386,7 +386,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updateMenuState(false, false);
+      updatePanelState(false, false);
     }
   };
 
@@ -395,7 +395,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return;
     }
 
-    updateMenuState(!state.opened, false);
+    updatePanelState(!state.opened, false);
   };
 
   const onButtonKeyDown = function (event: KeyboardEvent) {
@@ -411,7 +411,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     switch (action) {
       case SelectActions.Last:
       case SelectActions.First:
-        updateMenuState(true);
+        updatePanelState(true);
       // intentional fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
@@ -428,17 +428,18 @@ export function Select<T = any>(props: SelectProps<T>) {
       case SelectActions.CloseSelect:
         event.preventDefault();
         selectOption(state.activeIndex);
-      // intentional fallthrough
+        return updatePanelState(false);
+
       case SelectActions.Close:
         event.preventDefault();
-        return updateMenuState(false);
+        return updatePanelState(false);
 
       case SelectActions.Type:
         return onButtonType(key);
 
       case SelectActions.Open:
         event.preventDefault();
-        return updateMenuState(true);
+        return updatePanelState(true);
     }
   };
 
@@ -448,7 +449,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     // open the listbox if it is closed
-    updateMenuState(true);
+    updatePanelState(true);
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
@@ -474,7 +475,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     selectOption(index);
-    updateMenuState(false);
+
+    updatePanelState(false);
   };
 
   const onOptionMouseMove = (index: number) => {
@@ -492,7 +494,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     setState("ignoreBlur", true);
   };
 
-  const updateMenuState = function (opened: boolean, callFocus = true) {
+  const updatePanelState = function (opened: boolean, callFocus = true) {
     if (state.opened === opened) {
       return;
     }
@@ -540,7 +542,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return;
     }
 
-    updateMenuState(false, false);
+    updatePanelState(false, false);
   };
 
   const assignButtonRef = (el: HTMLButtonElement) => {
@@ -551,11 +553,11 @@ export function Select<T = any>(props: SelectProps<T>) {
     panelRef = el;
   };
 
-  const assignListboxRef = (el: HTMLUListElement) => {
+  const assignListboxRef = (el: HTMLDivElement) => {
     listboxRef = el;
   };
 
-  const scrollToOption = (optionRef: HTMLLIElement) => {
+  const scrollToOption = (optionRef: HTMLDivElement) => {
     if (!listboxRef) {
       return;
     }
