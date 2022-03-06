@@ -25,7 +25,7 @@ export const switchContainerStyles = css({
   userSelect: "none",
 
   "&[data-disabled]": {
-    opacity: "0.4",
+    opacity: "0.5",
     cursor: "not-allowed",
   },
 
@@ -71,6 +71,10 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   return {
     color: config.color,
 
+    "&[data-disabled]": {
+      color: "$neutral9",
+    },
+
     [`.${switchInputStyles}:focus + &`]: {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
@@ -98,7 +102,7 @@ export const switchControlStyles = css({
   transition: "background-color 250ms, border-color 250ms, box-shadow 250ms",
 
   "&[data-disabled]": {
-    opacity: "0.4",
+    opacity: "0.5",
     cursor: "not-allowed",
   },
 
