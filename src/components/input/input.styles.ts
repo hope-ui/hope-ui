@@ -350,13 +350,13 @@ export const inputAddonStyles = css({
         borderRadius: "$sm",
         border: "1px solid $neutral7",
         backgroundColor: "$neutral3",
-        color: "$neutral11",
+        color: "$neutral12",
       },
       filled: {
         borderRadius: "$sm",
         border: "1px solid transparent",
         backgroundColor: "$neutral3",
-        color: "$neutral11",
+        color: "$neutral12",
       },
       unstyled: {
         border: "1px solid transparent",
