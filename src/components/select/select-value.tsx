@@ -7,7 +7,6 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectValueStyles } from "./select.styles";
-import { getOptionLabel } from "./select.utils";
 
 const hopeSelectValueClass = "hope-select__trigger__value";
 
@@ -34,14 +33,10 @@ export function SelectValue<C extends ElementType = "span">(props: SelectValuePr
 
   const showValue = () => selectContext.state.value != null;
 
-  const selectedOptionLabel = () => {
-    return getOptionLabel(selectContext.state.value, selectContext.state.labelKey);
-  };
-
   return (
     <Show when={showValue()}>
       <Box class={classes()} __baseStyle={theme?.baseStyle?.value} {...others}>
-        <Show when={local.children} fallback={selectedOptionLabel()}>
+        <Show when={local.children} fallback={selectContext.state.valueLabel}>
           {local.children}
         </Show>
       </Box>

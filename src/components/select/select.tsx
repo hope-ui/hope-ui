@@ -10,6 +10,7 @@ import { SelectTriggerVariants } from "./select.styles";
 import {
   getActionFromKey,
   getIndexByLetter,
+  getOptionLabel,
   getUpdatedIndex,
   isOptionEqual,
   isScrollable,
@@ -116,6 +117,12 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
 type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey" | "labelKey">> &
   Pick<SelectProps<T>, "value" | "invalid" | "disabled"> & {
     /**
+     * The label of the selected option to display in the `Select.Value`.
+     * (in uncontrolled mode)
+     */
+    valueLabel: string;
+
+    /**
      * The value of the select to be `selected`.
      * (in uncontrolled mode)
      */
@@ -184,6 +191,16 @@ interface SelectContextValue<T = any> {
    * Props that should be spread on the select trigger to support embedding in `FormControl`.
    */
   formControlProps: Accessor<UseFormControlReturn<HTMLButtonElement>>;
+
+  /**
+   * Check if the option is the selected one by comparing its value with the selected value.
+   */
+  isOptionSelected: (value: any) => boolean;
+
+  /**
+   * Check if the option is the current active-descendant by comparing its index with the active index.
+   */
+  isOptionActiveDescendant: (index: number) => boolean;
 
   /**
    * Callback to assign the `SelectTrigger` ref.
@@ -290,6 +307,9 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get value() {
       return (this.isControlled ? props.value : this.valueState) as T | undefined;
+    },
+    get valueLabel() {
+      return getOptionLabel(this.value, this.labelKey);
     },
     get buttonId() {
       return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
@@ -403,11 +423,13 @@ export function Select<T = any>(props: SelectProps<T>) {
   const selectOption = (index: number) => {
     onOptionChange(index);
 
+    const selectedOption = state.options[index];
+
     if (!state.isControlled) {
-      setState("valueState", state.options[index].value);
+      setState("valueState", selectedOption.value);
     }
 
-    props.onChange?.(state.options[index].value as T);
+    props.onChange?.(selectedOption.value as T);
   };
 
   const isOptionDisabledCallback = (index: number) => {
@@ -581,6 +603,18 @@ export function Select<T = any>(props: SelectProps<T>) {
     updatePanelState(false, false);
   };
 
+  const isOptionSelected = (value: any) => {
+    if (state.value == null) {
+      return false;
+    }
+
+    return isOptionEqual(value, state.value, state.compareKey);
+  };
+
+  const isOptionActiveDescendant = (index: number) => {
+    return index === state.activeIndex;
+  };
+
   const assignButtonRef = (el: HTMLButtonElement) => {
     buttonRef = el;
   };
@@ -611,6 +645,8 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   const context: SelectContextValue = {
     state,
+    isOptionSelected,
+    isOptionActiveDescendant,
     formControlProps,
     assignButtonRef,
     assignPanelRef,
