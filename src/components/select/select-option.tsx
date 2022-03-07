@@ -8,7 +8,7 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
-import { getOptionLabel, isOptionEqual } from "./select.utils";
+import { getOptionLabel } from "./select.utils";
 
 export interface SelectOptionContextValue {
   selected: boolean;
@@ -43,6 +43,10 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
 
   const [local, others] = splitProps(props as SelectOptionProps<"div">, ["ref", "class", "value", "disabled"]);
 
+  const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
+  const isSelected = () => selectContext.isOptionSelected(local.value);
+  const isActiveDescendant = () => selectContext.isOptionActiveDescendant(index());
+
   const classes = () => {
     return classNames(
       local.class,
@@ -55,8 +59,6 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
     );
   };
 
-  const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
-
   const assignOptionRef = (el: HTMLDivElement) => {
     optionRef = el;
 
@@ -67,16 +69,6 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
       local.ref = el;
     }
   };
-
-  const isSelected = () => {
-    if (selectContext.state.value == null) {
-      return false;
-    }
-
-    return isOptionEqual(local.value, selectContext.state.value, selectContext.state.compareKey);
-  };
-
-  const isActiveDescendant = () => index() === selectContext.state.activeIndex;
 
   const context: Accessor<SelectOptionContextValue> = () => ({
     selected: isSelected(),

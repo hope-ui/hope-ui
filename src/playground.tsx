@@ -4,7 +4,6 @@ import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
 import { Box, Button, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
-import { IconChevronDown } from "./components/icons/IconChevronDown";
 
 const fruits = [
   "Apple",
@@ -104,7 +103,7 @@ export function App() {
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
-          <Select>
+          <Select defaultValue="Fig">
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value />

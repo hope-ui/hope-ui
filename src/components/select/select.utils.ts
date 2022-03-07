@@ -7,7 +7,7 @@ export interface SelectOptionData<T = any> {
   value: T;
 
   /**
-   * The label to use when searching for an option.
+   * The label to use in the typeahead behavior.
    */
   label: string;
 
@@ -214,7 +214,7 @@ export function isOptionEqual(a: any, b: any, compareKey: string): boolean {
  * Get the label of an option's value.
  */
 export function getOptionLabel(optionValue: any, labelKey: string): string {
-  return isObject(optionValue) ? optionValue[labelKey] : optionValue;
+  return isObject(optionValue) ? optionValue[labelKey] : optionValue.toString();
 }
 
 /**
