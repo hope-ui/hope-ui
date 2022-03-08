@@ -5,7 +5,7 @@ import { Portal } from "solid-js/web";
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 
-import { CloseButtonProps } from "../close-button/close-button";
+import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
 import { ModalBody } from "./modal-body";
 import { ModalCloseButton } from "./modal-close-button";
@@ -196,7 +196,7 @@ export interface ModalStyleConfig {
       | "preserveScrollBarGap"
       | "trapFocus"
     >;
-    closeButton?: Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">;
+    closeButton?: ThemeableCloseButtonOptions;
   };
 }
 

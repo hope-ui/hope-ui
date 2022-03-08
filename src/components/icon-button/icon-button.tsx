@@ -12,7 +12,14 @@ export interface IconButtonOptions
     ButtonOptions,
     "loadingText" | "loaderPlacement" | "leftIcon" | "rightIcon" | "iconSpacing" | "fullWidth"
   > {
+  /**
+   * A11y: A label that describes the button
+   */
   "aria-label": string;
+
+  /**
+   * The icon to be used in the button.
+   */
   icon: JSX.Element;
 }
 

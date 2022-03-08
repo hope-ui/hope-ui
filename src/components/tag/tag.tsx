@@ -11,7 +11,7 @@ import { TagCloseButton } from "./tag-close-button";
 import { TagLeftIcon, TagRightIcon } from "./tag-icon";
 import { TagLabel } from "./tag-label";
 
-type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
+type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size" | "dotPlacement">;
 
 export interface TagStyleConfig {
   baseStyle?: {
