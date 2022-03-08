@@ -181,7 +181,7 @@ export const tagStyles = css({
 
   borderRadius: "$full",
 
-  fontWeight: "$semibold",
+  fontWeight: "$medium",
   lineHeight: "$none",
   textDecoration: "none",
 

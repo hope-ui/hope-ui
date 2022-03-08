@@ -6,6 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
+import { GridItem } from "./grid-item";
 
 export type GridOptions = ResponsiveProps<{
   autoFlow?: Property.GridAutoFlow;
@@ -53,3 +54,5 @@ export function Grid<C extends ElementType = "div">(props: GridProps<C>) {
 }
 
 Grid.toString = () => createClassSelector(hopeGridClass);
+
+Grid.Item = GridItem;
