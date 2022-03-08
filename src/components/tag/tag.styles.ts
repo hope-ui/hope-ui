@@ -8,11 +8,11 @@ import { SystemStyleObject } from "@/styled-system/types";
  * -----------------------------------------------------------------------------------------------*/
 
 export const tagRightIconStyles = css({
-  marginInlineStart: "$1",
+  marginInlineStart: "$2",
 });
 
 export const tagLeftIconStyles = css({
-  marginInlineEnd: "$1",
+  marginInlineEnd: "$2",
 });
 
 /* -------------------------------------------------------------------------------------------------
