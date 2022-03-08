@@ -5,7 +5,7 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { RightJoinProps } from "@/utils/types";
 
-import { CloseButtonProps } from "../close-button/close-button";
+import { CloseButtonProps, ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { Modal, ModalProps } from "../modal/modal";
 import { ModalBody, ModalBodyProps } from "../modal/modal-body";
 import { ModalCloseButton } from "../modal/modal-close-button";
@@ -54,7 +54,7 @@ export interface DrawerStyleConfig {
       | "preserveScrollBarGap"
       | "trapFocus"
     >;
-    closeButton?: Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">;
+    closeButton?: ThemeableCloseButtonOptions;
   };
 }
 
@@ -119,10 +119,8 @@ function DrawerCloseButton(props: CloseButtonProps) {
 
   const defaultProps: CloseButtonProps = {
     "aria-label": theme?.defaultProps?.closeButton?.["aria-label"] ?? "Close drawer",
-    size: theme?.defaultProps?.closeButton?.size ?? "sm",
+    size: theme?.defaultProps?.closeButton?.size ?? "md",
     icon: theme?.defaultProps?.closeButton?.icon,
-    variant: theme?.defaultProps?.closeButton?.variant,
-    colorScheme: theme?.defaultProps?.closeButton?.colorScheme,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);

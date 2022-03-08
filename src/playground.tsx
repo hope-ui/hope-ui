@@ -3,7 +3,19 @@ import "./playground.css";
 import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, Divider, HopeProvider, HopeThemeConfig, HStack, Select, useColorMode, VStack } from ".";
+import {
+  Alert,
+  Box,
+  Button,
+  CloseButton,
+  Divider,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  Select,
+  useColorMode,
+  VStack,
+} from ".";
 
 const fruits = [
   "Apple",
@@ -48,6 +60,12 @@ export function App() {
 
   return (
     <Box p="$4">
+      <Alert status="danger">
+        <Alert.Icon />
+        <Alert.Title mr="$2">Your browser is outdated!</Alert.Title>
+        <Alert.Description>Your Chakra experience may be degraded.</Alert.Description>
+        <CloseButton position="absolute" right="8px" top="8px" />
+      </Alert>
       <HStack spacing="$5">
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
         <VStack spacing="$5" flexGrow={1}>

@@ -1,17 +1,28 @@
-import { mergeProps, splitProps } from "solid-js";
+import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { IconButton, IconButtonProps } from "../icon-button/icon-button";
+import { hope } from "../factory";
 import { IconClose } from "../icons/IconClose";
-import { SinglePartComponentStyleConfig } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
+import { closeButtonStyles, CloseButtonVariants } from "./close-button.styles";
 
-export type CloseButtonProps = Partial<IconButtonProps<"button">>;
+export interface ThemeableCloseButtonOptions extends CloseButtonVariants {
+  /**
+   * A11y: A label that describes the button
+   */
+  "aria-label"?: string;
 
-export type CloseButtonStyleConfig = SinglePartComponentStyleConfig<
-  Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">
->;
+  /**
+   * The icon to be used in the button.
+   */
+  icon?: JSX.Element;
+}
+
+export type CloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ThemeableCloseButtonOptions>;
+
+export type CloseButtonStyleConfig = SinglePartComponentStyleConfig<ThemeableCloseButtonOptions>;
 
 const hopeCloseButtonClass = "hope-close-button";
 
@@ -21,23 +32,29 @@ const hopeCloseButtonClass = "hope-close-button";
  * It is used to handle the close functionality in feedback and overlay components
  * like Alerts, Toasts, Drawers and Modals.
  */
-export function CloseButton(props: CloseButtonProps) {
+export function CloseButton<C extends ElementType = "button">(props: CloseButtonProps<C>) {
   const theme = useComponentStyleConfigs().CloseButton;
 
-  const defaultProps: IconButtonProps<"button"> = {
+  const defaultProps: CloseButtonProps<"button"> = {
     "aria-label": theme?.defaultProps?.["aria-label"] ?? "Close",
     icon: theme?.defaultProps?.icon ?? <IconClose />,
-    variant: theme?.defaultProps?.variant ?? "ghost",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "neutral",
     size: theme?.defaultProps?.size ?? "md",
   };
 
   const propsWithDefaults = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefaults, ["class"]);
+  const [local, others] = splitProps(propsWithDefaults, ["class", "children", "size", "icon"]);
 
-  const classes = () => classNames(local.class, hopeCloseButtonClass);
+  const classes = () => {
+    return classNames(local.class, hopeCloseButtonClass, closeButtonStyles({ size: local.size }));
+  };
 
-  return <IconButton class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
+  return (
+    <hope.button type="button" class={classes()} __baseStyle={theme?.baseStyle} {...others}>
+      <Show when={local.children} fallback={local.icon}>
+        {local.children}
+      </Show>
+    </hope.button>
+  );
 }
 
 CloseButton.toString = () => createClassSelector(hopeCloseButtonClass);

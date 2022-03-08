@@ -1,12 +1,12 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { CloseButton, CloseButtonProps } from "../close-button/close-button";
 import { useModalContext } from "./modal";
 import { modalCloseButtonStyles } from "./modal.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 const hopeModalCloseButtonClass = "hope-modal__close-button";
 
@@ -23,10 +23,8 @@ export function ModalCloseButton(props: CloseButtonProps) {
 
   const defaultProps: CloseButtonProps = {
     "aria-label": theme?.defaultProps?.closeButton?.["aria-label"] ?? "Close modal",
-    size: theme?.defaultProps?.closeButton?.size ?? "sm",
+    size: theme?.defaultProps?.closeButton?.size ?? "md",
     icon: theme?.defaultProps?.closeButton?.icon,
-    variant: theme?.defaultProps?.closeButton?.variant,
-    colorScheme: theme?.defaultProps?.closeButton?.colorScheme,
   };
 
   const propsWithDefaults = mergeProps(defaultProps, props);

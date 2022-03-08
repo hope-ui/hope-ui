@@ -2,6 +2,7 @@
  * Common to light and dark palette
  * -----------------------------------------------------------------------------------------------*/
 
+// Radix - BlackA
 const blackAlpha = {
   blackAlpha1: "#00000003",
   blackAlpha2: "#00000007",
@@ -17,6 +18,7 @@ const blackAlpha = {
   blackAlpha12: "#000000e8",
 };
 
+// Radix - WhiteA
 const whiteAlpha = {
   whiteAlpha1: "#ffffff00",
   whiteAlpha2: "#ffffff03",
@@ -44,6 +46,21 @@ export const commonColors = {
 /* -------------------------------------------------------------------------------------------------
  * Light palette
  * -----------------------------------------------------------------------------------------------*/
+
+const alpha = {
+  alpha1: "$blackAlpha1",
+  alpha2: "$blackAlpha2",
+  alpha3: "$blackAlpha3",
+  alpha4: "$blackAlpha4",
+  alpha5: "$blackAlpha5",
+  alpha6: "$blackAlpha6",
+  alpha7: "$blackAlpha7",
+  alpha8: "$blackAlpha8",
+  alpha9: "$blackAlpha9",
+  alpha10: "$blackAlpha10",
+  alpha11: "$blackAlpha11",
+  alpha12: "$blackAlpha12",
+};
 
 // Radix - Cyan
 const primary = {
@@ -148,6 +165,7 @@ const semanticColors = {
 };
 
 export const lightColors = {
+  ...alpha,
   ...primary,
   ...neutral,
   ...success,
@@ -160,6 +178,21 @@ export const lightColors = {
 /* -------------------------------------------------------------------------------------------------
  * Dark palette
  * -----------------------------------------------------------------------------------------------*/
+
+const alphaDark = {
+  alpha1: "$whiteAlpha1",
+  alpha2: "$whiteAlpha2",
+  alpha3: "$whiteAlpha3",
+  alpha4: "$whiteAlpha4",
+  alpha5: "$whiteAlpha5",
+  alpha6: "$whiteAlpha6",
+  alpha7: "$whiteAlpha7",
+  alpha8: "$whiteAlpha8",
+  alpha9: "$whiteAlpha9",
+  alpha10: "$whiteAlpha10",
+  alpha11: "$whiteAlpha11",
+  alpha12: "$whiteAlpha12",
+};
 
 // Radix - Cyan dark
 const primaryDark = {
@@ -264,6 +297,7 @@ const semanticDarkColors = {
 };
 
 export const darkColors: typeof lightColors = {
+  ...alphaDark,
   ...primaryDark,
   ...neutralDark,
   ...successDark,
