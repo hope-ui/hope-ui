@@ -2,7 +2,7 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
-import { IconCheckCircle } from "../../icons/IconCheckCircle";
+import { IconCheckCircleSolid } from "../../icons/IconCheckCircleSolid";
 import { tagLeftIconStyles, tagRightIconStyles } from "../tag.styles";
 import { TagLeftIcon, TagRightIcon } from "../tag-icon";
 
@@ -14,7 +14,7 @@ describe("TagLeftIcon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -23,7 +23,7 @@ describe("TagLeftIcon", () => {
 
   it("should render content provided by the 'as' prop", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -32,7 +32,7 @@ describe("TagLeftIcon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -48,7 +48,9 @@ describe("TagLeftIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" class={stubClass} as={IconCheckCircle} />);
+    renderWithHopeProvider(() => (
+      <TagLeftIcon data-testid="tag-left-icon" class={stubClass} as={IconCheckCircleSolid} />
+    ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -62,7 +64,7 @@ describe("TagLeftIcon", () => {
     // act
     renderWithHopeProvider(() => (
       // eslint-disable-next-line solid/no-react-specific-props
-      <TagLeftIcon data-testid="tag-left-icon" className={stubClass} as={IconCheckCircle} />
+      <TagLeftIcon data-testid="tag-left-icon" className={stubClass} as={IconCheckCircleSolid} />
     ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
@@ -76,7 +78,7 @@ describe("TagLeftIcon", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <TagLeftIcon data-testid="tag-left-icon" classList={{ [stubClass]: true }} as={IconCheckCircle} />
+      <TagLeftIcon data-testid="tag-left-icon" classList={{ [stubClass]: true }} as={IconCheckCircleSolid} />
     ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
@@ -89,7 +91,7 @@ describe("TagLeftIcon", () => {
     const tagLeftIconClass = tagLeftIconStyles();
 
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -105,7 +107,7 @@ describe("TagRightIcon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -114,7 +116,7 @@ describe("TagRightIcon", () => {
 
   it("should render content provided by the 'as' prop", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -123,7 +125,7 @@ describe("TagRightIcon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -139,7 +141,9 @@ describe("TagRightIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" class={stubClass} as={IconCheckCircle} />);
+    renderWithHopeProvider(() => (
+      <TagRightIcon data-testid="tag-right-icon" class={stubClass} as={IconCheckCircleSolid} />
+    ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -153,7 +157,7 @@ describe("TagRightIcon", () => {
     // act
     renderWithHopeProvider(() => (
       // eslint-disable-next-line solid/no-react-specific-props
-      <TagRightIcon data-testid="tag-right-icon" className={stubClass} as={IconCheckCircle} />
+      <TagRightIcon data-testid="tag-right-icon" className={stubClass} as={IconCheckCircleSolid} />
     ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
@@ -167,7 +171,7 @@ describe("TagRightIcon", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <TagRightIcon data-testid="tag-right-icon" classList={{ [stubClass]: true }} as={IconCheckCircle} />
+      <TagRightIcon data-testid="tag-right-icon" classList={{ [stubClass]: true }} as={IconCheckCircleSolid} />
     ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
@@ -180,7 +184,7 @@ describe("TagRightIcon", () => {
     const tagRightIconClass = tagRightIconStyles();
 
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert

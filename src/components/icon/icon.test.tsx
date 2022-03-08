@@ -4,7 +4,7 @@ import { renderWithHopeProvider } from "@/utils/test-utils";
 
 import { Icon } from "./icon";
 import { iconStyles } from "./icon.styles";
-import { IconCheckCircle } from "../icons/IconCheckCircle";
+import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
 
 describe("Icon", () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe("Icon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircleSolid} />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -58,7 +58,7 @@ describe("Icon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircleSolid} />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -74,7 +74,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" as={IconCheckCircleSolid} />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -88,7 +88,7 @@ describe("Icon", () => {
     // act
     renderWithHopeProvider(() => (
       // eslint-disable-next-line solid/no-react-specific-props
-      <Icon className={stubClass} data-testid="icon" as={IconCheckCircle} />
+      <Icon className={stubClass} data-testid="icon" as={IconCheckCircleSolid} />
     ));
 
     const icon = screen.getByTestId("icon");
@@ -102,7 +102,9 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Icon classList={{ [stubClass]: true }} data-testid="icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => (
+      <Icon classList={{ [stubClass]: true }} data-testid="icon" as={IconCheckCircleSolid} />
+    ));
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -114,7 +116,7 @@ describe("Icon", () => {
     const iconClass = iconStyles();
 
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircle} />);
+    renderWithHopeProvider(() => <Icon data-testid="icon" as={IconCheckCircleSolid} />);
     const icon = screen.getByTestId("icon");
 
     // assert
