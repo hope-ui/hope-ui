@@ -35,9 +35,6 @@ export const tagCloseButtonStyles = css({
   justifyContent: "center",
   alignItems: "center",
 
-  marginInlineStart: "$1",
-  marginInlineEnd: "-0.25rem",
-
   outline: "none",
   border: "1px solid transparent",
   borderRadius: "$full",
@@ -46,7 +43,6 @@ export const tagCloseButtonStyles = css({
 
   padding: "0",
 
-  //fontSize: "1em",
   lineHeight: "$none",
   textDecoration: "none",
   color: "inherit",
@@ -65,6 +61,23 @@ export const tagCloseButtonStyles = css({
     backgroundColor: "transparent",
     color: "$neutral3",
     cursor: "not-allowed",
+  },
+
+  variants: {
+    size: {
+      sm: {
+        marginInlineStart: "0.35rem",
+        marginInlineEnd: "-3px",
+      },
+      md: {
+        marginInlineStart: "$1_5",
+        marginInlineEnd: "calc(0.15rem * -1)",
+      },
+      lg: {
+        marginInlineStart: "$1_5",
+        marginInlineEnd: "calc($1 * -1)",
+      },
+    },
   },
 });
 
@@ -257,7 +270,7 @@ export const tagStyles = css({
         closeButtonSize: "$6",
       }),
     },
-    dotPosition: {
+    dotPlacement: {
       left: {},
       right: {},
     },
@@ -537,7 +550,7 @@ export const tagStyles = css({
 
     {
       variant: "dot",
-      dotPosition: "right",
+      dotPlacement: "right",
       css: {
         "&::before": {
           display: "none",
@@ -551,7 +564,7 @@ export const tagStyles = css({
 
     {
       variant: "dot",
-      dotPosition: "left",
+      dotPlacement: "left",
       css: {
         "&::before": {
           display: "block",
