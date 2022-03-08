@@ -16,6 +16,7 @@ import {
   useColorMode,
   VStack,
 } from ".";
+import { IconCloseSmall } from "./components/icons/IconCloseSmall";
 
 const fruits = [
   "Apple",
