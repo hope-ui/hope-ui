@@ -1,9 +1,15 @@
+import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
+import { Tag } from "../tag";
 import { tagCloseButtonStyles } from "../tag.styles";
 import { TagCloseButton } from "../tag-close-button";
+
+function renderWithTagContext(callback: () => JSX.Element) {
+  return renderWithHopeProvider(() => <Tag>{callback()}</Tag>);
+}
 
 describe("TagCloseButton", () => {
   afterEach(() => {
@@ -13,7 +19,7 @@ describe("TagCloseButton", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -22,7 +28,7 @@ describe("TagCloseButton", () => {
 
   it("should render <button> tag by default", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -31,7 +37,7 @@ describe("TagCloseButton", () => {
 
   it("should render tag provided with the as prop", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton as="a" aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton as="a" aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -40,7 +46,7 @@ describe("TagCloseButton", () => {
 
   it("should have type=button", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -49,7 +55,7 @@ describe("TagCloseButton", () => {
 
   it("should have role=button", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -58,7 +64,7 @@ describe("TagCloseButton", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -74,7 +80,7 @@ describe("TagCloseButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <TagCloseButton class={stubClass} aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton class={stubClass} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -86,7 +92,7 @@ describe("TagCloseButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => (
+    renderWithTagContext(() => (
       // eslint-disable-next-line solid/no-react-specific-props
       <TagCloseButton className={stubClass} aria-label="Close" />
     ));
@@ -101,7 +107,7 @@ describe("TagCloseButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <TagCloseButton classList={{ [stubClass]: true }} aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton classList={{ [stubClass]: true }} aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert
@@ -113,7 +119,7 @@ describe("TagCloseButton", () => {
     const tagCloseButtonClass = tagCloseButtonStyles();
 
     // act
-    renderWithHopeProvider(() => <TagCloseButton aria-label="Close" />);
+    renderWithTagContext(() => <TagCloseButton aria-label="Close" />);
     const button = screen.getByRole("button");
 
     // assert

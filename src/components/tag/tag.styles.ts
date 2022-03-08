@@ -128,7 +128,6 @@ interface TagSubtleCompoundVariantConfig {
   color: string;
   bgColor: string;
   closeButtonBgColorHover: string;
-  closeButtonBgColorActive: string;
 }
 
 function createTagSubtleCompoundVariant(config: TagSubtleCompoundVariantConfig): SystemStyleObject {
@@ -139,10 +138,6 @@ function createTagSubtleCompoundVariant(config: TagSubtleCompoundVariantConfig):
     [`& .${tagCloseButtonStyles}:not(:disabled):hover`]: {
       backgroundColor: config.closeButtonBgColorHover,
     },
-
-    [`& .${tagCloseButtonStyles}:not(:disabled):active`]: {
-      backgroundColor: config.closeButtonBgColorActive,
-    },
   };
 }
 
@@ -150,7 +145,6 @@ interface TagOutlineCompoundVariantConfig {
   color: string;
   borderColor: string;
   closeButtonBgColorHover: string;
-  closeButtonBgColorActive: string;
 }
 
 function createTagOutlineCompoundVariant(config: TagOutlineCompoundVariantConfig): SystemStyleObject {
@@ -160,10 +154,6 @@ function createTagOutlineCompoundVariant(config: TagOutlineCompoundVariantConfig
 
     [`& .${tagCloseButtonStyles}:not(:disabled):hover`]: {
       backgroundColor: config.closeButtonBgColorHover,
-    },
-
-    [`& .${tagCloseButtonStyles}:not(:disabled):active`]: {
-      backgroundColor: config.closeButtonBgColorActive,
     },
   };
 }
@@ -295,7 +285,7 @@ export const tagStyles = css({
       css: createTagSolidCompoundVariant({
         color: "white",
         bgColor: "$neutral9",
-        closeButtonBgColorHover: "$neutral10",
+        closeButtonBgColorHover: "$neutral11",
       }),
     },
     {
@@ -345,8 +335,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$primary11",
         bgColor: "$primary4",
-        closeButtonBgColorHover: "$primary5",
-        closeButtonBgColorActive: "$primary6",
+        closeButtonBgColorHover: "$primary6",
       }),
     },
     {
@@ -355,8 +344,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$neutral12",
         bgColor: "$neutral4",
-        closeButtonBgColorHover: "$neutral5",
-        closeButtonBgColorActive: "$neutral6",
+        closeButtonBgColorHover: "$neutral7",
       }),
     },
     {
@@ -365,8 +353,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$success11",
         bgColor: "$success4",
-        closeButtonBgColorHover: "$success5",
-        closeButtonBgColorActive: "$success6",
+        closeButtonBgColorHover: "$success6",
       }),
     },
     {
@@ -375,8 +362,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$info11",
         bgColor: "$info4",
-        closeButtonBgColorHover: "$info5",
-        closeButtonBgColorActive: "$info6",
+        closeButtonBgColorHover: "$info6",
       }),
     },
     {
@@ -385,8 +371,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$warning11",
         bgColor: "$warning4",
-        closeButtonBgColorHover: "$warning5",
-        closeButtonBgColorActive: "$warning6",
+        closeButtonBgColorHover: "$warning6",
       }),
     },
     {
@@ -395,8 +380,7 @@ export const tagStyles = css({
       css: createTagSubtleCompoundVariant({
         color: "$danger11",
         bgColor: "$danger4",
-        closeButtonBgColorHover: "$danger5",
-        closeButtonBgColorActive: "$danger6",
+        closeButtonBgColorHover: "$danger6",
       }),
     },
 
@@ -411,7 +395,6 @@ export const tagStyles = css({
         color: "$primary11",
         borderColor: "$primary7",
         closeButtonBgColorHover: "$primary4",
-        closeButtonBgColorActive: "$primary5",
       }),
     },
     {
@@ -421,7 +404,6 @@ export const tagStyles = css({
         color: "$neutral12",
         borderColor: "$neutral7",
         closeButtonBgColorHover: "$neutral4",
-        closeButtonBgColorActive: "$neutral5",
       }),
     },
     {
@@ -431,7 +413,6 @@ export const tagStyles = css({
         color: "$success11",
         borderColor: "$success7",
         closeButtonBgColorHover: "$success4",
-        closeButtonBgColorActive: "$success5",
       }),
     },
     {
@@ -441,7 +422,6 @@ export const tagStyles = css({
         color: "$info11",
         borderColor: "$info7",
         closeButtonBgColorHover: "$info4",
-        closeButtonBgColorActive: "$info5",
       }),
     },
     {
@@ -451,7 +431,6 @@ export const tagStyles = css({
         color: "$warning11",
         borderColor: "$warning7",
         closeButtonBgColorHover: "$warning4",
-        closeButtonBgColorActive: "$warning5",
       }),
     },
     {
@@ -461,7 +440,6 @@ export const tagStyles = css({
         color: "$danger11",
         borderColor: "$danger7",
         closeButtonBgColorHover: "$danger4",
-        closeButtonBgColorActive: "$danger5",
       }),
     },
 
