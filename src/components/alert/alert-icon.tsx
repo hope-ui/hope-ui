@@ -9,8 +9,8 @@ import { IconCrossCircle } from "../icons/IconCrossCircle";
 import { IconExclamationTriangle } from "../icons/IconExclamationTriangle";
 import { IconInfoCircle } from "../icons/IconInfoCircle";
 import { ElementType } from "../types";
+import { useAlertContext } from "./alert";
 import { alertIconStyles } from "./alert.styles";
-import { useAlertContext } from "./alert-provider";
 
 export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
 
@@ -37,16 +37,12 @@ export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C
     switch (status()) {
       case "success":
         return IconCheckCircle;
-        break;
       case "info":
         return IconInfoCircle;
-        break;
       case "warning":
         return IconExclamationTriangle;
-        break;
       case "danger":
         return IconCrossCircle;
-        break;
     }
   };
 

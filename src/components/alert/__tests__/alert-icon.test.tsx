@@ -3,12 +3,12 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { renderWithHopeProvider } from "@/utils/test-utils";
 
+import { Alert } from "../alert";
 import { alertIconStyles } from "../alert.styles";
 import { AlertIcon } from "../alert-icon";
-import { AlertProvider } from "../alert-provider";
 
-function renderWithAlertContextProvider(callback: () => JSX.Element) {
-  return renderWithHopeProvider(() => <AlertProvider status="success">{callback}</AlertProvider>);
+function renderWithAlertContext(callback: () => JSX.Element) {
+  return renderWithHopeProvider(() => <Alert status="success">{callback}</Alert>);
 }
 
 describe("AlertIcon", () => {
@@ -19,7 +19,7 @@ describe("AlertIcon", () => {
 
   it("should render", () => {
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
@@ -28,7 +28,7 @@ describe("AlertIcon", () => {
 
   it("should render content provided by the 'as' prop", () => {
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
@@ -37,7 +37,7 @@ describe("AlertIcon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
@@ -53,7 +53,7 @@ describe("AlertIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" class={stubClass} />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" class={stubClass} />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
@@ -65,7 +65,7 @@ describe("AlertIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithAlertContextProvider(() => (
+    renderWithAlertContext(() => (
       // eslint-disable-next-line solid/no-react-specific-props
       <AlertIcon data-testid="alert-icon" className={stubClass} />
     ));
@@ -80,7 +80,7 @@ describe("AlertIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" classList={{ [stubClass]: true }} />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" classList={{ [stubClass]: true }} />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
@@ -92,7 +92,7 @@ describe("AlertIcon", () => {
     const alertIconClass = alertIconStyles();
 
     // act
-    renderWithAlertContextProvider(() => <AlertIcon data-testid="alert-icon" />);
+    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" />);
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
