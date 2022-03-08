@@ -261,8 +261,8 @@ export const tagStyles = css({
       }),
     },
     dotPlacement: {
-      left: {},
-      right: {},
+      start: {},
+      end: {},
     },
   },
   compoundVariants: [
@@ -523,33 +523,32 @@ export const tagStyles = css({
     },
 
     /* -------------------------------------------------------------------------------------------------
-     * Variant - dot + dot position
+     * Variant - dot + dot placement
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "dot",
-      dotPlacement: "right",
+      dotPlacement: "start",
       css: {
         "&::before": {
-          display: "none",
+          display: "block",
         },
 
         "&::after": {
-          display: "block",
+          display: "none",
         },
       },
     },
 
     {
       variant: "dot",
-      dotPlacement: "left",
+      dotPlacement: "end",
       css: {
         "&::before": {
-          display: "block",
+          display: "none",
         },
 
         "&::after": {
-          display: "none",
+          display: "block",
         },
       },
     },
