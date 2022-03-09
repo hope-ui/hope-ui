@@ -14,7 +14,7 @@ export type SelectValueProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 /**
  * The part that reflects the selected value.
- * By default the selected option's value will be rendered (or the label if `labelKey` is provided on the select).
+ * By default the selected option's text will be rendered.
  * If you require more control, you can instead control the select and pass your own `children`.
  */
 export function SelectValue<C extends ElementType = "span">(props: SelectValueProps<C>) {
@@ -36,7 +36,7 @@ export function SelectValue<C extends ElementType = "span">(props: SelectValuePr
   return (
     <Show when={showValue()}>
       <Box class={classes()} __baseStyle={theme?.baseStyle?.value} {...others}>
-        <Show when={local.children} fallback={selectContext.state.valueLabel}>
+        <Show when={local.children} fallback={selectContext.state.textValue}>
           {local.children}
         </Show>
       </Box>

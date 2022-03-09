@@ -16,6 +16,7 @@ import {
   useColorMode,
   VStack,
 } from ".";
+import { IconCloseSmall } from "./components/icons/IconCloseSmall";
 
 const fruits = [
   "Apple",
@@ -97,7 +98,34 @@ export function App() {
               </Box>
             </Select.Panel>
           </Select>
-          <Select value={selectedObject()} onChange={setSelectedObject} compareKey="identifier" labelKey="name">
+          <Select value={selected()} onChange={setSelected}>
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a fruit</Select.Placeholder>
+              <Select.Value />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Box px="$4" py="$2">
+                Header
+              </Box>
+              <Divider />
+              <Select.Listbox>
+                <For each={fruits}>
+                  {fruit => (
+                    <Select.Option value={fruit} disabled={fruit === "Durian"}>
+                      <Select.OptionText>{fruit}</Select.OptionText>
+                      <Select.OptionIndicator />
+                    </Select.Option>
+                  )}
+                </For>
+              </Select.Listbox>
+              <Divider />
+              <Box px="$4" py="$2">
+                Footer
+              </Box>
+            </Select.Panel>
+          </Select>
+          <Select value={selectedObject()} onChange={setSelectedObject} compareKey="identifier">
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value>
@@ -109,7 +137,7 @@ export function App() {
               <Select.Listbox>
                 <For each={fruitsObject}>
                   {fruit => (
-                    <Select.Option value={fruit} disabled={fruit.disabled}>
+                    <Select.Option value={fruit} textValue={fruit.name} disabled={fruit.disabled}>
                       <Select.OptionText>{fruit.name}</Select.OptionText>
                       <Select.OptionIndicator />
                     </Select.Option>
@@ -121,7 +149,7 @@ export function App() {
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
           <p>Uncontrolled</p>
-          <Select defaultValue="Fig">
+          <Select defaultValue="Fig" defaultTextValue="Fig">
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
               <Select.Value />
@@ -140,10 +168,29 @@ export function App() {
               </Select.Listbox>
             </Select.Panel>
           </Select>
+          <Select defaultValue="luffy" defaultTextValue="Monkey D. Luffy">
+            <Select.Trigger maxW="300px">
+              <Select.Placeholder>Choose a framework</Select.Placeholder>
+              <Select.Value />
+              <Select.Icon />
+            </Select.Trigger>
+            <Select.Panel>
+              <Select.Listbox>
+                <Select.Option value="luffy">
+                  <Select.OptionText>Monkey D. Luffy</Select.OptionText>
+                  <Select.OptionIndicator />
+                </Select.Option>
+                <Select.Option value="zoro">
+                  <Select.OptionText>Roronoa Zoro</Select.OptionText>
+                  <Select.OptionIndicator />
+                </Select.Option>
+              </Select.Listbox>
+            </Select.Panel>
+          </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
+            defaultTextValue="Cherry"
             compareKey="identifier"
-            labelKey="name"
           >
             <Select.Trigger maxW="300px">
               <Select.Placeholder>Choose a fruit</Select.Placeholder>
@@ -154,7 +201,7 @@ export function App() {
               <Select.Listbox>
                 <For each={fruitsObject}>
                   {fruit => (
-                    <Select.Option value={fruit} disabled={fruit.disabled}>
+                    <Select.Option value={fruit} textValue={fruit.name} disabled={fruit.disabled}>
                       <Select.OptionText>{fruit.name}</Select.OptionText>
                       <Select.OptionIndicator />
                     </Select.Option>

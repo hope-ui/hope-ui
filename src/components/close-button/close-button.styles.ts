@@ -13,6 +13,8 @@ export const closeButtonStyles = css({
   borderRadius: "$sm",
   backgroundColor: "transparent",
 
+  color: "currentColor",
+
   cursor: "pointer",
   userSelect: "none",
   transition: "color 250ms, background-color 250ms",

@@ -7,9 +7,11 @@ export interface SelectOptionData<T = any> {
   value: T;
 
   /**
-   * The label to use in the typeahead behavior.
+   * Optional text used for typeahead purposes.
+   * By default the typeahead behavior will use the `.textContent` of the `Select.Option`.
+   * Use this when the content is complex, or you have non-textual content inside.
    */
-  label: string;
+  textValue: string;
 
   /**
    * If `true`, the option will be disabled.
@@ -68,8 +70,8 @@ function filterOptions(options: SelectOptionData[] = [], filter: string, exclude
       return false;
     }
 
-    const matches = option.label.toLowerCase().indexOf(filter.toLowerCase()) === 0;
-    return matches && exclude.indexOf(option.label) < 0;
+    const matches = option.textValue.toLowerCase().indexOf(filter.toLowerCase()) === 0;
+    return matches && exclude.indexOf(option.textValue) < 0;
   });
 }
 
@@ -208,13 +210,6 @@ export function isOptionEqual(a: any, b: any, compareKey: string): boolean {
   }
 
   return a[compareKey] === b[compareKey];
-}
-
-/**
- * Get the label of an option's value.
- */
-export function getOptionLabel(optionValue: any, labelKey: string): string {
-  return isObject(optionValue) ? optionValue[labelKey] : optionValue.toString();
 }
 
 /**
