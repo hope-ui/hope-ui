@@ -8,7 +8,6 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
-import { getOptionLabel } from "./select.utils";
 
 export interface SelectOptionContextValue {
   selected: boolean;
@@ -21,6 +20,13 @@ interface SelectOptionOptions<T> {
    * The value of the option.
    */
   value: T;
+
+  /**
+   * Optional text used for typeahead purposes.
+   * By default the typeahead behavior will use the `.textContent` of the `Select.Option`.
+   * Use this when the content is complex, or you have non-textual content inside.
+   */
+  textValue?: string;
 
   /**
    * If `true`, the option will be disabled.
@@ -41,7 +47,13 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
 
   let optionRef: HTMLDivElement | undefined;
 
-  const [local, others] = splitProps(props as SelectOptionProps<"div">, ["ref", "class", "value", "disabled"]);
+  const [local, others] = splitProps(props as SelectOptionProps<"div">, [
+    "ref",
+    "class",
+    "value",
+    "textValue",
+    "disabled",
+  ]);
 
   const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
   const isSelected = () => selectContext.isOptionSelected(local.value);
@@ -96,7 +108,7 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
   onMount(() => {
     const optionIndex = selectContext.registerOption({
       value: local.value,
-      label: getOptionLabel(local.value, selectContext.state.labelKey),
+      textValue: local.textValue ?? optionRef?.textContent ?? local.value,
       disabled: !!local.disabled,
     });
 

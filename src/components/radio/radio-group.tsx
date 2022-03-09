@@ -48,11 +48,10 @@ interface RadioGroupOptions extends ThemeableRadioOptions {
   invalid?: boolean;
 
   /**
-   * Function called once a radio is checked
-   * @param event the original event emitted by the `Radio` checked state changes
+   * Callback invoked once a radio is checked
    * @param value the value of the checked radio
    */
-  onChange?: (event: Event, value: string | number) => void;
+  onChange?: (value: string) => void;
 }
 
 type RadioGroupState = Omit<RadioGroupOptions, "name" | "onChange"> & {
@@ -141,7 +140,7 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
       setState("valueState", value);
     }
 
-    local.onChange?.(event, value);
+    local.onChange?.(String(value));
   };
 
   const context: RadioGroupContextValue = {

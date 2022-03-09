@@ -9,8 +9,8 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
 import { BreadcrumbItem } from "./breadcrumb-item";
-import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
 import { BreadcrumbLink } from "./breadcrumb-link";
+import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
 
 export interface BreadcrumbStyleConfig {
   baseStyle?: {
@@ -29,6 +29,11 @@ export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
    * The visual separator between each breadcrumb item
    */
   separator?: string | JSX.Element;
+
+  /**
+   * If `true`, append a separator to the last breadcrumb item.
+   */
+  withEndSeparator?: boolean;
 }
 
 export type BreadcrumbProps<C extends ElementType = "nav"> = HTMLHopeProps<C, BreadcrumbOptions>;
@@ -50,7 +55,13 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
   };
 
   const propsWithDefault: BreadcrumbProps<"nav"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children", "separator", "spacing"]);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "children",
+    "separator",
+    "withEndSeparator",
+    "spacing",
+  ]);
 
   const rootClasses = () => classNames(local.class, hopeBreadcrumbClass, breadcrumbStyles());
 
@@ -61,8 +72,8 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
     return isArray(items) ? items : [items];
   };
 
-  const isLastLink = (index: number) => {
-    return index + 1 === links().length;
+  const isNotLastLink = (index: number) => {
+    return index + 1 !== links().length;
   };
 
   return (
@@ -72,7 +83,7 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
           {(link, index) => (
             <BreadcrumbItem>
               {link}
-              <Show when={!isLastLink(index())}>
+              <Show when={isNotLastLink(index()) || local.withEndSeparator}>
                 <BreadcrumbSeparator spacing={local.spacing}>{local.separator}</BreadcrumbSeparator>
               </Show>
             </BreadcrumbItem>

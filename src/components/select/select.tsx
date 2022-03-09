@@ -10,7 +10,6 @@ import { SelectTriggerVariants } from "./select.styles";
 import {
   getActionFromKey,
   getIndexByLetter,
-  getOptionLabel,
   getUpdatedIndex,
   isOptionEqual,
   isScrollable,
@@ -41,12 +40,6 @@ interface ThemeableSelectOptions extends SelectTriggerVariants {
    * Used to compare if two options are equal.
    */
   compareKey?: string;
-
-  /**
-   * When using an object as an option value, the object key that represents the option label.
-   * Used for typeahead purposes.
-   */
-  labelKey?: string;
 }
 
 export interface SelectProps<T = any> extends ThemeableSelectOptions {
@@ -61,16 +54,21 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
   children?: JSX.Element;
 
   /**
-   * The value of the select to be `selected`.
+   * The value of the select.
    * (in controlled mode)
    */
   value?: T;
 
   /**
-   * The value of the select to be `selected` initially.
+   * The value of the select when initially rendered.
    * (in uncontrolled mode)
    */
   defaultValue?: T;
+
+  /**
+   * The value to display in `Select.Value` when initially rendered and no `children` is provided.
+   */
+  defaultTextValue?: string;
 
   /**
    * If `true`, the select will be required.
@@ -114,19 +112,18 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
 }
 
-type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey" | "labelKey">> &
+type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey">> &
   Pick<SelectProps<T>, "value" | "invalid" | "disabled"> & {
     /**
-     * The label of the selected option to display in the `Select.Value`.
-     * (in uncontrolled mode)
-     */
-    valueLabel: string;
-
-    /**
-     * The value of the select to be `selected`.
+     * The value of the select.
      * (in uncontrolled mode)
      */
     valueState?: T;
+
+    /**
+     * The value to display in `Select.Value` when no `children` is provided.
+     */
+    textValue?: string;
 
     /**
      * If `true`, the select is in controlled mode.
@@ -299,17 +296,17 @@ export function Select<T = any>(props: SelectProps<T>) {
   const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
 
   const [state, setState] = createStore<SelectState<T>>({
-    // Internal state for uncontrolled select.
     // eslint-disable-next-line solid/reactivity
     valueState: props.defaultValue,
+
+    // eslint-disable-next-line solid/reactivity
+    textValue: props.defaultTextValue,
+
     get isControlled() {
       return props.value !== undefined;
     },
     get value() {
       return (this.isControlled ? props.value : this.valueState) as T | undefined;
-    },
-    get valueLabel() {
-      return getOptionLabel(this.value, this.labelKey);
     },
     get buttonId() {
       return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
@@ -337,9 +334,6 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get compareKey() {
       return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
-    },
-    get labelKey() {
-      return props.labelKey ?? theme?.defaultProps?.root?.labelKey ?? "label";
     },
     options: [],
     opened: false,
@@ -370,7 +364,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, panelRef, {
       placement: "bottom",
       middleware: [
-        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 4),
+        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 7),
         flip(),
         shift(),
         size({
@@ -424,6 +418,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     onOptionChange(index);
 
     const selectedOption = state.options[index];
+
+    setState("textValue", selectedOption.textValue);
 
     if (!state.isControlled) {
       setState("valueState", selectedOption.value);
@@ -640,6 +636,11 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   const registerOption = (optionData: SelectOptionData) => {
     setState("options", prev => [...prev, optionData]);
+
+    if (isOptionSelected(optionData.value)) {
+      setState("textValue", optionData.textValue);
+    }
+
     return state.options.length - 1;
   };
 
