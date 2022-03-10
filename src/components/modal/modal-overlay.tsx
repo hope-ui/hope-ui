@@ -26,7 +26,7 @@ export function ModalOverlay<C extends ElementType = "div">(props: ModalOverlayP
   const classes = () => classNames(local.class, hopeModalOverlayClass, modalOverlayStyles());
 
   const transitionName = () => {
-    return modalContext.state.transition === "none" ? "hope-none" : modalTransitionName.fade;
+    return modalContext.state.motionPreset === "none" ? "hope-none" : modalTransitionName.fade;
   };
 
   return (

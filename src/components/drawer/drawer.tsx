@@ -27,10 +27,13 @@ interface DrawerOptions extends DrawerDialogVariants {
   /**
    * If `true`, the drawer will appear without any transition.
    */
-  disableTransition?: boolean;
+  disableMotion?: boolean;
 }
 
-export type DrawerProps = RightJoinProps<Omit<ModalProps, "scrollBehavior" | "centered" | "transition">, DrawerOptions>;
+export type DrawerProps = RightJoinProps<
+  Omit<ModalProps, "scrollBehavior" | "centered" | "motionPreset">,
+  DrawerOptions
+>;
 
 export interface DrawerStyleConfig {
   baseStyle?: {
@@ -47,7 +50,7 @@ export interface DrawerStyleConfig {
       | "placement"
       | "size"
       | "fullHeight"
-      | "disableTransition"
+      | "disableMotion"
       | "blockScrollOnMount"
       | "closeOnEsc"
       | "closeOnOverlayClick"
@@ -65,7 +68,7 @@ const DrawerContext = createContext<DrawerContextValue>();
 export function Drawer(props: DrawerProps) {
   const theme = useComponentStyleConfigs().Drawer;
 
-  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableTransition"]);
+  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableMotion"]);
 
   const [state] = createStore<DrawerContextValue>({
     get placement() {
@@ -77,8 +80,8 @@ export function Drawer(props: DrawerProps) {
     get fullHeight() {
       return props.fullHeight ?? theme?.defaultProps?.root?.fullHeight ?? false;
     },
-    get disableTransition() {
-      return props.disableTransition ?? theme?.defaultProps?.root?.disableTransition ?? false;
+    get disableMotion() {
+      return props.disableMotion ?? theme?.defaultProps?.root?.disableMotion ?? false;
     },
   });
 
