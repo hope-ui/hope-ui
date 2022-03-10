@@ -8,7 +8,9 @@ import {
   Box,
   Button,
   CloseButton,
+  createDisclosure,
   Divider,
+  Drawer,
   HopeProvider,
   HopeThemeConfig,
   HStack,
@@ -59,8 +61,22 @@ export function App() {
   const [selected, setSelected] = createSignal<string | null>("Cherry");
   const [selectedObject, setSelectedObject] = createSignal<Fruit>({ identifier: 5, name: "Cherry", disabled: false });
 
+  const { isOpen, onOpen, onClose } = createDisclosure();
+
   return (
     <Box p="$4">
+      <Button onClick={onOpen}>Open Drawer</Button>
+      <Drawer placement="right" onClose={onClose} opened={isOpen()}>
+        <Drawer.Overlay />
+        <Drawer.Panel>
+          <Drawer.Header borderBottomWidth="1px">Basic Drawer</Drawer.Header>
+          <Drawer.Body>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Drawer.Body>
+        </Drawer.Panel>
+      </Drawer>
       <Alert status="danger">
         <Alert.Icon />
         <Alert.Title mr="$2">Your browser is outdated!</Alert.Title>

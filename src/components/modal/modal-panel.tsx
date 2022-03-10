@@ -63,7 +63,7 @@ export function ModalPanel<C extends ElementType = "section">(props: ModalPanelP
   };
 
   const transitionName = () => {
-    switch (modalContext.state.transition) {
+    switch (modalContext.state.motionPreset) {
       case "fade-in-bottom":
         return modalTransitionName.fadeInBottom;
       case "scale":

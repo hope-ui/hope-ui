@@ -67,7 +67,7 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
   };
 
   const transitionName = () => {
-    if (drawerContext.disableTransition) {
+    if (drawerContext.disableMotion) {
       return "hope-none";
     }
 

@@ -223,8 +223,9 @@ export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;
 
 export const modalHeaderStyles = css({
   flex: 0,
-  px: "$5",
   pt: "$5",
+  px: "$5",
+  pb: "$3",
   fontSize: "$lg",
   fontWeight: "$medium",
 });
@@ -235,7 +236,8 @@ export const modalHeaderStyles = css({
 
 export const modalBodyStyles = css({
   flex: 1,
-  padding: "$5",
+  px: "$5",
+  py: "$2",
 
   variants: {
     scrollBehavior: {
@@ -257,6 +259,7 @@ export const modalFooterStyles = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
+  pt: "$3",
   px: "$5",
   pb: "$5",
 });

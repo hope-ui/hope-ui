@@ -14,7 +14,7 @@ import { ModalHeader } from "./modal-header";
 import { ModalOverlay } from "./modal-overlay";
 import { ModalPanel } from "./modal-panel";
 
-type ModalTransition = "fade-in-bottom" | "scale" | "none";
+type ModalMotionPreset = "fade-in-bottom" | "scale" | "none";
 
 export interface ModalProps extends ModalContainerVariants, ModalDialogVariants {
   /**
@@ -75,7 +75,7 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   /**
    * Modal opening/closing transition.
    */
-  transition?: ModalTransition;
+  motionPreset?: ModalMotionPreset;
 
   /**
    * Children of the Modal
@@ -97,7 +97,7 @@ type ModalState = Required<
   Pick<
     ModalProps,
     | "opened"
-    | "transition"
+    | "motionPreset"
     | "size"
     | "centered"
     | "scrollBehavior"
@@ -188,7 +188,7 @@ export interface ModalStyleConfig {
       ModalProps,
       | "scrollBehavior"
       | "centered"
-      | "transition"
+      | "motionPreset"
       | "size"
       | "blockScrollOnMount"
       | "closeOnEsc"
@@ -229,8 +229,8 @@ export function Modal(props: ModalProps) {
     get initialFocus() {
       return props.initialFocus;
     },
-    get transition() {
-      return props.transition ?? theme?.defaultProps?.root?.transition ?? "fade-in-bottom";
+    get motionPreset() {
+      return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "scale";
     },
     get size() {
       return props.size ?? theme?.defaultProps?.root?.size ?? "md";
@@ -272,7 +272,7 @@ export function Modal(props: ModalProps) {
       setIsPortalMounted(true);
     } else {
       // unmount portal instantly when there is no modal transition.
-      state.transition === "none" && setIsPortalMounted(false);
+      state.motionPreset === "none" && setIsPortalMounted(false);
     }
   });
 
