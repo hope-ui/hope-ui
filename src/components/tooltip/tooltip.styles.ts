@@ -60,6 +60,6 @@ export const tooltipArrowStyles = css({
   zIndex: "$tooltip",
   position: "absolute",
   boxSize: "8px",
-  backgroundColor: "$neutral12",
+  backgroundColor: "inherit",
   transform: "rotate(45deg)",
 });

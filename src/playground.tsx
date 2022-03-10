@@ -67,7 +67,7 @@ export function App() {
   return (
     <Box p="$4">
       <Box p="$4">
-        <Tooltip label="Hey, I'm here!" aria-label="A tooltip">
+        <Tooltip withArrow label="Search places" bg="$neutral4" color="black">
           <span>Hover me</span>
         </Tooltip>
       </Box>
