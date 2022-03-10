@@ -142,7 +142,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
-  const checked = () => (isControlled() ? local.checked : checkedState());
+  const checked = () => (isControlled() ? !!local.checked : checkedState());
 
   // Input loose focus if this is placed in `dataAttrs()`
   const dataChecked = () => (checked() ? "" : undefined);

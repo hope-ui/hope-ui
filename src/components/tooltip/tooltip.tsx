@@ -1,8 +1,9 @@
 import type { Placement as FloatingUIPlacement } from "@floating-ui/dom";
-import { arrow, computePosition, flip, getScrollParents, inline, offset, shift } from "@floating-ui/dom";
+import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
 import {
   children,
   createEffect,
+  createMemo,
   createSignal,
   createUniqueId,
   JSX,
@@ -198,14 +199,16 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   let exitTimeout: number | undefined;
 
   const isControlled = () => local.opened !== undefined;
-  const opened = () => (isControlled() ? local.opened : openedState());
+  const opened = () => (isControlled() ? !!local.opened : openedState());
 
   const tooltipClasses = () => classNames(local.class, hopeTooltipClass, tooltipStyles());
   const arrowClasses = () => classNames(hopeTooltipArrowClass, tooltipArrowStyles());
 
+  let cleanupTooltipAutoUpdate: (() => void) | undefined;
+
   const resolvedChildren = children(() => local.children);
 
-  const trigger = () => {
+  const trigger = createMemo(() => {
     let el = resolvedChildren() as Element;
 
     // recursively resolve element
@@ -214,11 +217,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     }
 
     return el;
-  };
-
-  const triggerScrollParents = () => {
-    return getScrollParents(trigger());
-  };
+  });
 
   async function updateTooltipPosition() {
     const triggerElement = trigger();
@@ -240,6 +239,8 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
       middleware.push(arrow({ element: arrowElement, padding: local.arrowPadding }));
     }
 
+    middleware.push(hide());
+
     const { x, y, placement, middlewareData } = await computePosition(triggerElement, tooltipElement, {
       placement: local.placement,
       middleware,
@@ -249,9 +250,12 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
       return;
     }
 
+    const referenceHidden = middlewareData.hide?.referenceHidden;
+
     Object.assign(tooltipElement.style, {
       left: `${Math.round(x)}px`,
       top: `${Math.round(y)}px`,
+      visibility: referenceHidden ? "hidden" : "visible",
     });
 
     if (!arrowElement) {
@@ -353,33 +357,21 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     triggerElement.removeEventListener("blur", closeWithDelay);
   };
 
-  const beforeToolipEnterTransition = () => {
-    if (isControlled()) {
-      // schedule a micro task so the tooltip appear in the right position.
-      Promise.resolve().then(updateTooltipPosition);
-    }
-  };
-
   const afterToolipEnterTransition = () => {
-    if (isServer) {
+    if (isServer || !tooltipElement) {
       return;
     }
 
     document.addEventListener("keydown", onKeyDown);
 
-    triggerScrollParents().forEach(el => {
-      el.addEventListener("scroll", updateTooltipPosition);
-      el.addEventListener("resize", updateTooltipPosition);
-    });
+    // schedule auto update of the tooltip position
+    cleanupTooltipAutoUpdate = autoUpdate(trigger(), tooltipElement, updateTooltipPosition);
   };
 
   const afterToolipExitTransition = () => {
     document.removeEventListener("keydown", onKeyDown);
 
-    triggerScrollParents().forEach(el => {
-      el.removeEventListener("scroll", updateTooltipPosition);
-      el.removeEventListener("resize", updateTooltipPosition);
-    });
+    cleanupTooltipAutoUpdate?.();
 
     // For smooth transition, unmount portal only after tooltip exit transition is done.
     setIsPortalMounted(false);
@@ -420,7 +412,6 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
           <Transition
             name={tooltipTransitionName.scale}
             appear
-            onBeforeEnter={beforeToolipEnterTransition}
             onAfterEnter={afterToolipEnterTransition}
             onAfterExit={afterToolipExitTransition}
           >
