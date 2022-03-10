@@ -160,7 +160,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return radioGroupContext.state.value === inputProps.value;
     }
 
-    return isControlled() ? local.checked : checkedState();
+    return isControlled() ? !!local.checked : checkedState();
   };
 
   // Input loose focus if this is placed in `dataAttrs()`

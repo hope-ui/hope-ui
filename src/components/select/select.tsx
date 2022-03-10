@@ -1,4 +1,4 @@
-import { computePosition, flip, getScrollParents, offset, shift, size } from "@floating-ui/dom";
+import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
 import { Accessor, createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
@@ -348,15 +348,9 @@ export function Select<T = any>(props: SelectProps<T>) {
   let panelRef: HTMLDivElement | undefined;
   let listboxRef: HTMLDivElement | undefined;
 
-  const buttonScrollParents = () => {
-    if (!buttonRef) {
-      return;
-    }
+  let cleanupPanelAutoUpdate: (() => void) | undefined;
 
-    return getScrollParents(buttonRef);
-  };
-
-  async function updateContentPosition() {
+  async function updatePanelPosition() {
     if (!buttonRef || !panelRef) {
       return;
     }
@@ -386,8 +380,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     Object.assign(panelRef.style, {
-      left: `${x}px`,
-      top: `${y}px`,
+      left: `${Math.round(x)}px`,
+      top: `${Math.round(y)}px`,
     });
   }
 
@@ -566,20 +560,17 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updateContentPosition();
+      updatePanelPosition();
 
-      buttonScrollParents()?.forEach(el => {
-        el.addEventListener("scroll", updateContentPosition);
-        el.addEventListener("resize", updateContentPosition);
-      });
+      // schedule auto update of the panel position
+      if (buttonRef && panelRef) {
+        cleanupPanelAutoUpdate = autoUpdate(buttonRef, panelRef, updatePanelPosition);
+      }
     } else {
       // select closed, clear the options
       setState("options", []);
 
-      buttonScrollParents()?.forEach(el => {
-        el.removeEventListener("scroll", updateContentPosition);
-        el.removeEventListener("resize", updateContentPosition);
-      });
+      cleanupPanelAutoUpdate?.();
     }
 
     // move focus back to the button, if needed
