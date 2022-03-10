@@ -7,6 +7,7 @@ import {
   Alert,
   Box,
   Button,
+  Tooltip,
   CloseButton,
   createDisclosure,
   Divider,
@@ -65,6 +66,11 @@ export function App() {
 
   return (
     <Box p="$4">
+      <Box p="$4">
+        <Tooltip label="Hey, I'm here!" aria-label="A tooltip">
+          <span>Hover me</span>
+        </Tooltip>
+      </Box>
       <Button onClick={onOpen}>Open Drawer</Button>
       <Drawer placement="right" onClose={onClose} opened={isOpen()}>
         <Drawer.Overlay />

@@ -386,8 +386,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     Object.assign(panelRef.style, {
-      left: `${x}px`,
-      top: `${y}px`,
+      left: `${Math.round(x)}px`,
+      top: `${Math.round(y)}px`,
     });
   }
 

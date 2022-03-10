@@ -250,8 +250,8 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     }
 
     Object.assign(tooltipElement.style, {
-      left: `${x}px`,
-      top: `${y}px`,
+      left: `${Math.round(x)}px`,
+      top: `${Math.round(y)}px`,
     });
 
     if (!arrowElement) {
