@@ -153,7 +153,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
     id: defaultId,
     placement: theme?.defaultProps?.placement ?? "bottom",
     offset: theme?.defaultProps?.offset ?? 8,
-    withArrow: theme?.defaultProps?.withArrow ?? true,
+    withArrow: theme?.defaultProps?.withArrow ?? false,
     arrowSize: theme?.defaultProps?.arrowSize ?? 8,
     arrowPadding: theme?.defaultProps?.arrowPadding ?? 8,
     openDelay: theme?.defaultProps?.openDelay ?? 0,

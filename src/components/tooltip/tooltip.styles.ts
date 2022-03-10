@@ -48,7 +48,7 @@ export const tooltipStyles = css({
 
   color: "$neutral1",
   fontSize: "$sm",
-  fontWeight: "$medium",
+  fontWeight: "$normal",
   lineHeight: "$4",
 });
 
