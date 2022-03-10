@@ -378,10 +378,6 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   };
 
   onMount(() => {
-    if (opened()) {
-      updateTooltipPosition();
-    }
-
     addTriggerListeners();
   });
 
