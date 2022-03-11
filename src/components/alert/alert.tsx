@@ -7,9 +7,6 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
-import { AlertDescription } from "./alert-description";
-import { AlertIcon } from "./alert-icon";
-import { AlertTitle } from "./alert-title";
 
 export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
 
@@ -70,7 +67,3 @@ export function useAlertContext() {
 
   return context;
 }
-
-Alert.Icon = AlertIcon;
-Alert.Title = AlertTitle;
-Alert.Description = AlertDescription;

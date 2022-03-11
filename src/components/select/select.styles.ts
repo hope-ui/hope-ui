@@ -99,10 +99,10 @@ export const selectIconStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - panel
+ * Select - content
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectPanelStyles = css({
+export const selectContentStyles = css({
   zIndex: "$dropdown",
   position: "absolute",
   left: 0,

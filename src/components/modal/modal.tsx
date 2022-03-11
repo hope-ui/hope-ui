@@ -7,12 +7,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
-import { ModalBody } from "./modal-body";
-import { ModalCloseButton } from "./modal-close-button";
-import { ModalFooter } from "./modal-footer";
-import { ModalHeader } from "./modal-header";
-import { ModalOverlay } from "./modal-overlay";
-import { ModalPanel } from "./modal-panel";
 
 type ModalMotionPreset = "fade-in-bottom" | "scale" | "none";
 
@@ -161,7 +155,7 @@ export interface ModalContextValue {
   /**
    * Callback invoked to notify that modal's content exit transition is done.
    */
-  onModalPanelExitTransitionEnd: () => void;
+  onModalContentExitTransitionEnd: () => void;
 
   /**
    * Callback function to set if the modal header is mounted
@@ -174,28 +168,30 @@ export interface ModalContextValue {
   setBodyMounted: (value: boolean) => void;
 }
 
+type ThemeableModalOptions = Pick<
+  ModalProps,
+  | "scrollBehavior"
+  | "centered"
+  | "motionPreset"
+  | "size"
+  | "blockScrollOnMount"
+  | "closeOnEsc"
+  | "closeOnOverlayClick"
+  | "preserveScrollBarGap"
+  | "trapFocus"
+>;
+
 export interface ModalStyleConfig {
   baseStyle?: {
     overlay?: SystemStyleObject;
-    panel?: SystemStyleObject;
+    content?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;
     footer?: SystemStyleObject;
   };
   defaultProps?: {
-    root?: Pick<
-      ModalProps,
-      | "scrollBehavior"
-      | "centered"
-      | "motionPreset"
-      | "size"
-      | "blockScrollOnMount"
-      | "closeOnEsc"
-      | "closeOnOverlayClick"
-      | "preserveScrollBarGap"
-      | "trapFocus"
-    >;
+    root?: ThemeableModalOptions;
     closeButton?: ThemeableCloseButtonOptions;
   };
 }
@@ -277,7 +273,7 @@ export function Modal(props: ModalProps) {
   });
 
   // For smooth transition, unmount portal only after modal's content exit transition is done.
-  const onModalPanelExitTransitionEnd = () => setIsPortalMounted(false);
+  const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
 
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
@@ -322,7 +318,7 @@ export function Modal(props: ModalProps) {
 
   const context: ModalContextValue = {
     state,
-    onModalPanelExitTransitionEnd,
+    onModalContentExitTransitionEnd,
     onClose,
     onMouseDown,
     onKeyDown,
@@ -352,10 +348,3 @@ export function useModalContext() {
 
   return context;
 }
-
-Modal.Overlay = ModalOverlay;
-Modal.Panel = ModalPanel;
-Modal.CloseButton = ModalCloseButton;
-Modal.Header = ModalHeader;
-Modal.Body = ModalBody;
-Modal.Footer = ModalFooter;

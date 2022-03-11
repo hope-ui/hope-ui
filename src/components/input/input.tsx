@@ -8,9 +8,7 @@ import { Box } from "../box/box";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
 import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
-import { InputGroup, ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
-import { InputLeftElement, InputRightElement } from "./input-element";
-import { InputLeftAddon, InputRightAddon } from "./input-addon";
+import { ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
 
 type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
 
@@ -91,9 +89,3 @@ export function Input(props: InputProps) {
 }
 
 Input.toString = () => createClassSelector(hopeInputClass);
-
-Input.Group = InputGroup;
-Input.LeftAddon = InputLeftAddon;
-Input.RightAddon = InputRightAddon;
-Input.LeftElement = InputLeftElement;
-Input.RightElement = InputRightElement;

@@ -74,14 +74,14 @@ export function App() {
       <Button onClick={onOpen}>Open Drawer</Button>
       <Drawer placement="right" onClose={onClose} opened={isOpen()}>
         <Drawer.Overlay />
-        <Drawer.Panel>
+        <Drawer.Content>
           <Drawer.Header borderBottomWidth="1px">Basic Drawer</Drawer.Header>
           <Drawer.Body>
             <p>Some contents...</p>
             <p>Some contents...</p>
             <p>Some contents...</p>
           </Drawer.Body>
-        </Drawer.Panel>
+        </Drawer.Content>
       </Drawer>
       <Alert status="danger">
         <Alert.Icon />
@@ -102,7 +102,7 @@ export function App() {
               <Select.Value>{selected()?.toUpperCase()}</Select.Value>
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Box px="$4" py="$2">
                 Header
               </Box>
@@ -121,7 +121,7 @@ export function App() {
               <Box px="$4" py="$2">
                 Footer
               </Box>
-            </Select.Panel>
+            </Select.Content>
           </Select>
           <Select value={selected()} onChange={setSelected}>
             <Select.Trigger maxW="300px">
@@ -129,7 +129,7 @@ export function App() {
               <Select.Value />
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Box px="$4" py="$2">
                 Header
               </Box>
@@ -148,7 +148,7 @@ export function App() {
               <Box px="$4" py="$2">
                 Footer
               </Box>
-            </Select.Panel>
+            </Select.Content>
           </Select>
           <Select value={selectedObject()} onChange={setSelectedObject} compareKey="identifier">
             <Select.Trigger maxW="300px">
@@ -158,7 +158,7 @@ export function App() {
               </Select.Value>
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Select.Listbox>
                 <For each={fruitsObject}>
                   {fruit => (
@@ -169,7 +169,7 @@ export function App() {
                   )}
                 </For>
               </Select.Listbox>
-            </Select.Panel>
+            </Select.Content>
           </Select>
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
@@ -180,7 +180,7 @@ export function App() {
               <Select.Value />
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Select.Listbox>
                 <For each={fruits}>
                   {fruit => (
@@ -191,7 +191,7 @@ export function App() {
                   )}
                 </For>
               </Select.Listbox>
-            </Select.Panel>
+            </Select.Content>
           </Select>
           <Select defaultValue="luffy" defaultTextValue="Monkey D. Luffy">
             <Select.Trigger maxW="300px">
@@ -199,7 +199,7 @@ export function App() {
               <Select.Value />
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Select.Listbox>
                 <Select.Option value="luffy">
                   <Select.OptionText>Monkey D. Luffy</Select.OptionText>
@@ -210,7 +210,7 @@ export function App() {
                   <Select.OptionIndicator />
                 </Select.Option>
               </Select.Listbox>
-            </Select.Panel>
+            </Select.Content>
           </Select>
           <Select
             defaultValue={{ identifier: 5, name: "Cherry", disabled: false }}
@@ -222,7 +222,7 @@ export function App() {
               <Select.Value />
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Select.Listbox>
                 <For each={fruitsObject}>
                   {fruit => (
@@ -233,7 +233,7 @@ export function App() {
                   )}
                 </For>
               </Select.Listbox>
-            </Select.Panel>
+            </Select.Content>
           </Select>
         </VStack>
         <VStack spacing="$5" flexGrow={1}>
@@ -244,7 +244,7 @@ export function App() {
               <Select.Value />
               <Select.Icon />
             </Select.Trigger>
-            <Select.Panel>
+            <Select.Content>
               <Select.Listbox>
                 <Select.OptGroup>
                   <Select.Label>Fruits</Select.Label>
@@ -280,7 +280,7 @@ export function App() {
                   </For>
                 </Select.OptGroup>
               </Select.Listbox>
-            </Select.Panel>
+            </Select.Content>
           </Select>
         </VStack>
       </HStack>

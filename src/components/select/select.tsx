@@ -17,17 +17,6 @@ import {
   SelectActions,
   SelectOptionData,
 } from "./select.utils";
-import { SelectIcon } from "./select-icon";
-import { SelectLabel } from "./select-label";
-import { SelectListbox } from "./select-listbox";
-import { SelectOptGroup } from "./select-optgroup";
-import { SelectOption } from "./select-option";
-import { SelectOptionIndicator } from "./select-option-indicator";
-import { SelectOptionText } from "./select-option-text";
-import { SelectPanel } from "./select-panel";
-import { SelectPlaceholder } from "./select-placeholder";
-import { SelectTrigger } from "./select-trigger";
-import { SelectValue } from "./select-value";
 
 interface ThemeableSelectOptions extends SelectTriggerVariants {
   /**
@@ -205,9 +194,9 @@ interface SelectContextValue<T = any> {
   assignButtonRef: (el: HTMLButtonElement) => void;
 
   /**
-   * Callback to assign the `SelectPanel` ref.
+   * Callback to assign the `SelectContent` ref.
    */
-  assignPanelRef: (el: HTMLDivElement) => void;
+  assignContentRef: (el: HTMLDivElement) => void;
 
   /**
    * Callback to assign the `SelectListbox` ref.
@@ -226,9 +215,9 @@ interface SelectContextValue<T = any> {
   registerOption: (optionData: SelectOptionData) => number;
 
   /**
-   * Callback invoked when the user click outside the `SelectPanel`.
+   * Callback invoked when the user click outside the `SelectContent`.
    */
-  onPanelOutsideClick: (target: HTMLElement) => void;
+  onContentOutsideClick: (target: HTMLElement) => void;
 
   /**
    * Callback invoked when the `SelectTrigger` loose focus.
@@ -272,7 +261,7 @@ export interface SelectStyleConfig {
     placeholder?: SystemStyleObject;
     value?: SystemStyleObject;
     icon?: SystemStyleObject;
-    panel?: SystemStyleObject;
+    content?: SystemStyleObject;
     listbox?: SystemStyleObject;
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
@@ -345,17 +334,17 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   // element refs
   let buttonRef: HTMLButtonElement | undefined;
-  let panelRef: HTMLDivElement | undefined;
+  let contentRef: HTMLDivElement | undefined;
   let listboxRef: HTMLDivElement | undefined;
 
-  let cleanupPanelAutoUpdate: (() => void) | undefined;
+  let cleanupContentAutoUpdate: (() => void) | undefined;
 
-  async function updatePanelPosition() {
-    if (!buttonRef || !panelRef) {
+  async function updateContentPosition() {
+    if (!buttonRef || !contentRef) {
       return;
     }
 
-    const { x, y } = await computePosition(buttonRef, panelRef, {
+    const { x, y } = await computePosition(buttonRef, contentRef, {
       placement: "bottom",
       middleware: [
         offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 7),
@@ -363,11 +352,11 @@ export function Select<T = any>(props: SelectProps<T>) {
         shift(),
         size({
           apply({ reference }) {
-            if (!panelRef) {
+            if (!contentRef) {
               return;
             }
 
-            Object.assign(panelRef.style, {
+            Object.assign(contentRef.style, {
               width: `${reference.width}px`,
             });
           },
@@ -375,11 +364,11 @@ export function Select<T = any>(props: SelectProps<T>) {
       ],
     });
 
-    if (!panelRef) {
+    if (!contentRef) {
       return;
     }
 
-    Object.assign(panelRef.style, {
+    Object.assign(contentRef.style, {
       left: `${Math.round(x)}px`,
       top: `${Math.round(y)}px`,
     });
@@ -434,7 +423,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updatePanelState(false, false);
+      updateContentState(false, false);
     }
   };
 
@@ -443,7 +432,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return;
     }
 
-    updatePanelState(!state.opened, false);
+    updateContentState(!state.opened, false);
   };
 
   const onButtonKeyDown = function (event: KeyboardEvent) {
@@ -459,7 +448,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     switch (action) {
       case SelectActions.Last:
       case SelectActions.First:
-        updatePanelState(true);
+        updateContentState(true);
       // intentional fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
@@ -476,18 +465,18 @@ export function Select<T = any>(props: SelectProps<T>) {
       case SelectActions.CloseSelect:
         event.preventDefault();
         selectOption(state.activeIndex);
-        return updatePanelState(false);
+        return updateContentState(false);
 
       case SelectActions.Close:
         event.preventDefault();
-        return updatePanelState(false);
+        return updateContentState(false);
 
       case SelectActions.Type:
         return onButtonType(key);
 
       case SelectActions.Open:
         event.preventDefault();
-        return updatePanelState(true);
+        return updateContentState(true);
     }
   };
 
@@ -497,7 +486,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     // open the listbox if it is closed
-    updatePanelState(true);
+    updateContentState(true);
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
@@ -524,7 +513,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     selectOption(index);
 
-    updatePanelState(false);
+    updateContentState(false);
   };
 
   const onOptionMouseMove = (index: number) => {
@@ -542,7 +531,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     setState("ignoreBlur", true);
   };
 
-  const updatePanelState = function (opened: boolean, callFocus = true) {
+  const updateContentState = function (opened: boolean, callFocus = true) {
     if (state.opened === opened) {
       return;
     }
@@ -560,17 +549,17 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
 
     if (state.opened) {
-      updatePanelPosition();
+      updateContentPosition();
 
-      // schedule auto update of the panel position
-      if (buttonRef && panelRef) {
-        cleanupPanelAutoUpdate = autoUpdate(buttonRef, panelRef, updatePanelPosition);
+      // schedule auto update of the content position
+      if (buttonRef && contentRef) {
+        cleanupContentAutoUpdate = autoUpdate(buttonRef, contentRef, updateContentPosition);
       }
     } else {
       // select closed, clear the options
       setState("options", []);
 
-      cleanupPanelAutoUpdate?.();
+      cleanupContentAutoUpdate?.();
     }
 
     // move focus back to the button, if needed
@@ -581,13 +570,13 @@ export function Select<T = any>(props: SelectProps<T>) {
     onOptionChange(-1);
   };
 
-  const onPanelOutsideClick = (target: HTMLElement) => {
+  const onContentOutsideClick = (target: HTMLElement) => {
     // clicking on the button is not considered an "outside click"
     if (buttonRef && buttonRef.contains(target)) {
       return;
     }
 
-    updatePanelState(false, false);
+    updateContentState(false, false);
   };
 
   const isOptionSelected = (value: any) => {
@@ -606,8 +595,8 @@ export function Select<T = any>(props: SelectProps<T>) {
     buttonRef = el;
   };
 
-  const assignPanelRef = (el: HTMLDivElement) => {
-    panelRef = el;
+  const assignContentRef = (el: HTMLDivElement) => {
+    contentRef = el;
   };
 
   const assignListboxRef = (el: HTMLDivElement) => {
@@ -641,11 +630,11 @@ export function Select<T = any>(props: SelectProps<T>) {
     isOptionActiveDescendant,
     formControlProps,
     assignButtonRef,
-    assignPanelRef,
+    assignContentRef,
     assignListboxRef,
     registerOption,
     scrollToOption,
-    onPanelOutsideClick,
+    onContentOutsideClick,
     onButtonBlur,
     onButtonClick,
     onButtonKeyDown,
@@ -667,15 +656,3 @@ export function useSelectContext() {
 
   return context;
 }
-
-Select.Trigger = SelectTrigger;
-Select.Placeholder = SelectPlaceholder;
-Select.Value = SelectValue;
-Select.Icon = SelectIcon;
-Select.Panel = SelectPanel;
-Select.Listbox = SelectListbox;
-Select.OptGroup = SelectOptGroup;
-Select.Label = SelectLabel;
-Select.Option = SelectOption;
-Select.OptionText = SelectOptionText;
-Select.OptionIndicator = SelectOptionIndicator;
