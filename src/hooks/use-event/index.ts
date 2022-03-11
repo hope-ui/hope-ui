@@ -10,7 +10,13 @@ export interface UseElementEventProps<Key> {
 }
 
 export function useEvent<Key extends string>(props: UseElementEventProps<Key>) {
+  let _once = false;
   const onEmit = (event: Event) => {
+    const { once } = props;
+    if (once && _once) {
+      return;
+    }
+    _once = true;
     props.handler?.(event);
   };
 
