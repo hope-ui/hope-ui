@@ -39,6 +39,8 @@ describe("useEvent", () => {
     expect(element).toHaveTextContent("1");
     _handle();
     expect(element).toHaveTextContent("2");
+    _handle();
+    expect(element).toHaveTextContent("3");
 
     wrapper.unmount();
     expect(removeEventListener).toBeCalled();
