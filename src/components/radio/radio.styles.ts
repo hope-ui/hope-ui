@@ -128,7 +128,7 @@ export const radioControlStyles = css({
     position: "relative",
     boxSize: "calc(50% + 1px)", // beacause of the 1px border
     borderRadius: "$full",
-    backgroundColor: "$panelBg",
+    backgroundColor: "$surface",
   },
 
   variants: {

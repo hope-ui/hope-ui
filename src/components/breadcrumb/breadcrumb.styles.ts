@@ -64,7 +64,7 @@ export const breadcrumbLinkStyles = css({
   },
 
   "&:focus": {
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 
   variants: {

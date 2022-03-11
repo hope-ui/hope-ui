@@ -53,7 +53,7 @@ export const tagCloseButtonStyles = css({
 
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 
   "&:disabled": {

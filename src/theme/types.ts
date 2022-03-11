@@ -2,6 +2,7 @@ import { Accessor } from "solid-js";
 
 import { AlertStyleConfig } from "@/components/alert/alert";
 import { AnchorStyleConfig } from "@/components/anchor/anchor";
+import { AvatarStyleConfig } from "@/components/avatar/avatar";
 import { BadgeStyleConfig } from "@/components/badge/badge";
 import { BreadcrumbStyleConfig } from "@/components/breadcrumb/breadcrumb";
 import { ButtonStyleConfig } from "@/components/button/button";
@@ -52,6 +53,7 @@ export type StitchesThemeConfig = {
 export interface ComponentsStyleConfigs {
   Alert?: AlertStyleConfig;
   Anchor?: AnchorStyleConfig;
+  Avatar?: AvatarStyleConfig;
   Badge?: BadgeStyleConfig;
   Breadcrumb?: BreadcrumbStyleConfig;
   Button?: ButtonStyleConfig;

@@ -146,7 +146,7 @@ export const baseDialogStyles = css({
 
   boxShadow: "$lg",
 
-  backgroundColor: "$panelBg",
+  backgroundColor: "$surface",
 
   color: "inherit",
 });

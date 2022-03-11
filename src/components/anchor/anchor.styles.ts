@@ -13,6 +13,6 @@ export const anchorStyles = css({
   },
 
   "&:focus": {
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 });

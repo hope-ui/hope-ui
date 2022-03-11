@@ -35,7 +35,7 @@ export const closeButtonStyles = css({
 
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 
   variants: {
