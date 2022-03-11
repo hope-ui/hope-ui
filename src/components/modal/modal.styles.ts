@@ -156,6 +156,12 @@ export const modalDialogStyles = css(baseDialogStyles, {
   my: "3.75rem",
   borderRadius: "$sm",
 
+  outline: "none",
+
+  "&:focus": {
+    outline: "none",
+  },
+
   variants: {
     size: {
       xs: {

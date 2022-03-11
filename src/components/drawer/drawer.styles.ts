@@ -105,6 +105,12 @@ export const drawerContainerStyles = css(baseModalContainerStyles, {
 export const drawerDialogStyles = css(baseDialogStyles, {
   maxHeight: "100vh",
 
+  outline: "none",
+
+  "&:focus": {
+    outline: "none",
+  },
+
   variants: {
     size: {
       xs: {

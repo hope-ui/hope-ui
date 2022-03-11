@@ -1,6 +1,7 @@
 export * from "./alert";
 export * from "./anchor";
 export * from "./aspect-ratio";
+export * from "./badge";
 export * from "./box";
 export * from "./breadcrumb";
 export * from "./button";
