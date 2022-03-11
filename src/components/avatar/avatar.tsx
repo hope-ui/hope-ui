@@ -4,7 +4,7 @@ import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ImageProps } from "../image";
 import { ElementType, HTMLHopeProps } from "../types";
 import { avatarStyles, AvatarVariants } from "./avatar.styles";
@@ -88,7 +88,6 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   const theme = useComponentStyleConfigs().Avatar;
 
   const defaultProps: AvatarProps<"span"> = {
-    as: "span",
     size: theme?.defaultProps?.root?.size ?? "md",
     withBorder: theme?.defaultProps?.root?.withBorder ?? false,
     icon: theme?.defaultProps?.root?.icon ?? <DefaultAvatarIcon />,
@@ -129,7 +128,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   };
 
   return (
-    <Box class={classes()} __baseStyle={theme?.baseStyle?.root} borderRadius={local.borderRadius} {...others}>
+    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} borderRadius={local.borderRadius} {...others}>
       <AvatarImage
         src={local.src}
         srcSet={local.srcSet}
@@ -144,7 +143,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
         ignoreFallback={local.ignoreFallback}
       />
       {local.children}
-    </Box>
+    </hope.span>
   );
 }
 

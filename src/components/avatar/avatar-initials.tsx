@@ -19,9 +19,9 @@ export function AvatarInitials(props: AvatarInitialsProps) {
 
   const [local, others] = splitProps(props, ["class", "getInitials", "name"]);
 
-  const diplayInitials = () => (local.name ? local.getInitials?.(local.name) : null);
-
   const classes = () => classNames(local.class, hopeAvatarInitialsClass);
+
+  const diplayInitials = () => local.name && local.getInitials?.(local.name);
 
   return (
     <Box role="img" aria-label={local.name} class={classes()} __baseStyle={theme?.baseStyle?.initials} {...others}>

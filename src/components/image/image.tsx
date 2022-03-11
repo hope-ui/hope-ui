@@ -84,8 +84,6 @@ export function Image<C extends ElementType = "img">(props: ImageProps<C>) {
     ["onError", "onLoad"]
   );
 
-  const classes = () => classNames(local.class, hopeImageClass);
-
   const shouldIgnore = () => {
     return (
       local.loading != null || // Defer to native `img` tag if `loading` prop is passed.
@@ -104,6 +102,8 @@ export function Image<C extends ElementType = "img">(props: ImageProps<C>) {
     ...(shouldIgnore() ? loadEventProps : {}),
     ...others,
   });
+
+  const classes = () => classNames(local.class, hopeImageClass);
 
   return (
     <Show

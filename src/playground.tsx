@@ -13,7 +13,8 @@ export function App() {
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
       </HStack>
       <HStack spacing="$4">
-        <Avatar size="2xs" name="Dan Abrahmov" src="https://bit.ly/dan-abramov">
+        <Avatar />
+        {/* <Avatar size="2xs" name="Dan Abrahmov" src="https://bit.ly/dan-abramov">
           <AvatarBadge boxSize="1.25em" bg="$success9" />
         </Avatar>
         <Avatar size="xs" name="Kola Tioluwani" src="https://bit.ly/tioluwani-kolawole">
@@ -33,7 +34,7 @@ export function App() {
         </Avatar>
         <Avatar size="2xl" name="Segun Adebayo" src="https://bit.ly/sage-adebayo">
           <AvatarBadge boxSize="1.25em" bg="$success9" />
-        </Avatar>
+        </Avatar> */}
       </HStack>
     </Box>
   );
