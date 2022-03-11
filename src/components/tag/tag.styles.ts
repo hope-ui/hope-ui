@@ -175,9 +175,6 @@ function createTagDotAndSizeCompoundVariant(size: string): SystemStyleObject {
 }
 
 export const tagStyles = css({
-  appearance: "none",
-  position: "relative",
-
   display: "inline-flex",
   justifyContent: "center",
   alignItems: "center",
@@ -186,7 +183,6 @@ export const tagStyles = css({
 
   fontWeight: "$medium",
   lineHeight: "$none",
-  textDecoration: "none",
 
   variants: {
     variant: {
