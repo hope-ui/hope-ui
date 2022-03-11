@@ -13,8 +13,6 @@ import { ModalFooter, ModalFooterProps } from "../modal/modal-footer";
 import { ModalHeader, ModalHeaderProps } from "../modal/modal-header";
 import { ElementType } from "../types";
 import { DrawerDialogVariants, drawerTransitionStyles } from "./drawer.styles";
-import { DrawerOverlay } from "./drawer-overlay";
-import { DrawerPanel } from "./drawer-panel";
 
 export type DrawerPlacement = "top" | "right" | "bottom" | "left";
 
@@ -35,28 +33,30 @@ export type DrawerProps = RightJoinProps<
   DrawerOptions
 >;
 
+type ThemeableDrawerOptions = Pick<
+  DrawerProps,
+  | "placement"
+  | "size"
+  | "fullHeight"
+  | "disableMotion"
+  | "blockScrollOnMount"
+  | "closeOnEsc"
+  | "closeOnOverlayClick"
+  | "preserveScrollBarGap"
+  | "trapFocus"
+>;
+
 export interface DrawerStyleConfig {
   baseStyle?: {
     overlay?: SystemStyleObject;
-    panel?: SystemStyleObject;
+    content?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;
     footer?: SystemStyleObject;
   };
   defaultProps?: {
-    root?: Pick<
-      DrawerProps,
-      | "placement"
-      | "size"
-      | "fullHeight"
-      | "disableMotion"
-      | "blockScrollOnMount"
-      | "closeOnEsc"
-      | "closeOnOverlayClick"
-      | "preserveScrollBarGap"
-      | "trapFocus"
-    >;
+    root?: ThemeableDrawerOptions;
     closeButton?: ThemeableCloseButtonOptions;
   };
 }
@@ -117,7 +117,7 @@ export function useDrawerContext() {
  * Drawer parts is just Modal parts with drawer's theme baseStyle
  * -----------------------------------------------------------------------------------------------*/
 
-function DrawerCloseButton(props: CloseButtonProps) {
+export function DrawerCloseButton(props: CloseButtonProps) {
   const theme = useComponentStyleConfigs().Drawer;
 
   const defaultProps: CloseButtonProps = {
@@ -131,24 +131,17 @@ function DrawerCloseButton(props: CloseButtonProps) {
   return <ModalCloseButton __baseStyle={theme?.baseStyle?.closeButton} {...propsWithDefault} />;
 }
 
-function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
+export function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalBody __baseStyle={theme?.baseStyle?.body} {...props} />;
 }
 
-function DrawerHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
+export function DrawerHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalHeader __baseStyle={theme?.baseStyle?.header} {...props} />;
 }
 
-function DrawerFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
+export function DrawerFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalFooter __baseStyle={theme?.baseStyle?.footer} {...props} />;
 }
-
-Drawer.Overlay = DrawerOverlay;
-Drawer.Panel = DrawerPanel;
-Drawer.CloseButton = DrawerCloseButton;
-Drawer.Header = DrawerHeader;
-Drawer.Body = DrawerBody;
-Drawer.Footer = DrawerFooter;

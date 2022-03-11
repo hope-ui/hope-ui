@@ -9,26 +9,26 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
-import { selectPanelStyles } from "./select.styles";
+import { selectContentStyles } from "./select.styles";
 
-export type SelectPanelProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
+export type SelectContentProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
-const hopeSelectPanelClass = "hope-select__panel";
+const hopeSelectContentClass = "hope-select__content";
 
 /**
  * The scrolling viewport that contains all of the options.
  */
-export function SelectPanel<C extends ElementType = "div">(props: SelectPanelProps<C>) {
+export function SelectContent<C extends ElementType = "div">(props: SelectContentProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectPanelProps<"div">, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectContentProps<"div">, ["ref", "class"]);
 
-  const classes = () => classNames(local.class, hopeSelectPanelClass, selectPanelStyles());
+  const classes = () => classNames(local.class, hopeSelectContentClass, selectContentStyles());
 
-  const assignPanelRef = (el: HTMLDivElement) => {
-    selectContext.assignPanelRef(el);
+  const assignContentRef = (el: HTMLDivElement) => {
+    selectContext.assignContentRef(el);
 
     if (isFunction(local.ref)) {
       local.ref(el);
@@ -39,21 +39,21 @@ export function SelectPanel<C extends ElementType = "div">(props: SelectPanelPro
   };
 
   const onOutsideClick = (event: Event) => {
-    selectContext.onPanelOutsideClick(event.target as HTMLElement);
+    selectContext.onContentOutsideClick(event.target as HTMLElement);
   };
 
   return (
     <Show when={selectContext.state.opened}>
       <Portal>
         <OutsideClickHandler onOutsideClick={onOutsideClick}>
-          <Box ref={assignPanelRef} class={classes()} __baseStyle={theme?.baseStyle?.panel} {...others} />
+          <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others} />
         </OutsideClickHandler>
       </Portal>
     </Show>
   );
 }
 
-SelectPanel.toString = () => createClassSelector(hopeSelectPanelClass);
+SelectContent.toString = () => createClassSelector(hopeSelectContentClass);
 
 /**
  * Renderless component that manage outside click on its children.

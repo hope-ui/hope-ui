@@ -74,7 +74,7 @@ export const WithSelect = (args: any) => (
         <Select.Value />
         <Select.Icon />
       </Select.Trigger>
-      <Select.Panel>
+      <Select.Content>
         <Select.Listbox>
           <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
             {item => (
@@ -85,7 +85,7 @@ export const WithSelect = (args: any) => (
             )}
           </For>
         </Select.Listbox>
-      </Select.Panel>
+      </Select.Content>
     </Select>
     <Show when={args.invalid} fallback={<FormHelperText>Choose SolidJS.</FormHelperText>}>
       <FormErrorMessage>An error occured</FormErrorMessage>

@@ -12,9 +12,9 @@ import { JSX } from "solid-js";
 import { callAllHandlers } from "@/utils/function";
 
 import { ModalContextValue, useModalContext } from "./modal";
-import { ModalPanelProps } from "./modal-panel";
+import { ModalContentProps } from "./modal-content";
 
-export type CreateModalProps = Pick<ModalPanelProps, "onClick" | "aria-labelledby" | "aria-describedby">;
+export type CreateModalProps = Pick<ModalContentProps, "onClick" | "aria-labelledby" | "aria-describedby">;
 
 interface CreateModalReturn {
   modalContext: ModalContextValue;
