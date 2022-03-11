@@ -2,7 +2,7 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Badge, Box, HopeProvider, HopeThemeConfig, Tag, useColorMode } from ".";
+import { Box, HopeProvider, HopeThemeConfig, useColorMode } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
