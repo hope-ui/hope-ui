@@ -50,9 +50,55 @@ export const avatarStyles = css({
       },
     },
     withBorder: {
-      true: { borderWidth: "0.1em" },
+      true: {},
     },
   },
+
+  compoundVariants: [
+    /* -------------------------------------------------------------------------------------------------
+     * Varaint - border + size
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      withBorder: true,
+      size: "2xs",
+      css: { borderWidth: "1px" },
+    },
+    {
+      withBorder: true,
+      size: "xs",
+      css: { borderWidth: "1px" },
+    },
+    {
+      withBorder: true,
+      size: "sm",
+      css: { borderWidth: "2px" },
+    },
+    {
+      withBorder: true,
+      size: "md",
+      css: { borderWidth: "2px" },
+    },
+    {
+      withBorder: true,
+      size: "lg",
+      css: { borderWidth: "3px" },
+    },
+    {
+      withBorder: true,
+      size: "xl",
+      css: { borderWidth: "4px" },
+    },
+    {
+      withBorder: true,
+      size: "2xl",
+      css: { borderWidth: "5px" },
+    },
+    {
+      withBorder: true,
+      size: "full",
+      css: { borderWidth: "2px" },
+    },
+  ],
 });
 
 export type AvatarVariants = VariantProps<typeof avatarStyles>;
@@ -62,6 +108,8 @@ export type AvatarVariants = VariantProps<typeof avatarStyles>;
  * -----------------------------------------------------------------------------------------------*/
 
 export const avatarExcessStyles = css(avatarStyles);
+
+export type AvatarExcessVariants = VariantProps<typeof avatarExcessStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Avatar - image
@@ -100,7 +148,7 @@ export const avatarBadgeStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const avatarGroupStyles = css({
-  display: "inline-flex",
+  display: "flex",
   alignItems: "center",
   justifyContent: "flex-start",
   flexDirection: "row",

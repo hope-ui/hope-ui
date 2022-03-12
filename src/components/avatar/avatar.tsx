@@ -83,6 +83,7 @@ export interface AvatarStyleConfig {
     image?: SystemStyleObject;
     initials?: SystemStyleObject;
     badge?: SystemStyleObject;
+    excess?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableAvatarOptions;
@@ -110,6 +111,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
 
     borderRadius: avatarGroupContext?.state.borderRadius,
     borderColor: avatarGroupContext?.state.borderColor,
+    borderWidth: avatarGroupContext?.state.borderWidth,
     marginStart: avatarGroupContext?.state.spacing,
 
     icon: theme?.defaultProps?.root?.icon ?? (props => <DefaultAvatarIcon {...props} />),
@@ -149,7 +151,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     );
   };
 
-  const isVisible = () => avatarGroupContext?.shouldShowAvatar(index());
+  const isVisible = () => avatarGroupContext?.shouldShowAvatar(index()) ?? true;
 
   const marginStart = () => {
     // Not in an avatar group, lets just pass the prop.
@@ -157,7 +159,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
       return local.marginStart;
     }
 
-    // Inside an avatar group the first avatar (which appears last) has no marginStart.
+    // Inside an avatar group the first avatar has no marginStart.
     return index() > 0 ? local.marginStart : undefined;
   };
 

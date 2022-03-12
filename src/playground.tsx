@@ -2,7 +2,18 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Avatar, AvatarBadge, AvatarGroup, Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarGroup,
+  AvatarExcess,
+  Box,
+  Button,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  useColorMode,
+} from ".";
 import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
@@ -61,7 +72,7 @@ export function App() {
         <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
         <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
       </AvatarGroup>
-      <AvatarGroup borderColor="tomato" max={2}>
+      <AvatarGroup max={2}>
         <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
         <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
         <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
@@ -88,6 +99,21 @@ export function App() {
         <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
         <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
         <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="2xl" borderRadius="$lg" borderWidth="8px">
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="2xl">
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+        <AvatarExcess>+72</AvatarExcess>
       </AvatarGroup>
     </Box>
   );
