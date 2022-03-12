@@ -29,9 +29,9 @@ export const avatarStyles = css({
   backgroundColor: "$neutral6",
 
   color: "$neutral12",
+  fontWeight: "$medium",
   textAlign: "center",
   textTransform: "uppercase",
-  fontWeight: "$medium",
 
   verticalAlign: "top",
 
@@ -50,14 +50,18 @@ export const avatarStyles = css({
       },
     },
     withBorder: {
-      true: {
-        borderWidth: "2px",
-      },
+      true: { borderWidth: "0.1em" },
     },
   },
 });
 
 export type AvatarVariants = VariantProps<typeof avatarStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Avatar - excess label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const avatarExcessStyles = css(avatarStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Avatar - image
@@ -92,13 +96,12 @@ export const avatarBadgeStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Avatar - group
+ * AvatarGroup
  * -----------------------------------------------------------------------------------------------*/
 
-export const avatarGroupStyles = css({});
-
-/* -------------------------------------------------------------------------------------------------
- * Avatar - excess label
- * -----------------------------------------------------------------------------------------------*/
-
-export const avatarExcessLabelStyles = css({});
+export const avatarGroupStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  flexDirection: "row",
+});

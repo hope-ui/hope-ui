@@ -2,7 +2,7 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Avatar, AvatarBadge, Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import { Avatar, AvatarBadge, AvatarGroup, Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
 import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
@@ -40,7 +40,55 @@ export function App() {
           <AvatarBadge boxSize="1.25em" bg="$success9" />
         </Avatar>
       </HStack>
-      <HStack spacing="$4"></HStack>
+      <AvatarGroup size="2xs" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="xs" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="sm" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup borderColor="tomato" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="lg" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="xl" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
+      <AvatarGroup size="2xl" max={2}>
+        <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+        <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
+        <Avatar name="Kent Dodds" src="https://bit.ly/kent-c-dodds" />
+        <Avatar name="Prosper Otemuyiwa" src="https://bit.ly/prosper-baba" />
+        <Avatar name="Christian Nwamba" src="https://bit.ly/code-beast" />
+      </AvatarGroup>
     </Box>
   );
 }

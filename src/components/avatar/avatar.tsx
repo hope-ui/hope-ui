@@ -1,4 +1,4 @@
-import { JSX, mergeProps, splitProps } from "solid-js";
+import { createSignal, JSX, mergeProps, onMount, Show, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -9,6 +9,7 @@ import { ImageProps } from "../image";
 import { ElementType, HTMLHopeProps } from "../types";
 import { avatarStyles, AvatarVariants } from "./avatar.styles";
 import { DefaultAvatarIcon, initials } from "./avatar.utils";
+import { useAvatarGroupContext } from "./avatar-group";
 import { AvatarImage } from "./avatar-image";
 
 export interface AvatarIconProps {
@@ -99,9 +100,18 @@ const hopeAvatarClass = "hope-avatar";
 export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   const theme = useComponentStyleConfigs().Avatar;
 
+  const avatarGroupContext = useAvatarGroupContext();
+
+  const [index, setIndex] = createSignal(0);
+
   const defaultProps: AvatarProps<"span"> = {
-    size: theme?.defaultProps?.root?.size ?? "md",
-    withBorder: theme?.defaultProps?.root?.withBorder ?? false,
+    size: avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+    withBorder: !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
+
+    borderRadius: avatarGroupContext?.state.borderRadius,
+    borderColor: avatarGroupContext?.state.borderColor,
+    marginStart: avatarGroupContext?.state.spacing,
+
     icon: theme?.defaultProps?.root?.icon ?? (props => <DefaultAvatarIcon {...props} />),
     iconLabel: theme?.defaultProps?.root?.iconLabel ?? "avatar",
     getInitials: theme?.defaultProps?.root?.getInitials ?? initials,
@@ -119,12 +129,12 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     "srcSet",
     "name",
     "borderRadius",
+    "marginStart",
     "onError",
     "getInitials",
     "icon",
     "iconLabel",
     "loading",
-    "borderColor",
     "ignoreFallback",
   ]);
 
@@ -139,23 +149,47 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     );
   };
 
+  const isVisible = () => avatarGroupContext?.shouldShowAvatar(index());
+
+  const marginStart = () => {
+    // Not in an avatar group, lets just pass the prop.
+    if (!avatarGroupContext) {
+      return local.marginStart;
+    }
+
+    // Inside an avatar group the first avatar (which appears last) has no marginStart.
+    return index() > 0 ? local.marginStart : undefined;
+  };
+
+  onMount(() => {
+    setIndex(avatarGroupContext?.registerAvatar() ?? 0);
+  });
+
   return (
-    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} borderRadius={local.borderRadius} {...others}>
-      <AvatarImage
-        src={local.src}
-        srcSet={local.srcSet}
-        loading={local.loading}
-        getInitials={local.getInitials}
-        name={local.name}
-        icon={local.icon}
-        iconLabel={local.iconLabel}
-        ignoreFallback={local.ignoreFallback}
+    <Show when={isVisible()}>
+      <hope.span
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.root}
         borderRadius={local.borderRadius}
-        // eslint-disable-next-line solid/reactivity
-        onError={local.onError}
-      />
-      {local.children}
-    </hope.span>
+        marginStart={marginStart()}
+        {...others}
+      >
+        <AvatarImage
+          src={local.src}
+          srcSet={local.srcSet}
+          loading={local.loading}
+          getInitials={local.getInitials}
+          name={local.name}
+          icon={local.icon}
+          iconLabel={local.iconLabel}
+          ignoreFallback={local.ignoreFallback}
+          borderRadius={local.borderRadius}
+          // eslint-disable-next-line solid/reactivity
+          onError={local.onError}
+        />
+        {local.children}
+      </hope.span>
+    </Show>
   );
 }
 
