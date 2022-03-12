@@ -1,6 +1,7 @@
 export * from "./alert";
 export * from "./anchor";
 export * from "./aspect-ratio";
+export * from "./avatar";
 export * from "./badge";
 export * from "./box";
 export * from "./breadcrumb";
@@ -18,6 +19,7 @@ export * from "./grid";
 export * from "./heading";
 export * from "./icon";
 export * from "./icon-button";
+export * from "./image";
 export * from "./input";
 export * from "./modal";
 export * from "./radio";

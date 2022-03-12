@@ -118,7 +118,7 @@ export const selectContentStyles = css({
   boxShadow: "$lg",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$panelBg",
+  backgroundColor: "$surface",
 
   padding: 0,
 });

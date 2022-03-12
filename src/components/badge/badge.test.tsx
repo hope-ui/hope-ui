@@ -20,7 +20,7 @@ describe("Badge", () => {
     expect(badge).toBeInTheDocument();
   });
 
-  it("should render <span> badge by default", () => {
+  it("should render <span> tag by default", () => {
     // act
     renderWithHopeProvider(() => <Badge data-testid="badge">Badge</Badge>);
     const badge = screen.getByTestId("badge");
@@ -29,7 +29,7 @@ describe("Badge", () => {
     expect(badge).toBeInstanceOf(HTMLSpanElement);
   });
 
-  it("should render badge provided with the as prop", () => {
+  it("should render tag provided with the as prop", () => {
     // act
     renderWithHopeProvider(() => (
       <Badge data-testid="badge" as="div">

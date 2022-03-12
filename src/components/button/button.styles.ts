@@ -222,7 +222,7 @@ export const buttonStyles = css({
 
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 
   "&:disabled": {
@@ -234,7 +234,7 @@ export const buttonStyles = css({
     variant: {
       default: {
         border: "1px solid $neutral7",
-        backgroundColor: "$panelBg",
+        backgroundColor: "$surface",
         color: "$neutral12",
 
         "&:not(:disabled):hover": {

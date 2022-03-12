@@ -40,6 +40,11 @@ export type LayoutProps = Partial<{
    * The CSS `object-fit` property
    */
   objectFit?: Property.ObjectFit;
+
+  /**
+   * The CSS `object-position` property
+   */
+  objectPosition?: Property.ObjectPosition;
 }>;
 
 /**
@@ -53,4 +58,5 @@ export const layoutPropNames: KeysOf<LayoutProps> = {
   overflowX: true,
   overflowY: true,
   objectFit: true,
+  objectPosition: true,
 };

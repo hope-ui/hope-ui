@@ -35,12 +35,12 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme `appBg` color for background-color.
+    1. Use theme `background` color for background-color.
     2. Use theme `neutral` color for text. 
     3. Improve text rendering. 
   */
   body: {
-    backgroundColor: "$appBg" /* 1 */,
+    backgroundColor: "$background" /* 1 */,
     color: "$neutral12" /* 2 */,
     fontFamily: "inherit",
     lineHeight: "inherit",

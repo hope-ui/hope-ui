@@ -1,19 +1,15 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { badgeStyles, BadgeVariants } from "./badge.styles";
 
 type ThemeableBadgeOptions = Pick<BadgeVariants, "variant" | "colorScheme">;
 
-export interface BadgeStyleConfig {
-  baseStyle?: SystemStyleObject;
-  defaultProps?: ThemeableBadgeOptions;
-}
+export type BadgeStyleConfig = SinglePartComponentStyleConfig<ThemeableBadgeOptions>;
 
 export type BadgeProps<C extends ElementType = "span"> = HTMLHopeProps<C, BadgeVariants>;
 
