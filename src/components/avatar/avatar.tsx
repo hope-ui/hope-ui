@@ -9,7 +9,7 @@ import { ImageProps } from "../image";
 import { ElementType, HTMLHopeProps } from "../types";
 import { avatarStyles, AvatarVariants } from "./avatar.styles";
 import { DefaultAvatarIcon, initials } from "./avatar.utils";
-import { useAvatarGroupContext } from "./avatar-group";
+import { ThemeableAvatarGroupOptions, useAvatarGroupContext } from "./avatar-group";
 import { AvatarImage } from "./avatar-image";
 
 export interface AvatarIconProps {
@@ -87,6 +87,7 @@ export interface AvatarStyleConfig {
   };
   defaultProps?: {
     root?: ThemeableAvatarOptions;
+    group?: ThemeableAvatarGroupOptions;
   };
 }
 

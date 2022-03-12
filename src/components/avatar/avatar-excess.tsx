@@ -8,7 +8,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { avatarExcessStyles, AvatarExcessVariants } from "./avatar.styles";
 import { useAvatarGroupContext } from "./avatar-group";
 
-export type AvatarExcessProps<C extends ElementType = "span"> = HTMLHopeProps<C, AvatarExcessVariants>;
+interface AvatarExcessOptions extends AvatarExcessVariants {
+  /**
+   * The number of avatar in excess.
+   */
+  count?: number | string;
+}
+
+export type AvatarExcessProps<C extends ElementType = "span"> = HTMLHopeProps<C, AvatarExcessOptions>;
 
 const hopeAvatarExcessClass = "hope-avatar__excess";
 
@@ -31,7 +38,7 @@ export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcess
   };
 
   const propsWithDefault: AvatarExcessProps<"span"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "size", "withBorder"]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "children", "count", "size", "withBorder"]);
 
   const classes = () => {
     return classNames(
@@ -41,7 +48,11 @@ export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcess
     );
   };
 
-  return <hope.span class={classes()} __baseStyle={theme?.baseStyle?.excess} {...others} />;
+  return (
+    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.excess} {...others}>
+      +{local.count}
+    </hope.span>
+  );
 }
 
 AvatarExcess.toString = () => createClassSelector(hopeAvatarExcessClass);

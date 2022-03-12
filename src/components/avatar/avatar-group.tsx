@@ -13,7 +13,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { avatarGroupStyles, AvatarVariants } from "./avatar.styles";
 import { AvatarExcess } from "./avatar-excess";
 
-interface AvatarGroupOptions {
+export interface ThemeableAvatarGroupOptions {
   /**
    * The space between the avatars in the group.
    */
@@ -38,26 +38,29 @@ interface AvatarGroupOptions {
    * The `border-width` of the avatars
    */
   borderWidth?: ResponsiveValue<BorderProps["borderWidth"]>;
+}
 
+interface AvatarGroupOptions extends ThemeableAvatarGroupOptions {
   /**
    * The maximum number of visible avatars.
    */
   max?: number;
+
+  /**
+   * The number of non-visible avatars.
+   * Displayed at the end of the group in an avatar with "+X" label.
+   */
+  excess?: number;
 }
 
 export type AvatarGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, AvatarGroupOptions>;
 
-type AvatarGroupState = Required<Pick<AvatarGroupOptions, "spacing" | "size">> &
+type AvatarGroupState = Required<Pick<AvatarGroupOptions, "spacing" | "size" | "excess">> &
   Pick<AvatarGroupOptions, "max" | "borderRadius" | "borderColor" | "borderWidth"> & {
     /**
      * The number of avatar children in the group.
      */
     avatarCount: number;
-
-    /**
-     * The number of avatars in excess.
-     */
-    excess: number;
   };
 
 interface AvatarGroupContextValue {
@@ -78,25 +81,33 @@ export function AvatarGroup<C extends ElementType = "div">(props: AvatarGroupPro
 
   const [state, setState] = createStore<AvatarGroupState>({
     get spacing() {
-      return props.spacing ?? "-1em";
+      return props.spacing ?? theme?.defaultProps?.group?.spacing ?? "-1em";
     },
     get size() {
-      return props.size ?? "md";
+      return props.size ?? theme?.defaultProps?.group?.size ?? "md";
     },
     get borderRadius() {
-      return props.borderRadius;
+      return props.borderRadius ?? theme?.defaultProps?.group?.borderRadius;
     },
     get borderColor() {
-      return props.borderColor;
+      return props.borderColor ?? theme?.defaultProps?.group?.borderColor;
     },
     get borderWidth() {
-      return props.borderWidth;
+      return props.borderWidth ?? theme?.defaultProps?.group?.borderWidth;
     },
     get max() {
       return props.max;
     },
     get excess() {
-      return this.max != null ? this.avatarCount - this.max : 0;
+      if (props.excess != null) {
+        return props.excess;
+      }
+
+      if (this.max != null) {
+        return this.avatarCount - this.max;
+      }
+
+      return 0;
     },
     avatarCount: 0,
   });
@@ -139,7 +150,7 @@ export function AvatarGroup<C extends ElementType = "div">(props: AvatarGroupPro
       <Box role="group" class={classes()} __baseStyle={theme?.baseStyle?.group} {...others}>
         {local.children}
         <Show when={state.excess > 0}>
-          <AvatarExcess>+{state.excess}</AvatarExcess>
+          <AvatarExcess count={state.excess} />
         </Show>
       </Box>
     </AvatarGroupContext.Provider>

@@ -1,4 +1,4 @@
-import { children, For, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { children, createMemo, For, JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -66,19 +66,21 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
 
   const listClasses = () => classNames(hopeBreadcrumbListClass, breadcrumbListStyles());
 
-  const links = () => {
-    const items = children(() => local.children)();
+  const resolvedChildren = children(() => local.children);
+
+  const breadcrumbLinks = createMemo(() => {
+    const items = resolvedChildren();
     return isArray(items) ? items : [items];
-  };
+  });
 
   const isNotLastLink = (index: number) => {
-    return index + 1 !== links().length;
+    return index + 1 !== breadcrumbLinks().length;
   };
 
   return (
     <Box as="nav" aria-label="breadcrumb" class={rootClasses()} __baseStyle={theme?.baseStyle?.root} {...others}>
       <Box as="ol" class={listClasses()}>
-        <For each={links()}>
+        <For each={breadcrumbLinks()}>
           {(link, index) => (
             <BreadcrumbItem>
               {link}
