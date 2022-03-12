@@ -11,6 +11,18 @@ import { avatarStyles, AvatarVariants } from "./avatar.styles";
 import { DefaultAvatarIcon, initials } from "./avatar.utils";
 import { AvatarImage } from "./avatar-image";
 
+export interface AvatarIconProps {
+  /**
+   * The role of the icon.
+   */
+  role: string;
+
+  /**
+   * A11y: A label that describes the icon
+   */
+  "aria-label": string;
+}
+
 interface ThemeableAvatarOptions extends AvatarVariants {
   /**
    * Defines loading strategy.
@@ -26,7 +38,7 @@ interface ThemeableAvatarOptions extends AvatarVariants {
   /**
    * The default avatar used as fallback when `name`, and `src` is not specified.
    */
-  icon?: JSX.Element;
+  icon?: (props: AvatarIconProps) => JSX.Element;
 
   /**
    * `aria-label` to use with the default avatar icon when no `name` is provided.
@@ -90,8 +102,8 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   const defaultProps: AvatarProps<"span"> = {
     size: theme?.defaultProps?.root?.size ?? "md",
     withBorder: theme?.defaultProps?.root?.withBorder ?? false,
-    icon: theme?.defaultProps?.root?.icon ?? <DefaultAvatarIcon />,
-    iconLabel: theme?.defaultProps?.root?.iconLabel ?? " avatar",
+    icon: theme?.defaultProps?.root?.icon ?? (props => <DefaultAvatarIcon {...props} />),
+    iconLabel: theme?.defaultProps?.root?.iconLabel ?? "avatar",
     getInitials: theme?.defaultProps?.root?.getInitials ?? initials,
     ignoreFallback: theme?.defaultProps?.root?.ignoreFallback ?? false,
     loading: theme?.defaultProps?.root?.loading,
@@ -133,14 +145,14 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
         src={local.src}
         srcSet={local.srcSet}
         loading={local.loading}
-        // eslint-disable-next-line solid/reactivity
-        onError={local.onError}
         getInitials={local.getInitials}
         name={local.name}
-        borderRadius={local.borderRadius}
         icon={local.icon}
         iconLabel={local.iconLabel}
         ignoreFallback={local.ignoreFallback}
+        borderRadius={local.borderRadius}
+        // eslint-disable-next-line solid/reactivity
+        onError={local.onError}
       />
       {local.children}
     </hope.span>

@@ -3,6 +3,7 @@ import "./playground.css";
 import { render } from "solid-js/web";
 
 import { Avatar, AvatarBadge, Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -14,7 +15,10 @@ export function App() {
       </HStack>
       <HStack spacing="$4">
         <Avatar />
-        {/* <Avatar size="2xs" name="Dan Abrahmov" src="https://bit.ly/dan-abramov">
+        <Avatar icon={props => <IconCheckCircleSolid {...props} />} />
+      </HStack>
+      <HStack spacing="$4">
+        <Avatar size="2xs" name="Dan Abrahmov" src="https://bit.ly/dan-abramov">
           <AvatarBadge boxSize="1.25em" bg="$success9" />
         </Avatar>
         <Avatar size="xs" name="Kola Tioluwani" src="https://bit.ly/tioluwani-kolawole">
@@ -34,8 +38,9 @@ export function App() {
         </Avatar>
         <Avatar size="2xl" name="Segun Adebayo" src="https://bit.ly/sage-adebayo">
           <AvatarBadge boxSize="1.25em" bg="$success9" />
-        </Avatar> */}
+        </Avatar>
       </HStack>
+      <HStack spacing="$4"></HStack>
     </Box>
   );
 }
@@ -50,3 +55,34 @@ render(
   ),
   document.getElementById("root") as HTMLElement
 );
+
+/*
+
+// Render props
+<Tooltip>
+  {(triggerProps) => (
+    <Button
+      variant="subtle"
+      colorScheme="warning"
+      size="sm"
+      leftIcon={<IconPlus boxSize="$6" />}
+      {...triggerProps}
+    >
+      Button
+    </Button>
+  )}
+</Tooltip>
+
+// Compound component
+<Tooltip>
+  <TooltipTrigger 
+    as={Button} 
+    variant="subtle"
+    colorScheme="warning"
+    size="sm"
+    leftIcon={<IconPlus boxSize="$6" />} 
+  >
+    Button
+  </TooltipTrigger>
+</Tooltip>
+*/
