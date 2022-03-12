@@ -43,6 +43,9 @@ export interface CreateImageProps {
    */
   crossOrigin?: NativeImageProps["crossOrigin"];
 
+  /**
+   * The image loading strategy.
+   */
   loading?: NativeImageProps["loading"];
 }
 

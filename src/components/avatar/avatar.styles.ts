@@ -26,7 +26,7 @@ export const avatarStyles = css({
   borderRadius: "$full",
   borderColor: "$background",
 
-  backgroundColor: "$neutral6",
+  backgroundColor: "$neutral8",
 
   color: "$neutral12",
   fontWeight: "$medium",

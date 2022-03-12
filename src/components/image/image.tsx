@@ -32,7 +32,7 @@ interface ImageOptions {
   fallback?: JSX.Element;
 
   /**
-   * Defines loading strategy.
+   * The image loading strategy.
    */
   loading?: "eager" | "lazy";
 
