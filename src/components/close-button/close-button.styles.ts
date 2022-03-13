@@ -26,11 +26,11 @@ export const closeButtonStyles = css({
   },
 
   "&:hover": {
-    backgroundColor: "$alpha4",
+    backgroundColor: "$closeButtonHoverBackground",
   },
 
   "&:active": {
-    backgroundColor: "$alpha5",
+    backgroundColor: "$closeButtonActiveBackground",
   },
 
   "&:focus": {
