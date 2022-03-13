@@ -27,13 +27,11 @@ export const progressTrackStyles = css({
   borderRadius: "$sm",
   backgroundColor: "$neutral4",
 
-  fontSize: "24px",
-
   variants: {
     size: {
       xs: {
         height: "$1",
-        fontSize: "6px",
+        fontSize: "4px",
       },
       sm: {
         height: "$2",
@@ -205,7 +203,6 @@ export const progressLabelStyles = css({
   width: "100%",
 
   color: "$background",
-  fontSize: "inherit",
   lineHeight: "$none",
   fontWeight: "$bold",
   textAlign: "center",

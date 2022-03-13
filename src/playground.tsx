@@ -2,15 +2,14 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, Progress, VStack, useColorMode } from ".";
-import { progressLabelStyles } from "./components/progress/progress.styles";
+import { Box, Button, HopeProvider, HopeThemeConfig, HStack, Progress, ProgressLabel, useColorMode, VStack } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
 
   return (
     <Box p="$4">
-      <HStack spacing="$4">
+      <HStack spacing="$4" mb="$4">
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
       </HStack>
       <VStack alignItems="stretch" spacing="$4">
@@ -29,19 +28,19 @@ export function App() {
         <Progress value={20} size="xs" colorScheme="danger" />
         <Progress size="xs" indeterminate />
         <Progress size="xs" value={50}>
-          <span class={progressLabelStyles()}>80%</span>
+          <ProgressLabel>80%</ProgressLabel>
         </Progress>
         <Progress size="sm" value={50}>
-          <span class={progressLabelStyles()}>80%</span>
+          <ProgressLabel>80%</ProgressLabel>
         </Progress>
         <Progress size="md" value={50}>
-          <span class={progressLabelStyles()}>80%</span>
+          <ProgressLabel>80%</ProgressLabel>
         </Progress>
         <Progress size="lg" value={50}>
-          <span class={progressLabelStyles()}>80%</span>
+          <ProgressLabel>80%</ProgressLabel>
         </Progress>
         <Progress h="40px" value={50}>
-          <span class={progressLabelStyles()}>80%</span>
+          <ProgressLabel fontSize="40px">80%</ProgressLabel>
         </Progress>
       </VStack>
     </Box>
