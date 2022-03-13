@@ -1,10 +1,10 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectTriggerStyles } from "./select.styles";
@@ -18,12 +18,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
 
   const selectContext = useSelectContext();
 
-  const defaultProps: SelectTriggerProps<"button"> = {
-    as: "button",
-  };
-
-  const propsWithDefault: SelectTriggerProps<"button"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class"]);
 
   const classes = () => {
     return classNames(
@@ -54,7 +49,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   };
 
   return (
-    <Box
+    <hope.button
       ref={assignButtonRef}
       id={selectContext.state.buttonId}
       type="button"

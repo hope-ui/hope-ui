@@ -14,6 +14,7 @@ import { HeadingStyleConfig } from "@/components/heading/heading";
 import { IconButtonStyleConfig } from "@/components/icon-button/icon-button";
 import { InputStyleConfig } from "@/components/input/input";
 import { ModalStyleConfig } from "@/components/modal/modal";
+import { ProgressStyleConfig } from "@/components/progress/progress";
 import { RadioStyleConfig } from "@/components/radio/radio";
 import { SelectStyleConfig } from "@/components/select/select";
 import { SpinnerStyleConfig } from "@/components/spinner/spinner";
@@ -65,6 +66,7 @@ export interface ComponentsStyleConfigs {
   IconButton?: IconButtonStyleConfig;
   Input?: InputStyleConfig;
   Modal?: ModalStyleConfig;
+  Progress?: ProgressStyleConfig;
   Radio?: RadioStyleConfig;
   Select?: SelectStyleConfig;
   Spinner?: SpinnerStyleConfig;

@@ -6,4 +6,5 @@ export const iconStyles = css({
   boxSize: "1em",
   color: "currentColor",
   lineHeight: "1em",
+  verticalAlign: "middle",
 });

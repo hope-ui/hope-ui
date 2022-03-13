@@ -9,7 +9,7 @@ import { IconSelector } from "../icons/IconSelector";
 import { ElementType } from "../types";
 import { selectIconStyles } from "./select.styles";
 
-const hopeSelectIconClass = "hope-select__trigger__icon";
+const hopeSelectIconClass = "hope-select__icon";
 
 /**
  * A small icon often displayed next to the value as a visual affordance for the fact it can be open.
