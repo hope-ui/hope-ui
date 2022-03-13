@@ -2,7 +2,26 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, Progress, ProgressLabel, useColorMode, VStack } from ".";
+import {
+  Box,
+  Button,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  List,
+  ListIcon,
+  ListItem,
+  OrderedList,
+  Progress,
+  ProgressLabel,
+  UnorderedList,
+  useColorMode,
+  VStack,
+} from ".";
+import { IconCheck } from "./components/icons/IconCheck";
+import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
+import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
+import { IconCrossCircle } from "./components/icons/IconCrossCircle";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -42,6 +61,37 @@ export function App() {
         <Progress h="40px" value={50}>
           <ProgressLabel fontSize="40px">80%</ProgressLabel>
         </Progress>
+        <UnorderedList>
+          <ListItem>Lorem ipsum dolor sit amet</ListItem>
+          <ListItem>Consectetur adipiscing elit</ListItem>
+          <ListItem>Integer molestie lorem at massa</ListItem>
+          <ListItem>Facilisis in pretium nisl aliquet</ListItem>
+        </UnorderedList>
+        <OrderedList>
+          <ListItem>Lorem ipsum dolor sit amet</ListItem>
+          <ListItem>Consectetur adipiscing elit</ListItem>
+          <ListItem>Integer molestie lorem at massa</ListItem>
+          <ListItem>Facilisis in pretium nisl aliquet</ListItem>
+        </OrderedList>
+        <List spacing="$3">
+          <ListItem>
+            <ListIcon as={IconCheckCircleSolid} color="$success9" />
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit
+          </ListItem>
+          <ListItem>
+            <ListIcon as={IconCheckCircleSolid} color="$success9" />
+            Assumenda, quia temporibus eveniet a libero incidunt suscipit
+          </ListItem>
+          <ListItem>
+            <ListIcon as={IconCheckCircleSolid} color="$success9" />
+            Quidem, ipsam illum quis sed voluptatum quae eum fugit earum
+          </ListItem>
+          {/* You can also use custom icons from react-icons */}
+          <ListItem>
+            <ListIcon as={IconCrossCircle} color="$danger9" />
+            Quidem, ipsam illum quis sed voluptatum quae eum fugit earum
+          </ListItem>
+        </List>
       </VStack>
     </Box>
   );

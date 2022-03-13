@@ -8,7 +8,7 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectValueStyles } from "./select.styles";
 
-const hopeSelectValueClass = "hope-select__trigger__value";
+const hopeSelectValueClass = "hope-select__value";
 
 export type SelectValueProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 

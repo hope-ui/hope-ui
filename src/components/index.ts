@@ -21,6 +21,7 @@ export * from "./icon";
 export * from "./icon-button";
 export * from "./image";
 export * from "./input";
+export * from "./list";
 export * from "./modal";
 export * from "./progress";
 export * from "./radio";
