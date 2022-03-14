@@ -24,3 +24,7 @@ export function isNull(value: any): value is null {
 export function isString(value: any): value is string {
   return Object.prototype.toString.call(value) === "[object String]";
 }
+
+export function isUndefined(value: any): value is undefined {
+  return typeof value === "undefined" || value === undefined;
+}

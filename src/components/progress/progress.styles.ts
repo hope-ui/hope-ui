@@ -24,9 +24,6 @@ export const progressTrackStyles = css({
   position: "relative",
   overflow: "hidden",
 
-  borderRadius: "$sm",
-  backgroundColor: "$neutral4",
-
   variants: {
     size: {
       xs: {
@@ -52,14 +49,10 @@ export const progressTrackStyles = css({
 export type ProgressTrackVariants = VariantProps<typeof progressTrackStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Progress - filled track
+ * Progress - indicator
  * -----------------------------------------------------------------------------------------------*/
 
-function createIndeterminateGradient(color: string) {
-  return `linear-gradient(to right, transparent 0%, ${color} 50%, transparent 100%)`;
-}
-
-export const progressFilledTrackStyles = css({
+export const progressIndicatorStyles = css({
   position: "relative",
   height: "100%",
 
@@ -69,14 +62,6 @@ export const progressFilledTrackStyles = css({
   transitionDuration: "slow",
 
   variants: {
-    colorScheme: {
-      primary: {},
-      neutral: {},
-      success: {},
-      info: {},
-      warning: {},
-      danger: {},
-    },
     striped: {
       true: {},
     },
@@ -94,94 +79,19 @@ export const progressFilledTrackStyles = css({
   },
 
   compoundVariants: [
-    /* -------------------------------------------------------------------------------------------------
-     * Varaint - colorScheme + indeterminate
-     * -----------------------------------------------------------------------------------------------*/
     {
-      colorScheme: "primary",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$primary9") },
-    },
-    {
-      colorScheme: "neutral",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$neutral9") },
-    },
-    {
-      colorScheme: "success",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$success9") },
-    },
-    {
-      colorScheme: "info",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$info9") },
-    },
-    {
-      colorScheme: "warning",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$warning9") },
-    },
-    {
-      colorScheme: "danger",
-      indeterminate: true,
-      css: { backgroundImage: createIndeterminateGradient("$colors$danger9") },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * Varaint - colorScheme + not indeterminate
-     * -----------------------------------------------------------------------------------------------*/
-    {
-      colorScheme: "primary",
       indeterminate: false,
-      css: { backgroundColor: "$primary9" },
-    },
-    {
-      colorScheme: "neutral",
-      indeterminate: false,
-      css: { backgroundColor: "$neutral9" },
-    },
-    {
-      colorScheme: "success",
-      indeterminate: false,
-      css: { backgroundColor: "$success9" },
-    },
-    {
-      colorScheme: "info",
-      indeterminate: false,
-      css: { backgroundColor: "$info9" },
-    },
-    {
-      colorScheme: "warning",
-      indeterminate: false,
-      css: { backgroundColor: "$warning9" },
-    },
-    {
-      colorScheme: "danger",
-      indeterminate: false,
-      css: { backgroundColor: "$danger9" },
-    },
-
-    /* -------------------------------------------------------------------------------------------------
-     * Varaint - striped + not indeterminate
-     * -----------------------------------------------------------------------------------------------*/
-    {
       striped: true,
-      indeterminate: false,
       css: {
         backgroundImage:
           "linear-gradient(45deg, $colors$progressStripe 25%, transparent 25%, transparent 50%, $colors$progressStripe 50%,  $colors$progressStripe 75%, transparent 75%, transparent)",
         backgroundSize: "1rem 1rem",
       },
     },
-
-    /* -------------------------------------------------------------------------------------------------
-     * Varaint - striped + animated + not indeterminate
-     * -----------------------------------------------------------------------------------------------*/
     {
+      indeterminate: false,
       striped: true,
       animated: true,
-      indeterminate: false,
       css: {
         animation: `${stripe} 750ms linear infinite`,
       },
@@ -189,7 +99,7 @@ export const progressFilledTrackStyles = css({
   ],
 });
 
-export type ProgressFilledTrackVariants = VariantProps<typeof progressFilledTrackStyles>;
+export type ProgressIndicatorVariants = VariantProps<typeof progressIndicatorStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Progress - label

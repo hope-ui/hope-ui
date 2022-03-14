@@ -76,6 +76,12 @@ export const resetStyles = globalCss({
     outline: "5px auto -webkit-focus-ring-color",
   },
 
+  /* fieldset have no margin and padding. */
+  fieldset: {
+    margin: 0,
+    padding: 0,
+  },
+
   /* List have no margin and padding. */
   "ol, ul": {
     margin: 0,

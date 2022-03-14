@@ -1,31 +1,37 @@
 import { createMemo, splitProps } from "solid-js";
 
+import { ColorProps } from "@/styled-system/props/color";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { progressFilledTrackStyles, ProgressFilledTrackVariants } from "./progress.styles";
+import { progressIndicatorStyles, ProgressIndicatorVariants } from "./progress.styles";
 import { getProgressProps, GetProgressPropsOptions } from "./progress.utils";
 
-type ProgressFilledTrackOptions = GetProgressPropsOptions & ProgressFilledTrackVariants;
+interface ProgressIndicatorOptions extends GetProgressPropsOptions, Omit<ProgressIndicatorVariants, "indeterminate"> {
+  /**
+   * The color of the progress indicator.
+   */
+  color?: ColorProps["color"];
+}
 
-export type ProgressFilledTrackProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressFilledTrackOptions>;
+export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressIndicatorOptions>;
 
-const hopeProgressFilledTrackClass = "hope-progress__filled-track";
+const hopeProgressIndicatorClass = "hope-progress__indicator";
 
 /**
- * ProgressFilledTrack (Linear)
+ * ProgressIndicator (Linear)
  *
  * The progress component that visually indicates the current level of the progress bar.
  * It applies `background-color` and changes its width.
  */
-export function ProgressFilledTrack<C extends ElementType = "div">(props: ProgressFilledTrackProps<C>) {
+export function ProgressIndicator<C extends ElementType = "div">(props: ProgressIndicatorProps<C>) {
   const [local, others] = splitProps(props, [
     "class",
     "min",
     "max",
     "value",
-    "colorScheme",
+    "color",
     "striped",
     "animated",
     "indeterminate",
@@ -44,15 +50,25 @@ export function ProgressFilledTrack<C extends ElementType = "div">(props: Progre
 
   const width = () => `${progress().percent}%`;
 
+  const backgroundStyles = () => {
+    if (local.indeterminate) {
+      return {
+        backgroundImage: `linear-gradient(to right, transparent 0%, ${local.color} 50%, transparent 100%)`,
+      };
+    }
+
+    return { backgroundColor: local.color };
+  };
+
   const classes = () => {
     return classNames(
       local.class,
-      hopeProgressFilledTrackClass,
-      progressFilledTrackStyles({
-        colorScheme: local.colorScheme,
+      hopeProgressIndicatorClass,
+      progressIndicatorStyles({
         striped: local.striped,
         animated: local.animated,
         indeterminate: local.indeterminate === true ? true : false, // ensure a boolean is passed so compound variants works correctly
+        css: backgroundStyles(),
       })
     );
   };
@@ -60,4 +76,4 @@ export function ProgressFilledTrack<C extends ElementType = "div">(props: Progre
   return <Box class={classes()} width={width()} {...progressProps} {...others} />;
 }
 
-ProgressFilledTrack.toString = () => createClassSelector(hopeProgressFilledTrackClass);
+ProgressIndicator.toString = () => createClassSelector(hopeProgressIndicatorClass);
