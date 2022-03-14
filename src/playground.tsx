@@ -19,6 +19,8 @@ import {
   CircularProgressLabel,
   useColorMode,
   VStack,
+  Breadcrumb,
+  BreadcrumbLink,
 } from ".";
 
 export function App() {
@@ -40,6 +42,22 @@ export function App() {
         </CircularProgress>
         <CircularProgress indeterminate color="$success9" />
         <CircularProgress value={0} color="$success9"></CircularProgress>
+        <Breadcrumb>
+          <BreadcrumbLink href="#">Home</BreadcrumbLink>
+          <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+          <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+        </Breadcrumb>
+        <Breadcrumb fontWeight="$medium" fontSize="$sm" spacing="$4">
+          <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+            Home
+          </BreadcrumbLink>
+          <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+            About
+          </BreadcrumbLink>
+          <BreadcrumbLink currentPage _hover={{ color: "$success9" }}>
+            Current
+          </BreadcrumbLink>
+        </Breadcrumb>
       </VStack>
     </Box>
   );

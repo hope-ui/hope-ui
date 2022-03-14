@@ -26,8 +26,15 @@ export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLin
 
   const [local, others] = splitProps(props as BreadcrumbLinkProps<"a">, ["class", "currentPage", "href"]);
 
-  const classes = () =>
-    classNames(local.class, hopeBreadcrumbLinkClass, breadcrumbLinkStyles({ currentPage: local.currentPage }));
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeBreadcrumbLinkClass,
+      breadcrumbLinkStyles({
+        currentPage: local.currentPage === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
+      })
+    );
+  };
 
   return (
     <Show
