@@ -72,6 +72,7 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
     if (modalContext.state.blockScrollOnMount) {
       addScrollableSelector(childOfDialogSelector);
       disablePageScroll(containerRef);
+
       // disableBodyScroll(containerRef, {
       //   allowTouchMove: el => {
       //     if (!containerRef || containerRef === el) {
