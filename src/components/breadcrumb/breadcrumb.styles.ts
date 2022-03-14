@@ -59,10 +59,6 @@ export const breadcrumbLinkStyles = css({
   cursor: "pointer",
   transition: "color 250ms, text-decoration 250ms",
 
-  "&:hover": {
-    color: "$primary11",
-  },
-
   "&:focus": {
     boxShadow: "$outline",
   },
@@ -72,9 +68,10 @@ export const breadcrumbLinkStyles = css({
       true: {
         color: "$neutral12",
         cursor: "default",
-
+      },
+      false: {
         "&:hover": {
-          color: "$neutral12",
+          color: "$primary11",
         },
       },
     },
