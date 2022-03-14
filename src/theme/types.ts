@@ -7,6 +7,7 @@ import { BadgeStyleConfig } from "@/components/badge/badge";
 import { BreadcrumbStyleConfig } from "@/components/breadcrumb/breadcrumb";
 import { ButtonStyleConfig } from "@/components/button/button";
 import { CheckboxStyleConfig } from "@/components/checkbox/checkbox";
+import { CircularProgressStyleConfig } from "@/components/circular-progress/circular-progress";
 import { CloseButtonStyleConfig } from "@/components/close-button/close-button";
 import { DrawerStyleConfig } from "@/components/drawer/drawer";
 import { FormControlStyleConfig } from "@/components/form-control/form-control";
@@ -59,6 +60,7 @@ export interface ComponentsStyleConfigs {
   Breadcrumb?: BreadcrumbStyleConfig;
   Button?: ButtonStyleConfig;
   Checkbox?: CheckboxStyleConfig;
+  CircularProgress?: CircularProgressStyleConfig;
   CloseButton?: CloseButtonStyleConfig;
   Drawer?: DrawerStyleConfig;
   FormControl?: FormControlStyleConfig;

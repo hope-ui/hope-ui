@@ -1,20 +1,36 @@
 import { mergeProps, splitProps } from "solid-js";
 
+import { ColorProps } from "@/styled-system/props/color";
 import { RadiiProps } from "@/styled-system/props/radii";
-import { ResponsiveValue } from "@/styled-system/types";
+import { ResponsiveValue, SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
-import { ProgressFilledTrackVariants, progressTrackStyles, ProgressTrackVariants } from "./progress.styles";
-import { ProgressFilledTrack } from "./progress-filled-track";
+import { ElementType, HTMLHopeProps } from "../types";
+import { ProgressIndicatorVariants, progressTrackStyles, ProgressTrackVariants } from "./progress.styles";
+import { ProgressIndicator } from "./progress-indicator";
 
 /* -------------------------------------------------------------------------------------------------
  * Progress
  * -----------------------------------------------------------------------------------------------*/
 
-interface ThemeableProgressOptions extends ProgressTrackVariants, Omit<ProgressFilledTrackVariants, "indeterminate"> {
+interface ThemeableProgressOptions extends ProgressTrackVariants, Omit<ProgressIndicatorVariants, "indeterminate"> {
+  /**
+   * The color of the progress indicator.
+   */
+  color?: ColorProps["color"];
+
+  /**
+   * The color of the progress track.
+   */
+  trackColor?: ColorProps["color"];
+
+  /**
+   * The border-radius of the progress track and indicator.
+   */
+  borderRadius?: ResponsiveValue<RadiiProps["borderRadius"]>;
+
   /**
    * The minimum value of the progress.
    */
@@ -41,7 +57,16 @@ interface ProgressOptions extends ThemeableProgressOptions {
 
 export type ProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressOptions>;
 
-export type ProgressStyleConfig = SinglePartComponentStyleConfig<ThemeableProgressOptions>;
+export interface ProgressStyleConfig {
+  baseStyle?: {
+    track?: SystemStyleObject;
+    indicator?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableProgressOptions;
+  };
+}
 
 const hopeProgressClass = "hope-progress";
 
@@ -58,14 +83,14 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
   const theme = useComponentStyleConfigs().Progress;
 
   const defaultProps: ProgressProps<"div"> = {
-    min: theme?.defaultProps?.min ?? 0,
-    max: theme?.defaultProps?.max ?? 100,
-    size: theme?.defaultProps?.size ?? "md",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    striped: theme?.defaultProps?.striped ?? false,
-    animated: theme?.defaultProps?.animated ?? false,
-
-    borderRadius: theme?.baseStyle?.borderRadius as ResponsiveValue<RadiiProps["borderRadius"]>,
+    color: theme?.defaultProps?.root?.color ?? "$primary9",
+    trackColor: theme?.defaultProps?.root?.trackColor ?? "$neutral4",
+    min: theme?.defaultProps?.root?.min ?? 0,
+    max: theme?.defaultProps?.root?.max ?? 100,
+    size: theme?.defaultProps?.root?.size ?? "md",
+    striped: theme?.defaultProps?.root?.striped ?? false,
+    animated: theme?.defaultProps?.root?.animated ?? false,
+    borderRadius: theme?.defaultProps?.root?.borderRadius ?? "$none",
   };
 
   const propsWithDefaults: ProgressProps<"div"> = mergeProps(defaultProps, props);
@@ -78,7 +103,8 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
     "aria-label",
     "aria-labelledby",
     "size",
-    "colorScheme",
+    "color",
+    "trackColor",
     "striped",
     "animated",
     "indeterminate",
@@ -88,21 +114,27 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
   const classes = () => classNames(local.class, hopeProgressClass, progressTrackStyles({ size: local.size }));
 
   return (
-    <Box class={classes()} __baseStyle={theme?.baseStyle} borderRadius={local.borderRadius} {...others}>
-      <ProgressFilledTrack
+    <Box
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.track}
+      bg={local.trackColor}
+      borderRadius={local.borderRadius}
+      {...others}
+    >
+      <ProgressIndicator
         aria-label={local["aria-label"]}
         aria-labelledby={local["aria-labelledby"]}
         min={local.min ?? 0}
         max={local.max ?? 100}
         value={local.value}
-        colorScheme={local.colorScheme}
+        color={local.color}
         striped={local.striped}
         animated={local.animated}
         indeterminate={local.indeterminate}
         borderRadius={local.borderRadius}
       >
         {local.children}
-      </ProgressFilledTrack>
+      </ProgressIndicator>
     </Box>
   );
 }

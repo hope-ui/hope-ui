@@ -8,6 +8,7 @@ export * from "./breadcrumb";
 export * from "./button";
 export * from "./center";
 export * from "./checkbox";
+export * from "./circular-progress";
 export * from "./close-button";
 export * from "./container";
 export * from "./divider";

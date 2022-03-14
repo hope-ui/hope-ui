@@ -1,7 +1,8 @@
 import { Property } from "csstype";
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { ColorScaleValue, SizeScaleValue } from "@/styled-system/types";
+import { BorderProps } from "@/styled-system/props/border";
+import { ColorProps } from "@/styled-system/props/color";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -12,14 +13,14 @@ import { spinnerStyles, SpinnerVariants } from "./spinner.styles";
 
 interface SpinnerOptions extends SpinnerVariants {
   /**
-   * The color of the empty area in the spinner
-   */
-  emptyColor?: Property.Color | ColorScaleValue;
-
-  /**
    * The color of the spinner
    */
-  color?: Property.Color | ColorScaleValue;
+  color?: ColorProps["color"];
+
+  /**
+   * The color of the empty area in the spinner
+   */
+  emptyColor?: ColorProps["color"];
 
   /**
    * The thickness of the spinner
@@ -28,7 +29,7 @@ interface SpinnerOptions extends SpinnerVariants {
    * <Spinner thickness="4px"/>
    * ```
    */
-  thickness?: Property.BorderWidth<SizeScaleValue>;
+  thickness?: BorderProps["borderWidth"];
 
   /**
    * The speed of the spinner.

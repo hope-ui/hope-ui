@@ -1,4 +1,4 @@
-import { mergeProps, splitProps } from "solid-js";
+import { createMemo, mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
@@ -29,14 +29,14 @@ const styled: HopeFactory = <T extends ElementType>(component: T, styleOptions?:
       usedStylePropNames
     );
 
-    const __baseStyles = () => {
+    const __baseStyles = createMemo(() => {
       const factoryBaseStyle = isFunction(styleOptions?.baseStyle)
         ? styleOptions?.baseStyle(props as any)
         : styleOptions?.baseStyle;
 
-      // order is import for css override
+      // order is important for css override
       return [factoryBaseStyle, local.__baseStyle];
-    };
+    });
 
     const classes = () => {
       return classNames(

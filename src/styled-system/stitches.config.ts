@@ -21,6 +21,7 @@ export const {
     borderRightWidth: "sizes",
     borderBottomWidth: "sizes",
     borderLeftWidth: "sizes",
+    strokeWidth: "sizes",
   },
   theme: baseThemeTokens,
   media: baseMedia,

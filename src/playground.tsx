@@ -15,13 +15,11 @@ import {
   Progress,
   ProgressLabel,
   UnorderedList,
+  CircularProgress,
+  CircularProgressLabel,
   useColorMode,
   VStack,
 } from ".";
-import { IconCheck } from "./components/icons/IconCheck";
-import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
-import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
-import { IconCrossCircle } from "./components/icons/IconCrossCircle";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -32,66 +30,16 @@ export function App() {
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
       </HStack>
       <VStack alignItems="stretch" spacing="$4">
-        <Progress value={80} />
-        <Progress striped value={64} />
-        <Progress striped animated value={64} />
-        <Progress colorScheme="success" size="sm" value={20} />
-        <Progress colorScheme="success" size="md" value={20} />
-        <Progress colorScheme="success" size="lg" value={20} />
-        <Progress colorScheme="success" height="32px" value={20} />
-        <Progress value={20} size="xs" colorScheme="primary" />
-        <Progress value={20} size="xs" colorScheme="neutral" />
-        <Progress value={20} size="xs" colorScheme="success" />
-        <Progress value={20} size="xs" colorScheme="info" />
-        <Progress value={20} size="xs" colorScheme="warning" />
-        <Progress value={20} size="xs" colorScheme="danger" />
-        <Progress size="xs" indeterminate />
-        <Progress size="xs" value={50}>
-          <ProgressLabel>80%</ProgressLabel>
-        </Progress>
-        <Progress size="sm" value={50}>
-          <ProgressLabel>80%</ProgressLabel>
-        </Progress>
-        <Progress size="md" value={50}>
-          <ProgressLabel>80%</ProgressLabel>
-        </Progress>
-        <Progress size="lg" value={50}>
-          <ProgressLabel>80%</ProgressLabel>
-        </Progress>
-        <Progress h="40px" value={50}>
-          <ProgressLabel fontSize="40px">80%</ProgressLabel>
-        </Progress>
-        <UnorderedList>
-          <ListItem>Lorem ipsum dolor sit amet</ListItem>
-          <ListItem>Consectetur adipiscing elit</ListItem>
-          <ListItem>Integer molestie lorem at massa</ListItem>
-          <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-        </UnorderedList>
-        <OrderedList>
-          <ListItem>Lorem ipsum dolor sit amet</ListItem>
-          <ListItem>Consectetur adipiscing elit</ListItem>
-          <ListItem>Integer molestie lorem at massa</ListItem>
-          <ListItem>Facilisis in pretium nisl aliquet</ListItem>
-        </OrderedList>
-        <List spacing="$3">
-          <ListItem>
-            <ListIcon as={IconCheckCircleSolid} color="$success9" />
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit
-          </ListItem>
-          <ListItem>
-            <ListIcon as={IconCheckCircleSolid} color="$success9" />
-            Assumenda, quia temporibus eveniet a libero incidunt suscipit
-          </ListItem>
-          <ListItem>
-            <ListIcon as={IconCheckCircleSolid} color="$success9" />
-            Quidem, ipsam illum quis sed voluptatum quae eum fugit earum
-          </ListItem>
-          {/* You can also use custom icons from react-icons */}
-          <ListItem>
-            <ListIcon as={IconCrossCircle} color="$danger9" />
-            Quidem, ipsam illum quis sed voluptatum quae eum fugit earum
-          </ListItem>
-        </List>
+        <Progress value={80} color="$success9" trackColor="$success3" borderRadius="$full" />
+        <CircularProgress color="tomato" value={80} />
+        <CircularProgress value={30} size="120px" />
+        <CircularProgress value={59} size="100px" thickness="4px" />
+        <CircularProgress value={30} color="$warning9" thickness="12px" />
+        <CircularProgress value={40} color="$success9">
+          <CircularProgressLabel>40%</CircularProgressLabel>
+        </CircularProgress>
+        <CircularProgress indeterminate color="$success9" />
+        <CircularProgress value={0} color="$success9"></CircularProgress>
       </VStack>
     </Box>
   );
