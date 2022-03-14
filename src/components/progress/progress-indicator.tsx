@@ -1,6 +1,7 @@
 import { createMemo, splitProps } from "solid-js";
 
 import { ColorProps } from "@/styled-system/props/color";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -26,6 +27,8 @@ const hopeProgressIndicatorClass = "hope-progress__indicator";
  * It applies `background-color` and changes its width.
  */
 export function ProgressIndicator<C extends ElementType = "div">(props: ProgressIndicatorProps<C>) {
+  const theme = useComponentStyleConfigs().Progress;
+
   const [local, others] = splitProps(props, [
     "class",
     "min",
@@ -73,7 +76,9 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
     );
   };
 
-  return <Box class={classes()} width={width()} {...progressProps} {...others} />;
+  return (
+    <Box class={classes()} __baseStyle={theme?.baseStyle?.indicator} width={width()} {...progressProps} {...others} />
+  );
 }
 
 ProgressIndicator.toString = () => createClassSelector(hopeProgressIndicatorClass);

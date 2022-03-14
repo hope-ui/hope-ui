@@ -7,6 +7,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
 import { CircleProgressIndicatorVariants, circularProgressIndicatorStyles } from "./circular-progress.styles";
+import { useComponentStyleConfigs } from "@/theme/provider";
 
 interface CircularProgressIndicatorOptions extends CircleProgressIndicatorVariants {
   /**
@@ -30,14 +31,16 @@ const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
  * The progress component that visually indicates the current level of the circular progress bar.
  */
 export function CircularProgressIndicator(props: CircularProgressIndicatorProps) {
-  const [local, others] = splitProps(props, ["class", "stroke", "strokeWidth", "roundedCap", "spin"]);
+  const theme = useComponentStyleConfigs().CircularProgress;
+
+  const [local, others] = splitProps(props, ["class", "stroke", "strokeWidth", "withRoundCap", "spin"]);
 
   const classes = () => {
     return classNames(
       local.class,
       hopeCircularProgressIndicatorClass,
       circularProgressIndicatorStyles({
-        roundedCap: local.roundedCap,
+        withRoundCap: local.withRoundCap,
         spin: local.spin === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
         css: {
           stroke: local.stroke,
@@ -47,7 +50,17 @@ export function CircularProgressIndicator(props: CircularProgressIndicatorProps)
     );
   };
 
-  return <hope.circle class={classes()} cx={50} cy={50} r={42} fill="transparent" {...others} />;
+  return (
+    <hope.circle
+      class={classes()}
+      cx={50}
+      cy={50}
+      r={42}
+      fill="transparent"
+      __baseStyle={theme?.baseStyle?.indicator}
+      {...others}
+    />
+  );
 }
 
 CircularProgressIndicator.toString = () => createClassSelector(hopeCircularProgressIndicatorClass);

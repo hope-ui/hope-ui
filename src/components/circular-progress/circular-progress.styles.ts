@@ -62,7 +62,7 @@ export const circularProgressTrackStyles = css({});
 
 export const circularProgressIndicatorStyles = css({
   variants: {
-    roundedCap: {
+    withRoundCap: {
       true: { strokeLinecap: "round" },
     },
     spin: {

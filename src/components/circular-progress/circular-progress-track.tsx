@@ -2,6 +2,7 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ColorScaleValue, SizeScaleValue } from "@/styled-system";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
@@ -25,6 +26,8 @@ type CircularProgressTrackProps = HTMLHopeProps<"circle", CircularProgressTrackO
 const hopeCircularProgressTrackClass = "hope-circular-progress__track";
 
 export function CircularProgressTrack(props: CircularProgressTrackProps) {
+  const theme = useComponentStyleConfigs().CircularProgress;
+
   const [local, others] = splitProps(props, ["class", "stroke", "strokeWidth"]);
 
   const classes = () =>
@@ -39,7 +42,17 @@ export function CircularProgressTrack(props: CircularProgressTrackProps) {
       })
     );
 
-  return <hope.circle class={classes()} cx={50} cy={50} r={42} fill="transparent" {...others} />;
+  return (
+    <hope.circle
+      class={classes()}
+      cx={50}
+      cy={50}
+      r={42}
+      fill="transparent"
+      __baseStyle={theme?.baseStyle?.track}
+      {...others}
+    />
+  );
 }
 
 CircularProgressTrack.toString = () => createClassSelector(hopeCircularProgressTrackClass);

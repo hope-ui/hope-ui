@@ -1,7 +1,7 @@
 import { Property } from "csstype";
 import { createMemo, JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { SizeScaleValue } from "@/styled-system";
+import { SizeScaleValue, SystemStyleObject } from "@/styled-system";
 import { ColorProps } from "@/styled-system/props/color";
 import { SizeProps } from "@/styled-system/props/size";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -10,7 +10,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
 import { getProgressProps } from "../progress/progress.utils";
-import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { circularProgressStyles, circularProgressSvgStyles } from "./circular-progress.styles";
 import { CircularProgressIndicator } from "./circular-progress-indicator";
 import { CircularProgressTrack } from "./circular-progress-track";
@@ -39,7 +39,7 @@ interface ThemeableCircularProgressOptions {
   /**
    * If `true`, the cap of the progress indicator will be rounded.
    */
-  roundedCap?: boolean;
+  withRoundCap?: boolean;
 
   /**
    * Minimum value defining 'no progress' (must be lower than 'max')
@@ -81,7 +81,17 @@ interface CircularProgressOptions extends ThemeableCircularProgressOptions {
 
 export type CircularProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, CircularProgressOptions>;
 
-export type CircularProgressStyleConfig = SinglePartComponentStyleConfig<ThemeableCircularProgressOptions>;
+export interface CircularProgressStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    track?: SystemStyleObject;
+    indicator?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableCircularProgressOptions;
+  };
+}
 
 const hopeCircularProgressClass = "hope-circular-progress";
 
@@ -98,12 +108,12 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
   const theme = useComponentStyleConfigs().CircularProgress;
 
   const defaultProps: CircularProgressProps<"div"> = {
-    size: theme?.defaultProps?.size ?? "$12",
-    min: theme?.defaultProps?.min ?? 0,
-    max: theme?.defaultProps?.max ?? 100,
-    thickness: theme?.defaultProps?.thickness ?? "$2_5",
-    color: theme?.defaultProps?.color ?? "$primary9",
-    trackColor: theme?.defaultProps?.trackColor ?? "$neutral4",
+    size: theme?.defaultProps?.root?.size ?? "$12",
+    min: theme?.defaultProps?.root?.min ?? 0,
+    max: theme?.defaultProps?.root?.max ?? 100,
+    thickness: theme?.defaultProps?.root?.thickness ?? "$2_5",
+    color: theme?.defaultProps?.root?.color ?? "$primary9",
+    trackColor: theme?.defaultProps?.root?.trackColor ?? "$neutral4",
   };
 
   const propsWithDefaults: CircularProgressProps<"div"> = mergeProps(defaultProps, props);
@@ -114,7 +124,7 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     "trackColor",
     "size",
     "thickness",
-    "roundedCap",
+    "withRoundCap",
     "value",
     "min",
     "max",
@@ -153,13 +163,13 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
   const svgClasses = () => circularProgressSvgStyles({ spin: local.indeterminate });
 
   return (
-    <Box class={classes()} {...progressProps} {...others}>
+    <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...progressProps} {...others}>
       <hope.svg viewBox="0 0 100 100" class={svgClasses()} boxSize={local.size}>
         <CircularProgressTrack stroke={local.trackColor} strokeWidth={local.thickness} />
         <Show when={isIndicatorVisible()}>
           <CircularProgressIndicator
             spin={local.indeterminate}
-            roundedCap={local.roundedCap}
+            withRoundCap={local.withRoundCap}
             stroke={local.color}
             strokeWidth={local.thickness}
             stroke-dasharray={strokeDasharray()}
