@@ -3,7 +3,7 @@ import { mergeProps, Show, splitProps } from "solid-js";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useFormControlContext } from "./form-control";
 import { formLabelStyles, requiredIndicatorStyles } from "./form-control.styles";
@@ -22,7 +22,6 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
   const formControl = useFormControlContext();
 
   const defaultProps: FormLabelProps<"label"> = {
-    as: "label",
     withRequiredIndicator: theme?.defaultProps?.label?.withRequiredIndicator ?? true,
   };
 
@@ -41,20 +40,16 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
 
   const classes = () => classNames(local.class, hopeFormLabelClass, formLabelStyles());
 
-  const formControlDataAttrs = () => ({
-    "data-focus": formControl?.state.isFocused ? "" : undefined,
-    "data-disabled": formControl?.state.disabled ? "" : undefined,
-    "data-invalid": formControl?.state.invalid ? "" : undefined,
-    "data-readonly": formControl?.state.readOnly ? "" : undefined,
-  });
-
   return (
-    <Box
+    <hope.label
       id={id()}
       for={htmlFor()}
       class={classes()}
       __baseStyle={theme?.baseStyle?.label}
-      {...formControlDataAttrs}
+      data-focus={formControl?.state["data-focus"]}
+      data-disabled={formControl?.state["data-disabled"]}
+      data-invalid={formControl?.state["data-invalid"]}
+      data-readonly={formControl?.state["data-readonly"]}
       {...others}
     >
       {local.children}
@@ -63,7 +58,7 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
           *
         </span>
       </Show>
-    </Box>
+    </hope.label>
   );
 }
 

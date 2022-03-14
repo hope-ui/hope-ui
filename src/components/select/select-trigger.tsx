@@ -64,7 +64,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       onBlur={selectContext.onButtonBlur}
       onClick={selectContext.onButtonClick}
       onKeyDown={selectContext.onButtonKeyDown}
-      {...selectContext.formControlProps()}
+      {...selectContext.formControlProps}
       {...others}
     />
   );

@@ -23,11 +23,6 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
 
   const classes = () => classNames(local.class, hopeFormErrorMessageClass, formErrorMessageStyles());
 
-  const formControlDataAttrs = () => ({
-    "data-disabled": formControl?.state.disabled ? "" : undefined,
-    "data-readonly": formControl?.state.readOnly ? "" : undefined,
-  });
-
   onMount(() => formControl?.setHasErrorMessage(true));
   onCleanup(() => formControl?.setHasErrorMessage(false));
 
@@ -38,7 +33,8 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
         id={id()}
         class={classes()}
         __baseStyle={theme?.baseStyle?.errorMessage}
-        {...formControlDataAttrs}
+        data-disabled={formControl?.state["data-disabled"]}
+        data-readonly={formControl?.state["data-readonly"]}
         {...others}
       />
     </Show>

@@ -1,30 +1,31 @@
 import "./playground.css";
 
+import { createSignal, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
   Button,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
   HopeProvider,
   HopeThemeConfig,
   HStack,
-  List,
-  ListIcon,
-  ListItem,
-  OrderedList,
-  Progress,
-  ProgressLabel,
-  UnorderedList,
-  CircularProgress,
-  CircularProgressLabel,
+  Input,
   useColorMode,
   VStack,
-  Breadcrumb,
-  BreadcrumbLink,
 } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [value, setValue] = createSignal("");
+
+  const handleInput = (e: any) => setValue(e.target.value);
+
+  const isInvalid = () => value() === "";
 
   return (
     <Box p="$4">
@@ -32,32 +33,16 @@ export function App() {
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
       </HStack>
       <VStack alignItems="stretch" spacing="$4">
-        <Progress value={80} color="$success9" trackColor="$success3" borderRadius="$full" />
-        <CircularProgress color="tomato" value={80} />
-        <CircularProgress value={30} size="120px" />
-        <CircularProgress value={59} size="100px" thickness="4px" />
-        <CircularProgress value={30} color="$warning9" thickness="12px" />
-        <CircularProgress value={40} color="$success9">
-          <CircularProgressLabel>40%</CircularProgressLabel>
-        </CircularProgress>
-        <CircularProgress indeterminate color="$success9" />
-        <CircularProgress value={0} color="$success9"></CircularProgress>
-        <Breadcrumb>
-          <BreadcrumbLink href="#">Home</BreadcrumbLink>
-          <BreadcrumbLink href="#">Docs</BreadcrumbLink>
-          <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
-        </Breadcrumb>
-        <Breadcrumb fontWeight="$medium" fontSize="$sm" spacing="$4">
-          <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
-            Home
-          </BreadcrumbLink>
-          <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
-            About
-          </BreadcrumbLink>
-          <BreadcrumbLink currentPage _hover={{ color: "$success9" }}>
-            Current
-          </BreadcrumbLink>
-        </Breadcrumb>
+        <FormControl invalid={isInvalid()}>
+          <FormLabel for="email">Email address</FormLabel>
+          <Input id="email" type="email" value={value()} onInput={handleInput} />
+          <Show
+            when={isInvalid()}
+            fallback={<FormHelperText>Enter the email you'd like to receive the newsletter on.</FormHelperText>}
+          >
+            <FormErrorMessage>Email is required.</FormErrorMessage>
+          </Show>
+        </FormControl>
       </VStack>
     </Box>
   );
