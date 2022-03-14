@@ -9,6 +9,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { ProgressIndicatorVariants, progressTrackStyles, ProgressTrackVariants } from "./progress.styles";
+import { GetProgressPropsOptions } from "./progress.utils";
 import { ProgressIndicator } from "./progress-indicator";
 
 /* -------------------------------------------------------------------------------------------------
@@ -42,7 +43,9 @@ interface ThemeableProgressOptions extends ProgressTrackVariants, Omit<ProgressI
   max?: number;
 }
 
-interface ProgressOptions extends ThemeableProgressOptions {
+interface ProgressOptions
+  extends ThemeableProgressOptions,
+    Pick<GetProgressPropsOptions, "valueText" | "getValueText"> {
   /**
    * The `value` of the progress indicator.
    * If `undefined` the progress bar will be in `indeterminate` state.
@@ -98,6 +101,8 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
     "class",
     "children",
     "value",
+    "valueText",
+    "getValueText",
     "min",
     "max",
     "aria-label",
@@ -127,6 +132,8 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
         min={local.min ?? 0}
         max={local.max ?? 100}
         value={local.value}
+        valueText={local.valueText}
+        getValueText={local.getValueText}
         color={local.color}
         striped={local.striped}
         animated={local.animated}

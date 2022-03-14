@@ -34,6 +34,8 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
     "min",
     "max",
     "value",
+    "valueText",
+    "getValueText",
     "color",
     "striped",
     "animated",
@@ -45,6 +47,8 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
       value: local.value,
       min: local.min,
       max: local.max,
+      valueText: local.valueText,
+      getValueText: local.getValueText,
       indeterminate: local.indeterminate,
     });
   });
