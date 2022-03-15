@@ -174,13 +174,13 @@ export const checkboxControlStyles = css({
     },
     size: {
       sm: {
-        boxSize: "$3",
-      },
-      md: {
         boxSize: "$4",
       },
-      lg: {
+      md: {
         boxSize: "$5",
+      },
+      lg: {
+        boxSize: "$6",
       },
     },
   },
@@ -194,7 +194,7 @@ export type CheckboxControlVariants = VariantProps<typeof checkboxControlStyles>
 
 function createSizeAndLabelPositionCompoundVariants() {
   return Object.entries({
-    sm: "$1_5",
+    sm: "$2",
     md: "$2",
     lg: "$2",
   }).flatMap(([key, value]) => [

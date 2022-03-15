@@ -263,7 +263,7 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
-  background: "$neutral1",
+  background: "$neutral1", // For app, modal, drawer backgrounds
   surface: "$neutral3",
   closeButtonHoverBackground: "$whiteAlpha4",
   closeButtonActiveBackground: "$whiteAlpha5",

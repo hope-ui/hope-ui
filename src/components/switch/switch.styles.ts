@@ -241,7 +241,7 @@ export type SwitchControlVariants = VariantProps<typeof switchControlStyles>;
 
 function createSizeAndLabelPositionCompoundVariants() {
   return Object.entries({
-    sm: "$1_5",
+    sm: "$2",
     md: "$2",
     lg: "$2",
   }).flatMap(([key, value]) => [
