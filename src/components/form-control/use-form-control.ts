@@ -29,7 +29,6 @@ export interface UseFormControlReturn<T extends HTMLElement> {
   id?: string;
   required?: boolean;
   disabled?: boolean;
-  invalid?: boolean;
   readOnly?: boolean;
   "aria-invalid"?: boolean;
   "aria-required"?: boolean;

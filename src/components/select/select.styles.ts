@@ -136,7 +136,7 @@ export const selectListboxStyles = css({
   overflowY: "auto",
 
   margin: 0,
-  padding: 0,
+  padding: "$1", //0,
 
   listStyle: "none",
 });
@@ -170,6 +170,8 @@ export const selectLabelStyles = css({
 export const selectOptionStyles = css({
   position: "relative",
 
+  borderRadius: "$sm",
+
   color: "$neutral12",
   fontSize: "$base",
   fontWeight: "$normal",
@@ -184,12 +186,15 @@ export const selectOptionStyles = css({
   },
 
   [`&[data-active]`]: {
-    backgroundColor: "$primary3",
-    color: "$primary11",
+    // backgroundColor: "$primary3",
+    // color: "$primary11",
+    backgroundColor: "$neutral3",
   },
 
   "&[aria-selected=true]": {
     fontWeight: "$medium",
+    backgroundColor: "$primary3",
+    color: "$primary11",
   },
 });
 

@@ -1,8 +1,9 @@
-import { splitProps } from "solid-js";
+import { JSX, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
+import { callAllHandlers } from "@/utils/function";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -48,10 +49,16 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
     }
   };
 
+  const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
+    const allHanders = callAllHandlers(selectContext.onButtonBlur, selectContext.formControlProps.onBlur);
+    allHanders(event);
+  };
+
   return (
     <hope.button
       ref={assignButtonRef}
       id={selectContext.state.buttonId}
+      disabled={selectContext.state.disabled}
       type="button"
       role="combobox"
       tabindex="0"
@@ -59,12 +66,16 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       aria-activedescendant={activeDescendantId()}
       aria-controls={selectContext.state.listboxId}
       aria-expanded={selectContext.state.opened}
+      aria-required={selectContext.formControlProps["aria-required"]}
+      aria-invalid={selectContext.formControlProps["aria-invalid"]}
+      aria-readonly={selectContext.formControlProps["aria-readonly"]}
+      aria-describedby={selectContext.formControlProps["aria-describedby"]}
       class={classes()}
       __baseStyle={theme?.baseStyle?.trigger}
-      onBlur={selectContext.onButtonBlur}
+      onFocus={selectContext.formControlProps.onFocus}
+      onBlur={onBlur}
       onClick={selectContext.onButtonClick}
       onKeyDown={selectContext.onButtonKeyDown}
-      {...selectContext.formControlProps}
       {...others}
     />
   );

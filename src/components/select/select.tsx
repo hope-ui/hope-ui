@@ -310,10 +310,10 @@ export function Select<T = any>(props: SelectProps<T>) {
       return `${defaultBaseId}-option`;
     },
     get invalid() {
-      return props.invalid;
+      return props.invalid ?? formControlProps["aria-invalid"] === true;
     },
     get disabled() {
-      return props.disabled;
+      return props.disabled ?? formControlProps.disabled;
     },
     get variant() {
       return props.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
