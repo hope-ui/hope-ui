@@ -102,6 +102,12 @@ export const baseModalContainerStyles = css({
   "@supports(height: -webkit-fill-available)": {
     height: "-webkit-fill-available",
   },
+
+  outline: "none",
+
+  "&:focus": {
+    outline: "none",
+  },
 });
 
 export const modalContainerStyles = css(baseModalContainerStyles, {
@@ -142,25 +148,21 @@ export const baseDialogStyles = css({
 
   width: "100%",
 
-  outline: 0,
-
+  outline: "none",
   boxShadow: "$lg",
-
   backgroundColor: "$surface",
 
   color: "inherit",
+
+  "&:focus": {
+    outline: "none",
+  },
 });
 
 export const modalDialogStyles = css(baseDialogStyles, {
   justifyContent: "center",
   my: "3.75rem",
   borderRadius: "$sm",
-
-  outline: "none",
-
-  "&:focus": {
-    outline: "none",
-  },
 
   variants: {
     size: {

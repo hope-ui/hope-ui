@@ -7,6 +7,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { createModal } from "./create-modal";
+import { useModalContext } from "./modal";
 import { modalContainerStyles, modalDialogStyles, modalTransitionName } from "./modal.styles";
 
 export type ModalContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
@@ -19,6 +20,8 @@ const hopeModalContentClass = "hope-modal__content";
  */
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
   const theme = useComponentStyleConfigs().Modal;
+
+  const modalContext = useModalContext();
 
   const defaultProps: ModalContentProps<"section"> = {
     as: "section",
@@ -34,15 +37,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
     "onClick",
   ]);
 
-  const {
-    modalContext,
-    assignContainerRef,
-    ariaLabelledBy,
-    ariaDescribedBy,
-    onDialogClick,
-    enableFocusTrapAndScrollLock,
-    disableFocusTrapAndScrollLock,
-  } = createModal(local);
+  const { assignContainerRef, ariaLabelledBy, ariaDescribedBy, onDialogClick } = createModal(local);
 
   const containerClasses = () => {
     const containerClass = modalContainerStyles({
@@ -74,13 +69,7 @@ export function ModalContent<C extends ElementType = "section">(props: ModalCont
   };
 
   return (
-    <Transition
-      name={transitionName()}
-      appear
-      onAfterEnter={enableFocusTrapAndScrollLock}
-      onBeforeExit={disableFocusTrapAndScrollLock}
-      onAfterExit={modalContext.onModalContentExitTransitionEnd}
-    >
+    <Transition name={transitionName()} appear onAfterExit={modalContext.unmountPortal}>
       <Show when={modalContext.state.opened}>
         <Box
           ref={assignContainerRef}

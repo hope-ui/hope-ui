@@ -36,7 +36,7 @@ export interface FormControlOptions {
 
   /**
    * If `true`, the form control will be invalid. This has 2 side effects:
-   * - The `FormLabel` and `FormErrorIcon` will have `data-invalid` set to `true`
+   * - The `FormLabel` and `FormErrorMessage` will have `data-invalid` set to `true`
    * - The form element (e.g, Input) will have `aria-invalid` set to `true`
    */
   invalid?: boolean;
@@ -62,6 +62,11 @@ export interface FormControlState extends FormControlOptions {
    * The custom `id` passed to the form error message (e.g, FormErrorMessage).
    */
   errorMessageId: string;
+
+  "data-focus"?: string;
+  "data-disabled"?: string;
+  "data-invalid"?: string;
+  "data-readonly"?: string;
 
   /**
    * Track whether the `FormHelperText` has been rendered.
@@ -151,6 +156,18 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
     },
     get readOnly() {
       return props.readOnly;
+    },
+    get ["data-focus"]() {
+      return this.isFocused ? "" : undefined;
+    },
+    get ["data-disabled"]() {
+      return this.disabled ? "" : undefined;
+    },
+    get ["data-invalid"]() {
+      return this.invalid ? "" : undefined;
+    },
+    get ["data-readonly"]() {
+      return this.readOnly ? "" : undefined;
     },
     hasHelperText: false,
     hasErrorMessage: false,

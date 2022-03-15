@@ -4,7 +4,7 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
 import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
@@ -77,8 +77,7 @@ export function Input(props: InputProps) {
     );
 
   return (
-    <Box
-      as="input"
+    <hope.input
       class={classes()}
       size={local.htmlSize}
       __baseStyle={theme?.baseStyle?.input}

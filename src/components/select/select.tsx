@@ -1,5 +1,5 @@
 import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
-import { Accessor, createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system";
@@ -176,7 +176,7 @@ interface SelectContextValue<T = any> {
   /**
    * Props that should be spread on the select trigger to support embedding in `FormControl`.
    */
-  formControlProps: Accessor<UseFormControlReturn<HTMLButtonElement>>;
+  formControlProps: UseFormControlReturn<HTMLButtonElement>;
 
   /**
    * Check if the option is the selected one by comparing its value with the selected value.
@@ -298,7 +298,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       return (this.isControlled ? props.value : this.valueState) as T | undefined;
     },
     get buttonId() {
-      return props.id ?? formControlProps().id ?? `${defaultBaseId}-button`;
+      return props.id ?? formControlProps.id ?? `${defaultBaseId}-button`;
     },
     get listboxId() {
       return `${defaultBaseId}-listbox`;
@@ -428,7 +428,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onButtonClick = function () {
-    if (formControlProps().readOnly) {
+    if (formControlProps.readOnly) {
       return;
     }
 
@@ -436,7 +436,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onButtonKeyDown = function (event: KeyboardEvent) {
-    if (formControlProps().readOnly) {
+    if (formControlProps.readOnly) {
       return;
     }
 
@@ -481,7 +481,7 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onButtonType = function (letter: string) {
-    if (formControlProps().readOnly) {
+    if (formControlProps.readOnly) {
       return;
     }
 

@@ -7,27 +7,24 @@ import {
   enablePageScroll,
   removeScrollableSelector,
 } from "scroll-lock";
-import { JSX } from "solid-js";
+import { JSX, onCleanup, onMount } from "solid-js";
 
 import { callAllHandlers } from "@/utils/function";
 
-import { ModalContextValue, useModalContext } from "./modal";
+import { useModalContext } from "./modal";
 import { ModalContentProps } from "./modal-content";
 
-export type CreateModalProps = Pick<ModalContentProps, "onClick" | "aria-labelledby" | "aria-describedby">;
+export type CreateModalProps = Pick<ModalContentProps, "onClick">;
 
 interface CreateModalReturn {
-  modalContext: ModalContextValue;
   assignContainerRef: (el: HTMLDivElement) => void;
   ariaLabelledBy: () => string | undefined;
   ariaDescribedBy: () => string | undefined;
   onDialogClick: JSX.EventHandler<HTMLElement, MouseEvent>;
-  enableFocusTrapAndScrollLock: () => void;
-  disableFocusTrapAndScrollLock: () => void;
 }
 
 /**
- * Modal hook that manages all the logic for the modal dialog widget
+ * Modal hook that manages all the logic for the modal dialog widget.
  */
 export function createModal(props: CreateModalProps): CreateModalReturn {
   const modalContext = useModalContext();
@@ -40,11 +37,11 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
   };
 
   const ariaLabelledBy = () => {
-    return modalContext.state.headerMounted ? modalContext.state.headerId : props["aria-labelledby"];
+    return modalContext.state.headerMounted ? modalContext.state.headerId : undefined;
   };
 
   const ariaDescribedBy = () => {
-    return modalContext.state.bodyMounted ? modalContext.state.bodyId : props["aria-describedby"];
+    return modalContext.state.bodyMounted ? modalContext.state.bodyId : undefined;
   };
 
   const onDialogClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
@@ -52,7 +49,8 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
     allHandlers(event);
   };
 
-  const childOfDialogSelector = `[id='${modalContext.state.dialogId}'] *`;
+  const dialogSelector = () => `[id='${modalContext.state.dialogId}']`;
+  const childOfDialogSelector = () => `${dialogSelector()} *`;
 
   const enableFocusTrapAndScrollLock = () => {
     if (!containerRef) {
@@ -62,7 +60,7 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
     if (modalContext.state.trapFocus) {
       focusTrap = createFocusTrap(containerRef, {
         initialFocus: modalContext.state.initialFocus,
-        fallbackFocus: `[id='${modalContext.state.dialogId}']`,
+        fallbackFocus: dialogSelector(),
         allowOutsideClick: false,
       });
 
@@ -70,8 +68,9 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
     }
 
     if (modalContext.state.blockScrollOnMount) {
-      addScrollableSelector(childOfDialogSelector);
+      addScrollableSelector(childOfDialogSelector());
       disablePageScroll(containerRef);
+
       // disableBodyScroll(containerRef, {
       //   allowTouchMove: el => {
       //     if (!containerRef || containerRef === el) {
@@ -87,20 +86,26 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
 
   const disableFocusTrapAndScrollLock = () => {
     focusTrap?.deactivate();
-    removeScrollableSelector(childOfDialogSelector);
+
+    removeScrollableSelector(childOfDialogSelector());
     clearQueueScrollLocks();
     enablePageScroll();
 
     //clearAllBodyScrollLocks();
   };
 
+  onMount(() => {
+    enableFocusTrapAndScrollLock();
+  });
+
+  onCleanup(() => {
+    disableFocusTrapAndScrollLock();
+  });
+
   return {
-    modalContext,
     assignContainerRef,
     ariaLabelledBy,
     ariaDescribedBy,
     onDialogClick,
-    enableFocusTrapAndScrollLock,
-    disableFocusTrapAndScrollLock,
   };
 }

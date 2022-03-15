@@ -1,4 +1,5 @@
-import { Accessor, JSX } from "solid-js";
+import { JSX } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { callAllHandlers } from "@/utils/function";
 
@@ -49,39 +50,87 @@ export interface UseFormControlReturn<T extends HTMLElement> {
  */
 export function useFormControl<T extends HTMLElement>(
   props: UseFormControlProps<T>
-): Accessor<UseFormControlReturn<T>> {
+  // ): Accessor<UseFormControlReturn<T>> {
+): UseFormControlReturn<T> {
   const formControl = useFormControlContext();
 
-  const id = () => props.id ?? formControl?.state.id;
-  const required = () => props.required ?? formControl?.state.required;
-  const disabled = () => props.disabled ?? formControl?.state.disabled;
-  const invalid = () => props.invalid ?? formControl?.state.invalid;
-  const readOnly = () => props.readOnly ?? formControl?.state.readOnly;
-  const ariaDescribedBy = () => {
-    const labelIds: string[] = props["aria-describedby"] ? [props["aria-describedby"]] : [];
+  const [state] = createStore<UseFormControlReturn<T>>({
+    get id() {
+      return props.id ?? formControl?.state.id;
+    },
+    get required() {
+      return props.required ?? formControl?.state.required;
+    },
+    get disabled() {
+      return props.disabled ?? formControl?.state.disabled;
+    },
+    get readOnly() {
+      return props.readOnly ?? formControl?.state.readOnly;
+    },
+    get ["aria-required"]() {
+      return this.required ? true : undefined;
+    },
+    get ["aria-invalid"]() {
+      const invalid = props.invalid ?? formControl?.state.invalid;
+      return invalid ? true : undefined;
+    },
+    get ["aria-readonly"]() {
+      return this.readOnly ? true : undefined;
+    },
+    get ["aria-describedby"]() {
+      const labelIds: string[] = props["aria-describedby"] ? [props["aria-describedby"]] : [];
 
-    // Error message must be described first in all scenarios.
-    if (formControl?.state.hasErrorMessage && formControl?.state.invalid) {
-      labelIds.push(formControl.state.errorMessageId);
-    }
+      // Error message must be described first in all scenarios.
+      if (formControl?.state.hasErrorMessage && formControl?.state.invalid) {
+        labelIds.push(formControl.state.errorMessageId);
+      }
 
-    if (formControl?.state.hasHelperText) {
-      labelIds.push(formControl.state.helperTextId);
-    }
+      if (formControl?.state.hasHelperText) {
+        labelIds.push(formControl.state.helperTextId);
+      }
 
-    return labelIds.join(" ") || undefined;
-  };
-
-  return () => ({
-    id: id(),
-    required: required(),
-    disabled: disabled(),
-    readOnly: readOnly(),
-    "aria-invalid": invalid() ? true : undefined,
-    "aria-required": required() ? true : undefined,
-    "aria-readonly": readOnly() ? true : undefined,
-    "aria-describedby": ariaDescribedBy(),
-    onFocus: callAllHandlers(formControl?.onFocus, props.onFocus),
-    onBlur: callAllHandlers(formControl?.onBlur, props.onBlur),
+      return labelIds.join(" ") || undefined;
+    },
+    get onFocus() {
+      return callAllHandlers(formControl?.onFocus, props.onFocus);
+    },
+    get onBlur() {
+      return callAllHandlers(formControl?.onBlur, props.onBlur);
+    },
   });
+
+  return state as UseFormControlReturn<T>;
+
+  // const id = () => props.id ?? formControl?.state.id;
+  // const required = () => props.required ?? formControl?.state.required;
+  // const disabled = () => props.disabled ?? formControl?.state.disabled;
+  // const invalid = () => props.invalid ?? formControl?.state.invalid;
+  // const readOnly = () => props.readOnly ?? formControl?.state.readOnly;
+  // const ariaDescribedBy = () => {
+  //   const labelIds: string[] = props["aria-describedby"] ? [props["aria-describedby"]] : [];
+
+  //   // Error message must be described first in all scenarios.
+  //   if (formControl?.state.hasErrorMessage && formControl?.state.invalid) {
+  //     labelIds.push(formControl.state.errorMessageId);
+  //   }
+
+  //   if (formControl?.state.hasHelperText) {
+  //     labelIds.push(formControl.state.helperTextId);
+  //   }
+
+  //   return labelIds.join(" ") || undefined;
+  // };
+
+  // return () => ({
+  //   id: id(),
+  //   required: required(),
+  //   disabled: disabled(),
+  //   readOnly: readOnly(),
+  //   "aria-required": required() ? true : undefined,
+  //   "aria-invalid": invalid() ? true : undefined,
+  //   "aria-readonly": readOnly() ? true : undefined,
+  //   "aria-describedby": ariaDescribedBy(),
+  //   onFocus: callAllHandlers(formControl?.onFocus, props.onFocus),
+  //   onBlur: callAllHandlers(formControl?.onBlur, props.onBlur),
+  // });
 }

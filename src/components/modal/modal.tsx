@@ -153,9 +153,9 @@ export interface ModalContextValue {
   onKeyDown: (event: KeyboardEvent) => void;
 
   /**
-   * Callback invoked to notify that modal's content exit transition is done.
+   * Callback function to unmount the modal's portal.
    */
-  onModalContentExitTransitionEnd: () => void;
+  unmountPortal: () => void;
 
   /**
    * Callback function to set if the modal header is mounted
@@ -273,7 +273,7 @@ export function Modal(props: ModalProps) {
   });
 
   // For smooth transition, unmount portal only after modal's content exit transition is done.
-  const onModalContentExitTransitionEnd = () => setIsPortalMounted(false);
+  const unmountPortal = () => setIsPortalMounted(false);
 
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
@@ -318,7 +318,7 @@ export function Modal(props: ModalProps) {
 
   const context: ModalContextValue = {
     state,
-    onModalContentExitTransitionEnd,
+    unmountPortal,
     onClose,
     onMouseDown,
     onKeyDown,

@@ -23,16 +23,18 @@ export function FormHelperText<C extends ElementType = "div">(props: FormHelperT
 
   const classes = () => classNames(local.class, hopeFormHelperTextClass, formHelperTextStyles());
 
-  const formControlDataAttrs = () => ({
-    "data-disabled": formControl?.state.disabled ? "" : undefined,
-    "data-readonly": formControl?.state.readOnly ? "" : undefined,
-  });
-
   onMount(() => formControl?.setHasHelperText(true));
   onCleanup(() => formControl?.setHasHelperText(false));
 
   return (
-    <Box id={id()} class={classes()} __baseStyle={theme?.baseStyle?.helperText} {...formControlDataAttrs} {...others} />
+    <Box
+      id={id()}
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.helperText}
+      data-disabled={formControl?.state["data-disabled"]}
+      data-readonly={formControl?.state["data-readonly"]}
+      {...others}
+    />
   );
 }
 

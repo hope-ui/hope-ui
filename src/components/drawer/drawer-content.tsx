@@ -5,6 +5,7 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { useModalContext } from "../modal";
 import { createModal } from "../modal/create-modal";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useDrawerContext } from "./drawer";
@@ -22,6 +23,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
   const theme = useComponentStyleConfigs().Drawer;
 
   const drawerContext = useDrawerContext();
+  const modalContext = useModalContext();
 
   const defaultProps: DrawerContentProps<"section"> = {
     as: "section",
@@ -37,15 +39,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
     "onClick",
   ]);
 
-  const {
-    modalContext,
-    assignContainerRef,
-    ariaLabelledBy,
-    ariaDescribedBy,
-    onDialogClick,
-    enableFocusTrapAndScrollLock,
-    disableFocusTrapAndScrollLock,
-  } = createModal(local);
+  const { assignContainerRef, ariaLabelledBy, ariaDescribedBy, onDialogClick } = createModal(local);
 
   const containerClasses = () => {
     return classNames(
@@ -84,13 +78,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
   };
 
   return (
-    <Transition
-      name={transitionName()}
-      appear
-      onAfterEnter={enableFocusTrapAndScrollLock}
-      onBeforeExit={disableFocusTrapAndScrollLock}
-      onAfterExit={modalContext.onModalContentExitTransitionEnd}
-    >
+    <Transition name={transitionName()} appear onAfterExit={modalContext.unmountPortal}>
       <Show when={modalContext.state.opened}>
         <Box
           ref={assignContainerRef}

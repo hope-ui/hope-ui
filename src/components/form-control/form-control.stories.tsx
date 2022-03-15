@@ -3,12 +3,23 @@ import { For, Show } from "solid-js";
 import { HopeWrapper } from "@/utils/storybook";
 
 import { Input } from "../input/input";
+import {
+  Select,
+  SelectContent,
+  SelectIcon,
+  SelectListbox,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPlaceholder,
+  SelectTrigger,
+  SelectValue,
+} from "../select";
 import { Textarea } from "../textarea/textarea";
 import { FormControl } from "./form-control";
 import { FormErrorMessage } from "./form-error-message";
 import { FormHelperText } from "./form-helper-text";
 import { FormLabel } from "./form-label";
-import { Select } from "../select/select";
 
 export default {
   title: "Data entry/FormControl",
@@ -69,23 +80,23 @@ export const WithSelect = (args: any) => (
   <FormControl {...args}>
     <FormLabel>Framework</FormLabel>
     <Select>
-      <Select.Trigger maxW="300px">
-        <Select.Placeholder>Choose a framework</Select.Placeholder>
-        <Select.Value />
-        <Select.Icon />
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Listbox>
+      <SelectTrigger maxW="300px">
+        <SelectPlaceholder>Choose a framework</SelectPlaceholder>
+        <SelectValue />
+        <SelectIcon />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectListbox>
           <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
             {item => (
-              <Select.Option value={item}>
-                <Select.OptionText>{item}</Select.OptionText>
-                <Select.OptionIndicator />
-              </Select.Option>
+              <SelectOption value={item}>
+                <SelectOptionText>{item}</SelectOptionText>
+                <SelectOptionIndicator />
+              </SelectOption>
             )}
           </For>
-        </Select.Listbox>
-      </Select.Content>
+        </SelectListbox>
+      </SelectContent>
     </Select>
     <Show when={args.invalid} fallback={<FormHelperText>Choose SolidJS.</FormHelperText>}>
       <FormErrorMessage>An error occured</FormErrorMessage>
