@@ -174,13 +174,13 @@ export const checkboxControlStyles = css({
     },
     size: {
       sm: {
-        boxSize: "$4",
+        boxSize: "$3",
       },
       md: {
-        boxSize: "$5",
+        boxSize: "$4",
       },
       lg: {
-        boxSize: "$6",
+        boxSize: "$5",
       },
     },
   },
