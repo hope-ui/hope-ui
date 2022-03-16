@@ -35,13 +35,13 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme `background` color for background-color.
-    2. Use theme `neutral` color for text. 
+    1. Use theme `loContrast` color for background-color.
+    2. Use theme `hiContrast` color for text. 
     3. Improve text rendering. 
   */
   body: {
-    backgroundColor: "$background" /* 1 */,
-    color: "$neutral12" /* 2 */,
+    backgroundColor: "$loContrast" /* 1 */,
+    color: "$hiContrast" /* 2 */,
     fontFamily: "inherit",
     lineHeight: "inherit",
     "-webkit-font-smoothing": "antialiased",

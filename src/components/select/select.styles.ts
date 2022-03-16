@@ -122,10 +122,10 @@ export const selectContentStyles = css({
 
   margin: 0,
 
-  boxShadow: "$lg",
+  boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$surface",
+  backgroundColor: "$panel",
 
   padding: 0,
 });

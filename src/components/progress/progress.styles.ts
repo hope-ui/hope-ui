@@ -112,7 +112,7 @@ export const progressLabelStyles = css({
 
   width: "100%",
 
-  color: "$background",
+  color: "$loContrast",
   lineHeight: "$none",
   fontWeight: "$bold",
   textAlign: "center",
