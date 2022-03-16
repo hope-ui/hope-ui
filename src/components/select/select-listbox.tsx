@@ -1,5 +1,6 @@
 import { splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -7,7 +8,6 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectListboxStyles } from "./select.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type SelectListboxProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 

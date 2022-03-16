@@ -82,7 +82,7 @@ export const modalOverlayStyles = css({
   width: "100vw",
   height: "100vh",
 
-  backgroundColor: "$blackAlpha11",
+  backgroundColor: "hsl(0 0% 0% / 65%)", //"$blackAlpha11",
 });
 
 /* -------------------------------------------------------------------------------------------------

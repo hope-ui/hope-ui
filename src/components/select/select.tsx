@@ -60,6 +60,11 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
   defaultTextValue?: string;
 
   /**
+   * The placeholder of the select trigger.
+   */
+  placeholder?: string;
+
+  /**
    * If `true`, the select will be required.
    */
   required?: boolean;
@@ -102,7 +107,7 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
 }
 
 type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey">> &
-  Pick<SelectProps<T>, "value" | "invalid" | "disabled"> & {
+  Pick<SelectProps<T>, "value" | "placeholder" | "invalid" | "disabled"> & {
     /**
      * The value of the select.
      * (in uncontrolled mode)
@@ -113,6 +118,11 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
      * The value to display in `Select.Value` when no `children` is provided.
      */
     textValue?: string;
+
+    /**
+     * The id of the current `aria-activedescendent` element.
+     */
+    activeDescendantId?: string;
 
     /**
      * If `true`, the select is in controlled mode.
@@ -266,8 +276,6 @@ export interface SelectStyleConfig {
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
     option?: SystemStyleObject;
-    optionText?: SystemStyleObject;
-    optionIndicator?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableSelectOptions;
@@ -276,6 +284,9 @@ export interface SelectStyleConfig {
 
 const SelectContext = createContext<SelectContextValue>();
 
+/**
+ * The wrapper component that provides context for all its children.
+ */
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
@@ -310,10 +321,10 @@ export function Select<T = any>(props: SelectProps<T>) {
       return `${defaultBaseId}-option`;
     },
     get invalid() {
-      return props.invalid;
+      return props.invalid ?? formControlProps["aria-invalid"] === true;
     },
     get disabled() {
-      return props.disabled;
+      return props.disabled ?? formControlProps.disabled;
     },
     get variant() {
       return props.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
@@ -323,6 +334,12 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get compareKey() {
       return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
+    },
+    get placeholder() {
+      return props.placeholder;
+    },
+    get activeDescendantId() {
+      return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;
     },
     options: [],
     opened: false,

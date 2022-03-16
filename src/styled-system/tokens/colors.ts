@@ -145,11 +145,11 @@ const danger = {
 
 const semanticColors = {
   background: "white",
-  surface: "white",
+  panel: "white",
+  focusRing: "#96c7f2",
   closeButtonHoverBackground: "$blackAlpha4",
   closeButtonActiveBackground: "$blackAlpha5",
   progressStripe: "$whiteAlpha6",
-  focusRing: "#96c7f2",
 };
 
 export const lightColors = {
@@ -263,12 +263,12 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
-  background: "$neutral1", // For app, modal, drawer backgrounds
-  surface: "$neutral3",
+  background: "$neutral1",
+  panel: "$neutral3",
+  focusRing: "#0a4481",
   closeButtonHoverBackground: "$whiteAlpha4",
   closeButtonActiveBackground: "$whiteAlpha5",
   progressStripe: "$blackAlpha6",
-  focusRing: "#0a4481",
 };
 
 export const darkColors: typeof lightColors = {

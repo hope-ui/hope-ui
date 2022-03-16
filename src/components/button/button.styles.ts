@@ -232,26 +232,6 @@ export const buttonStyles = css({
 
   variants: {
     variant: {
-      default: {
-        border: "1px solid $neutral7",
-        backgroundColor: "$surface",
-        color: "$neutral12",
-
-        "&:not(:disabled):hover": {
-          borderColor: "$neutral8",
-          backgroundColor: "$neutral4",
-        },
-
-        "&:not(:disabled):active": {
-          borderColor: "$neutral8",
-          backgroundColor: "$neutral5",
-        },
-
-        "&:disabled": {
-          borderColor: "$neutral3",
-          backgroundColor: "$neutral3",
-        },
-      },
       solid: {
         border: "1px solid transparent",
 

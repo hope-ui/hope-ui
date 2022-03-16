@@ -92,14 +92,21 @@ export const selectPlaceholderStyles = css(selectValueStyles, {
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectIconStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexGrow: 0,
   flexShrink: 0,
+
+  marginInlineStart: "auto",
+
+  color: "$neutral10",
   fontSize: "1.2em",
   pointerEvents: "none",
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - content
+ * Select - content (the floating panel)
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectContentStyles = css({
@@ -115,10 +122,10 @@ export const selectContentStyles = css({
 
   margin: 0,
 
-  boxShadow: "$lg",
+  boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$surface",
+  backgroundColor: "$panel",
 
   padding: 0,
 });
@@ -136,7 +143,7 @@ export const selectListboxStyles = css({
   overflowY: "auto",
 
   margin: 0,
-  padding: 0,
+  padding: "$1", //0,
 
   listStyle: "none",
 });
@@ -152,15 +159,15 @@ export const selectOptGroupStyles = css({});
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectLabelStyles = css({
-  mt: "$5",
-  mb: "$1",
-  paddingInlineStart: "$4",
-  paddingInlineEnd: "$10",
+  display: "flex",
+  alignItems: "center",
+
+  py: "$2",
+  px: "$3",
 
   color: "$neutral11",
-  fontSize: "$sm",
-  fontWeight: "$medium",
-  lineHeight: "$5",
+  fontSize: "$xs",
+  lineHeight: "$4",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -169,6 +176,14 @@ export const selectLabelStyles = css({
 
 export const selectOptionStyles = css({
   position: "relative",
+
+  display: "flex",
+  alignItems: "center",
+
+  borderRadius: "$sm",
+
+  py: "$2",
+  px: "$3",
 
   color: "$neutral12",
   fontSize: "$base",
@@ -184,42 +199,12 @@ export const selectOptionStyles = css({
   },
 
   [`&[data-active]`]: {
-    backgroundColor: "$primary3",
-    color: "$primary11",
+    backgroundColor: "$neutral4",
   },
 
   "&[aria-selected=true]": {
     fontWeight: "$medium",
+    backgroundColor: "$primary3",
+    color: "$primary11",
   },
-});
-
-/* -------------------------------------------------------------------------------------------------
- * Select - option text
- * -----------------------------------------------------------------------------------------------*/
-
-export const selectOptionTextStyles = css({
-  display: "inline-flex",
-  alignItems: "center",
-
-  py: "$2",
-  paddingInlineStart: "$4",
-  paddingInlineEnd: "$10",
-});
-
-/* -------------------------------------------------------------------------------------------------
- * Select - option indicator
- * -----------------------------------------------------------------------------------------------*/
-
-export const selectOptionIndicatorStyles = css({
-  position: "absolute",
-  top: 0,
-  bottom: 0,
-  right: 0,
-
-  display: "flex",
-  alignItems: "center",
-
-  paddingInlineEnd: "$4",
-
-  color: "$primary11",
 });

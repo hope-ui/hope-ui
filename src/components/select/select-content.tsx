@@ -16,7 +16,7 @@ export type SelectContentProps<C extends ElementType = "div"> = HTMLHopeProps<C>
 const hopeSelectContentClass = "hope-select__content";
 
 /**
- * The scrolling viewport that contains all of the options.
+ * The component that pops out when the select is open.
  */
 export function SelectContent<C extends ElementType = "div">(props: SelectContentProps<C>) {
   const theme = useComponentStyleConfigs().Select;
