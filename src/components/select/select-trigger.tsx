@@ -1,4 +1,4 @@
-import { JSX, splitProps } from "solid-js";
+import { JSX, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -9,6 +9,7 @@ import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectTriggerStyles } from "./select.styles";
+import { SelectPlaceholder } from "./select-placeholder";
 
 export type SelectTriggerProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
 
@@ -19,7 +20,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class", "children"]);
 
   const classes = () => {
     return classNames(
@@ -30,12 +31,6 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
         size: selectContext.state.size,
       })
     );
-  };
-
-  const activeDescendantId = () => {
-    return selectContext.state.opened
-      ? `${selectContext.state.optionIdPrefix}-${selectContext.state.activeIndex}`
-      : undefined;
   };
 
   const assignButtonRef = (el: HTMLButtonElement) => {
@@ -63,7 +58,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       role="combobox"
       tabindex="0"
       aria-haspopup="listbox"
-      aria-activedescendant={activeDescendantId()}
+      aria-activedescendant={selectContext.state.activeDescendantId}
       aria-controls={selectContext.state.listboxId}
       aria-expanded={selectContext.state.opened}
       aria-required={selectContext.formControlProps["aria-required"]}
@@ -77,7 +72,12 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       onClick={selectContext.onButtonClick}
       onKeyDown={selectContext.onButtonKeyDown}
       {...others}
-    />
+    >
+      <Show when={selectContext.state.isPlaceholderVisible}>
+        <SelectPlaceholder>{selectContext.state.placeholder}</SelectPlaceholder>
+      </Show>
+      {local.children}
+    </hope.button>
   );
 }
 

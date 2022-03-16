@@ -14,13 +14,11 @@ import {
   SelectIcon,
   SelectListbox,
   SelectOption,
-  SelectOptionIndicator,
-  SelectOptionText,
-  SelectPlaceholder,
   SelectTrigger,
   SelectValue,
   useColorMode,
 } from ".";
+import { SelectOptGroup } from "./components";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -32,20 +30,16 @@ export function App() {
       </HStack>
       <Select>
         <SelectTrigger maxW="300px">
-          <SelectPlaceholder>Choose a framework</SelectPlaceholder>
           <SelectValue />
           <SelectIcon />
         </SelectTrigger>
         <SelectContent>
           <SelectListbox>
-            <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
-              {item => (
-                <SelectOption value={item}>
-                  <SelectOptionText>{item}</SelectOptionText>
-                  <SelectOptionIndicator />
-                </SelectOption>
-              )}
-            </For>
+            <SelectOptGroup label="Frameworks">
+              <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+                {item => <SelectOption value={item}>{item}</SelectOption>}
+              </For>
+            </SelectOptGroup>
           </SelectListbox>
         </SelectContent>
       </Select>

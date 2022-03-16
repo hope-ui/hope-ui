@@ -60,6 +60,11 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
   defaultTextValue?: string;
 
   /**
+   * The placeholder of the select trigger.
+   */
+  placeholder?: string;
+
+  /**
    * If `true`, the select will be required.
    */
   required?: boolean;
@@ -102,7 +107,7 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
 }
 
 type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey">> &
-  Pick<SelectProps<T>, "value" | "invalid" | "disabled"> & {
+  Pick<SelectProps<T>, "value" | "placeholder" | "invalid" | "disabled"> & {
     /**
      * The value of the select.
      * (in uncontrolled mode)
@@ -115,9 +120,19 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     textValue?: string;
 
     /**
+     * The id of the current `aria-activedescendent` element.
+     */
+    activeDescendantId?: string;
+
+    /**
      * If `true`, the select is in controlled mode.
      */
     isControlled: boolean;
+
+    /**
+     * If `true`, the placeholder will be visible in the `SelectTrigger`.
+     */
+    isPlaceholderVisible: boolean;
 
     /**
      * The `id` of the `SelectTrigger`.
@@ -266,8 +281,6 @@ export interface SelectStyleConfig {
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
     option?: SystemStyleObject;
-    optionText?: SystemStyleObject;
-    optionIndicator?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableSelectOptions;
@@ -323,6 +336,15 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get compareKey() {
       return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
+    },
+    get placeholder() {
+      return props.placeholder;
+    },
+    get isPlaceholderVisible() {
+      return !!this.placeholder && this.value == null;
+    },
+    get activeDescendantId() {
+      return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;
     },
     options: [],
     opened: false,
