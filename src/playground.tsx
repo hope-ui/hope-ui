@@ -11,11 +11,9 @@ import {
   HStack,
   Select,
   SelectContent,
-  SelectIcon,
   SelectListbox,
   SelectOption,
   SelectTrigger,
-  SelectValue,
   useColorMode,
 } from ".";
 import { SelectOptGroup } from "./components";
@@ -28,18 +26,13 @@ export function App() {
       <HStack spacing="$4" mb="$4">
         <Button onClick={toggleColorMode}>Toggle color mode</Button>
       </HStack>
-      <Select>
-        <SelectTrigger maxW="300px">
-          <SelectValue />
-          <SelectIcon />
-        </SelectTrigger>
+      <Select placeholder="Choose wisely">
+        <SelectTrigger maxW="300px" />
         <SelectContent>
           <SelectListbox>
-            <SelectOptGroup label="Frameworks">
-              <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
-                {item => <SelectOption value={item}>{item}</SelectOption>}
-              </For>
-            </SelectOptGroup>
+            <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+              {item => <SelectOption value={item}>{item}</SelectOption>}
+            </For>
           </SelectListbox>
         </SelectContent>
       </Select>

@@ -92,11 +92,15 @@ export const selectPlaceholderStyles = css(selectValueStyles, {
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectIconStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexGrow: 0,
   flexShrink: 0,
 
   marginInlineStart: "auto",
 
+  color: "$neutral10",
   fontSize: "1.2em",
   pointerEvents: "none",
 });
@@ -195,7 +199,7 @@ export const selectOptionStyles = css({
   },
 
   [`&[data-active]`]: {
-    backgroundColor: "$neutral3",
+    backgroundColor: "$neutral4",
   },
 
   "&[aria-selected=true]": {

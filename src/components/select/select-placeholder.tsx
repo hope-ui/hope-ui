@@ -7,7 +7,7 @@ import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectPlaceholderStyles } from "./select.styles";
 
-const hopeSelectPlaceholderClass = "hope-select__trigger__placeholder";
+const hopeSelectPlaceholderClass = "hope-select__placeholder";
 
 export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 

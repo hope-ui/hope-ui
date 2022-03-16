@@ -130,11 +130,6 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     isControlled: boolean;
 
     /**
-     * If `true`, the placeholder will be visible in the `SelectTrigger`.
-     */
-    isPlaceholderVisible: boolean;
-
-    /**
      * The `id` of the `SelectTrigger`.
      */
     buttonId: string;
@@ -339,9 +334,6 @@ export function Select<T = any>(props: SelectProps<T>) {
     },
     get placeholder() {
       return props.placeholder;
-    },
-    get isPlaceholderVisible() {
-      return !!this.placeholder && this.value == null;
     },
     get activeDescendantId() {
       return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;

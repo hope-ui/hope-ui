@@ -118,6 +118,18 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
     selectContext.onOptionMouseMove(index());
   };
 
+  const resolvedChildren = children(() => {
+    if (isFunction(local.children)) {
+      return local.children({
+        active: isActiveDescendant(),
+        selected: isSelected(),
+        disabled: !!local.disabled,
+      });
+    }
+
+    return local.children;
+  });
+
   onMount(() => {
     const optionIndex = selectContext.registerOption({
       value: local.value,
@@ -132,18 +144,6 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
     if (isActiveDescendant() && optionRef) {
       selectContext.scrollToOption(optionRef);
     }
-  });
-
-  const resolvedChildren = children(() => {
-    if (isFunction(local.children)) {
-      return local.children({
-        active: isActiveDescendant(),
-        selected: isSelected(),
-        disabled: !!local.disabled,
-      });
-    }
-
-    return local.children;
   });
 
   return (
