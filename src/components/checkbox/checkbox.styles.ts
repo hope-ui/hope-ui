@@ -102,7 +102,7 @@ export const checkboxControlStyles = css({
   transition: "border-color 250ms, box-shadow 250ms",
 
   "& svg": {
-    color: "$loContrast",
+    color: "$background",
   },
 
   "&[data-disabled]": {
