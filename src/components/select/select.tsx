@@ -284,6 +284,9 @@ export interface SelectStyleConfig {
 
 const SelectContext = createContext<SelectContextValue>();
 
+/**
+ * The wrapper component that provides context for all its children.
+ */
 export function Select<T = any>(props: SelectProps<T>) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 

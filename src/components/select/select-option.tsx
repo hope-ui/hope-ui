@@ -54,6 +54,9 @@ export type SelectOptionProps<C extends ElementType = "div", T = any> = HTMLHope
 
 const hopeSelectOptionClass = "hope-select__option";
 
+/**
+ * The component that contains a select option.
+ */
 export function SelectOption<C extends ElementType = "div", T = any>(props: SelectOptionProps<C, T>) {
   const theme = useComponentStyleConfigs().Select;
 

@@ -33,6 +33,9 @@ export type SelectTriggerProps<C extends ElementType = "button"> = HTMLHopeProps
 
 const hopeSelectTriggerClass = "hope-select__trigger";
 
+/**
+ * The trigger that toggles the select.
+ */
 export function SelectTrigger<C extends ElementType = "button">(props: SelectTriggerProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 

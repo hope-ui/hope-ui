@@ -11,6 +11,9 @@ const hopeSelectPlaceholderClass = "hope-select__placeholder";
 
 export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
+/**
+ * Component used to display a placeholder when no option is selected.
+ */
 export function SelectPlaceholder<C extends ElementType = "span">(props: SelectPlaceholderProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
