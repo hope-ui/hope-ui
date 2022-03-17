@@ -203,8 +203,11 @@ export const selectOptionStyles = css({
   },
 
   "&[aria-selected=true]": {
-    fontWeight: "$medium",
     backgroundColor: "$primary3",
     color: "$primary11",
+  },
+
+  [`&[data-active][aria-selected=true]`]: {
+    backgroundColor: "$primary4",
   },
 });

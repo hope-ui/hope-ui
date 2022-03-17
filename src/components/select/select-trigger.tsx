@@ -14,7 +14,7 @@ import { SelectPlaceholder } from "./select-placeholder";
 import { SelectValue } from "./select-value";
 
 interface SelectTriggerRenderProps {
-  value?: unknown;
+  value?: any;
 }
 
 interface SelectTriggerOptions {
@@ -65,8 +65,6 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
     }
   };
 
-  const hasValueSelected = () => selectContext.state.value != null;
-
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
     const allHanders = callAllHandlers(selectContext.onButtonBlur, selectContext.formControlProps.onBlur);
     allHanders(event);
@@ -74,9 +72,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
 
   const resolvedChildren = children(() => {
     if (isFunction(local.children)) {
-      return local.children({
-        value: selectContext.state.value,
-      });
+      return local.children({ value: selectContext.state.value });
     }
 
     return local.children;
@@ -106,15 +102,10 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       onKeyDown={selectContext.onButtonKeyDown}
       {...others}
     >
-      <Show
-        when={hasValueSelected()}
-        fallback={<SelectPlaceholder>{selectContext.state.placeholder}</SelectPlaceholder>}
-      >
-        <SelectValue>
-          <Show when={resolvedChildren()} fallback={selectContext.state.textValue}>
-            {resolvedChildren()}
-          </Show>
-        </SelectValue>
+      <Show when={selectContext.state.hasSelectedOptions} fallback={<SelectPlaceholder />}>
+        <Show when={resolvedChildren()} fallback={<SelectValue />}>
+          {resolvedChildren()}
+        </Show>
       </Show>
       <SelectIcon>{local.icon}</SelectIcon>
     </hope.button>

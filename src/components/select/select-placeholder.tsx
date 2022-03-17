@@ -5,6 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
+import { useSelectContext } from "./select";
 import { selectPlaceholderStyles } from "./select.styles";
 
 const hopeSelectPlaceholderClass = "hope-select__placeholder";
@@ -17,11 +18,17 @@ export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopePro
 export function SelectPlaceholder<C extends ElementType = "span">(props: SelectPlaceholderProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
-  const [local, others] = splitProps(props, ["class"]);
+  const selectContext = useSelectContext();
+
+  const [local, others] = splitProps(props, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectPlaceholderClass, selectPlaceholderStyles());
 
-  return <hope.span class={classes()} __baseStyle={theme?.baseStyle?.placeholder} {...others} />;
+  return (
+    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.placeholder} {...others}>
+      {selectContext.state.placeholder}
+    </hope.span>
+  );
 }
 
 SelectPlaceholder.toString = () => createClassSelector(hopeSelectPlaceholderClass);

@@ -1,4 +1,4 @@
-import { children, createEffect, createSignal, JSX, onMount, splitProps } from "solid-js";
+import { Accessor, children, createEffect, createSignal, JSX, onMount, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -8,6 +8,7 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
+import { SelectOptionData } from "./select.utils";
 
 interface SelectOptionRenderProps {
   /**
@@ -26,11 +27,11 @@ interface SelectOptionRenderProps {
   disabled: boolean;
 }
 
-interface SelectOptionOptions<T> {
+interface SelectOptionOptions {
   /**
    * The value of the option.
    */
-  value: T;
+  value: any;
 
   /**
    * Optional text used for typeahead purposes.
@@ -50,14 +51,14 @@ interface SelectOptionOptions<T> {
   children?: JSX.Element | ((props: SelectOptionRenderProps) => JSX.Element);
 }
 
-export type SelectOptionProps<C extends ElementType = "div", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
+export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptionOptions>;
 
 const hopeSelectOptionClass = "hope-select__option";
 
 /**
  * The component that contains a select option.
  */
-export function SelectOption<C extends ElementType = "div", T = any>(props: SelectOptionProps<C, T>) {
+export function SelectOption<C extends ElementType = "div">(props: SelectOptionProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
   const selectContext = useSelectContext();
@@ -75,8 +76,14 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
     "disabled",
   ]);
 
+  const optionData: Accessor<SelectOptionData> = () => ({
+    value: local.value,
+    textValue: local.textValue ?? optionRef?.textContent ?? String(local.value),
+    disabled: !!local.disabled,
+  });
+
   const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
-  const isSelected = () => selectContext.isOptionSelected(local.value);
+  const isSelected = () => selectContext.isOptionSelected(optionData());
   const isActiveDescendant = () => selectContext.isOptionActiveDescendant(index());
 
   const classes = () => {
@@ -134,13 +141,7 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
   });
 
   onMount(() => {
-    const optionIndex = selectContext.registerOption({
-      value: local.value,
-      textValue: local.textValue ?? optionRef?.textContent ?? local.value,
-      disabled: !!local.disabled,
-    });
-
-    setIndex(optionIndex);
+    setIndex(selectContext.registerOption(optionData()));
   });
 
   createEffect(() => {
