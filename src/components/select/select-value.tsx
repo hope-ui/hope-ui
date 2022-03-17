@@ -28,11 +28,11 @@ export function SelectValue<C extends ElementType = "span">(props: SelectValuePr
 
   const classes = () => classNames(local.class, hopeSelectValueClass, selectValueStyles());
 
-  const unselectOption = (event: MouseEvent, option: SelectOptionData) => {
+  const onTagCloseButtonClick = (event: MouseEvent, option: SelectOptionData) => {
     event.preventDefault();
     event.stopPropagation();
 
-    selectContext.onSelectTagCloseButtonClick(option);
+    selectContext.unselectOption(option);
   };
 
   return (
@@ -44,12 +44,12 @@ export function SelectValue<C extends ElementType = "span">(props: SelectValuePr
         </hope.span>
       }
     >
-      <HStack wrap="wrap" spacing="$1" py="$1" mt="-4px" class={classes()} {...others}>
+      <HStack wrap="wrap" spacing="$2" py="$1_5" mt="-6px" class={classes()} {...others}>
         <For each={selectContext.state.selectedOptions}>
           {option => (
-            <Tag colorScheme="neutral" size="sm" mt="4px">
+            <Tag variant="subtle" colorScheme="neutral" size="md" rounded="$sm" mt="6px">
               <TagLabel>{option.textValue}</TagLabel>
-              <TagCloseButton onClick={(e: MouseEvent) => unselectOption(e, option)} />
+              <TagCloseButton me="-4px" onClick={(e: MouseEvent) => onTagCloseButtonClick(e, option)} />
             </Tag>
           )}
         </For>

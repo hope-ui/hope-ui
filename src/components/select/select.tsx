@@ -228,9 +228,9 @@ interface SelectContextValue {
   registerOption: (optionData: SelectOptionData) => number;
 
   /**
-   * Callback invoked when the user unselect an option by clicking on the `CloseButton` of a `SelectTag`.
+   * Callback to remove an option from the selected options.
    */
-  onSelectTagCloseButtonClick: (optionData: SelectOptionData) => void;
+  unselectOption: (optionData: SelectOptionData) => void;
 
   /**
    * Callback invoked when the user click outside the `SelectContent`.
@@ -515,8 +515,7 @@ export function Select(props: SelectProps) {
     props.onChange?.(getSelectedValue());
   };
 
-  const onSelectTagCloseButtonClick = (selectedOption: SelectOptionData) => {
-    setState("ignoreBlur", true);
+  const unselectOption = (selectedOption: SelectOptionData) => {
     removeFromSelectedOptions(selectedOption);
 
     props.onChange?.(getSelectedValue());
@@ -528,7 +527,16 @@ export function Select(props: SelectProps) {
     return state.options[index].disabled;
   };
 
+  const isInsideTrigger = (element: HTMLElement) => {
+    return !!buttonRef && buttonRef.contains(element);
+  };
+
   const onButtonBlur = (event: FocusEvent) => {
+    // if the blur was provoked by an element inside the trigger, ignore it
+    if (event.relatedTarget && isInsideTrigger(event.relatedTarget as HTMLElement)) {
+      return;
+    }
+
     // do not do blur action if ignoreBlur flag has been set
     if (state.ignoreBlur) {
       setState("ignoreBlur", false);
@@ -554,8 +562,13 @@ export function Select(props: SelectProps) {
     }
 
     const { key } = event;
-    const max = state.options.length - 1;
 
+    if (state.multiple && key === "Backspace") {
+      unselectOption(state.selectedOptions[state.selectedOptions.length - 1]);
+      return;
+    }
+
+    const max = state.options.length - 1;
     const action = getActionFromKey(event, state.opened);
 
     switch (action) {
@@ -686,8 +699,8 @@ export function Select(props: SelectProps) {
   };
 
   const onContentOutsideClick = (target: HTMLElement) => {
-    // clicking on the button is not considered an "outside click"
-    if (buttonRef && buttonRef.contains(target)) {
+    // clicking inside the trigger is not considered an "outside click"
+    if (isInsideTrigger(target)) {
       return;
     }
 
@@ -745,7 +758,7 @@ export function Select(props: SelectProps) {
   const context: SelectContextValue = {
     state: state as SelectState,
     isOptionSelected,
-    onSelectTagCloseButtonClick,
+    unselectOption,
     isOptionActiveDescendant,
     formControlProps,
     assignButtonRef,
