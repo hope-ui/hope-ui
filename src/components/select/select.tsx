@@ -563,7 +563,8 @@ export function Select(props: SelectProps) {
 
     const { key } = event;
 
-    if (state.multiple && key === "Backspace") {
+    // In multi-select, backspace unselect the last option
+    if (state.hasSelectedOptions && state.multiple && key === "Backspace") {
       unselectOption(state.selectedOptions[state.selectedOptions.length - 1]);
       return;
     }
