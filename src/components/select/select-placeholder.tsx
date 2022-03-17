@@ -1,4 +1,4 @@
-import { splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -20,14 +20,14 @@ export function SelectPlaceholder<C extends ElementType = "span">(props: SelectP
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props, ["class", "children"]);
+  const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => classNames(local.class, hopeSelectPlaceholderClass, selectPlaceholderStyles());
 
   return (
-    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.placeholder} {...others}>
-      {selectContext.state.placeholder}
-    </hope.span>
+    <Show when={!selectContext.state.hasSelectedOptions}>
+      <hope.span class={classes()} __baseStyle={theme?.baseStyle?.placeholder} {...others} />
+    </Show>
   );
 }
 

@@ -64,11 +64,6 @@ export interface SelectProps extends ThemeableSelectOptions {
   defaultValue?: Value;
 
   /**
-   * The placeholder of the select trigger.
-   */
-  placeholder?: string;
-
-  /**
    * If `true`, the select will be required.
    */
   required?: boolean;
@@ -111,7 +106,7 @@ export interface SelectProps extends ThemeableSelectOptions {
 }
 
 type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">> &
-  Pick<SelectProps, "multiple" | "value" | "placeholder" | "invalid" | "disabled"> & {
+  Pick<SelectProps, "multiple" | "value" | "invalid" | "disabled"> & {
     /**
      * If `true`, the select has options selected.
      */
@@ -277,13 +272,16 @@ export interface SelectStyleConfig {
   baseStyle?: {
     trigger?: SystemStyleObject;
     placeholder?: SystemStyleObject;
-    value?: SystemStyleObject;
+    singleValue?: SystemStyleObject;
+    multiValue?: SystemStyleObject;
     icon?: SystemStyleObject;
     content?: SystemStyleObject;
     listbox?: SystemStyleObject;
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
     option?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
+    optionText?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableSelectOptions;
@@ -349,9 +347,6 @@ export function Select(props: SelectProps) {
     },
     get compareKey() {
       return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
-    },
-    get placeholder() {
-      return props.placeholder;
     },
     get activeDescendantId() {
       return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;
@@ -548,7 +543,7 @@ export function Select(props: SelectProps) {
     }
   };
 
-  const onButtonClick = (event: MouseEvent) => {
+  const onButtonClick = () => {
     if (formControlProps.readOnly) {
       return;
     }

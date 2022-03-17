@@ -64,10 +64,10 @@ export const selectTriggerStyles = css(baseInputResetStyles, {
 export type SelectTriggerVariants = VariantProps<typeof selectTriggerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger value
+ * Select - trigger single value
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectValueStyles = css({
+export const selectSingleValueStyles = css({
   display: "block",
   flexGrow: 1,
   flexShrink: 1,
@@ -79,10 +79,26 @@ export const selectValueStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
+ * Select - trigger multi value
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectMultiValueStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  flexWrap: "wrap",
+  flexGrow: 1,
+  flexShrink: 1,
+  gap: "$1_5",
+
+  py: "$1_5",
+});
+
+/* -------------------------------------------------------------------------------------------------
  * Select - trigger placeholder
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectPlaceholderStyles = css(selectValueStyles, {
+export const selectPlaceholderStyles = css(selectSingleValueStyles, {
   color: "$neutral9",
   opacity: 1,
 });
@@ -182,9 +198,6 @@ export const selectOptionStyles = css({
 
   borderRadius: "$sm",
 
-  py: "$2",
-  px: "$3",
-
   color: "$neutral12",
   fontSize: "$base",
   fontWeight: "$normal",
@@ -201,13 +214,36 @@ export const selectOptionStyles = css({
   [`&[data-active]`]: {
     backgroundColor: "$neutral4",
   },
+});
 
-  "&[aria-selected=true]": {
-    backgroundColor: "$primary3",
-    color: "$primary11",
-  },
+/* -------------------------------------------------------------------------------------------------
+ * Select - option text
+ * -----------------------------------------------------------------------------------------------*/
 
-  [`&[data-active][aria-selected=true]`]: {
-    backgroundColor: "$primary4",
-  },
+export const selectOptionTextStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+
+  py: "$2",
+  paddingInlineStart: "$3",
+  paddingInlineEnd: "$6",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - option indicator
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectOptionIndicatorStyles = css({
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  right: 0,
+
+  display: "flex",
+  alignItems: "center",
+
+  paddingInlineEnd: "$3",
+
+  color: "$primary10",
+  pointerEvents: "none",
 });

@@ -1,22 +1,19 @@
-import { createUniqueId, JSX, Show, splitProps } from "solid-js";
+import { createContext, createSignal, splitProps, useContext } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useSelectContext } from "./select";
 import { selectOptGroupStyles } from "./select.styles";
-import { SelectLabel } from "./select-label";
 
-interface SelectOptGroupOptions {
-  /**
-   * The label of the group.
-   */
-  label?: JSX.Element;
+export interface SelectOptGroupContextValue {
+  setAriaLabelledBy: (id: string) => void;
 }
 
-export type SelectOptGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptGroupOptions>;
+const SelectOptGroupContext = createContext<SelectOptGroupContextValue>();
+
+export type SelectOptGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
 const hopeSelectOptGroupClass = "hope-select__optgroup";
 
@@ -24,32 +21,41 @@ const hopeSelectOptGroupClass = "hope-select__optgroup";
  * Component used to group multiple options.
  */
 export function SelectOptGroup<C extends ElementType = "div">(props: SelectOptGroupProps<C>) {
-  const labelIdSuffix = createUniqueId();
-
   const theme = useComponentStyleConfigs().Select;
 
-  const selectContext = useSelectContext();
+  const [ariaLabelledBy, setAriaLabelledBy] = createSignal<string>();
 
-  const [local, others] = splitProps(props, ["class", "children", "label"]);
+  const [local, others] = splitProps(props, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectOptGroupClass, selectOptGroupStyles());
 
-  const labelId = () => `${selectContext.state.labelIdPrefix}-${labelIdSuffix}`;
+  const context: SelectOptGroupContextValue = {
+    setAriaLabelledBy,
+  };
 
   return (
-    <Box
-      role="group"
-      aria-labelledby={labelId()}
-      class={classes()}
-      __baseStyle={theme?.baseStyle?.optgroup}
-      {...others}
-    >
-      <Show when={local.label}>
-        <SelectLabel id={labelId()}>{local.label}</SelectLabel>
-      </Show>
-      {local.children}
-    </Box>
+    <SelectOptGroupContext.Provider value={context}>
+      <Box
+        role="group"
+        aria-labelledby={ariaLabelledBy()}
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.optgroup}
+        {...others}
+      >
+        {local.children}
+      </Box>
+    </SelectOptGroupContext.Provider>
   );
 }
 
 SelectOptGroup.toString = () => createClassSelector(hopeSelectOptGroupClass);
+
+export function useSelectOptGroupContext() {
+  const context = useContext(SelectOptGroupContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useSelectOptGroupContext must be used within a `<Select.OptGroup />` component");
+  }
+
+  return context;
+}
