@@ -17,12 +17,14 @@ const stripe = keyframes({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Progress - track
+ * Progress
  * -----------------------------------------------------------------------------------------------*/
 
-export const progressTrackStyles = css({
+export const progressStyles = css({
   position: "relative",
   overflow: "hidden",
+
+  bg: "$neutral4",
 
   variants: {
     size: {
@@ -46,7 +48,7 @@ export const progressTrackStyles = css({
   },
 });
 
-export type ProgressTrackVariants = VariantProps<typeof progressTrackStyles>;
+export type ProgressVariants = VariantProps<typeof progressStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Progress - indicator
@@ -55,8 +57,6 @@ export type ProgressTrackVariants = VariantProps<typeof progressTrackStyles>;
 export const progressIndicatorStyles = css({
   position: "relative",
   height: "100%",
-
-  borderRadius: "$sm",
 
   transitionProperty: "common",
   transitionDuration: "slow",

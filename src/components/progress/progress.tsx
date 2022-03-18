@@ -1,68 +1,24 @@
-import { mergeProps, splitProps } from "solid-js";
+import { createContext, splitProps, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
-import { ColorProps } from "@/styled-system/props/color";
-import { RadiiProps } from "@/styled-system/props/radii";
-import { ResponsiveValue, SystemStyleObject } from "@/styled-system/types";
+import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { ProgressIndicatorVariants, progressTrackStyles, ProgressTrackVariants } from "./progress.styles";
+import { progressStyles, ProgressVariants } from "./progress.styles";
 import { GetProgressPropsOptions } from "./progress.utils";
-import { ProgressIndicator } from "./progress-indicator";
 
-/* -------------------------------------------------------------------------------------------------
- * Progress
- * -----------------------------------------------------------------------------------------------*/
+type ThemeableProgressOptions = ProgressVariants;
 
-interface ThemeableProgressOptions extends ProgressTrackVariants, Omit<ProgressIndicatorVariants, "indeterminate"> {
-  /**
-   * The color of the progress indicator.
-   */
-  color?: ColorProps["color"];
-
-  /**
-   * The color of the progress track.
-   */
-  trackColor?: ColorProps["color"];
-
-  /**
-   * The border-radius of the progress track and indicator.
-   */
-  borderRadius?: ResponsiveValue<RadiiProps["borderRadius"]>;
-
-  /**
-   * The minimum value of the progress.
-   */
-  min?: number;
-
-  /**
-   * The maximum value of the progress.
-   */
-  max?: number;
-}
-
-interface ProgressOptions
-  extends ThemeableProgressOptions,
-    Pick<GetProgressPropsOptions, "valueText" | "getValueText"> {
-  /**
-   * The `value` of the progress indicator.
-   * If `undefined` the progress bar will be in `indeterminate` state.
-   */
-  value?: number;
-
-  /**
-   * If `true`, the progress will be indeterminate and the `value` prop will be ignored.
-   */
-  indeterminate?: boolean;
-}
+interface ProgressOptions extends ThemeableProgressOptions, Partial<GetProgressPropsOptions> {}
 
 export type ProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressOptions>;
 
 export interface ProgressStyleConfig {
   baseStyle?: {
-    track?: SystemStyleObject;
+    root?: SystemStyleObject;
     indicator?: SystemStyleObject;
     label?: SystemStyleObject;
   };
@@ -70,6 +26,14 @@ export interface ProgressStyleConfig {
     root?: ThemeableProgressOptions;
   };
 }
+
+type ProgressState = GetProgressPropsOptions;
+
+interface ProgressContextValue {
+  state: ProgressState;
+}
+
+const ProgressContext = createContext<ProgressContextValue>();
 
 const hopeProgressClass = "hope-progress";
 
@@ -85,65 +49,56 @@ const hopeProgressClass = "hope-progress";
 export function Progress<C extends ElementType = "div">(props: ProgressProps<C>) {
   const theme = useComponentStyleConfigs().Progress;
 
-  const defaultProps: ProgressProps<"div"> = {
-    color: theme?.defaultProps?.root?.color ?? "$primary9",
-    trackColor: theme?.defaultProps?.root?.trackColor ?? "$neutral4",
-    min: theme?.defaultProps?.root?.min ?? 0,
-    max: theme?.defaultProps?.root?.max ?? 100,
-    size: theme?.defaultProps?.root?.size ?? "md",
-    striped: theme?.defaultProps?.root?.striped ?? false,
-    animated: theme?.defaultProps?.root?.animated ?? false,
-    borderRadius: theme?.defaultProps?.root?.borderRadius ?? "$none",
+  const [state] = createStore<ProgressState>({
+    get min() {
+      return props.min ?? 0;
+    },
+    get max() {
+      return props.max ?? 100;
+    },
+    get value() {
+      return props.value;
+    },
+    get valueText() {
+      return props.valueText;
+    },
+    get getValueText() {
+      return props.getValueText;
+    },
+    get indeterminate() {
+      return props.indeterminate;
+    },
+  });
+
+  const [local, others] = splitProps(props, ["class", "size"]);
+
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeProgressClass,
+      progressStyles({ size: local.size ?? theme?.defaultProps?.root?.size ?? "md" })
+    );
   };
 
-  const propsWithDefaults: ProgressProps<"div"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefaults, [
-    "class",
-    "children",
-    "value",
-    "valueText",
-    "getValueText",
-    "min",
-    "max",
-    "aria-label",
-    "aria-labelledby",
-    "size",
-    "color",
-    "trackColor",
-    "striped",
-    "animated",
-    "indeterminate",
-    "borderRadius",
-  ]);
-
-  const classes = () => classNames(local.class, hopeProgressClass, progressTrackStyles({ size: local.size }));
+  const context: ProgressContextValue = {
+    state,
+  };
 
   return (
-    <Box
-      class={classes()}
-      __baseStyle={theme?.baseStyle?.track}
-      bg={local.trackColor}
-      borderRadius={local.borderRadius}
-      {...others}
-    >
-      <ProgressIndicator
-        aria-label={local["aria-label"]}
-        aria-labelledby={local["aria-labelledby"]}
-        min={local.min ?? 0}
-        max={local.max ?? 100}
-        value={local.value}
-        valueText={local.valueText}
-        getValueText={local.getValueText}
-        color={local.color}
-        striped={local.striped}
-        animated={local.animated}
-        indeterminate={local.indeterminate}
-        borderRadius={local.borderRadius}
-      >
-        {local.children}
-      </ProgressIndicator>
-    </Box>
+    <ProgressContext.Provider value={context}>
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
+    </ProgressContext.Provider>
   );
 }
 
 Progress.toString = () => createClassSelector(hopeProgressClass);
+
+export function useProgressContext() {
+  const context = useContext(ProgressContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useProgressContext must be used within a `<Progress />` component");
+  }
+
+  return context;
+}

@@ -1,5 +1,6 @@
 import "./playground.css";
 
+import { For } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -21,6 +22,9 @@ import {
   SelectTrigger,
   useColorMode,
   VStack,
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
 } from ".";
 
 export function App() {
@@ -28,38 +32,23 @@ export function App() {
 
   return (
     <Box p="$4">
-      <VStack spacing="$4" alignItems="flex-start">
-        <HStack spacing="$4">
-          <Button onClick={toggleColorMode}>Toggle color mode</Button>
-        </HStack>
-        <Select multiple>
-          <SelectTrigger w="$full" maxW="300px">
+      <VStack spacing="$4" alignItems="stretch">
+        <Select>
+          <SelectTrigger maxW="300px">
             <SelectPlaceholder>Choose wisely</SelectPlaceholder>
-            <SelectMultiValue />
+            <SelectSingleValue />
             <SelectIcon />
           </SelectTrigger>
           <SelectContent>
             <SelectListbox>
-              <SelectOption value="react">
-                <SelectOptionText>React</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
-              <SelectOption value="angular">
-                <SelectOptionText>Angular</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
-              <SelectOption value="vue">
-                <SelectOptionText>Vue</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
-              <SelectOption value="svelte">
-                <SelectOptionText>Svelte</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
-              <SelectOption value="solid">
-                <SelectOptionText>Solid</SelectOptionText>
-                <SelectOptionIndicator />
-              </SelectOption>
+              <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+                {option => (
+                  <SelectOption value={option}>
+                    <SelectOptionText>{option}</SelectOptionText>
+                    <SelectOptionIndicator />
+                  </SelectOption>
+                )}
+              </For>
             </SelectListbox>
           </SelectContent>
         </Select>
