@@ -75,7 +75,8 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
     },
   });
 
-  const [local, others] = splitProps(props, ["class", "size"]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(props, ["class", "size"], ["min", "max", "getValueText"]);
 
   const classes = () => {
     return classNames(

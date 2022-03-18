@@ -15,7 +15,7 @@ interface ProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "inde
   /**
    * The color of the progress indicator.
    */
-  colorScheme?: ColorProps["color"];
+  color?: ColorProps["color"];
 
   /**
    * If `true`, the progress will be indeterminate and the `value` prop will be ignored.
@@ -54,7 +54,7 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
   const progressContext = useProgressContext();
 
   const defaultProps: ProgressIndicatorProps<"div"> = {
-    colorScheme: "$primary9",
+    color: "$primary9",
     value: 0,
     getValueText: progressContext.state.getValueText,
   };
@@ -62,7 +62,7 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
   const propsWithDefault: ProgressIndicatorProps<"div"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, [
     "class",
-    "colorScheme",
+    "color",
     "striped",
     "animated",
     "indeterminate",
@@ -90,11 +90,11 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
   const backgroundStyles = () => {
     if (local.indeterminate) {
       return {
-        backgroundImage: `linear-gradient(to right, transparent 0%, ${local.colorScheme} 50%, transparent 100%)`,
+        backgroundImage: `linear-gradient(to right, transparent 0%, ${local.color} 50%, transparent 100%)`,
       };
     }
 
-    return { backgroundColor: local.colorScheme };
+    return { backgroundColor: local.color };
   };
 
   const classes = () => {
