@@ -8,11 +8,27 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { progressStyles, ProgressVariants } from "./progress.styles";
-import { GetProgressPropsOptions } from "./progress.utils";
+
+interface ProgressState {
+  /**
+   * Minimum value defining 'no progress' (must be lower than 'max')
+   */
+  min: number;
+
+  /**
+   * Maximum value defining 100% progress made (must be higher than 'min')
+   */
+  max: number;
+
+  /**
+   * A function that returns the desired valueText to use in place of the value
+   */
+  getValueText?: (value: number, percent: number) => string;
+}
 
 type ThemeableProgressOptions = ProgressVariants;
 
-interface ProgressOptions extends ThemeableProgressOptions, Partial<GetProgressPropsOptions> {}
+type ProgressOptions = ThemeableProgressOptions & Partial<ProgressState>;
 
 export type ProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressOptions>;
 
@@ -26,8 +42,6 @@ export interface ProgressStyleConfig {
     root?: ThemeableProgressOptions;
   };
 }
-
-type ProgressState = GetProgressPropsOptions;
 
 interface ProgressContextValue {
   state: ProgressState;
@@ -56,17 +70,8 @@ export function Progress<C extends ElementType = "div">(props: ProgressProps<C>)
     get max() {
       return props.max ?? 100;
     },
-    get value() {
-      return props.value;
-    },
-    get valueText() {
-      return props.valueText;
-    },
     get getValueText() {
       return props.getValueText;
-    },
-    get indeterminate() {
-      return props.indeterminate;
     },
   });
 

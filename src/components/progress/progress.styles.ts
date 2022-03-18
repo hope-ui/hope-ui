@@ -24,6 +24,8 @@ export const progressStyles = css({
   position: "relative",
   overflow: "hidden",
 
+  display: "flex",
+
   bg: "$neutral4",
 
   variants: {
@@ -55,11 +57,13 @@ export type ProgressVariants = VariantProps<typeof progressStyles>;
  * -----------------------------------------------------------------------------------------------*/
 
 export const progressIndicatorStyles = css({
-  position: "relative",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+
   height: "100%",
 
-  transitionProperty: "common",
-  transitionDuration: "slow",
+  transition: "width 100ms linear",
 
   variants: {
     striped: {
@@ -106,16 +110,7 @@ export type ProgressIndicatorVariants = VariantProps<typeof progressIndicatorSty
  * -----------------------------------------------------------------------------------------------*/
 
 export const progressLabelStyles = css({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-
-  width: "100%",
-
   color: "$background",
   lineHeight: "$none",
   fontWeight: "$bold",
-  textAlign: "center",
-
-  transform: "translate(-50%, -50%)",
 });

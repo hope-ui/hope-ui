@@ -2,12 +2,12 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ColorScaleValue, SizeScaleValue } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
 import { CircleProgressIndicatorVariants, circularProgressIndicatorStyles } from "./circular-progress.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 interface CircularProgressIndicatorOptions extends CircleProgressIndicatorVariants {
   /**

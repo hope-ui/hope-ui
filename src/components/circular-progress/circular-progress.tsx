@@ -1,15 +1,16 @@
 import { Property } from "csstype";
-import { createMemo, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { SizeScaleValue, SystemStyleObject } from "@/styled-system";
 import { ColorProps } from "@/styled-system/props/color";
 import { SizeProps } from "@/styled-system/props/size";
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
+import { valueToPercent } from "@/utils/number";
 
 import { Box } from "../box/box";
 import { hope } from "../factory";
-import { getProgressProps } from "../progress/progress.utils";
 import { ElementType, HTMLHopeProps } from "../types";
 import { circularProgressStyles, circularProgressSvgStyles } from "./circular-progress.styles";
 import { CircularProgressIndicator } from "./circular-progress-indicator";
@@ -54,14 +55,14 @@ interface ThemeableCircularProgressOptions {
 
 interface CircularProgressOptions extends ThemeableCircularProgressOptions {
   /**
-   * Current progress (must be between min/max)
-   */
-  value?: number;
-
-  /**
    * If `true`, the progress will be indeterminate and the `value` prop will be ignored.
    */
   indeterminate?: boolean;
+
+  /**
+   * Current progress (must be between min/max)
+   */
+  value?: number;
 
   /**
    * The desired valueText to use in place of the value
@@ -69,14 +70,14 @@ interface CircularProgressOptions extends ThemeableCircularProgressOptions {
   valueText?: string;
 
   /**
+   * A function that returns the desired valueText to use in place of the value
+   */
+  getValueText?: (value: number, percent: number) => string;
+
+  /**
    * The content of the circular progress bar. If passed, the content will be inside and centered in the progress bar.
    */
   children?: JSX.Element;
-
-  /**
-   * A function that returns the desired valueText to use in place of the value
-   */
-  getValueText?(value: number, percent: number): string;
 }
 
 export type CircularProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, CircularProgressOptions>;
@@ -114,6 +115,9 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     thickness: theme?.defaultProps?.root?.thickness ?? "$2_5",
     color: theme?.defaultProps?.root?.color ?? "$primary9",
     trackColor: theme?.defaultProps?.root?.trackColor ?? "$neutral4",
+
+    value: 0,
+    //getValueText: progressContext.state.getValueText,
   };
 
   const propsWithDefaults: CircularProgressProps<"div"> = mergeProps(defaultProps, props);
@@ -133,37 +137,50 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     "getValueText",
   ]);
 
-  const progress = createMemo(() => {
-    return getProgressProps({
-      value: local.value,
-      min: local.min ?? 0,
-      max: local.max ?? 100,
-      valueText: local.valueText,
-      getValueText: local.getValueText,
-      indeterminate: local.indeterminate,
-    });
-  });
+  const percent = () => {
+    if (local.value == null) {
+      return 0;
+    }
 
-  const progressProps = () => progress().bind;
+    return valueToPercent(local.value, local.min!, local.max!);
+  };
+
+  const ariaValueText = () => {
+    if (local.value == null) {
+      return undefined;
+    }
+
+    return isFunction(local.getValueText) ? local.getValueText(local.value, percent()) : local.valueText;
+  };
 
   const strokeDasharray = () => {
     if (local.indeterminate) {
       return undefined;
     }
 
-    const determinant = (progress().percent ?? 0) * 2.64;
+    const determinant = (percent() ?? 0) * 2.64;
 
     return `${determinant} ${264 - determinant}`;
   };
 
-  const isIndicatorVisible = () => progress().value > 0 || local.indeterminate;
+  const isIndicatorVisible = () => local.value! > 0 || local.indeterminate;
 
   const classes = () => classNames(local.class, hopeCircularProgressClass, circularProgressStyles());
 
   const svgClasses = () => circularProgressSvgStyles({ spin: local.indeterminate });
 
   return (
-    <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...progressProps} {...others}>
+    <Box
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.root}
+      role="progressbar"
+      data-indeterminate={local.indeterminate ? "" : undefined}
+      aria-valuemin={local.min}
+      aria-valuemax={local.max}
+      aria-valuenow={local.indeterminate ? undefined : local.value}
+      aria-valuetext={ariaValueText()}
+      {...others}
+    >
       <hope.svg viewBox="0 0 100 100" class={svgClasses()} boxSize={local.size}>
         <CircularProgressTrack stroke={local.trackColor} strokeWidth={local.thickness} />
         <Show when={isIndicatorVisible()}>
