@@ -43,6 +43,11 @@ interface CircularProgressState {
    * A function that returns the desired valueText to use in place of the value
    */
   getValueText?: (value: number, percent: number) => string;
+
+  /**
+   * An array of all children circular progress indicator.
+   */
+  values: number[];
 }
 
 type CircularProgressOptions = Partial<CircularProgressState> & {
@@ -72,6 +77,16 @@ export interface CircularProgressStyleConfig {
 
 interface CircularProgressContextValue {
   state: CircularProgressState;
+
+  /**
+   * Callback to register a circular progress indicator to the context.
+   */
+  registerIndicator: (value: number) => number;
+
+  /**
+   * Get the length of the circular progress indicator.
+   */
+  getCircleLength: (index: number) => number;
 }
 
 const CircularProgressContext = createContext<CircularProgressContextValue>();
@@ -91,7 +106,7 @@ const hopeCircularProgressTrackClass = "hope-circular-progress__track";
 export function CircularProgress<C extends ElementType = "div">(props: CircularProgressProps<C>) {
   const theme = useComponentStyleConfigs().CircularProgress;
 
-  const [state] = createStore<CircularProgressState>({
+  const [state, setState] = createStore<CircularProgressState>({
     get size() {
       return props.size ?? theme?.defaultProps?.root?.size ?? "$12";
     },
@@ -110,6 +125,7 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     get getValueText() {
       return props.getValueText;
     },
+    values: [],
   });
 
   const defaultProps: CircularProgressProps<"div"> = {
@@ -136,8 +152,24 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     });
   };
 
+  const registerIndicator = (value: number) => {
+    setState("values", prev => [...prev, value]);
+
+    return state.values.length - 1;
+  };
+
+  const getCircleLength = (index: number) => {
+    if (index <= 0) {
+      return 0;
+    }
+
+    return state.values[index - 1];
+  };
+
   const context: CircularProgressContextValue = {
-    state,
+    state: state as CircularProgressState,
+    registerIndicator,
+    getCircleLength,
   };
 
   return (

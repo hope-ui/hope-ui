@@ -1,4 +1,4 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { createSignal, mergeProps, onMount, Show, splitProps } from "solid-js";
 
 import { ColorProps } from "@/styled-system/props/color";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -53,6 +53,8 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
 
   const circularProgressContext = useCircularProgressContext();
 
+  const [index, setIndex] = createSignal<number>(-1);
+
   const defaultProps: CircularProgressIndicatorProps<"div"> = {
     color: "$primary9",
     value: 0,
@@ -79,14 +81,6 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
     return valueToPercent(local.value, circularProgressContext.state.min, circularProgressContext.state.max);
   };
 
-  const ariaValueText = () => {
-    if (local.value == null) {
-      return undefined;
-    }
-
-    return isFunction(local.getValueText) ? local.getValueText(local.value, percent()) : local.valueText;
-  };
-
   const strokeDasharray = () => {
     if (local.indeterminate) {
       return undefined;
@@ -95,6 +89,14 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
     const determinant = (percent() ?? 0) * 2.64;
 
     return `${determinant} ${264 - determinant}`;
+  };
+
+  const ariaValueText = () => {
+    if (local.value == null) {
+      return undefined;
+    }
+
+    return isFunction(local.getValueText) ? local.getValueText(local.value, percent()) : local.valueText;
   };
 
   // prevent showing the indicator when value is 0 in safari.
@@ -121,9 +123,14 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
       css: {
         color: local.color,
         strokeWidth: circularProgressContext.state.thickness,
+        strokeDasharray: strokeDasharray(),
       },
     });
   };
+
+  onMount(() => {
+    setIndex(circularProgressContext.registerIndicator(local.value ?? 0));
+  });
 
   return (
     <Box
@@ -138,14 +145,7 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
     >
       <Show when={isIndicatorVisible()}>
         <hope.svg viewBox="0 0 100 100" boxSize={circularProgressContext.state.size}>
-          <hope.circle
-            cx={50}
-            cy={50}
-            r={42}
-            stroke-dasharray={strokeDasharray()}
-            class={indicatorClasses()}
-            __baseStyle={theme?.baseStyle?.indicator}
-          />
+          <hope.circle cx={50} cy={50} r={42} class={indicatorClasses()} __baseStyle={theme?.baseStyle?.indicator} />
         </hope.svg>
       </Show>
     </Box>
