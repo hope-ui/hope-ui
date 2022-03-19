@@ -17,10 +17,10 @@ const stripe = keyframes({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Progress - track
+ * Progress
  * -----------------------------------------------------------------------------------------------*/
 
-export const progressTrackStyles = css({
+export const progressStyles = css({
   position: "relative",
   overflow: "hidden",
 
@@ -46,7 +46,7 @@ export const progressTrackStyles = css({
   },
 });
 
-export type ProgressTrackVariants = VariantProps<typeof progressTrackStyles>;
+export type ProgressVariants = VariantProps<typeof progressStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Progress - indicator
@@ -56,10 +56,7 @@ export const progressIndicatorStyles = css({
   position: "relative",
   height: "100%",
 
-  borderRadius: "$sm",
-
-  transitionProperty: "common",
-  transitionDuration: "slow",
+  transition: "width 600ms ease",
 
   variants: {
     striped: {
@@ -112,7 +109,7 @@ export const progressLabelStyles = css({
 
   width: "100%",
 
-  color: "$background",
+  color: "$neutral12",
   lineHeight: "$none",
   fontWeight: "$bold",
   textAlign: "center",

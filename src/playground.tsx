@@ -1,42 +1,50 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
-  hope,
   Box,
   Button,
+  CircularProgress,
+  CircularProgressIndicator,
+  CircularProgressLabel,
   HopeProvider,
   HopeThemeConfig,
   HStack,
-  Select,
-  SelectContent,
-  SelectListbox,
-  SelectOption,
-  SelectTrigger,
   useColorMode,
+  VStack,
 } from ".";
+import { Progress, ProgressIndicator, ProgressLabel } from "./components";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
 
+  const [valZ, setValZ] = createSignal(50);
+
   return (
     <Box p="$4">
       <HStack spacing="$4" mb="$4">
-        <Button onClick={toggleColorMode}>Toggle color mode</Button>
+        <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
+          Toggle color mode
+        </Button>
+        <Button onClick={() => setValZ(prev => prev + 5)}>Inc Z</Button>
+        <Button onClick={() => setValZ(0)}>Reset Z</Button>
       </HStack>
-      <Select placeholder="Choose wisely">
-        <SelectTrigger maxW="300px" />
-        <SelectContent>
-          <SelectListbox>
-            <SelectOption value="react">React</SelectOption>
-            <SelectOption value="angular">Angular</SelectOption>
-            <SelectOption value="vue">Vue</SelectOption>
-            <SelectOption value="svelte">Svelte</SelectOption>
-            <SelectOption value="solid">Solid</SelectOption>
-          </SelectListbox>
-        </SelectContent>
-      </Select>
+      <VStack spacing="$4" alignItems="flex-start">
+        <Progress w="400px" value={valZ()} trackColor="$success4" aria-label="foo">
+          <ProgressIndicator color="$success9" />
+          <ProgressLabel />
+        </Progress>
+        <CircularProgress value={valZ()} trackColor="$success4" aria-label="foo">
+          <CircularProgressIndicator color="$success9" />
+          <CircularProgressLabel />
+        </CircularProgress>
+        <CircularProgress value={valZ()} size={64} thickness={8} indeterminate>
+          <CircularProgressIndicator withRoundCaps />
+          <CircularProgressLabel />
+        </CircularProgress>
+      </VStack>
     </Box>
   );
 }

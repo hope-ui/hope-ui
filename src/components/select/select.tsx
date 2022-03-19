@@ -1,9 +1,10 @@
 import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
-import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { createContext, createEffect, createSignal, createUniqueId, JSX, on, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme";
+import { isArray } from "@/utils/assertion";
 
 import { useFormControl, useFormControlPropNames, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
@@ -13,10 +14,13 @@ import {
   getUpdatedIndex,
   isOptionEqual,
   isScrollable,
+  isValueEqual,
   maintainScrollVisibility,
   SelectActions,
   SelectOptionData,
 } from "./select.utils";
+
+type Value = any | any[];
 
 interface ThemeableSelectOptions extends SelectTriggerVariants {
   /**
@@ -31,38 +35,33 @@ interface ThemeableSelectOptions extends SelectTriggerVariants {
   compareKey?: string;
 }
 
-export interface SelectProps<T = any> extends ThemeableSelectOptions {
+export interface SelectProps extends ThemeableSelectOptions {
   /**
-   * The `id` of the Select.
+   * The `id` of the select.
    */
   id?: string;
 
   /**
-   * Children of the Select.
+   * Children of the select.
    */
   children?: JSX.Element;
+
+  /**
+   * If `true`, allow multi-selection.
+   */
+  multiple?: boolean;
 
   /**
    * The value of the select.
    * (in controlled mode)
    */
-  value?: T;
+  value?: Value;
 
   /**
    * The value of the select when initially rendered.
    * (in uncontrolled mode)
    */
-  defaultValue?: T;
-
-  /**
-   * The value to display in `Select.Value` when initially rendered and no `children` is provided.
-   */
-  defaultTextValue?: string;
-
-  /**
-   * The placeholder of the select trigger.
-   */
-  placeholder?: string;
+  defaultValue?: Value;
 
   /**
    * If `true`, the select will be required.
@@ -93,7 +92,7 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
    * Callback invoked when the selected value changes.
    * (in controlled mode)
    */
-  onChange?: (value: T) => void;
+  onChange?: (value: Value) => void;
 
   /**
    * Callback invoked when the select trigger gain focus.
@@ -106,18 +105,12 @@ export interface SelectProps<T = any> extends ThemeableSelectOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
 }
 
-type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "compareKey">> &
-  Pick<SelectProps<T>, "value" | "placeholder" | "invalid" | "disabled"> & {
+type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">> &
+  Pick<SelectProps, "multiple" | "value" | "invalid" | "disabled"> & {
     /**
-     * The value of the select.
-     * (in uncontrolled mode)
+     * If `true`, the select has options selected.
      */
-    valueState?: T;
-
-    /**
-     * The value to display in `Select.Value` when no `children` is provided.
-     */
-    textValue?: string;
+    hasSelectedOptions: boolean;
 
     /**
      * The id of the current `aria-activedescendent` element.
@@ -150,12 +143,17 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     optionIdPrefix: string;
 
     /**
-     * The list of available `SelectOption` values.
+     * The list of available option.
      */
-    options: readonly SelectOptionData<T>[];
+    options: SelectOptionData[];
 
     /**
-     * If `true`, the Select will be open.
+     * The list of selected option.
+     */
+    selectedOptions: SelectOptionData[];
+
+    /**
+     * If `true`, the select will be open.
      */
     opened: boolean;
 
@@ -180,8 +178,8 @@ type SelectState<T = any> = Required<Pick<SelectProps<T>, "variant" | "size" | "
     searchTimeoutId?: number;
   };
 
-interface SelectContextValue<T = any> {
-  state: SelectState<T>;
+interface SelectContextValue {
+  state: SelectState;
 
   /**
    * Props that should be spread on the select trigger to support embedding in `FormControl`.
@@ -189,9 +187,9 @@ interface SelectContextValue<T = any> {
   formControlProps: UseFormControlReturn<HTMLButtonElement>;
 
   /**
-   * Check if the option is the selected one by comparing its value with the selected value.
+   * Check if the option is a selected one.
    */
-  isOptionSelected: (value: any) => boolean;
+  isOptionSelected: (option: SelectOptionData) => boolean;
 
   /**
    * Check if the option is the current active-descendant by comparing its index with the active index.
@@ -225,6 +223,11 @@ interface SelectContextValue<T = any> {
   registerOption: (optionData: SelectOptionData) => number;
 
   /**
+   * Callback to remove an option from the selected options.
+   */
+  unselectOption: (optionData: SelectOptionData) => void;
+
+  /**
    * Callback invoked when the user click outside the `SelectContent`.
    */
   onContentOutsideClick: (target: HTMLElement) => void;
@@ -232,12 +235,12 @@ interface SelectContextValue<T = any> {
   /**
    * Callback invoked when the `SelectTrigger` loose focus.
    */
-  onButtonBlur: () => void;
+  onButtonBlur: (event: FocusEvent) => void;
 
   /**
    * Callback invoked when the user click on the `SelectTrigger`.
    */
-  onButtonClick: () => void;
+  onButtonClick: (event: MouseEvent) => void;
 
   /**
    * Callback invoked when the user trigger the `SelectTrigger` with keyboard.
@@ -269,13 +272,16 @@ export interface SelectStyleConfig {
   baseStyle?: {
     trigger?: SystemStyleObject;
     placeholder?: SystemStyleObject;
-    value?: SystemStyleObject;
+    singleValue?: SystemStyleObject;
+    multiValue?: SystemStyleObject;
     icon?: SystemStyleObject;
     content?: SystemStyleObject;
     listbox?: SystemStyleObject;
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
     option?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
+    optionText?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableSelectOptions;
@@ -287,7 +293,7 @@ const SelectContext = createContext<SelectContextValue>();
 /**
  * The wrapper component that provides context for all its children.
  */
-export function Select<T = any>(props: SelectProps<T>) {
+export function Select(props: SelectProps) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
   const theme = useComponentStyleConfigs().Select;
@@ -295,18 +301,25 @@ export function Select<T = any>(props: SelectProps<T>) {
   const [useFormControlProps] = splitProps(props, useFormControlPropNames);
   const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
 
-  const [state, setState] = createStore<SelectState<T>>({
-    // eslint-disable-next-line solid/reactivity
-    valueState: props.defaultValue,
+  const [initialized, setInitialized] = createSignal(false);
 
-    // eslint-disable-next-line solid/reactivity
-    textValue: props.defaultTextValue,
-
+  const [state, setState] = createStore<SelectState>({
     get isControlled() {
       return props.value !== undefined;
     },
     get value() {
-      return (this.isControlled ? props.value : this.valueState) as T | undefined;
+      if (this.isControlled) {
+        return props.value;
+      }
+
+      if (this.multiple) {
+        return this.selectedOptions.map((option: SelectOptionData) => option.value);
+      }
+
+      return this.selectedOptions[0].value ?? undefined;
+    },
+    get multiple() {
+      return props.multiple;
     },
     get buttonId() {
       return props.id ?? formControlProps.id ?? `${defaultBaseId}-button`;
@@ -335,13 +348,14 @@ export function Select<T = any>(props: SelectProps<T>) {
     get compareKey() {
       return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
     },
-    get placeholder() {
-      return props.placeholder;
-    },
     get activeDescendantId() {
       return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;
     },
+    get hasSelectedOptions() {
+      return this.selectedOptions.length > 0;
+    },
     options: [],
+    selectedOptions: [],
     opened: false,
     activeIndex: 0,
     ignoreBlur: false,
@@ -356,7 +370,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
   let cleanupContentAutoUpdate: (() => void) | undefined;
 
-  async function updateContentPosition() {
+  const updateContentPosition = async () => {
     if (!buttonRef || !contentRef) {
       return;
     }
@@ -364,7 +378,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     const { x, y } = await computePosition(buttonRef, contentRef, {
       placement: "bottom",
       middleware: [
-        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 7),
+        offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 5),
         flip(),
         shift(),
         size({
@@ -389,9 +403,9 @@ export function Select<T = any>(props: SelectProps<T>) {
       left: `${Math.round(x)}px`,
       top: `${Math.round(y)}px`,
     });
-  }
+  };
 
-  const getSearchString = function (char: string) {
+  const getSearchString = (char: string) => {
     // reset typing timeout and start new timeout
     // this allows us to make multiple-letter matches, like a native select
     if (state.searchTimeoutId) {
@@ -410,29 +424,114 @@ export function Select<T = any>(props: SelectProps<T>) {
     return state.searchString;
   };
 
+  const focusTrigger = () => {
+    buttonRef?.focus();
+  };
+
+  const getDefaultSelectedValues = () => {
+    if (state.isControlled) {
+      if (props.value == null) {
+        return [];
+      }
+
+      return isArray(props.value) ? props.value : [props.value];
+    } else {
+      if (props.defaultValue == null) {
+        return [];
+      }
+
+      return isArray(props.defaultValue) ? props.defaultValue : [props.defaultValue];
+    }
+  };
+
+  const initSelectedOptions = () => {
+    if (initialized()) {
+      return;
+    }
+
+    const selectedOptions = getDefaultSelectedValues()
+      .map(value => state.options.find(option => isValueEqual(option.value, value, state.compareKey)))
+      .filter(Boolean);
+
+    setState("selectedOptions", prev => [...prev, ...selectedOptions]);
+
+    setInitialized(true);
+  };
+
   const onOptionChange = (index: number) => {
     setState("activeIndex", index);
+  };
+
+  const isOptionSelected = (option: SelectOptionData) => {
+    if (state.selectedOptions.length <= 0) {
+      return false;
+    }
+
+    if (state.multiple) {
+      return !!state.selectedOptions.find(selectedOption => isOptionEqual(option, selectedOption, state.compareKey));
+    } else {
+      return isOptionEqual(option, state.selectedOptions[0], state.compareKey);
+    }
+  };
+
+  const removeFromSelectedOptions = (selectedOption: SelectOptionData) => {
+    setState("selectedOptions", prev =>
+      prev.filter(option => !isOptionEqual(selectedOption, option, state.compareKey))
+    );
+  };
+
+  const setSelectedOptions = (index: number) => {
+    const newSelectedOption = state.options[index];
+
+    if (state.multiple) {
+      if (isOptionSelected(newSelectedOption)) {
+        removeFromSelectedOptions(newSelectedOption);
+      } else {
+        setState("selectedOptions", prev => [...prev, newSelectedOption]);
+      }
+    } else {
+      setState("selectedOptions", [newSelectedOption]);
+    }
+  };
+
+  const getSelectedValue = () => {
+    if (state.multiple) {
+      return state.selectedOptions.map(item => item.value);
+    } else {
+      return state.selectedOptions[0].value ?? undefined;
+    }
   };
 
   const selectOption = (index: number) => {
     onOptionChange(index);
 
-    const selectedOption = state.options[index];
+    setSelectedOptions(index);
 
-    setState("textValue", selectedOption.textValue);
+    props.onChange?.(getSelectedValue());
+  };
 
-    if (!state.isControlled) {
-      setState("valueState", selectedOption.value);
-    }
+  const unselectOption = (selectedOption: SelectOptionData) => {
+    removeFromSelectedOptions(selectedOption);
 
-    props.onChange?.(selectedOption.value as T);
+    props.onChange?.(getSelectedValue());
+
+    focusTrigger();
   };
 
   const isOptionDisabledCallback = (index: number) => {
     return state.options[index].disabled;
   };
 
-  const onButtonBlur = function () {
+  const isInsideTrigger = (element: HTMLElement) => {
+    return !!buttonRef && buttonRef.contains(element);
+  };
+
+  const onButtonBlur = (event: FocusEvent) => {
+    // if the blur was provoked by an element inside the trigger, ignore it
+    if (event.relatedTarget && isInsideTrigger(event.relatedTarget as HTMLElement)) {
+      return;
+    }
+
     // do not do blur action if ignoreBlur flag has been set
     if (state.ignoreBlur) {
       setState("ignoreBlur", false);
@@ -444,7 +543,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
   };
 
-  const onButtonClick = function () {
+  const onButtonClick = () => {
     if (formControlProps.readOnly) {
       return;
     }
@@ -452,14 +551,20 @@ export function Select<T = any>(props: SelectProps<T>) {
     updateContentState(!state.opened, false);
   };
 
-  const onButtonKeyDown = function (event: KeyboardEvent) {
+  const onButtonKeyDown = (event: KeyboardEvent) => {
     if (formControlProps.readOnly) {
       return;
     }
 
     const { key } = event;
-    const max = state.options.length - 1;
 
+    // In multi-select, backspace unselect the last option
+    if (state.hasSelectedOptions && state.multiple && key === "Backspace") {
+      unselectOption(state.selectedOptions[state.selectedOptions.length - 1]);
+      return;
+    }
+
+    const max = state.options.length - 1;
     const action = getActionFromKey(event, state.opened);
 
     switch (action) {
@@ -482,7 +587,7 @@ export function Select<T = any>(props: SelectProps<T>) {
       case SelectActions.CloseSelect:
         event.preventDefault();
         selectOption(state.activeIndex);
-        return updateContentState(false);
+        return state.multiple ? undefined : updateContentState(false); // don't close in multi-select.
 
       case SelectActions.Close:
         event.preventDefault();
@@ -497,7 +602,7 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
   };
 
-  const onButtonType = function (letter: string) {
+  const onButtonType = (letter: string) => {
     if (formControlProps.readOnly) {
       return;
     }
@@ -507,7 +612,7 @@ export function Select<T = any>(props: SelectProps<T>) {
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
-    const searchIndex = getIndexByLetter(state.options as SelectOptionData<T>[], searchString, state.activeIndex + 1);
+    const searchIndex = getIndexByLetter(state.options as SelectOptionData[], searchString, state.activeIndex + 1);
 
     // if a match was found, go to it
     if (searchIndex >= 0) {
@@ -521,16 +626,21 @@ export function Select<T = any>(props: SelectProps<T>) {
     }
   };
 
-  const onOptionClick = function (index: number) {
+  const onOptionClick = (index: number) => {
     // if option is disabled ensure to bring back focus to the `SelectTrigger` in order to keep keyboard navigation working.
     if (state.options[index].disabled) {
-      buttonRef?.focus();
+      focusTrigger();
       return;
     }
 
     selectOption(index);
 
-    updateContentState(false);
+    if (state.multiple) {
+      // don't close on multi-select and ensure to bring back focus to the `SelectTrigger` in order to keep keyboard navigation working.
+      focusTrigger();
+    } else {
+      updateContentState(false);
+    }
   };
 
   const onOptionMouseMove = (index: number) => {
@@ -542,25 +652,25 @@ export function Select<T = any>(props: SelectProps<T>) {
     onOptionChange(index);
   };
 
-  const onOptionMouseDown = function () {
+  const onOptionMouseDown = () => {
     // Clicking an option will cause a blur event,
     // but we don't want to perform the default keyboard blur action
     setState("ignoreBlur", true);
   };
 
-  const updateContentState = function (opened: boolean, callFocus = true) {
+  const updateContentState = (opened: boolean, callFocus = true) => {
     if (state.opened === opened) {
       return;
     }
 
     setState("opened", opened);
 
-    // focus on selected value or the first one
-    if (state.value != null) {
-      const selectedOptionIndex = state.options.findIndex(item => {
-        return isOptionEqual(item.value, state.value, state.compareKey);
-      });
-      setState("activeIndex", selectedOptionIndex);
+    // focus on first selected option or the first one
+    if (state.selectedOptions.length > 0) {
+      setState(
+        "activeIndex",
+        state.options.findIndex(option => isOptionSelected(option))
+      );
     } else {
       setState("activeIndex", 0);
     }
@@ -573,14 +683,11 @@ export function Select<T = any>(props: SelectProps<T>) {
         cleanupContentAutoUpdate = autoUpdate(buttonRef, contentRef, updateContentPosition);
       }
     } else {
-      // select closed, clear the options
-      setState("options", []);
-
       cleanupContentAutoUpdate?.();
     }
 
     // move focus back to the button, if needed
-    callFocus && buttonRef?.focus();
+    callFocus && focusTrigger();
   };
 
   const onListboxMouseLeave = () => {
@@ -588,20 +695,12 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const onContentOutsideClick = (target: HTMLElement) => {
-    // clicking on the button is not considered an "outside click"
-    if (buttonRef && buttonRef.contains(target)) {
+    // clicking inside the trigger is not considered an "outside click"
+    if (isInsideTrigger(target)) {
       return;
     }
 
     updateContentState(false, false);
-  };
-
-  const isOptionSelected = (value: any) => {
-    if (state.value == null) {
-      return false;
-    }
-
-    return isOptionEqual(value, state.value, state.compareKey);
   };
 
   const isOptionActiveDescendant = (index: number) => {
@@ -632,18 +731,30 @@ export function Select<T = any>(props: SelectProps<T>) {
   };
 
   const registerOption = (optionData: SelectOptionData) => {
-    setState("options", prev => [...prev, optionData]);
+    const index = state.options.findIndex(option => isOptionEqual(option, optionData, state.compareKey));
 
-    if (isOptionSelected(optionData.value)) {
-      setState("textValue", optionData.textValue);
+    // do not register the same option twice
+    if (index != -1) {
+      return index;
     }
+
+    setState("options", prev => [...prev, optionData]);
 
     return state.options.length - 1;
   };
 
+  createEffect(
+    on(
+      () => state.options,
+      () => initSelectedOptions(),
+      { defer: true }
+    )
+  );
+
   const context: SelectContextValue = {
-    state,
+    state: state as SelectState,
     isOptionSelected,
+    unselectOption,
     isOptionActiveDescendant,
     formControlProps,
     assignButtonRef,

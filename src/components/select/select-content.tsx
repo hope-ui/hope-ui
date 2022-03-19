@@ -23,9 +23,12 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectContentProps<"div">, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectContentProps<"div">, ["ref", "class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectContentClass, selectContentStyles());
+
+  // hack to force children `SelectOption` to mount and register themself to the select.
+  const resolvedChildren = children(() => local.children);
 
   const assignContentRef = (el: HTMLDivElement) => {
     selectContext.assignContentRef(el);
@@ -46,7 +49,9 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
     <Show when={selectContext.state.opened}>
       <Portal>
         <OutsideClickHandler onOutsideClick={onOutsideClick}>
-          <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others} />
+          <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others}>
+            {resolvedChildren()}
+          </Box>
         </OutsideClickHandler>
       </Portal>
     </Show>

@@ -1,27 +1,29 @@
-import { Property } from "csstype";
-import { splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 
-import { ColorScaleValue, SizeScaleValue } from "@/styled-system/types";
+import { ColorProps } from "@/styled-system/props/color";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
-import { CircleProgressIndicatorVariants, circularProgressIndicatorStyles } from "./circular-progress.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
+import { useCircularProgressContext } from "./circular-progress";
+import { circularProgressIndicatorContainerStyles, circularProgressIndicatorStyles } from "./circular-progress.styles";
 
-interface CircularProgressIndicatorOptions extends CircleProgressIndicatorVariants {
+export interface ThemeableCircularProgressIndicatorOptions {
   /**
    * The stroke color of the progress indicator.
    */
-  stroke?: Property.Stroke | ColorScaleValue;
+  color?: ColorProps["color"];
 
   /**
-   * The stroke width of the progress indicator.
+   * If `true`, the caps of the progress indicator will be rounded.
    */
-  strokeWidth?: Property.StrokeWidth<SizeScaleValue> | number;
+  withRoundCaps?: boolean;
 }
 
-type CircularProgressIndicatorProps = HTMLHopeProps<"circle", CircularProgressIndicatorOptions>;
+type CircularProgressIndicatorOptions = ThemeableCircularProgressIndicatorOptions;
+
+type CircularProgressIndicatorProps = HTMLHopeProps<"svg", CircularProgressIndicatorOptions>;
 
 const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
 
@@ -33,33 +35,52 @@ const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
 export function CircularProgressIndicator(props: CircularProgressIndicatorProps) {
   const theme = useComponentStyleConfigs().CircularProgress;
 
-  const [local, others] = splitProps(props, ["class", "stroke", "strokeWidth", "withRoundCap", "spin"]);
+  const circularProgressContext = useCircularProgressContext();
 
-  const classes = () => {
+  const defaultProps: CircularProgressIndicatorProps = {
+    color: theme?.defaultProps?.indicator?.color ?? "$primary9",
+    withRoundCaps: theme?.defaultProps?.indicator?.withRoundCaps ?? false,
+  };
+
+  const propsWithDefault: CircularProgressIndicatorProps = mergeProps(defaultProps, props);
+
+  const [local, others] = splitProps(propsWithDefault, ["class", "children", "color", "withRoundCaps"]);
+
+  const strokeDasharray = () => {
+    if (circularProgressContext.state.indeterminate) {
+      return undefined;
+    }
+
+    const determinant = circularProgressContext.state.percent * 2.64;
+
+    return `${determinant} ${264 - determinant}`;
+  };
+
+  const rootClasses = () => {
     return classNames(
       local.class,
       hopeCircularProgressIndicatorClass,
-      circularProgressIndicatorStyles({
-        withRoundCap: local.withRoundCap,
-        spin: local.spin === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
-        css: {
-          stroke: local.stroke,
-          strokeWidth: local.strokeWidth,
-        },
-      })
+      circularProgressIndicatorContainerStyles({ spin: circularProgressContext.state.indeterminate })
     );
   };
 
+  const indicatorClasses = () => {
+    return circularProgressIndicatorStyles({
+      hidden: !circularProgressContext.state.isIndicatorVisible,
+      indeterminate: circularProgressContext.state.indeterminate === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
+      withRoundCaps: local.withRoundCaps,
+      css: {
+        color: local.color,
+        strokeWidth: circularProgressContext.state.thickness,
+        strokeDasharray: strokeDasharray(),
+      },
+    });
+  };
+
   return (
-    <hope.circle
-      class={classes()}
-      cx={50}
-      cy={50}
-      r={42}
-      fill="transparent"
-      __baseStyle={theme?.baseStyle?.indicator}
-      {...others}
-    />
+    <hope.svg viewBox="0 0 100 100" class={rootClasses()} boxSize={circularProgressContext.state.size} {...others}>
+      <hope.circle cx={50} cy={50} r={42} class={indicatorClasses()} __baseStyle={theme?.baseStyle?.indicator} />
+    </hope.svg>
   );
 }
 

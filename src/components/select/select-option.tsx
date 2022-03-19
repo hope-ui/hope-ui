@@ -1,4 +1,4 @@
-import { children, createEffect, createSignal, JSX, onMount, splitProps } from "solid-js";
+import { Accessor, createContext, createEffect, createSignal, JSX, onMount, splitProps, useContext } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -8,29 +8,19 @@ import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectOptionStyles } from "./select.styles";
+import { SelectOptionData } from "./select.utils";
 
-interface SelectOptionRenderProps {
-  /**
-   * If `true`, the option is the current active descendant one.
-   */
-  active: boolean;
-
-  /**
-   * If `true`, the option is the selecetd one.
-   */
-  selected: boolean;
-
-  /**
-   * If `true`, the option is disabled.
-   */
-  disabled: boolean;
+export interface SelectOptionContextValue {
+  selected: Accessor<boolean>;
 }
 
-interface SelectOptionOptions<T> {
+const SelectOptionContext = createContext<SelectOptionContextValue>();
+
+interface SelectOptionOptions {
   /**
    * The value of the option.
    */
-  value: T;
+  value: any;
 
   /**
    * Optional text used for typeahead purposes.
@@ -47,17 +37,17 @@ interface SelectOptionOptions<T> {
   /**
    * The children of the option.
    */
-  children?: JSX.Element | ((props: SelectOptionRenderProps) => JSX.Element);
+  children?: JSX.Element;
 }
 
-export type SelectOptionProps<C extends ElementType = "div", T = any> = HTMLHopeProps<C, SelectOptionOptions<T>>;
+export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptionOptions>;
 
 const hopeSelectOptionClass = "hope-select__option";
 
 /**
  * The component that contains a select option.
  */
-export function SelectOption<C extends ElementType = "div", T = any>(props: SelectOptionProps<C, T>) {
+export function SelectOption<C extends ElementType = "div">(props: SelectOptionProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
   const selectContext = useSelectContext();
@@ -69,14 +59,19 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
   const [local, others] = splitProps(props as SelectOptionProps<"div">, [
     "ref",
     "class",
-    "children",
     "value",
     "textValue",
     "disabled",
   ]);
 
+  const optionData: Accessor<SelectOptionData> = () => ({
+    value: local.value,
+    textValue: local.textValue ?? optionRef?.textContent ?? String(local.value),
+    disabled: !!local.disabled,
+  });
+
   const id = () => `${selectContext.state.optionIdPrefix}-${index()}`;
-  const isSelected = () => selectContext.isOptionSelected(local.value);
+  const isSelected = () => selectContext.isOptionSelected(optionData());
   const isActiveDescendant = () => selectContext.isOptionActiveDescendant(index());
 
   const classes = () => {
@@ -121,26 +116,12 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
     selectContext.onOptionMouseMove(index());
   };
 
-  const resolvedChildren = children(() => {
-    if (isFunction(local.children)) {
-      return local.children({
-        active: isActiveDescendant(),
-        selected: isSelected(),
-        disabled: !!local.disabled,
-      });
-    }
-
-    return local.children;
-  });
+  const context: SelectOptionContextValue = {
+    selected: isSelected,
+  };
 
   onMount(() => {
-    const optionIndex = selectContext.registerOption({
-      value: local.value,
-      textValue: local.textValue ?? optionRef?.textContent ?? local.value,
-      disabled: !!local.disabled,
-    });
-
-    setIndex(optionIndex);
+    setIndex(selectContext.registerOption(optionData()));
   });
 
   createEffect(() => {
@@ -150,23 +131,34 @@ export function SelectOption<C extends ElementType = "div", T = any>(props: Sele
   });
 
   return (
-    <Box
-      ref={assignOptionRef}
-      role="option"
-      id={id()}
-      aria-selected={isSelected()}
-      data-active={isActiveDescendant() ? "" : undefined}
-      data-disabled={local.disabled ? "" : undefined}
-      class={classes()}
-      __baseStyle={theme?.baseStyle?.option}
-      onClick={onOptionClick}
-      onMouseMove={onOptionMouseMove}
-      onMouseDown={selectContext.onOptionMouseDown}
-      {...others}
-    >
-      {resolvedChildren()}
-    </Box>
+    <SelectOptionContext.Provider value={context}>
+      <Box
+        ref={assignOptionRef}
+        role="option"
+        id={id()}
+        aria-selected={isSelected()}
+        data-active={isActiveDescendant() ? "" : undefined}
+        data-disabled={local.disabled ? "" : undefined}
+        data-group
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.option}
+        onClick={onOptionClick}
+        onMouseMove={onOptionMouseMove}
+        onMouseDown={selectContext.onOptionMouseDown}
+        {...others}
+      />
+    </SelectOptionContext.Provider>
   );
 }
 
 SelectOption.toString = () => createClassSelector(hopeSelectOptionClass);
+
+export function useSelectOptionContext() {
+  const context = useContext(SelectOptionContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useSelectOptionContext must be used within a `<Select.Option />` component");
+  }
+
+  return context;
+}

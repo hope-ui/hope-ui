@@ -59,8 +59,8 @@
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
-| Avatar    |             |            |       |           |      |
-| Badge     |             |            |       |           |      |
+| Avatar    |     ✅      |     ✅     |       |           |      |
+| Badge     |     ✅      |     ✅     |       |           |      |
 | Icon      |     ✅      |     ✅     |  ✅   |           |      |
 | Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
@@ -78,13 +78,13 @@
 
 ### Feedback
 
-|              | Development | A11y check | Tests | Storybook | Docs |
-| ------------ | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert        |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Notification |             |            |       |           |      |
-| Progress     |             |            |       |           |      |
-| RingProgress |             |            |       |           |      |
-| Spinner      |     ✅      |     ✅     |       |           |      |
+|                  | Development | A11y check | Tests | Storybook | Docs |
+| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Alert            |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Notification     |             |            |       |           |      |
+| CircularProgress |     ✅      |     ✅     |       |           |      |
+| Progress         |     ✅      |     ✅     |       |           |      |
+| Spinner          |     ✅      |     ✅     |       |           |      |
 
 ### Overlay
 

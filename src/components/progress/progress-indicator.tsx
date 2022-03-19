@@ -1,4 +1,4 @@
-import { createMemo, splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 
 import { ColorProps } from "@/styled-system/props/color";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -6,15 +6,17 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
+import { useProgressContext } from "./progress";
 import { progressIndicatorStyles, ProgressIndicatorVariants } from "./progress.styles";
-import { getProgressProps, GetProgressPropsOptions } from "./progress.utils";
 
-interface ProgressIndicatorOptions extends GetProgressPropsOptions, Omit<ProgressIndicatorVariants, "indeterminate"> {
+export interface ThemeableProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "indeterminate"> {
   /**
    * The color of the progress indicator.
    */
   color?: ColorProps["color"];
 }
+
+type ProgressIndicatorOptions = ThemeableProgressIndicatorOptions;
 
 export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressIndicatorOptions>;
 
@@ -29,36 +31,17 @@ const hopeProgressIndicatorClass = "hope-progress__indicator";
 export function ProgressIndicator<C extends ElementType = "div">(props: ProgressIndicatorProps<C>) {
   const theme = useComponentStyleConfigs().Progress;
 
-  const [local, others] = splitProps(props, [
-    "class",
-    "min",
-    "max",
-    "value",
-    "valueText",
-    "getValueText",
-    "color",
-    "striped",
-    "animated",
-    "indeterminate",
-  ]);
+  const progressContext = useProgressContext();
 
-  const progress = createMemo(() => {
-    return getProgressProps({
-      value: local.value,
-      min: local.min,
-      max: local.max,
-      valueText: local.valueText,
-      getValueText: local.getValueText,
-      indeterminate: local.indeterminate,
-    });
-  });
+  const defaultProps: ProgressIndicatorProps<"div"> = {
+    color: "$primary9",
+  };
 
-  const progressProps = () => progress().bind;
-
-  const width = () => `${progress().percent}%`;
+  const propsWithDefault: ProgressIndicatorProps<"div"> = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault, ["class", "color", "striped", "animated"]);
 
   const backgroundStyles = () => {
-    if (local.indeterminate) {
+    if (progressContext.state.indeterminate) {
       return {
         backgroundImage: `linear-gradient(to right, transparent 0%, ${local.color} 50%, transparent 100%)`,
       };
@@ -74,15 +57,16 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
       progressIndicatorStyles({
         striped: local.striped,
         animated: local.animated,
-        indeterminate: local.indeterminate === true ? true : false, // ensure a boolean is passed so compound variants works correctly
-        css: backgroundStyles(),
+        indeterminate: progressContext.state.indeterminate === true ? true : false, // ensure a boolean is passed so compound variants works correctly
+        css: {
+          ...backgroundStyles(),
+          width: `${progressContext.state.percent}%`,
+        },
       })
     );
   };
 
-  return (
-    <Box class={classes()} __baseStyle={theme?.baseStyle?.indicator} width={width()} {...progressProps} {...others} />
-  );
+  return <Box class={classes()} __baseStyle={theme?.baseStyle?.indicator} {...others} />;
 }
 
 ProgressIndicator.toString = () => createClassSelector(hopeProgressIndicatorClass);

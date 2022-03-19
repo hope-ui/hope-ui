@@ -1,5 +1,3 @@
-import { VariantProps } from "@stitches/core";
-
 import { spin } from "@/styled-system/keyframes";
 import { css, keyframes } from "@/styled-system/stitches.config";
 
@@ -7,7 +5,7 @@ import { css, keyframes } from "@/styled-system/stitches.config";
  * CircularProgress - keyframes
  * -----------------------------------------------------------------------------------------------*/
 
-export const circularProgressSpin = keyframes({
+export const growAndShrink = keyframes({
   "0%": {
     strokeDasharray: "1, 400",
     strokeDashoffset: "0",
@@ -37,10 +35,23 @@ export const circularProgressStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * CircularProgress - svg container
+ * CircularProgress - track
  * -----------------------------------------------------------------------------------------------*/
 
-export const circularProgressSvgStyles = css({
+export const circularProgressTrackStyles = css({
+  fill: "transparent",
+  stroke: "currentColor",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * CircularProgress - svg container for the indicator
+ * -----------------------------------------------------------------------------------------------*/
+
+export const circularProgressIndicatorContainerStyles = css({
+  position: "absolute",
+  top: 0,
+  left: 0,
+
   variants: {
     spin: {
       true: {
@@ -51,35 +62,37 @@ export const circularProgressSvgStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * CircularProgress - track
- * -----------------------------------------------------------------------------------------------*/
-
-export const circularProgressTrackStyles = css({});
-
-/* -------------------------------------------------------------------------------------------------
  * CircularProgress - indicator
  * -----------------------------------------------------------------------------------------------*/
 
 export const circularProgressIndicatorStyles = css({
+  fill: "transparent",
+  stroke: "currentColor",
+
+  opacity: 1,
+
   variants: {
-    withRoundCap: {
+    hidden: {
+      true: {
+        opacity: 0,
+      },
+    },
+    withRoundCaps: {
       true: { strokeLinecap: "round" },
     },
-    spin: {
+    indeterminate: {
       true: {
-        animation: `${circularProgressSpin} 2s linear infinite`,
+        animation: `${growAndShrink} 2s linear infinite`,
       },
       false: {
         strokeDashoffset: 66,
-        transitionProperty: "stroke-dasharray, stroke",
-        transitionDuration: "0.6s",
+        transitionProperty: "stroke-dasharray, stroke, opacity",
+        transitionDuration: "600ms",
         transitionTimingFunction: "ease",
       },
     },
   },
 });
-
-export type CircleProgressIndicatorVariants = VariantProps<typeof circularProgressIndicatorStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * CircularProgress - label
