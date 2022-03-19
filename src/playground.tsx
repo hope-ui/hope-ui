@@ -22,10 +22,13 @@ import {
   SelectTrigger,
   useColorMode,
   VStack,
+  Progress,
   CircularProgress,
   CircularProgressIndicator,
   CircularProgressLabel,
   Center,
+  ProgressIndicator,
+  ProgressLabel,
 } from ".";
 
 export function App() {
@@ -33,31 +36,26 @@ export function App() {
 
   const [valZ, setValZ] = createSignal(30);
 
-  const [valA, setValA] = createSignal(30);
-  const [valB, setValB] = createSignal(20);
-  const [valC, setValC] = createSignal(10);
-
   return (
     <Box p="$4">
-      <HStack spacing="$4">
+      <HStack spacing="$4" mb="$4">
         <Button onClick={() => setValZ(prev => prev + 5)}>Inc Z</Button>
         <Button onClick={() => setValZ(0)}>Reset Z</Button>
-        <Button onClick={() => setValA(prev => prev + 5)}>Inc A</Button>
-        <Button onClick={() => setValB(prev => prev + 5)}>Inc B</Button>
-        <Button onClick={() => setValC(prev => prev + 5)}>Inc C</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <CircularProgress size={64} thickness={8} withRoundCaps>
-          <CircularProgressIndicator value={valZ()} />
-          <CircularProgressLabel>{valZ()}%</CircularProgressLabel>
-        </CircularProgress>
+        <Progress w="400px" value={valZ()} rounded="$full" indeterminate>
+          <ProgressIndicator striped animated rounded="$full" />
+          <ProgressLabel />
+        </Progress>
+        <Progress w="400px" value={valZ()} rounded="$full">
+          <ProgressIndicator striped animated rounded="$full" />
+          <ProgressLabel>Dowloading...{valZ()}% done</ProgressLabel>
+        </Progress>
+        {/* <CircularProgress value={valZ()} size={64} thickness={8}>
+          <CircularProgressIndicator withRoundCaps />
+          <CircularProgressLabel />
+        </CircularProgress> */}
       </VStack>
-      <CircularProgress size={64} withRoundCaps>
-        <CircularProgressIndicator value={valA()} color="#68b5e8" />
-        <CircularProgressIndicator value={valB()} color="#6888e8" />
-        <CircularProgressIndicator value={valC()} color="#8468e8" />
-        <CircularProgressLabel>Disk space</CircularProgressLabel>
-      </CircularProgress>
     </Box>
   );
 }

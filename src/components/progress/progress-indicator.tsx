@@ -2,9 +2,7 @@ import { mergeProps, splitProps } from "solid-js";
 
 import { ColorProps } from "@/styled-system/props/color";
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
-import { valueToPercent } from "@/utils/number";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -16,26 +14,6 @@ interface ProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "inde
    * The color of the progress indicator.
    */
   color?: ColorProps["color"];
-
-  /**
-   * If `true`, the progress will be indeterminate and the `value` prop will be ignored.
-   */
-  indeterminate?: boolean;
-
-  /**
-   * Current progress (must be between min/max)
-   */
-  value?: number;
-
-  /**
-   * The desired valueText to use in place of the value
-   */
-  valueText?: string;
-
-  /**
-   * A function that returns the desired valueText to use in place of the value
-   */
-  getValueText?: (value: number, percent: number) => string;
 }
 
 export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressIndicatorOptions>;
@@ -55,40 +33,13 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
 
   const defaultProps: ProgressIndicatorProps<"div"> = {
     color: "$primary9",
-    value: 0,
-    getValueText: progressContext.state.getValueText,
   };
 
   const propsWithDefault: ProgressIndicatorProps<"div"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "color",
-    "striped",
-    "animated",
-    "indeterminate",
-    "value",
-    "valueText",
-    "getValueText",
-  ]);
-
-  const percent = () => {
-    if (local.value == null) {
-      return 0;
-    }
-
-    return valueToPercent(local.value, progressContext.state.min, progressContext.state.max);
-  };
-
-  const ariaValueText = () => {
-    if (local.value == null) {
-      return undefined;
-    }
-
-    return isFunction(local.getValueText) ? local.getValueText(local.value, percent()) : local.valueText;
-  };
+  const [local, others] = splitProps(propsWithDefault, ["class", "color", "striped", "animated"]);
 
   const backgroundStyles = () => {
-    if (local.indeterminate) {
+    if (progressContext.state.indeterminate) {
       return {
         backgroundImage: `linear-gradient(to right, transparent 0%, ${local.color} 50%, transparent 100%)`,
       };
@@ -104,28 +55,16 @@ export function ProgressIndicator<C extends ElementType = "div">(props: Progress
       progressIndicatorStyles({
         striped: local.striped,
         animated: local.animated,
-        indeterminate: local.indeterminate === true ? true : false, // ensure a boolean is passed so compound variants works correctly
+        indeterminate: progressContext.state.indeterminate === true ? true : false, // ensure a boolean is passed so compound variants works correctly
         css: {
           ...backgroundStyles(),
-          width: `${percent()}%`,
+          width: `${progressContext.state.percent}%`,
         },
       })
     );
   };
 
-  return (
-    <Box
-      class={classes()}
-      __baseStyle={theme?.baseStyle?.indicator}
-      role="progressbar"
-      data-indeterminate={local.indeterminate ? "" : undefined}
-      aria-valuemin={progressContext.state.min}
-      aria-valuemax={progressContext.state.max}
-      aria-valuenow={local.indeterminate ? undefined : local.value}
-      aria-valuetext={ariaValueText()}
-      {...others}
-    />
-  );
+  return <Box class={classes()} __baseStyle={theme?.baseStyle?.indicator} {...others} />;
 }
 
 ProgressIndicator.toString = () => createClassSelector(hopeProgressIndicatorClass);
