@@ -14,16 +14,19 @@ import {
   HStack,
   useColorMode,
   VStack,
-} from ".";
-import {
   Avatar,
   AvatarBadge,
   AvatarGroup,
   AvatarRemaining,
+  Breadcrumb,
+  BreadcrumbLink,
   Progress,
   ProgressIndicator,
   ProgressLabel,
-} from "./components";
+  BreadcrumbItem,
+  BreadcrumbSeparator,
+} from ".";
+import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -35,7 +38,29 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start"></VStack>
+      <VStack spacing="$4" alignItems="flex-start">
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbSeparator />
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+            <BreadcrumbSeparator />
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+        <AvatarGroup size="md">
+          <Avatar name="Hector Rhodes" src="https://bit.ly/3pWHo72" />
+          <Avatar name="Isabella Mckinney" src="https://bit.ly/3tRVozX" />
+          <Avatar name="Courtney Watson" src="https://bit.ly/3w2rgom" />
+          <Avatar name="Alberto Sanchez" src="https://bit.ly/3q1WqrX" />
+          <Avatar name="Nicole Steeves" src="https://bit.ly/37dJ0m7" />
+          <AvatarRemaining>+3</AvatarRemaining>
+        </AvatarGroup>
+      </VStack>
     </Box>
   );
 }

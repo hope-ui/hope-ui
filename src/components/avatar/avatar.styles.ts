@@ -176,7 +176,7 @@ export const avatarGroupStyles = css({
   justifyContent: "flex-start",
   flexDirection: "row",
 
-  "& .hope-avatar:first-child": {
+  [`& .${avatarStyles}:first-child`]: {
     marginStart: "0",
   },
 });
