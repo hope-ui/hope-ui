@@ -104,12 +104,12 @@ export const avatarStyles = css({
 export type AvatarVariants = VariantProps<typeof avatarStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Avatar - excess label
+ * Avatar - remaining
  * -----------------------------------------------------------------------------------------------*/
 
-export const avatarExcessStyles = css(avatarStyles);
+export const avatarRemainingStyles = css(avatarStyles);
 
-export type AvatarExcessVariants = VariantProps<typeof avatarExcessStyles>;
+export type AvatarRemainingVariants = VariantProps<typeof avatarRemainingStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Avatar - image
@@ -127,8 +127,6 @@ export const avatarImageStyles = css({
 
 export const avatarBadgeStyles = css({
   position: "absolute",
-  insetInlineEnd: "0",
-  bottom: "0",
 
   display: "flex",
   alignItems: "center",
@@ -140,8 +138,33 @@ export const avatarBadgeStyles = css({
   borderStyle: "solid",
   borderColor: "$background",
 
-  transform: "translate(25%, 25%)",
+  variants: {
+    placement: {
+      "top-start": {
+        insetInlineStart: "0",
+        top: "0",
+        transform: "translate(-25%, -25%)",
+      },
+      "top-end": {
+        insetInlineEnd: "0",
+        top: "0",
+        transform: "translate(25%, -25%)",
+      },
+      "bottom-start": {
+        insetInlineStart: "0",
+        bottom: "0",
+        transform: "translate(-25%, 25%)",
+      },
+      "bottom-end": {
+        insetInlineEnd: "0",
+        bottom: "0",
+        transform: "translate(25%, 25%)",
+      },
+    },
+  },
 });
+
+export type AvatarBadgeVariants = VariantProps<typeof avatarBadgeStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * AvatarGroup
@@ -152,4 +175,8 @@ export const avatarGroupStyles = css({
   alignItems: "center",
   justifyContent: "flex-start",
   flexDirection: "row",
+
+  "& .hope-avatar:first-child": {
+    marginStart: "0",
+  },
 });

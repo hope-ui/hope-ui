@@ -15,12 +15,18 @@ import {
   useColorMode,
   VStack,
 } from ".";
-import { Progress, ProgressIndicator, ProgressLabel } from "./components";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarGroup,
+  AvatarRemaining,
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+} from "./components";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-
-  const [valZ, setValZ] = createSignal(50);
 
   return (
     <Box p="$4">
@@ -28,23 +34,8 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
-        <Button onClick={() => setValZ(prev => prev + 5)}>Inc Z</Button>
-        <Button onClick={() => setValZ(0)}>Reset Z</Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start">
-        <Progress w="400px" value={valZ()} trackColor="$success4" aria-label="foo">
-          <ProgressIndicator color="$success9" />
-          <ProgressLabel />
-        </Progress>
-        <CircularProgress value={valZ()} trackColor="$success4" aria-label="foo">
-          <CircularProgressIndicator color="$success9" />
-          <CircularProgressLabel />
-        </CircularProgress>
-        <CircularProgress value={valZ()} size={64} thickness={8} indeterminate>
-          <CircularProgressIndicator withRoundCaps />
-          <CircularProgressLabel />
-        </CircularProgress>
-      </VStack>
+      <VStack spacing="$4" alignItems="flex-start"></VStack>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { createContext, Show, splitProps, useContext } from "solid-js";
+import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { BorderProps } from "@/styled-system/props/border";
@@ -11,7 +11,6 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { avatarGroupStyles, AvatarVariants } from "./avatar.styles";
-import { AvatarExcess } from "./avatar-excess";
 
 export interface ThemeableAvatarGroupOptions {
   /**
@@ -27,46 +26,28 @@ export interface ThemeableAvatarGroupOptions {
   /**
    * The `border-radius` of the avatars
    */
-  borderRadius?: ResponsiveValue<RadiiProps["borderRadius"]>;
+  avatarBorderRadius?: ResponsiveValue<RadiiProps["borderRadius"]>;
 
   /**
    * The `border-color` of the avatars
    */
-  borderColor?: ResponsiveValue<BorderProps["borderColor"]>;
+  avatarBorderColor?: ResponsiveValue<BorderProps["borderColor"]>;
 
   /**
    * The `border-width` of the avatars
    */
-  borderWidth?: ResponsiveValue<BorderProps["borderWidth"]>;
+  avatarBorderWidth?: ResponsiveValue<BorderProps["borderWidth"]>;
 }
 
-interface AvatarGroupOptions extends ThemeableAvatarGroupOptions {
-  /**
-   * The maximum number of visible avatars.
-   */
-  max?: number;
-
-  /**
-   * The number of non-visible avatars.
-   * Displayed at the end of the group in an avatar with "+X" label.
-   */
-  excess?: number;
-}
+type AvatarGroupOptions = ThemeableAvatarGroupOptions;
 
 export type AvatarGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, AvatarGroupOptions>;
 
-type AvatarGroupState = Required<Pick<AvatarGroupOptions, "spacing" | "size" | "excess">> &
-  Pick<AvatarGroupOptions, "max" | "borderRadius" | "borderColor" | "borderWidth"> & {
-    /**
-     * The number of avatar children in the group.
-     */
-    avatarCount: number;
-  };
+type AvatarGroupState = Required<Pick<AvatarGroupOptions, "spacing" | "size">> &
+  Pick<AvatarGroupOptions, "avatarBorderRadius" | "avatarBorderColor" | "avatarBorderWidth">;
 
 interface AvatarGroupContextValue {
   state: AvatarGroupState;
-  shouldShowAvatar: (index: number) => boolean;
-  registerAvatar: () => number;
 }
 
 const AvatarGroupContext = createContext<AvatarGroupContextValue>();
@@ -79,80 +60,42 @@ const hopeAvatarGroupClass = "hope-avatar__group";
 export function AvatarGroup<C extends ElementType = "div">(props: AvatarGroupProps<C>) {
   const theme = useComponentStyleConfigs().Avatar;
 
-  const [state, setState] = createStore<AvatarGroupState>({
-    get spacing() {
-      return props.spacing ?? theme?.defaultProps?.group?.spacing ?? "-1em";
-    },
+  const [state] = createStore<AvatarGroupState>({
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size ?? "md";
     },
-    get borderRadius() {
-      return props.borderRadius ?? theme?.defaultProps?.group?.borderRadius;
+    get spacing() {
+      return props.spacing ?? theme?.defaultProps?.group?.spacing ?? "-1em";
     },
-    get borderColor() {
-      return props.borderColor ?? theme?.defaultProps?.group?.borderColor;
+    get avatarBorderRadius() {
+      return props.avatarBorderRadius ?? theme?.defaultProps?.group?.avatarBorderRadius;
     },
-    get borderWidth() {
-      return props.borderWidth ?? theme?.defaultProps?.group?.borderWidth;
+    get avatarBorderColor() {
+      return props.avatarBorderColor ?? theme?.defaultProps?.group?.avatarBorderColor;
     },
-    get max() {
-      return props.max;
+    get avatarBorderWidth() {
+      return props.avatarBorderWidth ?? theme?.defaultProps?.group?.avatarBorderWidth;
     },
-    get excess() {
-      if (props.excess != null) {
-        return props.excess;
-      }
-
-      if (this.max != null) {
-        return this.avatarCount - this.max;
-      }
-
-      return 0;
-    },
-    avatarCount: 0,
   });
 
   const [local, others] = splitProps(props, [
     "class",
-    "children",
-    "max",
+    "size",
     "spacing",
-    "borderRadius",
-    "borderColor",
-    "borderWidth",
+    "avatarBorderRadius",
+    "avatarBorderColor",
+    "avatarBorderWidth",
   ]);
 
   const classes = () => classNames(local.class, hopeAvatarGroupClass, avatarGroupStyles());
 
-  const shouldShowAvatar = (index: number) => {
-    return state.max != null ? index < state.max : true;
-  };
-
-  const registerAvatar = () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    setState("avatarCount", prev => prev + 1);
-
-    // return the avatar index/position
-    return state.avatarCount - 1;
-  };
-
   const context: AvatarGroupContextValue = {
-    // eslint-disable-next-line
-    // @ts-ignore
-    state,
-    shouldShowAvatar,
-    registerAvatar,
+    state: state as AvatarGroupState,
   };
 
   return (
     <AvatarGroupContext.Provider value={context}>
-      <Box role="group" class={classes()} __baseStyle={theme?.baseStyle?.group} {...others}>
-        {local.children}
-        <Show when={state.excess > 0}>
-          <AvatarExcess count={state.excess} />
-        </Show>
-      </Box>
+      <Box role="group" class={classes()} __baseStyle={theme?.baseStyle?.group} {...others} />
     </AvatarGroupContext.Provider>
   );
 }
