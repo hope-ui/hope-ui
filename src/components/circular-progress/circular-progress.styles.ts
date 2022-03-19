@@ -44,7 +44,7 @@ export const circularProgressTrackStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * CircularProgress - svg container for indicator
+ * CircularProgress - svg container for the indicator
  * -----------------------------------------------------------------------------------------------*/
 
 export const circularProgressIndicatorContainerStyles = css({
@@ -69,7 +69,14 @@ export const circularProgressIndicatorStyles = css({
   fill: "transparent",
   stroke: "currentColor",
 
+  opacity: 1,
+
   variants: {
+    hidden: {
+      true: {
+        opacity: 0,
+      },
+    },
     withRoundCaps: {
       true: { strokeLinecap: "round" },
     },
@@ -79,8 +86,8 @@ export const circularProgressIndicatorStyles = css({
       },
       false: {
         strokeDashoffset: 66,
-        transitionProperty: "stroke-dasharray, stroke",
-        transitionDuration: "0.6s",
+        transitionProperty: "stroke-dasharray, stroke, opacity",
+        transitionDuration: "600ms",
         transitionTimingFunction: "ease",
       },
     },

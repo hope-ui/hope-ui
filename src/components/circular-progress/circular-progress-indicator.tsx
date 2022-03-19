@@ -1,45 +1,29 @@
-import { createSignal, mergeProps, onMount, Show, splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 
 import { ColorProps } from "@/styled-system/props/color";
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
-import { valueToPercent } from "@/utils/number";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
-import { ElementType, HTMLHopeProps } from "../types";
+import { HTMLHopeProps } from "../types";
 import { useCircularProgressContext } from "./circular-progress";
 import { circularProgressIndicatorContainerStyles, circularProgressIndicatorStyles } from "./circular-progress.styles";
 
-interface CircularProgressIndicatorOptions {
+export interface ThemeableCircularProgressIndicatorOptions {
   /**
    * The stroke color of the progress indicator.
    */
   color?: ColorProps["color"];
 
   /**
-   * If `true`, the progress will be indeterminate and the `value` prop will be ignored.
+   * If `true`, the caps of the progress indicator will be rounded.
    */
-  indeterminate?: boolean;
-
-  /**
-   * Current progress (must be between min/max)
-   */
-  value?: number;
-
-  /**
-   * The desired valueText to use in place of the value
-   */
-  valueText?: string;
-
-  /**
-   * A function that returns the desired valueText to use in place of the value
-   */
-  getValueText?: (value: number, percent: number) => string;
+  withRoundCaps?: boolean;
 }
 
-type CircularProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, CircularProgressIndicatorOptions>;
+type CircularProgressIndicatorOptions = ThemeableCircularProgressIndicatorOptions;
+
+type CircularProgressIndicatorProps = HTMLHopeProps<"svg", CircularProgressIndicatorOptions>;
 
 const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
 
@@ -48,78 +32,43 @@ const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
  *
  * The progress component that visually indicates the current level of the circular progress bar.
  */
-export function CircularProgressIndicator<C extends ElementType = "div">(props: CircularProgressIndicatorProps<C>) {
+export function CircularProgressIndicator(props: CircularProgressIndicatorProps) {
   const theme = useComponentStyleConfigs().CircularProgress;
 
   const circularProgressContext = useCircularProgressContext();
 
-  const [index, setIndex] = createSignal<number>(-1);
-
-  const defaultProps: CircularProgressIndicatorProps<"div"> = {
-    color: "$primary9",
-    value: 0,
-    getValueText: circularProgressContext.state.getValueText,
+  const defaultProps: CircularProgressIndicatorProps = {
+    color: theme?.defaultProps?.indicator?.color ?? "$primary9",
+    withRoundCaps: theme?.defaultProps?.indicator?.withRoundCaps ?? false,
   };
 
-  const propsWithDefault: CircularProgressIndicatorProps<"div"> = mergeProps(defaultProps, props);
+  const propsWithDefault: CircularProgressIndicatorProps = mergeProps(defaultProps, props);
 
-  const [local, others] = splitProps(propsWithDefault, [
-    "class",
-    "children",
-    "color",
-    "indeterminate",
-    "value",
-    "valueText",
-    "getValueText",
-  ]);
-
-  const percent = () => {
-    if (local.value == null) {
-      return 0;
-    }
-
-    return valueToPercent(local.value, circularProgressContext.state.min, circularProgressContext.state.max);
-  };
+  const [local, others] = splitProps(propsWithDefault, ["class", "children", "color", "withRoundCaps"]);
 
   const strokeDasharray = () => {
-    if (local.indeterminate) {
+    if (circularProgressContext.state.indeterminate) {
       return undefined;
     }
 
-    const determinant = (percent() ?? 0) * 2.64;
+    const determinant = circularProgressContext.state.percent * 2.64;
 
     return `${determinant} ${264 - determinant}`;
-  };
-
-  const ariaValueText = () => {
-    if (local.value == null) {
-      return undefined;
-    }
-
-    return isFunction(local.getValueText) ? local.getValueText(local.value, percent()) : local.valueText;
-  };
-
-  // prevent showing the indicator when value is 0 in safari.
-  const isIndicatorVisible = () => {
-    if (local.value == null || local.value <= 0 || local.indeterminate) {
-      return false;
-    }
-
-    return true;
   };
 
   const rootClasses = () => {
     return classNames(
       local.class,
       hopeCircularProgressIndicatorClass,
-      circularProgressIndicatorContainerStyles({ spin: local.indeterminate })
+      circularProgressIndicatorContainerStyles({ spin: circularProgressContext.state.indeterminate })
     );
   };
 
   const indicatorClasses = () => {
     return circularProgressIndicatorStyles({
-      indeterminate: local.indeterminate === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
-      withRoundCaps: circularProgressContext.state.withRoundCaps,
+      hidden: !circularProgressContext.state.isIndicatorVisible,
+      indeterminate: circularProgressContext.state.indeterminate === true ? true : false, // ensure a boolean is passed so the `true/false` values works correctly
+      withRoundCaps: local.withRoundCaps,
       css: {
         color: local.color,
         strokeWidth: circularProgressContext.state.thickness,
@@ -128,27 +77,10 @@ export function CircularProgressIndicator<C extends ElementType = "div">(props: 
     });
   };
 
-  onMount(() => {
-    setIndex(circularProgressContext.registerIndicator(local.value ?? 0));
-  });
-
   return (
-    <Box
-      role="progressbar"
-      data-indeterminate={local.indeterminate ? "" : undefined}
-      aria-valuemin={circularProgressContext.state.min}
-      aria-valuemax={circularProgressContext.state.max}
-      aria-valuenow={local.indeterminate ? undefined : local.value}
-      aria-valuetext={ariaValueText()}
-      class={rootClasses()}
-      {...others}
-    >
-      <Show when={isIndicatorVisible()}>
-        <hope.svg viewBox="0 0 100 100" boxSize={circularProgressContext.state.size}>
-          <hope.circle cx={50} cy={50} r={42} class={indicatorClasses()} __baseStyle={theme?.baseStyle?.indicator} />
-        </hope.svg>
-      </Show>
-    </Box>
+    <hope.svg viewBox="0 0 100 100" class={rootClasses()} boxSize={circularProgressContext.state.size} {...others}>
+      <hope.circle cx={50} cy={50} r={42} class={indicatorClasses()} __baseStyle={theme?.baseStyle?.indicator} />
+    </hope.svg>
   );
 }
 

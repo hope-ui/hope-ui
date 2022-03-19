@@ -9,12 +9,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useProgressContext } from "./progress";
 import { progressIndicatorStyles, ProgressIndicatorVariants } from "./progress.styles";
 
-interface ProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "indeterminate"> {
+export interface ThemeableProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "indeterminate"> {
   /**
    * The color of the progress indicator.
    */
   color?: ColorProps["color"];
 }
+
+type ProgressIndicatorOptions = ThemeableProgressIndicatorOptions;
 
 export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressIndicatorOptions>;
 

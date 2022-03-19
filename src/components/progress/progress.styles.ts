@@ -56,7 +56,7 @@ export const progressIndicatorStyles = css({
   position: "relative",
   height: "100%",
 
-  transition: "width 100ms linear",
+  transition: "width 600ms ease",
 
   variants: {
     striped: {

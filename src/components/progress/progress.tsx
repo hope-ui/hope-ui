@@ -11,8 +11,9 @@ import { valueToPercent } from "@/utils/number";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { progressStyles, ProgressVariants } from "./progress.styles";
+import { ThemeableProgressIndicatorOptions } from "./progress-indicator";
 
-interface ProgressState {
+export interface ProgressState {
   /**
    * Minimum value defining 'no progress' (must be lower than 'max')
    */
@@ -73,6 +74,7 @@ export interface ProgressStyleConfig {
   };
   defaultProps?: {
     root?: ThemeableProgressOptions;
+    indicator?: ThemeableProgressIndicatorOptions;
   };
 }
 
