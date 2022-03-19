@@ -5,7 +5,7 @@ import { KeysOf, SpaceScaleValue } from "../types";
 /**
  * Types for CSS grid properties
  */
-export type GridProps = Partial<{
+export type GridLayoutProps = Partial<{
   /**
    * The CSS `grid-template` property.
    *
@@ -209,7 +209,7 @@ export type GridProps = Partial<{
 /**
  * Style prop names used in CSS grid based components
  */
-export const gridPropNames: KeysOf<GridProps> = {
+export const gridLayoutPropNames: KeysOf<GridLayoutProps> = {
   gridTemplate: true,
   gridTemplateColumns: true,
   gridTemplateRows: true,

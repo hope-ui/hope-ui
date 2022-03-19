@@ -14,13 +14,22 @@ import {
   HStack,
   useColorMode,
   VStack,
+  Avatar,
+  AvatarBadge,
+  AvatarGroup,
+  AvatarRemaining,
+  Breadcrumb,
+  BreadcrumbLink,
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  BreadcrumbItem,
+  BreadcrumbSeparator,
 } from ".";
-import { Progress, ProgressIndicator, ProgressLabel } from "./components";
+import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-
-  const [valZ, setValZ] = createSignal(50);
 
   return (
     <Box p="$4">
@@ -28,22 +37,29 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
-        <Button onClick={() => setValZ(prev => prev + 5)}>Inc Z</Button>
-        <Button onClick={() => setValZ(0)}>Reset Z</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <Progress w="400px" value={valZ()} trackColor="$success4" aria-label="foo">
-          <ProgressIndicator color="$success9" />
-          <ProgressLabel />
-        </Progress>
-        <CircularProgress value={valZ()} trackColor="$success4" aria-label="foo">
-          <CircularProgressIndicator color="$success9" />
-          <CircularProgressLabel />
-        </CircularProgress>
-        <CircularProgress value={valZ()} size={64} thickness={8} indeterminate>
-          <CircularProgressIndicator withRoundCaps />
-          <CircularProgressLabel />
-        </CircularProgress>
+        <Breadcrumb>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbSeparator />
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+            <BreadcrumbSeparator />
+          </BreadcrumbItem>
+          <BreadcrumbItem>
+            <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+          </BreadcrumbItem>
+        </Breadcrumb>
+        <AvatarGroup size="md">
+          <Avatar name="Hector Rhodes" src="https://bit.ly/3pWHo72" />
+          <Avatar name="Isabella Mckinney" src="https://bit.ly/3tRVozX" />
+          <Avatar name="Courtney Watson" src="https://bit.ly/3w2rgom" />
+          <Avatar name="Alberto Sanchez" src="https://bit.ly/3q1WqrX" />
+          <Avatar name="Nicole Steeves" src="https://bit.ly/37dJ0m7" />
+          <AvatarRemaining>+3</AvatarRemaining>
+        </AvatarGroup>
       </VStack>
     </Box>
   );

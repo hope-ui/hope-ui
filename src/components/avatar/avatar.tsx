@@ -1,4 +1,4 @@
-import { createSignal, JSX, mergeProps, onMount, Show, splitProps } from "solid-js";
+import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -83,7 +83,7 @@ export interface AvatarStyleConfig {
     image?: SystemStyleObject;
     initials?: SystemStyleObject;
     badge?: SystemStyleObject;
-    excess?: SystemStyleObject;
+    remaining?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableAvatarOptions;
@@ -104,15 +104,13 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
 
   const avatarGroupContext = useAvatarGroupContext();
 
-  const [index, setIndex] = createSignal(0);
-
   const defaultProps: AvatarProps<"span"> = {
     size: avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
     withBorder: !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
 
-    borderRadius: avatarGroupContext?.state.borderRadius,
-    borderColor: avatarGroupContext?.state.borderColor,
-    borderWidth: avatarGroupContext?.state.borderWidth,
+    borderRadius: avatarGroupContext?.state.avatarBorderRadius,
+    borderColor: avatarGroupContext?.state.avatarBorderColor,
+    borderWidth: avatarGroupContext?.state.avatarBorderWidth,
     marginStart: avatarGroupContext?.state.spacing,
 
     icon: theme?.defaultProps?.root?.icon ?? (props => <DefaultAvatarIcon {...props} />),
@@ -132,7 +130,6 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     "srcSet",
     "name",
     "borderRadius",
-    "marginStart",
     "onError",
     "getInitials",
     "icon",
@@ -152,47 +149,23 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     );
   };
 
-  const isVisible = () => avatarGroupContext?.shouldShowAvatar(index()) ?? true;
-
-  const marginStart = () => {
-    // Not in an avatar group, lets just pass the prop.
-    if (!avatarGroupContext) {
-      return local.marginStart;
-    }
-
-    // Inside an avatar group the first avatar has no marginStart.
-    return index() > 0 ? local.marginStart : undefined;
-  };
-
-  onMount(() => {
-    setIndex(avatarGroupContext?.registerAvatar() ?? 0);
-  });
-
   return (
-    <Show when={isVisible()}>
-      <hope.span
-        class={classes()}
-        __baseStyle={theme?.baseStyle?.root}
+    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} borderRadius={local.borderRadius} {...others}>
+      <AvatarImage
+        src={local.src}
+        srcSet={local.srcSet}
+        loading={local.loading}
+        getInitials={local.getInitials}
+        name={local.name}
+        icon={local.icon}
+        iconLabel={local.iconLabel}
+        ignoreFallback={local.ignoreFallback}
         borderRadius={local.borderRadius}
-        marginStart={marginStart()}
-        {...others}
-      >
-        <AvatarImage
-          src={local.src}
-          srcSet={local.srcSet}
-          loading={local.loading}
-          getInitials={local.getInitials}
-          name={local.name}
-          icon={local.icon}
-          iconLabel={local.iconLabel}
-          ignoreFallback={local.ignoreFallback}
-          borderRadius={local.borderRadius}
-          // eslint-disable-next-line solid/reactivity
-          onError={local.onError}
-        />
-        {local.children}
-      </hope.span>
-    </Show>
+        // eslint-disable-next-line solid/reactivity
+        onError={local.onError}
+      />
+      {local.children}
+    </hope.span>
   );
 }
 

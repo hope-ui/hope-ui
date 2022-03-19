@@ -3,7 +3,7 @@ import { Show, splitProps } from "solid-js";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbLinkStyles } from "./breadcrumb.styles";
 
@@ -39,9 +39,9 @@ export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLin
   return (
     <Show
       when={local.currentPage}
-      fallback={<Box as="a" href={local.href} class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />}
+      fallback={<hope.a href={local.href} class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />}
     >
-      <Box as="span" aria-current="page" class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />
+      <hope.span aria-current="page" class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />
     </Show>
   );
 }

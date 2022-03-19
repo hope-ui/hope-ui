@@ -5,7 +5,7 @@ import { borderPropNames, BorderProps } from "./props/border";
 import { colorPropNames, ColorProps } from "./props/color";
 import { CSSProp, cssPropName } from "./props/css";
 import { flexboxPropNames, FlexboxProps } from "./props/flexbox";
-import { gridPropNames, GridProps } from "./props/grid";
+import { gridLayoutPropNames, GridLayoutProps } from "./props/grid";
 import { interactivityPropNames, InteractivityProps } from "./props/interactivity";
 import { layoutPropNames, LayoutProps } from "./props/layout";
 import { marginPropNames, MarginProps } from "./props/margin";
@@ -25,7 +25,7 @@ export type StyleProps = ResponsiveProps<
   BorderProps &
     ColorProps &
     FlexboxProps &
-    GridProps &
+    GridLayoutProps &
     InteractivityProps &
     LayoutProps &
     MarginProps &
@@ -43,7 +43,7 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...borderPropNames,
   ...colorPropNames,
   ...flexboxPropNames,
-  ...gridPropNames,
+  ...gridLayoutPropNames,
   ...interactivityPropNames,
   ...layoutPropNames,
   ...marginPropNames,
