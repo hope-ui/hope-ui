@@ -79,7 +79,9 @@ export function App() {
               )}
             </SelectValue>
             <SelectIcon>
-              <IconCaretDown color="$warning9" />
+              {({ opened }) => (
+                <IconCaretDown color="$warning9" transform={opened ? "rotate(180deg)" : "rotate(0deg)"} />
+              )}
             </SelectIcon>
           </SelectTrigger>
           <SelectContent rounded="$none" shadow="$xl" borderColor="$warning7">

@@ -15,6 +15,8 @@ import { pseudoSelectorPropNames, PseudoSelectorProps } from "./props/pseudo-sel
 import { radiiPropNames, RadiiProps } from "./props/radii";
 import { shadowPropNames, ShadowProps } from "./props/shadow";
 import { sizePropNames, SizeProps } from "./props/size";
+import { transformPropNames, TransformProps } from "./props/transform";
+import { transitionPropNames, TransitionProps } from "./props/transition";
 import { typographyPropNames, TypographyProps } from "./props/typography";
 import { KeysOf, ResponsiveProps, SystemStyleObject } from "./types";
 
@@ -34,6 +36,8 @@ export type StyleProps = ResponsiveProps<
     RadiiProps &
     ShadowProps &
     SizeProps &
+    TransformProps &
+    TransitionProps &
     TypographyProps &
     PseudoSelectorProps
 > &
@@ -52,6 +56,8 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...radiiPropNames,
   ...shadowPropNames,
   ...sizePropNames,
+  ...transformPropNames,
+  ...transitionPropNames,
   ...typographyPropNames,
   ...pseudoSelectorPropNames,
   ...cssPropName,
