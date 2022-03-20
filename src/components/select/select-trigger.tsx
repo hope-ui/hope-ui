@@ -35,8 +35,8 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
     );
   };
 
-  const assignButtonRef = (el: HTMLButtonElement) => {
-    selectContext.assignButtonRef(el);
+  const assignTriggerRef = (el: HTMLButtonElement) => {
+    selectContext.assignTriggerRef(el);
 
     if (isFunction(local.ref)) {
       local.ref(el);
@@ -47,14 +47,14 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    const allHanders = callAllHandlers(selectContext.onButtonBlur, selectContext.formControlProps.onBlur);
+    const allHanders = callAllHandlers(selectContext.onTriggerBlur, selectContext.formControlProps.onBlur);
     allHanders(event);
   };
 
   return (
     <hope.button
-      ref={assignButtonRef}
-      id={selectContext.state.buttonId}
+      ref={assignTriggerRef}
+      id={selectContext.state.triggerId}
       disabled={selectContext.state.disabled}
       type="button"
       role="combobox"
@@ -71,8 +71,8 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       __baseStyle={theme?.baseStyle?.trigger}
       onFocus={selectContext.formControlProps.onFocus}
       onBlur={onBlur}
-      onClick={selectContext.onButtonClick}
-      onKeyDown={selectContext.onButtonKeyDown}
+      onClick={selectContext.onTriggerClick}
+      onKeyDown={selectContext.onTriggerKeyDown}
       {...others}
     />
   );

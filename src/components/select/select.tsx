@@ -125,7 +125,7 @@ type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">
     /**
      * The `id` of the `SelectTrigger`.
      */
-    buttonId: string;
+    triggerId: string;
 
     /**
      * The `id` of the `SelectListbox`.
@@ -199,7 +199,7 @@ interface SelectContextValue {
   /**
    * Callback to assign the `SelectTrigger` ref.
    */
-  assignButtonRef: (el: HTMLButtonElement) => void;
+  assignTriggerRef: (el: HTMLButtonElement) => void;
 
   /**
    * Callback to assign the `SelectContent` ref.
@@ -235,17 +235,17 @@ interface SelectContextValue {
   /**
    * Callback invoked when the `SelectTrigger` loose focus.
    */
-  onButtonBlur: (event: FocusEvent) => void;
+  onTriggerBlur: (event: FocusEvent) => void;
 
   /**
    * Callback invoked when the user click on the `SelectTrigger`.
    */
-  onButtonClick: (event: MouseEvent) => void;
+  onTriggerClick: (event: MouseEvent) => void;
 
   /**
    * Callback invoked when the user trigger the `SelectTrigger` with keyboard.
    */
-  onButtonKeyDown: (event: KeyboardEvent) => void;
+  onTriggerKeyDown: (event: KeyboardEvent) => void;
 
   /**
    * Callback invoked when the user click on a `SelectOption`.
@@ -282,8 +282,8 @@ export interface SelectStyleConfig {
     optgroup?: SystemStyleObject;
     label?: SystemStyleObject;
     option?: SystemStyleObject;
-    optionIndicator?: SystemStyleObject;
     optionText?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableSelectOptions;
@@ -323,8 +323,8 @@ export function Select(props: SelectProps) {
     get multiple() {
       return props.multiple;
     },
-    get buttonId() {
-      return props.id ?? formControlProps.id ?? `${defaultBaseId}-button`;
+    get triggerId() {
+      return props.id ?? formControlProps.id ?? `${defaultBaseId}-trigger`;
     },
     get listboxId() {
       return `${defaultBaseId}-listbox`;
@@ -366,18 +366,18 @@ export function Select(props: SelectProps) {
   });
 
   // element refs
-  let buttonRef: HTMLButtonElement | undefined;
+  let triggerRef: HTMLButtonElement | undefined;
   let contentRef: HTMLDivElement | undefined;
   let listboxRef: HTMLDivElement | undefined;
 
   let cleanupContentAutoUpdate: (() => void) | undefined;
 
   const updateContentPosition = async () => {
-    if (!buttonRef || !contentRef) {
+    if (!triggerRef || !contentRef) {
       return;
     }
 
-    const { x, y } = await computePosition(buttonRef, contentRef, {
+    const { x, y } = await computePosition(triggerRef, contentRef, {
       placement: "bottom",
       middleware: [
         offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 5),
@@ -427,7 +427,7 @@ export function Select(props: SelectProps) {
   };
 
   const focusTrigger = () => {
-    buttonRef?.focus();
+    triggerRef?.focus();
   };
 
   const getDefaultSelectedValues = () => {
@@ -525,10 +525,10 @@ export function Select(props: SelectProps) {
   };
 
   const isInsideTrigger = (element: HTMLElement) => {
-    return !!buttonRef && buttonRef.contains(element);
+    return !!triggerRef && triggerRef.contains(element);
   };
 
-  const onButtonBlur = (event: FocusEvent) => {
+  const onTriggerBlur = (event: FocusEvent) => {
     // if the blur was provoked by an element inside the trigger, ignore it
     if (event.relatedTarget && isInsideTrigger(event.relatedTarget as HTMLElement)) {
       return;
@@ -541,19 +541,19 @@ export function Select(props: SelectProps) {
     }
 
     if (state.opened) {
-      updateContentState(false, false);
+      updateOpeningState(false, false);
     }
   };
 
-  const onButtonClick = () => {
+  const onTriggerClick = () => {
     if (formControlProps.readOnly) {
       return;
     }
 
-    updateContentState(!state.opened, false);
+    updateOpeningState(!state.opened, false);
   };
 
-  const onButtonKeyDown = (event: KeyboardEvent) => {
+  const onTriggerKeyDown = (event: KeyboardEvent) => {
     if (formControlProps.readOnly) {
       return;
     }
@@ -572,7 +572,7 @@ export function Select(props: SelectProps) {
     switch (action) {
       case SelectActions.Last:
       case SelectActions.First:
-        updateContentState(true);
+        updateOpeningState(true);
       // intentional fallthrough
       case SelectActions.Next:
       case SelectActions.Previous:
@@ -589,28 +589,28 @@ export function Select(props: SelectProps) {
       case SelectActions.CloseSelect:
         event.preventDefault();
         selectOption(state.activeIndex);
-        return state.multiple ? undefined : updateContentState(false); // don't close in multi-select.
+        return state.multiple ? undefined : updateOpeningState(false); // don't close in multi-select.
 
       case SelectActions.Close:
         event.preventDefault();
-        return updateContentState(false);
+        return updateOpeningState(false);
 
       case SelectActions.Type:
-        return onButtonType(key);
+        return onTriggerType(key);
 
       case SelectActions.Open:
         event.preventDefault();
-        return updateContentState(true);
+        return updateOpeningState(true);
     }
   };
 
-  const onButtonType = (letter: string) => {
+  const onTriggerType = (letter: string) => {
     if (formControlProps.readOnly) {
       return;
     }
 
     // open the listbox if it is closed
-    updateContentState(true);
+    updateOpeningState(true);
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
@@ -641,7 +641,7 @@ export function Select(props: SelectProps) {
       // don't close on multi-select and ensure to bring back focus to the `SelectTrigger` in order to keep keyboard navigation working.
       focusTrigger();
     } else {
-      updateContentState(false);
+      updateOpeningState(false);
     }
   };
 
@@ -660,14 +660,8 @@ export function Select(props: SelectProps) {
     setState("ignoreBlur", true);
   };
 
-  const updateContentState = (opened: boolean, callFocus = true) => {
-    if (state.opened === opened) {
-      return;
-    }
-
-    setState("opened", opened);
-
-    // focus on first selected option or the first one
+  const setDefaultActiveOption = () => {
+    // focus on first selected option or the first one.
     if (state.selectedOptions.length > 0) {
       setState(
         "activeIndex",
@@ -676,19 +670,33 @@ export function Select(props: SelectProps) {
     } else {
       setState("activeIndex", 0);
     }
+  };
 
+  const scheduleContentPositionAutoUpdate = () => {
     if (state.opened) {
       updateContentPosition();
 
-      // schedule auto update of the content position
-      if (buttonRef && contentRef) {
-        cleanupContentAutoUpdate = autoUpdate(buttonRef, contentRef, updateContentPosition);
+      // schedule auto update of the content position.
+      if (triggerRef && contentRef) {
+        cleanupContentAutoUpdate = autoUpdate(triggerRef, contentRef, updateContentPosition);
       }
     } else {
       cleanupContentAutoUpdate?.();
     }
+  };
 
-    // move focus back to the button, if needed
+  const updateOpeningState = (opened: boolean, callFocus = true) => {
+    if (state.opened === opened) {
+      return;
+    }
+
+    setState("opened", opened);
+
+    setDefaultActiveOption();
+
+    scheduleContentPositionAutoUpdate();
+
+    // move focus back to the button, if needed.
     callFocus && focusTrigger();
   };
 
@@ -702,15 +710,15 @@ export function Select(props: SelectProps) {
       return;
     }
 
-    updateContentState(false, false);
+    updateOpeningState(false, false);
   };
 
   const isOptionActiveDescendant = (index: number) => {
     return index === state.activeIndex;
   };
 
-  const assignButtonRef = (el: HTMLButtonElement) => {
-    buttonRef = el;
+  const assignTriggerRef = (el: HTMLButtonElement) => {
+    triggerRef = el;
   };
 
   const assignContentRef = (el: HTMLDivElement) => {
@@ -759,15 +767,15 @@ export function Select(props: SelectProps) {
     unselectOption,
     isOptionActiveDescendant,
     formControlProps,
-    assignButtonRef,
+    assignTriggerRef,
     assignContentRef,
     assignListboxRef,
     registerOption,
     scrollToOption,
     onContentOutsideClick,
-    onButtonBlur,
-    onButtonClick,
-    onButtonKeyDown,
+    onTriggerBlur,
+    onTriggerClick,
+    onTriggerKeyDown,
     onOptionClick,
     onOptionMouseMove,
     onOptionMouseDown,

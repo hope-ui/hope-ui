@@ -1,9 +1,9 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { anchorStyles } from "./anchor.styles";
 
@@ -24,17 +24,12 @@ const hopeAnchorClass = "hope-anchor";
 export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
   const theme = useComponentStyleConfigs().Anchor;
 
-  const defaultProps: AnchorProps<"a"> = {
-    as: "a",
-  };
-
-  const propsWithDefault: AnchorProps<"a"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "external"]);
+  const [local, others] = splitProps(props, ["class", "external"]);
 
   const classes = () => classNames(local.class, hopeAnchorClass, anchorStyles());
 
   return (
-    <Box
+    <hope.a
       class={classes()}
       __baseStyle={theme?.baseStyle}
       target={local.external ? "_blank" : undefined}
