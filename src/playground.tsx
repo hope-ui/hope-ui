@@ -37,7 +37,8 @@ import {
   VStack,
 } from ".";
 import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
-import { createIcon } from "./components";
+import { createIcon, Input, InputGroup, InputLeftElement, InputRightElement } from "./components";
+import { IconCheck } from "./components/icons/IconCheck";
 
 const IconCaretDown = createIcon({
   viewBox: "0 0 15 15",
@@ -78,7 +79,9 @@ export function App() {
               )}
             </SelectValue>
             <SelectIcon>
-              <IconCaretDown color="$warning9" />
+              {({ opened }) => (
+                <IconCaretDown color="$warning9" transform={opened ? "rotate(180deg)" : "rotate(0deg)"} />
+              )}
             </SelectIcon>
           </SelectTrigger>
           <SelectContent rounded="$none" shadow="$xl" borderColor="$warning7">
@@ -99,6 +102,15 @@ export function App() {
             </SelectListbox>
           </SelectContent>
         </Select>
+        <InputGroup>
+          <InputLeftElement pointerEvents="none" color="$neutral8" fontSize="1.2em">
+            $
+          </InputLeftElement>
+          <Input placeholder="Enter amount" />
+          <InputRightElement pointerEvents="none">
+            <IconCheck boxSize="20px" color="$success9" />
+          </InputRightElement>
+        </InputGroup>
       </VStack>
     </Box>
   );

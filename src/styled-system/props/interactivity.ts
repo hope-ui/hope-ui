@@ -3,7 +3,7 @@ import { Property } from "csstype";
 import { ColorScaleValue, KeysOf } from "../types";
 
 /**
- * Types for other CSS properties
+ * Types for interactivity CSS properties
  */
 export type InteractivityProps = Partial<{
   /**
@@ -25,11 +25,6 @@ export type InteractivityProps = Partial<{
    * The CSS `resize` property
    */
   resize: Property.Resize;
-
-  /**
-   * The CSS `transition` property
-   */
-  transition: Property.Transition;
 
   /**
    * The CSS `cursor` property
@@ -59,7 +54,6 @@ export const interactivityPropNames: KeysOf<InteractivityProps> = {
   appearance: true,
   userSelect: true,
   pointerEvents: true,
-  transition: true,
   resize: true,
   cursor: true,
   outline: true,

@@ -289,19 +289,19 @@ export const inputElementStyles = css({
     size: {
       xs: {
         ...inputSizes.xs,
-        width: inputSizes.xs.height,
+        width: inputSizes.xs.minHeight,
       },
       sm: {
         ...inputSizes.sm,
-        width: inputSizes.sm.height,
+        width: inputSizes.sm.minHeight,
       },
       md: {
         ...inputSizes.md,
-        width: inputSizes.md.height,
+        width: inputSizes.md.minHeight,
       },
       lg: {
         ...inputSizes.lg,
-        width: inputSizes.lg.height,
+        width: inputSizes.lg.minHeight,
       },
     },
   },
