@@ -35,7 +35,6 @@
 | AutoComplete     |             |            |       |           |      |
 | Checkbox         |     ✅      |     ✅     |       |    ✅     |      |
 | DatePicker       |             |            |       |           |      |
-| Form             |             |            |       |           |      |
 | FormControl      |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | FormLabel        |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | FormHelperText   |     ✅      |     ✅     |  ✅   |    ✅     |      |
@@ -47,7 +46,7 @@
 | Radio            |     ✅      |     ✅     |       |    ✅     |      |
 | NativeSelect     |             |            |       |           |      |
 | Select           |     ✅      |     ✅     |       |           |      |
-| MultiSelect      |             |            |       |           |      |
+| MultiSelect      |     ✅      |     ✅     |       |           |      |
 | Slider           |             |            |       |           |      |
 | Switch           |     ✅      |     ✅     |       |    ✅     |      |
 | Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
@@ -81,10 +80,10 @@
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Alert            |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Notification     |             |            |       |           |      |
 | CircularProgress |     ✅      |     ✅     |       |           |      |
 | Progress         |     ✅      |     ✅     |       |           |      |
 | Spinner          |     ✅      |     ✅     |       |           |      |
+| Toast            |             |            |       |           |      |
 
 ### Overlay
 

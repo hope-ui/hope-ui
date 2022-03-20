@@ -14,14 +14,14 @@ import { avatarGroupStyles, AvatarVariants } from "./avatar.styles";
 
 export interface ThemeableAvatarGroupOptions {
   /**
-   * The space between the avatars in the group.
-   */
-  spacing?: ResponsiveValue<MarginProps["margin"]>;
-
-  /**
    * The size of the avatars.
    */
   size?: AvatarVariants["size"];
+
+  /**
+   * The space between the avatars in the group.
+   */
+  spacing?: ResponsiveValue<MarginProps["margin"]>;
 
   /**
    * The `border-radius` of the avatars

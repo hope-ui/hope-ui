@@ -64,11 +64,10 @@ export const selectTriggerStyles = css(baseInputResetStyles, {
 export type SelectTriggerVariants = VariantProps<typeof selectTriggerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger single value
+ * Select - trigger - single value
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectSingleValueStyles = css({
-  display: "block",
   flexGrow: 1,
   flexShrink: 1,
 
@@ -79,7 +78,7 @@ export const selectSingleValueStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger multi value
+ * Select - trigger - multi value
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectMultiValueStyles = css({
@@ -95,7 +94,66 @@ export const selectMultiValueStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger placeholder
+ * Select - trigger - multi value - tag
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectTagCloseButtonStyles = css({
+  appearance: "none",
+
+  display: "inline-flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  height: "100%",
+
+  outline: "none",
+  borderRightRadius: "$sm",
+
+  backgroundColor: "transparent",
+
+  px: "$1",
+
+  color: "inherit",
+  lineHeight: "$none",
+  textDecoration: "none",
+
+  cursor: "pointer",
+  userSelect: "none",
+  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+
+  "&:hover": {
+    backgroundColor: "$neutral7",
+  },
+
+  "&:focus": {
+    outline: "none",
+    boxShadow: "$outline",
+  },
+});
+
+export const selectTagStyles = css({
+  display: "inline-flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "$0_5",
+
+  height: "$6",
+
+  borderRadius: "$sm",
+
+  backgroundColor: "$neutral4",
+
+  py: 0,
+  pl: "$2",
+
+  color: "$neutral12",
+  fontSize: "$sm",
+  lineHeight: "$5",
+  fontWeight: "$medium",
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - trigger - placeholder
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectPlaceholderStyles = css(selectSingleValueStyles, {
@@ -104,7 +162,7 @@ export const selectPlaceholderStyles = css(selectSingleValueStyles, {
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger icon
+ * Select - trigger - dropdown icon
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectIconStyles = css({
