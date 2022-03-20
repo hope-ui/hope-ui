@@ -35,6 +35,7 @@ import {
   SelectValue,
   useColorMode,
   VStack,
+  Kbd,
 } from ".";
 import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
 import { createIcon, Input, InputGroup, InputLeftElement, InputRightElement } from "./components";
@@ -57,6 +58,9 @@ export function App() {
 
   return (
     <Box p="$4">
+      <span>
+        <Kbd>shift</Kbd> + <Kbd>H</Kbd>
+      </span>
       <HStack spacing="$4" mb="$4">
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode

@@ -61,6 +61,7 @@
 | Avatar    |     ✅      |     ✅     |       |           |      |
 | Badge     |     ✅      |     ✅     |       |           |      |
 | Icon      |     ✅      |     ✅     |  ✅   |           |      |
+| Kbd       |     ✅      |    n/a     |       |           |      |
 | Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
