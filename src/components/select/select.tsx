@@ -274,6 +274,8 @@ export interface SelectStyleConfig {
     placeholder?: SystemStyleObject;
     singleValue?: SystemStyleObject;
     multiValue?: SystemStyleObject;
+    tag?: SystemStyleObject;
+    tagCloseButton?: SystemStyleObject;
     icon?: SystemStyleObject;
     content?: SystemStyleObject;
     listbox?: SystemStyleObject;
