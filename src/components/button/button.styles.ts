@@ -685,3 +685,11 @@ export const buttonStyles = css({
 });
 
 export type ButtonVariants = VariantProps<typeof buttonStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * ButtonGroup
+ * -----------------------------------------------------------------------------------------------*/
+
+export const buttonGroupStyles = css({
+  display: "inline-flex",
+});
