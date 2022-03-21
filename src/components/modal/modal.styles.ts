@@ -150,7 +150,7 @@ export const baseDialogStyles = css({
 
   outline: "none",
   boxShadow: "$lg",
-  backgroundColor: "$background",
+  backgroundColor: "$loContrast",
 
   color: "inherit",
 
