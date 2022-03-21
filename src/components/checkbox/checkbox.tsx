@@ -163,17 +163,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     id: defaultId,
     iconChecked: <CheckboxIconCheck />,
     iconIndeterminate: <CheckboxIconIndeterminate />,
-
-    variant: checkboxGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
-    colorScheme: checkboxGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
-    size: checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md",
-    labelPlacement: checkboxGroupContext?.state?.labelPlacement ?? theme?.defaultProps?.root?.labelPlacement ?? "end",
-
-    name: checkboxGroupContext?.state.name,
-    required: checkboxGroupContext?.state.required,
-    disabled: checkboxGroupContext?.state.disabled,
-    invalid: checkboxGroupContext?.state.invalid,
-    readOnly: checkboxGroupContext?.state.readOnly,
   };
 
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
@@ -199,6 +188,40 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     ["variant", "colorScheme", "size", "labelPlacement"]
   );
 
+  const variant = () => {
+    return (
+      variantProps.variant ?? checkboxGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline"
+    );
+  };
+
+  const colorScheme = () => {
+    return (
+      variantProps.colorScheme ??
+      checkboxGroupContext?.state?.colorScheme ??
+      theme?.defaultProps?.root?.colorScheme ??
+      "primary"
+    );
+  };
+
+  const size = () => {
+    return variantProps.size ?? checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
+  };
+
+  const labelPlacement = () => {
+    return (
+      variantProps.labelPlacement ??
+      checkboxGroupContext?.state?.labelPlacement ??
+      theme?.defaultProps?.root?.labelPlacement ??
+      "end"
+    );
+  };
+
+  const name = () => inputProps.name ?? checkboxGroupContext?.state.name;
+  const required = () => inputProps.required ?? checkboxGroupContext?.state.required;
+  const disabled = () => inputProps.disabled ?? checkboxGroupContext?.state.disabled;
+  const invalid = () => local.invalid ?? checkboxGroupContext?.state.invalid;
+  const readOnly = () => inputProps.readOnly ?? checkboxGroupContext?.state.readOnly;
+
   // Internal state for uncontrolled checkbox.
   // eslint-disable-next-line solid/reactivity
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
@@ -216,35 +239,50 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     return isControlled() ? !!local.checked : checkedState();
   };
 
-  // Input loose focus if this is placed in `dataAttrs()`
+  const dataIndeterminate = () => (inputProps.indeterminate ? "" : undefined);
   const dataChecked = () => (checked() ? "" : undefined);
+  const dataRequired = () => (required() ? "" : undefined);
+  const dataDisabled = () => (disabled() ? "" : undefined);
+  const dataInvalid = () => (invalid() ? "" : undefined);
+  const dataReadonly = () => (readOnly() ? "" : undefined);
 
-  const dataAttrs = () => ({
-    "data-indeterminate": inputProps.indeterminate ? "" : undefined,
-    "data-required": inputProps.required ? "" : undefined,
-    "data-disabled": inputProps.disabled ? "" : undefined,
-    "data-invalid": local.invalid ? "" : undefined,
-    "data-readonly": inputProps.readOnly ? "" : undefined,
-  });
-
-  const ariaAttrs = () => ({
-    "aria-required": inputProps.required ? true : undefined,
-    "aria-disabled": inputProps.disabled ? true : undefined,
-    "aria-invalid": local.invalid ? true : undefined,
-    "aria-readonly": inputProps.readOnly ? true : undefined,
-  });
+  const ariaRequired = () => (required() ? true : undefined);
+  const ariaDisabled = () => (disabled() ? true : undefined);
+  const ariaInvalid = () => (invalid() ? true : undefined);
+  const ariaReadonly = () => (readOnly() ? true : undefined);
 
   const containerClasses = () => {
-    return classNames(local.class, hopeCheckboxClass, checkboxContainerStyles(variantProps));
+    return classNames(
+      local.class,
+      hopeCheckboxClass,
+      checkboxContainerStyles({
+        size: size(),
+        labelPlacement: labelPlacement(),
+      })
+    );
   };
 
   const inputClasses = () => classNames(hopeCheckboxInputClass, checkboxInputStyles());
 
   const controlClasses = () => {
-    return classNames(hopeCheckboxControlClass, checkboxControlStyles(variantProps));
+    return classNames(
+      hopeCheckboxControlClass,
+      checkboxControlStyles({
+        variant: variant(),
+        colorScheme: colorScheme(),
+        size: size(),
+      })
+    );
   };
 
-  const labelClasses = () => classNames(hopeCheckboxLabelClass, checkboxLabelStyles(variantProps));
+  const labelClasses = () =>
+    classNames(
+      hopeCheckboxLabelClass,
+      checkboxLabelStyles({
+        size: size(),
+        labelPlacement: labelPlacement(),
+      })
+    );
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     if (inputProps.readOnly || inputProps.disabled) {
@@ -265,8 +303,12 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       class={containerClasses()}
       __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
+      data-indeterminate={dataIndeterminate()}
       data-checked={dataChecked()}
-      {...dataAttrs}
+      data-required={dataRequired()}
+      data-disabled={dataDisabled()}
+      data-invalid={dataInvalid()}
+      data-readonly={dataReadonly()}
       {...others}
     >
       <input
@@ -274,15 +316,23 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         class={inputClasses()}
         checked={checked()}
         onChange={onChange}
+        name={name()}
+        aria-required={ariaRequired()}
+        aria-disabled={ariaDisabled()}
+        aria-invalid={ariaInvalid()}
+        aria-readonly={ariaReadonly()}
         {...inputProps}
-        {...ariaAttrs}
       />
       <hope.span
         aria-hidden={true}
         class={controlClasses()}
         __baseStyle={theme?.baseStyle?.control}
+        data-indeterminate={dataIndeterminate()}
         data-checked={dataChecked()}
-        {...dataAttrs}
+        data-required={dataRequired()}
+        data-disabled={dataDisabled()}
+        data-invalid={dataInvalid()}
+        data-readonly={dataReadonly()}
       >
         <Switch>
           <Match when={inputProps.indeterminate}>{local.iconIndeterminate}</Match>
@@ -293,8 +343,12 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         <hope.span
           class={labelClasses()}
           __baseStyle={theme?.baseStyle?.label}
+          data-indeterminate={dataIndeterminate()}
           data-checked={dataChecked()}
-          {...dataAttrs}
+          data-required={dataRequired()}
+          data-disabled={dataDisabled()}
+          data-invalid={dataInvalid()}
+          data-readonly={dataReadonly()}
         >
           {local.children}
         </hope.span>

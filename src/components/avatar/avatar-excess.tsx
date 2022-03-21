@@ -5,17 +5,17 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { avatarRemainingStyles, AvatarRemainingVariants } from "./avatar.styles";
+import { avatarExcessStyles, AvatarExcessVariants } from "./avatar.styles";
 import { useAvatarGroupContext } from "./avatar-group";
 
-export type AvatarRemainingProps<C extends ElementType = "span"> = HTMLHopeProps<C, AvatarRemainingVariants>;
+export type AvatarExcessProps<C extends ElementType = "span"> = HTMLHopeProps<C, AvatarExcessVariants>;
 
-const hopeAvatarRemainingClass = "hope-avatar__remaining";
+const hopeAvatarExcessClass = "hope-avatar__excess";
 
 /**
  * Component to show the remaining number of avatars in a group.
  */
-export function AvatarRemaining<C extends ElementType = "span">(props: AvatarRemainingProps<C>) {
+export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcessProps<C>) {
   const theme = useComponentStyleConfigs().Avatar;
 
   const avatarGroupContext = useAvatarGroupContext();
@@ -25,8 +25,8 @@ export function AvatarRemaining<C extends ElementType = "span">(props: AvatarRem
   const classes = () => {
     return classNames(
       local.class,
-      hopeAvatarRemainingClass,
-      avatarRemainingStyles({
+      hopeAvatarExcessClass,
+      avatarExcessStyles({
         size: local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
         withBorder: local.withBorder ?? !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
       })
@@ -46,4 +46,4 @@ export function AvatarRemaining<C extends ElementType = "span">(props: AvatarRem
   );
 }
 
-AvatarRemaining.toString = () => createClassSelector(hopeAvatarRemainingClass);
+AvatarExcess.toString = () => createClassSelector(hopeAvatarExcessClass);

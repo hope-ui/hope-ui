@@ -105,14 +105,6 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
   const avatarGroupContext = useAvatarGroupContext();
 
   const defaultProps: AvatarProps<"span"> = {
-    size: avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
-    withBorder: !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
-
-    borderRadius: avatarGroupContext?.state.avatarBorderRadius,
-    borderColor: avatarGroupContext?.state.avatarBorderColor,
-    borderWidth: avatarGroupContext?.state.avatarBorderWidth,
-    marginStart: avatarGroupContext?.state.spacing,
-
     icon: theme?.defaultProps?.root?.icon ?? (props => <DefaultAvatarIcon {...props} />),
     iconLabel: theme?.defaultProps?.root?.iconLabel ?? "avatar",
     getInitials: theme?.defaultProps?.root?.getInitials ?? initials,
@@ -143,14 +135,22 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
       local.class,
       hopeAvatarClass,
       avatarStyles({
-        size: local.size,
-        withBorder: local.withBorder,
+        size: local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        withBorder: local.withBorder ?? !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
       })
     );
   };
 
   return (
-    <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} borderRadius={local.borderRadius} {...others}>
+    <hope.span
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.root}
+      borderRadius={local.borderRadius ?? avatarGroupContext?.state.avatarBorderRadius}
+      borderColor={avatarGroupContext?.state.avatarBorderColor}
+      borderWidth={avatarGroupContext?.state.avatarBorderWidth}
+      marginStart={avatarGroupContext?.state.spacing}
+      {...others}
+    >
       <AvatarImage
         src={local.src}
         srcSet={local.srcSet}
@@ -160,7 +160,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
         icon={local.icon}
         iconLabel={local.iconLabel}
         ignoreFallback={local.ignoreFallback}
-        borderRadius={local.borderRadius}
+        borderRadius={local.borderRadius ?? avatarGroupContext?.state.avatarBorderRadius}
         // eslint-disable-next-line solid/reactivity
         onError={local.onError}
       />
