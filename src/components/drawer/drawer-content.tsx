@@ -1,10 +1,11 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { useModalContext } from "../modal";
 import { createModal } from "../modal/create-modal";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -25,12 +26,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
   const drawerContext = useDrawerContext();
   const modalContext = useModalContext();
 
-  const defaultProps: DrawerContentProps<"section"> = {
-    as: "section",
-  };
-
-  const propsWithDefault: DrawerContentProps<"section"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
+  const [local, others] = splitProps(props as DrawerContentProps<"section">, [
     "ref",
     "class",
     "role",
@@ -88,7 +84,7 @@ export function DrawerContent<C extends ElementType = "section">(props: DrawerCo
           onKeyDown={modalContext.onKeyDown}
           onClick={modalContext.onOverlayClick}
         >
-          <Box
+          <hope.section
             class={dialogClasses()}
             __baseStyle={theme?.baseStyle?.content}
             id={modalContext.state.dialogId}

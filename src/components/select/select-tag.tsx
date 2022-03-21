@@ -1,4 +1,4 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -20,21 +20,15 @@ export function SelectTag<C extends ElementType = "span">(props: SelectTagProps<
 
   const selectContext = useSelectContext();
 
-  const defaultProps: SelectTagProps<"span"> = {
-    size: selectContext.state.size ?? "md",
-    variant: selectContext.state.variant === "filled" ? "outline" : "subtle" ?? "subtle",
-  };
-
-  const propsWithDefault: SelectTagProps<"span"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "size", "variant"]);
+  const [local, others] = splitProps(props, ["class", "size", "variant"]);
 
   const classes = () => {
     return classNames(
       local.class,
       hopeSelectTagClass,
       selectTagStyles({
-        size: local.size,
-        variant: local.variant,
+        size: local.size ?? selectContext.state.size ?? "md",
+        variant: local.variant ?? selectContext.state.variant === "filled" ? "outline" : "subtle" ?? "subtle",
       })
     );
   };

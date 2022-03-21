@@ -1,4 +1,4 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -46,17 +46,9 @@ export function Input(props: InputProps) {
 
   const inputGroup = useInputGroupContext();
 
-  const defaultProps: InputProps = {
-    type: "text",
-    variant: inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
-    size: inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
-  };
-
-  const propsWithDefault: InputProps = mergeProps(defaultProps, props);
-  const [local, variantProps, useFormControlProps, others] = splitProps(
-    propsWithDefault,
-    ["class", "htmlSize"],
-    ["variant", "size"],
+  const [local, useFormControlProps, others] = splitProps(
+    props,
+    ["class", "htmlSize", "variant", "size"],
     useFormControlPropNames
   );
 
@@ -67,8 +59,8 @@ export function Input(props: InputProps) {
       local.class,
       hopeInputClass,
       inputStyles({
-        variant: variantProps.variant,
-        size: variantProps.size,
+        variant: local.variant ?? inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
+        size: local.size ?? inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
         withLeftElement: inputGroup?.state.hasLeftElement ?? false,
         withRightElement: inputGroup?.state.hasRightElement ?? false,
         withLeftAddon: inputGroup?.state.hasLeftAddon ?? false,
@@ -78,6 +70,7 @@ export function Input(props: InputProps) {
 
   return (
     <hope.input
+      type="text"
       class={classes()}
       size={local.htmlSize}
       __baseStyle={theme?.baseStyle?.input}

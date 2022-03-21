@@ -5,7 +5,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
@@ -114,18 +113,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const radioGroupContext = useRadioGroupContext();
 
   const defaultProps: RadioProps<"label"> = {
-    as: "label",
     id: defaultId,
-    variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
-    colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
-    size: radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md",
-    labelPlacement: radioGroupContext?.state?.labelPlacement ?? theme?.defaultProps?.root?.labelPlacement ?? "end",
-
-    name: radioGroupContext?.state.name,
-    required: radioGroupContext?.state.required,
-    disabled: radioGroupContext?.state.disabled,
-    readOnly: radioGroupContext?.state.readOnly,
-    invalid: radioGroupContext?.state.invalid,
   };
 
   const propsWithDefaults: RadioProps<"label"> = mergeProps(defaultProps, props);
@@ -150,47 +138,97 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     ["variant", "colorScheme", "size", "labelPlacement"]
   );
 
+  const variant = () => {
+    return variantProps.variant ?? radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+  };
+
+  const colorScheme = () => {
+    return (
+      variantProps.colorScheme ??
+      radioGroupContext?.state?.colorScheme ??
+      theme?.defaultProps?.root?.colorScheme ??
+      "primary"
+    );
+  };
+
+  const size = () => {
+    return variantProps.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
+  };
+
+  const labelPlacement = () => {
+    return (
+      variantProps.labelPlacement ??
+      radioGroupContext?.state?.labelPlacement ??
+      theme?.defaultProps?.root?.labelPlacement ??
+      "end"
+    );
+  };
+
+  const name = () => inputProps.name ?? radioGroupContext?.state.name;
+  const required = () => inputProps.required ?? radioGroupContext?.state.required;
+  const disabled = () => inputProps.disabled ?? radioGroupContext?.state.disabled;
+  const invalid = () => local.invalid ?? radioGroupContext?.state.invalid;
+  const readOnly = () => inputProps.readOnly ?? radioGroupContext?.state.readOnly;
+
   // Internal state for uncontrolled radio.
   // eslint-disable-next-line solid/reactivity
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
   const checked = () => {
-    if (radioGroupContext?.state.value != null && inputProps?.value != null) {
-      return radioGroupContext.state.value === inputProps.value;
+    if (radioGroupContext) {
+      const radioGroupValue = radioGroupContext.state.value;
+      return radioGroupValue != null ? inputProps.value === radioGroupValue : undefined;
     }
 
+    // Not in a RadioGroup
     return isControlled() ? !!local.checked : checkedState();
   };
 
-  // Input loose focus if this is placed in `dataAttrs()`
   const dataChecked = () => (checked() ? "" : undefined);
+  const dataRequired = () => (required() ? "" : undefined);
+  const dataDisabled = () => (disabled() ? "" : undefined);
+  const dataInvalid = () => (invalid() ? "" : undefined);
+  const dataReadonly = () => (readOnly() ? "" : undefined);
 
-  const dataAttrs = () => ({
-    "data-required": inputProps.required ? "" : undefined,
-    "data-disabled": inputProps.disabled ? "" : undefined,
-    "data-invalid": local.invalid ? "" : undefined,
-    "data-readonly": inputProps.readOnly ? "" : undefined,
-  });
-
-  const ariaAttrs = () => ({
-    "aria-required": inputProps.required ? true : undefined,
-    "aria-disabled": inputProps.disabled ? true : undefined,
-    "aria-invalid": local.invalid ? true : undefined,
-    "aria-readonly": inputProps.readOnly ? true : undefined,
-  });
+  const ariaRequired = () => (required() ? true : undefined);
+  const ariaDisabled = () => (disabled() ? true : undefined);
+  const ariaInvalid = () => (invalid() ? true : undefined);
+  const ariaReadonly = () => (readOnly() ? true : undefined);
 
   const containerClasses = () => {
-    return classNames(local.class, hopeRadioClass, radioContainerStyles(variantProps));
+    return classNames(
+      local.class,
+      hopeRadioClass,
+      radioContainerStyles({
+        size: size(),
+        labelPlacement: labelPlacement(),
+      })
+    );
   };
 
   const inputClasses = () => classNames(hopeRadioInputClass, radioInputStyles());
 
   const controlClasses = () => {
-    return classNames(hopeRadioControlClass, radioControlStyles(variantProps));
+    return classNames(
+      hopeRadioControlClass,
+      radioControlStyles({
+        variant: variant(),
+        colorScheme: colorScheme(),
+        size: size(),
+      })
+    );
   };
 
-  const labelClasses = () => classNames(hopeRadioLabelClass, radioLabelStyles(variantProps));
+  const labelClasses = () => {
+    return classNames(
+      hopeRadioLabelClass,
+      radioLabelStyles({
+        size: size(),
+        labelPlacement: labelPlacement(),
+      })
+    );
+  };
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     if (inputProps.readOnly || inputProps.disabled) {
@@ -207,41 +245,54 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   };
 
   return (
-    <Box
-      as="label"
+    <hope.label
       class={containerClasses()}
       __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
       data-checked={dataChecked()}
-      {...dataAttrs}
+      data-required={dataRequired()}
+      data-disabled={dataDisabled()}
+      data-invalid={dataInvalid()}
+      data-readonly={dataReadonly()}
       {...others}
     >
+      {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <input
         type="radio"
         class={inputClasses()}
         checked={checked()}
         onChange={onChange}
+        name={name()}
+        aria-required={ariaRequired()}
+        aria-disabled={ariaDisabled()}
+        aria-invalid={ariaInvalid()}
+        aria-readonly={ariaReadonly()}
         {...inputProps}
-        {...ariaAttrs}
       />
       <hope.span
         aria-hidden={true}
         class={controlClasses()}
         __baseStyle={theme?.baseStyle?.control}
         data-checked={dataChecked()}
-        {...dataAttrs}
+        data-required={dataRequired()}
+        data-disabled={dataDisabled()}
+        data-invalid={dataInvalid()}
+        data-readonly={dataReadonly()}
       />
       <Show when={local.children}>
         <hope.span
           class={labelClasses()}
           __baseStyle={theme?.baseStyle?.label}
           data-checked={dataChecked()}
-          {...dataAttrs}
+          data-required={dataRequired()}
+          data-disabled={dataDisabled()}
+          data-invalid={dataInvalid()}
+          data-readonly={dataReadonly()}
         >
           {local.children}
         </hope.span>
       </Show>
-    </Box>
+    </hope.label>
   );
 }
 

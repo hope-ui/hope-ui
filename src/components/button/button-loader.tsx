@@ -39,7 +39,6 @@ export function ButtonLoader<C extends ElementType = "div">(props: ButtonLoaderP
   const defaultProps: ButtonLoaderProps<"div"> = {
     spacing: "0.5rem",
     children: <ButtonIconSpinner class={buttonIconSpinnerStyles()} />,
-    // children: <Spinner color="currentColor" width="1em" height="1em" />,
   };
 
   const propsWithDefault: ButtonLoaderProps<"div"> = mergeProps(defaultProps, props);

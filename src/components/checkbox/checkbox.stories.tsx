@@ -5,6 +5,7 @@ import { HopeWrapper } from "@/utils/storybook";
 import { Button } from "..";
 import { HStack, VStack } from "../stack/stack";
 import { Checkbox } from "./checkbox";
+import { CheckboxGroup } from "./checkbox-group";
 
 export default {
   title: "Data entry/Checkbox",
@@ -82,4 +83,32 @@ export const Default = (args: any) => {
     </VStack>
   );
 };
-Default.storyName = "Checkbox";
+
+export const WithCheckboxGroup = (args: any) => {
+  const [fruits, setFruits] = createSignal(["orange"]);
+
+  const onChange = (value: string[]) => {
+    setFruits(value);
+  };
+
+  return (
+    <VStack spacing="$5">
+      <Button onClick={() => setFruits(["apple"])}>Select Apple (current: {JSON.stringify(fruits())})</Button>
+      <CheckboxGroup name="fruit" onChange={onChange} value={fruits()} {...args}>
+        <HStack spacing="$5">
+          <Checkbox value="peach">Peach</Checkbox>
+          <Checkbox value="apple">Apple</Checkbox>
+          <Checkbox value="orange">Orange</Checkbox>
+        </HStack>
+      </CheckboxGroup>
+      <CheckboxGroup defaultValue={["apple"]} {...args}>
+        <HStack spacing="$5">
+          <Checkbox value="peach">Peach</Checkbox>
+          <Checkbox value="apple">Apple</Checkbox>
+          <Checkbox value="orange">Orange</Checkbox>
+        </HStack>
+      </CheckboxGroup>
+    </VStack>
+  );
+};
+WithCheckboxGroup.storyName = "With CheckboxGroup";

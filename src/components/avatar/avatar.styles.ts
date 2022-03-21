@@ -104,12 +104,12 @@ export const avatarStyles = css({
 export type AvatarVariants = VariantProps<typeof avatarStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Avatar - remaining
+ * Avatar - excess
  * -----------------------------------------------------------------------------------------------*/
 
-export const avatarRemainingStyles = css(avatarStyles);
+export const avatarExcessStyles = css(avatarStyles);
 
-export type AvatarRemainingVariants = VariantProps<typeof avatarRemainingStyles>;
+export type AvatarExcessVariants = VariantProps<typeof avatarExcessStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Avatar - image

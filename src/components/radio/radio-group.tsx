@@ -10,7 +10,7 @@ import { ThemeableRadioOptions } from "./radio";
 
 interface RadioGroupOptions extends ThemeableRadioOptions {
   /**
-   * The `name` attribute forwarded to each `radio` element
+   * The `name` attribute forwarded to each `radio` element.
    */
   name?: string;
 
@@ -28,27 +28,27 @@ interface RadioGroupOptions extends ThemeableRadioOptions {
 
   /**
    * If `true`, all wrapped radio inputs will be marked as required,
-   * and `required` attribute will be added
+   * and `required` attribute will be added.
    */
   required?: boolean;
 
   /**
-   * If `true`, all wrapped radio inputs will be disabled
+   * If `true`, all wrapped radio inputs will be disabled.
    */
   disabled?: boolean;
 
   /**
-   * If `true`, all wrapped radio inputs will be readonly
-   */
-  readOnly?: boolean;
-
-  /**
-   * If `true`, all wrapped radio inputs will have `aria-invalid` set to `true`
+   * If `true`, all wrapped radio inputs will have `aria-invalid` set to `true`.
    */
   invalid?: boolean;
 
   /**
-   * Callback invoked once a radio is checked
+   * If `true`, all wrapped radio inputs will be readonly.
+   */
+  readOnly?: boolean;
+
+  /**
+   * Callback invoked once a radio is checked.
    * @param value the value of the checked radio
    */
   onChange?: (value: string) => void;
@@ -99,11 +99,11 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get disabled() {
       return props.disabled;
     },
-    get readOnly() {
-      return props.readOnly;
-    },
     get invalid() {
       return props.invalid;
+    },
+    get readOnly() {
+      return props.readOnly;
     },
     get variant() {
       return props.variant ?? theme?.defaultProps?.group?.variant;
@@ -136,9 +136,9 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
-    if (!state.isControlled) {
-      setState("valueState", value);
-    }
+    //if (!state.isControlled) {
+    setState("valueState", value);
+    //}
 
     local.onChange?.(String(value));
   };
