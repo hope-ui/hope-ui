@@ -32,7 +32,9 @@ export function SelectValue<C extends ElementType = "div">(props: SelectValuePro
 
   const singleValueClasses = () => classNames(local.class, hopeSelectValueClass, selectSingleValueStyles());
 
-  const multiValueClasses = () => classNames(local.class, hopeSelectValueClass, selectMultiValueStyles());
+  const multiValueClasses = () => {
+    return classNames(local.class, hopeSelectValueClass, selectMultiValueStyles({ size: selectContext.state.size }));
+  };
 
   const onTagCloseButtonClick = (event: MouseEvent, option: SelectOptionData) => {
     event.preventDefault();

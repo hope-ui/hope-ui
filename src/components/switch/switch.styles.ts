@@ -146,7 +146,7 @@ export const switchControlStyles = css({
         },
 
         "&[data-checked]::before": {
-          backgroundColor: "$background",
+          backgroundColor: "$loContrast",
         },
       },
       filled: {
@@ -154,7 +154,7 @@ export const switchControlStyles = css({
         backgroundColor: "$neutral7",
 
         "&::before": {
-          backgroundColor: "$background",
+          backgroundColor: "$loContrast",
         },
       },
     },

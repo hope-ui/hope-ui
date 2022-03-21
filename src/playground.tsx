@@ -58,63 +58,46 @@ export function App() {
 
   return (
     <Box p="$4">
-      <span>
-        <Kbd>shift</Kbd> + <Kbd>H</Kbd>
-      </span>
       <HStack spacing="$4" mb="$4">
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <Select offset={-1}>
-          <SelectTrigger maxW="300px" rounded="$none" _focus={{ shadow: "$none", borderColor: "$warning7" }}>
-            <SelectPlaceholder color="$warning9" fontSize="$sm" fontWeight="$black">
-              Choose wisely
-            </SelectPlaceholder>
-            <SelectValue>
-              {({ selectedOptions }) => (
-                <span>
-                  {selectedOptions
-                    .map(val => val.textValue)
-                    .join(", ")
-                    .trim()}
-                </span>
-              )}
-            </SelectValue>
-            <SelectIcon>
-              {({ opened }) => (
-                <IconCaretDown color="$warning9" transform={opened ? "rotate(180deg)" : "rotate(0deg)"} />
-              )}
-            </SelectIcon>
-          </SelectTrigger>
-          <SelectContent rounded="$none" shadow="$xl" borderColor="$warning7">
-            <SelectListbox p="0">
-              <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
-                {option => (
-                  <SelectOption
-                    value={option}
-                    rounded="$none"
-                    fontSize="$sm"
-                    _active={{ bg: "$warning3", color: "$warning11" }}
-                    _selected={{ bg: "$warning9", color: "white" }}
+        <For each={["xs", "sm", "md", "lg"]}>
+          {size => (
+            <HStack spacing="$4">
+              <For each={["outline", "filled", "unstyled"]}>
+                {variant => (
+                  <Select
+                    multiple
+                    size={size as any}
+                    variant={variant as any}
+                    defaultValue={["React", "Angular", "Vue", "Svelte", "Solid"]}
                   >
-                    <SelectOptionText _groupSelected={{ fontWeight: "$medium" }}>{option}</SelectOptionText>
-                  </SelectOption>
+                    <SelectTrigger maxW={300}>
+                      <SelectPlaceholder>Choose some frameworks</SelectPlaceholder>
+                      <SelectValue />
+                      <SelectIcon />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectListbox>
+                        <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+                          {item => (
+                            <SelectOption value={item}>
+                              <SelectOptionText>{item}</SelectOptionText>
+                              <SelectOptionIndicator />
+                            </SelectOption>
+                          )}
+                        </For>
+                      </SelectListbox>
+                    </SelectContent>
+                  </Select>
                 )}
               </For>
-            </SelectListbox>
-          </SelectContent>
-        </Select>
-        <InputGroup>
-          <InputLeftElement pointerEvents="none" color="$neutral8" fontSize="1.2em">
-            $
-          </InputLeftElement>
-          <Input placeholder="Enter amount" />
-          <InputRightElement pointerEvents="none">
-            <IconCheck boxSize="20px" color="$success9" />
-          </InputRightElement>
-        </InputGroup>
+            </HStack>
+          )}
+        </For>
       </VStack>
     </Box>
   );

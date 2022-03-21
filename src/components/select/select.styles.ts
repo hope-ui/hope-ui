@@ -88,14 +88,80 @@ export const selectMultiValueStyles = css({
   flexWrap: "wrap",
   flexGrow: 1,
   flexShrink: 1,
-  gap: "$1_5",
 
-  py: "$1_5",
+  variants: {
+    size: {
+      xs: {
+        gap: "$0_5",
+        py: "$0_5",
+      },
+      sm: {
+        gap: "$1",
+        py: "$1",
+      },
+      md: {
+        gap: "$1_5",
+        py: "$1_5",
+      },
+      lg: {
+        gap: "$2",
+        py: "$2",
+      },
+    },
+  },
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger - multi value - tag
+ * Select - trigger - tag
  * -----------------------------------------------------------------------------------------------*/
+
+export const selectTagStyles = css({
+  display: "inline-flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "$0_5",
+
+  borderRadius: "$sm",
+
+  py: 0,
+  pl: "$2",
+
+  lineHeight: "$none",
+
+  variants: {
+    variant: {
+      subtle: {
+        backgroundColor: "$neutral4",
+        color: "$neutral12",
+      },
+      outline: {
+        border: "1px solid $colors$neutral7",
+        backgroundColor: "$loContrast",
+        color: "$neutral12",
+      },
+    },
+    size: {
+      xs: {
+        height: "$4",
+        fontSize: "$2xs",
+      },
+      sm: {
+        height: "$5",
+        fontSize: "$xs",
+      },
+      md: {
+        height: "$6",
+        fontSize: "$sm",
+      },
+      lg: {
+        height: "$7",
+        fontSize: "$base",
+      },
+    },
+  },
+});
+
+export type SelectTagVariants = VariantProps<typeof selectTagStyles>;
 
 export const selectTagCloseButtonStyles = css({
   appearance: "none",
@@ -129,27 +195,6 @@ export const selectTagCloseButtonStyles = css({
     outline: "none",
     boxShadow: "$outline",
   },
-});
-
-export const selectTagStyles = css({
-  display: "inline-flex",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: "$0_5",
-
-  height: "$6",
-
-  borderRadius: "$sm",
-
-  backgroundColor: "$neutral4",
-
-  py: 0,
-  pl: "$2",
-
-  color: "$neutral12",
-  fontSize: "$sm",
-  lineHeight: "$5",
-  fontWeight: "$medium",
 });
 
 /* -------------------------------------------------------------------------------------------------

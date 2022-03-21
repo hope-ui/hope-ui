@@ -24,7 +24,7 @@ export const avatarStyles = css({
   flexShrink: 0,
 
   borderRadius: "$full",
-  borderColor: "$background",
+  borderColor: "$loContrast",
 
   backgroundColor: "$neutral8",
 
@@ -136,7 +136,7 @@ export const avatarBadgeStyles = css({
 
   borderWidth: "0.2em",
   borderStyle: "solid",
-  borderColor: "$background",
+  borderColor: "$loContrast",
 
   variants: {
     placement: {
