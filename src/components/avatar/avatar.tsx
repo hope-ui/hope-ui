@@ -83,7 +83,7 @@ export interface AvatarStyleConfig {
     image?: SystemStyleObject;
     initials?: SystemStyleObject;
     badge?: SystemStyleObject;
-    remaining?: SystemStyleObject;
+    excess?: SystemStyleObject;
   };
   defaultProps?: {
     root?: ThemeableAvatarOptions;

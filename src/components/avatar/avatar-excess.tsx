@@ -36,7 +36,7 @@ export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcess
   return (
     <hope.span
       class={classes()}
-      __baseStyle={theme?.baseStyle?.remaining}
+      __baseStyle={theme?.baseStyle?.excess}
       borderRadius={avatarGroupContext?.state.avatarBorderRadius}
       borderColor={avatarGroupContext?.state.avatarBorderColor}
       borderWidth={avatarGroupContext?.state.avatarBorderWidth}
