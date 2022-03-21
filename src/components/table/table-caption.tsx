@@ -3,7 +3,7 @@ import { mergeProps, splitProps } from "solid-js";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableCaptionStyles, TableCaptionVariants } from "./table.styles";
@@ -20,7 +20,6 @@ export function TableCaption<C extends ElementType = "caption">(props: TableCapt
   const tableContext = useTableContext();
 
   const defaultProps: TableCaptionProps<"caption"> = {
-    as: "caption",
     placement: theme?.defaultProps?.caption?.placement ?? "bottom",
   };
 
@@ -37,7 +36,7 @@ export function TableCaption<C extends ElementType = "caption">(props: TableCapt
       })
     );
 
-  return <Box class={classes()} __baseStyle={theme?.baseStyle?.caption} {...others} />;
+  return <hope.caption class={classes()} __baseStyle={theme?.baseStyle?.caption} {...others} />;
 }
 
 TableCaption.toString = () => createClassSelector(hopeTableCaptionClass);

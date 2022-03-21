@@ -145,12 +145,11 @@ const hopeTooltipClass = "hope-tooltip";
 const hopeTooltipArrowClass = "hope-tooltip__arrow";
 
 export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
-  const theme = useComponentStyleConfigs().Tooltip;
-
   const defaultId = `hope-tooltip-${createUniqueId()}`;
 
+  const theme = useComponentStyleConfigs().Tooltip;
+
   const defaultProps: TooltipProps<"div"> = {
-    as: "div",
     id: defaultId,
     placement: theme?.defaultProps?.placement ?? "bottom",
     offset: theme?.defaultProps?.offset ?? 8,

@@ -1,4 +1,4 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -20,31 +20,30 @@ export function AvatarRemaining<C extends ElementType = "span">(props: AvatarRem
 
   const avatarGroupContext = useAvatarGroupContext();
 
-  const defaultProps: AvatarRemainingProps<"span"> = {
-    size: avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
-    withBorder: !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
-
-    borderRadius: avatarGroupContext?.state.avatarBorderRadius,
-    borderColor: avatarGroupContext?.state.avatarBorderColor,
-    borderWidth: avatarGroupContext?.state.avatarBorderWidth,
-    marginStart: avatarGroupContext?.state.spacing,
-  };
-
-  const propsWithDefault: AvatarRemainingProps<"span"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "size", "withBorder"]);
+  const [local, others] = splitProps(props, ["class", "size", "withBorder"]);
 
   const classes = () => {
     return classNames(
       local.class,
       hopeAvatarRemainingClass,
       avatarRemainingStyles({
-        size: local.size,
-        withBorder: local.withBorder,
+        size: local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        withBorder: local.withBorder ?? !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
       })
     );
   };
 
-  return <hope.span class={classes()} __baseStyle={theme?.baseStyle?.remaining} {...others} />;
+  return (
+    <hope.span
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.remaining}
+      borderRadius={avatarGroupContext?.state.avatarBorderRadius}
+      borderColor={avatarGroupContext?.state.avatarBorderColor}
+      borderWidth={avatarGroupContext?.state.avatarBorderWidth}
+      marginStart={avatarGroupContext?.state.spacing}
+      {...others}
+    />
+  );
 }
 
 AvatarRemaining.toString = () => createClassSelector(hopeAvatarRemainingClass);

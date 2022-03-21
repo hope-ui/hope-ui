@@ -5,7 +5,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
@@ -104,11 +103,12 @@ const hopeSwitchControlClass = "hope-switch__control";
 const hopeSwitchLabelClass = "hope-switch__label";
 
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
+  const defaultId = `hope-switch-${createUniqueId()}`;
+
   const theme = useComponentStyleConfigs().Switch;
 
   const defaultProps: SwitchProps<"label"> = {
-    as: "label",
-    id: `hope-switch-${createUniqueId()}`,
+    id: defaultId,
     variant: theme?.defaultProps?.root?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
@@ -188,8 +188,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   };
 
   return (
-    <Box
-      as="label"
+    <hope.label
       class={containerClasses()}
       __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
@@ -223,7 +222,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
           {local.children}
         </hope.span>
       </Show>
-    </Box>
+    </hope.label>
   );
 }
 

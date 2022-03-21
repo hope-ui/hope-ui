@@ -4,7 +4,7 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
 
@@ -40,7 +40,6 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const theme = useComponentStyleConfigs().Tag;
 
   const defaultProps: TagProps<"span"> = {
-    as: "span",
     variant: theme?.defaultProps?.root?.variant ?? "subtle",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "neutral",
     size: theme?.defaultProps?.root?.size ?? "md",
@@ -63,7 +62,7 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
 
   return (
     <TagContext.Provider value={context}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
+      <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
     </TagContext.Provider>
   );
 }

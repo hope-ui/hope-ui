@@ -57,7 +57,6 @@ export function Spinner<C extends ElementType = "div">(props: SpinnerProps<C>) {
   const theme = useComponentStyleConfigs().Spinner;
 
   const defaultProps: SpinnerProps<"div"> = {
-    as: "div",
     label: theme?.defaultProps?.label ?? "Loading...",
     size: theme?.defaultProps?.size ?? "md",
     emptyColor: theme?.defaultProps?.emptyColor,
