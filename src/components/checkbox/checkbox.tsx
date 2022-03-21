@@ -5,7 +5,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -17,8 +16,9 @@ import {
   checkboxInputStyles,
   checkboxLabelStyles,
 } from "./checkbox.styles";
+import { useCheckboxGroupContext } from "./checkbox-group";
 
-type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
+export type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
 
 export interface CheckboxStyleConfig {
   baseStyle?: {
@@ -28,6 +28,7 @@ export interface CheckboxStyleConfig {
   };
   defaultProps?: {
     root?: ThemeableCheckboxOptions;
+    group?: ThemeableCheckboxOptions;
   };
 }
 
@@ -152,17 +153,27 @@ const CheckboxIconIndeterminate = createIcon({
 });
 
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
+  const defaultId = `hope-checkbox-${createUniqueId()}`;
+
   const theme = useComponentStyleConfigs().Checkbox;
 
+  const checkboxGroupContext = useCheckboxGroupContext();
+
   const defaultProps: CheckboxProps<"label"> = {
-    as: "label",
-    id: `hope-checkbox-${createUniqueId()}`,
+    id: defaultId,
     iconChecked: <CheckboxIconCheck />,
     iconIndeterminate: <CheckboxIconIndeterminate />,
-    variant: theme?.defaultProps?.root?.variant ?? "outline",
-    colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.root?.size ?? "md",
-    labelPlacement: theme?.defaultProps?.root?.labelPlacement ?? "end",
+
+    variant: checkboxGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
+    colorScheme: checkboxGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
+    size: checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md",
+    labelPlacement: checkboxGroupContext?.state?.labelPlacement ?? theme?.defaultProps?.root?.labelPlacement ?? "end",
+
+    name: checkboxGroupContext?.state.name,
+    required: checkboxGroupContext?.state.required,
+    disabled: checkboxGroupContext?.state.disabled,
+    invalid: checkboxGroupContext?.state.invalid,
+    readOnly: checkboxGroupContext?.state.readOnly,
   };
 
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
@@ -193,7 +204,17 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
-  const checked = () => (isControlled() ? !!local.checked : checkedState());
+  const checked = () => {
+    if (checkboxGroupContext) {
+      const checkboxGroupValue = checkboxGroupContext.state.value;
+      return checkboxGroupValue != null
+        ? checkboxGroupValue.some(val => String(inputProps.value) === String(val))
+        : undefined;
+    }
+
+    // Not in CheckboxGroup
+    return isControlled() ? !!local.checked : checkedState();
+  };
 
   // Input loose focus if this is placed in `dataAttrs()`
   const dataChecked = () => (checked() ? "" : undefined);
@@ -236,12 +257,11 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       setCheckedState(target.checked);
     }
 
-    callAllHandlers(local.onChange)(event);
+    callAllHandlers(checkboxGroupContext?.onChange, local.onChange)(event);
   };
 
   return (
-    <Box
-      as="label"
+    <hope.label
       class={containerClasses()}
       __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
@@ -279,7 +299,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
           {local.children}
         </hope.span>
       </Show>
-    </Box>
+    </hope.label>
   );
 }
 

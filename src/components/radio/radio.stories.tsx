@@ -87,7 +87,7 @@ export const Default = (args: any) => {
 export const WithRadioGroup = (args: any) => {
   const [fruit, setFruit] = createSignal("orange");
 
-  const onChange = (event: Event, value: string) => {
+  const onChange = (value: string) => {
     setFruit(value);
   };
 

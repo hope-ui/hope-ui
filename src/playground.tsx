@@ -63,42 +63,7 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start">
-        <For each={["xs", "sm", "md", "lg"]}>
-          {size => (
-            <HStack spacing="$4">
-              <For each={["outline", "filled", "unstyled"]}>
-                {variant => (
-                  <Select
-                    multiple
-                    size={size as any}
-                    variant={variant as any}
-                    defaultValue={["React", "Angular", "Vue", "Svelte", "Solid"]}
-                  >
-                    <SelectTrigger maxW={300}>
-                      <SelectPlaceholder>Choose some frameworks</SelectPlaceholder>
-                      <SelectValue />
-                      <SelectIcon />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectListbox>
-                        <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
-                          {item => (
-                            <SelectOption value={item}>
-                              <SelectOptionText>{item}</SelectOptionText>
-                              <SelectOptionIndicator />
-                            </SelectOption>
-                          )}
-                        </For>
-                      </SelectListbox>
-                    </SelectContent>
-                  </Select>
-                )}
-              </For>
-            </HStack>
-          )}
-        </For>
-      </VStack>
+      <VStack spacing="$4" alignItems="flex-start"></VStack>
     </Box>
   );
 }

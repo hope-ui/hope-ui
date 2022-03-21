@@ -5,7 +5,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
@@ -114,7 +113,6 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const radioGroupContext = useRadioGroupContext();
 
   const defaultProps: RadioProps<"label"> = {
-    as: "label",
     id: defaultId,
     variant: radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline",
     colorScheme: radioGroupContext?.state?.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary",
@@ -124,8 +122,8 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     name: radioGroupContext?.state.name,
     required: radioGroupContext?.state.required,
     disabled: radioGroupContext?.state.disabled,
-    readOnly: radioGroupContext?.state.readOnly,
     invalid: radioGroupContext?.state.invalid,
+    readOnly: radioGroupContext?.state.readOnly,
   };
 
   const propsWithDefaults: RadioProps<"label"> = mergeProps(defaultProps, props);
@@ -156,10 +154,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
 
   const isControlled = () => local.checked !== undefined;
   const checked = () => {
-    if (radioGroupContext?.state.value != null && inputProps?.value != null) {
-      return radioGroupContext.state.value === inputProps.value;
+    if (radioGroupContext) {
+      const radioGroupValue = radioGroupContext.state.value;
+      return radioGroupValue != null ? inputProps.value === radioGroupValue : undefined;
     }
 
+    // Not in a RadioGroup
     return isControlled() ? !!local.checked : checkedState();
   };
 
@@ -207,8 +207,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   };
 
   return (
-    <Box
-      as="label"
+    <hope.label
       class={containerClasses()}
       __baseStyle={theme?.baseStyle?.root}
       for={inputProps.id}
@@ -241,7 +240,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
           {local.children}
         </hope.span>
       </Show>
-    </Box>
+    </hope.label>
   );
 }
 
