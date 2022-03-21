@@ -34,7 +34,7 @@ export type ButtonGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, B
 
 const hopeButtonGroupClass = "hope-button__group";
 
-type ButtonGroupState = Required<Pick<ButtonGroupProps, "variant" | "colorScheme" | "size" | "disabled">>;
+type ButtonGroupState = Pick<ButtonGroupProps, "variant" | "colorScheme" | "size" | "disabled">;
 
 interface ButtonGroupContextValue {
   state: ButtonGroupState;
@@ -47,16 +47,16 @@ export function ButtonGroup<C extends ElementType = "div">(props: ButtonGroupPro
 
   const [state] = createStore<ButtonGroupState>({
     get variant() {
-      return props.variant ?? theme?.defaultProps?.group?.variant ?? "solid";
+      return props.variant ?? theme?.defaultProps?.group?.variant;
     },
     get colorScheme() {
-      return props.colorScheme ?? theme?.defaultProps?.group?.colorScheme ?? "primary";
+      return props.colorScheme ?? theme?.defaultProps?.group?.colorScheme;
     },
     get size() {
-      return props.size ?? theme?.defaultProps?.group?.size ?? "md";
+      return props.size ?? theme?.defaultProps?.group?.size;
     },
     get disabled() {
-      return props.disabled ?? false;
+      return props.disabled;
     },
   });
 
