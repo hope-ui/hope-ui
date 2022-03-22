@@ -3,7 +3,19 @@ import "./playground.css";
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, ButtonGroup, HopeProvider, HopeThemeConfig, HStack, IconButton, useColorMode, VStack } from ".";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  IconButton,
+  SimpleOption,
+  SimpleSelect,
+  useColorMode,
+  VStack,
+} from ".";
 import { IconCheck } from "./components/icons/IconCheck";
 
 export function App() {
@@ -16,7 +28,22 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start"></VStack>
+      <VStack spacing="$4" alignItems="flex-start">
+        <SimpleSelect placeholder="Choose wisely" maxW={300}>
+          <SimpleOption value="react">React</SimpleOption>
+          <SimpleOption value="angular">Angular</SimpleOption>
+          <SimpleOption value="vue">Vue</SimpleOption>
+          <SimpleOption value="svelte">Svelte</SimpleOption>
+          <SimpleOption value="solid">Solid</SimpleOption>
+        </SimpleSelect>
+        <SimpleSelect multiple placeholder="Choose wisely" maxW={300}>
+          <SimpleOption value="react">React</SimpleOption>
+          <SimpleOption value="angular">Angular</SimpleOption>
+          <SimpleOption value="vue">Vue</SimpleOption>
+          <SimpleOption value="svelte">Svelte</SimpleOption>
+          <SimpleOption value="solid">Solid</SimpleOption>
+        </SimpleSelect>
+      </VStack>
     </Box>
   );
 }
