@@ -47,6 +47,18 @@ export function App() {
           </RadioGroup>
           <FormHelperText>Select only if you're a fan.</FormHelperText>
         </FormControl>
+        <FormControl as="fieldset" required disabled invalid readOnly>
+          <FormLabel as="legend">Favorite Naruto Character</FormLabel>
+          <CheckboxGroup defaultValue={["Itachi"]}>
+            <HStack spacing="24px">
+              <Checkbox value="Sasuke">Sasuke</Checkbox>
+              <Checkbox value="Nagato">Nagato</Checkbox>
+              <Checkbox value="Itachi">Itachi</Checkbox>
+              <Checkbox value="Sage of the six Paths">Sage of the six Paths</Checkbox>
+            </HStack>
+          </CheckboxGroup>
+          <FormHelperText>Select only if you're a fan.</FormHelperText>
+        </FormControl>
       </VStack>
     </Box>
   );

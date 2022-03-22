@@ -339,7 +339,7 @@ export function Select(props: SelectProps) {
       return props.disabled ?? formControlProps.disabled;
     },
     get invalid() {
-      return props.invalid ?? formControlProps["aria-invalid"] === true;
+      return props.invalid ?? formControlProps.invalid;
     },
     get variant() {
       return props.variant ?? theme?.defaultProps?.root?.variant ?? "outline";

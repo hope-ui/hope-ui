@@ -1,4 +1,4 @@
-import { createSignal, createUniqueId, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { createSignal, createUniqueId, JSX, Show, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -6,6 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { hope } from "../factory";
+import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   radioContainerStyles,
@@ -112,14 +113,9 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
 
   const radioGroupContext = useRadioGroupContext();
 
-  const defaultProps: RadioProps<"label"> = {
-    id: defaultId,
-  };
-
-  const propsWithDefaults: RadioProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
-    propsWithDefaults,
-    ["checked", "defaultChecked", "invalid", "onChange", "class", "children"],
+    props as RadioProps<"label">,
+    ["checked", "defaultChecked", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -127,6 +123,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       "value",
       "required",
       "disabled",
+      "invalid",
       "readOnly",
       "aria-label",
       "aria-labelledby",
@@ -137,6 +134,8 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     ],
     ["variant", "colorScheme", "size", "labelPlacement"]
   );
+
+  const formControlProps = useFormControl<HTMLInputElement>(inputProps);
 
   const variant = () => {
     return variantProps.variant ?? radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
@@ -164,11 +163,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     );
   };
 
+  const id = () => formControlProps.id ?? defaultId;
   const name = () => inputProps.name ?? radioGroupContext?.state.name;
-  const required = () => inputProps.required ?? radioGroupContext?.state.required;
-  const disabled = () => inputProps.disabled ?? radioGroupContext?.state.disabled;
-  const invalid = () => local.invalid ?? radioGroupContext?.state.invalid;
-  const readOnly = () => inputProps.readOnly ?? radioGroupContext?.state.readOnly;
+  const required = () => formControlProps.required ?? radioGroupContext?.state.required;
+  const disabled = () => formControlProps.disabled ?? radioGroupContext?.state.disabled;
+  const invalid = () => formControlProps.invalid ?? radioGroupContext?.state.invalid;
+  const readOnly = () => formControlProps.readOnly ?? radioGroupContext?.state.readOnly;
 
   // Internal state for uncontrolled radio.
   // eslint-disable-next-line solid/reactivity
@@ -259,11 +259,13 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     >
       {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
       <input
+        ref={inputProps.ref}
         type="radio"
-        class={inputClasses()}
-        checked={checked()}
-        onChange={onChange}
+        id={id()}
+        tabIndex={inputProps.tabIndex}
+        value={inputProps.value}
         name={name()}
+        checked={checked()}
         required={required()}
         disabled={disabled()}
         readOnly={readOnly()}
@@ -271,7 +273,13 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
         aria-disabled={ariaDisabled()}
         aria-invalid={ariaInvalid()}
         aria-readonly={ariaReadonly()}
-        {...inputProps}
+        aria-label={inputProps["aria-label"]}
+        aria-labelledby={inputProps["aria-labelledby"]}
+        aria-describedby={formControlProps["aria-describedby"]}
+        class={inputClasses()}
+        onChange={onChange}
+        onFocus={formControlProps.onFocus}
+        onBlur={formControlProps.onBlur}
       />
       <hope.span
         aria-hidden={true}
