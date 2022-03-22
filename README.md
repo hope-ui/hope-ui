@@ -6,6 +6,8 @@
 
 🤞 The hoped component library for your SolidJS applications.
 
+# This project is a work in progress and is not production ready.
+
 ## Documentation available at [hope-ui.com](https://hope-ui.com/)
 
 ## Acknowledgment
