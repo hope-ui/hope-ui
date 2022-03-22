@@ -12,6 +12,9 @@ export type RadioLabelProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 const hopeRadioLabelClass = "hope-radio__label";
 
+/**
+ * The label of the radio.
+ */
 export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProp<C>) {
   const theme = useComponentStyleConfigs().Radio;
 
@@ -28,12 +31,12 @@ export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProp
       class={classes()}
       __baseStyle={theme?.baseStyle?.label}
       for={radioContext.state.id}
-      data-focus={radioContext.state.dataAttrs["data-focus"]}
-      data-checked={radioContext.state.dataAttrs["data-checked"]}
-      data-required={radioContext.state.dataAttrs["data-required"]}
-      data-disabled={radioContext.state.dataAttrs["data-disabled"]}
-      data-invalid={radioContext.state.dataAttrs["data-invalid"]}
-      data-readonly={radioContext.state.dataAttrs["data-readonly"]}
+      data-focus={radioContext.state["data-focus"]}
+      data-checked={radioContext.state["data-checked"]}
+      data-required={radioContext.state["data-required"]}
+      data-disabled={radioContext.state["data-disabled"]}
+      data-invalid={radioContext.state["data-invalid"]}
+      data-readonly={radioContext.state["data-readonly"]}
       {...others}
     />
   );

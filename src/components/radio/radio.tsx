@@ -8,7 +8,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
-import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
+import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import { radioContainerStyles, RadioIndicatorVariants } from "./radio.styles";
 import { useRadioGroupContext } from "./radio-group";
@@ -22,8 +22,7 @@ interface RadioOptions extends ThemeableRadioOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The name of the input field in a radio
-   * (Useful for form submission).
+   * The name of the input field in a radio.
    */
   name?: string;
 
@@ -83,82 +82,102 @@ interface RadioOptions extends ThemeableRadioOptions {
 
 export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
-export interface RadioStyleConfig {
-  baseStyle?: {
-    root?: SystemStyleObject;
-    group?: SystemStyleObject;
-    indicator?: SystemStyleObject;
-    label?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: ThemeableRadioOptions;
-    group?: ThemeableRadioOptions;
-  };
-}
-
 interface RadioContextState extends Required<RadioIndicatorVariants> {
-  _checked: boolean;
+  /**
+   * The `checked` state of the radio.
+   * (In controlled mode)
+   */
   checked: boolean;
-  focused: boolean;
+
+  /**
+   * The `checked` state of the radio.
+   * (In uncontrolled mode)
+   */
+  _checked: boolean;
+
+  /**
+   * If `true`, the radio is in controlled mode.
+   * (have checked and onChange props)
+   */
   isControlled: boolean;
 
-  id: string;
-  name: string;
+  /**
+   * The value to be used in the radio input.
+   * This is the value that will be returned on form submission.
+   */
   value?: string | number;
+
+  /**
+   * If `true`, the radio is currently focused.
+   */
+  focused: boolean;
+
+  /**
+   * The id of the input field in a radio.
+   */
+  id?: string;
+
+  /**
+   * The name of the input field in a radio.
+   */
+  name?: string;
+
+  /**
+   * If `true`, the radio input is marked as required,
+   * and `required` attribute will be added
+   */
   required?: boolean;
+
+  /**
+   * If `true`, the radio will be disabled
+   */
   disabled?: boolean;
+
+  /**
+   * If `true`, the input will have `aria-invalid` set to `true`
+   */
   invalid?: boolean;
+
+  /**
+   * If `true`, the radio will be readonly
+   */
   readOnly?: boolean;
 
-  ariaAttrs: {
-    "aria-required"?: boolean;
-    "aria-disabled"?: boolean;
-    "aria-invalid"?: boolean;
-    "aria-readonly"?: boolean;
-    "aria-label"?: string;
-    "aria-labelledby"?: string;
-    "aria-describedby"?: string;
-  };
+  "aria-required"?: boolean;
+  "aria-disabled"?: boolean;
+  "aria-invalid"?: boolean;
+  "aria-readonly"?: boolean;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
 
-  dataAttrs: {
-    "data-focus"?: string;
-    "data-checked"?: string;
-    "data-required"?: string;
-    "data-disabled"?: string;
-    "data-invalid"?: string;
-    "data-readonly"?: string;
-  };
+  "data-focus"?: string;
+  "data-checked"?: string;
+  "data-required"?: string;
+  "data-disabled"?: string;
+  "data-invalid"?: string;
+  "data-readonly"?: string;
 }
-
-interface RadioContextValue {
-  state: RadioContextState;
-
-  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
-  onFocus?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
-  onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
-}
-
-const RadioContext = createContext<RadioContextValue>();
 
 const hopeRadioClass = "hope-radio";
 const hopeRadioInputClass = "hope-radio__input";
 
+/**
+ * The component that provides context for all part of a `radio`.
+ * It act as a container and renders a `label` with a visualy hidden `input[type=radio]`.
+ */
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const defaultId = `hope-radio-${createUniqueId()}`;
-  const defaultName = `${defaultId}-name`;
 
   const theme = useComponentStyleConfigs().Radio;
 
   const radioGroupContext = useRadioGroupContext();
 
-  const [useFormControlProps] = splitProps(props as RadioProps<"label">, useFormControlPropNames);
-  const formControlProps = useFormControl<HTMLInputElement>(useFormControlProps);
+  const formControlProps = useFormControl<HTMLInputElement>(props);
 
   const [state, setState] = createStore<RadioContextState>({
-    // Internal state for uncontrolled radio.
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
-    focused: false,
     get isControlled() {
       return props.checked !== undefined;
     },
@@ -189,7 +208,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return formControlProps.id ?? defaultId;
     },
     get name() {
-      return props.name ?? radioGroupContext?.state.name ?? defaultName;
+      return props.name ?? radioGroupContext?.state.name;
     },
     get value() {
       return props.value;
@@ -206,33 +225,52 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     get readOnly() {
       return formControlProps.readOnly ?? radioGroupContext?.state.readOnly;
     },
-    get ariaAttrs() {
-      return {
-        "aria-required": this.required ? true : undefined,
-        "aria-disabled": this.disabled ? true : undefined,
-        "aria-invalid": this.invalid ? true : undefined,
-        "aria-readonly": this.readOnly ? true : undefined,
-        "aria-label": props["aria-label"],
-        "aria-labelledby": props["aria-labelledby"],
-        "aria-describedby": props["aria-describedby"],
-      };
+    get ["aria-required"]() {
+      return this.required ? true : undefined;
     },
-    get dataAttrs() {
-      return {
-        "data-focus": this.focused ? "" : undefined,
-        "data-checked": this.checked ? "" : undefined,
-        "data-required": this.required ? "" : undefined,
-        "data-disabled": this.disabled ? "" : undefined,
-        "data-invalid": this.invalid ? "" : undefined,
-        "data-readonly": this.readOnly ? "" : undefined,
-      };
+    get ["aria-disabled"]() {
+      return this.disabled ? true : undefined;
     },
+    get ["aria-invalid"]() {
+      return this.invalid ? true : undefined;
+    },
+    get ["aria-readonly"]() {
+      return this.readOnly ? true : undefined;
+    },
+    get ["aria-label"]() {
+      return props["aria-label"];
+    },
+    get ["aria-labelledby"]() {
+      return props["aria-labelledby"];
+    },
+    get ["aria-describedby"]() {
+      return props["aria-describedby"];
+    },
+    get ["data-focus"]() {
+      return this.focused ? "" : undefined;
+    },
+    get ["data-checked"]() {
+      return this.checked ? "" : undefined;
+    },
+    get ["data-required"]() {
+      return this.required ? "" : undefined;
+    },
+    get ["data-disabled"]() {
+      return this.disabled ? "" : undefined;
+    },
+    get ["data-invalid"]() {
+      return this.invalid ? "" : undefined;
+    },
+    get ["data-readonly"]() {
+      return this.readOnly ? "" : undefined;
+    },
+    focused: false,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [local, _, others] = splitProps(
     props as RadioProps<"label">,
-    ["class", "children", "ref", "tabIndex", "disabled", "readOnly", "onChange"],
+    ["class", "children", "ref", "tabIndex", "onChange"],
     [
       "variant",
       "colorScheme",
@@ -243,6 +281,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       "checked",
       "defaultChecked",
       "required",
+      "disabled",
       "invalid",
       "readOnly",
       "onFocus",
@@ -251,7 +290,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   );
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
-    if (local.readOnly || local.disabled) {
+    if (state.readOnly || state.disabled) {
       event.preventDefault();
       return;
     }
@@ -292,12 +331,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       <hope.label
         class={containerClasses()}
         __baseStyle={theme?.baseStyle?.root}
-        data-focus={state.dataAttrs["data-focus"]}
-        data-checked={state.dataAttrs["data-checked"]}
-        data-required={state.dataAttrs["data-required"]}
-        data-disabled={state.dataAttrs["data-disabled"]}
-        data-invalid={state.dataAttrs["data-invalid"]}
-        data-readonly={state.dataAttrs["data-readonly"]}
+        data-focus={state["data-focus"]}
+        data-checked={state["data-checked"]}
+        data-required={state["data-required"]}
+        data-disabled={state["data-disabled"]}
+        data-invalid={state["data-invalid"]}
+        data-readonly={state["data-readonly"]}
         {...others}
       >
         {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
@@ -316,13 +355,13 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          aria-required={state.ariaAttrs["aria-required"]}
-          aria-disabled={state.ariaAttrs["aria-disabled"]}
-          aria-invalid={state.ariaAttrs["aria-invalid"]}
-          aria-readonly={state.ariaAttrs["aria-readonly"]}
-          aria-label={state.ariaAttrs["aria-label"]}
-          aria-labelledby={state.ariaAttrs["aria-labelledby"]}
-          aria-describedby={state.ariaAttrs["aria-describedby"]}
+          aria-required={state["aria-required"]}
+          aria-disabled={state["aria-disabled"]}
+          aria-invalid={state["aria-invalid"]}
+          aria-readonly={state["aria-readonly"]}
+          aria-label={state["aria-label"]}
+          aria-labelledby={state["aria-labelledby"]}
+          aria-describedby={state["aria-describedby"]}
         />
         {local.children}
       </hope.label>
@@ -332,6 +371,16 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
 
 Radio.toString = () => createClassSelector(hopeRadioClass);
 
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+interface RadioContextValue extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
+  state: RadioContextState;
+}
+
+const RadioContext = createContext<RadioContextValue>();
+
 export function useRadioContext() {
   const context = useContext(RadioContext);
 
@@ -340,4 +389,21 @@ export function useRadioContext() {
   }
 
   return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface RadioStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    group?: SystemStyleObject;
+    indicator?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableRadioOptions;
+    group?: ThemeableRadioOptions;
+  };
 }

@@ -12,6 +12,9 @@ export type RadioIndicatorProp<C extends ElementType = "input"> = HTMLHopeProps<
 
 const hopeRadioIndicatorClass = "hope-radio__indicator";
 
+/**
+ * The visual indicator that represents a `radio`.
+ */
 export function RadioIndicator<C extends ElementType = "input">(props: RadioIndicatorProp<C>) {
   const theme = useComponentStyleConfigs().Radio;
 
@@ -36,12 +39,12 @@ export function RadioIndicator<C extends ElementType = "input">(props: RadioIndi
       aria-hidden={true}
       class={classes()}
       __baseStyle={theme?.baseStyle?.indicator}
-      data-focus={radioContext.state.dataAttrs["data-focus"]}
-      data-checked={radioContext.state.dataAttrs["data-checked"]}
-      data-required={radioContext.state.dataAttrs["data-required"]}
-      data-disabled={radioContext.state.dataAttrs["data-disabled"]}
-      data-invalid={radioContext.state.dataAttrs["data-invalid"]}
-      data-readonly={radioContext.state.dataAttrs["data-readonly"]}
+      data-focus={radioContext.state["data-focus"]}
+      data-checked={radioContext.state["data-checked"]}
+      data-required={radioContext.state["data-required"]}
+      data-disabled={radioContext.state["data-disabled"]}
+      data-invalid={radioContext.state["data-invalid"]}
+      data-readonly={radioContext.state["data-readonly"]}
       {...others}
     />
   );

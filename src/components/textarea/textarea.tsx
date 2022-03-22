@@ -4,7 +4,7 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
+import { useFormControl } from "../form-control/use-form-control";
 import { HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { textareaStyles, TextareaVariants } from "./textarea.styles";
 
@@ -31,16 +31,20 @@ export function Textarea(props: TextareaProps) {
 
   const propsWithDefault: TextareaProps = mergeProps(defaultProps, props);
 
-  const [local, variantProps, useFormControlProps, others] = splitProps(
-    propsWithDefault,
-    ["class"],
-    ["variant", "size"],
-    useFormControlPropNames
-  );
+  const [local, others] = splitProps(propsWithDefault, ["class", "variant", "size"]);
 
-  const formControlProps = useFormControl<HTMLTextAreaElement>(useFormControlProps);
+  const formControlProps = useFormControl<HTMLTextAreaElement>(props);
 
-  const classes = () => classNames(local.class, hopeTextareaClass, textareaStyles(variantProps));
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeTextareaClass,
+      textareaStyles({
+        variant: local.variant,
+        size: local.size,
+      })
+    );
+  };
 
   return <Box as="textarea" class={classes()} __baseStyle={theme?.baseStyle} {...formControlProps} {...others} />;
 }

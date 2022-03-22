@@ -1,12 +1,12 @@
 import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
-import { createContext, createEffect, createSignal, createUniqueId, JSX, on, splitProps, useContext } from "solid-js";
+import { createContext, createEffect, createSignal, createUniqueId, JSX, on, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme";
 import { isArray } from "@/utils/assertion";
 
-import { useFormControl, useFormControlPropNames, UseFormControlReturn } from "../form-control/use-form-control";
+import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {
   getActionFromKey,
@@ -300,8 +300,7 @@ export function Select(props: SelectProps) {
 
   const theme = useComponentStyleConfigs().Select;
 
-  const [useFormControlProps] = splitProps(props, useFormControlPropNames);
-  const formControlProps = useFormControl<HTMLButtonElement>(useFormControlProps);
+  const formControlProps = useFormControl<HTMLButtonElement>(props);
 
   const [initialized, setInitialized] = createSignal(false);
 

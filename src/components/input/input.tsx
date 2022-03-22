@@ -5,7 +5,7 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
-import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
+import { useFormControl } from "../form-control/use-form-control";
 import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
 import { ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
@@ -46,13 +46,9 @@ export function Input(props: InputProps) {
 
   const inputGroup = useInputGroupContext();
 
-  const [local, useFormControlProps, others] = splitProps(
-    props,
-    ["class", "htmlSize", "variant", "size"],
-    useFormControlPropNames
-  );
+  const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const formControlProps = useFormControl<HTMLInputElement>(useFormControlProps);
+  const [local, others] = splitProps(props, ["class", "htmlSize", "variant", "size"]);
 
   const classes = () =>
     classNames(
