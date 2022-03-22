@@ -118,7 +118,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const propsWithDefaults: SwitchProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["checked", "defaultChecked", "invalid", "onChange", "class", "children"],
+    ["checked", "defaultChecked", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -126,6 +126,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
       "value",
       "required",
       "disabled",
+      "invalid",
       "readOnly",
       "aria-label",
       "aria-labelledby",
@@ -150,14 +151,14 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const dataAttrs = () => ({
     "data-required": inputProps.required ? "" : undefined,
     "data-disabled": inputProps.disabled ? "" : undefined,
-    "data-invalid": local.invalid ? "" : undefined,
+    "data-invalid": inputProps.invalid ? "" : undefined,
     "data-readonly": inputProps.readOnly ? "" : undefined,
   });
 
   const ariaAttrs = () => ({
     "aria-required": inputProps.required ? true : undefined,
     "aria-disabled": inputProps.disabled ? true : undefined,
-    "aria-invalid": local.invalid ? true : undefined,
+    "aria-invalid": inputProps.invalid ? true : undefined,
     "aria-readonly": inputProps.readOnly ? true : undefined,
   });
 

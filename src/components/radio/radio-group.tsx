@@ -114,9 +114,6 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
     },
-    get labelPlacement() {
-      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
-    },
   });
 
   const [local, others] = splitProps(props, [
@@ -136,9 +133,7 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
-    //if (!state.isControlled) {
     setState("valueState", value);
-    //}
 
     local.onChange?.(String(value));
   };
