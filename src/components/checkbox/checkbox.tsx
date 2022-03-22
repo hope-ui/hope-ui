@@ -227,6 +227,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
+
   const checked = () => {
     if (checkboxGroupContext) {
       const checkboxGroupValue = checkboxGroupContext.state.value;
@@ -317,6 +318,9 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         checked={checked()}
         onChange={onChange}
         name={name()}
+        required={required()}
+        disabled={disabled()}
+        readOnly={readOnly()}
         aria-required={ariaRequired()}
         aria-disabled={ariaDisabled()}
         aria-invalid={ariaInvalid()}

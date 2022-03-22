@@ -175,6 +175,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
+
   const checked = () => {
     if (radioGroupContext) {
       const radioGroupValue = radioGroupContext.state.value;
@@ -263,6 +264,9 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
         checked={checked()}
         onChange={onChange}
         name={name()}
+        required={required()}
+        disabled={disabled()}
+        readOnly={readOnly()}
         aria-required={ariaRequired()}
         aria-disabled={ariaDisabled()}
         aria-invalid={ariaInvalid()}

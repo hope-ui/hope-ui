@@ -76,9 +76,9 @@ export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, Ra
 const hopeRadioGroupClass = "hope-radio-group";
 
 export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Radio;
-
   const defaultName = `hope-radio-group-${createUniqueId()}`;
+
+  const theme = useComponentStyleConfigs().Radio;
 
   const [state, setState] = createStore<RadioGroupState>({
     // Internal state for uncontrolled radio-group.

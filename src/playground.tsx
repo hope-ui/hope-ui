@@ -1,6 +1,6 @@
 import "./playground.css";
 
-import { createSignal } from "solid-js";
+import { createSignal, JSX } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -13,42 +13,39 @@ import {
   HopeThemeConfig,
   HStack,
   IconButton,
-  Radio,
-  RadioGroup,
+  Checkbox,
+  CheckboxGroup,
   SimpleOption,
   SimpleSelect,
   useColorMode,
   VStack,
+  RadioGroup,
+  Radio,
+  FormHelperText,
 } from ".";
 import { IconCheck } from "./components/icons/IconCheck";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-
-  const [gender, setGender] = createSignal<string>();
-
   return (
     <Box p="$4">
       <HStack spacing="$4" mb="$4">
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
-        <Button></Button>
-        <ButtonGroup size="sm" attached variant="outline">
-          <Button mr="-1px">Save</Button>
-          <IconButton aria-label="Add to friends" icon={<IconCheck />} />
-        </ButtonGroup>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <FormControl>
-          <FormLabel>Gender</FormLabel>
-          <RadioGroup name="gender" value={gender()} onChange={setGender}>
-            <HStack spacing="$5">
-              <Radio value="male">Male</Radio>
-              <Radio value="female">Female</Radio>
-              <Radio value="other">Other</Radio>
+        <FormControl as="fieldset" required disabled invalid readOnly>
+          <FormLabel as="legend">Favorite Naruto Character</FormLabel>
+          <RadioGroup defaultValue="Itachi">
+            <HStack spacing="24px">
+              <Radio value="Sasuke">Sasuke</Radio>
+              <Radio value="Nagato">Nagato</Radio>
+              <Radio value="Itachi">Itachi</Radio>
+              <Radio value="Sage of the six Paths">Sage of the six Paths</Radio>
             </HStack>
           </RadioGroup>
+          <FormHelperText>Select only if you're a fan.</FormHelperText>
         </FormControl>
       </VStack>
     </Box>

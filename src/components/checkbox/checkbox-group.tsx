@@ -76,9 +76,9 @@ interface CheckboxGroupContextValue {
 const CheckboxGroupContext = createContext<CheckboxGroupContextValue>();
 
 export function CheckboxGroup(props: CheckboxGroupProps) {
-  const theme = useComponentStyleConfigs().Checkbox;
-
   const defaultName = `hope-checkbox-group-${createUniqueId()}`;
+
+  const theme = useComponentStyleConfigs().Checkbox;
 
   const [state, setState] = createStore<CheckboxGroupState>({
     // Internal state for uncontrolled checkbox-group.
