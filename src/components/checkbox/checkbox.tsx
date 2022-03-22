@@ -6,6 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers } from "@/utils/function";
 
 import { hope } from "../factory";
+import { useFormControl } from "../form-control/use-form-control";
 import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
@@ -160,7 +161,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const checkboxGroupContext = useCheckboxGroupContext();
 
   const defaultProps: CheckboxProps<"label"> = {
-    id: defaultId,
     iconChecked: <CheckboxIconCheck />,
     iconIndeterminate: <CheckboxIconIndeterminate />,
   };
@@ -168,7 +168,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
   const [local, inputProps, variantProps, others] = splitProps(
     propsWithDefaults,
-    ["iconChecked", "iconIndeterminate", "checked", "defaultChecked", "invalid", "onChange", "class", "children"],
+    ["iconChecked", "iconIndeterminate", "checked", "defaultChecked", "onChange", "class", "children"],
     [
       "ref",
       "id",
@@ -177,6 +177,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       "indeterminate",
       "required",
       "disabled",
+      "invalid",
       "readOnly",
       "aria-label",
       "aria-labelledby",
@@ -187,6 +188,8 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     ],
     ["variant", "colorScheme", "size", "labelPlacement"]
   );
+
+  const formControlProps = useFormControl<HTMLInputElement>(inputProps);
 
   const variant = () => {
     return (
@@ -216,17 +219,19 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     );
   };
 
+  const id = () => formControlProps.id ?? defaultId;
   const name = () => inputProps.name ?? checkboxGroupContext?.state.name;
-  const required = () => inputProps.required ?? checkboxGroupContext?.state.required;
-  const disabled = () => inputProps.disabled ?? checkboxGroupContext?.state.disabled;
-  const invalid = () => local.invalid ?? checkboxGroupContext?.state.invalid;
-  const readOnly = () => inputProps.readOnly ?? checkboxGroupContext?.state.readOnly;
+  const required = () => formControlProps.required ?? checkboxGroupContext?.state.required;
+  const disabled = () => formControlProps.disabled ?? checkboxGroupContext?.state.disabled;
+  const invalid = () => formControlProps.invalid ?? checkboxGroupContext?.state.invalid;
+  const readOnly = () => formControlProps.readOnly ?? checkboxGroupContext?.state.readOnly;
 
   // Internal state for uncontrolled checkbox.
   // eslint-disable-next-line solid/reactivity
   const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
 
   const isControlled = () => local.checked !== undefined;
+
   const checked = () => {
     if (checkboxGroupContext) {
       const checkboxGroupValue = checkboxGroupContext.state.value;
@@ -312,16 +317,27 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       {...others}
     >
       <input
+        ref={inputProps.ref}
         type="checkbox"
-        class={inputClasses()}
-        checked={checked()}
-        onChange={onChange}
+        id={id()}
+        tabIndex={inputProps.tabIndex}
+        value={inputProps.value}
         name={name()}
+        checked={checked()}
+        required={required()}
+        disabled={disabled()}
+        readOnly={readOnly()}
         aria-required={ariaRequired()}
         aria-disabled={ariaDisabled()}
         aria-invalid={ariaInvalid()}
         aria-readonly={ariaReadonly()}
-        {...inputProps}
+        aria-label={inputProps["aria-label"]}
+        aria-labelledby={inputProps["aria-labelledby"]}
+        aria-describedby={formControlProps["aria-describedby"]}
+        class={inputClasses()}
+        onChange={onChange}
+        onFocus={formControlProps.onFocus}
+        onBlur={formControlProps.onBlur}
       />
       <hope.span
         aria-hidden={true}

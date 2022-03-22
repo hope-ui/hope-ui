@@ -692,4 +692,8 @@ export type ButtonVariants = VariantProps<typeof buttonStyles>;
 
 export const buttonGroupStyles = css({
   display: "inline-flex",
+
+  [`& .${buttonStyles}:focus`]: {
+    zIndex: 1,
+  },
 });

@@ -29,9 +29,11 @@ export interface UseFormControlReturn<T extends HTMLElement> {
   id?: string;
   required?: boolean;
   disabled?: boolean;
+  invalid?: boolean;
   readOnly?: boolean;
-  "aria-invalid"?: boolean;
   "aria-required"?: boolean;
+  "aria-disabled"?: boolean;
+  "aria-invalid"?: boolean;
   "aria-readonly"?: boolean;
   "aria-describedby"?: string;
   onFocus?: JSX.EventHandlerUnion<T, FocusEvent>;
@@ -63,15 +65,20 @@ export function useFormControl<T extends HTMLElement>(
     get disabled() {
       return props.disabled ?? formControl?.state.disabled;
     },
+    get invalid() {
+      return props.invalid ?? formControl?.state.invalid;
+    },
     get readOnly() {
       return props.readOnly ?? formControl?.state.readOnly;
     },
     get ["aria-required"]() {
       return this.required ? true : undefined;
     },
+    get ["aria-disabled"]() {
+      return this.disabled ? true : undefined;
+    },
     get ["aria-invalid"]() {
-      const invalid = props.invalid ?? formControl?.state.invalid;
-      return invalid ? true : undefined;
+      return this.invalid ? true : undefined;
     },
     get ["aria-readonly"]() {
       return this.readOnly ? true : undefined;
