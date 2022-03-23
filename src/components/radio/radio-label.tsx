@@ -30,7 +30,6 @@ export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProp
     <hope.span
       class={classes()}
       __baseStyle={theme?.baseStyle?.label}
-      for={radioContext.state.id}
       data-focus={radioContext.state["data-focus"]}
       data-checked={radioContext.state["data-checked"]}
       data-required={radioContext.state["data-required"]}

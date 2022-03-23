@@ -331,6 +331,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       <hope.label
         class={containerClasses()}
         __baseStyle={theme?.baseStyle?.root}
+        for={state.id}
         data-focus={state["data-focus"]}
         data-checked={state["data-checked"]}
         data-required={state["data-required"]}
