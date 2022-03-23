@@ -8,14 +8,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSwitchContext } from "./switch";
 import { switchControlStyles } from "./switch.styles";
 
-export type SwitchControlProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
+export type SwitchControlProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 const hopeSwitchControlClass = "hope-switch__control";
 
 /**
  * The visual control that represents a `switch`.
  */
-export function SwitchControl<C extends ElementType = "span">(props: SwitchControlProp<C>) {
+export function SwitchControl<C extends ElementType = "span">(props: SwitchControlProps<C>) {
   const theme = useComponentStyleConfigs().Switch;
 
   const switchContext = useSwitchContext();

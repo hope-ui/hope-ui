@@ -15,10 +15,9 @@ import {
   RadioControl,
   RadioGroup,
   RadioLabel,
-  Switch,
-  SwitchControl,
-  SwitchLabel,
-  Text,
+  Checkbox,
+  CheckboxControl,
+  CheckboxLabel,
   useColorMode,
   VStack,
 } from ".";
@@ -34,10 +33,10 @@ export function App() {
         </Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <Switch colorScheme="info">
-          <SwitchLabel>Foo</SwitchLabel>
-          <SwitchControl />
-        </Switch>
+        <Checkbox colorScheme="info">
+          <CheckboxLabel>Foo</CheckboxLabel>
+          <CheckboxControl />
+        </Checkbox>
       </VStack>
     </Box>
   );

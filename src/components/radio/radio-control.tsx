@@ -8,14 +8,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useRadioContext } from "./radio";
 import { radioControlStyles } from "./radio.styles";
 
-export type RadioControlProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
+export type RadioControlProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 const hopeRadioControlClass = "hope-radio__control";
 
 /**
  * The visual control that represents a `radio`.
  */
-export function RadioControl<C extends ElementType = "span">(props: RadioControlProp<C>) {
+export function RadioControl<C extends ElementType = "span">(props: RadioControlProps<C>) {
   const theme = useComponentStyleConfigs().Radio;
 
   const radioContext = useRadioContext();

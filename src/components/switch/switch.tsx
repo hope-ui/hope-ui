@@ -161,6 +161,10 @@ interface SwitchContextState extends Required<SwitchControlVariants> {
 const hopeSwitchClass = "hope-switch";
 const hopeSwitchInputClass = "hope-switch__input";
 
+/**
+ * The component that provides context for all part of a `checkbox`.
+ * It act as a container and renders a `label` with a visualy hidden `input[type=checkbox][role=switch]`.
+ */
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const defaultId = `hope-switch-${createUniqueId()}`;
 

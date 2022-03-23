@@ -8,14 +8,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useSwitchContext } from "./switch";
 import { switchLabelStyles } from "./switch.styles";
 
-export type SwitchLabelProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
+export type SwitchLabelProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 const hopeSwitchLabelClass = "hope-switch__label";
 
 /**
  * The label of the switch.
  */
-export function SwitchLabel<C extends ElementType = "span">(props: SwitchLabelProp<C>) {
+export function SwitchLabel<C extends ElementType = "span">(props: SwitchLabelProps<C>) {
   const theme = useComponentStyleConfigs().Switch;
 
   const switchContext = useSwitchContext();

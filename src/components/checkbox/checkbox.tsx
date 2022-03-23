@@ -1,37 +1,19 @@
-import { createSignal, createUniqueId, JSX, Match, mergeProps, Show, splitProps, Switch } from "solid-js";
+import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { visuallyHiddenStyles } from "@/theme/utils";
 import { classNames, createClassSelector } from "@/utils/css";
-import { callAllHandlers } from "@/utils/function";
+import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";
-import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";
-import {
-  checkboxContainerStyles,
-  checkboxControlStyles,
-  CheckboxControlVariants,
-  checkboxLabelStyles,
-} from "./checkbox.styles";
+import { checkboxContainerStyles, CheckboxControlVariants } from "./checkbox.styles";
 import { useCheckboxGroupContext } from "./checkbox-group";
-import { visuallyHiddenStyles } from "@/theme/utils";
 
 export type ThemeableCheckboxOptions = CheckboxControlVariants;
-
-export interface CheckboxStyleConfig {
-  baseStyle?: {
-    root?: SystemStyleObject;
-    group?: SystemStyleObject;
-    control?: SystemStyleObject;
-    label?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: ThemeableCheckboxOptions;
-    group?: ThemeableCheckboxOptions;
-  };
-}
 
 interface CheckboxOptions extends ThemeableCheckboxOptions {
   /**
@@ -40,18 +22,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The checked icon to use
-   */
-  iconChecked?: JSX.Element;
-
-  /**
-   * The indeterminate icon to use
-   */
-  iconIndeterminate?: JSX.Element;
-
-  /**
-   * The name of the input field in a checkbox
-   * (Useful for form submission).
+   * The name of the input field in a checkbox.
    */
   name?: string;
 
@@ -91,17 +62,17 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   disabled?: boolean;
 
   /**
-   * If `true`, the checkbox will be readonly
-   */
-  readOnly?: boolean;
-
-  /**
    * If `true`, the input will have `aria-invalid` set to `true`
    */
   invalid?: boolean;
 
   /**
-   * The callback invoked when the checked state of the `Checkbox` changes.
+   * If `true`, the checkbox will be readonly
+   */
+  readOnly?: boolean;
+
+  /**
+   * The callback invoked when the checked state of the checkbox changes.
    */
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
@@ -118,41 +89,98 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
 
 export type CheckboxProps<C extends ElementType = "label"> = HTMLHopeProps<C, CheckboxOptions>;
 
+interface CheckboxContextState extends Required<CheckboxControlVariants> {
+  /**
+   * The `checked` state of the checkbox.
+   * (In controlled mode)
+   */
+  checked: boolean;
+
+  /**
+   * The `checked` state of the checkbox.
+   * (In uncontrolled mode)
+   */
+  _checked: boolean;
+
+  /**
+   * If `true`, the checkbox is in controlled mode.
+   * (have checked and onChange props)
+   */
+  isControlled: boolean;
+
+  /**
+   * The value to be used in the checkbox input.
+   * This is the value that will be returned on form submission.
+   */
+  value?: string | number;
+
+  /**
+   * If `true`, the checkbox is currently focused.
+   */
+  focused: boolean;
+
+  /**
+   * The id of the input field in a checkbox.
+   */
+  id?: string;
+
+  /**
+   * The name of the input field in a checkbox.
+   */
+  name?: string;
+
+  /**
+   * If `true`, the checkbox input is marked as required,
+   * and `required` attribute will be added
+   */
+  required?: boolean;
+
+  /**
+   * If `true`, the checkbox will be indeterminate.
+   * This only affects the icon shown inside checkbox
+   * and does not modify the checked property.
+   */
+  indeterminate?: boolean;
+
+  /**
+   * If `true`, the checkbox will be disabled
+   */
+  disabled?: boolean;
+
+  /**
+   * If `true`, the input will have `aria-invalid` set to `true`
+   */
+  invalid?: boolean;
+
+  /**
+   * If `true`, the checkbox will be readonly
+   */
+  readOnly?: boolean;
+
+  "aria-required"?: boolean;
+  "aria-disabled"?: boolean;
+  "aria-invalid"?: boolean;
+  "aria-readonly"?: boolean;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+
+  "data-indeterminate"?: string;
+  "data-focus"?: string;
+  "data-checked"?: string;
+  "data-required"?: string;
+  "data-disabled"?: string;
+  "data-invalid"?: string;
+  "data-readonly"?: string;
+}
+
 const hopeCheckboxClass = "hope-checkbox";
 const hopeCheckboxInputClass = "hope-checkbox__input";
-const hopeCheckboxControlClass = "hope-checkbox__control";
-const hopeCheckboxLabelClass = "hope-checkbox__label";
 
-// A thicker version of radix-icon-check
-const CheckboxIconCheck = createIcon({
-  viewBox: "0 0 15 15",
-  path: () => (
-    <path
-      d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3355 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.55529 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
-      fill="currentColor"
-      stroke="currentColor"
-      stroke-width="1"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-    />
-  ),
-});
-
-// A thicker version of radix-icon-minus
-const CheckboxIconIndeterminate = createIcon({
-  viewBox: "0 0 15 15",
-  path: () => (
-    <path
-      d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z"
-      fill="currentColor"
-      stroke="currentColor"
-      stroke-width="1"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-    />
-  ),
-});
-
+/**
+ * The component that provides context for all part of a `checkbox`.
+ * It act as a container and renders a `label` with a visualy hidden `input[type=checkbox]`.
+ */
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const defaultId = `hope-checkbox-${createUniqueId()}`;
 
@@ -160,206 +188,247 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const checkboxGroupContext = useCheckboxGroupContext();
 
-  const defaultProps: CheckboxProps<"label"> = {
-    iconChecked: <CheckboxIconCheck />,
-    iconIndeterminate: <CheckboxIconIndeterminate />,
-  };
+  const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const propsWithDefaults: CheckboxProps<"label"> = mergeProps(defaultProps, props);
-  const [local, inputProps, variantProps, others] = splitProps(
-    propsWithDefaults,
-    ["iconChecked", "iconIndeterminate", "checked", "defaultChecked", "onChange", "class", "children"],
+  const [state, setState] = createStore<CheckboxContextState>({
+    // eslint-disable-next-line solid/reactivity
+    _checked: !!props.defaultChecked,
+    get isControlled() {
+      return props.checked !== undefined;
+    },
+    get checked() {
+      if (checkboxGroupContext) {
+        const checkboxGroupValue = checkboxGroupContext.state.value;
+        return checkboxGroupValue != null
+          ? checkboxGroupValue.some(val => String(props.value) === String(val))
+          : undefined;
+      }
+
+      // Not in CheckboxGroup
+      return this.isControlled ? !!props.checked : this._checked;
+    },
+    get variant() {
+      return props.variant ?? checkboxGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+    },
+    get colorScheme() {
+      return (
+        props.colorScheme ??
+        checkboxGroupContext?.state?.colorScheme ??
+        theme?.defaultProps?.root?.colorScheme ??
+        "primary"
+      );
+    },
+    get size() {
+      return props.size ?? checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
+    },
+    get id() {
+      return formControlProps.id ?? defaultId;
+    },
+    get name() {
+      return props.name ?? checkboxGroupContext?.state.name;
+    },
+    get value() {
+      return props.value;
+    },
+    get indeterminate() {
+      return props.indeterminate;
+    },
+    get required() {
+      return formControlProps.required ?? checkboxGroupContext?.state.required;
+    },
+    get disabled() {
+      return formControlProps.disabled ?? checkboxGroupContext?.state.disabled;
+    },
+    get invalid() {
+      return formControlProps.invalid ?? checkboxGroupContext?.state.invalid;
+    },
+    get readOnly() {
+      return formControlProps.readOnly ?? checkboxGroupContext?.state.readOnly;
+    },
+    get ["aria-required"]() {
+      return this.required ? true : undefined;
+    },
+    get ["aria-disabled"]() {
+      return this.disabled ? true : undefined;
+    },
+    get ["aria-invalid"]() {
+      return this.invalid ? true : undefined;
+    },
+    get ["aria-readonly"]() {
+      return this.readOnly ? true : undefined;
+    },
+    get ["aria-label"]() {
+      return props["aria-label"];
+    },
+    get ["aria-labelledby"]() {
+      return props["aria-labelledby"];
+    },
+    get ["aria-describedby"]() {
+      return props["aria-describedby"];
+    },
+    get ["data-indeterminate"]() {
+      return this.indeterminate ? "" : undefined;
+    },
+    get ["data-focus"]() {
+      return this.focused ? "" : undefined;
+    },
+    get ["data-checked"]() {
+      return this.checked ? "" : undefined;
+    },
+    get ["data-required"]() {
+      return this.required ? "" : undefined;
+    },
+    get ["data-disabled"]() {
+      return this.disabled ? "" : undefined;
+    },
+    get ["data-invalid"]() {
+      return this.invalid ? "" : undefined;
+    },
+    get ["data-readonly"]() {
+      return this.readOnly ? "" : undefined;
+    },
+    focused: false,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(
+    props as CheckboxProps<"label">,
+    ["class", "children", "ref", "tabIndex", "onChange"],
     [
-      "ref",
+      "variant",
+      "colorScheme",
+      "size",
       "id",
       "name",
       "value",
       "indeterminate",
+      "checked",
+      "defaultChecked",
       "required",
       "disabled",
       "invalid",
       "readOnly",
-      "aria-label",
-      "aria-labelledby",
-      "aria-describedby",
-      "tabIndex",
       "onFocus",
       "onBlur",
-    ],
-    ["variant", "colorScheme", "size"]
+    ]
   );
 
-  const formControlProps = useFormControl<HTMLInputElement>(inputProps);
-
-  const variant = () => {
-    return (
-      variantProps.variant ?? checkboxGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline"
-    );
-  };
-
-  const colorScheme = () => {
-    return (
-      variantProps.colorScheme ??
-      checkboxGroupContext?.state?.colorScheme ??
-      theme?.defaultProps?.root?.colorScheme ??
-      "primary"
-    );
-  };
-
-  const size = () => {
-    return variantProps.size ?? checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
-  };
-
-  const id = () => formControlProps.id ?? defaultId;
-  const name = () => inputProps.name ?? checkboxGroupContext?.state.name;
-  const required = () => formControlProps.required ?? checkboxGroupContext?.state.required;
-  const disabled = () => formControlProps.disabled ?? checkboxGroupContext?.state.disabled;
-  const invalid = () => formControlProps.invalid ?? checkboxGroupContext?.state.invalid;
-  const readOnly = () => formControlProps.readOnly ?? checkboxGroupContext?.state.readOnly;
-
-  // Internal state for uncontrolled checkbox.
-  // eslint-disable-next-line solid/reactivity
-  const [checkedState, setCheckedState] = createSignal(!!local.defaultChecked);
-
-  const isControlled = () => local.checked !== undefined;
-
-  const checked = () => {
-    if (checkboxGroupContext) {
-      const checkboxGroupValue = checkboxGroupContext.state.value;
-      return checkboxGroupValue != null
-        ? checkboxGroupValue.some(val => String(inputProps.value) === String(val))
-        : undefined;
-    }
-
-    // Not in CheckboxGroup
-    return isControlled() ? !!local.checked : checkedState();
-  };
-
-  const dataIndeterminate = () => (inputProps.indeterminate ? "" : undefined);
-  const dataChecked = () => (checked() ? "" : undefined);
-  const dataRequired = () => (required() ? "" : undefined);
-  const dataDisabled = () => (disabled() ? "" : undefined);
-  const dataInvalid = () => (invalid() ? "" : undefined);
-  const dataReadonly = () => (readOnly() ? "" : undefined);
-
-  const ariaRequired = () => (required() ? true : undefined);
-  const ariaDisabled = () => (disabled() ? true : undefined);
-  const ariaInvalid = () => (invalid() ? true : undefined);
-  const ariaReadonly = () => (readOnly() ? true : undefined);
-
-  const containerClasses = () => {
-    return classNames(
-      local.class,
-      hopeCheckboxClass,
-      checkboxContainerStyles({
-        size: size(),
-      })
-    );
-  };
-
-  const inputClasses = () => classNames(hopeCheckboxInputClass, visuallyHiddenStyles());
-
-  const controlClasses = () => {
-    return classNames(
-      hopeCheckboxControlClass,
-      checkboxControlStyles({
-        variant: variant(),
-        colorScheme: colorScheme(),
-        size: size(),
-      })
-    );
-  };
-
-  const labelClasses = () =>
-    classNames(
-      hopeCheckboxLabelClass,
-      checkboxLabelStyles({
-        size: size(),
-      })
-    );
-
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
-    if (inputProps.readOnly || inputProps.disabled) {
+    if (state.readOnly || state.disabled) {
       event.preventDefault();
       return;
     }
 
-    if (!isControlled()) {
+    if (!state.isControlled) {
       const target = event.target as HTMLInputElement;
-      setCheckedState(target.checked);
+      setState("_checked", target.checked);
     }
 
     callAllHandlers(checkboxGroupContext?.onChange, local.onChange)(event);
   };
 
+  const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
+    setState("focused", true);
+    callHandler(formControlProps.onFocus)(event);
+  };
+
+  const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
+    setState("focused", false);
+    callHandler(formControlProps.onBlur)(event);
+  };
+
+  const containerClasses = () => {
+    return classNames(local.class, hopeCheckboxClass, checkboxContainerStyles({ size: state.size }));
+  };
+
+  const inputClasses = () => classNames(hopeCheckboxInputClass, visuallyHiddenStyles());
+
+  const context: CheckboxContextValue = {
+    state,
+    onChange,
+    onFocus,
+    onBlur,
+  };
+
   return (
-    <hope.label
-      class={containerClasses()}
-      __baseStyle={theme?.baseStyle?.root}
-      for={inputProps.id}
-      data-indeterminate={dataIndeterminate()}
-      data-checked={dataChecked()}
-      data-required={dataRequired()}
-      data-disabled={dataDisabled()}
-      data-invalid={dataInvalid()}
-      data-readonly={dataReadonly()}
-      {...others}
-    >
-      <input
-        ref={inputProps.ref}
-        type="checkbox"
-        id={id()}
-        tabIndex={inputProps.tabIndex}
-        value={inputProps.value}
-        name={name()}
-        checked={checked()}
-        required={required()}
-        disabled={disabled()}
-        readOnly={readOnly()}
-        aria-required={ariaRequired()}
-        aria-disabled={ariaDisabled()}
-        aria-invalid={ariaInvalid()}
-        aria-readonly={ariaReadonly()}
-        aria-label={inputProps["aria-label"]}
-        aria-labelledby={inputProps["aria-labelledby"]}
-        aria-describedby={formControlProps["aria-describedby"]}
-        class={inputClasses()}
-        onChange={onChange}
-        onFocus={formControlProps.onFocus}
-        onBlur={formControlProps.onBlur}
-      />
-      <hope.span
-        aria-hidden={true}
-        class={controlClasses()}
-        __baseStyle={theme?.baseStyle?.control}
-        data-indeterminate={dataIndeterminate()}
-        data-checked={dataChecked()}
-        data-required={dataRequired()}
-        data-disabled={dataDisabled()}
-        data-invalid={dataInvalid()}
-        data-readonly={dataReadonly()}
+    <CheckboxContext.Provider value={context}>
+      <hope.label
+        class={containerClasses()}
+        __baseStyle={theme?.baseStyle?.root}
+        for={state.id}
+        data-indeterminate={state["data-indeterminate"]}
+        data-focus={state["data-focus"]}
+        data-checked={state["data-checked"]}
+        data-required={state["data-required"]}
+        data-disabled={state["data-disabled"]}
+        data-invalid={state["data-invalid"]}
+        data-readonly={state["data-readonly"]}
+        {...others}
       >
-        <Switch>
-          <Match when={inputProps.indeterminate}>{local.iconIndeterminate}</Match>
-          <Match when={checked() && !inputProps.indeterminate}>{local.iconChecked}</Match>
-        </Switch>
-      </hope.span>
-      <Show when={local.children}>
-        <hope.span
-          class={labelClasses()}
-          __baseStyle={theme?.baseStyle?.label}
-          data-indeterminate={dataIndeterminate()}
-          data-checked={dataChecked()}
-          data-required={dataRequired()}
-          data-disabled={dataDisabled()}
-          data-invalid={dataInvalid()}
-          data-readonly={dataReadonly()}
-        >
-          {local.children}
-        </hope.span>
-      </Show>
-    </hope.label>
+        <input
+          type="checkbox"
+          class={inputClasses()}
+          ref={local.ref}
+          tabIndex={local.tabIndex}
+          value={state.value}
+          id={state.id}
+          name={state.name}
+          checked={state.checked}
+          required={state.required}
+          disabled={state.disabled}
+          readOnly={state.readOnly}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          aria-required={state["aria-required"]}
+          aria-disabled={state["aria-disabled"]}
+          aria-invalid={state["aria-invalid"]}
+          aria-readonly={state["aria-readonly"]}
+          aria-label={state["aria-label"]}
+          aria-labelledby={state["aria-labelledby"]}
+          aria-describedby={state["aria-describedby"]}
+        />
+        {local.children}
+      </hope.label>
+    </CheckboxContext.Provider>
   );
 }
 
 Checkbox.toString = () => createClassSelector(hopeCheckboxClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+interface CheckboxContextValue extends Required<Pick<CheckboxOptions, "onChange" | "onFocus" | "onBlur">> {
+  state: CheckboxContextState;
+}
+
+const CheckboxContext = createContext<CheckboxContextValue>();
+
+export function useCheckboxContext() {
+  const context = useContext(CheckboxContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useCheckboxContext must be used within a `<Checkbox />` component");
+  }
+
+  return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface CheckboxStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    group?: SystemStyleObject;
+    control?: SystemStyleObject;
+    label?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableCheckboxOptions;
+    group?: ThemeableCheckboxOptions;
+  };
+}
