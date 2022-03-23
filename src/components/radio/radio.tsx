@@ -22,7 +22,12 @@ interface RadioOptions extends ThemeableRadioOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The name of the input field in a radio.
+   * The id to be passed to the internal <input> tag.
+   */
+  id?: string;
+
+  /**
+   * The name to be passed to the internal <input> tag.
    */
   name?: string;
 
@@ -85,12 +90,6 @@ export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, Radio
 interface RadioContextState extends Required<RadioControlVariants> {
   /**
    * The `checked` state of the radio.
-   * (In controlled mode)
-   */
-  checked: boolean;
-
-  /**
-   * The `checked` state of the radio.
    * (In uncontrolled mode)
    */
   _checked: boolean;
@@ -102,15 +101,21 @@ interface RadioContextState extends Required<RadioControlVariants> {
   isControlled: boolean;
 
   /**
+   * If `true`, the radio is currently focused.
+   */
+  isFocused: boolean;
+
+  /**
+   * The `checked` state of the radio.
+   * (In controlled mode)
+   */
+  checked: boolean;
+
+  /**
    * The value to be used in the radio input.
    * This is the value that will be returned on form submission.
    */
   value?: string | number;
-
-  /**
-   * If `true`, the radio is currently focused.
-   */
-  focused: boolean;
 
   /**
    * The id of the input field in a radio.
@@ -178,6 +183,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const [state, setState] = createStore<RadioContextState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
+    isFocused: false,
     get isControlled() {
       return props.checked !== undefined;
     },
@@ -247,7 +253,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return props["aria-describedby"];
     },
     get ["data-focus"]() {
-      return this.focused ? "" : undefined;
+      return this.isFocused ? "" : undefined;
     },
     get ["data-checked"]() {
       return this.checked ? "" : undefined;
@@ -264,7 +270,6 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     get ["data-readonly"]() {
       return this.readOnly ? "" : undefined;
     },
-    focused: false,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -304,12 +309,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
-    setState("focused", true);
+    setState("isFocused", true);
     callHandler(formControlProps.onFocus)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
-    setState("focused", false);
+    setState("isFocused", false);
     callHandler(formControlProps.onBlur)(event);
   };
 

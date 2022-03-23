@@ -2,29 +2,25 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 
-import {
-  selectionControlContainerStyles,
-  selectionControlLabelStyles,
-  selectionControlStyles,
-} from "../checkbox/checkbox.styles";
+import { toggleContainerStyles, toggleControlLabelStyles, toggleControlStyles } from "../checkbox/checkbox.styles";
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioContainerStyles = css(selectionControlContainerStyles);
+export const radioContainerStyles = css(toggleContainerStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - label
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioLabelStyles = css(selectionControlLabelStyles);
+export const radioLabelStyles = css(toggleControlLabelStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - control
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioControlStyles = css(selectionControlStyles, {
+export const radioControlStyles = css(toggleControlStyles, {
   borderRadius: "$full",
 
   "&[data-checked]::before": {
