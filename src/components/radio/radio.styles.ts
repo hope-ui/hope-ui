@@ -54,7 +54,7 @@ export const radioLabelStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Radio - indicator
+ * Radio - control
  * -----------------------------------------------------------------------------------------------*/
 
 interface ColorVariantConfig {
@@ -78,7 +78,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const radioIndicatorStyles = css({
+export const radioControlStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -184,4 +184,4 @@ export const radioIndicatorStyles = css({
   },
 });
 
-export type RadioIndicatorVariants = VariantProps<typeof radioIndicatorStyles>;
+export type RadioControlVariants = VariantProps<typeof radioControlStyles>;

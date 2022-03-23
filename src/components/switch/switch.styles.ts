@@ -2,13 +2,6 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
-import { visuallyHiddenStyles } from "@/theme/utils";
-
-/* -------------------------------------------------------------------------------------------------
- * Switch - input
- * -----------------------------------------------------------------------------------------------*/
-
-export const switchInputStyles = css(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - container
@@ -44,18 +37,22 @@ export const switchContainerStyles = css({
         lineHeight: "$7",
       },
     },
-    labelPlacement: {
-      start: {
-        flexDirection: "row-reverse",
-      },
-      end: {
-        flexDirection: "row",
-      },
-    },
   },
 });
 
-export type SwitchContainerVariants = VariantProps<typeof switchContainerStyles>;
+/* -------------------------------------------------------------------------------------------------
+ * Switch - label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const switchLabelStyles = css({
+  cursor: "pointer",
+  userSelect: "none",
+
+  "&[data-disabled]": {
+    opacity: "0.5",
+    cursor: "not-allowed",
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - control
@@ -75,7 +72,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
       color: "$neutral9",
     },
 
-    [`.${switchInputStyles}:focus + &`]: {
+    "&[data-focus]": {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
     },
@@ -111,13 +108,12 @@ export const switchControlStyles = css({
     color: "$danger9",
   },
 
-  [`.${switchInputStyles}:focus + &[data-invalid]`]: {
+  "&[data-focus][data-invalid]": {
     boxShadow: "0 0 0 3px $colors$danger5",
     borderColor: "$danger8",
   },
 
-  [`&[data-checked], 
-    .${switchInputStyles}:focus + &[data-checked]`]: {
+  "&[data-checked], &[data-focus][data-checked]": {
     borderColor: "transparent",
     backgroundColor: "currentColor",
   },
@@ -234,41 +230,3 @@ export const switchControlStyles = css({
 });
 
 export type SwitchControlVariants = VariantProps<typeof switchControlStyles>;
-
-/* -------------------------------------------------------------------------------------------------
- * Switch - span containing the text label
- * -----------------------------------------------------------------------------------------------*/
-
-function createSizeAndLabelPositionCompoundVariants() {
-  return Object.entries({
-    sm: "$2",
-    md: "$2",
-    lg: "$2",
-  }).flatMap(([key, value]) => [
-    {
-      labelPlacement: "start",
-      size: key,
-      css: { marginInlineEnd: value },
-    },
-    {
-      labelPlacement: "end",
-      size: key,
-      css: { marginInlineStart: value },
-    },
-  ]);
-}
-
-export const switchLabelStyles = css({
-  variants: {
-    size: {
-      sm: {},
-      md: {},
-      lg: {},
-    },
-    labelPlacement: {
-      start: {},
-      end: {},
-    },
-  },
-  compoundVariants: createSizeAndLabelPositionCompoundVariants(),
-});
