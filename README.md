@@ -5,7 +5,7 @@
 [![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui "MIT License")](LICENSE.md)
 [![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid "@hope-ui/solid npm")](https://www.npmjs.com/package/@hope-ui/solid)
 
-🤞 The hoped component library for your SolidJS applications.
+🤞 The SolidJS component library you've hoped for.
 
 # This project is a work in progress and is not production ready.
 
