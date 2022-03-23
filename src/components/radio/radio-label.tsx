@@ -8,14 +8,14 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useRadioContext } from "./radio";
 import { radioLabelStyles } from "./radio.styles";
 
-export type RadioLabelProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
+export type RadioLabelProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
 const hopeRadioLabelClass = "hope-radio__label";
 
 /**
  * The label of the radio.
  */
-export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProp<C>) {
+export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProps<C>) {
   const theme = useComponentStyleConfigs().Radio;
 
   const radioContext = useRadioContext();

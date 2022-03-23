@@ -2,12 +2,15 @@ import { createContext, createUniqueId, JSX, splitProps, useContext } from "soli
 import { createStore } from "solid-js/store";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { classNames, createClassSelector } from "@/utils/css";
 
+import { Box } from "../box/box";
+import { ElementType, HTMLHopeProps } from "../types";
 import { ThemeableCheckboxOptions } from "./checkbox";
 
 type CheckboxGroupValue = (string | number)[];
 
-interface CheckboxGroupProps extends ThemeableCheckboxOptions {
+interface CheckboxGroupOptions extends ThemeableCheckboxOptions {
   /**
    * The `name` attribute forwarded to each `checkbox` element
    */
@@ -58,37 +61,42 @@ interface CheckboxGroupProps extends ThemeableCheckboxOptions {
   onChange?: (value: CheckboxGroupValue) => void;
 }
 
-type CheckboxGroupState = Omit<CheckboxGroupProps, "name" | "onChange"> & {
-  valueState: CheckboxGroupValue;
-  isControlled: boolean;
-  name: string;
-};
+export type CheckboxGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, CheckboxGroupOptions>;
 
-interface CheckboxGroupContextValue {
-  state: CheckboxGroupState;
+interface CheckboxGroupState extends Omit<CheckboxGroupProps, "name" | "onChange"> {
+  /**
+   * The `name` attribute forwarded to each `radio` element.
+   */
+  name: string;
 
   /**
-   * The callback invoked when the checked state of the `Checkbox` in `CheckboxGroup` changes.
+   * The value of the radio to be `checked`.
+   * (in uncontrolled mode)
    */
-  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+  _value: CheckboxGroupValue;
+
+  /**
+   * If `true`, the radio group is in controlled mode.
+   * (have value and onChange props)
+   */
+  isControlled: boolean;
 }
 
-const CheckboxGroupContext = createContext<CheckboxGroupContextValue>();
+const hopeCheckboxGroupClass = "hope-checkbox-group";
 
-export function CheckboxGroup(props: CheckboxGroupProps) {
-  const defaultName = `hope-checkbox-group-${createUniqueId()}`;
+export function CheckboxGroup<C extends ElementType = "div">(props: CheckboxGroupProps<C>) {
+  const defaultName = `hope-checkbox-group-${createUniqueId()}--checkbox`;
 
   const theme = useComponentStyleConfigs().Checkbox;
 
   const [state, setState] = createStore<CheckboxGroupState>({
-    // Internal state for uncontrolled checkbox-group.
     // eslint-disable-next-line solid/reactivity
-    valueState: props.defaultValue ?? [],
+    _value: props.defaultValue ?? [],
     get isControlled() {
       return props.value !== undefined;
     },
     get value() {
-      return this.isControlled ? props.value : this.valueState;
+      return this.isControlled ? props.value : this._value;
     },
     get name() {
       return props.name ?? defaultName;
@@ -114,12 +122,14 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
     },
-    get labelPlacement() {
-      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
-    },
   });
 
-  const [local, others] = splitProps(props, ["children", "value", "defaultValue", "name", "disabled", "onChange"]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(
+    props,
+    ["class", "onChange"],
+    ["value", "defaultValue", "name", "required", "disabled", "readOnly", "invalid"]
+  );
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     if (!state.value) {
@@ -132,12 +142,12 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
       ? [...state.value, target.value]
       : state.value.filter(val => String(val) !== String(target.value));
 
-    //if (!state.isControlled) {
-    setState("valueState", nextValue);
-    //}
+    setState("_value", nextValue);
 
     local.onChange?.(nextValue);
   };
+
+  const classes = () => classNames(local.class, hopeCheckboxGroupClass);
 
   const context: CheckboxGroupContextValue = {
     state: state as CheckboxGroupState,
@@ -145,11 +155,28 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   };
 
   return (
-    <CheckboxGroupContext.Provider value={context} {...others}>
-      {local.children}
+    <CheckboxGroupContext.Provider value={context}>
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.group} {...others} />
     </CheckboxGroupContext.Provider>
   );
 }
+
+CheckboxGroup.toString = () => createClassSelector(hopeCheckboxGroupClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+interface CheckboxGroupContextValue {
+  state: CheckboxGroupState;
+
+  /**
+   * The callback invoked when the checked state of the `Checkbox` in `CheckboxGroup` changes.
+   */
+  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+}
+
+const CheckboxGroupContext = createContext<CheckboxGroupContextValue>();
 
 export function useCheckboxGroupContext() {
   return useContext(CheckboxGroupContext);

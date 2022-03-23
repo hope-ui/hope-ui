@@ -6,27 +6,27 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useRadioContext } from "./radio";
-import { radioIndicatorStyles } from "./radio.styles";
+import { radioControlStyles } from "./radio.styles";
 
-export type RadioIndicatorProp<C extends ElementType = "input"> = HTMLHopeProps<C>;
+export type RadioControlProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
-const hopeRadioIndicatorClass = "hope-radio__indicator";
+const hopeRadioControlClass = "hope-radio__control";
 
 /**
- * The visual indicator that represents a `radio`.
+ * The visual control that represents a `radio`.
  */
-export function RadioIndicator<C extends ElementType = "input">(props: RadioIndicatorProp<C>) {
+export function RadioControl<C extends ElementType = "span">(props: RadioControlProps<C>) {
   const theme = useComponentStyleConfigs().Radio;
 
   const radioContext = useRadioContext();
 
-  const [local, others] = splitProps(props as RadioIndicatorProp<"input">, ["class"]);
+  const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => {
     return classNames(
       local.class,
-      hopeRadioIndicatorClass,
-      radioIndicatorStyles({
+      hopeRadioControlClass,
+      radioControlStyles({
         variant: radioContext.state.variant,
         colorScheme: radioContext.state.colorScheme,
         size: radioContext.state.size,
@@ -38,7 +38,7 @@ export function RadioIndicator<C extends ElementType = "input">(props: RadioIndi
     <hope.span
       aria-hidden={true}
       class={classes()}
-      __baseStyle={theme?.baseStyle?.indicator}
+      __baseStyle={theme?.baseStyle?.control}
       data-focus={radioContext.state["data-focus"]}
       data-checked={radioContext.state["data-checked"]}
       data-required={radioContext.state["data-required"]}
@@ -50,4 +50,4 @@ export function RadioIndicator<C extends ElementType = "input">(props: RadioIndi
   );
 }
 
-RadioIndicator.toString = () => createClassSelector(hopeRadioIndicatorClass);
+RadioControl.toString = () => createClassSelector(hopeRadioControlClass);

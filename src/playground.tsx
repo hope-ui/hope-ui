@@ -1,28 +1,29 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
   Button,
+  FormControl,
+  FormLabel,
   HopeProvider,
   HopeThemeConfig,
   HStack,
   Radio,
+  RadioControl,
   RadioGroup,
-  RadioIndicator,
   RadioLabel,
-  Text,
+  Checkbox,
+  CheckboxControl,
+  CheckboxLabel,
   useColorMode,
   VStack,
 } from ".";
-import { FormControl, FormLabel } from "./components";
-import { createSignal } from "solid-js";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-
-  const [disabled, setDisabled] = createSignal(false);
 
   return (
     <Box p="$4">
@@ -30,28 +31,12 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
-        <Button onClick={() => setDisabled(prev => !prev)}>Disable formcontrol</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <FormControl as="fieldset">
-          <FormLabel as="legend">Choose wisely</FormLabel>
-          <RadioGroup>
-            <HStack spacing="$4">
-              <Radio value="react" disabled={disabled()}>
-                <RadioIndicator />
-                <RadioLabel>React</RadioLabel>
-              </Radio>
-              <Radio value="angular">
-                <RadioIndicator />
-                <RadioLabel>Angular</RadioLabel>
-              </Radio>
-              <Radio value="vue">
-                <RadioIndicator />
-                <RadioLabel>Vue</RadioLabel>
-              </Radio>
-            </HStack>
-          </RadioGroup>
-        </FormControl>
+        <Checkbox colorScheme="info">
+          <CheckboxLabel>Foo</CheckboxLabel>
+          <CheckboxControl />
+        </Checkbox>
       </VStack>
     </Box>
   );

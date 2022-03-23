@@ -53,7 +53,7 @@ export function callAllHandlers<T, E extends Event>(...fns: Array<JSX.EventHandl
 
 /**
  * Return a function that will call the provided event handler.
- * It simplify the way to call a JSX.EventHandlerUnion programmatically.
+ * Simple way to call a JSX.EventHandlerUnion programmatically.
  */
 export function callHandler<T, E extends Event>(fn: JSX.EventHandlerUnion<T, E> | undefined) {
   return function (

@@ -10,10 +10,10 @@ import { callAllHandlers, callHandler } from "@/utils/function";
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
-import { radioContainerStyles, RadioIndicatorVariants } from "./radio.styles";
+import { radioContainerStyles, RadioControlVariants } from "./radio.styles";
 import { useRadioGroupContext } from "./radio-group";
 
-export type ThemeableRadioOptions = RadioIndicatorVariants;
+export type ThemeableRadioOptions = RadioControlVariants;
 
 interface RadioOptions extends ThemeableRadioOptions {
   /**
@@ -65,7 +65,7 @@ interface RadioOptions extends ThemeableRadioOptions {
   readOnly?: boolean;
 
   /**
-   * The callback invoked when the checked state of the `Radio` changes.
+   * The callback invoked when the checked state of the radio changes.
    */
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
@@ -82,7 +82,7 @@ interface RadioOptions extends ThemeableRadioOptions {
 
 export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
-interface RadioContextState extends Required<RadioIndicatorVariants> {
+interface RadioContextState extends Required<RadioControlVariants> {
   /**
    * The `checked` state of the radio.
    * (In controlled mode)
@@ -188,7 +188,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       }
 
       // Not in a RadioGroup
-      return this.isControlled ? !!props.checked : this.internalChecked;
+      return this.isControlled ? !!props.checked : this._checked;
     },
     get variant() {
       return props.variant ?? radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
@@ -400,7 +400,7 @@ export interface RadioStyleConfig {
   baseStyle?: {
     root?: SystemStyleObject;
     group?: SystemStyleObject;
-    indicator?: SystemStyleObject;
+    control?: SystemStyleObject;
     label?: SystemStyleObject;
   };
   defaultProps?: {
