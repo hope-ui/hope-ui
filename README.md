@@ -1,6 +1,7 @@
 # @hope-ui/solid (WIP)
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript)
 [![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui "MIT License")](LICENSE.md)
 [![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid "@hope-ui/solid npm")](https://www.npmjs.com/package/@hope-ui/solid)
 
