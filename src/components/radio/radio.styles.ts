@@ -2,13 +2,6 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
-import { visuallyHiddenStyles } from "@/theme/utils";
-
-/* -------------------------------------------------------------------------------------------------
- * Radio - input
- * -----------------------------------------------------------------------------------------------*/
-
-export const radioInputStyles = css(visuallyHiddenStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - container
@@ -18,8 +11,7 @@ export const radioContainerStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
-
-  borderColor: "$neutral8",
+  gap: "$2",
 
   cursor: "pointer",
   userSelect: "none",
@@ -44,21 +36,25 @@ export const radioContainerStyles = css({
         lineHeight: "$7",
       },
     },
-    labelPlacement: {
-      start: {
-        flexDirection: "row-reverse",
-      },
-      end: {
-        flexDirection: "row",
-      },
-    },
   },
 });
 
-export type RadioContainerVariants = VariantProps<typeof radioContainerStyles>;
+/* -------------------------------------------------------------------------------------------------
+ * Radio - label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const radioLabelStyles = css({
+  cursor: "pointer",
+  userSelect: "none",
+
+  "&[data-disabled]": {
+    opacity: "0.5",
+    cursor: "not-allowed",
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
- * Radio - control
+ * Radio - indicator
  * -----------------------------------------------------------------------------------------------*/
 
 interface ColorVariantConfig {
@@ -75,14 +71,14 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
       color: "$neutral10",
     },
 
-    [`.${radioInputStyles}:focus + &`]: {
+    "&[data-focus]": {
       boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
       borderColor: config.borderColorFocus,
     },
   };
 }
 
-export const radioControlStyles = css({
+export const radioIndicatorStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -98,6 +94,7 @@ export const radioControlStyles = css({
   padding: 0,
 
   verticalAlign: "middle",
+  cursor: "pointer",
   userSelect: "none",
   transition: "border-color 250ms, box-shadow 250ms",
 
@@ -111,13 +108,12 @@ export const radioControlStyles = css({
     color: "$danger9",
   },
 
-  [`.${radioInputStyles}:focus + &[data-invalid]`]: {
+  "&[data-focus][data-invalid]": {
     boxShadow: "0 0 0 3px $colors$danger5",
     borderColor: "$danger8",
   },
 
-  [`&[data-checked],
-    .${radioInputStyles}:focus + &[data-checked]`]: {
+  "&[data-checked], &[data-focus][data-checked]": {
     borderColor: "transparent",
     backgroundColor: "currentColor",
   },
@@ -134,8 +130,7 @@ export const radioControlStyles = css({
   variants: {
     variant: {
       outline: {
-        border: "1px solid",
-        borderColor: "inherit", // allow passing borderColor style props to parent container
+        border: "1px solid $colors$neutral8",
         backgroundColor: "transparent",
       },
       filled: {
@@ -189,42 +184,4 @@ export const radioControlStyles = css({
   },
 });
 
-export type RadioControlVariants = VariantProps<typeof radioControlStyles>;
-
-/* -------------------------------------------------------------------------------------------------
- * Radio - span containing the text label
- * -----------------------------------------------------------------------------------------------*/
-
-function createSizeAndLabelPositionCompoundVariants() {
-  return Object.entries({
-    sm: "$2",
-    md: "$2",
-    lg: "$2",
-  }).flatMap(([key, value]) => [
-    {
-      labelPlacement: "start",
-      size: key,
-      css: { marginInlineEnd: value },
-    },
-    {
-      labelPlacement: "end",
-      size: key,
-      css: { marginInlineStart: value },
-    },
-  ]);
-}
-
-export const radioLabelStyles = css({
-  variants: {
-    size: {
-      sm: {},
-      md: {},
-      lg: {},
-    },
-    labelPlacement: {
-      start: {},
-      end: {},
-    },
-  },
-  compoundVariants: createSizeAndLabelPositionCompoundVariants(),
-});
+export type RadioIndicatorVariants = VariantProps<typeof radioIndicatorStyles>;

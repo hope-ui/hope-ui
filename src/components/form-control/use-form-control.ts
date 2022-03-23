@@ -11,20 +11,6 @@ export interface UseFormControlProps<T extends HTMLElement> extends FormControlO
   onBlur?: JSX.EventHandlerUnion<T, FocusEvent>;
 }
 
-/**
- * Array of commonly splited props by component that use `useFormControl`.
- */
-export const useFormControlPropNames: Array<keyof UseFormControlProps<HTMLElement>> = [
-  "id",
-  "required",
-  "disabled",
-  "invalid",
-  "readOnly",
-  "aria-describedby",
-  "onFocus",
-  "onBlur",
-];
-
 export interface UseFormControlReturn<T extends HTMLElement> {
   id?: string;
   required?: boolean;

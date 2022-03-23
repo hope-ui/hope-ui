@@ -54,44 +54,48 @@ interface RadioGroupOptions extends ThemeableRadioOptions {
   onChange?: (value: string) => void;
 }
 
-type RadioGroupState = Omit<RadioGroupOptions, "name" | "onChange"> & {
-  valueState?: string | number;
-  isControlled: boolean;
-  name: string;
-};
+export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, RadioGroupOptions>;
 
-interface RadioGroupContextValue {
-  state: RadioGroupState;
+interface RadioGroupState extends Omit<RadioGroupOptions, "name" | "onChange"> {
+  /**
+   * The `name` attribute forwarded to each `radio` element.
+   */
+  name: string;
 
   /**
-   * The callback invoked when the checked state of the `Radio` in `RadioGroup` changes.
+   * The value of the radio to be `checked`.
+   * (in uncontrolled mode)
    */
-  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+  _value?: string | number;
+
+  /**
+   * If `true`, the radio group is in controlled mode.
+   * (have value and onChange props)
+   */
+  isControlled: boolean;
 }
-
-const RadioGroupContext = createContext<RadioGroupContextValue>();
-
-export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, RadioGroupOptions>;
 
 const hopeRadioGroupClass = "hope-radio-group";
 
+/**
+ * RadioGroup provides context for all its radio childrens.
+ */
 export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps<C>) {
-  const defaultName = `hope-radio-group-${createUniqueId()}`;
+  const defaultRadioName = `hope-radio-group-${createUniqueId()}--radio`;
 
   const theme = useComponentStyleConfigs().Radio;
 
   const [state, setState] = createStore<RadioGroupState>({
-    // Internal state for uncontrolled radio-group.
     // eslint-disable-next-line solid/reactivity
-    valueState: props.defaultValue,
+    _value: props.defaultValue,
     get isControlled() {
       return props.value !== undefined;
     },
     get value() {
-      return this.isControlled ? props.value : this.valueState;
+      return this.isControlled ? props.value : this._value;
     },
     get name() {
-      return props.name ?? defaultName;
+      return props.name ?? defaultRadioName;
     },
     get required() {
       return props.required;
@@ -114,31 +118,21 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
     },
-    get labelPlacement() {
-      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
-    },
   });
 
-  const [local, others] = splitProps(props, [
-    "class",
-    "value",
-    "defaultValue",
-    "name",
-    "required",
-    "disabled",
-    "readOnly",
-    "invalid",
-    "onChange",
-  ]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(
+    props,
+    ["class", "onChange"],
+    ["value", "defaultValue", "name", "required", "disabled", "readOnly", "invalid"]
+  );
 
   const classes = () => classNames(local.class, hopeRadioGroupClass);
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
-    //if (!state.isControlled) {
-    setState("valueState", value);
-    //}
+    setState("_value", value);
 
     local.onChange?.(String(value));
   };
@@ -156,6 +150,21 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
 }
 
 RadioGroup.toString = () => createClassSelector(hopeRadioGroupClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * RadioGroupContext
+ * -----------------------------------------------------------------------------------------------*/
+
+interface RadioGroupContextValue {
+  state: RadioGroupState;
+
+  /**
+   * The callback invoked when the checked state of a `Radio` in `RadioGroup` changes.
+   */
+  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+}
+
+const RadioGroupContext = createContext<RadioGroupContextValue>();
 
 export function useRadioGroupContext() {
   return useContext(RadioGroupContext);
