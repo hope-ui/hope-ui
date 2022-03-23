@@ -127,8 +127,6 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     ["value", "defaultValue", "name", "required", "disabled", "readOnly", "invalid"]
   );
 
-  const classes = () => classNames(local.class, hopeRadioGroupClass);
-
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
@@ -136,6 +134,8 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
 
     local.onChange?.(String(value));
   };
+
+  const classes = () => classNames(local.class, hopeRadioGroupClass);
 
   const context: RadioGroupContextValue = {
     state,
@@ -152,7 +152,7 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
 RadioGroup.toString = () => createClassSelector(hopeRadioGroupClass);
 
 /* -------------------------------------------------------------------------------------------------
- * RadioGroupContext
+ * Context
  * -----------------------------------------------------------------------------------------------*/
 
 interface RadioGroupContextValue {

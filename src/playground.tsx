@@ -33,7 +33,12 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start"></VStack>
+      <VStack spacing="$4" alignItems="flex-start">
+        <Switch colorScheme="info">
+          <SwitchLabel>Foo</SwitchLabel>
+          <SwitchControl />
+        </Switch>
+      </VStack>
     </Box>
   );
 }

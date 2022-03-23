@@ -11,19 +11,19 @@ import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";
 import {
   checkboxContainerStyles,
-  CheckboxContainerVariants,
   checkboxControlStyles,
   CheckboxControlVariants,
-  checkboxInputStyles,
   checkboxLabelStyles,
 } from "./checkbox.styles";
 import { useCheckboxGroupContext } from "./checkbox-group";
+import { visuallyHiddenStyles } from "@/theme/utils";
 
-export type ThemeableCheckboxOptions = CheckboxContainerVariants & CheckboxControlVariants;
+export type ThemeableCheckboxOptions = CheckboxControlVariants;
 
 export interface CheckboxStyleConfig {
   baseStyle?: {
     root?: SystemStyleObject;
+    group?: SystemStyleObject;
     control?: SystemStyleObject;
     label?: SystemStyleObject;
   };
@@ -186,7 +186,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       "onFocus",
       "onBlur",
     ],
-    ["variant", "colorScheme", "size", "labelPlacement"]
+    ["variant", "colorScheme", "size"]
   );
 
   const formControlProps = useFormControl<HTMLInputElement>(inputProps);
@@ -208,15 +208,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const size = () => {
     return variantProps.size ?? checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
-  };
-
-  const labelPlacement = () => {
-    return (
-      variantProps.labelPlacement ??
-      checkboxGroupContext?.state?.labelPlacement ??
-      theme?.defaultProps?.root?.labelPlacement ??
-      "end"
-    );
   };
 
   const id = () => formControlProps.id ?? defaultId;
@@ -262,12 +253,11 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       hopeCheckboxClass,
       checkboxContainerStyles({
         size: size(),
-        labelPlacement: labelPlacement(),
       })
     );
   };
 
-  const inputClasses = () => classNames(hopeCheckboxInputClass, checkboxInputStyles());
+  const inputClasses = () => classNames(hopeCheckboxInputClass, visuallyHiddenStyles());
 
   const controlClasses = () => {
     return classNames(
@@ -285,7 +275,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       hopeCheckboxLabelClass,
       checkboxLabelStyles({
         size: size(),
-        labelPlacement: labelPlacement(),
       })
     );
 
