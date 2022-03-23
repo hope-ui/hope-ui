@@ -2,29 +2,25 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 
-import {
-  selectionControlContainerStyles,
-  selectionControlLabelStyles,
-  selectionControlStyles,
-} from "../checkbox/checkbox.styles";
+import { toggleContainerStyles, toggleControlLabelStyles, toggleControlStyles } from "../checkbox/checkbox.styles";
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchContainerStyles = css(selectionControlContainerStyles);
+export const switchContainerStyles = css(toggleContainerStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - label
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchLabelStyles = css(selectionControlLabelStyles);
+export const switchLabelStyles = css(toggleControlLabelStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - control
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchControlStyles = css(selectionControlStyles, {
+export const switchControlStyles = css(toggleControlStyles, {
   borderRadius: "$full",
 
   transition: "background-color 250ms, border-color 250ms, box-shadow 250ms",

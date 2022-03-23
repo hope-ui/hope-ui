@@ -4,7 +4,7 @@ import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
- * SelectionControl - base style for checkbox, radio and switch
+ * Toggle - base style for checkbox, radio and switch
  * -----------------------------------------------------------------------------------------------*/
 
 interface ColorVariantConfig {
@@ -28,7 +28,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const selectionControlContainerStyles = css({
+export const toggleContainerStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -60,7 +60,7 @@ export const selectionControlContainerStyles = css({
   },
 });
 
-export const selectionControlLabelStyles = css({
+export const toggleControlLabelStyles = css({
   cursor: "pointer",
   userSelect: "none",
 
@@ -70,7 +70,7 @@ export const selectionControlLabelStyles = css({
   },
 });
 
-export const selectionControlStyles = css({
+export const toggleControlStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -169,19 +169,19 @@ export const selectionControlStyles = css({
  * Checkbox - container
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxContainerStyles = css(selectionControlContainerStyles);
+export const checkboxContainerStyles = css(toggleContainerStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - label
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxLabelStyles = css(selectionControlLabelStyles);
+export const checkboxLabelStyles = css(toggleControlLabelStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - control
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxControlStyles = css(selectionControlStyles, {
+export const checkboxControlStyles = css(toggleControlStyles, {
   borderRadius: "$sm",
 
   "& svg": {
