@@ -22,12 +22,12 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
 
   /**
-   * The id of the input field in a checkbox.
+   * The id to be passed to the internal <input> tag.
    */
   id?: string;
 
   /**
-   * The name of the input field in a checkbox.
+   * The name to be passed to the internal <input> tag.
    */
   name?: string;
 
@@ -97,12 +97,6 @@ export type CheckboxProps<C extends ElementType = "label"> = HTMLHopeProps<C, Ch
 interface CheckboxContextState extends Required<CheckboxControlVariants> {
   /**
    * The `checked` state of the checkbox.
-   * (In controlled mode)
-   */
-  checked: boolean;
-
-  /**
-   * The `checked` state of the checkbox.
    * (In uncontrolled mode)
    */
   _checked: boolean;
@@ -114,15 +108,21 @@ interface CheckboxContextState extends Required<CheckboxControlVariants> {
   isControlled: boolean;
 
   /**
+   * If `true`, the checkbox is currently focused.
+   */
+  isFocused: boolean;
+
+  /**
+   * The `checked` state of the checkbox.
+   * (In controlled mode)
+   */
+  checked: boolean;
+
+  /**
    * The value to be used in the checkbox input.
    * This is the value that will be returned on form submission.
    */
   value?: string | number;
-
-  /**
-   * If `true`, the checkbox is currently focused.
-   */
-  focused: boolean;
 
   /**
    * The id of the input field in a checkbox.
@@ -198,6 +198,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   const [state, setState] = createStore<CheckboxContextState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
+    isFocused: false,
     get isControlled() {
       return props.checked !== undefined;
     },
@@ -275,7 +276,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       return this.indeterminate ? "" : undefined;
     },
     get ["data-focus"]() {
-      return this.focused ? "" : undefined;
+      return this.isFocused ? "" : undefined;
     },
     get ["data-checked"]() {
       return this.checked ? "" : undefined;
@@ -292,7 +293,6 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     get ["data-readonly"]() {
       return this.readOnly ? "" : undefined;
     },
-    focused: false,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -333,12 +333,12 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
-    setState("focused", true);
+    setState("isFocused", true);
     callHandler(formControlProps.onFocus)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
-    setState("focused", false);
+    setState("isFocused", false);
     callHandler(formControlProps.onBlur)(event);
   };
 
