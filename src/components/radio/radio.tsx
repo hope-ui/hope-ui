@@ -94,7 +94,7 @@ interface RadioOptions extends ThemeableRadioOptions {
 
 export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
-interface RadioContextState extends Required<RadioControlVariants> {
+interface RadioState extends Required<RadioControlVariants> {
   /**
    * The `checked` state of the radio.
    * (In uncontrolled mode)
@@ -188,7 +188,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const [state, setState] = createStore<RadioContextState>({
+  const [state, setState] = createStore<RadioState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
     isFocused: false,
@@ -395,7 +395,7 @@ Radio.toString = () => createClassSelector(hopeRadioClass);
  * -----------------------------------------------------------------------------------------------*/
 
 interface RadioContextValue extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
-  state: RadioContextState;
+  state: RadioState;
 }
 
 const RadioContext = createContext<RadioContextValue>();

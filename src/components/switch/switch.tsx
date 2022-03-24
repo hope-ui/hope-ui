@@ -92,7 +92,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
 
 export type SwitchProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchOptions>;
 
-interface SwitchContextState extends Required<SwitchControlVariants> {
+interface SwitchState extends Required<SwitchControlVariants> {
   /**
    * The `checked` state of the switch.
    * (In uncontrolled mode)
@@ -183,7 +183,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const [state, setState] = createStore<SwitchContextState>({
+  const [state, setState] = createStore<SwitchState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
     isFocused: false,
@@ -375,7 +375,7 @@ Switch.toString = () => createClassSelector(hopeSwitchClass);
  * -----------------------------------------------------------------------------------------------*/
 
 interface SwitchContextValue extends Required<Pick<SwitchOptions, "onChange" | "onFocus" | "onBlur">> {
-  state: SwitchContextState;
+  state: SwitchState;
 }
 
 const SwitchContext = createContext<SwitchContextValue>();

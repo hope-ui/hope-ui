@@ -3,10 +3,17 @@ import { JSX } from "solid-js";
 import { isFunction, isObject } from "./assertion";
 
 /**
- * Do nothing
+ * Do nothing.
  */
 export function noop() {
   return;
+}
+
+/**
+ * Cast a given value to another.
+ */
+export function cast<T>(value: any): T {
+  return value as T;
 }
 
 /**

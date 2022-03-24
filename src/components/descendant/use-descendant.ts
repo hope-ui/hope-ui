@@ -1,0 +1,121 @@
+import { createContext, createEffect, createSignal, onCleanup, useContext } from "solid-js";
+
+import { cast } from "@/utils/function";
+
+import { DescendantOptions, DescendantsManager } from "./descendant";
+
+/**
+ * Custom hook that initializes the DescendantsManager.
+ *
+ * @internal
+ */
+function createDescendantsManager<T extends HTMLElement = HTMLElement, K = {}>() {
+  const descendants = new DescendantsManager<T, K>();
+
+  onCleanup(() => {
+    descendants.destroy();
+  });
+
+  return descendants;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Descendants context to be used in component-land.
+ *
+ * - Mount the `DescendantsContextProvider` at the root of the component
+ * - Call `useDescendantsContext` anywhere you need access to the descendants information
+ * -----------------------------------------------------------------------------------------------*/
+
+const DescendantsContext = createContext<DescendantsManager<HTMLElement, {}>>();
+
+function useDescendantsContext() {
+  const context = useContext(DescendantsContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useDescendantsContext must be used within a `<DescendantsProvider />` component");
+  }
+
+  return context;
+}
+
+/**
+ * This hook provides information a descendant such as:
+ * - Its index compared to other descendants
+ * - ref callback to register the descendant
+ * - Its enabled index compared to other enabled descendants
+ *
+ * @internal
+ */
+function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: DescendantOptions<K>) {
+  const descendants = useDescendantsContext();
+
+  const [index, setIndex] = createSignal(-1);
+
+  let ref: T | null = null;
+
+  const assignRef = (el: T) => {
+    if (options) {
+      descendants.register(options)?.(el);
+    } else {
+      descendants.register(el);
+    }
+
+    ref = el;
+  };
+
+  createEffect(() => {
+    if (!ref) {
+      return;
+    }
+
+    const dataIndex = Number(ref.dataset["index"]);
+
+    if (index() != dataIndex && !Number.isNaN(dataIndex)) {
+      setIndex(dataIndex);
+    }
+  });
+
+  onCleanup(() => {
+    if (!ref) {
+      return;
+    }
+
+    descendants.unregister(ref);
+  });
+
+  return {
+    descendants,
+    index,
+    enabledIndex: descendants.enabledIndexOf(ref),
+    register: assignRef,
+  };
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Function that provides strongly typed versions of the context provider and hooks above.
+ * To be used in component-land
+ * -----------------------------------------------------------------------------------------------*/
+
+export function createDescendantContext<T extends HTMLElement = HTMLElement, K = {}>() {
+  const ContextProvider = DescendantsContext.Provider;
+
+  const _useDescendantsContext = () => cast<DescendantsManager<T, K>>(useDescendantsContext());
+
+  const _useDescendant = (options?: DescendantOptions<K>) => useDescendant<T, K>(options);
+
+  const _createDescendantsManager = () => createDescendantsManager<T, K>();
+
+  return [
+    // context provider
+    ContextProvider,
+
+    // call this when you need to read from context
+    _useDescendantsContext,
+
+    // descendants state information, to be called and passed to `ContextProvider`
+    _createDescendantsManager,
+
+    // descendant index information
+    _useDescendant,
+  ] as const;
+}

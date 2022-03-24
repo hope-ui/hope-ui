@@ -178,120 +178,6 @@ type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">
     searchTimeoutId?: number;
   };
 
-interface SelectContextValue {
-  state: SelectState;
-
-  /**
-   * Props that should be spread on the select trigger to support embedding in `FormControl`.
-   */
-  formControlProps: UseFormControlReturn<HTMLButtonElement>;
-
-  /**
-   * Check if the option is a selected one.
-   */
-  isOptionSelected: (option: SelectOptionData) => boolean;
-
-  /**
-   * Check if the option is the current active-descendant by comparing its index with the active index.
-   */
-  isOptionActiveDescendant: (index: number) => boolean;
-
-  /**
-   * Callback to assign the `SelectTrigger` ref.
-   */
-  assignTriggerRef: (el: HTMLButtonElement) => void;
-
-  /**
-   * Callback to assign the `SelectContent` ref.
-   */
-  assignContentRef: (el: HTMLDivElement) => void;
-
-  /**
-   * Callback to assign the `SelectListbox` ref.
-   */
-  assignListboxRef: (el: HTMLDivElement) => void;
-
-  /**
-   * Scroll to the active option.
-   */
-  scrollToOption: (optionRef: HTMLDivElement) => void;
-
-  /**
-   * Callback to notify the context that a `SelectOption` is mounted.
-   * @return The index of the option.
-   */
-  registerOption: (optionData: SelectOptionData) => number;
-
-  /**
-   * Callback to remove an option from the selected options.
-   */
-  unselectOption: (optionData: SelectOptionData) => void;
-
-  /**
-   * Callback invoked when the user click outside the `SelectContent`.
-   */
-  onContentOutsideClick: (target: HTMLElement) => void;
-
-  /**
-   * Callback invoked when the `SelectTrigger` loose focus.
-   */
-  onTriggerBlur: (event: FocusEvent) => void;
-
-  /**
-   * Callback invoked when the user click on the `SelectTrigger`.
-   */
-  onTriggerClick: (event: MouseEvent) => void;
-
-  /**
-   * Callback invoked when the user trigger the `SelectTrigger` with keyboard.
-   */
-  onTriggerKeyDown: (event: KeyboardEvent) => void;
-
-  /**
-   * Callback invoked when the user click on a `SelectOption`.
-   */
-  onOptionClick: (index: number) => void;
-
-  /**
-   * Callback invoked when the user cursor move on a `SelectOption`.
-   */
-  onOptionMouseMove: (index: number) => void;
-
-  /**
-   * Callback invoked when the user click on a `SelectOption`.
-   */
-  onOptionMouseDown: () => void;
-
-  /**
-   * Callback invoked when the user cursor leave the `SelectListbox`.
-   */
-  onListboxMouseLeave: () => void;
-}
-
-export interface SelectStyleConfig {
-  baseStyle?: {
-    trigger?: SystemStyleObject;
-    placeholder?: SystemStyleObject;
-    singleValue?: SystemStyleObject;
-    multiValue?: SystemStyleObject;
-    tag?: SystemStyleObject;
-    tagCloseButton?: SystemStyleObject;
-    icon?: SystemStyleObject;
-    content?: SystemStyleObject;
-    listbox?: SystemStyleObject;
-    optgroup?: SystemStyleObject;
-    label?: SystemStyleObject;
-    option?: SystemStyleObject;
-    optionText?: SystemStyleObject;
-    optionIndicator?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: ThemeableSelectOptions;
-  };
-}
-
-const SelectContext = createContext<SelectContextValue>();
-
 /**
  * The wrapper component that provides context for all its children.
  */
@@ -784,6 +670,102 @@ export function Select(props: SelectProps) {
   return <SelectContext.Provider value={context}>{props.children}</SelectContext.Provider>;
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+interface SelectContextValue {
+  state: SelectState;
+
+  /**
+   * Props that should be spread on the select trigger to support embedding in `FormControl`.
+   */
+  formControlProps: UseFormControlReturn<HTMLButtonElement>;
+
+  /**
+   * Check if the option is a selected one.
+   */
+  isOptionSelected: (option: SelectOptionData) => boolean;
+
+  /**
+   * Check if the option is the current active-descendant by comparing its index with the active index.
+   */
+  isOptionActiveDescendant: (index: number) => boolean;
+
+  /**
+   * Callback to assign the `SelectTrigger` ref.
+   */
+  assignTriggerRef: (el: HTMLButtonElement) => void;
+
+  /**
+   * Callback to assign the `SelectContent` ref.
+   */
+  assignContentRef: (el: HTMLDivElement) => void;
+
+  /**
+   * Callback to assign the `SelectListbox` ref.
+   */
+  assignListboxRef: (el: HTMLDivElement) => void;
+
+  /**
+   * Scroll to the active option.
+   */
+  scrollToOption: (optionRef: HTMLDivElement) => void;
+
+  /**
+   * Callback to notify the context that a `SelectOption` is mounted.
+   * @return The index of the option.
+   */
+  registerOption: (optionData: SelectOptionData) => number;
+
+  /**
+   * Callback to remove an option from the selected options.
+   */
+  unselectOption: (optionData: SelectOptionData) => void;
+
+  /**
+   * Callback invoked when the user click outside the `SelectContent`.
+   */
+  onContentOutsideClick: (target: HTMLElement) => void;
+
+  /**
+   * Callback invoked when the `SelectTrigger` loose focus.
+   */
+  onTriggerBlur: (event: FocusEvent) => void;
+
+  /**
+   * Callback invoked when the user click on the `SelectTrigger`.
+   */
+  onTriggerClick: (event: MouseEvent) => void;
+
+  /**
+   * Callback invoked when the user trigger the `SelectTrigger` with keyboard.
+   */
+  onTriggerKeyDown: (event: KeyboardEvent) => void;
+
+  /**
+   * Callback invoked when the user click on a `SelectOption`.
+   */
+  onOptionClick: (index: number) => void;
+
+  /**
+   * Callback invoked when the user cursor move on a `SelectOption`.
+   */
+  onOptionMouseMove: (index: number) => void;
+
+  /**
+   * Callback invoked when the user click on a `SelectOption`.
+   */
+  onOptionMouseDown: () => void;
+
+  /**
+   * Callback invoked when the user cursor leave the `SelectListbox`.
+   */
+  onListboxMouseLeave: () => void;
+}
+
+const SelectContext = createContext<SelectContextValue>();
+
 export function useSelectContext() {
   const context = useContext(SelectContext);
 
@@ -792,4 +774,30 @@ export function useSelectContext() {
   }
 
   return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface SelectStyleConfig {
+  baseStyle?: {
+    trigger?: SystemStyleObject;
+    placeholder?: SystemStyleObject;
+    singleValue?: SystemStyleObject;
+    multiValue?: SystemStyleObject;
+    tag?: SystemStyleObject;
+    tagCloseButton?: SystemStyleObject;
+    icon?: SystemStyleObject;
+    content?: SystemStyleObject;
+    listbox?: SystemStyleObject;
+    optgroup?: SystemStyleObject;
+    label?: SystemStyleObject;
+    option?: SystemStyleObject;
+    optionText?: SystemStyleObject;
+    optionIndicator?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableSelectOptions;
+  };
 }
