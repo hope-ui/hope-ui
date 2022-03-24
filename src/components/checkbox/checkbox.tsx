@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
@@ -75,6 +76,11 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
    * If `true`, the checkbox will be readonly
    */
   readOnly?: boolean;
+
+  /**
+   * The children of the switch.
+   */
+  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
 
   /**
    * The callback invoked when the checked state of the checkbox changes.
@@ -205,9 +211,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
     get checked() {
       if (checkboxGroupContext) {
         const checkboxGroupValue = checkboxGroupContext.state.value;
-        return checkboxGroupValue != null
-          ? checkboxGroupValue.some(val => String(props.value) === String(val))
-          : undefined;
+        return checkboxGroupValue != null ? checkboxGroupValue.some(val => String(props.value) === String(val)) : false;
       }
 
       // Not in CheckboxGroup
@@ -361,6 +365,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
         class={containerClasses()}
         __baseStyle={theme?.baseStyle?.root}
         for={state.id}
+        data-group
         data-indeterminate={state["data-indeterminate"]}
         data-focus={state["data-focus"]}
         data-checked={state["data-checked"]}
@@ -393,7 +398,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        {local.children}
+        {isFunction(local.children) ? local.children({ checked: state.checked }) : local.children}
       </hope.label>
     </CheckboxContext.Provider>
   );

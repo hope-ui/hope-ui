@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callHandler } from "@/utils/function";
 
@@ -67,6 +68,11 @@ interface SwitchOptions extends ThemeableSwitchOptions {
    * If `true`, the switch will be readonly
    */
   readOnly?: boolean;
+
+  /**
+   * The children of the switch.
+   */
+  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
 
   /**
    * The callback invoked when the checked state of the switch changes.
@@ -323,6 +329,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
         class={containerClasses()}
         __baseStyle={theme?.baseStyle?.root}
         for={state.id}
+        data-group
         data-focus={state["data-focus"]}
         data-checked={state["data-checked"]}
         data-required={state["data-required"]}
@@ -355,7 +362,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        {local.children}
+        {isFunction(local.children) ? local.children({ checked: state.checked }) : local.children}
       </hope.label>
     </SwitchContext.Provider>
   );

@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
@@ -68,6 +69,11 @@ interface RadioOptions extends ThemeableRadioOptions {
    * If `true`, the radio will be readonly
    */
   readOnly?: boolean;
+
+  /**
+   * The children of the radio.
+   */
+  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
 
   /**
    * The callback invoked when the checked state of the radio changes.
@@ -190,7 +196,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     get checked() {
       if (radioGroupContext) {
         const radioGroupValue = radioGroupContext.state.value;
-        return radioGroupValue != null ? props.value === radioGroupValue : false;
+        return radioGroupValue != null ? String(props.value) === String(radioGroupValue) : false;
       }
 
       // Not in a RadioGroup
@@ -337,6 +343,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
         class={containerClasses()}
         __baseStyle={theme?.baseStyle?.root}
         for={state.id}
+        data-group
         data-focus={state["data-focus"]}
         data-checked={state["data-checked"]}
         data-required={state["data-required"]}
@@ -369,7 +376,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        {local.children}
+        {isFunction(local.children) ? local.children({ checked: state.checked }) : local.children}
       </hope.label>
     </RadioContext.Provider>
   );
