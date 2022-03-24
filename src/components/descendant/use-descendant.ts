@@ -1,3 +1,4 @@
+import type { Context } from "solid-js";
 import { createContext, createEffect, createSignal, onCleanup, useContext } from "solid-js";
 
 import { cast } from "@/utils/function";
@@ -39,7 +40,7 @@ function useDescendantsContext() {
 }
 
 /**
- * This hook provides information a descendant such as:
+ * This hook provides information to a descendant such as:
  * - Its index compared to other descendants
  * - ref callback to register the descendant
  * - Its enabled index compared to other enabled descendants
@@ -47,7 +48,7 @@ function useDescendantsContext() {
  * @internal
  */
 function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: DescendantOptions<K>) {
-  const descendants = useDescendantsContext();
+  const descendantsManager = useDescendantsContext();
 
   const [index, setIndex] = createSignal(-1);
 
@@ -55,9 +56,9 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
 
   const assignRef = (el: T) => {
     if (options) {
-      descendants.register(options)?.(el);
+      descendantsManager.register(options)?.(el);
     } else {
-      descendants.register(el);
+      descendantsManager.register(el);
     }
 
     ref = el;
@@ -80,13 +81,13 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
       return;
     }
 
-    descendants.unregister(ref);
+    descendantsManager.unregister(ref);
   });
 
   return {
-    descendants,
+    descendantsManager,
     index,
-    enabledIndex: descendants.enabledIndexOf(ref),
+    enabledIndex: () => descendantsManager.enabledIndexOf(ref),
     register: assignRef,
   };
 }
@@ -97,13 +98,14 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
  * -----------------------------------------------------------------------------------------------*/
 
 export function createDescendantContext<T extends HTMLElement = HTMLElement, K = {}>() {
-  const ContextProvider = DescendantsContext.Provider;
+  type ContextProviderType = Context<DescendantsManager<T, K>>;
+  const ContextProvider = cast<ContextProviderType>(DescendantsContext).Provider;
 
   const _useDescendantsContext = () => cast<DescendantsManager<T, K>>(useDescendantsContext());
 
-  const _useDescendant = (options?: DescendantOptions<K>) => useDescendant<T, K>(options);
-
   const _createDescendantsManager = () => createDescendantsManager<T, K>();
+
+  const _useDescendant = (options?: DescendantOptions<K>) => useDescendant<T, K>(options);
 
   return [
     // context provider
