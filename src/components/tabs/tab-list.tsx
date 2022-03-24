@@ -75,9 +75,9 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
 
     const action = keyMap()[eventKey];
 
-    event.preventDefault();
-
     callAllHandlers(local.onKeyDown, action)(event);
+
+    event.preventDefault();
   };
 
   const classes = () => {

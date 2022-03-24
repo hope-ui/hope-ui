@@ -87,8 +87,8 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
   return {
     descendantsManager,
     index,
+    assignRef,
     enabledIndex: () => descendantsManager.enabledIndexOf(ref),
-    register: assignRef,
   };
 }
 

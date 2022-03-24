@@ -9,16 +9,14 @@ import { render } from "solid-js/web";
 import {
   Box,
   Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   HopeProvider,
   HopeThemeConfig,
   HStack,
-  Radio,
-  RadioControl,
-  RadioGroup,
-  RadioLabel,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   useColorMode,
   VStack,
 } from ".";
@@ -34,34 +32,24 @@ export function App() {
         </Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <FormControl as="fieldset">
-          <FormLabel as="legend">Choose a framework</FormLabel>
-          <RadioGroup defaultValue="solid">
-            <HStack spacing="$6">
-              <Radio value="react">
-                <RadioControl />
-                <RadioLabel>React</RadioLabel>
-              </Radio>
-              <Radio value="angular" disabled>
-                <RadioControl />
-                <RadioLabel>Angular</RadioLabel>
-              </Radio>
-              <Radio value="vue">
-                <RadioControl />
-                <RadioLabel>Vue</RadioLabel>
-              </Radio>
-              <Radio value="svelte">
-                <RadioControl />
-                <RadioLabel>Svelte</RadioLabel>
-              </Radio>
-              <Radio value="solid">
-                <RadioControl />
-                <RadioLabel>Solid</RadioLabel>
-              </Radio>
-            </HStack>
-          </RadioGroup>
-          <FormHelperText>You should choose Solid.</FormHelperText>
-        </FormControl>
+        <Tabs>
+          <TabList>
+            <Tab>One</Tab>
+            <Tab>Two</Tab>
+            <Tab>Three</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <p>one!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>two!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>three!</p>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </VStack>
     </Box>
   );

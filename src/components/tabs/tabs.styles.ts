@@ -32,7 +32,9 @@ export const tabListStyles = css({
   variants: {
     variant: {
       underline: {
-        borderColor: "inherit",
+        borderWidth: 0,
+        borderStyle: "solid",
+        borderColor: "$neutral7",
       },
       outline: {},
       pill: {},
@@ -66,14 +68,14 @@ export const tabListStyles = css({
       variant: "underline",
       orientation: "horizontal",
       css: {
-        borderInlineEnd: "2px solid",
+        borderBottomWidth: "2px",
       },
     },
     {
       variant: "underline",
       orientation: "vertical",
       css: {
-        borderBottom: "2px solid",
+        borderInlineEndWidth: "2px",
       },
     },
   ],
@@ -87,18 +89,23 @@ export type TabListVariants = VariantProps<typeof tabListStyles>;
 
 function createUnderlineAndColorVariant(color: string): SystemStyleObject {
   return {
-    "&[aria-selected=true]": {
+    "&[aria-selected='true']": {
       color,
     },
   };
 }
 
 export const tabStyles = css({
+  appearance: "none",
+
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
 
-  outline: "0",
+  outline: "none",
+
+  border: "$none",
+  backgroundColor: "transparent",
 
   px: "$4",
 
@@ -107,15 +114,18 @@ export const tabStyles = css({
 
   "&:focus": {
     zIndex: 1,
+    outline: "none",
     boxShadow: "$outline",
   },
 
   variants: {
     variant: {
       underline: {
+        borderWidth: 0,
+        borderStyle: "solid",
         borderColor: "transparent",
 
-        "&[aria-selected=true]": {
+        "&[aria-selected='true']": {
           borderColor: "currentColor",
         },
 
@@ -206,16 +216,16 @@ export const tabStyles = css({
       variant: "underline",
       orientation: "horizontal",
       css: {
-        borderInlineEnd: "2px solid",
-        marginInlineEnd: "-2px",
+        borderBottomWidth: "2px",
+        marginBottom: "-2px",
       },
     },
     {
       variant: "underline",
       orientation: "vertical",
       css: {
-        borderBottom: "2px solid",
-        marginBottom: "-2px",
+        borderInlineEndWidth: "2px",
+        marginInlineEnd: "-2px",
       },
     },
   ],
@@ -236,6 +246,6 @@ export const tabPanelsStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const tabPanelStyles = css({
-  outline: "0",
+  outline: "none",
   padding: "$4",
 });

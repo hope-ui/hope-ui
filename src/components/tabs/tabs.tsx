@@ -169,6 +169,7 @@ Tabs.toString = () => createClassSelector(hopeTabsClass);
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
+// Manage descendant tabs
 export const [TabsDescendantsProvider, useTabsDescendantsContext, createTabsDescendantsManager, useTabsDescendant] =
   createDescendantContext<HTMLButtonElement>();
 

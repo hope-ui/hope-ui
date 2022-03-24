@@ -1,5 +1,6 @@
 import { createMemo, JSX, splitProps } from "solid-js";
 
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callHandler } from "@/utils/function";
 
@@ -23,7 +24,7 @@ const hopeTabClass = "hope-tabs__tab";
 export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   const tabsContext = useTabsContext();
 
-  const [local, others] = splitProps(props as TabProps<"button">, ["class", "disabled", "onClick", "onFocus"]);
+  const [local, others] = splitProps(props as TabProps<"button">, ["ref", "class", "disabled", "onClick", "onFocus"]);
 
   const tabsDescendant = createMemo(() => {
     return useTabsDescendant({ disabled: local.disabled });
@@ -34,6 +35,17 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   const tabId = () => makeTabId(tabsContext.state.id, tabsDescendant().index());
 
   const tabPanelId = () => makeTabPanelId(tabsContext.state.id, tabsDescendant().index());
+
+  const assignTabRef = (el: HTMLButtonElement) => {
+    tabsDescendant().assignRef(el);
+
+    if (isFunction(local.ref)) {
+      local.ref(el);
+    } else {
+      // eslint-disable-next-line solid/reactivity
+      local.ref = el;
+    }
+  };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     tabsContext.setSelectedIndex(tabsDescendant().index());
@@ -63,6 +75,7 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
 
   return (
     <hope.button
+      ref={assignTabRef}
       role="tab"
       id={tabId()}
       tabIndex={isSelected() ? 0 : -1}
