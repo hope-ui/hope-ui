@@ -9,6 +9,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
+import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import { checkboxContainerStyles, CheckboxControlVariants } from "./checkbox.styles";
@@ -197,6 +198,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const theme = useComponentStyleConfigs().Checkbox;
 
+  const formControlContext = useFormControlContext();
   const checkboxGroupContext = useCheckboxGroupContext();
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
@@ -232,7 +234,11 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
       return props.size ?? checkboxGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
     },
     get id() {
-      return formControlProps.id ?? defaultId;
+      if (formControlContext && !checkboxGroupContext) {
+        return formControlProps.id;
+      }
+
+      return props.id ?? defaultId;
     },
     get name() {
       return props.name ?? checkboxGroupContext?.state.name;
