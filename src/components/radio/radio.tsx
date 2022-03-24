@@ -9,6 +9,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
+import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import { radioContainerStyles, RadioControlVariants } from "./radio.styles";
@@ -182,6 +183,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
 
   const theme = useComponentStyleConfigs().Radio;
 
+  const formControlContext = useFormControlContext();
   const radioGroupContext = useRadioGroupContext();
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
@@ -217,7 +219,11 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return props.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
     },
     get id() {
-      return formControlProps.id ?? defaultId;
+      if (formControlContext && !radioGroupContext) {
+        return formControlProps.id;
+      }
+
+      return props.id ?? defaultId;
     },
     get name() {
       return props.name ?? radioGroupContext?.state.name;
