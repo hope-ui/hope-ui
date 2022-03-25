@@ -4,7 +4,6 @@ import { createStore } from "solid-js/store";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { createDescendantContext } from "../descendant/use-descendant";
 import { ElementType, HTMLHopeProps } from "../types";
 import { TabListVariants, tabsStyles, TabVariants } from "./tabs.styles";
 
@@ -152,19 +151,15 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     );
   };
 
-  const tabsDescendantsManager = createTabsDescendantsManager();
-
   const tabsContext: TabsContextValue = {
     state,
     setSelectedIndex,
   };
 
   return (
-    <TabsDescendantsProvider value={tabsDescendantsManager}>
-      <TabsContext.Provider value={tabsContext}>
-        <Box class={classes()} {...others} />
-      </TabsContext.Provider>
-    </TabsDescendantsProvider>
+    <TabsContext.Provider value={tabsContext}>
+      <Box class={classes()} {...others} />
+    </TabsContext.Provider>
   );
 }
 
@@ -174,13 +169,12 @@ Tabs.toString = () => createClassSelector(hopeTabsClass);
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
-// Manage descendant tabs
-export const [TabsDescendantsProvider, useTabsDescendantsContext, createTabsDescendantsManager, useTabsDescendant] =
-  createDescendantContext<HTMLButtonElement>();
-
 interface TabsContextValue {
   state: TabsState;
 
+  /**
+   * Callback to set the active tab index.
+   */
   setSelectedIndex: (index: number) => void;
 }
 

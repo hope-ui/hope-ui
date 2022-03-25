@@ -23,22 +23,10 @@ import {
 import { IconCrossCircle } from "./components/icons/IconCrossCircle";
 import { Input } from "./components";
 
-function Counter() {
-  const [count, setCount] = createSignal(0);
-
-  onMount(() => {
-    console.log("mounted");
-  });
-
-  onCleanup(() => {
-    console.log("cleanup");
-  });
-
-  return <Button onClick={() => setCount(prev => prev + 1)}>Clicked {count()} times</Button>;
-}
-
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [disabled, setDisabled] = createSignal(false);
 
   return (
     <Box p="$4">
@@ -46,23 +34,24 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
+        <Button onClick={() => setDisabled(prev => !prev)}>Toggle disabled</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <Tabs keepAlive>
+        <Tabs fitted>
           <TabList>
             <Tab>One</Tab>
-            <Tab>Two</Tab>
+            <Tab disabled={disabled()}>Two</Tab>
             <Tab>Three</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
-              <Input />
+              <p>one!</p>
             </TabPanel>
             <TabPanel>
               <p>two!</p>
             </TabPanel>
             <TabPanel>
-              <Counter />
+              <p>three!</p>
             </TabPanel>
           </TabPanels>
         </Tabs>

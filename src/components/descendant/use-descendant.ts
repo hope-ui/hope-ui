@@ -86,8 +86,8 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
 
   return {
     descendantsManager,
-    index,
     assignRef,
+    index,
     enabledIndex: () => descendantsManager.enabledIndexOf(ref),
   };
 }
@@ -108,16 +108,16 @@ export function createDescendantContext<T extends HTMLElement = HTMLElement, K =
   const _useDescendant = (options?: DescendantOptions<K>) => useDescendant<T, K>(options);
 
   return [
-    // context provider
+    // context provider.
     ContextProvider,
 
-    // call this when you need to read from context
+    // call this when you need to read from context.
     _useDescendantsContext,
 
-    // descendants state information, to be called and passed to `ContextProvider`
+    // descendants state information, to be called and passed to `ContextProvider`.
     _createDescendantsManager,
 
-    // descendant index information
+    // descendant index information.
     _useDescendant,
   ] as const;
 }

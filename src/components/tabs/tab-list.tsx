@@ -7,8 +7,9 @@ import { callHandler } from "@/utils/function";
 import { EventKeyMap } from "@/utils/types";
 
 import { Box } from "../box/box";
+import { createDescendantContext } from "../descendant/use-descendant";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useTabsContext, useTabsDescendantsContext } from "./tabs";
+import { useTabsContext } from "./tabs";
 import { tabListStyles } from "./tabs.styles";
 
 export type TabListProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
@@ -22,7 +23,7 @@ const hopeTabListClass = "hope-tabs__tablist";
 export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
   const tabsContext = useTabsContext();
 
-  const tabsDescendantsManager = useTabsDescendantsContext();
+  const tabsDescendantsManager = createTabsDescendantsManager();
 
   const [local, others] = splitProps(props as TabListProps<"div">, ["class", "onKeyDown"]);
 
@@ -96,14 +97,26 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
   };
 
   return (
-    <Box
-      role="tablist"
-      aria-orientation={tabsContext.state.orientation}
-      class={classes()}
-      onKeyDown={onKeyDown}
-      {...others}
-    />
+    <TabsDescendantsProvider value={tabsDescendantsManager}>
+      <Box
+        role="tablist"
+        aria-orientation={tabsContext.state.orientation}
+        class={classes()}
+        onKeyDown={onKeyDown}
+        {...others}
+      />
+    </TabsDescendantsProvider>
   );
 }
 
 TabList.toString = () => createClassSelector(hopeTabListClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+/**
+ * Context for managing descendant `tab` components.
+ */
+export const [TabsDescendantsProvider, useTabsDescendantsContext, createTabsDescendantsManager, useTabsDescendant] =
+  createDescendantContext<HTMLButtonElement>();

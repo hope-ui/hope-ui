@@ -16,9 +16,9 @@ const hopeTabPanelsClass = "hope-tabs__tab-panels";
  * It renders a `div` by default.
  */
 export function TabPanels<C extends ElementType = "div">(props: TabPanelsProps<C>) {
-  const [local, others] = splitProps(props, ["class"]);
-
   const tabPanelsDescendantsManager = createTabPanelsDescendantsManager();
+
+  const [local, others] = splitProps(props, ["class"]);
 
   const classes = () => {
     return classNames(local.class, hopeTabPanelsClass, tabPanelsStyles());
@@ -37,7 +37,9 @@ TabPanels.toString = () => createClassSelector(hopeTabPanelsClass);
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
-// Manage descendant tab panels
+/**
+ * Context for managing descendant `tab panel` components.
+ */
 export const [
   TabPanelsDescendantsProvider,
   useTabPanelsDescendantsContext,

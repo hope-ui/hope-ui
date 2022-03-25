@@ -1,4 +1,5 @@
-import { getNextIndex, getPrevIndex, isElement, sortNodes } from "./descendant.utils";
+import { isElement, sortNodes } from "@/utils/dom";
+import { getNextIndex, getPrevIndex } from "@/utils/number";
 
 export type DescendantOptions<T = {}> = T & {
   /**
@@ -26,10 +27,10 @@ export type Descendant<T, K> = DescendantOptions<K> & {
 };
 
 /**
- * @internal
- *
  * Class to manage descendants and their relative indices in the DOM.
  * It uses `node.compareDocumentPosition(...)` under the hood.
+ *
+ * @internal
  */
 export class DescendantsManager<T extends HTMLElement, K extends Record<string, any> = {}> {
   private descendants = new Map<T, Descendant<T, K>>();
@@ -50,7 +51,9 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
 
   unregister = (node: T) => {
     this.descendants.delete(node);
+
     const sorted = sortNodes(Array.from(this.descendants.keys()));
+
     this.assignIndex(sorted);
   };
 
@@ -80,12 +83,18 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
   };
 
   item = (index: number) => {
-    if (this.count() === 0) return undefined;
+    if (this.count() === 0) {
+      return undefined;
+    }
+
     return this.values()[index];
   };
 
   enabledItem = (index: number) => {
-    if (this.enabledCount() === 0) return undefined;
+    if (this.enabledCount() === 0) {
+      return undefined;
+    }
+
     return this.enabledValues()[index];
   };
 
@@ -101,25 +110,35 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
   };
 
   indexOf = (node: T | null) => {
-    if (!node) return -1;
+    if (!node) {
+      return -1;
+    }
+
     return this.descendants.get(node)?.index ?? -1;
   };
 
   enabledIndexOf = (node: T | null) => {
-    if (node == null) return -1;
+    if (node == null) {
+      return -1;
+    }
+
     return this.enabledValues().findIndex(i => i.node.isSameNode(node));
   };
 
   next = (index: number, loop = true) => {
-    const next = getNextIndex(index, this.count(), loop);
+    const next = getNextIndex(index, this.count() - 1, loop);
     return this.item(next);
   };
 
   nextEnabled = (index: number, loop = true) => {
     const item = this.item(index);
-    if (!item) return;
+
+    if (!item) {
+      return;
+    }
+
     const enabledIndex = this.enabledIndexOf(item.node);
-    const nextEnabledIndex = getNextIndex(enabledIndex, this.enabledCount(), loop);
+    const nextEnabledIndex = getNextIndex(enabledIndex, this.enabledCount() - 1, loop);
     return this.enabledItem(nextEnabledIndex);
   };
 
@@ -130,14 +149,20 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
 
   prevEnabled = (index: number, loop = true) => {
     const item = this.item(index);
-    if (!item) return;
+
+    if (!item) {
+      return;
+    }
+
     const enabledIndex = this.enabledIndexOf(item.node);
     const prevEnabledIndex = getPrevIndex(enabledIndex, this.enabledCount() - 1, loop);
     return this.enabledItem(prevEnabledIndex);
   };
 
   private registerNode = (node: T | null, options?: DescendantOptions<K>) => {
-    if (!node || this.descendants.has(node)) return;
+    if (!node || this.descendants.has(node)) {
+      return;
+    }
 
     const keys = Array.from(this.descendants.keys()).concat(node);
     const sorted = sortNodes(keys);

@@ -6,10 +6,14 @@ import { callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { makeTabId, makeTabPanelId, useTabsContext, useTabsDescendant } from "./tabs";
+import { useTabsDescendant } from "./tab-list";
+import { makeTabId, makeTabPanelId, useTabsContext } from "./tabs";
 import { tabStyles } from "./tabs.styles";
 
 interface TabOptions {
+  /**
+   * The `id` of the tab-panel activated by this tab.
+   */
   panelId?: string;
 }
 
@@ -18,8 +22,7 @@ export type TabProps<C extends ElementType = "button"> = HTMLHopeProps<C, TabOpt
 const hopeTabClass = "hope-tabs__tab";
 
 /**
- * Tab button used to activate a specific tab panel. It renders a `button`,
- * and is responsible for automatic and manual selection modes.
+ * Tab button used to activate a specific tab panel. It renders a `button` by default.
  */
 export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   const tabsContext = useTabsContext();
