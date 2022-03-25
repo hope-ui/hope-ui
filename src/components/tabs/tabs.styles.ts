@@ -29,6 +29,9 @@ export type TabsVariants = VariantProps<typeof tabsStyles>;
 export const tabListStyles = css({
   display: "flex",
 
+  color: "$neutral11",
+  fontWeight: "$normal",
+
   variants: {
     variant: {
       underline: {
@@ -36,22 +39,30 @@ export const tabListStyles = css({
         borderStyle: "solid",
         borderColor: "$neutral7",
       },
-      outline: {},
-      pill: {},
-      card: {},
+      outline: {
+        borderStyle: "solid",
+        borderColor: "$neutral7",
+      },
+      cards: {
+        borderStyle: "solid",
+        borderColor: "$neutral7",
+      },
+      pills: {
+        gap: "$1_5",
+      },
     },
     alignment: {
       start: {
         justifyContent: "flex-start",
+      },
+      end: {
+        justifyContent: "flex-end",
       },
       center: {
         justifyContent: "center",
       },
       apart: {
         justifyContent: "space-between",
-      },
-      end: {
-        justifyContent: "flex-end",
       },
     },
     orientation: {
@@ -64,6 +75,9 @@ export const tabListStyles = css({
     },
   },
   compoundVariants: [
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - underline + orientation
+     * -----------------------------------------------------------------------------------------------*/
     {
       variant: "underline",
       orientation: "horizontal",
@@ -78,6 +92,46 @@ export const tabListStyles = css({
         borderInlineEndWidth: "2px",
       },
     },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + orientation
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "outline",
+      orientation: "horizontal",
+      css: {
+        mb: "-1px",
+        borderBottomWidth: "1px",
+      },
+    },
+    {
+      variant: "outline",
+      orientation: "vertical",
+      css: {
+        marginInlineEnd: "-1px",
+        borderInlineEndWidth: "1px",
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - cards + orientation
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "cards",
+      orientation: "horizontal",
+      css: {
+        mb: "-1px",
+        borderBottomWidth: "1px",
+      },
+    },
+    {
+      variant: "cards",
+      orientation: "vertical",
+      css: {
+        marginInlineEnd: "-1px",
+        borderInlineEndWidth: "1px",
+      },
+    },
   ],
 });
 
@@ -87,10 +141,19 @@ export type TabListVariants = VariantProps<typeof tabListStyles>;
  * Tab
  * -----------------------------------------------------------------------------------------------*/
 
-function createUnderlineAndColorVariant(color: string): SystemStyleObject {
+function createSelectedColorVariant(color: string): SystemStyleObject {
   return {
     "&[aria-selected='true']": {
       color,
+    },
+  };
+}
+
+function createPillsAndColorVariant(config: { color: string; bgColor: string }): SystemStyleObject {
+  return {
+    "&[aria-selected='true']": {
+      color: config.color,
+      backgroundColor: config.bgColor,
     },
   };
 }
@@ -109,6 +172,11 @@ export const tabStyles = css({
 
   px: "$4",
 
+  color: "inherit",
+  fontWeight: "inherit",
+
+  cursor: "pointer",
+
   transitionProperty: "background-color, border-color, color, fill, stroke, opacity, box-shadow, transform",
   transitionDuration: "250ms",
 
@@ -116,6 +184,11 @@ export const tabStyles = css({
     zIndex: 1,
     outline: "none",
     boxShadow: "$outline",
+  },
+
+  "&:disabled": {
+    opacity: 0.5,
+    cursor: "not-allowed",
   },
 
   variants: {
@@ -132,15 +205,34 @@ export const tabStyles = css({
         "&:active": {
           backgroundColor: "$neutral4",
         },
+      },
+      outline: {
+        borderWidth: "1px",
+        borderStyle: "solid",
+        borderColor: "transparent",
 
-        "&:disabled": {
-          opacity: 0.5,
-          cursor: "not-allowed",
+        "&[aria-selected='true']": {
+          borderColor: "inherit",
         },
       },
-      outline: {},
-      pill: {},
-      card: {},
+      cards: {
+        borderWidth: "1px",
+        borderStyle: "solid",
+        borderColor: "inherit",
+        backgroundColor: "$neutral3",
+
+        "&[aria-selected='true']": {
+          borderColor: "inherit",
+          backgroundColor: "$loContrast",
+        },
+      },
+      pills: {
+        borderRadius: "$sm",
+
+        "&:hover": {
+          backgroundColor: "$neutral3",
+        },
+      },
     },
     colorScheme: {
       primary: {},
@@ -181,32 +273,134 @@ export const tabStyles = css({
     {
       variant: "underline",
       colorScheme: "primary",
-      css: createUnderlineAndColorVariant("$primary11"),
+      css: createSelectedColorVariant("$primary11"),
     },
     {
       variant: "underline",
       colorScheme: "neutral",
-      css: createUnderlineAndColorVariant("$neutral11"),
+      css: createSelectedColorVariant("$neutral12"),
     },
     {
       variant: "underline",
       colorScheme: "success",
-      css: createUnderlineAndColorVariant("$success11"),
+      css: createSelectedColorVariant("$success11"),
     },
     {
       variant: "underline",
       colorScheme: "info",
-      css: createUnderlineAndColorVariant("$info11"),
+      css: createSelectedColorVariant("$info11"),
     },
     {
       variant: "underline",
       colorScheme: "warning",
-      css: createUnderlineAndColorVariant("$warning11"),
+      css: createSelectedColorVariant("$warning11"),
     },
     {
       variant: "underline",
       colorScheme: "danger",
-      css: createUnderlineAndColorVariant("$danger11"),
+      css: createSelectedColorVariant("$danger11"),
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + colorScheme
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "outline",
+      colorScheme: "primary",
+      css: createSelectedColorVariant("$primary11"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "neutral",
+      css: createSelectedColorVariant("$neutral12"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "success",
+      css: createSelectedColorVariant("$success11"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "info",
+      css: createSelectedColorVariant("$info11"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "warning",
+      css: createSelectedColorVariant("$warning11"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "danger",
+      css: createSelectedColorVariant("$danger11"),
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - cards + colorScheme
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "cards",
+      colorScheme: "primary",
+      css: createSelectedColorVariant("$primary11"),
+    },
+    {
+      variant: "cards",
+      colorScheme: "neutral",
+      css: createSelectedColorVariant("$neutral12"),
+    },
+    {
+      variant: "cards",
+      colorScheme: "success",
+      css: createSelectedColorVariant("$success11"),
+    },
+    {
+      variant: "cards",
+      colorScheme: "info",
+      css: createSelectedColorVariant("$info11"),
+    },
+    {
+      variant: "cards",
+      colorScheme: "warning",
+      css: createSelectedColorVariant("$warning11"),
+    },
+    {
+      variant: "cards",
+      colorScheme: "danger",
+      css: createSelectedColorVariant("$danger11"),
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - pills + colorScheme
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "pills",
+      colorScheme: "primary",
+      css: createPillsAndColorVariant({ color: "$primary11", bgColor: "$primary3" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "neutral",
+      css: createPillsAndColorVariant({ color: "$neutral12", bgColor: "$neutral3" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "success",
+      css: createPillsAndColorVariant({ color: "$success11", bgColor: "$success3" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "info",
+      css: createPillsAndColorVariant({ color: "$info11", bgColor: "$info3" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "warning",
+      css: createPillsAndColorVariant({ color: "$warning11", bgColor: "$warning3" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "danger",
+      css: createPillsAndColorVariant({ color: "$danger11", bgColor: "$danger3" }),
     },
 
     /* -------------------------------------------------------------------------------------------------
@@ -226,6 +420,72 @@ export const tabStyles = css({
       css: {
         borderInlineEndWidth: "2px",
         marginInlineEnd: "-2px",
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - outline + orientation
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "outline",
+      orientation: "horizontal",
+      css: {
+        mb: "-1px",
+        borderTopRadius: "$sm",
+
+        "&[aria-selected='true']": {
+          borderBottomColor: "$loContrast",
+        },
+      },
+    },
+    {
+      variant: "outline",
+      orientation: "vertical",
+      css: {
+        marginInlineEnd: "-1px",
+        borderStartRadius: "$radii$sm",
+
+        "&[aria-selected='true']": {
+          borderInlineEndColor: "$colors$loContrast",
+        },
+      },
+    },
+
+    /* -------------------------------------------------------------------------------------------------
+     * Variant - cards + orientation
+     * -----------------------------------------------------------------------------------------------*/
+    {
+      variant: "cards",
+      orientation: "horizontal",
+      css: {
+        mb: "-1px",
+        borderBottomWidth: "1px",
+
+        "&:not(:last-of-type)": {
+          marginInlineEnd: "-1px",
+        },
+
+        "&[aria-selected='true']": {
+          borderTopColor: "currentColor",
+          borderBottomColor: "transparent",
+        },
+      },
+    },
+    {
+      variant: "cards",
+      orientation: "vertical",
+      css: {
+        marginInlineEnd: "-1px",
+        borderInlineEndWidth: "1px",
+
+        "&:not(:last-of-type)": {
+          mb: "-1px",
+        },
+
+        "&[aria-selected='true']": {
+          borderInlineStartColor: "currentColor",
+          borderInlineEndColor: "transparent",
+        },
       },
     },
   ],

@@ -3,7 +3,7 @@ import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 import { classNames, createClassSelector } from "@/utils/css";
 import { normalizeEventKey } from "@/utils/dom";
 import { focus } from "@/utils/focus";
-import { callAllHandlers } from "@/utils/function";
+import { callHandler } from "@/utils/function";
 import { EventKeyMap } from "@/utils/types";
 
 import { Box } from "../box/box";
@@ -71,13 +71,16 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
   }));
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = event => {
+    callHandler(local.onKeyDown)(event);
+
     const eventKey = normalizeEventKey(event);
 
     const action = keyMap()[eventKey];
 
-    callAllHandlers(local.onKeyDown, action)(event);
-
-    event.preventDefault();
+    if (action) {
+      event.preventDefault();
+      callHandler(action)(event);
+    }
   };
 
   const classes = () => {

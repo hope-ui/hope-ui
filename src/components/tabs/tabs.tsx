@@ -129,7 +129,12 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     },
   });
 
-  const [local, others] = splitProps(props, ["class", "onChange"]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(
+    props,
+    ["class", "onChange"],
+    ["index", "defaultIndex", "keepAlive", "alignment", "orientation", "variant", "colorScheme", "size", "fitted"]
+  );
 
   const setSelectedIndex = (index: number) => {
     setState("_selectedIndex", index);
