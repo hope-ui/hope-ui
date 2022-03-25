@@ -18,6 +18,14 @@ export const radii = {
   }),
 
   /**
+   * The CSS `border-start-start-radius` and `border-end-start-radius` property
+   */
+  borderStartRadius: (value: PropertyValue<"borderStartStartRadius">) => ({
+    borderStartStartRadius: value,
+    borderEndStartRadius: value,
+  }),
+
+  /**
    * The CSS `border-bottom-right-radius` and `border-bottom-left-radius` property
    */
   borderBottomRadius: (value: PropertyValue<"borderBottomLeftRadius">) => ({
@@ -31,6 +39,14 @@ export const radii = {
   borderLeftRadius: (value: PropertyValue<"borderTopLeftRadius">) => ({
     borderTopLeftRadius: value,
     borderBottomLeftRadius: value,
+  }),
+
+  /**
+   * The CSS `border-start-end-radius` and `border-end-end-radius` property
+   */
+  borderEndRadius: (value: PropertyValue<"borderStartEndRadius">) => ({
+    borderStartEndRadius: value,
+    borderEndEndRadius: value,
   }),
 
   /**
@@ -57,6 +73,14 @@ export const radii = {
   }),
 
   /**
+   * The CSS `border-start-start-radius` and `border-end-start-radius` property
+   */
+  roundedStart: (value: PropertyValue<"borderStartStartRadius">) => ({
+    borderStartStartRadius: value,
+    borderEndStartRadius: value,
+  }),
+
+  /**
    * The CSS `border-bottom-right-radius` and `border-bottom-left-radius` property
    */
   roundedBottom: (value: PropertyValue<"borderBottomLeftRadius">) => ({
@@ -70,5 +94,13 @@ export const radii = {
   roundedLeft: (value: PropertyValue<"borderTopLeftRadius">) => ({
     borderTopLeftRadius: value,
     borderBottomLeftRadius: value,
+  }),
+
+  /**
+   * The CSS `border-start-end-radius` and `border-end-end-radius` property
+   */
+  roundedEnd: (value: PropertyValue<"borderStartEndRadius">) => ({
+    borderStartEndRadius: value,
+    borderEndEndRadius: value,
   }),
 };

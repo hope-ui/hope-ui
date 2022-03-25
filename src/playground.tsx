@@ -3,28 +3,30 @@
 
 import "./playground.css";
 
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
   Box,
   Button,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   HopeProvider,
   HopeThemeConfig,
   HStack,
-  Radio,
-  RadioControl,
-  RadioGroup,
-  RadioLabel,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   useColorMode,
   VStack,
 } from ".";
+import { IconCrossCircle } from "./components/icons/IconCrossCircle";
+import { Input } from "./components";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [disabled, setDisabled] = createSignal(false);
 
   return (
     <Box p="$4">
@@ -32,36 +34,39 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
+        <Button onClick={() => setDisabled(prev => !prev)}>Toggle disabled</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <FormControl as="fieldset">
-          <FormLabel as="legend">Choose a framework</FormLabel>
-          <RadioGroup defaultValue="solid">
-            <HStack spacing="$6">
-              <Radio value="react">
-                <RadioControl />
-                <RadioLabel>React</RadioLabel>
-              </Radio>
-              <Radio value="angular" disabled>
-                <RadioControl />
-                <RadioLabel>Angular</RadioLabel>
-              </Radio>
-              <Radio value="vue">
-                <RadioControl />
-                <RadioLabel>Vue</RadioLabel>
-              </Radio>
-              <Radio value="svelte">
-                <RadioControl />
-                <RadioLabel>Svelte</RadioLabel>
-              </Radio>
-              <Radio value="solid">
-                <RadioControl />
-                <RadioLabel>Solid</RadioLabel>
-              </Radio>
-            </HStack>
-          </RadioGroup>
-          <FormHelperText>You should choose Solid.</FormHelperText>
-        </FormControl>
+        <Tabs fitted keepAlive>
+          <TabList>
+            <Tab>One</Tab>
+            <Tab disabled={disabled()}>Two</Tab>
+            <Tab>Three</Tab>
+            <Tab disabled={disabled()}>Four</Tab>
+            <Tab>Five</Tab>
+            <Tab disabled={disabled()}>Six</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <p>one!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>two!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>three!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>four!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>five!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>six!</p>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </VStack>
     </Box>
   );

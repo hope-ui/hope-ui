@@ -101,7 +101,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
 
 export type CheckboxProps<C extends ElementType = "label"> = HTMLHopeProps<C, CheckboxOptions>;
 
-interface CheckboxContextState extends Required<CheckboxControlVariants> {
+interface CheckboxState extends Required<CheckboxControlVariants> {
   /**
    * The `checked` state of the checkbox.
    * (In uncontrolled mode)
@@ -203,7 +203,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const [state, setState] = createStore<CheckboxContextState>({
+  const [state, setState] = createStore<CheckboxState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
     isFocused: false,
@@ -417,7 +417,7 @@ Checkbox.toString = () => createClassSelector(hopeCheckboxClass);
  * -----------------------------------------------------------------------------------------------*/
 
 interface CheckboxContextValue extends Required<Pick<CheckboxOptions, "onChange" | "onFocus" | "onBlur">> {
-  state: CheckboxContextState;
+  state: CheckboxState;
 }
 
 const CheckboxContext = createContext<CheckboxContextValue>();
