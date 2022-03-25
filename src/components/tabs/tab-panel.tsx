@@ -1,4 +1,4 @@
-import { Show, splitProps } from "solid-js";
+import { children, Show, splitProps } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
@@ -40,6 +40,8 @@ export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>)
     }
   };
 
+  const resolvedChildren = children(() => local.children);
+
   const classes = () => {
     return classNames(local.class, hopeTabPanelClass, tabPanelStyles());
   };
@@ -55,7 +57,11 @@ export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>)
       class={classes()}
       {...others}
     >
-      <Show when={isSelected()}>{local.children}</Show>
+      <Show when={isSelected()}>
+        <Show when={tabsContext.state.keepAlive} fallback={local.children}>
+          {resolvedChildren()}
+        </Show>
+      </Show>
     </Box>
   );
 }
