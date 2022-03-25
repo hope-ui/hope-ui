@@ -6,7 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTabPanelsDescendant } from "./tab-panels";
-import { makeTabId, makeTabPanelId, useTabsContext } from "./tabs";
+import { useTabsContext } from "./tabs";
 import { tabPanelStyles } from "./tabs.styles";
 
 export type TabPanelProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
@@ -23,11 +23,11 @@ export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>)
 
   const tabPanelsDescendant = useTabPanelsDescendant();
 
-  const isSelected = () => tabPanelsDescendant.index() === tabsContext.state.selectedIndex;
+  const isSelected = () => tabsContext.isSelectedIndex(tabPanelsDescendant.index());
 
-  const tabId = () => makeTabId(tabsContext.state.id, tabPanelsDescendant.index());
+  const tabId = () => tabsContext.getTabId(tabPanelsDescendant.index());
 
-  const tabPanelId = () => makeTabPanelId(tabsContext.state.id, tabPanelsDescendant.index());
+  const tabPanelId = () => tabsContext.getTabPanelId(tabPanelsDescendant.index());
 
   const assignTabPanelRef = (el: HTMLDivElement) => {
     tabPanelsDescendant.assignRef(el);

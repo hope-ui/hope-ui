@@ -11,13 +11,13 @@ import { DescendantOptions, DescendantsManager } from "./descendant";
  * @internal
  */
 function createDescendantsManager<T extends HTMLElement = HTMLElement, K = {}>() {
-  const descendants = new DescendantsManager<T, K>();
+  const descendantsManager = new DescendantsManager<T, K>();
 
   onCleanup(() => {
-    descendants.destroy();
+    descendantsManager.destroy();
   });
 
-  return descendants;
+  return descendantsManager;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -54,6 +54,8 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
 
   let ref: T | null = null;
 
+  const enabledIndex = () => descendantsManager.enabledIndexOf(ref);
+
   const assignRef = (el: T) => {
     if (options) {
       descendantsManager.register(options)?.(el);
@@ -62,6 +64,10 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
     }
 
     ref = el;
+  };
+
+  const setDisabled = (disabled: boolean) => {
+    descendantsManager.setDisabled(index(), disabled);
   };
 
   createEffect(() => {
@@ -88,7 +94,8 @@ function useDescendant<T extends HTMLElement = HTMLElement, K = {}>(options?: De
     descendantsManager,
     assignRef,
     index,
-    enabledIndex: () => descendantsManager.enabledIndexOf(ref),
+    enabledIndex,
+    setDisabled,
   };
 }
 

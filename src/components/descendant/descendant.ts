@@ -159,6 +159,16 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
     return this.enabledItem(prevEnabledIndex);
   };
 
+  setDisabled = (index: number, disabled: boolean) => {
+    const item = this.item(index);
+
+    if (!item) {
+      return;
+    }
+
+    item.disabled = !!disabled;
+  };
+
   private registerNode = (node: T | null, options?: DescendantOptions<K>) => {
     if (!node || this.descendants.has(node)) {
       return;
@@ -167,11 +177,12 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
     const keys = Array.from(this.descendants.keys()).concat(node);
     const sorted = sortNodes(keys);
 
-    if (options?.disabled) {
-      options.disabled = !!options.disabled;
-    }
+    const descendantOptions: DescendantOptions = {
+      ...options,
+      disabled: !!options?.disabled ?? false,
+    };
 
-    const descendant = { node, index: -1, ...options };
+    const descendant = { node, index: -1, ...descendantOptions };
 
     this.descendants.set(node, descendant as Descendant<T, K>);
 

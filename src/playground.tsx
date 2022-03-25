@@ -37,11 +37,14 @@ export function App() {
         <Button onClick={() => setDisabled(prev => !prev)}>Toggle disabled</Button>
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
-        <Tabs fitted>
+        <Tabs fitted keepAlive>
           <TabList>
             <Tab>One</Tab>
             <Tab disabled={disabled()}>Two</Tab>
             <Tab>Three</Tab>
+            <Tab disabled={disabled()}>Four</Tab>
+            <Tab>Five</Tab>
+            <Tab disabled={disabled()}>Six</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -52,6 +55,15 @@ export function App() {
             </TabPanel>
             <TabPanel>
               <p>three!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>four!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>five!</p>
+            </TabPanel>
+            <TabPanel>
+              <p>six!</p>
             </TabPanel>
           </TabPanels>
         </Tabs>

@@ -141,6 +141,18 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     local.onChange?.(index);
   };
 
+  const isSelectedIndex = (index: number) => {
+    return index === state.selectedIndex;
+  };
+
+  const getTabId = (index: number) => {
+    return `${state.id}--tab-${index}`;
+  };
+
+  const getTabPanelId = (index: number) => {
+    return `${state.id}--tabpanel-${index}`;
+  };
+
   const classes = () => {
     return classNames(
       local.class,
@@ -154,6 +166,9 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   const tabsContext: TabsContextValue = {
     state,
     setSelectedIndex,
+    isSelectedIndex,
+    getTabId,
+    getTabPanelId,
   };
 
   return (
@@ -176,6 +191,21 @@ interface TabsContextValue {
    * Callback to set the active tab index.
    */
   setSelectedIndex: (index: number) => void;
+
+  /**
+   * Return `true` if the given index is the selected one.
+   */
+  isSelectedIndex: (index: number) => boolean;
+
+  /**
+   * Return the tab `id` of the given index.
+   */
+  getTabId: (index: number) => string;
+
+  /**
+   * Return the tab panel `id` of the given index.
+   */
+  getTabPanelId: (index: number) => string;
 }
 
 const TabsContext = createContext<TabsContextValue>();
@@ -188,16 +218,4 @@ export function useTabsContext() {
   }
 
   return context;
-}
-
-/* -------------------------------------------------------------------------------------------------
- * Utils
- * -----------------------------------------------------------------------------------------------*/
-
-export function makeTabId(id: string, index: number) {
-  return `${id}--tab-${index}`;
-}
-
-export function makeTabPanelId(id: string, index: number) {
-  return `${id}--tabpanel-${index}`;
 }
