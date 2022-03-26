@@ -65,7 +65,7 @@ export interface ButtonStyleConfig {
 
 export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
-const hopeButtonClass = "hope-button";
+export const hopeButtonClass = "hope-button";
 
 /**
  * The Button component is used to trigger an action or event,
