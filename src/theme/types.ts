@@ -22,6 +22,7 @@ import { SelectStyleConfig } from "@/components/select/select";
 import { SpinnerStyleConfig } from "@/components/spinner/spinner";
 import { SwitchStyleConfig } from "@/components/switch/switch";
 import { TableStyleConfig } from "@/components/table/table";
+import { TabsStyleConfig } from "@/components/tabs/tabs";
 import { TagStyleConfig } from "@/components/tag/tag";
 import { TextStyleConfig } from "@/components/text/text";
 import { TextareaStyleConfig } from "@/components/textarea/textarea";
@@ -76,6 +77,7 @@ export interface ComponentsStyleConfigs {
   Spinner?: SpinnerStyleConfig;
   Switch?: SwitchStyleConfig;
   Table?: TableStyleConfig;
+  Tabs?: TabsStyleConfig;
   Tag?: TagStyleConfig;
   Text?: TextStyleConfig;
   Textarea?: TextareaStyleConfig;

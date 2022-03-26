@@ -1,47 +1,51 @@
 import { createContext, createUniqueId, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { TabListVariants, tabsStyles, TabVariants } from "./tabs.styles";
 
-type TabsOptions = Pick<TabListVariants, "alignment"> &
-  TabVariants & {
-    /**
-     * The orientation of the tab list.
-     */
-    orientation?: "horizontal" | "vertical";
-
-    /**
-     * The index of the selected tab.
-     * (in controlled mode)
-     */
-    index?: number;
-
-    /**
-     * The initial index of the selected tab.
-     * (in uncontrolled mode)
-     */
-    defaultIndex?: number;
-
-    /**
-     * The id of the tabs component.
-     */
-    id?: string;
-
+type ThemeableTabsOptions = Pick<TabListVariants, "alignment"> &
+  Omit<TabVariants, "orientation"> & {
     /**
      * If `true`, the content of inactive tab panels stays mounted when unselected.
      */
     keepAlive?: boolean;
-
-    /**
-     * Callback invoked when the index changes.
-     * (in controlled or un-controlled modes)
-     */
-    onChange?: (index: number) => void;
   };
+
+interface TabsOptions extends ThemeableTabsOptions {
+  /**
+   * The orientation of the tab list.
+   */
+  orientation?: "horizontal" | "vertical";
+
+  /**
+   * The index of the selected tab.
+   * (in controlled mode)
+   */
+  index?: number;
+
+  /**
+   * The initial index of the selected tab.
+   * (in uncontrolled mode)
+   */
+  defaultIndex?: number;
+
+  /**
+   * The id of the tabs component.
+   */
+  id?: string;
+
+  /**
+   * Callback invoked when the index changes.
+   * (in controlled or un-controlled modes)
+   */
+  onChange?: (index: number) => void;
+}
 
 export type TabsProps<C extends ElementType = "div"> = HTMLHopeProps<C, TabsOptions>;
 
@@ -93,6 +97,8 @@ const hopeTabsClass = "hope-tabs";
 export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   const defaultId = `hope-tabs-${createUniqueId()}`;
 
+  const theme = useComponentStyleConfigs().Tabs;
+
   const [state, setState] = createStore<TabsState>({
     // eslint-disable-next-line solid/reactivity
     _selectedIndex: props.defaultIndex ?? 0,
@@ -105,26 +111,26 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     get id() {
       return props.id ?? defaultId;
     },
-    get keepAlive() {
-      return props.keepAlive ?? false;
-    },
-    get alignment() {
-      return props.alignment ?? "start";
-    },
     get orientation() {
       return props.orientation ?? "horizontal";
     },
+    get keepAlive() {
+      return props.keepAlive ?? theme?.defaultProps?.root?.keepAlive ?? false;
+    },
+    get alignment() {
+      return props.alignment ?? theme?.defaultProps?.root?.alignment ?? "start";
+    },
     get variant() {
-      return props.variant ?? "underline";
+      return props.variant ?? theme?.defaultProps?.root?.variant ?? "underline";
     },
     get colorScheme() {
-      return props.colorScheme ?? "primary";
+      return props.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary";
     },
     get size() {
-      return props.size ?? "md";
+      return props.size ?? theme?.defaultProps?.root?.size ?? "md";
     },
     get fitted() {
-      return props.fitted ?? false;
+      return props.fitted ?? theme?.defaultProps?.root?.fitted ?? false;
     },
   });
 
@@ -173,7 +179,7 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
 
   return (
     <TabsContext.Provider value={tabsContext}>
-      <Box class={classes()} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
     </TabsContext.Provider>
   );
 }
@@ -218,4 +224,21 @@ export function useTabsContext() {
   }
 
   return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface TabsStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    tabList?: SystemStyleObject;
+    tab?: SystemStyleObject;
+    tabPanels?: SystemStyleObject;
+    tabPanel?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableTabsOptions;
+  };
 }

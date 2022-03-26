@@ -1,5 +1,6 @@
 import { children, Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -17,6 +18,8 @@ const hopeTabPanelClass = "hope-tabs__tab-panel";
  * TabPanel is used to render the content for a specific tab.
  */
 export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>) {
+  const theme = useComponentStyleConfigs().Tabs;
+
   const tabsContext = useTabsContext();
 
   const [local, others] = splitProps(props as TabPanelProps<"div">, ["ref", "class", "children"]);
@@ -55,6 +58,7 @@ export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>)
       aria-labelledby={tabId()}
       hidden={!isSelected()}
       class={classes()}
+      __baseStyle={theme?.baseStyle?.tabPanel}
       {...others}
     >
       <Show when={isSelected()}>
