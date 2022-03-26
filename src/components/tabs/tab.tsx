@@ -27,9 +27,13 @@ const hopeTabClass = "hope-tabs__tab";
 export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   const tabsContext = useTabsContext();
 
-  const [local, others] = splitProps(props as TabProps<"button">, ["ref", "class", "disabled", "onClick", "onFocus"]);
+  const [local, tabsDescendantOptions, others] = splitProps(
+    props as TabProps<"button">,
+    ["ref", "class", "disabled", "onClick", "onFocus"],
+    ["disabled"]
+  );
 
-  const tabsDescendant = useTabsDescendant(local);
+  const tabsDescendant = useTabsDescendant(tabsDescendantOptions);
 
   const isSelected = () => tabsContext.isSelectedIndex(tabsDescendant.index());
 
