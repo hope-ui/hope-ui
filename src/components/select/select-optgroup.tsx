@@ -51,11 +51,5 @@ export function SelectOptGroup<C extends ElementType = "div">(props: SelectOptGr
 SelectOptGroup.toString = () => createClassSelector(hopeSelectOptGroupClass);
 
 export function useSelectOptGroupContext() {
-  const context = useContext(SelectOptGroupContext);
-
-  if (!context) {
-    throw new Error("[Hope UI]: useSelectOptGroupContext must be used within a `<Select.OptGroup />` component");
-  }
-
-  return context;
+  return useContext(SelectOptGroupContext);
 }

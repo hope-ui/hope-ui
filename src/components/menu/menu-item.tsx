@@ -1,38 +1,33 @@
-import { Accessor, createEffect, createSignal, onMount, splitProps } from "solid-js";
+import { Accessor, createEffect, createSignal, JSX, onMount, splitProps } from "solid-js";
 
+import { MarginProps } from "@/styled-system/props/margin";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
-import { menuItemStyles } from "./menu.styles";
+import { menuItemIconWrapperStyles, menuItemStyles, MenuItemVariants } from "./menu.styles";
 import { MenuItemData } from "./menu.utils";
 
-interface MenuItemOptions {
-  /**
-   * Optional text used for typeahead purposes.
-   * By default the typeahead behavior will use the `.textContent` of the `MenuItem`.
-   * Use this when the content is complex, or you have non-textual content inside.
-   */
-  textValue?: string;
+type MenuItemOptions = Partial<MenuItemData> &
+  MenuItemVariants & {
+    /**
+     * The icon to display next to the menu item text.
+     */
+    icon?: JSX.Element;
 
-  /**
-   * If `true`, the item will be disabled.
-   */
-  disabled?: boolean;
-
-  /**
-   * Event handler called when the user selects an item (via mouse or keyboard).
-   * Calling `event.preventDefault` in this handler
-   * will prevent the dropdown menu from closing when selecting that item.
-   */
-  onSelect?: (event: Event) => void;
-}
+    /**
+     * The space between the icon and the menu item text.
+     */
+    iconSpacing?: MarginProps["marginRight"];
+  };
 
 export type MenuItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, MenuItemOptions>;
 
 const hopeMenuItemClass = "hope-menu__item";
+const hopeMenuItemIconWrapperClass = "hope-menu__item__icon-wrapper";
 
 /**
  * The component that contains a menu item.
@@ -47,14 +42,21 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
   const [local, others] = splitProps(props as MenuItemProps<"div">, [
     "ref",
     "class",
+    "children",
+    "colorScheme",
+    "icon",
+    "iconSpacing",
     "textValue",
     "disabled",
+    "closeOnSelect",
     "onSelect",
+    "onClick",
   ]);
 
   const itemData: Accessor<MenuItemData> = () => ({
     textValue: local.textValue ?? itemRef?.textContent ?? "",
     disabled: !!local.disabled,
+    closeOnSelect: local.closeOnSelect != null ? !!local.closeOnSelect : menuContext.state.closeOnSelect,
     onSelect: local.onSelect,
   });
 
@@ -74,7 +76,7 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
 
   const onItemClick = (event: MouseEvent) => {
     event.stopPropagation();
-    menuContext.onItemClick(index(), event);
+    menuContext.onItemClick(index());
   };
 
   const onItemMouseMove = (event: MouseEvent) => {
@@ -91,7 +93,19 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
     menuContext.onItemMouseMove(index());
   };
 
-  const classes = () => classNames(local.class, hopeMenuItemClass, menuItemStyles());
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeMenuItemClass,
+      menuItemStyles({
+        colorScheme: local.colorScheme,
+      })
+    );
+  };
+
+  const iconWrapperClasses = () => {
+    return classNames(hopeMenuItemIconWrapperClass, menuItemIconWrapperStyles());
+  };
 
   onMount(() => {
     setIndex(menuContext.registerItem(itemData()));
@@ -116,7 +130,12 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
       onMouseMove={onItemMouseMove}
       onMouseDown={menuContext.onItemMouseDown}
       {...others}
-    />
+    >
+      <hope.span aria-hidden="true" class={iconWrapperClasses()} mr={local.iconSpacing ?? "0.5rem"}>
+        {local.icon}
+      </hope.span>
+      {local.children}
+    </Box>
   );
 }
 

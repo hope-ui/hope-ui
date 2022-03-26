@@ -12,11 +12,14 @@ export interface MenuItemData {
   disabled: boolean;
 
   /**
-   * Event handler called when the user selects an item (via mouse or keyboard).
-   * Calling `event.preventDefault` in this handler
-   * will prevent the dropdown menu from closing when selecting that item.
+   * If `true`, the menu will close when the menu item is selected.
    */
-  onSelect?: (event: Event) => void;
+  closeOnSelect: boolean;
+
+  /**
+   * Event handler called when the user selects an item (via mouse or keyboard).
+   */
+  onSelect?: () => void;
 }
 
 interface GetUpdatedIndexParams {
@@ -140,7 +143,7 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
       return MenuActions.Previous;
     } else if (key === "Escape") {
       return MenuActions.Close;
-    } else if (key === "Enter") {
+    } else if (key === "Enter" || key === " ") {
       return MenuActions.SelectAndClose;
     }
   }

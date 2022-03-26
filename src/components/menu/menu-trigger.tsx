@@ -7,6 +7,7 @@ import { callAllHandlers } from "@/utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
+import { menuTriggerStyles } from "./menu.styles";
 
 export type MenuTriggerProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
 
@@ -35,7 +36,7 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
     callAllHandlers(menuContext.onTriggerBlur, local.onBlur)(event);
   };
 
-  const classes = () => classNames(local.class, hopeMenuTriggerClass);
+  const classes = () => classNames(local.class, hopeMenuTriggerClass, menuTriggerStyles());
 
   return (
     <hope.button

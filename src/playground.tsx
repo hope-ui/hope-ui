@@ -18,12 +18,13 @@ import {
   VStack,
 } from ".";
 import { IconCrossCircle } from "./components/icons/IconCrossCircle";
+import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
 
-  const onDownload = (event: Event) => {
-    console.log(event);
+  const onDownload = () => {
+    console.log("download");
   };
 
   return (
@@ -39,13 +40,33 @@ export function App() {
             Actions
           </MenuTrigger>
           <MenuContent>
-            <MenuItem onSelect={onDownload}>Download</MenuItem>
-            <MenuItem>Create a Copy</MenuItem>
-            <MenuItem>Mark as Draft</MenuItem>
-            <MenuItem>Delete</MenuItem>
-            <MenuItem disabled>Dave</MenuItem>
-            <MenuItem>Didi</MenuItem>
-            <MenuItem>Attend a Workshop</MenuItem>
+            <MenuGroup>
+              <MenuItem onSelect={onDownload}>Download</MenuItem>
+            </MenuGroup>
+            <MenuGroup>
+              <MenuLabel>Foo</MenuLabel>
+              <MenuItem>Create a Copy</MenuItem>
+              <MenuItem closeOnSelect={false}>Mark as Draft</MenuItem>
+              <MenuItem disabled>Delete</MenuItem>
+            </MenuGroup>
+            <MenuItem colorScheme="primary" icon={<IconExclamationTriangleSolid />} iconSpacing="$4">
+              Attend a Workshop
+            </MenuItem>
+            <MenuItem colorScheme="neutral" icon={<IconExclamationTriangleSolid />}>
+              Attend a Workshop
+            </MenuItem>
+            <MenuItem colorScheme="success" icon={<IconExclamationTriangleSolid />}>
+              Attend a Workshop
+            </MenuItem>
+            <MenuItem colorScheme="info" icon={<IconExclamationTriangleSolid />}>
+              Attend a Workshop
+            </MenuItem>
+            <MenuItem colorScheme="warning" icon={<IconExclamationTriangleSolid />}>
+              Attend a Workshop
+            </MenuItem>
+            <MenuItem colorScheme="danger" icon={<IconExclamationTriangleSolid />}>
+              Attend a Workshop
+            </MenuItem>
           </MenuContent>
         </Menu>
       </VStack>

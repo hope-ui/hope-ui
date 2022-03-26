@@ -9,6 +9,11 @@ import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuI
 
 export interface MenuProps {
   /**
+   * If `true`, the menu will close when a menu item is selected.
+   */
+  closeOnSelect?: boolean;
+
+  /**
    * Offset between the menu content and the reference (trigger) element.
    */
   offset?: number;
@@ -22,16 +27,6 @@ export interface MenuProps {
    * Children of the menu.
    */
   children?: JSX.Element;
-
-  /**
-   * Callback invoked when the menu trigger gain focus.
-   */
-  onFocus?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
-
-  /**
-   * Callback invoked when the menu trigger loose focus.
-   */
-  onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
 }
 
 interface MenuState {
@@ -39,6 +34,11 @@ interface MenuState {
    * If `true`, the menu will be open.
    */
   opened: boolean;
+
+  /**
+   * If `true`, the menu will close when a menu item is clicked.
+   */
+  closeOnSelect: boolean;
 
   /**
    * The id of the current `aria-activedescendent` element.
@@ -71,17 +71,17 @@ interface MenuState {
   items: MenuItemData[];
 
   /**
-   * Index of the active `SelectOption`.
+   * Index of the active `MenuItem`.
    */
   activeIndex: number;
 
   /**
-   * If `true`, prevent the blur event when clicking a `SelectOption`.
+   * If `true`, prevent the blur event when clicking a `MenuItem`.
    */
   ignoreBlur: boolean;
 
   /**
-   * The string to search for in the `SelectListbox`.
+   * The string to search for in the `MenuContent`.
    */
   searchString: string;
 
@@ -114,6 +114,9 @@ export function Menu(props: MenuProps) {
     },
     get activeDescendantId() {
       return this.opened ? `${this.itemIdPrefix}-${this.activeIndex}` : undefined;
+    },
+    get closeOnSelect() {
+      return props.closeOnSelect ?? true;
     },
     items: [],
     opened: false,
@@ -176,10 +179,19 @@ export function Menu(props: MenuProps) {
     return state.items[index].disabled;
   };
 
-  const selectItem = (index: number, event: Event) => {
+  const selectItem = (index: number) => {
     onItemChange(index);
 
-    state.items[index].onSelect?.(event);
+    const menuItem = state.items[index];
+
+    menuItem.onSelect?.();
+
+    if (menuItem.closeOnSelect) {
+      updateOpeningState(false);
+    } else {
+      // if we don't close the menu on select, ensure to bring back focus to the `MenuTrigger` in order to keep keyboard navigation working.
+      focusTrigger();
+    }
   };
 
   const focusTrigger = () => {
@@ -234,8 +246,8 @@ export function Menu(props: MenuProps) {
 
       case MenuActions.SelectAndClose:
         event.preventDefault();
-        selectItem(state.activeIndex, event);
-        return updateOpeningState(false);
+        selectItem(state.activeIndex);
+        return;
 
       case MenuActions.Close:
         event.preventDefault();
@@ -274,16 +286,14 @@ export function Menu(props: MenuProps) {
     }
   };
 
-  const onItemClick = (index: number, event: Event) => {
-    // if item is disabled ensure to bring back focus to the `SelectTrigger` in order to keep keyboard navigation working.
+  const onItemClick = (index: number) => {
+    // if item is disabled ensure to bring back focus to the `MenuTrigger` in order to keep keyboard navigation working.
     if (state.items[index].disabled) {
       focusTrigger();
       return;
     }
 
-    selectItem(index, event);
-
-    updateOpeningState(false);
+    selectItem(index);
   };
 
   const onItemMouseMove = (index: number) => {
@@ -442,7 +452,7 @@ interface MenuContextValue {
   /**
    * Callback invoked when the user click on a `MenuItem`.
    */
-  onItemClick: (index: number, event: Event) => void;
+  onItemClick: (index: number) => void;
 
   /**
    * Callback invoked when the user cursor move on a `MenuItem`.
