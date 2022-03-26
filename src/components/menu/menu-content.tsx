@@ -22,7 +22,7 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
 
   const [local, others] = splitProps(props as MenuContentProps<"div">, ["ref", "class", "children"]);
 
-  // hack to force children `SelectOption` to mount and register themself to the select.
+  // hack to force children `MenuItem` to mount and register themself to the menu.
   const resolvedChildren = children(() => local.children);
 
   const assignContentRef = (el: HTMLDivElement) => {

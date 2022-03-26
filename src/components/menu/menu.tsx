@@ -9,6 +9,11 @@ import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuI
 
 export interface MenuProps {
   /**
+   * Offset between the menu content and the reference (trigger) element.
+   */
+  offset?: number;
+
+  /**
    * The `id` of the menu.
    */
   id?: string;
@@ -131,12 +136,7 @@ export function Menu(props: MenuProps) {
 
     const { x, y } = await computePosition(triggerRef, contentRef, {
       placement: "bottom-start",
-      middleware: [
-        // offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 5),
-        offset(5),
-        flip(),
-        shift(),
-      ],
+      middleware: [offset(props.offset ?? 5), flip(), shift()],
     });
 
     if (!contentRef) {
