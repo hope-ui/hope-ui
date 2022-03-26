@@ -24,6 +24,7 @@ export * from "./image";
 export * from "./input";
 export * from "./kbd";
 export * from "./list";
+export * from "./menu";
 export * from "./modal";
 export * from "./progress";
 export * from "./radio";

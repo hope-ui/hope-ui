@@ -74,3 +74,28 @@ export function sortNodes(nodes: Node[]) {
     }
   });
 }
+
+/**
+ * Check if an element is currently scrollable
+ */
+export function isScrollable(element: HTMLElement) {
+  return element && element.clientHeight < element.scrollHeight;
+}
+
+/**
+ * Ensure a given child element is within the parent's visible scroll area
+ * if the child is not visible, scroll the parent
+ */
+export function maintainScrollVisibility(activeElement: HTMLElement, scrollParent: HTMLElement) {
+  const { offsetHeight, offsetTop } = activeElement;
+  const { offsetHeight: parentOffsetHeight, scrollTop } = scrollParent;
+
+  const isAbove = offsetTop < scrollTop;
+  const isBelow = offsetTop + offsetHeight > scrollTop + parentOffsetHeight;
+
+  if (isAbove) {
+    scrollParent.scrollTo(0, offsetTop);
+  } else if (isBelow) {
+    scrollParent.scrollTo(0, offsetTop - parentOffsetHeight + offsetHeight);
+  }
+}

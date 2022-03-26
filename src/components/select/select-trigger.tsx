@@ -22,7 +22,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class"]);
+  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class", "onBlur"]);
 
   const classes = () => {
     return classNames(
@@ -47,8 +47,7 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    const allHanders = callAllHandlers(selectContext.onTriggerBlur, selectContext.formControlProps.onBlur);
-    allHanders(event);
+    callAllHandlers(selectContext.onTriggerBlur, selectContext.formControlProps.onBlur, local.onBlur)(event);
   };
 
   return (

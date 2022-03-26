@@ -63,7 +63,7 @@ SelectContent.toString = () => createClassSelector(hopeSelectContentClass);
 /**
  * Renderless component that manage outside click on its children.
  */
-function OutsideClick(props: PropsWithChildren<{ onOutsideClick: (event: Event) => void }>) {
+export function OutsideClick(props: PropsWithChildren<{ onOutsideClick: (event: Event) => void }>) {
   const resolvedChildren = children(() => props.children);
 
   useOutsideClick({

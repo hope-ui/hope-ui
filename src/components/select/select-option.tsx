@@ -1,4 +1,4 @@
-import { Accessor, createContext, createEffect, createSignal, JSX, onMount, splitProps, useContext } from "solid-js";
+import { Accessor, createContext, createEffect, createSignal, onMount, splitProps, useContext } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -24,7 +24,7 @@ interface SelectOptionOptions {
 
   /**
    * Optional text used for typeahead purposes.
-   * By default the typeahead behavior will use the `.textContent` of the `Select.Option`.
+   * By default the typeahead behavior will use the `.textContent` of the `SelectOption`.
    * Use this when the content is complex, or you have non-textual content inside.
    */
   textValue?: string;
@@ -33,11 +33,6 @@ interface SelectOptionOptions {
    * If `true`, the option will be disabled.
    */
   disabled?: boolean;
-
-  /**
-   * The children of the option.
-   */
-  children?: JSX.Element;
 }
 
 export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptionOptions>;
@@ -75,15 +70,7 @@ export function SelectOption<C extends ElementType = "div">(props: SelectOptionP
   const isActiveDescendant = () => selectContext.isOptionActiveDescendant(index());
 
   const classes = () => {
-    return classNames(
-      local.class,
-      hopeSelectOptionClass,
-      selectOptionStyles({
-        active: isActiveDescendant(),
-        selected: isSelected(),
-        disabled: local.disabled,
-      })
-    );
+    return classNames(local.class, hopeSelectOptionClass, selectOptionStyles());
   };
 
   const assignOptionRef = (el: HTMLDivElement) => {
