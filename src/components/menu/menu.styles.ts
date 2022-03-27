@@ -61,6 +61,7 @@ export const menuLabelStyles = css({
 
   color: "$neutral11",
   fontSize: "$xs",
+  fontWeight: "$medium",
   lineHeight: "$4",
 });
 
@@ -133,4 +134,16 @@ export const menuItemIconWrapperStyles = css({
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Menu - item command
+ * -----------------------------------------------------------------------------------------------*/
+
+export const menuItemCommandStyles = css({
+  flexShrink: 0,
+
+  color: "$neutral11",
+  fontSize: "$sm",
+  lineHeight: "$none",
 });

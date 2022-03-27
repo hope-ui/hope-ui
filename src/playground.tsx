@@ -17,6 +17,7 @@ import {
   useColorMode,
   VStack,
 } from ".";
+import { Checkbox, CheckboxControl, CheckboxLabel } from "./components";
 import { IconCrossCircle } from "./components/icons/IconCrossCircle";
 import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
 
@@ -52,7 +53,7 @@ export function App() {
             <MenuItem colorScheme="primary" icon={<IconExclamationTriangleSolid />} iconSpacing="$4">
               Attend a Workshop
             </MenuItem>
-            <MenuItem colorScheme="neutral" icon={<IconExclamationTriangleSolid />}>
+            <MenuItem colorScheme="neutral" icon={<IconExclamationTriangleSolid />} command="⌘K">
               Attend a Workshop
             </MenuItem>
             <MenuItem colorScheme="success" icon={<IconExclamationTriangleSolid />}>
@@ -69,6 +70,10 @@ export function App() {
             </MenuItem>
           </MenuContent>
         </Menu>
+        <Checkbox>
+          <CheckboxControl />
+          <CheckboxLabel>Checkbox</CheckboxLabel>
+        </Checkbox>
       </VStack>
     </Box>
   );

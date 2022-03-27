@@ -1,6 +1,7 @@
 import { children, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -18,6 +19,8 @@ const hopeMenuContentClass = "hope-menu__content";
  * The component that pops out when the menu is open.
  */
 export function MenuContent<C extends ElementType = "div">(props: MenuContentProps<C>) {
+  const theme = useComponentStyleConfigs().Menu;
+
   const menuContext = useMenuContext();
 
   const [local, others] = splitProps(props as MenuContentProps<"div">, ["ref", "class", "children"]);
@@ -55,6 +58,7 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
             aria-labelledby={menuContext.state.triggerId}
             aria-orientation="vertical"
             class={classes()}
+            __baseStyle={theme?.baseStyle?.content}
             onMouseLeave={menuContext.onContentMouseLeave}
             {...others}
           >

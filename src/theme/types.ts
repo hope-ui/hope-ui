@@ -15,6 +15,7 @@ import { HeadingStyleConfig } from "@/components/heading/heading";
 import { IconButtonStyleConfig } from "@/components/icon-button/icon-button";
 import { InputStyleConfig } from "@/components/input/input";
 import { KbdStyleConfig } from "@/components/kbd/kbd";
+import { MenuStyleConfig } from "@/components/menu/menu";
 import { ModalStyleConfig } from "@/components/modal/modal";
 import { ProgressStyleConfig } from "@/components/progress/progress";
 import { RadioStyleConfig } from "@/components/radio/radio";
@@ -70,6 +71,7 @@ export interface ComponentsStyleConfigs {
   IconButton?: IconButtonStyleConfig;
   Input?: InputStyleConfig;
   Kbd?: KbdStyleConfig;
+  Menu?: MenuStyleConfig;
   Modal?: ModalStyleConfig;
   Progress?: ProgressStyleConfig;
   Radio?: RadioStyleConfig;

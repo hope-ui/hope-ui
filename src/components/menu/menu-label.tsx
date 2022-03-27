@@ -1,5 +1,6 @@
 import { createUniqueId, onMount, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -18,6 +19,8 @@ const hopeMenuLabelClass = "hope-menu__label";
 export function MenuLabel<C extends ElementType = "div">(props: MenuLabelProps<C>) {
   const defaultIdSuffix = createUniqueId();
 
+  const theme = useComponentStyleConfigs().Menu;
+
   const menuContext = useMenuContext();
   const menuGroupContext = useMenuGroupContext();
 
@@ -31,7 +34,7 @@ export function MenuLabel<C extends ElementType = "div">(props: MenuLabelProps<C
     menuGroupContext?.setAriaLabelledBy(id());
   });
 
-  return <Box id={id()} class={classes()} {...others} />;
+  return <Box id={id()} class={classes()} __baseStyle={theme?.baseStyle?.label} {...others} />;
 }
 
 MenuLabel.toString = () => createClassSelector(hopeMenuLabelClass);

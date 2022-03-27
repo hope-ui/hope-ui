@@ -2,12 +2,14 @@ import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/d
 import { createContext, createUniqueId, JSX, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SystemStyleObject } from "@/styled-system/types";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
 
 import { createDescendantContext } from "../descendant/use-descendant";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
 
-export interface MenuProps {
+interface ThemeableMenuOptions {
   /**
    * If `true`, the menu will close when a menu item is selected.
    */
@@ -17,7 +19,9 @@ export interface MenuProps {
    * Offset between the menu content and the reference (trigger) element.
    */
   offset?: number;
+}
 
+export interface MenuProps extends ThemeableMenuOptions {
   /**
    * The `id` of the menu.
    */
@@ -26,7 +30,7 @@ export interface MenuProps {
   /**
    * Children of the menu.
    */
-  children?: JSX.Element;
+  children?: JSX.Element; // | ((props: { opened: boolean }) => JSX.Element);
 }
 
 interface MenuState {
@@ -97,7 +101,7 @@ interface MenuState {
 export function Menu(props: MenuProps) {
   const defaultBaseId = `hope-menu-${createUniqueId()}`;
 
-  //const theme = useComponentStyleConfigs().Menu;
+  const theme = useComponentStyleConfigs().Menu;
 
   const [state, setState] = createStore<MenuState>({
     get triggerId() {
@@ -116,7 +120,7 @@ export function Menu(props: MenuProps) {
       return this.opened ? `${this.itemIdPrefix}-${this.activeIndex}` : undefined;
     },
     get closeOnSelect() {
-      return props.closeOnSelect ?? true;
+      return props.closeOnSelect ?? theme?.defaultProps?.root?.closeOnSelect ?? true;
     },
     items: [],
     opened: false,
@@ -139,7 +143,7 @@ export function Menu(props: MenuProps) {
 
     const { x, y } = await computePosition(triggerRef, contentRef, {
       placement: "bottom-start",
-      middleware: [offset(props.offset ?? 5), flip(), shift()],
+      middleware: [offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 5), flip(), shift()],
     });
 
     if (!contentRef) {
@@ -376,6 +380,13 @@ export function Menu(props: MenuProps) {
   };
 
   const registerItem = (itemData: MenuItemData) => {
+    const index = state.items.findIndex(item => item.key === itemData.key);
+
+    // do not register the same item twice.
+    if (index != -1) {
+      return index;
+    }
+
     setState("items", prev => [...prev, itemData]);
 
     return state.items.length - 1;
@@ -492,3 +503,22 @@ export function useMenuContext() {
  */
 export const [MenuDescendantsProvider, useMenuDescendantsContext, useMenuDescendants, useMenuDescendant] =
   createDescendantContext<HTMLElement>();
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface MenuStyleConfig {
+  baseStyle?: {
+    trigger?: SystemStyleObject;
+    content?: SystemStyleObject;
+    group?: SystemStyleObject;
+    label?: SystemStyleObject;
+    item?: SystemStyleObject;
+    itemIconWrapper?: SystemStyleObject;
+    itemCommand?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableMenuOptions;
+  };
+}

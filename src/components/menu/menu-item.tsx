@@ -1,6 +1,7 @@
-import { Accessor, createEffect, createSignal, JSX, onMount, splitProps } from "solid-js";
+import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, splitProps } from "solid-js";
 
 import { MarginProps } from "@/styled-system/props/margin";
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
@@ -8,7 +9,7 @@ import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
-import { menuItemIconWrapperStyles, menuItemStyles, MenuItemVariants } from "./menu.styles";
+import { menuItemCommandStyles, menuItemIconWrapperStyles, menuItemStyles, MenuItemVariants } from "./menu.styles";
 import { MenuItemData } from "./menu.utils";
 
 type MenuItemOptions = Partial<MenuItemData> &
@@ -22,17 +23,32 @@ type MenuItemOptions = Partial<MenuItemData> &
      * The space between the icon and the menu item text.
      */
     iconSpacing?: MarginProps["marginRight"];
+
+    /**
+     * Right-aligned label text content, useful for displaying hotkeys.
+     */
+    command?: string;
+
+    /**
+     * The space between the command and the menu item text.
+     */
+    commandSpacing?: MarginProps["marginLeft"];
   };
 
 export type MenuItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, MenuItemOptions>;
 
 const hopeMenuItemClass = "hope-menu__item";
 const hopeMenuItemIconWrapperClass = "hope-menu__item__icon-wrapper";
+const hopeMenuItemCommandClass = "hope-menu__item__command";
 
 /**
  * The component that contains a menu item.
  */
 export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>) {
+  const key = createUniqueId();
+
+  const theme = useComponentStyleConfigs().Menu;
+
   const menuContext = useMenuContext();
 
   const [index, setIndex] = createSignal<number>(-1);
@@ -46,6 +62,8 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
     "colorScheme",
     "icon",
     "iconSpacing",
+    "command",
+    "commandSpacing",
     "textValue",
     "disabled",
     "closeOnSelect",
@@ -54,6 +72,7 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
   ]);
 
   const itemData: Accessor<MenuItemData> = () => ({
+    key,
     textValue: local.textValue ?? itemRef?.textContent ?? "",
     disabled: !!local.disabled,
     closeOnSelect: local.closeOnSelect != null ? !!local.closeOnSelect : menuContext.state.closeOnSelect,
@@ -107,6 +126,10 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
     return classNames(hopeMenuItemIconWrapperClass, menuItemIconWrapperStyles());
   };
 
+  const commandClasses = () => {
+    return classNames(hopeMenuItemCommandClass, menuItemCommandStyles());
+  };
+
   onMount(() => {
     setIndex(menuContext.registerItem(itemData()));
   });
@@ -126,15 +149,28 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
       data-disabled={local.disabled ? "" : undefined}
       data-group
       class={classes()}
+      __baseStyle={theme?.baseStyle?.item}
       onClick={onItemClick}
       onMouseMove={onItemMouseMove}
       onMouseDown={menuContext.onItemMouseDown}
       {...others}
     >
-      <hope.span aria-hidden="true" class={iconWrapperClasses()} mr={local.iconSpacing ?? "0.5rem"}>
+      <hope.span
+        aria-hidden="true"
+        class={iconWrapperClasses()}
+        __baseStyle={theme?.baseStyle?.itemIconWrapper}
+        mr={local.iconSpacing ?? "0.5rem"}
+      >
         {local.icon}
       </hope.span>
       {local.children}
+      <hope.span
+        class={commandClasses()}
+        __baseStyle={theme?.baseStyle?.itemCommand}
+        ml={local.commandSpacing ?? "0.5rem"}
+      >
+        {local.command}
+      </hope.span>
     </Box>
   );
 }

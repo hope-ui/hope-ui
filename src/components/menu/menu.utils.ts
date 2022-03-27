@@ -1,5 +1,10 @@
 export interface MenuItemData {
   /**
+   * A key that uniquely identify the menu item.
+   */
+  key: string;
+
+  /**
    * Optional text used for typeahead purposes.
    * By default the typeahead behavior will use the `.textContent` of the `MenuItem`.
    * Use this when the content is complex, or you have non-textual content inside.
