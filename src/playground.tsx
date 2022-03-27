@@ -31,6 +31,7 @@ export function App() {
           {({ opened }) => (
             <>
               <MenuTrigger as={Button}>{opened() ? "Close" : "Open"}</MenuTrigger>
+              {/* <MenuTrigger as={Button}>Actions</MenuTrigger> */}
               <MenuContent>
                 <MenuItem>Download</MenuItem>
                 <MenuItem onClick={() => alert("Kagebunshin")}>Create a Copy</MenuItem>

@@ -1,7 +1,62 @@
 import { VariantProps } from "@stitches/core";
 
 import { SystemStyleObject } from "@/styled-system";
-import { css } from "@/styled-system/stitches.config";
+import { css, globalCss } from "@/styled-system/stitches.config";
+
+/* -------------------------------------------------------------------------------------------------
+ * Menu - solid-transition-group classes
+ * -----------------------------------------------------------------------------------------------*/
+
+export const menuTransitionName = {
+  scaleTopLeft: "hope-menu-scale-top-left-transition",
+  scaleTopRight: "hope-menu-scale-top-right-transition",
+};
+
+export const menuTransitionStyles = globalCss({
+  /* scale top left */
+  [`.${menuTransitionName.scaleTopLeft}-enter, .${menuTransitionName.scaleTopLeft}-exit-to`]: {
+    opacity: 0,
+    transform: "scale(0.8)",
+  },
+  [`.${menuTransitionName.scaleTopLeft}-enter-to, .${menuTransitionName.scaleTopLeft}-exit`]: {
+    opacity: 1,
+    transform: "scale(1)",
+  },
+  [`.${menuTransitionName.scaleTopLeft}-enter-active`]: {
+    transformOrigin: "top left",
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-out",
+  },
+  [`.${menuTransitionName.scaleTopLeft}-exit-active`]: {
+    transformOrigin: "top left",
+    transitionProperty: "opacity, transform",
+    transitionDuration: "100ms",
+    transitionTimingFunction: "ease-in",
+  },
+
+  /* scale top right */
+  [`.${menuTransitionName.scaleTopRight}-enter, .${menuTransitionName.scaleTopRight}-exit-to`]: {
+    opacity: 0,
+    transform: "scale(0.8)",
+  },
+  [`.${menuTransitionName.scaleTopRight}-enter-to, .${menuTransitionName.scaleTopRight}-exit`]: {
+    opacity: 1,
+    transform: "scale(1)",
+  },
+  [`.${menuTransitionName.scaleTopRight}-enter-active`]: {
+    transformOrigin: "top right",
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-out",
+  },
+  [`.${menuTransitionName.scaleTopRight}-exit-active`]: {
+    transformOrigin: "top right",
+    transitionProperty: "opacity, transform",
+    transitionDuration: "100ms",
+    transitionTimingFunction: "ease-in",
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Menu - trigger

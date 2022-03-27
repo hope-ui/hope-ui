@@ -1,5 +1,6 @@
-import { children, Show, splitProps } from "solid-js";
+import { children, createEffect, createSignal, on, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
+import { Transition } from "solid-transition-group";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -9,7 +10,7 @@ import { Box } from "../box/box";
 import { OutsideClick } from "../select/select-content";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
-import { menuContentStyles } from "./menu.styles";
+import { menuContentStyles, menuTransitionName } from "./menu.styles";
 
 export type MenuContentProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
@@ -24,6 +25,30 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
   const menuContext = useMenuContext();
 
   const [local, others] = splitProps(props as MenuContentProps<"div">, ["ref", "class", "children"]);
+
+  /**
+   * Internal state to handle menu content portal `mounted` state.
+   * Dirty hack since solid-transition-group doesn't work with Portal.
+   */
+  const [isPortalMounted, setIsPortalMounted] = createSignal(false);
+
+  createEffect(
+    on(
+      () => menuContext.state.opened,
+      () => {
+        if (menuContext.state.opened) {
+          // mount portal when state `opened` is true.
+          setIsPortalMounted(true);
+        } else {
+          // unmount portal instantly when there is no menu transition.
+          menuContext.state.motionPreset === "none" && setIsPortalMounted(false);
+        }
+      }
+    )
+  );
+
+  // For smooth transition, unmount portal only after menu's content exit transition is done.
+  const unmountPortal = () => setIsPortalMounted(false);
 
   // hack to force children `MenuItem` to mount and register themself to the menu.
   const resolvedChildren = children(() => local.children);
@@ -45,26 +70,41 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
 
   const classes = () => classNames(local.class, hopeMenuContentClass, menuContentStyles());
 
+  const transitionName = () => {
+    switch (menuContext.state.motionPreset) {
+      case "scale-top-left":
+        return menuTransitionName.scaleTopLeft;
+      case "scale-top-right":
+        return menuTransitionName.scaleTopRight;
+      case "none":
+        return "hope-none";
+    }
+  };
+
   return (
-    <Show when={menuContext.state.opened}>
+    <Show when={isPortalMounted()}>
       <Portal>
-        <OutsideClick onOutsideClick={onOutsideClick}>
-          <Box
-            role="menu"
-            tabindex="-1"
-            ref={assignContentRef}
-            id={menuContext.state.menuContentId}
-            aria-activedescendant={menuContext.state.activeDescendantId}
-            aria-labelledby={menuContext.state.triggerId}
-            aria-orientation="vertical"
-            class={classes()}
-            __baseStyle={theme?.baseStyle?.content}
-            onMouseLeave={menuContext.onContentMouseLeave}
-            {...others}
-          >
-            {resolvedChildren()}
-          </Box>
-        </OutsideClick>
+        <Transition name={transitionName()} appear onAfterExit={unmountPortal}>
+          <Show when={menuContext.state.opened}>
+            <OutsideClick onOutsideClick={onOutsideClick}>
+              <Box
+                role="menu"
+                tabindex="-1"
+                ref={assignContentRef}
+                id={menuContext.state.menuContentId}
+                aria-activedescendant={menuContext.state.activeDescendantId}
+                aria-labelledby={menuContext.state.triggerId}
+                aria-orientation="vertical"
+                class={classes()}
+                __baseStyle={theme?.baseStyle?.content}
+                onMouseLeave={menuContext.onContentMouseLeave}
+                {...others}
+              >
+                {resolvedChildren()}
+              </Box>
+            </OutsideClick>
+          </Show>
+        </Transition>
       </Portal>
     </Show>
   );

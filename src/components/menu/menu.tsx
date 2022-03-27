@@ -1,3 +1,4 @@
+import type { Placement } from "@floating-ui/dom";
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { Accessor, createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -8,7 +9,10 @@ import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
 import { isChildrenFunction } from "@/utils/solid";
 
 import { createDescendantContext } from "../descendant/use-descendant";
+import { menuTransitionStyles } from "./menu.styles";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
+
+type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "none";
 
 type MenuChildrenRenderProp = (props: { opened: Accessor<boolean> }) => JSX.Element;
 
@@ -22,6 +26,16 @@ interface ThemeableMenuOptions {
    * Offset between the menu content and the reference (trigger) element.
    */
   offset?: number;
+
+  /**
+   * Placement of the menu content.
+   */
+  placement?: Placement;
+
+  /**
+   * Menu content opening/closing transition.
+   */
+  motionPreset?: MenuMotionPreset;
 }
 
 export interface MenuProps extends ThemeableMenuOptions {
@@ -78,6 +92,11 @@ interface MenuState {
   items: MenuItemData[];
 
   /**
+   * Menu opening/closing transition.
+   */
+  motionPreset?: MenuMotionPreset;
+
+  /**
    * Index of the active `MenuItem`.
    */
   activeIndex: number;
@@ -125,6 +144,9 @@ export function Menu(props: MenuProps) {
     get closeOnSelect() {
       return props.closeOnSelect ?? theme?.defaultProps?.root?.closeOnSelect ?? true;
     },
+    get motionPreset() {
+      return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "scale-top-left";
+    },
     items: [],
     opened: false,
     activeIndex: 0,
@@ -145,7 +167,7 @@ export function Menu(props: MenuProps) {
     }
 
     const { x, y } = await computePosition(triggerRef, contentRef, {
-      placement: "bottom-start",
+      placement: props.placement ?? theme?.defaultProps?.root?.placement ?? "bottom-start",
       middleware: [offset(props.offset ?? theme?.defaultProps?.root?.offset ?? 5), flip(), shift()],
     });
 
@@ -396,6 +418,9 @@ export function Menu(props: MenuProps) {
   };
 
   const openedRenderProp = () => state.opened;
+
+  // inject global css for transitions
+  menuTransitionStyles();
 
   const context: MenuContextValue = {
     state: state as MenuState,
