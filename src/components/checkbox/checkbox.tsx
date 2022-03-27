@@ -1,12 +1,12 @@
-import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { visuallyHiddenStyles } from "@/theme/utils";
-import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
+import { isChildrenFunction } from "@/utils/solid";
 
 import { hope } from "../factory";
 import { useFormControlContext } from "../form-control/form-control";
@@ -404,7 +404,9 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        {isFunction(local.children) ? local.children({ checked: state.checked }) : local.children}
+        <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
+          {(local.children as any)?.({ checked: state.checked })}
+        </Show>
       </hope.label>
     </CheckboxContext.Provider>
   );

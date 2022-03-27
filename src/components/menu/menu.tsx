@@ -1,13 +1,16 @@
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
-import { createContext, createUniqueId, JSX, useContext } from "solid-js";
+import { createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
+import { isChildrenFunction } from "@/utils/solid";
 
 import { createDescendantContext } from "../descendant/use-descendant";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
+
+//type MenuChildrenRenderProp = (props: { opened: boolean }) => JSX.Element;
 
 interface ThemeableMenuOptions {
   /**
@@ -30,7 +33,7 @@ export interface MenuProps extends ThemeableMenuOptions {
   /**
    * Children of the menu.
    */
-  children?: JSX.Element; // | ((props: { opened: boolean }) => JSX.Element);
+  children?: JSX.Element; // | MenuChildrenRenderProp;
 }
 
 interface MenuState {
@@ -410,6 +413,14 @@ export function Menu(props: MenuProps) {
   };
 
   return <MenuContext.Provider value={context}>{props.children}</MenuContext.Provider>;
+
+  // return (
+  //   <MenuContext.Provider value={context}>
+  //     <Show when={isChildrenFunction(props)} fallback={props.children as JSX.Element}>
+  //       {(props.children as MenuChildrenRenderProp)?.({ opened: state.opened })}
+  //     </Show>
+  //   </MenuContext.Provider>
+  // );
 }
 
 /* -------------------------------------------------------------------------------------------------
