@@ -34,7 +34,7 @@ export const menuContentStyles = css({
   boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$panel",
+  backgroundColor: "$loContrast",
 
   px: 0,
   py: "$1",

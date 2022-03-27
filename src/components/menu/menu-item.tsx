@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, splitProps } from "solid-js";
+import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, Show, splitProps } from "solid-js";
 
 import { MarginProps } from "@/styled-system/props/margin";
 import { useComponentStyleConfigs } from "@/theme/provider";
@@ -155,22 +155,26 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
       onMouseDown={menuContext.onItemMouseDown}
       {...others}
     >
-      <hope.span
-        aria-hidden="true"
-        class={iconWrapperClasses()}
-        __baseStyle={theme?.baseStyle?.itemIconWrapper}
-        mr={local.iconSpacing ?? "0.5rem"}
-      >
-        {local.icon}
-      </hope.span>
+      <Show when={local.icon}>
+        <hope.span
+          aria-hidden="true"
+          class={iconWrapperClasses()}
+          __baseStyle={theme?.baseStyle?.itemIconWrapper}
+          mr={local.iconSpacing ?? "0.5rem"}
+        >
+          {local.icon}
+        </hope.span>
+      </Show>
       {local.children}
-      <hope.span
-        class={commandClasses()}
-        __baseStyle={theme?.baseStyle?.itemCommand}
-        ml={local.commandSpacing ?? "0.5rem"}
-      >
-        {local.command}
-      </hope.span>
+      <Show when={local.command}>
+        <hope.span
+          class={commandClasses()}
+          __baseStyle={theme?.baseStyle?.itemCommand}
+          ml={local.commandSpacing ?? "0.5rem"}
+        >
+          {local.command}
+        </hope.span>
+      </Show>
     </Box>
   );
 }

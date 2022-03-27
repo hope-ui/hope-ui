@@ -10,23 +10,14 @@ import {
   HStack,
   Menu,
   MenuContent,
-  MenuGroup,
   MenuItem,
-  MenuLabel,
   MenuTrigger,
   useColorMode,
   VStack,
 } from ".";
-import { Checkbox, CheckboxControl, CheckboxLabel } from "./components";
-import { IconCrossCircle } from "./components/icons/IconCrossCircle";
-import { IconExclamationTriangleSolid } from "./components/icons/IconExclamationTriangleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
-
-  const onDownload = () => {
-    console.log("download");
-  };
 
   return (
     <Box p="$4">
@@ -37,43 +28,26 @@ export function App() {
       </HStack>
       <VStack spacing="$4" alignItems="flex-start">
         <Menu>
-          <MenuTrigger as={Button} rightIcon={<IconCrossCircle />}>
-            Actions
-          </MenuTrigger>
+          {({ opened }) => (
+            <>
+              <MenuTrigger as={Button}>{opened() ? "Close" : "Open"}</MenuTrigger>
+              <MenuContent>
+                <MenuItem>Download</MenuItem>
+                <MenuItem onClick={() => alert("Kagebunshin")}>Create a Copy</MenuItem>
+              </MenuContent>
+            </>
+          )}
+        </Menu>
+        <Menu>
+          <MenuTrigger as={Button}>Actions</MenuTrigger>
           <MenuContent>
-            <MenuGroup>
-              <MenuItem onSelect={onDownload}>Download</MenuItem>
-            </MenuGroup>
-            <MenuGroup>
-              <MenuLabel>Foo</MenuLabel>
-              <MenuItem>Create a Copy</MenuItem>
-              <MenuItem closeOnSelect={false}>Mark as Draft</MenuItem>
-              <MenuItem disabled>Delete</MenuItem>
-            </MenuGroup>
-            <MenuItem colorScheme="primary" icon={<IconExclamationTriangleSolid />} iconSpacing="$4">
-              Attend a Workshop
-            </MenuItem>
-            <MenuItem colorScheme="neutral" icon={<IconExclamationTriangleSolid />} command="⌘K">
-              Attend a Workshop
-            </MenuItem>
-            <MenuItem colorScheme="success" icon={<IconExclamationTriangleSolid />}>
-              Attend a Workshop
-            </MenuItem>
-            <MenuItem colorScheme="info" icon={<IconExclamationTriangleSolid />}>
-              Attend a Workshop
-            </MenuItem>
-            <MenuItem colorScheme="warning" icon={<IconExclamationTriangleSolid />}>
-              Attend a Workshop
-            </MenuItem>
-            <MenuItem colorScheme="danger" icon={<IconExclamationTriangleSolid />}>
-              Attend a Workshop
-            </MenuItem>
+            <MenuItem>Download</MenuItem>
+            <MenuItem>Create a Copy</MenuItem>
+            <MenuItem>Mark as Draft</MenuItem>
+            <MenuItem>Delete</MenuItem>
+            <MenuItem>Attend a Workshop</MenuItem>
           </MenuContent>
         </Menu>
-        <Checkbox>
-          <CheckboxControl />
-          <CheckboxLabel>Checkbox</CheckboxLabel>
-        </Checkbox>
       </VStack>
     </Box>
   );

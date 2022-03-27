@@ -146,7 +146,6 @@ const danger = {
 const semanticColors = {
   loContrast: "white",
   background: "$loContrast",
-  panel: "white",
   focusRing: "#96c7f2",
   closeButtonHoverBackground: "$blackAlpha4",
   closeButtonActiveBackground: "$blackAlpha5",
@@ -266,7 +265,6 @@ const dangerDark = {
 const semanticDarkColors = {
   loContrast: "$neutral1",
   background: "$loContrast",
-  panel: "$neutral3",
   focusRing: "#0a4481",
   closeButtonHoverBackground: "$whiteAlpha4",
   closeButtonActiveBackground: "$whiteAlpha5",
