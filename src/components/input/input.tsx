@@ -1,16 +1,14 @@
-import { mergeProps, splitProps } from "solid-js";
+import { splitProps } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
-import { useFormControl, useFormControlPropNames } from "../form-control/use-form-control";
+import { hope } from "../factory";
+import { useFormControl } from "../form-control/use-form-control";
 import { HTMLHopeProps } from "../types";
 import { inputStyles, InputVariants } from "./input.styles";
-import { InputGroup, ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
-import { InputLeftElement, InputRightElement } from "./input-element";
-import { InputLeftAddon, InputRightAddon } from "./input-addon";
+import { ThemeableInputGroupOptions, useInputGroupContext } from "./input-group";
 
 type ThemeableInputOptions = Pick<InputVariants, "variant" | "size">;
 
@@ -48,29 +46,17 @@ export function Input(props: InputProps) {
 
   const inputGroup = useInputGroupContext();
 
-  const defaultProps: InputProps = {
-    type: "text",
-    variant: inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
-    size: inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
-  };
+  const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const propsWithDefault: InputProps = mergeProps(defaultProps, props);
-  const [local, variantProps, useFormControlProps, others] = splitProps(
-    propsWithDefault,
-    ["class", "htmlSize"],
-    ["variant", "size"],
-    useFormControlPropNames
-  );
-
-  const formControlProps = useFormControl<HTMLInputElement>(useFormControlProps);
+  const [local, others] = splitProps(props, ["class", "htmlSize", "variant", "size"]);
 
   const classes = () =>
     classNames(
       local.class,
       hopeInputClass,
       inputStyles({
-        variant: variantProps.variant,
-        size: variantProps.size,
+        variant: local.variant ?? inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
+        size: local.size ?? inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
         withLeftElement: inputGroup?.state.hasLeftElement ?? false,
         withRightElement: inputGroup?.state.hasRightElement ?? false,
         withLeftAddon: inputGroup?.state.hasLeftAddon ?? false,
@@ -79,8 +65,8 @@ export function Input(props: InputProps) {
     );
 
   return (
-    <Box
-      as="input"
+    <hope.input
+      type="text"
       class={classes()}
       size={local.htmlSize}
       __baseStyle={theme?.baseStyle?.input}
@@ -91,9 +77,3 @@ export function Input(props: InputProps) {
 }
 
 Input.toString = () => createClassSelector(hopeInputClass);
-
-Input.Group = InputGroup;
-Input.LeftAddon = InputLeftAddon;
-Input.RightAddon = InputRightAddon;
-Input.LeftElement = InputLeftElement;
-Input.RightElement = InputRightElement;

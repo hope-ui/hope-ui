@@ -1,12 +1,19 @@
 import { JSX } from "solid-js";
 
-import { isObject } from "./assertion";
+import { isFunction, isObject } from "./assertion";
 
 /**
- * Do nothing
+ * Do nothing.
  */
 export function noop() {
   return;
+}
+
+/**
+ * Cast a given value to another.
+ */
+export function cast<T>(value: any): T {
+  return value as T;
 }
 
 /**
@@ -28,7 +35,7 @@ export function mapKeys(prop: any, mapper: (val: any) => any) {
 }
 
 /**
- * Call all provided event handlers.
+ * Return a function that will call all provided event handlers.
  */
 export function callAllHandlers<T, E extends Event>(...fns: Array<JSX.EventHandlerUnion<T, E> | undefined>) {
   return function (
@@ -39,7 +46,7 @@ export function callAllHandlers<T, E extends Event>(...fns: Array<JSX.EventHandl
   ) {
     fns.some(fn => {
       if (fn) {
-        if (typeof fn === "function") {
+        if (isFunction(fn)) {
           fn(event);
         } else {
           fn[0](fn[1], event);
@@ -48,5 +55,28 @@ export function callAllHandlers<T, E extends Event>(...fns: Array<JSX.EventHandl
 
       return event?.defaultPrevented;
     });
+  };
+}
+
+/**
+ * Return a function that will call the provided event handler.
+ * Simple way to call a JSX.EventHandlerUnion programmatically.
+ */
+export function callHandler<T, E extends Event>(fn: JSX.EventHandlerUnion<T, E> | undefined) {
+  return function (
+    event: E & {
+      currentTarget: T;
+      target: Element;
+    }
+  ) {
+    if (fn) {
+      if (isFunction(fn)) {
+        fn(event);
+      } else {
+        fn[0](fn[1], event);
+      }
+    }
+
+    return event?.defaultPrevented;
   };
 }

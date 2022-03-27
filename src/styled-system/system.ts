@@ -5,7 +5,7 @@ import { borderPropNames, BorderProps } from "./props/border";
 import { colorPropNames, ColorProps } from "./props/color";
 import { CSSProp, cssPropName } from "./props/css";
 import { flexboxPropNames, FlexboxProps } from "./props/flexbox";
-import { gridPropNames, GridProps } from "./props/grid";
+import { gridLayoutPropNames, GridLayoutProps } from "./props/grid";
 import { interactivityPropNames, InteractivityProps } from "./props/interactivity";
 import { layoutPropNames, LayoutProps } from "./props/layout";
 import { marginPropNames, MarginProps } from "./props/margin";
@@ -15,6 +15,8 @@ import { pseudoSelectorPropNames, PseudoSelectorProps } from "./props/pseudo-sel
 import { radiiPropNames, RadiiProps } from "./props/radii";
 import { shadowPropNames, ShadowProps } from "./props/shadow";
 import { sizePropNames, SizeProps } from "./props/size";
+import { transformPropNames, TransformProps } from "./props/transform";
+import { transitionPropNames, TransitionProps } from "./props/transition";
 import { typographyPropNames, TypographyProps } from "./props/typography";
 import { KeysOf, ResponsiveProps, SystemStyleObject } from "./types";
 
@@ -25,7 +27,7 @@ export type StyleProps = ResponsiveProps<
   BorderProps &
     ColorProps &
     FlexboxProps &
-    GridProps &
+    GridLayoutProps &
     InteractivityProps &
     LayoutProps &
     MarginProps &
@@ -34,6 +36,8 @@ export type StyleProps = ResponsiveProps<
     RadiiProps &
     ShadowProps &
     SizeProps &
+    TransformProps &
+    TransitionProps &
     TypographyProps &
     PseudoSelectorProps
 > &
@@ -43,7 +47,7 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...borderPropNames,
   ...colorPropNames,
   ...flexboxPropNames,
-  ...gridPropNames,
+  ...gridLayoutPropNames,
   ...interactivityPropNames,
   ...layoutPropNames,
   ...marginPropNames,
@@ -52,6 +56,8 @@ export const stylePropNames: KeysOf<StyleProps> = {
   ...radiiPropNames,
   ...shadowPropNames,
   ...sizePropNames,
+  ...transformPropNames,
+  ...transitionPropNames,
   ...typographyPropNames,
   ...pseudoSelectorPropNames,
   ...cssPropName,

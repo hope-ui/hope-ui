@@ -3,7 +3,7 @@ import { mergeProps, splitProps } from "solid-js";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { textStyles, TextVariants } from "./text.styles";
 
@@ -21,7 +21,6 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
   const theme = useComponentStyleConfigs().Text;
 
   const defaultProps: TextProps<"p"> = {
-    as: "p",
     size: theme?.defaultProps?.size,
   };
 
@@ -30,7 +29,7 @@ export function Text<C extends ElementType = "p">(props: TextProps<C>) {
 
   const classes = () => classNames(local.class, hopeTextClass, textStyles({ size: local.size }));
 
-  return <Box class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
+  return <hope.p class={classes()} __baseStyle={theme?.baseStyle} {...others} />;
 }
 
 Text.toString = () => createClassSelector(hopeTextClass);

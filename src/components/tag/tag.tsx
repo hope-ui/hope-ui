@@ -1,17 +1,14 @@
-import { mergeProps, splitProps } from "solid-js";
+import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tagStyles, TagVariants } from "./tag.styles";
-import { TagCloseButton } from "./tag-close-button";
-import { TagLeftIcon, TagRightIcon } from "./tag-icon";
-import { TagLabel } from "./tag-label";
 
-type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size">;
+type ThemeableTagOptions = Pick<TagVariants, "variant" | "colorScheme" | "size" | "dotPlacement">;
 
 export interface TagStyleConfig {
   baseStyle?: {
@@ -29,6 +26,12 @@ export type TagProps<C extends ElementType = "span"> = HTMLHopeProps<C, TagVaria
 
 const hopeTagClass = "hope-tag";
 
+interface TagContextValue {
+  size: Accessor<TagVariants["size"]>;
+}
+
+const TagContext = createContext<TagContextValue>();
+
 /**
  * Tag component is used for items that need to be labeled, categorized,
  * or organized using keywords that describe them.
@@ -37,7 +40,6 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const theme = useComponentStyleConfigs().Tag;
 
   const defaultProps: TagProps<"span"> = {
-    as: "span",
     variant: theme?.defaultProps?.root?.variant ?? "subtle",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "neutral",
     size: theme?.defaultProps?.root?.size ?? "md",
@@ -47,17 +49,32 @@ export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
   const [local, variantProps, others] = splitProps(
     propsWithDefault,
     ["class"],
-    ["variant", "colorScheme", "size", "dotPosition"]
+    ["variant", "colorScheme", "size", "dotPlacement"]
   );
 
   const classes = () => classNames(local.class, hopeTagClass, tagStyles(variantProps));
 
-  return <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />;
+  const tagSize = () => variantProps.size;
+
+  const context: TagContextValue = {
+    size: tagSize,
+  };
+
+  return (
+    <TagContext.Provider value={context}>
+      <hope.span class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
+    </TagContext.Provider>
+  );
 }
 
 Tag.toString = () => createClassSelector(hopeTagClass);
 
-Tag.CloseButton = TagCloseButton;
-Tag.LeftIcon = TagLeftIcon;
-Tag.RightIcon = TagRightIcon;
-Tag.Label = TagLabel;
+export function useTagContext() {
+  const context = useContext(TagContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useTagContext must be used within a `<Tag />` component");
+  }
+
+  return context;
+}

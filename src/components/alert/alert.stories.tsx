@@ -41,6 +41,28 @@ export const Default = (args: any) => (
   </VStack>
 );
 
+export const WithTitleAndDescription = (args: any) => (
+  <VStack alignItems="flex-start" spacing="$4">
+    <Alert status="success" variant={args.variant}>
+      <AlertTitle mr="$2">Success</AlertTitle>
+      <AlertDescription>{args.children}</AlertDescription>
+    </Alert>
+    <Alert status="info" variant={args.variant}>
+      <AlertTitle mr="$2">Info</AlertTitle>
+      <AlertDescription>{args.children}</AlertDescription>
+    </Alert>
+    <Alert status="warning" variant={args.variant}>
+      <AlertTitle mr="$2">Warning</AlertTitle>
+      <AlertDescription>{args.children}</AlertDescription>
+    </Alert>
+    <Alert status="danger" variant={args.variant}>
+      <AlertTitle mr="$2">Danger</AlertTitle>
+      <AlertDescription>{args.children}</AlertDescription>
+    </Alert>
+  </VStack>
+);
+WithTitleAndDescription.storyName = "With title and description";
+
 export const WithIcon = (args: any) => (
   <VStack spacing="$4">
     <Alert status="success" variant={args.variant}>

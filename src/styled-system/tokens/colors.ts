@@ -2,6 +2,7 @@
  * Common to light and dark palette
  * -----------------------------------------------------------------------------------------------*/
 
+// Radix - BlackA
 const blackAlpha = {
   blackAlpha1: "#00000003",
   blackAlpha2: "#00000007",
@@ -17,6 +18,7 @@ const blackAlpha = {
   blackAlpha12: "#000000e8",
 };
 
+// Radix - WhiteA
 const whiteAlpha = {
   whiteAlpha1: "#ffffff00",
   whiteAlpha2: "#ffffff03",
@@ -142,9 +144,13 @@ const danger = {
 };
 
 const semanticColors = {
-  appBg: "white",
-  panelBg: "white",
+  loContrast: "white",
+  background: "$loContrast",
+  panel: "white",
   focusRing: "#96c7f2",
+  closeButtonHoverBackground: "$blackAlpha4",
+  closeButtonActiveBackground: "$blackAlpha5",
+  progressStripe: "$whiteAlpha6",
 };
 
 export const lightColors = {
@@ -258,9 +264,13 @@ const dangerDark = {
 };
 
 const semanticDarkColors = {
-  appBg: "$neutral1",
-  panelBg: "$neutral3",
+  loContrast: "$neutral1",
+  background: "$loContrast",
+  panel: "$neutral3",
   focusRing: "#0a4481",
+  closeButtonHoverBackground: "$whiteAlpha4",
+  closeButtonActiveBackground: "$whiteAlpha5",
+  progressStripe: "$blackAlpha6",
 };
 
 export const darkColors: typeof lightColors = {

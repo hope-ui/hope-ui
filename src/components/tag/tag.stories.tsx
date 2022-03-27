@@ -2,9 +2,12 @@ import { action } from "@storybook/addon-actions";
 
 import { HopeWrapper } from "@/utils/storybook";
 
-import { IconInfoCircle } from "../icons/IconInfoCircle";
+import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { HStack } from "../stack/stack";
 import { Tag } from "./tag";
+import { TagCloseButton } from "./tag-close-button";
+import { TagLeftIcon, TagRightIcon } from "./tag-icon";
+import { TagLabel } from "./tag-label";
 
 export default {
   title: "Data display/Tag",
@@ -47,12 +50,12 @@ export const Default = (args: any) => <Tag {...args} />;
 export const WithIcon = (args: any) => (
   <HStack spacing="$4">
     <Tag {...args}>
-      <Tag.LeftIcon as={IconInfoCircle} />
-      <Tag.Label>Tag</Tag.Label>
+      <TagLeftIcon as={IconInfoCircleSolid} />
+      <TagLabel>Tag</TagLabel>
     </Tag>
     <Tag {...args}>
-      <Tag.Label>Tag</Tag.Label>
-      <Tag.RightIcon as={IconInfoCircle} />
+      <TagLabel>Tag</TagLabel>
+      <TagRightIcon as={IconInfoCircleSolid} />
     </Tag>
   </HStack>
 );
@@ -60,8 +63,8 @@ WithIcon.storyName = "With icon";
 
 export const WithCloseButton = (args: any) => (
   <Tag {...args}>
-    <Tag.Label>Tag</Tag.Label>
-    <Tag.CloseButton onClick={action("clicked close button")} />
+    <TagLabel>Tag</TagLabel>
+    <TagCloseButton onClick={action("clicked close button")} />
   </Tag>
 );
 WithCloseButton.storyName = "With close button";

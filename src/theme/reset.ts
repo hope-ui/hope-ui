@@ -6,7 +6,7 @@ import { globalCss } from "../styled-system/stitches.config";
 export const resetStyles = globalCss({
   /* 
     1. Use a more-intuitive box-sizing model. 
-    2. Set default border width and style to apply border props easily  
+    2. Set default border width and style to apply border props easily. 
   */
   "*, ::before, ::after": {
     boxSizing: "border-box" /* 1 */,
@@ -35,12 +35,12 @@ export const resetStyles = globalCss({
   },
 
   /* 
-    1. Use theme `appBg` color for background-color.
+    1. Use theme `background` color for background-color.
     2. Use theme `neutral` color for text. 
     3. Improve text rendering. 
   */
   body: {
-    backgroundColor: "$appBg" /* 1 */,
+    backgroundColor: "$background" /* 1 */,
     color: "$neutral12" /* 2 */,
     fontFamily: "inherit",
     lineHeight: "inherit",
@@ -65,18 +65,30 @@ export const resetStyles = globalCss({
     maxWidth: "100%",
   },
 
-  /* Remove built-in form typography styles */
+  /* Remove built-in form typography styles. */
   "button, input, textarea, select, optgroup": {
     fontFamily: "inherit",
     fontSize: "100%",
   },
 
-  /* Buttons have a default outline */
+  /* Buttons have a default outline. */
   "button:focus": {
     outline: "5px auto -webkit-focus-ring-color",
   },
 
-  /* Anchor are unstyled */
+  /* fieldset have no margin and padding. */
+  fieldset: {
+    margin: 0,
+    padding: 0,
+  },
+
+  /* List have no margin and padding. */
+  "ol, ul": {
+    margin: 0,
+    padding: 0,
+  },
+
+  /* Anchor are unstyled. */
   a: {
     backgroundColor: "transparent",
     color: "inherit",

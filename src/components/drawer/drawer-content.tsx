@@ -1,34 +1,32 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { hope } from "../factory";
+import { useModalContext } from "../modal";
 import { createModal } from "../modal/create-modal";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useDrawerContext } from "./drawer";
 import { drawerContainerStyles, drawerDialogStyles, drawerTransitionName } from "./drawer.styles";
 
-export type DrawerPanelProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
+export type DrawerContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
-const hopeDrawerContainerClass = "hope-drawer__panel-container";
-const hopeDrawerPanelClass = "hope-drawer__panel";
+const hopeDrawerContainerClass = "hope-drawer__content-container";
+const hopeDrawerContentClass = "hope-drawer__content";
 
 /**
  * Container for the drawer dialog's content.
  */
-export function DrawerPanel<C extends ElementType = "section">(props: DrawerPanelProps<C>) {
+export function DrawerContent<C extends ElementType = "section">(props: DrawerContentProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
 
   const drawerContext = useDrawerContext();
+  const modalContext = useModalContext();
 
-  const defaultProps: DrawerPanelProps<"section"> = {
-    as: "section",
-  };
-
-  const propsWithDefault: DrawerPanelProps<"section"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, [
+  const [local, others] = splitProps(props as DrawerContentProps<"section">, [
     "ref",
     "class",
     "role",
@@ -37,15 +35,7 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
     "onClick",
   ]);
 
-  const {
-    modalContext,
-    assignContainerRef,
-    ariaLabelledBy,
-    ariaDescribedBy,
-    onDialogClick,
-    enableFocusTrapAndScrollLock,
-    disableFocusTrapAndScrollLock,
-  } = createModal(local);
+  const { assignContainerRef, ariaLabelledBy, ariaDescribedBy, onDialogClick } = createModal(local);
 
   const containerClasses = () => {
     return classNames(
@@ -63,11 +53,11 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
       fullHeight: drawerContext.fullHeight,
     });
 
-    return classNames(local.class, hopeDrawerPanelClass, dialogClass);
+    return classNames(local.class, hopeDrawerContentClass, dialogClass);
   };
 
   const transitionName = () => {
-    if (drawerContext.disableTransition) {
+    if (drawerContext.disableMotion) {
       return "hope-none";
     }
 
@@ -84,13 +74,7 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
   };
 
   return (
-    <Transition
-      name={transitionName()}
-      appear
-      onAfterEnter={enableFocusTrapAndScrollLock}
-      onBeforeExit={disableFocusTrapAndScrollLock}
-      onAfterExit={modalContext.onModalPanelExitTransitionEnd}
-    >
+    <Transition name={transitionName()} appear onAfterExit={modalContext.unmountPortal}>
       <Show when={modalContext.state.opened}>
         <Box
           ref={assignContainerRef}
@@ -100,9 +84,9 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
           onKeyDown={modalContext.onKeyDown}
           onClick={modalContext.onOverlayClick}
         >
-          <Box
+          <hope.section
             class={dialogClasses()}
-            __baseStyle={theme?.baseStyle?.panel}
+            __baseStyle={theme?.baseStyle?.content}
             id={modalContext.state.dialogId}
             role={local.role ?? "dialog"}
             tabIndex={-1}
@@ -118,4 +102,4 @@ export function DrawerPanel<C extends ElementType = "section">(props: DrawerPane
   );
 }
 
-DrawerPanel.toString = () => createClassSelector(hopeDrawerPanelClass);
+DrawerContent.toString = () => createClassSelector(hopeDrawerContentClass);

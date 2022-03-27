@@ -1,10 +1,11 @@
-import { JSX, mergeProps, Show, splitProps } from "solid-js";
+import { JSX, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Button, ButtonOptions } from "../button/button";
 import { hopeIconButtonClass } from "../button/button.styles";
+import { useButtonGroupContext } from "../button/button-group";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 
 export interface IconButtonOptions
@@ -12,7 +13,14 @@ export interface IconButtonOptions
     ButtonOptions,
     "loadingText" | "loaderPlacement" | "leftIcon" | "rightIcon" | "iconSpacing" | "fullWidth"
   > {
+  /**
+   * A11y: A label that describes the button
+   */
   "aria-label": string;
+
+  /**
+   * The icon to be used in the button.
+   */
   icon: JSX.Element;
 }
 
@@ -29,19 +37,40 @@ export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C,
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
   const theme = useComponentStyleConfigs().IconButton;
 
-  const defaultProps: Partial<IconButtonProps<"button">> = {
-    variant: theme?.defaultProps?.variant ?? "solid",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
+  const buttonGroupContext = useButtonGroupContext();
+
+  const [local, others] = splitProps(props, [
+    "class",
+    "children",
+    "icon",
+    "variant",
+    "colorScheme",
+    "size",
+    "disabled",
+  ]);
+
+  const variant = () => local.variant ?? buttonGroupContext?.state.variant ?? theme?.defaultProps?.variant ?? "solid";
+
+  const colorScheme = () => {
+    return local.colorScheme ?? buttonGroupContext?.state.colorScheme ?? theme?.defaultProps?.colorScheme ?? "primary";
   };
 
-  const propsWithDefault: IconButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children", "icon"]);
+  const size = () => local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.size ?? "md";
+
+  const disabled = () => local.disabled ?? buttonGroupContext?.state.disabled;
 
   const classes = () => classNames(local.class, hopeIconButtonClass);
 
   return (
-    <Button class={classes()} __baseStyle={theme?.baseStyle} {...others}>
+    <Button
+      class={classes()}
+      __baseStyle={theme?.baseStyle}
+      variant={variant()}
+      colorScheme={colorScheme()}
+      size={size()}
+      disabled={disabled()}
+      {...others}
+    >
       <Show when={local.icon} fallback={local.children}>
         {local.icon}
       </Show>

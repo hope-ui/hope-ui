@@ -64,11 +64,10 @@ export const selectTriggerStyles = css(baseInputResetStyles, {
 export type SelectTriggerVariants = VariantProps<typeof selectTriggerStyles>;
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger value
+ * Select - trigger - single value
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectValueStyles = css({
-  display: "block",
+export const selectSingleValueStyles = css({
   flexGrow: 1,
   flexShrink: 1,
 
@@ -79,30 +78,157 @@ export const selectValueStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger placeholder
+ * Select - trigger - multi value
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectPlaceholderStyles = css(selectValueStyles, {
+export const selectMultiValueStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  flexWrap: "wrap",
+  flexGrow: 1,
+  flexShrink: 1,
+
+  variants: {
+    size: {
+      xs: {
+        gap: "$0_5",
+        py: "$0_5",
+      },
+      sm: {
+        gap: "$1",
+        py: "$1",
+      },
+      md: {
+        gap: "$1_5",
+        py: "$1_5",
+      },
+      lg: {
+        gap: "$2",
+        py: "$2",
+      },
+    },
+  },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - trigger - tag
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectTagStyles = css({
+  display: "inline-flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "$0_5",
+
+  borderRadius: "$sm",
+
+  py: 0,
+  pl: "$2",
+
+  lineHeight: "$none",
+
+  variants: {
+    variant: {
+      subtle: {
+        backgroundColor: "$neutral4",
+        color: "$neutral12",
+      },
+      outline: {
+        border: "1px solid $colors$neutral7",
+        backgroundColor: "$loContrast",
+        color: "$neutral12",
+      },
+    },
+    size: {
+      xs: {
+        height: "$4",
+        fontSize: "$2xs",
+      },
+      sm: {
+        height: "$5",
+        fontSize: "$xs",
+      },
+      md: {
+        height: "$6",
+        fontSize: "$sm",
+      },
+      lg: {
+        height: "$7",
+        fontSize: "$base",
+      },
+    },
+  },
+});
+
+export type SelectTagVariants = VariantProps<typeof selectTagStyles>;
+
+export const selectTagCloseButtonStyles = css({
+  appearance: "none",
+
+  display: "inline-flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  height: "100%",
+
+  outline: "none",
+  borderRightRadius: "$sm",
+
+  backgroundColor: "transparent",
+
+  px: "$1",
+
+  color: "inherit",
+  lineHeight: "$none",
+  textDecoration: "none",
+
+  cursor: "pointer",
+  userSelect: "none",
+  transition: "color 250ms, background-color 250ms, box-shadow 250ms",
+
+  "&:hover": {
+    backgroundColor: "$neutral7",
+  },
+
+  "&:focus": {
+    outline: "none",
+    boxShadow: "$outline",
+  },
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - trigger - placeholder
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectPlaceholderStyles = css(selectSingleValueStyles, {
   color: "$neutral9",
   opacity: 1,
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - trigger icon
+ * Select - trigger - dropdown icon
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectIconStyles = css({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexGrow: 0,
   flexShrink: 0,
+
+  marginInlineStart: "auto",
+
+  color: "$neutral10",
   fontSize: "1.2em",
   pointerEvents: "none",
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Select - panel
+ * Select - content (the floating panel)
  * -----------------------------------------------------------------------------------------------*/
 
-export const selectPanelStyles = css({
+export const selectContentStyles = css({
   zIndex: "$dropdown",
   position: "absolute",
   left: 0,
@@ -115,10 +241,10 @@ export const selectPanelStyles = css({
 
   margin: 0,
 
-  boxShadow: "$lg",
+  boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$panelBg",
+  backgroundColor: "$panel",
 
   padding: 0,
 });
@@ -136,7 +262,7 @@ export const selectListboxStyles = css({
   overflowY: "auto",
 
   margin: 0,
-  padding: 0,
+  padding: "$1", //0,
 
   listStyle: "none",
 });
@@ -152,15 +278,15 @@ export const selectOptGroupStyles = css({});
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectLabelStyles = css({
-  mt: "$5",
-  mb: "$1",
-  paddingInlineStart: "$4",
-  paddingInlineEnd: "$10",
+  display: "flex",
+  alignItems: "center",
+
+  py: "$2",
+  px: "$3",
 
   color: "$neutral11",
-  fontSize: "$sm",
-  fontWeight: "$medium",
-  lineHeight: "$5",
+  fontSize: "$xs",
+  lineHeight: "$4",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -169,6 +295,11 @@ export const selectLabelStyles = css({
 
 export const selectOptionStyles = css({
   position: "relative",
+
+  display: "flex",
+  alignItems: "center",
+
+  borderRadius: "$sm",
 
   color: "$neutral12",
   fontSize: "$base",
@@ -184,12 +315,7 @@ export const selectOptionStyles = css({
   },
 
   [`&[data-active]`]: {
-    backgroundColor: "$primary3",
-    color: "$primary11",
-  },
-
-  "&[aria-selected=true]": {
-    fontWeight: "$medium",
+    backgroundColor: "$neutral4",
   },
 });
 
@@ -202,8 +328,8 @@ export const selectOptionTextStyles = css({
   alignItems: "center",
 
   py: "$2",
-  paddingInlineStart: "$4",
-  paddingInlineEnd: "$10",
+  paddingInlineStart: "$3",
+  paddingInlineEnd: "$6",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -219,7 +345,8 @@ export const selectOptionIndicatorStyles = css({
   display: "flex",
   alignItems: "center",
 
-  paddingInlineEnd: "$4",
+  paddingInlineEnd: "$3",
 
-  color: "$primary11",
+  color: "$primary10",
+  pointerEvents: "none",
 });

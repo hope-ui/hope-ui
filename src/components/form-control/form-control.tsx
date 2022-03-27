@@ -36,7 +36,7 @@ export interface FormControlOptions {
 
   /**
    * If `true`, the form control will be invalid. This has 2 side effects:
-   * - The `FormLabel` and `FormErrorIcon` will have `data-invalid` set to `true`
+   * - The `FormLabel` and `FormErrorMessage` will have `data-invalid` set to `true`
    * - The form element (e.g, Input) will have `aria-invalid` set to `true`
    */
   invalid?: boolean;
@@ -79,10 +79,35 @@ export interface FormControlState extends FormControlOptions {
    * Track whether the form element (e.g, `input`) has focus.
    */
   isFocused: boolean;
+
+  /**
+   * data attribute used in others `FormControl` related components
+   * to reflect that the form element (e.g, Input) is currently focused.
+   */
+  "data-focus"?: string;
+
+  /**
+   * data attribute used in others `FormControl` related components
+   * to reflect that the form element (e.g, Input) is currently disabled.
+   */
+  "data-disabled"?: string;
+
+  /**
+   * data attribute used in others `FormControl` related components
+   * to reflect that the form element (e.g, Input) is currently invalid.
+   */
+  "data-invalid"?: string;
+
+  /**
+   * data attribute used in others `FormControl` related components
+   * to reflect that the form element (e.g, Input) is currently readonly.
+   */
+  "data-readonly"?: string;
 }
 
 export interface FormControlContextValue {
   state: FormControlState;
+
   /**
    * Action to change form control state `hasHelperText`.
    */
@@ -123,9 +148,9 @@ export interface FormControlStyleConfig {
 const hopeFormControlClass = "hope-form-control";
 
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
-  const theme = useComponentStyleConfigs().FormControl;
-
   const defaultId = `hope-field-${createUniqueId()}`;
+
+  const theme = useComponentStyleConfigs().FormControl;
 
   const [state, setState] = createStore<FormControlState>({
     get id() {
@@ -151,6 +176,18 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
     },
     get readOnly() {
       return props.readOnly;
+    },
+    get ["data-focus"]() {
+      return this.isFocused ? "" : undefined;
+    },
+    get ["data-disabled"]() {
+      return this.disabled ? "" : undefined;
+    },
+    get ["data-invalid"]() {
+      return this.invalid ? "" : undefined;
+    },
+    get ["data-readonly"]() {
+      return this.readOnly ? "" : undefined;
     },
     hasHelperText: false,
     hasErrorMessage: false,

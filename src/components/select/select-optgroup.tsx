@@ -1,11 +1,11 @@
 import { createContext, createSignal, splitProps, useContext } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptGroupStyles } from "./select.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export interface SelectOptGroupContextValue {
   setAriaLabelledBy: (id: string) => void;
@@ -23,9 +23,9 @@ const hopeSelectOptGroupClass = "hope-select__optgroup";
 export function SelectOptGroup<C extends ElementType = "div">(props: SelectOptGroupProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
-  const [local, others] = splitProps(props, ["class"]);
+  const [ariaLabelledBy, setAriaLabelledBy] = createSignal<string>();
 
-  const [ariaLabelledBy, setAriaLabelledBy] = createSignal<string | undefined>(undefined);
+  const [local, others] = splitProps(props, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectOptGroupClass, selectOptGroupStyles());
 
@@ -41,7 +41,9 @@ export function SelectOptGroup<C extends ElementType = "div">(props: SelectOptGr
         class={classes()}
         __baseStyle={theme?.baseStyle?.optgroup}
         {...others}
-      />
+      >
+        {local.children}
+      </Box>
     </SelectOptGroupContext.Provider>
   );
 }

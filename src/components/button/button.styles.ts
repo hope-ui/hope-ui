@@ -222,7 +222,7 @@ export const buttonStyles = css({
 
   "&:focus": {
     outline: "none",
-    boxShadow: "0 0 0 3px $colors$focusRing",
+    boxShadow: "$outline",
   },
 
   "&:disabled": {
@@ -232,26 +232,6 @@ export const buttonStyles = css({
 
   variants: {
     variant: {
-      default: {
-        border: "1px solid $neutral7",
-        backgroundColor: "$panelBg",
-        color: "$neutral12",
-
-        "&:not(:disabled):hover": {
-          borderColor: "$neutral8",
-          backgroundColor: "$neutral4",
-        },
-
-        "&:not(:disabled):active": {
-          borderColor: "$neutral8",
-          backgroundColor: "$neutral5",
-        },
-
-        "&:disabled": {
-          borderColor: "$neutral3",
-          backgroundColor: "$neutral3",
-        },
-      },
       solid: {
         border: "1px solid transparent",
 
@@ -705,3 +685,15 @@ export const buttonStyles = css({
 });
 
 export type ButtonVariants = VariantProps<typeof buttonStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * ButtonGroup
+ * -----------------------------------------------------------------------------------------------*/
+
+export const buttonGroupStyles = css({
+  display: "inline-flex",
+
+  [`& .${buttonStyles}:focus`]: {
+    zIndex: 1,
+  },
+});

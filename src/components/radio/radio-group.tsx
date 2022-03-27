@@ -10,7 +10,7 @@ import { ThemeableRadioOptions } from "./radio";
 
 interface RadioGroupOptions extends ThemeableRadioOptions {
   /**
-   * The `name` attribute forwarded to each `radio` element
+   * The `name` attribute forwarded to each `radio` element.
    */
   name?: string;
 
@@ -28,71 +28,74 @@ interface RadioGroupOptions extends ThemeableRadioOptions {
 
   /**
    * If `true`, all wrapped radio inputs will be marked as required,
-   * and `required` attribute will be added
+   * and `required` attribute will be added.
    */
   required?: boolean;
 
   /**
-   * If `true`, all wrapped radio inputs will be disabled
+   * If `true`, all wrapped radio inputs will be disabled.
    */
   disabled?: boolean;
 
   /**
-   * If `true`, all wrapped radio inputs will be readonly
-   */
-  readOnly?: boolean;
-
-  /**
-   * If `true`, all wrapped radio inputs will have `aria-invalid` set to `true`
+   * If `true`, all wrapped radio inputs will have `aria-invalid` set to `true`.
    */
   invalid?: boolean;
 
   /**
-   * Function called once a radio is checked
-   * @param event the original event emitted by the `Radio` checked state changes
-   * @param value the value of the checked radio
+   * If `true`, all wrapped radio inputs will be readonly.
    */
-  onChange?: (event: Event, value: string | number) => void;
-}
-
-type RadioGroupState = Omit<RadioGroupOptions, "name" | "onChange"> & {
-  valueState?: string | number;
-  isControlled: boolean;
-  name: string;
-};
-
-interface RadioGroupContextValue {
-  state: RadioGroupState;
+  readOnly?: boolean;
 
   /**
-   * The callback invoked when the checked state of the `Radio` in `RadioGroup` changes.
+   * Callback invoked once a radio is checked.
+   * @param value the value of the checked radio
    */
-  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+  onChange?: (value: string) => void;
 }
-
-const RadioGroupContext = createContext<RadioGroupContextValue>();
 
 export type RadioGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, RadioGroupOptions>;
 
+interface RadioGroupState extends Omit<RadioGroupOptions, "name" | "onChange"> {
+  /**
+   * The `name` attribute forwarded to each `radio` element.
+   */
+  name: string;
+
+  /**
+   * The value of the radio to be `checked`.
+   * (in uncontrolled mode)
+   */
+  _value?: string | number;
+
+  /**
+   * If `true`, the radio group is in controlled mode.
+   * (have value and onChange props)
+   */
+  isControlled: boolean;
+}
+
 const hopeRadioGroupClass = "hope-radio-group";
 
+/**
+ * RadioGroup provides context for all its radio childrens.
+ */
 export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps<C>) {
+  const defaultRadioName = `hope-radio-group-${createUniqueId()}--radio`;
+
   const theme = useComponentStyleConfigs().Radio;
 
-  const defaultName = `hope-radio-group-${createUniqueId()}`;
-
   const [state, setState] = createStore<RadioGroupState>({
-    // Internal state for uncontrolled radio-group.
     // eslint-disable-next-line solid/reactivity
-    valueState: props.defaultValue,
+    _value: props.defaultValue,
     get isControlled() {
       return props.value !== undefined;
     },
     get value() {
-      return this.isControlled ? props.value : this.valueState;
+      return this.isControlled ? props.value : this._value;
     },
     get name() {
-      return props.name ?? defaultName;
+      return props.name ?? defaultRadioName;
     },
     get required() {
       return props.required;
@@ -100,11 +103,11 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get disabled() {
       return props.disabled;
     },
-    get readOnly() {
-      return props.readOnly;
-    },
     get invalid() {
       return props.invalid;
+    },
+    get readOnly() {
+      return props.readOnly;
     },
     get variant() {
       return props.variant ?? theme?.defaultProps?.group?.variant;
@@ -115,34 +118,24 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
     },
-    get labelPlacement() {
-      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
-    },
   });
 
-  const [local, others] = splitProps(props, [
-    "class",
-    "value",
-    "defaultValue",
-    "name",
-    "required",
-    "disabled",
-    "readOnly",
-    "invalid",
-    "onChange",
-  ]);
-
-  const classes = () => classNames(local.class, hopeRadioGroupClass);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [local, _, others] = splitProps(
+    props,
+    ["class", "onChange"],
+    ["value", "defaultValue", "name", "required", "disabled", "readOnly", "invalid"]
+  );
 
   const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     const value = (event.target as HTMLInputElement).value;
 
-    if (!state.isControlled) {
-      setState("valueState", value);
-    }
+    setState("_value", value);
 
-    local.onChange?.(event, value);
+    local.onChange?.(String(value));
   };
+
+  const classes = () => classNames(local.class, hopeRadioGroupClass);
 
   const context: RadioGroupContextValue = {
     state,
@@ -157,6 +150,21 @@ export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps
 }
 
 RadioGroup.toString = () => createClassSelector(hopeRadioGroupClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+interface RadioGroupContextValue {
+  state: RadioGroupState;
+
+  /**
+   * The callback invoked when the checked state of a `Radio` in `RadioGroup` changes.
+   */
+  onChange: JSX.EventHandlerUnion<HTMLInputElement, Event>;
+}
+
+const RadioGroupContext = createContext<RadioGroupContextValue>();
 
 export function useRadioGroupContext() {
   return useContext(RadioGroupContext);

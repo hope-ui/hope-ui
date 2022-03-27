@@ -5,16 +5,10 @@ import { Portal } from "solid-js/web";
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 
-import { CloseButtonProps } from "../close-button/close-button";
+import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
-import { ModalBody } from "./modal-body";
-import { ModalCloseButton } from "./modal-close-button";
-import { ModalFooter } from "./modal-footer";
-import { ModalHeader } from "./modal-header";
-import { ModalOverlay } from "./modal-overlay";
-import { ModalPanel } from "./modal-panel";
 
-type ModalTransition = "fade-in-bottom" | "scale" | "none";
+type ModalMotionPreset = "fade-in-bottom" | "scale" | "none";
 
 export interface ModalProps extends ModalContainerVariants, ModalDialogVariants {
   /**
@@ -75,7 +69,7 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   /**
    * Modal opening/closing transition.
    */
-  transition?: ModalTransition;
+  motionPreset?: ModalMotionPreset;
 
   /**
    * Children of the Modal
@@ -97,7 +91,7 @@ type ModalState = Required<
   Pick<
     ModalProps,
     | "opened"
-    | "transition"
+    | "motionPreset"
     | "size"
     | "centered"
     | "scrollBehavior"
@@ -159,9 +153,9 @@ export interface ModalContextValue {
   onKeyDown: (event: KeyboardEvent) => void;
 
   /**
-   * Callback invoked to notify that modal's content exit transition is done.
+   * Callback function to unmount the modal's portal.
    */
-  onModalPanelExitTransitionEnd: () => void;
+  unmountPortal: () => void;
 
   /**
    * Callback function to set if the modal header is mounted
@@ -174,29 +168,31 @@ export interface ModalContextValue {
   setBodyMounted: (value: boolean) => void;
 }
 
+type ThemeableModalOptions = Pick<
+  ModalProps,
+  | "scrollBehavior"
+  | "centered"
+  | "motionPreset"
+  | "size"
+  | "blockScrollOnMount"
+  | "closeOnEsc"
+  | "closeOnOverlayClick"
+  | "preserveScrollBarGap"
+  | "trapFocus"
+>;
+
 export interface ModalStyleConfig {
   baseStyle?: {
     overlay?: SystemStyleObject;
-    panel?: SystemStyleObject;
+    content?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;
     footer?: SystemStyleObject;
   };
   defaultProps?: {
-    root?: Pick<
-      ModalProps,
-      | "scrollBehavior"
-      | "centered"
-      | "transition"
-      | "size"
-      | "blockScrollOnMount"
-      | "closeOnEsc"
-      | "closeOnOverlayClick"
-      | "preserveScrollBarGap"
-      | "trapFocus"
-    >;
-    closeButton?: Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">;
+    root?: ThemeableModalOptions;
+    closeButton?: ThemeableCloseButtonOptions;
   };
 }
 
@@ -229,8 +225,8 @@ export function Modal(props: ModalProps) {
     get initialFocus() {
       return props.initialFocus;
     },
-    get transition() {
-      return props.transition ?? theme?.defaultProps?.root?.transition ?? "fade-in-bottom";
+    get motionPreset() {
+      return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "scale";
     },
     get size() {
       return props.size ?? theme?.defaultProps?.root?.size ?? "md";
@@ -272,12 +268,12 @@ export function Modal(props: ModalProps) {
       setIsPortalMounted(true);
     } else {
       // unmount portal instantly when there is no modal transition.
-      state.transition === "none" && setIsPortalMounted(false);
+      state.motionPreset === "none" && setIsPortalMounted(false);
     }
   });
 
   // For smooth transition, unmount portal only after modal's content exit transition is done.
-  const onModalPanelExitTransitionEnd = () => setIsPortalMounted(false);
+  const unmountPortal = () => setIsPortalMounted(false);
 
   const onClose = () => props.onClose();
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
@@ -322,7 +318,7 @@ export function Modal(props: ModalProps) {
 
   const context: ModalContextValue = {
     state,
-    onModalPanelExitTransitionEnd,
+    unmountPortal,
     onClose,
     onMouseDown,
     onKeyDown,
@@ -352,10 +348,3 @@ export function useModalContext() {
 
   return context;
 }
-
-Modal.Overlay = ModalOverlay;
-Modal.Panel = ModalPanel;
-Modal.CloseButton = ModalCloseButton;
-Modal.Header = ModalHeader;
-Modal.Body = ModalBody;
-Modal.Footer = ModalFooter;

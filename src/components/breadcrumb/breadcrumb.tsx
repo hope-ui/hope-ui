@@ -1,16 +1,38 @@
-import { children, For, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { createContext, JSX, splitProps, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
+import { GridLayoutProps } from "@/styled-system/props/grid";
+import { ResponsiveValue, SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { isArray } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";
-import { BreadcrumbItem } from "./breadcrumb-item";
-import { BreadcrumbSeparator, BreadcrumbSeparatorOptions } from "./breadcrumb-separator";
-import { BreadcrumbLink } from "./breadcrumb-link";
+
+interface BreadcrumbState {
+  /**
+   * The space between each item, link and separator.
+   */
+  spacing: ResponsiveValue<GridLayoutProps["gap"]>;
+
+  /**
+   * The visual separator between each breadcrumb item.
+   */
+  separator: string | JSX.Element;
+}
+
+interface BreadcrumbContextValue {
+  state: BreadcrumbState;
+}
+
+const BreadcrumbContext = createContext<BreadcrumbContextValue>();
+
+type BreadcrumbOptions = Partial<BreadcrumbState>;
+
+type ThemeableBreadcrumbOptions = BreadcrumbOptions;
+
+export type BreadcrumbProps<C extends ElementType = "nav"> = HTMLHopeProps<C, BreadcrumbOptions>;
 
 export interface BreadcrumbStyleConfig {
   baseStyle?: {
@@ -20,18 +42,9 @@ export interface BreadcrumbStyleConfig {
     separator?: SystemStyleObject;
   };
   defaultProps?: {
-    root?: Pick<BreadcrumbOptions, "separator" | "spacing">;
+    root?: ThemeableBreadcrumbOptions;
   };
 }
-
-export interface BreadcrumbOptions extends BreadcrumbSeparatorOptions {
-  /**
-   * The visual separator between each breadcrumb item
-   */
-  separator?: string | JSX.Element;
-}
-
-export type BreadcrumbProps<C extends ElementType = "nav"> = HTMLHopeProps<C, BreadcrumbOptions>;
 
 const hopeBreadcrumbClass = "hope-breadcrumb";
 const hopeBreadcrumbListClass = "hope-breadcrumb__list";
@@ -43,48 +56,44 @@ const hopeBreadcrumbListClass = "hope-breadcrumb__list";
 export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps<C>) {
   const theme = useComponentStyleConfigs().Breadcrumb;
 
-  const defaultProps: BreadcrumbProps<"nav"> = {
-    as: "nav",
-    separator: theme?.defaultProps?.root?.separator ?? "/",
-    spacing: theme?.defaultProps?.root?.spacing ?? "0.5rem",
-  };
+  const [state] = createStore<BreadcrumbState>({
+    get spacing() {
+      return props.spacing ?? theme?.defaultProps?.root?.spacing ?? "0.5rem";
+    },
+    get separator() {
+      return props.separator ?? theme?.defaultProps?.root?.separator ?? "/";
+    },
+  });
 
-  const propsWithDefault: BreadcrumbProps<"nav"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children", "separator", "spacing"]);
+  const [local, others] = splitProps(props, ["class", "children", "separator", "spacing"]);
 
   const rootClasses = () => classNames(local.class, hopeBreadcrumbClass, breadcrumbStyles());
 
   const listClasses = () => classNames(hopeBreadcrumbListClass, breadcrumbListStyles());
 
-  const links = () => {
-    const items = children(() => local.children)();
-    return isArray(items) ? items : [items];
-  };
-
-  const isLastLink = (index: number) => {
-    return index + 1 === links().length;
+  const context: BreadcrumbContextValue = {
+    state: state as BreadcrumbState,
   };
 
   return (
-    <Box as="nav" aria-label="breadcrumb" class={rootClasses()} __baseStyle={theme?.baseStyle?.root} {...others}>
-      <Box as="ol" class={listClasses()}>
-        <For each={links()}>
-          {(link, index) => (
-            <BreadcrumbItem>
-              {link}
-              <Show when={!isLastLink(index())}>
-                <BreadcrumbSeparator spacing={local.spacing}>{local.separator}</BreadcrumbSeparator>
-              </Show>
-            </BreadcrumbItem>
-          )}
-        </For>
-      </Box>
-    </Box>
+    <BreadcrumbContext.Provider value={context}>
+      <hope.nav aria-label="breadcrumb" class={rootClasses()} __baseStyle={theme?.baseStyle?.root} {...others}>
+        <hope.ol class={listClasses()} gap={(state as BreadcrumbState).spacing}>
+          {local.children}
+        </hope.ol>
+      </hope.nav>
+    </BreadcrumbContext.Provider>
   );
 }
 
 Breadcrumb.toString = () => createClassSelector(hopeBreadcrumbClass);
 
-Breadcrumb.Link = BreadcrumbLink;
-//Breadcrumb.Item = BreadcrumbItem;
-//Breadcrumb.Separator = BreadcrumbSeparator;
+export function useBreadcrumbContext() {
+  const context = useContext(BreadcrumbContext);
+
+  if (!context) {
+    throw new Error("[Hope UI]: useBreadcrumbContext must be used within a `<Breadcrumb />` component");
+  }
+
+  return context;
+}

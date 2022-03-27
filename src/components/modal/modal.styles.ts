@@ -82,7 +82,7 @@ export const modalOverlayStyles = css({
   width: "100vw",
   height: "100vh",
 
-  backgroundColor: "$blackAlpha11",
+  backgroundColor: "hsl(0 0% 0% / 65%)", //"$blackAlpha11",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -101,6 +101,12 @@ export const baseModalContainerStyles = css({
   height: "100vh",
   "@supports(height: -webkit-fill-available)": {
     height: "-webkit-fill-available",
+  },
+
+  outline: "none",
+
+  "&:focus": {
+    outline: "none",
   },
 });
 
@@ -142,13 +148,15 @@ export const baseDialogStyles = css({
 
   width: "100%",
 
-  outline: 0,
-
+  outline: "none",
   boxShadow: "$lg",
-
-  backgroundColor: "$panelBg",
+  backgroundColor: "$loContrast",
 
   color: "inherit",
+
+  "&:focus": {
+    outline: "none",
+  },
 });
 
 export const modalDialogStyles = css(baseDialogStyles, {
@@ -223,8 +231,9 @@ export type ModalDialogVariants = VariantProps<typeof modalDialogStyles>;
 
 export const modalHeaderStyles = css({
   flex: 0,
-  px: "$5",
   pt: "$5",
+  px: "$5",
+  pb: "$3",
   fontSize: "$lg",
   fontWeight: "$medium",
 });
@@ -235,7 +244,8 @@ export const modalHeaderStyles = css({
 
 export const modalBodyStyles = css({
   flex: 1,
-  padding: "$5",
+  px: "$5",
+  py: "$2",
 
   variants: {
     scrollBehavior: {
@@ -257,6 +267,7 @@ export const modalFooterStyles = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
+  pt: "$3",
   px: "$5",
   pb: "$5",
 });

@@ -1,15 +1,17 @@
 import { isObject } from "@/utils/assertion";
 
-export interface SelectOptionData<T = any> {
+export interface SelectOptionData {
   /**
    * The value to use when the option is selected.
    */
-  value: T;
+  value: any;
 
   /**
-   * The label to use in the typeahead behavior.
+   * Optional text used for typeahead purposes.
+   * By default the typeahead behavior will use the `.textContent` of the `Select.Option`.
+   * Use this when the content is complex, or you have non-textual content inside.
    */
-  label: string;
+  textValue: string;
 
   /**
    * If `true`, the option will be disabled.
@@ -68,8 +70,8 @@ function filterOptions(options: SelectOptionData[] = [], filter: string, exclude
       return false;
     }
 
-    const matches = option.label.toLowerCase().indexOf(filter.toLowerCase()) === 0;
-    return matches && exclude.indexOf(option.label) < 0;
+    const matches = option.textValue.toLowerCase().indexOf(filter.toLowerCase()) === 0;
+    return matches && exclude.indexOf(option.textValue) < 0;
   });
 }
 
@@ -200,9 +202,9 @@ export function getUpdatedIndex(params: GetUpdatedIndexParams) {
 }
 
 /**
- * Check if two options value are equal.
+ * Check if two options values are equal.
  */
-export function isOptionEqual(a: any, b: any, compareKey: string): boolean {
+export function isValueEqual(a: any, b: any, compareKey: string): boolean {
   if (!isObject(a)) {
     return a === b;
   }
@@ -211,10 +213,10 @@ export function isOptionEqual(a: any, b: any, compareKey: string): boolean {
 }
 
 /**
- * Get the label of an option's value.
+ * Check if two options are equal.
  */
-export function getOptionLabel(optionValue: any, labelKey: string): string {
-  return isObject(optionValue) ? optionValue[labelKey] : optionValue.toString();
+export function isOptionEqual(a: SelectOptionData, b: SelectOptionData, compareKey: string): boolean {
+  return isValueEqual(a.value, b.value, compareKey);
 }
 
 /**

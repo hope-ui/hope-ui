@@ -2,24 +2,37 @@ import { VariantProps } from "@stitches/core";
 
 import { css } from "@/styled-system/stitches.config";
 import { SystemStyleObject } from "@/styled-system/types";
-import { visuallyHiddenStyles } from "@/theme/utils";
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - input
+ * Toggle - base style for checkbox, radio and switch
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxInputStyles = css(visuallyHiddenStyles);
+interface ColorVariantConfig {
+  color: string;
+  boxShadowColorFocus: string;
+  borderColorFocus: string;
+}
 
-/* -------------------------------------------------------------------------------------------------
- * Checkbox - container
- * -----------------------------------------------------------------------------------------------*/
+function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
+  return {
+    color: config.color,
 
-export const checkboxContainerStyles = css({
+    "&[data-disabled]": {
+      color: "$neutral10",
+    },
+
+    "&[data-focus]": {
+      boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
+      borderColor: config.borderColorFocus,
+    },
+  };
+}
+
+export const toggleContainerStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
-
-  borderColor: "$neutral8",
+  gap: "$2",
 
   cursor: "pointer",
   userSelect: "none",
@@ -44,45 +57,20 @@ export const checkboxContainerStyles = css({
         lineHeight: "$7",
       },
     },
-    labelPlacement: {
-      start: {
-        flexDirection: "row-reverse",
-      },
-      end: {
-        flexDirection: "row",
-      },
-    },
   },
 });
 
-export type CheckboxContainerVariants = VariantProps<typeof checkboxContainerStyles>;
+export const toggleControlLabelStyles = css({
+  cursor: "pointer",
+  userSelect: "none",
 
-/* -------------------------------------------------------------------------------------------------
- * Checkbox - control
- * -----------------------------------------------------------------------------------------------*/
+  "&[data-disabled]": {
+    opacity: "0.5",
+    cursor: "not-allowed",
+  },
+});
 
-interface ColorVariantConfig {
-  color: string;
-  boxShadowColorFocus: string;
-  borderColorFocus: string;
-}
-
-function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
-  return {
-    color: config.color,
-
-    "&[data-disabled]": {
-      color: "$neutral10",
-    },
-
-    [`.${checkboxInputStyles}:focus + &`]: {
-      boxShadow: `0 0 0 3px $colors${config.boxShadowColorFocus}`,
-      borderColor: config.borderColorFocus,
-    },
-  };
-}
-
-export const checkboxControlStyles = css({
+export const toggleControlStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -93,17 +81,12 @@ export const checkboxControlStyles = css({
 
   outline: "none",
 
-  borderRadius: "$sm",
-
   padding: 0,
 
   verticalAlign: "middle",
+  cursor: "pointer",
   userSelect: "none",
   transition: "border-color 250ms, box-shadow 250ms",
-
-  "& svg": {
-    color: "$panelBg",
-  },
 
   "&[data-disabled]": {
     opacity: "0.5",
@@ -115,15 +98,12 @@ export const checkboxControlStyles = css({
     color: "$danger9",
   },
 
-  [`.${checkboxInputStyles}:focus + &[data-invalid]`]: {
+  "&[data-focus][data-invalid]": {
     boxShadow: "0 0 0 3px $colors$danger5",
     borderColor: "$danger8",
   },
 
-  [`&[data-checked],
-    .${checkboxInputStyles}:focus + &[data-checked],
-    &[data-indeterminate],
-    .${checkboxInputStyles}:focus + &[data-indeterminate]`]: {
+  "&[data-checked], &[data-focus][data-checked]": {
     borderColor: "transparent",
     backgroundColor: "currentColor",
   },
@@ -131,8 +111,7 @@ export const checkboxControlStyles = css({
   variants: {
     variant: {
       outline: {
-        border: "1px solid",
-        borderColor: "inherit", // allow passing borderColor style props to parent container
+        border: "1px solid $colors$neutral8",
         backgroundColor: "transparent",
       },
       filled: {
@@ -186,42 +165,33 @@ export const checkboxControlStyles = css({
   },
 });
 
-export type CheckboxControlVariants = VariantProps<typeof checkboxControlStyles>;
-
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - span containing the text label
+ * Checkbox - container
  * -----------------------------------------------------------------------------------------------*/
 
-function createSizeAndLabelPositionCompoundVariants() {
-  return Object.entries({
-    sm: "$1_5",
-    md: "$2",
-    lg: "$2",
-  }).flatMap(([key, value]) => [
-    {
-      labelPlacement: "start",
-      size: key,
-      css: { marginInlineEnd: value },
-    },
-    {
-      labelPlacement: "end",
-      size: key,
-      css: { marginInlineStart: value },
-    },
-  ]);
-}
+export const checkboxContainerStyles = css(toggleContainerStyles);
 
-export const checkboxLabelStyles = css({
-  variants: {
-    size: {
-      sm: {},
-      md: {},
-      lg: {},
-    },
-    labelPlacement: {
-      start: {},
-      end: {},
-    },
+/* -------------------------------------------------------------------------------------------------
+ * Checkbox - label
+ * -----------------------------------------------------------------------------------------------*/
+
+export const checkboxLabelStyles = css(toggleControlLabelStyles);
+
+/* -------------------------------------------------------------------------------------------------
+ * Checkbox - control
+ * -----------------------------------------------------------------------------------------------*/
+
+export const checkboxControlStyles = css(toggleControlStyles, {
+  borderRadius: "$sm",
+
+  "& svg": {
+    color: "$loContrast",
   },
-  compoundVariants: createSizeAndLabelPositionCompoundVariants(),
+
+  "&[data-indeterminate], &[data-focus][data-indeterminate]": {
+    borderColor: "transparent",
+    backgroundColor: "currentColor",
+  },
 });
+
+export type CheckboxControlVariants = VariantProps<typeof checkboxControlStyles>;

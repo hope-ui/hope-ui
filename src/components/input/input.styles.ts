@@ -6,22 +6,22 @@ import { SystemStyleObject } from "@/styled-system/types";
 interface InputSizeVariantConfig {
   fontSize: string;
   lineHeight: string;
-  height: string;
+  minHeight: string;
 }
 
 function createInputSizeVariant(config: InputSizeVariantConfig): SystemStyleObject {
   return {
-    height: config.height,
+    minHeight: config.minHeight,
     fontSize: config.fontSize,
     lineHeight: config.lineHeight,
   };
 }
 
 const inputSizes = {
-  xs: createInputSizeVariant({ fontSize: "$xs", lineHeight: "$4", height: "$6" }),
-  sm: createInputSizeVariant({ fontSize: "$sm", lineHeight: "$5", height: "$8" }),
-  md: createInputSizeVariant({ fontSize: "$base", lineHeight: "$6", height: "$10" }),
-  lg: createInputSizeVariant({ fontSize: "$lg", lineHeight: "$7", height: "$12" }),
+  xs: createInputSizeVariant({ fontSize: "$xs", lineHeight: "$4", minHeight: "$6" }),
+  sm: createInputSizeVariant({ fontSize: "$sm", lineHeight: "$5", minHeight: "$8" }),
+  md: createInputSizeVariant({ fontSize: "$base", lineHeight: "$6", minHeight: "$10" }),
+  lg: createInputSizeVariant({ fontSize: "$lg", lineHeight: "$7", minHeight: "$12" }),
 };
 
 /* -------------------------------------------------------------------------------------------------
@@ -289,19 +289,19 @@ export const inputElementStyles = css({
     size: {
       xs: {
         ...inputSizes.xs,
-        width: inputSizes.xs.height,
+        width: inputSizes.xs.minHeight,
       },
       sm: {
         ...inputSizes.sm,
-        width: inputSizes.sm.height,
+        width: inputSizes.sm.minHeight,
       },
       md: {
         ...inputSizes.md,
-        width: inputSizes.md.height,
+        width: inputSizes.md.minHeight,
       },
       lg: {
         ...inputSizes.lg,
-        width: inputSizes.lg.height,
+        width: inputSizes.lg.minHeight,
       },
     },
   },
@@ -350,13 +350,13 @@ export const inputAddonStyles = css({
         borderRadius: "$sm",
         border: "1px solid $neutral7",
         backgroundColor: "$neutral3",
-        color: "$neutral11",
+        color: "$neutral12",
       },
       filled: {
         borderRadius: "$sm",
         border: "1px solid transparent",
         backgroundColor: "$neutral3",
-        color: "$neutral11",
+        color: "$neutral12",
       },
       unstyled: {
         border: "1px solid transparent",

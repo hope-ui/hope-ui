@@ -5,7 +5,7 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { RightJoinProps } from "@/utils/types";
 
-import { CloseButtonProps } from "../close-button/close-button";
+import { CloseButtonProps, ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { Modal, ModalProps } from "../modal/modal";
 import { ModalBody, ModalBodyProps } from "../modal/modal-body";
 import { ModalCloseButton } from "../modal/modal-close-button";
@@ -13,8 +13,6 @@ import { ModalFooter, ModalFooterProps } from "../modal/modal-footer";
 import { ModalHeader, ModalHeaderProps } from "../modal/modal-header";
 import { ElementType } from "../types";
 import { DrawerDialogVariants, drawerTransitionStyles } from "./drawer.styles";
-import { DrawerOverlay } from "./drawer-overlay";
-import { DrawerPanel } from "./drawer-panel";
 
 export type DrawerPlacement = "top" | "right" | "bottom" | "left";
 
@@ -27,34 +25,39 @@ interface DrawerOptions extends DrawerDialogVariants {
   /**
    * If `true`, the drawer will appear without any transition.
    */
-  disableTransition?: boolean;
+  disableMotion?: boolean;
 }
 
-export type DrawerProps = RightJoinProps<Omit<ModalProps, "scrollBehavior" | "centered" | "transition">, DrawerOptions>;
+export type DrawerProps = RightJoinProps<
+  Omit<ModalProps, "scrollBehavior" | "centered" | "motionPreset">,
+  DrawerOptions
+>;
+
+type ThemeableDrawerOptions = Pick<
+  DrawerProps,
+  | "placement"
+  | "size"
+  | "fullHeight"
+  | "disableMotion"
+  | "blockScrollOnMount"
+  | "closeOnEsc"
+  | "closeOnOverlayClick"
+  | "preserveScrollBarGap"
+  | "trapFocus"
+>;
 
 export interface DrawerStyleConfig {
   baseStyle?: {
     overlay?: SystemStyleObject;
-    panel?: SystemStyleObject;
+    content?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;
     footer?: SystemStyleObject;
   };
   defaultProps?: {
-    root?: Pick<
-      DrawerProps,
-      | "placement"
-      | "size"
-      | "fullHeight"
-      | "disableTransition"
-      | "blockScrollOnMount"
-      | "closeOnEsc"
-      | "closeOnOverlayClick"
-      | "preserveScrollBarGap"
-      | "trapFocus"
-    >;
-    closeButton?: Pick<CloseButtonProps, "aria-label" | "icon" | "variant" | "colorScheme" | "size">;
+    root?: ThemeableDrawerOptions;
+    closeButton?: ThemeableCloseButtonOptions;
   };
 }
 
@@ -65,7 +68,7 @@ const DrawerContext = createContext<DrawerContextValue>();
 export function Drawer(props: DrawerProps) {
   const theme = useComponentStyleConfigs().Drawer;
 
-  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableTransition"]);
+  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableMotion"]);
 
   const [state] = createStore<DrawerContextValue>({
     get placement() {
@@ -77,8 +80,8 @@ export function Drawer(props: DrawerProps) {
     get fullHeight() {
       return props.fullHeight ?? theme?.defaultProps?.root?.fullHeight ?? false;
     },
-    get disableTransition() {
-      return props.disableTransition ?? theme?.defaultProps?.root?.disableTransition ?? false;
+    get disableMotion() {
+      return props.disableMotion ?? theme?.defaultProps?.root?.disableMotion ?? false;
     },
   });
 
@@ -114,15 +117,13 @@ export function useDrawerContext() {
  * Drawer parts is just Modal parts with drawer's theme baseStyle
  * -----------------------------------------------------------------------------------------------*/
 
-function DrawerCloseButton(props: CloseButtonProps) {
+export function DrawerCloseButton(props: CloseButtonProps) {
   const theme = useComponentStyleConfigs().Drawer;
 
   const defaultProps: CloseButtonProps = {
     "aria-label": theme?.defaultProps?.closeButton?.["aria-label"] ?? "Close drawer",
-    size: theme?.defaultProps?.closeButton?.size ?? "sm",
+    size: theme?.defaultProps?.closeButton?.size ?? "md",
     icon: theme?.defaultProps?.closeButton?.icon,
-    variant: theme?.defaultProps?.closeButton?.variant,
-    colorScheme: theme?.defaultProps?.closeButton?.colorScheme,
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
@@ -130,24 +131,17 @@ function DrawerCloseButton(props: CloseButtonProps) {
   return <ModalCloseButton __baseStyle={theme?.baseStyle?.closeButton} {...propsWithDefault} />;
 }
 
-function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
+export function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalBody __baseStyle={theme?.baseStyle?.body} {...props} />;
 }
 
-function DrawerHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
+export function DrawerHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalHeader __baseStyle={theme?.baseStyle?.header} {...props} />;
 }
 
-function DrawerFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
+export function DrawerFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
   const theme = useComponentStyleConfigs().Drawer;
   return <ModalFooter __baseStyle={theme?.baseStyle?.footer} {...props} />;
 }
-
-Drawer.Overlay = DrawerOverlay;
-Drawer.Panel = DrawerPanel;
-Drawer.CloseButton = DrawerCloseButton;
-Drawer.Header = DrawerHeader;
-Drawer.Body = DrawerBody;
-Drawer.Footer = DrawerFooter;

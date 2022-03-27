@@ -1,13 +1,14 @@
 import { Property } from "csstype";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { SpaceScaleValue } from "@/styled-system/types";
+import { SpaceScaleValue, SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
-import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 import { buttonStyles, ButtonVariants } from "./button.styles";
+import { ThemeableButtonGroupOptions, useButtonGroupContext } from "./button-group";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";
 
@@ -49,9 +50,18 @@ export interface ButtonOptions extends ButtonVariants {
   rightIcon?: JSX.Element;
 }
 
-export type ButtonStyleConfig = SinglePartComponentStyleConfig<
-  Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">
->;
+export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">;
+
+export interface ButtonStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    group?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableButtonOptions;
+    group?: ThemeableButtonGroupOptions;
+  };
+}
 
 export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
@@ -64,32 +74,58 @@ const hopeButtonClass = "hope-button";
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
   const theme = useComponentStyleConfigs().Button;
 
+  const buttonGroupContext = useButtonGroupContext();
+
   const defaultProps: ButtonProps<"button"> = {
-    as: "button",
-    variant: theme?.defaultProps?.variant ?? "solid",
-    colorScheme: theme?.defaultProps?.colorScheme ?? "primary",
-    size: theme?.defaultProps?.size ?? "md",
-    loaderPlacement: theme?.defaultProps?.loaderPlacement ?? "start",
-    loading: false,
-    disabled: false,
+    loaderPlacement: theme?.defaultProps?.root?.loaderPlacement ?? "start",
     iconSpacing: "0.5rem",
     type: "button",
     role: "button",
   };
 
   const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
-  const [local, variantProps, contentProps, others] = splitProps(
+  const [local, contentProps, others] = splitProps(
     propsWithDefault,
-    ["class", "disabled", "loadingText", "loader", "loaderPlacement"],
-    ["variant", "colorScheme", "size", "loading", "compact", "fullWidth"],
+    [
+      "class",
+      "disabled",
+      "loadingText",
+      "loader",
+      "loaderPlacement",
+      "variant",
+      "colorScheme",
+      "size",
+      "loading",
+      "compact",
+      "fullWidth",
+    ],
     ["children", "iconSpacing", "leftIcon", "rightIcon"]
   );
 
-  const classes = () => classNames(local.class, hopeButtonClass, buttonStyles(variantProps));
+  const disabled = () => local.disabled ?? buttonGroupContext?.state.disabled;
+
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeButtonClass,
+      buttonStyles({
+        variant: local.variant ?? buttonGroupContext?.state.variant ?? theme?.defaultProps?.root?.variant ?? "solid",
+        colorScheme:
+          local.colorScheme ??
+          buttonGroupContext?.state.colorScheme ??
+          theme?.defaultProps?.root?.colorScheme ??
+          "primary",
+        size: local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        loading: local.loading,
+        compact: local.compact,
+        fullWidth: local.fullWidth,
+      })
+    );
+  };
 
   return (
-    <hope.button class={classes()} disabled={local.disabled} __baseStyle={theme?.baseStyle} {...others}>
-      <Show when={variantProps.loading && local.loaderPlacement === "start"}>
+    <hope.button class={classes()} disabled={disabled()} __baseStyle={theme?.baseStyle?.root} {...others}>
+      <Show when={local.loading && local.loaderPlacement === "start"}>
         <ButtonLoader
           class="hope-button__loader--start"
           withLoadingText={!!local.loadingText}
@@ -100,7 +136,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
         </ButtonLoader>
       </Show>
 
-      <Show when={variantProps.loading} fallback={<ButtonContent {...contentProps} />}>
+      <Show when={local.loading} fallback={<ButtonContent {...contentProps} />}>
         <Show
           when={local.loadingText}
           fallback={
@@ -113,7 +149,7 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
         </Show>
       </Show>
 
-      <Show when={variantProps.loading && local.loaderPlacement === "end"}>
+      <Show when={local.loading && local.loaderPlacement === "end"}>
         <ButtonLoader
           class="hope-button__loader--end"
           withLoadingText={!!local.loadingText}

@@ -4,7 +4,7 @@ import { BorderProps } from "./props/border";
 import { ColorProps } from "./props/color";
 import { CSSProp } from "./props/css";
 import { FlexboxProps } from "./props/flexbox";
-import { GridProps } from "./props/grid";
+import { GridLayoutProps } from "./props/grid";
 import { LayoutProps } from "./props/layout";
 import { MarginProps } from "./props/margin";
 import { PaddingProps } from "./props/padding";
@@ -133,7 +133,7 @@ export type StyleProps = ResponsiveProps<
   BorderProps &
     ColorProps &
     FlexboxProps &
-    GridProps &
+    GridLayoutProps &
     LayoutProps &
     MarginProps &
     PaddingProps &

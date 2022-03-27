@@ -1,45 +1,79 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { children, For, JSX, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
-import { selectValueStyles } from "./select.styles";
+import { selectMultiValueStyles, selectSingleValueStyles } from "./select.styles";
+import { SelectOptionData } from "./select.utils";
+import { SelectTag } from "./select-tag";
+import { SelectTagCloseButton } from "./select-tag-close-button";
 
-const hopeSelectValueClass = "hope-select__trigger__value";
+interface SelectValueOptions {
+  children?: JSX.Element | ((props: { selectedOptions: SelectOptionData[] }) => JSX.Element);
+}
 
-export type SelectValueProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
+export type SelectValueProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectValueOptions>;
+
+const hopeSelectValueClass = "hope-select__value";
 
 /**
  * The part that reflects the selected value.
- * By default the selected option's value will be rendered (or the label if `labelKey` is provided on the select).
- * If you require more control, you can instead control the select and pass your own `children`.
  */
-export function SelectValue<C extends ElementType = "span">(props: SelectValueProps<C>) {
+export function SelectValue<C extends ElementType = "div">(props: SelectValueProps<C>) {
   const theme = useComponentStyleConfigs().Select;
 
   const selectContext = useSelectContext();
 
-  const defaultProps: SelectValueProps<"span"> = {
-    as: "span",
+  const [local, others] = splitProps(props as SelectValueProps<"div">, ["class", "children"]);
+
+  const singleValueClasses = () => classNames(local.class, hopeSelectValueClass, selectSingleValueStyles());
+
+  const multiValueClasses = () => {
+    return classNames(local.class, hopeSelectValueClass, selectMultiValueStyles({ size: selectContext.state.size }));
   };
 
-  const propsWithDefault: SelectValueProps<"span"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children"]);
+  const onTagCloseButtonClick = (event: MouseEvent, option: SelectOptionData) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-  const classes = () => classNames(local.class, hopeSelectValueClass, selectValueStyles());
+    selectContext.unselectOption(option);
+  };
 
-  const showValue = () => selectContext.state.value != null;
+  const resolvedChildren = children(() => {
+    if (isFunction(local.children)) {
+      return local.children({ selectedOptions: selectContext.state.selectedOptions });
+    }
+
+    return local.children;
+  });
 
   return (
-    <Show when={showValue()}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle?.value} {...others}>
-        <Show when={local.children} fallback={selectContext.state.valueLabel}>
-          {local.children}
+    <Show when={selectContext.state.hasSelectedOptions}>
+      <Show when={!resolvedChildren()} fallback={resolvedChildren()}>
+        <Show
+          when={selectContext.state.multiple}
+          fallback={
+            <Box class={singleValueClasses()} __baseStyle={theme?.baseStyle?.singleValue} {...others}>
+              {selectContext.state.selectedOptions[0].textValue}
+            </Box>
+          }
+        >
+          <Box class={multiValueClasses()} __baseStyle={theme?.baseStyle?.multiValue} {...others}>
+            <For each={selectContext.state.selectedOptions}>
+              {option => (
+                <SelectTag>
+                  <span>{option.textValue}</span>
+                  <SelectTagCloseButton onClick={(e: MouseEvent) => onTagCloseButtonClick(e, option)} />
+                </SelectTag>
+              )}
+            </For>
+          </Box>
         </Show>
-      </Box>
+      </Show>
     </Show>
   );
 }

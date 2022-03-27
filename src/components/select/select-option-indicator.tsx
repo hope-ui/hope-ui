@@ -1,17 +1,17 @@
-import { mergeProps, Show, splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
-import { Box } from "../box/box";
+import { hope } from "../factory";
 import { IconCheck } from "../icons/IconCheck";
 import { ElementType, HTMLHopeProps } from "../types";
 import { selectOptionIndicatorStyles } from "./select.styles";
 import { useSelectOptionContext } from "./select-option";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type SelectOptionIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
-const hopeSelectOptionIndicatorClass = "hope-select__option__indicator";
+const hopeSelectOptionIndicatorClass = "hope-select__option-indicator";
 
 /**
  * Visual indicator rendered when the option is selected.
@@ -21,22 +21,17 @@ export function SelectOptionIndicator<C extends ElementType = "span">(props: Sel
 
   const selectOptionContext = useSelectOptionContext();
 
-  const defaultProps: SelectOptionIndicatorProps<"span"> = {
-    as: "span",
-  };
-
-  const propsWithDefault: SelectOptionIndicatorProps<"span"> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children"]);
+  const [local, others] = splitProps(props, ["class", "children"]);
 
   const classes = () => classNames(local.class, hopeSelectOptionIndicatorClass, selectOptionIndicatorStyles());
 
   return (
-    <Show when={selectOptionContext().selected}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle?.optionIndicator} {...others}>
+    <Show when={selectOptionContext.selected()}>
+      <hope.span class={classes()} __baseStyle={theme?.baseStyle?.optionIndicator} {...others}>
         <Show when={local.children} fallback={<IconCheck aria-hidden="true" boxSize="$5" />}>
           {local.children}
         </Show>
-      </Box>
+      </hope.span>
     </Show>
   );
 }

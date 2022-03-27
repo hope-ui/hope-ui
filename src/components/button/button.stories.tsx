@@ -43,7 +43,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["solid", "subtle", "outline", "dashed", "ghost", "default"],
+      options: ["solid", "subtle", "outline", "dashed", "ghost"],
     },
     colorScheme: {
       control: { type: "select" },

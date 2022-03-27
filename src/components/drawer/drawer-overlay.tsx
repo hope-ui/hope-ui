@@ -29,7 +29,7 @@ export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverla
   const classes = () => classNames(local.class, hopeDrawerOverlayClass, modalOverlayStyles());
 
   const transitionName = () => {
-    return drawerContext.disableTransition ? "hope-none" : drawerTransitionName.fade;
+    return drawerContext.disableMotion ? "hope-none" : drawerTransitionName.fade;
   };
 
   return (

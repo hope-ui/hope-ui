@@ -35,7 +35,6 @@
 | AutoComplete     |             |            |       |           |      |
 | Checkbox         |     ✅      |     ✅     |       |    ✅     |      |
 | DatePicker       |             |            |       |           |      |
-| Form             |             |            |       |           |      |
 | FormControl      |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | FormLabel        |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | FormHelperText   |     ✅      |     ✅     |  ✅   |    ✅     |      |
@@ -47,7 +46,7 @@
 | Radio            |     ✅      |     ✅     |       |    ✅     |      |
 | NativeSelect     |             |            |       |           |      |
 | Select           |     ✅      |     ✅     |       |           |      |
-| MultiSelect      |             |            |       |           |      |
+| MultiSelect      |     ✅      |     ✅     |       |           |      |
 | Slider           |             |            |       |           |      |
 | Switch           |     ✅      |     ✅     |       |    ✅     |      |
 | Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
@@ -59,9 +58,10 @@
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Accordion |             |            |       |           |      |
-| Avatar    |             |            |       |           |      |
-| Badge     |             |            |       |           |      |
+| Avatar    |     ✅      |     ✅     |       |           |      |
+| Badge     |     ✅      |     ✅     |       |           |      |
 | Icon      |     ✅      |     ✅     |  ✅   |           |      |
+| Kbd       |     ✅      |    n/a     |       |           |      |
 | Table     |     ✅      |     ✅     |       |           |      |
 | Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
 | Timeline  |             |            |       |           |      |
@@ -78,13 +78,13 @@
 
 ### Feedback
 
-|              | Development | A11y check | Tests | Storybook | Docs |
-| ------------ | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert        |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Notification |             |            |       |           |      |
-| Progress     |             |            |       |           |      |
-| RingProgress |             |            |       |           |      |
-| Spinner      |     ✅      |     ✅     |       |           |      |
+|                  | Development | A11y check | Tests | Storybook | Docs |
+| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Alert            |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| CircularProgress |     ✅      |     ✅     |       |           |      |
+| Progress         |     ✅      |     ✅     |       |           |      |
+| Spinner          |     ✅      |     ✅     |       |           |      |
+| Toast            |             |            |       |           |      |
 
 ### Overlay
 
