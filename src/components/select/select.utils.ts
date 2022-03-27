@@ -8,7 +8,7 @@ export interface SelectOptionData {
 
   /**
    * Optional text used for typeahead purposes.
-   * By default the typeahead behavior will use the `.textContent` of the `Select.Option`.
+   * By default the typeahead behavior will use the `.textContent` of the `SelectOption`.
    * Use this when the content is complex, or you have non-textual content inside.
    */
   textValue: string;
@@ -46,7 +46,7 @@ interface GetUpdatedIndexParams {
  */
 export enum SelectActions {
   Close,
-  CloseSelect,
+  SelectAndClose,
   First,
   Last,
   Next,
@@ -129,7 +129,7 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
   // handle keys when open
   if (menuOpen) {
     if (key === "ArrowUp" && altKey) {
-      return SelectActions.CloseSelect;
+      return SelectActions.SelectAndClose;
     } else if (key === "ArrowDown" && !altKey) {
       return SelectActions.Next;
     } else if (key === "ArrowUp") {
@@ -137,7 +137,7 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
     } else if (key === "Escape") {
       return SelectActions.Close;
     } else if (key === "Enter" || key === " ") {
-      return SelectActions.CloseSelect;
+      return SelectActions.SelectAndClose;
     }
   }
 }
@@ -217,29 +217,4 @@ export function isValueEqual(a: any, b: any, compareKey: string): boolean {
  */
 export function isOptionEqual(a: SelectOptionData, b: SelectOptionData, compareKey: string): boolean {
   return isValueEqual(a.value, b.value, compareKey);
-}
-
-/**
- * Check if an element is currently scrollable
- */
-export function isScrollable(element: HTMLElement) {
-  return element && element.clientHeight < element.scrollHeight;
-}
-
-/**
- * Ensure a given child element is within the parent's visible scroll area
- * if the child is not visible, scroll the parent
- */
-export function maintainScrollVisibility(activeElement: HTMLElement, scrollParent: HTMLElement) {
-  const { offsetHeight, offsetTop } = activeElement;
-  const { offsetHeight: parentOffsetHeight, scrollTop } = scrollParent;
-
-  const isAbove = offsetTop < scrollTop;
-  const isBelow = offsetTop + offsetHeight > scrollTop + parentOffsetHeight;
-
-  if (isAbove) {
-    scrollParent.scrollTo(0, offsetTop);
-  } else if (isBelow) {
-    scrollParent.scrollTo(0, offsetTop - parentOffsetHeight + offsetHeight);
-  }
 }

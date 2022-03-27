@@ -1,5 +1,6 @@
 import { splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
@@ -16,6 +17,8 @@ const hopeTabPanelsClass = "hope-tabs__tab-panels";
  * It renders a `div` by default.
  */
 export function TabPanels<C extends ElementType = "div">(props: TabPanelsProps<C>) {
+  const theme = useComponentStyleConfigs().Tabs;
+
   const tabPanelsDescendantsManager = createTabPanelsDescendantsManager();
 
   const [local, others] = splitProps(props, ["class"]);
@@ -26,7 +29,7 @@ export function TabPanels<C extends ElementType = "div">(props: TabPanelsProps<C
 
   return (
     <TabPanelsDescendantsProvider value={tabPanelsDescendantsManager}>
-      <Box class={classes()} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.tabPanels} {...others} />
     </TabPanelsDescendantsProvider>
   );
 }

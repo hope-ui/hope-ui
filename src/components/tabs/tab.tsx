@@ -1,5 +1,6 @@
 import { createEffect, JSX, on, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callHandler } from "@/utils/function";
@@ -25,11 +26,17 @@ const hopeTabClass = "hope-tabs__tab";
  * Tab button used to activate a specific tab panel. It renders a `button` by default.
  */
 export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
+  const theme = useComponentStyleConfigs().Tabs;
+
   const tabsContext = useTabsContext();
 
-  const [local, others] = splitProps(props as TabProps<"button">, ["ref", "class", "disabled", "onClick", "onFocus"]);
+  const [local, tabsDescendantOptions, others] = splitProps(
+    props as TabProps<"button">,
+    ["ref", "class", "disabled", "onClick", "onFocus"],
+    ["disabled"]
+  );
 
-  const tabsDescendant = useTabsDescendant(local);
+  const tabsDescendant = useTabsDescendant(tabsDescendantOptions);
 
   const isSelected = () => tabsContext.isSelectedIndex(tabsDescendant.index());
 
@@ -91,6 +98,7 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
       aria-selected={isSelected()}
       aria-controls={tabPanelId()}
       class={classes()}
+      __baseStyle={theme?.baseStyle?.tab}
       onClick={onClick}
       onFocus={onFocus}
       {...others}

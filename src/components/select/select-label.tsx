@@ -31,7 +31,7 @@ export function SelectLabel<C extends ElementType = "div">(props: SelectLabelPro
   const classes = () => classNames(local.class, hopeSelectLabelClass, selectLabelStyles());
 
   onMount(() => {
-    selectOptGroupContext.setAriaLabelledBy(id());
+    selectOptGroupContext?.setAriaLabelledBy(id());
   });
 
   return <Box id={id()} class={classes()} __baseStyle={theme?.baseStyle?.label} {...others} />;

@@ -244,7 +244,7 @@ export const selectContentStyles = css({
   boxShadow: "$md",
   border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
-  backgroundColor: "$panel",
+  backgroundColor: "$loContrast",
 
   padding: 0,
 });

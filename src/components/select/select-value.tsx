@@ -1,8 +1,8 @@
 import { children, For, JSX, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
+import { isChildrenFunction } from "@/utils/solid";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -12,8 +12,10 @@ import { SelectOptionData } from "./select.utils";
 import { SelectTag } from "./select-tag";
 import { SelectTagCloseButton } from "./select-tag-close-button";
 
+type SelectValueChildrenRenderProp = (props: { selectedOptions: SelectOptionData[] }) => JSX.Element;
+
 interface SelectValueOptions {
-  children?: JSX.Element | ((props: { selectedOptions: SelectOptionData[] }) => JSX.Element);
+  children?: JSX.Element | SelectValueChildrenRenderProp;
 }
 
 export type SelectValueProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectValueOptions>;
@@ -44,11 +46,13 @@ export function SelectValue<C extends ElementType = "div">(props: SelectValuePro
   };
 
   const resolvedChildren = children(() => {
-    if (isFunction(local.children)) {
-      return local.children({ selectedOptions: selectContext.state.selectedOptions });
+    if (isChildrenFunction(local)) {
+      return (local.children as SelectValueChildrenRenderProp)?.({
+        selectedOptions: selectContext.state.selectedOptions,
+      });
     }
 
-    return local.children;
+    return local.children as JSX.Element;
   });
 
   return (

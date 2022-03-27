@@ -82,14 +82,14 @@ export const tabListStyles = css({
       variant: "underline",
       orientation: "horizontal",
       css: {
-        borderBottomWidth: "2px",
+        borderBottomWidth: "1px",
       },
     },
     {
       variant: "underline",
       orientation: "vertical",
       css: {
-        borderInlineEndWidth: "2px",
+        borderInlineEndWidth: "1px",
       },
     },
 
@@ -149,11 +149,19 @@ function createSelectedColorVariant(color: string): SystemStyleObject {
   };
 }
 
-function createPillsAndColorVariant(config: { color: string; bgColor: string }): SystemStyleObject {
+function createPillsAndColorVariant(config: {
+  color: string;
+  bgColor: string;
+  bgColorHover: string;
+}): SystemStyleObject {
   return {
     "&[aria-selected='true']": {
       color: config.color,
       backgroundColor: config.bgColor,
+    },
+
+    "&[aria-selected='true']:hover": {
+      backgroundColor: config.bgColorHover,
     },
   };
 }
@@ -229,7 +237,7 @@ export const tabStyles = css({
       pills: {
         borderRadius: "$sm",
 
-        "&:hover": {
+        "&:not(:disabled):hover": {
           backgroundColor: "$neutral3",
         },
       },
@@ -375,32 +383,32 @@ export const tabStyles = css({
     {
       variant: "pills",
       colorScheme: "primary",
-      css: createPillsAndColorVariant({ color: "$primary11", bgColor: "$primary3" }),
+      css: createPillsAndColorVariant({ color: "$primary11", bgColor: "$primary3", bgColorHover: "$primary4" }),
     },
     {
       variant: "pills",
       colorScheme: "neutral",
-      css: createPillsAndColorVariant({ color: "$neutral12", bgColor: "$neutral3" }),
+      css: createPillsAndColorVariant({ color: "$neutral12", bgColor: "$neutral3", bgColorHover: "$neutral4" }),
     },
     {
       variant: "pills",
       colorScheme: "success",
-      css: createPillsAndColorVariant({ color: "$success11", bgColor: "$success3" }),
+      css: createPillsAndColorVariant({ color: "$success11", bgColor: "$success3", bgColorHover: "$success4" }),
     },
     {
       variant: "pills",
       colorScheme: "info",
-      css: createPillsAndColorVariant({ color: "$info11", bgColor: "$info3" }),
+      css: createPillsAndColorVariant({ color: "$info11", bgColor: "$info3", bgColorHover: "$info4" }),
     },
     {
       variant: "pills",
       colorScheme: "warning",
-      css: createPillsAndColorVariant({ color: "$warning11", bgColor: "$warning3" }),
+      css: createPillsAndColorVariant({ color: "$warning11", bgColor: "$warning3", bgColorHover: "$warning4" }),
     },
     {
       variant: "pills",
       colorScheme: "danger",
-      css: createPillsAndColorVariant({ color: "$danger11", bgColor: "$danger3" }),
+      css: createPillsAndColorVariant({ color: "$danger11", bgColor: "$danger3", bgColorHover: "$danger4" }),
     },
 
     /* -------------------------------------------------------------------------------------------------
@@ -411,7 +419,7 @@ export const tabStyles = css({
       orientation: "horizontal",
       css: {
         borderBottomWidth: "2px",
-        marginBottom: "-2px",
+        marginBottom: "-1px",
       },
     },
     {
@@ -419,7 +427,7 @@ export const tabStyles = css({
       orientation: "vertical",
       css: {
         borderInlineEndWidth: "2px",
-        marginInlineEnd: "-2px",
+        marginInlineEnd: "-1px",
       },
     },
 

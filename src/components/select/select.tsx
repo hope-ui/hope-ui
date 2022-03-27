@@ -5,6 +5,7 @@ import { createStore } from "solid-js/store";
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme";
 import { isArray } from "@/utils/assertion";
+import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
 
 import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
@@ -13,9 +14,7 @@ import {
   getIndexByLetter,
   getUpdatedIndex,
   isOptionEqual,
-  isScrollable,
   isValueEqual,
-  maintainScrollVisibility,
   SelectActions,
   SelectOptionData,
 } from "./select.utils";
@@ -471,7 +470,7 @@ export function Select(props: SelectProps) {
           })
         );
 
-      case SelectActions.CloseSelect:
+      case SelectActions.SelectAndClose:
         event.preventDefault();
         selectOption(state.activeIndex);
         return state.multiple ? undefined : updateOpeningState(false); // don't close in multi-select.

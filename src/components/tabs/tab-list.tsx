@@ -1,5 +1,6 @@
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { normalizeEventKey } from "@/utils/dom";
 import { focus } from "@/utils/focus";
@@ -21,6 +22,8 @@ const hopeTabListClass = "hope-tabs__tablist";
  * and is responsible of the keyboard interaction between tabs.
  */
 export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
+  const theme = useComponentStyleConfigs().Tabs;
+
   const tabsContext = useTabsContext();
 
   const tabsDescendantsManager = createTabsDescendantsManager();
@@ -102,6 +105,7 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
         role="tablist"
         aria-orientation={tabsContext.state.orientation}
         class={classes()}
+        __baseStyle={theme?.baseStyle?.tabList}
         onKeyDown={onKeyDown}
         {...others}
       />

@@ -48,11 +48,11 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
   return (
     <Show when={selectContext.state.opened}>
       <Portal>
-        <OutsideClickHandler onOutsideClick={onOutsideClick}>
+        <OutsideClick onOutsideClick={onOutsideClick}>
           <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others}>
             {resolvedChildren()}
           </Box>
-        </OutsideClickHandler>
+        </OutsideClick>
       </Portal>
     </Show>
   );
@@ -63,7 +63,7 @@ SelectContent.toString = () => createClassSelector(hopeSelectContentClass);
 /**
  * Renderless component that manage outside click on its children.
  */
-function OutsideClickHandler(props: PropsWithChildren<{ onOutsideClick: (event: Event) => void }>) {
+export function OutsideClick(props: PropsWithChildren<{ onOutsideClick: (event: Event) => void }>) {
   const resolvedChildren = children(() => props.children);
 
   useOutsideClick({
