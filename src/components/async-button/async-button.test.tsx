@@ -8,7 +8,6 @@ import { AsyncButton } from "./async-button";
 describe("AsyncButton", () => {
   afterEach(() => {
     jest.clearAllMocks();
-    jest.useRealTimers();
     cleanup();
   });
 
@@ -21,26 +20,23 @@ describe("AsyncButton", () => {
     expect(button).toBeInTheDocument();
   });
 
-  it("should change state to loading and back when clicked", () => {
+  it("should change state to loading and back when clicked", async () => {
     // setup
-    jest.useFakeTimers();
-    jest.spyOn(global, "setTimeout");
-    const buttonNotLoadingClass = buttonStyles({ loading: false });
-    const buttonLoadingClass = buttonStyles({ loading: false });
-    const handleClick = jest.fn().mockResolvedValue(() => setTimeout(Promise.resolve, 200));
+    const buttonLoadingClass = buttonStyles({ loading: true });
+    const handleClick = jest.fn(async () => undefined);
 
-    // render
+    // render still button
     renderWithHopeProvider(() => <AsyncButton onClick={handleClick} />);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass(buttonNotLoadingClass.className);
+    expect(button.className.split(" ")).not.toEqual(expect.arrayContaining(buttonLoadingClass.className.split(" ")));
 
-    // act
+    // make it loading
     fireEvent.click(button);
-    expect(button).toHaveClass(buttonLoadingClass.className);
+    expect(button.className.split(" ")).toEqual(expect.arrayContaining(buttonLoadingClass.className.split(" ")));
     expect(handleClick).toBeCalled();
 
-    // resolve
-    jest.runAllTimers();
-    expect(button).toHaveClass(buttonNotLoadingClass.className);
+    // next tick resolve back to still button
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(button.className.split(" ")).not.toEqual(expect.arrayContaining(buttonLoadingClass.className.split(" ")));
   });
 });

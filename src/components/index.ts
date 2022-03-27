@@ -1,6 +1,7 @@
 export * from "./alert";
 export * from "./anchor";
 export * from "./aspect-ratio";
+export * from "./async-button";
 export * from "./avatar";
 export * from "./badge";
 export * from "./box";
