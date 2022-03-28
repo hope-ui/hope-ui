@@ -9,10 +9,16 @@ import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
-import { menuItemCommandStyles, menuItemIconWrapperStyles, menuItemStyles, MenuItemVariants } from "./menu.styles";
+import {
+  menuItemCommandStyles,
+  menuItemIconWrapperStyles,
+  menuItemStyles,
+  menuItemTextStyles,
+  MenuItemVariants,
+} from "./menu.styles";
 import { MenuItemData } from "./menu.utils";
 
-type MenuItemOptions = Partial<MenuItemData> &
+type MenuItemOptions = Partial<Omit<MenuItemData, "key">> &
   MenuItemVariants & {
     /**
      * The icon to display next to the menu item text.
@@ -39,6 +45,7 @@ export type MenuItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, Menu
 
 const hopeMenuItemClass = "hope-menu__item";
 const hopeMenuItemIconWrapperClass = "hope-menu__item__icon-wrapper";
+const hopeMenuItemTextClass = "hope-menu__item__text";
 const hopeMenuItemCommandClass = "hope-menu__item__command";
 
 /**
@@ -126,6 +133,10 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
     return classNames(hopeMenuItemIconWrapperClass, menuItemIconWrapperStyles());
   };
 
+  const textClasses = () => {
+    return classNames(hopeMenuItemTextClass, menuItemTextStyles());
+  };
+
   const commandClasses = () => {
     return classNames(hopeMenuItemCommandClass, menuItemCommandStyles());
   };
@@ -165,7 +176,11 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
           {local.icon}
         </hope.span>
       </Show>
-      {local.children}
+      <Show when={local.children}>
+        <hope.span class={textClasses()} __baseStyle={theme?.baseStyle?.itemText}>
+          {local.children}
+        </hope.span>
+      </Show>
       <Show when={local.command}>
         <hope.span
           class={commandClasses()}
