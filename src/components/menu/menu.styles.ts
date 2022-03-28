@@ -84,6 +84,8 @@ export const menuContentStyles = css({
   minWidth: "$56",
   overflowY: "auto",
 
+  outline: "none",
+
   margin: 0,
 
   boxShadow: "$md",
@@ -93,6 +95,10 @@ export const menuContentStyles = css({
 
   px: 0,
   py: "$1",
+
+  "&:focus": {
+    outline: "none",
+  },
 });
 
 /* -------------------------------------------------------------------------------------------------
