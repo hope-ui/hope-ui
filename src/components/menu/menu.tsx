@@ -551,6 +551,7 @@ export interface MenuStyleConfig {
     group?: SystemStyleObject;
     label?: SystemStyleObject;
     item?: SystemStyleObject;
+    itemText?: SystemStyleObject;
     itemIconWrapper?: SystemStyleObject;
     itemCommand?: SystemStyleObject;
   };
