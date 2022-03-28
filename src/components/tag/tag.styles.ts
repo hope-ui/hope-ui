@@ -227,6 +227,7 @@ export const tagStyles = css({
     },
     colorScheme: {
       primary: {},
+      accent: {},
       neutral: {},
       success: {},
       info: {},
@@ -265,7 +266,6 @@ export const tagStyles = css({
     /* -------------------------------------------------------------------------------------------------
      * Variant - solid + color
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "solid",
       colorScheme: "primary",
@@ -273,6 +273,15 @@ export const tagStyles = css({
         color: "white",
         bgColor: "$primary9",
         closeButtonBgColorHover: "$primary10",
+      }),
+    },
+    {
+      variant: "solid",
+      colorScheme: "accent",
+      css: createTagSolidCompoundVariant({
+        color: "white",
+        bgColor: "$accent9",
+        closeButtonBgColorHover: "$accent10",
       }),
     },
     {
@@ -324,7 +333,6 @@ export const tagStyles = css({
     /* -------------------------------------------------------------------------------------------------
      * Variant - subtle + color
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "subtle",
       colorScheme: "primary",
@@ -332,6 +340,15 @@ export const tagStyles = css({
         color: "$primary11",
         bgColor: "$primary4",
         closeButtonBgColorHover: "$primary6",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "accent",
+      css: createTagSubtleCompoundVariant({
+        color: "$accent11",
+        bgColor: "$accent4",
+        closeButtonBgColorHover: "$accent6",
       }),
     },
     {
@@ -383,7 +400,6 @@ export const tagStyles = css({
     /* -------------------------------------------------------------------------------------------------
      * Variant - outline + color
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "outline",
       colorScheme: "primary",
@@ -391,6 +407,15 @@ export const tagStyles = css({
         color: "$primary11",
         borderColor: "$primary7",
         closeButtonBgColorHover: "$primary4",
+      }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "accent",
+      css: createTagOutlineCompoundVariant({
+        color: "$accent11",
+        borderColor: "$accent7",
+        closeButtonBgColorHover: "$accent4",
       }),
     },
     {
@@ -442,13 +467,21 @@ export const tagStyles = css({
     /* -------------------------------------------------------------------------------------------------
      * Variant - dot + color
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "dot",
       colorScheme: "primary",
       css: {
         "&::before, &::after": {
           backgroundColor: "$primary9",
+        },
+      },
+    },
+    {
+      variant: "dot",
+      colorScheme: "accent",
+      css: {
+        "&::before, &::after": {
+          backgroundColor: "$accent9",
         },
       },
     },
@@ -501,7 +534,6 @@ export const tagStyles = css({
     /* -------------------------------------------------------------------------------------------------
      * Variant - dot + size
      * -----------------------------------------------------------------------------------------------*/
-
     {
       variant: "dot",
       size: "sm",

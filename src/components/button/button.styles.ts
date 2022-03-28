@@ -271,6 +271,7 @@ export const buttonStyles = css({
     },
     colorScheme: {
       primary: {},
+      accent: {},
       neutral: {},
       success: {},
       info: {},
@@ -348,6 +349,15 @@ export const buttonStyles = css({
     },
     {
       variant: "solid",
+      colorScheme: "accent",
+      css: createSolidCompoundVariant({
+        color: "white",
+        bgColor: "$accent9",
+        bgColorHover: "$accent10",
+      }),
+    },
+    {
+      variant: "solid",
       colorScheme: "neutral",
       css: createSolidCompoundVariant({
         color: "white",
@@ -403,6 +413,16 @@ export const buttonStyles = css({
         bgColor: "$primary4",
         bgColorHover: "$primary5",
         bgColorActive: "$primary6",
+      }),
+    },
+    {
+      variant: "subtle",
+      colorScheme: "accent",
+      css: createSubtleCompoundVariant({
+        color: "$accent11",
+        bgColor: "$accent4",
+        bgColorHover: "$accent5",
+        bgColorActive: "$accent6",
       }),
     },
     {
@@ -468,6 +488,17 @@ export const buttonStyles = css({
         borderColorHover: "$primary8",
         bgColorHover: "$primary4",
         bgColorActive: "$primary5",
+      }),
+    },
+    {
+      variant: "outline",
+      colorScheme: "accent",
+      css: createOutlineCompoundVariant({
+        color: "$accent11",
+        borderColor: "$accent7",
+        borderColorHover: "$accent8",
+        bgColorHover: "$accent4",
+        bgColorActive: "$accent5",
       }),
     },
     {
@@ -542,6 +573,17 @@ export const buttonStyles = css({
     },
     {
       variant: "dashed",
+      colorScheme: "accent",
+      css: createOutlineCompoundVariant({
+        color: "$accent11",
+        borderColor: "$accent7",
+        borderColorHover: "$accent8",
+        bgColorHover: "$accent4",
+        bgColorActive: "$accent5",
+      }),
+    },
+    {
+      variant: "dashed",
       colorScheme: "neutral",
       css: createOutlineCompoundVariant({
         color: "$neutral12",
@@ -605,6 +647,15 @@ export const buttonStyles = css({
         color: "$primary11",
         bgColorHover: "$primary4",
         bgColorActive: "$primary5",
+      }),
+    },
+    {
+      variant: "ghost",
+      colorScheme: "accent",
+      css: createGhostCompoundVariant({
+        color: "$accent11",
+        bgColorHover: "$accent4",
+        bgColorActive: "$accent5",
       }),
     },
     {

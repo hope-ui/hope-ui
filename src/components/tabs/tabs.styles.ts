@@ -244,6 +244,7 @@ export const tabStyles = css({
     },
     colorScheme: {
       primary: {},
+      accent: {},
       neutral: {},
       success: {},
       info: {},
@@ -285,6 +286,11 @@ export const tabStyles = css({
     },
     {
       variant: "underline",
+      colorScheme: "accent",
+      css: createSelectedColorVariant("$accent11"),
+    },
+    {
+      variant: "underline",
       colorScheme: "neutral",
       css: createSelectedColorVariant("$neutral12"),
     },
@@ -316,6 +322,11 @@ export const tabStyles = css({
       variant: "outline",
       colorScheme: "primary",
       css: createSelectedColorVariant("$primary11"),
+    },
+    {
+      variant: "outline",
+      colorScheme: "accent",
+      css: createSelectedColorVariant("$accent11"),
     },
     {
       variant: "outline",
@@ -353,6 +364,11 @@ export const tabStyles = css({
     },
     {
       variant: "cards",
+      colorScheme: "accent",
+      css: createSelectedColorVariant("$accent11"),
+    },
+    {
+      variant: "cards",
       colorScheme: "neutral",
       css: createSelectedColorVariant("$neutral12"),
     },
@@ -384,6 +400,11 @@ export const tabStyles = css({
       variant: "pills",
       colorScheme: "primary",
       css: createPillsAndColorVariant({ color: "$primary11", bgColor: "$primary3", bgColorHover: "$primary4" }),
+    },
+    {
+      variant: "pills",
+      colorScheme: "accent",
+      css: createPillsAndColorVariant({ color: "$accent11", bgColor: "$accent3", bgColorHover: "$accent4" }),
     },
     {
       variant: "pills",

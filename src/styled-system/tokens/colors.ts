@@ -63,6 +63,22 @@ const primary = {
   primary12: "#04313c",
 };
 
+// Radix - Violet
+const accent = {
+  accent1: "#fdfcfe",
+  accent2: "#fbfaff",
+  accent3: "#f5f2ff",
+  accent4: "#ede9fe",
+  accent5: "#e4defc",
+  accent6: "#d7cff9",
+  accent7: "#c4b8f3",
+  accent8: "#aa99ec",
+  accent9: "#6e56cf",
+  accent10: "#644fc1",
+  accent11: "#5746af",
+  accent12: "#20134b",
+};
+
 // Radix - Slate
 const neutral = {
   neutral1: "#fbfcfd",
@@ -154,6 +170,7 @@ const semanticColors = {
 
 export const lightColors = {
   ...primary,
+  ...accent,
   ...neutral,
   ...success,
   ...info,
@@ -180,6 +197,22 @@ const primaryDark = {
   primary10: "#00b1cc",
   primary11: "#00c2d7",
   primary12: "#e1f8fa",
+};
+
+// Radix - Violet dark
+const accentDark = {
+  accent1: "#17151f",
+  accent2: "#1c172b",
+  accent3: "#251e40",
+  accent4: "#2c2250",
+  accent5: "#32275f",
+  accent6: "#392c72",
+  accent7: "#443592",
+  accent8: "#5842c3",
+  accent9: "#6e56cf",
+  accent10: "#7c66dc",
+  accent11: "#9e8cfc",
+  accent12: "#f1eefe",
 };
 
 // Radix - Slate dark
@@ -273,6 +306,7 @@ const semanticDarkColors = {
 
 export const darkColors: typeof lightColors = {
   ...primaryDark,
+  ...accentDark,
   ...neutralDark,
   ...successDark,
   ...infoDark,
