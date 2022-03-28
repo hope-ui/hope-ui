@@ -84,6 +84,8 @@ export const menuContentStyles = css({
   minWidth: "$56",
   overflowY: "auto",
 
+  outline: "none",
+
   margin: 0,
 
   boxShadow: "$md",
@@ -93,6 +95,10 @@ export const menuContentStyles = css({
 
   px: 0,
   py: "$1",
+
+  "&:focus": {
+    outline: "none",
+  },
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -147,7 +153,6 @@ export const menuItemStyles = css({
   py: "$2",
   px: "$3",
 
-  color: "$neutral12",
   fontSize: "$base",
   fontWeight: "$normal",
   lineHeight: "$6",
@@ -162,10 +167,6 @@ export const menuItemStyles = css({
     cursor: "not-allowed",
   },
 
-  [`&[data-active]`]: {
-    backgroundColor: "$neutral4",
-  },
-
   variants: {
     colorScheme: {
       primary: createColorVariant({ color: "$primary11", bgColorActive: "$primary3" }),
@@ -175,6 +176,10 @@ export const menuItemStyles = css({
       warning: createColorVariant({ color: "$warning11", bgColorActive: "$warning3" }),
       danger: createColorVariant({ color: "$danger11", bgColorActive: "$danger3" }),
     },
+  },
+
+  defaultVariants: {
+    colorScheme: "neutral",
   },
 });
 

@@ -39,6 +39,7 @@ export const badgeStyles = css({
     },
     colorScheme: {
       primary: {},
+      accent: {},
       neutral: {},
       success: {},
       info: {},
@@ -56,6 +57,14 @@ export const badgeStyles = css({
       css: {
         color: "white",
         bgColor: "$primary9",
+      },
+    },
+    {
+      variant: "solid",
+      colorScheme: "accent",
+      css: {
+        color: "white",
+        bgColor: "$accent9",
       },
     },
     {
@@ -112,6 +121,14 @@ export const badgeStyles = css({
     },
     {
       variant: "subtle",
+      colorScheme: "accent",
+      css: {
+        color: "$accent11",
+        bgColor: "$accent4",
+      },
+    },
+    {
+      variant: "subtle",
       colorScheme: "neutral",
       css: {
         color: "$neutral12",
@@ -160,6 +177,14 @@ export const badgeStyles = css({
       css: {
         color: "$primary11",
         borderColor: "$primary7",
+      },
+    },
+    {
+      variant: "outline",
+      colorScheme: "accent",
+      css: {
+        color: "$accent11",
+        borderColor: "$accent7",
       },
     },
     {

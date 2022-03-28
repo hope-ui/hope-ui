@@ -125,6 +125,11 @@ export const toggleControlStyles = css({
         boxShadowColorFocus: "$primary5",
         borderColorFocus: "$primary8",
       }),
+      accent: createColorVariant({
+        color: "$accent9",
+        boxShadowColorFocus: "$accent5",
+        borderColorFocus: "$accent8",
+      }),
       neutral: createColorVariant({
         color: "$neutral9",
         boxShadowColorFocus: "$neutral5",

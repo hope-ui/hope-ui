@@ -74,7 +74,7 @@
 | Breadcrumb |     ✅      |     ✅     |       |           |      |
 | Pagination |             |            |       |           |      |
 | Stepper    |             |            |       |           |      |
-| Tabs       |             |            |       |           |      |
+| Tabs       |     ✅      |     ✅     |       |           |      |
 
 ### Feedback
 
@@ -91,7 +91,7 @@
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Drawer  |     ✅      |     ✅     |       |           |      |
-| Menu    |             |            |       |           |      |
+| Menu    |     ✅      |     ✅     |       |           |      |
 | Modal   |     ✅      |     ✅     |       |           |      |
 | Popover |             |            |       |           |      |
 | Tooltip |     ✅      |     ✅     |       |           |      |
