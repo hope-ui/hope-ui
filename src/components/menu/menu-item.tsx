@@ -18,7 +18,7 @@ import {
 } from "./menu.styles";
 import { MenuItemData } from "./menu.utils";
 
-type MenuItemOptions = Partial<MenuItemData> &
+type MenuItemOptions = Partial<Omit<MenuItemData, "key">> &
   MenuItemVariants & {
     /**
      * The icon to display next to the menu item text.
