@@ -170,6 +170,7 @@ export const menuItemStyles = css({
   variants: {
     colorScheme: {
       primary: createColorVariant({ color: "$primary11", bgColorActive: "$primary3" }),
+      accent: createColorVariant({ color: "$accent11", bgColorActive: "$accent3" }),
       neutral: createColorVariant({ color: "$neutral12", bgColorActive: "$neutral4" }),
       success: createColorVariant({ color: "$success11", bgColorActive: "$success3" }),
       info: createColorVariant({ color: "$info11", bgColorActive: "$info3" }),
