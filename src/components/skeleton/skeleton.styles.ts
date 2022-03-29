@@ -2,12 +2,12 @@ import { css, keyframes } from "@/styled-system/stitches.config";
 
 const skeletonColorFade = keyframes({
   from: {
-    borderColor: "var(--hope--startColor)",
-    background: "var(--hope--startColor)",
+    borderColor: "$$startColor",
+    background: "$$startColor",
   },
   to: {
-    borderColor: "var(--hope--endColor)",
-    background: "var(--hope--endColor)",
+    borderColor: "$$endColor",
+    background: "$$endColor",
   },
 });
 

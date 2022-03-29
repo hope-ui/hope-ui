@@ -6,6 +6,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
+import { stackStyles } from "./stack.styles";
 
 export type StackOptions = ResponsiveProps<{
   direction?: Property.FlexDirection;
@@ -25,38 +26,14 @@ const hopeStackClass = "hope-stack";
 export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const [local, others] = splitProps(props, ["class", "direction", "wrap", "spacing"]);
 
-  const classes = () => classNames(local.class, hopeStackClass);
+  const classes = () => classNames(local.class, hopeStackClass, stackStyles());
 
   return (
-    <Box
-      class={classes()}
-      display="flex"
-      alignItems="center"
-      flexDirection={local.direction}
-      flexWrap={local.wrap}
-      gap={local.spacing}
-      {...others}
-    />
+    <Box class={classes()} flexDirection={local.direction} flexWrap={local.wrap} gap={local.spacing} {...others} />
   );
 }
 
 Stack.toString = () => createClassSelector(hopeStackClass);
-
-/* -------------------------------------------------------------------------------------------------
- * VStack
- * -----------------------------------------------------------------------------------------------*/
-
-export type VStackOptions = ResponsiveProps<{
-  spacing?: Property.RowGap<SpaceScaleValue> | number;
-}>;
-
-export type VStackProps<C extends ElementType = "div"> = StackProps<C> & VStackOptions;
-
-export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
-  const [local, others] = splitProps(props, ["spacing"]);
-
-  return <Stack direction="column" rowGap={local.spacing} {...others} />;
-}
 
 /* -------------------------------------------------------------------------------------------------
  * HStack
@@ -68,8 +45,34 @@ export type HStackOptions = ResponsiveProps<{
 
 export type HStackProps<C extends ElementType = "div"> = StackProps<C> & HStackOptions;
 
+/**
+ * A view that arranges its children in a horizontal line.
+ */
 export function HStack<C extends ElementType = "div">(props: HStackProps<C>) {
   const [local, others] = splitProps(props, ["spacing"]);
 
-  return <Stack direction="row" columnGap={local.spacing} {...others} />;
+  return <Stack direction="row" alignItems="center" columnGap={local.spacing} {...others} />;
 }
+
+HStack.toString = () => createClassSelector(hopeStackClass);
+
+/* -------------------------------------------------------------------------------------------------
+ * VStack
+ * -----------------------------------------------------------------------------------------------*/
+
+export type VStackOptions = ResponsiveProps<{
+  spacing?: Property.RowGap<SpaceScaleValue> | number;
+}>;
+
+export type VStackProps<C extends ElementType = "div"> = StackProps<C> & VStackOptions;
+
+/**
+ * A view that arranges its children in a vertical line.
+ */
+export function VStack<C extends ElementType = "div">(props: VStackProps<C>) {
+  const [local, others] = splitProps(props, ["spacing"]);
+
+  return <Stack direction="column" alignItems="center" rowGap={local.spacing} {...others} />;
+}
+
+VStack.toString = () => createClassSelector(hopeStackClass);

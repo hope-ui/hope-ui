@@ -80,3 +80,12 @@ export function callHandler<T, E extends Event>(fn: JSX.EventHandlerUnion<T, E> 
     return event?.defaultPrevented;
   };
 }
+
+/**
+ * Return an array with the size of the provided range.
+ */
+export function range(count: number) {
+  return Array(count)
+    .fill(1)
+    .map((_, index) => index + 1);
+}

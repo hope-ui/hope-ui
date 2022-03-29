@@ -1,3 +1,13 @@
+## [0.3.0](https://github.com/fabien-ml/hope-ui/compare/v0.2.0...v0.3.0) (2022-04-05)
+
+### 💥 BREAKING CHANGES
+
+- `Stack` default value for `alignItems` prop is `stretch`.
+
+### ✨ Features
+
+- Added `Skeleton` component.
+
 ## [0.2.0](https://github.com/fabien-ml/hope-ui/compare/v0.1.2...v0.2.0) (2022-03-28)
 
 ### ✨ Features

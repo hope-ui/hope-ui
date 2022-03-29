@@ -1,11 +1,14 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, Skeleton, useColorMode, VStack } from ".";
+import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode, VStack } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [isLoaded, setIsLoaded] = createSignal(true);
 
   return (
     <Box p="$4">
@@ -13,15 +16,9 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
+        <Button onClick={() => setIsLoaded(prev => !prev)}>Toggle isLoaded</Button>
       </HStack>
-      <VStack spacing="$4" alignItems="stretch">
-        <Skeleton height="20px" />
-        <Skeleton height="20px" startColor="$accent2" endColor="$accent8" />
-        <Skeleton height="20px" startColor="tomato" endColor="dodgerblue" />
-        <Skeleton height="20px" loaded fadeDuration="3s">
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae, consequatur!</p>
-        </Skeleton>
-      </VStack>
+      <VStack spacing="$4" alignItems="flex-start"></VStack>
     </Box>
   );
 }
