@@ -2,19 +2,7 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  Button,
-  HopeProvider,
-  HopeThemeConfig,
-  HStack,
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuTrigger,
-  useColorMode,
-  VStack,
-} from ".";
+import { Box, Button, HopeProvider, HopeThemeConfig, HStack, Skeleton, useColorMode, VStack } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -26,29 +14,13 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start">
-        <Menu>
-          {({ opened }) => (
-            <>
-              <MenuTrigger as={Button}>{opened() ? "Close" : "Open"}</MenuTrigger>
-              {/* <MenuTrigger as={Button}>Actions</MenuTrigger> */}
-              <MenuContent>
-                <MenuItem>Download</MenuItem>
-                <MenuItem onClick={() => alert("Kagebunshin")}>Create a Copy</MenuItem>
-              </MenuContent>
-            </>
-          )}
-        </Menu>
-        <Menu>
-          <MenuTrigger as={Button}>Actions</MenuTrigger>
-          <MenuContent>
-            <MenuItem>Download</MenuItem>
-            <MenuItem>Create a Copy</MenuItem>
-            <MenuItem>Mark as Draft</MenuItem>
-            <MenuItem>Delete</MenuItem>
-            <MenuItem>Attend a Workshop</MenuItem>
-          </MenuContent>
-        </Menu>
+      <VStack spacing="$4" alignItems="stretch">
+        <Skeleton height="20px" />
+        <Skeleton height="20px" startColor="$accent2" endColor="$accent8" />
+        <Skeleton height="20px" startColor="tomato" endColor="dodgerblue" />
+        <Skeleton height="20px" loaded fadeDuration="3s">
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae, consequatur!</p>
+        </Skeleton>
       </VStack>
     </Box>
   );
