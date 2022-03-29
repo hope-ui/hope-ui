@@ -12,7 +12,7 @@ import { ModalCloseButton } from "../modal/modal-close-button";
 import { ModalFooter, ModalFooterProps } from "../modal/modal-footer";
 import { ModalHeader, ModalHeaderProps } from "../modal/modal-header";
 import { ElementType } from "../types";
-import { DrawerDialogVariants, drawerTransitionStyles } from "./drawer.styles";
+import { DrawerDialogVariants } from "./drawer.styles";
 
 export type DrawerPlacement = "top" | "right" | "bottom" | "left";
 
@@ -84,9 +84,6 @@ export function Drawer(props: DrawerProps) {
       return props.disableMotion ?? theme?.defaultProps?.root?.disableMotion ?? false;
     },
   });
-
-  // inject global css for transitions
-  drawerTransitionStyles();
 
   return (
     <DrawerContext.Provider value={state}>

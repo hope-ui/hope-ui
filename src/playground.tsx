@@ -3,12 +3,12 @@ import "./playground.css";
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode, VStack } from ".";
+import { Box, Button, Collapse, HopeProvider, HopeThemeConfig, HStack, useColorMode, VStack } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
 
-  const [isLoaded, setIsLoaded] = createSignal(true);
+  const [isExpanded, setIsExpanded] = createSignal(false);
 
   return (
     <Box p="$4">
@@ -16,9 +16,19 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
-        <Button onClick={() => setIsLoaded(prev => !prev)}>Toggle isLoaded</Button>
+        <Button onClick={() => setIsExpanded(prev => !prev)}>Toggle isExpanded</Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start"></VStack>
+      <VStack spacing="$4" alignItems="flex-start">
+        <Collapse expanded={isExpanded()}>
+          <Box p="40px" color="white" bg="$primary9" rounded="$md" shadow="$md">
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, debitis id ea, consectetur, culpa
+              doloremque optio nostrum aut nulla nam voluptas aliquam aspernatur placeat distinctio quasi tenetur ipsa
+              maiores accusantium?
+            </p>
+          </Box>
+        </Collapse>
+      </VStack>
     </Box>
   );
 }

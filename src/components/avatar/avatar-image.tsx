@@ -5,7 +5,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { hope } from "../factory";
 import { ImageProps } from "../image";
-import { createImage } from "../image/create-image";
+import { createImageLoadingStatus } from "../image/image.utils";
 import { AvatarIconProps, AvatarProps } from "./avatar";
 import { avatarImageStyles } from "./avatar.styles";
 import { AvatarInitials } from "./avatar-initials";
@@ -32,7 +32,7 @@ export function AvatarImage(props: AvatarImageProps) {
   ]);
 
   const status = createMemo(() => {
-    return createImage({
+    return createImageLoadingStatus({
       src: local.src,
       onError: local.onError,
       ignoreFallback: local.ignoreFallback,

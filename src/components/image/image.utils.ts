@@ -6,7 +6,7 @@ import { PropsOf } from "../types";
 
 type NativeImageProps = PropsOf<"img">;
 
-export interface CreateImageProps {
+export interface CreateImageLoadingStatusProps {
   /**
    * The image `src` attribute.
    */
@@ -72,7 +72,7 @@ type ImageEvent = Event & {
  * }
  * ```
  */
-export function createImage(props: CreateImageProps) {
+export function createImageLoadingStatus(props: CreateImageLoadingStatusProps) {
   const [statusState, setStatusState] = createSignal<Status>("pending");
 
   // If user opts out of the fallback/placeholder logic, let's just return 'loaded'.

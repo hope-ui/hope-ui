@@ -6,7 +6,7 @@ import { RightJoinProps } from "@/utils/types";
 
 import { Box } from "../box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { createImage, CreateImageProps } from "./create-image";
+import { createImageLoadingStatus, CreateImageLoadingStatusProps } from "./image.utils";
 
 interface ImageOptions {
   /**
@@ -56,7 +56,7 @@ interface ImageOptions {
 
 export type ImageProps<C extends ElementType = "img"> = RightJoinProps<
   HTMLHopeProps<C, ImageOptions>,
-  CreateImageProps
+  CreateImageLoadingStatusProps
 >;
 
 const hopeImageClass = "hope-image";
@@ -92,7 +92,7 @@ export function Image<C extends ElementType = "img">(props: ImageProps<C>) {
     );
   };
 
-  const status = createMemo(() => createImage({ ...props, ignoreFallback: shouldIgnore() }));
+  const status = createMemo(() => createImageLoadingStatus({ ...props, ignoreFallback: shouldIgnore() }));
 
   const sharedProps = () => ({
     objectFit: local.fit,

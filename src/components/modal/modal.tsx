@@ -6,7 +6,7 @@ import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
-import { ModalContainerVariants, ModalDialogVariants, modalTransitionStyles } from "./modal.styles";
+import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 
 type ModalMotionPreset = "fade-in-bottom" | "scale" | "none";
 
@@ -326,9 +326,6 @@ export function Modal(props: ModalProps) {
     setHeaderMounted,
     setBodyMounted,
   };
-
-  // inject global css for transitions
-  modalTransitionStyles();
 
   return (
     <Show when={isPortalMounted()}>

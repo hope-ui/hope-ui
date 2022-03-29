@@ -10,6 +10,7 @@ export * from "./center";
 export * from "./checkbox";
 export * from "./circular-progress";
 export * from "./close-button";
+export * from "./collapse";
 export * from "./container";
 export * from "./divider";
 export * from "./drawer";

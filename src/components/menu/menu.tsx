@@ -9,7 +9,6 @@ import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
 import { isChildrenFunction } from "@/utils/solid";
 
 import { createDescendantContext } from "../descendant/use-descendant";
-import { menuTransitionStyles } from "./menu.styles";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
 
 type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "none";
@@ -418,9 +417,6 @@ export function Menu(props: MenuProps) {
   };
 
   const openedRenderProp = () => state.opened;
-
-  // inject global css for transitions
-  menuTransitionStyles();
 
   const context: MenuContextValue = {
     state: state as MenuState,
