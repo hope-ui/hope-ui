@@ -1,30 +1,21 @@
 import merge from "lodash.merge";
-import { isServer } from "solid-js/web";
 
 import { baseTheme, createTheme, css } from "@/styled-system/stitches.config";
 import { baseDarkThemeTokens } from "@/styled-system/tokens";
-import { __DEV__ } from "@/utils/assertion";
-import { mockBody } from "@/utils/object";
 
-import { ColorMode, StitchesThemeConfig } from "./types";
-
-/**
- * Theme CSS class name added to `document.body` based on color mode.
- */
-const classNames = {
-  light: "hope-ui-light",
-  dark: "hope-ui-dark",
-};
+import { colorModeClassNames } from "./color-mode";
+import { StitchesThemeConfig } from "./types";
 
 /**
- * [Internal]
  * Create new stitches dark or light theme.
  * @return a merged theme object containing the base stitches theme and the override values.
+ *
+ * @internal
  */
 export function extendBaseTheme<T extends StitchesThemeConfig>(type: "light" | "dark", themeConfig: T) {
   const isDark = type === "dark";
 
-  const className = isDark ? classNames.dark : classNames.light;
+  const className = isDark ? colorModeClassNames.dark : colorModeClassNames.light;
 
   // If dark theme, we need to add base dark theme tokens which is not present in the base theme.
   const finalConfig = isDark ? merge({}, baseDarkThemeTokens, themeConfig) : themeConfig;
@@ -34,76 +25,23 @@ export function extendBaseTheme<T extends StitchesThemeConfig>(type: "light" | "
   return merge({}, baseTheme, customTheme);
 }
 
-const hasLocalStorageSupport = () => typeof Storage !== "undefined";
-
-const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
-
-function getColorModeFromLocalStorage() {
-  if (!hasLocalStorageSupport()) {
-    return null;
-  }
-
-  try {
-    return localStorage.getItem(COLOR_MODE_STORAGE_KEY) as ColorMode | null;
-  } catch (error) {
-    if (__DEV__) {
-      console.log(error);
-    }
-    return null;
-  }
-}
-
-export function saveColorModeToLocalStorage(value: ColorMode) {
-  if (!hasLocalStorageSupport()) {
-    return;
-  }
-
-  try {
-    localStorage.setItem(COLOR_MODE_STORAGE_KEY, value);
-  } catch (error) {
-    if (__DEV__) {
-      console.log(error);
-    }
-  }
-}
-
 /**
- * Get the default color mode based on system preference or from local storage.
- * @param fallbackValue Fallback color mode value, if `system` it will be the system color mode.
- * @returns The default color mode to use.
+ * Return the css variable associated with the given token if exists, or the token itself otherwise.
+ *
+ * @example
+ * "$primary9" -> "var(--hope-colors-primary9)"
+ * "tomato" -> "tomato"
  */
-export function getDefaultColorMode(fallbackValue: ColorMode): ColorMode {
-  const persistedPreference = getColorModeFromLocalStorage();
-
-  if (persistedPreference) {
-    return persistedPreference;
-  } else if (fallbackValue === "system") {
-    const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return isSystemDark ? "dark" : "light";
-  } else {
-    return fallbackValue;
+export function colorTokenToCssVar(token: string): string {
+  if (!token.startsWith("$")) {
+    return token;
   }
+
+  return `var(--hope-colors-${token.substring(1)})`;
 }
 
 /**
- * Function to add/remove class from `document.body` based on color mode.
- */
-export function syncBodyColorModeClassName(isDark: boolean) {
-  const body = isServer ? mockBody : document.body;
-
-  body.classList.add(isDark ? classNames.dark : classNames.light);
-  body.classList.remove(isDark ? classNames.light : classNames.dark);
-}
-
-/**
- * Function to set `document` [data-theme] attribute based on color mode.
- */
-export function setDocumentColorModeDataTheme(colorMode: ColorMode) {
-  document.documentElement.setAttribute("data-theme", colorMode);
-}
-
-/**
- * Visually hide an element without hiding it from screen readers
+ * Visually hide an element without hiding it from screen readers.
  */
 export const visuallyHiddenStyles = css({
   position: "absolute",

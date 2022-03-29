@@ -84,6 +84,7 @@
 | CircularProgress |     ✅      |     ✅     |       |           |      |
 | Progress         |     ✅      |     ✅     |       |           |      |
 | Spinner          |     ✅      |     ✅     |       |           |      |
+| Skeleton         |     ✅      |    n/a     |       |           |      |
 | Toast            |             |            |       |           |      |
 
 ### Overlay

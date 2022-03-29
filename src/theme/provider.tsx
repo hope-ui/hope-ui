@@ -1,15 +1,15 @@
 /* eslint-disable solid/reactivity */
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { resetStyles } from "./reset";
-import { ColorMode, ComponentsStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
 import {
-  extendBaseTheme,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
   setDocumentColorModeDataTheme,
   syncBodyColorModeClassName,
-} from "./utils";
+} from "./color-mode";
+import { resetStyles } from "./reset";
+import { ColorMode, ComponentsStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
+import { extendBaseTheme } from "./utils";
 
 export const HopeContext = createContext<HopeContextValue>();
 

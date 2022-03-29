@@ -1,4 +1,3 @@
-/* eslint-disable solid/reactivity */
 import { isObject } from "@/utils/assertion";
 
 import { StyleProps } from "./system";

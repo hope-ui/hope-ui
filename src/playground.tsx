@@ -1,23 +1,14 @@
 import "./playground.css";
 
+import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  Button,
-  HopeProvider,
-  HopeThemeConfig,
-  HStack,
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuTrigger,
-  useColorMode,
-  VStack,
-} from ".";
+import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode, VStack } from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [isLoaded, setIsLoaded] = createSignal(true);
 
   return (
     <Box p="$4">
@@ -25,31 +16,9 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
+        <Button onClick={() => setIsLoaded(prev => !prev)}>Toggle isLoaded</Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start">
-        <Menu>
-          {({ opened }) => (
-            <>
-              <MenuTrigger as={Button}>{opened() ? "Close" : "Open"}</MenuTrigger>
-              {/* <MenuTrigger as={Button}>Actions</MenuTrigger> */}
-              <MenuContent>
-                <MenuItem>Download</MenuItem>
-                <MenuItem onClick={() => alert("Kagebunshin")}>Create a Copy</MenuItem>
-              </MenuContent>
-            </>
-          )}
-        </Menu>
-        <Menu>
-          <MenuTrigger as={Button}>Actions</MenuTrigger>
-          <MenuContent>
-            <MenuItem>Download</MenuItem>
-            <MenuItem>Create a Copy</MenuItem>
-            <MenuItem>Mark as Draft</MenuItem>
-            <MenuItem>Delete</MenuItem>
-            <MenuItem>Attend a Workshop</MenuItem>
-          </MenuContent>
-        </Menu>
-      </VStack>
+      <VStack spacing="$4" alignItems="flex-start"></VStack>
     </Box>
   );
 }
