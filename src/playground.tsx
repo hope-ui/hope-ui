@@ -35,7 +35,7 @@ export function App() {
             <Tab>Two</Tab>
             <Tab>Three</Tab>
           </TabList>
-          {/* <TabPanels>
+          <TabPanels>
             <TabPanel>
               <p>one!</p>
             </TabPanel>
@@ -45,7 +45,7 @@ export function App() {
             <TabPanel>
               <p>three!</p>
             </TabPanel>
-          </TabPanels> */}
+          </TabPanels>
         </Tabs>
       </VStack>
     </Box>

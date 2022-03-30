@@ -1,4 +1,4 @@
-import { isElement } from "@/utils/dom";
+import { isElement, sortNodes } from "@/utils/dom";
 import { getNextIndex, getPrevIndex } from "@/utils/number";
 
 export type DescendantOptions<T = {}> = T & {
@@ -33,7 +33,7 @@ export type Descendant<T, K> = DescendantOptions<K> & {
  * @internal
  */
 export class DescendantsManager<T extends HTMLElement, K extends Record<string, any> = {}> {
-  private descendants: Array<Descendant<T, K>> = [];
+  private descendants = new Map<T, Descendant<T, K>>();
 
   register = (nodeOrOptions: T | null | DescendantOptions<K>) => {
     if (nodeOrOptions == null) {
@@ -50,23 +50,26 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
   };
 
   unregister = (node: T) => {
-    this.descendants = this.descendants.filter(item => item.node !== node);
+    this.descendants.delete(node);
 
-    this.assignIndex();
+    const sorted = sortNodes(Array.from(this.descendants.keys()));
+
+    this.assignIndex(sorted);
   };
 
   destroy = () => {
-    this.descendants = [];
+    this.descendants.clear();
   };
 
-  private assignIndex = () => {
-    this.descendants.forEach((descendant, index) => {
+  private assignIndex = (nodes: Node[]) => {
+    this.descendants.forEach(descendant => {
+      const index = nodes.indexOf(descendant.node);
       descendant.index = index;
-      descendant.node.dataset["index"] = index.toString();
+      descendant.node.dataset["index"] = descendant.index.toString();
     });
   };
 
-  count = () => this.descendants.length;
+  count = () => this.descendants.size;
 
   enabledCount = () => this.enabledValues().length;
 
@@ -99,7 +102,7 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
 
   firstEnabled = () => this.enabledItem(0);
 
-  last = () => this.item(this.descendants.length - 1);
+  last = () => this.item(this.descendants.size - 1);
 
   lastEnabled = () => {
     const lastIndex = this.enabledValues().length - 1;
@@ -111,7 +114,7 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
       return -1;
     }
 
-    return this.descendants.findIndex(item => item.node === node);
+    return this.descendants.get(node)?.index ?? -1;
   };
 
   enabledIndexOf = (node: T | null) => {
@@ -167,19 +170,22 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
   };
 
   private registerNode = (node: T | null, options?: DescendantOptions<K>) => {
-    if (!node || this.indexOf(node) !== -1) {
+    if (!node || this.descendants.has(node)) {
       return;
     }
+
+    const keys = Array.from(this.descendants.keys()).concat(node);
+    const sorted = sortNodes(keys);
 
     const descendantOptions: DescendantOptions = {
       ...options,
       disabled: options?.disabled ? !!options.disabled : undefined,
     };
 
-    const descendant: Descendant<T, any> = { node, index: -1, ...descendantOptions };
+    const descendant = { node, index: -1, ...descendantOptions };
 
-    this.descendants = [...this.descendants, descendant];
+    this.descendants.set(node, descendant as Descendant<T, K>);
 
-    this.assignIndex();
+    this.assignIndex(sorted);
   };
 }
