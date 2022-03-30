@@ -1,6 +1,11 @@
 /* eslint-disable solid/reactivity */
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
+import { drawerTransitionStyles } from "@/components/drawer/drawer.styles";
+import { menuTransitionStyles } from "@/components/menu/menu.styles";
+import { modalTransitionStyles } from "@/components/modal/modal.styles";
+import { tooltipTransitionStyles } from "@/components/tooltip/tooltip.styles";
+
 import {
   getDefaultColorMode,
   saveColorModeToLocalStorage,
@@ -16,6 +21,15 @@ export const HopeContext = createContext<HopeContextValue>();
 export type HopeProviderProps = PropsWithChildren<{
   config?: HopeThemeConfig;
 }>;
+
+function applyGlobalStyles() {
+  resetStyles();
+
+  drawerTransitionStyles();
+  menuTransitionStyles();
+  modalTransitionStyles();
+  tooltipTransitionStyles();
+}
 
 export function HopeProvider(props: HopeProviderProps) {
   // Create themes
@@ -56,8 +70,7 @@ export function HopeProvider(props: HopeProviderProps) {
     syncBodyColorModeClassName(isDark);
   });
 
-  // Apply css reset
-  resetStyles();
+  applyGlobalStyles();
 
   return <HopeContext.Provider value={context}>{props.children}</HopeContext.Provider>;
 }

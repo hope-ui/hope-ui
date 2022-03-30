@@ -1,12 +1,8 @@
-## [0.3.0](https://github.com/fabien-ml/hope-ui/compare/v0.2.0...v0.3.0) (2022-04-05)
+## [0.2.1](https://github.com/fabien-ml/hope-ui/compare/v0.2.0...v0.2.1) (2022-03-30)
 
-### 💥 BREAKING CHANGES
+### 🐛 Bug fixes
 
-- `Stack` default value for `alignItems` prop is `stretch`.
-
-### ✨ Features
-
-- Added `Skeleton` component.
+- `Tabs` not showing correct `TabPanel` in Safari.
 
 ## [0.2.0](https://github.com/fabien-ml/hope-ui/compare/v0.1.2...v0.2.0) (2022-03-28)
 

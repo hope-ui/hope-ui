@@ -22,7 +22,7 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
-import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName, tooltipTransitionStyles } from "./tooltip.styles";
+import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName } from "./tooltip.styles";
 
 export interface TooltipOptions {
   /**
@@ -399,9 +399,6 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
       trigger().removeAttribute("aria-describedby");
     }
   });
-
-  // inject global css for transitions
-  tooltipTransitionStyles();
 
   return (
     <>
