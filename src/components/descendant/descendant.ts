@@ -61,9 +61,9 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
     this.descendants.clear();
   };
 
-  private assignIndex = (descendants: Node[]) => {
+  private assignIndex = (nodes: Node[]) => {
     this.descendants.forEach(descendant => {
-      const index = descendants.indexOf(descendant.node);
+      const index = nodes.indexOf(descendant.node);
       descendant.index = index;
       descendant.node.dataset["index"] = descendant.index.toString();
     });
@@ -179,7 +179,7 @@ export class DescendantsManager<T extends HTMLElement, K extends Record<string, 
 
     const descendantOptions: DescendantOptions = {
       ...options,
-      disabled: !!options?.disabled ?? false,
+      disabled: options?.disabled ? !!options.disabled : undefined,
     };
 
     const descendant = { node, index: -1, ...descendantOptions };
