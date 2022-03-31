@@ -1,25 +1,39 @@
 import "./playground.css";
 
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   Button,
   HopeProvider,
   HopeThemeConfig,
   HStack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
+  Select,
+  SelectContent,
+  SelectIcon,
+  SelectListbox,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPlaceholder,
+  SelectTrigger,
+  SelectValue,
   useColorMode,
-  VStack,
 } from ".";
+import { IconCaretDown } from "./components/icons/IconCaretDown";
+import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
+
+  const [isDisabled, setIsDisabled] = createSignal(false);
+  const [idx, setIdx] = createSignal<number[]>([]);
 
   return (
     <Box p="$4">
@@ -27,27 +41,61 @@ export function App() {
         <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
           Toggle color mode
         </Button>
+        <Button onClick={() => setIsDisabled(prev => !prev)}>Toggle isDisabled</Button>
+        <Button onClick={() => setIdx(prev => (prev.length === 0 ? [0, 1] : []))}>Toggle all</Button>
       </HStack>
-      <VStack spacing="$4" alignItems="flex-start">
-        <Tabs>
-          <TabList>
-            <Tab>One</Tab>
-            <Tab>Two</Tab>
-            <Tab>Three</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <p>one!</p>
-            </TabPanel>
-            <TabPanel>
-              <p>two!</p>
-            </TabPanel>
-            <TabPanel>
-              <p>three!</p>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </VStack>
+      <p>idx : {idx()}</p>
+      <Accordion allowMultiple index={idx()} onChange={(val: number[]) => setIdx(val)}>
+        <AccordionItem disabled={isDisabled()}>
+          <h2>
+            <AccordionButton>
+              <Box flex="1" textAlign="left">
+                Section 1 title
+              </Box>
+              <AccordionIcon as={IconCheckCircleSolid} />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb="$4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem>
+          <h2>
+            <AccordionButton>
+              <Box flex="1" textAlign="left">
+                Section 2 title
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb="$4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
+      <Select>
+        <SelectTrigger>
+          <SelectPlaceholder>Choose a framework</SelectPlaceholder>
+          <SelectValue />
+          <SelectIcon rotateOnOpen as={IconCaretDown} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectListbox>
+            <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+              {item => (
+                <SelectOption value={item}>
+                  <SelectOptionText>{item}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              )}
+            </For>
+          </SelectListbox>
+        </SelectContent>
+      </Select>
     </Box>
   );
 }

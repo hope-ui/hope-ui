@@ -1,3 +1,4 @@
+export * from "./accordion";
 export * from "./alert";
 export * from "./anchor";
 export * from "./aspect-ratio";

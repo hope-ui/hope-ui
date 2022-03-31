@@ -8,7 +8,6 @@ import { useComponentStyleConfigs } from "@/theme/provider";
 import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
 import { isChildrenFunction } from "@/utils/solid";
 
-import { createDescendantContext } from "../descendant/use-descendant";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
 
 type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "none";
@@ -529,12 +528,6 @@ export function useMenuContext() {
 
   return context;
 }
-
-/**
- * Context for managing descendant `menuitem` components.
- */
-export const [MenuDescendantsProvider, useMenuDescendantsContext, useMenuDescendants, useMenuDescendant] =
-  createDescendantContext<HTMLElement>();
 
 /* -------------------------------------------------------------------------------------------------
  * StyleConfig

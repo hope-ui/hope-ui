@@ -33,7 +33,6 @@ export function SimpleSelect(props: SimpleSelectProps) {
       "variant",
       "size",
       "offset",
-      "compareKey",
       "id",
       "multiple",
       "value",
