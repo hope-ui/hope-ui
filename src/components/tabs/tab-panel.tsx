@@ -1,4 +1,4 @@
-import { children, Show, splitProps } from "solid-js";
+import { children, createSignal, Show, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -6,7 +6,6 @@ import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useTabPanelsDescendant } from "./tab-panels";
 import { useTabsContext } from "./tabs";
 import { tabPanelStyles } from "./tabs.styles";
 
@@ -22,18 +21,18 @@ export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>)
 
   const tabsContext = useTabsContext();
 
+  const [index, setIndex] = createSignal(-1);
+
   const [local, others] = splitProps(props as TabPanelProps<"div">, ["ref", "class", "children"]);
 
-  const tabPanelsDescendant = useTabPanelsDescendant();
+  const isSelected = () => tabsContext.isSelectedIndex(index());
 
-  const isSelected = () => tabsContext.isSelectedIndex(tabPanelsDescendant.index());
+  const tabId = () => tabsContext.getTabId(index());
 
-  const tabId = () => tabsContext.getTabId(tabPanelsDescendant.index());
-
-  const tabPanelId = () => tabsContext.getTabPanelId(tabPanelsDescendant.index());
+  const tabPanelId = () => tabsContext.getTabPanelId(index());
 
   const assignTabPanelRef = (el: HTMLDivElement) => {
-    tabPanelsDescendant.assignRef(el);
+    setIndex(tabsContext.registerTabPanel(el));
 
     if (isFunction(local.ref)) {
       local.ref(el);

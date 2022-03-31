@@ -1,9 +1,10 @@
-import { createContext, createUniqueId, splitProps, useContext } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createContext, createMemo, createUniqueId, splitProps, useContext } from "solid-js";
+import { createStore, DeepReadonly } from "solid-js/store";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
+import { getNextIndex, getPrevIndex } from "@/utils/number";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -69,9 +70,9 @@ interface TabsState extends Required<TabVariants> {
   selectedIndex: number;
 
   /**
-   * The id of the tabs component.
+   * The base id used as prefix for tab and tab-panel ids.
    */
-  id: string;
+  baseId: string;
 
   /**
    * If `true`, the content of inactive tab panels stays mounted when unselected.
@@ -87,6 +88,16 @@ interface TabsState extends Required<TabVariants> {
    * The alignment of tabs in the tablist.
    */
   alignment: TabListVariants["alignment"];
+
+  /**
+   * All tab nodes.
+   */
+  tabs: Array<HTMLButtonElement>;
+
+  /**
+   * All tab panel nodes.
+   */
+  tabPanels: Array<HTMLElement>;
 }
 
 const hopeTabsClass = "hope-tabs";
@@ -95,21 +106,23 @@ const hopeTabsClass = "hope-tabs";
  * Tabs provides context and logic for all tabs components.
  */
 export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
-  const defaultId = `hope-tabs-${createUniqueId()}`;
+  const defaultBaseId = `hope-tabs-${createUniqueId()}`;
 
   const theme = useComponentStyleConfigs().Tabs;
 
   const [state, setState] = createStore<TabsState>({
     // eslint-disable-next-line solid/reactivity
     _selectedIndex: props.defaultIndex ?? 0,
+    tabs: [],
+    tabPanels: [],
     get isControlled() {
       return props.index !== undefined;
     },
     get selectedIndex() {
       return this.isControlled ? props.index : this._selectedIndex;
     },
-    get id() {
-      return props.id ?? defaultId;
+    get baseId() {
+      return props.id ?? defaultBaseId;
     },
     get orientation() {
       return props.orientation ?? "horizontal";
@@ -141,6 +154,8 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     ["index", "defaultIndex", "keepAlive", "alignment", "orientation", "variant", "colorScheme", "size", "fitted"]
   );
 
+  const reverseTabs = createMemo(() => state.tabs.slice().reverse());
+
   const setSelectedIndex = (index: number) => {
     setState("_selectedIndex", index);
 
@@ -152,11 +167,59 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   };
 
   const getTabId = (index: number) => {
-    return `${state.id}--tab-${index}`;
+    return `${state.baseId}--tab-${index}`;
   };
 
   const getTabPanelId = (index: number) => {
-    return `${state.id}--tabpanel-${index}`;
+    return `${state.baseId}--tabpanel-${index}`;
+  };
+
+  const registerTab = (node: HTMLButtonElement) => {
+    setState("tabs", prev => [...prev, node] as Array<DeepReadonly<HTMLButtonElement>>);
+
+    return state.tabs.length - 1;
+  };
+
+  const registerTabPanel = (node: HTMLElement) => {
+    setState("tabPanels", prev => [...prev, node] as Array<DeepReadonly<HTMLElement>>);
+
+    return state.tabPanels.length - 1;
+  };
+
+  const focusNextTab = () => {
+    const lastIndex = state.tabs.length - 1;
+    let nextIndex = getNextIndex(tabsContext.state.selectedIndex, lastIndex, true);
+    let nextTab = state.tabs[nextIndex];
+
+    while (nextTab.disabled) {
+      nextIndex = getNextIndex(nextIndex, lastIndex, true);
+      nextTab = state.tabs[nextIndex];
+    }
+
+    nextTab.focus();
+  };
+
+  const focusPrevTab = () => {
+    const lastIndex = state.tabs.length - 1;
+    let prevIndex = getPrevIndex(tabsContext.state.selectedIndex, lastIndex, true);
+    let prevTab = state.tabs[prevIndex];
+
+    while (prevTab.disabled) {
+      prevIndex = getPrevIndex(prevIndex, lastIndex, true);
+      prevTab = state.tabs[prevIndex];
+    }
+
+    prevTab.focus();
+  };
+
+  const focusFirstTab = () => {
+    state.tabs.find(tab => !tab.disabled)?.focus();
+  };
+
+  const focusLastTab = () => {
+    reverseTabs()
+      .find(tab => !tab.disabled)
+      ?.focus();
   };
 
   const classes = () => {
@@ -170,11 +233,17 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   };
 
   const tabsContext: TabsContextValue = {
-    state,
+    state: state as TabsState,
     setSelectedIndex,
     isSelectedIndex,
     getTabId,
     getTabPanelId,
+    registerTab,
+    registerTabPanel,
+    focusPrevTab,
+    focusNextTab,
+    focusFirstTab,
+    focusLastTab,
   };
 
   return (
@@ -212,6 +281,38 @@ interface TabsContextValue {
    * Return the tab panel `id` of the given index.
    */
   getTabPanelId: (index: number) => string;
+
+  /**
+   * Register a `Tab` to the context.
+   * @return The index of the tab.
+   */
+  registerTab: (node: HTMLButtonElement) => number;
+
+  /**
+   * Register a `TabPanel` to the context.
+   * @return The index of the tab panel.
+   */
+  registerTabPanel: (node: HTMLElement) => number;
+
+  /**
+   * Focus the previous non disabled tab.
+   */
+  focusPrevTab: () => void;
+
+  /**
+   * Focus the next non disabled tab.
+   */
+  focusNextTab: () => void;
+
+  /**
+   * Focus the first non disabled tab.
+   */
+  focusFirstTab: () => void;
+
+  /**
+   * Focus the last non disabled tab.
+   */
+  focusLastTab: () => void;
 }
 
 const TabsContext = createContext<TabsContextValue>();

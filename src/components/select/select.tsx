@@ -712,7 +712,7 @@ interface SelectContextValue {
   scrollToOption: (optionRef: HTMLDivElement) => void;
 
   /**
-   * Callback to notify the context that a `SelectOption` is mounted.
+   * Register a `SelectOption` to the context.
    * @return The index of the option.
    */
   registerOption: (optionData: SelectOptionData) => number;

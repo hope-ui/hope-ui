@@ -1,4 +1,4 @@
-import { createEffect, JSX, on, splitProps } from "solid-js";
+import { createSignal, JSX, splitProps } from "solid-js";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
@@ -7,7 +7,6 @@ import { callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useTabsDescendant } from "./tab-list";
 import { useTabsContext } from "./tabs";
 import { tabStyles } from "./tabs.styles";
 
@@ -30,22 +29,18 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
 
   const tabsContext = useTabsContext();
 
-  const [local, tabsDescendantOptions, others] = splitProps(
-    props as TabProps<"button">,
-    ["ref", "class", "disabled", "onClick", "onFocus"],
-    ["disabled"]
-  );
+  const [index, setIndex] = createSignal(-1);
 
-  const tabsDescendant = useTabsDescendant(tabsDescendantOptions);
+  const [local, others] = splitProps(props as TabProps<"button">, ["ref", "class", "disabled", "onClick", "onFocus"]);
 
-  const isSelected = () => tabsContext.isSelectedIndex(tabsDescendant.index());
+  const isSelected = () => tabsContext.isSelectedIndex(index());
 
-  const tabId = () => tabsContext.getTabId(tabsDescendant.index());
+  const tabId = () => tabsContext.getTabId(index());
 
-  const tabPanelId = () => tabsContext.getTabPanelId(tabsDescendant.index());
+  const tabPanelId = () => tabsContext.getTabPanelId(index());
 
   const assignTabRef = (el: HTMLButtonElement) => {
-    tabsDescendant.assignRef(el);
+    setIndex(tabsContext.registerTab(el));
 
     if (isFunction(local.ref)) {
       local.ref(el);
@@ -56,13 +51,13 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    tabsContext.setSelectedIndex(tabsDescendant.index());
+    tabsContext.setSelectedIndex(index());
 
     callHandler(local.onClick)(event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    tabsContext.setSelectedIndex(tabsDescendant.index());
+    tabsContext.setSelectedIndex(index());
 
     callHandler(local.onFocus)(event);
   };
@@ -80,13 +75,6 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
       })
     );
   };
-
-  createEffect(
-    on(
-      () => local.disabled,
-      () => tabsDescendant.setDisabled(!!local.disabled)
-    )
-  );
 
   return (
     <hope.button
