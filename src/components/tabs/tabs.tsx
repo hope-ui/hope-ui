@@ -336,7 +336,6 @@ export interface TabsStyleConfig {
     root?: SystemStyleObject;
     tabList?: SystemStyleObject;
     tab?: SystemStyleObject;
-    tabPanels?: SystemStyleObject;
     tabPanel?: SystemStyleObject;
   };
   defaultProps?: {

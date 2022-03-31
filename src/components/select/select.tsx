@@ -18,7 +18,7 @@ import {
   SelectOptionData,
 } from "./select.utils";
 
-type Value = string | number | (string | number)[];
+type Value = any | any[];
 
 interface ThemeableSelectOptions extends SelectTriggerVariants {
   /**
