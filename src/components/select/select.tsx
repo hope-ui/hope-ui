@@ -14,29 +14,22 @@ import {
   getIndexByLetter,
   getUpdatedIndex,
   isOptionEqual,
-  isValueEqual,
   SelectActions,
   SelectOptionData,
 } from "./select.utils";
 
-type Value = any | any[];
+type Value = string | number | (string | number)[];
 
 interface ThemeableSelectOptions extends SelectTriggerVariants {
   /**
    * Offset between the listbox and the reference (trigger) element.
    */
   offset?: number;
-
-  /**
-   * When using an object as an option value, the object key that uniquely identifies an option.
-   * Used to compare if two options are equal.
-   */
-  compareKey?: string;
 }
 
 export interface SelectProps extends ThemeableSelectOptions {
   /**
-   * The `id` of the select.
+   * The `id` of the internal select element.
    */
   id?: string;
 
@@ -104,7 +97,7 @@ export interface SelectProps extends ThemeableSelectOptions {
   onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
 }
 
-type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">> &
+type SelectState = Required<Pick<SelectProps, "variant" | "size">> &
   Pick<SelectProps, "multiple" | "value" | "invalid" | "disabled"> & {
     /**
      * If `true`, the select has options selected.
@@ -120,6 +113,12 @@ type SelectState = Required<Pick<SelectProps, "variant" | "size" | "compareKey">
      * If `true`, the select is in controlled mode.
      */
     isControlled: boolean;
+
+    /**
+     * The `id` of the internal select element.
+     * Also used as a prefix for other components ids.
+     */
+    baseId: string;
 
     /**
      * The `id` of the `SelectTrigger`.
@@ -207,17 +206,20 @@ export function Select(props: SelectProps) {
     get multiple() {
       return props.multiple;
     },
+    get baseId() {
+      return props.id ?? formControlProps.id ?? defaultBaseId;
+    },
     get triggerId() {
-      return props.id ?? formControlProps.id ?? `${defaultBaseId}-trigger`;
+      return `${this.baseId}-trigger`;
     },
     get listboxId() {
-      return `${defaultBaseId}-listbox`;
+      return `${this.baseId}-listbox`;
     },
     get labelIdPrefix() {
-      return `${defaultBaseId}-label`;
+      return `${this.baseId}-label`;
     },
     get optionIdPrefix() {
-      return `${defaultBaseId}-option`;
+      return `${this.baseId}-option`;
     },
     get disabled() {
       return props.disabled ?? formControlProps.disabled;
@@ -230,9 +232,6 @@ export function Select(props: SelectProps) {
     },
     get size() {
       return props.size ?? theme?.defaultProps?.root?.size ?? "md";
-    },
-    get compareKey() {
-      return props.compareKey ?? theme?.defaultProps?.root?.compareKey ?? "id";
     },
     get activeDescendantId() {
       return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;
@@ -336,7 +335,7 @@ export function Select(props: SelectProps) {
     }
 
     const selectedOptions = getDefaultSelectedValues()
-      .map(value => state.options.find(option => isValueEqual(option.value, value, state.compareKey)))
+      .map(value => state.options.find(option => option.value === value))
       .filter(Boolean);
 
     setState("selectedOptions", prev => [...prev, ...selectedOptions]);
@@ -354,16 +353,14 @@ export function Select(props: SelectProps) {
     }
 
     if (state.multiple) {
-      return !!state.selectedOptions.find(selectedOption => isOptionEqual(option, selectedOption, state.compareKey));
+      return !!state.selectedOptions.find(selectedOption => isOptionEqual(option, selectedOption));
     } else {
-      return isOptionEqual(option, state.selectedOptions[0], state.compareKey);
+      return isOptionEqual(option, state.selectedOptions[0]);
     }
   };
 
   const removeFromSelectedOptions = (selectedOption: SelectOptionData) => {
-    setState("selectedOptions", prev =>
-      prev.filter(option => !isOptionEqual(selectedOption, option, state.compareKey))
-    );
+    setState("selectedOptions", prev => prev.filter(option => !isOptionEqual(selectedOption, option)));
   };
 
   const setSelectedOptions = (index: number) => {
@@ -625,7 +622,7 @@ export function Select(props: SelectProps) {
   };
 
   const registerOption = (optionData: SelectOptionData) => {
-    const index = state.options.findIndex(option => isOptionEqual(option, optionData, state.compareKey));
+    const index = state.options.findIndex(option => isOptionEqual(option, optionData));
 
     // do not register the same option twice
     if (index != -1) {
@@ -665,6 +662,16 @@ export function Select(props: SelectProps) {
     onOptionMouseDown,
     onListboxMouseLeave,
   };
+
+  // const nativeSelectValue = createMemo(() => {
+  //   if (state.selectedOptions.length <= 0) {
+  //     return undefined;
+  //   }
+
+  //   return state.multiple
+  //     ? state.selectedOptions.map(option => String(option.value))
+  //     : String(state.selectedOptions[0].value);
+  // });
 
   return <SelectContext.Provider value={context}>{props.children}</SelectContext.Provider>;
 }

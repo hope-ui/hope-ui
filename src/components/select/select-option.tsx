@@ -16,24 +16,8 @@ export interface SelectOptionContextValue {
 
 const SelectOptionContext = createContext<SelectOptionContextValue>();
 
-interface SelectOptionOptions {
-  /**
-   * The value of the option.
-   */
-  value: any;
-
-  /**
-   * Optional text used for typeahead purposes.
-   * By default the typeahead behavior will use the `.textContent` of the `SelectOption`.
-   * Use this when the content is complex, or you have non-textual content inside.
-   */
-  textValue?: string;
-
-  /**
-   * If `true`, the option will be disabled.
-   */
-  disabled?: boolean;
-}
+type SelectOptionOptions = Required<Pick<SelectOptionData, "value">> &
+  Partial<Pick<SelectOptionData, "textValue" | "disabled">>;
 
 export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptionOptions>;
 

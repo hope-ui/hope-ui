@@ -1,6 +1,6 @@
 import "./playground.css";
 
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -16,6 +16,7 @@ import {
   useColorMode,
   VStack,
 } from ".";
+import { SimpleOption, SimpleSelect } from "./components";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -47,6 +48,16 @@ export function App() {
           <TabPanel>5</TabPanel>
           <TabPanel>6</TabPanel>
         </Tabs>
+        <SimpleSelect multiple>
+          <For
+            each={[
+              { id: 1, label: "React" },
+              { id: 2, label: "Angular" },
+            ]}
+          >
+            {option => <SimpleOption value={option.id}>{option.label}</SimpleOption>}
+          </For>
+        </SimpleSelect>
       </VStack>
     </Box>
   );

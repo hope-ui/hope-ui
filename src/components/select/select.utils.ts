@@ -1,10 +1,8 @@
-import { isObject } from "@/utils/assertion";
-
 export interface SelectOptionData {
   /**
    * The value to use when the option is selected.
    */
-  value: any;
+  value: string | number;
 
   /**
    * Optional text used for typeahead purposes.
@@ -202,19 +200,8 @@ export function getUpdatedIndex(params: GetUpdatedIndexParams) {
 }
 
 /**
- * Check if two options values are equal.
- */
-export function isValueEqual(a: any, b: any, compareKey: string): boolean {
-  if (!isObject(a)) {
-    return a === b;
-  }
-
-  return a[compareKey] === b[compareKey];
-}
-
-/**
  * Check if two options are equal.
  */
-export function isOptionEqual(a: SelectOptionData, b: SelectOptionData, compareKey: string): boolean {
-  return isValueEqual(a.value, b.value, compareKey);
+export function isOptionEqual(a: SelectOptionData, b: SelectOptionData): boolean {
+  return String(a.value) === String(b.value);
 }
