@@ -43,7 +43,7 @@ interface TabsOptions extends ThemeableTabsOptions {
 
   /**
    * Callback invoked when the index changes.
-   * (in controlled or un-controlled modes)
+   * (in controlled mode)
    */
   onChange?: (index: number) => void;
 }
@@ -188,7 +188,7 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
 
   const focusNextTab = () => {
     const lastIndex = state.tabs.length - 1;
-    let nextIndex = getNextIndex(tabsContext.state.selectedIndex, lastIndex, true);
+    let nextIndex = getNextIndex(state.selectedIndex, lastIndex, true);
     let nextTab = state.tabs[nextIndex];
 
     while (nextTab.disabled) {
@@ -201,7 +201,7 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
 
   const focusPrevTab = () => {
     const lastIndex = state.tabs.length - 1;
-    let prevIndex = getPrevIndex(tabsContext.state.selectedIndex, lastIndex, true);
+    let prevIndex = getPrevIndex(state.selectedIndex, lastIndex, true);
     let prevTab = state.tabs[prevIndex];
 
     while (prevTab.disabled) {
@@ -232,7 +232,7 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
     );
   };
 
-  const tabsContext: TabsContextValue = {
+  const context: TabsContextValue = {
     state: state as TabsState,
     setSelectedIndex,
     isSelectedIndex,
@@ -247,7 +247,7 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   };
 
   return (
-    <TabsContext.Provider value={tabsContext}>
+    <TabsContext.Provider value={context}>
       <Box class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
     </TabsContext.Provider>
   );

@@ -36,14 +36,14 @@ export function Icon<C extends ElementType = "svg">(props: IconProps<C>) {
   const classes = () => classNames(local.class, hopeIconClass, iconStyles());
 
   /**
-   * If you're using an icon library.
+   * If the `as` prop is a component (ex: if you're using an icon library).
    * Note: anyone passing the `as` prop, should manage the `viewBox` from the external component
    */
-  const shouldRenderSvgComponent = () => local.as && !isString(local.as);
+  const shouldRenderComponent = () => local.as && !isString(local.as);
 
   return (
     <Show
-      when={shouldRenderSvgComponent()}
+      when={shouldRenderComponent()}
       fallback={
         <hope.svg class={classes()} viewBox={local.viewBox} {...others}>
           <Show when={local.children} fallback={fallbackIcon.path}>

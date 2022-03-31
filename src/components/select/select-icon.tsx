@@ -41,7 +41,7 @@ export function SelectIcon<C extends ElementType = "div">(props: SelectIconProps
   });
 
   return (
-    <Box aria-hidden="true" class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others}>
+    <Box aria-hidden class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others}>
       <Show when={resolvedChildren()} fallback={<IconSelector />}>
         {resolvedChildren()}
       </Show>

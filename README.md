@@ -1,19 +1,25 @@
-# @hope-ui/solid (WIP)
+# @hope-ui/solid
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript)
 [![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui "MIT License")](LICENSE.md)
 [![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid "@hope-ui/solid npm")](https://www.npmjs.com/package/@hope-ui/solid)
 
-🤞 The SolidJS component library you've hoped for.
+**🤞 The SolidJS component library you've hoped for.**
 
-# This project is a work in progress and is not production ready.
+Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
 
-## Documentation available at [hope-ui.com](https://hope-ui.com/)
+## Project status
+
+Hope UI is still under development and is not ready for production.
+
+## Documentation
+
+For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 ## Acknowledgment
 
-This project would not have been possible without these open source projects :
+This project is inspired by :
 
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
