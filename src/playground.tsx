@@ -1,6 +1,6 @@
 import "./playground.css";
 
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { render } from "solid-js/web";
 
 import {
@@ -14,8 +14,19 @@ import {
   HopeProvider,
   HopeThemeConfig,
   HStack,
+  Select,
+  SelectContent,
+  SelectIcon,
+  SelectListbox,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPlaceholder,
+  SelectTrigger,
+  SelectValue,
   useColorMode,
 } from ".";
+import { IconCaretDown } from "./components/icons/IconCaretDown";
 import { IconCheckCircleSolid } from "./components/icons/IconCheckCircleSolid";
 
 export function App() {
@@ -66,6 +77,25 @@ export function App() {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
+      <Select>
+        <SelectTrigger>
+          <SelectPlaceholder>Choose a framework</SelectPlaceholder>
+          <SelectValue />
+          <SelectIcon rotateOnOpen as={IconCaretDown} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectListbox>
+            <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
+              {item => (
+                <SelectOption value={item}>
+                  <SelectOptionText>{item}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              )}
+            </For>
+          </SelectListbox>
+        </SelectContent>
+      </Select>
     </Box>
   );
 }

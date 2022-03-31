@@ -211,17 +211,25 @@ export const selectPlaceholderStyles = css(selectSingleValueStyles, {
  * -----------------------------------------------------------------------------------------------*/
 
 export const selectIconStyles = css({
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
   flexGrow: 0,
   flexShrink: 0,
 
   marginInlineStart: "auto",
 
-  color: "$neutral10",
-  fontSize: "1.2em",
+  color: "$neutral11",
+  fontSize: "1.25em",
   pointerEvents: "none",
+
+  transition: "transform 250ms",
+  transformOrigin: "center",
+
+  variants: {
+    opened: {
+      true: {
+        transform: "rotate(-180deg)",
+      },
+    },
+  },
 });
 
 /* -------------------------------------------------------------------------------------------------

@@ -61,7 +61,11 @@ export const accordionButtonStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const accordionIconStyles = css({
+  flexGrow: 0,
+  flexShrink: 0,
+
   fontSize: "1.25em",
+  pointerEvents: "none",
 
   transition: "transform 250ms",
   transformOrigin: "center",
