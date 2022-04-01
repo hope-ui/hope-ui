@@ -1,8 +1,38 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { css, globalCss } from "@/styled-system/stitches.config";
 
 import { baseInputResetStyles } from "../input/input.styles";
+
+/* -------------------------------------------------------------------------------------------------
+ * Select - solid-transition-group classes
+ * -----------------------------------------------------------------------------------------------*/
+
+export const selectTransitionName = {
+  fadeInTop: "hope-select-fade-in-top-transition",
+};
+
+export const selectTransitionStyles = globalCss({
+  /* fade-in-top */
+  [`.${selectTransitionName.fadeInTop}-enter, .${selectTransitionName.fadeInTop}-exit-to`]: {
+    opacity: 0,
+    transform: "translateY(-16px)",
+  },
+  [`.${selectTransitionName.fadeInTop}-enter-to, .${selectTransitionName.fadeInTop}-exit`]: {
+    opacity: 1,
+    transform: "translateY(0)",
+  },
+  [`.${selectTransitionName.fadeInTop}-enter-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: "ease-out",
+  },
+  [`.${selectTransitionName.fadeInTop}-exit-active`]: {
+    transitionProperty: "opacity, transform",
+    transitionDuration: "100ms",
+    transitionTimingFunction: "ease-in",
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Select - trigger

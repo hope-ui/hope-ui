@@ -1,4 +1,4 @@
-import type { Placement as FloatingUIPlacement } from "@floating-ui/dom";
+import type { Placement } from "@floating-ui/dom";
 import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
 import {
   children,
@@ -28,7 +28,7 @@ export interface TooltipOptions {
   /**
    * Placement of the tooltip
    */
-  placement?: FloatingUIPlacement;
+  placement?: Placement;
 
   /**
    * Offset between the tooltip and the reference (trigger) element.
@@ -41,12 +41,14 @@ export interface TooltipOptions {
   id?: string;
 
   /**
-   * If `true`, the tooltip will be shown (in controlled mode)
+   * If `true`, the tooltip will be shown.
+   * (in controlled mode)
    */
   opened?: boolean;
 
   /**
    * If `true`, the tooltip will be initially shown
+   * (in uncontrolled mode)
    */
   defaultOpened?: boolean;
 
@@ -194,8 +196,8 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   let tooltipElement: HTMLDivElement | undefined;
   let arrowElement: HTMLDivElement | undefined;
 
-  let enterTimeout: number | undefined;
-  let exitTimeout: number | undefined;
+  let enterTimeoutId: number | undefined;
+  let exitTimeoutId: number | undefined;
 
   const isControlled = () => local.opened !== undefined;
   const opened = () => (isControlled() ? !!local.opened : openedState());
@@ -302,16 +304,16 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
   const openWithDelay = () => {
     if (!local.disabled) {
-      enterTimeout = window.setTimeout(onOpen, local.openDelay);
+      enterTimeoutId = window.setTimeout(onOpen, local.openDelay);
     }
   };
 
   const closeWithDelay = () => {
-    if (enterTimeout) {
-      window.clearTimeout(enterTimeout);
+    if (enterTimeoutId) {
+      window.clearTimeout(enterTimeoutId);
     }
 
-    exitTimeout = window.setTimeout(onClose, local.closeDelay);
+    exitTimeoutId = window.setTimeout(onClose, local.closeDelay);
   };
 
   const onClick = () => {
@@ -383,8 +385,8 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   onCleanup(() => {
     removeTriggerListeners();
 
-    window.clearTimeout(enterTimeout);
-    window.clearTimeout(exitTimeout);
+    window.clearTimeout(enterTimeoutId);
+    window.clearTimeout(exitTimeoutId);
   });
 
   createEffect(() => {

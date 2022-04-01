@@ -15,6 +15,8 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { radioContainerStyles, RadioControlVariants } from "./radio.styles";
 import { useRadioGroupContext } from "./radio-group";
 
+type RadioChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
+
 export type ThemeableRadioOptions = RadioControlVariants;
 
 interface RadioOptions extends ThemeableRadioOptions {
@@ -74,7 +76,7 @@ interface RadioOptions extends ThemeableRadioOptions {
   /**
    * The children of the radio.
    */
-  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
+  children?: JSX.Element | RadioChildrenRenderProp;
 
   /**
    * The callback invoked when the checked state of the radio changes.
@@ -383,7 +385,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
           aria-describedby={state["aria-describedby"]}
         />
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as any)?.({ checked: state.checked })}
+          {(local.children as RadioChildrenRenderProp)?.({ checked: state.checked })}
         </Show>
       </hope.label>
     </RadioContext.Provider>

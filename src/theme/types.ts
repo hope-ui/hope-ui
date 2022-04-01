@@ -1,5 +1,6 @@
 import { Accessor } from "solid-js";
 
+import { AccordionStyleConfig } from "@/components/accordion/accordion";
 import { AlertStyleConfig } from "@/components/alert/alert";
 import { AnchorStyleConfig } from "@/components/anchor/anchor";
 import { AvatarStyleConfig } from "@/components/avatar/avatar";
@@ -17,6 +18,7 @@ import { InputStyleConfig } from "@/components/input/input";
 import { KbdStyleConfig } from "@/components/kbd/kbd";
 import { MenuStyleConfig } from "@/components/menu/menu";
 import { ModalStyleConfig } from "@/components/modal/modal";
+import { PopoverStyleConfig } from "@/components/popover/popover";
 import { ProgressStyleConfig } from "@/components/progress/progress";
 import { RadioStyleConfig } from "@/components/radio/radio";
 import { SelectStyleConfig } from "@/components/select/select";
@@ -56,6 +58,7 @@ export type StitchesThemeConfig = {
 };
 
 export interface ComponentsStyleConfigs {
+  Accordion?: AccordionStyleConfig;
   Alert?: AlertStyleConfig;
   Anchor?: AnchorStyleConfig;
   Avatar?: AvatarStyleConfig;
@@ -73,6 +76,7 @@ export interface ComponentsStyleConfigs {
   Kbd?: KbdStyleConfig;
   Menu?: MenuStyleConfig;
   Modal?: ModalStyleConfig;
+  Popover?: PopoverStyleConfig;
   Progress?: ProgressStyleConfig;
   Radio?: RadioStyleConfig;
   Select?: SelectStyleConfig;

@@ -76,6 +76,10 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
         return menuTransitionName.scaleTopLeft;
       case "scale-top-right":
         return menuTransitionName.scaleTopRight;
+      case "scale-bottom-left":
+        return menuTransitionName.scaleBottomLeft;
+      case "scale-bottom-right":
+        return menuTransitionName.scaleBottomRight;
       case "none":
         return "hope-none";
     }

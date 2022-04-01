@@ -87,87 +87,6 @@ export interface ModalProps extends ModalContainerVariants, ModalDialogVariants 
   onEsc?: () => void;
 }
 
-type ModalState = Required<
-  Pick<
-    ModalProps,
-    | "opened"
-    | "motionPreset"
-    | "size"
-    | "centered"
-    | "scrollBehavior"
-    | "closeOnOverlayClick"
-    | "closeOnEsc"
-    | "trapFocus"
-    | "blockScrollOnMount"
-    | "preserveScrollBarGap"
-  >
-> &
-  Pick<ModalProps, "initialFocus"> & {
-    /**
-     * The `id` of the modal dialog
-     */
-    dialogId: string;
-
-    /**
-     * The `id` of the modal dialog header
-     */
-    headerId: string;
-
-    /**
-     * The `id` of the modal dialog body
-     */
-    bodyId: string;
-
-    /**
-     * If `true`, notify that the modal header component is rendered
-     */
-    headerMounted: boolean;
-
-    /**
-     * If `true`, notify that the modal body component is rendered
-     */
-    bodyMounted: boolean;
-  };
-
-export interface ModalContextValue {
-  state: ModalState;
-
-  /**
-   * Callback invoked to close the modal.
-   */
-  onClose: () => void;
-
-  /**
-   * Callback invoked when the overlay is clicked.
-   */
-  onOverlayClick: (event: MouseEvent) => void;
-
-  /**
-   * Callback invoked when a `mouseDown` is fired on the modal container.
-   */
-  onMouseDown: (event: MouseEvent) => void;
-
-  /**
-   * Callback invoked when a `keyDown` is fired on the modal container.
-   */
-  onKeyDown: (event: KeyboardEvent) => void;
-
-  /**
-   * Callback function to unmount the modal's portal.
-   */
-  unmountPortal: () => void;
-
-  /**
-   * Callback function to set if the modal header is mounted
-   */
-  setHeaderMounted: (value: boolean) => void;
-
-  /**
-   * Callback function to set if the modal body is mounted
-   */
-  setBodyMounted: (value: boolean) => void;
-}
-
 type ThemeableModalOptions = Pick<
   ModalProps,
   | "scrollBehavior"
@@ -181,22 +100,48 @@ type ThemeableModalOptions = Pick<
   | "trapFocus"
 >;
 
-export interface ModalStyleConfig {
-  baseStyle?: {
-    overlay?: SystemStyleObject;
-    content?: SystemStyleObject;
-    closeButton?: SystemStyleObject;
-    header?: SystemStyleObject;
-    body?: SystemStyleObject;
-    footer?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: ThemeableModalOptions;
-    closeButton?: ThemeableCloseButtonOptions;
-  };
-}
+interface ModalState
+  extends Required<
+      Pick<
+        ModalProps,
+        | "opened"
+        | "motionPreset"
+        | "size"
+        | "centered"
+        | "scrollBehavior"
+        | "closeOnOverlayClick"
+        | "closeOnEsc"
+        | "trapFocus"
+        | "blockScrollOnMount"
+        | "preserveScrollBarGap"
+      >
+    >,
+    Pick<ModalProps, "initialFocus"> {
+  /**
+   * The `id` of the modal dialog
+   */
+  dialogId: string;
 
-const ModalContext = createContext<ModalContextValue>();
+  /**
+   * The `id` of the modal dialog header
+   */
+  headerId: string;
+
+  /**
+   * The `id` of the modal dialog body
+   */
+  bodyId: string;
+
+  /**
+   * If `true`, notify that the modal header component is rendered
+   */
+  headerMounted: boolean;
+
+  /**
+   * If `true`, notify that the modal body component is rendered
+   */
+  bodyMounted: boolean;
+}
 
 /**
  * Modal provides context, theming, and accessibility properties
@@ -205,11 +150,13 @@ const ModalContext = createContext<ModalContextValue>();
  * It doesn't render any DOM node.
  */
 export function Modal(props: ModalProps) {
-  const theme = useComponentStyleConfigs().Modal;
-
   const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
+  const theme = useComponentStyleConfigs().Modal;
+
   const [state, setState] = createStore<ModalState>({
+    headerMounted: false,
+    bodyMounted: false,
     get opened() {
       return props.opened;
     },
@@ -252,8 +199,6 @@ export function Modal(props: ModalProps) {
     get preserveScrollBarGap() {
       return props.preserveScrollBarGap ?? theme?.defaultProps?.root?.preserveScrollBarGap ?? false;
     },
-    headerMounted: false,
-    bodyMounted: false,
   });
 
   /**
@@ -336,6 +281,51 @@ export function Modal(props: ModalProps) {
   );
 }
 
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface ModalContextValue {
+  state: ModalState;
+
+  /**
+   * Callback invoked to close the modal.
+   */
+  onClose: () => void;
+
+  /**
+   * Callback invoked when the overlay is clicked.
+   */
+  onOverlayClick: (event: MouseEvent) => void;
+
+  /**
+   * Callback invoked when a `mouseDown` is fired on the modal container.
+   */
+  onMouseDown: (event: MouseEvent) => void;
+
+  /**
+   * Callback invoked when a `keyDown` is fired on the modal container.
+   */
+  onKeyDown: (event: KeyboardEvent) => void;
+
+  /**
+   * Callback function to unmount the modal's portal.
+   */
+  unmountPortal: () => void;
+
+  /**
+   * Callback function to set if the modal header is mounted
+   */
+  setHeaderMounted: (value: boolean) => void;
+
+  /**
+   * Callback function to set if the modal body is mounted
+   */
+  setBodyMounted: (value: boolean) => void;
+}
+
+const ModalContext = createContext<ModalContextValue>();
+
 export function useModalContext() {
   const context = useContext(ModalContext);
 
@@ -344,4 +334,23 @@ export function useModalContext() {
   }
 
   return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface ModalStyleConfig {
+  baseStyle?: {
+    overlay?: SystemStyleObject;
+    content?: SystemStyleObject;
+    closeButton?: SystemStyleObject;
+    header?: SystemStyleObject;
+    body?: SystemStyleObject;
+    footer?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableModalOptions;
+    closeButton?: ThemeableCloseButtonOptions;
+  };
 }

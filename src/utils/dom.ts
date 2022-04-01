@@ -46,33 +46,23 @@ export function normalizeEventKey(event: Pick<KeyboardEvent, "key" | "keyCode">)
   return eventKey as EventKeys;
 }
 
-/**
- * Sort an array of DOM nodes according to the HTML tree order
- * @see http://www.w3.org/TR/html5/infrastructure.html#tree-order and https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
- */
-export function sortNodes(nodes: Node[]) {
-  return nodes.sort((a, b) => {
-    const compare = a.compareDocumentPosition(b);
+export function getActiveElement(node?: HTMLElement) {
+  const doc = getOwnerDocument(node);
+  return doc?.activeElement as HTMLElement;
+}
 
-    // b is after or is a descendant of a.
-    if (compare & Node.DOCUMENT_POSITION_FOLLOWING || compare & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-      // a < b
-      return -1;
-    }
+export function contains(parent: HTMLElement | undefined, child: HTMLElement) {
+  if (!parent) {
+    return false;
+  }
 
-    // b is before or is an ancestor of a.
-    if (compare & Node.DOCUMENT_POSITION_PRECEDING || compare & Node.DOCUMENT_POSITION_CONTAINS) {
-      // a > b
-      return 1;
-    }
+  return parent === child || parent.contains(child);
+}
 
-    // b and a is not in same tree.
-    if (compare & Node.DOCUMENT_POSITION_DISCONNECTED || compare & Node.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC) {
-      throw Error("Cannot sort the given nodes.");
-    } else {
-      return 0;
-    }
-  });
+export function getRelatedTarget(event: Pick<FocusEvent, "relatedTarget" | "target" | "currentTarget">) {
+  const target = (event.target ?? event.currentTarget) as HTMLElement;
+  const activeElement = getActiveElement(target);
+  return (event.relatedTarget ?? activeElement) as HTMLElement;
 }
 
 /**

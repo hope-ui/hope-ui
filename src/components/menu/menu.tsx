@@ -10,7 +10,7 @@ import { isChildrenFunction } from "@/utils/solid";
 
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
 
-type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "none";
+type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "scale-bottom-left" | "scale-bottom-right" | "none";
 
 type MenuChildrenRenderProp = (props: { opened: Accessor<boolean> }) => JSX.Element;
 
@@ -143,7 +143,19 @@ export function Menu(props: MenuProps) {
       return props.closeOnSelect ?? theme?.defaultProps?.root?.closeOnSelect ?? true;
     },
     get motionPreset() {
-      return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "scale-top-left";
+      if (props.motionPreset) {
+        return props.motionPreset;
+      }
+
+      if (theme?.defaultProps?.root?.motionPreset) {
+        return theme?.defaultProps?.root?.motionPreset;
+      }
+
+      if (props.placement?.startsWith("top")) {
+        return "scale-bottom-left";
+      }
+
+      return "scale-top-left";
     },
     items: [],
     opened: false,

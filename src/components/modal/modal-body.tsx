@@ -1,12 +1,12 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useModalContext } from "./modal";
 import { modalBodyStyles } from "./modal.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type ModalBodyProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
@@ -22,14 +22,15 @@ export function ModalBody<C extends ElementType = "div">(props: ModalBodyProps<C
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () =>
-    classNames(
+  const classes = () => {
+    return classNames(
       local.class,
       hopeModalBodyClass,
       modalBodyStyles({
         scrollBehavior: modalContext.state.scrollBehavior,
       })
     );
+  };
 
   /**
    * Notify the modal context if this component was rendered or used
