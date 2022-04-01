@@ -28,6 +28,7 @@ export * from "./kbd";
 export * from "./list";
 export * from "./menu";
 export * from "./modal";
+export * from "./popover";
 export * from "./progress";
 export * from "./radio";
 export * from "./select";

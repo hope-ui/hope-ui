@@ -2,7 +2,20 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import {
+  Box,
+  Button,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  Popover,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  useColorMode,
+} from ".";
 
 export function App() {
   const { toggleColorMode } = useColorMode();
@@ -14,6 +27,14 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
+      <Popover>
+        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+        <PopoverContent>
+          <PopoverCloseButton />
+          <PopoverHeader>Confirmation!</PopoverHeader>
+          <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
+        </PopoverContent>
+      </Popover>
     </Box>
   );
 }

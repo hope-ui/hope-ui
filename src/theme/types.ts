@@ -18,6 +18,7 @@ import { InputStyleConfig } from "@/components/input/input";
 import { KbdStyleConfig } from "@/components/kbd/kbd";
 import { MenuStyleConfig } from "@/components/menu/menu";
 import { ModalStyleConfig } from "@/components/modal/modal";
+import { PopoverStyleConfig } from "@/components/popover/popover";
 import { ProgressStyleConfig } from "@/components/progress/progress";
 import { RadioStyleConfig } from "@/components/radio/radio";
 import { SelectStyleConfig } from "@/components/select/select";
@@ -75,6 +76,7 @@ export interface ComponentsStyleConfigs {
   Kbd?: KbdStyleConfig;
   Menu?: MenuStyleConfig;
   Modal?: ModalStyleConfig;
+  Popover?: PopoverStyleConfig;
   Progress?: ProgressStyleConfig;
   Radio?: RadioStyleConfig;
   Select?: SelectStyleConfig;
