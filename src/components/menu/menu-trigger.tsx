@@ -22,7 +22,13 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
 
   const menuContext = useMenuContext();
 
-  const [local, others] = splitProps(props as MenuTriggerProps<"button">, ["ref", "class", "onBlur"]);
+  const [local, others] = splitProps(props as MenuTriggerProps<"button">, [
+    "ref",
+    "class",
+    "onClick",
+    "onKeyDown",
+    "onBlur",
+  ]);
 
   const assignTriggerRef = (el: HTMLButtonElement) => {
     menuContext.assignTriggerRef(el);
@@ -33,6 +39,14 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
       // eslint-disable-next-line solid/reactivity
       local.ref = el;
     }
+  };
+
+  const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+    callAllHandlers(menuContext.onTriggerClick, local.onClick)(event);
+  };
+
+  const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
+    callAllHandlers(menuContext.onTriggerKeyDown, local.onKeyDown)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
@@ -51,9 +65,9 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
       aria-expanded={menuContext.state.opened}
       class={classes()}
       __baseStyle={theme?.baseStyle?.trigger}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
       onBlur={onBlur}
-      onClick={menuContext.onTriggerClick}
-      onKeyDown={menuContext.onTriggerKeyDown}
       {...others}
     />
   );
