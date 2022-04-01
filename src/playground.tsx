@@ -76,26 +76,37 @@ export function App() {
             ea commodo consequat.
           </AccordionPanel>
         </AccordionItem>
+        <AccordionItem disabled={isDisabled()}>
+          <h2>
+            <AccordionButton>
+              <Box flex="1" textAlign="left">
+                Section 3 title
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb="$4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </AccordionPanel>
+        </AccordionItem>
+        <AccordionItem>
+          <h2>
+            <AccordionButton>
+              <Box flex="1" textAlign="left">
+                Section 4 title
+              </Box>
+              <AccordionIcon />
+            </AccordionButton>
+          </h2>
+          <AccordionPanel pb="$4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+            ea commodo consequat.
+          </AccordionPanel>
+        </AccordionItem>
       </Accordion>
-      <Select>
-        <SelectTrigger>
-          <SelectPlaceholder>Choose a framework</SelectPlaceholder>
-          <SelectValue />
-          <SelectIcon rotateOnOpen as={IconCaretDown} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectListbox>
-            <For each={["React", "Angular", "Vue", "Svelte", "Solid"]}>
-              {item => (
-                <SelectOption value={item}>
-                  <SelectOptionText>{item}</SelectOptionText>
-                  <SelectOptionIndicator />
-                </SelectOption>
-              )}
-            </For>
-          </SelectListbox>
-        </SelectContent>
-      </Select>
     </Box>
   );
 }

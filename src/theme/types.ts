@@ -1,5 +1,6 @@
 import { Accessor } from "solid-js";
 
+import { AccordionStyleConfig } from "@/components/accordion/accordion";
 import { AlertStyleConfig } from "@/components/alert/alert";
 import { AnchorStyleConfig } from "@/components/anchor/anchor";
 import { AvatarStyleConfig } from "@/components/avatar/avatar";
@@ -56,6 +57,7 @@ export type StitchesThemeConfig = {
 };
 
 export interface ComponentsStyleConfigs {
+  Accordion?: AccordionStyleConfig;
   Alert?: AlertStyleConfig;
   Anchor?: AnchorStyleConfig;
   Avatar?: AvatarStyleConfig;

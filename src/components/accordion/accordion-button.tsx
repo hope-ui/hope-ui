@@ -1,8 +1,9 @@
 import { JSX, splitProps } from "solid-js";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
-import { callHandler } from "@/utils/function";
+import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -21,9 +22,18 @@ const hopeAccordionButtonClass = "hope-accordion__button";
  * that is appropriate for the information architecture of the page.
  */
 export function AccordionButton<C extends ElementType = "button">(props: AccordionButtonProps<C>) {
+  const theme = useComponentStyleConfigs().Accordion;
+
   const accordionItemContext = useAccordionItemContext();
 
-  const [local, others] = splitProps(props as AccordionButtonProps<"button">, ["ref", "class", "disabled", "onClick"]);
+  const [local, others] = splitProps(props as AccordionButtonProps<"button">, [
+    "ref",
+    "class",
+    "disabled",
+    "onClick",
+    "onFocus",
+    "onKeyDown",
+  ]);
 
   const assignRef = (el: HTMLButtonElement) => {
     accordionItemContext.registerButton(el);
@@ -37,9 +47,19 @@ export function AccordionButton<C extends ElementType = "button">(props: Accordi
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    accordionItemContext.toggleExpandedState();
-
     callHandler(local.onClick)(event);
+
+    accordionItemContext.toggleExpandedState();
+  };
+
+  const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
+    callHandler(local.onFocus)(event);
+
+    accordionItemContext.setFocusedIndex();
+  };
+
+  const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
+    callAllHandlers(local.onKeyDown, accordionItemContext.onButtonKeyDown)(event);
   };
 
   const classes = () => classNames(local.class, hopeAccordionButtonClass, accordionButtonStyles());
@@ -52,7 +72,10 @@ export function AccordionButton<C extends ElementType = "button">(props: Accordi
       aria-expanded={accordionItemContext.state.expanded}
       disabled={accordionItemContext.state.disabled}
       class={classes()}
+      __baseStyle={theme?.baseStyle?.button}
       onClick={onClick}
+      onFocus={onFocus}
+      onKeyDown={onKeyDown}
       {...others}
     />
   );

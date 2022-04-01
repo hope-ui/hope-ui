@@ -1,7 +1,11 @@
-import { createContext, createUniqueId, splitProps, useContext } from "solid-js";
+import { Accessor, createContext, createMemo, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
+import { normalizeEventKey } from "@/utils/dom";
+import { callHandler } from "@/utils/function";
+import { EventKeyMap } from "@/utils/types";
 
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -55,6 +59,8 @@ const hopeAccordionItemClass = "hope-accordion__item";
 export function AccordionItem<C extends ElementType = "div">(props: AccordionItemProps<C>) {
   const defaultIdPrefix = `hope-accordion-item-${createUniqueId()}`;
 
+  const theme = useComponentStyleConfigs().Accordion;
+
   const accordionContext = useAccordionContext();
 
   const [state, setState] = createStore<AccordionItemState>({
@@ -80,8 +86,30 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
     setState("index", index);
   };
 
+  const setFocusedIndex = () => {
+    accordionContext.setFocusedIndex(state.index);
+  };
+
   const toggleExpandedState = () => {
     accordionContext.setExpandedIndex(state.index, !state.expanded);
+  };
+
+  const keyMap: Accessor<EventKeyMap> = createMemo(() => ({
+    ArrowDown: accordionContext.focusNextAccordionButton,
+    ArrowUp: accordionContext.focusPrevAccordionButton,
+    Home: accordionContext.focusFirstAccordionButton,
+    End: accordionContext.focusLastAccordionButton,
+  }));
+
+  const onButtonKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
+    const eventKey = normalizeEventKey(event);
+
+    const action = keyMap()[eventKey];
+
+    if (action) {
+      event.preventDefault();
+      callHandler(action)(event);
+    }
   };
 
   const classes = () => classNames(local.class, hopeAccordionItemClass, accordionItemStyles());
@@ -89,12 +117,14 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
   const context: AccordionItemContextValue = {
     state: state as AccordionItemState,
     registerButton,
+    setFocusedIndex,
     toggleExpandedState,
+    onButtonKeyDown,
   };
 
   return (
     <AccordionItemContext.Provider value={context}>
-      <Box class={classes()} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.item} {...others} />
     </AccordionItemContext.Provider>
   );
 }
@@ -114,9 +144,19 @@ interface AccordionItemContextValue {
   registerButton: (el: HTMLButtonElement) => void;
 
   /**
+   * Callback to notify the accordion context that this item has focus.
+   */
+  setFocusedIndex: () => void;
+
+  /**
    * Callback to toggle the expanded state of the accordion item.
    */
   toggleExpandedState: () => void;
+
+  /**
+   * Manage keyboard navigation between accordion items.
+   */
+  onButtonKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent>;
 }
 
 const AccordionItemContext = createContext<AccordionItemContextValue>();

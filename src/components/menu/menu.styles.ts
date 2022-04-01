@@ -14,7 +14,7 @@ export const menuTransitionName = {
   scaleBottomRight: "hope-menu-scale-bottom-right-transition",
 };
 
-function createMenuScaleTransition(name: string, transformOrigin: string): SystemStyleObject {
+function createMenuScaleTransition(name: string, transformOrigin: string) {
   return {
     [`.${name}-enter, .${name}-exit-to`]: {
       opacity: 0,
