@@ -64,8 +64,6 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    console.log("blur");
-
     callAllHandlers(local.onBlur, popoverContext.onPopoverBlur)(event);
   };
 
