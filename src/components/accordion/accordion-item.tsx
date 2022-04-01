@@ -13,7 +13,10 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useAccordionContext } from "./accordion";
 import { accordionItemStyles } from "./accordion.styles";
 
-type AccordionItemChildrenRenderProp = (props: { expanded: boolean; disabled: boolean }) => JSX.Element;
+type AccordionItemChildrenRenderProp = (props: {
+  expanded: Accessor<boolean>;
+  disabled: Accessor<boolean>;
+}) => JSX.Element;
 
 interface AccordionItemOptions {
   /**
@@ -120,6 +123,9 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
     }
   };
 
+  const expandedAccessor = () => state.expanded;
+  const disabledAccessor = () => state.disabled;
+
   const classes = () => classNames(local.class, hopeAccordionItemClass, accordionItemStyles());
 
   const context: AccordionItemContextValue = {
@@ -135,8 +141,8 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
       <Box class={classes()} __baseStyle={theme?.baseStyle?.item} {...others}>
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
           {(local.children as AccordionItemChildrenRenderProp)?.({
-            expanded: state.expanded,
-            disabled: state.disabled,
+            expanded: expandedAccessor,
+            disabled: disabledAccessor,
           })}
         </Show>
       </Box>
