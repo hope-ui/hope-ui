@@ -1,11 +1,14 @@
 import type { Placement } from "@floating-ui/dom";
 import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
+import { createFocusTrap, FocusTrap } from "focus-trap";
 import { createContext, createUniqueId, JSX, onCleanup, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
+import { contains, getRelatedTarget } from "@/utils/dom";
+import { isFocusable } from "@/utils/tabbable";
 
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 
@@ -21,6 +24,12 @@ export interface PopoverProps {
    * Offset between the popover and the reference (trigger) element.
    */
   offset?: number;
+
+  /**
+   * The amount of padding to apply when the popover might go off screen.
+   * @see https://floating-ui.com/docs/shift
+   */
+  shiftPadding?: number;
 
   /**
    * The id of the popover content.
@@ -168,9 +177,24 @@ interface PopoverState
 
   /**
    * If `true`, the popover is in controlled mode.
-   * (have opened prop)
+   * (have opened, onOpen and onClose prop)
    */
   isControlled: boolean;
+
+  /**
+   * If `true`, the popover trigger or content is hovered.
+   */
+  isHovering: boolean;
+
+  /**
+   * If `true`, the trigger type is `click`.
+   */
+  triggerOnClick: boolean;
+
+  /**
+   * If `true`, the trigger type is `hover`.
+   */
+  triggerOnHover: boolean;
 
   /**
    * The `id` of the popover trigger.
@@ -217,6 +241,7 @@ export function Popover(props: PopoverProps) {
   const [state, setState] = createStore<PopoverState>({
     // eslint-disable-next-line solid/reactivity
     _opened: !!props.defaultOpened,
+    isHovering: false,
     headerMounted: false,
     bodyMounted: false,
     get isControlled() {
@@ -240,6 +265,12 @@ export function Popover(props: PopoverProps) {
     get triggerType() {
       return props.triggerType ?? "click";
     },
+    get triggerOnClick() {
+      return this.triggerType === "click";
+    },
+    get triggerOnHover() {
+      return this.triggerType === "hover";
+    },
     get initialFocus() {
       return props.initialFocus;
     },
@@ -262,10 +293,10 @@ export function Popover(props: PopoverProps) {
       return props.arrowPadding ?? theme?.defaultProps?.root?.arrowPadding ?? 8;
     },
     get openDelay() {
-      return props.openDelay ?? theme?.defaultProps?.root?.openDelay ?? 200;
+      return props.openDelay ?? theme?.defaultProps?.root?.openDelay ?? 0;
     },
     get closeDelay() {
-      return props.closeDelay ?? theme?.defaultProps?.root?.closeDelay ?? 200;
+      return props.closeDelay ?? theme?.defaultProps?.root?.closeDelay ?? 100;
     },
     get motionPreset() {
       return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "scale";
@@ -286,10 +317,14 @@ export function Popover(props: PopoverProps) {
   let popoverRef: HTMLElement | undefined;
   let arrowRef: HTMLElement | undefined;
 
+  let focusTrap: FocusTrap | undefined;
+
   let enterTimeoutId: number | undefined;
   let exitTimeoutId: number | undefined;
 
   let cleanupPopoverAutoUpdate: (() => void) | undefined;
+
+  const popoverSelector = () => `[id='${state.contentId}']`;
 
   const assignAnchorRef = (el: HTMLElement) => {
     anchorRef = el;
@@ -321,7 +356,7 @@ export function Popover(props: PopoverProps) {
     }
 
     middleware.push(flip());
-    middleware.push(shift());
+    middleware.push(shift({ padding: props.shiftPadding }));
 
     if (state.withArrow && arrowRef) {
       middleware.push(arrow({ element: arrowRef, padding: state.arrowPadding }));
@@ -389,6 +424,10 @@ export function Popover(props: PopoverProps) {
     props.onClose?.();
   };
 
+  const closeIfNotHover = () => {
+    !state.isHovering && onClose();
+  };
+
   const openWithDelay = () => {
     enterTimeoutId = window.setTimeout(onOpen, state.openDelay);
   };
@@ -397,6 +436,7 @@ export function Popover(props: PopoverProps) {
     if (enterTimeoutId) {
       window.clearTimeout(enterTimeoutId);
     }
+
     exitTimeoutId = window.setTimeout(onClose, state.closeDelay);
   };
 
@@ -415,6 +455,69 @@ export function Popover(props: PopoverProps) {
     cleanupPopoverAutoUpdate = autoUpdate(referenceElement, popoverRef, updatePopoverPosition);
   };
 
+  const focusInitialElement = () => {
+    if (!state.initialFocus) {
+      popoverRef?.focus();
+      return;
+    }
+
+    const initialFocusRef = document.querySelector(state.initialFocus) as HTMLElement | null;
+    initialFocusRef && isFocusable(initialFocusRef) && initialFocusRef?.focus();
+  };
+
+  const onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+    const relatedTarget = getRelatedTarget(event);
+    const targetIsPopover = contains(popoverRef, relatedTarget);
+    const targetIsTrigger = contains(triggerRef, relatedTarget);
+    const isValidBlur = !targetIsPopover && !targetIsTrigger;
+
+    if (state.opened && state.closeOnBlur && isValidBlur) {
+      closeWithDelay();
+    }
+  };
+
+  const onTriggerMouseLeave = () => {
+    setIsHovering(false);
+
+    if (enterTimeoutId) {
+      window.clearTimeout(enterTimeoutId);
+    }
+
+    exitTimeoutId = window.setTimeout(closeIfNotHover, state.closeDelay);
+  };
+
+  const onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+    const relatedTarget = getRelatedTarget(event);
+    const isValidBlur = !contains(popoverRef, relatedTarget);
+
+    if (state.opened && state.closeOnBlur && isValidBlur) {
+      closeWithDelay();
+    }
+  };
+
+  const afterPopoverOpen = () => {
+    // schedule auto update of the tooltip position
+    setupPopoverAutoUpdate();
+
+    if (state.trapFocus && popoverRef) {
+      focusTrap = createFocusTrap(popoverRef, {
+        initialFocus: state.initialFocus,
+        fallbackFocus: popoverSelector(),
+        allowOutsideClick: false,
+      });
+
+      focusTrap.activate();
+    } else {
+      focusInitialElement();
+    }
+  };
+
+  const afterPopoverClose = () => {
+    focusTrap?.deactivate();
+    cleanupPopoverAutoUpdate?.();
+  };
+
+  const setIsHovering = (value: boolean) => setState("isHovering", value);
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
   const setBodyMounted = (value: boolean) => setState("bodyMounted", value);
 
@@ -431,8 +534,12 @@ export function Popover(props: PopoverProps) {
     assignArrowRef,
     openWithDelay,
     closeWithDelay,
-    setupPopoverAutoUpdate,
-    cleanupPopoverAutoUpdate,
+    onTriggerBlur,
+    onTriggerMouseLeave,
+    onPopoverBlur,
+    afterPopoverOpen,
+    afterPopoverClose,
+    setIsHovering,
     setHeaderMounted,
     setBodyMounted,
   };
@@ -478,14 +585,9 @@ interface PopoverContextValue {
   closeWithDelay: () => void;
 
   /**
-   * Callback to setup floating-ui auto update.
+   * Callback function to set if the popover trigger or content is hovered.
    */
-  setupPopoverAutoUpdate: () => void;
-
-  /**
-   * Callback to cleanup floating-ui auto update.
-   */
-  cleanupPopoverAutoUpdate?: () => void;
+  setIsHovering: (value: boolean) => void;
 
   /**
    * Callback function to set if the popover header is mounted.
@@ -496,6 +598,31 @@ interface PopoverContextValue {
    * Callback function to set if the popover body is mounted.
    */
   setBodyMounted: (value: boolean) => void;
+
+  /**
+   * Callback invoked after the popover content appears.
+   */
+  afterPopoverOpen: () => void;
+
+  /**
+   * Callback invoked after the popover content disappears.
+   */
+  afterPopoverClose: () => void;
+
+  /**
+   * Callback invoked when the mouse leaves the popover trigger.
+   */
+  onTriggerMouseLeave: () => void;
+
+  /**
+   * Callback invoked when the popover trigger loses focus.
+   */
+  onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+
+  /**
+   * Callback invoked when the popover content loses focus.
+   */
+  onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
 }
 
 const PopoverContext = createContext<PopoverContextValue>();

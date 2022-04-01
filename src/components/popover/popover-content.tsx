@@ -5,7 +5,7 @@ import { Transition } from "solid-transition-group";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
-import { callHandler } from "@/utils/function";
+import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { Box } from "../box/box";
 import { hope } from "../factory";
@@ -26,29 +26,21 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
 
   const popoverContext = usePopoverContext();
 
-  const [local, others] = splitProps(props as PopoverContentProps<"section">, [
-    "ref",
-    "class",
-    "children",
-    "onKeyDown",
-    "onBlur",
-  ]);
-
   /**
    * Internal state to handle popover portal `mounted` state.
    * Dirty hack since solid-transition-group doesn't work with Portal.
    */
   const [isPortalMounted, setIsPortalMounted] = createSignal(false);
 
-  createEffect(() => {
-    if (popoverContext.state.opened) {
-      // mount portal when state `opened` is true.
-      setIsPortalMounted(true);
-    } else {
-      // unmount portal instantly when there is no popover transition.
-      popoverContext.state.motionPreset === "none" && setIsPortalMounted(false);
-    }
-  });
+  const [local, others] = splitProps(props as PopoverContentProps<"section">, [
+    "ref",
+    "class",
+    "children",
+    "onKeyDown",
+    "onBlur",
+    "onMouseEnter",
+    "onMouseLeave",
+  ]);
 
   const assignRef = (el: HTMLElement) => {
     popoverContext.assignPopoverRef(el);
@@ -61,26 +53,33 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
     }
   };
 
-  const shouldClosePopoverOnKeyDown = (event: KeyboardEvent) => {
+  const closeOnKeyDown = (event: KeyboardEvent) => {
     if (popoverContext.state.closeOnEsc && event.key === "Escape") {
       popoverContext.closeWithDelay();
     }
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    callHandler(local.onKeyDown)(event);
-
-    shouldClosePopoverOnKeyDown(event);
+    callAllHandlers(local.onKeyDown, closeOnKeyDown)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callHandler(local.onBlur)(event);
+    console.log("blur");
 
-    //TODO: check if target is valid.
+    callAllHandlers(local.onBlur, popoverContext.onPopoverBlur)(event);
+  };
 
-    if (popoverContext.state.opened && popoverContext.state.closeOnBlur) {
-      popoverContext.closeWithDelay();
-    }
+  const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
+    callHandler(local.onMouseEnter)(event);
+
+    popoverContext.setIsHovering(true);
+  };
+
+  const onMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
+    callHandler(local.onMouseLeave)(event);
+
+    popoverContext.setIsHovering(false);
+    popoverContext.closeWithDelay();
   };
 
   const afterPopoverEnterTransition = () => {
@@ -88,26 +87,27 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
       return;
     }
 
-    document.addEventListener("keydown", shouldClosePopoverOnKeyDown);
+    document.addEventListener("keydown", closeOnKeyDown);
 
-    // schedule auto update of the tooltip position
-    popoverContext.setupPopoverAutoUpdate();
+    popoverContext.afterPopoverOpen();
   };
 
   const afterPopoverExitTransition = () => {
-    document.removeEventListener("keydown", shouldClosePopoverOnKeyDown);
+    document.removeEventListener("keydown", closeOnKeyDown);
 
-    popoverContext.cleanupPopoverAutoUpdate?.();
+    popoverContext.afterPopoverClose();
 
     // For smooth transition, unmount portal only after popover's content exit transition is done.
     setIsPortalMounted(false);
   };
 
-  const classes = () => {
+  const popoverClasses = () => {
     return classNames(local.class, hopePopoverContentClass, popoverContentStyles());
   };
 
-  const arrowClasses = () => classNames(hopePopoverArrowClass, popoverArrowStyles());
+  const arrowClasses = () => {
+    return classNames(hopePopoverArrowClass, popoverArrowStyles());
+  };
 
   const transitionName = () => {
     switch (popoverContext.state.motionPreset) {
@@ -117,6 +117,16 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
         return "hope-none";
     }
   };
+
+  createEffect(() => {
+    if (popoverContext.state.opened) {
+      // mount portal when state `opened` is true.
+      setIsPortalMounted(true);
+    } else {
+      // unmount portal instantly when there is no popover transition.
+      popoverContext.state.motionPreset === "none" && setIsPortalMounted(false);
+    }
+  });
 
   return (
     <Show when={isPortalMounted()}>
@@ -135,12 +145,12 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
               role={popoverContext.state.triggerType === "hover" ? "tooltip" : "dialog"}
               aria-labelledby={popoverContext.state.headerMounted ? popoverContext.state.headerId : undefined}
               aria-describedby={popoverContext.state.bodyMounted ? popoverContext.state.bodyId : undefined}
-              class={classes()}
+              class={popoverClasses()}
               __baseStyle={theme?.baseStyle?.content}
               onKeyDown={onKeyDown}
               onBlur={onBlur}
-              // onMouseEnter={popoverContext.onPopoverMouseEnter}
-              // onMouseLeave={popoverContext.onPopoverMouseLeave}
+              onMouseEnter={popoverContext.state.triggerOnHover ? onMouseEnter : undefined}
+              onMouseLeave={popoverContext.state.triggerOnHover ? onMouseLeave : undefined}
               {...others}
             >
               {local.children}

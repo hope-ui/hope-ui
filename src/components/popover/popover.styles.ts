@@ -1,5 +1,3 @@
-import { VariantProps } from "@stitches/core";
-
 import { css, globalCss } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
@@ -33,16 +31,12 @@ export const popoverTransitionStyles = globalCss({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Popover
- * -----------------------------------------------------------------------------------------------*/
-
-/* -------------------------------------------------------------------------------------------------
  * Popover - content
  * -----------------------------------------------------------------------------------------------*/
 
 export const popoverContentStyles = css({
   zIndex: "$popover",
-  position: "relative",
+  position: "absolute",
 
   display: "flex",
   flexDirection: "column",
@@ -52,15 +46,17 @@ export const popoverContentStyles = css({
   maxWidth: "$xs",
 
   outline: "none",
+
   boxShadow: "$md",
-  backgroundColor: "$loContrast",
+  border: "1px solid $colors$neutral7",
   borderRadius: "$sm",
+  backgroundColor: "$loContrast",
 
   color: "inherit",
 
   "&:focus": {
     outline: "none",
-    boxShadow: "$outline",
+    //boxShadow: "$outline",
   },
 });
 
@@ -70,10 +66,12 @@ export const popoverContentStyles = css({
 
 export const popoverHeaderStyles = css({
   flex: 0,
-  pt: "$5",
-  px: "$5",
-  pb: "$3",
-  fontSize: "$lg",
+  borderColor: "inherit",
+  borderBottomWidth: "1px",
+  pt: "$2",
+  px: "$3",
+  pb: "$1",
+  fontSize: "$base",
   fontWeight: "$medium",
 });
 
@@ -83,8 +81,8 @@ export const popoverHeaderStyles = css({
 
 export const popoverBodyStyles = css({
   flex: 1,
-  px: "$5",
-  py: "$2",
+  px: "$3",
+  py: "$1",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -95,9 +93,11 @@ export const popoverFooterStyles = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  pt: "$3",
-  px: "$5",
-  pb: "$5",
+  borderColor: "inherit",
+  borderTopWidth: "1px",
+  pt: "$1",
+  px: "$3",
+  pb: "$2",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -106,8 +106,8 @@ export const popoverFooterStyles = css({
 
 export const popoverCloseButtonStyles = css({
   position: "absolute",
-  top: "$4",
-  insetInlineEnd: "$4",
+  top: "$1_5",
+  insetInlineEnd: "$1_5",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -118,6 +118,7 @@ export const popoverArrowStyles = css({
   zIndex: "$popover",
   position: "absolute",
   boxSize: "8px",
+  border: "1px solid inherit",
   backgroundColor: "inherit",
   transform: "rotate(45deg)",
 });
