@@ -1,10 +1,11 @@
-import { Accessor, createContext, createMemo, createUniqueId, JSX, splitProps, useContext } from "solid-js";
+import { Accessor, createContext, createMemo, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { classNames, createClassSelector } from "@/utils/css";
 import { normalizeEventKey } from "@/utils/dom";
 import { callHandler } from "@/utils/function";
+import { isChildrenFunction } from "@/utils/solid";
 import { EventKeyMap } from "@/utils/types";
 
 import { Box } from "../box/box";
@@ -12,11 +13,18 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useAccordionContext } from "./accordion";
 import { accordionItemStyles } from "./accordion.styles";
 
+type AccordionItemChildrenRenderProp = (props: { expanded: boolean; disabled: boolean }) => JSX.Element;
+
 interface AccordionItemOptions {
   /**
    * If `true`, the accordion item will be disabled.
    */
   disabled?: boolean;
+
+  /**
+   * The children of the accordion item.
+   */
+  children?: JSX.Element | AccordionItemChildrenRenderProp;
 }
 
 export type AccordionItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, AccordionItemOptions>;
@@ -79,7 +87,7 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
     },
   });
 
-  const [local, others] = splitProps(props, ["class"]);
+  const [local, others] = splitProps(props, ["class", "children"]);
 
   const registerButton = (el: HTMLButtonElement) => {
     const index = accordionContext.registerAccordionButton(el);
@@ -124,7 +132,14 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
 
   return (
     <AccordionItemContext.Provider value={context}>
-      <Box class={classes()} __baseStyle={theme?.baseStyle?.item} {...others} />
+      <Box class={classes()} __baseStyle={theme?.baseStyle?.item} {...others}>
+        <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
+          {(local.children as AccordionItemChildrenRenderProp)?.({
+            expanded: state.expanded,
+            disabled: state.disabled,
+          })}
+        </Show>
+      </Box>
     </AccordionItemContext.Provider>
   );
 }

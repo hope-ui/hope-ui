@@ -15,6 +15,8 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { checkboxContainerStyles, CheckboxControlVariants } from "./checkbox.styles";
 import { useCheckboxGroupContext } from "./checkbox-group";
 
+type CheckboxChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
+
 export type ThemeableCheckboxOptions = CheckboxControlVariants;
 
 interface CheckboxOptions extends ThemeableCheckboxOptions {
@@ -81,7 +83,7 @@ interface CheckboxOptions extends ThemeableCheckboxOptions {
   /**
    * The children of the switch.
    */
-  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
+  children?: JSX.Element | CheckboxChildrenRenderProp;
 
   /**
    * The callback invoked when the checked state of the checkbox changes.
@@ -405,7 +407,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
           aria-describedby={state["aria-describedby"]}
         />
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as any)?.({ checked: state.checked })}
+          {(local.children as CheckboxChildrenRenderProp)?.({ checked: state.checked })}
         </Show>
       </hope.label>
     </CheckboxContext.Provider>

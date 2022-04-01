@@ -13,6 +13,8 @@ import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import { switchContainerStyles, SwitchControlVariants } from "./switch.styles";
 
+type SwitchChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
+
 type ThemeableSwitchOptions = SwitchControlVariants;
 
 interface SwitchOptions extends ThemeableSwitchOptions {
@@ -72,7 +74,7 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   /**
    * The children of the switch.
    */
-  children?: JSX.Element | ((props: { checked: boolean }) => JSX.Element);
+  children?: JSX.Element | SwitchChildrenRenderProp;
 
   /**
    * The callback invoked when the checked state of the switch changes.
@@ -363,7 +365,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
           aria-describedby={state["aria-describedby"]}
         />
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as any)?.({ checked: state.checked })}
+          {(local.children as SwitchChildrenRenderProp)?.({ checked: state.checked })}
         </Show>
       </hope.label>
     </SwitchContext.Provider>
