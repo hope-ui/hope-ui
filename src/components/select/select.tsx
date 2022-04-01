@@ -18,6 +18,8 @@ import {
   SelectOptionData,
 } from "./select.utils";
 
+type SelectMotionPreset = "fade-in-top" | "none";
+
 type Value = any | any[];
 
 interface ThemeableSelectOptions extends SelectTriggerVariants {
@@ -25,6 +27,11 @@ interface ThemeableSelectOptions extends SelectTriggerVariants {
    * Offset between the listbox and the reference (trigger) element.
    */
   offset?: number;
+
+  /**
+   * Select content opening/closing transition.
+   */
+  motionPreset?: SelectMotionPreset;
 }
 
 export interface SelectProps extends ThemeableSelectOptions {
@@ -98,7 +105,7 @@ export interface SelectProps extends ThemeableSelectOptions {
 }
 
 type SelectState = Required<Pick<SelectProps, "variant" | "size">> &
-  Pick<SelectProps, "multiple" | "value" | "invalid" | "disabled"> & {
+  Pick<SelectProps, "multiple" | "value" | "invalid" | "disabled" | "motionPreset"> & {
     /**
      * If `true`, the select has options selected.
      */
@@ -232,6 +239,9 @@ export function Select(props: SelectProps) {
     },
     get size() {
       return props.size ?? theme?.defaultProps?.root?.size ?? "md";
+    },
+    get motionPreset() {
+      return props.motionPreset ?? theme?.defaultProps?.root?.motionPreset ?? "fade-in-top";
     },
     get activeDescendantId() {
       return this.opened ? `${this.optionIdPrefix}-${this.activeIndex}` : undefined;

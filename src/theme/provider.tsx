@@ -4,6 +4,7 @@ import { createContext, createEffect, createSignal, PropsWithChildren, useContex
 import { drawerTransitionStyles } from "@/components/drawer/drawer.styles";
 import { menuTransitionStyles } from "@/components/menu/menu.styles";
 import { modalTransitionStyles } from "@/components/modal/modal.styles";
+import { selectTransitionStyles } from "@/components/select/select.styles";
 import { tooltipTransitionStyles } from "@/components/tooltip/tooltip.styles";
 
 import {
@@ -28,6 +29,7 @@ function applyGlobalStyles() {
   drawerTransitionStyles();
   menuTransitionStyles();
   modalTransitionStyles();
+  selectTransitionStyles();
   tooltipTransitionStyles();
 }
 
