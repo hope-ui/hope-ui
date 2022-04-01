@@ -22,7 +22,14 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectTriggerProps<"button">, ["ref", "class", "onBlur"]);
+  const [local, others] = splitProps(props as SelectTriggerProps<"button">, [
+    "ref",
+    "class",
+    "onClick",
+    "onKeyDown",
+    "onFocus",
+    "onBlur",
+  ]);
 
   const classes = () => {
     return classNames(
@@ -44,6 +51,18 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       // eslint-disable-next-line solid/reactivity
       local.ref = el;
     }
+  };
+
+  const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+    callAllHandlers(selectContext.onTriggerClick, local.onClick)(event);
+  };
+
+  const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
+    callAllHandlers(selectContext.onTriggerKeyDown, local.onKeyDown)(event);
+  };
+
+  const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
+    callAllHandlers(selectContext.formControlProps.onFocus, local.onFocus)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
@@ -68,10 +87,10 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
       aria-describedby={selectContext.formControlProps["aria-describedby"]}
       class={classes()}
       __baseStyle={theme?.baseStyle?.trigger}
-      onFocus={selectContext.formControlProps.onFocus}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onFocus={onFocus}
       onBlur={onBlur}
-      onClick={selectContext.onTriggerClick}
-      onKeyDown={selectContext.onTriggerKeyDown}
       {...others}
     />
   );
