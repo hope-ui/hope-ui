@@ -1,3 +1,5 @@
+import { VariantProps } from "@stitches/core";
+
 import { css, globalCss } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
@@ -115,8 +117,37 @@ export const popoverCloseButtonStyles = css({
 export const popoverArrowStyles = css({
   zIndex: "$popover",
   position: "absolute",
+
   boxSize: "8px",
-  border: "1px solid inherit",
+
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: "inherit",
+
   backgroundColor: "inherit",
+
   transform: "rotate(45deg)",
+
+  variants: {
+    popoverPlacement: {
+      left: {
+        borderLeft: 0,
+        borderBottom: 0,
+      },
+      top: {
+        borderLeft: 0,
+        borderTop: 0,
+      },
+      right: {
+        borderTop: 0,
+        borderRight: 0,
+      },
+      bottom: {
+        borderRight: 0,
+        borderBottom: 0,
+      },
+    },
+  },
 });
+
+export type PopoverArrowVariants = VariantProps<typeof popoverArrowStyles>;

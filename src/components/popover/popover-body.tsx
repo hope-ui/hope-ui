@@ -13,7 +13,8 @@ export type PopoverBodyProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 const hopePopoverBodyClass = "hope-popover__body";
 
 /**
- * PopoverBody houses the main content of the popover.
+ * PopoverBody is the main content area for the popover.
+ * It should contain at least one interactive element.
  */
 export function PopoverBody<C extends ElementType = "div">(props: PopoverBodyProps<C>) {
   const theme = useComponentStyleConfigs().Popover;

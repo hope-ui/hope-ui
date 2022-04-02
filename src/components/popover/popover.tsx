@@ -66,16 +66,6 @@ export interface PopoverProps {
   inline?: boolean;
 
   /**
-   * If `true`, the popover will show an arrow tip
-   */
-  withArrow?: boolean;
-
-  /**
-   * Size of the arrow.
-   */
-  arrowSize?: number;
-
-  /**
    * The padding between the arrow and the edges of the popover.
    */
   arrowPadding?: number;
@@ -137,8 +127,6 @@ type ThemeablePopoverOptions = Pick<
   PopoverProps,
   | "placement"
   | "offset"
-  | "withArrow"
-  | "arrowSize"
   | "arrowPadding"
   | "openDelay"
   | "closeDelay"
@@ -153,11 +141,8 @@ interface PopoverState
       Pick<
         PopoverProps,
         | "triggerType"
-        | "placement"
         | "offset"
         | "inline"
-        | "withArrow"
-        | "arrowSize"
         | "arrowPadding"
         | "openDelay"
         | "closeDelay"
@@ -195,6 +180,16 @@ interface PopoverState
    * If `true`, the trigger type is `hover`.
    */
   triggerOnHover: boolean;
+
+  /**
+   * The inital popover placement that you requested.
+   */
+  initialPlacement: Placement;
+
+  /**
+   * The final popover placement after all floating-ui middleware has been applied.
+   */
+  finalPlacement: Placement;
 
   /**
    * The `id` of the popover trigger.
@@ -244,6 +239,7 @@ export function Popover(props: PopoverProps) {
     isHovering: false,
     headerMounted: false,
     bodyMounted: false,
+    finalPlacement: "bottom",
     get isControlled() {
       return props.opened !== undefined;
     },
@@ -277,17 +273,11 @@ export function Popover(props: PopoverProps) {
     get inline() {
       return props.inline ?? false;
     },
-    get placement() {
+    get initialPlacement() {
       return props.placement ?? theme?.defaultProps?.root?.placement ?? "bottom";
     },
     get offset() {
       return props.offset ?? theme?.defaultProps?.root?.offset ?? 8;
-    },
-    get withArrow() {
-      return props.withArrow ?? theme?.defaultProps?.root?.withArrow ?? true;
-    },
-    get arrowSize() {
-      return props.arrowSize ?? theme?.defaultProps?.root?.arrowSize ?? 8;
     },
     get arrowPadding() {
       return props.arrowPadding ?? theme?.defaultProps?.root?.arrowPadding ?? 8;
@@ -358,16 +348,20 @@ export function Popover(props: PopoverProps) {
     middleware.push(flip());
     middleware.push(shift({ padding: props.shiftPadding }));
 
-    if (state.withArrow && arrowRef) {
+    if (arrowRef) {
       middleware.push(arrow({ element: arrowRef, padding: state.arrowPadding }));
     }
 
     middleware.push(hide());
 
     const { x, y, placement, middlewareData } = await computePosition(referenceElement, popoverRef, {
-      placement: state.placement,
+      placement: state.initialPlacement,
       middleware,
     });
+
+    if (placement !== state.finalPlacement) {
+      setState("finalPlacement", placement);
+    }
 
     if (!popoverRef) {
       return;
@@ -396,7 +390,7 @@ export function Popover(props: PopoverProps) {
     }[placement.split("-")[0]] as string;
 
     // Used to put half of the arrow outside of the popover.
-    const arrowOffset = `${state.arrowSize ? Math.round(state.arrowSize / 2) * -1 : -4}px`;
+    const arrowOffset = `${(Math.round(arrowRef.clientWidth / 2) + 1) * -1}px`;
 
     Object.assign(arrowRef.style, {
       left: arrowX != null ? `${Math.round(arrowX)}px` : "",
@@ -456,10 +450,6 @@ export function Popover(props: PopoverProps) {
   };
 
   const focusInitialElement = () => {
-    if (!state.triggerOnClick) {
-      return;
-    }
-
     if (!state.initialFocus) {
       popoverRef?.focus();
       return;
@@ -488,7 +478,7 @@ export function Popover(props: PopoverProps) {
     exitTimeoutId = window.setTimeout(closeIfNotHover, state.closeDelay);
   };
 
-  const onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+  const onPopoverFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
     const relatedTarget = getRelatedTarget(event);
     const targetIsPopover = contains(popoverRef, relatedTarget);
     const targetIsTrigger = contains(triggerRef, relatedTarget);
@@ -540,7 +530,7 @@ export function Popover(props: PopoverProps) {
     closeWithDelay,
     onTriggerBlur,
     onTriggerMouseLeave,
-    onPopoverBlur,
+    onPopoverFocusOut,
     afterPopoverOpen,
     afterPopoverClose,
     setIsHovering,
@@ -624,9 +614,9 @@ interface PopoverContextValue {
   onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
 
   /**
-   * Callback invoked when the popover content loses focus.
+   * Callback invoked when the focus moves out of the popover content.
    */
-  onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+  onPopoverFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
 }
 
 const PopoverContext = createContext<PopoverContextValue>();
@@ -648,6 +638,7 @@ export function usePopoverContext() {
 export interface PopoverStyleConfig {
   baseStyle?: {
     content?: SystemStyleObject;
+    arrow?: SystemStyleObject;
     closeButton?: SystemStyleObject;
     header?: SystemStyleObject;
     body?: SystemStyleObject;

@@ -1,26 +1,38 @@
 import { JSX, splitProps } from "solid-js";
 
 import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
 
+// interface PopoverTriggerRenderPropParams {
+//   ref: (el: HTMLElement) => void;
+//   id: string;
+//   "aria-haspopup": string;
+//   "aria-controls": string;
+//   "aria-expanded": boolean;
+//   onClick?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
+//   onKeyDown?: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
+//   onFocus?: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+//   onBlur?: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+//   onMouseEnter?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
+//   onMouseLeave?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
+// }
+
 export type PopoverTriggerProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
 
-const hopePopoverTriggerClass = "hope-popover__trigger";
-
 /**
- * The trigger that toggles the popover.
+ * PopoverTrigger opens the popover's content.
+ * It must be an interactive element.
+ * It renders a `button` by edfault.
  */
 export function PopoverTrigger<C extends ElementType = "button">(props: PopoverTriggerProps<C>) {
   const popoverContext = usePopoverContext();
 
   const [local, others] = splitProps(props as PopoverTriggerProps<ElementType>, [
     "ref",
-    "class",
     "onClick",
     "onKeyDown",
     "onFocus",
@@ -77,8 +89,6 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
     popoverContext.onTriggerMouseLeave();
   };
 
-  const classes = () => classNames(local.class, hopePopoverTriggerClass);
-
   return (
     <hope.button
       ref={assignTriggerRef}
@@ -86,7 +96,6 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
       aria-haspopup="dialog"
       aria-controls={popoverContext.state.contentId}
       aria-expanded={popoverContext.state.opened}
-      class={classes()}
       onClick={popoverContext.state.triggerOnClick ? onClick : undefined}
       onKeyDown={popoverContext.state.triggerOnHover ? onKeyDown : undefined}
       onFocus={popoverContext.state.triggerOnHover ? onFocus : undefined}
@@ -97,5 +106,3 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
     />
   );
 }
-
-PopoverTrigger.toString = () => createClassSelector(hopePopoverTriggerClass);
