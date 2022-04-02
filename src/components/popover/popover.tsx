@@ -456,6 +456,10 @@ export function Popover(props: PopoverProps) {
   };
 
   const focusInitialElement = () => {
+    if (!state.triggerOnClick) {
+      return;
+    }
+
     if (!state.initialFocus) {
       popoverRef?.focus();
       return;
@@ -467,9 +471,7 @@ export function Popover(props: PopoverProps) {
 
   const onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
     const relatedTarget = getRelatedTarget(event);
-    const targetIsPopover = contains(popoverRef, relatedTarget);
-    const targetIsTrigger = contains(triggerRef, relatedTarget);
-    const isValidBlur = !targetIsPopover && !targetIsTrigger;
+    const isValidBlur = !contains(popoverRef, relatedTarget);
 
     if (state.opened && state.closeOnBlur && isValidBlur) {
       closeWithDelay();
@@ -488,7 +490,9 @@ export function Popover(props: PopoverProps) {
 
   const onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
     const relatedTarget = getRelatedTarget(event);
-    const isValidBlur = !contains(popoverRef, relatedTarget);
+    const targetIsPopover = contains(popoverRef, relatedTarget);
+    const targetIsTrigger = contains(triggerRef, relatedTarget);
+    const isValidBlur = !targetIsPopover && !targetIsTrigger;
 
     if (state.opened && state.closeOnBlur && isValidBlur) {
       closeWithDelay();

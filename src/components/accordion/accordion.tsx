@@ -33,7 +33,7 @@ interface AccordionOptions {
   /**
    * The callback invoked when accordion items are expanded or collapsed.
    */
-  onChange?(expandedIndex: ExpandedIndex): void;
+  onChange?: (expandedIndex: ExpandedIndex) => void;
 }
 
 export type AccordionProps<C extends ElementType = "div"> = HTMLHopeProps<C, AccordionOptions>;

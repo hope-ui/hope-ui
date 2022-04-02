@@ -37,7 +37,15 @@ export function App() {
           <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
         </PopoverContent>
       </Popover>
-      <Popover initialFocus="#next" placement="right-end" closeOnBlur={false}>
+      <Popover>
+        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+        <PopoverContent>
+          <PopoverCloseButton />
+          <PopoverHeader>Confirmation!</PopoverHeader>
+          <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
+        </PopoverContent>
+      </Popover>
+      <Popover initialFocus="#next" placement="right-end" closeOnBlur={true}>
         <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
         <PopoverContent color="white" bg="$info11" borderColor="$info11">
           <PopoverHeader pt="$4" fontWeight="$bold" border="0">
