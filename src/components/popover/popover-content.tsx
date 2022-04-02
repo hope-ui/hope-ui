@@ -37,7 +37,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
     "class",
     "children",
     "onKeyDown",
-    "onBlur",
+    "onFocusOut",
     "onMouseEnter",
     "onMouseLeave",
   ]);
@@ -63,8 +63,8 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
     callAllHandlers(local.onKeyDown, closeOnKeyDown)(event);
   };
 
-  const onBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callAllHandlers(local.onBlur, popoverContext.onPopoverBlur)(event);
+  const onFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+    callAllHandlers(local.onFocusOut, popoverContext.onPopoverFocusOut)(event);
   };
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
@@ -146,7 +146,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
               class={popoverClasses()}
               __baseStyle={theme?.baseStyle?.content}
               onKeyDown={onKeyDown}
-              onBlur={onBlur}
+              onFocusOut={onFocusOut}
               onMouseEnter={popoverContext.state.triggerOnHover ? onMouseEnter : undefined}
               onMouseLeave={popoverContext.state.triggerOnHover ? onMouseLeave : undefined}
               {...others}

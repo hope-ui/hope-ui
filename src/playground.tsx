@@ -29,24 +29,24 @@ export function App() {
           Toggle color mode
         </Button>
       </HStack>
-      <Popover triggerType="hover">
-        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-        <PopoverContent>
-          <PopoverCloseButton />
-          <PopoverHeader>Confirmation!</PopoverHeader>
-          <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
-        </PopoverContent>
-      </Popover>
       <Popover>
-        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+        <PopoverTrigger as={Button}>Basic</PopoverTrigger>
         <PopoverContent>
           <PopoverCloseButton />
           <PopoverHeader>Confirmation!</PopoverHeader>
           <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
         </PopoverContent>
       </Popover>
-      <Popover initialFocus="#next" placement="right-end" closeOnBlur={true}>
-        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+      <Popover triggerType="hover">
+        <PopoverTrigger as={Button}>Hover</PopoverTrigger>
+        <PopoverContent>
+          <PopoverCloseButton />
+          <PopoverHeader>Confirmation!</PopoverHeader>
+          <PopoverBody>Are you sure you want to have that milkshake?</PopoverBody>
+        </PopoverContent>
+      </Popover>
+      <Popover initialFocus="#next" placement="right-end">
+        <PopoverTrigger as={Button}>Custom</PopoverTrigger>
         <PopoverContent color="white" bg="$info11" borderColor="$info11">
           <PopoverHeader pt="$4" fontWeight="$bold" border="0">
             Manage Your Channels

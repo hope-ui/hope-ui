@@ -56,7 +56,7 @@ export const popoverContentStyles = css({
 
   "&:focus": {
     outline: "none",
-    //boxShadow: "$outline",
+    boxShadow: "$outline",
   },
 });
 
@@ -115,8 +115,14 @@ export const popoverCloseButtonStyles = css({
 export const popoverArrowStyles = css({
   zIndex: "$popover",
   position: "absolute",
+
   boxSize: "8px",
-  border: "1px solid inherit",
+
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: "inherit",
+
   backgroundColor: "inherit",
+
   transform: "rotate(45deg)",
 });

@@ -456,10 +456,6 @@ export function Popover(props: PopoverProps) {
   };
 
   const focusInitialElement = () => {
-    if (!state.triggerOnClick) {
-      return;
-    }
-
     if (!state.initialFocus) {
       popoverRef?.focus();
       return;
@@ -488,7 +484,7 @@ export function Popover(props: PopoverProps) {
     exitTimeoutId = window.setTimeout(closeIfNotHover, state.closeDelay);
   };
 
-  const onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+  const onPopoverFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
     const relatedTarget = getRelatedTarget(event);
     const targetIsPopover = contains(popoverRef, relatedTarget);
     const targetIsTrigger = contains(triggerRef, relatedTarget);
@@ -540,7 +536,7 @@ export function Popover(props: PopoverProps) {
     closeWithDelay,
     onTriggerBlur,
     onTriggerMouseLeave,
-    onPopoverBlur,
+    onPopoverFocusOut,
     afterPopoverOpen,
     afterPopoverClose,
     setIsHovering,
@@ -624,9 +620,9 @@ interface PopoverContextValue {
   onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
 
   /**
-   * Callback invoked when the popover content loses focus.
+   * Callback invoked when the focus moves out of the popover content.
    */
-  onPopoverBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+  onPopoverFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
 }
 
 const PopoverContext = createContext<PopoverContextValue>();
