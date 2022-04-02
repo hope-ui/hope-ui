@@ -1,3 +1,5 @@
+import { VariantProps } from "@stitches/core";
+
 import { css, globalCss } from "@/styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
@@ -56,7 +58,7 @@ export const popoverContentStyles = css({
 
   "&:focus": {
     outline: "none",
-    boxShadow: "$outline",
+    //boxShadow: "$outline",
   },
 });
 
@@ -125,4 +127,27 @@ export const popoverArrowStyles = css({
   backgroundColor: "inherit",
 
   transform: "rotate(45deg)",
+
+  variants: {
+    popoverPlacement: {
+      left: {
+        borderLeft: 0,
+        borderBottom: 0,
+      },
+      top: {
+        borderLeft: 0,
+        borderTop: 0,
+      },
+      right: {
+        borderTop: 0,
+        borderRight: 0,
+      },
+      bottom: {
+        borderRight: 0,
+        borderBottom: 0,
+      },
+    },
+  },
 });
+
+export type PopoverArrowVariants = VariantProps<typeof popoverArrowStyles>;

@@ -1,5 +1,6 @@
 export * from "./popover";
 //export * from "./popover-anchor";
+export * from "./popover-arrow";
 export * from "./popover-body";
 export * from "./popover-close-button";
 export * from "./popover-content";

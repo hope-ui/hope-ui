@@ -7,16 +7,14 @@ import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 import { callAllHandlers, callHandler } from "@/utils/function";
 
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
-import { popoverArrowStyles, popoverContentStyles, popoverTransitionName } from "./popover.styles";
+import { popoverContentStyles, popoverTransitionName } from "./popover.styles";
 
 export type PopoverContentProps<C extends ElementType = "section"> = HTMLHopeProps<C>;
 
 const hopePopoverContentClass = "hope-popover__content";
-const hopePopoverArrowClass = "hope-popover__arrow";
 
 /**
  * The popover content container.
@@ -35,7 +33,6 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
   const [local, others] = splitProps(props as PopoverContentProps<"section">, [
     "ref",
     "class",
-    "children",
     "onKeyDown",
     "onFocusOut",
     "onMouseEnter",
@@ -103,10 +100,6 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
     return classNames(local.class, hopePopoverContentClass, popoverContentStyles());
   };
 
-  const arrowClasses = () => {
-    return classNames(hopePopoverArrowClass, popoverArrowStyles());
-  };
-
   const transitionName = () => {
     switch (popoverContext.state.motionPreset) {
       case "scale":
@@ -150,16 +143,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
               onMouseEnter={popoverContext.state.triggerOnHover ? onMouseEnter : undefined}
               onMouseLeave={popoverContext.state.triggerOnHover ? onMouseLeave : undefined}
               {...others}
-            >
-              {local.children}
-              <Show when={popoverContext.state.withArrow}>
-                <Box
-                  ref={popoverContext.assignArrowRef}
-                  class={arrowClasses()}
-                  boxSize={popoverContext.state.arrowSize}
-                />
-              </Show>
-            </hope.section>
+            />
           </Show>
         </Transition>
       </Portal>
