@@ -66,6 +66,7 @@ export function AccordionButton<C extends ElementType = "button">(props: Accordi
 
   return (
     <hope.button
+      role="button"
       ref={assignRef}
       id={accordionItemContext.state.buttonId}
       aria-controls={accordionItemContext.state.panelId}

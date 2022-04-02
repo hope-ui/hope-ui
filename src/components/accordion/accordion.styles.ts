@@ -91,5 +91,5 @@ export const accordionIconStyles = css({
 export const accordionPanelStyles = css({
   pt: "$2",
   px: "$4",
-  pb: "$5",
+  pb: "$4",
 });
