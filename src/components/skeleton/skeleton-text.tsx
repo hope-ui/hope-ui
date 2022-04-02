@@ -12,7 +12,7 @@ import { hopeSkeletonClass, Skeleton, SkeletonProps } from "./skeleton";
 
 interface SkeletonTextOptions {
   /**
-   * The number or skeleton text lines.
+   * The number of skeleton text lines.
    */
   noOfLines?: number;
 

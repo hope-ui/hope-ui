@@ -46,7 +46,7 @@ export const accordionButtonStyles = css({
     cursor: "not-allowed",
   },
 
-  "&:not(:disabled):hover": {
+  "&:hover": {
     backgroundColor: "$neutral4",
   },
 
