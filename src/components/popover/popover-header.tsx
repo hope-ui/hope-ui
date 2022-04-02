@@ -13,7 +13,8 @@ export type PopoverHeaderProps<C extends ElementType = "header"> = HTMLHopeProps
 const hopePopoverHeaderClass = "hope-popover__header";
 
 /**
- * PopoverHeader houses the title of the popover.
+ * PopoverHeader is the accessible header or label
+ * for the popover's content and it is first announced by screenreaders.
  */
 export function PopoverHeader<C extends ElementType = "header">(props: PopoverHeaderProps<C>) {
   const theme = useComponentStyleConfigs().Popover;

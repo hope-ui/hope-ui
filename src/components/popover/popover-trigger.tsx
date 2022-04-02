@@ -13,7 +13,8 @@ export type PopoverTriggerProps<C extends ElementType = "button"> = HTMLHopeProp
 const hopePopoverTriggerClass = "hope-popover__trigger";
 
 /**
- * The trigger that toggles the popover.
+ * PopoverTrigger opens the popover's content. It must be an interactive element
+ * and renders a `button` by edfault.
  */
 export function PopoverTrigger<C extends ElementType = "button">(props: PopoverTriggerProps<C>) {
   const popoverContext = usePopoverContext();
