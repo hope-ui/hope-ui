@@ -124,6 +124,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
         <Transition
           name={transitionName()}
           appear
+          onBeforeEnter={popoverContext.updatePopoverPosition}
           onAfterEnter={afterPopoverEnterTransition}
           onAfterExit={afterPopoverExitTransition}
         >

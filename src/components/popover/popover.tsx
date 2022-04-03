@@ -80,13 +80,11 @@ export interface PopoverProps {
 
   /**
    * Delay (in ms) before showing the popover
-   * @default 0ms
    */
   openDelay?: number;
 
   /**
    * Delay (in ms) before hiding the popover
-   * @default 0ms
    */
   closeDelay?: number;
 
@@ -545,6 +543,7 @@ export function Popover(props: PopoverProps) {
     onTriggerMouseLeave,
     onPopoverFocusOut,
     onPopoverMouseLeave,
+    updatePopoverPosition,
     afterPopoverOpen,
     afterPopoverClose,
     setIsHovering,
@@ -615,6 +614,11 @@ interface PopoverContextValue {
    * Callback function to set if the popover body is mounted.
    */
   setBodyMounted: (value: boolean) => void;
+
+  /**
+   * Callback function to update the popover position.
+   */
+  updatePopoverPosition: () => void;
 
   /**
    * Callback invoked after the popover content appears.

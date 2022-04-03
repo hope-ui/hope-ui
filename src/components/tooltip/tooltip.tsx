@@ -410,6 +410,7 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
           <Transition
             name={tooltipTransitionName.scale}
             appear
+            onBeforeEnter={updateTooltipPosition}
             onAfterEnter={afterToolipEnterTransition}
             onAfterExit={afterToolipExitTransition}
           >

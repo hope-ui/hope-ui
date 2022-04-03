@@ -1,3 +1,19 @@
+## [0.3.0](https://github.com/fabien-ml/hope-ui/compare/v0.2.1...v0.3.0) (2022-04-03)
+
+### 💥 BREAKING CHANGES
+
+- `Select` and `SelectOption` only accept `string | number` as value.
+- `SelectIcon` render prop has been removed.
+- `Stack` default value for `alignItems` prop is `stretch`.
+- `TabPanels` component has been removed.
+
+### ✨ Features
+
+- Added `Skeleton` component.
+- Added `Accordion` component.
+- Added `Popover` component.
+- Added `screenW` and `screenH` theme tokens as semantic equivalents of `100vw` and `100vh`.
+
 ## [0.2.1](https://github.com/fabien-ml/hope-ui/compare/v0.2.0...v0.2.1) (2022-03-30)
 
 ### 🐛 Bug fixes
