@@ -7,20 +7,6 @@ import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
 
-// interface PopoverTriggerRenderPropParams {
-//   ref: (el: HTMLElement) => void;
-//   id: string;
-//   "aria-haspopup": string;
-//   "aria-controls": string;
-//   "aria-expanded": boolean;
-//   onClick?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
-//   onKeyDown?: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
-//   onFocus?: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
-//   onBlur?: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
-//   onMouseEnter?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
-//   onMouseLeave?: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
-// }
-
 export type PopoverTriggerProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
 
 /**

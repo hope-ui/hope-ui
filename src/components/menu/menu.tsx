@@ -427,7 +427,7 @@ export function Menu(props: MenuProps) {
     return state.items.length - 1;
   };
 
-  const openedRenderProp = () => state.opened;
+  const openedAccessor = () => state.opened;
 
   const context: MenuContextValue = {
     state: state as MenuState,
@@ -449,7 +449,7 @@ export function Menu(props: MenuProps) {
   return (
     <MenuContext.Provider value={context}>
       <Show when={isChildrenFunction(props)} fallback={props.children as JSX.Element}>
-        {(props.children as MenuChildrenRenderProp)?.({ opened: openedRenderProp })}
+        {(props.children as MenuChildrenRenderProp)?.({ opened: openedAccessor })}
       </Show>
     </MenuContext.Provider>
   );

@@ -67,11 +67,16 @@ export const popoverContentStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const popoverHeaderStyles = css({
+  display: "flex",
+  alignItems: "center",
   flex: 0,
+
   borderColor: "inherit",
   borderBottomWidth: "1px",
+
   px: "$3",
   py: "$2",
+
   fontSize: "$base",
   fontWeight: "$medium",
 });
@@ -82,6 +87,7 @@ export const popoverHeaderStyles = css({
 
 export const popoverBodyStyles = css({
   flex: 1,
+
   px: "$3",
   py: "$2",
 });
@@ -93,9 +99,10 @@ export const popoverBodyStyles = css({
 export const popoverFooterStyles = css({
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-end",
+
   borderColor: "inherit",
   borderTopWidth: "1px",
+
   px: "$3",
   py: "$2",
 });

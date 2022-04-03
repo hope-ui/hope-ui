@@ -673,16 +673,6 @@ export function Select(props: SelectProps) {
     onListboxMouseLeave,
   };
 
-  // const nativeSelectValue = createMemo(() => {
-  //   if (state.selectedOptions.length <= 0) {
-  //     return undefined;
-  //   }
-
-  //   return state.multiple
-  //     ? state.selectedOptions.map(option => String(option.value))
-  //     : String(state.selectedOptions[0].value);
-  // });
-
   return <SelectContext.Provider value={context}>{props.children}</SelectContext.Provider>;
 }
 
