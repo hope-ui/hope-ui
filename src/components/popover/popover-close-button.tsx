@@ -13,8 +13,8 @@ const hopePopoverCloseButtonClass = "hope-popover__close-button";
 /**
  * PopoverCloseButton is used closes the popover.
  *
- * You don't need to pass the `onClick` to it, it reads the
- * `onClose` action from the popover context.
+ * You don't need to pass the `onClick` to it, it gets the
+ * `close` action from the popover context.
  */
 export function PopoverCloseButton(props: CloseButtonProps) {
   const theme = useComponentStyleConfigs().Popover;

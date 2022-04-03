@@ -1,16 +1,24 @@
 import type { Placement } from "@floating-ui/dom";
 import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import { createContext, createUniqueId, JSX, onCleanup, useContext } from "solid-js";
+import { Accessor, createContext, createUniqueId, JSX, onCleanup, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
 import { SystemStyleObject } from "@/styled-system/types";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { contains, getRelatedTarget } from "@/utils/dom";
+import { isChildrenFunction } from "@/utils/solid";
 import { isFocusable } from "@/utils/tabbable";
 
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
+
+interface PopoverChildrenRenderPropParams {
+  opened: Accessor<boolean>;
+  onClose: () => void;
+}
+
+type PopoverChildrenRenderProp = (props: PopoverChildrenRenderPropParams) => JSX.Element;
 
 type PopoverMotionPreset = "scale" | "none";
 
@@ -57,7 +65,7 @@ export interface PopoverProps {
    * `click` - means the popover will open on click or
    * press `Enter` to `Space` on keyboard
    */
-  triggerType?: "hover" | "click";
+  triggerMode?: "hover" | "click";
 
   /**
    * If `true`, apply floating-ui `inline` middleware.
@@ -108,9 +116,9 @@ export interface PopoverProps {
   motionPreset?: PopoverMotionPreset;
 
   /**
-   * Children of the Popover.
+   * Children of the popover.
    */
-  children?: JSX.Element;
+  children?: JSX.Element | PopoverChildrenRenderProp;
 
   /**
    * Callback fired when the popover opens.
@@ -140,7 +148,7 @@ interface PopoverState
   extends Required<
       Pick<
         PopoverProps,
-        | "triggerType"
+        | "triggerMode"
         | "offset"
         | "inline"
         | "arrowPadding"
@@ -172,12 +180,12 @@ interface PopoverState
   isHovering: boolean;
 
   /**
-   * If `true`, the trigger type is `click`.
+   * If `true`, the trigger mode is `click`.
    */
   triggerOnClick: boolean;
 
   /**
-   * If `true`, the trigger type is `hover`.
+   * If `true`, the trigger mode is `hover`.
    */
   triggerOnHover: boolean;
 
@@ -258,14 +266,14 @@ export function Popover(props: PopoverProps) {
     get bodyId() {
       return `${this.contentId}--body`;
     },
-    get triggerType() {
-      return props.triggerType ?? "click";
+    get triggerMode() {
+      return props.triggerMode ?? "click";
     },
     get triggerOnClick() {
-      return this.triggerType === "click";
+      return this.triggerMode === "click";
     },
     get triggerOnHover() {
-      return this.triggerType === "hover";
+      return this.triggerMode === "hover";
     },
     get initialFocus() {
       return props.initialFocus;
@@ -489,6 +497,9 @@ export function Popover(props: PopoverProps) {
     }
   };
 
+  // For now it's the same code but might change in the future.
+  const onPopoverMouseLeave = onTriggerMouseLeave;
+
   const afterPopoverOpen = () => {
     // schedule auto update of the tooltip position
     setupPopoverAutoUpdate();
@@ -515,6 +526,8 @@ export function Popover(props: PopoverProps) {
   const setHeaderMounted = (value: boolean) => setState("headerMounted", value);
   const setBodyMounted = (value: boolean) => setState("bodyMounted", value);
 
+  const openedAccessor = () => state.opened;
+
   onCleanup(() => {
     window.clearTimeout(enterTimeoutId);
     window.clearTimeout(exitTimeoutId);
@@ -531,6 +544,7 @@ export function Popover(props: PopoverProps) {
     onTriggerBlur,
     onTriggerMouseLeave,
     onPopoverFocusOut,
+    onPopoverMouseLeave,
     afterPopoverOpen,
     afterPopoverClose,
     setIsHovering,
@@ -538,7 +552,16 @@ export function Popover(props: PopoverProps) {
     setBodyMounted,
   };
 
-  return <PopoverContext.Provider value={context}>{props.children}</PopoverContext.Provider>;
+  return (
+    <PopoverContext.Provider value={context}>
+      <Show when={isChildrenFunction(props)} fallback={props.children as JSX.Element}>
+        {(props.children as PopoverChildrenRenderProp)?.({
+          opened: openedAccessor,
+          onClose: closeWithDelay,
+        })}
+      </Show>
+    </PopoverContext.Provider>
+  );
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -607,6 +630,11 @@ interface PopoverContextValue {
    * Callback invoked when the mouse leaves the popover trigger.
    */
   onTriggerMouseLeave: () => void;
+
+  /**
+   * Callback invoked when the mouse leaves the popover content.
+   */
+  onPopoverMouseLeave: () => void;
 
   /**
    * Callback invoked when the popover trigger loses focus.

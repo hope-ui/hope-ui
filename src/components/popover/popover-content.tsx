@@ -73,8 +73,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
   const onMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
     callHandler(local.onMouseLeave)(event);
 
-    popoverContext.setIsHovering(false);
-    popoverContext.closeWithDelay();
+    popoverContext.onPopoverMouseLeave();
   };
 
   const afterPopoverEnterTransition = () => {
@@ -133,7 +132,7 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
               ref={assignRef}
               tabIndex={-1}
               id={popoverContext.state.contentId}
-              role={popoverContext.state.triggerType === "hover" ? "tooltip" : "dialog"}
+              role={popoverContext.state.triggerOnHover ? "tooltip" : "dialog"}
               aria-labelledby={popoverContext.state.headerMounted ? popoverContext.state.headerId : undefined}
               aria-describedby={popoverContext.state.bodyMounted ? popoverContext.state.bodyId : undefined}
               class={popoverClasses()}
