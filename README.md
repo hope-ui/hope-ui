@@ -7,7 +7,7 @@
   </a>
 </p>
 
-<h1 align="center">🤞 The SolidJS component library you've hoped for</h1>
+<h1 align="center">The SolidJS component library you've hoped for</h1>
 
 <p align="center">
   <a href="#contributors-">
