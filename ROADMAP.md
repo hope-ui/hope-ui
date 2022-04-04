@@ -57,7 +57,7 @@
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Accordion |             |            |       |           |      |
+| Accordion |     ✅      |     ✅     |       |           |      |
 | Avatar    |     ✅      |     ✅     |       |           |      |
 | Badge     |     ✅      |     ✅     |       |           |      |
 | Icon      |     ✅      |     ✅     |  ✅   |           |      |
@@ -94,5 +94,5 @@
 | Drawer  |     ✅      |     ✅     |       |           |      |
 | Menu    |     ✅      |     ✅     |       |           |      |
 | Modal   |     ✅      |     ✅     |       |           |      |
-| Popover |             |            |       |           |      |
+| Popover |     ✅      |     ✅     |       |           |      |
 | Tooltip |     ✅      |     ✅     |       |           |      |

@@ -31,12 +31,12 @@ export type TypographyProps = Partial<{
   /**
    * The CSS `line-height` property
    */
-  lineHeight: Property.LineHeight<LineHeightScaleValue> | number;
+  lineHeight: Property.LineHeight<LineHeightScaleValue> | string | number;
 
   /**
    * The CSS `letter-spacing` property
    */
-  letterSpacing: Property.LetterSpacing<LetterSpacingScaleValue> | number;
+  letterSpacing: Property.LetterSpacing<LetterSpacingScaleValue> | string | number;
 
   /**
    * The CSS `text-align` property

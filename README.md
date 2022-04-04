@@ -1,4 +1,9 @@
-# @hope-ui/solid
+<a href="https://hope-ui.com">
+  <img
+    alt="Hope UI | The SolidJS component library you've hoped for."
+    src="./assets/banner.jpg" 
+  />
+</a>
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript)
