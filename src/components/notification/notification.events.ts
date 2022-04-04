@@ -1,6 +1,7 @@
 import { onCleanup, onMount } from "solid-js";
 
-import type { NotificationConfig, NotificationManagerContextValue } from "./notification-manager";
+import type { NotificationConfig, ShowNotificationProps } from "./notification.types";
+import type { NotificationManagerContextValue } from "./notification-manager";
 
 type ValueOf<T> = T[keyof T];
 
@@ -16,7 +17,7 @@ export function createEvent(type: ValueOf<typeof NOTIFICATIONS_EVENTS>, detail?:
   return new CustomEvent(type, { detail });
 }
 
-export function showNotification(config: NotificationConfig) {
+export function showNotification(config: ShowNotificationProps) {
   window.dispatchEvent(createEvent(NOTIFICATIONS_EVENTS.show, config));
 }
 

@@ -11,5 +11,5 @@ export const zIndices = {
   popover: 1500,
   tooltip: 1600,
   skipLink: 1700,
-  toast: 1800,
+  notification: 1800,
 };

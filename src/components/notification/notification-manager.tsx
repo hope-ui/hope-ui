@@ -1,74 +1,166 @@
-import { createContext, JSX, useContext } from "solid-js";
+import { Accessor, createContext, createMemo, createUniqueId, For, JSX, splitProps, useContext } from "solid-js";
+import { Portal } from "solid-js/web";
+import { TransitionGroup } from "solid-transition-group";
 
-type NotificationStatus = "success" | "info" | "warning" | "danger";
+import { createQueue } from "@/hooks/create-queue";
+import { PositionProps } from "@/styled-system/props/position";
+import { classNames } from "@/utils/css";
 
-type NotificationPlacement = "top-start" | "top" | "top-end" | "bottom-start" | "bottom" | "bottom-end";
+import { Box } from "../box/box";
+import { useNotificationsEvents } from "./notification.events";
+import { notificationListStyles, NotificationListVariants, notificationTransitionName } from "./notification.styles";
+import { NotificationConfig, ShowNotificationProps } from "./notification.types";
+import { NotificationContainer } from "./notification-container";
 
-interface NotificationConfigRenderProps {
-  id: string;
-  onClose: () => void;
-}
-
-export interface NotificationConfig {
+interface NotificationManagerProps extends NotificationListVariants {
   /**
-   * The id of the notification, used to update and remove notification.
-   * By default, a unique id is generated for each notification.
+   * Maximum amount of notifications displayed at a time,
+   * other new notifications will be added to queue.
    */
-  id?: string;
+  limit?: number;
 
   /**
-   * The status of the notification.
-   */
-  status?: NotificationStatus;
-
-  /**
-   * The title of the notification.
-   */
-  title?: string;
-
-  /**
-   * The description of the notification.
-   */
-  description?: string;
-
-  /**
-   * If `true`, the notification will show a close button.
+   * If `true`, notifications will show a close button.
    */
   closable?: boolean;
 
   /**
-   * The delay (in ms) before the notification hides.
-   * If set to `null`, the notification will never dismiss.
+   * The delay (in ms) before notifications hides.
+   * If set to `null`, notifications will never dismiss.
    */
   duration?: number | null;
 
   /**
-   * The placement of the notification.
+   * The `z-index` css property of all notifications.
    */
-  placement?: NotificationPlacement;
+  zIndex?: PositionProps["zIndex"];
 
   /**
-   * Callback function to run side effects after the notification has closed.
+   * The children of the notification manager.
    */
-  onClose?: () => void;
-
-  /**
-   * Render a custom component.
-   * It will receive `id` and `onClose` as render props.
-   */
-  render?: (props: NotificationConfigRenderProps) => JSX.Element;
+  children: JSX.Element;
 }
 
-interface NotificationManagerState {
-  /**
-   * All currently displayed notifications.
-   */
-  notifications: NotificationConfig[];
+const hopeNotificationListClass = "hope-notification__list";
 
-  /**
-   * All pending notifications.
-   */
-  queue: NotificationConfig[];
+export function NotificationManager(props: NotificationManagerProps) {
+  const [local] = splitProps(props, ["children", "placement", "closable", "duration", "limit", "zIndex"]);
+
+  const notificationQueue = createMemo(() => {
+    return createQueue<NotificationConfig>({
+      initialValues: [],
+      limit: local.limit ?? 10,
+    });
+  });
+
+  const finalPlacement: Accessor<NotificationManagerProps["placement"]> = () => local.placement ?? "top-end";
+
+  const notificationsAccessor = () => notificationQueue().state.current;
+
+  const queueAccessor = () => notificationQueue().state.queue;
+
+  const showNotification = (notification: ShowNotificationProps) => {
+    const id = notification.id ?? `hope-notification-${createUniqueId()}`;
+    const closable = notification.closable ?? local.closable ?? true;
+    const duration = notification.duration ?? local.duration ?? 4_000;
+
+    notificationQueue().update(notifications => {
+      if (notification.id && notifications.some(n => n.id === notification.id)) {
+        return notifications;
+      }
+
+      const newNotification: NotificationConfig = { ...notification, id, closable, duration };
+
+      return [...notifications, newNotification];
+    });
+
+    return id;
+  };
+
+  const updateNotification = (id: string, notification: NotificationConfig) => {
+    notificationQueue().update(notifications => {
+      const index = notifications.findIndex(n => n.id === id);
+
+      if (index === -1) {
+        return notifications;
+      }
+
+      const newNotifications = [...notifications];
+      newNotifications[index] = notification;
+
+      return newNotifications;
+    });
+  };
+
+  const hideNotification = (id: string) => {
+    notificationQueue().update(notifications => {
+      return notifications.filter(notification => {
+        if (notification.id === id) {
+          notification.onClose?.(notification.id);
+          return false;
+        }
+
+        return true;
+      });
+    });
+  };
+
+  const clear = () => notificationQueue().update(() => []);
+
+  const clearQueue = () => notificationQueue().clearQueue();
+
+  const classes = () => {
+    return classNames(
+      hopeNotificationListClass,
+      notificationListStyles({
+        placement: finalPlacement(),
+      })
+    );
+  };
+
+  const transitionName = () => {
+    switch (finalPlacement()) {
+      case "top-start":
+        return notificationTransitionName.slideInLeft;
+      case "top":
+        return notificationTransitionName.slideInTop;
+      case "top-end":
+        return notificationTransitionName.slideInRight;
+      case "bottom-start":
+        return notificationTransitionName.slideInLeft;
+      case "bottom":
+        return notificationTransitionName.slideInBottom;
+      case "bottom-end":
+        return notificationTransitionName.slideInRight;
+      default:
+        return notificationTransitionName.slideInRight;
+    }
+  };
+
+  const context: NotificationManagerContextValue = {
+    notifications: notificationsAccessor,
+    queue: queueAccessor,
+    showNotification,
+    updateNotification,
+    hideNotification,
+    clear,
+    clearQueue,
+  };
+
+  useNotificationsEvents(context);
+
+  return (
+    <NotificationManagerContext.Provider value={context}>
+      <Portal>
+        <Box class={classes()} zIndex={local.zIndex}>
+          <TransitionGroup name={transitionName()}>
+            <For each={context.notifications()}>{notification => <NotificationContainer {...notification} />}</For>
+          </TransitionGroup>
+        </Box>
+      </Portal>
+      {local.children}
+    </NotificationManagerContext.Provider>
+  );
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -76,7 +168,15 @@ interface NotificationManagerState {
  * -----------------------------------------------------------------------------------------------*/
 
 export interface NotificationManagerContextValue {
-  state: NotificationManagerState;
+  /**
+   * All currently displayed notifications.
+   */
+  notifications: Accessor<NotificationConfig[]>;
+
+  /**
+   * All pending notifications.
+   */
+  queue: Accessor<NotificationConfig[]>;
 
   /**
    * Show a notification.

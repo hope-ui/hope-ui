@@ -1,6 +1,143 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { css, globalCss } from "@/styled-system/stitches.config";
+
+/* -------------------------------------------------------------------------------------------------
+ * Notification - solid-transition-group classes
+ * -----------------------------------------------------------------------------------------------*/
+
+export const notificationTransitionName = {
+  slideInTop: "hope-notification-slide-in-top-transition",
+  slideInRight: "hope-notification-slide-in-right-transition",
+  slideInBottom: "hope-notification-slide-in-bottom-transition",
+  slideInLeft: "hope-notification-slide-in-left-transition",
+};
+
+function createNotificationSlideTransition(config: { name: string; enterTransform: string; leaveTransform: string }) {
+  return {
+    [`.${config.name}-enter, .${config.name}-exit-to`]: {
+      transform: config.enterTransform,
+    },
+    [`.${config.name}-enter-to, .${config.name}-exit`]: {
+      transform: config.leaveTransform,
+    },
+    [`.${config.name}-enter-active`]: {
+      transition: "transform 250ms cubic-bezier(.51,.3,0,1.21)",
+    },
+    [`.${config.name}-exit-active`]: {
+      transition: "transform 150ms ease-in",
+    },
+  };
+}
+
+export const notificationTransitionStyles = globalCss({
+  ...createNotificationSlideTransition({
+    name: notificationTransitionName.slideInTop,
+    enterTransform: "translateY(-100%)",
+    leaveTransform: "translateY(0)",
+  }),
+  ...createNotificationSlideTransition({
+    name: notificationTransitionName.slideInRight,
+    enterTransform: "translateX(100%)",
+    leaveTransform: "translateX(0)",
+  }),
+  ...createNotificationSlideTransition({
+    name: notificationTransitionName.slideInBottom,
+    enterTransform: "translateY(100%)",
+    leaveTransform: "translateY(0)",
+  }),
+  ...createNotificationSlideTransition({
+    name: notificationTransitionName.slideInLeft,
+    enterTransform: "translateX(-100%)",
+    leaveTransform: "translateX(0)",
+  }),
+});
+
+/* -------------------------------------------------------------------------------------------------
+ * Notification - list
+ * -----------------------------------------------------------------------------------------------*/
+
+export const notificationListStyles = css({
+  position: "fixed",
+  zIndex: "$notification",
+
+  display: "flex",
+  flexDirection: "column",
+  gap: "$4",
+
+  variants: {
+    placement: {
+      "top-start": {
+        top: "$4",
+        left: "$4",
+      },
+      top: {
+        top: "$4",
+        left: "50%",
+        transform: "translateX(-50%)",
+      },
+      "top-end": {
+        top: "$4",
+        right: "$4",
+      },
+      "bottom-start": {
+        bottom: "$4",
+        left: "$4",
+      },
+      bottom: {
+        bottom: "$4",
+        left: "50%",
+        transform: "translateX(-50%)",
+      },
+      "bottom-end": {
+        bottom: "$4",
+        right: "$4",
+      },
+    },
+  },
+
+  defaultVariants: {
+    placement: "top-end",
+  },
+});
+
+export type NotificationListVariants = VariantProps<typeof notificationListStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Notification
+ * -----------------------------------------------------------------------------------------------*/
+
+export const notificationStyles = css({
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+
+  minWidth: "$xs",
+  maxWidth: "$md",
+
+  borderRadius: "$sm",
+  border: "1px solid $colors$neutral5",
+
+  boxShadow: "$lg",
+
+  backgroundColor: "$loContrast",
+
+  padding: "$3",
+
+  fontSize: "$sm",
+  lineHeight: "$5",
+
+  variants: {
+    status: {
+      success: {},
+      info: {},
+      warning: {},
+      danger: {},
+    },
+  },
+});
+
+export type NotificationVariants = VariantProps<typeof notificationStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * NotificationIcon
@@ -24,7 +161,6 @@ export const notificationIconStyles = css({
  * -----------------------------------------------------------------------------------------------*/
 
 export const notificationTitleStyles = css({
-  mb: "$1",
   fontWeight: "$medium",
 });
 
@@ -36,38 +172,3 @@ export const notificationDescriptionStyles = css({
   display: "inline-block",
   color: "$neutral11",
 });
-
-/* -------------------------------------------------------------------------------------------------
- * Notification
- * -----------------------------------------------------------------------------------------------*/
-
-export const notificationStyles = css({
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-
-  width: "max-content",
-  maxWidth: "$md",
-
-  borderRadius: "$sm",
-  border: "1px solid $colors$neutral5",
-
-  boxShadow: "$lg",
-
-  px: "$4",
-  py: "$3",
-
-  fontSize: "$sm",
-  lineHeight: "$5",
-
-  variants: {
-    status: {
-      success: {},
-      info: {},
-      warning: {},
-      danger: {},
-    },
-  },
-});
-
-export type NotificationVariants = VariantProps<typeof notificationStyles>;

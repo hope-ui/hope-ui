@@ -2,52 +2,46 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import {
+  Box,
+  Button,
+  HopeProvider,
+  HopeThemeConfig,
+  HStack,
+  NotificationManager,
+  showNotification,
+  useColorMode,
+} from ".";
+import { NotificationVariants } from "./components/notification/notification.styles";
+
+function getRandomStatus() {
+  const index = Math.floor(Math.random() * (4 - 0) + 0);
+  return ["success", "info", "warning", "danger"][index] as NotificationVariants["status"];
+}
 
 export function App() {
-  const { toggleColorMode } = useColorMode();
+  const notify = () => {
+    showNotification({
+      status: getRandomStatus(),
+      title: "Default notification",
+      description: "This is default notification with title and body",
+    });
+  };
 
   return (
     <Box p="$4">
-      <HStack spacing="$4" mb="$4">
-        <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
-          Toggle color mode
-        </Button>
-      </HStack>
+      <Button onClick={notify}>Notify</Button>
     </Box>
   );
 }
 
-const config: HopeThemeConfig = {};
-
 render(
   () => (
-    <HopeProvider config={config}>
-      <App />
+    <HopeProvider>
+      <NotificationManager placement="bottom-start">
+        <App />
+      </NotificationManager>
     </HopeProvider>
   ),
   document.getElementById("root") as HTMLElement
 );
-
-/**
-<Notification status="info" gap="$2_5">
-  <NotificationIcon />
-  <VStack alignItems="flex-start">
-    <NotificationTitle>Default notification</NotificationTitle>
-    <NotificationDescription>This is default notification with title and body</NotificationDescription>
-  </VStack>
-  <CloseButton size="sm" position="absolute" top="$1" right="$1" />
-</Notification>
-
-showNotification({
-  id: "custom-id",
-  status: 'info',
-  title: "You've been compromised",
-  description: 'Leave the building immediately',
-  closable: true,
-  duration: 5000,
-  position: "top-right",
-  render: () => (<span>Custom JSX rendered</span>),
-  onClose: () => console.log('unmounted'),
-})
- */

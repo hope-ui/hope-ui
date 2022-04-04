@@ -5,8 +5,21 @@ interface CreateQueueProps<T> {
   limit: number;
 }
 
-export function createQueue<T>(props: CreateQueueProps<T>) {
-  const [state, setState] = createStore({
+interface CreateQueueState<T> {
+  current: T[];
+  queue: T[];
+  limit: number;
+}
+
+interface CreateQueueReturn<T> {
+  state: CreateQueueState<T>;
+  add: (...items: T[]) => void;
+  update: (fn: (state: T[]) => T[]) => void;
+  clearQueue: () => void;
+}
+
+export function createQueue<T>(props: CreateQueueProps<T>): CreateQueueReturn<T> {
+  const [state, setState] = createStore<CreateQueueState<T>>({
     // eslint-disable-next-line solid/reactivity
     current: props.initialValues?.slice(0, props.limit) ?? [],
 
@@ -37,7 +50,7 @@ export function createQueue<T>(props: CreateQueueProps<T>) {
   };
 
   return {
-    state,
+    state: state as CreateQueueState<T>,
     add,
     update,
     clearQueue,
