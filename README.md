@@ -1,16 +1,28 @@
-<a href="https://hope-ui.com">
-  <img
-    alt="Hope UI | The SolidJS component library you've hoped for."
-    src="./assets/banner.jpg" 
-  />
-</a>
+<p align="center">
+  <a href="https://hope-ui.com">
+    <img
+      alt="Hope UI | The SolidJS component library you've hoped for."
+      src="./assets/banner.jpg" 
+    />
+  </a>
+</p>
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript)
-[![MIT License](https://badgen.net/github/license/fabien-ml/hope-ui "MIT License")](LICENSE.md)
-[![npm - hope-ui-solid](https://badgen.net/npm/v/@hope-ui/solid "@hope-ui/solid npm")](https://www.npmjs.com/package/@hope-ui/solid)
+<h1 align="center">🤞 The SolidJS component library you've hoped for</h1>
 
-**🤞 The SolidJS component library you've hoped for.**
+<p align="center">
+  <a href="#contributors-">
+    <img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square"/>
+  </a>
+  <a href="https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript">
+    <img alt="Language grade: JavaScript" src="https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18"/>
+  </a>
+  <a href="LICENSE.md">
+    <img alt="MIT License" src="https://badgen.net/github/license/fabien-ml/hope-ui"/>
+  </a>
+  <a href="https://www.npmjs.com/package/@hope-ui/solid">
+    <img alt="npm - @hope-ui/solid" src="https://badgen.net/npm/v/@hope-ui/solid"/>
+  </a>
+</p>
 
 Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
 
