@@ -157,14 +157,12 @@ export const inputStyles = css(baseInputResetStyles, {
     },
     withLeftAddon: {
       true: {
-        borderStartStartRadius: 0,
-        borderEndStartRadius: 0,
+        borderLeftRadius: 0,
       },
     },
     withRightAddon: {
       true: {
-        borderStartEndRadius: 0,
-        borderEndEndRadius: 0,
+        borderRightRadius: 0,
       },
     },
   },
@@ -375,8 +373,7 @@ export const inputAddonStyles = css({
       variant: "outline",
       placement: "left",
       css: {
-        borderStartEndRadius: 0,
-        borderEndEndRadius: 0,
+        borderRightRadius: 0,
         borderInlineEndColor: "transparent",
       },
     },
@@ -384,8 +381,7 @@ export const inputAddonStyles = css({
       variant: "outline",
       placement: "right",
       css: {
-        borderStartStartRadius: 0,
-        borderEndStartRadius: 0,
+        borderLeftRadius: 0,
         borderInlineStartColor: "transparent",
       },
     },

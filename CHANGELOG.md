@@ -1,3 +1,9 @@
+## [0.3.1](https://github.com/fabien-ml/hope-ui/compare/v0.3.0...v0.3.1) (2022-04-04)
+
+### 🐛 Bug fixes
+
+- Incorrect `borderRadius` on `Input` with addons.
+
 ## [0.3.0](https://github.com/fabien-ml/hope-ui/compare/v0.2.1...v0.3.0) (2022-04-03)
 
 ### 💥 BREAKING CHANGES
