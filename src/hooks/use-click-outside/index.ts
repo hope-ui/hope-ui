@@ -5,7 +5,7 @@ import { getOwnerDocument, isValidEvent } from "@/utils/dom";
 
 // Thanks Chakra UI (https://github.com/chakra-ui/chakra-ui/blob/main/packages/hooks/src/use-outside-click.ts)
 
-export interface UseOutsideClickProps {
+export interface UseClickOutsideProps {
   /**
    * The reference to a DOM element.
    */
@@ -17,7 +17,7 @@ export interface UseOutsideClickProps {
   handler?: (e: Event) => void;
 }
 
-export function useOutsideClick(props: UseOutsideClickProps) {
+export function useClickOutside(props: UseClickOutsideProps) {
   const [state, setState] = createStore({
     isPointerDown: false,
     ignoreEmulatedMouseEvents: false,

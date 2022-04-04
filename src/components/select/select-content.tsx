@@ -1,13 +1,13 @@
-import { children, createEffect, createSignal, on, PropsWithChildren, Show, splitProps } from "solid-js";
+import { children, createEffect, createSignal, on, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useOutsideClick } from "@/hooks/use-outside-click";
 import { useComponentStyleConfigs } from "@/theme/provider";
 import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
+import { ClickOutside } from "../click-outside/click-outside";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
 import { selectContentStyles, selectTransitionName } from "./select.styles";
@@ -66,8 +66,8 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
     }
   };
 
-  const onOutsideClick = (event: Event) => {
-    selectContext.onContentOutsideClick(event.target as HTMLElement);
+  const onClickOutside = (event: Event) => {
+    selectContext.onContentClickOutside(event.target as HTMLElement);
   };
 
   const transitionName = () => {
@@ -84,11 +84,11 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
       <Portal>
         <Transition name={transitionName()} appear onAfterExit={unmountPortal}>
           <Show when={selectContext.state.opened}>
-            <OutsideClick onOutsideClick={onOutsideClick}>
+            <ClickOutside onClickOutside={onClickOutside}>
               <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others}>
                 {resolvedChildren()}
               </Box>
-            </OutsideClick>
+            </ClickOutside>
           </Show>
         </Transition>
       </Portal>
@@ -97,17 +97,3 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
 }
 
 SelectContent.toString = () => createClassSelector(hopeSelectContentClass);
-
-/**
- * Renderless component that manage outside click on its children.
- */
-export function OutsideClick(props: PropsWithChildren<{ onOutsideClick: (event: Event) => void }>) {
-  const resolvedChildren = children(() => props.children);
-
-  useOutsideClick({
-    element: () => resolvedChildren() as HTMLElement,
-    handler: event => props.onOutsideClick(event),
-  });
-
-  return resolvedChildren;
-}

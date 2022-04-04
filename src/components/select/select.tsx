@@ -5,7 +5,7 @@ import { createStore } from "solid-js/store";
 import { SystemStyleObject } from "@/styled-system";
 import { useComponentStyleConfigs } from "@/theme";
 import { isArray } from "@/utils/assertion";
-import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
+import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "@/utils/dom";
 
 import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
@@ -415,13 +415,9 @@ export function Select(props: SelectProps) {
     return state.options[index].disabled;
   };
 
-  const isInsideTrigger = (element: HTMLElement) => {
-    return !!triggerRef && triggerRef.contains(element);
-  };
-
   const onTriggerBlur = (event: FocusEvent) => {
     // if the blur was provoked by an element inside the trigger, ignore it
-    if (event.relatedTarget && isInsideTrigger(event.relatedTarget as HTMLElement)) {
+    if (contains(triggerRef, getRelatedTarget(event))) {
       return;
     }
 
@@ -595,9 +591,9 @@ export function Select(props: SelectProps) {
     onOptionChange(-1);
   };
 
-  const onContentOutsideClick = (target: HTMLElement) => {
+  const onContentClickOutside = (target: HTMLElement) => {
     // clicking inside the trigger is not considered an "outside click"
-    if (isInsideTrigger(target)) {
+    if (contains(triggerRef, target)) {
       return;
     }
 
@@ -663,7 +659,7 @@ export function Select(props: SelectProps) {
     assignListboxRef,
     registerOption,
     scrollToOption,
-    onContentOutsideClick,
+    onContentClickOutside,
     onTriggerBlur,
     onTriggerClick,
     onTriggerKeyDown,
@@ -732,7 +728,7 @@ interface SelectContextValue {
   /**
    * Callback invoked when the user click outside the `SelectContent`.
    */
-  onContentOutsideClick: (target: HTMLElement) => void;
+  onContentClickOutside: (target: HTMLElement) => void;
 
   /**
    * Callback invoked when the `SelectTrigger` loose focus.

@@ -7,7 +7,7 @@ import { isFunction } from "@/utils/assertion";
 import { classNames, createClassSelector } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { OutsideClick } from "../select/select-content";
+import { ClickOutside } from "../click-outside/click-outside";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
 import { menuContentStyles, menuTransitionName } from "./menu.styles";
@@ -64,8 +64,8 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
     }
   };
 
-  const onOutsideClick = (event: Event) => {
-    menuContext.onContentOutsideClick(event.target as HTMLElement);
+  const onClickOutside = (event: Event) => {
+    menuContext.onContentClickOutside(event.target as HTMLElement);
   };
 
   const classes = () => classNames(local.class, hopeMenuContentClass, menuContentStyles());
@@ -90,7 +90,7 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
       <Portal>
         <Transition name={transitionName()} appear onAfterExit={unmountPortal}>
           <Show when={menuContext.state.opened}>
-            <OutsideClick onOutsideClick={onOutsideClick}>
+            <ClickOutside onClickOutside={onClickOutside}>
               <Box
                 role="menu"
                 tabindex="-1"
@@ -106,7 +106,7 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
               >
                 {resolvedChildren()}
               </Box>
-            </OutsideClick>
+            </ClickOutside>
           </Show>
         </Transition>
       </Portal>
