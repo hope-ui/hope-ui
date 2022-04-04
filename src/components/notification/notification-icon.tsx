@@ -9,25 +9,33 @@ import { IconExclamationCircleSolid } from "../icons/IconExclamationCircleSolid"
 import { IconExclamationTriangleSolid } from "../icons/IconExclamationTriangleSolid";
 import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { ElementType } from "../types";
-import { useAlertContext } from "./alert";
-import { alertIconStyles } from "./alert.styles";
+import { useNotificationContext } from "./notification";
+import { notificationIconStyles } from "./notification.styles";
 
-export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
+export type NotificationIconProps<C extends ElementType = "svg"> = IconProps<C>;
 
-const hopeAlertIconClass = "hope-alert__icon";
+const hopeNotificationIconClass = "hope-notification__icon";
 
-export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C>) {
-  const theme = useComponentStyleConfigs().Alert;
-  const { status } = useAlertContext();
+export function NotificationIcon<C extends ElementType = "svg">(props: NotificationIconProps<C>) {
+  const theme = useComponentStyleConfigs().Notification;
+  const { status } = useNotificationContext();
 
-  const defaultProps: AlertIconProps<"svg"> = {
-    boxSize: "$6",
+  const defaultProps: NotificationIconProps<"svg"> = {
+    boxSize: "$7",
   };
 
-  const propsWithDefault: AlertIconProps<"svg"> = mergeProps(defaultProps, props);
+  const propsWithDefault: NotificationIconProps<"svg"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["as", "class"]);
 
-  const classes = () => classNames(local.class, hopeAlertIconClass, alertIconStyles());
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeNotificationIconClass,
+      notificationIconStyles({
+        status: status(),
+      })
+    );
+  };
 
   const icon = () => {
     if (local.as) {
@@ -49,4 +57,4 @@ export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C
   return <Icon as={icon()} class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />;
 }
 
-AlertIcon.toString = () => createClassSelector(hopeAlertIconClass);
+NotificationIcon.toString = () => createClassSelector(hopeNotificationIconClass);

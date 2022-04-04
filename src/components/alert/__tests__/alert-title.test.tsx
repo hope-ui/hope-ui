@@ -60,11 +60,11 @@ describe("AlertTitle", () => {
     const alertTitle = screen.getByTestId("alert-title");
 
     // assert
-    expect(alertTitle).toHaveClass("hope-alert-title");
+    expect(alertTitle).toHaveClass("hope-alert__title");
   });
 
   it("should return semantic hope class as css selector when calling toString()", () => {
-    expect(AlertTitle.toString()).toBe(".hope-alert-title");
+    expect(AlertTitle.toString()).toBe(".hope-alert__title");
   });
 
   it("should have class from class prop", () => {

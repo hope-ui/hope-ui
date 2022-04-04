@@ -9,7 +9,7 @@ import { alertTitleStyles } from "./alert.styles";
 
 export type AlertTitleProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 
-const hopeAlertTitleClass = "hope-alert-title";
+const hopeAlertTitleClass = "hope-alert__title";
 
 export function AlertTitle<C extends ElementType = "div">(props: AlertTitleProps<C>) {
   const theme = useComponentStyleConfigs().Alert;

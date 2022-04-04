@@ -28,3 +28,14 @@ render(
   ),
   document.getElementById("root") as HTMLElement
 );
+
+/**
+<Notification status="info" gap="$2_5">
+  <NotificationIcon />
+  <VStack alignItems="flex-start">
+    <NotificationTitle>Default notification</NotificationTitle>
+    <NotificationDescription>This is default notification with title and body</NotificationDescription>
+  </VStack>
+  <CloseButton size="sm" position="absolute" top="$1" right="$1" />
+</Notification>
+ */

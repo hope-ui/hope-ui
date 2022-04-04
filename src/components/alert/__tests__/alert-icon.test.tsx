@@ -41,11 +41,11 @@ describe("AlertIcon", () => {
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert
-    expect(alertIcon).toHaveClass("hope-alert-icon");
+    expect(alertIcon).toHaveClass("hope-alert__icon");
   });
 
   it("should return semantic hope class of <Icon/> as css selector when calling toString()", () => {
-    expect(AlertIcon.toString()).toBe(".hope-alert-icon");
+    expect(AlertIcon.toString()).toBe(".hope-alert__icon");
   });
 
   it("should have class from class prop", () => {
