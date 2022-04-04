@@ -38,4 +38,16 @@ render(
   </VStack>
   <CloseButton size="sm" position="absolute" top="$1" right="$1" />
 </Notification>
+
+showNotification({
+  id: "custom-id",
+  status: 'info',
+  title: "You've been compromised",
+  description: 'Leave the building immediately',
+  closable: true,
+  duration: 5000,
+  position: "top-right",
+  render: () => (<span>Custom JSX rendered</span>),
+  onClose: () => console.log('unmounted'),
+})
  */
