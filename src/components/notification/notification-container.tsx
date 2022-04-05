@@ -9,7 +9,7 @@ import { NotificationConfig } from "./notification.types";
 import { NotificationDescription } from "./notification-description";
 import { NotificationIcon } from "./notification-icon";
 import { NotificationTitle } from "./notification-title";
-import { useNotificationsProviderContext } from "./notifications-provider";
+import { useNotificationsProviderContext } from "./notifications-provider.context";
 
 type NotificationContainerOptions = Omit<NotificationConfig, "onClose">;
 

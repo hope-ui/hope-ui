@@ -1,15 +1,4 @@
-import {
-  Accessor,
-  createContext,
-  createMemo,
-  createUniqueId,
-  For,
-  JSX,
-  onCleanup,
-  onMount,
-  splitProps,
-  useContext,
-} from "solid-js";
+import { Accessor, createMemo, createUniqueId, For, JSX, onCleanup, onMount, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 
@@ -26,6 +15,7 @@ import {
 } from "./notification.styles";
 import { NotificationConfig, ShowNotificationProps } from "./notification.types";
 import { NotificationContainer } from "./notification-container";
+import { NotificationsProviderContext, NotificationsProviderContextValue } from "./notifications-provider.context";
 
 interface NotificationsProviderProps extends NotificationListVariants {
   /**
@@ -204,60 +194,4 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
       {local.children}
     </NotificationsProviderContext.Provider>
   );
-}
-
-/* -------------------------------------------------------------------------------------------------
- * Context
- * -----------------------------------------------------------------------------------------------*/
-
-export interface NotificationsProviderContextValue {
-  /**
-   * All currently displayed notifications.
-   */
-  notifications: Accessor<NotificationConfig[]>;
-
-  /**
-   * All pending notifications.
-   */
-  queue: Accessor<NotificationConfig[]>;
-
-  /**
-   * Show a notification.
-   */
-  showNotification(config: NotificationConfig): string;
-
-  /**
-   * Update a notification for a given `id`.
-   */
-  updateNotification(id: string, config: NotificationConfig): void;
-
-  /**
-   * Hide a notification.
-   */
-  hideNotification(id: string): void;
-
-  /**
-   * Remove all notifications.
-   * (displayed and from the queue)
-   */
-  clear(): void;
-
-  /**
-   * Remove all pending notifications for the queue only.
-   */
-  clearQueue(): void;
-}
-
-const NotificationsProviderContext = createContext<NotificationsProviderContextValue>();
-
-export function useNotificationsProviderContext() {
-  const context = useContext(NotificationsProviderContext);
-
-  if (!context) {
-    throw new Error(
-      "[Hope UI]: useNotificationManagerContext must be used within a `<NotificationsProvider />` component"
-    );
-  }
-
-  return context;
 }
