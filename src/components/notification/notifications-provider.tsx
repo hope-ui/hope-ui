@@ -62,7 +62,7 @@ interface NotificationsProviderProps extends NotificationListVariants {
 
 const hopeNotificationsProviderClass = "hope-notification__provider";
 
-const DEFAULT_NOTIFICATION_DURATION = 4_000;
+const DEFAULT_NOTIFICATION_DURATION = 5_000;
 
 /**
  * Context provider for the notification system.
