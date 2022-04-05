@@ -16,16 +16,22 @@ export const notificationTransitionName = {
 function createNotificationSlideTransition(config: { name: string; enterTransform: string; leaveTransform: string }) {
   return {
     [`.${config.name}-enter, .${config.name}-exit-to`]: {
+      opacity: 0,
       transform: config.enterTransform,
     },
     [`.${config.name}-enter-to, .${config.name}-exit`]: {
+      opacity: 1,
       transform: config.leaveTransform,
     },
     [`.${config.name}-enter-active`]: {
-      transition: "transform 250ms cubic-bezier(.51,.3,0,1.21)",
+      transitionProperty: "opacity, transform",
+      transitionTimingFunction: "cubic-bezier(.51,.3,0,1.21)",
+      transitionDuration: "300ms",
     },
     [`.${config.name}-exit-active`]: {
-      transition: "transform 150ms ease-in",
+      transitionProperty: "opacity, transform",
+      transitionTimingFunction: "ease-in",
+      transitionDuration: "200ms",
     },
   };
 }
