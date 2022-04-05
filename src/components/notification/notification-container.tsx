@@ -1,5 +1,6 @@
 import { Match, onCleanup, onMount, Show, splitProps, Switch } from "solid-js";
 
+import { Box } from "../box/box";
 import { CloseButton } from "../close-button/close-button";
 import { VStack } from "../stack/stack";
 import { HTMLHopeProps } from "../types";
@@ -21,14 +22,15 @@ export type NotificationContainerProps = HTMLHopeProps<"div", NotificationContai
 export function NotificationContainer(props: NotificationContainerProps) {
   const notificationsProviderContext = useNotificationsProviderContext();
 
-  const [local, others] = splitProps(props, [
+  const [local] = splitProps(props, [
     "render",
     "id",
     "status",
     "title",
     "description",
-    "closable",
     "duration",
+    "persistent",
+    "closable",
     "onMouseEnter",
     "onMouseLeave",
   ]);
@@ -48,9 +50,11 @@ export function NotificationContainer(props: NotificationContainerProps) {
   };
 
   const closeWithDelay = () => {
-    if (local.duration !== null) {
-      closeDelayId = window.setTimeout(closeNotification, local.duration);
+    if (local.persistent || local.duration == null) {
+      return;
     }
+
+    closeDelayId = window.setTimeout(closeNotification, local.duration);
   };
 
   onMount(() => {
@@ -65,13 +69,18 @@ export function NotificationContainer(props: NotificationContainerProps) {
     <Show
       when={local.render}
       fallback={
-        <Notification status={local.status} onMouseEnter={clearCloseDelay} onMouseLeave={closeWithDelay} {...others}>
+        <Notification
+          status={local.status}
+          pr={local.closable ? "$9" : "$3"}
+          onMouseEnter={clearCloseDelay}
+          onMouseLeave={closeWithDelay}
+        >
           <Show when={local.status}>
             <NotificationIcon mr="$2_5" />
           </Show>
           <Switch>
             <Match when={local.title && local.description}>
-              <VStack alignItems="flex-start">
+              <VStack alignItems="flex-start" spacing="$1">
                 <NotificationTitle>{local.title}</NotificationTitle>
                 <NotificationDescription>{local.description}</NotificationDescription>
               </VStack>
@@ -89,10 +98,12 @@ export function NotificationContainer(props: NotificationContainerProps) {
         </Notification>
       }
     >
-      {local.render?.({
-        id: local.id,
-        close: closeNotification,
-      })}
+      <Box onMouseEnter={clearCloseDelay} onMouseLeave={closeWithDelay}>
+        {local.render?.({
+          id: local.id,
+          close: closeNotification,
+        })}
+      </Box>
     </Show>
   );
 }

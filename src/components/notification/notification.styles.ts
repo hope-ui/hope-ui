@@ -60,10 +60,10 @@ export const notificationTransitionStyles = globalCss({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Notification - list
+ * Notification - provider (contains the list of notifcations)
  * -----------------------------------------------------------------------------------------------*/
 
-export const notificationListStyles = css({
+export const notificationsProviderStyles = css({
   position: "fixed",
   zIndex: "$notification",
 
@@ -107,7 +107,7 @@ export const notificationListStyles = css({
   },
 });
 
-export type NotificationListVariants = VariantProps<typeof notificationListStyles>;
+export type NotificationListVariants = VariantProps<typeof notificationsProviderStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Notification

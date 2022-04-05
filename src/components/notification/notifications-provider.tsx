@@ -1,4 +1,15 @@
-import { Accessor, createContext, createMemo, createUniqueId, For, JSX, splitProps, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createMemo,
+  createUniqueId,
+  For,
+  JSX,
+  onCleanup,
+  onMount,
+  splitProps,
+  useContext,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 
@@ -7,8 +18,12 @@ import { PositionProps } from "@/styled-system/props/position";
 import { classNames } from "@/utils/css";
 
 import { Box } from "../box/box";
-import { useNotificationsEvents } from "./notification.events";
-import { notificationListStyles, NotificationListVariants, notificationTransitionName } from "./notification.styles";
+import { NOTIFICATIONS_EVENTS } from "./notification.events";
+import {
+  NotificationListVariants,
+  notificationsProviderStyles,
+  notificationTransitionName,
+} from "./notification.styles";
 import { NotificationConfig, ShowNotificationProps } from "./notification.types";
 import { NotificationContainer } from "./notification-container";
 
@@ -20,15 +35,19 @@ interface NotificationsProviderProps extends NotificationListVariants {
   limit?: number;
 
   /**
+   * The delay (in ms) before the notification hides.
+   */
+  duration?: number;
+
+  /**
+   * If `true`, duration will be ignored and notifications will never dismiss.
+   */
+  persistent?: boolean;
+
+  /**
    * If `true`, notifications will show a close button.
    */
   closable?: boolean;
-
-  /**
-   * The delay (in ms) before notifications hides.
-   * If set to `null`, notifications will never dismiss.
-   */
-  duration?: number | null;
 
   /**
    * The `z-index` css property of all notifications.
@@ -36,18 +55,20 @@ interface NotificationsProviderProps extends NotificationListVariants {
   zIndex?: PositionProps["zIndex"];
 
   /**
-   * The children of the notification manager.
+   * The children of the notifications provider.
    */
   children: JSX.Element;
 }
 
-const hopeNotificationListClass = "hope-notification__list";
+const hopeNotificationsProviderClass = "hope-notification__provider";
+
+const DEFAULT_NOTIFICATION_DURATION = 4_000;
 
 /**
  * Context provider for the notification system.
  */
 export function NotificationsProvider(props: NotificationsProviderProps) {
-  const [local] = splitProps(props, ["children", "placement", "closable", "duration", "limit", "zIndex"]);
+  const [local] = splitProps(props, ["children", "placement", "duration", "persistent", "closable", "limit", "zIndex"]);
 
   const notificationQueue = createMemo(() => {
     return createQueue<NotificationConfig>({
@@ -64,15 +85,16 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
 
   const showNotification = (notification: ShowNotificationProps) => {
     const id = notification.id ?? `hope-notification-${createUniqueId()}`;
+    const persistent = notification.persistent ?? local.persistent ?? false;
+    const duration = notification.duration ?? local.duration ?? DEFAULT_NOTIFICATION_DURATION;
     const closable = notification.closable ?? local.closable ?? true;
-    const duration = notification.duration ?? local.duration ?? 4_000;
 
     notificationQueue().update(notifications => {
       if (notification.id && notifications.some(n => n.id === notification.id)) {
         return notifications;
       }
 
-      const newNotification: NotificationConfig = { ...notification, id, closable, duration };
+      const newNotification: NotificationConfig = { ...notification, id, persistent, duration, closable };
 
       return [...notifications, newNotification];
     });
@@ -114,8 +136,8 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
 
   const classes = () => {
     return classNames(
-      hopeNotificationListClass,
-      notificationListStyles({
+      hopeNotificationsProviderClass,
+      notificationsProviderStyles({
         placement: finalPlacement(),
       })
     );
@@ -150,7 +172,25 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
     clearQueue,
   };
 
-  useNotificationsEvents(context);
+  const showHandler = (event: any) => showNotification(event.detail);
+  const updateHandler = (event: any) => updateNotification(event.detail.id, event.detail);
+  const hideHandler = (event: any) => hideNotification(event.detail);
+
+  onMount(() => {
+    window.addEventListener(NOTIFICATIONS_EVENTS.show, showHandler);
+    window.addEventListener(NOTIFICATIONS_EVENTS.update, updateHandler);
+    window.addEventListener(NOTIFICATIONS_EVENTS.hide, hideHandler);
+    window.addEventListener(NOTIFICATIONS_EVENTS.clear, clear);
+    window.addEventListener(NOTIFICATIONS_EVENTS.clearQueue, clearQueue);
+  });
+
+  onCleanup(() => {
+    window.removeEventListener(NOTIFICATIONS_EVENTS.show, showHandler);
+    window.removeEventListener(NOTIFICATIONS_EVENTS.update, updateHandler);
+    window.removeEventListener(NOTIFICATIONS_EVENTS.hide, hideHandler);
+    window.removeEventListener(NOTIFICATIONS_EVENTS.clear, clear);
+    window.removeEventListener(NOTIFICATIONS_EVENTS.clearQueue, clearQueue);
+  });
 
   return (
     <NotificationsProviderContext.Provider value={context}>

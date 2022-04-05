@@ -37,15 +37,19 @@ export interface NotificationConfig {
   description?: string;
 
   /**
+   * The delay (in ms) before the notification hides.
+   */
+  duration?: number;
+
+  /**
+   * If `true`, duration will be ignored and the notification will never dismiss.
+   */
+  persistent?: boolean;
+
+  /**
    * If `true`, the notification will show a close button.
    */
   closable?: boolean;
-
-  /**
-   * The delay (in ms) before the notification hides.
-   * If set to `null`, the notification will never dismiss.
-   */
-  duration?: number | null;
 
   /**
    * Callback function to run side effects after the notification has closed.

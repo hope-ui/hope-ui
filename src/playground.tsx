@@ -2,21 +2,10 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, NotificationsProvider, showNotification } from ".";
+import { Box, HopeProvider, NotificationsProvider } from ".";
 
 export function App() {
-  const notify = () => {
-    showNotification({
-      title: "Default notification",
-      description: "This is default notification with title and body",
-    });
-  };
-
-  return (
-    <Box p="$4">
-      <Button onClick={notify}>Notify</Button>
-    </Box>
-  );
+  return <Box p="$4"></Box>;
 }
 
 render(
