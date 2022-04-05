@@ -46,7 +46,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run typecheck && rollup -c",
+    "build": "rollup -c",
     "build:storybook": "build-storybook",
     "commit": "git-cz",
     "dev": "vite --host",
