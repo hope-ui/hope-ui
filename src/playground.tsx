@@ -2,27 +2,11 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import {
-  Box,
-  Button,
-  HopeProvider,
-  HopeThemeConfig,
-  HStack,
-  NotificationManager,
-  showNotification,
-  useColorMode,
-} from ".";
-import { NotificationVariants } from "./components/notification/notification.styles";
-
-function getRandomStatus() {
-  const index = Math.floor(Math.random() * (4 - 0) + 0);
-  return ["success", "info", "warning", "danger"][index] as NotificationVariants["status"];
-}
+import { Box, Button, HopeProvider, NotificationsProvider, showNotification } from ".";
 
 export function App() {
   const notify = () => {
     showNotification({
-      status: getRandomStatus(),
       title: "Default notification",
       description: "This is default notification with title and body",
     });
@@ -38,9 +22,9 @@ export function App() {
 render(
   () => (
     <HopeProvider>
-      <NotificationManager placement="bottom-start">
+      <NotificationsProvider>
         <App />
-      </NotificationManager>
+      </NotificationsProvider>
     </HopeProvider>
   ),
   document.getElementById("root") as HTMLElement

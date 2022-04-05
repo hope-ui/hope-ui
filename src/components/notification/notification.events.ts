@@ -1,7 +1,7 @@
 import { onCleanup, onMount } from "solid-js";
 
 import type { NotificationConfig, ShowNotificationProps } from "./notification.types";
-import type { NotificationManagerContextValue } from "./notification-manager";
+import type { NotificationsProviderContextValue } from "./notifications-provider";
 
 type ValueOf<T> = T[keyof T];
 
@@ -37,7 +37,7 @@ export function clearNotificationsQueue() {
   window.dispatchEvent(createEvent(NOTIFICATIONS_EVENTS.clearQueue));
 }
 
-export function useNotificationsEvents(ctx: NotificationManagerContextValue) {
+export function useNotificationsEvents(ctx: NotificationsProviderContextValue) {
   const events = {
     show: (event: any) => ctx.showNotification(event.detail),
     hide: (event: any) => ctx.hideNotification(event.detail),

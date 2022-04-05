@@ -7,8 +7,8 @@ import { Notification } from "./notification";
 import { NotificationConfig } from "./notification.types";
 import { NotificationDescription } from "./notification-description";
 import { NotificationIcon } from "./notification-icon";
-import { useNotificationManagerContext } from "./notification-manager";
 import { NotificationTitle } from "./notification-title";
+import { useNotificationsProviderContext } from "./notifications-provider";
 
 type NotificationContainerOptions = Omit<NotificationConfig, "onClose">;
 
@@ -19,7 +19,7 @@ export type NotificationContainerProps = HTMLHopeProps<"div", NotificationContai
  * It renders the default Hope UI designed notification or a custom one if the `render` prop is passed.
  */
 export function NotificationContainer(props: NotificationContainerProps) {
-  const notificationManagerContext = useNotificationManagerContext();
+  const notificationsProviderContext = useNotificationsProviderContext();
 
   const [local, others] = splitProps(props, [
     "render",
@@ -44,7 +44,7 @@ export function NotificationContainer(props: NotificationContainerProps) {
   const closeNotification = () => {
     clearCloseDelay();
 
-    notificationManagerContext.hideNotification(local.id);
+    notificationsProviderContext.hideNotification(local.id);
   };
 
   const closeWithDelay = () => {

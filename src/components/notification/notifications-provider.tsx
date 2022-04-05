@@ -12,7 +12,7 @@ import { notificationListStyles, NotificationListVariants, notificationTransitio
 import { NotificationConfig, ShowNotificationProps } from "./notification.types";
 import { NotificationContainer } from "./notification-container";
 
-interface NotificationManagerProps extends NotificationListVariants {
+interface NotificationsProviderProps extends NotificationListVariants {
   /**
    * Maximum amount of notifications displayed at a time,
    * other new notifications will be added to queue.
@@ -43,7 +43,10 @@ interface NotificationManagerProps extends NotificationListVariants {
 
 const hopeNotificationListClass = "hope-notification__list";
 
-export function NotificationManager(props: NotificationManagerProps) {
+/**
+ * Context provider for the notification system.
+ */
+export function NotificationsProvider(props: NotificationsProviderProps) {
   const [local] = splitProps(props, ["children", "placement", "closable", "duration", "limit", "zIndex"]);
 
   const notificationQueue = createMemo(() => {
@@ -53,7 +56,7 @@ export function NotificationManager(props: NotificationManagerProps) {
     });
   });
 
-  const finalPlacement: Accessor<NotificationManagerProps["placement"]> = () => local.placement ?? "top-end";
+  const finalPlacement: Accessor<NotificationsProviderProps["placement"]> = () => local.placement ?? "top-end";
 
   const notificationsAccessor = () => notificationQueue().state.current;
 
@@ -137,7 +140,7 @@ export function NotificationManager(props: NotificationManagerProps) {
     }
   };
 
-  const context: NotificationManagerContextValue = {
+  const context: NotificationsProviderContextValue = {
     notifications: notificationsAccessor,
     queue: queueAccessor,
     showNotification,
@@ -150,7 +153,7 @@ export function NotificationManager(props: NotificationManagerProps) {
   useNotificationsEvents(context);
 
   return (
-    <NotificationManagerContext.Provider value={context}>
+    <NotificationsProviderContext.Provider value={context}>
       <Portal>
         <Box class={classes()} zIndex={local.zIndex}>
           <TransitionGroup name={transitionName()}>
@@ -159,7 +162,7 @@ export function NotificationManager(props: NotificationManagerProps) {
         </Box>
       </Portal>
       {local.children}
-    </NotificationManagerContext.Provider>
+    </NotificationsProviderContext.Provider>
   );
 }
 
@@ -167,7 +170,7 @@ export function NotificationManager(props: NotificationManagerProps) {
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
-export interface NotificationManagerContextValue {
+export interface NotificationsProviderContextValue {
   /**
    * All currently displayed notifications.
    */
@@ -205,14 +208,14 @@ export interface NotificationManagerContextValue {
   clearQueue(): void;
 }
 
-const NotificationManagerContext = createContext<NotificationManagerContextValue>();
+const NotificationsProviderContext = createContext<NotificationsProviderContextValue>();
 
-export function useNotificationManagerContext() {
-  const context = useContext(NotificationManagerContext);
+export function useNotificationsProviderContext() {
+  const context = useContext(NotificationsProviderContext);
 
   if (!context) {
     throw new Error(
-      "[Hope UI]: useNotificationManagerContext must be used within a `<NotificationManager />` component"
+      "[Hope UI]: useNotificationManagerContext must be used within a `<NotificationsProvider />` component"
     );
   }
 

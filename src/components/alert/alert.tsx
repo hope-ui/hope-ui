@@ -14,6 +14,10 @@ export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVa
 
 const hopeAlertClass = "hope-alert";
 
+/**
+ * Alert is used to communicate the state or status of a page,
+ * feature or action
+ */
 export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
   const theme = useComponentStyleConfigs().Alert;
 
