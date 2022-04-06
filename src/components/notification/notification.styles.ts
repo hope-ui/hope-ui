@@ -70,7 +70,7 @@ export const notificationListStyles = css({
 
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-end",
+  justifyContent: "stretch",
   gap: "$4",
 
   variants: {
@@ -120,8 +120,7 @@ export const notificationStyles = css({
   display: "flex",
   alignItems: "center",
 
-  minWidth: "$xs",
-  maxWidth: "$md",
+  width: "$md",
 
   borderRadius: "$sm",
   border: "1px solid $colors$neutral5",
