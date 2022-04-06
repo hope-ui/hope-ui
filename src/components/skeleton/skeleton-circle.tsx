@@ -1,7 +1,6 @@
-import { SizeProps } from "@/styled-system/props/size";
-import { createClassSelector } from "@/utils/css";
-import { RightJoinProps } from "@/utils/types";
-
+import { SizeProps } from "../../styled-system/props/size";
+import { createClassSelector } from "../../utils/css";
+import { RightJoinProps } from "../../utils/types";
 import { ElementType } from "../types";
 import { hopeSkeletonClass, Skeleton, SkeletonProps } from "./skeleton";
 

@@ -1,9 +1,8 @@
 import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";

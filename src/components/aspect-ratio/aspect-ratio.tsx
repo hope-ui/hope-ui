@@ -1,9 +1,8 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { ResponsiveValue } from "@/styled-system/types";
-import { classNames, createClassSelector } from "@/utils/css";
-import { mapResponsive } from "@/utils/responsive";
-
+import { ResponsiveValue } from "../../styled-system/types";
+import { classNames, createClassSelector } from "../../utils/css";
+import { mapResponsive } from "../../utils/responsive";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { aspectRatioStyles } from "./aspect-ratio.styles";

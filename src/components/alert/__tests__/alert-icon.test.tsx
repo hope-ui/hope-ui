@@ -1,8 +1,7 @@
 import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { Alert } from "../alert";
 import { alertIconStyles } from "../alert.styles";
 import { AlertIcon } from "../alert-icon";

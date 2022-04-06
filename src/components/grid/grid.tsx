@@ -1,9 +1,8 @@
 import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
-import { ResponsiveProps } from "@/styled-system/types";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { ResponsiveProps } from "../../styled-system/types";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 

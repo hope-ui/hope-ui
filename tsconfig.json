@@ -18,10 +18,7 @@
     "strict": true,
     "sourceMap": true,
     "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"],
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "baseUrl": "./"
   },
   "include": ["vite.config.*", "jest.setup.ts", "src/**/*", "src/**/*.tsx"]
 }

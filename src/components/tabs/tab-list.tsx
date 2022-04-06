@@ -1,11 +1,10 @@
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-import { normalizeEventKey } from "@/utils/dom";
-import { callHandler } from "@/utils/function";
-import { EventKeyMap } from "@/utils/types";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
+import { normalizeEventKey } from "../../utils/dom";
+import { callHandler } from "../../utils/function";
+import { EventKeyMap } from "../../utils/types";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTabsContext } from "./tabs";

@@ -2,10 +2,9 @@ import { Accessor, createMemo, createUniqueId, For, JSX, onCleanup, onMount, spl
 import { Portal } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 
-import { createQueue } from "@/hooks/create-queue";
-import { PositionProps } from "@/styled-system/props/position";
-import { classNames } from "@/utils/css";
-
+import { createQueue } from "../../hooks/create-queue";
+import { PositionProps } from "../../styled-system/props/position";
+import { classNames } from "../../utils/css";
 import { Box } from "../box/box";
 import { NOTIFICATIONS_EVENTS } from "./notification.events";
 import {

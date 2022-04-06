@@ -1,12 +1,11 @@
 import { Property } from "csstype";
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { BorderProps } from "@/styled-system/props/border";
-import { ColorProps } from "@/styled-system/props/color";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { visuallyHiddenStyles } from "@/theme/utils";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { BorderProps } from "../../styled-system/props/border";
+import { ColorProps } from "../../styled-system/props/color";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { visuallyHiddenStyles } from "../../theme/utils";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { spinnerStyles, SpinnerVariants } from "./spinner.styles";

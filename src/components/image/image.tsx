@@ -1,9 +1,8 @@
 import { Property } from "csstype";
 import { createMemo, JSX, Show, splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-import { RightJoinProps } from "@/utils/types";
-
+import { classNames, createClassSelector } from "../../utils/css";
+import { RightJoinProps } from "../../utils/types";
 import { Box } from "../box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { createImageLoadingStatus, CreateImageLoadingStatusProps } from "./image.utils";

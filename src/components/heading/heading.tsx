@@ -1,8 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { headingStyles, HeadingVariants } from "./heading.styles";

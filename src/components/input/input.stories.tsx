@@ -1,5 +1,4 @@
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { createIcon } from "../icon/create-icon";
 import { Icon } from "../icon/icon";
 import { VStack } from "../stack";

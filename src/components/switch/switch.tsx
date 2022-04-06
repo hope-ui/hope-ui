@@ -1,13 +1,12 @@
 import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { visuallyHiddenStyles } from "@/theme/utils";
-import { classNames, createClassSelector } from "@/utils/css";
-import { callHandler } from "@/utils/function";
-import { isChildrenFunction } from "@/utils/solid";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { visuallyHiddenStyles } from "../../theme/utils";
+import { classNames, createClassSelector } from "../../utils/css";
+import { callHandler } from "../../utils/function";
+import { isChildrenFunction } from "../../utils/solid";
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";

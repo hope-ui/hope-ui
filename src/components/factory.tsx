@@ -1,10 +1,9 @@
 import { createMemo, mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { createStyledSystemClass, getUsedStylePropNames } from "@/styled-system/system";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { createStyledSystemClass, getUsedStylePropNames } from "../styled-system/system";
+import { isFunction } from "../utils/assertion";
+import { classNames, createClassSelector } from "../utils/css";
 import {
   DOMElements,
   ElementType,

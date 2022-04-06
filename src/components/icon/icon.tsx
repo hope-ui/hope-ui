@@ -1,8 +1,7 @@
 import { mergeProps, Show, splitProps } from "solid-js";
 
-import { isString } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { isString } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";

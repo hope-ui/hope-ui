@@ -1,9 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { FormErrorMessage, FormHelperText } from "@/components";
-import { FormControl } from "@/components/form-control/form-control";
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { FormControl, FormErrorMessage, FormHelperText } from "../../../components";
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { Input } from "../input";
 import { baseInputResetStyles, inputStyles } from "../input.styles";
 

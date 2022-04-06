@@ -2,11 +2,10 @@ import { autoUpdate, computePosition, flip, offset, shift, size } from "@floatin
 import { createContext, createEffect, createSignal, createUniqueId, JSX, on, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system";
-import { useComponentStyleConfigs } from "@/theme";
-import { isArray } from "@/utils/assertion";
-import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "@/utils/dom";
-
+import { SystemStyleObject } from "../../styled-system";
+import { useComponentStyleConfigs } from "../../theme";
+import { isArray } from "../../utils/assertion";
+import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
 import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {

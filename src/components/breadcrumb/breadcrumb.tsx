@@ -1,11 +1,10 @@
 import { createContext, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { GridLayoutProps } from "@/styled-system/props/grid";
-import { ResponsiveValue, SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { GridLayoutProps } from "../../styled-system/props/grid";
+import { ResponsiveValue, SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { breadcrumbListStyles, breadcrumbStyles } from "./breadcrumb.styles";

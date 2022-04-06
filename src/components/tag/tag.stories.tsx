@@ -1,7 +1,6 @@
 import { action } from "@storybook/addon-actions";
 
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { HStack } from "../stack/stack";
 import { Tag } from "./tag";

@@ -1,10 +1,9 @@
 import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tableStyles } from "./table.styles";

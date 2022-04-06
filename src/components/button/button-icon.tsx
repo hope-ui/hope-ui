@@ -1,7 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { buttonIconStyles } from "./button.styles";

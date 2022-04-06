@@ -1,5 +1,4 @@
-import { ResponsiveValue } from "@/styled-system/types";
-
+import { ResponsiveValue } from "../styled-system/types";
 import { isObject } from "./assertion";
 
 /**

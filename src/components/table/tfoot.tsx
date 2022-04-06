@@ -1,11 +1,10 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { tableFootStyles } from "./table.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type TfootProps<C extends ElementType = "tfoot"> = HTMLHopeProps<C>;
 

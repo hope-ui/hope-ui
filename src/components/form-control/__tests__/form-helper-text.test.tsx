@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { FormControl } from "../form-control";
 import { formHelperTextStyles } from "../form-control.styles";
 import { FormHelperText } from "../form-helper-text";

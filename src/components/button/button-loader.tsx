@@ -1,9 +1,8 @@
 import { Property } from "csstype";
 import { mergeProps, splitProps } from "solid-js";
 
-import { SpaceScaleValue } from "@/styled-system";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SpaceScaleValue } from "../../styled-system";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";

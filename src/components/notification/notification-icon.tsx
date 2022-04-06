@@ -1,8 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
 import { IconExclamationCircleSolid } from "../icons/IconExclamationCircleSolid";

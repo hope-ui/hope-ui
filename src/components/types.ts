@@ -1,8 +1,8 @@
 import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
-import { StyleProps } from "@/styled-system/system";
-import { SystemStyleObject } from "@/styled-system/types";
-import { RightJoinProps } from "@/utils/types";
+import { StyleProps } from "../styled-system/system";
+import { SystemStyleObject } from "../styled-system/types";
+import { RightJoinProps } from "../utils/types";
 
 /**
  * Represent any HTML element or SolidJS component.

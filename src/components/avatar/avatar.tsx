@@ -1,9 +1,8 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SystemStyleObject } from "../../styled-system";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ImageProps } from "../image";
 import { ElementType, HTMLHopeProps } from "../types";

@@ -1,8 +1,7 @@
 import { Accessor, createMemo, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ImageProps } from "../image";
 import { createImageLoadingStatus } from "../image/image.utils";

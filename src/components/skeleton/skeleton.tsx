@@ -1,11 +1,10 @@
 import { Property } from "csstype";
 import { createEffect, createSignal, mergeProps, on, Show, splitProps } from "solid-js";
 
-import { fadeIn } from "@/styled-system/keyframes";
-import { ColorProps } from "@/styled-system/props/color";
-import { colorTokenToCssVar } from "@/theme/utils";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { fadeIn } from "../../styled-system/keyframes";
+import { ColorProps } from "../../styled-system/props/color";
+import { colorTokenToCssVar } from "../../theme/utils";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { skeletonStyles } from "./skeleton.styles";

@@ -1,12 +1,11 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableCellStyles, TableCellVariants } from "./table.styles";
-import { useComponentStyleConfigs } from "@/theme/provider";
 
 export type TdProps<C extends ElementType = "td"> = HTMLHopeProps<C, Pick<TableCellVariants, "numeric">>;
 

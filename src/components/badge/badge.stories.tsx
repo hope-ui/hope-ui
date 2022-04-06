@@ -1,5 +1,4 @@
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { Badge } from "./badge";
 
 export default {

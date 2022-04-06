@@ -32,18 +32,21 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "solid": "./dist/source/index.js",
+      "import": "./dist/esm/index.js",
+      "browser": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "node": "./dist/cjs/index.js"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "npm run typecheck && rollup -c",
     "build:storybook": "build-storybook",
     "commit": "git-cz",
     "dev": "vite --host",
@@ -84,7 +87,6 @@
     "@commitlint/cli": "16.0.2",
     "@commitlint/config-conventional": "16.0.0",
     "@commitlint/cz-commitlint": "16.0.0",
-    "@rollup/plugin-alias": "^3.1.9",
     "@stitches/core": "1.2.6",
     "@storybook/addon-a11y": "6.4.12",
     "@storybook/addon-actions": "6.4.12",
@@ -128,7 +130,6 @@
     "ts-jest": "27.1.3",
     "typescript": "4.5.4",
     "vite": "2.7.11",
-    "vite-plugin-dts": "^1.0.5",
     "vite-plugin-solid": "2.2.2"
   },
   "peerDependencies": {

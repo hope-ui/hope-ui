@@ -1,8 +1,7 @@
 import merge from "lodash.merge";
 
-import { baseTheme, createTheme, css } from "@/styled-system/stitches.config";
-import { baseDarkThemeTokens } from "@/styled-system/tokens";
-
+import { baseTheme, createTheme, css } from "../styled-system/stitches.config";
+import { baseDarkThemeTokens } from "../styled-system/tokens";
 import { colorModeClassNames } from "./color-mode";
 import { StitchesThemeConfig } from "./types";
 

@@ -1,7 +1,6 @@
 import { JSX } from "solid-js";
 
-import { createClassSelector } from "@/utils/css";
-
+import { createClassSelector } from "../../utils/css";
 import { ElementType } from "../types";
 import { hopeIconClass, Icon, IconProps } from "./icon";
 

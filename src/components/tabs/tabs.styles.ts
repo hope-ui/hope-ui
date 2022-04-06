@@ -1,7 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
-import { SystemStyleObject } from "@/styled-system/types";
+import { css } from "../../styled-system/stitches.config";
+import { SystemStyleObject } from "../../styled-system/types";
 
 /* -------------------------------------------------------------------------------------------------
  * Tabs

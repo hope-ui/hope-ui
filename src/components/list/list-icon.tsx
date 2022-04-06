@@ -1,7 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { ElementType } from "../types";
 import { listIconStyles } from "./list.styles";

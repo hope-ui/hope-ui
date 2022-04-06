@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../utils/test-utils";
 import { Button } from "./button";
 import { buttonStyles, ButtonVariants } from "./button.styles";
 

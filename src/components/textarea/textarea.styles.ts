@@ -1,7 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
-
+import { css } from "../../styled-system/stitches.config";
 import { baseInputResetStyles } from "../input/input.styles";
 
 function createVariantAndSizeCompoundVariants(variant: string, paddingX?: string | number) {

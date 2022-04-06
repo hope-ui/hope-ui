@@ -1,10 +1,9 @@
 import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, Show, splitProps } from "solid-js";
 
-import { MarginProps } from "@/styled-system/props/margin";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { MarginProps } from "../../styled-system/props/margin";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";

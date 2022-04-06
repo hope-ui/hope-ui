@@ -1,8 +1,7 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { ElementType } from "../types";
 import { tagLeftIconStyles, tagRightIconStyles } from "./tag.styles";

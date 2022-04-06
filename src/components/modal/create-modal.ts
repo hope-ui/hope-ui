@@ -9,8 +9,7 @@ import {
 } from "scroll-lock";
 import { JSX, onCleanup, onMount } from "solid-js";
 
-import { callAllHandlers } from "@/utils/function";
-
+import { callAllHandlers } from "../../utils/function";
 import { useModalContext } from "./modal";
 import { ModalContentProps } from "./modal-content";
 

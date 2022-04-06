@@ -1,6 +1,6 @@
 import { children, PropsWithChildren } from "solid-js";
 
-import { useClickOutside } from "@/hooks/use-click-outside";
+import { useClickOutside } from "../../hooks/use-click-outside";
 
 export type ClickOutsideProps = PropsWithChildren<{
   /**

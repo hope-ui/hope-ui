@@ -1,9 +1,8 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";

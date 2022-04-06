@@ -1,8 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { useFormControl } from "../form-control/use-form-control";
 import { HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";

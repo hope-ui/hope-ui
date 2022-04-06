@@ -1,9 +1,8 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-import { callAllHandlers } from "@/utils/function";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
+import { callAllHandlers } from "../../utils/function";
 import { CloseButton, CloseButtonProps } from "../close-button/close-button";
 import { useModalContext } from "./modal";
 import { modalCloseButtonStyles } from "./modal.styles";

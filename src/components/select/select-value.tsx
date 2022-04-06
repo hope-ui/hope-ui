@@ -1,9 +1,8 @@
 import { children, For, JSX, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-import { isChildrenFunction } from "@/utils/solid";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
+import { isChildrenFunction } from "../../utils/solid";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";

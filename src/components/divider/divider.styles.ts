@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { css } from "../../styled-system/stitches.config";
 
 export const dividerStyles = css({
   border: 0,

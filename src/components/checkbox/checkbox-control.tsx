@@ -1,8 +1,7 @@
 import { JSX, Match, mergeProps, splitProps, Switch } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";

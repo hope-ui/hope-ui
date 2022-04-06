@@ -16,10 +16,9 @@ import {
 import { isServer, Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { tooltipArrowStyles, tooltipStyles, tooltipTransitionName } from "./tooltip.styles";

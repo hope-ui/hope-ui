@@ -1,10 +1,9 @@
 import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { RightJoinProps } from "@/utils/types";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { RightJoinProps } from "../../utils/types";
 import { CloseButtonProps, ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { Modal, ModalProps } from "../modal/modal";
 import { ModalBody, ModalBodyProps } from "../modal/modal-body";

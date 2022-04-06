@@ -1,8 +1,7 @@
 import { JSX } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { callAllHandlers } from "@/utils/function";
-
+import { callAllHandlers } from "../../utils/function";
 import { FormControlOptions, useFormControlContext } from "./form-control";
 
 export interface UseFormControlProps<T extends HTMLElement> extends FormControlOptions {

@@ -1,8 +1,7 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { IconSelector } from "../icons/IconSelector";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";

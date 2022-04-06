@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { alertTitleStyles } from "../alert.styles";
 import { AlertTitle } from "../alert-title";
 

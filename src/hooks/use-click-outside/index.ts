@@ -1,7 +1,7 @@
 import { Accessor, onCleanup, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { getOwnerDocument, isValidEvent } from "@/utils/dom";
+import { getOwnerDocument, isValidEvent } from "../../utils/dom";
 
 // Thanks Chakra UI (https://github.com/chakra-ui/chakra-ui/blob/main/packages/hooks/src/use-outside-click.ts)
 

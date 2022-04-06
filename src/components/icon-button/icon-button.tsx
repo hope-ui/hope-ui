@@ -1,8 +1,7 @@
 import { JSX, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Button, ButtonOptions } from "../button/button";
 import { hopeIconButtonClass } from "../button/button.styles";
 import { useButtonGroupContext } from "../button/button-group";

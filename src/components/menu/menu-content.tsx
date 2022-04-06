@@ -2,10 +2,9 @@ import { children, createEffect, createSignal, on, Show, splitProps } from "soli
 import { Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ClickOutside } from "../click-outside/click-outside";
 import { ElementType, HTMLHopeProps } from "../types";

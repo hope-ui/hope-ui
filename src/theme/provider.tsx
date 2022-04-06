@@ -1,14 +1,13 @@
 /* eslint-disable solid/reactivity */
 import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { drawerTransitionStyles } from "@/components/drawer/drawer.styles";
-import { menuTransitionStyles } from "@/components/menu/menu.styles";
-import { modalTransitionStyles } from "@/components/modal/modal.styles";
-import { notificationTransitionStyles } from "@/components/notification/notification.styles";
-import { popoverTransitionStyles } from "@/components/popover/popover.styles";
-import { selectTransitionStyles } from "@/components/select/select.styles";
-import { tooltipTransitionStyles } from "@/components/tooltip/tooltip.styles";
-
+import { drawerTransitionStyles } from "../components/drawer/drawer.styles";
+import { menuTransitionStyles } from "../components/menu/menu.styles";
+import { modalTransitionStyles } from "../components/modal/modal.styles";
+import { notificationTransitionStyles } from "../components/notification/notification.styles";
+import { popoverTransitionStyles } from "../components/popover/popover.styles";
+import { selectTransitionStyles } from "../components/select/select.styles";
+import { tooltipTransitionStyles } from "../components/tooltip/tooltip.styles";
 import {
   getDefaultColorMode,
   saveColorModeToLocalStorage,
@@ -16,7 +15,7 @@ import {
   syncBodyColorModeClassName,
 } from "./color-mode";
 import { resetStyles } from "./reset";
-import { ColorMode, ComponentsStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
+import { ColorMode, ComponentStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
 import { extendBaseTheme } from "./utils";
 
 export const HopeContext = createContext<HopeContextValue>();
@@ -103,7 +102,7 @@ export function useTheme() {
  * Custom hook that reads from `HopeProvider` context
  * Returns an accessor for the theme based components style configs.
  */
-export function useComponentStyleConfigs(): ComponentsStyleConfigs {
+export function useComponentStyleConfigs(): ComponentStyleConfigs {
   const context = useContext(HopeContext);
 
   if (!context) {
