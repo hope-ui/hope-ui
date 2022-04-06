@@ -52,13 +52,18 @@ export interface NotificationConfig {
   closable?: boolean;
 
   /**
+   * If `true`, the notification will show a loader.
+   */
+  loading?: boolean;
+
+  /**
    * Callback function to run side effects after the notification has closed.
    */
   onClose?: (id: string) => void;
 
   /**
    * Render a custom component.
-   * It will receive `id` and `onClose` as render props.
+   * It will receive the notification `id` and a `close` function as render props.
    */
   render?: (props: NotificationConfigRenderProps) => JSX.Element;
 }

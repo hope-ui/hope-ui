@@ -2,9 +2,11 @@ import { Match, onCleanup, onMount, Show, splitProps, Switch } from "solid-js";
 
 import { Box } from "../box/box";
 import { CloseButton } from "../close-button/close-button";
+import { IconSpinner } from "../icons/IconSpinner";
 import { VStack } from "../stack/stack";
 import { HTMLHopeProps } from "../types";
 import { Notification } from "./notification";
+import { notificationLoaderStyles } from "./notification.styles";
 import { NotificationConfig } from "./notification.types";
 import { NotificationDescription } from "./notification-description";
 import { NotificationIcon } from "./notification-icon";
@@ -31,6 +33,7 @@ export function NotificationContainer(props: NotificationContainerProps) {
     "duration",
     "persistent",
     "closable",
+    "loading",
     "onMouseEnter",
     "onMouseLeave",
   ]);
@@ -57,6 +60,10 @@ export function NotificationContainer(props: NotificationContainerProps) {
     closeDelayId = window.setTimeout(closeNotification, local.duration);
   };
 
+  const showIcon = () => {
+    return local.status && !local.loading;
+  };
+
   onMount(() => {
     closeWithDelay();
   });
@@ -75,8 +82,11 @@ export function NotificationContainer(props: NotificationContainerProps) {
           onMouseEnter={clearCloseDelay}
           onMouseLeave={closeWithDelay}
         >
-          <Show when={local.status}>
+          <Show when={showIcon()}>
             <NotificationIcon mr="$2_5" />
+          </Show>
+          <Show when={local.loading}>
+            <IconSpinner color="$primary10" boxSize="$8" mr="$2_5" class={notificationLoaderStyles()} />
           </Show>
           <Switch>
             <Match when={local.title && local.description}>

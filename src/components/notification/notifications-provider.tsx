@@ -7,11 +7,7 @@ import { PositionProps } from "../../styled-system/props/position";
 import { classNames } from "../../utils/css";
 import { Box } from "../box/box";
 import { NOTIFICATIONS_EVENTS } from "./notification.events";
-import {
-  NotificationListVariants,
-  notificationsProviderStyles,
-  notificationTransitionName,
-} from "./notification.styles";
+import { notificationListStyles, NotificationListVariants, notificationTransitionName } from "./notification.styles";
 import { NotificationConfig, ShowNotificationProps } from "./notification.types";
 import { NotificationContainer } from "./notification-container";
 import { NotificationsProviderContext, NotificationsProviderContextValue } from "./notifications-provider.context";
@@ -49,7 +45,7 @@ interface NotificationsProviderProps extends NotificationListVariants {
   children: JSX.Element;
 }
 
-const hopeNotificationsProviderClass = "hope-notification__provider";
+const hopeNotificationListClass = "hope-notification__list";
 
 const DEFAULT_NOTIFICATION_DURATION = 5_000;
 
@@ -125,8 +121,8 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
 
   const classes = () => {
     return classNames(
-      hopeNotificationsProviderClass,
-      notificationsProviderStyles({
+      hopeNotificationListClass,
+      notificationListStyles({
         placement: finalPlacement(),
       })
     );

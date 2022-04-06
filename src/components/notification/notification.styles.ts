@@ -1,5 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
+import { spin } from "../../styled-system/keyframes";
 import { css, globalCss } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
@@ -60,15 +61,16 @@ export const notificationTransitionStyles = globalCss({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Notification - provider (contains the list of notifcations)
+ * Notification - list (contains the list of notifcations)
  * -----------------------------------------------------------------------------------------------*/
 
-export const notificationsProviderStyles = css({
+export const notificationListStyles = css({
   position: "fixed",
   zIndex: "$notification",
 
   display: "flex",
   flexDirection: "column",
+  justifyContent: "flex-end",
   gap: "$4",
 
   variants: {
@@ -107,7 +109,7 @@ export const notificationsProviderStyles = css({
   },
 });
 
-export type NotificationListVariants = VariantProps<typeof notificationsProviderStyles>;
+export type NotificationListVariants = VariantProps<typeof notificationListStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Notification
@@ -144,6 +146,14 @@ export const notificationStyles = css({
 });
 
 export type NotificationVariants = VariantProps<typeof notificationStyles>;
+
+/* -------------------------------------------------------------------------------------------------
+ * Notification - loader
+ * -----------------------------------------------------------------------------------------------*/
+
+export const notificationLoaderStyles = css({
+  animation: `1s linear infinite ${spin}`,
+});
 
 /* -------------------------------------------------------------------------------------------------
  * NotificationIcon
