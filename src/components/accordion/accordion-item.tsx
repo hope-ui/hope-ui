@@ -1,13 +1,12 @@
 import { Accessor, createContext, createMemo, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-import { normalizeEventKey } from "@/utils/dom";
-import { callHandler } from "@/utils/function";
-import { isChildrenFunction } from "@/utils/solid";
-import { EventKeyMap } from "@/utils/types";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
+import { normalizeEventKey } from "../../utils/dom";
+import { callHandler } from "../../utils/function";
+import { isChildrenFunction } from "../../utils/solid";
+import { EventKeyMap } from "../../utils/types";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useAccordionContext } from "./accordion";

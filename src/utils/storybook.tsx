@@ -2,8 +2,7 @@
 import { addons } from "@storybook/addons";
 import { JSX, onCleanup, onMount } from "solid-js";
 
-import { useColorMode } from "@/theme/color-mode";
-import { HopeProvider } from "@/theme/provider";
+import { HopeProvider, useColorMode } from "../theme/provider";
 
 const channel = addons.getChannel();
 

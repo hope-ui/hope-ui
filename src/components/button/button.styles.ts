@@ -1,8 +1,8 @@
 import { VariantProps } from "@stitches/core";
 
-import { spin } from "@/styled-system/keyframes";
-import { css } from "@/styled-system/stitches.config";
-import { SystemStyleObject } from "@/styled-system/types";
+import { spin } from "../../styled-system/keyframes";
+import { css } from "../../styled-system/stitches.config";
+import { SystemStyleObject } from "../../styled-system/types";
 
 export const hopeIconButtonClass = "hope-icon-button";
 

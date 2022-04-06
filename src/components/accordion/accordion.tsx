@@ -1,12 +1,11 @@
 import { createContext, createMemo, onCleanup, splitProps, useContext } from "solid-js";
 import { createStore, DeepReadonly } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isArray } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-import { getNextIndex, getPrevIndex } from "@/utils/number";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isArray } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
+import { getNextIndex, getPrevIndex } from "../../utils/number";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 

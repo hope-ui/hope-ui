@@ -1,11 +1,10 @@
 import { createMemo, Index, mergeProps, Show, splitProps } from "solid-js";
 
-import { GridLayoutProps } from "@/styled-system/props/grid";
-import { SizeProps } from "@/styled-system/props/size";
-import { classNames, createClassSelector } from "@/utils/css";
-import { range } from "@/utils/function";
-import { RightJoinProps } from "@/utils/types";
-
+import { GridLayoutProps } from "../../styled-system/props/grid";
+import { SizeProps } from "../../styled-system/props/size";
+import { classNames, createClassSelector } from "../../utils/css";
+import { range } from "../../utils/function";
+import { RightJoinProps } from "../../utils/types";
 import { Box } from "../box/box";
 import { ElementType } from "../types";
 import { hopeSkeletonClass, Skeleton, SkeletonProps } from "./skeleton";

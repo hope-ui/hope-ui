@@ -3,11 +3,10 @@ import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/d
 import { Accessor, createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isScrollable, maintainScrollVisibility } from "@/utils/dom";
-import { isChildrenFunction } from "@/utils/solid";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
+import { isChildrenFunction } from "../../utils/solid";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
 
 type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "scale-bottom-left" | "scale-bottom-right" | "none";
@@ -237,13 +236,9 @@ export function Menu(props: MenuProps) {
     triggerRef?.focus();
   };
 
-  const isInsideTrigger = (element: HTMLElement) => {
-    return !!triggerRef && triggerRef.contains(element);
-  };
-
   const onTriggerBlur = (event: FocusEvent) => {
     // if the blur was provoked by an element inside the trigger, ignore it
-    if (event.relatedTarget && isInsideTrigger(event.relatedTarget as HTMLElement)) {
+    if (contains(triggerRef, getRelatedTarget(event))) {
       return;
     }
 
@@ -382,9 +377,9 @@ export function Menu(props: MenuProps) {
     onItemChange(-1);
   };
 
-  const onContentOutsideClick = (target: HTMLElement) => {
+  const onContentClickOutside = (target: HTMLElement) => {
     // clicking inside the trigger is not considered an "outside click"
-    if (isInsideTrigger(target)) {
+    if (contains(triggerRef, target)) {
       return;
     }
 
@@ -440,7 +435,7 @@ export function Menu(props: MenuProps) {
     onTriggerClick,
     onTriggerKeyDown,
     onContentMouseLeave,
-    onContentOutsideClick,
+    onContentClickOutside,
     onItemClick,
     onItemMouseMove,
     onItemMouseDown,
@@ -521,7 +516,7 @@ interface MenuContextValue {
   /**
    * Callback invoked when the user click outside the `MenuContent`.
    */
-  onContentOutsideClick: (target: HTMLElement) => void;
+  onContentClickOutside: (target: HTMLElement) => void;
 
   /**
    * Callback invoked when the user cursor leave the `MenuContent`.

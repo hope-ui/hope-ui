@@ -1,6 +1,5 @@
-import { css } from "@/styled-system/stitches.config";
-import { toCssObject } from "@/styled-system/utils";
-
+import { css } from "../styled-system/stitches.config";
+import { toCssObject } from "../styled-system/utils";
 import { borderPropNames, BorderProps } from "./props/border";
 import { colorPropNames, ColorProps } from "./props/color";
 import { CSSProp, cssPropName } from "./props/css";

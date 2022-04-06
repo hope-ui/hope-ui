@@ -2,28 +2,18 @@ import "./playground.css";
 
 import { render } from "solid-js/web";
 
-import { Box, Button, HopeProvider, HopeThemeConfig, HStack, useColorMode } from ".";
+import { Box, HopeProvider, NotificationsProvider } from ".";
 
 export function App() {
-  const { toggleColorMode } = useColorMode();
-
-  return (
-    <Box p="$4">
-      <HStack spacing="$4" mb="$4">
-        <Button variant="subtle" colorScheme="neutral" onClick={toggleColorMode}>
-          Toggle color mode
-        </Button>
-      </HStack>
-    </Box>
-  );
+  return <Box p="$4"></Box>;
 }
-
-const config: HopeThemeConfig = {};
 
 render(
   () => (
-    <HopeProvider config={config}>
-      <App />
+    <HopeProvider>
+      <NotificationsProvider>
+        <App />
+      </NotificationsProvider>
     </HopeProvider>
   ),
   document.getElementById("root") as HTMLElement

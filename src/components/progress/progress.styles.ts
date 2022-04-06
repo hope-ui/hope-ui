@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css, keyframes } from "@/styled-system/stitches.config";
+import { css, keyframes } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * Progress - keyframes

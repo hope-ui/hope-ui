@@ -1,8 +1,7 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
 import { anchorStyles } from "./anchor.styles";

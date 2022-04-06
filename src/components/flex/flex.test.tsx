@@ -1,9 +1,8 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { css } from "@/styled-system";
-import * as styledSystem from "@/styled-system/system";
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { css } from "../../styled-system";
+import * as styledSystem from "../../styled-system/system";
+import { renderWithHopeProvider } from "../../utils/test-utils";
 import { Flex, FlexOptions } from "./flex";
 
 describe("Flex", () => {

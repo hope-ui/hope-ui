@@ -1,5 +1,4 @@
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { Textarea } from "./textarea";
 
 export default {

@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css, globalCss } from "@/styled-system/stitches.config";
+import { css, globalCss } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * Popover - solid-transition-group classes

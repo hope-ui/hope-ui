@@ -1,8 +1,7 @@
 import { cleanup, fireEvent, screen } from "solid-testing-library";
 
-import { Input } from "@/components/input/input";
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { Input } from "../../../components/input/input";
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { FormControl } from "../form-control";
 import { formControlStyles } from "../form-control.styles";
 import { FormErrorMessage } from "../form-error-message";

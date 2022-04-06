@@ -1,7 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
-import { spin } from "@/styled-system/keyframes";
-import { css } from "@/styled-system/stitches.config";
+import { spin } from "../../styled-system/keyframes";
+import { css } from "../../styled-system/stitches.config";
 
 export const spinnerStyles = css({
   display: "inline-block",

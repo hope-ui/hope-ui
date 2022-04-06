@@ -1,4 +1,4 @@
-import { css, keyframes } from "@/styled-system/stitches.config";
+import { css, keyframes } from "../../styled-system/stitches.config";
 
 const skeletonColorFade = keyframes({
   from: {

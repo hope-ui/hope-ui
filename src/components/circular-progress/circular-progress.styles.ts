@@ -1,5 +1,5 @@
-import { spin } from "@/styled-system/keyframes";
-import { css, keyframes } from "@/styled-system/stitches.config";
+import { spin } from "../../styled-system/keyframes";
+import { css, keyframes } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * CircularProgress - keyframes

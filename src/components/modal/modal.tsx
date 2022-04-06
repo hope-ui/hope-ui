@@ -2,9 +2,8 @@ import { createContext, createEffect, createSignal, createUniqueId, JSX, Show, u
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 

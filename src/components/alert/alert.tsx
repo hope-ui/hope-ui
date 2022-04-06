@@ -1,35 +1,22 @@
 import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { alertStyles, AlertVariants } from "./alert.styles";
 
+type ThemeableAlertOptions = AlertVariants;
+
 export type AlertProps<C extends ElementType = "div"> = HTMLHopeProps<C, AlertVariants>;
-
-export interface AlertStyleConfig {
-  baseStyle?: {
-    root?: SystemStyleObject;
-    icon?: SystemStyleObject;
-    title?: SystemStyleObject;
-    description?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: Pick<AlertVariants, "variant" | "status">;
-  };
-}
-
-type AlertContextValue = {
-  status: Accessor<AlertVariants["status"]>;
-};
-
-const AlertContext = createContext<AlertContextValue>();
 
 const hopeAlertClass = "hope-alert";
 
+/**
+ * Alert is used to communicate the state or status of a page,
+ * feature or action
+ */
 export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
   const theme = useComponentStyleConfigs().Alert;
 
@@ -39,14 +26,23 @@ export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
   };
 
   const propsWithDefault: AlertProps<"div"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["variant", "status"]);
+  const [local, others] = splitProps(propsWithDefault, ["class", "variant", "status"]);
 
-  const classes = () => classNames(local.class, hopeAlertClass, alertStyles(variantProps));
+  const classes = () => {
+    return classNames(
+      local.class,
+      hopeAlertClass,
+      alertStyles({
+        variant: local.variant,
+        status: local.status,
+      })
+    );
+  };
 
-  const alertStatus = () => variantProps.status;
+  const statusAccessor = () => local.status;
 
   const context: AlertContextValue = {
-    status: alertStatus,
+    status: statusAccessor,
   };
 
   return (
@@ -58,6 +54,16 @@ export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
 
 Alert.toString = () => createClassSelector(hopeAlertClass);
 
+/* -------------------------------------------------------------------------------------------------
+ * Context
+ * -----------------------------------------------------------------------------------------------*/
+
+type AlertContextValue = {
+  status: Accessor<AlertVariants["status"]>;
+};
+
+const AlertContext = createContext<AlertContextValue>();
+
 export function useAlertContext() {
   const context = useContext(AlertContext);
 
@@ -66,4 +72,20 @@ export function useAlertContext() {
   }
 
   return context;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfig
+ * -----------------------------------------------------------------------------------------------*/
+
+export interface AlertStyleConfig {
+  baseStyle?: {
+    root?: SystemStyleObject;
+    icon?: SystemStyleObject;
+    title?: SystemStyleObject;
+    description?: SystemStyleObject;
+  };
+  defaultProps?: {
+    root?: ThemeableAlertOptions;
+  };
 }

@@ -1,10 +1,9 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../utils/test-utils";
+import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
 import { Icon } from "./icon";
 import { iconStyles } from "./icon.styles";
-import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
 
 describe("Icon", () => {
   afterEach(() => {

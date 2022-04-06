@@ -1,13 +1,12 @@
 import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { ColorProps } from "@/styled-system/props/color";
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-import { valueToPercent } from "@/utils/number";
-
+import { ColorProps } from "../../styled-system/props/color";
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
+import { valueToPercent } from "../../utils/number";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { progressStyles, ProgressVariants } from "./progress.styles";

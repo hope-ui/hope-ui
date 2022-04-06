@@ -1,8 +1,7 @@
 import { JSX, splitProps } from "solid-js";
 
-import { isFunction } from "@/utils/assertion";
-import { callAllHandlers, callHandler } from "@/utils/function";
-
+import { isFunction } from "../../utils/assertion";
+import { callAllHandlers, callHandler } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";

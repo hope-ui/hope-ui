@@ -1,5 +1,4 @@
-import { isObject } from "@/utils/assertion";
-
+import { isObject } from "../utils/assertion";
 import { StyleProps } from "./system";
 import { SystemMediaCssSelector, SystemStyleObject } from "./types";
 

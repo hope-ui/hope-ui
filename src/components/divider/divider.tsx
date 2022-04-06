@@ -1,9 +1,8 @@
 import { Property } from "csstype";
 import { mergeProps, splitProps } from "solid-js";
 
-import { SizeScaleValue } from "@/styled-system/types";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { SizeScaleValue } from "../../styled-system/types";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { dividerStyles, DividerVariants } from "./divider.styles";

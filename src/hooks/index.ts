@@ -1,2 +1,2 @@
 export * from "./create-disclosure";
-export * from "./use-outside-click";
+export * from "./use-click-outside";

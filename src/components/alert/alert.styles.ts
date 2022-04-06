@@ -1,6 +1,6 @@
 import { VariantProps } from "@stitches/core";
 
-import { css } from "@/styled-system/stitches.config";
+import { css } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * AlertIcon
@@ -8,7 +8,6 @@ import { css } from "@/styled-system/stitches.config";
 
 export const alertIconStyles = css({
   flexShrink: 0,
-  marginInlineEnd: "$2_5",
 });
 
 /* -------------------------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ export const alertStyles = css({
   py: "$3",
 
   fontSize: "$base",
-  lineHeight: "$base",
+  lineHeight: "$6",
 
   variants: {
     variant: {

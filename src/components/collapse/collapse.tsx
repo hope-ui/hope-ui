@@ -2,8 +2,7 @@ import { Property } from "csstype";
 import { children, mergeProps, Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { collapseStyles } from "./collapse.styles";

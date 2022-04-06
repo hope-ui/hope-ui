@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { IconCheckCircleSolid } from "../../icons/IconCheckCircleSolid";
 import { tagLeftIconStyles, tagRightIconStyles } from "../tag.styles";
 import { TagLeftIcon, TagRightIcon } from "../tag-icon";

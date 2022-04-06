@@ -1,7 +1,6 @@
 import { For, Show } from "solid-js";
 
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { Input } from "../input/input";
 import {
   Select,

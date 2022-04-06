@@ -1,10 +1,9 @@
 import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
-import { MarginProps } from "@/styled-system/props/margin";
-import { ResponsiveValue } from "@/styled-system/types";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { MarginProps } from "../../styled-system/props/margin";
+import { ResponsiveValue } from "../../styled-system/types";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { listStyles } from "./list.styles";

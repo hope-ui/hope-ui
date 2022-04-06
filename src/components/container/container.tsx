@@ -1,7 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { containerStyles, ContainerVariants } from "./container.styles";

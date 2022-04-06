@@ -1,7 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../utils/storybook";
 import { Button } from "..";
 import { HStack, VStack } from "../stack/stack";
 import { Switch } from "./switch";

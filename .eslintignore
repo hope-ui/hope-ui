@@ -8,4 +8,5 @@ __mocks__/
 
 commitlint.config.js
 jest.config.js
+rollup.config.js
 *.d.ts

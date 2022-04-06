@@ -1,9 +1,8 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { ColorProps } from "@/styled-system/props/color";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { ColorProps } from "../../styled-system/props/color";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
 import { useCircularProgressContext } from "./circular-progress";

@@ -1,7 +1,7 @@
 import { VariantProps } from "@stitches/core";
 
-import { SystemStyleObject } from "@/styled-system";
-import { css, globalCss } from "@/styled-system/stitches.config";
+import { SystemStyleObject } from "../../styled-system";
+import { css, globalCss } from "../../styled-system/stitches.config";
 
 /* -------------------------------------------------------------------------------------------------
  * Menu - solid-transition-group classes

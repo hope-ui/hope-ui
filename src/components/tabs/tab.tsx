@@ -1,10 +1,9 @@
 import { createSignal, JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-import { callHandler } from "@/utils/function";
-
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
+import { callHandler } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useTabsContext } from "./tabs";

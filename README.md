@@ -11,16 +11,19 @@
 
 <p align="center">
   <a href="#contributors-">
-    <img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square"/>
+    <img src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square" alt="All Contributors"/>
   </a>
   <a href="https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript">
-    <img alt="Language grade: JavaScript" src="https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18"/>
+    <img src="https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18" alt="Language grade: JavaScript"/>
   </a>
   <a href="LICENSE.md">
-    <img alt="MIT License" src="https://badgen.net/github/license/fabien-ml/hope-ui"/>
+    <img src="https://img.shields.io/github/license/fabien-ml/hope-ui" alt="MIT License"/>
   </a>
   <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img alt="npm - @hope-ui/solid" src="https://badgen.net/npm/v/@hope-ui/solid"/>
+    <img src="https://img.shields.io/npm/v/@hope-ui/solid" alt="npm - @hope-ui/solid"/>
+  </a>
+  <a href="https://www.npmjs.com/package/@hope-ui/solid">
+    <img src="https://img.shields.io/npm/dm/@hope-ui/solid.svg" alt="npm - downloads" height="18">
   </a>
 </p>
 
@@ -28,7 +31,7 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 ## Project status
 
-Hope UI is still under development and is not ready for production.
+> ⚠️ Hope UI is still under development and is not ready for production.
 
 ## Documentation
 

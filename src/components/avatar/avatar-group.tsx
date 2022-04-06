@@ -1,13 +1,12 @@
 import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { BorderProps } from "@/styled-system/props/border";
-import { MarginProps } from "@/styled-system/props/margin";
-import { RadiiProps } from "@/styled-system/props/radii";
-import { ResponsiveValue } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { classNames, createClassSelector } from "@/utils/css";
-
+import { BorderProps } from "../../styled-system/props/border";
+import { MarginProps } from "../../styled-system/props/margin";
+import { RadiiProps } from "../../styled-system/props/radii";
+import { ResponsiveValue } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { avatarGroupStyles, AvatarVariants } from "./avatar.styles";

@@ -2,14 +2,13 @@ import { Property } from "csstype";
 import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SizeScaleValue, SystemStyleObject } from "@/styled-system";
-import { ColorProps } from "@/styled-system/props/color";
-import { SizeProps } from "@/styled-system/props/size";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { isFunction } from "@/utils/assertion";
-import { classNames, createClassSelector } from "@/utils/css";
-import { valueToPercent } from "@/utils/number";
-
+import { SizeScaleValue, SystemStyleObject } from "../../styled-system";
+import { ColorProps } from "../../styled-system/props/color";
+import { SizeProps } from "../../styled-system/props/size";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { isFunction } from "../../utils/assertion";
+import { classNames, createClassSelector } from "../../utils/css";
+import { valueToPercent } from "../../utils/number";
 import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ProgressState } from "../progress/progress";

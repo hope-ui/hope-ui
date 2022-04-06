@@ -5,12 +5,11 @@ import { Accessor, createContext, createUniqueId, JSX, onCleanup, Show, useConte
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
-import { SystemStyleObject } from "@/styled-system/types";
-import { useComponentStyleConfigs } from "@/theme/provider";
-import { contains, getRelatedTarget } from "@/utils/dom";
-import { isChildrenFunction } from "@/utils/solid";
-import { isFocusable } from "@/utils/tabbable";
-
+import { SystemStyleObject } from "../../styled-system/types";
+import { useComponentStyleConfigs } from "../../theme/provider";
+import { contains, getRelatedTarget } from "../../utils/dom";
+import { isChildrenFunction } from "../../utils/solid";
+import { isFocusable } from "../../utils/tabbable";
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 
 interface PopoverChildrenRenderPropParams {

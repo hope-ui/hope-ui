@@ -1,7 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "@/utils/test-utils";
-
+import { renderWithHopeProvider } from "../../utils/test-utils";
 import { Container } from "./container";
 import { containerStyles, ContainerVariants } from "./container.styles";
 

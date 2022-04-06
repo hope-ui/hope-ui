@@ -1,8 +1,7 @@
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { isFunction } from "@/utils/assertion";
-
+import { isFunction } from "../../utils/assertion";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
 
