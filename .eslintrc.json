@@ -42,9 +42,6 @@
       "typescript": {
         "project": ["./tsconfig.eslint.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
         "alwaysTryTypes": true
-      },
-      "node": {
-        "project": ["./tsconfig.eslint.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"]
       }
     }
   }
