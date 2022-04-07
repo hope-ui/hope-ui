@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/fabien-ml/hope-ui/compare/v0.4.0...v0.4.1) (2022-04-08)
+
+### 🐛 Bug fixes
+
+- `Accordion` and `Tabs` causes infinite loops.
+
 ## [0.4.0](https://github.com/fabien-ml/hope-ui/compare/v0.3.1...v0.4.0) (2022-04-06)
 
 ### ✨ Features

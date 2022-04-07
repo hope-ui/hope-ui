@@ -1,5 +1,5 @@
-import { createContext, createMemo, onCleanup, splitProps, useContext } from "solid-js";
-import { createStore, DeepReadonly } from "solid-js/store";
+import { createContext, createMemo, createSignal, onCleanup, splitProps, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
 import { useComponentStyleConfigs } from "../../theme/provider";
@@ -64,7 +64,7 @@ interface AccordionState {
   /**
    * All accordion button nodes.
    */
-  buttons: Array<HTMLButtonElement>;
+  //buttons: Array<HTMLButtonElement>;
 }
 
 const hopeAccordionClass = "hope-accordion";
@@ -76,11 +76,13 @@ const hopeAccordionClass = "hope-accordion";
 export function Accordion<C extends ElementType = "div">(props: AccordionProps<C>) {
   const theme = useComponentStyleConfigs().Accordion;
 
+  const [buttons, setButtons] = createSignal<HTMLButtonElement[]>([]);
+
   const [state, setState] = createStore<AccordionState>({
     // eslint-disable-next-line solid/reactivity
     _expandedIndex: props.defaultIndex ?? (props.allowMultiple ? [] : -1),
     focusedIndex: -1,
-    buttons: [],
+    //buttons: [],
     get isControlled() {
       return props.index !== undefined;
     },
@@ -91,7 +93,7 @@ export function Accordion<C extends ElementType = "div">(props: AccordionProps<C
 
   const [local, others] = splitProps(props, ["class", "allowMultiple", "index", "defaultIndex", "onChange"]);
 
-  const reverseButtons = createMemo(() => state.buttons.slice().reverse());
+  const reverseButtons = createMemo(() => buttons().slice().reverse());
 
   const setFocusedIndex = (index: number) => {
     setState("focusedIndex", index);
@@ -118,39 +120,44 @@ export function Accordion<C extends ElementType = "div">(props: AccordionProps<C
   };
 
   const registerAccordionButton = (node: HTMLButtonElement) => {
-    setState("buttons", prev => [...prev, node] as Array<DeepReadonly<HTMLButtonElement>>);
+    return setButtons(prev => [...prev, node]).length - 1;
 
-    return state.buttons.length - 1;
+    // This cause infinite loop and crash, so use a signal instead
+    //setState("buttons", prev => [...prev, node] as Array<DeepReadonly<HTMLButtonElement>>);
+
+    //return state.buttons.length - 1;
   };
 
   const focusNextAccordionButton = () => {
-    const lastIndex = state.buttons.length - 1;
+    const lastIndex = buttons().length - 1;
     let nextIndex = getNextIndex(state.focusedIndex, lastIndex, true);
-    let nextButton = state.buttons[nextIndex];
+    let nextButton = buttons()[nextIndex];
 
     while (nextButton.disabled) {
       nextIndex = getNextIndex(nextIndex, lastIndex, true);
-      nextButton = state.buttons[nextIndex];
+      nextButton = buttons()[nextIndex];
     }
 
     nextButton.focus();
   };
 
   const focusPrevAccordionButton = () => {
-    const lastIndex = state.buttons.length - 1;
+    const lastIndex = buttons().length - 1;
     let prevIndex = getPrevIndex(state.focusedIndex, lastIndex, true);
-    let prevButton = state.buttons[prevIndex];
+    let prevButton = buttons()[prevIndex];
 
     while (prevButton.disabled) {
       prevIndex = getPrevIndex(prevIndex, lastIndex, true);
-      prevButton = state.buttons[prevIndex];
+      prevButton = buttons()[prevIndex];
     }
 
     prevButton.focus();
   };
 
   const focusFirstAccordionButton = () => {
-    state.buttons.find(button => !button.disabled)?.focus();
+    buttons()
+      .find(button => !button.disabled)
+      ?.focus();
   };
 
   const focusLastAccordionButton = () => {
