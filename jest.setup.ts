@@ -2,4 +2,5 @@
 // allows you to do things like:
 // expect(element).toHaveTextContent(/solidjs/i)
 // learn more: https://github.com/testing-library/jest-dom
+import "regenerator-runtime/runtime";
 import "@testing-library/jest-dom";

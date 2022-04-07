@@ -26,7 +26,8 @@
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./",
+    "project": ["./tsconfig.eslint.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
     "ecmaVersion": 2021,
     "sourceType": "module",
     "ecmaFeatures": {
@@ -39,7 +40,11 @@
     },
     "import/resolver": {
       "typescript": {
+        "project": ["./tsconfig.eslint.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
         "alwaysTryTypes": true
+      },
+      "node": {
+        "project": ["./tsconfig.eslint.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"]
       }
     }
   }
