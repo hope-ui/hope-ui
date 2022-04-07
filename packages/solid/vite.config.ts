@@ -1,5 +1,4 @@
 import path from "path";
-import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import solidPlugin from "vite-plugin-solid";
@@ -17,11 +16,6 @@ export default defineConfig({
       logDiagnostics: true,
     }),
   ],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-    },
-  },
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),

@@ -34,8 +34,8 @@ export function createQueue<T>(props: CreateQueueProps<T>): CreateQueueReturn<T>
   const add = (...items: T[]) => {
     const results = [...state.current, ...state.queue, ...items];
 
-    setState("current", results.slice(0, state.limit));
-    setState("queue", results.slice(state.limit));
+    setState("current", results.slice(0, state.limit) as T[]);
+    setState("queue", results.slice(state.limit) as T[]);
   };
 
   const update = (fn: (state: T[]) => T[]) => {
@@ -50,7 +50,7 @@ export function createQueue<T>(props: CreateQueueProps<T>): CreateQueueReturn<T>
   };
 
   return {
-    state: state as CreateQueueState<T>,
+    state: state as CreateQueueState<any>,
     add,
     update,
     clearQueue,
