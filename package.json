@@ -34,8 +34,10 @@
     "./packages/*"
   ],
   "scripts": {
-    "build:lib": "npm run build -w packages/hope-ui-solid",
+    "build:lib": "npm run build -w packages/solid",
+    "build:site": "npm run build -w apps/site",
     "commit": "git-cz",
+    "dev:site": "npm run dev -w apps/site",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "lint:fix": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
@@ -107,6 +109,7 @@
     "typescript": "4.5.4",
     "vite": "2.7.11",
     "vite-plugin-dts": "1.0.5",
+    "vite-plugin-prismjs": "0.0.8",
     "vite-plugin-solid": "2.2.2"
   },
   "info": "Hope UI is a composable and accessible component library for SolidJS with a style props API, theming, dark mode and following WAI ARIA 1.2 design patterns"

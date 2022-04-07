@@ -18,11 +18,5 @@
     "sourceMap": true,
     "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
   },
-  "references": [
-    {
-      "path": "./packages/hope-ui-solid"
-    }
-  ],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "files": []
+  "exclude": ["**/node_modules", "**/.*/", "**/*/dist"]
 }
