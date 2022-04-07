@@ -15,7 +15,7 @@ module.exports = {
 
   testEnvironment: "jsdom",
 
-  setupFilesAfterEnv: [`${repoRootPath}/jest.setup.ts`],
+  setupFilesAfterEnv: [`${repoRootPath}/jest.setup.ts`, "regenerator-runtime"],
 
   moduleNameMapper: {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,

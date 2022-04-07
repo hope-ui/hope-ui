@@ -42,8 +42,8 @@
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "lint:fix": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",
-    "test:unit": "jest --watch",
-    "test:unit:ci": "jest",
+    "test": "jest --watch",
+    "test:ci": "jest",
     "typecheck": "tsc --noEmit"
   },
   "lint-staged": {

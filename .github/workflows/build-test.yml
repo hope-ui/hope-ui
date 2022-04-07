@@ -34,4 +34,4 @@ jobs:
         run: |
           pnpm install
           pnpm build:lib
-          pnpm test:unit:ci
+          pnpm test:ci
