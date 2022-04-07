@@ -31,6 +31,7 @@ importers:
       '@types/node': 17.0.23
       '@types/prismjs': 1.26.0
       '@types/scroll-lock': 2.1.0
+      '@types/testing-library__jest-dom': ^5.14.3
       '@typescript-eslint/eslint-plugin': 5.18.0
       '@typescript-eslint/parser': 5.18.0
       babel-loader: 8.2.4
@@ -92,6 +93,7 @@ importers:
       '@types/node': 17.0.23
       '@types/prismjs': 1.26.0
       '@types/scroll-lock': 2.1.0
+      '@types/testing-library__jest-dom': 5.14.3
       '@typescript-eslint/eslint-plugin': 5.18.0_a07dca3bdfc4bfa60f4dda0c1f9e3287
       '@typescript-eslint/parser': 5.18.0_eslint@8.12.0+typescript@4.6.3
       babel-loader: 8.2.4_acba72ea4bf9d339cdfcd8f55cdb7006
