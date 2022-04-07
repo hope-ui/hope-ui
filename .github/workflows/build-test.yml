@@ -33,5 +33,5 @@ jobs:
       - name: pnpm install, build and test
         run: |
           pnpm install
-          pnpm build:lib --if-present
+          pnpm build:lib
           pnpm test:unit:ci
