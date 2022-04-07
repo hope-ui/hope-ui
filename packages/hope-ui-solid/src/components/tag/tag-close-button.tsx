@@ -30,8 +30,8 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
     "aria-label": "Close",
   };
 
-  const propsWithDefault: TagCloseButtonProps<C> = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault, ["class", "children"]);
+  const propsWithDefault = mergeProps(defaultProps, props);
+  const [local, others] = splitProps(propsWithDefault as TagCloseButtonProps<C>, ["class", "children"]);
 
   const classes = () =>
     classNames(
