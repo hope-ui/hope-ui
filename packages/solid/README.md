@@ -1,6 +1,8 @@
 # @hope-ui/solid
 
-Hope UI component library for SolidJS.
+Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
+
+## Documentation
 
 For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
