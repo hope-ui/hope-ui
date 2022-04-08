@@ -34,14 +34,14 @@
     "./packages/*"
   ],
   "scripts": {
-    "build:lib": "pnpm --filter @hope-ui/solid build",
-    "build:site": "pnpm --filter @hope-ui/site build",
+    "build": "pnpm --filter @hope-ui/solid build",
+    "build:docs": "pnpm --filter @hope-ui/docs build",
     "commit": "git-cz",
-    "dev:site": "pnpm --filter @hope-ui/site dev",
+    "dev:docs": "pnpm --filter @hope-ui/docs dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",
+    "storybook": "pnpm --filter @hope-ui/solid storybook",
     "test": "jest --watch",
     "test:ci": "jest",
     "typecheck": "tsc --noEmit"
