@@ -33,5 +33,5 @@ jobs:
       - name: pnpm install, build and test
         run: |
           pnpm install --frozen-lockfile
-          pnpm build:lib
-          pnpm test:ci
+          pnpm build
+          pnpm test
