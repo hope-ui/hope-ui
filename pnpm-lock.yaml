@@ -128,7 +128,7 @@ importers:
       vite-plugin-solid: 2.2.6
       webpack: 5.72.0
 
-  apps/site:
+  apps/docs:
     specifiers:
       '@felte/solid': 1.1.5
       '@felte/validator-yup': 1.0.3
