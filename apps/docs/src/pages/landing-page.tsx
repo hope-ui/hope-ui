@@ -141,9 +141,7 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Ready to go
               </Text>
-              <Text color="$neutral11">
-                Start your project with well designed SolidJS components that work out of the box.
-              </Text>
+              <Text color="$neutral11">Start your project with over 40 well designed SolidJS components.</Text>
             </GridItem>
             <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
               <Center
@@ -160,7 +158,7 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Composable
               </Text>
-              <Text color="$neutral11">Compose your application interface with reusable building blocks.</Text>
+              <Text color="$neutral11">Compose your application UI with reusable building blocks.</Text>
             </GridItem>
             <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
               <Center
