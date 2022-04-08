@@ -336,7 +336,7 @@ export default function SpinnerDoc() {
           onClick={() =>
             notificationService.show({
               render: props => (
-                <HStack bg="$loContrast" rounded="$md" border="1px solid $neutral7" shadow="$lg" p="$4" w="$sm">
+                <HStack bg="$loContrast" rounded="$md" border="1px solid $neutral7" shadow="$lg" p="$4" w="$full">
                   <Avatar name="Courtney Watson" src="https://bit.ly/3w2rgom" mr="$3" />
                   <VStack alignItems="flex-start">
                     <Text size="sm" fontWeight="$medium">

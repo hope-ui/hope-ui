@@ -1,7 +1,7 @@
 import { Match, onCleanup, onMount, Show, splitProps, Switch } from "solid-js";
 
-import { Box } from "../box/box";
 import { CloseButton } from "../close-button/close-button";
+import { Flex } from "../flex/flex";
 import { IconSpinner } from "../icons/IconSpinner";
 import { VStack } from "../stack/stack";
 import { HTMLHopeProps } from "../types";
@@ -108,12 +108,12 @@ export function NotificationContainer(props: NotificationContainerProps) {
         </Notification>
       }
     >
-      <Box onMouseEnter={clearCloseDelay} onMouseLeave={closeWithDelay}>
+      <Flex w="$full" justifyContent="flex-end" onMouseEnter={clearCloseDelay} onMouseLeave={closeWithDelay}>
         {local.render?.({
           id: local.id,
           close: closeNotification,
         })}
-      </Box>
+      </Flex>
     </Show>
   );
 }

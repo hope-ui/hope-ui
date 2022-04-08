@@ -96,7 +96,7 @@ const customComponent = `<Button
           border="1px solid $neutral7"
           shadow="$lg"
           p="$4"
-          w="$sm"
+          w="$full"
         >
           <Avatar name="Courtney Watson" src="https://bit.ly/3w2rgom" mr="$3" />
           <VStack alignItems="flex-start">
