@@ -1,3 +1,9 @@
+## [0.4.2](https://github.com/fabien-ml/hope-ui/compare/v0.4.1...v0.4.2) (2022-04-08)
+
+### 🐛 Bug fixes
+
+- improved `Notification` styles.
+
 ## [0.4.1](https://github.com/fabien-ml/hope-ui/compare/v0.4.0...v0.4.1) (2022-04-08)
 
 ### 🐛 Bug fixes
