@@ -21,7 +21,7 @@ export default function Changelog() {
       <Text>
         All notable changes of the current major version are described in the{" "}
         <Anchor
-          href="https://github.com/fabien-ml/hope-ui/blob/main/CHANGELOG.md"
+          href="https://github.com/fabien-ml/hope-ui/blob/main/packages/solid/CHANGELOG.md"
           external
           color="$primary11"
           fontWeight="$semibold"
