@@ -1,4 +1,4 @@
-import { HopeWrapper } from "../../utils/storybook";
+import { HopeWrapper } from "../storybook-utils";
 import { Container } from "./container";
 
 export default {

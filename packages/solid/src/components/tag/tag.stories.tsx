@@ -1,8 +1,8 @@
 import { action } from "@storybook/addon-actions";
 
-import { HopeWrapper } from "../../utils/storybook";
 import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { HStack } from "../stack/stack";
+import { HopeWrapper } from "../storybook-utils";
 import { Tag } from "./tag";
 import { TagCloseButton } from "./tag-close-button";
 import { TagLeftIcon, TagRightIcon } from "./tag-icon";

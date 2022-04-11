@@ -1,7 +1,7 @@
 import { action } from "@storybook/addon-actions";
 import { JSX } from "solid-js";
 
-import { HopeWrapper } from "../../utils/storybook";
+import { HopeWrapper } from "../storybook-utils";
 import { IconButton } from "./icon-button";
 
 function IconCart(props: JSX.SvgSVGAttributes<SVGSVGElement>) {

@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../utils/test-utils";
+import { renderWithHopeProvider } from "../test-utils";
 import { AspectRatio } from "./aspect-ratio";
 import { aspectRatioStyles } from "./aspect-ratio.styles";
 

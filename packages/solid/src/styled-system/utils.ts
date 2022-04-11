@@ -1,6 +1,6 @@
 import { isObject } from "../utils/assertion";
 import { StyleProps } from "./system";
-import { SystemMediaCssSelector, SystemStyleObject } from "./types";
+import { ResponsiveValue, SystemMediaCssSelector, SystemStyleObject } from "./types";
 
 /**
  * Merge a source SystemStyleObject to both normal and responsive destination SystemStyleObject.
@@ -103,4 +103,22 @@ export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObj
 
   // spread responsive values last to ensure css override works correctly.
   return { ...destStyleObject, ...destResponsiveStyleObject };
+}
+
+/**
+ * Map a responsive value to a new one
+ */
+export function mapResponsive(prop: ResponsiveValue<any>, mapper: (val: any) => any) {
+  if (isObject(prop)) {
+    return Object.keys(prop).reduce((result: Record<string, any>, key) => {
+      result[key] = mapper(prop[key]);
+      return result;
+    }, {});
+  }
+
+  if (prop != null) {
+    return mapper(prop);
+  }
+
+  return null;
 }
