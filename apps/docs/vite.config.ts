@@ -15,7 +15,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@/": fileURLToPath(new URL("./src/", import.meta.url)),
-      "@hope-ui/solid": fileURLToPath(new URL("../../packages/solid/src", import.meta.url)),
     },
   },
   build: {
