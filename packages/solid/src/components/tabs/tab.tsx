@@ -1,6 +1,6 @@
 import { createSignal, JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callHandler } from "../../utils/function";
@@ -24,7 +24,7 @@ const hopeTabClass = "hope-tabs__tab";
  * Tab button used to activate a specific tab panel. It renders a `button` by default.
  */
 export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
-  const theme = useComponentStyleConfigs().Tabs;
+  const theme = useStyleConfig().Tabs;
 
   const tabsContext = useTabsContext();
 

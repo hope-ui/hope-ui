@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.4.2",
+  "version": "0.5.0-alpha.1",
   "private": false,
   "description": "The SolidJS component library you've hoped for.",
   "keywords": [
@@ -32,20 +32,22 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "solid": "./dist/source/index.js",
+      "import": "./dist/esm/index.js",
+      "browser": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "node": "./dist/cjs/index.js"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "rollup -c",
     "build:storybook": "build-storybook",
-    "dev": "vite --host",
     "storybook": "start-storybook -p 6006"
   },
   "dependencies": {

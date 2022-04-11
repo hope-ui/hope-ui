@@ -2,7 +2,7 @@ import { createContext, createMemo, createSignal, createUniqueId, splitProps, us
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { getNextIndex, getPrevIndex } from "../../utils/number";
 import { Box } from "../box/box";
@@ -107,7 +107,7 @@ const hopeTabsClass = "hope-tabs";
 export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   const defaultBaseId = `hope-tabs-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Tabs;
+  const theme = useStyleConfig().Tabs;
 
   const [tabs, setTabs] = createSignal<Array<HTMLButtonElement>>([]);
   const [tabPanels, setTabPanels] = createSignal<Array<HTMLElement>>([]);

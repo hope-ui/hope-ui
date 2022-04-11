@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopePro
  * Component used to display a placeholder when no option is selected.
  */
 export function SelectPlaceholder<C extends ElementType = "span">(props: SelectPlaceholderProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -17,7 +17,7 @@ const hopeAvatarBadgeClass = "hope-avatar__badge";
  * or bottom-right corner of an avatar.
  */
 export function AvatarBadge<C extends ElementType = "div">(props: AvatarBadgeProps<C>) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const [local, others] = splitProps(props, ["class", "placement"]);
 

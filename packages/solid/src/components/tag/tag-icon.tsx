@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { ElementType } from "../types";
@@ -15,7 +15,7 @@ export type TagLeftIconProps<C extends ElementType = "svg"> = IconProps<C>;
 const hopeTagLeftIconClass = "hope-tag-left-icon";
 
 export function TagLeftIcon<C extends ElementType = "svg">(props: TagLeftIconProps<C>) {
-  const theme = useComponentStyleConfigs().Tag;
+  const theme = useStyleConfig().Tag;
 
   const [local, others] = splitProps(props, ["class"]);
 
@@ -35,7 +35,7 @@ export type TagRightIconProps<C extends ElementType = "svg"> = IconProps<C>;
 const hopeTagRightIconClass = "hope-tag-right-icon";
 
 export function TagRightIcon<C extends ElementType = "svg">(props: TagRightIconProps<C>) {
-  const theme = useComponentStyleConfigs().Tag;
+  const theme = useStyleConfig().Tag;
 
   const [local, others] = splitProps(props, ["class"]);
 

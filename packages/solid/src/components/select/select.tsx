@@ -2,8 +2,8 @@ import { autoUpdate, computePosition, flip, offset, shift, size } from "@floatin
 import { createContext, createEffect, createSignal, createUniqueId, JSX, on, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system";
-import { useComponentStyleConfigs } from "../../theme";
 import { isArray } from "../../utils/assertion";
 import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
 import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
@@ -188,7 +188,7 @@ type SelectState = Required<Pick<SelectProps, "variant" | "size">> &
 export function Select(props: SelectProps) {
   const defaultBaseId = `hope-select-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const formControlProps = useFormControl<HTMLButtonElement>(props);
 

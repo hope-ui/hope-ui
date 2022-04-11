@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -14,7 +14,7 @@ const hopeModalFooterClass = "hope-modal__footer";
  * ModalFooter houses the action buttons of the modal.
  */
 export function ModalFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const [local, others] = splitProps(props, ["class"]);
 

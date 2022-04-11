@@ -1,7 +1,7 @@
 import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -35,7 +35,7 @@ export function useInputGroupContext() {
 const hopeInputGroupClass = "hope-input-group";
 
 export function InputGroup<C extends ElementType = "div">(props: InputGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Input;
+  const theme = useStyleConfig().Input;
 
   const [state, setState] = createStore<InputGroupState>({
     get variant() {

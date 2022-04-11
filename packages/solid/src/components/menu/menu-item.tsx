@@ -1,7 +1,7 @@
 import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, Show, splitProps } from "solid-js";
 
 import { MarginProps } from "../../styled-system/props/margin";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -53,7 +53,7 @@ const hopeMenuItemCommandClass = "hope-menu__item__command";
 export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>) {
   const key = createUniqueId();
 
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const menuContext = useMenuContext();
 

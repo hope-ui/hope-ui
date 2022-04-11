@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { IconCloseSmall } from "../icons/IconCloseSmall";
@@ -20,7 +20,7 @@ const hopeTagCloseButtonClass = "hope-tag-close-button";
  * TagCloseButton is used to close "remove" the tag
  */
 export function TagCloseButton<C extends ElementType = "button">(props: TagCloseButtonProps<C>) {
-  const theme = useComponentStyleConfigs().Tag;
+  const theme = useStyleConfig().Tag;
 
   const tagContext = useTagContext();
 

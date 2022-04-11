@@ -2,8 +2,8 @@ import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
-import { visuallyHiddenStyles } from "../../theme/utils";
+import { visuallyHiddenStyles } from "../../styled-system/utils";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
@@ -197,7 +197,7 @@ const hopeCheckboxInputClass = "hope-checkbox__input";
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const defaultId = `hope-checkbox-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Checkbox;
+  const theme = useStyleConfig().Checkbox;
 
   const formControlContext = useFormControlContext();
   const checkboxGroupContext = useCheckboxGroupContext();

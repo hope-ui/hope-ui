@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeProgressLabelClass = "hope-progress__label";
  * ProgressLabel is used to show the numeric value of the progress.
  */
 export function ProgressLabel<C extends ElementType = "div">(props: ProgressLabelProps<C>) {
-  const theme = useComponentStyleConfigs().Progress;
+  const theme = useStyleConfig().Progress;
 
   const progressContext = useProgressContext();
 

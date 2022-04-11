@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
@@ -18,7 +18,7 @@ const hopeBadgeClass = "hope-badge";
  * Badges are used to highlight an item's status for quick recognition.
  */
 export function Badge<C extends ElementType = "span">(props: BadgeProps<C>) {
-  const theme = useComponentStyleConfigs().Badge;
+  const theme = useStyleConfig().Badge;
 
   const defaultProps: BadgeProps<"span"> = {
     variant: theme?.defaultProps?.variant ?? "subtle",

@@ -1,7 +1,7 @@
 import { splitProps } from "solid-js";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";
@@ -41,7 +41,7 @@ export interface InputStyleConfig {
 const hopeInputClass = "hope-input";
 
 export function Input(props: InputProps) {
-  const theme = useComponentStyleConfigs().Input;
+  const theme = useStyleConfig().Input;
 
   const inputGroup = useInputGroupContext();
 

@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { HTMLHopeProps } from "../types";
@@ -14,7 +14,7 @@ const hopeAvatarInitialsClass = "hope-avatar__initials";
  * The avatar initials container.
  */
 export function AvatarInitials(props: AvatarInitialsProps) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const [local, others] = splitProps(props, ["class", "getInitials", "name"]);
 

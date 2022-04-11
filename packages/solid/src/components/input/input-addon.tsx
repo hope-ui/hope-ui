@@ -1,6 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -10,7 +10,7 @@ import { useInputGroupContext } from "./input-group";
 export type InputAddonProps<C extends ElementType = "div"> = HTMLHopeProps<C, InputAddonVariants>;
 
 export function InputAddon<C extends ElementType = "div">(props: InputAddonProps<C>) {
-  const theme = useComponentStyleConfigs().Input;
+  const theme = useStyleConfig().Input;
 
   const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "variant", "size"]);
 

@@ -44,7 +44,6 @@
 | PasswordInput    |             |            |       |           |      |
 | RadioGroup       |     ✅      |     ✅     |       |    ✅     |      |
 | Radio            |     ✅      |     ✅     |       |    ✅     |      |
-| NativeSelect     |             |            |       |           |      |
 | Select           |     ✅      |     ✅     |       |           |      |
 | MultiSelect      |     ✅      |     ✅     |       |           |      |
 | Slider           |             |            |       |           |      |
@@ -78,14 +77,14 @@
 
 ### Feedback
 
-|                  | Development | A11y check | Tests | Storybook | Docs |
-| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert            |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| CircularProgress |     ✅      |     ✅     |       |           |      |
-| Progress         |     ✅      |     ✅     |       |           |      |
-| Spinner          |     ✅      |     ✅     |       |           |      |
-| Skeleton         |     ✅      |    n/a     |       |           |      |
-| Toast            |             |            |       |           |      |
+|                      | Development | A11y check | Tests | Storybook | Docs |
+| -------------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Alert                |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| CircularProgress     |     ✅      |     ✅     |       |           |      |
+| Progress             |     ✅      |     ✅     |       |           |      |
+| Spinner              |     ✅      |     ✅     |       |           |      |
+| Skeleton             |     ✅      |    n/a     |       |           |      |
+| Notification (Toast) |     ✅      |     ✅     |       |           |      |
 
 ### Overlay
 

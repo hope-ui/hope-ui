@@ -1,6 +1,6 @@
 import { JSX, Match, mergeProps, splitProps, Switch } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { createIcon } from "../icon/create-icon";
@@ -28,7 +28,7 @@ const hopeCheckboxControlClass = "hope-checkbox__control";
  * The visual control that represents a `checkbox`.
  */
 export function CheckboxControl<C extends ElementType = "span">(props: CheckboxControlProps<C>) {
-  const theme = useComponentStyleConfigs().Checkbox;
+  const theme = useStyleConfig().Checkbox;
 
   const checkboxContext = useCheckboxContext();
 

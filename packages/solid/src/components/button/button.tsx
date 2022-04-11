@@ -1,8 +1,8 @@
 import { Property } from "csstype";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
+import { useStyleConfig } from "../../hope-provider";
 import { SpaceScaleValue, SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -71,7 +71,7 @@ const hopeButtonClass = "hope-button";
  * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
  */
 export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
-  const theme = useComponentStyleConfigs().Button;
+  const theme = useStyleConfig().Button;
 
   const buttonGroupContext = useButtonGroupContext();
 

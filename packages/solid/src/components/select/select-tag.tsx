@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeSelectTagClass = "hope-select__tag";
  * Tag representing a selected value in a multi-select.
  */
 export function SelectTag<C extends ElementType = "span">(props: SelectTagProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

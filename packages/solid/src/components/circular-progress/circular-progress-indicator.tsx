@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { ColorProps } from "../../styled-system/props/color";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
@@ -32,7 +32,7 @@ const hopeCircularProgressIndicatorClass = "hope-circular-progress__indicator";
  * The progress component that visually indicates the current level of the circular progress bar.
  */
 export function CircularProgressIndicator(props: CircularProgressIndicatorProps) {
-  const theme = useComponentStyleConfigs().CircularProgress;
+  const theme = useStyleConfig().CircularProgress;
 
   const circularProgressContext = useCircularProgressContext();
 

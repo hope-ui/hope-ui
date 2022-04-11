@@ -5,7 +5,7 @@ import { createStore } from "solid-js/store";
 import { SizeScaleValue, SystemStyleObject } from "../../styled-system";
 import { ColorProps } from "../../styled-system/props/color";
 import { SizeProps } from "../../styled-system/props/size";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { valueToPercent } from "../../utils/number";
@@ -83,7 +83,7 @@ const hopeCircularProgressTrackClass = "hope-circular-progress__track";
  * and speak the progress values.
  */
 export function CircularProgress<C extends ElementType = "div">(props: CircularProgressProps<C>) {
-  const theme = useComponentStyleConfigs().CircularProgress;
+  const theme = useStyleConfig().CircularProgress;
 
   const [state] = createStore<CircularProgressState>({
     get size() {

@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeBreadcrumbSeparatorClass = "hope-breadcrumb__separator";
  * The visual separator between each breadcrumb.
  */
 export function BreadcrumbSeparator<C extends ElementType = "span">(props: BreadcrumbSeparatorProps<C>) {
-  const theme = useComponentStyleConfigs().Breadcrumb;
+  const theme = useStyleConfig().Breadcrumb;
 
   const breadcrumbContext = useBreadcrumbContext();
 

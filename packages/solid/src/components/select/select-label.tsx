@@ -1,6 +1,6 @@
 import { createUniqueId, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -18,7 +18,7 @@ const hopeSelectLabelClass = "hope-select__label";
 export function SelectLabel<C extends ElementType = "div">(props: SelectLabelProps<C>) {
   const defaultIdSuffix = createUniqueId();
 
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
   const selectOptGroupContext = useSelectOptGroupContext();

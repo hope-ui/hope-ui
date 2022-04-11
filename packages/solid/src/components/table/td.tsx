@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -12,7 +12,7 @@ export type TdProps<C extends ElementType = "td"> = HTMLHopeProps<C, Pick<TableC
 const hopeTdClass = "hope-td";
 
 export function Td<C extends ElementType = "td">(props: TdProps<C>) {
-  const theme = useComponentStyleConfigs().Table;
+  const theme = useStyleConfig().Table;
 
   const tableContext = useTableContext();
 

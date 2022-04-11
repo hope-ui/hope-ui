@@ -2,7 +2,7 @@ import { createEffect, createSignal, JSX, Show, splitProps } from "solid-js";
 import { isServer, Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
@@ -19,7 +19,7 @@ const hopePopoverContentClass = "hope-popover__content";
  * The popover content container.
  */
 export function PopoverContent<C extends ElementType = "section">(props: PopoverContentProps<C>) {
-  const theme = useComponentStyleConfigs().Popover;
+  const theme = useStyleConfig().Popover;
 
   const popoverContext = usePopoverContext();
 

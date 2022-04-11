@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeCheckboxLabelClass = "hope-checkbox__label";
  * The label of the checkbox.
  */
 export function CheckboxLabel<C extends ElementType = "span">(props: CheckboxLabelProp<C>) {
-  const theme = useComponentStyleConfigs().Checkbox;
+  const theme = useStyleConfig().Checkbox;
 
   const checkboxContext = useCheckboxContext();
 

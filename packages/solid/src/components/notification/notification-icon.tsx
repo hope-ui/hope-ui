@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
@@ -16,7 +16,7 @@ export type NotificationIconProps<C extends ElementType = "svg"> = IconProps<C>;
 const hopeNotificationIconClass = "hope-notification__icon";
 
 export function NotificationIcon<C extends ElementType = "svg">(props: NotificationIconProps<C>) {
-  const theme = useComponentStyleConfigs().Notification;
+  const theme = useStyleConfig().Notification;
   const { status } = useNotificationContext();
 
   const defaultProps: NotificationIconProps<"svg"> = {

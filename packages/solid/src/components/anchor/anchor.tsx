@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
@@ -21,7 +21,7 @@ const hopeAnchorClass = "hope-anchor";
  * This component is styled to resemble a hyperlink and semantically renders an <a>.
  */
 export function Anchor<C extends ElementType = "a">(props: AnchorProps<C>) {
-  const theme = useComponentStyleConfigs().Anchor;
+  const theme = useStyleConfig().Anchor;
 
   const [local, others] = splitProps(props, ["class", "external"]);
 
