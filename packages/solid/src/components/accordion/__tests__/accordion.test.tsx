@@ -46,11 +46,17 @@ describe("Accordion", () => {
 
   //   const trigger = screen.getByText("Trigger");
 
+  //   expect(trigger).toHaveAttribute("aria-expanded", "false");
+
   //   // assert
   //   fireEvent.click(trigger);
+  //   await Promise.resolve();
+
   //   expect(trigger).toHaveAttribute("aria-expanded", "true");
 
   //   fireEvent.click(trigger);
+  //   await Promise.resolve();
+
   //   expect(trigger).toHaveAttribute("aria-expanded", "false");
   // });
 });

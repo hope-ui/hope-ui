@@ -1,10 +1,12 @@
 {
-  "extends": "./tsconfig",
+  "extends": "../../tsconfig",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
-    "declarationDir": "dist"
+    "declarationDir": "dist",
+    "outDir": "dist",
+    "rootDir": "."
   },
   "include": ["src/**/*"],
-  "exclude": ["**/*.spec.ts", "**/*.stories.*"]
+  "exclude": ["**/*.spec.*", "**/*.test.*", "**/*.stories.*"]
 }
