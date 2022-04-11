@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeRadioLabelClass = "hope-radio__label";
  * The label of the radio.
  */
 export function RadioLabel<C extends ElementType = "span">(props: RadioLabelProps<C>) {
-  const theme = useComponentStyleConfigs().Radio;
+  const theme = useStyleConfig().Radio;
 
   const radioContext = useRadioContext();
 

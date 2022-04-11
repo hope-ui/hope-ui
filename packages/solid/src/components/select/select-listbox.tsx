@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -16,7 +16,7 @@ const hopeSelectListboxClass = "hope-select__listbox";
  * The scrolling viewport that contains all of the options.
  */
 export function SelectListbox<C extends ElementType = "div">(props: SelectListboxProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

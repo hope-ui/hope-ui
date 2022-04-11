@@ -1,7 +1,7 @@
 import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -18,7 +18,7 @@ const hopeAlertClass = "hope-alert";
  * feature or action
  */
 export function Alert<C extends ElementType = "div">(props: AlertProps<C>) {
-  const theme = useComponentStyleConfigs().Alert;
+  const theme = useStyleConfig().Alert;
 
   const defaultProps: AlertProps<"div"> = {
     variant: theme?.defaultProps?.root?.variant ?? "subtle",

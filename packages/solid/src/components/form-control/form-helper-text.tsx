@@ -1,6 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -12,7 +12,7 @@ export type FormHelperTextProps<C extends ElementType = "div"> = HTMLHopeProps<C
 const hopeFormHelperTextClass = "hope-form-helper-text";
 
 export function FormHelperText<C extends ElementType = "div">(props: FormHelperTextProps<C>) {
-  const theme = useComponentStyleConfigs().FormControl;
+  const theme = useStyleConfig().FormControl;
 
   const formControl = useFormControlContext();
 

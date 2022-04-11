@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -10,7 +10,7 @@ export type TheadProps<C extends ElementType = "thead"> = HTMLHopeProps<C>;
 const hopeTheadClass = "hope-thead";
 
 export function Thead<C extends ElementType = "thead">(props: TheadProps<C>) {
-  const theme = useComponentStyleConfigs().Table;
+  const theme = useStyleConfig().Table;
 
   const [local, others] = splitProps(props, ["class"]);
 

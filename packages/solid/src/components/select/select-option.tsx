@@ -1,6 +1,6 @@
 import { Accessor, createContext, createEffect, createSignal, onMount, splitProps, useContext } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -26,7 +26,7 @@ const hopeSelectOptionClass = "hope-select__option";
  * The component that contains a select option.
  */
 export function SelectOption<C extends ElementType = "div">(props: SelectOptionProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

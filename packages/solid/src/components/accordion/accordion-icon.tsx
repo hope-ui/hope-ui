@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { IconProps } from "../icon/icon";
 import { IconCaretDown } from "../icons/IconCaretDown";
@@ -17,7 +17,7 @@ const hopeAccordionIconClass = "hope-accordion__icon";
  * It rotates `180deg` based on the open/close state.
  */
 export function AccordionIcon<C extends ElementType = "svg">(props: AccordionIconProps<C>) {
-  const theme = useComponentStyleConfigs().Accordion;
+  const theme = useStyleConfig().Accordion;
 
   const accordionItemContext = useAccordionItemContext();
 

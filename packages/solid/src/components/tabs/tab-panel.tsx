@@ -1,6 +1,6 @@
 import { children, createSignal, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -16,7 +16,7 @@ const hopeTabPanelClass = "hope-tabs__tab-panel";
  * TabPanel is used to render the content for a specific tab.
  */
 export function TabPanel<C extends ElementType = "div">(props: TabPanelProps<C>) {
-  const theme = useComponentStyleConfigs().Tabs;
+  const theme = useStyleConfig().Tabs;
 
   const tabsContext = useTabsContext();
 

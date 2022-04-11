@@ -1,7 +1,7 @@
 import { Accessor, createContext, createMemo, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { normalizeEventKey } from "../../utils/dom";
 import { callHandler } from "../../utils/function";
@@ -69,7 +69,7 @@ const hopeAccordionItemClass = "hope-accordion__item";
 export function AccordionItem<C extends ElementType = "div">(props: AccordionItemProps<C>) {
   const defaultIdPrefix = `hope-accordion-item-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Accordion;
+  const theme = useStyleConfig().Accordion;
 
   const accordionContext = useAccordionContext();
 

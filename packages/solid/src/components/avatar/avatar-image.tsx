@@ -1,6 +1,6 @@
 import { Accessor, createMemo, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ImageProps } from "../image";
@@ -15,7 +15,7 @@ export type AvatarImageProps = ImageProps &
 const hopeAvatarImageClass = "hope-avatar__image";
 
 export function AvatarImage(props: AvatarImageProps) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const [local, others] = splitProps(props, [
     "class",

@@ -2,7 +2,7 @@ import { children, createEffect, createSignal, on, Show, splitProps } from "soli
 import { Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -19,7 +19,7 @@ const hopeSelectContentClass = "hope-select__content";
  * The component that pops out when the select is open.
  */
 export function SelectContent<C extends ElementType = "div">(props: SelectContentProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

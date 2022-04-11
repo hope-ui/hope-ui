@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -21,7 +21,7 @@ const hopeBreadcrumbLinkClass = "hope-breadcrumb__link";
  * Otherwise, it renders an anchor tag.
  */
 export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLinkProps<C>) {
-  const theme = useComponentStyleConfigs().Breadcrumb;
+  const theme = useStyleConfig().Breadcrumb;
 
   const [local, others] = splitProps(props as BreadcrumbLinkProps<"a">, ["class", "currentPage", "href"]);
 

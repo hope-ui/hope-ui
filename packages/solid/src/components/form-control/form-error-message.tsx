@@ -1,6 +1,6 @@
 import { onCleanup, onMount, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -12,7 +12,7 @@ export type FormErrorMessageProps<C extends ElementType = "div"> = HTMLHopeProps
 const hopeFormErrorMessageClass = "hope-form-error-message";
 
 export function FormErrorMessage<C extends ElementType = "div">(props: FormErrorMessageProps<C>) {
-  const theme = useComponentStyleConfigs().FormControl;
+  const theme = useStyleConfig().FormControl;
 
   const formControl = useFormControlContext();
 

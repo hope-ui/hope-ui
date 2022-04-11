@@ -2,7 +2,7 @@ import { Accessor, createContext, createUniqueId, splitProps, useContext } from 
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -149,7 +149,7 @@ const hopeFormControlClass = "hope-form-control";
 export function FormControl<C extends ElementType = "div">(props: FormControlProps<C>) {
   const defaultId = `hope-field-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().FormControl;
+  const theme = useStyleConfig().FormControl;
 
   const [state, setState] = createStore<FormControlState>({
     get id() {

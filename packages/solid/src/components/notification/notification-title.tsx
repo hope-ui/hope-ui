@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -11,7 +11,7 @@ export type NotificationTitleProps<C extends ElementType = "div"> = HTMLHopeProp
 const hopeNotificationTitleClass = "hope-notification__title";
 
 export function NotificationTitle<C extends ElementType = "div">(props: NotificationTitleProps<C>) {
-  const theme = useComponentStyleConfigs().Notification;
+  const theme = useStyleConfig().Notification;
 
   const [local, others] = splitProps(props, ["class"]);
 

@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -14,7 +14,7 @@ export type TableCaptionProps<C extends ElementType = "caption"> = HTMLHopeProps
 const hopeTableCaptionClass = "hope-table-caption";
 
 export function TableCaption<C extends ElementType = "caption">(props: TableCaptionProps<C>) {
-  const theme = useComponentStyleConfigs().Table;
+  const theme = useStyleConfig().Table;
 
   const tableContext = useTableContext();
 

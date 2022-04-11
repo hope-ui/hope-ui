@@ -1,6 +1,6 @@
 import { JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers } from "../../utils/function";
@@ -17,7 +17,7 @@ const hopeSelectTriggerClass = "hope-select__trigger";
  * The trigger that toggles the select.
  */
 export function SelectTrigger<C extends ElementType = "button">(props: SelectTriggerProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

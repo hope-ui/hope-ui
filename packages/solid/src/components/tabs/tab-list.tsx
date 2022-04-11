@@ -1,6 +1,6 @@
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { normalizeEventKey } from "../../utils/dom";
 import { callHandler } from "../../utils/function";
@@ -19,7 +19,7 @@ const hopeTabListClass = "hope-tabs__tablist";
  * and is responsible of the keyboard interaction between tabs.
  */
 export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
-  const theme = useComponentStyleConfigs().Tabs;
+  const theme = useStyleConfig().Tabs;
 
   const tabsContext = useTabsContext();
 

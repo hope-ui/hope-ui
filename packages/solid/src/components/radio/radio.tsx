@@ -2,8 +2,8 @@ import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
-import { visuallyHiddenStyles } from "../../theme/utils";
+import { visuallyHiddenStyles } from "../../styled-system/utils";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
@@ -182,7 +182,7 @@ const hopeRadioInputClass = "hope-radio__input";
 export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   const defaultId = `hope-radio-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Radio;
+  const theme = useStyleConfig().Radio;
 
   const formControlContext = useFormControlContext();
   const radioGroupContext = useRadioGroupContext();

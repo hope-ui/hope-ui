@@ -1,7 +1,7 @@
 import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -36,7 +36,7 @@ const TagContext = createContext<TagContextValue>();
  * or organized using keywords that describe them.
  */
 export function Tag<C extends ElementType = "span">(props: TagProps<C>) {
-  const theme = useComponentStyleConfigs().Tag;
+  const theme = useStyleConfig().Tag;
 
   const defaultProps: TagProps<"span"> = {
     variant: theme?.defaultProps?.root?.variant ?? "subtle",

@@ -1,6 +1,6 @@
 import { JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
@@ -21,7 +21,7 @@ const hopeAccordionButtonClass = "hope-accordion__button";
  * that is appropriate for the information architecture of the page.
  */
 export function AccordionButton<C extends ElementType = "button">(props: AccordionButtonProps<C>) {
-  const theme = useComponentStyleConfigs().Accordion;
+  const theme = useStyleConfig().Accordion;
 
   const accordionItemContext = useAccordionItemContext();
 

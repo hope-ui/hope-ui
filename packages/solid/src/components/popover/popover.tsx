@@ -6,7 +6,7 @@ import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { contains, getRelatedTarget } from "../../utils/dom";
 import { isChildrenFunction } from "../../utils/solid";
 import { isFocusable } from "../../utils/tabbable";
@@ -236,7 +236,7 @@ interface PopoverState
 export function Popover(props: PopoverProps) {
   const defaultContentId = `hope-popover-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Popover;
+  const theme = useStyleConfig().Popover;
 
   const [state, setState] = createStore<PopoverState>({
     // eslint-disable-next-line solid/reactivity

@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -16,7 +16,7 @@ const hopeBreadcrumbItemClass = "hope-breadcrumb__item";
  * It renders a `li` element to denote it belongs to an order list of links.
  */
 export function BreadcrumbItem<C extends ElementType = "li">(props: BreadcrumbItemProps<C>) {
-  const theme = useComponentStyleConfigs().Breadcrumb;
+  const theme = useStyleConfig().Breadcrumb;
 
   const breadcrumbContext = useBreadcrumbContext();
 

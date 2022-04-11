@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeSwitchControlClass = "hope-switch__control";
  * The visual control that represents a `switch`.
  */
 export function SwitchControl<C extends ElementType = "span">(props: SwitchControlProps<C>) {
-  const theme = useComponentStyleConfigs().Switch;
+  const theme = useStyleConfig().Switch;
 
   const switchContext = useSwitchContext();
 

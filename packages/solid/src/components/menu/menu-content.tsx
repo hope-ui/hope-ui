@@ -2,7 +2,7 @@ import { children, createEffect, createSignal, on, Show, splitProps } from "soli
 import { Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -19,7 +19,7 @@ const hopeMenuContentClass = "hope-menu__content";
  * The component that pops out when the menu is open.
  */
 export function MenuContent<C extends ElementType = "div">(props: MenuContentProps<C>) {
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const menuContext = useMenuContext();
 

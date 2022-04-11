@@ -16,7 +16,7 @@ import {
 import { isServer, Portal } from "solid-js/web";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
@@ -148,7 +148,7 @@ const hopeTooltipArrowClass = "hope-tooltip__arrow";
 export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
   const defaultId = `hope-tooltip-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Tooltip;
+  const theme = useStyleConfig().Tooltip;
 
   const defaultProps: TooltipProps<"div"> = {
     id: defaultId,

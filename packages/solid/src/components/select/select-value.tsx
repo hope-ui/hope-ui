@@ -1,6 +1,6 @@
 import { children, For, JSX, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { isChildrenFunction } from "../../utils/solid";
 import { Box } from "../box/box";
@@ -25,7 +25,7 @@ const hopeSelectValueClass = "hope-select__value";
  * The part that reflects the selected value.
  */
 export function SelectValue<C extends ElementType = "div">(props: SelectValueProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

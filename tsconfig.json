@@ -20,6 +20,6 @@
     "baseUrl": ".",
     "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
   },
-  "include": ["apps", "packages", "jest.setup.ts"],
+  "include": ["packages", "jest.setup.ts"],
   "exclude": ["node_modules", "**/*/dist"]
 }

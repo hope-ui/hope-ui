@@ -1,4 +1,4 @@
-import { globalCss } from "../styled-system/stitches.config";
+import { globalCss } from "./stitches.config";
 
 /**
  * Hope UI css reset

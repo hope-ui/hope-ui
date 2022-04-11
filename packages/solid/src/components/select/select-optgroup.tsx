@@ -1,6 +1,6 @@
 import { createContext, createSignal, splitProps, useContext } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -20,7 +20,7 @@ const hopeSelectOptGroupClass = "hope-select__optgroup";
  * Component used to group multiple options.
  */
 export function SelectOptGroup<C extends ElementType = "div">(props: SelectOptGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const [ariaLabelledBy, setAriaLabelledBy] = createSignal<string>();
 

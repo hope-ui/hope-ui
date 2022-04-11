@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -11,7 +11,7 @@ export type TagLabelProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 const hopeTagLabelClass = "hope-tag-label";
 
 export function TagLabel<C extends ElementType = "span">(props: TagLabelProps<C>) {
-  const theme = useComponentStyleConfigs().Tag;
+  const theme = useStyleConfig().Tag;
 
   const [local, others] = splitProps(props, ["class"]);
 

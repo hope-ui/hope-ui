@@ -1,7 +1,7 @@
 import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -86,7 +86,7 @@ const hopeCheckboxGroupClass = "hope-checkbox-group";
 export function CheckboxGroup<C extends ElementType = "div">(props: CheckboxGroupProps<C>) {
   const defaultName = `hope-checkbox-group-${createUniqueId()}--checkbox`;
 
-  const theme = useComponentStyleConfigs().Checkbox;
+  const theme = useStyleConfig().Checkbox;
 
   const [state, setState] = createStore<CheckboxGroupState>({
     // eslint-disable-next-line solid/reactivity

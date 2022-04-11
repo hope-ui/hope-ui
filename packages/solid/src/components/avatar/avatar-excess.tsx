@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeAvatarExcessClass = "hope-avatar__excess";
  * Component to show the remaining number of avatars in a group.
  */
 export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcessProps<C>) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const avatarGroupContext = useAvatarGroupContext();
 

@@ -1,8 +1,8 @@
 import { createContext, createMemo, createSignal, onCleanup, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
 import { isArray } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { getNextIndex, getPrevIndex } from "../../utils/number";
@@ -74,7 +74,7 @@ const hopeAccordionClass = "hope-accordion";
  * It wraps all accordion items in a `div` for better grouping.
  */
 export function Accordion<C extends ElementType = "div">(props: AccordionProps<C>) {
-  const theme = useComponentStyleConfigs().Accordion;
+  const theme = useStyleConfig().Accordion;
 
   const [buttons, setButtons] = createSignal<HTMLButtonElement[]>([]);
 

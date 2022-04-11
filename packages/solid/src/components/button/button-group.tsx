@@ -2,7 +2,7 @@ import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { MarginProps } from "../../styled-system/props/margin";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -42,7 +42,7 @@ interface ButtonGroupContextValue {
 const ButtonGroupContext = createContext<ButtonGroupContextValue>();
 
 export function ButtonGroup<C extends ElementType = "div">(props: ButtonGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Button;
+  const theme = useStyleConfig().Button;
 
   const [state] = createStore<ButtonGroupState>({
     get variant() {
