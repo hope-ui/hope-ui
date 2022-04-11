@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite --host",
-    "serve": "vite preview --port 3000"
+    "serve": "vite preview --port 3000",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@felte/solid": "1.1.5",
