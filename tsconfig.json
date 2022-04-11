@@ -15,11 +15,7 @@
     "skipLibCheck": true,
     "strict": true,
     "sourceMap": true,
-    "declaration": true,
-    "rootDir": ".",
-    "baseUrl": ".",
     "types": ["vite/client", "node", "jest", "@testing-library/jest-dom"]
   },
-  "include": ["packages", "jest.setup.ts"],
   "exclude": ["node_modules", "**/*/dist"]
 }

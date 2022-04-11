@@ -2,9 +2,9 @@
   "extends": "../../tsconfig",
   "compilerOptions": {
     "declaration": true,
-    "declarationMap": true,
-    "declarationDir": "dist",
+    "emitDeclarationOnly": true,
     "outDir": "dist",
+    "baseUrl": ".",
     "rootDir": "."
   },
   "include": ["src/**/*"],

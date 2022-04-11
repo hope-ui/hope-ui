@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "@/*": ["src/*"],
       "@hope-ui/solid": ["../../packages/solid/src/index.ts"]
