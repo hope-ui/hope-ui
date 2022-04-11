@@ -45,7 +45,7 @@
     "storybook": "pnpm --filter @hope-ui/solid storybook",
     "test": "pnpm --filter @hope-ui/solid test",
     "test:watch": "pnpm --filter @hope-ui/solid test:watch",
-    "typecheck": "pnpm --filter @hope-ui/solid typecheck"
+    "typecheck": "pnpm --filter @hope-ui/* typecheck"
   },
   "lint-staged": {
     "*.{md,json}": [

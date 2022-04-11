@@ -50,6 +50,6 @@ packages/
 
 ### Testing scripts
 
-- `typecheck` – runs TypeScript typechecking with `tsc --noEmit` on all packages
+- `typecheck` – runs TypeScript typechecking with `tsc --noEmit` on all packages and docs
 - `lint` – runs ESLint on all packages and docs
 - `test` – runs tests with jest
