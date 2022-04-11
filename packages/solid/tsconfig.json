@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -7,6 +7,5 @@
     "baseUrl": ".",
     "rootDir": "."
   },
-  "include": ["src/**/*"],
-  "exclude": ["**/*.spec.*", "**/*.test.*", "**/*.stories.*"]
+  "include": ["vite.config.ts", "jest.setup.ts", "package.json", "src/**/*"]
 }
