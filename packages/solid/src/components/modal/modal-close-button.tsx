@@ -1,6 +1,6 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers } from "../../utils/function";
 import { CloseButton, CloseButtonProps } from "../close-button/close-button";
@@ -16,7 +16,7 @@ const hopeModalCloseButtonClass = "hope-modal__close-button";
  * `onClose` action from the modal context.
  */
 export function ModalCloseButton(props: CloseButtonProps) {
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const modalContext = useModalContext();
 

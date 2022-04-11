@@ -1,10 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "emitDeclarationOnly": true,
     "outDir": "dist",
+    "baseUrl": ".",
     "rootDir": "."
   },
-  "include": ["vite.config.*", "package.json", "src/**/*"]
+  "include": ["vite.config.ts", "jest.setup.ts", "package.json", "src/**/*"]
 }

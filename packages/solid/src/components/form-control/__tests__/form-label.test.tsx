@@ -1,7 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { Input } from "../../input/input";
+import { renderWithHopeProvider } from "../../test-utils";
 import { FormControl } from "../form-control";
 import { formLabelStyles } from "../form-control.styles";
 import { FormLabel } from "../form-label";

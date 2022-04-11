@@ -1,8 +1,9 @@
 import { isServer } from "solid-js/web";
 
-import { __DEV__ } from "../utils/assertion";
-import { mockBody } from "../utils/object";
-import { ColorMode } from "./types";
+import { __DEV__ } from "./utils/assertion";
+import { mockBody } from "./utils/object";
+
+export type ColorMode = "light" | "dark" | "system";
 
 const hasLocalStorageSupport = () => typeof Storage !== "undefined";
 

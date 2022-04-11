@@ -1,7 +1,7 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { SystemStyleObject } from "../../styled-system";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ImageProps } from "../image";
@@ -99,7 +99,7 @@ const hopeAvatarClass = "hope-avatar";
  * support for fallback avatar and name-only avatars
  */
 export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const avatarGroupContext = useAvatarGroupContext();
 

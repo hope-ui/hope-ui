@@ -1,7 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
 import { IconCheckCircleSolid } from "../../icons/IconCheckCircleSolid";
+import { renderWithHopeProvider } from "../../test-utils";
 import { inputElementStyles, InputElementVariants } from "../input.styles";
 import { InputElement, InputLeftElement, InputRightElement } from "../input-element";
 import * as inputGroupModule from "../input-group";

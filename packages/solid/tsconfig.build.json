@@ -6,5 +6,5 @@
     "declarationDir": "dist"
   },
   "include": ["src/**/*"],
-  "exclude": ["**/*.spec.ts", "**/*.stories.*"]
+  "exclude": ["**/*.spec.*", "**/*.test.*", "**/*.stories.*"]
 }

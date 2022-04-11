@@ -2,8 +2,8 @@ import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
-import { visuallyHiddenStyles } from "../../theme/utils";
+import { visuallyHiddenStyles } from "../../styled-system/utils";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callHandler } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
@@ -180,7 +180,7 @@ const hopeSwitchInputClass = "hope-switch__input";
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const defaultId = `hope-switch-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Switch;
+  const theme = useStyleConfig().Switch;
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
 

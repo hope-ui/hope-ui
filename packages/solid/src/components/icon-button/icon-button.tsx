@@ -1,6 +1,6 @@
 import { JSX, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Button, ButtonOptions } from "../button/button";
 import { hopeIconButtonClass } from "../button/button.styles";
@@ -34,7 +34,7 @@ export type IconButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C,
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export function IconButton<C extends ElementType = "button">(props: IconButtonProps<C>) {
-  const theme = useComponentStyleConfigs().IconButton;
+  const theme = useStyleConfig().IconButton;
 
   const buttonGroupContext = useButtonGroupContext();
 

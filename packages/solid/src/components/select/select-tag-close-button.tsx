@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { IconCloseSmall } from "../icons/IconCloseSmall";
@@ -16,7 +16,7 @@ const hopeSelectTagCloseButtonClass = "hope-select__tag-close-button";
  * Used to remove an option in a multi-select.
  */
 export function SelectTagCloseButton<C extends ElementType = "button">(props: SelectTagCloseButtonProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const [local, others] = splitProps(props, ["class", "children"]);
 

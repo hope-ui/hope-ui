@@ -1,6 +1,5 @@
 import { For, Show } from "solid-js";
 
-import { HopeWrapper } from "../../utils/storybook";
 import { Input } from "../input/input";
 import {
   Select,
@@ -14,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../select";
+import { HopeWrapper } from "../storybook-utils";
 import { Textarea } from "../textarea/textarea";
 import { FormControl } from "./form-control";
 import { FormErrorMessage } from "./form-error-message";

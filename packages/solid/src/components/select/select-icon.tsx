@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { IconSelector } from "../icons/IconSelector";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -22,7 +22,7 @@ const hopeSelectIconClass = "hope-select__icon";
  * A small icon often displayed next to the value as a visual affordance for the fact it can be open.
  */
 export function SelectIcon<C extends ElementType = "svg">(props: SelectIconProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 

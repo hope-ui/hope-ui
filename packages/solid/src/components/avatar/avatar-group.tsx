@@ -5,7 +5,7 @@ import { BorderProps } from "../../styled-system/props/border";
 import { MarginProps } from "../../styled-system/props/margin";
 import { RadiiProps } from "../../styled-system/props/radii";
 import { ResponsiveValue } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -57,7 +57,7 @@ const hopeAvatarGroupClass = "hope-avatar__group";
  * AvatarGroup displays a number of avatars grouped together in a stack.
  */
 export function AvatarGroup<C extends ElementType = "div">(props: AvatarGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Avatar;
+  const theme = useStyleConfig().Avatar;
 
   const [state] = createStore<AvatarGroupState>({
     get size() {

@@ -1,6 +1,6 @@
 import { createMemo, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -12,7 +12,7 @@ export type PopoverArrowProps<C extends ElementType = "div"> = HTMLHopeProps<C>;
 const hopePopoverArrowClass = "hope-popover__arrow";
 
 export function PopoverArrow<C extends ElementType = "div">(props: PopoverArrowProps<C>) {
-  const theme = useComponentStyleConfigs().Popover;
+  const theme = useStyleConfig().Popover;
 
   const popoverContext = usePopoverContext();
 

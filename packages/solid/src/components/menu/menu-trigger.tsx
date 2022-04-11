@@ -1,6 +1,6 @@
 import { JSX, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers } from "../../utils/function";
@@ -17,7 +17,7 @@ const hopeMenuTriggerClass = "hope-menu__trigger";
  * The trigger that toggles the menu.
  */
 export function MenuTrigger<C extends ElementType = "button">(props: MenuTriggerProps<C>) {
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const menuContext = useMenuContext();
 

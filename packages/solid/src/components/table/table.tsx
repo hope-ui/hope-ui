@@ -2,7 +2,7 @@ import { createContext, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -52,7 +52,7 @@ const TableContext = createContext<TableContextValue>();
 const hopeTableClass = "hope-table";
 
 export function Table<C extends ElementType = "table">(props: TableProps<C>) {
-  const theme = useComponentStyleConfigs().Table;
+  const theme = useStyleConfig().Table;
 
   const [state] = createStore<TableContextValue>({
     get striped() {

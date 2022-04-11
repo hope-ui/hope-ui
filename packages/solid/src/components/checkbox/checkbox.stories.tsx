@@ -1,8 +1,8 @@
 import { createSignal } from "solid-js";
 
-import { HopeWrapper } from "../../utils/storybook";
 import { Button } from "..";
 import { HStack, VStack } from "../stack/stack";
+import { HopeWrapper } from "../storybook-utils";
 import { Checkbox } from "./checkbox";
 import { CheckboxControl } from "./checkbox-control";
 import { CheckboxGroup } from "./checkbox-group";

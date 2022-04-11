@@ -1,6 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeModalHeaderClass = "hope-modal__header";
  * ModalHeader houses the title of the modal.
  */
 export function ModalHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const modalContext = useModalContext();
 

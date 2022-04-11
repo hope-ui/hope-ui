@@ -1,7 +1,7 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
@@ -20,7 +20,7 @@ const hopeDrawerContentClass = "hope-drawer__content";
  * Container for the drawer dialog's content.
  */
 export function DrawerContent<C extends ElementType = "section">(props: DrawerContentProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
 
   const drawerContext = useDrawerContext();
   const modalContext = useModalContext();

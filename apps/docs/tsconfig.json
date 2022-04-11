@@ -1,17 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@hope-ui/solid": ["../../packages/solid/src"],
-      "@hope-ui/solid/*": ["../../packages/solid/src/*"]
+      "@/*": ["src/*"]
     }
   },
-  "include": ["vite.config.*", "src/**/*"],
-  "references": [
-    {
-      "path": "../../packages/solid"
-    }
-  ]
+  "include": ["vite.config.*", "src/**/*"]
 }

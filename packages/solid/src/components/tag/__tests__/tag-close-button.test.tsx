@@ -1,7 +1,7 @@
 import { JSX } from "solid-js";
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
+import { renderWithHopeProvider } from "../../test-utils";
 import { Tag } from "../tag";
 import { tagCloseButtonStyles } from "../tag.styles";
 import { TagCloseButton } from "../tag-close-button";

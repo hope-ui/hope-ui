@@ -1,6 +1,6 @@
 import { createContext, createSignal, splitProps, useContext } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -20,7 +20,7 @@ const hopeMenuGroupClass = "hope-menu__group";
  * Component used to group multiple menu item.
  */
 export function MenuGroup<C extends ElementType = "div">(props: MenuGroupProps<C>) {
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const [ariaLabelledBy, setAriaLabelledBy] = createSignal<string>();
 

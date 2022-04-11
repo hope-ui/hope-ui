@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { GridLayoutProps } from "../../styled-system/props/grid";
 import { ResponsiveValue, SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -53,7 +53,7 @@ const hopeBreadcrumbListClass = "hope-breadcrumb__list";
  * It renders a `nav` element with `aria-label` set to `breadcrumb`
  */
 export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps<C>) {
-  const theme = useComponentStyleConfigs().Breadcrumb;
+  const theme = useStyleConfig().Breadcrumb;
 
   const [state] = createStore<BreadcrumbState>({
     get spacing() {

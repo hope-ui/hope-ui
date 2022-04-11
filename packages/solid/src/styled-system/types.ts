@@ -14,7 +14,30 @@ import { RadiiProps } from "./props/radii";
 import { ShadowProps } from "./props/shadow";
 import { SizeProps } from "./props/size";
 import { TypographyProps } from "./props/typography";
-import { config } from "./stitches.config";
+import { baseTheme, config } from "./stitches.config";
+import { baseThemeTokens } from "./tokens";
+
+/**
+ * Hope UI - Stitches theme interface.
+ */
+export type HopeTheme = typeof baseTheme;
+
+/**
+ * Stitches theme config interface.
+ */
+export type StitchesThemeConfig = {
+  [Scale in keyof typeof baseThemeTokens]?: {
+    [Token in keyof typeof baseThemeTokens[Scale]]?: boolean | number | string;
+  };
+} & {
+  [Scale in keyof typeof baseThemeTokens]?: {
+    [Token in string]: boolean | number | string;
+  };
+} & {
+  [Scale in string]: {
+    [Token in string]: boolean | number | string;
+  };
+};
 
 /**
  * Stitches config type.

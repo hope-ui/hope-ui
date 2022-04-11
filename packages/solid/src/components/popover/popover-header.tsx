@@ -1,6 +1,6 @@
 import { onCleanup, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -16,7 +16,7 @@ const hopePopoverHeaderClass = "hope-popover__header";
  * for the popover's content and it is first announced by screenreaders.
  */
 export function PopoverHeader<C extends ElementType = "header">(props: PopoverHeaderProps<C>) {
-  const theme = useComponentStyleConfigs().Popover;
+  const theme = useStyleConfig().Popover;
 
   const popoverContext = usePopoverContext();
 

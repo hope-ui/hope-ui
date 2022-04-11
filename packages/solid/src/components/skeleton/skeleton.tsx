@@ -3,7 +3,7 @@ import { createEffect, createSignal, mergeProps, on, Show, splitProps } from "so
 
 import { fadeIn } from "../../styled-system/keyframes";
 import { ColorProps } from "../../styled-system/props/color";
-import { colorTokenToCssVar } from "../../theme/utils";
+import { colorTokenToCssVar } from "../../styled-system/utils";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";

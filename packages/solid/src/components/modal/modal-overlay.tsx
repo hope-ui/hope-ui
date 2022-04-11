@@ -1,7 +1,7 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -16,7 +16,7 @@ const hopeModalOverlayClass = "hope-modal__overlay";
  * ModalOverlay renders a backdrop behind the modal.
  */
 export function ModalOverlay<C extends ElementType = "div">(props: ModalOverlayProps<C>) {
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const modalContext = useModalContext();
 

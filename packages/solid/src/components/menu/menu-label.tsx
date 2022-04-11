@@ -1,6 +1,6 @@
 import { createUniqueId, onMount, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -18,7 +18,7 @@ const hopeMenuLabelClass = "hope-menu__label";
 export function MenuLabel<C extends ElementType = "div">(props: MenuLabelProps<C>) {
   const defaultIdSuffix = createUniqueId();
 
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const menuContext = useMenuContext();
   const menuGroupContext = useMenuGroupContext();

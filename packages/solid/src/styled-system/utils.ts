@@ -1,6 +1,11 @@
+import merge from "lodash.merge";
+
+import { colorModeClassNames } from "../color-mode";
 import { isObject } from "../utils/assertion";
+import { baseTheme, createTheme, css } from "./stitches.config";
 import { StyleProps } from "./system";
-import { SystemMediaCssSelector, SystemStyleObject } from "./types";
+import { baseDarkThemeTokens } from "./tokens";
+import { ResponsiveValue, StitchesThemeConfig, SystemMediaCssSelector, SystemStyleObject } from "./types";
 
 /**
  * Merge a source SystemStyleObject to both normal and responsive destination SystemStyleObject.
@@ -104,3 +109,70 @@ export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObj
   // spread responsive values last to ensure css override works correctly.
   return { ...destStyleObject, ...destResponsiveStyleObject };
 }
+
+/**
+ * Create new stitches dark or light theme.
+ * @return a merged theme object containing the base stitches theme and the override values.
+ *
+ * @internal
+ */
+export function extendBaseTheme<T extends StitchesThemeConfig>(type: "light" | "dark", themeConfig: T) {
+  const isDark = type === "dark";
+
+  const className = isDark ? colorModeClassNames.dark : colorModeClassNames.light;
+
+  // If dark theme, we need to add base dark theme tokens which is not present in the base theme.
+  const finalConfig = isDark ? merge({}, baseDarkThemeTokens, themeConfig) : themeConfig;
+
+  const customTheme = createTheme(className, finalConfig);
+
+  return merge({}, baseTheme, customTheme);
+}
+
+/**
+ * Map a responsive value to a new one
+ */
+export function mapResponsive(prop: ResponsiveValue<any>, mapper: (val: any) => any) {
+  if (isObject(prop)) {
+    return Object.keys(prop).reduce((result: Record<string, any>, key) => {
+      result[key] = mapper(prop[key]);
+      return result;
+    }, {});
+  }
+
+  if (prop != null) {
+    return mapper(prop);
+  }
+
+  return null;
+}
+
+/**
+ * Return the css variable associated with the given token if exists, or the token itself otherwise.
+ *
+ * @example
+ * "$primary9" -> "var(--hope-colors-primary9)"
+ * "tomato" -> "tomato"
+ */
+export function colorTokenToCssVar(token: string): string {
+  if (!token.startsWith("$")) {
+    return token;
+  }
+
+  return `var(--hope-colors-${token.substring(1)})`;
+}
+
+/**
+ * Visually hide an element without hiding it from screen readers.
+ */
+export const visuallyHiddenStyles = css({
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: "0",
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  borderWidth: "0",
+});

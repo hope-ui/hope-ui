@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
+import { renderWithHopeProvider } from "../../test-utils";
 import { Input } from "..";
 import { inputGroupStyles } from "../input.styles";
 import { InputGroup } from "../input-group";

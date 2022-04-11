@@ -1,6 +1,6 @@
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { IconClose } from "../icons/IconClose";
@@ -32,7 +32,7 @@ const hopeCloseButtonClass = "hope-close-button";
  * like Alerts, Toasts, Drawers and Modals.
  */
 export function CloseButton<C extends ElementType = "button">(props: CloseButtonProps<C>) {
-  const theme = useComponentStyleConfigs().CloseButton;
+  const theme = useStyleConfig().CloseButton;
 
   const defaultProps: CloseButtonProps<"button"> = {
     "aria-label": theme?.defaultProps?.["aria-label"] ?? "Close",

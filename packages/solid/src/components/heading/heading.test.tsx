@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../utils/test-utils";
+import { renderWithHopeProvider } from "../test-utils";
 import { Heading, HeadingProps } from "./heading";
 import { headingStyles } from "./heading.styles";
 

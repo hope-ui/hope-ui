@@ -1,6 +1,6 @@
 import { Show, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { IconCheck } from "../icons/IconCheck";
@@ -16,7 +16,7 @@ const hopeSelectOptionIndicatorClass = "hope-select__option-indicator";
  * Visual indicator rendered when the option is selected.
  */
 export function SelectOptionIndicator<C extends ElementType = "span">(props: SelectOptionIndicatorProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const selectOptionContext = useSelectOptionContext();
 

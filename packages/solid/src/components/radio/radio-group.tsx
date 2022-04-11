@@ -1,7 +1,7 @@
 import { createContext, createUniqueId, JSX, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -82,7 +82,7 @@ const hopeRadioGroupClass = "hope-radio-group";
 export function RadioGroup<C extends ElementType = "div">(props: RadioGroupProps<C>) {
   const defaultRadioName = `hope-radio-group-${createUniqueId()}--radio`;
 
-  const theme = useComponentStyleConfigs().Radio;
+  const theme = useStyleConfig().Radio;
 
   const [state, setState] = createStore<RadioGroupState>({
     // eslint-disable-next-line solid/reactivity

@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { ColorProps } from "../../styled-system/props/color";
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { valueToPercent } from "../../utils/number";
@@ -95,7 +95,7 @@ const hopeProgressClass = "hope-progress";
  * and speak the progress values.
  */
 export function Progress<C extends ElementType = "div">(props: ProgressProps<C>) {
-  const theme = useComponentStyleConfigs().Progress;
+  const theme = useStyleConfig().Progress;
 
   const [state] = createStore<ProgressState>({
     get min() {

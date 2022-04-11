@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
+import { renderWithHopeProvider } from "../../test-utils";
 import { Accordion } from "../accordion";
 import { AccordionButton } from "../accordion-button";
 import { AccordionItem } from "../accordion-item";
@@ -46,11 +46,17 @@ describe("Accordion", () => {
 
   //   const trigger = screen.getByText("Trigger");
 
+  //   expect(trigger).toHaveAttribute("aria-expanded", "false");
+
   //   // assert
   //   fireEvent.click(trigger);
+  //   await Promise.resolve();
+
   //   expect(trigger).toHaveAttribute("aria-expanded", "true");
 
   //   fireEvent.click(trigger);
+  //   await Promise.resolve();
+
   //   expect(trigger).toHaveAttribute("aria-expanded", "false");
   // });
 });

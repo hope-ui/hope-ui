@@ -1,5 +1,5 @@
 const repoRootPath = `<rootDir>`;
-const solidjsPath = `${repoRootPath}/node_modules/solid-js`;
+const solidjsPath = `${repoRootPath}/../../node_modules/solid-js`;
 
 module.exports = {
   preset: "ts-jest",

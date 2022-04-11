@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -14,7 +14,7 @@ const hopeSelectOptionTextClass = "hope-select__option-text";
  * The textual part of the option.
  */
 export function SelectOptionText<C extends ElementType = "span">(props: SelectOptionTextProps<C>) {
-  const theme = useComponentStyleConfigs().Select;
+  const theme = useStyleConfig().Select;
 
   const [local, others] = splitProps(props, ["class"]);
 

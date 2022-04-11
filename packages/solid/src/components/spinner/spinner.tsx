@@ -3,8 +3,8 @@ import { mergeProps, Show, splitProps } from "solid-js";
 
 import { BorderProps } from "../../styled-system/props/border";
 import { ColorProps } from "../../styled-system/props/color";
-import { useComponentStyleConfigs } from "../../theme/provider";
-import { visuallyHiddenStyles } from "../../theme/utils";
+import { visuallyHiddenStyles } from "../../styled-system/utils";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
@@ -53,7 +53,7 @@ export type SpinnerStyleConfig = SinglePartComponentStyleConfig<SpinnerOptions>;
 const hopeSpinnerClass = "hope-spinner";
 
 export function Spinner<C extends ElementType = "div">(props: SpinnerProps<C>) {
-  const theme = useComponentStyleConfigs().Spinner;
+  const theme = useStyleConfig().Spinner;
 
   const defaultProps: SpinnerProps<"div"> = {
     label: theme?.defaultProps?.label ?? "Loading...",

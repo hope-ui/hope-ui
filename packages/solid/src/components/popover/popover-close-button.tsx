@@ -1,6 +1,6 @@
 import { JSX, mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers } from "../../utils/function";
 import { CloseButton, CloseButtonProps } from "../close-button/close-button";
@@ -16,7 +16,7 @@ const hopePopoverCloseButtonClass = "hope-popover__close-button";
  * `close` action from the popover context.
  */
 export function PopoverCloseButton(props: CloseButtonProps) {
-  const theme = useComponentStyleConfigs().Popover;
+  const theme = useStyleConfig().Popover;
 
   const popoverContext = usePopoverContext();
 

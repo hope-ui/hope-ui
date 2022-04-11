@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { Collapse } from "../collapse/collapse";
@@ -19,7 +19,7 @@ const hopeAccordionPanelClass = "hope-accordion__panel";
  * It uses the `Collapse` component to animate its height.
  */
 export function AccordionPanel<C extends ElementType = "div">(props: AccordionPanelProps<C>) {
-  const theme = useComponentStyleConfigs().Accordion;
+  const theme = useStyleConfig().Accordion;
 
   const accordionItemContext = useAccordionItemContext();
 

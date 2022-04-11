@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite --host",
-    "serve": "vite preview --port 3000"
+    "serve": "vite preview --port 3000",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@felte/solid": "1.1.5",
@@ -17,7 +18,7 @@
     "prismjs": "1.27.0",
     "solid-app-router": "0.2.1",
     "solid-js": "1.3.14",
-    "solid-transition-group": "0.0.8",
+    "solid-transition-group": "0.0.10",
     "yup": "0.32.11"
   }
 }

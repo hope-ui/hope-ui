@@ -1,7 +1,7 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { hope } from "../factory";
@@ -19,7 +19,7 @@ const hopeModalContentClass = "hope-modal__content";
  * Container for the modal dialog's content.
  */
 export function ModalContent<C extends ElementType = "section">(props: ModalContentProps<C>) {
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const modalContext = useModalContext();
 

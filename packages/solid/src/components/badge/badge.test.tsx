@@ -1,6 +1,6 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../utils/test-utils";
+import { renderWithHopeProvider } from "../test-utils";
 import { Badge } from "./badge";
 import { badgeStyles, BadgeVariants } from "./badge.styles";
 

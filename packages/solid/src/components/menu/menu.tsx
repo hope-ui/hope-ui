@@ -4,7 +4,7 @@ import { Accessor, createContext, createUniqueId, JSX, Show, useContext } from "
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
 import { isChildrenFunction } from "../../utils/solid";
 import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
@@ -120,7 +120,7 @@ interface MenuState {
 export function Menu(props: MenuProps) {
   const defaultBaseId = `hope-menu-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Menu;
+  const theme = useStyleConfig().Menu;
 
   const [state, setState] = createStore<MenuState>({
     get triggerId() {

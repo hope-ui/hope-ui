@@ -1,5 +1,5 @@
-import { HopeWrapper } from "../../utils/storybook";
 import { VStack } from "../stack/stack";
+import { HopeWrapper } from "../storybook-utils";
 import { Alert } from "./alert";
 import { AlertDescription } from "./alert-description";
 import { AlertIcon } from "./alert-icon";

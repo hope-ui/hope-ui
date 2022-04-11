@@ -2,9 +2,9 @@ import { Property } from "csstype";
 import { splitProps } from "solid-js";
 
 import { ResponsiveValue, SizeScaleValue } from "../../styled-system/types";
+import { mapResponsive } from "../../styled-system/utils";
 import { isNull, isNumber } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
-import { mapResponsive } from "../../utils/responsive";
 import { ElementType, HTMLHopeProps } from "../types";
 import { Grid, GridOptions } from "./grid";
 

@@ -1,22 +1,42 @@
 /* eslint-disable solid/reactivity */
-import { createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
+import { Accessor, createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
 
-import { drawerTransitionStyles } from "../components/drawer/drawer.styles";
-import { menuTransitionStyles } from "../components/menu/menu.styles";
-import { modalTransitionStyles } from "../components/modal/modal.styles";
-import { notificationTransitionStyles } from "../components/notification/notification.styles";
-import { popoverTransitionStyles } from "../components/popover/popover.styles";
-import { selectTransitionStyles } from "../components/select/select.styles";
-import { tooltipTransitionStyles } from "../components/tooltip/tooltip.styles";
 import {
+  ColorMode,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
   setDocumentColorModeDataTheme,
   syncBodyColorModeClassName,
 } from "./color-mode";
-import { resetStyles } from "./reset";
-import { ColorMode, ComponentStyleConfigs, HopeContextValue, HopeThemeConfig } from "./types";
-import { extendBaseTheme } from "./utils";
+import { drawerTransitionStyles } from "./components/drawer/drawer.styles";
+import { menuTransitionStyles } from "./components/menu/menu.styles";
+import { modalTransitionStyles } from "./components/modal/modal.styles";
+import { notificationTransitionStyles } from "./components/notification/notification.styles";
+import { popoverTransitionStyles } from "./components/popover/popover.styles";
+import { selectTransitionStyles } from "./components/select/select.styles";
+import { tooltipTransitionStyles } from "./components/tooltip/tooltip.styles";
+import { ThemeStyleConfig } from "./style-config.types";
+import { resetStyles } from "./styled-system/css-reset";
+import { HopeTheme, StitchesThemeConfig } from "./styled-system/types";
+import { extendBaseTheme } from "./styled-system/utils";
+
+/**
+ * Hope UI theme override configuration.
+ */
+export interface HopeThemeConfig {
+  initialColorMode?: ColorMode;
+  lightTheme?: StitchesThemeConfig;
+  darkTheme?: StitchesThemeConfig;
+  components?: ThemeStyleConfig;
+}
+
+export interface HopeContextValue {
+  components: ThemeStyleConfig;
+  theme: Accessor<HopeTheme>;
+  colorMode: Accessor<ColorMode>;
+  setColorMode: (value: ColorMode) => void;
+  toggleColorMode: () => void;
+}
 
 export const HopeContext = createContext<HopeContextValue>();
 
@@ -100,13 +120,13 @@ export function useTheme() {
 
 /**
  * Custom hook that reads from `HopeProvider` context
- * Returns an accessor for the theme based components style configs.
+ * Returns an accessor for the theme based components style config.
  */
-export function useComponentStyleConfigs(): ComponentStyleConfigs {
+export function useStyleConfig(): ThemeStyleConfig {
   const context = useContext(HopeContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useComponentStyleConfigs must be used within a HopeProvider");
+    throw new Error("[Hope UI]: useStyleConfig must be used within a HopeProvider");
   }
 
   return context.components;

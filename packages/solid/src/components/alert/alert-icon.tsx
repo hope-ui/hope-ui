@@ -1,6 +1,6 @@
 import { mergeProps, splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Icon, IconProps } from "../icon/icon";
 import { IconCheckCircleSolid } from "../icons/IconCheckCircleSolid";
@@ -16,7 +16,7 @@ export type AlertIconProps<C extends ElementType = "svg"> = IconProps<C>;
 const hopeAlertIconClass = "hope-alert__icon";
 
 export function AlertIcon<C extends ElementType = "svg">(props: AlertIconProps<C>) {
-  const theme = useComponentStyleConfigs().Alert;
+  const theme = useStyleConfig().Alert;
   const { status } = useAlertContext();
 
   const defaultProps: AlertIconProps<"svg"> = {

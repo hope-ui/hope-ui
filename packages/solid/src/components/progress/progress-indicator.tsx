@@ -1,7 +1,7 @@
 import { mergeProps, splitProps } from "solid-js";
 
 import { ColorProps } from "../../styled-system/props/color";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -28,7 +28,7 @@ const hopeProgressIndicatorClass = "hope-progress__indicator";
  * It applies `background-color` and changes its width.
  */
 export function ProgressIndicator<C extends ElementType = "div">(props: ProgressIndicatorProps<C>) {
-  const theme = useComponentStyleConfigs().Progress;
+  const theme = useStyleConfig().Progress;
 
   const progressContext = useProgressContext();
 

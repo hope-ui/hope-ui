@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps, SinglePartComponentStyleConfig } from "../types";
@@ -16,7 +16,7 @@ const hopeKbdClass = "hope-kbd";
  * Semantic component to render a keyboard shortcut within an application.
  */
 export function Kbd<C extends ElementType = "kbd">(props: KbdProps<C>) {
-  const theme = useComponentStyleConfigs().Kbd;
+  const theme = useStyleConfig().Kbd;
 
   const [local, others] = splitProps(props, ["class"]);
 

@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeRadioControlClass = "hope-radio__control";
  * The visual control that represents a `radio`.
  */
 export function RadioControl<C extends ElementType = "span">(props: RadioControlProps<C>) {
-  const theme = useComponentStyleConfigs().Radio;
+  const theme = useStyleConfig().Radio;
 
   const radioContext = useRadioContext();
 

@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 
@@ -151,7 +151,7 @@ interface ModalState
 export function Modal(props: ModalProps) {
   const defaultDialogId = `hope-modal-${createUniqueId()}`;
 
-  const theme = useComponentStyleConfigs().Modal;
+  const theme = useStyleConfig().Modal;
 
   const [state, setState] = createStore<ModalState>({
     headerMounted: false,

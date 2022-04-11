@@ -2,7 +2,7 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { createStyledSystemClass } from "../../styled-system/system";
 import { StyleProps } from "../../styled-system/types";
-import { renderWithHopeProvider } from "../../utils/test-utils";
+import { renderWithHopeProvider } from "../test-utils";
 import { Box } from "./box";
 
 describe("Box", () => {

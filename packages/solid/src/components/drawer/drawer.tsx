@@ -2,7 +2,7 @@ import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { RightJoinProps } from "../../utils/types";
 import { CloseButtonProps, ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { Modal, ModalProps } from "../modal/modal";
@@ -65,7 +65,7 @@ type DrawerContextValue = Required<DrawerOptions>;
 const DrawerContext = createContext<DrawerContextValue>();
 
 export function Drawer(props: DrawerProps) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
 
   const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableMotion"]);
 
@@ -114,7 +114,7 @@ export function useDrawerContext() {
  * -----------------------------------------------------------------------------------------------*/
 
 export function DrawerCloseButton(props: CloseButtonProps) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
 
   const defaultProps: CloseButtonProps = {
     "aria-label": theme?.defaultProps?.closeButton?.["aria-label"] ?? "Close drawer",
@@ -128,16 +128,16 @@ export function DrawerCloseButton(props: CloseButtonProps) {
 }
 
 export function DrawerBody<C extends ElementType = "div">(props: ModalBodyProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
   return <ModalBody __baseStyle={theme?.baseStyle?.body} {...props} />;
 }
 
 export function DrawerHeader<C extends ElementType = "header">(props: ModalHeaderProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
   return <ModalHeader __baseStyle={theme?.baseStyle?.header} {...props} />;
 }
 
 export function DrawerFooter<C extends ElementType = "footer">(props: ModalFooterProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
   return <ModalFooter __baseStyle={theme?.baseStyle?.footer} {...props} />;
 }

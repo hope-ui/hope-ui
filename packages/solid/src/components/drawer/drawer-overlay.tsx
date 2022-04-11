@@ -1,7 +1,7 @@
 import { Show, splitProps } from "solid-js";
 import { Transition } from "solid-transition-group";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { useModalContext } from "../modal/modal";
@@ -18,7 +18,7 @@ const hopeDrawerOverlayClass = "hope-drawer__overlay";
  * DrawerOverlay renders a backdrop behind the drawer.
  */
 export function DrawerOverlay<C extends ElementType = "div">(props: DrawerOverlayProps<C>) {
-  const theme = useComponentStyleConfigs().Drawer;
+  const theme = useStyleConfig().Drawer;
 
   const drawerContext = useDrawerContext();
   const modalContext = useModalContext();

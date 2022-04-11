@@ -1,7 +1,7 @@
-import { HopeWrapper } from "../../utils/storybook";
 import { createIcon } from "../icon/create-icon";
 import { Icon } from "../icon/icon";
 import { VStack } from "../stack";
+import { HopeWrapper } from "../storybook-utils";
 import { Input } from "./input";
 import { InputLeftAddon, InputRightAddon } from "./input-addon";
 import { InputLeftElement, InputRightElement } from "./input-element";

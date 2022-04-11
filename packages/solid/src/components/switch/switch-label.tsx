@@ -1,6 +1,6 @@
 import { splitProps } from "solid-js";
 
-import { useComponentStyleConfigs } from "../../theme/provider";
+import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -15,7 +15,7 @@ const hopeSwitchLabelClass = "hope-switch__label";
  * The label of the switch.
  */
 export function SwitchLabel<C extends ElementType = "span">(props: SwitchLabelProps<C>) {
-  const theme = useComponentStyleConfigs().Switch;
+  const theme = useStyleConfig().Switch;
 
   const switchContext = useSwitchContext();
 
