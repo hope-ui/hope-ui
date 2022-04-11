@@ -54,7 +54,7 @@ importers:
       react: 17.0.1
       react-dom: 17.0.1
       rollup: 2.70.1
-      rollup-preset-solid: 1.4.0
+      rollup-preset-solid: 1.2.2
       solid-js: 1.3.14
       solid-testing-library: 0.3.0
       solid-transition-group: 0.0.10
@@ -117,7 +117,7 @@ importers:
       react: 17.0.1
       react-dom: 17.0.1_react@17.0.1
       rollup: 2.70.1
-      rollup-preset-solid: 1.4.0
+      rollup-preset-solid: 1.2.2
       solid-js: 1.3.14
       solid-testing-library: 0.3.0_solid-js@1.3.14
       solid-transition-group: 0.0.10_solid-js@1.3.14
@@ -676,7 +676,7 @@ packages:
       '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.12.9
-      '@babel/helper-plugin-utils': 7.10.4
+      '@babel/helper-plugin-utils': 7.16.7
       '@babel/plugin-syntax-object-rest-spread': 7.8.3_@babel+core@7.12.9
       '@babel/plugin-transform-parameters': 7.16.7_@babel+core@7.12.9
     dev: true
@@ -13211,8 +13211,8 @@ packages:
       terser: 5.12.1
     dev: true
 
-  /rollup-preset-solid/1.4.0:
-    resolution: {integrity: sha512-rjUH0dMkyHxkin1uBcdZX110DL/P0hppMWF0RAwJdl7ly9IH/N+jHxmnyf7OzkyI2pGUBO9Lr1NN8Me9TFKN6Q==}
+  /rollup-preset-solid/1.2.2:
+    resolution: {integrity: sha512-LF5v6cEdOQX3murdfgXcnNf/oUAhElK7pV+Gl43rzgh+IJW5LU/uKcc+4XRdZP/WZcdx3niQRom0DgB4HpPgKA==}
     dependencies:
       '@babel/core': 7.17.9
       '@babel/preset-env': 7.16.11_@babel+core@7.17.9
