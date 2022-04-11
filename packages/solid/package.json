@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.5.0-alpha.1",
+  "version": "0.5.0-alpha.2",
   "private": false,
   "description": "The SolidJS component library you've hoped for.",
   "keywords": [
@@ -48,7 +48,10 @@
   "scripts": {
     "build": "rollup -c",
     "build:storybook": "build-storybook",
-    "storybook": "start-storybook -p 6006"
+    "storybook": "start-storybook -p 6006",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@floating-ui/dom": "0.4.4",
