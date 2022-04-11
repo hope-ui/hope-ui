@@ -2,7 +2,7 @@ import { cleanup, screen } from "solid-testing-library";
 
 import { css } from "../../styled-system/stitches.config";
 import * as styledSystem from "../../styled-system/system";
-import { renderWithHopeProvider } from "../../utils/test-utils";
+import { renderWithHopeProvider } from "../test-utils";
 import { HStack, HStackOptions, Stack, VStack, VStackOptions } from "./stack";
 
 describe("Stack", () => {

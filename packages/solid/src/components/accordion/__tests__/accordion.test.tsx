@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, screen } from "solid-testing-library";
 
-import { renderWithHopeProvider } from "../../../utils/test-utils";
+import { renderWithHopeProvider } from "../../test-utils";
 import { Accordion } from "../accordion";
 import { AccordionButton } from "../accordion-button";
 import { AccordionItem } from "../accordion-item";

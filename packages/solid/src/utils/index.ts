@@ -4,7 +4,6 @@ export * from "./dom";
 export * from "./function";
 export * from "./number";
 export * from "./object";
-export * from "./responsive";
 export * from "./solid";
 export * from "./tabbable";
 export * from "./types";

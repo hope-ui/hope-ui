@@ -1,5 +1,5 @@
-import { HopeWrapper } from "../../utils/storybook";
 import { Flex, Text } from "..";
+import { HopeWrapper } from "../storybook-utils";
 import { Anchor } from "./anchor";
 
 export default {
