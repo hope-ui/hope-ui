@@ -42,6 +42,8 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 > ⚠️ Hope UI is still under development and is not ready for production.
 
+> ⚠️ The `main` branch of the repo will remain unchanged until the end of SolidHack voting (May 2nd).
+
 ## Documentation
 
 For full documentation, visit [hope-ui.com](https://hope-ui.com/).
