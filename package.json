@@ -1,6 +1,5 @@
 {
   "name": "hope-ui",
-  "version": "0.0.1",
   "private": false,
   "description": "The SolidJS component library you've hoped for.",
   "keywords": [
@@ -42,8 +41,8 @@
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "prepare": "husky install",
     "storybook": "pnpm --filter @hope-ui/solid storybook",
-    "test": "jest --watch",
-    "test:ci": "jest",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
