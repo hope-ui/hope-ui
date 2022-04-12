@@ -11,11 +11,7 @@ import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useCheckboxGroupContext } from "./checkbox-group";
 
-/* -------------------------------------------------------------------------------------------------
- * CheckboxPrimitive
- * -----------------------------------------------------------------------------------------------*/
-
-type CheckboxPrimitiveChildrenRenderProp = (props: { checked: Accessor<boolean> }) => JSX.Element;
+type CheckboxPrimitiveChildrenRenderProp = (props: { state: Accessor<CheckboxPrimitiveState> }) => JSX.Element;
 
 interface CheckboxPrimitiveOptions {
   /**
@@ -338,13 +334,10 @@ export function CheckboxPrimitive<C extends ElementType = "label">(props: Checkb
 
   const inputClasses = () => classNames(local.inputClass, visuallyHiddenStyles());
 
-  const checkedAccessor = () => state.checked;
+  const stateAccessor = () => state;
 
   const context: CheckboxPrimitiveContextValue = {
     state,
-    onChange,
-    onFocus,
-    onBlur,
   };
 
   return (
@@ -385,7 +378,7 @@ export function CheckboxPrimitive<C extends ElementType = "label">(props: Checkb
           aria-describedby={state["aria-describedby"]}
         />
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as CheckboxPrimitiveChildrenRenderProp)?.({ checked: checkedAccessor })}
+          {(local.children as CheckboxPrimitiveChildrenRenderProp)?.({ state: stateAccessor })}
         </Show>
       </hope.label>
     </CheckboxPrimitiveContext.Provider>
@@ -393,11 +386,10 @@ export function CheckboxPrimitive<C extends ElementType = "label">(props: Checkb
 }
 
 /* -------------------------------------------------------------------------------------------------
- * CheckboxPrimitive - context
+ * Context
  * -----------------------------------------------------------------------------------------------*/
 
-interface CheckboxPrimitiveContextValue
-  extends Required<Pick<CheckboxPrimitiveOptions, "onChange" | "onFocus" | "onBlur">> {
+interface CheckboxPrimitiveContextValue {
   state: CheckboxPrimitiveState;
 }
 
@@ -411,34 +403,4 @@ export function useCheckboxPrimitiveContext() {
   }
 
   return context;
-}
-
-/* -------------------------------------------------------------------------------------------------
- * CheckboxPrimitiveIndicator
- * -----------------------------------------------------------------------------------------------*/
-
-export type CheckboxPrimitiveIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
-
-/**
- * Renders when the checkbox primitive is in a checked or indeterminate state.
- * You can style this element directly, or you can use it as a wrapper to put an icon into, or both.
- */
-export function CheckboxPrimitiveIndicator<C extends ElementType = "span">(props: CheckboxPrimitiveIndicatorProps<C>) {
-  const checkboxPrimitiveContext = useCheckboxPrimitiveContext();
-
-  return (
-    <Show when={checkboxPrimitiveContext.state.checked || checkboxPrimitiveContext.state.indeterminate}>
-      <hope.span
-        aria-hidden={true}
-        data-indeterminate={checkboxPrimitiveContext.state["data-indeterminate"]}
-        data-focus={checkboxPrimitiveContext.state["data-focus"]}
-        data-checked={checkboxPrimitiveContext.state["data-checked"]}
-        data-required={checkboxPrimitiveContext.state["data-required"]}
-        data-disabled={checkboxPrimitiveContext.state["data-disabled"]}
-        data-invalid={checkboxPrimitiveContext.state["data-invalid"]}
-        data-readonly={checkboxPrimitiveContext.state["data-readonly"]}
-        {...props}
-      />
-    </Show>
-  );
 }

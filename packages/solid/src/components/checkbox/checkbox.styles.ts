@@ -174,13 +174,37 @@ export const toggleControlStyles = css({
  * Checkbox - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxWrapperStyles = css(toggleWrapperStyles);
+export const checkboxWrapperStyles = css(toggleWrapperStyles, {
+  variants: {
+    labelPlacement: {
+      start: {
+        flexDirection: "row-reverse",
+      },
+      end: {
+        flexDirection: "row",
+      },
+    },
+  },
+});
+
+export type CheckboxWrapperVariants = VariantProps<typeof checkboxWrapperStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - label
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxLabelStyles = css(toggleControlLabelStyles);
+export const checkboxLabelStyles = css(toggleControlLabelStyles, {
+  variants: {
+    labelPlacement: {
+      start: {
+        marginRight: "$2",
+      },
+      end: {
+        marginLeft: "$2",
+      },
+    },
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - control

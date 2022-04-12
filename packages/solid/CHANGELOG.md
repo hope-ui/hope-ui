@@ -1,3 +1,15 @@
+## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.2...v0.5.0) (2022-0)
+
+### 💥 BREAKING CHANGES
+
+- `CheckboxControl` and `CheckboxLabel` components has been removed.
+
+### ✨ Features
+
+- Added `CheckboxPrimitive` unstyled component.
+
+### 🐛 Bug fixes
+
 ## [0.4.2](https://github.com/fabien-ml/hope-ui/compare/v0.4.1...v0.4.2) (2022-04-08)
 
 ### 🐛 Bug fixes
