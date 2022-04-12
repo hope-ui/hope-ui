@@ -224,7 +224,7 @@ const composition = `function CompositionExample() {
                       borderColor: "transparent",
                     }}
                   >
-                    <Show when={checked}>
+                    <Show when={checked()}>
                       <IconCheck boxSize="$4" />
                     </Show>
                   </Center>

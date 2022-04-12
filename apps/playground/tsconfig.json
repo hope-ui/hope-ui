@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@hope-ui/solid": ["../../packages/solid/src/index.ts"]
+    }
+  },
+  "include": ["vite.config.*", "src/**/*", "../../packages/**/*"]
+}

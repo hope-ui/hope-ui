@@ -6,6 +6,7 @@ import { hope } from "../factory";
 import { createIcon } from "../icon/create-icon";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useCheckboxContext } from "./checkbox";
+import { useCheckboxPrimitiveContext } from "./checkbox.primitive";
 import { checkboxControlStyles } from "./checkbox.styles";
 
 interface CheckboxControlOptions {
@@ -30,6 +31,7 @@ const hopeCheckboxControlClass = "hope-checkbox__control";
 export function CheckboxControl<C extends ElementType = "span">(props: CheckboxControlProps<C>) {
   const theme = useStyleConfig().Checkbox;
 
+  const checkboxPrimitiveContext = useCheckboxPrimitiveContext();
   const checkboxContext = useCheckboxContext();
 
   const defaultProps: CheckboxControlProps<"span"> = {
@@ -57,18 +59,20 @@ export function CheckboxControl<C extends ElementType = "span">(props: CheckboxC
       aria-hidden={true}
       class={classes()}
       __baseStyle={theme?.baseStyle?.control}
-      data-indeterminate={checkboxContext.state["data-indeterminate"]}
-      data-focus={checkboxContext.state["data-focus"]}
-      data-checked={checkboxContext.state["data-checked"]}
-      data-required={checkboxContext.state["data-required"]}
-      data-disabled={checkboxContext.state["data-disabled"]}
-      data-invalid={checkboxContext.state["data-invalid"]}
-      data-readonly={checkboxContext.state["data-readonly"]}
+      data-indeterminate={checkboxPrimitiveContext.state["data-indeterminate"]}
+      data-focus={checkboxPrimitiveContext.state["data-focus"]}
+      data-checked={checkboxPrimitiveContext.state["data-checked"]}
+      data-required={checkboxPrimitiveContext.state["data-required"]}
+      data-disabled={checkboxPrimitiveContext.state["data-disabled"]}
+      data-invalid={checkboxPrimitiveContext.state["data-invalid"]}
+      data-readonly={checkboxPrimitiveContext.state["data-readonly"]}
       {...others}
     >
       <Switch>
-        <Match when={checkboxContext.state.indeterminate}>{local.iconIndeterminate}</Match>
-        <Match when={checkboxContext.state.checked && !checkboxContext.state.indeterminate}>{local.iconChecked}</Match>
+        <Match when={checkboxPrimitiveContext.state.indeterminate}>{local.iconIndeterminate}</Match>
+        <Match when={checkboxPrimitiveContext.state.checked && !checkboxPrimitiveContext.state.indeterminate}>
+          {local.iconChecked}
+        </Match>
       </Switch>
     </hope.span>
   );

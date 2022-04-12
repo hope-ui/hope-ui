@@ -4,7 +4,7 @@ import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useCheckboxContext } from "./checkbox";
+import { useCheckboxPrimitiveContext } from "./checkbox.primitive";
 import { checkboxLabelStyles } from "./checkbox.styles";
 
 export type CheckboxLabelProp<C extends ElementType = "span"> = HTMLHopeProps<C>;
@@ -17,7 +17,7 @@ const hopeCheckboxLabelClass = "hope-checkbox__label";
 export function CheckboxLabel<C extends ElementType = "span">(props: CheckboxLabelProp<C>) {
   const theme = useStyleConfig().Checkbox;
 
-  const checkboxContext = useCheckboxContext();
+  const checkboxPrimitiveContext = useCheckboxPrimitiveContext();
 
   const [local, others] = splitProps(props, ["class"]);
 
@@ -29,13 +29,13 @@ export function CheckboxLabel<C extends ElementType = "span">(props: CheckboxLab
     <hope.span
       class={classes()}
       __baseStyle={theme?.baseStyle?.label}
-      data-indeterminate={checkboxContext.state["data-indeterminate"]}
-      data-focus={checkboxContext.state["data-focus"]}
-      data-checked={checkboxContext.state["data-checked"]}
-      data-required={checkboxContext.state["data-required"]}
-      data-disabled={checkboxContext.state["data-disabled"]}
-      data-invalid={checkboxContext.state["data-invalid"]}
-      data-readonly={checkboxContext.state["data-readonly"]}
+      data-indeterminate={checkboxPrimitiveContext.state["data-indeterminate"]}
+      data-focus={checkboxPrimitiveContext.state["data-focus"]}
+      data-checked={checkboxPrimitiveContext.state["data-checked"]}
+      data-required={checkboxPrimitiveContext.state["data-required"]}
+      data-disabled={checkboxPrimitiveContext.state["data-disabled"]}
+      data-invalid={checkboxPrimitiveContext.state["data-invalid"]}
+      data-readonly={checkboxPrimitiveContext.state["data-readonly"]}
       {...others}
     />
   );

@@ -39,6 +39,7 @@
     "dev:docs": "pnpm --filter @hope-ui/docs dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
+    "playground": "pnpm --filter @hope-ui/playground dev",
     "prepare": "husky install",
     "publish": "pnpm --filter @hope-ui/solid publish",
     "publish:next": "pnpm --filter @hope-ui/solid publish --tag next",

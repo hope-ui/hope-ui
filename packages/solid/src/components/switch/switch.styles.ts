@@ -1,13 +1,13 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "../../styled-system/stitches.config";
-import { toggleContainerStyles, toggleControlLabelStyles, toggleControlStyles } from "../checkbox/checkbox.styles";
+import { toggleControlLabelStyles, toggleControlStyles, toggleWrapperStyles } from "../checkbox/checkbox.styles";
 
 /* -------------------------------------------------------------------------------------------------
- * Switch - container
+ * Switch - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchContainerStyles = css(toggleContainerStyles);
+export const switchWrapperStyles = css(toggleWrapperStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - label

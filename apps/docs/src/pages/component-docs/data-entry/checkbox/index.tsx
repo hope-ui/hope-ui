@@ -149,7 +149,7 @@ export default function CheckboxDoc() {
     {
       name: "children",
       description: "The children of the checkbox. If used as a render props, the `checked` state will be passed.",
-      type: "JSX.Element | (props: { checked: boolean }) => JSX.Element",
+      type: "JSX.Element | (props: { checked: Accessor<boolean> }) => JSX.Element",
     },
     {
       name: "onChange",
@@ -522,7 +522,7 @@ export default function CheckboxDoc() {
                           borderColor: "transparent",
                         }}
                       >
-                        <Show when={checked}>
+                        <Show when={checked()}>
                           <IconCheck boxSize="$4" />
                         </Show>
                       </Center>

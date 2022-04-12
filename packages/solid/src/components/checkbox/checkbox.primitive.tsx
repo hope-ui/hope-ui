@@ -1,22 +1,23 @@
-import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
+import { Accessor, createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useStyleConfig } from "../../hope-provider";
-import { SystemStyleObject } from "../../styled-system/types";
 import { visuallyHiddenStyles } from "../../styled-system/utils";
-import { classNames, createClassSelector } from "../../utils/css";
-import { callHandler } from "../../utils/function";
+import { classNames } from "../../utils/css";
+import { callAllHandlers, callHandler } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
 import { hope } from "../factory";
+import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
-import { SwitchControlVariants, switchWrapperStyles } from "./switch.styles";
+import { useCheckboxGroupContext } from "./checkbox-group";
 
-type SwitchChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
+/* -------------------------------------------------------------------------------------------------
+ * CheckboxPrimitive
+ * -----------------------------------------------------------------------------------------------*/
 
-type ThemeableSwitchOptions = SwitchControlVariants;
+type CheckboxPrimitiveChildrenRenderProp = (props: { checked: Accessor<boolean> }) => JSX.Element;
 
-interface SwitchOptions extends ThemeableSwitchOptions {
+interface CheckboxPrimitiveOptions {
   /**
    * The ref to be passed to the internal <input> tag.
    */
@@ -28,35 +29,47 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   id?: string;
 
   /**
+   * The css class to be passed to the internal <input> tag.
+   */
+  inputClass?: string;
+
+  /**
    * The name to be passed to the internal <input> tag.
    */
   name?: string;
 
   /**
-   * The value to be used in the switch input.
+   * The value to be used in the checkbox input.
    * This is the value that will be returned on form submission.
    */
   value?: string | number;
 
   /**
-   * If `true`, the switch will be checked.
+   * If `true`, the checkbox will be checked.
    * You'll need to pass `onChange` to update its value (since it is now controlled)
    */
   checked?: boolean;
 
   /**
-   * If `true`, the switch will be initially checked.
+   * If `true`, the checkbox will be initially checked.
    */
   defaultChecked?: boolean;
 
   /**
-   * If `true`, the switch input is marked as required,
+   * If `true`, the checkbox will be indeterminate.
+   * This only affects the icon shown inside checkbox
+   * and does not modify the checked property.
+   */
+  indeterminate?: boolean;
+
+  /**
+   * If `true`, the checkbox input is marked as required,
    * and `required` attribute will be added
    */
   required?: boolean;
 
   /**
-   * If `true`, the switch will be disabled
+   * If `true`, the checkbox will be disabled
    */
   disabled?: boolean;
 
@@ -66,81 +79,88 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   invalid?: boolean;
 
   /**
-   * If `true`, the switch will be readonly
+   * If `true`, the checkbox will be readonly
    */
   readOnly?: boolean;
 
   /**
    * The children of the switch.
    */
-  children?: JSX.Element | SwitchChildrenRenderProp;
+  children?: JSX.Element | CheckboxPrimitiveChildrenRenderProp;
 
   /**
-   * The callback invoked when the checked state of the switch changes.
+   * The callback invoked when the checked state of the checkbox changes.
    */
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
   /**
-   * The callback invoked when the switch is focused
+   * The callback invoked when the checkbox is focused
    */
   onFocus?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 
   /**
-   * The callback invoked when the switch is blurred (loses focus)
+   * The callback invoked when the checkbox is blurred (loses focus)
    */
   onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchOptions>;
+export type CheckboxPrimitiveProps<C extends ElementType = "label"> = HTMLHopeProps<C, CheckboxPrimitiveOptions>;
 
-interface SwitchState extends Required<SwitchControlVariants> {
+export interface CheckboxPrimitiveState {
   /**
-   * The `checked` state of the switch.
+   * The `checked` state of the checkbox.
    * (In uncontrolled mode)
    */
   _checked: boolean;
 
   /**
-   * If `true`, the switch is in controlled mode.
+   * If `true`, the checkbox is in controlled mode.
    * (have checked and onChange props)
    */
   isControlled: boolean;
 
   /**
-   * If `true`, the switch is currently focused.
+   * If `true`, the checkbox is currently focused.
    */
   isFocused: boolean;
 
   /**
-   * The `checked` state of the switch.
+   * The `checked` state of the checkbox.
    * (In controlled mode)
    */
   checked: boolean;
 
   /**
-   * The value to be used in the switch input.
+   * The value to be used in the checkbox input.
    * This is the value that will be returned on form submission.
    */
   value?: string | number;
 
   /**
-   * The id of the input field in a switch.
+   * The id of the input field in a checkbox.
    */
   id?: string;
 
   /**
-   * The name of the input field in a switch.
+   * The name of the input field in a checkbox.
    */
   name?: string;
 
   /**
-   * If `true`, the switch input is marked as required,
+   * If `true`, the checkbox input is marked as required,
    * and `required` attribute will be added
    */
   required?: boolean;
 
   /**
-   * If `true`, the switch will be disabled
+   * If `true`, the checkbox will be indeterminate.
+   * This only affects the icon shown inside checkbox
+   * and does not modify the checked property.
+   */
+  indeterminate?: boolean;
+
+  /**
+   * If `true`, the checkbox will be disabled
    */
   disabled?: boolean;
 
@@ -150,7 +170,7 @@ interface SwitchState extends Required<SwitchControlVariants> {
   invalid?: boolean;
 
   /**
-   * If `true`, the switch will be readonly
+   * If `true`, the checkbox will be readonly
    */
   readOnly?: boolean;
 
@@ -162,6 +182,7 @@ interface SwitchState extends Required<SwitchControlVariants> {
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
 
+  "data-indeterminate"?: string;
   "data-focus"?: string;
   "data-checked"?: string;
   "data-required"?: string;
@@ -170,21 +191,20 @@ interface SwitchState extends Required<SwitchControlVariants> {
   "data-readonly"?: string;
 }
 
-const hopeSwitchClass = "hope-switch";
-const hopeSwitchInputClass = "hope-switch__input";
-
 /**
- * The component that provides context for all part of a `checkbox`.
- * It act as a container and renders a `label` with a visualy hidden `input[type=checkbox][role=switch]`.
+ * Contains all the parts of a checkbox.
+ * It renders a `label` with a visualy hidden `input[type=checkbox]`.
+ * You can style this element directly, or you can use it as a wrapper to put other components into, or both.
  */
-export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
-  const defaultId = `hope-switch-${createUniqueId()}`;
+export function CheckboxPrimitive<C extends ElementType = "label">(props: CheckboxPrimitiveProps<C>) {
+  const defaultId = `hope-checkbox-${createUniqueId()}`;
 
-  const theme = useStyleConfig().Switch;
+  const formControlContext = useFormControlContext();
+  const checkboxGroupContext = useCheckboxGroupContext();
 
   const formControlProps = useFormControl<HTMLInputElement>(props);
 
-  const [state, setState] = createStore<SwitchState>({
+  const [state, setState] = createStore<CheckboxPrimitiveState>({
     // eslint-disable-next-line solid/reactivity
     _checked: !!props.defaultChecked,
     isFocused: false,
@@ -192,37 +212,41 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
       return props.checked !== undefined;
     },
     get checked() {
+      if (checkboxGroupContext) {
+        const checkboxGroupValue = checkboxGroupContext.state.value;
+        return checkboxGroupValue != null ? checkboxGroupValue.some(val => String(props.value) === String(val)) : false;
+      }
+
+      // Not in CheckboxGroup
       return this.isControlled ? !!props.checked : this._checked;
     },
-    get variant() {
-      return props.variant ?? theme?.defaultProps?.root?.variant ?? "filled";
-    },
-    get colorScheme() {
-      return props.colorScheme ?? theme?.defaultProps?.root?.colorScheme ?? "primary";
-    },
-    get size() {
-      return props.size ?? theme?.defaultProps?.root?.size ?? "md";
-    },
     get id() {
-      return formControlProps.id ?? defaultId;
+      if (formControlContext && !checkboxGroupContext) {
+        return formControlProps.id;
+      }
+
+      return props.id ?? defaultId;
     },
     get name() {
-      return props.name;
+      return props.name ?? checkboxGroupContext?.state.name;
     },
     get value() {
       return props.value;
     },
+    get indeterminate() {
+      return props.indeterminate;
+    },
     get required() {
-      return formControlProps.required;
+      return formControlProps.required ?? checkboxGroupContext?.state.required;
     },
     get disabled() {
-      return formControlProps.disabled;
+      return formControlProps.disabled ?? checkboxGroupContext?.state.disabled;
     },
     get invalid() {
-      return formControlProps.invalid;
+      return formControlProps.invalid ?? checkboxGroupContext?.state.invalid;
     },
     get readOnly() {
-      return formControlProps.readOnly;
+      return formControlProps.readOnly ?? checkboxGroupContext?.state.readOnly;
     },
     get ["aria-required"]() {
       return this.required ? true : undefined;
@@ -244,6 +268,9 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
     },
     get ["aria-describedby"]() {
       return props["aria-describedby"];
+    },
+    get ["data-indeterminate"]() {
+      return this.indeterminate ? "" : undefined;
     },
     get ["data-focus"]() {
       return this.isFocused ? "" : undefined;
@@ -267,15 +294,13 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [local, _, others] = splitProps(
-    props as SwitchProps<"label">,
-    ["class", "children", "ref", "tabIndex", "onChange"],
+    props as CheckboxPrimitiveProps<"label">,
+    ["inputClass", "children", "ref", "tabIndex", "onChange"],
     [
-      "variant",
-      "colorScheme",
-      "size",
       "id",
       "name",
       "value",
+      "indeterminate",
       "checked",
       "defaultChecked",
       "required",
@@ -298,7 +323,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
       setState("_checked", target.checked);
     }
 
-    callHandler(local.onChange)(event);
+    callAllHandlers(checkboxGroupContext?.onChange, local.onChange)(event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
@@ -311,13 +336,11 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
     callHandler(formControlProps.onBlur)(event);
   };
 
-  const wrapperClasses = () => {
-    return classNames(local.class, hopeSwitchClass, switchWrapperStyles({ size: state.size }));
-  };
+  const inputClasses = () => classNames(local.inputClass, visuallyHiddenStyles());
 
-  const inputClasses = () => classNames(hopeSwitchInputClass, visuallyHiddenStyles());
+  const checkedAccessor = () => state.checked;
 
-  const context: SwitchContextValue = {
+  const context: CheckboxPrimitiveContextValue = {
     state,
     onChange,
     onFocus,
@@ -325,12 +348,11 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   };
 
   return (
-    <SwitchContext.Provider value={context}>
+    <CheckboxPrimitiveContext.Provider value={context}>
       <hope.label
-        class={wrapperClasses()}
-        __baseStyle={theme?.baseStyle?.root}
         for={state.id}
         data-group
+        data-indeterminate={state["data-indeterminate"]}
         data-focus={state["data-focus"]}
         data-checked={state["data-checked"]}
         data-required={state["data-required"]}
@@ -341,7 +363,6 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
       >
         <input
           type="checkbox"
-          role="switch"
           class={inputClasses()}
           ref={local.ref}
           tabIndex={local.tabIndex}
@@ -364,46 +385,60 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
           aria-describedby={state["aria-describedby"]}
         />
         <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as SwitchChildrenRenderProp)?.({ checked: state.checked })}
+          {(local.children as CheckboxPrimitiveChildrenRenderProp)?.({ checked: checkedAccessor })}
         </Show>
       </hope.label>
-    </SwitchContext.Provider>
+    </CheckboxPrimitiveContext.Provider>
   );
 }
 
-Switch.toString = () => createClassSelector(hopeSwitchClass);
-
 /* -------------------------------------------------------------------------------------------------
- * Context
+ * CheckboxPrimitive - context
  * -----------------------------------------------------------------------------------------------*/
 
-interface SwitchContextValue extends Required<Pick<SwitchOptions, "onChange" | "onFocus" | "onBlur">> {
-  state: SwitchState;
+interface CheckboxPrimitiveContextValue
+  extends Required<Pick<CheckboxPrimitiveOptions, "onChange" | "onFocus" | "onBlur">> {
+  state: CheckboxPrimitiveState;
 }
 
-const SwitchContext = createContext<SwitchContextValue>();
+const CheckboxPrimitiveContext = createContext<CheckboxPrimitiveContextValue>();
 
-export function useSwitchContext() {
-  const context = useContext(SwitchContext);
+export function useCheckboxPrimitiveContext() {
+  const context = useContext(CheckboxPrimitiveContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useSwitchContext must be used within a `<Switch />` component");
+    throw new Error("[Hope UI]: useCheckboxPrimitiveContext must be used within a `<CheckboxPrimitive />` component");
   }
 
   return context;
 }
 
 /* -------------------------------------------------------------------------------------------------
- * StyleConfig
+ * CheckboxPrimitiveIndicator
  * -----------------------------------------------------------------------------------------------*/
 
-export interface SwitchStyleConfig {
-  baseStyle?: {
-    root?: SystemStyleObject;
-    control?: SystemStyleObject;
-    label?: SystemStyleObject;
-  };
-  defaultProps?: {
-    root?: ThemeableSwitchOptions;
-  };
+export type CheckboxPrimitiveIndicatorProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
+
+/**
+ * Renders when the checkbox primitive is in a checked or indeterminate state.
+ * You can style this element directly, or you can use it as a wrapper to put an icon into, or both.
+ */
+export function CheckboxPrimitiveIndicator<C extends ElementType = "span">(props: CheckboxPrimitiveIndicatorProps<C>) {
+  const checkboxPrimitiveContext = useCheckboxPrimitiveContext();
+
+  return (
+    <Show when={checkboxPrimitiveContext.state.checked || checkboxPrimitiveContext.state.indeterminate}>
+      <hope.span
+        aria-hidden={true}
+        data-indeterminate={checkboxPrimitiveContext.state["data-indeterminate"]}
+        data-focus={checkboxPrimitiveContext.state["data-focus"]}
+        data-checked={checkboxPrimitiveContext.state["data-checked"]}
+        data-required={checkboxPrimitiveContext.state["data-required"]}
+        data-disabled={checkboxPrimitiveContext.state["data-disabled"]}
+        data-invalid={checkboxPrimitiveContext.state["data-invalid"]}
+        data-readonly={checkboxPrimitiveContext.state["data-readonly"]}
+        {...props}
+      />
+    </Show>
+  );
 }
