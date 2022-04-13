@@ -11,9 +11,9 @@ export default defineConfig({
     dts({
       tsConfigFilePath: "tsconfig.build.json",
       insertTypesEntry: true,
-      noEmitOnError: true,
-      skipDiagnostics: false,
-      logDiagnostics: true,
+      // noEmitOnError: true,
+      // skipDiagnostics: false,
+      // logDiagnostics: true,
     }),
   ],
   build: {
@@ -26,6 +26,7 @@ export default defineConfig({
       external: [
         ...Object.keys(pkg.dependencies),
         ...Object.keys(pkg.peerDependencies),
+        "solid-js",
         "solid-js/web",
         "solid-js/store",
       ],

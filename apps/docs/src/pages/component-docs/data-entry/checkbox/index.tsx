@@ -1,10 +1,10 @@
 import {
-  Anchor,
   Center,
   Checkbox,
-  CheckboxControl,
   CheckboxGroup,
-  CheckboxLabel,
+  CheckboxPrimitive,
+  CheckboxPrimitiveIndicator,
+  css,
   HStack,
   ListItem,
   Text,
@@ -12,8 +12,7 @@ import {
   VStack,
 } from "@hope-ui/solid";
 import Prism from "prismjs";
-import { Link } from "solid-app-router";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createSignal, For, onMount } from "solid-js";
 
 import Code from "@/components/Code";
 import CodeSnippet from "@/components/CodeSnippet";
@@ -29,6 +28,41 @@ import { IconPlus } from "@/icons/IconPlus";
 import { IconQuestionMark } from "@/icons/IconQuestionMark";
 
 import { snippets } from "./snippets";
+
+const checkboxRootStyles = css({
+  length: undefined,
+  rounded: "$md",
+  border: "1px solid $neutral7",
+  shadow: "$sm",
+  bg: "$loContrast",
+  px: "$4",
+  py: "$3",
+  w: "$full",
+  cursor: "pointer",
+
+  "&[data-focus]": {
+    borderColor: "$info7",
+    shadow: "0 0 0 3px $colors$info5",
+  },
+
+  "&[data-checked]": {
+    borderColor: "transparent",
+    bg: "#0c4a6e",
+    color: "white",
+  },
+});
+
+const checkboxIndicatorStyles = css({
+  length: undefined,
+  rounded: "$sm",
+  border: "1px solid $neutral7",
+  bg: "$whiteAlpha7",
+  boxSize: "$5",
+
+  _groupChecked: {
+    borderColor: "transparent",
+  },
+});
 
 export default function CheckboxDoc() {
   const preferences = [
@@ -65,39 +99,21 @@ export default function CheckboxDoc() {
     { href: "#colors", label: "Checkbox colors", indent: true },
     { href: "#sizes", label: "Checkbox sizes", indent: true },
     { href: "#variants", label: "Checkbox variants", indent: true },
+    { href: "#label-placement", label: "Checkbox label placement", indent: true },
     { href: "#disabled", label: "Disabled state", indent: true },
     { href: "#invalid", label: "Invalid state", indent: true },
     { href: "#indeterminate", label: "Indeterminate state", indent: true },
     { href: "#custom-icon", label: "Custom icon", indent: true },
     { href: "#checkbox-group", label: "CheckboxGroup", indent: true },
-    { href: "#composition", label: "Composition" },
+    { href: "#headless-api", label: "Headless API" },
     { href: "#theming", label: "Theming" },
     { href: "#props", label: "Props" },
+    { href: "#checkbox-primitive-props", label: "CheckboxPrimitive props", indent: true },
     { href: "#checkbox-props", label: "Checkbox props", indent: true },
-    { href: "#checkbox-control-props", label: "CheckboxControl props", indent: true },
     { href: "#checkbox-group-props", label: "CheckboxGroup props", indent: true },
-    { href: "#other-components-props", label: "Other components props", indent: true },
   ];
 
-  const checkboxPropItems: PropsTableItem[] = [
-    {
-      name: "variant",
-      description: "The visual style of the checkbox.",
-      type: '"outline" | "filled"',
-      defaultValue: '"outline"',
-    },
-    {
-      name: "colorScheme",
-      description: "The color of the checkbox.",
-      type: '"primary" | "accent" | "neutral" | "success" | "info" | "warning" | "danger"',
-      defaultValue: '"primary"',
-    },
-    {
-      name: "size",
-      description: "The size of the checkbox.",
-      type: '"sm" | "md" | "lg"',
-      defaultValue: '"md"',
-    },
+  const checkboxPrimitivePropItems: PropsTableItem[] = [
     {
       name: "name",
       description: "The name of the input field in a checkbox (Useful for form submission).",
@@ -148,8 +164,8 @@ export default function CheckboxDoc() {
     },
     {
       name: "children",
-      description: "The children of the checkbox. If used as a render props, the `checked` state will be passed.",
-      type: "JSX.Element | (props: { checked: boolean }) => JSX.Element",
+      description: "The children of the checkbox. If used as a render props, the internal state will be passed.",
+      type: "JSX.Element | (props: { state: Accessor<CheckboxState> }) => JSX.Element",
     },
     {
       name: "onChange",
@@ -168,7 +184,31 @@ export default function CheckboxDoc() {
     },
   ];
 
-  const checkboxControlPropItems: PropsTableItem[] = [
+  const checkboxPropItems: PropsTableItem[] = [
+    {
+      name: "variant",
+      description: "The visual style of the checkbox.",
+      type: '"outline" | "filled"',
+      defaultValue: '"outline"',
+    },
+    {
+      name: "colorScheme",
+      description: "The color of the checkbox.",
+      type: '"primary" | "accent" | "neutral" | "success" | "info" | "warning" | "danger"',
+      defaultValue: '"primary"',
+    },
+    {
+      name: "size",
+      description: "The size of the checkbox.",
+      type: '"sm" | "md" | "lg"',
+      defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the checkbox label.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
+    },
     {
       name: "iconChecked",
       description: "The icon to use when the checkbox is checked.",
@@ -179,7 +219,13 @@ export default function CheckboxDoc() {
       description: "The icon to use when the checkbox is in indeterminate state.",
       type: "JSX.Element",
     },
+    {
+      name: "children",
+      description: "The children of the checkbox.",
+      type: "JSX.Element",
+    },
   ];
+
   const checkboxGroupPropItems: PropsTableItem[] = [
     {
       name: "variant",
@@ -198,6 +244,12 @@ export default function CheckboxDoc() {
       description: "The size of the checkboxes.",
       type: '"sm" | "md" | "lg"',
       defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the checkboxes labels.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
     },
     {
       name: "name",
@@ -262,15 +314,15 @@ export default function CheckboxDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>Checkbox:</strong> Provides context for all its children. It renders a <Code>label</Code> and a
-          visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code>.
+          <strong>CheckboxPrimitive:</strong> Unstyled component containing all the parts of a checkbox. It renders a{" "}
+          <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code>.
         </ListItem>
         <ListItem>
-          <strong>CheckboxControl:</strong> The component that visualy represents a checkbox. It's not visible by screen
-          readers.
+          <strong>CheckboxPrimitiveIndicator:</strong> Unstyled component rendered when the{" "}
+          <Code>CheckboxPrimitive</Code> is in a <Code>checked</Code> or <Code>indeterminate</Code> state.
         </ListItem>
         <ListItem>
-          <strong>CheckboxLabel:</strong> The label of the checkbox.
+          <strong>Checkbox:</strong> The Hope UI styled checkbox component based on <Code>CheckboxPrimitive</Code>.
         </ListItem>
         <ListItem>
           <strong>CheckboxGroup:</strong> Component to help manage the checked state of its children{" "}
@@ -280,10 +332,7 @@ export default function CheckboxDoc() {
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5"></Text>
       <Preview snippet={snippets.basicUsage} mb="$12">
-        <Checkbox defaultChecked>
-          <CheckboxControl />
-          <CheckboxLabel>Checkbox</CheckboxLabel>
-        </Checkbox>
+        <Checkbox defaultChecked>Checkbox</Checkbox>
       </Preview>
       <SectionSubtitle id="colors">Checkbox colors</SectionSubtitle>
       <Text mb="$5">
@@ -293,27 +342,13 @@ export default function CheckboxDoc() {
       </Text>
       <Preview snippet={snippets.checkboxColors} mb="$10">
         <HStack spacing="$4">
-          <Checkbox defaultChecked colorScheme="primary">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="accent">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="neutral">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="success">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="info">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="warning">
-            <CheckboxControl />
-          </Checkbox>
-          <Checkbox defaultChecked colorScheme="danger">
-            <CheckboxControl />
-          </Checkbox>
+          <Checkbox defaultChecked colorScheme="primary" />
+          <Checkbox defaultChecked colorScheme="accent" />
+          <Checkbox defaultChecked colorScheme="neutral" />
+          <Checkbox defaultChecked colorScheme="success" />
+          <Checkbox defaultChecked colorScheme="info" />
+          <Checkbox defaultChecked colorScheme="warning" />
+          <Checkbox defaultChecked colorScheme="danger" />
         </HStack>
       </Preview>
       <SectionSubtitle id="sizes">Checkbox sizes</SectionSubtitle>
@@ -324,16 +359,13 @@ export default function CheckboxDoc() {
       <Preview snippet={snippets.checkboxSizes} mb="$10">
         <HStack spacing="$4">
           <Checkbox defaultChecked size="sm">
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
           <Checkbox defaultChecked size="md">
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
           <Checkbox defaultChecked size="lg">
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
         </HStack>
       </Preview>
@@ -344,14 +376,19 @@ export default function CheckboxDoc() {
       </Text>
       <Preview snippet={snippets.checkboxVariants} mb="$10">
         <HStack spacing="$4">
-          <Checkbox variant="outline">
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
-          </Checkbox>
-          <Checkbox variant="filled">
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
-          </Checkbox>
+          <Checkbox variant="outline">Checkbox</Checkbox>
+          <Checkbox variant="filled">Checkbox</Checkbox>
+        </HStack>
+      </Preview>
+      <SectionSubtitle id="label-placement">Checkbox label placement</SectionSubtitle>
+      <Text mb="$5">
+        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set the value to{" "}
+        <Code>start</Code> or <Code>end</Code>.
+      </Text>
+      <Preview snippet={snippets.checkboxLabelPlacement} mb="$10">
+        <HStack spacing="$4">
+          <Checkbox labelPlacement="start">Checkbox</Checkbox>
+          <Checkbox labelPlacement="end">Checkbox</Checkbox>
         </HStack>
       </Preview>
       <SectionSubtitle id="disabled">Disabled state</SectionSubtitle>
@@ -360,17 +397,12 @@ export default function CheckboxDoc() {
       </Text>
       <Preview snippet={snippets.checkboxDisabled} mb="$10">
         <HStack spacing="$4">
-          <Checkbox disabled>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
-          </Checkbox>
+          <Checkbox disabled>Checkbox</Checkbox>
           <Checkbox variant="filled" disabled>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
           <Checkbox defaultChecked disabled>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
         </HStack>
       </Preview>
@@ -380,17 +412,12 @@ export default function CheckboxDoc() {
       </Text>
       <Preview snippet={snippets.checkboxInvalid} mb="$10">
         <HStack spacing="$4">
-          <Checkbox invalid>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
-          </Checkbox>
+          <Checkbox invalid>Checkbox</Checkbox>
           <Checkbox variant="filled" invalid>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
           <Checkbox defaultChecked invalid>
-            <CheckboxControl />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+            Checkbox
           </Checkbox>
         </HStack>
       </Preview>
@@ -402,27 +429,24 @@ export default function CheckboxDoc() {
         <Checkbox
           checked={allChecked()}
           indeterminate={isIndeterminate()}
-          onChange={e =>
+          onChange={(e: Event) =>
             setCheckedItems([(e.target as HTMLInputElement).checked, (e.target as HTMLInputElement).checked])
           }
         >
-          <CheckboxControl />
-          <CheckboxLabel>Parent Checkbox</CheckboxLabel>
+          Parent Checkbox
         </Checkbox>
         <VStack alignItems="flex-start" pl="$6" mt="$1" spacing="$1">
           <Checkbox
             checked={checkedItems()[0]}
-            onChange={e => setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])}
+            onChange={(e: Event) => setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])}
           >
-            <CheckboxControl />
-            <CheckboxLabel>Child Checkbox 1</CheckboxLabel>
+            Child Checkbox 1
           </Checkbox>
           <Checkbox
             checked={checkedItems()[1]}
-            onChange={e => setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])}
+            onChange={(e: Event) => setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])}
           >
-            <CheckboxControl />
-            <CheckboxLabel>Child Checkbox 2</CheckboxLabel>
+            Child Checkbox 2
           </Checkbox>
         </VStack>
       </Preview>
@@ -433,13 +457,11 @@ export default function CheckboxDoc() {
       </Text>
       <Preview snippet={snippets.checkboxCustomIcon} mb="$12">
         <HStack spacing="$4">
-          <Checkbox defaultChecked>
-            <CheckboxControl iconChecked={<IconPlus />} />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+          <Checkbox defaultChecked iconChecked={<IconPlus />}>
+            Checkbox
           </Checkbox>
-          <Checkbox indeterminate>
-            <CheckboxControl iconIndeterminate={<IconQuestionMark />} />
-            <CheckboxLabel>Checkbox</CheckboxLabel>
+          <Checkbox indeterminate iconIndeterminate={<IconQuestionMark />}>
+            Checkbox
           </Checkbox>
         </HStack>
       </Preview>
@@ -452,83 +474,45 @@ export default function CheckboxDoc() {
       <Preview snippet={snippets.checkboxGroup} mb="$12">
         <CheckboxGroup colorScheme="success" defaultValue={["luffy", "sanji"]}>
           <HStack spacing="$5">
-            <Checkbox value="luffy">
-              <CheckboxControl />
-              <CheckboxLabel>Luffy</CheckboxLabel>
-            </Checkbox>
-            <Checkbox value="zoro">
-              <CheckboxControl />
-              <CheckboxLabel>Zoro</CheckboxLabel>
-            </Checkbox>
-            <Checkbox value="sanji">
-              <CheckboxControl />
-              <CheckboxLabel>Sanji</CheckboxLabel>
-            </Checkbox>
+            <Checkbox value="luffy">Luffy</Checkbox>
+            <Checkbox value="zoro">Zoro</Checkbox>
+            <Checkbox value="sanji">Sanji</Checkbox>
           </HStack>
         </CheckboxGroup>
       </Preview>{" "}
-      <SectionTitle id="composition">Composition</SectionTitle>
+      <SectionTitle id="headless-api">Headless API</SectionTitle>
       <Text mb="$5">
-        <Code>Checkbox</Code> is made up of several components that you can customize to achieve your desired design.
+        Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design. You can pair it with
+        your styling solution of choice. The below example uses style props and the <Code>css</Code> function.
       </Text>
-      <Preview snippet={snippets.composition} mb="$12">
+      <Preview snippet={snippets.headless} mb="$12">
         <CheckboxGroup>
           <VStack spacing="$4">
             <For each={preferences}>
               {preference => (
-                <Checkbox
-                  value={preference.id}
-                  rounded="$md"
-                  border="1px solid $neutral7"
-                  shadow="$sm"
-                  bg="$loContrast"
-                  px="$4"
-                  py="$3"
-                  w="$full"
-                  _focus={{
-                    borderColor: "$info7",
-                    shadow: "0 0 0 3px $colors$info5",
-                  }}
-                  _checked={{
-                    borderColor: "transparent",
-                    bg: "#0c4a6e",
-                    color: "white",
-                  }}
-                >
-                  {({ checked }) => (
-                    <HStack justifyContent="space-between" w="$full">
-                      <CheckboxLabel>
-                        <VStack alignItems="flex-start">
-                          <Text size="sm" fontWeight="$semibold">
-                            {preference.name}
-                          </Text>
-                          <Text
-                            size="sm"
-                            color="$neutral11"
-                            _groupChecked={{
-                              color: "$whiteAlpha12",
-                            }}
-                          >
-                            {preference.description}
-                          </Text>
-                        </VStack>
-                      </CheckboxLabel>
-                      <Center
-                        rounded="$sm"
-                        border="1px solid $neutral7"
-                        bg="$whiteAlpha7"
-                        boxSize="$5"
+                <CheckboxPrimitive value={preference.id} class={checkboxRootStyles()}>
+                  <HStack justifyContent="space-between" w="$full">
+                    <VStack alignItems="flex-start">
+                      <Text size="sm" fontWeight="$semibold">
+                        {preference.name}
+                      </Text>
+                      <Text
+                        size="sm"
+                        color="$neutral11"
                         _groupChecked={{
-                          borderColor: "transparent",
+                          color: "$whiteAlpha12",
                         }}
                       >
-                        <Show when={checked}>
-                          <IconCheck boxSize="$4" />
-                        </Show>
-                      </Center>
-                    </HStack>
-                  )}
-                </Checkbox>
+                        {preference.description}
+                      </Text>
+                    </VStack>
+                    <Center class={checkboxIndicatorStyles()}>
+                      <CheckboxPrimitiveIndicator>
+                        <IconCheck display="block" boxSize="$4" />
+                      </CheckboxPrimitiveIndicator>
+                    </Center>
+                  </HStack>
+                </CheckboxPrimitive>
               )}
             </For>
           </VStack>
@@ -541,20 +525,16 @@ export default function CheckboxDoc() {
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
+      <SectionSubtitle id="checkbox-primitive-props">CheckboxPrimitive props</SectionSubtitle>
+      <PropsTable items={checkboxPrimitivePropItems} mb="$10" />
       <SectionSubtitle id="checkbox-props">Checkbox props</SectionSubtitle>
-      <PropsTable items={checkboxPropItems} mb="$10" />
-      <SectionSubtitle id="checkbox-control-props">CheckboxControl props</SectionSubtitle>
-      <PropsTable items={checkboxControlPropItems} mb="$10" />
-      <SectionSubtitle id="checkbox-group-props">CheckboxGroup props</SectionSubtitle>
-      <PropsTable items={checkboxGroupPropItems} mb="$10" />
-      <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
-      <Text>
-        <Code>CheckboxLabel</Code> composes{" "}
-        <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
-          Box
-        </Anchor>
-        .
+      <Text mb="$5">
+        <Code>Checkbox</Code> composes the <Code>CheckboxPrimitive</Code> component, so you can pass all its props.
+        These are props specific to the <Code>Checkbox</Code> component:
       </Text>
+      <PropsTable items={checkboxPropItems} mb="$10" />
+      <SectionSubtitle id="checkbox-group-props">CheckboxGroup props</SectionSubtitle>
+      <PropsTable items={checkboxGroupPropItems} />
     </PageLayout>
   );
 }

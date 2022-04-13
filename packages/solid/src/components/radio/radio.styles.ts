@@ -1,13 +1,13 @@
 import { VariantProps } from "@stitches/core";
 
 import { css } from "../../styled-system/stitches.config";
-import { toggleContainerStyles, toggleControlLabelStyles, toggleControlStyles } from "../checkbox/checkbox.styles";
+import { toggleControlLabelStyles, toggleControlStyles, toggleWrapperStyles } from "../checkbox/checkbox.styles";
 
 /* -------------------------------------------------------------------------------------------------
- * Radio - container
+ * Radio - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioContainerStyles = css(toggleContainerStyles);
+export const radioWrapperStyles = css(toggleWrapperStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - label

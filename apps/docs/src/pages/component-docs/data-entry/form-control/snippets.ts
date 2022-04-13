@@ -197,10 +197,7 @@ export function FelteExample() {
           <FormErrorMessage>{errors("bio")[0]}</FormErrorMessage>
         </Show>
       </FormControl>
-      <Checkbox name="subscribe">
-        <CheckboxControl />
-        <CheckboxLabel>Subscribe to the newsletter</CheckboxLabel>
-      </Checkbox>
+      <Checkbox name="subscribe">Subscribe to the newsletter</Checkbox>
       <HStack justifyContent="flex-end">
         <Button type="submit" disabled={!isValid()}>
           Submit

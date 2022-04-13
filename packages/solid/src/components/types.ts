@@ -2,7 +2,7 @@ import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
 import { StyleProps } from "../styled-system/system";
 import { SystemStyleObject } from "../styled-system/types";
-import { RightJoinProps } from "../utils/types";
+import { OverrideProps } from "../utils/types";
 
 /**
  * Represent any HTML element or SolidJS component.
@@ -38,7 +38,7 @@ export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObj
 /**
  * Enhance props of a SolidJS component or jsx element with Hope UI props.
  */
-export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
+export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = OverrideProps<
   PropsWithChildren<PropsOf<C>>,
   HopeProps & AdditionalProps & { as?: C }
 >;

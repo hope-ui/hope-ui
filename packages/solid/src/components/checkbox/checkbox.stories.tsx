@@ -4,9 +4,7 @@ import { Button } from "..";
 import { HStack, VStack } from "../stack/stack";
 import { HopeWrapper } from "../storybook-utils";
 import { Checkbox } from "./checkbox";
-import { CheckboxControl } from "./checkbox-control";
 import { CheckboxGroup } from "./checkbox-group";
-import { CheckboxLabel } from "./checkbox-label";
 
 export default {
   title: "Data entry/Checkbox",
@@ -72,13 +70,9 @@ export const Default = (args: any) => {
       <Button onClick={() => setChecked(prev => !prev)}>Toggle controlled checkbox ({checked().toString()})</Button>
       <HStack spacing="$5">
         <Checkbox {...args} checked={checked()} onChange={onChange}>
-          <CheckboxControl />
-          <CheckboxLabel>Controlled</CheckboxLabel>
+          Controlled
         </Checkbox>
-        <Checkbox {...args}>
-          <CheckboxControl />
-          <CheckboxLabel>Uncontrolled</CheckboxLabel>
-        </Checkbox>
+        <Checkbox {...args}>Uncontrolled</Checkbox>
       </HStack>
     </VStack>
   );
@@ -96,34 +90,16 @@ export const WithCheckboxGroup = (args: any) => {
       <Button onClick={() => setFruits(["apple"])}>Select Apple (current: {JSON.stringify(fruits())})</Button>
       <CheckboxGroup name="fruit" onChange={onChange} value={fruits()} {...args}>
         <HStack spacing="$5">
-          <Checkbox value="peach">
-            <CheckboxControl />
-            <CheckboxLabel>Peach</CheckboxLabel>
-          </Checkbox>
-          <Checkbox value="apple">
-            <CheckboxControl />
-            <CheckboxLabel>Apple</CheckboxLabel>
-          </Checkbox>
-          <Checkbox value="orange">
-            <CheckboxControl />
-            <CheckboxLabel>Orange</CheckboxLabel>
-          </Checkbox>
+          <Checkbox value="peach">Peach</Checkbox>
+          <Checkbox value="apple">Apple</Checkbox>
+          <Checkbox value="orange">Orange</Checkbox>
         </HStack>
       </CheckboxGroup>
       <CheckboxGroup defaultValue={["apple"]} {...args}>
         <HStack spacing="$5">
-          <Checkbox value="peach">
-            <CheckboxControl />
-            <CheckboxLabel>Peach</CheckboxLabel>
-          </Checkbox>
-          <Checkbox value="apple">
-            <CheckboxControl />
-            <CheckboxLabel>Apple</CheckboxLabel>
-          </Checkbox>
-          <Checkbox value="orange">
-            <CheckboxControl />
-            <CheckboxLabel>Orange</CheckboxLabel>
-          </Checkbox>
+          <Checkbox value="peach">Peach</Checkbox>
+          <Checkbox value="apple">Apple</Checkbox>
+          <Checkbox value="orange">Orange</Checkbox>
         </HStack>
       </CheckboxGroup>
     </VStack>
