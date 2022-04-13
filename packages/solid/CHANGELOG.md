@@ -6,9 +6,7 @@
 
 ### ✨ Features
 
-- Added `CheckboxPrimitive` unstyled component.
-
-### 🐛 Bug fixes
+- Added `CheckboxPrimitive` and `CheckboxPrimitiveIndicator` unstyled component.
 
 ## [0.4.2](https://github.com/fabien-ml/hope-ui/compare/v0.4.1...v0.4.2) (2022-04-08)
 
