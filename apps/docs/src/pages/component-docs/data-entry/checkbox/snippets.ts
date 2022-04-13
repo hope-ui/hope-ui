@@ -1,8 +1,8 @@
 const importComponent = `import { 
   CheckboxPrimitive,
-  CheckboxPrimitiveIndicator ,
+  CheckboxPrimitiveIndicator,
   Checkbox, 
-  CheckboxGroup,
+  CheckboxGroup
 } from "@hope-ui/solid"`;
 
 const basicUsage = `<Checkbox defaultChecked>Checkbox</Checkbox>`;
@@ -95,7 +95,42 @@ const checkboxGroup = `<CheckboxGroup colorScheme="success" defaultValue={["luff
   </HStack>
 </CheckboxGroup>`;
 
-const headless = `function HeadlessExample() {
+const headless = `import { css } from "@hope-ui/solid"
+
+const checkboxRootStyles = css({
+  rounded: "$md",
+  border: "1px solid $neutral7",
+  shadow: "$sm",
+  bg: "$loContrast",
+  px: "$4",
+  py: "$3",
+  w: "$full",
+  cursor: "pointer",
+
+  "&[data-focus]": {
+    borderColor: "$info7",
+    shadow: "0 0 0 3px $colors$info5",
+  },
+
+  "&[data-checked]": {
+    borderColor: "transparent",
+    bg: "#0c4a6e",
+    color: "white",
+  },
+});
+
+const checkboxIndicatorStyles = css({
+  rounded: "$sm",
+  border: "1px solid $neutral7",
+  bg: "$whiteAlpha7",
+  boxSize: "$5",
+
+  _groupChecked: {
+    borderColor: "transparent",
+  },
+});
+
+function HeadlessExample() {
   const preferences = [
     {
       id: 1,
@@ -119,59 +154,32 @@ const headless = `function HeadlessExample() {
       <VStack spacing="$4">
         <For each={preferences}>
           {preference => (
-            <Checkbox
-              value={preference.id}
-              rounded="$md"
-              border="1px solid $neutral7"
-              shadow="$sm"
-              bg="$loContrast"
-              px="$4"
-              py="$3"
-              w="$full"
-              _focus={{
-                borderColor: "$info7",
-                shadow: "0 0 0 3px $colors$info5",
-              }}
-              _checked={{
-                borderColor: "transparent",
-                bg: "#0c4a6e",
-                color: "white",
-              }}
+            <CheckboxPrimitive 
+              value={preference.id} 
+              class={checkboxRootStyles()}
             >
-              {({ checked }) => (
-                <HStack justifyContent="space-between" w="$full">
-                  <CheckboxLabel>
-                    <VStack alignItems="flex-start">
-                      <Text size="sm" fontWeight="$semibold">
-                        {preference.name}
-                      </Text>
-                      <Text
-                        size="sm"
-                        color="$neutral11"
-                        _groupChecked={{
-                          color: "$whiteAlpha12",
-                        }}
-                      >
-                        {preference.description}
-                      </Text>
-                    </VStack>
-                  </CheckboxLabel>
-                  <Center
-                    rounded="$sm"
-                    border="1px solid $neutral7"
-                    bg="$whiteAlpha7"
-                    boxSize="$5"
+              <HStack justifyContent="space-between" w="$full">
+                <VStack alignItems="flex-start">
+                  <Text size="sm" fontWeight="$semibold">
+                    {preference.name}
+                  </Text>
+                  <Text
+                    size="sm"
+                    color="$neutral11"
                     _groupChecked={{
-                      borderColor: "transparent",
+                      color: "$whiteAlpha12",
                     }}
                   >
-                    <Show when={checked()}>
-                      <IconCheck boxSize="$4" />
-                    </Show>
-                  </Center>
-                </HStack>
-              )}
-            </Checkbox>
+                    {preference.description}
+                  </Text>
+                </VStack>
+                <Center class={checkboxIndicatorStyles()}>
+                  <CheckboxPrimitiveIndicator>
+                    <IconCheck display="block" boxSize="$4" />
+                  </CheckboxPrimitiveIndicator>
+                </Center>
+              </HStack>
+            </CheckboxPrimitive>
           )}
         </For>
       </VStack>

@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Center,
   Checkbox,
   CheckboxGroup,
@@ -13,7 +12,6 @@ import {
   VStack,
 } from "@hope-ui/solid";
 import Prism from "prismjs";
-import { Link } from "solid-app-router";
 import { createSignal, For, onMount } from "solid-js";
 
 import Code from "@/components/Code";
@@ -31,7 +29,8 @@ import { IconQuestionMark } from "@/icons/IconQuestionMark";
 
 import { snippets } from "./snippets";
 
-const styledCheckboxRootStyles = css({
+const checkboxRootStyles = css({
+  length: undefined,
   rounded: "$md",
   border: "1px solid $neutral7",
   shadow: "$sm",
@@ -53,7 +52,8 @@ const styledCheckboxRootStyles = css({
   },
 });
 
-const styledCheckboxBoxStyles = css({
+const checkboxIndicatorStyles = css({
+  length: undefined,
   rounded: "$sm",
   border: "1px solid $neutral7",
   bg: "$whiteAlpha7",
@@ -111,28 +111,9 @@ export default function CheckboxDoc() {
     { href: "#checkbox-primitive-props", label: "CheckboxPrimitive props", indent: true },
     { href: "#checkbox-props", label: "Checkbox props", indent: true },
     { href: "#checkbox-group-props", label: "CheckboxGroup props", indent: true },
-    { href: "#other-components-props", label: "Other components props", indent: true },
   ];
 
-  const checkboxPropItems: PropsTableItem[] = [
-    {
-      name: "variant",
-      description: "The visual style of the checkbox.",
-      type: '"outline" | "filled"',
-      defaultValue: '"outline"',
-    },
-    {
-      name: "colorScheme",
-      description: "The color of the checkbox.",
-      type: '"primary" | "accent" | "neutral" | "success" | "info" | "warning" | "danger"',
-      defaultValue: '"primary"',
-    },
-    {
-      name: "size",
-      description: "The size of the checkbox.",
-      type: '"sm" | "md" | "lg"',
-      defaultValue: '"md"',
-    },
+  const checkboxPrimitivePropItems: PropsTableItem[] = [
     {
       name: "name",
       description: "The name of the input field in a checkbox (Useful for form submission).",
@@ -203,7 +184,31 @@ export default function CheckboxDoc() {
     },
   ];
 
-  const checkboxControlPropItems: PropsTableItem[] = [
+  const checkboxPropItems: PropsTableItem[] = [
+    {
+      name: "variant",
+      description: "The visual style of the checkbox.",
+      type: '"outline" | "filled"',
+      defaultValue: '"outline"',
+    },
+    {
+      name: "colorScheme",
+      description: "The color of the checkbox.",
+      type: '"primary" | "accent" | "neutral" | "success" | "info" | "warning" | "danger"',
+      defaultValue: '"primary"',
+    },
+    {
+      name: "size",
+      description: "The size of the checkbox.",
+      type: '"sm" | "md" | "lg"',
+      defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the checkbox label.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
+    },
     {
       name: "iconChecked",
       description: "The icon to use when the checkbox is checked.",
@@ -214,7 +219,13 @@ export default function CheckboxDoc() {
       description: "The icon to use when the checkbox is in indeterminate state.",
       type: "JSX.Element",
     },
+    {
+      name: "children",
+      description: "The children of the checkbox.",
+      type: "JSX.Element",
+    },
   ];
+
   const checkboxGroupPropItems: PropsTableItem[] = [
     {
       name: "variant",
@@ -233,6 +244,12 @@ export default function CheckboxDoc() {
       description: "The size of the checkboxes.",
       type: '"sm" | "md" | "lg"',
       defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the checkboxes labels.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
     },
     {
       name: "name",
@@ -466,14 +483,14 @@ export default function CheckboxDoc() {
       <SectionTitle id="headless-api">Headless API</SectionTitle>
       <Text mb="$5">
         Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design. You can pair it with
-        your styling solution of choice. The below example uses both Hope UI styles props and Stitches.
+        your styling solution of choice. The below example uses style props and the <Code>css</Code> function.
       </Text>
       <Preview snippet={snippets.headless} mb="$12">
         <CheckboxGroup>
           <VStack spacing="$4">
             <For each={preferences}>
               {preference => (
-                <CheckboxPrimitive value={preference.id} class={styledCheckboxRootStyles()}>
+                <CheckboxPrimitive value={preference.id} class={checkboxRootStyles()}>
                   <HStack justifyContent="space-between" w="$full">
                     <VStack alignItems="flex-start">
                       <Text size="sm" fontWeight="$semibold">
@@ -489,9 +506,9 @@ export default function CheckboxDoc() {
                         {preference.description}
                       </Text>
                     </VStack>
-                    <Center class={styledCheckboxBoxStyles()}>
+                    <Center class={checkboxIndicatorStyles()}>
                       <CheckboxPrimitiveIndicator>
-                        <IconCheck boxSize="$4" />
+                        <IconCheck display="block" boxSize="$4" />
                       </CheckboxPrimitiveIndicator>
                     </Center>
                   </HStack>
@@ -508,20 +525,16 @@ export default function CheckboxDoc() {
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
+      <SectionSubtitle id="checkbox-primitive-props">CheckboxPrimitive props</SectionSubtitle>
+      <PropsTable items={checkboxPrimitivePropItems} mb="$10" />
       <SectionSubtitle id="checkbox-props">Checkbox props</SectionSubtitle>
-      <PropsTable items={checkboxPropItems} mb="$10" />
-      <SectionSubtitle id="checkbox-control-props">CheckboxControl props</SectionSubtitle>
-      <PropsTable items={checkboxControlPropItems} mb="$10" />
-      <SectionSubtitle id="checkbox-group-props">CheckboxGroup props</SectionSubtitle>
-      <PropsTable items={checkboxGroupPropItems} mb="$10" />
-      <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
-      <Text>
-        <Code>CheckboxLabel</Code> composes{" "}
-        <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
-          Box
-        </Anchor>
-        .
+      <Text mb="$5">
+        <Code>Checkbox</Code> composes the <Code>CheckboxPrimitive</Code> component, so you can pass all its props.
+        These are props specific to the <Code>Checkbox</Code> component:
       </Text>
+      <PropsTable items={checkboxPropItems} mb="$10" />
+      <SectionSubtitle id="checkbox-group-props">CheckboxGroup props</SectionSubtitle>
+      <PropsTable items={checkboxGroupPropItems} />
     </PageLayout>
   );
 }
