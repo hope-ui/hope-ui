@@ -60,10 +60,10 @@ export type HTMLHopeComponents = {
 
 export interface HopeFactoryStyleOptions<T extends ElementType> {
   /**
-   * The CSS class to use when targeting the component in a css selector.
-   * This class will be applied to the rendered dom element of the component.
+   * Base CSS class applied to the component.
+   * This class will be used when targeting the component in a css selector.
    */
-  className?: string;
+  baseClass?: string;
 
   /**
    * Base style applied to the component.

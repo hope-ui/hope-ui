@@ -39,7 +39,7 @@ const styled: HopeFactory = <T extends ElementType>(component: T, styleOptions?:
 
     const classes = () => {
       return classNames(
-        styleOptions?.className, // In order to target the component in stitches css method and prop, like any other Hope UI components.
+        styleOptions?.baseClass, // In order to target the component in stitches css method and prop, like any other Hope UI components.
         local.class,
         local.className,
         createStyledSystemClass(styleProps, __baseStyles())
@@ -50,7 +50,7 @@ const styled: HopeFactory = <T extends ElementType>(component: T, styleOptions?:
   };
 
   // In order to target the component in stitches css method and prop, like any other Hope UI components.
-  hopeComponent.toString = () => (styleOptions?.className ? createClassSelector(styleOptions.className) : "");
+  hopeComponent.toString = () => (styleOptions?.baseClass ? createClassSelector(styleOptions.baseClass) : "");
 
   return hopeComponent;
 };

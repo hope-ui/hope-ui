@@ -7,7 +7,18 @@ import { toggleControlLabelStyles, toggleControlStyles, toggleWrapperStyles } fr
  * Switch - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const switchWrapperStyles = css(toggleWrapperStyles);
+export const switchWrapperStyles = css(toggleWrapperStyles, {
+  variants: {
+    labelPlacement: {
+      start: {
+        flexDirection: "row",
+      },
+      end: {
+        flexDirection: "row-reverse",
+      },
+    },
+  },
+});
 
 /* -------------------------------------------------------------------------------------------------
  * Switch - label

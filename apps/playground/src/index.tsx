@@ -1,36 +1,52 @@
 import "./index.css";
 
-import {
-  Checkbox,
-  CheckboxPrimitive,
-  CheckboxPrimitiveIndicator,
-  createIcon,
-  HopeProvider,
-  NotificationsProvider,
-} from "@hope-ui/solid";
+import { hope, HopeProvider, NotificationsProvider, SwitchPrimitive, SwitchPrimitiveThumb } from "@hope-ui/solid";
 import { render } from "solid-js/web";
 
-const CheckIcon = createIcon({
-  viewBox: "0 0 15 15",
-  path: () => (
-    <path
-      d="M11.4669 3.72684C11.7558 3.91574 11.8369 4.30308 11.648 4.59198L7.39799 11.092C7.29783 11.2452 7.13556 11.3467 6.95402 11.3699C6.77247 11.3931 6.58989 11.3355 6.45446 11.2124L3.70446 8.71241C3.44905 8.48022 3.43023 8.08494 3.66242 7.82953C3.89461 7.57412 4.28989 7.55529 4.5453 7.78749L6.75292 9.79441L10.6018 3.90792C10.7907 3.61902 11.178 3.53795 11.4669 3.72684Z"
-      fill="currentColor"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-    />
-  ),
+const StyledSwitch = hope(SwitchPrimitive, {
+  baseStyle: {
+    all: "unset",
+    width: 42,
+    height: 25,
+    backgroundColor: "$blackAlpha9",
+    borderRadius: "9999px",
+    position: "relative",
+    boxShadow: "0 2px 10px $colors$blackAlpha7",
+    WebkitTapHighlightColor: "rgba(0, 0, 0, 0)",
+
+    "&[data-focus]": {
+      boxShadow: `0 0 0 2px black`,
+    },
+
+    "&[data-checked]": {
+      backgroundColor: "black",
+    },
+  },
+});
+
+const StyledThumb = hope(SwitchPrimitiveThumb, {
+  baseStyle: {
+    display: "block",
+    width: 21,
+    height: 21,
+    backgroundColor: "white",
+    borderRadius: "9999px",
+    boxShadow: "0 2px 2px $colors$blackAlpha7",
+    transition: "transform 100ms",
+    transform: "translateX(2px)",
+    willChange: "transform",
+    "&[data-checked]": {
+      transform: "translateX(19px)",
+    },
+  },
 });
 
 function App() {
   return (
     <div>
-      <CheckboxPrimitive class="cursor-pointer flex justify-center items-center bg-white w-6 h-6 rounded shadow-md hover:bg-violet-100 focus-within:ring-2 focus-within:ring-offset-0 focus-within:ring-black">
-        <CheckboxPrimitiveIndicator class="flex justify-center items-center text-violet-700">
-          <CheckIcon />
-        </CheckboxPrimitiveIndicator>
-      </CheckboxPrimitive>
-      <Checkbox>Checkbox</Checkbox>
+      <StyledSwitch>
+        <StyledThumb />
+      </StyledSwitch>
     </div>
   );
 }

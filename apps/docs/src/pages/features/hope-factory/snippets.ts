@@ -20,7 +20,7 @@ function Example() {
 }`;
 
 const attachingStyles = `const HopeLink = hope(Link, {
-  className: "my-link",
+  baseClass: "my-link",
   baseStyle: {
     color: "$primary9"
   }
@@ -28,7 +28,7 @@ const attachingStyles = `const HopeLink = hope(Link, {
 `;
 
 const attachingStylesJsxElement = `const Card = hope("div", {
-  className: "my-card",
+  baseClass: "my-card",
   baseStyle: {
     shadow: "$lg",
     rounded: "$lg",

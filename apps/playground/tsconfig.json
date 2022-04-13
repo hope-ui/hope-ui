@@ -9,5 +9,5 @@
       "@hope-ui/solid": ["../../packages/solid/src/index.ts"]
     }
   },
-  "include": ["vite.config.*", "src/**/*", "../../packages/**/*"]
+  "include": ["vite.config.*", "src/**/*"]
 }

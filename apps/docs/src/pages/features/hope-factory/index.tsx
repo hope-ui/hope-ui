@@ -81,7 +81,7 @@ export default function HopeFactory() {
       <Text mb="$5">You can also use the hope factory on jsx elements as well.</Text>
       <CodeSnippet snippet={snippets.attachingStylesJsxElement} mb="$5" />
       <Text mb="$5">
-        The <strong>className</strong> property is the CSS class to use when targeting this component in a css selector.
+        The <strong>baseClass</strong> property is the CSS class to use when targeting this component in a css selector.
         This class will be applied to the rendered dom element.
       </Text>
       <Text>

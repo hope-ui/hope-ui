@@ -1,3 +1,3 @@
 export * from "./switch";
-export * from "./switch-control";
-export * from "./switch-label";
+export * from "./switch-primitive";
+export * from "./switch-primitive-thumb";
