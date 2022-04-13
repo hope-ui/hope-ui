@@ -2,7 +2,6 @@ import "./index.css";
 
 import {
   Checkbox,
-  CheckboxControl,
   CheckboxPrimitive,
   CheckboxPrimitiveIndicator,
   createIcon,
@@ -31,9 +30,7 @@ function App() {
           <CheckIcon />
         </CheckboxPrimitiveIndicator>
       </CheckboxPrimitive>
-      <Checkbox>
-        <CheckboxControl />
-      </Checkbox>
+      <Checkbox>Checkbox</Checkbox>
     </div>
   );
 }

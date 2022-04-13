@@ -193,18 +193,7 @@ export type CheckboxWrapperVariants = VariantProps<typeof checkboxWrapperStyles>
  * Checkbox - label
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxLabelStyles = css(toggleControlLabelStyles, {
-  variants: {
-    labelPlacement: {
-      start: {
-        marginRight: "$2",
-      },
-      end: {
-        marginLeft: "$2",
-      },
-    },
-  },
-});
+export const checkboxLabelStyles = css(toggleControlLabelStyles);
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - control

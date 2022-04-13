@@ -1,93 +1,48 @@
 const importComponent = `import { 
-  Checkbox,
-  CheckboxControl,
-  CheckboxLabel,
-  CheckboxGroup
+  CheckboxPrimitive,
+  CheckboxPrimitiveIndicator ,
+  Checkbox, 
+  CheckboxGroup,
 } from "@hope-ui/solid"`;
 
-const basicUsage = `<Checkbox defaultChecked>
-  <CheckboxControl />
-  <CheckboxLabel>Checkbox</CheckboxLabel>
-</Checkbox>`;
+const basicUsage = `<Checkbox defaultChecked>Checkbox</Checkbox>`;
 
 const checkboxColors = `<HStack spacing="$4">
-  <Checkbox defaultChecked colorScheme="primary">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="accent">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="neutral">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="success">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="info">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="warning">
-    <CheckboxControl />
-  </Checkbox>
-  <Checkbox defaultChecked colorScheme="danger">
-    <CheckboxControl />
-  </Checkbox>
+  <Checkbox defaultChecked colorScheme="primary" />
+  <Checkbox defaultChecked colorScheme="accent" />
+  <Checkbox defaultChecked colorScheme="neutral" />
+  <Checkbox defaultChecked colorScheme="success" />
+  <Checkbox defaultChecked colorScheme="info" />
+  <Checkbox defaultChecked colorScheme="warning" />
+  <Checkbox defaultChecked colorScheme="danger" />
 </HStack>`;
 
 const checkboxSizes = `<HStack spacing="$4">
-  <Checkbox defaultChecked size="sm">
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox defaultChecked size="md">
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox defaultChecked size="lg">
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
+  <Checkbox defaultChecked size="sm">Checkbox</Checkbox>
+  <Checkbox defaultChecked size="md">Checkbox</Checkbox>
+  <Checkbox defaultChecked size="lg">Checkbox</Checkbox>
 </HStack>`;
 
 const checkboxVariants = `<HStack spacing="$4">
-  <Checkbox variant="outline">
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox variant="filled">
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
+  <Checkbox variant="outline">Checkbox</Checkbox>
+  <Checkbox variant="filled">Checkbox</Checkbox>
+</HStack>`;
+
+const checkboxLabelPlacement = `<HStack spacing="$4">
+  <Checkbox LabelPlacement="start">Checkbox</Checkbox>
+  <Checkbox LabelPlacement="end">Checkbox</Checkbox>
 </HStack>`;
 
 const checkboxDisabled = `<HStack spacing="$4">
-  <Checkbox disabled>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox variant="filled" disabled>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox defaultChecked disabled>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
+  <Checkbox disabled>Checkbox</Checkbox>
+  <Checkbox variant="filled" disabled>Checkbox</Checkbox>
+  <Checkbox defaultChecked disabled>Checkbox</Checkbox>
 </HStack>`;
 
 const checkboxInvalid = `<HStack spacing="$4">
-  <Checkbox invalid>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox variant="filled" invalid>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
-  <Checkbox defaultChecked invalid>
-    <CheckboxControl />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
-  </Checkbox>
+  <Checkbox invalid>Checkbox</Checkbox>
+  <Checkbox variant="filled" invalid>Checkbox</Checkbox>
+  <Checkbox defaultChecked invalid>Checkbox</Checkbox>
 </HStack>`;
 
 const checkboxIndeterminate = `function IndeterminateExample() {
@@ -103,23 +58,20 @@ const checkboxIndeterminate = `function IndeterminateExample() {
         indeterminate={isIndeterminate()}
         onChange={e => setCheckedItems([e.target.checked, e.target.checked])}
       >
-        <CheckboxControl />
-        <CheckboxLabel>Parent Checkbox</CheckboxLabel>
+        Parent Checkbox
       </Checkbox>
       <VStack alignItems="flex-start" pl="$6" mt="$1" spacing="$1">
         <Checkbox
           checked={checkedItems()[0]}
           onChange={e => setCheckedItems([e.target.checked, checkedItems()[1]])}
         >
-          <CheckboxControl />
-          <CheckboxLabel>Child Checkbox 1</CheckboxLabel>
+          Child Checkbox 1
         </Checkbox>
         <Checkbox
           checked={checkedItems()[1]}
           onChange={e => setCheckedItems([checkedItems()[0], e.target.checked])}
         >
-          <CheckboxControl />
-          <CheckboxLabel>Child Checkbox 2</CheckboxLabel>
+          Child Checkbox 2
         </Checkbox>
       </VStack>
     </>
@@ -127,34 +79,23 @@ const checkboxIndeterminate = `function IndeterminateExample() {
 }`;
 
 const checkboxCustomIcon = `<HStack spacing="$4">
-  <Checkbox defaultChecked>
-    <CheckboxControl iconChecked={<IconPlus />} />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
+  <Checkbox defaultChecked iconChecked={<IconPlus />}>
+    Checkbox
   </Checkbox>
-  <Checkbox indeterminate>
-    <CheckboxControl iconIndeterminate={<IconQuestionMark />} />
-    <CheckboxLabel>Checkbox</CheckboxLabel>
+  <Checkbox indeterminate iconIndeterminate={<IconQuestionMark />}>
+    Checkbox
   </Checkbox>
 </HStack>`;
 
 const checkboxGroup = `<CheckboxGroup colorScheme="success" defaultValue={["luffy", "sanji"]}>
   <HStack spacing="$5">
-    <Checkbox value="luffy">
-      <CheckboxControl />
-      <CheckboxLabel>Luffy</CheckboxLabel>
-    </Checkbox>
-    <Checkbox value="zoro">
-      <CheckboxControl />
-      <CheckboxLabel>Zoro</CheckboxLabel>
-    </Checkbox>
-    <Checkbox value="sanji">
-      <CheckboxControl />
-      <CheckboxLabel>Sanji</CheckboxLabel>
-    </Checkbox>
+    <Checkbox value="luffy">Luffy</Checkbox>
+    <Checkbox value="zoro">Zoro</Checkbox>
+    <Checkbox value="sanji">Sanji</Checkbox>
   </HStack>
 </CheckboxGroup>`;
 
-const composition = `function CompositionExample() {
+const headless = `function HeadlessExample() {
   const preferences = [
     {
       id: 1,
@@ -261,11 +202,12 @@ export const snippets = {
   checkboxColors,
   checkboxSizes,
   checkboxVariants,
+  checkboxLabelPlacement,
   checkboxDisabled,
   checkboxInvalid,
   checkboxIndeterminate,
   checkboxCustomIcon,
   checkboxGroup,
-  composition,
+  headless,
   theming,
 };

@@ -2,9 +2,9 @@ import { Accessor, createContext, createUniqueId, JSX, Show, splitProps, useCont
 import { createStore } from "solid-js/store";
 
 import { visuallyHiddenStyles } from "../../styled-system/utils";
+import { isFunction } from "../../utils/assertion";
 import { classNames } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
-import { isChildrenFunction } from "../../utils/solid";
 import { hope } from "../factory";
 import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
@@ -80,7 +80,7 @@ interface CheckboxPrimitiveOptions {
   readOnly?: boolean;
 
   /**
-   * The children of the switch.
+   * The children of the checkbox.
    */
   children?: JSX.Element | CheckboxPrimitiveChildrenRenderProp;
 
@@ -377,7 +377,7 @@ export function CheckboxPrimitive<C extends ElementType = "label">(props: Checkb
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
+        <Show when={isFunction(local.children)} fallback={local.children as JSX.Element}>
           {(local.children as CheckboxPrimitiveChildrenRenderProp)?.({ state: stateAccessor })}
         </Show>
       </hope.label>

@@ -5,6 +5,7 @@ import {
   CheckboxGroup,
   CheckboxPrimitive,
   CheckboxPrimitiveIndicator,
+  css,
   HStack,
   ListItem,
   Text,
@@ -13,7 +14,7 @@ import {
 } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createSignal, For, onMount } from "solid-js";
 
 import Code from "@/components/Code";
 import CodeSnippet from "@/components/CodeSnippet";
@@ -29,6 +30,39 @@ import { IconPlus } from "@/icons/IconPlus";
 import { IconQuestionMark } from "@/icons/IconQuestionMark";
 
 import { snippets } from "./snippets";
+
+const styledCheckboxRootStyles = css({
+  rounded: "$md",
+  border: "1px solid $neutral7",
+  shadow: "$sm",
+  bg: "$loContrast",
+  px: "$4",
+  py: "$3",
+  w: "$full",
+  cursor: "pointer",
+
+  "&[data-focus]": {
+    borderColor: "$info7",
+    shadow: "0 0 0 3px $colors$info5",
+  },
+
+  "&[data-checked]": {
+    borderColor: "transparent",
+    bg: "#0c4a6e",
+    color: "white",
+  },
+});
+
+const styledCheckboxBoxStyles = css({
+  rounded: "$sm",
+  border: "1px solid $neutral7",
+  bg: "$whiteAlpha7",
+  boxSize: "$5",
+
+  _groupChecked: {
+    borderColor: "transparent",
+  },
+});
 
 export default function CheckboxDoc() {
   const preferences = [
@@ -65,6 +99,7 @@ export default function CheckboxDoc() {
     { href: "#colors", label: "Checkbox colors", indent: true },
     { href: "#sizes", label: "Checkbox sizes", indent: true },
     { href: "#variants", label: "Checkbox variants", indent: true },
+    { href: "#label-placement", label: "Checkbox label placement", indent: true },
     { href: "#disabled", label: "Disabled state", indent: true },
     { href: "#invalid", label: "Invalid state", indent: true },
     { href: "#indeterminate", label: "Indeterminate state", indent: true },
@@ -262,15 +297,15 @@ export default function CheckboxDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>Checkbox:</strong> Provides context for all its children. It renders a <Code>label</Code> and a
-          visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code>.
+          <strong>CheckboxPrimitive:</strong> Unstyled component containing all the parts of a checkbox. It renders a{" "}
+          <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code>.
         </ListItem>
         <ListItem>
-          <strong>CheckboxControl:</strong> The component that visualy represents a checkbox. It's not visible by screen
-          readers.
+          <strong>CheckboxPrimitiveIndicator:</strong> Unstyled component rendered when the{" "}
+          <Code>CheckboxPrimitive</Code> is in a <Code>checked</Code> or <Code>indeterminate</Code> state.
         </ListItem>
         <ListItem>
-          <strong>CheckboxLabel:</strong> The label of the checkbox.
+          <strong>Checkbox:</strong> The Hope UI styled checkbox component based on <Code>CheckboxPrimitive</Code>.
         </ListItem>
         <ListItem>
           <strong>CheckboxGroup:</strong> Component to help manage the checked state of its children{" "}
@@ -328,6 +363,17 @@ export default function CheckboxDoc() {
           <Checkbox variant="filled">Checkbox</Checkbox>
         </HStack>
       </Preview>
+      <SectionSubtitle id="label-placement">Checkbox label placement</SectionSubtitle>
+      <Text mb="$5">
+        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set the value to{" "}
+        <Code>start</Code> or <Code>end</Code>.
+      </Text>
+      <Preview snippet={snippets.checkboxLabelPlacement} mb="$10">
+        <HStack spacing="$4">
+          <Checkbox labelPlacement="start">Checkbox</Checkbox>
+          <Checkbox labelPlacement="end">Checkbox</Checkbox>
+        </HStack>
+      </Preview>
       <SectionSubtitle id="disabled">Disabled state</SectionSubtitle>
       <Text mb="$5">
         Use the <Code>disabled</Code> prop to disable the Checkbox.
@@ -366,7 +412,7 @@ export default function CheckboxDoc() {
         <Checkbox
           checked={allChecked()}
           indeterminate={isIndeterminate()}
-          onChange={e =>
+          onChange={(e: Event) =>
             setCheckedItems([(e.target as HTMLInputElement).checked, (e.target as HTMLInputElement).checked])
           }
         >
@@ -375,13 +421,13 @@ export default function CheckboxDoc() {
         <VStack alignItems="flex-start" pl="$6" mt="$1" spacing="$1">
           <Checkbox
             checked={checkedItems()[0]}
-            onChange={e => setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])}
+            onChange={(e: Event) => setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])}
           >
             Child Checkbox 1
           </Checkbox>
           <Checkbox
             checked={checkedItems()[1]}
-            onChange={e => setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])}
+            onChange={(e: Event) => setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])}
           >
             Child Checkbox 2
           </Checkbox>
@@ -419,32 +465,15 @@ export default function CheckboxDoc() {
       </Preview>{" "}
       <SectionTitle id="headless-api">Headless API</SectionTitle>
       <Text mb="$5">
-        Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design.
+        Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design. You can pair it with
+        your styling solution of choice. The below example uses both Hope UI styles props and Stitches.
       </Text>
-      <Preview snippet={snippets.composition} mb="$12">
+      <Preview snippet={snippets.headless} mb="$12">
         <CheckboxGroup>
           <VStack spacing="$4">
             <For each={preferences}>
               {preference => (
-                <CheckboxPrimitive
-                  value={preference.id}
-                  rounded="$md"
-                  border="1px solid $neutral7"
-                  shadow="$sm"
-                  bg="$loContrast"
-                  px="$4"
-                  py="$3"
-                  w="$full"
-                  _focus={{
-                    borderColor: "$info7",
-                    shadow: "0 0 0 3px $colors$info5",
-                  }}
-                  _checked={{
-                    borderColor: "transparent",
-                    bg: "#0c4a6e",
-                    color: "white",
-                  }}
-                >
+                <CheckboxPrimitive value={preference.id} class={styledCheckboxRootStyles()}>
                   <HStack justifyContent="space-between" w="$full">
                     <VStack alignItems="flex-start">
                       <Text size="sm" fontWeight="$semibold">
@@ -460,15 +489,7 @@ export default function CheckboxDoc() {
                         {preference.description}
                       </Text>
                     </VStack>
-                    <Center
-                      rounded="$sm"
-                      border="1px solid $neutral7"
-                      bg="$whiteAlpha7"
-                      boxSize="$5"
-                      _groupChecked={{
-                        borderColor: "transparent",
-                      }}
-                    >
+                    <Center class={styledCheckboxBoxStyles()}>
                       <CheckboxPrimitiveIndicator>
                         <IconCheck boxSize="$4" />
                       </CheckboxPrimitiveIndicator>
