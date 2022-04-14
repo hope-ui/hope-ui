@@ -20,6 +20,8 @@ export const switchWrapperStyles = css(toggleWrapperStyles, {
   },
 });
 
+export type SwitchWrapperVariants = VariantProps<typeof switchWrapperStyles>;
+
 /* -------------------------------------------------------------------------------------------------
  * Switch - label
  * -----------------------------------------------------------------------------------------------*/
