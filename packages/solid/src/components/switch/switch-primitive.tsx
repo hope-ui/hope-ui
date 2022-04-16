@@ -1,30 +1,42 @@
-import { Accessor, createContext, createMemo, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
+import { Accessor, createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { visuallyHiddenStyles } from "../../styled-system/utils";
 import { isFunction } from "../../utils";
+import { classNames } from "../../utils/css";
 import { callHandler } from "../../utils/function";
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";
-import { ElementType, HopeComponent, HTMLHopeProps } from "../types";
+import { ElementType, HTMLHopeProps } from "../types";
 
 type SwitchPrimitiveChildrenRenderProp = (props: { state: Accessor<SwitchPrimitiveState> }) => JSX.Element;
 
 interface SwitchPrimitiveOptions {
   /**
-   * The id to be passed to the internal <button> tag.
+   * The ref to be passed to the internal <input> tag.
+   */
+  ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
+
+  /**
+   * The id to be passed to the internal <input> tag.
    */
   id?: string;
 
   /**
-   * The name to be passed to the internal <button> tag.
+   * The css class to be passed to the internal <input> tag.
+   */
+  inputClass?: string;
+
+  /**
+   * The name to be passed to the internal <input> tag.
    */
   name?: string;
 
   /**
-   * The value to be used in the switch button.
+   * The value to be used in the switch input.
    * This is the value that will be returned on form submission.
    */
-  value?: string;
+  value?: string | number;
 
   /**
    * If `true`, the switch will be checked.
@@ -66,20 +78,20 @@ interface SwitchPrimitiveOptions {
   /**
    * The callback invoked when the checked state of the switch changes.
    */
-  onChange?: (checked: boolean) => void;
+  onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>;
 
   /**
    * The callback invoked when the switch is focused
    */
-  onFocus?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
+  onFocus?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 
   /**
    * The callback invoked when the switch is blurred (loses focus)
    */
-  onBlur?: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent>;
+  onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>;
 }
 
-export type SwitchPrimitiveProps<C extends ElementType = "button"> = HTMLHopeProps<C, SwitchPrimitiveOptions>;
+export type SwitchPrimitiveProps<C extends ElementType = "label"> = HTMLHopeProps<C, SwitchPrimitiveOptions>;
 
 interface SwitchPrimitiveState {
   /**
@@ -109,7 +121,7 @@ interface SwitchPrimitiveState {
    * The value to be used in the switch input.
    * This is the value that will be returned on form submission.
    */
-  value?: string;
+  value?: string | number;
 
   /**
    * The id of the input field in a switch.
@@ -160,11 +172,10 @@ interface SwitchPrimitiveState {
  * It renders a `label` with a visualy hidden `input[type=checkbox][role=switch]`.
  * You can style this element directly, or you can use it as a wrapper to put other components into, or both.
  */
-// export function SwitchPrimitive<C extends ElementType = "button">(props: SwitchPrimitiveProps<C>) {
-export const SwitchPrimitive: HopeComponent<"button", SwitchPrimitiveOptions> = props => {
+export function SwitchPrimitive<C extends ElementType = "label">(props: SwitchPrimitiveProps<C>) {
   const defaultId = `hope-switch-${createUniqueId()}`;
 
-  const formControlProps = useFormControl<HTMLButtonElement>(props);
+  const formControlProps = useFormControl<HTMLInputElement>(props);
 
   const [state, setState] = createStore<SwitchPrimitiveState>({
     // eslint-disable-next-line solid/reactivity
@@ -183,7 +194,7 @@ export const SwitchPrimitive: HopeComponent<"button", SwitchPrimitiveOptions> = 
       return props.name;
     },
     get value() {
-      return props.value ?? "on";
+      return props.value;
     },
     get required() {
       return formControlProps.required;
@@ -231,8 +242,8 @@ export const SwitchPrimitive: HopeComponent<"button", SwitchPrimitiveOptions> = 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [local, _, others] = splitProps(
-    props as SwitchPrimitiveProps<"button">,
-    ["children", "onClick", "onChange"],
+    props as SwitchPrimitiveProps<"label">,
+    ["inputClass", "children", "ref", "tabIndex", "aria-label", "aria-labelledby", "aria-describedby", "onChange"],
     [
       "id",
       "name",
@@ -248,32 +259,31 @@ export const SwitchPrimitive: HopeComponent<"button", SwitchPrimitiveOptions> = 
     ]
   );
 
-  const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+  const onChange: JSX.EventHandlerUnion<HTMLInputElement, Event> = event => {
     if (state.readOnly || state.disabled) {
       event.preventDefault();
       return;
     }
 
-    const newValue = !state.checked;
-
     if (!state.isControlled) {
-      setState("_checked", newValue);
+      const target = event.target as HTMLInputElement;
+      setState("_checked", target.checked);
     }
 
-    local.onChange?.(newValue);
-
-    callHandler(local.onClick)(event);
+    callHandler(local.onChange)(event);
   };
 
-  const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
+  const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", true);
     callHandler(formControlProps.onFocus)(event);
   };
 
-  const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
+  const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", false);
     callHandler(formControlProps.onBlur)(event);
   };
+
+  const inputClasses = () => classNames(local.inputClass, visuallyHiddenStyles());
 
   const stateAccessor = () => state;
 
@@ -283,30 +293,48 @@ export const SwitchPrimitive: HopeComponent<"button", SwitchPrimitiveOptions> = 
 
   return (
     <SwitchPrimitiveContext.Provider value={context}>
-      <hope.button
-        type="button"
-        role="switch"
-        value={state.value}
-        id={state.id}
-        name={state.name}
-        disabled={state.disabled}
-        aria-checked={state.checked}
-        aria-required={state["aria-required"]}
-        aria-disabled={state["aria-disabled"]}
-        aria-invalid={state["aria-invalid"]}
-        aria-readonly={state["aria-readonly"]}
-        onClick={onClick}
-        onFocus={onFocus}
-        onBlur={onBlur}
+      <hope.label
+        for={state.id}
+        data-group
+        data-focus={state["data-focus"]}
+        data-checked={state["data-checked"]}
+        data-required={state["data-required"]}
+        data-disabled={state["data-disabled"]}
+        data-invalid={state["data-invalid"]}
+        data-readonly={state["data-readonly"]}
         {...others}
       >
+        <input
+          type="checkbox"
+          role="switch"
+          class={inputClasses()}
+          ref={local.ref}
+          tabIndex={local.tabIndex}
+          value={state.value}
+          id={state.id}
+          name={state.name}
+          checked={state.checked}
+          required={state.required}
+          disabled={state.disabled}
+          readOnly={state.readOnly}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          aria-required={state["aria-required"]}
+          aria-disabled={state["aria-disabled"]}
+          aria-invalid={state["aria-invalid"]}
+          aria-readonly={state["aria-readonly"]}
+          aria-label={local["aria-label"]}
+          aria-labelledby={local["aria-labelledby"]}
+          aria-describedby={local["aria-describedby"]}
+        />
         <Show when={isFunction(local.children)} fallback={local.children as JSX.Element}>
           {(local.children as SwitchPrimitiveChildrenRenderProp)?.({ state: stateAccessor })}
         </Show>
-      </hope.button>
+      </hope.label>
     </SwitchPrimitiveContext.Provider>
   );
-};
+}
 
 /* -------------------------------------------------------------------------------------------------
  * Context
@@ -318,11 +346,11 @@ interface SwitchPrimitiveContextValue {
 
 const SwitchPrimitiveContext = createContext<SwitchPrimitiveContextValue>();
 
-export function useSwitcPrimitivehContext() {
+export function useSwitchPrimitivehContext() {
   const context = useContext(SwitchPrimitiveContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useSwitcPrimitivehContext must be used within a `<SwitchPrimitive />` component");
+    throw new Error("[Hope UI]: useSwitchPrimitivehContext must be used within a `<SwitchPrimitive />` component");
   }
 
   return context;

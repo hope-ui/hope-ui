@@ -107,12 +107,12 @@ const checkboxRootStyles = css({
   w: "$full",
   cursor: "pointer",
 
-  "&[data-focus]": {
+  _focus: {
     borderColor: "$info7",
     shadow: "0 0 0 3px $colors$info5",
   },
 
-  "&[data-checked]": {
+  _checked: {
     borderColor: "transparent",
     bg: "#0c4a6e",
     color: "white",

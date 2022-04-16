@@ -40,12 +40,12 @@ const checkboxRootStyles = css({
   w: "$full",
   cursor: "pointer",
 
-  "&[data-focus]": {
+  _focus: {
     borderColor: "$info7",
     shadow: "0 0 0 3px $colors$info5",
   },
 
-  "&[data-checked]": {
+  _checked: {
     borderColor: "transparent",
     bg: "#0c4a6e",
     color: "white",
@@ -114,6 +114,11 @@ export default function CheckboxDoc() {
   ];
 
   const checkboxPrimitivePropItems: PropsTableItem[] = [
+    {
+      name: "id",
+      description: "The id to be passed to the internal <input> tag.",
+      type: "string",
+    },
     {
       name: "name",
       description: "The name of the input field in a checkbox (Useful for form submission).",

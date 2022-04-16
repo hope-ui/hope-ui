@@ -1,6 +1,6 @@
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
-import { useSwitcPrimitivehContext } from "./switch-primitive";
+import { useSwitchPrimitivehContext } from "./switch-primitive";
 
 export type SwitchPrimitiveThumbProps<C extends ElementType = "span"> = HTMLHopeProps<C>;
 
@@ -9,7 +9,7 @@ export type SwitchPrimitiveThumbProps<C extends ElementType = "span"> = HTMLHope
  * You can style this element directly, or you can use it as a wrapper to put an icon into, or both.
  */
 export function SwitchPrimitiveThumb<C extends ElementType = "span">(props: SwitchPrimitiveThumbProps<C>) {
-  const switchPrimitiveContext = useSwitcPrimitivehContext();
+  const switchPrimitiveContext = useSwitchPrimitivehContext();
 
   return (
     <hope.span

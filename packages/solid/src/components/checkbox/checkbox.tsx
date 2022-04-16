@@ -44,8 +44,8 @@ const hopeCheckboxControlClass = "hope-checkbox__control";
 const hopeCheckboxLabelClass = "hope-checkbox__label";
 
 /**
- * Checkbox is used when a user needs to select
- * multiple values from several options.
+ * Checkboxes allow users to select multiple items from a list of individual items,
+ * or to mark one individual item as selected.
  */
 export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C>) {
   const theme = useStyleConfig().Checkbox;

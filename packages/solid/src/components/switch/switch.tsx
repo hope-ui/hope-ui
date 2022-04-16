@@ -4,7 +4,6 @@ import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system/types";
 import { OverrideProps } from "../../utils";
 import { classNames, createClassSelector } from "../../utils/css";
-import { Box } from "../box/box";
 import { hope } from "../factory";
 import { ElementType } from "../types";
 import {
@@ -25,27 +24,28 @@ interface SwitchOptions extends ThemeableSwitchOptions {
   children?: JSX.Element;
 }
 
-export type SwitchProps<C extends ElementType = "button"> = OverrideProps<SwitchPrimitiveProps<C>, SwitchOptions>;
+export type SwitchProps<C extends ElementType = "label"> = OverrideProps<SwitchPrimitiveProps<C>, SwitchOptions>;
 
 const hopeSwitchClass = "hope-switch";
+const hopeSwitchInputClass = "hope-checkbox__input";
 const hopeSwitchControlClass = "hope-switch__control";
 const hopeSwitchLabelClass = "hope-switch__label";
 
 /**
- * The component that provides context for all part of a `checkbox`.
- * It act as a container and renders a `label` with a visualy hidden `input[type=checkbox][role=switch]`.
+ * Switches allow users to turn an individual option on or off.
+ * They are usually used to activate or deactivate a specific setting.
  */
 export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   const theme = useStyleConfig().Switch;
 
-  const defaultProps: SwitchProps<"button"> = {
-    variant: theme?.defaultProps?.root?.variant ?? "outline",
+  const defaultProps: SwitchProps<"label"> = {
+    variant: theme?.defaultProps?.root?.variant ?? "filled",
     colorScheme: theme?.defaultProps?.root?.colorScheme ?? "primary",
     size: theme?.defaultProps?.root?.size ?? "md",
     labelPlacement: theme?.defaultProps?.root?.labelPlacement ?? "start",
   };
 
-  const propsWitDefault: SwitchProps<"button"> = mergeProps(defaultProps, props);
+  const propsWitDefault: SwitchProps<"label"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWitDefault, [
     "children",
     "class",
@@ -82,10 +82,40 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   };
 
   return (
-    <Box>
-      <SwitchPrimitive />
-      <hope.label class={labelClasses()}>{local.children}</hope.label>
-    </Box>
+    <SwitchPrimitive
+      class={wrapperClasses()}
+      inputClass={hopeSwitchInputClass}
+      __baseStyle={theme?.baseStyle?.root}
+      {...others}
+    >
+      {({ state }) => (
+        <>
+          <hope.span
+            class={labelClasses()}
+            __baseStyle={theme?.baseStyle?.label}
+            data-focus={state()["data-focus"]}
+            data-checked={state()["data-checked"]}
+            data-required={state()["data-required"]}
+            data-disabled={state()["data-disabled"]}
+            data-invalid={state()["data-invalid"]}
+            data-readonly={state()["data-readonly"]}
+          >
+            {local.children}
+          </hope.span>
+          <hope.span
+            aria-hidden={true}
+            class={controlClasses()}
+            __baseStyle={theme?.baseStyle?.control}
+            data-focus={state()["data-focus"]}
+            data-checked={state()["data-checked"]}
+            data-required={state()["data-required"]}
+            data-disabled={state()["data-disabled"]}
+            data-invalid={state()["data-invalid"]}
+            data-readonly={state()["data-readonly"]}
+          />
+        </>
+      )}
+    </SwitchPrimitive>
   );
 }
 
