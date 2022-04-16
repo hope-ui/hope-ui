@@ -5,8 +5,7 @@
     "baseUrl": ".",
     "rootDir": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@hope-ui/solid": ["../../packages/solid/src/index.ts"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["vite.config.*", "src/**/*"]
