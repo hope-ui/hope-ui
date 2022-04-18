@@ -47,7 +47,7 @@ export function combineProps<T extends Props[]>(...args: T): UnionToIntersection
         // eslint-disable-next-line solid/reactivity
         combinedProps = mergeProps(combinedProps, { [key]: chainHandlers(a, b) });
 
-        // Merge classNames, sometimes classNames are empty string which eval to false, so we just need to do a type check
+        // Merge classes, sometimes classes are empty string which eval to false, so we just need to do a type check
       } else if (key === "class" && typeof a === "string" && typeof b === "string") {
         // eslint-disable-next-line solid/reactivity
         combinedProps = mergeProps(combinedProps, { [key]: clsx(a, b) });
