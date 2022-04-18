@@ -46,53 +46,6 @@ describe("createPress", () => {
     ]);
   });
 
-  it("does not handle press events on children", async () => {
-    const events: any[] = [];
-    const addEvent = (e: any) => events.push({ type: e.type, target: e.target });
-
-    render(() => (
-      <Example
-        onClick={addEvent}
-        onMouseDown={addEvent}
-        onMouseUp={addEvent}
-        onPressChange={(isPressed: boolean) => events.push({ type: "presschange", isPressed })}
-      >
-        <button data-testid="child" />
-      </Example>
-    ));
-
-    const el = screen.getByTestId("example");
-    const child = screen.getByTestId("child");
-
-    fireEvent.click(child);
-    await Promise.resolve();
-
-    fireEvent.mouseDown(child);
-    await Promise.resolve();
-
-    fireEvent.mouseUp(child);
-    await Promise.resolve();
-
-    expect(events).toEqual([]);
-
-    fireEvent.click(el);
-    await Promise.resolve();
-
-    fireEvent.mouseDown(el);
-    await Promise.resolve();
-
-    fireEvent.mouseUp(el);
-    await Promise.resolve();
-
-    expect(events).toEqual([
-      { type: "click", target: el },
-      { type: "mousedown", target: el },
-      { type: "presschange", isPressed: true },
-      { type: "mouseup", target: el },
-      { type: "presschange", isPressed: false },
-    ]);
-  });
-
   it("does not handle press events if disabled", async () => {
     const events: any[] = [];
     const addEvent = (e: any) => events.push({ type: e.type, target: e.target });

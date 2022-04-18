@@ -1,5 +1,5 @@
 import { access, MaybeAccessor } from "@solid-primitives/utils";
-import { createMemo, createSignal } from "solid-js";
+import { Accessor, createMemo, createSignal } from "solid-js";
 
 import { isUndefined } from "./assertion";
 import { runIfFn } from "./function";
@@ -56,27 +56,9 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
  * that can be controlled with `value` and `onChange` props.
  */
 export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>) {
-  // Internal uncontrolled value
-  // eslint-disable-next-line solid/reactivity
-  const [_value, _setValue] = createSignal(!!access(props.defaultValue));
+  const [_value, setValue] = createControllableSignal(props);
 
-  const isControlled = createMemo(() => !isUndefined(access(props.value)));
-
-  const value = createMemo(() => (isControlled() ? !!access(props.value) : _value()));
-
-  const setValue = (next: boolean | ((prev: boolean) => boolean)) => {
-    const nextValue = runIfFn(next, value());
-
-    if (!Object.is(nextValue, value())) {
-      if (!isControlled()) {
-        _setValue(nextValue);
-      }
-
-      props.onChange?.(nextValue);
-    }
-
-    return nextValue;
-  };
+  const value: Accessor<boolean> = () => _value() ?? false;
 
   return [value, setValue] as const;
 }

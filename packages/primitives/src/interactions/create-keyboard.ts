@@ -14,12 +14,12 @@ export interface keyboardElementProps {
   /**
    * Handler that is called when a key is pressed.
    */
-  onKeyDown?: KeyboardEvents["onKeyDown"];
+  onKeyDown: KeyboardEvents["onKeyDown"];
 
   /**
    * Handler that is called when a key is released.
    */
-  onKeyUp?: KeyboardEvents["onKeyUp"];
+  onKeyUp: KeyboardEvents["onKeyUp"];
 }
 
 export interface KeyboardResult {
@@ -30,19 +30,29 @@ export interface KeyboardResult {
 }
 
 /**
- * Handles keyboard interactions for a focusable element.
+ * Handles keyboard events.
  */
 export function createKeyboard(props: CreateKeyboardProps): KeyboardResult {
-  const keyboardProps: Accessor<keyboardElementProps> = createMemo(() => {
+  const onKeyDown: CreateKeyboardProps["onKeyDown"] = event => {
     if (access(props.isDisabled)) {
-      return {};
+      return;
     }
 
-    return {
-      onKeyDown: props.onKeyDown,
-      onKeyUp: props.onKeyUp,
-    };
-  });
+    props.onKeyDown?.(event);
+  };
+
+  const onKeyUp: CreateKeyboardProps["onKeyUp"] = event => {
+    if (access(props.isDisabled)) {
+      return;
+    }
+
+    props.onKeyUp?.(event);
+  };
+
+  const keyboardProps: Accessor<keyboardElementProps> = createMemo(() => ({
+    onKeyDown,
+    onKeyUp,
+  }));
 
   return { keyboardProps };
 }

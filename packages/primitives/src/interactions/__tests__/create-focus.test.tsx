@@ -41,45 +41,6 @@ describe("createFocus", () => {
     ]);
   });
 
-  it("does not handle focus events on children", async () => {
-    const events: any[] = [];
-    const addEvent = (e: any) => events.push({ type: e.type, target: e.target });
-
-    render(() => (
-      <Example
-        onFocus={addEvent}
-        onBlur={addEvent}
-        onFocusChange={(isFocused: boolean) => events.push({ type: "focuschange", isFocused })}
-      >
-        <div data-testid="child" tabIndex={-1} />
-      </Example>
-    ));
-
-    const el = screen.getByTestId("example");
-    const child = screen.getByTestId("child");
-
-    fireEvent.focus(child);
-    await Promise.resolve();
-
-    fireEvent.blur(child);
-    await Promise.resolve();
-
-    expect(events).toEqual([]);
-
-    fireEvent.focus(el);
-    await Promise.resolve();
-
-    fireEvent.blur(el);
-    await Promise.resolve();
-
-    expect(events).toEqual([
-      { type: "focus", target: el },
-      { type: "focuschange", isFocused: true },
-      { type: "blur", target: el },
-      { type: "focuschange", isFocused: false },
-    ]);
-  });
-
   it("does not handle focus events if disabled", async () => {
     const events: any[] = [];
     const addEvent = (e: any) => events.push({ type: e.type, target: e.target });

@@ -30,26 +30,25 @@ export interface FocusResult {
 }
 
 /**
- * Handles focus events for the immediate target.
- * Focus events on child elements will be ignored.
+ * Handles focus events.
  */
 export function createFocus(props: CreateFocusProps): FocusResult {
-  const onBlur: CreateFocusProps["onBlur"] = event => {
-    const isDisabled = access(props.isDisabled);
-
-    if (!isDisabled && event.target === event.currentTarget) {
-      props.onBlur?.(event);
-      props.onFocusChange?.(false);
+  const onFocus: CreateFocusProps["onFocus"] = event => {
+    if (access(props.isDisabled)) {
+      return;
     }
+
+    props.onFocus?.(event);
+    props.onFocusChange?.(true);
   };
 
-  const onFocus: CreateFocusProps["onFocus"] = event => {
-    const isDisabled = access(props.isDisabled);
-
-    if (!isDisabled && event.target === event.currentTarget) {
-      props.onFocus?.(event);
-      props.onFocusChange?.(true);
+  const onBlur: CreateFocusProps["onBlur"] = event => {
+    if (access(props.isDisabled)) {
+      return;
     }
+
+    props.onBlur?.(event);
+    props.onFocusChange?.(false);
   };
 
   const focusProps: Accessor<FocusElementProps> = createMemo(() => ({

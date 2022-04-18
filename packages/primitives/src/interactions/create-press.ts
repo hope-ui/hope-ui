@@ -35,34 +35,33 @@ export interface PressResult {
 }
 
 /**
- * Handles press events for the immediate target.
- * Press events on child elements will be ignored.
+ * Handles press events.
  */
 export function createPress(props: CreatePressProps): PressResult {
   const onClick: CreatePressProps["onClick"] = event => {
-    const isDisabled = access(props.isDisabled);
-
-    if (!isDisabled && event.target === event.currentTarget) {
-      props.onClick?.(event);
+    if (access(props.isDisabled)) {
+      return;
     }
-  };
 
-  const onMouseUp: CreatePressProps["onMouseUp"] = event => {
-    const isDisabled = access(props.isDisabled);
-
-    if (!isDisabled && event.target === event.currentTarget) {
-      props.onMouseUp?.(event);
-      props.onPressChange?.(false);
-    }
+    props.onClick?.(event);
   };
 
   const onMouseDown: CreatePressProps["onMouseDown"] = event => {
-    const isDisabled = access(props.isDisabled);
-
-    if (!isDisabled && event.target === event.currentTarget) {
-      props.onMouseDown?.(event);
-      props.onPressChange?.(true);
+    if (access(props.isDisabled)) {
+      return;
     }
+
+    props.onMouseDown?.(event);
+    props.onPressChange?.(true);
+  };
+
+  const onMouseUp: CreatePressProps["onMouseUp"] = event => {
+    if (access(props.isDisabled)) {
+      return;
+    }
+
+    props.onMouseUp?.(event);
+    props.onPressChange?.(false);
   };
 
   const pressProps: Accessor<PressElementProps> = createMemo(() => ({
