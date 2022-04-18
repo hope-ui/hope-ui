@@ -2,7 +2,7 @@ import { MaybeAccessor } from "@solid-primitives/utils";
 
 /**
  * A set of common DOM props that are allowed on any component
- * Ensure this is synced with DOMPropNames in filterDOMProps.
+ * Ensure this is synced with DOMPropNames in utils/filterDOMProps.
  */
 export interface DOMProps {
   /**

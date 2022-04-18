@@ -1,5 +1,9 @@
 import { MaybeAccessor } from "@solid-primitives/utils";
 
+/**
+ * A set of common labelling DOM props that are allowed on any component
+ * Ensure this is synced with labelablePropNames in utils/filterDOMProps.
+ */
 export interface AriaLabelingProps {
   /**
    * Defines a string value that labels the current element.

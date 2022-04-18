@@ -2,8 +2,16 @@ import { splitProps } from "solid-js";
 
 import { AriaLabelingProps, DOMProps } from "../types";
 
+/**
+ * A set of common DOM props that are allowed on any component
+ * Ensure this is synced with DOMProps in types/dom.
+ */
 const DOMPropNames = new Set(["id"]);
 
+/**
+ * A set of common DOM props that are allowed on any component
+ * Ensure this is synced with AriaLabelingProps in types/aria.
+ */
 const labelablePropNames = new Set([
   "aria-label",
   "aria-labelledby",
@@ -25,13 +33,14 @@ interface Options {
 
 const propRe = /^(data-.*)$/;
 
+// Note: "valid DOM props" refers to the `DOMPropNames` Set above.
 /**
  * Filters out all props that aren't valid DOM props or defined via override prop obj.
  * @param props - The component props to be filtered.
  * @param opts - Props to override.
  */
 export function filterDOMProps(
-  props: DOMProps & AriaLabelingProps,
+  props: Record<string, any> & DOMProps & AriaLabelingProps,
   opts: Options = {}
 ): DOMProps & AriaLabelingProps {
   const { labelable, propNames } = opts;

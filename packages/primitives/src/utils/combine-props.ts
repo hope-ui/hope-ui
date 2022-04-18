@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { mergeProps } from "solid-js";
 
-import { chainHandlers } from "./function";
+import { chainHandlers } from "./handler";
 
 interface Props {
   [key: string]: any;
