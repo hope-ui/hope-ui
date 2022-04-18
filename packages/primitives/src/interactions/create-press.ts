@@ -1,3 +1,4 @@
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
 
 import { PressEvents } from "../types";
@@ -6,7 +7,7 @@ export interface CreatePressProps extends PressEvents {
   /**
    * Whether the press events should be disabled.
    */
-  isDisabled?: boolean;
+  isDisabled?: MaybeAccessor<boolean | undefined>;
 }
 
 export interface PressElementProps {
@@ -38,7 +39,7 @@ export interface PressResult {
  */
 export function createPress(props: CreatePressProps): PressResult {
   const onClick: CreatePressProps["onClick"] = event => {
-    if (props.isDisabled) {
+    if (access(props.isDisabled)) {
       return;
     }
 
@@ -46,7 +47,7 @@ export function createPress(props: CreatePressProps): PressResult {
   };
 
   const onMouseDown: CreatePressProps["onMouseDown"] = event => {
-    if (props.isDisabled) {
+    if (access(props.isDisabled)) {
       return;
     }
 
@@ -55,7 +56,7 @@ export function createPress(props: CreatePressProps): PressResult {
   };
 
   const onMouseUp: CreatePressProps["onMouseUp"] = event => {
-    if (props.isDisabled) {
+    if (access(props.isDisabled)) {
       return;
     }
 

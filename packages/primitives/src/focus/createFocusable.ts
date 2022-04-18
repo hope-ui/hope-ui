@@ -1,19 +1,34 @@
+import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, onMount } from "solid-js";
 
 import {
   createFocus,
+  CreateFocusProps,
   createKeyboard,
+  CreateKeyboardProps,
   FocusElementProps,
   keyboardElementProps,
 } from "../interactions";
-import { FocusableDOMProps, FocusableProps } from "../types";
 import { combineProps } from "../utils";
 
-export interface CreateFocusableProps extends FocusableProps, FocusableDOMProps {
+export interface CreateFocusableProps extends CreateFocusProps, CreateKeyboardProps {
   /**
    * Whether focus should be disabled.
    */
-  isDisabled?: boolean;
+  isDisabled?: MaybeAccessor<boolean | undefined>;
+
+  /**
+   * Whether the element should receive focus on render.
+   */
+  autoFocus?: MaybeAccessor<boolean | undefined>;
+
+  /**
+   * Whether to exclude the element from the sequential tab order. If true,
+   * the element will not be focusable via the keyboard by tabbing. This should
+   * be avoided except in rare scenarios where an alternative means of accessing
+   * the element or its functionality via the keyboard is available.
+   */
+  excludeFromTabOrder?: MaybeAccessor<boolean | undefined>;
 }
 
 export type FocusableElementProps = FocusElementProps &
@@ -31,8 +46,11 @@ export interface FocusableResult {
 /**
  * Used to make an element focusable and capable of auto focus.
  */
-export function createFocusable(props: CreateFocusableProps, ref?: HTMLElement): FocusableResult {
-  const [autoFocus, setAutoFocus] = createSignal(!!props.autoFocus);
+export function createFocusable(
+  props: CreateFocusableProps,
+  ref?: MaybeAccessor<HTMLElement>
+): FocusableResult {
+  const [autoFocus, setAutoFocus] = createSignal(!!access(props.autoFocus));
 
   const { focusProps } = createFocus(props);
   const { keyboardProps } = createKeyboard(props);
@@ -46,14 +64,14 @@ export function createFocusable(props: CreateFocusableProps, ref?: HTMLElement):
       focusProps(),
       keyboardProps(),
       {
-        tabIndex: props.excludeFromTabOrder && !props.isDisabled ? -1 : undefined,
+        tabIndex: access(props.excludeFromTabOrder) && !access(props.isDisabled) ? -1 : undefined,
       }
       // interactionProps()
     );
   });
 
   onMount(() => {
-    autoFocus() && ref?.focus();
+    autoFocus() && access(ref)?.focus();
     setAutoFocus(false);
   });
 
