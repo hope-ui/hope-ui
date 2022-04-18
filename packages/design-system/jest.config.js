@@ -1,5 +1,5 @@
 const repoRootPath = `<rootDir>`;
-const solidjsPath = `${repoRootPath}/node_modules/solid-js`;
+const solidjsPath = `${repoRootPath}/../../node_modules/solid-js`;
 
 module.exports = {
   preset: "ts-jest",
@@ -15,12 +15,12 @@ module.exports = {
 
   testEnvironment: "jsdom",
 
-  setupFilesAfterEnv: [`${repoRootPath}/jest.setup.ts`, "regenerator-runtime"],
+  setupFilesAfterEnv: [`${repoRootPath}/../../jest.setup.js`, "regenerator-runtime"],
 
   moduleNameMapper: {
-    "solid-js": `${solidjsPath}/dist/solid.cjs`,
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
+    "solid-js": `${solidjsPath}/dist/solid.cjs`,
   },
 
   verbose: true,
