@@ -2,16 +2,15 @@ import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
 
 import { FocusEvents } from "../types";
-import { createSyntheticBlurEvent } from "./utils";
 
-interface CreateFocusProps extends FocusEvents {
+export interface CreateFocusProps extends FocusEvents {
   /**
    * Whether the focus events should be disabled.
    */
   isDisabled?: MaybeAccessor<boolean | undefined>;
 }
 
-interface FocusProps {
+export interface FocusElementProps {
   /**
    * Handler that is called when the element receives focus.
    */
@@ -23,11 +22,11 @@ interface FocusProps {
   onBlur: FocusEvents["onBlur"];
 }
 
-interface FocusResult {
+export interface FocusResult {
   /**
    * Props to spread onto the target element.
    */
-  focusProps: Accessor<FocusProps>;
+  focusProps: Accessor<FocusElementProps>;
 }
 
 /**
@@ -38,34 +37,22 @@ export function createFocus(props: CreateFocusProps): FocusResult {
   const onBlur: CreateFocusProps["onBlur"] = event => {
     const isDisabled = access(props.isDisabled);
 
-    if (
-      !isDisabled &&
-      (props.onBlur || props.onFocusChange) &&
-      event.target === event.currentTarget
-    ) {
+    if (!isDisabled && event.target === event.currentTarget) {
       props.onBlur?.(event);
       props.onFocusChange?.(false);
-      return true;
     }
   };
-
-  const onSyntheticFocus = createSyntheticBlurEvent(onBlur);
 
   const onFocus: CreateFocusProps["onFocus"] = event => {
     const isDisabled = access(props.isDisabled);
 
-    if (
-      !isDisabled &&
-      (props.onFocus || props.onFocusChange || props.onBlur) &&
-      event.target === event.currentTarget
-    ) {
+    if (!isDisabled && event.target === event.currentTarget) {
       props.onFocus?.(event);
       props.onFocusChange?.(true);
-      onSyntheticFocus(event);
     }
   };
 
-  const focusProps: Accessor<FocusProps> = createMemo(() => ({
+  const focusProps: Accessor<FocusElementProps> = createMemo(() => ({
     onFocus,
     onBlur,
   }));

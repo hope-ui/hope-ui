@@ -1,4 +1,3 @@
-import { createSignal } from "solid-js";
 import { fireEvent, render, screen } from "solid-testing-library";
 
 import { createFocus } from "..";
@@ -129,46 +128,5 @@ describe("createFocus", () => {
     expect(onInnerBlur).toHaveBeenCalledTimes(1);
     expect(onWrapperFocus).not.toHaveBeenCalled();
     expect(onWrapperBlur).not.toHaveBeenCalled();
-  });
-
-  it("should fire onBlur when a focused element is disabled", async () => {
-    const onFocus = jest.fn();
-    const onBlur = jest.fn();
-
-    function Example(props: any) {
-      const { focusProps } = createFocus(props);
-      return (
-        <button data-testid="example-button" disabled={props.disabled} {...focusProps}>
-          Button
-        </button>
-      );
-    }
-
-    function Wrapper() {
-      const [isDisabled, setIsDisabled] = createSignal(false);
-      return (
-        <div>
-          <Example disabled={isDisabled()} onFocus={onFocus} onBlur={onBlur} />
-          <button data-testid="disable-button" onClick={() => setIsDisabled(true)}>
-            Disable
-          </button>
-        </div>
-      );
-    }
-
-    render(() => <Wrapper />);
-
-    const exampleButton = screen.getByTestId("example-button");
-    const disableButton = screen.getByTestId("disable-button");
-
-    fireEvent.focus(exampleButton);
-    await Promise.resolve();
-
-    expect(onFocus).toHaveBeenCalled();
-
-    fireEvent.click(disableButton);
-    await Promise.resolve();
-
-    expect(onBlur).toHaveBeenCalled();
   });
 });

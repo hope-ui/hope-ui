@@ -21,6 +21,10 @@ export interface CreateControllableSignalProps<T> {
   onChange?: (value: T) => void;
 }
 
+/**
+ * Creates a simple reactive state with a getter and setter,
+ * that can be controlled with `value` and `onChange` props.
+ */
 export function createControllableSignal<T>(props: CreateControllableSignalProps<T>) {
   // Internal uncontrolled value
   // eslint-disable-next-line solid/reactivity
@@ -36,6 +40,36 @@ export function createControllableSignal<T>(props: CreateControllableSignalProps
     if (!Object.is(nextValue, value())) {
       if (!isControlled()) {
         _setValue(nextValue as Exclude<T, Function>);
+      }
+
+      props.onChange?.(nextValue);
+    }
+
+    return nextValue;
+  };
+
+  return [value, setValue] as const;
+}
+
+/**
+ * Creates a simple reactive boolean state with a getter and setter,
+ * that can be controlled with `value` and `onChange` props.
+ */
+export function createControllableBooleanSignal(props: CreateControllableSignalProps<boolean>) {
+  // Internal uncontrolled value
+  // eslint-disable-next-line solid/reactivity
+  const [_value, _setValue] = createSignal(!!access(props.defaultValue));
+
+  const isControlled = createMemo(() => !isUndefined(access(props.value)));
+
+  const value = createMemo(() => (isControlled() ? !!access(props.value) : _value()));
+
+  const setValue = (next: boolean | ((prev: boolean) => boolean)) => {
+    const nextValue = runIfFn(next, value());
+
+    if (!Object.is(nextValue, value())) {
+      if (!isControlled()) {
+        _setValue(nextValue);
       }
 
       props.onChange?.(nextValue);
