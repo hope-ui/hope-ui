@@ -1,4 +1,3 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, onMount } from "solid-js";
 
 import {
@@ -14,7 +13,7 @@ export interface CreateFocusableProps extends FocusableProps, FocusableDOMProps 
   /**
    * Whether focus should be disabled.
    */
-  isDisabled?: MaybeAccessor<boolean | undefined>;
+  isDisabled?: boolean;
 }
 
 export type FocusableElementProps = FocusElementProps &
@@ -32,11 +31,8 @@ export interface FocusableResult {
 /**
  * Used to make an element focusable and capable of auto focus.
  */
-export function createFocusable(
-  props: CreateFocusableProps,
-  ref: MaybeAccessor<HTMLElement>
-): FocusableResult {
-  const [autoFocus, setAutoFocus] = createSignal(!!access(props.autoFocus));
+export function createFocusable(props: CreateFocusableProps, ref?: HTMLElement): FocusableResult {
+  const [autoFocus, setAutoFocus] = createSignal(!!props.autoFocus);
 
   const { focusProps } = createFocus(props);
   const { keyboardProps } = createKeyboard(props);
@@ -50,14 +46,14 @@ export function createFocusable(
       focusProps(),
       keyboardProps(),
       {
-        tabIndex: access(props.excludeFromTabOrder) && !access(props.isDisabled) ? -1 : undefined,
+        tabIndex: props.excludeFromTabOrder && !props.isDisabled ? -1 : undefined,
       }
       // interactionProps()
     );
   });
 
   onMount(() => {
-    autoFocus() && access(ref)?.focus();
+    autoFocus() && ref?.focus();
     setAutoFocus(false);
   });
 

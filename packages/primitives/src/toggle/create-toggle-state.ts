@@ -1,4 +1,3 @@
-import { access } from "@solid-primitives/utils";
 import { Accessor } from "solid-js";
 
 import { ToggleProps } from "../types";
@@ -26,8 +25,8 @@ export interface ToggleState {
  */
 export function createToggleState(props: ToggleProps = {}): ToggleState {
   const [isSelected, setSelected] = createControllableBooleanSignal({
-    value: () => access(props.isSelected),
-    defaultValue: () => !!access(props.defaultSelected),
+    value: () => props.isSelected,
+    defaultValue: () => !!props.defaultSelected,
     onChange: props.onChange,
   });
 

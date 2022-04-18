@@ -1,4 +1,3 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
 
 import { KeyboardEvents } from "../types";
@@ -7,7 +6,7 @@ export interface CreateKeyboardProps extends KeyboardEvents {
   /**
    * Whether the keyboard events should be disabled.
    */
-  isDisabled?: MaybeAccessor<boolean | undefined>;
+  isDisabled?: boolean;
 }
 
 export interface keyboardElementProps {
@@ -34,7 +33,7 @@ export interface KeyboardResult {
  */
 export function createKeyboard(props: CreateKeyboardProps): KeyboardResult {
   const onKeyDown: CreateKeyboardProps["onKeyDown"] = event => {
-    if (access(props.isDisabled)) {
+    if (props.isDisabled) {
       return;
     }
 
@@ -42,7 +41,7 @@ export function createKeyboard(props: CreateKeyboardProps): KeyboardResult {
   };
 
   const onKeyUp: CreateKeyboardProps["onKeyUp"] = event => {
-    if (access(props.isDisabled)) {
+    if (props.isDisabled) {
       return;
     }
 

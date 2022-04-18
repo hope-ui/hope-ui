@@ -31,7 +31,7 @@ interface Options {
   propNames?: Set<string>;
 }
 
-const propRe = /^(data-.*)$/;
+const dataAttrsRegex = /^(data-.*)$/;
 
 // Note: "valid DOM props" refers to the `DOMPropNames` Set above.
 /**
@@ -52,7 +52,7 @@ export function filterDOMProps(
       (DOMPropNames.has(prop) ||
         (labelable && labelablePropNames.has(prop)) ||
         propNames?.has(prop) ||
-        propRe.test(prop))
+        dataAttrsRegex.test(prop))
     ) {
       filteredPropNames.push(prop);
     }

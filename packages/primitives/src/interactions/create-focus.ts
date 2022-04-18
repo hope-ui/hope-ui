@@ -1,4 +1,3 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
 
 import { FocusEvents } from "../types";
@@ -7,7 +6,7 @@ export interface CreateFocusProps extends FocusEvents {
   /**
    * Whether the focus events should be disabled.
    */
-  isDisabled?: MaybeAccessor<boolean | undefined>;
+  isDisabled?: boolean;
 }
 
 export interface FocusElementProps {
@@ -34,7 +33,7 @@ export interface FocusResult {
  */
 export function createFocus(props: CreateFocusProps): FocusResult {
   const onFocus: CreateFocusProps["onFocus"] = event => {
-    if (access(props.isDisabled)) {
+    if (props.isDisabled) {
       return;
     }
 
@@ -43,7 +42,7 @@ export function createFocus(props: CreateFocusProps): FocusResult {
   };
 
   const onBlur: CreateFocusProps["onBlur"] = event => {
-    if (access(props.isDisabled)) {
+    if (props.isDisabled) {
       return;
     }
 

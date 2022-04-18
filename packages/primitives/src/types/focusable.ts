@@ -1,5 +1,3 @@
-import { MaybeAccessor } from "@solid-primitives/utils";
-
 import { DOMProps } from "./dom";
 import { FocusEvents, KeyboardEvents } from "./events";
 
@@ -7,7 +5,7 @@ export interface FocusableProps extends FocusEvents, KeyboardEvents {
   /**
    * Whether the element should receive focus on render.
    */
-  autoFocus?: MaybeAccessor<boolean | undefined>;
+  autoFocus?: boolean;
 }
 
 export interface FocusableDOMProps extends DOMProps {
@@ -17,5 +15,5 @@ export interface FocusableDOMProps extends DOMProps {
    * be avoided except in rare scenarios where an alternative means of accessing
    * the element or its functionality via the keyboard is available.
    */
-  excludeFromTabOrder?: MaybeAccessor<boolean | undefined>;
+  excludeFromTabOrder?: boolean;
 }

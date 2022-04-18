@@ -1,4 +1,3 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, JSX } from "solid-js";
 
 import { createFocus } from "../interactions";
@@ -9,12 +8,12 @@ interface CreateVisuallyHiddenProps {
   /**
    * Whether the element should become visible on focus, for example skip links.
    */
-  isVisibleOnFocus?: MaybeAccessor<boolean | undefined>;
+  isVisibleOnFocus?: boolean;
 
   /**
    * The style prop of the element.
    */
-  style?: MaybeAccessor<JSX.HTMLAttributes<HTMLElement>["style"] | undefined>;
+  style?: JSX.HTMLAttributes<HTMLElement>["style"];
 }
 
 interface VisuallyHiddenProps {
@@ -62,18 +61,16 @@ export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): Vis
   const [isFocused, setFocused] = createSignal(false);
 
   const { focusProps } = createFocus({
-    isDisabled: () => !access(props.isVisibleOnFocus),
+    isDisabled: () => !props.isVisibleOnFocus,
     onFocusChange: setFocused,
   });
 
   // If focused, don't hide the element.
   const combinedStyles = createMemo(() => {
-    const propStyle = access(props.style);
-
     if (isFocused()) {
-      return propStyle;
-    } else if (isObject(propStyle)) {
-      return { ...visuallyHiddenStyles, ...propStyle };
+      return props.style;
+    } else if (isObject(props.style)) {
+      return { ...visuallyHiddenStyles, ...props.style };
     } else {
       return visuallyHiddenStyles;
     }

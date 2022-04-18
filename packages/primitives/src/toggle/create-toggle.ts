@@ -1,4 +1,3 @@
-import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, JSX, mergeProps, splitProps } from "solid-js";
 
 import { createFocusable } from "../focus";
@@ -20,7 +19,7 @@ export interface ToggleResult {
 export function createToggle(
   props: AriaToggleProps,
   state: ToggleState,
-  ref: MaybeAccessor<HTMLElement>
+  ref?: HTMLElement
 ): ToggleResult {
   const defaultProps: AriaToggleProps = {
     isDisabled: false,
@@ -34,11 +33,6 @@ export function createToggle(
     "isReadOnly",
     "value",
     "name",
-    "id",
-    "aria-label",
-    "aria-labelledby",
-    "aria-describedby",
-    "aria-details",
     "aria-errormessage",
     "aria-controls",
     "validationState",
@@ -60,19 +54,14 @@ export function createToggle(
     return combineProps(
       domProps,
       {
-        "aria-label": access(local["aria-label"]),
-        "aria-labelledby": access(local["aria-labelledby"]),
-        "aria-describedby": access(local["aria-describedby"]),
-        "aria-details": access(local["aria-details"]),
-        "aria-invalid": access(local.validationState) === "invalid" || undefined,
-        "aria-errormessage": access(local["aria-errormessage"]),
-        "aria-controls": access(local["aria-controls"]),
-        "aria-readonly": access(local.isReadOnly) || undefined,
-        "aria-required": access(local.isRequired) || undefined,
-        disabled: access(local.isDisabled),
-        value: access(local.value),
-        name: access(local.name),
-        id: access(local.id),
+        "aria-invalid": local.validationState === "invalid" || undefined,
+        "aria-errormessage": local["aria-errormessage"],
+        "aria-controls": local["aria-controls"],
+        "aria-readonly": local.isReadOnly || undefined,
+        "aria-required": local.isRequired || undefined,
+        disabled: local.isDisabled,
+        value: local.value,
+        name: local.name,
         type: "checkbox",
         onChange,
       },
