@@ -5,4 +5,5 @@ export * from "./events";
 export * from "./focusable";
 export * from "./inputs";
 export * from "./polymorphic";
+export * from "./switch";
 export * from "./toggle";
