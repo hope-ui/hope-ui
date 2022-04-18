@@ -1,4 +1,4 @@
-import { Anchor, Grid, GridItem, hope, Text } from "@hope-ui/solid";
+import { Anchor, Grid, GridItem, hope, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -112,15 +112,19 @@ export default function GridDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Grid</PageTitle>
       <Text mb="$5">
         A primitive useful for grid layouts. Grid is{" "}
         <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
           Box
         </Anchor>{" "}
-        with <Code>display: grid</Code> and it comes with helpful style shorthand. It renders a <Code>div</Code>{" "}
-        element.
+        with <Code>display: grid</Code> and it comes with helpful style shorthand. It renders a{" "}
+        <Code>div</Code> element.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -129,14 +133,14 @@ export default function GridDoc() {
           <strong>Grid:</strong> The main wrapper with <Code>display: grid</Code>.
         </hope.li>
         <hope.li>
-          <strong>GridItem:</strong> Used as a child of <Code>Grid</Code> to control the span, and start positions
-          within the grid.
+          <strong>GridItem:</strong> Used as a child of <Code>Grid</Code> to control the span, and
+          start positions within the grid.
         </hope.li>
       </hope.ul>
       <SectionTitle id="template-columns">Template columns</SectionTitle>
       <Text mb="$5">
-        Here's an example of using grid template columns with the <Code>Grid</Code> component, and applying a{" "}
-        <Code>gap</Code> (space) between the grid items.
+        Here's an example of using grid template columns with the <Code>Grid</Code> component, and
+        applying a <Code>gap</Code> (space) between the grid items.
       </Text>
       <Preview snippet={snippets.templateColumns} mb="$12">
         <Grid templateColumns="repeat(5, 1fr)" gap="$6">
@@ -149,13 +153,13 @@ export default function GridDoc() {
       </Preview>
       <SectionTitle id="spanning-columns">Spanning columns</SectionTitle>
       <Text mb="$5">
-        In some layouts, you may need certain grid items to span specific amount of columns or rows instead of an even
-        distribution.
+        In some layouts, you may need certain grid items to span specific amount of columns or rows
+        instead of an even distribution.
       </Text>
       <Text mb="$5">
-        To achieve this, you need to pass the <Code>colSpan</Code> prop to the <Code>GridItem</Code> component to span
-        across columns and also pass the <Code>rowSpan</Code> component to span across rows. You also need to specify
-        the <Code>templateColumns</Code> and
+        To achieve this, you need to pass the <Code>colSpan</Code> prop to the <Code>GridItem</Code>{" "}
+        component to span across columns and also pass the <Code>rowSpan</Code> component to span
+        across rows. You also need to specify the <Code>templateColumns</Code> and
         <Code>templateRows</Code>.
       </Text>
       <Preview snippet={snippets.spanningColumns} mb="$12">
@@ -168,8 +172,8 @@ export default function GridDoc() {
       </Preview>
       <SectionTitle id="starting-and-ending-lines">Starting and ending lines</SectionTitle>
       <Text mb="$5">
-        Pass the <Code>colStart</Code> and <Code>colEnd</Code> prop to <Code>GridItem</Code> component to make an
-        element start or end at the <Code>nth</Code> grid position.
+        Pass the <Code>colStart</Code> and <Code>colEnd</Code> prop to <Code>GridItem</Code>{" "}
+        component to make an element start or end at the <Code>nth</Code> grid position.
       </Text>
       <Preview snippet={snippets.startingAndEndingLines} mb="$12">
         <Grid templateColumns="repeat(5, 1fr)" gap="$4">
@@ -180,8 +184,8 @@ export default function GridDoc() {
       <SectionTitle id="props">Props</SectionTitle>
       <SectionSubtitle id="grid-props">Grid props</SectionSubtitle>
       <Text mb="$5">
-        Grid composes <Code>Box</Code> so you can pass all the <Code>Box</Code> prop, css grid props, and these
-        shorthand prop to save you some time:
+        Grid composes <Code>Box</Code> so you can pass all the <Code>Box</Code> prop, css grid
+        props, and these shorthand prop to save you some time:
       </Text>
       <PropsTable items={gridPropItems} mb="$10" />
       <SectionSubtitle id="grid-item-props">GridItem props</SectionSubtitle>

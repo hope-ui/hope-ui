@@ -1,4 +1,14 @@
-import { Box, Grid, GridItem, GridProps, hope, HStack, SystemConfig, useTheme, VStack } from "@hope-ui/solid";
+import {
+  Box,
+  Grid,
+  GridItem,
+  GridProps,
+  hope,
+  HStack,
+  SystemConfig,
+  useTheme,
+  VStack,
+} from "@hope-ui/design-system";
 import { For, splitProps } from "solid-js";
 
 export interface ColorScaleItem {

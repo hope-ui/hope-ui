@@ -1,4 +1,4 @@
-import { Text, Textarea, VStack } from "@hope-ui/solid";
+import { Text, Textarea, VStack } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { createSignal, onMount } from "solid-js";
 
@@ -55,7 +55,8 @@ export default function TextareaDoc() {
     },
     {
       name: "required",
-      description: "If `true`, the textarea is marked as required, and `required` attribute will be added",
+      description:
+        "If `true`, the textarea is marked as required, and `required` attribute will be added",
       type: "boolean",
     },
     {
@@ -80,7 +81,11 @@ export default function TextareaDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Textarea</PageTitle>
       <Text mb="$5">
         The <Code>Textarea</Code> component allows you to easily create multi-line text textareas.
@@ -93,8 +98,8 @@ export default function TextareaDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Textarea sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Textarea's text. You can set the value to{" "}
-        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Textarea's text. You can set the
+        value to <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.textareaSizes} mb="$10">
         <VStack spacing="$4">
@@ -106,8 +111,8 @@ export default function TextareaDoc() {
       </Preview>
       <SectionSubtitle id="variants">Textarea variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Textarea. You can set the value to{" "}
-        <Code>outline</Code>, <Code>filled</Code> or <Code>unstyled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Textarea. You can set
+        the value to <Code>outline</Code>, <Code>filled</Code> or <Code>unstyled</Code>.
       </Text>
       <Preview snippet={snippets.textareaVariants} mb="$10">
         <VStack spacing="$4">
@@ -133,12 +138,17 @@ export default function TextareaDoc() {
       <SectionSubtitle id="controlled">Controlled textarea</SectionSubtitle>
       <Preview snippet={snippets.controlledTextarea} mb="$12">
         <Text mb="$2">Value: {value()}</Text>
-        <Textarea value={value()} onInput={handleInput} placeholder="Here is a sample placeholder" size="sm" />
+        <Textarea
+          value={value()}
+          onInput={handleInput}
+          placeholder="Here is a sample placeholder"
+          size="sm"
+        />
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Textarea</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Textarea</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

@@ -2,7 +2,7 @@ const importComponent = `import {
   CircularProgress, 
   CircularProgressIndicator,
   CircularProgressLabel 
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<CircularProgress value={80}>
   <CircularProgressIndicator />

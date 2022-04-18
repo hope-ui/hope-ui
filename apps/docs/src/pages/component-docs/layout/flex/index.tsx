@@ -1,4 +1,16 @@
-import { Anchor, Box, Button, Center, Flex, Grid, Heading, hope, HStack, Spacer, Text } from "@hope-ui/solid";
+import {
+  Anchor,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Grid,
+  Heading,
+  hope,
+  HStack,
+  Spacer,
+  Text,
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -52,14 +64,19 @@ export default function FlexDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Flex</PageTitle>
       <Text mb="$5">
         Flex is{" "}
         <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
           Box
         </Anchor>{" "}
-        with <Code>display: flex</Code> and comes with helpful style shorthand. It renders a <Code>div</Code> element.
+        with <Code>display: flex</Code> and comes with helpful style shorthand. It renders a{" "}
+        <Code>div</Code> element.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -68,8 +85,8 @@ export default function FlexDoc() {
           <strong>Flex:</strong> A <Code>Box</Code> with <Code>display: flex</Code>.
         </hope.li>
         <hope.li>
-          <strong>Spacer:</strong> Creates an adjustable, empty space that can be used to tune the spacing between child
-          elements within <Code>Flex</Code>.
+          <strong>Spacer:</strong> Creates an adjustable, empty space that can be used to tune the
+          spacing between child elements within <Code>Flex</Code>.
         </hope.li>
       </hope.ul>
       <SectionTitle id="usage">Usage</SectionTitle>
@@ -82,7 +99,9 @@ export default function FlexDoc() {
           <Code>flexWrap</Code> is <Code>wrap</Code>.
         </hope.li>
       </hope.ul>
-      <Text mb="$5">While you can pass the verbose props, using the shorthand can save you some time.</Text>
+      <Text mb="$5">
+        While you can pass the verbose props, using the shorthand can save you some time.
+      </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Flex color="white">
           <Center w="100px" bg="$success10">
@@ -98,8 +117,8 @@ export default function FlexDoc() {
       </Preview>
       <SectionSubtitle id="using-the-spacer">Using the Spacer</SectionSubtitle>
       <Text mb="$5">
-        As an alternative to <Code>Stack</Code>, you can combine <Code>Flex</Code> and <Code>Spacer</Code> to create
-        stackable and responsive layouts.
+        As an alternative to <Code>Stack</Code>, you can combine <Code>Flex</Code> and{" "}
+        <Code>Spacer</Code> to create stackable and responsive layouts.
       </Text>
       <Preview snippet={snippets.usingSpacer} mb="$12">
         <Flex>
@@ -114,21 +133,21 @@ export default function FlexDoc() {
       </Preview>
       <SectionTitle id="vs">Flex and Spacer vs Grid vs Stack</SectionTitle>
       <Text mb="$4">
-        The <Code>Flex</Code> and <Code>Spacer</Code> components, <Code>Grid</Code> and <Code>HStack</Code> treat
-        children of different widths differently.
+        The <Code>Flex</Code> and <Code>Spacer</Code> components, <Code>Grid</Code> and{" "}
+        <Code>HStack</Code> treat children of different widths differently.
       </Text>
       <hope.ul ps="$6" mb="$6">
         <hope.li mb="$2">
-          With <Code>Flex</Code> and <Code>Spacer</Code>, the children will span the entire width of the container and
-          also have equal spacing between them.
+          With <Code>Flex</Code> and <Code>Spacer</Code>, the children will span the entire width of
+          the container and also have equal spacing between them.
         </hope.li>
         <hope.li mb="$2">
-          In <Code>Grid</Code>, the starting points of the children will be equally spaced but the gaps between them
-          will not be equal.
+          In <Code>Grid</Code>, the starting points of the children will be equally spaced but the
+          gaps between them will not be equal.
         </hope.li>
         <hope.li>
-          In <Code>HStack</Code>, the children will have equal spacing between them but they won't span the entire width
-          of the container.
+          In <Code>HStack</Code>, the children will have equal spacing between them but they won't
+          span the entire width of the container.
         </hope.li>
       </hope.ul>
       <Preview snippet={snippets.vs} mb="$8">
@@ -149,7 +168,9 @@ export default function FlexDoc() {
             <Box w="180px" h="$10" bg="$info9" />
           </Grid>
 
-          <Text mt="$4">HStack: The children have equal spacing but don't span the whole container</Text>
+          <Text mt="$4">
+            HStack: The children have equal spacing but don't span the whole container
+          </Text>
           <HStack spacing="24px">
             <Box w="70px" h="$10" bg="$success9" />
             <Box w="170px" h="$10" bg="$success9" />
@@ -158,7 +179,8 @@ export default function FlexDoc() {
         </Box>
       </Preview>
       <Text mb="$5">
-        A good use case for <Code>Spacer</Code> is to create a navbar with a signup/login button aligned to the right.
+        A good use case for <Code>Spacer</Code> is to create a navbar with a signup/login button
+        aligned to the right.
       </Text>
       <Preview snippet={snippets.spacerUseCase} mb="$12">
         <Flex>

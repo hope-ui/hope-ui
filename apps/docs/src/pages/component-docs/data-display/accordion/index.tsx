@@ -13,7 +13,7 @@ import {
   ListItem,
   Text,
   UnorderedList,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { createSignal, onMount } from "solid-js";
@@ -104,27 +104,33 @@ export default function AccordionDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Accordion</PageTitle>
       <Text mb="$5">
-        Accordions display a list of high-level options that can expand/collapse to reveal more information.
+        Accordions display a list of high-level options that can expand/collapse to reveal more
+        information.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>Accordion:</strong> The wrapper components that provides context for all its children.
+          <strong>Accordion:</strong> The wrapper components that provides context for all its
+          children.
         </ListItem>
         <ListItem>
           <strong>AccordionItem:</strong> A single accordion item.
         </ListItem>
         <ListItem>
-          <strong>AccordionButton:</strong> The button that toggles the expand/collapse state of the accordion item.
-          This button must be wrapped in an element with role <Code>heading</Code>.
+          <strong>AccordionButton:</strong> The button that toggles the expand/collapse state of the
+          accordion item. This button must be wrapped in an element with role <Code>heading</Code>.
         </ListItem>
         <ListItem>
-          <strong>AccordionIcon:</strong> A <Code>caret-down</Code> icon that rotates based on the expanded/collapsed
-          state.
+          <strong>AccordionIcon:</strong> A <Code>caret-down</Code> icon that rotates based on the
+          expanded/collapsed state.
         </ListItem>
         <ListItem>
           <strong>AccordionPanel:</strong> The container for the details to be revealed.
@@ -142,7 +148,9 @@ export default function AccordionDoc() {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+            <AccordionPanel>
+              Compose your application interface with reusable building blocks.
+            </AccordionPanel>
           </AccordionItem>
 
           <AccordionItem>
@@ -155,7 +163,8 @@ export default function AccordionDoc() {
               </AccordionButton>
             </h2>
             <AccordionPanel>
-              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
+              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible
+              with less effort.
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
@@ -175,7 +184,9 @@ export default function AccordionDoc() {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+            <AccordionPanel>
+              Compose your application interface with reusable building blocks.
+            </AccordionPanel>
           </AccordionItem>
 
           <AccordionItem>
@@ -188,7 +199,8 @@ export default function AccordionDoc() {
               </AccordionButton>
             </h2>
             <AccordionPanel>
-              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
+              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible
+              with less effort.
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
@@ -208,7 +220,9 @@ export default function AccordionDoc() {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+            <AccordionPanel>
+              Compose your application interface with reusable building blocks.
+            </AccordionPanel>
           </AccordionItem>
 
           <AccordionItem>
@@ -221,21 +235,24 @@ export default function AccordionDoc() {
               </AccordionButton>
             </h2>
             <AccordionPanel>
-              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
+              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible
+              with less effort.
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
       </Preview>
       <Alert status="warning" mb="$10">
         <AlertDescription>
-          If you pass this prop, ensure that the <Code>index</Code> or <Code>defaultIndex</Code> prop is an array.
+          If you pass this prop, ensure that the <Code>index</Code> or <Code>defaultIndex</Code>{" "}
+          prop is an array.
         </AlertDescription>
       </Alert>
       <SectionSubtitle id="styling-expanded-state">Styling the expanded state</SectionSubtitle>
       <Text mb="$5">
-        The <Code>AccordionButton</Code> component has <Code>aria-expanded</Code> set to <Code>true</Code> or{" "}
-        <Code>false</Code> depending on the state of the <Code>AccordionItem</Code>. That means you can use the{" "}
-        <Code>_expanded</Code> style prop to style this state.
+        The <Code>AccordionButton</Code> component has <Code>aria-expanded</Code> set to{" "}
+        <Code>true</Code> or <Code>false</Code> depending on the state of the{" "}
+        <Code>AccordionItem</Code>. That means you can use the <Code>_expanded</Code> style prop to
+        style this state.
       </Text>
       <Preview snippet={snippets.stylingExpandedState} mb="$10">
         <Accordion>
@@ -248,14 +265,16 @@ export default function AccordionDoc() {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+            <AccordionPanel>
+              Compose your application interface with reusable building blocks.
+            </AccordionPanel>
           </AccordionItem>
         </Accordion>
       </Preview>
       <SectionSubtitle id="accessing-internal-state">Accessing the internal state</SectionSubtitle>
       <Text mb="$5">
-        If you need access to the internal state of each accordion item, you can use a render prop. It provides 2
-        internal state props: <Code>expanded</Code> and <Code>disabled</Code>.
+        If you need access to the internal state of each accordion item, you can use a render prop.
+        It provides 2 internal state props: <Code>expanded</Code> and <Code>disabled</Code>.
       </Text>
       <Preview snippet={snippets.internalState} mb="$10">
         <Accordion>
@@ -270,7 +289,9 @@ export default function AccordionDoc() {
                     <AccordionIcon fontSize="1em" as={expanded() ? IconMinus : IconPlus} />
                   </AccordionButton>
                 </h2>
-                <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+                <AccordionPanel>
+                  Compose your application interface with reusable building blocks.
+                </AccordionPanel>
               </>
             )}
           </AccordionItem>
@@ -278,7 +299,8 @@ export default function AccordionDoc() {
       </Preview>
       <SectionSubtitle id="controlled-accordion">Controlled accordion</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>index</Code> and <Code>onChange</Code> props to control the <Code>Accordion</Code>.
+        Use the <Code>index</Code> and <Code>onChange</Code> props to control the{" "}
+        <Code>Accordion</Code>.
       </Text>
       <Preview snippet={snippets.controlled} mb="$12">
         <HStack spacing="$4" mb="$4">
@@ -299,7 +321,9 @@ export default function AccordionDoc() {
                 <AccordionIcon />
               </AccordionButton>
             </h2>
-            <AccordionPanel>Compose your application interface with reusable building blocks.</AccordionPanel>
+            <AccordionPanel>
+              Compose your application interface with reusable building blocks.
+            </AccordionPanel>
           </AccordionItem>
 
           <AccordionItem>
@@ -312,7 +336,8 @@ export default function AccordionDoc() {
               </AccordionButton>
             </h2>
             <AccordionPanel>
-              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
+              Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible
+              with less effort.
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
@@ -321,25 +346,26 @@ export default function AccordionDoc() {
       <SectionSubtitle>ARIA roles and attributes</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$8">
         <ListItem>
-          Each <Code>AccordionButton</Code> should be wrapped in an element with role <Code>heading</Code>.
+          Each <Code>AccordionButton</Code> should be wrapped in an element with role{" "}
+          <Code>heading</Code>.
         </ListItem>
         <ListItem>
           <Code>AccordionButton</Code> as <Code>role</Code> set to <Code>button</Code>.
         </ListItem>
         <ListItem>
-          <Code>AccordionButton</Code> as <Code>aria-controls</Code> set to the <Code>id</Code> of its associated{" "}
-          <Code>AccordionPanel</Code>.
+          <Code>AccordionButton</Code> as <Code>aria-controls</Code> set to the <Code>id</Code> of
+          its associated <Code>AccordionPanel</Code>.
         </ListItem>
         <ListItem>
-          <Code>AccordionButton</Code> as <Code>aria-expanded</Code> set to <Code>true</Code> when its associated{" "}
-          <Code>AccordionPanel</Code> is expanded, <Code>false</Code> otherwise.
+          <Code>AccordionButton</Code> as <Code>aria-expanded</Code> set to <Code>true</Code> when
+          its associated <Code>AccordionPanel</Code> is expanded, <Code>false</Code> otherwise.
         </ListItem>
         <ListItem>
           <Code>AccordionPanel</Code> as <Code>role</Code> set to <Code>region</Code>.
         </ListItem>
         <ListItem>
-          <Code>AccordionPanel</Code> as <Code>aria-labelledby</Code> set to the <Code>id</Code> of its associated{" "}
-          <Code>AccordionButton</Code>.
+          <Code>AccordionPanel</Code> as <Code>aria-labelledby</Code> set to the <Code>id</Code> of
+          its associated <Code>AccordionButton</Code>.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support</SectionSubtitle>
@@ -359,8 +385,8 @@ export default function AccordionDoc() {
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Accordion</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Accordion</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -372,14 +398,26 @@ export default function AccordionDoc() {
       <UnorderedList spacing="$2">
         <ListItem>
           <Code>AccordionButton</Code> and <Code>AccordionPanel</Code> composes{" "}
-          <Anchor as={Link} href="/docs/layout/box" external color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/layout/box"
+            external
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             Box
           </Anchor>
           .
         </ListItem>
         <ListItem>
           <Code>AccordionIcon</Code> composes{" "}
-          <Anchor as={Link} href="/docs/data-display/icon" external color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/data-display/icon"
+            external
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             Icon
           </Anchor>
           .

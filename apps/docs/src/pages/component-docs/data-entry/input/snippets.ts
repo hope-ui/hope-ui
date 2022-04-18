@@ -5,7 +5,7 @@ const importComponent = `import {
   InputLeftElement,
   InputRightAddon,
   InputRightElement,
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Input placeholder="Basic usage" />`;
 

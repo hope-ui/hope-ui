@@ -1,4 +1,4 @@
-import { Anchor, Box, Heading, Text } from "@hope-ui/solid";
+import { Anchor, Box, Heading, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -38,41 +38,62 @@ export default function CSSProp() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>
         The <Code>css</Code> prop
       </PageTitle>
       <Text mb="$5">
-        With <Code>css</Code> you can provide any valid CSS to an element and utilize tokens from your theme to ensure
-        consistency and that you are utilizing constraint-based design principles when styling your application.
+        With <Code>css</Code> you can provide any valid CSS to an element and utilize tokens from
+        your theme to ensure consistency and that you are utilizing constraint-based design
+        principles when styling your application.
       </Text>
       <Text mb="$5">
-        This prop provides a superset of CSS (contains all CSS properties/selectors in addition to custom ones) that
-        maps values directly from the theme, depending on the CSS property used. Also, it allows a simple way of
-        defining responsive values that correspond to the breakpoints defined in the theme.
+        This prop provides a superset of CSS (contains all CSS properties/selectors in addition to
+        custom ones) that maps values directly from the theme, depending on the CSS property used.
+        Also, it allows a simple way of defining responsive values that correspond to the
+        breakpoints defined in the theme.
       </Text>
       <Text mb="$5">
         To find out which properties are theme-aware, see the{" "}
-        <Anchor as={Link} href="/docs/features/style-props" color="$primary11" fontWeight="$semibold">
+        <Anchor
+          as={Link}
+          href="/docs/features/style-props"
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           Style Props
         </Anchor>
         .
       </Text>
       <Text mb="$8">
-        Although the <Code>css</Code> prop is considered an escape hatch, there are few cases where it is needed.
+        Although the <Code>css</Code> prop is considered an escape hatch, there are few cases where
+        it is needed.
       </Text>
-      <SectionTitle id="defining-any-standard-css-property">Defining any standard CSS property</SectionTitle>
+      <SectionTitle id="defining-any-standard-css-property">
+        Defining any standard CSS property
+      </SectionTitle>
       <Text mb="$5">
-        In case you need to set a CSS property that is not listed in the Style Props list, you can use the{" "}
-        <Code>css</Code> prop and pass it whatever CSS property you desire.
+        In case you need to set a CSS property that is not listed in the Style Props list, you can
+        use the <Code>css</Code> prop and pass it whatever CSS property you desire.
       </Text>
       <Text mb="$5">
         One such example is the <Code>filter</Code> property:
       </Text>
       <Preview snippet={snippets.defineStandardCSSProperty} mb="$12">
-        <Box as="img" src="http://placekitten.com/200/300" alt="a kitten" css={{ filter: "blur(8px)" }} />
+        <Box
+          as="img"
+          src="http://placekitten.com/200/300"
+          alt="a kitten"
+          css={{ filter: "blur(8px)" }}
+        />
       </Preview>
-      <SectionTitle id="defining-css-custom-properties">Defining CSS custom properties</SectionTitle>
+      <SectionTitle id="defining-css-custom-properties">
+        Defining CSS custom properties
+      </SectionTitle>
       <Text mb="$5">
         Custom CSS properties can be defined via the <Code>css</Code> prop as well:
       </Text>
@@ -105,17 +126,21 @@ export default function CSSProp() {
           </Heading>
         </Box>
       </Preview>
-      <SectionTitle id="targeting-other-hope-components">Targeting other Hope UI components</SectionTitle>
+      <SectionTitle id="targeting-other-hope-components">
+        Targeting other Hope UI components
+      </SectionTitle>
       <Text mb="$5">
-        Inside the <Code>css</Code> prop you can target other Hope UI components using string interpolation in the
-        selector.
+        Inside the <Code>css</Code> prop you can target other Hope UI components using string
+        interpolation in the selector.
       </Text>
       <CodeSnippet snippet={snippets.targetingOtherHopeComponent} mb="$12" />
 
-      <SectionTitle id="targeting-other-solid-components">Targeting other SolidJS components</SectionTitle>
+      <SectionTitle id="targeting-other-solid-components">
+        Targeting other SolidJS components
+      </SectionTitle>
       <Text mb="$5">
-        Inside the <Code>css</Code> prop you can target other SolidJS components using string interpolation in the
-        selector.
+        Inside the <Code>css</Code> prop you can target other SolidJS components using string
+        interpolation in the selector.
       </Text>
       <CodeSnippet snippet={snippets.targetingOtherSolidComponent} mb="$12" />
 

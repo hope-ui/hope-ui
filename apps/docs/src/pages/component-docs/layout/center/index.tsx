@@ -1,4 +1,4 @@
-import { Anchor, AspectRatio, Box, Center, hope, HStack, Text } from "@hope-ui/solid";
+import { Anchor, AspectRatio, Box, Center, hope, HStack, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -37,15 +37,19 @@ export default function CenterDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Center</PageTitle>
       <Text mb="$5">Center is a layout component that centers its child within itself.</Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        Put any child element inside it, give it any <Code>width</Code> or/and <Code>height</Code>, it'll ensure the
-        child is centered.
+        Put any child element inside it, give it any <Code>width</Code> or/and <Code>height</Code>,
+        it'll ensure the child is centered.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Center bg="tomato" h="100px" color="white">

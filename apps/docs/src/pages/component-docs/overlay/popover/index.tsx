@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
   Text,
   UnorderedList,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -139,7 +139,8 @@ export default function PopoverDoc() {
     },
     {
       name: "closeOnBlur",
-      description: "If `true`, the popover will close when the user blur out it by clicking outside or tabbing out.",
+      description:
+        "If `true`, the popover will close when the user blur out it by clicking outside or tabbing out.",
       type: "boolean",
       defaultValue: "true",
     },
@@ -157,7 +158,8 @@ export default function PopoverDoc() {
     },
     {
       name: "initialFocus",
-      description: "A query selector string targeting the element to receive focus when the popover opens.",
+      description:
+        "A query selector string targeting the element to receive focus when the popover opens.",
       type: "string",
     },
     {
@@ -188,29 +190,36 @@ export default function PopoverDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Popover</PageTitle>
       <Text mb="$5">
-        Popover is a non-modal dialog that floats around a trigger. It is used to display contextual information to the
-        user, and should be paired with a clickable trigger element.
+        Popover is a non-modal dialog that floats around a trigger. It is used to display contextual
+        information to the user, and should be paired with a clickable trigger element.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>Popover:</strong> The wrapper that provides props, state, and context to its children.
+          <strong>Popover:</strong> The wrapper that provides props, state, and context to its
+          children.
         </ListItem>
         <ListItem>
           <strong>PopoverTrigger:</strong> The component that opens/closes the popover.
         </ListItem>
         <ListItem>
-          <strong>PopoverAnchor:</strong> The component to use as positioning reference instead of the trigger.
+          <strong>PopoverAnchor:</strong> The component to use as positioning reference instead of
+          the trigger.
         </ListItem>
         <ListItem>
           <strong>PopoverContent:</strong> The popover itself.
         </ListItem>
         <ListItem>
-          <strong>PopoverArrow:</strong> A visual arrow that points to the reference (trigger or anchor) element.
+          <strong>PopoverArrow:</strong> A visual arrow that points to the reference (trigger or
+          anchor) element.
         </ListItem>
         <ListItem>
           <strong>PopoverCloseButton:</strong> A button to close the popover.
@@ -227,8 +236,9 @@ export default function PopoverDoc() {
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        <Code>PopoverTrigger</Code> renders an unstyled <Code>button</Code> by default. For accessiblity reason, when
-        using the <Code>as</Code> prop ensure the element passed in is focusable.
+        <Code>PopoverTrigger</Code> renders an unstyled <Code>button</Code> by default. For
+        accessiblity reason, when using the <Code>as</Code> prop ensure the element passed in is
+        focusable.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$6">
         <Popover>
@@ -251,8 +261,8 @@ export default function PopoverDoc() {
       </Alert>
       <SectionSubtitle id="trigger-mode">Trigger mode</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>triggerMode</Code> prop to change the way of opening the popover. You can set the value to{" "}
-        <Code>hover</Code> or <Code>click</Code>.
+        Use the <Code>triggerMode</Code> prop to change the way of opening the popover. You can set
+        the value to <Code>hover</Code> or <Code>click</Code>.
       </Text>
       <Preview snippet={snippets.triggerOnHover} mb="$10">
         <Popover triggerMode="hover">
@@ -269,8 +279,8 @@ export default function PopoverDoc() {
       </Preview>
       <SectionSubtitle id="initial-focus">Initial focus</SectionSubtitle>
       <Text mb="$5">
-        By default, focus is sent to <Code>PopoverContent</Code> when it opens. Use the <Code>initialFocus</Code> prop
-        to send focus to a specific element instead.
+        By default, focus is sent to <Code>PopoverContent</Code> when it opens. Use the{" "}
+        <Code>initialFocus</Code> prop to send focus to a specific element instead.
       </Text>
       <Preview snippet={snippets.initialFocus} mb="$10">
         <Popover initialFocus="#next">
@@ -282,7 +292,13 @@ export default function PopoverDoc() {
             <PopoverArrow />
             <PopoverCloseButton />
             <PopoverBody>To start the development server run npm start command</PopoverBody>
-            <PopoverFooter border="0" d="flex" alignItems="center" justifyContent="space-between" pb="$4">
+            <PopoverFooter
+              border="0"
+              d="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              pb="$4"
+            >
               <Box fontSize="$sm">Step 2 of 4</Box>
               <ButtonGroup size="sm">
                 <Button colorScheme="neutral" variant="subtle">
@@ -310,7 +326,13 @@ export default function PopoverDoc() {
             <PopoverArrow />
             <PopoverCloseButton />
             <PopoverBody>To start the development server run npm start command</PopoverBody>
-            <PopoverFooter border="0" d="flex" alignItems="center" justifyContent="space-between" pb="$4">
+            <PopoverFooter
+              border="0"
+              d="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              pb="$4"
+            >
               <Box fontSize="$sm">Step 2 of 4</Box>
               <ButtonGroup size="sm">
                 <Button colorScheme="neutral" variant="subtle">
@@ -324,9 +346,9 @@ export default function PopoverDoc() {
       </Preview>
       <SectionSubtitle id="popover-placement">Popover placement</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>placement</Code> prop to set the preferred popover placement. You can set the value to{" "}
-        <Code>top</Code>, <Code>right</Code>, <Code>left</Code>, <Code>bottom</Code> and their <Code>-start</Code> or{" "}
-        <Code>-end</Code> variants.
+        Use the <Code>placement</Code> prop to set the preferred popover placement. You can set the
+        value to <Code>top</Code>, <Code>right</Code>, <Code>left</Code>, <Code>bottom</Code> and
+        their <Code>-start</Code> or <Code>-end</Code> variants.
       </Text>
       <Preview snippet={snippets.placement} mb="$6">
         <Popover placement="top-start">
@@ -343,23 +365,29 @@ export default function PopoverDoc() {
       </Preview>
       <Alert status="warning" mb="$10">
         <AlertDescription>
-          Even though you specified the placement, Popover will try to reposition itself in the event that available
-          space at the specified placement isn't enough.
+          Even though you specified the placement, Popover will try to reposition itself in the
+          event that available space at the specified placement isn't enough.
         </AlertDescription>
       </Alert>
       <SectionSubtitle id="popover-anchor">Popover anchor</SectionSubtitle>
       <Text mb="$3">
-        Use the <Code>PopoverAnchor</Code> component if you want to use a different element for the popover positioning
-        reference.
+        Use the <Code>PopoverAnchor</Code> component if you want to use a different element for the
+        popover positioning reference.
       </Text>
       <Text mb="$5">
-        In the example below, the <Code>Button</Code> is the trigger that opens/closes the popover and the{" "}
-        <Code>Input</Code> is the reference element that the popover will position relative to.
+        In the example below, the <Code>Button</Code> is the trigger that opens/closes the popover
+        and the <Code>Input</Code> is the reference element that the popover will position relative
+        to.
       </Text>
       <Preview snippet={snippets.anchor} mb="$10">
         <Popover>
           <HStack spacing="$2">
-            <PopoverAnchor as={Input} w="auto" display="inline-flex" placeholder="I am the anchor" />
+            <PopoverAnchor
+              as={Input}
+              w="auto"
+              display="inline-flex"
+              placeholder="I am the anchor"
+            />
             <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
           </HStack>
           <PopoverContent>
@@ -372,8 +400,8 @@ export default function PopoverDoc() {
       </Preview>
       <SectionSubtitle id="accessing-internal-state">Accessing internal state</SectionSubtitle>
       <Text mb="$5">
-        Popover provides access to its internal state <Code>opened</Code> state and an <Code>onClose</Code> method that
-        you can access via a render prop.
+        Popover provides access to its internal state <Code>opened</Code> state and an{" "}
+        <Code>onClose</Code> method that you can access via a render prop.
       </Text>
       <Preview snippet={snippets.internalState} mb="$10">
         <Popover closeOnBlur={false} placement="left" initialFocus="#close-btn">
@@ -399,7 +427,8 @@ export default function PopoverDoc() {
       </Preview>
       <SectionSubtitle id="controlled-popover">Controlled popover</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>opened</Code> and <Code>onClose</Code> props to control the opening and closing of the popover.
+        Use the <Code>opened</Code> and <Code>onClose</Code> props to control the opening and
+        closing of the popover.
       </Text>
       <Preview snippet={snippets.controlled} mb="$12">
         <Button variant="subtle" colorScheme="neutral" mr="$2" onClick={onToggle}>
@@ -417,7 +446,8 @@ export default function PopoverDoc() {
       </Preview>
       <SectionTitle id="composition">Composition</SectionTitle>
       <Text mb="$5">
-        <Code>Popover</Code> is made up of several components that you can customize to achieve your desired design.
+        <Code>Popover</Code> is made up of several components that you can customize to achieve your
+        desired design.
       </Text>
       <Preview snippet={snippets.composition} mb="$12">
         <Popover offset={24}>
@@ -442,69 +472,71 @@ export default function PopoverDoc() {
       <SectionSubtitle>ARIA roles and attributes</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$8">
         <ListItem>
-          <Code>PopoverTrigger</Code> has <Code>aria-haspopup</Code> set to <Code>dialog</Code> to denote that it
-          triggers a popover.
+          <Code>PopoverTrigger</Code> has <Code>aria-haspopup</Code> set to <Code>dialog</Code> to
+          denote that it triggers a popover.
         </ListItem>
         <ListItem>
-          <Code>PopoverTrigger</Code> has <Code>aria-controls</Code> set to the <Code>id</Code> of the{" "}
-          <Code>PopoverContent</Code>.
+          <Code>PopoverTrigger</Code> has <Code>aria-controls</Code> set to the <Code>id</Code> of
+          the <Code>PopoverContent</Code>.
         </ListItem>
         <ListItem>
-          <Code>PopoverTrigger</Code> has <Code>aria-expanded</Code> set to <Code>true</Code> or <Code>false</Code>{" "}
-          depending on the open/closed state of the popover.
+          <Code>PopoverTrigger</Code> has <Code>aria-expanded</Code> set to <Code>true</Code> or{" "}
+          <Code>false</Code> depending on the open/closed state of the popover.
         </ListItem>
         <ListItem>
-          <Code>PopoverContent</Code> has <Code>aria-labelledby</Code> set to the <Code>id</Code> of the{" "}
-          <Code>PopoverHeader</Code>.
+          <Code>PopoverContent</Code> has <Code>aria-labelledby</Code> set to the <Code>id</Code> of
+          the <Code>PopoverHeader</Code>.
         </ListItem>
         <ListItem>
-          <Code>PopoverContent</Code> has <Code>aria-describedby</Code> set to the <Code>id</Code> of the{" "}
-          <Code>PopoverBody</Code>.
+          <Code>PopoverContent</Code> has <Code>aria-describedby</Code> set to the <Code>id</Code>{" "}
+          of the <Code>PopoverBody</Code>.
         </ListItem>
         <ListItem>
-          When the <Code>triggerMode</Code> is set to <Code>hover</Code>, <Code>PopoverContent</Code> has{" "}
-          <Code>role</Code> set to <Code>tooltip</Code>, otherwise <Code>role</Code> is set to <Code>dialog</Code>.
+          When the <Code>triggerMode</Code> is set to <Code>hover</Code>,{" "}
+          <Code>PopoverContent</Code> has <Code>role</Code> set to <Code>tooltip</Code>, otherwise{" "}
+          <Code>role</Code> is set to <Code>dialog</Code>.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support (closed popover)</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$8">
         <ListItem>
-          When the <Code>triggerMode</Code> prop is set to <Code>click</Code>, clicking the <Code>PopoverTrigger</Code>{" "}
-          or pressing <Kbd>space</Kbd> or <Kbd>enter</Kbd> when focus is on the trigger will open the popover.
+          When the <Code>triggerMode</Code> prop is set to <Code>click</Code>, clicking the{" "}
+          <Code>PopoverTrigger</Code> or pressing <Kbd>space</Kbd> or <Kbd>enter</Kbd> when focus is
+          on the trigger will open the popover.
         </ListItem>
         <ListItem>
-          When the <Code>triggerMode</Code> prop is set to <Code>hover</Code>, focusing on or mousing over the{" "}
-          <Code>PopoverTrigger</Code> will open the popover.
+          When the <Code>triggerMode</Code> prop is set to <Code>hover</Code>, focusing on or
+          mousing over the <Code>PopoverTrigger</Code> will open the popover.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support (opened popover)</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          When the <Code>initialFocus</Code> prop is set, focus is moved to the matching element, otherwise focus moves
-          to the <Code>PopoverContent</Code>.
+          When the <Code>initialFocus</Code> prop is set, focus is moved to the matching element,
+          otherwise focus moves to the <Code>PopoverContent</Code>.
         </ListItem>
         <ListItem>
-          When the <Code>triggerMode</Code> prop is set to <Code>click</Code>, clicking the <Code>PopoverTrigger</Code>{" "}
-          closes the popover.
+          When the <Code>triggerMode</Code> prop is set to <Code>click</Code>, clicking the{" "}
+          <Code>PopoverTrigger</Code> closes the popover.
         </ListItem>
         <ListItem>
-          When the <Code>triggerMode</Code> prop is set to <Code>hover</Code>, blurring or mousing out of the{" "}
-          <Code>PopoverTrigger</Code> will close the popover. If you move your mouse into the{" "}
-          <Code>PopoverContent</Code>, it'll remain visible.
+          When the <Code>triggerMode</Code> prop is set to <Code>hover</Code>, blurring or mousing
+          out of the <Code>PopoverTrigger</Code> will close the popover. If you move your mouse into
+          the <Code>PopoverContent</Code>, it'll remain visible.
         </ListItem>
         <ListItem>
-          When focus is within the <Code>PopoverContent</Code> and <Code>closeOnEsc</Code> prop is set to{" "}
-          <Code>true</Code>, pressing <Kbd>esc</Kbd> closes the popover.
+          When focus is within the <Code>PopoverContent</Code> and <Code>closeOnEsc</Code> prop is
+          set to <Code>true</Code>, pressing <Kbd>esc</Kbd> closes the popover.
         </ListItem>
         <ListItem>
-          When <Code>closeOnBur</Code> prop is set to <Code>true</Code>, clicking outside or blurring out of the{" "}
-          <Code>PopoverContent</Code> closes the popover.
+          When <Code>closeOnBur</Code> prop is set to <Code>true</Code>, clicking outside or
+          blurring out of the <Code>PopoverContent</Code> closes the popover.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Popover</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Popover</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -513,16 +545,28 @@ export default function PopoverDoc() {
       <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
       <UnorderedList spacing="$2">
         <ListItem>
-          <Code>PopoverContent</Code>, <Code>PopoverArrow</Code>, <Code>PopoverHeader</Code>, <Code>PopoverBody</Code>{" "}
-          and <Code>PopoverFooter</Code> composes{" "}
-          <Anchor as={Link} href="/docs/layout/box" external color="$primary11" fontWeight="$semibold">
+          <Code>PopoverContent</Code>, <Code>PopoverArrow</Code>, <Code>PopoverHeader</Code>,{" "}
+          <Code>PopoverBody</Code> and <Code>PopoverFooter</Code> composes{" "}
+          <Anchor
+            as={Link}
+            href="/docs/layout/box"
+            external
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             Box
           </Anchor>
           .
         </ListItem>
         <ListItem>
           <Code>PopoverCloseButton</Code> composes{" "}
-          <Anchor as={Link} href="/docs/others/close-button" external color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/others/close-button"
+            external
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             CloseButton
           </Anchor>
           .

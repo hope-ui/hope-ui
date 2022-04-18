@@ -1,4 +1,12 @@
-import { ListItem, Progress, ProgressIndicator, ProgressLabel, Text, UnorderedList, VStack } from "@hope-ui/solid";
+import {
+  ListItem,
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  Text,
+  UnorderedList,
+  VStack,
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -61,7 +69,8 @@ export default function ProgressDoc() {
     },
     {
       name: "indeterminate",
-      description: "If `true`, the progress will be indeterminate and the `value` prop will be ignored.",
+      description:
+        "If `true`, the progress will be indeterminate and the `value` prop will be ignored.",
       type: "boolean",
     },
     {
@@ -83,7 +92,8 @@ export default function ProgressDoc() {
     },
     {
       name: "getValueText",
-      description: "A function that returns the desired `aria-valuetext` to use in place of the value.",
+      description:
+        "A function that returns the desired `aria-valuetext` to use in place of the value.",
       type: "(value: number, percent: number) => string",
     },
   ];
@@ -112,11 +122,15 @@ export default function ProgressDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Progress</PageTitle>
       <Text mb="$5">
-        <Code>Progress</Code> is used to display the progress status for a task that takes a long time or consists of
-        several steps.
+        <Code>Progress</Code> is used to display the progress status for a task that takes a long
+        time or consists of several steps.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -139,8 +153,8 @@ export default function ProgressDoc() {
       </Preview>
       <SectionSubtitle id="colors">Progress color</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>color</Code> prop to change the color of the <Code>ProgressIndicator</Code> and the{" "}
-        <Code>trackColor</Code> prop to change the color of the progress track (background).
+        Use the <Code>color</Code> prop to change the color of the <Code>ProgressIndicator</Code>{" "}
+        and the <Code>trackColor</Code> prop to change the color of the progress track (background).
       </Text>
       <Preview snippet={snippets.colors} mb="$10">
         <Progress trackColor="$info3" value={64}>
@@ -149,8 +163,8 @@ export default function ProgressDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Progress sizes</SectionSubtitle>
       <Text mb="$2">
-        Use the <Code>size</Code> prop to change the size of the Progress. You can set the value to <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Progress. You can set the value to{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Text mb="$5">
         You can also use the <Code>height</Code> prop to manually set a height.
@@ -176,8 +190,8 @@ export default function ProgressDoc() {
       </Preview>
       <SectionSubtitle id="with-label">Progress with label</SectionSubtitle>
       <Text mb="$5">
-        You can set a label inside the propgress by using the <Code>ProgressLabel</Code> component. By default it will
-        display the progress percentage.
+        You can set a label inside the propgress by using the <Code>ProgressLabel</Code> component.
+        By default it will display the progress percentage.
       </Text>
       <Preview snippet={snippets.withLabel} mb="$12">
         <Progress size="lg" value={80}>
@@ -215,17 +229,19 @@ export default function ProgressDoc() {
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <Code>Progress</Code> has a <Code>role</Code> set to <Code>progressbar</Code> to denote that it is a progress.
+          <Code>Progress</Code> has a <Code>role</Code> set to <Code>progressbar</Code> to denote
+          that it is a progress.
         </ListItem>
         <ListItem>
-          <Code>Progress</Code> has <Code>aria-valuenow</Code> set to the percentage completion value passed to the
-          component, to ensure the progress percent is visible to screen readers.
+          <Code>Progress</Code> has <Code>aria-valuenow</Code> set to the percentage completion
+          value passed to the component, to ensure the progress percent is visible to screen
+          readers.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Progress</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Progress</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

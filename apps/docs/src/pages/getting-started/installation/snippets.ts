@@ -1,9 +1,9 @@
-const npmInstall = "npm install @hope-ui/solid @stitches/core solid-transition-group";
-const yarnAdd = "yarn add @hope-ui/solid @stitches/core solid-transition-group";
-const pnpmAdd = "pnpm add @hope-ui/solid @stitches/core solid-transition-group";
+const npmInstall = "npm install @hope-ui/design-system @stitches/core solid-transition-group";
+const yarnAdd = "yarn add @hope-ui/design-system @stitches/core solid-transition-group";
+const pnpmAdd = "pnpm add @hope-ui/design-system @stitches/core solid-transition-group";
 
 const providerSetup = `// 1. import \`HopeProvider\` component
-import { HopeProvider } from '@hope-ui/solid'
+import { HopeProvider } from '@hope-ui/design-system'
 
 // 2. Wrap HopeProvider at the root of your app
 function App() {
@@ -15,7 +15,7 @@ function App() {
 }`;
 
 const customizeTheme = `// 1. Import the \`HopeThemeConfig\` type
-import { HopeThemeConfig, HopeProvider } from '@hope-ui/solid'
+import { HopeThemeConfig, HopeProvider } from '@hope-ui/design-system'
 
 // 2. Create a theme config to include custom colors, fonts, etc
 const config: HopeThemeConfig = {

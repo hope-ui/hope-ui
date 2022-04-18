@@ -9,7 +9,7 @@ import {
   Text,
   UnorderedList,
   VStack,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -70,9 +70,15 @@ export default function AlertDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Alert</PageTitle>
-      <Text mb="$5">Alerts are used to communicate a state that affects a system, feature or page.</Text>
+      <Text mb="$5">
+        Alerts are used to communicate a state that affects a system, feature or page.
+      </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
@@ -80,13 +86,15 @@ export default function AlertDoc() {
           <strong>Alert:</strong> The wrapper for alert components.
         </ListItem>
         <ListItem>
-          <strong>AlertIcon:</strong> The visual icon for the alert that changes based on the <Code>status</Code> prop.
+          <strong>AlertIcon:</strong> The visual icon for the alert that changes based on the{" "}
+          <Code>status</Code> prop.
         </ListItem>
         <ListItem>
           <strong>AlertTitle:</strong> The title of the alert to be announced by screen readers.
         </ListItem>
         <ListItem>
-          <strong>AlertDescription:</strong> The description of the alert to be announced by screen readers.
+          <strong>AlertDescription:</strong> The description of the alert to be announced by screen
+          readers.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
@@ -101,8 +109,9 @@ export default function AlertDoc() {
       </Preview>
       <SectionSubtitle id="statuses">Alert statuses</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>status</Code> prop to change the status of the alert. This affects the color scheme and icon used.
-        You can set the value to <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>status</Code> prop to change the status of the alert. This affects the color
+        scheme and icon used. You can set the value to <Code>success</Code>, <Code>info</Code>,{" "}
+        <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.status} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -126,8 +135,9 @@ export default function AlertDoc() {
       </Preview>
       <SectionSubtitle id="variants">Alert variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Alert You can set the value to{" "}
-        <Code>solid</Code>, <Code>subtle</Code>, <Code>left-accent</Code> or <Code>top-accent</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Alert You can set the
+        value to <Code>solid</Code>, <Code>subtle</Code>, <Code>left-accent</Code> or{" "}
+        <Code>top-accent</Code>.
       </Text>
       <Preview snippet={snippets.variants} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -151,8 +161,8 @@ export default function AlertDoc() {
       </Preview>
       <SectionSubtitle id="composition">Composition</SectionSubtitle>
       <Text mb="$5">
-        <Code>Alert</Code> ships with smaller components to allow for flexibility in creating all kinds of layouts.
-        Here's an example of a custom alert style and layout:
+        <Code>Alert</Code> ships with smaller components to allow for flexibility in creating all
+        kinds of layouts. Here's an example of a custom alert style and layout:
       </Text>
       <Preview snippet={snippets.composition} mb="$8">
         <Alert
@@ -173,8 +183,8 @@ export default function AlertDoc() {
         </Alert>
       </Preview>
       <Text mb="$5">
-        <Code>Alert</Code> can also incorporate other Hope UI components. Here's an example of an alert with wrapping
-        description text:
+        <Code>Alert</Code> can also incorporate other Hope UI components. Here's an example of an
+        alert with wrapping description text:
       </Text>
       <Preview snippet={snippets.compositionTwo} mb="$12">
         <Alert status="success">
@@ -182,7 +192,8 @@ export default function AlertDoc() {
           <Box flex="1">
             <AlertTitle>Success!</AlertTitle>
             <AlertDescription display="block">
-              Your application has been received. We will review your application and respond within the next 48 hours.
+              Your application has been received. We will review your application and respond within
+              the next 48 hours.
             </AlertDescription>
           </Box>
           <CloseButton position="absolute" right="8px" top="8px" />
@@ -190,8 +201,8 @@ export default function AlertDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Alert</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Alert</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -199,8 +210,8 @@ export default function AlertDoc() {
       <PropsTable items={propItems} mb="$10" />
       <SectionSubtitle id="alert-icon-props">AlertIcon props</SectionSubtitle>
       <Text mb="$10">
-        <Code>AlertIcon</Code> composes <Code>Icon</Code> and changes the icon based on the <Code>status</Code> prop.
-        You can use the <Code>as</Code> prop to render a custom icon.
+        <Code>AlertIcon</Code> composes <Code>Icon</Code> and changes the icon based on the{" "}
+        <Code>status</Code> prop. You can use the <Code>as</Code> prop to render a custom icon.
       </Text>
       <SectionSubtitle id="alert-title-props">AlertTitle props</SectionSubtitle>
       <Text mb="$10">

@@ -1,4 +1,4 @@
-const importComponent = `import { Stack, HStack, VStack } from "@hope-ui/solid"`;
+const importComponent = `import { Stack, HStack, VStack } from "@hope-ui/design-system"`;
 
 const basicUsage = `<HStack spacing="24px">
   <Box w="40px" h="40px" bg="$warning9">

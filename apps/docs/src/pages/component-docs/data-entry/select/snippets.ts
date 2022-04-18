@@ -13,7 +13,7 @@ const importComponent = `import {
   SelectOption,
   SelectOptionText,
   SelectOptionIndicator,
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Select>
   <SelectTrigger>

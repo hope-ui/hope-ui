@@ -1,6 +1,6 @@
 import "./index.css";
 
-import { HopeProvider, HopeThemeConfig, NotificationsProvider } from "@hope-ui/solid";
+import { HopeProvider, HopeThemeConfig, NotificationsProvider } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Router } from "solid-app-router";
 import { render } from "solid-js/web";

@@ -1,4 +1,4 @@
-const importComponent = `import { IconButton } from "@hope-ui/solid"`;
+const importComponent = `import { IconButton } from "@hope-ui/design-system"`;
 
 const basicUsage = `<IconButton aria-label="Search" icon={<IconSearch />} />`;
 

@@ -9,7 +9,7 @@ import {
   TagRightIcon,
   Text,
   VStack,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { For, onMount } from "solid-js";
 
@@ -82,11 +82,15 @@ export default function TagDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Tag</PageTitle>
       <Text mb="$5">
-        <Code>Tag</Code> component is used for items that need to be labeled, categorized, or organized using keywords
-        that describe them.
+        <Code>Tag</Code> component is used for items that need to be labeled, categorized, or
+        organized using keywords that describe them.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -113,9 +117,9 @@ export default function TagDoc() {
       </Preview>
       <SectionSubtitle id="colors">Tag colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Tag You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Tag You can set the value
+        to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>,{" "}
+        <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.colors} mb="$10">
         <HStack spacing="$4">
@@ -130,8 +134,8 @@ export default function TagDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Tag sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Tag You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Tag You can set the value to{" "}
+        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.sizes} mb="$10">
         <HStack spacing="$4">
@@ -142,8 +146,8 @@ export default function TagDoc() {
       </Preview>
       <SectionSubtitle id="variants">Tag variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Tag You can set the value to{" "}
-        <Code>solid</Code>, <Code>subtle</Code>, <Code>outline</Code> or <Code>dot</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Tag You can set the
+        value to <Code>solid</Code>, <Code>subtle</Code>, <Code>outline</Code> or <Code>dot</Code>.
       </Text>
       <Preview snippet={snippets.variants} mb="$8">
         <HStack spacing="$4">
@@ -164,9 +168,14 @@ export default function TagDoc() {
           <For each={["solid", "subtle", "outline", "dot"]}>
             {variant => (
               <HStack spacing="$4">
-                <For each={["primary", "accent", "neutral", "success", "info", "warning", "danger"]}>
+                <For
+                  each={["primary", "accent", "neutral", "success", "info", "warning", "danger"]}
+                >
                   {colorScheme => (
-                    <Tag variant={variant as TagProps["variant"]} colorScheme={colorScheme as TagProps["colorScheme"]}>
+                    <Tag
+                      variant={variant as TagProps["variant"]}
+                      colorScheme={colorScheme as TagProps["colorScheme"]}
+                    >
                       Tag
                     </Tag>
                   )}
@@ -235,7 +244,8 @@ export default function TagDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Tag</Code> base styles and default props can be overridden in the Hope UI theme configuration like below:
+        <Code>Tag</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

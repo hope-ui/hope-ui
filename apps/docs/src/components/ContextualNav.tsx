@@ -1,4 +1,4 @@
-import { Anchor, Box, Heading, HTMLHopeProps, VStack } from "@hope-ui/solid";
+import { Anchor, Box, Heading, HTMLHopeProps, VStack } from "@hope-ui/design-system";
 import { useLocation } from "solid-app-router";
 import { For, splitProps } from "solid-js";
 

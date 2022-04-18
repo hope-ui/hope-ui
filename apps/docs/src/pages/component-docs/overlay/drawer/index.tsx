@@ -24,7 +24,7 @@ import {
   RadioLabel,
   Text,
   UnorderedList,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { createSignal, For, onMount } from "solid-js";
@@ -113,11 +113,16 @@ export default function DrawerDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Drawer</PageTitle>
       <Text mb="$5">
-        The <Code>Drawer</Code> component is a panel that slides out from the edge of the screen. It can be useful when
-        you need users to complete a task or view some details without leaving the current page.
+        The <Code>Drawer</Code> component is a panel that slides out from the edge of the screen. It
+        can be useful when you need users to complete a task or view some details without leaving
+        the current page.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -147,7 +152,11 @@ export default function DrawerDoc() {
       <SectionTitle id="usage">Usage</SectionTitle>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Button onClick={basicUsageDisclosure.onOpen}>Open</Button>
-        <Drawer opened={basicUsageDisclosure.isOpen()} placement="right" onClose={basicUsageDisclosure.onClose}>
+        <Drawer
+          opened={basicUsageDisclosure.isOpen()}
+          placement="right"
+          onClose={basicUsageDisclosure.onClose}
+        >
           <DrawerOverlay />
           <DrawerContent>
             <DrawerCloseButton />
@@ -166,8 +175,8 @@ export default function DrawerDoc() {
       </Preview>
       <SectionSubtitle id="drawer-placement">Drawer placement</SectionSubtitle>
       <Text mb="$5">
-        The Drawer can appear from any edge of the screen. Pass the <Code>placement</Code> prop and set it to{" "}
-        <Code>top</Code>, <Code>right</Code>, <Code>bottom</Code>, or <Code>left</Code>.
+        The Drawer can appear from any edge of the screen. Pass the <Code>placement</Code> prop and
+        set it to <Code>top</Code>, <Code>right</Code>, <Code>bottom</Code>, or <Code>left</Code>.
       </Text>
       <Preview snippet={snippets.placement} mb="$10">
         <RadioGroup value={placement()} onChange={value => setPlacement(value as DrawerPlacement)}>
@@ -191,7 +200,11 @@ export default function DrawerDoc() {
           </HStack>
         </RadioGroup>
         <Button onClick={placementDisclosure.onOpen}>Open</Button>
-        <Drawer opened={placementDisclosure.isOpen()} placement={placement()} onClose={placementDisclosure.onClose}>
+        <Drawer
+          opened={placementDisclosure.isOpen()}
+          placement={placement()}
+          onClose={placementDisclosure.onClose}
+        >
           <DrawerOverlay />
           <DrawerContent>
             <DrawerHeader>Basic Drawer</DrawerHeader>
@@ -205,9 +218,9 @@ export default function DrawerDoc() {
       </Preview>
       <SectionSubtitle id="focus-on-specific-element">Focus on specific element</SectionSubtitle>
       <Text mb="$5">
-        Hope UI automatically sets focus on the first tabbable element in the drawer. However, there might be scenarios
-        where you need to manually control where focus goes. To do this, pass a CSS query selector to the{" "}
-        <Code>initialFocus</Code> prop.
+        Hope UI automatically sets focus on the first tabbable element in the drawer. However, there
+        might be scenarios where you need to manually control where focus goes. To do this, pass a
+        CSS query selector to the <Code>initialFocus</Code> prop.
       </Text>
       <Preview snippet={snippets.initialFocus} mb="$6">
         <Button leftIcon={<IconPlus />} onClick={initialFocusDisclosure.onOpen}>
@@ -251,13 +264,17 @@ export default function DrawerDoc() {
       </Alert>
       <SectionSubtitle id="drawer-sizes">Drawer sizes</SectionSubtitle>
       <Text mb="$5">
-        Pass the <Code>size</Code> prop if you need to adjust the size of the drawer. Values can be <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>, <Code>xl</Code>, or <Code>full</Code>.
+        Pass the <Code>size</Code> prop if you need to adjust the size of the drawer. Values can be{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>, <Code>xl</Code>, or{" "}
+        <Code>full</Code>.
       </Text>
       <Preview snippet={snippets.drawerSizes} mb="$10">
         <For each={sizes}>
           {size => (
-            <Button onClick={() => handleSizeClick(size as DrawerProps["size"])} m="$4">{`Open ${size} Drawer`}</Button>
+            <Button
+              onClick={() => handleSizeClick(size as DrawerProps["size"])}
+              m="$4"
+            >{`Open ${size} Drawer`}</Button>
           )}
         </For>
 
@@ -266,36 +283,41 @@ export default function DrawerDoc() {
           <DrawerContent>
             <DrawerHeader>{`${size()} drawer contents`}</DrawerHeader>
             <DrawerBody>
-              {size() === "full" ? `You're trapped 😆 , refresh the page to leave or press 'Esc' key.` : null}
+              {size() === "full"
+                ? `You're trapped 😆 , refresh the page to leave or press 'Esc' key.`
+                : null}
             </DrawerBody>
           </DrawerContent>
         </Drawer>
       </Preview>
       <SectionSubtitle id="using-form-in-drawer">Using a form in a Drawer</SectionSubtitle>
       <Text mb="$5">
-        If you need to but a form within the Drawer and place the sumit button in the drawer's footer, here's the
-        recommended way to do it:
+        If you need to but a form within the Drawer and place the sumit button in the drawer's
+        footer, here's the recommended way to do it:
       </Text>
       <CodeSnippet snippet={snippets.usingForm} mb="$6" />
       <Alert status="warning" mb="$12">
         <AlertDescription>
-          Because the button is located outside the form, you have to leverage its native HTML <Code>form</Code>{" "}
-          attribute and refer to the <Code>id</Code> of the <Code>form</Code>.
+          Because the button is located outside the form, you have to leverage its native HTML{" "}
+          <Code>form</Code> attribute and refer to the <Code>id</Code> of the <Code>form</Code>.
         </AlertDescription>
       </Alert>
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>When opening the Drawer, focus is trapped inside the Drawer.</ListItem>
         <ListItem>
-          By default, the drawer sets focus on the first focusable element. If the <Code>initialFocus</Code> prop is
-          passed, the drawer sets focus on the element that matches the CSS query selector.
+          By default, the drawer sets focus on the first focusable element. If the{" "}
+          <Code>initialFocus</Code> prop is passed, the drawer sets focus on the element that
+          matches the CSS query selector.
         </ListItem>
-        <ListItem>After the drawer closes, it'll return focus to the element that triggered it.</ListItem>
+        <ListItem>
+          After the drawer closes, it'll return focus to the element that triggered it.
+        </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Drawer</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Drawer</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -311,8 +333,8 @@ export default function DrawerDoc() {
       <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
       <UnorderedList spacing="$2">
         <ListItem>
-          <Code>DrawerOverlay</Code>, <Code>DrawerContent</Code>, <Code>DrawerHeader</Code>, <Code>DrawerBody</Code> and{" "}
-          <Code>DrawerFooter</Code> composes{" "}
+          <Code>DrawerOverlay</Code>, <Code>DrawerContent</Code>, <Code>DrawerHeader</Code>,{" "}
+          <Code>DrawerBody</Code> and <Code>DrawerFooter</Code> composes{" "}
           <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
             Box
           </Anchor>{" "}
@@ -320,7 +342,12 @@ export default function DrawerDoc() {
         </ListItem>
         <ListItem>
           <Code>DrawerCloseButton</Code> composes{" "}
-          <Anchor as={Link} href="/docs/others/close-button" color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/others/close-button"
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             CloseButton
           </Anchor>
           .

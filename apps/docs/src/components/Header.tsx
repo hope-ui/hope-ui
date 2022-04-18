@@ -14,7 +14,7 @@ import {
   Text,
   useColorMode,
   useColorModeValue,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import { Link } from "solid-app-router";
 import { createSignal } from "solid-js";
 
@@ -109,7 +109,11 @@ export default function Header() {
           </HStack>
         </HStack>
       </Container>
-      <Drawer placement="left" opened={isMainNavOverlayVisible()} onClose={() => setIsMainNavOverlayVisible(false)}>
+      <Drawer
+        placement="left"
+        opened={isMainNavOverlayVisible()}
+        onClose={() => setIsMainNavOverlayVisible(false)}
+      >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader fontWeight="$bold" fontSize="$2xl">

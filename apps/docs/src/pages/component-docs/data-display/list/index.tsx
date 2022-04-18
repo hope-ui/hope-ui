@@ -1,4 +1,12 @@
-import { Anchor, List, ListIcon, ListItem, OrderedList, Text, UnorderedList } from "@hope-ui/solid";
+import {
+  Anchor,
+  List,
+  ListIcon,
+  ListItem,
+  OrderedList,
+  Text,
+  UnorderedList,
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -61,10 +69,15 @@ export default function ListDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>List</PageTitle>
       <Text mb="$5">
-        <Code>List</Code> component is used to display list items. It renders a <Code>ul</Code> element by default.
+        <Code>List</Code> component is used to display list items. It renders a <Code>ul</Code>{" "}
+        element by default.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -90,8 +103,8 @@ export default function ListDoc() {
       </Preview>
       <SectionTitle id="unstyled-list">Unstyled List with icon</SectionTitle>
       <Text mb="$5">
-        Add icons to the list items by using the <Code>ListIcon</Code> component. The size of the icon is relative to
-        the font size of the list item.
+        Add icons to the list items by using the <Code>ListIcon</Code> component. The size of the
+        icon is relative to the font size of the list item.
       </Text>
       <Preview snippet={snippets.unstyledListWithIcon} mb="$12">
         <List spacing="$3">
@@ -131,7 +144,12 @@ export default function ListDoc() {
         </ListItem>
         <ListItem>
           <Code>ListIcon</Code> composes{" "}
-          <Anchor as={Link} href="/docs/data-display/icon" color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/data-display/icon"
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             Icon
           </Anchor>{" "}
           component.

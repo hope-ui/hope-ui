@@ -2,7 +2,7 @@ const importComponent = `import {
   SwitchPrimitive,
   SwitchPrimitiveThumb,
   Switch 
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Switch defaultChecked>Switch</Switch>`;
 
@@ -44,7 +44,7 @@ const switchInvalid = `<HStack spacing="$4">
   <Switch defaultChecked invalid>Switch</Switch>
 </HStack>`;
 
-const headless = `import { css } from "@hope-ui/solid"
+const headless = `import { css } from "@hope-ui/design-system"
 
 const switchRootClass = css({
   display: "inline-flex",

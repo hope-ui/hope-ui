@@ -10,7 +10,7 @@ import {
   Text,
   UnorderedList,
   VStack,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { createSignal, For, onMount } from "solid-js";
 
@@ -149,7 +149,8 @@ export default function CheckboxDoc() {
     },
     {
       name: "required",
-      description: "If `true`, the checkbox is marked as required, and `required` attribute will be added",
+      description:
+        "If `true`, the checkbox is marked as required, and `required` attribute will be added",
       type: "boolean",
     },
     {
@@ -169,7 +170,8 @@ export default function CheckboxDoc() {
     },
     {
       name: "children",
-      description: "The children of the checkbox. If used as a render props, the internal state will be passed.",
+      description:
+        "The children of the checkbox. If used as a render props, the internal state will be passed.",
       type: "JSX.Element | (props: { state: Accessor<CheckboxState> }) => JSX.Element",
     },
     {
@@ -309,25 +311,32 @@ export default function CheckboxDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Checkbox</PageTitle>
       <Text mb="$5">
-        The <Code>Checkbox</Code> component is used in forms when a user needs to select multiple values from several
-        options.
+        The <Code>Checkbox</Code> component is used in forms when a user needs to select multiple
+        values from several options.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>CheckboxPrimitive:</strong> Unstyled component containing all the parts of a checkbox. It renders a{" "}
-          <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code>.
+          <strong>CheckboxPrimitive:</strong> Unstyled component containing all the parts of a
+          checkbox. It renders a <Code>label</Code> and a visualy hidden <Code>input</Code> with
+          type set to <Code>checkbox</Code>.
         </ListItem>
         <ListItem>
           <strong>CheckboxPrimitiveIndicator:</strong> Unstyled component rendered when the{" "}
-          <Code>CheckboxPrimitive</Code> is in a <Code>checked</Code> or <Code>indeterminate</Code> state.
+          <Code>CheckboxPrimitive</Code> is in a <Code>checked</Code> or <Code>indeterminate</Code>{" "}
+          state.
         </ListItem>
         <ListItem>
-          <strong>Checkbox:</strong> The Hope UI styled checkbox component based on <Code>CheckboxPrimitive</Code>.
+          <strong>Checkbox:</strong> The Hope UI styled checkbox component based on{" "}
+          <Code>CheckboxPrimitive</Code>.
         </ListItem>
         <ListItem>
           <strong>CheckboxGroup:</strong> Component to help manage the checked state of its children{" "}
@@ -341,9 +350,9 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionSubtitle id="colors">Checkbox colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Checkbox. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Checkbox. You can set the
+        value to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>,{" "}
+        <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.checkboxColors} mb="$10">
         <HStack spacing="$4">
@@ -358,8 +367,8 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Checkbox sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Checkbox. You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Checkbox. You can set the value to{" "}
+        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.checkboxSizes} mb="$10">
         <HStack spacing="$4">
@@ -376,8 +385,8 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionSubtitle id="variants">Checkbox variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Checkbox. You can set the value to{" "}
-        <Code>outline</Code> or <Code>filled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Checkbox. You can set
+        the value to <Code>outline</Code> or <Code>filled</Code>.
       </Text>
       <Preview snippet={snippets.checkboxVariants} mb="$10">
         <HStack spacing="$4">
@@ -387,8 +396,8 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionSubtitle id="label-placement">Checkbox label placement</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set the value to{" "}
-        <Code>start</Code> or <Code>end</Code>.
+        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set
+        the value to <Code>start</Code> or <Code>end</Code>.
       </Text>
       <Preview snippet={snippets.checkboxLabelPlacement} mb="$10">
         <HStack spacing="$4">
@@ -435,7 +444,10 @@ export default function CheckboxDoc() {
           checked={allChecked()}
           indeterminate={isIndeterminate()}
           onChange={(e: Event) =>
-            setCheckedItems([(e.target as HTMLInputElement).checked, (e.target as HTMLInputElement).checked])
+            setCheckedItems([
+              (e.target as HTMLInputElement).checked,
+              (e.target as HTMLInputElement).checked,
+            ])
           }
         >
           Parent Checkbox
@@ -443,13 +455,17 @@ export default function CheckboxDoc() {
         <VStack alignItems="flex-start" pl="$6" mt="$1" spacing="$1">
           <Checkbox
             checked={checkedItems()[0]}
-            onChange={(e: Event) => setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])}
+            onChange={(e: Event) =>
+              setCheckedItems([(e.target as HTMLInputElement).checked, checkedItems()[1]])
+            }
           >
             Child Checkbox 1
           </Checkbox>
           <Checkbox
             checked={checkedItems()[1]}
-            onChange={(e: Event) => setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])}
+            onChange={(e: Event) =>
+              setCheckedItems([checkedItems()[0], (e.target as HTMLInputElement).checked])
+            }
           >
             Child Checkbox 2
           </Checkbox>
@@ -457,8 +473,8 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionSubtitle id="custom-icon">Custom icon</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>iconChecked</Code> and <Code>iconIndeterminate</Code> prop on <Code>CheckboxControl</Code> to
-        change the Checkbox icon.
+        Use the <Code>iconChecked</Code> and <Code>iconIndeterminate</Code> prop on{" "}
+        <Code>CheckboxControl</Code> to change the Checkbox icon.
       </Text>
       <Preview snippet={snippets.checkboxCustomIcon} mb="$12">
         <HStack spacing="$4">
@@ -473,8 +489,8 @@ export default function CheckboxDoc() {
       <SectionSubtitle id="checkbox-group">CheckboxGroup</SectionSubtitle>
       <Text mb="$5">
         You can use the <Code>CheckboxGroup</Code> component to manage the checked state of related{" "}
-        <Code>Checkbox</Code> components and conveniently pass a few shared style props to each. See the props table at
-        the bottom of this page for a list of the shared styling props.
+        <Code>Checkbox</Code> components and conveniently pass a few shared style props to each. See
+        the props table at the bottom of this page for a list of the shared styling props.
       </Text>
       <Preview snippet={snippets.checkboxGroup} mb="$12">
         <CheckboxGroup colorScheme="success" defaultValue={["luffy", "sanji"]}>
@@ -487,8 +503,9 @@ export default function CheckboxDoc() {
       </Preview>{" "}
       <SectionTitle id="headless-api">Headless API</SectionTitle>
       <Text mb="$5">
-        Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design. You can pair it with
-        your styling solution of choice. The below example uses style props and the <Code>css</Code> function.
+        Use the unstyled <Code>CheckboxPrimitive</Code> component to achieve your desired design.
+        You can pair it with your styling solution of choice. The below example uses style props and
+        the <Code>css</Code> function.
       </Text>
       <Preview snippet={snippets.headless} mb="$12">
         <CheckboxGroup>
@@ -525,8 +542,8 @@ export default function CheckboxDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Checkbox</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Checkbox</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -534,8 +551,8 @@ export default function CheckboxDoc() {
       <PropsTable items={checkboxPrimitivePropItems} mb="$10" />
       <SectionSubtitle id="checkbox-props">Checkbox props</SectionSubtitle>
       <Text mb="$5">
-        <Code>Checkbox</Code> composes the <Code>CheckboxPrimitive</Code> component, so you can pass all its props.
-        These are props specific to the <Code>Checkbox</Code> component:
+        <Code>Checkbox</Code> composes the <Code>CheckboxPrimitive</Code> component, so you can pass
+        all its props. These are props specific to the <Code>Checkbox</Code> component:
       </Text>
       <PropsTable items={checkboxPropItems} mb="$10" />
       <SectionSubtitle id="checkbox-group-props">CheckboxGroup props</SectionSubtitle>

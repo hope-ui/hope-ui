@@ -20,7 +20,7 @@ const usageWithCssProp = `<Box
   Box
 </Box>`;
 
-const usageWithCssFunction = `import { css } from "@hope-ui/solid";
+const usageWithCssFunction = `import { css } from "@hope-ui/design-system";
 
 const cardStyles = css({
   borderRadius: "$lg",

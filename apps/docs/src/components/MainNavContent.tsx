@@ -1,4 +1,4 @@
-import { VStack } from "@hope-ui/solid";
+import { VStack } from "@hope-ui/design-system";
 
 import AppNavLink from "./AppNavLink";
 import Code from "./Code";

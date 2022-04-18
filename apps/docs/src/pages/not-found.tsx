@@ -1,4 +1,4 @@
-import { Button, Center, Divider, Flex, Stack, Text, VStack } from "@hope-ui/solid";
+import { Button, Center, Divider, Flex, Stack, Text, VStack } from "@hope-ui/design-system";
 import { Link } from "solid-app-router";
 
 import Header from "@/components/Header";
@@ -9,10 +9,19 @@ export default function NotFound() {
       <Header />
       <Center minH="calc(100vh - 72px)">
         <Stack direction={{ "@initial": "column", "@md": "row" }} alignItems="flex-start" mx="auto">
-          <Text size={{ "@initial": "3xl", "@sm": "4xl", "@md": "7xl" }} fontWeight="$extrabold" color="$primary9">
+          <Text
+            size={{ "@initial": "3xl", "@sm": "4xl", "@md": "7xl" }}
+            fontWeight="$extrabold"
+            color="$primary9"
+          >
             404
           </Text>
-          <Divider d={{ "@initial": "none", "@md": "inline-block" }} orientation="vertical" h="115px" mx="$8" />
+          <Divider
+            d={{ "@initial": "none", "@md": "inline-block" }}
+            orientation="vertical"
+            h="115px"
+            mx="$8"
+          />
           <Flex direction="column" alignItems="flex-start">
             <Text
               size={{ "@initial": "4xl", "@sm": "6xl", "@md": "7xl" }}
@@ -22,7 +31,12 @@ export default function NotFound() {
             >
               Page not found
             </Text>
-            <Text size={{ "@initial": "sm", "@sm": "base", "@md": "lg" }} color="$neutral11" ml="$0_5" mb="$4">
+            <Text
+              size={{ "@initial": "sm", "@sm": "base", "@md": "lg" }}
+              color="$neutral11"
+              ml="$0_5"
+              mb="$4"
+            >
               Please check the URL in the address bar an try again.
             </Text>
             <Button as={Link} href="/">

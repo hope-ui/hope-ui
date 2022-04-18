@@ -10,7 +10,7 @@ import {
   Text,
   UnorderedList,
   VStack,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -136,7 +136,8 @@ export default function SwitchDoc() {
     },
     {
       name: "required",
-      description: "If `true`, the switch is marked as required, and `required` attribute will be added",
+      description:
+        "If `true`, the switch is marked as required, and `required` attribute will be added",
       type: "boolean",
     },
     {
@@ -156,7 +157,8 @@ export default function SwitchDoc() {
     },
     {
       name: "children",
-      description: "The children of the switch. If used as a render props, the internal state will be passed.",
+      description:
+        "The children of the switch. If used as a render props, the internal state will be passed.",
       type: "JSX.Element | (props: { state: Accessor<SwitchState> }) => JSX.Element",
     },
     {
@@ -208,11 +210,20 @@ export default function SwitchDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Switch</PageTitle>
       <Text mb="$5">
         The <Code>Switch</Code> component is used as an alternative for the{" "}
-        <Anchor as={Link} href="/docs/data-entry/checkbox" color="$primary11" fontWeight="$semibold">
+        <Anchor
+          as={Link}
+          href="/docs/data-entry/checkbox"
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           Checkbox
         </Anchor>{" "}
         component. You can switch between enabled or disabled states.
@@ -221,16 +232,17 @@ export default function SwitchDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>SwitchPrimitive:</strong> Unstyled component containing all the parts of a switch. It renders a{" "}
-          <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to <Code>checkbox</Code> and role set
-          to <Code>switch</Code>.
+          <strong>SwitchPrimitive:</strong> Unstyled component containing all the parts of a switch.
+          It renders a <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to{" "}
+          <Code>checkbox</Code> and role set to <Code>switch</Code>.
         </ListItem>
         <ListItem>
-          <strong>SwitchPrimitiveThumb:</strong> The thumb that is used to visually indicate whether the switch is on or
-          off.
+          <strong>SwitchPrimitiveThumb:</strong> The thumb that is used to visually indicate whether
+          the switch is on or off.
         </ListItem>
         <ListItem>
-          <strong>Switch:</strong> The Hope UI styled switch component based on <Code>SwitchPrimitive</Code>.
+          <strong>Switch:</strong> The Hope UI styled switch component based on{" "}
+          <Code>SwitchPrimitive</Code>.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
@@ -240,9 +252,9 @@ export default function SwitchDoc() {
       </Preview>
       <SectionSubtitle id="colors">Switch colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Switch. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Switch. You can set the
+        value to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>,{" "}
+        <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.switchColors} mb="$10">
         <HStack spacing="$4">
@@ -257,8 +269,8 @@ export default function SwitchDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Switch sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Switch. You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Switch. You can set the value to{" "}
+        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.switchSizes} mb="$10">
         <HStack spacing="$4">
@@ -275,8 +287,8 @@ export default function SwitchDoc() {
       </Preview>
       <SectionSubtitle id="variants">Switch variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Switch. You can set the value to{" "}
-        <Code>outline</Code> or <Code>filled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Switch. You can set the
+        value to <Code>outline</Code> or <Code>filled</Code>.
       </Text>
       <Preview snippet={snippets.switchVariants} mb="$10">
         <HStack spacing="$4">
@@ -286,8 +298,8 @@ export default function SwitchDoc() {
       </Preview>
       <SectionSubtitle id="label-placement">Switch label placement</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set the value to{" "}
-        <Code>start</Code> or <Code>end</Code>.
+        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set
+        the value to <Code>start</Code> or <Code>end</Code>.
       </Text>
       <Preview snippet={snippets.switchLabelPlacement} mb="$10">
         <HStack spacing="$4">
@@ -327,8 +339,9 @@ export default function SwitchDoc() {
       </Preview>
       <SectionTitle id="headless-api">Headless API</SectionTitle>
       <Text mb="$5">
-        Use the unstyled <Code>SwitchPrimitive</Code> component to achieve your desired design. You can pair it with
-        your styling solution of choice. The below example uses style props and the <Code>css</Code> function.
+        Use the unstyled <Code>SwitchPrimitive</Code> component to achieve your desired design. You
+        can pair it with your styling solution of choice. The below example uses style props and the{" "}
+        <Code>css</Code> function.
       </Text>
       <Preview snippet={snippets.headless} mb="$12">
         <SwitchPrimitive class={switchRootClass()}>
@@ -347,8 +360,8 @@ export default function SwitchDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Switch</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Switch</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -356,8 +369,8 @@ export default function SwitchDoc() {
       <PropsTable items={switchPrimitivePropItems} mb="$10" />
       <SectionSubtitle id="switch-props">Switch props</SectionSubtitle>
       <Text mb="$5">
-        <Code>Switch</Code> composes the <Code>SwitchPrimitive</Code> component, so you can pass all its props. These
-        are props specific to the <Code>Switch</Code> component:
+        <Code>Switch</Code> composes the <Code>SwitchPrimitive</Code> component, so you can pass all
+        its props. These are props specific to the <Code>Switch</Code> component:
       </Text>
       <PropsTable items={switchPropItems} />
     </PageLayout>

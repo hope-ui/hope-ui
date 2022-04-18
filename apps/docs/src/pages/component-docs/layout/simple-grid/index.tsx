@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, Box, SimpleGrid, Text } from "@hope-ui/solid";
+import { Alert, AlertDescription, Box, SimpleGrid, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -52,11 +52,15 @@ export default function SimpleGridDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>SimpleGrid</PageTitle>
       <Text mb="$8">
-        SimpleGrid provides a friendly interface to create responsive grid layouts with ease. It renders a{" "}
-        <Code>div</Code> element with <Code>display: grid</Code>.
+        SimpleGrid provides a friendly interface to create responsive grid layouts with ease. It
+        renders a <Code>div</Code> element with <Code>display: grid</Code>.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -72,7 +76,8 @@ export default function SimpleGridDoc() {
         </SimpleGrid>
       </Preview>
       <Text mb="$5">
-        You can also make it responsive by passing an object value into the <Code>columns</Code> prop.
+        You can also make it responsive by passing an object value into the <Code>columns</Code>{" "}
+        prop.
       </Text>
       <Preview snippet={snippets.responsiveColumns} mb="$10">
         <SimpleGrid columns={{ "@initial": 2, "@md": 3 }} gap="40px">
@@ -85,9 +90,9 @@ export default function SimpleGridDoc() {
       </Preview>
       <SectionSubtitle id="auto-responsive-grid">Auto-responsive grid</SectionSubtitle>
       <Text mb="$5">
-        To make the grid responsive and adjust automatically without passing <Code>columns</Code>, simply pass the{" "}
-        <Code>minChildWidth</Code> prop to specify the <Code>min-width</Code> a child should have before adjusting the
-        layout.
+        To make the grid responsive and adjust automatically without passing <Code>columns</Code>,
+        simply pass the <Code>minChildWidth</Code> prop to specify the <Code>min-width</Code> a
+        child should have before adjusting the layout.
       </Text>
       <Text mb="$5">
         This uses css grid <Code>auto-fit</Code> and <Code>minmax()</Code> internally.
@@ -104,9 +109,9 @@ export default function SimpleGridDoc() {
       </Preview>
       <SectionSubtitle id="spacing">Changing the spacing for columns and rows</SectionSubtitle>
       <Text mb="$5">
-        Simply pass the <Code>gap</Code> prop to change the row and column spacing between the grid items.{" "}
-        <Code>SimpleGrid</Code> also allows you pass <Code>columnGap</Code> and <Code>rowGap</Code> to define the space
-        between columns and rows respectively.
+        Simply pass the <Code>gap</Code> prop to change the row and column spacing between the grid
+        items. <Code>SimpleGrid</Code> also allows you pass <Code>columnGap</Code> and{" "}
+        <Code>rowGap</Code> to define the space between columns and rows respectively.
       </Text>
       <Preview snippet={snippets.spacing} mb="$6">
         <SimpleGrid columns={2} columnGap="40px" rowGap="20px">
@@ -119,14 +124,14 @@ export default function SimpleGridDoc() {
       </Preview>
       <Alert status="warning" mb="$12">
         <AlertDescription>
-          CSS gap properties can be confusing, <Code>columnGap</Code> add space on the X axis whereas{" "}
-          <Code>rowGap</Code> add space on the Y axis.
+          CSS gap properties can be confusing, <Code>columnGap</Code> add space on the X axis
+          whereas <Code>rowGap</Code> add space on the Y axis.
         </AlertDescription>
       </Alert>
       <SectionTitle id="props">Props</SectionTitle>
       <Text mb="$5">
-        SimpleGrid composes <Code>Grid</Code> so you can pass all the <Code>Grid</Code> props and css grid props with
-        addition of these:
+        SimpleGrid composes <Code>Grid</Code> so you can pass all the <Code>Grid</Code> props and
+        css grid props with addition of these:
       </Text>
       <PropsTable items={propItems} />
     </PageLayout>

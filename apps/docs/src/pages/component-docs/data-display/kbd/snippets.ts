@@ -1,4 +1,4 @@
-const importComponent = `import { Kbd } from "@hope-ui/solid"`;
+const importComponent = `import { Kbd } from "@hope-ui/design-system"`;
 
 const basicUsage = `<span>
   <Kbd>shift</Kbd> + <Kbd>H</Kbd>

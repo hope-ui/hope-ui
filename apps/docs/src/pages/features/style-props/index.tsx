@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, Button, Text } from "@hope-ui/solid";
+import { Alert, AlertDescription, Button, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -225,7 +225,8 @@ const pseudoProps: StylePropsTableItem[] = [
   },
   {
     prop: "_peerHover",
-    cssProperty: "[data-peer]:hover ~ &, [data-peer][data-hover] ~ &, .peer:hover ~ &, .peer[data-hover] ~ &",
+    cssProperty:
+      "[data-peer]:hover ~ &, [data-peer][data-hover] ~ &, .peer:hover ~ &, .peer[data-hover] ~ &",
   },
   {
     prop: "_groupFocus",
@@ -234,11 +235,13 @@ const pseudoProps: StylePropsTableItem[] = [
   },
   {
     prop: "_peerFocus",
-    cssProperty: "[data-peer]:focus ~ &, [data-peer][data-focus] ~ &, .peer:focus ~ &, .peer[data-focus] ~ &",
+    cssProperty:
+      "[data-peer]:focus ~ &, [data-peer][data-focus] ~ &, .peer:focus ~ &, .peer[data-focus] ~ &",
   },
   {
     prop: "_groupFocusVisible",
-    cssProperty: "[role=group]:focus-visible &, [data-group]:focus-visible &, .group:focus-visible &",
+    cssProperty:
+      "[role=group]:focus-visible &, [data-group]:focus-visible &, .group:focus-visible &",
   },
   {
     prop: "_peerFocusVisible",
@@ -251,7 +254,8 @@ const pseudoProps: StylePropsTableItem[] = [
   },
   {
     prop: "_peerActive",
-    cssProperty: "[data-peer]:active ~ &, [data-peer][data-active] ~ &, .peer:active ~ &, .peer[data-active] ~ &",
+    cssProperty:
+      "[data-peer]:active ~ &, [data-peer][data-active] ~ &, .peer:active ~ &, .peer[data-active] ~ &",
   },
   {
     prop: "_groupSelected",
@@ -280,7 +284,8 @@ const pseudoProps: StylePropsTableItem[] = [
   },
   {
     prop: "_peerInvalid",
-    cssProperty: "[data-peer]:invalid ~ &, [data-peer][data-invalid] ~ &, .peer:invalid ~ &, .peer[data-invalid] ~ &",
+    cssProperty:
+      "[data-peer]:invalid ~ &, [data-peer][data-invalid] ~ &, .peer:invalid ~ &, .peer[data-invalid] ~ &",
   },
   {
     prop: "_groupChecked",
@@ -289,7 +294,8 @@ const pseudoProps: StylePropsTableItem[] = [
   },
   {
     prop: "_peerChecked",
-    cssProperty: "[data-peer]:checked ~ &, [data-peer][data-checked] ~ &, .peer:checked ~ &, .peer[data-checked] ~ &",
+    cssProperty:
+      "[data-peer]:checked ~ &, [data-peer][data-checked] ~ &, .peer:checked ~ &, .peer[data-checked] ~ &",
   },
   {
     prop: "_groupFocusWithin",
@@ -355,15 +361,21 @@ export default function StyleProps() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Style props</PageTitle>
 
       <Text mb="$6">
-        Style props are a way to alter the style of a component by simply passing props to it. It helps to save time by
-        providing helpful shorthand ways to style components.
+        Style props are a way to alter the style of a component by simply passing props to it. It
+        helps to save time by providing helpful shorthand ways to style components.
       </Text>
       <SectionTitle>Reference</SectionTitle>
-      <Text mb="$5">The following table shows a list of every style prop and the properties within each group.</Text>
+      <Text mb="$5">
+        The following table shows a list of every style prop and the properties within each group.
+      </Text>
       <SectionSubtitle id="margin-padding">Margin and padding</SectionSubtitle>
       <CodeSnippet snippet={snippets.marginPadding} mb="$8" />
       <StylePropsTable items={marginPaddingProps} mb="$12" />
@@ -388,8 +400,8 @@ export default function StyleProps() {
       <CodeSnippet snippet={snippets.flexbox} mb="$4" />
       <Alert status="warning" mb="$8">
         <AlertDescription>
-          Props marked with an <Code>*</Code> will only work if you use the <Code>Flex</Code> or <Code>Stack</Code>{" "}
-          components.
+          Props marked with an <Code>*</Code> will only work if you use the <Code>Flex</Code> or{" "}
+          <Code>Stack</Code> components.
         </AlertDescription>
       </Alert>
       <StylePropsTable items={flexboxProps} mb="$12" />
@@ -398,8 +410,8 @@ export default function StyleProps() {
       <CodeSnippet snippet={snippets.grid} mb="$4" />
       <Alert status="warning" mb="$8">
         <AlertDescription>
-          Props marked with an <Code>*</Code> will only work if you use the <Code>Grid</Code> and <Code>GridItem</Code>{" "}
-          components.
+          Props marked with an <Code>*</Code> will only work if you use the <Code>Grid</Code> and{" "}
+          <Code>GridItem</Code> components.
         </AlertDescription>
       </Alert>
       <StylePropsTable items={gridProps} mb="$12" />
@@ -431,12 +443,12 @@ export default function StyleProps() {
         The <Code>as</Code> prop
       </SectionTitle>
       <Text mb="$5">
-        All Hope UI components are polymorphic, meaning you can use the <Code>as</Code> prop to change the rendered
-        element.
+        All Hope UI components are polymorphic, meaning you can use the <Code>as</Code> prop to
+        change the rendered element.
       </Text>
       <Text mb="$5">
-        For example, say you are using a <Code>Button</Code> component, and you need to make it a link instead. You can
-        compose <Code>a</Code> and <Code>Button</Code> like this:
+        For example, say you are using a <Code>Button</Code> component, and you need to make it a
+        link instead. You can compose <Code>a</Code> and <Code>Button</Code> like this:
       </Text>
       <Preview snippet={snippets.asPropWithHTMLElement} mb="$8">
         <Button as="a" target="_blank" href="https://solidjs.com/">
@@ -450,7 +462,8 @@ export default function StyleProps() {
         </Button>
       </Preview>
       <Text>
-        If you are using TypeScript you will get proper auto-completion based on the value of the <Code>as</Code> prop.
+        If you are using TypeScript you will get proper auto-completion based on the value of the{" "}
+        <Code>as</Code> prop.
       </Text>
     </PageLayout>
   );

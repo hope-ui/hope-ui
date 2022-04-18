@@ -1,4 +1,13 @@
-import { Box, ListItem, Skeleton, SkeletonCircle, SkeletonText, Text, UnorderedList, VStack } from "@hope-ui/solid";
+import {
+  Box,
+  ListItem,
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+  Text,
+  UnorderedList,
+  VStack,
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -106,7 +115,11 @@ export default function SkeletonDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Skeleton</PageTitle>
       <Text mb="$5">
         <Code>Skeleton</Code> is used to display the loading state of some components.
@@ -149,12 +162,15 @@ export default function SkeletonDoc() {
       </Preview>
       <SectionSubtitle id="color">Skeleton color</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>startColor</Code> and <Code>endColor</Code> props to change the animation color.
+        Use the <Code>startColor</Code> and <Code>endColor</Code> props to change the animation
+        color.
       </Text>
       <Preview snippet={snippets.color} mb="$10">
         <Skeleton startColor="tomato" endColor="orange" height="20px" />
       </Preview>
-      <SectionSubtitle id="skip-when-content-is-loaded">Skipping the skeleton when content is loaded</SectionSubtitle>
+      <SectionSubtitle id="skip-when-content-is-loaded">
+        Skipping the skeleton when content is loaded
+      </SectionSubtitle>
       <Text mb="$5">
         Use the <Code>loaded</Code> prop to prevent the skeleton from rendering.
       </Text>

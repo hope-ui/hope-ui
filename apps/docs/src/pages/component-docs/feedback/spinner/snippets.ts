@@ -1,4 +1,4 @@
-const importComponent = `import { Spinner } from "@hope-ui/solid"`;
+const importComponent = `import { Spinner } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Spinner />`;
 

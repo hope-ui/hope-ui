@@ -1,6 +1,6 @@
-const importGlobalCssFunction = `import { globalCss } from "@hope-ui/solid"`;
+const importGlobalCssFunction = `import { globalCss } from "@hope-ui/design-system"`;
 
-const usingGlobalCssFunction = `import { globalCss } from "@hope-ui/solid"
+const usingGlobalCssFunction = `import { globalCss } from "@hope-ui/design-system"
 
 const globalStyles = globalCss({
   '*': { 

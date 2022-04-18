@@ -8,6 +8,7 @@
     "dev": "vite --host"
   },
   "dependencies": {
-    "@hope-ui/solid": "workspace:*"
+    "@hope-ui/design-system": "workspace:*",
+    "@hope-ui/primitives": "workspace:*"
   }
 }

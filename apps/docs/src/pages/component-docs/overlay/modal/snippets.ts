@@ -6,7 +6,7 @@ const importComponent = `import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `function ModalExample() {
   const { isOpen, onOpen, onClose } = createDisclosure()

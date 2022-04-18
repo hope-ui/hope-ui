@@ -1,4 +1,4 @@
-const importComponent = `import { Center } from "@hope-ui/solid"`;
+const importComponent = `import { Center } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Center bg="tomato" h="100px" color="white">
   This is the Center

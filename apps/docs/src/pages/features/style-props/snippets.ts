@@ -8,7 +8,7 @@ const asPropWithComponent = `import { Link } from "solid-app-router";
   Back to home
 </Button>`;
 
-const marginPadding = `import { Box } from "@hope-ui/solid"
+const marginPadding = `import { Box } from "@hope-ui/design-system"
 
 // $2 refers to the value of \`theme().space[2]\`
 <Box m="$2">Tomato</Box>
@@ -20,7 +20,7 @@ const marginPadding = `import { Box } from "@hope-ui/solid"
 <Box m={{ "@initial": "$2", "@sm": "$3" }} />
 `;
 
-const colors = `import { Box } from "@hope-ui/solid"
+const colors = `import { Box } from "@hope-ui/design-system"
 
 // $neutral9 refers to the value of \`theme().colors.neutral9\`
 <Box color="$neutral9" />
@@ -34,7 +34,7 @@ const colors = `import { Box } from "@hope-ui/solid"
 // verbose prop
 <Box backgroundColor="tomato" />`;
 
-const typography = `import { Text } from "@hope-ui/solid"
+const typography = `import { Text } from "@hope-ui/design-system"
 
 // font-size of \`theme().fontSizes.base\`
 <Text fontSize="$base" />
@@ -48,7 +48,7 @@ const typography = `import { Text } from "@hope-ui/solid"
 // text-align \`left\` on all viewports and \`center\` from the first breakpoint and up
 <Text textAlign={{ "@initial": "left", "@sm": "center" }} />`;
 
-const layout = `import { Box } from "@hope-ui/solid"
+const layout = `import { Box } from "@hope-ui/design-system"
 
 // verbose
 <Box display="flex" />
@@ -56,7 +56,7 @@ const layout = `import { Box } from "@hope-ui/solid"
 // shorthand
 <Box d="flex" />`;
 
-const size = `import { Box } from "@hope-ui/solid"
+const size = `import { Box } from "@hope-ui/design-system"
 
 // verbose
 <Box width="100%" height={32} />
@@ -73,7 +73,7 @@ const size = `import { Box } from "@hope-ui/solid"
 // width \`"40px"\`
 <Box w="40px" />`;
 
-const flexbox = `import { Box, Flex } from "@hope-ui/solid"
+const flexbox = `import { Box, Flex } from "@hope-ui/design-system"
 
 // verbose
 <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -85,7 +85,7 @@ const flexbox = `import { Box, Flex } from "@hope-ui/solid"
   Flex Container
 </Flex>`;
 
-const grid = `import { Box, Grid } from "@hope-ui/solid"
+const grid = `import { Box, Grid } from "@hope-ui/design-system"
 
 // verbose
 <Box display="grid" gap={2} gridAutoFlow="row dense">
@@ -97,13 +97,13 @@ const grid = `import { Box, Grid } from "@hope-ui/solid"
   Grid
 </Grid>`;
 
-const borders = `import { Box } from "@hope-ui/solid"
+const borders = `import { Box } from "@hope-ui/design-system"
 
 <Box border="1px" borderColor="$neutral6">
   Card
 </Box>`;
 
-const borderRadius = `import { Button } from "@hope-ui/solid"
+const borderRadius = `import { Button } from "@hope-ui/design-system"
 
 // This button will have no right borderRadius
 <Button borderRightRadius="0">Button 1</Button>
@@ -114,7 +114,7 @@ const borderRadius = `import { Button } from "@hope-ui/solid"
 // top left and top right radius will be \`theme().radii.md\` => 6px
 <Button borderTopRadius="$md">Button 3</Button>`;
 
-const position = `import { Box } from "@hope-ui/solid"
+const position = `import { Box } from "@hope-ui/design-system"
 
 // verbose
 <Box position="absolute">Cover</Box>
@@ -129,7 +129,7 @@ const position = `import { Box } from "@hope-ui/solid"
   Fixed with zIndex
 </Box>`;
 
-const shadow = `import { Box } from "@hope-ui/solid"
+const shadow = `import { Box } from "@hope-ui/design-system"
 
 // use \`theme().shadows.md\`
 <Box boxShadow="$md">
@@ -137,7 +137,7 @@ const shadow = `import { Box } from "@hope-ui/solid"
 </Box>
 `;
 
-const pseudo = `import { Button } from "@hope-ui/solid"
+const pseudo = `import { Button } from "@hope-ui/design-system"
 
 // :hover style
 <Button

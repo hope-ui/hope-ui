@@ -1,4 +1,4 @@
-const importHopeFactory = `import { hope } from "@hope-ui/solid"`;
+const importHopeFactory = `import { hope } from "@hope-ui/design-system"`;
 
 const hopeJsxElements = `<hope.button 
   px="$3" 
@@ -10,7 +10,7 @@ const hopeJsxElements = `<hope.button
   Click me
 </hope.button>`;
 
-const hopeFactoryFunction = `import { hope } from "@hope-ui/solid"
+const hopeFactoryFunction = `import { hope } from "@hope-ui/design-system"
 import { Link } from "solid-app-router"
 
 const HopeLink = hope(Link)

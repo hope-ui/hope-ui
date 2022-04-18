@@ -1,4 +1,4 @@
-const importComponent = `import { SimpleGrid } from "@hope-ui/solid"`;
+const importComponent = `import { SimpleGrid } from "@hope-ui/design-system"`;
 
 const basicUsage = `<SimpleGrid columns={2} gap="$10">
   <Box bg="tomato" height="80px"></Box>

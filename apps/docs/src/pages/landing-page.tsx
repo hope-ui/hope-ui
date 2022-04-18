@@ -11,7 +11,7 @@ import {
   Text,
   VStack,
   VStackProps,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import { Link } from "solid-app-router";
 
 import Footer from "@/components/Footer";
@@ -47,8 +47,8 @@ function HeroSection(props: VStackProps) {
         for
       </Heading>
       <Text size={{ "@initial": "base", "@sm": "xl" }} color="$neutral11" maxW="$prose" mb="$8">
-        Hope UI is a composable and accessible component library that gives you the foundation to build your next
-        SolidJS application.
+        Hope UI is a composable and accessible component library that gives you the foundation to
+        build your next SolidJS application.
       </Text>
       <Stack
         direction={{ "@initial": "column", "@sm": "row" }}
@@ -117,8 +117,8 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
             maxW="$prose"
             mb={{ "@initial": "$14", "@sm": "$20" }}
           >
-            Hope UI provides the foundation for building your application's user interface, giving you the ability to
-            focus on what really matter for your users.
+            Hope UI provides the foundation for building your application's user interface, giving
+            you the ability to focus on what really matter for your users.
           </Text>
           <SimpleGrid
             columns={{ "@initial": 1, "@sm": 2, "@lg": 3 }}
@@ -126,7 +126,15 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
             rowGap={{ "@initial": "$14", "@sm": "$20" }}
             mx="auto"
           >
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -141,9 +149,19 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Ready to go
               </Text>
-              <Text color="$neutral11">Start your project with over 40 well designed SolidJS components.</Text>
+              <Text color="$neutral11">
+                Start your project with over 40 well designed SolidJS components.
+              </Text>
             </GridItem>
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -158,9 +176,19 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Composable
               </Text>
-              <Text color="$neutral11">Compose your application UI with reusable building blocks.</Text>
+              <Text color="$neutral11">
+                Compose your application UI with reusable building blocks.
+              </Text>
             </GridItem>
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -176,10 +204,19 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
                 Accessible
               </Text>
               <Text color="$neutral11">
-                Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
+                Hope UI follows WAI-ARIA standards, helping you to reach the largest audience
+                possible with less effort.
               </Text>
             </GridItem>
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -194,9 +231,19 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Themeable
               </Text>
-              <Text color="$neutral11">Use Hope UI's design system or build your own using the theming features.</Text>
+              <Text color="$neutral11">
+                Use Hope UI's design system or build your own using the theming features.
+              </Text>
             </GridItem>
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -212,11 +259,19 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
                 Dark mode
               </Text>
               <Text color="$neutral11">
-                Add dark mode support to your app with just a few lines of code. All components are built with dark mode
-                in mind.
+                Add dark mode support to your app with just a few lines of code. All components are
+                built with dark mode in mind.
               </Text>
             </GridItem>
-            <GridItem as={VStack} bg="$neutral3" rounded="$sm" px="$6" pb="$6" maxW="$sm" textAlign="center">
+            <GridItem
+              as={VStack}
+              bg="$neutral3"
+              rounded="$sm"
+              px="$6"
+              pb="$6"
+              maxW="$sm"
+              textAlign="center"
+            >
               <Center
                 bg="$primary9"
                 boxSize="$12"
@@ -231,7 +286,9 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
               <Text fontSize="$lg" fontWeight="$semibold" mt="-8px" mb="$3">
                 Developer experience
               </Text>
-              <Text color="$neutral11">An intuitive and familiar API that help you speed up your development.</Text>
+              <Text color="$neutral11">
+                An intuitive and familiar API that help you speed up your development.
+              </Text>
             </GridItem>
           </SimpleGrid>
         </VStack>

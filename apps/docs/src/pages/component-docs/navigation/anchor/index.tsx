@@ -1,4 +1,4 @@
-import { Anchor, Text } from "@hope-ui/solid";
+import { Anchor, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -49,11 +49,15 @@ export default function AnchorDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Anchor</PageTitle>
       <Text mb="$5">
-        Anchors are accessible elements used primarily for navigation. This component is styled to resemble a hyperlink
-        and semantically renders an <Code>a</Code>.
+        Anchors are accessible elements used primarily for navigation. This component is styled to
+        resemble a hyperlink and semantically renders an <Code>a</Code>.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -81,15 +85,15 @@ export default function AnchorDoc() {
       </Preview>
       <SectionTitle id="usage-with-routing-library">Usage with routing library</SectionTitle>
       <Text mb="$5">
-        To use the <Code>Anchor</Code> with a routing library like <Code>solid-app-router</Code>, all you need to do is
-        pass the <Code>as</Code> prop. It'll replace the rendered <Code>a</Code> tag with the router's <Code>Link</Code>
-        .
+        To use the <Code>Anchor</Code> with a routing library like <Code>solid-app-router</Code>,
+        all you need to do is pass the <Code>as</Code> prop. It'll replace the rendered{" "}
+        <Code>a</Code> tag with the router's <Code>Link</Code>.
       </Text>
       <CodeSnippet snippet={snippets.usageWithRoutingLibrary} mb="$12" />
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Anchor</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Anchor</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

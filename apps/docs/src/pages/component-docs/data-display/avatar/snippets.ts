@@ -3,7 +3,7 @@ const importComponent = `import {
   AvatarBadge, 
   AvatarGroup,
   AvatarExcess
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<HStack wrap="wrap" spacing="$4">
   <Avatar name="Hector Rhodes" src="https://bit.ly/3pWHo72" />

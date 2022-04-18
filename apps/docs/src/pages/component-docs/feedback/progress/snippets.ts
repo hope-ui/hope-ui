@@ -1,4 +1,4 @@
-const importComponent = `import { Progress, ProgressIndicator, ProgressLabel } from "@hope-ui/solid"`;
+const importComponent = `import { Progress, ProgressIndicator, ProgressLabel } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Progress value={80}>
   <ProgressIndicator />

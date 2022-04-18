@@ -1,4 +1,4 @@
-const importComponent = `import { Badge } from "@hope-ui/solid"`;
+const importComponent = `import { Badge } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Badge>Badge</Badge>`;
 

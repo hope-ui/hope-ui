@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, HTMLHopeProps, Stack, Text, VStack } from "@hope-ui/solid";
+import { Box, Flex, HStack, HTMLHopeProps, Stack, Text, VStack } from "@hope-ui/design-system";
 import { Link } from "solid-app-router";
 import { Show, splitProps } from "solid-js";
 
@@ -18,7 +18,12 @@ type PageLayoutProps = HTMLHopeProps<
 >;
 
 export default function PageLayout(props: PageLayoutProps) {
-  const [local, others] = splitProps(props, ["children", "previousLink", "nextLink", "contextualNavLinks"]);
+  const [local, others] = splitProps(props, [
+    "children",
+    "previousLink",
+    "nextLink",
+    "contextualNavLinks",
+  ]);
 
   return (
     <Flex h="$full" {...others}>

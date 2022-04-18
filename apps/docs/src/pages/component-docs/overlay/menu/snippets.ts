@@ -5,7 +5,7 @@ const importComponent = `import {
   MenuGroup,
   MenuLabel,
   MenuItem
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Menu>
   <MenuTrigger

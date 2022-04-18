@@ -1,4 +1,4 @@
-const importComponent = `import { Button } from "@hope-ui/solid"`;
+const importComponent = `import { Button } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Button>Button</Button>`;
 

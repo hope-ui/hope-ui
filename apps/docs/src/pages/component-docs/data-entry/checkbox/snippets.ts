@@ -3,7 +3,7 @@ const importComponent = `import {
   CheckboxPrimitiveIndicator,
   Checkbox, 
   CheckboxGroup
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Checkbox defaultChecked>Checkbox</Checkbox>`;
 
@@ -95,7 +95,7 @@ const checkboxGroup = `<CheckboxGroup colorScheme="success" defaultValue={["luff
   </HStack>
 </CheckboxGroup>`;
 
-const headless = `import { css } from "@hope-ui/solid"
+const headless = `import { css } from "@hope-ui/design-system"
 
 const checkboxRootStyles = css({
   rounded: "$md",

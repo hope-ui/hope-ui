@@ -17,7 +17,7 @@ import {
   SimpleSelect,
   Textarea,
   VStack,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import { For, Show } from "solid-js";
 import type { InferType } from "yup";
 import { boolean, mixed, object, string } from "yup";
@@ -47,7 +47,10 @@ export function FelteExample() {
       </FormControl>
       <FormControl required invalid={errors("jobTitle")}>
         <FormLabel>Job title</FormLabel>
-        <SimpleSelect placeholder="Choose a job title" onChange={value => setFields("jobTitle", value)}>
+        <SimpleSelect
+          placeholder="Choose a job title"
+          onChange={value => setFields("jobTitle", value)}
+        >
           <For each={["Designer", "Frontend developer", "Backend developer", "Devops"]}>
             {item => <SimpleOption value={item}>{item}</SimpleOption>}
           </For>

@@ -1,6 +1,6 @@
-const importCssFunction = `import { css } from "@hope-ui/solid"`;
+const importCssFunction = `import { css } from "@hope-ui/design-system"`;
 
-const usingCssFunction = `import { css } from "@hope-ui/solid"
+const usingCssFunction = `import { css } from "@hope-ui/design-system"
 
 const myButtonStyles = css({
   backgroundColor: "gainsboro",

@@ -1,4 +1,4 @@
-import { Anchor, Text } from "@hope-ui/solid";
+import { Anchor, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -31,7 +31,11 @@ export default function GlobalStyles() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Global styles</PageTitle>
       <Text mb="$8">For handling things like global resets, you can write global CSS styles.</Text>
       <SectionTitle id="the-globalcss-function">
@@ -41,7 +45,9 @@ export default function GlobalStyles() {
         Hope UI expose the <Code>globalCss</Code> function from <Code>@stitches/core</Code>.
       </Text>
       <CodeSnippet snippet={snippets.importGlobalCssFunction} mb="$8" />
-      <Text mb="$5">This function will return another function, which you must call in your app.</Text>
+      <Text mb="$5">
+        This function will return another function, which you must call in your app.
+      </Text>
       <CodeSnippet snippet={snippets.usingGlobalCssFunction} mb="$8" />
       <Text>
         If you want to learn more, check out{" "}

@@ -1,4 +1,4 @@
-const importComponent = `import { Anchor } from "@hope-ui/solid"`;
+const importComponent = `import { Anchor } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Anchor>Hope UI</Anchor>`;
 

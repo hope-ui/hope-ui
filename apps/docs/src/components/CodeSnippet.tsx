@@ -1,4 +1,4 @@
-import { Box, HTMLHopeProps } from "@hope-ui/solid";
+import { Box, HTMLHopeProps } from "@hope-ui/design-system";
 import { mergeProps, splitProps } from "solid-js";
 
 export interface CodeSnippetProps extends HTMLHopeProps<"div"> {
@@ -11,7 +11,14 @@ export default function CodeSnippet(props: CodeSnippetProps) {
   const [local, others] = splitProps(propsWithDefault, ["snippet", "lang"]);
 
   return (
-    <Box borderRadius="$lg" overflow="hidden" position="relative" fontSize="$sm" w="$full" {...others}>
+    <Box
+      borderRadius="$lg"
+      overflow="hidden"
+      position="relative"
+      fontSize="$sm"
+      w="$full"
+      {...others}
+    >
       <pre class="line-numbers">
         <code class={`language-${local.lang}`}>{local.snippet}</code>
       </pre>

@@ -1,4 +1,4 @@
-import { CloseButton, HStack, Text } from "@hope-ui/solid";
+import { CloseButton, HStack, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -55,8 +55,9 @@ export default function CloseButtonDoc() {
     <PageLayout previousLink={previousLink} contextualNavLinks={contextualNavLinks}>
       <PageTitle>CloseButton</PageTitle>
       <Text mb="$5">
-        <Code>CloseButton</Code> is essentially a button with a close icon. It is used to handle the close functionality
-        in feedback and overlay components like Alerts, Notifications, Drawers and Modals.
+        <Code>CloseButton</Code> is essentially a button with a close icon. It is used to handle the
+        close functionality in feedback and overlay components like Alerts, Notifications, Drawers
+        and Modals.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -66,8 +67,8 @@ export default function CloseButtonDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Button sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the CloseButton. You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the CloseButton. You can set the value
+        to <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.closeButtonSizes} mb="$12">
         <HStack spacing="$4">
@@ -78,8 +79,8 @@ export default function CloseButtonDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>CloseButton</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>CloseButton</Code> base styles and default props can be overridden in the Hope UI
+        theme configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

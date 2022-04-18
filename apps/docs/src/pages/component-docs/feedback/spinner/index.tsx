@@ -1,4 +1,4 @@
-import { HStack, Spinner, Text } from "@hope-ui/solid";
+import { HStack, Spinner, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -64,7 +64,8 @@ export default function SpinnerDoc() {
     },
     {
       name: "label",
-      description: "For accessibility, the fallback loading text. This text will be visible to screen readers.",
+      description:
+        "For accessibility, the fallback loading text. This text will be visible to screen readers.",
       type: "string",
       defaultValue: "Loading...",
     },
@@ -75,10 +76,15 @@ export default function SpinnerDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Spinner</PageTitle>
       <Text mb="$5">
-        Spinners provide a visual cue that an action is either processing, awaiting a course of change or a result.
+        Spinners provide a visual cue that an action is either processing, awaiting a course of
+        change or a result.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -102,8 +108,8 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Spinner sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Button. You can set the value to <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code> or <Code>xl</Code>.
+        Use the <Code>size</Code> prop to change the size of the Button. You can set the value to{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code> or <Code>xl</Code>.
       </Text>
       <Preview snippet={snippets.sizes} mb="$12">
         <HStack spacing="$4">
@@ -116,8 +122,8 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Spinner</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Spinner</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

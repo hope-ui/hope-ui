@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, Anchor, hope, Text } from "@hope-ui/solid";
+import { Alert, AlertDescription, Anchor, hope, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -188,16 +188,21 @@ export default function DefaultTheme() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Default theme</PageTitle>
       <Text mb="$8">
-        The theme object is where you define your application's color palette, type scale, font stacks, border radius
-        values, and more.
+        The theme object is where you define your application's color palette, type scale, font
+        stacks, border radius values, and more.
       </Text>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        Many CSS properties used in style props or stitches's <Code>css</Code> function are mapped to a scale from the
-        Hope UI theme. The list of CSS property / theme token mapping is available on the{" "}
+        Many CSS properties used in style props or stitches's <Code>css</Code> function are mapped
+        to a scale from the Hope UI theme. The list of CSS property / theme token mapping is
+        available on the{" "}
         <Anchor
           href="https://stitches.dev/docs/tokens#property-mapping"
           external
@@ -218,23 +223,29 @@ export default function DefaultTheme() {
       </Text>
       <Text mb="$5">
         Hope UI uses{" "}
-        <Anchor href="https://www.radix-ui.com/colors" external color="$primary11" fontWeight="$semibold">
+        <Anchor
+          href="https://www.radix-ui.com/colors"
+          external
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           Radix Colors
         </Anchor>{" "}
-        in its default theme. Radix Colors are designed to be accessible, well-balanced, harmonious and provide light
-        and dark palette for each of their colors.
+        in its default theme. Radix Colors are designed to be accessible, well-balanced, harmonious
+        and provide light and dark palette for each of their colors.
       </Text>
       <Alert status="warning" mb="$5">
         <AlertDescription>
-          Since Hope UI components are built with Radix Colors, unless you have any design skills, the recommended way
-          of customizing colors is to pick a light and dark scale from Radix Colors in order to keep all components
-          accessible and dark mode friendly.
+          Since Hope UI components are built with Radix Colors, unless you have any design skills,
+          the recommended way of customizing colors is to pick a light and dark scale from Radix
+          Colors in order to keep all components accessible and dark mode friendly.
         </AlertDescription>
       </Alert>
       <CodeSnippet snippet={snippets.colors} mb="$8" />
       <Text mb="$8">
-        Below are the list of all colors available in the default Hope UI theme. For semantic colors like{" "}
-        <Code>primary</Code>, switching to dark mode will show the proper hex values from the dark palette.
+        Below are the list of all colors available in the default Hope UI theme. For semantic colors
+        like <Code>primary</Code>, switching to dark mode will show the proper hex values from the
+        dark palette.
       </Text>
       <SectionSubtitle id="black-alpha">Black alpha</SectionSubtitle>
       <ColorScale scale={colors.blackAlpha} mb="$10" />
@@ -264,7 +275,9 @@ export default function DefaultTheme() {
       <ColorScale scale={colors.danger} mb="$12" />
 
       <SectionTitle id="typography">Typography</SectionTitle>
-      <Text mb="$2">To manage typography options, the theme object supports the following keys:</Text>
+      <Text mb="$2">
+        To manage typography options, the theme object supports the following keys:
+      </Text>
       <hope.ul ps="$5" mb="$5">
         <hope.li mb="$2">
           <Code>fonts</Code> (font families)
@@ -286,39 +299,42 @@ export default function DefaultTheme() {
 
       <SectionTitle id="space">Space</SectionTitle>
       <Text mb="$5">
-        The <Code>space</Code> key allows you to customize the global spacing scale for your project.
+        The <Code>space</Code> key allows you to customize the global spacing scale for your
+        project.
       </Text>
       <CodeSnippet snippet={snippets.space} mb="$5" />
       <Alert status="info" mb="$12">
         <AlertDescription>
-          <Code>0_5</Code> actually means <Code>0.5</Code>, unfortunately stitches doesn't allow dots in theme token
-          names.
+          <Code>0_5</Code> actually means <Code>0.5</Code>, unfortunately stitches doesn't allow
+          dots in theme token names.
         </AlertDescription>
       </Alert>
 
       <SectionTitle id="sizes">Sizes</SectionTitle>
       <Text mb="$5">
-        The <Code>sizes</Code> key allows you to customize the global sizing of components you build for your project.
+        The <Code>sizes</Code> key allows you to customize the global sizing of components you build
+        for your project.
       </Text>
       <CodeSnippet snippet={snippets.sizes} mb="$12" />
 
       <SectionTitle id="radii">Radii (Border radius)</SectionTitle>
       <Text mb="$5">
-        Hope UI provides a set of smooth corner radius values. The <Code>radii</Code> key allows you to customize the
-        global radii scale for your project.
+        Hope UI provides a set of smooth corner radius values. The <Code>radii</Code> key allows you
+        to customize the global radii scale for your project.
       </Text>
       <CodeSnippet snippet={snippets.radii} mb="$12" />
 
       <SectionTitle id="shadows">Shadows</SectionTitle>
       <Text mb="$5">
-        Hope UI provides a default set of shadows. The <Code>shadows</Code> key allows you to customize the global
-        shadow scale for your project.
+        Hope UI provides a default set of shadows. The <Code>shadows</Code> key allows you to
+        customize the global shadow scale for your project.
       </Text>
       <CodeSnippet snippet={snippets.shadows} mb="$12" />
 
       <SectionTitle id="z-indices">z-index values</SectionTitle>
       <Text mb="$5">
-        hope UI provides a set of z-indices out of the box to help control the stacking order of components.
+        hope UI provides a set of z-indices out of the box to help control the stacking order of
+        components.
       </Text>
       <CodeSnippet snippet={snippets.zIndices} />
     </PageLayout>

@@ -3,7 +3,7 @@ const importComponent = `import {
   RadioControl,
   RadioLabel,
   RadioGroup 
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<RadioGroup defaultValue="1">
   <HStack spacing="$4">

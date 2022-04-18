@@ -1,4 +1,4 @@
-import { hope, Table, TableProps, Tbody, Td, Th, Thead, Tr } from "@hope-ui/solid";
+import { hope, Table, TableProps, Tbody, Td, Th, Thead, Tr } from "@hope-ui/design-system";
 import { For, splitProps } from "solid-js";
 
 export interface StylePropsTableItem {
@@ -28,7 +28,9 @@ export function StylePropsTable(props: StylePropsTableProps) {
               <Tr>
                 <Td>{item.prop}</Td>
                 <Td>{item.cssProperty}</Td>
-                <Td color={item.themeToken ? "inherit" : "$neutral12"}>{item.themeToken || "none"}</Td>
+                <Td color={item.themeToken ? "inherit" : "$neutral12"}>
+                  {item.themeToken || "none"}
+                </Td>
               </Tr>
             )}
           </For>

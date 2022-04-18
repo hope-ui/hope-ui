@@ -1,4 +1,4 @@
-const importComponent = `import { Image } from "@hope-ui/solid"`;
+const importComponent = `import { Image } from "@hope-ui/design-system"`;
 
 const basicUsage = `<Image 
   boxSize="$sm" 

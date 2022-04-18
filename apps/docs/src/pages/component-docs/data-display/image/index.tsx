@@ -1,4 +1,4 @@
-import { hope, HStack, Image, Text } from "@hope-ui/solid";
+import { hope, HStack, Image, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -80,7 +80,8 @@ export default function ImageDoc() {
     },
     {
       name: "align",
-      description: "How to align the image within its bounds. It maps to css `object-position` property.",
+      description:
+        "How to align the image within its bounds. It maps to css `object-position` property.",
       type: "Property.ObjectPosition",
     },
     {
@@ -115,7 +116,11 @@ export default function ImageDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Image</PageTitle>
       <Text mb="$5">
         The <Code>Image</Code> component is used to display images.
@@ -132,9 +137,24 @@ export default function ImageDoc() {
       </Text>
       <Preview snippet={snippets.size} mb="$10">
         <HStack alignItems="flex-start" spacing="$4">
-          <Image boxSize="100px" src="https://bit.ly/3pq0AcS" alt="Monkey D. Luffy" objectFit="cover" />
-          <Image boxSize="150px" src="https://bit.ly/3pq0AcS" alt="Monkey D. Luffy" objectFit="cover" />
-          <Image boxSize="200px" src="https://bit.ly/3pq0AcS" alt="Monkey D. Luffy" objectFit="cover" />
+          <Image
+            boxSize="100px"
+            src="https://bit.ly/3pq0AcS"
+            alt="Monkey D. Luffy"
+            objectFit="cover"
+          />
+          <Image
+            boxSize="150px"
+            src="https://bit.ly/3pq0AcS"
+            alt="Monkey D. Luffy"
+            objectFit="cover"
+          />
+          <Image
+            boxSize="200px"
+            src="https://bit.ly/3pq0AcS"
+            alt="Monkey D. Luffy"
+            objectFit="cover"
+          />
         </HStack>
       </Preview>
       <SectionSubtitle id="image-with-border-radius">Image with border radius</SectionSubtitle>
@@ -152,7 +172,8 @@ export default function ImageDoc() {
       </Preview>
       <SectionSubtitle id="image-fallback">Image fallback</SectionSubtitle>
       <Text mb="$2">
-        The <Code>Image</Code> component allows you provide a fallback placeholder. The placeholder is displayed when:
+        The <Code>Image</Code> component allows you provide a fallback placeholder. The placeholder
+        is displayed when:
       </Text>
       <hope.ul ps="$6" mb="$5">
         <hope.li mb="$2">

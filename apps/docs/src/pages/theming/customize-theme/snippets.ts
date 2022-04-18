@@ -1,5 +1,5 @@
 const overrideThemeColors = `// 1. Import the \`HopeThemeConfig\` type
-import { HopeThemeConfig, HopeProvider } from "@hope-ui/solid"
+import { HopeThemeConfig, HopeProvider } from "@hope-ui/design-system"
 
 // 2. Create a theme config and pass your custom values
 const config: HopeThemeConfig = {

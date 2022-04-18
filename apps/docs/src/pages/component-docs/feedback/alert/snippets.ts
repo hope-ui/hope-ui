@@ -3,7 +3,7 @@ const importComponent = `import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Alert status="danger">
   <AlertIcon mr="$2_5" />

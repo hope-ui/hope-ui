@@ -1,4 +1,4 @@
-import { createIcon } from "@hope-ui/solid";
+import { createIcon } from "@hope-ui/design-system";
 
 // tabler-circle-dashed
 export const IconCircleDashed = createIcon({

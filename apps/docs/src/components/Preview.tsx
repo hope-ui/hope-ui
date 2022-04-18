@@ -1,4 +1,4 @@
-import { Box } from "@hope-ui/solid";
+import { Box } from "@hope-ui/design-system";
 import { Show, splitProps } from "solid-js";
 
 import CodeSnippet, { CodeSnippetProps } from "./CodeSnippet";

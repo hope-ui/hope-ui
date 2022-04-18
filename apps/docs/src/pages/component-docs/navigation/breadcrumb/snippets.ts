@@ -3,7 +3,7 @@ const importComponent = `import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbSeparator
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Breadcrumb>
   <BreadcrumbItem>

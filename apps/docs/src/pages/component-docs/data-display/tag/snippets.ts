@@ -4,7 +4,7 @@ const importComponent = `import {
   TagLabel,
   TagLeftIcon,
   TagRightIcon,
-} from "@hope-ui/solid"`;
+} from "@hope-ui/design-system"`;
 
 const basicUsage = `<Tag>Sample Tag</Tag>`;
 

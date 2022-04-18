@@ -7,7 +7,7 @@ import {
   ListItem,
   Text,
   UnorderedList,
-} from "@hope-ui/solid";
+} from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";
@@ -71,7 +71,8 @@ export default function BreadcrumbDoc() {
   const breadcrumbLinkPropItems: PropsTableItem[] = [
     {
       name: "currentPage",
-      description: "If `true`, renders a span with `aria-current` set to `page` instead of an anchor element.",
+      description:
+        "If `true`, renders a span with `aria-current` set to `page` instead of an anchor element.",
       type: "boolean",
     },
   ];
@@ -81,11 +82,15 @@ export default function BreadcrumbDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Breadcrumb</PageTitle>
       <Text mb="$5">
-        Breadcrumbs, or a breadcrumb navigation, can help enhance how users navigate to previous page levels of a
-        website, especially if that website has many pages or products.
+        Breadcrumbs, or a breadcrumb navigation, can help enhance how users navigate to previous
+        page levels of a website, especially if that website has many pages or products.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -94,7 +99,8 @@ export default function BreadcrumbDoc() {
           <strong>Breadcrumb:</strong> The parent container for breadcrumbs.
         </ListItem>
         <ListItem>
-          <strong>BreadcrumbItem:</strong> Individual breadcrumb element containing a link and separator.
+          <strong>BreadcrumbItem:</strong> Individual breadcrumb element containing a link and
+          separator.
         </ListItem>
         <ListItem>
           <strong>BreadcrumbLink:</strong> The breadcrumb link.
@@ -105,9 +111,10 @@ export default function BreadcrumbDoc() {
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        Add the <Code>currentPage</Code> prop to the <Code>BreadcrumbLink</Code> that matches the current path. When
-        this prop is present, the <Code>BreadcrumbLink</Code> renders a <Code>span</Code> with <Code>aria-current</Code>{" "}
-        set to <Code>page</Code> instead of an anchor element.
+        Add the <Code>currentPage</Code> prop to the <Code>BreadcrumbLink</Code> that matches the
+        current path. When this prop is present, the <Code>BreadcrumbLink</Code> renders a{" "}
+        <Code>span</Code> with <Code>aria-current</Code> set to <Code>page</Code> instead of an
+        anchor element.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Breadcrumb>
@@ -164,7 +171,8 @@ export default function BreadcrumbDoc() {
       </Preview>
       <SectionSubtitle id="with-end-separator">Using end separator</SectionSubtitle>
       <Text mb="$5">
-        To append a separator to the last breadcrumb item, just add a <Code>BreadcrumbSeparator</Code> component.
+        To append a separator to the last breadcrumb item, just add a{" "}
+        <Code>BreadcrumbSeparator</Code> component.
       </Text>
       <Preview snippet={snippets.withEndSeparator} mb="$10">
         <Breadcrumb>
@@ -232,8 +240,8 @@ export default function BreadcrumbDoc() {
       </Preview>
       <SectionTitle id="with-routing-library">Usage with routing library</SectionTitle>
       <Text mb="$5">
-        To use the Breadcrumb with a routing Library like <Code>solid-app-router</Code>, all you need to do is to pass
-        the <Code>as</Code> prop to the <Code>BreadcrumbLink</Code> component.
+        To use the Breadcrumb with a routing Library like <Code>solid-app-router</Code>, all you
+        need to do is to pass the <Code>as</Code> prop to the <Code>BreadcrumbLink</Code> component.
       </Text>
       <Preview snippet={snippets.withRoutingLibrary} mb="$12">
         <Breadcrumb>
@@ -257,24 +265,26 @@ export default function BreadcrumbDoc() {
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          The Breadcrumbs are rendered in a <Code>nav</Code> to denote that it is a navigation landmark.
+          The Breadcrumbs are rendered in a <Code>nav</Code> to denote that it is a navigation
+          landmark.
         </ListItem>
         <ListItem>
-          The Breadcrumb <Code>nav</Code> has <Code>aria-label</Code> set to <Code>breadcrumb</Code>.
+          The Breadcrumb <Code>nav</Code> has <Code>aria-label</Code> set to <Code>breadcrumb</Code>
+          .
         </ListItem>
         <ListItem>
-          The <Code>BreadcrumbLink</Code> with <Code>currentPage</Code> prop has <Code>aria-current</Code> set to{" "}
-          <Code>page</Code>.
+          The <Code>BreadcrumbLink</Code> with <Code>currentPage</Code> prop has{" "}
+          <Code>aria-current</Code> set to <Code>page</Code>.
         </ListItem>
         <ListItem>
-          The separator has <Code>role</Code> set to <Code>presentation</Code> to denote that its for presentation
-          purposes.
+          The separator has <Code>role</Code> set to <Code>presentation</Code> to denote that its
+          for presentation purposes.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Breadcrumb</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Breadcrumb</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

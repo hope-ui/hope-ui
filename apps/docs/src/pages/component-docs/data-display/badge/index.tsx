@@ -1,4 +1,4 @@
-import { Badge, HStack, Text } from "@hope-ui/solid";
+import { Badge, HStack, Text } from "@hope-ui/design-system";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -54,7 +54,11 @@ export default function BadgeDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Badge</PageTitle>
       <Text mb="$5">Badges are used to highlight an item's status for quick recognition.</Text>
       <SectionTitle id="import">Import</SectionTitle>
@@ -65,9 +69,9 @@ export default function BadgeDoc() {
       </Preview>
       <SectionSubtitle id="colors">Badge colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Badge. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Badge. You can set the
+        value to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>,{" "}
+        <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.colors} mb="$10">
         <HStack spacing="$4">
@@ -82,8 +86,8 @@ export default function BadgeDoc() {
       </Preview>
       <SectionSubtitle id="variants">Badge variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Badge. You can set the value to{" "}
-        <Code>solid</Code>, <Code>subtle</Code> or <Code>outline</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Badge. You can set the
+        value to <Code>solid</Code>, <Code>subtle</Code> or <Code>outline</Code>.
       </Text>
       <Preview snippet={snippets.variants} mb="$10">
         <HStack spacing="$4">
@@ -94,8 +98,8 @@ export default function BadgeDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Badge</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Badge</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
