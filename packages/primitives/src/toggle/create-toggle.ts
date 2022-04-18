@@ -65,8 +65,8 @@ export function createToggle(
         type: "checkbox",
         onChange,
       },
-      pressProps,
-      focusableProps
+      pressProps(),
+      focusableProps()
     );
   });
 

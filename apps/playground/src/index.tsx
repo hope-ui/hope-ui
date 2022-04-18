@@ -1,15 +1,15 @@
-import { HopeProvider, NotificationsProvider } from "@hope-ui/design-system";
+import "./index.css";
+
 import {
   AriaSwitchProps,
+  combineProps,
   createSwitch,
   createToggleState,
   createVisuallyHidden,
 } from "@hope-ui/primitives";
 import { render } from "solid-js/web";
 
-type SwitchProps = AriaSwitchProps;
-
-function Switch(props: SwitchProps) {
+function Switch(props: AriaSwitchProps) {
   let ref: HTMLInputElement | undefined;
 
   const state = createToggleState(props);
@@ -17,41 +17,31 @@ function Switch(props: SwitchProps) {
   const { visuallyHiddenProps } = createVisuallyHidden();
 
   return (
-    <label style={{ display: "flex", "align-items": "center" }}>
-      <div {...visuallyHiddenProps}>
-        <input {...inputProps} ref={ref} />
+    <label
+      class={`${state.isSelected() ? "bg-cyan-500" : "bg-slate-300"}
+    relative inline-flex flex-shrink-0 h-[38px] w-[74px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200`}
+    >
+      <div {...visuallyHiddenProps()}>
+        <input {...inputProps()} ref={ref} />
       </div>
-      <svg width={40} height={24} aria-hidden="true" style={{ "margin-right": 4 }}>
-        <rect
-          x={4}
-          y={4}
-          width={32}
-          height={16}
-          rx={8}
-          fill={state.isSelected() ? "orange" : "gray"}
-        />
-        <circle cx={state.isSelected() ? 28 : 12} cy={12} r={5} fill="white" />
-      </svg>
-      {props.children}
+      <span
+        aria-hidden="true"
+        class={`${state.isSelected() ? "translate-x-9" : "translate-x-0"}
+        pointer-events-none inline-block h-[34px] w-[34px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
+      />
     </label>
   );
 }
 
 function App() {
+  const onFocus = () => console.log("focused");
+  const onBlur = () => console.log("blurred");
+
   return (
-    <div>
-      Hello world <Switch>Test</Switch>
+    <div class="p-4">
+      <Switch onFocus={onFocus} onBlur={onBlur} />
     </div>
   );
 }
 
-render(
-  () => (
-    <HopeProvider>
-      <NotificationsProvider>
-        <App />
-      </NotificationsProvider>
-    </HopeProvider>
-  ),
-  document.getElementById("root") as HTMLElement
-);
+render(() => <App />, document.getElementById("root") as HTMLElement);
