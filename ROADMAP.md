@@ -44,7 +44,6 @@
 | PasswordInput    |             |            |       |           |      |
 | RadioGroup       |     ✅      |     ✅     |       |    ✅     |      |
 | Radio            |     ✅      |     ✅     |       |    ✅     |      |
-| NativeSelect     |             |            |       |           |      |
 | Select           |     ✅      |     ✅     |       |           |      |
 | MultiSelect      |     ✅      |     ✅     |       |           |      |
 | Slider           |             |            |       |           |      |
@@ -57,7 +56,7 @@
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Accordion |             |            |       |           |      |
+| Accordion |     ✅      |     ✅     |       |           |      |
 | Avatar    |     ✅      |     ✅     |       |           |      |
 | Badge     |     ✅      |     ✅     |       |           |      |
 | Icon      |     ✅      |     ✅     |  ✅   |           |      |
@@ -74,24 +73,25 @@
 | Breadcrumb |     ✅      |     ✅     |       |           |      |
 | Pagination |             |            |       |           |      |
 | Stepper    |             |            |       |           |      |
-| Tabs       |             |            |       |           |      |
+| Tabs       |     ✅      |     ✅     |       |           |      |
 
 ### Feedback
 
-|                  | Development | A11y check | Tests | Storybook | Docs |
-| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert            |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| CircularProgress |     ✅      |     ✅     |       |           |      |
-| Progress         |     ✅      |     ✅     |       |           |      |
-| Spinner          |     ✅      |     ✅     |       |           |      |
-| Toast            |             |            |       |           |      |
+|                      | Development | A11y check | Tests | Storybook | Docs |
+| -------------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Alert                |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| CircularProgress     |     ✅      |     ✅     |       |           |      |
+| Progress             |     ✅      |     ✅     |       |           |      |
+| Spinner              |     ✅      |     ✅     |       |           |      |
+| Skeleton             |     ✅      |    n/a     |       |           |      |
+| Notification (Toast) |     ✅      |     ✅     |       |           |      |
 
 ### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Drawer  |     ✅      |     ✅     |       |           |      |
-| Menu    |             |            |       |           |      |
+| Menu    |     ✅      |     ✅     |       |           |      |
 | Modal   |     ✅      |     ✅     |       |           |      |
-| Popover |             |            |       |           |      |
+| Popover |     ✅      |     ✅     |       |           |      |
 | Tooltip |     ✅      |     ✅     |       |           |      |
