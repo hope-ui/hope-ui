@@ -13,12 +13,12 @@ export interface CreateFocusWithinProps {
   /**
    * Handler that is called when the target element or a descendant receives focus.
    */
-  onFocusWithin?: (e: FocusEvent) => void;
+  onFocusIn?: (e: FocusEvent) => void;
 
   /**
    * Handler that is called when the target element and all descendants lose focus.
    */
-  onBlurWithin?: (e: FocusEvent) => void;
+  onFocusOut?: (e: FocusEvent) => void;
 
   /**
    * Handler that is called when the the focus within state changes.
@@ -30,12 +30,12 @@ export interface FocusWithinElementProps {
   /**
    * Handler that is called when the element receives focus.
    */
-  onFocus: FocusEvents["onFocus"];
+  onFocusIn: FocusEvents["onFocusIn"];
 
   /**
    * Handler that is called when the element loses focus.
    */
-  onBlur: FocusEvents["onBlur"];
+  onFocusOut: FocusEvents["onFocusOut"];
 }
 
 export interface FocusWithinResult {
@@ -51,33 +51,33 @@ export interface FocusWithinResult {
 export function createFocusWithin(props: CreateFocusWithinProps): FocusWithinResult {
   const [isFocusWithin, setIsFocusWithin] = createSignal(false);
 
-  const onBlur: FocusEvents["onBlur"] = event => {
+  const onFocusOut: FocusEvents["onFocusOut"] = event => {
     if (access(props.isDisabled)) {
       return;
     }
 
-    // We don't want to trigger onBlurWithin and then immediately onFocusWithin again
+    const currentTarget = event.currentTarget as Element | null;
+    const relatedTarget = event.relatedTarget as Element | null;
+
+    // We don't want to trigger onFocusOut and then immediately onFocusIn again
     // when moving focus inside the element. Only trigger if the currentTarget doesn't
     // include the relatedTarget (where focus is moving).
-    if (
-      isFocusWithin() &&
-      !(event.currentTarget as Element).contains(event.relatedTarget as Element)
-    ) {
+    if (isFocusWithin() && !currentTarget?.contains(relatedTarget)) {
       setIsFocusWithin(false);
-      props.onBlurWithin?.(event);
+      props.onFocusOut?.(event);
       props.onFocusWithinChange?.(false);
     }
   };
 
-  const onSyntheticFocus = createSyntheticBlurEvent(onBlur);
+  const onSyntheticFocus = createSyntheticBlurEvent(onFocusOut);
 
-  const onFocus: FocusEvents["onFocus"] = event => {
+  const onFocusIn: FocusEvents["onFocusIn"] = event => {
     if (access(props.isDisabled)) {
       return;
     }
 
     if (!isFocusWithin()) {
-      props.onFocusWithin?.(event);
+      props.onFocusIn?.(event);
       props.onFocusWithinChange?.(true);
       setIsFocusWithin(true);
       onSyntheticFocus(event);
@@ -85,8 +85,8 @@ export function createFocusWithin(props: CreateFocusWithinProps): FocusWithinRes
   };
 
   const focusWithinProps: Accessor<FocusWithinElementProps> = createMemo(() => ({
-    onFocus,
-    onBlur,
+    onFocusIn,
+    onFocusOut,
   }));
 
   return { focusWithinProps };
