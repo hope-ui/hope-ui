@@ -19,11 +19,11 @@
   <a href="LICENSE.md">
     <img src="https://img.shields.io/github/license/fabien-ml/hope-ui" alt="MIT License"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/v/@hope-ui/solid" alt="npm - @hope-ui/solid"/>
+  <a href="https://www.npmjs.com/package/@hope-ui/design-system">
+    <img src="https://img.shields.io/npm/v/@hope-ui/design-system" alt="npm - @hope-ui/design-system"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/dm/@hope-ui/solid.svg" alt="npm - downloads" height="18">
+  <a href="https://www.npmjs.com/package/@hope-ui/design-system">
+    <img src="https://img.shields.io/npm/dm/@hope-ui/design-system.svg" alt="npm - downloads" height="18">
   </a>
 </p>
 
@@ -34,9 +34,10 @@ Hope UI is a composable and accessible component library that gives you the foun
 - **Ready to go**: Start your project with over 40 well designed SolidJS components.
 - **Composable**: Compose your UI with reusable building blocks.
 - **Accessible**: Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
-- **Themeable**: Use Hope UI's design system or build your own using the theming features.
+- **Themeable**: Use Hope UI's design system or customize it using the theming features.
 - **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
 - **Style props**: All component styles can be overridden or extended via style props like `<Box bg="tomato" padding="24px">Box</Box>`.
+- **Headless-able**: Create your own design system with all the available, unstyled, low level primitives.
 
 ## Project status
 
@@ -52,6 +53,7 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 This project is inspired by :
 
+- [React Spectrum Libraries](https://github.com/adobe/react-spectrum)
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
 

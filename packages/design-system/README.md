@@ -1,6 +1,6 @@
-# @hope-ui/solid
+# @hope-ui/design-system
 
-Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
+A composable and accessible component library that gives you the foundation to build your next SolidJS application.
 
 ## Documentation
 
@@ -10,13 +10,13 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 ```sh
 # With npm
-npm install @hope-ui/solid @stitches/core solid-transition-group
+npm install @hope-ui/design-system @stitches/core solid-transition-group
 
 # With yarn
-yarn add @hope-ui/solid @stitches/core solid-transition-group
+yarn add @hope-ui/design-system @stitches/core solid-transition-group
 
 # With pnpm
-pnpm add @hope-ui/solid @stitches/core solid-transition-group
+pnpm add @hope-ui/design-system @stitches/core solid-transition-group
 ```
 
 ## License
