@@ -32,21 +32,26 @@ export interface FocusEvents {
   onBlur?: (e: FocusEvent) => void;
 
   /**
-   * Handler that is called when the element receives focus.
-   * Unlike `focus`, `focusin` event bubbles.
+   * Handler that is called when the element's focus status changes.
+   */
+  onFocusChange?: (isFocused: boolean) => void;
+}
+
+export interface FocusWithinEvents {
+  /**
+   * Handler that is called when the element or a descendant receives focus.
    */
   onFocusIn?: (e: FocusEvent) => void;
 
   /**
-   * Handler that is called when the element loses focus.
-   * Unlike `blur`, `focusout` event bubbles.
+   * Handler that is called when the element and all descendants lose focus.
    */
   onFocusOut?: (e: FocusEvent) => void;
 
   /**
-   * Handler that is called when the element's focus status changes.
+   * Handler that is called when the the focus within state changes.
    */
-  onFocusChange?: (isFocused: boolean) => void;
+  onFocusWithinChange?: (isFocusWithin: boolean) => void;
 }
 
 export interface KeyboardEvents {

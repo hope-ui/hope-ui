@@ -1,42 +1,17 @@
 import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal } from "solid-js";
 
-import { FocusEvents } from "../types";
+import { FocusWithinEvents } from "../types";
 import { createSyntheticBlurEvent } from "./utils";
 
-export interface CreateFocusWithinProps {
+export interface CreateFocusWithinProps extends FocusWithinEvents {
   /**
    * Whether the focus within events should be disabled.
    */
   isDisabled?: MaybeAccessor<boolean | undefined>;
-
-  /**
-   * Handler that is called when the target element or a descendant receives focus.
-   */
-  onFocusIn?: (e: FocusEvent) => void;
-
-  /**
-   * Handler that is called when the target element and all descendants lose focus.
-   */
-  onFocusOut?: (e: FocusEvent) => void;
-
-  /**
-   * Handler that is called when the the focus within state changes.
-   */
-  onFocusWithinChange?: (isFocusWithin: boolean) => void;
 }
 
-export interface FocusWithinElementProps {
-  /**
-   * Handler that is called when the element receives focus.
-   */
-  onFocusIn: FocusEvents["onFocusIn"];
-
-  /**
-   * Handler that is called when the element loses focus.
-   */
-  onFocusOut: FocusEvents["onFocusOut"];
-}
+export type FocusWithinElementProps = Required<Pick<FocusWithinEvents, "onFocusIn" | "onFocusOut">>;
 
 export interface FocusWithinResult {
   /**
@@ -51,7 +26,7 @@ export interface FocusWithinResult {
 export function createFocusWithin(props: CreateFocusWithinProps): FocusWithinResult {
   const [isFocusWithin, setIsFocusWithin] = createSignal(false);
 
-  const onFocusOut: FocusEvents["onFocusOut"] = event => {
+  const onFocusOut: FocusWithinEvents["onFocusOut"] = event => {
     if (access(props.isDisabled)) {
       return;
     }
@@ -71,7 +46,7 @@ export function createFocusWithin(props: CreateFocusWithinProps): FocusWithinRes
 
   const onSyntheticFocus = createSyntheticBlurEvent(onFocusOut);
 
-  const onFocusIn: FocusEvents["onFocusIn"] = event => {
+  const onFocusIn: FocusWithinEvents["onFocusIn"] = event => {
     if (access(props.isDisabled)) {
       return;
     }

@@ -30,14 +30,19 @@ function Switch(props: AriaSwitchProps) {
         aria-hidden="true"
         class={`switch__thumb ${state.isSelected() ? "translate-x-9" : "translate-x-0"}`}
       />
+      {props.children}
     </label>
   );
 }
 
 function App() {
+  const onFocusIn = () => console.log("focusin");
+  const onFocus = () => console.log("focus");
+
   return (
     <div class="p-4">
-      <Switch />
+      <Switch onFocusIn={onFocusIn} onFocus={onFocus} />
+      <button>bar</button>
     </div>
   );
 }
