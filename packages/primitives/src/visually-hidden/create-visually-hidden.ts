@@ -7,14 +7,9 @@ import { isObject } from "../utils";
 
 interface CreateVisuallyHiddenProps {
   /**
-   * Whether the element is focusable.
-   */
-  isFocusable?: MaybeAccessor<boolean | undefined>;
-
-  /**
    * Whether the element should become visible on focus, for example skip links.
    */
-  isVisibleOnFocus?: MaybeAccessor<boolean | undefined>;
+  isFocusable?: MaybeAccessor<boolean | undefined>;
 
   /**
    * The style prop of the element.
@@ -75,7 +70,7 @@ export function createVisuallyHidden(props: CreateVisuallyHiddenProps = {}): Vis
   const combinedStyles = createMemo(() => {
     const style = access(props.style);
 
-    if (isFocused() && access(props.isVisibleOnFocus)) {
+    if (isFocused()) {
       return style;
     }
 

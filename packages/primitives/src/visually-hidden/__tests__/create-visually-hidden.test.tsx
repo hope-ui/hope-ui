@@ -54,8 +54,8 @@ describe("createVisuallyHidden", () => {
     });
   });
 
-  it("should remove visually hidden styles if element is visible on focus", async () => {
-    render(() => <Example isVisibleOnFocus />);
+  it("should remove visually hidden styles if element has focus", async () => {
+    render(() => <Example isFocusable />);
 
     const el = screen.getByTestId("example");
 
