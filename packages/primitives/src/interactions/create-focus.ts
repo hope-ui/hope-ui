@@ -2,6 +2,7 @@ import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo } from "solid-js";
 
 import { FocusEvents } from "../types";
+import { createSyntheticBlurEvent } from "./utils";
 
 export interface CreateFocusProps extends FocusEvents {
   /**
@@ -30,25 +31,28 @@ export interface FocusResult {
 }
 
 /**
- * Handles focus events.
+ * Handles focus events for the target.
  */
 export function createFocus(props: CreateFocusProps): FocusResult {
-  const onFocus: CreateFocusProps["onFocus"] = event => {
-    if (access(props.isDisabled)) {
-      return;
-    }
-
-    props.onFocus?.(event);
-    props.onFocusChange?.(true);
-  };
-
-  const onBlur: CreateFocusProps["onBlur"] = event => {
+  const onBlur: FocusEvents["onBlur"] = event => {
     if (access(props.isDisabled)) {
       return;
     }
 
     props.onBlur?.(event);
     props.onFocusChange?.(false);
+  };
+
+  const onSyntheticFocus = createSyntheticBlurEvent(onBlur);
+
+  const onFocus: FocusEvents["onFocus"] = event => {
+    if (access(props.isDisabled)) {
+      return;
+    }
+
+    props.onFocus?.(event);
+    props.onFocusChange?.(true);
+    onSyntheticFocus(event);
   };
 
   const focusProps: Accessor<FocusElementProps> = createMemo(() => ({

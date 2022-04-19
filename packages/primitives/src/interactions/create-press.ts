@@ -35,7 +35,7 @@ export interface PressResult {
 }
 
 /**
- * Handles press events.
+ * Handles press events for the target.
  */
 export function createPress(props: CreatePressProps): PressResult {
   const onClick: CreatePressProps["onClick"] = event => {

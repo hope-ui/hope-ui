@@ -30,7 +30,7 @@ export interface KeyboardResult {
 }
 
 /**
- * Handles keyboard events.
+ * Handles keyboard events for the target.
  */
 export function createKeyboard(props: CreateKeyboardProps): KeyboardResult {
   const onKeyDown: CreateKeyboardProps["onKeyDown"] = event => {

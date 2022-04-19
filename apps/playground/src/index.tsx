@@ -2,7 +2,7 @@ import "./index.css";
 
 import {
   AriaSwitchProps,
-  combineProps,
+  createFocusRing,
   createSwitch,
   createToggleState,
   createVisuallyHidden,
@@ -15,31 +15,29 @@ function Switch(props: AriaSwitchProps) {
   const state = createToggleState(props);
   const { inputProps } = createSwitch(props, state, ref);
   const { visuallyHiddenProps } = createVisuallyHidden();
+  const { isFocusVisible, focusRingProps } = createFocusRing();
 
   return (
     <label
-      class={`${state.isSelected() ? "bg-cyan-500" : "bg-slate-300"}
-    relative inline-flex flex-shrink-0 h-[38px] w-[74px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200`}
+      class={`switch ${state.isSelected() ? "bg-cyan-500" : "bg-slate-300"} ${
+        isFocusVisible() && "ring ring-red-500 ring-opacity-75"
+      }`}
     >
       <div {...visuallyHiddenProps()}>
-        <input {...inputProps()} ref={ref} />
+        <input {...inputProps()} {...focusRingProps()} ref={ref} />
       </div>
       <span
         aria-hidden="true"
-        class={`${state.isSelected() ? "translate-x-9" : "translate-x-0"}
-        pointer-events-none inline-block h-[34px] w-[34px] rounded-full bg-white shadow-lg transform ring-0 transition ease-in-out duration-200`}
+        class={`switch__thumb ${state.isSelected() ? "translate-x-9" : "translate-x-0"}`}
       />
     </label>
   );
 }
 
 function App() {
-  const onFocus = () => console.log("focused");
-  const onBlur = () => console.log("blurred");
-
   return (
     <div class="p-4">
-      <Switch onFocus={onFocus} onBlur={onBlur} />
+      <Switch />
     </div>
   );
 }
