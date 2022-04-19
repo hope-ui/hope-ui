@@ -1,4 +1,5 @@
 export * from "./select";
+export * from "./select.styles";
 export * from "./select-content";
 export * from "./select-icon";
 export * from "./select-label";
