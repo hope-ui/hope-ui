@@ -1,4 +1,4 @@
-const importComponent = `import { Skeleton, SkeletonCircle, SkeletonText } from "@hope-ui/design-system"`;
+const importComponent = `import { Skeleton, SkeletonCircle, SkeletonText } from "@hope-ui/solid"`;
 
 const basicUsageStandalone = `<VStack alignItems="stretch" spacing="$2">
   <Skeleton height="20px" />

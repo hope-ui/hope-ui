@@ -1,4 +1,4 @@
-const importComponent = `import { Heading } from "@hope-ui/design-system"`;
+const importComponent = `import { Heading } from "@hope-ui/solid"`;
 
 const basicUsage = `<Heading>I'm a Heading</Heading>`;
 

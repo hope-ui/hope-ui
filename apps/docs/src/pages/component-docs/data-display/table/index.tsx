@@ -1,4 +1,4 @@
-import { Table, TableCaption, Tbody, Td, Text, Tfoot, Th, Thead, Tr } from "@hope-ui/design-system";
+import { Table, TableCaption, Tbody, Td, Text, Tfoot, Th, Thead, Tr } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 

@@ -1,4 +1,4 @@
-import { Text, Textarea, VStack } from "@hope-ui/design-system";
+import { Text, Textarea, VStack } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { createSignal, onMount } from "solid-js";
 

@@ -6,7 +6,7 @@ import {
   Progress,
   ProgressIndicator,
   Spinner,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import { Outlet, Route, Routes, useIsRouting } from "solid-app-router";
 import { lazy, Suspense } from "solid-js";
 import { Portal } from "solid-js/web";

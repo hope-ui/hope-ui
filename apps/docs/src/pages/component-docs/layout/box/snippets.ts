@@ -1,4 +1,4 @@
-const importComponent = `import { Box } from "@hope-ui/design-system"`;
+const importComponent = `import { Box } from "@hope-ui/solid"`;
 
 const basicUsage = `<Box bg="tomato" w="100%" p="$4" color="white">
   This is the Box

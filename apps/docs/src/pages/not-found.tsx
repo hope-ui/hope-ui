@@ -1,4 +1,4 @@
-import { Button, Center, Divider, Flex, Stack, Text, VStack } from "@hope-ui/design-system";
+import { Button, Center, Divider, Flex, Stack, Text, VStack } from "@hope-ui/solid";
 import { Link } from "solid-app-router";
 
 import Header from "@/components/Header";

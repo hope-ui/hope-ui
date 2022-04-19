@@ -25,7 +25,7 @@
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "playground": "pnpm -F hope-ui-playground dev",
     "prepare": "husky install",
-    "storybook": "pnpm -F @hope-ui/design-system storybook",
+    "storybook": "pnpm -F @hope-ui/solid storybook",
     "test": "pnpm -F @hope-ui/* test",
     "typecheck": "pnpm -F @hope-ui/* typecheck"
   },

@@ -1,4 +1,4 @@
-const importComponent = `import { Grid, GridItem } from "@hope-ui/design-system"`;
+const importComponent = `import { Grid, GridItem } from "@hope-ui/solid"`;
 
 const templateColumns = `<Grid templateColumns="repeat(5, 1fr)" gap="$6">
   <GridItem w="100%" h="$10" bg="$info9" />

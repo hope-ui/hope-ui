@@ -1,4 +1,4 @@
-const importComponent = `import { Container } from "@hope-ui/design-system"`;
+const importComponent = `import { Container } from "@hope-ui/solid"`;
 
 const basicUsage = `<Container>
   There are many benefits to a joint design and development system. Not only does it bring

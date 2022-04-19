@@ -3,7 +3,7 @@ const importComponent = `import {
   TabList, 
   Tab,
   TabPanel
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `<Tabs>
   <TabList>

@@ -1,4 +1,4 @@
-import { createIcon } from "@hope-ui/design-system";
+import { createIcon } from "@hope-ui/solid";
 
 export const IconCaretDown = createIcon({
   viewBox: "0 0 15 15",

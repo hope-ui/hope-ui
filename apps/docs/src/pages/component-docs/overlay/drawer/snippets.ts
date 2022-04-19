@@ -6,7 +6,7 @@ const importComponent = `import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `function DrawerExample() {
   const { isOpen, onOpen, onClose } = createDisclosure()

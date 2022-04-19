@@ -2,7 +2,6 @@
 
 ### 💥 BREAKING CHANGES
 
-- Package `@hope-ui/solid` has been deprecated in favor of `@hope-ui/design-system`.
 - `CheckboxControl` and `CheckboxLabel` components has been removed.
 - `RadioControl` and `RadioLabel` components has been removed.
 - `SwitchControl` and `SwitchLabel` components has been removed.

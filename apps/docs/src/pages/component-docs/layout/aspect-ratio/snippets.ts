@@ -1,4 +1,4 @@
-const importComponent = `import { AspectRatio } from "@hope-ui/design-system"`;
+const importComponent = `import { AspectRatio } from "@hope-ui/solid"`;
 
 const embedVideo = `// This video will have equal sides
 <AspectRatio maxW="560px" ratio={1}>

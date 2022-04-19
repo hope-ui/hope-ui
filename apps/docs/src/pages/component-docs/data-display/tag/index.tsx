@@ -9,7 +9,7 @@ import {
   TagRightIcon,
   Text,
   VStack,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import Prism from "prismjs";
 import { For, onMount } from "solid-js";
 

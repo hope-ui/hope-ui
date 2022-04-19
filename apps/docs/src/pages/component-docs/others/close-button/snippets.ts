@@ -1,4 +1,4 @@
-const importComponent = `import { CloseButton } from "@hope-ui/design-system"`;
+const importComponent = `import { CloseButton } from "@hope-ui/solid"`;
 
 const basicUsage = `<CloseButton />`;
 

@@ -1,4 +1,4 @@
-import { hope } from "@hope-ui/design-system";
+import { hope } from "@hope-ui/solid";
 
 const Code = hope("code", {
   baseStyle: {

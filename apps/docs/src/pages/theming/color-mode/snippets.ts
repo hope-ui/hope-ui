@@ -1,4 +1,4 @@
-const initialColorMode = `import { HopeThemeConfig, HopeProvider } from "@hope-ui/design-system"
+const initialColorMode = `import { HopeThemeConfig, HopeProvider } from "@hope-ui/solid"
 
 // 1. Create a theme config
 const config: HopeThemeConfig = {

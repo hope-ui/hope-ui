@@ -1,7 +1,7 @@
-const importComponent = `import { Icon } from "@hope-ui/design-system"`;
+const importComponent = `import { Icon } from "@hope-ui/solid"`;
 
 const usingThirdPartyIconLibrary = `// 1. Import
-import { Icon } from "@hope-ui/design-system"
+import { Icon } from "@hope-ui/solid"
 import { SettingsIcon } from "some-icon-library"
 
 // 2. Use the \`as\` prop
@@ -9,7 +9,7 @@ function Example() {
   return <Icon as={SettingsIcon} />
 }`;
 
-const importIconAndCreateIcon = `import { Icon, createIcon } from "@hope-ui/design-system"`;
+const importIconAndCreateIcon = `import { Icon, createIcon } from "@hope-ui/solid"`;
 
 const customIconWithIconComponent = `<Icon viewBox="0 0 200 200" color="$danger9">
   <path
@@ -40,7 +40,7 @@ const customIconAsComponentUsage = `<HStack>
   <CircleIcon boxSize="$8" color="$danger9" />
 </HStack>`;
 
-const createIconExample = `import { createIcon } from "@hope-ui/design-system"
+const createIconExample = `import { createIcon } from "@hope-ui/solid"
 
 export const CircleIcon = createIcon({
   viewBox: "0 0 200 200",

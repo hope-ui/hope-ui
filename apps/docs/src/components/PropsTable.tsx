@@ -1,4 +1,4 @@
-import { Table, TableProps, Tag, Tbody, Td, Th, Thead, Tr, VStack } from "@hope-ui/design-system";
+import { Table, TableProps, Tag, Tbody, Td, Th, Thead, Tr, VStack } from "@hope-ui/solid";
 import { For, Show, splitProps } from "solid-js";
 
 export interface PropsTableItem {

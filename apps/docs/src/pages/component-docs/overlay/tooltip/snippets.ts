@@ -1,4 +1,4 @@
-const importComponent = `import { Tooltip } from "@hope-ui/design-system"`;
+const importComponent = `import { Tooltip } from "@hope-ui/solid"`;
 
 const basicUsage = `<Tooltip label="Hey, I'm here!">
   <span>Hover me</span>

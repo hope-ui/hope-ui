@@ -13,7 +13,7 @@
   "dependencies": {
     "@felte/solid": "1.1.5",
     "@felte/validator-yup": "1.0.3",
-    "@hope-ui/design-system": "workspace:*",
+    "@hope-ui/solid": "workspace:*",
     "@stitches/core": "1.2.7",
     "prism-themes": "1.9.0",
     "prismjs": "1.27.0",

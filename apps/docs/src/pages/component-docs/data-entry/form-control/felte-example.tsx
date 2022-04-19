@@ -17,7 +17,7 @@ import {
   SimpleSelect,
   Textarea,
   VStack,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import { For, Show } from "solid-js";
 import type { InferType } from "yup";
 import { boolean, mixed, object, string } from "yup";

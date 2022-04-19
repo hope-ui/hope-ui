@@ -1,4 +1,4 @@
-import { Text } from "@hope-ui/design-system";
+import { Text } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -48,7 +48,7 @@ export default function Installation() {
       <SectionTitle id="optional-setup">Optional setup</SectionTitle>
       <Text mb="$3">
         If you intend to customise the default theme to match your design requirements, you can
-        extend the <Code>theme</Code> from <Code>@hope-ui/design-system</Code>.
+        extend the <Code>theme</Code> from <Code>@hope-ui/solid</Code>.
       </Text>
       <Text mb="$5">
         The HopeProvider accept a <Code>config</Code> prop that deep merges the default theme with

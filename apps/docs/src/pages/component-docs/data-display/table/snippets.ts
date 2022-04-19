@@ -7,7 +7,7 @@ const importComponent = `import {
   Tr,
   Th,
   Td
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `<Table>
   <TableCaption>Imperial to metric conversion factors</TableCaption>

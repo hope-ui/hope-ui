@@ -1,4 +1,4 @@
-const importComponent = `import { Divider } from "@hope-ui/design-system"`;
+const importComponent = `import { Divider } from "@hope-ui/solid"`;
 
 const basicUsage = `<Divider />`;
 

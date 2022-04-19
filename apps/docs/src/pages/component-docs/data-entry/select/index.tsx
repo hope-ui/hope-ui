@@ -25,7 +25,7 @@ import {
   Text,
   UnorderedList,
   VStack,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { createSignal, For, onMount } from "solid-js";

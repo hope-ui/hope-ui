@@ -4,7 +4,7 @@ const importComponent = `import {
   ListIcon,
   OrderedList,
   UnorderedList,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const unorderedList = `<UnorderedList>
   <ListItem>Clone or download repository from GitHub</ListItem>

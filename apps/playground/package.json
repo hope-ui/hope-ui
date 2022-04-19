@@ -8,8 +8,8 @@
     "dev": "vite --host"
   },
   "dependencies": {
-    "@hope-ui/design-system": "workspace:*",
-    "@hope-ui/primitives": "workspace:*"
+    "@hope-ui/primitives": "workspace:*",
+    "@hope-ui/solid": "workspace:*"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.4",

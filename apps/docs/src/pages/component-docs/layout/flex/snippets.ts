@@ -1,4 +1,4 @@
-const importComponent = `import { Flex, Spacer } from "@hope-ui/design-system"`;
+const importComponent = `import { Flex, Spacer } from "@hope-ui/solid"`;
 
 const basicUsage = `<Flex color="white">
   <Center w="100px" bg="$success10">

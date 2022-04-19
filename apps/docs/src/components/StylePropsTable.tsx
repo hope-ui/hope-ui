@@ -1,4 +1,4 @@
-import { hope, Table, TableProps, Tbody, Td, Th, Thead, Tr } from "@hope-ui/design-system";
+import { hope, Table, TableProps, Tbody, Td, Th, Thead, Tr } from "@hope-ui/solid";
 import { For, splitProps } from "solid-js";
 
 export interface StylePropsTableItem {

@@ -1,4 +1,4 @@
-import { createIcon } from "@hope-ui/design-system";
+import { createIcon } from "@hope-ui/solid";
 
 export const IconPalette = createIcon({
   viewBox: "0 0 24 24",

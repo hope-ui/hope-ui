@@ -1,4 +1,4 @@
-import { Box, HTMLHopeProps } from "@hope-ui/design-system";
+import { Box, HTMLHopeProps } from "@hope-ui/solid";
 import { mergeProps, splitProps } from "solid-js";
 
 export interface CodeSnippetProps extends HTMLHopeProps<"div"> {

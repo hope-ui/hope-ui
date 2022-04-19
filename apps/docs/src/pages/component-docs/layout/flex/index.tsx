@@ -10,7 +10,7 @@ import {
   HStack,
   Spacer,
   Text,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import Prism from "prismjs";
 import { Link } from "solid-app-router";
 import { onMount } from "solid-js";

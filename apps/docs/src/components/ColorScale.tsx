@@ -8,7 +8,7 @@ import {
   SystemConfig,
   useTheme,
   VStack,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import { For, splitProps } from "solid-js";
 
 export interface ColorScaleItem {

@@ -3,7 +3,7 @@ const importComponent = `import {
   FormLabel,
   FormErrorMessage,
   FormHelperText,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `<FormControl>
   <FormLabel for="email">Email address</FormLabel>
@@ -110,7 +110,7 @@ import {
   SimpleSelect,
   Textarea,
   VStack,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import { For, Show } from "solid-js";
 import type { InferType } from "yup";
 import { boolean, mixed, object, string } from "yup";

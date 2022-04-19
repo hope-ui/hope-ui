@@ -1,4 +1,4 @@
-import { Anchor, Button, Flex, HStack, Text, Tooltip, VStack } from "@hope-ui/design-system";
+import { Anchor, Button, Flex, HStack, Text, Tooltip, VStack } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 

@@ -1,4 +1,4 @@
-import { Anchor, Center, HStack, Text } from "@hope-ui/design-system";
+import { Anchor, Center, HStack, Text } from "@hope-ui/solid";
 
 import { IconGithub } from "@/icons/IconGithub";
 import { IconTwitter } from "@/icons/IconTwitter";

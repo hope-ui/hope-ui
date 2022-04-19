@@ -1,4 +1,4 @@
-import { Center, Divider, Text, VStack } from "@hope-ui/design-system";
+import { Center, Divider, Text, VStack } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 

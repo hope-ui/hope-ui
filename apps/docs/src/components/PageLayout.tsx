@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, HTMLHopeProps, Stack, Text, VStack } from "@hope-ui/design-system";
+import { Box, Flex, HStack, HTMLHopeProps, Stack, Text, VStack } from "@hope-ui/solid";
 import { Link } from "solid-app-router";
 import { Show, splitProps } from "solid-js";
 

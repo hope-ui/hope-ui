@@ -8,7 +8,7 @@ const importComponent = `import {
   PopoverHeader,
   PopoverBody,
   PopoverFooter,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `<Popover>
   <PopoverTrigger as={Button} variant="subtle" colorScheme="neutral">

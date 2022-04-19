@@ -1,4 +1,4 @@
-const importComponent = `import { Text } from "@hope-ui/design-system"`;
+const importComponent = `import { Text } from "@hope-ui/solid"`;
 
 const basicUsage = `<Text>I'm a Text</Text>`;
 

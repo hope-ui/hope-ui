@@ -1,4 +1,4 @@
-import { Badge, hope } from "@hope-ui/design-system";
+import { Badge, hope } from "@hope-ui/solid";
 import { NavLink } from "solid-app-router";
 import { ComponentProps, Show, splitProps } from "solid-js";
 

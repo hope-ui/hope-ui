@@ -1,4 +1,4 @@
-import { Anchor, createIcon, hope, HStack, Icon, IconProps, Text } from "@hope-ui/design-system";
+import { Anchor, createIcon, hope, HStack, Icon, IconProps, Text } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -108,7 +108,7 @@ export default function IconDoc() {
       <Text mb="$3">To use third-party icon libraries, here are the steps:</Text>
       <hope.ul ps="$6" mb="$5">
         <hope.li mb="$2">
-          Import the <Code>Icon</Code> component from <Code>@hope-ui/design-system</Code>.
+          Import the <Code>Icon</Code> component from <Code>@hope-ui/solid</Code>.
         </hope.li>
         <hope.li>
           Pass the desired third party icon into the <Code>as</Code> prop.
@@ -126,7 +126,7 @@ export default function IconDoc() {
         </hope.li>
       </hope.ul>
       <Text mb="$5">
-        They can be imported from <Code>@hope-ui/design-system</Code>:
+        They can be imported from <Code>@hope-ui/solid</Code>:
       </Text>
       <CodeSnippet snippet={snippets.importIconAndCreateIcon} mb="$10" />
       <SectionSubtitle id="using-icon-component">

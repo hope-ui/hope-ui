@@ -1,4 +1,4 @@
-import { Flex } from "@hope-ui/design-system";
+import { Flex } from "@hope-ui/solid";
 
 import MainNavContent from "./MainNavContent";
 

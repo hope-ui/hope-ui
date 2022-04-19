@@ -1,13 +1,4 @@
-import {
-  Alert,
-  AlertDescription,
-  Anchor,
-  Box,
-  hope,
-  HStack,
-  Stack,
-  Text,
-} from "@hope-ui/design-system";
+import { Alert, AlertDescription, Anchor, Box, hope, HStack, Stack, Text } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 

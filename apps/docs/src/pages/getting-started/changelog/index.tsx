@@ -1,4 +1,4 @@
-import { Anchor, Text } from "@hope-ui/design-system";
+import { Anchor, Text } from "@hope-ui/solid";
 
 import { ContextualNavLink } from "@/components/ContextualNav";
 import PageLayout from "@/components/PageLayout";

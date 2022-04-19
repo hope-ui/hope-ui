@@ -1,4 +1,4 @@
-import { Text } from "@hope-ui/design-system";
+import { Text } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 

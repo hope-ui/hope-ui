@@ -5,10 +5,10 @@ const importComponent = `import {
   NotificationTitle,
   NotificationDescription,
   notificationService,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const setup = `// 1. import \`NotificationsProvider\` component
-import { HopeProvider, NotificationsProvider } from '@hope-ui/design-system'
+import { HopeProvider, NotificationsProvider } from '@hope-ui/solid'
 
 // 2. Wrap NotificationsProvider at the root of your app
 function App() {
@@ -21,7 +21,7 @@ function App() {
   )
 }`;
 
-const basicUsage = `import { notificationService } from '@hope-ui/design-system'
+const basicUsage = `import { notificationService } from '@hope-ui/solid'
 
 function NotificationExample() {
   const showNotification = () => {
@@ -50,7 +50,7 @@ const status = `<Button
   Show notification
 </Button>`;
 
-const placement = `import { HopeProvider, NotificationsProvider } from '@hope-ui/design-system'
+const placement = `import { HopeProvider, NotificationsProvider } from '@hope-ui/solid'
 
 function App() {
   return (
@@ -172,7 +172,7 @@ const updating = `<Button
   Show upadate notification
 </Button>`;
 
-const limitAndQueueSetup = `import { HopeProvider, NotificationsProvider } from '@hope-ui/design-system'
+const limitAndQueueSetup = `import { HopeProvider, NotificationsProvider } from '@hope-ui/solid'
 
 function App() {
   return (

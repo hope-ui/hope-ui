@@ -1,4 +1,4 @@
-import { ElementType, Text, TextProps } from "@hope-ui/design-system";
+import { ElementType, Text, TextProps } from "@hope-ui/solid";
 
 export default function MainNavSubtitle<C extends ElementType = "p">(props: TextProps<C>) {
   return (

@@ -11,7 +11,7 @@ import {
   Text,
   VStack,
   VStackProps,
-} from "@hope-ui/design-system";
+} from "@hope-ui/solid";
 import { Link } from "solid-app-router";
 
 import Footer from "@/components/Footer";

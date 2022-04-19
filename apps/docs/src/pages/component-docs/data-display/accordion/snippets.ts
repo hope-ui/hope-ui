@@ -4,7 +4,7 @@ const importComponent = `import {
   AccordionButton,
   AccordionIcon,
   AccordionPanel,
-} from "@hope-ui/design-system"`;
+} from "@hope-ui/solid"`;
 
 const basicUsage = `<Accordion>
   <AccordionItem>

@@ -1,4 +1,4 @@
-const importComponent = `import { Textarea } from "@hope-ui/design-system"`;
+const importComponent = `import { Textarea } from "@hope-ui/solid"`;
 
 const basicUsage = `<Textarea placeholder="Basic usage" />`;
 
