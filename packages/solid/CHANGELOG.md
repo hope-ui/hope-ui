@@ -1,3 +1,9 @@
+## [0.4.3](https://github.com/fabien-ml/hope-ui/compare/v0.4.2...v0.4.3) (2022-04-19)
+
+### 🐛 Bug fixes
+
+- Export all component styles.
+
 ## [0.4.2](https://github.com/fabien-ml/hope-ui/compare/v0.4.1...v0.4.2) (2022-04-08)
 
 ### 🐛 Bug fixes

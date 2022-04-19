@@ -1,7 +1,7 @@
 import { splitProps } from "solid-js";
 
-import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
+import { SystemStyleObject } from "../../styled-system/types";
 import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { useFormControl } from "../form-control/use-form-control";

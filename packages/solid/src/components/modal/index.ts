@@ -1,4 +1,5 @@
 export * from "./modal";
+export * from "./modal.styles";
 export * from "./modal-body";
 export * from "./modal-close-button";
 export * from "./modal-content";
