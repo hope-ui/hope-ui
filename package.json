@@ -13,21 +13,21 @@
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
   "workspaces": [
-    "./apps/*",
-    "./packages/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
-    "build": "pnpm -F @hope-ui/* build",
-    "build:docs": "pnpm -F hope-ui-docs build",
+    "build": "turbo run build",
+    "changeset": "changeset",
+    "clean": "turbo run clean && rm -rf node_modules",
     "commit": "git-cz",
-    "dev:docs": "pnpm -F hope-ui-docs dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
-    "playground": "pnpm -F hope-ui-playground dev",
     "prepare": "husky install",
-    "storybook": "pnpm -F @hope-ui/solid storybook",
-    "test": "pnpm -F @hope-ui/* test",
-    "typecheck": "pnpm -F @hope-ui/* typecheck"
+    "release": "turbo run build && changeset publish",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "version-packages": "changeset version"
   },
   "lint-staged": {
     "*.{md,json}": [
@@ -46,7 +46,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.17.9",
+    "@babel/preset-env": "7.16.11",
     "@babel/preset-typescript": "7.16.7",
+    "@changesets/cli": "2.22.0",
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-conventional": "16.2.1",
     "@commitlint/cz-commitlint": "16.2.3",
@@ -93,14 +95,13 @@
     "prismjs": "1.27.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "rollup": "2.70.2",
-    "rollup-preset-solid": "1.4.0",
     "solid-js": "1.3.15",
     "solid-testing-library": "0.3.0",
     "solid-transition-group": "0.0.10",
     "sort-package-json": "1.55.0",
     "storybook-dark-mode": "1.0.9",
     "ts-jest": "27.1.4",
+    "turbo": "1.2.4",
     "typescript": "4.6.3",
     "vite": "2.9.1",
     "vite-plugin-dts": "1.0.5",

@@ -8,5 +8,4 @@ __mocks__/
 
 commitlint.config.js
 jest.config.js
-jest.setup.js
 *.d.ts

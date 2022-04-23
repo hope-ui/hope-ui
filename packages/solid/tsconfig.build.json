@@ -6,6 +6,6 @@
     "declarationMap": true,
     "declarationDir": "dist"
   },
-  "include": ["src/**/*"],
+  "include": ["./src"],
   "exclude": ["**/*.spec.*", "**/*.test.*", "**/*.stories.*"]
 }

@@ -1,6 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/jetbrains,macos,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=jetbrains,macos,node
 
+# Vercel
+.vercel
+
+# Turborepo
+.turbo
+build/**
+dist/**
+
+
 # Storybook
 storybook-static
 
