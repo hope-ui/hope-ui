@@ -1,7 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 
-import { HopeWrapper } from "@/utils/storybook";
-
+import { HopeWrapper } from "../../components/storybook-utils";
 import { useEvent } from "./";
 
 export default {
