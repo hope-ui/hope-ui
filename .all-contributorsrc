@@ -16,6 +16,15 @@
         "doc",
         "maintenance"
       ]
+    },
+    {
+      "login": "bichikim",
+      "name": "Bichi Kim",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13829322?v=4",
+      "profile": "https://github.com/bichikim",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
