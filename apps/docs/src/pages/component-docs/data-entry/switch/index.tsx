@@ -28,7 +28,6 @@ import SectionTitle from "@/components/SectionTitle";
 import { snippets } from "./snippets";
 
 const switchRootClass = css({
-  length: undefined,
   display: "inline-flex",
   alignItems: "center",
   border: "1px solid $neutral7",
@@ -47,7 +46,6 @@ const switchRootClass = css({
 });
 
 const switchControlClass = css({
-  length: undefined,
   all: "unset",
   width: 34,
   height: 12,
@@ -63,7 +61,6 @@ const switchControlClass = css({
 });
 
 const switchThumbClass = css({
-  length: undefined,
   display: "block",
   width: 20,
   height: 20,

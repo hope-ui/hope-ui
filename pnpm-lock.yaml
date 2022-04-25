@@ -11,7 +11,7 @@ importers:
       '@commitlint/cli': 16.2.3
       '@commitlint/config-conventional': 16.2.1
       '@commitlint/cz-commitlint': 16.2.3
-      '@stitches/core': 1.2.7
+      '@stitches/core': 1.2.8
       '@storybook/addon-a11y': 6.4.20
       '@storybook/addon-actions': 6.4.20
       '@storybook/addon-essentials': 6.4.20
@@ -75,7 +75,7 @@ importers:
       '@commitlint/cli': 16.2.3
       '@commitlint/config-conventional': 16.2.1
       '@commitlint/cz-commitlint': 16.2.3_commitizen@4.2.4+inquirer@8.2.2
-      '@stitches/core': 1.2.7
+      '@stitches/core': 1.2.8
       '@storybook/addon-a11y': 6.4.20_react-dom@17.0.1+react@17.0.1
       '@storybook/addon-actions': 6.4.20_react-dom@17.0.1+react@17.0.1
       '@storybook/addon-essentials': 6.4.20_be64294eb9361d5e43289f2c2c6f7090
@@ -137,7 +137,7 @@ importers:
       '@felte/solid': 1.1.5
       '@felte/validator-yup': 1.0.3
       '@hope-ui/solid': workspace:*
-      '@stitches/core': 1.2.7
+      '@stitches/core': 1.2.8
       prism-themes: 1.9.0
       prismjs: 1.27.0
       solid-app-router: 0.2.1
@@ -148,7 +148,7 @@ importers:
       '@felte/solid': 1.1.5_solid-js@1.3.14
       '@felte/validator-yup': 1.0.3_yup@0.32.11
       '@hope-ui/solid': link:../../packages/solid
-      '@stitches/core': 1.2.7
+      '@stitches/core': 1.2.8
       prism-themes: 1.9.0
       prismjs: 1.27.0
       solid-app-router: 0.2.1_solid-js@1.3.14
@@ -2594,8 +2594,8 @@ packages:
       '@sinonjs/commons': 1.8.3
     dev: true
 
-  /@stitches/core/1.2.7:
-    resolution: {integrity: sha512-2bSto+jqPjeODcdNvwuXduhUH5b1bROmGNSBj/EVOGk8a8dIdCnoZyXYSxdKlKA9SnedBg94qNO0QQAMvTAz3w==}
+  /@stitches/core/1.2.8:
+    resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
 
   /@storybook/addon-a11y/6.4.20_react-dom@17.0.1+react@17.0.1:
     resolution: {integrity: sha512-DNUkSruVgO+r1AAxZGIwlxKRG/58t81tpoIX38S4bqn3U97BkemndrzydQs93SYDks2raoMeEnOwphQP4GTG5A==}

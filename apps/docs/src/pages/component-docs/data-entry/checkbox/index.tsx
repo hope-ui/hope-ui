@@ -30,7 +30,6 @@ import { IconQuestionMark } from "@/icons/IconQuestionMark";
 import { snippets } from "./snippets";
 
 const checkboxRootStyles = css({
-  length: undefined,
   rounded: "$md",
   border: "1px solid $neutral7",
   shadow: "$sm",
@@ -53,7 +52,6 @@ const checkboxRootStyles = css({
 });
 
 const checkboxIndicatorStyles = css({
-  length: undefined,
   rounded: "$sm",
   border: "1px solid $neutral7",
   bg: "$whiteAlpha7",
