@@ -54,7 +54,11 @@ export function Input(props: InputProps) {
       local.class,
       hopeInputClass,
       inputStyles({
-        variant: local.variant ?? inputGroup?.state.variant ?? theme?.defaultProps?.input?.variant ?? "outline",
+        variant:
+          local.variant ??
+          inputGroup?.state.variant ??
+          theme?.defaultProps?.input?.variant ??
+          "outline",
         size: local.size ?? inputGroup?.state.size ?? theme?.defaultProps?.input?.size ?? "md",
         withLeftElement: inputGroup?.state.hasLeftElement ?? false,
         withRightElement: inputGroup?.state.hasRightElement ?? false,

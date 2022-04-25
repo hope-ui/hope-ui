@@ -2,7 +2,7 @@ import { Property } from "csstype";
 import { createMemo, JSX, Show, splitProps } from "solid-js";
 
 import { classNames, createClassSelector } from "../../utils/css";
-import { RightJoinProps } from "../../utils/types";
+import { OverrideProps } from "../../utils/types";
 import { Box } from "../box";
 import { ElementType, HTMLHopeProps } from "../types";
 import { createImageLoadingStatus, CreateImageLoadingStatusProps } from "./image.utils";
@@ -53,7 +53,7 @@ interface ImageOptions {
   ignoreFallback?: boolean;
 }
 
-export type ImageProps<C extends ElementType = "img"> = RightJoinProps<
+export type ImageProps<C extends ElementType = "img"> = OverrideProps<
   HTMLHopeProps<C, ImageOptions>,
   CreateImageLoadingStatusProps
 >;
@@ -91,7 +91,9 @@ export function Image<C extends ElementType = "img">(props: ImageProps<C>) {
     );
   };
 
-  const status = createMemo(() => createImageLoadingStatus({ ...props, ignoreFallback: shouldIgnore() }));
+  const status = createMemo(() =>
+    createImageLoadingStatus({ ...props, ignoreFallback: shouldIgnore() })
+  );
 
   const sharedProps = () => ({
     objectFit: local.fit,
@@ -110,7 +112,14 @@ export function Image<C extends ElementType = "img">(props: ImageProps<C>) {
       fallback={
         <Show
           when={local.fallback}
-          fallback={<Box as="img" src={local.fallbackSrc} class="hope-image__placeholder" {...sharedProps} />}
+          fallback={
+            <Box
+              as="img"
+              src={local.fallbackSrc}
+              class="hope-image__placeholder"
+              {...sharedProps}
+            />
+          }
         >
           {local.fallback}
         </Show>

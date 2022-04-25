@@ -4,7 +4,7 @@ import { GridLayoutProps } from "../../styled-system/props/grid";
 import { SizeProps } from "../../styled-system/props/size";
 import { classNames, createClassSelector } from "../../utils/css";
 import { range } from "../../utils/function";
-import { RightJoinProps } from "../../utils/types";
+import { OverrideProps } from "../../utils/types";
 import { Box } from "../box/box";
 import { ElementType } from "../types";
 import { hopeSkeletonClass, Skeleton, SkeletonProps } from "./skeleton";
@@ -26,7 +26,10 @@ interface SkeletonTextOptions {
   skeletonHeight?: SizeProps["height"];
 }
 
-export type SkeletonTextProps<C extends ElementType = "div"> = RightJoinProps<SkeletonProps<C>, SkeletonTextOptions>;
+export type SkeletonTextProps<C extends ElementType = "div"> = OverrideProps<
+  SkeletonProps<C>,
+  SkeletonTextOptions
+>;
 
 export function SkeletonText<C extends ElementType = "div">(props: SkeletonTextProps<C>) {
   const defaultProps: SkeletonTextProps<"div"> = {
@@ -64,7 +67,9 @@ export function SkeletonText<C extends ElementType = "div">(props: SkeletonTextP
       fallback={
         <Box class={classes()} d="flex" flexDirection="column" gap={local.spacing} {...others}>
           <Index each={numbers()}>
-            {(_, index) => <Skeleton width={getWidth(index)} height={local.skeletonHeight} {...skeletonProps} />}
+            {(_, index) => (
+              <Skeleton width={getWidth(index)} height={local.skeletonHeight} {...skeletonProps} />
+            )}
           </Index>
         </Box>
       }

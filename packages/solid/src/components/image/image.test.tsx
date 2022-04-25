@@ -93,7 +93,9 @@ describe("Image", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Image data-testid="image" classList={{ [stubClass]: true }} src={src} />);
+    renderWithHopeProvider(() => (
+      <Image data-testid="image" classList={{ [stubClass]: true }} src={src} />
+    ));
     const image = screen.getByTestId("image");
 
     // assert

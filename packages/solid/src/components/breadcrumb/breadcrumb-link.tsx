@@ -10,7 +10,10 @@ export interface BreadcrumbLinkOptions {
   currentPage?: boolean;
 }
 
-export type BreadcrumbLinkProps<C extends ElementType = "a"> = HTMLHopeProps<C, BreadcrumbLinkOptions>;
+export type BreadcrumbLinkProps<C extends ElementType = "a"> = HTMLHopeProps<
+  C,
+  BreadcrumbLinkOptions
+>;
 
 const hopeBreadcrumbLinkClass = "hope-breadcrumb__link";
 
@@ -23,7 +26,11 @@ const hopeBreadcrumbLinkClass = "hope-breadcrumb__link";
 export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLinkProps<C>) {
   const theme = useStyleConfig().Breadcrumb;
 
-  const [local, others] = splitProps(props as BreadcrumbLinkProps<"a">, ["class", "currentPage", "href"]);
+  const [local, others] = splitProps(props as BreadcrumbLinkProps<"a">, [
+    "class",
+    "currentPage",
+    "href",
+  ]);
 
   const classes = () => {
     return classNames(
@@ -38,9 +45,21 @@ export function BreadcrumbLink<C extends ElementType = "a">(props: BreadcrumbLin
   return (
     <Show
       when={local.currentPage}
-      fallback={<hope.a href={local.href} class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />}
+      fallback={
+        <hope.a
+          href={local.href}
+          class={classes()}
+          __baseStyle={theme?.baseStyle?.link}
+          {...others}
+        />
+      }
     >
-      <hope.span aria-current="page" class={classes()} __baseStyle={theme?.baseStyle?.link} {...others} />
+      <hope.span
+        aria-current="page"
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.link}
+        {...others}
+      />
     </Show>
   );
 }

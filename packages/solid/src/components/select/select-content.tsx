@@ -23,7 +23,11 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
 
   const selectContext = useSelectContext();
 
-  const [local, others] = splitProps(props as SelectContentProps<"div">, ["ref", "class", "children"]);
+  const [local, others] = splitProps(props as SelectContentProps<"div">, [
+    "ref",
+    "class",
+    "children",
+  ]);
 
   /**
    * Internal state to handle select content portal `mounted` state.
@@ -84,7 +88,12 @@ export function SelectContent<C extends ElementType = "div">(props: SelectConten
         <Transition name={transitionName()} appear onAfterExit={unmountPortal}>
           <Show when={selectContext.state.opened}>
             <ClickOutside onClickOutside={onClickOutside}>
-              <Box ref={assignContentRef} class={classes()} __baseStyle={theme?.baseStyle?.content} {...others}>
+              <Box
+                ref={assignContentRef}
+                class={classes()}
+                __baseStyle={theme?.baseStyle?.content}
+                {...others}
+              >
                 {resolvedChildren()}
               </Box>
             </ClickOutside>

@@ -1,9 +1,9 @@
 import { createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
-import { RightJoinProps } from "../../utils/types";
+import { SystemStyleObject } from "../../styled-system/types";
+import { OverrideProps } from "../../utils/types";
 import { CloseButtonProps, ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { Modal, ModalProps } from "../modal/modal";
 import { ModalBody, ModalBodyProps } from "../modal/modal-body";
@@ -27,7 +27,7 @@ interface DrawerOptions extends DrawerDialogVariants {
   disableMotion?: boolean;
 }
 
-export type DrawerProps = RightJoinProps<
+export type DrawerProps = OverrideProps<
   Omit<ModalProps, "scrollBehavior" | "centered" | "motionPreset">,
   DrawerOptions
 >;

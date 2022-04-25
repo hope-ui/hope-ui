@@ -45,7 +45,15 @@ export function Textarea(props: TextareaProps) {
     );
   };
 
-  return <Box as="textarea" class={classes()} __baseStyle={theme?.baseStyle} {...formControlProps} {...others} />;
+  return (
+    <Box
+      as="textarea"
+      class={classes()}
+      __baseStyle={theme?.baseStyle}
+      {...formControlProps}
+      {...others}
+    />
+  );
 }
 
 Textarea.toString = () => createClassSelector(hopeTextareaClass);

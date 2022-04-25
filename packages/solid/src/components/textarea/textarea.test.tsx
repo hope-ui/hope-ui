@@ -211,7 +211,9 @@ describe("Textarea", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Textarea data-testid="textarea" classList={{ [stubClass]: true }} />);
+    renderWithHopeProvider(() => (
+      <Textarea data-testid="textarea" classList={{ [stubClass]: true }} />
+    ));
     const textarea = screen.getByTestId("textarea");
 
     // assert

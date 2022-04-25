@@ -46,11 +46,15 @@ export default function BoxDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Box</PageTitle>
       <Text mb="$5">
-        Box is the most abstract component on top of which all other Hope UI components are built. By default, it
-        renders a <Code>div</Code> element.
+        Box is the most abstract component on top of which all other Hope UI components are built.
+        By default, it renders a <Code>div</Code> element.
       </Text>
       <Text mb="$2">The Box component is useful because it helps with 3 common use cases:</Text>
       <hope.ul ps="$6" mb="$8">
@@ -72,7 +76,13 @@ export default function BoxDoc() {
         A more complexe example of composing with <Code>Box</Code>:
       </Text>
       <Preview snippet={snippets.complexeExample} mb="$12">
-        <Box maxW="$sm" borderWidth="1px" borderColor="$neutral6" borderRadius="$lg" overflow="hidden">
+        <Box
+          maxW="$sm"
+          borderWidth="1px"
+          borderColor="$neutral6"
+          borderRadius="$lg"
+          overflow="hidden"
+        >
           <Box as="img" src={property.imageUrl} alt={property.imageAlt} />
           <Box p="$6">
             <Box display="flex" alignItems="baseline">
@@ -117,7 +127,8 @@ export default function BoxDoc() {
         The <Code>as</Code> prop
       </SectionTitle>
       <Text mb="$5">
-        You can use the <Code>as</Code> prop to change the element render, just like styled-components.
+        You can use the <Code>as</Code> prop to change the element render, just like
+        styled-components.
       </Text>
       <Preview snippet={snippets.asProp}>
         <Box as="button" borderRadius="$md" bg="tomato" color="white" px="$4" h="$8">

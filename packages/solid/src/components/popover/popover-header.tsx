@@ -32,7 +32,12 @@ export function PopoverHeader<C extends ElementType = "header">(props: PopoverHe
   onCleanup(() => popoverContext.setHeaderMounted(false));
 
   return (
-    <Box class={classes()} id={popoverContext.state.headerId} __baseStyle={theme?.baseStyle?.header} {...others} />
+    <Box
+      class={classes()}
+      id={popoverContext.state.headerId}
+      __baseStyle={theme?.baseStyle?.header}
+      {...others}
+    />
   );
 }
 

@@ -27,7 +27,10 @@ export function SelectTag<C extends ElementType = "span">(props: SelectTagProps<
       hopeSelectTagClass,
       selectTagStyles({
         size: local.size ?? selectContext.state.size ?? "md",
-        variant: local.variant ?? selectContext.state.variant === "filled" ? "outline" : "subtle" ?? "subtle",
+        variant:
+          local.variant ?? selectContext.state.variant === "filled"
+            ? "outline"
+            : "subtle" ?? "subtle",
       })
     );
   };

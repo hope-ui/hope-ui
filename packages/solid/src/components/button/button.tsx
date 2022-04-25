@@ -49,7 +49,10 @@ export interface ButtonOptions extends ButtonVariants {
   rightIcon?: JSX.Element;
 }
 
-export type ThemeableButtonOptions = Pick<ButtonOptions, "variant" | "colorScheme" | "size" | "loaderPlacement">;
+export type ThemeableButtonOptions = Pick<
+  ButtonOptions,
+  "variant" | "colorScheme" | "size" | "loaderPlacement"
+>;
 
 export interface ButtonStyleConfig {
   baseStyle?: {
@@ -64,7 +67,7 @@ export interface ButtonStyleConfig {
 
 export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
 
-const hopeButtonClass = "hope-button";
+export const hopeButtonClass = "hope-button";
 
 /**
  * The Button component is used to trigger an action or event,
@@ -108,13 +111,18 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
       local.class,
       hopeButtonClass,
       buttonStyles({
-        variant: local.variant ?? buttonGroupContext?.state.variant ?? theme?.defaultProps?.root?.variant ?? "solid",
+        variant:
+          local.variant ??
+          buttonGroupContext?.state.variant ??
+          theme?.defaultProps?.root?.variant ??
+          "solid",
         colorScheme:
           local.colorScheme ??
           buttonGroupContext?.state.colorScheme ??
           theme?.defaultProps?.root?.colorScheme ??
           "primary",
-        size: local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        size:
+          local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
         loading: local.loading,
         compact: local.compact,
         fullWidth: local.fullWidth,
@@ -123,7 +131,12 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   };
 
   return (
-    <hope.button class={classes()} disabled={disabled()} __baseStyle={theme?.baseStyle?.root} {...others}>
+    <hope.button
+      class={classes()}
+      disabled={disabled()}
+      __baseStyle={theme?.baseStyle?.root}
+      {...others}
+    >
       <Show when={local.loading && local.loaderPlacement === "start"}>
         <ButtonLoader
           class="hope-button__loader--start"

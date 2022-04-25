@@ -62,7 +62,8 @@ export default function AvatarDoc() {
     },
     {
       name: "withBorder",
-      description: "If `true`, the Avatar will show a border around it. Best for a group of avatars.",
+      description:
+        "If `true`, the Avatar will show a border around it. Best for a group of avatars.",
       type: "boolean",
       defaultValue: "false",
     },
@@ -89,7 +90,8 @@ export default function AvatarDoc() {
     },
     {
       name: "iconLabel",
-      description: "The `aria-label` to use with the default avatar icon when no `name` is provided.",
+      description:
+        "The `aria-label` to use with the default avatar icon when no `name` is provided.",
       type: "string",
     },
     {
@@ -150,11 +152,15 @@ export default function AvatarDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Avatar</PageTitle>
       <Text mb="$5">
-        The <Code>Avatar</Code> component is used to represent a user, and displays the profile picture, initials or
-        fallback icon.
+        The <Code>Avatar</Code> component is used to represent a user, and displays the profile
+        picture, initials or fallback icon.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -163,7 +169,8 @@ export default function AvatarDoc() {
           <strong>Avatar:</strong> The image that represents the user.
         </ListItem>
         <ListItem>
-          <strong>AvatarBadge:</strong> A wrapper that displays its content on the right corner of the avatar.
+          <strong>AvatarBadge:</strong> A wrapper that displays its content on the right corner of
+          the avatar.
         </ListItem>
         <ListItem>
           <strong>AvatarGroup:</strong> A wrapper to stack multiple Avatars together.
@@ -187,8 +194,9 @@ export default function AvatarDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Avatar sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Avatar. You can set the value to <Code>2xs</Code>,{" "}
-        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>, <Code>xl</Code> or <Code>2xl</Code>.
+        Use the <Code>size</Code> prop to change the size of the Avatar. You can set the value to{" "}
+        <Code>2xs</Code>, <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>,{" "}
+        <Code>xl</Code> or <Code>2xl</Code>.
       </Text>
       <Preview snippet={snippets.sizes} mb="$10">
         <HStack alignItems="flex-start" wrap="wrap" spacing="$4">
@@ -221,7 +229,8 @@ export default function AvatarDoc() {
       </Preview>
       <SectionSubtitle id="custom-fallback">Customize the fallback avatar</SectionSubtitle>
       <Text mb="$2">
-        You can customize the background color and icon of the fallback avatar icon to match your design requirements.
+        You can customize the background color and icon of the fallback avatar icon to match your
+        design requirements.
       </Text>
       <hope.ul ps="$6" mb="$5">
         <hope.li mb="$2">
@@ -239,14 +248,14 @@ export default function AvatarDoc() {
       </Preview>
       <Alert status="warning" mb="$10">
         <AlertDescription>
-          <Code>icon</Code> is a render prop that provides proper <Code>role</Code> and <Code>aria-label</Code>{" "}
-          attributes to use in your custom icon.
+          <Code>icon</Code> is a render prop that provides proper <Code>role</Code> and{" "}
+          <Code>aria-label</Code> attributes to use in your custom icon.
         </AlertDescription>
       </Alert>
       <SectionSubtitle id="with-badge">Avatar with badge</SectionSubtitle>
       <Text mb="$5">
-        In some products, you might need to show a badge on the right corner of the avatar. We call this a{" "}
-        <strong>badge</strong>. Here's an example that shows if the user is online:
+        In some products, you might need to show a badge on the right corner of the avatar. We call
+        this a <strong>badge</strong>. Here's an example that shows if the user is online:
       </Text>
       <Preview snippet={snippets.withBadge} mb="$5">
         <HStack spacing="$4">
@@ -260,13 +269,14 @@ export default function AvatarDoc() {
       </Preview>
       <Alert status="warning" mb="$10">
         <AlertDescription>
-          Note the use of <Code>em</Code> for the size of the <Code>AvatarBadge</Code>. This is useful to size the badge
-          relative to the avatar font size.
+          Note the use of <Code>em</Code> for the size of the <Code>AvatarBadge</Code>. This is
+          useful to size the badge relative to the avatar font size.
         </AlertDescription>
       </Alert>
       <SectionSubtitle id="avatar-group">AvatarGroup</SectionSubtitle>
       <Text mb="$2">
-        In some cases, you might need to stack avatars as a group. Use the <Code>AvatarGroup</Code> component.
+        In some cases, you might need to stack avatars as a group. Use the <Code>AvatarGroup</Code>{" "}
+        component.
       </Text>
       <hope.ul ps="$6" mb="$5">
         <hope.li mb="$2">
@@ -288,13 +298,13 @@ export default function AvatarDoc() {
       </Preview>
       <SectionSubtitle id="change-initials-logic">Changing the initials logic</SectionSubtitle>
       <Text mb="$12">
-        Use the <Code>getInitials</Code> prop to manage how initials are generated from name. By default Hope UI merge
-        the first characters of each word in the <Code>name</Code> prop.
+        Use the <Code>getInitials</Code> prop to manage how initials are generated from name. By
+        default Hope UI merge the first characters of each word in the <Code>name</Code> prop.
       </Text>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Avatar</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Avatar</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

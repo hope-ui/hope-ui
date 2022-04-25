@@ -33,7 +33,12 @@ export function Divider<C extends ElementType = "div">(props: DividerProps<C>) {
 
   const propsWithDefault: DividerProps<"div"> = mergeProps(defaultProps, props);
 
-  const [local, others] = splitProps(propsWithDefault, ["class", "variant", "orientation", "thickness"]);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "variant",
+    "orientation",
+    "thickness",
+  ]);
 
   const classes = () => {
     return classNames(

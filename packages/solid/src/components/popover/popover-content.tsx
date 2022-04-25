@@ -133,8 +133,12 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
               tabIndex={-1}
               id={popoverContext.state.contentId}
               role={popoverContext.state.triggerOnHover ? "tooltip" : "dialog"}
-              aria-labelledby={popoverContext.state.headerMounted ? popoverContext.state.headerId : undefined}
-              aria-describedby={popoverContext.state.bodyMounted ? popoverContext.state.bodyId : undefined}
+              aria-labelledby={
+                popoverContext.state.headerMounted ? popoverContext.state.headerId : undefined
+              }
+              aria-describedby={
+                popoverContext.state.bodyMounted ? popoverContext.state.bodyId : undefined
+              }
               class={popoverClasses()}
               __baseStyle={theme?.baseStyle?.content}
               onKeyDown={onKeyDown}

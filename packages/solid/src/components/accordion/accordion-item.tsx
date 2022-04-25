@@ -1,4 +1,13 @@
-import { Accessor, createContext, createMemo, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createMemo,
+  createUniqueId,
+  JSX,
+  Show,
+  splitProps,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useStyleConfig } from "../../hope-provider";
@@ -29,7 +38,10 @@ interface AccordionItemOptions {
   children?: JSX.Element | AccordionItemChildrenRenderProp;
 }
 
-export type AccordionItemProps<C extends ElementType = "div"> = HTMLHopeProps<C, AccordionItemOptions>;
+export type AccordionItemProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  AccordionItemOptions
+>;
 
 interface AccordionItemState {
   /**
@@ -185,7 +197,9 @@ export function useAccordionItemContext() {
   const context = useContext(AccordionItemContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useAccordionItemContext must be used within a `<AccordionItem />` component");
+    throw new Error(
+      "[Hope UI]: useAccordionItemContext must be used within a `<AccordionItem />` component"
+    );
   }
 
   return context;

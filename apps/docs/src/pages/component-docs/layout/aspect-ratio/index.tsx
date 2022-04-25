@@ -48,11 +48,21 @@ export default function AspectRatioDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>AspectRatio</PageTitle>
       <Text mb="$5">
-        AspectRatio component is used to embed responsive videos and maps, etc. It uses a very common{" "}
-        <Anchor href="https://css-tricks.com/aspect-ratio-boxes/" external color="$primary11" fontWeight="$semibold">
+        AspectRatio component is used to embed responsive videos and maps, etc. It uses a very
+        common{" "}
+        <Anchor
+          href="https://css-tricks.com/aspect-ratio-boxes/"
+          external
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           padding hack
         </Anchor>{" "}
         to achieve this.
@@ -62,15 +72,20 @@ export default function AspectRatioDoc() {
       <SectionTitle id="usage">Usage</SectionTitle>
       <SectionSubtitle id="embed-video">Embed video</SectionSubtitle>
       <Text mb="$5">
-        To embed a video with a specific aspect ratio, use an iframe with <Code>src</Code> pointing to the link of the
-        video.
+        To embed a video with a specific aspect ratio, use an iframe with <Code>src</Code> pointing
+        to the link of the video.
       </Text>
       <Text mb="$5">
-        Pass the <Code>maxWidth</Code> prop to <Code>AspectRatio</Code> to control the width of the content.
+        Pass the <Code>maxWidth</Code> prop to <Code>AspectRatio</Code> to control the width of the
+        content.
       </Text>
       <Preview snippet={snippets.embedVideo} mb="$10">
         <AspectRatio maxW="560px" ratio={1}>
-          <iframe title="one piece opening 1" src="https://www.youtube.com/embed/HRaoYuRKBaA" allowfullscreen />
+          <iframe
+            title="one piece opening 1"
+            src="https://www.youtube.com/embed/HRaoYuRKBaA"
+            allowfullscreen
+          />
         </AspectRatio>
       </Preview>
       <SectionSubtitle id="embed-image">Embed image</SectionSubtitle>
@@ -82,8 +97,8 @@ export default function AspectRatioDoc() {
       </Preview>
       <SectionSubtitle id="embed-map">Embed a map</SectionSubtitle>
       <Text mb="$5">
-        Here's how to embed a responsive Google map using <Code>AspectRatio</Code>. To make the map take up the entire
-        width, we can ignore the <Code>maxWidth</Code> prop.
+        Here's how to embed a responsive Google map using <Code>AspectRatio</Code>. To make the map
+        take up the entire width, we can ignore the <Code>maxWidth</Code> prop.
       </Text>
       <Preview snippet={snippets.embedMap} mb="$12">
         <AspectRatio ratio={16 / 9}>

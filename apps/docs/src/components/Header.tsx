@@ -79,7 +79,7 @@ export default function Header() {
               </hope.span>
             </Text>
             <Tag size="sm" rounded="$sm" fontWeight="$semibold">
-              v0.4.2
+              v0.5.0
             </Tag>
           </HStack>
           <HStack spacing="$2">
@@ -109,7 +109,11 @@ export default function Header() {
           </HStack>
         </HStack>
       </Container>
-      <Drawer placement="left" opened={isMainNavOverlayVisible()} onClose={() => setIsMainNavOverlayVisible(false)}>
+      <Drawer
+        placement="left"
+        opened={isMainNavOverlayVisible()}
+        onClose={() => setIsMainNavOverlayVisible(false)}
+      >
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader fontWeight="$bold" fontSize="$2xl">

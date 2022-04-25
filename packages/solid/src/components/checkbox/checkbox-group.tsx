@@ -60,7 +60,10 @@ interface CheckboxGroupOptions extends ThemeableCheckboxOptions {
   onChange?: (value: CheckboxGroupValue) => void;
 }
 
-export type CheckboxGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, CheckboxGroupOptions>;
+export type CheckboxGroupProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  CheckboxGroupOptions
+>;
 
 interface CheckboxGroupState extends Omit<CheckboxGroupProps, "name" | "onChange"> {
   /**
@@ -81,7 +84,7 @@ interface CheckboxGroupState extends Omit<CheckboxGroupProps, "name" | "onChange
   isControlled: boolean;
 }
 
-const hopeCheckboxGroupClass = "hope-checkbox-group";
+const hopeCheckboxGroupClass = "hope-checkbox__group";
 
 export function CheckboxGroup<C extends ElementType = "div">(props: CheckboxGroupProps<C>) {
   const defaultName = `hope-checkbox-group-${createUniqueId()}--checkbox`;
@@ -120,6 +123,9 @@ export function CheckboxGroup<C extends ElementType = "div">(props: CheckboxGrou
     },
     get size() {
       return props.size ?? theme?.defaultProps?.group?.size;
+    },
+    get labelPlacement() {
+      return props.labelPlacement ?? theme?.defaultProps?.group?.labelPlacement;
     },
   });
 

@@ -78,7 +78,8 @@ export default function CircularProgressDoc() {
     },
     {
       name: "indeterminate",
-      description: "If `true`, the progress will be indeterminate and the `value` prop will be ignored.",
+      description:
+        "If `true`, the progress will be indeterminate and the `value` prop will be ignored.",
       type: "boolean",
     },
     {
@@ -100,7 +101,8 @@ export default function CircularProgressDoc() {
     },
     {
       name: "getValueText",
-      description: "A function that returns the desired `aria-valuetext` to use in place of the value.",
+      description:
+        "A function that returns the desired `aria-valuetext` to use in place of the value.",
       type: "(value: number, percent: number) => string",
     },
   ];
@@ -125,11 +127,15 @@ export default function CircularProgressDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>CircularProgress</PageTitle>
       <Text mb="$5">
-        The <Code>CircularProgress</Code> component is used to indicate the progress for determinate and indeterminate
-        processes.
+        The <Code>CircularProgress</Code> component is used to indicate the progress for determinate
+        and indeterminate processes.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -152,8 +158,9 @@ export default function CircularProgressDoc() {
       </Preview>
       <SectionSubtitle id="color">CircularProgress color</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>color</Code> prop to change the color of the <Code>CircularProgressIndicator</Code> and the{" "}
-        <Code>trackColor</Code> prop to change the color of the progress track (background).
+        Use the <Code>color</Code> prop to change the color of the{" "}
+        <Code>CircularProgressIndicator</Code> and the <Code>trackColor</Code> prop to change the
+        color of the progress track (background).
       </Text>
       <Preview snippet={snippets.color} mb="$10">
         <CircularProgress trackColor="$info3" value={64}>
@@ -180,7 +187,8 @@ export default function CircularProgressDoc() {
       </Preview>
       <SectionSubtitle id="with-round-cap">CircularProgress with round cap</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>withRoundCaps</Code> prop to set the <Code>CircularProgressIndicator</Code> caps rounded.
+        Use the <Code>withRoundCaps</Code> prop to set the <Code>CircularProgressIndicator</Code>{" "}
+        caps rounded.
       </Text>
       <Preview snippet={snippets.withRoundCaps} mb="$10">
         <CircularProgress value={80}>
@@ -189,8 +197,8 @@ export default function CircularProgressDoc() {
       </Preview>
       <SectionSubtitle id="with-label">CircularProgress with label</SectionSubtitle>
       <Text mb="$5">
-        You can set a label inside the propgress by using the <Code>CircularProgressLabel</Code> component. By default
-        it will display the progress percentage.
+        You can set a label inside the propgress by using the <Code>CircularProgressLabel</Code>{" "}
+        component. By default it will display the progress percentage.
       </Text>
       <Preview snippet={snippets.withLabel} mb="$10">
         <CircularProgress value={40}>
@@ -210,24 +218,27 @@ export default function CircularProgressDoc() {
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <Code>CircularProgress</Code> has a <Code>role</Code> set to <Code>progressbar</Code> to denote that it is a
-          progress.
+          <Code>CircularProgress</Code> has a <Code>role</Code> set to <Code>progressbar</Code> to
+          denote that it is a progress.
         </ListItem>
         <ListItem>
-          <Code>CircularProgress</Code> has <Code>aria-valuenow</Code> set to the percentage completion value passed to
-          the component, to ensure the progress percent is visible to screen readers.
+          <Code>CircularProgress</Code> has <Code>aria-valuenow</Code> set to the percentage
+          completion value passed to the component, to ensure the progress percent is visible to
+          screen readers.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>CircularProgress</Code> base styles and default props can be overridden in the Hope UI theme configuration
-        like below:
+        <Code>CircularProgress</Code> base styles and default props can be overridden in the Hope UI
+        theme configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
       <SectionSubtitle id="circular-progress-props">CircularProgress props</SectionSubtitle>
       <PropsTable items={circularProgressPropItems} mb="$10" />
-      <SectionSubtitle id="circular-progress-indicator-props">CircularProgressIndicator props</SectionSubtitle>
+      <SectionSubtitle id="circular-progress-indicator-props">
+        CircularProgressIndicator props
+      </SectionSubtitle>
       <PropsTable items={circularProgressIndicatorPropItems} />
     </PageLayout>
   );

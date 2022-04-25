@@ -1,5 +1,12 @@
 /* eslint-disable solid/reactivity */
-import { Accessor, createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  PropsWithChildren,
+  useContext,
+} from "solid-js";
 
 import {
   ColorMode,
@@ -140,7 +147,10 @@ export function useStyleConfig(): ThemeStyleConfig {
  * Custom hook that reads from `HopeProvider` context
  * Returns an accessor for the color mode and function to toggle it
  */
-export function useColorMode(): Pick<HopeContextValue, "colorMode" | "setColorMode" | "toggleColorMode"> {
+export function useColorMode(): Pick<
+  HopeContextValue,
+  "colorMode" | "setColorMode" | "toggleColorMode"
+> {
   const context = useContext(HopeContext);
 
   if (!context) {

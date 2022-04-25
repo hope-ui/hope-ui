@@ -60,7 +60,8 @@ export default function TableDoc() {
   const tableCaptionPropItems: PropsTableItem[] = [
     {
       name: "placement",
-      description: "The placement of the table caption. This sets the `caption-side` CSS attribute.",
+      description:
+        "The placement of the table caption. This sets the `caption-side` CSS attribute.",
       type: '"top" | "bottom"',
       defaultValue: '"bottom"',
     },
@@ -87,10 +88,15 @@ export default function TableDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Table</PageTitle>
       <Text mb="$5">
-        Tables are used to organize and display data efficiently. It renders a <Code>table</Code> element by default.
+        Tables are used to organize and display data efficiently. It renders a <Code>table</Code>{" "}
+        element by default.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -133,8 +139,8 @@ export default function TableDoc() {
       </Preview>
       <SectionTitle id="striped">Striped table</SectionTitle>
       <Text mb="$5">
-        Use the <Code>striped</Code> prop to render striped rows. You can set the value to <Code>even</Code> or{" "}
-        <Code>odd</Code>.
+        Use the <Code>striped</Code> prop to render striped rows. You can set the value to{" "}
+        <Code>even</Code> or <Code>odd</Code>.
       </Text>
       <Preview snippet={snippets.striped} mb="$12">
         <Table striped="odd">
@@ -254,8 +260,8 @@ export default function TableDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Table</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Table</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

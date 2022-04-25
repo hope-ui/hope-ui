@@ -14,14 +14,17 @@ export type SelectPlaceholderProps<C extends ElementType = "span"> = HTMLHopePro
 /**
  * Component used to display a placeholder when no option is selected.
  */
-export function SelectPlaceholder<C extends ElementType = "span">(props: SelectPlaceholderProps<C>) {
+export function SelectPlaceholder<C extends ElementType = "span">(
+  props: SelectPlaceholderProps<C>
+) {
   const theme = useStyleConfig().Select;
 
   const selectContext = useSelectContext();
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, hopeSelectPlaceholderClass, selectPlaceholderStyles());
+  const classes = () =>
+    classNames(local.class, hopeSelectPlaceholderClass, selectPlaceholderStyles());
 
   return (
     <Show when={!selectContext.state.hasSelectedOptions}>

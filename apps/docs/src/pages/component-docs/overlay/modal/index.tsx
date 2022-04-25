@@ -114,7 +114,8 @@ export default function ModalDoc() {
     },
     {
       name: "scrollBehavior",
-      description: "Defines how scrolling should happen when content overflows beyond the viewport.",
+      description:
+        "Defines how scrolling should happen when content overflows beyond the viewport.",
       type: '"inside" | "outside"',
       defaultValue: '"outside"',
     },
@@ -157,7 +158,8 @@ export default function ModalDoc() {
     },
     {
       name: "initialFocus",
-      description: "A query selector string targeting the element to receive focus when the modal opens.",
+      description:
+        "A query selector string targeting the element to receive focus when the modal opens.",
       type: "string",
     },
     {
@@ -182,11 +184,15 @@ export default function ModalDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Modal</PageTitle>
       <Text mb="$5">
-        A modal dialog is a window overlaid on either the primary window or another dialog window. Content behind a
-        modal dialog is inert, meaning that users cannot interact with it.
+        A modal dialog is a window overlaid on either the primary window or another dialog window.
+        Content behind a modal dialog is inert, meaning that users cannot interact with it.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -215,8 +221,8 @@ export default function ModalDoc() {
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        When the modal opens, focus is sent into the modal and set to the first tabbable element. If there are no
-        tabbled elements, focus is set on <Code>ModalContent</Code>.
+        When the modal opens, focus is sent into the modal and set to the first tabbable element. If
+        there are no tabbled elements, focus is set on <Code>ModalContent</Code>.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Button onClick={basicUsageDisclosure.onOpen}>Open Modal</Button>
@@ -237,9 +243,9 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="block-scrolling">Block scrolling when modal opens</SectionSubtitle>
       <Text mb="$5">
-        For accessibility, it is recommended to block scrolling on the main document behind the modal. Hope UI does this
-        by default but you can set <Code>blockScrollOnMount</Code> to <Code>false</Code> to allow scrolling behind the
-        modal.
+        For accessibility, it is recommended to block scrolling on the main document behind the
+        modal. Hope UI does this by default but you can set <Code>blockScrollOnMount</Code> to{" "}
+        <Code>false</Code> to allow scrolling behind the modal.
       </Text>
       <Preview snippet={snippets.blockScroll} mb="$10">
         <Button onClick={blockScrollDisclosure.onOpen}>Open Modal</Button>
@@ -264,9 +270,9 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="focus-on-specific-element">Focus on specific element</SectionSubtitle>
       <Text mb="$5">
-        Hope UI automatically sets focus on the first tabbable element in the modal. However, there might be scenarios
-        where you need to manually control where focus goes. To do this, pass a CSS query selector to the{" "}
-        <Code>initialFocus</Code> prop.
+        Hope UI automatically sets focus on the first tabbable element in the modal. However, there
+        might be scenarios where you need to manually control where focus goes. To do this, pass a
+        CSS query selector to the <Code>initialFocus</Code> prop.
       </Text>
       <Preview snippet={snippets.initialFocus} mb="$10">
         <Button onClick={initialFocusDisclosure.onOpen}>Open Modal</Button>
@@ -298,8 +304,9 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="close-on-overlay-click">Close modal on overlay click</SectionSubtitle>
       <Text mb="$5">
-        By default, the modal closes when you click its overlay. You can set <Code>closeOnOverlayClick</Code> to{" "}
-        <Code>false</Code> if you want the modal to stay visible.
+        By default, the modal closes when you click its overlay. You can set{" "}
+        <Code>closeOnOverlayClick</Code> to <Code>false</Code> if you want the modal to stay
+        visible.
       </Text>
       <Preview snippet={snippets.closeOnOverlayClick} mb="$10">
         <Button onClick={closeOnOverlayClickDisclosure.onOpen}>Open Modal</Button>
@@ -322,11 +329,13 @@ export default function ModalDoc() {
           </ModalContent>
         </Modal>
       </Preview>
-      <SectionSubtitle id="modal-vertically-centered">Make modal vertically centered</SectionSubtitle>
+      <SectionSubtitle id="modal-vertically-centered">
+        Make modal vertically centered
+      </SectionSubtitle>
       <Text mb="$5">
-        By default the modal has a vertical offset of <Code>3.75rem</Code> which you can change by passing{" "}
-        <Code>top</Code> to the <Code>ModalContent</Code>. If you need to vertically center the modal, pass the{" "}
-        <Code>centered</Code> prop.
+        By default the modal has a vertical offset of <Code>3.75rem</Code> which you can change by
+        passing <Code>top</Code> to the <Code>ModalContent</Code>. If you need to vertically center
+        the modal, pass the <Code>centered</Code> prop.
       </Text>
       <Preview snippet={snippets.centered} mb="$6">
         <Button onClick={centeredDisclosure.onOpen}>Open Modal</Button>
@@ -347,7 +356,8 @@ export default function ModalDoc() {
       </Preview>
       <Alert status="warning" mb="$10">
         <AlertDescription>
-          If the content within the modal overflows beyond the viewport, don't use this prop. Try setting the{" "}
+          If the content within the modal overflows beyond the viewport, don't use this prop. Try
+          setting the{" "}
           <Anchor href="#overflow-behavior" color="$primary11" fontWeight="$semibold">
             overflow behavior
           </Anchor>{" "}
@@ -356,9 +366,9 @@ export default function ModalDoc() {
       </Alert>
       <SectionSubtitle id="changing-transition">Changing the transition</SectionSubtitle>
       <Text mb="$5">
-        The <Code>Modal</Code> comes with a scale transition by default but you can change it by passing the{" "}
-        <Code>motionPreset</Code> prop, and set its value to either <Code>fade-in-bottom</Code>, <Code>scale</Code> or{" "}
-        <Code>none</Code>.
+        The <Code>Modal</Code> comes with a scale transition by default but you can change it by
+        passing the <Code>motionPreset</Code> prop, and set its value to either{" "}
+        <Code>fade-in-bottom</Code>, <Code>scale</Code> or <Code>none</Code>.
       </Text>
       <Preview snippet={snippets.transition} mb="$10">
         <Button onClick={transitionDisclosure.onOpen}>Open Modal</Button>
@@ -391,7 +401,8 @@ export default function ModalDoc() {
           If set to <Code>inside</Code>, scroll only occurs within the <Code>ModalBody</Code>.
         </ListItem>
         <ListItem>
-          If set to <Code>outside</Code>, the entire <Code>ModalContent</Code> will scroll within the viewport.
+          If set to <Code>outside</Code>, the entire <Code>ModalContent</Code> will scroll within
+          the viewport.
         </ListItem>
       </UnorderedList>
       <Preview snippet={snippets.overflow} mb="$10">
@@ -419,44 +430,53 @@ export default function ModalDoc() {
             <ModalHeader>Modal Title</ModalHeader>
             <ModalBody>
               <p>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos blanditiis accusamus in praesentium
-                dolorem, sunt quia sit sequi minima maxime? Eius natus, aut omnis deserunt nostrum fugiat! Totam magni
-                sapiente maxime maiores aut doloremque veniam excepturi, id quae veritatis est omnis, nesciunt ipsum,
-                voluptate adipisci nam sed ea inventore facere nulla optio aliquid? Aliquid iure, optio et fuga quo
-                dicta ratione impedit praesentium mollitia maiores ipsa, magni sapiente reiciendis perspiciatis.
-                Molestiae quisquam eveniet aliquam consequatur accusantium quasi ut sint animi reiciendis. Suscipit
-                numquam commodi fuga provident? Voluptatem dicta exercitationem nemo beatae cum consequuntur pariatur
-                quidem magni sed tempore. Eaque itaque totam quae incidunt quidem officia atque libero placeat?
-                Obcaecati, ullam dolores velit sequi magni animi inventore earum error maiores et, sunt numquam illo
-                fugiat ducimus in aspernatur possimus minus, placeat blanditiis alias. Deleniti corrupti eaque debitis
-                adipisci, doloremque rerum temporibus saepe error! Fugiat inventore possimus doloribus, nemo qui,
-                nostrum alias non tempora nam itaque quae maiores tempore, quasi blanditiis incidunt aut. Sapiente sit
-                distinctio adipisci. Consectetur numquam ratione facere fuga ipsum quasi aliquam velit illum iure
-                consequuntur, repellat cumque quibusdam dolorem asperiores perspiciatis ducimus. Quod earum alias nihil
-                voluptate inventore dolores mollitia natus saepe esse. Aut assumenda nulla maxime recusandae nihil iusto
-                dicta commodi pariatur veritatis? Impedit nam deserunt optio aspernatur praesentium totam illum facere
-                id exercitationem veniam eveniet vitae obcaecati minima, similique rerum suscipit dolorum tempora
-                perferendis voluptatem ex ipsam! Ut ea, sapiente cum, adipisci ab voluptatem enim, explicabo illo sunt
-                exercitationem ipsum doloribus? Consectetur impedit voluptatibus culpa aperiam facere, animi placeat ea
-                corrupti quidem repellendus sed saepe accusamus autem delectus enim, in soluta minus laboriosam
-                adipisci! Numquam quod dolorem eum tempora totam, assumenda nostrum eligendi aliquam rerum dignissimos
-                autem quo. Qui fugit, aperiam sequi quis exercitationem quisquam nobis facilis debitis placeat quia
-                temporibus distinctio maiores animi nisi voluptatum accusamus laudantium non dolore? Dolorem eum vitae
-                modi ipsam quibusdam tempora natus obcaecati in, expedita fugit. Explicabo quae accusantium porro unde
-                dolores maxime ullam optio enim quibusdam fugit veritatis excepturi ad, molestias natus tenetur esse
-                rerum et ab rem cupiditate, dicta aspernatur corrupti deleniti iste. Aspernatur repellendus, voluptates
-                omnis, hic quod minima laudantium officiis aliquam quasi voluptatibus voluptatum provident soluta
-                suscipit ea illum amet fugit blanditiis velit exercitationem assumenda inventore rerum nihil! Inventore
-                reprehenderit distinctio non veniam eum beatae nihil reiciendis nemo est molestias qui, dolorum
-                praesentium explicabo id culpa nostrum repudiandae recusandae! Vero ut placeat, fugiat, aliquam quos
-                omnis similique temporibus iusto nulla non rerum repellat repudiandae illum sit sapiente. Iusto et qui
-                eaque odit eum culpa ipsa, libero, perspiciatis voluptatem quaerat aperiam assumenda. Architecto minus
-                doloremque sed numquam aperiam, ratione dolorem dolores odio obcaecati quis nemo sit delectus voluptatum
-                possimus ad maxime et officia minima nulla illum eum quos molestiae laboriosam. Nihil harum voluptates,
-                ea consequatur tenetur, nulla explicabo fugiat earum veritatis doloribus maxime deleniti nostrum quos
-                praesentium voluptate commodi quas assumenda fuga et placeat? Quam repudiandae, tempore consequuntur
-                aperiam itaque in omnis et ut unde, temporibus alias maiores distinctio, nihil culpa. Fugiat quasi
-                quisquam eaque facilis totam.
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos blanditiis accusamus
+                in praesentium dolorem, sunt quia sit sequi minima maxime? Eius natus, aut omnis
+                deserunt nostrum fugiat! Totam magni sapiente maxime maiores aut doloremque veniam
+                excepturi, id quae veritatis est omnis, nesciunt ipsum, voluptate adipisci nam sed
+                ea inventore facere nulla optio aliquid? Aliquid iure, optio et fuga quo dicta
+                ratione impedit praesentium mollitia maiores ipsa, magni sapiente reiciendis
+                perspiciatis. Molestiae quisquam eveniet aliquam consequatur accusantium quasi ut
+                sint animi reiciendis. Suscipit numquam commodi fuga provident? Voluptatem dicta
+                exercitationem nemo beatae cum consequuntur pariatur quidem magni sed tempore. Eaque
+                itaque totam quae incidunt quidem officia atque libero placeat? Obcaecati, ullam
+                dolores velit sequi magni animi inventore earum error maiores et, sunt numquam illo
+                fugiat ducimus in aspernatur possimus minus, placeat blanditiis alias. Deleniti
+                corrupti eaque debitis adipisci, doloremque rerum temporibus saepe error! Fugiat
+                inventore possimus doloribus, nemo qui, nostrum alias non tempora nam itaque quae
+                maiores tempore, quasi blanditiis incidunt aut. Sapiente sit distinctio adipisci.
+                Consectetur numquam ratione facere fuga ipsum quasi aliquam velit illum iure
+                consequuntur, repellat cumque quibusdam dolorem asperiores perspiciatis ducimus.
+                Quod earum alias nihil voluptate inventore dolores mollitia natus saepe esse. Aut
+                assumenda nulla maxime recusandae nihil iusto dicta commodi pariatur veritatis?
+                Impedit nam deserunt optio aspernatur praesentium totam illum facere id
+                exercitationem veniam eveniet vitae obcaecati minima, similique rerum suscipit
+                dolorum tempora perferendis voluptatem ex ipsam! Ut ea, sapiente cum, adipisci ab
+                voluptatem enim, explicabo illo sunt exercitationem ipsum doloribus? Consectetur
+                impedit voluptatibus culpa aperiam facere, animi placeat ea corrupti quidem
+                repellendus sed saepe accusamus autem delectus enim, in soluta minus laboriosam
+                adipisci! Numquam quod dolorem eum tempora totam, assumenda nostrum eligendi aliquam
+                rerum dignissimos autem quo. Qui fugit, aperiam sequi quis exercitationem quisquam
+                nobis facilis debitis placeat quia temporibus distinctio maiores animi nisi
+                voluptatum accusamus laudantium non dolore? Dolorem eum vitae modi ipsam quibusdam
+                tempora natus obcaecati in, expedita fugit. Explicabo quae accusantium porro unde
+                dolores maxime ullam optio enim quibusdam fugit veritatis excepturi ad, molestias
+                natus tenetur esse rerum et ab rem cupiditate, dicta aspernatur corrupti deleniti
+                iste. Aspernatur repellendus, voluptates omnis, hic quod minima laudantium officiis
+                aliquam quasi voluptatibus voluptatum provident soluta suscipit ea illum amet fugit
+                blanditiis velit exercitationem assumenda inventore rerum nihil! Inventore
+                reprehenderit distinctio non veniam eum beatae nihil reiciendis nemo est molestias
+                qui, dolorum praesentium explicabo id culpa nostrum repudiandae recusandae! Vero ut
+                placeat, fugiat, aliquam quos omnis similique temporibus iusto nulla non rerum
+                repellat repudiandae illum sit sapiente. Iusto et qui eaque odit eum culpa ipsa,
+                libero, perspiciatis voluptatem quaerat aperiam assumenda. Architecto minus
+                doloremque sed numquam aperiam, ratione dolorem dolores odio obcaecati quis nemo sit
+                delectus voluptatum possimus ad maxime et officia minima nulla illum eum quos
+                molestiae laboriosam. Nihil harum voluptates, ea consequatur tenetur, nulla
+                explicabo fugiat earum veritatis doloribus maxime deleniti nostrum quos praesentium
+                voluptate commodi quas assumenda fuga et placeat? Quam repudiandae, tempore
+                consequuntur aperiam itaque in omnis et ut unde, temporibus alias maiores
+                distinctio, nihil culpa. Fugiat quasi quisquam eaque facilis totam.
               </p>
             </ModalBody>
 
@@ -468,13 +488,17 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="modal-sizes">Modal sizes</SectionSubtitle>
       <Text mb="$5">
-        Pass the <Code>size</Code> prop if you need to adjust the size of the modal. Values can be <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>, <Code>xl...8xl</Code>, or <Code>full</Code>.
+        Pass the <Code>size</Code> prop if you need to adjust the size of the modal. Values can be{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code>, <Code>xl...8xl</Code>,
+        or <Code>full</Code>.
       </Text>
       <Preview snippet={snippets.sizes} mb="$10">
         <For each={sizes}>
           {size => (
-            <Button onClick={() => handleSizeClick(size as ModalProps["size"])} m="$4">{`Open ${size} Modal`}</Button>
+            <Button
+              onClick={() => handleSizeClick(size as ModalProps["size"])}
+              m="$4"
+            >{`Open ${size} Modal`}</Button>
           )}
         </For>
 
@@ -494,19 +518,24 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="prevent-focus-trapping">Prevent focus trapping</SectionSubtitle>
       <Text mb="$5">
-        By default the modal and drawer locks the focus inside them. Normally this is what you want to maintain
-        accessibility standards.
+        By default the modal and drawer locks the focus inside them. Normally this is what you want
+        to maintain accessibility standards.
       </Text>
       <Text mb="$5">
-        <strong>While strongly discourage this use case</strong> due to the accessibility impacts, there are certain
-        situations where you might not want the modal to trap focus.
+        <strong>While strongly discourage this use case</strong> due to the accessibility impacts,
+        there are certain situations where you might not want the modal to trap focus.
       </Text>
       <Text mb="$5">
-        To prevent focus trapping, pass <Code>trapFocus</Code> and set its value to <Code>false</Code>.
+        To prevent focus trapping, pass <Code>trapFocus</Code> and set its value to{" "}
+        <Code>false</Code>.
       </Text>
       <Preview snippet={snippets.trapFocus} mb="$10">
         <Button onClick={trapFocusDisclosure.onOpen}>Open Modal</Button>
-        <Modal trapFocus={false} opened={trapFocusDisclosure.isOpen()} onClose={trapFocusDisclosure.onClose}>
+        <Modal
+          trapFocus={false}
+          opened={trapFocusDisclosure.isOpen()}
+          onClose={trapFocusDisclosure.onClose}
+        >
           <ModalOverlay />
           <ModalContent>
             <ModalCloseButton />
@@ -522,8 +551,8 @@ export default function ModalDoc() {
       </Preview>
       <SectionSubtitle id="styling-backdrop">Styling the backdrop</SectionSubtitle>
       <Text mb="$5">
-        The backdrop's background by default is set to <Code>$blackAlpha11</Code>, but if you want to achieve a
-        different style you can use style props.
+        The backdrop's background by default is set to <Code>$blackAlpha11</Code>, but if you want
+        to achieve a different style you can use style props.
       </Text>
       <Preview snippet={snippets.backdropStyle} mb="$6">
         <Button onClick={backdropStyleDisclosure.onOpen}>Open Modal</Button>
@@ -548,8 +577,8 @@ export default function ModalDoc() {
       </Preview>
       <Alert status="warning" mb="$12">
         <AlertDescription>
-          Please be aware that not every browser supports the <Code>backdrop-filter</Code> CSS property, used in the
-          example above.
+          Please be aware that not every browser supports the <Code>backdrop-filter</Code> CSS
+          property, used in the example above.
         </AlertDescription>
       </Alert>
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
@@ -559,20 +588,20 @@ export default function ModalDoc() {
           The <Code>ModalContent</Code> has <Code>aria-modal</Code> set to <Code>true</Code>.
         </ListItem>
         <ListItem>
-          The <Code>ModalContent</Code> has <Code>aria-labelledby</Code> set to the <Code>id</Code> of the{" "}
-          <Code>ModalHeader</Code>.
+          The <Code>ModalContent</Code> has <Code>aria-labelledby</Code> set to the <Code>id</Code>{" "}
+          of the <Code>ModalHeader</Code>.
         </ListItem>
         <ListItem>
-          The <Code>ModalContent</Code> has <Code>aria-describedby</Code> set to the <Code>id</Code> of the{" "}
-          <Code>ModalBody</Code>.
+          The <Code>ModalContent</Code> has <Code>aria-describedby</Code> set to the <Code>id</Code>{" "}
+          of the <Code>ModalBody</Code>.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support and Focus management</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>When the modal opens, focus is trapped within it.</ListItem>
         <ListItem>
-          When the modal opens, focus is automatically set to the first enabled element, or the element from{" "}
-          <Code>initialFocus</Code>.
+          When the modal opens, focus is automatically set to the first enabled element, or the
+          element from <Code>initialFocus</Code>.
         </ListItem>
         <ListItem>Clicking on the overlay closes the Modal.</ListItem>
         <ListItem>
@@ -580,15 +609,15 @@ export default function ModalDoc() {
         </ListItem>
         <ListItem>Scrolling is blocked on the elements behind the modal.</ListItem>
         <ListItem>
-          The modal is rendered in a portal attached to the end of <Code>document.body</Code> to break it out of the
-          source order.
+          The modal is rendered in a portal attached to the end of <Code>document.body</Code> to
+          break it out of the source order.
         </ListItem>
       </UnorderedList>
 
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Modal</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Modal</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -597,8 +626,8 @@ export default function ModalDoc() {
       <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
       <UnorderedList spacing="$2">
         <ListItem>
-          <Code>ModalOverlay</Code>, <Code>ModalContent</Code>, <Code>ModalHeader</Code>, <Code>ModalBody</Code> and{" "}
-          <Code>ModalFooter</Code> composes{" "}
+          <Code>ModalOverlay</Code>, <Code>ModalContent</Code>, <Code>ModalHeader</Code>,{" "}
+          <Code>ModalBody</Code> and <Code>ModalFooter</Code> composes{" "}
           <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
             Box
           </Anchor>
@@ -606,7 +635,12 @@ export default function ModalDoc() {
         </ListItem>
         <ListItem>
           <Code>ModalCloseButton</Code> composes{" "}
-          <Anchor as={Link} href="/docs/others/close-button" color="$primary11" fontWeight="$semibold">
+          <Anchor
+            as={Link}
+            href="/docs/others/close-button"
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             CloseButton
           </Anchor>
           .

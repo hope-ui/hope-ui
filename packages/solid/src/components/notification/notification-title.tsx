@@ -15,7 +15,8 @@ export function NotificationTitle<C extends ElementType = "div">(props: Notifica
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, hopeNotificationTitleClass, notificationTitleStyles());
+  const classes = () =>
+    classNames(local.class, hopeNotificationTitleClass, notificationTitleStyles());
 
   return <Box class={classes()} __baseStyle={theme?.baseStyle?.title} {...others} />;
 }

@@ -1,4 +1,11 @@
-import { createContext, createMemo, createSignal, createUniqueId, splitProps, useContext } from "solid-js";
+import {
+  createContext,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  splitProps,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
@@ -153,7 +160,17 @@ export function Tabs<C extends ElementType = "div">(props: TabsProps<C>) {
   const [local, _, others] = splitProps(
     props,
     ["class", "onChange"],
-    ["index", "defaultIndex", "keepAlive", "alignment", "orientation", "variant", "colorScheme", "size", "fitted"]
+    [
+      "index",
+      "defaultIndex",
+      "keepAlive",
+      "alignment",
+      "orientation",
+      "variant",
+      "colorScheme",
+      "size",
+      "fitted",
+    ]
   );
 
   const reverseTabs = createMemo(() => tabs().slice().reverse());

@@ -9,7 +9,10 @@ import { tableCaptionStyles, TableCaptionVariants } from "./table.styles";
 
 export type ThemeableTableCaptionOptions = Pick<TableCaptionVariants, "placement">;
 
-export type TableCaptionProps<C extends ElementType = "caption"> = HTMLHopeProps<C, ThemeableTableCaptionOptions>;
+export type TableCaptionProps<C extends ElementType = "caption"> = HTMLHopeProps<
+  C,
+  ThemeableTableCaptionOptions
+>;
 
 const hopeTableCaptionClass = "hope-table-caption";
 

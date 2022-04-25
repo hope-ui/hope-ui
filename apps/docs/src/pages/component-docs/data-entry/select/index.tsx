@@ -215,11 +215,16 @@ export default function SelectDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Select</PageTitle>
       <Text mb="$5">
-        <Code>Select</Code> component is a component that allows users pick a value from predefined options. Ideally, it
-        should be used when there are more than 5 options, otherwise you might consider using a radio group instead.
+        <Code>Select</Code> component is a component that allows users pick a value from predefined
+        options. Ideally, it should be used when there are more than 5 options, otherwise you might
+        consider using a radio group instead.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
@@ -231,16 +236,19 @@ export default function SelectDoc() {
           <strong>SelectTrigger:</strong> The trigger that toggles the select.
         </ListItem>
         <ListItem>
-          <strong>SelectPlaceholder:</strong> The component used to display a placeholder when no option is selected.
+          <strong>SelectPlaceholder:</strong> The component used to display a placeholder when no
+          option is selected.
         </ListItem>
         <ListItem>
           <strong>SelectValue:</strong> The part that reflects the selected value in the trigger.
         </ListItem>
         <ListItem>
-          <strong>SelectTag:</strong> The component used to display a selected value in a multi-select.
+          <strong>SelectTag:</strong> The component used to display a selected value in a
+          multi-select.
         </ListItem>
         <ListItem>
-          <strong>SelectTagCloseButton:</strong> The button used to remove a selected option in a multi-select.
+          <strong>SelectTagCloseButton:</strong> The button used to remove a selected option in a
+          multi-select.
         </ListItem>
         <ListItem>
           <strong>SelectIcon:</strong> The container for the select dropdown icon.
@@ -264,7 +272,8 @@ export default function SelectDoc() {
           <strong>SelectOptionText:</strong> The textual part of the option.
         </ListItem>
         <ListItem>
-          <strong>SelectOptionIndicator:</strong> A visual indicator rendered when the option is selected.
+          <strong>SelectOptionIndicator:</strong> A visual indicator rendered when the option is
+          selected.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
@@ -291,8 +300,8 @@ export default function SelectDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Trigger sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the <Code>SelectTrigger</Code>. You can set the value to{" "}
-        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the <Code>SelectTrigger</Code>. You can
+        set the value to <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.triggerSizes} mb="$10">
         <VStack spacing="$4">
@@ -323,8 +332,9 @@ export default function SelectDoc() {
       </Preview>
       <SectionSubtitle id="variants">Trigger variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the <Code>SelectTrigger</Code>. You can set the
-        value to <Code>outline</Code>, <Code>filled</Code> or <Code>unstyled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the{" "}
+        <Code>SelectTrigger</Code>. You can set the value to <Code>outline</Code>,{" "}
+        <Code>filled</Code> or <Code>unstyled</Code>.
       </Text>
       <Preview snippet={snippets.triggerVariants} mb="$10">
         <VStack spacing="$4">
@@ -494,11 +504,13 @@ export default function SelectDoc() {
       </Preview>
       <SectionSubtitle id="typeahead-complex-option">Typeahead with complex option</SectionSubtitle>
       <Text mb="$3">
-        By default the typeahead behavior will use the <Code>.textContent</Code> of the <Code>SelectOption</Code>.
+        By default the typeahead behavior will use the <Code>.textContent</Code> of the{" "}
+        <Code>SelectOption</Code>.
       </Text>
       <Text mb="$5">
-        However, when the content is more complex than just a text, Use the <Code>textValue</Code> prop on{" "}
-        <Code>SelectOption</Code> to define which text should be used for typeahead purposes.
+        However, when the content is more complex than just a text, Use the <Code>textValue</Code>{" "}
+        prop on <Code>SelectOption</Code> to define which text should be used for typeahead
+        purposes.
       </Text>
       <Preview snippet={snippets.typeaheadComplexOption} mb="$10">
         <Select>
@@ -579,7 +591,8 @@ export default function SelectDoc() {
       </Preview>
       <SectionSubtitle id="multi-default-value">Default values</SectionSubtitle>
       <Text mb="$5">
-        In a multi-select pass an array to the <Code>defaultValue</Code> prop to make some options selected by default.
+        In a multi-select pass an array to the <Code>defaultValue</Code> prop to make some options
+        selected by default.
       </Text>
       <Preview snippet={snippets.multiSelectDefaultValues} mb="$10">
         <Select multiple defaultValue={["React", "Solid"]}>
@@ -630,7 +643,8 @@ export default function SelectDoc() {
       </Preview>
       <SectionTitle id="composition">Composition</SectionTitle>
       <Text mb="$5">
-        <Code>Select</Code> is made up of several components that you can customize to achieve your desired design.
+        <Code>Select</Code> is made up of several components that you can customize to achieve your
+        desired design.
       </Text>
       <Preview snippet={snippets.composition} mb="$6">
         <Select multiple offset={-1}>
@@ -667,7 +681,9 @@ export default function SelectDoc() {
                       _active={{ bg: "$warning3", color: "$warning11" }}
                       _selected={{ bg: "$warning9", color: "white" }}
                     >
-                      <SelectOptionText _groupSelected={{ fontWeight: "$medium" }}>{option}</SelectOptionText>
+                      <SelectOptionText _groupSelected={{ fontWeight: "$medium" }}>
+                        {option}
+                      </SelectOptionText>
                     </SelectOption>
                   )}
                 </For>
@@ -683,7 +699,9 @@ export default function SelectDoc() {
                       _active={{ bg: "$warning3", color: "$warning11" }}
                       _selected={{ bg: "$warning9", color: "white" }}
                     >
-                      <SelectOptionText _groupSelected={{ fontWeight: "$medium" }}>{option}</SelectOptionText>
+                      <SelectOptionText _groupSelected={{ fontWeight: "$medium" }}>
+                        {option}
+                      </SelectOptionText>
                     </SelectOption>
                   )}
                 </For>
@@ -697,13 +715,15 @@ export default function SelectDoc() {
         </Select>
       </Preview>
       <Alert status="warning" mb="$12">
-        <AlertDescription>Obviously, don't make ugly design like the above example 😅.</AlertDescription>
+        <AlertDescription>
+          Obviously, don't make ugly design like the above example 😅.
+        </AlertDescription>
       </Alert>
       <SectionTitle id="simple-select">Simple select</SectionTitle>
       <Text mb="$5">
-        If you don't need to customize every parts of <Code>Select</Code> and want a simpler API, Hope UI exposes the{" "}
-        <Code>SimpleSelect</Code> and <Code>SimpleOption</Code> components. Those are just abstraction over the base{" "}
-        <Code>Select</Code> component.
+        If you don't need to customize every parts of <Code>Select</Code> and want a simpler API,
+        Hope UI exposes the <Code>SimpleSelect</Code> and <Code>SimpleOption</Code> components.
+        Those are just abstraction over the base <Code>Select</Code> component.
       </Text>
       <Preview snippet={snippets.simpleSelect} mb="$5">
         <SimpleSelect placeholder="Choose a framework">
@@ -756,12 +776,12 @@ export default function SelectDoc() {
           <Code>SelectListbox</Code>.
         </ListItem>
         <ListItem>
-          <Code>SelectTrigger</Code> has <Code>aria-expanded</Code> set to <Code>true</Code> when the listbox is
-          displayed and <Code>false</Code> otherwise.
+          <Code>SelectTrigger</Code> has <Code>aria-expanded</Code> set to <Code>true</Code> when
+          the listbox is displayed and <Code>false</Code> otherwise.
         </ListItem>
         <ListItem>
-          When the select is open, <Code>SelectTrigger</Code> has <Code>aria-activedescendant</Code> set to the{" "}
-          <Code>id</Code> of the active <Code>SelectOption</Code>.
+          When the select is open, <Code>SelectTrigger</Code> has <Code>aria-activedescendant</Code>{" "}
+          set to the <Code>id</Code> of the active <Code>SelectOption</Code>.
         </ListItem>
         <ListItem>
           <Code>SelectListbox</Code> has <Code>role</Code> of <Code>listbox</Code>.
@@ -770,14 +790,15 @@ export default function SelectDoc() {
           <Code>SelectOption</Code> has <Code>role</Code> of <Code>option</Code>.
         </ListItem>
         <ListItem>
-          The selected <Code>SelectOption</Code> has <Code>aria-selected</Code> set to <Code>true</Code>.
+          The selected <Code>SelectOption</Code> has <Code>aria-selected</Code> set to{" "}
+          <Code>true</Code>.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support (closed select)</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$8">
         <ListItem>
-          <Kbd>enter</Kbd>, <Kbd>space</Kbd> , <Kbd>↓</Kbd> and <Kbd>↑</Kbd> opens the select and move visual focus to
-          the first option or the selected one.
+          <Kbd>enter</Kbd>, <Kbd>space</Kbd> , <Kbd>↓</Kbd> and <Kbd>↑</Kbd> opens the select and
+          move visual focus to the first option or the selected one.
         </ListItem>
         <ListItem>
           <Kbd>home</Kbd> open the select and move visual focus to the first option.
@@ -792,7 +813,8 @@ export default function SelectDoc() {
       <SectionSubtitle>Keyboard support (opened select)</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$8">
         <ListItem>
-          <Kbd>enter</Kbd>, <Kbd>space</Kbd> or <Kbd>alt</Kbd> + <Kbd>↑</Kbd> select the option and close the select.
+          <Kbd>enter</Kbd>, <Kbd>space</Kbd> or <Kbd>alt</Kbd> + <Kbd>↑</Kbd> select the option and
+          close the select.
         </ListItem>
         <ListItem>
           <Kbd>↓</Kbd> move visual focus to the next option.
@@ -819,21 +841,22 @@ export default function SelectDoc() {
       <SectionSubtitle>Typeahead behavior</SectionSubtitle>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          Any printable characters move visual focus to the first option that matches the typed character.
-        </ListItem>
-        <ListItem>
-          If multiple keys are typed in quick succession, visual focus moves to the first option that matches the full
-          string.
-        </ListItem>
-        <ListItem>
-          If the same character is typed in succession, visual focus cycles among the options starting with that
+          Any printable characters move visual focus to the first option that matches the typed
           character.
+        </ListItem>
+        <ListItem>
+          If multiple keys are typed in quick succession, visual focus moves to the first option
+          that matches the full string.
+        </ListItem>
+        <ListItem>
+          If the same character is typed in succession, visual focus cycles among the options
+          starting with that character.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Select</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Select</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

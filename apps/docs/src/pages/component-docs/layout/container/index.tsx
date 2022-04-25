@@ -53,15 +53,20 @@ export default function ContainerDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Container</PageTitle>
       <Text mb="$5">
-        Containers are used to constrain a content's width to the current breakpoint, while keeping it fluid.
+        Containers are used to constrain a content's width to the current breakpoint, while keeping
+        it fluid.
       </Text>
       <Text mb="$5">
-        By default, it sets the <Code>max-width</Code> of the content to match the <Code>min-width</Code> of the current
-        breakpoint. This is useful if you’d prefer to design for a fixed set of screen sizes instead of trying to
-        accommodate a fully fluid viewport.
+        By default, it sets the <Code>max-width</Code> of the content to match the{" "}
+        <Code>min-width</Code> of the current breakpoint. This is useful if you’d prefer to design
+        for a fixed set of screen sizes instead of trying to accommodate a fully fluid viewport.
       </Text>
       <Text mb="$5">
         You can customize this behavior by passing custom <Code>maxWidth</Code> values.
@@ -74,37 +79,40 @@ export default function ContainerDoc() {
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$5">
         <Container>
-          There are many benefits to a joint design and development system. Not only does it bring benefits to the
-          design team, but it also brings benefits to engineering teams. It makes sure that our experiences have a
-          consistent look and feel, not just in our design specs, but in production
+          There are many benefits to a joint design and development system. Not only does it bring
+          benefits to the design team, but it also brings benefits to engineering teams. It makes
+          sure that our experiences have a consistent look and feel, not just in our design specs,
+          but in production
         </Container>
       </Preview>
       <Alert status="info" mb="$12">
         <AlertDescription>
-          The whole Hope UI docs is inside a <Code>Container</Code>, try resize your browser to see it in action.
+          The whole Hope UI docs is inside a <Code>Container</Code>, try resize your browser to see
+          it in action.
         </AlertDescription>
       </Alert>
       <SectionSubtitle id="centering-the-container">Centering the container</SectionSubtitle>
       <Text mb="$5">
-        By default the container is centered within its parent with a margin <Code>auto</Code> on left and right, you
-        can disabled this behavior by setting the <Code>centered</Code> prop to <Code>false</Code>.
+        By default the container is centered within its parent with a margin <Code>auto</Code> on
+        left and right, you can disabled this behavior by setting the <Code>centered</Code> prop to{" "}
+        <Code>false</Code>.
       </Text>
       <Preview snippet={snippets.centerContainer} mb="$12">
         <Container p="$4" bg="tomato" color="white" maxW="$xl" centered={false}>
-          There are many benefits to a joint design and development system. Not only does it bring benefits to the
-          design team.
+          There are many benefits to a joint design and development system. Not only does it bring
+          benefits to the design team.
         </Container>
       </Preview>
       <SectionSubtitle id="centering-the-children">Centering the children</SectionSubtitle>
       <Text mb="$5">
-        In some cases, the width of the content can be smaller than the container's width, you can use the{" "}
-        <Code>centerContent</Code> prop to center the content.
+        In some cases, the width of the content can be smaller than the container's width, you can
+        use the <Code>centerContent</Code> prop to center the content.
       </Text>
       <Preview snippet={snippets.centerContent} mb="$12">
         <Container bg="salmon" centerContent>
           <Box p="$4" bg="tomato" color="white" maxW="$xl">
-            There are many benefits to a joint design and development system. Not only does it bring benefits to the
-            design team.
+            There are many benefits to a joint design and development system. Not only does it bring
+            benefits to the design team.
           </Box>
         </Container>
       </Preview>

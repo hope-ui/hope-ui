@@ -108,12 +108,21 @@ export default function FormControlDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>FormControl</PageTitle>
       <Text mb="$5">
-        FormControl provides context such as <Code>required</Code>, <Code>disabled</Code> and <Code>invalid</Code> to
-        form elements. It follows the{" "}
-        <Anchor href="https://www.w3.org/WAI/tutorials/forms/" external color="$primary11" fontWeight="$semibold">
+        FormControl provides context such as <Code>required</Code>, <Code>disabled</Code> and{" "}
+        <Code>invalid</Code> to form elements. It follows the{" "}
+        <Anchor
+          href="https://www.w3.org/WAI/tutorials/forms/"
+          external
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           WAI specifications
         </Anchor>{" "}
         for forms.
@@ -122,13 +131,16 @@ export default function FormControlDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>FormControl:</strong> The wrapper that provides context and functionality for all children.
+          <strong>FormControl:</strong> The wrapper that provides context and functionality for all
+          children.
         </ListItem>
         <ListItem>
-          <strong>FormLabel:</strong> The label of a form section. The usage is similar to html label.
+          <strong>FormLabel:</strong> The label of a form section. The usage is similar to html
+          label.
         </ListItem>
         <ListItem>
-          <strong>FormHelperText:</strong> The message that tells users more details about the form section.
+          <strong>FormHelperText:</strong> The message that tells users more details about the form
+          section.
         </ListItem>
         <ListItem>
           <strong>FormErrorMessage:</strong> The message that shows up when an error occurs.
@@ -144,8 +156,9 @@ export default function FormControlDoc() {
       </Preview>
       <SectionSubtitle id="required-field">Required field</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>required</Code> prop to make the form control required. The Input field will have{" "}
-        <Code>aria-required</Code> set to <Code>true</Code>, and the <Code>FormLabel</Code> will show a red asterisk.
+        Use the <Code>required</Code> prop to make the form control required. The Input field will
+        have <Code>aria-required</Code> set to <Code>true</Code>, and the <Code>FormLabel</Code>{" "}
+        will show a red asterisk.
       </Text>
       <Preview snippet={snippets.required} mb="$10">
         <FormControl required>
@@ -167,8 +180,8 @@ export default function FormControlDoc() {
       </Preview>
       <SectionSubtitle id="invalid-field">Invalid field</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>invalid</Code> prop to make the form control invalid. the <Code>FormErrorMessage</Code> will only
-        show up when the <Code>invalid</Code> prop is true.
+        Use the <Code>invalid</Code> prop to make the form control invalid. the{" "}
+        <Code>FormErrorMessage</Code> will only show up when the <Code>invalid</Code> prop is true.
       </Text>
       <Preview snippet={snippets.invalid} mb="$10">
         <FormControl invalid={isInvalid()}>
@@ -176,13 +189,19 @@ export default function FormControlDoc() {
           <Input id="email" type="email" value={invalidInput()} onInput={handleInvalidInput} />
           <Show
             when={isInvalid()}
-            fallback={<FormHelperText>Enter the email you'd like to receive the newsletter on.</FormHelperText>}
+            fallback={
+              <FormHelperText>
+                Enter the email you'd like to receive the newsletter on.
+              </FormHelperText>
+            }
           >
             <FormErrorMessage>Email is required.</FormErrorMessage>
           </Show>
         </FormControl>
       </Preview>
-      <SectionSubtitle id="usage-with-radio-or-checkbox-group">Usage with radio or checkbox group</SectionSubtitle>
+      <SectionSubtitle id="usage-with-radio-or-checkbox-group">
+        Usage with radio or checkbox group
+      </SectionSubtitle>
       <Preview snippet={snippets.withRadioGroup} mb="$10">
         <FormControl as="fieldset">
           <FormLabel as="legend">Choose a framework</FormLabel>
@@ -231,18 +250,24 @@ export default function FormControlDoc() {
       </Preview>
       <Alert status="warning" mb="$12">
         <AlertDescription>
-          You can also use the more composable <Code>Select</Code> component instead of <Code>SimpleSelect</Code>.
+          You can also use the more composable <Code>Select</Code> component instead of{" "}
+          <Code>SimpleSelect</Code>.
         </AlertDescription>
       </Alert>
       <SectionTitle id="usage-with-form-libraries">Usage with form libraries</SectionTitle>
       <Text mb="$5">
-        The below example demonstrate the use of <Code>FormControl</Code> and others Hope UI form related components
-        with the{" "}
+        The below example demonstrate the use of <Code>FormControl</Code> and others Hope UI form
+        related components with the{" "}
         <Anchor href="https://felte.dev" external color="$primary11" fontWeight="$semibold">
           @felte/solid
         </Anchor>{" "}
         form library paired with{" "}
-        <Anchor href="https://github.com/jquense/yup" external color="$primary11" fontWeight="$semibold">
+        <Anchor
+          href="https://github.com/jquense/yup"
+          external
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           yup
         </Anchor>{" "}
         for object schema validation.
@@ -256,35 +281,39 @@ export default function FormControlDoc() {
           <Code>id</Code> passed to the form control will be passed to the input directly.
         </ListItem>
         <ListItem>
-          <Code>FormLabel</Code> will have <Code>for</Code> pointing to the <Code>id</Code> of the input.
+          <Code>FormLabel</Code> will have <Code>for</Code> pointing to the <Code>id</Code> of the
+          input.
         </ListItem>
         <ListItem>
           The input will have <Code>aria-describedby</Code> pointing to the <Code>id</Code> of the{" "}
           <Code>FormHelperText</Code>.
         </ListItem>
         <ListItem>
-          When the field is invalid, the input will have <Code>aria-invalid</Code> set to <Code>true</Code> and{" "}
-          <Code>aria-describedby</Code> pointing to the <Code>id</Code> of the <Code>FormErrorMessage</Code> first.
+          When the field is invalid, the input will have <Code>aria-invalid</Code> set to{" "}
+          <Code>true</Code> and <Code>aria-describedby</Code> pointing to the <Code>id</Code> of the{" "}
+          <Code>FormErrorMessage</Code> first.
         </ListItem>
         <ListItem>
-          <Code>required</Code>, <Code>disabled</Code>, <Code>invalid</Code> and <Code>readOnly</Code> props passed to{" "}
-          <Code>FormControl</Code> will cascade across all related components.
+          <Code>required</Code>, <Code>disabled</Code>, <Code>invalid</Code> and{" "}
+          <Code>readOnly</Code> props passed to <Code>FormControl</Code> will cascade across all
+          related components.
         </ListItem>
       </UnorderedList>
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <Code>FormLabel</Code> is aware of the <Code>disabled</Code>, <Code>focused</Code> and <Code>invalid</Code>{" "}
-          state of the input. This helps you style the label accordingly using the <Code>_disabled</Code>,{" "}
-          <Code>_focus</Code>, and <Code>_invalid</Code> style props.
+          <Code>FormLabel</Code> is aware of the <Code>disabled</Code>, <Code>focused</Code> and{" "}
+          <Code>invalid</Code> state of the input. This helps you style the label accordingly using
+          the <Code>_disabled</Code>, <Code>_focus</Code>, and <Code>_invalid</Code> style props.
         </ListItem>
         <ListItem>
-          <Code>FormErrorMessage</Code> only renders if <Code>invalid</Code> is set to <Code>true</Code>.
+          <Code>FormErrorMessage</Code> only renders if <Code>invalid</Code> is set to{" "}
+          <Code>true</Code>.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>FormControl</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>FormControl</Code> base styles and default props can be overridden in the Hope UI
+        theme configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

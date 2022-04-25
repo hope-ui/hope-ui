@@ -1,12 +1,11 @@
 import { JSX } from "solid-js";
 
 /**
- * Allows for extending a set of props (`SourceProps`) by an overriding set of props
- * (`OverrideProps`), ensuring that any duplicates are overridden by the overriding
+ * Allows for extending a set of props (`Source`) by an overriding set of props
+ * (`Override`), ensuring that any duplicates are overridden by the overriding
  * set of props.
  */
-export type RightJoinProps<SourceProps = {}, OverrideProps = {}> = Omit<SourceProps, keyof OverrideProps> &
-  OverrideProps;
+export type OverrideProps<Source = {}, Override = {}> = Omit<Source, keyof Override> & Override;
 
 export type EventKeys =
   | "ArrowDown"
@@ -28,4 +27,6 @@ export type EventKeys =
   | " "
   | "Shift";
 
-export type EventKeyMap = Partial<Record<EventKeys, JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>>>;
+export type EventKeyMap = Partial<
+  Record<EventKeys, JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>>
+>;

@@ -28,7 +28,7 @@ function createColorVariant(config: ColorVariantConfig): SystemStyleObject {
   };
 }
 
-export const toggleContainerStyles = css({
+export const toggleWrapperStyles = css({
   position: "relative",
   display: "inline-flex",
   alignItems: "center",
@@ -171,10 +171,23 @@ export const toggleControlStyles = css({
 });
 
 /* -------------------------------------------------------------------------------------------------
- * Checkbox - container
+ * Checkbox - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const checkboxContainerStyles = css(toggleContainerStyles);
+export const checkboxWrapperStyles = css(toggleWrapperStyles, {
+  variants: {
+    labelPlacement: {
+      start: {
+        flexDirection: "row-reverse",
+      },
+      end: {
+        flexDirection: "row",
+      },
+    },
+  },
+});
+
+export type CheckboxWrapperVariants = VariantProps<typeof checkboxWrapperStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Checkbox - label

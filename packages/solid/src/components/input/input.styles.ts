@@ -317,7 +317,9 @@ interface InputAddonVariantAndSizeCompoundVariantConfig {
   paddingX: string | number;
 }
 
-function createInputAddonVariantAndSizeCompoundVariant(config: InputAddonVariantAndSizeCompoundVariantConfig) {
+function createInputAddonVariantAndSizeCompoundVariant(
+  config: InputAddonVariantAndSizeCompoundVariantConfig
+) {
   return {
     variant: config.variant,
     size: config.size,

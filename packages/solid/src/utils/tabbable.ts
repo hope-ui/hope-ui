@@ -13,7 +13,10 @@ export function isHidden(element: HTMLElement) {
 }
 
 export function isDisabled(element: HTMLElement) {
-  return Boolean(element.getAttribute("disabled")) === true || Boolean(element.getAttribute("aria-disabled")) === true;
+  return (
+    Boolean(element.getAttribute("disabled")) === true ||
+    Boolean(element.getAttribute("aria-disabled")) === true
+  );
 }
 
 export function isContentEditable(element: HTMLElement) {

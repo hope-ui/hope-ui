@@ -156,7 +156,9 @@ describe("SimpleGrid", () => {
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
     // act
-    renderWithHopeProvider(() => <SimpleGrid minChildWidth={stubMinChildWitdh}>SimpleGrid</SimpleGrid>);
+    renderWithHopeProvider(() => (
+      <SimpleGrid minChildWidth={stubMinChildWitdh}>SimpleGrid</SimpleGrid>
+    ));
 
     // assert
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(
@@ -175,7 +177,9 @@ describe("SimpleGrid", () => {
     jest.spyOn(styledSystem, "createStyledSystemClass").mockReturnValue(stubClassName);
 
     // act
-    renderWithHopeProvider(() => <SimpleGrid minChildWidth={stubMinChildWitdh}>SimpleGrid</SimpleGrid>);
+    renderWithHopeProvider(() => (
+      <SimpleGrid minChildWidth={stubMinChildWitdh}>SimpleGrid</SimpleGrid>
+    ));
 
     // assert
     expect(styledSystem.createStyledSystemClass).toHaveBeenCalledWith(

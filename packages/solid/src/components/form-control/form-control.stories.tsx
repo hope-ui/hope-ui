@@ -57,7 +57,10 @@ export const WithInput = (args: any) => (
   <FormControl maxW={300} {...args}>
     <FormLabel>Email address</FormLabel>
     <Input type="email" placeholder="Placeholder" />
-    <Show when={args.invalid} fallback={<FormHelperText>We'll never share your email.</FormHelperText>}>
+    <Show
+      when={args.invalid}
+      fallback={<FormHelperText>We'll never share your email.</FormHelperText>}
+    >
       <FormErrorMessage>An error occured</FormErrorMessage>
     </Show>
   </FormControl>

@@ -1,7 +1,24 @@
 import type { Placement } from "@floating-ui/dom";
-import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
+import {
+  arrow,
+  autoUpdate,
+  computePosition,
+  flip,
+  hide,
+  inline,
+  offset,
+  shift,
+} from "@floating-ui/dom";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import { Accessor, createContext, createUniqueId, JSX, onCleanup, Show, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createUniqueId,
+  JSX,
+  onCleanup,
+  Show,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
@@ -359,10 +376,14 @@ export function Popover(props: PopoverProps) {
 
     middleware.push(hide());
 
-    const { x, y, placement, middlewareData } = await computePosition(referenceElement, popoverRef, {
-      placement: state.initialPlacement,
-      middleware,
-    });
+    const { x, y, placement, middlewareData } = await computePosition(
+      referenceElement,
+      popoverRef,
+      {
+        placement: state.initialPlacement,
+        middleware,
+      }
+    );
 
     if (placement !== state.finalPlacement) {
       setState("finalPlacement", placement);

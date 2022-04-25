@@ -65,7 +65,11 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    callAllHandlers(selectContext.onTriggerBlur, selectContext.formControlProps.onBlur, local.onBlur)(event);
+    callAllHandlers(
+      selectContext.onTriggerBlur,
+      selectContext.formControlProps.onBlur,
+      local.onBlur
+    )(event);
   };
 
   return (

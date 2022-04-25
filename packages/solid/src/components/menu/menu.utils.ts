@@ -136,7 +136,11 @@ export function getActionFromKey(event: KeyboardEvent, menuOpen: boolean) {
   }
 
   // handle typing characters when open or closed
-  if (key === "Backspace" || key === "Clear" || (key.length === 1 && key !== " " && !altKey && !ctrlKey && !metaKey)) {
+  if (
+    key === "Backspace" ||
+    key === "Clear" ||
+    (key.length === 1 && key !== " " && !altKey && !ctrlKey && !metaKey)
+  ) {
     return MenuActions.Type;
   }
 

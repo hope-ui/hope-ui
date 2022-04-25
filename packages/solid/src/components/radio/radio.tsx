@@ -1,9 +1,9 @@
 import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system/types";
 import { visuallyHiddenStyles } from "../../styled-system/utils";
-import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
 import { callAllHandlers, callHandler } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
@@ -11,7 +11,7 @@ import { hope } from "../factory";
 import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
-import { radioContainerStyles, RadioControlVariants } from "./radio.styles";
+import { RadioControlVariants, radioWrapperStyles } from "./radio.styles";
 import { useRadioGroupContext } from "./radio-group";
 
 type RadioChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
@@ -206,7 +206,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return this.isControlled ? !!props.checked : this._checked;
     },
     get variant() {
-      return props.variant ?? radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+      return (
+        props.variant ??
+        radioGroupContext?.state?.variant ??
+        theme?.defaultProps?.root?.variant ??
+        "outline"
+      );
     },
     get colorScheme() {
       return (
@@ -217,7 +222,9 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       );
     },
     get size() {
-      return props.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
+      return (
+        props.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md"
+      );
     },
     get id() {
       if (formControlContext && !radioGroupContext) {
@@ -331,8 +338,8 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
     callHandler(formControlProps.onBlur)(event);
   };
 
-  const containerClasses = () => {
-    return classNames(local.class, hopeRadioClass, radioContainerStyles({ size: state.size }));
+  const wrapperClasses = () => {
+    return classNames(local.class, hopeRadioClass, radioWrapperStyles({ size: state.size }));
   };
 
   const inputClasses = () => classNames(hopeRadioInputClass, visuallyHiddenStyles());
@@ -347,7 +354,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   return (
     <RadioContext.Provider value={context}>
       <hope.label
-        class={containerClasses()}
+        class={wrapperClasses()}
         __baseStyle={theme?.baseStyle?.root}
         for={state.id}
         data-group
@@ -397,7 +404,8 @@ Radio.toString = () => createClassSelector(hopeRadioClass);
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
-interface RadioContextValue extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
+interface RadioContextValue
+  extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
   state: RadioState;
 }
 

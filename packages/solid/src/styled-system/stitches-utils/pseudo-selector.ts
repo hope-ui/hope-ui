@@ -1,7 +1,9 @@
 import type { CSS } from "@stitches/core";
 
 function createGroupSelector(...selectors: string[]): string {
-  return selectors.map(item => `[role=group]${item} &, [data-group]${item} &, .group${item} &`).join(", ");
+  return selectors
+    .map(item => `[role=group]${item} &, [data-group]${item} &, .group${item} &`)
+    .join(", ");
 }
 
 function createPeerSelector(...selectors: string[]): string {

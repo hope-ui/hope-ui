@@ -31,7 +31,14 @@ export function PopoverBody<C extends ElementType = "div">(props: PopoverBodyPro
   onMount(() => popoverContext.setBodyMounted(true));
   onCleanup(() => popoverContext.setBodyMounted(false));
 
-  return <Box class={classes()} id={popoverContext.state.bodyId} __baseStyle={theme?.baseStyle?.body} {...others} />;
+  return (
+    <Box
+      class={classes()}
+      id={popoverContext.state.bodyId}
+      __baseStyle={theme?.baseStyle?.body}
+      {...others}
+    />
+  );
 }
 
 PopoverBody.toString = () => createClassSelector(hopePopoverBodyClass);

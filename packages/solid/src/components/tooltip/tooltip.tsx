@@ -1,5 +1,14 @@
 import type { Placement } from "@floating-ui/dom";
-import { arrow, autoUpdate, computePosition, flip, hide, inline, offset, shift } from "@floating-ui/dom";
+import {
+  arrow,
+  autoUpdate,
+  computePosition,
+  flip,
+  hide,
+  inline,
+  offset,
+  shift,
+} from "@floating-ui/dom";
 import {
   children,
   createEffect,
@@ -241,10 +250,14 @@ export function Tooltip<C extends ElementType = "div">(props: TooltipProps<C>) {
 
     middleware.push(hide());
 
-    const { x, y, placement, middlewareData } = await computePosition(triggerElement, tooltipElement, {
-      placement: local.placement,
-      middleware,
-    });
+    const { x, y, placement, middlewareData } = await computePosition(
+      triggerElement,
+      tooltipElement,
+      {
+        placement: local.placement,
+        middleware,
+      }
+    );
 
     if (!tooltipElement) {
       return;

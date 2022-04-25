@@ -15,12 +15,15 @@ const hopeSelectTagCloseButtonClass = "hope-select__tag-close-button";
  * The close button that sit inside a `SelectTag`.
  * Used to remove an option in a multi-select.
  */
-export function SelectTagCloseButton<C extends ElementType = "button">(props: SelectTagCloseButtonProps<C>) {
+export function SelectTagCloseButton<C extends ElementType = "button">(
+  props: SelectTagCloseButtonProps<C>
+) {
   const theme = useStyleConfig().Select;
 
   const [local, others] = splitProps(props, ["class", "children"]);
 
-  const classes = () => classNames(local.class, hopeSelectTagCloseButtonClass, selectTagCloseButtonStyles());
+  const classes = () =>
+    classNames(local.class, hopeSelectTagCloseButtonClass, selectTagCloseButtonStyles());
 
   return (
     <hope.button

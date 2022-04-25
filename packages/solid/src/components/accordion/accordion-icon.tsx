@@ -34,7 +34,9 @@ export function AccordionIcon<C extends ElementType = "svg">(props: AccordionIco
     );
   };
 
-  return <IconCaretDown aria-hidden class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />;
+  return (
+    <IconCaretDown aria-hidden class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />
+  );
 }
 
 AccordionIcon.toString = () => createClassSelector(hopeAccordionIconClass);

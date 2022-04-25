@@ -70,7 +70,8 @@ export default function InputDoc() {
     },
     {
       name: "required",
-      description: "If `true`, the input is marked as required, and `required` attribute will be added",
+      description:
+        "If `true`, the input is marked as required, and `required` attribute will be added",
       type: "boolean",
     },
     {
@@ -115,10 +116,15 @@ export default function InputDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Input</PageTitle>
       <Text mb="$5">
-        The <Code>Input</Code> component is a component that is used to get user input in a text field.
+        The <Code>Input</Code> component is a component that is used to get user input in a text
+        field.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -128,8 +134,8 @@ export default function InputDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Input sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Input. You can set the value to <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Input. You can set the value to{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.inputSizes} mb="$8">
         <VStack spacing="$4">
@@ -140,16 +146,17 @@ export default function InputDoc() {
         </VStack>
       </Preview>
       <Text mb="$5">
-        If you want to use the native DOM <Code>size</Code> attribute you can use the <Code>htmlSize</Code> prop. For it
-        to work as expected you will also need to provide the <Code>width</Code> prop set to <Code>auto</Code>.
+        If you want to use the native DOM <Code>size</Code> attribute you can use the{" "}
+        <Code>htmlSize</Code> prop. For it to work as expected you will also need to provide the{" "}
+        <Code>width</Code> prop set to <Code>auto</Code>.
       </Text>
       <Preview snippet={snippets.inputDomSize} mb="$10">
         <Input htmlSize={4} width="auto" />
       </Preview>
       <SectionSubtitle id="variants">Input variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Input. You can set the value to{" "}
-        <Code>outline</Code>, <Code>filled</Code> or <Code>unstyled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Input. You can set the
+        value to <Code>outline</Code>, <Code>filled</Code> or <Code>unstyled</Code>.
       </Text>
       <Preview snippet={snippets.inputVariants} mb="$10">
         <VStack spacing="$4">
@@ -160,9 +167,9 @@ export default function InputDoc() {
       </Preview>
       <SectionSubtitle id="addons">Input addons</SectionSubtitle>
       <Text mb="$5">
-        You can add addons to the left and right of the <Code>Input</Code> component. Hope UI exports{" "}
-        <Code>InputGroup</Code>, <Code>InputLeftAddon</Code> and <Code>InputRightAddon</Code> to help with this use
-        case.
+        You can add addons to the left and right of the <Code>Input</Code> component. Hope UI
+        exports <Code>InputGroup</Code>, <Code>InputLeftAddon</Code> and{" "}
+        <Code>InputRightAddon</Code> to help with this use case.
       </Text>
       <Preview snippet={snippets.inputAddons} mb="$10">
         <VStack spacing="$4">
@@ -179,13 +186,14 @@ export default function InputDoc() {
       </Preview>
       <SectionSubtitle id="elements">Input elements</SectionSubtitle>
       <Text mb="$5">
-        In some scenarios, you might need to add an icon or button inside the input component. Hope UI exports{" "}
-        <Code>InputLeftElement</Code> and <Code>InputRightElement</Code> to help with this use case.
+        In some scenarios, you might need to add an icon or button inside the input component. Hope
+        UI exports <Code>InputLeftElement</Code> and <Code>InputRightElement</Code> to help with
+        this use case.
       </Text>
       <Text mb="$5">
         If the left or right is an icon or text, you can pass <Code>pointerEvents="none"</Code> to{" "}
-        <Code>InputLeftElement</Code> or <Code>InputRightElement</Code> to ensure that clicking on them focused the
-        input.
+        <Code>InputLeftElement</Code> or <Code>InputRightElement</Code> to ensure that clicking on
+        them focused the input.
       </Text>
       <Preview snippet={snippets.inputElements} mb="$10">
         <VStack spacing="$4">
@@ -223,12 +231,17 @@ export default function InputDoc() {
       <SectionSubtitle id="controlled">Controlled input</SectionSubtitle>
       <Preview snippet={snippets.controlledInput} mb="$12">
         <Text mb="$2">Value: {value()}</Text>
-        <Input value={value()} onInput={handleInput} placeholder="Here is a sample placeholder" size="sm" />
+        <Input
+          value={value()}
+          onInput={handleInput}
+          placeholder="Here is a sample placeholder"
+          size="sm"
+        />
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Input</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Input</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

@@ -3,8 +3,6 @@ import { validator } from "@felte/validator-yup";
 import {
   Button,
   Checkbox,
-  CheckboxControl,
-  CheckboxLabel,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -49,7 +47,10 @@ export function FelteExample() {
       </FormControl>
       <FormControl required invalid={errors("jobTitle")}>
         <FormLabel>Job title</FormLabel>
-        <SimpleSelect placeholder="Choose a job title" onChange={value => setFields("jobTitle", value)}>
+        <SimpleSelect
+          placeholder="Choose a job title"
+          onChange={value => setFields("jobTitle", value)}
+        >
           <For each={["Designer", "Frontend developer", "Backend developer", "Devops"]}>
             {item => <SimpleOption value={item}>{item}</SimpleOption>}
           </For>
@@ -90,10 +91,7 @@ export function FelteExample() {
           <FormErrorMessage>{errors("bio")[0]}</FormErrorMessage>
         </Show>
       </FormControl>
-      <Checkbox name="subscribe">
-        <CheckboxControl />
-        <CheckboxLabel>Subscribe to the newsletter</CheckboxLabel>
-      </Checkbox>
+      <Checkbox name="subscribe">Subscribe to the newsletter</Checkbox>
       <HStack justifyContent="flex-end">
         <Button type="submit" disabled={!isValid()}>
           Submit

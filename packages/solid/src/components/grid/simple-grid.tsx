@@ -30,7 +30,9 @@ function toPx(n: string | number) {
 }
 
 function widthToColumns(width: any) {
-  return mapResponsive(width, value => (isNull(value) ? null : `repeat(auto-fit, minmax(${toPx(value)}, 1fr))`));
+  return mapResponsive(width, value =>
+    isNull(value) ? null : `repeat(auto-fit, minmax(${toPx(value)}, 1fr))`
+  );
 }
 
 function countToColumns(count: any) {
@@ -46,7 +48,9 @@ export function SimpleGrid<C extends ElementType = "div">(props: SimpleGridProps
   const classes = () => classNames(local.class, hopeSimpleGridClass);
 
   const templateColumns = () => {
-    return local.minChildWidth ? widthToColumns(local.minChildWidth) : countToColumns(local.columns);
+    return local.minChildWidth
+      ? widthToColumns(local.minChildWidth)
+      : countToColumns(local.columns);
   };
 
   return <Grid class={classes()} templateColumns={templateColumns()} {...others} />;

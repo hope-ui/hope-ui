@@ -60,7 +60,11 @@ export default function DividerDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Divider</PageTitle>
       <Text mb="$5">Dividers are used to visually separate content in a list or group.</Text>
 
@@ -68,19 +72,23 @@ export default function DividerDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        The <Code>Divider</Code> displays a thin horizontal or vertical line, and renders a <Code>div</Code> tag.
+        The <Code>Divider</Code> displays a thin horizontal or vertical line, and renders a{" "}
+        <Code>div</Code> tag.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <Divider />
       </Preview>
       <SectionSubtitle id="orientation">Orientation</SectionSubtitle>
       <Text mb="$5">
-        Pass the <Code>orientation</Code> prop and set it to either <Code>horizontal</Code> or <Code>vertical</Code>.
+        Pass the <Code>orientation</Code> prop and set it to either <Code>horizontal</Code> or{" "}
+        <Code>vertical</Code>.
       </Text>
       <Preview snippet={snippets.horizontal} mb="$8">
         <Divider orientation="horizontal" />
       </Preview>
-      <Text mb="$5">If the vertical orientation is used, make sure that the parent element is assigned a height.</Text>
+      <Text mb="$5">
+        If the vertical orientation is used, make sure that the parent element is assigned a height.
+      </Text>
       <Preview snippet={snippets.vertical} mb="$10">
         <Center height="50px">
           <Divider orientation="vertical" />

@@ -1,8 +1,8 @@
 import { Accessor, createContext, createUniqueId, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
+import { SystemStyleObject } from "../../styled-system/types";
 import { classNames, createClassSelector } from "../../utils/css";
 import { Box } from "../box/box";
 import { ElementType, HTMLHopeProps } from "../types";
@@ -193,7 +193,14 @@ export function FormControl<C extends ElementType = "div">(props: FormControlPro
     isFocused: false,
   });
 
-  const [local, others] = splitProps(props, ["id", "required", "disabled", "invalid", "readOnly", "class"]);
+  const [local, others] = splitProps(props, [
+    "id",
+    "required",
+    "disabled",
+    "invalid",
+    "readOnly",
+    "class",
+  ]);
 
   const setHasHelperText = (value: boolean) => setState("hasHelperText", value);
 

@@ -1,4 +1,5 @@
 export * from "./menu";
+export * from "./menu.styles";
 export * from "./menu-content";
 export * from "./menu-group";
 export * from "./menu-item";

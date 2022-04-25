@@ -13,7 +13,9 @@ describe("TagLeftIcon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />
+    ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -22,7 +24,9 @@ describe("TagLeftIcon", () => {
 
   it("should render content provided by the 'as' prop", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />
+    ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -31,7 +35,9 @@ describe("TagLeftIcon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />
+    ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -77,7 +83,11 @@ describe("TagLeftIcon", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <TagLeftIcon data-testid="tag-left-icon" classList={{ [stubClass]: true }} as={IconCheckCircleSolid} />
+      <TagLeftIcon
+        data-testid="tag-left-icon"
+        classList={{ [stubClass]: true }}
+        as={IconCheckCircleSolid}
+      />
     ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
@@ -90,7 +100,9 @@ describe("TagLeftIcon", () => {
     const tagLeftIconClass = tagLeftIconStyles();
 
     // act
-    renderWithHopeProvider(() => <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagLeftIcon data-testid="tag-left-icon" as={IconCheckCircleSolid} />
+    ));
     const tagLeftIcon = screen.getByTestId("tag-left-icon");
 
     // assert
@@ -106,7 +118,9 @@ describe("TagRightIcon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />
+    ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -115,7 +129,9 @@ describe("TagRightIcon", () => {
 
   it("should render content provided by the 'as' prop", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />
+    ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -124,7 +140,9 @@ describe("TagRightIcon", () => {
 
   it("should have semantic hope class", () => {
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />
+    ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert
@@ -170,7 +188,11 @@ describe("TagRightIcon", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <TagRightIcon data-testid="tag-right-icon" classList={{ [stubClass]: true }} as={IconCheckCircleSolid} />
+      <TagRightIcon
+        data-testid="tag-right-icon"
+        classList={{ [stubClass]: true }}
+        as={IconCheckCircleSolid}
+      />
     ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
@@ -183,7 +205,9 @@ describe("TagRightIcon", () => {
     const tagRightIconClass = tagRightIconStyles();
 
     // act
-    renderWithHopeProvider(() => <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <TagRightIcon data-testid="tag-right-icon" as={IconCheckCircleSolid} />
+    ));
     const tagRightIcon = screen.getByTestId("tag-right-icon");
 
     // assert

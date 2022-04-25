@@ -134,8 +134,13 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
       local.class,
       hopeAvatarClass,
       avatarStyles({
-        size: local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
-        withBorder: local.withBorder ?? !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
+        size:
+          local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        withBorder:
+          local.withBorder ??
+          !!avatarGroupContext ??
+          theme?.defaultProps?.root?.withBorder ??
+          false,
       })
     );
   };

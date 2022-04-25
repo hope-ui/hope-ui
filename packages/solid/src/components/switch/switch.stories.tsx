@@ -67,7 +67,9 @@ export const Default = (args: any) => {
 
   return (
     <VStack spacing="$5">
-      <Button onClick={() => setChecked(prev => !prev)}>Toggle controlled switch ({checked().toString()})</Button>
+      <Button onClick={() => setChecked(prev => !prev)}>
+        Toggle controlled switch ({checked().toString()})
+      </Button>
       <HStack spacing="$5">
         <Switch {...args} checked={checked()} onChange={onChange}>
           Controlled

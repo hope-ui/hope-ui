@@ -58,19 +58,26 @@ export default function ResponsiveStyles() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Responsive styles</PageTitle>
       <Text mb="$5">
-        Hope UI supports responsive styles out of the box. Instead of manually adding <Code>@media</Code> queries and
-        adding nested styles throughout your code, Hope UI allows you to use an object syntax to add mobile-first
-        responsive styles.
+        Hope UI supports responsive styles out of the box. Instead of manually adding{" "}
+        <Code>@media</Code> queries and adding nested styles throughout your code, Hope UI allows
+        you to use an object syntax to add mobile-first responsive styles.
       </Text>
       <Alert status="info" mb="$5">
         <AlertDescription>
-          Hope UI use the <Code>@media(min-width)</Code> media query to ensure your interfaces are mobile-first.
+          Hope UI use the <Code>@media(min-width)</Code> media query to ensure your interfaces are
+          mobile-first.
         </AlertDescription>
       </Alert>
-      <Text mb="$5">Responsive syntax relies on the following breakpoints defined in the Hope UI theme:</Text>
+      <Text mb="$5">
+        Responsive syntax relies on the following breakpoints defined in the Hope UI theme:
+      </Text>
       <hope.div overflowX="auto" mb="$8">
         <Table dense>
           <Thead bg="$neutral2">
@@ -93,12 +100,15 @@ export default function ResponsiveStyles() {
       </hope.div>
       <Alert status="warning" mb="$8">
         <AlertDescription>
-          Breakpoints are created during the <Code>createStitches</Code> call which occurs internally in Hope UI, for
-          this reason it is currently not possible to customize breakpoint values.
+          Breakpoints are created during the <Code>createStitches</Code> call which occurs
+          internally in Hope UI, for this reason it is currently not possible to customize
+          breakpoint values.
         </AlertDescription>
       </Alert>
       <SectionTitle id="the-object-syntax">The object syntax</SectionTitle>
-      <Text mb="$4">All style props accept an object as value for mobile-first responsive styles.</Text>
+      <Text mb="$4">
+        All style props accept an object as value for mobile-first responsive styles.
+      </Text>
       <Text mb="$5">
         Let's say you have a <Code>Box</Code> with the following properties:
       </Text>
@@ -109,8 +119,9 @@ export default function ResponsiveStyles() {
         Usage with the <Code>css</Code> prop
       </SectionTitle>
       <Text mb="$5">
-        When using responsive styles with the <Code>css</Code> prop you don't need the <Code>@initial</Code> breakpoint.
-        It's like the normal way of creating mobile-first responsive styles in CSS.
+        When using responsive styles with the <Code>css</Code> prop you don't need the{" "}
+        <Code>@initial</Code> breakpoint. It's like the normal way of creating mobile-first
+        responsive styles in CSS.
       </Text>
       <CodeSnippet snippet={snippets.usageWithCssProp} mb="$5" />
       <Text mb="$8">
@@ -129,7 +140,8 @@ export default function ResponsiveStyles() {
         Usage with stitches <Code>css</Code> function
       </SectionTitle>
       <Text mb="$5">
-        Like style props, variant created with stitches <Code>css</Code> function support responsive styles.
+        Like style props, variant created with stitches <Code>css</Code> function support responsive
+        styles.
       </Text>
       <CodeSnippet snippet={snippets.usageWithCssFunction} mb="$5" />
       <Text mb="$8">
@@ -146,8 +158,9 @@ export default function ResponsiveStyles() {
       </Text>
       <SectionTitle id="demo">Demo</SectionTitle>
       <Text mb="$5">
-        Here's a simple example of a marketing page component that uses a stacked layout on small screens, and a
-        side-by-side layout on larger screens <strong>(resize your browser to see it in action):</strong>
+        Here's a simple example of a marketing page component that uses a stacked layout on small
+        screens, and a side-by-side layout on larger screens{" "}
+        <strong>(resize your browser to see it in action):</strong>
       </Text>
       <Preview snippet={snippets.demo}>
         <Box p="$4" display={{ "@md": "flex" }}>
@@ -160,15 +173,28 @@ export default function ResponsiveStyles() {
             />
           </Box>
           <Box mt={{ "@initial": "$4", "@md": 0 }} ml={{ "@md": "$6" }}>
-            <Text fontWeight="$bold" textTransform="uppercase" fontSize="$sm" letterSpacing="$wide" color="$primary9">
+            <Text
+              fontWeight="$bold"
+              textTransform="uppercase"
+              fontSize="$sm"
+              letterSpacing="$wide"
+              color="$primary9"
+            >
               Marketing
             </Text>
-            <Anchor mt="$1" display="block" fontSize="$lg" lineHeight="$normal" fontWeight="$semibold" href="#">
+            <Anchor
+              mt="$1"
+              display="block"
+              fontSize="$lg"
+              lineHeight="$normal"
+              fontWeight="$semibold"
+              href="#"
+            >
               Finding customers for your new business
             </Anchor>
             <Text mt="$2" color="$neutral11">
-              Getting a new business off the ground is a lot of hard work. Here are five ideas you can use to find your
-              first customers.
+              Getting a new business off the ground is a lot of hard work. Here are five ideas you
+              can use to find your first customers.
             </Text>
           </Box>
         </Box>

@@ -14,7 +14,9 @@ const hopeCircularProgressLabelClass = "hope-circular-progress__label";
 /**
  * CircularProgressLabel is used to show the numeric value of the progress.
  */
-export function CircularProgressLabel<C extends ElementType = "div">(props: CircularProgressLabelProps<C>) {
+export function CircularProgressLabel<C extends ElementType = "div">(
+  props: CircularProgressLabelProps<C>
+) {
   const theme = useStyleConfig().CircularProgress;
 
   const circularProgressContext = useCircularProgressContext();

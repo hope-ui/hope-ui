@@ -102,7 +102,11 @@ export default function IconButtonDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>IconButton</PageTitle>
       <Text mb="$8">
         IconButton composes the <Code>Button</Code> component except that it renders only an icon.
@@ -115,8 +119,8 @@ export default function IconButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-colors">Button colors</SectionSubtitle>
       <Text mb="$5">
-        The <Code>IconButton</Code> component accepts most of the props from the <Code>Button</Code> component, so we
-        can use <Code>colorScheme</Code> prop to change the color of the button.
+        The <Code>IconButton</Code> component accepts most of the props from the <Code>Button</Code>{" "}
+        component, so we can use <Code>colorScheme</Code> prop to change the color of the button.
       </Text>
       <Preview snippet={snippets.buttonColors} mb="$10">
         <HStack spacing="$4">
@@ -131,7 +135,8 @@ export default function IconButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-sizes">Button sizes</SectionSubtitle>
       <Text mb="$5">
-        Like the <Code>Button</Code> component, pass the <Code>size</Code> prop to change the size of the button.
+        Like the <Code>Button</Code> component, pass the <Code>size</Code> prop to change the size
+        of the button.
       </Text>
       <Preview snippet={snippets.buttonSizes} mb="$8">
         <HStack spacing="$4">
@@ -156,7 +161,8 @@ export default function IconButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-variants">Button variants</SectionSubtitle>
       <Text mb="$5">
-        Like the <Code>Button</Code> component, pass the <Code>variant</Code> prop to change the style of the button.
+        Like the <Code>Button</Code> component, pass the <Code>variant</Code> prop to change the
+        style of the button.
       </Text>
       <Preview snippet={snippets.buttonVariants} mb="$10">
         <HStack spacing="$4">
@@ -175,11 +181,16 @@ export default function IconButtonDoc() {
         <IconButton loading aria-label="Search" icon={<IconSearch />} />
       </Preview>
       <Text mb="$5">
-        You can change the loader element to use custom loaders as per your design requirements. Pass the{" "}
-        <Code>loader</Code> prop and set it to a custom jsx element.
+        You can change the loader element to use custom loaders as per your design requirements.
+        Pass the <Code>loader</Code> prop and set it to a custom jsx element.
       </Text>
       <Preview snippet={snippets.buttonCustomLoader} mb="$12">
-        <IconButton loading loader={<BeatLoader boxSize="$6" />} aria-label="Search" icon={<IconSearch />} />
+        <IconButton
+          loading
+          loader={<BeatLoader boxSize="$6" />}
+          aria-label="Search"
+          icon={<IconSearch />}
+        />
       </Preview>
       <SectionTitle id="accessibility">Accessibility</SectionTitle>
       <hope.ul ps="$5" mb="$12">
@@ -193,8 +204,8 @@ export default function IconButtonDoc() {
       </hope.ul>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>IconButton</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>IconButton</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

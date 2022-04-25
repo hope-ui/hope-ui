@@ -30,7 +30,13 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
 
   const [index, setIndex] = createSignal(-1);
 
-  const [local, others] = splitProps(props as TabProps<"button">, ["ref", "class", "disabled", "onClick", "onFocus"]);
+  const [local, others] = splitProps(props as TabProps<"button">, [
+    "ref",
+    "class",
+    "disabled",
+    "onClick",
+    "onFocus",
+  ]);
 
   const isSelected = () => tabsContext.isSelectedIndex(index());
 

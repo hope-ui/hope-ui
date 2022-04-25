@@ -20,7 +20,8 @@ export function FormErrorMessage<C extends ElementType = "div">(props: FormError
 
   const id = () => local.id ?? formControl?.state.errorMessageId;
 
-  const classes = () => classNames(local.class, hopeFormErrorMessageClass, formErrorMessageStyles());
+  const classes = () =>
+    classNames(local.class, hopeFormErrorMessageClass, formErrorMessageStyles());
 
   onMount(() => formControl?.setHasErrorMessage(true));
   onCleanup(() => formControl?.setHasErrorMessage(false));

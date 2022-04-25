@@ -15,14 +15,17 @@ const hopeSelectOptionIndicatorClass = "hope-select__option-indicator";
 /**
  * Visual indicator rendered when the option is selected.
  */
-export function SelectOptionIndicator<C extends ElementType = "span">(props: SelectOptionIndicatorProps<C>) {
+export function SelectOptionIndicator<C extends ElementType = "span">(
+  props: SelectOptionIndicatorProps<C>
+) {
   const theme = useStyleConfig().Select;
 
   const selectOptionContext = useSelectOptionContext();
 
   const [local, others] = splitProps(props, ["class", "children"]);
 
-  const classes = () => classNames(local.class, hopeSelectOptionIndicatorClass, selectOptionIndicatorStyles());
+  const classes = () =>
+    classNames(local.class, hopeSelectOptionIndicatorClass, selectOptionIndicatorStyles());
 
   return (
     <Show when={selectOptionContext.selected()}>

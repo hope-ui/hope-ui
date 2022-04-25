@@ -34,9 +34,10 @@ Hope UI is a composable and accessible component library that gives you the foun
 - **Ready to go**: Start your project with over 40 well designed SolidJS components.
 - **Composable**: Compose your UI with reusable building blocks.
 - **Accessible**: Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
-- **Themeable**: Use Hope UI's design system or build your own using the theming features.
+- **Themeable**: Use Hope UI's design system or customize it using the theming features.
 - **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
 - **Style props**: All component styles can be overridden or extended via style props like `<Box bg="tomato" padding="24px">Box</Box>`.
+- **Headless-able**: Create your own design system with all the available, unstyled, low level primitives.
 
 ## Project status
 
@@ -52,6 +53,7 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 This project is inspired by :
 
+- [React Spectrum Libraries](https://github.com/adobe/react-spectrum)
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
 
@@ -65,6 +67,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/fabien-ml"><img src="https://avatars.githubusercontent.com/u/2832351?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Fabien MARIE-LOUISE</b></sub></a><br /><a href="#design-fabien-ml" title="Design">🎨</a> <a href="https://github.com/fabien-ml/hope-ui/commits?author=fabien-ml" title="Code">💻</a> <a href="https://github.com/fabien-ml/hope-ui/commits?author=fabien-ml" title="Documentation">📖</a> <a href="#maintenance-fabien-ml" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/bichikim"><img src="https://avatars.githubusercontent.com/u/13829322?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Bichi Kim</b></sub></a><br /><a href="https://github.com/fabien-ml/hope-ui/commits?author=bichikim" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/NurbekGithub"><img src="https://avatars.githubusercontent.com/u/24915724?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nurbek</b></sub></a><br /><a href="https://github.com/fabien-ml/hope-ui/commits?author=NurbekGithub" title="Code">💻</a></td>
   </tr>
 </table>

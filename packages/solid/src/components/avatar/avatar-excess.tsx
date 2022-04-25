@@ -7,7 +7,10 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { avatarExcessStyles, AvatarExcessVariants } from "./avatar.styles";
 import { useAvatarGroupContext } from "./avatar-group";
 
-export type AvatarExcessProps<C extends ElementType = "span"> = HTMLHopeProps<C, AvatarExcessVariants>;
+export type AvatarExcessProps<C extends ElementType = "span"> = HTMLHopeProps<
+  C,
+  AvatarExcessVariants
+>;
 
 const hopeAvatarExcessClass = "hope-avatar__excess";
 
@@ -26,8 +29,13 @@ export function AvatarExcess<C extends ElementType = "span">(props: AvatarExcess
       local.class,
       hopeAvatarExcessClass,
       avatarExcessStyles({
-        size: local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
-        withBorder: local.withBorder ?? !!avatarGroupContext ?? theme?.defaultProps?.root?.withBorder ?? false,
+        size:
+          local.size ?? avatarGroupContext?.state.size ?? theme?.defaultProps?.root?.size ?? "md",
+        withBorder:
+          local.withBorder ??
+          !!avatarGroupContext ??
+          theme?.defaultProps?.root?.withBorder ??
+          false,
       })
     );
   };

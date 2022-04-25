@@ -47,9 +47,15 @@ interface CircularProgressOptions
   valueText?: string;
 }
 
-type ThemeableCircularProgressOptions = Pick<CircularProgressOptions, "size" | "thickness" | "trackColor">;
+type ThemeableCircularProgressOptions = Pick<
+  CircularProgressOptions,
+  "size" | "thickness" | "trackColor"
+>;
 
-export type CircularProgressProps<C extends ElementType = "div"> = HTMLHopeProps<C, CircularProgressOptions>;
+export type CircularProgressProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  CircularProgressOptions
+>;
 
 export interface CircularProgressStyleConfig {
   baseStyle?: {
@@ -141,7 +147,8 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
     ["size", "thickness", "min", "max", "getValueText"]
   );
 
-  const rootClasses = () => classNames(local.class, hopeCircularProgressClass, circularProgressStyles());
+  const rootClasses = () =>
+    classNames(local.class, hopeCircularProgressClass, circularProgressStyles());
 
   const trackClasses = () => {
     return classNames(
@@ -173,7 +180,13 @@ export function CircularProgress<C extends ElementType = "div">(props: CircularP
         {...others}
       >
         <hope.svg viewBox="0 0 100 100" boxSize={state.size}>
-          <hope.circle cx={50} cy={50} r={42} class={trackClasses()} __baseStyle={theme?.baseStyle?.track} />
+          <hope.circle
+            cx={50}
+            cy={50}
+            r={42}
+            class={trackClasses()}
+            __baseStyle={theme?.baseStyle?.track}
+          />
         </hope.svg>
         {local.children}
       </Box>
@@ -187,7 +200,9 @@ export function useCircularProgressContext() {
   const context = useContext(CircularProgressContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useCircularProgressContext must be used within a `<CircularProgress />` component");
+    throw new Error(
+      "[Hope UI]: useCircularProgressContext must be used within a `<CircularProgress />` component"
+    );
   }
 
   return context;

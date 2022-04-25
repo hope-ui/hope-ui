@@ -1,4 +1,12 @@
-import { Accessor, createContext, createEffect, createSignal, onMount, splitProps, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  onMount,
+  splitProps,
+  useContext,
+} from "solid-js";
 
 import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
@@ -18,7 +26,10 @@ const SelectOptionContext = createContext<SelectOptionContextValue>();
 type SelectOptionOptions = Required<Pick<SelectOptionData, "value">> &
   Partial<Pick<SelectOptionData, "textValue" | "disabled">>;
 
-export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<C, SelectOptionOptions>;
+export type SelectOptionProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  SelectOptionOptions
+>;
 
 const hopeSelectOptionClass = "hope-select__option";
 
@@ -127,7 +138,9 @@ export function useSelectOptionContext() {
   const context = useContext(SelectOptionContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useSelectOptionContext must be used within a `<Select.Option />` component");
+    throw new Error(
+      "[Hope UI]: useSelectOptionContext must be used within a `<Select.Option />` component"
+    );
   }
 
   return context;

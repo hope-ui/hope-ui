@@ -28,7 +28,13 @@ export function Stack<C extends ElementType = "div">(props: StackProps<C>) {
   const classes = () => classNames(local.class, hopeStackClass, stackStyles());
 
   return (
-    <Box class={classes()} flexDirection={local.direction} flexWrap={local.wrap} gap={local.spacing} {...others} />
+    <Box
+      class={classes()}
+      flexDirection={local.direction}
+      flexWrap={local.wrap}
+      gap={local.spacing}
+      {...others}
+    />
   );
 }
 

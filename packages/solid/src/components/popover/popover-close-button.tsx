@@ -29,7 +29,8 @@ export function PopoverCloseButton(props: CloseButtonProps) {
   const propsWithDefaults = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefaults, ["class", "onClick"]);
 
-  const classes = () => classNames(local.class, hopePopoverCloseButtonClass, popoverCloseButtonStyles());
+  const classes = () =>
+    classNames(local.class, hopePopoverCloseButtonClass, popoverCloseButtonStyles());
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     const allHandlers = callAllHandlers(local.onClick, e => {
@@ -40,7 +41,14 @@ export function PopoverCloseButton(props: CloseButtonProps) {
     allHandlers(event);
   };
 
-  return <CloseButton class={classes()} __baseStyle={theme?.baseStyle?.closeButton} onClick={onClick} {...others} />;
+  return (
+    <CloseButton
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.closeButton}
+      onClick={onClick}
+      {...others}
+    />
+  );
 }
 
 PopoverCloseButton.toString = () => createClassSelector(hopePopoverCloseButtonClass);

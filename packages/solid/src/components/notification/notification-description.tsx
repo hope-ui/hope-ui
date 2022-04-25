@@ -10,12 +10,15 @@ export type NotificationDescriptionProps<C extends ElementType = "div"> = HTMLHo
 
 const hopeNotificationDescriptionClass = "hope-notification__description";
 
-export function NotificationDescription<C extends ElementType = "div">(props: NotificationDescriptionProps<C>) {
+export function NotificationDescription<C extends ElementType = "div">(
+  props: NotificationDescriptionProps<C>
+) {
   const theme = useStyleConfig().Notification;
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, hopeNotificationDescriptionClass, notificationDescriptionStyles());
+  const classes = () =>
+    classNames(local.class, hopeNotificationDescriptionClass, notificationDescriptionStyles());
 
   return <Box class={classes()} __baseStyle={theme?.baseStyle?.description} {...others} />;
 }

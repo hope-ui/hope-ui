@@ -1,4 +1,13 @@
-import { Accessor, createEffect, createSignal, createUniqueId, JSX, onMount, Show, splitProps } from "solid-js";
+import {
+  Accessor,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  JSX,
+  onMount,
+  Show,
+  splitProps,
+} from "solid-js";
 
 import { MarginProps } from "../../styled-system/props/margin";
 import { useStyleConfig } from "../../hope-provider";
@@ -81,7 +90,8 @@ export function MenuItem<C extends ElementType = "div">(props: MenuItemProps<C>)
     key,
     textValue: local.textValue ?? itemRef?.textContent ?? "",
     disabled: !!local.disabled,
-    closeOnSelect: local.closeOnSelect != null ? !!local.closeOnSelect : menuContext.state.closeOnSelect,
+    closeOnSelect:
+      local.closeOnSelect != null ? !!local.closeOnSelect : menuContext.state.closeOnSelect,
     onSelect: local.onSelect,
   });
 

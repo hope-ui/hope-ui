@@ -14,7 +14,9 @@ const hopeBreadcrumbSeparatorClass = "hope-breadcrumb__separator";
 /**
  * The visual separator between each breadcrumb.
  */
-export function BreadcrumbSeparator<C extends ElementType = "span">(props: BreadcrumbSeparatorProps<C>) {
+export function BreadcrumbSeparator<C extends ElementType = "span">(
+  props: BreadcrumbSeparatorProps<C>
+) {
   const theme = useStyleConfig().Breadcrumb;
 
   const breadcrumbContext = useBreadcrumbContext();
@@ -26,7 +28,12 @@ export function BreadcrumbSeparator<C extends ElementType = "span">(props: Bread
   };
 
   return (
-    <hope.span role="presentation" class={classes()} __baseStyle={theme?.baseStyle?.separator} {...others}>
+    <hope.span
+      role="presentation"
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.separator}
+      {...others}
+    >
       <Show when={local.children} fallback={breadcrumbContext.state.separator}>
         {local.children}
       </Show>

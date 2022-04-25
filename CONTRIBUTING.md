@@ -36,9 +36,10 @@ Hope UI is a monorepo separated in two main folders.
 
 ```
 apps/
-  docs/          - Hope UI documentation website
+  docs/            - Hope UI documentation website
 packages/
-  solid/         - Hope UI library
+  design-system/   - Hope UI component library
+  primitives/      - Hope UI low level primitives for building components
 ```
 
 ## npm scripts

@@ -11,7 +11,9 @@ import { SelectOptionData } from "./select.utils";
 import { SelectTag } from "./select-tag";
 import { SelectTagCloseButton } from "./select-tag-close-button";
 
-type SelectValueChildrenRenderProp = (props: { selectedOptions: SelectOptionData[] }) => JSX.Element;
+type SelectValueChildrenRenderProp = (props: {
+  selectedOptions: SelectOptionData[];
+}) => JSX.Element;
 
 interface SelectValueOptions {
   children?: JSX.Element | SelectValueChildrenRenderProp;
@@ -31,10 +33,15 @@ export function SelectValue<C extends ElementType = "div">(props: SelectValuePro
 
   const [local, others] = splitProps(props as SelectValueProps<"div">, ["class", "children"]);
 
-  const singleValueClasses = () => classNames(local.class, hopeSelectValueClass, selectSingleValueStyles());
+  const singleValueClasses = () =>
+    classNames(local.class, hopeSelectValueClass, selectSingleValueStyles());
 
   const multiValueClasses = () => {
-    return classNames(local.class, hopeSelectValueClass, selectMultiValueStyles({ size: selectContext.state.size }));
+    return classNames(
+      local.class,
+      hopeSelectValueClass,
+      selectMultiValueStyles({ size: selectContext.state.size })
+    );
   };
 
   const onTagCloseButtonClick = (event: MouseEvent, option: SelectOptionData) => {
@@ -60,7 +67,11 @@ export function SelectValue<C extends ElementType = "div">(props: SelectValuePro
         <Show
           when={selectContext.state.multiple}
           fallback={
-            <Box class={singleValueClasses()} __baseStyle={theme?.baseStyle?.singleValue} {...others}>
+            <Box
+              class={singleValueClasses()}
+              __baseStyle={theme?.baseStyle?.singleValue}
+              {...others}
+            >
               {selectContext.state.selectedOptions[0].textValue}
             </Box>
           }
@@ -70,7 +81,9 @@ export function SelectValue<C extends ElementType = "div">(props: SelectValuePro
               {option => (
                 <SelectTag>
                   <span>{option.textValue}</span>
-                  <SelectTagCloseButton onClick={(e: MouseEvent) => onTagCloseButtonClick(e, option)} />
+                  <SelectTagCloseButton
+                    onClick={(e: MouseEvent) => onTagCloseButtonClick(e, option)}
+                  />
                 </SelectTag>
               )}
             </For>

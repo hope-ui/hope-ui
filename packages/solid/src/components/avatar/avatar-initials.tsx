@@ -23,7 +23,13 @@ export function AvatarInitials(props: AvatarInitialsProps) {
   const diplayInitials = () => local.name && local.getInitials?.(local.name);
 
   return (
-    <Box role="img" aria-label={local.name} class={classes()} __baseStyle={theme?.baseStyle?.initials} {...others}>
+    <Box
+      role="img"
+      aria-label={local.name}
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.initials}
+      {...others}
+    >
       {diplayInitials()}
     </Box>
   );

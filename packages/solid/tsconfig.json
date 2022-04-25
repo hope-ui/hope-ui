@@ -1,9 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "baseUrl": ".",
-    "rootDir": "."
-  },
-  "include": ["vite.config.ts", "jest.setup.ts", "package.json", "src/**/*"]
+  "include": ["./src", "./dev", "vite.config.ts", "package.json"],
+  "exclude": ["node_modules", "./dist"]
 }
