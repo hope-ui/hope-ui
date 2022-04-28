@@ -238,8 +238,12 @@ export const tabStyles = css({
       pills: {
         borderRadius: "$sm",
 
-        "&:not(:disabled):hover": {
+        "&:hover": {
           backgroundColor: "$neutral3",
+        },
+
+        "&:hover:disabled": {
+          backgroundColor: "transparent",
         },
       },
     },

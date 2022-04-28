@@ -6,6 +6,18 @@
 - `RadioControl` and `RadioLabel` components has been removed.
 - `SwitchControl` and `SwitchLabel` components has been removed.
 
+## [0.4.4](https://github.com/fabien-ml/hope-ui/compare/v0.4.3...v0.4.4) (2022-04-28)
+
+### 🐛 Bug fixes
+
+- `_hover` style prop is not applied on `Button` and `Tabs`.
+
+## [0.4.3](https://github.com/fabien-ml/hope-ui/compare/v0.4.2...v0.4.3) (2022-04-19)
+
+### 🐛 Bug fixes
+
+- Export all component styles.
+
 ## [0.4.2](https://github.com/fabien-ml/hope-ui/compare/v0.4.1...v0.4.2) (2022-04-08)
 
 ### 🐛 Bug fixes
