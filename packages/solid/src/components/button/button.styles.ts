@@ -106,7 +106,7 @@ function createSolidCompoundVariant(config: SolidCompoundVariantConfig): SystemS
     backgroundColor: config.bgColor,
     color: config.color,
 
-    "&:not(:disabled):hover": {
+    "&:hover": {
       backgroundColor: config.bgColorHover,
     },
   };
@@ -128,11 +128,11 @@ function createSubtleCompoundVariant(config: SubtleCompoundVariantConfig): Syste
     backgroundColor: config.bgColor,
     color: config.color,
 
-    "&:not(:disabled):hover": {
+    "&:hover": {
       backgroundColor: config.bgColorHover,
     },
 
-    "&:not(:disabled):active": {
+    "&:active": {
       backgroundColor: config.bgColorActive,
     },
   };
@@ -155,12 +155,12 @@ function createOutlineCompoundVariant(config: OutlineCompoundVariantConfig): Sys
     borderColor: config.borderColor,
     color: config.color,
 
-    "&:not(:disabled):hover": {
+    "&:hover": {
       borderColor: config.borderColorHover,
       backgroundColor: config.bgColorHover,
     },
 
-    "&:not(:disabled):active": {
+    "&:active": {
       backgroundColor: config.bgColorActive,
     },
   };
@@ -180,11 +180,11 @@ function createGhostCompoundVariant(config: GhostCompoundVariantConfig): SystemS
   return {
     color: config.color,
 
-    "&:not(:disabled):hover": {
+    "&:hover": {
       backgroundColor: config.bgColorHover,
     },
 
-    "&:not(:disabled):active": {
+    "&:active": {
       backgroundColor: config.bgColorActive,
     },
   };
@@ -225,7 +225,7 @@ export const buttonStyles = css({
     boxShadow: "$outline",
   },
 
-  "&:disabled": {
+  "&:disabled, &:hover:disabled": {
     color: "$neutral7",
     cursor: "not-allowed",
   },
@@ -235,14 +235,14 @@ export const buttonStyles = css({
       solid: {
         border: "1px solid transparent",
 
-        "&:disabled": {
+        "&:disabled, &:hover:disabled": {
           backgroundColor: "$neutral3",
         },
       },
       subtle: {
         border: "1px solid transparent",
 
-        "&:disabled": {
+        "&:disabled, &:hover:disabled": {
           backgroundColor: "$neutral3",
         },
       },
@@ -251,7 +251,7 @@ export const buttonStyles = css({
         borderWidth: "1px",
         backgroundColor: "transparent",
 
-        "&:disabled": {
+        "&:disabled, &:hover:disabled": {
           borderColor: "$neutral3",
         },
       },
@@ -260,7 +260,7 @@ export const buttonStyles = css({
         borderWidth: "1px",
         backgroundColor: "transparent",
 
-        "&:disabled": {
+        "&:disabled, &:hover:disabled": {
           borderColor: "$neutral3",
         },
       },

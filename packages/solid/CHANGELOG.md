@@ -1,3 +1,9 @@
+## [0.4.4](https://github.com/fabien-ml/hope-ui/compare/v0.4.3...v0.4.4) (2022-04-28)
+
+### 🐛 Bug fixes
+
+- `_hover` style prop is not applied on `Button` and `Tabs`.
+
 ## [0.4.3](https://github.com/fabien-ml/hope-ui/compare/v0.4.2...v0.4.3) (2022-04-19)
 
 ### 🐛 Bug fixes
