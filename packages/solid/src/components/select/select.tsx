@@ -666,6 +666,26 @@ export function Select(props: SelectProps) {
     )
   );
 
+  createEffect(
+    on(
+      () => props.value,
+      () => {
+        if (!state.isControlled) {
+          return;
+        }
+
+        const controlledValues = isArray(props.value) ? props.value : [props.value];
+
+        const selectedOptions = controlledValues
+          .map(value => state.options.find(option => option.value === value))
+          .filter(Boolean);
+
+        setState("selectedOptions", selectedOptions);
+      },
+      { defer: true }
+    )
+  );
+
   const context: SelectContextValue = {
     state: state as SelectState,
     isOptionSelected,

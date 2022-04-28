@@ -6,6 +6,12 @@
 - `RadioControl` and `RadioLabel` components has been removed.
 - `SwitchControl` and `SwitchLabel` components has been removed.
 
+## [0.4.5](https://github.com/fabien-ml/hope-ui/compare/v0.4.4...v0.4.5) (2022-04-28)
+
+### 🐛 Bug fixes
+
+- `Select` in controlled mode doesn't show the current value (#140).
+
 ## [0.4.4](https://github.com/fabien-ml/hope-ui/compare/v0.4.3...v0.4.4) (2022-04-28)
 
 ### 🐛 Bug fixes
