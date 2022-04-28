@@ -225,7 +225,7 @@ export const buttonStyles = css({
     boxShadow: "$outline",
   },
 
-  "&:disabled": {
+  "&:disabled, &:hover:disabled": {
     color: "$neutral7",
     cursor: "not-allowed",
   },
