@@ -292,17 +292,17 @@ export function SwitchPrimitive<C extends ElementType = "label">(props: SwitchPr
       setState("_checked", target.checked);
     }
 
-    callHandler(local.onChange)(event);
+    callHandler(local.onChange, event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", true);
-    callHandler(formControlProps.onFocus)(event);
+    callHandler(formControlProps.onFocus, event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", false);
-    callHandler(formControlProps.onBlur)(event);
+    callHandler(formControlProps.onBlur, event);
   };
 
   const inputClasses = () => classNames(local.inputClass, visuallyHiddenStyles());

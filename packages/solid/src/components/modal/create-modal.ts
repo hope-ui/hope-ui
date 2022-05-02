@@ -9,7 +9,7 @@ import {
 } from "scroll-lock";
 import { JSX, onCleanup, onMount } from "solid-js";
 
-import { callAllHandlers } from "../../utils/function";
+import { chainHandlers } from "../../utils/function";
 import { useModalContext } from "./modal";
 import { ModalContentProps } from "./modal-content";
 
@@ -44,8 +44,7 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
   };
 
   const onDialogClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    const allHandlers = callAllHandlers(props.onClick, e => e.stopPropagation());
-    allHandlers(event);
+    chainHandlers(props.onClick, e => e.stopPropagation())(event);
   };
 
   const dialogSelector = () => `[id='${modalContext.state.dialogId}']`;

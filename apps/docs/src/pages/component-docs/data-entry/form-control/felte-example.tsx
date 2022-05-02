@@ -10,9 +10,7 @@ import {
   HStack,
   Input,
   Radio,
-  RadioControl,
   RadioGroup,
-  RadioLabel,
   SimpleOption,
   SimpleSelect,
   Textarea,
@@ -61,18 +59,9 @@ export function FelteExample() {
         <FormLabel as="legend">Gender</FormLabel>
         <RadioGroup name="gender">
           <HStack spacing="$5">
-            <Radio value="male">
-              <RadioControl />
-              <RadioLabel>Male</RadioLabel>
-            </Radio>
-            <Radio value="female">
-              <RadioControl />
-              <RadioLabel>Female</RadioLabel>
-            </Radio>
-            <Radio value="other">
-              <RadioControl />
-              <RadioLabel>Other</RadioLabel>
-            </Radio>
+            <Radio value="male">Male</Radio>
+            <Radio value="female">Female</Radio>
+            <Radio value="other">Other</Radio>
           </HStack>
         </RadioGroup>
         <FormErrorMessage>{errors("gender")[0]}</FormErrorMessage>

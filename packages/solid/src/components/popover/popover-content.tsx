@@ -5,7 +5,7 @@ import { Transition } from "solid-transition-group";
 import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers, callHandler } from "../../utils/function";
+import { callHandler, chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
@@ -56,21 +56,21 @@ export function PopoverContent<C extends ElementType = "section">(props: Popover
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    callAllHandlers(local.onKeyDown, closeOnKeyDown)(event);
+    chainHandlers(local.onKeyDown, closeOnKeyDown)(event);
   };
 
   const onFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callAllHandlers(local.onFocusOut, popoverContext.onPopoverFocusOut)(event);
+    chainHandlers(local.onFocusOut, popoverContext.onPopoverFocusOut)(event);
   };
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    callHandler(local.onMouseEnter)(event);
+    callHandler(local.onMouseEnter, event);
 
     popoverContext.setIsHovering(true);
   };
 
   const onMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    callHandler(local.onMouseLeave)(event);
+    callHandler(local.onMouseLeave, event);
 
     popoverContext.onPopoverMouseLeave();
   };

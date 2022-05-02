@@ -19,9 +19,7 @@ import {
   Input,
   ListItem,
   Radio,
-  RadioControl,
   RadioGroup,
-  RadioLabel,
   Text,
   UnorderedList,
 } from "@hope-ui/solid";
@@ -181,22 +179,10 @@ export default function DrawerDoc() {
       <Preview snippet={snippets.placement} mb="$10">
         <RadioGroup value={placement()} onChange={value => setPlacement(value as DrawerPlacement)}>
           <HStack spacing="$4" mb="$4">
-            <Radio value="top">
-              <RadioControl />
-              <RadioLabel>Top</RadioLabel>
-            </Radio>
-            <Radio value="right">
-              <RadioControl />
-              <RadioLabel>Right</RadioLabel>
-            </Radio>
-            <Radio value="bottom">
-              <RadioControl />
-              <RadioLabel>Bottom</RadioLabel>
-            </Radio>
-            <Radio value="left">
-              <RadioControl />
-              <RadioLabel>Left</RadioLabel>
-            </Radio>
+            <Radio value="top">Top</Radio>
+            <Radio value="right">Right</Radio>
+            <Radio value="bottom">Bottom</Radio>
+            <Radio value="left">Left</Radio>
           </HStack>
         </RadioGroup>
         <Button onClick={placementDisclosure.onOpen}>Open</Button>

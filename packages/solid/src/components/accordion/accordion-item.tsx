@@ -130,7 +130,7 @@ export function AccordionItem<C extends ElementType = "div">(props: AccordionIte
 
     if (action) {
       event.preventDefault();
-      callHandler(action)(event);
+      callHandler(action, event);
     }
   };
 

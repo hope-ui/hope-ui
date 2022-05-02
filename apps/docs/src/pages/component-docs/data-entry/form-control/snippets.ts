@@ -56,26 +56,11 @@ const withRadioGroup = `<FormControl as="fieldset">
   <FormLabel as="legend">Choose a framework</FormLabel>
   <RadioGroup defaultValue="solid">
     <HStack spacing="$6">
-      <Radio value="react">
-        <RadioControl />
-        <RadioLabel>React</RadioLabel>
-      </Radio>
-      <Radio value="angular" disabled>
-        <RadioControl />
-        <RadioLabel>Angular</RadioLabel>
-      </Radio>
-      <Radio value="vue">
-        <RadioControl />
-        <RadioLabel>Vue</RadioLabel>
-      </Radio>
-      <Radio value="svelte">
-        <RadioControl />
-        <RadioLabel>Svelte</RadioLabel>
-      </Radio>
-      <Radio value="solid">
-        <RadioControl />
-        <RadioLabel>Solid</RadioLabel>
-      </Radio>
+      <Radio value="react">React</Radio>
+      <Radio value="angular" disabled>Angular</Radio>
+      <Radio value="vue">Vue</Radio>
+      <Radio value="svelte">Svelte</Radio>
+      <Radio value="solid">Solid</Radio>
     </HStack>
   </RadioGroup>
   <FormHelperText>You should choose Solid.</FormHelperText>
@@ -167,18 +152,9 @@ export function FelteExample() {
         <FormLabel as="legend">Gender</FormLabel>
         <RadioGroup name="gender">
           <HStack spacing="$5">
-            <Radio value="male">
-              <RadioControl />
-              <RadioLabel>Male</RadioLabel>
-            </Radio>
-            <Radio value="female">
-              <RadioControl />
-              <RadioLabel>Female</RadioLabel>
-            </Radio>
-            <Radio value="other">
-              <RadioControl />
-              <RadioLabel>Other</RadioLabel>
-            </Radio>
+            <Radio value="male">Male</Radio>
+            <Radio value="female">Female</Radio>
+            <Radio value="other">Other</Radio>
           </HStack>
         </RadioGroup>
         <FormErrorMessage>{errors("gender")[0]}</FormErrorMessage>

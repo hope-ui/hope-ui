@@ -104,7 +104,7 @@ export function Checkbox<C extends ElementType = "label">(props: CheckboxProps<C
   };
 
   const labelClasses = () => {
-    return classNames(local.class, hopeCheckboxLabelClass, checkboxLabelStyles());
+    return classNames(hopeCheckboxLabelClass, checkboxLabelStyles());
   };
 
   return (

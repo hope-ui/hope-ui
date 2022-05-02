@@ -1,10 +1,14 @@
-## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.2...v0.5.0) (2022-0)
+## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.5...v0.5.0) (2022-05-03)
 
 ### 💥 BREAKING CHANGES
 
 - `CheckboxControl` and `CheckboxLabel` components has been removed.
 - `RadioControl` and `RadioLabel` components has been removed.
 - `SwitchControl` and `SwitchLabel` components has been removed.
+
+### 🐛 Bug fixes
+
+- `Input` event listener leak (#141).
 
 ## [0.4.5](https://github.com/fabien-ml/hope-ui/compare/v0.4.4...v0.4.5) (2022-04-28)
 

@@ -81,7 +81,7 @@ export function Switch<C extends ElementType = "label">(props: SwitchProps<C>) {
   };
 
   const labelClasses = () => {
-    return classNames(local.class, hopeSwitchLabelClass, switchLabelStyles());
+    return classNames(hopeSwitchLabelClass, switchLabelStyles());
   };
 
   return (

@@ -58,13 +58,13 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     tabsContext.setSelectedIndex(index());
 
-    callHandler(local.onClick)(event);
+    callHandler(local.onClick, event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
     tabsContext.setSelectedIndex(index());
 
-    callHandler(local.onFocus)(event);
+    callHandler(local.onFocus, event);
   };
 
   const classes = () => {

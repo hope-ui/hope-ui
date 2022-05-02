@@ -12,7 +12,7 @@ import { createStore } from "solid-js/store";
 import { visuallyHiddenStyles } from "../../styled-system/utils";
 import { isFunction } from "../../utils/assertion";
 import { classNames } from "../../utils/css";
-import { callAllHandlers, callHandler } from "../../utils/function";
+import { callHandler, chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
@@ -336,17 +336,17 @@ export function CheckboxPrimitive<C extends ElementType = "label">(
       setState("_checked", target.checked);
     }
 
-    callAllHandlers(checkboxGroupContext?.onChange, local.onChange)(event);
+    chainHandlers(checkboxGroupContext?.onChange, local.onChange)(event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", true);
-    callHandler(formControlProps.onFocus)(event);
+    callHandler(formControlProps.onFocus, event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", false);
-    callHandler(formControlProps.onBlur)(event);
+    callHandler(formControlProps.onBlur, event);
   };
 
   const inputClasses = () => classNames(local.inputClass, visuallyHiddenStyles());

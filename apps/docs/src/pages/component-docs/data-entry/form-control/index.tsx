@@ -10,9 +10,7 @@ import {
   Input,
   ListItem,
   Radio,
-  RadioControl,
   RadioGroup,
-  RadioLabel,
   SimpleOption,
   SimpleSelect,
   Text,
@@ -207,26 +205,13 @@ export default function FormControlDoc() {
           <FormLabel as="legend">Choose a framework</FormLabel>
           <RadioGroup defaultValue="solid">
             <HStack spacing="$6">
-              <Radio value="react">
-                <RadioControl />
-                <RadioLabel>React</RadioLabel>
-              </Radio>
+              <Radio value="react">React</Radio>
               <Radio value="angular" disabled>
-                <RadioControl />
-                <RadioLabel>Angular</RadioLabel>
+                Angular
               </Radio>
-              <Radio value="vue">
-                <RadioControl />
-                <RadioLabel>Vue</RadioLabel>
-              </Radio>
-              <Radio value="svelte">
-                <RadioControl />
-                <RadioLabel>Svelte</RadioLabel>
-              </Radio>
-              <Radio value="solid">
-                <RadioControl />
-                <RadioLabel>Solid</RadioLabel>
-              </Radio>
+              <Radio value="vue">Vue</Radio>
+              <Radio value="svelte">Svelte</Radio>
+              <Radio value="solid">Solid</Radio>
             </HStack>
           </RadioGroup>
           <FormHelperText>You should choose Solid.</FormHelperText>

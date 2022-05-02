@@ -3,7 +3,7 @@ import { JSX, splitProps } from "solid-js";
 import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers } from "../../utils/function";
+import { chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useSelectContext } from "./select";
@@ -53,19 +53,19 @@ export function SelectTrigger<C extends ElementType = "button">(props: SelectTri
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    callAllHandlers(selectContext.onTriggerClick, local.onClick)(event);
+    chainHandlers(selectContext.onTriggerClick, local.onClick)(event);
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
-    callAllHandlers(selectContext.onTriggerKeyDown, local.onKeyDown)(event);
+    chainHandlers(selectContext.onTriggerKeyDown, local.onKeyDown)(event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    callAllHandlers(selectContext.formControlProps.onFocus, local.onFocus)(event);
+    chainHandlers(selectContext.formControlProps.onFocus, local.onFocus)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    callAllHandlers(
+    chainHandlers(
       selectContext.onTriggerBlur,
       selectContext.formControlProps.onBlur,
       local.onBlur

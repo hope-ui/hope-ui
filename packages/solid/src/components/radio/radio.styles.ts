@@ -11,7 +11,20 @@ import {
  * Radio - wrapper
  * -----------------------------------------------------------------------------------------------*/
 
-export const radioWrapperStyles = css(toggleWrapperStyles);
+export const radioWrapperStyles = css(toggleWrapperStyles, {
+  variants: {
+    labelPlacement: {
+      start: {
+        flexDirection: "row-reverse",
+      },
+      end: {
+        flexDirection: "row",
+      },
+    },
+  },
+});
+
+export type RadioWrapperVariants = VariantProps<typeof radioWrapperStyles>;
 
 /* -------------------------------------------------------------------------------------------------
  * Radio - label
