@@ -141,19 +141,19 @@ importers:
       prism-themes: 1.9.0
       prismjs: 1.27.0
       solid-app-router: 0.2.1
-      solid-js: 1.3.14
+      solid-js: 1.3.15
       solid-transition-group: 0.0.10
       yup: 0.32.11
     dependencies:
-      '@felte/solid': 1.1.5_solid-js@1.3.14
+      '@felte/solid': 1.1.5_solid-js@1.3.15
       '@felte/validator-yup': 1.0.3_yup@0.32.11
       '@hope-ui/solid': link:../../packages/solid
       '@stitches/core': 1.2.8
       prism-themes: 1.9.0
       prismjs: 1.27.0
-      solid-app-router: 0.2.1_solid-js@1.3.14
-      solid-js: 1.3.14
-      solid-transition-group: 0.0.10_solid-js@1.3.14
+      solid-app-router: 0.2.1_solid-js@1.3.15
+      solid-js: 1.3.15
+      solid-transition-group: 0.0.10_solid-js@1.3.15
       yup: 0.32.11
 
   packages/solid:
@@ -2154,14 +2154,14 @@ packages:
       '@felte/common': 1.0.3
     dev: false
 
-  /@felte/solid/1.1.5_solid-js@1.3.14:
+  /@felte/solid/1.1.5_solid-js@1.3.15:
     resolution: {integrity: sha512-VQ5iMkUSrTgasfWzgqNhVU7hFiDUQpWyPVgUbTRkmgQVbQgNrDOdaNkdgZsZmerYTUdtInVlg7tFu42lkBtZ1A==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     peerDependencies:
       solid-js: ^1.2.0
     dependencies:
       '@felte/core': 1.2.3
-      solid-js: 1.3.14
+      solid-js: 1.3.15
     dev: false
 
   /@felte/validator-yup/1.0.3_yup@0.32.11:
@@ -14000,21 +14000,16 @@ packages:
       use: 3.1.1
     dev: true
 
-  /solid-app-router/0.2.1_solid-js@1.3.14:
+  /solid-app-router/0.2.1_solid-js@1.3.15:
     resolution: {integrity: sha512-ENkhw3EF6MbkOuhRuCvmALtXs2x/fjvQw1ZSQP3ON7l6q6+QqTT8d0oZf6r5VYS95IIlevSSJNnAwvc1+Fx6Hw==}
     peerDependencies:
       solid-js: ^1.3.0
     dependencies:
-      solid-js: 1.3.14
-    dev: false
-
-  /solid-js/1.3.14:
-    resolution: {integrity: sha512-eSLm3DTTAWvFnPJT4/PuHC1TAGSNF/aFG+dyuVRPfPepT7wV2SXllA1gf9gr5kBpuloqFxzLcqXy6B9VLSgCkQ==}
+      solid-js: 1.3.15
     dev: false
 
   /solid-js/1.3.15:
     resolution: {integrity: sha512-tghvvwstKQWC3RIkIT1xf70gQx7+oxYeQ2BR/Y0MrCF4+icen/xBwy3nJ0fUNuP58QCbFmszK6TmMturD/sNrA==}
-    dev: true
 
   /solid-refresh/0.4.0_solid-js@1.3.15:
     resolution: {integrity: sha512-5XCUz845n/sHPzKK2i2G2EeV61tAmzv6SqzqhXcPaYhrgzVy7nKTQaBpKK8InKrriq9Z2JFF/mguIU00t/73xw==}
@@ -14037,21 +14032,12 @@ packages:
       solid-js: 1.3.15
     dev: true
 
-  /solid-transition-group/0.0.10_solid-js@1.3.14:
-    resolution: {integrity: sha512-b3O9z6BUP60CG1WnTdqFuvHms0reDNYwQF+eAEEaSaoDEmiOu9+Lu7zQgWGySJjaAdSAClhmFCmx/eAjQgfIoA==}
-    peerDependencies:
-      solid-js: ^1.0.0
-    dependencies:
-      solid-js: 1.3.14
-    dev: false
-
   /solid-transition-group/0.0.10_solid-js@1.3.15:
     resolution: {integrity: sha512-b3O9z6BUP60CG1WnTdqFuvHms0reDNYwQF+eAEEaSaoDEmiOu9+Lu7zQgWGySJjaAdSAClhmFCmx/eAjQgfIoA==}
     peerDependencies:
       solid-js: ^1.0.0
     dependencies:
       solid-js: 1.3.15
-    dev: true
 
   /sort-object-keys/1.1.3:
     resolution: {integrity: sha512-855pvK+VkU7PaKYPc+Jjnmt4EzejQHyhhF33q31qG8x7maDzkeFhAAThdCYay11CISO+qAMwjOBP+fPZe0IPyg==}
