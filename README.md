@@ -37,13 +37,10 @@ Hope UI is a composable and accessible component library that gives you the foun
 - **Themeable**: Use Hope UI's design system or customize it using the theming features.
 - **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
 - **Style props**: All component styles can be overridden or extended via style props like `<Box bg="tomato" padding="24px">Box</Box>`.
-- **Headless-able**: Create your own design system with all the available, unstyled, low level primitives.
 
 ## Project status
 
 > ⚠️ Hope UI is still under development and is not ready for production.
-
-> ⚠️ The `main` branch of the repo will remain unchanged until the end of SolidHack voting (May 2nd).
 
 ## Documentation
 
@@ -53,7 +50,6 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 This project is inspired by :
 
-- [React Spectrum Libraries](https://github.com/adobe/react-spectrum)
 - [Chakra UI](https://chakra-ui.com/)
 - [Mantine](https://mantine.dev/)
 
