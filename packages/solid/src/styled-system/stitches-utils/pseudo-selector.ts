@@ -428,19 +428,19 @@ export const pseudoSelectors = {
   }),
 
   /**
-   * Styles for when `data-theme` is applied to any parent of
+   * Styles for when dark theme is applied to any parent of
    * this component or element.
    */
   _dark: (value: CSS) => ({
-    ".hope-ui-dark &, [data-theme=dark] &, &[data-theme=dark]": value,
+    ".hope-ui-dark &": value,
   }),
 
   /**
-   * Styles for when `data-theme` is applied to any parent of
+   * Styles for when light theme is applied to any parent of
    * this component or element.
    */
   _light: (value: CSS) => ({
-    ".hope-ui-light &, [data-theme=light] &, &[data-theme=light]": value,
+    ".hope-ui-light &": value,
   }),
 };
 

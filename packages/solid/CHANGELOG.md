@@ -1,4 +1,4 @@
-## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.5...v0.5.0) (2022-05-03)
+## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.5...v0.5.0) (2022-05-04)
 
 ### 💥 BREAKING CHANGES
 

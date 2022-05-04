@@ -312,8 +312,8 @@ const pseudoProps: StylePropsTableItem[] = [
   { prop: "_selection", cssProperty: "&::selection" },
   { prop: "_mediaDark", cssProperty: "@media (prefers-color-scheme: dark)" },
   { prop: "_mediaReduceMotion", cssProperty: "@media (prefers-reduced-motion: reduce)" },
-  { prop: "_dark", cssProperty: ".hope-ui-dark &, [data-theme=dark] &, &[data-theme=dark" },
-  { prop: "_light", cssProperty: ".hope-ui-light &, [data-theme=light] &, &[data-theme=light]" },
+  { prop: "_dark", cssProperty: ".hope-ui-dark &" },
+  { prop: "_light", cssProperty: ".hope-ui-light &" },
 ];
 
 const othersProps: StylePropsTableItem[] = [
