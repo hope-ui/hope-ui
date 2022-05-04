@@ -1,7 +1,9 @@
 import { EventKeys } from "./types";
 
 export function isElement(el: any): el is Element {
-  return el != null && typeof el == "object" && "nodeType" in el && el.nodeType === Node.ELEMENT_NODE;
+  return (
+    el != null && typeof el == "object" && "nodeType" in el && el.nodeType === Node.ELEMENT_NODE
+  );
 }
 
 export function isHTMLElement(el: any): el is HTMLElement {
@@ -59,7 +61,9 @@ export function contains(parent: HTMLElement | undefined, child: HTMLElement) {
   return parent === child || parent.contains(child);
 }
 
-export function getRelatedTarget(event: Pick<FocusEvent, "relatedTarget" | "target" | "currentTarget">) {
+export function getRelatedTarget(
+  event: Pick<FocusEvent, "relatedTarget" | "target" | "currentTarget">
+) {
   const target = (event.target ?? event.currentTarget) as HTMLElement;
   const activeElement = getActiveElement(target);
   return (event.relatedTarget ?? activeElement) as HTMLElement;

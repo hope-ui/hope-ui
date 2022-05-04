@@ -9,7 +9,10 @@ import { notificationStyles, NotificationVariants } from "./notification.styles"
 
 type ThemeableNotificationOptions = NotificationVariants;
 
-export type NotificationProps<C extends ElementType = "div"> = HTMLHopeProps<C, NotificationVariants>;
+export type NotificationProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  NotificationVariants
+>;
 
 const hopeNotificationClass = "hope-notification";
 
@@ -60,7 +63,9 @@ export function useNotificationContext() {
   const context = useContext(NotificationContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useNotificationContext must be used within an `<Notification />` component");
+    throw new Error(
+      "[Hope UI]: useNotificationContext must be used within an `<Notification />` component"
+    );
   }
 
   return context;

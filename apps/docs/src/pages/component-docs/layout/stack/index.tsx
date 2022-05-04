@@ -56,11 +56,15 @@ export default function StackDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Stack</PageTitle>
       <Text mb="$5">
-        Stack is a layout component that makes it easy to stack elements together and apply a space between them. It
-        uses CSS <Code>gap</Code> properties to add spacing between its children
+        Stack is a layout component that makes it easy to stack elements together and apply a space
+        between them. It uses CSS <Code>gap</Code> properties to add spacing between its children
       </Text>
       <Alert status="warning" mb="$12">
         <AlertDescription>
@@ -79,20 +83,23 @@ export default function StackDoc() {
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <hope.ul ps="$6" mb="$12">
         <hope.li mb="$2">
-          <strong>Stack:</strong> Used to add spacing between elements in the horizontal or vertical direction. It
-          supports responsive values.
+          <strong>Stack:</strong> Used to add spacing between elements in the horizontal or vertical
+          direction. It supports responsive values.
         </hope.li>
         <hope.li mb="$2">
-          <strong>HStack:</strong> Used to add spacing between elements in horizontal direction, and centers them.
+          <strong>HStack:</strong> Used to add spacing between elements in horizontal direction, and
+          centers them.
         </hope.li>
         <hope.li>
-          <strong>VStack:</strong> Used to add spacing between elements in vertical direction only, and centers them.
+          <strong>VStack:</strong> Used to add spacing between elements in vertical direction only,
+          and centers them.
         </hope.li>
       </hope.ul>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Text mb="$5">
-        To stack elements in horizontal or vertical direction only, use the <Code>HStack</Code> or <Code>VStack</Code>{" "}
-        components. You can also use the <Code>Stack</Code> component as well and pass the <Code>direction</Code> prop.
+        To stack elements in horizontal or vertical direction only, use the <Code>HStack</Code> or{" "}
+        <Code>VStack</Code> components. You can also use the <Code>Stack</Code> component as well
+        and pass the <Code>direction</Code> prop.
       </Text>
       <Preview snippet={snippets.basicUsage} mb="$10">
         <HStack spacing="24px">
@@ -109,8 +116,8 @@ export default function StackDoc() {
       </Preview>
       <SectionSubtitle id="responsive-direction">Responsive direction</SectionSubtitle>
       <Text mb="$5">
-        You can pass responsive values to the <Code>Stack</Code> component to change stack direction and/or spacing
-        between elements.
+        You can pass responsive values to the <Code>Stack</Code> component to change stack direction
+        and/or spacing between elements.
       </Text>
       <Preview snippet={snippets.responsiveDirection} mb="$10">
         <Stack direction={{ "@initial": "column", "@md": "row" }} spacing="24px">
@@ -127,9 +134,10 @@ export default function StackDoc() {
       </Preview>
       <SectionSubtitle id="notes-on-stack-vs-flex">Notes on Stack vs Flex</SectionSubtitle>
       <Text mb="$12">
-        Stack's primary use case is to lay items out and control the spacing between each item. If you have a more
-        complicated use case, such as changing the margin on the last child, you can combine <Code>Stack</Code> and{" "}
-        <Code>Flex</Code> and use <Code>justify-content: space-between</Code> for more control of the layout.
+        Stack's primary use case is to lay items out and control the spacing between each item. If
+        you have a more complicated use case, such as changing the margin on the last child, you can
+        combine <Code>Stack</Code> and <Code>Flex</Code> and use{" "}
+        <Code>justify-content: space-between</Code> for more control of the layout.
       </Text>
       <SectionTitle id="props">Props</SectionTitle>
       <PropsTable items={propItems} />

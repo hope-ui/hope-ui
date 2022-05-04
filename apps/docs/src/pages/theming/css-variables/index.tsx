@@ -28,15 +28,20 @@ export default function CSSVariables() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>CSS variables</PageTitle>
       <Text mb="$5">
-        All Hope UI theme tokens are available as CSS custom properties (aka CSS variables) with the <Code>hope</Code>{" "}
-        prefix.
+        All Hope UI theme tokens are available as CSS custom properties (aka CSS variables) with the{" "}
+        <Code>hope</Code> prefix.
       </Text>
       <Text mb="$5">
-        Let's say you want to change your application <Code>#root</Code> div <Code>background-color</Code> using a color
-        from the Hope UI theme. In a plain CSS file you can do it like this:
+        Let's say you want to change your application <Code>#root</Code> div{" "}
+        <Code>background-color</Code> using a color from the Hope UI theme. In a plain CSS file you
+        can do it like this:
       </Text>
       <CodeSnippet lang="css" snippet={snippets.cssVariables} />
     </PageLayout>

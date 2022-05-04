@@ -76,7 +76,12 @@ export function Breadcrumb<C extends ElementType = "nav">(props: BreadcrumbProps
 
   return (
     <BreadcrumbContext.Provider value={context}>
-      <hope.nav aria-label="breadcrumb" class={rootClasses()} __baseStyle={theme?.baseStyle?.root} {...others}>
+      <hope.nav
+        aria-label="breadcrumb"
+        class={rootClasses()}
+        __baseStyle={theme?.baseStyle?.root}
+        {...others}
+      >
         <hope.ol class={listClasses()} gap={(state as BreadcrumbState).spacing}>
           {local.children}
         </hope.ol>
@@ -91,7 +96,9 @@ export function useBreadcrumbContext() {
   const context = useContext(BreadcrumbContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useBreadcrumbContext must be used within a `<Breadcrumb />` component");
+    throw new Error(
+      "[Hope UI]: useBreadcrumbContext must be used within a `<Breadcrumb />` component"
+    );
   }
 
   return context;

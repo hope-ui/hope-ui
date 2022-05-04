@@ -28,7 +28,15 @@ export function Tbody<C extends ElementType = "tbody">(props: TbodyProps<C>) {
       })
     );
 
-  return <Box as="tbody" role="rowgroup" class={classes()} __baseStyle={theme?.baseStyle?.tbody} {...others} />;
+  return (
+    <Box
+      as="tbody"
+      role="rowgroup"
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.tbody}
+      {...others}
+    />
+  );
 }
 
 Tbody.toString = () => createClassSelector(hopeTbodyClass);

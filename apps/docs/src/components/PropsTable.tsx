@@ -42,7 +42,12 @@ export function PropsTable(props: PropsTableProps) {
                 <Td fontWeight="$medium" maxW="100px" w="20%">
                   Type
                 </Td>
-                <Td fontFamily="$mono" fontSize="$sm" color="$primary11" css={{ wordBreak: "break-word" }}>
+                <Td
+                  fontFamily="$mono"
+                  fontSize="$sm"
+                  color="$primary11"
+                  css={{ wordBreak: "break-word" }}
+                >
                   {item.type}
                 </Td>
               </Tr>

@@ -23,7 +23,11 @@ export function MenuContent<C extends ElementType = "div">(props: MenuContentPro
 
   const menuContext = useMenuContext();
 
-  const [local, others] = splitProps(props as MenuContentProps<"div">, ["ref", "class", "children"]);
+  const [local, others] = splitProps(props as MenuContentProps<"div">, [
+    "ref",
+    "class",
+    "children",
+  ]);
 
   /**
    * Internal state to handle menu content portal `mounted` state.

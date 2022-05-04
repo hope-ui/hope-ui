@@ -3,7 +3,7 @@ import { JSX, splitProps } from "solid-js";
 import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers, callHandler } from "../../utils/function";
+import { callHandler, chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { accordionButtonStyles } from "./accordion.styles";
@@ -46,19 +46,19 @@ export function AccordionButton<C extends ElementType = "button">(props: Accordi
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    callHandler(local.onClick)(event);
+    callHandler(local.onClick, event);
 
     accordionItemContext.toggleExpandedState();
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    callHandler(local.onFocus)(event);
+    callHandler(local.onFocus, event);
 
     accordionItemContext.setFocusedIndex();
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
-    callAllHandlers(local.onKeyDown, accordionItemContext.onButtonKeyDown)(event);
+    chainHandlers(local.onKeyDown, accordionItemContext.onButtonKeyDown)(event);
   };
 
   const classes = () => classNames(local.class, hopeAccordionButtonClass, accordionButtonStyles());

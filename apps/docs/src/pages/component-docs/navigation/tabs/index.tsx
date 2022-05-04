@@ -131,7 +131,8 @@ export default function TabsDoc() {
     },
     {
       name: "onChange",
-      description: "Callback invoked when the tabs index changes (in controlled or un-controlled modes).",
+      description:
+        "Callback invoked when the tabs index changes (in controlled or un-controlled modes).",
       type: "(index: number) => void",
     },
   ];
@@ -159,10 +160,15 @@ export default function TabsDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Tabs</PageTitle>
       <Text mb="$5">
-        An accessible tabs component that provides keyboard interactions and ARIA attributes described in the{" "}
+        An accessible tabs component that provides keyboard interactions and ARIA attributes
+        described in the{" "}
         <Anchor
           href="https://www.w3.org/TR/wai-aria-practices-1.2/#tabpanel"
           external
@@ -183,8 +189,8 @@ export default function TabsDoc() {
           <strong>TabList:</strong> Wrapper for the <Code>Tab</Code> components.
         </ListItem>
         <ListItem>
-          <strong>Tab:</strong> Element that serves as a label for one of the tab panels and can be activated to display
-          that panel.
+          <strong>Tab:</strong> Element that serves as a label for one of the tab panels and can be
+          activated to display that panel.
         </ListItem>
         <ListItem>
           <strong>TabPanel:</strong> Element that contains the content associated with a tab.
@@ -206,9 +212,9 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="colors">Tabs colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Tabs. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Tabs. You can set the value
+        to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>,{" "}
+        <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.colors} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -230,8 +236,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="sizes">Tabs sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Tabs. You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Tabs. You can set the value to{" "}
+        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.sizes} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -253,8 +259,9 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="variants">Tabs variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Tabs. You can set the value to{" "}
-        <Code>underline</Code>, <Code>outline</Code>, <Code>cards</Code> or <Code>pills</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Tabs. You can set the
+        value to <Code>underline</Code>, <Code>outline</Code>, <Code>cards</Code> or{" "}
+        <Code>pills</Code>.
       </Text>
       <Preview snippet={snippets.variants} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -276,8 +283,9 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="aligments">Tabs aligments</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>aligment</Code> prop to change the alignment of the <Code>TabList</Code>. You can set the value to{" "}
-        <Code>start</Code>, <Code>center</Code>, <Code>apart</Code> or <Code>end</Code>.
+        Use the <Code>aligment</Code> prop to change the alignment of the <Code>TabList</Code>. You
+        can set the value to <Code>start</Code>, <Code>center</Code>, <Code>apart</Code> or{" "}
+        <Code>end</Code>.
       </Text>
       <Preview snippet={snippets.aligments} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -299,8 +307,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="orientation">Tabs orientation</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>orientation</Code> prop to change the orientation of the Tabs. You can set the value to{" "}
-        <Code>horizontal</Code> or <Code>vertical</Code>.
+        Use the <Code>orientation</Code> prop to change the orientation of the Tabs. You can set the
+        value to <Code>horizontal</Code> or <Code>vertical</Code>.
       </Text>
       <Preview snippet={snippets.orientation} mb="$10">
         <Tabs orientation="vertical">
@@ -332,8 +340,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="disabled-tab">Disabled tab</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>disabled</Code> prop to disabled a <Code>Tab</Code>. When a <Code>Tab</Code> is disabled, it is
-        skipped during keyboard navigation and it is not clickable.
+        Use the <Code>disabled</Code> prop to disabled a <Code>Tab</Code>. When a <Code>Tab</Code>{" "}
+        is disabled, it is skipped during keyboard navigation and it is not clickable.
       </Text>
       <Preview snippet={snippets.disabled} mb="$10">
         <Tabs>
@@ -349,7 +357,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="initial-active-tab">Make a tab initially active</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>defaultIndex</Code> prop to set a <Code>Tab</Code> initially active. Indexes start at 0.
+        Use the <Code>defaultIndex</Code> prop to set a <Code>Tab</Code> initially active. Indexes
+        start at 0.
       </Text>
       <Preview snippet={snippets.initialActive} mb="$10">
         <Tabs defaultIndex={1}>
@@ -365,8 +374,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="keep-alive">Keeping tab panels alive</SectionSubtitle>
       <Text mb="$5">
-        By default, when you switch between tabs the state of the tab panels are lost, use the <Code>keepAlive</Code>{" "}
-        prop to keep tab panels alive even when there's not visible.
+        By default, when you switch between tabs the state of the tab panels are lost, use the{" "}
+        <Code>keepAlive</Code> prop to keep tab panels alive even when there's not visible.
       </Text>
       <Preview snippet={snippets.keepAlive} mb="$10">
         <VStack alignItems="stretch" spacing="$4">
@@ -398,7 +407,8 @@ export default function TabsDoc() {
       </Preview>
       <SectionSubtitle id="controlled-tabs">Controlled tabs</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>index</Code> and <Code>onChange</Code> props to control the <Code>Tabs</Code> like form inputs.
+        Use the <Code>index</Code> and <Code>onChange</Code> props to control the <Code>Tabs</Code>{" "}
+        like form inputs.
       </Text>
       <Preview snippet={snippets.controlled} mb="$12">
         <input type="range" min="0" max="2" value={tabIndex()} onInput={handleSliderChange} />
@@ -426,8 +436,8 @@ export default function TabsDoc() {
           <Code>TabList</Code> as <Code>role</Code> set to <Code>tablist</Code>.
         </ListItem>
         <ListItem>
-          <Code>TabList</Code> as <Code>aria-orientation</Code> set to <Code>horizontal</Code> or <Code>vertical</Code>{" "}
-          based on the value of the <Code>orientation</Code> prop.
+          <Code>TabList</Code> as <Code>aria-orientation</Code> set to <Code>horizontal</Code> or{" "}
+          <Code>vertical</Code> based on the value of the <Code>orientation</Code> prop.
         </ListItem>
         <ListItem>
           <Code>Tab</Code> as <Code>role</Code> set to <Code>tab</Code>.
@@ -436,15 +446,15 @@ export default function TabsDoc() {
           <Code>Tab</Code> as <Code>aria-selected</Code> set to <Code>true</Code> when its selected.
         </ListItem>
         <ListItem>
-          <Code>Tab</Code> as <Code>aria-controls</Code> set to the <Code>id</Code> of its associated{" "}
-          <Code>TabPanel</Code>.
+          <Code>Tab</Code> as <Code>aria-controls</Code> set to the <Code>id</Code> of its
+          associated <Code>TabPanel</Code>.
         </ListItem>
         <ListItem>
           <Code>TabPanel</Code> as <Code>role</Code> set to <Code>tabpanel</Code>.
         </ListItem>
         <ListItem>
-          <Code>TabPanel</Code> as <Code>aria-labelledby</Code> set to the <Code>id</Code> of the <Code>Tab</Code> that
-          labels it.
+          <Code>TabPanel</Code> as <Code>aria-labelledby</Code> set to the <Code>id</Code> of the{" "}
+          <Code>Tab</Code> that labels it.
         </ListItem>
       </UnorderedList>
       <SectionSubtitle>Keyboard support</SectionSubtitle>
@@ -473,7 +483,8 @@ export default function TabsDoc() {
       </UnorderedList>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Tabs</Code> base styles and default props can be overridden in the Hope UI theme configuration like below:
+        <Code>Tabs</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
@@ -484,7 +495,13 @@ export default function TabsDoc() {
       <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
       <Text>
         <Code>TabList</Code>, <Code>TabPanels</Code> and <Code>TabPanel</Code> composes{" "}
-        <Anchor as={Link} href="/docs/layout/box" external color="$primary11" fontWeight="$semibold">
+        <Anchor
+          as={Link}
+          href="/docs/layout/box"
+          external
+          color="$primary11"
+          fontWeight="$semibold"
+        >
           Box
         </Anchor>
         .

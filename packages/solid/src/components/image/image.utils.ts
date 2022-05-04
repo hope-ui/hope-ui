@@ -116,13 +116,13 @@ export function createImageLoadingStatus(props: CreateImageLoadingStatusProps) {
     img.onload = event => {
       flush();
       setStatusState("loaded");
-      callHandler(props.onLoad)(event as unknown as ImageEvent);
+      callHandler(props.onLoad, event as unknown as ImageEvent);
     };
 
     img.onerror = error => {
       flush();
       setStatusState("failed");
-      callHandler(props.onError)(error as any);
+      callHandler(props.onError, error as any);
     };
 
     imageRef = img;

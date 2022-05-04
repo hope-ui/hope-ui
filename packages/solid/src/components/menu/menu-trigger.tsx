@@ -3,7 +3,7 @@ import { JSX, splitProps } from "solid-js";
 import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers } from "../../utils/function";
+import { chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
@@ -41,15 +41,15 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    callAllHandlers(menuContext.onTriggerClick, local.onClick)(event);
+    chainHandlers(menuContext.onTriggerClick, local.onClick)(event);
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
-    callAllHandlers(menuContext.onTriggerKeyDown, local.onKeyDown)(event);
+    chainHandlers(menuContext.onTriggerKeyDown, local.onKeyDown)(event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
-    callAllHandlers(menuContext.onTriggerBlur, local.onBlur)(event);
+    chainHandlers(menuContext.onTriggerBlur, local.onBlur)(event);
   };
 
   const classes = () => classNames(local.class, hopeMenuTriggerClass, menuTriggerStyles());

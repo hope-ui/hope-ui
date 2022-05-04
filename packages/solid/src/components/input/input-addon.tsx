@@ -12,7 +12,11 @@ export type InputAddonProps<C extends ElementType = "div"> = HTMLHopeProps<C, In
 export function InputAddon<C extends ElementType = "div">(props: InputAddonProps<C>) {
   const theme = useStyleConfig().Input;
 
-  const [local, variantProps, others] = splitProps(props, ["class"], ["placement", "variant", "size"]);
+  const [local, variantProps, others] = splitProps(
+    props,
+    ["class"],
+    ["placement", "variant", "size"]
+  );
 
   const classes = () => classNames(local.class, inputAddonStyles(variantProps));
 

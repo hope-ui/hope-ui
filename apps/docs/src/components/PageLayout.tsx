@@ -18,7 +18,12 @@ type PageLayoutProps = HTMLHopeProps<
 >;
 
 export default function PageLayout(props: PageLayoutProps) {
-  const [local, others] = splitProps(props, ["children", "previousLink", "nextLink", "contextualNavLinks"]);
+  const [local, others] = splitProps(props, [
+    "children",
+    "previousLink",
+    "nextLink",
+    "contextualNavLinks",
+  ]);
 
   return (
     <Flex h="$full" {...others}>

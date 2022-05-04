@@ -25,7 +25,15 @@ export const parameters = {
   decorators,
   options: {
     storySort: {
-      order: ["General", "Layout", "Data entry", "Data display", "Navigation", "Feedback", "Overlay"],
+      order: [
+        "General",
+        "Layout",
+        "Data entry",
+        "Data display",
+        "Navigation",
+        "Feedback",
+        "Overlay",
+      ],
     },
   },
   darkMode: {

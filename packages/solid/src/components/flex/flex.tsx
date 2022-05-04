@@ -24,7 +24,15 @@ export function Flex<C extends ElementType = "div">(props: FlexProps<C>) {
 
   const classes = () => classNames(local.class, hopeFlexClass);
 
-  return <Box class={classes()} display="flex" flexDirection={local.direction} flexWrap={local.wrap} {...others} />;
+  return (
+    <Box
+      class={classes()}
+      display="flex"
+      flexDirection={local.direction}
+      flexWrap={local.wrap}
+      {...others}
+    />
+  );
 }
 
 Flex.toString = () => createClassSelector(hopeFlexClass);

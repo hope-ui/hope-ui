@@ -1,6 +1,11 @@
 import { splitProps } from "solid-js";
 
-import { SelectOption, SelectOptionIndicator, SelectOptionProps, SelectOptionText } from "../select";
+import {
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionProps,
+  SelectOptionText,
+} from "../select";
 import { ElementType } from "../types";
 
 /**

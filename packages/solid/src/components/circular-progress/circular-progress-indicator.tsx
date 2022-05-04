@@ -6,7 +6,10 @@ import { classNames, createClassSelector } from "../../utils/css";
 import { hope } from "../factory";
 import { HTMLHopeProps } from "../types";
 import { useCircularProgressContext } from "./circular-progress";
-import { circularProgressIndicatorContainerStyles, circularProgressIndicatorStyles } from "./circular-progress.styles";
+import {
+  circularProgressIndicatorContainerStyles,
+  circularProgressIndicatorStyles,
+} from "./circular-progress.styles";
 
 export interface ThemeableCircularProgressIndicatorOptions {
   /**
@@ -43,7 +46,12 @@ export function CircularProgressIndicator(props: CircularProgressIndicatorProps)
 
   const propsWithDefault: CircularProgressIndicatorProps = mergeProps(defaultProps, props);
 
-  const [local, others] = splitProps(propsWithDefault, ["class", "children", "color", "withRoundCaps"]);
+  const [local, others] = splitProps(propsWithDefault, [
+    "class",
+    "children",
+    "color",
+    "withRoundCaps",
+  ]);
 
   const strokeDasharray = () => {
     if (circularProgressContext.state.indeterminate) {
@@ -59,7 +67,9 @@ export function CircularProgressIndicator(props: CircularProgressIndicatorProps)
     return classNames(
       local.class,
       hopeCircularProgressIndicatorClass,
-      circularProgressIndicatorContainerStyles({ spin: circularProgressContext.state.indeterminate })
+      circularProgressIndicatorContainerStyles({
+        spin: circularProgressContext.state.indeterminate,
+      })
     );
   };
 
@@ -77,8 +87,19 @@ export function CircularProgressIndicator(props: CircularProgressIndicatorProps)
   };
 
   return (
-    <hope.svg viewBox="0 0 100 100" class={rootClasses()} boxSize={circularProgressContext.state.size} {...others}>
-      <hope.circle cx={50} cy={50} r={42} class={indicatorClasses()} __baseStyle={theme?.baseStyle?.indicator} />
+    <hope.svg
+      viewBox="0 0 100 100"
+      class={rootClasses()}
+      boxSize={circularProgressContext.state.size}
+      {...others}
+    >
+      <hope.circle
+        cx={50}
+        cy={50}
+        r={42}
+        class={indicatorClasses()}
+        __baseStyle={theme?.baseStyle?.indicator}
+      />
     </hope.svg>
   );
 }

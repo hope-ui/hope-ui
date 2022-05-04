@@ -27,7 +27,12 @@ export function BreadcrumbItem<C extends ElementType = "li">(props: BreadcrumbIt
   };
 
   return (
-    <hope.li class={classes()} __baseStyle={theme?.baseStyle?.item} gap={breadcrumbContext.state.spacing} {...others} />
+    <hope.li
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.item}
+      gap={breadcrumbContext.state.spacing}
+      {...others}
+    />
   );
 }
 

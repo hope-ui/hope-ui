@@ -42,7 +42,9 @@ export function SelectIcon<C extends ElementType = "svg">(props: SelectIconProps
     );
   };
 
-  return <IconSelector aria-hidden class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />;
+  return (
+    <IconSelector aria-hidden class={classes()} __baseStyle={theme?.baseStyle?.icon} {...others} />
+  );
 }
 
 SelectIcon.toString = () => createClassSelector(hopeSelectIconClass);

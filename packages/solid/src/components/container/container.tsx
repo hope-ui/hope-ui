@@ -22,7 +22,11 @@ export function Container<C extends ElementType = "div">(props: ContainerProps<C
   };
 
   const propsWithDefault: ContainerProps<"div"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["centered", "centerContent"]);
+  const [local, variantProps, others] = splitProps(
+    propsWithDefault,
+    ["class"],
+    ["centered", "centerContent"]
+  );
 
   const classes = () => classNames(local.class, hopeContainerClass, containerStyles(variantProps));
 

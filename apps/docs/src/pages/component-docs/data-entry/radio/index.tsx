@@ -1,19 +1,6 @@
-import {
-  Anchor,
-  Center,
-  HStack,
-  ListItem,
-  Radio,
-  RadioControl,
-  RadioGroup,
-  RadioLabel,
-  Text,
-  UnorderedList,
-  VStack,
-} from "@hope-ui/solid";
+import { HStack, ListItem, Radio, RadioGroup, Text, UnorderedList } from "@hope-ui/solid";
 import Prism from "prismjs";
-import { Link } from "solid-app-router";
-import { For, onMount, Show } from "solid-js";
+import { onMount } from "solid-js";
 
 import Code from "@/components/Code";
 import CodeSnippet from "@/components/CodeSnippet";
@@ -24,7 +11,6 @@ import { Preview } from "@/components/Preview";
 import { PropsTable, PropsTableItem } from "@/components/PropsTable";
 import SectionSubtitle from "@/components/SectionSubtitle";
 import SectionTitle from "@/components/SectionTitle";
-import { IconCheck } from "@/icons/IconCheck";
 
 import { snippets } from "./snippets";
 
@@ -69,15 +55,14 @@ export default function RadioDoc() {
     { href: "#colors", label: "Radio colors", indent: true },
     { href: "#sizes", label: "Radio sizes", indent: true },
     { href: "#variants", label: "Radio variants", indent: true },
+    { href: "#label-placement", label: "Radio label placement", indent: true },
     { href: "#disabled", label: "Disabled state", indent: true },
     { href: "#invalid", label: "Invalid state", indent: true },
     { href: "#name-prop", label: "Note about `name` prop", indent: true },
-    { href: "#composition", label: "Composition" },
     { href: "#theming", label: "Theming" },
     { href: "#props", label: "Props" },
     { href: "#radio-props", label: "Radio props", indent: true },
     { href: "#radio-group-props", label: "RadioGroup props", indent: true },
-    { href: "#other-components-props", label: "Other components props", indent: true },
   ];
 
   const radioPropItems: PropsTableItem[] = [
@@ -98,6 +83,12 @@ export default function RadioDoc() {
       description: "The size of the radio.",
       type: '"sm" | "md" | "lg"',
       defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the radio label.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
     },
     {
       name: "name",
@@ -123,7 +114,8 @@ export default function RadioDoc() {
     },
     {
       name: "required",
-      description: "If `true`, the radio is marked as required, and `required` attribute will be added",
+      description:
+        "If `true`, the radio is marked as required, and `required` attribute will be added",
       type: "boolean",
     },
     {
@@ -143,7 +135,8 @@ export default function RadioDoc() {
     },
     {
       name: "children",
-      description: "The children of the radio. If used as a render props, the `checked` state will be passed.",
+      description:
+        "The children of the radio. If used as a render props, the `checked` state will be passed.",
       type: "JSX.Element | (props: { checked: boolean }) => JSX.Element",
     },
     {
@@ -181,6 +174,12 @@ export default function RadioDoc() {
       description: "The size of the radios.",
       type: '"sm" | "md" | "lg"',
       defaultValue: '"md"',
+    },
+    {
+      name: "labelPlacement",
+      description: "The placement of the radios labels.",
+      type: '"start" | "end"',
+      defaultValue: '"end"',
     },
     {
       name: "name",
@@ -230,114 +229,93 @@ export default function RadioDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Radio</PageTitle>
-      <Text mb="$5">Radios are used when only one choice may be selected in a series of options.</Text>
+      <Text mb="$5">
+        Radios are used when only one choice may be selected in a series of options.
+      </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>Radio:</strong> Provides context for all its children. It renders a <Code>label</Code> and a visualy
-          hidden <Code>input</Code> with type set to <Code>radio</Code>.
+          <strong>Radio:</strong> Provides context for all its children. It renders a{" "}
+          <Code>label</Code> and a visualy hidden <Code>input</Code> with type set to{" "}
+          <Code>radio</Code>.
         </ListItem>
         <ListItem>
-          <strong>RadioControl:</strong> The component that visualy represents a radio. It's not visible by screen
-          readers.
-        </ListItem>
-        <ListItem>
-          <strong>RadioLabel:</strong> The label of the radio.
-        </ListItem>
-        <ListItem>
-          <strong>RadioGroup:</strong> Component to help manage the checked state of its children <Code>Radio</Code>{" "}
-          components and conveniently pass a few shared style props to each.
+          <strong>RadioGroup:</strong> Component to help manage the checked state of its children{" "}
+          <Code>Radio</Code> components and conveniently pass a few shared style props to each.
         </ListItem>
       </UnorderedList>
       <SectionTitle id="usage">Usage</SectionTitle>
       <Preview snippet={snippets.basicUsage} mb="$12">
         <RadioGroup defaultValue="1">
           <HStack spacing="$4">
-            <Radio value="1">
-              <RadioControl />
-              <RadioLabel>First</RadioLabel>
-            </Radio>
-            <Radio value="2">
-              <RadioControl />
-              <RadioLabel>Second</RadioLabel>
-            </Radio>
-            <Radio value="3">
-              <RadioControl />
-              <RadioLabel>Third</RadioLabel>
-            </Radio>
+            <Radio value="1">First</Radio>
+            <Radio value="2">Second</Radio>
+            <Radio value="3">Third</Radio>
           </HStack>
         </RadioGroup>
       </Preview>
       <SectionSubtitle id="colors">Radio colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Radio. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Radio. You can set the
+        value to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>,{" "}
+        <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.radioColors} mb="$10">
         <HStack spacing="$4">
-          <Radio defaultChecked colorScheme="primary">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="accent">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="neutral">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="success">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="info">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="warning">
-            <RadioControl />
-          </Radio>
-          <Radio defaultChecked colorScheme="danger">
-            <RadioControl />
-          </Radio>
+          <Radio defaultChecked colorScheme="primary" />
+          <Radio defaultChecked colorScheme="accent" />
+          <Radio defaultChecked colorScheme="neutral" />
+          <Radio defaultChecked colorScheme="success" />
+          <Radio defaultChecked colorScheme="info" />
+          <Radio defaultChecked colorScheme="warning" />
+          <Radio defaultChecked colorScheme="danger" />
         </HStack>
       </Preview>
       <SectionSubtitle id="sizes">Radio sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Radio. You can set the value to <Code>sm</Code>,{" "}
-        <Code>md</Code> or <Code>lg</Code>.
+        Use the <Code>size</Code> prop to change the size of the Radio. You can set the value to{" "}
+        <Code>sm</Code>, <Code>md</Code> or <Code>lg</Code>.
       </Text>
       <Preview snippet={snippets.radioSizes} mb="$10">
         <HStack spacing="$4">
           <Radio defaultChecked size="sm">
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
           <Radio defaultChecked size="md">
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
           <Radio defaultChecked size="lg">
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
         </HStack>
       </Preview>
       <SectionSubtitle id="variants">Radio variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Radio. You can set the value to{" "}
-        <Code>outline</Code> or <Code>filled</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Radio. You can set the
+        value to <Code>outline</Code> or <Code>filled</Code>.
       </Text>
       <Preview snippet={snippets.radioVariants} mb="$10">
         <HStack spacing="$4">
-          <Radio variant="outline">
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
-          </Radio>
-          <Radio variant="filled">
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
-          </Radio>
+          <Radio variant="outline">Radio</Radio>
+          <Radio variant="filled">Radio</Radio>
+        </HStack>
+      </Preview>
+      <SectionSubtitle id="label-placement">Radio label placement</SectionSubtitle>
+      <Text mb="$5">
+        Use the <Code>labelPlacement</Code> prop to change the placement of the label. You can set
+        the value to <Code>start</Code> or <Code>end</Code>.
+      </Text>
+      <Preview snippet={snippets.radioLabelPlacement} mb="$10">
+        <HStack spacing="$4">
+          <Radio labelPlacement="start">Radio</Radio>
+          <Radio labelPlacement="end">Radio</Radio>
         </HStack>
       </Preview>
       <SectionSubtitle id="disabled">Disabled state</SectionSubtitle>
@@ -346,17 +324,12 @@ export default function RadioDoc() {
       </Text>
       <Preview snippet={snippets.radioDisabled} mb="$10">
         <HStack spacing="$4">
-          <Radio disabled>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
-          </Radio>
+          <Radio disabled>Radio</Radio>
           <Radio variant="filled" disabled>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
           <Radio defaultChecked disabled>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
         </HStack>
       </Preview>
@@ -366,17 +339,12 @@ export default function RadioDoc() {
       </Text>
       <Preview snippet={snippets.radioInvalid} mb="$10">
         <HStack spacing="$4">
-          <Radio invalid>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
-          </Radio>
+          <Radio invalid>Radio</Radio>
           <Radio variant="filled" invalid>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
           <Radio defaultChecked invalid>
-            <RadioControl />
-            <RadioLabel>Radio</RadioLabel>
+            Radio
           </Radio>
         </HStack>
       </Preview>
@@ -384,89 +352,22 @@ export default function RadioDoc() {
         Note about <Code>name</Code> prop
       </SectionSubtitle>
       <Text mb="$5">
-        We recommend passing the <Code>name</Code> prop to the <Code>RadioGroup</Code> component, instead of passing it
-        to each <Code>Radio</Code> component. By default, the <Code>name</Code> prop of the <Code>RadioGroup</Code>{" "}
-        takes precedence.
+        We recommend passing the <Code>name</Code> prop to the <Code>RadioGroup</Code> component,
+        instead of passing it to each <Code>Radio</Code> component. By default, the{" "}
+        <Code>name</Code> prop of the <Code>RadioGroup</Code> takes precedence.
       </Text>
       <CodeSnippet snippet={snippets.nameProp} mb="$12" />
-      <SectionTitle id="composition">Composition</SectionTitle>
-      <Text mb="$5">
-        <Code>Radio</Code> is made up of several components that you can customize to achieve your desired design.
-      </Text>
-      <Preview snippet={snippets.composition} mb="$12">
-        <RadioGroup defaultValue={plans[0].id}>
-          <VStack spacing="$4">
-            <For each={plans}>
-              {plan => (
-                <Radio
-                  value={plan.id}
-                  rounded="$md"
-                  border="1px solid $neutral7"
-                  shadow="$sm"
-                  bg="$loContrast"
-                  px="$4"
-                  py="$3"
-                  w="$full"
-                  _focus={{
-                    borderColor: "$info7",
-                    shadow: "0 0 0 3px $colors$info5",
-                  }}
-                  _checked={{
-                    borderColor: "transparent",
-                    bg: "#0c4a6e",
-                    color: "white",
-                  }}
-                >
-                  {({ checked }) => (
-                    <HStack justifyContent="space-between" w="$full">
-                      <RadioLabel>
-                        <VStack alignItems="flex-start">
-                          <Text size="sm" fontWeight="$semibold">
-                            {plan.name}
-                          </Text>
-                          <Text
-                            size="sm"
-                            color="$neutral11"
-                            _groupChecked={{
-                              color: "$whiteAlpha12",
-                            }}
-                          >
-                            {plan.ram}/{plan.cpus} - {plan.disk}
-                          </Text>
-                        </VStack>
-                      </RadioLabel>
-                      <Show when={checked}>
-                        <Center rounded="$full" bg="$whiteAlpha7" p="$1">
-                          <IconCheck boxSize="$6" />
-                        </Center>
-                      </Show>
-                    </HStack>
-                  )}
-                </Radio>
-              )}
-            </For>
-          </VStack>
-        </RadioGroup>
-      </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Radio</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Radio</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
       <SectionSubtitle id="radio-props">Radio props</SectionSubtitle>
       <PropsTable items={radioPropItems} mb="$10" />
       <SectionSubtitle id="radio-group-props">RadioGroup props</SectionSubtitle>
-      <PropsTable items={radioGroupPropItems} mb="$10" />
-      <SectionSubtitle id="other-components-props">Other components props</SectionSubtitle>
-      <Text>
-        <Code>RadioControl</Code> and <Code>RadioLabel</Code> composes{" "}
-        <Anchor as={Link} href="/docs/layout/box" color="$primary11" fontWeight="$semibold">
-          Box
-        </Anchor>
-        .
-      </Text>
+      <PropsTable items={radioGroupPropItems} />
     </PageLayout>
   );
 }

@@ -65,18 +65,18 @@ export function getDefaultColorMode(fallbackValue: ColorMode): ColorMode {
 }
 
 /**
- * Function to add/remove class from `document.body` based on color mode.
+ * Returns the theme class to apply based on color mode.
+ */
+export function getColorModeClassName(isDark: boolean) {
+  return isDark ? colorModeClassNames.dark : colorModeClassNames.light;
+}
+
+/**
+ * Toggle the theme class from `document.body` based on color mode.
  */
 export function syncBodyColorModeClassName(isDark: boolean) {
   const body = isServer ? mockBody : document.body;
 
-  body.classList.add(isDark ? colorModeClassNames.dark : colorModeClassNames.light);
+  body.classList.add(getColorModeClassName(isDark));
   body.classList.remove(isDark ? colorModeClassNames.light : colorModeClassNames.dark);
-}
-
-/**
- * Function to set `document` [data-theme] attribute based on color mode.
- */
-export function setDocumentColorModeDataTheme(colorMode: ColorMode) {
-  document.documentElement.setAttribute("data-theme", colorMode);
 }

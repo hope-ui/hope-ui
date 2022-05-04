@@ -14,7 +14,11 @@ export const notificationTransitionName = {
   slideInLeft: "hope-notification-slide-in-left-transition",
 };
 
-function createNotificationSlideTransition(config: { name: string; enterTransform: string; leaveTransform: string }) {
+function createNotificationSlideTransition(config: {
+  name: string;
+  enterTransform: string;
+  leaveTransform: string;
+}) {
   return {
     [`.${config.name}-enter, .${config.name}-exit-to`]: {
       opacity: 0,

@@ -19,7 +19,10 @@ export interface ThemeableCloseButtonOptions extends CloseButtonVariants {
   icon?: JSX.Element;
 }
 
-export type CloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ThemeableCloseButtonOptions>;
+export type CloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<
+  C,
+  ThemeableCloseButtonOptions
+>;
 
 export type CloseButtonStyleConfig = SinglePartComponentStyleConfig<ThemeableCloseButtonOptions>;
 

@@ -79,7 +79,9 @@ describe("AlertIcon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithAlertContext(() => <AlertIcon data-testid="alert-icon" classList={{ [stubClass]: true }} />);
+    renderWithAlertContext(() => (
+      <AlertIcon data-testid="alert-icon" classList={{ [stubClass]: true }} />
+    ));
     const alertIcon = screen.getByTestId("alert-icon");
 
     // assert

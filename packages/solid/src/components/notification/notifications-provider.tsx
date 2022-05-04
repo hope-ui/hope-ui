@@ -1,4 +1,13 @@
-import { Accessor, createMemo, createUniqueId, For, JSX, onCleanup, onMount, splitProps } from "solid-js";
+import {
+  Accessor,
+  createMemo,
+  createUniqueId,
+  For,
+  JSX,
+  onCleanup,
+  onMount,
+  splitProps,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 import { TransitionGroup } from "solid-transition-group";
 
@@ -7,10 +16,17 @@ import { PositionProps } from "../../styled-system/props/position";
 import { classNames } from "../../utils/css";
 import { Box } from "../box/box";
 import { NOTIFICATIONS_EVENTS } from "./notification.events";
-import { notificationListStyles, NotificationListVariants, notificationTransitionName } from "./notification.styles";
+import {
+  notificationListStyles,
+  NotificationListVariants,
+  notificationTransitionName,
+} from "./notification.styles";
 import { NotificationConfig, ShowNotificationProps } from "./notification.types";
 import { NotificationContainer } from "./notification-container";
-import { NotificationsProviderContext, NotificationsProviderContextValue } from "./notifications-provider.context";
+import {
+  NotificationsProviderContext,
+  NotificationsProviderContextValue,
+} from "./notifications-provider.context";
 
 interface NotificationsProviderProps extends NotificationListVariants {
   /**
@@ -53,7 +69,15 @@ const DEFAULT_NOTIFICATION_DURATION = 5_000;
  * Context provider for the notification system.
  */
 export function NotificationsProvider(props: NotificationsProviderProps) {
-  const [local] = splitProps(props, ["children", "placement", "duration", "persistent", "closable", "limit", "zIndex"]);
+  const [local] = splitProps(props, [
+    "children",
+    "placement",
+    "duration",
+    "persistent",
+    "closable",
+    "limit",
+    "zIndex",
+  ]);
 
   const notificationQueue = createMemo(() => {
     return createQueue<NotificationConfig>({
@@ -62,7 +86,8 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
     });
   });
 
-  const finalPlacement: Accessor<NotificationsProviderProps["placement"]> = () => local.placement ?? "top-end";
+  const finalPlacement: Accessor<NotificationsProviderProps["placement"]> = () =>
+    local.placement ?? "top-end";
 
   const notificationsAccessor = () => notificationQueue().state.current;
 
@@ -79,7 +104,13 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
         return notifications;
       }
 
-      const newNotification: NotificationConfig = { ...notification, id, persistent, duration, closable };
+      const newNotification: NotificationConfig = {
+        ...notification,
+        id,
+        persistent,
+        duration,
+        closable,
+      };
 
       return [...notifications, newNotification];
     });
@@ -182,7 +213,9 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
       <Portal>
         <Box class={classes()} zIndex={local.zIndex}>
           <TransitionGroup name={transitionName()}>
-            <For each={context.notifications()}>{notification => <NotificationContainer {...notification} />}</For>
+            <For each={context.notifications()}>
+              {notification => <NotificationContainer {...notification} />}
+            </For>
           </TransitionGroup>
         </Box>
       </Portal>

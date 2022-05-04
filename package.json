@@ -1,17 +1,7 @@
 {
-  "name": "hope-ui",
-  "private": false,
+  "name": "hope-ui-monorepo",
+  "private": true,
   "description": "The SolidJS component library you've hoped for.",
-  "keywords": [
-    "solidhack",
-    "best_ecosystem",
-    "solid",
-    "solidjs",
-    "ui",
-    "framework",
-    "frontend",
-    "components"
-  ],
   "homepage": "https://hope-ui.com",
   "bugs": {
     "url": "https://github.com/fabien-ml/hope-ui/issues"
@@ -22,30 +12,22 @@
   },
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
-  "contributors": [
-    {
-      "name": "Fabien MARIE-LOUISE",
-      "email": "fabienml.dev@gmail.com"
-    }
-  ],
   "workspaces": [
-    "./apps/*",
-    "./packages/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
-    "build": "pnpm --filter @hope-ui/solid build",
-    "build:docs": "pnpm --filter @hope-ui/docs build",
+    "build": "turbo run build",
+    "changeset": "changeset",
+    "clean": "turbo run clean && rm -rf node_modules",
     "commit": "git-cz",
-    "dev:docs": "pnpm --filter @hope-ui/docs dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "prepare": "husky install",
-    "publish": "pnpm --filter @hope-ui/solid publish",
-    "publish:next": "pnpm --filter @hope-ui/solid publish --tag next",
-    "storybook": "pnpm --filter @hope-ui/solid storybook",
-    "test": "pnpm --filter @hope-ui/solid test",
-    "test:watch": "pnpm --filter @hope-ui/solid test:watch",
-    "typecheck": "pnpm --filter @hope-ui/* typecheck"
+    "release": "turbo run build && changeset publish",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "version-packages": "changeset version"
   },
   "lint-staged": {
     "*.{md,json}": [
@@ -64,11 +46,13 @@
   },
   "devDependencies": {
     "@babel/core": "7.17.9",
+    "@babel/preset-env": "7.16.11",
     "@babel/preset-typescript": "7.16.7",
+    "@changesets/cli": "2.22.0",
     "@commitlint/cli": "16.2.3",
     "@commitlint/config-conventional": "16.2.1",
     "@commitlint/cz-commitlint": "16.2.3",
-    "@stitches/core": "1.2.7",
+    "@stitches/core": "1.2.8",
     "@storybook/addon-a11y": "6.4.20",
     "@storybook/addon-actions": "6.4.20",
     "@storybook/addon-essentials": "6.4.20",
@@ -89,7 +73,7 @@
     "@types/node": "17.0.23",
     "@types/prismjs": "1.26.0",
     "@types/scroll-lock": "2.1.0",
-    "@types/testing-library__jest-dom": "^5.14.3",
+    "@types/testing-library__jest-dom": "5.14.3",
     "@typescript-eslint/eslint-plugin": "5.18.0",
     "@typescript-eslint/parser": "5.18.0",
     "babel-loader": "8.2.4",
@@ -111,18 +95,18 @@
     "prismjs": "1.27.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "solid-js": "1.3.14",
+    "solid-js": "1.3.15",
     "solid-testing-library": "0.3.0",
     "solid-transition-group": "0.0.10",
     "sort-package-json": "1.55.0",
     "storybook-dark-mode": "1.0.9",
     "ts-jest": "27.1.4",
+    "turbo": "1.2.4",
     "typescript": "4.6.3",
     "vite": "2.9.1",
-    "vite-plugin-dts": "^1.0.5",
+    "vite-plugin-dts": "1.0.5",
     "vite-plugin-prismjs": "0.0.8",
     "vite-plugin-solid": "2.2.6",
     "webpack": "5.72.0"
-  },
-  "info": "Hope UI is a composable and accessible component library for SolidJS with a style props API, theming, dark mode and following WAI ARIA 1.2 design patterns"
+  }
 }

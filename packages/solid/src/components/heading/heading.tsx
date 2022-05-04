@@ -37,7 +37,8 @@ export function Heading<C extends ElementType = "h2">(props: HeadingProps<C>) {
   const propsWithDefault: HeadingProps<"h2"> = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefault, ["class", "as", "level", "size"]);
 
-  const classes = () => classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
+  const classes = () =>
+    classNames(local.class, hopeHeadingClass, headingStyles({ size: local.size }));
 
   // create an `h` tag with the level or return the `as` prop
   const asProp = () => (local.level ? (`h${local.level}` as ElementType) : local.as);

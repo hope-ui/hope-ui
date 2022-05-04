@@ -15,7 +15,8 @@ export function AlertDescription<C extends ElementType = "div">(props: AlertDesc
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, hopeAlertDescriptionClass, alertDescriptionStyles());
+  const classes = () =>
+    classNames(local.class, hopeAlertDescriptionClass, alertDescriptionStyles());
 
   return <Box class={classes()} __baseStyle={theme?.baseStyle?.description} {...others} />;
 }

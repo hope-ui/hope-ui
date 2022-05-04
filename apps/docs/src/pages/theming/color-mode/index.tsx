@@ -1,4 +1,12 @@
-import { Alert, AlertDescription, Box, Button, Text, useColorMode, useColorModeValue } from "@hope-ui/solid";
+import {
+  Alert,
+  AlertDescription,
+  Box,
+  Button,
+  Text,
+  useColorMode,
+  useColorModeValue,
+} from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -40,30 +48,36 @@ export default function ColorMode() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Color mode</PageTitle>
       <Text mb="$5">
-        Hope UI comes with built-in support for managing color mode in your applications. All Hope UI components are
-        color-mode aware.
+        Hope UI comes with built-in support for managing color mode in your applications. All Hope
+        UI components are color-mode aware.
       </Text>
       <Alert status="info" mb="$12">
         <AlertDescription>
-          Hope UI stores the color mode in <Code>localStorage</Code> and appends a className to the <Code>body</Code> to
-          ensure the color mode is persistent.
+          Hope UI stores the color mode in <Code>localStorage</Code> and appends a className to the{" "}
+          <Code>body</Code> to ensure the color mode is persistent.
         </AlertDescription>
       </Alert>
       <SectionTitle id="initial-color-mode">Initial color mode</SectionTitle>
       <Text mb="$5">
-        The default color mode used by Hope UI is <Code>light</Code>. To set the initial color mode your application
-        should start with, create a theme config, set the <Code>initialColorMode</Code> to either <Code>light</Code>,{" "}
-        <Code>dark</Code> or <Code>system</Code> and pass the config to the HopeProvider.
+        The default color mode used by Hope UI is <Code>light</Code>. To set the initial color mode
+        your application should start with, create a theme config, set the{" "}
+        <Code>initialColorMode</Code> to either <Code>light</Code>, <Code>dark</Code> or{" "}
+        <Code>system</Code> and pass the config to the HopeProvider.
       </Text>
       <CodeSnippet snippet={snippets.initialColorMode} mb="$6" />
       <Alert status="warning" mb="$12">
         <AlertDescription>
-          When using <Code>system</Code> as initial color mode, the theme will change with the system preference.
-          However, if another theme is manually selected by the user then that theme will be used on the next page load.
-          To reset it to system preference, simply remove the <Code>hope-ui-color-mode</Code> entry from localStorage.
+          When using <Code>system</Code> as initial color mode, the theme will change with the
+          system preference. However, if another theme is manually selected by the user then that
+          theme will be used on the next page load. To reset it to system preference, simply remove
+          the <Code>hope-ui-color-mode</Code> entry from localStorage.
         </AlertDescription>
       </Alert>
       <SectionTitle id="changing-color-mode">Changing color mode</SectionTitle>
@@ -73,11 +87,13 @@ export default function ColorMode() {
       </Text>
       <SectionSubtitle id="use-color-mode">useColorMode</SectionSubtitle>
       <Text mb="$5">
-        <Code>useColorMode</Code> is a custom hook that gives you an accessor to get the current color mode, and a
-        function to toggle it.
+        <Code>useColorMode</Code> is a custom hook that gives you an accessor to get the current
+        color mode, and a function to toggle it.
       </Text>
       <Preview snippet={snippets.useColorMode} mb="$5">
-        <Button onClick={toggleColorMode}>Toggle {colorMode() === "light" ? "dark" : "light"}</Button>
+        <Button onClick={toggleColorMode}>
+          Toggle {colorMode() === "light" ? "dark" : "light"}
+        </Button>
       </Preview>
       <Text mb="$10">
         Calling <Code>toggleColorMode</Code> anywhere in your app tree toggles the color mode from
@@ -85,13 +101,13 @@ export default function ColorMode() {
       </Text>
       <SectionSubtitle id="use-color-mode-value">useColorModeValue</SectionSubtitle>
       <Text mb="$5">
-        <Code>useColorModeValue</Code> is a custom hook used to change any value or style based on the color mode. It
-        takes 2 arguments: the value in light mode, the value in dark mode and returns a derived signal with the correct
-        value based on the color mode.
+        <Code>useColorModeValue</Code> is a custom hook used to change any value or style based on
+        the color mode. It takes 2 arguments: the value in light mode, the value in dark mode and
+        returns a derived signal with the correct value based on the color mode.
       </Text>
       <Text mb="$5">
-        Here's an example that changes the <Code>background-color</Code> and <Code>color</Code> using the{" "}
-        <Code>useColorModeValue</Code> hook.
+        Here's an example that changes the <Code>background-color</Code> and <Code>color</Code>{" "}
+        using the <Code>useColorModeValue</Code> hook.
       </Text>
       <Preview snippet={snippets.useColorModeValue}>
         <div>

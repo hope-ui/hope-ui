@@ -24,7 +24,10 @@ export interface InputGroupContextValue {
   setHasRightAddon: (value: boolean) => void;
 }
 
-export type InputGroupProps<C extends ElementType = "div"> = HTMLHopeProps<C, ThemeableInputGroupOptions>;
+export type InputGroupProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  ThemeableInputGroupOptions
+>;
 
 const InputGroupContext = createContext<InputGroupContextValue>();
 

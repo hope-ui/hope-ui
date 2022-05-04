@@ -2,17 +2,17 @@ import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
 
 import { StyleProps } from "../styled-system/system";
 import { SystemStyleObject } from "../styled-system/types";
-import { RightJoinProps } from "../utils/types";
-
-/**
- * Represent any HTML element or SolidJS component.
- */
-export type ElementType<Props = any> = keyof JSX.IntrinsicElements | Component<Props>;
+import { OverrideProps } from "../utils/types";
 
 /**
  * All HTML and SVG elements.
  */
 export type DOMElements = keyof JSX.IntrinsicElements;
+
+/**
+ * Represent any HTML element or SolidJS component.
+ */
+export type ElementType<Props = any> = DOMElements | Component<Props>;
 
 /**
  * Take the props of the passed HTML element or component and returns its type.
@@ -31,14 +31,21 @@ export interface ClassProps {
 }
 
 /**
+ * Tag or component that should be used as root element.
+ */
+export interface AsProp<C extends ElementType> {
+  as?: C;
+}
+
+/**
  * Hope UI specific props.
  */
 export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObject };
 
 /**
- * Enhance props of a SolidJS component or jsx element with Hope UI props.
+ * Enhance props of a SolidJS component or JSX element with Hope UI props.
  */
-export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = RightJoinProps<
+export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = OverrideProps<
   PropsWithChildren<PropsOf<C>>,
   HopeProps & AdditionalProps & { as?: C }
 >;
@@ -60,10 +67,10 @@ export type HTMLHopeComponents = {
 
 export interface HopeFactoryStyleOptions<T extends ElementType> {
   /**
-   * The CSS class to use when targeting the component in a css selector.
-   * This class will be applied to the rendered dom element of the component.
+   * Base CSS class applied to the component.
+   * This class will be used when targeting the component in a css selector.
    */
-  className?: string;
+  baseClass?: string;
 
   /**
    * Base style applied to the component.

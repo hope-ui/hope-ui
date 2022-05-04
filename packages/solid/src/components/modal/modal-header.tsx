@@ -30,7 +30,14 @@ export function ModalHeader<C extends ElementType = "header">(props: ModalHeader
   onMount(() => modalContext.setHeaderMounted(true));
   onCleanup(() => modalContext.setHeaderMounted(false));
 
-  return <Box class={classes()} id={modalContext.state.headerId} __baseStyle={theme?.baseStyle?.header} {...others} />;
+  return (
+    <Box
+      class={classes()}
+      id={modalContext.state.headerId}
+      __baseStyle={theme?.baseStyle?.header}
+      {...others}
+    />
+  );
 }
 
 ModalHeader.toString = () => createClassSelector(hopeModalHeaderClass);

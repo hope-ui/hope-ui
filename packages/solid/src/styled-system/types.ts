@@ -127,7 +127,9 @@ export type SystemMediaCssSelector = Prefixed<"@", keyof SystemMedia>;
 /**
  * All breakpoint css selectors
  */
-export type BreakpointCssSelector = "@initial" | Exclude<SystemMediaCssSelector, "@reduce-motion" | "@light" | "@dark">;
+export type BreakpointCssSelector =
+  | "@initial"
+  | Exclude<SystemMediaCssSelector, "@reduce-motion" | "@light" | "@dark">;
 
 /**
  * Utility type to convert a given props type to a stitches responsive variant-like type.

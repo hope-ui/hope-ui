@@ -73,7 +73,9 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" as={IconCheckCircleSolid} />);
+    renderWithHopeProvider(() => (
+      <Icon class={stubClass} data-testid="icon" as={IconCheckCircleSolid} />
+    ));
     const icon = screen.getByTestId("icon");
 
     // assert

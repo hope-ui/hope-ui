@@ -49,11 +49,15 @@ export default function TextDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Text</PageTitle>
       <Text mb="$8">
-        <Code>Text</Code> component is the used to render text and paragraphs within an interface. It renders a{" "}
-        <Code>p</Code> tag by default.
+        <Code>Text</Code> component is the used to render text and paragraphs within an interface.
+        It renders a <Code>p</Code> tag by default.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -63,8 +67,9 @@ export default function TextDoc() {
       </Preview>
       <SectionSubtitle id="changing-font-size">Changing the font size</SectionSubtitle>
       <Text mb="$5">
-        To increase the font size of the text, you can pass the <Code>size</Code> prop. It apply a combination of{" "}
-        <Code>fontSize</Code> and <Code>lineHeight</Code> for an optimal reading experience.
+        To increase the font size of the text, you can pass the <Code>size</Code> prop. It apply a
+        combination of <Code>fontSize</Code> and <Code>lineHeight</Code> for an optimal reading
+        experience.
       </Text>
       <Preview snippet={snippets.sizes} mb="$12">
         <VStack spacing="$3" alignItems="flex-start">
@@ -91,20 +96,20 @@ export default function TextDoc() {
       </Preview>
       <SectionSubtitle id="truncate-text">Truncate text</SectionSubtitle>
       <Text mb="$5">
-        If you'd like to truncate the text after a specific number of lines, pass the <Code>noOfLines</Code> prop and
-        set it to the desired number of lines. It will render an ellipsis when the text exceeds the width of the
-        viewport or <Code>maxWidth</Code> prop.
+        If you'd like to truncate the text after a specific number of lines, pass the{" "}
+        <Code>noOfLines</Code> prop and set it to the desired number of lines. It will render an
+        ellipsis when the text exceeds the width of the viewport or <Code>maxWidth</Code> prop.
       </Text>
       <Preview snippet={snippets.truncateText} mb="$12">
         <Text noOfLines={1}>
-          Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing
-          layouts and visual mockups.
+          Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing
+          industries for previewing layouts and visual mockups.
         </Text>
       </Preview>
       <SectionSubtitle id="override-style">Override style</SectionSubtitle>
       <Text mb="$5">
-        You can change the entire style of the text via props. For example, to change the font size, pass the{" "}
-        <Code>fontSize</Code> prop.
+        You can change the entire style of the text via props. For example, to change the font size,
+        pass the <Code>fontSize</Code> prop.
       </Text>
       <Preview snippet={snippets.overrideStyle} mb="$12">
         <Text fontSize="50px" color="tomato">
@@ -113,8 +118,8 @@ export default function TextDoc() {
       </Preview>
       <SectionSubtitle id="override-element">Override the element</SectionSubtitle>
       <Text mb="$5">
-        To override the element that gets rendered, pass the <Code>as</Code> prop. Use <strong>Inspect Element</strong>{" "}
-        to see the element that gets rendered in html.
+        To override the element that gets rendered, pass the <Code>as</Code> prop. Use{" "}
+        <strong>Inspect Element</strong> to see the element that gets rendered in html.
       </Text>
       <Preview snippet={snippets.overrideElement} mb="$12">
         <VStack alignItems="flex-start">
@@ -135,7 +140,8 @@ export default function TextDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Text</Code> base styles and default props can be overridden in the Hope UI theme configuration like below:
+        <Code>Text</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

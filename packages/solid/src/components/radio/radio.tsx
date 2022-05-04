@@ -1,22 +1,28 @@
 import { createContext, createUniqueId, JSX, Show, splitProps, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system/types";
 import { visuallyHiddenStyles } from "../../styled-system/utils";
-import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers, callHandler } from "../../utils/function";
+import { callHandler, chainHandlers } from "../../utils/function";
 import { isChildrenFunction } from "../../utils/solid";
 import { hope } from "../factory";
 import { useFormControlContext } from "../form-control/form-control";
 import { useFormControl } from "../form-control/use-form-control";
 import { ElementType, HTMLHopeProps } from "../types";
-import { radioContainerStyles, RadioControlVariants } from "./radio.styles";
+import {
+  radioControlStyles,
+  RadioControlVariants,
+  radioLabelStyles,
+  radioWrapperStyles,
+  RadioWrapperVariants,
+} from "./radio.styles";
 import { useRadioGroupContext } from "./radio-group";
 
 type RadioChildrenRenderProp = (props: { checked: boolean }) => JSX.Element;
 
-export type ThemeableRadioOptions = RadioControlVariants;
+export type ThemeableRadioOptions = RadioWrapperVariants & RadioControlVariants;
 
 interface RadioOptions extends ThemeableRadioOptions {
   /**
@@ -95,7 +101,7 @@ interface RadioOptions extends ThemeableRadioOptions {
 
 export type RadioProps<C extends ElementType = "label"> = HTMLHopeProps<C, RadioOptions>;
 
-interface RadioState extends Required<RadioControlVariants> {
+interface RadioState extends Required<ThemeableRadioOptions> {
   /**
    * The `checked` state of the radio.
    * (In uncontrolled mode)
@@ -174,6 +180,8 @@ interface RadioState extends Required<RadioControlVariants> {
 
 const hopeRadioClass = "hope-radio";
 const hopeRadioInputClass = "hope-radio__input";
+const hopeRadioControlClass = "hope-radio__control";
+const hopeRadioLabelClass = "hope-radio__label";
 
 /**
  * The component that provides context for all part of a `radio`.
@@ -206,7 +214,12 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       return this.isControlled ? !!props.checked : this._checked;
     },
     get variant() {
-      return props.variant ?? radioGroupContext?.state?.variant ?? theme?.defaultProps?.root?.variant ?? "outline";
+      return (
+        props.variant ??
+        radioGroupContext?.state?.variant ??
+        theme?.defaultProps?.root?.variant ??
+        "outline"
+      );
     },
     get colorScheme() {
       return (
@@ -217,7 +230,17 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       );
     },
     get size() {
-      return props.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md";
+      return (
+        props.size ?? radioGroupContext?.state?.size ?? theme?.defaultProps?.root?.size ?? "md"
+      );
+    },
+    get labelPlacement() {
+      return (
+        props.labelPlacement ??
+        radioGroupContext?.state?.labelPlacement ??
+        theme?.defaultProps?.root?.labelPlacement ??
+        "end"
+      );
     },
     get id() {
       if (formControlContext && !radioGroupContext) {
@@ -293,6 +316,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       "variant",
       "colorScheme",
       "size",
+      "labelPlacement",
       "id",
       "name",
       "value",
@@ -318,24 +342,46 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
       setState("_checked", target.checked);
     }
 
-    callAllHandlers(radioGroupContext?.onChange, local.onChange)(event);
+    chainHandlers(radioGroupContext?.onChange, local.onChange)(event);
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", true);
-    callHandler(formControlProps.onFocus)(event);
+    callHandler(formControlProps.onFocus, event);
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent> = event => {
     setState("isFocused", false);
-    callHandler(formControlProps.onBlur)(event);
+    callHandler(formControlProps.onBlur, event);
   };
 
-  const containerClasses = () => {
-    return classNames(local.class, hopeRadioClass, radioContainerStyles({ size: state.size }));
+  const wrapperClasses = () => {
+    return classNames(
+      local.class,
+      hopeRadioClass,
+      radioWrapperStyles({
+        size: state.size,
+        labelPlacement: state.labelPlacement,
+      })
+    );
   };
 
   const inputClasses = () => classNames(hopeRadioInputClass, visuallyHiddenStyles());
+
+  const controlClasses = () => {
+    return classNames(
+      hopeRadioControlClass,
+      radioControlStyles({
+        variant: state.variant,
+        colorScheme: state.colorScheme,
+        size: state.size,
+      })
+    );
+  };
+
+  const labelClasses = () => {
+    return classNames(hopeRadioLabelClass, radioLabelStyles());
+  };
 
   const context: RadioContextValue = {
     state,
@@ -347,7 +393,7 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
   return (
     <RadioContext.Provider value={context}>
       <hope.label
-        class={containerClasses()}
+        class={wrapperClasses()}
         __baseStyle={theme?.baseStyle?.root}
         for={state.id}
         data-group
@@ -383,9 +429,32 @@ export function Radio<C extends ElementType = "label">(props: RadioProps<C>) {
           aria-labelledby={state["aria-labelledby"]}
           aria-describedby={state["aria-describedby"]}
         />
-        <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
-          {(local.children as RadioChildrenRenderProp)?.({ checked: state.checked })}
-        </Show>
+        <hope.span
+          aria-hidden={true}
+          class={controlClasses()}
+          __baseStyle={theme?.baseStyle?.control}
+          data-focus={state["data-focus"]}
+          data-checked={state["data-checked"]}
+          data-required={state["data-required"]}
+          data-disabled={state["data-disabled"]}
+          data-invalid={state["data-invalid"]}
+          data-readonly={state["data-readonly"]}
+          {...others}
+        />
+        <hope.span
+          class={labelClasses()}
+          __baseStyle={theme?.baseStyle?.label}
+          data-focus={state["data-focus"]}
+          data-checked={state["data-checked"]}
+          data-required={state["data-required"]}
+          data-disabled={state["data-disabled"]}
+          data-invalid={state["data-invalid"]}
+          data-readonly={state["data-readonly"]}
+        >
+          <Show when={isChildrenFunction(local)} fallback={local.children as JSX.Element}>
+            {(local.children as RadioChildrenRenderProp)?.({ checked: state.checked })}
+          </Show>
+        </hope.span>
       </hope.label>
     </RadioContext.Provider>
   );
@@ -397,7 +466,8 @@ Radio.toString = () => createClassSelector(hopeRadioClass);
  * Context
  * -----------------------------------------------------------------------------------------------*/
 
-interface RadioContextValue extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
+interface RadioContextValue
+  extends Required<Pick<RadioOptions, "onChange" | "onFocus" | "onBlur">> {
   state: RadioState;
 }
 

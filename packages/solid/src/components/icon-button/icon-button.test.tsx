@@ -31,7 +31,9 @@ describe("IconButton", () => {
 
   it("should render tag provided with the as prop", () => {
     // act
-    renderWithHopeProvider(() => <IconButton as="a" aria-label="User" icon={<IconCheckCircleSolid />} />);
+    renderWithHopeProvider(() => (
+      <IconButton as="a" aria-label="User" icon={<IconCheckCircleSolid />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
@@ -74,7 +76,9 @@ describe("IconButton", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <IconButton class={stubClass} aria-label="User" icon={<IconCheckCircleSolid />} />);
+    renderWithHopeProvider(() => (
+      <IconButton class={stubClass} aria-label="User" icon={<IconCheckCircleSolid />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert
@@ -102,7 +106,11 @@ describe("IconButton", () => {
 
     // act
     renderWithHopeProvider(() => (
-      <IconButton classList={{ [stubClass]: true }} aria-label="User" icon={<IconCheckCircleSolid />} />
+      <IconButton
+        classList={{ [stubClass]: true }}
+        aria-label="User"
+        icon={<IconCheckCircleSolid />}
+      />
     ));
     const button = screen.getByRole("button");
 
@@ -134,7 +142,9 @@ describe("IconButton", () => {
     const buttonClass = buttonStyles(variantProps);
 
     // act
-    renderWithHopeProvider(() => <IconButton {...variantProps} aria-label="User" icon={<IconCheckCircleSolid />} />);
+    renderWithHopeProvider(() => (
+      <IconButton {...variantProps} aria-label="User" icon={<IconCheckCircleSolid />} />
+    ));
     const button = screen.getByRole("button");
 
     // assert

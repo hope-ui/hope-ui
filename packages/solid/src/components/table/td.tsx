@@ -7,7 +7,10 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableCellStyles, TableCellVariants } from "./table.styles";
 
-export type TdProps<C extends ElementType = "td"> = HTMLHopeProps<C, Pick<TableCellVariants, "numeric">>;
+export type TdProps<C extends ElementType = "td"> = HTMLHopeProps<
+  C,
+  Pick<TableCellVariants, "numeric">
+>;
 
 const hopeTdClass = "hope-td";
 
@@ -28,7 +31,9 @@ export function Td<C extends ElementType = "td">(props: TdProps<C>) {
       })
     );
 
-  return <Box as="td" role="cell" class={classes()} __baseStyle={theme?.baseStyle?.td} {...others} />;
+  return (
+    <Box as="td" role="cell" class={classes()} __baseStyle={theme?.baseStyle?.td} {...others} />
+  );
 }
 
 Td.toString = () => createClassSelector(hopeTdClass);

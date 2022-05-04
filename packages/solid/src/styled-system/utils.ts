@@ -5,7 +5,12 @@ import { isObject } from "../utils/assertion";
 import { baseTheme, createTheme, css } from "./stitches.config";
 import { StyleProps } from "./system";
 import { baseDarkThemeTokens } from "./tokens";
-import { ResponsiveValue, StitchesThemeConfig, SystemMediaCssSelector, SystemStyleObject } from "./types";
+import {
+  ResponsiveValue,
+  StitchesThemeConfig,
+  SystemMediaCssSelector,
+  SystemStyleObject,
+} from "./types";
 
 /**
  * Merge a source SystemStyleObject to both normal and responsive destination SystemStyleObject.
@@ -44,7 +49,10 @@ function mergeStyleObject(
  * Return a valid Stitches CSS object based on the given style props.
  * `baseStyles` objects should be declared in the order of desired style override.
  */
-export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObject | undefined>): SystemStyleObject {
+export function toCssObject(
+  props: StyleProps,
+  baseStyles?: Array<SystemStyleObject | undefined>
+): SystemStyleObject {
   /**
    * Destination object containing all non-responsive styles.
    */
@@ -65,7 +73,9 @@ export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObj
   };
 
   // Add content of the `baseStyles` first to ensure css override works correctly.
-  baseStyles?.forEach(styles => styles && mergeStyleObject(styles, destStyleObject, destResponsiveStyleObject));
+  baseStyles?.forEach(
+    styles => styles && mergeStyleObject(styles, destStyleObject, destResponsiveStyleObject)
+  );
 
   // Add content of the `style props`
   Object.entries(props).forEach(([prop, value]) => {
@@ -116,7 +126,10 @@ export function toCssObject(props: StyleProps, baseStyles?: Array<SystemStyleObj
  *
  * @internal
  */
-export function extendBaseTheme<T extends StitchesThemeConfig>(type: "light" | "dark", themeConfig: T) {
+export function extendBaseTheme<T extends StitchesThemeConfig>(
+  type: "light" | "dark",
+  themeConfig: T
+) {
   const isDark = type === "dark";
 
   const className = isDark ? colorModeClassNames.dark : colorModeClassNames.light;

@@ -38,7 +38,14 @@ export function ModalBody<C extends ElementType = "div">(props: ModalBodyProps<C
   onMount(() => modalContext.setBodyMounted(true));
   onCleanup(() => modalContext.setBodyMounted(false));
 
-  return <Box class={classes()} id={modalContext.state.bodyId} __baseStyle={theme?.baseStyle?.body} {...others} />;
+  return (
+    <Box
+      class={classes()}
+      id={modalContext.state.bodyId}
+      __baseStyle={theme?.baseStyle?.body}
+      {...others}
+    />
+  );
 }
 
 ModalBody.toString = () => createClassSelector(hopeModalBodyClass);

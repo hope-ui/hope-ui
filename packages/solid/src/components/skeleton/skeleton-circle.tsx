@@ -1,6 +1,6 @@
 import { SizeProps } from "../../styled-system/props/size";
 import { createClassSelector } from "../../utils/css";
-import { RightJoinProps } from "../../utils/types";
+import { OverrideProps } from "../../utils/types";
 import { ElementType } from "../types";
 import { hopeSkeletonClass, Skeleton, SkeletonProps } from "./skeleton";
 
@@ -11,7 +11,7 @@ interface SkeletonCircleOptions {
   size?: SizeProps["boxSize"];
 }
 
-export type SkeletonCircleProps<C extends ElementType = "div"> = RightJoinProps<
+export type SkeletonCircleProps<C extends ElementType = "div"> = OverrideProps<
   SkeletonProps<C>,
   SkeletonCircleOptions
 >;

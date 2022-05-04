@@ -7,7 +7,10 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useTableContext } from "./table";
 import { tableColumnHeaderStyles, TableColumnHeaderVariants } from "./table.styles";
 
-export type ThProps<C extends ElementType = "th"> = HTMLHopeProps<C, Pick<TableColumnHeaderVariants, "numeric">>;
+export type ThProps<C extends ElementType = "th"> = HTMLHopeProps<
+  C,
+  Pick<TableColumnHeaderVariants, "numeric">
+>;
 
 const hopeThClass = "hope-th";
 
@@ -28,7 +31,15 @@ export function Th<C extends ElementType = "th">(props: ThProps<C>) {
       })
     );
 
-  return <Box as="th" role="columnheader" class={classes()} __baseStyle={theme?.baseStyle?.th} {...others} />;
+  return (
+    <Box
+      as="th"
+      role="columnheader"
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.th}
+      {...others}
+    />
+  );
 }
 
 Th.toString = () => createClassSelector(hopeThClass);

@@ -69,13 +69,31 @@ export const Default = (args: any) => {
     <VStack spacing="$5">
       <Button onClick={() => setFruit("apple")}>Select Apple (current: {fruit()})</Button>
       <HStack spacing="$5">
-        <Radio name="fruit" value="peach" checked={fruit() === "peach"} onChange={onChange} {...args}>
+        <Radio
+          name="fruit"
+          value="peach"
+          checked={fruit() === "peach"}
+          onChange={onChange}
+          {...args}
+        >
           Peach
         </Radio>
-        <Radio name="fruit" value="apple" checked={fruit() === "apple"} onChange={onChange} {...args}>
+        <Radio
+          name="fruit"
+          value="apple"
+          checked={fruit() === "apple"}
+          onChange={onChange}
+          {...args}
+        >
           Apple
         </Radio>
-        <Radio name="fruit" value="orange" checked={fruit() === "orange"} onChange={onChange} {...args}>
+        <Radio
+          name="fruit"
+          value="orange"
+          checked={fruit() === "orange"}
+          onChange={onChange}
+          {...args}
+        >
           Orange
         </Radio>
       </HStack>

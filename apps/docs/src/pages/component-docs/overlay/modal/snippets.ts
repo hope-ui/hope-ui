@@ -179,14 +179,8 @@ const overflow = `function OverflowExample() {
     <>
       <RadioGroup value={scrollBehavior()} onChange={setScrollBehavior}>
         <HStack spacing="$4" mb="$4">
-          <Radio value="inside">
-            <RadioControl />
-            <RadioLabel>Inside</RadioLabel>
-          </Radio>
-          <Radio value="outside">
-            <RadioControl />
-            <RadioLabel>Outside</RadioLabel>
-          </Radio>
+          <Radio value="inside">Inside</Radio>
+          <Radio value="outside">Outside</Radio>
         </HStack>
       </RadioGroup>
 

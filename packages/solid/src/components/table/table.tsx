@@ -72,7 +72,13 @@ export function Table<C extends ElementType = "table">(props: TableProps<C>) {
 
   return (
     <TableContext.Provider value={state}>
-      <Box as="table" role="table" class={classes()} __baseStyle={theme?.baseStyle?.root} {...others} />
+      <Box
+        as="table"
+        role="table"
+        class={classes()}
+        __baseStyle={theme?.baseStyle?.root}
+        {...others}
+      />
     </TableContext.Provider>
   );
 }

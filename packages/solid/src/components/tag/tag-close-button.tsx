@@ -12,7 +12,10 @@ interface TagCloseButtonOptions {
   "aria-label"?: string;
 }
 
-export type TagCloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, TagCloseButtonOptions>;
+export type TagCloseButtonProps<C extends ElementType = "button"> = HTMLHopeProps<
+  C,
+  TagCloseButtonOptions
+>;
 
 const hopeTagCloseButtonClass = "hope-tag-close-button";
 
@@ -31,7 +34,10 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault as TagCloseButtonProps<C>, ["class", "children"]);
+  const [local, others] = splitProps(propsWithDefault as TagCloseButtonProps<C>, [
+    "class",
+    "children",
+  ]);
 
   const classes = () =>
     classNames(

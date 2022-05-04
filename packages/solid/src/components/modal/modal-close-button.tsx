@@ -2,7 +2,7 @@ import { JSX, mergeProps, splitProps } from "solid-js";
 
 import { useStyleConfig } from "../../hope-provider";
 import { classNames, createClassSelector } from "../../utils/css";
-import { callAllHandlers } from "../../utils/function";
+import { chainHandlers } from "../../utils/function";
 import { CloseButton, CloseButtonProps } from "../close-button/close-button";
 import { useModalContext } from "./modal";
 import { modalCloseButtonStyles } from "./modal.styles";
@@ -29,18 +29,24 @@ export function ModalCloseButton(props: CloseButtonProps) {
   const propsWithDefaults = mergeProps(defaultProps, props);
   const [local, others] = splitProps(propsWithDefaults, ["class", "onClick"]);
 
-  const classes = () => classNames(local.class, hopeModalCloseButtonClass, modalCloseButtonStyles());
+  const classes = () =>
+    classNames(local.class, hopeModalCloseButtonClass, modalCloseButtonStyles());
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    const allHandlers = callAllHandlers(local.onClick, e => {
+    chainHandlers(local.onClick, e => {
       e.stopPropagation();
       modalContext.onClose();
-    });
-
-    allHandlers(event);
+    })(event);
   };
 
-  return <CloseButton class={classes()} __baseStyle={theme?.baseStyle?.closeButton} onClick={onClick} {...others} />;
+  return (
+    <CloseButton
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.closeButton}
+      onClick={onClick}
+      {...others}
+    />
+  );
 }
 
 ModalCloseButton.toString = () => createClassSelector(hopeModalCloseButtonClass);

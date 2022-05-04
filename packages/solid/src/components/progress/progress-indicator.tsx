@@ -8,7 +8,8 @@ import { ElementType, HTMLHopeProps } from "../types";
 import { useProgressContext } from "./progress";
 import { progressIndicatorStyles, ProgressIndicatorVariants } from "./progress.styles";
 
-export interface ThemeableProgressIndicatorOptions extends Omit<ProgressIndicatorVariants, "indeterminate"> {
+export interface ThemeableProgressIndicatorOptions
+  extends Omit<ProgressIndicatorVariants, "indeterminate"> {
   /**
    * The color of the progress indicator.
    */
@@ -17,7 +18,10 @@ export interface ThemeableProgressIndicatorOptions extends Omit<ProgressIndicato
 
 type ProgressIndicatorOptions = ThemeableProgressIndicatorOptions;
 
-export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<C, ProgressIndicatorOptions>;
+export type ProgressIndicatorProps<C extends ElementType = "div"> = HTMLHopeProps<
+  C,
+  ProgressIndicatorOptions
+>;
 
 const hopeProgressIndicatorClass = "hope-progress__indicator";
 

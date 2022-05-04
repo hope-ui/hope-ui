@@ -1,4 +1,12 @@
-import { Center, Container, Flex, hope, Progress, ProgressIndicator, Spinner } from "@hope-ui/solid";
+import {
+  Center,
+  Container,
+  Flex,
+  hope,
+  Progress,
+  ProgressIndicator,
+  Spinner,
+} from "@hope-ui/solid";
 import { Outlet, Route, Routes, useIsRouting } from "solid-app-router";
 import { lazy, Suspense } from "solid-js";
 import { Portal } from "solid-js/web";

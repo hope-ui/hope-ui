@@ -1,11 +1,17 @@
 /* eslint-disable solid/reactivity */
-import { Accessor, createContext, createEffect, createSignal, PropsWithChildren, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  PropsWithChildren,
+  useContext,
+} from "solid-js";
 
 import {
   ColorMode,
   getDefaultColorMode,
   saveColorModeToLocalStorage,
-  setDocumentColorModeDataTheme,
   syncBodyColorModeClassName,
 } from "./color-mode";
 import { drawerTransitionStyles } from "./components/drawer/drawer.styles";
@@ -16,7 +22,7 @@ import { popoverTransitionStyles } from "./components/popover/popover.styles";
 import { selectTransitionStyles } from "./components/select/select.styles";
 import { tooltipTransitionStyles } from "./components/tooltip/tooltip.styles";
 import { ThemeStyleConfig } from "./style-config.types";
-import { resetStyles } from "./styled-system/css-reset";
+import { globalResetStyles } from "./styled-system/css-reset";
 import { HopeTheme, StitchesThemeConfig } from "./styled-system/types";
 import { extendBaseTheme } from "./styled-system/utils";
 
@@ -41,12 +47,16 @@ export interface HopeContextValue {
 export const HopeContext = createContext<HopeContextValue>();
 
 export type HopeProviderProps = PropsWithChildren<{
+  /**
+   * Hope UI theme configuration.
+   */
   config?: HopeThemeConfig;
 }>;
 
-function applyGlobalStyles() {
-  resetStyles();
-
+/**
+ * Apply the styles needed for Hope UI components transitions.
+ */
+function applyGlobalTransitionStyles() {
   drawerTransitionStyles();
   menuTransitionStyles();
   modalTransitionStyles();
@@ -69,13 +79,15 @@ export function HopeProvider(props: HopeProviderProps) {
   const [colorMode, rawSetColorMode] = createSignal(defaultColorMode);
   const [theme, setTheme] = createSignal(defaultTheme);
 
+  const isDarkMode = () => colorMode() === "dark";
+
   const setColorMode = (value: ColorMode) => {
     rawSetColorMode(value);
     saveColorModeToLocalStorage(value);
   };
 
   const toggleColorMode = () => {
-    setColorMode(colorMode() === "light" ? "dark" : "light");
+    setColorMode(isDarkMode() ? "light" : "dark");
   };
 
   const context: HopeContextValue = {
@@ -88,14 +100,12 @@ export function HopeProvider(props: HopeProviderProps) {
 
   createEffect(() => {
     // When color mode changes, switch theme and update `document.body` theme class.
-    const isDark = colorMode() === "dark";
-
-    setTheme(isDark ? darkTheme : lightTheme);
-    setDocumentColorModeDataTheme(colorMode());
-    syncBodyColorModeClassName(isDark);
+    setTheme(isDarkMode() ? darkTheme : lightTheme);
+    syncBodyColorModeClassName(isDarkMode());
   });
 
-  applyGlobalStyles();
+  globalResetStyles();
+  applyGlobalTransitionStyles();
 
   return <HopeContext.Provider value={context}>{props.children}</HopeContext.Provider>;
 }
@@ -140,7 +150,10 @@ export function useStyleConfig(): ThemeStyleConfig {
  * Custom hook that reads from `HopeProvider` context
  * Returns an accessor for the color mode and function to toggle it
  */
-export function useColorMode(): Pick<HopeContextValue, "colorMode" | "setColorMode" | "toggleColorMode"> {
+export function useColorMode(): Pick<
+  HopeContextValue,
+  "colorMode" | "setColorMode" | "toggleColorMode"
+> {
   const context = useContext(HopeContext);
 
   if (!context) {

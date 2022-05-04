@@ -43,7 +43,7 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
   }));
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLDivElement, KeyboardEvent> = event => {
-    callHandler(local.onKeyDown)(event);
+    callHandler(local.onKeyDown, event);
 
     const eventKey = normalizeEventKey(event);
 
@@ -51,7 +51,7 @@ export function TabList<C extends ElementType = "div">(props: TabListProps<C>) {
 
     if (action) {
       event.preventDefault();
-      callHandler(action)(event);
+      callHandler(action, event);
     }
   };
 

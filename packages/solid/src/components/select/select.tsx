@@ -1,11 +1,24 @@
 import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
-import { createContext, createEffect, createSignal, createUniqueId, JSX, on, useContext } from "solid-js";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  JSX,
+  on,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useStyleConfig } from "../../hope-provider";
 import { SystemStyleObject } from "../../styled-system";
 import { isArray } from "../../utils/assertion";
-import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
+import {
+  contains,
+  getRelatedTarget,
+  isScrollable,
+  maintainScrollVisibility,
+} from "../../utils/dom";
 import { useFormControl, UseFormControlReturn } from "../form-control/use-form-control";
 import { SelectTriggerVariants } from "./select.styles";
 import {
@@ -369,7 +382,9 @@ export function Select(props: SelectProps) {
   };
 
   const removeFromSelectedOptions = (selectedOption: SelectOptionData) => {
-    setState("selectedOptions", prev => prev.filter(option => !isOptionEqual(selectedOption, option)));
+    setState("selectedOptions", prev =>
+      prev.filter(option => !isOptionEqual(selectedOption, option))
+    );
   };
 
   const setSelectedOptions = (index: number) => {
@@ -500,7 +515,11 @@ export function Select(props: SelectProps) {
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
-    const searchIndex = getIndexByLetter(state.options as SelectOptionData[], searchString, state.activeIndex + 1);
+    const searchIndex = getIndexByLetter(
+      state.options as SelectOptionData[],
+      searchString,
+      state.activeIndex + 1
+    );
 
     // if a match was found, go to it
     if (searchIndex >= 0) {
@@ -643,6 +662,26 @@ export function Select(props: SelectProps) {
     on(
       () => state.options,
       () => initSelectedOptions(),
+      { defer: true }
+    )
+  );
+
+  createEffect(
+    on(
+      () => props.value,
+      () => {
+        if (!state.isControlled) {
+          return;
+        }
+
+        const controlledValues = isArray(props.value) ? props.value : [props.value];
+
+        const selectedOptions = controlledValues
+          .map(value => state.options.find(option => option.value === value))
+          .filter(Boolean);
+
+        setState("selectedOptions", selectedOptions);
+      },
       { defer: true }
     )
   );

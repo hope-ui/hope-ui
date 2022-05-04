@@ -17,7 +17,15 @@ export function Tfoot<C extends ElementType = "tfoot">(props: TfootProps<C>) {
 
   const classes = () => classNames(local.class, hopeTfootClass, tableFootStyles());
 
-  return <Box as="tfoot" role="rowgroup" class={classes()} __baseStyle={theme?.baseStyle?.tfoot} {...others} />;
+  return (
+    <Box
+      as="tfoot"
+      role="rowgroup"
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.tfoot}
+      {...others}
+    />
+  );
 }
 
 Tfoot.toString = () => createClassSelector(hopeTfootClass);

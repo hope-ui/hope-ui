@@ -1,4 +1,11 @@
-import { createContext, createMemo, createSignal, onCleanup, splitProps, useContext } from "solid-js";
+import {
+  createContext,
+  createMemo,
+  createSignal,
+  onCleanup,
+  splitProps,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useStyleConfig } from "../../hope-provider";
@@ -91,7 +98,13 @@ export function Accordion<C extends ElementType = "div">(props: AccordionProps<C
     },
   });
 
-  const [local, others] = splitProps(props, ["class", "allowMultiple", "index", "defaultIndex", "onChange"]);
+  const [local, others] = splitProps(props, [
+    "class",
+    "allowMultiple",
+    "index",
+    "defaultIndex",
+    "onChange",
+  ]);
 
   const reverseButtons = createMemo(() => buttons().slice().reverse());
 
@@ -103,7 +116,9 @@ export function Accordion<C extends ElementType = "div">(props: AccordionProps<C
     let nextState: ExpandedIndex = -1;
 
     if (local.allowMultiple && isArray<number>(state.expandedIndex)) {
-      nextState = isExpanded ? [...state.expandedIndex, index] : state.expandedIndex.filter(idx => idx !== index);
+      nextState = isExpanded
+        ? [...state.expandedIndex, index]
+        : state.expandedIndex.filter(idx => idx !== index);
     } else if (isExpanded) {
       nextState = index;
     } else {
@@ -116,7 +131,9 @@ export function Accordion<C extends ElementType = "div">(props: AccordionProps<C
   };
 
   const isExpandedIndex = (index: number) => {
-    return isArray(state.expandedIndex) ? state.expandedIndex.includes(index) : state.expandedIndex === index;
+    return isArray(state.expandedIndex)
+      ? state.expandedIndex.includes(index)
+      : state.expandedIndex === index;
   };
 
   const registerAccordionButton = (node: HTMLButtonElement) => {
@@ -249,7 +266,9 @@ export function useAccordionContext() {
   const context = useContext(AccordionContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: useAccordionContext must be used within a `<Accordion />` component");
+    throw new Error(
+      "[Hope UI]: useAccordionContext must be used within a `<Accordion />` component"
+    );
   }
 
   return context;

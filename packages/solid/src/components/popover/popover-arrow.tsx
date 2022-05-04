@@ -19,7 +19,9 @@ export function PopoverArrow<C extends ElementType = "div">(props: PopoverArrowP
   const [local, others] = splitProps(props, ["class"]);
 
   const placement = createMemo(() => {
-    return popoverContext.state.finalPlacement.split("-")[0] as PopoverArrowVariants["popoverPlacement"];
+    return popoverContext.state.finalPlacement.split(
+      "-"
+    )[0] as PopoverArrowVariants["popoverPlacement"];
   });
 
   const classes = () => {
@@ -33,7 +35,12 @@ export function PopoverArrow<C extends ElementType = "div">(props: PopoverArrowP
   };
 
   return (
-    <Box ref={popoverContext.assignArrowRef} class={classes()} __baseStyle={theme?.baseStyle?.arrow} {...others} />
+    <Box
+      ref={popoverContext.assignArrowRef}
+      class={classes()}
+      __baseStyle={theme?.baseStyle?.arrow}
+      {...others}
+    />
   );
 }
 

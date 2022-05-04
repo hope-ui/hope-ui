@@ -91,14 +91,20 @@ export default function IconDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Icon</PageTitle>
       <Text mb="$5">
         The <Code>Icon</Code> component is used to render <Code>svg</Code>.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
-      <SectionTitle id="using-third-party-icon-library">Using a third-party icon library</SectionTitle>
+      <SectionTitle id="using-third-party-icon-library">
+        Using a third-party icon library
+      </SectionTitle>
       <Text mb="$3">To use third-party icon libraries, here are the steps:</Text>
       <hope.ul ps="$6" mb="$5">
         <hope.li mb="$2">
@@ -131,7 +137,10 @@ export default function IconDoc() {
       </Text>
       <Preview snippet={snippets.customIconWithIconComponent} mb="$8">
         <Icon viewBox="0 0 200 200" color="$danger9">
-          <path fill="currentColor" d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0" />
+          <path
+            fill="currentColor"
+            d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
+          />
         </Icon>
       </Preview>
       <Text mb="$5">This enables you to define your own custom icon components:</Text>
@@ -148,8 +157,9 @@ export default function IconDoc() {
         Using the <Code>createIcon</Code> function
       </SectionSubtitle>
       <Text mb="$5">
-        The <Code>createIcon</Code> function is a convenience wrapper around the process of generating icons with{" "}
-        <Code>Icon</Code>, allowing you to achieve the same functionality with less effort.
+        The <Code>createIcon</Code> function is a convenience wrapper around the process of
+        generating icons with <Code>Icon</Code>, allowing you to achieve the same functionality with
+        less effort.
       </Text>
       <CodeSnippet snippet={snippets.createIconExample} mb="$10" />
       <SectionSubtitle id="tips">Tips for generating your own icons</SectionSubtitle>
@@ -167,19 +177,25 @@ export default function IconDoc() {
         </hope.li>
         <hope.li mb="$2">
           Use a tool like{" "}
-          <Anchor href="https://jakearchibald.github.io/svgomg/" external color="$primary11" fontWeight="$semibold">
+          <Anchor
+            href="https://jakearchibald.github.io/svgomg/"
+            external
+            color="$primary11"
+            fontWeight="$semibold"
+          >
             SvgOmg
           </Anchor>{" "}
           to reduce the size and minify the markup.
         </hope.li>
         <hope.li>
-          To use the <Code>color</Code> style prop, set the <Code>fill</Code> or <Code>stroke</Code> prop of your svg{" "}
-          <Code>path</Code> to <Code>currentColor</Code>.
+          To use the <Code>color</Code> style prop, set the <Code>fill</Code> or <Code>stroke</Code>{" "}
+          prop of your svg <Code>path</Code> to <Code>currentColor</Code>.
         </hope.li>
       </hope.ul>
       <SectionTitle id="fallback-icon">Fallback icon</SectionTitle>
       <Text mb="$5">
-        When <Code>children</Code> is not provided, the <Code>Icon</Code> component renders a fallback icon.
+        When <Code>children</Code> is not provided, the <Code>Icon</Code> component renders a
+        fallback icon.
       </Text>
       <Preview snippet={snippets.fallbackIcon} mb="$12">
         <Icon />

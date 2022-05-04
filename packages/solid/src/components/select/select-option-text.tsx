@@ -18,7 +18,8 @@ export function SelectOptionText<C extends ElementType = "span">(props: SelectOp
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const classes = () => classNames(local.class, hopeSelectOptionTextClass, selectOptionTextStyles());
+  const classes = () =>
+    classNames(local.class, hopeSelectOptionTextClass, selectOptionTextStyles());
 
   return <hope.span class={classes()} __baseStyle={theme?.baseStyle?.optionText} {...others} />;
 }

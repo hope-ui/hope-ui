@@ -86,7 +86,12 @@ export function NotificationContainer(props: NotificationContainerProps) {
             <NotificationIcon mr="$2_5" />
           </Show>
           <Show when={local.loading}>
-            <IconSpinner color="$primary10" boxSize="$8" mr="$2_5" class={notificationLoaderStyles()} />
+            <IconSpinner
+              color="$primary10"
+              boxSize="$8"
+              mr="$2_5"
+              class={notificationLoaderStyles()}
+            />
           </Show>
           <Switch>
             <Match when={local.title && local.description}>
@@ -103,12 +108,23 @@ export function NotificationContainer(props: NotificationContainerProps) {
             </Match>
           </Switch>
           <Show when={local.closable}>
-            <CloseButton size="sm" position="absolute" top="$1_5" right="$1_5" onClick={closeNotification} />
+            <CloseButton
+              size="sm"
+              position="absolute"
+              top="$1_5"
+              right="$1_5"
+              onClick={closeNotification}
+            />
           </Show>
         </Notification>
       }
     >
-      <Flex w="$full" justifyContent="flex-end" onMouseEnter={clearCloseDelay} onMouseLeave={closeWithDelay}>
+      <Flex
+        w="$full"
+        justifyContent="flex-end"
+        onMouseEnter={clearCloseDelay}
+        onMouseLeave={closeWithDelay}
+      >
         {local.render?.({
           id: local.id,
           close: closeNotification,

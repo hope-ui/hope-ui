@@ -26,7 +26,11 @@ export function Badge<C extends ElementType = "span">(props: BadgeProps<C>) {
   };
 
   const propsWithDefault: BadgeProps<"span"> = mergeProps(defaultProps, props);
-  const [local, variantProps, others] = splitProps(propsWithDefault, ["class"], ["variant", "colorScheme"]);
+  const [local, variantProps, others] = splitProps(
+    propsWithDefault,
+    ["class"],
+    ["variant", "colorScheme"]
+  );
 
   const classes = () => classNames(local.class, hopeBadgeClass, badgeStyles(variantProps));
 

@@ -1,9 +1,9 @@
 import { globalCss } from "./stitches.config";
 
 /**
- * Hope UI css reset
+ * Hope UI global css reset
  */
-export const resetStyles = globalCss({
+export const globalResetStyles = globalCss({
   /* 
     1. Use a more-intuitive box-sizing model. 
     2. Set default border width and style to apply border props easily. 
@@ -92,6 +92,6 @@ export const resetStyles = globalCss({
   a: {
     backgroundColor: "transparent",
     color: "inherit",
-    textCecoration: "inherit",
+    textDecoration: "inherit",
   },
 });

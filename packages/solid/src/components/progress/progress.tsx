@@ -56,7 +56,9 @@ interface ThemeableProgressOptions extends ProgressVariants {
   trackColor?: ColorProps["color"];
 }
 
-interface ProgressOptions extends ThemeableProgressOptions, Partial<Omit<ProgressState, "percent" | "ariaValueText">> {
+interface ProgressOptions
+  extends ThemeableProgressOptions,
+    Partial<Omit<ProgressState, "percent" | "ariaValueText">> {
   /**
    * The desired valueText to use in place of the value
    */

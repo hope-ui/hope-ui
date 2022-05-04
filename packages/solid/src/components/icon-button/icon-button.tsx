@@ -48,13 +48,20 @@ export function IconButton<C extends ElementType = "button">(props: IconButtonPr
     "disabled",
   ]);
 
-  const variant = () => local.variant ?? buttonGroupContext?.state.variant ?? theme?.defaultProps?.variant ?? "solid";
+  const variant = () =>
+    local.variant ?? buttonGroupContext?.state.variant ?? theme?.defaultProps?.variant ?? "solid";
 
   const colorScheme = () => {
-    return local.colorScheme ?? buttonGroupContext?.state.colorScheme ?? theme?.defaultProps?.colorScheme ?? "primary";
+    return (
+      local.colorScheme ??
+      buttonGroupContext?.state.colorScheme ??
+      theme?.defaultProps?.colorScheme ??
+      "primary"
+    );
   };
 
-  const size = () => local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.size ?? "md";
+  const size = () =>
+    local.size ?? buttonGroupContext?.state.size ?? theme?.defaultProps?.size ?? "md";
 
   const disabled = () => local.disabled ?? buttonGroupContext?.state.disabled;
 

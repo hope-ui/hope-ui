@@ -5,11 +5,27 @@ import { createStore } from "solid-js/store";
 
 import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
-import { contains, getRelatedTarget, isScrollable, maintainScrollVisibility } from "../../utils/dom";
+import {
+  contains,
+  getRelatedTarget,
+  isScrollable,
+  maintainScrollVisibility,
+} from "../../utils/dom";
 import { isChildrenFunction } from "../../utils/solid";
-import { getActionFromKey, getIndexByLetter, getUpdatedIndex, MenuActions, MenuItemData } from "./menu.utils";
+import {
+  getActionFromKey,
+  getIndexByLetter,
+  getUpdatedIndex,
+  MenuActions,
+  MenuItemData,
+} from "./menu.utils";
 
-type MenuMotionPreset = "scale-top-left" | "scale-top-right" | "scale-bottom-left" | "scale-bottom-right" | "none";
+type MenuMotionPreset =
+  | "scale-top-left"
+  | "scale-top-right"
+  | "scale-bottom-left"
+  | "scale-bottom-right"
+  | "none";
 
 type MenuChildrenRenderProp = (props: { opened: Accessor<boolean> }) => JSX.Element;
 
@@ -306,7 +322,11 @@ export function Menu(props: MenuProps) {
 
     // find the index of the first matching option
     const searchString = getSearchString(letter);
-    const searchIndex = getIndexByLetter(state.items as MenuItemData[], searchString, state.activeIndex + 1);
+    const searchIndex = getIndexByLetter(
+      state.items as MenuItemData[],
+      searchString,
+      state.activeIndex + 1
+    );
 
     // if a match was found, go to it
     if (searchIndex >= 0) {

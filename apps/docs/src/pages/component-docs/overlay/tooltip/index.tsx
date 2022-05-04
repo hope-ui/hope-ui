@@ -147,11 +147,16 @@ export default function TooltipDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Tooltip</PageTitle>
       <Text mb="$5">
-        A tooltip is a brief, informative message that appears when a user interacts with an element. Tooltips are
-        usually initiated in one of two ways: through a mouse-hover gesture or through a keyboard-hover gesture.
+        A tooltip is a brief, informative message that appears when a user interacts with an
+        element. Tooltips are usually initiated in one of two ways: through a mouse-hover gesture or
+        through a keyboard-hover gesture.
       </Text>
       <Text mb="$5">
         The <Code>Tooltip</Code> component follows the{" "}
@@ -185,8 +190,8 @@ export default function TooltipDoc() {
       </Preview>
       <SectionSubtitle id="with-focusable-content">Tooltip with focusable content</SectionSubtitle>
       <Text mb="$5">
-        If the children of the tooltip is a focusable element, the tooltip will show when you focus or hover on the
-        element, and will hide when you blur or move cursor out of the element.
+        If the children of the tooltip is a focusable element, the tooltip will show when you focus
+        or hover on the element, and will hide when you blur or move cursor out of the element.
       </Text>
       <Preview snippet={snippets.withFocusableContent} mb="$10">
         <Tooltip label="Search places">
@@ -299,8 +304,8 @@ export default function TooltipDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Tooltip</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Tooltip</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

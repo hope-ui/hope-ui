@@ -180,11 +180,15 @@ export default function ButtonDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Button</PageTitle>
       <Text mb="$8">
-        The Button component is used to trigger an action or event, such as submitting a form, opening a dialog,
-        canceling an action, or performing a delete operation.
+        The Button component is used to trigger an action or event, such as submitting a form,
+        opening a dialog, canceling an action, or performing a delete operation.
       </Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$12" />
@@ -194,9 +198,9 @@ export default function ButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-colors">Button colors</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>colorScheme</Code> prop to change the color of the Button. You can set the value to{" "}
-        <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>, <Code>success</Code>, <Code>info</Code>,{" "}
-        <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>colorScheme</Code> prop to change the color of the Button. You can set the
+        value to <Code>primary</Code>, <Code>accent</Code>, <Code>neutral</Code>,{" "}
+        <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.buttonColors} mb="$10">
         <HStack spacing="$4">
@@ -211,8 +215,8 @@ export default function ButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-sizes">Button sizes</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>size</Code> prop to change the size of the Button. You can set the value to <Code>xs</Code>,{" "}
-        <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code> or <Code>xl</Code>.
+        Use the <Code>size</Code> prop to change the size of the Button. You can set the value to{" "}
+        <Code>xs</Code>, <Code>sm</Code>, <Code>md</Code>, <Code>lg</Code> or <Code>xl</Code>.
       </Text>
       <Preview snippet={snippets.buttonSizes} mb="$8">
         <HStack spacing="$4">
@@ -247,8 +251,9 @@ export default function ButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-variants">Button variants</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>variant</Code> prop to change the visual style of the Button. You can set the value to{" "}
-        <Code>solid</Code>, <Code>subtle</Code>, <Code>outline</Code>, <Code>dashed</Code> or <Code>ghost</Code>.
+        Use the <Code>variant</Code> prop to change the visual style of the Button. You can set the
+        value to <Code>solid</Code>, <Code>subtle</Code>, <Code>outline</Code>, <Code>dashed</Code>{" "}
+        or <Code>ghost</Code>.
       </Text>
       <Preview snippet={snippets.buttonVariants} mb="$10">
         <HStack spacing="$4">
@@ -266,7 +271,8 @@ export default function ButtonDoc() {
       </Text>
       <Alert status="warning" mb="$5">
         <AlertDescription>
-          The <Code>leftIcon</Code> and <Code>rightIcon</Code> prop values should be jsx elements not strings.
+          The <Code>leftIcon</Code> and <Code>rightIcon</Code> prop values should be jsx elements
+          not strings.
         </AlertDescription>
       </Alert>
       <Preview snippet={snippets.buttonWithIcon} mb="$5">
@@ -286,9 +292,9 @@ export default function ButtonDoc() {
       </Text>
       <SectionSubtitle id="button-loading-state">Button loading state</SectionSubtitle>
       <Text mb="$5">
-        Pass the <Code>loading</Code> prop to show its loading state. By default, the button will show a spinner and
-        leave the button's width unchanged. You can also pass the <Code>loadingText</Code> prop to show a spinner and
-        the loading text.
+        Pass the <Code>loading</Code> prop to show its loading state. By default, the button will
+        show a spinner and leave the button's width unchanged. You can also pass the{" "}
+        <Code>loadingText</Code> prop to show a spinner and the loading text.
       </Text>
       <Preview snippet={snippets.buttonLoadingState} mb="$8">
         <HStack spacing="$4">
@@ -299,8 +305,8 @@ export default function ButtonDoc() {
         </HStack>
       </Preview>
       <Text mb="$5">
-        You can change the loader element to use custom loaders as per your design requirements. Pass the{" "}
-        <Code>loader</Code> prop and set it to a custom jsx element.
+        You can change the loader element to use custom loaders as per your design requirements.
+        Pass the <Code>loader</Code> prop and set it to a custom jsx element.
       </Text>
       <Preview snippet={snippets.buttonCustomLoader} mb="$8">
         <Button loading loader={<BeatLoader boxSize="$8" />}>
@@ -308,8 +314,8 @@ export default function ButtonDoc() {
         </Button>
       </Preview>
       <Text mb="$5">
-        When a <Code>loaderText</Code> is present, you can change the placement of the loader element to either{" "}
-        <Code>start</Code> or <Code>end</Code>.
+        When a <Code>loaderText</Code> is present, you can change the placement of the loader
+        element to either <Code>start</Code> or <Code>end</Code>.
       </Text>
       <Preview snippet={snippets.buttonLoaderPlacement} mb="$10">
         <HStack spacing="$4">
@@ -323,18 +329,20 @@ export default function ButtonDoc() {
       </Preview>
       <SectionSubtitle id="button-group">Grouping buttons</SectionSubtitle>
       <Text mb="$3">
-        You can use the <Code>Stack</Code> or <Code>ButtonGroup</Code> component to group buttons. When you use the{" "}
-        <Code>ButtonGroup</Code> component, it allows you to:
+        You can use the <Code>Stack</Code> or <Code>ButtonGroup</Code> component to group buttons.
+        When you use the <Code>ButtonGroup</Code> component, it allows you to:
       </Text>
       <UnorderedList spacing="$2" mb="$5">
         <ListItem>
-          Set the <Code>variant</Code>, <Code>colorScheme</Code>, <Code>size</Code> and <Code>disabled</Code> state of
-          all buttons within it.
+          Set the <Code>variant</Code>, <Code>colorScheme</Code>, <Code>size</Code> and{" "}
+          <Code>disabled</Code> state of all buttons within it.
         </ListItem>
         <ListItem>
           Add <Code>spacing</Code> between the buttons.
         </ListItem>
-        <ListItem>Flush the buttons together by removing the border radius of its children as needed.</ListItem>
+        <ListItem>
+          Flush the buttons together by removing the border radius of its children as needed.
+        </ListItem>
       </UnorderedList>
       <Preview snippet={snippets.buttonGroup} mb="$6">
         <ButtonGroup variant="outline" spacing="$6">
@@ -375,8 +383,8 @@ export default function ButtonDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Button</Code> base styles and default props can be overridden in the Hope UI theme configuration like
-        below:
+        <Code>Button</Code> base styles and default props can be overridden in the Hope UI theme
+        configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>

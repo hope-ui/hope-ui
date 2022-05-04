@@ -16,7 +16,9 @@ export function Tr<C extends ElementType = "tr">(props: TrProps<C>) {
 
   const classes = () => classNames(local.class, hopeTrClass);
 
-  return <Box as="tr" role="row" class={classes()} __baseStyle={theme?.baseStyle?.tr} {...others} />;
+  return (
+    <Box as="tr" role="row" class={classes()} __baseStyle={theme?.baseStyle?.tr} {...others} />
+  );
 }
 
 Tr.toString = () => createClassSelector(hopeTrClass);

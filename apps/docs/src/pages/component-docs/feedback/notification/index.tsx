@@ -192,21 +192,26 @@ export default function SpinnerDoc() {
   });
 
   return (
-    <PageLayout previousLink={previousLink} nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
+    <PageLayout
+      previousLink={previousLink}
+      nextLink={nextLink}
+      contextualNavLinks={contextualNavLinks}
+    >
       <PageTitle>Notification</PageTitle>
       <Text mb="$5">Notification give feedback to users after an action has taken place.</Text>
       <SectionTitle id="import">Import</SectionTitle>
       <CodeSnippet snippet={snippets.importComponent} mb="$6" />
       <UnorderedList spacing="$2" mb="$12">
         <ListItem>
-          <strong>NotificationsProvider:</strong> The component that provides the notification system.
+          <strong>NotificationsProvider:</strong> The component that provides the notification
+          system.
         </ListItem>
         <ListItem>
           <strong>Notification:</strong> The wrapper for notification components.
         </ListItem>
         <ListItem>
-          <strong>NotificationIcon:</strong> The visual icon for the notification that changes based on the{" "}
-          <Code>status</Code> prop.
+          <strong>NotificationIcon:</strong> The visual icon for the notification that changes based
+          on the <Code>status</Code> prop.
         </ListItem>
         <ListItem>
           <strong>NotificationTitle:</strong> The title of the notification.
@@ -242,19 +247,21 @@ export default function SpinnerDoc() {
         The <Code>notificationService</Code> API
       </SectionSubtitle>
       <Text mb="$3">
-        The notification system is based on custom events, Hope UI exports the following methods through the{" "}
-        <Code>notificationService</Code> object:
+        The notification system is based on custom events, Hope UI exports the following methods
+        through the <Code>notificationService</Code> object:
       </Text>
       <UnorderedList spacing="$2" mb="$10">
         <ListItem>
-          <strong>show:</strong> adds given notification to notifications list or queue depending on current state and
-          limit.
+          <strong>show:</strong> adds given notification to notifications list or queue depending on
+          current state and limit.
         </ListItem>
         <ListItem>
-          <strong>update:</strong> updates notification that was previously added to the state or queue.
+          <strong>update:</strong> updates notification that was previously added to the state or
+          queue.
         </ListItem>
         <ListItem>
-          <strong>hide:</strong> removes notification with given id from notifications state and queue.
+          <strong>hide:</strong> removes notification with given id from notifications state and
+          queue.
         </ListItem>
         <ListItem>
           <strong>clear:</strong> removes all notifications from notifications state and queue.
@@ -265,8 +272,9 @@ export default function SpinnerDoc() {
       </UnorderedList>
       <SectionSubtitle id="notification-status">Notification status</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>status</Code> parameter to change the status of the notification, this affects the icon used. You
-        can set the value to <Code>success</Code>, <Code>info</Code>, <Code>warning</Code> or <Code>danger</Code>.
+        Use the <Code>status</Code> parameter to change the status of the notification, this affects
+        the icon used. You can set the value to <Code>success</Code>, <Code>info</Code>,{" "}
+        <Code>warning</Code> or <Code>danger</Code>.
       </Text>
       <Preview snippet={snippets.status} mb="$10">
         <Button
@@ -285,16 +293,17 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="notification-placement">Notification placement</SectionSubtitle>
       <Text mb="$5">
-        <Code>NotificationsProvider</Code> renders notifications with fixed position inside a Portal. Position cannot be
-        changed per notification. Use the <Code>placement</Code> prop to define the placement. You can set the value to{" "}
-        <Code>top-start</Code>, <Code>top</Code>, <Code>top-end</Code>, <Code>bottom-start</Code>, <Code>bottom</Code>{" "}
-        or <Code>bottom-end</Code>.
+        <Code>NotificationsProvider</Code> renders notifications with fixed position inside a
+        Portal. Position cannot be changed per notification. Use the <Code>placement</Code> prop to
+        define the placement. You can set the value to <Code>top-start</Code>, <Code>top</Code>,{" "}
+        <Code>top-end</Code>, <Code>bottom-start</Code>, <Code>bottom</Code> or{" "}
+        <Code>bottom-end</Code>.
       </Text>
       <CodeSnippet snippet={snippets.placement} mb="$10" />
       <SectionSubtitle id="notification-duration">Notification duration</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>duration</Code> parameter to change the duration of the notification. By default, notitification
-        will dismiss after 5 seconds.
+        Use the <Code>duration</Code> parameter to change the duration of the notification. By
+        default, notitification will dismiss after 5 seconds.
       </Text>
       <Preview snippet={snippets.duration} mb="$10">
         <Button
@@ -311,7 +320,8 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="persistent-notification">Persistent notification</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>persistent</Code> parameter to make the notification persistent. the duration will be ignored.
+        Use the <Code>persistent</Code> parameter to make the notification persistent. the duration
+        will be ignored.
       </Text>
       <Preview snippet={snippets.persistent} mb="$10">
         <Button
@@ -328,15 +338,22 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="using-custom-component">Using custom component</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>render</Code> parameter to display a custom component instead of the default Hope UI{" "}
-        <Code>Notification</Code>.
+        Use the <Code>render</Code> parameter to display a custom component instead of the default
+        Hope UI <Code>Notification</Code>.
       </Text>
       <Preview snippet={snippets.customComponent} mb="$10">
         <Button
           onClick={() =>
             notificationService.show({
               render: props => (
-                <HStack bg="$loContrast" rounded="$md" border="1px solid $neutral7" shadow="$lg" p="$4" w="$full">
+                <HStack
+                  bg="$loContrast"
+                  rounded="$md"
+                  border="1px solid $neutral7"
+                  shadow="$lg"
+                  p="$4"
+                  w="$full"
+                >
                   <Avatar name="Courtney Watson" src="https://bit.ly/3w2rgom" mr="$3" />
                   <VStack alignItems="flex-start">
                     <Text size="sm" fontWeight="$medium">
@@ -346,7 +363,13 @@ export default function SpinnerDoc() {
                       Sure! 8:30pm works great!
                     </Text>
                   </VStack>
-                  <Button variant="ghost" colorScheme="accent" size="sm" ml="auto" onClick={() => props.close()}>
+                  <Button
+                    variant="ghost"
+                    colorScheme="accent"
+                    size="sm"
+                    ml="auto"
+                    onClick={() => props.close()}
+                  >
                     Reply
                   </Button>
                 </HStack>
@@ -359,8 +382,8 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="updating-notification">Updating notification</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>update</Code> method to update a specific notification. This method takes the same parameters as
-        the <Code>show</Code> method except that <Code>id</Code> is required.
+        Use the <Code>update</Code> method to update a specific notification. This method takes the
+        same parameters as the <Code>show</Code> method except that <Code>id</Code> is required.
       </Text>
       <Preview snippet={snippets.updating} mb="$10">
         <Button
@@ -390,7 +413,8 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionSubtitle id="hidding-notification">Hidding notification</SectionSubtitle>
       <Text mb="$5">
-        Use the <Code>hide</Code> method to dismiss a specific notification by passing its notification id.
+        Use the <Code>hide</Code> method to dismiss a specific notification by passing its
+        notification id.
       </Text>
       <Preview snippet={snippets.hidding} mb="$10">
         <HStack spacing="$4">
@@ -407,24 +431,29 @@ export default function SpinnerDoc() {
           >
             Show notification
           </Button>
-          <Button variant="subtle" colorScheme="neutral" onClick={() => notificationService.hide("notification-id")}>
+          <Button
+            variant="subtle"
+            colorScheme="neutral"
+            onClick={() => notificationService.hide("notification-id")}
+          >
             Hide notification
           </Button>
         </HStack>
       </Preview>
       <SectionSubtitle id="limit-and-queue"> Limit and queue</SectionSubtitle>
       <Text mb="$5">
-        <Code>NotificationsProvider</Code> uses a queue to manage its state. You can limit maximum amount of
-        notifications that can be displayed by setting the <Code>limit</Code> prop.
+        <Code>NotificationsProvider</Code> uses a queue to manage its state. You can limit maximum
+        amount of notifications that can be displayed by setting the <Code>limit</Code> prop.
       </Text>
       <CodeSnippet snippet={snippets.limitAndQueueSetup} mb="$6" />
       <Text mb="$3">
-        All notifications added after limit was reached will be added into queue and displayed when notification from
-        current state is closed.
+        All notifications added after limit was reached will be added into queue and displayed when
+        notification from current state is closed.
       </Text>
       <Text mb="$5">
-        You can use the <Code>clearQueue</Code> method to remove all notifications that are not currently displayed and
-        the <Code>clear</Code> method to remove all notifications from state and queue.
+        You can use the <Code>clearQueue</Code> method to remove all notifications that are not
+        currently displayed and the <Code>clear</Code> method to remove all notifications from state
+        and queue.
       </Text>
       <Preview snippet={snippets.limitAndQueue} mb="$12">
         <HStack spacing="$4">
@@ -442,7 +471,11 @@ export default function SpinnerDoc() {
           >
             Show 20 notifications
           </Button>
-          <Button colorScheme="neutral" variant="subtle" onClick={() => notificationService.clearQueue()}>
+          <Button
+            colorScheme="neutral"
+            variant="subtle"
+            onClick={() => notificationService.clearQueue()}
+          >
             Clear queue
           </Button>
           <Button colorScheme="danger" variant="subtle" onClick={() => notificationService.clear()}>
@@ -452,12 +485,14 @@ export default function SpinnerDoc() {
       </Preview>
       <SectionTitle id="theming">Theming</SectionTitle>
       <Text mb="$5">
-        <Code>Notification</Code> base styles and default props can be overridden in the Hope UI theme configuration
-        like below:
+        <Code>Notification</Code> base styles and default props can be overridden in the Hope UI
+        theme configuration like below:
       </Text>
       <CodeSnippet lang="js" snippet={snippets.theming} mb="$12" />
       <SectionTitle id="props">Props</SectionTitle>
-      <SectionSubtitle id="notifications-provider-props">NotificationsProvider props</SectionSubtitle>
+      <SectionSubtitle id="notifications-provider-props">
+        NotificationsProvider props
+      </SectionSubtitle>
       <PropsTable items={notificationsProviderPropItems} mb="$10" />
       <SectionSubtitle id="notification-props">Notification props</SectionSubtitle>
       <PropsTable items={notificationPropItems} mb="$10" />
@@ -469,8 +504,8 @@ export default function SpinnerDoc() {
         notificationService.<Code>update</Code>
       </SectionSubtitle>
       <Text mb="$10">
-        The <Code>update</Code> method takes the same parameters as the <Code>show</Code> method except that{" "}
-        <Code>id</Code> is required.
+        The <Code>update</Code> method takes the same parameters as the <Code>show</Code> method
+        except that <Code>id</Code> is required.
       </Text>
       <SectionSubtitle id="notification-service-hide">
         notificationService.<Code>hide</Code>

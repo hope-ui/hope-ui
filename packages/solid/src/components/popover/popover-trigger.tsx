@@ -1,7 +1,7 @@
 import { JSX, splitProps } from "solid-js";
 
 import { isFunction } from "../../utils/assertion";
-import { callAllHandlers, callHandler } from "../../utils/function";
+import { callHandler, chainHandlers } from "../../utils/function";
 import { hope } from "../factory";
 import { ElementType, HTMLHopeProps } from "../types";
 import { usePopoverContext } from "./popover";
@@ -38,13 +38,13 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
   };
 
   const onClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    callHandler(local.onClick)(event);
+    callHandler(local.onClick, event);
 
     popoverContext.state.opened ? popoverContext.closeWithDelay() : popoverContext.openWithDelay();
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    callHandler(local.onKeyDown)(event);
+    callHandler(local.onKeyDown, event);
 
     if (event.key === "Escape") {
       popoverContext.closeWithDelay();
@@ -52,24 +52,24 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callHandler(local.onFocus)(event);
+    callHandler(local.onFocus, event);
 
     popoverContext.openWithDelay();
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callAllHandlers(local.onBlur, popoverContext.onTriggerBlur)(event);
+    chainHandlers(local.onBlur, popoverContext.onTriggerBlur)(event);
   };
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    callHandler(local.onMouseEnter)(event);
+    callHandler(local.onMouseEnter, event);
 
     popoverContext.setIsHovering(true);
     popoverContext.openWithDelay();
   };
 
   const onMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    callHandler(local.onMouseLeave)(event);
+    callHandler(local.onMouseLeave, event);
 
     popoverContext.onTriggerMouseLeave();
   };

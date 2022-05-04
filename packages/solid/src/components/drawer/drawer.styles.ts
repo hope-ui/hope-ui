@@ -31,9 +31,10 @@ export const drawerTransitionStyles = globalCss({
   [`.${drawerTransitionName.slideInTop}-enter-active, .${drawerTransitionName.slideInTop}-exit-active,
     .${drawerTransitionName.slideInRight}-enter-active, .${drawerTransitionName.slideInRight}-exit-active,
     .${drawerTransitionName.slideInBottom}-enter-active, .${drawerTransitionName.slideInBottom}-exit-active,
-    .${drawerTransitionName.slideInLeft}-enter-active, .${drawerTransitionName.slideInLeft}-exit-active`]: {
-    transition: "transform 500ms ease-in-out",
-  },
+    .${drawerTransitionName.slideInLeft}-enter-active, .${drawerTransitionName.slideInLeft}-exit-active`]:
+    {
+      transition: "transform 500ms ease-in-out",
+    },
 
   /* slide-in-top */
   [`.${drawerTransitionName.slideInTop}-enter, .${drawerTransitionName.slideInTop}-exit-to`]: {
@@ -52,12 +53,14 @@ export const drawerTransitionStyles = globalCss({
   },
 
   /* slide-in-bottom */
-  [`.${drawerTransitionName.slideInBottom}-enter, .${drawerTransitionName.slideInBottom}-exit-to`]: {
-    transform: "translateY(100%)",
-  },
-  [`.${drawerTransitionName.slideInBottom}-enter-to, .${drawerTransitionName.slideInBottom}-exit`]: {
-    transform: "translateY(0)",
-  },
+  [`.${drawerTransitionName.slideInBottom}-enter, .${drawerTransitionName.slideInBottom}-exit-to`]:
+    {
+      transform: "translateY(100%)",
+    },
+  [`.${drawerTransitionName.slideInBottom}-enter-to, .${drawerTransitionName.slideInBottom}-exit`]:
+    {
+      transform: "translateY(0)",
+    },
 
   /* slide-in-left */
   [`.${drawerTransitionName.slideInLeft}-enter, .${drawerTransitionName.slideInLeft}-exit-to`]: {
