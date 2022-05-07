@@ -215,9 +215,6 @@ export const buttonStyles = css({
   userSelect: "none",
   whiteSpace: "nowrap",
   verticalAlign: "middle",
-  //transition: "color 250ms, background-color 250ms",
-
-  // box-shadow transition on button focus f*cked up solid-transition-group of modal and drawer
   transition: "color 250ms, background-color 250ms, box-shadow 250ms",
 
   "&:focus": {

@@ -3,13 +3,16 @@ import { VariantProps } from "@stitches/core";
 import { css } from "../../styled-system/stitches.config";
 
 export const closeButtonStyles = css({
+  appearance: "none",
+
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
 
-  outline: 0,
+  outline: "none",
 
+  borderWidth: 0,
   borderRadius: "$sm",
   backgroundColor: "transparent",
 
