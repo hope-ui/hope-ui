@@ -1,3 +1,9 @@
+## [0.5.1](https://github.com/fabien-ml/hope-ui/compare/v0.5.0...v0.5.1) (2022-05-08)
+
+### 🐛 Bug fixes
+
+- Clicking Scrollbar in `Select` closes dropdown instead of scrolling (#145).
+
 ## [0.5.0](https://github.com/fabien-ml/hope-ui/compare/v0.4.5...v0.5.0) (2022-05-04)
 
 ### 💥 BREAKING CHANGES

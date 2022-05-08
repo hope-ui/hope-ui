@@ -634,7 +634,7 @@ export function Select(props: SelectProps) {
     listboxRef = el;
   };
 
-  const scrollToOption = (optionRef: HTMLDivElement) => {
+  const scrollToOption = (optionRef: HTMLElement) => {
     if (!listboxRef) {
       return;
     }
@@ -683,6 +683,28 @@ export function Select(props: SelectProps) {
         setState("selectedOptions", selectedOptions);
       },
       { defer: true }
+    )
+  );
+
+  createEffect(
+    on(
+      () => state.opened,
+      newValue => {
+        if (!newValue) {
+          return;
+        }
+
+        // Use a micro task so the listbox is visible when trying to scroll to selected option.
+        setTimeout(() => {
+          const firstSelectedOption = listboxRef?.querySelector(
+            "[role='option'][aria-selected='true']"
+          ) as HTMLDivElement;
+
+          if (firstSelectedOption) {
+            scrollToOption(firstSelectedOption);
+          }
+        }, 0);
+      }
     )
   );
 
@@ -750,7 +772,7 @@ interface SelectContextValue {
   /**
    * Scroll to the active option.
    */
-  scrollToOption: (optionRef: HTMLDivElement) => void;
+  scrollToOption: (optionRef: HTMLElement) => void;
 
   /**
    * Register a `SelectOption` to the context.

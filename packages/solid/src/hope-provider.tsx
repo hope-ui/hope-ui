@@ -4,6 +4,7 @@ import {
   createContext,
   createEffect,
   createSignal,
+  mergeProps,
   PropsWithChildren,
   useContext,
 } from "solid-js";
@@ -51,6 +52,11 @@ export type HopeProviderProps = PropsWithChildren<{
    * Hope UI theme configuration.
    */
   config?: HopeThemeConfig;
+
+  /**
+   * Whether CSS Reset should be applied.
+   */
+  enableCssReset?: boolean;
 }>;
 
 /**
@@ -67,6 +73,12 @@ function applyGlobalTransitionStyles() {
 }
 
 export function HopeProvider(props: HopeProviderProps) {
+  const defaultProps: HopeProviderProps = {
+    enableCssReset: true,
+  };
+
+  props = mergeProps(defaultProps, props);
+
   // Create themes
   const lightTheme = extendBaseTheme("light", props.config?.lightTheme ?? {});
   const darkTheme = extendBaseTheme("dark", props.config?.darkTheme ?? {});
@@ -104,7 +116,10 @@ export function HopeProvider(props: HopeProviderProps) {
     syncBodyColorModeClassName(isDarkMode());
   });
 
-  globalResetStyles();
+  if (props.enableCssReset) {
+    globalResetStyles();
+  }
+
   applyGlobalTransitionStyles();
 
   return <HopeContext.Provider value={context}>{props.children}</HopeContext.Provider>;

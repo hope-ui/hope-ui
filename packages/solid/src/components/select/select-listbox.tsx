@@ -35,6 +35,11 @@ export function SelectListbox<C extends ElementType = "div">(props: SelectListbo
     }
   };
 
+  const onMouseDown = (event: MouseEvent) => {
+    // Prevent select trigger from loosing focus and close the listbox.
+    event.preventDefault();
+  };
+
   return (
     <Box
       ref={assignListboxRef}
@@ -44,6 +49,7 @@ export function SelectListbox<C extends ElementType = "div">(props: SelectListbo
       class={classes()}
       __baseStyle={theme?.baseStyle?.listbox}
       onMouseLeave={selectContext.onListboxMouseLeave}
+      onMouseDown={onMouseDown}
       {...others}
     />
   );
