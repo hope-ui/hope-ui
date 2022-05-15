@@ -34,7 +34,7 @@ export function TagCloseButton<C extends ElementType = "button">(props: TagClose
   };
 
   const propsWithDefault = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefault as TagCloseButtonProps<C>, [
+  const [local, others] = splitProps(propsWithDefault as TagCloseButtonProps<"button">, [
     "class",
     "children",
   ]);

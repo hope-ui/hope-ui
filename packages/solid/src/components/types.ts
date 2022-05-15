@@ -1,4 +1,4 @@
-import { Component, ComponentProps, JSX, PropsWithChildren } from "solid-js";
+import { Component, ComponentProps, JSX, ParentProps } from "solid-js";
 
 import { StyleProps } from "../styled-system/system";
 import { SystemStyleObject } from "../styled-system/types";
@@ -16,10 +16,8 @@ export type ElementType<Props = any> = DOMElements | Component<Props>;
 
 /**
  * Take the props of the passed HTML element or component and returns its type.
- * It uses a more precise version of just ComponentProps on its own.
- * Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
  */
-export type PropsOf<C extends ElementType> = JSX.LibraryManagedAttributes<C, ComponentProps<C>>;
+export type PropsOf<C extends ElementType> = ComponentProps<C>;
 
 /**
  * All SolidJS props that apply css classes.
@@ -46,7 +44,7 @@ export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObj
  * Enhance props of a SolidJS component or JSX element with Hope UI props.
  */
 export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = OverrideProps<
-  PropsWithChildren<PropsOf<C>>,
+  ParentProps<PropsOf<C>>,
   HopeProps & AdditionalProps & { as?: C }
 >;
 

@@ -10,8 +10,8 @@ import {
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
 
-import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
+import { SystemStyleObject } from "../../styled-system/types";
 import { ThemeableCloseButtonOptions } from "../close-button/close-button";
 import { ModalContainerVariants, ModalDialogVariants } from "./modal.styles";
 

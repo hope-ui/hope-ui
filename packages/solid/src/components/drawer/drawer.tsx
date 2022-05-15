@@ -67,7 +67,14 @@ const DrawerContext = createContext<DrawerContextValue>();
 export function Drawer(props: DrawerProps) {
   const theme = useStyleConfig().Drawer;
 
-  const [, modalProps] = splitProps(props, ["placement", "size", "fullHeight", "disableMotion"]);
+  const [, modalProps] = splitProps(props, [
+    "opened",
+    "onClose",
+    "placement",
+    "size",
+    "fullHeight",
+    "disableMotion",
+  ]);
 
   const [state] = createStore<DrawerContextValue>({
     get placement() {
@@ -93,6 +100,8 @@ export function Drawer(props: DrawerProps) {
         closeOnOverlayClick={theme?.defaultProps?.root?.closeOnOverlayClick}
         preserveScrollBarGap={theme?.defaultProps?.root?.preserveScrollBarGap}
         trapFocus={theme?.defaultProps?.root?.trapFocus}
+        opened={props.opened}
+        onClose={props.onClose}
         {...modalProps}
       />
     </DrawerContext.Provider>

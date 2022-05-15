@@ -1,3 +1,13 @@
+## [0.6.0](https://github.com/fabien-ml/hope-ui/compare/v0.5.1...v0.6.0) (2022-05-15)
+
+### 💥 BREAKING CHANGES
+
+- Update `solid-js` peer dependency version to `^1.4.0`.
+
+### 🐛 Bug fixes
+
+- `Select` and `Menu` doesn't work with SolidJS ^1.4.0 (#150).
+
 ## [0.5.1](https://github.com/fabien-ml/hope-ui/compare/v0.5.0...v0.5.1) (2022-05-08)
 
 ### 🐛 Bug fixes
