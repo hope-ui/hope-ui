@@ -1,10 +1,18 @@
 import type { Placement } from "@floating-ui/dom";
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
-import { Accessor, createContext, createUniqueId, JSX, Show, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createSignal,
+  createUniqueId,
+  JSX,
+  Show,
+  useContext,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SystemStyleObject } from "../../styled-system/types";
 import { useStyleConfig } from "../../hope-provider";
+import { SystemStyleObject } from "../../styled-system/types";
 import {
   contains,
   getRelatedTarget,
@@ -138,6 +146,8 @@ export function Menu(props: MenuProps) {
 
   const theme = useStyleConfig().Menu;
 
+  const [_items, _setItems] = createSignal<Array<MenuItemData>>([]);
+
   const [state, setState] = createStore<MenuState>({
     get triggerId() {
       return props.id ?? `${defaultBaseId}-trigger`;
@@ -172,7 +182,9 @@ export function Menu(props: MenuProps) {
 
       return "scale-top-left";
     },
-    items: [],
+    get items() {
+      return _items();
+    },
     opened: false,
     activeIndex: 0,
     ignoreBlur: false,
@@ -437,9 +449,14 @@ export function Menu(props: MenuProps) {
       return index;
     }
 
-    setState("items", prev => [...prev, itemData]);
+    // In Solid ^1.4.0 state.options is not up to date after setState call
 
-    return state.items.length - 1;
+    // setState("items", prev => [...prev, itemData]);
+    // return state.items.length - 1;
+
+    const updatedItems = _setItems(prev => [...prev, itemData]);
+
+    return updatedItems.length - 1;
   };
 
   const openedAccessor = () => state.opened;

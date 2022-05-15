@@ -206,6 +206,7 @@ export function Select(props: SelectProps) {
   const formControlProps = useFormControl<HTMLButtonElement>(props);
 
   const [initialized, setInitialized] = createSignal(false);
+  const [_options, _setOptions] = createSignal<Array<SelectOptionData>>([]);
 
   const [state, setState] = createStore<SelectState>({
     get isControlled() {
@@ -261,7 +262,9 @@ export function Select(props: SelectProps) {
     get hasSelectedOptions() {
       return this.selectedOptions.length > 0;
     },
-    options: [],
+    get options() {
+      return _options();
+    },
     selectedOptions: [],
     opened: false,
     activeIndex: 0,
@@ -653,9 +656,14 @@ export function Select(props: SelectProps) {
       return index;
     }
 
-    setState("options", prev => [...prev, optionData]);
+    // In Solid ^1.4.0 state.options is not up to date after setState call
 
-    return state.options.length - 1;
+    // setState("options", prev => [...prev, optionData]);
+    // return state.options.length - 1;
+
+    const updatedOptions = _setOptions(prev => [...prev, optionData]);
+
+    return updatedOptions.length - 1;
   };
 
   createEffect(

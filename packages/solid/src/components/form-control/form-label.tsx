@@ -28,14 +28,13 @@ export function FormLabel<C extends ElementType = "label">(props: FormLabelProps
   const [local, others] = splitProps(propsWithDefault, [
     "id",
     "for",
-    "htmlFor",
     "class",
     "children",
     "withRequiredIndicator",
   ]);
 
   const id = () => local.id ?? formControl?.state.labelId;
-  const htmlFor = () => local.for ?? local.htmlFor ?? formControl?.state.id;
+  const htmlFor = () => local.for ?? formControl?.state.id;
 
   const classes = () => classNames(local.class, hopeFormLabelClass, formLabelStyles());
 

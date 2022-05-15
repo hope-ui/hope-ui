@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": false,
   "description": "The SolidJS component library you've hoped for.",
   "keywords": [
@@ -54,7 +54,7 @@
   },
   "peerDependencies": {
     "@stitches/core": "^1.2.8",
-    "solid-js": "^1.3.15",
+    "solid-js": "^1.4.0",
     "solid-transition-group": "^0.0.10"
   },
   "publishConfig": {

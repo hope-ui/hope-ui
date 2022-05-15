@@ -44,7 +44,12 @@ export function CloseButton<C extends ElementType = "button">(props: CloseButton
   };
 
   const propsWithDefaults = mergeProps(defaultProps, props);
-  const [local, others] = splitProps(propsWithDefaults, ["class", "children", "size", "icon"]);
+  const [local, others] = splitProps(propsWithDefaults as CloseButtonProps<"button">, [
+    "class",
+    "children",
+    "size",
+    "icon",
+  ]);
 
   const classes = () => {
     return classNames(local.class, hopeCloseButtonClass, closeButtonStyles({ size: local.size }));

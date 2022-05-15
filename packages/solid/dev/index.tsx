@@ -1,17 +1,24 @@
-import { For } from "solid-js";
 import { render } from "solid-js/web";
 
 import { HopeProvider, SimpleOption, SimpleSelect } from "../src";
 
 function App() {
   return (
-    <SimpleSelect placeholder="Pick a number">
-      <For each={Array(100).fill(0)}>
-        {(_, i) => <SimpleOption value={i()}>{i()}</SimpleOption>}
-      </For>
+    <SimpleSelect placeholder="Choose a framework" w="300px">
+      <SimpleOption value="react">React</SimpleOption>
+      <SimpleOption value="angular" disabled>
+        Angular
+      </SimpleOption>
+      <SimpleOption value="vue">Vue</SimpleOption>
+      <SimpleOption value="svelte">Svelte</SimpleOption>
+      <SimpleOption value="solid">Solid</SimpleOption>
     </SimpleSelect>
   );
 }
+
+// function App() {
+//   return <div>Hello Hope UI</div>;
+// }
 
 render(
   () => (

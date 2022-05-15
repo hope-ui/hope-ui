@@ -26,7 +26,7 @@ const styled: HopeFactory = <T extends ElementType>(
     const propsWithDefault = mergeProps({ as: component }, props);
 
     const [local, styleProps, others] = splitProps(
-      propsWithDefault as HTMLHopeProps<T>,
+      propsWithDefault as HTMLHopeProps<any>,
       ["as", "class", "className", "__baseStyle"],
       usedStylePropNames
     );
