@@ -79,7 +79,7 @@ export default function Header() {
               </hope.span>
             </Text>
             <Tag size="sm" rounded="$sm" fontWeight="$semibold">
-              v0.5.1
+              v0.6.0
             </Tag>
           </HStack>
           <HStack spacing="$2">
