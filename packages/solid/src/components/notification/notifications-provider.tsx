@@ -89,9 +89,9 @@ export function NotificationsProvider(props: NotificationsProviderProps) {
   const finalPlacement: Accessor<NotificationsProviderProps["placement"]> = () =>
     local.placement ?? "top-end";
 
-  const notificationsAccessor = () => notificationQueue().state.current;
+  const notificationsAccessor = () => notificationQueue().state.current();
 
-  const queueAccessor = () => notificationQueue().state.queue;
+  const queueAccessor = () => notificationQueue().state.queue();
 
   const showNotification = (notification: ShowNotificationProps) => {
     const id = notification.id ?? `hope-notification-${createUniqueId()}`;

@@ -1,4 +1,4 @@
-import { createStore } from "solid-js/store";
+import { Accessor, createSignal } from "solid-js";
 
 interface CreateQueueProps<T> {
   initialValues?: T[];
@@ -6,9 +6,9 @@ interface CreateQueueProps<T> {
 }
 
 interface CreateQueueState<T> {
-  current: T[];
-  queue: T[];
-  limit: number;
+  current: Accessor<T[]>;
+  queue: Accessor<T[]>;
+  limit: Accessor<number>;
 }
 
 interface CreateQueueReturn<T> {
@@ -19,38 +19,40 @@ interface CreateQueueReturn<T> {
 }
 
 export function createQueue<T>(props: CreateQueueProps<T>): CreateQueueReturn<T> {
-  const [state, setState] = createStore<CreateQueueState<T>>({
-    // eslint-disable-next-line solid/reactivity
-    current: props.initialValues?.slice(0, props.limit) ?? [],
+  const [currentState, setCurrentState] = createSignal(
+    props.initialValues?.slice(0, props.limit) ?? []
+  );
 
-    // eslint-disable-next-line solid/reactivity
-    queue: props.initialValues?.slice(props.limit) ?? [],
+  const [queue, setQueue] = createSignal(props.initialValues?.slice(props.limit) ?? []);
 
-    get limit() {
-      return props.limit;
-    },
-  });
+  const limit = () => props.limit;
 
   const add = (...items: T[]) => {
-    const results = [...state.current, ...state.queue, ...items];
+    const results = [...currentState(), ...queue(), ...items];
 
-    setState("current", results.slice(0, state.limit) as T[]);
-    setState("queue", results.slice(state.limit) as T[]);
+    setCurrentState(results.slice(0, limit()) as T[]);
+    setQueue(results.slice(limit()) as T[]);
   };
 
   const update = (fn: (state: T[]) => T[]) => {
-    const results = fn([...state.current, ...state.queue] as Array<T>);
+    const results = fn([...currentState(), ...queue()] as Array<T>);
 
-    setState("current", results.slice(0, state.limit));
-    setState("queue", results.slice(state.limit));
+    setCurrentState(results.slice(0, limit()) as T[]);
+    setQueue(results.slice(limit()) as T[]);
   };
 
   const clearQueue = () => {
-    setState("queue", []);
+    setQueue([]);
+  };
+
+  const state: CreateQueueState<T> = {
+    current: currentState,
+    queue,
+    limit,
   };
 
   return {
-    state: state as CreateQueueState<any>,
+    state,
     add,
     update,
     clearQueue,

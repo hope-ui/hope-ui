@@ -4,15 +4,15 @@ describe("createQueue", () => {
   it("correctly distributes initial values when limit is not reached", () => {
     const { state } = createQueue({ initialValues: [1], limit: 2 });
 
-    expect(state.current).toStrictEqual([1]);
-    expect(state.queue).toStrictEqual([]);
+    expect(state.current()).toStrictEqual([1]);
+    expect(state.queue()).toStrictEqual([]);
   });
 
   it("correctly distributes initial values when limit is reached", () => {
     const { state } = createQueue({ initialValues: [1, 2, 3, 4, 5], limit: 2 });
 
-    expect(state.current).toStrictEqual([1, 2]);
-    expect(state.queue).toStrictEqual([3, 4, 5]);
+    expect(state.current()).toStrictEqual([1, 2]);
+    expect(state.queue()).toStrictEqual([3, 4, 5]);
   });
 
   it("adds items to the state when limit is not reached", () => {
@@ -20,8 +20,8 @@ describe("createQueue", () => {
 
     add(2);
 
-    expect(state.current).toStrictEqual([1, 2]);
-    expect(state.queue).toStrictEqual([]);
+    expect(state.current()).toStrictEqual([1, 2]);
+    expect(state.queue()).toStrictEqual([]);
   });
 
   it("adds items to the queue when limit is reached", () => {
@@ -29,8 +29,8 @@ describe("createQueue", () => {
 
     add(3, 4, 5);
 
-    expect(state.current).toStrictEqual([1, 2]);
-    expect(state.queue).toStrictEqual([3, 4, 5]);
+    expect(state.current()).toStrictEqual([1, 2]);
+    expect(state.queue()).toStrictEqual([3, 4, 5]);
   });
 
   it("correctly applies given update to state without queue", () => {
@@ -38,8 +38,8 @@ describe("createQueue", () => {
 
     update(state => state.filter(i => i % 2));
 
-    expect(state.current).toStrictEqual([1]);
-    expect(state.queue).toStrictEqual([]);
+    expect(state.current()).toStrictEqual([1]);
+    expect(state.queue()).toStrictEqual([]);
   });
 
   it("correctly applies given update to state with queue", () => {
@@ -47,8 +47,8 @@ describe("createQueue", () => {
 
     update(state => state.filter(i => i % 2));
 
-    expect(state.current).toStrictEqual([1, 3, 5]);
-    expect(state.queue).toStrictEqual([7]);
+    expect(state.current()).toStrictEqual([1, 3, 5]);
+    expect(state.queue()).toStrictEqual([7]);
   });
 
   it("puts extra items to the queue if state has extra items after update", () => {
@@ -56,8 +56,8 @@ describe("createQueue", () => {
 
     update(() => [1, 2, 3, 4, 5, 6, 7, 8]);
 
-    expect(state.current).toStrictEqual([1, 2, 3]);
-    expect(state.queue).toStrictEqual([4, 5, 6, 7, 8]);
+    expect(state.current()).toStrictEqual([1, 2, 3]);
+    expect(state.queue()).toStrictEqual([4, 5, 6, 7, 8]);
   });
 
   it("cleans queue with cleanQueue handlers", () => {
@@ -65,7 +65,7 @@ describe("createQueue", () => {
 
     clearQueue();
 
-    expect(state.current).toStrictEqual([1, 2]);
-    expect(state.queue).toStrictEqual([]);
+    expect(state.current()).toStrictEqual([1, 2]);
+    expect(state.queue()).toStrictEqual([]);
   });
 });
