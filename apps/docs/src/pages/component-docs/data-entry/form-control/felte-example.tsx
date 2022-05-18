@@ -38,12 +38,12 @@ export function FelteExample() {
 
   return (
     <VStack as="form" ref={form} spacing="$5" alignItems="stretch" maxW="$96" mx="auto">
-      <FormControl required invalid={errors("email")}>
+      <FormControl required invalid={!!errors("email")}>
         <FormLabel>Email</FormLabel>
         <Input type="email" name="email" placeholder="contact@hope-ui.com" />
         <FormErrorMessage>{errors("email")[0]}</FormErrorMessage>
       </FormControl>
-      <FormControl required invalid={errors("jobTitle")}>
+      <FormControl required invalid={!!errors("jobTitle")}>
         <FormLabel>Job title</FormLabel>
         <SimpleSelect
           placeholder="Choose a job title"
@@ -55,7 +55,7 @@ export function FelteExample() {
         </SimpleSelect>
         <FormErrorMessage>{errors("jobTitle")[0]}</FormErrorMessage>
       </FormControl>
-      <FormControl as="fieldset" required invalid={errors("gender")}>
+      <FormControl as="fieldset" required invalid={!!errors("gender")}>
         <FormLabel as="legend">Gender</FormLabel>
         <RadioGroup name="gender">
           <HStack spacing="$5">
@@ -66,7 +66,7 @@ export function FelteExample() {
         </RadioGroup>
         <FormErrorMessage>{errors("gender")[0]}</FormErrorMessage>
       </FormControl>
-      <FormControl invalid={errors("bio")}>
+      <FormControl invalid={!!errors("bio")}>
         <FormLabel>Bio</FormLabel>
         <Textarea name="bio" placeholder="Tell us something about yourself" />
         <Show
