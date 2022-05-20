@@ -78,6 +78,7 @@ export function PopoverTrigger<C extends ElementType = "button">(props: PopoverT
     <hope.button
       ref={assignTriggerRef}
       id={popoverContext.state.triggerId}
+      type="button"
       aria-haspopup="dialog"
       aria-controls={popoverContext.state.contentId}
       aria-expanded={popoverContext.state.opened}

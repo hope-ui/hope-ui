@@ -27,8 +27,8 @@ export function SelectTagCloseButton<C extends ElementType = "button">(
 
   return (
     <hope.button
-      type="button"
       role="button"
+      type="button"
       aria-label="Delete"
       tabIndex="-1"
       class={classes()}
