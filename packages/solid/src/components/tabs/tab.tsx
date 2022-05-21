@@ -85,6 +85,7 @@ export function Tab<C extends ElementType = "button">(props: TabProps<C>) {
     <hope.button
       ref={assignTabRef}
       role="tab"
+      type="button"
       id={tabId()}
       tabIndex={isSelected() ? 0 : -1}
       disabled={local.disabled}

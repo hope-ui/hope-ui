@@ -99,9 +99,7 @@ export default function MainNavContent() {
         <AppNavLink href="/docs/feedback/progress">Progress</AppNavLink>
         <AppNavLink href="/docs/feedback/skeleton">Skeleton</AppNavLink>
         <AppNavLink href="/docs/feedback/spinner">Spinner</AppNavLink>
-        <AppNavLink href="/docs/feedback/notification" isNew>
-          Notification
-        </AppNavLink>
+        <AppNavLink href="/docs/feedback/notification">Notification</AppNavLink>
       </VStack>
       <MainNavSubtitle mb="$2">Overlay</MainNavSubtitle>
       <VStack alignItems="flex-start" spacing="$1" mb="$6">

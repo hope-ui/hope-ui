@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/fabien-ml/hope-ui/compare/v0.6.0...v0.6.1) (2022-05-21)
+
+### 🐛 Bug fixes
+
+- Opening accordion triggers form submission (#154).
+- Notification close button is too small on mobile devices (#155).
+
 ## [0.6.0](https://github.com/fabien-ml/hope-ui/compare/v0.5.1...v0.6.0) (2022-05-15)
 
 ### 💥 BREAKING CHANGES
