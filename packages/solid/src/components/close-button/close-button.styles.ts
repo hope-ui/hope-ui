@@ -15,6 +15,7 @@ export const closeButtonStyles = css({
   borderWidth: 0,
   borderRadius: "$sm",
   backgroundColor: "transparent",
+  padding: 0,
 
   color: "currentColor",
 

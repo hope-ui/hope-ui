@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/solid",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": false,
   "description": "The SolidJS component library you've hoped for.",
   "keywords": [
@@ -47,7 +47,6 @@
   },
   "dependencies": {
     "@floating-ui/dom": "0.4.4",
-    "@solid-primitives/refs": "0.2.0",
     "csstype": "3.0.11",
     "focus-trap": "6.7.3",
     "lodash.merge": "4.6.2",

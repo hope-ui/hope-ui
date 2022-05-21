@@ -159,14 +159,12 @@ importers:
   packages/solid:
     specifiers:
       '@floating-ui/dom': 0.4.4
-      '@solid-primitives/refs': 0.2.0
       csstype: 3.0.11
       focus-trap: 6.7.3
       lodash.merge: 4.6.2
       scroll-lock: 2.1.5
     dependencies:
       '@floating-ui/dom': 0.4.4
-      '@solid-primitives/refs': 0.2.0
       csstype: 3.0.11
       focus-trap: 6.7.3
       lodash.merge: 4.6.2
@@ -2664,38 +2662,6 @@ packages:
     dependencies:
       '@sinonjs/commons': 1.8.3
     dev: true
-
-  /@solid-primitives/immutable/0.1.0:
-    resolution: {integrity: sha512-vKA318tb65h6f9mizF/x7ep9CxhtCtD6HMm5XVpRE+KrujgwyWB3DAVxmJ0lM4v4cImc7jvwBWvYirpnupe11A==}
-    dependencies:
-      '@solid-primitives/utils': 1.5.2
-    transitivePeerDependencies:
-      - solid-js
-    dev: false
-
-  /@solid-primitives/refs/0.2.0:
-    resolution: {integrity: sha512-1XmLrM6K8qzuVN4Sj3XYFy5fYewGFBLEkiZfBhhSTDcBmlAWLBYjrcQTtq+/a6Ya8ji70C9biLH/BJPuQq1I3w==}
-    peerDependencies:
-      solid-js: ^1.3.0
-    dependencies:
-      '@solid-primitives/immutable': 0.1.0
-      '@solid-primitives/rootless': 1.1.0
-      '@solid-primitives/utils': 1.5.2
-    dev: false
-
-  /@solid-primitives/rootless/1.1.0:
-    resolution: {integrity: sha512-9KiTDWxEQ8d5NTElCqKVASxukUWMYMVOVGE6ZAq1MUUQPT94lQ2BdnHVUOplN5zu+rQ15AWleM8fZRwty6Ge9A==}
-    peerDependencies:
-      solid-js: ^1.3.1
-    dependencies:
-      '@solid-primitives/utils': 1.5.2
-    dev: false
-
-  /@solid-primitives/utils/1.5.2:
-    resolution: {integrity: sha512-dZUHjzasuqS2lDO+PQCY1+jFmtWHlaP3tUvkX1Jr06LI/Ipa2P/ZNVSvuIoqQ0Bg+Ny27LvtrXxflZNeGtptvA==}
-    peerDependencies:
-      solid-js: ^1.3.1
-    dev: false
 
   /@stitches/core/1.2.8:
     resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}

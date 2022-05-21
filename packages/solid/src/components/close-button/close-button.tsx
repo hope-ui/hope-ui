@@ -39,7 +39,7 @@ export function CloseButton<C extends ElementType = "button">(props: CloseButton
 
   const defaultProps: CloseButtonProps<"button"> = {
     "aria-label": theme?.defaultProps?.["aria-label"] ?? "Close",
-    icon: theme?.defaultProps?.icon ?? <IconClose width="1em" height="1em" />,
+    icon: theme?.defaultProps?.icon ?? <IconClose />,
     size: theme?.defaultProps?.size ?? "md",
   };
 
