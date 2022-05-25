@@ -25,12 +25,10 @@
     "@felte/solid": "1.1.5",
     "@felte/validator-yup": "1.0.3",
     "@hope-ui/core": "workspace:*",
-    "@stitches/core": "1.2.8",
     "prism-themes": "1.9.0",
     "prismjs": "1.27.0",
     "solid-app-router": "0.2.1",
     "solid-js": "1.4.0",
-    "solid-transition-group": "0.0.10",
     "yup": "0.32.11"
   },
   "devDependencies": {
