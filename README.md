@@ -27,6 +27,8 @@
   </a>
 </p>
 
+> ⚠️ Hope UI is in a major redesign process, expect **breaking changes** and **feature removal** until 1.0 ⚠️
+
 Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
 
 ## Why use Hope UI ?
@@ -36,7 +38,6 @@ Hope UI is a composable and accessible component library that gives you the foun
 - **Accessible**: Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
 - **Themeable**: Use Hope UI's design system or customize it using the theming features.
 - **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
-- **Style props**: All component styles can be overridden or extended via style props like `<Box bg="tomato" padding="24px">Box</Box>`.
 
 ## Project status
 
