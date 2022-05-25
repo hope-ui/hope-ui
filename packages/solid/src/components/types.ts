@@ -1,4 +1,4 @@
-import { Component, ComponentProps, JSX, ParentProps } from "solid-js";
+import { Component, ComponentProps, JSX } from "solid-js";
 
 import { StyleProps } from "../styled-system/system";
 import { SystemStyleObject } from "../styled-system/types";
@@ -10,30 +10,22 @@ import { OverrideProps } from "../utils/types";
 export type DOMElements = keyof JSX.IntrinsicElements;
 
 /**
- * Represent any HTML element or SolidJS component.
+ * Any HTML element or SolidJS component.
  */
 export type ElementType<Props = any> = DOMElements | Component<Props>;
-
-/**
- * Take the props of the passed HTML element or component and returns its type.
- */
-export type PropsOf<C extends ElementType> = ComponentProps<C>;
 
 /**
  * All SolidJS props that apply css classes.
  */
 export interface ClassProps {
   class?: string;
-  className?: string;
   classList?: { [key: string]: boolean };
 }
 
 /**
- * Tag or component that should be used as root element.
+ * The "as" prop type.
  */
-export interface AsProp<C extends ElementType> {
-  as?: C;
-}
+export type As<Props = any> = ElementType<Props>;
 
 /**
  * Hope UI specific props.
@@ -43,24 +35,25 @@ export type HopeProps = StyleProps & ClassProps & { __baseStyle?: SystemStyleObj
 /**
  * Enhance props of a SolidJS component or JSX element with Hope UI props.
  */
-export type HTMLHopeProps<C extends ElementType, AdditionalProps = {}> = OverrideProps<
-  ParentProps<PropsOf<C>>,
-  HopeProps & AdditionalProps & { as?: C }
+export type HTMLHopeProps<Type extends As = As, Props = {}> = OverrideProps<
+  ComponentProps<Type>,
+  Props & HopeProps & { as?: Type; children?: JSX.Element }
 >;
 
 /**
  * A hope-enabled component that accept style props.
  */
-export type HopeComponent<T extends ElementType, P = {}> = <C extends ElementType = T>(
-  props: HTMLHopeProps<C, P>
-) => JSX.Element;
+export type HopeComponent<DefaultType extends As, Props> = {
+  <Type extends As>(props: HTMLHopeProps<Type, Props> & { as: Type }): JSX.Element;
+  (props: HTMLHopeProps<DefaultType, Props>): JSX.Element;
+};
 
 /**
  * All html and svg elements for hope components.
  * This is mostly for `hope.<element>` syntax.
  */
 export type HTMLHopeComponents = {
-  [Tag in DOMElements]: HopeComponent<Tag>;
+  [Tag in DOMElements]: HopeComponent<Tag, {}>;
 };
 
 export interface HopeFactoryStyleOptions<T extends ElementType> {
@@ -83,7 +76,7 @@ export interface HopeFactoryStyleOptions<T extends ElementType> {
 export type HopeFactory = <T extends ElementType>(
   component: T,
   styleOptions?: HopeFactoryStyleOptions<T>
-) => HopeComponent<T>;
+) => HopeComponent<T, {}>;
 
 /**
  * Style configuration for Hope UI single-part component.

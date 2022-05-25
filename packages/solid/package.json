@@ -19,25 +19,28 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fabien-ml/hope-ui.git",
-    "directory": "packages/design-system"
+    "directory": "packages/solid"
   },
   "license": "MIT",
   "author": "Fabien MARIE-LOUISE (https://github.com/fabien-ml)",
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "solid": "./dist/source/index.jsx",
+      "import": "./dist/esm/index.js",
+      "browser": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "node": "./dist/cjs/index.js"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "rollup -c",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "storybook": "start-storybook -p 6006",

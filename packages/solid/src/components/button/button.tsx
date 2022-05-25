@@ -1,11 +1,11 @@
 import { Property } from "csstype";
-import { JSX, mergeProps, Show, splitProps } from "solid-js";
+import { JSX, mergeProps, ParentProps, Show, splitProps } from "solid-js";
 
 import { useStyleConfig } from "../../hope-provider";
 import { SpaceScaleValue, SystemStyleObject } from "../../styled-system/types";
 import { classNames, createClassSelector } from "../../utils/css";
-import { hope } from "../factory";
-import { ElementType, HTMLHopeProps } from "../types";
+import { createComponentWithAs, hope } from "../factory";
+import { HTMLHopeProps } from "../types";
 import { buttonStyles, ButtonVariants } from "./button.styles";
 import { ThemeableButtonGroupOptions, useButtonGroupContext } from "./button-group";
 import { ButtonIcon } from "./button-icon";
@@ -65,27 +65,23 @@ export interface ButtonStyleConfig {
   };
 }
 
-export type ButtonProps<C extends ElementType = "button"> = HTMLHopeProps<C, ButtonOptions>;
+type ButtonComponentProps = HTMLHopeProps<"button", ButtonOptions>;
 
 export const hopeButtonClass = "hope-button";
 
-/**
- * The Button component is used to trigger an action or event,
- * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
- */
-export function Button<C extends ElementType = "button">(props: ButtonProps<C>) {
+function ButtonComponent(props: ButtonComponentProps) {
   const theme = useStyleConfig().Button;
 
   const buttonGroupContext = useButtonGroupContext();
 
-  const defaultProps: ButtonProps<"button"> = {
+  const defaultProps: ButtonComponentProps = {
     loaderPlacement: theme?.defaultProps?.root?.loaderPlacement ?? "start",
     iconSpacing: "0.5rem",
     type: "button",
     role: "button",
   };
 
-  const propsWithDefault: ButtonProps<"button"> = mergeProps(defaultProps, props);
+  const propsWithDefault: ButtonComponentProps = mergeProps(defaultProps, props);
   const [local, contentProps, others] = splitProps(
     propsWithDefault,
     [
@@ -175,9 +171,11 @@ export function Button<C extends ElementType = "button">(props: ButtonProps<C>) 
   );
 }
 
-Button.toString = () => createClassSelector(hopeButtonClass);
+ButtonComponent.toString = () => createClassSelector(hopeButtonClass);
 
-type ButtonContentProps = Pick<ButtonProps, "iconSpacing" | "leftIcon" | "rightIcon" | "children">;
+type ButtonContentProps = ParentProps<
+  Pick<ButtonOptions, "iconSpacing" | "leftIcon" | "rightIcon">
+>;
 
 function ButtonContent(props: ButtonContentProps) {
   return (
@@ -192,3 +190,9 @@ function ButtonContent(props: ButtonContentProps) {
     </>
   );
 }
+
+/**
+ * The Button component is used to trigger an action or event,
+ * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
+ */
+export const Button = createComponentWithAs<"button", ButtonOptions>(ButtonComponent);

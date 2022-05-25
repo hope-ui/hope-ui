@@ -1,10 +1,11 @@
-import { createMemo, mergeProps, splitProps } from "solid-js";
+import { Component, createMemo, mergeProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createStyledSystemClass, getUsedStylePropNames } from "../styled-system/system";
 import { isFunction } from "../utils/assertion";
 import { classNames, createClassSelector } from "../utils/css";
 import {
+  As,
   DOMElements,
   ElementType,
   HopeComponent,
@@ -14,13 +15,18 @@ import {
   HTMLHopeProps,
 } from "./types";
 
-// TODO: add stitches variant support
+/**
+ * Factory function to create component with the "as" prop.
+ */
+export function createComponentWithAs<DefaultType extends As, Props>(component: Component<any>) {
+  return component as unknown as HopeComponent<DefaultType, Props>;
+}
 
 const styled: HopeFactory = <T extends ElementType>(
   component: T,
   styleOptions?: HopeFactoryStyleOptions<T>
 ) => {
-  const hopeComponent: HopeComponent<T> = props => {
+  const hopeComponent = createComponentWithAs<T, {}>((props: HTMLHopeProps<T>) => {
     const usedStylePropNames = getUsedStylePropNames(props);
 
     const propsWithDefault = mergeProps({ as: component }, props);
@@ -50,7 +56,7 @@ const styled: HopeFactory = <T extends ElementType>(
     };
 
     return <Dynamic component={local.as ?? "div"} class={classes()} {...others} />;
-  };
+  });
 
   // In order to target the component in stitches css method and prop, like any other Hope UI components.
   hopeComponent.toString = () =>
@@ -60,7 +66,7 @@ const styled: HopeFactory = <T extends ElementType>(
 };
 
 function factory() {
-  const cache = new Map<DOMElements, HopeComponent<DOMElements>>();
+  const cache = new Map<DOMElements, HopeComponent<DOMElements, {}>>();
 
   return new Proxy(styled, {
     /**

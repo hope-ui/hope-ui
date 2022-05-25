@@ -4,30 +4,21 @@ import { useStyleConfig } from "../../hope-provider";
 import { isFunction } from "../../utils/assertion";
 import { classNames, createClassSelector } from "../../utils/css";
 import { chainHandlers } from "../../utils/function";
-import { hope } from "../factory";
-import { ElementType, HTMLHopeProps } from "../types";
+import { createComponentWithAs, hope } from "../factory";
+import { HTMLHopeProps } from "../types";
 import { useMenuContext } from "./menu";
 import { menuTriggerStyles } from "./menu.styles";
 
-export type MenuTriggerProps<C extends ElementType = "button"> = HTMLHopeProps<C>;
-
 const hopeMenuTriggerClass = "hope-menu__trigger";
 
-/**
- * The trigger that toggles the menu.
- */
-export function MenuTrigger<C extends ElementType = "button">(props: MenuTriggerProps<C>) {
+type MenuTriggerComponentProps = HTMLHopeProps<"button">;
+
+function MenuTriggerComponent(props: MenuTriggerComponentProps) {
   const theme = useStyleConfig().Menu;
 
   const menuContext = useMenuContext();
 
-  const [local, others] = splitProps(props as MenuTriggerProps<"button">, [
-    "ref",
-    "class",
-    "onClick",
-    "onKeyDown",
-    "onBlur",
-  ]);
+  const [local, others] = splitProps(props, ["ref", "class", "onClick", "onKeyDown", "onBlur"]);
 
   const assignTriggerRef = (el: HTMLButtonElement) => {
     menuContext.assignTriggerRef(el);
@@ -72,4 +63,9 @@ export function MenuTrigger<C extends ElementType = "button">(props: MenuTrigger
   );
 }
 
-MenuTrigger.toString = () => createClassSelector(hopeMenuTriggerClass);
+MenuTriggerComponent.toString = () => createClassSelector(hopeMenuTriggerClass);
+
+/**
+ * The trigger that toggles the menu.
+ */
+export const MenuTrigger = createComponentWithAs<"button", {}>(MenuTriggerComponent);

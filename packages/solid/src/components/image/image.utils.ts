@@ -1,9 +1,14 @@
-import { createEffect, createRenderEffect, createSignal, onCleanup } from "solid-js";
+import {
+  ComponentProps,
+  createEffect,
+  createRenderEffect,
+  createSignal,
+  onCleanup,
+} from "solid-js";
 
 import { callHandler } from "../../utils/function";
-import { PropsOf } from "../types";
 
-type NativeImageProps = PropsOf<"img">;
+type NativeImageProps = ComponentProps<"img">;
 
 export interface CreateImageLoadingStatusProps {
   /**
