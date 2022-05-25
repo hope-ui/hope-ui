@@ -19,11 +19,11 @@
   <a href="LICENSE.md">
     <img src="https://img.shields.io/github/license/fabien-ml/hope-ui" alt="MIT License"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/v/@hope-ui/solid" alt="npm - @hope-ui/solid"/>
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/v/@hope-ui/core" alt="npm - @hope-ui/core"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/dm/@hope-ui/solid.svg" alt="npm - downloads" height="18">
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/dm/@hope-ui/core.svg" alt="npm - downloads" height="18">
   </a>
 </p>
 
