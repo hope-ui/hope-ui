@@ -1,0 +1,104 @@
+:root {
+  // Primary (Tailwind - Cyan)
+  --hope-colors-primary-50: 236 254 255;
+  --hope-colors-primary-100: 207 250 254;
+  --hope-colors-primary-200: 165 243 252;
+  --hope-colors-primary-300: 103 232 249;
+  --hope-colors-primary-400: 34 211 238;
+  --hope-colors-primary-500: 6 182 212;
+  --hope-colors-primary-600: 8 145 178;
+  --hope-colors-primary-700: 14 116 144;
+  --hope-colors-primary-800: 21 94 117;
+  --hope-colors-primary-900: 22 78 99;
+
+  // Accent (Tailwind - Violet)
+  --hope-colors-accent-50: 245 243 255;
+  --hope-colors-accent-100: 237 233 254;
+  --hope-colors-accent-200: 221 214 254;
+  --hope-colors-accent-300: 196 181 253;
+  --hope-colors-accent-400: 167 139 250;
+  --hope-colors-accent-500: 139 92 246;
+  --hope-colors-accent-600: 124 58 237;
+  --hope-colors-accent-700: 109 40 217;
+  --hope-colors-accent-800: 91 33 182;
+  --hope-colors-accent-900: 76 29 149;
+
+  // Dark (Mantine - Dark)
+  --hope-colors-dark-50: 193 194 197;
+  --hope-colors-dark-100: 166 167 171;
+  --hope-colors-dark-200: 144 146 150;
+  --hope-colors-dark-300: 92 95 102;
+  --hope-colors-dark-400: 55 58 64;
+  --hope-colors-dark-500: 44 46 51;
+  --hope-colors-dark-600: 37 38 43;
+  --hope-colors-dark-700: 26 27 30;
+  --hope-colors-dark-800: 20 21 23;
+  --hope-colors-dark-900: 16 17 19;
+
+  // Neutral (Tailwind - Gray)
+  --hope-colors-neutral-50: 249 250 251;
+  --hope-colors-neutral-100: 243 244 246;
+  --hope-colors-neutral-200: 229 231 235;
+  --hope-colors-neutral-300: 209 213 219;
+  --hope-colors-neutral-400: 156 163 175;
+  --hope-colors-neutral-500: 107 114 128;
+  --hope-colors-neutral-600: 75 85 99;
+  --hope-colors-neutral-700: 55 65 81;
+  --hope-colors-neutral-800: 31 41 55;
+  --hope-colors-neutral-900: 17 24 39;
+
+  // Success (Tailwind - Green)
+  --hope-colors-success-50: 240 253 244;
+  --hope-colors-success-100: 220 252 231;
+  --hope-colors-success-200: 187 247 208;
+  --hope-colors-success-300: 134 239 172;
+  --hope-colors-success-400: 74 222 128;
+  --hope-colors-success-500: 34 197 94;
+  --hope-colors-success-600: 22 163 74;
+  --hope-colors-success-700: 21 128 61;
+  --hope-colors-success-800: 22 101 52;
+  --hope-colors-success-900: 20 83 45;
+
+  // Info (Tailwind - Blue)
+  --hope-colors-info-50: 239 246 255;
+  --hope-colors-info-100: 219 234 254;
+  --hope-colors-info-200: 191 219 254;
+  --hope-colors-info-300: 147 197 253;
+  --hope-colors-info-400: 96 165 250;
+  --hope-colors-info-500: 59 130 246;
+  --hope-colors-info-600: 37 99 235;
+  --hope-colors-info-700: 29 78 216;
+  --hope-colors-info-800: 30 64 175;
+  --hope-colors-info-900: 30 58 138;
+
+  // Warning (Tailwind - Yellow)
+  --hope-colors-warning-50: 254 252 232;
+  --hope-colors-warning-100: 254 249 195;
+  --hope-colors-warning-200: 254 240 138;
+  --hope-colors-warning-300: 253 224 71;
+  --hope-colors-warning-400: 250 204 21;
+  --hope-colors-warning-500: 234 179 8;
+  --hope-colors-warning-600: 202 138 4;
+  --hope-colors-warning-700: 161 98 7;
+  --hope-colors-warning-800: 133 77 14;
+  --hope-colors-warning-900: 113 63 18;
+
+  // Danger (Tailwind - Red)
+  --hope-colors-danger-50: 254 242 242;
+  --hope-colors-danger-100: 254 226 226;
+  --hope-colors-danger-200: 254 202 202;
+  --hope-colors-danger-300: 252 165 165;
+  --hope-colors-danger-400: 248 113 113;
+  --hope-colors-danger-500: 239 68 68;
+  --hope-colors-danger-600: 220 38 38;
+  --hope-colors-danger-700: 185 28 28;
+  --hope-colors-danger-800: 153 27 27;
+  --hope-colors-danger-900: 127 29 29;
+
+  --hope-fonts-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --hope-fonts-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --hope-fonts-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}

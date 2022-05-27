@@ -31,7 +31,8 @@
       "browser": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "node": "./dist/cjs/index.js"
-    }
+    },
+    "./styles": "./dist/styles"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -40,12 +41,25 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && rimraf dist/styles && sass styles:dist/styles --no-source-map && postcss -r dist/styles/*.css",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch --passWithNoTests",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hope-ui/utils": "workspace:^*",
+    "lodash.merge": "4.6.2"
+  },
+  "devDependencies": {
+    "@types/lodash.merge": "4.6.6",
+    "autoprefixer": "10.4.7",
+    "cssnano": "5.1.9",
+    "postcss": "8.4.14",
+    "postcss-cli": "9.1.0",
+    "rimraf": "3.0.2",
+    "sass": "1.52.1"
   },
   "peerDependencies": {
     "solid-js": "^1.4.0"

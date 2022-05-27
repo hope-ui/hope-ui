@@ -47,6 +47,10 @@
     "test:watch": "jest --watch --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@hope-ui/theme": "workspace:^*",
+    "@hope-ui/utils": "workspace:^*"
+  },
   "peerDependencies": {
     "solid-js": "^1.4.0"
   },
