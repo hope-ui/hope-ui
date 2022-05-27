@@ -1,1 +1,3 @@
-@import "../node_modules/@hope-ui/theme/dist/styles/hope-ui.css";
+@import "../node_modules/@hope-ui/theme/dist/styles/variables.css";
+@import "../node_modules/@hope-ui/theme/dist/styles/reset.css";
+@import "../node_modules/@hope-ui/theme/dist/styles/components.css";

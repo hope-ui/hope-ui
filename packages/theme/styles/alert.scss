@@ -12,9 +12,9 @@
  * Alert
  * -----------------------------------------------------------------------------------------------*/
 .hope-alert {
-  position: "relative";
-  display: "flex";
-  align-items: "center";
+  position: relative;
+  display: flex;
+  align-items: center;
   border-radius: var(--hope-alert-border-radius);
   border: 1px solid transparent;
   padding: var(--hope-alert-padding);
@@ -49,28 +49,36 @@
   &.hope-alert--success {
     background-color: rgb(var(--hope-colors-success-50));
     color: rgb(var(--hope-colors-success-700));
+
+    & .hope-alert-icon {
+      color: rgb(var(--hope-colors-success-500));
+    }
   }
 
   &.hope-alert--info {
     background-color: rgb(var(--hope-colors-info-50));
     color: rgb(var(--hope-colors-info-700));
+
+    & .hope-alert-icon {
+      color: rgb(var(--hope-colors-info-500));
+    }
   }
 
   &.hope-alert--warning {
     background-color: rgb(var(--hope-colors-warning-50));
     color: rgb(var(--hope-colors-warning-700));
+
+    & .hope-alert-icon {
+      color: rgb(var(--hope-colors-warning-500));
+    }
   }
 
   &.hope-alert--danger {
     background-color: rgb(var(--hope-colors-danger-50));
     color: rgb(var(--hope-colors-danger-700));
-  }
-}
 
-/* -------------------------------------------------------------------------------------------------
- * AlertIcon
- * -----------------------------------------------------------------------------------------------*/
-.hope-alert-icon {
-  flex-shrink: 0;
-  flex-grow: 0;
+    & .hope-alert-icon {
+      color: rgb(var(--hope-colors-danger-500));
+    }
+  }
 }
