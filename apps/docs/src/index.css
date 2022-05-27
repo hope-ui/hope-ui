@@ -6,3 +6,7 @@
 @import "../node_modules/@hope-ui/core/dist/styles/components.css";
 
 @import "tailwindcss/utilities";
+
+.hope-ui-dark {
+  @apply text-white/90 bg-dark-900;
+}

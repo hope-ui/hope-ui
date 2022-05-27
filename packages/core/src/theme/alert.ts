@@ -1,7 +1,7 @@
 import { ComponentConfig } from "./component";
 
 export interface AlertVariants {
-  variant?: "solid" | "subtle";
+  variant?: "solid" | "subtle" | "left-accent" | "top-accent";
   status?: "success" | "info" | "warning" | "danger";
 }
 
