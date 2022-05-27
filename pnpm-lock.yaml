@@ -91,6 +91,7 @@ importers:
       '@felte/solid': 1.1.5
       '@felte/validator-yup': 1.0.3
       '@hope-ui/core': workspace:*
+      '@hope-ui/tailwind': workspace:*
       '@types/prismjs': 1.26.0
       autoprefixer: 10.4.7
       postcss: 8.4.14
@@ -111,6 +112,7 @@ importers:
       solid-js: 1.4.0
       yup: 0.32.11
     devDependencies:
+      '@hope-ui/tailwind': link:../../packages/tailwind
       '@types/prismjs': 1.26.0
       autoprefixer: 10.4.7_postcss@8.4.14
       postcss: 8.4.14
@@ -141,6 +143,12 @@ importers:
       postcss-cli: 9.1.0_postcss@8.4.14
       rimraf: 3.0.2
       sass: 1.52.1
+
+  packages/tailwind:
+    specifiers:
+      tailwindcss: 3.0.24
+    devDependencies:
+      tailwindcss: 3.0.24
 
   packages/utils:
     specifiers: {}
