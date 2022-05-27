@@ -17,7 +17,7 @@ describe("css", () => {
 
   describe("withBemModifiers", () => {
     it("should return an array of classes with modifiers following BEM naming convention", () => {
-      expect(withBemModifiers("hope-button", ["outline", "primary", "xs"])).toBe([
+      expect(withBemModifiers("hope-button", ["outline", "primary", "xs"])).toEqual([
         "hope-button--outline",
         "hope-button--primary",
         "hope-button--xs",

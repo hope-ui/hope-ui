@@ -1,19 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
-import { createIcon, Icon } from "../../src";
+import { Icon } from "../../src";
 import { renderWithHopeProvider } from "../render";
-
-const StubIcon = createIcon({
-  viewBox: "0 0 15 15",
-  path: () => (
-    <path
-      d="M5 7.5C5 7.22386 5.22386 7 5.5 7H9.5C9.77614 7 10 7.22386 10 7.5C10 7.77614 9.77614 8 9.5 8H5.5C5.22386 8 5 7.77614 5 7.5Z"
-      fill="currentColor"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
-    />
-  ),
-});
 
 describe("Icon", () => {
   afterEach(() => {
@@ -23,7 +11,7 @@ describe("Icon", () => {
 
   it("should render", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" as={StubIcon} />);
+    renderWithHopeProvider(() => <Icon data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -59,7 +47,7 @@ describe("Icon", () => {
 
   it("should have 'hope-icon' class", () => {
     // act
-    renderWithHopeProvider(() => <Icon data-testid="icon" as={StubIcon} />);
+    renderWithHopeProvider(() => <Icon data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
     // assert
@@ -71,21 +59,7 @@ describe("Icon", () => {
     const stubClass = "stub";
 
     // act
-    renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" as={StubIcon} />);
-    const icon = screen.getByTestId("icon");
-
-    // assert
-    expect(icon).toHaveClass(stubClass);
-  });
-
-  it("should accept classList prop", () => {
-    // arrange
-    const stubClass = "stub";
-
-    // act
-    renderWithHopeProvider(() => (
-      <Icon classList={{ [stubClass]: true }} data-testid="icon" as={StubIcon} />
-    ));
+    renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
     // assert
