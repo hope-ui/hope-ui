@@ -15,7 +15,7 @@ import {
   saveColorModeToLocalStorage,
   toggleBodyDarkModeClass,
 } from "./color-mode";
-import { defaultHopeConfig, HopeComponentNames, HopeConfig, OverrideHopeConfig } from "./config";
+import { defaultHopeConfig, HopeComponentNames, HopeConfig, OverrideHopeConfig } from "./theme";
 
 export interface HopeContextValue {
   config: HopeConfig;

@@ -11,11 +11,11 @@ export default function App() {
         <AlertIcon class="mr-2" />
         <span>Hi mom</span>
       </Alert>
-      <Alert>
+      <Alert status="warning">
         <AlertIcon class="mr-2" />
         <span>Hi mom</span>
       </Alert>
-      <Alert>
+      <Alert status="danger">
         <AlertIcon class="mr-2" />
         <span>Hi mom</span>
       </Alert>

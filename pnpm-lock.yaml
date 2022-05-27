@@ -91,7 +91,6 @@ importers:
       '@felte/solid': 1.1.5
       '@felte/validator-yup': 1.0.3
       '@hope-ui/core': workspace:*
-      '@hope-ui/theme': workspace:*
       '@types/prismjs': 1.26.0
       autoprefixer: 10.4.7
       postcss: 8.4.14
@@ -106,7 +105,6 @@ importers:
       '@felte/solid': 1.1.5_solid-js@1.4.0
       '@felte/validator-yup': 1.0.3_yup@0.32.11
       '@hope-ui/core': link:../../packages/core
-      '@hope-ui/theme': link:../../packages/theme
       prism-themes: 1.9.0
       prismjs: 1.27.0
       solid-app-router: 0.2.1_solid-js@1.4.0
@@ -121,19 +119,10 @@ importers:
 
   packages/core:
     specifiers:
-      '@hope-ui/theme': workspace:^*
-      '@hope-ui/utils': workspace:^*
-      clsx: 1.1.1
-    dependencies:
-      '@hope-ui/theme': link:../theme
-      '@hope-ui/utils': link:../utils
-      clsx: 1.1.1
-
-  packages/theme:
-    specifiers:
       '@hope-ui/utils': workspace:^*
       '@types/lodash.merge': 4.6.6
       autoprefixer: 10.4.7
+      clsx: 1.1.1
       cssnano: 5.1.9
       lodash.merge: 4.6.2
       postcss: 8.4.14
@@ -142,6 +131,7 @@ importers:
       sass: 1.52.1
     dependencies:
       '@hope-ui/utils': link:../utils
+      clsx: 1.1.1
       lodash.merge: 4.6.2
     devDependencies:
       '@types/lodash.merge': 4.6.6

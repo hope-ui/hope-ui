@@ -6,6 +6,7 @@
   --hope-alert-padding: 0.75rem 1rem;
   --hope-alert-font-size: 1rem;
   --hope-alert-line-height: 1.5rem;
+  --hope-alert-icon-size: 1.5rem;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -81,4 +82,14 @@
       color: rgb(var(--hope-colors-danger-500));
     }
   }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * AlertIcon
+ * -----------------------------------------------------------------------------------------------*/
+.hope-alert-icon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  width: var(--hope-alert-icon-size);
+  height: var(--hope-alert-icon-size);
 }

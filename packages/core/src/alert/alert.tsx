@@ -1,10 +1,11 @@
-import { AlertVariants, useComponentConfig } from "@hope-ui/theme";
 import { withBemModifiers } from "@hope-ui/utils";
 import clsx from "clsx";
 import { Accessor, createContext, mergeProps, splitProps, useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createComponentWithAs, PropsWithAs } from "../factory";
+import { useComponentConfig } from "../provider";
+import { AlertVariants } from "../theme";
 
 const baseClass = "hope-alert";
 
