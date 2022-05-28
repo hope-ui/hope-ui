@@ -1,1 +1,215 @@
+/* -------------------------------------------------------------------------------------------------
+ * Variables
+ * -----------------------------------------------------------------------------------------------*/
+:root {
+  --hope-button-border-radius: 0.25rem;
+  --hope-button-font-weight: 600;
 
+  --hope-button-xs-height: 30px;
+  --hope-button-xs-border-radius: var(--hope-button-border-radius);
+  --hope-button-xs-padding: 0 14px;
+  --hope-button-xs-font-size: 12px;
+
+  --hope-button-sm-height: 36px;
+  --hope-button-sm-border-radius: var(--hope-button-border-radius);
+  --hope-button-sm-padding: 0 18px;
+  --hope-button-sm-font-size: 14px;
+
+  --hope-button-md-height: 42px;
+  --hope-button-md-border-radius: var(--hope-button-border-radius);
+  --hope-button-md-padding: 0 22px;
+  --hope-button-md-font-size: 16px;
+
+  --hope-button-lg-height: 50px;
+  --hope-button-lg-border-radius: var(--hope-button-border-radius);
+  --hope-button-lg-padding: 0 26px;
+  --hope-button-lg-font-size: 18px;
+
+  --hope-button-xl-height: 60px;
+  --hope-button-xl-border-radius: var(--hope-button-border-radius);
+  --hope-button-xl-padding: 0 32px;
+  --hope-button-xl-font-size: 20px;
+}
+
+$hope-button-sizes: xs, sm, md, lg, xl;
+$hope-button-colors: primary, accent, dark, neutral, success, info, warning, danger;
+
+/* -------------------------------------------------------------------------------------------------
+ * Button
+ * -----------------------------------------------------------------------------------------------*/
+.hope-button {
+  appearance: none;
+  position: relative;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  outline: none;
+  border: 1px solid transparent;
+  border-radius: var(--hope-button-border-radius);
+
+  padding: 0;
+
+  font-weight: var(--hope-button-font-weight);
+  line-height: 1;
+  text-decoration: none;
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: color 250ms, background-color 250ms, box-shadow 250ms;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - size
+ * -----------------------------------------------------------------------------------------------*/
+@each $size in $hope-button-sizes {
+  .hope-button--#{$size} {
+    height: var(--hope-button-#{$size}-height);
+    border-radius: var(--hope-button-#{$size}-border-radius);
+    padding: var(--hope-button-#{$size}-padding);
+    font-size: var(--hope-button-#{$size}-font-size);
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - variant
+ * -----------------------------------------------------------------------------------------------*/
+.hope-button--default {
+  border-color: rgb(var(--hope-colors-neutral-300));
+  background-color: white;
+  color: rgb(var(--hope-colors-dark-900));
+}
+
+.hope-button--solid {
+  color: white;
+
+  @each $color in $hope-button-colors {
+    &.hope-button--#{$color} {
+      background-color: rgb(var(--hope-colors-#{$color}-500));
+    }
+  }
+
+  &.hope-button--warning {
+    color: rgb(var(--hope-colors-dark-500));
+  }
+}
+
+.hope-button--subtle,
+.hope-button--outline,
+.hope-button--dashed,
+.hope-button--ghost {
+  @each $color in $hope-button-colors {
+    &.hope-button--#{$color} {
+      color: rgb(var(--hope-colors-#{$color}-700));
+
+      & .hope-button-icon {
+        color: rgb(var(--hope-colors-#{$color}-600));
+      }
+    }
+  }
+}
+
+.hope-button--subtle {
+  @each $color in $hope-button-colors {
+    &.hope-button--#{$color} {
+      background-color: rgb(var(--hope-colors-#{$color}-50));
+    }
+  }
+}
+
+.hope-button--dashed {
+  border-style: dashed;
+}
+
+.hope-button--outline,
+.hope-button--dashed {
+  background-color: transparent;
+
+  @each $color in $hope-button-colors {
+    &.hope-button--#{$color} {
+      border-color: rgb(var(--hope-colors-#{$color}-500));
+    }
+  }
+}
+
+.hope-button--ghost {
+  background-color: transparent;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Dark mode
+ * -----------------------------------------------------------------------------------------------*/
+.hope-ui-dark {
+  .hope-button--default,
+  .hope-button--solid {
+    color: rgb(255 255 255 / 0.95);
+
+    & .hope-button-icon {
+      color: rgb(255 255 255 / 0.85);
+    }
+  }
+
+  .hope-button--default {
+    border-color: rgb(var(--hope-colors-dark-500));
+    background-color: rgb(var(--hope-colors-dark-900));
+  }
+
+  .hope-button--solid {
+    @each $color in $hope-button-colors {
+      &.hope-button--#{$color} {
+        background-color: rgb(var(--hope-colors-#{$color}-700));
+      }
+    }
+
+    &.hope-button--dark {
+      background-color: rgb(var(--hope-colors-dark-400));
+    }
+  }
+
+  .hope-button--subtle,
+  .hope-button--outline,
+  .hope-button--dashed,
+  .hope-button--ghost {
+    @each $color in $hope-button-colors {
+      &.hope-button--#{$color} {
+        color: rgb(var(--hope-colors-#{$color}-400));
+
+        & .hope-button-icon {
+          color: rgb(var(--hope-colors-#{$color}-500));
+        }
+      }
+    }
+
+    &.hope-button--dark {
+      color: rgb(var(--hope-colors-dark-50));
+    }
+  }
+
+  .hope-button--subtle {
+    @each $color in $hope-button-colors {
+      &.hope-button--#{$color} {
+        background-color: rgb(var(--hope-colors-#{$color}-700) / 0.35);
+      }
+    }
+
+    &.hope-button--dark {
+      background-color: rgb(var(--hope-colors-dark-600));
+    }
+  }
+
+  .hope-button--outline,
+  .hope-button--dashed {
+    @each $color in $hope-button-colors {
+      &.hope-button--#{$color} {
+        border-color: rgb(var(--hope-colors-#{$color}-700));
+      }
+    }
+
+    &.hope-button--dark {
+      border-color: rgb(var(--hope-colors-dark-400));
+    }
+  }
+}

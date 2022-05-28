@@ -4,6 +4,30 @@
 
 @use "./variables";
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  color: rgb(var(--hope-colors-neutral-800));
+  font-family: var(--hope-fonts-sans);
+  line-height: 1.5;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hope-ui-dark {
+  background-color: rgb(var(--hope-colors-dark-900));
+  color: rgb(255 255 255 / 0.9);
+}
+
 .hope-icon {
   display: inline-block;
   flex-shrink: 0;

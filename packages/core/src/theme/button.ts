@@ -12,7 +12,6 @@ export interface ButtonVariants {
     | "warning"
     | "danger";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  compact?: boolean;
 }
 
 export type ButtonConfig = ComponentConfig<ButtonVariants>;
