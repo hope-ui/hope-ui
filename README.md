@@ -27,11 +27,15 @@
   </a>
 </p>
 
-> ⚠️ Hope UI is still under development and not ready for production, expect **breaking changes** until 1.0 ⚠️
-
-> ⚠️ Hope UI style props API will be removed in 1.0, if you came here for this specific feature please consider using another library ⚠️
-
 Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
+
+# ⚠️ WARNING ⚠️
+
+Hope UI is still under development and not ready for production, expect **breaking changes** until 1.0.
+
+Expected breaking changes in 1.0 :
+- The CSS-in-JS library will be replaced by plain old CSS.
+- The style props API and all layout and typography components will be **removed**, use pure CSS (flexbox, grid) or a utility library like [TailwindCSS](https://tailwindcss.com/) or [WindiCSS](https://windicss.org/) instead.
 
 ## Why use Hope UI ?
 
