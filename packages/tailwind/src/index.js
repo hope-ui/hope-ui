@@ -18,6 +18,7 @@ module.exports = plugin(
     theme: {
       extend: {
         colors: {
+          "focus-ring": withOpacityValue("--hope-colors-focus-ring"),
           primary: {
             50: withOpacityValue("--hope-colors-primary-50"),
             100: withOpacityValue("--hope-colors-primary-100"),

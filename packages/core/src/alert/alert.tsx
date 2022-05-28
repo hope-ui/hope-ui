@@ -7,9 +7,9 @@ import { createComponentWithAs, PropsWithAs } from "../factory";
 import { useComponentConfig } from "../provider";
 import { AlertVariants } from "../theme";
 
-const baseClass = "hope-alert";
-
 type AlertComponentProps = PropsWithAs<"div", AlertVariants>;
+
+const baseClass = "hope-alert";
 
 function AlertComponent(props: AlertComponentProps) {
   const config = useComponentConfig("Alert");

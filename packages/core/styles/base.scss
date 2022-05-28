@@ -38,6 +38,10 @@ body {
   vertical-align: middle;
 }
 
+.hope-focus-ring {
+  box-shadow: 0 0 0 3px rgb(var(--hope-colors-focus-ring));
+}
+
 @keyframes hope-spin {
   from {
     transform: rotate(0deg);
