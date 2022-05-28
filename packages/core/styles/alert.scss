@@ -73,7 +73,7 @@ $hope-alert-colors: success, info, warning, danger;
       background-color: rgb(var(--hope-colors-#{$color}-50));
       color: rgb(var(--hope-colors-#{$color}-700));
 
-      & .hope-alert-icon {
+      & .hope-alert__icon {
         color: rgb(var(--hope-colors-#{$color}-500));
       }
     }
@@ -83,7 +83,7 @@ $hope-alert-colors: success, info, warning, danger;
 /* -------------------------------------------------------------------------------------------------
  * AlertIcon
  * -----------------------------------------------------------------------------------------------*/
-.hope-alert-icon {
+.hope-alert__icon {
   flex-grow: 0;
   flex-shrink: 0;
   width: var(--hope-alert-icon-size);
@@ -97,7 +97,7 @@ $hope-alert-colors: success, info, warning, danger;
   .hope-alert--solid {
     color: rgb(255 255 255 / 0.95);
 
-    & .hope-alert-icon {
+    & .hope-alert__icon {
       color: rgb(255 255 255 / 0.85);
     }
 
@@ -116,7 +116,7 @@ $hope-alert-colors: success, info, warning, danger;
         background-color: rgb(var(--hope-colors-#{$color}-700) / 0.35);
         color: rgb(var(--hope-colors-#{$color}-400));
 
-        & .hope-alert-icon {
+        & .hope-alert__icon {
           color: rgb(var(--hope-colors-#{$color}-500));
         }
       }

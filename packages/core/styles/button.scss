@@ -29,6 +29,8 @@
   --hope-button-xl-border-radius: var(--hope-button-border-radius);
   --hope-button-xl-padding: 0 32px;
   --hope-button-xl-font-size: 20px;
+
+  --hope-button-icon-spacing: 0.5rem;
 }
 
 $hope-button-sizes: xs, sm, md, lg, xl;
@@ -44,6 +46,9 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  gap: var(--hope-button-icon-spacing);
+
+  width: auto;
 
   outline: none;
   border: 1px solid transparent;
@@ -60,6 +65,17 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
   white-space: nowrap;
   vertical-align: middle;
   transition: color 250ms, background-color 250ms, box-shadow 250ms;
+
+  &.hope-button--is-full-width {
+    display: flex;
+    width: 100%;
+  }
+
+  &.hope-button--is-loadding {
+    opacity: 0.75;
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -105,7 +121,7 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
     &.hope-button--#{$color} {
       color: rgb(var(--hope-colors-#{$color}-700));
 
-      & .hope-button-icon {
+      & .hope-button__icon {
         color: rgb(var(--hope-colors-#{$color}-600));
       }
     }
@@ -140,6 +156,39 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * ButtonIcon
+ * -----------------------------------------------------------------------------------------------*/
+.hope-button__icon {
+  display: inline-flex;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * ButtonLoader
+ * -----------------------------------------------------------------------------------------------*/
+.hope-button__loader {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 1em;
+  line-height: normal;
+
+  &.hope-button__loader--with-loading-text {
+    position: relative;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Button - default icon spinner
+ * -----------------------------------------------------------------------------------------------*/
+.hope-button__icon-spinner {
+  font-size: 1.3em;
+  animation: 1s linear infinite hope-spin;
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Dark mode
  * -----------------------------------------------------------------------------------------------*/
 .hope-ui-dark {
@@ -147,7 +196,7 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
   .hope-button--solid {
     color: rgb(255 255 255 / 0.95);
 
-    & .hope-button-icon {
+    & .hope-button__icon {
       color: rgb(255 255 255 / 0.85);
     }
   }
@@ -177,7 +226,7 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
       &.hope-button--#{$color} {
         color: rgb(var(--hope-colors-#{$color}-400));
 
-        & .hope-button-icon {
+        & .hope-button__icon {
           color: rgb(var(--hope-colors-#{$color}-500));
         }
       }

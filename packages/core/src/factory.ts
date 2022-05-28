@@ -32,7 +32,7 @@ export type As<Props = any> = ElementType<Props>;
 /**
  * Props object that includes the "as" prop.
  */
-export type PropsWithAs<Props = {}, Type extends As = As> = OverrideProps<
+export type PropsWithAs<Type extends As = As, Props = {}> = OverrideProps<
   ComponentProps<Type>,
   Props & ClassProps & { as?: Type; children?: JSX.Element }
 >;
@@ -40,14 +40,16 @@ export type PropsWithAs<Props = {}, Type extends As = As> = OverrideProps<
 /**
  * A component with the "as" prop.
  */
-export type ComponentWithAs<Props, DefaultType extends As> = {
-  <Type extends As>(props: PropsWithAs<Props, Type> & { as: Type }): JSX.Element;
-  (props: PropsWithAs<Props, DefaultType>): JSX.Element;
+export type ComponentWithAs<DefaultType extends As, Props = {}> = {
+  <Type extends As>(props: PropsWithAs<Type, Props> & { as: Type }): JSX.Element;
+  (props: PropsWithAs<DefaultType, Props>): JSX.Element;
 };
 
 /**
  * Factory function to create component with the "as" prop.
  */
-export function createComponentWithAs<Props, DefaultType extends As>(component: Component<any>) {
-  return component as unknown as ComponentWithAs<Props, DefaultType>;
+export function createComponentWithAs<DefaultType extends As, Props = {}>(
+  component: Component<any>
+) {
+  return component as unknown as ComponentWithAs<DefaultType, Props>;
 }

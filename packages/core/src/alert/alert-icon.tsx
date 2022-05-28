@@ -9,14 +9,16 @@ import { IconExclamationTriangleSolid } from "../icons/IconExclamationTriangleSo
 import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { useAlertContext } from "./alert";
 
-type AlertIconComponentProps = PropsWithAs<{}, "svg">;
+const baseClass = "hope-alert__icon";
+
+type AlertIconComponentProps = PropsWithAs<"svg">;
 
 function AlertIconComponent(props: AlertIconComponentProps) {
   const { variants } = useAlertContext();
 
   const [local, others] = splitProps(props, ["as", "class"]);
 
-  const classes = () => clsx(local.class, "hope-alert-icon");
+  const classes = () => clsx(local.class, baseClass);
 
   const icon = () => {
     if (local.as) {
@@ -40,4 +42,4 @@ function AlertIconComponent(props: AlertIconComponentProps) {
   return <Dynamic component={icon()} class={classes()} {...others} />;
 }
 
-export const AlertIcon = createComponentWithAs<{}, "svg">(AlertIconComponent);
+export const AlertIcon = createComponentWithAs<"svg">(AlertIconComponent);

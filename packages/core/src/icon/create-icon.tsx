@@ -22,7 +22,7 @@ interface CreateIconOptions {
 export function createIcon(options: CreateIconOptions) {
   const { viewBox = "0 0 24 24" } = options;
 
-  return createComponentWithAs<{}, "svg">((props: PropsWithAs<{}, "svg">) => {
+  return createComponentWithAs<"svg">((props: PropsWithAs<"svg">) => {
     return (
       <Icon viewBox={viewBox} {...props}>
         {options.path}

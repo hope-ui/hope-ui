@@ -18,7 +18,7 @@ const fallbackIcon = {
   ),
 };
 
-type IconComponentProps = PropsWithAs<{}, "svg">;
+type IconComponentProps = PropsWithAs<"svg">;
 
 function IconComponent(props: IconComponentProps) {
   const defaultProps: IconComponentProps = {
@@ -54,4 +54,4 @@ function IconComponent(props: IconComponentProps) {
   );
 }
 
-export const Icon = createComponentWithAs<{}, "svg">(IconComponent);
+export const Icon = createComponentWithAs<"svg">(IconComponent);

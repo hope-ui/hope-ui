@@ -9,7 +9,7 @@ import { AlertVariants } from "../theme";
 
 const baseClass = "hope-alert";
 
-type AlertComponentProps = PropsWithAs<AlertVariants, "div">;
+type AlertComponentProps = PropsWithAs<"div", AlertVariants>;
 
 function AlertComponent(props: AlertComponentProps) {
   const config = useComponentConfig("Alert");
@@ -42,7 +42,7 @@ function AlertComponent(props: AlertComponentProps) {
 /**
  * Alert is used to communicate the state or status of a page, feature or action
  */
-export const Alert = createComponentWithAs<AlertVariants, "div">(AlertComponent);
+export const Alert = createComponentWithAs<"div", AlertVariants>(AlertComponent);
 
 /* -------------------------------------------------------------------------------------------------
  * Context

@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, createIcon, useColorMode } from "@hope-ui/core";
+import { Alert, AlertIcon, Button, createIcon, useColorMode } from "@hope-ui/core";
 import { For } from "solid-js";
 
 const IconBadgeCheck = createIcon({
@@ -33,23 +33,19 @@ export default function App() {
           </div>
         )}
       </For>
-      <button
-        class={`flex items-center space-x-2 hope-button hope-button--sm hope-button--default`}
-      >
-        <IconBadgeCheck class="text-[1.5em]" />
-        <span>Button</span>
-      </button>
+      <Button leftIcon={<IconBadgeCheck class="text-[1.5em]" />}>Button</Button>
       <For each={["primary", "accent", "dark", "neutral", "success", "info", "warning", "danger"]}>
         {colorScheme => (
           <div class="flex items-center space-x-4">
             <For each={["solid", "subtle", "outline", "dashed", "ghost"]}>
               {variant => (
-                <button
-                  class={`flex items-center space-x-2 hope-button hope-button--sm hope-button--${colorScheme} hope-button--${variant}`}
+                <Button
+                  variant={variant as any}
+                  colorScheme={colorScheme as any}
+                  leftIcon={<IconBadgeCheck class="text-[1.5em]" />}
                 >
-                  <IconBadgeCheck class="text-[1.5em]" />
-                  <span>Button</span>
-                </button>
+                  Button
+                </Button>
               )}
             </For>
           </div>
