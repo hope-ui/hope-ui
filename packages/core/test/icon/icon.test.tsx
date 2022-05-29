@@ -1,7 +1,7 @@
 import { cleanup, screen } from "solid-testing-library";
 
 import { Icon } from "../../src";
-import { renderWithHopeProvider } from "../render";
+import { renderWithHopeProvider } from "../test-utils";
 
 describe("Icon", () => {
   afterEach(() => {
