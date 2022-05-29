@@ -63,7 +63,11 @@ function App() {
           )}
         </For>
       </div>
-      <Button leftIcon={<IconBadgeCheck style={{ "font-size": "1.5em" }} />} onClick={handleClick}>
+      <Button
+        isDisabled
+        leftIcon={<IconBadgeCheck style={{ "font-size": "1.5em" }} />}
+        onClick={handleClick}
+      >
         Button
       </Button>
       <For each={["primary", "accent", "dark", "neutral", "success", "info", "warning", "danger"]}>
@@ -72,6 +76,7 @@ function App() {
             <For each={["solid", "subtle", "outline", "dashed", "ghost"]}>
               {variant => (
                 <Button
+                  isDisabled
                   variant={variant as any}
                   colorScheme={colorScheme as any}
                   leftIcon={<IconBadgeCheck style={{ "font-size": "1.5em" }} />}
