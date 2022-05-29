@@ -112,20 +112,16 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 .hope-button--solid {
   color: white;
 
-  &.hope-button--warning {
-    color: rgb(var(--hope-colors-dark-500));
-  }
-
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-500));
+      background-color: rgb(var(--hope-colors-#{$color}-600));
 
       &.hope-button--is-hovered {
-        background-color: rgb(var(--hope-colors-#{$color}-600));
+        background-color: rgb(var(--hope-colors-#{$color}-700));
       }
 
       &.hope-button--is-active {
-        background-color: rgb(var(--hope-colors-#{$color}-700));
+        background-color: rgb(var(--hope-colors-#{$color}-800));
       }
     }
   }

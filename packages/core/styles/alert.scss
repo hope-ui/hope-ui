@@ -32,13 +32,9 @@ $hope-alert-colors: success, info, warning, danger;
 .hope-alert--solid {
   color: white;
 
-  &.hope-alert--warning {
-    color: rgb(var(--hope-colors-dark-500));
-  }
-
   @each $color in $hope-alert-colors {
     &.hope-alert--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-500));
+      background-color: rgb(var(--hope-colors-#{$color}-600));
     }
   }
 }

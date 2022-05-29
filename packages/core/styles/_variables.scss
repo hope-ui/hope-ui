@@ -75,17 +75,17 @@
   --hope-colors-info-800: 30 64 175;
   --hope-colors-info-900: 30 58 138;
 
-  // Warning (Tailwind - Yellow)
-  --hope-colors-warning-50: 254 252 232;
-  --hope-colors-warning-100: 254 249 195;
-  --hope-colors-warning-200: 254 240 138;
-  --hope-colors-warning-300: 253 224 71;
-  --hope-colors-warning-400: 250 204 21;
-  --hope-colors-warning-500: 234 179 8;
-  --hope-colors-warning-600: 202 138 4;
-  --hope-colors-warning-700: 161 98 7;
-  --hope-colors-warning-800: 133 77 14;
-  --hope-colors-warning-900: 113 63 18;
+  // Warning (Yellow Vivid)
+  --hope-colors-warning-50: 255 251 234;
+  --hope-colors-warning-100: 255 243 196;
+  --hope-colors-warning-200: 252 229 136;
+  --hope-colors-warning-300: 250 219 95;
+  --hope-colors-warning-400: 247 201 72;
+  --hope-colors-warning-500: 240 180 41;
+  --hope-colors-warning-600: 222 145 29;
+  --hope-colors-warning-700: 203 110 23;
+  --hope-colors-warning-800: 180 77 18;
+  --hope-colors-warning-900: 141 43 11;
 
   // Danger (Tailwind - Red)
   --hope-colors-danger-50: 254 242 242;
@@ -99,7 +99,8 @@
   --hope-colors-danger-800: 153 27 27;
   --hope-colors-danger-900: 127 29 29;
 
-  --hope-colors-focus-ring: 150 199 242;
+  // Focus Ring (Indigo Vivid 500)
+  --hope-colors-focus-ring: 34 81 204;
 
   --hope-fonts-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
