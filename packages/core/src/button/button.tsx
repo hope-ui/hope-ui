@@ -55,46 +55,48 @@ function ButtonComponent(props: ButtonComponentProps) {
     size: buttonGroupContext?.state.size ?? config.defaultVariants?.size,
     loaderPlacement: config.defaultVariants?.loaderPlacement,
     isDisabled: buttonGroupContext?.state.isDisabled,
-    type: "button",
-    role: "button",
   };
 
+  // eslint-disable-next-line solid/reactivity
   props = mergeProps(defaultProps, props);
+
   const [local, others] = splitProps(props, [
     "ref",
     "as",
     "class",
     "children",
-    "isDisabled",
+    // ButtonOptions
     "isFullWidth",
     "isLoading",
     "loadingText",
     "loader",
     "leftIcon",
     "rightIcon",
+    // ButtonVariants
     "variant",
     "colorScheme",
     "size",
     "loaderPlacement",
+    // AriaButtonProps
+    "isDisabled",
+    "preventFocusOnPress",
+    "allowFocusWhenDisabled",
+    "excludeFromTabOrder",
   ]);
 
-  const createButtonProps = mergeProps(
-    {
-      elementType: props.as,
-      isDisabled: props.isDisabled ?? buttonGroupContext?.state.isDisabled,
-      onPress: props.onPress ?? props.onClick,
-    } as AriaButtonProps,
-    props
-  );
+  const isDisabled = () => local.isDisabled ?? buttonGroupContext?.state.isDisabled ?? false;
+
+  const createButtonProps = mergeProps(props, {
+    get elementType() {
+      return local.as;
+    },
+    get isDisabled() {
+      return isDisabled();
+    },
+  } as AriaButtonProps);
 
   const { buttonProps, isPressed } = createButton(createButtonProps, () => domRef);
-
-  const { hoverProps, isHovered } = createHover({
-    get isDisabled() {
-      return local.isDisabled ?? buttonGroupContext?.state.isDisabled;
-    },
-  });
-
+  const { hoverProps, isHovered } = createHover({ isDisabled });
   const { focusProps, isFocusVisible } = createFocusRing(props);
 
   const rootProps = createMemo(() => {
@@ -125,7 +127,7 @@ function ButtonComponent(props: ButtonComponentProps) {
         size,
         local.isLoading ? "is-loading" : null,
         local.isFullWidth ? "is-full-width" : null,
-        local.isDisabled ? "is-disabled" : null,
+        isDisabled() ? "is-disabled" : null,
         isPressed() ? "is-active" : null,
         isHovered() ? "is-hovered" : null,
       ])

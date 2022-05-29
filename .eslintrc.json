@@ -44,6 +44,7 @@
         "project": ["./tsconfig.eslint.json"],
         "alwaysTryTypes": true
       }
-    }
+    },
+    "import/ignore": ["node_modules"]
   }
 }
