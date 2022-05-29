@@ -50,11 +50,11 @@ function ButtonComponent(props: ButtonComponentProps) {
   const buttonGroupContext = useButtonGroupContext();
 
   const defaultProps: ButtonComponentProps = {
-    variant: buttonGroupContext?.state.variant ?? config.defaultVariants?.variant,
-    colorScheme: buttonGroupContext?.state.colorScheme ?? config.defaultVariants?.colorScheme,
-    size: buttonGroupContext?.state.size ?? config.defaultVariants?.size,
+    variant: buttonGroupContext?.variant() ?? config.defaultVariants?.variant,
+    colorScheme: buttonGroupContext?.colorScheme() ?? config.defaultVariants?.colorScheme,
+    size: buttonGroupContext?.size() ?? config.defaultVariants?.size,
     loaderPlacement: config.defaultVariants?.loaderPlacement,
-    isDisabled: buttonGroupContext?.state.isDisabled,
+    isDisabled: buttonGroupContext?.isDisabled(),
   };
 
   // eslint-disable-next-line solid/reactivity
@@ -84,7 +84,7 @@ function ButtonComponent(props: ButtonComponentProps) {
     "excludeFromTabOrder",
   ]);
 
-  const isDisabled = () => local.isDisabled ?? buttonGroupContext?.state.isDisabled ?? false;
+  const isDisabled = () => local.isDisabled ?? buttonGroupContext?.isDisabled() ?? false;
 
   const createButtonProps = mergeProps(props, {
     get elementType() {
@@ -105,17 +105,17 @@ function ButtonComponent(props: ButtonComponentProps) {
 
   const classes = createMemo(() => {
     const variant =
-      local.variant ?? buttonGroupContext?.state.variant ?? config.defaultVariants?.variant;
+      local.variant ?? buttonGroupContext?.variant() ?? config.defaultVariants?.variant;
 
     // Ignore colorScheme for default variant.
     const colorScheme =
       variant === "default"
         ? null
         : local.colorScheme ??
-          buttonGroupContext?.state.colorScheme ??
+          buttonGroupContext?.colorScheme() ??
           config.defaultVariants?.colorScheme;
 
-    const size = local.size ?? buttonGroupContext?.state.size ?? config.defaultVariants?.size;
+    const size = local.size ?? buttonGroupContext?.size() ?? config.defaultVariants?.size;
 
     return clsx(
       local.class,
@@ -127,9 +127,9 @@ function ButtonComponent(props: ButtonComponentProps) {
         size,
         local.isLoading ? "is-loading" : null,
         local.isFullWidth ? "is-full-width" : null,
-        isDisabled() ? "is-disabled" : null,
-        isPressed() ? "is-active" : null,
         isHovered() ? "is-hovered" : null,
+        isPressed() ? "is-active" : null,
+        isDisabled() ? "is-disabled" : null,
       ])
     );
   });
@@ -166,8 +166,9 @@ function ButtonComponent(props: ButtonComponentProps) {
 }
 
 /**
- * The Button component is used to trigger an action or event,
- * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
+ * Buttons allow users to perform an action or to navigate to another page.
+ * They have multiple styles for various needs, and are ideal for calling attention
+ * to where a user needs to do something in order to move forward in a flow.
  */
 export const Button = createComponentWithAs<"button", ButtonOptions>(ButtonComponent);
 

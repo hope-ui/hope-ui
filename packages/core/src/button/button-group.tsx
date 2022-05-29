@@ -1,17 +1,13 @@
 import { withBemModifiers } from "@hope-ui/utils";
 import clsx from "clsx";
-import { createContext, splitProps, useContext } from "solid-js";
-import { createStore } from "solid-js/store";
+import { Accessor, createContext, splitProps, useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createComponentWithAs, PropsWithAs } from "../factory";
 import { ButtonOptions } from "./button";
 
 interface ButtonGroupOptions extends Pick<ButtonOptions, "variant" | "colorScheme" | "size"> {
-  /**
-   * If `true`, the borderRadius of button that are direct children will be altered
-   * to look flushed together.
-   */
+  /** If `true`, the borderRadius of button that are direct children will be altered to look flushed together. */
   isAttached?: boolean;
 
   /** If `true`, all wrapped button will be disabled. */
@@ -23,27 +19,15 @@ type ButtonGroupComponentProps = PropsWithAs<"div", ButtonGroupOptions>;
 const baseClass = "hope-button__group";
 
 function ButtonGroupComponent(props: ButtonGroupComponentProps) {
-  const [state] = createStore<ButtonGroupState>({
-    get variant() {
-      return props.variant;
-    },
-    get colorScheme() {
-      return props.colorScheme;
-    },
-    get size() {
-      return props.size;
-    },
-    get isDisabled() {
-      return props.isDisabled;
-    },
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [local, _, others] = splitProps(
-    props,
-    ["as", "class", "isAttached"],
-    ["variant", "colorScheme", "size", "isDisabled"]
-  );
+  const [local, others] = splitProps(props, [
+    "as",
+    "class",
+    "isAttached",
+    "variant",
+    "colorScheme",
+    "size",
+    "isDisabled",
+  ]);
 
   const classes = () => {
     return clsx(
@@ -54,7 +38,10 @@ function ButtonGroupComponent(props: ButtonGroupComponentProps) {
   };
 
   const context: ButtonGroupContextValue = {
-    state,
+    variant: () => local.variant,
+    colorScheme: () => local.colorScheme,
+    size: () => local.size,
+    isDisabled: () => local.isDisabled,
   };
 
   return (
@@ -64,19 +51,20 @@ function ButtonGroupComponent(props: ButtonGroupComponentProps) {
   );
 }
 
+/**
+ * ButtonGroup handles a grouping of buttons whose actions are related to each other.
+ */
 export const ButtonGroup = createComponentWithAs<"div", ButtonGroupOptions>(ButtonGroupComponent);
 
 /* -------------------------------------------------------------------------------------------------
  * ButtonContent
  * -----------------------------------------------------------------------------------------------*/
 
-type ButtonGroupState = Pick<
-  ButtonGroupComponentProps,
-  "variant" | "colorScheme" | "size" | "isDisabled"
->;
-
 interface ButtonGroupContextValue {
-  state: ButtonGroupState;
+  variant: Accessor<ButtonGroupOptions["variant"]>;
+  colorScheme: Accessor<ButtonGroupOptions["colorScheme"]>;
+  size: Accessor<ButtonGroupOptions["size"]>;
+  isDisabled: Accessor<ButtonGroupOptions["isDisabled"]>;
 }
 
 const ButtonGroupContext = createContext<ButtonGroupContextValue>();
