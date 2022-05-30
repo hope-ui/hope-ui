@@ -4,7 +4,7 @@ import { Dynamic } from "solid-js/web";
 
 import { createComponentWithAs, PropsWithAs } from "../factory";
 
-type ButtonIconComponentProps = PropsWithAs<"span">;
+export type ButtonIconComponentProps = PropsWithAs<"span">;
 
 const baseClass = "hope-button__icon";
 

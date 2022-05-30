@@ -18,7 +18,7 @@ const fallbackIcon = {
   ),
 };
 
-type IconComponentProps = PropsWithAs<"svg">;
+export type IconComponentProps = PropsWithAs<"svg">;
 
 function IconComponent(props: IconComponentProps) {
   const defaultProps: IconComponentProps = {

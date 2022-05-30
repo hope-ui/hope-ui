@@ -10,16 +10,14 @@ describe("Icon", () => {
   });
 
   it("should render", () => {
-    // act
     renderWithHopeProvider(() => <Icon data-testid="icon" />);
+
     const icon = screen.getByTestId("icon");
 
-    // assert
     expect(icon).toBeInTheDocument();
   });
 
   it("should render <svg> tag with children", () => {
-    // arrange
     const path = (
       <g fill="none">
         <path
@@ -31,7 +29,6 @@ describe("Icon", () => {
       </g>
     );
 
-    // act
     renderWithHopeProvider(() => (
       <Icon data-testid="icon" viewBox="0 0 20 20">
         {path}
@@ -40,29 +37,24 @@ describe("Icon", () => {
 
     const icon = screen.getByTestId("icon");
 
-    // assert
     expect(icon).toBeInstanceOf(SVGElement);
     expect(icon.querySelector("g")).toBe(path);
   });
 
   it("should have 'hope-icon' class", () => {
-    // act
     renderWithHopeProvider(() => <Icon data-testid="icon" />);
+
     const icon = screen.getByTestId("icon");
 
-    // assert
     expect(icon).toHaveClass("hope-icon");
   });
 
   it("should accept class prop", () => {
-    // arrange
     const stubClass = "stub";
 
-    // act
     renderWithHopeProvider(() => <Icon class={stubClass} data-testid="icon" />);
     const icon = screen.getByTestId("icon");
 
-    // assert
     expect(icon).toHaveClass(stubClass);
   });
 });

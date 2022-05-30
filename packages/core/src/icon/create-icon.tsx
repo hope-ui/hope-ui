@@ -3,7 +3,7 @@ import { JSX } from "solid-js";
 import { createComponentWithAs, PropsWithAs } from "../factory";
 import { Icon } from "./icon";
 
-interface CreateIconOptions {
+export interface CreateIconOptions {
   /**
    * The icon `svg` viewBox
    * @default "0 0 24 24"

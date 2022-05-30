@@ -38,7 +38,7 @@ export interface ButtonOptions extends ButtonVariants, Omit<AriaButtonProps, "el
   rightIcon?: JSX.Element;
 }
 
-type ButtonComponentProps = PropsWithAs<"button", ButtonOptions>;
+export type ButtonComponentProps = PropsWithAs<"button", ButtonOptions>;
 
 const baseClass = "hope-button";
 

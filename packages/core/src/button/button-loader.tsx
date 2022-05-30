@@ -10,7 +10,7 @@ export interface ButtonLoaderOptions {
   withLoadingText?: boolean;
 }
 
-type ButtonLoaderComponentProps = PropsWithAs<"div", ButtonLoaderOptions>;
+export type ButtonLoaderComponentProps = PropsWithAs<"div", ButtonLoaderOptions>;
 
 const baseClass = "hope-button__loader";
 

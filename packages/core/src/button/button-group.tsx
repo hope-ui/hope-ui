@@ -14,7 +14,7 @@ interface ButtonGroupOptions extends Pick<ButtonOptions, "variant" | "colorSchem
   isDisabled?: boolean;
 }
 
-type ButtonGroupComponentProps = PropsWithAs<"div", ButtonGroupOptions>;
+export type ButtonGroupComponentProps = PropsWithAs<"div", ButtonGroupOptions>;
 
 const baseClass = "hope-button__group";
 
