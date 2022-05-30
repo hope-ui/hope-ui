@@ -32,9 +32,13 @@ $hope-alert-colors: success, info, warning, danger;
 .hope-alert--solid {
   color: white;
 
+  &.hope-alert--warning {
+    color: var(--hope-colors-black-alpha-12);
+  }
+
   @each $color in $hope-alert-colors {
     &.hope-alert--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-600));
+      background-color: var(--hope-colors-#{$color}-9);
     }
   }
 }
@@ -45,7 +49,7 @@ $hope-alert-colors: success, info, warning, danger;
 
   @each $color in $hope-alert-colors {
     &.hope-alert--#{$color} {
-      border-left-color: rgb(var(--hope-colors-#{$color}-500));
+      border-left-color: var(--hope-colors-#{$color}-9);
     }
   }
 }
@@ -56,7 +60,7 @@ $hope-alert-colors: success, info, warning, danger;
 
   @each $color in $hope-alert-colors {
     &.hope-alert--#{$color} {
-      border-top-color: rgb(var(--hope-colors-#{$color}-500));
+      border-top-color: var(--hope-colors-#{$color}-9);
     }
   }
 }
@@ -66,11 +70,11 @@ $hope-alert-colors: success, info, warning, danger;
 .hope-alert--top-accent {
   @each $color in $hope-alert-colors {
     &.hope-alert--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-50));
-      color: rgb(var(--hope-colors-#{$color}-700));
+      background-color: var(--hope-colors-#{$color}-3);
+      color: var(--hope-colors-#{$color}-11);
 
       & .hope-alert__icon {
-        color: rgb(var(--hope-colors-#{$color}-500));
+        color: var(--hope-colors-#{$color}-9);
       }
     }
   }
@@ -84,38 +88,4 @@ $hope-alert-colors: success, info, warning, danger;
   flex-shrink: 0;
   width: var(--hope-alert-icon-size);
   height: var(--hope-alert-icon-size);
-}
-
-/* -------------------------------------------------------------------------------------------------
-* Dark mode
-* -----------------------------------------------------------------------------------------------*/
-.hope-ui-dark {
-  .hope-alert--solid {
-    color: rgb(255 255 255 / 0.95);
-
-    & .hope-alert__icon {
-      color: rgb(255 255 255 / 0.85);
-    }
-
-    @each $color in $hope-alert-colors {
-      &.hope-alert--#{$color} {
-        background-color: rgb(var(--hope-colors-#{$color}-700));
-      }
-    }
-  }
-
-  .hope-alert--subtle,
-  .hope-alert--left-accent,
-  .hope-alert--top-accent {
-    @each $color in $hope-alert-colors {
-      &.hope-alert--#{$color} {
-        background-color: rgb(var(--hope-colors-#{$color}-700) / 0.35);
-        color: rgb(var(--hope-colors-#{$color}-400));
-
-        & .hope-alert__icon {
-          color: rgb(var(--hope-colors-#{$color}-500));
-        }
-      }
-    }
-  }
 }

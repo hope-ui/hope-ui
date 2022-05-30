@@ -34,7 +34,7 @@
 }
 
 $hope-button-sizes: xs, sm, md, lg, xl;
-$hope-button-colors: primary, accent, dark, neutral, success, info, warning, danger;
+$hope-button-colors: primary, accent, neutral, success, info, warning, danger;
 
 /* -------------------------------------------------------------------------------------------------
  * Button
@@ -100,43 +100,23 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 /* -------------------------------------------------------------------------------------------------
  * Button - variant
  * -----------------------------------------------------------------------------------------------*/
-.hope-button--default {
-  border-color: rgb(var(--hope-colors-neutral-300));
-  background-color: white;
-  color: rgb(var(--hope-colors-dark-900));
-
-  &.hope-button--is-hovered {
-    background-color: rgb(var(--hope-colors-neutral-50));
-  }
-
-  &.hope-button--is-active {
-    background-color: rgb(var(--hope-colors-neutral-100));
-  }
-
-  &.hope-button--is-disabled {
-    border-color: rgb(var(--hope-colors-neutral-100));
-    color: rgb(var(--hope-colors-neutral-300));
-  }
-}
-
 .hope-button--solid {
   color: white;
 
+  &.hope-button--warning {
+    color: var(--hope-colors-black-alpha-12);
+  }
+
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-600));
+      background-color: var(--hope-colors-#{$color}-9);
 
       &.hope-button--is-hovered {
-        background-color: rgb(var(--hope-colors-#{$color}-700));
+        background-color: var(--hope-colors-#{$color}-10);
       }
 
       &.hope-button--is-active {
-        background-color: rgb(var(--hope-colors-#{$color}-800));
-      }
-
-      &.hope-button--is-disabled {
-        background-color: rgb(var(--hope-colors-neutral-100));
-        color: rgb(var(--hope-colors-neutral-300));
+        background-color: var(--hope-colors-#{$color}-11);
       }
     }
   }
@@ -145,19 +125,26 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 .hope-button--subtle {
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
-      background-color: rgb(var(--hope-colors-#{$color}-50));
+      background-color: var(--hope-colors-#{$color}-4);
 
       &.hope-button--is-hovered {
-        background-color: rgb(var(--hope-colors-#{$color}-100));
+        background-color: var(--hope-colors-#{$color}-5);
       }
 
       &.hope-button--is-active {
-        background-color: rgb(var(--hope-colors-#{$color}-200));
+        background-color: var(--hope-colors-#{$color}-6);
       }
+    }
+  }
+}
 
+.hope-button--solid,
+.hope-button--subtle {
+  @each $color in $hope-button-colors {
+    &.hope-button--#{$color} {
       &.hope-button--is-disabled {
-        background-color: rgb(var(--hope-colors-neutral-50));
-        color: rgb(var(--hope-colors-neutral-300));
+        background-color: var(--hope-colors-neutral-2);
+        color: var(--hope-colors-neutral-7);
       }
     }
   }
@@ -171,10 +158,15 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 .hope-button--dashed {
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
-      border-color: rgb(var(--hope-colors-#{$color}-500));
+      border-color: var(--hope-colors-#{$color}-7);
+
+      &.hope-button--is-hovered,
+      &.hope-button--is-active {
+        border-color: var(--hope-colors-#{$color}-8);
+      }
 
       &.hope-button--is-disabled {
-        border-color: rgb(var(--hope-colors-neutral-100));
+        border-color: var(--hope-colors-neutral-3);
       }
     }
   }
@@ -188,15 +180,15 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
       &.hope-button--is-hovered {
-        background-color: rgb(var(--hope-colors-#{$color}-50));
+        background-color: var(--hope-colors-#{$color}-4);
       }
 
       &.hope-button--is-active {
-        background-color: rgb(var(--hope-colors-#{$color}-100));
+        background-color: var(--hope-colors-#{$color}-5);
       }
 
       &.hope-button--is-disabled {
-        color: rgb(var(--hope-colors-neutral-300));
+        color: var(--hope-colors-neutral-7);
       }
     }
   }
@@ -208,16 +200,10 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
 .hope-button--ghost {
   @each $color in $hope-button-colors {
     &.hope-button--#{$color} {
-      color: rgb(var(--hope-colors-#{$color}-700));
-
-      & .hope-button__icon {
-        color: rgb(var(--hope-colors-#{$color}-600));
-      }
-
-      &.hope-button--is-disabled {
-        & .hope-button__icon {
-          color: rgb(var(--hope-colors-neutral-300));
-        }
+      @if $color == neutral {
+        color: var(--hope-colors-neutral-12);
+      } @else {
+        color: var(--hope-colors-#{$color}-11);
       }
     }
   }
@@ -279,186 +265,6 @@ $hope-button-colors: primary, accent, dark, neutral, success, info, warning, dan
     & > *:not(:first-of-type):last-of-type {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
-    }
-  }
-}
-
-/* -------------------------------------------------------------------------------------------------
- * Dark mode
- * -----------------------------------------------------------------------------------------------*/
-.hope-ui-dark {
-  .hope-button--default {
-    border-color: rgb(var(--hope-colors-dark-500));
-    background-color: rgb(var(--hope-colors-dark-900));
-
-    &.hope-button--is-hovered {
-      background-color: rgb(var(--hope-colors-dark-800));
-    }
-
-    &.hope-button--is-active {
-      background-color: rgb(var(--hope-colors-dark-700));
-    }
-
-    &.hope-button--is-disabled {
-      border-color: rgb(var(--hope-colors-dark-700));
-      color: rgb(var(--hope-colors-dark-500));
-    }
-  }
-
-  .hope-button--solid {
-    @each $color in $hope-button-colors {
-      &.hope-button--#{$color} {
-        @if $color == dark {
-          background-color: rgb(var(--hope-colors-dark-400));
-
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-dark-300));
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-dark-200));
-          }
-        } @else {
-          background-color: rgb(var(--hope-colors-#{$color}-700));
-
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-#{$color}-600));
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-#{$color}-500));
-          }
-        }
-
-        &.hope-button--is-disabled {
-          background-color: rgb(var(--hope-colors-dark-700));
-          color: rgb(var(--hope-colors-dark-500));
-        }
-      }
-    }
-  }
-
-  .hope-button--default,
-  .hope-button--solid {
-    color: rgb(255 255 255 / 0.95);
-
-    & .hope-button__icon {
-      color: rgb(255 255 255 / 0.85);
-    }
-
-    &.hope-button--is-disabled {
-      & .hope-button__icon {
-        color: rgb(var(--hope-colors-dark-500));
-      }
-    }
-  }
-
-  .hope-button--subtle {
-    @each $color in $hope-button-colors {
-      &.hope-button--#{$color} {
-        @if $color == dark {
-          background-color: rgb(var(--hope-colors-dark-700));
-
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-dark-600));
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-dark-500));
-          }
-        } @else {
-          background-color: rgb(var(--hope-colors-#{$color}-700) / 0.35);
-
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-#{$color}-600) / 0.35);
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-#{$color}-500) / 0.35);
-          }
-        }
-
-        &.hope-button--is-disabled {
-          background-color: rgb(var(--hope-colors-dark-800));
-          color: rgb(var(--hope-colors-dark-500));
-        }
-      }
-    }
-  }
-
-  .hope-button--outline,
-  .hope-button--dashed {
-    @each $color in $hope-button-colors {
-      &.hope-button--#{$color} {
-        @if $color == dark {
-          border-color: rgb(var(--hope-colors-dark-400));
-        } @else {
-          border-color: rgb(var(--hope-colors-#{$color}-700));
-        }
-
-        &.hope-button--is-disabled {
-          border-color: rgb(var(--hope-colors-dark-800));
-        }
-      }
-    }
-  }
-
-  .hope-button--outline,
-  .hope-button--dashed,
-  .hope-button--ghost {
-    @each $color in $hope-button-colors {
-      &.hope-button--#{$color} {
-        @if $color == dark {
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-dark-700));
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-dark-600));
-          }
-        } @else {
-          &.hope-button--is-hovered {
-            background-color: rgb(var(--hope-colors-#{$color}-300) / 0.05);
-          }
-
-          &.hope-button--is-active {
-            background-color: rgb(var(--hope-colors-#{$color}-400) / 0.1);
-          }
-        }
-
-        &.hope-button--is-disabled {
-          color: rgb(var(--hope-colors-dark-500));
-        }
-      }
-    }
-  }
-
-  .hope-button--subtle,
-  .hope-button--outline,
-  .hope-button--dashed,
-  .hope-button--ghost {
-    @each $color in $hope-button-colors {
-      &.hope-button--#{$color} {
-        @if $color == dark {
-          color: rgb(var(--hope-colors-dark-50));
-
-          & .hope-button__icon {
-            color: rgb(var(--hope-colors-dark-100));
-          }
-        } @else {
-          color: rgb(var(--hope-colors-#{$color}-400));
-
-          & .hope-button__icon {
-            color: rgb(var(--hope-colors-#{$color}-500));
-          }
-        }
-
-        &.hope-button--is-disabled {
-          & .hope-button__icon {
-            color: rgb(var(--hope-colors-dark-500));
-          }
-        }
-      }
     }
   }
 }

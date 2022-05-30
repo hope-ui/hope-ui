@@ -2,18 +2,10 @@ import { ComponentConfig } from "./component";
 
 export interface ButtonVariants {
   /** The visual style of the button. */
-  variant?: "solid" | "subtle" | "outline" | "dashed" | "ghost" | "default";
+  variant?: "solid" | "subtle" | "outline" | "dashed" | "ghost";
 
   /** The color of the button. */
-  colorScheme?:
-    | "primary"
-    | "accent"
-    | "dark"
-    | "neutral"
-    | "success"
-    | "info"
-    | "warning"
-    | "danger";
+  colorScheme?: "primary" | "accent" | "neutral" | "success" | "info" | "warning" | "danger";
 
   /** The size of the button. */
   size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -26,7 +18,8 @@ export type ButtonConfig = ComponentConfig<ButtonVariants>;
 
 export const defaultButtonConfig: ButtonConfig = {
   defaultVariants: {
-    variant: "default",
+    variant: "outline",
+    colorScheme: "neutral",
     size: "sm",
     loaderPlacement: "start",
   },

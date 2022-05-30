@@ -15,7 +15,7 @@
 }
 
 body {
-  color: rgb(var(--hope-colors-neutral-800));
+  color: var(--hope-colors-neutral-12);
   font-family: var(--hope-fonts-sans);
   line-height: 1.5;
   font-size: 16px;
@@ -24,8 +24,8 @@ body {
 }
 
 .hope-ui-dark {
-  background-color: rgb(var(--hope-colors-dark-900));
-  color: rgb(255 255 255 / 0.9);
+  background-color: var(--hope-colors-neutral-1);
+  color: var(--hope-colors-white-alpha-12);
 }
 
 .hope-icon {
@@ -39,7 +39,7 @@ body {
 }
 
 .hope-focus-ring {
-  box-shadow: 0 0 0 3px rgb(var(--hope-colors-focus-ring));
+  box-shadow: 0 0 0 3px var(--hope-colors-focus-ring);
 }
 
 @keyframes hope-spin {

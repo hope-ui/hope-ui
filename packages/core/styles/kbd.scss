@@ -14,30 +14,19 @@
  * -----------------------------------------------------------------------------------------------*/
 .hope-kbd {
   border-radius: var(--hope-kbd-border-radius);
-  border-color: rgb(var(--hope-colors-neutral-300));
+  border-color: var(--hope-colors-neutral-7);
   border-style: solid;
   border-width: 1px;
   border-bottom-width: 3px;
 
-  background-color: rgb(var(--hope-colors-neutral-50));
+  background-color: var(--hope-colors-neutral-2);
 
   padding: var(--hope-kbd-padding);
 
-  color: rgb(var(--hope-colors-neutral-700));
+  color: var(--hope-colors-neutral-12);
   font-family: var(--hope-fonts-mono);
   font-size: var(--hope-kbd-font-size);
   font-weight: var(--hope-kbd-font-weight);
   line-height: var(--hope-kbd-line-height);
   white-space: nowrap;
-}
-
-/* -------------------------------------------------------------------------------------------------
- * Dark mode
- * -----------------------------------------------------------------------------------------------*/
-.hope-ui-dark {
-  .hope-kbd {
-    border-color: rgb(var(--hope-colors-dark-400));
-    background-color: rgb(var(--hope-colors-dark-700));
-    color: rgb(255 255 255 / 0.95);
-  }
 }
