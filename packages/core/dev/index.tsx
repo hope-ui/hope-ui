@@ -63,11 +63,7 @@ function App() {
           )}
         </For>
       </div>
-      <Button
-        isDisabled
-        leftIcon={<IconBadgeCheck style={{ "font-size": "1.5em" }} />}
-        onClick={handleClick}
-      >
+      <Button leftIcon={<IconBadgeCheck style={{ "font-size": "1.5em" }} />} onClick={handleClick}>
         Button
       </Button>
       <For each={["primary", "accent", "dark", "neutral", "success", "info", "warning", "danger"]}>

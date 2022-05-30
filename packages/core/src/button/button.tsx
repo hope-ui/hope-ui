@@ -50,6 +50,7 @@ function ButtonComponent(props: ButtonComponentProps) {
   const buttonGroupContext = useButtonGroupContext();
 
   const defaultProps: ButtonComponentProps = {
+    as: "button",
     variant: buttonGroupContext?.variant() ?? config.defaultVariants?.variant,
     colorScheme: buttonGroupContext?.colorScheme() ?? config.defaultVariants?.colorScheme,
     size: buttonGroupContext?.size() ?? config.defaultVariants?.size,
@@ -97,11 +98,9 @@ function ButtonComponent(props: ButtonComponentProps) {
 
   const { buttonProps, isPressed } = createButton(createButtonProps, () => domRef);
   const { hoverProps, isHovered } = createHover({ isDisabled });
-  const { focusProps, isFocusVisible } = createFocusRing(props);
+  const { focusProps, isFocusVisible } = createFocusRing({ autoFocus: () => props.autoFocus });
 
-  const rootProps = createMemo(() => {
-    return combineProps(buttonProps(), hoverProps(), focusProps(), others);
-  });
+  const rootProps = createMemo(() => combineProps(buttonProps(), hoverProps(), focusProps()));
 
   const classes = createMemo(() => {
     const variant =
@@ -136,8 +135,9 @@ function ButtonComponent(props: ButtonComponentProps) {
 
   return (
     <Dynamic
-      component={local.as ?? "button"}
+      component={local.as}
       class={classes()}
+      {...others}
       {...rootProps()}
       ref={mergeRefs(el => (domRef = el), local.ref)}
     >
