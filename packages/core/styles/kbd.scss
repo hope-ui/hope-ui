@@ -1,0 +1,43 @@
+/* -------------------------------------------------------------------------------------------------
+ * Variables
+ * -----------------------------------------------------------------------------------------------*/
+:root {
+  --hope-kbd-border-radius: 0.375rem;
+  --hope-kbd-padding: 0 0.4em;
+  --hope-kbd-font-size: 0.8em;
+  --hope-kbd-font-weight: 700;
+  --hope-kbd-line-height: normal;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Kbd
+ * -----------------------------------------------------------------------------------------------*/
+.hope-kbd {
+  border-radius: var(--hope-kbd-border-radius);
+  border-color: rgb(var(--hope-colors-neutral-300));
+  border-style: solid;
+  border-width: 1px;
+  border-bottom-width: 3px;
+
+  background-color: rgb(var(--hope-colors-neutral-50));
+
+  padding: var(--hope-kbd-padding);
+
+  color: rgb(var(--hope-colors-neutral-700));
+  font-family: var(--hope-fonts-mono);
+  font-size: var(--hope-kbd-font-size);
+  font-weight: var(--hope-kbd-font-weight);
+  line-height: var(--hope-kbd-line-height);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Dark mode
+ * -----------------------------------------------------------------------------------------------*/
+.hope-ui-dark {
+  .hope-kbd {
+    border-color: rgb(var(--hope-colors-dark-400));
+    background-color: rgb(var(--hope-colors-dark-700));
+    color: rgb(255 255 255 / 0.95);
+  }
+}

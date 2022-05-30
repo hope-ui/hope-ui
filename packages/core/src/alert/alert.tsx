@@ -40,7 +40,7 @@ function AlertComponent(props: AlertComponentProps) {
 }
 
 /**
- * Alert is used to communicate the state or status of a page, feature or action
+ * Alert is used to communicate a state that affects a system, feature or page.
  */
 export const Alert = createComponentWithAs<"div", AlertVariants>(AlertComponent);
 

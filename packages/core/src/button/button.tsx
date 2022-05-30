@@ -166,9 +166,8 @@ function ButtonComponent(props: ButtonComponentProps) {
 }
 
 /**
- * Buttons allow users to perform an action or to navigate to another page.
- * They have multiple styles for various needs, and are ideal for calling attention
- * to where a user needs to do something in order to move forward in a flow.
+ * Button is used to trigger an action or event, such as submitting a form,
+ * opening a dialog, canceling an action, or performing a delete operation.
  */
 export const Button = createComponentWithAs<"button", ButtonOptions>(ButtonComponent);
 
