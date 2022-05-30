@@ -9,7 +9,7 @@ import { IconExclamationTriangleSolid } from "../icons/IconExclamationTriangleSo
 import { IconInfoCircleSolid } from "../icons/IconInfoCircleSolid";
 import { useAlertContext } from "./alert";
 
-type AlertIconComponentProps = PropsWithAs<"svg">;
+export type AlertIconComponentProps = PropsWithAs<"svg">;
 
 const baseClass = "hope-alert__icon";
 
