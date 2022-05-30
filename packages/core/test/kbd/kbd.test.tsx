@@ -13,7 +13,11 @@ describe("Kbd", () => {
   });
 
   it("should allows custom classes", () => {
-    renderWithHopeProvider(() => <Kbd data-testid="kbd">shift</Kbd>);
+    renderWithHopeProvider(() => (
+      <Kbd data-testid="kbd" class="test">
+        shift
+      </Kbd>
+    ));
 
     const kbd = screen.getByTestId("kbd");
 
