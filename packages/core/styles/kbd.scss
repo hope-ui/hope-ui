@@ -14,16 +14,16 @@
  * -----------------------------------------------------------------------------------------------*/
 .hope-kbd {
   border-radius: var(--hope-kbd-border-radius);
-  border-color: var(--hope-colors-neutral-7);
+  border-color: rgb(var(--hope-colors-neutral-7));
   border-style: solid;
   border-width: 1px;
   border-bottom-width: 3px;
 
-  background-color: var(--hope-colors-neutral-2);
+  background-color: rgb(var(--hope-colors-neutral-2));
 
   padding: var(--hope-kbd-padding);
 
-  color: var(--hope-colors-neutral-12);
+  color: rgb(var(--hope-colors-neutral-12));
   font-family: var(--hope-fonts-mono);
   font-size: var(--hope-kbd-font-size);
   font-weight: var(--hope-kbd-font-weight);
