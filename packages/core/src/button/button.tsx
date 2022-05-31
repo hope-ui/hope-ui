@@ -106,13 +106,8 @@ function ButtonComponent(props: ButtonComponentProps) {
     const variant =
       local.variant ?? buttonGroupContext?.variant() ?? config.defaultVariants?.variant;
 
-    // Ignore colorScheme for default variant.
     const colorScheme =
-      variant === "default"
-        ? null
-        : local.colorScheme ??
-          buttonGroupContext?.colorScheme() ??
-          config.defaultVariants?.colorScheme;
+      local.colorScheme ?? buttonGroupContext?.colorScheme() ?? config.defaultVariants?.colorScheme;
 
     const size = local.size ?? buttonGroupContext?.size() ?? config.defaultVariants?.size;
 
