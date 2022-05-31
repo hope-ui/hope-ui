@@ -59,7 +59,7 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
       focusTrap = createFocusTrap(containerRef, {
         initialFocus: modalContext.state.initialFocus,
         fallbackFocus: dialogSelector(),
-        allowOutsideClick: false,
+        allowOutsideClick: true,
       });
 
       focusTrap.activate();
