@@ -1,9 +1,3 @@
-## here's a test for version [0.6.2+test2](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-05)
-
-### 🐛 Bug fixes
-
-- Test number 2
-
 ## [0.6.3](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-05)
 
 ### 🐛 Bug fixes

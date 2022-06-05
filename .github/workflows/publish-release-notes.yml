@@ -1,7 +1,7 @@
 name: Publish Release Notes Workflow
 on:
   push:
-    branches: [auto-publish-release-notes]
+    branches: [main]
 
 jobs:
   build:
