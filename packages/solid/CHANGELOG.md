@@ -1,4 +1,4 @@
-## [0.6.3](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-05)
+## [0.6.2-test](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.2-test) (2022-06-05)
 
 ### 🐛 Bug fixes
 
