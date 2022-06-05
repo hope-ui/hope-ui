@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: mangs/simple-release-notes-action@v1
+      - uses: mangs/simple-release-notes-action@v2
         with:
           changelog_path: ./packages/solid/CHANGELOG.md
           github_token: ${{ secrets.GITHUB_TOKEN }}
