@@ -1,8 +1,8 @@
-## [0.6.2-test](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.2-test) (2022-06-05)
+## [0.6.3](https://github.com/mangs/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-05)
 
 ### 🐛 Bug fixes
 
-- Testing auto-publishing release notes
+- Add [Publish Release Notes Workflow](.github/workflows/publish-release-notes.yml) to enable auto-publishing of release notes to GitHub using [mangs/simple-release-notes-action](https://github.com/mangs/simple-release-notes-action)
 
 ## [0.6.2](https://github.com/fabien-ml/hope-ui/compare/v0.6.1...v0.6.2) (2022-05-31)
 
