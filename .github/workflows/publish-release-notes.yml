@@ -1,0 +1,15 @@
+name: Publish Release Notes Workflow
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mangs/simple-release-notes-action@v1
+        with:
+          changelog_path: ./packages/solid/CHANGELOG.md
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          packagejson_path: ./packages/solid/package.json
