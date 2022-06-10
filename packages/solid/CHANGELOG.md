@@ -1,3 +1,9 @@
+## [0.6.3](https://github.com/fabien-ml/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-10)
+
+### 🐛 Bug fixes
+
+- Add `solid-start` support (#172).
+
 ## [0.6.2](https://github.com/fabien-ml/hope-ui/compare/v0.6.1...v0.6.2) (2022-05-31)
 
 ### 🐛 Bug fixes
