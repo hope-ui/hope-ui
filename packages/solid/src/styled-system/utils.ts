@@ -1,4 +1,4 @@
-import merge from "lodash.merge";
+import { merge } from "lodash-es";
 
 import { colorModeClassNames } from "../color-mode";
 import { isObject } from "../utils/assertion";

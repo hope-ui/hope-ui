@@ -28,7 +28,7 @@ importers:
       '@testing-library/jest-dom': 5.16.4
       '@testing-library/user-event': 14.0.4
       '@types/jest': 27.4.1
-      '@types/lodash.merge': 4.6.6
+      '@types/lodash-es': 4.17.6
       '@types/node': 17.0.23
       '@types/prismjs': 1.26.0
       '@types/scroll-lock': 2.1.0
@@ -93,7 +93,7 @@ importers:
       '@testing-library/jest-dom': 5.16.4
       '@testing-library/user-event': 14.0.4_tlwynutqiyp5mns3woioasuxnq
       '@types/jest': 27.4.1
-      '@types/lodash.merge': 4.6.6
+      '@types/lodash-es': 4.17.6
       '@types/node': 17.0.23
       '@types/prismjs': 1.26.0
       '@types/scroll-lock': 2.1.0
@@ -163,13 +163,13 @@ importers:
       '@floating-ui/dom': 0.4.4
       csstype: 3.0.11
       focus-trap: 6.7.3
-      lodash.merge: 4.6.2
+      lodash-es: 4.17.21
       scroll-lock: 2.1.5
     dependencies:
       '@floating-ui/dom': 0.4.4
       csstype: 3.0.11
       focus-trap: 6.7.3
-      lodash.merge: 4.6.2
+      lodash-es: 4.17.21
       scroll-lock: 2.1.5
 
 packages:
@@ -5004,8 +5004,8 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
 
-  /@types/lodash.merge/4.6.6:
-    resolution: {integrity: sha512-IB90krzMf7YpfgP3u/EvZEdXVvm4e3gJbUvh5ieuI+o+XqiNEt6fCzqNRaiLlPVScLI59RxIGZMQ3+Ko/DJ8vQ==}
+  /@types/lodash-es/4.17.6:
+    resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
     dependencies:
       '@types/lodash': 4.14.182
     dev: true
@@ -11531,6 +11531,7 @@ packages:
 
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+    dev: true
 
   /lodash.startcase/4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
