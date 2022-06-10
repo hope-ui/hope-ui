@@ -1,5 +1,9 @@
 ## [0.6.3](https://github.com/fabien-ml/hope-ui/compare/v0.6.2...v0.6.3) (2022-06-10)
 
+### 💥 BREAKING CHANGES
+
+- Update `solid-js` peer dependency version to `^1.4.4`.
+
 ### 🐛 Bug fixes
 
 - Add `solid-start` support (#172).

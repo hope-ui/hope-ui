@@ -1,13 +1,7 @@
-// import { clearAllBodyScrollLocks, disableBodyScroll } from "body-scroll-lock";
+// eslint-disable-next-line import/named
+import { createPreventScroll } from "@solid-aria/primitives";
 import { createFocusTrap, FocusTrap } from "focus-trap";
-import {
-  addScrollableSelector,
-  clearQueueScrollLocks,
-  disablePageScroll,
-  enablePageScroll,
-  removeScrollableSelector,
-} from "scroll-lock";
-import { JSX, onCleanup, onMount } from "solid-js";
+import { createSignal, JSX, onCleanup, onMount } from "solid-js";
 
 import { chainHandlers } from "../../utils/function";
 import { useModalContext } from "./modal";
@@ -26,6 +20,8 @@ interface CreateModalReturn {
  * Modal hook that manages all the logic for the modal dialog widget.
  */
 export function createModal(props: CreateModalProps): CreateModalReturn {
+  const [isPreventScrollDisabled, setIsPreventScrollDisabled] = createSignal(false);
+
   const modalContext = useModalContext();
 
   let containerRef: HTMLDivElement | undefined;
@@ -48,7 +44,6 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
   };
 
   const dialogSelector = () => `[id='${modalContext.state.dialogId}']`;
-  const childOfDialogSelector = () => `${dialogSelector()} *`;
 
   const enableFocusTrapAndScrollLock = () => {
     if (!containerRef) {
@@ -65,32 +60,17 @@ export function createModal(props: CreateModalProps): CreateModalReturn {
       focusTrap.activate();
     }
 
-    if (modalContext.state.blockScrollOnMount) {
-      addScrollableSelector(childOfDialogSelector());
-      disablePageScroll(containerRef);
-
-      // disableBodyScroll(containerRef, {
-      //   allowTouchMove: el => {
-      //     if (!containerRef || containerRef === el) {
-      //       return false;
-      //     }
-      //     // allow touchmove only if `el` is a child of `container`
-      //     return containerRef.contains(el);
-      //   },
-      //   reserveScrollBarGap: modalContext.state.preserveScrollBarGap,
-      // });
-    }
+    setIsPreventScrollDisabled(!modalContext.state.blockScrollOnMount);
   };
 
   const disableFocusTrapAndScrollLock = () => {
     focusTrap?.deactivate();
-
-    removeScrollableSelector(childOfDialogSelector());
-    clearQueueScrollLocks();
-    enablePageScroll();
-
-    //clearAllBodyScrollLocks();
+    setIsPreventScrollDisabled(true);
   };
+
+  createPreventScroll({
+    isDisabled: isPreventScrollDisabled,
+  });
 
   onMount(() => {
     enableFocusTrapAndScrollLock();
