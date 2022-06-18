@@ -1,8 +1,8 @@
 {
-  "name": "@hope-ui/utils",
+  "name": "@hope-ui/css",
   "version": "0.0.0",
   "private": false,
-  "description": "Common utilities for Hope UI.",
+  "description": "The SolidJS component library you've hoped for.",
   "keywords": [
     "solid",
     "solidjs",
@@ -19,36 +19,31 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fabien-ml/hope-ui.git",
-    "directory": "packages/utils"
+    "directory": "packages/css"
   },
   "license": "MIT",
   "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
   "sideEffects": false,
   "exports": {
-    ".": {
-      "solid": "./dist/source/index.jsx",
-      "import": "./dist/esm/index.js",
-      "browser": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "node": "./dist/cjs/index.js"
-    }
+    ".": "./dist"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/hope-ui.css",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "rimraf dist && sass src:dist --no-source-map && postcss -r dist/*.css",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "vite serve dev --host",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "typecheck": "tsc --noEmit"
+    "dev": "vite serve dev --host"
   },
-  "peerDependencies": {
-    "solid-js": "^1.4.4"
+  "devDependencies": {
+    "autoprefixer": "10.4.7",
+    "cssnano": "5.1.9",
+    "postcss": "8.4.14",
+    "postcss-cli": "9.1.0",
+    "rimraf": "3.0.2",
+    "sass": "1.52.1",
+    "solid-js": "1.4.4"
   },
   "publishConfig": {
     "access": "public"

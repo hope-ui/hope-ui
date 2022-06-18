@@ -59,16 +59,10 @@
   },
   "devDependencies": {
     "@types/lodash.merge": "4.6.6",
-    "autoprefixer": "10.4.7",
-    "cssnano": "5.1.9",
-    "postcss": "8.4.14",
-    "postcss-cli": "9.1.0",
-    "rimraf": "3.0.2",
-    "sass": "1.52.1",
-    "solid-js": "1.4.3"
+    "solid-js": "1.4.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.4.3"
+    "solid-js": "^1.4.4"
   },
   "publishConfig": {
     "access": "public"

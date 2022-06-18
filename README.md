@@ -16,22 +16,21 @@
   <a href="LICENSE.md">
     <img src="https://img.shields.io/github/license/fabien-ml/hope-ui" alt="MIT License"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/v/@hope-ui/solid" alt="npm - @hope-ui/solid"/>
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/v/@hope-ui/core" alt="npm - @hope-ui/core"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/dm/@hope-ui/solid.svg" alt="npm - downloads" height="18">
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/dm/@hope-ui/core.svg" alt="npm - downloads" height="18">
   </a>
 </p>
 
-Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
+Hope UI is an accessible component library that gives you the foundation to build your next SolidJS application.
 
 ## Why use Hope UI ?
 
 - **Ready to go**: Start your project with over 40 well designed SolidJS components.
-- **Composable**: Compose your UI with reusable building blocks.
 - **Accessible**: Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
-- **Themeable**: Use Hope UI's design system or customize it using the theming features.
+- **Themeable**: Use Hope UI default themes, customize them or create your own from scratch.
 - **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
 
 ## Documentation

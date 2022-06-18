@@ -28,7 +28,9 @@ describe("Button", () => {
   });
 
   it("should handles defaults", async () => {
-    renderWithHopeProvider(() => <Button onPress={onPressSpy}>Click Me</Button>);
+    renderWithHopeProvider(() => (
+      <Button onPress={onPressSpy}>Click Me</Button>
+    ));
 
     const button = screen.getByRole("button");
 
@@ -150,7 +152,9 @@ describe("Button", () => {
 
     const button = screen.getByRole("button");
 
-    expect(button.getAttribute("class")).toEqual(expect.stringContaining("test"));
+    expect(button.getAttribute("class")).toEqual(
+      expect.stringContaining("test")
+    );
   });
 
   it("should have focus ring class when keyboard focused", async () => {
@@ -166,13 +170,17 @@ describe("Button", () => {
   it("should handles deprecated onClick", async () => {
     const spyWarn = jest.spyOn(console, "warn").mockImplementation();
 
-    renderWithHopeProvider(() => <Button onClick={onPressSpy}>Click Me</Button>);
+    renderWithHopeProvider(() => (
+      <Button onClick={onPressSpy}>Click Me</Button>
+    ));
 
     const button = screen.getByRole("button");
 
     await triggerPress(button);
     expect(onPressSpy).toHaveBeenCalledTimes(1);
-    expect(spyWarn).toHaveBeenCalledWith("onClick is deprecated, please use onPress");
+    expect(spyWarn).toHaveBeenCalledWith(
+      "onClick is deprecated, please use onPress"
+    );
   });
 
   it("can render an <a> tag", async () => {

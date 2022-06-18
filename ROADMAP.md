@@ -2,53 +2,34 @@
 
 ### General
 
-|            | Development | A11y check | Tests | Storybook | Docs |
-| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Button     |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| IconButton |     ✅      |     ✅     |  ✅   |    ✅     |      |
-
-### Layout
-
 |             | Development | A11y check | Tests | Storybook | Docs |
 | ----------- | :---------: | :--------: | :---: | :-------: | :--: |
-| AspectRatio |     ✅      |    n/a     |  ✅   |           |      |
-| Box         |     ✅      |    n/a     |  ✅   |    n/a    |      |
-| Center      |     ✅      |    n/a     |  ✅   |    ✅     |      |
-| Container   |     ✅      |    n/a     |  ✅   |    ✅     |      |
-| Divider     |     ✅      |    n/a     |       |           |      |
-| Flex        |     ✅      |    n/a     |  ✅   |           |      |
-| Grid        |     ✅      |    n/a     |  ✅   |           |      |
-| SimpleGrid  |     ✅      |    n/a     |  ✅   |           |      |
-| Stack       |     ✅      |    n/a     |  ✅   |           |      |
-
-### Typography
-
-|         | Development | A11y check | Tests | Storybook | Docs |
-| ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Text    |     ✅      |     ✅     |  ✅   |    n/a    |      |
-| Heading |     ✅      |     ✅     |  ✅   |    n/a    |      |
+| Button      |             |            |       |           |      |
+| ButtonGroup |             |            |       |           |      |
+| IconButton  |             |            |       |           |      |
 
 ### Data entry
 
 |                  | Development | A11y check | Tests | Storybook | Docs |
 | ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
 | AutoComplete     |             |            |       |           |      |
-| Checkbox         |     ✅      |     ✅     |       |    ✅     |      |
+| Checkbox         |             |            |       |           |      |
 | DatePicker       |             |            |       |           |      |
-| FormControl      |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| FormLabel        |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| FormHelperText   |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| FormErrorMessage |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Input (Text)     |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| NumberInput      |             |            |       |           |      |
-| PasswordInput    |             |            |       |           |      |
-| RadioGroup       |     ✅      |     ✅     |       |    ✅     |      |
-| Radio            |     ✅      |     ✅     |       |    ✅     |      |
-| Select           |     ✅      |     ✅     |       |           |      |
-| MultiSelect      |     ✅      |     ✅     |       |           |      |
+| FormControl      |             |            |       |           |      |
+| FormLabel        |             |            |       |           |      |
+| FormHelperText   |             |            |       |           |      |
+| FormErrorMessage |             |            |       |           |      |
+| NumberField      |             |            |       |           |      |
+| PasswordField    |             |            |       |           |      |
+| RadioGroup       |             |            |       |           |      |
+| Radio            |             |            |       |           |      |
+| Select           |             |            |       |           |      |
+| MultiSelect      |             |            |       |           |      |
+| RangeSlider      |             |            |       |           |      |
 | Slider           |             |            |       |           |      |
-| Switch           |     ✅      |     ✅     |       |    ✅     |      |
-| Textarea         |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Switch           |             |            |       |           |      |
+| TextArea         |             |            |       |           |      |
+| TextField        |             |            |       |           |      |
 | TimePicker       |             |            |       |           |      |
 | UploadInput      |             |            |       |           |      |
 
@@ -56,42 +37,43 @@
 
 |           | Development | A11y check | Tests | Storybook | Docs |
 | --------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Accordion |     ✅      |     ✅     |       |           |      |
-| Avatar    |     ✅      |     ✅     |       |           |      |
-| Badge     |     ✅      |     ✅     |       |           |      |
-| Icon      |     ✅      |     ✅     |  ✅   |           |      |
-| Kbd       |     ✅      |    n/a     |       |           |      |
-| Table     |     ✅      |     ✅     |       |           |      |
-| Tag       |     ✅      |     ✅     |  ✅   |    ✅     |      |
+| Accordion |             |            |       |           |      |
+| Avatar    |             |            |       |           |      |
+| Badge     |             |            |       |           |      |
+| Divider   |             |            |       |           |      |
+| Icon      |             |            |       |           |      |
+| Kbd       |             |            |       |           |      |
+| Table     |             |            |       |           |      |
+| Tag       |             |            |       |           |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation
 
 |            | Development | A11y check | Tests | Storybook | Docs |
 | ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Anchor     |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| Breadcrumb |     ✅      |     ✅     |       |           |      |
+| Anchor     |             |            |       |           |      |
+| Breadcrumb |             |            |       |           |      |
 | Pagination |             |            |       |           |      |
 | Stepper    |             |            |       |           |      |
-| Tabs       |     ✅      |     ✅     |       |           |      |
+| Tabs       |             |            |       |           |      |
 
 ### Feedback
 
 |                      | Development | A11y check | Tests | Storybook | Docs |
 | -------------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert                |     ✅      |     ✅     |  ✅   |    ✅     |      |
-| CircularProgress     |     ✅      |     ✅     |       |           |      |
-| Progress             |     ✅      |     ✅     |       |           |      |
-| Spinner              |     ✅      |     ✅     |       |           |      |
-| Skeleton             |     ✅      |    n/a     |       |           |      |
-| Notification (Toast) |     ✅      |     ✅     |       |           |      |
+| Alert                |             |            |       |           |      |
+| CircularProgress     |             |            |       |           |      |
+| Progress             |             |            |       |           |      |
+| Spinner              |             |            |       |           |      |
+| Skeleton             |             |            |       |           |      |
+| Notification (Toast) |             |            |       |           |      |
 
 ### Overlay
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Drawer  |     ✅      |     ✅     |       |           |      |
-| Menu    |     ✅      |     ✅     |       |           |      |
-| Modal   |     ✅      |     ✅     |       |           |      |
-| Popover |     ✅      |     ✅     |       |           |      |
-| Tooltip |     ✅      |     ✅     |       |           |      |
+| Drawer  |             |            |       |           |      |
+| Menu    |             |            |       |           |      |
+| Modal   |             |            |       |           |      |
+| Popover |             |            |       |           |      |
+| Tooltip |             |            |       |           |      |

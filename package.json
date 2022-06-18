@@ -1,6 +1,6 @@
 {
   "name": "hope-ui-monorepo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "The SolidJS component library you've hoped for.",
   "homepage": "https://hope-ui.com",
@@ -20,15 +20,17 @@
   "scripts": {
     "build": "turbo run build",
     "changeset": "changeset",
+    "ci:release": "turbo run build && changeset publish",
+    "ci:release-snapshot": "turbo run build && changeset publish --no-git-tag --tag snapshot",
+    "ci:version": "changeset version && pnpm install --no-frozen-lockfile && git add .",
+    "ci:version-snapshot": "changeset version --snapshot snapshot && pnpm install --no-frozen-lockfile && git add .",
     "clean": "turbo run clean && rm -rf node_modules",
     "commit": "git-cz",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --ignore-path .gitignore",
     "prepare": "husky install",
-    "release": "turbo run build && changeset publish",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "version": "changeset version"
+    "typecheck": "turbo run typecheck"
   },
   "lint-staged": {
     "*.{md,json}": [
@@ -78,7 +80,7 @@
     "prettier": "2.6.2",
     "rollup": "2.74.1",
     "rollup-preset-solid": "1.4.0",
-    "solid-js": "1.4.3",
+    "solid-js": "1.4.4",
     "solid-testing-library": "0.3.0",
     "sort-package-json": "1.55.0",
     "ts-jest": "27.1.4",
