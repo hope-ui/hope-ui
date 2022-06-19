@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c && rimraf dist/styles && sass styles:dist/styles --no-source-map && postcss -r dist/styles/*.css",
+    "build": "rollup -c",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "test": "jest --passWithNoTests",

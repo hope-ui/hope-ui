@@ -43,27 +43,28 @@
 | Divider   |             |            |       |           |      |
 | Icon      |             |            |       |           |      |
 | Kbd       |             |            |       |           |      |
+| Meter     |             |            |       |           |      |
 | Table     |             |            |       |           |      |
 | Tag       |             |            |       |           |      |
 | Timeline  |             |            |       |           |      |
 
 ### Navigation
 
-|            | Development | A11y check | Tests | Storybook | Docs |
-| ---------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Anchor     |             |            |       |           |      |
-| Breadcrumb |             |            |       |           |      |
-| Pagination |             |            |       |           |      |
-| Stepper    |             |            |       |           |      |
-| Tabs       |             |            |       |           |      |
+|             | Development | A11y check | Tests | Storybook | Docs |
+| ----------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Anchor      |             |            |       |           |      |
+| Breadcrumbs |             |            |       |           |      |
+| Pagination  |             |            |       |           |      |
+| Stepper     |             |            |       |           |      |
+| Tabs        |             |            |       |           |      |
 
 ### Feedback
 
 |                      | Development | A11y check | Tests | Storybook | Docs |
 | -------------------- | :---------: | :--------: | :---: | :-------: | :--: |
 | Alert                |             |            |       |           |      |
-| CircularProgress     |             |            |       |           |      |
-| Progress             |             |            |       |           |      |
+| ProgressBar          |             |            |       |           |      |
+| ProgressCircle       |             |            |       |           |      |
 | Spinner              |             |            |       |           |      |
 | Skeleton             |             |            |       |           |      |
 | Notification (Toast) |             |            |       |           |      |
