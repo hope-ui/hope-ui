@@ -16,9 +16,12 @@
     "import/no-named-as-default-member": "off",
     "simple-import-sort/imports": "warn",
     "simple-import-sort/exports": "warn",
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-types": "off",
-    "@typescript-eslint/no-namespace": "off"
+    "@typescript-eslint/no-namespace": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/label-has-associated-control": "off"
   },
   "env": {
     "es6": true,
@@ -44,7 +47,6 @@
         "project": ["./tsconfig.eslint.json"],
         "alwaysTryTypes": true
       }
-    },
-    "import/ignore": ["node_modules"]
+    }
   }
 }

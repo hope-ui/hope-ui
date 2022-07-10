@@ -30,27 +30,4 @@ Thank you for showing interest in contributing to Hope UI. All of your contribut
 - Install dependencies with pnpm – `pnpm install`
 - Take an initial peek at our components by running `pnpm storybook`
 
-### Project Structure
-
-Hope UI is a monorepo separated in two main folders.
-
-```
-apps/
-  docs/            - Hope UI documentation website
-packages/
-  design-system/   - Hope UI component library
-  primitives/      - Hope UI low level primitives for building components
-```
-
-## npm scripts
-
-### Development scripts
-
-- `dev:docs` – starts the docs development server
-- `storybook` - starts the storybook development server
-
-### Testing scripts
-
-- `typecheck` – runs TypeScript typechecking with `tsc --noEmit` on all packages and docs
-- `lint` – runs ESLint on all packages and docs
-- `test` – runs tests with jest
+## TODO

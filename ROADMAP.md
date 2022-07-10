@@ -10,28 +10,27 @@
 
 ### Data entry
 
-|                  | Development | A11y check | Tests | Storybook | Docs |
-| ---------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| AutoComplete     |             |            |       |           |      |
-| Checkbox         |             |            |       |           |      |
-| DatePicker       |             |            |       |           |      |
-| FormControl      |             |            |       |           |      |
-| FormLabel        |             |            |       |           |      |
-| FormHelperText   |             |            |       |           |      |
-| FormErrorMessage |             |            |       |           |      |
-| NumberField      |             |            |       |           |      |
-| PasswordField    |             |            |       |           |      |
-| RadioGroup       |             |            |       |           |      |
-| Radio            |             |            |       |           |      |
-| Select           |             |            |       |           |      |
-| MultiSelect      |             |            |       |           |      |
-| RangeSlider      |             |            |       |           |      |
-| Slider           |             |            |       |           |      |
-| Switch           |             |            |       |           |      |
-| TextArea         |             |            |       |           |      |
-| TextField        |             |            |       |           |      |
-| TimePicker       |             |            |       |           |      |
-| UploadInput      |             |            |       |           |      |
+|                | Development | A11y check | Tests | Storybook | Docs |
+| -------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| ComboBox       |             |            |       |           |      |
+| Calendar       |             |            |       |           |      |
+| Checkbox       |             |            |       |           |      |
+| DatePicker     |             |            |       |           |      |
+| DateTimePicker |             |            |       |           |      |
+| Label          |             |            |       |           |      |
+| NumberInput    |             |            |       |           |      |
+| PasswordInput  |             |            |       |           |      |
+| RadioGroup     |             |            |       |           |      |
+| Select         |             |            |       |           |      |
+| MultiSelect    |             |            |       |           |      |
+| SearchInput    |             |            |       |           |      |
+| RangeSlider    |             |            |       |           |      |
+| Slider         |             |            |       |           |      |
+| Switch         |             |            |       |           |      |
+| TextArea       |             |            |       |           |      |
+| TextInput      |             |            |       |           |      |
+| TimePicker     |             |            |       |           |      |
+| FileInput      |             |            |       |           |      |
 
 ### Data display
 
@@ -43,10 +42,10 @@
 | Divider   |             |            |       |           |      |
 | Icon      |             |            |       |           |      |
 | Kbd       |             |            |       |           |      |
+| List      |             |            |       |           |      |
 | Meter     |             |            |       |           |      |
 | Table     |             |            |       |           |      |
 | Tag       |             |            |       |           |      |
-| Timeline  |             |            |       |           |      |
 
 ### Navigation
 
@@ -60,14 +59,14 @@
 
 ### Feedback
 
-|                      | Development | A11y check | Tests | Storybook | Docs |
-| -------------------- | :---------: | :--------: | :---: | :-------: | :--: |
-| Alert                |             |            |       |           |      |
-| ProgressBar          |             |            |       |           |      |
-| ProgressCircle       |             |            |       |           |      |
-| Spinner              |             |            |       |           |      |
-| Skeleton             |             |            |       |           |      |
-| Notification (Toast) |             |            |       |           |      |
+|                | Development | A11y check | Tests | Storybook | Docs |
+| -------------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Alert          |             |            |       |           |      |
+| ProgressBar    |             |            |       |           |      |
+| ProgressCircle |             |            |       |           |      |
+| Spinner        |             |            |       |           |      |
+| Skeleton       |             |            |       |           |      |
+| Toast          |             |            |       |           |      |
 
 ### Overlay
 

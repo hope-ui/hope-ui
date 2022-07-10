@@ -3,9 +3,10 @@ node_modules/
 # Ignore artifacts:
 coverage/
 dist/
+build/
 public/
+template/
 __mocks__/
 
 commitlint.config.js
-jest.config.js
 *.d.ts

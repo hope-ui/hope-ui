@@ -1,8 +1,8 @@
 {
-  "name": "@hope-ui/utils",
+  "name": "@hope-ui/template",
   "version": "0.0.0",
   "private": false,
-  "description": "Common utilities for Hope UI.",
+  "description": "Hope UI template component.",
   "keywords": [
     "solid",
     "solidjs",
@@ -12,7 +12,7 @@
     "system",
     "components"
   ],
-  "homepage": "https://github.com/fabien-ml/hope-ui/tree/main/packages/utils#readme",
+  "homepage": "https://github.com/fabien-ml/hope-ui/tree/main/packages/template#readme",
   "bugs": {
     "url": "https://github.com/fabien-ml/hope-ui/issues"
   },
@@ -45,12 +45,13 @@
   "scripts": {
     "build": "rollup -c ../../configs/rollup.config.ts",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "test": "jest --passWithNoTests",
+    "dev": "vite serve dev --host",
+    "test": "jest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hope-ui/types": "^0.0.0",
-    "@solid-primitives/utils": "^2.1.1"
+    "@hope-ui/utils": "^0.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.4.7"

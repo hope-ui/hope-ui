@@ -1,7 +1,0 @@
-@import "tailwindcss/base";
-@import "../node_modules/@hope-ui/core/dist/styles/base.css";
-
-@import "tailwindcss/components";
-@import "../node_modules/@hope-ui/core/dist/styles/components.css";
-
-@import "tailwindcss/utilities";

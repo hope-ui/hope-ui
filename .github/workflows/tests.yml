@@ -1,9 +1,9 @@
-name: Test
+name: Build and Test
 
 on: [push]
 
 jobs:
-  test:
+  build:
     runs-on: ${{ matrix.operating-system }}
 
     strategy:
@@ -17,12 +17,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 7.1.7
+      - uses: pnpm/action-setup@v2.2.2
 
       - name: Setup Node.js environment ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
