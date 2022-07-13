@@ -62,7 +62,7 @@ export const Divider = createComponentWithAs<"div", DividerProps>(props => {
   const classes = createMemo(() => {
     return clsx(
       local.class,
-      withBemModifiers("pl-divider", [
+      withBemModifiers("hope-divider", [
         local.variant,
         local.orientation,
         hasLabel() && `label-${local.labelPlacement}`,
