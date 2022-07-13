@@ -1,0 +1,107 @@
+:root {
+  // Tailwind - Indigo
+  --hope-colors-primary-50: 238 242 255;
+  --hope-colors-primary-100: 224 231 255;
+  --hope-colors-primary-200: 199 210 254;
+  --hope-colors-primary-300: 165 180 252;
+  --hope-colors-primary-400: 129 140 248;
+  --hope-colors-primary-500: 99 102 241;
+  --hope-colors-primary-600: 79 70 229;
+  --hope-colors-primary-700: 67 56 202;
+  --hope-colors-primary-800: 55 48 163;
+  --hope-colors-primary-900: 49 46 129;
+
+  // Tailwind - Slate
+  --hope-colors-neutral-50: 248 250 252;
+  --hope-colors-neutral-100: 241 245 249;
+  --hope-colors-neutral-200: 226 232 240;
+  --hope-colors-neutral-300: 203 213 225;
+  --hope-colors-neutral-400: 148 163 184;
+  --hope-colors-neutral-500: 100 116 139;
+  --hope-colors-neutral-600: 71 85 105;
+  --hope-colors-neutral-700: 51 65 85;
+  --hope-colors-neutral-800: 30 41 59;
+  --hope-colors-neutral-900: 15 23 42;
+
+  // Tailwind - Emerald
+  --hope-colors-success-50: 236 253 245;
+  --hope-colors-success-100: 209 250 229;
+  --hope-colors-success-200: 167 243 208;
+  --hope-colors-success-300: 110 231 183;
+  --hope-colors-success-400: 52 211 153;
+  --hope-colors-success-500: 16 185 129;
+  --hope-colors-success-600: 5 150 105;
+  --hope-colors-success-700: 4 120 87;
+  --hope-colors-success-800: 6 95 70;
+  --hope-colors-success-900: 6 78 59;
+
+  // Tailwind - Sky
+  --hope-colors-info-50: 240 249 255;
+  --hope-colors-info-100: 224 242 254;
+  --hope-colors-info-200: 186 230 253;
+  --hope-colors-info-300: 125 211 252;
+  --hope-colors-info-400: 56 189 248;
+  --hope-colors-info-500: 14 165 233;
+  --hope-colors-info-600: 2 132 199;
+  --hope-colors-info-700: 3 105 161;
+  --hope-colors-info-800: 7 89 133;
+  --hope-colors-info-900: 12 74 110;
+
+  // Tailwind - Amber
+  --hope-colors-warning-50: 255 251 235;
+  --hope-colors-warning-100: 254 243 199;
+  --hope-colors-warning-200: 253 230 138;
+  --hope-colors-warning-300: 252 211 77;
+  --hope-colors-warning-400: 251 191 36;
+  --hope-colors-warning-500: 245 158 11;
+  --hope-colors-warning-600: 217 119 6;
+  --hope-colors-warning-700: 180 83 9;
+  --hope-colors-warning-800: 146 64 14;
+  --hope-colors-warning-900: 120 53 15;
+
+  // Tailwind - Red
+  --hope-colors-danger-50: 254 242 242;
+  --hope-colors-danger-100: 254 226 226;
+  --hope-colors-danger-200: 254 202 202;
+  --hope-colors-danger-300: 252 165 165;
+  --hope-colors-danger-400: 248 113 113;
+  --hope-colors-danger-500: 239 68 68;
+  --hope-colors-danger-600: 220 38 38;
+  --hope-colors-danger-700: 185 28 28;
+  --hope-colors-danger-800: 153 27 27;
+  --hope-colors-danger-900: 127 29 29;
+
+  // Semantic Colors
+  --hope-colors-focus-ring: 37 99 235;
+
+  // Shadows
+  --hope-shadows-xs: 0px 1px 2px rgb(16 24 40 / 5%);
+  --hope-shadows-sm: 0px 1px 3px rgb(16 24 40 / 10%), 0px 1px 2px rgb(16 24 40 / 6%);
+  --hope-shadows-md: 0px 4px 8px -2px rgb(16 24 40 / 10%), 0px 2px 4px -2px rgb(16 24 40 / 6%);
+  --hope-shadows-lg: 0px 12px 16px -4px rgb(16 24 40 / 8%), 0px 4px 6px -2px rgb(16 24 40 / 3%);
+  --hope-shadows-xl: 0px 20px 24px -4px rgb(16 24 40 / 8%), 0px 8px 8px -4px rgb(16 24 40 / 3%);
+  --hope-shadows-2xl: 0px 24px 48px -12px rgb(16 24 40 / 18%);
+  --hope-shadows-3xl: 0px 32px 64px -12px rgb(16 24 40 / 14%);
+
+  // Typography
+  --hope-fonts-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --hope-fonts-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --hope-fonts-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Dark mode
+ * -----------------------------------------------------------------------------------------------*/
+.hope-theme-dark {
+  // Shadows (In dark mode shadow should not be used to express elevation use a lighter surface color instead)
+  --hope-shadows-xs: none;
+  --hope-shadows-sm: none;
+  --hope-shadows-md: none;
+  --hope-shadows-lg: none;
+  --hope-shadows-xl: none;
+  --hope-shadows-2xl: none;
+  --hope-shadows-3xl: none;
+}

@@ -1,4 +1,4 @@
-# @hope-ui/solid
+# hope-ui
 
 <p>
   <a href="https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript">

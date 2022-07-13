@@ -9,4 +9,5 @@ template/
 __mocks__/
 
 commitlint.config.js
+postcss.config.js
 *.d.ts

@@ -1,0 +1,75 @@
+/* Use a more-intuitive box-sizing model. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Remove default margin. */
+* {
+  margin: 0;
+}
+
+/* Allow percentage-based heights in applications. */
+html,
+body {
+  height: 100%;
+}
+
+/* Use theme `sans` font-family. */
+html {
+  font-family: var(--hope-fonts-sans);
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/*
+  1. Use theme `neutral` color for text.
+  2. Improve text rendering.
+*/
+body {
+  color: rgb(var(--hope-colors-neutral-700)); /* 1 */
+  font-family: inherit;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased; /* 2 */
+  -moz-osx-font-smoothing: grayscale; /* 2 */
+}
+
+/* Headings are unstyled. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Avoid text overflows. */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* Remove built-in form typography styles. */
+button,
+input,
+textarea,
+select,
+optgroup {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+/* Anchor are unstyled. */
+a {
+  background-color: transparent;
+  color: inherit;
+  text-decoration: inherit;
+}

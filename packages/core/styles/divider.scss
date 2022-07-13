@@ -1,0 +1,81 @@
+.hope-divider {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border-width: 0;
+  border-color: rgb(var(--hope-colors-neutral-400));
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Divider - variant
+ * -----------------------------------------------------------------------------------------------*/
+.hope-divider--solid {
+  border-style: solid;
+}
+
+.hope-divider--dashed {
+  border-style: dashed;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Divider - orientation
+ * -----------------------------------------------------------------------------------------------*/
+.hope-divider--horizontal {
+  border-top-width: 1px;
+}
+
+.hope-divider--vertical {
+  align-self: stretch;
+  height: 100%;
+  border-left-width: 1px;
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Divider - with label
+ * -----------------------------------------------------------------------------------------------*/
+.hope-divider--label-center,
+.hope-divider--label-start,
+.hope-divider--label-end {
+  border-top: 0;
+
+  &::before,
+  &::after {
+    border-top-color: rgb(var(--hope-colors-neutral-400));
+  }
+
+  &.hope-divider--solid {
+    &::before,
+    &::after {
+      border-top-style: solid;
+    }
+  }
+
+  &.hope-divider--dashed {
+    &::before,
+    &::after {
+      border-top-style: dashed;
+    }
+  }
+}
+
+.hope-divider--label-center,
+.hope-divider--label-start {
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    border-top-width: 1px;
+    margin-inline-start: 8px;
+  }
+}
+
+.hope-divider--label-center,
+.hope-divider--label-end {
+  &::before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    border-top-width: 1px;
+    margin-inline-end: 8px;
+  }
+}
