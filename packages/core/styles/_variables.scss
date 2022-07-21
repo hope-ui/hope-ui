@@ -1,53 +1,53 @@
 :root {
-  // Tailwind - Indigo
-  --hope-colors-primary-50: 238 242 255;
-  --hope-colors-primary-100: 224 231 255;
-  --hope-colors-primary-200: 199 210 254;
-  --hope-colors-primary-300: 165 180 252;
-  --hope-colors-primary-400: 129 140 248;
-  --hope-colors-primary-500: 99 102 241;
-  --hope-colors-primary-600: 79 70 229;
-  --hope-colors-primary-700: 67 56 202;
-  --hope-colors-primary-800: 55 48 163;
-  --hope-colors-primary-900: 49 46 129;
+  // Primary (Tailwind - Cyan)
+  --sui-colors-primary-50: 236 254 255;
+  --sui-colors-primary-100: 207 250 254;
+  --sui-colors-primary-200: 165 243 252;
+  --sui-colors-primary-300: 103 232 249;
+  --sui-colors-primary-400: 34 211 238;
+  --sui-colors-primary-500: 6 182 212;
+  --sui-colors-primary-600: 8 145 178;
+  --sui-colors-primary-700: 14 116 144;
+  --sui-colors-primary-800: 21 94 117;
+  --sui-colors-primary-900: 22 78 99;
 
-  // Tailwind - Slate
-  --hope-colors-neutral-50: 248 250 252;
-  --hope-colors-neutral-100: 241 245 249;
-  --hope-colors-neutral-200: 226 232 240;
-  --hope-colors-neutral-300: 203 213 225;
-  --hope-colors-neutral-400: 148 163 184;
-  --hope-colors-neutral-500: 100 116 139;
-  --hope-colors-neutral-600: 71 85 105;
-  --hope-colors-neutral-700: 51 65 85;
-  --hope-colors-neutral-800: 30 41 59;
-  --hope-colors-neutral-900: 15 23 42;
+  // Neutral (Tailwind - Gray)
+  --hope-colors-neutral-50: 249 250 251;
+  --hope-colors-neutral-100: 243 244 246;
+  --hope-colors-neutral-200: 229 231 235;
+  --hope-colors-neutral-300: 209 213 219;
+  --hope-colors-neutral-400: 156 163 175;
+  --hope-colors-neutral-500: 107 114 128;
+  --hope-colors-neutral-600: 75 85 99;
+  --hope-colors-neutral-700: 55 65 81;
+  --hope-colors-neutral-800: 31 41 55;
+  --hope-colors-neutral-900: 17 24 39;
 
-  // Tailwind - Emerald
-  --hope-colors-success-50: 236 253 245;
-  --hope-colors-success-100: 209 250 229;
-  --hope-colors-success-200: 167 243 208;
-  --hope-colors-success-300: 110 231 183;
-  --hope-colors-success-400: 52 211 153;
-  --hope-colors-success-500: 16 185 129;
-  --hope-colors-success-600: 5 150 105;
-  --hope-colors-success-700: 4 120 87;
-  --hope-colors-success-800: 6 95 70;
-  --hope-colors-success-900: 6 78 59;
+  // Success (Tailwind - Green)
+  --hope-colors-success-50: 240 253 244;
+  --hope-colors-success-100: 220 252 231;
+  --hope-colors-success-200: 187 247 208;
+  --hope-colors-success-300: 134 239 172;
+  --hope-colors-success-400: 74 222 128;
+  --hope-colors-success-500: 34 197 94;
+  --hope-colors-success-600: 22 163 74;
+  --hope-colors-success-700: 21 128 61;
+  --hope-colors-success-800: 22 101 52;
+  --hope-colors-success-900: 20 83 45;
 
-  // Tailwind - Sky
-  --hope-colors-info-50: 240 249 255;
-  --hope-colors-info-100: 224 242 254;
-  --hope-colors-info-200: 186 230 253;
-  --hope-colors-info-300: 125 211 252;
-  --hope-colors-info-400: 56 189 248;
-  --hope-colors-info-500: 14 165 233;
-  --hope-colors-info-600: 2 132 199;
-  --hope-colors-info-700: 3 105 161;
-  --hope-colors-info-800: 7 89 133;
-  --hope-colors-info-900: 12 74 110;
+  // Info (Tailwind - Blue)
+  --hope-colors-info-50: 239 246 255;
+  --hope-colors-info-100: 219 234 254;
+  --hope-colors-info-200: 191 219 254;
+  --hope-colors-info-300: 147 197 253;
+  --hope-colors-info-400: 96 165 250;
+  --hope-colors-info-500: 59 130 246;
+  --hope-colors-info-600: 37 99 235;
+  --hope-colors-info-700: 29 78 216;
+  --hope-colors-info-800: 30 64 175;
+  --hope-colors-info-900: 30 58 138;
 
-  // Tailwind - Amber
+  // Warning (Tailwind - Amber)
   --hope-colors-warning-50: 255 251 235;
   --hope-colors-warning-100: 254 243 199;
   --hope-colors-warning-200: 253 230 138;
@@ -59,7 +59,7 @@
   --hope-colors-warning-800: 146 64 14;
   --hope-colors-warning-900: 120 53 15;
 
-  // Tailwind - Red
+  // Danger (Tailwind - Red)
   --hope-colors-danger-50: 254 242 242;
   --hope-colors-danger-100: 254 226 226;
   --hope-colors-danger-200: 254 202 202;

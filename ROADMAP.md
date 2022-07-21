@@ -43,7 +43,6 @@
 | Icon      |             |            |       |           |      |
 | Kbd       |             |            |       |           |      |
 | List      |             |            |       |           |      |
-| Meter     |             |            |       |           |      |
 | Table     |             |            |       |           |      |
 | Tag       |             |            |       |           |      |
 
@@ -72,8 +71,8 @@
 
 |         | Development | A11y check | Tests | Storybook | Docs |
 | ------- | :---------: | :--------: | :---: | :-------: | :--: |
+| Dialog  |             |            |       |           |      |
 | Drawer  |             |            |       |           |      |
 | Menu    |             |            |       |           |      |
-| Modal   |             |            |       |           |      |
 | Popover |             |            |       |           |      |
 | Tooltip |             |            |       |           |      |

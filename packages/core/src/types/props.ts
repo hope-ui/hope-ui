@@ -4,9 +4,7 @@
  */
 export type OverrideProps<Source = {}, Override = {}> = Omit<Source, keyof Override> & Override;
 
-/**
- * All SolidJS props that apply css classes.
- */
+/** All SolidJS props that apply css classes. */
 export interface ClassProps {
   class?: string;
   classList?: { [key: string]: boolean };

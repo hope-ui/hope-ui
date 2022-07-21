@@ -1,6 +1,6 @@
 import { render, screen } from "solid-testing-library";
 
-import { Divider } from "../divider";
+import { Divider } from "./divider";
 
 describe("Divider", () => {
   it("should render a '<div>' by default", () => {
