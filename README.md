@@ -30,9 +30,7 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 This project is not ready for production, use at your own risk.
 
-Hope UI is in a rewrite process. For the next few months, the focus will be on the [solid-aria](https://github.com/solidjs-community/solid-aria) project which will serve as a more robust and accessible base for the next version of the library.
-
-Major breaking changes expected :
+Hope UI is in a rewrite process, major breaking changes expected :
 - The CSS-in-JS library will be replaced by plain old CSS.
 - The style props API and all layout and typography components will be **removed**, use pure CSS (flexbox, grid) or a utility library like [TailwindCSS](https://tailwindcss.com/) or [WindiCSS](https://windicss.org/) instead.
 
