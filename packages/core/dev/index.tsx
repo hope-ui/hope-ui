@@ -1,16 +1,9 @@
-import "../styles/index.scss";
+import "../scss/index.scss";
 
 import { render } from "solid-js/web";
 
-import { Divider } from "../src";
-
 function App() {
-  return (
-    <>
-      <Divider />
-      <Divider variant="dashed">Label</Divider>
-    </>
-  );
+  return <div class="hope-app"></div>;
 }
 
 render(() => <App />, document.getElementById("root") as HTMLDivElement);

@@ -1,14 +1,5 @@
 /* -------------------------------------------------------------------------------------------------
- * All base style and utilities
+ * All components scss
  * -----------------------------------------------------------------------------------------------*/
 
-// Base
-@use "variables";
-@use "mixins";
-@use "reset";
-
-// Utilities
-@use "keyframes";
-@use "visually-hidden";
-@use "focus-ring";
-@use "icon";
+@use "divider";

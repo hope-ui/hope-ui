@@ -55,3 +55,32 @@
   font-size: 4.5rem; /* 72px */
   line-height: 1;
 }
+
+/* -------------------------------------------------------------------------------------------------
+ * Focus ring
+ * -----------------------------------------------------------------------------------------------*/
+@mixin focus-ring {
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus {
+    outline-offset: 2px;
+    outline: 2px solid rgb(var(--hope-colors-focus-ring));
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
+ * Color mode
+ * -----------------------------------------------------------------------------------------------*/
+@mixin color-mode-var($property, $light-value, $dark-value) {
+  :root {
+    #{$property}: $light-value;
+  }
+
+  .hope-theme-dark {
+    #{$property}: $dark-value;
+  }
+}

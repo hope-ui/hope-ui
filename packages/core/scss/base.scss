@@ -1,5 +1,13 @@
 /* -------------------------------------------------------------------------------------------------
- * All components styles
+ * All base style and utilities
  * -----------------------------------------------------------------------------------------------*/
 
-@use "divider";
+// Base
+@use "variables";
+@use "mixins";
+@use "reset";
+
+// Utilities
+@use "keyframes";
+@use "visually-hidden";
+@use "icon";

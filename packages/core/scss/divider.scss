@@ -1,9 +1,29 @@
+@use "mixins" as *;
+
+/* -------------------------------------------------------------------------------------------------
+ * Variables
+ * -----------------------------------------------------------------------------------------------*/
+@include color-mode-var(
+  --hope-divider-border-color,
+  rgb(var(--hope-colors-neutral-300)),
+  rgb(var(--hope-colors-neutral-600))
+);
+
+@include color-mode-var(
+  --hope-divider-label-color,
+  rgb(var(--hope-colors-neutral-600)),
+  rgb(var(--hope-colors-neutral-300))
+);
+
+/* -------------------------------------------------------------------------------------------------
+ * Divider
+ * -----------------------------------------------------------------------------------------------*/
 .hope-divider {
   display: flex;
   align-items: center;
   margin: 0;
   border-width: 0;
-  border-color: rgb(var(--hope-colors-neutral-400));
+  border-color: var(--hope-divider-border-color);
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -38,9 +58,12 @@
 .hope-divider--label-end {
   border-top: 0;
 
+  @include text-sm;
+  color: var(--hope-divider-label-color);
+
   &::before,
   &::after {
-    border-top-color: rgb(var(--hope-colors-neutral-300));
+    border-top-color: var(--hope-divider-border-color);
   }
 
   &.hope-divider--solid {
