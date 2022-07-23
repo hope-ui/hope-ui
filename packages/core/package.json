@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c && sass scss:dist/styles --no-source-map && postcss -r dist/styles/*.css",
+    "build": "rollup -c && sass scss:dist/styles --style=compressed --no-source-map && postcss -r dist/styles/*.css",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "storybook": "start-storybook -p 6006",

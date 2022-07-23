@@ -75,12 +75,20 @@
 /* -------------------------------------------------------------------------------------------------
  * Color mode
  * -----------------------------------------------------------------------------------------------*/
-@mixin color-mode-var($property, $light-value, $dark-value) {
-  :root {
-    #{$property}: $light-value;
+@function color-mode-value($key, $light, $dark) {
+  @return $key $light $dark;
+}
+
+@mixin color-mode-vars($vars) {
+  root {
+    @each $key, $light in $vars {
+      #{$key}: $light;
+    }
   }
 
   .hope-theme-dark {
-    #{$property}: $dark-value;
+    @each $key, $_, $dark in $vars {
+      #{$key}: $dark;
+    }
   }
 }

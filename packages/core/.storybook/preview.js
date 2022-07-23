@@ -1,4 +1,4 @@
-import "../scss/index.scss";
+import "../scss/hope-ui.scss";
 
 import { themes } from "@storybook/theming";
 
@@ -42,7 +42,7 @@ export const parameters = {
   },
   darkMode: {
     light: { ...themes.normal, appBg: "#f9fafb", appContentBg: "#ffffff" },
-    dark: { ...themes.dark, appBg: "#1f2937", appContentBg: "#111827" },
+    dark: { ...themes.dark, appBg: "#262626", appContentBg: "#171717" },
   },
   controls: {
     matchers: {

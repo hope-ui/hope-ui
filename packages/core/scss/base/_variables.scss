@@ -1,27 +1,39 @@
 :root {
   // Primary (Tailwind - Cyan)
-  --sui-colors-primary-50: 236 254 255;
-  --sui-colors-primary-100: 207 250 254;
-  --sui-colors-primary-200: 165 243 252;
-  --sui-colors-primary-300: 103 232 249;
-  --sui-colors-primary-400: 34 211 238;
-  --sui-colors-primary-500: 6 182 212;
-  --sui-colors-primary-600: 8 145 178;
-  --sui-colors-primary-700: 14 116 144;
-  --sui-colors-primary-800: 21 94 117;
-  --sui-colors-primary-900: 22 78 99;
+  --hope-colors-primary-50: 236 254 255;
+  --hope-colors-primary-100: 207 250 254;
+  --hope-colors-primary-200: 165 243 252;
+  --hope-colors-primary-300: 103 232 249;
+  --hope-colors-primary-400: 34 211 238;
+  --hope-colors-primary-500: 6 182 212;
+  --hope-colors-primary-600: 8 145 178;
+  --hope-colors-primary-700: 14 116 144;
+  --hope-colors-primary-800: 21 94 117;
+  --hope-colors-primary-900: 22 78 99;
 
-  // Neutral (Tailwind - Gray)
-  --hope-colors-neutral-50: 249 250 251;
-  --hope-colors-neutral-100: 243 244 246;
-  --hope-colors-neutral-200: 229 231 235;
-  --hope-colors-neutral-300: 209 213 219;
-  --hope-colors-neutral-400: 156 163 175;
-  --hope-colors-neutral-500: 107 114 128;
-  --hope-colors-neutral-600: 75 85 99;
-  --hope-colors-neutral-700: 55 65 81;
-  --hope-colors-neutral-800: 31 41 55;
-  --hope-colors-neutral-900: 17 24 39;
+  // Accent (Tailwind - Violet)
+  --hope-colors-accent-50: 247 245 255;
+  --hope-colors-accent-100: 237 233 254;
+  --hope-colors-accent-200: 221 214 254;
+  --hope-colors-accent-300: 196 181 253;
+  --hope-colors-accent-400: 167 139 250;
+  --hope-colors-accent-500: 139 92 246;
+  --hope-colors-accent-600: 124 58 237;
+  --hope-colors-accent-700: 109 40 217;
+  --hope-colors-accent-800: 91 33 182;
+  --hope-colors-accent-900: 76 29 149;
+
+  // Neutral (Tailwind - Neutral)
+  --hope-colors-neutral-50: 250 250 250;
+  --hope-colors-neutral-100: 245 245 245;
+  --hope-colors-neutral-200: 229 229 229;
+  --hope-colors-neutral-300: 212 212 212;
+  --hope-colors-neutral-400: 163 163 163;
+  --hope-colors-neutral-500: 115 115 115;
+  --hope-colors-neutral-600: 82 82 82;
+  --hope-colors-neutral-700: 64 64 64;
+  --hope-colors-neutral-800: 38 38 38;
+  --hope-colors-neutral-900: 23 23 23;
 
   // Success (Tailwind - Green)
   --hope-colors-success-50: 240 253 244;
@@ -71,7 +83,7 @@
   --hope-colors-danger-800: 153 27 27;
   --hope-colors-danger-900: 127 29 29;
 
-  // Semantic Colors
+  // Focus Ring (Tailwind - Blue 600)
   --hope-colors-focus-ring: 37 99 235;
 
   // Shadows
