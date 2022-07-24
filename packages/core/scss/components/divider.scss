@@ -1,20 +1,16 @@
 @use "../base/mixins" as *;
 
 /* -------------------------------------------------------------------------------------------------
- * Variables
+ * Theme variables
  * -----------------------------------------------------------------------------------------------*/
+:root {
+  --hope-divider-thickness: 1px;
+}
+
 @include color-mode-vars(
   (
-    color-mode-value(
-      --hope-divider-border-color,
-      rgb(var(--hope-colors-neutral-300)),
-      rgb(var(--hope-colors-neutral-600))
-    ),
-    color-mode-value(
-      --hope-divider-label-color,
-      rgb(var(--hope-colors-neutral-600)),
-      rgb(var(--hope-colors-neutral-300))
-    )
+    color-mode-value(--hope-divider-border-color, rgb-var(--hope-colors-neutral-300)),
+    color-mode-value(--hope-divider-label-color, rgb-var(--hope-colors-neutral-600))
   )
 );
 
@@ -44,13 +40,13 @@
  * Divider - orientation
  * -----------------------------------------------------------------------------------------------*/
 .hope-divider--horizontal {
-  border-top-width: 1px;
+  border-top-width: var(--hope-divider-thickness);
 }
 
 .hope-divider--vertical {
   align-self: stretch;
   height: 100%;
-  border-left-width: 1px;
+  border-left-width: var(--hope-divider-thickness);
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -90,8 +86,8 @@
   &::after {
     content: "";
     flex: 1;
-    height: 1px;
-    border-top-width: 1px;
+    height: var(--hope-divider-thickness);
+    border-top-width: var(--hope-divider-thickness);
     margin-inline-start: 8px;
   }
 }
@@ -101,8 +97,8 @@
   &::before {
     content: "";
     flex: 1;
-    height: 1px;
-    border-top-width: 1px;
+    height: var(--hope-divider-thickness);
+    border-top-width: var(--hope-divider-thickness);
     margin-inline-end: 8px;
   }
 }

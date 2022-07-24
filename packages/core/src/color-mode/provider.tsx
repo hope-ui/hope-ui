@@ -10,9 +10,7 @@ import {
   toggleDocumentDarkModeClass,
 } from "./utils";
 
-/**
- * Provides context for the color mode.
- */
+/** Provides context for the color mode. */
 export function ColorModeProvider(props: ColorModeProviderProps) {
   const [colorMode, rawSetColorMode] = createSignal(getInitialColorMode(props.initialColorMode));
 

@@ -51,9 +51,7 @@ export function saveColorModeToLocalStorage(value: RawColorMode) {
   }
 }
 
-/**
- * Get the color mode based on system preference.
- */
+/** Get the color mode based on system preference. */
 export function getSystemColorMode(): RawColorMode {
   if (isServer) {
     return "light";
@@ -64,9 +62,7 @@ export function getSystemColorMode(): RawColorMode {
   return isSystemDark ? "dark" : "light";
 }
 
-/**
- * Get the initial color mode based on theme value or system preference.
- */
+/** Get the initial color mode based on theme value or system preference. */
 export function getInitialColorMode(fallbackColorMode: ColorMode = "system"): RawColorMode {
   const preferredColorMode = getColorModeFromLocalStorage();
 
@@ -81,9 +77,7 @@ export function getInitialColorMode(fallbackColorMode: ColorMode = "system"): Ra
   return fallbackColorMode;
 }
 
-/**
- * Toggle the dark mode class from `document` based on color mode.
- */
+/** Toggle the dark mode class from `document` based on color mode. */
 export function toggleDocumentDarkModeClass(colorMode: RawColorMode) {
   if (isServer) {
     return;

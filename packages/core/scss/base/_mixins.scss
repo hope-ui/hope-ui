@@ -1,3 +1,5 @@
+@use "sass:map";
+
 /* -------------------------------------------------------------------------------------------------
  * Typography
  * -----------------------------------------------------------------------------------------------*/
@@ -73,22 +75,37 @@
 }
 
 /* -------------------------------------------------------------------------------------------------
+ * CSS variables
+ * -----------------------------------------------------------------------------------------------*/
+@function rgb-var($var, $alpha: null) {
+  @if ($alpha == null) {
+    @return rgb(var($var));
+  } @else {
+    @return rgb(var($var) / $alpha);
+  }
+}
+
+/* -------------------------------------------------------------------------------------------------
  * Color mode
  * -----------------------------------------------------------------------------------------------*/
-@function color-mode-value($key, $light, $dark) {
-  @return $key $light $dark;
+@function color-mode-value($key, $light, $dark: null) {
+  @if ($dark == null) {
+    @return ("key": $key, "light": $light, "dark": $light);
+  } @else {
+    @return ("key": $key, "light": $light, "dark": $dark);
+  }
 }
 
 @mixin color-mode-vars($vars) {
-  root {
-    @each $key, $light in $vars {
-      #{$key}: $light;
+  :root {
+    @each $var in $vars {
+      #{map.get($var, "key")}: map.get($var, "light");
     }
   }
 
   .hope-theme-dark {
-    @each $key, $_, $dark in $vars {
-      #{$key}: $dark;
+    @each $var in $vars {
+      #{map.get($var, "key")}: map.get($var, "dark");
     }
   }
 }

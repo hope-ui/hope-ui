@@ -1,7 +1,7 @@
 import { addons } from "@storybook/addons";
 import { onCleanup, onMount } from "solid-js";
 
-import { HopeApp, useColorMode } from "../src";
+import { HopeProvider, useColorMode } from "../src";
 
 const channel = addons.getChannel();
 
@@ -25,5 +25,5 @@ function ColorModeWrapper(props) {
 }
 
 export function HopeWrapper(props) {
-  return HopeApp({ children: () => ColorModeWrapper({ children: props.children }) });
+  return HopeProvider({ children: () => ColorModeWrapper({ children: props.children }) });
 }

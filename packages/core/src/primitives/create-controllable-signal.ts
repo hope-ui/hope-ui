@@ -2,19 +2,13 @@ import { access, accessWith, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createMemo, createSignal, untrack } from "solid-js";
 
 export interface CreateControllableSignalProps<T> {
-  /**
-   * The value to be used, in controlled mode.
-   */
+  /** The value to be used, in controlled mode. */
   value?: MaybeAccessor<T | undefined>;
 
-  /**
-   * The initial value to be used, in uncontrolled mode.
-   */
+  /** The initial value to be used, in uncontrolled mode. */
   defaultValue?: MaybeAccessor<T | undefined>;
 
-  /**
-   * The callback fired when the value changes.
-   */
+  /** The callback fired when the value changes. */
   onChange?: (value: T) => void;
 }
 

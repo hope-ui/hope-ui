@@ -2,25 +2,19 @@ import { access, MaybeAccessor } from "@solid-primitives/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 
 interface CreateInteractOutsideProps {
-  /**
-   * Whether the interact outside events should be disabled.
-   */
+  /** Whether interact outside events should be disabled. */
   isDisabled?: MaybeAccessor<boolean | undefined>;
 
-  /**
-   * Handler that is called when an interaction outside of the `ref` element start.
-   */
+  /** Handler that is called when an interaction outside the `ref` element start. */
   onInteractOutsideStart?: (e: Event) => void;
 
-  /**
-   * Handler that is called when interaction outside of the `ref` element end.
-   */
+  /** Handler that is called when interaction outside the `ref` element end. */
   onInteractOutside?: (e: Event) => void;
 }
 
 /**
  * Handles interaction outside a given element.
- * Used in components like Dialogs and Popovers so they can close when a user clicks outside them.
+ * Used in components like Dialogs and Popovers, so they can close when a user clicks outside them.
  * @param props - Props for the interact outside primitive.
  * @param ref - A ref for the HTML element.
  */

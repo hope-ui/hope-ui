@@ -71,59 +71,62 @@ describe("Divider", () => {
     expect(divider).toBe(ref);
   });
 
-  describe("styles", () => {
-    it("should have base class", () => {
-      render(() => <Divider />);
+  it("should have base class", () => {
+    render(() => <Divider />);
+
+    const divider = screen.getByRole("separator");
+
+    expect(divider).toHaveClass("hope-divider");
+  });
+
+  it("should apply class from class prop", () => {
+    render(() => <Divider class="test" />);
+
+    const divider = screen.getByRole("separator");
+
+    expect(divider).toHaveClass("test");
+  });
+
+  it.each(["solid", "dashed"])("should have %p variant modifier class", variant => {
+    render(() => <Divider variant={variant as any} />);
+
+    const divider = screen.getByRole("separator");
+
+    expect(divider).toHaveClass(`hope-divider--${variant}`);
+  });
+
+  it.each(["horizontal", "vertical"])("should have %p orientation modifier class", orientation => {
+    render(() => <Divider orientation={orientation as any} />);
+
+    const divider = screen.getByRole("separator");
+
+    expect(divider).toHaveClass(`hope-divider--${orientation}`);
+  });
+
+  it.each(["start", "center", "end"])(
+    "should have %p labelPlacement modifier class",
+    labelPlacement => {
+      render(() => <Divider labelPlacement={labelPlacement as any}>Label</Divider>);
 
       const divider = screen.getByRole("separator");
 
-      expect(divider).toHaveClass("hope-divider");
-    });
+      expect(divider).toHaveClass(`hope-divider--label-${labelPlacement}`);
+    }
+  );
 
-    it.each(["solid", "dashed"])("should have %p variant modifier class", variant => {
-      render(() => <Divider variant={variant as any} />);
+  it("should not have labelPlacement modifier class when no children is provided", () => {
+    render(() => <Divider labelPlacement="start" />);
 
-      const divider = screen.getByRole("separator");
+    const divider = screen.getByRole("separator");
 
-      expect(divider).toHaveClass(`hope-divider--${variant}`);
-    });
+    expect(divider).not.toHaveClass("hope-divider--label-start");
+  });
 
-    it.each(["horizontal", "vertical"])(
-      "should have %p orientation modifier class",
-      orientation => {
-        render(() => <Divider orientation={orientation as any} />);
+  it("should not have labelPlacement modifier class when 'orientation=vertical'", () => {
+    render(() => <Divider labelPlacement="start" orientation="vertical" />);
 
-        const divider = screen.getByRole("separator");
+    const divider = screen.getByRole("separator");
 
-        expect(divider).toHaveClass(`hope-divider--${orientation}`);
-      }
-    );
-
-    it.each(["start", "center", "end"])(
-      "should have %p labelPlacement modifier class",
-      labelPlacement => {
-        render(() => <Divider labelPlacement={labelPlacement as any}>Label</Divider>);
-
-        const divider = screen.getByRole("separator");
-
-        expect(divider).toHaveClass(`hope-divider--label-${labelPlacement}`);
-      }
-    );
-
-    it("should not have labelPlacement modifier class when no children is provided", () => {
-      render(() => <Divider labelPlacement="start" />);
-
-      const divider = screen.getByRole("separator");
-
-      expect(divider).not.toHaveClass("hope-divider--label-start");
-    });
-
-    it("should not have labelPlacement modifier class when 'orientation=vertical'", () => {
-      render(() => <Divider labelPlacement="start" orientation="vertical" />);
-
-      const divider = screen.getByRole("separator");
-
-      expect(divider).not.toHaveClass("hope-divider--label-start");
-    });
+    expect(divider).not.toHaveClass("hope-divider--label-start");
   });
 });

@@ -1,0 +1,49 @@
+@mixin style-prop($prop) {
+  #{$prop}: var(--hope-box-#{$prop}, initial);
+}
+
+.hope-box {
+  // margin
+  @include style-prop(margin-top);
+  @include style-prop(margin-right);
+  @include style-prop(margin-bottom);
+  @include style-prop(margin-left);
+
+  // padding
+  @include style-prop(padding-top);
+  @include style-prop(padding-right);
+  @include style-prop(padding-bottom);
+  @include style-prop(padding-left);
+
+  // color
+  @include style-prop(background);
+  @include style-prop(color);
+
+  // layout
+  @include style-prop(display);
+
+  // size
+  @include style-prop(width);
+  @include style-prop(height);
+  @include style-prop(min-width);
+  @include style-prop(max-width);
+  @include style-prop(min-height);
+  @include style-prop(max-height);
+
+  // radii
+  @include style-prop(border-top-left-radius);
+  @include style-prop(border-top-right-radius);
+  @include style-prop(border-bottom-right-radius);
+  @include style-prop(border-bottom-left-radius);
+
+  // position
+  @include style-prop(position);
+  @include style-prop(z-index);
+  @include style-prop(top);
+  @include style-prop(right);
+  @include style-prop(bottom);
+  @include style-prop(left);
+
+  // shadow
+  @include style-prop(box-shadow);
+}

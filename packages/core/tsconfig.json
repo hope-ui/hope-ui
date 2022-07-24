@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["./src", "./dev", "jest.config.ts", "rollup.config.ts"],
+  "include": ["./src", "./dev", "jest.config.ts"],
   "exclude": ["node_modules", "./dist"]
 }

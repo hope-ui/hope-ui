@@ -18,6 +18,7 @@
     "ci:version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
     "clean": "turbo run clean && rm -rf node_modules",
     "commit": "git-cz",
+    "dev": "pnpm -F @hope-ui/core dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "prepare": "husky install",
     "storybook": "pnpm -F @hope-ui/core storybook",

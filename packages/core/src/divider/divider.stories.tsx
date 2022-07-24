@@ -14,25 +14,25 @@ export default {
     variant: {
       control: "select",
       options: ["solid", "dashed"],
-      defaultValue: "solid",
+    },
+    thickness: {
+      control: "text",
     },
     orientation: {
       control: "select",
       options: ["horizontal", "vertical"],
-      defaultValue: "horizontal",
     },
     labelPlacement: {
       control: "select",
       options: ["start", "center", "end"],
-      defaultValue: "start",
     },
     children: {
       control: "text",
-      defaultValue: "Label",
     },
   },
   args: {
     variant: "solid",
+    thickness: "1",
     orientation: "horizontal",
     labelPlacement: "start",
     children: "Label",
