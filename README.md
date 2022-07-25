@@ -30,12 +30,6 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 This project is not ready for production, use at your own risk.
 
-Hope UI is in a rewrite process, major breaking changes expected :
-- The CSS-in-JS library will be replaced by plain old CSS.
-- The style props API and all layout and typography components will be **removed**, use pure CSS (flexbox, grid) or a utility library like [TailwindCSS](https://tailwindcss.com/) or [WindiCSS](https://windicss.org/) instead.
-
-The library will no longer be considered as "Chakra UI like".
-
 ## Why use Hope UI ?
 
 - **Ready to go**: Start your project with over 40 well designed SolidJS components.
