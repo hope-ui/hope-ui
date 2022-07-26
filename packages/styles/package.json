@@ -46,9 +46,12 @@
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "clsx": "1.2.1",
+    "csstype": "3.1.0"
+  },
   "peerDependencies": {
+    "@emotion/css": "^11.9.0",
     "solid-js": "^1.4.7"
   },
   "publishConfig": {
