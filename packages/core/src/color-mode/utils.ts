@@ -1,11 +1,10 @@
 import { isServer } from "solid-js/web";
 
+import { DARK_THEME_CLASS, LIGHT_THEME_CLASS } from "../theme";
 import { __DEV__ } from "../utils/assertion";
 import { ColorMode, RawColorMode } from "./types";
 
 const COLOR_MODE_STORAGE_KEY = "hope-color-mode";
-
-const DARK_MODE_CLASS = "hope-theme-dark";
 
 function getColorModeFromLocalStorage() {
   if (isServer) {
@@ -84,8 +83,10 @@ export function toggleDocumentDarkModeClass(colorMode: RawColorMode) {
   }
 
   if (colorMode === "dark") {
-    document.documentElement.classList.add(DARK_MODE_CLASS);
+    document.documentElement.classList.add(DARK_THEME_CLASS);
+    document.documentElement.classList.remove(LIGHT_THEME_CLASS);
   } else {
-    document.documentElement.classList.remove(DARK_MODE_CLASS);
+    document.documentElement.classList.add(LIGHT_THEME_CLASS);
+    document.documentElement.classList.remove(DARK_THEME_CLASS);
   }
 }

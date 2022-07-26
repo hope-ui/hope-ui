@@ -16,5 +16,5 @@ export interface ColorModeProviderProps {
    */
   initialColorMode?: ColorMode;
 
-  children: JSX.Element;
+  children?: JSX.Element;
 }

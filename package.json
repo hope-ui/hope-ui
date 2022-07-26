@@ -9,6 +9,7 @@
   "license": "MIT",
   "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "scripts": {

@@ -1,25 +1,24 @@
 import { globalStyle } from "@vanilla-extract/css";
 
 import { rgbVar } from "../utils/css";
-import { vars } from "./theme.css";
+import { vars } from "./contract.css";
 
 globalStyle("*, *::before, *::after", {
-  /* Use a more-intuitive box-sizing model. */
   boxSizing: "border-box",
 });
 
 globalStyle("html", {
   fontFamily: vars.fonts.sans,
+  lineHeight: vars.lineHeights.base,
   fontSize: "16px",
-  lineHeight: 1.5,
 });
 
 globalStyle("body", {
-  color: rgbVar(vars.colors.neutral[800]),
+  margin: 0,
+  backgroundColor: rgbVar(vars.colors.background),
+  color: rgbVar(vars.colors.neutral[12]),
   fontFamily: "inherit",
   lineHeight: "inherit",
-
-  /* Improve text rendering */
   WebkitFontSmoothing: "antialiased",
   MozOsxFontSmoothing: "grayscale",
 });
