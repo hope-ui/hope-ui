@@ -1,5 +1,3 @@
-import "../scss/hope-ui.scss";
-
 import { themes } from "@storybook/theming";
 
 import { render } from "solid-js/web";

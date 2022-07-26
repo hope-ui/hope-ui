@@ -25,8 +25,8 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 This project is inspired by :
 
-- [React Spectrum](https://github.com/adobe/react-spectrum)
 - [Mantine](https://mantine.dev/)
+- [Chakra UI](https://chakra-ui.com)
 
 ## License
 

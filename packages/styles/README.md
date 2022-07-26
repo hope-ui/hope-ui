@@ -1,15 +1,15 @@
-# @hope-ui/core
+# @hope-ui/styles
 
-Hope UI core components library.
+Hope UI CSS-in-JS library built on top of emotion.
 
 ## Installation
 
 ```bash
-npm install @hope-ui/core
+npm install @hope-ui/styles
 # or
-yarn add @hope-ui/core
+yarn add @hope-ui/styles
 # or
-pnpm add @hope-ui/core
+pnpm add @hope-ui/styles
 ```
 
 ## Documentation
