@@ -1,1 +1,1 @@
-export {};
+export * from "@hope-ui/styles";

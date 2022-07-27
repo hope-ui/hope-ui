@@ -48,7 +48,9 @@
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@hope-ui/styles": "^0.0.0"
+  },
   "devDependencies": {
     "@storybook/addon-a11y": "6.4.20",
     "@storybook/addon-actions": "6.4.20",
