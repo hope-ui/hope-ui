@@ -135,10 +135,8 @@ importers:
 
   packages/styles:
     specifiers:
-      clsx: 1.2.1
       csstype: 3.1.0
     dependencies:
-      clsx: 1.2.1
       csstype: 3.1.0
 
 packages:
@@ -7921,6 +7919,7 @@ packages:
   /clsx/1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
+    dev: true
 
   /co/4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}

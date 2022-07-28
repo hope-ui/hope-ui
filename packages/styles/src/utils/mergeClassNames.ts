@@ -1,7 +1,7 @@
 import { HopeProviderStyles } from "../theme/HopeProvider";
 
 interface MergeClassNamesParams<T extends Record<string, string>> {
-  /** A function to merge classNames, like `clsx`. */
+  /** A function that merge classNames. */
   cx(...classNames: any): string;
 
   /** The internal component classNames. */
