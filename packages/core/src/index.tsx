@@ -1,1 +1,1 @@
-export * from "@hope-ui/styles";
+export * from "./color-mode";

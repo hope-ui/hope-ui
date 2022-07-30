@@ -2,7 +2,7 @@
   "name": "@hope-ui/styles",
   "version": "0.0.0",
   "private": false,
-  "description": "The SolidJS component library you've hoped for.",
+  "description": "Hope UI CSS-in-JS library built on top of emotion.",
   "keywords": [
     "solid",
     "solidjs",
