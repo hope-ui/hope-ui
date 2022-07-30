@@ -9,7 +9,7 @@ export type MaybeColorMode = ColorMode | undefined;
 export interface ColorModeStorageManager {
   type: "cookie" | "localStorage";
   ssr?: boolean;
-  get: (fallbackValue?: ColorMode) => MaybeColorMode;
+  get: () => MaybeColorMode;
   set: (value: ConfigColorMode) => void;
 }
 
@@ -19,13 +19,13 @@ export interface ColorModeContextType {
   toggleColorMode: () => void;
 }
 
-export interface ColorModeOptions {
-  initialColorMode?: ConfigColorMode;
-  useSystemColorMode?: boolean;
-  disableTransitionOnChange?: boolean;
-}
-
 export interface ColorModeProviderProps extends ParentProps {
-  options?: ColorModeOptions;
-  colorModeManager?: ColorModeStorageManager;
+  /** The initial color mode to use. */
+  initialColorMode?: ConfigColorMode;
+
+  /** Whether css transitions should be disabled during the color mode changes. */
+  disableTransitionOnChange?: boolean;
+
+  /** The color mode storage manager, either localStorage or cookie. */
+  storageManager?: ColorModeStorageManager;
 }

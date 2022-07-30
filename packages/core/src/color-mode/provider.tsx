@@ -1,77 +1,61 @@
-import {
-  Accessor,
-  createEffect,
-  createMemo,
-  createSignal,
-  on,
-  onCleanup,
-  onMount,
-  ParentProps,
-} from "solid-js";
+import { createEffect, createSignal, on, onCleanup, ParentProps } from "solid-js";
 
 import { noop } from "../utils/function";
 import { ColorModeContext } from "./context";
 import { localStorageManager } from "./storage-manager";
-import {
-  ColorMode,
-  ColorModeContextType,
-  ColorModeProviderProps,
-  ColorModeStorageManager,
-  ConfigColorMode,
-} from "./types";
+import { ColorMode, ColorModeContextType, ColorModeProviderProps, ConfigColorMode } from "./types";
 import {
   addColorModeListener,
-  getSystemTheme,
+  getInitialColorMode,
+  getSystemColorMode,
   setColorModeClassName,
   setColorModeDataset,
 } from "./utils";
-
-function getTheme(manager: ColorModeStorageManager, fallback?: ColorMode) {
-  return manager.type === "cookie" && manager.ssr ? manager.get(fallback) : fallback;
-}
 
 /**
  * Provides context for the color mode based on config in `theme`
  * Returns the color mode and function to toggle the color mode
  */
 export function ColorModeProvider(props: ColorModeProviderProps) {
-  const colorModeManager = createMemo(() => props.colorModeManager ?? localStorageManager);
-  const defaultColorMode = createMemo(() =>
-    props.options?.initialColorMode === "dark" ? "dark" : "light"
-  );
+  const colorModeManager = () => props.storageManager ?? localStorageManager;
+  const fallbackColorMode = () => (props.initialColorMode === "dark" ? "dark" : "light");
+  let colorModeListenerCleanupFn: (() => unknown) | undefined;
 
   const [colorMode, rawSetColorMode] = createSignal(
-    getTheme(colorModeManager(), defaultColorMode())
+    getInitialColorMode(colorModeManager(), fallbackColorMode())
   );
 
-  const [resolvedColorMode, setResolvedColorMode] = createSignal(getTheme(colorModeManager()));
+  const applyColorMode = (value: ColorMode) => {
+    rawSetColorMode(value);
 
-  const resolvedValue = () => {
-    return props.options?.initialColorMode === "system" && !colorMode()
-      ? resolvedColorMode()
-      : colorMode();
+    setColorModeClassName(value === "dark");
+    setColorModeDataset(value, props.disableTransitionOnChange);
   };
 
   const setColorMode = (value: ConfigColorMode) => {
-    const resolved = value === "system" ? getSystemTheme() : value;
-    rawSetColorMode(resolved);
+    if (colorModeListenerCleanupFn) {
+      colorModeListenerCleanupFn();
+      colorModeListenerCleanupFn = undefined;
+    }
 
-    setColorModeClassName(resolved === "dark");
-    setColorModeDataset(resolved, props.options?.disableTransitionOnChange);
+    const isSystem = value === "system";
 
-    colorModeManager().set(resolved);
+    if (isSystem) {
+      colorModeListenerCleanupFn = addColorModeListener(applyColorMode);
+    }
+
+    applyColorMode(isSystem ? getSystemColorMode() : value);
+    colorModeManager().set(value);
   };
 
-  onMount(() => {
-    if (props.options?.initialColorMode === "system") {
-      setResolvedColorMode(getSystemTheme());
-    }
-  });
+  const toggleColorMode = () => {
+    setColorMode(colorMode() === "dark" ? "light" : "dark");
+  };
 
   createEffect(
     on(
-      [colorModeManager, defaultColorMode, () => props.options?.initialColorMode],
-      ([colorModeManager, defaultColorMode, initialColorMode]) => {
+      [colorModeManager, fallbackColorMode, () => props.initialColorMode],
+      ([colorModeManager, fallbackColorMode, initialColorMode]) => {
         const managerValue = colorModeManager.get();
 
         if (managerValue) {
@@ -84,27 +68,18 @@ export function ColorModeProvider(props: ColorModeProviderProps) {
           return;
         }
 
-        setColorMode(defaultColorMode);
+        setColorMode(fallbackColorMode);
       }
     )
   );
 
-  const toggleColorMode = () => {
-    setColorMode(resolvedValue() === "dark" ? "light" : "dark");
-  };
-
-  createEffect(() => {
-    if (!props.options?.useSystemColorMode) {
-      return;
-    }
-
-    const cleanupFn = addColorModeListener(setColorMode);
-
-    onCleanup(cleanupFn);
+  onCleanup(() => {
+    // ensure listener is always cleaned when component is destroyed.
+    colorModeListenerCleanupFn?.();
   });
 
   const context: ColorModeContextType = {
-    colorMode: resolvedValue as Accessor<ColorMode>,
+    colorMode,
     setColorMode,
     toggleColorMode,
   };

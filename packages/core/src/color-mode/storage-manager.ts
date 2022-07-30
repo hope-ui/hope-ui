@@ -8,19 +8,19 @@ export function createLocalStorageManager(key: string): ColorModeStorageManager 
   return {
     ssr: false,
     type: "localStorage",
-    get: (fallbackValue?): MaybeColorMode => {
+    get: (): MaybeColorMode => {
       if (isServer) {
-        return fallbackValue;
+        return undefined;
       }
 
       let value: any;
       try {
-        value = localStorage.getItem(key) || fallbackValue;
+        value = localStorage.getItem(key);
       } catch (e) {
         // noop
       }
 
-      return value || fallbackValue;
+      return value ?? undefined;
     },
     set: value => {
       try {
@@ -43,16 +43,16 @@ export function createCookieStorageManager(key: string, cookie?: string): ColorM
   return {
     ssr: !!cookie,
     type: "cookie",
-    get: (fallbackValue?): MaybeColorMode => {
+    get: (): MaybeColorMode => {
       if (cookie) {
-        return parseCookie(cookie, key);
+        return parseCookie(cookie, key) ?? undefined;
       }
 
       if (isServer) {
-        return fallbackValue;
+        return undefined;
       }
 
-      return parseCookie(document.cookie, key) || fallbackValue;
+      return parseCookie(document.cookie, key) ?? undefined;
     },
     set: value => {
       document.cookie = `${key}=${value}; max-age=31536000; path=/`;

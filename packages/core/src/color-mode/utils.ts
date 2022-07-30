@@ -1,4 +1,4 @@
-import { ColorMode } from "./types";
+import { ColorMode, ColorModeStorageManager, ConfigColorMode } from "./types";
 
 const classNames = {
   light: "hope-theme-light",
@@ -31,9 +31,9 @@ function preventTransition() {
   };
 }
 
-export function setColorModeClassName(dark: boolean) {
-  document.body.classList.add(dark ? classNames.dark : classNames.light);
-  document.body.classList.remove(dark ? classNames.light : classNames.dark);
+export function setColorModeClassName(isDark: boolean) {
+  document.body.classList.add(isDark ? classNames.dark : classNames.light);
+  document.body.classList.remove(isDark ? classNames.light : classNames.dark);
 }
 
 export function setColorModeDataset(value: ColorMode, shouldPreventTransition = true) {
@@ -43,9 +43,17 @@ export function setColorModeDataset(value: ColorMode, shouldPreventTransition = 
   cleanup?.();
 }
 
-export function getSystemTheme(fallback?: ColorMode) {
-  const dark = query().matches ?? fallback === "dark";
-  return dark ? "dark" : "light";
+export function getSystemColorMode(fallback?: ColorMode): ColorMode {
+  const isDark = query().matches ?? fallback === "dark";
+  return isDark ? "dark" : "light";
+}
+
+export function getInitialColorMode(manager: ColorModeStorageManager, fallback: ColorMode) {
+  if (manager.type === "cookie" && manager.ssr) {
+    return manager.get() ?? fallback;
+  }
+
+  return fallback;
 }
 
 export function addColorModeListener(fn: (cm: ColorMode) => unknown) {
