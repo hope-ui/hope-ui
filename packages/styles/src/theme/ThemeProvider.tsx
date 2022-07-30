@@ -1,32 +1,32 @@
-import { Accessor, createContext, createMemo, JSX, mergeProps, useContext } from "solid-js";
+import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { CSSObject, HopeTheme, HopeThemeOverride } from "../types";
 import { mergeThemeWithFunctions } from "../utils/mergeTheme";
 import { DEFAULT_THEME } from "./defaultTheme";
 
-export interface HopeProviderStyles {
+export interface ThemeProviderStyles {
   classNames: Record<string, string>;
   styles:
     | Record<string, CSSObject>
     | ((theme: HopeTheme, params: any) => Record<string, CSSObject>);
 }
 
-interface HopeProviderContextValue {
+interface ThemeProviderContextType {
   theme: Accessor<HopeTheme>;
 }
 
-const HopeProviderContext = createContext<HopeProviderContextValue>({
+const ThemeProviderContext = createContext<ThemeProviderContextType>({
   theme: () => DEFAULT_THEME,
 });
 
-export function useHopeTheme() {
-  return useContext(HopeProviderContext).theme;
+export function useTheme() {
+  return useContext(ThemeProviderContext).theme;
 }
 
-export function useHopeProviderStyles(component?: string | string[]) {
-  const theme = useHopeTheme();
+export function useThemeProviderStyles(component?: string | string[]) {
+  const theme = useTheme();
 
-  const getStyles = (name?: string): HopeProviderStyles => {
+  const getStyles = (name?: string): ThemeProviderStyles => {
     if (name == null) {
       return { styles: {}, classNames: {} };
     }
@@ -49,28 +49,29 @@ export function useComponentDefaultProps<T extends Record<string, any>>(
   defaultProps: Partial<T>,
   props: T
 ): T {
-  const theme = useHopeTheme();
+  const theme = useTheme();
 
   const themeProps = createMemo(() => theme().components[component]?.defaultProps);
 
   return mergeProps(defaultProps, themeProps, props);
 }
 
-export interface HopeProviderProps {
+export interface ThemeProviderProps extends ParentProps {
   theme?: HopeThemeOverride;
-  children?: JSX.Element;
   inherit?: boolean;
 }
 
-export function HopeProvider(props: HopeProviderProps) {
-  const ctx = useContext(HopeProviderContext);
+export function ThemeProvider(props: ThemeProviderProps) {
+  const ctx = useContext(ThemeProviderContext);
 
   const theme = createMemo(() => {
-    const themeOverride = props.inherit ? { ...ctx.theme(), ...props.theme } : props.theme;
+    const themeOverride = props.inherit ? mergeProps(ctx.theme, props.theme) : props.theme;
     return mergeThemeWithFunctions(DEFAULT_THEME, themeOverride);
   });
 
   return (
-    <HopeProviderContext.Provider value={{ theme }}>{props.children}</HopeProviderContext.Provider>
+    <ThemeProviderContext.Provider value={{ theme }}>
+      {props.children}
+    </ThemeProviderContext.Provider>
   );
 }

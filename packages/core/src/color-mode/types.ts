@@ -1,6 +1,5 @@
+import { ColorMode } from "@hope-ui/styles";
 import { Accessor, ParentProps } from "solid-js";
-
-export type ColorMode = "light" | "dark";
 
 export type ConfigColorMode = ColorMode | "system";
 
@@ -19,7 +18,7 @@ export interface ColorModeContextType {
   toggleColorMode: () => void;
 }
 
-export interface ColorModeProviderProps extends ParentProps {
+export interface ColorModeOptions {
   /** The initial color mode to use. */
   initialColorMode?: ConfigColorMode;
 
@@ -29,3 +28,5 @@ export interface ColorModeProviderProps extends ParentProps {
   /** The color mode storage manager, either localStorage or cookie. */
   storageManager?: ColorModeStorageManager;
 }
+
+export type ColorModeProviderProps = ParentProps<ColorModeOptions>;

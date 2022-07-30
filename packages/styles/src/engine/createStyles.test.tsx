@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { render, screen } from "solid-testing-library";
 
-import { DEFAULT_THEME, HopeProvider } from "../theme";
+import { DEFAULT_THEME, ThemeProvider } from "../theme";
 import { CSSObject } from "../types";
 import { createStyles } from "./createStyles";
 
@@ -139,9 +139,9 @@ describe("createStyles", () => {
     });
   });
 
-  it("assigns classNames from HopeProvider", () => {
+  it("assigns classNames from ThemeProvider", () => {
     render(() => (
-      <HopeProvider
+      <ThemeProvider
         theme={{
           components: {
             NamedComponent: {
@@ -151,16 +151,16 @@ describe("createStyles", () => {
         }}
       >
         <NamedContainer classNames={{ testObject: "local-class" }} />
-      </HopeProvider>
+      </ThemeProvider>
     ));
 
     expect(screen.getByText("test-element")).toHaveClass("provider-class");
     expect(screen.getByText("test-element")).toHaveClass("local-class");
   });
 
-  it("assigns styles from HopeProvider (object)", () => {
+  it("assigns styles from ThemeProvider (object)", () => {
     render(() => (
-      <HopeProvider
+      <ThemeProvider
         theme={{
           components: {
             NamedComponent: {
@@ -170,15 +170,15 @@ describe("createStyles", () => {
         }}
       >
         <NamedContainer styles={{ testObject: { color: "cyan" } }} />
-      </HopeProvider>
+      </ThemeProvider>
     ));
 
     expect(screen.getByText("test-element")).toHaveStyle({ background: "#EF56ED", color: "cyan" });
   });
 
-  it("assigns styles from HopeProvider (function)", () => {
+  it("assigns styles from ThemeProvider (function)", () => {
     render(() => (
-      <HopeProvider
+      <ThemeProvider
         theme={{
           components: {
             NamedComponent: {
@@ -188,7 +188,7 @@ describe("createStyles", () => {
         }}
       >
         <NamedContainer styles={{ testObject: { color: "cyan" } }} />
-      </HopeProvider>
+      </ThemeProvider>
     ));
 
     expect(screen.getByText("test-element")).toHaveStyle({
@@ -204,9 +204,9 @@ describe("createStyles", () => {
     expect(screen.getByText("test-element")).toHaveClass("hope-TestName-testObject");
   });
 
-  it("supports HopeProvider classNames for multiple names", () => {
+  it("supports ThemeProvider classNames for multiple names", () => {
     render(() => (
-      <HopeProvider
+      <ThemeProvider
         theme={{
           components: {
             NamedComponent: {
@@ -220,7 +220,7 @@ describe("createStyles", () => {
         }}
       >
         <MultipleNames classNames={{ testObject: "local-class" }} />
-      </HopeProvider>
+      </ThemeProvider>
     ));
 
     expect(screen.getByText("test-element")).toHaveClass("named-class");
@@ -228,9 +228,9 @@ describe("createStyles", () => {
     expect(screen.getByText("test-element")).toHaveClass("local-class");
   });
 
-  it("supports HopeProvider styles object for multiple names", () => {
+  it("supports ThemeProvider styles object for multiple names", () => {
     render(() => (
-      <HopeProvider
+      <ThemeProvider
         theme={{
           components: {
             NamedComponent: {
@@ -244,7 +244,7 @@ describe("createStyles", () => {
         }}
       >
         <MultipleNames styles={{ testObject: { fontSize: "12%" } }} />
-      </HopeProvider>
+      </ThemeProvider>
     ));
 
     expect(screen.getByText("test-element")).toHaveStyle({

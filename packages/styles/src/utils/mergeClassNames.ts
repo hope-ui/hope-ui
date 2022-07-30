@@ -1,4 +1,4 @@
-import { HopeProviderStyles } from "../theme/HopeProvider";
+import { ThemeProviderStyles } from "../theme/ThemeProvider";
 
 interface MergeClassNamesParams<T extends Record<string, string>> {
   /** A function that merge classNames. */
@@ -7,8 +7,8 @@ interface MergeClassNamesParams<T extends Record<string, string>> {
   /** The internal component classNames. */
   classes: T;
 
-  /** The styles provided by the nearest `HopeProviderContext`. */
-  context: HopeProviderStyles[];
+  /** The styles provided by the nearest `ThemeProviderContext`. */
+  themeStyles: ThemeProviderStyles[];
 
   /** The external classNames provided to the component via props. */
   classNames?: Partial<T>;
@@ -20,7 +20,7 @@ interface MergeClassNamesParams<T extends Record<string, string>> {
 export function mergeClassNames<T extends Record<string, string>>(
   params: MergeClassNamesParams<T>
 ) {
-  const contextClassNames = params.context.reduce<Record<string, string>>((acc, item) => {
+  const themeClassNames = params.themeStyles.reduce<Record<string, string>>((acc, item) => {
     Object.keys(item.classNames).forEach(key => {
       if (typeof acc[key] !== "string") {
         acc[key] = item.classNames[key];
@@ -46,7 +46,7 @@ export function mergeClassNames<T extends Record<string, string>>(
 
     const mergedClassName = params.cx(
       params.classes[className],
-      contextClassNames[className],
+      themeClassNames[className],
       params.classNames?.[className],
       staticClass
     );

@@ -1,9 +1,8 @@
 import { css, cx } from "@emotion/css";
 import { createMemo, createUniqueId } from "solid-js";
 
-import { HopeProviderStyles, useHopeProviderStyles, useHopeTheme } from "../theme/HopeProvider";
+import { ThemeProviderStyles, useTheme, useThemeProviderStyles } from "../theme/ThemeProvider";
 import type { CSSObject, HopeTheme } from "../types";
-import { fromEntries } from "../utils/fromEntries";
 import { mergeClassNames } from "../utils/mergeClassNames";
 
 type StylesPartial<Key extends string> =
@@ -26,7 +25,7 @@ function createGetRef(id: string) {
 }
 
 function getStyles<Key extends string>(
-  styles: UseStylesOptions<Key>["styles"] | HopeProviderStyles[],
+  styles: UseStylesOptions<Key>["styles"] | ThemeProviderStyles[],
   theme: HopeTheme,
   params: Record<string, any>
 ): CSSObject {
@@ -70,8 +69,8 @@ export function createStyles<Key extends string = string, Params = void>(
   const getCssObject = typeof input === "function" ? input : () => input;
 
   function useStyles(params: Params, options?: UseStylesOptions<Key>) {
-    const theme = useHopeTheme();
-    const contextStyles = useHopeProviderStyles(options?.name);
+    const theme = useTheme();
+    const contextStyles = useThemeProviderStyles(options?.name);
 
     const classes = createMemo(() => {
       const cssObject = getCssObject(theme(), params, getRef) as Record<string, CSSObject>;
@@ -79,7 +78,7 @@ export function createStyles<Key extends string = string, Params = void>(
       const componentStyles = getStyles(options?.styles, theme(), params);
       const providerStyles = getStyles(contextStyles(), theme(), params);
 
-      const baseClasses = fromEntries(
+      const baseClasses = Object.fromEntries(
         Object.keys(cssObject).map(key => {
           const { ref, ...baseStyles } = cssObject[key];
 
@@ -97,7 +96,7 @@ export function createStyles<Key extends string = string, Params = void>(
       return mergeClassNames({
         cx,
         classes: baseClasses,
-        context: contextStyles(),
+        themeStyles: contextStyles(),
         classNames: options?.classNames,
         name: options?.name,
       });

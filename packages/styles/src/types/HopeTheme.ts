@@ -25,6 +25,7 @@ export interface HopePrimaryShade {
 
 interface HopeThemeFunctions {
   focusStyles(): CSSObject;
+  colorModeValue<T>(light: T, dark: T): T;
   smallerThan(breakpoint: HopeBreakpoint | number): string;
   largerThan(breakpoint: HopeBreakpoint | number): string;
   rgba(color: string, alpha: number): string;

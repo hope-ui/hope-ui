@@ -71,4 +71,4 @@ export type SizeProps = Partial<{
   boxSize: Property.Width<HopeSize> | number;
 }>;
 
-export type HopeStyleSystemProps = MarginProps & PaddingProps & SizeProps;
+export type SystemStyleProps = MarginProps & PaddingProps & SizeProps;

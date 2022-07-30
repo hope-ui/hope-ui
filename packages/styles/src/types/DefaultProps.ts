@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 
 import type { CSSObject } from "./CSSObject";
-import type { HopeStyleSystemProps } from "./HopeStyleSystem";
+import type { SystemStyleProps } from "./SystemStyleProps";
 import type { HopeTheme } from "./HopeTheme";
 
 export type Sx = CSSObject | ((theme: HopeTheme) => CSSObject);
@@ -14,7 +14,7 @@ export type Styles<StylesNames extends string, StylesParams extends Record<strin
 export interface DefaultProps<
   StylesNames extends string = never,
   StylesParams extends Record<string, any> = never
-> extends HopeStyleSystemProps {
+> extends SystemStyleProps {
   className?: string;
   style?: JSX.CSSProperties;
   sx?: Sx | (Sx | undefined)[];

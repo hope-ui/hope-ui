@@ -1,29 +1,28 @@
-import { Accessor, createContext, JSX, useContext } from "solid-js";
+import { Accessor, createContext, ParentProps, useContext } from "solid-js";
 
-interface StylesApiContextValue {
+interface StylesApiContextType {
   classNames: Accessor<Record<string, string>>;
   styles: Accessor<Record<string, any>>;
   unstyled: Accessor<boolean>;
   staticSelector: Accessor<string | undefined>;
 }
 
-const StylesApiContext = createContext<StylesApiContextValue>({
+const StylesApiContext = createContext<StylesApiContextType>({
   classNames: () => ({}),
   styles: () => ({}),
   unstyled: () => false,
   staticSelector: () => undefined,
 });
 
-export interface StylesApiProviderProps {
+export interface StylesApiProviderProps extends ParentProps {
   classNames: Record<string, string>;
   styles: Record<string, any>;
   unstyled: boolean;
   staticSelector?: string;
-  children?: JSX.Element;
 }
 
 export function StylesApiProvider(props: StylesApiProviderProps) {
-  const context: StylesApiContextValue = {
+  const context: StylesApiContextType = {
     classNames: () => props.classNames,
     styles: () => props.styles,
     unstyled: () => props.unstyled,

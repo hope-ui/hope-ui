@@ -1,4 +1,4 @@
 export * from "./context";
 export * from "./provider";
-export * from "./storage-manager";
+export * from "./storageManager";
 export * from "./types";
