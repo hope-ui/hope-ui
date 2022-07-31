@@ -1,10 +1,10 @@
-import { HopeTheme, HopeThemeBase } from "../../types";
+import { Theme, ThemeBase } from "../../types";
 import { largerThan, smallerThan } from "./breakpoints";
-import { colorModeValue } from "./colorModeValue";
-import { focusStyles } from "./focusStyles";
+import { colorModeValue } from "./color-mode-value";
+import { focusStyles } from "./focus-styles";
 import { rgba } from "./rgba";
 
-export function attachFunctions(themeBase: HopeThemeBase): HopeTheme {
+export function attachFunctions(themeBase: ThemeBase): Theme {
   return {
     ...themeBase,
     fn: {

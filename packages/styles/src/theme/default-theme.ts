@@ -1,8 +1,8 @@
-import { HopeThemeBase } from "../types";
-import { DEFAULT_COLORS } from "./defaultColors";
-import { attachFunctions } from "./functions/attachFunctions";
+import { ThemeBase } from "../types";
+import { DEFAULT_COLORS } from "./default-colors";
+import { attachFunctions } from "./functions/attach-functions";
 
-const space: HopeThemeBase["space"] = {
+const space: ThemeBase["space"] = {
   px: "1px",
   "0.5": "0.125rem",
   "1": "0.25rem",
@@ -38,8 +38,7 @@ const space: HopeThemeBase["space"] = {
   "96": "24rem",
 };
 
-const _DEFAULT_THEME: HopeThemeBase = {
-  dir: "ltr",
+const _DEFAULT_THEME: ThemeBase = {
   colorMode: "light",
   primaryColor: "blue",
   primaryShade: {
@@ -148,6 +147,7 @@ const _DEFAULT_THEME: HopeThemeBase = {
     inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)",
   },
   breakpoints: {
+    base: 0,
     sm: 640,
     md: 768,
     lg: 1024,

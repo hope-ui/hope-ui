@@ -1,6 +1,6 @@
-import type { HopeBreakpoint, HopeThemeBase } from "../../types";
+import type { ThemeBase, ThemeBreakpoint } from "../../types";
 
-function getBreakpointValue(breakpoint: HopeBreakpoint | number, theme: HopeThemeBase) {
+function getBreakpointValue(breakpoint: ThemeBreakpoint | number, theme: ThemeBase) {
   if (typeof breakpoint === "number") {
     return breakpoint;
   }
@@ -8,14 +8,14 @@ function getBreakpointValue(breakpoint: HopeBreakpoint | number, theme: HopeThem
   return theme.breakpoints[breakpoint];
 }
 
-export function largerThan(theme: HopeThemeBase) {
-  return (breakpoint: HopeBreakpoint | number) => {
+export function largerThan(theme: ThemeBase) {
+  return (breakpoint: ThemeBreakpoint | number) => {
     return `@media (min-width: ${getBreakpointValue(breakpoint, theme) + 1}px)`;
   };
 }
 
-export function smallerThan(theme: HopeThemeBase) {
-  return (breakpoint: HopeBreakpoint | number) => {
+export function smallerThan(theme: ThemeBase) {
+  return (breakpoint: ThemeBreakpoint | number) => {
     return `@media (max-width: ${getBreakpointValue(breakpoint, theme)}px)`;
   };
 }

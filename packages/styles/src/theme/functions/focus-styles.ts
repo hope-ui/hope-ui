@@ -1,6 +1,6 @@
-import type { CSSObject, HopeThemeBase } from "../../types";
+import type { CSSObject, ThemeBase } from "../../types";
 
-export function focusStyles(theme: HopeThemeBase) {
+export function focusStyles(theme: ThemeBase) {
   return (): CSSObject => ({
     WebkitTapHighlightColor: "transparent",
 

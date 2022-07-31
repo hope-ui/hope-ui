@@ -1,8 +1,8 @@
 export type Shade = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
-export type HopeColorPalette = Record<Shade, string>;
+export type ThemeColorPalette = Record<Shade, string>;
 
-export type DefaultHopeColor =
+export type ThemeColor =
   | "slate"
   | "gray"
   | "zinc"
@@ -27,19 +27,9 @@ export type DefaultHopeColor =
   | "rose"
   | (string & {});
 
-export type HopeThemeColorsOverride = {};
+export type ThemeFontFamily = "sans" | "serif" | "mono" | (string & {});
 
-export type HopeThemeColors = HopeThemeColorsOverride extends {
-  colors: Record<infer CustomColors, HopeColorPalette>;
-}
-  ? Record<CustomColors, HopeColorPalette>
-  : Record<DefaultHopeColor, HopeColorPalette>;
-
-export type HopeColor = keyof HopeThemeColors;
-
-export type HopeFontFamily = "sans" | "serif" | "mono" | (string & {});
-
-export type HopeFontSize =
+export type ThemeFontSize =
   | "xs"
   | "sm"
   | "base"
@@ -55,7 +45,7 @@ export type HopeFontSize =
   | "9xl"
   | (string & {});
 
-export type HopeFontWeight =
+export type ThemeFontWeight =
   | "hairline"
   | "thin"
   | "light"
@@ -67,7 +57,7 @@ export type HopeFontWeight =
   | "black"
   | (string & {});
 
-export type HopeLineHeight =
+export type ThemeLineHeight =
   | "normal"
   | "none"
   | "shorter"
@@ -85,7 +75,7 @@ export type HopeLineHeight =
   | "10"
   | (string & {});
 
-export type HopeLetterSpacing =
+export type ThemeLetterSpacing =
   | "tighter"
   | "tight"
   | "normal"
@@ -94,7 +84,7 @@ export type HopeLetterSpacing =
   | "widest"
   | (string & {});
 
-export type HopeSpace =
+export type ThemeSpace =
   | "px"
   | "0.5"
   | "1"
@@ -130,8 +120,8 @@ export type HopeSpace =
   | "96"
   | (string & {});
 
-export type HopeSize =
-  | HopeSpace
+export type ThemeSize =
+  | ThemeSpace
   | "prose"
   | "max"
   | "min"
@@ -152,7 +142,7 @@ export type HopeSize =
   | "8xl"
   | (string & {});
 
-export type HopeRadii =
+export type ThemeRadii =
   | "none"
   | "xs"
   | "sm"
@@ -164,7 +154,7 @@ export type HopeRadii =
   | "full"
   | (string & {});
 
-export type HopeShadow =
+export type ThemeShadow =
   | "none"
   | "xs"
   | "sm"
@@ -176,4 +166,4 @@ export type HopeShadow =
   | "inner"
   | (string & {});
 
-export type HopeBreakpoint = "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});
+export type ThemeBreakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});

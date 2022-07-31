@@ -1,4 +1,4 @@
-import { toRgba } from "../../utils/toRgba";
+import { toRgba } from "../../utils/to-rgba";
 
 export function rgba(hexOrRgbColor: string, alpha: number) {
   if (hexOrRgbColor == null || hexOrRgbColor == "" || alpha > 1 || alpha < 0) {

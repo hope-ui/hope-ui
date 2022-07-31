@@ -3,7 +3,7 @@ import { createEffect, createSignal, on, onCleanup, ParentProps } from "solid-js
 
 import { noop } from "../utils/function";
 import { ColorModeContext } from "./context";
-import { localStorageManager } from "./storageManager";
+import { localStorageManager } from "./storage-manager";
 import { ColorModeContextType, ColorModeProviderProps, ConfigColorMode } from "./types";
 import {
   addColorModeListener,

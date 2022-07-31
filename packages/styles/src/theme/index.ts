@@ -1,4 +1,4 @@
-export { DEFAULT_THEME } from "./defaultTheme";
-export { StylesApiProvider, useStylesApiContext } from "./StylesApiContext";
-export type { ThemeProviderProps } from "./ThemeProvider";
-export { ThemeProvider, useComponentDefaultProps, useTheme } from "./ThemeProvider";
+export { DEFAULT_THEME } from "./default-theme";
+export { StylesApiProvider, useStylesApiContext } from "./styles-api-context";
+export type { ThemeProviderProps } from "./theme-provider";
+export { ThemeProvider, useComponentDefaultProps, useTheme } from "./theme-provider";

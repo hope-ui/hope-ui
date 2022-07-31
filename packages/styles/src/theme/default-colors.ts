@@ -1,6 +1,10 @@
-import { HopeThemeColors } from "../types";
+import { ThemeColor, ThemeColorPalette } from "../types";
 
-export const DEFAULT_COLORS: HopeThemeColors = {
+/**
+ * Tailwind CSS colors.
+ * @see https://tailwindcss.com/docs/customizing-colors
+ */
+export const DEFAULT_COLORS: Record<ThemeColor, ThemeColorPalette> = {
   slate: {
     50: "#f8fafc",
     100: "#f1f5f9",

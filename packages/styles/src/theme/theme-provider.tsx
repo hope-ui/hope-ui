@@ -1,32 +1,24 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { CSSObject, HopeTheme, HopeThemeOverride } from "../types";
-import { mergeThemeWithFunctions } from "../utils/mergeTheme";
-import { DEFAULT_THEME } from "./defaultTheme";
+import type { CSSObject, Theme, ThemeOverride } from "../types";
+import { mergeThemeWithFunctions } from "../utils/merge-theme";
+import { DEFAULT_THEME } from "./default-theme";
 
-export interface ThemeProviderStyles {
+export interface ThemeStylesObject {
   classNames: Record<string, string>;
-  styles:
-    | Record<string, CSSObject>
-    | ((theme: HopeTheme, params: any) => Record<string, CSSObject>);
+  styles: Record<string, CSSObject> | ((theme: Theme, variants: any) => Record<string, CSSObject>);
 }
 
-interface ThemeProviderContextType {
-  theme: Accessor<HopeTheme>;
-}
-
-const ThemeProviderContext = createContext<ThemeProviderContextType>({
-  theme: () => DEFAULT_THEME,
-});
+const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);
 
 export function useTheme() {
-  return useContext(ThemeProviderContext).theme;
+  return useContext(ThemeContext);
 }
 
-export function useThemeProviderStyles(component?: string | string[]) {
+export function useThemeStyles(component?: string | string[]) {
   const theme = useTheme();
 
-  const getStyles = (name?: string): ThemeProviderStyles => {
+  const getStyles = (name?: string): ThemeStylesObject => {
     if (name == null) {
       return { styles: {}, classNames: {} };
     }
@@ -57,21 +49,17 @@ export function useComponentDefaultProps<T extends Record<string, any>>(
 }
 
 export interface ThemeProviderProps extends ParentProps {
-  theme?: HopeThemeOverride;
+  theme?: ThemeOverride;
   inherit?: boolean;
 }
 
 export function ThemeProvider(props: ThemeProviderProps) {
-  const ctx = useContext(ThemeProviderContext);
+  const parentTheme = useTheme();
 
   const theme = createMemo(() => {
-    const themeOverride = props.inherit ? mergeProps(ctx.theme, props.theme) : props.theme;
+    const themeOverride = props.inherit ? mergeProps(parentTheme, props.theme) : props.theme;
     return mergeThemeWithFunctions(DEFAULT_THEME, themeOverride);
   });
 
-  return (
-    <ThemeProviderContext.Provider value={{ theme }}>
-      {props.children}
-    </ThemeProviderContext.Provider>
-  );
+  return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
 }

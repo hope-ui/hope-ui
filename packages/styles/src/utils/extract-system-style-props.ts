@@ -2,7 +2,8 @@ import { splitProps } from "solid-js";
 
 import type { SystemStyleProps } from "../types";
 
-const SYSTEM_STYLE_PROPS = [
+const SYSTEM_STYLE_PROPS: Array<keyof SystemStyleProps> = [
+  // margin
   "m",
   "mx",
   "my",
@@ -10,6 +11,7 @@ const SYSTEM_STYLE_PROPS = [
   "mb",
   "ml",
   "mr",
+  // padding
   "p",
   "px",
   "py",
@@ -17,6 +19,10 @@ const SYSTEM_STYLE_PROPS = [
   "pb",
   "pl",
   "pr",
+  // color
+  "color",
+  "bg",
+  // size
   "w",
   "minW",
   "maxW",
@@ -24,7 +30,7 @@ const SYSTEM_STYLE_PROPS = [
   "minH",
   "maxH",
   "boxSize",
-] as const;
+];
 
 /** Split props into system style props and others props. */
 export function extractSystemStyleProps<T extends Record<string, any>>(

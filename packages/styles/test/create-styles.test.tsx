@@ -1,9 +1,10 @@
 import { Component } from "solid-js";
 import { render, screen } from "solid-testing-library";
 
-import { DEFAULT_THEME, ThemeProvider } from "../theme";
-import { CSSObject } from "../types";
-import { createStyles } from "./createStyles";
+import { createStyles } from "../src/engine/create-styles";
+import { DEFAULT_THEME, ThemeProvider } from "../src/theme";
+import { CSSObject } from "../src/types";
+import { cx } from "@emotion/css";
 
 function expectStyles(Example: Component, styles: CSSObject) {
   render(() => <Example />);
@@ -39,65 +40,64 @@ const getRefStyles = createStyles((_theme, _params, getRef) => ({
 }));
 
 function NamedContainer(props: { classNames?: any; styles?: any }) {
-  const { classes } = objectStyles(undefined, {
+  const classes = objectStyles(undefined, {
     name: "NamedComponent",
-    get classNames() {
-      return props.classNames;
-    },
-    get styles() {
-      return props.styles;
-    },
+    classNames: () => props.classNames,
+    styles: () => props.styles,
   });
   return <div class={classes().testObject}>test-element</div>;
 }
 
 function MultipleNames(props: { classNames?: any; styles?: any }) {
-  const { classes } = objectStyles(undefined, {
+  const classes = objectStyles(undefined, {
     name: ["NamedComponent", "TestName"],
-    get classNames() {
-      return props.classNames;
-    },
-    get styles() {
-      return props.styles;
-    },
+    classNames: () => props.classNames,
+    styles: () => props.styles,
   });
   return <div class={classes().testObject}>test-element</div>;
 }
 
 describe("createStyles", () => {
   it("assigns styles with css object", () => {
-    expectStyles(() => <div class={objectStyles().classes().testObject}>test-element</div>, {
+    const classes = objectStyles();
+
+    expectStyles(() => <div class={classes().testObject}>test-element</div>, {
       backgroundColor: "#FEF67F",
     });
   });
 
   it("assigns styles with function", () => {
-    expectStyles(() => <div class={functionStyles().classes().testFunction}>test-element</div>, {
+    const classes = functionStyles();
+
+    expectStyles(() => <div class={classes().testFunction}>test-element</div>, {
       borderColor: "#CE5634",
     });
   });
 
   it("supports getting theme as first argument", () => {
-    expectStyles(() => <div class={themeStyles().classes().testTheme}>test-element</div>, {
+    const classes = themeStyles();
+
+    expectStyles(() => <div class={classes().testTheme}>test-element</div>, {
       fontSize: `${DEFAULT_THEME.fontSizes.xl}px`,
     });
   });
 
   it("supports getting params as second argument", () => {
-    expectStyles(
-      () => <div class={paramsStyles({ radius: 432 }).classes().testParams}>test-element</div>,
-      { borderRadius: "432px" }
-    );
+    const classes = paramsStyles({ radius: 432 });
+
+    expectStyles(() => <div class={classes().testParams}>test-element</div>, {
+      borderRadius: "432px",
+    });
   });
 
   it("allows to merge styles with cx function", () => {
+    const fnClasses = functionStyles();
+    const objClasses = objectStyles();
+
     expectStyles(
       () => {
-        const { classes, cx } = objectStyles();
         return (
-          <div class={cx(functionStyles().classes().testFunction, classes().testObject)}>
-            test-element
-          </div>
+          <div class={cx(fnClasses().testFunction, objClasses().testObject)}>test-element</div>
         );
       },
       { backgroundColor: "#FEF67F", borderColor: "#CE5634" }
@@ -107,7 +107,7 @@ describe("createStyles", () => {
   it("allows to override styles with getRef function", () => {
     expectStyles(
       () => {
-        const { classes, cx } = getRefStyles();
+        const classes = getRefStyles();
         return <div class={cx(classes().testRef, classes().overrideRef)}>test-element</div>;
       },
       { backgroundColor: "blue" }

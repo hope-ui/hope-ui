@@ -1,17 +1,14 @@
-import { attachFunctions } from "../theme/functions/attachFunctions";
-import { HopeTheme, HopeThemeBase, HopeThemeOverride } from "../types";
+import { attachFunctions } from "../theme/functions/attach-functions";
+import { Theme, ThemeBase, ThemeOverride } from "../types";
 
-export function mergeTheme(
-  currentTheme: HopeThemeBase,
-  themeOverride?: HopeThemeOverride
-): HopeThemeBase {
+export function mergeTheme(currentTheme: ThemeBase, themeOverride?: ThemeOverride): ThemeBase {
   if (!themeOverride) {
     return currentTheme;
   }
 
   return Object.keys(currentTheme).reduce((acc, key) => {
-    const currentValue = currentTheme[key as keyof HopeThemeBase];
-    const overrideValue = themeOverride[key as keyof HopeThemeOverride];
+    const currentValue = currentTheme[key as keyof ThemeBase];
+    const overrideValue = themeOverride[key as keyof ThemeOverride];
 
     let mergedValue;
 
@@ -25,12 +22,12 @@ export function mergeTheme(
       ...acc,
       [key]: mergedValue,
     };
-  }, {} as HopeThemeBase);
+  }, {} as ThemeBase);
 }
 
 export function mergeThemeWithFunctions(
-  currentTheme: HopeThemeBase,
-  themeOverride?: HopeThemeOverride
-): HopeTheme {
+  currentTheme: ThemeBase,
+  themeOverride?: ThemeOverride
+): Theme {
   return attachFunctions(mergeTheme(currentTheme, themeOverride));
 }
