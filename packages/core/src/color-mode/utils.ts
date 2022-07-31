@@ -1,4 +1,6 @@
-import { ColorMode, ColorModeStorageManager, ConfigColorMode } from "./types";
+import { ColorMode } from "@hope-ui/styles";
+
+import { ColorModeStorageManager } from "./types";
 
 const classNames = {
   light: "hope-theme-light",

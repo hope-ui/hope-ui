@@ -1,6 +1,6 @@
 import { Property } from "csstype";
 
-import { ThemeBreakpoint, ThemeColor, ThemeSize, ThemeSpace } from "./token";
+import { ThemeBreakpoint, ThemeColorShade, ThemeSize, ThemeSpace } from "./token";
 
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 
@@ -54,10 +54,10 @@ type PaddingProps = Partial<{
 
 export type ColorProps = Partial<{
   /** The CSS `color` property. */
-  color: Property.Color | ThemeColor;
+  color: Property.Color | ThemeColorShade;
 
   /** The CSS `background` property. */
-  bg: Property.Background<ThemeColor>;
+  bg: Property.Background<ThemeColorShade>;
 }>;
 
 export type LayoutProps = Partial<{
