@@ -22,11 +22,8 @@ export type ThemeOther = Record<string, any>;
 export type ThemePrimaryShade = Shade | { light: Shade; dark: Shade };
 
 interface ThemeFunctions {
-  focusStyles(): CSSObject;
-  colorModeValue<T>(light: T, dark: T): T;
-  smallerThan(breakpoint: ThemeBreakpoint | number): string;
-  largerThan(breakpoint: ThemeBreakpoint | number): string;
-  rgba(color: string, alpha: number): string;
+  focusStyles: () => CSSObject;
+  rgba: (hexOrRgbColor: string, alpha: number) => string;
 }
 
 export interface Theme {
@@ -44,7 +41,7 @@ export interface Theme {
   size: Record<ThemeSize, string>;
   radii: Record<ThemeRadii, string>;
   shadows: Record<ThemeShadow, string>;
-  breakpoints: Record<ThemeBreakpoint, number>;
+  breakpoints: Record<ThemeBreakpoint, string>;
 
   fn: ThemeFunctions;
   other: ThemeOther;

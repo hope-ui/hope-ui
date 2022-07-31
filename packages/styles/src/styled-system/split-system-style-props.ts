@@ -33,18 +33,16 @@ const SYSTEM_STYLE_PROPS: Array<keyof SystemStyleProps> = [
 ];
 
 /** Split props into system style props and others props. */
-export function extractSystemStyleProps<T extends Record<string, any>>(
-  props: SystemStyleProps & T
-) {
+export function splitSystemStyleProps<T extends Record<string, any>>(props: SystemStyleProps & T) {
   const [systemProps, others] = splitProps(props, SYSTEM_STYLE_PROPS);
 
   /*
-  Object.keys(systemProps).forEach(key => {
-    if (systemProps[key] === undefined) {
-      delete systemProps[key];
-    }
-  });
-  */
+Object.keys(systemProps).forEach(key => {
+  if (systemProps[key] === undefined) {
+    delete systemProps[key];
+  }
+});
+*/
 
   return { systemProps, others };
 }
