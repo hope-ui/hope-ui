@@ -3,7 +3,7 @@ import { render } from "solid-js/web";
 import { HopeProvider } from "../src";
 
 function App() {
-  return <div>Hello Hope UI</div>;
+  return <></>;
 }
 
 render(
