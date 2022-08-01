@@ -1,7 +1,7 @@
-import type { CSSObject, ThemeBase } from "../../types";
+import { CSSObject, ThemeBase } from "../types";
 
-export function focusStyles(theme: ThemeBase) {
-  return (): CSSObject => ({
+export function focusStyles(theme: ThemeBase): CSSObject {
+  return {
     WebkitTapHighlightColor: "transparent",
 
     "&:focus": {
@@ -14,5 +14,5 @@ export function focusStyles(theme: ThemeBase) {
     "&:focus:not(:focus-visible)": {
       outline: "none",
     },
-  });
+  };
 }

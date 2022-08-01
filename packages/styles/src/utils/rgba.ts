@@ -48,7 +48,7 @@ function rgbStringToRgba(color: string): RGBA {
   return { r, g, b, a: a || 1 };
 }
 
-export function toRgba(color: string): RGBA {
+function toRgba(color: string): RGBA {
   if (isHexColor(color)) {
     return hexToRgba(color);
   }
@@ -63,4 +63,14 @@ export function toRgba(color: string): RGBA {
     b: 0,
     a: 1,
   };
+}
+
+export function rgba(hexOrRgbColor: string, alpha: number) {
+  if (hexOrRgbColor == null || hexOrRgbColor == "" || alpha > 1 || alpha < 0) {
+    return "rgba(0, 0, 0, 1)";
+  }
+
+  const { r, g, b } = toRgba(hexOrRgbColor);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

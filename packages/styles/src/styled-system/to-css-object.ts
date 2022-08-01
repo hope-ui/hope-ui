@@ -6,9 +6,10 @@ import { ThemeScale } from "../types/theme";
 import { Shade } from "../types/token";
 import { px } from "../utils/breakpoint";
 import { expandResponsive } from "./expand-responsive";
-import { PseudoSelectorProps, pseudoSelectors } from "./props/pseudos";
-import { SHORTHAND_MAP } from "./shorthand-map";
-import { stylePropNames, SystemStyleObject, SystemStyleProps } from "./system";
+import { BaseSystemStyleProps } from "./props/base";
+import { PseudoSelectorProps } from "./props/pseudos";
+import { SystemStyleObject } from "./system.types";
+import { PSEUDO_SELECTORS_MAP, STYLE_PROPS_MAP } from "./system-map";
 
 /** Get a color value from theme if the token exist, return the token otherwise. */
 function resolveColorTokenValue(token: string, theme: ThemeBase) {
@@ -44,23 +45,18 @@ function resolveTokenValue(
   return theme[scale][String(token)] ?? token;
 }
 
-/** Take a props object and return only the keys that match a style prop. */
-export function getUsedSystemStylePropNames(props: Record<string | number, any>) {
-  return Object.keys(props).filter(key => key in stylePropNames) as Array<keyof SystemStyleProps>;
-}
-
 /** Return a CSSObject from a system style object. */
 export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme): CSSObject {
   const computedStyles: CSSObject = {};
 
   const styles = expandResponsive(systemStyleObject)(theme);
 
-  for (let key in styles) {
-    const valueOrFn = styles[key];
+  for (let propertyName in styles) {
+    const valueOrFn = styles[propertyName];
 
     /**
-     * allows the user to pass functional values
-     * boxShadow: theme => `0 2px 2px ${theme.colors.red}`
+     * allows the user to pass functional values.
+     * boxShadow: theme => `0 2px 2px ${theme.colors.red["500"]}`
      */
     let value = runIfFn(valueOrFn, theme);
 
@@ -69,33 +65,51 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
     }
 
     /**
-     * converts pseudo shorthands to valid selector
+     * converts pseudo shorthands to valid selector.
      * "_hover" => "&:hover"
      */
-    if (key.startsWith("_")) {
-      key = pseudoSelectors[key as keyof PseudoSelectorProps];
+    if (propertyName.startsWith("_")) {
+      propertyName = PSEUDO_SELECTORS_MAP[propertyName as keyof PseudoSelectorProps];
     }
 
-    if (key == null) {
+    if (propertyName == null) {
       continue;
     }
 
+    /**
+     * run recursively until all css objects are resolved,
+     * aka pseudo selectors and media queries.
+     */
     if (isObject(value)) {
-      computedStyles[key] = computedStyles[key] ?? {};
-      computedStyles[key] = mergeWith({}, computedStyles[key], toCSSObject(value, theme));
+      computedStyles[propertyName] = computedStyles[propertyName] ?? {};
+      computedStyles[propertyName] = mergeWith(
+        {},
+        computedStyles[propertyName],
+        toCSSObject(value, theme)
+      );
       continue;
     }
 
-    const longhandKeys = SHORTHAND_MAP[key as keyof SystemStyleProps] ?? [key];
+    /**
+     * converts style props shorthands to valid css properties.
+     * "mx" => ["marginLeft", "marginRight"]
+     */
+    const propertyNames = STYLE_PROPS_MAP[propertyName as keyof BaseSystemStyleProps] ?? [
+      propertyName,
+    ];
 
-    longhandKeys.forEach(key => {
-      const scale = theme.themeMap[key];
+    /**
+     * apply same value to each css properties.
+     * { mx: 4 } => { marginLeft: "1rem", "marginRight: "1rem" }
+     */
+    propertyNames.forEach(propertyName => {
+      const scale = theme.themeMap[propertyName];
 
       if (scale != null) {
         value = resolveTokenValue(value, scale, theme);
       }
 
-      computedStyles[key] = value;
+      computedStyles[propertyName] = value;
     });
   }
 

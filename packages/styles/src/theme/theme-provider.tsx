@@ -1,12 +1,15 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { CSSObject, Theme, ThemeOverride } from "../types";
+import { SystemStyleObject } from "../styled-system/system.types";
+import type { Theme, ThemeOverride } from "../types";
 import { mergeThemeWithMetadata } from "../utils/merge-theme";
 import { DEFAULT_THEME } from "./default-theme";
 
 export interface ThemeStylesObject {
   classNames: Record<string, string>;
-  styles: Record<string, CSSObject> | ((theme: Theme, variants: any) => Record<string, CSSObject>);
+  styles:
+    | Record<string, SystemStyleObject>
+    | ((theme: Theme, variants: any) => Record<string, SystemStyleObject>);
 }
 
 const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);

@@ -1,3 +1,4 @@
+import { SystemStyleObject } from "../styled-system/system.types";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import type { ColorMode } from "./color-mode";
 import type { CSSObject } from "./css-object";
@@ -25,11 +26,6 @@ export type ThemePrimaryShade = Shade | { light: Shade; dark: Shade };
 
 export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScale>>;
 
-interface ThemeFunctions {
-  focusStyles: () => CSSObject;
-  rgba: (hexOrRgbColor: string, alpha: number) => string;
-}
-
 export interface ThemeScale {
   colors: Record<ThemeColor, ThemeColorPalette>;
   fonts: Record<ThemeFontFamily, string>;
@@ -49,22 +45,23 @@ export interface Theme extends ThemeScale {
   primaryColor: ThemeColor;
   primaryShade: ThemePrimaryShade;
   breakpoints: Record<ThemeBreakpoint, string>;
-  __breakpoints: AnalyzeBreakpointsReturn;
   themeMap: ThemeMap;
-  fn: ThemeFunctions;
   other: ThemeOther;
   components: Record<string, ThemeComponent>;
+  __breakpoints: AnalyzeBreakpointsReturn;
 }
 
 interface ThemeComponent {
   defaultProps?: Record<string, any>;
   classNames?: Record<string, string>;
-  styles?: Record<string, CSSObject> | ((theme: Theme, variants: any) => Record<string, CSSObject>);
+  styles?:
+    | Record<string, SystemStyleObject>
+    | ((theme: Theme, params: any) => Record<string, SystemStyleObject>);
 }
 
-export type ThemeBase = Omit<Theme, "__breakpoints" | "fn">;
+export type ThemeBase = Omit<Theme, "__breakpoints">;
 export type ThemeOverride = DeepPartial<
-  Omit<ThemeBase, "__breakpoints" | "fn" | "other" | "components">
+  Omit<ThemeBase, "other" | "components" | "__breakpoints">
 > & {
   other?: ThemeOther;
   components?: Record<string, ThemeComponent>;

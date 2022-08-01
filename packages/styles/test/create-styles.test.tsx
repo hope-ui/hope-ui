@@ -1,10 +1,10 @@
+import { cx } from "@emotion/css";
 import { Component } from "solid-js";
 import { render, screen } from "solid-testing-library";
 
-import { createStyles } from "../src/engine/create-styles";
+import { createStyles } from "../src/create-styles";
 import { DEFAULT_THEME, ThemeProvider } from "../src/theme";
 import { CSSObject } from "../src/types";
-import { cx } from "@emotion/css";
 
 function expectStyles(Example: Component, styles: CSSObject) {
   render(() => <Example />);
