@@ -116,13 +116,10 @@ importers:
       '@storybook/html': 6.4.20
       '@storybook/manager-webpack5': 6.4.20
       '@storybook/theming': 6.4.20
-      '@types/lodash.mergewith': ^4.6.7
-      lodash.mergewith: ^4.6.2
       storybook-dark-mode: 1.1.0
     dependencies:
       '@hope-ui/styles': link:../styles
       '@hope-ui/utils': link:../utils
-      lodash.mergewith: 4.6.2
     devDependencies:
       '@storybook/addon-a11y': 6.4.20_zkbncb2mrwigeq3keybbaytzya
       '@storybook/addon-actions': 6.4.20_zkbncb2mrwigeq3keybbaytzya
@@ -136,7 +133,6 @@ importers:
       '@storybook/html': 6.4.20_slj34jk2sj7fxcvzs72mnlytzu
       '@storybook/manager-webpack5': 6.4.20_zq4c6ig72ovddqnbblcyygael4
       '@storybook/theming': 6.4.20_zkbncb2mrwigeq3keybbaytzya
-      '@types/lodash.mergewith': 4.6.7
       storybook-dark-mode: 1.1.0_3omdoyodqrhwrh3p6zau65yfv4
 
   packages/styles:
@@ -5916,16 +5912,6 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
-    dev: true
-
-  /@types/lodash.mergewith/4.6.7:
-    resolution: {integrity: sha512-3m+lkO5CLRRYU0fhGRp7zbsGi6+BZj0uTVSwvcKU+nSlhjA9/QRNfuSGnD2mX6hQA7ZbmcCkzk5h4ZYGOtk14A==}
-    dependencies:
-      '@types/lodash': 4.14.182
-    dev: true
-
-  /@types/lodash/4.14.182:
-    resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
     dev: true
 
   /@types/mdast/3.0.10:
@@ -12421,10 +12407,6 @@ packages:
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
     dev: true
-
-  /lodash.mergewith/4.6.2:
-    resolution: {integrity: sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==}
-    dev: false
 
   /lodash.startcase/4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}

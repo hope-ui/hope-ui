@@ -1,8 +1,8 @@
 {
-  "name": "@hope-ui/styles",
+  "name": "@hope-ui/utils",
   "version": "0.0.0",
   "private": false,
-  "description": "Hope UI CSS-in-JS library built on top of emotion.",
+  "description": "Common utilities and types for Hope UI.",
   "keywords": [
     "solid",
     "solidjs",
@@ -11,7 +11,7 @@
     "design-system",
     "components"
   ],
-  "homepage": "https://github.com/hope-ui/hope-ui/tree/main/packages/styles#readme",
+  "homepage": "https://github.com/hope-ui/hope-ui/tree/main/packages/utils#readme",
   "bugs": {
     "url": "https://github.com/hope-ui/hope-ui/issues"
   },
@@ -43,16 +43,11 @@
   "scripts": {
     "build": "rollup -c ../../configs/rollup.config.ts",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "vite serve dev --host",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@hope-ui/utils": "^0.0.0",
-    "csstype": "3.1.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "@emotion/css": "^11.9.0",
     "solid-js": "^1.4.7"
   },
   "publishConfig": {

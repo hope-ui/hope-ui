@@ -1,7 +1,7 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { CSSObject, Theme, ThemeOverride } from "../types";
-import { mergeThemeWithFunctions } from "../utils/merge-theme";
+import { mergeThemeWithMetadata } from "../utils/merge-theme";
 import { DEFAULT_THEME } from "./default-theme";
 
 export interface ThemeStylesObject {
@@ -58,7 +58,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
 
   const theme = createMemo(() => {
     const themeOverride = props.inherit ? mergeProps(parentTheme, props.theme) : props.theme;
-    return mergeThemeWithFunctions(DEFAULT_THEME, themeOverride);
+    return mergeThemeWithMetadata(DEFAULT_THEME, themeOverride);
   });
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;

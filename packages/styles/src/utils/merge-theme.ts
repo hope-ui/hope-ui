@@ -1,4 +1,4 @@
-import { attachFunctions } from "../theme/functions/attach-functions";
+import { attachMetadata } from "../theme/attach-metadata";
 import { Theme, ThemeBase, ThemeOverride } from "../types";
 
 export function mergeTheme(currentTheme: ThemeBase, themeOverride?: ThemeOverride): ThemeBase {
@@ -25,9 +25,9 @@ export function mergeTheme(currentTheme: ThemeBase, themeOverride?: ThemeOverrid
   }, {} as ThemeBase);
 }
 
-export function mergeThemeWithFunctions(
+export function mergeThemeWithMetadata(
   currentTheme: ThemeBase,
   themeOverride?: ThemeOverride
 ): Theme {
-  return attachFunctions(mergeTheme(currentTheme, themeOverride));
+  return attachMetadata(mergeTheme(currentTheme, themeOverride));
 }

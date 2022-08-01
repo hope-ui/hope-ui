@@ -49,7 +49,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/styles": "^0.0.0"
+    "@hope-ui/styles": "^0.0.0",
+    "@hope-ui/utils": "^0.0.0"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "6.4.20",

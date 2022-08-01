@@ -16,6 +16,7 @@ import {
   ThemeSize,
   ThemeSpace,
 } from "./token";
+import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 
 export type ThemeOther = Record<string, any>;
 
@@ -43,6 +44,7 @@ export interface Theme {
   shadows: Record<ThemeShadow, string>;
   breakpoints: Record<ThemeBreakpoint, string>;
 
+  __breakpoints: AnalyzeBreakpointsReturn;
   fn: ThemeFunctions;
   other: ThemeOther;
   components: Record<string, ThemeComponent>;
@@ -54,8 +56,10 @@ interface ThemeComponent {
   styles?: Record<string, CSSObject> | ((theme: Theme, variants: any) => Record<string, CSSObject>);
 }
 
-export type ThemeBase = Omit<Theme, "fn">;
-export type ThemeOverride = DeepPartial<Omit<ThemeBase, "fn" | "other" | "components">> & {
+export type ThemeBase = Omit<Theme, "__breakpoints" | "fn">;
+export type ThemeOverride = DeepPartial<
+  Omit<ThemeBase, "__breakpoints" | "fn" | "other" | "components">
+> & {
   other?: ThemeOther;
   components?: Record<string, ThemeComponent>;
 };

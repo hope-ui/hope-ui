@@ -1,7 +1,7 @@
 import { ColorMode } from "@hope-ui/styles";
+import { noop } from "@hope-ui/utils";
 import { createEffect, createSignal, on, onCleanup, ParentProps } from "solid-js";
 
-import { noop } from "../utils/function";
 import { ColorModeContext } from "./context";
 import { localStorageManager } from "./storage-manager";
 import { ColorModeContextType, ColorModeProviderProps, ConfigColorMode } from "./types";

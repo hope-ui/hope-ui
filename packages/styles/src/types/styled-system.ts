@@ -2,9 +2,11 @@ import { Property } from "csstype";
 
 import { ThemeBreakpoint, ThemeColorShade, ThemeSize, ThemeSpace } from "./token";
 
+export type ResponsiveArray<T> = Array<T | null>;
+
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 
-export type ResponsiveValue<T> = T | ResponsiveObject<T>;
+export type ResponsiveValue<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
 
 type MarginProps = Partial<{
   /** The CSS `margin` property. */
@@ -54,27 +56,27 @@ type PaddingProps = Partial<{
 
 export type ColorProps = Partial<{
   /** The CSS `color` property. */
-  color: Property.Color | ThemeColorShade;
+  color: ResponsiveValue<Property.Color | ThemeColorShade>;
 
   /** The CSS `background` property. */
-  bg: Property.Background<ThemeColorShade>;
+  bg: ResponsiveValue<Property.Background<ThemeColorShade>>;
 }>;
 
 export type LayoutProps = Partial<{
   /** The CSS `display` property. */
-  d: Property.Display;
+  d: ResponsiveValue<Property.Display>;
 
   /** The CSS `vertical-align` property. */
-  verticalAlign: Property.VerticalAlign;
+  verticalAlign: ResponsiveValue<Property.VerticalAlign>;
 
   /** The CSS `overflow` property. */
-  overflow: Property.Overflow;
+  overflow: ResponsiveValue<Property.Overflow>;
 
   /** The CSS `overflow-x` property. */
-  overflowX: Property.OverflowX;
+  overflowX: ResponsiveValue<Property.OverflowX>;
 
   /** The CSS `overflow-y` property. */
-  overflowY: Property.OverflowY;
+  overflowY: ResponsiveValue<Property.OverflowY>;
 }>;
 
 export type SizeProps = Partial<{
@@ -111,7 +113,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-items)
    */
-  alignItems: Property.AlignItems;
+  alignItems: ResponsiveValue<Property.AlignItems>;
 
   /**
    * The CSS `align-content` property.
@@ -121,7 +123,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-content)
    */
-  alignContent: Property.AlignContent;
+  alignContent: ResponsiveValue<Property.AlignContent>;
 
   /**
    * The CSS `align-self` property.
@@ -131,7 +133,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-self)
    */
-  alignSelf: Property.AlignSelf;
+  alignSelf: ResponsiveValue<Property.AlignSelf>;
 
   /**
    * The CSS `justify-items` property.
@@ -142,7 +144,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/justify-items)
    */
-  justifyItems: Property.JustifyItems;
+  justifyItems: ResponsiveValue<Property.JustifyItems>;
 
   /**
    * The CSS `justify-content` property.
@@ -152,7 +154,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/justify-content)
    */
-  justifyContent: Property.JustifyContent;
+  justifyContent: ResponsiveValue<Property.JustifyContent>;
 
   /**
    * The CSS `justify-self` property.
@@ -162,7 +164,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-flow)
    */
-  justifySelf: Property.JustifySelf;
+  justifySelf: ResponsiveValue<Property.JustifySelf>;
 
   /**
    * The CSS `flex-wrap` property.
@@ -173,7 +175,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-wrap)
    */
-  flexWrap: Property.FlexWrap;
+  flexWrap: ResponsiveValue<Property.FlexWrap>;
 
   /**
    * The CSS `flex-direction` property.
@@ -183,7 +185,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-direction)
    */
-  flexDirection: Property.FlexDirection;
+  flexDirection: ResponsiveValue<Property.FlexDirection>;
 
   /**
    * The CSS `flex` property.
@@ -193,7 +195,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex)
    */
-  flex: Property.Flex;
+  flex: ResponsiveValue<Property.Flex>;
 
   /**
    * The CSS `flex-grow` property.
@@ -203,7 +205,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-grow)
    */
-  flexGrow: Property.FlexGrow;
+  flexGrow: ResponsiveValue<Property.FlexGrow>;
 
   /**
    * The CSS `flex-shrink` property.
@@ -213,7 +215,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-shrink)
    */
-  flexShrink: Property.FlexShrink;
+  flexShrink: ResponsiveValue<Property.FlexShrink>;
 
   /**
    * The CSS `flex-basis` property.
@@ -222,7 +224,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-basis)
    */
-  flexBasis: Property.FlexBasis;
+  flexBasis: ResponsiveValue<Property.FlexBasis>;
 
   /**
    * The CSS `order` property.
@@ -231,7 +233,7 @@ export type FlexboxProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/order)
    */
-  order: Property.Order;
+  order: ResponsiveValue<Property.Order>;
 }>;
 
 export type GridLayoutProps = Partial<{
@@ -242,7 +244,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template)
    */
-  gridTemplate: Property.GridTemplate;
+  gridTemplate: ResponsiveValue<Property.GridTemplate>;
 
   /**
    * The CSS `grid-template-columns` property
@@ -251,7 +253,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns)
    */
-  gridTemplateColumns: Property.GridTemplateColumns;
+  gridTemplateColumns: ResponsiveValue<Property.GridTemplateColumns>;
 
   /**
    * The CSS `grid-template-rows` property.
@@ -260,14 +262,14 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows)
    */
-  gridTemplateRows: Property.GridTemplateRows;
+  gridTemplateRows: ResponsiveValue<Property.GridTemplateRows>;
 
   /**
    * The CSS `grid-template-areas` property.
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas)
    */
-  gridTemplateAreas: Property.GridTemplateAreas;
+  gridTemplateAreas: ResponsiveValue<Property.GridTemplateAreas>;
 
   /**
    * The CSS `grid-areas` property.
@@ -278,7 +280,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-area)
    */
-  gridArea: Property.GridArea;
+  gridArea: ResponsiveValue<Property.GridArea>;
 
   /**
    * The CSS `grid-auto-flow` property
@@ -288,7 +290,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow)
    */
-  gridAutoFlow: Property.GridAutoFlow;
+  gridAutoFlow: ResponsiveValue<Property.GridAutoFlow>;
 
   /**
    * The CSS `grid-auto-columns` property.
@@ -297,7 +299,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-columns)
    */
-  gridAutoColumns: Property.GridAutoColumns;
+  gridAutoColumns: ResponsiveValue<Property.GridAutoColumns>;
 
   /**
    * The CSS `grid-auto-rows` property.
@@ -306,7 +308,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-rows)
    */
-  gridAutoRows: Property.GridAutoRows;
+  gridAutoRows: ResponsiveValue<Property.GridAutoRows>;
 
   /**
    * The CSS `grid-column` property.
@@ -317,7 +319,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column)
    */
-  gridColumn: Property.GridColumn;
+  gridColumn: ResponsiveValue<Property.GridColumn>;
 
   /**
    * The CSS `grid-column` property.
@@ -327,7 +329,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-start)
    */
-  gridColumnStart: Property.GridColumnStart;
+  gridColumnStart: ResponsiveValue<Property.GridColumnStart>;
 
   /**
    * The CSS `grid-column` property
@@ -338,7 +340,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-end)
    */
-  gridColumnEnd: Property.GridColumnEnd;
+  gridColumnEnd: ResponsiveValue<Property.GridColumnEnd>;
 
   /**
    * The CSS `grid-row` property
@@ -349,7 +351,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row)
    */
-  gridRow: Property.GridRow;
+  gridRow: ResponsiveValue<Property.GridRow>;
 
   /**
    * The CSS `grid-row-start` property
@@ -360,7 +362,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-start)
    */
-  gridRowStart: Property.GridRowStart;
+  gridRowStart: ResponsiveValue<Property.GridRowStart>;
 
   /**
    * The CSS `grid-row-end` property
@@ -371,7 +373,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-end)
    */
-  gridRowEnd: Property.GridRowEnd;
+  gridRowEnd: ResponsiveValue<Property.GridRowEnd>;
 
   /**
    * The CSS `place-items` property.
@@ -382,7 +384,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-items)
    */
-  placeItems: Property.PlaceItems;
+  placeItems: ResponsiveValue<Property.PlaceItems>;
 
   /**
    * The CSS `place-content` property.
@@ -393,7 +395,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-content)
    */
-  placeContent: Property.PlaceContent;
+  placeContent: ResponsiveValue<Property.PlaceContent>;
 
   /**
    * The CSS `place-self` property.
@@ -404,7 +406,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-self)
    */
-  placeSelf: Property.PlaceSelf;
+  placeSelf: ResponsiveValue<Property.PlaceSelf>;
 
   /**
    * The CSS `gap` property.
@@ -414,7 +416,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/gap)
    */
-  gap: Property.Gap<ThemeSpace> | number;
+  gap: ResponsiveValue<Property.Gap<ThemeSpace> | number>;
 
   /**
    * The CSS `row-gap` property.
@@ -423,7 +425,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/row-gap)
    */
-  rowGap: Property.RowGap<ThemeSpace> | number;
+  rowGap: ResponsiveValue<Property.RowGap<ThemeSpace> | number>;
 
   /**
    * The CSS `column-gap` property.
@@ -432,7 +434,7 @@ export type GridLayoutProps = Partial<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/column-gap)
    */
-  columnGap: Property.ColumnGap<ThemeSpace> | number;
+  columnGap: ResponsiveValue<Property.ColumnGap<ThemeSpace> | number>;
 }>;
 
 export type SystemStyleProps = MarginProps &

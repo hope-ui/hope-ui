@@ -1,6 +1,6 @@
 import { ThemeBase } from "../types";
 import { DEFAULT_COLORS } from "./default-colors";
-import { attachFunctions } from "./functions/attach-functions";
+import { attachMetadata } from "./attach-metadata";
 
 const space: ThemeBase["space"] = {
   px: "1px",
@@ -158,4 +158,4 @@ const _DEFAULT_THEME: ThemeBase = {
   components: {},
 };
 
-export const DEFAULT_THEME = attachFunctions(_DEFAULT_THEME);
+export const DEFAULT_THEME = attachMetadata(_DEFAULT_THEME);

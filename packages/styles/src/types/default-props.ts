@@ -1,5 +1,5 @@
 import type { CSSObject } from "./css-object";
-import type { SystemStyleProps } from "./system-style-props";
+import type { SystemStyleProps } from "./styled-system";
 import type { Theme } from "./theme";
 
 export type Sx = CSSObject | ((theme: Theme) => CSSObject);
