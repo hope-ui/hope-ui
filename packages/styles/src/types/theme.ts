@@ -1,3 +1,4 @@
+import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import type { ColorMode } from "./color-mode";
 import type { CSSObject } from "./css-object";
 import type { DeepPartial } from "./deep-partial";
@@ -15,23 +16,21 @@ import {
   ThemeShadow,
   ThemeSize,
   ThemeSpace,
+  ThemeZIndice,
 } from "./token";
-import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 
 export type ThemeOther = Record<string, any>;
 
 export type ThemePrimaryShade = Shade | { light: Shade; dark: Shade };
+
+export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScale>>;
 
 interface ThemeFunctions {
   focusStyles: () => CSSObject;
   rgba: (hexOrRgbColor: string, alpha: number) => string;
 }
 
-export interface Theme {
-  colorMode: ColorMode;
-  primaryColor: ThemeColor;
-  primaryShade: ThemePrimaryShade;
-
+export interface ThemeScale {
   colors: Record<ThemeColor, ThemeColorPalette>;
   fonts: Record<ThemeFontFamily, string>;
   fontSizes: Record<ThemeFontSize, string>;
@@ -39,12 +38,19 @@ export interface Theme {
   lineHeights: Record<ThemeLineHeight, string | number>;
   letterSpacings: Record<ThemeLetterSpacing, string>;
   space: Record<ThemeSpace, string>;
-  size: Record<ThemeSize, string>;
+  sizes: Record<ThemeSize, string>;
   radii: Record<ThemeRadii, string>;
   shadows: Record<ThemeShadow, string>;
-  breakpoints: Record<ThemeBreakpoint, string>;
+  zIndices: Record<ThemeZIndice, string | number>;
+}
 
+export interface Theme extends ThemeScale {
+  colorMode: ColorMode;
+  primaryColor: ThemeColor;
+  primaryShade: ThemePrimaryShade;
+  breakpoints: Record<ThemeBreakpoint, string>;
   __breakpoints: AnalyzeBreakpointsReturn;
+  themeMap: ThemeMap;
   fn: ThemeFunctions;
   other: ThemeOther;
   components: Record<string, ThemeComponent>;

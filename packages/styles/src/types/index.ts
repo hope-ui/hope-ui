@@ -1,8 +1,7 @@
 export type { ColorMode } from "./color-mode";
 export type { CSSObject } from "./css-object";
-export type { ClassNames, DefaultProps, Styles, Sx } from "./default-props";
+export type { KeysOf } from "./keys-of";
 export type { Selectors } from "./selectors";
-export type { SystemStyleProps } from "./styled-system";
 export type { Theme, ThemeBase, ThemeOther, ThemeOverride } from "./theme";
 export type {
   ThemeBreakpoint,

@@ -1,6 +1,7 @@
 import { ThemeBase } from "../types";
-import { DEFAULT_COLORS } from "./default-colors";
 import { attachMetadata } from "./attach-metadata";
+import { DEFAULT_COLORS } from "./default-colors";
+import { DEFAULT_THEME_MAP } from "./default-theme-map";
 
 const space: ThemeBase["space"] = {
   px: "1px",
@@ -103,7 +104,7 @@ const _DEFAULT_THEME: ThemeBase = {
     widest: "0.1em",
   },
   space,
-  size: {
+  sizes: {
     ...space,
     prose: "65ch",
     max: "max-content",
@@ -146,6 +147,21 @@ const _DEFAULT_THEME: ThemeBase = {
     "3xl": "0px 32px 64px -12px rgb(16 24 40 / 14%)",
     inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.06)",
   },
+  zIndices: {
+    hide: -1,
+    auto: "auto",
+    base: 0,
+    docked: 10,
+    sticky: 1000,
+    banner: 1100,
+    overlay: 1200,
+    modal: 1300,
+    dropdown: 1400,
+    popover: 1500,
+    tooltip: 1600,
+    skipLink: 1700,
+    toast: 1800,
+  },
   breakpoints: {
     base: "0px",
     sm: "640px",
@@ -154,6 +170,7 @@ const _DEFAULT_THEME: ThemeBase = {
     xl: "1280px",
     "2xl": "1536px",
   },
+  themeMap: DEFAULT_THEME_MAP,
   other: {},
   components: {},
 };

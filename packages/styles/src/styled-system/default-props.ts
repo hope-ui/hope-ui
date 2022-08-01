@@ -1,8 +1,6 @@
-import type { CSSObject } from "./css-object";
-import type { SystemStyleProps } from "./styled-system";
-import type { Theme } from "./theme";
-
-export type Sx = CSSObject | ((theme: Theme) => CSSObject);
+import type { CSSObject } from "../types/css-object";
+import type { Theme } from "../types/theme";
+import { SystemStyleProps } from "./system";
 
 export type ClassNames<StylesNames extends string> = Partial<Record<StylesNames, string>>;
 
@@ -14,8 +12,8 @@ export interface DefaultProps<
   StylesNames extends string = never,
   VariantProps extends Record<string, any> = never
 > extends SystemStyleProps {
-  /** The style applied to the root element, will be parsed by `emotion` and added to the head. */
-  sx?: Sx | (Sx | undefined)[];
+  /** The css class applied to the root of the component. */
+  class?: string;
 
   /** The classNames applied to each parts of the component. */
   classNames?: ClassNames<StylesNames>;

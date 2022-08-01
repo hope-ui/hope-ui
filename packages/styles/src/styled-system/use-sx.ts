@@ -1,26 +1,27 @@
 import { css, cx } from "@emotion/css";
-import { createMemo } from "solid-js";
+import { runIfFn } from "@hope-ui/utils";
+import { createMemo, splitProps } from "solid-js";
 
 import { useTheme } from "../theme";
-import { Sx, SystemStyleProps, Theme } from "../types";
-import { getSystemStyles } from "./get-system-styles";
+import { getUsedSystemStylePropNames, toCSSObject } from "./to-css-object";
+import { SystemStyleProps } from "./system";
 
-function extractSx(sx: Sx, theme: Theme) {
-  return typeof sx === "function" ? sx(theme) : sx;
-}
+export function useSx(props: any) {
+  const [local, systemProps] = splitProps(
+    props,
+    ["sx", "class"],
+    getUsedSystemStylePropNames(props)
+  );
 
-export function useSx(sx: Sx | Sx[], systemProps: SystemStyleProps, className: string) {
   const theme = useTheme();
 
   return createMemo(() => {
-    if (Array.isArray(sx)) {
-      return cx(
-        className,
-        css(getSystemStyles(systemProps, theme())),
-        sx.map(partial => css(extractSx(partial, theme())))
-      );
-    }
+    const _sx = Array.isArray(local.sx) ? local.sx : [local.sx];
 
-    return cx(className, css(extractSx(sx, theme())), css(getSystemStyles(systemProps, theme())));
+    return cx(
+      local.class,
+      css(toCSSObject(systemProps, theme())),
+      _sx.map(partial => css(toCSSObject(runIfFn(partial, theme()), theme())))
+    );
   });
 }

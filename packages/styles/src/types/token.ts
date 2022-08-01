@@ -171,3 +171,19 @@ export type ThemeShadow =
   | (string & {});
 
 export type ThemeBreakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});
+
+export type ThemeZIndice =
+  | "hide"
+  | "auto"
+  | "base"
+  | "docked"
+  | "sticky"
+  | "banner"
+  | "overlay"
+  | "modal"
+  | "dropdown"
+  | "popover"
+  | "tooltip"
+  | "skipLink"
+  | "toast"
+  | (string & {});

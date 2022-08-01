@@ -1,4 +1,5 @@
 import { Dict, isObject, runIfFn } from "@hope-ui/utils";
+
 import { Theme } from "../types";
 
 /**
@@ -23,7 +24,9 @@ export const expandResponsive = (styles: Dict) => (theme: Theme) => {
   for (const key in styles) {
     let value = runIfFn(styles[key], theme);
 
-    if (value == null) continue;
+    if (value == null) {
+      continue;
+    }
 
     // converts the object responsive syntax to array syntax
     value = isObject(value) && isResponsive(value) ? toArrayValue(value) : value;

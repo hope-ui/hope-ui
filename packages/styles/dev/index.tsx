@@ -1,15 +1,17 @@
 import { render } from "solid-js/web";
 
-import { DefaultProps, expandResponsive, ThemeProvider, useTheme } from "../src";
+import { DefaultProps, ThemeProvider, toCSSObject, useSx, useTheme } from "../src";
 
-function Test(props: DefaultProps) {
+function Test(props: DefaultProps & { class?: string }) {
   const theme = useTheme();
 
-  const expandedStyleProps = expandResponsive(props)(theme());
+  const styles = toCSSObject(props as any, theme());
+
+  const className = useSx(props);
 
   return (
-    <div>
-      <pre>{JSON.stringify(expandedStyleProps, null, 2)}</pre>
+    <div class={className()}>
+      <pre>{JSON.stringify(styles, null, 2)}</pre>
     </div>
   );
 }
@@ -19,16 +21,19 @@ function App() {
     <>
       <ThemeProvider>
         <Test
-          m={[4, null, 8]}
-          color="gray.600"
-          d={["block", "flex"]}
-          p={{
-            base: 8,
-            "2xl": 42,
-            sm: 3,
-            xl: 9,
-            lg: 78,
-            md: 56,
+          color="white"
+          bg="tomato"
+          w="full"
+          p="4"
+          _hover={theme => ({
+            border: `4px solid ${theme.colors.blue["500"]}`,
+            bg: "gray.600",
+            mx: 4,
+          })}
+          sx={{
+            borderColor: "red.900",
+            bg: "green.600",
+            mx: 12,
           }}
         />
       </ThemeProvider>
