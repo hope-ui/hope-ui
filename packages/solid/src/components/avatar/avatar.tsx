@@ -73,6 +73,11 @@ export interface AvatarOptions extends ThemeableAvatarOptions {
    * Function called when image failed to load.
    */
   onError?: ImageProps["onError"];
+
+  /**
+   * Additional props to be passed to the `AvatarImage`.
+   */
+  imageProps?: ImageProps;
 }
 
 export interface AvatarStyleConfig {
@@ -127,6 +132,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
     "iconLabel",
     "loading",
     "ignoreFallback",
+    "imageProps",
   ]);
 
   const classes = () => {
@@ -167,6 +173,7 @@ export function Avatar<C extends ElementType = "span">(props: AvatarProps<C>) {
         borderRadius={local.borderRadius ?? avatarGroupContext?.state.avatarBorderRadius}
         // eslint-disable-next-line solid/reactivity
         onError={local.onError}
+        {...local.imageProps}
       />
       {local.children}
     </hope.span>

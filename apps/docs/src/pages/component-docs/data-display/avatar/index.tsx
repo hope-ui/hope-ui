@@ -115,6 +115,11 @@ export default function AvatarDoc() {
       description: "Function called when image failed to load.",
       type: "JSX.EventHandlerUnion<HTMLImageElement, Event>",
     },
+    {
+      name: "imageProps",
+      description: "Props to be passed to the AvatarImage",
+      type: "ImageProps",
+    },
   ];
 
   const avatarGroupPropItems: PropsTableItem[] = [
