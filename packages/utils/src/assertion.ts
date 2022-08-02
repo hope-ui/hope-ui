@@ -16,6 +16,10 @@ export function isObject(value: any): value is Dict {
   return value != null && (type === "object" || type === "function") && !isArray(value);
 }
 
+export function isEmptyObject(value: any) {
+  return isObject(value) && Object.keys(value).length === 0;
+}
+
 // Function assertions
 export function isFunction<T extends Function = Function>(value: any): value is T {
   return typeof value === "function";

@@ -1,5 +1,5 @@
 import { css, cx } from "@emotion/css";
-import { runIfFn } from "@hope-ui/utils";
+import { filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { createMemo, ParentProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
@@ -25,9 +25,13 @@ export const Box = createComponentWithAs<"div", BoxProps>(props => {
 
     const finalStyles = Object.assign(
       {},
-      styleProps,
+      filterUndefined(styleProps),
       ..._sx.map(partial => runIfFn(partial, theme()))
     );
+
+    if (isEmptyObject(finalStyles)) {
+      return local.class;
+    }
 
     return cx(local.class, css(toCSSObject(finalStyles, theme())));
   });

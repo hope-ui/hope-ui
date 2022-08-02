@@ -3,7 +3,11 @@ import { For, render } from "solid-js/web";
 
 import { Box, ThemeProvider } from "../src";
 
-const range = [...Array(1000).keys()];
+const range = [...Array(1500).keys()];
+
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}
 
 function App() {
   const startTime = new Date().getTime();
@@ -17,35 +21,29 @@ function App() {
   });
 
   return (
-    <>
-      <ThemeProvider>
-        <For each={range}>
-          {i => {
-            return (
-              <Box
-                as="footer"
-                color="white"
-                bg="tomato"
-                w="full"
-                p="4"
-                _hover={{
-                  border: `4px solid`,
-                  borderColor: "blue.500",
-                  bg: "gray.600",
-                  mx: 4,
-                }}
-                sx={{
-                  borderColor: "red.900",
-                  bg: "green.600",
-                  mx: `${12 + i}px`,
-                }}
-              />
-            );
-          }}
-        </For>
-      </ThemeProvider>
-    </>
+    <ThemeProvider>
+      <For each={range}>
+        {(_, i) => (
+          <Box
+            h="100px"
+            w={`${i() < 200 ? i() : 200}px`}
+            borderWidth="3px"
+            bg={["green.500", "zinc.500", "slate.100"]}
+            borderStyle={["dashed", "solid", "dotted"]}
+            _hover={{
+              bg: ["green.700", "zinc.700", "slate.300"],
+            }}
+          >
+            test case
+          </Box>
+        )}
+      </For>
+    </ThemeProvider>
   );
 }
 
 render(() => <App />, document.getElementById("root") as HTMLDivElement);
+
+/*
+
+*/
