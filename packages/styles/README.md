@@ -1,6 +1,6 @@
 # @hope-ui/styles
 
-Hope UI CSS-in-JS library built on top of emotion.
+Hope UI CSS-in-JS library built on top of stitches.
 
 ## Installation
 

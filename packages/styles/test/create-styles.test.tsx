@@ -1,10 +1,10 @@
-import { cx } from "@emotion/css";
+import { clsx } from "clsx";
 import { Component } from "solid-js";
 import { render, screen } from "solid-testing-library";
 
+import { CSSObject } from "../src";
 import { createStyles } from "../src/create-styles";
 import { DEFAULT_THEME, ThemeProvider } from "../src/theme";
-import { CSSObject } from "../src/types";
 
 function expectStyles(Example: Component, styles: CSSObject) {
   render(() => <Example />);
@@ -78,7 +78,7 @@ describe("createStyles", () => {
     const classes = themeStyles();
 
     expectStyles(() => <div class={classes().testTheme}>test-element</div>, {
-      fontSize: `${DEFAULT_THEME.fontSizes.xl}px`,
+      fontSize: DEFAULT_THEME.fontSizes.xl,
     });
   });
 
@@ -97,7 +97,7 @@ describe("createStyles", () => {
     expectStyles(
       () => {
         return (
-          <div class={cx(fnClasses().testFunction, objClasses().testObject)}>test-element</div>
+          <div class={clsx(fnClasses().testFunction, objClasses().testObject)}>test-element</div>
         );
       },
       { backgroundColor: "#FEF67F", borderColor: "#CE5634" }
@@ -108,7 +108,7 @@ describe("createStyles", () => {
     expectStyles(
       () => {
         const classes = getRefStyles();
-        return <div class={cx(classes().testRef, classes().overrideRef)}>test-element</div>;
+        return <div class={clsx(classes().testRef, classes().overrideRef)}>test-element</div>;
       },
       { backgroundColor: "blue" }
     );

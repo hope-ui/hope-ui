@@ -5,6 +5,24 @@ import { ResponsiveProps } from "./responsive-value";
 
 export type SizeProps = ResponsiveProps<{
   /** The CSS `width` property. */
+  width: Property.Width<ThemeSize> | number;
+
+  /** The CSS `min-width` property. */
+  minWidth: Property.MinWidth<ThemeSize> | number;
+
+  /** The CSS `max-width` property. */
+  maxWidth: Property.MaxWidth<ThemeSize> | number;
+
+  /** The CSS `height` property. */
+  height: Property.Height<ThemeSize> | number;
+
+  /** The CSS `min-height` property. */
+  minHeight: Property.MinHeight<ThemeSize> | number;
+
+  /** The CSS `max-height` property. */
+  maxHeight: Property.MaxHeight<ThemeSize> | number;
+
+  /** The CSS `width` property. */
   w: Property.Width<ThemeSize> | number;
 
   /** The CSS `min-width` property. */
@@ -27,6 +45,12 @@ export type SizeProps = ResponsiveProps<{
 }>;
 
 export const sizePropNames: KeysOf<SizeProps> = {
+  width: true,
+  minWidth: true,
+  maxWidth: true,
+  height: true,
+  minHeight: true,
+  maxHeight: true,
   w: true,
   minW: true,
   maxW: true,

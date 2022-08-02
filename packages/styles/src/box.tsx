@@ -1,5 +1,5 @@
-import { css, cx } from "@emotion/css";
 import { filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
+import { clsx } from "clsx";
 import { createMemo, ParentProps, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
@@ -8,13 +8,14 @@ import { extractStyleProps } from "./styled-system/extract-style-props";
 import { DefaultProps } from "./styled-system/system.types";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
+import { css } from "./stitches.config";
 
 export type BoxProps = ParentProps<DefaultProps>;
 
 export const Box = createComponentWithAs<"div", BoxProps>(props => {
   const [local, styleProps, others] = splitProps(
     props,
-    ["as", "class", "sx"],
+    ["as", "class", "sx", "classNames", "styles", "unstyled"],
     extractStyleProps(props)
   );
 
@@ -33,7 +34,9 @@ export const Box = createComponentWithAs<"div", BoxProps>(props => {
       return local.class;
     }
 
-    return cx(local.class, css(toCSSObject(finalStyles, theme())));
+    const cssComponent = css(toCSSObject(finalStyles, theme()));
+
+    return clsx(local.class, cssComponent().className);
   });
 
   return <Dynamic component={local.as ?? "div"} class={className()} {...others} />;

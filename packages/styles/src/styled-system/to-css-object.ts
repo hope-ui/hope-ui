@@ -1,7 +1,8 @@
 import { isObject, runIfFn } from "@hope-ui/utils";
 import mergeWith from "lodash.mergewith";
 
-import { CSSObject, Theme, ThemeBase, ThemeColor } from "../types";
+import { CSSObject } from "../stitches.config";
+import { Theme, ThemeBase, ThemeColor } from "../types";
 import { ThemeScale } from "../types/theme";
 import { Shade } from "../types/token";
 import { px } from "../utils/breakpoint";
@@ -9,7 +10,7 @@ import { expandResponsive } from "./expand-responsive";
 import { BaseSystemStyleProps } from "./props/base";
 import { PseudoSelectorProps } from "./props/pseudos";
 import { SystemStyleObject } from "./system.types";
-import { PSEUDO_SELECTORS_MAP, STYLE_PROPS_MAP } from "./system-map";
+import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./system-map";
 
 /** Get a color value from theme if the token exist, return the token otherwise. */
 function resolveColorTokenValue(token: string, theme: ThemeBase) {
@@ -90,11 +91,15 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       continue;
     }
 
+    //const scale = theme.themeMap[propertyName];
+
+    //computedStyles[propertyName] = scale != null ? resolveTokenValue(value, scale, theme) : value;
+
     /**
      * converts style props shorthands to valid css properties.
      * "mx" => ["marginLeft", "marginRight"]
      */
-    const propertyNames = STYLE_PROPS_MAP[propertyName as keyof BaseSystemStyleProps] ?? [
+    const propertyNames = SHORTHANDS_MAP[propertyName as keyof BaseSystemStyleProps] ?? [
       propertyName,
     ];
 

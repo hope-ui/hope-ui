@@ -1,6 +1,7 @@
 import { OverrideProps } from "@hope-ui/utils";
 
-import { CSSObject, Theme } from "../types";
+import { CSSObject } from "../stitches.config";
+import { Theme } from "../types";
 import { SystemStyleProps } from "./props";
 
 export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
@@ -14,8 +15,8 @@ export type Styles<StyleNames extends string, StyleParams extends Record<string,
   | ((theme: Theme, params: StyleParams) => Partial<Record<StyleNames, SystemStyleObject>>);
 
 export interface DefaultProps<
-  StyleNames extends string = never,
-  StyleParams extends Record<string, any> = never
+  StyleNames extends string = any,
+  StyleParams extends Record<string, any> = any
 > extends SystemStyleProps {
   /** The css class applied to the root of the component. */
   class?: string;

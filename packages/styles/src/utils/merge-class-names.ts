@@ -1,4 +1,4 @@
-import { cx } from "@emotion/css";
+import { clsx } from "clsx";
 
 import { ThemeStylesObject } from "../theme/theme-provider";
 
@@ -43,9 +43,7 @@ export function mergeClassNames<T extends Record<string, string>>(
       staticClass = params.name ? `hope-${params.name}-${key}` : null;
     }
 
-    console.log(params.baseClassNames[key], themeClassNames[key], params.classNames?.[key]);
-
-    const mergedClassName = cx(
+    const mergedClassName = clsx(
       params.baseClassNames[key],
       themeClassNames[key],
       params.classNames?.[key],

@@ -5,6 +5,21 @@ import { ResponsiveProps } from "./responsive-value";
 
 export type MarginProps = ResponsiveProps<{
   /** The CSS `margin` property. */
+  margin: Property.Margin<ThemeSpace> | number;
+
+  /** The CSS `margin-top` property. */
+  marginTop: Property.MarginTop<ThemeSpace> | number;
+
+  /** The CSS `margin-right` property. */
+  marginRight: Property.MarginRight<ThemeSpace> | number;
+
+  /** The CSS `margin-bottom` property. */
+  marginBottom: Property.MarginBottom<ThemeSpace> | number;
+
+  /** The CSS `margin-left`  property. */
+  marginLeft: Property.MarginLeft<ThemeSpace> | number;
+
+  /** The CSS `margin` property. */
   m: Property.Margin<ThemeSpace> | number;
 
   /** The CSS `margin-top` property. */
@@ -27,6 +42,11 @@ export type MarginProps = ResponsiveProps<{
 }>;
 
 export const marginPropNames: KeysOf<MarginProps> = {
+  margin: true,
+  marginTop: true,
+  marginRight: true,
+  marginBottom: true,
+  marginLeft: true,
   m: true,
   mt: true,
   mr: true,

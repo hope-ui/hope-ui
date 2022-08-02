@@ -1,5 +1,4 @@
 export type { ColorMode } from "./color-mode";
-export type { CSSObject } from "./css-object";
 export type { KeysOf } from "./keys-of";
 export type { Selectors } from "./selectors";
 export type { Theme, ThemeBase, ThemeOther, ThemeOverride } from "./theme";

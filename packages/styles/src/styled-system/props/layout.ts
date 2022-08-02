@@ -7,6 +7,9 @@ export type LayoutProps = ResponsiveProps<{
   /** The CSS `display` property. */
   d: Property.Display;
 
+  /** The CSS `display` property. */
+  display: Property.Display;
+
   /** The CSS `vertical-align` property. */
   verticalAlign: Property.VerticalAlign;
 
@@ -22,6 +25,7 @@ export type LayoutProps = ResponsiveProps<{
 
 export const layoutPropNames: KeysOf<LayoutProps> = {
   d: true,
+  display: true,
   verticalAlign: true,
   overflow: true,
   overflowX: true,

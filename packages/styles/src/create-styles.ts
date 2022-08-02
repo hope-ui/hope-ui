@@ -1,7 +1,9 @@
-import { css, cx } from "@emotion/css";
 import { isFunction } from "@hope-ui/utils";
+import { clsx } from "clsx";
+import mergeWith from "lodash.mergewith";
 import { Accessor, createMemo, createUniqueId } from "solid-js";
 
+import { css } from "./stitches.config";
 import { SystemStyleObject } from "./styled-system/system.types";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { ThemeStylesObject, useTheme, useThemeStyles } from "./theme/theme-provider";
@@ -65,20 +67,20 @@ function getStyles<Key extends string, StyleParams>(
   return extractStyles(styles);
 }
 
-export function createStyles<Key extends string = string, StyleParams = void>(
+export function createStyles<StyleNames extends string = string, StyleParams = void>(
   input:
     | ((
         theme: Theme,
         params: StyleParams,
         getRef: (refName: string) => string
-      ) => Record<Key, SystemStyleObject>)
-    | Record<Key, SystemStyleObject>
+      ) => Record<StyleNames, SystemStyleObject>)
+    | Record<StyleNames, SystemStyleObject>
 ) {
   const getRef = createGetRef(createUniqueId());
 
   const getInputStyles = typeof input === "function" ? input : () => input;
 
-  function useStyles(params: StyleParams, options?: UseStylesOptions<Key, StyleParams>) {
+  function useStyles(params: StyleParams, options?: UseStylesOptions<StyleNames, StyleParams>) {
     const theme = useTheme();
     const contextStyles = useThemeStyles(options?.name);
 
@@ -95,16 +97,18 @@ export function createStyles<Key extends string = string, StyleParams = void>(
         Object.keys(inputStyles).map(key => {
           const { ref, ...baseStyles } = inputStyles[key];
 
-          const mergedStyles = cx(
-            !options?.unstyled?.() ? css(toCSSObject(baseStyles, theme())) : undefined,
-            themeStyles[key] ? css(toCSSObject(themeStyles[key], theme())) : undefined,
-            componentStyles[key] ? css(toCSSObject(componentStyles[key], theme())) : undefined,
-            ref as string // static className used as selector ref
+          const mergedStyles = mergeWith(
+            {},
+            !options?.unstyled?.() ? baseStyles : {},
+            themeStyles[key] ? themeStyles[key] : {},
+            componentStyles[key] ? componentStyles[key] : {}
           );
 
-          return [key, mergedStyles];
+          const cssComponent = css(toCSSObject(mergedStyles, theme()));
+
+          return [key, clsx(cssComponent().className, ref)];
         })
-      ) as Record<Key, string>;
+      ) as Record<StyleNames, string>;
 
       return mergeClassNames({
         baseClassNames: baseClassNames,

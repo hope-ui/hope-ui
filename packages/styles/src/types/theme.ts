@@ -1,7 +1,6 @@
 import { SystemStyleObject } from "../styled-system/system.types";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import type { ColorMode } from "./color-mode";
-import type { CSSObject } from "./css-object";
 import type { DeepPartial } from "./deep-partial";
 import {
   Shade,
@@ -19,6 +18,7 @@ import {
   ThemeSpace,
   ThemeZIndice,
 } from "./token";
+import { CSSObject } from "../stitches.config";
 
 export type ThemeOther = Record<string, any>;
 

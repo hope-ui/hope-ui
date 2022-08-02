@@ -5,6 +5,21 @@ import { ResponsiveProps } from "./responsive-value";
 
 export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding` property. */
+  padding: Property.Padding<ThemeSpace> | number;
+
+  /** The CSS `padding-top` property. */
+  paddingTop: Property.PaddingTop<ThemeSpace> | number;
+
+  /** The CSS `padding-right` property. */
+  paddingRight: Property.PaddingRight<ThemeSpace> | number;
+
+  /** The CSS `padding-bottom` property. */
+  paddingBottom: Property.PaddingBottom<ThemeSpace> | number;
+
+  /** The CSS `padding-left`  property. */
+  paddingLeft: Property.PaddingLeft<ThemeSpace> | number;
+
+  /** The CSS `padding` property. */
   p: Property.Padding<ThemeSpace> | number;
 
   /** The CSS `padding-top` property. */
@@ -27,6 +42,11 @@ export type PaddingProps = ResponsiveProps<{
 }>;
 
 export const paddingPropNames: KeysOf<PaddingProps> = {
+  padding: true,
+  paddingTop: true,
+  paddingRight: true,
+  paddingBottom: true,
+  paddingLeft: true,
   p: true,
   pt: true,
   pr: true,

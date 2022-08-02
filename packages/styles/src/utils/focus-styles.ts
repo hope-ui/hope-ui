@@ -1,4 +1,5 @@
-import { CSSObject, ThemeBase } from "../types";
+import { ThemeBase } from "../types";
+import { CSSObject } from "../stitches.config";
 
 export function focusStyles(theme: ThemeBase): CSSObject {
   return {

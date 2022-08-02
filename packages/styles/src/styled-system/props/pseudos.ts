@@ -1,10 +1,11 @@
 import { OverrideProps } from "@hope-ui/utils";
 
-import { CSSObject, KeysOf, Theme } from "../../types";
+import { CSSObject } from "../../stitches.config";
+import { KeysOf, Theme } from "../../types";
 import { BaseSystemStyleProps } from "./base";
 
 type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProps>;
-type PseudoSelectorValue = BaseSystemStyleObject | ((theme: Theme) => BaseSystemStyleObject);
+export type PseudoSelectorValue = BaseSystemStyleObject | ((theme: Theme) => BaseSystemStyleObject);
 
 export type PseudoSelectorProps = Partial<{
   /** Styles for CSS selector `&:hover`. */

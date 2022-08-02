@@ -1,6 +1,6 @@
 import { AnyFunction } from "@hope-ui/utils";
 
-import { CSSObject } from "../types";
+import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps } from "./props/base";
 import { PseudoSelectorProps } from "./props/pseudos";
 
@@ -47,57 +47,57 @@ export const PSEUDO_SELECTORS_MAP: Record<keyof PseudoSelectorProps, string> = {
   _peerDisabled: toPeer(state.disabled),
 };
 
-/** Map system style props to css properties. */
-export const STYLE_PROPS_MAP: Partial<Record<keyof BaseSystemStyleProps, Array<keyof CSSObject>>> =
-  {
-    // border
-    borderX: ["borderRight", "borderLeft"],
-    borderY: ["borderTop", "borderBottom"],
+/** Map system style shorthands props to css properties. */
+export const SHORTHANDS_MAP: Partial<Record<keyof BaseSystemStyleProps, Array<keyof CSSObject>>> = {
+  // border
+  borderX: ["borderRight", "borderLeft"],
+  borderY: ["borderTop", "borderBottom"],
 
-    // color
-    bg: ["background"],
+  // color
+  bg: ["background"],
+  bgColor: ["backgroundColor"],
 
-    // layout
-    d: ["display"],
+  // layout
+  d: ["display"],
 
-    // margin
-    m: ["margin"],
-    mt: ["marginTop"],
-    mr: ["marginRight"],
-    mb: ["marginBottom"],
-    ml: ["marginLeft"],
-    mx: ["marginInlineStart", "marginInlineEnd"],
-    my: ["marginTop", "marginBottom"],
+  // margin
+  m: ["margin"],
+  mt: ["marginTop"],
+  mr: ["marginRight"],
+  mb: ["marginBottom"],
+  ml: ["marginLeft"],
+  mx: ["marginInlineStart", "marginInlineEnd"],
+  my: ["marginTop", "marginBottom"],
 
-    // padding
-    p: ["padding"],
-    pt: ["paddingTop"],
-    pr: ["paddingRight"],
-    pb: ["paddingBottom"],
-    pl: ["paddingLeft"],
-    px: ["paddingInlineStart", "paddingInlineEnd"],
-    py: ["paddingTop", "paddingBottom"],
+  // padding
+  p: ["padding"],
+  pt: ["paddingTop"],
+  pr: ["paddingRight"],
+  pb: ["paddingBottom"],
+  pl: ["paddingLeft"],
+  px: ["paddingInlineStart", "paddingInlineEnd"],
+  py: ["paddingTop", "paddingBottom"],
 
-    // radii
-    borderTopRadius: ["borderTopLeftRadius", "borderTopRightRadius"],
-    borderRightRadius: ["borderTopRightRadius", "borderBottomRightRadius"],
-    borderBottomRadius: ["borderBottomRightRadius", "borderBottomLeftRadius"],
-    borderLeftRadius: ["borderTopLeftRadius", "borderBottomLeftRadius"],
-    rounded: ["borderRadius"],
-    roundedTop: ["borderTopLeftRadius", "borderTopRightRadius"],
-    roundedRight: ["borderTopRightRadius", "borderBottomRightRadius"],
-    roundedBottom: ["borderBottomRightRadius", "borderBottomLeftRadius"],
-    roundedLeft: ["borderTopLeftRadius", "borderBottomLeftRadius"],
+  // radii
+  borderTopRadius: ["borderTopLeftRadius", "borderTopRightRadius"],
+  borderRightRadius: ["borderTopRightRadius", "borderBottomRightRadius"],
+  borderBottomRadius: ["borderBottomRightRadius", "borderBottomLeftRadius"],
+  borderLeftRadius: ["borderTopLeftRadius", "borderBottomLeftRadius"],
+  rounded: ["borderRadius"],
+  roundedTop: ["borderTopLeftRadius", "borderTopRightRadius"],
+  roundedRight: ["borderTopRightRadius", "borderBottomRightRadius"],
+  roundedBottom: ["borderBottomRightRadius", "borderBottomLeftRadius"],
+  roundedLeft: ["borderTopLeftRadius", "borderBottomLeftRadius"],
 
-    // shadow
-    shadow: ["boxShadow"],
+  // shadow
+  shadow: ["boxShadow"],
 
-    // size
-    w: ["width"],
-    minW: ["minWidth"],
-    maxW: ["maxWidth"],
-    h: ["height"],
-    minH: ["minHeight"],
-    maxH: ["maxHeight"],
-    boxSize: ["width", "height"],
-  };
+  // size
+  w: ["width"],
+  minW: ["minWidth"],
+  maxW: ["maxWidth"],
+  h: ["height"],
+  minH: ["minHeight"],
+  maxH: ["maxHeight"],
+  boxSize: ["width", "height"],
+};

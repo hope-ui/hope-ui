@@ -2,7 +2,7 @@
   "name": "@hope-ui/styles",
   "version": "0.0.0",
   "private": false,
-  "description": "Hope UI CSS-in-JS library built on top of emotion.",
+  "description": "Hope UI CSS-in-JS library built on top of stitches.",
   "keywords": [
     "solid",
     "solidjs",
@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@hope-ui/utils": "^0.0.0",
+    "clsx": "^1.2.1",
     "csstype": "3.1.0",
     "lodash.mergewith": "4.6.2"
   },
@@ -56,7 +57,7 @@
     "@types/lodash.mergewith": "4.6.7"
   },
   "peerDependencies": {
-    "@emotion/css": "^11.9.0",
+    "@stitches/core": "^1.2.8",
     "solid-js": "^1.4.7"
   },
   "publishConfig": {
