@@ -1,20 +1,26 @@
+import { onMount } from "solid-js";
 import { For, render } from "solid-js/web";
 
 import { Box, ThemeProvider } from "../src";
 
+const range = [...Array(1000).keys()];
+
 function App() {
   const startTime = new Date().getTime();
+
+  onMount(() => {
+    const endTime = new Date().getTime();
+    console.log(endTime);
+    console.log(startTime);
+
+    console.log("duration [ms] = " + (endTime - startTime));
+  });
 
   return (
     <>
       <ThemeProvider>
-        <For each={Array(1000).map((_, i) => i)}>
-          {(_, i) => {
-            if (i() === 999) {
-              const endTime = new Date().getTime();
-              console.log("duration [ms] = " + (endTime - startTime));
-            }
-
+        <For each={range}>
+          {i => {
             return (
               <Box
                 as="footer"
@@ -22,15 +28,16 @@ function App() {
                 bg="tomato"
                 w="full"
                 p="4"
-                _hover={theme => ({
-                  border: `4px solid ${theme.colors.blue["500"]}`,
+                _hover={{
+                  border: `4px solid`,
+                  borderColor: "blue.500",
                   bg: "gray.600",
                   mx: 4,
-                })}
+                }}
                 sx={{
                   borderColor: "red.900",
                   bg: "green.600",
-                  mx: 12 + i() + "px",
+                  mx: `${12 + i}px`,
                 }}
               />
             );

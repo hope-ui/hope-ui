@@ -23,11 +23,13 @@ export const Box = createComponentWithAs<"div", BoxProps>(props => {
   const className = createMemo(() => {
     const _sx = Array.isArray(local.sx) ? local.sx : [local.sx];
 
-    return cx(
-      local.class,
-      css(toCSSObject(styleProps as any, theme())),
-      _sx.map(partial => css(toCSSObject(runIfFn(partial, theme()) as any, theme())))
+    const finalStyles = Object.assign(
+      {},
+      styleProps,
+      ..._sx.map(partial => runIfFn(partial, theme()))
     );
+
+    return cx(local.class, css(toCSSObject(finalStyles, theme())));
   });
 
   return <Dynamic component={local.as ?? "div"} class={className()} {...others} />;
