@@ -65,6 +65,7 @@ function toRgba(color: string): RGBA {
   };
 }
 
+/** Convert a Hex or RGB color to RGBA. */
 export function rgba(hexOrRgbColor: string, alpha: number) {
   if (hexOrRgbColor == null || hexOrRgbColor == "" || alpha > 1 || alpha < 0) {
     return "rgba(0, 0, 0, 1)";

@@ -1,14 +1,11 @@
 import { ClassNames, Styles } from "./styles";
 import { SxProp, SystemStyleProps } from "./system-style";
 
-export interface DefaultProps<
+export interface StyleApiProps<
   ComponentParts extends string = any,
   StyleParams extends Record<string, any> = any
 > extends SystemStyleProps,
     SxProp {
-  /** The css class applied to the root of the component. */
-  class?: string;
-
   /** The classNames applied to each parts of the component. */
   classNames?: ClassNames<ComponentParts>;
 

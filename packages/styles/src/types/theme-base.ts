@@ -38,11 +38,16 @@ export interface ThemeScale {
   zIndices: Record<ThemeZIndice, string | number>;
 }
 
+export interface ThemeFunctions {
+  mode: <T>(lightValue: T, darkValue: T) => T;
+  focusStyles: () => CSSObject;
+  rgba: (hexOrRgbColor: string, alpha: number) => string;
+}
+
 export interface ThemeBase extends ThemeScale {
   colorMode: ColorMode;
-  primaryColor: ThemeColor;
-  primaryShade: ThemePrimaryShade;
   themeMap: ThemeMap;
+  fn: ThemeFunctions;
   other: ThemeOther;
   breakpoints: Record<ThemeBreakpoint, string>;
   __breakpoints?: AnalyzeBreakpointsReturn;

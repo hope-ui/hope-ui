@@ -1,10 +1,23 @@
-import { ThemeColor, ThemeColorPalette } from "../types";
-
 /**
- * Tailwind CSS colors.
+ * Thanks Tailwind CSS for this color palettes.
  * @see https://tailwindcss.com/docs/customizing-colors
  */
+
+import { ThemeColor, ThemeColorPalette } from "../types";
+
 export const DEFAULT_COLORS: Record<ThemeColor, ThemeColorPalette> = {
+  primary: {
+    50: "#e6f6ff",
+    100: "#bae3ff",
+    200: "#7cc4fa",
+    300: "#47a3f3",
+    400: "#2186eb",
+    500: "#0967d2",
+    600: "#0552b5",
+    700: "#03449e",
+    800: "#01337d",
+    900: "#002159",
+  },
   slate: {
     50: "#f8fafc",
     100: "#f1f5f9",
