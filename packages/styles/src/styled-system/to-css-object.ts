@@ -2,18 +2,21 @@ import { isObject, runIfFn } from "@hope-ui/utils";
 import mergeWith from "lodash.mergewith";
 
 import { CSSObject } from "../stitches.config";
-import { Theme, ThemeBase, ThemeColor } from "../types";
-import { ThemeScale } from "../types/theme";
-import { Shade } from "../types/token";
+import {
+  BaseSystemStyleProps,
+  PseudoSelectorProps,
+  Shade,
+  SystemStyleObject,
+  Theme,
+  ThemeColor,
+  ThemeScale,
+} from "../types";
 import { px } from "../utils/breakpoint";
 import { expandResponsive } from "./expand-responsive";
-import { BaseSystemStyleProps } from "./props/base";
-import { PseudoSelectorProps } from "./props/pseudos";
-import { SystemStyleObject } from "./system.types";
-import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./system-map";
+import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
 
 /** Get a color value from theme if the token exist, return the token otherwise. */
-function resolveColorTokenValue(token: string, theme: ThemeBase) {
+function resolveColorTokenValue(token: string, theme: Theme) {
   const parts = token.split(".");
 
   if (parts.length !== 2) {
@@ -29,7 +32,7 @@ function resolveColorTokenValue(token: string, theme: ThemeBase) {
 function resolveTokenValue(
   token: string | number | null | undefined,
   scale: keyof ThemeScale,
-  theme: ThemeBase
+  theme: Theme
 ) {
   if (token == null) {
     return undefined;

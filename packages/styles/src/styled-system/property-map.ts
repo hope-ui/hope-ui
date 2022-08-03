@@ -1,8 +1,7 @@
 import { AnyFunction } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
-import { BaseSystemStyleProps } from "./props/base";
-import { PseudoSelectorProps } from "./props/pseudos";
+import { BaseSystemStyleProps, PseudoSelectorProps } from "../types/system-style";
 
 const state = {
   hover: (str: string, post: string) => `${str}:hover ${post}, ${str}[data-hover] ${post}`,

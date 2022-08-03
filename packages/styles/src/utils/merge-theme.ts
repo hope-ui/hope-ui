@@ -1,13 +1,13 @@
-import { attachMetadata } from "../theme/attach-metadata";
-import { Theme, ThemeBase, ThemeOverride } from "../types";
+import { Theme, ThemeOverride } from "../types";
+import { analyzeBreakpoints } from "./breakpoint";
 
-export function mergeTheme(currentTheme: ThemeBase, themeOverride?: ThemeOverride): ThemeBase {
+export function mergeTheme(currentTheme: Theme, themeOverride?: ThemeOverride): Theme {
   if (!themeOverride) {
     return currentTheme;
   }
 
-  return Object.keys(currentTheme).reduce((acc, key) => {
-    const currentValue = currentTheme[key as keyof ThemeBase];
+  const themeBase = Object.keys(currentTheme).reduce((acc, key) => {
+    const currentValue = currentTheme[key as keyof Theme];
     const overrideValue = themeOverride[key as keyof ThemeOverride];
 
     let mergedValue;
@@ -22,12 +22,10 @@ export function mergeTheme(currentTheme: ThemeBase, themeOverride?: ThemeOverrid
       ...acc,
       [key]: mergedValue,
     };
-  }, {} as ThemeBase);
-}
+  }, {} as Theme);
 
-export function mergeThemeWithMetadata(
-  currentTheme: ThemeBase,
-  themeOverride?: ThemeOverride
-): Theme {
-  return attachMetadata(mergeTheme(currentTheme, themeOverride));
+  return {
+    ...themeBase,
+    __breakpoints: analyzeBreakpoints(themeBase.breakpoints),
+  };
 }

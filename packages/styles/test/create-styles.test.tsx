@@ -29,7 +29,7 @@ const paramsStyles = createStyles((_theme, params: { radius: number }) => ({
 }));
 
 const getRefStyles = createStyles((_theme, _params, getRef) => ({
-  overrideRef: { ref: getRef("override") },
+  overrideRef: { __staticClass: getRef("override") },
   testRef: {
     backgroundColor: "red",
 

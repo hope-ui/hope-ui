@@ -1,16 +1,9 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import { SystemStyleObject } from "../styled-system/system.types";
-import type { Theme, ThemeOverride } from "../types";
-import { mergeThemeWithMetadata } from "../utils/merge-theme";
+import type { ComponentTheme, Theme } from "../types";
+import { ThemeOverride } from "../types";
+import { mergeTheme } from "../utils/merge-theme";
 import { DEFAULT_THEME } from "./default-theme";
-
-export interface ThemeStylesObject {
-  classNames: Record<string, string>;
-  styles:
-    | Record<string, SystemStyleObject>
-    | ((theme: Theme, variants: any) => Record<string, SystemStyleObject>);
-}
 
 const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);
 
@@ -18,24 +11,15 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(component?: string | string[]) {
+export function useComponentTheme(component?: string): Accessor<ComponentTheme | null> {
   const theme = useTheme();
 
-  const getStyles = (name?: string): ThemeStylesObject => {
-    if (name == null) {
-      return { styles: {}, classNames: {} };
+  return createMemo(() => {
+    if (component == null) {
+      return null;
     }
 
-    const componentTheme = theme().components[name];
-
-    return {
-      styles: componentTheme?.styles ?? {},
-      classNames: componentTheme?.classNames ?? {},
-    };
-  };
-
-  return createMemo(() => {
-    return Array.isArray(component) ? component.map(getStyles) : [getStyles(component)];
+    return theme().components[component] ?? null;
   });
 }
 
@@ -44,9 +28,7 @@ export function useComponentDefaultProps<T extends Record<string, any>>(
   defaultProps: Partial<T>,
   props: T
 ): T {
-  const theme = useTheme();
-
-  const themeProps = createMemo(() => theme().components[component]?.defaultProps);
+  const themeProps = () => useComponentTheme(component)()?.defaultProps ?? {};
 
   return mergeProps(defaultProps, themeProps, props);
 }
@@ -61,7 +43,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
 
   const theme = createMemo(() => {
     const themeOverride = props.inherit ? mergeProps(parentTheme, props.theme) : props.theme;
-    return mergeThemeWithMetadata(DEFAULT_THEME, themeOverride);
+    return mergeTheme(DEFAULT_THEME, themeOverride);
   });
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;

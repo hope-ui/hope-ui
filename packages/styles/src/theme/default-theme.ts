@@ -1,9 +1,9 @@
-import { ThemeBase } from "../types";
-import { attachMetadata } from "./attach-metadata";
+import { Theme } from "../types";
+import { analyzeBreakpoints } from "../utils/breakpoint";
 import { DEFAULT_COLORS } from "./default-colors";
 import { DEFAULT_THEME_MAP } from "./default-theme-map";
 
-const space: ThemeBase["space"] = {
+const space: Theme["space"] = {
   px: "1px",
   "0.5": "0.125rem",
   "1": "0.25rem",
@@ -39,7 +39,16 @@ const space: ThemeBase["space"] = {
   "96": "24rem",
 };
 
-const _DEFAULT_THEME: ThemeBase = {
+const breakpoints: Theme["breakpoints"] = {
+  base: "0px",
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+  "2xl": "1536px",
+};
+
+export const DEFAULT_THEME: Theme = {
   colorMode: "light",
   primaryColor: "blue",
   primaryShade: {
@@ -162,17 +171,9 @@ const _DEFAULT_THEME: ThemeBase = {
     skipLink: 1700,
     toast: 1800,
   },
-  breakpoints: {
-    base: "0px",
-    sm: "640px",
-    md: "768px",
-    lg: "1024px",
-    xl: "1280px",
-    "2xl": "1536px",
-  },
+  breakpoints,
+  __breakpoints: analyzeBreakpoints(breakpoints),
   themeMap: DEFAULT_THEME_MAP,
   other: {},
   components: {},
 };
-
-export const DEFAULT_THEME = attachMetadata(_DEFAULT_THEME);

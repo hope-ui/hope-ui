@@ -1,58 +1,31 @@
 import { clsx } from "clsx";
 
-import { ThemeStylesObject } from "../theme/theme-provider";
+import { ClassNames } from "../types";
+import { getComponentPartClassName } from "./get-component-part-class-name";
 
-interface MergeClassNamesParams<T extends Record<string, string>> {
+interface MergeClassNamesParams {
+  /** The name of the component. */
+  name: string;
+
   /** The base classNames. */
-  baseClassNames: T;
+  baseClassNames: ClassNames<string>;
 
-  /** The styles provided by the closest `ThemeProviderContext`. */
-  themeStyles: ThemeStylesObject[];
+  /** The classNames provided by the closest `ThemeProviderContext`. */
+  themeClassNames?: ClassNames<string>;
 
   /** The classNames provided to the component via props. */
-  classNames?: Partial<T>;
-
-  /** The name of the component/parts. */
-  name?: string | string[];
+  propClassNames?: ClassNames<string>;
 }
 
-export function mergeClassNames<T extends Record<string, string>>(
-  params: MergeClassNamesParams<T>
-) {
-  const themeClassNames = params.themeStyles.reduce<Record<string, string>>((acc, item) => {
-    Object.keys(item.classNames).forEach(key => {
-      if (typeof acc[key] !== "string") {
-        acc[key] = item.classNames[key];
-      } else {
-        acc[key] = `${acc[key]} ${item.classNames[key]}`;
-      }
-    });
-
-    return acc;
-  }, {});
-
+export function mergeClassNames(params: MergeClassNamesParams) {
   return Object.keys(params.baseClassNames).reduce((acc, key) => {
-    let staticClass;
-
-    if (Array.isArray(params.name)) {
-      staticClass = params.name
-        .filter(Boolean)
-        .map(part => `hope-${part}-${key}`)
-        .join(" ");
-    } else {
-      staticClass = params.name ? `hope-${params.name}-${key}` : null;
-    }
-
-    const mergedClassName = clsx(
+    acc[key] = clsx(
       params.baseClassNames[key],
-      themeClassNames[key],
-      params.classNames?.[key],
-      staticClass
+      params.themeClassNames?.[key],
+      params.propClassNames?.[key],
+      getComponentPartClassName(params.name, key)
     );
 
-    return {
-      ...acc,
-      [key]: mergedClassName,
-    };
-  }, {}) as T;
+    return acc;
+  }, {} as ClassNames<string>);
 }

@@ -1,4 +1,4 @@
-import { ThemeMap } from "../types/theme";
+import { ThemeMap } from "../types/theme-base";
 
 /** Map CSS properties to theme scale. */
 export const DEFAULT_THEME_MAP: ThemeMap = {
