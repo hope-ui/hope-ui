@@ -1,4 +1,4 @@
-import { DOMElements, ElementType, filterUndefined, runIfFn } from "@hope-ui/utils";
+import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -7,37 +7,59 @@ import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { Sx } from "./types";
-import { HopeComponent, HopeFactory, HopeProps, HTMLHopeComponents } from "./types/polymorphic";
+import {
+  HopeComponent,
+  HopeFactory,
+  HopeFactoryStyleOptions,
+  HopeProps,
+  HTMLHopeComponents,
+} from "./types";
 import { packSx } from "./utils/pack-sx";
 
-const styled: HopeFactory = <T extends ElementType>(component: T, baseStyles: Sx = {}) => {
-  const hopeComponent = (props: HopeProps<T>) => {
+const styled: HopeFactory = <T extends ElementType, Props = {}>(
+  component: T,
+  options: HopeFactoryStyleOptions<Props> = {}
+) => {
+  const { excludedProps = [], baseStyle = {} } = options;
+
+  const hopeComponent = (props: HopeProps<T, Props>) => {
     const [local, styleProps, others] = splitProps(
       props,
-      ["as", "class", "sx"],
+      ["as", "class", "sx", ...excludedProps],
       extractStyleProps(props)
     );
 
     const theme = useTheme();
 
     const className = createMemo(() => {
-      const finalStyles = Object.assign(
-        {},
-        runIfFn(baseStyles, theme()),
-        filterUndefined(styleProps),
-        ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
+      const computedBaseStyles = runIfFn(baseStyle, { theme: theme(), props });
+
+      const cssComponent = css(toCSSObject(computedBaseStyles, theme()));
+
+      const overrideStyles = toCSSObject(
+        Object.assign(
+          {},
+          filterUndefined(styleProps),
+          ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
+        ),
+        theme()
       );
 
-      const cssComponent = css(toCSSObject(finalStyles, theme()));
+      let computedClass: string;
 
-      return clsx(local.class, cssComponent().className);
+      if (isEmptyObject(overrideStyles)) {
+        computedClass = cssComponent().className;
+      } else {
+        computedClass = cssComponent({ css: overrideStyles }).className;
+      }
+
+      return clsx(computedClass, local.class);
     });
 
     return <Dynamic component={local.as ?? component} class={className()} {...others} />;
   };
 
-  return hopeComponent as HopeComponent<T>;
+  return hopeComponent as HopeComponent<T, Props>;
 };
 
 function factory() {
@@ -49,7 +71,7 @@ function factory() {
      * const Div = hope("div")
      * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType, Sx]) {
+    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<any>]) {
       return styled(...argArray);
     },
 
