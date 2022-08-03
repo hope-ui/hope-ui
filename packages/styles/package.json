@@ -44,7 +44,7 @@
     "build": "rollup -c ../../configs/rollup.config.ts",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
