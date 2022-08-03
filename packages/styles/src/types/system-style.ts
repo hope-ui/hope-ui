@@ -811,3 +811,8 @@ export type SystemStyleProps = BaseSystemStyleProps & PseudoSelectorProps;
 export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
 
 export type Sx = SystemStyleObject | ((theme: ThemeBase) => SystemStyleObject);
+
+export interface SxProp {
+  /** The style applied to the root element, will be parsed by `stitches` and added to the head. */
+  sx?: Sx | (Sx | undefined)[];
+}

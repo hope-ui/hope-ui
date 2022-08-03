@@ -1,6 +1,7 @@
 export * from "./color-mode";
 export * from "./default-props";
 export * from "./keys-of";
+export * from "./polymorphic";
 export * from "./selectors";
 export * from "./styles";
 export * from "./system-style";
