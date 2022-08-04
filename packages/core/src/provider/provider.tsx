@@ -3,7 +3,7 @@ import { createMemo, mergeProps, ParentProps } from "solid-js";
 
 import { ColorModeProvider, ColorModeProviderProps, useColorMode } from "../color-mode";
 
-type HopeThemeOverride = Omit<ThemeOverride, "colorMode">;
+export type HopeThemeOverride = Omit<ThemeOverride, "colorMode">;
 
 interface ThemeProviderWithColorModeProps extends ParentProps {
   /** The custom theme to use. */
