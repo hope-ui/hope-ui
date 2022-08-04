@@ -813,6 +813,10 @@ export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
 export type Sx = SystemStyleObject | ((theme: ThemeBase) => SystemStyleObject);
 
 export interface SxProp {
-  /** The style applied to the root element, will be parsed by `stitches` and added to the head. */
+  /**
+   * The `sx` prop is a shortcut for defining custom style that has access to the theme.
+   * The property is a superset of CSS that packages all the style props that are exposed by Hope UI.
+   * You can specify any valid CSS using this prop.
+   */
   sx?: Sx | (Sx | undefined)[];
 }

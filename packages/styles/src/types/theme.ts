@@ -1,10 +1,9 @@
 import type { DeepPartial } from "./deep-partial";
-import { ClassNames, Styles } from "./styles";
 import { ThemeBase, ThemeOther } from "./theme-base";
+import { Styles } from "./styles-api";
 
 export interface ComponentTheme {
   defaultProps?: Record<string, any>;
-  classNames?: ClassNames<string>;
   styles?: Styles<string, any>;
 }
 

@@ -11,8 +11,9 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "@emotion/css": "11.9.0",
     "@hope-ui/core": "workspace:*",
+    "@stitches/core": "1.2.8",
+    "clsx": "1.2.1",
     "solid-js": "1.4.7"
   }
 }

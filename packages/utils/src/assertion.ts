@@ -10,6 +10,10 @@ export function isArray<T>(value: any): value is Array<T> {
   return Array.isArray(value);
 }
 
+export function isEmptyArray(value: any) {
+  return isArray(value) && value.length === 0;
+}
+
 // Object assertions
 export function isObject(value: any): value is Dict {
   const type = typeof value;

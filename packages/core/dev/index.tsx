@@ -1,31 +1,60 @@
+import { splitProps } from "solid-js";
 import { render } from "solid-js/web";
 
-import { hope, HopeProvider } from "../src";
+import { createHopeComponent, createStyles, hope, HopeProvider, StylesProps } from "../src";
 
-interface CardProps {
-  variant: "outlined" | "soft";
+type ButtonParts = "root";
+
+const CustomButton = createHopeComponent<"button", ButtonProps>(props => {
+  const { styles } = customButtonStyles();
+
+  return <Button styles={styles()} {...props} />;
+});
+
+const customButtonStyles = createStyles<ButtonParts>("CustomButton", {
+  root: {
+    bg: "red.500",
+  },
+});
+
+const buttonStyles = createStyles<ButtonParts>("Button", {
+  root: {
+    bg: "blue.500",
+    color: "white",
+  },
+});
+
+interface ButtonProps extends StylesProps<ButtonParts> {
+  isFullWidth?: boolean;
 }
 
-const Card = hope<"div", CardProps>("div", {
-  excludedProps: ["variant"],
-  baseStyle: ({ theme, props }) => ({
-    d: "flex",
-    border: props.variant === "outlined" ? `1px solid ${theme.colors.slate[700]}` : "none",
-    bg: "gray.300",
-    shadow: "md",
-    p: 4,
-  }),
+const Button = createHopeComponent<"button", ButtonProps>(props => {
+  const [local, others] = splitProps(props, ["styles", "unstyled", "__css"]);
+
+  const { styles } = buttonStyles(undefined, {
+    styles: () => local.styles,
+    unstyled: () => local.unstyled,
+  });
+
+  return <hope.button __css={{ ...styles().root, ...local.__css }} {...others} />;
 });
 
 function App() {
   return (
     <HopeProvider>
-      <Card variant="outlined" mb={4}>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque, quia?
-      </Card>
-      <Card variant="soft">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloremque, quia?
-      </Card>
+      <CustomButton __css={{ rounded: "md" }} mr={4}>
+        Override with classNames and createStyles - red
+      </CustomButton>
+      <Button
+        styles={{
+          root: {
+            bg: "green.500",
+          },
+        }}
+      >
+        Override with inline styles - green
+      </Button>
+      <Button>Base createStyles - blue</Button>
     </HopeProvider>
   );
 }

@@ -1,20 +1,17 @@
-import { isFunction, runIfFn } from "@hope-ui/utils";
+import { isFunction } from "@hope-ui/utils";
 import mergeWith from "lodash.mergewith";
 import { Accessor, createMemo } from "solid-js";
 
-import { css } from "./stitches.config";
-import { toCSSObject } from "./styled-system/to-css-object";
-import { useComponentTheme, useTheme } from "./theme/theme-provider";
-import type { ClassNames, Styles, SystemStyleObject, Theme } from "./types";
+import { useTheme, useThemeStyles } from "./theme/theme-provider";
+import type { Styles, SystemStyleObject, Theme } from "./types";
 import { ThemeBase } from "./types";
 import { getComponentPartClassName } from "./utils/get-component-part-class-name";
-import { mergeClassNames } from "./utils/merge-class-names";
 
 interface UseStylesOptions<ComponentParts extends string, StyleParams> {
-  /** The classNames applied to each parts of the component. */
-  classNames?: Accessor<ClassNames<ComponentParts> | undefined>;
-
-  /** The styles applied to each parts of the component, will be parsed by `emotion` and added to the head. */
+  /**
+   * Styles that will be merged with the "base styles" created by the `createStyles()` call.
+   * Mostly used to override/add additional styles.
+   */
   styles?: Accessor<Styles<ComponentParts, StyleParams> | undefined>;
 
   /** Whether the base styles should be applied or not. */
@@ -33,10 +30,7 @@ function extractStyles<StyleParams>(
   return styles ?? {};
 }
 
-interface CreateStylesOptions<
-  ComponentParts extends string,
-  StyleParams extends Record<string, any>
-> {
+interface CreateStylesOptions<ComponentParts extends string, StyleParams = void> {
   /** The theme provided by the closest `ThemeProviderContext`. */
   theme: ThemeBase;
 
@@ -44,24 +38,26 @@ interface CreateStylesOptions<
   params: StyleParams;
 
   /**
-   * Return a css class selector for a given component part.
+   * Return a css className for a given component part.
    * @example
-   * // selector("leftIcon") => ".hope-button__left-icon"
+   * // selector("leftIcon") => "hope-button__left-icon"
    */
   selector: (part: ComponentParts) => string;
+}
+
+interface UseStylesReturn<ComponentParts extends string>
+  extends Pick<CreateStylesOptions<ComponentParts>, "selector"> {
+  /** Accessor for the styles objects merged with theme and prop styles. */
+  styles: Accessor<Record<ComponentParts, SystemStyleObject>>;
 }
 
 /**
  * Create a styles primitive to use inside a component.
  *
- * @param name The name of the component
+ * @param name The name of the component, used for retrieving theme styles and generating static classNames.
  * @param styles The styles object to be processed by `stitches`.
- * @return A primitive to use inside the component to get the generated classNames.
  */
-export function createStyles<
-  ComponentParts extends string = string,
-  StyleParams extends Record<string, any> = {}
->(
+export function createStyles<ComponentParts extends string = string, StyleParams = void>(
   name: string,
   styles:
     | ((
@@ -70,49 +66,43 @@ export function createStyles<
     | Record<ComponentParts, SystemStyleObject>
 ) {
   const selector = (part: ComponentParts) => {
-    return `.${getComponentPartClassName(name, part)}`;
+    return getComponentPartClassName(name, part);
   };
 
   const extractBaseStyles = typeof styles === "function" ? styles : () => styles;
 
-  function useStyles(params: StyleParams, options?: UseStylesOptions<ComponentParts, StyleParams>) {
+  function useStyles(
+    params: StyleParams,
+    options?: UseStylesOptions<ComponentParts, StyleParams>
+  ): UseStylesReturn<ComponentParts> {
     const theme = useTheme();
-    const componentTheme = useComponentTheme(name);
+    const themeStyles = useThemeStyles(name);
 
-    const classes = createMemo(() => {
-      const baseStyles = extractBaseStyles({
+    const styles = createMemo(() => {
+      const baseStyleObject = extractBaseStyles({
         theme: theme(),
         params,
         selector,
       }) as Record<string, SystemStyleObject>;
 
-      const themeStyles = extractStyles(componentTheme()?.styles, theme(), params);
-      const propStyles = extractStyles(options?.styles?.(), theme(), params);
+      const themeStyleObject = extractStyles(themeStyles(), theme(), params);
+      const propStyleObject = extractStyles(options?.styles?.(), theme(), params);
 
-      const baseClassNames = Object.fromEntries(
-        Object.keys(baseStyles).map(key => {
-          const mergedStyles = mergeWith(
+      return Object.fromEntries(
+        Object.keys(baseStyleObject).map(key => {
+          const mergedStyleObject = mergeWith(
             {},
-            !options?.unstyled?.() ? baseStyles[key] : {},
-            themeStyles[key] ? themeStyles[key] : {},
-            propStyles[key] ? propStyles[key] : {}
+            options?.unstyled?.() ? {} : baseStyleObject[key],
+            themeStyleObject[key] ?? {},
+            propStyleObject[key] ?? {}
           );
 
-          const cssComponent = css(toCSSObject(mergedStyles, theme()));
-
-          return [key, cssComponent().className];
+          return [key, mergedStyleObject];
         })
-      ) as Record<ComponentParts, string>;
-
-      return mergeClassNames({
-        name,
-        baseClassNames,
-        themeClassNames: componentTheme()?.classNames,
-        propClassNames: options?.classNames?.(),
-      });
+      ) as Record<ComponentParts, SystemStyleObject>;
     });
 
-    return classes;
+    return { styles, selector };
   }
 
   return useStyles;

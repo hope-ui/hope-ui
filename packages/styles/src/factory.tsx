@@ -7,43 +7,67 @@ import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { HopeComponent, HopeFactory, HopeProps, HTMLHopeComponents } from "./types";
+import {
+  HopeComponent,
+  HopeFactory,
+  HopeFactoryStyleOptions,
+  HopeProps,
+  HTMLHopeComponents,
+} from "./types";
 import { packSx } from "./utils/pack-sx";
 
-// singleton stitches cssComponent used for sx and system style props.
-const systemCssComponent = css({});
+const styled: HopeFactory = <T extends ElementType, Props = {}>(
+  component: T,
+  options: HopeFactoryStyleOptions<Props> = {}
+) => {
+  const { excludedProps = [], baseStyle = {} } = options;
 
-const styled: HopeFactory = <T extends ElementType>(component: T) => {
-  const hopeComponent = (props: HopeProps<T>) => {
+  const hopeComponent = (props: HopeProps<T, Props>) => {
     const [local, styleProps, others] = splitProps(
       props,
-      ["as", "class", "sx"],
+      ["as", "class", "sx", "__css", ...excludedProps],
       extractStyleProps(props)
     );
 
     const theme = useTheme();
 
     const className = createMemo(() => {
-      const systemStyles = Object.assign(
+      const baseStyleObject = Object.assign(
+        {},
+        local.__css,
+        runIfFn(baseStyle, { theme: theme(), props })
+      );
+
+      const overrideStyleObject = Object.assign(
         {},
         filterUndefined(styleProps),
         ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
       );
 
-      if (isEmptyObject(systemStyles)) {
-        return local.class;
+      if (isEmptyObject(baseStyleObject) && isEmptyObject(overrideStyleObject)) {
+        return undefined;
       }
 
-      // use `css` prop to have higher specificity than `createStyles`.
-      const systemClass = systemCssComponent({ css: toCSSObject(systemStyles, theme()) }).className;
+      const cssComponent = css(toCSSObject(baseStyleObject, theme()));
 
-      return clsx(systemClass, local.class);
+      if (isEmptyObject(overrideStyleObject)) {
+        return cssComponent().className;
+      }
+
+      // use `css` prop to have higher specificity.
+      return cssComponent({ css: toCSSObject(overrideStyleObject, theme()) }).className;
     });
 
-    return <Dynamic component={local.as ?? component} class={className} {...others} />;
+    return (
+      <Dynamic
+        component={local.as ?? component}
+        class={clsx(className(), local.class)}
+        {...others}
+      />
+    );
   };
 
-  return hopeComponent as HopeComponent<T>;
+  return hopeComponent as HopeComponent<T, Props>;
 };
 
 function factory() {
@@ -53,9 +77,9 @@ function factory() {
     /**
      * @example
      * const Div = hope("div")
-     * const StyledLink = hope(Link)
+     * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType]) {
+    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<any>]) {
       return styled(...argArray);
     },
 
