@@ -1,8 +1,7 @@
 import { ClassProps, DOMElements, ElementType, OverrideProps } from "@hope-ui/utils";
 import { ComponentProps, JSX } from "solid-js";
 
-import { SxProp, SystemStyleObject, SystemStyleProps } from "./system-style";
-import { ThemeBase } from "./theme-base";
+import { SxProp, SystemStyleProps } from "./system-style";
 
 /** The `as` prop type. */
 export type As<Props = any> = ElementType<Props>;
@@ -27,21 +26,8 @@ export type HTMLHopeComponents = {
   [Tag in DOMElements]: HopeComponent<Tag>;
 };
 
-export interface HopeFactoryStyleOptions<Props> {
-  /** Props that will not be forwarded to the underlying dom element. */
-  excludedProps?: Array<keyof Props>;
-
-  /** Base style applied to the component. */
-  baseStyle?:
-    | SystemStyleObject
-    | ((params: { theme: ThemeBase; props: Props }) => SystemStyleObject);
-}
-
 /**
  * Factory function that converts non Hope UI components or jsx element
  * to Hope UI components, so you can pass system style props to them.
  */
-export type HopeFactory = <T extends ElementType, Props = {}>(
-  component: T,
-  options?: HopeFactoryStyleOptions<Props>
-) => HopeComponent<T, Props>;
+export type HopeFactory = <T extends ElementType>(component: T) => HopeComponent<T>;

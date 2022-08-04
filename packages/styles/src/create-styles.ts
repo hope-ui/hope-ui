@@ -1,4 +1,4 @@
-import { isFunction } from "@hope-ui/utils";
+import { isFunction, runIfFn } from "@hope-ui/utils";
 import mergeWith from "lodash.mergewith";
 import { Accessor, createMemo } from "solid-js";
 
@@ -33,14 +33,14 @@ function extractStyles<StyleParams>(
   return styles ?? {};
 }
 
-interface CreateStylesConfig<
+interface CreateStylesOptions<
   ComponentParts extends string,
   StyleParams extends Record<string, any>
 > {
   /** The theme provided by the closest `ThemeProviderContext`. */
   theme: ThemeBase;
 
-  /** Params to be passed to the result of `createStyles`. */
+  /** Params passed by the component using to the result of `createStyles`. */
   params: StyleParams;
 
   /**
@@ -65,7 +65,7 @@ export function createStyles<
   name: string,
   styles:
     | ((
-        config: CreateStylesConfig<ComponentParts, StyleParams>
+        options: CreateStylesOptions<ComponentParts, StyleParams>
       ) => Record<ComponentParts, SystemStyleObject>)
     | Record<ComponentParts, SystemStyleObject>
 ) {
