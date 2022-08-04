@@ -1,6 +1,7 @@
 import { ClassNames, Styles } from "./styles";
 import { SxProp, SystemStyleProps } from "./system-style";
 
+/** Props of component using `createStyles` . */
 export interface StylePartsProps<
   ComponentParts extends string = any,
   StyleParams extends Record<string, any> = any

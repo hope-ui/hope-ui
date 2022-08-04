@@ -4,10 +4,10 @@ import { ComponentProps, JSX } from "solid-js";
 import { SxProp, SystemStyleObject, SystemStyleProps } from "./system-style";
 import { ThemeBase } from "./theme-base";
 
-/** The "as" prop type. */
+/** The `as` prop type. */
 export type As<Props = any> = ElementType<Props>;
 
-/** Props object that includes "system style" props and the "as" prop. */
+/** Props object that includes `system style` props and the `as` prop. */
 export type HopeProps<Type extends As = As, Props = {}> = OverrideProps<
   ComponentProps<Type>,
   Props & SystemStyleProps & SxProp & ClassProps & { as?: Type; children?: JSX.Element }

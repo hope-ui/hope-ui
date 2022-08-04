@@ -16,11 +16,14 @@ import {
 } from "./types";
 import { packSx } from "./utils/pack-sx";
 
+// singleton stitches cssComponent used for sx and system style props.
+const systemCssComponent = css({});
+
 const styled: HopeFactory = <T extends ElementType, Props = {}>(
   component: T,
   options: HopeFactoryStyleOptions<Props> = {}
 ) => {
-  const { excludedProps = [], baseStyle = {} } = options;
+  const { excludedProps = [], baseStyle: __baseStyle = {} } = options;
 
   const hopeComponent = (props: HopeProps<T, Props>) => {
     const [local, styleProps, others] = splitProps(
@@ -31,32 +34,42 @@ const styled: HopeFactory = <T extends ElementType, Props = {}>(
 
     const theme = useTheme();
 
-    const className = createMemo(() => {
-      const computedBaseStyles = runIfFn(baseStyle, { theme: theme(), props });
+    // className for hope factory `baseStyle`.
+    const baseClass = createMemo(() => {
+      const baseStyles = runIfFn(__baseStyle, { theme: theme(), props });
 
-      const cssComponent = css(toCSSObject(computedBaseStyles, theme()));
-
-      const overrideStyles = toCSSObject(
-        Object.assign(
-          {},
-          filterUndefined(styleProps),
-          ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
-        ),
-        theme()
-      );
-
-      let computedClass: string;
-
-      if (isEmptyObject(overrideStyles)) {
-        computedClass = cssComponent().className;
-      } else {
-        computedClass = cssComponent({ css: overrideStyles }).className;
+      if (isEmptyObject(baseStyles)) {
+        return undefined;
       }
 
-      return clsx(computedClass, local.class);
+      const baseCssComponent = css(toCSSObject(baseStyles, theme()));
+
+      return baseCssComponent.className;
     });
 
-    return <Dynamic component={local.as ?? component} class={className()} {...others} />;
+    // className for `sx` and `system style` props.
+    const systemClass = createMemo(() => {
+      const systemStyles = Object.assign(
+        {},
+        filterUndefined(styleProps),
+        ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
+      );
+
+      if (isEmptyObject(systemStyles)) {
+        return undefined;
+      }
+
+      // use `css` prop to have higher specificity.
+      return systemCssComponent({ css: toCSSObject(systemStyles, theme()) }).className;
+    });
+
+    return (
+      <Dynamic
+        component={local.as ?? component}
+        class={clsx(baseClass(), systemClass(), local.class)}
+        {...others}
+      />
+    );
   };
 
   return hopeComponent as HopeComponent<T, Props>;
