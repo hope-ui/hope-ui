@@ -1,5 +1,5 @@
-import { Theme } from "../types";
-import { analyzeBreakpoints } from "../utils/breakpoint";
+import { Theme, ThemeWithoutMetaData } from "../types";
+import { attachMetaData } from "../utils/attach-meta-data";
 import { DEFAULT_COLORS } from "./default-colors";
 import { DEFAULT_THEME_MAP } from "./default-theme-map";
 
@@ -39,22 +39,8 @@ const space: Theme["space"] = {
   "96": "24rem",
 };
 
-const breakpoints: Theme["breakpoints"] = {
-  base: "0px",
-  sm: "640px",
-  md: "768px",
-  lg: "1024px",
-  xl: "1280px",
-  "2xl": "1536px",
-};
-
-export const DEFAULT_THEME: Theme = {
+const _DEFAULT_THEME: ThemeWithoutMetaData = {
   colorMode: "light",
-  primaryColor: "blue",
-  primaryShade: {
-    light: 500,
-    dark: 600,
-  },
   colors: DEFAULT_COLORS,
   fonts: {
     sans: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
@@ -171,9 +157,17 @@ export const DEFAULT_THEME: Theme = {
     skipLink: 1700,
     toast: 1800,
   },
-  breakpoints,
-  __breakpoints: analyzeBreakpoints(breakpoints),
+  breakpoints: {
+    base: "0px",
+    sm: "640px",
+    md: "768px",
+    lg: "1024px",
+    xl: "1280px",
+    "2xl": "1536px",
+  },
   themeMap: DEFAULT_THEME_MAP,
   other: {},
   components: {},
 };
+
+export const DEFAULT_THEME: Theme = attachMetaData(_DEFAULT_THEME);

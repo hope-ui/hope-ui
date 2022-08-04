@@ -1,8 +1,5 @@
 import { Theme, ThemeOverride } from "../types";
-import { analyzeBreakpoints } from "./breakpoint";
-import { focusStyles } from "./focus-styles";
-import { mode } from "./mode";
-import { rgba } from "./rgba";
+import { attachMetaData } from "./attach-meta-data";
 
 export function mergeTheme(currentTheme: Theme, themeOverride?: ThemeOverride): Theme {
   if (!themeOverride) {
@@ -27,13 +24,5 @@ export function mergeTheme(currentTheme: Theme, themeOverride?: ThemeOverride): 
     };
   }, {} as Theme);
 
-  return {
-    ...themeBase,
-    fn: {
-      mode: mode(themeBase),
-      focusStyles: focusStyles(themeBase),
-      rgba,
-    },
-    __breakpoints: analyzeBreakpoints(themeBase.breakpoints),
-  };
+  return attachMetaData(themeBase);
 }

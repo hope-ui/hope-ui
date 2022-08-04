@@ -2,7 +2,6 @@ import { CSSObject } from "../stitches.config";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import { ColorMode } from "./color-mode";
 import {
-  Shade,
   ThemeBreakpoint,
   ThemeColor,
   ThemeColorPalette,
@@ -19,8 +18,6 @@ import {
 } from "./token";
 
 export type ThemeOther = Record<string, any>;
-
-export type ThemePrimaryShade = Shade | { light: Shade; dark: Shade };
 
 export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScale>>;
 
