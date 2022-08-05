@@ -1,6 +1,6 @@
 import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { createMemo, splitProps } from "solid-js";
+import { createEffect, createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { css } from "./stitches.config";
@@ -61,7 +61,7 @@ const styled: HopeFactory = <T extends ElementType, Props = {}>(
     return (
       <Dynamic
         component={local.as ?? component}
-        class={clsx(className(), local.class)}
+        class={clsx(className(), local.class) || undefined}
         {...others}
       />
     );
