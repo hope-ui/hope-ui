@@ -22,11 +22,11 @@ export type ResponsiveArray<T> = Array<T | null>;
 
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 
+type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
+
 export type ResponsiveValue<T> =
-  | T
-  | ResponsiveArray<T>
-  | ResponsiveObject<T>
-  | ((theme: ThemeBase) => T | ResponsiveArray<T> | ResponsiveObject<T>);
+  | ResponsiveValueRaw<T>
+  | ((theme: ThemeBase) => ResponsiveValueRaw<T>);
 
 export type ResponsiveProps<Props> = {
   [K in keyof Props]?: ResponsiveValue<Props[K]>;
@@ -768,6 +768,28 @@ export type PseudoSelectorProps = Partial<{
    * - `&[data-disabled]`
    */
   _disabled: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS selector `&::before`
+   *
+   * NOTE:When using this, ensure the `content` is wrapped in a backtick.
+   * @example
+   * ```jsx
+   * <Box _before={{content:`""` }}/>
+   * ```
+   */
+  _before: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS selector `&::after`
+   *
+   * NOTE:When using this, ensure the `content` is wrapped in a backtick.
+   * @example
+   * ```jsx
+   * <Box _after={{content:`""` }}/>
+   * ```
+   */
+  _after: PseudoSelectorValue;
 
   /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is hovered. */
   _groupHover: PseudoSelectorValue;

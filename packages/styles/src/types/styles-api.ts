@@ -1,4 +1,4 @@
-import { SystemStyleObject } from "./system-style";
+import { SystemStyleObject } from "./styled-system";
 import { ThemeBase } from "./theme-base";
 
 /** An object or function that returns an object of styles. */

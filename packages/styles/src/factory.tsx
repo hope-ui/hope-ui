@@ -1,6 +1,6 @@
 import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { createEffect, createMemo, splitProps } from "solid-js";
+import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { css } from "./stitches.config";
@@ -14,7 +14,7 @@ import {
   HopeProps,
   HTMLHopeComponents,
 } from "./types";
-import { packSx } from "./utils/pack-sx";
+import { packSx } from "./utils";
 
 const styled: HopeFactory = <T extends ElementType, Props = {}>(
   component: T,

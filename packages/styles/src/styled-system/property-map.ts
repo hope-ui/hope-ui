@@ -1,7 +1,7 @@
 import { AnyFunction } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
-import { BaseSystemStyleProps, PseudoSelectorProps } from "../types/system-style";
+import { BaseSystemStyleProps, PseudoSelectorProps } from "../types/styled-system";
 
 const state = {
   hover: (str: string, post: string) => `${str}:hover ${post}, ${str}[data-hover] ${post}`,
@@ -32,6 +32,8 @@ export const PSEUDO_SELECTORS_MAP: Record<keyof PseudoSelectorProps, string> = {
   _focusWithin: "&:focus-within",
   _focusVisible: "&:focus-visible, &[data-focus-visible]",
   _disabled: "&[disabled], &[aria-disabled=true], &[data-disabled]",
+  _before: "&::before",
+  _after: "&::after",
   _groupHover: toGroup(state.hover),
   _groupActive: toGroup(state.active),
   _groupFocus: toGroup(state.focus),

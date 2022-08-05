@@ -1,7 +1,7 @@
 import { ClassProps, DOMElements, ElementType, OverrideProps } from "@hope-ui/utils";
 import { ComponentProps, JSX } from "solid-js";
 
-import { SxProp, SystemStyleObject, SystemStyleProps } from "./system-style";
+import { SxProp, SystemStyleObject, SystemStyleProps } from "./styled-system";
 import { ThemeBase } from "./theme-base";
 
 /** The `as` prop type. */

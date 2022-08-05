@@ -14,7 +14,7 @@ import {
   ShadowProps,
   SizeProps,
   TypographyProps,
-} from "../types/system-style";
+} from "../types/styled-system";
 
 const borderPropNames: KeysOf<BorderProps> = {
   border: true,
@@ -205,6 +205,8 @@ const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _focusWithin: true,
   _focusVisible: true,
   _disabled: true,
+  _before: true,
+  _after: true,
   _groupHover: true,
   _groupActive: true,
   _groupFocus: true,
