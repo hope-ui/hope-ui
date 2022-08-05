@@ -1,16 +1,24 @@
-import { onMount } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Box, hope, HopeProvider } from "../src";
+import { AspectRatio, AspectRatioProps, HopeProvider } from "../src";
 
 function App() {
-  let ref: HTMLDivElement | undefined;
-
-  onMount(() => console.log(ref));
-
   return (
-    <HopeProvider>
-      <Box ref={ref}>hi</Box>
+    <HopeProvider
+      theme={{
+        components: {
+          AspectRatio: {
+            defaultProps: {
+              ratio: 32 / 9,
+              border: "4px solid cyan",
+            } as AspectRatioProps,
+          },
+        },
+      }}
+    >
+      <AspectRatio maxW="400px">
+        <img src="https://bit.ly/3pq0AcS" alt="Monkey D. Luffy" />
+      </AspectRatio>
     </HopeProvider>
   );
 }

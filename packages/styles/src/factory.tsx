@@ -3,40 +3,47 @@ import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import {
+  As,
+  createPolymorphicComponent,
+  PolymorphicComponent,
+} from "./create-polymorphic-component";
 import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import {
-  HopeComponent,
-  HopeFactory,
-  HopeFactoryStyleOptions,
-  HopeProps,
-  HTMLHopeComponents,
-} from "./types";
+import { HopeProps } from "./types";
 import { packSx } from "./utils";
 
-const styled: HopeFactory = <T extends ElementType, Props = {}>(
-  component: T,
-  options: HopeFactoryStyleOptions<Props> = {}
-) => {
-  const { excludedProps = [], baseStyle = {} } = options;
+/** A component with Hope UI props. */
+type HopeComponent<DefaultType extends As> = PolymorphicComponent<DefaultType, HopeProps>;
 
-  const hopeComponent = (props: HopeProps<T, Props>) => {
+/**
+ * All html and svg elements for hope components.
+ * This is mostly for `hope.<element>` syntax.
+ */
+type HTMLHopeComponents = {
+  [Tag in DOMElements]: HopeComponent<Tag>;
+};
+
+/**
+ * Factory function that converts non Hope UI components or jsx element
+ * to Hope UI components, so you can pass system style props to them.
+ */
+type HopeFactory = <T extends ElementType>(component: T) => HopeComponent<T>;
+
+function styled<T extends ElementType>(component: T) {
+  const hopeComponent = createPolymorphicComponent<T, HopeProps>(props => {
     const [local, styleProps, others] = splitProps(
       props,
-      ["as", "class", "sx", "__css", ...excludedProps],
+      ["as", "class", "sx", "__baseStyle"],
       extractStyleProps(props)
     );
 
     const theme = useTheme();
 
     const className = createMemo(() => {
-      const baseStyleObject = Object.assign(
-        {},
-        local.__css,
-        runIfFn(baseStyle, { theme: theme(), props })
-      );
+      const baseStyleObject = local.__baseStyle ?? {};
 
       const overrideStyleObject = Object.assign(
         {},
@@ -65,10 +72,10 @@ const styled: HopeFactory = <T extends ElementType, Props = {}>(
         {...others}
       />
     );
-  };
+  });
 
-  return hopeComponent as HopeComponent<T, Props>;
-};
+  return hopeComponent as HopeComponent<T>;
+}
 
 function factory() {
   const cache = new Map<DOMElements, HopeComponent<DOMElements>>();
@@ -79,7 +86,7 @@ function factory() {
      * const Div = hope("div")
      * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<any>]) {
+    apply(target, thisArg, argArray: [ElementType]) {
       return styled(...argArray);
     },
 

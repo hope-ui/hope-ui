@@ -11,26 +11,26 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(component?: string): Accessor<Styles<string, any>> {
+export function useThemeStyles(componentName?: string): Accessor<Styles<string, any>> {
   const theme = useTheme();
 
   return createMemo(() => {
-    if (component == null) {
+    if (componentName == null) {
       return {};
     }
 
-    return theme().components[component]?.styles ?? {};
+    return theme().components[componentName]?.styles ?? {};
   });
 }
 
 export function useComponentDefaultProps<T extends Record<string, any>>(
-  component: string,
+  componentName: string,
   defaultProps: Partial<T>,
   props: T
 ): T {
   const theme = useTheme();
 
-  const themeProps = () => theme().components[component]?.defaultProps ?? {};
+  const themeProps = () => theme().components[componentName]?.defaultProps ?? {};
 
   return mergeProps(defaultProps, themeProps, props);
 }

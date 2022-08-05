@@ -7,3 +7,4 @@ export * from "./provider";
 
 // components
 export * from "./layout";
+export { splitStylesProps } from "./utils/split-styles-props";

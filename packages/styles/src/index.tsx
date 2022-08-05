@@ -1,4 +1,4 @@
-export * from "./create-hope-component";
+export * from "./create-polymorphic-component";
 export * from "./create-styles";
 export * from "./factory";
 export * from "./stitches.config";

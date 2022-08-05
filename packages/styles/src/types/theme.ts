@@ -1,5 +1,5 @@
 import type { DeepPartial } from "./deep-partial";
-import { Styles } from "./styles-api";
+import { Styles } from "./styles";
 import { ThemeBase, ThemeOther } from "./theme-base";
 
 export interface ComponentTheme {
