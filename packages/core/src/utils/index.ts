@@ -1,1 +1,1 @@
-export * from "./split-styles-props";
+export * from "./split-default-props";

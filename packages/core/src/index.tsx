@@ -9,3 +9,4 @@ export * from "./utils";
 // components
 export * from "./aspect-ratio";
 export * from "./box";
+export * from "./center";

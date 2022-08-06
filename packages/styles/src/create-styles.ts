@@ -28,7 +28,10 @@ function extractStyles<ComponentParts extends string, StylesParams>(
   return styles ?? {};
 }
 
-interface CreateStylesOptions<ComponentParts extends string, StylesParams> {
+interface CreateStylesOptions<
+  ComponentParts extends string,
+  StylesParams extends Record<string, any>
+> {
   /** The name of the component, used for retrieving theme styles and generating static classNames. */
   component: string;
 
@@ -40,9 +43,10 @@ interface CreateStylesOptions<ComponentParts extends string, StylesParams> {
 }
 
 /** Create a `useStyles` primitive to use inside a component. */
-export function createStyles<ComponentParts extends string = string, StylesParams = void>(
-  options: CreateStylesOptions<ComponentParts, StylesParams>
-) {
+export function createStyles<
+  ComponentParts extends string = string,
+  StylesParams extends Record<string, any> = {}
+>(options: CreateStylesOptions<ComponentParts, StylesParams>) {
   const { component, styles, defaultStylesParams = {} as StylesParams } = options;
 
   const getStaticClass: GetStaticClass<ComponentParts> = part => {
@@ -52,13 +56,13 @@ export function createStyles<ComponentParts extends string = string, StylesParam
   const extractBaseStyles = typeof styles === "function" ? styles : () => styles;
 
   function useStyles(
-    options: UseStylesOptions<ComponentParts, StylesParams>
+    options?: UseStylesOptions<ComponentParts, StylesParams>
   ): UseStylesReturn<ComponentParts> {
     const theme = useTheme();
     const themeStyles = useThemeStyles(component);
 
     const styles = createMemo(() => {
-      const { styles, unstyled, ...stylesParams } = options;
+      const { styles, unstyled, ...stylesParams } = options ?? {};
 
       const params = {
         ...defaultStylesParams,

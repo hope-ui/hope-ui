@@ -12,10 +12,9 @@ export type ElementType<Props = any> = DOMElements | Component<Props>;
  */
 export type OverrideProps<Source = {}, Override = {}> = Omit<Source, keyof Override> & Override;
 
-/** All SolidJS props that apply css classes. */
-export interface ClassProps {
+/** The css `class` prop. */
+export interface ClassProp {
   class?: string;
-  classList?: { [key: string]: boolean };
 }
 
 export type AnyFunction<T = any> = (...args: T[]) => any;

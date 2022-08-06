@@ -11,7 +11,7 @@ import {
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 
-import { splitStylesProps } from "../utils/split-styles-props";
+import { splitDefaultProps } from "../utils";
 
 export interface AspectRatioStylesParams {
   /**
@@ -74,7 +74,7 @@ export type AspectRatioTheme = ComponentTheme<
 >;
 
 /**
- * AspectRatio is used to cropping media (videos, images and maps)
+ * `AspectRatio` is used to cropping media (videos, images and maps)
  * to a desired aspect ratio.
  */
 export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(props => {
@@ -86,7 +86,7 @@ export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(p
     props
   );
 
-  const [local, others] = splitStylesProps(props, ["class", "children", "ratio"]);
+  const [local, others] = splitDefaultProps(props, ["class", "ratio"]);
 
   const { styles, getStaticClass } = useStyles(local);
 
@@ -95,8 +95,6 @@ export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(p
       class={clsx(getStaticClass("root"), local.class)}
       __baseStyle={styles().root}
       {...others}
-    >
-      {props.children}
-    </hope.div>
+    />
   );
 });

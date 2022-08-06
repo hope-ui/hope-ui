@@ -7,15 +7,10 @@ import { ThemeBase } from "./theme-base";
 export type StylesObject<ComponentParts extends string> = Record<ComponentParts, SystemStyleObject>;
 
 /** Return a static css className for a given component part. */
-export type GetStaticClass<ComponentParts extends string> = (
-  part: ComponentParts | string
-) => string;
+export type GetStaticClass<ComponentParts extends string> = (part: ComponentParts) => string;
 
 /** An object or function that returns an object of styles. */
-export type Styles<
-  ComponentParts extends string,
-  StylesParams extends Record<string, any> = never
-> =
+export type Styles<ComponentParts extends string, StylesParams extends Record<string, any>> =
   | StylesObject<ComponentParts>
   | ((
       theme: ThemeBase,
@@ -26,7 +21,7 @@ export type Styles<
 /** An object or function that returns a partial object of styles. */
 export type PartialStyles<
   ComponentParts extends string,
-  StylesParams extends Record<string, any> = never
+  StylesParams extends Record<string, any>
 > =
   | Partial<StylesObject<ComponentParts>>
   | ((
@@ -37,7 +32,7 @@ export type PartialStyles<
 
 export type UseStylesOptions<
   ComponentParts extends string,
-  StylesParams
+  StylesParams extends Record<string, any>
 > = Partial<StylesParams> & {
   /**
    * Styles that will be merged with the "base styles" created by the `createStyles()` call.
