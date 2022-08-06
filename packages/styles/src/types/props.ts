@@ -1,7 +1,7 @@
 import { ClassProps } from "@hope-ui/utils";
 
 import { SxProp, SystemStyleObject, SystemStyleProps } from "./styled-system";
-import { Styles } from "./styles";
+import { UseStylesOptions } from "./styles";
 
 /** Hope UI specific props. */
 export interface HopeProps extends SystemStyleProps, SxProp, ClassProps {
@@ -13,13 +13,8 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProps {
 }
 
 /** Props of components that should supports the `Styles API` and `system style` props. */
-export interface DefaultProps<
-  StylesNames extends string = any,
+export type DefaultProps<
+  ComponentParts extends string = any,
   StylesParams extends Record<string, any> = any
-> extends Omit<HopeProps, "__baseStyle"> {
-  /** The styles to apply to the component. */
-  styles?: Styles<StylesNames, StylesParams>;
-
-  /** Whether the base styles should be applied or not. */
-  unstyled?: boolean;
-}
+> = Omit<HopeProps, "__baseStyle"> &
+  Pick<UseStylesOptions<ComponentParts, StylesParams>, "styles" | "unstyled">;

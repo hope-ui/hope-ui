@@ -1,18 +1,19 @@
 import {
+  ComponentTheme,
   createPolymorphicComponent,
   createStyles,
   DefaultProps,
   hope,
   mapResponsive,
+  PartsOf,
   ResponsiveValue,
-  Selectors,
   useComponentDefaultProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 
 import { splitStylesProps } from "../utils/split-styles-props";
 
-interface AspectRatioStylesParams {
+export interface AspectRatioStylesParams {
   /**
    * The aspect ratio of the Box.
    * Common values are: `21/9`, `16/9`, `9/16`, `4/3`, `1.85/1`
@@ -21,26 +22,39 @@ interface AspectRatioStylesParams {
 }
 
 const useStyles = createStyles({
-  componentName: "AspectRatio",
+  component: "AspectRatio",
   styles: (theme, params: AspectRatioStylesParams) => ({
     root: {
       position: "relative",
+      maxWidth: "100%",
+
       "&::before": {
+        content: '""',
         height: 0,
-        content: `""`,
         display: "block",
         paddingBottom: mapResponsive(params.ratio, r => `${(1 / r) * 100}%`),
       },
+
+      "&::after": {
+        content: '""',
+        display: "table",
+        clear: "both",
+      },
+
       "& > *:not(style)": {
         overflow: "hidden",
         position: "absolute",
-        inset: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
         height: "100%",
       },
+
       "& > img, & > video": {
         objectFit: "cover",
       },
@@ -48,11 +62,16 @@ const useStyles = createStyles({
   }),
 });
 
-type AspectRatioStylesNames = Selectors<typeof useStyles>;
+export type AspectRatioParts = PartsOf<typeof useStyles>;
 
-export interface AspectRatioProps
-  extends DefaultProps<AspectRatioStylesNames, AspectRatioStylesParams>,
-    Partial<AspectRatioStylesParams> {}
+export type AspectRatioProps = DefaultProps<AspectRatioParts, AspectRatioStylesParams> &
+  Partial<AspectRatioStylesParams>;
+
+export type AspectRatioTheme = ComponentTheme<
+  AspectRatioProps,
+  AspectRatioParts,
+  AspectRatioStylesParams
+>;
 
 /**
  * AspectRatio is used to cropping media (videos, images and maps)
@@ -62,7 +81,7 @@ export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(p
   props = useComponentDefaultProps(
     "AspectRatio",
     {
-      ratio: 16 / 9,
+      ratio: 4 / 3,
     },
     props
   );

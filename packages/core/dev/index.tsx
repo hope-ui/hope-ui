@@ -1,6 +1,6 @@
 import { render } from "solid-js/web";
 
-import { AspectRatio, AspectRatioProps, HopeProvider } from "../src";
+import { AspectRatio, AspectRatioTheme, HopeProvider } from "../src";
 
 function App() {
   return (
@@ -11,8 +11,13 @@ function App() {
             defaultProps: {
               ratio: 32 / 9,
               border: "4px solid cyan",
-            } as AspectRatioProps,
-          },
+            },
+            styles: (theme, params, getStaticClass) => ({
+              root: {
+                bg: getStaticClass("root"),
+              },
+            }),
+          } as AspectRatioTheme,
         },
       }}
     >

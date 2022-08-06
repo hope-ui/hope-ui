@@ -1,6 +1,6 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { Styles, Theme } from "../types";
+import type { PartialStyles, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { mergeTheme } from "../utils/merge-theme";
 import { DEFAULT_THEME } from "./default-theme";
@@ -11,26 +11,26 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(componentName?: string): Accessor<Styles<string, any>> {
+export function useThemeStyles(component?: string): Accessor<PartialStyles<any, any>> {
   const theme = useTheme();
 
   return createMemo(() => {
-    if (componentName == null) {
+    if (component == null) {
       return {};
     }
 
-    return theme().components[componentName]?.styles ?? {};
+    return theme().components[component]?.styles ?? {};
   });
 }
 
 export function useComponentDefaultProps<T extends Record<string, any>>(
-  componentName: string,
+  component: string,
   defaultProps: Partial<T>,
   props: T
 ): T {
   const theme = useTheme();
 
-  const themeProps = () => theme().components[componentName]?.defaultProps ?? {};
+  const themeProps = () => theme().components[component]?.defaultProps ?? {};
 
   return mergeProps(defaultProps, themeProps, props);
 }
