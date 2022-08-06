@@ -1,31 +1,39 @@
-import { ThemeOverride, ThemeProvider } from "@hope-ui/styles";
-import { createMemo, mergeProps, ParentProps } from "solid-js";
+import { ThemeOverride, ThemeProvider, ThemeProviderProps } from "@hope-ui/styles";
+import { createMemo, mergeProps, splitProps } from "solid-js";
 
 import { ColorModeProvider, ColorModeProviderProps, useColorMode } from "../color-mode";
 
 export type HopeThemeOverride = Omit<ThemeOverride, "colorMode">;
 
-interface ThemeProviderWithColorModeProps extends ParentProps {
+type ThemeProviderWithColorModeProps = Omit<ThemeProviderProps, "theme" | "inherit"> & {
   /** The custom theme to use. */
   theme?: HopeThemeOverride;
-}
+};
 
 function ThemeProviderWithColorMode(props: ThemeProviderWithColorModeProps) {
+  const [local, others] = splitProps(props, ["theme"]);
+
   const { colorMode } = useColorMode();
 
-  const theme = createMemo(() => mergeProps(props.theme, { colorMode: colorMode() }));
+  const theme = createMemo(() => mergeProps(local.theme, { colorMode: colorMode() }));
 
-  return <ThemeProvider theme={theme()}>{props.children}</ThemeProvider>;
+  return <ThemeProvider theme={theme()} {...others} />;
 }
 
 export function HopeProvider(props: ColorModeProviderProps & ThemeProviderWithColorModeProps) {
+  const [local, others] = splitProps(props, [
+    "initialColorMode",
+    "storageManager",
+    "disableTransitionOnChange",
+  ]);
+
   return (
     <ColorModeProvider
-      initialColorMode={props.initialColorMode}
-      storageManager={props.storageManager}
-      disableTransitionOnChange={props.disableTransitionOnChange}
+      initialColorMode={local.initialColorMode}
+      storageManager={local.storageManager}
+      disableTransitionOnChange={local.disableTransitionOnChange}
     >
-      <ThemeProviderWithColorMode theme={props.theme}>{props.children}</ThemeProviderWithColorMode>
+      <ThemeProviderWithColorMode {...others} />
     </ColorModeProvider>
   );
 }

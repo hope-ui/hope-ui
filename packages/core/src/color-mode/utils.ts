@@ -1,11 +1,6 @@
-import { ColorMode } from "@hope-ui/styles";
+import { COLOR_MODE_CLASSNAMES, ColorMode } from "@hope-ui/styles";
 
 import { ColorModeStorageManager } from "./types";
-
-const classNames = {
-  light: "hope-theme-light",
-  dark: "hope-theme-dark",
-};
 
 function query() {
   return window.matchMedia("(prefers-color-scheme: dark)");
@@ -34,8 +29,8 @@ function preventTransition() {
 }
 
 export function setColorModeClassName(isDark: boolean) {
-  document.body.classList.add(isDark ? classNames.dark : classNames.light);
-  document.body.classList.remove(isDark ? classNames.light : classNames.dark);
+  document.body.classList.add(isDark ? COLOR_MODE_CLASSNAMES.dark : COLOR_MODE_CLASSNAMES.light);
+  document.body.classList.remove(isDark ? COLOR_MODE_CLASSNAMES.light : COLOR_MODE_CLASSNAMES.dark);
 }
 
 export function setColorModeDataset(value: ColorMode, shouldPreventTransition = true) {

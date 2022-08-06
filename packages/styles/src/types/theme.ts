@@ -5,7 +5,7 @@ import { ThemeBase, ThemeOther } from "./theme-base";
 export interface ComponentTheme<
   Props extends Record<string, any> = {},
   ComponentParts extends string = string,
-  StylesParams extends Record<string, any> = never
+  StylesParams extends Record<string, any> = {}
 > {
   /** Default props to be passed to the component. */
   defaultProps?: Props;

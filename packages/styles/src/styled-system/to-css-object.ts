@@ -94,10 +94,6 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       continue;
     }
 
-    //const scale = theme.themeMap[propertyName];
-
-    //computedStyles[propertyName] = scale != null ? resolveTokenValue(value, scale, theme) : value;
-
     /**
      * converts style props shorthands to valid css properties.
      * "mx" => ["marginLeft", "marginRight"]

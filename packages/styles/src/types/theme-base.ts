@@ -33,6 +33,7 @@ export interface ThemeScale {
   radii: Record<ThemeRadii, string>;
   shadows: Record<ThemeShadow, string>;
   zIndices: Record<ThemeZIndice, string | number>;
+  breakpoints: Record<ThemeBreakpoint, string>;
 }
 
 export interface ThemeFunctions {
@@ -46,6 +47,5 @@ export interface ThemeBase extends ThemeScale {
   themeMap: ThemeMap;
   fn: ThemeFunctions;
   other: ThemeOther;
-  breakpoints: Record<ThemeBreakpoint, string>;
   __breakpoints?: AnalyzeBreakpointsReturn;
 }

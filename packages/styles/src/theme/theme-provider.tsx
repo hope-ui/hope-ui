@@ -1,9 +1,19 @@
-import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
+import {
+  Accessor,
+  createContext,
+  createMemo,
+  mergeProps,
+  onMount,
+  ParentProps,
+  useContext,
+} from "solid-js";
 
 import type { PartialStyles, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { mergeTheme } from "../utils/merge-theme";
 import { DEFAULT_THEME } from "./default-theme";
+import { globalStyles } from "./global-styles";
+import { cssVariables } from "./css-variables";
 
 const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);
 
@@ -36,7 +46,16 @@ export function useComponentDefaultProps<T extends Record<string, any>>(
 }
 
 export interface ThemeProviderProps extends ParentProps {
+  /** The custom theme to use. */
   theme?: ThemeOverride;
+
+  /** Whether Hope UI theme tokens should be added as css variables to `:root`. */
+  withCSSVariables?: boolean;
+
+  /** Whether Hope UI global styles should be applied. */
+  withGlobalStyles?: boolean;
+
+  /** Whether the theme should inherit from its parent theme. */
   inherit?: boolean;
 }
 
@@ -46,6 +65,11 @@ export function ThemeProvider(props: ThemeProviderProps) {
   const theme = createMemo(() => {
     const themeOverride = props.inherit ? mergeProps(parentTheme, props.theme) : props.theme;
     return mergeTheme(DEFAULT_THEME, themeOverride);
+  });
+
+  onMount(() => {
+    props.withGlobalStyles && globalStyles(theme());
+    props.withCSSVariables && cssVariables(theme());
   });
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
