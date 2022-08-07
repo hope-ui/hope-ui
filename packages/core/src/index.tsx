@@ -10,3 +10,4 @@ export * from "./utils";
 export * from "./aspect-ratio";
 export * from "./box";
 export * from "./center";
+export * from "./container";
