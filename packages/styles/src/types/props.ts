@@ -6,15 +6,15 @@ import { UseStylesOptions } from "./styles";
 /** Hope UI specific props. */
 export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
   /**
-   * The `__baseStyle` prop has the same API as the `sx` prop, but with a lower style priority.
+   * The `__css` prop has the same API as the `sx` prop, but with a lower style priority.
    * Use it to apply base styles that can be overridden by `sx` and `system style` props.
    */
-  __baseStyle?: SystemStyleObject;
+  __css?: SystemStyleObject;
 }
 
 /** Props of components that should supports the `Styles API` and `system style` props. */
 export type DefaultProps<
-  ComponentParts extends string = any,
+  ComponentParts extends string = string,
   StylesParams extends Record<string, any> = any
 > = Omit<HopeProps, "__baseStyle"> &
   Pick<UseStylesOptions<ComponentParts, StylesParams>, "styles" | "unstyled">;

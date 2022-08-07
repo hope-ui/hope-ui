@@ -8,12 +8,12 @@ import {
   useContext,
 } from "solid-js";
 
-import type { PartialStyles, Theme } from "../types";
+import type { PartialStylesInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { mergeTheme } from "../utils/merge-theme";
+import { cssVariables } from "./css-variables";
 import { DEFAULT_THEME } from "./default-theme";
 import { globalStyles } from "./global-styles";
-import { cssVariables } from "./css-variables";
 
 const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);
 
@@ -21,7 +21,7 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(component?: string): Accessor<PartialStyles<any, any>> {
+export function useThemeStyles(component?: string): Accessor<PartialStylesInterpolation<any, any>> {
   const theme = useTheme();
 
   return createMemo(() => {
@@ -33,7 +33,13 @@ export function useThemeStyles(component?: string): Accessor<PartialStyles<any, 
   });
 }
 
-export function useComponentDefaultProps<T extends Record<string, any>>(
+/**
+ * Merge component props, theme's default props and fallback/default props into a single props object.
+ * @param component The component to look at for default props in the theme.
+ * @param defaultProps The fallback/default props.
+ * @param props The component props.
+ */
+export function useThemeDefaultProps<T extends Record<string, any>>(
   component: string,
   defaultProps: Partial<T>,
   props: T

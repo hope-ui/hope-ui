@@ -7,7 +7,7 @@ import {
   mapResponsive,
   PartsOf,
   ResponsiveValue,
-  useComponentDefaultProps,
+  useThemeDefaultProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 
@@ -21,46 +21,43 @@ export interface AspectRatioStylesParams {
   ratio: ResponsiveValue<number>;
 }
 
-const useStyles = createStyles({
-  component: "AspectRatio",
-  styles: (theme, params: AspectRatioStylesParams) => ({
-    root: {
-      position: "relative",
-      maxWidth: "100%",
+const useStyles = createStyles((theme, params: AspectRatioStylesParams) => ({
+  root: {
+    position: "relative",
+    maxWidth: "100%",
 
-      "&::before": {
-        content: '""',
-        height: 0,
-        display: "block",
-        paddingBottom: mapResponsive(params.ratio, r => `${(1 / r) * 100}%`),
-      },
-
-      "&::after": {
-        content: '""',
-        display: "table",
-        clear: "both",
-      },
-
-      "& > *:not(style)": {
-        overflow: "hidden",
-        position: "absolute",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        height: "100%",
-      },
-
-      "& > img, & > video": {
-        objectFit: "cover",
-      },
+    "&::before": {
+      content: '""',
+      height: 0,
+      display: "block",
+      paddingBottom: mapResponsive(params.ratio, r => `${(1 / r) * 100}%`),
     },
-  }),
-});
+
+    "&::after": {
+      content: '""',
+      display: "table",
+      clear: "both",
+    },
+
+    "& > *:not(style)": {
+      overflow: "hidden",
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      height: "100%",
+    },
+
+    "& > img, & > video": {
+      objectFit: "cover",
+    },
+  },
+}));
 
 export type AspectRatioParts = PartsOf<typeof useStyles>;
 
@@ -78,7 +75,7 @@ export type AspectRatioTheme = ComponentTheme<
  * to a desired aspect ratio.
  */
 export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(props => {
-  props = useComponentDefaultProps(
+  props = useThemeDefaultProps(
     "AspectRatio",
     {
       ratio: 4 / 3,
@@ -88,13 +85,9 @@ export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(p
 
   const [local, others] = splitDefaultProps(props, ["class", "ratio"]);
 
-  const { styles, getStaticClass } = useStyles(local);
+  const { styles } = useStyles(local, "AspectRatio");
 
   return (
-    <hope.div
-      class={clsx(getStaticClass("root"), local.class)}
-      __baseStyle={styles().root}
-      {...others}
-    />
+    <hope.div class={clsx("hope-aspect-ratio", local.class)} __css={styles().root} {...others} />
   );
 });

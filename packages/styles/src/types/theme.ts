@@ -1,5 +1,5 @@
 import type { DeepPartial } from "./deep-partial";
-import { PartialStyles } from "./styles";
+import { PartialStylesInterpolation } from "./styles";
 import { ThemeBase, ThemeOther } from "./theme-base";
 
 export interface ComponentTheme<
@@ -14,7 +14,7 @@ export interface ComponentTheme<
    * Styles that will be merged with the "base styles" of the component.
    * Mostly used to override/add additional styles.
    */
-  styles?: PartialStyles<ComponentParts, StylesParams>;
+  styles?: PartialStylesInterpolation<ComponentParts, StylesParams>;
 }
 
 export interface Theme extends ThemeBase {
