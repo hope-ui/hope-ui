@@ -1,7 +1,7 @@
 import { ClassProp } from "@hope-ui/utils";
 
 import { SxProp, SystemStyleObject, SystemStyleProps } from "./styled-system";
-import { UseStylesOptions } from "./styles";
+import { PartialStylesInterpolation } from "./styles";
 
 /** Hope UI specific props. */
 export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
@@ -13,8 +13,16 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
 }
 
 /** Props of components that should supports the `Styles API` and `system style` props. */
-export type DefaultProps<
-  ComponentParts extends string = string,
-  StylesParams extends Record<string, any> = any
-> = Omit<HopeProps, "__baseStyle"> &
-  Pick<UseStylesOptions<ComponentParts, StylesParams>, "styles" | "unstyled">;
+export interface DefaultProps<
+  ComponentParts extends string = never,
+  StylesParams extends Record<string, any> = never
+> extends Omit<HopeProps, "__baseStyle"> {
+  /**
+   * Styles that will be merged with the "base styles" created by the `createStyles` call.
+   * Mostly used to override/add additional styles.
+   */
+  styles?: PartialStylesInterpolation<ComponentParts, StylesParams>;
+
+  /** Whether the base styles should be applied or not. */
+  unstyled?: boolean;
+}

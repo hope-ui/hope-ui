@@ -7,7 +7,7 @@ import {
   mapResponsive,
   PartsOf,
   ResponsiveValue,
-  useThemeDefaultProps,
+  useComponentDefaultProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 
@@ -54,7 +54,7 @@ export type ContainerTheme = ComponentTheme<ContainerProps, ContainerParts, Cont
  *  By default, it sets `margin-left` and `margin-right` to `auto`, to keep its content centered.
  */
 export const Container = createPolymorphicComponent<"div", ContainerProps>(props => {
-  props = useThemeDefaultProps(
+  props = useComponentDefaultProps(
     "Container",
     {
       isCentered: true,
@@ -65,7 +65,7 @@ export const Container = createPolymorphicComponent<"div", ContainerProps>(props
 
   const [local, others] = splitDefaultProps(props, ["class", "isCentered", "centerContent"]);
 
-  const { styles } = useStyles(local, "Container");
+  const { styles } = useStyles(local as ContainerStylesParams, { name: "Container" });
 
   return <hope.div class={clsx("hope-container", local.class)} __css={styles().root} {...others} />;
 });

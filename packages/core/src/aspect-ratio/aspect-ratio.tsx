@@ -7,7 +7,7 @@ import {
   mapResponsive,
   PartsOf,
   ResponsiveValue,
-  useThemeDefaultProps,
+  useComponentDefaultProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 
@@ -75,17 +75,15 @@ export type AspectRatioTheme = ComponentTheme<
  * to a desired aspect ratio.
  */
 export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(props => {
-  props = useThemeDefaultProps(
-    "AspectRatio",
-    {
-      ratio: 4 / 3,
-    },
-    props
-  );
+  props = useComponentDefaultProps("AspectRatio", { ratio: 4 / 3 }, props);
 
   const [local, others] = splitDefaultProps(props, ["class", "ratio"]);
 
-  const { styles } = useStyles(local, "AspectRatio");
+  const { styles } = useStyles(local as AspectRatioStylesParams, {
+    name: "AspectRatio",
+    styles: () => local.styles,
+    unstyled: () => local.unstyled,
+  });
 
   return (
     <hope.div class={clsx("hope-aspect-ratio", local.class)} __css={styles().root} {...others} />

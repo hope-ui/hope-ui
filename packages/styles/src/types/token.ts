@@ -5,35 +5,15 @@ export type Shade = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 export type ThemeColorPalette = Record<Shade, string>;
 
 export type ThemeColor =
-  // semantic colors
+  | "whiteAlpha"
+  | "blackAlpha"
+  | "dark"
   | "primary"
   | "neutral"
   | "success"
   | "info"
   | "warning"
   | "danger"
-  // additional colors
-  | "slate"
-  | "gray"
-  | "zinc"
-  | "stone"
-  | "red"
-  | "orange"
-  | "amber"
-  | "yellow"
-  | "lime"
-  | "green"
-  | "emerald"
-  | "teal"
-  | "cyan"
-  | "sky"
-  | "blue"
-  | "indigo"
-  | "violet"
-  | "purple"
-  | "fuchsia"
-  | "pink"
-  | "rose"
   | (string & {});
 
 export type ThemeColorShade = Prefixed<ThemeColor, Prefixed<".", Shade>>;

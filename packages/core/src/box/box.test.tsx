@@ -6,7 +6,7 @@ import {
   itSupportsStyle,
 } from "@hope-ui/tests";
 
-import { Box } from "../../src";
+import { Box } from "./box";
 
 const defaultProps = {};
 

@@ -39,7 +39,7 @@ export function useThemeStyles(component?: string): Accessor<PartialStylesInterp
  * @param defaultProps The fallback/default props.
  * @param props The component props.
  */
-export function useThemeDefaultProps<T extends Record<string, any>>(
+export function useComponentDefaultProps<T extends Record<string, any>>(
   component: string,
   defaultProps: Partial<T>,
   props: T

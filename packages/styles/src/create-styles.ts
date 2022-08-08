@@ -4,7 +4,7 @@ import { createMemo, createUniqueId } from "solid-js";
 
 import { useTheme, useThemeStyles } from "./theme/theme-provider";
 import type {
-  GetClass,
+  GetStaticClass,
   PartialStylesInterpolation,
   StylesInterpolation,
   StylesObject,
@@ -18,43 +18,40 @@ function extractStyles<ComponentParts extends string, StylesParams extends Recor
   styles: PartialStylesInterpolation<ComponentParts, StylesParams> | undefined,
   theme: Theme,
   params: StylesParams,
-  getClass: GetClass<ComponentParts>
+  getStaticClass: GetStaticClass<ComponentParts>
 ): Partial<StylesObject<ComponentParts>> {
   if (isFunction(styles)) {
-    return styles(theme, params ?? ({} as StylesParams), getClass);
+    return styles(theme, params ?? ({} as StylesParams), getStaticClass);
   }
 
   return styles ?? {};
 }
 
 /** Create a `useStyles` primitive to use inside a component. */
-export function createStyles<
-  ComponentParts extends string = string,
-  StylesParams extends Record<string, any> = any
->(styles: StylesInterpolation<ComponentParts, StylesParams>) {
+export function createStyles<ComponentParts extends string = string, StylesParams = void>(
+  styles: StylesInterpolation<ComponentParts, StylesParams>
+) {
   const uniqueId = createUniqueId();
 
-  const getClass: GetClass<ComponentParts> = part => {
-    return `__hope-${uniqueId}-${part}`;
+  const getStaticClass: GetStaticClass<ComponentParts> = part => {
+    return `hope-${uniqueId}-${part}`;
   };
 
   const extractBaseStyles = typeof styles === "function" ? styles : () => styles;
 
   function useStyles(
-    options?: UseStylesOptions<ComponentParts, StylesParams>,
-    themeKey?: string
+    params: StylesParams,
+    options?: UseStylesOptions<ComponentParts, StylesParams>
   ): UseStylesReturn<ComponentParts> {
     const theme = useTheme();
-    const themeStyles = useThemeStyles(themeKey);
+    const themeStyles = useThemeStyles(options?.name);
 
     const styles = createMemo(() => {
-      const { styles, unstyled, ...stylesParams } = options ?? {};
+      const { styles, unstyled } = options ?? {};
 
-      const params = stylesParams as StylesParams;
-
-      const baseStyleObject = extractBaseStyles(theme(), params, getClass);
-      const themeStyleObject = extractStyles(themeStyles(), theme(), params, getClass);
-      const propStyleObject = extractStyles(styles, theme(), params, getClass);
+      const baseStyleObject = extractBaseStyles(theme(), params, getStaticClass);
+      const themeStyleObject = extractStyles(themeStyles(), theme(), params, getStaticClass);
+      const propStyleObject = extractStyles(styles?.(), theme(), params, getStaticClass);
 
       const parts = Object.keys(baseStyleObject) as ComponentParts[];
 
@@ -62,7 +59,7 @@ export function createStyles<
         parts.map(key => {
           const mergedStyleObject = mergeWith(
             {},
-            !unstyled ? baseStyleObject[key] : {},
+            !unstyled?.() ? baseStyleObject[key] : {},
             themeStyleObject[key] ?? {},
             propStyleObject[key] ?? {}
           );
@@ -72,7 +69,7 @@ export function createStyles<
       ) as Record<ComponentParts, SystemStyleObject>;
     });
 
-    return { styles, getClass };
+    return { styles, getStaticClass };
   }
 
   return useStyles;
