@@ -2,52 +2,10 @@ import { isObject, runIfFn } from "@hope-ui/utils";
 import mergeWith from "lodash.mergewith";
 
 import { CSSObject } from "../stitches.config";
-import {
-  BaseSystemStyleProps,
-  PseudoSelectorProps,
-  Shade,
-  SystemStyleObject,
-  Theme,
-  ThemeColor,
-  ThemeScale,
-} from "../types";
-import { px } from "../utils/breakpoint";
+import { BaseSystemStyleProps, PseudoSelectorProps, SystemStyleObject, Theme } from "../types";
 import { expandResponsive } from "./expand-responsive";
 import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
-
-/** Get a color value from theme if the token exist, return the token otherwise. */
-function resolveColorTokenValue(token: string, theme: Theme) {
-  const parts = token.split(".");
-
-  if (parts.length !== 2) {
-    return token;
-  }
-
-  const [color, shade] = parts as [ThemeColor, Shade];
-
-  return theme.colors[color]?.[shade] ?? token;
-}
-
-/** Get a value from theme if the token exist, return the token otherwise. */
-function resolveTokenValue(
-  token: string | number | null | undefined,
-  scale: keyof ThemeScale,
-  theme: Theme
-) {
-  if (token == null) {
-    return undefined;
-  }
-
-  if (scale === "colors") {
-    return resolveColorTokenValue(String(token), theme);
-  }
-
-  if (scale === "space" || scale === "sizes" || scale === "radii") {
-    return theme[scale][String(token)] ?? px(token);
-  }
-
-  return theme[scale][String(token)] ?? token;
-}
+import { resolveTokenValue } from "./resolve-token-value";
 
 /** Return a CSSObject from a system style object. */
 export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme): CSSObject {

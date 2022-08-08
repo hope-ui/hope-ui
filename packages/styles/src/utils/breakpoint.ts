@@ -70,6 +70,12 @@ export function toMediaQueryString(min: string | null, max?: string) {
   return query.join(" ");
 }
 
+/**
+ * Converts the object responsive syntax to array syntax.
+ *
+ * @example
+ * objectToArrayNotation({ base: 1, sm: 2, md: 3 }) // => [1, 2, 3]
+ */
 export function objectToArrayNotation(obj: Dict, breakpoints: string[]) {
   const result = breakpoints.map(bp => obj[bp] ?? null);
 
@@ -80,6 +86,12 @@ export function objectToArrayNotation(obj: Dict, breakpoints: string[]) {
   return result;
 }
 
+/**
+ * Converts the array responsive syntax to object syntax.
+ *
+ * @example
+ * arrayToObjectNotation([1, 2, 3]) // => { base: 1, sm: 2, md: 3 }
+ */
 export function arrayToObjectNotation(values: any[], breakpoints: string[]) {
   const result = {} as Dict;
 

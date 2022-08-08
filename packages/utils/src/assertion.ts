@@ -24,6 +24,10 @@ export function isEmptyObject(value: any) {
   return isObject(value) && Object.keys(value).length === 0;
 }
 
+export function isNull(value: any): value is null {
+  return value == null;
+}
+
 // Function assertions
 export function isFunction<T extends Function = Function>(value: any): value is T {
   return typeof value === "function";
