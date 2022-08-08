@@ -11,7 +11,7 @@ import { Flex, FlexProps } from "./flex";
 
 const defaultProps: FlexProps = {};
 
-describe("Container", () => {
+describe("Flex", () => {
   itIsPolymorphic(Flex as any, defaultProps);
   itRendersChildren(Flex as any, defaultProps);
   itSupportsClass(Flex as any, defaultProps);
