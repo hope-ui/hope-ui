@@ -1,28 +1,65 @@
 import { isObject, runIfFn } from "@hope-ui/utils";
-import mergeWith from "lodash.mergewith";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps, SystemStyleObject, Theme } from "../types";
-import { expandResponsive } from "./expand-responsive";
 import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
 import { resolveTokenValue } from "./resolve-token-value";
 
 /** Return a CSSObject from a system style object. */
 export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme): CSSObject {
-  const computedStyles: CSSObject = {};
+  let computedStyles: CSSObject = {};
 
-  const styles = expandResponsive(systemStyleObject)(theme);
+  if (!theme.__breakpoints) {
+    return computedStyles;
+  }
 
-  for (let propertyName in styles) {
-    const valueOrFn = styles[propertyName];
+  const { isResponsive, toArrayValue, media: medias } = theme.__breakpoints;
 
+  for (let key in systemStyleObject) {
     /**
      * allows the user to pass functional values.
      * boxShadow: theme => `0 2px 2px ${theme.colors.red["500"]}`
      */
-    let value = runIfFn(valueOrFn, theme);
+    let value = runIfFn(systemStyleObject[key], theme);
 
     if (value == null) {
+      continue;
+    }
+
+    /**
+     * Expands an array or object syntax responsive style.
+     * // { mx: [1, 2] }
+     * // or
+     * // { mx: { base: 1, sm: 2 } }
+     * // => { mx: 1, "@media(min-width:<sm>)": { mx: 2 } }
+     */
+    if (Array.isArray(value) || (isObject(value) && isResponsive(value))) {
+      let values = Array.isArray(value) ? value : toArrayValue(value);
+      values = values.slice(0, medias.length);
+
+      for (let index = 0; index < values.length; index++) {
+        const media = medias[index];
+        const val = values[index];
+
+        if (media) {
+          if (val == null) {
+            computedStyles[media] ??= {};
+          } else {
+            computedStyles[media] = Object.assign(
+              {},
+              computedStyles[media],
+              toCSSObject({ [key]: val }, theme)
+            );
+          }
+        } else {
+          computedStyles = Object.assign(
+            {},
+            computedStyles,
+            toCSSObject({ ...systemStyleObject, [key]: val }, theme)
+          );
+        }
+      }
+
       continue;
     }
 
@@ -30,11 +67,11 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
      * converts pseudo shorthands to valid selector.
      * "_hover" => "&:hover"
      */
-    if (propertyName.startsWith("_")) {
-      propertyName = PSEUDO_SELECTORS_MAP[propertyName as keyof PseudoSelectorProps];
+    if (key.startsWith("_")) {
+      key = PSEUDO_SELECTORS_MAP[key as keyof PseudoSelectorProps];
     }
 
-    if (propertyName == null) {
+    if (key == null) {
       continue;
     }
 
@@ -43,11 +80,10 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
      * aka pseudo selectors and media queries.
      */
     if (isObject(value)) {
-      computedStyles[propertyName] = computedStyles[propertyName] ?? {};
-      computedStyles[propertyName] = mergeWith(
+      computedStyles[key] = Object.assign(
         {},
-        computedStyles[propertyName],
-        toCSSObject(value, theme)
+        computedStyles[key],
+        toCSSObject(value as any, theme)
       );
       continue;
     }
@@ -56,9 +92,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
      * converts style props shorthands to valid css properties.
      * "mx" => ["marginLeft", "marginRight"]
      */
-    const propertyNames = SHORTHANDS_MAP[propertyName as keyof BaseSystemStyleProps] ?? [
-      propertyName,
-    ];
+    const propertyNames = SHORTHANDS_MAP[key as keyof BaseSystemStyleProps] ?? [key];
 
     /**
      * apply same value to each css properties.
@@ -68,7 +102,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       const scale = theme.themeMap[propertyName];
 
       if (scale != null) {
-        value = resolveTokenValue(value, scale, theme);
+        value = resolveTokenValue(value as any, scale, theme);
       }
 
       computedStyles[propertyName] = value;

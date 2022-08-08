@@ -28,7 +28,7 @@ export function resolveTokenValue(
     return resolveColorTokenValue(String(token), theme);
   }
 
-  if (scale === "space" || scale === "sizes" || scale === "radii") {
+  if (scale === "fontSizes" || scale === "space" || scale === "sizes" || scale === "radii") {
     return theme[scale][String(token)] ?? px(token);
   }
 
