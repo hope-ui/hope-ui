@@ -21,26 +21,24 @@ export interface ContainerStylesParams {
   centerContent: boolean;
 }
 
-const useStyles = createStyles((theme, params: ContainerStylesParams) => {
-  return {
-    root: {
-      width: "100%",
-      maxWidth: {
-        sm: theme.breakpoints.sm,
-        md: theme.breakpoints.md,
-        lg: theme.breakpoints.lg,
-        xl: theme.breakpoints.xl,
-        "2xl": theme.breakpoints["2xl"],
-      },
-      mx: mapResponsive(params.isCentered, isCentered => (isCentered ? "auto" : undefined)),
-      ...(params.centerContent && {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }),
+const useStyles = createStyles((theme, params: ContainerStylesParams) => ({
+  root: {
+    width: "100%",
+    maxWidth: {
+      sm: theme.breakpoints.sm,
+      md: theme.breakpoints.md,
+      lg: theme.breakpoints.lg,
+      xl: theme.breakpoints.xl,
+      "2xl": theme.breakpoints["2xl"],
     },
-  };
-});
+    mx: mapResponsive(params.isCentered, isCentered => (isCentered ? "auto" : undefined)),
+    ...(params.centerContent && {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+    }),
+  },
+}));
 
 export type ContainerParts = PartsOf<typeof useStyles>;
 
@@ -65,7 +63,11 @@ export const Container = createPolymorphicComponent<"div", ContainerProps>(props
 
   const [local, others] = splitDefaultProps(props, ["class", "isCentered", "centerContent"]);
 
-  const { styles } = useStyles(local as ContainerStylesParams, { name: "Container" });
+  const { styles } = useStyles(local as ContainerStylesParams, {
+    name: "Container",
+    styles: () => local.styles,
+    unstyled: () => local.unstyled,
+  });
 
   return <hope.div class={clsx("hope-container", local.class)} __css={styles().root} {...others} />;
 });

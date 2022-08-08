@@ -35,9 +35,11 @@ export function useThemeStyles(component?: string): Accessor<PartialStylesInterp
 
 /**
  * Merge component props, theme's default props and fallback/default props into a single props object.
- * @param component The component to look at for default props in the theme.
+ * @param component The component to look for default props in the theme.
  * @param defaultProps The fallback/default props.
  * @param props The component props.
+ * @example
+ * // mergedProps = defaultProps <== themeProps <== props
  */
 export function useComponentDefaultProps<T extends Record<string, any>>(
   component: string,
