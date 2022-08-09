@@ -12,8 +12,8 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
   __css?: SystemStyleObject;
 }
 
-/** Props of components that should supports the `Styles API` and `system style` props. */
-export interface DefaultProps<
+/** Props of components that supports the `Styles API` and `system style` props. */
+export interface UseStylesProps<
   ComponentParts extends string = never,
   StylesParams extends Record<string, any> = never
 > extends Omit<HopeProps, "__css"> {

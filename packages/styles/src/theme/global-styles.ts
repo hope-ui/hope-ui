@@ -5,13 +5,13 @@ import { COLOR_MODE_CLASSNAMES } from "../utils";
 export function globalStyles(theme: ThemeBase) {
   const styles = globalCss({
     ":root": {
-      "--hope-colors-background-body": "white",
-      "--hope-colors-text": theme.colors.gray["800"],
+      "--hope-colors-body-background": "white",
+      "--hope-colors-body-text": theme.colors.neutral["800"],
     },
 
     [`.${COLOR_MODE_CLASSNAMES.dark}`]: {
-      "--hope-colors-background-body": theme.colors.gray["900"],
-      "--hope-colors-text": theme.colors.gray["100"],
+      "--hope-colors-body-background": theme.colors.neutral["900"],
+      "--hope-colors-body-text": theme.colors.neutral["100"],
     },
 
     "*, ::before, ::after": {
@@ -28,8 +28,8 @@ export function globalStyles(theme: ThemeBase) {
 
     body: {
       margin: 0,
-      backgroundColor: "var(--hope-colors-background-body)",
-      color: "var(--hope-colors-text)",
+      backgroundColor: "var(--hope-colors-body-background)",
+      color: "var(--hope-colors-body-text)",
       fontFamily: "inherit",
       lineHeight: "inherit",
       WebkitFontSmoothing: "antialiased",

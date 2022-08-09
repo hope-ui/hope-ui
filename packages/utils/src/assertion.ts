@@ -14,6 +14,11 @@ export function isEmptyArray(value: any) {
   return isArray(value) && value.length === 0;
 }
 
+// Function assertions
+export function isFunction<T extends Function = Function>(value: any): value is T {
+  return typeof value === "function";
+}
+
 // Object assertions
 export function isObject(value: any): value is Dict {
   const type = typeof value;
@@ -28,7 +33,7 @@ export function isNull(value: any): value is null {
   return value == null;
 }
 
-// Function assertions
-export function isFunction<T extends Function = Function>(value: any): value is T {
-  return typeof value === "function";
+// String assertions
+export function isString(value: any): value is string {
+  return Object.prototype.toString.call(value) === "[object String]";
 }

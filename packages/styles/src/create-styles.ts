@@ -11,8 +11,11 @@ import type {
   SystemStyleObject,
   Theme,
   UseStylesOptions,
+  UseStylesProps,
   UseStylesReturn,
 } from "./types";
+
+export const USE_STYLES_PROPS: Array<keyof UseStylesProps> = ["styles", "unstyled"];
 
 function extractStyles<ComponentParts extends string, StylesParams extends Record<string, any>>(
   styles: PartialStylesInterpolation<ComponentParts, StylesParams> | undefined,
@@ -38,18 +41,20 @@ export function createStyles<ComponentParts extends string = string, StylesParam
   const extractBaseStyles = typeof styles === "function" ? styles : () => styles;
 
   function useStyles(
-    params: StylesParams,
-    options?: UseStylesOptions<ComponentParts, StylesParams>
+    options: UseStylesOptions<ComponentParts, StylesParams>,
+    name?: string
   ): UseStylesReturn<ComponentParts> {
     const theme = useTheme();
-    const themeStyles = useThemeStyles(options?.name);
+    const themeStyles = useThemeStyles(name);
 
     const styles = createMemo(() => {
-      const { styles, unstyled } = options ?? {};
+      const { styles, unstyled, ...stylesParams } = options ?? {};
+
+      const params = stylesParams as StylesParams;
 
       const baseStyleObject = extractBaseStyles(theme, params, getStaticClass);
       const themeStyleObject = extractStyles(themeStyles(), theme, params, getStaticClass);
-      const propStyleObject = extractStyles(styles?.(), theme, params, getStaticClass);
+      const propStyleObject = extractStyles(styles, theme, params, getStaticClass);
 
       const parts = Object.keys(baseStyleObject) as ComponentParts[];
 
@@ -57,7 +62,7 @@ export function createStyles<ComponentParts extends string = string, StylesParam
         parts.map(key => {
           const mergedStyleObject = mergeWith(
             {},
-            !unstyled?.() ? baseStyleObject[key] : {},
+            !unstyled ? baseStyleObject[key] : {},
             themeStyleObject[key] ?? {},
             propStyleObject[key] ?? {}
           );

@@ -770,6 +770,12 @@ export type PseudoSelectorProps = Partial<{
   _disabled: PseudoSelectorValue;
 
   /**
+   * Styles to apply when the ARIA attribute `aria-invalid` is `true`
+   * - CSS selector `&[aria-invalid=true]`
+   */
+  _invalid: PseudoSelectorValue;
+
+  /**
    * Styles for CSS selector `&::before`
    *
    * NOTE:When using this, ensure the `content` is wrapped in a backtick.
@@ -791,6 +797,24 @@ export type PseudoSelectorProps = Partial<{
    */
   _after: PseudoSelectorValue;
 
+  /** Styles for CSS Selector `&:nth-child(even)`. */
+  _even: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:nth-child(odd)`. */
+  _odd: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:first-of-type`. */
+  _first: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:last-of-type`. */
+  _last: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:not(:first-of-type)`. */
+  _notFirst: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:not(:last-of-type)`. */
+  _notLast: PseudoSelectorValue;
+
   /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is hovered. */
   _groupHover: PseudoSelectorValue;
 
@@ -809,6 +833,9 @@ export type PseudoSelectorProps = Partial<{
   /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is disabled. */
   _groupDisabled: PseudoSelectorValue;
 
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is invalid. */
+  _groupInvalid: PseudoSelectorValue;
+
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is hovered. */
   _peerHover: PseudoSelectorValue;
 
@@ -826,6 +853,15 @@ export type PseudoSelectorProps = Partial<{
 
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is disabled. */
   _peerDisabled: PseudoSelectorValue;
+
+  /** Styles to apply when a sibling element with `.peer` or `data-peer` is invalid. */
+  _peerInvalid: PseudoSelectorValue;
+
+  /** Styles for when dark theme is applied to any parent of this component or element. */
+  _dark: PseudoSelectorValue;
+
+  /** Styles for when light theme is applied to any parent of this component or element. */
+  _light: PseudoSelectorValue;
 }>;
 
 export type SystemStyleProps = BaseSystemStyleProps & PseudoSelectorProps;

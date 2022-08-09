@@ -36,18 +36,15 @@ export type PartialStylesInterpolation<
 export type UseStylesOptions<
   ComponentParts extends string,
   StylesParams extends Record<string, any>
-> = {
-  /** The name of the component to look for in the theme. */
-  name?: string;
-
+> = Partial<StylesParams> & {
   /**
    * Styles that will be merged with the "base styles" created by the `createStyles` call.
    * Mostly used to override/add additional styles.
    */
-  styles?: Accessor<PartialStylesInterpolation<ComponentParts, StylesParams> | undefined>;
+  styles?: PartialStylesInterpolation<ComponentParts, StylesParams>;
 
   /** Whether the base styles should be applied or not. */
-  unstyled?: Accessor<boolean | undefined>;
+  unstyled?: boolean;
 };
 
 export interface UseStylesReturn<ComponentParts extends string> {
