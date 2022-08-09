@@ -6,8 +6,8 @@ import { ThemeBase } from "./theme-base";
 /** An object of component parts/style. */
 export type StylesObject<ComponentParts extends string> = Record<ComponentParts, SystemStyleObject>;
 
-/** Return a unique css class for a given component part. */
-export type GetStaticClass<ComponentParts extends string> = (part: ComponentParts) => string;
+/** Return a static css class. */
+export type GetStaticClass = (suffix: string) => string;
 
 /** An object or function that returns a styles object. */
 export type StylesInterpolation<
@@ -18,7 +18,7 @@ export type StylesInterpolation<
   | ((
       theme: ThemeBase,
       params: StylesParams,
-      getStaticClass: GetStaticClass<ComponentParts>
+      getStaticClass: GetStaticClass
     ) => StylesObject<ComponentParts>);
 
 /** An object or function that returns a partial styles object. */
@@ -30,7 +30,7 @@ export type PartialStylesInterpolation<
   | ((
       theme: ThemeBase,
       params: StylesParams,
-      getStaticClass: GetStaticClass<ComponentParts>
+      getStaticClass: GetStaticClass
     ) => Partial<StylesObject<ComponentParts>>);
 
 export type UseStylesOptions<
@@ -55,9 +55,9 @@ export interface UseStylesReturn<ComponentParts extends string> {
   styles: Accessor<StylesObject<ComponentParts>>;
 
   /**
-   * Return a static css class for a given component part.
+   * Return a static css class.
    * @example
    * // getStaticClass("leftIcon") => "hope-cl-0-leftIcon"
    */
-  getStaticClass: GetStaticClass<ComponentParts>;
+  getStaticClass: GetStaticClass;
 }

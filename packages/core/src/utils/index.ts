@@ -1,1 +1,1 @@
-export * from "./split-default-props";
+export * from "./merge-default-props";

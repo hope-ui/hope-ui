@@ -16,7 +16,7 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
 export interface DefaultProps<
   ComponentParts extends string = never,
   StylesParams extends Record<string, any> = never
-> extends Omit<HopeProps, "__baseStyle"> {
+> extends Omit<HopeProps, "__css"> {
   /**
    * Styles that will be merged with the "base styles" created by the `createStyles` call.
    * Mostly used to override/add additional styles.

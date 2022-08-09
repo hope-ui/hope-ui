@@ -1,7 +1,8 @@
-import { createPolymorphicComponent, hope, SystemStyleProps } from "@hope-ui/styles";
+import { createPolymorphicComponent, hope, HopeProps, SystemStyleProps } from "@hope-ui/styles";
+import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface FlexProps {
+export interface FlexProps extends HopeProps {
   /** Shorthand for `flexDirection` style prop. */
   direction?: SystemStyleProps["flexDirection"];
 
@@ -20,10 +21,11 @@ export interface FlexProps {
  * It renders a `div` with `display: flex` and comes with helpful style shorthand.
  */
 export const Flex = createPolymorphicComponent<"div", FlexProps>(props => {
-  const [local, others] = splitProps(props, ["direction", "align", "justify", "wrap"]);
+  const [local, others] = splitProps(props, ["class", "direction", "align", "justify", "wrap"]);
 
   return (
     <hope.div
+      class={clsx("hope-flex", local.class)}
       __css={{
         display: "flex",
         flexDirection: local.direction,

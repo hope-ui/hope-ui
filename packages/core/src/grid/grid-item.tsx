@@ -1,14 +1,17 @@
 import {
   createPolymorphicComponent,
   hope,
+  HopeProps,
   mapResponsive,
   ResponsiveValue,
+  SystemStyleObject,
   SystemStyleProps,
 } from "@hope-ui/styles";
 import { filterUndefined } from "@hope-ui/utils";
+import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface GridItemProps {
+export interface GridItemProps extends HopeProps {
   /** Shorthand prop for `gridArea`. */
   area?: SystemStyleProps["gridArea"];
 
@@ -31,17 +34,13 @@ export interface GridItemProps {
   rowEnd?: ResponsiveValue<number | "auto">;
 }
 
-/** Utility function to apply a column or row span to the `GridItem`. */
-function spanFn(span?: ResponsiveValue<number | "auto">) {
-  return mapResponsive(span, value => (value === "auto" ? "auto" : `span ${value}/span ${value}`));
-}
-
 /**
  * `GridItem` is used as a child of `Grid` to control the span,
  * start and end positions within the grid.
  */
 export const GridItem = createPolymorphicComponent<"div", GridItemProps>(props => {
   const [local, others] = splitProps(props, [
+    "class",
     "area",
     "colSpan",
     "colStart",
@@ -53,7 +52,8 @@ export const GridItem = createPolymorphicComponent<"div", GridItemProps>(props =
 
   return (
     <hope.div
-      __css={filterUndefined({
+      class={clsx("hop-grid-item", local.class)}
+      __css={filterUndefined<SystemStyleObject>({
         gridArea: local.area,
         gridColumn: spanFn(local.colSpan),
         gridRow: spanFn(local.rowSpan),
@@ -66,3 +66,8 @@ export const GridItem = createPolymorphicComponent<"div", GridItemProps>(props =
     />
   );
 });
+
+/** Utility function to apply a column or row span to the `GridItem`. */
+function spanFn(span?: ResponsiveValue<number | "auto">) {
+  return mapResponsive(span, value => (value === "auto" ? "auto" : `span ${value}/span ${value}`));
+}

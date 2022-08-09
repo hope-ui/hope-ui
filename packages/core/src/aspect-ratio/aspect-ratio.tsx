@@ -1,91 +1,63 @@
 import {
-  ComponentTheme,
   createPolymorphicComponent,
-  createStyles,
-  DefaultProps,
   hope,
+  HopeProps,
   mapResponsive,
-  PartsOf,
   ResponsiveValue,
-  useComponentDefaultProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
+import { splitProps } from "solid-js";
 
-import { splitDefaultProps } from "../utils";
+import { mergeDefaultProps } from "../utils";
 
-export interface AspectRatioStylesParams {
+export interface AspectRatioProps extends HopeProps {
   /**
    * The aspect ratio of the Box.
    * Common values are: `21/9`, `16/9`, `9/16`, `4/3`, `1.85/1`
    */
-  ratio: ResponsiveValue<number>;
+  ratio?: ResponsiveValue<number>;
 }
-
-const useStyles = createStyles((theme, params: AspectRatioStylesParams) => ({
-  root: {
-    position: "relative",
-    maxWidth: "100%",
-
-    "&::before": {
-      content: '""',
-      height: 0,
-      display: "block",
-      paddingBottom: mapResponsive(params.ratio, r => `${(1 / r) * 100}%`),
-    },
-
-    "&::after": {
-      content: '""',
-      display: "table",
-      clear: "both",
-    },
-
-    "& > *:not(style)": {
-      overflow: "hidden",
-      position: "absolute",
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "100%",
-      height: "100%",
-    },
-
-    "& > img, & > video": {
-      objectFit: "cover",
-    },
-  },
-}));
-
-export type AspectRatioParts = PartsOf<typeof useStyles>;
-
-export type AspectRatioProps = DefaultProps<AspectRatioParts, AspectRatioStylesParams> &
-  Partial<AspectRatioStylesParams>;
-
-export type AspectRatioTheme = ComponentTheme<
-  AspectRatioProps,
-  AspectRatioParts,
-  AspectRatioStylesParams
->;
 
 /**
  * `AspectRatio` is used to cropping media (videos, images and maps)
  * to a desired aspect ratio.
  */
 export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(props => {
-  props = useComponentDefaultProps("AspectRatio", { ratio: 4 / 3 }, props);
+  props = mergeDefaultProps(
+    {
+      ratio: 4 / 3,
+    },
+    props
+  );
 
-  const [local, others] = splitDefaultProps(props, ["class", "ratio"]);
-
-  const { styles } = useStyles(local as AspectRatioStylesParams, {
-    name: "AspectRatio",
-    styles: () => local.styles,
-    unstyled: () => local.unstyled,
-  });
+  const [local, others] = splitProps(props, ["class", "ratio"]);
 
   return (
-    <hope.div class={clsx("hope-aspect-ratio", local.class)} __css={styles().root} {...others} />
+    <hope.div
+      class={clsx("hope-aspect-ratio", local.class)}
+      __css={{
+        position: "relative",
+        maxWidth: "100%",
+        "&::before": {
+          content: '""',
+          height: 0,
+          display: "block",
+          paddingBottom: mapResponsive(local.ratio, r => `${(1 / r) * 100}%`),
+        },
+        "& > *:not(style)": {
+          overflow: "hidden",
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          boxSize: "100%",
+        },
+        "& > img, & > video": {
+          objectFit: "cover",
+        },
+      }}
+      {...others}
+    />
   );
 });

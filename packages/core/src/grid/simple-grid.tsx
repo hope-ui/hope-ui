@@ -12,17 +12,6 @@ import { splitProps } from "solid-js";
 
 import { Grid, GridProps } from "./grid";
 
-function widthToColumns(width: any, theme: Theme) {
-  return mapResponsive(width, value => {
-    const _value = resolveTokenValue(value, "sizes", theme);
-    return isNull(value) ? null : `repeat(auto-fit, minmax(${_value}, 1fr))`;
-  });
-}
-
-function countToColumns(count: any) {
-  return mapResponsive(count, value => (isNull(value) ? null : `repeat(${value}, minmax(0, 1fr))`));
-}
-
 export interface SimpleGridProps extends GridProps {
   /**
    * The width at which child elements will break into columns.
@@ -53,3 +42,14 @@ export const SimpleGrid = createPolymorphicComponent<"div", SimpleGridProps>(pro
 
   return <Grid templateColumns={templateColumns()} {...others} />;
 });
+
+function widthToColumns(width: any, theme: Theme) {
+  return mapResponsive(width, value => {
+    const _value = resolveTokenValue(value, "sizes", theme);
+    return isNull(value) ? null : `repeat(auto-fit, minmax(${_value}, 1fr))`;
+  });
+}
+
+function countToColumns(count: any) {
+  return mapResponsive(count, value => (isNull(value) ? null : `repeat(${value}, minmax(0, 1fr))`));
+}

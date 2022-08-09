@@ -1,7 +1,8 @@
-import { createPolymorphicComponent, hope, SystemStyleProps } from "@hope-ui/styles";
+import { createPolymorphicComponent, hope, HopeProps, SystemStyleProps } from "@hope-ui/styles";
+import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface GridProps {
+export interface GridProps extends HopeProps {
   /** Shorthand prop for `gridAutoFlow`. */
   autoFlow?: SystemStyleProps["gridAutoFlow"];
 
@@ -33,6 +34,7 @@ export interface GridProps {
  */
 export const Grid = createPolymorphicComponent<"div", GridProps>(props => {
   const [local, others] = splitProps(props, [
+    "class",
     "autoFlow",
     "autoColumns",
     "autoRows",
@@ -45,6 +47,7 @@ export const Grid = createPolymorphicComponent<"div", GridProps>(props => {
 
   return (
     <hope.div
+      class={clsx("hope-grid", local.class)}
       __css={{
         display: "grid",
         gridAutoFlow: local.autoFlow,

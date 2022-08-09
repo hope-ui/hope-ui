@@ -33,24 +33,30 @@ export function useThemeStyles(component?: string): Accessor<PartialStylesInterp
   });
 }
 
+interface MergeWithThemePropsParams<T extends Record<string, any>> {
+  /** The name of the component to look for in the theme. */
+  name: string;
+
+  /** The default props, will be overridden by theme and component props. */
+  defaultProps: Partial<T>;
+
+  /** The component `props` object. */
+  props: T;
+}
+
 /**
- * Merge component props, theme's default props and fallback/default props into a single props object.
- * @param component The component to look for default props in the theme.
- * @param defaultProps The fallback/default props.
- * @param props The component props.
+ * Merge default, theme and component props into a single props object.
  * @example
  * // mergedProps = defaultProps <== themeProps <== props
  */
-export function useComponentDefaultProps<T extends Record<string, any>>(
-  component: string,
-  defaultProps: Partial<T>,
-  props: T
+export function mergeWithThemeProps<T extends Record<string, any>>(
+  params: MergeWithThemePropsParams<T>
 ): T {
   const theme = useTheme();
 
-  const themeProps = () => theme().components[component]?.defaultProps ?? {};
+  const themeProps = () => theme().components[params.name]?.defaultProps ?? {};
 
-  return mergeProps(defaultProps, themeProps, props);
+  return mergeProps(params.defaultProps, themeProps, params.props);
 }
 
 export interface ThemeProviderProps extends ParentProps {

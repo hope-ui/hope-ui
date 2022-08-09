@@ -25,6 +25,6 @@ export function objectFilter<T extends Dict>(object: T, fn: FilterFn<T>) {
   return result;
 }
 
-export const filterUndefined = (object: Dict) => {
+export function filterUndefined<T = Dict>(object: T) {
   return objectFilter(object, val => val !== null && val !== undefined);
-};
+}

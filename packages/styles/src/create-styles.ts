@@ -18,7 +18,7 @@ function extractStyles<ComponentParts extends string, StylesParams extends Recor
   styles: PartialStylesInterpolation<ComponentParts, StylesParams> | undefined,
   theme: Theme,
   params: StylesParams,
-  getStaticClass: GetStaticClass<ComponentParts>
+  getStaticClass: GetStaticClass
 ): Partial<StylesObject<ComponentParts>> {
   if (isFunction(styles)) {
     return styles(theme, params ?? ({} as StylesParams), getStaticClass);
@@ -33,9 +33,7 @@ export function createStyles<ComponentParts extends string = string, StylesParam
 ) {
   const uniqueId = createUniqueId();
 
-  const getStaticClass: GetStaticClass<ComponentParts> = part => {
-    return `hope-${uniqueId}-${part}`;
-  };
+  const getStaticClass: GetStaticClass = suffix => `hope-${uniqueId}-${suffix}`;
 
   const extractBaseStyles = typeof styles === "function" ? styles : () => styles;
 

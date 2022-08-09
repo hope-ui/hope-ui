@@ -14,3 +14,4 @@ export * from "./container";
 export * from "./flex";
 export * from "./grid";
 export * from "./spacer";
+export * from "./stack";
