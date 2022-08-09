@@ -1,8 +1,7 @@
-import { CSSObject } from "../stitches.config";
-import { ThemeWithoutMetaData } from "../types";
+import { SystemStyleObject, ThemeWithoutMetaData } from "../types";
 
 export function focusStyles(theme: ThemeWithoutMetaData) {
-  return (): CSSObject => ({
+  return (): SystemStyleObject => ({
     WebkitTapHighlightColor: "transparent",
 
     "&:focus": {

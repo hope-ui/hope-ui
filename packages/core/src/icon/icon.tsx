@@ -3,7 +3,6 @@ import { ElementType, isString, OverrideProps } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
 
-import { Box } from "../box";
 import { mergeDefaultProps } from "../utils";
 
 const fallbackIcon = {
@@ -73,7 +72,7 @@ export const Icon = createPolymorphicComponent<"svg", IconProps>(props => {
         </hope.svg>
       }
     >
-      <Box as={local.as as ElementType} class={classes()} __css={styles()} {...others} />
+      <hope.div as={local.as as ElementType} class={classes()} __css={styles()} {...others} />
     </Show>
   );
 });

@@ -16,6 +16,7 @@ import {
   ThemeSpace,
   ThemeZIndice,
 } from "./token";
+import { SystemStyleObject } from "./styled-system";
 
 export type ThemeOther = Record<string, any>;
 
@@ -38,7 +39,7 @@ export interface ThemeScale {
 
 export interface ThemeFunctions {
   mode: <T>(lightValue: T, darkValue: T) => T;
-  focusStyles: () => CSSObject;
+  focusStyles: () => SystemStyleObject;
   rgba: (hexOrRgbColor: string, alpha: number) => string;
 }
 
