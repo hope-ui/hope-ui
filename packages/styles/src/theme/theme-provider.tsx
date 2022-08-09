@@ -1,12 +1,4 @@
-import {
-  Accessor,
-  createContext,
-  createMemo,
-  mergeProps,
-  onMount,
-  ParentProps,
-  useContext,
-} from "solid-js";
+import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { PartialStylesInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
@@ -15,7 +7,7 @@ import { cssVariables } from "./css-variables";
 import { DEFAULT_THEME } from "./default-theme";
 import { globalStyles } from "./global-styles";
 
-const ThemeContext = createContext<Accessor<Theme>>(() => DEFAULT_THEME);
+const ThemeContext = createContext<Theme>(DEFAULT_THEME);
 
 export function useTheme() {
   return useContext(ThemeContext);
@@ -29,7 +21,7 @@ export function useThemeStyles(component?: string): Accessor<PartialStylesInterp
       return {};
     }
 
-    return theme().components[component]?.styles ?? {};
+    return theme.components[component]?.styles ?? {};
   });
 }
 
@@ -49,12 +41,12 @@ interface MergeWithThemePropsParams<T extends Record<string, any>> {
  * @example
  * // mergedProps = defaultProps <== themeProps <== props
  */
-export function mergeWithThemeProps<T extends Record<string, any>>(
+export function mergeThemeProps<T extends Record<string, any>>(
   params: MergeWithThemePropsParams<T>
 ): T {
   const theme = useTheme();
 
-  const themeProps = () => theme().components[params.name]?.defaultProps ?? {};
+  const themeProps = () => theme.components[params.name]?.defaultProps ?? {};
 
   return mergeProps(params.defaultProps, themeProps, params.props);
 }
@@ -68,23 +60,14 @@ export interface ThemeProviderProps extends ParentProps {
 
   /** Whether Hope UI global styles should be applied. */
   withGlobalStyles?: boolean;
-
-  /** Whether the theme should inherit from its parent theme. */
-  inherit?: boolean;
 }
 
 export function ThemeProvider(props: ThemeProviderProps) {
-  const parentTheme = useTheme();
+  // We don't care about reactivity here, theme is set once and isn't intended to be dynamic.
+  const theme = mergeTheme(DEFAULT_THEME, props.theme);
 
-  const theme = createMemo(() => {
-    const themeOverride = props.inherit ? mergeProps(parentTheme, props.theme) : props.theme;
-    return mergeTheme(DEFAULT_THEME, themeOverride);
-  });
-
-  onMount(() => {
-    props.withGlobalStyles && globalStyles(theme());
-    props.withCSSVariables && cssVariables(theme());
-  });
+  props.withGlobalStyles && globalStyles(theme);
+  props.withCSSVariables && cssVariables(theme);
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
 }

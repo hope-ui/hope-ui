@@ -1,4 +1,4 @@
-import mergeWith from "lodash.mergewith";
+import { mergeWith } from "lodash-es";
 
 import { Theme, ThemeOverride } from "../types";
 import { attachMetaData } from "./attach-meta-data";

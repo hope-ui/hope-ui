@@ -42,11 +42,11 @@ export const Container = createPolymorphicComponent<"div", ContainerProps>(props
       __css={{
         width: "100%",
         maxWidth: {
-          sm: theme().breakpoints.sm,
-          md: theme().breakpoints.md,
-          lg: theme().breakpoints.lg,
-          xl: theme().breakpoints.xl,
-          "2xl": theme().breakpoints["2xl"],
+          sm: theme.breakpoints.sm,
+          md: theme.breakpoints.md,
+          lg: theme.breakpoints.lg,
+          xl: theme.breakpoints.xl,
+          "2xl": theme.breakpoints["2xl"],
         },
         mx: mapResponsive(local.isCentered, isCentered => (isCentered ? "auto" : undefined)),
         ...(local.centerContent && {

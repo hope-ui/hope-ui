@@ -16,13 +16,13 @@ export interface StackProps extends HopeProps {
   /** Shorthand for `flexWrap` style prop. */
   wrap?: SystemStyleProps["flexWrap"];
 
-  /** The space between each child on the X and Y axis. */
+  /** The gap between the stack items. */
   spacing?: SystemStyleProps["gap"];
 
-  /** The space between each child on the X axis. */
+  /** The column gap between the stack items. */
   spacingX?: SystemStyleProps["columnGap"];
 
-  /** The space between each child on the Y axis. */
+  /** The row gap between the stack items. */
   spacingY?: SystemStyleProps["rowGap"];
 }
 

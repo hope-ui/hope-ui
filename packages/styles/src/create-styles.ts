@@ -1,5 +1,5 @@
 import { isFunction } from "@hope-ui/utils";
-import mergeWith from "lodash.mergewith";
+import { mergeWith } from "lodash-es";
 import { createMemo, createUniqueId } from "solid-js";
 
 import { useTheme, useThemeStyles } from "./theme/theme-provider";
@@ -47,9 +47,9 @@ export function createStyles<ComponentParts extends string = string, StylesParam
     const styles = createMemo(() => {
       const { styles, unstyled } = options ?? {};
 
-      const baseStyleObject = extractBaseStyles(theme(), params, getStaticClass);
-      const themeStyleObject = extractStyles(themeStyles(), theme(), params, getStaticClass);
-      const propStyleObject = extractStyles(styles?.(), theme(), params, getStaticClass);
+      const baseStyleObject = extractBaseStyles(theme, params, getStaticClass);
+      const themeStyleObject = extractStyles(themeStyles(), theme, params, getStaticClass);
+      const propStyleObject = extractStyles(styles?.(), theme, params, getStaticClass);
 
       const parts = Object.keys(baseStyleObject) as ComponentParts[];
 

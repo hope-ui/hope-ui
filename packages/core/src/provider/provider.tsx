@@ -1,5 +1,5 @@
 import { ThemeOverride, ThemeProvider, ThemeProviderProps } from "@hope-ui/styles";
-import { createMemo, mergeProps, splitProps } from "solid-js";
+import { mergeProps, splitProps } from "solid-js";
 
 import { ColorModeProvider, ColorModeProviderProps, useColorMode } from "../color-mode";
 
@@ -15,9 +15,14 @@ function ThemeProviderWithColorMode(props: ThemeProviderWithColorModeProps) {
 
   const { colorMode } = useColorMode();
 
-  const theme = createMemo(() => mergeProps(local.theme, { colorMode: colorMode() }));
+  // We don't care about reactivity here, theme is set once and isn't intended to be dynamic.
+  const theme = mergeProps(local.theme, {
+    get colorMode() {
+      return colorMode();
+    },
+  });
 
-  return <ThemeProvider theme={theme()} {...others} />;
+  return <ThemeProvider theme={theme} {...others} />;
 }
 
 export function HopeProvider(props: ColorModeProviderProps & ThemeProviderWithColorModeProps) {

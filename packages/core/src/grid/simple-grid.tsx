@@ -21,6 +21,15 @@ export interface SimpleGridProps extends GridProps {
 
   /** The number of columns. */
   columns?: ResponsiveValue<number>;
+
+  /** The gap between the grid items. */
+  spacing?: SystemStyleProps["gap"];
+
+  /** The column gap between the grid items. */
+  spacingX?: SystemStyleProps["columnGap"];
+
+  /** The row gap between the grid items. */
+  spacingY?: SystemStyleProps["rowGap"];
 }
 
 /**
@@ -28,19 +37,33 @@ export interface SimpleGridProps extends GridProps {
  * Provides props that easily define columns and spacing.
  */
 export const SimpleGrid = createPolymorphicComponent<"div", SimpleGridProps>(props => {
-  const [local, others] = splitProps(props, ["minChildWidth", "columns"]);
+  const [local, others] = splitProps(props, [
+    "minChildWidth",
+    "columns",
+    "spacing",
+    "spacingX",
+    "spacingY",
+  ]);
 
   const theme = useTheme();
 
   const templateColumns = () => {
     if (local.minChildWidth) {
-      return widthToColumns(local.minChildWidth, theme());
+      return widthToColumns(local.minChildWidth, theme);
     }
 
     return countToColumns(local.columns);
   };
 
-  return <Grid templateColumns={templateColumns()} {...others} />;
+  return (
+    <Grid
+      gap={local.spacing}
+      columnGap={local.spacingX}
+      rowGap={local.spacingY}
+      templateColumns={templateColumns()}
+      {...others}
+    />
+  );
 });
 
 function widthToColumns(width: any, theme: Theme) {

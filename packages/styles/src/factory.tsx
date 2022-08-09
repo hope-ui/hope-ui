@@ -67,27 +67,27 @@ function styled<T extends ElementType, Props = {}>(
       const baseStyleObject = Object.assign(
         {},
         local.__css,
-        runIfFn(baseStyle, { theme: theme(), props }),
+        runIfFn(baseStyle, { theme: theme, props }),
         filterUndefined(styleProps)
       );
 
       const overrideStyleObject = Object.assign(
         {},
-        ...packSx(local.sx).map(partial => runIfFn(partial, theme()))
+        ...packSx(local.sx).map(partial => runIfFn(partial, theme))
       );
 
       if (isEmptyObject(baseStyleObject) && isEmptyObject(overrideStyleObject)) {
         return undefined;
       }
 
-      const cssComponent = css(toCSSObject(baseStyleObject, theme()));
+      const cssComponent = css(toCSSObject(baseStyleObject, theme));
 
       if (isEmptyObject(overrideStyleObject)) {
         return cssComponent().className;
       }
 
       // use `css` prop to have higher specificity.
-      return cssComponent({ css: toCSSObject(overrideStyleObject, theme()) }).className;
+      return cssComponent({ css: toCSSObject(overrideStyleObject, theme) }).className;
     });
 
     return (

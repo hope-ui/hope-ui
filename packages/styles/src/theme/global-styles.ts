@@ -6,16 +6,18 @@ export function globalStyles(theme: ThemeBase) {
   const styles = globalCss({
     ":root": {
       "--hope-colors-background-body": "white",
-      "--hope-colors-text": theme.colors.neutral["800"],
+      "--hope-colors-text": theme.colors.gray["800"],
     },
 
     [`.${COLOR_MODE_CLASSNAMES.dark}`]: {
-      "--hope-colors-background-body": theme.colors.neutral["900"],
-      "--hope-colors-text": theme.colors.neutral["100"],
+      "--hope-colors-background-body": theme.colors.gray["900"],
+      "--hope-colors-text": theme.colors.gray["100"],
     },
 
     "*, ::before, ::after": {
       boxSizing: "border-box",
+      borderWidth: "0",
+      borderStyle: "solid",
     },
 
     html: {

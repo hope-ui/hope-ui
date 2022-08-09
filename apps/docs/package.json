@@ -1,0 +1,48 @@
+{
+  "name": "@hope-ui/docs",
+  "private": true,
+  "description": "Documentation website of the Hope UI component library",
+  "keywords": [
+    "solid",
+    "solidjs",
+    "ui",
+    "library",
+    "design-system",
+    "components"
+  ],
+  "homepage": "https://github.com/hope-ui/hope-ui/tree/main/apps/docs#readme",
+  "bugs": {
+    "url": "https://github.com/hope-ui/hope-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hope-ui/hope-ui.git"
+  },
+  "license": "MIT",
+  "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "solid-start build",
+    "clean": "rm -rf .solid && rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "solid-start dev",
+    "start": "solid-start start"
+  },
+  "dependencies": {
+    "@hope-ui/core": "workspace:*",
+    "@stitches/core": "1.2.8",
+    "clsx": "1.2.1"
+  },
+  "devDependencies": {
+    "@solidjs/meta": "0.28.0",
+    "@solidjs/router": "0.4.2",
+    "solid-js": "1.4.7",
+    "solid-start": "0.1.0-alpha.99",
+    "solid-start-node": "0.1.0-alpha.99",
+    "typescript": "4.7.4",
+    "undici": "5.8.1",
+    "vite": "3.0.4"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
