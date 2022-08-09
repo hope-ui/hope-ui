@@ -23,6 +23,7 @@ const config: Config.InitialOptions = {
     "solid-js/web": `${solidjsPath}/web/dist/web.cjs`,
     "solid-js/store": `${solidjsPath}/store/dist/store.cjs`,
     "solid-js": `${solidjsPath}/dist/solid.cjs`,
+    "lodash-es": "lodash",
   },
 
   testPathIgnorePatterns: ["/node_modules/"],
