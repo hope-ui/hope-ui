@@ -1,28 +1,9 @@
-import { HopeProps, SystemStyleProps, ThemeColor, UseStylesProps } from "@hope-ui/styles";
+import { HopeProps, SystemStyleProps } from "@hope-ui/styles";
 import { Accessor, JSX } from "solid-js";
 
-export type ButtonParts = "root" | "icon";
+import { ButtonRecipeProps } from "./button.styles";
 
-export interface ButtonStylesParams {
-  /** The visual style of the button. */
-  variant: "solid" | "soft" | "outlined" | "plain";
-
-  /** The color of the button. */
-  colorScheme: Omit<ThemeColor, "whiteAlpha" | "blackAlpha">;
-
-  /** The size of the button. */
-  size: "xs" | "sm" | "md" | "lg";
-
-  /** Whether the button should take all available width. */
-  isFullWidth: boolean;
-
-  /** Whether the button should show a loading spinner. */
-  isLoading: boolean;
-}
-
-export interface ButtonProps
-  extends UseStylesProps<ButtonParts, ButtonStylesParams>,
-    Partial<ButtonStylesParams> {
+export interface ButtonProps extends ButtonRecipeProps {
   /** The placement of the loader when `isLoading` is true. */
   loaderPlacement?: "start" | "end";
 

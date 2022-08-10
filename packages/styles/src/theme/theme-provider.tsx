@@ -1,6 +1,6 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { PartialStylesInterpolation, Theme } from "../types";
+import type { RecipeConfigInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { mergeTheme } from "../utils/merge-theme";
 import { cssVariables } from "./css-variables";
@@ -13,15 +13,17 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(component?: string): Accessor<PartialStylesInterpolation<any, any>> {
+export function useThemeStyles(
+  component?: string
+): Accessor<RecipeConfigInterpolation<any, any, any> | undefined> {
   const theme = useTheme();
 
   return createMemo(() => {
     if (component == null) {
-      return {};
+      return;
     }
 
-    return theme.components[component]?.styles ?? {};
+    return theme.components[component]?.styles;
   });
 }
 
@@ -33,7 +35,7 @@ export function useThemeStyles(component?: string): Accessor<PartialStylesInterp
  * @example
  * // mergedProps = defaultProps <== themeProps <== props
  */
-export function mergeThemeProps<T extends Record<string, any>>(
+export function mergeWithThemeProps<T extends Record<string, any>>(
   name: string,
   defaultProps: Partial<T>,
   props: T

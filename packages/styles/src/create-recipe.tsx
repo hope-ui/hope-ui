@@ -1,77 +1,24 @@
 import { isEmpty, isEmptyObject, isFunction } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
-import { Accessor, createMemo, createUniqueId } from "solid-js";
+import { createMemo, createUniqueId } from "solid-js";
 
 import { css } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
 import { useThemeStyles } from "./theme/theme-provider";
-import { SystemStyleObject, Theme, ThemeBase } from "./types";
+import {
+  GetStaticClass,
+  RecipeClassNames,
+  RecipeConfig,
+  RecipeConfigInterpolation,
+  Theme,
+  UseRecipeFn,
+  UseRecipeOptions,
+  VariantGroups,
+  VariantSelection,
+} from "./types";
 
-export type RecipePartsStyles<Parts extends string> = Record<Parts, SystemStyleObject>;
-export type RecipePartsClassNames<Parts extends string> = Record<Parts, string>;
-
-export type GetStaticClass<Parts extends string> = (part: Parts) => string;
-
-export type VariantDefinitions<Parts extends string> = Record<
-  string,
-  Partial<RecipePartsStyles<Parts>>
->;
-
-type BooleanMap<T> = T extends "true" | "false" ? boolean : T;
-
-export type VariantGroups<Parts extends string> = Record<string, VariantDefinitions<Parts>>;
-
-export type VariantSelection<Parts extends string, Variants extends VariantGroups<Parts>> = {
-  [VariantGroup in keyof Variants]?: BooleanMap<keyof Variants[VariantGroup]>;
-};
-
-export interface CompoundVariant<Parts extends string, Variants extends VariantGroups<Parts>> {
-  variants: VariantSelection<Parts, Variants>;
-  style: Partial<RecipePartsStyles<Parts>>;
-}
-
-export type RecipeOptions<Parts extends string, Variants extends VariantGroups<Parts>> = {
-  parts: Array<Parts>;
-  base?: Partial<RecipePartsStyles<Parts>>;
-  variants?: Variants;
-  defaultVariants?: VariantSelection<Parts, Variants>;
-  compoundVariants?: Array<CompoundVariant<Parts, Variants>>;
-};
-
-export type RecipeOptionsInterpolation<
-  Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
-> =
-  | RecipeOptions<Parts, Variants>
-  | ((
-      theme: ThemeBase,
-      params: Params,
-      getStaticClass: GetStaticClass<Parts>
-    ) => RecipeOptions<Parts, Variants>);
-
-export interface UseRecipeConfig<
-  Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
-> {
-  params: Params;
-  variants?: VariantSelection<Parts, Variants>;
-  styles?: RecipeOptions<Parts, Variants>;
-  unstyled?: boolean;
-  name?: string;
-}
-
-export type UseRecipeFn<
-  Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
-> = (config: UseRecipeConfig<Parts, Params, Variants>) => Accessor<RecipePartsClassNames<Parts>>;
-
-export type RecipeVariants<RecipeFn extends UseRecipeFn<any, any, any>> =
-  Parameters<RecipeFn>[0]["variants"];
-
+/** Return whether a compound variant should be applied. */
 function shouldApplyCompound<Parts extends string, Variants extends VariantGroups<Parts>>(
   compoundCheck: VariantSelection<Parts, Variants>,
   selections: VariantSelection<Parts, Variants>,
@@ -86,75 +33,65 @@ function shouldApplyCompound<Parts extends string, Variants extends VariantGroup
   return true;
 }
 
-function extractRecipeOptions<
+function extractRecipe<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  recipeOptions: RecipeOptionsInterpolation<Parts, Params, Variants> | undefined,
+  config: RecipeConfigInterpolation<Parts, Params, Variants> | undefined,
   theme: Theme,
   params: Params,
   getStaticClass: GetStaticClass<Parts>
-): Partial<RecipeOptions<Parts, Variants>> {
-  if (isFunction(recipeOptions)) {
-    return recipeOptions(theme, params ?? ({} as Params), getStaticClass);
+): Partial<RecipeConfig<Parts, Variants>> {
+  if (isFunction(config)) {
+    return config(theme, params ?? ({} as Params), getStaticClass);
   }
 
-  return recipeOptions ?? {};
+  return config ?? {};
 }
 
-function createRecipe<
+/** Create a `useRecipe` primitive. */
+export function createRecipe<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
->(options: RecipeOptionsInterpolation<Parts, Params, Variants>) {
+>(
+  config: RecipeConfigInterpolation<Parts, Params, Variants>
+): UseRecipeFn<Parts, Params, Variants> {
   const uniqueId = createUniqueId();
 
-  const extractBaseRecipeOptions = typeof options === "function" ? options : () => options;
+  const extractBaseRecipe = typeof config === "function" ? config : () => config;
 
-  function useRecipe(config: UseRecipeConfig<Parts, Params, Variants>) {
+  function useRecipe(options: UseRecipeOptions<Parts, Params, Variants>) {
     const getStaticClass: GetStaticClass<Parts> = part => {
-      return `hope-${config.name || uniqueId}-${part}`;
+      return `hope-${options.name || uniqueId}-${part}`;
     };
 
     const theme = useTheme();
-    const themeStyles = useThemeStyles(config.name) as unknown as Accessor<
-      RecipeOptions<Parts, Variants>
-    >;
+    const themeStyles = useThemeStyles(options.name);
 
     const classes = createMemo(() => {
-      const baseRecipeOptions = config.unstyled
+      const baseRecipe = options.unstyled
         ? {}
-        : extractBaseRecipeOptions(theme, config.params, getStaticClass);
+        : extractBaseRecipe(theme, options.params, getStaticClass);
 
-      const themeRecipeOptions = extractRecipeOptions(
-        themeStyles(),
-        theme,
-        config.params,
-        getStaticClass
-      );
-
-      const propRecipeOptions = extractRecipeOptions(
-        config.styles,
-        theme,
-        config.params,
-        getStaticClass
-      );
+      const themeRecipe = extractRecipe(themeStyles(), theme, options.params, getStaticClass);
+      const propRecipe = extractRecipe(options.styles, theme, options.params, getStaticClass);
 
       // 1. merge recipe options
-      const mergedRecipeOptions: RecipeOptions<Parts, Variants> = mergeWith(
+      const mergedRecipe: RecipeConfig<Parts, Variants> = mergeWith(
         {},
-        baseRecipeOptions,
-        themeRecipeOptions,
-        propRecipeOptions
+        baseRecipe,
+        themeRecipe,
+        propRecipe
       );
 
-      const parts = mergedRecipeOptions.parts;
+      const parts = mergedRecipe.parts;
 
       // 2. add "recipe base" classes
       const finalClassNames = Object.fromEntries(
         parts.map(key => {
-          const baseStyleObject = mergedRecipeOptions.base?.[key] ?? {};
+          const baseStyleObject = mergedRecipe.base?.[key] ?? {};
 
           if (isEmptyObject(baseStyleObject)) {
             return [key, undefined];
@@ -164,17 +101,17 @@ function createRecipe<
 
           return [key, cssComponent().className];
         })
-      ) as Partial<RecipePartsClassNames<Parts>>;
+      ) as RecipeClassNames<Parts>;
 
       // 3. add "recipe variants" classes
       const selections = {
-        ...mergedRecipeOptions.defaultVariants,
-        ...config.variants,
+        ...mergedRecipe.defaultVariants,
+        ...options.variants,
       } as VariantSelection<Parts, Variants>;
 
       for (const variantName in selections) {
         const variantSelection =
-          selections[variantName] ?? mergedRecipeOptions.defaultVariants?.[variantName];
+          selections[variantName] ?? mergedRecipe.defaultVariants?.[variantName];
 
         if (variantSelection != null) {
           let selection = variantSelection;
@@ -187,7 +124,7 @@ function createRecipe<
           const selectionClassNames = Object.fromEntries(
             parts.map(key => {
               const selectionStyleObject =
-                mergedRecipeOptions.variants?.[variantName as any]?.[selection as any][key] ?? {};
+                mergedRecipe.variants?.[variantName as any]?.[selection as any][key] ?? {};
 
               if (isEmptyObject(selectionStyleObject)) {
                 return [key, undefined];
@@ -197,7 +134,7 @@ function createRecipe<
 
               return [key, cssComponent().className];
             })
-          ) as RecipePartsClassNames<Parts>;
+          ) as RecipeClassNames<Parts>;
 
           parts.forEach(key => {
             const mergedClassNames = [finalClassNames[key], selectionClassNames[key]]
@@ -210,12 +147,12 @@ function createRecipe<
       }
 
       // 4. add "recipe compoundVariants" classes
-      for (const compoundVariant of mergedRecipeOptions.compoundVariants ?? []) {
+      for (const compoundVariant of mergedRecipe.compoundVariants ?? []) {
         if (
           shouldApplyCompound(
             compoundVariant.variants,
             selections,
-            mergedRecipeOptions.defaultVariants ?? {}
+            mergedRecipe.defaultVariants ?? {}
           )
         ) {
           const compoundClassNames = Object.fromEntries(
@@ -230,7 +167,7 @@ function createRecipe<
 
               return [key, cssComponent().className];
             })
-          ) as RecipePartsClassNames<Parts>;
+          ) as RecipeClassNames<Parts>;
 
           parts.forEach(key => {
             const mergedClassNames = [finalClassNames[key], compoundClassNames[key]]
@@ -254,7 +191,7 @@ function createRecipe<
       return finalClassNames;
     });
 
-    return { classes, getStaticClass };
+    return classes;
   }
 
   return useRecipe;

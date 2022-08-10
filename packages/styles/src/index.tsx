@@ -1,5 +1,5 @@
 export * from "./create-polymorphic-component";
-export * from "./create-styles";
+export * from "./create-recipe";
 export * from "./factory";
 export * from "./stitches.config";
 export * from "./styled-system";
