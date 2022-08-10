@@ -37,3 +37,16 @@ export function isNull(value: any): value is null {
 export function isString(value: any): value is string {
   return Object.prototype.toString.call(value) === "[object String]";
 }
+
+// Empty assertions
+export function isEmpty(value: any): boolean {
+  if (isArray(value)) {
+    return isEmptyArray(value);
+  }
+
+  if (isObject(value)) {
+    return isEmptyObject(value);
+  }
+
+  return value == null || value === "";
+}
