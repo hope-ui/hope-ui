@@ -67,12 +67,12 @@ function styled<T extends ElementType, Props = {}>(
       const baseStyleObject = Object.assign(
         {},
         local.__css,
-        runIfFn(baseStyle, { theme: theme, props }),
-        filterUndefined(styleProps)
+        runIfFn(baseStyle, { theme: theme, props })
       );
 
       const overrideStyleObject = Object.assign(
         {},
+        filterUndefined(styleProps),
         ...packSx(local.sx).map(partial => runIfFn(partial, theme))
       );
 

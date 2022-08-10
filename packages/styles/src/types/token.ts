@@ -48,7 +48,6 @@ export type ThemeFontWeight =
   | (string & {});
 
 export type ThemeLineHeight =
-  | "normal"
   | "none"
   | "shorter"
   | "short"
@@ -75,7 +74,6 @@ export type ThemeLetterSpacing =
   | (string & {});
 
 export type ThemeSpace =
-  | "px"
   | "0.5"
   | "1"
   | "1.5"
@@ -156,11 +154,8 @@ export type ThemeShadow =
   | "inner"
   | (string & {});
 
-export type ThemeBreakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});
-
 export type ThemeZIndice =
   | "hide"
-  | "auto"
   | "base"
   | "docked"
   | "sticky"
@@ -173,3 +168,5 @@ export type ThemeZIndice =
   | "skipLink"
   | "toast"
   | (string & {});
+
+export type ThemeBreakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});

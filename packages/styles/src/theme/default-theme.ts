@@ -4,7 +4,6 @@ import { DEFAULT_COLORS } from "./default-colors";
 import { DEFAULT_THEME_MAP } from "./default-theme-map";
 
 const space: Theme["space"] = {
-  px: "1px",
   "0.5": "0.125rem",
   "1": "0.25rem",
   "1.5": "0.375rem",
@@ -74,7 +73,6 @@ const _DEFAULT_THEME: ThemeWithoutMetaData = {
     black: 900,
   },
   lineHeights: {
-    normal: "normal",
     none: 1,
     shorter: 1.25,
     short: 1.375,
@@ -144,7 +142,6 @@ const _DEFAULT_THEME: ThemeWithoutMetaData = {
   },
   zIndices: {
     hide: -1,
-    auto: "auto",
     base: 0,
     docked: 10,
     sticky: 1000,
