@@ -25,8 +25,9 @@ For full documentation, visit [hope-ui.com](https://hope-ui.com/).
 
 This project is inspired by :
 
-- [Mantine](https://mantine.dev/)
 - [Chakra UI](https://chakra-ui.com)
+- [Mantine](https://mantine.dev/)
+- [Joy UI](https://mui.com/joy-ui/getting-started/overview/)
 
 ## License
 
