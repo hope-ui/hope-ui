@@ -18,9 +18,9 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
   for (let key in systemStyleObject) {
     /**
      * allows the user to pass functional values.
-     * boxShadow: theme => `0 2px 2px ${theme.colors.red["500"]}`
+     * boxShadow: vars => `0 2px 2px ${vars.colors.primary["500"]}`
      */
-    let value = runIfFn(systemStyleObject[key], theme);
+    let value = runIfFn(systemStyleObject[key], theme.vars);
 
     if (value == null) {
       continue;
@@ -102,7 +102,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       const scale = theme.themeMap[propertyName];
 
       if (scale != null) {
-        value = resolveTokenValue(value as any, scale, theme);
+        value = resolveTokenValue(value as any, scale, theme.vars);
       }
 
       computedStyles[propertyName] = value;

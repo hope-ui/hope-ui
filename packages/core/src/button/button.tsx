@@ -1,11 +1,11 @@
-import { createPolymorphicComponent, hope, mergeWithThemeProps } from "@hope-ui/styles";
+import { createPolymorphicComponent, hope, mergeThemeProps } from "@hope-ui/styles";
 import { splitProps } from "solid-js";
 
 import { ButtonParams, useRecipe } from "./button.styles";
 import { ButtonProps } from "./types";
 
 export const Button = createPolymorphicComponent<"button", ButtonProps>(props => {
-  props = mergeWithThemeProps(
+  props = mergeThemeProps(
     "Button",
     {
       colorScheme: "primary",

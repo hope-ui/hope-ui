@@ -1,16 +1,12 @@
-import { SystemStyleObject, ThemeWithoutMetaData } from "../types";
+export const focusStyles = {
+  WebkitTapHighlightColor: "transparent",
 
-export function focusStyles(theme: ThemeWithoutMetaData) {
-  return (): SystemStyleObject => ({
-    WebkitTapHighlightColor: "transparent",
+  "&:focus": {
+    outlineOffset: 2,
+    outline: "2px solid var(--hope-colors-focus-ring)",
+  },
 
-    "&:focus": {
-      outlineOffset: 2,
-      outline: `2px solid ${theme.colors.primary[theme.colorMode === "dark" ? 600 : 500]}`,
-    },
-
-    "&:focus:not(:focus-visible)": {
-      outline: "none",
-    },
-  });
-}
+  "&:focus:not(:focus-visible)": {
+    outline: "none",
+  },
+};

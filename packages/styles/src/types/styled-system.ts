@@ -2,10 +2,10 @@ import { OverrideProps } from "@hope-ui/utils";
 import { Property } from "csstype";
 
 import { CSSObject } from "../stitches.config";
-import { ThemeBase } from "./theme-base";
+import { ColorSystemTokenName } from "./color-system";
+import { ThemeVars } from "./theme";
 import {
   ThemeBreakpoint,
-  ThemeColorShade,
   ThemeFontFamily,
   ThemeFontSize,
   ThemeFontWeight,
@@ -26,7 +26,7 @@ type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>
-  | ((theme: ThemeBase) => ResponsiveValueRaw<T>);
+  | ((vars: ThemeVars) => ResponsiveValueRaw<T>);
 
 export type ResponsiveProps<Props> = {
   [K in keyof Props]?: ResponsiveValue<Props[K]>;
@@ -43,7 +43,7 @@ export type BorderProps = ResponsiveProps<{
   borderStyle: Property.BorderStyle;
 
   /** The CSS `border-color` property. */
-  borderColor: Property.BorderColor | ThemeColorShade;
+  borderColor: Property.BorderColor | ColorSystemTokenName;
 
   /** The CSS `border-top` property. */
   borderTop: Property.BorderTop;
@@ -55,7 +55,7 @@ export type BorderProps = ResponsiveProps<{
   borderTopStyle: Property.BorderTopStyle;
 
   /** The CSS `border-top-color` property. */
-  borderTopColor: Property.BorderTopColor | ThemeColorShade;
+  borderTopColor: Property.BorderTopColor | ColorSystemTokenName;
 
   /** The CSS `border-right` property. */
   borderRight: Property.BorderRight;
@@ -67,7 +67,7 @@ export type BorderProps = ResponsiveProps<{
   borderRightStyle: Property.BorderRightStyle;
 
   /** The CSS `border-right-color` property. */
-  borderRightColor: Property.BorderRightColor | ThemeColorShade;
+  borderRightColor: Property.BorderRightColor | ColorSystemTokenName;
 
   /** The CSS `border-bottom` property. */
   borderBottom: Property.BorderBottom;
@@ -79,7 +79,7 @@ export type BorderProps = ResponsiveProps<{
   borderBottomStyle: Property.BorderBottomStyle;
 
   /** The CSS `border-bottom-color` property. */
-  borderBottomColor: Property.BorderBottomColor | ThemeColorShade;
+  borderBottomColor: Property.BorderBottomColor | ColorSystemTokenName;
 
   /** The CSS `border-left` property. */
   borderLeft: Property.BorderLeft;
@@ -91,7 +91,7 @@ export type BorderProps = ResponsiveProps<{
   borderLeftStyle: Property.BorderLeftStyle;
 
   /** The CSS `border-left-color` property. */
-  borderLeftColor: Property.BorderLeftColor | ThemeColorShade;
+  borderLeftColor: Property.BorderLeftColor | ColorSystemTokenName;
 
   /** The CSS `border-right` and `border-left` property. */
   borderX: Property.BorderLeft;
@@ -102,19 +102,19 @@ export type BorderProps = ResponsiveProps<{
 
 export type ColorProps = ResponsiveProps<{
   /** The CSS `color` property. */
-  color: Property.Color | ThemeColorShade;
+  color: Property.Color | ColorSystemTokenName;
 
   /** The CSS `background` property. */
-  bg: Property.Background<ThemeColorShade>;
+  bg: Property.Background<ColorSystemTokenName>;
 
   /** The CSS `background` property. */
-  background: Property.Background<ThemeColorShade>;
+  background: Property.Background<ColorSystemTokenName>;
 
   /** The CSS `background-color` property. */
-  bgColor: Property.BackgroundColor | ThemeColorShade;
+  bgColor: Property.BackgroundColor | ColorSystemTokenName;
 
   /** The CSS `background-color` property. */
-  backgroundColor: Property.BackgroundColor | ThemeColorShade;
+  backgroundColor: Property.BackgroundColor | ColorSystemTokenName;
 
   /** The CSS `opacity` property. */
   opacity: Property.Opacity;
@@ -498,7 +498,7 @@ export type InteractivityProps = ResponsiveProps<{
   outlineOffset: Property.OutlineOffset<string | 0 | number>;
 
   /** The CSS `outline-color` property. */
-  outlineColor: Property.OutlineColor | ThemeColorShade;
+  outlineColor: Property.OutlineColor | ColorSystemTokenName;
 }>;
 
 export type MarginProps = ResponsiveProps<{
@@ -737,14 +737,11 @@ export type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProp
 
 export type PseudoSelectorValue =
   | BaseSystemStyleObject
-  | ((theme: ThemeBase) => BaseSystemStyleObject);
+  | ((vars: ThemeVars) => BaseSystemStyleObject);
 
 export type PseudoSelectorProps = Partial<{
   /** Styles for CSS selector `&:hover`. */
   _hover: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:active`. */
-  _active: PseudoSelectorValue;
 
   /** Styles for CSS selector `&:focus`. */
   _focus: PseudoSelectorValue;
@@ -761,6 +758,9 @@ export type PseudoSelectorProps = Partial<{
    */
   _focusVisible: PseudoSelectorValue;
 
+  /** Styles for CSS Selector `&:active`. */
+  _active: PseudoSelectorValue;
+
   /**
    * Styles to apply when this element is disabled. The passed styles are applied to these CSS selectors:
    * - `&[aria-disabled=true]`
@@ -774,6 +774,18 @@ export type PseudoSelectorProps = Partial<{
    * - CSS selector `&[aria-invalid=true]`
    */
   _invalid: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:first-child`. */
+  _first: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:last-child`. */
+  _last: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:nth-child(odd)`. */
+  _odd: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:nth-child(even)`. */
+  _even: PseudoSelectorValue;
 
   /**
    * Styles for CSS selector `&::before`
@@ -796,24 +808,6 @@ export type PseudoSelectorProps = Partial<{
    * ```
    */
   _after: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:nth-child(even)`. */
-  _even: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:nth-child(odd)`. */
-  _odd: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:first-of-type`. */
-  _first: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:last-of-type`. */
-  _last: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:not(:first-of-type)`. */
-  _notFirst: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:not(:last-of-type)`. */
-  _notLast: PseudoSelectorValue;
 
   /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is hovered. */
   _groupHover: PseudoSelectorValue;
@@ -857,18 +851,18 @@ export type PseudoSelectorProps = Partial<{
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is invalid. */
   _peerInvalid: PseudoSelectorValue;
 
-  /** Styles for when dark theme is applied to any parent of this component or element. */
-  _dark: PseudoSelectorValue;
-
   /** Styles for when light theme is applied to any parent of this component or element. */
   _light: PseudoSelectorValue;
+
+  /** Styles for when dark theme is applied to any parent of this component or element. */
+  _dark: PseudoSelectorValue;
 }>;
 
 export type SystemStyleProps = BaseSystemStyleProps & PseudoSelectorProps;
 
 export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
 
-export type Sx = SystemStyleObject | ((theme: ThemeBase) => SystemStyleObject);
+export type Sx = SystemStyleObject | ((vars: ThemeVars) => SystemStyleObject);
 
 export interface SxProp {
   /**

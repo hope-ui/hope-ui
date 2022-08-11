@@ -1,9 +1,10 @@
-import { Theme, ThemeWithoutMetaData } from "../types";
-import { attachMetaData } from "../utils/attach-meta-data";
-import { DEFAULT_COLORS } from "./default-colors";
+import { ThemeBase, ThemeScales } from "../types";
+import { DEFAULT_CSS_VAR_PREFIX } from "../utils/css-var";
+import { attachMetaData } from "./attach-meta-data";
+import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME_MAP } from "./default-theme-map";
 
-const space: Theme["space"] = {
+const space: ThemeScales["space"] = {
   "0.5": "0.125rem",
   "1": "0.25rem",
   "1.5": "0.375rem",
@@ -38,9 +39,8 @@ const space: Theme["space"] = {
   "96": "24rem",
 };
 
-const _DEFAULT_THEME: ThemeWithoutMetaData = {
-  colorMode: "light",
-  colors: DEFAULT_COLORS,
+const defaultThemeScales: ThemeScales = {
+  colors: createDefaultColors(DEFAULT_CSS_VAR_PREFIX),
   fonts: {
     sans: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
     serif: "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif",
@@ -162,9 +162,13 @@ const _DEFAULT_THEME: ThemeWithoutMetaData = {
     xl: "1280px",
     "2xl": "1536px",
   },
+};
+
+const _DEFAULT_THEME: ThemeBase = {
+  ...defaultThemeScales,
+  cssVarPrefix: DEFAULT_CSS_VAR_PREFIX,
   themeMap: DEFAULT_THEME_MAP,
-  other: {},
   components: {},
 };
 
-export const DEFAULT_THEME: Theme = attachMetaData(_DEFAULT_THEME);
+export const DEFAULT_THEME = attachMetaData(_DEFAULT_THEME);

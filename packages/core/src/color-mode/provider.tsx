@@ -1,6 +1,5 @@
 import { ColorMode } from "@hope-ui/styles";
-import { noop } from "@hope-ui/utils";
-import { createEffect, createSignal, on, onCleanup, ParentProps } from "solid-js";
+import { createEffect, createSignal, on, onCleanup } from "solid-js";
 
 import { ColorModeContext } from "./context";
 import { localStorageManager } from "./storage-manager";
@@ -87,25 +86,3 @@ export function ColorModeProvider(props: ColorModeProviderProps) {
 
   return <ColorModeContext.Provider value={context}>{props.children}</ColorModeContext.Provider>;
 }
-
-/** Locks the color mode to `dark`, without any way to change it. */
-export const DarkMode = (props: ParentProps) => {
-  const context: ColorModeContextType = {
-    colorMode: () => "dark",
-    toggleColorMode: noop,
-    setColorMode: noop,
-  };
-
-  return <ColorModeContext.Provider value={context}>{props.children}</ColorModeContext.Provider>;
-};
-
-/** Locks the color mode to `light` without any way to change it. */
-export const LightMode = (props: ParentProps) => {
-  const context: ColorModeContextType = {
-    colorMode: () => "light",
-    toggleColorMode: noop,
-    setColorMode: noop,
-  };
-
-  return <ColorModeContext.Provider value={context}>{props.children}</ColorModeContext.Provider>;
-};

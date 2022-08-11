@@ -4,14 +4,13 @@ import { createMemo, createUniqueId } from "solid-js";
 
 import { css } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
-import { useTheme } from "./theme";
-import { useThemeStyles } from "./theme/theme-provider";
+import { useTheme, useThemeStyles } from "./theme";
 import {
   GetStaticClass,
   RecipeClassNames,
   RecipeConfig,
   RecipeConfigInterpolation,
-  Theme,
+  ThemeVars,
   UseRecipeFn,
   UseRecipeOptions,
   VariantGroups,
@@ -39,12 +38,12 @@ function extractRecipe<
   Variants extends VariantGroups<Parts>
 >(
   config: RecipeConfigInterpolation<Parts, Params, Variants> | undefined,
-  theme: Theme,
+  vars: ThemeVars,
   params: Params,
   getStaticClass: GetStaticClass<Parts>
 ): Partial<RecipeConfig<Parts, Variants>> {
   if (isFunction(config)) {
-    return config(theme, params ?? ({} as Params), getStaticClass);
+    return config(vars, params ?? ({} as Params), getStaticClass);
   }
 
   return config ?? {};
@@ -70,13 +69,14 @@ export function createRecipe<
     const theme = useTheme();
     const themeStyles = useThemeStyles(options.name);
 
+    // TODO: optimise
     const classes = createMemo(() => {
       const baseRecipe = options.unstyled
         ? {}
-        : extractBaseRecipe(theme, options.params, getStaticClass);
+        : extractBaseRecipe(theme.vars, options.params, getStaticClass);
 
-      const themeRecipe = extractRecipe(themeStyles(), theme, options.params, getStaticClass);
-      const propRecipe = extractRecipe(options.styles, theme, options.params, getStaticClass);
+      const themeRecipe = extractRecipe(themeStyles(), theme.vars, options.params, getStaticClass);
+      const propRecipe = extractRecipe(options.styles, theme.vars, options.params, getStaticClass);
 
       // 1. merge recipe options
       const mergedRecipe: RecipeConfig<Parts, Variants> = mergeWith(

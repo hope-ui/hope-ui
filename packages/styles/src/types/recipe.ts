@@ -1,7 +1,7 @@
 import { Accessor } from "solid-js";
 
 import { SystemStyleObject } from "./styled-system";
-import { ThemeBase } from "./theme-base";
+import { ThemeVars } from "./theme";
 
 type BooleanMap<T> = T extends "true" | "false" ? boolean : T;
 
@@ -58,7 +58,7 @@ export type RecipeConfigInterpolation<
 > =
   | RecipeConfig<Parts, Variants>
   | ((
-      theme: ThemeBase,
+      vars: ThemeVars,
       params: Params,
       getStaticClass: GetStaticClass<Parts>
     ) => RecipeConfig<Parts, Variants>);
@@ -94,4 +94,4 @@ export type UseRecipeFn<
 > = (options: UseRecipeOptions<Parts, Params, Variants>) => Accessor<RecipeClassNames<Parts>>;
 
 /** Extract the option's type of `useRecipe` primitive. */
-export type RecipeOptions<RecipeFn extends UseRecipeFn<any, any, any>> = Parameters<RecipeFn>[0];
+export type RecipeOptionsOf<RecipeFn extends UseRecipeFn<any, any, any>> = Parameters<RecipeFn>[0];

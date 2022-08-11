@@ -20,6 +20,7 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/no-empty-interface": "off",
     "jsx-a11y/no-autofocus": "off",
     "jsx-a11y/label-has-associated-control": "off"
   },

@@ -1,12 +1,58 @@
-import type { DeepPartial } from "./deep-partial";
-import { RecipeConfigInterpolation, VariantGroups } from "./recipe";
-import { ThemeBase, ThemeOther } from "./theme-base";
+import { Dict } from "@hope-ui/utils";
+
+import { CSSObject } from "../stitches.config";
+import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
+import { ColorSystem } from "./color-system";
+import { DeepPartial } from "./deep-partial";
+import { RecipeOptionsOf, UseRecipeFn } from "./recipe";
+import {
+  ThemeBreakpoint,
+  ThemeFontFamily,
+  ThemeFontSize,
+  ThemeFontWeight,
+  ThemeLetterSpacing,
+  ThemeLineHeight,
+  ThemeRadii,
+  ThemeShadow,
+  ThemeSize,
+  ThemeSpace,
+  ThemeZIndice,
+} from "./token";
+
+export interface ThemeColors {
+  light: ColorSystem;
+  dark: ColorSystem;
+}
+
+export interface ThemeScales {
+  colors: ThemeColors;
+  fonts: Record<ThemeFontFamily, string>;
+  fontSizes: Record<ThemeFontSize, string>;
+  fontWeights: Record<ThemeFontWeight, number>;
+  lineHeights: Record<ThemeLineHeight, string | number>;
+  letterSpacings: Record<ThemeLetterSpacing, string>;
+  space: Record<ThemeSpace, string>;
+  sizes: Record<ThemeSize, string>;
+  radii: Record<ThemeRadii, string>;
+  shadows: Record<ThemeShadow, string>;
+  zIndices: Record<ThemeZIndice, string | number>;
+  breakpoints: Record<ThemeBreakpoint, string>;
+}
+
+/** An object with the same shape as `ThemeScales` but with css variables reference as value. */
+export type ThemeVars = {
+  [Scale in keyof Omit<ThemeScales, "colors">]: {
+    [Token in keyof ThemeScales[Scale]]: string;
+  };
+} & {
+  colors: ColorSystem;
+};
+
+export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScales>>;
 
 export interface ComponentTheme<
   Props extends Record<string, any> = {},
-  Parts extends string = string,
-  Params extends Record<string, any> = {},
-  Variants extends VariantGroups<Parts> = {}
+  RecipeFn extends UseRecipeFn<any, any, any> = any
 > {
   /** Default props to be passed to the component. */
   defaultProps?: Props;
@@ -15,18 +61,38 @@ export interface ComponentTheme<
    * Styles that will be merged with the "base styles" of the component.
    * Mostly used to override/add additional styles.
    */
-  styles?: RecipeConfigInterpolation<Parts, Params, Variants>;
+  styles?: RecipeOptionsOf<RecipeFn>["styles"];
 }
 
-export interface Theme extends ThemeBase {
+export interface ThemeBase extends ThemeScales {
+  cssVarPrefix: string;
+  themeMap: ThemeMap;
   components: Record<string, ComponentTheme>;
 }
 
-export type ThemeWithoutMetaData = Omit<Theme, "fn" | "__breakpoints">;
+export interface ThemeCSSVariables {
+  /** The css variables to be injected in `:root`. */
+  root: Dict;
 
-export type ThemeOverride = DeepPartial<
-  Omit<Theme, "fn" | "other" | "components" | "__breakpoints">
-> & {
-  other?: ThemeOther;
+  /** The css variables to be injected in the dark theme selector. */
+  dark: Dict;
+}
+
+interface ThemeMetaData {
+  /** An object with the same shape as `ThemeScales` but with css variables reference as value. */
+  vars: ThemeVars;
+
+  /** The css variables to be injected globally. */
+  __cssVarsValues: ThemeCSSVariables;
+
+  /** Metadata about the theme breakpoints. */
+  __breakpoints: AnalyzeBreakpointsReturn;
+}
+
+export type Theme = ThemeBase & ThemeMetaData;
+
+export type MaybeThemeWithMetaData = ThemeBase & Partial<ThemeMetaData>;
+
+export type ThemeOverride = DeepPartial<Omit<Theme, "components" | keyof ThemeMetaData>> & {
   components?: Record<string, ComponentTheme>;
 };

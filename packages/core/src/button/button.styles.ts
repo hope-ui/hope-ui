@@ -1,13 +1,11 @@
-import { createRecipe, RecipeProps, ThemeColor } from "@hope-ui/styles";
+import { createRecipe, RecipeProps, ThemeColorPalette } from "@hope-ui/styles";
 
 export interface ButtonParams {
   /** The color of the button. */
-  colorScheme: ThemeColor;
+  colorScheme: ThemeColorPalette;
 }
 
-export const useRecipe = createRecipe((theme, params: ButtonParams) => {
-  console.log(theme.colorMode);
-
+export const useRecipe = createRecipe((vars, params: ButtonParams) => {
   return {
     parts: ["root", "icon"],
     base: {
@@ -43,7 +41,10 @@ export const useRecipe = createRecipe((theme, params: ButtonParams) => {
         soft: {},
         outlined: {
           root: {
-            bg: theme.colorMode == "dark" ? "blue" : "red",
+            bg: vars.colors.primary["500"],
+            _hover: {
+              bg: "primary.600",
+            },
           },
         },
         plain: {},

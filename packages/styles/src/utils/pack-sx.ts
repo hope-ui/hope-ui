@@ -1,3 +1,5 @@
+import { isArray } from "@hope-ui/utils";
+
 export function packSx<T>(sx: T | T[]) {
-  return Array.isArray(sx) ? sx : [sx];
+  return isArray(sx) ? sx : [sx];
 }

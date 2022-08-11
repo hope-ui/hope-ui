@@ -1,11 +1,12 @@
-import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
+import { createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { RecipeConfigInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
-import { mergeTheme } from "../utils/merge-theme";
-import { cssVariables } from "./css-variables";
+import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME } from "./default-theme";
-import { globalStyles } from "./global-styles";
+import { injectCSSVars } from "./inject-css-vars";
+import { injectGlobalStyles } from "./inject-global-styles";
+import { mergeTheme } from "./merge-theme";
 
 const ThemeContext = createContext<Theme>(DEFAULT_THEME);
 
@@ -13,17 +14,17 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(
-  component?: string
-): Accessor<RecipeConfigInterpolation<any, any, any> | undefined> {
+export function useThemeStyles(component?: string) {
   const theme = useTheme();
 
   return createMemo(() => {
     if (component == null) {
-      return;
+      return undefined;
     }
 
-    return theme.components[component]?.styles;
+    return theme.components[component]?.styles as
+      | RecipeConfigInterpolation<any, any, any>
+      | undefined;
   });
 }
 
@@ -35,7 +36,7 @@ export function useThemeStyles(
  * @example
  * // mergedProps = defaultProps <== themeProps <== props
  */
-export function mergeWithThemeProps<T extends Record<string, any>>(
+export function mergeThemeProps<T extends Record<string, any>>(
   name: string,
   defaultProps: Partial<T>,
   props: T
@@ -49,21 +50,33 @@ export function mergeWithThemeProps<T extends Record<string, any>>(
 
 export interface ThemeProviderProps extends ParentProps {
   /** The custom theme to use. */
-  theme?: ThemeOverride;
-
-  /** Whether Hope UI theme tokens should be added as css variables to `:root`. */
-  withCSSVariables?: boolean;
+  theme?: Theme;
 
   /** Whether Hope UI global styles should be applied. */
   withGlobalStyles?: boolean;
 }
 
 export function ThemeProvider(props: ThemeProviderProps) {
-  // We don't care about reactivity here, theme is set once and isn't intended to be dynamic.
-  const theme = mergeTheme(DEFAULT_THEME, props.theme);
+  // We don't care about reactivity here since theme is not intended to be dynamic, it should be set once.
+  const theme = props.theme ?? DEFAULT_THEME;
 
-  props.withGlobalStyles && globalStyles(theme);
-  props.withCSSVariables && cssVariables(theme);
+  injectCSSVars(theme);
+  props.withGlobalStyles && injectGlobalStyles(theme);
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
+}
+
+export function extendTheme(themeOverride: ThemeOverride): Theme {
+  let finalDefaultTheme = DEFAULT_THEME;
+
+  // Need to recreate colors if user has set a custom css var prefix,
+  // so global variants css variables reference is correct.
+  if (themeOverride.cssVarPrefix != null) {
+    finalDefaultTheme = {
+      ...DEFAULT_THEME,
+      colors: createDefaultColors(themeOverride.cssVarPrefix),
+    };
+  }
+
+  return mergeTheme(finalDefaultTheme, themeOverride);
 }

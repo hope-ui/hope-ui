@@ -1,22 +1,3 @@
-import { Prefixed } from "./prefixed";
-
-export type Shade = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-
-export type ThemeColorPalette = Record<Shade, string>;
-
-export type ThemeColor =
-  | "whiteAlpha"
-  | "blackAlpha"
-  | "primary"
-  | "neutral"
-  | "success"
-  | "info"
-  | "warning"
-  | "danger"
-  | (string & {});
-
-export type ThemeColorShade = Prefixed<ThemeColor, Prefixed<".", Shade>>;
-
 export type ThemeFontFamily = "sans" | "serif" | "mono" | (string & {});
 
 export type ThemeFontSize =

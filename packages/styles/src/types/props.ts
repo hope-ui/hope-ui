@@ -1,6 +1,6 @@
 import { ClassProp } from "@hope-ui/utils";
 
-import { RecipeConfigInterpolation, RecipeOptions, UseRecipeFn, VariantGroups } from "./recipe";
+import { RecipeOptionsOf, UseRecipeFn } from "./recipe";
 import { SxProp, SystemStyleObject, SystemStyleProps } from "./styled-system";
 
 /** Hope UI specific props. */
@@ -13,14 +13,14 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
 }
 
 /** Props of components that supports the `Recipe API` and `system style` props. */
-export type RecipeProps<RecipeFn extends UseRecipeFn<any, any, any>> = Omit<HopeProps, "__css"> &
-  Partial<RecipeOptions<RecipeFn>["variants"] & RecipeOptions<RecipeFn>["params"]> & {
+export type RecipeProps<RecipeFn extends UseRecipeFn<any, any, any>> = HopeProps &
+  Partial<RecipeOptionsOf<RecipeFn>["variants"] & RecipeOptionsOf<RecipeFn>["params"]> & {
     /**
-     * Styles that will be merged with the "base styles" created by the `createStyles` call.
+     * Styles that will be merged with the "base styles" created by the `createRecipe` call.
      * Mostly used to override/add additional styles.
      */
-    styles?: RecipeOptions<RecipeFn>["styles"];
+    styles?: RecipeOptionsOf<RecipeFn>["styles"];
 
     /** Whether the base styles should be applied or not. */
-    unstyled?: RecipeOptions<RecipeFn>["unstyled"];
+    unstyled?: RecipeOptionsOf<RecipeFn>["unstyled"];
   };

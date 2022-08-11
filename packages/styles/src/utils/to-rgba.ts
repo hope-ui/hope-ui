@@ -48,13 +48,13 @@ function rgbStringToRgba(color: string): RGBA {
   return { r, g, b, a: a || 1 };
 }
 
-function toRgba(color: string): RGBA {
-  if (isHexColor(color)) {
-    return hexToRgba(color);
+export function toRgba(hexOrRgb: string): RGBA {
+  if (isHexColor(hexOrRgb)) {
+    return hexToRgba(hexOrRgb);
   }
 
-  if (color.startsWith("rgb")) {
-    return rgbStringToRgba(color);
+  if (hexOrRgb.startsWith("rgb")) {
+    return rgbStringToRgba(hexOrRgb);
   }
 
   return {
@@ -63,15 +63,4 @@ function toRgba(color: string): RGBA {
     b: 0,
     a: 1,
   };
-}
-
-/** Convert a Hex or RGB color to RGBA. */
-export function rgba(hexOrRgbColor: string, alpha: number) {
-  if (hexOrRgbColor == null || hexOrRgbColor == "" || alpha > 1 || alpha < 0) {
-    return "rgba(0, 0, 0, 1)";
-  }
-
-  const { r, g, b } = toRgba(hexOrRgbColor);
-
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

@@ -1,10 +1,10 @@
-import { KeysOf, SystemStyleProps } from "../types";
 import {
   BorderProps,
   ColorProps,
   FlexboxProps,
   GridLayoutProps,
   InteractivityProps,
+  KeysOf,
   LayoutProps,
   MarginProps,
   PaddingProps,
@@ -13,8 +13,9 @@ import {
   RadiiProps,
   ShadowProps,
   SizeProps,
+  SystemStyleProps,
   TypographyProps,
-} from "../types/styled-system";
+} from "../types";
 
 const borderPropNames: KeysOf<BorderProps> = {
   border: true,
@@ -200,25 +201,34 @@ const typographyPropNames: KeysOf<TypographyProps> = {
 
 const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _hover: true,
-  _active: true,
   _focus: true,
   _focusWithin: true,
   _focusVisible: true,
+  _active: true,
   _disabled: true,
+  _invalid: true,
+  _first: true,
+  _last: true,
+  _odd: true,
+  _even: true,
   _before: true,
   _after: true,
   _groupHover: true,
-  _groupActive: true,
   _groupFocus: true,
   _groupFocusWithin: true,
   _groupFocusVisible: true,
+  _groupActive: true,
   _groupDisabled: true,
+  _groupInvalid: true,
   _peerHover: true,
-  _peerActive: true,
   _peerFocus: true,
   _peerFocusWithin: true,
   _peerFocusVisible: true,
+  _peerActive: true,
   _peerDisabled: true,
+  _peerInvalid: true,
+  _light: true,
+  _dark: true,
 };
 
 export const stylePropNames: KeysOf<SystemStyleProps> = {
