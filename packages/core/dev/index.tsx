@@ -16,7 +16,9 @@ function Foo() {
   return <Button onClick={toggleColorMode}>Button</Button>;
 }
 
-const theme = extendTheme({});
+const theme = extendTheme({
+  cssVarPrefix: "",
+});
 
 function App() {
   const startTime = new Date().getTime();
@@ -31,7 +33,8 @@ function App() {
 
   return (
     <HopeProvider withGlobalStyles>
-      <For each={range}>{(_, i) => <Button>Button</Button>}</For>
+      <Foo />
+      {/*<For each={range}>{(_, i) => <Button>Button</Button>}</For>*/}
     </HopeProvider>
   );
 }

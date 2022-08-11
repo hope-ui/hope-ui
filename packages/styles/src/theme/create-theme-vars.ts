@@ -59,18 +59,12 @@ export function createThemeVars(scales: ThemeScales, cssVarPrefix?: string) {
   const lightColors = { colors: colors.light };
   const darkColors = { colors: colors.dark };
 
-  const flatOtherTokens = flatten(otherScales, FLATTEN_SEPARATOR);
   const flatLightColorsTokens = flatten(lightColors, FLATTEN_SEPARATOR);
   const flatDarkColorsTokens = flatten(darkColors, FLATTEN_SEPARATOR);
+  const flatOtherTokens = flatten(otherScales, FLATTEN_SEPARATOR);
 
   // Replace both separator and `.`, because it's not a valid character in css variable name.
   const regex = new RegExp(`(${FLATTEN_SEPARATOR}|\\.)`, "g");
-
-  for (const [token, value] of Object.entries(flatOtherTokens)) {
-    const { variable, reference } = tokenToCssVar(regex, token, cssVarPrefix);
-    rootVars[variable] = value;
-    varsReference[token] = reference;
-  }
 
   for (const [token, value] of Object.entries(flatLightColorsTokens)) {
     const { variable, reference } = tokenToCssVar(regex, token, cssVarPrefix);
@@ -82,6 +76,12 @@ export function createThemeVars(scales: ThemeScales, cssVarPrefix?: string) {
     const { variable } = tokenToCssVar(regex, token, cssVarPrefix);
     darkVars[variable] = value;
     // No need to add to `varsReference` since light colors vars already be added.
+  }
+
+  for (const [token, value] of Object.entries(flatOtherTokens)) {
+    const { variable, reference } = tokenToCssVar(regex, token, cssVarPrefix);
+    rootVars[variable] = value;
+    varsReference[token] = reference;
   }
 
   // TODO: find more performant solution than flatten => unflatten.

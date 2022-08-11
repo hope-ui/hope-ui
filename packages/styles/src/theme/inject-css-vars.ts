@@ -5,6 +5,6 @@ import { COLOR_MODE_CLASSNAMES } from "../utils";
 export function injectCSSVars(theme: Theme) {
   globalCss({
     ":root": theme.__cssVarsValues.root,
-    [COLOR_MODE_CLASSNAMES.dark]: theme.__cssVarsValues.dark,
+    [`.${COLOR_MODE_CLASSNAMES.dark}`]: theme.__cssVarsValues.dark,
   })();
 }

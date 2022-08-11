@@ -20,7 +20,7 @@ const common = {
   ...generatePaletteChannel(scale),
 };
 
-export const amber: PaletteRangeGenerator = (palette, cssVarPrefix) => {
+export const amberPalette: PaletteRangeGenerator = (palette, cssVarPrefix) => {
   const getCssVar = createGetCssVar(cssVarPrefix);
 
   return {

@@ -41,9 +41,15 @@ export const useRecipe = createRecipe((vars, params: ButtonParams) => {
         soft: {},
         outlined: {
           root: {
-            bg: vars.colors.primary["500"],
+            border: "1px solid",
+            color: vars.colors[params.colorScheme].outlinedText,
+            bg: vars.colors[params.colorScheme].outlinedBackground,
+            borderColor: vars.colors[params.colorScheme].outlinedBorder,
+
             _hover: {
-              bg: "primary.600",
+              color: vars.colors[params.colorScheme].outlinedHoverText,
+              bg: vars.colors[params.colorScheme].outlinedHoverBackground,
+              borderColor: vars.colors[params.colorScheme].outlinedHoverBorder,
             },
           },
         },

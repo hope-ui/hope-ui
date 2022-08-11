@@ -136,8 +136,8 @@ export type ThemePaletteRanges = Record<ThemeColorPalette, PaletteRange>;
 // Note: ColorSystem keys can't be objects more than one level deep.
 export interface ColorSystem extends ThemePaletteRanges {
   common: PaletteCommon;
-  background: PaletteBackground;
   text: PaletteText;
+  background: PaletteBackground;
 }
 
 /**
