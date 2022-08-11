@@ -3,7 +3,7 @@ import { onMount } from "solid-js";
 import { For } from "solid-js/web";
 import { Title } from "solid-start";
 
-const range = [...Array(1000).keys()];
+const range = [...Array(3000).keys()];
 
 export default function Home() {
   const startTime = new Date().getTime();
