@@ -7,6 +7,7 @@ import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme, useThemeStyles } from "./theme";
 import {
   GetStaticClass,
+  PartialRecipeConfigInterpolation,
   RecipeClassNames,
   RecipeConfig,
   RecipeConfigInterpolation,
@@ -37,7 +38,7 @@ function extractRecipe<
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  config: RecipeConfigInterpolation<Parts, Params, Variants> | undefined,
+  config: PartialRecipeConfigInterpolation<Parts, Params, Variants> | undefined,
   vars: ThemeVars,
   params: Params,
   getStaticClass: GetStaticClass<Parts>

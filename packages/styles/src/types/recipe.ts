@@ -63,6 +63,19 @@ export type RecipeConfigInterpolation<
       getStaticClass: GetStaticClass<Parts>
     ) => RecipeConfig<Parts, Variants>);
 
+/** An object or function that returns a partial recipe configuration. */
+export type PartialRecipeConfigInterpolation<
+  Parts extends string,
+  Params extends Record<string, any>,
+  Variants extends VariantGroups<Parts>
+> =
+  | Partial<RecipeConfig<Parts, Variants>>
+  | ((
+      vars: ThemeVars,
+      params: Params,
+      getStaticClass: GetStaticClass<Parts>
+    ) => Partial<RecipeConfig<Parts, Variants>>);
+
 export interface UseRecipeOptions<
   Parts extends string,
   Params extends Record<string, any>,
@@ -81,7 +94,7 @@ export interface UseRecipeOptions<
    * Styles that will be merged with the "base styles" created by the `createStyles` call.
    * Mostly used to override/add additional styles.
    */
-  styles?: RecipeConfigInterpolation<Parts, Params, Variants>;
+  styles?: PartialRecipeConfigInterpolation<Parts, Params, Variants>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;

@@ -1,4 +1,4 @@
-import { HopeProps, SystemStyleProps } from "@hope-ui/styles";
+import { ComponentTheme, HopeProps, SystemStyleProps } from "@hope-ui/styles";
 import { Accessor, JSX } from "solid-js";
 
 import { ButtonRecipeProps } from "./button.styles";
@@ -49,3 +49,5 @@ export interface ButtonGroupContextValue {
   size: Accessor<ButtonGroupProps["size"]>;
   isDisabled: Accessor<ButtonGroupProps["isDisabled"]>;
 }
+
+export type ButtonTheme = ComponentTheme<ButtonProps, ButtonProps["styles"]>;
