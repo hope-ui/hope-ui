@@ -1,3 +1,11 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/styled-system/src/create-theme-vars/create-theme-vars.ts
+ */
+
 import { flatten, unflatten } from "@hope-ui/utils";
 
 import { ThemeCSSVariables, ThemeScales, ThemeVars } from "../types";

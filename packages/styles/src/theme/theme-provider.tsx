@@ -1,3 +1,11 @@
+/*!
+ * Original code by Mantinedev
+ * MIT Licensed, Copyright (c) 2021 Vitaly Rtishchev.
+ *
+ * Credits to the Mantinedev team:
+ * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/theme/MantineProvider.tsx
+ */
+
 import { createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { RecipeConfigInterpolation, Theme } from "../types";

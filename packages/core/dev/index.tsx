@@ -4,7 +4,7 @@ import { For, render } from "solid-js/web";
 import { Button, extendTheme, HopeProvider, useColorMode, useTheme } from "../src";
 import { ButtonTheme } from "../src/button/types";
 
-const range = [...Array(3000).keys()];
+const range = [...Array(1000).keys()];
 
 function Foo() {
   const { toggleColorMode } = useColorMode();

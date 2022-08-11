@@ -1,3 +1,17 @@
+/*!
+ * Original code by SEEK
+ * MIT Licensed, Copyright (c) 2021 SEEK.
+ *
+ * Credits to the SEEK team:
+ * https://github.com/seek-oss/vanilla-extract/blob/master/packages/recipes/src/createRuntimeFn.ts
+ *
+ * Original code by Mantinedev
+ * MIT Licensed, Copyright (c) 2021 Vitaly Rtishchev.
+ *
+ * Credits to the Mantinedev team:
+ * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/tss/create-styles.ts
+ */
+
 import { isEmpty, isEmptyObject, isFunction } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
 import { createMemo, createUniqueId } from "solid-js";

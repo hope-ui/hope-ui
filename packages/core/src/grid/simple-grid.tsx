@@ -1,10 +1,18 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/simple-grid.tsx
+ */
+
 import {
   createPolymorphicComponent,
   mapResponsive,
   resolveTokenValue,
   ResponsiveValue,
   SystemStyleProps,
-  Theme,
+  ThemeVars,
   useTheme,
 } from "@hope-ui/styles";
 import { isNull } from "@hope-ui/utils";
@@ -49,7 +57,7 @@ export const SimpleGrid = createPolymorphicComponent<"div", SimpleGridProps>(pro
 
   const templateColumns = () => {
     if (local.minChildWidth) {
-      return widthToColumns(local.minChildWidth, theme);
+      return widthToColumns(local.minChildWidth, theme.vars);
     }
 
     return countToColumns(local.columns);
@@ -66,9 +74,9 @@ export const SimpleGrid = createPolymorphicComponent<"div", SimpleGridProps>(pro
   );
 });
 
-function widthToColumns(width: any, theme: Theme) {
+function widthToColumns(width: any, vars: ThemeVars) {
   return mapResponsive(width, value => {
-    const _value = resolveTokenValue(value, "sizes", theme);
+    const _value = resolveTokenValue(value, "sizes", vars);
     return isNull(value) ? null : `repeat(auto-fit, minmax(${_value}, 1fr))`;
   });
 }

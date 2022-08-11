@@ -1,26 +1,41 @@
 // @refresh reload
 import "./root.css";
 
-import { getCssText, HopeProvider, HopeThemeOverride } from "@hope-ui/core";
+import { ButtonTheme, extendTheme, getCssText, HopeProvider } from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts } from "solid-start";
 
-const theme: HopeThemeOverride = {
+const theme = extendTheme({
+  cssVarPrefix: "chien",
   colors: {
-    primary: {
-      50: "#f5f3ff",
-      100: "#ede9fe",
-      200: "#ddd6fe",
-      300: "#c4b5fd",
-      400: "#a78bfa",
-      500: "#8b5cf6",
-      600: "#7c3aed",
-      700: "#6d28d9",
-      800: "#5b21b6",
-      900: "#4c1d95",
+    light: {
+      primary: {
+        outlinedBackground: "red",
+        outlinedHoverBorder: "green",
+      },
     },
   },
-};
+  components: {
+    Button: {
+      styles: (vars, params) => ({
+        base: {
+          root: {
+            rounded: "full",
+          },
+        },
+        variants: {
+          variant: {
+            outlined: {
+              root: {
+                background: vars.colors[params.colorScheme]["900"],
+              },
+            },
+          },
+        },
+      }),
+    } as ButtonTheme,
+  },
+});
 
 export default function Root() {
   return (

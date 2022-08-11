@@ -1,3 +1,11 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/system/src/factory.ts
+ */
+
 import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";

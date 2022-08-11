@@ -4,12 +4,7 @@ import { CSSObject } from "../stitches.config";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import { ColorSystem } from "./color-system";
 import { DeepPartial } from "./deep-partial";
-import {
-  PartialRecipeConfigInterpolation,
-  RecipeConfigInterpolation,
-  RecipeOptionsOf,
-  UseRecipeFn,
-} from "./recipe";
+import { PartialRecipeConfigInterpolation } from "./recipe";
 import {
   ThemeBreakpoint,
   ThemeFontFamily,

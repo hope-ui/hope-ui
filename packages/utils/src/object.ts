@@ -1,3 +1,11 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/utils/src/object.ts
+ */
+
 import { Dict, FilterFn } from "./types";
 
 export function pick<T extends Dict, K extends keyof T>(object: T, keys: K[]) {

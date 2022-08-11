@@ -1,3 +1,11 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/color-mode/src/storage-manager.ts
+ */
+
 import { isServer } from "solid-js/web";
 
 import { ColorModeStorageManager, MaybeColorMode } from "./types";
