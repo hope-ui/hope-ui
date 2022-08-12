@@ -1,53 +1,9 @@
 import { onMount } from "solid-js";
 import { For, render } from "solid-js/web";
 
-import { Button, extendTheme, HopeProvider, useColorMode, useTheme } from "../src";
-import { ButtonTheme } from "../src/button/types";
+import { Button, HopeProvider } from "../src";
 
-const range = [...Array(1000).keys()];
-
-function Foo() {
-  const { toggleColorMode } = useColorMode();
-
-  const theme = useTheme();
-
-  //console.log(theme.__cssVarsValues);
-  //console.log(theme.vars);
-
-  return <Button onClick={toggleColorMode}>Button</Button>;
-}
-
-const theme = extendTheme({
-  cssVarPrefix: "chien",
-  colors: {
-    light: {
-      primary: {
-        outlinedBackground: "red",
-        outlinedHoverBorder: "green",
-      },
-    },
-  },
-  components: {
-    Button: {
-      styles: (vars, params) => ({
-        base: {
-          root: {
-            rounded: "full",
-          },
-        },
-        variants: {
-          variant: {
-            outlined: {
-              root: {
-                background: vars.colors[params.colorScheme]["900"],
-              },
-            },
-          },
-        },
-      }),
-    } as ButtonTheme,
-  },
-});
+const range = [...Array(3000).keys()];
 
 function App() {
   const startTime = new Date().getTime();
@@ -61,8 +17,7 @@ function App() {
   });
 
   return (
-    <HopeProvider withGlobalStyles theme={theme}>
-      <Foo />
+    <HopeProvider withGlobalStyles>
       <For each={range}>{(_, i) => <Button>Button</Button>}</For>
     </HopeProvider>
   );

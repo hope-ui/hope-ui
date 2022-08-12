@@ -1,5 +1,13 @@
+/*!
+ * Original code by Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/styled-system/tests/css.test.ts
+ */
+
 import { DEFAULT_THEME } from "../../theme";
-import { ThemeBase } from "../../types";
+import { ThemeVars } from "../../types";
 import { toCSSObject } from "../to-css-object";
 
 describe("toCSSObject", () => {
@@ -15,13 +23,13 @@ describe("toCSSObject", () => {
     expect(result).toMatchInlineSnapshot(`
     Object {
       "@media screen and (min-width: 640px)": Object {
-        "fontSize": "${DEFAULT_THEME.fontSizes.lg}",
+        "fontSize": "${DEFAULT_THEME.vars.fontSizes.lg}",
       },
       "@media screen and (min-width: 768px)": Object {
-        "fontSize": "${DEFAULT_THEME.fontSizes.xl}",
+        "fontSize": "${DEFAULT_THEME.vars.fontSizes.xl}",
       },
-      "color": "${DEFAULT_THEME.colors.primary["500"]}",
-      "fontSize": "${DEFAULT_THEME.fontSizes.base}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["500"]}",
+      "fontSize": "${DEFAULT_THEME.vars.fontSizes.base}",
     }
   `);
   });
@@ -40,9 +48,9 @@ describe("toCSSObject", () => {
     expect(result).toMatchInlineSnapshot(`
     Object {
       "&:hover": Object {
-        "color": "${DEFAULT_THEME.colors.primary["600"]}",
+        "color": "${DEFAULT_THEME.vars.colors.primary["600"]}",
       },
-      "color": "${DEFAULT_THEME.colors.primary["500"]}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["500"]}",
     }
   `);
   });
@@ -60,14 +68,14 @@ describe("toCSSObject", () => {
 
     expect(result).toMatchInlineSnapshot(`
     Object {
-      "color": "${DEFAULT_THEME.colors.primary["500"]}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["500"]}",
       "h1": Object {
         "@media screen and (min-width: 640px)": Object {
-          "paddingBottom": "${DEFAULT_THEME.space["4"]}",
-          "paddingTop": "${DEFAULT_THEME.space["4"]}",
+          "paddingBottom": "${DEFAULT_THEME.vars.space["4"]}",
+          "paddingTop": "${DEFAULT_THEME.vars.space["4"]}",
         },
-        "paddingBottom": "${DEFAULT_THEME.space["3"]}",
-        "paddingTop": "${DEFAULT_THEME.space["3"]}",
+        "paddingBottom": "${DEFAULT_THEME.vars.space["3"]}",
+        "paddingTop": "${DEFAULT_THEME.vars.space["3"]}",
       },
     }
   `);
@@ -94,19 +102,19 @@ describe("toCSSObject", () => {
 
     expect(result).toMatchInlineSnapshot(`
     Object {
-      "background": "${DEFAULT_THEME.colors.primary["50"]}",
-      "color": "${DEFAULT_THEME.colors.primary["500"]}",
-      "fontFamily": "${DEFAULT_THEME.fonts.mono}",
-      "fontSize": "${DEFAULT_THEME.fontSizes.lg}",
-      "fontWeight": ${DEFAULT_THEME.fontWeights.bold},
-      "lineHeight": ${DEFAULT_THEME.lineHeights.base},
+      "background": "${DEFAULT_THEME.vars.colors.primary["50"]}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["500"]}",
+      "fontFamily": "${DEFAULT_THEME.vars.fonts.mono}",
+      "fontSize": "${DEFAULT_THEME.vars.fontSizes.lg}",
+      "fontWeight": "${DEFAULT_THEME.vars.fontWeights.bold}",
+      "lineHeight": "${DEFAULT_THEME.vars.lineHeights.base}",
       "margin": "0px",
-      "marginBottom": "${DEFAULT_THEME.space["2"]}",
+      "marginBottom": "${DEFAULT_THEME.vars.space["2"]}",
       "marginInlineEnd": "auto",
       "marginInlineStart": "auto",
-      "padding": "${DEFAULT_THEME.space["3"]}",
-      "paddingBottom": "${DEFAULT_THEME.space["4"]}",
-      "paddingTop": "${DEFAULT_THEME.space["4"]}",
+      "padding": "${DEFAULT_THEME.vars.space["3"]}",
+      "paddingBottom": "${DEFAULT_THEME.vars.space["4"]}",
+      "paddingTop": "${DEFAULT_THEME.vars.space["4"]}",
       "textTransform": "uppercase",
     }
   `);
@@ -115,13 +123,13 @@ describe("toCSSObject", () => {
   it("supports functional values", () => {
     const result = toCSSObject(
       {
-        color: (theme: ThemeBase) => theme.colors.primary["500"],
+        color: (vars: ThemeVars) => vars.colors.primary["500"],
       },
       DEFAULT_THEME
     );
 
     expect(result).toEqual({
-      color: DEFAULT_THEME.colors.primary["500"],
+      color: DEFAULT_THEME.vars.colors.primary["500"],
     });
   });
 
@@ -160,9 +168,9 @@ describe("toCSSObject", () => {
       "p": Object {
         "color": "tomato",
         "fontSize": "32px",
-        "padding": "${DEFAULT_THEME.space["2"]}",
+        "padding": "${DEFAULT_THEME.vars.space["2"]}",
       },
-      "padding": "${DEFAULT_THEME.space["32"]}",
+      "padding": "${DEFAULT_THEME.vars.space["32"]}",
     }
   `);
   });
@@ -170,7 +178,7 @@ describe("toCSSObject", () => {
   it("functional values can return responsive arrays", () => {
     const result = toCSSObject(
       {
-        color: (theme: ThemeBase) => [theme.colors.primary["500"], theme.colors.primary["600"]],
+        color: (vars: ThemeVars) => [vars.colors.primary["500"], vars.colors.primary["600"]],
       },
       DEFAULT_THEME
     );
@@ -178,9 +186,9 @@ describe("toCSSObject", () => {
     expect(result).toMatchInlineSnapshot(`
     Object {
       "@media screen and (min-width: 640px)": Object {
-        "color": "${DEFAULT_THEME.colors.primary["600"]}",
+        "color": "${DEFAULT_THEME.vars.colors.primary["600"]}",
       },
-      "color": "${DEFAULT_THEME.colors.primary["500"]}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["500"]}",
     }
   `);
   });
@@ -194,7 +202,7 @@ describe("toCSSObject", () => {
     );
 
     expect(result).toEqual({
-      color: DEFAULT_THEME.colors.primary["500"],
+      color: DEFAULT_THEME.vars.colors.primary["500"],
     });
   });
 
@@ -223,20 +231,20 @@ describe("toCSSObject", () => {
 
     expect(result).toMatchInlineSnapshot(`
     Object {
-      "borderBottomColor": "${DEFAULT_THEME.colors.primary["500"]}",
-      "borderBottomLeftRadius": "${DEFAULT_THEME.radii.sm}",
-      "borderBottomRightRadius": "${DEFAULT_THEME.radii.sm}",
+      "borderBottomColor": "${DEFAULT_THEME.vars.colors.primary["500"]}",
+      "borderBottomLeftRadius": "${DEFAULT_THEME.vars.radii.sm}",
+      "borderBottomRightRadius": "${DEFAULT_THEME.vars.radii.sm}",
       "borderBottomStyle": "solid",
       "borderBottomWidth": "2px",
-      "borderLeftColor": "${DEFAULT_THEME.colors.primary["500"]}",
+      "borderLeftColor": "${DEFAULT_THEME.vars.colors.primary["500"]}",
       "borderLeftStyle": "solid",
       "borderLeftWidth": "2px",
-      "borderRightColor": "${DEFAULT_THEME.colors.primary["500"]}",
+      "borderRightColor": "${DEFAULT_THEME.vars.colors.primary["500"]}",
       "borderRightStyle": "solid",
       "borderRightWidth": "2px",
-      "borderTopColor": "${DEFAULT_THEME.colors.primary["500"]}",
-      "borderTopLeftRadius": "${DEFAULT_THEME.radii.sm}",
-      "borderTopRightRadius": "${DEFAULT_THEME.radii.sm}",
+      "borderTopColor": "${DEFAULT_THEME.vars.colors.primary["500"]}",
+      "borderTopLeftRadius": "${DEFAULT_THEME.vars.radii.sm}",
+      "borderTopRightRadius": "${DEFAULT_THEME.vars.radii.sm}",
       "borderTopStyle": "solid",
       "borderTopWidth": "2px",
     }
@@ -252,7 +260,7 @@ describe("toCSSObject", () => {
     );
     expect(style).toMatchInlineSnapshot(`
     Object {
-      "flexBasis": "${DEFAULT_THEME.sizes["4"]}",
+      "flexBasis": "${DEFAULT_THEME.vars.sizes["4"]}",
     }
   `);
   });
@@ -271,15 +279,15 @@ describe("toCSSObject", () => {
 
     expect(style).toMatchInlineSnapshot(`
     Object {
-      "marginBottom": "${DEFAULT_THEME.space["2"]}",
-      "marginInlineEnd": "${DEFAULT_THEME.space["2"]}",
-      "marginInlineStart": "${DEFAULT_THEME.space["2"]}",
-      "marginTop": "${DEFAULT_THEME.space["2"]}",
-      "paddingBottom": "${DEFAULT_THEME.space["2"]}",
-      "paddingInlineEnd": "${DEFAULT_THEME.space["2"]}",
-      "paddingInlineStart": "${DEFAULT_THEME.space["2"]}",
-      "paddingTop": "${DEFAULT_THEME.space["2"]}",
-      "width": "${DEFAULT_THEME.sizes.sm}",
+      "marginBottom": "${DEFAULT_THEME.vars.space["2"]}",
+      "marginInlineEnd": "${DEFAULT_THEME.vars.space["2"]}",
+      "marginInlineStart": "${DEFAULT_THEME.vars.space["2"]}",
+      "marginTop": "${DEFAULT_THEME.vars.space["2"]}",
+      "paddingBottom": "${DEFAULT_THEME.vars.space["2"]}",
+      "paddingInlineEnd": "${DEFAULT_THEME.vars.space["2"]}",
+      "paddingInlineStart": "${DEFAULT_THEME.vars.space["2"]}",
+      "paddingTop": "${DEFAULT_THEME.vars.space["2"]}",
+      "width": "${DEFAULT_THEME.vars.sizes.sm}",
     }
   `);
   });
@@ -294,7 +302,7 @@ describe("toCSSObject", () => {
 
     expect(result).toMatchInlineSnapshot(`
     Object {
-      "outlineColor": "${DEFAULT_THEME.colors.primary["500"]}",
+      "outlineColor": "${DEFAULT_THEME.vars.colors.primary["500"]}",
     }
   `);
   });
@@ -311,13 +319,13 @@ describe("toCSSObject", () => {
     expect(result).toMatchInlineSnapshot(`
     Object {
       "@media screen and (min-width: 640px)": Object {
-        "color": "${DEFAULT_THEME.colors.primary["100"]}",
+        "color": "${DEFAULT_THEME.vars.colors.primary["100"]}",
       },
       "@media screen and (min-width: 768px)": Object {
-        "color": "${DEFAULT_THEME.colors.primary["200"]}",
+        "color": "${DEFAULT_THEME.vars.colors.primary["200"]}",
         "width": "50%",
       },
-      "color": "${DEFAULT_THEME.colors.primary["50"]}",
+      "color": "${DEFAULT_THEME.vars.colors.primary["50"]}",
       "width": "100%",
     }
   `);
@@ -369,15 +377,15 @@ describe("toCSSObject", () => {
     Object {
       "&::before": Object {
         "@media screen and (min-width: 640px)": Object {
-          "paddingLeft": "${DEFAULT_THEME.space["3"]}",
-          "paddingRight": "${DEFAULT_THEME.space["2"]}",
+          "paddingLeft": "${DEFAULT_THEME.vars.space["3"]}",
+          "paddingRight": "${DEFAULT_THEME.vars.space["2"]}",
         },
         "@media screen and (min-width: 768px)": Object {
-          "paddingLeft": "${DEFAULT_THEME.space["4"]}",
+          "paddingLeft": "${DEFAULT_THEME.vars.space["4"]}",
         },
-        "paddingBottom": "${DEFAULT_THEME.space["2"]}",
-        "paddingLeft": "${DEFAULT_THEME.space["2"]}",
-        "paddingRight": "${DEFAULT_THEME.space["1"]}",
+        "paddingBottom": "${DEFAULT_THEME.vars.space["2"]}",
+        "paddingLeft": "${DEFAULT_THEME.vars.space["2"]}",
+        "paddingRight": "${DEFAULT_THEME.vars.space["1"]}",
       },
     }
   `);

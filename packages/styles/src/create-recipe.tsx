@@ -12,9 +12,9 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/tss/create-styles.ts
  */
 
-import { isEmpty, isEmptyObject, isFunction } from "@hope-ui/utils";
+import { isEmpty, isEmptyObject, isFunction, uniqueId } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
-import { createMemo, createUniqueId } from "solid-js";
+import { createMemo } from "solid-js";
 
 import { css } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
@@ -72,13 +72,13 @@ export function createRecipe<
 >(
   config: RecipeConfigInterpolation<Parts, Params, Variants>
 ): UseRecipeFn<Parts, Params, Variants> {
-  const uniqueId = createUniqueId();
+  const _uniqueId = uniqueId();
 
   const extractBaseRecipe = typeof config === "function" ? config : () => config;
 
   function useRecipe(options: UseRecipeOptions<Parts, Params, Variants>) {
     const getStaticClass: GetStaticClass<Parts> = part => {
-      return `hope-${options.name || uniqueId}-${part}`;
+      return `hope-${options.name || _uniqueId}-${part}`;
     };
 
     const theme = useTheme();
