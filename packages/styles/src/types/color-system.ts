@@ -44,67 +44,67 @@ export interface PaletteChannel {
 
 export interface PaletteRange extends PaletteScale, PaletteChannel {
   solidText: string;
-  solidBackground: string;
+  solidBg: string;
   solidBorder: string;
   // hover state
   solidHoverText: string;
-  solidHoverBackground: string;
+  solidHoverBg: string;
   solidHoverBorder: string;
   // active state
   solidActiveText: string;
-  solidActiveBackground: string;
+  solidActiveBg: string;
   solidActiveBorder: string;
   // disabled state
   solidDisabledText: string;
-  solidDisabledBackground: string;
+  solidDisabledBg: string;
   solidDisabledBorder: string;
 
   softText: string;
-  softBackground: string;
+  softBg: string;
   softBorder: string;
   // hover state
   softHoverText: string;
-  softHoverBackground: string;
+  softHoverBg: string;
   softHoverBorder: string;
   // active state
   softActiveText: string;
-  softActiveBackground: string;
+  softActiveBg: string;
   softActiveBorder: string;
   // disabled state
   softDisabledText: string;
-  softDisabledBackground: string;
+  softDisabledBg: string;
   softDisabledBorder: string;
 
   outlinedText: string;
-  outlinedBackground: string;
+  outlinedBg: string;
   outlinedBorder: string;
   // hover state
   outlinedHoverText: string;
-  outlinedHoverBackground: string;
+  outlinedHoverBg: string;
   outlinedHoverBorder: string;
   // active state
   outlinedActiveText: string;
-  outlinedActiveBackground: string;
+  outlinedActiveBg: string;
   outlinedActiveBorder: string;
   // disabled state
   outlinedDisabledText: string;
-  outlinedDisabledBackground: string;
+  outlinedDisabledBg: string;
   outlinedDisabledBorder: string;
 
   plainText: string;
-  plainBackground: string;
+  plainBg: string;
   plainBorder: string;
   // hover state
   plainHoverText: string;
-  plainHoverBackground: string;
+  plainHoverBg: string;
   plainHoverBorder: string;
   // active state
   plainActiveText: string;
-  plainActiveBackground: string;
+  plainActiveBg: string;
   plainActiveBorder: string;
   // disabled state
   plainDisabledText: string;
-  plainDisabledBackground: string;
+  plainDisabledBg: string;
   plainDisabledBorder: string;
 
   // override palette.text
@@ -113,8 +113,14 @@ export interface PaletteRange extends PaletteScale, PaletteChannel {
   overrideTextTertiary: string;
 }
 
+/**
+ * Generate a color palette to use in Hope UI Theme.
+ *
+ * @param color The semantic color it will be used for in the theme (e.g. primary, info, etc...)
+ * @param cssVarPrefix The prefix to use when accessing css variables, should be the same as defined in the theme.
+ */
 export type PaletteRangeGenerator = (
-  palette: ThemeColorPalette,
+  color: ThemeColorPalette,
   cssVarPrefix?: string
 ) => PaletteRange;
 
