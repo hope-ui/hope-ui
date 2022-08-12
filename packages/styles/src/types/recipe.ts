@@ -16,11 +16,6 @@ type BooleanMap<T> = T extends "true" | "false" ? boolean : T;
 /** An object of recipe parts/styles object. */
 export type RecipeStylesObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
 
-/** An object of recipe parts/classNames. */
-export type RecipeClassNames<Parts extends string> = Record<Parts, string | undefined>;
-
-export type GetStaticClass<Parts extends string> = (part: Parts) => string;
-
 export type VariantDefinitions<Parts extends string> = Record<
   string,
   Partial<RecipeStylesObjects<Parts>>
@@ -65,11 +60,7 @@ export type RecipeConfigInterpolation<
   Variants extends VariantGroups<Parts>
 > =
   | RecipeConfig<Parts, Variants>
-  | ((
-      vars: ThemeVars,
-      params: Params,
-      getStaticClass: GetStaticClass<Parts>
-    ) => RecipeConfig<Parts, Variants>);
+  | ((vars: ThemeVars, params: Params) => RecipeConfig<Parts, Variants>);
 
 /** An object or function that returns a partial recipe configuration. */
 export type PartialRecipeConfigInterpolation<
@@ -78,11 +69,7 @@ export type PartialRecipeConfigInterpolation<
   Variants extends VariantGroups<Parts>
 > =
   | Partial<RecipeConfig<Parts, Variants>>
-  | ((
-      vars: ThemeVars,
-      params: Params,
-      getStaticClass: GetStaticClass<Parts>
-    ) => Partial<RecipeConfig<Parts, Variants>>);
+  | ((vars: ThemeVars, params: Params) => Partial<RecipeConfig<Parts, Variants>>);
 
 export interface UseRecipeOptions<
   Parts extends string,
@@ -112,7 +99,7 @@ export type UseRecipeFn<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
-> = (options: UseRecipeOptions<Parts, Params, Variants>) => Accessor<RecipeClassNames<Parts>>;
+> = (options: UseRecipeOptions<Parts, Params, Variants>) => Accessor<RecipeStylesObjects<Parts>>;
 
 /** Extract the option's type of `useRecipe` primitive. */
 export type RecipeOptionsOf<RecipeFn extends UseRecipeFn<any, any, any>> = Parameters<RecipeFn>[0];

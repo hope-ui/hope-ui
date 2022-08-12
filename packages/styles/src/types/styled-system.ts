@@ -709,10 +709,10 @@ export type TypographyProps = ResponsiveProps<{
   fontWeight: Property.FontWeight | ThemeFontWeight | number;
 
   /** The CSS `line-height` property. */
-  lineHeight: Property.LineHeight<ThemeLineHeight> | string | number;
+  lineHeight: Property.LineHeight<ThemeLineHeight> | number;
 
   /** The CSS `letter-spacing` property. */
-  letterSpacing: Property.LetterSpacing<ThemeLetterSpacing> | string | number;
+  letterSpacing: Property.LetterSpacing<ThemeLetterSpacing> | number;
 
   /** The CSS `text-align` property. */
   textAlign: Property.TextAlign;

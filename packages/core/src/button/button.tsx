@@ -23,7 +23,7 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
     "isLoading",
   ]);
 
-  const classes = useRecipe({
+  const styles = useRecipe({
     name: "Button",
     params: local as ButtonParams,
     variants: local,
@@ -35,5 +35,5 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
     },
   });
 
-  return <hope.button class={classes().root} {...others} />;
+  return <hope.button __css={styles().root} {...others} />;
 });
