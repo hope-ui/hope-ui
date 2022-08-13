@@ -4,7 +4,7 @@ import { CSSObject } from "../stitches.config";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import { ColorSystem } from "./color-system";
 import { DeepPartial } from "./deep-partial";
-import { PartialRecipeConfigInterpolation } from "./recipe";
+import { PartialStylesConfigInterpolation } from "./styles-config";
 import {
   ThemeBreakpoint,
   ThemeFontFamily,
@@ -52,7 +52,7 @@ export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScales>>;
 
 export interface ComponentTheme<
   Props extends Record<string, any> = {},
-  RecipeConfig extends PartialRecipeConfigInterpolation<any, any, any> | undefined = any
+  StylesConfig extends PartialStylesConfigInterpolation<any, any, any> | undefined = any
 > {
   /** Default props to be passed to the component. */
   defaultProps?: Props;
@@ -61,7 +61,7 @@ export interface ComponentTheme<
    * Styles that will be merged with the "base styles" of the component.
    * Mostly used to override/add additional styles.
    */
-  styles?: RecipeConfig;
+  styles?: StylesConfig;
 }
 
 export interface ThemeBase extends ThemeScales {

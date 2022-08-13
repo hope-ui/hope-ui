@@ -8,7 +8,7 @@
 
 import { createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { RecipeConfigInterpolation, Theme } from "../types";
+import type { StylesConfigInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME } from "./default-theme";
@@ -31,7 +31,7 @@ export function useThemeStyles(component?: string) {
     }
 
     return theme.components[component]?.styles as
-      | RecipeConfigInterpolation<any, any, any>
+      | StylesConfigInterpolation<any, any, any>
       | undefined;
   });
 }

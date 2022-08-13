@@ -18,14 +18,14 @@ import { createMemo } from "solid-js";
 
 import { useTheme, useThemeStyles } from "./theme";
 import {
-  PartialRecipeConfigInterpolation,
-  RecipeConfig,
-  RecipeConfigInterpolation,
-  RecipeStylesObjects,
+  PartialStylesConfigInterpolation,
+  StylesConfig,
+  StylesConfigInterpolation,
+  StylesObjects,
   SystemStyleObject,
   ThemeVars,
-  UseRecipeFn,
-  UseRecipeOptions,
+  UseStylesFn,
+  UseStylesOptions,
   VariantGroups,
   VariantSelection,
 } from "./types";
@@ -45,15 +45,15 @@ function shouldApplyCompound<Parts extends string, Variants extends VariantGroup
   return true;
 }
 
-function extractRecipe<
+function extractStylesConfig<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  config: PartialRecipeConfigInterpolation<Parts, Params, Variants> | undefined,
+  config: PartialStylesConfigInterpolation<Parts, Params, Variants> | undefined,
   vars: ThemeVars,
   params: Params
-): Partial<RecipeConfig<Parts, Variants>> {
+): Partial<StylesConfig<Parts, Variants>> {
   if (isFunction(config)) {
     return config(vars, params ?? ({} as Params));
   }
@@ -61,54 +61,56 @@ function extractRecipe<
   return config ?? {};
 }
 
-/** Create a `useRecipe` primitive. */
-export function createRecipe<
+/** Create a `useStyles` primitive. */
+export function createStyles<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  config: RecipeConfigInterpolation<Parts, Params, Variants>
-): UseRecipeFn<Parts, Params, Variants> {
-  const extractBaseRecipe = typeof config === "function" ? config : () => config;
+  config: StylesConfigInterpolation<Parts, Params, Variants>
+): UseStylesFn<Parts, Params, Variants> {
+  const extractBaseStylesConfig = typeof config === "function" ? config : () => config;
 
-  function useRecipe(options: UseRecipeOptions<Parts, Params, Variants>) {
+  function useStyles(options: UseStylesOptions<Parts, Params, Variants>) {
     const theme = useTheme();
     const themeStyles = useThemeStyles(options.name);
 
     const styles = createMemo(() => {
-      const baseRecipe = options.unstyled ? {} : extractBaseRecipe(theme.vars, options.params);
+      const baseStylesConfig = options.unstyled
+        ? {}
+        : extractBaseStylesConfig(theme.vars, options.params);
 
-      const themeRecipe = extractRecipe(themeStyles(), theme.vars, options.params);
-      const propRecipe = extractRecipe(options.styles, theme.vars, options.params);
+      const themeStylesConfig = extractStylesConfig(themeStyles(), theme.vars, options.params);
+      const propStylesConfig = extractStylesConfig(options.styles, theme.vars, options.params);
 
-      // 1. merge recipe options.
-      const mergedRecipe: RecipeConfig<Parts, Variants> = mergeWith(
+      // 1. merge styles configs.
+      const mergedConfig: StylesConfig<Parts, Variants> = mergeWith(
         {},
-        baseRecipe,
-        themeRecipe,
-        propRecipe
+        baseStylesConfig,
+        themeStylesConfig,
+        propStylesConfig
       );
 
-      // 2. add "recipe base" styles.
+      // 2. add "base" styles.
       const stylesMap = new Map<Parts, Array<SystemStyleObject | undefined>>(
-        mergedRecipe.parts.map(part => [part, [mergedRecipe.base?.[part]]])
+        mergedConfig.parts.map(part => [part, [mergedConfig.base?.[part]]])
       );
 
-      // 3. add "recipe variants" styles.
+      // 3. add "variants" styles.
       const selections = {
-        ...mergedRecipe.defaultVariants,
+        ...mergedConfig.defaultVariants,
         ...options.variants,
       } as VariantSelection<Parts, Variants>;
 
       for (const variantName in selections) {
-        const selection = selections[variantName] ?? mergedRecipe.defaultVariants?.[variantName];
+        const selection = selections[variantName] ?? mergedConfig.defaultVariants?.[variantName];
 
         if (selection == null) {
           continue;
         }
 
         const selectionStyle =
-          mergedRecipe.variants?.[variantName as any]?.[String(selection) as any];
+          mergedConfig.variants?.[variantName as any]?.[String(selection) as any];
 
         if (!selectionStyle) {
           continue;
@@ -119,13 +121,13 @@ export function createRecipe<
         });
       }
 
-      // 4. add "recipe compoundVariants" styles.
-      for (const compoundVariant of mergedRecipe.compoundVariants ?? []) {
+      // 4. add "compoundVariants" styles.
+      for (const compoundVariant of mergedConfig.compoundVariants ?? []) {
         if (
           shouldApplyCompound(
             compoundVariant.variants,
             selections,
-            mergedRecipe.defaultVariants ?? {}
+            mergedConfig.defaultVariants ?? {}
           )
         ) {
           Object.entries(compoundVariant.style).forEach(([part, style]) => {
@@ -141,11 +143,11 @@ export function createRecipe<
         mergedStyles[part] = mergeWith({}, ...styles);
       });
 
-      return mergedStyles as RecipeStylesObjects<Parts>;
+      return mergedStyles as StylesObjects<Parts>;
     });
 
     return styles;
   }
 
-  return useRecipe;
+  return useStyles;
 }

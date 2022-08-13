@@ -1,11 +1,11 @@
-import { createRecipe, focusStyles, RecipeProps, ThemeColorPalette } from "@hope-ui/styles";
+import { createStyles, focusStyles, StylesConfigProps, ThemeColorPalette } from "@hope-ui/styles";
 
 export interface ButtonParams {
   /** The color of the button. */
   colorScheme: ThemeColorPalette;
 }
 
-export const useRecipe = createRecipe((vars, params: ButtonParams) => {
+export const useStyles = createStyles((vars, params: ButtonParams) => {
   return {
     parts: ["root", "icon"],
     base: {
@@ -210,4 +210,4 @@ export const useRecipe = createRecipe((vars, params: ButtonParams) => {
   };
 });
 
-export type ButtonRecipeProps = RecipeProps<typeof useRecipe>;
+export type ButtonStylesConfigProps = StylesConfigProps<typeof useStyles>;

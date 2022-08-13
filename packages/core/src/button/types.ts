@@ -1,9 +1,9 @@
 import { ComponentTheme, HopeProps, SystemStyleProps } from "@hope-ui/styles";
 import { Accessor, JSX } from "solid-js";
 
-import { ButtonRecipeProps } from "./button.styles";
+import { ButtonStylesConfigProps } from "./button.styles";
 
-export interface ButtonProps extends ButtonRecipeProps {
+export interface ButtonProps extends ButtonStylesConfigProps {
   /** The placement of the loader when `isLoading` is true. */
   loaderPlacement?: "start" | "end";
 

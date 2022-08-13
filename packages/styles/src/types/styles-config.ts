@@ -13,12 +13,12 @@ import { ThemeVars } from "./theme";
 
 type BooleanMap<T> = T extends "true" | "false" ? boolean : T;
 
-/** An object of recipe parts/styles object. */
-export type RecipeStylesObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
+/** An object of styles parts/style objects. */
+export type StylesObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
 
 export type VariantDefinitions<Parts extends string> = Record<
   string,
-  Partial<RecipeStylesObjects<Parts>>
+  Partial<StylesObjects<Parts>>
 >;
 
 export type VariantGroups<Parts extends string> = Record<string, VariantDefinitions<Parts>>;
@@ -32,16 +32,16 @@ export interface CompoundVariant<Parts extends string, Variants extends VariantG
   variants: VariantSelection<Parts, Variants>;
 
   /** The styles to be applied. */
-  style: Partial<RecipeStylesObjects<Parts>>;
+  style: Partial<StylesObjects<Parts>>;
 }
 
-/** An recipe configuration. */
-export type RecipeConfig<Parts extends string, Variants extends VariantGroups<Parts>> = {
+/** A styles configuration. */
+export type StylesConfig<Parts extends string, Variants extends VariantGroups<Parts>> = {
   /** The parts of the recipe/component. */
   parts: Array<Parts>;
 
   /** The base styles of each part. */
-  base?: Partial<RecipeStylesObjects<Parts>>;
+  base?: Partial<StylesObjects<Parts>>;
 
   /** The variants style of each part. */
   variants?: Variants;
@@ -53,53 +53,50 @@ export type RecipeConfig<Parts extends string, Variants extends VariantGroups<Pa
   defaultVariants?: VariantSelection<Parts, Variants>;
 };
 
-/** An object or function that returns a recipe configuration. */
-export type RecipeConfigInterpolation<
+/** An object or function that returns styles configuration. */
+export type StylesConfigInterpolation<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 > =
-  | RecipeConfig<Parts, Variants>
-  | ((vars: ThemeVars, params: Params) => RecipeConfig<Parts, Variants>);
+  | StylesConfig<Parts, Variants>
+  | ((vars: ThemeVars, params: Params) => StylesConfig<Parts, Variants>);
 
-/** An object or function that returns a partial recipe configuration. */
-export type PartialRecipeConfigInterpolation<
+/** An object or function that returns partial styles configuration. */
+export type PartialStylesConfigInterpolation<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 > =
-  | Partial<RecipeConfig<Parts, Variants>>
-  | ((vars: ThemeVars, params: Params) => Partial<RecipeConfig<Parts, Variants>>);
+  | Partial<StylesConfig<Parts, Variants>>
+  | ((vars: ThemeVars, params: Params) => Partial<StylesConfig<Parts, Variants>>);
 
-export interface UseRecipeOptions<
+export interface UseStylesOptions<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 > {
-  /** The name of the component, used to retrieve theme styles and generating static classNames. */
+  /** The name of the component, used to retrieve theme styles. */
   name?: string;
 
-  /** Dynamic params that will be passed to the recipe. */
+  /** Dynamic params that will be passed to the `useStyles` call. */
   params: Params;
 
-  /** The recipe variants, used to determine which classNames should be applied. */
+  /** The variants used to determine which style should be applied. */
   variants?: VariantSelection<Parts, Variants>;
 
   /**
    * Styles that will be merged with the "base styles" created by the `createStyles` call.
    * Mostly used to override/add additional styles.
    */
-  styles?: PartialRecipeConfigInterpolation<Parts, Params, Variants>;
+  styles?: PartialStylesConfigInterpolation<Parts, Params, Variants>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
 }
 
-export type UseRecipeFn<
+export type UseStylesFn<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
-> = (options: UseRecipeOptions<Parts, Params, Variants>) => Accessor<RecipeStylesObjects<Parts>>;
-
-/** Extract the option's type of `useRecipe` primitive. */
-export type RecipeOptionsOf<RecipeFn extends UseRecipeFn<any, any, any>> = Parameters<RecipeFn>[0];
+> = (options: UseStylesOptions<Parts, Params, Variants>) => Accessor<StylesObjects<Parts>>;
