@@ -3,7 +3,7 @@ import { For } from "solid-js/web";
 
 import { Button } from "../src";
 
-const range = [...Array(3000).keys()];
+const range = [...Array(3001).keys()];
 
 export default function App() {
   const startTime = new Date().getTime();
