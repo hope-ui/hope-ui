@@ -27,7 +27,7 @@ import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { HopeProps, Sx, SystemStyleObject, ThemeVars } from "./types";
+import { HopeProps, SystemStyleObject, ThemeVars } from "./types";
 import { packSx } from "./utils";
 
 /** A component with Hope UI props. */
@@ -61,6 +61,20 @@ type HopeFactory = <T extends ElementType, Props = {}>(
   options?: HopeFactoryStyleOptions<Props>
 ) => HopeComponent<T, Props>;
 
+/**
+ * Singleton stitches `cssComponent`.
+ * Used to inject styles at the consumption layer via the `css` prop.
+ * Also act as a css reset for all Hope UI component.
+ */
+const systemCssComponent = css({
+  boxSizing: "border-box",
+  margin: 0,
+
+  "&::before, &::after": {
+    boxSizing: "border-box",
+  },
+});
+
 function styled<T extends ElementType, Props = {}>(
   component: T,
   options: HopeFactoryStyleOptions<Props> = {}
@@ -77,32 +91,21 @@ function styled<T extends ElementType, Props = {}>(
     const theme = useTheme();
 
     const className = createMemo(() => {
-      const baseStyleObject = Object.assign(
+      const styles = Object.assign(
         {},
         local.__css,
         isFunction(baseStyle) ? baseStyle(theme.vars, props) : baseStyle,
-        filterUndefined(styleProps)
-      );
-
-      const overrideStyleObject = Object.assign(
-        {},
+        filterUndefined(styleProps),
         ...packSx(local.sx).map(partial => runIfFn(partial, theme.vars))
       );
 
-      if (isEmptyObject(baseStyleObject) && isEmptyObject(overrideStyleObject)) {
+      if (isEmptyObject(styles)) {
         return undefined;
       }
 
-      const cssComponent = css(toCSSObject(baseStyleObject, theme));
+      const overrideCss = toCSSObject(styles, theme);
 
-      if (isEmptyObject(overrideStyleObject)) {
-        return cssComponent().className;
-      }
-
-      const overrideCss = toCSSObject(overrideStyleObject, theme);
-
-      // use `css` prop to have higher specificity.
-      return cssComponent({ css: overrideCss }).className;
+      return systemCssComponent({ css: overrideCss }).className;
     });
 
     return (

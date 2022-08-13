@@ -6,10 +6,8 @@ export function injectGlobalStyles(theme: Theme) {
   const getCssVar = createGetCssVar(theme.cssVarPrefix);
 
   globalCss({
-    "*, ::before, ::after": {
+    "*, *::before, *::after": {
       boxSizing: "border-box",
-      borderWidth: 0,
-      borderStyle: "solid",
     },
 
     html: {
