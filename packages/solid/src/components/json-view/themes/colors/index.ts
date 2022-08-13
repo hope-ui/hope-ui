@@ -1,8 +1,44 @@
-import { Base16Theme } from "react-base16-styling";
+export { default as apathy } from "./apathy";
+export { default as ashes } from "./ashes";
+export { default as atelierDune } from "./atelier-dune";
+export { default as atelierForest } from "./atelier-forest";
+export { default as atelierHeath } from "./atelier-heath";
+export { default as atelierLakeside } from "./atelier-lakeside";
+export { default as atelierSeaside } from "./atelier-seaside";
+export { default as bespin } from "./bespin";
+export { default as brewer } from "./brewer";
+export { default as bright } from "./bright";
+export { default as chalk } from "./chalk";
+export { default as codeschool } from "./codeschool";
+export { default as colors } from "./colors";
+export { default as default } from "./default";
+export { default as eighties } from "./eighties";
+export { default as embers } from "./embers";
+export { default as flat } from "./flat";
+export { default as google } from "./google";
+export { default as grayscale } from "./grayscale";
+export { default as greenscreen } from "./greenscreen";
+export { default as harmonic } from "./harmonic";
+export { default as hopscotch } from "./hopscotch";
+export { default as isotope } from "./isotope";
+export { default as marrakesh } from "./marrakesh";
+export { default as mocha } from "./mocha";
+export { default as monokai } from "./monokai";
+export { default as ocean } from "./ocean";
+export { default as paraiso } from "./paraiso";
+export { default as pop } from "./pop";
+export { default as railscasts } from "./railscasts";
+export { default as shapeshifter } from "./shapeshifter";
+export { default as solarized } from "./solarized";
+export { default as summerfruit } from "./summerfruit";
+export { default as threezerotwofour } from "./threezerotwofour";
+export { default as tomorrow } from "./tomorrow";
+export { default as tube } from "./tube";
+export { default as twilight } from "./twilight";
 
-export const JV_DEFAULT: Base16Theme = {
+export const JV_DEFAULT = {
   scheme: "default",
-  author: "jaspreet",
+  author: "mac",
   //transparent main background
   base00: "rgba(0, 0, 0, 0)",
   base01: "rgb(245, 245, 245)",
@@ -20,25 +56,4 @@ export const JV_DEFAULT: Base16Theme = {
   base0D: "#586e75",
   base0E: "#2aa198",
   base0F: "#268bd2",
-};
-
-export const JV_GREY: Base16Theme = {
-  scheme: "grey",
-  author: "jaspreet",
-  base00: "rgba(1, 1, 1, 0)",
-  base01: "rgba(1, 1, 1, 0.1)",
-  base02: "rgba(0, 0, 0, 0.2)",
-  base03: "rgba(1, 1, 1, 0.3)",
-  base04: "rgba(0, 0, 0, 0.4)",
-  base05: "rgba(1, 1, 1, 0.5)",
-  base06: "rgba(1, 1, 1, 0.6)",
-  base07: "rgba(1, 1, 1, 0.7)",
-  base08: "rgba(1, 1, 1, 0.8)",
-  base09: "rgba(1, 1, 1, 0.8)",
-  base0A: "rgba(1, 1, 1, 0.8)",
-  base0B: "rgba(1, 1, 1, 0.8)",
-  base0C: "rgba(1, 1, 1, 0.8)",
-  base0D: "rgba(1, 1, 1, 0.8)",
-  base0E: "rgba(1, 1, 1, 0.8)",
-  base0F: "rgba(1, 1, 1, 0.8)",
 };

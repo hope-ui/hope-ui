@@ -1,10 +1,9 @@
-import { Property } from "csstype";
-import { Base16Theme, createStyling, StylingConfig } from "react-base16-styling";
-
-import { JV_DEFAULT, JV_GREY } from "./colors";
+import { createStitches } from "@stitches/core";
+import { Base16Theme } from "./base-16.type";
+import * as Themes from "./colors";
 import constants from "./style-constants";
 
-const colorMap = (theme: Base16Theme) => ({
+const colorMap = (theme: Base16Theme = Themes.JV_DEFAULT) => ({
   backgroundColor: theme.base00,
   ellipsisColor: theme.base09,
   braceColor: theme.base07,
@@ -16,392 +15,408 @@ const colorMap = (theme: Base16Theme) => ({
   copyToClipboard: theme.base0F,
   copyToClipboardCheck: theme.base0D,
   objectBorder: theme.base02,
-  dataTypes: {
-    boolean: theme.base0E,
-    date: theme.base0D,
-    float: theme.base0B,
-    function: theme.base0D,
-    integer: theme.base0F,
-    string: theme.base09,
-    nan: theme.base08,
-    null: theme.base0A,
-    undefined: theme.base05,
-    regexp: theme.base0A,
-    background: theme.base02,
-  },
-  editVariable: {
-    editIcon: theme.base0E,
-    cancelIcon: theme.base09,
-    removeIcon: theme.base09,
-    addIcon: theme.base0E,
-    checkIcon: theme.base0E,
-    background: theme.base01,
-    color: theme.base0A,
-    border: theme.base07,
-  },
-  addKeyModal: {
-    background: theme.base05,
-    border: theme.base04,
-    color: theme.base0A,
-    labelColor: theme.base01,
-  },
-  validationFailure: {
-    background: theme.base09,
-    iconColor: theme.base01,
-    fontColor: theme.base01,
+
+  dataTypeBoolean: theme.base0E,
+  dataTypeDate: theme.base0D,
+  dataTypeFloat: theme.base0B,
+  dataTypeFunction: theme.base0D,
+  dataTypeInteger: theme.base0F,
+  dataTypeString: theme.base09,
+  dataTypeNan: theme.base08,
+  dataTypeNull: theme.base0A,
+  dataTypeUndefined: theme.base05,
+  dataTypeRegexp: theme.base0A,
+  dataTypeBackground: theme.base02,
+
+  editableVariableEditIcon: theme.base0E,
+  editableVariableCancelIcon: theme.base09,
+  editableVariableRemoveIcon: theme.base09,
+  editableVariableAddIcon: theme.base0E,
+  editableVariableCheckIcon: theme.base0E,
+  editableVariableBackground: theme.base01,
+  editableVariableColor: theme.base0A,
+  editableVariableBorder: theme.base07,
+
+  addKeyModalBackground: theme.base05,
+  addKeyModalBorder: theme.base04,
+  addKeyModalColor: theme.base0A,
+  addKeyModalLabelColor: theme.base01,
+
+  validationFailureBackground: theme.base09,
+  validationFailureIconColor: theme.base01,
+  validationFailureFontColor: theme.base01,
+});
+
+const { css, createTheme } = createStitches({
+  theme: {
+    colors: { ...colorMap(Themes.JV_DEFAULT) },
   },
 });
 
-const getDefaultThemeStyling = (theme: Base16Theme) => {
-  const colors = colorMap(theme);
+export const appContainer = css({
+  fontFamily: constants.globalFontFamily,
+  cursor: constants.globalCursor,
+  backgroundColor: "$backgroundColor",
+  position: "relative",
+});
 
-  const styling: StylingConfig = {
-    "app-container": {
-      fontFamily: constants.globalFontFamily,
-      cursor: constants.globalCursor,
-      backgroundColor: colors.backgroundColor,
-      position: "relative",
-    },
-    ellipsis: {
-      display: "inline-block",
-      color: colors.ellipsisColor,
-      fontSize: constants.ellipsisFontSize,
-      lineHeight: constants.ellipsisLineHeight,
-      cursor: constants.ellipsisCursor,
-    },
-    "brace-row": {
-      display: "inline-block",
-      cursor: "pointer",
-    },
-    brace: {
-      display: "inline-block",
-      cursor: constants.braceCursor,
-      fontWeight: constants.braceFontWeight,
-      color: colors.braceColor,
-    },
-    "expanded-icon": {
-      color: colors.expandedIcon,
-    },
-    "collapsed-icon": {
-      color: colors.collapsedIcon,
-    },
-    colon: {
-      display: "inline-block",
-      margin: constants.keyMargin,
-      color: colors.keyColor,
-      verticalAlign: "top",
-    },
-    objectKeyVal: (variable_style: any) => {
-      return {
-        style: {
-          paddingTop: constants.keyValPaddingTop,
-          paddingRight: constants.keyValPaddingRight,
-          paddingBottom: constants.keyValPaddingBottom,
-          borderLeft: constants.keyValBorderLeft + " " + colors.objectBorder,
-          ":hover": {
-            paddingLeft: variable_style.paddingLeft - 1 + "px",
-            borderLeft: constants.keyValBorderHover + " " + colors.objectBorder,
-          },
-          ...variable_style,
+export const elipsis = css({
+  fontFamily: constants.globalFontFamily,
+  cursor: constants.globalCursor,
+  backgroundColor: "$backgroundColor",
+  position: "relative",
+});
+export const functionElipsis = css({
+  display: "inline-block",
+  color: "$ellipsisColor",
+  fontSize: constants.ellipsisFontSize,
+  lineHeight: constants.ellipsisLineHeight,
+  cursor: constants.ellipsisCursor,
+});
+export const braceRow = css({
+  display: "inline-block",
+  cursor: "pointer",
+});
+export const brace = css({
+  display: "inline-block",
+  cursor: constants.braceCursor,
+  fontWeight: constants.braceFontWeight,
+  color: "$braceColor",
+});
+
+export const expandedIcon = css({
+  color: "$expandedIcon",
+});
+export const collapsedIcon = css({
+  color: "$collapsedIcon",
+});
+export const colon = css({
+  display: "inline-block",
+  margin: constants.keyMargin,
+  color: "$keyColor",
+  verticalAlign: "top",
+});
+
+export const objectKeyVal = css({
+  variants: {
+    border: {
+      default: {
+        paddingTop: constants.keyValPaddingTop,
+        paddingRight: constants.keyValPaddingRight,
+        paddingBottom: constants.keyValPaddingBottom,
+        borderLeft: constants.keyValBorderLeft + " " + "$objectBorder",
+        "&:hover": {
+          borderLeft: constants.keyValBorderHover + " " + "$objectBorder",
         },
-      };
+      },
+      noBorder: {
+        padding: constants.keyValPaddingTop,
+      },
     },
-    "object-key-val-no-border": {
-      padding: constants.keyValPaddingTop,
-    },
-    "pushed-content": {
-      marginLeft: constants.pushedContentMarginLeft,
-    },
-    variableValue: (variable_style: any) => {
-      return {
-        style: {
+  },
+  defaultVariants: {
+    border: "default",
+  },
+});
+
+export const pushedContent = css({
+  marginLeft: constants.pushedContentMarginLeft,
+});
+
+export const objectName = css({
+  display: "inline-block",
+  color: "$keyColor",
+  letterSpacing: constants.keyLetterSpacing,
+  fontStyle: constants.keyFontStyle,
+  verticalAlign: constants.keyVerticalAlign,
+  opacity: constants.keyOpacity,
+  "&:hover": {
+    opacity: constants.keyOpacityHover,
+  },
+});
+
+export const arrayKey = css({
+  display: "inline-block",
+  color: "$arrayKeyColor",
+  letterSpacing: constants.keyLetterSpacing,
+  fontStyle: constants.keyFontStyle,
+  verticalAlign: constants.keyVerticalAlign,
+  opacity: constants.keyOpacity,
+  "&:hover": {
+    opacity: constants.keyOpacityHover,
+  },
+});
+export const objectSize = css({
+  color: "$objectSize",
+  borderRadius: constants.objectSizeBorderRadius,
+  fontStyle: constants.objectSizeFontStyle,
+  margin: constants.objectSizeMargin,
+  cursor: "default",
+});
+export const dataTypeLabel = css({
+  fontSize: constants.dataTypeFontSize,
+  marginRight: constants.dataTypeMarginRight,
+  opacity: constants.datatypeOpacity,
+});
+
+export const variableValue = css({
+  display: "inline-block",
+  paddingRight: constants.variableValuePaddingRight,
+  position: "relative",
+  variants: {
+    dataType: {
+      boolean: {
+        color: "$dataTypeBoolean",
+      },
+      date: {
+        color: "$dataTypeDate",
+        "&>.date-value": {
+          marginLeft: constants.dateValueMarginLeft,
+        },
+      },
+      float: {
+        display: "inline-block",
+        color: "$dataTypeFloat",
+      },
+      function: {
+        display: "inline-block",
+        color: "$dataTypeFunction",
+        cursor: "pointer",
+        whiteSpace: "pre-line",
+
+        "&>.functionValue": {
+          fontStyle: "italic",
+        },
+      },
+      integer: {
+        display: "inline-block",
+        color: "$dataTypeInteger",
+      },
+      string: {
+        display: "inline-block",
+        color: "$dataTypeString",
+        "&:>.string-value": {
           display: "inline-block",
-          paddingRight: constants.variableValuePaddingRight,
-          position: "relative",
-          ...variable_style,
         },
-      };
+      },
+      nan: {
+        display: "inline-block",
+        color: "$dataTypeNan",
+        fontSize: constants.nanFontSize,
+        fontWeight: constants.nanFontWeight,
+        backgroundColor: "$dataTypeBackground",
+        padding: constants.nanPadding,
+        borderRadius: constants.nanBorderRadius,
+      },
+      null: {
+        display: "inline-block",
+        color: "$dataTypeNull",
+        fontSize: constants.nullFontSize,
+        fontWeight: constants.nullFontWeight,
+        backgroundColor: "$dataTypeBackground",
+        padding: constants.nullPadding,
+        borderRadius: constants.nullBorderRadius,
+      },
+      undefined: {
+        display: "inline-block",
+        color: "$dataTypeUndefined",
+        fontSize: constants.undefinedFontSize,
+        fontWeight: constants.undefinedFontWeight,
+        backgroundColor: "$dataTypeBackground",
+        padding: constants.undefinedPadding,
+        borderRadius: constants.undefinedBorderRadius,
+      },
+      regexp: {
+        display: "inline-block",
+        color: "$dataTypeRegexp",
+      },
     },
-    "object-name": {
-      display: "inline-block",
-      color: colors.keyColor,
-      letterSpacing: constants.keyLetterSpacing,
-      fontStyle: constants.keyFontStyle,
-      verticalAlign: constants.keyVerticalAlign,
-      opacity: constants.keyOpacity,
-      // ":hover": {
-      //   opacity: constants.keyOpacityHover,
-      // },
-    },
-    "array-key": {
-      display: "inline-block",
-      color: colors.arrayKeyColor,
-      letterSpacing: constants.keyLetterSpacing,
-      fontStyle: constants.keyFontStyle,
-      verticalAlign: constants.keyVerticalAlign,
-      opacity: constants.keyOpacity,
-      // ":hover": {
-      //   opacity: constants.keyOpacityHover,
-      // },
-    },
-    "object-size": {
-      color: colors.objectSize,
-      borderRadius: constants.objectSizeBorderRadius,
-      fontStyle: constants.objectSizeFontStyle,
-      margin: constants.objectSizeMargin,
-      cursor: "default",
-    },
-    "data-type-label": {
-      fontSize: constants.dataTypeFontSize,
-      marginRight: constants.dataTypeMarginRight,
-      opacity: constants.datatypeOpacity,
-    },
-    boolean: {
-      display: "inline-block",
-      color: colors.dataTypes.boolean,
-    },
-    date: {
-      display: "inline-block",
-      color: colors.dataTypes.date,
-    },
-    "date-value": {
-      marginLeft: constants.dateValueMarginLeft,
-    },
-    float: {
-      display: "inline-block",
-      color: colors.dataTypes.float,
-    },
-    function: {
-      display: "inline-block",
-      color: colors.dataTypes["function"],
-      cursor: "pointer",
-      whiteSpace: "pre-line",
-    },
-    "function-value": {
-      fontStyle: "italic",
-    },
-    integer: {
-      display: "inline-block",
-      color: colors.dataTypes.integer,
-    },
-    string: {
-      display: "inline-block",
-      color: colors.dataTypes.string,
-    },
-    nan: {
-      display: "inline-block",
-      color: colors.dataTypes.nan,
-      fontSize: constants.nanFontSize,
-      fontWeight: constants.nanFontWeight,
-      backgroundColor: colors.dataTypes.background,
-      padding: constants.nanPadding,
-      borderRadius: constants.nanBorderRadius,
-    },
-    null: {
-      display: "inline-block",
-      color: colors.dataTypes.null,
-      fontSize: constants.nullFontSize,
-      fontWeight: constants.nullFontWeight,
-      backgroundColor: colors.dataTypes.background,
-      padding: constants.nullPadding,
-      borderRadius: constants.nullBorderRadius,
-    },
-    undefined: {
-      display: "inline-block",
-      color: colors.dataTypes.undefined,
-      fontSize: constants.undefinedFontSize,
-      padding: constants.undefinedPadding,
-      borderRadius: constants.undefinedBorderRadius,
-      backgroundColor: colors.dataTypes.background,
-    },
-    regexp: {
-      display: "inline-block",
-      color: colors.dataTypes.regexp,
-    },
-    "copy-to-clipboard": {
-      cursor: constants.clipboardCursor,
-    },
-    "copy-icon": {
-      color: colors.copyToClipboard,
-      fontSize: constants.iconFontSize,
-      marginRight: constants.iconMarginRight,
-      verticalAlign: "top",
-    },
-    "copy-icon-copied": {
-      color: colors.copyToClipboardCheck,
-      marginLeft: constants.clipboardCheckMarginLeft,
-    },
-    "array-group-meta-data": {
-      display: "inline-block",
-      padding: constants.arrayGroupMetaPadding,
-    },
-    "object-meta-data": {
-      display: "inline-block",
-      padding: constants.metaDataPadding,
-    },
-    "icon-container": {
-      display: "inline-block",
-      width: constants.iconContainerWidth,
-    },
-    tooltip: {
-      padding: constants.tooltipPadding,
-    },
-    removeVarIcon: {
-      verticalAlign: "top",
-      display: "inline-block",
-      color: colors.editVariable.removeIcon,
-      cursor: constants.iconCursor,
-      fontSize: constants.iconFontSize,
-      marginRight: constants.iconMarginRight,
-    },
-    addVarIcon: {
-      verticalAlign: "top",
-      display: "inline-block",
-      color: colors.editVariable.addIcon,
-      cursor: constants.iconCursor,
-      fontSize: constants.iconFontSize,
-      marginRight: constants.iconMarginRight,
-    },
-    editVarIcon: {
-      verticalAlign: "top",
-      display: "inline-block",
-      color: colors.editVariable.editIcon,
-      cursor: constants.iconCursor,
-      fontSize: constants.iconFontSize,
-      marginRight: constants.iconMarginRight,
-    },
-    "edit-icon-container": {
-      display: "inline-block",
-      verticalAlign: "top",
-    },
-    "check-icon": {
-      display: "inline-block",
-      cursor: constants.iconCursor,
-      color: colors.editVariable.checkIcon,
-      fontSize: constants.iconFontSize,
-      paddingRight: constants.iconPaddingRight,
-    },
-    "cancel-icon": {
-      display: "inline-block",
-      cursor: constants.iconCursor,
-      color: colors.editVariable.cancelIcon,
-      fontSize: constants.iconFontSize,
-      paddingRight: constants.iconPaddingRight,
-    },
-    "edit-input": {
-      display: "inline-block",
-      minWidth: constants.editInputMinWidth,
-      borderRadius: constants.editInputBorderRadius,
-      backgroundColor: colors.editVariable.background,
-      color: colors.editVariable.color,
-      padding: constants.editInputPadding,
-      marginRight: constants.editInputMarginRight,
-      fontFamily: constants.editInputFontFamily,
-    },
-    "detected-row": {
-      paddingTop: constants.detectedRowPaddingTop,
-    },
-    "key-modal-request": {
-      position: constants.addKeyCoverPosition as Property.Position,
-      top: constants.addKeyCoverPositionPx,
-      left: constants.addKeyCoverPositionPx,
-      right: constants.addKeyCoverPositionPx,
-      bottom: constants.addKeyCoverPositionPx,
-      backgroundColor: constants.addKeyCoverBackground,
-    },
-    "key-modal": {
-      width: constants.addKeyModalWidth,
-      backgroundColor: colors.addKeyModal.background,
-      marginLeft: constants.addKeyModalMargin,
-      marginRight: constants.addKeyModalMargin,
-      padding: constants.addKeyModalPadding,
-      borderRadius: constants.addKeyModalRadius,
-      marginTop: "15px",
-      position: "relative",
-    },
-    "key-modal-label": {
-      color: colors.addKeyModal.labelColor,
-      marginLeft: "2px",
-      marginBottom: "5px",
-      fontSize: "11px",
-    },
-    "key-modal-input-container": {
-      overflow: "hidden",
-    },
-    "key-modal-input": {
-      width: "100%",
-      padding: "3px 6px",
-      fontFamily: "monospace",
-      color: colors.addKeyModal.color,
-      border: "none",
-      boxSizing: "border-box",
-      borderRadius: "2px",
-    },
-    "key-modal-cancel": {
-      backgroundColor: colors.editVariable.removeIcon,
-      position: "absolute",
-      top: "0px",
-      right: "0px",
-      borderRadius: "0px 3px 0px 3px",
-      cursor: "pointer",
-    },
-    "key-modal-cancel-icon": {
-      color: colors.addKeyModal.labelColor,
-      fontSize: constants.iconFontSize,
-      transform: "rotate(45deg)",
-    },
-    "key-modal-submit": {
-      color: colors.editVariable.addIcon,
-      fontSize: constants.iconFontSize,
-      position: "absolute",
-      right: "2px",
-      top: "3px",
-      cursor: "pointer",
-    },
-    "function-ellipsis": {
-      display: "inline-block",
-      color: colors.ellipsisColor,
-      fontSize: constants.ellipsisFontSize,
-      lineHeight: constants.ellipsisLineHeight,
-      cursor: constants.ellipsisCursor,
-    },
-    "validation-failure": {
-      float: "right",
-      padding: "3px 6px",
-      borderRadius: "2px",
-      cursor: "pointer",
-      color: colors.validationFailure.fontColor,
-      backgroundColor: colors.validationFailure.background,
-    },
-    "validation-failure-label": {
-      marginRight: "6px",
-    },
-    "validation-failure-clear": {
-      position: "relative",
-      verticalAlign: "top",
-      cursor: "pointer",
-      color: colors.validationFailure.iconColor,
-      fontSize: constants.iconFontSize,
-      transform: "rotate(45deg)",
-    },
-  };
+  },
+  defaultVariants: { dataType: "string" },
+});
 
-  return styling;
-};
+export const copyToClipboard = css({
+  cursor: constants.clipboardCursor,
+});
 
-const getStyle = (theme: string | undefined) => {
-  let jvTheme = JV_DEFAULT;
-  if (!theme || theme === "none") {
-    jvTheme = JV_GREY;
+export const copyIcon = css({
+  variants: {
+    state: {
+      default: {
+        color: "$copyToClipboard",
+        fontSize: constants.iconFontSize,
+        marginRight: constants.iconMarginRight,
+        verticalAlign: "top",
+      },
+      copied: {
+        color: "$copyToClipboardCheck",
+        marginLeft: constants.clipboardCheckMarginLeft,
+      },
+    },
+  },
+  defaultVariants: {
+    state: "default",
+  },
+});
+
+export const metaData = css({
+  display: "inline-block",
+  variants: {
+    dataType: {
+      arrayGroup: {
+        padding: constants.arrayGroupMetaPadding,
+      },
+      object: {
+        padding: constants.metaDataPadding,
+      },
+    },
+  },
+});
+
+export const iconContainer = css({
+  display: "inline-block",
+  width: constants.iconContainerWidth,
+});
+
+export const varIcon = css({
+  verticalAlign: "top",
+  display: "inline-block",
+  cursor: constants.iconCursor,
+  fontSize: constants.iconFontSize,
+  marginRight: constants.iconMarginRight,
+
+  variants: {
+    color: {
+      remove: {
+        color: "$editableVariableRemoveIcon",
+      },
+      add: {
+        color: "$editableVariableAddIcon",
+      },
+      edit: {
+        color: "$editableVariableEditIcon",
+      },
+      check: {
+        color: "$editableVariableCheckIcon",
+      },
+      cancel: {
+        color: "$editableVariableCancelIcon",
+      },
+    },
+  },
+});
+
+export const toolTip = css({
+  padding: constants.tooltipPadding,
+});
+
+export const editInput = css({
+  display: "inline-block",
+  minWidth: constants.editInputMinWidth,
+  borderRadius: constants.editInputBorderRadius,
+  backgroundColor: "$editableVariableBackground",
+  color: "$editableVariableColor",
+  padding: constants.editInputPadding,
+  marginRight: constants.editInputMarginRight,
+  fontFamily: constants.editInputFontFamily,
+});
+
+export const detectedRow = css({
+  paddingTop: constants.detectedRowPaddingTop,
+});
+
+export const keyModal = css({
+  width: constants.addKeyModalWidth,
+  backgroundColor: "$addKeyModalBackground",
+  marginLeft: constants.addKeyModalMargin,
+  marginRight: constants.addKeyModalMargin,
+  padding: constants.addKeyModalPadding,
+  borderRadius: constants.addKeyModalRadius,
+  marginTop: "15px",
+  position: "relative",
+});
+
+export const keyModalRequest = css({
+  position: constants.addKeyCoverPosition,
+  top: constants.addKeyCoverPositionPx,
+  left: constants.addKeyCoverPositionPx,
+  right: constants.addKeyCoverPositionPx,
+  bottom: constants.addKeyCoverPositionPx,
+  backgroundColor: constants.addKeyCoverBackground,
+});
+
+export const keyModalLabel = css({
+  color: "$addKeyModalLabelColor",
+  marginLeft: "2px",
+  marginBottom: "5px",
+  fontSize: "11px",
+});
+
+export const keyModalInput = css({
+  width: "100%",
+  padding: "3px 6px",
+  fontFamily: "monospace",
+  color: "$addKeyModalColor",
+  border: "none",
+  boxSizing: "border-box",
+  borderRadius: "2px",
+});
+
+export const keyModalCancel = css({
+  backgroundColor: "$editableVariableRemoveIcon",
+  position: "absolute",
+  top: "0px",
+  right: "0px",
+  borderRadius: "0px 3px 0px 3px",
+  cursor: "pointer",
+});
+
+export const keyModalCancelIcon = css({
+  color: "$addKeyModalLabelColor",
+  fontSize: constants.iconFontSize,
+  transform: "rotate(45deg)",
+});
+
+export const keyModalSubmit = css({
+  color: "$editableVariableAddIcon",
+  fontSize: constants.iconFontSize,
+  position: "absolute",
+  right: "2px",
+  top: "3px",
+  cursor: "pointer",
+});
+
+export const validationFailure = css({
+  float: "right",
+  padding: "3px 6px",
+  borderRadius: "2px",
+  cursor: "pointer",
+  color: "$validationFailureFontColor",
+  backgroundColor: "$validationFailureBackground",
+});
+
+export const validationFailureClear = css({
+  position: "relative",
+  verticalAlign: "top",
+  cursor: "pointer",
+  color: "$validationFailureIconColor",
+  fontSize: constants.iconFontSize,
+  transform: "rotate(45deg)",
+});
+
+export const setTheme = (theme: Base16Theme | string | undefined) => {
+  let themeName = "default";
+  if (typeof theme === "string") {
+    themeName = theme;
+    const colorTheme = (Themes as any)[theme] as Base16Theme;
+    return createTheme(themeName, {
+      colors: { ...colorMap(colorTheme) },
+    });
+  } else {
+    themeName = "custom-theme";
+    const colorTheme = theme;
+    return createTheme(themeName, {
+      colors: { ...colorMap(colorTheme) },
+    });
   }
-
-  return createStyling(getDefaultThemeStyling, { defaultBase16: jvTheme })(theme);
 };
-
-export default function style(theme: string | undefined, component: string, args?: any): any {
-  if (!theme) {
-    console.error("theme has not been set");
-  }
-
-  return getStyle(theme)(component, args);
-}
