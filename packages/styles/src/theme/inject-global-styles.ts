@@ -8,7 +8,7 @@ export function injectGlobalStyles(theme: Theme) {
   globalCss({
     "*, ::before, ::after": {
       boxSizing: "border-box",
-      borderWidth: "0",
+      borderWidth: 0,
       borderStyle: "solid",
     },
 

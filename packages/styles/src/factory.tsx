@@ -6,7 +6,14 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/system/src/factory.ts
  */
 
-import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
+import {
+  DOMElements,
+  ElementType,
+  filterUndefined,
+  isEmptyObject,
+  isFunction,
+  runIfFn,
+} from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -20,7 +27,7 @@ import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { HopeProps, SystemStyleObject, ThemeBase } from "./types";
+import { HopeProps, Sx, SystemStyleObject, ThemeVars } from "./types";
 import { packSx } from "./utils";
 
 /** A component with Hope UI props. */
@@ -42,9 +49,7 @@ interface HopeFactoryStyleOptions<Props> {
   excludedProps?: Array<keyof Props>;
 
   /** Base style applied to the component. */
-  baseStyle?:
-    | SystemStyleObject
-    | ((params: { theme: ThemeBase; props: Props }) => SystemStyleObject);
+  baseStyle?: SystemStyleObject | ((vars: ThemeVars, props: Props) => SystemStyleObject);
 }
 
 /**
@@ -75,13 +80,13 @@ function styled<T extends ElementType, Props = {}>(
       const baseStyleObject = Object.assign(
         {},
         local.__css,
-        runIfFn(baseStyle, { theme: theme, props }),
+        isFunction(baseStyle) ? baseStyle(theme.vars, props) : baseStyle,
         filterUndefined(styleProps)
       );
 
       const overrideStyleObject = Object.assign(
         {},
-        ...packSx(local.sx).map(partial => runIfFn(partial, theme))
+        ...packSx(local.sx).map(partial => runIfFn(partial, theme.vars))
       );
 
       if (isEmptyObject(baseStyleObject) && isEmptyObject(overrideStyleObject)) {
@@ -94,8 +99,10 @@ function styled<T extends ElementType, Props = {}>(
         return cssComponent().className;
       }
 
+      const overrideCss = toCSSObject(overrideStyleObject, theme);
+
       // use `css` prop to have higher specificity.
-      return cssComponent({ css: toCSSObject(overrideStyleObject, theme) }).className;
+      return cssComponent({ css: overrideCss }).className;
     });
 
     return (

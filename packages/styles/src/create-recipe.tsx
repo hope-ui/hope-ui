@@ -12,7 +12,7 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/tss/create-styles.ts
  */
 
-import { isEmptyObject, isFunction } from "@hope-ui/utils";
+import { isFunction } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
 import { createMemo } from "solid-js";
 

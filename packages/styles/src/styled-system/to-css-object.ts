@@ -76,11 +76,13 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
      * "_hover" => "&:hover"
      */
     if (key.startsWith("_")) {
-      key = PSEUDO_SELECTORS_MAP[key as keyof PseudoSelectorProps];
-    }
+      const pseudoSelector = PSEUDO_SELECTORS_MAP.get(key as keyof PseudoSelectorProps);
 
-    if (key == null) {
-      continue;
+      if (pseudoSelector == null) {
+        continue;
+      }
+
+      key = pseudoSelector;
     }
 
     /**
@@ -100,13 +102,13 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
      * converts style props shorthands to valid css properties.
      * "mx" => ["marginLeft", "marginRight"]
      */
-    const propertyNames = SHORTHANDS_MAP[key as keyof BaseSystemStyleProps] ?? [key];
+    const propertyNames = SHORTHANDS_MAP.get(key as keyof BaseSystemStyleProps) ?? [key];
 
     /**
      * apply same value to each css properties.
      * { mx: 4 } => { marginLeft: "1rem", "marginRight: "1rem" }
      */
-    propertyNames.forEach(propertyName => {
+    for (const propertyName of propertyNames) {
       const scale = theme.themeMap[propertyName];
 
       if (scale != null) {
@@ -114,7 +116,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       }
 
       computedStyles[propertyName] = value;
-    });
+    }
   }
 
   return computedStyles;
