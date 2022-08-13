@@ -23,7 +23,7 @@
   "type": "module",
   "scripts": {
     "build": "solid-start build",
-    "clean": "rm -rf .solid && rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "clean": "rm -rf .solid && rm -rf netlify && rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "solid-start dev",
     "start": "solid-start start"
   },
