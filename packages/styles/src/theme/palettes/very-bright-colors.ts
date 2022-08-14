@@ -30,17 +30,17 @@ function veryBrightPalette(scale: PaletteScale): PaletteGeneratorTuple {
       ...common,
 
       // global variant - solid
-      solidText: getCssVar(`colors-${color}-800`),
-      solidBg: getCssVar(`colors-${color}-200`),
-      solidBorder: getCssVar(`colors-${color}-200`),
+      solidText: getCssVar(`colors-${color}-900`),
+      solidBg: getCssVar(`colors-${color}-400`),
+      solidBorder: getCssVar(`colors-${color}-400`),
 
-      solidHoverText: getCssVar(`colors-${color}-800`),
-      solidHoverBg: getCssVar(`colors-${color}-300`),
-      solidHoverBorder: getCssVar(`colors-${color}-300`),
+      solidHoverText: getCssVar(`colors-${color}-900`),
+      solidHoverBg: getCssVar(`colors-${color}-500`),
+      solidHoverBorder: getCssVar(`colors-${color}-500`),
 
       solidActiveText: getCssVar(`colors-${color}-900`),
-      solidActiveBg: getCssVar(`colors-${color}-400`),
-      solidActiveBorder: getCssVar(`colors-${color}-400`),
+      solidActiveBg: getCssVar(`colors-${color}-600`),
+      solidActiveBorder: getCssVar(`colors-${color}-600`),
 
       solidDisabledText: getCssVar(`colors-${color}-200`),
       solidDisabledBg: getCssVar(`colors-${color}-50`),
@@ -48,16 +48,16 @@ function veryBrightPalette(scale: PaletteScale): PaletteGeneratorTuple {
 
       // global variant - soft
       softText: getCssVar(`colors-${color}-800`),
-      softBg: getCssVar(`colors-${color}-50`),
-      softBorder: getCssVar(`colors-${color}-50`),
+      softBg: getCssVar(`colors-${color}-100`),
+      softBorder: getCssVar(`colors-${color}-100`),
 
       softHoverText: getCssVar(`colors-${color}-800`),
-      softHoverBg: getCssVar(`colors-${color}-100`),
-      softHoverBorder: getCssVar(`colors-${color}-100`),
+      softHoverBg: getCssVar(`colors-${color}-200`),
+      softHoverBorder: getCssVar(`colors-${color}-200`),
 
       softActiveText: getCssVar(`colors-${color}-800`),
-      softActiveBg: getCssVar(`colors-${color}-200`),
-      softActiveBorder: getCssVar(`colors-${color}-200`),
+      softActiveBg: getCssVar(`colors-${color}-300`),
+      softActiveBorder: getCssVar(`colors-${color}-300`),
 
       softDisabledText: getCssVar(`colors-${color}-200`),
       softDisabledBg: getCssVar(`colors-${color}-50`),
@@ -112,16 +112,16 @@ function veryBrightPalette(scale: PaletteScale): PaletteGeneratorTuple {
 
       // global variant - solid
       solidText: getCssVar(`colors-${color}-900`),
-      solidBg: getCssVar(`colors-${color}-300`),
-      solidBorder: getCssVar(`colors-${color}-300`),
+      solidBg: getCssVar(`colors-${color}-400`),
+      solidBorder: getCssVar(`colors-${color}-400`),
 
       solidHoverText: getCssVar(`colors-${color}-900`),
-      solidHoverBg: getCssVar(`colors-${color}-400`),
-      solidHoverBorder: getCssVar(`colors-${color}-400`),
+      solidHoverBg: getCssVar(`colors-${color}-500`),
+      solidHoverBorder: getCssVar(`colors-${color}-500`),
 
       solidActiveText: getCssVar(`colors-${color}-900`),
-      solidActiveBg: getCssVar(`colors-${color}-500`),
-      solidActiveBorder: getCssVar(`colors-${color}-500`),
+      solidActiveBg: getCssVar(`colors-${color}-600`),
+      solidActiveBorder: getCssVar(`colors-${color}-600`),
 
       solidDisabledText: getCssVar(`colors-${color}-800`),
       solidDisabledBg: `rgb(${getCssVar(`colors-${color}-darkChannel`)} / 0.6)`,

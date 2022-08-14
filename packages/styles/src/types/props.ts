@@ -13,17 +13,8 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
 }
 
 /** Extract the option's type of `useStyleConfig` primitive. */
-type StyleConfigOptionsOf<T extends UseStyleConfigFn<any, any, any>> = Parameters<T>[0];
+type StyleConfigOptionsOf<T extends UseStyleConfigFn<any, any>> = Parameters<T>[1];
 
 /** Props of components that supports the `Style Config API` and `system style` props. */
-export type StyleConfigProps<T extends UseStyleConfigFn<any, any, any>> = HopeProps &
-  Partial<StyleConfigOptionsOf<T>["variants"] & StyleConfigOptionsOf<T>["params"]> & {
-    /**
-     * Styles that will be merged with the "base styles" created by `createStyleConfig`.
-     * Used to override/add additional styles.
-     */
-    styleConfig?: StyleConfigOptionsOf<T>["styleConfig"];
-
-    /** Whether the base styles should be applied or not. */
-    unstyled?: StyleConfigOptionsOf<T>["unstyled"];
-  };
+export type StyleConfigProps<T extends UseStyleConfigFn<any, any>> = HopeProps &
+  StyleConfigOptionsOf<T>;

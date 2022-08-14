@@ -49,7 +49,9 @@ interface HopeFactoryStyleOptions<Props> {
   excludedProps?: Array<keyof Props>;
 
   /** Base style applied to the component. */
-  baseStyle?: SystemStyleObject | ((vars: ThemeVars, props: Props) => SystemStyleObject);
+  baseStyle?:
+    | SystemStyleObject
+    | ((options: { vars: ThemeVars; props: Props }) => SystemStyleObject);
 }
 
 /**
@@ -94,7 +96,7 @@ function styled<T extends ElementType, Props = {}>(
       const styles = Object.assign(
         {},
         local.__css,
-        isFunction(baseStyle) ? baseStyle(theme.vars, props) : baseStyle,
+        isFunction(baseStyle) ? baseStyle({ vars: theme.vars, props }) : baseStyle,
         filterUndefined(styleProps),
         ...packSx(local.sx).map(partial => runIfFn(partial, theme.vars))
       );

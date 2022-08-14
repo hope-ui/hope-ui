@@ -52,7 +52,7 @@ export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScales>>;
 
 export interface ComponentTheme<
   Props extends Record<string, any> = {},
-  StyleConfigOverride extends StyleConfigOverrideInterpolation<any, any, any> | undefined = any
+  StyleConfigOverride extends StyleConfigOverrideInterpolation<any, any> | undefined = any
 > {
   /** Default props to be passed to the component. */
   defaultProps?: Props;
@@ -61,7 +61,7 @@ export interface ComponentTheme<
    * Styles that will be merged with the "base styles" created by `createStyleConfig`.
    * Used to override/add additional styles.
    */
-  styleConfig?: StyleConfigOverride;
+  styleConfigOverride?: StyleConfigOverride;
 }
 
 export interface ThemeBase extends ThemeScales {

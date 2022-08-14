@@ -9,7 +9,7 @@
 import { createPolymorphicComponent, hope, HopeProps, SystemStyleObject } from "@hope-ui/styles";
 import { ElementType, isString, OverrideProps } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
+import { createMemo, JSX, mergeProps, Show, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
@@ -46,14 +46,18 @@ export const Icon = createPolymorphicComponent<"svg", IconProps>(props => {
     "__css",
   ]);
 
-  const styles: Accessor<SystemStyleObject> = createMemo(() => ({
-    display: "inline-block",
-    flexShrink: 0,
-    boxSize: "1em",
-    lineHeight: "1em",
-    color: local.color,
-    __css: local.__css,
-  }));
+  const styles = createMemo(() => {
+    return mergeProps(
+      {
+        display: "inline-block",
+        flexShrink: 0,
+        boxSize: "1em",
+        lineHeight: "1em",
+        color: local.color,
+      } as SystemStyleObject,
+      local.__css
+    );
+  });
 
   /**
    * If the `as` prop is a component (ex: if you're using an icon library).

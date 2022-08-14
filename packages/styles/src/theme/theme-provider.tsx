@@ -24,7 +24,7 @@ export function useTheme() {
 
 export function useThemeStyleConfig(
   component?: string
-): Accessor<StyleConfigOverrideInterpolation<any, any, any>> {
+): Accessor<StyleConfigOverrideInterpolation<any, any> | undefined> {
   const theme = useTheme();
 
   return createMemo(() => {
@@ -32,7 +32,7 @@ export function useThemeStyleConfig(
       return undefined;
     }
 
-    return theme.components[component].styleConfig;
+    return theme.components[component]?.styleConfigOverride;
   });
 }
 

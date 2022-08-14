@@ -8,20 +8,20 @@
 
 import { Prefixed } from "./prefixed";
 
-/** Default theme color palette. */
-export type DefaultColorPalette = "primary" | "neutral" | "success" | "info" | "warning" | "danger";
+/** Default theme colors. */
+export type DefaultColorScheme = "primary" | "neutral" | "success" | "info" | "warning" | "danger";
 
 /**
- * Theme color palette, can be augmented via TypeScript.
+ * Theme colors, can be augmented via TypeScript.
  * @example
  * // typing.d.ts
- * import { ThemeColorPalette, DefaultColorPalette } from '@hope-ui/core';
+ * import { ThemeColorScheme, DefaultColorScheme } from '@hope-ui/core';
  *
  * declare module '@hope-ui/core' {
- *   export type ThemeColorPalette = DefaultColorPalette | 'brand';
+ *   export type ThemeColorScheme = DefaultColorScheme | 'brand';
  * }
  */
-export type ThemeColorPalette = DefaultColorPalette;
+export type ThemeColorScheme = DefaultColorScheme;
 
 export interface PaletteScale {
   50: string;
@@ -120,7 +120,7 @@ export interface PaletteRange extends PaletteScale, PaletteChannel {
  * @param cssVarPrefix The prefix to use when accessing css variables, should be the same as defined in the theme.
  */
 export type PaletteRangeGenerator = (
-  color: ThemeColorPalette,
+  color: ThemeColorScheme,
   cssVarPrefix?: string
 ) => PaletteRange;
 
@@ -145,7 +145,7 @@ export interface PaletteBackground {
   tooltip: string;
 }
 
-export type ThemePaletteRanges = Record<ThemeColorPalette, PaletteRange>;
+export type ThemePaletteRanges = Record<ThemeColorScheme, PaletteRange>;
 
 // Note: ColorSystem keys can't be objects more than one level deep.
 export interface ColorSystem extends ThemePaletteRanges {

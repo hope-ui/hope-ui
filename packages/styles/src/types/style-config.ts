@@ -8,101 +8,120 @@
 
 import { Accessor } from "solid-js";
 
+import { ThemeColorScheme } from "./color-system";
 import { SystemStyleObject } from "./styled-system";
 import { ThemeVars } from "./theme";
 
-type BooleanMap<T> = T extends "true" | "false" ? boolean : T;
+/** String representation of `boolean` type. */
+type BooleanStringUnion = "true" | "false";
 
-/** An object of styles parts/style objects. */
-export type StylesObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
+/** Infer the type to `boolean` if it's a string union of `"true" | "false"`. */
+type BooleanMap<T> = T extends BooleanStringUnion ? boolean : T;
 
-export type VariantDefinitions<Parts extends string> = Record<
-  string,
-  Partial<StylesObjects<Parts>>
->;
+/** Infer the type to string union of `"true" | "false"` if it's a `boolean`. */
+type ReverseBooleanMap<T> = T extends boolean ? BooleanStringUnion : T;
 
-export type VariantGroups<Parts extends string> = Record<string, VariantDefinitions<Parts>>;
+/** An object of style config parts/style objects. */
+export type StyleObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
 
-export type VariantSelection<Parts extends string, Variants extends VariantGroups<Parts>> = {
-  [VariantGroup in keyof Variants]?: BooleanMap<keyof Variants[VariantGroup]>;
+export type VariantSelection<VariantDefinitions extends Record<string, any>> = {
+  [VariantName in keyof VariantDefinitions]?: BooleanMap<VariantDefinitions[VariantName]>;
 };
 
-export interface CompoundVariant<Parts extends string, Variants extends VariantGroups<Parts>> {
+export interface CompoundVariant<
+  Parts extends string,
+  VariantDefinitions extends Record<string, any>
+> {
   /** The combined variants that should apply the styles. */
-  variants: VariantSelection<Parts, Variants>;
+  variants: VariantSelection<VariantDefinitions>;
 
   /** The styles to be applied. */
-  style: Partial<StylesObjects<Parts>>;
+  style: Partial<StyleObjects<Parts>>;
 }
 
-/** A style configuration. */
-export type StyleConfig<Parts extends string, Variants extends VariantGroups<Parts>> = {
-  /** The parts of the recipe/component. */
-  parts: Array<Parts>;
+type Variants<Parts extends string, T extends Record<string, any>> = {
+  [K in keyof T]?: {
+    [V in ReverseBooleanMap<T[K]>]?: Partial<StyleObjects<Parts>>;
+  };
+};
 
-  /** The base style of each part. */
-  baseStyle?: Partial<StylesObjects<Parts>>;
+/** A style configuration. */
+export type StyleConfig<Parts extends string, VariantDefinitions extends Record<string, any>> = {
+  /**
+   * The base style of each part.
+   * Note: if a part doesn't need base style just put an empty object.
+   * @example
+   * {
+   *   root: {
+   *     background: "primary.500",
+   *   },
+   *   icon: {},
+   * }
+   */
+  baseStyle: StyleObjects<Parts>;
 
   /** The variants style of each part. */
-  variants?: Variants;
+  variants?: Variants<Parts, VariantDefinitions>;
 
   /** The combined variants style of each part. */
-  compoundVariants?: Array<CompoundVariant<Parts, Variants>>;
+  compoundVariants?: Array<CompoundVariant<Parts, VariantDefinitions>>;
 
   /** The default variants to use. */
-  defaultVariants?: VariantSelection<Parts, Variants>;
+  defaultVariants?: VariantSelection<VariantDefinitions>;
 };
 
 /** An object or function that returns style configuration. */
 export type StyleConfigInterpolation<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
+  VariantDefinitions extends Record<string, any>
 > =
-  | StyleConfig<Parts, Variants>
-  | ((vars: ThemeVars, params: Params) => StyleConfig<Parts, Variants>);
+  | StyleConfig<Parts, VariantDefinitions>
+  | ((options: {
+      vars: ThemeVars;
+      colorScheme: ThemeColorScheme;
+    }) => StyleConfig<Parts, VariantDefinitions>);
 
 /** A style configuration used for theming and component level styles overrides. */
-export type StyleConfigOverride<Parts extends string, Variants extends VariantGroups<Parts>> = Omit<
-  StyleConfig<Parts, Variants>,
-  "parts" | "defaultVariants"
->;
+export type StyleConfigOverride<
+  Parts extends string,
+  VariantDefinitions extends Record<string, any>
+> = Omit<StyleConfig<Parts, VariantDefinitions>, "baseStyle" | "defaultVariants"> & {
+  /** The base style of each part. */
+  baseStyle?: Partial<StyleObjects<Parts>>;
+};
 
 /** An object or function that returns style configuration overrides. */
 export type StyleConfigOverrideInterpolation<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
+  VariantDefinitions extends Record<string, any>
 > =
-  | StyleConfigOverride<Parts, Variants>
-  | ((vars: ThemeVars, params: Params) => StyleConfigOverride<Parts, Variants>);
+  | StyleConfigOverride<Parts, VariantDefinitions>
+  | ((options: {
+      vars: ThemeVars;
+      colorScheme: ThemeColorScheme;
+    }) => StyleConfigOverride<Parts, VariantDefinitions>);
 
-export interface UseStyleConfigOptions<
+export type UseStyleConfigOptions<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
-> {
-  /** The name of the component, used to retrieve theme styles. */
-  name?: string;
-
-  /** Dynamic params that will be passed to the `useStyleConfig` call. */
-  params: Params;
-
-  /** The variants used to determine which style should be applied. */
-  variants?: VariantSelection<Parts, Variants>;
+  VariantDefinitions extends Record<string, any>
+> = VariantSelection<VariantDefinitions> & {
+  /** The color scheme to use. */
+  colorScheme?: ThemeColorScheme;
 
   /**
    * Styles that will be merged with the "base styles" created by `createStyleConfig`.
    * Mostly used to override/add additional styles.
    */
-  styleConfig?: StyleConfigOverrideInterpolation<Parts, Params, Variants>;
+  styleConfigOverride?: StyleConfigOverrideInterpolation<Parts, VariantDefinitions>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
-}
+};
 
 export type UseStyleConfigFn<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
-> = (options: UseStyleConfigOptions<Parts, Params, Variants>) => Accessor<StylesObjects<Parts>>;
+  VariantDefinitions extends Record<string, any>
+> = (
+  name: string,
+  options: UseStyleConfigOptions<Parts, VariantDefinitions>
+) => Accessor<StyleObjects<Parts>>;

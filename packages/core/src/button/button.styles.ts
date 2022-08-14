@@ -1,26 +1,24 @@
-import {
-  createStyleConfig,
-  focusStyles,
-  StyleConfigProps,
-  ThemeColorPalette,
-} from "@hope-ui/styles";
+import { createStyleConfig, focusStyles, StyleConfigProps } from "@hope-ui/styles";
 
-export interface ButtonParams {
-  /** The color of the button. */
-  colorScheme: ThemeColorPalette;
-}
+type ButtonParts = "root" | "icon";
 
-export interface ButtonVariants {
-  variant: "solid" | "soft" | "outlined" | "ghost";
+interface ButtonVariants {
+  /** The visual style of the button. */
+  variant: "solid" | "soft" | "outlined" | "plain";
+
+  /** The size of the button. */
   size: "xs" | "sm" | "md" | "lg";
+
+  /** Whether the button should take all available width. */
   isFullWidth: boolean;
+
+  /** Whether the button is in a loading state. */
   isLoading: boolean;
 }
 
-export const useStyleConfig = createStyleConfig((vars, params: ButtonParams) => {
-  return {
-    parts: ["root", "icon"],
-    base: {
+export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
+  ({ vars, colorScheme }) => ({
+    baseStyle: {
       root: {
         appearance: "none",
         position: "relative",
@@ -68,101 +66,101 @@ export const useStyleConfig = createStyleConfig((vars, params: ButtonParams) => 
       variant: {
         solid: {
           root: {
-            color: vars.colors[params.colorScheme].solidText,
-            bg: vars.colors[params.colorScheme].solidBg,
-            borderColor: vars.colors[params.colorScheme].solidBorder,
+            color: vars.colors[colorScheme].solidText,
+            bg: vars.colors[colorScheme].solidBg,
+            borderColor: vars.colors[colorScheme].solidBorder,
 
             _hover: {
-              color: vars.colors[params.colorScheme].solidHoverText,
-              bg: vars.colors[params.colorScheme].solidHoverBg,
-              borderColor: vars.colors[params.colorScheme].solidHoverBorder,
+              color: vars.colors[colorScheme].solidHoverText,
+              bg: vars.colors[colorScheme].solidHoverBg,
+              borderColor: vars.colors[colorScheme].solidHoverBorder,
             },
 
             _active: {
-              color: vars.colors[params.colorScheme].solidActiveText,
-              bg: vars.colors[params.colorScheme].solidActiveBg,
-              borderColor: vars.colors[params.colorScheme].solidActiveBorder,
+              color: vars.colors[colorScheme].solidActiveText,
+              bg: vars.colors[colorScheme].solidActiveBg,
+              borderColor: vars.colors[colorScheme].solidActiveBorder,
             },
 
             _disabled: {
-              color: vars.colors[params.colorScheme].solidDisabledText,
-              bg: vars.colors[params.colorScheme].solidDisabledBg,
-              borderColor: vars.colors[params.colorScheme].solidDisabledBorder,
+              color: vars.colors[colorScheme].solidDisabledText,
+              bg: vars.colors[colorScheme].solidDisabledBg,
+              borderColor: vars.colors[colorScheme].solidDisabledBorder,
             },
           },
         },
         soft: {
           root: {
-            color: vars.colors[params.colorScheme].softText,
-            bg: vars.colors[params.colorScheme].softBg,
-            borderColor: vars.colors[params.colorScheme].softBorder,
+            color: vars.colors[colorScheme].softText,
+            bg: vars.colors[colorScheme].softBg,
+            borderColor: vars.colors[colorScheme].softBorder,
 
             _hover: {
-              color: vars.colors[params.colorScheme].softHoverText,
-              bg: vars.colors[params.colorScheme].softHoverBg,
-              borderColor: vars.colors[params.colorScheme].softHoverBorder,
+              color: vars.colors[colorScheme].softHoverText,
+              bg: vars.colors[colorScheme].softHoverBg,
+              borderColor: vars.colors[colorScheme].softHoverBorder,
             },
 
             _active: {
-              color: vars.colors[params.colorScheme].softActiveText,
-              bg: vars.colors[params.colorScheme].softActiveBg,
-              borderColor: vars.colors[params.colorScheme].softActiveBorder,
+              color: vars.colors[colorScheme].softActiveText,
+              bg: vars.colors[colorScheme].softActiveBg,
+              borderColor: vars.colors[colorScheme].softActiveBorder,
             },
 
             _disabled: {
-              color: vars.colors[params.colorScheme].softDisabledText,
-              bg: vars.colors[params.colorScheme].softDisabledBg,
-              borderColor: vars.colors[params.colorScheme].softDisabledBorder,
+              color: vars.colors[colorScheme].softDisabledText,
+              bg: vars.colors[colorScheme].softDisabledBg,
+              borderColor: vars.colors[colorScheme].softDisabledBorder,
             },
           },
         },
         outlined: {
           root: {
-            color: vars.colors[params.colorScheme].outlinedText,
-            bg: vars.colors[params.colorScheme].outlinedBg,
-            borderColor: vars.colors[params.colorScheme].outlinedBorder,
+            color: vars.colors[colorScheme].outlinedText,
+            bg: vars.colors[colorScheme].outlinedBg,
+            borderColor: vars.colors[colorScheme].outlinedBorder,
 
             _hover: {
-              color: vars.colors[params.colorScheme].outlinedHoverText,
-              bg: vars.colors[params.colorScheme].outlinedHoverBg,
-              borderColor: vars.colors[params.colorScheme].outlinedHoverBorder,
+              color: vars.colors[colorScheme].outlinedHoverText,
+              bg: vars.colors[colorScheme].outlinedHoverBg,
+              borderColor: vars.colors[colorScheme].outlinedHoverBorder,
             },
 
             _active: {
-              color: vars.colors[params.colorScheme].outlinedActiveText,
-              bg: vars.colors[params.colorScheme].outlinedActiveBg,
-              borderColor: vars.colors[params.colorScheme].outlinedActiveBorder,
+              color: vars.colors[colorScheme].outlinedActiveText,
+              bg: vars.colors[colorScheme].outlinedActiveBg,
+              borderColor: vars.colors[colorScheme].outlinedActiveBorder,
             },
 
             _disabled: {
-              color: vars.colors[params.colorScheme].outlinedDisabledText,
-              bg: vars.colors[params.colorScheme].outlinedDisabledBg,
-              borderColor: vars.colors[params.colorScheme].outlinedDisabledBorder,
+              color: vars.colors[colorScheme].outlinedDisabledText,
+              bg: vars.colors[colorScheme].outlinedDisabledBg,
+              borderColor: vars.colors[colorScheme].outlinedDisabledBorder,
             },
           },
         },
         plain: {
           root: {
-            color: vars.colors[params.colorScheme].plainText,
-            bg: vars.colors[params.colorScheme].plainBg,
-            borderColor: vars.colors[params.colorScheme].plainBorder,
+            color: vars.colors[colorScheme].plainText,
+            bg: vars.colors[colorScheme].plainBg,
+            borderColor: vars.colors[colorScheme].plainBorder,
 
             _hover: {
-              color: vars.colors[params.colorScheme].plainHoverText,
-              bg: vars.colors[params.colorScheme].plainHoverBg,
-              borderColor: vars.colors[params.colorScheme].plainHoverBorder,
+              color: vars.colors[colorScheme].plainHoverText,
+              bg: vars.colors[colorScheme].plainHoverBg,
+              borderColor: vars.colors[colorScheme].plainHoverBorder,
             },
 
             _active: {
-              color: vars.colors[params.colorScheme].plainActiveText,
-              bg: vars.colors[params.colorScheme].plainActiveBg,
-              borderColor: vars.colors[params.colorScheme].plainActiveBorder,
+              color: vars.colors[colorScheme].plainActiveText,
+              bg: vars.colors[colorScheme].plainActiveBg,
+              borderColor: vars.colors[colorScheme].plainActiveBorder,
             },
 
             _disabled: {
-              color: vars.colors[params.colorScheme].plainDisabledText,
-              bg: vars.colors[params.colorScheme].plainDisabledBg,
-              borderColor: vars.colors[params.colorScheme].plainDisabledBorder,
+              color: vars.colors[colorScheme].plainDisabledText,
+              bg: vars.colors[colorScheme].plainDisabledBg,
+              borderColor: vars.colors[colorScheme].plainDisabledBorder,
             },
           },
         },
@@ -214,12 +212,12 @@ export const useStyleConfig = createStyleConfig((vars, params: ButtonParams) => 
       },
     },
     defaultVariants: {
-      variant: "outlined",
+      variant: "solid",
       size: "md",
       isFullWidth: false,
       isLoading: false,
     },
-  };
-});
+  })
+);
 
 export type ButtonStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;

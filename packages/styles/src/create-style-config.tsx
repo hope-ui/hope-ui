@@ -12,7 +12,7 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/tss/create-styles.ts
  */
 
-import { isFunction } from "@hope-ui/utils";
+import { filterUndefined, isFunction } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
 import { createMemo } from "solid-js";
 
@@ -22,23 +22,19 @@ import {
   StyleConfigInterpolation,
   StyleConfigOverride,
   StyleConfigOverrideInterpolation,
-  StylesObjects,
+  StyleObjects,
   SystemStyleObject,
+  ThemeColorScheme,
   ThemeVars,
   UseStyleConfigFn,
   UseStyleConfigOptions,
-  VariantGroups,
   VariantSelection,
 } from "./types";
 
 /** Return whether a compound variant should be applied. */
-function shouldApplyCompound<Parts extends string, Variants extends VariantGroups<Parts>>(
-  compoundCheck: VariantSelection<Parts, Variants>,
-  selections: VariantSelection<Parts, Variants>,
-  defaultVariants: VariantSelection<Parts, Variants>
-) {
+function shouldApplyCompound<T extends VariantSelection<any>>(compoundCheck: T, selections: T) {
   for (const key of Object.keys(compoundCheck)) {
-    if (compoundCheck[key] !== (selections[key] ?? defaultVariants[key])) {
+    if (compoundCheck[key] !== selections[key]) {
       return false;
     }
   }
@@ -48,15 +44,14 @@ function shouldApplyCompound<Parts extends string, Variants extends VariantGroup
 
 function extractStyleConfigOverride<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
+  VariantDefinitions extends Record<string, any>
 >(
-  config: StyleConfigOverrideInterpolation<Parts, Params, Variants> | undefined,
+  config: StyleConfigOverrideInterpolation<Parts, VariantDefinitions> | undefined,
   vars: ThemeVars,
-  params: Params
-): StyleConfigOverride<Parts, Variants> {
+  colorScheme: ThemeColorScheme
+): StyleConfigOverride<Parts, VariantDefinitions> {
   if (isFunction(config)) {
-    return config(vars, params ?? ({} as Params));
+    return config({ vars, colorScheme });
   }
 
   return config ?? {};
@@ -65,39 +60,45 @@ function extractStyleConfigOverride<
 /** Create a `useStyleConfig` primitive. */
 export function createStyleConfig<
   Parts extends string,
-  Params extends Record<string, any>,
-  Variants extends VariantGroups<Parts>
+  VariantDefinitions extends Record<string, any>
 >(
-  interpolation: StyleConfigInterpolation<Parts, Params, Variants>
-): UseStyleConfigFn<Parts, Params, Variants> {
+  interpolation: StyleConfigInterpolation<Parts, VariantDefinitions>
+): UseStyleConfigFn<Parts, VariantDefinitions> {
   const extractBaseStyleConfig = isFunction(interpolation) ? interpolation : () => interpolation;
 
-  function useStyles(options: UseStyleConfigOptions<Parts, Params, Variants>) {
+  function useStyles(name: string, options: UseStyleConfigOptions<Parts, VariantDefinitions>) {
     const theme = useTheme();
-    const themeStyleConfig = useThemeStyleConfig(options.name);
+    const themeStyleConfig = useThemeStyleConfig(name);
 
     const styles = createMemo(() => {
+      const {
+        colorScheme = "primary", // fallback to primary colorScheme if not provided.
+        styleConfigOverride,
+        unstyled,
+        ...variantSelections
+      } = options;
+
       // base.
-      const baseStyleConfig = options.unstyled
+      const baseStyleConfig = unstyled
         ? {}
-        : extractBaseStyleConfig(theme.vars, options.params);
+        : extractBaseStyleConfig({ vars: theme.vars, colorScheme });
 
       // overrides from theme.
       const themeStyleConfigOverride = extractStyleConfigOverride(
         themeStyleConfig(),
         theme.vars,
-        options.params
+        colorScheme
       );
 
       // overrides from component `styleConfig` prop.
       const componentStyleConfigOverride = extractStyleConfigOverride(
-        options.styleConfig,
+        styleConfigOverride,
         theme.vars,
-        options.params
+        colorScheme
       );
 
       // 1. merge styles configs.
-      const mergedConfig: StyleConfig<Parts, Variants> = mergeWith(
+      const mergedConfig: StyleConfig<Parts, VariantDefinitions> = mergeWith(
         {},
         baseStyleConfig,
         themeStyleConfigOverride,
@@ -105,25 +106,28 @@ export function createStyleConfig<
       );
 
       // 2. add "base" styles.
-      const stylesMap = new Map<Parts, Array<SystemStyleObject | undefined>>(
-        mergedConfig.parts.map(part => [part, [mergedConfig.baseStyle?.[part]]])
+      const stylesMap = new Map(
+        Object.entries(mergedConfig.baseStyle).map(([part, style]) => [
+          part as Parts,
+          [style as SystemStyleObject | undefined],
+        ])
       );
 
       // 3. add "variants" styles.
       const selections = {
         ...mergedConfig.defaultVariants,
-        ...options.variants,
-      } as VariantSelection<Parts, Variants>;
+        ...filterUndefined(variantSelections),
+      } as VariantSelection<VariantDefinitions>;
 
       for (const variantName in selections) {
-        const selection = selections[variantName] ?? mergedConfig.defaultVariants?.[variantName];
+        const selection = selections[variantName];
 
         if (selection == null) {
           continue;
         }
 
-        const selectionStyle =
-          mergedConfig.variants?.[variantName as any]?.[String(selection) as any];
+        // @ts-ignore
+        const selectionStyle = mergedConfig.variants?.[variantName]?.[String(selection)];
 
         if (!selectionStyle) {
           continue;
@@ -136,13 +140,7 @@ export function createStyleConfig<
 
       // 4. add "compoundVariants" styles.
       for (const compoundVariant of mergedConfig.compoundVariants ?? []) {
-        if (
-          shouldApplyCompound(
-            compoundVariant.variants,
-            selections,
-            mergedConfig.defaultVariants ?? {}
-          )
-        ) {
+        if (shouldApplyCompound(compoundVariant.variants, selections)) {
           Object.entries(compoundVariant.style).forEach(([part, style]) => {
             stylesMap.get(part as Parts)?.push(style as SystemStyleObject);
           });
@@ -156,7 +154,7 @@ export function createStyleConfig<
         mergedStyles[part] = mergeWith({}, ...styles);
       });
 
-      return mergedStyles as StylesObjects<Parts>;
+      return mergedStyles as StyleObjects<Parts>;
     });
 
     return styles;

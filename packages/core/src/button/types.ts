@@ -52,5 +52,5 @@ export interface ButtonGroupContextValue {
 
 export type ButtonTheme = ComponentTheme<
   Pick<ButtonProps, "colorScheme" | "variant" | "size" | "loaderPlacement">,
-  ButtonProps["styleConfig"]
+  ButtonProps["styleConfigOverride"]
 >;
