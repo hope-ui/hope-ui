@@ -6,9 +6,9 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/theme/MantineProvider.tsx
  */
 
-import { createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
+import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { StylesConfigInterpolation, Theme } from "../types";
+import type { StyleConfigOverrideInterpolation, Theme } from "../types";
 import { ThemeOverride } from "../types";
 import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME } from "./default-theme";
@@ -22,7 +22,9 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyles(component?: string) {
+export function useThemeStyleConfig(
+  component?: string
+): Accessor<StyleConfigOverrideInterpolation<any, any, any>> {
   const theme = useTheme();
 
   return createMemo(() => {
@@ -30,9 +32,7 @@ export function useThemeStyles(component?: string) {
       return undefined;
     }
 
-    return theme.components[component]?.styles as
-      | StylesConfigInterpolation<any, any, any>
-      | undefined;
+    return theme.components[component].styleConfig;
   });
 }
 

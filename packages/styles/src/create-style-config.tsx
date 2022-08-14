@@ -16,16 +16,17 @@ import { isFunction } from "@hope-ui/utils";
 import { mergeWith } from "lodash-es";
 import { createMemo } from "solid-js";
 
-import { useTheme, useThemeStyles } from "./theme";
+import { useTheme, useThemeStyleConfig } from "./theme";
 import {
-  PartialStylesConfigInterpolation,
-  StylesConfig,
-  StylesConfigInterpolation,
+  StyleConfig,
+  StyleConfigInterpolation,
+  StyleConfigOverride,
+  StyleConfigOverrideInterpolation,
   StylesObjects,
   SystemStyleObject,
   ThemeVars,
-  UseStylesFn,
-  UseStylesOptions,
+  UseStyleConfigFn,
+  UseStyleConfigOptions,
   VariantGroups,
   VariantSelection,
 } from "./types";
@@ -45,15 +46,15 @@ function shouldApplyCompound<Parts extends string, Variants extends VariantGroup
   return true;
 }
 
-function extractStylesConfig<
+function extractStyleConfigOverride<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  config: PartialStylesConfigInterpolation<Parts, Params, Variants> | undefined,
+  config: StyleConfigOverrideInterpolation<Parts, Params, Variants> | undefined,
   vars: ThemeVars,
   params: Params
-): Partial<StylesConfig<Parts, Variants>> {
+): StyleConfigOverride<Parts, Variants> {
   if (isFunction(config)) {
     return config(vars, params ?? ({} as Params));
   }
@@ -61,39 +62,51 @@ function extractStylesConfig<
   return config ?? {};
 }
 
-/** Create a `useStyles` primitive. */
-export function createStyles<
+/** Create a `useStyleConfig` primitive. */
+export function createStyleConfig<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 >(
-  config: StylesConfigInterpolation<Parts, Params, Variants>
-): UseStylesFn<Parts, Params, Variants> {
-  const extractBaseStylesConfig = typeof config === "function" ? config : () => config;
+  interpolation: StyleConfigInterpolation<Parts, Params, Variants>
+): UseStyleConfigFn<Parts, Params, Variants> {
+  const extractBaseStyleConfig = isFunction(interpolation) ? interpolation : () => interpolation;
 
-  function useStyles(options: UseStylesOptions<Parts, Params, Variants>) {
+  function useStyles(options: UseStyleConfigOptions<Parts, Params, Variants>) {
     const theme = useTheme();
-    const themeStyles = useThemeStyles(options.name);
+    const themeStyleConfig = useThemeStyleConfig(options.name);
 
     const styles = createMemo(() => {
-      const baseStylesConfig = options.unstyled
+      // base.
+      const baseStyleConfig = options.unstyled
         ? {}
-        : extractBaseStylesConfig(theme.vars, options.params);
+        : extractBaseStyleConfig(theme.vars, options.params);
 
-      const themeStylesConfig = extractStylesConfig(themeStyles(), theme.vars, options.params);
-      const propStylesConfig = extractStylesConfig(options.styles, theme.vars, options.params);
+      // overrides from theme.
+      const themeStyleConfigOverride = extractStyleConfigOverride(
+        themeStyleConfig(),
+        theme.vars,
+        options.params
+      );
+
+      // overrides from component `styleConfig` prop.
+      const componentStyleConfigOverride = extractStyleConfigOverride(
+        options.styleConfig,
+        theme.vars,
+        options.params
+      );
 
       // 1. merge styles configs.
-      const mergedConfig: StylesConfig<Parts, Variants> = mergeWith(
+      const mergedConfig: StyleConfig<Parts, Variants> = mergeWith(
         {},
-        baseStylesConfig,
-        themeStylesConfig,
-        propStylesConfig
+        baseStyleConfig,
+        themeStyleConfigOverride,
+        componentStyleConfigOverride
       );
 
       // 2. add "base" styles.
       const stylesMap = new Map<Parts, Array<SystemStyleObject | undefined>>(
-        mergedConfig.parts.map(part => [part, [mergedConfig.base?.[part]]])
+        mergedConfig.parts.map(part => [part, [mergedConfig.baseStyle?.[part]]])
       );
 
       // 3. add "variants" styles.

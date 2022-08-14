@@ -35,13 +35,13 @@ export interface CompoundVariant<Parts extends string, Variants extends VariantG
   style: Partial<StylesObjects<Parts>>;
 }
 
-/** A styles configuration. */
-export type StylesConfig<Parts extends string, Variants extends VariantGroups<Parts>> = {
+/** A style configuration. */
+export type StyleConfig<Parts extends string, Variants extends VariantGroups<Parts>> = {
   /** The parts of the recipe/component. */
   parts: Array<Parts>;
 
-  /** The base styles of each part. */
-  base?: Partial<StylesObjects<Parts>>;
+  /** The base style of each part. */
+  baseStyle?: Partial<StylesObjects<Parts>>;
 
   /** The variants style of each part. */
   variants?: Variants;
@@ -53,25 +53,31 @@ export type StylesConfig<Parts extends string, Variants extends VariantGroups<Pa
   defaultVariants?: VariantSelection<Parts, Variants>;
 };
 
-/** An object or function that returns styles configuration. */
-export type StylesConfigInterpolation<
+/** An object or function that returns style configuration. */
+export type StyleConfigInterpolation<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 > =
-  | StylesConfig<Parts, Variants>
-  | ((vars: ThemeVars, params: Params) => StylesConfig<Parts, Variants>);
+  | StyleConfig<Parts, Variants>
+  | ((vars: ThemeVars, params: Params) => StyleConfig<Parts, Variants>);
 
-/** An object or function that returns partial styles configuration. */
-export type PartialStylesConfigInterpolation<
+/** A style configuration used for theming and component level styles overrides. */
+export type StyleConfigOverride<Parts extends string, Variants extends VariantGroups<Parts>> = Omit<
+  StyleConfig<Parts, Variants>,
+  "parts" | "defaultVariants"
+>;
+
+/** An object or function that returns style configuration overrides. */
+export type StyleConfigOverrideInterpolation<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
 > =
-  | Partial<StylesConfig<Parts, Variants>>
-  | ((vars: ThemeVars, params: Params) => Partial<StylesConfig<Parts, Variants>>);
+  | StyleConfigOverride<Parts, Variants>
+  | ((vars: ThemeVars, params: Params) => StyleConfigOverride<Parts, Variants>);
 
-export interface UseStylesOptions<
+export interface UseStyleConfigOptions<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
@@ -79,24 +85,24 @@ export interface UseStylesOptions<
   /** The name of the component, used to retrieve theme styles. */
   name?: string;
 
-  /** Dynamic params that will be passed to the `useStyles` call. */
+  /** Dynamic params that will be passed to the `useStyleConfig` call. */
   params: Params;
 
   /** The variants used to determine which style should be applied. */
   variants?: VariantSelection<Parts, Variants>;
 
   /**
-   * Styles that will be merged with the "base styles" created by the `createStyles` call.
+   * Styles that will be merged with the "base styles" created by `createStyleConfig`.
    * Mostly used to override/add additional styles.
    */
-  styles?: PartialStylesConfigInterpolation<Parts, Params, Variants>;
+  styleConfig?: StyleConfigOverrideInterpolation<Parts, Params, Variants>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
 }
 
-export type UseStylesFn<
+export type UseStyleConfigFn<
   Parts extends string,
   Params extends Record<string, any>,
   Variants extends VariantGroups<Parts>
-> = (options: UseStylesOptions<Parts, Params, Variants>) => Accessor<StylesObjects<Parts>>;
+> = (options: UseStyleConfigOptions<Parts, Params, Variants>) => Accessor<StylesObjects<Parts>>;

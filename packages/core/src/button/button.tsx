@@ -1,7 +1,7 @@
 import { createPolymorphicComponent, hope, mergeThemeProps } from "@hope-ui/styles";
 import { splitProps } from "solid-js";
 
-import { ButtonParams, useStyles } from "./button.styles";
+import { ButtonParams, useStyleConfig } from "./button.styles";
 import { ButtonProps } from "./types";
 
 export const Button = createPolymorphicComponent<"button", ButtonProps>(props => {
@@ -14,7 +14,7 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
   );
 
   const [local, others] = splitProps(props, [
-    "styles",
+    "styleConfig",
     "unstyled",
     "colorScheme",
     "variant",
@@ -23,12 +23,12 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
     "isLoading",
   ]);
 
-  const styles = useStyles({
+  const styles = useStyleConfig({
     name: "Button",
     params: local as ButtonParams,
     variants: local,
-    get styles() {
-      return local.styles;
+    get styleConfig() {
+      return local.styleConfig;
     },
     get unstyled() {
       return local.unstyled;

@@ -1,11 +1,27 @@
 import { render } from "solid-js/web";
 
-import { HopeProvider } from "../src";
+import { ButtonTheme, extendTheme, HopeProvider } from "../src";
 import App from "./App";
+
+const theme = extendTheme({
+  components: {
+    Button: {
+      defaultProps: {},
+      styleConfig: {
+        baseStyle: {},
+        variants: {
+          variant: {
+            outlined: {},
+          },
+        },
+      },
+    } as ButtonTheme,
+  },
+});
 
 render(
   () => (
-    <HopeProvider withGlobalStyles>
+    <HopeProvider withGlobalStyles theme={theme}>
       <App />
     </HopeProvider>
   ),

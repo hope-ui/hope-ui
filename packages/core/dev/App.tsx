@@ -1,5 +1,11 @@
+import { Button } from "../src";
+
 export default function App() {
-  return <></>;
+  return (
+    <>
+      <Button styleConfig={{}}></Button>
+    </>
+  );
 }
 
 /*

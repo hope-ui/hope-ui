@@ -1,11 +1,23 @@
-import { createStyles, focusStyles, StylesConfigProps, ThemeColorPalette } from "@hope-ui/styles";
+import {
+  createStyleConfig,
+  focusStyles,
+  StyleConfigProps,
+  ThemeColorPalette,
+} from "@hope-ui/styles";
 
 export interface ButtonParams {
   /** The color of the button. */
   colorScheme: ThemeColorPalette;
 }
 
-export const useStyles = createStyles((vars, params: ButtonParams) => {
+export interface ButtonVariants {
+  variant: "solid" | "soft" | "outlined" | "ghost";
+  size: "xs" | "sm" | "md" | "lg";
+  isFullWidth: boolean;
+  isLoading: boolean;
+}
+
+export const useStyleConfig = createStyleConfig((vars, params: ButtonParams) => {
   return {
     parts: ["root", "icon"],
     base: {
@@ -210,4 +222,4 @@ export const useStyles = createStyles((vars, params: ButtonParams) => {
   };
 });
 
-export type ButtonStylesConfigProps = StylesConfigProps<typeof useStyles>;
+export type ButtonStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;

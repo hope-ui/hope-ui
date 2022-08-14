@@ -1,9 +1,9 @@
 import { ComponentTheme, HopeProps, SystemStyleProps } from "@hope-ui/styles";
 import { Accessor, JSX } from "solid-js";
 
-import { ButtonStylesConfigProps } from "./button.styles";
+import { ButtonStyleConfigProps } from "./button.styles";
 
-export interface ButtonProps extends ButtonStylesConfigProps {
+export interface ButtonProps extends ButtonStyleConfigProps {
   /** The placement of the loader when `isLoading` is true. */
   loaderPlacement?: "start" | "end";
 
@@ -34,7 +34,7 @@ export interface ButtonLoaderProps {
 export type ButtonContentProps = Pick<ButtonProps, "leftIcon" | "rightIcon" | "children">;
 
 interface ButtonGroupProps
-  extends Pick<ButtonProps, "variant" | "colorScheme" | "size" | "isDisabled">,
+  extends Pick<ButtonProps, "colorScheme" | "variant" | "size" | "isDisabled">,
     HopeProps {
   /** Whether the borderRadius of button that are direct children will be altered to look flushed together. */
   isAttached?: boolean;
@@ -50,4 +50,7 @@ export interface ButtonGroupContextValue {
   isDisabled: Accessor<ButtonGroupProps["isDisabled"]>;
 }
 
-export type ButtonTheme = ComponentTheme<ButtonProps, ButtonProps["styles"]>;
+export type ButtonTheme = ComponentTheme<
+  Pick<ButtonProps, "colorScheme" | "variant" | "size" | "loaderPlacement">,
+  ButtonProps["styleConfig"]
+>;

@@ -1,7 +1,7 @@
 import { ClassProp } from "@hope-ui/utils";
 
+import { UseStyleConfigFn } from "./style-config";
 import { SxProp, SystemStyleObject, SystemStyleProps } from "./styled-system";
-import { UseStylesFn } from "./styles-config";
 
 /** Hope UI specific props. */
 export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
@@ -12,18 +12,18 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
   __css?: SystemStyleObject;
 }
 
-/** Extract the option's type of `useStyles` primitive. */
-type StylesConfigOptionsOf<T extends UseStylesFn<any, any, any>> = Parameters<T>[0];
+/** Extract the option's type of `useStyleConfig` primitive. */
+type StyleConfigOptionsOf<T extends UseStyleConfigFn<any, any, any>> = Parameters<T>[0];
 
-/** Props of components that supports the `Styles Config API` and `system style` props. */
-export type StylesConfigProps<T extends UseStylesFn<any, any, any>> = HopeProps &
-  Partial<StylesConfigOptionsOf<T>["variants"] & StylesConfigOptionsOf<T>["params"]> & {
+/** Props of components that supports the `Style Config API` and `system style` props. */
+export type StyleConfigProps<T extends UseStyleConfigFn<any, any, any>> = HopeProps &
+  Partial<StyleConfigOptionsOf<T>["variants"] & StyleConfigOptionsOf<T>["params"]> & {
     /**
-     * Styles that will be merged with the "base styles" created by the `createStyles` call.
-     * Mostly used to override/add additional styles.
+     * Styles that will be merged with the "base styles" created by `createStyleConfig`.
+     * Used to override/add additional styles.
      */
-    styles?: StylesConfigOptionsOf<T>["styles"];
+    styleConfig?: StyleConfigOptionsOf<T>["styleConfig"];
 
     /** Whether the base styles should be applied or not. */
-    unstyled?: StylesConfigOptionsOf<T>["unstyled"];
+    unstyled?: StyleConfigOptionsOf<T>["unstyled"];
   };
