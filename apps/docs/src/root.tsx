@@ -15,15 +15,15 @@ export default function Root() {
         <style id="stitches" innerHTML={getCssText()} />
       </Head>
       <Body>
-        <Suspense>
-          <HopeProvider withGlobalStyles>
+        <HopeProvider withGlobalStyles>
+          <Suspense>
             <ErrorBoundary>
               <Routes>
                 <FileRoutes />
               </Routes>
             </ErrorBoundary>
-          </HopeProvider>
-        </Suspense>
+          </Suspense>
+        </HopeProvider>
         <Scripts />
       </Body>
     </Html>
