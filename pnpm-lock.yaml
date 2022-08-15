@@ -98,6 +98,7 @@ importers:
       encoding: 0.1.13
       iconv-lite: 0.6.3
       node-fetch: 2.6.7
+      safer-buffer: 2.1.2
       solid-js: 1.4.7
       solid-start: 0.1.0-alpha.99
       solid-start-netlify: 0.1.0-alpha.99
@@ -115,6 +116,7 @@ importers:
       encoding: 0.1.13
       iconv-lite: 0.6.3
       node-fetch: 2.6.7_encoding@0.1.13
+      safer-buffer: 2.1.2
       solid-js: 1.4.7
       solid-start: 0.1.0-alpha.99_qumfg53klmtpjvq4xmlsbh3yhy
       solid-start-netlify: 0.1.0-alpha.99_solid-start@0.1.0-alpha.99
