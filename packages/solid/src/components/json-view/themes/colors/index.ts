@@ -11,7 +11,6 @@ export { default as bright } from "./bright";
 export { default as chalk } from "./chalk";
 export { default as codeschool } from "./codeschool";
 export { default as colors } from "./colors";
-export { default as default } from "./default";
 export { default as eighties } from "./eighties";
 export { default as embers } from "./embers";
 export { default as flat } from "./flat";
@@ -36,7 +35,7 @@ export { default as tomorrow } from "./tomorrow";
 export { default as tube } from "./tube";
 export { default as twilight } from "./twilight";
 
-export const JV_DEFAULT = {
+export const jv_default = {
   scheme: "default",
   author: "mac",
   //transparent main background

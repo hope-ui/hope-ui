@@ -1,9 +1,10 @@
 import { createStitches } from "@stitches/core";
+
 import { Base16Theme } from "./base-16.type";
 import * as Themes from "./colors";
 import constants from "./style-constants";
 
-const colorMap = (theme: Base16Theme = Themes.JV_DEFAULT) => ({
+const colorMap = (theme: Base16Theme = Themes.jv_default) => ({
   backgroundColor: theme.base00,
   ellipsisColor: theme.base09,
   braceColor: theme.base07,
@@ -49,7 +50,7 @@ const colorMap = (theme: Base16Theme = Themes.JV_DEFAULT) => ({
 
 const { css, createTheme } = createStitches({
   theme: {
-    colors: { ...colorMap(Themes.JV_DEFAULT) },
+    colors: { ...colorMap(Themes.jv_default) },
   },
 });
 
@@ -184,7 +185,7 @@ export const variableValue = css({
         cursor: "pointer",
         whiteSpace: "pre-line",
 
-        "&>.functionValue": {
+        "&>.function-value": {
           fontStyle: "italic",
         },
       },
@@ -246,7 +247,7 @@ export const copyIcon = css({
         color: "$copyToClipboard",
         fontSize: constants.iconFontSize,
         marginRight: constants.iconMarginRight,
-        verticalAlign: "top",
+        verticalAlign: "middle",
       },
       copied: {
         color: "$copyToClipboardCheck",
@@ -279,7 +280,7 @@ export const iconContainer = css({
 });
 
 export const varIcon = css({
-  verticalAlign: "top",
+  verticalAlign: ",middle",
   display: "inline-block",
   cursor: constants.iconCursor,
   fontSize: constants.iconFontSize,
@@ -405,7 +406,7 @@ export const validationFailureClear = css({
 });
 
 export const setTheme = (theme: Base16Theme | string | undefined) => {
-  let themeName = "default";
+  let themeName = "jv_default";
   if (typeof theme === "string") {
     themeName = theme;
     const colorTheme = (Themes as any)[theme] as Base16Theme;
