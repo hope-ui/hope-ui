@@ -50,7 +50,6 @@
     "csstype": "3.0.11",
     "focus-trap": "6.7.3",
     "lodash.merge": "4.6.2",
-    "react-base16-styling": "^0.9.1",
     "scroll-lock": "2.1.5"
   },
   "peerDependencies": {
