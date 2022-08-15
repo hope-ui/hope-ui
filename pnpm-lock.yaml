@@ -95,6 +95,7 @@ importers:
       '@solidjs/router': 0.4.2
       '@stitches/core': 1.2.8
       clsx: 1.2.1
+      encoding: 0.1.13
       node-fetch: 2.6.7
       solid-js: 1.4.7
       solid-start: 0.1.0-alpha.99
@@ -110,7 +111,8 @@ importers:
       '@stitches/core': 1.2.8
       clsx: 1.2.1
     devDependencies:
-      node-fetch: 2.6.7
+      encoding: 0.1.13
+      node-fetch: 2.6.7_encoding@0.1.13
       solid-js: 1.4.7
       solid-start: 0.1.0-alpha.99_qumfg53klmtpjvq4xmlsbh3yhy
       solid-start-netlify: 0.1.0-alpha.99_solid-start@0.1.0-alpha.99
@@ -13293,6 +13295,19 @@ packages:
       encoding:
         optional: true
     dependencies:
+      whatwg-url: 5.0.0
+    dev: true
+
+  /node-fetch/2.6.7_encoding@0.1.13:
+    resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
+    engines: {node: 4.x || >=6.0.0}
+    peerDependencies:
+      encoding: ^0.1.0
+    peerDependenciesMeta:
+      encoding:
+        optional: true
+    dependencies:
+      encoding: 0.1.13
       whatwg-url: 5.0.0
     dev: true
 
