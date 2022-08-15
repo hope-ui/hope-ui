@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "encoding": "0.1.13",
+    "iconv-lite": "0.6.3",
     "node-fetch": "2.6.7",
     "solid-js": "1.4.7",
     "solid-start": "0.1.0-alpha.99",
