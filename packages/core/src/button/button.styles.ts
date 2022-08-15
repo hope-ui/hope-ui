@@ -23,19 +23,16 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
         appearance: "none",
         position: "relative",
 
-        display: "inline-flex",
         justifyContent: "center",
         alignItems: "center",
         gap: 2,
-
-        width: "auto",
 
         outline: "none",
 
         border: "1px solid transparent",
         borderRadius: "sm",
 
-        padding: "0",
+        padding: 0,
 
         fontFamily: "inherit",
         fontSize: "100%",
@@ -200,6 +197,12 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
           root: {
             display: "flex",
             width: "100%",
+          },
+        },
+        false: {
+          root: {
+            display: "inline-flex",
+            width: "auto",
           },
         },
       },

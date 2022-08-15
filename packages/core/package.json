@@ -49,12 +49,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/styles": "^0.0.0",
-    "@hope-ui/utils": "^0.0.0"
+    "@hope-ui/styles": "0.0.0",
+    "@hope-ui/utils": "0.0.0",
+    "@solid-primitives/refs": "0.3.0"
   },
   "devDependencies": {
     "@hope-ui/tests": "workspace:*",
-    "@stitches/core": "1.2.8",
     "@storybook/addon-a11y": "6.4.20",
     "@storybook/addon-actions": "6.4.20",
     "@storybook/addon-essentials": "6.4.20",
@@ -67,7 +67,6 @@
     "@storybook/html": "6.4.20",
     "@storybook/manager-webpack5": "6.4.20",
     "@storybook/theming": "6.4.20",
-    "clsx": "1.2.1",
     "storybook-dark-mode": "1.1.0"
   },
   "peerDependencies": {

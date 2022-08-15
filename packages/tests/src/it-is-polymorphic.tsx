@@ -20,7 +20,7 @@ export function itIsPolymorphic<P>(Comp: Component<P>, requiredProps: P, selecto
     };
 
     const { container: withTag } = render(() => (
-      <Comp as="a" href="https://mantine.dev" {...requiredProps} />
+      <Comp as="a" href="https://hope-ui.com" {...requiredProps} />
     ));
 
     const { container: withComponent } = render(() => (

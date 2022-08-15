@@ -93,8 +93,6 @@ importers:
       '@hope-ui/core': workspace:*
       '@solidjs/meta': 0.28.0
       '@solidjs/router': 0.4.2
-      '@stitches/core': 1.2.8
-      clsx: 1.2.1
       encoding: 0.1.13
       iconv-lite: 0.6.3
       node-fetch: 2.6.7
@@ -110,8 +108,6 @@ importers:
       '@hope-ui/core': link:../../packages/core
       '@solidjs/meta': 0.28.0_solid-js@1.4.7
       '@solidjs/router': 0.4.2_solid-js@1.4.7
-      '@stitches/core': 1.2.8
-      clsx: 1.2.1
     devDependencies:
       encoding: 0.1.13
       iconv-lite: 0.6.3
@@ -127,10 +123,10 @@ importers:
 
   packages/core:
     specifiers:
-      '@hope-ui/styles': ^0.0.0
+      '@hope-ui/styles': 0.0.0
       '@hope-ui/tests': workspace:*
-      '@hope-ui/utils': ^0.0.0
-      '@stitches/core': 1.2.8
+      '@hope-ui/utils': 0.0.0
+      '@solid-primitives/refs': 0.3.0
       '@storybook/addon-a11y': 6.4.20
       '@storybook/addon-actions': 6.4.20
       '@storybook/addon-essentials': 6.4.20
@@ -143,14 +139,13 @@ importers:
       '@storybook/html': 6.4.20
       '@storybook/manager-webpack5': 6.4.20
       '@storybook/theming': 6.4.20
-      clsx: 1.2.1
       storybook-dark-mode: 1.1.0
     dependencies:
       '@hope-ui/styles': link:../styles
       '@hope-ui/utils': link:../utils
+      '@solid-primitives/refs': 0.3.0_solid-js@1.4.7
     devDependencies:
       '@hope-ui/tests': link:../tests
-      '@stitches/core': 1.2.8
       '@storybook/addon-a11y': 6.4.20_zkbncb2mrwigeq3keybbaytzya
       '@storybook/addon-actions': 6.4.20_zkbncb2mrwigeq3keybbaytzya
       '@storybook/addon-essentials': 6.4.20_prmwuqi6j43574q2ke3bq626fm
@@ -163,12 +158,11 @@ importers:
       '@storybook/html': 6.4.20_wzcc6o7wyzwzieplteumybwsji
       '@storybook/manager-webpack5': 6.4.20_zq4c6ig72ovddqnbblcyygael4
       '@storybook/theming': 6.4.20_zkbncb2mrwigeq3keybbaytzya
-      clsx: 1.2.1
       storybook-dark-mode: 1.1.0_3omdoyodqrhwrh3p6zau65yfv4
 
   packages/styles:
     specifiers:
-      '@hope-ui/utils': ^0.0.0
+      '@hope-ui/utils': 0.0.0
       '@stitches/core': 1.2.8
       '@types/lodash-es': ^4.17.6
       clsx: 1.2.1
@@ -176,12 +170,12 @@ importers:
       lodash-es: 4.17.21
     dependencies:
       '@hope-ui/utils': link:../utils
+      '@stitches/core': 1.2.8
+      clsx: 1.2.1
       csstype: 3.1.0
       lodash-es: 4.17.21
     devDependencies:
-      '@stitches/core': 1.2.8
       '@types/lodash-es': 4.17.6
-      clsx: 1.2.1
 
   packages/tests:
     specifiers: {}
@@ -3735,6 +3729,50 @@ packages:
       '@sinonjs/commons': 1.8.3
     dev: true
 
+  /@solid-primitives/immutable/0.1.0_solid-js@1.4.7:
+    resolution: {integrity: sha512-vKA318tb65h6f9mizF/x7ep9CxhtCtD6HMm5XVpRE+KrujgwyWB3DAVxmJ0lM4v4cImc7jvwBWvYirpnupe11A==}
+    dependencies:
+      '@solid-primitives/utils': 1.5.2_solid-js@1.4.7
+    transitivePeerDependencies:
+      - solid-js
+    dev: false
+
+  /@solid-primitives/refs/0.3.0_solid-js@1.4.7:
+    resolution: {integrity: sha512-vIX48CesMEuXLq3r7iPUu5N216Mnozq4nmEqvL4RYjEFgJoRghKeNwCKLlJODzNSiHpLy7nLCuk+U0qftE9Cdw==}
+    peerDependencies:
+      solid-js: ^1.3.0
+    dependencies:
+      '@solid-primitives/immutable': 0.1.0_solid-js@1.4.7
+      '@solid-primitives/rootless': 1.1.2_solid-js@1.4.7
+      '@solid-primitives/utils': 1.5.2_solid-js@1.4.7
+      solid-js: 1.4.7
+    dev: false
+
+  /@solid-primitives/rootless/1.1.2_solid-js@1.4.7:
+    resolution: {integrity: sha512-CSOM3+KUXiim/EqXTnfgQSZ0sAev9bd+6U8eME3amrYwZIxVF46tmYTAig/GZa3nLylmyokwqYStlcwCgSMQpQ==}
+    peerDependencies:
+      solid-js: ^1.3.1
+    dependencies:
+      '@solid-primitives/utils': 3.0.1_solid-js@1.4.7
+      solid-js: 1.4.7
+    dev: false
+
+  /@solid-primitives/utils/1.5.2_solid-js@1.4.7:
+    resolution: {integrity: sha512-dZUHjzasuqS2lDO+PQCY1+jFmtWHlaP3tUvkX1Jr06LI/Ipa2P/ZNVSvuIoqQ0Bg+Ny27LvtrXxflZNeGtptvA==}
+    peerDependencies:
+      solid-js: ^1.3.1
+    dependencies:
+      solid-js: 1.4.7
+    dev: false
+
+  /@solid-primitives/utils/3.0.1_solid-js@1.4.7:
+    resolution: {integrity: sha512-tQl0z8HG+iJ7eryq5KmRkr9xNk9oU06gOUQ37YKod0N5oPaWEvP+ATzi7Uo7w5L67wjaZuQCt80p9vlm1/J/Mg==}
+    peerDependencies:
+      solid-js: ^1.4.1
+    dependencies:
+      solid-js: 1.4.7
+    dev: false
+
   /@solidjs/meta/0.28.0_solid-js@1.4.7:
     resolution: {integrity: sha512-x52VdB9RZJ1apDB/pAmf58oeJsJ0lGKFXWjnm/TE/MlENIBPg3JaW8H5v2HnGpQC0WUbgiIsDFWpLWVNBo5t6g==}
     peerDependencies:
@@ -3751,6 +3789,7 @@ packages:
 
   /@stitches/core/1.2.8:
     resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
+    dev: false
 
   /@storybook/addon-a11y/6.4.20_zkbncb2mrwigeq3keybbaytzya:
     resolution: {integrity: sha512-DNUkSruVgO+r1AAxZGIwlxKRG/58t81tpoIX38S4bqn3U97BkemndrzydQs93SYDks2raoMeEnOwphQP4GTG5A==}

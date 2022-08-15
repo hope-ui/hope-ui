@@ -46,7 +46,6 @@
     "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
   "peerDependencies": {
     "solid-js": "^1.4.7"
   },
