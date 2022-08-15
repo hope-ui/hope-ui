@@ -25,6 +25,7 @@ export * from "./icon";
 export * from "./icon-button";
 export * from "./image";
 export * from "./input";
+export * from "./json-view";
 export * from "./kbd";
 export * from "./list";
 export * from "./menu";
