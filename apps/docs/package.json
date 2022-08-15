@@ -29,12 +29,13 @@
   },
   "dependencies": {
     "@hope-ui/core": "workspace:*",
+    "@solidjs/meta": "0.28.0",
+    "@solidjs/router": "0.4.2",
     "@stitches/core": "1.2.8",
     "clsx": "1.2.1"
   },
   "devDependencies": {
-    "@solidjs/meta": "0.28.0",
-    "@solidjs/router": "0.4.2",
+    "node-fetch": "2.6.7",
     "solid-js": "1.4.7",
     "solid-start": "0.1.0-alpha.99",
     "solid-start-netlify": "0.1.0-alpha.99",
@@ -44,6 +45,6 @@
     "vite": "3.0.4"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   }
 }
