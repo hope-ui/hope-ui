@@ -14,7 +14,7 @@ const defaultProps: JsonViewProps = {
   name: "root",
   theme: "default",
   collapsed: false,
-  collapseStringsAfterLength: 10,
+  collapseStringsAfterLength: false,
   shouldCollapse: () => false,
   sortKeys: false,
   quotesOnKeys: true,
