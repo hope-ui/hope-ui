@@ -17,13 +17,15 @@ const BUTTON_INPUT_TYPES = ["button", "color", "file", "image", "reset", "submit
  * isButton(document.querySelector("input[type='text']")); // false
  * isButton(document.querySelector("div[role='button']")); // false
  */
-export function isButton(tagName: string, inputType?: string) {
-  if (tagName.toLowerCase() === "button") {
+export function isButton(element: { tagName: string; type?: string }) {
+  const tagName = element.tagName.toLowerCase();
+
+  if (tagName === "button") {
     return true;
   }
 
-  if (tagName.toLowerCase() === "input" && inputType) {
-    return BUTTON_INPUT_TYPES.indexOf(inputType) !== -1;
+  if (tagName === "input" && element.type) {
+    return BUTTON_INPUT_TYPES.indexOf(element.type) !== -1;
   }
 
   return false;

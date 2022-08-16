@@ -1,8 +1,8 @@
 import { createPolymorphicComponent, hope, mergeThemeProps } from "@hope-ui/styles";
-import { stringOrUndefined } from "@hope-ui/utils";
 import { mergeRefs } from "@solid-primitives/refs";
-import { createMemo, splitProps } from "solid-js";
+import { createMemo, createSignal, onMount, splitProps } from "solid-js";
 
+import { createTagName } from "../primitives/create-tag-name";
 import { useStyleConfig } from "./button.styles";
 import { isButton } from "./is-button";
 import { ButtonProps } from "./types";
@@ -29,13 +29,18 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
     "isLoading",
   ]);
 
-  const tagName = createMemo(() => {
-    return stringOrUndefined(ref?.tagName?.toLowerCase() || local.as || "button");
-  });
+  const tagName = createTagName(
+    () => ref,
+    () => props.as || "button"
+  );
 
-  const isNativeButton = createMemo(() => {
-    return tagName() != null && isButton(tagName(), local.type);
-  });
+  const [isNativeButton, setIsNativeButton] = createSignal(
+    tagName() != null &&
+      isButton({
+        tagName: tagName(),
+        type: local.type,
+      })
+  );
 
   const type = createMemo(() => {
     if (local.type != null) {
@@ -46,6 +51,10 @@ export const Button = createPolymorphicComponent<"button", ButtonProps>(props =>
   });
 
   const styles = useStyleConfig("Button", local);
+
+  onMount(() => {
+    ref != null && setIsNativeButton(isButton(ref));
+  });
 
   return (
     <hope.button
