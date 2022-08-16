@@ -28,7 +28,7 @@ export interface ButtonProps extends ButtonStyleConfigProps {
 
 export interface ButtonLoaderProps {
   /** Whether a loading text should be displayed next to the loader icon. */
-  withLoadingText?: boolean;
+  hasLoadingText?: boolean;
 }
 
 export type ButtonContentProps = Pick<ButtonProps, "leftIcon" | "rightIcon" | "children">;

@@ -587,7 +587,7 @@ export type PaddingProps = ResponsiveProps<{
 
 export type PositionProps = ResponsiveProps<{
   /** The CSS `position` property. */
-  position: Property.Position;
+  position: Property.Position | string;
 
   /** The CSS `z-index` property. */
   zIndex: Property.ZIndex | ThemeZIndice;

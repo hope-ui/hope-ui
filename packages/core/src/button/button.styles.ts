@@ -1,7 +1,5 @@
 import { createStyleConfig, focusStyles, StyleConfigProps } from "@hope-ui/styles";
 
-type ButtonParts = "root" | "icon";
-
 interface ButtonVariants {
   /** The visual style of the button. */
   variant: "solid" | "soft" | "outlined" | "plain";
@@ -16,7 +14,7 @@ interface ButtonVariants {
   isLoading: boolean;
 }
 
-export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
+export const useStyleConfig = createStyleConfig<"root", ButtonVariants>(
   ({ vars, colorScheme }) => ({
     baseStyle: {
       root: {
@@ -52,11 +50,6 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
         },
 
         ...focusStyles(vars),
-      },
-      icon: {
-        display: "inline-flex",
-        alignSelf: "center",
-        flexShrink: 0,
       },
     },
     variants: {
