@@ -9,16 +9,19 @@ import { ButtonLoaderProps } from "./types";
 export const ButtonLoader = createHopeComponent<"div", ButtonLoaderProps>(props => {
   const [local, others] = splitProps(props, ["class", "children", "hasLoadingText"]);
 
-  const styles = useStyleConfigContext<ButtonParts>();
+  const { classes, styles } = useStyleConfigContext<ButtonParts>();
 
   return (
     <hope.div
-      __css={styles().loaderWrapper}
+      class={clsx("hope-button__loader", classes().loaderWrapper, local.class)}
       position={local.hasLoadingText ? "relative" : "absolute"}
-      class={clsx("hope-button__loader", local.class)}
+      __css={styles().loaderWrapper}
       {...others}
     >
-      <Show when={local.children} fallback={<IconSpinner __css={styles().loaderIcon} />}>
+      <Show
+        when={local.children}
+        fallback={<IconSpinner class={classes().loaderIcon} __css={styles().loaderIcon} />}
+      >
         {local.children}
       </Show>
     </hope.div>

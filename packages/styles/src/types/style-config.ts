@@ -19,10 +19,13 @@ type BooleanStringUnion = "true" | "false";
 type BooleanMap<T> = T extends BooleanStringUnion ? boolean : T;
 
 /** Infer the type to string union of `"true" | "false"` if it's a `boolean`. */
-type ReverseBooleanMap<T> = T extends boolean ? BooleanStringUnion : T;
+export type ReverseBooleanMap<T> = T extends boolean ? BooleanStringUnion : T;
 
-/** An object of style config parts/style objects. */
+/** An object of style config parts/system style object. */
 export type StyleObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
+
+/** An object of style config parts/className. */
+export type ClassNameObjects<Parts extends string> = Record<Parts, string>;
 
 export type VariantSelection<VariantDefinitions extends Record<string, any>> = {
   [VariantName in keyof VariantDefinitions]?: BooleanMap<VariantDefinitions[VariantName]>;
@@ -46,7 +49,7 @@ type Variants<Parts extends string, T extends Record<string, any>> = {
 };
 
 /** A style configuration. */
-export type StyleConfig<Parts extends string, VariantDefinitions extends Record<string, any>> = {
+export interface StyleConfig<Parts extends string, VariantDefinitions extends Record<string, any>> {
   /**
    * The base style of each part.
    * Note: if a part doesn't need base style just put an empty object.
@@ -68,7 +71,7 @@ export type StyleConfig<Parts extends string, VariantDefinitions extends Record<
 
   /** The default variants to use. */
   defaultVariants?: VariantSelection<VariantDefinitions>;
-};
+}
 
 /** An object or function that returns style configuration. */
 export type StyleConfigInterpolation<
@@ -118,10 +121,15 @@ export type UseStyleConfigOptions<
   unstyled?: boolean;
 };
 
+export interface UseStyleConfigFnReturn<Parts extends string> {
+  classes: Accessor<ClassNameObjects<Parts>>;
+  styles: Accessor<StyleObjects<Parts>>;
+}
+
 export type UseStyleConfigFn<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
 > = (
   name: string,
   options: UseStyleConfigOptions<Parts, VariantDefinitions>
-) => Accessor<StyleObjects<Parts>>;
+) => UseStyleConfigFnReturn<Parts>;

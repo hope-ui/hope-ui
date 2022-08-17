@@ -97,6 +97,7 @@ function styled<T extends ElementType, Props = {}>(
 
       const overrideCss = toCSSObject(styles, theme);
 
+      // use `css` prop to have higher specificity.
       return systemCssComponent({ css: overrideCss }).className;
     });
 

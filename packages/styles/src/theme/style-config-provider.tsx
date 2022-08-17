@@ -1,14 +1,14 @@
-import { Accessor, createContext, ParentProps, useContext } from "solid-js";
+import { createContext, ParentProps, useContext } from "solid-js";
 
-import { StyleObjects } from "../types";
+import { UseStyleConfigFnReturn } from "../types";
 
-type StyleConfigContextValue<Parts extends string> = Accessor<StyleObjects<Parts>>;
+type StyleConfigContextValue<Parts extends string> = UseStyleConfigFnReturn<Parts>;
 
 const StyleConfigContext = createContext<StyleConfigContextValue<any>>();
 
-export function StyleConfigProvider(props: ParentProps<{ styles: StyleConfigContextValue<any> }>) {
+export function StyleConfigProvider(props: ParentProps<{ value: StyleConfigContextValue<any> }>) {
   return (
-    <StyleConfigContext.Provider value={props.styles}>{props.children}</StyleConfigContext.Provider>
+    <StyleConfigContext.Provider value={props.value}>{props.children}</StyleConfigContext.Provider>
   );
 }
 

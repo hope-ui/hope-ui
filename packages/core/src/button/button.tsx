@@ -55,14 +55,14 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
     return isNativeButton() ? "button" : undefined;
   });
 
-  const styles = useStyleConfig("Button", styleConfigProps);
+  const { classes, styles } = useStyleConfig("Button", styleConfigProps);
 
   onMount(() => {
     ref != null && setIsNativeButton(isButton(ref));
   });
 
   return (
-    <StyleConfigProvider styles={styles}>
+    <StyleConfigProvider value={{ classes, styles }}>
       <hope.button
         as={local.as}
         ref={mergeRefs(el => (ref = el), local.ref)}
@@ -70,8 +70,8 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
         type={type()}
         tabIndex={!isNativeButton() ? 0 : undefined}
         disabled={local.isDisabled}
-        class={clsx("hope-button", local.class)}
         data-loading={local.isLoading || undefined}
+        class={clsx("hope-button", classes().root, local.class)}
         __css={styles().root}
         {...others}
       >
@@ -99,16 +99,20 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
 });
 
 function ButtonContent(props: ButtonContentProps) {
-  const styles = useStyleConfigContext<ButtonParts>();
+  const { classes, styles } = useStyleConfigContext<ButtonParts>();
 
   return (
     <>
       <Show when={props.leftIcon}>
-        <ButtonIcon __css={styles().leftIcon}>{props.leftIcon}</ButtonIcon>
+        <ButtonIcon class={classes().leftIcon} __css={styles().leftIcon}>
+          {props.leftIcon}
+        </ButtonIcon>
       </Show>
       {props.children}
       <Show when={props.rightIcon}>
-        <ButtonIcon __css={styles().rightIcon}>{props.rightIcon}</ButtonIcon>
+        <ButtonIcon class={classes().rightIcon} __css={styles().rightIcon}>
+          {props.rightIcon}
+        </ButtonIcon>
       </Show>
     </>
   );

@@ -12,7 +12,7 @@ import { ButtonParts } from "./button.styles";
 export const ButtonIcon = createHopeComponent<"span">(props => {
   const [local, others] = splitProps(props, ["class", "__css"]);
 
-  const styles = useStyleConfigContext<ButtonParts>();
+  const { classes, styles } = useStyleConfigContext<ButtonParts>();
 
   const iconStyles: Accessor<SystemStyleObject> = createMemo(() => ({
     ...styles().icon,
@@ -21,9 +21,9 @@ export const ButtonIcon = createHopeComponent<"span">(props => {
 
   return (
     <hope.span
-      __css={iconStyles()}
-      class={clsx("hope-button__icon", local.class)}
       aria-hidden={true}
+      class={clsx("hope-button__icon", classes().icon, local.class)}
+      __css={iconStyles()}
       {...others}
     />
   );
