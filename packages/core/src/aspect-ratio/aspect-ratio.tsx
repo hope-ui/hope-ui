@@ -6,19 +6,13 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/aspect-ratio.tsx
  */
 
-import {
-  createPolymorphicComponent,
-  hope,
-  HopeProps,
-  mapResponsive,
-  ResponsiveValue,
-} from "@hope-ui/styles";
+import { createHopeComponent, hope, mapResponsive, ResponsiveValue } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
-export interface AspectRatioProps extends HopeProps {
+export interface AspectRatioProps {
   /**
    * The aspect ratio of the Box.
    * Common values are: `21/9`, `16/9`, `9/16`, `4/3`, `1.85/1`
@@ -30,7 +24,7 @@ export interface AspectRatioProps extends HopeProps {
  * `AspectRatio` is used to cropping media (videos, images and maps)
  * to a desired aspect ratio.
  */
-export const AspectRatio = createPolymorphicComponent<"div", AspectRatioProps>(props => {
+export const AspectRatio = createHopeComponent<"div", AspectRatioProps>(props => {
   props = mergeDefaultProps(
     {
       ratio: 4 / 3,

@@ -207,6 +207,7 @@ const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _active: true,
   _disabled: true,
   _invalid: true,
+  _loading: true,
   _first: true,
   _last: true,
   _odd: true,

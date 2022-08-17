@@ -18,23 +18,13 @@ import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import {
-  As,
-  createPolymorphicComponent,
-  PolymorphicComponent,
-} from "./create-polymorphic-component";
+import { createHopeComponent, HopeComponent } from "./create-hope-component";
 import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { HopeProps, SystemStyleObject, ThemeVars } from "./types";
+import { SystemStyleObject, ThemeVars } from "./types";
 import { packSx } from "./utils";
-
-/** A component with Hope UI props. */
-type HopeComponent<DefaultType extends As, Props = {}> = PolymorphicComponent<
-  DefaultType,
-  Props & HopeProps
->;
 
 /**
  * All html and svg elements for hope components.
@@ -83,7 +73,7 @@ function styled<T extends ElementType, Props = {}>(
 ) {
   const { excludedProps = [], baseStyle = {} } = options;
 
-  const hopeComponent = createPolymorphicComponent<T, Props & HopeProps>(props => {
+  const hopeComponent = createHopeComponent<T, Props>(props => {
     const [local, styleProps, others] = splitProps(
       props,
       ["as", "class", "sx", "__css", ...excludedProps],
@@ -119,7 +109,7 @@ function styled<T extends ElementType, Props = {}>(
     );
   });
 
-  return hopeComponent as HopeComponent<T>;
+  return hopeComponent as HopeComponent<T, Props>;
 }
 
 function factory() {
@@ -131,7 +121,7 @@ function factory() {
      * const Div = hope("div")
      * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType]) {
+    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<ElementType>]) {
       return styled(...argArray);
     },
 

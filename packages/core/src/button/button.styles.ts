@@ -1,4 +1,12 @@
-import { createStyleConfig, focusStyles, StyleConfigProps } from "@hope-ui/styles";
+import { createStyleConfig, focusStyles, spin, StyleConfigProps } from "@hope-ui/styles";
+
+export type ButtonParts =
+  | "root"
+  | "icon"
+  | "leftIcon"
+  | "rightIcon"
+  | "loaderWrapper"
+  | "loaderIcon";
 
 interface ButtonVariants {
   /** The visual style of the button. */
@@ -9,12 +17,9 @@ interface ButtonVariants {
 
   /** Whether the button should take all available width. */
   isFullWidth: boolean;
-
-  /** Whether the button is in a loading state. */
-  isLoading: boolean;
 }
 
-export const useStyleConfig = createStyleConfig<"root", ButtonVariants>(
+export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
   ({ vars, colorScheme }) => ({
     baseStyle: {
       root: {
@@ -49,7 +54,30 @@ export const useStyleConfig = createStyleConfig<"root", ButtonVariants>(
           cursor: "not-allowed",
         },
 
+        _loading: {
+          opacity: 0.8,
+        },
+
         ...focusStyles(vars),
+      },
+      icon: {
+        display: "inline-flex",
+        alignSelf: "center",
+        flexShrink: 0,
+      },
+      leftIcon: {},
+      rightIcon: {},
+      loaderWrapper: {
+        position: "absolute",
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        fontSize: "1em",
+        lineHeight: "normal",
+      },
+      loaderIcon: {
+        fontSize: "1.3em",
+        animation: `1s linear infinite ${spin}`,
       },
     },
     variants: {
@@ -196,13 +224,6 @@ export const useStyleConfig = createStyleConfig<"root", ButtonVariants>(
           root: {
             display: "inline-flex",
             width: "auto",
-          },
-        },
-      },
-      isLoading: {
-        true: {
-          root: {
-            opacity: 0.8,
           },
         },
       },

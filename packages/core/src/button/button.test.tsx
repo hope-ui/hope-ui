@@ -1,4 +1,5 @@
 import {
+  checkAccessibility,
   itHasSemanticClass,
   itIsPolymorphic,
   itRendersChildren,
@@ -14,6 +15,7 @@ import { ButtonProps } from "./types";
 const defaultProps: ButtonProps = {};
 
 describe("Button", () => {
+  checkAccessibility([<Button>Button</Button>]);
   itIsPolymorphic(Button as any, defaultProps);
   itRendersChildren(Button as any, defaultProps);
   itSupportsClass(Button as any, defaultProps);
@@ -53,7 +55,7 @@ describe("Button", () => {
     expect(button).not.toHaveAttribute("role");
   });
 
-  it("should have 'type' from props", () => {
+  it("should have attribute 'type' based on prop", () => {
     render(() => (
       <Button type="submit" data-testid="button">
         Button
@@ -65,7 +67,7 @@ describe("Button", () => {
     expect(button.type).toBe("submit");
   });
 
-  it("should have 'type=button' by default when its a native button", () => {
+  it("should have attribute 'type=button' by default when its a native button", () => {
     render(() => <Button data-testid="button">Button</Button>);
 
     const button = screen.getByTestId("button") as HTMLButtonElement;
@@ -73,7 +75,7 @@ describe("Button", () => {
     expect(button.type).toBe("button");
   });
 
-  it("should not have 'type' by default when its not a native button", () => {
+  it("should not have attribute 'type' by default when its not a native button", () => {
     render(() => (
       <Button as="div" data-testid="button">
         Button
@@ -104,5 +106,66 @@ describe("Button", () => {
     const button = screen.getByTestId("button");
 
     expect(button).not.toHaveAttribute("tabindex");
+  });
+
+  it("should renders left and right icons if they are provided", () => {
+    render(() => <Button rightIcon="right-icon" leftIcon="left-icon" />);
+
+    expect(screen.getByText("right-icon")).toBeInTheDocument();
+    expect(screen.getByText("left-icon")).toBeInTheDocument();
+  });
+
+  it("should sets attribute 'disabled' based on 'isDisabled' prop", () => {
+    render(() => (
+      <Button isDisabled data-testid="button">
+        Button
+      </Button>
+    ));
+
+    const button = screen.getByTestId("button");
+
+    expect(button).toBeDisabled();
+  });
+
+  it("should sets attribute 'data-loading' based on 'isLoading' prop", () => {
+    render(() => (
+      <Button isLoading data-testid="button">
+        Button
+      </Button>
+    ));
+
+    const button = screen.getByTestId("button");
+
+    expect(button).toHaveAttribute("data-loading");
+  });
+
+  it("should show loader when 'isLoading' prop is true", () => {
+    const { container } = render(() => (
+      <Button isLoading data-testid="button">
+        Button
+      </Button>
+    ));
+
+    expect(container.querySelector(".hope-button__loader")).toBeInTheDocument();
+  });
+
+  it("should show loading text when 'isLoading' prop is true and a loading text is provided", () => {
+    render(() => (
+      <Button isLoading loadingText="Loading..." data-testid="button">
+        Button
+      </Button>
+    ));
+
+    expect(screen.getByText("Loading...")).toBeVisible();
+  });
+
+  it("should hide button text content when 'isLoading' prop is true", () => {
+    render(() => (
+      <Button isLoading data-testid="button">
+        Button
+      </Button>
+    ));
+
+    expect(screen.getByText("Button")).not.toBeVisible();
   });
 });

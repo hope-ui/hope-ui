@@ -1,18 +1,29 @@
-import { createPolymorphicComponent, hope } from "@hope-ui/styles";
+import {
+  createHopeComponent,
+  hope,
+  SystemStyleObject,
+  useStyleConfigContext,
+} from "@hope-ui/styles";
 import { clsx } from "clsx";
-import { splitProps } from "solid-js";
+import { Accessor, createMemo, splitProps } from "solid-js";
 
-export const ButtonIcon = createPolymorphicComponent<"span">(props => {
-  const [local, others] = splitProps(props, ["class"]);
+import { ButtonParts } from "./button.styles";
+
+export const ButtonIcon = createHopeComponent<"span">(props => {
+  const [local, others] = splitProps(props, ["class", "__css"]);
+
+  const styles = useStyleConfigContext<ButtonParts>();
+
+  const iconStyles: Accessor<SystemStyleObject> = createMemo(() => ({
+    ...styles().icon,
+    ...local.__css,
+  }));
 
   return (
     <hope.span
-      __css={{
-        display: "inline-flex",
-        alignSelf: "center",
-        flexShrink: 0,
-      }}
+      __css={iconStyles()}
       class={clsx("hope-button__icon", local.class)}
+      aria-hidden={true}
       {...others}
     />
   );

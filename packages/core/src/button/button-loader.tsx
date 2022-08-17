@@ -1,30 +1,24 @@
-import { createPolymorphicComponent, hope, spin, SystemStyleObject } from "@hope-ui/styles";
+import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
 import { clsx } from "clsx";
-import { Accessor, createMemo, Show, splitProps } from "solid-js";
+import { Show, splitProps } from "solid-js";
 
 import { IconSpinner } from "../icons/icon-spinner";
+import { ButtonParts } from "./button.styles";
 import { ButtonLoaderProps } from "./types";
 
-export const ButtonLoader = createPolymorphicComponent<"div", ButtonLoaderProps>(props => {
+export const ButtonLoader = createHopeComponent<"div", ButtonLoaderProps>(props => {
   const [local, others] = splitProps(props, ["class", "children", "hasLoadingText"]);
 
-  const loaderStyles: Accessor<SystemStyleObject> = createMemo(() => ({
-    position: local.hasLoadingText ? "relative" : "absolute",
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-    fontSize: "1em",
-    lineHeight: "normal",
-  }));
-
-  const iconStyles: SystemStyleObject = {
-    fontSize: "1.3em",
-    animation: `1s linear infinite ${spin}`,
-  };
+  const styles = useStyleConfigContext<ButtonParts>();
 
   return (
-    <hope.div __css={loaderStyles()} class={clsx("hope-button__loader", local.class)} {...others}>
-      <Show when={local.children} fallback={<IconSpinner __css={iconStyles} />}>
+    <hope.div
+      __css={styles().loaderWrapper}
+      position={local.hasLoadingText ? "relative" : "absolute"}
+      class={clsx("hope-button__loader", local.class)}
+      {...others}
+    >
+      <Show when={local.children} fallback={<IconSpinner __css={styles().loaderIcon} />}>
         {local.children}
       </Show>
     </hope.div>

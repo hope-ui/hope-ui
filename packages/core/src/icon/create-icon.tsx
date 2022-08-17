@@ -6,7 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/icon/src/create-icon.tsx
  */
 
-import { createPolymorphicComponent, HopeProps } from "@hope-ui/styles";
+import { createHopeComponent } from "@hope-ui/styles";
 import { JSX } from "solid-js";
 
 import { Icon, IconProps } from "./icon";
@@ -30,7 +30,7 @@ interface CreateIconOptions {
 export function createIcon(options: CreateIconOptions) {
   const { viewBox = "0 0 24 24", defaultProps = {} } = options;
 
-  return createPolymorphicComponent<"svg", IconProps>(props => (
+  return createHopeComponent<"svg", IconProps>(props => (
     <Icon viewBox={viewBox} {...defaultProps} {...props}>
       {options.path}
     </Icon>

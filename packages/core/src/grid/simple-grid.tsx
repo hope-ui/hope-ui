@@ -7,7 +7,7 @@
  */
 
 import {
-  createPolymorphicComponent,
+  createHopeComponent,
   mapResponsive,
   resolveTokenValue,
   ResponsiveValue,
@@ -44,7 +44,7 @@ export interface SimpleGridProps extends GridProps {
  * `SimpleGrid` uses the `Grid` component and provides a simpler interface to create responsive grid layouts.
  * Provides props that easily define columns and spacing.
  */
-export const SimpleGrid = createPolymorphicComponent<"div", SimpleGridProps>(props => {
+export const SimpleGrid = createHopeComponent<"div", SimpleGridProps>(props => {
   const [local, others] = splitProps(props, [
     "minChildWidth",
     "columns",

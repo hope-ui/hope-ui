@@ -44,6 +44,7 @@ export const PSEUDO_SELECTORS_MAP = new Map<keyof PseudoSelectorProps, string>([
   ["_active", "&:active, &[data-active]"],
   ["_disabled", "&[disabled], &[aria-disabled=true], &[data-disabled]"],
   ["_invalid", "&[aria-invalid=true], &[data-invalid]"],
+  ["_loading", "&[data-loading], &[aria-busy=true]"],
   ["_first", "&:first-child"],
   ["_last", "&:last-child"],
   ["_odd", "&:nth-of-type(odd)"],

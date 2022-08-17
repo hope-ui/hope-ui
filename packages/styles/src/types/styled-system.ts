@@ -783,6 +783,12 @@ export type PseudoSelectorProps = Partial<{
    */
   _invalid: PseudoSelectorValue;
 
+  /**
+   * Styles for CSS Selector `&[aria-busy=true]` or `&[data-loading=true]`.
+   * Useful for styling loading states
+   */
+  _loading: PseudoSelectorValue;
+
   /** Styles for CSS Selector `&:first-child`. */
   _first: PseudoSelectorValue;
 

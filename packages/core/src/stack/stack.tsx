@@ -6,18 +6,12 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/stack.tsx
  */
 
-import {
-  createPolymorphicComponent,
-  hope,
-  HopeProps,
-  SystemStyleObject,
-  SystemStyleProps,
-} from "@hope-ui/styles";
+import { createHopeComponent, hope, SystemStyleObject, SystemStyleProps } from "@hope-ui/styles";
 import { filterUndefined } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface StackProps extends HopeProps {
+export interface StackProps {
   /** Shorthand for `flexDirection` style prop. */
   direction?: SystemStyleProps["flexDirection"];
 
@@ -37,7 +31,7 @@ export interface StackProps extends HopeProps {
 /**
  * `Stack` makes it easy to stack elements together and apply a space between them.
  */
-export const Stack = createPolymorphicComponent<"div", StackProps>(props => {
+export const Stack = createHopeComponent<"div", StackProps>(props => {
   const [local, others] = splitProps(props, [
     "class",
     "direction",
@@ -72,7 +66,7 @@ export interface FixedDirectionStackProps extends Omit<StackProps, "direction" |
 /**
  * `HStack` arranges its children in a horizontal line.
  */
-export const HStack = createPolymorphicComponent<"div", FixedDirectionStackProps>(props => {
+export const HStack = createHopeComponent<"div", FixedDirectionStackProps>(props => {
   const [local, others] = splitProps(props, ["reverse"]);
 
   return <Stack {...others} direction={local.reverse ? "row-reverse" : "row"} />;
@@ -81,7 +75,7 @@ export const HStack = createPolymorphicComponent<"div", FixedDirectionStackProps
 /**
  * `VStack` arranges its children in a vertical line.
  */
-export const VStack = createPolymorphicComponent<"div", FixedDirectionStackProps>(props => {
+export const VStack = createHopeComponent<"div", FixedDirectionStackProps>(props => {
   const [local, others] = splitProps(props, ["reverse"]);
 
   return <Stack {...others} direction={local.reverse ? "column-reverse" : "column"} />;

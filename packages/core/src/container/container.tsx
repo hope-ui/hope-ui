@@ -7,9 +7,8 @@
  */
 
 import {
-  createPolymorphicComponent,
+  createHopeComponent,
   hope,
-  HopeProps,
   mapResponsive,
   ResponsiveValue,
   useTheme,
@@ -19,7 +18,7 @@ import { splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
-export interface ContainerProps extends HopeProps {
+export interface ContainerProps {
   /** Whether the container itself should be centered on the page. */
   isCentered?: ResponsiveValue<boolean>;
 
@@ -31,7 +30,7 @@ export interface ContainerProps extends HopeProps {
  * `Container` is used to constrain a content's width to the current breakpoint, while keeping it fluid.
  *  By default, it sets `margin-left` and `margin-right` to `auto`, to keep its content centered.
  */
-export const Container = createPolymorphicComponent<"div", ContainerProps>(props => {
+export const Container = createHopeComponent<"div", ContainerProps>(props => {
   props = mergeDefaultProps(
     {
       isCentered: true,

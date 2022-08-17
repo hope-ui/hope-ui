@@ -7,6 +7,9 @@ export interface ButtonProps extends ButtonStyleConfigProps {
   /** The placement of the loader when `isLoading` is true. */
   loaderPlacement?: "start" | "end";
 
+  /** Whether the button is in a loading state. */
+  isLoading?: boolean;
+
   /** Whether the button should be disabled. */
   isDisabled?: boolean;
 

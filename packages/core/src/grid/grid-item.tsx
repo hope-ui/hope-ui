@@ -7,9 +7,8 @@
  */
 
 import {
-  createPolymorphicComponent,
+  createHopeComponent,
   hope,
-  HopeProps,
   mapResponsive,
   ResponsiveValue,
   SystemStyleObject,
@@ -19,7 +18,7 @@ import { filterUndefined } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface GridItemProps extends HopeProps {
+export interface GridItemProps {
   /** Shorthand prop for `gridArea`. */
   area?: SystemStyleProps["gridArea"];
 
@@ -46,7 +45,7 @@ export interface GridItemProps extends HopeProps {
  * `GridItem` is used as a child of `Grid` to control the span,
  * start and end positions within the grid.
  */
-export const GridItem = createPolymorphicComponent<"div", GridItemProps>(props => {
+export const GridItem = createHopeComponent<"div", GridItemProps>(props => {
   const [local, others] = splitProps(props, [
     "class",
     "area",

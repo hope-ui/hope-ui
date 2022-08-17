@@ -6,10 +6,10 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/icon/src/icon.tsx
  */
 
-import { createPolymorphicComponent, hope, HopeProps, SystemStyleObject } from "@hope-ui/styles";
-import { ElementType, isString, OverrideProps } from "@hope-ui/utils";
+import { createHopeComponent, hope, SystemStyleObject } from "@hope-ui/styles";
+import { ElementType, isString } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { Accessor, createMemo, JSX, mergeProps, Show, splitProps } from "solid-js";
+import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
@@ -26,9 +26,9 @@ const fallbackIcon = {
   ),
 };
 
-export type IconProps = OverrideProps<JSX.SvgSVGAttributes<SVGSVGElement>, HopeProps>;
+export type IconProps = JSX.SvgSVGAttributes<SVGSVGElement>;
 
-export const Icon = createPolymorphicComponent<"svg", IconProps>(props => {
+export const Icon = createHopeComponent<"svg", IconProps>(props => {
   props = mergeDefaultProps(
     {
       viewBox: fallbackIcon.viewBox,

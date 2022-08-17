@@ -6,11 +6,11 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/flex.tsx
  */
 
-import { createPolymorphicComponent, hope, HopeProps, SystemStyleProps } from "@hope-ui/styles";
+import { createHopeComponent, hope, SystemStyleProps } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface FlexProps extends HopeProps {
+export interface FlexProps {
   /** Shorthand for `flexDirection` style prop. */
   direction?: SystemStyleProps["flexDirection"];
 
@@ -28,7 +28,7 @@ export interface FlexProps extends HopeProps {
  * `Flex` is used to create flexbox layouts.
  * It renders a `div` with `display: flex` and comes with helpful style shorthand.
  */
-export const Flex = createPolymorphicComponent<"div", FlexProps>(props => {
+export const Flex = createHopeComponent<"div", FlexProps>(props => {
   const [local, others] = splitProps(props, ["class", "direction", "align", "justify", "wrap"]);
 
   return (

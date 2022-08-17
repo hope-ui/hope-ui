@@ -6,11 +6,11 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/grid.tsx
  */
 
-import { createPolymorphicComponent, hope, HopeProps, SystemStyleProps } from "@hope-ui/styles";
+import { createHopeComponent, hope, SystemStyleProps } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-export interface GridProps extends HopeProps {
+export interface GridProps {
   /** Shorthand prop for `gridAutoFlow`. */
   autoFlow?: SystemStyleProps["gridAutoFlow"];
 
@@ -40,7 +40,7 @@ export interface GridProps extends HopeProps {
  * `Grid` is used to create grid layouts.
  * It renders a `div` with `display: grid` and comes with helpful style shorthand.
  */
-export const Grid = createPolymorphicComponent<"div", GridProps>(props => {
+export const Grid = createHopeComponent<"div", GridProps>(props => {
   const [local, others] = splitProps(props, [
     "class",
     "autoFlow",
