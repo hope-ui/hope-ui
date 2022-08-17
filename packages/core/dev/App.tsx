@@ -1,6 +1,6 @@
 import { For, onMount } from "solid-js";
 
-import { Button, HStack } from "../src";
+import { Button } from "../src";
 
 const range = [...Array(3000).keys()];
 
@@ -12,11 +12,7 @@ export default function App() {
     console.log(endTime - startTime);
   });
 
-  return (
-    <HStack spacing={4} wrap="wrap" p="4">
-      <For each={range}>{(_, i) => <Button>Button</Button>}</For>
-    </HStack>
-  );
+  return <For each={range}>{(_, i) => <Button>Button</Button>}</For>;
 }
 
 /*
