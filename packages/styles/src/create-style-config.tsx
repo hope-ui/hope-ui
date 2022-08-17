@@ -79,9 +79,10 @@ export function createStyleConfig<
       } = options;
 
       // base.
-      const baseStyleConfig = unstyled
-        ? {}
-        : extractBaseStyleConfig({ vars: theme.vars, colorScheme });
+      const baseStyleConfig = extractBaseStyleConfig({ vars: theme.vars, colorScheme });
+
+      // get component parts from baseStyle object.
+      const parts = Object.keys(baseStyleConfig.baseStyle) as Array<Parts>;
 
       // overrides from theme.
       const themeStyleConfigOverride = extractStyleConfigOverride(
@@ -98,20 +99,15 @@ export function createStyleConfig<
       );
 
       // 1. merge styles configs.
-      const mergedConfig: StyleConfig<Parts, VariantDefinitions> = mergeWith(
+      const mergedConfig = mergeWith(
         {},
-        baseStyleConfig,
+        !unstyled ? baseStyleConfig : {},
         themeStyleConfigOverride,
         componentStyleConfigOverride
-      );
+      ) as StyleConfig<Parts, VariantDefinitions>;
 
       // 2. add "base" styles.
-      const stylesMap = new Map(
-        Object.entries(mergedConfig.baseStyle).map(([part, style]) => [
-          part as Parts,
-          [style as SystemStyleObject | undefined],
-        ])
-      );
+      const stylesMap = new Map(parts.map(part => [part, [mergedConfig.baseStyle?.[part]]]));
 
       // 3. add "variants" styles.
       const selections = {
