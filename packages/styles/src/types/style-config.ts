@@ -9,7 +9,7 @@
 import { Accessor } from "solid-js";
 
 import { SystemStyleObject } from "./styled-system";
-import { ThemeVars } from "./theme-base";
+import { ThemeVars } from "./vars";
 
 /** String representation of `boolean` type. */
 type BooleanStringUnion = "true" | "false";

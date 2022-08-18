@@ -6,6 +6,13 @@
  * https://github.com/chakra-ui/chakra-ui/tree/main/packages/styled-system/src/config
  */
 
+import { ColorSystem } from "./color-system";
+
+export interface ThemeColors {
+  light: ColorSystem;
+  dark: ColorSystem;
+}
+
 export type ThemeFontFamily = "sans" | "serif" | "mono" | (string & {});
 
 export type ThemeFontSize =
@@ -153,3 +160,18 @@ export type ThemeZIndice =
   | (string & {});
 
 export type ThemeBreakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl" | (string & {});
+
+export interface ThemeScales {
+  colors: ThemeColors;
+  fonts: Record<ThemeFontFamily, string>;
+  fontSizes: Record<ThemeFontSize, string>;
+  fontWeights: Record<ThemeFontWeight, number>;
+  lineHeights: Record<ThemeLineHeight, string | number>;
+  letterSpacings: Record<ThemeLetterSpacing, string>;
+  space: Record<ThemeSpace, string>;
+  sizes: Record<ThemeSize, string>;
+  radii: Record<ThemeRadii, string>;
+  shadows: Record<ThemeShadow, string>;
+  zIndices: Record<ThemeZIndice, string | number>;
+  breakpoints: Record<ThemeBreakpoint, string>;
+}

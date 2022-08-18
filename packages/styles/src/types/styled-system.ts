@@ -11,7 +11,6 @@ import { Property } from "csstype";
 
 import { CSSObject } from "../stitches.config";
 import { ColorSystemTokenName } from "./color-system";
-import { ThemeVars } from "./theme-base";
 import {
   ThemeBreakpoint,
   ThemeFontFamily,
@@ -24,7 +23,8 @@ import {
   ThemeSize,
   ThemeSpace,
   ThemeZIndice,
-} from "./token";
+} from "./scales";
+import { ThemeVars } from "./vars";
 
 export type ResponsiveArray<T> = Array<T | null>;
 
