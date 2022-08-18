@@ -21,7 +21,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
     return computedStyles;
   }
 
-  const { isResponsive, toArrayValue, media: medias } = theme.__breakpoints;
+  const { isResponsive, toArrayValue, medias } = theme.__breakpoints;
 
   for (let key in systemStyleObject) {
     /**
@@ -63,7 +63,8 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
           computedStyles = Object.assign(
             {},
             computedStyles,
-            toCSSObject({ ...systemStyleObject, [key]: val }, theme)
+            toCSSObject({ [key]: val }, theme)
+            //toCSSObject({ ...systemStyleObject, [key]: val }, theme)
           );
         }
       }
@@ -95,6 +96,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
         computedStyles[key],
         toCSSObject(value as any, theme)
       );
+
       continue;
     }
 

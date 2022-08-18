@@ -6,4 +6,5 @@ export * from "./props";
 export * from "./style-config";
 export * from "./styled-system";
 export * from "./theme";
+export * from "./theme-base";
 export * from "./token";

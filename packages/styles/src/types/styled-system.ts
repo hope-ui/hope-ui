@@ -11,7 +11,7 @@ import { Property } from "csstype";
 
 import { CSSObject } from "../stitches.config";
 import { ColorSystemTokenName } from "./color-system";
-import { ThemeVars } from "./theme";
+import { ThemeVars } from "./theme-base";
 import {
   ThemeBreakpoint,
   ThemeFontFamily,

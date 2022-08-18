@@ -19,24 +19,69 @@ import { createMemo, splitProps } from "solid-js";
 
 import { css } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
-import { DEFAULT_THEME, useTheme, useThemeStyleConfig } from "./theme";
+import { useTheme, useThemeStyleConfig } from "./theme";
 import {
   ClassNameObjects,
-  ReverseBooleanMap,
   StyleConfig,
+  StyleConfigClassNames,
   StyleConfigInterpolation,
   StyleConfigOverride,
   StyleConfigOverrideInterpolation,
   StyleObjects,
   SystemStyleObject,
   Theme,
-  ThemeColorScheme,
   ThemeVars,
   UseStyleConfigFn,
-  UseStyleConfigFnReturn,
   UseStyleConfigOptions,
+  UseStyleConfigReturn,
   VariantSelection,
 } from "./types";
+
+/** Convert style objects to className objects. */
+function toClassNameObjects<Parts extends string>(
+  styleObjects: Partial<StyleObjects<Parts>>,
+  theme: Theme
+) {
+  return Object.entries(styleObjects).reduce((acc, [part, style]) => {
+    acc[part as Parts] = css(toCSSObject(style as SystemStyleObject, theme))().className;
+    return acc;
+  }, {} as Partial<ClassNameObjects<Parts>>);
+}
+
+/** Compute classNames from a style config. */
+function computeClassNames<Parts extends string, VariantDefinitions extends Record<string, any>>(
+  styleConfig: StyleConfig<Parts, VariantDefinitions>,
+  theme: Theme
+): StyleConfigClassNames<Parts, VariantDefinitions> {
+  // 1. create "base" classNames.
+  const baseClassNames = toClassNameObjects(styleConfig.baseStyles, theme);
+
+  // 2. create "variants" classNames.
+  const variantsClassNames = Object.entries(styleConfig.variants).reduce(
+    (acc, [variant, definition]) => {
+      // a variant like "size"
+      acc[variant] = Object.entries(definition).reduce((acc, [value, styleObjects]) => {
+        // a variant value like "sm"
+        acc[value] = toClassNameObjects(styleObjects, theme);
+        return acc;
+      }, {} as any);
+      return acc;
+    },
+    {} as any
+  );
+
+  // 3. create "compound variants" classNames.
+  const compoundVariantsClassNames = styleConfig.compoundVariants?.map(compoundVariant => ({
+    variants: compoundVariant.variants,
+    classNames: toClassNameObjects(compoundVariant.styles, theme),
+  }));
+
+  return {
+    baseClassNames: baseClassNames,
+    variants: variantsClassNames,
+    compoundVariants: compoundVariantsClassNames,
+  } as StyleConfigClassNames<Parts, VariantDefinitions>;
+}
 
 /** Return whether a compound variant should be applied. */
 function shouldApplyCompound<T extends VariantSelection<any>>(compoundCheck: T, selections: T) {
@@ -54,11 +99,10 @@ function extractStyleConfigOverride<
   VariantDefinitions extends Record<string, any>
 >(
   config: StyleConfigOverrideInterpolation<Parts, VariantDefinitions> | undefined,
-  vars: ThemeVars,
-  colorScheme: ThemeColorScheme
+  vars: ThemeVars
 ): StyleConfigOverride<Parts, VariantDefinitions> {
   if (isFunction(config)) {
-    return config({ vars, colorScheme });
+    return config(vars);
   }
 
   return config ?? {};
@@ -73,44 +117,39 @@ export function createStyleConfig<
 ): UseStyleConfigFn<Parts, VariantDefinitions> {
   const extractBaseStyleConfig = isFunction(interpolation) ? interpolation : () => interpolation;
 
-  const baseStyleConfig = extractBaseStyleConfig({
-    vars: DEFAULT_THEME.vars,
-    colorScheme: "primary",
-  });
-
-  const baseStyleConfigClassNames = computeClassNames<Parts, VariantDefinitions>(
-    baseStyleConfig,
-    DEFAULT_THEME
-  );
-
-  // get component parts from config baseStyle object.
-  const parts = Object.keys(baseStyleConfig.baseStyle) as Array<Parts>;
+  let isFirstLoad = true;
+  let baseStyleConfig: StyleConfig<Parts, VariantDefinitions> | undefined;
+  let baseStyleConfigClassNames: StyleConfigClassNames<Parts, VariantDefinitions> | undefined;
+  let parts: Array<Parts> = [];
 
   return function useStyleConfig(
     name: string,
     options: UseStyleConfigOptions<Parts, VariantDefinitions>
-  ): UseStyleConfigFnReturn<Parts> {
+  ): UseStyleConfigReturn<Parts> {
     const theme = useTheme();
     const themeStyleConfig = useThemeStyleConfig(name);
 
-    const styleConfigOverrides = createMemo(() => {
-      const {
-        colorScheme = "primary", // fallback to primary colorScheme if not provided.
-        styleConfigOverride,
-      } = options;
+    // Hack to make sure base style config is computed only once for every component instance,
+    // but has access to the current theme since `useStyleConfig` run in a component context.
+    if (isFirstLoad) {
+      baseStyleConfig = extractBaseStyleConfig(theme.vars);
 
+      baseStyleConfigClassNames = computeClassNames(baseStyleConfig, theme);
+
+      // get component parts from config baseStyles object.
+      parts = Object.keys(baseStyleConfig?.baseStyles) as Array<Parts>;
+
+      isFirstLoad = false;
+    }
+
+    const styleConfigOverrides = createMemo(() => {
       // overrides from theme.
-      const themeStyleConfigOverride = extractStyleConfigOverride(
-        themeStyleConfig(),
-        theme.vars,
-        colorScheme
-      );
+      const themeStyleConfigOverride = extractStyleConfigOverride(themeStyleConfig(), theme.vars);
 
       // overrides from component `styleConfig` prop.
       const componentStyleConfigOverride = extractStyleConfigOverride(
-        styleConfigOverride,
-        theme.vars,
-        colorScheme
+        options.styleConfigOverride,
+        theme.vars
       );
 
       return mergeWith({}, themeStyleConfigOverride, componentStyleConfigOverride) as StyleConfig<
@@ -120,28 +159,24 @@ export function createStyleConfig<
     });
 
     const selectedVariants = createMemo(() => {
-      const [_, variantSelections] = splitProps(options, [
-        "colorScheme",
-        "styleConfigOverride",
-        "unstyled",
-      ]);
+      const [_, variantSelections] = splitProps(options, ["styleConfigOverride", "unstyled"]);
 
       return {
-        ...baseStyleConfig.defaultVariants,
+        ...baseStyleConfig?.defaultVariants,
         ...filterUndefined(styleConfigOverrides().defaultVariants ?? {}),
         ...filterUndefined(variantSelections),
       } as VariantSelection<VariantDefinitions>;
     });
 
     const classes = createMemo(() => {
-      // If unstyled, return empty classNames for each part.
+      // If unstyled, return empty object.
       if (options.unstyled) {
-        return Object.fromEntries(parts.map(part => [part, ""])) as ClassNameObjects<Parts>;
+        return {} as ClassNameObjects<Parts>;
       }
 
       // 1. add "base" classNames.
       const classNamesMap = new Map(
-        parts.map(part => [part, [baseStyleConfigClassNames.baseClassName?.[part]]])
+        parts.map(part => [part, [baseStyleConfigClassNames?.baseClassNames[part]]])
       );
 
       // 2. add "variants" classNames.
@@ -154,7 +189,7 @@ export function createStyleConfig<
 
         const selectionClassNameObjects =
           // @ts-ignore
-          baseStyleConfigClassNames.variants?.[variantName]?.[String(selection)];
+          baseStyleConfigClassNames.variants[variantName]?.[String(selection)];
 
         if (selectionClassNameObjects != null) {
           Object.entries(selectionClassNameObjects).forEach(([part, className]) => {
@@ -164,7 +199,7 @@ export function createStyleConfig<
       }
 
       // 3. add "compoundVariants" classNames.
-      for (const compoundVariant of baseStyleConfigClassNames.compoundVariants ?? []) {
+      for (const compoundVariant of baseStyleConfigClassNames.compoundVariants) {
         if (shouldApplyCompound(compoundVariant.variants, selectedVariants())) {
           Object.entries(compoundVariant.classNames).forEach(([part, className]) => {
             classNamesMap.get(part as Parts)?.push(className as string);
@@ -173,18 +208,17 @@ export function createStyleConfig<
       }
 
       // 4. merge all classNames of each part.
-      return Object.fromEntries(
-        Array.from(classNamesMap.entries()).map(([part, classNames]) => [
-          part,
-          clsx(`hope-${name}-${part}`, ...classNames),
-        ])
-      ) as ClassNameObjects<Parts>;
+      return Array.from(classNamesMap.entries()).reduce((acc, [part, classNames]) => {
+        const staticClass = `hope-${name}-${part}`;
+        acc[part] = clsx(staticClass, ...classNames);
+        return acc;
+      }, {} as ClassNameObjects<Parts>);
     });
 
     const styles = createMemo(() => {
       // 1. add "base" styles.
       const stylesMap = new Map(
-        parts.map(part => [part, [styleConfigOverrides().baseStyle?.[part]]])
+        parts.map(part => [part, [styleConfigOverrides().baseStyles?.[part]]])
       );
 
       // 2. add "variants" styles.
@@ -209,103 +243,19 @@ export function createStyleConfig<
       // 3. add "compoundVariants" styles.
       for (const compoundVariant of styleConfigOverrides().compoundVariants ?? []) {
         if (shouldApplyCompound(compoundVariant.variants, selectedVariants())) {
-          Object.entries(compoundVariant.style).forEach(([part, style]) => {
+          Object.entries(compoundVariant.styles).forEach(([part, style]) => {
             stylesMap.get(part as Parts)?.push(style as SystemStyleObject);
           });
         }
       }
 
       // 4. merge all styles objects of each part.
-      return Object.fromEntries(
-        Array.from(stylesMap.entries()).map(([part, styles]) => [part, mergeWith({}, ...styles)])
-      ) as StyleObjects<Parts>;
+      return Array.from(stylesMap.entries()).reduce((acc, [part, styles]) => {
+        acc[part] = mergeWith({}, ...styles);
+        return acc;
+      }, {} as StyleObjects<Parts>);
     });
 
     return { classes, styles };
   };
-}
-
-type VariantsClassNames<Parts extends string, T extends Record<string, any>> = {
-  [K in keyof T]?: {
-    [V in ReverseBooleanMap<T[K]>]?: Partial<ClassNameObjects<Parts>>;
-  };
-};
-
-interface CompoundVariantClassNames<
-  Parts extends string,
-  VariantDefinitions extends Record<string, any>
-> {
-  /** The combined variants that should apply the styles. */
-  variants: VariantSelection<VariantDefinitions>;
-
-  /** The styles to be applied. */
-  classNames: Partial<ClassNameObjects<Parts>>;
-}
-
-interface StyleConfigClassNames<
-  Parts extends string,
-  VariantDefinitions extends Record<string, any>
-> {
-  /** The base classNames of each part. */
-  baseClassName: Partial<ClassNameObjects<Parts>>;
-
-  /** The variants classNames of each part. */
-  variants: VariantsClassNames<Parts, VariantDefinitions>;
-
-  /** The combined variants classNames of each part. */
-  compoundVariants: Array<CompoundVariantClassNames<Parts, VariantDefinitions>>;
-}
-
-function computeClassNames<Parts extends string, VariantDefinitions extends Record<string, any>>(
-  styleConfig: StyleConfig<Parts, VariantDefinitions>,
-  theme: Theme
-): StyleConfigClassNames<Parts, VariantDefinitions> {
-  // 1. create "base" classNames.
-  const baseClassNames = Object.fromEntries(
-    Object.entries(styleConfig.baseStyle).map(([part, style]) => {
-      return [part, css(toCSSObject(style as SystemStyleObject, theme))().className];
-    })
-  );
-
-  // 2. create "variants" classNames.
-  const variantsClassNames = styleConfig.variants
-    ? Object.fromEntries(
-        Object.entries(styleConfig.variants).map(([variant, definition]) => {
-          return [
-            variant,
-            Object.fromEntries(
-              Object.entries(definition).map(([value, styleObjects]) => {
-                return [
-                  value,
-                  Object.fromEntries(
-                    Object.entries(styleObjects as any).map(([part, style]) => {
-                      return [
-                        part,
-                        css(toCSSObject(style as SystemStyleObject, theme))().className,
-                      ];
-                    })
-                  ),
-                ];
-              })
-            ),
-          ];
-        })
-      )
-    : {};
-
-  // 3. create "compound variants" classNames.
-  const compoundVariantsClassNames = styleConfig.compoundVariants?.map(compoundVariant => ({
-    variants: compoundVariant.variants,
-    classNames: Object.fromEntries(
-      Object.entries(compoundVariant.style).map(([part, style]) => {
-        return [part, css(toCSSObject(style as SystemStyleObject, theme))().className];
-      })
-    ),
-  }));
-
-  return {
-    baseClassName: baseClassNames,
-    variants: variantsClassNames,
-    compoundVariants: compoundVariantsClassNames,
-  } as StyleConfigClassNames<Parts, VariantDefinitions>;
 }

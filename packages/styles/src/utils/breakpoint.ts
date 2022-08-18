@@ -157,7 +157,7 @@ export function analyzeBreakpoints(breakpoints: Dict) {
     asObject: sortBps(breakpoints),
     asArray: normalize(breakpoints),
     details: queries,
-    media: [null, ...normalized.map(minW => toMediaQueryString(minW)).slice(1)],
+    medias: [null, ...normalized.map(minW => toMediaQueryString(minW)).slice(1)],
     isResponsive(test: Dict) {
       return isResponsiveObjectLike(test, _keysArr);
     },

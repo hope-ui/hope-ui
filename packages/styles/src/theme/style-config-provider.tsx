@@ -1,8 +1,8 @@
 import { createContext, ParentProps, useContext } from "solid-js";
 
-import { UseStyleConfigFnReturn } from "../types";
+import { UseStyleConfigReturn } from "../types";
 
-type StyleConfigContextValue<Parts extends string> = UseStyleConfigFnReturn<Parts>;
+type StyleConfigContextValue<Parts extends string> = UseStyleConfigReturn<Parts>;
 
 const StyleConfigContext = createContext<StyleConfigContextValue<any>>();
 
