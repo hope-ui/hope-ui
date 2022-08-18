@@ -41,11 +41,11 @@ import {
 function toClassNameObjects<Parts extends string>(
   styleObjects: Partial<StyleObjects<Parts>>,
   theme: Theme
-) {
+): Partial<ClassNameObjects<Parts>> {
   return Object.entries(styleObjects).reduce((acc, [part, style]) => {
-    acc[part as Parts] = css(toCSSObject(style as SystemStyleObject, theme))().className;
+    acc[part] = css(toCSSObject(style as SystemStyleObject, theme))().className;
     return acc;
-  }, {} as Partial<ClassNameObjects<Parts>>);
+  }, {} as any);
 }
 
 /** Compute classNames from a style config. */
@@ -53,25 +53,24 @@ function computeClassNames<Parts extends string, VariantDefinitions extends Reco
   styleConfig: StyleConfig<Parts, VariantDefinitions>,
   theme: Theme
 ): StyleConfigClassNames<Parts, VariantDefinitions> {
+  const { baseStyles = {}, variants = {}, compoundVariants = [] } = styleConfig;
+
   // 1. create "base" classNames.
-  const baseClassNames = toClassNameObjects(styleConfig.baseStyles, theme);
+  const baseClassNames = toClassNameObjects(baseStyles, theme);
 
   // 2. create "variants" classNames.
-  const variantsClassNames = Object.entries(styleConfig.variants).reduce(
-    (acc, [variant, definition]) => {
-      // a variant like "size"
-      acc[variant] = Object.entries(definition).reduce((acc, [value, styleObjects]) => {
-        // a variant value like "sm"
-        acc[value] = toClassNameObjects(styleObjects, theme);
-        return acc;
-      }, {} as any);
+  const variantsClassNames = Object.entries(variants).reduce((acc, [variant, definition]) => {
+    // a variant like "size"
+    acc[variant] = Object.entries(definition as any).reduce((acc, [value, styleObjects]) => {
+      // a variant value like "sm"
+      acc[value] = toClassNameObjects(styleObjects as any, theme);
       return acc;
-    },
-    {} as any
-  );
+    }, {} as any);
+    return acc;
+  }, {} as any);
 
   // 3. create "compound variants" classNames.
-  const compoundVariantsClassNames = styleConfig.compoundVariants?.map(compoundVariant => ({
+  const compoundVariantsClassNames = compoundVariants.map(compoundVariant => ({
     variants: compoundVariant.variants,
     classNames: toClassNameObjects(compoundVariant.styles, theme),
   }));
@@ -199,7 +198,7 @@ export function createStyleConfig<
       }
 
       // 3. add "compoundVariants" classNames.
-      for (const compoundVariant of baseStyleConfigClassNames.compoundVariants) {
+      for (const compoundVariant of baseStyleConfigClassNames?.compoundVariants ?? []) {
         if (shouldApplyCompound(compoundVariant.variants, selectedVariants())) {
           Object.entries(compoundVariant.classNames).forEach(([part, className]) => {
             classNamesMap.get(part as Parts)?.push(className as string);
