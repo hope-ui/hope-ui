@@ -17,7 +17,7 @@ describe("AspectRatio", () => {
   itIsPolymorphic(AspectRatio as any, defaultProps);
   itRendersChildren(AspectRatio as any, defaultProps);
   itSupportsClass(AspectRatio as any, defaultProps);
-  itHasSemanticClass(AspectRatio as any, defaultProps, "hope-aspect-ratio");
+  itHasSemanticClass(AspectRatio as any, defaultProps, "hope-AspectRatio-root");
   itSupportsRef(AspectRatio as any, defaultProps, HTMLDivElement);
   itSupportsStyle(AspectRatio as any, defaultProps);
 });

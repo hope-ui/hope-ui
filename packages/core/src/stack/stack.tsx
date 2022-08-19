@@ -43,7 +43,7 @@ export const Stack = createHopeComponent<"div", StackProps>(props => {
 
   return (
     <hope.div
-      class={clsx("hope-stack", local.class)}
+      class={clsx("hope-Stack-root", local.class)}
       __css={filterUndefined<SystemStyleObject>({
         display: "flex",
         alignItems: "center",

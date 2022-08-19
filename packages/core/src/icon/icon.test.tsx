@@ -21,7 +21,7 @@ const defaultProps: IconProps = {
 describe("Icon", () => {
   itRendersChildren(Icon as any, defaultProps);
   itSupportsClass(Icon as any, defaultProps);
-  itHasSemanticClass(Icon as any, defaultProps, "hope-icon");
+  itHasSemanticClass(Icon as any, defaultProps, "hope-Icon-root");
   itSupportsRef(Icon as any, defaultProps, SVGSVGElement);
   itSupportsStyle(Icon as any, defaultProps);
 

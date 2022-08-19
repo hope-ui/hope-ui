@@ -55,7 +55,7 @@ export const Grid = createHopeComponent<"div", GridProps>(props => {
 
   return (
     <hope.div
-      class={clsx("hope-grid", local.class)}
+      class={clsx("hope-Grid-root", local.class)}
       __css={{
         display: "grid",
         gridAutoFlow: local.autoFlow,

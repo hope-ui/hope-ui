@@ -33,7 +33,7 @@ export const Flex = createHopeComponent<"div", FlexProps>(props => {
 
   return (
     <hope.div
-      class={clsx("hope-flex", local.class)}
+      class={clsx("hope-Flex-root", local.class)}
       __css={{
         display: "flex",
         flexDirection: local.direction,

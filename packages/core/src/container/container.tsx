@@ -45,7 +45,7 @@ export const Container = createHopeComponent<"div", ContainerProps>(props => {
 
   return (
     <hope.div
-      class={clsx("hope-container", local.class)}
+      class={clsx("hope-Container-root", local.class)}
       __css={{
         width: "100%",
         maxWidth: {

@@ -15,7 +15,7 @@ describe("GridItem", () => {
   itIsPolymorphic(GridItem as any, defaultProps);
   itRendersChildren(GridItem as any, defaultProps);
   itSupportsClass(GridItem as any, defaultProps);
-  itHasSemanticClass(GridItem as any, defaultProps, "hope-grid-item");
+  itHasSemanticClass(GridItem as any, defaultProps, "hope-GridItem-root");
   itSupportsRef(GridItem as any, defaultProps, HTMLDivElement);
   itSupportsStyle(GridItem as any, defaultProps);
 });

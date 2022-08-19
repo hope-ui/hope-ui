@@ -19,7 +19,7 @@ describe("Button", () => {
   itIsPolymorphic(Button as any, defaultProps);
   itRendersChildren(Button as any, defaultProps);
   itSupportsClass(Button as any, defaultProps);
-  itHasSemanticClass(Button as any, defaultProps, "hope-button");
+  itHasSemanticClass(Button as any, defaultProps, "hope-Button-root");
   itSupportsRef(Button as any, defaultProps, HTMLButtonElement);
   itSupportsStyle(Button as any, defaultProps);
 
@@ -146,7 +146,7 @@ describe("Button", () => {
       </Button>
     ));
 
-    expect(container.querySelector(".hope-button__loader")).toBeInTheDocument();
+    expect(container.querySelector(".hope-Button-loaderWrapper")).toBeInTheDocument();
   });
 
   it("should show loading text when 'isLoading' prop is true and a loading text is provided", () => {

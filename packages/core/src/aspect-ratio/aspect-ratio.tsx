@@ -36,7 +36,7 @@ export const AspectRatio = createHopeComponent<"div", AspectRatioProps>(props =>
 
   return (
     <hope.div
-      class={clsx("hope-aspect-ratio", local.class)}
+      class={clsx("hope-AspectRatio-root", local.class)}
       __css={{
         position: "relative",
         maxWidth: "100%",

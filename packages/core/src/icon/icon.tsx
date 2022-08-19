@@ -61,7 +61,7 @@ export const Icon = createHopeComponent<"svg", IconProps>(props => {
    */
   const shouldRenderComponent = () => local.as && !isString(local.as);
 
-  const classes = () => clsx("hope-icon", local.class);
+  const classes = () => clsx("hope-Icon-root", local.class);
 
   return (
     <Show

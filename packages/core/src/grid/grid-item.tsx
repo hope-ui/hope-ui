@@ -59,7 +59,7 @@ export const GridItem = createHopeComponent<"div", GridItemProps>(props => {
 
   return (
     <hope.div
-      class={clsx("hop-grid-item", local.class)}
+      class={clsx("hope-GridItem-root", local.class)}
       __css={filterUndefined<SystemStyleObject>({
         gridArea: local.area,
         gridColumn: spanFn(local.colSpan),
