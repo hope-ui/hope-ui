@@ -87,9 +87,9 @@ function computeMultiPartStyleConfig<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
 >(
-  multiPartStyleConfig: MultiPartStyleConfig<Parts, VariantDefinitions>,
+  multiPartStyleConfig: Partial<MultiPartStyleConfig<Parts, VariantDefinitions>>,
   theme: Theme
-): MultiPartStyleConfigResult<Parts, VariantDefinitions> {
+): Partial<MultiPartStyleConfigResult<Parts, VariantDefinitions>> {
   return Object.entries(multiPartStyleConfig).reduce((acc, [part, config]) => {
     acc[part] = computeStyleConfig(config as StyleConfig<VariantDefinitions>, theme);
     return acc;
@@ -116,8 +116,13 @@ export function createStyleConfig<
   defaultVariants?: VariantSelection<VariantDefinitions>
 ): UseStyleConfigFn<Parts, VariantDefinitions> {
   let isFirstLoad = true;
+
   let baseConfig: MultiPartStyleConfig<Parts, VariantDefinitions> | undefined;
   let baseConfigResult: MultiPartStyleConfigResult<Parts, VariantDefinitions> | undefined;
+
+  let themeConfig: Partial<MultiPartStyleConfig<Parts, VariantDefinitions>> | undefined;
+  let themeConfigResult: Partial<MultiPartStyleConfigResult<Parts, VariantDefinitions>> | undefined;
+
   let parts: Array<Parts> = [];
 
   return function useStyleConfig(
@@ -130,13 +135,13 @@ export function createStyleConfig<
     // Hack to make sure base style config is computed only once for every component instance,
     // but has access to the current theme since `useStyleConfig` run in a component context.
     if (isFirstLoad) {
+      // 1. compute base styles.
       baseConfig = runIfFn(interpolation, theme.vars);
+      baseConfigResult = computeMultiPartStyleConfig(baseConfig, theme) as any; // force type because we know it's not a partial.
 
-      const themeConfig = runIfFn(componentTheme()?.styleConfigOverrides, theme.vars);
-
-      mergeWith(baseConfig, themeConfig);
-
-      baseConfigResult = computeMultiPartStyleConfig(baseConfig, theme);
+      // 2. compute theme styles, so it will be injected to `head` after base styles.
+      themeConfig = runIfFn(componentTheme()?.styleConfigOverrides, theme.vars);
+      themeConfigResult = themeConfig && computeMultiPartStyleConfig(themeConfig, theme);
 
       // get component parts from config.
       parts = Object.keys(baseConfig) as Array<Parts>;
@@ -167,8 +172,12 @@ export function createStyleConfig<
         const variants = baseConfigResult?.[part].variants ?? ({} as any);
         const compoundVariants = baseConfigResult?.[part].compoundVariants ?? [];
 
+        const themeBase = themeConfigResult?.[part]?.base ?? "";
+        const themeVariants = themeConfigResult?.[part]?.variants ?? ({} as any);
+        const themeCompoundVariants = themeConfigResult?.[part]?.compoundVariants ?? [];
+
         // 1. add "static" and "base" classNames.
-        const classNames = [`hope-${name}-${part}`, base];
+        const classNames = [`hope-${name}-${part}`, base, themeBase];
 
         // 2. add "variants" classNames.
         for (const name in selectedVariants()) {
@@ -179,10 +188,11 @@ export function createStyleConfig<
           }
 
           classNames.push(variants[name]?.[String(value)]);
+          classNames.push(themeVariants[name]?.[String(value)]);
         }
 
         // 3. add "compound variants" classNames.
-        for (const compoundVariant of compoundVariants) {
+        for (const compoundVariant of [...compoundVariants, ...themeCompoundVariants]) {
           if (shouldApplyCompound(compoundVariant.variants, selectedVariants())) {
             classNames.push(compoundVariant.className);
           }

@@ -52,24 +52,24 @@ function getRootColorSchemeCompoundVariants(vars: ThemeVars) {
         },
         style: {
           color: vars.colors[colorScheme][`${variant}Text`],
-          bg: vars.colors[colorScheme][`${variant}Bg`],
+          backgroundColor: vars.colors[colorScheme][`${variant}Bg`],
           borderColor: vars.colors[colorScheme][`${variant}Border`],
 
           _hover: {
             color: vars.colors[colorScheme][`${variant}HoverText`],
-            bg: vars.colors[colorScheme][`${variant}HoverBg`],
+            backgroundColor: vars.colors[colorScheme][`${variant}HoverBg`],
             borderColor: vars.colors[colorScheme][`${variant}HoverBorder`],
           },
 
           _active: {
             color: vars.colors[colorScheme][`${variant}ActiveText`],
-            bg: vars.colors[colorScheme][`${variant}ActiveBg`],
+            backgroundColor: vars.colors[colorScheme][`${variant}ActiveBg`],
             borderColor: vars.colors[colorScheme][`${variant}ActiveBorder`],
           },
 
           _disabled: {
             color: vars.colors[colorScheme][`${variant}DisabledText`],
-            bg: vars.colors[colorScheme][`${variant}DisabledBg`],
+            backgroundColor: vars.colors[colorScheme][`${variant}DisabledBg`],
             borderColor: vars.colors[colorScheme][`${variant}DisabledBorder`],
           },
         },
