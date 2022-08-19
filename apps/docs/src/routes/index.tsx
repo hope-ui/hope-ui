@@ -1,17 +1,26 @@
-import { Button, hope } from "@hope-ui/core";
-import { For } from "solid-js";
 import { Title } from "solid-start";
 
-const range = [...Array(3000).keys()];
-
 export default function Home() {
-  const startTime = new Date().getTime();
-
   return (
     <main>
       <Title>Hello World</Title>
       <h1>Hello world!</h1>
+    </main>
+  );
+}
 
+/*
+import { For } from "solid-js";
+
+import { Button, hope } from "../src";
+
+const range = [...Array(3000).keys()];
+
+export default function App() {
+  const startTime = new Date().getTime();
+
+  return (
+    <>
       <For each={range}>{(_, i) => <Button>Button</Button>}</For>
       <hope.div
         sx={{
@@ -25,6 +34,7 @@ export default function Home() {
       >
         {new Date().getTime() - startTime}
       </hope.div>
-    </main>
+    </>
   );
 }
+*/

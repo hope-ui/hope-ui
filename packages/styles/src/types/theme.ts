@@ -4,23 +4,25 @@ import { CSSObject } from "../stitches.config";
 import { AnalyzeBreakpointsReturn } from "../utils/breakpoint";
 import { DeepPartial } from "./deep-partial";
 import { ThemeScales } from "./scales";
-import { StyleConfigOverrideInterpolation } from "./style-config";
+import { PartialMultiPartStyleConfigInterpolation } from "./style-config";
 import { ThemeVars } from "./vars";
 
 export type ThemeMap = Partial<Record<keyof CSSObject, keyof ThemeScales>>;
 
 export interface ComponentTheme<
   Props extends Record<string, any> = {},
-  StyleConfigOverride extends StyleConfigOverrideInterpolation<any, any> | undefined = any
+  StyleConfigOverrides extends PartialMultiPartStyleConfigInterpolation<any, any> | undefined =
+    | PartialMultiPartStyleConfigInterpolation<any, any>
+    | undefined
 > {
   /** Default props to be passed to the component. */
   defaultProps?: Props;
 
   /**
-   * Styles that will be merged with the "base styles" created by `createStyleConfig`.
+   * Styles that will be merged with the "base styles".
    * Used to override/add additional styles.
    */
-  styleConfigOverride?: StyleConfigOverride;
+  styleConfigOverrides?: StyleConfigOverrides;
 }
 
 export interface ThemeBase extends ThemeScales {

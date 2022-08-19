@@ -20,131 +20,119 @@ type BooleanMap<T> = T extends BooleanStringUnion ? boolean : T;
 /** Infer the type to string union of `"true" | "false"` if it's a `boolean`. */
 type ReverseBooleanMap<T> = T extends boolean ? BooleanStringUnion : T;
 
-/** An object of style config parts/system style object. */
-export type StyleObjects<Parts extends string> = Record<Parts, SystemStyleObject>;
-
-/** An object of style config parts/className. */
-export type ClassNameObjects<Parts extends string> = Record<Parts, string>;
-
 export type VariantSelection<VariantDefinitions extends Record<string, any>> = {
   [VariantName in keyof VariantDefinitions]?: BooleanMap<VariantDefinitions[VariantName]>;
 };
 
-export interface CompoundVariant<
-  Parts extends string,
-  VariantDefinitions extends Record<string, any>
-> {
+export type Variants<T extends Record<string, any>> = {
+  [K in keyof T]?: {
+    [V in ReverseBooleanMap<T[K]>]?: SystemStyleObject;
+  };
+};
+
+export interface CompoundVariant<VariantDefinitions extends Record<string, any>> {
   /** The combined variants that should apply the styles. */
   variants: VariantSelection<VariantDefinitions>;
 
   /** The styles to be applied. */
-  styles: Partial<StyleObjects<Parts>>;
+  style: SystemStyleObject;
 }
-
-type Variants<Parts extends string, T extends Record<string, any>> = {
-  [K in keyof T]?: {
-    [V in ReverseBooleanMap<T[K]>]?: Partial<StyleObjects<Parts>>;
-  };
-};
 
 /** A style configuration. */
-export interface StyleConfig<Parts extends string, VariantDefinitions extends Record<string, any>> {
-  /**
-   * The base styles of each part.
-   * Note: if a part doesn't need base style just put an empty object.
-   * @example
-   * {
-   *   root: {
-   *     background: "primary.500",
-   *   },
-   *   icon: {},
-   * }
-   */
-  baseStyles: StyleObjects<Parts>;
+export interface StyleConfig<VariantDefinitions extends Record<string, any>> {
+  /** The base style. */
+  base?: SystemStyleObject;
 
-  /** The variants style of each part. */
-  variants?: Variants<Parts, VariantDefinitions>;
+  /** The variants style. */
+  variants?: Variants<VariantDefinitions>;
 
-  /** The combined variants style of each part. */
-  compoundVariants?: Array<CompoundVariant<Parts, VariantDefinitions>>;
-
-  /** The default variants to use. */
-  defaultVariants?: VariantSelection<VariantDefinitions>;
+  /** The combined variants style. */
+  compoundVariants?: Array<CompoundVariant<VariantDefinitions>>;
 }
 
-/** An object or function that returns style configuration. */
-export type StyleConfigInterpolation<
+// ---
+
+/** Style configurations for multi-parts components. */
+export type MultiPartStyleConfig<
+  Parts extends string,
+  VariantDefinitions extends Record<string, any>
+> = Record<Parts, StyleConfig<VariantDefinitions>>;
+
+/** An object or function that returns multi-parts style configuration. */
+export type MultiPartStyleConfigInterpolation<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
 > =
-  | StyleConfig<Parts, VariantDefinitions>
-  | ((vars: ThemeVars) => StyleConfig<Parts, VariantDefinitions>);
+  | MultiPartStyleConfig<Parts, VariantDefinitions>
+  | ((vars: ThemeVars) => MultiPartStyleConfig<Parts, VariantDefinitions>);
 
-/** A style configuration used for theming and component level styles overrides. */
-export type StyleConfigOverride<
-  Parts extends string,
-  VariantDefinitions extends Record<string, any>
-> = Omit<StyleConfig<Parts, VariantDefinitions>, "baseStyles" | "defaultVariants"> & {
-  /** The base styles of each part. */
-  baseStyles?: Partial<StyleObjects<Parts>>;
-};
-
-/** An object or function that returns style configuration overrides. */
-export type StyleConfigOverrideInterpolation<
+/** An object or function that returns partial multi-parts style configuration. */
+export type PartialMultiPartStyleConfigInterpolation<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
 > =
-  | StyleConfigOverride<Parts, VariantDefinitions>
-  | ((vars: ThemeVars) => StyleConfigOverride<Parts, VariantDefinitions>);
+  | Partial<MultiPartStyleConfig<Parts, VariantDefinitions>>
+  | ((vars: ThemeVars) => Partial<MultiPartStyleConfig<Parts, VariantDefinitions>>);
 
-type VariantsClassNames<Parts extends string, T extends Record<string, any>> = {
+// ---
+
+export type VariantsClassNames<T extends Record<string, any>> = {
   [K in keyof T]?: {
-    [V in ReverseBooleanMap<T[K]>]?: Partial<ClassNameObjects<Parts>>;
+    [V in ReverseBooleanMap<T[K]>]?: string;
   };
 };
 
-export interface CompoundVariantClassNames<
-  Parts extends string,
-  VariantDefinitions extends Record<string, any>
-> {
-  /** The combined variants that should apply the classNames. */
+export interface CompoundVariantClassNames<VariantDefinitions extends Record<string, any>> {
+  /** The combined variants that should apply the className. */
   variants: VariantSelection<VariantDefinitions>;
 
-  /** The classNames to be applied. */
-  classNames: Partial<ClassNameObjects<Parts>>;
+  /** The className to be applied. */
+  className: string;
 }
 
-export interface StyleConfigClassNames<
+/** ClassNames generated from a style configuration. */
+export interface StyleConfigResult<VariantDefinitions extends Record<string, any>> {
+  /** The base className. */
+  base?: string;
+
+  /** The variants classNames. */
+  variants?: VariantsClassNames<VariantDefinitions>;
+
+  /** The combined variants classNames. */
+  compoundVariants?: Array<CompoundVariantClassNames<VariantDefinitions>>;
+}
+
+/** Style configuration classNames for multi-parts components. */
+export type MultiPartStyleConfigResult<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
-> {
-  /** The base classNames of each part. */
-  baseClassNames: Partial<ClassNameObjects<Parts>>;
+> = Record<Parts, StyleConfigResult<VariantDefinitions>>;
 
-  /** The variants classNames of each part. */
-  variants: VariantsClassNames<Parts, VariantDefinitions>;
+// ---
 
-  /** The combined variants classNames of each part. */
-  compoundVariants: Array<CompoundVariantClassNames<Parts, VariantDefinitions>>;
-}
+/** An object of classNames. */
+export type ClassNames<Parts extends string> = Record<Parts, string>;
+
+/** An object system style objects. */
+export type Styles<Parts extends string> = Record<Parts, SystemStyleObject>;
 
 export type UseStyleConfigOptions<
   Parts extends string,
   VariantDefinitions extends Record<string, any>
 > = VariantSelection<VariantDefinitions> & {
   /**
-   * Styles that will be merged with the "base styles" created by `createStyleConfig`.
+   * Styles that will be merged with the "base styles".
    * Mostly used to override/add additional styles.
    */
-  styleConfigOverride?: StyleConfigOverrideInterpolation<Parts, VariantDefinitions>;
+  styleConfigOverrides?: PartialMultiPartStyleConfigInterpolation<Parts, VariantDefinitions>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
 };
 
 export interface UseStyleConfigReturn<Parts extends string> {
-  classes: Accessor<ClassNameObjects<Parts>>;
-  styles: Accessor<StyleObjects<Parts>>;
+  classes: Accessor<ClassNames<Parts>>;
+  styleOverrides: Accessor<Styles<Parts>>;
 }
 
 export type UseStyleConfigFn<

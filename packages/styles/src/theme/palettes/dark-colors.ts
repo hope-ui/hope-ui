@@ -47,15 +47,15 @@ function darkPalette(scale: PaletteScale): PaletteGeneratorTuple {
       solidDisabledBorder: getCssVar(`colors-${color}-200`),
 
       // global variant - soft
-      softText: getCssVar(`colors-${color}-900`),
+      softText: getCssVar(`colors-${color}-800`),
       softBg: getCssVar(`colors-${color}-100`),
       softBorder: getCssVar(`colors-${color}-100`),
 
-      softHoverText: getCssVar(`colors-${color}-900`),
+      softHoverText: getCssVar(`colors-${color}-800`),
       softHoverBg: getCssVar(`colors-${color}-200`),
       softHoverBorder: getCssVar(`colors-${color}-200`),
 
-      softActiveText: getCssVar(`colors-${color}-900`),
+      softActiveText: getCssVar(`colors-${color}-800`),
       softActiveBg: getCssVar(`colors-${color}-300`),
       softActiveBorder: getCssVar(`colors-${color}-300`),
 
@@ -64,15 +64,15 @@ function darkPalette(scale: PaletteScale): PaletteGeneratorTuple {
       softDisabledBorder: getCssVar(`colors-${color}-50`),
 
       // global variant - outlined
-      outlinedText: getCssVar(`colors-${color}-900`),
+      outlinedText: getCssVar(`colors-${color}-800`),
       outlinedBg: "transparent",
       outlinedBorder: getCssVar(`colors-${color}-300`),
 
-      outlinedHoverText: getCssVar(`colors-${color}-900`),
+      outlinedHoverText: getCssVar(`colors-${color}-800`),
       outlinedHoverBg: getCssVar(`colors-${color}-50`),
       outlinedHoverBorder: getCssVar(`colors-${color}-400`),
 
-      outlinedActiveText: getCssVar(`colors-${color}-900`),
+      outlinedActiveText: getCssVar(`colors-${color}-800`),
       outlinedActiveBg: getCssVar(`colors-${color}-100`),
       outlinedActiveBorder: getCssVar(`colors-${color}-400`),
 
@@ -81,15 +81,15 @@ function darkPalette(scale: PaletteScale): PaletteGeneratorTuple {
       outlinedDisabledBorder: getCssVar(`colors-${color}-100`),
 
       // global variant - plain
-      plainText: getCssVar(`colors-${color}-900`),
+      plainText: getCssVar(`colors-${color}-800`),
       plainBg: "transparent",
       plainBorder: "transparent",
 
-      plainHoverText: getCssVar(`colors-${color}-900`),
+      plainHoverText: getCssVar(`colors-${color}-800`),
       plainHoverBg: getCssVar(`colors-${color}-50`),
       plainHoverBorder: getCssVar(`colors-${color}-50`),
 
-      plainActiveText: getCssVar(`colors-${color}-900`),
+      plainActiveText: getCssVar(`colors-${color}-800`),
       plainActiveBg: getCssVar(`colors-${color}-100`),
       plainActiveBorder: getCssVar(`colors-${color}-100`),
 

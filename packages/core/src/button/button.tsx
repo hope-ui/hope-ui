@@ -35,7 +35,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
       "isDisabled",
     ],
     ["children", "leftIcon", "rightIcon"],
-    ["styleConfigOverride", "unstyled", "colorScheme", "variant", "size", "isFullWidth"]
+    ["styleConfigOverrides", "unstyled", "colorScheme", "variant", "size", "isFullWidth"]
   );
 
   const tagName = createTagName(
@@ -55,14 +55,14 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
     return isNativeButton() ? "button" : undefined;
   });
 
-  const { classes, styles } = useStyleConfig("Button", styleConfigProps);
+  const { classes, styleOverrides } = useStyleConfig("Button", styleConfigProps);
 
   onMount(() => {
     ref != null && setIsNativeButton(isButton(ref));
   });
 
   return (
-    <StyleConfigProvider value={{ classes, styles }}>
+    <StyleConfigProvider value={{ classes, styleOverrides }}>
       <hope.button
         as={local.as}
         ref={mergeRefs(el => (ref = el), local.ref)}
@@ -71,8 +71,8 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
         tabIndex={!isNativeButton() ? 0 : undefined}
         disabled={local.isDisabled}
         data-loading={local.isLoading || undefined}
-        class={clsx("hope-button", classes().root, local.class)}
-        __css={styles().root}
+        class={clsx(classes().root, local.class)}
+        __css={styleOverrides().root}
         {...others}
       >
         <Show when={local.isLoading && local.loaderPlacement === "start"}>
@@ -99,18 +99,18 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
 });
 
 function ButtonContent(props: ButtonContentProps) {
-  const { classes, styles } = useStyleConfigContext<ButtonParts>();
+  const { classes, styleOverrides } = useStyleConfigContext<ButtonParts>();
 
   return (
     <>
       <Show when={props.leftIcon}>
-        <ButtonIcon class={classes().leftIcon} __css={styles().leftIcon}>
+        <ButtonIcon class={classes().leftIcon} __css={styleOverrides().leftIcon}>
           {props.leftIcon}
         </ButtonIcon>
       </Show>
       {props.children}
       <Show when={props.rightIcon}>
-        <ButtonIcon class={classes().rightIcon} __css={styles().rightIcon}>
+        <ButtonIcon class={classes().rightIcon} __css={styleOverrides().rightIcon}>
           {props.rightIcon}
         </ButtonIcon>
       </Show>

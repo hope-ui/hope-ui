@@ -31,16 +31,16 @@ function veryBrightPalette(scale: PaletteScale): PaletteGeneratorTuple {
 
       // global variant - solid
       solidText: getCssVar(`colors-${color}-900`),
-      solidBg: getCssVar(`colors-${color}-400`),
-      solidBorder: getCssVar(`colors-${color}-400`),
+      solidBg: getCssVar(`colors-${color}-300`),
+      solidBorder: getCssVar(`colors-${color}-300`),
 
       solidHoverText: getCssVar(`colors-${color}-900`),
-      solidHoverBg: getCssVar(`colors-${color}-500`),
-      solidHoverBorder: getCssVar(`colors-${color}-500`),
+      solidHoverBg: getCssVar(`colors-${color}-400`),
+      solidHoverBorder: getCssVar(`colors-${color}-400`),
 
       solidActiveText: getCssVar(`colors-${color}-900`),
-      solidActiveBg: getCssVar(`colors-${color}-600`),
-      solidActiveBorder: getCssVar(`colors-${color}-600`),
+      solidActiveBg: getCssVar(`colors-${color}-500`),
+      solidActiveBorder: getCssVar(`colors-${color}-500`),
 
       solidDisabledText: getCssVar(`colors-${color}-200`),
       solidDisabledBg: getCssVar(`colors-${color}-50`),

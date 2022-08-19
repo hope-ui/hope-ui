@@ -8,8 +8,7 @@
 
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
-import type { StyleConfigOverrideInterpolation, Theme } from "../types";
-import { ThemeOverride } from "../types";
+import type { ComponentTheme, Theme, ThemeOverride } from "../types";
 import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME } from "./default-theme";
 import { injectCSSVars } from "./inject-css-vars";
@@ -22,9 +21,7 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useThemeStyleConfig(
-  component?: string
-): Accessor<StyleConfigOverrideInterpolation<any, any> | undefined> {
+export function useComponentTheme(component?: string): Accessor<ComponentTheme | undefined> {
   const theme = useTheme();
 
   return createMemo(() => {
@@ -32,7 +29,7 @@ export function useThemeStyleConfig(
       return undefined;
     }
 
-    return theme.components[component]?.styleConfigOverride;
+    return theme.components[component] ?? undefined;
   });
 }
 
@@ -69,6 +66,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
   const theme = props.theme ?? DEFAULT_THEME;
 
   injectCSSVars(theme);
+
   props.withGlobalStyles && injectGlobalStyles(theme);
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
