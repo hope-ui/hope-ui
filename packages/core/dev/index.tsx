@@ -1,11 +1,13 @@
 import { render } from "solid-js/web";
 
-import { HopeProvider } from "../src";
+import { extendTheme, HopeProvider } from "../src";
 import App from "./App";
+
+const theme = extendTheme({});
 
 render(
   () => (
-    <HopeProvider withGlobalStyles>
+    <HopeProvider withGlobalStyles theme={theme}>
       <App />
     </HopeProvider>
   ),

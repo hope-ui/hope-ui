@@ -124,6 +124,9 @@ export type PaletteRangeGenerator = (
   cssVarPrefix?: string
 ) => PaletteRange;
 
+/** [light, dark]. */
+export type PaletteGeneratorTuple = [PaletteRangeGenerator, PaletteRangeGenerator];
+
 export interface PaletteCommon {
   white: string;
   black: string;

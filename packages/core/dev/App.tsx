@@ -1,4 +1,4 @@
-import { Button, Box } from "../src";
+import { Button } from "../src";
 
 export default function App() {
   return <Button>Button</Button>;
