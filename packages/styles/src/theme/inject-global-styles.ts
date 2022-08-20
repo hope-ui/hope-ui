@@ -1,6 +1,6 @@
 import { globalCss } from "../stitches.config";
 import { Theme } from "../types";
-import { createGetCssVar } from "../utils/css-var";
+import { createGetCssVar } from "../utils";
 
 export function injectGlobalStyles(theme: Theme) {
   const getCssVar = createGetCssVar(theme.cssVarPrefix);

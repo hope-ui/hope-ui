@@ -1,7 +1,18 @@
-import { Button } from "../src";
+import { Button, Kbd, useColorMode } from "../src";
 
 export default function App() {
-  return <Button>Button</Button>;
+  const { toggleColorMode } = useColorMode();
+
+  return (
+    <>
+      <Button variant="soft" onClick={toggleColorMode}>
+        Toggle color mode
+      </Button>
+      <div>
+        <Kbd>shift</Kbd> + <Kbd>H</Kbd>
+      </div>
+    </>
+  );
 }
 
 /*
