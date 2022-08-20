@@ -4,12 +4,6 @@
  *
  * Credits to the SEEK team:
  * https://github.com/seek-oss/vanilla-extract/blob/master/packages/recipes/src/createRuntimeFn.ts
- *
- * Original code by Mantinedev
- * MIT Licensed, Copyright (c) 2021 Vitaly Rtishchev.
- *
- * Credits to the Mantinedev team:
- * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/tss/create-styles.ts
  */
 
 import { filterUndefined, runIfFn } from "@hope-ui/utils";

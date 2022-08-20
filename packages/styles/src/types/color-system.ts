@@ -141,10 +141,10 @@ export interface PaletteText {
 }
 export interface PaletteBackground {
   body: string;
-  surface0: string;
-  surface1: string;
-  surface2: string;
-  surface3: string;
+  surface: string;
+  level1: string;
+  level2: string;
+  level3: string;
   tooltip: string;
 }
 

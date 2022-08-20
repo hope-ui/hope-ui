@@ -1,9 +1,12 @@
 // @refresh reload
-import "./root.css";
+import "./code.css";
 
 import { getCssText, HopeProvider } from "@hope-ui/core";
 import { Suspense } from "solid-js";
+import { MDXProvider } from "solid-mdx";
 import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts } from "solid-start";
+
+import mdxComponents from "./mdx-components";
 
 export default function Root() {
   return (
@@ -18,9 +21,11 @@ export default function Root() {
         <HopeProvider withGlobalStyles>
           <Suspense>
             <ErrorBoundary>
-              <Routes>
-                <FileRoutes />
-              </Routes>
+              <MDXProvider components={{ ...mdxComponents }}>
+                <Routes>
+                  <FileRoutes />
+                </Routes>
+              </MDXProvider>
             </ErrorBoundary>
           </Suspense>
         </HopeProvider>

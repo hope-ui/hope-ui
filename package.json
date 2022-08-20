@@ -20,6 +20,7 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "commit": "git-cz",
     "dev": "pnpm -F @hope-ui/core dev",
+    "dev:docs": "pnpm -F @hope-ui/docs dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "prepare": "husky install",
     "storybook": "pnpm -F @hope-ui/core storybook",
