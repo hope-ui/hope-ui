@@ -15,11 +15,11 @@ const useStyleConfig = createStyleConfig<"root", {}>({
     base: {
       borderRadius: "md",
       borderStyle: "solid",
-      borderColor: "neutral.outlinedBorder",
+      borderColor: "neutral.300",
       borderWidth: "1px",
       borderBottomWidth: "3px",
 
-      backgroundColor: "neutral.outlinedBg",
+      backgroundColor: "neutral.100",
 
       px: "0.4em",
 
@@ -28,6 +28,11 @@ const useStyleConfig = createStyleConfig<"root", {}>({
       fontWeight: "bold",
       lineHeight: "normal",
       whiteSpace: "nowrap",
+
+      _dark: {
+        borderColor: "neutral.600",
+        backgroundColor: "neutral.800",
+      },
     },
   },
 });
