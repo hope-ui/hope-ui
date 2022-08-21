@@ -22,7 +22,7 @@ function resolveColorTokenValue(token: string, vars: ThemeVars) {
   // value is like "500" | "solidText" | "divider", etc...
   const [key, value] = parts;
 
-  return (vars.colors as any)[key][value] ?? token;
+  return (vars.colors as any)[key]?.[value] ?? token;
 }
 
 /** Get a value from theme if the token exist, return the token otherwise. */

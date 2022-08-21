@@ -36,76 +36,11 @@ export interface PaletteScale {
   900: string;
 }
 
-export interface PaletteChannel {
+export interface PaletteRange extends PaletteScale {
+  // rgb color channel used to create alpha colors
   mainChannel: string;
   lightChannel: string;
   darkChannel: string;
-}
-
-export interface PaletteRange extends PaletteScale, PaletteChannel {
-  solidText: string;
-  solidBg: string;
-  solidBorder: string;
-  // hover state
-  solidHoverText: string;
-  solidHoverBg: string;
-  solidHoverBorder: string;
-  // active state
-  solidActiveText: string;
-  solidActiveBg: string;
-  solidActiveBorder: string;
-  // disabled state
-  solidDisabledText: string;
-  solidDisabledBg: string;
-  solidDisabledBorder: string;
-
-  softText: string;
-  softBg: string;
-  softBorder: string;
-  // hover state
-  softHoverText: string;
-  softHoverBg: string;
-  softHoverBorder: string;
-  // active state
-  softActiveText: string;
-  softActiveBg: string;
-  softActiveBorder: string;
-  // disabled state
-  softDisabledText: string;
-  softDisabledBg: string;
-  softDisabledBorder: string;
-
-  outlinedText: string;
-  outlinedBg: string;
-  outlinedBorder: string;
-  // hover state
-  outlinedHoverText: string;
-  outlinedHoverBg: string;
-  outlinedHoverBorder: string;
-  // active state
-  outlinedActiveText: string;
-  outlinedActiveBg: string;
-  outlinedActiveBorder: string;
-  // disabled state
-  outlinedDisabledText: string;
-  outlinedDisabledBg: string;
-  outlinedDisabledBorder: string;
-
-  plainText: string;
-  plainBg: string;
-  plainBorder: string;
-  // hover state
-  plainHoverText: string;
-  plainHoverBg: string;
-  plainHoverBorder: string;
-  // active state
-  plainActiveText: string;
-  plainActiveBg: string;
-  plainActiveBorder: string;
-  // disabled state
-  plainDisabledText: string;
-  plainDisabledBg: string;
-  plainDisabledBorder: string;
 
   // override palette.text
   overrideTextPrimary: string;
@@ -139,6 +74,7 @@ export interface PaletteText {
   secondary: string;
   tertiary: string;
 }
+
 export interface PaletteBackground {
   body: string;
   surface: string;
@@ -152,6 +88,8 @@ export type ThemePaletteRanges = Record<ThemeColorScheme, PaletteRange>;
 
 // Note: ColorSystem keys can't be objects more than one level deep.
 export interface ColorSystem extends ThemePaletteRanges {
+  whiteAlpha: PaletteScale;
+  blackAlpha: PaletteScale;
   common: PaletteCommon;
   text: PaletteText;
   background: PaletteBackground;
@@ -166,9 +104,11 @@ export interface ColorSystem extends ThemePaletteRanges {
  *     50: string;
  *     100: string;
  *   };
- *   divider: string;
+ *   common: {
+ *     divider: string;
+ *   }
  * }
- * => 'primary.50' | 'primary.100' | 'divider'
+ * => 'primary.50' | 'primary.100' | 'common.divider'
  */
 type ColorSystemStringUnion<K extends keyof ColorSystem> = ColorSystem[K] extends Record<
   string,
@@ -182,7 +122,7 @@ type ColorSystemStringUnion<K extends keyof ColorSystem> = ColorSystem[K] extend
  *
  * @example
  * {
- *   bg: "primary.solidBackground"
+ *   bg: "primary.500"
  * }
  */
 export type ColorSystemTokenName = {

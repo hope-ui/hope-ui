@@ -8,6 +8,8 @@ import {
   ThemeVars,
 } from "@hope-ui/styles";
 
+import { rgba } from "../utils";
+
 export type ButtonParts =
   | "root"
   | "icon"
@@ -30,51 +32,270 @@ interface ButtonVariants {
   isFullWidth: boolean;
 }
 
-function getRootColorSchemeCompoundVariants(vars: ThemeVars) {
-  const variants: Array<ButtonVariants["variant"]> = ["solid", "soft", "outlined", "plain"];
-  const colorSchemes: Array<ButtonVariants["colorScheme"]> = [
-    "primary",
-    "neutral",
-    "success",
-    "info",
-    "warning",
-    "danger",
-  ];
+const colorSchemes: Array<ButtonVariants["colorScheme"]> = [
+  "primary",
+  "neutral",
+  "success",
+  "info",
+  "warning",
+  "danger",
+];
 
+function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
   const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
 
-  for (const variant of variants) {
-    for (const colorScheme of colorSchemes) {
-      compoundVariants.push({
-        variants: {
-          variant,
-          colorScheme,
+  for (const colorScheme of colorSchemes) {
+    const isNeutral = colorScheme === "neutral";
+    const isWarning = colorScheme === "warning";
+
+    compoundVariants.push({
+      variants: {
+        variant: "solid",
+        colorScheme,
+      },
+      style: {
+        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+        backgroundColor: vars.colors[colorScheme][isNeutral ? "900" : isWarning ? "300" : "500"],
+        borderColor: vars.colors[colorScheme][isNeutral ? "900" : isWarning ? "300" : "500"],
+
+        _hover: {
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "400" : "600"],
+          borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "400" : "600"],
         },
-        style: {
-          color: vars.colors[colorScheme][`${variant}Text`],
-          backgroundColor: vars.colors[colorScheme][`${variant}Bg`],
-          borderColor: vars.colors[colorScheme][`${variant}Border`],
+
+        _active: {
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          backgroundColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
+          borderColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
+        },
+
+        _disabled: {
+          color: vars.colors.common.white,
+          backgroundColor: vars.colors.neutral["200"],
+          borderColor: vars.colors.neutral["200"],
+        },
+
+        _dark: {
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+          backgroundColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
+          borderColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
 
           _hover: {
-            color: vars.colors[colorScheme][`${variant}HoverText`],
-            backgroundColor: vars.colors[colorScheme][`${variant}HoverBg`],
-            borderColor: vars.colors[colorScheme][`${variant}HoverBorder`],
+            color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+            backgroundColor: vars.colors[colorScheme][isWarning ? "400" : "600"],
+            borderColor: vars.colors[colorScheme][isWarning ? "400" : "600"],
           },
 
           _active: {
-            color: vars.colors[colorScheme][`${variant}ActiveText`],
-            backgroundColor: vars.colors[colorScheme][`${variant}ActiveBg`],
-            borderColor: vars.colors[colorScheme][`${variant}ActiveBorder`],
+            color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+            backgroundColor: vars.colors[colorScheme][isWarning ? "300" : "500"],
+            borderColor: vars.colors[colorScheme][isWarning ? "300" : "500"],
           },
 
           _disabled: {
-            color: vars.colors[colorScheme][`${variant}DisabledText`],
-            backgroundColor: vars.colors[colorScheme][`${variant}DisabledBg`],
-            borderColor: vars.colors[colorScheme][`${variant}DisabledBorder`],
+            color: vars.colors.whiteAlpha["300"],
+            backgroundColor: vars.colors.whiteAlpha["100"],
+            borderColor: "transparent",
           },
         },
-      });
-    }
+      },
+    });
+  }
+
+  return compoundVariants;
+}
+
+function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
+  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+
+  for (const colorScheme of colorSchemes) {
+    const isNeutral = colorScheme === "neutral";
+    const isWarning = colorScheme === "warning";
+
+    compoundVariants.push({
+      variants: {
+        variant: "soft",
+        colorScheme,
+      },
+      style: {
+        color: vars.colors[colorScheme][isWarning ? "900" : "800"],
+        backgroundColor: vars.colors[colorScheme][isNeutral ? "200" : isWarning ? "100" : "50"],
+        borderColor: vars.colors[colorScheme][isNeutral ? "200" : isWarning ? "100" : "50"],
+
+        _hover: {
+          color: vars.colors[colorScheme][isWarning ? "900" : "800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral ? "300" : isWarning ? "200" : "100"],
+          borderColor: vars.colors[colorScheme][isNeutral ? "300" : isWarning ? "200" : "100"],
+        },
+
+        _active: {
+          color: vars.colors[colorScheme][isWarning ? "900" : "800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral ? "400" : isWarning ? "300" : "200"],
+          borderColor: vars.colors[colorScheme][isNeutral ? "400" : isWarning ? "300" : "200"],
+        },
+
+        _disabled: {
+          color: vars.colors.neutral["200"],
+          backgroundColor: vars.colors.neutral["50"],
+          borderColor: vars.colors.neutral["50"],
+        },
+
+        _dark: {
+          color: vars.colors[colorScheme]["200"],
+          backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+          borderColor: "transparent",
+
+          _hover: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.2 : 0.3),
+            borderColor: "transparent",
+          },
+
+          _active: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.3 : 0.4),
+            borderColor: "transparent",
+          },
+
+          _disabled: {
+            color: vars.colors.whiteAlpha["200"],
+            backgroundColor: vars.colors.whiteAlpha["50"],
+            borderColor: "transparent",
+          },
+        },
+      },
+    });
+  }
+
+  return compoundVariants;
+}
+
+function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
+  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+
+  for (const colorScheme of colorSchemes) {
+    const isNeutral = colorScheme === "neutral";
+    const isWarning = colorScheme === "warning";
+
+    compoundVariants.push({
+      variants: {
+        variant: "outlined",
+        colorScheme,
+      },
+      style: {
+        color: vars.colors[colorScheme]["800"],
+        backgroundColor: "transparent",
+        borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "400" : "300"],
+
+        _hover: {
+          color: vars.colors[colorScheme]["800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
+          borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "500" : "400"],
+        },
+
+        _active: {
+          color: vars.colors[colorScheme]["800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
+          borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "500" : "400"],
+        },
+
+        _disabled: {
+          color: vars.colors.neutral["200"],
+          backgroundColor: "transparent",
+          borderColor: vars.colors.neutral["100"],
+        },
+
+        _dark: {
+          color: vars.colors[colorScheme]["200"],
+          backgroundColor: "transparent",
+          borderColor: vars.colors[colorScheme]["800"],
+
+          _hover: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.05 : 0.1),
+            borderColor: vars.colors[colorScheme]["700"],
+          },
+
+          _active: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+            borderColor: vars.colors[colorScheme]["700"],
+          },
+
+          _disabled: {
+            color: vars.colors.whiteAlpha["200"],
+            backgroundColor: "transparent",
+            borderColor: vars.colors.whiteAlpha["50"],
+          },
+        },
+      },
+    });
+  }
+
+  return compoundVariants;
+}
+
+function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
+  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+
+  for (const colorScheme of colorSchemes) {
+    const isNeutral = colorScheme === "neutral";
+    const isWarning = colorScheme === "warning";
+
+    compoundVariants.push({
+      variants: {
+        variant: "plain",
+        colorScheme,
+      },
+      style: {
+        color: vars.colors[colorScheme]["800"],
+        backgroundColor: "transparent",
+        borderColor: "transparent",
+
+        _hover: {
+          color: vars.colors[colorScheme]["800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
+          borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
+        },
+
+        _active: {
+          color: vars.colors[colorScheme]["800"],
+          backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
+          borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
+        },
+
+        _disabled: {
+          color: vars.colors.neutral["200"],
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+        },
+
+        _dark: {
+          color: vars.colors[colorScheme]["200"],
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+
+          _hover: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.05 : 0.1),
+            borderColor: "transparent",
+          },
+
+          _active: {
+            color: vars.colors[colorScheme]["200"],
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+            borderColor: "transparent",
+          },
+
+          _disabled: {
+            color: vars.colors.whiteAlpha["200"],
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+          },
+        },
+      },
+    });
   }
 
   return compoundVariants;
@@ -155,7 +376,12 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
           },
         },
       },
-      compoundVariants: getRootColorSchemeCompoundVariants(vars),
+      compoundVariants: [
+        ...getRootSolidColorSchemeCompoundVariants(vars),
+        ...getRootSoftColorSchemeCompoundVariants(vars),
+        ...getRootOutlinedColorSchemeCompoundVariants(vars),
+        ...getRootPlainColorSchemeCompoundVariants(vars),
+      ],
     },
     icon: {
       base: {

@@ -6,15 +6,10 @@
  * https://github.com/tailwindlabs/tailwindcss/blob/master/src/public/colors.js
  */
 
-import {
-  createBrightPalette,
-  createDarkPalette,
-  createMediumPalette,
-  createVeryBrightPalette,
-} from "@hope-ui/styles";
+import { createGrayPalette, createPalette } from "@hope-ui/styles";
 
-// Dark colors
-export const [slate, slateDark] = createDarkPalette({
+// Gray based colors
+export const [slate, slateDark] = createGrayPalette({
   50: "#f8fafc",
   100: "#f1f5f9",
   200: "#e2e8f0",
@@ -27,7 +22,7 @@ export const [slate, slateDark] = createDarkPalette({
   900: "#0f172a",
 });
 
-export const [gray, grayDark] = createDarkPalette({
+export const [gray, grayDark] = createGrayPalette({
   50: "#f9fafb",
   100: "#f3f4f6",
   200: "#e5e7eb",
@@ -40,7 +35,7 @@ export const [gray, grayDark] = createDarkPalette({
   900: "#111827",
 });
 
-export const [zinc, zincDark] = createDarkPalette({
+export const [zinc, zincDark] = createGrayPalette({
   50: "#fafafa",
   100: "#f4f4f5",
   200: "#e4e4e7",
@@ -53,7 +48,7 @@ export const [zinc, zincDark] = createDarkPalette({
   900: "#18181b",
 });
 
-export const [neutral, neutralDark] = createDarkPalette({
+export const [neutral, neutralDark] = createGrayPalette({
   50: "#fafafa",
   100: "#f5f5f5",
   200: "#e5e5e5",
@@ -66,7 +61,7 @@ export const [neutral, neutralDark] = createDarkPalette({
   900: "#171717",
 });
 
-export const [stone, stoneDark] = createDarkPalette({
+export const [stone, stoneDark] = createGrayPalette({
   50: "#fafaf9",
   100: "#f5f5f4",
   200: "#e7e5e4",
@@ -79,99 +74,8 @@ export const [stone, stoneDark] = createDarkPalette({
   900: "#1c1917",
 });
 
-// Medium colors
-export const [blue, blueDark] = createMediumPalette({
-  50: "#eff6ff",
-  100: "#dbeafe",
-  200: "#bfdbfe",
-  300: "#93c5fd",
-  400: "#60a5fa",
-  500: "#3b82f6",
-  600: "#2563eb",
-  700: "#1d4ed8",
-  800: "#1e40af",
-  900: "#1e3a8a",
-});
-
-export const [indigo, indigoDark] = createMediumPalette({
-  50: "#eef2ff",
-  100: "#e0e7ff",
-  200: "#c7d2fe",
-  300: "#a5b4fc",
-  400: "#818cf8",
-  500: "#6366f1",
-  600: "#4f46e5",
-  700: "#4338ca",
-  800: "#3730a3",
-  900: "#312e81",
-});
-
-export const [violet, violetDark] = createMediumPalette({
-  50: "#f5f3ff",
-  100: "#ede9fe",
-  200: "#ddd6fe",
-  300: "#c4b5fd",
-  400: "#a78bfa",
-  500: "#8b5cf6",
-  600: "#7c3aed",
-  700: "#6d28d9",
-  800: "#5b21b6",
-  900: "#4c1d95",
-});
-
-export const [purple, purpleDark] = createMediumPalette({
-  50: "#faf5ff",
-  100: "#f3e8ff",
-  200: "#e9d5ff",
-  300: "#d8b4fe",
-  400: "#c084fc",
-  500: "#a855f7",
-  600: "#9333ea",
-  700: "#7e22ce",
-  800: "#6b21a8",
-  900: "#581c87",
-});
-
-export const [fuchsia, fuchsiaDark] = createMediumPalette({
-  50: "#fdf4ff",
-  100: "#fae8ff",
-  200: "#f5d0fe",
-  300: "#f0abfc",
-  400: "#e879f9",
-  500: "#d946ef",
-  600: "#c026d3",
-  700: "#a21caf",
-  800: "#86198f",
-  900: "#701a75",
-});
-
-export const [pink, pinkDark] = createMediumPalette({
-  50: "#fdf2f8",
-  100: "#fce7f3",
-  200: "#fbcfe8",
-  300: "#f9a8d4",
-  400: "#f472b6",
-  500: "#ec4899",
-  600: "#db2777",
-  700: "#be185d",
-  800: "#9d174d",
-  900: "#831843",
-});
-
-export const [rose, roseDark] = createMediumPalette({
-  50: "#fff1f2",
-  100: "#ffe4e6",
-  200: "#fecdd3",
-  300: "#fda4af",
-  400: "#fb7185",
-  500: "#f43f5e",
-  600: "#e11d48",
-  700: "#be123c",
-  800: "#9f1239",
-  900: "#881337",
-});
-
-export const [red, redDark] = createMediumPalette({
+// Other colors
+export const [red, redDark] = createPalette({
   50: "#fef2f2",
   100: "#fee2e2",
   200: "#fecaca",
@@ -184,8 +88,7 @@ export const [red, redDark] = createMediumPalette({
   900: "#7f1d1d",
 });
 
-// Bright colors
-export const [orange, orangeDark] = createBrightPalette({
+export const [orange, orangeDark] = createPalette({
   50: "#fff7ed",
   100: "#ffedd5",
   200: "#fed7aa",
@@ -198,60 +101,7 @@ export const [orange, orangeDark] = createBrightPalette({
   900: "#7c2d12",
 });
 
-export const [emerald, emeraldDark] = createBrightPalette({
-  50: "#ecfdf5",
-  100: "#d1fae5",
-  200: "#a7f3d0",
-  300: "#6ee7b7",
-  400: "#34d399",
-  500: "#10b981",
-  600: "#059669",
-  700: "#047857",
-  800: "#065f46",
-  900: "#064e3b",
-});
-
-export const [teal, tealDark] = createBrightPalette({
-  50: "#f0fdfa",
-  100: "#ccfbf1",
-  200: "#99f6e4",
-  300: "#5eead4",
-  400: "#2dd4bf",
-  500: "#14b8a6",
-  600: "#0d9488",
-  700: "#0f766e",
-  800: "#115e59",
-  900: "#134e4a",
-});
-
-export const [cyan, cyanDark] = createBrightPalette({
-  50: "#ecfeff",
-  100: "#cffafe",
-  200: "#a5f3fc",
-  300: "#67e8f9",
-  400: "#22d3ee",
-  500: "#06b6d4",
-  600: "#0891b2",
-  700: "#0e7490",
-  800: "#155e75",
-  900: "#164e63",
-});
-
-export const [sky, skyDark] = createBrightPalette({
-  50: "#f0f9ff",
-  100: "#e0f2fe",
-  200: "#bae6fd",
-  300: "#7dd3fc",
-  400: "#38bdf8",
-  500: "#0ea5e9",
-  600: "#0284c7",
-  700: "#0369a1",
-  800: "#075985",
-  900: "#0c4a6e",
-});
-
-// Very bright colors
-export const [amber, amberDark] = createVeryBrightPalette({
+export const [amber, amberDark] = createPalette({
   50: "#fffbeb",
   100: "#fef3c7",
   200: "#fde68a",
@@ -264,7 +114,7 @@ export const [amber, amberDark] = createVeryBrightPalette({
   900: "#78350f",
 });
 
-export const [yellow, yellowDark] = createVeryBrightPalette({
+export const [yellow, yellowDark] = createPalette({
   50: "#fefce8",
   100: "#fef9c3",
   200: "#fef08a",
@@ -277,7 +127,7 @@ export const [yellow, yellowDark] = createVeryBrightPalette({
   900: "#713f12",
 });
 
-export const [lime, limeDark] = createVeryBrightPalette({
+export const [lime, limeDark] = createPalette({
   50: "#f7fee7",
   100: "#ecfccb",
   200: "#d9f99d",
@@ -290,7 +140,7 @@ export const [lime, limeDark] = createVeryBrightPalette({
   900: "#365314",
 });
 
-export const [green, greenDark] = createVeryBrightPalette({
+export const [green, greenDark] = createPalette({
   50: "#f0fdf4",
   100: "#dcfce7",
   200: "#bbf7d0",
@@ -301,4 +151,147 @@ export const [green, greenDark] = createVeryBrightPalette({
   700: "#15803d",
   800: "#166534",
   900: "#14532d",
+});
+
+export const [emerald, emeraldDark] = createPalette({
+  50: "#ecfdf5",
+  100: "#d1fae5",
+  200: "#a7f3d0",
+  300: "#6ee7b7",
+  400: "#34d399",
+  500: "#10b981",
+  600: "#059669",
+  700: "#047857",
+  800: "#065f46",
+  900: "#064e3b",
+});
+
+export const [teal, tealDark] = createPalette({
+  50: "#f0fdfa",
+  100: "#ccfbf1",
+  200: "#99f6e4",
+  300: "#5eead4",
+  400: "#2dd4bf",
+  500: "#14b8a6",
+  600: "#0d9488",
+  700: "#0f766e",
+  800: "#115e59",
+  900: "#134e4a",
+});
+
+export const [cyan, cyanDark] = createPalette({
+  50: "#ecfeff",
+  100: "#cffafe",
+  200: "#a5f3fc",
+  300: "#67e8f9",
+  400: "#22d3ee",
+  500: "#06b6d4",
+  600: "#0891b2",
+  700: "#0e7490",
+  800: "#155e75",
+  900: "#164e63",
+});
+
+export const [sky, skyDark] = createPalette({
+  50: "#f0f9ff",
+  100: "#e0f2fe",
+  200: "#bae6fd",
+  300: "#7dd3fc",
+  400: "#38bdf8",
+  500: "#0ea5e9",
+  600: "#0284c7",
+  700: "#0369a1",
+  800: "#075985",
+  900: "#0c4a6e",
+});
+
+export const [blue, blueDark] = createPalette({
+  50: "#eff6ff",
+  100: "#dbeafe",
+  200: "#bfdbfe",
+  300: "#93c5fd",
+  400: "#60a5fa",
+  500: "#3b82f6",
+  600: "#2563eb",
+  700: "#1d4ed8",
+  800: "#1e40af",
+  900: "#1e3a8a",
+});
+
+export const [indigo, indigoDark] = createPalette({
+  50: "#eef2ff",
+  100: "#e0e7ff",
+  200: "#c7d2fe",
+  300: "#a5b4fc",
+  400: "#818cf8",
+  500: "#6366f1",
+  600: "#4f46e5",
+  700: "#4338ca",
+  800: "#3730a3",
+  900: "#312e81",
+});
+
+export const [violet, violetDark] = createPalette({
+  50: "#f5f3ff",
+  100: "#ede9fe",
+  200: "#ddd6fe",
+  300: "#c4b5fd",
+  400: "#a78bfa",
+  500: "#8b5cf6",
+  600: "#7c3aed",
+  700: "#6d28d9",
+  800: "#5b21b6",
+  900: "#4c1d95",
+});
+
+export const [purple, purpleDark] = createPalette({
+  50: "#faf5ff",
+  100: "#f3e8ff",
+  200: "#e9d5ff",
+  300: "#d8b4fe",
+  400: "#c084fc",
+  500: "#a855f7",
+  600: "#9333ea",
+  700: "#7e22ce",
+  800: "#6b21a8",
+  900: "#581c87",
+});
+
+export const [fuchsia, fuchsiaDark] = createPalette({
+  50: "#fdf4ff",
+  100: "#fae8ff",
+  200: "#f5d0fe",
+  300: "#f0abfc",
+  400: "#e879f9",
+  500: "#d946ef",
+  600: "#c026d3",
+  700: "#a21caf",
+  800: "#86198f",
+  900: "#701a75",
+});
+
+export const [pink, pinkDark] = createPalette({
+  50: "#fdf2f8",
+  100: "#fce7f3",
+  200: "#fbcfe8",
+  300: "#f9a8d4",
+  400: "#f472b6",
+  500: "#ec4899",
+  600: "#db2777",
+  700: "#be185d",
+  800: "#9d174d",
+  900: "#831843",
+});
+
+export const [rose, roseDark] = createPalette({
+  50: "#fff1f2",
+  100: "#ffe4e6",
+  200: "#fecdd3",
+  300: "#fda4af",
+  400: "#fb7185",
+  500: "#f43f5e",
+  600: "#e11d48",
+  700: "#be123c",
+  800: "#9f1239",
+  900: "#881337",
 });

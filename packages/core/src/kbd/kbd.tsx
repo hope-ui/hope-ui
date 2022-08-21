@@ -15,19 +15,20 @@ const useStyleConfig = createStyleConfig<"root", {}>({
     base: {
       borderRadius: "md",
       borderStyle: "solid",
-      borderColor: "neutral.300",
       borderWidth: "1px",
       borderBottomWidth: "3px",
 
-      backgroundColor: "neutral.100",
-
       px: "0.4em",
 
+      color: "text.primary",
       fontFamily: "mono",
       fontSize: "0.8em",
       fontWeight: "bold",
       lineHeight: "normal",
       whiteSpace: "nowrap",
+
+      borderColor: "neutral.300",
+      backgroundColor: "neutral.100",
 
       _dark: {
         borderColor: "neutral.600",

@@ -1,31 +1,29 @@
 /*!
- * Colors from TailwindCSS
- * MIT Licensed, Copyright (c) Tailwind Labs, Inc.
+ * whiteAlpha and blackAlpha colors from Chakra UI
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
  *
- * Credits to the Tailwind Labs team:
- * https://github.com/tailwindlabs/tailwindcss/blob/master/src/public/colors.js
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/main/packages/theme/src/foundations/colors.ts
  */
 
-import { ThemeColors } from "../types";
+import { PaletteScale, ThemeColors } from "../types";
 import { createGetCssVar } from "../utils";
-import { createDarkPalette, createMediumPalette, createVeryBrightPalette } from "./create-palette";
+import { createGrayPalette, createPalette } from "./create-palette";
 
-// Tailwind blue
-const [primary, primaryDark] = createMediumPalette({
-  50: "#eff6ff",
-  100: "#dbeafe",
-  200: "#bfdbfe",
-  300: "#93c5fd",
-  400: "#60a5fa",
-  500: "#3b82f6",
-  600: "#2563eb",
-  700: "#1d4ed8",
-  800: "#1e40af",
-  900: "#1e3a8a",
+const [primary, primaryDark] = createPalette({
+  50: "#e6f6ff",
+  100: "#bae3ff",
+  200: "#7cc4fa",
+  300: "#47a3f3",
+  400: "#2186eb",
+  500: "#0967d2",
+  600: "#0552b5",
+  700: "#03449e",
+  800: "#01337d",
+  900: "#002159",
 });
 
-// Tailwind neutral
-const [neutral, neutralDark] = createDarkPalette({
+const [neutral, neutralDark] = createGrayPalette({
   50: "#fafafa",
   100: "#f5f5f5",
   200: "#e5e5e5",
@@ -38,67 +36,94 @@ const [neutral, neutralDark] = createDarkPalette({
   900: "#171717",
 });
 
-// Tailwind green
-const [success, successDark] = createVeryBrightPalette({
-  50: "#f0fdf4",
-  100: "#dcfce7",
-  200: "#bbf7d0",
-  300: "#86efac",
-  400: "#4ade80",
-  500: "#22c55e",
-  600: "#16a34a",
-  700: "#15803d",
-  800: "#166534",
-  900: "#14532d",
+const [success, successDark] = createPalette({
+  50: "#e3f9e5",
+  100: "#c1eac5",
+  200: "#a3d9a5",
+  300: "#7bc47f",
+  400: "#57ae5b",
+  500: "#3f9142",
+  600: "#2f8132",
+  700: "#207227",
+  800: "#0e5814",
+  900: "#05400a",
 });
 
-// Tailwind purple
-const [info, infoDark] = createMediumPalette({
-  50: "#faf5ff",
-  100: "#f3e8ff",
-  200: "#e9d5ff",
-  300: "#d8b4fe",
-  400: "#c084fc",
-  500: "#a855f7",
-  600: "#9333ea",
-  700: "#7e22ce",
-  800: "#6b21a8",
-  900: "#581c87",
+const [info, infoDark] = createPalette({
+  50: "#eae2f8",
+  100: "#cfbcf2",
+  200: "#a081d9",
+  300: "#8662c7",
+  400: "#724bb7",
+  500: "#653cad",
+  600: "#51279b",
+  700: "#421987",
+  800: "#34126f",
+  900: "#240754",
 });
 
-// Tailwind yellow
-const [warning, warningDark] = createVeryBrightPalette({
-  50: "#fefce8",
-  100: "#fef9c3",
-  200: "#fef08a",
-  300: "#fde047",
-  400: "#facc15",
-  500: "#eab308",
-  600: "#ca8a04",
-  700: "#a16207",
-  800: "#854d0e",
-  900: "#713f12",
+const [warning, warningDark] = createPalette({
+  50: "#fffbea",
+  100: "#fff3c4",
+  200: "#fce588",
+  300: "#fadb5f",
+  400: "#f7c948",
+  500: "#f0b429",
+  600: "#de911d",
+  700: "#cb6e17",
+  800: "#b44d12",
+  900: "#8d2b0b",
 });
 
-// Tailwind red
-const [danger, dangerDark] = createMediumPalette({
-  50: "#fef2f2",
-  100: "#fee2e2",
-  200: "#fecaca",
-  300: "#fca5a5",
-  400: "#f87171",
-  500: "#ef4444",
-  600: "#dc2626",
-  700: "#b91c1c",
-  800: "#991b1b",
-  900: "#7f1d1d",
+const [danger, dangerDark] = createPalette({
+  50: "#ffe3e3",
+  100: "#ffbdbd",
+  200: "#ff9b9b",
+  300: "#f86a6a",
+  400: "#ef4e4e",
+  500: "#e12d39",
+  600: "#cf1124",
+  700: "#ab091e",
+  800: "#8a041a",
+  900: "#610316",
 });
+
+const whiteAlpha: PaletteScale = {
+  50: "rgba(255, 255, 255, 0.04)",
+  100: "rgba(255, 255, 255, 0.06)",
+  200: "rgba(255, 255, 255, 0.08)",
+  300: "rgba(255, 255, 255, 0.16)",
+  400: "rgba(255, 255, 255, 0.24)",
+  500: "rgba(255, 255, 255, 0.36)",
+  600: "rgba(255, 255, 255, 0.48)",
+  700: "rgba(255, 255, 255, 0.64)",
+  800: "rgba(255, 255, 255, 0.80)",
+  900: "rgba(255, 255, 255, 0.92)",
+};
+
+const blackAlpha: PaletteScale = {
+  50: "rgba(0, 0, 0, 0.04)",
+  100: "rgba(0, 0, 0, 0.06)",
+  200: "rgba(0, 0, 0, 0.08)",
+  300: "rgba(0, 0, 0, 0.16)",
+  400: "rgba(0, 0, 0, 0.24)",
+  500: "rgba(0, 0, 0, 0.36)",
+  600: "rgba(0, 0, 0, 0.48)",
+  700: "rgba(0, 0, 0, 0.64)",
+  800: "rgba(0, 0, 0, 0.80)",
+  900: "rgba(0, 0, 0, 0.92)",
+};
+
+const white = "#ffffff";
+const black = "#0a0a0a"; // very dark neutral gray, do not use pure black.
 
 export function createDefaultColors(cssVarPrefix: string): ThemeColors {
   const getCssVar = createGetCssVar(cssVarPrefix);
 
   return {
     light: {
+      whiteAlpha,
+      blackAlpha,
       primary: primary("primary", cssVarPrefix),
       neutral: neutral("neutral", cssVarPrefix),
       success: success("success", cssVarPrefix),
@@ -106,8 +131,8 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
       warning: warning("warning", cssVarPrefix),
       danger: danger("danger", cssVarPrefix),
       common: {
-        white: "#ffffff",
-        black: "#000000",
+        white,
+        black,
         divider: getCssVar("colors-neutral-200"),
         focusRing: getCssVar("colors-primary-500"),
       },
@@ -126,6 +151,8 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
       },
     },
     dark: {
+      whiteAlpha,
+      blackAlpha,
       primary: primaryDark("primary", cssVarPrefix),
       neutral: neutralDark("neutral", cssVarPrefix),
       success: successDark("success", cssVarPrefix),
@@ -133,8 +160,8 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
       warning: warningDark("warning", cssVarPrefix),
       danger: dangerDark("danger", cssVarPrefix),
       common: {
-        white: "#ffffff",
-        black: "#0a0a0a", // very dark neutral gray, do not use pure black.
+        white,
+        black,
         divider: getCssVar("colors-neutral-800"),
         focusRing: getCssVar("colors-primary-500"),
       },
