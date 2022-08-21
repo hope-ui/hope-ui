@@ -41,26 +41,7 @@ export interface PaletteRange extends PaletteScale {
   mainChannel: string;
   lightChannel: string;
   darkChannel: string;
-
-  // override palette.text
-  overrideTextPrimary: string;
-  overrideTextSecondary: string;
-  overrideTextTertiary: string;
 }
-
-/**
- * Generate a color palette to use in Hope UI Theme.
- *
- * @param color The semantic color it will be used for in the theme (e.g. primary, info, etc...)
- * @param cssVarPrefix The prefix to use when accessing css variables, should be the same as defined in the theme.
- */
-export type PaletteRangeGenerator = (
-  color: ThemeColorScheme,
-  cssVarPrefix?: string
-) => PaletteRange;
-
-/** [light, dark]. */
-export type PaletteGeneratorTuple = [PaletteRangeGenerator, PaletteRangeGenerator];
 
 export interface PaletteCommon {
   white: string;

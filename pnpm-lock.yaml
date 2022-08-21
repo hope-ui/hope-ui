@@ -182,12 +182,6 @@ importers:
       '@storybook/theming': 6.4.20_zkbncb2mrwigeq3keybbaytzya
       storybook-dark-mode: 1.1.0_3omdoyodqrhwrh3p6zau65yfv4
 
-  packages/palettes:
-    specifiers:
-      '@hope-ui/styles': 0.0.0
-    dependencies:
-      '@hope-ui/styles': link:../styles
-
   packages/styles:
     specifiers:
       '@hope-ui/utils': 0.0.0

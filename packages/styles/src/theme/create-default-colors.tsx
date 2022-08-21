@@ -1,5 +1,11 @@
 /*!
- * whiteAlpha and blackAlpha colors from Chakra UI
+ * Colors from TailwindCSS
+ * MIT Licensed, Copyright (c) Tailwind Labs, Inc.
+ *
+ * Credits to the Tailwind Labs team:
+ * https://github.com/tailwindlabs/tailwindcss/blob/master/src/public/colors.js
+ *
+ * Colors from Chakra UI
  * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
  *
  * Credits to the Chakra UI team:
@@ -8,9 +14,9 @@
 
 import { PaletteScale, ThemeColors } from "../types";
 import { createGetCssVar } from "../utils";
-import { createGrayPalette, createPalette } from "./create-palette";
+import { createPalette } from "./create-palette";
 
-const [primary, primaryDark] = createPalette({
+const primary = createPalette({
   50: "#e6f6ff",
   100: "#bae3ff",
   200: "#7cc4fa",
@@ -23,7 +29,7 @@ const [primary, primaryDark] = createPalette({
   900: "#002159",
 });
 
-const [neutral, neutralDark] = createGrayPalette({
+const neutral = createPalette({
   50: "#fafafa",
   100: "#f5f5f5",
   200: "#e5e5e5",
@@ -36,7 +42,7 @@ const [neutral, neutralDark] = createGrayPalette({
   900: "#171717",
 });
 
-const [success, successDark] = createPalette({
+const success = createPalette({
   50: "#e3f9e5",
   100: "#c1eac5",
   200: "#a3d9a5",
@@ -49,7 +55,7 @@ const [success, successDark] = createPalette({
   900: "#05400a",
 });
 
-const [info, infoDark] = createPalette({
+const info = createPalette({
   50: "#eae2f8",
   100: "#cfbcf2",
   200: "#a081d9",
@@ -62,7 +68,7 @@ const [info, infoDark] = createPalette({
   900: "#240754",
 });
 
-const [warning, warningDark] = createPalette({
+const warning = createPalette({
   50: "#fffbea",
   100: "#fff3c4",
   200: "#fce588",
@@ -75,7 +81,7 @@ const [warning, warningDark] = createPalette({
   900: "#8d2b0b",
 });
 
-const [danger, dangerDark] = createPalette({
+const danger = createPalette({
   50: "#ffe3e3",
   100: "#ffbdbd",
   200: "#ff9b9b",
@@ -124,12 +130,12 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
     light: {
       whiteAlpha,
       blackAlpha,
-      primary: primary("primary", cssVarPrefix),
-      neutral: neutral("neutral", cssVarPrefix),
-      success: success("success", cssVarPrefix),
-      info: info("info", cssVarPrefix),
-      warning: warning("warning", cssVarPrefix),
-      danger: danger("danger", cssVarPrefix),
+      primary,
+      neutral,
+      success,
+      info,
+      warning,
+      danger,
       common: {
         white,
         black,
@@ -153,17 +159,17 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
     dark: {
       whiteAlpha,
       blackAlpha,
-      primary: primaryDark("primary", cssVarPrefix),
-      neutral: neutralDark("neutral", cssVarPrefix),
-      success: successDark("success", cssVarPrefix),
-      info: infoDark("info", cssVarPrefix),
-      warning: warningDark("warning", cssVarPrefix),
-      danger: dangerDark("danger", cssVarPrefix),
+      primary,
+      neutral,
+      success,
+      info,
+      warning,
+      danger,
       common: {
         white,
         black,
         divider: getCssVar("colors-neutral-800"),
-        focusRing: getCssVar("colors-primary-500"),
+        focusRing: getCssVar("colors-primary-600"),
       },
       text: {
         primary: getCssVar("colors-neutral-100"),
@@ -171,7 +177,7 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
         tertiary: getCssVar("colors-neutral-400"),
       },
       background: {
-        body: getCssVar("colors-neutral-900"),
+        body: getCssVar("colors-common-black"),
         surface: getCssVar("colors-neutral-900"),
         level1: getCssVar("colors-neutral-800"),
         level2: getCssVar("colors-neutral-700"),
