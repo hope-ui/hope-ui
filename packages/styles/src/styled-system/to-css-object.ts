@@ -63,8 +63,7 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
           computedStyles = Object.assign(
             {},
             computedStyles,
-            toCSSObject({ [key]: val }, theme)
-            //toCSSObject({ ...systemStyleObject, [key]: val }, theme)
+            toCSSObject({ ...systemStyleObject, [key]: val }, theme)
           );
         }
       }

@@ -18,3 +18,4 @@ export * from "./icon";
 export * from "./kbd";
 export * from "./spacer";
 export * from "./stack";
+export * from "./text";
