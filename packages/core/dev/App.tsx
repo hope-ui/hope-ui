@@ -1,14 +1,14 @@
-import { Button, hope, HStack, useColorMode, VStack } from "../src";
+import { Button, hope, useColorMode } from "../src";
 
 export default function App() {
   const { toggleColorMode } = useColorMode();
 
   return (
-    <>
-      <Button variant="soft" onClick={toggleColorMode} mb={4}>
+    <hope.div p={4}>
+      <Button onClick={toggleColorMode} mb={4}>
         Toggle color mode
       </Button>
-    </>
+    </hope.div>
   );
 }
 

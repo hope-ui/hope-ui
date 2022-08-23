@@ -23,7 +23,7 @@ interface ButtonVariants {
   colorScheme: ThemeColorScheme;
 
   /** The visual style of the button. */
-  variant: "solid" | "soft" | "outlined" | "plain";
+  variant: "solid" | "soft" | "outlined" | "plain" | "default";
 
   /** The size of the button. */
   size: "xs" | "sm" | "md" | "lg";
@@ -315,13 +315,13 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
         outline: "none",
 
         border: "1px solid transparent",
-        borderRadius: "sm",
+        borderRadius: "md",
 
         padding: 0,
 
         fontFamily: "inherit",
         fontSize: "100%",
-        fontWeight: "medium",
+        fontWeight: "normal",
         lineHeight: "none",
         textDecoration: "none",
 
@@ -329,7 +329,7 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
         whiteSpace: "nowrap",
         verticalAlign: "middle",
 
-        transitionProperty: "color, border-color, background-color, box-shadow",
+        transitionProperty: "color, background-color, border-color",
         transitionDuration: "250ms",
 
         _disabled: {
@@ -343,6 +343,55 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
         ...focusStyles(vars),
       },
       variants: {
+        variant: {
+          default: {
+            color: vars.colors.neutral["800"],
+            backgroundColor: vars.colors.common.white,
+            borderColor: vars.colors.neutral["300"],
+
+            _hover: {
+              color: vars.colors.neutral["800"],
+              backgroundColor: vars.colors.neutral["50"],
+              borderColor: vars.colors.neutral["400"],
+            },
+
+            _active: {
+              color: vars.colors.neutral["800"],
+              backgroundColor: vars.colors.neutral["100"],
+              borderColor: vars.colors.neutral["400"],
+            },
+
+            _disabled: {
+              color: vars.colors.neutral["200"],
+              backgroundColor: "transparent",
+              borderColor: vars.colors.neutral["100"],
+            },
+
+            _dark: {
+              color: vars.colors.whiteAlpha["900"],
+              backgroundColor: vars.colors.whiteAlpha["50"],
+              borderColor: vars.colors.whiteAlpha["200"],
+
+              _hover: {
+                color: vars.colors.whiteAlpha["900"],
+                backgroundColor: vars.colors.whiteAlpha["100"],
+                borderColor: vars.colors.whiteAlpha["300"],
+              },
+
+              _active: {
+                color: vars.colors.whiteAlpha["900"],
+                backgroundColor: vars.colors.whiteAlpha["200"],
+                borderColor: vars.colors.whiteAlpha["300"],
+              },
+
+              _disabled: {
+                color: vars.colors.whiteAlpha["200"],
+                backgroundColor: "transparent",
+                borderColor: vars.colors.whiteAlpha["50"],
+              },
+            },
+          },
+        },
         size: {
           xs: {
             height: 7,
@@ -410,8 +459,7 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
     },
   }),
   {
-    colorScheme: "neutral",
-    variant: "outlined",
+    variant: "default",
     size: "md",
     isFullWidth: false,
   }
