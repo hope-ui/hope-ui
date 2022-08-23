@@ -92,7 +92,7 @@ function styled<T extends ElementType, Props = {}>(
       );
 
       if (isEmptyObject(styles)) {
-        return undefined;
+        return systemCssComponent().className;
       }
 
       const overrideCss = toCSSObject(styles, theme);

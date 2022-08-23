@@ -1,24 +1,9 @@
-import { Box, Button, hope, Text, useColorMode } from "../src";
+import { useColorMode } from "../src";
 
 export default function App() {
   const { toggleColorMode } = useColorMode();
 
-  return (
-    <>
-      <Box bg={["tomato", "salmon", "crimson"]} w="100%" p={4} color="white">
-        This is the Box
-      </Box>
-      <Text lineClamp={[1, null, 3, 4]}>
-        "The quick brown fox jumps over the lazy dog" is an English-language pangram—a sentence that
-        contains all of the letters of the English alphabet. Owing to its existence, Chakra was
-        created. "The quick brown fox jumps over the lazy dog" is an English-language pangram—a
-        sentence that contains all of the letters of the English alphabet. Owing to its existence,
-        Chakra was created. "The quick brown fox jumps over the lazy dog" is an English-language
-        pangram—a sentence that contains all of the letters of the English alphabet. Owing to its
-        existence, Chakra was created.
-      </Text>
-    </>
-  );
+  return <></>;
 }
 
 /*

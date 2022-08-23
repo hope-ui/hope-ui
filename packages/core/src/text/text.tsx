@@ -1,13 +1,8 @@
-import {
-  createHopeComponent,
-  hope,
-  mapResponsive,
-  mergeThemeProps,
-  ResponsiveValue,
-  SystemStyleObject,
-} from "@hope-ui/styles";
+import { createHopeComponent, hope, mergeThemeProps, ResponsiveValue } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
+
+import { lineClamp } from "../utils";
 import { TextStyleConfigProps, useStyleConfig } from "./text.styles";
 
 export interface TextProps extends TextStyleConfigProps {
@@ -32,24 +27,10 @@ export const Text = createHopeComponent<"p", TextProps>(props => {
 
   const rootStyleOverrides = createMemo(() => ({
     ...styleOverrides().root,
-    ...getLineClamp(local.lineClamp),
+    ...lineClamp(local.lineClamp),
   }));
 
   return (
     <hope.p class={clsx(classes().root, local.class)} __css={rootStyleOverrides()} {...others} />
   );
 });
-
-function getLineClamp(lineClamp: ResponsiveValue<number> | undefined): SystemStyleObject {
-  if (lineClamp == null) {
-    return {};
-  }
-
-  return {
-    overflow: mapResponsive(lineClamp, value => (value != null ? "hidden" : undefined)),
-    textOverflow: mapResponsive(lineClamp, value => (value != null ? "ellipsis" : undefined)),
-    display: mapResponsive(lineClamp, value => (value != null ? "-webkit-box" : undefined)),
-    WebkitLineClamp: mapResponsive(lineClamp, value => (value != null ? value : undefined)),
-    WebkitBoxOrient: mapResponsive(lineClamp, value => (value != null ? "vertical" : undefined)),
-  };
-}

@@ -14,6 +14,7 @@ export * from "./center";
 export * from "./container";
 export * from "./flex";
 export * from "./grid";
+export * from "./heading";
 export * from "./icon";
 export * from "./kbd";
 export * from "./spacer";
