@@ -1,19 +1,9 @@
-import { mergeWith } from "lodash-es";
+import { dset } from "dset/merge";
 
 import { Theme, ThemeOverride } from "../types";
 import { attachMetaData } from "./attach-meta-data";
 import { createDefaultColors } from "./create-default-colors";
 import { DEFAULT_THEME } from "./default-theme";
-
-function mergeTheme(currentTheme: Theme, themeOverride?: ThemeOverride): Theme {
-  if (!themeOverride) {
-    return currentTheme;
-  }
-
-  const mergedTheme = mergeWith({}, currentTheme, themeOverride);
-
-  return attachMetaData(mergedTheme);
-}
 
 export function extendTheme(themeOverride: ThemeOverride): Theme {
   let finalDefaultTheme = DEFAULT_THEME;
@@ -27,5 +17,15 @@ export function extendTheme(themeOverride: ThemeOverride): Theme {
     };
   }
 
-  return mergeTheme(finalDefaultTheme, themeOverride);
+  if (!themeOverride) {
+    return finalDefaultTheme;
+  }
+
+  const mergedTheme = {
+    value: finalDefaultTheme,
+  };
+
+  dset(mergedTheme, "value", themeOverride);
+
+  return attachMetaData(mergedTheme.value);
 }

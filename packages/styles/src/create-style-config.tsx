@@ -6,9 +6,9 @@
  * https://github.com/seek-oss/vanilla-extract/blob/master/packages/recipes/src/createRuntimeFn.ts
  */
 
-import { filterUndefined, runIfFn } from "@hope-ui/utils";
+import { filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { mergeWith } from "lodash-es";
+import { dset } from "dset/merge";
 import { createMemo, splitProps } from "solid-js";
 
 import { css } from "./stitches.config";
@@ -211,7 +211,7 @@ export function createStyleConfig<
         const compoundVariants = configOverrides[part]?.compoundVariants ?? [];
 
         // 1. add "base" styles.
-        const styles = [base];
+        acc[part] = base;
 
         // 2. add "variants" styles.
         for (const name in selectedVariants()) {
@@ -221,17 +221,21 @@ export function createStyleConfig<
             continue;
           }
 
-          styles.push(variants[name]?.[String(value)]);
+          const style = variants[name]?.[String(value)] ?? {};
+
+          if (isEmptyObject(style)) {
+            continue;
+          }
+
+          dset(acc, part, style);
         }
 
         // 3. add "compound variants" styles.
         for (const compoundVariant of compoundVariants) {
           if (shouldApplyCompound(compoundVariant.variants, selectedVariants())) {
-            styles.push(compoundVariant.style);
+            dset(acc, part, compoundVariant.style);
           }
         }
-
-        acc[part] = mergeWith({}, ...styles);
 
         return acc;
       }, {} as Styles<Parts>);
