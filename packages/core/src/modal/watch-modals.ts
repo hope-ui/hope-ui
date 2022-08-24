@@ -18,37 +18,27 @@ type Revert = () => void;
 
 const currentDocument = typeof document !== "undefined" ? document : undefined;
 
+const ROOT_ELEMENTS_SELECTOR = "body > :not(script, style)";
 const ARIA_MODAL_SELECTOR = '[aria-modal="true"], [data-ismodal="true"]';
 
-function hideOthers(document: Document, modalNode: HTMLElement) {
-  // Apply `aria-hidden` on each sibling node of the highest ancestor node of modal (e.g. the portal).
-  const rootNodes = Array.from<HTMLElement>(
-    document.querySelectorAll("body > :not(script, style)")
-  ).map(node => {
-    if (node.contains(modalNode)) {
-      return undefined;
-    }
+function hideOthers(document: Document, modal: HTMLElement) {
+  // Apply `aria-hidden` on each sibling element of the highest ancestor element of modal (e.g. the portal).
+  const elements = Array.from<HTMLElement>(document.querySelectorAll(ROOT_ELEMENTS_SELECTOR))
+    .filter(element => !element.contains(modal))
+    .map(element => {
+      const previousAriaHidden = element.getAttribute("aria-hidden") || "";
+      element.setAttribute("aria-hidden", "true");
 
-    const ariaHidden = node.getAttribute("aria-hidden");
-
-    if (ariaHidden == null || ariaHidden === "false") {
-      node.setAttribute("aria-hidden", "true");
-    }
-
-    return { node, ariaHidden };
-  });
+      return { element, previousAriaHidden };
+    });
 
   return () => {
-    // Restore previous `aria-hidden` value of each node.
-    rootNodes.forEach(item => {
-      if (!item) {
-        return;
-      }
-
-      if (item.ariaHidden == null) {
-        item.node.removeAttribute("aria-hidden");
+    // Restore previous `aria-hidden` value of each element.
+    elements.forEach(({ element, previousAriaHidden }) => {
+      if (previousAriaHidden) {
+        element.setAttribute("aria-hidden", previousAriaHidden);
       } else {
-        item.node.setAttribute("aria-hidden", item.ariaHidden);
+        element.removeAttribute("aria-hidden");
       }
     });
   };

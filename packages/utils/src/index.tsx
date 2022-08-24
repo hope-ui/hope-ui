@@ -9,4 +9,5 @@ export * from "./object";
 export * from "./platform";
 export * from "./refs";
 export * from "./string";
+export * from "./tabbable";
 export * from "./types";
