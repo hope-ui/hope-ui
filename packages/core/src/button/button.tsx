@@ -6,7 +6,7 @@ import {
   StyleConfigProvider,
   useStyleConfigContext,
 } from "@hope-ui/styles";
-import { mergeRefs } from "@solid-primitives/refs";
+import { mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 

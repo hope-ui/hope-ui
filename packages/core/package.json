@@ -52,8 +52,7 @@
     "@floating-ui/dom": "1.0.1",
     "@hope-ui/primitives": "0.0.0",
     "@hope-ui/styles": "0.0.0",
-    "@hope-ui/utils": "0.0.0",
-    "@solid-primitives/refs": "0.3.0"
+    "@hope-ui/utils": "0.0.0"
   },
   "devDependencies": {
     "@hope-ui/tests": "workspace:*",

@@ -8,6 +8,8 @@
 
 import { isFunction } from "./assertion";
 
+export { chain } from "@solid-primitives/utils";
+
 export function noop() {
   return;
 }

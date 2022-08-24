@@ -47,9 +47,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/tests": "0.0.0",
-    "@hope-ui/utils": "0.0.0",
-    "@solid-primitives/utils": "3.0.1"
+    "@hope-ui/utils": "0.0.0"
+  },
+  "devDependencies": {
+    "@hope-ui/tests": "workspace:*"
   },
   "peerDependencies": {
     "solid-js": "^1.4.7"

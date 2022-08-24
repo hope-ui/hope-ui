@@ -6,7 +6,7 @@
  * https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/interactions/src/useInteractOutside.ts
  */
 
-import { access, MaybeAccessor } from "@solid-primitives/utils";
+import { access, MaybeAccessor } from "@hope-ui/utils";
 import { Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 
 export interface CreateInteractOutsideProps {
@@ -63,19 +63,21 @@ export function createInteractOutside(
 
 /**
  * Returns whether the event is a valid interact outside event
- * (e.g. the event target is outside the `ref` element).
+ * (e.g. the event target is outside the element).
  */
-function isInteractOutsideEvent(event: any, ref: Element | undefined) {
+function isInteractOutsideEvent(event: any, element: Element | undefined) {
   if (event.button > 0) {
     return false;
   }
 
-  const ownerDocument = event.target.ownerDocument;
-
   // if the event target is no longer in the document
-  if (!ownerDocument || !ownerDocument.documentElement.contains(event.target)) {
-    return false;
+  if (event.target) {
+    const ownerDocument = event.target.ownerDocument;
+
+    if (!ownerDocument || !ownerDocument.documentElement.contains(event.target)) {
+      return false;
+    }
   }
 
-  return ref && !ref.contains(event.target);
+  return !element?.contains(event.target);
 }

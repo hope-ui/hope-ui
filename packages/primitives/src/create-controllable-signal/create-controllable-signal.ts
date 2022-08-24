@@ -1,4 +1,4 @@
-import { access, accessWith, MaybeAccessor } from "@solid-primitives/utils";
+import { access, accessWith, MaybeAccessor } from "@hope-ui/utils";
 import { Accessor, createMemo, createSignal, untrack } from "solid-js";
 
 export interface CreateControllableSignalProps<T> {

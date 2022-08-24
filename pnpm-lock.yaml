@@ -150,7 +150,6 @@ importers:
       '@hope-ui/styles': 0.0.0
       '@hope-ui/tests': workspace:*
       '@hope-ui/utils': 0.0.0
-      '@solid-primitives/refs': 0.3.0
       '@storybook/addon-a11y': 6.4.20
       '@storybook/addon-actions': 6.4.20
       '@storybook/addon-essentials': 6.4.20
@@ -169,7 +168,6 @@ importers:
       '@hope-ui/primitives': link:../primitives
       '@hope-ui/styles': link:../styles
       '@hope-ui/utils': link:../utils
-      '@solid-primitives/refs': 0.3.0_solid-js@1.4.8
     devDependencies:
       '@hope-ui/tests': link:../tests
       '@storybook/addon-a11y': 6.4.20_zkbncb2mrwigeq3keybbaytzya
@@ -188,13 +186,12 @@ importers:
 
   packages/primitives:
     specifiers:
-      '@hope-ui/tests': 0.0.0
+      '@hope-ui/tests': workspace:*
       '@hope-ui/utils': 0.0.0
-      '@solid-primitives/utils': 3.0.1
     dependencies:
-      '@hope-ui/tests': link:../tests
       '@hope-ui/utils': link:../utils
-      '@solid-primitives/utils': 3.0.1_solid-js@1.4.8
+    devDependencies:
+      '@hope-ui/tests': link:../tests
 
   packages/styles:
     specifiers:
@@ -216,7 +213,14 @@ importers:
       '@types/jest-axe': 3.5.4
 
   packages/utils:
-    specifiers: {}
+    specifiers:
+      '@solid-primitives/platform': 0.0.100
+      '@solid-primitives/refs': 0.3.0
+      '@solid-primitives/utils': 3.0.1
+    dependencies:
+      '@solid-primitives/platform': 0.0.100_solid-js@1.4.8
+      '@solid-primitives/refs': 0.3.0_solid-js@1.4.8
+      '@solid-primitives/utils': 3.0.1_solid-js@1.4.8
 
 packages:
 
@@ -3416,7 +3420,7 @@ packages:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 18.7.13
+      '@types/node': 18.0.3
       '@types/yargs': 15.0.14
       chalk: 4.1.2
     dev: true
@@ -3817,6 +3821,14 @@ packages:
       '@solid-primitives/utils': 3.0.1_solid-js@1.4.8
     transitivePeerDependencies:
       - solid-js
+    dev: false
+
+  /@solid-primitives/platform/0.0.100_solid-js@1.4.8:
+    resolution: {integrity: sha512-TMGeDtjA8b7xlUQGq3QhdR8SSa49bvqhFJ0iD+iy4fsnEHr9xA5hIDyBX/ntmz70SbOVyz+z9IdXwBnqurr4bQ==}
+    peerDependencies:
+      solid-js: ^1.4.0
+    dependencies:
+      solid-js: 1.4.8
     dev: false
 
   /@solid-primitives/refs/0.3.0_solid-js@1.4.8:
@@ -6108,7 +6120,7 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 5.1.0
-      '@types/node': 14.18.26
+      '@types/node': 18.0.3
     dev: true
 
   /@types/graceful-fs/4.1.5:
