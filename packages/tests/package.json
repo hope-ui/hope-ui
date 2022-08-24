@@ -49,7 +49,7 @@
     "jest-axe": "6.0.0"
   },
   "devDependencies": {
-    "@types/jest-axe": "^3.5.4"
+    "@types/jest-axe": "3.5.4"
   },
   "peerDependencies": {
     "solid-js": "^1.4.7",

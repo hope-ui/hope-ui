@@ -1,5 +1,5 @@
 /*!
- * Original code by Ariakit
+ * Portions of this file are based on code from ariakit.
  * MIT Licensed, Copyright (c) Diego Haz.
  *
  * Credits to the Ariakit team:
@@ -9,7 +9,7 @@
 import { createEffect } from "solid-js";
 import { render } from "solid-testing-library";
 
-import { createTagName } from "../create-tag-name";
+import { createTagName } from "./create-tag-name";
 
 describe("createTagName", () => {
   it("should use 'tagName' from ref", () => {

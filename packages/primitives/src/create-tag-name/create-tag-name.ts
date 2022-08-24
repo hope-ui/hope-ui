@@ -1,5 +1,5 @@
 /*!
- * Original code by Ariakit
+ * Portions of this file are based on code from ariakit.
  * MIT Licensed, Copyright (c) Diego Haz.
  *
  * Credits to the Ariakit team:

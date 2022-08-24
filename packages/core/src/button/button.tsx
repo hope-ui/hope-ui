@@ -1,3 +1,4 @@
+import { createTagName } from "@hope-ui/primitives";
 import {
   createHopeComponent,
   hope,
@@ -9,7 +10,6 @@ import { mergeRefs } from "@solid-primitives/refs";
 import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 
-import { createTagName } from "../primitives/create-tag-name";
 import { ButtonParts, useStyleConfig } from "./button.styles";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";
