@@ -7,6 +7,10 @@ export function injectGlobalStyles(vars: ThemeVars) {
       boxSizing: "border-box",
     },
 
+    "*": {
+      margin: 0,
+    },
+
     html: {
       fontFamily: vars.fonts.sans,
       lineHeight: vars.lineHeights.base,

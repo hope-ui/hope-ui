@@ -6,51 +6,44 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/container.tsx
  */
 
-import {
-  createHopeComponent,
-  createStyles,
-  hope,
-  mapResponsive,
-  ResponsiveValue,
-  VariantProps,
-} from "@hope-ui/styles";
-import { clsx } from "clsx";
-import { splitProps } from "solid-js";
+import { createHopeComponent, hope, mapResponsive, ResponsiveValue } from "@hope-ui/styles";
+import { ComponentProps, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
-const useStyles = createStyles(vars => ({
-  base: {
-    width: "100%",
-    maxWidth: {
-      sm: vars.breakpoints.sm,
-      md: vars.breakpoints.md,
-      lg: vars.breakpoints.lg,
-      xl: vars.breakpoints.xl,
-      "2xl": vars.breakpoints["2xl"],
-    },
-  },
-  variants: {
-    centerContent: {
-      true: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+const BaseContainer = hope(
+  "div",
+  vars => ({
+    base: {
+      width: "100%",
+      maxWidth: {
+        sm: vars.breakpoints.sm,
+        md: vars.breakpoints.md,
+        lg: vars.breakpoints.lg,
+        xl: vars.breakpoints.xl,
+        "2xl": vars.breakpoints["2xl"],
       },
-      false: {},
     },
-  },
-  defaultVariants: {
-    centerContent: false,
-  },
-}));
+    variants: {
+      centerContent: {
+        true: {
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        },
+      },
+    },
+    defaultVariants: {
+      centerContent: false,
+    },
+  }),
+  "hope-Container-root"
+);
 
-type ContainerVariants = VariantProps<typeof useStyles>;
-
-export type ContainerProps = ContainerVariants & {
+export interface ContainerProps extends ComponentProps<typeof BaseContainer> {
   /** Whether the container itself should be centered on the page. */
   isCentered?: ResponsiveValue<boolean>;
-};
+}
 
 /**
  * `Container` is used to constrain a content's width to the current breakpoint, while keeping it fluid.
@@ -59,13 +52,10 @@ export type ContainerProps = ContainerVariants & {
 export const Container = createHopeComponent<"div", ContainerProps>(props => {
   props = mergeDefaultProps({ isCentered: true }, props);
 
-  const [local, others] = splitProps(props, ["class", "isCentered", "centerContent"]);
-
-  const className = useStyles(local);
+  const [local, others] = splitProps(props, ["isCentered"]);
 
   return (
-    <hope.div
-      class={clsx("hope-Container-root", className(), local.class)}
+    <BaseContainer
       mx={mapResponsive(local.isCentered, isCentered => (isCentered ? "auto" : undefined))}
       {...others}
     />

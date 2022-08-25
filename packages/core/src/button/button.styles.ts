@@ -1,8 +1,8 @@
 import {
-  CompoundVariant,
   createStyleConfig,
   focusStyles,
   spin,
+  StyleConfigCompoundVariant,
   StyleConfigProps,
   ThemeColorScheme,
   ThemeVars,
@@ -42,7 +42,7 @@ const colorSchemes: Array<ButtonVariants["colorScheme"]> = [
 ];
 
 function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
-  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+  const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
 
   for (const colorScheme of colorSchemes) {
     const isNeutral = colorScheme === "neutral";
@@ -107,7 +107,7 @@ function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
 }
 
 function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
-  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+  const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
 
   for (const colorScheme of colorSchemes) {
     const isNeutral = colorScheme === "neutral";
@@ -172,7 +172,7 @@ function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
 }
 
 function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
-  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+  const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
 
   for (const colorScheme of colorSchemes) {
     const isNeutral = colorScheme === "neutral";
@@ -237,7 +237,7 @@ function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
 }
 
 function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
-  const compoundVariants: Array<CompoundVariant<ButtonVariants>> = [];
+  const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
 
   for (const colorScheme of colorSchemes) {
     const isNeutral = colorScheme === "neutral";

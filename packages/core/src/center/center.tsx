@@ -6,28 +6,20 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/center.tsx
  */
 
-import { createHopeComponent, createStyles, hope } from "@hope-ui/styles";
-import { clsx } from "clsx";
-import { splitProps } from "solid-js";
+import { hope } from "@hope-ui/styles";
 
-const useStyles = createStyles({
-  root: {
+/**
+ * `Center` is used to horizontally and vertically center its child.
+ * It uses the popular `display: flex` centering technique.
+ */
+export const Center = hope(
+  "div",
+  {
     base: {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
     },
   },
-});
-
-/**
- * `Center` is used to horizontally and vertically center its child.
- * It uses the popular `display: flex` centering technique.
- */
-export const Center = createHopeComponent<"div">(props => {
-  const [local, others] = splitProps(props, ["class"]);
-
-  const classes = useStyles();
-
-  return <hope.div class={clsx("hope-Center-root", classes().root, local.class)} {...others} />;
-});
+  "hope-Center-root"
+);
