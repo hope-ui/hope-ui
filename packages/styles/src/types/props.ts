@@ -16,5 +16,5 @@ export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
 type StyleConfigOptionsOf<T extends UseStyleConfigFn<any, any>> = Parameters<T>[1];
 
 /** Props of components that supports the `Style Config API` and `system style` props. */
-export type StyleConfigProps<T extends UseStyleConfigFn<any, any>> = HopeProps &
+export type StyleConfigProps<T extends UseStyleConfigFn<any, any>> = Omit<HopeProps, "__css"> &
   StyleConfigOptionsOf<T>;

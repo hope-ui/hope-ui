@@ -1,25 +1,22 @@
 import { globalCss } from "../stitches.config";
-import { Theme } from "../types";
-import { createGetCssVar } from "../utils";
+import { ThemeVars } from "../types";
 
-export function injectGlobalStyles(theme: Theme) {
-  const getCssVar = createGetCssVar(theme.cssVarPrefix);
-
+export function injectGlobalStyles(vars: ThemeVars) {
   globalCss({
     "*, *::before, *::after": {
       boxSizing: "border-box",
     },
 
     html: {
-      fontFamily: getCssVar("fonts-sans"),
-      lineHeight: getCssVar("lineHeights-base"),
+      fontFamily: vars.fonts.sans,
+      lineHeight: vars.lineHeights.base,
       fontSize: "16px",
     },
 
     body: {
       margin: 0,
-      backgroundColor: getCssVar("colors-background-body"),
-      color: getCssVar("colors-text-primary"),
+      backgroundColor: vars.colors.background.body,
+      color: vars.colors.text.primary,
       fontFamily: "inherit",
       lineHeight: "inherit",
       WebkitFontSmoothing: "antialiased",

@@ -1,8 +1,8 @@
 import * as Stitches from "@stitches/core";
 import { createStitches } from "@stitches/core";
 
-export const { css, globalCss, keyframes, getCssText, config } = createStitches({
-  prefix: "hope",
-});
+const stitches = createStitches({ prefix: "hope" });
 
-export type CSSObject = Stitches.CSS<typeof config>;
+export const { css, globalCss, getCssText, keyframes } = stitches;
+
+export type CSSObject = Stitches.CSS<typeof stitches.config>;

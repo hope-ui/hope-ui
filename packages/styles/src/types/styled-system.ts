@@ -25,6 +25,7 @@ import {
   ThemeZIndice,
 } from "./scales";
 import { ThemeVars } from "./vars";
+import * as CSSUtil from "@stitches/core/types/css-util";
 
 export type ResponsiveArray<T> = Array<T | null>;
 
@@ -587,7 +588,7 @@ export type PaddingProps = ResponsiveProps<{
 
 export type PositionProps = ResponsiveProps<{
   /** The CSS `position` property. */
-  position: Property.Position | string;
+  position: Property.Position;
 
   /** The CSS `z-index` property. */
   zIndex: Property.ZIndex | ThemeZIndice;

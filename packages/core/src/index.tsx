@@ -20,3 +20,4 @@ export * from "./kbd";
 export * from "./spacer";
 export * from "./stack";
 export * from "./text";
+export * from "./visually-hidden";

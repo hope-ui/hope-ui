@@ -8,60 +8,65 @@
 
 import {
   createHopeComponent,
+  createStyles,
   hope,
   mapResponsive,
   ResponsiveValue,
-  useTheme,
+  VariantProps,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
-export interface ContainerProps {
+const useStyles = createStyles(vars => ({
+  base: {
+    width: "100%",
+    maxWidth: {
+      sm: vars.breakpoints.sm,
+      md: vars.breakpoints.md,
+      lg: vars.breakpoints.lg,
+      xl: vars.breakpoints.xl,
+      "2xl": vars.breakpoints["2xl"],
+    },
+  },
+  variants: {
+    centerContent: {
+      true: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    centerContent: false,
+  },
+}));
+
+type ContainerVariants = VariantProps<typeof useStyles>;
+
+export type ContainerProps = ContainerVariants & {
   /** Whether the container itself should be centered on the page. */
   isCentered?: ResponsiveValue<boolean>;
-
-  /** Whether the container should center its children regardless of their width. */
-  centerContent?: boolean;
-}
+};
 
 /**
  * `Container` is used to constrain a content's width to the current breakpoint, while keeping it fluid.
  *  By default, it sets `margin-left` and `margin-right` to `auto`, to keep its content centered.
  */
 export const Container = createHopeComponent<"div", ContainerProps>(props => {
-  props = mergeDefaultProps(
-    {
-      isCentered: true,
-      centerContent: false,
-    },
-    props
-  );
+  props = mergeDefaultProps({ isCentered: true }, props);
 
   const [local, others] = splitProps(props, ["class", "isCentered", "centerContent"]);
 
-  const theme = useTheme();
+  const className = useStyles(local);
 
   return (
     <hope.div
-      class={clsx("hope-Container-root", local.class)}
-      __css={{
-        width: "100%",
-        maxWidth: {
-          sm: theme.breakpoints.sm,
-          md: theme.breakpoints.md,
-          lg: theme.breakpoints.lg,
-          xl: theme.breakpoints.xl,
-          "2xl": theme.breakpoints["2xl"],
-        },
-        mx: mapResponsive(local.isCentered, isCentered => (isCentered ? "auto" : undefined)),
-        ...(local.centerContent && {
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }),
-      }}
+      class={clsx("hope-Container-root", className(), local.class)}
+      mx={mapResponsive(local.isCentered, isCentered => (isCentered ? "auto" : undefined))}
       {...others}
     />
   );

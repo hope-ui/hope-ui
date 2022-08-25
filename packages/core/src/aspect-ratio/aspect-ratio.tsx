@@ -6,11 +6,46 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/aspect-ratio.tsx
  */
 
-import { createHopeComponent, hope, mapResponsive, ResponsiveValue } from "@hope-ui/styles";
+import {
+  createHopeComponent,
+  createStyles,
+  hope,
+  mapResponsive,
+  ResponsiveValue,
+} from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
+
+const useStyles = createStyles({
+  root: {
+    base: {
+      position: "relative",
+      maxWidth: "100%",
+
+      "&::before": {
+        content: '""',
+        height: 0,
+        display: "block",
+      },
+
+      "& > *:not(style)": {
+        overflow: "hidden",
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        boxSize: "100%",
+      },
+
+      "& > img, & > video": {
+        objectFit: "cover",
+      },
+    },
+  },
+});
 
 export interface AspectRatioProps {
   /**
@@ -25,40 +60,16 @@ export interface AspectRatioProps {
  * to a desired aspect ratio.
  */
 export const AspectRatio = createHopeComponent<"div", AspectRatioProps>(props => {
-  props = mergeDefaultProps(
-    {
-      ratio: 4 / 3,
-    },
-    props
-  );
+  props = mergeDefaultProps({ ratio: 4 / 3 }, props);
 
   const [local, others] = splitProps(props, ["class", "ratio"]);
 
+  const classes = useStyles();
+
   return (
     <hope.div
-      class={clsx("hope-AspectRatio-root", local.class)}
-      __css={{
-        position: "relative",
-        maxWidth: "100%",
-        "&::before": {
-          content: '""',
-          height: 0,
-          display: "block",
-          paddingBottom: mapResponsive(local.ratio, r => `${(1 / r) * 100}%`),
-        },
-        "& > *:not(style)": {
-          overflow: "hidden",
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          boxSize: "100%",
-        },
-        "& > img, & > video": {
-          objectFit: "cover",
-        },
-      }}
+      class={clsx("hope-AspectRatio-root", classes().root, local.class)}
+      _before={{ paddingBottom: mapResponsive(local.ratio, r => `${(1 / r) * 100}%`) }}
       {...others}
     />
   );

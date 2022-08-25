@@ -17,10 +17,6 @@ export function extendTheme(themeOverride: ThemeOverride): Theme {
     };
   }
 
-  if (!themeOverride) {
-    return finalDefaultTheme;
-  }
-
   const mergedTheme = {
     value: finalDefaultTheme,
   };

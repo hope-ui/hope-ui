@@ -65,7 +65,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
 
   injectCSSVars(theme);
 
-  props.withGlobalStyles && injectGlobalStyles(theme);
+  props.withGlobalStyles && injectGlobalStyles(theme.vars);
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
 }

@@ -6,14 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/system/src/factory.ts
  */
 
-import {
-  DOMElements,
-  ElementType,
-  filterUndefined,
-  isEmptyObject,
-  isFunction,
-  runIfFn,
-} from "@hope-ui/utils";
+import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -23,7 +16,6 @@ import { css } from "./stitches.config";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { SystemStyleObject, ThemeVars } from "./types";
 import { packSx } from "./utils";
 
 /**
@@ -34,24 +26,11 @@ type HTMLHopeComponents = {
   [Tag in DOMElements]: HopeComponent<Tag>;
 };
 
-interface HopeFactoryStyleOptions<Props> {
-  /** Props that will not be forwarded to the underlying dom element. */
-  excludedProps?: Array<keyof Props>;
-
-  /** Base style applied to the component. */
-  baseStyle?:
-    | SystemStyleObject
-    | ((options: { vars: ThemeVars; props: Props }) => SystemStyleObject);
-}
-
 /**
  * Factory function that converts non Hope UI components or jsx element
  * to Hope UI components, so you can pass system style props to them.
  */
-type HopeFactory = <T extends ElementType, Props = {}>(
-  component: T,
-  options?: HopeFactoryStyleOptions<Props>
-) => HopeComponent<T, Props>;
+type HopeFactory = <T extends ElementType>(component: T) => HopeComponent<T>;
 
 /**
  * Singleton stitches `cssComponent`.
@@ -67,16 +46,11 @@ const systemCssComponent = css({
   },
 });
 
-function styled<T extends ElementType, Props = {}>(
-  component: T,
-  options: HopeFactoryStyleOptions<Props> = {}
-) {
-  const { excludedProps = [], baseStyle = {} } = options;
-
-  const hopeComponent = createHopeComponent<T, Props>(props => {
+function styled<T extends ElementType>(component: T) {
+  const hopeComponent = createHopeComponent<T>(props => {
     const [local, styleProps, others] = splitProps(
       props,
-      ["as", "class", "sx", "__css", ...excludedProps],
+      ["as", "class", "sx", "__css"],
       extractStyleProps(props)
     );
 
@@ -86,7 +60,6 @@ function styled<T extends ElementType, Props = {}>(
       const styles = Object.assign(
         {},
         local.__css,
-        isFunction(baseStyle) ? baseStyle({ vars: theme.vars, props }) : baseStyle,
         filterUndefined(styleProps),
         ...packSx(local.sx).map(partial => runIfFn(partial, theme.vars))
       );
@@ -110,7 +83,7 @@ function styled<T extends ElementType, Props = {}>(
     );
   });
 
-  return hopeComponent as HopeComponent<T, Props>;
+  return hopeComponent as HopeComponent<T>;
 }
 
 function factory() {
@@ -122,7 +95,7 @@ function factory() {
      * const Div = hope("div")
      * const WithHope = hope(AnotherComponent)
      */
-    apply(target, thisArg, argArray: [ElementType, HopeFactoryStyleOptions<ElementType>]) {
+    apply(target, thisArg, argArray: [ElementType]) {
       return styled(...argArray);
     },
 
