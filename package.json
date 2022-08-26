@@ -76,7 +76,6 @@
     "jest-environment-jsdom": "28.1.2",
     "lint-staged": "13.0.3",
     "prettier": "2.7.1",
-    "prettier-plugin-astro": "0.5.3",
     "rollup": "2.75.7",
     "rollup-preset-solid": "1.4.0",
     "solid-js": "1.5.1",
