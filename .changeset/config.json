@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@hope-ui/docs", "@hope-ui/tests"]
+  "ignore": ["@hope-ui/docs", "@hope-ui/playground", "@hope-ui/tests"]
 }

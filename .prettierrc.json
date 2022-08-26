@@ -1,4 +1,13 @@
 {
+  "plugins": ["./node_modules/prettier-plugin-astro"],
   "arrowParens": "avoid",
-  "printWidth": 100
+  "printWidth": 100,
+  "overrides": [
+    {
+      "files": "*.astro",
+      "options": {
+        "parser": "astro"
+      }
+    }
+  ]
 }
