@@ -1,9 +1,9 @@
-import { runIfFn } from "@hope-ui/utils";
+import { once, runIfFn } from "@hope-ui/utils";
 
 import { CSSObject, globalCss } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { SystemStyleObject, ThemeVars } from "./types";
+import { SystemStyleObject, Theme, ThemeVars } from "./types";
 
 type GlobalSystemStyleObject = Record<string, SystemStyleObject> & {
   /** The **@import** CSS at-rule imports style rules from other style sheets. */
@@ -19,33 +19,30 @@ type GlobalSystemStyleObjectInterpolation =
 
 /** Create a `useGlobalStyles` primitive. */
 export function createGlobalStyles(interpolation: GlobalSystemStyleObjectInterpolation) {
-  let isFirstLoad = true;
+  const runOnce = once((theme: Theme) => {
+    const {
+      "@import": atImport,
+      "@font-face": atFontFace,
+      ...rest
+    } = runIfFn(interpolation, theme.vars);
+
+    const styles = Object.entries(rest).reduce((acc, [selector, systemStyleObject]) => {
+      acc[selector] = toCSSObject(systemStyleObject, theme);
+
+      return acc;
+    }, {} as Record<string, CSSObject>);
+
+    globalCss({
+      "@import": atImport ?? [],
+      "@font-face": atFontFace ?? {},
+      ...styles,
+    })();
+  });
 
   return function useGlobalStyles() {
     const theme = useTheme();
 
-    // Hack to make sure style is computed only once for every component instance,
-    // but has access to the current theme since `useGlobalStyles` run in a component context.
-    if (isFirstLoad) {
-      const {
-        "@import": atImport,
-        "@font-face": atFontFace,
-        ...rest
-      } = runIfFn(interpolation, theme.vars);
-
-      const styles = Object.entries(rest).reduce((acc, [selector, systemStyleObject]) => {
-        acc[selector] = toCSSObject(systemStyleObject, theme);
-
-        return acc;
-      }, {} as Record<string, CSSObject>);
-
-      globalCss({
-        "@import": atImport ?? [],
-        "@font-face": atFontFace ?? {},
-        ...styles,
-      })();
-
-      isFirstLoad = false;
-    }
+    // generate global styles once.
+    runOnce(theme);
   };
 }

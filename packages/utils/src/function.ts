@@ -17,3 +17,15 @@ export function noop() {
 export function runIfFn<T, U>(valueOrFn: T | ((...fnArgs: U[]) => T), ...args: U[]): T {
   return isFunction(valueOrFn) ? valueOrFn(...args) : valueOrFn;
 }
+
+/** Create a function that only run once. */
+export function once<T extends (...args: any[]) => void>(callback: T) {
+  let hasRun = false;
+
+  return function (...args: any[]) {
+    if (!hasRun) {
+      hasRun = true;
+      callback(...args);
+    }
+  } as T;
+}

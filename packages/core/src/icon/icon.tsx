@@ -6,10 +6,9 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/icon/src/icon.tsx
  */
 
-import { createHopeComponent, hope, SystemStyleObject } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { ElementType, isString } from "@hope-ui/utils";
-import { clsx } from "clsx";
-import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
+import { JSX, Show, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 
@@ -28,6 +27,20 @@ const fallbackIcon = {
 
 export type IconProps = JSX.SvgSVGAttributes<SVGSVGElement>;
 
+const BaseIcon = hope(
+  "svg",
+  {
+    base: {
+      display: "inline-block",
+      flexShrink: 0,
+      boxSize: "1em",
+      color: "currentColor",
+      lineHeight: "1em",
+    },
+  },
+  "hope-Icon-root"
+);
+
 export const Icon = createHopeComponent<"svg", IconProps>(props => {
   props = mergeDefaultProps(
     {
@@ -37,23 +50,7 @@ export const Icon = createHopeComponent<"svg", IconProps>(props => {
     props
   );
 
-  const [local, others] = splitProps(props, [
-    "as",
-    "class",
-    "children",
-    "viewBox",
-    "color",
-    "__css",
-  ]);
-
-  const styles: Accessor<SystemStyleObject> = createMemo(() => ({
-    display: "inline-block",
-    flexShrink: 0,
-    boxSize: "1em",
-    lineHeight: "1em",
-    color: local.color,
-    ...local.__css,
-  }));
+  const [local, others] = splitProps(props, ["as", "children", "viewBox"]);
 
   /**
    * If the `as` prop is a component (ex: if you're using an icon library).
@@ -61,26 +58,18 @@ export const Icon = createHopeComponent<"svg", IconProps>(props => {
    */
   const shouldRenderComponent = () => local.as && !isString(local.as);
 
-  const classes = () => clsx("hope-Icon-root", local.class);
-
   return (
     <Show
       when={shouldRenderComponent()}
       fallback={
-        <hope.svg
-          verticalAlign="middle"
-          viewBox={local.viewBox}
-          class={classes()}
-          __css={styles()}
-          {...others}
-        >
+        <BaseIcon viewBox={local.viewBox} verticalAlign="middle" {...others}>
           <Show when={local.children} fallback={fallbackIcon.path}>
             {local.children}
           </Show>
-        </hope.svg>
+        </BaseIcon>
       }
     >
-      <hope.div as={local.as as ElementType} class={classes()} __css={styles()} {...others} />
+      <BaseIcon as={local.as as ElementType} {...others} />
     </Show>
   );
 });

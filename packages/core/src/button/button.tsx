@@ -35,7 +35,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
       "isDisabled",
     ],
     ["children", "leftIcon", "rightIcon"],
-    ["styleConfigOverrides", "unstyled", "colorScheme", "variant", "size", "isFullWidth"]
+    ["styleConfig", "unstyled", "colorScheme", "variant", "size", "isFullWidth"]
   );
 
   const tagName = createTagName(
@@ -55,14 +55,14 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
     return isNativeButton() ? "button" : undefined;
   });
 
-  const { classes, styleOverrides } = useStyleConfig("Button", styleConfigProps);
+  const { classes, styles } = useStyleConfig("Button", styleConfigProps);
 
   onMount(() => {
     ref != null && setIsNativeButton(isButton(ref));
   });
 
   return (
-    <StyleConfigProvider value={{ classes, styleOverrides }}>
+    <StyleConfigProvider value={{ classes, styles }}>
       <hope.button
         as={local.as}
         ref={mergeRefs(el => (ref = el), local.ref)}
@@ -72,7 +72,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
         disabled={local.isDisabled}
         data-loading={local.isLoading || undefined}
         class={clsx(classes().root, local.class)}
-        __css={styleOverrides().root}
+        __css={styles().root}
         {...others}
       >
         <Show when={local.isLoading && local.loaderPlacement === "start"}>
@@ -99,18 +99,18 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
 });
 
 function ButtonContent(props: ButtonContentProps) {
-  const { classes, styleOverrides } = useStyleConfigContext<ButtonParts>();
+  const { classes, styles } = useStyleConfigContext<ButtonParts>();
 
   return (
     <>
       <Show when={props.leftIcon}>
-        <ButtonIcon class={classes().leftIcon} __css={styleOverrides().leftIcon}>
+        <ButtonIcon class={classes().leftIcon} __css={styles().leftIcon}>
           {props.leftIcon}
         </ButtonIcon>
       </Show>
       {props.children}
       <Show when={props.rightIcon}>
-        <ButtonIcon class={classes().rightIcon} __css={styleOverrides().rightIcon}>
+        <ButtonIcon class={classes().rightIcon} __css={styles().rightIcon}>
           {props.rightIcon}
         </ButtonIcon>
       </Show>

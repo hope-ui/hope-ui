@@ -12,19 +12,27 @@
  * https://github.com/seek-oss/vanilla-extract/blob/master/packages/recipes/src/types.ts
  */
 
-import { DOMElements, ElementType, filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
+import {
+  DOMElements,
+  ElementType,
+  filterUndefined,
+  isEmptyObject,
+  once,
+  runIfFn,
+} from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createHopeComponent, HopeComponent } from "./create-hope-component";
 import { css } from "./stitches.config";
-import { computeStyle } from "./styled-system";
+import { computeStyle } from "./styled-system/compute-style";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
 import { BooleanMap, SystemStyleObject, Theme, ThemeVars } from "./types";
-import { packSx, shouldApplyCompound } from "./utils";
+import { packSx } from "./utils";
+import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 /**
  * All html and svg elements for hope components.
@@ -105,6 +113,15 @@ const systemCssComponent = css();
 // utility to create unique id.
 let nextId = 0;
 
+/*
+ * Style injection order (first to last)
+ * - base (least specific)
+ * - variants
+ * - compound variants
+ * - __css
+ * - style props
+ * - sx (override all)
+ */
 function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
   component: T,
   styleInterpolation?: HopeStyleOptionsInterpolation<Variants>,
@@ -113,26 +130,25 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
   // A unique/static css className for the component.
   const uniqueClassName = staticClassName ?? `hope-component-${nextId++}`;
 
-  let isFirstLoad = true;
-
   let styleOptions: HopeStyleOptions<Variants> | undefined;
   let styleResult: HopeStyleResult<Variants> | undefined;
   let variantPropsKeys: Array<keyof Variants> = [];
 
+  const runOnce = once((theme: Theme) => {
+    if (styleInterpolation == null) {
+      return;
+    }
+
+    styleOptions = runIfFn(styleInterpolation, theme.vars);
+    styleResult = computeStyleOptions(styleOptions, theme);
+    variantPropsKeys = styleOptions.variants ? Object.keys(styleOptions.variants) : [];
+  });
+
   const hopeComponent = createHopeComponent<T, HopeVariantSelection<Variants>>(props => {
     const theme = useTheme();
 
-    // Hack to make sure style options is computed only once for every component instance,
-    // but has access to the current theme.
-    if (isFirstLoad && styleInterpolation) {
-      styleOptions = runIfFn(styleInterpolation, theme.vars);
-
-      styleResult = computeStyleOptions(styleOptions, theme);
-
-      variantPropsKeys = styleOptions.variants ? Object.keys(styleOptions.variants) : [];
-
-      isFirstLoad = false;
-    }
+    // generate style options classNames once.
+    runOnce(theme);
 
     const [local, styleProps, others] = splitProps(
       props,

@@ -23,6 +23,7 @@ interface HeadingVariants {
 export const useStyleConfig = createStyleConfig<HeadingParts, HeadingVariants>({
   root: {
     base: {
+      margin: 0,
       fontSize: "inherit",
       fontWeight: "semibold",
       lineHeight: "inherit",

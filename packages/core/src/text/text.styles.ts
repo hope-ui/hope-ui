@@ -22,6 +22,9 @@ interface TextVariants {
 
 export const useStyleConfig = createStyleConfig<TextParts, TextVariants>({
   root: {
+    base: {
+      margin: 0,
+    },
     variants: {
       size: {
         xs: {

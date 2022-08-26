@@ -1,6 +1,5 @@
 import {
   itHasSemanticClass,
-  itIsPolymorphic,
   itRendersChildren,
   itSupportsClass,
   itSupportsRef,

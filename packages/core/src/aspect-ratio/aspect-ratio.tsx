@@ -61,7 +61,7 @@ export const AspectRatio = createHopeComponent<"div", AspectRatioProps>(props =>
 
   return (
     <BaseAspectRatio
-      _before={{ paddingBottom: mapResponsive(local.ratio, r => `${(1 / r) * 100}%`) }}
+      _before={{ pb: mapResponsive(local.ratio, r => `${(1 / r) * 100}%`) }}
       {...others}
     />
   );

@@ -7,7 +7,7 @@
  */
 
 import { PaletteRange, PaletteScale } from "../types";
-import { rgbColorChannel } from "../utils";
+import { rgbColorChannel } from "../utils/rgb-color-channel";
 
 /** Utility function to create color palettes. */
 export function createPalette(scale: PaletteScale): PaletteRange {

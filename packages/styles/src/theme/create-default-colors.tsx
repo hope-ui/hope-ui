@@ -13,7 +13,7 @@
  */
 
 import { PaletteScale, ThemeColors } from "../types";
-import { createGetCssVar } from "../utils";
+import { createGetCssVar } from "../utils/css-var";
 import { createPalette } from "./create-palette";
 
 const primary = createPalette({

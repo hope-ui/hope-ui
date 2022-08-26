@@ -6,7 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/tree/main/packages/styled-system/src/config
  */
 
-import { OverrideProps } from "@hope-ui/utils";
+import { ClassProp, OverrideProps } from "@hope-ui/utils";
 import { Property } from "csstype";
 
 import { CSSObject } from "../stitches.config";
@@ -25,7 +25,6 @@ import {
   ThemeZIndice,
 } from "./scales";
 import { ThemeVars } from "./vars";
-import * as CSSUtil from "@stitches/core/types/css-util";
 
 export type ResponsiveArray<T> = Array<T | null>;
 
@@ -886,4 +885,13 @@ export interface SxProp {
    * You can specify any valid CSS using this prop.
    */
   sx?: Sx | (Sx | undefined)[];
+}
+
+/** Hope UI specific props. */
+export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
+  /**
+   * The `__css` prop has the same API as the `sx` prop, but with a lower style priority.
+   * Use it to apply base styles that can be overridden by `sx` and `system style` props.
+   */
+  __css?: SystemStyleObject;
 }

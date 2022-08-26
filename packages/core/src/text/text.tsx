@@ -1,4 +1,10 @@
-import { createHopeComponent, hope, mergeThemeProps, ResponsiveValue } from "@hope-ui/styles";
+import {
+  ComponentTheme,
+  createHopeComponent,
+  hope,
+  mergeThemeProps,
+  ResponsiveValue,
+} from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 
@@ -10,6 +16,8 @@ export interface TextProps extends TextStyleConfigProps {
   lineClamp?: ResponsiveValue<number>;
 }
 
+export type TextTheme = ComponentTheme<TextProps, "size">;
+
 /**
  * Text component is the used to render text and paragraphs within an interface.
  * It renders a <p> tag by default.
@@ -20,17 +28,15 @@ export const Text = createHopeComponent<"p", TextProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class", "lineClamp"],
-    ["styleConfigOverrides", "unstyled", "size"]
+    ["styleConfig", "unstyled", "size"]
   );
 
-  const { classes, styleOverrides } = useStyleConfig("Text", styleConfigProps);
+  const { classes, styles } = useStyleConfig("Text", styleConfigProps);
 
-  const rootStyleOverrides = createMemo(() => ({
-    ...styleOverrides().root,
+  const rootStyles = createMemo(() => ({
+    ...styles().root,
     ...lineClamp(local.lineClamp),
   }));
 
-  return (
-    <hope.p class={clsx(classes().root, local.class)} __css={rootStyleOverrides()} {...others} />
-  );
+  return <hope.p class={clsx(classes().root, local.class)} __css={rootStyles()} {...others} />;
 });

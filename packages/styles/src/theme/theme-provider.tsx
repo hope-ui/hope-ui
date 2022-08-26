@@ -9,6 +9,7 @@
 import { Accessor, createContext, createMemo, mergeProps, ParentProps, useContext } from "solid-js";
 
 import type { ComponentTheme, Theme } from "../types";
+import { UseStyleConfigOptions } from "../types";
 import { DEFAULT_THEME } from "./default-theme";
 import { injectCSSVars } from "./inject-css-vars";
 import { injectGlobalStyles } from "./inject-global-styles";
@@ -19,7 +20,9 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function useComponentTheme(component?: string): Accessor<ComponentTheme | undefined> {
+export function useComponentTheme<T extends UseStyleConfigOptions<any, any>>(
+  component?: string
+): Accessor<ComponentTheme<T> | undefined> {
   const theme = useTheme();
 
   return createMemo(() => {
@@ -27,7 +30,7 @@ export function useComponentTheme(component?: string): Accessor<ComponentTheme |
       return undefined;
     }
 
-    return theme.components[component] ?? undefined;
+    return (theme.components[component] as ComponentTheme<T>) ?? undefined;
   });
 }
 

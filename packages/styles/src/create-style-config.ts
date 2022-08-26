@@ -6,17 +6,18 @@
  * https://github.com/seek-oss/vanilla-extract/blob/master/packages/recipes/src/createRuntimeFn.ts
  */
 
-import { filterUndefined, isEmptyObject, runIfFn } from "@hope-ui/utils";
+import { filterUndefined, isEmptyObject, once, runIfFn } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { dset } from "dset/merge";
 import { createMemo, splitProps } from "solid-js";
 
-import { computeStyle } from "./styled-system";
+import { computeStyle } from "./styled-system/compute-style";
 import { useComponentTheme, useTheme } from "./theme";
 import {
   MultiPartStyleConfig,
   MultiPartStyleConfigInterpolation,
   MultiPartStyleConfigResult,
+  PartialMultiPartStyleConfigInterpolation,
   StyleConfig,
   StyleConfigVariantSelection,
   SystemStyleObject,
@@ -24,7 +25,7 @@ import {
   UseStyleConfigFn,
   UseStyleConfigOptions,
 } from "./types";
-import { shouldApplyCompound } from "./utils";
+import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 /** Compute classNames from a multi-part style config. */
 function computeMultiPartStyleConfig<Parts extends string, Variants extends Record<string, any>>(
@@ -63,8 +64,6 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
   interpolation: MultiPartStyleConfigInterpolation<Parts, Variants>,
   defaultVariants?: StyleConfigVariantSelection<Variants>
 ): UseStyleConfigFn<Parts, Variants> {
-  let isFirstLoad = true;
-
   let baseConfig: MultiPartStyleConfig<Parts, Variants>;
   let baseConfigResult: MultiPartStyleConfigResult<Parts, Variants>;
 
@@ -72,14 +71,14 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
   let themeConfigResult: Partial<MultiPartStyleConfigResult<Parts, Variants>> | undefined;
 
   let parts: Array<Parts> = [];
+  let staticClassNames: Record<Parts, string>;
 
-  return function useStyleConfig(name: string, options: UseStyleConfigOptions<Parts, Variants>) {
-    const theme = useTheme();
-    const componentTheme = useComponentTheme(name);
-
-    // Hack to make sure base style config is computed only once for every component instance,
-    // but has access to the current theme since `useStyleConfig` run in a component context.
-    if (isFirstLoad) {
+  const runOnce = once(
+    (
+      name: string,
+      theme: Theme,
+      componentThemeConfig?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>
+    ) => {
       // 1. compute base styles.
       baseConfig = runIfFn(interpolation, theme.vars);
       baseConfigResult = computeMultiPartStyleConfig(
@@ -88,21 +87,32 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       ) as MultiPartStyleConfigResult<Parts, Variants>; // force type because we know it's not a partial.
 
       // 2. compute theme styles, so it will be injected to `head` after base styles.
-      themeConfig = runIfFn(componentTheme()?.styleConfigOverrides, theme.vars);
+      themeConfig = runIfFn(componentThemeConfig, theme.vars);
       themeConfigResult = themeConfig && computeMultiPartStyleConfig(themeConfig, theme);
 
-      // get component parts from config.
+      // 3. get component parts from config.
       parts = Object.keys(baseConfig) as Array<Parts>;
 
-      isFirstLoad = false;
+      // 4. create static classNames.
+      staticClassNames = Object.fromEntries(
+        parts.map(part => [part, `hope-${name}-${part}`])
+      ) as Record<Parts, string>;
     }
+  );
+
+  return function useStyleConfig(name: string, options: UseStyleConfigOptions<Parts, Variants>) {
+    const theme = useTheme();
+    const componentTheme = useComponentTheme(name);
+
+    // generate static, base and theme classNames once.
+    runOnce(name, theme, componentTheme()?.styleConfig);
 
     const styleConfigOverrides = createMemo(() => {
-      return runIfFn(options.styleConfigOverrides, theme.vars);
+      return runIfFn(options.styleConfig, theme.vars);
     });
 
     const selectedVariants = createMemo(() => {
-      const [_, variantSelections] = splitProps(options, ["styleConfigOverrides", "unstyled"]);
+      const [_, variantSelections] = splitProps(options, ["styleConfig", "unstyled"]);
 
       return {
         ...defaultVariants,
@@ -112,7 +122,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
 
     const classes = createMemo(() => {
       if (options.unstyled) {
-        return {} as Record<Parts, string>;
+        return staticClassNames;
       }
 
       return parts.reduce((acc, part) => {
@@ -125,7 +135,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
         const themeCompoundVariants = themeConfigResult?.[part]?.compoundVariants ?? [];
 
         // 1. add "static" and "base" classNames.
-        const classNames = [`hope-${name}-${part}`, baseClassName, themeBaseClassName];
+        const classNames = [staticClassNames[part], baseClassName, themeBaseClassName];
 
         // 2. add "variants" classNames.
         for (const name in selectedVariants()) {
@@ -152,7 +162,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       }, {} as Record<Parts, string>);
     });
 
-    const styleOverrides = createMemo(() => {
+    const styles = createMemo(() => {
       const configOverrides = styleConfigOverrides();
 
       if (configOverrides == null) {
@@ -195,6 +205,6 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       }, {} as Record<Parts, SystemStyleObject>);
     });
 
-    return { classes, styleOverrides };
+    return { classes, styles };
   };
 }

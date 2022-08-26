@@ -8,7 +8,7 @@
 
 import { Accessor } from "solid-js";
 
-import { SystemStyleObject } from "./styled-system";
+import { HopeProps, SystemStyleObject } from "./styled-system";
 import { ThemeVars } from "./vars";
 
 /** String representation of `boolean` type. */
@@ -112,7 +112,7 @@ export type UseStyleConfigOptions<
    * Styles that will be merged with the "base styles".
    * Mostly used to override/add additional styles.
    */
-  styleConfigOverrides?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>;
+  styleConfig?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
@@ -122,11 +122,25 @@ export interface UseStyleConfigReturn<Parts extends string> {
   /** An accessor of parts/classNames. */
   classes: Accessor<Record<Parts, string>>;
 
-  /** An accessor of parts/system style object. */
-  styleOverrides: Accessor<Record<Parts, SystemStyleObject>>;
+  /**
+   * An accessor of parts/system style object intended to be passed to `__css` prop.
+   * Mostly used to override/add additional styles.
+   */
+  styles: Accessor<Record<Parts, SystemStyleObject>>;
 }
 
 export type UseStyleConfigFn<Parts extends string, Variants extends Record<string, any>> = (
   name: string,
   options: UseStyleConfigOptions<Parts, Variants>
 ) => UseStyleConfigReturn<Parts>;
+
+/* -------------------------------------------------------------------------------------------------
+ * StyleConfigProps
+ * -----------------------------------------------------------------------------------------------*/
+
+/** Extract the option's type of `useStyleConfig` primitive. */
+type StyleConfigOptionsOf<T extends UseStyleConfigFn<any, any>> = Parameters<T>[1];
+
+/** Props of components that supports the `Style Config API` and `system style` props. */
+export type StyleConfigProps<T extends UseStyleConfigFn<any, any>> = Omit<HopeProps, "__css"> &
+  StyleConfigOptionsOf<T>;

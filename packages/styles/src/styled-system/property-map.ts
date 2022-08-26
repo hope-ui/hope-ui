@@ -10,7 +10,7 @@ import { AnyFunction } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps } from "../types";
-import { COLOR_MODE_CLASSNAMES } from "../utils";
+import { COLOR_MODE_CLASSNAMES } from "../utils/color-mode-classnames";
 
 const state = {
   hover: (str: string, post: string) => `${str}:hover ${post}, ${str}[data-hover] ${post}`,
