@@ -79,7 +79,7 @@
     "prettier-plugin-astro": "0.5.3",
     "rollup": "2.75.7",
     "rollup-preset-solid": "1.4.0",
-    "solid-js": "1.4.7",
+    "solid-js": "1.5.1",
     "solid-testing-library": "0.3.0",
     "sort-package-json": "1.57.0",
     "ts-jest": "28.0.5",
