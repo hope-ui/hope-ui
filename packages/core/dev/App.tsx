@@ -1,9 +1,25 @@
-import { useColorMode } from "../src";
+import { createDisclosure } from "@hope-ui/primitives";
+import { Show } from "solid-js";
+
+import { Button, FocusTrap, useColorMode } from "../src";
 
 export default function App() {
   const { toggleColorMode } = useColorMode();
 
-  return <></>;
+  const { isOpen, toggle, close } = createDisclosure();
+
+  return (
+    <>
+      <Button onClick={toggle}>Open</Button>
+      <Show when={isOpen()}>
+        <FocusTrap restoreFocus p={4} border="1px solid tomato">
+          <Button>Button 1</Button>
+          <Button data-autofocus>Button 2</Button>
+          <Button onClick={close}>Close</Button>
+        </FocusTrap>
+      </Show>
+    </>
+  );
 }
 
 /*

@@ -13,6 +13,7 @@ export * from "./button";
 export * from "./center";
 export * from "./container";
 export * from "./flex";
+export * from "./focus-trap";
 export * from "./grid";
 export * from "./heading";
 export * from "./icon";

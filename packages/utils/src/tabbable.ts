@@ -60,11 +60,9 @@ export function isTabbable(element: Element): element is HTMLElement {
  * including the container itself.
  */
 export function getAllTabbableIn(container: HTMLElement, includeContainer?: boolean) {
-  const focusableElements = Array.from(
-    container.querySelectorAll<HTMLElement>(FOCUSABLE_ELEMENT_SELECTOR)
-  );
+  const elements = Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_ELEMENT_SELECTOR));
 
-  const tabbableElements = focusableElements.filter(isTabbable);
+  const tabbableElements = elements.filter(isTabbable);
 
   if (includeContainer && isTabbable(container)) {
     tabbableElements.unshift(container);

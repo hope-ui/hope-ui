@@ -22,6 +22,7 @@ import {
 } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
+// eslint-disable-next-line import/no-unresolved
 import { Dynamic } from "solid-js/web";
 
 import { createHopeComponent, HopeComponent } from "./create-hope-component";
@@ -108,10 +109,7 @@ function computeStyleOptions<Variants extends HopeVariantGroups>(
  * Singleton stitches `cssComponent`.
  * Used to inject styles at the consumption layer via the `css` prop.
  */
-const systemCssComponent = css();
-
-// utility to create unique id.
-let nextId = 0;
+const systemCssComponent = css({});
 
 /*
  * Style injection order (first to last)
@@ -122,14 +120,17 @@ let nextId = 0;
  * - style props
  * - sx (override all)
  */
+/**
+ * Create a `styled` component capable of using Hope UI `system style` props.
+ * @param component The component/html element to render.
+ * @param styleInterpolation The styles to apply.
+ * @param staticClassName A static className for the component, used as a css selector.
+ */
 function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
   component: T,
   styleInterpolation?: HopeStyleOptionsInterpolation<Variants>,
   staticClassName?: string
 ) {
-  // A unique/static css className for the component.
-  const uniqueClassName = staticClassName ?? `hope-component-${nextId++}`;
-
   let styleOptions: HopeStyleOptions<Variants> | undefined;
   let styleResult: HopeStyleResult<Variants> | undefined;
   let variantPropsKeys: Array<keyof Variants> = [];
@@ -208,10 +209,11 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
     });
 
     return (
+      // @ts-ignore
       <Dynamic
         component={local.as ?? component}
         class={clsx(
-          uniqueClassName,
+          staticClassName,
           styleResult?.baseClassName,
           ...variantClassNames(),
           sxClassName(),
@@ -222,9 +224,11 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
     );
   });
 
-  // Override `toString` to return a selector for the unique/static className,
+  // Override `toString` to return a selector for the static className,
   // so the component can be referenced in css rules.
-  hopeComponent.toString = () => `.${uniqueClassName}`;
+  if (staticClassName != null) {
+    hopeComponent.toString = () => `.${staticClassName}`;
+  }
 
   return hopeComponent;
 }
