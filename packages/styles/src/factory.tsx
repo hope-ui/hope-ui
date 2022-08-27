@@ -212,13 +212,15 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
       // @ts-ignore
       <Dynamic
         component={local.as ?? component}
-        class={clsx(
-          staticClassName,
-          styleResult?.baseClassName,
-          ...variantClassNames(),
-          sxClassName(),
-          local.class
-        )}
+        class={
+          clsx(
+            staticClassName,
+            styleResult?.baseClassName,
+            ...variantClassNames(),
+            sxClassName(),
+            local.class
+          ) || undefined
+        }
         {...others}
       />
     );

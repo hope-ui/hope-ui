@@ -6,29 +6,17 @@
  * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-utils/src/dom.ts
  */
 
+function isScrollable(node: Element): boolean {
+  const style = window.getComputedStyle(node);
+  return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
+}
+
 export function getScrollParent(node: Element | null): Element {
   while (node && !isScrollable(node)) {
     node = node.parentElement;
   }
 
   return node || document.scrollingElement || document.documentElement;
-}
-
-function isScrollable(node: Element): boolean {
-  const style = window.getComputedStyle(node);
-  return /(auto|scroll)/.test(style.overflow + style.overflowX + style.overflowY);
-}
-
-/**
- * Checks if the element is visible or not.
- */
-export function isVisible(element: Element) {
-  const htmlElement = element as HTMLElement;
-  return (
-    htmlElement.offsetWidth > 0 ||
-    htmlElement.offsetHeight > 0 ||
-    element.getClientRects().length > 0
-  );
 }
 
 /**

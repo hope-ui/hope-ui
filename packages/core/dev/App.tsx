@@ -8,13 +8,15 @@ export default function App() {
 
   const { isOpen, toggle, close } = createDisclosure();
 
+  let ref: any;
+
   return (
     <>
       <Button onClick={toggle}>Open</Button>
       <Show when={isOpen()}>
-        <FocusTrap restoreFocus p={4} border="1px solid tomato">
+        <FocusTrap ref={ref} restoreFocus p={4} border="1px solid tomato">
           <Button>Button 1</Button>
-          <Button data-autofocus>Button 2</Button>
+          <Button>Button 2</Button>
           <Button onClick={close}>Close</Button>
         </FocusTrap>
       </Show>

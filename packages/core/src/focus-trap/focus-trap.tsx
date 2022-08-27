@@ -12,11 +12,24 @@ import { JSX, onCleanup, onMount, ParentProps, Show, splitProps } from "solid-js
 
 import { VisuallyHidden } from "../visually-hidden";
 
-interface FocusTrapProps extends ParentProps {
+export interface FocusTrapProps extends ParentProps {
   /**
-   * Whether focus should be restored to the element that
-   * triggered the `FocusTrap` once it unmounts.
+   * A query selector to retrieve the element that should receive focus once `FocusTrap` mounts.
+   * This value has priority over `autoFocus`.
+   * @default '[data-autofocus]'
    */
+  initialFocusSelector?: string;
+
+  /**
+   * A query selector to retrieve the element that should receive focus once `FocusTrap` unmounts.
+   * This value has priority over `restoreFocus`.
+   */
+  finalFocusSelector?: string;
+
+  /** Whether the first focusable element should be focused once `FocusTrap` mounts. */
+  autoFocus?: boolean;
+
+  /** Whether focus should be restored to the element that triggered the `FocusTrap` once it unmounts. */
   restoreFocus?: boolean;
 
   /** Whether the focus trap should be disabled. */
@@ -27,17 +40,58 @@ interface FocusTrapProps extends ParentProps {
  * `FocusTrap` traps focus within itself.
  */
 export const FocusTrap = createHopeComponent<"div", FocusTrapProps>(props => {
-  let previousActiveElement: HTMLElement | null;
+  let finalFocusElement: HTMLElement | null;
   let containerRef: HTMLDivElement | undefined;
 
-  const [local, others] = splitProps(props, ["ref", "restoreFocus", "isDisabled"]);
+  const [local, others] = splitProps(props, [
+    "ref",
+    "initialFocusSelector",
+    "finalFocusSelector",
+    "autoFocus",
+    "restoreFocus",
+    "isDisabled",
+  ]);
+
+  const setFinalFocusElement = () => {
+    // get a reference to the requested final focus element.
+    if (local.finalFocusSelector) {
+      finalFocusElement = document.querySelector(local.finalFocusSelector) as HTMLElement | null;
+      return;
+    }
+
+    // get a reference to the previous active element to restore focus back.
+    if (local.restoreFocus) {
+      finalFocusElement = document.activeElement as HTMLElement | null;
+    }
+  };
+
+  const focusInitialElement = () => {
+    if (!containerRef) {
+      return;
+    }
+
+    const initialFocusElement = containerRef.querySelector(
+      local.initialFocusSelector ?? "[data-autofocus]"
+    ) as HTMLElement | null;
+
+    if (initialFocusElement) {
+      initialFocusElement.focus();
+      return;
+    }
+
+    // fallback to first focusable element or container.
+    if (local.autoFocus) {
+      const first = getAllTabbableIn(containerRef)[0];
+      first ? first.focus() : containerRef.focus();
+    }
+  };
 
   const onFocus: JSX.EventHandlerUnion<HTMLSpanElement, FocusEvent> = event => {
     if (!containerRef) {
       return;
     }
 
-    const tabbables = getAllTabbableIn(containerRef, true);
+    const tabbables = getAllTabbableIn(containerRef);
 
     // Fallback to the container element
     if (!tabbables.length) {
@@ -56,23 +110,15 @@ export const FocusTrap = createHopeComponent<"div", FocusTrapProps>(props => {
   };
 
   onMount(() => {
-    if (local.restoreFocus) {
-      previousActiveElement = document.activeElement as HTMLElement | null;
-    }
+    // should run first to get the previous active element in case of restoreFocus,
+    // before FocusTrap try to focus initial element.
+    setFinalFocusElement();
 
-    if (containerRef) {
-      let first = containerRef.querySelector("[data-autofocus]") as HTMLElement | null;
-
-      if (!first) {
-        first = getAllTabbableIn(containerRef, true)[0];
-      }
-
-      first ? first.focus() : containerRef.focus();
-    }
+    focusInitialElement();
   });
 
   onCleanup(() => {
-    previousActiveElement?.focus();
+    finalFocusElement?.focus();
   });
 
   return (

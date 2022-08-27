@@ -9,12 +9,18 @@
 import { Component } from "solid-js";
 import { render } from "solid-testing-library";
 
-export function itSupportsStyle<P>(Comp: Component<P>, requiredProps: P) {
+export function itSupportsStyle<P>(Comp: Component<P>, requiredProps: P, selector?: string) {
   it("supports style property", async () => {
+    const getTarget = (container: HTMLElement) => {
+      return selector
+        ? container.querySelector(selector)
+        : (container.firstElementChild as HTMLElement);
+    };
+
     const { container } = render(() => (
       <Comp {...requiredProps} style={{ border: "1px solid cyan" }} />
     ));
 
-    expect(container.firstElementChild).toHaveStyle({ border: "1px solid cyan" });
+    expect(getTarget(container)).toHaveStyle({ border: "1px solid cyan" });
   });
 }
