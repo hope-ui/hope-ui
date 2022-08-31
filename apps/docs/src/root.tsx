@@ -1,12 +1,24 @@
 // @refresh reload
-import "./code.css";
+import "./styles/index.css";
+import "./styles/code.css";
 
-import { getCssText, HopeProvider } from "@hope-ui/core";
+import { DEFAULT_THEME, extendTheme, getCssText, HopeProvider } from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import { MDXProvider } from "solid-mdx";
 import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts } from "solid-start";
 
+import { Layout } from "./components/layout";
 import mdxComponents from "./mdx-components";
+
+const theme = extendTheme({
+  fonts: {
+    sans: `Inter ${DEFAULT_THEME.fonts.sans}`,
+    display: `Lexend ${DEFAULT_THEME.fonts.sans}`,
+  },
+  sizes: {
+    "8xl": "88rem",
+  },
+});
 
 export default function Root() {
   return (
@@ -14,17 +26,20 @@ export default function Root() {
       <Head>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
+
         {/* eslint-disable-next-line solid/no-innerhtml */}
         <style id="stitches" innerHTML={getCssText()} />
       </Head>
       <Body>
-        <HopeProvider withGlobalStyles>
+        <HopeProvider withGlobalStyles theme={theme}>
           <Suspense>
             <ErrorBoundary>
               <MDXProvider components={{ ...mdxComponents }}>
-                <Routes>
-                  <FileRoutes />
-                </Routes>
+                <Layout>
+                  <Routes>
+                    <FileRoutes />
+                  </Routes>
+                </Layout>
               </MDXProvider>
             </ErrorBoundary>
           </Suspense>

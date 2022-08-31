@@ -754,8 +754,15 @@ export type PseudoSelectorProps = Partial<{
   /** Styles for CSS selector `&:hover`. */
   _hover: PseudoSelectorValue;
 
-  /** Styles for CSS selector `&:focus`. */
+  /** Styles for CSS Selector `&:active`. */
+  _active: PseudoSelectorValue;
+
+  /** Styles for CSS selector `&:focus.  *
+   */
   _focus: PseudoSelectorValue;
+
+  /** Styles for the highlighted state.. */
+  _highlighted: PseudoSelectorValue;
 
   /**
    * Styles to apply when a child of this element has received focus
@@ -769,9 +776,6 @@ export type PseudoSelectorProps = Partial<{
    */
   _focusVisible: PseudoSelectorValue;
 
-  /** Styles for CSS Selector `&:active`. */
-  _active: PseudoSelectorValue;
-
   /**
    * Styles to apply when this element is disabled. The passed styles are applied to these CSS selectors:
    * - `&[aria-disabled=true]`
@@ -780,29 +784,8 @@ export type PseudoSelectorProps = Partial<{
    */
   _disabled: PseudoSelectorValue;
 
-  /**
-   * Styles to apply when the ARIA attribute `aria-invalid` is `true`
-   * - CSS selector `&[aria-invalid=true]`
-   */
-  _invalid: PseudoSelectorValue;
-
-  /**
-   * Styles for CSS Selector `&[aria-busy=true]` or `&[data-loading=true]`.
-   * Useful for styling loading states
-   */
-  _loading: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:first-child`. */
-  _first: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:last-child`. */
-  _last: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:nth-child(odd)`. */
-  _odd: PseudoSelectorValue;
-
-  /** Styles for CSS Selector `&:nth-child(even)`. */
-  _even: PseudoSelectorValue;
+  /** Styles for CSS Selector `&:readonly`. */
+  _readOnly: PseudoSelectorValue;
 
   /**
    * Styles for CSS selector `&::before`
@@ -826,47 +809,189 @@ export type PseudoSelectorProps = Partial<{
    */
   _after: PseudoSelectorValue;
 
+  /** Styles for CSS selector `&:empty`. */
+  _empty: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-expanded` is `true`
+   * - CSS selector `&[aria-expanded=true]`
+   */
+  _expanded: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-checked` is `true`
+   * - CSS selector `&[aria-checked=true]`
+   */
+  _checked: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-grabbed` is `true`
+   * - CSS selector `&[aria-grabbed=true]`
+   */
+  _grabbed: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `&[aria-pressed=true]`
+   * Typically used to style the current "pressed" state of toggle buttons
+   */
+  _pressed: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-invalid` is `true`
+   * - CSS selector `&[aria-invalid=true]`
+   */
+  _invalid: PseudoSelectorValue;
+
+  /**
+   * Styles for the valid state
+   * - CSS selector `&[data-valid], &[data-state=valid]`
+   */
+  _valid: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `&[aria-busy=true]` or `&[data-loading=true]`.
+   * Useful for styling loading states
+   */
+  _loading: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-selected` is `true`
+   *
+   * - CSS selector `&[aria-selected=true]`
+   */
+  _selected: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `[hidden=true]`. */
+  _hidden: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:-webkit-autofill`. */
+  _autofill: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:nth-child(even)`. */
+  _even: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:nth-child(odd)`. */
+  _odd: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:first-child`. */
+  _first: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:last-child`. */
+  _last: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:not(:first-child)`. */
+  _notFirst: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:not(:last-child)`. */
+  _notLast: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:visited`. */
+  _visited: PseudoSelectorValue;
+
+  /**
+   * Used to style the active link in a navigation
+   * Styles for CSS Selector `&[aria-current=page]`
+   */
+  _activeLink: PseudoSelectorValue;
+
+  /**
+   * Used to style the current step within a process
+   * Styles for CSS Selector `&[aria-current=step]`
+   */
+  _activeStep: PseudoSelectorValue;
+
+  /**
+   * Styles to apply when the ARIA attribute `aria-checked` is `mixed`
+   * - CSS selector `&[aria-checked=mixed]`
+   */
+  _indeterminate: PseudoSelectorValue;
+
   /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is hovered. */
   _groupHover: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is active. */
-  _groupActive: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is focused. */
-  _groupFocus: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` has focus within. */
-  _groupFocusWithin: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` has visible focus. */
-  _groupFocusVisible: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is disabled. */
-  _groupDisabled: PseudoSelectorValue;
-
-  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is invalid. */
-  _groupInvalid: PseudoSelectorValue;
 
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is hovered. */
   _peerHover: PseudoSelectorValue;
 
-  /** Styles to apply when a sibling element with `.peer` or `data-peer` is active. */
-  _peerActive: PseudoSelectorValue;
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is focused. */
+  _groupFocus: PseudoSelectorValue;
 
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is focused. */
   _peerFocus: PseudoSelectorValue;
 
-  /** Styles to apply when a sibling element with `.peer` or `data-peer` has focus within. */
-  _peerFocusWithin: PseudoSelectorValue;
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` has visible focus. */
+  _groupFocusVisible: PseudoSelectorValue;
 
   /** Styles to apply when a sibling element with `.peer`or `data-peer` has visible focus. */
   _peerFocusVisible: PseudoSelectorValue;
 
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is active. */
+  _groupActive: PseudoSelectorValue;
+
+  /** Styles to apply when a sibling element with `.peer` or `data-peer` is active. */
+  _peerActive: PseudoSelectorValue;
+
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is disabled. */
+  _groupDisabled: PseudoSelectorValue;
+
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is disabled. */
   _peerDisabled: PseudoSelectorValue;
 
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is invalid. */
+  _groupInvalid: PseudoSelectorValue;
+
   /** Styles to apply when a sibling element with `.peer` or `data-peer` is invalid. */
   _peerInvalid: PseudoSelectorValue;
+
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` is checked. */
+  _groupChecked: PseudoSelectorValue;
+
+  /** Styles to apply when a sibling element with `.peer` or `data-peer` is checked. */
+  _peerChecked: PseudoSelectorValue;
+
+  /** Styles to apply when a parent element with `.group`, `data-group` or `role=group` has focus within. */
+  _groupFocusWithin: PseudoSelectorValue;
+
+  /** Styles to apply when a sibling element with `.peer` or `data-peer` has focus within. */
+  _peerFocusWithin: PseudoSelectorValue;
+
+  /** Styles to apply when a sibling element with `.peer` or `data-peer` has placeholder shown. */
+  _peerPlaceholderShown: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&::placeholder`.. */
+  _placeholder: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:placeholder-shown`.. */
+  _placeholderShown: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&:fullscreen`.. */
+  _fullScreen: PseudoSelectorValue;
+
+  /** Styles for CSS Selector `&::selection`. */
+  _selection: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `[dir=rtl] &`
+   * It is applied when a parent element or this element has `dir="rtl"`
+   */
+  _rtl: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `[dir=ltr] &`
+   * It is applied when a parent element or this element has `dir="ltr"`
+   */
+  _ltr: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `@media (prefers-color-scheme: dark)`
+   * It is used when the user has requested the system use a light or dark color theme.
+   */
+  _mediaDark: PseudoSelectorValue;
+
+  /**
+   * Styles for CSS Selector `@media (prefers-reduced-motion: reduce)`
+   * It is used when the user has requested the system to reduce the amount of animations.
+   */
+  _mediaReduceMotion: PseudoSelectorValue;
 
   /** Styles for when light theme is applied to any parent of this component or element. */
   _light: PseudoSelectorValue;

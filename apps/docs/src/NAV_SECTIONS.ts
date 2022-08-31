@@ -3,7 +3,7 @@ interface NavLink {
   href: string;
 }
 
-interface NavSection {
+export interface NavSection {
   title: string;
   links: NavLink[];
 }
@@ -17,7 +17,7 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/docs/introduction/getting-started",
       },
       {
-        title: "Lean the basics",
+        title: "Learn the basics",
         href: "/docs/introduction/learn-the-basics",
       },
     ],
@@ -26,24 +26,24 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Styles",
     links: [
       {
-        title: "",
-        href: "/docs/styles/",
+        title: "Style props",
+        href: "/docs/styles/style-props",
       },
       {
-        title: "",
-        href: "/docs/styles/",
+        title: "The sx prop",
+        href: "/docs/styles/sx-prop",
       },
       {
-        title: "",
-        href: "/docs/styles/",
+        title: "Responsive styles",
+        href: "/docs/styles/responsive-styles",
       },
       {
-        title: "",
-        href: "/docs/styles/",
+        title: "Global styles",
+        href: "/docs/styles/global-styles",
       },
       {
-        title: "",
-        href: "/docs/styles/",
+        title: "Hope factory",
+        href: "/docs/styles/hope-factory",
       },
     ],
   },

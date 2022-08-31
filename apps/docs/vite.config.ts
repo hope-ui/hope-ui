@@ -1,6 +1,7 @@
 import { nodeTypes } from "@mdx-js/mdx";
 import mdx from "@mdx-js/rollup";
 import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import remarkShikiTwoslash from "remark-shiki-twoslash";
 import solid from "solid-start/vite";
 import netlify from "solid-start-netlify";
@@ -18,6 +19,7 @@ export default defineConfig({
         providerImportSource: "solid-mdx",
         rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
         remarkPlugins: [
+          remarkGfm,
           [
             // @ts-ignore
             remarkShikiTwoslash.default,

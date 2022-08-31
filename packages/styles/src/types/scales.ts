@@ -106,6 +106,11 @@ export type ThemeSpace =
 
 export type ThemeSize =
   | ThemeSpace
+  | "max"
+  | "min"
+  | "full"
+  | "screenW"
+  | "screenH"
   | "xs"
   | "sm"
   | "md"

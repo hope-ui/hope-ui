@@ -99,6 +99,11 @@ const defaultThemeScales: ThemeScales = {
   space,
   sizes: {
     ...space,
+    max: "max-content",
+    min: "min-content",
+    full: "100%",
+    screenW: "100vw",
+    screenH: "100vh",
     xs: "20rem",
     sm: "24rem",
     md: "28rem",
