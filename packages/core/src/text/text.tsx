@@ -9,7 +9,7 @@ import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 
 import { lineClamp } from "../utils";
-import { TextStyleConfigProps, useStyleConfig } from "./text.styles";
+import { TextStyleConfigProps, useTextStyleConfig } from "./text.styles";
 
 export interface TextProps extends TextStyleConfigProps {
   /** The number of lines the text should be truncate. */
@@ -31,7 +31,7 @@ export const Text = createHopeComponent<"p", TextProps>(props => {
     ["styleConfig", "unstyled", "size"]
   );
 
-  const { classes, styles } = useStyleConfig("Text", styleConfigProps);
+  const { classes, styles } = useTextStyleConfig("Text", styleConfigProps);
 
   const rootStyles = createMemo(() => ({
     ...styles().root,

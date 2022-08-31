@@ -10,7 +10,7 @@ import { mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 
-import { ButtonParts, useStyleConfig } from "./button.styles";
+import { ButtonParts, useButtonStyleConfig } from "./button.styles";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";
 import { isButton } from "./is-button";
@@ -55,7 +55,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
     return isNativeButton() ? "button" : undefined;
   });
 
-  const { classes, styles } = useStyleConfig("Button", styleConfigProps);
+  const { classes, styles } = useButtonStyleConfig("Button", styleConfigProps);
 
   onMount(() => {
     ref != null && setIsNativeButton(isButton(ref));

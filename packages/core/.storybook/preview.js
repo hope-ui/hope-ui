@@ -27,20 +27,12 @@ export const parameters = {
   decorators,
   options: {
     storySort: {
-      order: [
-        "General",
-        "Data entry",
-        "Data display",
-        "Navigation",
-        "Feedback",
-        "Overlay",
-        "Others",
-      ],
+      order: ["Button", "Data entry", "Data display", "Navigation", "Feedback", "Overlay"],
     },
   },
   darkMode: {
     light: { ...themes.normal, appBg: "#f9fafb", appContentBg: "#ffffff" },
-    dark: { ...themes.dark, appBg: "#262626", appContentBg: "#171717" },
+    dark: { ...themes.dark, appBg: "#1f2937", appContentBg: "#111827" },
   },
   controls: {
     matchers: {

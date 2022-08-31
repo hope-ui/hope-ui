@@ -113,16 +113,16 @@ export type ColorProps = ResponsiveProps<{
   color: Property.Color | ColorSystemTokenName;
 
   /** The CSS `background` property. */
-  bg: Property.Background<ColorSystemTokenName>;
-
-  /** The CSS `background` property. */
   background: Property.Background<ColorSystemTokenName>;
 
-  /** The CSS `background-color` property. */
-  bgColor: Property.BackgroundColor | ColorSystemTokenName;
+  /** The CSS `background` property. */
+  bg: Property.Background<ColorSystemTokenName>;
 
   /** The CSS `background-color` property. */
   backgroundColor: Property.BackgroundColor | ColorSystemTokenName;
+
+  /** The CSS `background-color` property. */
+  bgColor: Property.BackgroundColor | ColorSystemTokenName;
 
   /** The CSS `opacity` property. */
   opacity: Property.Opacity;
@@ -465,10 +465,10 @@ export type GridLayoutProps = ResponsiveProps<{
 
 export type LayoutProps = ResponsiveProps<{
   /** The CSS `display` property. */
-  d: Property.Display;
+  display: Property.Display;
 
   /** The CSS `display` property. */
-  display: Property.Display;
+  d: Property.Display;
 
   /** The CSS `vertical-align` property. */
   verticalAlign: Property.VerticalAlign;
@@ -588,6 +588,9 @@ export type PaddingProps = ResponsiveProps<{
 export type PositionProps = ResponsiveProps<{
   /** The CSS `position` property. */
   position: Property.Position;
+
+  /** The CSS `position` property. */
+  pos: Property.Position;
 
   /** The CSS `z-index` property. */
   zIndex: Property.ZIndex | ThemeZIndice;

@@ -20,7 +20,7 @@ interface TextVariants {
     | "9xl";
 }
 
-export const useStyleConfig = createStyleConfig<TextParts, TextVariants>({
+export const useTextStyleConfig = createStyleConfig<TextParts, TextVariants>({
   root: {
     base: {
       margin: 0,
@@ -84,4 +84,4 @@ export const useStyleConfig = createStyleConfig<TextParts, TextVariants>({
   },
 });
 
-export type TextStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;
+export type TextStyleConfigProps = StyleConfigProps<typeof useTextStyleConfig>;

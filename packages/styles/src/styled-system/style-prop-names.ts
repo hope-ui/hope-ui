@@ -44,10 +44,10 @@ const borderPropNames: KeysOf<BorderProps> = {
 
 const colorPropNames: KeysOf<ColorProps> = {
   color: true,
-  bg: true,
   background: true,
-  bgColor: true,
+  bg: true,
   backgroundColor: true,
+  bgColor: true,
   opacity: true,
 };
 
@@ -102,8 +102,8 @@ const interactivityPropNames: KeysOf<InteractivityProps> = {
 };
 
 const layoutPropNames: KeysOf<LayoutProps> = {
-  d: true,
   display: true,
+  d: true,
   verticalAlign: true,
   overflow: true,
   overflowX: true,
@@ -142,6 +142,7 @@ const paddingPropNames: KeysOf<PaddingProps> = {
 
 const positionPropNames: KeysOf<PositionProps> = {
   position: true,
+  pos: true,
   zIndex: true,
   top: true,
   right: true,

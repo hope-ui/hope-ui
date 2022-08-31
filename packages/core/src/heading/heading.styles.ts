@@ -20,7 +20,7 @@ interface HeadingVariants {
     | "9xl";
 }
 
-export const useStyleConfig = createStyleConfig<HeadingParts, HeadingVariants>({
+export const useHeadingStyleConfig = createStyleConfig<HeadingParts, HeadingVariants>({
   root: {
     base: {
       margin: 0,
@@ -87,4 +87,4 @@ export const useStyleConfig = createStyleConfig<HeadingParts, HeadingVariants>({
   },
 });
 
-export type HeadingStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;
+export type HeadingStyleConfigProps = StyleConfigProps<typeof useHeadingStyleConfig>;

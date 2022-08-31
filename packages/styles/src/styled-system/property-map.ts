@@ -88,6 +88,9 @@ export const SHORTHANDS_MAP = new Map<keyof BaseSystemStyleProps, Array<keyof CS
   // layout
   ["d", ["display"]],
 
+  // position
+  ["pos", ["position"]],
+
   // margin
   ["m", ["margin"]],
   ["mt", ["marginTop"]],

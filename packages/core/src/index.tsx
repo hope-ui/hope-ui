@@ -7,6 +7,7 @@ export * from "./provider";
 export * from "./utils";
 
 // components
+export * from "./anchor";
 export * from "./aspect-ratio";
 export * from "./box";
 export * from "./button";

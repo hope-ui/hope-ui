@@ -55,25 +55,25 @@ function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
       },
       style: {
         color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
-        backgroundColor: vars.colors[colorScheme][isNeutral ? "900" : isWarning ? "300" : "500"],
-        borderColor: vars.colors[colorScheme][isNeutral ? "900" : isWarning ? "300" : "500"],
+        backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
+        borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
 
         _hover: {
           color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
-          backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "400" : "600"],
-          borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "400" : "600"],
+          backgroundColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
+          borderColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
         },
 
         _active: {
           color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
-          backgroundColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
-          borderColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
+          backgroundColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
+          borderColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
         },
 
         _disabled: {
-          color: vars.colors.common.white,
-          backgroundColor: vars.colors.neutral["200"],
-          borderColor: vars.colors.neutral["200"],
+          color: vars.colors.neutral["200"],
+          backgroundColor: vars.colors.neutral["100"],
+          borderColor: vars.colors.neutral["100"],
         },
 
         _dark: {
@@ -119,7 +119,7 @@ function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: vars.colors[colorScheme][isWarning ? "900" : "800"],
+        color: vars.colors[colorScheme][isWarning ? "900" : "700"],
         backgroundColor: vars.colors[colorScheme][isNeutral ? "200" : isWarning ? "100" : "50"],
         borderColor: vars.colors[colorScheme][isNeutral ? "200" : isWarning ? "100" : "50"],
 
@@ -184,18 +184,18 @@ function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: vars.colors[colorScheme]["800"],
+        color: vars.colors[colorScheme][isWarning ? "800" : "700"],
         backgroundColor: "transparent",
         borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "400" : "300"],
 
         _hover: {
-          color: vars.colors[colorScheme]["800"],
+          color: vars.colors[colorScheme][isWarning ? "800" : "700"],
           backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
           borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "500" : "400"],
         },
 
         _active: {
-          color: vars.colors[colorScheme]["800"],
+          color: vars.colors[colorScheme][isWarning ? "800" : "700"],
           backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
           borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "500" : "400"],
         },
@@ -249,18 +249,18 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: vars.colors[colorScheme]["800"],
+        color: vars.colors[colorScheme][isWarning ? "800" : "700"],
         backgroundColor: "transparent",
         borderColor: "transparent",
 
         _hover: {
-          color: vars.colors[colorScheme]["800"],
+          color: vars.colors[colorScheme][isWarning ? "800" : "700"],
           backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
           borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "100" : "50"],
         },
 
         _active: {
-          color: vars.colors[colorScheme]["800"],
+          color: vars.colors[colorScheme][isWarning ? "800" : "700"],
           backgroundColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
           borderColor: vars.colors[colorScheme][isNeutral || isWarning ? "200" : "100"],
         },
@@ -301,7 +301,7 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
   return compoundVariants;
 }
 
-export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
+export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
   vars => ({
     root: {
       base: {
@@ -351,13 +351,13 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
 
             _hover: {
               color: vars.colors.neutral["800"],
-              backgroundColor: vars.colors.neutral["50"],
+              backgroundColor: vars.colors.neutral["100"],
               borderColor: vars.colors.neutral["400"],
             },
 
             _active: {
               color: vars.colors.neutral["800"],
-              backgroundColor: vars.colors.neutral["100"],
+              backgroundColor: vars.colors.neutral["200"],
               borderColor: vars.colors.neutral["400"],
             },
 
@@ -465,4 +465,4 @@ export const useStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
   }
 );
 
-export type ButtonStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;
+export type ButtonStyleConfigProps = StyleConfigProps<typeof useButtonStyleConfig>;

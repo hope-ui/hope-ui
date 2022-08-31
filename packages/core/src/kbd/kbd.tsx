@@ -10,7 +10,7 @@ import { ComponentTheme, createHopeComponent, hope } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-import { KbdStyleConfigProps, useStyleConfig } from "./kbd.styles";
+import { KbdStyleConfigProps, useKbdStyleConfig } from "./kbd.styles";
 
 export interface KbdProps extends KbdStyleConfigProps {}
 
@@ -26,7 +26,7 @@ export const Kbd = createHopeComponent<"kbd", KbdProps>(props => {
     ["styleConfig", "unstyled"]
   );
 
-  const { classes, styles } = useStyleConfig("Kbd", styleConfigProps);
+  const { classes, styles } = useKbdStyleConfig("Kbd", styleConfigProps);
 
   return <hope.kbd class={clsx(classes().root, local.class)} __css={styles().root} {...others} />;
 });

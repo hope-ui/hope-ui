@@ -1,6 +1,6 @@
 import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
-export const useStyleConfig = createStyleConfig<"root", {}>({
+export const useKbdStyleConfig = createStyleConfig<"root", {}>({
   root: {
     base: {
       borderRadius: "md",
@@ -28,4 +28,4 @@ export const useStyleConfig = createStyleConfig<"root", {}>({
   },
 });
 
-export type KbdStyleConfigProps = StyleConfigProps<typeof useStyleConfig>;
+export type KbdStyleConfigProps = StyleConfigProps<typeof useKbdStyleConfig>;

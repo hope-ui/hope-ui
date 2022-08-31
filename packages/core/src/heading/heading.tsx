@@ -10,7 +10,7 @@ import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
 
 import { lineClamp } from "../utils";
-import { HeadingStyleConfigProps, useStyleConfig } from "./heading.styles";
+import { HeadingStyleConfigProps, useHeadingStyleConfig } from "./heading.styles";
 
 type StringAndNumber<T extends number> = T | `${T}`;
 
@@ -39,7 +39,7 @@ export const Heading = createHopeComponent<"h2", HeadingProps>(props => {
     ["styleConfig", "unstyled", "size"]
   );
 
-  const { classes, styles } = useStyleConfig("Heading", styleConfigProps);
+  const { classes, styles } = useHeadingStyleConfig("Heading", styleConfigProps);
 
   // create an `<h>` tag with the level or return the `as` prop
   const asProp = () => (local.level ? `h${local.level}` : local.as);

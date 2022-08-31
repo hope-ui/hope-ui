@@ -50,6 +50,7 @@
     "@commitlint/config-conventional": "17.0.3",
     "@commitlint/cz-commitlint": "17.0.3",
     "@jest/types": "28.1.1",
+    "@motionone/solid": "10.14.1",
     "@stitches/core": "1.2.8",
     "@testing-library/dom": "8.14.0",
     "@testing-library/jest-dom": "5.16.4",
