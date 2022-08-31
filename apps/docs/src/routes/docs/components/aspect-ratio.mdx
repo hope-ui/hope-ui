@@ -1,6 +1,10 @@
+import { AspectRatio, hope } from "@hope-ui/core";
+
+import { Preview } from "../../../components/preview";
+
 # AspectRatio
 
-AspectRatio component is used to embed responsive videos and maps, etc. It uses a very common [padding hack](https://css-tricks.com/aspect-ratio-boxes/) to achieve this.
+Display images, videos, maps and other media with a consistent width/height ratio.
 
 ## Import
 
@@ -10,15 +14,43 @@ import { AspectRatio } from "@hope-ui/core";
 
 ## Usage
 
-### Embed video
+Use the `ratio` prop to define a consistent width/height ratio.
 
-To embed a video with a specific aspect ratio, use an iframe with `src` pointing to the link of the video.
+<Preview>
+  <AspectRatio ratio={9 / 16} maxW="200px" mx="auto">
+    <hope.img
+      src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
+      alt="Monkey D. Luffy"
+      objectFit="cover"
+    />
+  </AspectRatio>
+</Preview>
 
-Pass the `maxWidth` prop to `AspectRatio` to control the width of the content.
+```tsx
+<AspectRatio ratio={9 / 16} maxW="200px" mx="auto">
+  <Image
+    src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
+    alt="Monkey D. Luffy"
+    objectFit="cover"
+  />
+</AspectRatio>
+```
+
+### Embed a video
+
+<Preview>
+  <AspectRatio ratio={1} maxW="560px" mx="auto">
+    <iframe
+      title="one piece opening 1"
+      src="https://www.youtube.com/embed/HRaoYuRKBaA"
+      allowfullscreen
+    />
+  </AspectRatio>
+</Preview>
 
 ```tsx
 // This video will have equal sides
-<AspectRatio maxW="560px" ratio={1}>
+<AspectRatio ratio={1} maxW="560px" mx="auto">
   <iframe
     title="one piece opening 1"
     src="https://www.youtube.com/embed/HRaoYuRKBaA"
@@ -27,19 +59,19 @@ Pass the `maxWidth` prop to `AspectRatio` to control the width of the content.
 </AspectRatio>
 ```
 
-### Embed image
-
-Here's how to embed an image that has a 4 by 3 aspect ratio.
-
-```tsx
-<AspectRatio maxW="400px" ratio={4 / 3}>
-  <Image src="https://bit.ly/3pq0AcS" alt="Monkey D. Luffy" objectFit="cover" />
-</AspectRatio>
-```
-
 ### Embed a map
 
-Here's how to embed a responsive Google map using `AspectRatio`. To make the map take up the entire width, we can ignore the `maxWidth` prop.
+<Preview>
+  <AspectRatio ratio={16 / 9}>
+    <iframe
+      title="reunion island"
+      src="https://www.google.com/maps/embed?
+pb=!1m18!1m12!1m3!1d10240.720471033459!2d55.27333136315537!3d-21.009371764170627!2m3!1
+f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x218288b199fec3e9%3A0xcd75253c6f21188d!2
+sSt%20Paul%2097460%2C%20La%20R%C3%A9union!5e0!3m2!1sfr!2sfr!4v1646123686380!5m2!1sfr!2sfr"
+    />
+  </AspectRatio>
+</Preview>
 
 ```tsx
 <AspectRatio ratio={16 / 9}>
@@ -55,6 +87,6 @@ sSt%20Paul%2097460%2C%20La%20R%C3%A9union!5e0!3m2!1sfr!2sfr!4v1646123686380!5m2!
 
 ## Props
 
-| Name  | Type                      | Description                                       | Default value |
-| ----- | ------------------------- | ------------------------------------------------- | ------------- |
-| ratio | `ResponsiveValue<number>` | The aspect ratio of the Box (ex: 16/9, 4/3, etc). | 4/3           |
+| Name  | Type                      | Description                                  | Default value |
+| ----- | ------------------------- | -------------------------------------------- | ------------- |
+| ratio | `ResponsiveValue<number>` | The aspect ratio of the Box (ex: 16/9, 4/3). | 4/3           |
