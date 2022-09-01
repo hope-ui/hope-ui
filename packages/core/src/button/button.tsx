@@ -1,3 +1,11 @@
+/*!
+ * Portions of this file are based on code from chakra-ui.
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/7d7e04d53d871e324debe0a2cb3ff44d7dbf3bca/packages/components/button/src/button.tsx
+ */
+
 import { createTagName } from "@hope-ui/primitives";
 import {
   createHopeComponent,
@@ -16,6 +24,10 @@ import { ButtonLoader } from "./button-loader";
 import { isButton } from "./is-button";
 import { ButtonContentProps, ButtonProps } from "./types";
 
+/**
+ * Button is used to trigger an action or event,
+ * such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.
+ */
 export const Button = createHopeComponent<"button", ButtonProps>(props => {
   let ref: HTMLButtonElement | undefined;
 
@@ -35,7 +47,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
       "isDisabled",
     ],
     ["children", "leftIcon", "rightIcon"],
-    ["styleConfig", "unstyled", "colorScheme", "variant", "size", "isFullWidth"]
+    ["styleConfig", "unstyled", "colorScheme", "variant", "size", "isFullWidth", "isIconButton"]
   );
 
   const tagName = createTagName(

@@ -73,6 +73,19 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    title: "Guides",
+    links: [
+      {
+        title: "Custom components",
+        href: "/docs/guides/custom-components",
+      },
+      {
+        title: "Usage with Solid Start",
+        href: "/docs/guides/usage-with-solid-start",
+      },
+    ],
+  },
+  {
     title: "Layout",
     links: [
       {

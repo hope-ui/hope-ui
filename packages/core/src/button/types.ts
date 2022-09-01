@@ -57,3 +57,24 @@ export type ButtonTheme = ComponentTheme<
   ButtonProps,
   "colorScheme" | "variant" | "size" | "loaderPlacement"
 >;
+
+export interface IconButtonProps
+  extends Omit<
+    ButtonProps,
+    | "loadingText"
+    | "loaderPlacement"
+    | "leftIcon"
+    | "rightIcon"
+    | "isFullWidth"
+    | "isIconButton"
+    | "children"
+  > {
+  /** A label that describes the button. */
+  "aria-label": string;
+
+  /** The icon to be used in the button. */
+  icon?: JSX.Element;
+
+  /** The icon to be used in the button. */
+  children?: JSX.Element;
+}

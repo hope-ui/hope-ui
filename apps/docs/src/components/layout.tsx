@@ -6,6 +6,7 @@ import { NAV_SECTIONS } from "../NAV_SECTIONS";
 import { ArrowLeftIcon, ArrowRightIcon, GitHubIcon } from "./icons";
 import { Logo } from "./logo";
 import { Navigation } from "./navigation";
+import { MobileNavigation } from "./mobile-navigation";
 
 const PageLink = hope(Link, {
   base: {
@@ -45,8 +46,8 @@ const StyledHeader = hope("header", {
 function Header() {
   return (
     <StyledHeader>
-      <Flex d={{ lg: "none" }} mr={6}>
-        {/* <MobileNavigation navigation={NAV_SECTIONS} /> */}
+      <Flex d={{ lg: "none" }} mr={4}>
+        <MobileNavigation sections={NAV_SECTIONS} />
       </Flex>
       <Flex pos="relative" alignItems="center" flexGrow={1} flexBasis={0}>
         <HStack as={Link} href="/" aria-label="Home page" spacing={2}>
@@ -134,7 +135,6 @@ export function Layout(props: ParentProps) {
               </header>
             </Show>
             <div>{props.children}</div>
-            {/* <Prose>{props.children}</Prose> */}
           </article>
           <Flex
             as="dl"

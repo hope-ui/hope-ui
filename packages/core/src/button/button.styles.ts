@@ -5,6 +5,7 @@ import {
   StyleConfigCompoundVariant,
   StyleConfigProps,
   ThemeColorScheme,
+  ThemeSize,
   ThemeVars,
 } from "@hope-ui/styles";
 
@@ -30,6 +31,9 @@ interface ButtonVariants {
 
   /** Whether the button should take all available width. */
   isFullWidth: boolean;
+
+  /** Whether the button is an icon only button. */
+  isIconButton: boolean;
 }
 
 const colorSchemes: Array<ButtonVariants["colorScheme"]> = [
@@ -301,6 +305,32 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
   return compoundVariants;
 }
 
+const boxSizes: Map<ButtonVariants["size"], ThemeSize> = new Map([
+  ["xs", "7"],
+  ["sm", "8"],
+  ["md", "10"],
+  ["lg", "12"],
+]);
+
+function getRootIconButtonSizeCompoundVariants(vars: ThemeVars) {
+  const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
+
+  for (const [size, tokenValue] of boxSizes) {
+    compoundVariants.push({
+      variants: {
+        isIconButton: true,
+        size,
+      },
+      style: {
+        width: tokenValue, // for IconButton width === height
+        p: 0,
+      },
+    });
+  }
+
+  return compoundVariants;
+}
+
 export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
   vars => ({
     root: {
@@ -394,22 +424,22 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         },
         size: {
           xs: {
-            height: 7,
+            height: boxSizes.get("xs"),
             px: 3,
             fontSize: "xs",
           },
           sm: {
-            height: 8,
+            height: boxSizes.get("sm"),
             px: 4,
             fontSize: "sm",
           },
           md: {
-            height: 10,
+            height: boxSizes.get("md"),
             px: 5,
             fontSize: "base",
           },
           lg: {
-            height: 12,
+            height: boxSizes.get("lg"),
             px: 6,
             fontSize: "lg",
           },
@@ -430,6 +460,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         ...getRootSoftColorSchemeCompoundVariants(vars),
         ...getRootOutlinedColorSchemeCompoundVariants(vars),
         ...getRootPlainColorSchemeCompoundVariants(vars),
+        ...getRootIconButtonSizeCompoundVariants(vars),
       ],
     },
     icon: {
