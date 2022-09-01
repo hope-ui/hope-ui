@@ -55,7 +55,7 @@
   "peerDependencies": {
     "@stitches/core": "^1.2.8",
     "clsx": "^1.2.1",
-    "solid-js": "^1.5.1"
+    "solid-js": "^1.5.3"
   },
   "publishConfig": {
     "access": "public"
