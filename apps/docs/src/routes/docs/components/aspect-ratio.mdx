@@ -1,6 +1,6 @@
 import { AspectRatio, hope } from "@hope-ui/core";
 
-import { Preview } from "../../../components/preview";
+import { Preview } from "~/components/preview";
 
 # AspectRatio
 
@@ -17,17 +17,17 @@ import { AspectRatio } from "@hope-ui/core";
 Use the `ratio` prop to define a consistent width/height ratio.
 
 <Preview>
-  <AspectRatio ratio={9 / 16} maxW="200px" mx="auto">
+  <AspectRatio ratio={9 / 16} maxW="200px">
     <hope.img
       src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
       alt="Monkey D. Luffy"
-      objectFit="cover"
+      sx={{ objectFit: "cover" }}
     />
   </AspectRatio>
 </Preview>
 
 ```tsx
-<AspectRatio ratio={9 / 16} maxW="200px" mx="auto">
+<AspectRatio ratio={9 / 16} maxW="200px">
   <Image
     src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
     alt="Monkey D. Luffy"
@@ -39,7 +39,7 @@ Use the `ratio` prop to define a consistent width/height ratio.
 ### Embed a video
 
 <Preview>
-  <AspectRatio ratio={1} maxW="560px" mx="auto">
+  <AspectRatio ratio={1} maxW="560px">
     <iframe
       title="one piece opening 1"
       src="https://www.youtube.com/embed/HRaoYuRKBaA"
@@ -50,7 +50,7 @@ Use the `ratio` prop to define a consistent width/height ratio.
 
 ```tsx
 // This video will have equal sides
-<AspectRatio ratio={1} maxW="560px" mx="auto">
+<AspectRatio ratio={1} maxW="560px">
   <iframe
     title="one piece opening 1"
     src="https://www.youtube.com/embed/HRaoYuRKBaA"

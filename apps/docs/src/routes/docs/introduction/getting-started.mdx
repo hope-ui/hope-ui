@@ -1,0 +1,48 @@
+# Getting started
+
+## Installation
+
+Install Hope UI dependencies by running either of the following:
+
+```bash
+npm install @hope-ui/core @stitches/core @motionone/solid clsx
+```
+
+```bash
+yarn add @hope-ui/core @stitches/core @motionone/solid clsx
+```
+
+```bash
+pnpm add @hope-ui/core @stitches/core @motionone/solid clsx
+```
+
+Wrap your application root component with `HopeProvider`:
+
+```tsx
+import { HopeProvider } from "@hope-ui/core";
+
+function Demo() {
+  return (
+    <HopeProvider withGlobalStyles>
+      <App />
+    </HopeProvider>
+  );
+}
+```
+
+Now you can use Hope UI components in your application.
+
+```tsx
+import { Button } from "@hope-ui/core";
+
+function App() {
+  return <Button>Button</Button>;
+}
+```
+
+### Dependencies explanation
+
+- `@hope-ui/core`: The core Hope UI library containing components and style engine.
+- `@stitches/core`: The CSS-in-JS library used internally by Hope UI.
+- `@motionone/solid`: The animation library used internally by Hope UI.
+- `clsx`: Utility for constructing className strings conditionally.

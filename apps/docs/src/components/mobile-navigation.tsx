@@ -1,6 +1,7 @@
 import { createHopeComponent, createIcon, IconButton } from "@hope-ui/core";
 import { useIsRouting } from "@solidjs/router";
 import { createComputed, createSignal } from "solid-js";
+
 import { NavSection } from "../NAV_SECTIONS";
 
 const MenuIcon = createIcon({

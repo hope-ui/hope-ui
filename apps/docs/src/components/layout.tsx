@@ -1,12 +1,12 @@
-import { Box, Flex, hope, HStack, Text } from "@hope-ui/core";
+import { Anchor, Box, Flex, hope, HStack, Text } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
-import { ParentProps, Show } from "solid-js";
+import { createMemo, ParentProps, Show } from "solid-js";
 
-import { NAV_SECTIONS } from "../NAV_SECTIONS";
-import { ArrowLeftIcon, ArrowRightIcon, GitHubIcon } from "./icons";
+import { NAV_SECTIONS, NavSection } from "../NAV_SECTIONS";
+import { ArrowLeftIcon, ArrowRightIcon, ExclamationCircleMiniIcon, GitHubIcon } from "./icons";
 import { Logo } from "./logo";
-import { Navigation } from "./navigation";
 import { MobileNavigation } from "./mobile-navigation";
+import { Navigation } from "./navigation";
 
 const PageLink = hope(Link, {
   base: {
@@ -26,10 +26,6 @@ const PageLink = hope(Link, {
 
 const StyledHeader = hope("header", {
   base: {
-    position: "sticky",
-    top: 0,
-    zIndex: "sticky",
-
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -43,60 +39,89 @@ const StyledHeader = hope("header", {
   },
 });
 
-function Header() {
+interface HeaderProps {
+  navSections: NavSection[];
+}
+
+function Header(props: HeaderProps) {
   return (
-    <StyledHeader>
-      <Flex d={{ lg: "none" }} mr={4}>
-        <MobileNavigation sections={NAV_SECTIONS} />
-      </Flex>
-      <Flex pos="relative" alignItems="center" flexGrow={1} flexBasis={0}>
-        <HStack as={Link} href="/" aria-label="Home page" spacing={2}>
-          <Logo boxSize={8} />
-          <hope.span color="neutral.900" fontWeight="medium" fontSize="xl">
-            Hope
-            <hope.span color="primary.500" fontWeight="bold" ml={1}>
-              UI
-            </hope.span>
-          </hope.span>
-        </HStack>
-      </Flex>
-      <Box mr={[6, 8, 0]} my={vars => `calc(${vars.space[5]} * -1)`}>
-        {/*<Search />*/}
-      </Box>
-      <Flex
-        pos="relative"
-        flexBasis={0}
-        justifyContent="flex-end"
-        gap={[6, 8]}
-        flexGrow={{ md: 1 }}
+    <Box pos="sticky" top={0} zIndex="sticky">
+      <HStack
+        fontSize="sm"
+        fontWeight="medium"
+        lineHeight={5}
+        px={2}
+        py={1}
+        spacing={1}
+        bg="danger.600"
+        color="common.white"
       >
-        {/*<ThemeSelector class="relative z-10" />*/}
-        <Link href="https://github.com/hope-ui/hope-ui" class="group" aria-label="GitHub">
-          <GitHubIcon
-            boxSize={6}
-            color="neutral.700"
-            _groupHover={{
-              color: "neutral.800",
+        <ExclamationCircleMiniIcon fontSize="1.3em" />
+        <span>
+          This is Hope UI <strong>1.0-next</strong> documentation, examples and information may be
+          broken or outdated.
+        </span>
+      </HStack>
+      <StyledHeader>
+        <Flex d={{ lg: "none" }} mr={4}>
+          <MobileNavigation sections={props.navSections} />
+        </Flex>
+        <Flex pos="relative" alignItems="center" flexGrow={1} flexBasis={0}>
+          <HStack as={Link} href="/" aria-label="Home page" spacing={2}>
+            <Logo boxSize={8} />
+            <hope.span color="neutral.900" fontWeight="medium" fontSize="xl">
+              Hope
+              <hope.span color="primary.500" fontWeight="bold" ml={1}>
+                UI
+              </hope.span>
+            </hope.span>
+          </HStack>
+        </Flex>
+        <Box mr={[6, 8, 0]} my={vars => `calc(${vars.space[5]} * -1)`}>
+          {/*<Search />*/}
+        </Box>
+        <Flex
+          pos="relative"
+          flexBasis={0}
+          justifyContent="flex-end"
+          gap={[6, 8]}
+          flexGrow={{ md: 1 }}
+        >
+          {/*<ThemeSelector class="relative z-10" />*/}
+          <Anchor
+            unstyled
+            isExternal
+            href="https://github.com/hope-ui/hope-ui"
+            aria-label="GitHub"
+            color="neutral.600"
+            _hover={{
+              color: "neutral.700",
             }}
-          />
-        </Link>
-      </Flex>
-    </StyledHeader>
+          >
+            <GitHubIcon boxSize={6} />
+          </Anchor>
+        </Flex>
+      </StyledHeader>
+    </Box>
   );
 }
 
 export function Layout(props: ParentProps) {
   const location = useLocation();
+
   const allLinks = NAV_SECTIONS.flatMap(section => section.links);
   const linkIndex = () => allLinks.findIndex(link => link.href === location.pathname);
   const previousPage = () => allLinks[linkIndex() - 1];
   const nextPage = () => allLinks[linkIndex() + 1];
-  const section = () =>
-    NAV_SECTIONS.find(section => section.links.find(link => link.href === location.pathname));
+  const section = () => {
+    return NAV_SECTIONS.find(section =>
+      section.links.find(link => link.href === location.pathname)
+    );
+  };
 
   return (
     <>
-      <Header />
+      <Header navSections={NAV_SECTIONS} />
       <Flex
         pos="relative"
         mx="auto"
@@ -107,10 +132,11 @@ export function Layout(props: ParentProps) {
         <Box d={{ base: "none", lg: "block" }} pos={{ lg: "relative" }} flex={{ lg: "none" }}>
           <Box
             pos="sticky"
-            top="4.5rem"
+            top="100px" // height of the header
             ml={vars => `calc(${vars.space["0.5"]} * -1)`}
-            h="calc(100vh - 4.5rem)"
+            h="calc(100vh - 100px)" // 100vh - height of the header
             overflowY="auto"
+            overflowX="hidden"
             py={16}
             pl={0.5}
           >

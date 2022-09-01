@@ -2,7 +2,10 @@ import { hope } from "@hope-ui/core";
 
 export const Preview = hope("div", vars => ({
   base: {
-    mt: 6,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    mt: 5,
     roundedTop: "lg",
     border: `1px solid ${vars.colors.neutral[200]}`,
     overflowY: "auto",
@@ -15,6 +18,13 @@ export const Preview = hope("div", vars => ({
       p: 4,
       borderTop: "none",
       borderTopRadius: "none",
+    },
+  },
+  variants: {
+    isFullRounded: {
+      true: {
+        rounded: "lg",
+      },
     },
   },
 }));

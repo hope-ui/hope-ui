@@ -45,22 +45,32 @@ export default {
     <hope.code
       fontSize="0.9em"
       fontFamily="mono"
-      rounded="sm"
+      rounded="md"
       bg="neutral.100"
-      px="0.25em"
-      py="2px"
-      sx={{
+      px="0.4em"
+      py="0.2em"
+      sx={vars => ({
         overflowWrap: "break-word",
+
+        // Reset style inside Callout.
+        ".hope-docs-Callout-root &": {
+          border: `1px solid ${vars.colors.neutral["300"]}`,
+          color: "neutral.700",
+        },
 
         // Reset style inside table (ex: for props tables).
         "table &": {
           color: "primary.500",
           bg: "transparent",
+          px: 0,
         },
-      }}
+      })}
       {...props}
     />
   ),
+  ul: (props: any) => <hope.ul ml={6} mt={6} sx={{ listStyleType: "disc" }} {...props} />,
+  ol: (props: any) => <hope.ol ml={6} mt={6} sx={{ listStyleType: "decimal" }} {...props} />,
+  li: (props: any) => <hope.li my={3} {...props} />,
   table: (props: any) => (
     <hope.table
       p={0}

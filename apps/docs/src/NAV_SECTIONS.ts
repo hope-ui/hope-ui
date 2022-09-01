@@ -8,6 +8,18 @@ export interface NavSection {
   links: NavLink[];
 }
 
+const VERSIONS = ["1.0.0"].reverse();
+
+const CHANGELOG_NAV_SECTIONS: NavSection[] = [
+  {
+    title: "Changelog",
+    links: VERSIONS.map(version => ({
+      title: `v${version}`,
+      href: `/docs/changelog/${version.replaceAll(".", "-")}`,
+    })),
+  },
+];
+
 export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Introduction",
@@ -156,7 +168,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
-  {
+  /*{
     title: "Data entry",
     links: [
       {
@@ -200,5 +212,6 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/docs/components/",
       },
     ],
-  },
+  },*/
+  //...CHANGELOG_NAV_SECTIONS,
 ];
