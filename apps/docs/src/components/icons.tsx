@@ -22,6 +22,7 @@ export const LightIcon = createIcon({
 });
 
 export const DarkIcon = createIcon({
+  viewBox: "0 0 16 16",
   path: () => (
     <path
       fill-rule="evenodd"
@@ -32,11 +33,34 @@ export const DarkIcon = createIcon({
 });
 
 export const SystemIcon = createIcon({
+  viewBox: "0 0 16 16",
   path: () => (
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"
       d="M1 4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-1.5l.31 1.242c.084.333.36.573.63.808.091.08.182.158.264.24A1 1 0 0 1 11 15H5a1 1 0 0 1-.704-1.71c.082-.082.173-.16.264-.24.27-.235.546-.475.63-.808L5.5 11H4a3 3 0 0 1-3-3V4Zm3-1a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4Z"
+    />
+  ),
+});
+
+export const ArrowRightIcon = createIcon({
+  path: () => (
+    <path
+      fill="currentColor"
+      fill-rule="evenodd"
+      d="M12.97 3.97a.75.75 0 011.06 0l7.5 7.5a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 11-1.06-1.06l6.22-6.22H3a.75.75 0 010-1.5h16.19l-6.22-6.22a.75.75 0 010-1.06z"
+      clip-rule="evenodd"
+    />
+  ),
+});
+
+export const ArrowLeftIcon = createIcon({
+  path: () => (
+    <path
+      fill="currentColor"
+      fill-rule="evenodd"
+      d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z"
+      clip-rule="evenodd"
     />
   ),
 });

@@ -1,14 +1,17 @@
-import { Box, Flex, Heading, hope, HStack, Text, VStack } from "@hope-ui/core";
+import { Box, Flex, hope, HStack, Text } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
 import { ParentProps, Show } from "solid-js";
 
 import { NAV_SECTIONS } from "../NAV_SECTIONS";
-import { GitHubIcon } from "./icons";
+import { ArrowLeftIcon, ArrowRightIcon, GitHubIcon } from "./icons";
 import { Logo } from "./logo";
 import { Navigation } from "./navigation";
 
 const PageLink = hope(Link, {
   base: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1.5,
     color: "neutral.500",
     fontSize: "base",
     lineHeight: 6,
@@ -148,8 +151,8 @@ export function Layout(props: ParentProps) {
                 </hope.dt>
                 <hope.dd mt={1}>
                   <PageLink href={previousPage().href}>
-                    <span aria-hidden="true">&larr; </span>
-                    {previousPage().title}
+                    <ArrowLeftIcon aria-hidden="true" />
+                    <span>{previousPage().title}</span>
                   </PageLink>
                 </hope.dd>
               </div>
@@ -161,8 +164,8 @@ export function Layout(props: ParentProps) {
                 </hope.dt>
                 <hope.dd mt={1}>
                   <PageLink href={nextPage().href}>
-                    {nextPage().title}
-                    <span aria-hidden="true"> &rarr;</span>
+                    <span>{nextPage().title}</span>
+                    <ArrowRightIcon aria-hidden="true" />
                   </PageLink>
                 </hope.dd>
               </Box>
