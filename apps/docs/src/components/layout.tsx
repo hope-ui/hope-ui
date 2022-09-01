@@ -148,7 +148,8 @@ export function Layout(props: ParentProps) {
                 </hope.dt>
                 <hope.dd mt={1}>
                   <PageLink href={previousPage().href}>
-                    <span aria-hidden="true">&larr;</span> {previousPage().title}
+                    <span aria-hidden="true">&larr; </span>
+                    {previousPage().title}
                   </PageLink>
                 </hope.dd>
               </div>
@@ -160,7 +161,8 @@ export function Layout(props: ParentProps) {
                 </hope.dt>
                 <hope.dd mt={1}>
                   <PageLink href={nextPage().href}>
-                    {nextPage().title} <span aria-hidden="true">&rarr;</span>
+                    {nextPage().title}
+                    <span aria-hidden="true"> &rarr;</span>
                   </PageLink>
                 </hope.dd>
               </Box>

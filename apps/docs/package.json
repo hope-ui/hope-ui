@@ -38,6 +38,7 @@
   "devDependencies": {
     "@mdx-js/mdx": "2.1.0",
     "@mdx-js/rollup": "2.0.0",
+    "babel-preset-solid": "^1.5.3",
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",
     "node-fetch": "2.6.7",
@@ -46,14 +47,14 @@
     "remark-gfm": "3.0.1",
     "remark-shiki-twoslash": "3.1.0",
     "safer-buffer": "2.1.2",
-    "solid-js": "1.5.1",
+    "solid-js": "1.5.3",
     "solid-mdx": "0.0.6",
     "solid-start": "0.1.0-alpha.99",
     "solid-start-netlify": "0.1.0-alpha.99",
     "solid-start-node": "0.1.0-alpha.99",
     "typescript": "4.7.4",
     "undici": "5.8.1",
-    "vite": "3.0.4"
+    "vite": "3.0.9"
   },
   "engines": {
     "node": ">=16"
