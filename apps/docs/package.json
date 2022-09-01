@@ -38,6 +38,7 @@
   "devDependencies": {
     "@mdx-js/mdx": "2.1.0",
     "@mdx-js/rollup": "2.0.0",
+    "babel-preset-solid": "^1.5.3",
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",
     "node-fetch": "2.6.7",
