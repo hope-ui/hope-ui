@@ -1,109 +1,176 @@
-import { Anchor, Heading, hope, Text } from "@hope-ui/core";
-import { Link } from "@solidjs/router";
+import { Anchor, hope } from "@hope-ui/core";
+import { Link, LinkProps } from "@solidjs/router";
+import { createMemo } from "solid-js";
 
-export default {
-  h1: (props: any) => (
-    <Heading
-      level={1}
-      size="4xl"
-      fontWeight="semibold"
-      fontFamily="display"
-      letterSpacing="tight"
-      color="neutral.900"
-      mt={1}
-      mb={8}
-      {...props}
-    />
-  ),
-  h2: (props: any) => (
-    <Heading
-      level={2}
-      color="neutral.800"
-      size="3xl"
-      fontWeight="semibold"
-      fontFamily="display"
-      borderBottom={vars => `1px solid ${vars.colors.neutral[200]} `}
-      mt={10}
-      pb={1}
-      {...props}
-    />
-  ),
-  h3: (props: any) => (
-    <Heading
-      level={3}
-      color="neutral.800"
-      size="2xl"
-      fontWeight="semibold"
-      fontFamily="display"
-      mt={8}
-      {...props}
-    />
-  ),
-  p: (props: any) => <Text _notFirst={{ mt: 6 }} {...props} />,
-  a: (props: any) => <Anchor as={Link} color="primary.500" textDecoration="underline" {...props} />,
-  code: (props: any) => (
-    <hope.code
-      fontSize="0.9em"
-      fontFamily="mono"
-      rounded="md"
-      bg="neutral.100"
-      px="0.4em"
-      py="0.2em"
-      sx={vars => ({
-        overflowWrap: "break-word",
+const H1 = hope("h1", {
+  base: {
+    color: "neutral.900",
+    fontFamily: "display",
+    fontSize: "4xl",
+    fontWeight: "semibold",
+    lineHeight: 10,
+    letterSpacing: "tight",
+    mt: 1,
+    mb: 8,
+  },
+});
 
-        // Reset style inside Callout.
-        ".hope-docs-Callout-root &": {
-          border: `1px solid ${vars.colors.neutral["300"]}`,
-          color: "neutral.700",
-        },
+const H2 = hope("h2", vars => ({
+  base: {
+    color: "neutral.800",
+    fontFamily: "display",
+    fontSize: "3xl",
+    fontWeight: "semibold",
+    lineHeight: 9,
+    mt: 10,
+    pb: 1,
+    borderBottom: `1px solid ${vars.colors.neutral[200]}`,
+  },
+}));
 
-        // Reset style inside table (ex: for props tables).
-        "table &": {
-          color: "primary.500",
-          bg: "transparent",
-          px: 0,
-        },
-      })}
+const H3 = hope("h3", {
+  base: {
+    color: "neutral.800",
+    fontFamily: "display",
+    fontSize: "2xl",
+    fontWeight: "semibold",
+    lineHeight: 9,
+    mt: 8,
+  },
+});
+
+const P = hope("p", {
+  base: {
+    _notFirst: {
+      mt: 6,
+    },
+  },
+});
+
+const Code = hope("code", vars => ({
+  base: {
+    rounded: "md",
+    bg: "neutral.100",
+    px: "0.4em",
+    py: "0.2em",
+    fontSize: "0.9em",
+    fontFamily: "mono",
+    overflowWrap: "break-word",
+
+    // Reset style inside Callout.
+    ".hope-docs-Callout-root &": {
+      border: `1px solid ${vars.colors.neutral["300"]}`,
+      color: "neutral.700",
+    },
+
+    // Reset style inside table (ex: for props tables).
+    "table &": {
+      color: "primary.500",
+      bg: "transparent",
+      px: 0,
+    },
+  },
+}));
+
+const Ul = hope("ul", {
+  base: {
+    ml: 6,
+    mt: 6,
+    listStyleType: "disc",
+  },
+});
+
+const Ol = hope("ol", {
+  base: {
+    ml: 6,
+    mt: 6,
+    listStyleType: "decimal",
+  },
+});
+
+const Li = hope("li", {
+  base: {
+    my: 3,
+  },
+});
+
+const Table = hope("table", {
+  base: {
+    w: "full",
+    p: 0,
+    fontSize: "sm",
+    lineHeight: 5,
+    borderCollapse: "collapse",
+    _notFirst: {
+      mt: 6,
+    },
+  },
+});
+
+const Tr = hope("tr", vars => ({
+  base: {
+    m: 0,
+    p: 0,
+    _notLast: {
+      borderBottom: `1px solid ${vars.colors.neutral[300]}`,
+    },
+    _even: {
+      bg: "neutral.50",
+    },
+  },
+}));
+
+const Th = hope("th", vars => ({
+  base: {
+    m: 0,
+    px: 4,
+    py: 2,
+    color: "neutral.600",
+    fontWeight: "semibold",
+    textAlign: "start",
+    borderBottom: `1px solid ${vars.colors.neutral[300]}`,
+  },
+}));
+
+const Td = hope("td", {
+  base: {
+    m: 0,
+    px: 4,
+    py: 2,
+  },
+});
+
+const ExternalLink = (props: LinkProps) => {
+  const isExternal = createMemo(() => props.href[0] !== "/");
+
+  return (
+    <Link
       {...props}
+      target={isExternal() ? "_blank" : undefined}
+      rel={isExternal() ? "noopener noreferrer" : undefined}
     />
-  ),
-  ul: (props: any) => <hope.ul ml={6} mt={6} sx={{ listStyleType: "disc" }} {...props} />,
-  ol: (props: any) => <hope.ol ml={6} mt={6} sx={{ listStyleType: "decimal" }} {...props} />,
-  li: (props: any) => <hope.li my={3} {...props} />,
-  table: (props: any) => (
-    <hope.table
-      p={0}
-      w="full"
-      fontSize="sm"
-      lineHeight={5}
-      _notFirst={{ mt: 6 }}
-      sx={{ borderCollapse: "collapse" }}
-      {...props}
-    />
-  ),
-  tr: (props: any) => (
-    <hope.tr
-      m={0}
-      p={0}
-      _notLast={vars => ({
-        borderBottom: `1px solid ${vars.colors.neutral[300]} `,
-      })}
-      _even={{ bg: "neutral.50" }}
-      {...props}
-    />
-  ),
-  th: (props: any) => (
-    <hope.th
-      m={0}
-      px={4}
-      py={2}
-      color="neutral.600"
-      fontWeight="semibold"
-      textAlign="start"
-      borderBottom={vars => `1px solid ${vars.colors.neutral[300]} `}
-      {...props}
-    />
-  ),
-  td: (props: any) => <hope.td m={0} px={4} py={2} {...props} />,
+  );
+};
+
+const A = hope(ExternalLink, {
+  base: {
+    color: "primary.500",
+    textDecoration: "underline",
+  },
+});
+
+export const mdxComponents = {
+  h1: H1,
+  h2: H2,
+  h3: H3,
+  p: P,
+  code: Code,
+  ul: Ul,
+  ol: Ol,
+  li: Li,
+  table: Table,
+  tr: Tr,
+  th: Th,
+  td: Td,
+  a: A, //(props: any) => <Anchor as={Link} color="primary.500" textDecoration="underline" {...props} />,
 };

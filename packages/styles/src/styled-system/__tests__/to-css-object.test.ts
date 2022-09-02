@@ -34,7 +34,7 @@ describe("toCSSObject", () => {
   `);
   });
 
-  it("should  returns nested system props styles", () => {
+  it("should returns nested system props styles", () => {
     const result = toCSSObject(
       {
         color: "primary.500",
@@ -387,6 +387,40 @@ describe("toCSSObject", () => {
         "paddingLeft": "${DEFAULT_THEME.vars.space["2"]}",
         "paddingRight": "${DEFAULT_THEME.vars.space["1"]}",
       },
+    }
+  `);
+  });
+
+  it("supports '!' syntax", () => {
+    const result = toCSSObject(
+      {
+        background: "primary.100!",
+        padding: "4px!",
+      },
+      DEFAULT_THEME
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+    Object {
+      "background": "${DEFAULT_THEME.vars.colors.primary["100"]} !important",
+      "padding": "4px !important",
+    }
+  `);
+  });
+
+  it("supports '!important' syntax", () => {
+    const result = toCSSObject(
+      {
+        background: "primary.100 !important",
+        padding: "4px !important",
+      },
+      DEFAULT_THEME
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+    Object {
+      "background": "${DEFAULT_THEME.vars.colors.primary["100"]} !important",
+      "padding": "4px !important",
     }
   `);
   });

@@ -24,13 +24,16 @@ import {
   ThemeSpace,
   ThemeZIndice,
 } from "./scales";
+import { Suffixed } from "./suffixed";
 import { ThemeVars } from "./vars";
 
-export type ResponsiveArray<T> = Array<T | null>;
+type MaybeImportant<T> = T | Suffixed<"!", T>;
 
-export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
+export type ResponsiveArray<T> = Array<MaybeImportant<T> | null>;
 
-type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
+export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeImportant<T>>>;
+
+type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>
@@ -481,6 +484,12 @@ export type LayoutProps = ResponsiveProps<{
 
   /** The CSS `overflow-y` property. */
   overflowY: Property.OverflowY;
+
+  /** The CSS `object-fit` property. */
+  objectFit?: Property.ObjectFit;
+
+  /** The CSS `object-position` property. */
+  objectPosition?: Property.ObjectPosition;
 }>;
 
 export type InteractivityProps = ResponsiveProps<{
@@ -519,11 +528,17 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-right` property. */
   marginRight: Property.MarginRight<ThemeSpace> | number;
 
+  /** The CSS `margin-inline-start` property. */
+  marginStart: Property.MarginInlineStart<ThemeSpace> | number;
+
   /** The CSS `margin-bottom` property. */
   marginBottom: Property.MarginBottom<ThemeSpace> | number;
 
   /** The CSS `margin-left`  property. */
   marginLeft: Property.MarginLeft<ThemeSpace> | number;
+
+  /** The CSS `margin-inline-end` property. */
+  marginEnd: Property.MarginInlineEnd<ThemeSpace> | number;
 
   /** The CSS `margin` property. */
   m: Property.Margin<ThemeSpace> | number;
@@ -534,11 +549,17 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-right` property. */
   mr: Property.MarginRight<ThemeSpace> | number;
 
+  /** The CSS `margin-inline-start` property. */
+  ms: Property.MarginInlineStart<ThemeSpace> | number;
+
   /** The CSS `margin-bottom` property. */
   mb: Property.MarginBottom<ThemeSpace> | number;
 
   /** The CSS `margin-left`  property. */
   ml: Property.MarginLeft<ThemeSpace> | number;
+
+  /** The CSS `margin-inline-end` property. */
+  me: Property.MarginInlineEnd<ThemeSpace> | number;
 
   /** The CSS `margin-inline-start` and `margin-inline-end` property. */
   mx: Property.MarginInlineStart<ThemeSpace> | number;
@@ -557,11 +578,17 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-right` property. */
   paddingRight: Property.PaddingRight<ThemeSpace> | number;
 
+  /** The CSS `padding-inline-start` property. */
+  paddingStart: Property.PaddingInlineStart<ThemeSpace> | number;
+
   /** The CSS `padding-bottom` property. */
   paddingBottom: Property.PaddingBottom<ThemeSpace> | number;
 
   /** The CSS `padding-left`  property. */
   paddingLeft: Property.PaddingLeft<ThemeSpace> | number;
+
+  /** The CSS `padding-inline-end` property. */
+  paddingEnd: Property.PaddingInlineEnd<ThemeSpace> | number;
 
   /** The CSS `padding` property. */
   p: Property.Padding<ThemeSpace> | number;
@@ -572,11 +599,17 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-right` property. */
   pr: Property.PaddingRight<ThemeSpace> | number;
 
+  /** The CSS `padding-inline-start` property. */
+  ps: Property.PaddingInlineStart<ThemeSpace> | number;
+
   /** The CSS `padding-bottom` property. */
   pb: Property.PaddingBottom<ThemeSpace> | number;
 
   /** The CSS `padding-left`  property. */
   pl: Property.PaddingLeft<ThemeSpace> | number;
+
+  /** The CSS `padding-inline-end` property. */
+  pe: Property.PaddingInlineEnd<ThemeSpace> | number;
 
   /** The CSS `padding-inline-start` and `padding-inline-end` property. */
   px: Property.PaddingInlineStart<ThemeSpace> | number;
@@ -653,6 +686,9 @@ export type RadiiProps = ResponsiveProps<{
 }>;
 
 export type ShadowProps = ResponsiveProps<{
+  /** The CSS `text-shadow` property. */
+  textShadow: Property.TextShadow | ThemeShadow;
+
   /** The CSS `box-shadow` property. */
   boxShadow: Property.BoxShadow | ThemeShadow;
 
@@ -730,6 +766,40 @@ export type TypographyProps = ResponsiveProps<{
   textDecoration: Property.TextDecoration;
 }>;
 
+export type TransformProps = ResponsiveProps<{
+  /** The CSS `transform` property. */
+  transform: Property.Transform;
+
+  /** The CSS `transform-origin` property. */
+  transformOrigin: Property.TransformOrigin<ThemeSize> | number;
+
+  /** The CSS `clip-path` property. */
+  clipPath: Property.ClipPath;
+}>;
+
+export type TransitionProps = ResponsiveProps<{
+  /** The CSS `transition` property. */
+  transition: Property.Transition;
+
+  /** The CSS `transition-property` property. */
+  transitionProperty: Property.TransitionProperty;
+
+  /** The CSS `transition-timing-function` property. */
+  transitionTimingFunction: Property.TransitionTimingFunction;
+
+  /** The CSS `transition-duration` property. */
+  transitionDuration: Property.TransitionDuration;
+
+  /** The CSS `transition-delay` property. */
+  transitionDelay: Property.TransitionDelay;
+
+  /** The CSS `animation` property. */
+  animation: Property.Animation;
+
+  /** The CSS `will-change` property. */
+  willChange: Property.WillChange;
+}>;
+
 export type BaseSystemStyleProps = BorderProps &
   ColorProps &
   FlexboxProps &
@@ -742,6 +812,8 @@ export type BaseSystemStyleProps = BorderProps &
   RadiiProps &
   ShadowProps &
   SizeProps &
+  TransformProps &
+  TransitionProps &
   TypographyProps;
 
 export type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProps>;

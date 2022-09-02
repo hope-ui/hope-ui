@@ -10,7 +10,7 @@ import { AnyFunction } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps } from "../types";
-import { COLOR_MODE_CLASSNAMES } from "../utils/color-mode-classnames";
+import { COLOR_MODE_CLASSNAMES } from "../utils";
 
 const state = {
   hover: (str: string, post: string) => `${str}:hover ${post}, ${str}[data-hover] ${post}`,
@@ -124,26 +124,34 @@ export const SHORTHANDS_MAP = new Map<keyof BaseSystemStyleProps, Array<keyof CS
   // layout
   ["d", ["display"]],
 
-  // position
-  ["pos", ["position"]],
-
   // margin
+  ["marginStart", ["marginInlineStart"]],
+  ["marginEnd", ["marginInlineEnd"]],
   ["m", ["margin"]],
   ["mt", ["marginTop"]],
   ["mr", ["marginRight"]],
+  ["ms", ["marginInlineStart"]],
   ["mb", ["marginBottom"]],
   ["ml", ["marginLeft"]],
+  ["me", ["marginInlineEnd"]],
   ["mx", ["marginInlineStart", "marginInlineEnd"]],
   ["my", ["marginTop", "marginBottom"]],
 
   // padding
+  ["paddingStart", ["paddingInlineStart"]],
+  ["paddingEnd", ["paddingInlineEnd"]],
   ["p", ["padding"]],
   ["pt", ["paddingTop"]],
   ["pr", ["paddingRight"]],
+  ["ps", ["paddingInlineStart"]],
   ["pb", ["paddingBottom"]],
   ["pl", ["paddingLeft"]],
+  ["pe", ["paddingInlineEnd"]],
   ["px", ["paddingInlineStart", "paddingInlineEnd"]],
   ["py", ["paddingTop", "paddingBottom"]],
+
+  // position
+  ["pos", ["position"]],
 
   // radii
   ["borderTopRadius", ["borderTopLeftRadius", "borderTopRightRadius"]],

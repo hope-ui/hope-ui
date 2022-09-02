@@ -8,7 +8,7 @@ import { MDXProvider } from "solid-mdx";
 import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts } from "solid-start";
 
 import { Layout } from "./components/layout";
-import mdxComponents from "./mdx-components";
+import { mdxComponents } from "./mdx-components";
 
 const theme = extendTheme({
   fonts: {
@@ -33,7 +33,7 @@ export default function Root() {
         <Body>
           <Suspense>
             <ErrorBoundary>
-              <MDXProvider components={{ ...mdxComponents }}>
+              <MDXProvider components={mdxComponents}>
                 <Layout>
                   <Routes>
                     <FileRoutes />

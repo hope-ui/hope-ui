@@ -14,6 +14,8 @@ import {
   ShadowProps,
   SizeProps,
   SystemStyleProps,
+  TransformProps,
+  TransitionProps,
   TypographyProps,
 } from "../types";
 
@@ -108,19 +110,25 @@ const layoutPropNames: KeysOf<LayoutProps> = {
   overflow: true,
   overflowX: true,
   overflowY: true,
+  objectFit: true,
+  objectPosition: true,
 };
 
 const marginPropNames: KeysOf<MarginProps> = {
   margin: true,
   marginTop: true,
   marginRight: true,
+  marginStart: true,
   marginBottom: true,
   marginLeft: true,
+  marginEnd: true,
   m: true,
   mt: true,
   mr: true,
+  ms: true,
   mb: true,
   ml: true,
+  me: true,
   mx: true,
   my: true,
 };
@@ -129,13 +137,17 @@ const paddingPropNames: KeysOf<PaddingProps> = {
   padding: true,
   paddingTop: true,
   paddingRight: true,
+  paddingStart: true,
   paddingBottom: true,
   paddingLeft: true,
+  paddingEnd: true,
   p: true,
   pt: true,
   pr: true,
+  ps: true,
   pb: true,
   pl: true,
+  pe: true,
   px: true,
   py: true,
 };
@@ -168,6 +180,7 @@ const radiiPropNames: KeysOf<RadiiProps> = {
 };
 
 const shadowPropNames: KeysOf<ShadowProps> = {
+  textShadow: true,
   boxShadow: true,
   shadow: true,
 };
@@ -186,6 +199,22 @@ const sizePropNames: KeysOf<SizeProps> = {
   minH: true,
   maxH: true,
   boxSize: true,
+};
+
+const transformPropNames: KeysOf<TransformProps> = {
+  transform: true,
+  transformOrigin: true,
+  clipPath: true,
+};
+
+const transitionPropNames: KeysOf<TransitionProps> = {
+  transition: true,
+  transitionProperty: true,
+  transitionTimingFunction: true,
+  transitionDuration: true,
+  transitionDelay: true,
+  animation: true,
+  willChange: true,
 };
 
 const typographyPropNames: KeysOf<TypographyProps> = {
@@ -274,6 +303,8 @@ export const stylePropNames: KeysOf<SystemStyleProps> = {
   ...radiiPropNames,
   ...shadowPropNames,
   ...sizePropNames,
+  ...transformPropNames,
+  ...transitionPropNames,
   ...typographyPropNames,
   ...pseudoSelectorPropNames,
 };

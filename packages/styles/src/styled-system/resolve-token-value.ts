@@ -10,6 +10,16 @@ const UNITLESS_SCALES: Array<keyof ThemeScales> = [
   "zIndices",
 ];
 
+const IMPORTANT_REGEX = /!(important)?$/;
+
+function isImportant(value: string) {
+  return IMPORTANT_REGEX.test(value);
+}
+
+function withoutImportant(value: string) {
+  return value.replace(IMPORTANT_REGEX, "").trim();
+}
+
 /** Get a color value from theme if the token exist, return the token otherwise. */
 function resolveColorTokenValue(token: string, vars: ThemeVars) {
   const parts = token.split(".");
@@ -35,13 +45,19 @@ export function resolveTokenValue(
     return undefined;
   }
 
+  const tokenStr = String(token);
+
+  const rawToken = withoutImportant(tokenStr);
+
+  let resolvedValue;
+
   if (scale === "colors") {
-    return resolveColorTokenValue(String(token), vars);
+    resolvedValue = resolveColorTokenValue(rawToken, vars);
+  } else if (UNITLESS_SCALES.includes(scale)) {
+    resolvedValue = vars[scale][rawToken] ?? rawToken;
+  } else {
+    resolvedValue = vars[scale][rawToken] ?? px(rawToken);
   }
 
-  if (UNITLESS_SCALES.includes(scale)) {
-    return vars[scale][String(token)] ?? token;
-  }
-
-  return vars[scale][String(token)] ?? px(token);
+  return isImportant(tokenStr) ? `${resolvedValue} !important` : resolvedValue;
 }
