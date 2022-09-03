@@ -58,7 +58,7 @@ function Header(props: HeaderProps) {
       >
         <ExclamationCircleMiniIcon fontSize="1.3em" />
         <span>
-          This is Hope UI <strong>1.0-next</strong> documentation, examples and information may be
+          This is Hope UI <strong>1.0</strong> documentation (WIP), examples and information may be
           broken or outdated.
         </span>
       </HStack>
@@ -87,7 +87,7 @@ function Header(props: HeaderProps) {
           gap={[6, 8]}
           flexGrow={{ md: 1 }}
         >
-          {/*<ThemeSelector class="relative z-10" />*/}
+          {/*<ThemeSelector />*/}
           <Anchor
             unstyled
             isExternal

@@ -1,5 +1,6 @@
 import { nodeTypes } from "@mdx-js/mdx";
 import mdx from "@mdx-js/rollup";
+import rehypePrettyCode from "rehype-pretty-code";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import remarkShikiTwoslash from "remark-shiki-twoslash";
@@ -17,7 +18,10 @@ export default defineConfig({
         jsx: true,
         jsxImportSource: "solid-js",
         providerImportSource: "solid-mdx",
-        rehypePlugins: [[rehypeRaw, { passThrough: nodeTypes }]],
+        rehypePlugins: [
+          [rehypeRaw, { passThrough: nodeTypes }],
+          [rehypePrettyCode, {}],
+        ],
         remarkPlugins: [
           remarkGfm,
           [

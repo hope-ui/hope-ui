@@ -42,6 +42,7 @@
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",
     "node-fetch": "2.6.7",
+    "rehype-pretty-code": "0.3.2",
     "rehype-raw": "6.1.1",
     "remark-code-extra": "1.0.1",
     "remark-gfm": "3.0.1",

@@ -5,7 +5,7 @@ export const Preview = hope("div", vars => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    mt: 5,
+    mt: 6,
     roundedTop: "lg",
     border: `1px solid ${vars.colors.neutral[200]}`,
     overflowY: "auto",

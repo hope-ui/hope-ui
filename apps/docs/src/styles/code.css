@@ -21,7 +21,7 @@ pre {
   border-left: 1px solid #999;
   border-bottom: 1px solid #999;
 
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   margin-bottom: 1rem;
 
   /* Important to allow the code to move horizontally; */
@@ -69,7 +69,7 @@ pre.shiki:hover .dim {
   opacity: 1;
 }
 pre.shiki div.dim {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 pre.shiki div.dim,
 pre.shiki div.highlight {
@@ -78,7 +78,7 @@ pre.shiki div.highlight {
 }
 pre.shiki div.highlight {
   opacity: 1;
-  background-color: #f1f8ff;
+  background-color: var(--hope-colors-primary-50);
 }
 pre.shiki div.line {
   min-height: 1rem;

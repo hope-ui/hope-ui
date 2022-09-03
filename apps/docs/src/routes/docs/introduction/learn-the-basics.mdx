@@ -1,20 +1,247 @@
 import { Preview } from "~/components/preview";
-import { CardTutorial } from "~/components/card-tutorial";
+import { CardTutorialFinal } from "~/components/card-tutorial";
+import { Callout } from "~/components/callout";
 
 # Learn the basics
 
 Get familiar with core Hope UI concepts by building this `Card` component.
 
 <Preview isFullRounded>
-  <CardTutorial />
+  <CardTutorialFinal />
 </Preview>
 
-## Creating a Box
+### The layout
 
-## Style props
+First, we define the structure of the `Card` using two layout components:
 
-## Layout components
+- **Box:** The most abstract Hope UI component, it basically a `div` with superpowers.
+- **Flex:** A Box with `display: flex`.
 
-## Typography components
+```tsx
+import { Box, Flex } from "@hope-ui/core";
 
-## Put everything together
+export function Card() {
+  return (
+    <Flex>
+      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Box>
+        <Flex>
+          <span>Reunion Island</span>
+          <Flex>
+            <span>Nature</span>
+          </Flex>
+        </Flex>
+        <p>
+          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
+          department and region of France.
+        </p>
+        <button>Learn more</button>
+      </Box>
+    </Flex>
+  );
+}
+```
+
+### Typography components
+
+Currently, we are using native HTML elements like `span` and `p` to render our text content. Let's use one of Hope UI typography components: `Text`.
+
+`Text` renders a `<p>` tag by default and come with a `size` prop that we can use to adjust the size of the text will keep it legible.
+
+Finally, since it's a built-in Hope UI component it will also make our life easier when it comes to styling later on.
+
+```tsx {0,8,10-12,15-18}
+import { Box, Flex, Text } from "@hope-ui/core";
+
+export function Card() {
+  return (
+    <Flex>
+      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Box>
+        <Flex>
+          <Text as="span">Reunion Island</Text>
+          <Flex>
+            <Text as="span" size="xs">
+              Nature
+            </Text>
+          </Flex>
+        </Flex>
+        <Text size="sm">
+          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
+          department and region of France.
+        </Text>
+        <button>Learn more</button>
+      </Box>
+    </Flex>
+  );
+}
+```
+
+<Callout>
+  Notice the use of the `as` prop on the first two `Text` components which allows changing the
+  rendered DOM element.
+</Callout>
+
+### More built-in components
+
+We are using a native HTML `button` at the bottom of our `Card`, which looks not that good. Let's replace it by one more built-in Hope UI component, the `Button`.
+
+```tsx {0,19-21}
+import { Box, Button, Flex, Text } from "@hope-ui/core";
+
+export function Card() {
+  return (
+    <Flex>
+      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Box>
+        <Flex>
+          <Text as="span">Reunion Island</Text>
+          <Flex>
+            <Text as="span" size="xs">
+              Nature
+            </Text>
+          </Flex>
+        </Flex>
+        <Text size="sm">
+          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
+          department and region of France.
+        </Text>
+        <Button variant="soft" colorScheme="primary" isFullWidth>
+          Learn more
+        </Button>
+      </Box>
+    </Flex>
+  );
+}
+```
+
+### Make it looks good
+
+Now the fun part, Styling! Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
+
+```tsx {5-11,14-16,18-25,30-32,38,42}
+import { Box, Button, Flex, Text } from "@hope-ui/core";
+
+function Card() {
+  return (
+    <Flex
+      flexDirection="column"
+      border={vars => `1px solid ${vars.colors.neutral["200"]}`}
+      borderRadius="lg"
+      boxShadow="lg"
+      width="full"
+      maxWidth={96}
+      overflow="clip"
+    >
+      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Box padding={5}>
+        <Flex justifyContent="space-between" alignItems="center" width="full" marginBottom={2}>
+          <Text fontWeight="semibold">Reunion Island</Text>
+          <Flex
+            paddingLeft={2}
+            paddingRight={2}
+            paddingTop={1}
+            paddingBottom={1}
+            alignItems="center"
+            backgroundColor="success.50"
+            color="success.800"
+            borderRadius="full"
+          >
+            <Text
+              as="span"
+              size="xs"
+              lineHeight="none"
+              fontWeight="semibold"
+              textTransform="uppercase"
+            >
+              Nature
+            </Text>
+          </Flex>
+        </Flex>
+        <Text size="sm" color="neutral.500" marginBottom={3}>
+          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
+          department and region of France.
+        </Text>
+        <Button variant="soft" colorScheme="primary" isFullWidth marginTop={3}>
+          Learn more
+        </Button>
+      </Box>
+    </Flex>
+  );
+}
+```
+
+### Understanding theme tokens
+
+All style props above are pretty much self-explanatory, however some values are weird like:
+
+- `color="success.800"`
+- `width="full"`
+- `paddingRight={2}`
+- `border={vars => '1px solid ${vars.colors.neutral["200"]}'}`
+
+This is what we call _"Theme Tokens"_, a set of values (colors, spacing, shadows, etc...) that we can refer to when styling to keep our design consistent.
+
+We can refer to them directly as value of our style props or use the _"function form"_ (like for the `border` prop above) which gives us access to all available tokens through the `vars` object.
+
+### Write less, do more
+
+Our `Card` component is pretty good now, but we can save some typing by using Hope UI _"shorthand"_ style props.
+
+```tsx {5,7-10,14-15,18-19,21-23,36,40}
+import { Box, Button, Flex, Text } from "@hope-ui/core";
+
+function Card() {
+  return (
+    <Flex
+      direction="column"
+      border={vars => `1px solid ${vars.colors.neutral["200"]}`}
+      rounded="lg"
+      shadow="lg"
+      w="full"
+      maxW={96}
+      overflow="clip"
+    >
+      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Box p={5}>
+        <Flex justifyContent="space-between" alignItems="center" w="full" mb={2}>
+          <Text fontWeight="semibold">Reunion Island</Text>
+          <Flex
+            px={2}
+            py={1}
+            alignItems="center"
+            bgColor="success.50"
+            color="success.800"
+            rounded="full"
+          >
+            <Text
+              as="span"
+              size="xs"
+              lineHeight="none"
+              fontWeight="semibold"
+              textTransform="uppercase"
+            >
+              Nature
+            </Text>
+          </Flex>
+        </Flex>
+        <Text size="sm" color="neutral.500" mb={3}>
+          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
+          department and region of France.
+        </Text>
+        <Button variant="soft" colorScheme="primary" isFullWidth mt={3}>
+          Learn more
+        </Button>
+      </Box>
+    </Flex>
+  );
+}
+```
+
+## Summary
+
+- Hope UI provides layout components to help achieve common layout scenarios (`Flex`, `Grid`, etc...).
+- Hope UI provides typography components to works with texts and headings.
+- Style props are a way to define components styles by simply passing props to them.
+- Theme tokens allows styling your application with a consistent set of colors, spacing, shadows and more.
+- The `as` prop allows changing the rendered DOM element.
