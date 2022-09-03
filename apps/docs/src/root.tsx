@@ -12,8 +12,8 @@ import { mdxComponents } from "./mdx-components";
 
 const theme = extendTheme({
   fonts: {
-    sans: `Inter ${DEFAULT_THEME.fonts.sans}`,
-    display: `Lexend ${DEFAULT_THEME.fonts.sans}`,
+    sans: `Inter, ${DEFAULT_THEME.fonts.sans}`,
+    display: `Lexend, ${DEFAULT_THEME.fonts.sans}`,
   },
   sizes: {
     "8xl": "88rem",

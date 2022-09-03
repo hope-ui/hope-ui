@@ -4,15 +4,17 @@ import { Callout } from "~/components/callout";
 
 # Learn the basics
 
-Get familiar with core Hope UI concepts by building this `Card` component.
+Get familiar with core Hope UI concepts by building a simple `Card` component.
 
 <Preview isFullRounded>
   <CardTutorialFinal />
 </Preview>
 
-### The layout
+## The process
 
-First, we define the structure of the `Card` using two layout components:
+### Layout components
+
+First, we define the structure of the `Card` using two layout components from Hope UI:
 
 - **Box:** The most abstract Hope UI component, it basically a `div` with superpowers.
 - **Flex:** A Box with `display: flex`.
@@ -44,11 +46,11 @@ export function Card() {
 
 ### Typography components
 
-Currently, we are using native HTML elements like `span` and `p` to render our text content. Let's use one of Hope UI typography components: `Text`.
+We are using native HTML elements like `span` and `p` to render our text content. Let's replace them by one of Hope UI's typography components: `Text`.
 
-`Text` renders a `<p>` tag by default and come with a `size` prop that we can use to adjust the size of the text will keep it legible.
+`Text` renders a `p` tag by default and come with a `size` prop that we can use to adjust the size of the text will keep it legible.
 
-Finally, since it's a built-in Hope UI component it will also make our life easier when it comes to styling later on.
+Also, since it's a built-in Hope UI component it will also make our life easier when it comes to styling later on.
 
 ```tsx {0,8,10-12,15-18}
 import { Box, Flex, Text } from "@hope-ui/core";
@@ -188,7 +190,7 @@ We can refer to them directly as value of our style props or use the _"function 
 
 Our `Card` component is pretty good now, but we can save some typing by using Hope UI _"shorthand"_ style props.
 
-```tsx {5,7-10,14-15,18-19,21-23,36,40}
+```tsx {5,7-10,14-15,18-23,36,40}
 import { Box, Button, Flex, Text } from "@hope-ui/core";
 
 function Card() {
@@ -204,12 +206,12 @@ function Card() {
     >
       <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
       <Box p={5}>
-        <Flex justifyContent="space-between" alignItems="center" w="full" mb={2}>
+        <Flex justify="space-between" align="center" w="full" mb={2}>
           <Text fontWeight="semibold">Reunion Island</Text>
           <Flex
             px={2}
             py={1}
-            alignItems="center"
+            align="center"
             bgColor="success.50"
             color="success.800"
             rounded="full"

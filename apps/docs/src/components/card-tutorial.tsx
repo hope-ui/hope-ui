@@ -13,12 +13,12 @@ export function CardTutorialFinal() {
     >
       <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
       <Box p={5}>
-        <Flex justifyContent="space-between" alignItems="center" w="full" mb={2}>
+        <Flex justify="space-between" align="center" w="full" mb={2}>
           <Text fontWeight="semibold">Reunion Island</Text>
           <Flex
             px={2}
             py={1}
-            alignItems="center"
+            align="center"
             bgColor="success.50"
             color="success.800"
             rounded="full"

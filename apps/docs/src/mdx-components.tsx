@@ -1,4 +1,4 @@
-import { Anchor, hope } from "@hope-ui/core";
+import { hope } from "@hope-ui/core";
 import { Link, LinkProps } from "@solidjs/router";
 import { createMemo } from "solid-js";
 
@@ -7,7 +7,7 @@ const H1 = hope("h1", {
     color: "neutral.900",
     fontFamily: "display",
     fontSize: "4xl",
-    fontWeight: "semibold",
+    fontWeight: "medium",
     lineHeight: 10,
     letterSpacing: "tight",
     mt: 1,
@@ -20,7 +20,7 @@ const H2 = hope("h2", vars => ({
     color: "neutral.800",
     fontFamily: "display",
     fontSize: "3xl",
-    fontWeight: "semibold",
+    fontWeight: "medium",
     lineHeight: 9,
     mt: 10,
     pb: 1,
@@ -33,8 +33,8 @@ const H3 = hope("h3", {
     color: "neutral.800",
     fontFamily: "display",
     fontSize: "2xl",
-    fontWeight: "semibold",
-    lineHeight: 9,
+    fontWeight: "medium",
+    lineHeight: 8,
     mt: 8,
   },
 });
