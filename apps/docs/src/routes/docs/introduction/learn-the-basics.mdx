@@ -12,7 +12,7 @@ Get familiar with core Hope UI concepts by building a simple `Card` component.
 
 ## The process
 
-### Layout components
+### Layout
 
 First, we define the structure of the `Card` using two layout components from Hope UI:
 
@@ -44,7 +44,7 @@ export function Card() {
 }
 ```
 
-### Typography components
+### Typography
 
 We are using native HTML elements like `span` and `p` to render our text content. Let's replace them by one of Hope UI's typography components: `Text`.
 
@@ -86,7 +86,7 @@ export function Card() {
 
 ### More built-in components
 
-We are using a native HTML `button` at the bottom of our `Card`, which looks not that good. Let's replace it by one more built-in Hope UI component, the `Button`.
+At the bottom of our `Card` there is a native HTML `button`, which looks not that good. Let's replace it by one more built-in Hope UI component, the `Button`.
 
 ```tsx {0,19-21}
 import { Box, Button, Flex, Text } from "@hope-ui/core";
@@ -117,7 +117,7 @@ export function Card() {
 }
 ```
 
-### Make it looks good
+### Styling
 
 Now the fun part, Styling! Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
 
@@ -186,7 +186,7 @@ This is what we call _"Theme Tokens"_, a set of values (colors, spacing, shadows
 
 We can refer to them directly as value of our style props or use the _"function form"_ (like for the `border` prop above) which gives us access to all available tokens through the `vars` object.
 
-### Write less, do more
+### Using shorthand style props
 
 Our `Card` component is pretty good now, but we can save some typing by using Hope UI _"shorthand"_ style props.
 

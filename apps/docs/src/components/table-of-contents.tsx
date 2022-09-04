@@ -1,0 +1,168 @@
+import { Heading, hope, VStack } from "@hope-ui/core";
+import { Link, useLocation } from "@solidjs/router";
+import { Accessor, createEffect, createSignal, For, onCleanup, Suspense } from "solid-js";
+import { createServerData } from "solid-start/server";
+
+import { mods } from "../root";
+
+type TocItems = Array<{ depth: number; text: string; slug: string }>;
+
+function getHeadingsFromToc(tableOfContents: TocItems) {
+  return tableOfContents.map(({ slug }) => {
+    const el = document.getElementById(slug);
+
+    if (!el) {
+      return;
+    }
+
+    const style = window.getComputedStyle(el);
+    const scrollMt = parseFloat(style.scrollMarginTop) + 1;
+
+    const top = window.scrollY + el.getBoundingClientRect().top - scrollMt;
+
+    return { slug, top };
+  });
+}
+
+function useCurrentSection(tableOfContents: Accessor<TocItems | undefined>) {
+  const [currentSection, setCurrentSection] = createSignal(tableOfContents()?.[0].slug);
+
+  createEffect(() => {
+    const toc = tableOfContents();
+
+    if (toc == null || toc.length === 0) {
+      return;
+    }
+
+    const headings = getHeadingsFromToc(toc);
+
+    function onScroll() {
+      const top = window.scrollY;
+      let current = headings[0]?.slug;
+
+      for (const heading of headings) {
+        if (heading == null) {
+          continue;
+        }
+
+        if (top >= heading.top) {
+          current = heading.slug;
+        } else {
+          break;
+        }
+      }
+
+      setCurrentSection(current);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    onScroll();
+
+    onCleanup(() => {
+      // @ts-ignore
+      window.removeEventListener("scroll", onScroll, { passive: true });
+    });
+  });
+
+  return currentSection;
+}
+
+const TocLink = hope(Link, {
+  base: {
+    display: "flex",
+    alignItems: "center",
+
+    color: "neutral.500",
+    fontSize: "sm",
+    fontWeight: "normal",
+    lineHeight: 5,
+
+    _hover: {
+      color: "neutral.600",
+    },
+  },
+  variants: {
+    isIndent: {
+      true: {
+        pl: 5,
+      },
+    },
+    isActive: {
+      true: {
+        color: "primary.500",
+        _hover: {
+          color: "primary.600",
+        },
+      },
+    },
+  },
+});
+
+const TocRoot = hope("div", vars => ({
+  base: {
+    display: "none",
+
+    [`@media screen and (min-width: 1280px)`]: {
+      display: "block",
+      position: "sticky",
+      top: "100px", // height of the header
+      height: "calc(100vh - 100px)", // 100vh - height of the header
+      mr: `calc(${vars.space["6"]}) * -1`,
+      flex: "none",
+      overflowY: "auto",
+      py: 16,
+      pr: 6,
+    },
+  },
+}));
+
+export function TableOfContents() {
+  const path = useLocation();
+
+  const toc = createServerData(
+    () => path.pathname,
+    async pathname => {
+      const mod = mods[`./routes${pathname}.mdx`] ?? mods[`./routes${pathname}.md`];
+      return mod.getHeadings().filter(h => h.depth > 1 && h.depth <= 3);
+    }
+  );
+
+  const currentSection = useCurrentSection(toc);
+
+  return (
+    <TocRoot>
+      <hope.nav aria-labelledby="on-this-page-title" w={56}>
+        <Suspense>
+          <Heading
+            id="on-this-page-title"
+            color="neutral.900"
+            fontFamily="display"
+            fontWeight="medium"
+            fontSize="sm"
+            lineHeight={5}
+          >
+            On this page
+          </Heading>
+          <VStack as="ol" mt={4} alignItems="stretch" spacing={3}>
+            <For each={toc()}>
+              {section => (
+                <li>
+                  <h3>
+                    <TocLink
+                      isIndent={section.depth === 3}
+                      isActive={section.slug === currentSection()}
+                      href={`${path.pathname}#${section.slug}`}
+                    >
+                      {section.text}
+                    </TocLink>
+                  </h3>
+                </li>
+              )}
+            </For>
+          </VStack>
+        </Suspense>
+      </hope.nav>
+    </TocRoot>
+  );
+}

@@ -10,13 +10,30 @@ import { Body, ErrorBoundary, FileRoutes, Head, Html, Meta, Routes, Scripts } fr
 import { Layout } from "./components/layout";
 import { mdxComponents } from "./mdx-components";
 
+export const mods = /*#__PURE__*/ import.meta.glob<
+  true,
+  any,
+  {
+    getHeadings: () => {
+      depth: number;
+      text: string;
+      slug: string;
+    }[];
+  }
+>("./routes/docs/**/*.{md,mdx}", {
+  eager: true,
+  query: {
+    meta: "",
+  },
+});
+
 const theme = extendTheme({
   fonts: {
     sans: `Inter, ${DEFAULT_THEME.fonts.sans}`,
     display: `Lexend, ${DEFAULT_THEME.fonts.sans}`,
   },
   sizes: {
-    "8xl": "88rem",
+    "8xl": "96rem",
   },
 });
 

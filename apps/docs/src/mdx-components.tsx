@@ -1,4 +1,5 @@
 import { hope } from "@hope-ui/core";
+import { Title as MetaTitle } from "@solidjs/meta";
 import { Link, LinkProps } from "@solidjs/router";
 import { createMemo } from "solid-js";
 
@@ -11,6 +12,7 @@ const H1 = hope("h1", {
     lineHeight: 10,
     letterSpacing: "tight",
     mt: 1,
+    scrollMarginTop: "150px", // header height x1.5
     mb: 8,
   },
 });
@@ -23,6 +25,7 @@ const H2 = hope("h2", vars => ({
     fontWeight: "medium",
     lineHeight: 9,
     mt: 10,
+    scrollMarginTop: "150px", // header height x1.5
     pb: 1,
     borderBottom: `1px solid ${vars.colors.neutral[200]}`,
   },
@@ -36,6 +39,7 @@ const H3 = hope("h3", {
     fontWeight: "medium",
     lineHeight: 8,
     mt: 8,
+    scrollMarginTop: "150px", // header height x1.5
   },
 });
 
@@ -160,7 +164,12 @@ const A = hope(ExternalLink, {
 });
 
 export const mdxComponents = {
-  h1: H1,
+  h1: (props: any) => (
+    <H1 {...props}>
+      <MetaTitle>{props.children + " | Hope UI"}</MetaTitle>
+      {props.children}
+    </H1>
+  ),
   h2: H2,
   h3: H3,
   p: P,
@@ -172,5 +181,5 @@ export const mdxComponents = {
   tr: Tr,
   th: Th,
   td: Td,
-  a: A, //(props: any) => <Anchor as={Link} color="primary.500" textDecoration="underline" {...props} />,
+  a: A,
 };

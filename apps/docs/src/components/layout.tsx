@@ -1,12 +1,13 @@
 import { Anchor, Box, Flex, hope, HStack, Text } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
-import { createMemo, ParentProps, Show } from "solid-js";
+import { ParentProps, Show } from "solid-js";
 
 import { NAV_SECTIONS, NavSection } from "../NAV_SECTIONS";
 import { ArrowLeftIcon, ArrowRightIcon, ExclamationCircleMiniIcon, GitHubIcon } from "./icons";
 import { Logo } from "./logo";
 import { MobileNavigation } from "./mobile-navigation";
 import { Navigation } from "./navigation";
+import { TableOfContents } from "./table-of-contents";
 
 const PageLink = hope(Link, {
   base: {
@@ -98,7 +99,7 @@ function Header(props: HeaderProps) {
               color: "neutral.700",
             }}
           >
-            <GitHubIcon boxSize={6} />
+            <GitHubIcon boxSize={5} />
           </Anchor>
         </Flex>
       </StyledHeader>
@@ -198,61 +199,7 @@ export function Layout(props: ParentProps) {
             </Show>
           </Flex>
         </Box>
-        {/*
-        <div class="hidden xl:sticky xl:top-[4.5rem] xl:-mr-6 xl:block xl:h-[calc(100vh-4.5rem)] xl:flex-none xl:overflow-y-auto xl:py-16 xl:pr-6">
-          <nav aria-labelledby="on-this-page-title" class="w-56">
-            {tableOfContents.length > 0 && (
-              <>
-                <h2
-                  id="on-this-page-title"
-                  class="font-display text-sm font-medium text-slate-900 dark:text-white"
-                >
-                  On this page
-                </h2>
-                <ol role="list" class="mt-4 space-y-3 text-sm">
-                  {tableOfContents.map(section => (
-                    <li key={section.id}>
-                      <h3>
-                        <Link
-                          href={`#${section.id}`}
-                          class={clsx(
-                            isActive(section)
-                              ? "text-sky-500"
-                              : "font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-                          )}
-                        >
-                          {section.title}
-                        </Link>
-                      </h3>
-                      {section.children.length > 0 && (
-                        <ol
-                          role="list"
-                          class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"
-                        >
-                          {section.children.map(subSection => (
-                            <li key={subSection.id}>
-                              <Link
-                                href={`#${subSection.id}`}
-                                class={
-                                  isActive(subSection)
-                                    ? "text-sky-500"
-                                    : "hover:text-slate-600 dark:hover:text-slate-300"
-                                }
-                              >
-                                {subSection.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ol>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </>
-            )}
-          </nav>
-        </div>
-        */}
+        <TableOfContents />
       </Flex>
     </>
   );

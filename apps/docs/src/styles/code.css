@@ -30,11 +30,11 @@ pre {
 }
 
 .hope-theme-light .shiki.github-dark {
-  display: none;
+  display: none !important;
 }
 
 .hope-theme-dark .shiki.github-light {
-  display: none;
+  display: none !important;
 }
 
 pre.shiki {
@@ -46,7 +46,7 @@ pre.shiki {
   border-radius: var(--hope-radii-lg);
   border: 1px solid var(--hope-colors-neutral-200);
 
-  background-color: var(--hope-colors-background-level1);
+  background-color: var(--hope-colors-background-level1) !important;
 
   padding: var(--hope-space-3);
 
@@ -179,8 +179,7 @@ pre .error-behind {
   margin-left: -14px;
   margin-top: 8px;
   margin-bottom: 4px;
-  padding: 6px;
-  padding-left: 14px;
+  padding: 6px 6px 6px 14px;
   width: calc(100% - 20px);
   white-space: pre-wrap;
   display: block;
@@ -232,7 +231,6 @@ pre .inline-completions ul.dropdown {
   width: 240px;
   background-color: gainsboro;
   color: grey;
-  padding-top: 4px;
   font-family: var(--code-font);
   font-size: 0.8rem;
   margin: 0;
@@ -293,7 +291,7 @@ data-lsp {
   /** Default annotation text to 200px */
   width: 200px;
   color: #187abf;
-  background-color: #fcf3d9 bb;
+  background-color: #fcf3d9;
 }
 .tag-container .twoslash-annotation p {
   text-align: left;

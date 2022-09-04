@@ -15,7 +15,7 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
 
   return (
     <hope.nav fontSize={{ base: "base", lg: "sm" }} lineHeight={{ base: 6, lg: 5 }} {...others}>
-      <VStack as="ul" role="list" spacing={9} alignItems="stetch">
+      <VStack as="ul" role="list" spacing={9} alignItems="stretch">
         <For each={local.sections}>
           {section => (
             <li>

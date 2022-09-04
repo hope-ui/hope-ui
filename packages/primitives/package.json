@@ -53,7 +53,7 @@
     "@hope-ui/tests": "workspace:*"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.3"
+    "solid-js": "^1.5.4"
   },
   "publishConfig": {
     "access": "public"
