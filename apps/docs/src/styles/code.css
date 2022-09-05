@@ -78,7 +78,7 @@ pre.shiki div.highlight {
 }
 pre.shiki div.highlight {
   opacity: 1;
-  background-color: var(--hope-colors-primary-50);
+  background-color: rgb(var(--hope-colors-success-lightChannel) / 0.4);
 }
 pre.shiki div.line {
   min-height: 1rem;

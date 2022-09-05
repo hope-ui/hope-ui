@@ -25,7 +25,7 @@ import {
   ThemeZIndice,
 } from "./scales";
 import { Suffixed } from "./suffixed";
-import { ThemeVars } from "./vars";
+import { ThemeVarsAndBreakpoints } from "./vars";
 
 type MaybeImportant<T> = T | Suffixed<"!", T>;
 
@@ -37,7 +37,7 @@ type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | Responsive
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>
-  | ((vars: ThemeVars) => ResponsiveValueRaw<T>);
+  | ((theme: ThemeVarsAndBreakpoints) => ResponsiveValueRaw<T>);
 
 export type ResponsiveProps<Props> = {
   [K in keyof Props]?: ResponsiveValue<Props[K]>;
@@ -820,7 +820,7 @@ export type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProp
 
 export type PseudoSelectorValue =
   | BaseSystemStyleObject
-  | ((vars: ThemeVars) => BaseSystemStyleObject);
+  | ((theme: ThemeVarsAndBreakpoints) => BaseSystemStyleObject);
 
 export type PseudoSelectorProps = Partial<{
   /** Styles for CSS selector `&:hover`. */
@@ -829,11 +829,10 @@ export type PseudoSelectorProps = Partial<{
   /** Styles for CSS Selector `&:active`. */
   _active: PseudoSelectorValue;
 
-  /** Styles for CSS selector `&:focus.  *
-   */
+  /** Styles for CSS selector `&:focus. */
   _focus: PseudoSelectorValue;
 
-  /** Styles for the highlighted state.. */
+  /** Styles for the highlighted state. */
   _highlighted: PseudoSelectorValue;
 
   /**
@@ -1076,7 +1075,7 @@ export type SystemStyleProps = BaseSystemStyleProps & PseudoSelectorProps;
 
 export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
 
-export type Sx = SystemStyleObject | ((vars: ThemeVars) => SystemStyleObject);
+export type Sx = SystemStyleObject | ((theme: ThemeVarsAndBreakpoints) => SystemStyleObject);
 
 export interface SxProp {
   /**
@@ -1084,7 +1083,7 @@ export interface SxProp {
    * The property is a superset of CSS that packages all the style props that are exposed by Hope UI.
    * You can specify any valid CSS using this prop.
    */
-  sx?: Sx | (Sx | undefined)[];
+  sx?: Sx | Array<Sx | undefined>;
 }
 
 /** Hope UI specific props. */

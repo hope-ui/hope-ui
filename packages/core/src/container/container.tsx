@@ -13,7 +13,7 @@ import { mergeDefaultProps } from "../utils";
 
 const BaseContainer = hope(
   "div",
-  vars => ({
+  ({ vars }) => ({
     base: {
       width: "100%",
       maxWidth: {

@@ -9,3 +9,11 @@ export type ThemeVars = {
 } & {
   colors: ColorSystem;
 };
+
+export interface ThemeVarsAndBreakpoints {
+  /** All theme tokens as CSS variables reference (e.g. `var(--xxx)`). */
+  vars: ThemeVars;
+
+  /** All theme breakpoints values, useful for defining `@media` queries since it doesn't support CSS variables. */
+  breakpoints: ThemeScales["breakpoints"];
+}

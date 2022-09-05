@@ -1,4 +1,4 @@
-import { AspectRatio, hope } from "@hope-ui/core";
+import { AspectRatio, Image } from "@hope-ui/core";
 
 import { Preview } from "~/components/preview";
 
@@ -18,21 +18,13 @@ Use the `ratio` prop to define a consistent width/height ratio.
 
 <Preview>
   <AspectRatio ratio={9 / 16} w="full" maxW="200px">
-    <hope.img
-      src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
-      alt="Monkey D. Luffy"
-      sx={{ objectFit: "cover" }}
-    />
+    <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" fit="cover" />
   </AspectRatio>
 </Preview>
 
 ```tsx
 <AspectRatio ratio={9 / 16} w="full" maxW="200px">
-  <Image
-    src="https://images.unsplash.com/photo-1560746420-1b4dc6d92d17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=988&q=80"
-    alt="Monkey D. Luffy"
-    objectFit="cover"
-  />
+  <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" fit="cover" />
 </AspectRatio>
 ```
 
@@ -63,25 +55,13 @@ Use the `ratio` prop to define a consistent width/height ratio.
 
 <Preview>
   <AspectRatio ratio={16 / 9} w="full">
-    <iframe
-      title="reunion island"
-      src="https://www.google.com/maps/embed?
-pb=!1m18!1m12!1m3!1d10240.720471033459!2d55.27333136315537!3d-21.009371764170627!2m3!1
-f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x218288b199fec3e9%3A0xcd75253c6f21188d!2
-sSt%20Paul%2097460%2C%20La%20R%C3%A9union!5e0!3m2!1sfr!2sfr!4v1646123686380!5m2!1sfr!2sfr"
-    />
+    <iframe title="Yosemite National Park" src="https://bit.ly/3KKbOm9" />
   </AspectRatio>
 </Preview>
 
 ```tsx
 <AspectRatio ratio={16 / 9} w="full">
-  <iframe
-    title="reunion island"
-    src="https://www.google.com/maps/embed?
-pb=!1m18!1m12!1m3!1d10240.720471033459!2d55.27333136315537!3d-21.009371764170627!2m3!1
-f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x218288b199fec3e9%3A0xcd75253c6f21188d!2
-sSt%20Paul%2097460%2C%20La%20R%C3%A9union!5e0!3m2!1sfr!2sfr!4v1646123686380!5m2!1sfr!2sfr"
-  />
+  <iframe title="Yosemite National Park" src="https://bit.ly/3KKbOm9" />
 </AspectRatio>
 ```
 

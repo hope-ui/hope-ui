@@ -312,7 +312,7 @@ const boxSizes: Map<ButtonVariants["size"], ThemeSize> = new Map([
   ["lg", "12"],
 ]);
 
-function getRootIconButtonSizeCompoundVariants(vars: ThemeVars) {
+function getRootIconButtonSizeCompoundVariants() {
   const compoundVariants: Array<StyleConfigCompoundVariant<ButtonVariants>> = [];
 
   for (const [size, tokenValue] of boxSizes) {
@@ -332,7 +332,7 @@ function getRootIconButtonSizeCompoundVariants(vars: ThemeVars) {
 }
 
 export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
-  vars => ({
+  ({ vars }) => ({
     root: {
       base: {
         appearance: "none",
@@ -460,7 +460,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         ...getRootSoftColorSchemeCompoundVariants(vars),
         ...getRootOutlinedColorSchemeCompoundVariants(vars),
         ...getRootPlainColorSchemeCompoundVariants(vars),
-        ...getRootIconButtonSizeCompoundVariants(vars),
+        ...getRootIconButtonSizeCompoundVariants(),
       ],
     },
     icon: {

@@ -80,14 +80,14 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       componentThemeConfig?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>
     ) => {
       // 1. compute base styles.
-      baseConfig = runIfFn(interpolation, theme.vars);
+      baseConfig = runIfFn(interpolation, theme);
       baseConfigResult = computeMultiPartStyleConfig(
         baseConfig,
         theme
       ) as MultiPartStyleConfigResult<Parts, Variants>; // force type because we know it's not a partial.
 
       // 2. compute theme styles, so it will be injected to `head` after base styles.
-      themeConfig = runIfFn(componentThemeConfig, theme.vars);
+      themeConfig = runIfFn(componentThemeConfig, theme);
       themeConfigResult = themeConfig && computeMultiPartStyleConfig(themeConfig, theme);
 
       // 3. get component parts from config.
@@ -108,7 +108,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
     runOnce(name, theme, componentTheme()?.styleConfig);
 
     const styleConfigOverrides = createMemo(() => {
-      return runIfFn(options.styleConfig, theme.vars);
+      return runIfFn(options.styleConfig, theme);
     });
 
     const selectedVariants = createMemo(() => {

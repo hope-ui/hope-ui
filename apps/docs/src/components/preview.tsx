@@ -1,6 +1,6 @@
 import { hope } from "@hope-ui/core";
 
-export const Preview = hope("div", vars => ({
+export const Preview = hope("div", ({ vars }) => ({
   base: {
     display: "flex",
     alignItems: "center",

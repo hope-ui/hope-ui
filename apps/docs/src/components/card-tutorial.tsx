@@ -1,20 +1,25 @@
-import { Box, Button, Flex, Text } from "@hope-ui/core";
+import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
-export function CardTutorialFinal() {
+export function CardTutorial() {
   return (
     <Flex
       direction="column"
-      border={vars => `1px solid ${vars.colors.neutral["200"]}`}
+      border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
-      overflow="clip"
     >
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Image
+        src="https://bit.ly/3CVFryX"
+        alt="Yosemite National Park"
+        //fallback={<Box roundedTop="lg" bg="neutral.100" w="full" h="200px" />}
+        roundedTop="lg"
+        maxH="200px"
+      />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold">Reunion Island</Text>
+          <Text fontWeight="semibold">Yosemite National Park</Text>
           <Flex
             px={2}
             py={1}
@@ -35,10 +40,10 @@ export function CardTutorialFinal() {
           </Flex>
         </Flex>
         <Text size="sm" color="neutral.500" mb={3}>
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
-        <Button variant="soft" colorScheme="primary" isFullWidth mt={3}>
+        <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
         </Button>
       </Box>

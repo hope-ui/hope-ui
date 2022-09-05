@@ -17,7 +17,7 @@ const H1 = hope("h1", {
   },
 });
 
-const H2 = hope("h2", vars => ({
+const H2 = hope("h2", ({ vars }) => ({
   base: {
     color: "neutral.800",
     fontFamily: "display",
@@ -51,7 +51,7 @@ const P = hope("p", {
   },
 });
 
-const Code = hope("code", vars => ({
+const Code = hope("code", ({ vars }) => ({
   base: {
     rounded: "md",
     bg: "neutral.100",
@@ -111,7 +111,7 @@ const Table = hope("table", {
   },
 });
 
-const Tr = hope("tr", vars => ({
+const Tr = hope("tr", ({ vars }) => ({
   base: {
     m: 0,
     p: 0,
@@ -124,7 +124,7 @@ const Tr = hope("tr", vars => ({
   },
 }));
 
-const Th = hope("th", vars => ({
+const Th = hope("th", ({ vars }) => ({
   base: {
     m: 0,
     px: 4,

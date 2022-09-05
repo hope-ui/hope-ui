@@ -59,8 +59,8 @@ function Header(props: HeaderProps) {
       >
         <ExclamationCircleMiniIcon fontSize="1.3em" />
         <span>
-          This is Hope UI <strong>1.0</strong> documentation (WIP), examples and information may be
-          broken or outdated.
+          You are looking at the <em>work in progress</em> documentation of Hope UI{" "}
+          <strong>1.0</strong>, examples and information may be broken or outdated.
         </span>
       </HStack>
       <StyledHeader>
@@ -78,7 +78,7 @@ function Header(props: HeaderProps) {
             </hope.span>
           </HStack>
         </Flex>
-        <Box mr={[6, 8, 0]} my={vars => `calc(${vars.space[5]} * -1)`}>
+        <Box mr={[6, 8, 0]} my={({ vars }) => `calc(${vars.space[5]} * -1)`}>
           {/*<Search />*/}
         </Box>
         <Flex
@@ -134,7 +134,7 @@ export function Layout(props: ParentProps) {
           <Box
             pos="sticky"
             top="100px" // height of the header
-            ml={vars => `calc(${vars.space["0.5"]} * -1)`}
+            ml={({ vars }) => `calc(${vars.space["0.5"]} * -1)`}
             h="calc(100vh - 100px)" // 100vh - height of the header
             overflowY="auto"
             overflowX="hidden"

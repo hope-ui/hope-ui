@@ -1,16 +1,16 @@
-import { Preview } from "~/components/preview";
-import { CardTutorialFinal } from "~/components/card-tutorial";
 import { Callout } from "~/components/callout";
+import { CardTutorial } from "~/components/card-tutorial";
+import { Preview } from "~/components/preview";
 
 # Learn the basics
 
 Get familiar with core Hope UI concepts by building a simple `Card` component.
 
 <Preview isFullRounded>
-  <CardTutorialFinal />
+  <CardTutorial />
 </Preview>
 
-## The process
+## Building a Card
 
 ### Layout
 
@@ -25,17 +25,17 @@ import { Box, Flex } from "@hope-ui/core";
 export function Card() {
   return (
     <Flex>
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <img src="https://bit.ly/3CVFryX" alt="Yosemite National Park" />
       <Box>
         <Flex>
-          <span>Reunion Island</span>
+          <span>Yosemite National Park</span>
           <Flex>
             <span>Nature</span>
           </Flex>
         </Flex>
         <p>
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </p>
         <button>Learn more</button>
       </Box>
@@ -58,10 +58,10 @@ import { Box, Flex, Text } from "@hope-ui/core";
 export function Card() {
   return (
     <Flex>
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <img src="https://bit.ly/3CVFryX" alt="Yosemite National Park" />
       <Box>
         <Flex>
-          <Text as="span">Reunion Island</Text>
+          <Text as="span">Yosemite National Park</Text>
           <Flex>
             <Text as="span" size="xs">
               Nature
@@ -69,8 +69,8 @@ export function Card() {
           </Flex>
         </Flex>
         <Text size="sm">
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
         <button>Learn more</button>
       </Box>
@@ -86,18 +86,18 @@ export function Card() {
 
 ### More built-in components
 
-At the bottom of our `Card` there is a native HTML `button`, which looks not that good. Let's replace it by one more built-in Hope UI component, the `Button`.
+The last two native HTML elements that we can replace are `img` and `button`. Let's use their Hope UI counterparts: `Image` and `Button`.
 
-```tsx {0,19-21}
-import { Box, Button, Flex, Text } from "@hope-ui/core";
+```tsx {0,5,19-21}
+import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 export function Card() {
   return (
     <Flex>
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Image src="https://bit.ly/3CVFryX" alt="Yosemite National Park" />
       <Box>
         <Flex>
-          <Text as="span">Reunion Island</Text>
+          <Text as="span">Yosemite National Park</Text>
           <Flex>
             <Text as="span" size="xs">
               Nature
@@ -105,8 +105,8 @@ export function Card() {
           </Flex>
         </Flex>
         <Text size="sm">
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
@@ -119,26 +119,31 @@ export function Card() {
 
 ### Styling
 
-Now the fun part, Styling! Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
+Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
 
-```tsx {5-11,14-16,18-25,30-32,38,42}
-import { Box, Button, Flex, Text } from "@hope-ui/core";
+```tsx {5-10,15-17,19-21,23-30,35-37,43}
+import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 function Card() {
   return (
     <Flex
       flexDirection="column"
-      border={vars => `1px solid ${vars.colors.neutral["200"]}`}
+      border={theme => `1px solid ${theme.vars.colors.neutral["200"]}`}
       borderRadius="lg"
       boxShadow="lg"
       width="full"
       maxWidth={96}
-      overflow="clip"
     >
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Image
+        src="https://bit.ly/3CVFryX"
+        alt="Yosemite National Park"
+        borderTopLeftRadius="lg"
+        borderTopRightRadius="lg"
+        maxHeight="200px"
+      />
       <Box padding={5}>
         <Flex justifyContent="space-between" alignItems="center" width="full" marginBottom={2}>
-          <Text fontWeight="semibold">Reunion Island</Text>
+          <Text fontWeight="semibold">Yosemite National Park</Text>
           <Flex
             paddingLeft={2}
             paddingRight={2}
@@ -161,10 +166,10 @@ function Card() {
           </Flex>
         </Flex>
         <Text size="sm" color="neutral.500" marginBottom={3}>
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
-        <Button variant="soft" colorScheme="primary" isFullWidth marginTop={3}>
+        <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
         </Button>
       </Box>
@@ -180,34 +185,38 @@ All style props above are pretty much self-explanatory, however some values are 
 - `color="success.800"`
 - `width="full"`
 - `paddingRight={2}`
-- `border={vars => '1px solid ${vars.colors.neutral["200"]}'}`
+- `border={theme => '1px solid ${theme.vars.colors.neutral["200"]}'}`
 
 This is what we call _"Theme Tokens"_, a set of values (colors, spacing, shadows, etc...) that we can refer to when styling to keep our design consistent.
 
-We can refer to them directly as value of our style props or use the _"function form"_ (like for the `border` prop above) which gives us access to all available tokens through the `vars` object.
+We can refer to them directly as value of our style props or use the _"function form"_ (like for the `border` prop above) which gives us access to all available tokens through the `vars` property on the `theme` object.
 
 ### Using shorthand style props
 
 Our `Card` component is pretty good now, but we can save some typing by using Hope UI _"shorthand"_ style props.
 
-```tsx {5,7-10,14-15,18-23,36,40}
-import { Box, Button, Flex, Text } from "@hope-ui/core";
+```tsx {5,7-10,15-16,18-19,22-27,40}
+import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 function Card() {
   return (
     <Flex
       direction="column"
-      border={vars => `1px solid ${vars.colors.neutral["200"]}`}
+      border={theme => `1px solid ${theme.vars.colors.neutral["200"]}`}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
-      overflow="clip"
     >
-      <img src="https://bit.ly/3TIBe7N" alt="Reunion Island" />
+      <Image
+        src="https://bit.ly/3CVFryX"
+        alt="Yosemite National Park"
+        roundedTop="lg"
+        maxH="200px"
+      />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold">Reunion Island</Text>
+          <Text fontWeight="semibold">Yosemite National Park</Text>
           <Flex
             px={2}
             py={1}
@@ -228,10 +237,10 @@ function Card() {
           </Flex>
         </Flex>
         <Text size="sm" color="neutral.500" mb={3}>
-          La Reunion, previously Ile Bourbon; is an island in the Indian Ocean that is an overseas
-          department and region of France.
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
-        <Button variant="soft" colorScheme="primary" isFullWidth mt={3}>
+        <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
         </Button>
       </Box>

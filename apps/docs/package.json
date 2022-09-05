@@ -24,7 +24,7 @@
   "scripts": {
     "build": "solid-start build",
     "clean": "rm -rf .solid && rm -rf netlify && rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "solid-start dev",
+    "dev": "solid-start dev --host",
     "start": "solid-start start"
   },
   "dependencies": {

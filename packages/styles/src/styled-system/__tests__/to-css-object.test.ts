@@ -7,7 +7,7 @@
  */
 
 import { DEFAULT_THEME } from "../../theme";
-import { ThemeVars } from "../../types";
+import { ThemeVarsAndBreakpoints } from "../../types";
 import { toCSSObject } from "../to-css-object";
 
 describe("toCSSObject", () => {
@@ -123,7 +123,7 @@ describe("toCSSObject", () => {
   it("supports functional values", () => {
     const result = toCSSObject(
       {
-        color: (vars: ThemeVars) => vars.colors.primary["500"],
+        color: (theme: ThemeVarsAndBreakpoints) => theme.vars.colors.primary["500"],
       },
       DEFAULT_THEME
     );
@@ -178,7 +178,10 @@ describe("toCSSObject", () => {
   it("functional values can return responsive arrays", () => {
     const result = toCSSObject(
       {
-        color: (vars: ThemeVars) => [vars.colors.primary["500"], vars.colors.primary["600"]],
+        color: (theme: ThemeVarsAndBreakpoints) => [
+          theme.vars.colors.primary["500"],
+          theme.vars.colors.primary["600"],
+        ],
       },
       DEFAULT_THEME
     );

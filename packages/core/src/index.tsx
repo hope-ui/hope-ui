@@ -18,6 +18,7 @@ export * from "./focus-trap";
 export * from "./grid";
 export * from "./heading";
 export * from "./icon";
+export * from "./image";
 export * from "./kbd";
 export * from "./spacer";
 export * from "./stack";

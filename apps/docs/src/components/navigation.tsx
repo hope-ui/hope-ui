@@ -41,7 +41,7 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                         d="block"
                         w="full"
                         pl={3.5}
-                        _before={vars => ({
+                        _before={({ vars }) => ({
                           content: "''",
                           pointerEvents: "none",
                           position: "absolute",

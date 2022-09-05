@@ -1,3 +1,3 @@
 export * from "./color-mode-classnames";
 export * from "./map-responsive";
-export * from "./pack-sx";
+export { pack } from "@hope-ui/utils";

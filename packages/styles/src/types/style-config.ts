@@ -9,7 +9,7 @@
 import { Accessor } from "solid-js";
 
 import { HopeProps, SystemStyleObject } from "./styled-system";
-import { ThemeVars } from "./vars";
+import { ThemeVarsAndBreakpoints } from "./vars";
 
 /** String representation of `boolean` type. */
 type BooleanStringUnion = "true" | "false";
@@ -64,7 +64,7 @@ export type MultiPartStyleConfigInterpolation<
   Variants extends Record<string, any>
 > =
   | MultiPartStyleConfig<Parts, Variants>
-  | ((vars: ThemeVars) => MultiPartStyleConfig<Parts, Variants>);
+  | ((theme: ThemeVarsAndBreakpoints) => MultiPartStyleConfig<Parts, Variants>);
 
 /** An object or function that returns partial multipart style configuration. */
 export type PartialMultiPartStyleConfigInterpolation<
@@ -72,7 +72,7 @@ export type PartialMultiPartStyleConfigInterpolation<
   Variants extends Record<string, any>
 > =
   | Partial<MultiPartStyleConfig<Parts, Variants>>
-  | ((vars: ThemeVars) => Partial<MultiPartStyleConfig<Parts, Variants>>);
+  | ((theme: ThemeVarsAndBreakpoints) => Partial<MultiPartStyleConfig<Parts, Variants>>);
 
 /* -------------------------------------------------------------------------------------------------
  * StyleConfigResult

@@ -31,8 +31,8 @@ import { computeStyle } from "./styled-system/compute-style";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { BooleanMap, SystemStyleObject, Theme, ThemeVars } from "./types";
-import { packSx } from "./utils";
+import { BooleanMap, SxProp, SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
+import { pack } from "./utils";
 import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 /**
@@ -65,7 +65,7 @@ type HopeStyleOptions<Variants extends HopeVariantGroups> = {
 
 type HopeStyleOptionsInterpolation<Variants extends HopeVariantGroups> =
   | HopeStyleOptions<Variants>
-  | ((vars: ThemeVars) => HopeStyleOptions<Variants>);
+  | ((theme: ThemeVarsAndBreakpoints) => HopeStyleOptions<Variants>);
 
 type HopeStyleResult<Variants extends HopeVariantGroups> = {
   baseClassName: string;
@@ -140,7 +140,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
       return;
     }
 
-    styleOptions = runIfFn(styleInterpolation, theme.vars);
+    styleOptions = runIfFn(styleInterpolation, theme);
     styleResult = computeStyleOptions(styleOptions, theme);
     variantPropsKeys = styleOptions.variants ? Object.keys(styleOptions.variants) : [];
   });
@@ -197,7 +197,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
         {},
         local.__css,
         filterUndefined(styleProps),
-        ...packSx(local.sx).map(partial => runIfFn(partial, theme.vars))
+        ...pack<SxProp["sx"]>(local.sx).map(partial => runIfFn(partial, theme))
       );
 
       if (isEmptyObject(styleOverrides)) {

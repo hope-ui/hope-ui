@@ -2,7 +2,7 @@ import { createStyleConfig, focusStyles, StyleConfigProps } from "@hope-ui/style
 
 type AnchorParts = "root";
 
-export const useAnchorStyleConfig = createStyleConfig<AnchorParts, {}>(vars => ({
+export const useAnchorStyleConfig = createStyleConfig<AnchorParts, {}>(({ vars }) => ({
   root: {
     base: {
       position: "relative",

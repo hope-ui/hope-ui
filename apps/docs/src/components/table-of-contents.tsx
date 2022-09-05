@@ -99,16 +99,16 @@ const TocLink = hope(Link, {
   },
 });
 
-const TocRoot = hope("div", vars => ({
+const TocRoot = hope("div", theme => ({
   base: {
     display: "none",
 
-    [`@media screen and (min-width: 1280px)`]: {
+    [`@media screen and (min-width: ${theme.breakpoints.xl})`]: {
       display: "block",
       position: "sticky",
       top: "100px", // height of the header
       height: "calc(100vh - 100px)", // 100vh - height of the header
-      mr: `calc(${vars.space["6"]}) * -1`,
+      mr: `calc(${theme.vars.space["6"]}) * -1`,
       flex: "none",
       overflowY: "auto",
       py: 16,

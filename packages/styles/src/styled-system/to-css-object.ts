@@ -26,9 +26,9 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
   for (let key in systemStyleObject) {
     /**
      * allows the user to pass functional values.
-     * boxShadow: vars => `0 2px 2px ${vars.colors.primary["500"]}`
+     * boxShadow: theme => `0 2px 2px ${theme.vars.colors.primary["500"]}`
      */
-    let value = runIfFn(systemStyleObject[key], theme.vars);
+    let value = runIfFn(systemStyleObject[key], theme);
 
     if (value == null) {
       continue;

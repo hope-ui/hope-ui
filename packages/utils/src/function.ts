@@ -6,6 +6,8 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/utils/src/function.ts
  */
 
+import { JSX } from "solid-js";
+
 import { isArray, isFunction, isObject } from "./assertion";
 import { Dict } from "./types";
 
@@ -14,6 +16,25 @@ export { chain } from "@solid-primitives/utils";
 /** A function that does nothing. */
 export function noop() {
   return;
+}
+
+/** Call a JSX.EventHandlerUnion with the event. */
+export function callHandler<T, E extends Event>(
+  handler: JSX.EventHandlerUnion<T, E> | undefined,
+  event: E & {
+    currentTarget: T;
+    target: Element;
+  }
+) {
+  if (handler) {
+    if (isFunction(handler)) {
+      handler(event);
+    } else {
+      handler[0](handler[1], event);
+    }
+  }
+
+  return event?.defaultPrevented;
 }
 
 /** Run the value with the given args if it's a function, otherwise return the value as is. */

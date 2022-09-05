@@ -3,7 +3,7 @@ import { once, runIfFn } from "@hope-ui/utils";
 import { CSSObject, globalCss } from "./stitches.config";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { SystemStyleObject, Theme, ThemeVars } from "./types";
+import { SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
 
 type GlobalSystemStyleObject = Record<string, SystemStyleObject> & {
   /** The **@import** CSS at-rule imports style rules from other style sheets. */
@@ -15,7 +15,7 @@ type GlobalSystemStyleObject = Record<string, SystemStyleObject> & {
 
 type GlobalSystemStyleObjectInterpolation =
   | GlobalSystemStyleObject
-  | ((vars: ThemeVars) => GlobalSystemStyleObject);
+  | ((theme: ThemeVarsAndBreakpoints) => GlobalSystemStyleObject);
 
 /** Create a `useGlobalStyles` primitive. */
 export function createGlobalStyles(interpolation: GlobalSystemStyleObjectInterpolation) {
@@ -24,7 +24,7 @@ export function createGlobalStyles(interpolation: GlobalSystemStyleObjectInterpo
       "@import": atImport,
       "@font-face": atFontFace,
       ...rest
-    } = runIfFn(interpolation, theme.vars);
+    } = runIfFn(interpolation, theme);
 
     const styles = Object.entries(rest).reduce((acc, [selector, systemStyleObject]) => {
       acc[selector] = toCSSObject(systemStyleObject, theme);
