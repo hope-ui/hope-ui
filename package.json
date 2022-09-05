@@ -1,6 +1,6 @@
 {
   "name": "hope-ui-monorepo",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The SolidJS component library you've hoped for.",
   "repository": {
     "type": "git",

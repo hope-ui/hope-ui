@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "@hope-ui/core": "0.0.0",
+    "@hope-ui/primitives": "0.0.0",
+    "@hope-ui/styles": "0.0.0",
+    "@hope-ui/tests": "0.0.0",
+    "@hope-ui/utils": "0.0.0"
+  },
+  "changesets": []
+}
