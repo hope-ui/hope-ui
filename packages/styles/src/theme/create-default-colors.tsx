@@ -153,7 +153,6 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
         level1: getCssVar("colors-neutral-50"),
         level2: getCssVar("colors-neutral-100"),
         level3: getCssVar("colors-neutral-200"),
-        tooltip: getCssVar("colors-neutral-800"),
       },
     },
     dark: {
@@ -182,7 +181,6 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
         level1: getCssVar("colors-neutral-800"),
         level2: getCssVar("colors-neutral-700"),
         level3: getCssVar("colors-neutral-600"),
-        tooltip: getCssVar("colors-neutral-600"),
       },
     },
   };
