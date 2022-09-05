@@ -76,6 +76,17 @@ function Header(props: HeaderProps) {
                 UI
               </hope.span>
             </hope.span>
+            <hope.span
+              rounded="sm"
+              bg="neutral.100"
+              px="1.5"
+              py="1"
+              fontSize="sm"
+              lineHeight="none"
+              fontWeight="medium"
+            >
+              v1.0.0-next.0
+            </hope.span>
           </HStack>
         </Flex>
         <Box mr={[6, 8, 0]} my={({ vars }) => `calc(${vars.space[5]} * -1)`}>

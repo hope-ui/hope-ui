@@ -491,6 +491,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
   }),
   {
     variant: "default",
+    colorScheme: "primary",
     size: "md",
     isFullWidth: false,
   }

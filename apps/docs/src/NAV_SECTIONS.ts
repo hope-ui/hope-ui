@@ -213,5 +213,5 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },*/
-  ...CHANGELOG_NAV_SECTIONS,
+  //...CHANGELOG_NAV_SECTIONS,
 ];

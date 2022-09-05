@@ -19,8 +19,6 @@ import { IconButtonProps } from "./types";
 export const IconButton = createHopeComponent<"button", IconButtonProps>(props => {
   const [local, others] = splitProps(props, ["children", "icon"]);
 
-  // TODO: find a way to pass a custom style config to Button
-
   return (
     <Button isIconButton {...others}>
       <Show when={local.icon} fallback={local.children}>

@@ -1,7 +1,8 @@
-import { hope } from "@hope-ui/core";
+import { hope, IconButton } from "@hope-ui/core";
 import { Title as MetaTitle } from "@solidjs/meta";
 import { Link, LinkProps } from "@solidjs/router";
-import { createMemo } from "solid-js";
+import { ComponentProps, createMemo, createSignal, Show, splitProps } from "solid-js";
+import { CheckIcon, ClipboardIcon } from "./components/icons";
 
 const H1 = hope("h1", {
   base: {
@@ -75,6 +76,64 @@ const Code = hope("code", ({ vars }) => ({
     },
   },
 }));
+
+const Pre = (props: ComponentProps<"pre">) => {
+  let domRef: HTMLPreElement | undefined;
+
+  const [local, others] = splitProps(props, ["children"]);
+
+  const [isCopied, setIsCopied] = createSignal(false);
+
+  const reset = () => {
+    setIsCopied(false);
+  };
+
+  const copyToClipboard = () => {
+    const innerText = domRef?.querySelector("code")?.innerText ?? "";
+    setIsCopied(true);
+    void navigator.clipboard.writeText(innerText);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  return (
+    <pre ref={domRef} onMouseLeave={reset} {...others}>
+      <IconButton
+        aria-label="copy to clipboard"
+        variant={isCopied() ? "soft" : "plain"}
+        colorScheme={isCopied() ? "success" : "neutral"}
+        onClick={copyToClipboard}
+        size="xs"
+        pos="absolute"
+        top={2}
+        right={2}
+        zIndex="docked"
+        fontSize="16px"
+        styleConfig={{
+          root: {
+            compoundVariants: [
+              {
+                variants: {
+                  variant: "plain",
+                  colorScheme: "neutral",
+                },
+                style: {
+                  _hover: {
+                    bg: "neutral.200",
+                  },
+                },
+              },
+            ],
+          },
+        }}
+      >
+        <Show when={isCopied()} fallback={<ClipboardIcon />}>
+          <CheckIcon />
+        </Show>
+      </IconButton>
+      {local.children}
+    </pre>
+  );
+};
 
 const Ul = hope("ul", {
   base: {
@@ -164,16 +223,21 @@ const A = hope(ExternalLink, {
 });
 
 export const mdxComponents = {
-  h1: (props: any) => (
-    <H1 {...props}>
-      <MetaTitle>{props.children + " | Hope UI"}</MetaTitle>
-      {props.children}
-    </H1>
-  ),
+  h1: (props: ComponentProps<"h1">) => {
+    const [local, others] = splitProps(props, ["children"]);
+
+    return (
+      <H1 {...others}>
+        <MetaTitle>{local.children + " | Hope UI"}</MetaTitle>
+        {local.children}
+      </H1>
+    );
+  },
   h2: H2,
   h3: H3,
   p: P,
   code: Code,
+  pre: Pre,
   ul: Ul,
   ol: Ol,
   li: Li,
