@@ -1,0 +1,502 @@
+import { Button } from "@hope-ui/core";
+import { Link } from "@solidjs/router";
+
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+
+# Style props
+
+Define component's style simply by passing props.
+
+## Reference table
+
+The following tables shows a list of every style props and the CSS properties their map to.
+
+### Margin and padding
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// Refers to the value of `theme.vars.space["2"]`
+<Box m={2}>Tomato</Box>
+
+// You can also use custom values
+<Box maxW="960px" mx="auto" />
+
+// Sets margin `8px` on all viewports and `12px` from the first breakpoint and up
+<Box m={[2, 3]} />
+```
+
+| Prop                  | CSS Property                                  | Theme scale |
+| --------------------- | --------------------------------------------- | ----------- |
+| `m`, `margin`         | `margin`                                      | `space`     |
+| `mt`, `marginTop`     | `margin-top`                                  | `space`     |
+| `mr`, `marginRight`   | `margin-right`                                | `space`     |
+| `me`, `marginEnd`     | `margin-inline-end`                           | `space`     |
+| `mb`, `marginBottom`  | `margin-bottom`                               | `space`     |
+| `ml`, `marginLeft`    | `margin-left`                                 | `space`     |
+| `ms`, `marginStart`   | `margin-inline-start`                         | `space`     |
+| `mx`, `marginX`       | `margin-inline-start` + `margin-inline-end`   | `space`     |
+| `my`, `marginY`       | `margin-top` + `margin-bottom`                | `space`     |
+| `p`, `padding`        | `padding`                                     | `space`     |
+| `pt`, `paddingTop`    | `padding-top`                                 | `space`     |
+| `pr`, `paddingRight`  | `padding-right`                               | `space`     |
+| `pe`, `paddingEnd`    | `padding-inline-end`                          | `space`     |
+| `pb`, `paddingBottom` | `padding-bottom`                              | `space`     |
+| `pl`, `paddingLeft`   | `padding-left`                                | `space`     |
+| `ps`, `paddingStart`  | `padding-inline-start`                        | `space`     |
+| `px`, `paddingX`      | `padding-inline-start` + `padding-inline-end` | `space`     |
+| `py`, `paddingY`      | `padding-top` + `padding-bottom`              | `space`     |
+
+### Color
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// Refers to the value of `theme.vars.colors.neutral["50"]`
+<Box color='neutral.50' />
+
+// Use raw CSS color value
+<Box color='#f00' />
+
+// Background colors
+<Box backgroundColor='tomato' />
+
+// Shortand prop
+<Box bgColor='tomato' />
+```
+
+| Prop                         | CSS Property       | Theme scale |
+| ---------------------------- | ------------------ | ----------- |
+| `color`                      | `color`            | `colors`    |
+| `bg`, `background`           | `background`       | `colors`    |
+| `bgColor`, `backgroundColor` | `background-color` | `colors`    |
+| `opacity`                    | `opacity`          | none        |
+
+### Typography
+
+```tsx
+import { Text } from "@hope-ui/core";
+
+// Refers to the value of `theme.vars.fontSizes.md`
+<Text fontSize="md" />
+
+// font-size `32px`
+<Text fontSize={32} />
+
+// font-size `"2em"`
+<Text fontSize='2em' />
+
+// text-align `left` on all viewports and `center` from the first breakpoint and up
+<Text textAlign={[ 'left', 'center' ]} />
+```
+
+| Prop             | CSS Property      | Theme scale      |
+| ---------------- | ----------------- | ---------------- |
+| `fontFamily`     | `font-family`     | `fonts`          |
+| `fontSize`       | `font-size`       | `fontSizes`      |
+| `fontWeight`     | `font-weight`     | `fontWeights`    |
+| `lineHeight`     | `line-height`     | `lineHeights`    |
+| `letterSpacing`  | `letter-spacing`  | `letterSpacings` |
+| `textAlign`      | `text-align`      | none             |
+| `fontStyle`      | `font-style`      | none             |
+| `textTransform`  | `text-transform`  | none             |
+| `textDecoration` | `text-decoration` | none             |
+
+### Layout
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// verbose
+<Box display="flex" />
+
+// shorthand
+<Box d="flex" />
+```
+
+| Prop            | CSS Property     | Theme scale |
+| --------------- | ---------------- | ----------- |
+| `d`, `display`  | `display`        | none        |
+| `verticalAlign` | `vertical-align` | none        |
+| `overflow`      | `overflow`       | none        |
+| `overflowX`     | `overflow-x`     | none        |
+| `overflowY`     | `overflow-y`     | none        |
+
+### Size
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// verbose
+<Box width="100%" height={32} />
+
+// shorthand
+<Box w="100%" h="32px" />
+
+// Refers to `theme.vars.size.sm`
+<Box boxSize="sm" />
+
+// width `256px`
+<Box w={256} />
+
+// width `"40px"`
+<Box w='40px' />
+
+```
+
+| Prop                | CSS Property      | Theme scale |
+| ------------------- | ----------------- | ----------- |
+| `w`, `width`        | `width`           | `sizes`     |
+| `h`, `height`       | `height`          | `sizes`     |
+| `minW`, `minWidth`  | `min-width`       | `sizes`     |
+| `maxW`, `maxWidth`  | `max-width`       | `sizes`     |
+| `minH`, `minHeight` | `min-height`      | `sizes`     |
+| `maxH`, `maxHeight` | `max-height`      | `sizes`     |
+| `boxSize`           | `width`, `height` | `sizes`     |
+
+### Flexbox
+
+```tsx
+import { Box, Flex } from "@hope-ui/core";
+
+// verbose
+<Box display="flex" alignItems="center" justifyContent="space-between">
+  Box with Flex props
+</Box>
+
+// shorthand using the `Flex` component
+<Flex align="center" justify="center">
+  Flex Container
+</Flex>
+```
+
+<Callout type="warning">
+  Props marked with an <strong>*</strong> will only work if you use the `Flex` or `Stack`
+  components.
+</Callout>
+
+| Prop                           | CSS Property      | Theme scale |
+| ------------------------------ | ----------------- | ----------- |
+| `alignContent`                 | `align-content`   | none        |
+| `justifyItems`                 | `justify-items`   | none        |
+| `alignItems`, \*`align`        | `align-items`     | none        |
+| `justifyContent`, \*`justify`  | `justify-content` | none        |
+| `flexDirection`, \*`direction` | `flex-direction`  | none        |
+| `flexWrap`, \*`wrap`           | `flex-wrap`       | none        |
+| `flex`                         | `flex`            | none        |
+| `flexGrow`                     | `flex-grow`       | none        |
+| `flexShrink`                   | `flex-shrink`     | none        |
+| `flexBasis`                    | `flex-basis`      | none        |
+| `justifySelf`                  | `justify-self`    | none        |
+| `alignSelf`                    | `align-self`      | none        |
+| `order`                        | `order`           | none        |
+
+### Grid Layout
+
+```tsx
+import { Box, Grid } from "@hope-ui/core";
+
+// verbose
+<Box display="grid" gap={2} gridAutoFlow="row dense">
+  Grid
+</Box>
+
+// shorthand using the `Grid` component
+<Grid gap={2} autoFlow="row dense">
+  Grid
+</Grid>
+```
+
+<Callout type="warning">
+  Props marked with an <strong>*</strong> will only work if you use the `Grid` and `GridItem`
+  components.
+</Callout>
+
+| Prop                                       | CSS Property            | Theme scale |
+| ------------------------------------------ | ----------------------- | ----------- |
+| `gap`                                      | `grid-gap`              | `space`     |
+| `rowGap`                                   | `grid-row-gap`          | `space`     |
+| `columnGap`                                | `grid-column-gap`       | `space`     |
+| `gridTemplate`                             | `grid-template`         | none        |
+| `gridTemplateColumns`, \*`templateColumns` | `grid-template-columns` | none        |
+| `gridTemplateRows`, \*`templateRows`       | `grid-template-rows`    | none        |
+| `gridTemplateAreas`, \*`templateAreas`     | `grid-template-areas`   | none        |
+| `gridArea`, \*`area`                       | `grid-area`             | none        |
+| `gridColumn`                               | `grid-column`           | none        |
+| `gridColumnStart`, \*`colStart`            | `grid-column-start`     | none        |
+| `gridColumnEnd`, \*`colEnd`                | `grid-column-end`       | none        |
+| `gridRow`                                  | `grid-row`              | none        |
+| `gridRowStart`, \*`rowStart`               | `grid-row-start`        | none        |
+| `gridRowEnd`, \*`rowEnd`                   | `grid-row-end`          | none        |
+| `gridAutoFlow`, \*`autoFlow`               | `grid-auto-flow`        | none        |
+| `gridAutoColumns`, \*`autoColumns`         | `grid-auto-columns`     | none        |
+| `gridAutoRows`, \*`autoRows`               | `grid-auto-rows`        | none        |
+| `placeItems`                               | `place-items`           | none        |
+| `placeContent`                             | `place-content`         | none        |
+| `placeSelf`                                | `place-self`            | none        |
+
+### Border
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+<Box border="1px" borderColor="neutral.200">
+  Card
+</Box>;
+```
+
+| Prop                | CSS Property                   | Theme scale    |
+| ------------------- | ------------------------------ | -------------- |
+| `border`            | `border`                       | `borders`      |
+| `borderWidth`       | `border-width`                 | `borderWidths` |
+| `borderStyle`       | `border-style`                 | `borderStyles` |
+| `borderColor`       | `border-color`                 | `colors`       |
+| `borderTop`         | `border-top`                   | `borders`      |
+| `borderTopWidth`    | `border-top-width`             | `borderWidths` |
+| `borderTopStyle`    | `border-top-style`             | `borderStyles` |
+| `borderTopColor`    | `border-top-color`             | `colors`       |
+| `borderRight`       | `border-right`                 | `borders`      |
+| `borderRightWidth`  | `border-right-width`           | `borderWidths` |
+| `borderRightStyle`  | `border-right-style`           | `borderStyles` |
+| `borderRightColor`  | `border-right-color`           | `colors`       |
+| `borderBottom`      | `border-bottom`                | `borders`      |
+| `borderBottomWidth` | `border-bottom-width`          | `borderWidths` |
+| `borderBottomStyle` | `border-bottom-style`          | `borderStyles` |
+| `borderBottomColor` | `border-bottom-color`          | `colors`       |
+| `borderLeft`        | `border-left`                  | `borders`      |
+| `borderLeftWidth`   | `border-left-width`            | `borderWidths` |
+| `borderLeftStyle`   | `border-left-style`            | `borderStyles` |
+| `borderLeftColor`   | `border-left-color`            | `colors`       |
+| `borderX`           | `border-left` , `border-right` | `borders`      |
+| `borderY`           | `border-top` , `border-bottom` | `borders`      |
+
+### Border Radius
+
+```tsx
+import { Button } from "@hope-ui/core";
+
+// This button will have no right borderRadius
+<Button borderRightRadius={0}>Button 1</Button>
+
+// This button will have no left borderRadius*/
+<Button borderLeftRadius={0}>Button 2</Button>
+
+// top left and top right radius will be `theme.vars.radii.md`
+<Button borderTopRadius="md">Button 2</Button>
+```
+
+| Prop                                  | CSS Property                                               | Theme scale |
+| ------------------------------------- | ---------------------------------------------------------- | ----------- |
+| `borderRadius`, `rounded`             | `border-radius`                                            | `radii`     |
+| `borderTopLeftRadius`                 | `border-top-left-radius`                                   | `radii`     |
+| `borderTopRightRadius`                | `border-top-right-radius`                                  | `radii`     |
+| `borderBottomRightRadius`             | `border-bottom-right-radius`                               | `radii`     |
+| `borderBottomLeftRadius`              | `border-bottom-left-radius`                                | `radii`     |
+| `borderTopRadius`, `roundedTop`       | `border-top-left-radius` + `border-top-right-radius`       | `radii`     |
+| `borderRightRadius`, `roundedRight`   | `border-top-right-radius` + `border-bottom-right-radius`   | `radii`     |
+| `borderBottomRadius`, `roundedBottom` | `border-bottom-left-radius` + `border-bottom-right-radius` | `radii`     |
+| `borderLeftRadius`, `roundedLeft`     | `border-top-left-radius` + `border-bottom-left-radius`     | `radii`     |
+
+### Position
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// verbose
+<Box position="absolute">Cover</Box>
+
+// shorthand
+<Box pos="absolute">Cover</Box>
+
+<Box pos="absolute" top="0" left="0">
+  Absolute with top and left
+</Box>
+
+<Box pos="fixed" w="100%" zIndex={2}>
+  Fixed with zIndex
+</Box>
+```
+
+| Prop             | CSS Property | Theme scale |
+| ---------------- | ------------ | ----------- |
+| `pos`,`position` | `position`   | none        |
+| `zIndex`         | `z-index`    | `zIndices`  |
+| `top`            | `top`        | `space`     |
+| `right`          | `right`      | `space`     |
+| `bottom`         | `bottom`     | `space`     |
+| `left`           | `left`       | `space`     |
+
+### Shadow
+
+```tsx
+import { Box } from "@hope-ui/core";
+
+// Refers to `theme.vars.shadows.md`
+<Box boxShadow="md">Shadow md</Box>;
+```
+
+| Prop                  | CSS Property  | Theme scale |
+| --------------------- | ------------- | ----------- |
+| `textShadow`          | `text-shadow` | `shadows`   |
+| `shadow`, `boxShadow` | `box-shadow`  | `shadows`   |
+
+### Pseudo selector
+
+```tsx
+import { Button } from "@hope-ui/core";
+
+// :hover style
+<Button
+  colorScheme="primary"
+  _hover={{
+    background: "white",
+    color: "primary.500",
+  }}
+>
+  Hover me
+</Button>
+
+// apply :hover over parent element
+<Box
+  role="group"
+>
+  <Box
+    _hover={{ fontWeight: 'semibold' }}
+    _groupHover={{ color: 'tomato' }}
+  >
+  </Box>
+</Box>
+
+// add ::before pseudo element
+// Note: the content value needs an extra set of quotes!
+<Box
+  _before={{ content: '"🙂"', display: 'inline-block', mr: '5px' }}
+>
+  A pseudo element
+</Box>
+```
+
+| Prop                    | CSS Property                                                                                                                                                                               | Theme scale |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `_hover`                | `&:hover`<br />`&[data-hover]`                                                                                                                                                             | none        |
+| `_active`               | `&:active`<br />`&[data-active]`                                                                                                                                                           | none        |
+| `_focus`                | `&:focus`<br />`&[data-focus]`                                                                                                                                                             | none        |
+| `_highlighted`          | `&[data-highlighted]`                                                                                                                                                                      | none        |
+| `_focusWithin`          | `&:focus-within`                                                                                                                                                                           | none        |
+| `_focusVisible`         | `&:focus-visible`                                                                                                                                                                          | none        |
+| `_disabled`             | `&[disabled]`<br />`&[aria-disabled=true]`<br />`&[data-disabled]`                                                                                                                         | none        |
+| `_readOnly`             | `&[aria-readonly=true]`<br />`&[readonly]`<br />`&[data-readonly]`                                                                                                                         | none        |
+| `_before`               | `&::before`                                                                                                                                                                                | none        |
+| `_after`                | `&::after`                                                                                                                                                                                 | none        |
+| `_empty`                | `&:empty`                                                                                                                                                                                  | none        |
+| `_expanded`             | `&[aria-expanded=true]`<br />`&[data-expanded]`                                                                                                                                            | none        |
+| `_checked`              | `&[aria-checked=true]`<br />`&[data-checked]`                                                                                                                                              | none        |
+| `_grabbed`              | `&[aria-grabbed=true]`<br />`&[data-grabbed]`                                                                                                                                              | none        |
+| `_pressed`              | `&[aria-pressed=true]`<br />`&[data-pressed]`                                                                                                                                              | none        |
+| `_invalid`              | `&[aria-invalid=true]`<br />`&[data-invalid]`                                                                                                                                              | none        |
+| `_valid`                | `&[data-valid]`<br />`&[data-state=valid]`                                                                                                                                                 | none        |
+| `_loading`              | `&[data-loading]`<br />`&[aria-busy=true]`                                                                                                                                                 | none        |
+| `_selected`             | `&[aria-selected=true]`<br />`&[data-selected]`                                                                                                                                            | none        |
+| `_hidden`               | `&[hidden]`<br />`&[data-hidden]`                                                                                                                                                          | none        |
+| `_autofill`             | `&:-webkit-autofill`                                                                                                                                                                       | none        |
+| `_even`                 | `&:nth-of-type(even)`                                                                                                                                                                      | none        |
+| `_odd`                  | `&:nth-of-type(odd)`                                                                                                                                                                       | none        |
+| `_first`                | `&:first-child`                                                                                                                                                                            | none        |
+| `_last`                 | `&:last-child`                                                                                                                                                                             | none        |
+| `_notFirst`             | `&:not(:first-child)`                                                                                                                                                                      | none        |
+| `_notLast`              | `&:not(:last-child)`                                                                                                                                                                       | none        |
+| `_visited`              | `&:visited`                                                                                                                                                                                | none        |
+| `_activeLink`           | `&[aria-current=page]`                                                                                                                                                                     | none        |
+| `_activeStep`           | `&[aria-current=step]`                                                                                                                                                                     | none        |
+| `_indeterminate`        | `&:indeterminate`<br />`&[aria-checked=mixed]`<br />`&[data-indeterminate]`                                                                                                                | none        |
+| `_groupHover`           | `[role=group]:hover &`<br />`[role=group][data-hover] &`<br />`[data-group]:hover &`<br />`[data-group][data-hover] &`<br />`.group:hover &`<br />`.group[data-hover] &`                   | none        |
+| `_peerHover`            | `[data-peer]:hover ~ &`<br />`[data-peer][data-hover] ~ &`<br />`.peer:hover ~ &`<br />`.peer[data-hover] ~ &`                                                                             | none        |
+| `_groupFocus`           | `[role=group]:focus &`<br />`[role=group][data-focus] &`<br />`[data-group]:focus &`<br />`[data-group][data-focus] &`<br />`.group:focus &`<br />`.group[data-focus] &`                   | none        |
+| `_peerFocus`            | `[data-peer]:focus ~ &`<br />`[data-peer][data-focus] ~ &`<br />`.peer:focus ~ &`<br />`.peer[data-focus] ~ &`                                                                             | none        |
+| `_groupFocusVisible`    | `[role=group]:focus-visible &`<br />`[data-group]:focus-visible &`<br />`.group:focus-visible &`                                                                                           | none        |
+| `_peerFocusVisible`     | `[data-peer]:focus-visible ~ &`<br />`.peer:focus-visible ~ &`                                                                                                                             | none        |
+| `_groupActive`          | `[role=group]:active &`<br />`[role=group][data-active] &`<br />`[data-group]:active &`<br />`[data-group][data-active] &`<br />`.group:active &`<br />`.group[data-active] &`             | none        |
+| `_peerActive`           | `[data-peer]:active ~ &`<br />`[data-peer][data-active] ~ &`<br />`.peer:active ~ &`<br />`.peer[data-active] ~ &`                                                                         | none        |
+| `_groupDisabled`        | `[role=group]:disabled &`<br />`[role=group][data-disabled] &`<br />`[data-group]:disabled &`<br />`[data-group][data-disabled] &`<br />`.group:disabled &`<br />`.group[data-disabled] &` | none        |
+| `_peerDisabled`         | `[data-peer]:disabled ~ &`<br />`[data-peer][data-disabled] ~ &`<br />`.peer:disabled ~ &`<br />`.peer[data-disabled] ~ &`                                                                 | none        |
+| `_groupInvalid`         | `[role=group]:invalid &`<br />`[role=group][data-invalid] &`<br />`[data-group]:invalid &`<br />`[data-group][data-invalid] &`<br />`.group:invalid &`<br />`.group[data-invalid] &`       | none        |
+| `_peerInvalid`          | `[data-peer]:invalid ~ &`<br />`[data-peer][data-invalid] ~ &`<br />`.peer:invalid ~ &`<br />`.peer[data-invalid] ~ &`                                                                     | none        |
+| `_groupChecked`         | `[role=group]:checked &`<br />`[role=group][data-checked] &`<br />`[data-group]:checked &`<br />`[data-group][data-checked] &`<br />`.group:checked &`<br />`.group[data-checked] &`       | none        |
+| `_peerChecked`          | `[data-peer]:checked ~ &`<br />`[data-peer][data-checked] ~ &`<br />`.peer:checked ~ &`<br />`.peer[data-checked] ~ &`                                                                     | none        |
+| `_groupFocusWithin`     | `[role=group]:focus-within &`<br />`[data-group]:focus-within &`<br />`.group:focus-within &`                                                                                              | none        |
+| `_peerFocusWithin`      | `[data-peer]:focus-within ~ &`<br />`.peer:focus-within ~ &`                                                                                                                               | none        |
+| `_peerPlaceholderShown` | `[data-peer]:placeholder-shown ~ &`<br />`.peer:placeholder-shown ~ &`                                                                                                                     | none        |
+| `_placeholder`          | `&::placeholder`                                                                                                                                                                           | none        |
+| `_placeholderShown`     | `&:placeholder-shown`                                                                                                                                                                      | none        |
+| `_fullScreen`           | `&:fullscreen`                                                                                                                                                                             | none        |
+| `_selection`            | `&::selection`                                                                                                                                                                             | none        |
+| `_rtl`                  | `[dir=rtl] &`<br />`&[dir=rtl]`                                                                                                                                                            | none        |
+| `_ltr`                  | `[dir=ltr] &`<br />`&[dir=ltr]`                                                                                                                                                            | none        |
+| `_mediaDark`            | `@media (prefers-color-scheme: dark)`                                                                                                                                                      | none        |
+| `_mediaReduceMotion`    | `@media (prefers-reduced-motion: reduce)`                                                                                                                                                  | none        |
+| `_light`                | `.hope-theme-light &`<br />`[data-theme=light] &`<br />`&[data-theme=light]`                                                                                                               | none        |
+| `_dark`                 | `.hope-theme-dark &`<br />`[data-theme=dark] &`<br />`&[data-theme=dark]`                                                                                                                  | none        |
+
+### Others
+
+| Prop                       | CSS Property                 | Theme scale |
+| -------------------------- | ---------------------------- | ----------- |
+| `appearance`               | `appearance`                 | none        |
+| `userSelect`               | `user-select`                | none        |
+| `pointerEvents`            | `pointer-events`             | none        |
+| `resize`                   | `resize`                     | none        |
+| `cursor`                   | `cursor`                     | none        |
+| `outline`                  | `outline`                    | none        |
+| `outlineOffset`            | `outline-offset`             | none        |
+| `outlineColor`             | `outline-color`              | `colors`    |
+| `transform`                | `transform`                  | none        |
+| `transformOrigin`          | `transform-origin`           | none        |
+| `clipPath`                 | `clip-path`                  | none        |
+| `transition`               | `transition`                 | none        |
+| `transitionProperty`       | `transition-property`        | none        |
+| `transitionTimingFunction` | `transition-timing-function` | none        |
+| `transitionDuration`       | `transition-duration`        | none        |
+| `transitionDelay`          | `transition-delay`           | none        |
+| `animation`                | `animation`                  | none        |
+| `willChange`               | `will-change`                | none        |
+| `objectFit`                | `object-fit`                 | none        |
+| `objectPosition`           | `object-position`            | none        |
+
+## The `as` prop
+
+All Hope UI components are polymorphic, meaning you can use the `as` prop to change the rendered element.
+
+For example, say you are using the `Button` component, and you need to make it a link instead. You can compose `a` and `Button` like below:
+
+<Preview>
+  <Button as="a" target="_blank" href="https://solidjs.com">
+    Go to SolidJS website
+  </Button>
+</Preview>
+
+```tsx
+<Button as="a" target="_blank" href="https://solidjs.com">
+  Go to SolidJS website
+</Button>
+```
+
+And it works with SolidJS components too:
+
+<Preview>
+  <Button as={Link} href="/">
+    Back to home
+  </Button>
+</Preview>
+
+```tsx
+import { Link } from "@solidjs/router";
+
+function App() {
+  return (
+    <Button as={Link} href="/">
+      Back to home
+    </Button>
+  );
+}
+```

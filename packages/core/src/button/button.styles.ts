@@ -351,7 +351,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
 
         fontFamily: "inherit",
         fontSize: "100%",
-        fontWeight: "normal",
+        fontWeight: "medium",
         lineHeight: "none",
         textDecoration: "none",
 

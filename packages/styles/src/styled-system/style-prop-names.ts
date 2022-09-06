@@ -7,6 +7,7 @@ import {
   KeysOf,
   LayoutProps,
   MarginProps,
+  OtherStyleProps,
   PaddingProps,
   PositionProps,
   PseudoSelectorProps,
@@ -110,25 +111,23 @@ const layoutPropNames: KeysOf<LayoutProps> = {
   overflow: true,
   overflowX: true,
   overflowY: true,
-  objectFit: true,
-  objectPosition: true,
 };
 
 const marginPropNames: KeysOf<MarginProps> = {
   margin: true,
   marginTop: true,
   marginRight: true,
-  marginStart: true,
+  marginEnd: true,
   marginBottom: true,
   marginLeft: true,
-  marginEnd: true,
+  marginStart: true,
   m: true,
   mt: true,
   mr: true,
-  ms: true,
+  me: true,
   mb: true,
   ml: true,
-  me: true,
+  ms: true,
   mx: true,
   my: true,
 };
@@ -137,17 +136,17 @@ const paddingPropNames: KeysOf<PaddingProps> = {
   padding: true,
   paddingTop: true,
   paddingRight: true,
-  paddingStart: true,
+  paddingEnd: true,
   paddingBottom: true,
   paddingLeft: true,
-  paddingEnd: true,
+  paddingStart: true,
   p: true,
   pt: true,
   pr: true,
-  ps: true,
+  pe: true,
   pb: true,
   pl: true,
-  pe: true,
+  ps: true,
   px: true,
   py: true,
 };
@@ -229,6 +228,11 @@ const typographyPropNames: KeysOf<TypographyProps> = {
   textDecoration: true,
 };
 
+const otherStylePropNames: KeysOf<OtherStyleProps> = {
+  objectFit: true,
+  objectPosition: true,
+};
+
 const pseudoSelectorPropNames: KeysOf<PseudoSelectorProps> = {
   _hover: true,
   _active: true,
@@ -306,5 +310,6 @@ export const stylePropNames: KeysOf<SystemStyleProps> = {
   ...transformPropNames,
   ...transitionPropNames,
   ...typographyPropNames,
+  ...otherStylePropNames,
   ...pseudoSelectorPropNames,
 };

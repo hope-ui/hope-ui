@@ -484,12 +484,6 @@ export type LayoutProps = ResponsiveProps<{
 
   /** The CSS `overflow-y` property. */
   overflowY: Property.OverflowY;
-
-  /** The CSS `object-fit` property. */
-  objectFit?: Property.ObjectFit;
-
-  /** The CSS `object-position` property. */
-  objectPosition?: Property.ObjectPosition;
 }>;
 
 export type InteractivityProps = ResponsiveProps<{
@@ -528,8 +522,8 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-right` property. */
   marginRight: Property.MarginRight<ThemeSpace> | number;
 
-  /** The CSS `margin-inline-start` property. */
-  marginStart: Property.MarginInlineStart<ThemeSpace> | number;
+  /** The CSS `margin-inline-end` property. */
+  marginEnd: Property.MarginInlineEnd<ThemeSpace> | number;
 
   /** The CSS `margin-bottom` property. */
   marginBottom: Property.MarginBottom<ThemeSpace> | number;
@@ -537,8 +531,8 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-left`  property. */
   marginLeft: Property.MarginLeft<ThemeSpace> | number;
 
-  /** The CSS `margin-inline-end` property. */
-  marginEnd: Property.MarginInlineEnd<ThemeSpace> | number;
+  /** The CSS `margin-inline-start` property. */
+  marginStart: Property.MarginInlineStart<ThemeSpace> | number;
 
   /** The CSS `margin` property. */
   m: Property.Margin<ThemeSpace> | number;
@@ -549,8 +543,8 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-right` property. */
   mr: Property.MarginRight<ThemeSpace> | number;
 
-  /** The CSS `margin-inline-start` property. */
-  ms: Property.MarginInlineStart<ThemeSpace> | number;
+  /** The CSS `margin-inline-end` property. */
+  me: Property.MarginInlineEnd<ThemeSpace> | number;
 
   /** The CSS `margin-bottom` property. */
   mb: Property.MarginBottom<ThemeSpace> | number;
@@ -558,8 +552,8 @@ export type MarginProps = ResponsiveProps<{
   /** The CSS `margin-left`  property. */
   ml: Property.MarginLeft<ThemeSpace> | number;
 
-  /** The CSS `margin-inline-end` property. */
-  me: Property.MarginInlineEnd<ThemeSpace> | number;
+  /** The CSS `margin-inline-start` property. */
+  ms: Property.MarginInlineStart<ThemeSpace> | number;
 
   /** The CSS `margin-inline-start` and `margin-inline-end` property. */
   mx: Property.MarginInlineStart<ThemeSpace> | number;
@@ -578,8 +572,8 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-right` property. */
   paddingRight: Property.PaddingRight<ThemeSpace> | number;
 
-  /** The CSS `padding-inline-start` property. */
-  paddingStart: Property.PaddingInlineStart<ThemeSpace> | number;
+  /** The CSS `padding-inline-end` property. */
+  paddingEnd: Property.PaddingInlineEnd<ThemeSpace> | number;
 
   /** The CSS `padding-bottom` property. */
   paddingBottom: Property.PaddingBottom<ThemeSpace> | number;
@@ -587,8 +581,8 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-left`  property. */
   paddingLeft: Property.PaddingLeft<ThemeSpace> | number;
 
-  /** The CSS `padding-inline-end` property. */
-  paddingEnd: Property.PaddingInlineEnd<ThemeSpace> | number;
+  /** The CSS `padding-inline-start` property. */
+  paddingStart: Property.PaddingInlineStart<ThemeSpace> | number;
 
   /** The CSS `padding` property. */
   p: Property.Padding<ThemeSpace> | number;
@@ -599,8 +593,8 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-right` property. */
   pr: Property.PaddingRight<ThemeSpace> | number;
 
-  /** The CSS `padding-inline-start` property. */
-  ps: Property.PaddingInlineStart<ThemeSpace> | number;
+  /** The CSS `padding-inline-end` property. */
+  pe: Property.PaddingInlineEnd<ThemeSpace> | number;
 
   /** The CSS `padding-bottom` property. */
   pb: Property.PaddingBottom<ThemeSpace> | number;
@@ -608,8 +602,8 @@ export type PaddingProps = ResponsiveProps<{
   /** The CSS `padding-left`  property. */
   pl: Property.PaddingLeft<ThemeSpace> | number;
 
-  /** The CSS `padding-inline-end` property. */
-  pe: Property.PaddingInlineEnd<ThemeSpace> | number;
+  /** The CSS `padding-inline-start` property. */
+  ps: Property.PaddingInlineStart<ThemeSpace> | number;
 
   /** The CSS `padding-inline-start` and `padding-inline-end` property. */
   px: Property.PaddingInlineStart<ThemeSpace> | number;
@@ -800,6 +794,14 @@ export type TransitionProps = ResponsiveProps<{
   willChange: Property.WillChange;
 }>;
 
+export type OtherStyleProps = ResponsiveProps<{
+  /** The CSS `object-fit` property. */
+  objectFit?: Property.ObjectFit;
+
+  /** The CSS `object-position` property. */
+  objectPosition?: Property.ObjectPosition;
+}>;
+
 export type BaseSystemStyleProps = BorderProps &
   ColorProps &
   FlexboxProps &
@@ -814,7 +816,8 @@ export type BaseSystemStyleProps = BorderProps &
   SizeProps &
   TransformProps &
   TransitionProps &
-  TypographyProps;
+  TypographyProps &
+  OtherStyleProps;
 
 export type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProps>;
 
