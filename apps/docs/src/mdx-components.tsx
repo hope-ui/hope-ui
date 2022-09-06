@@ -6,7 +6,7 @@ import { ComponentProps, createMemo, createSignal, Show, splitProps } from "soli
 import { CheckIcon, ClipboardIcon } from "./components/icons";
 
 const H1 = hope("h1", {
-  base: {
+  baseStyle: {
     color: "neutral.800",
     fontFamily: "display",
     fontSize: "4xl",
@@ -20,7 +20,7 @@ const H1 = hope("h1", {
 });
 
 const H2 = hope("h2", ({ vars }) => ({
-  base: {
+  baseStyle: {
     color: "neutral.700",
     fontFamily: "display",
     fontSize: "3xl",
@@ -34,7 +34,7 @@ const H2 = hope("h2", ({ vars }) => ({
 }));
 
 const H3 = hope("h3", {
-  base: {
+  baseStyle: {
     color: "neutral.700",
     fontFamily: "display",
     fontSize: "2xl",
@@ -46,7 +46,7 @@ const H3 = hope("h3", {
 });
 
 const P = hope("p", {
-  base: {
+  baseStyle: {
     _notFirst: {
       mt: 6,
 
@@ -58,7 +58,7 @@ const P = hope("p", {
 });
 
 const Code = hope("code", ({ vars }) => ({
-  base: {
+  baseStyle: {
     rounded: "md",
     bg: "neutral.100",
     px: "0.4em",
@@ -132,6 +132,8 @@ const Pre = (props: ComponentProps<"pre">) => {
                   colorScheme: "neutral",
                 },
                 style: {
+                  bg: "background.level1",
+
                   _hover: {
                     bg: "neutral.200",
                   },
@@ -151,7 +153,7 @@ const Pre = (props: ComponentProps<"pre">) => {
 };
 
 const Ul = hope("ul", {
-  base: {
+  baseStyle: {
     ml: 6,
     mt: 6,
     listStyleType: "disc",
@@ -159,7 +161,7 @@ const Ul = hope("ul", {
 });
 
 const Ol = hope("ol", {
-  base: {
+  baseStyle: {
     ml: 6,
     mt: 6,
     listStyleType: "decimal",
@@ -167,13 +169,13 @@ const Ol = hope("ol", {
 });
 
 const Li = hope("li", {
-  base: {
+  baseStyle: {
     my: 3,
   },
 });
 
 const Table = hope("table", {
-  base: {
+  baseStyle: {
     w: "full",
     p: 0,
     fontSize: "sm",
@@ -186,7 +188,7 @@ const Table = hope("table", {
 });
 
 const Tr = hope("tr", ({ vars }) => ({
-  base: {
+  baseStyle: {
     m: 0,
     p: 0,
     _notLast: {
@@ -199,7 +201,7 @@ const Tr = hope("tr", ({ vars }) => ({
 }));
 
 const Th = hope("th", ({ vars }) => ({
-  base: {
+  baseStyle: {
     m: 0,
     px: 4,
     py: 2,
@@ -211,7 +213,7 @@ const Th = hope("th", ({ vars }) => ({
 }));
 
 const Td = hope("td", {
-  base: {
+  baseStyle: {
     m: 0,
     px: 4,
     py: 2,
@@ -231,7 +233,7 @@ const ExternalLink = (props: LinkProps) => {
 };
 
 const A = hope(ExternalLink, {
-  base: {
+  baseStyle: {
     color: "primary.500",
     textDecoration: "underline",
   },

@@ -10,7 +10,7 @@ import { Navigation } from "./navigation";
 import { TableOfContents } from "./table-of-contents";
 
 const PageLink = hope(Link, {
-  base: {
+  baseStyle: {
     display: "flex",
     alignItems: "center",
     gap: 1.5,
@@ -26,7 +26,7 @@ const PageLink = hope(Link, {
 });
 
 const StyledHeader = hope("header", {
-  base: {
+  baseStyle: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",

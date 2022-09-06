@@ -15,7 +15,7 @@ import { hope } from "@hope-ui/styles";
 export const Center = hope(
   "div",
   {
-    base: {
+    baseStyle: {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",

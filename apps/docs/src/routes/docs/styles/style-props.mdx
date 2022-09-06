@@ -10,20 +10,20 @@ Define component's style simply by passing props.
 
 ## Reference table
 
-The following tables shows a list of every style props and the CSS properties their map to.
+The following table shows all available style props and CSS properties their map to.
 
 ### Margin and padding
 
 ```tsx
 import { Box } from "@hope-ui/core";
 
-// Refers to the value of `theme.vars.space["2"]`
+// refers to the value of `theme.vars.space["2"]`
 <Box m={2}>Tomato</Box>
 
-// You can also use custom values
+// you can also use custom values
 <Box maxW="960px" mx="auto" />
 
-// Sets margin `8px` on all viewports and `12px` from the first breakpoint and up
+// sets margin `8px` on all viewports and `12px` from the first breakpoint and up
 <Box m={[2, 3]} />
 ```
 
@@ -53,16 +53,16 @@ import { Box } from "@hope-ui/core";
 ```tsx
 import { Box } from "@hope-ui/core";
 
-// Refers to the value of `theme.vars.colors.neutral["50"]`
+// refers to the value of `theme.vars.colors.neutral["50"]`
 <Box color='neutral.50' />
 
-// Use raw CSS color value
+// use raw CSS color value
 <Box color='#f00' />
 
-// Background colors
+// background colors
 <Box backgroundColor='tomato' />
 
-// Shortand prop
+// shorthand prop
 <Box bgColor='tomato' />
 ```
 
@@ -78,8 +78,8 @@ import { Box } from "@hope-ui/core";
 ```tsx
 import { Text } from "@hope-ui/core";
 
-// Refers to the value of `theme.vars.fontSizes.md`
-<Text fontSize="md" />
+// refers to the value of `theme.vars.fontSizes.base`
+<Text fontSize="base" />
 
 // font-size `32px`
 <Text fontSize={32} />
@@ -134,7 +134,7 @@ import { Box } from "@hope-ui/core";
 // shorthand
 <Box w="100%" h="32px" />
 
-// Refers to `theme.vars.size.sm`
+// refers to `theme.vars.size.sm`
 <Box boxSize="sm" />
 
 // width `256px`
@@ -276,10 +276,10 @@ import { Box } from "@hope-ui/core";
 ```tsx
 import { Button } from "@hope-ui/core";
 
-// This button will have no right borderRadius
+// this button will have no right borderRadius
 <Button borderRightRadius={0}>Button 1</Button>
 
-// This button will have no left borderRadius*/
+// this button will have no left borderRadius*/
 <Button borderLeftRadius={0}>Button 2</Button>
 
 // top left and top right radius will be `theme.vars.radii.md`
@@ -318,21 +318,21 @@ import { Box } from "@hope-ui/core";
 </Box>
 ```
 
-| Prop             | CSS Property | Theme scale |
-| ---------------- | ------------ | ----------- |
-| `pos`,`position` | `position`   | none        |
-| `zIndex`         | `z-index`    | `zIndices`  |
-| `top`            | `top`        | `space`     |
-| `right`          | `right`      | `space`     |
-| `bottom`         | `bottom`     | `space`     |
-| `left`           | `left`       | `space`     |
+| Prop              | CSS Property | Theme scale |
+| ----------------- | ------------ | ----------- |
+| `pos`, `position` | `position`   | none        |
+| `zIndex`          | `z-index`    | `zIndices`  |
+| `top`             | `top`        | `space`     |
+| `right`           | `right`      | `space`     |
+| `bottom`          | `bottom`     | `space`     |
+| `left`            | `left`       | `space`     |
 
 ### Shadow
 
 ```tsx
 import { Box } from "@hope-ui/core";
 
-// Refers to `theme.vars.shadows.md`
+// refers to `theme.vars.shadows.md`
 <Box boxShadow="md">Shadow md</Box>;
 ```
 
@@ -344,99 +344,101 @@ import { Box } from "@hope-ui/core";
 ### Pseudo selector
 
 ```tsx
-import { Button } from "@hope-ui/core";
+import { Box } from "@hope-ui/core";
 
 // :hover style
-<Button
-  colorScheme="primary"
+<Box
   _hover={{
     background: "white",
     color: "primary.500",
   }}
 >
   Hover me
-</Button>
+</Box>
 
 // apply :hover over parent element
-<Box
-  role="group"
->
+<Box role="group">
   <Box
     _hover={{ fontWeight: 'semibold' }}
     _groupHover={{ color: 'tomato' }}
   >
+    Hover me
   </Box>
 </Box>
 
-// add ::before pseudo element
+// add ::before pseudo-element
 // Note: the content value needs an extra set of quotes!
 <Box
-  _before={{ content: '"🙂"', display: 'inline-block', mr: '5px' }}
+  _before={{
+    content: '"🙂"',
+    display: 'inline-block',
+    mr: '5px'
+  }}
 >
   A pseudo element
 </Box>
 ```
 
-| Prop                    | CSS Property                                                                                                                                                                               | Theme scale |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| `_hover`                | `&:hover`<br />`&[data-hover]`                                                                                                                                                             | none        |
-| `_active`               | `&:active`<br />`&[data-active]`                                                                                                                                                           | none        |
-| `_focus`                | `&:focus`<br />`&[data-focus]`                                                                                                                                                             | none        |
-| `_highlighted`          | `&[data-highlighted]`                                                                                                                                                                      | none        |
-| `_focusWithin`          | `&:focus-within`                                                                                                                                                                           | none        |
-| `_focusVisible`         | `&:focus-visible`                                                                                                                                                                          | none        |
-| `_disabled`             | `&[disabled]`<br />`&[aria-disabled=true]`<br />`&[data-disabled]`                                                                                                                         | none        |
-| `_readOnly`             | `&[aria-readonly=true]`<br />`&[readonly]`<br />`&[data-readonly]`                                                                                                                         | none        |
-| `_before`               | `&::before`                                                                                                                                                                                | none        |
-| `_after`                | `&::after`                                                                                                                                                                                 | none        |
-| `_empty`                | `&:empty`                                                                                                                                                                                  | none        |
-| `_expanded`             | `&[aria-expanded=true]`<br />`&[data-expanded]`                                                                                                                                            | none        |
-| `_checked`              | `&[aria-checked=true]`<br />`&[data-checked]`                                                                                                                                              | none        |
-| `_grabbed`              | `&[aria-grabbed=true]`<br />`&[data-grabbed]`                                                                                                                                              | none        |
-| `_pressed`              | `&[aria-pressed=true]`<br />`&[data-pressed]`                                                                                                                                              | none        |
-| `_invalid`              | `&[aria-invalid=true]`<br />`&[data-invalid]`                                                                                                                                              | none        |
-| `_valid`                | `&[data-valid]`<br />`&[data-state=valid]`                                                                                                                                                 | none        |
-| `_loading`              | `&[data-loading]`<br />`&[aria-busy=true]`                                                                                                                                                 | none        |
-| `_selected`             | `&[aria-selected=true]`<br />`&[data-selected]`                                                                                                                                            | none        |
-| `_hidden`               | `&[hidden]`<br />`&[data-hidden]`                                                                                                                                                          | none        |
-| `_autofill`             | `&:-webkit-autofill`                                                                                                                                                                       | none        |
-| `_even`                 | `&:nth-of-type(even)`                                                                                                                                                                      | none        |
-| `_odd`                  | `&:nth-of-type(odd)`                                                                                                                                                                       | none        |
-| `_first`                | `&:first-child`                                                                                                                                                                            | none        |
-| `_last`                 | `&:last-child`                                                                                                                                                                             | none        |
-| `_notFirst`             | `&:not(:first-child)`                                                                                                                                                                      | none        |
-| `_notLast`              | `&:not(:last-child)`                                                                                                                                                                       | none        |
-| `_visited`              | `&:visited`                                                                                                                                                                                | none        |
-| `_activeLink`           | `&[aria-current=page]`                                                                                                                                                                     | none        |
-| `_activeStep`           | `&[aria-current=step]`                                                                                                                                                                     | none        |
-| `_indeterminate`        | `&:indeterminate`<br />`&[aria-checked=mixed]`<br />`&[data-indeterminate]`                                                                                                                | none        |
-| `_groupHover`           | `[role=group]:hover &`<br />`[role=group][data-hover] &`<br />`[data-group]:hover &`<br />`[data-group][data-hover] &`<br />`.group:hover &`<br />`.group[data-hover] &`                   | none        |
-| `_peerHover`            | `[data-peer]:hover ~ &`<br />`[data-peer][data-hover] ~ &`<br />`.peer:hover ~ &`<br />`.peer[data-hover] ~ &`                                                                             | none        |
-| `_groupFocus`           | `[role=group]:focus &`<br />`[role=group][data-focus] &`<br />`[data-group]:focus &`<br />`[data-group][data-focus] &`<br />`.group:focus &`<br />`.group[data-focus] &`                   | none        |
-| `_peerFocus`            | `[data-peer]:focus ~ &`<br />`[data-peer][data-focus] ~ &`<br />`.peer:focus ~ &`<br />`.peer[data-focus] ~ &`                                                                             | none        |
-| `_groupFocusVisible`    | `[role=group]:focus-visible &`<br />`[data-group]:focus-visible &`<br />`.group:focus-visible &`                                                                                           | none        |
-| `_peerFocusVisible`     | `[data-peer]:focus-visible ~ &`<br />`.peer:focus-visible ~ &`                                                                                                                             | none        |
-| `_groupActive`          | `[role=group]:active &`<br />`[role=group][data-active] &`<br />`[data-group]:active &`<br />`[data-group][data-active] &`<br />`.group:active &`<br />`.group[data-active] &`             | none        |
-| `_peerActive`           | `[data-peer]:active ~ &`<br />`[data-peer][data-active] ~ &`<br />`.peer:active ~ &`<br />`.peer[data-active] ~ &`                                                                         | none        |
-| `_groupDisabled`        | `[role=group]:disabled &`<br />`[role=group][data-disabled] &`<br />`[data-group]:disabled &`<br />`[data-group][data-disabled] &`<br />`.group:disabled &`<br />`.group[data-disabled] &` | none        |
-| `_peerDisabled`         | `[data-peer]:disabled ~ &`<br />`[data-peer][data-disabled] ~ &`<br />`.peer:disabled ~ &`<br />`.peer[data-disabled] ~ &`                                                                 | none        |
-| `_groupInvalid`         | `[role=group]:invalid &`<br />`[role=group][data-invalid] &`<br />`[data-group]:invalid &`<br />`[data-group][data-invalid] &`<br />`.group:invalid &`<br />`.group[data-invalid] &`       | none        |
-| `_peerInvalid`          | `[data-peer]:invalid ~ &`<br />`[data-peer][data-invalid] ~ &`<br />`.peer:invalid ~ &`<br />`.peer[data-invalid] ~ &`                                                                     | none        |
-| `_groupChecked`         | `[role=group]:checked &`<br />`[role=group][data-checked] &`<br />`[data-group]:checked &`<br />`[data-group][data-checked] &`<br />`.group:checked &`<br />`.group[data-checked] &`       | none        |
-| `_peerChecked`          | `[data-peer]:checked ~ &`<br />`[data-peer][data-checked] ~ &`<br />`.peer:checked ~ &`<br />`.peer[data-checked] ~ &`                                                                     | none        |
-| `_groupFocusWithin`     | `[role=group]:focus-within &`<br />`[data-group]:focus-within &`<br />`.group:focus-within &`                                                                                              | none        |
-| `_peerFocusWithin`      | `[data-peer]:focus-within ~ &`<br />`.peer:focus-within ~ &`                                                                                                                               | none        |
-| `_peerPlaceholderShown` | `[data-peer]:placeholder-shown ~ &`<br />`.peer:placeholder-shown ~ &`                                                                                                                     | none        |
-| `_placeholder`          | `&::placeholder`                                                                                                                                                                           | none        |
-| `_placeholderShown`     | `&:placeholder-shown`                                                                                                                                                                      | none        |
-| `_fullScreen`           | `&:fullscreen`                                                                                                                                                                             | none        |
-| `_selection`            | `&::selection`                                                                                                                                                                             | none        |
-| `_rtl`                  | `[dir=rtl] &`<br />`&[dir=rtl]`                                                                                                                                                            | none        |
-| `_ltr`                  | `[dir=ltr] &`<br />`&[dir=ltr]`                                                                                                                                                            | none        |
-| `_mediaDark`            | `@media (prefers-color-scheme: dark)`                                                                                                                                                      | none        |
-| `_mediaReduceMotion`    | `@media (prefers-reduced-motion: reduce)`                                                                                                                                                  | none        |
-| `_light`                | `.hope-theme-light &`<br />`[data-theme=light] &`<br />`&[data-theme=light]`                                                                                                               | none        |
-| `_dark`                 | `.hope-theme-dark &`<br />`[data-theme=dark] &`<br />`&[data-theme=dark]`                                                                                                                  | none        |
+| Prop                    | CSS Property                                                                                                                                                           | Theme scale |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `_hover`                | `&:hover`, `&[data-hover]`                                                                                                                                             | none        |
+| `_active`               | `&:active`, `&[data-active]`                                                                                                                                           | none        |
+| `_focus`                | `&:focus`, `&[data-focus]`                                                                                                                                             | none        |
+| `_highlighted`          | `&[data-highlighted]`                                                                                                                                                  | none        |
+| `_focusWithin`          | `&:focus-within`                                                                                                                                                       | none        |
+| `_focusVisible`         | `&:focus-visible`                                                                                                                                                      | none        |
+| `_disabled`             | `&[disabled]`, `&[aria-disabled=true]`, `&[data-disabled]`                                                                                                             | none        |
+| `_readOnly`             | `&[aria-readonly=true]`, `&[readonly]`, `&[data-readonly]`                                                                                                             | none        |
+| `_before`               | `&::before`                                                                                                                                                            | none        |
+| `_after`                | `&::after`                                                                                                                                                             | none        |
+| `_empty`                | `&:empty`                                                                                                                                                              | none        |
+| `_expanded`             | `&[aria-expanded=true]`, `&[data-expanded]`                                                                                                                            | none        |
+| `_checked`              | `&[aria-checked=true]`, `&[data-checked]`                                                                                                                              | none        |
+| `_grabbed`              | `&[aria-grabbed=true]`, `&[data-grabbed]`                                                                                                                              | none        |
+| `_pressed`              | `&[aria-pressed=true]`, `&[data-pressed]`                                                                                                                              | none        |
+| `_invalid`              | `&[aria-invalid=true]`, `&[data-invalid]`                                                                                                                              | none        |
+| `_valid`                | `&[data-valid]`, `&[data-state=valid]`                                                                                                                                 | none        |
+| `_loading`              | `&[data-loading]`, `&[aria-busy=true]`                                                                                                                                 | none        |
+| `_selected`             | `&[aria-selected=true]`, `&[data-selected]`                                                                                                                            | none        |
+| `_hidden`               | `&[hidden]`, `&[data-hidden]`                                                                                                                                          | none        |
+| `_autofill`             | `&:-webkit-autofill`                                                                                                                                                   | none        |
+| `_even`                 | `&:nth-of-type(even)`                                                                                                                                                  | none        |
+| `_odd`                  | `&:nth-of-type(odd)`                                                                                                                                                   | none        |
+| `_first`                | `&:first-child`                                                                                                                                                        | none        |
+| `_last`                 | `&:last-child`                                                                                                                                                         | none        |
+| `_notFirst`             | `&:not(:first-child)`                                                                                                                                                  | none        |
+| `_notLast`              | `&:not(:last-child)`                                                                                                                                                   | none        |
+| `_visited`              | `&:visited`                                                                                                                                                            | none        |
+| `_activeLink`           | `&[aria-current=page]`                                                                                                                                                 | none        |
+| `_activeStep`           | `&[aria-current=step]`                                                                                                                                                 | none        |
+| `_indeterminate`        | `&:indeterminate`, `&[aria-checked=mixed]`, `&[data-indeterminate]`                                                                                                    | none        |
+| `_groupHover`           | `[role=group]:hover &`, `[role=group][data-hover] &`, `[data-group]:hover &`, `[data-group][data-hover] &`, `.group:hover &`, `.group[data-hover] &`                   | none        |
+| `_peerHover`            | `[data-peer]:hover ~ &`, `[data-peer][data-hover] ~ &`, `.peer:hover ~ &`, `.peer[data-hover] ~ &`                                                                     | none        |
+| `_groupFocus`           | `[role=group]:focus &`, `[role=group][data-focus] &`, `[data-group]:focus &`, `[data-group][data-focus] &`, `.group:focus &`, `.group[data-focus] &`                   | none        |
+| `_peerFocus`            | `[data-peer]:focus ~ &`, `[data-peer][data-focus] ~ &`, `.peer:focus ~ &`, `.peer[data-focus] ~ &`                                                                     | none        |
+| `_groupFocusVisible`    | `[role=group]:focus-visible &`, `[data-group]:focus-visible &`, `.group:focus-visible &`                                                                               | none        |
+| `_peerFocusVisible`     | `[data-peer]:focus-visible ~ &`, `.peer:focus-visible ~ &`                                                                                                             | none        |
+| `_groupActive`          | `[role=group]:active &`, `[role=group][data-active] &`, `[data-group]:active &`, `[data-group][data-active] &`, `.group:active &`, `.group[data-active] &`             | none        |
+| `_peerActive`           | `[data-peer]:active ~ &`, `[data-peer][data-active] ~ &`, `.peer:active ~ &`, `.peer[data-active] ~ &`                                                                 | none        |
+| `_groupDisabled`        | `[role=group]:disabled &`, `[role=group][data-disabled] &`, `[data-group]:disabled &`, `[data-group][data-disabled] &`, `.group:disabled &`, `.group[data-disabled] &` | none        |
+| `_peerDisabled`         | `[data-peer]:disabled ~ &`, `[data-peer][data-disabled] ~ &`, `.peer:disabled ~ &`, `.peer[data-disabled] ~ &`                                                         | none        |
+| `_groupInvalid`         | `[role=group]:invalid &`, `[role=group][data-invalid] &`, `[data-group]:invalid &`, `[data-group][data-invalid] &`, `.group:invalid &`, `.group[data-invalid] &`       | none        |
+| `_peerInvalid`          | `[data-peer]:invalid ~ &`, `[data-peer][data-invalid] ~ &`, `.peer:invalid ~ &`, `.peer[data-invalid] ~ &`                                                             | none        |
+| `_groupChecked`         | `[role=group]:checked &`, `[role=group][data-checked] &`, `[data-group]:checked &`, `[data-group][data-checked] &`, `.group:checked &`, `.group[data-checked] &`       | none        |
+| `_peerChecked`          | `[data-peer]:checked ~ &`, `[data-peer][data-checked] ~ &`, `.peer:checked ~ &`, `.peer[data-checked] ~ &`                                                             | none        |
+| `_groupFocusWithin`     | `[role=group]:focus-within &`, `[data-group]:focus-within &`, `.group:focus-within &`                                                                                  | none        |
+| `_peerFocusWithin`      | `[data-peer]:focus-within ~ &`, `.peer:focus-within ~ &`                                                                                                               | none        |
+| `_peerPlaceholderShown` | `[data-peer]:placeholder-shown ~ &`, `.peer:placeholder-shown ~ &`                                                                                                     | none        |
+| `_placeholder`          | `&::placeholder`                                                                                                                                                       | none        |
+| `_placeholderShown`     | `&:placeholder-shown`                                                                                                                                                  | none        |
+| `_fullScreen`           | `&:fullscreen`                                                                                                                                                         | none        |
+| `_selection`            | `&::selection`                                                                                                                                                         | none        |
+| `_rtl`                  | `[dir=rtl] &`, `&[dir=rtl]`                                                                                                                                            | none        |
+| `_ltr`                  | `[dir=ltr] &`, `&[dir=ltr]`                                                                                                                                            | none        |
+| `_mediaDark`            | `@media (prefers-color-scheme: dark)`                                                                                                                                  | none        |
+| `_mediaReduceMotion`    | `@media (prefers-reduced-motion: reduce)`                                                                                                                              | none        |
+| `_light`                | `.hope-theme-light &`, `[data-theme=light] &`, `&[data-theme=light]`                                                                                                   | none        |
+| `_dark`                 | `.hope-theme-dark &`, `[data-theme=dark] &`, `&[data-theme=dark]`                                                                                                      | none        |
 
 ### Others
 

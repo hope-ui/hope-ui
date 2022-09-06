@@ -69,7 +69,7 @@ function useCurrentSection(tableOfContents: Accessor<TocItems | undefined>) {
 }
 
 const TocLink = hope(Link, {
-  base: {
+  baseStyle: {
     display: "flex",
     alignItems: "center",
 
@@ -100,7 +100,7 @@ const TocLink = hope(Link, {
 });
 
 const TocRoot = hope("div", theme => ({
-  base: {
+  baseStyle: {
     display: "none",
 
     [`@media screen and (min-width: ${theme.breakpoints.xl})`]: {

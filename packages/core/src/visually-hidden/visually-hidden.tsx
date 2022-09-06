@@ -17,12 +17,12 @@ const visuallyHiddenStyles: SystemStyleObject = {
  * `VisuallyHidden` hides its children visually but keeps content visible to assistive technology.
  */
 export const VisuallyHidden = hope("span", {
-  base: visuallyHiddenStyles,
+  baseStyle: visuallyHiddenStyles,
 });
 
 /**
  * A `VisuallyHidden` input used to create custom input components like checkbox, radio and switch.
  */
 export const VisuallyHiddenInput = hope("input", {
-  base: visuallyHiddenStyles,
+  baseStyle: visuallyHiddenStyles,
 });

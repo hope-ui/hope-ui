@@ -14,7 +14,7 @@ import { mergeDefaultProps } from "../utils";
 const BaseContainer = hope(
   "div",
   ({ vars }) => ({
-    base: {
+    baseStyle: {
       width: "100%",
       maxWidth: {
         sm: vars.breakpoints.sm,

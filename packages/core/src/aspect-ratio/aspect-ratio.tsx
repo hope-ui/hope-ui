@@ -14,7 +14,7 @@ import { mergeDefaultProps } from "../utils";
 const BaseAspectRatio = hope(
   "div",
   {
-    base: {
+    baseStyle: {
       position: "relative",
       maxWidth: "100%",
 

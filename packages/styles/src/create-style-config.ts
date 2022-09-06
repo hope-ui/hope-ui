@@ -19,6 +19,7 @@ import {
   MultiPartStyleConfigResult,
   PartialMultiPartStyleConfigInterpolation,
   StyleConfig,
+  StyleConfigResult,
   StyleConfigVariantSelection,
   SystemStyleObject,
   Theme,
@@ -33,10 +34,14 @@ function computeMultiPartStyleConfig<Parts extends string, Variants extends Reco
   theme: Theme
 ): Partial<MultiPartStyleConfigResult<Parts, Variants>> {
   return Object.entries(configs).reduce((acc, [part, config]) => {
-    const { base = {}, variants = {}, compoundVariants = [] } = config as StyleConfig<Variants>;
+    const {
+      baseStyle = {},
+      variants = {},
+      compoundVariants = [],
+    } = config as StyleConfig<Variants>;
 
     acc[part as Parts] = {
-      baseClassName: computeStyle(base, theme),
+      baseClassName: computeStyle(baseStyle, theme),
       variantClassNames: Object.entries(variants).reduce((acc, [variant, definition]) => {
         // a variant (ex: "size")
         acc[variant] = Object.entries(definition as Record<string, SystemStyleObject>).reduce(
@@ -121,14 +126,17 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
     });
 
     const classes = createMemo(() => {
-      if (options.unstyled) {
-        return staticClassNames;
-      }
-
       return parts.reduce((acc, part) => {
-        const baseClassName = baseConfigResult[part].baseClassName ?? "";
-        const variantClassNames = baseConfigResult[part].variantClassNames ?? ({} as any);
-        const compoundVariants = baseConfigResult[part].compoundVariants ?? [];
+        let baseClassName = "";
+        let variantClassNames: any = {};
+        let compoundVariants: Array<[StyleConfigVariantSelection<Variants>, string]> = [];
+
+        // use base config only if not `unstyled`.
+        if (!options.unstyled) {
+          baseClassName = baseConfigResult[part].baseClassName ?? "";
+          variantClassNames = baseConfigResult[part].variantClassNames ?? ({} as any);
+          compoundVariants = baseConfigResult[part].compoundVariants ?? [];
+        }
 
         const themeBaseClassName = themeConfigResult?.[part]?.baseClassName ?? "";
         const themeVariantClassNames = themeConfigResult?.[part]?.variantClassNames ?? ({} as any);
@@ -170,7 +178,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       }
 
       return parts.reduce((acc, part) => {
-        const base = configOverrides[part]?.base ?? {};
+        const base = configOverrides[part]?.baseStyle ?? {};
         const variants = configOverrides[part]?.variants ?? ({} as any);
         const compoundVariants = configOverrides[part]?.compoundVariants ?? [];
 

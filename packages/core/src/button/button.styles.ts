@@ -334,7 +334,7 @@ function getRootIconButtonSizeCompoundVariants() {
 export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariants>(
   ({ vars }) => ({
     root: {
-      base: {
+      baseStyle: {
         appearance: "none",
         position: "relative",
 
@@ -464,7 +464,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
       ],
     },
     icon: {
-      base: {
+      baseStyle: {
         display: "inline-flex",
         alignSelf: "center",
         flexShrink: 0,
@@ -473,7 +473,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
     leftIcon: {},
     rightIcon: {},
     loaderWrapper: {
-      base: {
+      baseStyle: {
         position: "absolute",
         display: "flex",
         alignItems: "center",
@@ -483,7 +483,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
       },
     },
     loaderIcon: {
-      base: {
+      baseStyle: {
         fontSize: "1.3em",
         animation: `1s linear infinite ${spin}`,
       },

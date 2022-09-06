@@ -15,7 +15,7 @@ import { hope } from "@hope-ui/styles";
 export const Spacer = hope(
   "div",
   {
-    base: {
+    baseStyle: {
       flex: 1,
       justifySelf: "stretch",
       alignSelf: "stretch",

@@ -2,7 +2,7 @@ import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
 export const useKbdStyleConfig = createStyleConfig<"root", {}>({
   root: {
-    base: {
+    baseStyle: {
       borderRadius: "md",
       borderStyle: "solid",
       borderWidth: "1px",

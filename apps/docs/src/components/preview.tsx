@@ -1,7 +1,7 @@
 import { hope } from "@hope-ui/core";
 
 export const Preview = hope("div", ({ vars }) => ({
-  base: {
+  baseStyle: {
     mt: 4,
     roundedTop: "lg",
     border: `1px solid ${vars.colors.neutral[200]}`,

@@ -52,16 +52,29 @@ type HopeVariantSelection<Variants extends HopeVariantGroups> = {
 };
 
 interface HopeCompoundVariant<Variants extends HopeVariantGroups> {
+  /** The combined variants that should apply the style. */
   variants: HopeVariantSelection<Variants>;
+
+  /** The style to be applied. */
   style: SystemStyleObject;
 }
 
-type HopeStyleOptions<Variants extends HopeVariantGroups> = {
-  base?: SystemStyleObject;
+interface HopeStyleOptions<Variants extends HopeVariantGroups> {
+  /** The base style. */
+  baseStyle?: SystemStyleObject;
+
+  /**
+   * The variants style.
+   * Each variant will become a `prop` of the component.
+   */
   variants?: Variants;
+
+  /** The combined variants style. */
   compoundVariants?: Array<HopeCompoundVariant<Variants>>;
+
+  /** The default value for each variant. */
   defaultVariants?: HopeVariantSelection<Variants>;
-};
+}
 
 type HopeStyleOptionsInterpolation<Variants extends HopeVariantGroups> =
   | HopeStyleOptions<Variants>
@@ -82,10 +95,10 @@ function computeStyleOptions<Variants extends HopeVariantGroups>(
   options: HopeStyleOptions<Variants>,
   theme: Theme
 ): HopeStyleResult<Variants> {
-  const { base = {}, variants = {}, compoundVariants = [] } = options;
+  const { baseStyle = {}, variants = {}, compoundVariants = [] } = options;
 
   return {
-    baseClassName: computeStyle(base, theme),
+    baseClassName: computeStyle(baseStyle, theme),
     variantClassNames: Object.entries(variants).reduce((acc, [variant, definition]) => {
       // a variant (ex: "size")
       acc[variant] = Object.entries(definition as HopeVariantDefinitions).reduce(
@@ -113,7 +126,7 @@ const systemCssComponent = css({});
 
 /*
  * Style injection order (first to last)
- * - base (least specific)
+ * - baseStyle (least specific)
  * - variants
  * - compound variants
  * - __css

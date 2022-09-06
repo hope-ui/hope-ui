@@ -30,7 +30,7 @@ export type IconProps = JSX.SvgSVGAttributes<SVGSVGElement>;
 const BaseIcon = hope(
   "svg",
   {
-    base: {
+    baseStyle: {
       display: "inline-block",
       flexShrink: 0,
       boxSize: "1em",

@@ -22,7 +22,7 @@ interface HeadingVariants {
 
 export const useHeadingStyleConfig = createStyleConfig<HeadingParts, HeadingVariants>({
   root: {
-    base: {
+    baseStyle: {
       margin: 0,
       fontSize: "inherit",
       fontWeight: "semibold",

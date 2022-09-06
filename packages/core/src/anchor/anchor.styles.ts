@@ -4,7 +4,7 @@ type AnchorParts = "root";
 
 export const useAnchorStyleConfig = createStyleConfig<AnchorParts, {}>(({ vars }) => ({
   root: {
-    base: {
+    baseStyle: {
       position: "relative",
       outline: "none",
       backgroundColor: "transparent",

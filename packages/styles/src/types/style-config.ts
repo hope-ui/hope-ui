@@ -32,14 +32,14 @@ export interface StyleConfigCompoundVariant<Variants extends Record<string, any>
   /** The combined variants that should apply the styles. */
   variants: StyleConfigVariantSelection<Variants>;
 
-  /** The styles to be applied. */
+  /** The style to be applied. */
   style: SystemStyleObject;
 }
 
 /** A style configuration. */
 export interface StyleConfig<Variants extends Record<string, any>> {
   /** The base style. */
-  base?: SystemStyleObject;
+  baseStyle?: SystemStyleObject;
 
   /** The variants style. */
   variants?: {
@@ -79,7 +79,7 @@ export type PartialMultiPartStyleConfigInterpolation<
  * -----------------------------------------------------------------------------------------------*/
 
 /** ClassNames generated from a style configuration. */
-interface StyleConfigResult<Variants extends Record<string, any>> {
+export interface StyleConfigResult<Variants extends Record<string, any>> {
   /** The base className. */
   baseClassName?: string;
 
