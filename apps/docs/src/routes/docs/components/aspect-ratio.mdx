@@ -16,21 +16,21 @@ import { AspectRatio } from "@hope-ui/core";
 
 Use the `ratio` prop to define a consistent width/height ratio.
 
-<Preview>
+<Preview isCentered>
   <AspectRatio ratio={9 / 16} w="full" maxW="200px">
-    <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" fit="cover" />
+    <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" objectFit="cover" />
   </AspectRatio>
 </Preview>
 
 ```tsx
 <AspectRatio ratio={9 / 16} w="full" maxW="200px">
-  <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" fit="cover" />
+  <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" objectFit="cover" />
 </AspectRatio>
 ```
 
 ### Embed a video
 
-<Preview>
+<Preview isCentered>
   <AspectRatio ratio={1} w="full" maxW="560px">
     <iframe
       title="one piece opening 1"
@@ -53,7 +53,7 @@ Use the `ratio` prop to define a consistent width/height ratio.
 
 ### Embed a map
 
-<Preview>
+<Preview isCentered>
   <AspectRatio ratio={16 / 9} w="full">
     <iframe title="Yosemite National Park" src="https://bit.ly/3KKbOm9" />
   </AspectRatio>

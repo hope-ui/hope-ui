@@ -117,10 +117,6 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/docs/components/container",
       },
       {
-        title: "Divider",
-        href: "/docs/components/divider",
-      },
-      {
         title: "Flex",
         href: "/docs/components/flex",
       },

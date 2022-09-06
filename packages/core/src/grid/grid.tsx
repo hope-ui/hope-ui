@@ -28,12 +28,6 @@ export interface GridProps {
 
   /** Shorthand prop for `gridTemplateRows`. */
   templateRows?: SystemStyleProps["gridTemplateRows"];
-
-  /** Shorthand prop for `gridColumn`. */
-  column?: SystemStyleProps["gridColumn"];
-
-  /** Shorthand prop for `gridRow`. */
-  row?: SystemStyleProps["gridRow"];
 }
 
 /**
@@ -49,8 +43,6 @@ export const Grid = createHopeComponent<"div", GridProps>(props => {
     "templateAreas",
     "templateColumns",
     "templateRows",
-    "column",
-    "row",
   ]);
 
   return (

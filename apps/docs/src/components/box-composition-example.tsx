@@ -1,16 +1,18 @@
-import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
+import { Box } from "@hope-ui/core";
 
-export function CardTutorial() {
+export function BoxCompositionExample() {
   return (
-    <Flex
-      direction="column"
+    <Box
+      display="flex"
+      flexDirection="column"
       border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
     >
-      <Image
+      <Box
+        as="img"
         src="https://bit.ly/3CVFryX"
         alt="Yosemite National Park"
         objectFit="cover"
@@ -18,35 +20,35 @@ export function CardTutorial() {
         maxH="200px"
       />
       <Box p={5}>
-        <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold">Yosemite National Park</Text>
-          <Flex
+        <Box display="flex" justifyContent="space-between" alignItems="center" w="full" mb={2}>
+          <Box as="span" fontSize="base" lineHeight={6} fontWeight="semibold">
+            Yosemite National Park
+          </Box>
+          <Box
+            display="flex"
             px={2}
             py={1}
-            align="center"
+            alignItems="center"
             bgColor="success.50"
             color="success.800"
             rounded="full"
           >
-            <Text
+            <Box
               as="span"
-              size="xs"
+              fontSize="xs"
               lineHeight="none"
               fontWeight="semibold"
               textTransform="uppercase"
             >
               Nature
-            </Text>
-          </Flex>
-        </Flex>
-        <Text size="sm" color="neutral.500" mb={3}>
+            </Box>
+          </Box>
+        </Box>
+        <Box as="p" fontSize="sm" lineHeight={5} color="neutral.500">
           Yosemite National Park is an American national park in California, surrounded on the
           southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
-        </Text>
-        <Button variant="soft" colorScheme="primary" isFullWidth>
-          Learn more
-        </Button>
+        </Box>
       </Box>
-    </Flex>
+    </Box>
   );
 }

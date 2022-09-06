@@ -21,7 +21,7 @@ pre {
   border-left: 1px solid #999;
   border-bottom: 1px solid #999;
 
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   margin-bottom: 1rem;
 
   /* Important to allow the code to move horizontally; */
@@ -118,6 +118,7 @@ pre.twoslash data-lsp:hover::before {
 
 pre .code-container {
   overflow: auto;
+  width: 100%;
 }
 /* The try button */
 pre .code-container > a {

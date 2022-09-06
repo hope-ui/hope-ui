@@ -2,11 +2,12 @@ import { hope, IconButton } from "@hope-ui/core";
 import { Title as MetaTitle } from "@solidjs/meta";
 import { Link, LinkProps } from "@solidjs/router";
 import { ComponentProps, createMemo, createSignal, Show, splitProps } from "solid-js";
+
 import { CheckIcon, ClipboardIcon } from "./components/icons";
 
 const H1 = hope("h1", {
   base: {
-    color: "neutral.900",
+    color: "neutral.800",
     fontFamily: "display",
     fontSize: "4xl",
     fontWeight: "medium",
@@ -20,7 +21,7 @@ const H1 = hope("h1", {
 
 const H2 = hope("h2", ({ vars }) => ({
   base: {
-    color: "neutral.800",
+    color: "neutral.700",
     fontFamily: "display",
     fontSize: "3xl",
     fontWeight: "medium",
@@ -34,7 +35,7 @@ const H2 = hope("h2", ({ vars }) => ({
 
 const H3 = hope("h3", {
   base: {
-    color: "neutral.800",
+    color: "neutral.700",
     fontFamily: "display",
     fontSize: "2xl",
     fontWeight: "medium",
@@ -48,6 +49,10 @@ const P = hope("p", {
   base: {
     _notFirst: {
       mt: 6,
+
+      "h3 + &": {
+        mt: 4,
+      },
     },
   },
 });
@@ -68,11 +73,21 @@ const Code = hope("code", ({ vars }) => ({
       color: "neutral.700",
     },
 
+    // Reset style inside headings.
+    "h1 &, h2 &, h3 &": {
+      rounded: "none",
+      bg: "transparent",
+      p: 0,
+      color: "primary.500",
+      fontWeight: "semibold",
+    },
+
     // Reset style inside table (ex: for props tables).
     "table &": {
-      color: "primary.500",
+      rounded: "none",
       bg: "transparent",
-      px: 0,
+      p: 0,
+      color: "primary.500",
     },
   },
 }));
@@ -175,7 +190,7 @@ const Tr = hope("tr", ({ vars }) => ({
     m: 0,
     p: 0,
     _notLast: {
-      borderBottom: `1px solid ${vars.colors.neutral[300]}`,
+      borderBottom: `1px solid ${vars.colors.neutral[200]}`,
     },
     _even: {
       bg: "neutral.50",

@@ -1,0 +1,76 @@
+import { Box, Container } from "@hope-ui/core";
+
+import { Preview } from "~/components/preview";
+
+# Container
+
+Constrain a content's width to the current breakpoint, while keeping it fluid.
+
+## Import
+
+```ts
+import { Container } from "@hope-ui/core";
+```
+
+## Usage
+
+<Preview>
+  <Container>
+    Yosemite National Park is an American national park in California, surrounded on the southeast
+    by Sierra National Forest and on the northwest by Stanislaus National Forest.
+  </Container>
+</Preview>
+
+```tsx
+<Container>
+  Yosemite National Park is an American national park in California, surrounded on the southeast by
+  Sierra National Forest and on the northwest by Stanislaus National Forest.
+</Container>
+```
+
+### Centering the container
+
+By default, the container is centered within its parent with a margin `auto` on left and right, you can disabled this behavior by setting the `isCentered` prop to `false.
+
+<Preview isCentered={false}>
+  <Container p={4} bg="royalblue" color="white" maxW="xl" isCentered={false}>
+    Yosemite National Park is an American national park in California, surrounded on the southeast
+    by Sierra National Forest and on the northwest by Stanislaus National Forest.
+  </Container>
+</Preview>
+
+```tsx
+<Container p={4} bg="royalblue" color="white" maxW="xl" isCentered={false}>
+  Yosemite National Park is an American national park in California, surrounded on the southeast by
+  Sierra National Forest and on the northwest by Stanislaus National Forest.
+</Container>
+```
+
+### Centering the children
+
+In some cases, the width of the content can be smaller than the container's width, you can use the `centerContent` prop to center the content.
+
+<Preview isCentered={false}>
+  <Container bg="dodgerblue" centerContent>
+    <Box p={4} bg="royalblue" color="white" maxW="xl">
+      Yosemite National Park is an American national park in California, surrounded on the southeast
+      by Sierra National Forest and on the northwest by Stanislaus National Forest.
+    </Box>
+  </Container>
+</Preview>
+
+```tsx
+<Container bg="dodgerblue" centerContent>
+  <Box p={4} bg="royalblue" color="white" maxW="xl">
+    Yosemite National Park is an American national park in California, surrounded on the southeast
+    by Sierra National Forest and on the northwest by Stanislaus National Forest.
+  </Box>
+</Container>
+```
+
+## Props
+
+| Name          | Type                       | Description                                                                 | Default value |
+| ------------- | -------------------------- | --------------------------------------------------------------------------- | ------------- |
+| isCentered    | `ResponsiveValue<boolean>` | Whether the container itself should be centered on the page.                | true          |
+| centerContent | `boolean`                  | Whether the container's content should be centered regardless of its width. | false         |

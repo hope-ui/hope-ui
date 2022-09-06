@@ -112,7 +112,7 @@ const TocRoot = hope("div", theme => ({
       flex: "none",
       overflowY: "auto",
       py: 16,
-      pr: 6,
+      pr: 2,
     },
   },
 }));

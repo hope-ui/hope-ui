@@ -25,5 +25,7 @@ function ColorModeWrapper(props) {
 }
 
 export function HopeWrapper(props) {
-  return HopeProvider({ children: () => ColorModeWrapper({ children: props.children }) });
+  return HopeProvider({
+    children: () => ColorModeWrapper({ children: props.children }),
+  });
 }

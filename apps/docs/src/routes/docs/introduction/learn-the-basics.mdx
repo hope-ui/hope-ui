@@ -6,7 +6,7 @@ import { Preview } from "~/components/preview";
 
 Get familiar with core Hope UI concepts by building a simple `Card` component.
 
-<Preview isFullRounded>
+<Preview isCentered isFullRounded>
   <CardTutorial />
 </Preview>
 
@@ -121,7 +121,7 @@ export function Card() {
 
 Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
 
-```tsx {5-10,15-17,19-21,23-30,35-37,43}
+```tsx {5-10,15-18,20-22,24-31,36-38,44}
 import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 function Card() {
@@ -137,6 +137,7 @@ function Card() {
       <Image
         src="https://bit.ly/3CVFryX"
         alt="Yosemite National Park"
+        objectFit="cover"
         borderTopLeftRadius="lg"
         borderTopRightRadius="lg"
         maxHeight="200px"
@@ -195,7 +196,7 @@ We can refer to them directly as value of our style props or use the _"function 
 
 Our `Card` component is pretty good now, but we can save some typing by using Hope UI _"shorthand"_ style props.
 
-```tsx {5,7-10,15-16,18-19,22-27,40}
+```tsx {5,7-10,15-17,19-20,23-28,41}
 import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 function Card() {
@@ -211,6 +212,7 @@ function Card() {
       <Image
         src="https://bit.ly/3CVFryX"
         alt="Yosemite National Park"
+        objectFit="cover"
         roundedTop="lg"
         maxH="200px"
       />

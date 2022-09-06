@@ -1,0 +1,33 @@
+import { Box, SimpleGrid } from "@hope-ui/core";
+
+import { Preview } from "~/components/preview";
+
+# SimpleGrid
+
+A friendly interface to create responsive grid layouts with ease.
+
+## Import
+
+```ts
+import { SimpleGrid } from "@hope-ui/core";
+```
+
+## Usage
+
+Specifying the number of columns for the grid layout.
+
+<Preview>
+  <SimpleGrid columns={2} gap={10}>
+    <Box bg="royalblue" height="80px"></Box>
+    <Box bg="royalblue" height="80px"></Box>
+    <Box bg="royalblue" height="80px"></Box>
+    <Box bg="royalblue" height="80px"></Box>
+    <Box bg="royalblue" height="80px"></Box>
+  </SimpleGrid>
+</Preview>
+
+## Props
+
+| Name   | Type     | Description | Default value   |
+| ------ | -------- | ----------- | --------------- |
+| [name] | [`type`] | [desc]      | [default-value] |

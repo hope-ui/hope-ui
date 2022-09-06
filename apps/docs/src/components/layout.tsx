@@ -134,13 +134,7 @@ export function Layout(props: ParentProps) {
   return (
     <>
       <Header navSections={NAV_SECTIONS} />
-      <Flex
-        pos="relative"
-        mx="auto"
-        maxW="8xl"
-        justifyContent="center"
-        px={{ sm: 2, lg: 8, xl: 12 }}
-      >
+      <Flex pos="relative" mx="auto" maxW="8xl" justify="center" px={{ sm: 2, lg: 8, xl: 12 }}>
         <Box d={{ base: "none", lg: "block" }} pos={{ lg: "relative" }} flex={{ lg: "none" }}>
           <Box
             pos="sticky"
@@ -152,7 +146,7 @@ export function Layout(props: ParentProps) {
             py={16}
             pl={0.5}
           >
-            <Navigation sections={NAV_SECTIONS} w={{ base: 64, xl: 72 }} pr={{ base: 8, xl: 16 }} />
+            <Navigation sections={NAV_SECTIONS} w={56} pr={2} />
           </Box>
         </Box>
         <Box
