@@ -144,7 +144,7 @@ export function TableOfContents() {
           >
             On this page
           </Heading>
-          <VStack as="ol" mt={4} alignItems="stretch" spacing={3}>
+          <VStack as="ol" mt={4} align="stretch" spacing={3}>
             <For each={toc()}>
               {section => (
                 <li>

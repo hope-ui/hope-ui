@@ -1,23 +1,107 @@
-import {} from "@hope-ui/core";
+import { Center, Stack, HStack, VStack } from "@hope-ui/core";
 
 import { Preview } from "~/components/preview";
 
-# [ComponentName]
+# Stack
 
-[Desc]
+Arranges content on a horizontal or vertical line.
 
 ## Import
 
 ```ts
-import {} from "@hope-ui/core";
+import { Stack, HStack, VStack } from "@hope-ui/core";
 ```
+
+- **Stack:** Used to add spacing between elements in the horizontal or vertical direction.
+- **HStack:** Used to add spacing between elements in horizontal direction, and centers them.
+- **VStack:** Used to add spacing between elements in vertical direction, and centers them.
 
 ## Usage
 
-[Desc]
+To stack elements in one direction only, use the `HStack` or `VStack` components. You can also use the `Stack` component as well and pass the `direction` prop.
+
+<Preview>
+  <HStack color="white" spacing="24px">
+    <Center boxSize="40px" bg="royalblue">
+      1
+    </Center>
+    <Center boxSize="40px" bg="royalblue">
+      2
+    </Center>
+    <Center boxSize="40px" bg="royalblue">
+      3
+    </Center>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack color="white" spacing="24px">
+  <Center boxSize="40px" bg="royalblue">
+    1
+  </Center>
+  <Center boxSize="40px" bg="royalblue">
+    2
+  </Center>
+  <Center boxSize="40px" bg="royalblue">
+    3
+  </Center>
+</HStack>
+```
+
+### Responsive direction
+
+To have a responsive direction, simply pass a responsive value to the `direction` prop of the `Stack` component.
+
+<Preview>
+  <Stack color="white" direction={{ base: "column", md: "row" }} spacing="24px">
+    <Center boxSize="40px" bg="royalblue">
+      1
+    </Center>
+    <Center boxSize="40px" bg="royalblue">
+      2
+    </Center>
+    <Center boxSize="40px" bg="royalblue">
+      3
+    </Center>
+  </Stack>
+</Preview>
+
+```tsx
+<Stack color="white" direction={{ base: "column", md: "row" }} spacing="24px">
+  <Center boxSize="40px" bg="royalblue">
+    1
+  </Center>
+  <Center boxSize="40px" bg="royalblue">
+    2
+  </Center>
+  <Center boxSize="40px" bg="royalblue">
+    3
+  </Center>
+</Stack>
+```
 
 ## Props
 
-| Name   | Type     | Description | Default value   |
-| ------ | -------- | ----------- | --------------- |
-| [name] | [`type`] | [desc]      | [default-value] |
+### Stack
+
+| Name      | Type                                       | Description                                      |
+| --------- | ------------------------------------------ | ------------------------------------------------ |
+| direction | `ResponsiveValue<Property.FlexDirection>`  | Shorthand for `flexDirection` style prop.        |
+| wrap      | `ResponsiveValue<Property.FlexWrap>`       | Shorthand for `flexWrap` style prop.             |
+| align     | `ResponsiveValue<Property.AlignItems>`     | Shorthand for `alignItems` style prop.           |
+| justify   | `ResponsiveValue<Property.JustifyContent>` | Shorthand for `justifyContent` style prop.       |
+| spacing   | `ResponsiveValue<Property.Gap>`            | The space between the stack items.               |
+| spacingX  | `ResponsiveValue<Property.ColumnGap>`      | The space between the stack items on the X axis. |
+| spacingY  | `ResponsiveValue<Property.RowGap>`         | The space between the stack items on the Y axis. |
+
+### HStack and VStack
+
+| Name     | Type                                       | Description                                      |
+| -------- | ------------------------------------------ | ------------------------------------------------ |
+| reverse  | `ResponsiveValue<boolean>`                 | Whether the direction should be reversed.        |
+| wrap     | `ResponsiveValue<Property.FlexWrap>`       | Shorthand for `flexWrap` style prop.             |
+| align    | `ResponsiveValue<Property.AlignItems>`     | Shorthand for `alignItems` style prop.           |
+| justify  | `ResponsiveValue<Property.JustifyContent>` | Shorthand for `justifyContent` style prop.       |
+| spacing  | `ResponsiveValue<Property.Gap>`            | The space between the stack items.               |
+| spacingX | `ResponsiveValue<Property.ColumnGap>`      | The space between the stack items on the X axis. |
+| spacingY | `ResponsiveValue<Property.RowGap>`         | The space between the stack items on the Y axis. |

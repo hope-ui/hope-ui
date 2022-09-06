@@ -30,13 +30,13 @@ export interface SimpleGridProps extends GridProps {
   /** The number of columns. */
   columns?: ResponsiveValue<number>;
 
-  /** The gap between the grid items. */
+  /** The space between the grid items. */
   spacing?: SystemStyleProps["gap"];
 
-  /** The column gap between the grid items. */
+  /** The space between the grid items on the X axis. */
   spacingX?: SystemStyleProps["columnGap"];
 
-  /** The row gap between the grid items. */
+  /** The space between the grid items on the Y axis. */
   spacingY?: SystemStyleProps["rowGap"];
 }
 
@@ -65,10 +65,10 @@ export const SimpleGrid = createHopeComponent<"div", SimpleGridProps>(props => {
 
   return (
     <Grid
+      templateColumns={templateColumns()}
       gap={local.spacing}
       columnGap={local.spacingX}
       rowGap={local.spacingY}
-      templateColumns={templateColumns()}
       {...others}
     />
   );

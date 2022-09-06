@@ -14,14 +14,14 @@ export interface FlexProps {
   /** Shorthand for `flexDirection` style prop. */
   direction?: SystemStyleProps["flexDirection"];
 
+  /** Shorthand for `flexWrap` style prop. */
+  wrap?: SystemStyleProps["flexWrap"];
+
   /** Shorthand for `alignItems` style prop. */
   align?: SystemStyleProps["alignItems"];
 
   /** Shorthand for `justifyContent` style prop. */
   justify?: SystemStyleProps["justifyContent"];
-
-  /** Shorthand for `flexWrap` style prop. */
-  wrap?: SystemStyleProps["flexWrap"];
 }
 
 /**
@@ -29,7 +29,7 @@ export interface FlexProps {
  * It renders a `div` with `display: flex` and comes with helpful style shorthand.
  */
 export const Flex = createHopeComponent<"div", FlexProps>(props => {
-  const [local, others] = splitProps(props, ["class", "direction", "align", "justify", "wrap"]);
+  const [local, others] = splitProps(props, ["class", "direction", "wrap", "align", "justify"]);
 
   return (
     <hope.div
@@ -37,9 +37,9 @@ export const Flex = createHopeComponent<"div", FlexProps>(props => {
       __css={{
         display: "flex",
         flexDirection: local.direction,
+        flexWrap: local.wrap,
         alignItems: local.align,
         justifyContent: local.justify,
-        flexWrap: local.wrap,
       }}
       {...others}
     />

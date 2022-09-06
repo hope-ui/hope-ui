@@ -25,9 +25,9 @@ import { Flex, Spacer } from "@hope-ui/core";
     <Center boxSize="150px" bg="dodgerblue">
       <Text>Box 2</Text>
     </Center>
-    <Box flex="1" bg="tomato">
+    <Center flex="1" bg="tomato">
       <Text>Box 3</Text>
-    </Box>
+    </Center>
   </Flex>
 </Preview>
 
@@ -39,9 +39,9 @@ import { Flex, Spacer } from "@hope-ui/core";
   <Center boxSize="150px" bg="dodgerblue">
     <Text>Box 2</Text>
   </Center>
-  <Box flex="1" bg="tomato">
+  <Center flex="1" bg="tomato">
     <Text>Box 3</Text>
-  </Box>
+  </Center>
 </Flex>
 ```
 
@@ -94,11 +94,11 @@ While you can pass the verbose props, `Flex` allows to use some helpful shorthan
   <Box>
     <Text>Flex and Spacer: Full width, equal spacing</Text>
     <Flex mb={4}>
-      <Box w="70px" h={10} bg="tomato" />
+      <Box w="70px" h={10} bg="mediumseagreen" />
       <Spacer />
-      <Box w="170px" h={10} bg="tomato" />
+      <Box w="170px" h={10} bg="mediumseagreen" />
       <Spacer />
-      <Box w="180px" h={10} bg="tomato" />
+      <Box w="180px" h={10} bg="mediumseagreen" />
     </Flex>
     <Text>Grid: The children start at the beginning, the 1/3 mark and 2/3 mark</Text>
     <Grid templateColumns="repeat(3, 1fr)" gap={6} mb={4}>
@@ -108,9 +108,9 @@ While you can pass the verbose props, `Flex` allows to use some helpful shorthan
     </Grid>
     <Text>HStack: The children have equal spacing but don't span the whole container</Text>
     <HStack spacing="24px">
-      <Box w="70px" h={10} bg="mediumseagreen" />
-      <Box w="170px" h={10} bg="mediumseagreen" />
-      <Box w="180px" h={10} bg="mediumseagreen" />
+      <Box w="70px" h={10} bg="tomato" />
+      <Box w="170px" h={10} bg="tomato" />
+      <Box w="180px" h={10} bg="tomato" />
     </HStack>
   </Box>
 </Preview>
@@ -119,11 +119,11 @@ While you can pass the verbose props, `Flex` allows to use some helpful shorthan
 <Box>
   <Text>Flex and Spacer: Full width, equal spacing</Text>
   <Flex mb={4}>
-    <Box w="70px" h={10} bg="tomato" />
+    <Box w="70px" h={10} bg="mediumseagreen" />
     <Spacer />
-    <Box w="170px" h={10} bg="tomato" />
+    <Box w="170px" h={10} bg="mediumseagreen" />
     <Spacer />
-    <Box w="180px" h={10} bg="tomato" />
+    <Box w="180px" h={10} bg="mediumseagreen" />
   </Flex>
 
   <Text>Grid: The children start at the beginning, the 1/3 mark and 2/3 mark</Text>
@@ -135,9 +135,9 @@ While you can pass the verbose props, `Flex` allows to use some helpful shorthan
 
   <Text>HStack: The children have equal spacing but don't span the whole container</Text>
   <HStack spacing="24px">
-    <Box w="70px" h={10} bg="mediumseagreen" />
-    <Box w="170px" h={10} bg="mediumseagreen" />
-    <Box w="180px" h={10} bg="mediumseagreen" />
+    <Box w="70px" h={10} bg="tomato" />
+    <Box w="170px" h={10} bg="tomato" />
+    <Box w="180px" h={10} bg="tomato" />
   </HStack>
 </Box>
 ```
@@ -146,7 +146,7 @@ While you can pass the verbose props, `Flex` allows to use some helpful shorthan
 
 | Name      | Type                                       | Description                                |
 | --------- | ------------------------------------------ | ------------------------------------------ |
-| direction | ` ResponsiveValue<Property.FlexDirection>` | Shorthand for `flexDirection` style prop.  |
+| direction | `ResponsiveValue<Property.FlexDirection>`  | Shorthand for `flexDirection` style prop.  |
 | wrap      | `ResponsiveValue<Property.FlexWrap>`       | Shorthand for `flexWrap` style prop.       |
 | align     | `ResponsiveValue<Property.AlignItems>`     | Shorthand for `alignItems` style prop.     |
 | justify   | `ResponsiveValue<Property.JustifyContent>` | Shorthand for `justifyContent` style prop. |
