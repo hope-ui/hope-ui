@@ -2,7 +2,13 @@
 import "./styles/index.css";
 import "./styles/code.css";
 
-import { DEFAULT_THEME, extendTheme, getCssText, HopeProvider } from "@hope-ui/core";
+import {
+  DEFAULT_THEME,
+  extendTheme,
+  HopeCriticalStyle,
+  HopeProvider,
+  createGlobalStyles,
+} from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import { MDXProvider } from "solid-mdx";
 import {
@@ -49,7 +55,7 @@ const theme = extendTheme({
 
 export default function Root() {
   return (
-    <HopeProvider withGlobalStyles theme={theme}>
+    <HopeProvider theme={theme}>
       <Html lang="en">
         <Head>
           <Meta charset="utf-8" />
@@ -58,8 +64,7 @@ export default function Root() {
           <Link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <Link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <Link rel="manifest" href="/site.webmanifest" />
-          {/* eslint-disable-next-line solid/no-innerhtml */}
-          <style id="stitches" innerHTML={getCssText()} />
+          <HopeCriticalStyle />
         </Head>
         <Body>
           <Suspense>

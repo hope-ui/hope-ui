@@ -1,7 +1,8 @@
 import { globalCss } from "../stitches.config";
 import { ThemeVars } from "../types";
 
-export function injectGlobalStyles(vars: ThemeVars) {
+/** Hope UI global CSS reset. */
+export function injectCssReset(vars: ThemeVars) {
   globalCss({
     "*, *::before, *::after": {
       boxSizing: "border-box",

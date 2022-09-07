@@ -50,7 +50,7 @@ const P = hope("p", {
     _notFirst: {
       mt: 6,
 
-      "h3 + &": {
+      "p + &": {
         mt: 4,
       },
     },
@@ -154,17 +154,23 @@ const Pre = (props: ComponentProps<"pre">) => {
 
 const Ul = hope("ul", {
   baseStyle: {
+    listStyleType: "disc",
     ml: 6,
     mt: 6,
-    listStyleType: "disc",
+    "p + &": {
+      mt: 4,
+    },
   },
 });
 
 const Ol = hope("ol", {
   baseStyle: {
+    listStyleType: "decimal",
     ml: 6,
     mt: 6,
-    listStyleType: "decimal",
+    "p + &": {
+      mt: 4,
+    },
   },
 });
 

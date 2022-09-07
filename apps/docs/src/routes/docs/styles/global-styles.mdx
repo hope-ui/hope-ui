@@ -1,0 +1,70 @@
+import { Callout } from "~/components/callout";
+
+# Global styles
+
+A convenient way to add global styles, while keeping access to Hope UI styling features.
+
+## Import
+
+```tsx
+import { createGlobalStyles } from "@hope-ui/core";
+```
+
+## Usage
+
+The `createGlobalStyles` function return another function, which you must call in your app.
+
+```jsx
+const useGlobalStyles = createGlobalStyles({
+  "*": {
+    margin: 0,
+    padding: 0,
+  },
+});
+
+function Demo() {
+  useGlobalStyles();
+
+  return <App />;
+}
+```
+
+<Callout type="warning">
+  The returned function **must** be called inside a descendant of `HopeProvider`.
+</Callout>
+
+### Using Hope UI styling features
+
+Like style props and `sx`, `createGlobalStyles` supports all Hope UI styling features like theme tokens, shorthand properties, responsive syntax, etc.
+
+```jsx
+const useGlobalStyles = createGlobalStyles({
+  a: {
+    color: "primary.500",
+    _hover: {
+      color: "primary.600",
+    },
+  },
+  ".container": {
+    maxW: [640, 768, 1024],
+  },
+});
+```
+
+### Accessing the theme object
+
+`createGlobalStyles` can accept a _function_ as parameter which give you access to the current theme.
+
+```jsx
+const useGlobalStyles = createGlobalStyles(theme => ({
+  body: {
+    color: theme.vars.colors.neutral["800"],
+  },
+}));
+
+function Demo() {
+  useGlobalStyles();
+
+  return <App />;
+}
+```

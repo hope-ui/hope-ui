@@ -1,0 +1,167 @@
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+import { ResponsiveCardExample } from "~/components/responsive-card-example";
+
+# Responsive styles
+
+An simple syntax to add mobile-first responsive styles.
+
+## Usage
+
+Hope UI allows you to use an _array or object_ syntax to add mobile-first responsive styles, this relies on breakpoints defined in the Hope UI theme.
+
+The default breakpoints provided by Hope UI are listed below:
+
+| Breakpoint | Value  |
+| ---------- | ------ |
+| `sm`       | 640px  |
+| `md`       | 768px  |
+| `lg`       | 1024px |
+| `xl`       | 1280px |
+| `2xl`      | 1536px |
+
+<Callout>
+  Hope UI use the `@media(min-width)` media query to ensure your interfaces are mobile-first.
+</Callout>
+
+### The array syntax
+
+All style props accept arrays as values for mobile-first responsive styles.
+
+For example to make the `width` of a `Box` responsive you can do:
+
+```tsx
+<Box bg="royalblue" width={[300, 400, 500]}>
+  A responsive Box
+</Box>
+```
+
+Based on the default breakpoints listed above, you can interpret this syntax like this:
+
+- `300px` from `0px` and up.
+- `400px` from `640px` and up.
+- `500px` from `768px` and up.
+
+<Callout>
+  To skip certain breakpoints, you can pass&nbsp;`null`&nbsp;to any position in the array.
+</Callout>
+
+### The object syntax
+
+The example above can also be written with an object syntax like this:
+
+```tsx
+<Box bg="royalblue" width={{ base: 300, sm: 400, md: 500 }}>
+  A responsive Box
+</Box>
+```
+
+Here each key represent a breakpoint defined in the Hope UI theme, while `base` define the base, non-responsive value.
+
+<Callout>To skip certain breakpoints, just don't define them in the object.</Callout>
+
+### Defining custom breakpoints
+
+You can extend the default Hope UI theme to define custom breakpoints.
+
+```tsx
+import { extendTheme, HopeProvider } from "@hope-ui/core";
+
+const theme = extendTheme({
+  breakpoints: {
+    sm: "320px",
+    md: "768px",
+    lg: "960px",
+    xl: "1200px",
+    "2xl": "1536px",
+  },
+});
+
+function Demo() {
+  return (
+    <HopeProvider theme={theme}>
+      <App />
+    </HopeProvider>
+  );
+}
+```
+
+<Callout type="warning">
+  Make sure to provide the same units for each value, the default theme use **pixels**.
+</Callout>
+
+## Demo
+
+Below is a example of a card component that uses a stacked layout on small screens, and a side-by-side layout on larger screens **(resize your browser to see it in action)**.
+
+<Preview isCentered>
+  <ResponsiveCardExample />
+</Preview>
+
+```tsx
+import { Box, Image, Flex, Text } from "@hope-ui/core";
+
+function ResponsiveCard() {
+  return (
+    <Flex
+      direction={{ base: "column", md: "row" }}
+      border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
+      rounded="lg"
+      shadow="lg"
+      w="full"
+      maxW={{ base: 96, md: "none" }}
+    >
+      <Image
+        src="https://bit.ly/3CVFryX"
+        alt="Yosemite National Park"
+        objectFit="cover"
+        roundedTop={{ base: "lg", md: "none" }}
+        roundedLeft={{ md: "lg" }}
+        maxH={200}
+        maxW={{ md: 250 }}
+      />
+      <Box p={5}>
+        <Flex
+          direction={{ md: "column-reverse" }}
+          justify="space-between"
+          align={{ base: "center", md: "flex-start" }}
+          w="full"
+          mb={2}
+        >
+          <Text fontWeight="semibold" mt={{ md: 1 }}>
+            Yosemite National Park
+          </Text>
+          <Flex
+            px={2}
+            py={1}
+            align="center"
+            bgColor="success.50"
+            color="success.800"
+            rounded="full"
+          >
+            <Text
+              as="span"
+              size="xs"
+              lineHeight="none"
+              fontWeight="semibold"
+              textTransform="uppercase"
+            >
+              Nature
+            </Text>
+          </Flex>
+        </Flex>
+        <Text size="sm" color="neutral.500" lineClamp={{ base: 3, md: 5 }}>
+          Yosemite National Park is an American national park in California, surrounded on the
+          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          The park is managed by the National Park Service and covers an area of 759,620 acres
+          (1,187 sq mi; 3,074 km2) and sits in four counties – centered in Tuolumne and Mariposa,
+          extending north and east to Mono and south to Madera County. Designated a World Heritage
+          Site in 1984, Yosemite is internationally recognized for its granite cliffs, waterfalls,
+          clear streams, giant sequoia groves, lakes, mountains, meadows, glaciers, and biological
+          diversity. Almost 95 percent of the park is designated wilderness.
+        </Text>
+      </Box>
+    </Flex>
+  );
+}
+```

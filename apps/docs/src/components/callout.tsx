@@ -6,9 +6,8 @@ export const Callout = hope(
     baseStyle: {
       display: "flex",
       alignItems: "center",
-      gap: 4,
       rounded: "md",
-      my: 8,
+      mt: 6,
       p: 4,
       fontSize: "base",
       lineHeight: 6,

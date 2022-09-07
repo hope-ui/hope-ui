@@ -1,4 +1,4 @@
-import { Button } from "@hope-ui/core";
+import { Box, Button } from "@hope-ui/core";
 import { Link } from "@solidjs/router";
 
 import { Callout } from "~/components/callout";
@@ -54,16 +54,16 @@ import { Box } from "@hope-ui/core";
 import { Box } from "@hope-ui/core";
 
 // refers to the value of `theme.vars.colors.neutral["50"]`
-<Box color='neutral.50' />
+<Box color="neutral.50" />
 
 // use raw CSS color value
-<Box color='#f00' />
+<Box color="#f00" />
 
 // background colors
-<Box backgroundColor='tomato' />
+<Box backgroundColor="tomato" />
 
 // shorthand prop
-<Box bgColor='tomato' />
+<Box bgColor="tomato" />
 ```
 
 | Prop                         | CSS Property       | Theme scale |
@@ -85,10 +85,10 @@ import { Text } from "@hope-ui/core";
 <Text fontSize={32} />
 
 // font-size `"2em"`
-<Text fontSize='2em' />
+<Text fontSize="2em" />
 
 // text-align `left` on all viewports and `center` from the first breakpoint and up
-<Text textAlign={[ 'left', 'center' ]} />
+<Text textAlign={[ "left", "center" ]} />
 ```
 
 | Prop             | CSS Property      | Theme scale      |
@@ -141,7 +141,7 @@ import { Box } from "@hope-ui/core";
 <Box w={256} />
 
 // width `"40px"`
-<Box w='40px' />
+<Box w="40px" />
 
 ```
 
@@ -309,7 +309,7 @@ import { Box } from "@hope-ui/core";
 // shorthand
 <Box pos="absolute">Cover</Box>
 
-<Box pos="absolute" top="0" left="0">
+<Box pos="absolute" top={0} left={0}>
   Absolute with top and left
 </Box>
 
@@ -359,8 +359,8 @@ import { Box } from "@hope-ui/core";
 // apply :hover over parent element
 <Box role="group">
   <Box
-    _hover={{ fontWeight: 'semibold' }}
-    _groupHover={{ color: 'tomato' }}
+    _hover={{ fontWeight: "semibold" }}
+    _groupHover={{ color: "tomato" }}
   >
     Hover me
   </Box>
@@ -370,9 +370,9 @@ import { Box } from "@hope-ui/core";
 // Note: the content value needs an extra set of quotes!
 <Box
   _before={{
-    content: '"🙂"',
-    display: 'inline-block',
-    mr: '5px'
+    content: "'🙂'",
+    display: "inline-block",
+    mr: "5px"
   }}
 >
   A pseudo element

@@ -24,16 +24,21 @@ import {
   ThemeSpace,
   ThemeZIndice,
 } from "./scales";
-import { Suffixed } from "./suffixed";
 import { ThemeVarsAndBreakpoints } from "./vars";
 
+/*
+import { Suffixed } from "./suffixed";
 type MaybeImportant<T> = T | Suffixed<"!", T>;
-
 export type ResponsiveArray<T> = Array<MaybeImportant<T> | null>;
-
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeImportant<T>>>;
-
 type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | ResponsiveObject<T>;
+*/
+
+export type ResponsiveArray<T> = Array<T | null>;
+
+export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
+
+type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>

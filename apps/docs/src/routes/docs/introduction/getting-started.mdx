@@ -1,3 +1,5 @@
+import { Callout } from "~/components/callout";
+
 # Getting started
 
 ## Installation
@@ -23,7 +25,7 @@ import { HopeProvider } from "@hope-ui/core";
 
 function Demo() {
   return (
-    <HopeProvider withGlobalStyles>
+    <HopeProvider>
       <App />
     </HopeProvider>
   );
@@ -46,3 +48,70 @@ function App() {
 - `@stitches/core`: The CSS-in-JS library used internally by Hope UI.
 - `@motionone/solid`: The animation library used internally by Hope UI.
 - `clsx`: Utility for constructing className strings conditionally.
+
+## Usage with Solid Start
+
+If you are using [Solid Start](https://github.com/solidjs/solid-start) you will need to add the `ssr` setting to your `vite.config.ts`:
+
+```ts {7-9}
+// vite.config.ts
+
+import solid from "solid-start/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [solid()],
+  ssr: {
+    noExternal: ["@hope-ui/core", "@hope-ui/styles"],
+  },
+});
+```
+
+Then wrap your application root component with `HopeProvider` and add `HopeCriticalStyle` to the `Head`:
+
+```tsx {18,24,37}
+// root.tsx
+
+import { HopeProvider, HopeCriticalStyle } from "@hope-ui/core";
+import { Suspense } from "solid-js";
+import {
+  Body,
+  ErrorBoundary,
+  FileRoutes,
+  Head,
+  Html,
+  Meta,
+  Routes,
+  Scripts,
+  Title,
+} from "solid-start";
+
+export default function Root() {
+  return (
+    <HopeProvider withGlobalStyles>
+      <Html lang="en">
+        <Head>
+          <Title>SolidStart - Bare</Title>
+          <Meta charset="utf-8" />
+          <Meta name="viewport" content="width=device-width, initial-scale=1" />
+          <HopeCriticalStyle />
+        </Head>
+        <Body>
+          <Suspense>
+            <ErrorBoundary>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </ErrorBoundary>
+          </Suspense>
+          <Scripts />
+        </Body>
+      </Html>
+    </HopeProvider>
+  );
+}
+```
+
+<Callout>
+  `HopeCriticalStyle`&nbsp;will inject all critical CSS during server-side rendering.
+</Callout>

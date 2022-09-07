@@ -12,7 +12,7 @@ import type { ComponentTheme, Theme } from "../types";
 import { UseStyleConfigOptions } from "../types";
 import { DEFAULT_THEME } from "./default-theme";
 import { injectCSSVars } from "./inject-css-vars";
-import { injectGlobalStyles } from "./inject-global-styles";
+import { injectCssReset } from "./inject-css-reset";
 
 const ThemeContext = createContext<Theme>(DEFAULT_THEME);
 
@@ -58,8 +58,8 @@ export interface ThemeProviderProps extends ParentProps {
   /** The custom theme to use. */
   theme?: Theme;
 
-  /** Whether Hope UI global styles should be applied. */
-  withGlobalStyles?: boolean;
+  /** Whether Hope UI global CSS reset should be applied. */
+  withCssReset?: boolean;
 }
 
 export function ThemeProvider(props: ThemeProviderProps) {
@@ -68,7 +68,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
 
   injectCSSVars(theme);
 
-  props.withGlobalStyles && injectGlobalStyles(theme.vars);
+  props.withCssReset && injectCssReset(theme.vars);
 
   return <ThemeContext.Provider value={theme}>{props.children}</ThemeContext.Provider>;
 }
