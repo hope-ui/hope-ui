@@ -8,7 +8,13 @@ import { mergeDefaultProps } from "../utils";
 export function HopeProvider(props: ColorModeProviderProps & ThemeProviderProps) {
   watchModals();
 
-  props = mergeDefaultProps({ withCssReset: true }, props);
+  props = mergeDefaultProps(
+    {
+      initialColorMode: "system",
+      withCssReset: true,
+    },
+    props
+  );
 
   const [local, others] = splitProps(props, [
     "initialColorMode",

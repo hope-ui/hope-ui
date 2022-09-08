@@ -16,6 +16,9 @@ const H1 = hope("h1", {
     mt: 1,
     scrollMarginTop: "150px", // header height x1.5
     mb: 8,
+    _dark: {
+      color: "neutral.200",
+    },
   },
 });
 
@@ -29,7 +32,10 @@ const H2 = hope("h2", ({ vars }) => ({
     mt: 10,
     scrollMarginTop: "150px", // header height x1.5
     pb: 1,
-    borderBottom: `1px solid ${vars.colors.neutral[200]}`,
+    borderBottom: `1px solid ${vars.colors.common.divider}`,
+    _dark: {
+      color: "neutral.300",
+    },
   },
 }));
 
@@ -42,6 +48,9 @@ const H3 = hope("h3", {
     lineHeight: 8,
     mt: 8,
     scrollMarginTop: "150px", // header height x1.5
+    _dark: {
+      color: "neutral.300",
+    },
   },
 });
 
@@ -67,10 +76,19 @@ const Code = hope("code", ({ vars }) => ({
     fontFamily: "mono",
     overflowWrap: "break-word",
 
+    _dark: {
+      bg: "neutral.800",
+    },
+
     // Reset style inside Callout.
     ".hope-docs-Callout-root &": {
       border: `1px solid ${vars.colors.neutral["300"]}`,
       color: "neutral.700",
+
+      _dark: {
+        borderColor: "neutral.700",
+        color: "neutral.200",
+      },
     },
 
     // Reset style inside headings.
@@ -80,6 +98,11 @@ const Code = hope("code", ({ vars }) => ({
       p: 0,
       color: "primary.500",
       fontWeight: "semibold",
+
+      _dark: {
+        bg: "transparent",
+        color: "primary.600",
+      },
     },
 
     // Reset style inside table (ex: for props tables).
@@ -88,6 +111,10 @@ const Code = hope("code", ({ vars }) => ({
       bg: "transparent",
       p: 0,
       color: "primary.500",
+
+      _dark: {
+        bg: "transparent",
+      },
     },
   },
 }));
@@ -195,13 +222,22 @@ const Table = hope("table", {
 
 const Tr = hope("tr", ({ vars }) => ({
   baseStyle: {
+    bg: "transparent",
     m: 0,
     p: 0,
     _notLast: {
       borderBottom: `1px solid ${vars.colors.neutral[200]}`,
+
+      _dark: {
+        borderBottomColor: "neutral.800",
+      },
     },
     _even: {
       bg: "neutral.50",
+
+      _dark: {
+        bg: "transparent",
+      },
     },
   },
 }));
@@ -215,6 +251,11 @@ const Th = hope("th", ({ vars }) => ({
     fontWeight: "semibold",
     textAlign: "start",
     borderBottom: `1px solid ${vars.colors.neutral[300]}`,
+
+    _dark: {
+      color: "neutral.400",
+      borderBottomColor: "neutral.700",
+    },
   },
 }));
 
@@ -242,6 +283,10 @@ const A = hope(ExternalLink, {
   baseStyle: {
     color: "primary.500",
     textDecoration: "underline",
+
+    _dark: {
+      color: "primary.600",
+    },
   },
 });
 

@@ -8,13 +8,18 @@ export const Preview = hope("div", ({ vars }) => ({
     overflowY: "auto",
     p: 4,
 
-    "& + pre.shiki": {
+    // the second `pre.shiki` is for dark mode
+    "& + pre.shiki, & + pre.shiki + pre.shiki": {
       mt: 0,
       mx: 0,
       mb: 4,
       p: 4,
       borderTop: "none",
       borderTopRadius: "none",
+    },
+
+    _dark: {
+      borderColor: "neutral.700",
     },
   },
   variants: {

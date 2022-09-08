@@ -1,0 +1,87 @@
+import { Callout } from "~/components/callout";
+import { UseColorModeExample, UseColorModeValueExample } from "~/components/color-mode-example";
+import { Preview } from "~/components/preview";
+
+# Color mode
+
+Adjust your application color scheme based on user preference.
+
+## Usage
+
+Hope UI comes with built-in support for managing color mode in your application. All components are color-mode aware.
+
+<Callout>
+  The color mode is stored in `localStorage` and appends a class to the `body` element.
+</Callout>
+
+### Initial color mode
+
+The default color mode used by Hope UI is `system`, meaning it will adapt to user preference.
+
+To set the initial color mode your application should start with, pass the `initialColorMode` prop to `HopeProvider` with either `light`, `dark` or `system`.
+
+```tsx
+import { HopeProvider } from "@hope-ui/core";
+
+function Demo() {
+  return (
+    <HopeProvider initialColorMode="dark">
+      <App />
+    </HopeProvider>
+  );
+}
+```
+
+### Changing color mode
+
+To manage color mode in your application, Hope UI exposes the `useColorMode` primitive, it gives you an accessor to get the current color mode, and a function to toggle it.
+
+<Preview>
+  <UseColorModeExample />
+</Preview>
+
+```tsx
+import { Button, useColorMode } from "@hope-ui/core";
+
+function UseColorModeExample() {
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  return (
+    <Button onClick={toggleColorMode}>
+      Toggle {colorMode() === "light" ? "dark" : "light"} mode
+    </Button>
+  );
+}
+```
+
+### Changing a value based on color mode
+
+The `useColorModeValue` primitive can be used to change any value or style based on the color mode.
+
+It takes 2 arguments: the value in light and dark mode, and returns a derived signal with the correct value based on the color mode.
+
+The below example demonstrate how to change a Box's background and color using `useColorModeValue`.
+
+<Preview>
+  <UseColorModeValueExample />
+</Preview>
+
+```tsx
+import { Box, Button, useColorMode, useColorModeValue } from "@hope-ui/core";
+
+export function UseColorModeValueExample() {
+  const { toggleColorMode } = useColorMode();
+
+  const bg = useColorModeValue("tomato", "royalblue");
+  const color = useColorModeValue("black", "white");
+
+  return (
+    <>
+      <Box mb={4} p={2} bg={bg()} color={color()}>
+        This box's style will change based on the color mode.
+      </Box>
+      <Button onClick={toggleColorMode}>Toggle color mode</Button>
+    </>
+  );
+}
+```

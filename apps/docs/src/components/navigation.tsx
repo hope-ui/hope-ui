@@ -19,7 +19,7 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
         <For each={local.sections}>
           {section => (
             <li>
-              <Heading fontWeight="medium" color="neutral.900">
+              <Heading fontWeight="medium" color="neutral.900" _dark={{ color: "neutral.50" }}>
                 {section.title}
               </Heading>
               <VStack
@@ -31,6 +31,7 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                 borderLeftWidth="2px"
                 borderLeftStyle="solid"
                 borderLeftColor={{ base: "neutral.100", lg: "neutral.200" }}
+                _dark={{ borderLeftColor: "neutral.800" }}
               >
                 <For each={section.links}>
                   {link => (
@@ -53,10 +54,16 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                           ...(link.href === location.pathname
                             ? {
                                 backgroundColor: "primary.500",
+                                _dark: {
+                                  backgroundColor: "primary.600",
+                                },
                               }
                             : {
                                 display: "none",
                                 backgroundColor: "neutral.300",
+                                _dark: {
+                                  backgroundColor: "neutral.700",
+                                },
                               }),
                         })}
                         {...(link.href === location.pathname
@@ -66,6 +73,9 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
 
                               _hover: {
                                 textDecoration: "none",
+                              },
+                              _dark: {
+                                color: "primary.600",
                               },
                             }
                           : {
@@ -77,6 +87,14 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
 
                                 _before: {
                                   display: "block",
+                                },
+                              },
+
+                              _dark: {
+                                color: "neutral.400",
+
+                                _hover: {
+                                  color: "neutral.300",
                                 },
                               },
                             })}

@@ -57,6 +57,10 @@ export const NAV_SECTIONS: NavSection[] = [
         title: "Hope factory",
         href: "/docs/styles/hope-factory",
       },
+      {
+        title: "Styled components",
+        href: "/docs/styles/styled-components",
+      },
     ],
   },
   {

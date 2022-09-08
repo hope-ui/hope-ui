@@ -53,6 +53,10 @@ pre.shiki {
   font-family: var(--hope-fonts-mono);
 }
 
+.hope-theme-dark pre.shiki {
+  border-color: var(--hope-colors-neutral-700);
+}
+
 /* Reset mdx-components `code`. */
 pre.shiki code {
   font-size: 14px;

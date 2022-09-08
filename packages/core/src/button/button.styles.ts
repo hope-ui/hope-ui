@@ -338,9 +338,12 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         appearance: "none",
         position: "relative",
 
+        display: "inline-flex",
         justifyContent: "center",
         alignItems: "center",
         gap: 2,
+
+        width: "auto",
 
         outline: "none",
 
@@ -449,10 +452,6 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
             display: "flex",
             width: "100%",
           },
-          false: {
-            display: "inline-flex",
-            width: "auto",
-          },
         },
       },
       compoundVariants: [
@@ -493,7 +492,6 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
     variant: "default",
     colorScheme: "primary",
     size: "md",
-    isFullWidth: false,
   }
 );
 

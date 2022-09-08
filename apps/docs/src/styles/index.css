@@ -29,6 +29,24 @@ body {
     fixed 10px 10px / 20px 20px radial-gradient(var(--hope-colors-neutral-200) 1px, transparent 0);
 }
 
+body.hope-theme-dark {
+  background: linear-gradient(to bottom, rgba(23, 23, 23, 0) 0%, var(--hope-colors-background-body) 300px),
+  fixed 0 0 / 20px 20px radial-gradient(var(--hope-colors-neutral-800) 1px, transparent 0),
+  fixed 10px 10px / 20px 20px radial-gradient(var(--hope-colors-neutral-800) 1px, transparent 0);
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+
 /* List are unstyled. */
 ol,
 ul {

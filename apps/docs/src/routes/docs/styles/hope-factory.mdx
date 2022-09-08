@@ -5,7 +5,7 @@ import { Preview } from "~/components/preview";
 
 # Hope factory
 
-Enhance JSX elements with Hope UI styling features or create custom _styled components_.
+Enhance JSX elements or third party components with Hope UI styling features.
 
 ## Import
 
@@ -15,7 +15,7 @@ import { hope } from "@hope-ui/core";
 
 ## Usage
 
-Hope factory serves as an object of enhanced JSX elements, and also a function that can be used to enable custom component receive Hope UI's style props.
+Hope factory serves as an object of enhanced JSX elements, and also a function that can be used to enhance third party components with Hope UI styling features.
 
 ### Enhanced JSX elements
 
@@ -30,6 +30,7 @@ The example below show how to enhance a plain HTML button with Hope UI styling f
     color="white"
     border="none"
     bg="primary.500"
+    fontSize="base"
     rounded="md"
     _hover={{ bg: "primary.600" }}
   >
@@ -44,6 +45,7 @@ The example below show how to enhance a plain HTML button with Hope UI styling f
   color="white"
   border="none"
   bg="primary.500"
+  fontSize="base"
   rounded="md"
   _hover={{ bg: "primary.600" }}
 >
@@ -53,7 +55,7 @@ The example below show how to enhance a plain HTML button with Hope UI styling f
 
 ### Factory function
 
-The `hope()` function converts non Hope UI components or JSX elements to _"hope-enabled"_ components, so you can use all available Hope UI styling features with them.
+The `hope()` function converts non Hope UI components or JSX elements to _"hope-enabled"_ components, so you can use feature like style props with them.
 
 Consider the `Link` component of the `@solidjs/router` package, to make it a _"hope-enabled"_ component you can do the following:
 
@@ -64,99 +66,10 @@ import { Link } from "@solidjs/router";
 const HopeLink = hope(Link);
 
 function Example() {
-  return <HopeLink href="#" bg="primary.500" fontSize="sm" />;
+  return <HopeLink href="#" color="primary.500" fontSize="sm" />;
 }
 ```
 
 <Callout type="warning">
   Make sure the _non-hope_ component accepts a `class` prop for this to work correctly.
 </Callout>
-
-### Styled components
-
-You can create so called _"styled components"_ by passing a style configuration as the second argument of the `hope()` factory function. This use an API inspired by Vanilla Extract [Recipes](https://vanilla-extract.style/documentation/packages/recipes/).
-
-The example below demonstrate how to create a custom _styled_ `Button` component.
-
-```jsx
-const StyledButton = hope("button", {
-  // The base style, always applied
-  baseStyle: {
-    display: "inline-flex",
-    width: "auto",
-    px: 4,
-  },
-  // Each variant became a `prop` of the component
-  variants: {
-    variant: {
-      // Each key became a `value` of the prop
-      outlined: {
-        border: "1px solid gray",
-      },
-      plain: {},
-    },
-    colorScheme: {
-      // If you don't have specific style just create an empty object
-      // to make the value available in the prop
-      brand: {},
-      error: {},
-    },
-    size: {
-      sm: {
-        height: 8,
-      },
-      md: {
-        height: 10,
-      },
-    },
-    // true/false value became a `boolean` prop
-    isFullWidth: {
-      true: {
-        display: "flex",
-        width: "100%",
-      },
-    },
-  },
-  // Define styles that should be applied when multiple variants combination matches
-  compoundVariants: [
-    {
-      variants: {
-        variant: "outlined",
-        colorScheme: "brand",
-      },
-      style: {
-        bg: "royalblue",
-        color: "white",
-      },
-    },
-  ],
-  // Default variants values (aka default props)
-  defaultVariants: {
-    variant: "outlined",
-    colorScheme: "brand",
-    size: "md",
-  },
-});
-
-function App() {
-  return (
-    <StyledButton isFullWidth size="sm">
-      Click me
-    </StyledButton>
-  );
-}
-```
-
-Styled components also supports style props, `sx` and the `as` prop to change the rendered element.
-
-```jsx
-//...same as above
-
-function App() {
-  return (
-    <StyledButton as="a" href="#" mt={4}>
-      Click me
-    </StyledButton>
-  );
-}
-```

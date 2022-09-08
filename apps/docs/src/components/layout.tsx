@@ -1,4 +1,4 @@
-import { Anchor, Box, Flex, hope, HStack, Text } from "@hope-ui/core";
+import { IconButton, Box, Flex, hope, HStack, rgba, Text } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
 import { ParentProps, Show } from "solid-js";
 
@@ -8,6 +8,7 @@ import { Logo } from "./logo";
 import { MobileNavigation } from "./mobile-navigation";
 import { Navigation } from "./navigation";
 import { TableOfContents } from "./table-of-contents";
+import { ColorModeSwitcher } from "./color-mode-switcher";
 
 const PageLink = hope(Link, {
   baseStyle: {
@@ -22,6 +23,14 @@ const PageLink = hope(Link, {
     _hover: {
       color: "neutral.600",
     },
+
+    _dark: {
+      color: "neutral.400",
+
+      _hover: {
+        color: "neutral.300",
+      },
+    },
   },
 });
 
@@ -33,10 +42,15 @@ const StyledHeader = hope("header", {
     flexWrap: "wrap",
 
     boxShadow: "md",
-    backgroundColor: "common.white",
+    backgroundColor: "background.body",
 
     px: [4, 6, null, 8],
     py: 5,
+
+    _dark: {
+      boxShadow: "none",
+      borderBottom: theme => `1px solid ${theme.vars.colors.common.divider}`,
+    },
   },
 });
 
@@ -47,22 +61,28 @@ interface HeaderProps {
 function Header(props: HeaderProps) {
   return (
     <Box pos="sticky" top={0} zIndex="sticky">
-      <HStack
-        fontSize="sm"
-        fontWeight="medium"
-        lineHeight={5}
-        px={2}
-        py={1}
-        spacing={1}
-        bg="danger.600"
-        color="common.white"
-      >
-        <ExclamationCircleMiniIcon fontSize="1.3em" />
-        <span>
-          You are looking at the <em>work in progress</em> documentation of Hope UI{" "}
-          <strong>1.0</strong>, examples and information may be broken or outdated.
-        </span>
-      </HStack>
+      <Box bg="background.body">
+        <HStack
+          fontSize="sm"
+          fontWeight="medium"
+          lineHeight={5}
+          px={2}
+          py={1}
+          spacing={1}
+          bg="danger.600"
+          color="common.white"
+          _dark={{
+            bg: theme => rgba(theme.vars.colors.danger.darkChannel, 0.4),
+            color: "danger.400",
+          }}
+        >
+          <ExclamationCircleMiniIcon fontSize="1.3em" />
+          <span>
+            You are looking at the <em>work in progress</em> documentation of Hope UI{" "}
+            <strong>1.0</strong>, examples and information may be broken or outdated.
+          </span>
+        </HStack>
+      </Box>
       <StyledHeader>
         <Flex d={{ lg: "none" }} mr={4}>
           <MobileNavigation sections={props.navSections} />
@@ -70,9 +90,23 @@ function Header(props: HeaderProps) {
         <Flex pos="relative" alignItems="center" flexGrow={1} flexBasis={0}>
           <HStack as={Link} href="/" aria-label="Home page" spacing={2}>
             <Logo boxSize={8} />
-            <hope.span color="neutral.900" fontWeight="medium" fontSize="xl">
+            <hope.span
+              color="neutral.900"
+              fontWeight="medium"
+              fontSize="xl"
+              _dark={{
+                color: "neutral.100",
+              }}
+            >
               Hope
-              <hope.span color="primary.500" fontWeight="bold" ml={1}>
+              <hope.span
+                color="primary.500"
+                fontWeight="bold"
+                ml={1}
+                _dark={{
+                  color: "primary.600",
+                }}
+              >
                 UI
               </hope.span>
             </hope.span>
@@ -84,35 +118,39 @@ function Header(props: HeaderProps) {
               fontSize="sm"
               lineHeight="none"
               fontWeight="medium"
+              _dark={{
+                bg: "neutral.800",
+                color: "neutral.300",
+              }}
             >
-              v1.0.0-next.0
+              v1.0.0-next.1
             </hope.span>
           </HStack>
         </Flex>
         <Box mr={[6, 8, 0]} my={({ vars }) => `calc(${vars.space[5]} * -1)`}>
           {/*<Search />*/}
         </Box>
-        <Flex
+        <HStack
           pos="relative"
           flexBasis={0}
           justifyContent="flex-end"
-          gap={[6, 8]}
+          spacing={2}
           flexGrow={{ md: 1 }}
         >
-          {/*<ThemeSelector />*/}
-          <Anchor
-            unstyled
-            isExternal
+          <IconButton
+            as="a"
+            variant="plain"
+            colorScheme="neutral"
+            size="sm"
             href="https://github.com/hope-ui/hope-ui"
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="GitHub"
-            color="neutral.600"
-            _hover={{
-              color: "neutral.700",
-            }}
           >
             <GitHubIcon boxSize={5} />
-          </Anchor>
-        </Flex>
+          </IconButton>
+          <ColorModeSwitcher />
+        </HStack>
       </StyledHeader>
     </Box>
   );
@@ -137,6 +175,7 @@ export function Layout(props: ParentProps) {
       <Flex pos="relative" mx="auto" maxW="8xl" justify="center" px={{ sm: 2, lg: 8, xl: 12 }}>
         <Box d={{ base: "none", lg: "block" }} pos={{ lg: "relative" }} flex={{ lg: "none" }}>
           <Box
+            class="hide-scrollbar"
             pos="sticky"
             top="100px" // height of the header
             ml={({ vars }) => `calc(${vars.space["0.5"]} * -1)`}
@@ -161,7 +200,13 @@ export function Layout(props: ParentProps) {
           <article>
             <Show when={section()}>
               <header>
-                <Text size="sm" fontFamily="display" fontWeight="medium" color="primary.500">
+                <Text
+                  size="sm"
+                  fontFamily="display"
+                  fontWeight="medium"
+                  color="primary.500"
+                  _dark={{ color: "primary.600" }}
+                >
                   {section()?.title}
                 </Text>
               </header>
@@ -172,13 +217,19 @@ export function Layout(props: ParentProps) {
             as="dl"
             mt={12}
             pt={6}
-            borderTop="1px"
-            borderTopStyle="solid"
-            borderTopColor="neutral.200"
+            borderTop={theme => `1px solid ${theme.vars.colors.common.divider}`}
           >
             <Show when={previousPage()}>
               <div>
-                <hope.dt fontSize="sm" lineHeight={5} fontWeight="medium" color="neutral.900">
+                <hope.dt
+                  fontSize="sm"
+                  lineHeight={5}
+                  fontWeight="medium"
+                  color="neutral.900"
+                  _dark={{
+                    color: "neutral.100",
+                  }}
+                >
                   Previous
                 </hope.dt>
                 <hope.dd mt={1}>
@@ -191,7 +242,15 @@ export function Layout(props: ParentProps) {
             </Show>
             <Show when={nextPage()}>
               <Box ml="auto" textAlign="right">
-                <hope.dt fontSize="sm" lineHeight={5} fontWeight="medium" color="neutral.900">
+                <hope.dt
+                  fontSize="sm"
+                  lineHeight={5}
+                  fontWeight="medium"
+                  color="neutral.900"
+                  _dark={{
+                    color: "neutral.100",
+                  }}
+                >
                   Next
                 </hope.dt>
                 <hope.dd mt={1}>

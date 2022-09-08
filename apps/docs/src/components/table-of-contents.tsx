@@ -81,6 +81,14 @@ const TocLink = hope(Link, {
     _hover: {
       color: "neutral.600",
     },
+
+    _dark: {
+      color: "neutral.400",
+
+      _hover: {
+        color: "neutral.300",
+      },
+    },
   },
   variants: {
     isIndent: {
@@ -91,8 +99,16 @@ const TocLink = hope(Link, {
     isActive: {
       true: {
         color: "primary.500",
+
         _hover: {
           color: "primary.600",
+        },
+        _dark: {
+          color: "primary.600",
+
+          _hover: {
+            color: "primary.500",
+          },
         },
       },
     },
@@ -141,6 +157,9 @@ export function TableOfContents() {
             fontWeight="medium"
             fontSize="sm"
             lineHeight={5}
+            _dark={{
+              color: "neutral.100",
+            }}
           >
             On this page
           </Heading>
