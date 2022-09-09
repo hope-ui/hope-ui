@@ -1,14 +1,14 @@
-import { IconButton, Box, Flex, hope, HStack, rgba, Text } from "@hope-ui/core";
+import { IconButton, Box, Flex, hope, HStack, rgba, Text, useColorMode } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
 import { ParentProps, Show } from "solid-js";
 
 import { NAV_SECTIONS, NavSection } from "../NAV_SECTIONS";
-import { ArrowLeftIcon, ArrowRightIcon, ExclamationCircleMiniIcon, GitHubIcon } from "./icons";
-import { Logo } from "./logo";
+import { ArrowLeftIcon, ArrowRightIcon, ExclamationTriangleIcon, GitHubIcon } from "./icons";
+import { Logo, LogoDark } from "./logo";
 import { MobileNavigation } from "./mobile-navigation";
 import { Navigation } from "./navigation";
 import { TableOfContents } from "./table-of-contents";
-import { ColorModeSwitcher } from "./color-mode-switcher";
+import { ThemeSelector } from "./theme-selector";
 
 const PageLink = hope(Link, {
   baseStyle: {
@@ -42,14 +42,14 @@ const StyledHeader = hope("header", {
     flexWrap: "wrap",
 
     boxShadow: "md",
-    backgroundColor: "background.body",
+    backgroundColor: "background",
 
     px: [4, 6, null, 8],
     py: 5,
 
     _dark: {
       boxShadow: "none",
-      borderBottom: theme => `1px solid ${theme.vars.colors.common.divider}`,
+      borderBottom: theme => `1px solid ${theme.vars.colors.neutral["800"]}`,
     },
   },
 });
@@ -59,9 +59,11 @@ interface HeaderProps {
 }
 
 function Header(props: HeaderProps) {
+  const { colorMode } = useColorMode();
+
   return (
     <Box pos="sticky" top={0} zIndex="sticky">
-      <Box bg="background.body">
+      <Box bg="background">
         <HStack
           fontSize="sm"
           fontWeight="medium"
@@ -70,13 +72,13 @@ function Header(props: HeaderProps) {
           py={1}
           spacing={1}
           bg="danger.600"
-          color="common.white"
+          color="white"
           _dark={{
             bg: theme => rgba(theme.vars.colors.danger.darkChannel, 0.4),
             color: "danger.400",
           }}
         >
-          <ExclamationCircleMiniIcon fontSize="1.3em" />
+          <ExclamationTriangleIcon fontSize="1.3em" />
           <span>
             You are looking at the <em>work in progress</em> documentation of Hope UI{" "}
             <strong>1.0</strong>, examples and information may be broken or outdated.
@@ -89,13 +91,15 @@ function Header(props: HeaderProps) {
         </Flex>
         <Flex pos="relative" alignItems="center" flexGrow={1} flexBasis={0}>
           <HStack as={Link} href="/" aria-label="Home page" spacing={2}>
-            <Logo boxSize={8} />
+            <Show when={colorMode() === "dark"} fallback={<Logo boxSize={8} />}>
+              <LogoDark boxSize={8} />
+            </Show>
             <hope.span
               color="neutral.900"
               fontWeight="medium"
               fontSize="xl"
               _dark={{
-                color: "neutral.100",
+                color: "neutral.200",
               }}
             >
               Hope
@@ -149,7 +153,7 @@ function Header(props: HeaderProps) {
           >
             <GitHubIcon boxSize={5} />
           </IconButton>
-          <ColorModeSwitcher />
+          <ThemeSelector />
         </HStack>
       </StyledHeader>
     </Box>
@@ -178,7 +182,7 @@ export function Layout(props: ParentProps) {
             class="hide-scrollbar"
             pos="sticky"
             top="100px" // height of the header
-            ml={({ vars }) => `calc(${vars.space["0.5"]} * -1)`}
+            ml={theme => `calc(${theme.vars.space["0.5"]} * -1)`}
             h="calc(100vh - 100px)" // 100vh - height of the header
             overflowY="auto"
             overflowX="hidden"
@@ -217,7 +221,10 @@ export function Layout(props: ParentProps) {
             as="dl"
             mt={12}
             pt={6}
-            borderTop={theme => `1px solid ${theme.vars.colors.common.divider}`}
+            borderTop={theme => `1px solid ${theme.vars.colors.neutral["200"]}`}
+            _dark={{
+              borderTopColor: "neutral.800",
+            }}
           >
             <Show when={previousPage()}>
               <div>

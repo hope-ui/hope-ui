@@ -5,9 +5,13 @@ import { createServerData } from "solid-start/server";
 
 import { mods } from "../root";
 
-type TocItems = Array<{ depth: number; text: string; slug: string }>;
+interface TocItem {
+  depth: number;
+  text: string;
+  slug: string;
+}
 
-function getHeadingsFromToc(tableOfContents: TocItems) {
+function getHeadingsFromToc(tableOfContents: TocItem[]) {
   return tableOfContents.map(({ slug }) => {
     const el = document.getElementById(slug);
 
@@ -24,7 +28,7 @@ function getHeadingsFromToc(tableOfContents: TocItems) {
   });
 }
 
-function useCurrentSection(tableOfContents: Accessor<TocItems | undefined>) {
+function useCurrentSection(tableOfContents: Accessor<TocItem[] | undefined>) {
   const [currentSection, setCurrentSection] = createSignal(tableOfContents()?.[0].slug);
 
   createEffect(() => {
@@ -158,7 +162,7 @@ export function TableOfContents() {
             fontSize="sm"
             lineHeight={5}
             _dark={{
-              color: "neutral.100",
+              color: "neutral.200",
             }}
           >
             On this page

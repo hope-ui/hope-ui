@@ -29,17 +29,18 @@ const primary = createPalette({
   900: "#002159",
 });
 
+// Tailwind neutral (+ 10% saturation blue - hue 217)
 const neutral = createPalette({
-  50: "#fafafa",
-  100: "#f5f5f5",
-  200: "#e5e5e5",
-  300: "#d4d4d4",
-  400: "#a3a3a3",
-  500: "#737373",
-  600: "#525252",
-  700: "#404040",
-  800: "#262626",
-  900: "#171717",
+  50: "#f9fafa",
+  100: "#f4f5f6",
+  200: "#e3e5e8",
+  300: "#cfd3d8",
+  400: "#9aa1ac",
+  500: "#67707e",
+  600: "#49505a",
+  700: "#393e46",
+  800: "#22252a",
+  900: "#151619",
 });
 
 const success = createPalette({
@@ -121,7 +122,7 @@ const blackAlpha: PaletteScale = {
 };
 
 const white = "#ffffff";
-const black = "#0a0a0a"; // very dark neutral gray, do not use pure black.
+const black = "#121212"; // very dark neutral gray, do not use pure black.
 
 export function createDefaultColors(cssVarPrefix: string): ThemeColors {
   const getCssVar = createGetCssVar(cssVarPrefix);
@@ -136,24 +137,11 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
       info,
       warning,
       danger,
-      common: {
-        white,
-        black,
-        divider: getCssVar("colors-neutral-200"),
-        focusRing: getCssVar("colors-primary-500"),
-      },
-      text: {
-        primary: getCssVar("colors-neutral-800"),
-        secondary: getCssVar("colors-neutral-600"),
-        tertiary: getCssVar("colors-neutral-500"),
-      },
-      background: {
-        body: getCssVar("colors-common-white"),
-        surface: getCssVar("colors-common-white"),
-        level1: getCssVar("colors-neutral-50"),
-        level2: getCssVar("colors-neutral-100"),
-        level3: getCssVar("colors-neutral-200"),
-      },
+      white,
+      black,
+      foreground: getCssVar("colors-neutral-800"),
+      background: "#ffffff",
+      focusRing: getCssVar("colors-primary-500"),
     },
     dark: {
       whiteAlpha,
@@ -164,24 +152,11 @@ export function createDefaultColors(cssVarPrefix: string): ThemeColors {
       info,
       warning,
       danger,
-      common: {
-        white,
-        black,
-        divider: getCssVar("colors-neutral-800"),
-        focusRing: getCssVar("colors-primary-600"),
-      },
-      text: {
-        primary: getCssVar("colors-neutral-100"),
-        secondary: getCssVar("colors-neutral-300"),
-        tertiary: getCssVar("colors-neutral-400"),
-      },
-      background: {
-        body: getCssVar("colors-neutral-900"),
-        surface: getCssVar("colors-common-black"),
-        level1: getCssVar("colors-neutral-800"),
-        level2: getCssVar("colors-neutral-700"),
-        level3: getCssVar("colors-neutral-600"),
-      },
+      white,
+      black,
+      foreground: getCssVar("colors-neutral-200"),
+      background: getCssVar("colors-neutral-900"),
+      focusRing: getCssVar("colors-primary-600"),
     },
   };
 }

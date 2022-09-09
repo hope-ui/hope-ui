@@ -85,3 +85,33 @@ export function UseColorModeValueExample() {
   );
 }
 ```
+
+### The `_dark` style prop
+
+Hope UI provides a `_dark` style prop for apply dark mode style easily. The above example could also be achieved this way:
+
+```tsx {12-15}
+import { Box, Button, useColorMode } from "@hope-ui/core";
+
+export function UseDarkStylePropExample() {
+  const { toggleColorMode } = useColorMode();
+
+  return (
+    <>
+      <Box
+        mb={4}
+        p={2}
+        bg="tomato"
+        color="black"
+        _dark={{
+          bg: "royalblue",
+          color: "white",
+        }}
+      >
+        This box's style will change based on the color mode.
+      </Box>
+      <Button onClick={toggleColorMode}>Toggle color mode</Button>
+    </>
+  );
+}
+```

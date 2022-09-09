@@ -96,3 +96,8 @@ export function unflatten<T extends Dict>(flatObject: T, separator: string) {
     return res;
   }, {} as T);
 }
+
+/** Get a dot-notated path within a nested object if it exists. */
+export function delve<T extends Dict>(obj: T, key: string) {
+  return key.split(".").reduce((acc, b) => (acc ? acc[b] : acc), obj);
+}

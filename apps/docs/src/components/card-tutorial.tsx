@@ -9,6 +9,11 @@ export function CardTutorial() {
       shadow="lg"
       w="full"
       maxW={96}
+      bg="white"
+      _dark={{
+        borderColor: "neutral.800",
+        bg: "neutral.900",
+      }}
     >
       <Image
         src="https://bit.ly/3CVFryX"
@@ -19,7 +24,9 @@ export function CardTutorial() {
       />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold">Yosemite National Park</Text>
+          <Text fontWeight="semibold" _dark={{ color: "neutral.300" }}>
+            Yosemite National Park
+          </Text>
           <Flex
             px={2}
             py={1}
@@ -27,6 +34,10 @@ export function CardTutorial() {
             bgColor="success.50"
             color="success.800"
             rounded="full"
+            _dark={{
+              bgColor: "success.900",
+              color: "success.300",
+            }}
           >
             <Text
               as="span"
@@ -39,7 +50,7 @@ export function CardTutorial() {
             </Text>
           </Flex>
         </Flex>
-        <Text size="sm" color="neutral.500" mb={3}>
+        <Text size="sm" color="neutral.500" mb={3} _dark={{ color: "neutral.400" }}>
           Yosemite National Park is an American national park in California, surrounded on the
           southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>

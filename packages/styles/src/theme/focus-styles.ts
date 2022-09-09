@@ -14,7 +14,7 @@ export function focusStyles(vars: ThemeVars): SystemStyleObject {
 
     "&:focus": {
       outlineOffset: "2px",
-      outline: `2px solid ${vars.colors.common.focusRing}`,
+      outline: `2px solid ${vars.colors.focusRing}`,
     },
 
     "&:focus:not(:focus-visible)": {

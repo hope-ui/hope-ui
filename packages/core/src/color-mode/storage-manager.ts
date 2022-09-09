@@ -10,7 +10,7 @@ import { isServer } from "solid-js/web";
 
 import { ColorModeStorageManager, MaybeColorMode } from "./types";
 
-export const STORAGE_KEY = "hope-ui-color-mode";
+export const COLOR_MODE_STORAGE_KEY = "hope-ui-color-mode";
 
 export function createLocalStorageManager(key: string): ColorModeStorageManager {
   return {
@@ -40,7 +40,7 @@ export function createLocalStorageManager(key: string): ColorModeStorageManager 
   };
 }
 
-export const localStorageManager = createLocalStorageManager(STORAGE_KEY);
+export const localStorageManager = createLocalStorageManager(COLOR_MODE_STORAGE_KEY);
 
 function parseCookie(cookie: string, key: string): MaybeColorMode {
   const match = cookie.match(new RegExp(`(^| )${key}=([^;]+)`));
@@ -68,8 +68,8 @@ export function createCookieStorageManager(key: string, cookie?: string): ColorM
   };
 }
 
-export const cookieStorageManager = createCookieStorageManager(STORAGE_KEY);
+export const cookieStorageManager = createCookieStorageManager(COLOR_MODE_STORAGE_KEY);
 
 export function cookieStorageManagerSSR(cookie: string) {
-  return createCookieStorageManager(STORAGE_KEY, cookie);
+  return createCookieStorageManager(COLOR_MODE_STORAGE_KEY, cookie);
 }

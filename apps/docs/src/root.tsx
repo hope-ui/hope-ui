@@ -2,13 +2,7 @@
 import "./styles/index.css";
 import "./styles/code.css";
 
-import {
-  DEFAULT_THEME,
-  extendTheme,
-  HopeCriticalStyle,
-  HopeProvider,
-  createGlobalStyles,
-} from "@hope-ui/core";
+import { DEFAULT_THEME, extendTheme, HopeCriticalStyle, HopeProvider } from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import { MDXProvider } from "solid-mdx";
 import {

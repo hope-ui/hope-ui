@@ -58,18 +58,18 @@ function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
         backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
         borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
 
         _hover: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
           backgroundColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
           borderColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
         },
 
         _active: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
           backgroundColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
           borderColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
         },
@@ -147,18 +147,18 @@ function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
 
         _dark: {
           color: vars.colors[colorScheme]["200"],
-          backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+          backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.2),
           borderColor: "transparent",
 
           _hover: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.2 : 0.3),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.3),
             borderColor: "transparent",
           },
 
           _active: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.3 : 0.4),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.4),
             borderColor: "transparent",
           },
 
@@ -217,13 +217,13 @@ function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
 
           _hover: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.05 : 0.1),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.1),
             borderColor: vars.colors[colorScheme]["700"],
           },
 
           _active: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.2),
             borderColor: vars.colors[colorScheme]["700"],
           },
 
@@ -282,13 +282,13 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
 
           _hover: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.05 : 0.1),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.1),
             borderColor: "transparent",
           },
 
           _active: {
             color: vars.colors[colorScheme]["200"],
-            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, isNeutral ? 0.1 : 0.2),
+            backgroundColor: rgba(vars.colors[colorScheme].mainChannel, 0.2),
             borderColor: "transparent",
           },
 
@@ -379,7 +379,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         variant: {
           default: {
             color: vars.colors.neutral["800"],
-            backgroundColor: vars.colors.common.white,
+            backgroundColor: vars.colors.white,
             borderColor: vars.colors.neutral["300"],
 
             _hover: {

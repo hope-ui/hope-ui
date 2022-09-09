@@ -6,6 +6,8 @@
  * https://github.com/chakra-ui/chakra-ui/blob/7d7e04d53d871e324debe0a2cb3ff44d7dbf3bca/packages/components/styled-system/src/utils/create-transform.ts
  */
 
+import { delve, isNumber } from "@hope-ui/utils";
+
 import { ThemeScales, ThemeVars } from "../types";
 import { px } from "../utils/breakpoint";
 
@@ -28,21 +30,6 @@ function withoutImportant(value: string) {
   return value.replace(IMPORTANT_REGEX, "").trim();
 }
 
-/** Get a color value from theme if the token exist, return the token otherwise. */
-function resolveColorTokenValue(token: string, vars: ThemeVars) {
-  const parts = token.split(".");
-
-  if (parts.length !== 2) {
-    return token;
-  }
-
-  // key is like "primary" | "text" | "common", etc...
-  // value is like "500" | "solidText" | "divider", etc...
-  const [key, value] = parts;
-
-  return (vars.colors as any)[key]?.[value] ?? token;
-}
-
 /** Get a value from theme if the token exist, return the token otherwise. */
 export function resolveTokenValue(
   token: string | number | null | undefined,
@@ -57,14 +44,12 @@ export function resolveTokenValue(
 
   const rawToken = withoutImportant(tokenStr);
 
-  let resolvedValue;
+  // if the value is not found in the scale root,
+  // maybe it's a dot-notated path like "neutral.500" so ty to access it via `delve`
+  let resolvedValue = (vars[scale] as any)[rawToken] ?? delve(vars[scale], rawToken);
 
-  if (scale === "colors") {
-    resolvedValue = resolveColorTokenValue(rawToken, vars);
-  } else if (UNITLESS_SCALES.includes(scale)) {
-    resolvedValue = vars[scale][rawToken] ?? rawToken;
-  } else {
-    resolvedValue = vars[scale][rawToken] ?? px(rawToken);
+  if (resolvedValue == null) {
+    resolvedValue = UNITLESS_SCALES.includes(scale) ? rawToken : px(rawToken);
   }
 
   return isImportant(tokenStr) ? `${resolvedValue} !important` : resolvedValue;

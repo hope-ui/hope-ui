@@ -19,7 +19,7 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
         <For each={local.sections}>
           {section => (
             <li>
-              <Heading fontWeight="medium" color="neutral.900" _dark={{ color: "neutral.50" }}>
+              <Heading fontWeight="medium" color="neutral.900" _dark={{ color: "neutral.200" }}>
                 {section.title}
               </Heading>
               <VStack
@@ -54,16 +54,10 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                           ...(link.href === location.pathname
                             ? {
                                 backgroundColor: "primary.500",
-                                _dark: {
-                                  backgroundColor: "primary.600",
-                                },
                               }
                             : {
                                 display: "none",
                                 backgroundColor: "neutral.300",
-                                _dark: {
-                                  backgroundColor: "neutral.700",
-                                },
                               }),
                         })}
                         {...(link.href === location.pathname
@@ -74,8 +68,13 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                               _hover: {
                                 textDecoration: "none",
                               },
+
                               _dark: {
                                 color: "primary.600",
+
+                                _before: {
+                                  backgroundColor: "primary.600",
+                                },
                               },
                             }
                           : {
@@ -95,6 +94,10 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
 
                                 _hover: {
                                   color: "neutral.300",
+                                },
+
+                                _before: {
+                                  backgroundColor: "neutral.700",
                                 },
                               },
                             })}

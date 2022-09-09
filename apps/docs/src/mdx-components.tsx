@@ -3,7 +3,7 @@ import { Title as MetaTitle } from "@solidjs/meta";
 import { Link, LinkProps } from "@solidjs/router";
 import { ComponentProps, createMemo, createSignal, Show, splitProps } from "solid-js";
 
-import { CheckIcon, ClipboardIcon } from "./components/icons";
+import { CheckIcon, CopyIcon } from "./components/icons";
 
 const H1 = hope("h1", {
   baseStyle: {
@@ -32,9 +32,10 @@ const H2 = hope("h2", ({ vars }) => ({
     mt: 10,
     scrollMarginTop: "150px", // header height x1.5
     pb: 1,
-    borderBottom: `1px solid ${vars.colors.common.divider}`,
+    borderBottom: `1px solid ${vars.colors.neutral["200"]}`,
     _dark: {
-      color: "neutral.300",
+      color: "neutral.200",
+      borderBottomColor: "neutral.800",
     },
   },
 }));
@@ -49,7 +50,7 @@ const H3 = hope("h3", {
     mt: 8,
     scrollMarginTop: "150px", // header height x1.5
     _dark: {
-      color: "neutral.300",
+      color: "neutral.200",
     },
   },
 });
@@ -77,7 +78,7 @@ const Code = hope("code", ({ vars }) => ({
     overflowWrap: "break-word",
 
     _dark: {
-      bg: "neutral.800",
+      bg: "neutral.700",
     },
 
     // Reset style inside Callout.
@@ -87,6 +88,7 @@ const Code = hope("code", ({ vars }) => ({
 
       _dark: {
         borderColor: "neutral.700",
+        bg: "neutral.800",
         color: "neutral.200",
       },
     },
@@ -159,10 +161,16 @@ const Pre = (props: ComponentProps<"pre">) => {
                   colorScheme: "neutral",
                 },
                 style: {
-                  bg: "background.level1",
+                  bg: "neutral.50",
 
                   _hover: {
                     bg: "neutral.200",
+                  },
+
+                  _dark: {
+                    _hover: {
+                      bg: "neutral.700",
+                    },
                   },
                 },
               },
@@ -170,7 +178,7 @@ const Pre = (props: ComponentProps<"pre">) => {
           },
         }}
       >
-        <Show when={isCopied()} fallback={<ClipboardIcon />}>
+        <Show when={isCopied()} fallback={<CopyIcon />}>
           <CheckIcon />
         </Show>
       </IconButton>

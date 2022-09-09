@@ -20,6 +20,7 @@ export const Preview = hope("div", ({ vars }) => ({
 
     _dark: {
       borderColor: "neutral.700",
+      bg: "black",
     },
   },
   variants: {

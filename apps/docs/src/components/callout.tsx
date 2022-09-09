@@ -19,8 +19,8 @@ export const Callout = hope(
           color: "primary.800",
 
           _dark: {
-            backgroundColor: rgba(theme.vars.colors.primary.darkChannel, 0.4),
-            color: "primary.300",
+            backgroundColor: rgba(theme.vars.colors.primary.darkChannel, 0.6),
+            color: "primary.200",
           },
         },
         warning: {
@@ -29,7 +29,7 @@ export const Callout = hope(
 
           _dark: {
             backgroundColor: rgba(theme.vars.colors.warning.darkChannel, 0.2),
-            color: "warning.500",
+            color: "warning.400",
           },
         },
       },

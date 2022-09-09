@@ -1,4 +1,4 @@
-import { Box, Image, Flex, Text } from "@hope-ui/core";
+import { Box, Flex, Image, Text } from "@hope-ui/core";
 
 export function ResponsiveCardExample() {
   return (
@@ -9,6 +9,11 @@ export function ResponsiveCardExample() {
       shadow="lg"
       w="full"
       maxW={{ base: 96, md: "none" }}
+      bg="white"
+      _dark={{
+        borderColor: "neutral.800",
+        bg: "neutral.900",
+      }}
     >
       <Image
         src="https://bit.ly/3CVFryX"
@@ -27,7 +32,7 @@ export function ResponsiveCardExample() {
           w="full"
           mb={2}
         >
-          <Text fontWeight="semibold" mt={{ md: 1 }}>
+          <Text fontWeight="semibold" mt={{ md: 1 }} _dark={{ color: "neutral.300" }}>
             Yosemite National Park
           </Text>
           <Flex
@@ -37,6 +42,10 @@ export function ResponsiveCardExample() {
             bgColor="success.50"
             color="success.800"
             rounded="full"
+            _dark={{
+              bgColor: "success.900",
+              color: "success.300",
+            }}
           >
             <Text
               as="span"
@@ -49,7 +58,12 @@ export function ResponsiveCardExample() {
             </Text>
           </Flex>
         </Flex>
-        <Text size="sm" color="neutral.500" lineClamp={{ base: 3, md: 5 }}>
+        <Text
+          size="sm"
+          color="neutral.500"
+          lineClamp={{ base: 3, md: 5 }}
+          _dark={{ color: "neutral.400" }}
+        >
           Yosemite National Park is an American national park in California, surrounded on the
           southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
           The park is managed by the National Park Service and covers an area of 759,620 acres

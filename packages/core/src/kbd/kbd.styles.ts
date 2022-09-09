@@ -10,7 +10,7 @@ export const useKbdStyleConfig = createStyleConfig<"root", {}>({
 
       px: "0.4em",
 
-      color: "text.primary",
+      color: "foreground",
       fontFamily: "mono",
       fontSize: "0.8em",
       fontWeight: "bold",
