@@ -33,7 +33,7 @@ body.hope-theme-dark {
   background: linear-gradient(
       to bottom,
       rgba(21, 22, 25, 0) 0%,
-      var(--hope-colors-background) 300px
+      var(--hope-colors-common-background) 300px
     ),
     fixed 0 0 / 20px 20px radial-gradient(var(--hope-colors-neutral-800) 1px, transparent 0),
     fixed 10px 10px / 20px 20px radial-gradient(var(--hope-colors-neutral-800) 1px, transparent 0);

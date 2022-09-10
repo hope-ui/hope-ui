@@ -7,10 +7,11 @@
  */
 
 import { ColorSystem } from "./color-system";
+import { DeepPartial } from "./deep-partial";
 
 export interface ThemeColors {
   light: ColorSystem;
-  dark: ColorSystem;
+  dark: DeepPartial<ColorSystem>;
 }
 
 export type ThemeFontFamily = "sans" | "serif" | "mono" | (string & {});

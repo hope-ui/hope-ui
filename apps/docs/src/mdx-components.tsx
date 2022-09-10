@@ -24,7 +24,7 @@ const H1 = hope("h1", {
 
 const H2 = hope("h2", ({ vars }) => ({
   baseStyle: {
-    color: "neutral.700",
+    color: "neutral.800",
     fontFamily: "display",
     fontSize: "3xl",
     fontWeight: "medium",
@@ -42,7 +42,7 @@ const H2 = hope("h2", ({ vars }) => ({
 
 const H3 = hope("h3", {
   baseStyle: {
-    color: "neutral.700",
+    color: "neutral.800",
     fontFamily: "display",
     fontSize: "2xl",
     fontWeight: "medium",

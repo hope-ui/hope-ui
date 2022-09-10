@@ -20,8 +20,8 @@ export function injectCssReset(vars: ThemeVars) {
 
     body: {
       margin: 0,
-      backgroundColor: vars.colors.background,
-      color: vars.colors.foreground,
+      backgroundColor: vars.colors.common.background,
+      color: vars.colors.common.foreground,
       fontFamily: "inherit",
       lineHeight: "inherit",
       WebkitFontSmoothing: "antialiased",

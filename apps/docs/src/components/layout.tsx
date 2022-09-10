@@ -42,7 +42,7 @@ const StyledHeader = hope("header", {
     flexWrap: "wrap",
 
     boxShadow: "md",
-    backgroundColor: "background",
+    backgroundColor: "common.background",
 
     px: [4, 6, null, 8],
     py: 5,

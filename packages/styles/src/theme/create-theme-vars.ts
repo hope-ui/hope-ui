@@ -22,7 +22,7 @@ const FLATTEN_SEPARATOR = "__";
  * Convert a token name to a css variable.
  *
  * @example
- * tokenToCssVar('colors__primary__500', 'hope')
+ * tokenToCssVar(regex, 'colors__primary__500', 'hope')
  * => {
  *   variable: '--hope-colors-primary-500',
  *   reference: 'var(--hope-colors-primary-500)'

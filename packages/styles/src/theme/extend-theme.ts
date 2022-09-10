@@ -12,7 +12,7 @@ export function extendTheme(themeOverride: ThemeOverride): Theme {
   // so global variants css variables reference is correct.
   if (themeOverride.cssVarPrefix != null) {
     finalDefaultTheme = {
-      ...DEFAULT_THEME,
+      ...finalDefaultTheme,
       colors: createDefaultColors(themeOverride.cssVarPrefix),
     };
   }

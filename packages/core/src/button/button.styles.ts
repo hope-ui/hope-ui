@@ -58,18 +58,18 @@ function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
+        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
         backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
         borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
 
         _hover: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
           backgroundColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
           borderColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
         },
 
         _active: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
           backgroundColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
           borderColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
         },
@@ -379,7 +379,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
         variant: {
           default: {
             color: vars.colors.neutral["800"],
-            backgroundColor: vars.colors.white,
+            backgroundColor: vars.colors.common.white,
             borderColor: vars.colors.neutral["300"],
 
             _hover: {

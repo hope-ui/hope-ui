@@ -7,7 +7,7 @@ const theme = extendTheme({});
 
 render(
   () => (
-    <HopeProvider withGlobalStyles theme={theme}>
+    <HopeProvider theme={theme}>
       <App />
     </HopeProvider>
   ),
