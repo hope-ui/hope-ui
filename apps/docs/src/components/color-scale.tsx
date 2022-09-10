@@ -19,6 +19,18 @@ export function ColorScale(props: ColorScaleProps) {
   const { colorMode } = useColorMode();
   const theme = useTheme();
 
+  const colors = () => {
+    if (colorMode() === "light") {
+      return theme.colors.light[props.name];
+    }
+
+    // hack to show all colors in the doc, since the dark object only has dark colors
+    return {
+      ...theme.colors.light[props.name],
+      ...theme.colors.dark[props.name],
+    };
+  };
+
   return (
     <Grid
       templateColumns={{
@@ -28,7 +40,7 @@ export function ColorScale(props: ColorScaleProps) {
       gap={8}
       mt={6}
     >
-      <For each={Object.entries(theme.colors[colorMode()][props.name])}>
+      <For each={Object.entries(colors())}>
         {([key, value]) => (
           <Show when={!key.toLowerCase().endsWith("channel")}>
             <GridItem>

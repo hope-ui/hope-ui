@@ -7,23 +7,16 @@ The theme object is where you define your application's color palette, type scal
 
 ## Colors
 
-The `colors` key allows you to customize the color palettes for your project. Hope UI uses **10 shades** color palettes that ranges from `50` to `900`.
-
-Two popular color palettes that you can use are:
-
-- [TailwindCSS colors](https://tailwindcss.com/docs/customizing-colors)
-- [OpenColor](https://yeun.github.io/open-color/)
-
-<Callout>
-  <span>`colors` is the only scale to have light/dark option.</span>
-</Callout>
+The `colors` key allows you to customize the color palettes for your project. Hope UI uses color palettes of **10 shades** ranging from `50` to `900`.
 
 ```tsx
+import { createPalette } from "@hope-ui/core";
+
 // example theme object
 export default {
   colors: {
     light: {
-      primary: {
+      primary: createPalette({
         50: "#eff6ff",
         100: "#dbeafe",
         200: "#bfdbfe",
@@ -34,30 +27,39 @@ export default {
         700: "#1d4ed8",
         800: "#1e40af",
         900: "#1e3a8a",
-        mainChannel: "59 130 246", // Shade 500 rgb channels
-        lightChannel: "219 234 254", // Shade 100 rgb channels
-        darkChannel: "30 59 138", // Shade 900 rgb channels
-      },
+      }),
     },
-    dark: {
-      primary: {
-        // ...dark primary shades, if needed
-      },
-    },
+  },
+  dark: {
+    // ...dark palettes, if needed
   },
 };
 ```
 
-`mainChannel`, `lightChannel` and `darkChannel` **should be** space separated RGB color channels. This is used to create colors with different opacity using CSS variables.
+the `createPalette` function will generate three additional values:
 
-```css
-button {
-  background: rgb(var(--hope-colors-primary-mainChannel) / 0.8); /* rgb(59 130 246 / 0.8) */
-}
+- `mainChannel`: RGB color channel of the `500` shade.
+- `lightChannel`: RGB color channel of the `100` shade.
+- `darkChannel`: RGB color channel of the `900` shade.
+
+This values allows to create translucent colors using CSS variables.
+
+```tsx
+<Box bg={theme => `rgb(${theme.vars.colors.primary.mainChannel} / 0.8)`}>
+  Box with translucent background
+</Box>
 ```
 
 Below are the list of all colors available in the default Hope UI theme. Switching to dark mode will show the proper values from the
 dark palette.
+
+<Callout>
+  <span>
+    If you want to use your own colors, two popular options are
+    [TailwindCSS](https://tailwindcss.com/docs/customizing-colors) and
+    [OpenColor](https://yeun.github.io/open-color/).
+  </span>
+</Callout>
 
 ### Common
 

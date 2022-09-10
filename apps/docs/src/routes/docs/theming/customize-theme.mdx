@@ -1,0 +1,117 @@
+import { Callout } from "~/components/callout";
+
+# Customize theme
+
+Extend the default Hope UI theme to match your design requirements.
+
+## Customizing theme tokens
+
+To override a token in the default theme, import the `extendTheme` function and add the keys you'd like to override. You can also add new values to the theme.
+
+The below example demonstrate how to override the light mode primary color palette.
+
+```tsx
+import { extendTheme, HopeProvider } from "@hope-ui/core";
+
+const theme = extendTheme({
+  colors: {
+    light: {
+      primary: {
+        50: "#eff6ff",
+        //...
+        900: "#1e3a8a",
+      },
+    },
+  },
+});
+
+function Demo() {
+  <HopeProvider theme={theme}>
+    <App />
+  </HopeProvider>;
+}
+```
+
+## Customizing component theme
+
+The theme override object accept a `components` key allowing you to set default props and styles for each Hope UI components.
+
+### Default props
+
+Use the `defaultProps` key to override the default props of a component.
+
+```tsx
+import { extendTheme, ButtonTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  // ...others theme tokens override
+
+  components: {
+    Button: {
+      defaultProps: {
+        variant: "outlined",
+        size: "sm",
+        colorScheme: "neutral",
+      },
+    } as ButtonTheme,
+  },
+});
+```
+
+<Callout type="warning">
+  <span>
+    The `components` key is not strongly typed, hence the use of `ButtonTheme` type in the above
+    example.
+  </span>
+</Callout>
+
+### Style config
+
+Use the `styleConfig` key to override the default styles of a component.
+
+Each key refers to a _part_ of the component, for which you can define the `baseStyle`, `variants` and `compoundVariants` like described in the [Styled components](/docs/styles/styled-components) section.
+
+```tsx
+import { extendTheme, ButtonTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  // ...others theme tokens override
+
+  components: {
+    Button: {
+      defaultProps: {},
+      styleConfig: {
+        // styles for the Button "root" part
+        root: {
+          baseStyle: {
+            // base style override
+          },
+          variants: {
+            size: {
+              sm: {
+                // style override to apply when the `size="sm"` prop is passed
+              },
+            },
+          },
+          compoundVariants: [
+            {
+              variants: {
+                variant: "solid",
+                colorScheme: "primary",
+              },
+              style: {
+                // style override to apply when both `variant="solid"` and `colorScheme="primary"` props are passed
+              },
+            },
+          ],
+        },
+        // ...style of other parts of the component, if any
+      },
+    } as ButtonTheme,
+  },
+});
+```
+
+<Callout>
+  <span>All Hope UI components has a **root** part.</span>
+</Callout>

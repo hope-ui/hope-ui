@@ -63,7 +63,7 @@ function Header(props: HeaderProps) {
 
   return (
     <Box pos="sticky" top={0} zIndex="sticky">
-      <Box bg="background">
+      <Box bg="common.background">
         <HStack
           fontSize="sm"
           fontWeight="medium"
@@ -80,7 +80,7 @@ function Header(props: HeaderProps) {
         >
           <ExclamationTriangleIcon fontSize="1.3em" />
           <span>
-            You are looking at the <em>work in progress</em> documentation of Hope UI{" "}
+            You are looking at the documentation of the <em>work in progress</em> Hope UI{" "}
             <strong>1.0</strong>, examples and information may be broken or outdated.
           </span>
         </HStack>

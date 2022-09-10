@@ -51,7 +51,7 @@ To define variants use the `variants` keyword:
 
 ```jsx
 const StyledButton = hope("button", {
-  // baseStyle
+  // ...baseStyle
 
   variants: {
     variant: {
@@ -114,7 +114,7 @@ In the case of needing to set styles based on a combination of variants, you can
 
 ```jsx
 const StyledButton = hope("button", {
-  // baseStyle and variants
+  // ...baseStyle and variants
 
   compoundVariants: [
     {
@@ -136,7 +136,7 @@ You can use the `defaultVariants` keyword to set a variant by default, think of 
 
 ```jsx
 const StyledButton = hope("button", {
-  // baseStyle, variants and compoundVariants
+  // ...baseStyle, variants and compoundVariants
 
   defaultVariants: {
     variant: "solid",
@@ -166,6 +166,6 @@ const StyledButton = hope("button", theme => ({
     border: `1px solid ${theme.vars.colors.neutral["300"]}`,
   },
 
-  // variants, compoundVariants and defaultVariants
+  // ...variants, compoundVariants and defaultVariants
 }));
 ```
