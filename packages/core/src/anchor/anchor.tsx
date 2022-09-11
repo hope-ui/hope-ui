@@ -27,15 +27,15 @@ export const Anchor = createHopeComponent<"a", AnchorProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class", "isExternal"],
-    ["styleConfig", "unstyled"]
+    ["styleConfigOverride", "unstyled"]
   );
 
-  const { classes, styles } = useAnchorStyleConfig("Anchor", styleConfigProps);
+  const { baseClasses, styleOverrides } = useAnchorStyleConfig("Anchor", styleConfigProps);
 
   return (
     <hope.a
-      class={clsx(classes().root, local.class)}
-      __css={styles().root}
+      class={clsx(baseClasses().root, local.class)}
+      __css={styleOverrides().root}
       target={local.isExternal ? "_blank" : undefined}
       rel={local.isExternal ? "noopener noreferrer" : undefined}
       {...others}

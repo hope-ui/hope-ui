@@ -11,16 +11,23 @@ To override a token in the default theme, import the `extendTheme` function and 
 The below example demonstrate how to override the light mode primary color palette.
 
 ```tsx
-import { extendTheme, HopeProvider } from "@hope-ui/core";
+import { createPalette, extendTheme, HopeProvider } from "@hope-ui/core";
 
 const theme = extendTheme({
   colors: {
     light: {
-      primary: {
+      primary: createPalette({
         50: "#eff6ff",
-        //...
+        100: "#dbeafe",
+        200: "#bfdbfe",
+        300: "#93c5fd",
+        400: "#60a5fa",
+        500: "#3b82f6",
+        600: "#2563eb",
+        700: "#1d4ed8",
+        800: "#1e40af",
         900: "#1e3a8a",
-      },
+      }),
     },
   },
 });
@@ -65,9 +72,9 @@ const theme = extendTheme({
   </span>
 </Callout>
 
-### Style config
+### Style config override
 
-Use the `styleConfig` key to override the default styles of a component.
+Use the `styleConfigOverride` key to override the default styles of a component.
 
 Each key refers to a _part_ of the component, for which you can define the `baseStyle`, `variants` and `compoundVariants` like described in the [Styled components](/docs/styles/styled-components) section.
 
@@ -79,8 +86,10 @@ const theme = extendTheme({
 
   components: {
     Button: {
-      defaultProps: {},
-      styleConfig: {
+      defaultProps: {
+        // default props override
+      },
+      styleConfigOverride: {
         // styles for the Button "root" part
         root: {
           baseStyle: {
@@ -112,6 +121,4 @@ const theme = extendTheme({
 });
 ```
 
-<Callout>
-  <span>All Hope UI components has a **root** part.</span>
-</Callout>
+To know which Hope UI components are themeable refers to the _theming_ section of their documentation.

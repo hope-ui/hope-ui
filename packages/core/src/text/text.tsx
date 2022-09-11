@@ -28,15 +28,15 @@ export const Text = createHopeComponent<"p", TextProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class", "lineClamp"],
-    ["styleConfig", "unstyled", "size"]
+    ["styleConfigOverride", "unstyled", "size"]
   );
 
-  const { classes, styles } = useTextStyleConfig("Text", styleConfigProps);
+  const { baseClasses, styleOverrides } = useTextStyleConfig("Text", styleConfigProps);
 
   const rootStyles = createMemo(() => ({
-    ...styles().root,
+    ...styleOverrides().root,
     ...lineClamp(local.lineClamp),
   }));
 
-  return <hope.p class={clsx(classes().root, local.class)} __css={rootStyles()} {...others} />;
+  return <hope.p class={clsx(baseClasses().root, local.class)} __css={rootStyles()} {...others} />;
 });

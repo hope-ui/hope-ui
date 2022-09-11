@@ -36,23 +36,23 @@ export const Heading = createHopeComponent<"h2", HeadingProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["as", "class", "level", "lineClamp"],
-    ["styleConfig", "unstyled", "size"]
+    ["styleConfigOverride", "unstyled", "size"]
   );
 
-  const { classes, styles } = useHeadingStyleConfig("Heading", styleConfigProps);
+  const { baseClasses, styleOverrides } = useHeadingStyleConfig("Heading", styleConfigProps);
 
   // create an `<h>` tag with the level or return the `as` prop
   const asProp = () => (local.level ? `h${local.level}` : local.as);
 
   const rootStyles = createMemo(() => ({
-    ...styles().root,
+    ...styleOverrides().root,
     ...lineClamp(local.lineClamp),
   }));
 
   return (
     <hope.h2
       as={asProp() as ElementType}
-      class={clsx(classes().root, local.class)}
+      class={clsx(baseClasses().root, local.class)}
       __css={rootStyles()}
       {...others}
     />

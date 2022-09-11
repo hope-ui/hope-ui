@@ -20,7 +20,7 @@ export type ComponentTheme<
    * Styles that will be merged with the "base styles".
    * Used to override/add additional styles.
    */
-  styleConfig?: Props["styleConfig"];
+  styleConfigOverride?: Props["styleConfigOverride"];
 };
 
 export interface ThemeBase extends ThemeScales {

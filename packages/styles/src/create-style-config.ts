@@ -19,7 +19,6 @@ import {
   MultiPartStyleConfigResult,
   PartialMultiPartStyleConfigInterpolation,
   StyleConfig,
-  StyleConfigResult,
   StyleConfigVariantSelection,
   SystemStyleObject,
   Theme,
@@ -112,12 +111,12 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
     // generate static, base and theme classNames once.
     runOnce(name, theme, componentTheme()?.styleConfig);
 
-    const styleConfigOverrides = createMemo(() => {
-      return runIfFn(options.styleConfig, theme);
+    const styleConfigOverride = createMemo(() => {
+      return runIfFn(options.styleConfigOverride, theme);
     });
 
     const selectedVariants = createMemo(() => {
-      const [_, variantSelections] = splitProps(options, ["styleConfig", "unstyled"]);
+      const [_, variantSelections] = splitProps(options, ["styleConfigOverride", "unstyled"]);
 
       return {
         ...defaultVariants,
@@ -125,7 +124,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       } as StyleConfigVariantSelection<Variants>;
     });
 
-    const classes = createMemo(() => {
+    const baseClasses = createMemo(() => {
       return parts.reduce((acc, part) => {
         let baseClassName = "";
         let variantClassNames: any = {};
@@ -170,8 +169,8 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       }, {} as Record<Parts, string>);
     });
 
-    const styles = createMemo(() => {
-      const configOverrides = styleConfigOverrides();
+    const styleOverrides = createMemo(() => {
+      const configOverrides = styleConfigOverride();
 
       if (configOverrides == null) {
         return {} as Record<Parts, SystemStyleObject>;
@@ -213,6 +212,6 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
       }, {} as Record<Parts, SystemStyleObject>);
     });
 
-    return { classes, styles };
+    return { baseClasses, styleOverrides };
   };
 }

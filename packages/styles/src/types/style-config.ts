@@ -112,7 +112,7 @@ export type UseStyleConfigOptions<
    * Styles that will be merged with the "base styles".
    * Mostly used to override/add additional styles.
    */
-  styleConfig?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>;
+  styleConfigOverride?: PartialMultiPartStyleConfigInterpolation<Parts, Variants>;
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
@@ -120,13 +120,13 @@ export type UseStyleConfigOptions<
 
 export interface UseStyleConfigReturn<Parts extends string> {
   /** An accessor of parts/classNames. */
-  classes: Accessor<Record<Parts, string>>;
+  baseClasses: Accessor<Record<Parts, string>>;
 
   /**
    * An accessor of parts/system style object intended to be passed to `__css` prop.
    * Mostly used to override/add additional styles.
    */
-  styles: Accessor<Record<Parts, SystemStyleObject>>;
+  styleOverrides: Accessor<Record<Parts, SystemStyleObject>>;
 }
 
 export type UseStyleConfigFn<Parts extends string, Variants extends Record<string, any>> = (

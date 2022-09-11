@@ -15,13 +15,13 @@ import { ButtonParts } from "./button.styles";
 export const ButtonIcon = createHopeComponent<"span">(props => {
   const [local, others] = splitProps(props, ["class"]);
 
-  const { classes, styles } = useStyleConfigContext<ButtonParts>();
+  const { baseClasses, styleOverrides } = useStyleConfigContext<ButtonParts>();
 
   return (
     <hope.span
       aria-hidden={true}
-      class={clsx(classes().icon, local.class)}
-      __css={styles().icon}
+      class={clsx(baseClasses().icon, local.class)}
+      __css={styleOverrides().icon}
       {...others}
     />
   );

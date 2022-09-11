@@ -23,10 +23,16 @@ export const Kbd = createHopeComponent<"kbd", KbdProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class"],
-    ["styleConfig", "unstyled"]
+    ["styleConfigOverride", "unstyled"]
   );
 
-  const { classes, styles } = useKbdStyleConfig("Kbd", styleConfigProps);
+  const { baseClasses, styleOverrides } = useKbdStyleConfig("Kbd", styleConfigProps);
 
-  return <hope.kbd class={clsx(classes().root, local.class)} __css={styles().root} {...others} />;
+  return (
+    <hope.kbd
+      class={clsx(baseClasses().root, local.class)}
+      __css={styleOverrides().root}
+      {...others}
+    />
+  );
 });
