@@ -1,0 +1,98 @@
+import { Text } from "@hope-ui/core";
+
+import { Preview } from "~/components/preview";
+import { ChangeSizeExample, LineClampExample } from "~/components/text-example";
+
+# Text
+
+Display text and paragraph with Hope UI styling features
+
+## Import
+
+```tsx
+import { Text } from "@hope-ui/core";
+```
+
+## Usage
+
+`Text` renders a `p` tag by default and supports style props, `sx` and the polymorphic `as` prop.
+
+<Preview>
+  <Text>I'm a Text</Text>
+</Preview>
+
+```tsx
+<Text>I'm a Text</Text>
+```
+
+### Changing the font size
+
+To increase the font size of the text, you can pass the `size` prop. It applies a combination of `fontSize` and `lineHeight` for an optimal reading experience.
+
+<Preview>
+  <ChangeSizeExample />
+</Preview>
+
+```tsx
+<VStack spacing={3} align="flex-start">
+  <Text size="9xl">(9xl) The quick brown fox</Text>
+  <Text size="8xl">(8xl) The quick brown fox</Text>
+  <Text size="7xl">(7xl) The quick brown fox</Text>
+  <Text size="6xl">(6xl) The quick brown fox</Text>
+  <Text size="5xl">(5xl) The quick brown fox</Text>
+  <Text size="4xl">(4xl) The quick brown fox</Text>
+  <Text size="3xl">(3xl) The quick brown fox</Text>
+  <Text size="2xl">(2xl) The quick brown fox</Text>
+  <Text size="xl">(xl) The quick brown fox</Text>
+  <Text size="lg">(lg) The quick brown fox</Text>
+  <Text size="base">(base) The quick brown fox</Text>
+  <Text size="sm">(sm) The quick brown fox</Text>
+  <Text size="xs">(xs) The quick brown fox</Text>
+</VStack>
+```
+
+### Truncate text
+
+If you'd like to truncate the text after a specific number of lines, pass the `lineClamp` prop and set it to the desired number of lines.
+
+It will render an ellipsis when the text exceeds the width of the viewport or `maxWidth` prop.
+
+<Preview>
+  <LineClampExample />
+</Preview>
+
+```tsx
+<Text lineClamp={1}>
+  Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for
+  previewing layouts and visual mockups.
+</Text>
+```
+
+## Theming
+
+Use the `TextTheme` type to override `Text` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, TextTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Text: {
+      // ...overrides
+    } as TextTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name | Static selector  | Description   |
+| ---- | ---------------- | ------------- |
+| root | `hope-Text-root` | Root element. |
+
+## Props
+
+| Name      | Type                                                                                                             | Description                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| size      | `"xs" \| "sm" \| "base" \| "lg" \| "xl" \| "2xl" \| "3xl" \| "4xl" \| "5xl" \| "6xl" \| "7xl" \| "8xl" \| "9xl"` | The size of the text. It apply a combination of `font-size` and `line-height`. |
+| lineClamp | `ResponsiveValue<number>`                                                                                        | The number of lines the text should be truncate.                               |

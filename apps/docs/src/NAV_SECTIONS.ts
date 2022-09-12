@@ -138,6 +138,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  /*
   {
     title: "Buttons",
     links: [
@@ -151,7 +152,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
-  /*{
+  {
     title: "Data entry",
     links: [
       {
@@ -195,6 +196,7 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/docs/components/",
       },
     ],
-  },*/
+  },
+  */
   //...CHANGELOG_NAV_SECTIONS,
 ];
