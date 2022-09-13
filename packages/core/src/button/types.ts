@@ -36,23 +36,6 @@ export interface ButtonLoaderProps {
 
 export type ButtonContentProps = Pick<ButtonProps, "leftIcon" | "rightIcon" | "children">;
 
-interface ButtonGroupProps
-  extends Pick<ButtonProps, "colorScheme" | "variant" | "size" | "isDisabled">,
-    HopeProps {
-  /** Whether the borderRadius of button that are direct children will be altered to look flushed together. */
-  isAttached?: boolean;
-
-  /** The spacing between each button. */
-  spacing?: SystemStyleProps["marginRight"];
-}
-
-export interface ButtonGroupContextValue {
-  variant: Accessor<ButtonGroupProps["variant"]>;
-  colorScheme: Accessor<ButtonGroupProps["colorScheme"]>;
-  size: Accessor<ButtonGroupProps["size"]>;
-  isDisabled: Accessor<ButtonGroupProps["isDisabled"]>;
-}
-
 export type ButtonTheme = ComponentTheme<
   ButtonProps,
   "colorScheme" | "variant" | "size" | "loaderPlacement"

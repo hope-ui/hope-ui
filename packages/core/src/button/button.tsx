@@ -18,7 +18,9 @@ import { mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 
+import { mergeDefaultProps } from "../utils";
 import { ButtonParts, useButtonStyleConfig } from "./button.styles";
+import { useButtonGroupContext } from "./button-group";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";
 import { isButton } from "./is-button";
@@ -31,7 +33,33 @@ import { ButtonContentProps, ButtonProps } from "./types";
 export const Button = createHopeComponent<"button", ButtonProps>(props => {
   let ref: HTMLButtonElement | undefined;
 
-  props = mergeThemeProps("Button", { loaderPlacement: "start" }, props);
+  const buttonGroupContext = useButtonGroupContext();
+
+  const propsWithButtonGroupDefaults = mergeDefaultProps(
+    {
+      get variant() {
+        return buttonGroupContext?.variant;
+      },
+      get colorScheme() {
+        return buttonGroupContext?.colorScheme;
+      },
+      get size() {
+        return buttonGroupContext?.size;
+      },
+      get isDisabled() {
+        return buttonGroupContext?.isDisabled;
+      },
+    },
+    props
+  );
+
+  props = mergeThemeProps(
+    "Button",
+    {
+      loaderPlacement: "start",
+    },
+    propsWithButtonGroupDefaults
+  );
 
   const [local, contentProps, styleConfigProps, others] = splitProps(
     props,

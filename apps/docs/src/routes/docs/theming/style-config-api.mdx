@@ -345,13 +345,9 @@ export const AlertDescription = createHopeComponent<"div">(props => {
 });
 ```
 
-## Theme level customization
-
-Let's add theme level customization supports to our `Alert` components.
-
 ### Creating a component theme type
 
-First, we need to create a _component theme_ type to get TypeScript supports in the theme object. To do that, Hope UI expose the `ComponentTheme` utility type.
+We need to create a _component theme_ type to get TypeScript supports in the theme object. To do that, Hope UI expose the `ComponentTheme` utility type.
 
 In the example below, only `variant` and `status` from the `AlertStyleConfigProps` type will be available to set in the theme default props section.
 
@@ -395,7 +391,7 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 
 ### Add theme default props support
 
-Then, we need to allow default props from the theme to be merged in the component.
+We also need to allow default props from the theme to be merged in the component.
 
 To do that, use the `mergeThemeProps` function and pass it the following parameters:
 
@@ -450,7 +446,33 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
   </span>
 </Callout>
 
-Now our `Alert` component default props and styles can be overridden in Hope UI theme `components` section by using the **same name** passed to `mergeThemeProps` and `useAlertStyleConfig` (here "Alert").
+## Using the component
+
+Finally, our `Alert` component can be used like this:
+
+```tsx
+<Alert variant="solid" status="info">
+  <AlertTitle>Get ready!</AlertTitle>
+  <AlertDescription>Hope UI 1.0 is going live soon.</AlertDescription>
+</Alert>
+```
+
+It alo supports the polymorphic `as` prop, styles props and `sx`.
+
+```tsx
+<Alert variant="solid" status="info" as="section" p={4}>
+  <AlertTitle as="h2" fontWeight="semibold" mb={2}>
+    Get ready!
+  </AlertTitle>
+  <AlertDescription as="span">Hope UI 1.0 is going live soon.</AlertDescription>
+</Alert>
+```
+
+## Theme level customization
+
+Default props and style config can be overridden in Hope UI theme `components` section by using the **same name** passed to both `mergeThemeProps` and `useAlertStyleConfig` (here "Alert").
+
+And to get proper TypeScript support we cast the object as an `AlertTheme` type.
 
 ```tsx
 import { extendTheme } from "@hope-ui/core";
@@ -512,29 +534,9 @@ const theme = extendTheme({
 });
 ```
 
-## Using the component
+## Component level customization
 
-Finally, our `Alert` component can be used like this:
-
-```tsx
-<Alert variant="solid" status="info">
-  <AlertTitle>Get ready!</AlertTitle>
-  <AlertDescription>Hope UI 1.0 is going live soon.</AlertDescription>
-</Alert>
-```
-
-It alo supports the polymorphic `as` prop, styles props and `sx`.
-
-```tsx
-<Alert variant="solid" status="info" as="section" p={4}>
-  <AlertTitle as="h2" fontWeight="semibold" mb={2}>
-    Get ready!
-  </AlertTitle>
-  <AlertDescription as="span">Hope UI 1.0 is going live soon.</AlertDescription>
-</Alert>
-```
-
-And supports style config override at the component level.
+Use the `styleConfigOverride` prop to override the style config at the component level.
 
 ```tsx
 <Alert

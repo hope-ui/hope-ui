@@ -1,0 +1,265 @@
+import { Button, ButtonGroup, HStack, IconButton } from "@hope-ui/core";
+
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+import { ArrowRightIcon, BeatLoaderIcon, CopyIcon, PlusIcon } from "~/components/icons";
+
+# Button
+
+Buttons allow users to perform an action.
+
+## Import
+
+```tsx
+import { Button } from "@hope-ui/core";
+```
+
+## Usage
+
+<Preview>
+  <Button>Button</Button>
+</Preview>
+
+```tsx
+<Button>Button</Button>
+```
+
+### Variants
+
+Use the `variant` prop to change the visual style of the `Button`.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button variant="default">Button</Button>
+    <Button variant="solid">Button</Button>
+    <Button variant="soft">Button</Button>
+    <Button variant="outlined">Button</Button>
+    <Button variant="plain">Button</Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button variant="default">Button</Button>
+  <Button variant="solid">Button</Button>
+  <Button variant="soft">Button</Button>
+  <Button variant="outlined">Button</Button>
+  <Button variant="plain">Button</Button>
+</HStack>
+```
+
+### Colors
+
+The `colorScheme` prop allows changing the color of the `Button`.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button variant="solid" colorScheme="primary">
+      Button
+    </Button>
+    <Button variant="solid" colorScheme="neutral">
+      Button
+    </Button>
+    <Button variant="solid" colorScheme="success">
+      Button
+    </Button>
+    <Button variant="solid" colorScheme="info">
+      Button
+    </Button>
+    <Button variant="solid" colorScheme="warning">
+      Button
+    </Button>
+    <Button variant="solid" colorScheme="danger">
+      Button
+    </Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button variant="solid" colorScheme="primary">
+    Button
+  </Button>
+  <Button variant="solid" colorScheme="neutral">
+    Button
+  </Button>
+  <Button variant="solid" colorScheme="success">
+    Button
+  </Button>
+  <Button variant="solid" colorScheme="info">
+    Button
+  </Button>
+  <Button variant="solid" colorScheme="warning">
+    Button
+  </Button>
+  <Button variant="solid" colorScheme="danger">
+    Button
+  </Button>
+</HStack>
+```
+
+<Callout>
+  <span>The `colorScheme` prop is ignored when the `variant` is set to **default**.</span>
+</Callout>
+
+### Sizes
+
+Use the `size` prop to change the size of the `Button`.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button size="xs">Button</Button>
+    <Button size="sm">Button</Button>
+    <Button size="md">Button</Button>
+    <Button size="lg">Button</Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button size="xs">Button</Button>
+  <Button size="sm">Button</Button>
+  <Button size="md">Button</Button>
+  <Button size="lg">Button</Button>
+</HStack>
+```
+
+### Button with icon
+
+The `leftIcon` and `rightIcon` props allows to add left and right icons to the `Button`.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button leftIcon={<CopyIcon boxSize={18} />}>Copy to clipboard</Button>
+    <Button rightIcon={<ArrowRightIcon />}>Next</Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button leftIcon={<CopyIcon boxSize={18} />}>Copy to clipboard</Button>
+  <Button rightIcon={<ArrowRightIcon />}>Next</Button>
+</HStack>
+```
+
+If you want to create your own icon components check out Hope UI [Icon](/docs/components/icon) documentation.
+
+### Loading state
+
+Pass the `isLoading` prop to show its loading state. By default, the button will show a spinner and leave the button's width unchanged. You can also pass the `loadingText` prop to show a spinner and the loading text.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button isLoading>Loading</Button>
+    <Button isLoading loadingText="Processing">
+      Save
+    </Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button isLoading>Loading</Button>
+  <Button isLoading loadingText="Processing">
+    Save
+  </Button>
+</HStack>
+```
+
+You can also change the loader element with the `loader` prop.
+
+<Preview>
+  <Button isLoading loader={<BeatLoaderIcon boxSize={8} />}>
+    Button
+  </Button>
+</Preview>
+
+```tsx
+<Button isLoading loader={<BeatLoaderIcon boxSize={8} />}>
+  Button
+</Button>
+```
+
+When a `loaderText` is present, you can change the placement of the loader element to either `start`or`end`.
+
+<Preview>
+  <HStack spacing={4}>
+    <Button isLoading loadingText="Loading" loaderPlacement="start">
+      Save
+    </Button>
+    <Button isLoading loadingText="Loading" loaderPlacement="end">
+      Continue
+    </Button>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <Button isLoading loadingText="Loading" loaderPlacement="start">
+    Save
+  </Button>
+  <Button isLoading loadingText="Loading" loaderPlacement="end">
+    Continue
+  </Button>
+</HStack>
+```
+
+### Grouping buttons
+
+You can use the `ButtonGroup` component to group buttons which allows to:
+
+- Set the `variant`, `colorScheme`, `size` and `isDisabled` state of all buttons within it.
+- Flush the buttons together by removing the border radius of its children as needed.
+- Supports horizontal and vertical stacking.
+
+<Preview>
+  <ButtonGroup size="sm" variant="outlined">
+    <Button>Save</Button>
+    <IconButton aria-label="Create new file" icon={<PlusIcon />} />
+  </ButtonGroup>
+</Preview>
+
+```tsx
+<ButtonGroup size="sm" variant="outlined">
+  <Button>Save</Button>
+  <IconButton aria-label="Create new file" icon={<PlusIcon />} />
+</ButtonGroup>
+```
+
+Use the `orientation` prop to change the orientation of the group.
+
+<Preview>
+  <ButtonGroup orientation="vertical">
+    <Button>First</Button>
+    <Button>Second</Button>
+    <Button>Third</Button>
+  </ButtonGroup>
+</Preview>
+
+```tsx
+<ButtonGroup orientation="vertical">
+  <Button>First</Button>
+  <Button>Second</Button>
+  <Button>Third</Button>
+</ButtonGroup>
+```
+
+## Theming
+
+TODO
+
+### Component parts
+
+TODO
+
+## Props
+
+TODO
+
+### Button
+
+TODO
+
+### ButtonGroup
+
+TODO

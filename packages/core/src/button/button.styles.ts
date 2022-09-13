@@ -385,7 +385,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
             _hover: {
               color: vars.colors.neutral["800"],
               backgroundColor: vars.colors.neutral["100"],
-              borderColor: vars.colors.neutral["400"],
+              borderColor: vars.colors.neutral["300"],
             },
 
             _active: {
@@ -408,7 +408,7 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
               _hover: {
                 color: vars.colors.whiteAlpha["900"],
                 backgroundColor: vars.colors.whiteAlpha["100"],
-                borderColor: vars.colors.whiteAlpha["300"],
+                borderColor: vars.colors.whiteAlpha["200"],
               },
 
               _active: {
