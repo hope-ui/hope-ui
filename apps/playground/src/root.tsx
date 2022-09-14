@@ -1,4 +1,5 @@
 // @refresh reload
+import { HopeCriticalStyle, HopeProvider } from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import {
   Body,
@@ -11,7 +12,6 @@ import {
   Scripts,
   Title,
 } from "solid-start";
-import { HopeProvider, HopeCriticalStyle } from "@hope-ui/core";
 
 export default function Root() {
   return (

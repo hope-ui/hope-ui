@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@hope-ui/core": "workspace:*",
-    "@motionone/solid": "10.14.1",
+    "@motionone/solid": "10.14.2",
     "@solidjs/meta": "0.28.0",
     "@solidjs/router": "0.4.2",
     "@stitches/core": "1.2.8",

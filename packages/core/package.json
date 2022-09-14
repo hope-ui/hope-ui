@@ -68,10 +68,10 @@
     "@storybook/html": "6.5.10",
     "@storybook/manager-webpack5": "6.5.10",
     "@storybook/theming": "6.5.10",
-    "storybook-dark-mode": "1.1.0"
+    "storybook-dark-mode": "1.1.2"
   },
   "peerDependencies": {
-    "@motionone/solid": "^10.14.1",
+    "@motionone/solid": "^10.14.2",
     "solid-js": "^1.5.4"
   },
   "publishConfig": {
