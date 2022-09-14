@@ -22,7 +22,6 @@ import {
 } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
-// eslint-disable-next-line import/no-unresolved
 import { Dynamic } from "solid-js/web";
 
 import { createHopeComponent, HopeComponent } from "./create-hope-component";
@@ -222,9 +221,8 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
     });
 
     return (
-      // @ts-ignore
       <Dynamic
-        component={local.as ?? component}
+        component={local.as ?? (component as ElementType)}
         class={
           clsx(
             staticClassName,

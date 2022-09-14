@@ -215,14 +215,18 @@ You can use the `ButtonGroup` component to group buttons which allows to:
 <Preview>
   <ButtonGroup size="sm" variant="outlined">
     <Button>Save</Button>
-    <IconButton aria-label="Create new file" icon={<PlusIcon />} />
+    <IconButton aria-label="Create new file">
+      <PlusIcon />
+    </IconButton>
   </ButtonGroup>
 </Preview>
 
 ```tsx
 <ButtonGroup size="sm" variant="outlined">
   <Button>Save</Button>
-  <IconButton aria-label="Create new file" icon={<PlusIcon />} />
+  <IconButton aria-label="Create new file">
+    <PlusIcon />
+  </IconButton>
 </ButtonGroup>
 ```
 

@@ -51,6 +51,13 @@ function App() {
 
 ## Usage with Solid Start
 
+<Callout type="warning">
+  <span>
+    Hope UI has been tested with `solid-start@0.1.0-alpha.99`, compatibility with other versions is
+    not guaranteed.
+  </span>
+</Callout>
+
 If you are using [Solid Start](https://github.com/solidjs/solid-start) you will need to add the `ssr` setting to your `vite.config.ts`:
 
 ```ts {7-9}
@@ -69,7 +76,7 @@ export default defineConfig({
 
 Then wrap your application root component with `HopeProvider` and add `HopeCriticalStyle` to the `Head`:
 
-```tsx {18,24,37}
+```tsx {2, 18,24,37}
 // root.tsx
 
 import { HopeProvider, HopeCriticalStyle } from "@hope-ui/core";
@@ -88,7 +95,7 @@ import {
 
 export default function Root() {
   return (
-    <HopeProvider withGlobalStyles>
+    <HopeProvider>
       <Html lang="en">
         <Head>
           <Title>SolidStart - Bare</Title>
@@ -112,6 +119,4 @@ export default function Root() {
 }
 ```
 
-<Callout>
-  <span>`HopeCriticalStyle` will inject all critical CSS during server-side rendering.</span>
-</Callout>
+`HopeCriticalStyle` will inject all critical CSS during server-side rendering.

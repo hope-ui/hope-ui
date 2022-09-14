@@ -10,7 +10,7 @@ import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/style
 import { clsx } from "clsx";
 import { Show, splitProps } from "solid-js";
 
-import { IconSpinner } from "../icons/icon-spinner";
+import { IconSpinner } from "../icon/icons";
 import { ButtonParts } from "./button.styles";
 import { ButtonLoaderProps } from "./types";
 
