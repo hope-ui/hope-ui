@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/utils",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "private": false,
   "description": "Common utilities and types for Hope UI.",
   "keywords": [

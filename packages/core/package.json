@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/core",
-  "version": "1.0.0-next.0",
+  "version": "1.0.0-next.1",
   "private": false,
   "description": "Hope UI core components library.",
   "keywords": [
@@ -50,9 +50,9 @@
   },
   "dependencies": {
     "@floating-ui/dom": "1.0.1",
-    "@hope-ui/primitives": "1.0.0-next.0",
-    "@hope-ui/styles": "1.0.0-next.0",
-    "@hope-ui/utils": "1.0.0-next.0"
+    "@hope-ui/primitives": "1.0.0-next.1",
+    "@hope-ui/styles": "1.0.0-next.1",
+    "@hope-ui/utils": "1.0.0-next.1"
   },
   "devDependencies": {
     "@hope-ui/tests": "workspace:*",
