@@ -145,10 +145,12 @@ export const NAV_SECTIONS: NavSection[] = [
         title: "Button",
         href: "/docs/components/button",
       },
+      /*
       {
         title: "IconButton",
         href: "/docs/components/icon-button",
       },
+      */
     ],
   },
   /*

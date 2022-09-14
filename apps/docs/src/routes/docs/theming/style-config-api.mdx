@@ -457,7 +457,7 @@ Finally, our `Alert` component can be used like this:
 </Alert>
 ```
 
-It alo supports the polymorphic `as` prop, styles props and `sx`.
+It also supports the polymorphic `as` prop, styles props and `sx`.
 
 ```tsx
 <Alert variant="solid" status="info" as="section" p={4}>
@@ -467,109 +467,3 @@ It alo supports the polymorphic `as` prop, styles props and `sx`.
   <AlertDescription as="span">Hope UI 1.0 is going live soon.</AlertDescription>
 </Alert>
 ```
-
-## Theme level customization
-
-Default props and style config can be overridden in Hope UI theme `components` section by using the **same name** passed to both `mergeThemeProps` and `useAlertStyleConfig` (here "Alert").
-
-And to get proper TypeScript support we cast the object as an `AlertTheme` type.
-
-```tsx
-import { extendTheme } from "@hope-ui/core";
-
-import { AlertTheme } from "./alert.tsx";
-
-const theme = extendTheme({
-  // ...others theme tokens override
-
-  components: {
-    Alert: {
-      defaultProps: {
-        variant: "soft",
-        status: "success",
-      },
-      styleConfigOverride: {
-        // style override of the "root" part
-        root: {
-          baseStyle: {
-            // base style override
-          },
-          variants: {
-            variant: {
-              solid: {
-                // style override when the `variant="solid"` prop is passed
-              },
-              soft: {},
-            },
-            status: {
-              success: {
-                // style override when the `status="success"` prop is passed
-              },
-              info: {},
-              warning: {},
-              danger: {},
-            },
-          },
-          compoundVariants: [
-            {
-              variants: {
-                variant: "solid",
-                status: "success",
-              },
-              style: {
-                // style override when both `variant="solid"` and `status="success"` props are passed
-              },
-            },
-          ],
-        },
-        title: {
-          // style override of the "title" part, if any
-        },
-        description: {
-          // style override of the "description" part, if any
-        },
-      },
-    } as AlertTheme,
-  },
-});
-```
-
-## Component level customization
-
-Use the `styleConfigOverride` prop to override the style config at the component level.
-
-```tsx
-<Alert
-  variant="solid"
-  status="info"
-  styleConfigOverride={{
-    root: {
-      baseStyle: {
-        // base style override of the "root" part
-      },
-      variants: {
-        // variants style override of the "root" part
-      },
-      compoundVariants: [
-        // compound variants style override of the "root" part
-      ],
-    },
-    title: {
-      // style override of the "title" part, if any
-    },
-    description: {
-      // style override of the "description" part, if any
-    },
-  }}
->
-  <AlertTitle>Get ready!</AlertTitle>
-  <AlertDescription>Hope UI 1.0 is going live soon.</AlertDescription>
-</Alert>
-```
-
-<Callout>
-  <span>
-    Style config override at the component level will take precedence over the one defined in the
-    theme.
-  </span>
-</Callout>
