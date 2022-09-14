@@ -28,6 +28,10 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 # ⚠️ WARNING ⚠️
 
+Hope UI is in a rewrite process, focus will be on the next major version (`v1.0`) and no new feature will be added to `v0.x`.
+
+If you want to try the `1.0` prereleases learn more at [next.hope-ui.com](http://next.hope-ui.com).
+
 This project is not ready for production, use at your own risk.
 
 ## Why use Hope UI ?
