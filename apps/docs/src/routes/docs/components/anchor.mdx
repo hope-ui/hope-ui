@@ -1,0 +1,81 @@
+import { Anchor, Text } from "@hope-ui/core";
+
+import { Preview } from "~/components/preview";
+import { ExternalLinkIcon } from "~/components/icons";
+
+# Anchor
+
+Display links with Hope UI styling features.
+
+## Import
+
+```tsx
+import { Anchor } from "@hope-ui/core";
+```
+
+## Usage
+
+<Preview>
+  <Anchor href="/">Hope UI</Anchor>
+</Preview>
+
+```tsx
+<Anchor href="/">Hope UI</Anchor>
+```
+
+### External link
+
+Use the `isExternal` prop to open the link in a new tab.
+
+<Preview>
+  <Anchor href="https://hope-ui.com" isExternal>
+    <span>Hope UI </span>
+    <ExternalLinkIcon />
+  </Anchor>
+</Preview>
+
+```tsx
+<Anchor href="https://hope-ui.com" isExternal>
+  Hope UI <ExternalLinkIcon />
+</Anchor>
+```
+
+### Usage with routing library
+
+Pass the `as` prop to `Anchor` to replace the rendered `a` tag with the router's link component.
+
+```tsx
+import { Link } from "@solidjs/router";
+
+<Anchor as={Link} href="/">
+  Home
+</Anchor>;
+```
+
+## Theming
+
+Use the `AnchorTheme` type to override `Anchor` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, AnchorTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Anchor: {
+      // ...overrides
+    } as AnchorTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name | Static selector    | Description  |
+| ---- | ------------------ | ------------ |
+| root | `hope-Anchor-root` | Root element |
+
+## Props
+
+| Name       | Type      | Description                                     |
+| ---------- | --------- | ----------------------------------------------- |
+| isExternal | `boolean` | Whether the link should be opened in a new tab. |
