@@ -10,7 +10,7 @@ import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/style
 import { clsx } from "clsx";
 import { Show, splitProps } from "solid-js";
 
-import { IconSpinner } from "../icon/icons";
+import { SpinnerIcon } from "../icon/icon-set";
 import { ButtonParts } from "./button.styles";
 import { ButtonLoaderProps } from "./types";
 
@@ -29,7 +29,7 @@ export const ButtonLoader = createHopeComponent<"div", ButtonLoaderProps>(props 
       <Show
         when={local.children}
         fallback={
-          <IconSpinner class={baseClasses().loaderIcon} __css={styleOverrides().loaderIcon} />
+          <SpinnerIcon class={baseClasses().loaderIcon} __css={styleOverrides().loaderIcon} />
         }
       >
         {local.children}

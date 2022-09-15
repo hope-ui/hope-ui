@@ -7,7 +7,6 @@
  */
 
 import { createHopeComponent } from "@hope-ui/styles";
-import { Show, splitProps } from "solid-js";
 
 import { Button } from "./button";
 import { IconButtonProps } from "./types";
@@ -17,13 +16,5 @@ import { IconButtonProps } from "./types";
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export const IconButton = createHopeComponent<"button", IconButtonProps>(props => {
-  const [local, others] = splitProps(props, ["children", "icon"]);
-
-  return (
-    <Button isIconButton {...others}>
-      <Show when={local.icon} fallback={local.children}>
-        {local.icon}
-      </Show>
-    </Button>
-  );
+  return <Button isIconButton {...props} />;
 });

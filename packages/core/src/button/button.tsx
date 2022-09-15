@@ -11,6 +11,7 @@ import {
   createHopeComponent,
   hope,
   mergeThemeProps,
+  STYLE_CONFIG_PROP_NAMES,
   StyleConfigProvider,
   useStyleConfigContext,
 } from "@hope-ui/styles";
@@ -75,15 +76,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
       "isDisabled",
     ],
     ["children", "leftIcon", "rightIcon"],
-    [
-      "styleConfigOverride",
-      "unstyled",
-      "colorScheme",
-      "variant",
-      "size",
-      "isFullWidth",
-      "isIconButton",
-    ]
+    [...STYLE_CONFIG_PROP_NAMES, "colorScheme", "variant", "size", "isFullWidth", "isIconButton"]
   );
 
   const tagName = createTagName(

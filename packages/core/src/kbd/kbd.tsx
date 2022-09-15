@@ -6,7 +6,12 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/layout/src/kbd.tsx
  */
 
-import { ComponentTheme, createHopeComponent, hope } from "@hope-ui/styles";
+import {
+  ComponentTheme,
+  createHopeComponent,
+  hope,
+  STYLE_CONFIG_PROP_NAMES,
+} from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
@@ -20,11 +25,7 @@ export type KbdTheme = ComponentTheme<KbdProps>;
  * `Kbd` is a semantic component used to render keyboard shortcut.
  */
 export const Kbd = createHopeComponent<"kbd", KbdProps>(props => {
-  const [local, styleConfigProps, others] = splitProps(
-    props,
-    ["class"],
-    ["styleConfigOverride", "unstyled"]
-  );
+  const [local, styleConfigProps, others] = splitProps(props, ["class"], STYLE_CONFIG_PROP_NAMES);
 
   const { baseClasses, styleOverrides } = useKbdStyleConfig("Kbd", styleConfigProps);
 

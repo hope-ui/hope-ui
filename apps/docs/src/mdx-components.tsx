@@ -152,7 +152,7 @@ const Pre = (props: ComponentProps<"pre">) => {
         right={2}
         zIndex="docked"
         fontSize="16px"
-        styleConfig={{
+        styleConfigOverride={{
           root: {
             compoundVariants: [
               {

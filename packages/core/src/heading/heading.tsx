@@ -4,6 +4,7 @@ import {
   hope,
   mergeThemeProps,
   ResponsiveValue,
+  STYLE_CONFIG_PROP_NAMES,
 } from "@hope-ui/styles";
 import { ElementType } from "@hope-ui/utils";
 import { clsx } from "clsx";
@@ -36,7 +37,7 @@ export const Heading = createHopeComponent<"h2", HeadingProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["as", "class", "level", "lineClamp"],
-    ["styleConfigOverride", "unstyled", "size"]
+    [...STYLE_CONFIG_PROP_NAMES, "size"]
   );
 
   const { baseClasses, styleOverrides } = useHeadingStyleConfig("Heading", styleConfigProps);

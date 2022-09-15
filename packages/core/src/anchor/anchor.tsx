@@ -6,7 +6,12 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/components/layout/src/link.tsx
  */
 
-import { createHopeComponent, hope, mergeThemeProps } from "@hope-ui/styles";
+import {
+  createHopeComponent,
+  hope,
+  mergeThemeProps,
+  STYLE_CONFIG_PROP_NAMES,
+} from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
@@ -27,7 +32,7 @@ export const Anchor = createHopeComponent<"a", AnchorProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class", "isExternal"],
-    ["styleConfigOverride", "unstyled"]
+    STYLE_CONFIG_PROP_NAMES
   );
 
   const { baseClasses, styleOverrides } = useAnchorStyleConfig("Anchor", styleConfigProps);

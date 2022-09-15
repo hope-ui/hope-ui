@@ -9,9 +9,7 @@ import {
 import { render, screen } from "solid-testing-library";
 
 import { createIcon } from "../icon";
-import { Button } from "./button";
-import { IconButton } from "./icon-button";
-import { IconButtonProps } from "./types";
+import { CloseButton, CloseButtonProps } from "./close-button";
 
 const BeakerIcon = createIcon({
   path: () => (
@@ -26,21 +24,21 @@ const BeakerIcon = createIcon({
   ),
 });
 
-const defaultProps: IconButtonProps = {
+const defaultProps: CloseButtonProps = {
   "aria-label": "test",
   children: () => <BeakerIcon />,
 };
 
-describe("IconButton", () => {
-  checkAccessibility([<IconButton {...defaultProps} />]);
-  itIsPolymorphic(IconButton as any, defaultProps);
-  itRendersChildren(Button as any, defaultProps);
-  itSupportsClass(IconButton as any, defaultProps);
-  itSupportsRef(IconButton as any, defaultProps, HTMLButtonElement);
-  itSupportsStyle(IconButton as any, defaultProps);
+describe("CloseButton", () => {
+  checkAccessibility([<CloseButton {...defaultProps} />]);
+  itIsPolymorphic(CloseButton as any, defaultProps);
+  itRendersChildren(CloseButton as any, defaultProps);
+  itSupportsClass(CloseButton as any, defaultProps);
+  itSupportsRef(CloseButton as any, defaultProps, HTMLButtonElement);
+  itSupportsStyle(CloseButton as any, defaultProps);
 
   it("should have required 'aria-label'", () => {
-    render(() => <IconButton data-testid="button" {...defaultProps} />);
+    render(() => <CloseButton data-testid="button" {...defaultProps} />);
 
     const button = screen.getByTestId("button");
 

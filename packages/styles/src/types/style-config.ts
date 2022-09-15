@@ -104,10 +104,10 @@ export type MultiPartStyleConfigResult<
  * UseStyleConfig
  * -----------------------------------------------------------------------------------------------*/
 
-export type UseStyleConfigOptions<
+export interface BaseUseStyleConfigOptions<
   Parts extends string,
   Variants extends Record<string, any>
-> = StyleConfigVariantSelection<Variants> & {
+> {
   /**
    * Styles that will be merged with the "base styles".
    * Mostly used to override/add additional styles.
@@ -116,7 +116,12 @@ export type UseStyleConfigOptions<
 
   /** Whether the base styles should be applied or not. */
   unstyled?: boolean;
-};
+}
+
+export type UseStyleConfigOptions<
+  Parts extends string,
+  Variants extends Record<string, any>
+> = StyleConfigVariantSelection<Variants> & BaseUseStyleConfigOptions<Parts, Variants>;
 
 export interface UseStyleConfigReturn<Parts extends string> {
   /** An accessor of parts/classNames. */

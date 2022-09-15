@@ -1,5 +1,5 @@
-import { ComponentTheme, HopeProps, SystemStyleProps } from "@hope-ui/styles";
-import { Accessor, JSX } from "solid-js";
+import { ComponentTheme } from "@hope-ui/styles";
+import { JSX } from "solid-js";
 
 import { ButtonStyleConfigProps } from "./button.styles";
 
@@ -54,9 +54,6 @@ export interface IconButtonProps
   > {
   /** A label that describes the button. */
   "aria-label": string;
-
-  /** The icon to be used in the button. */
-  icon?: JSX.Element;
 
   /** The icon to be used in the button. */
   children?: JSX.Element;

@@ -4,6 +4,7 @@ import {
   hope,
   mergeThemeProps,
   ResponsiveValue,
+  STYLE_CONFIG_PROP_NAMES,
 } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { createMemo, splitProps } from "solid-js";
@@ -28,7 +29,7 @@ export const Text = createHopeComponent<"p", TextProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["class", "lineClamp"],
-    ["styleConfigOverride", "unstyled", "size"]
+    [...STYLE_CONFIG_PROP_NAMES, "size"]
   );
 
   const { baseClasses, styleOverrides } = useTextStyleConfig("Text", styleConfigProps);
