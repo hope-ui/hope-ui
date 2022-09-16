@@ -86,12 +86,14 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
     }
   };
 
-  const onFocus: JSX.EventHandlerUnion<HTMLSpanElement, FocusEvent> = event => {
+  const onTrapFocus: JSX.EventHandlerUnion<HTMLSpanElement, FocusEvent> = event => {
     if (!containerRef) {
       return;
     }
 
-    const tabbables = getAllTabbableIn(containerRef);
+    // Because this function run only when focus trap is active,
+    // we remove first and last element since they are `FocusTrap`.
+    const tabbables = getAllTabbableIn(containerRef).slice(1, -1);
 
     // Fallback to the container element
     if (!tabbables.length) {
@@ -122,21 +124,19 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
   });
 
   return (
-    <>
+    <hope.div ref={mergeRefs(el => (containerRef = el), local.ref)} tabIndex={-1} {...others}>
       <Show when={!props.isDisabled}>
-        <FocusTrapElement onFocus={onFocus} />
+        <FocusTrap onFocus={onTrapFocus} />
       </Show>
-      <hope.div ref={mergeRefs(el => (containerRef = el), local.ref)} tabIndex={-1} {...others}>
-        {props.children}
-      </hope.div>
+      {props.children}
       <Show when={!props.isDisabled}>
-        <FocusTrapElement onFocus={onFocus} />
+        <FocusTrap onFocus={onTrapFocus} />
       </Show>
-    </>
+    </hope.div>
   );
 });
 
-const FocusTrapElement = createHopeComponent<"span">(props => {
+const FocusTrap = createHopeComponent<"span">(props => {
   return (
     <VisuallyHidden
       data-focus-trap

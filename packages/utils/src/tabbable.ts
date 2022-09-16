@@ -14,23 +14,11 @@
 
 import { isFrame } from "./dom";
 
-const FOCUSABLE_ELEMENT_SELECTOR = [
-  "input:not([disabled]):not([type=hidden])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
-  "button:not([disabled])",
-  "a[href]",
-  "area[href]",
-  "summary",
-  "iframe",
-  "object",
-  "embed",
-  "audio[controls]",
-  "video[controls]",
-  "[contenteditable]:not([contenteditable='false'])",
-  ":not([hidden])",
-  "[tabindex]:not([disabled]):not([hidden])",
-].join(",");
+const FOCUSABLE_ELEMENT_SELECTOR =
+  "input:not([type='hidden']):not([disabled]), select:not([disabled]), " +
+  "textarea:not([disabled]), a[href], button:not([disabled]), [tabindex], " +
+  "iframe, object, embed, area[href], audio[controls], video[controls], " +
+  "[contenteditable]:not([contenteditable='false'])";
 
 /**
  * Returns all the tabbable elements in `container`.

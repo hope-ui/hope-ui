@@ -11,8 +11,6 @@ import { JSX } from "solid-js";
 import { isArray, isFunction, isObject } from "./assertion";
 import { Dict } from "./types";
 
-export { chain } from "@solid-primitives/utils";
-
 /** A function that does nothing. */
 export function noop() {
   return;

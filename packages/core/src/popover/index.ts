@@ -1,11 +1,26 @@
-export {};
+export * from "./popover";
+export * from "./popover-content";
+export * from "./popover-trigger";
+export * from "./types";
 
 /*
-import { Popover } from "@hope-ui/core";
-
-<Popover>
-  <Popover.Trigger><
+<Popover
+  withArrow
+  styleConfigOverride={{
+    root: {},
+    arrow: {},
+    closeButton: {},
+    heading: {},
+    description: {},
+  }}
+  >
+  <PopoverAnchor />
+  <PopoverTrigger />
+  <PopoverContent>
+    <PopoverCloseButton />
+    <PopoverHeading />
+    <PopoverDescription />
+    <div />
+  </PopoverContent>
 </Popover>
-
-
  */

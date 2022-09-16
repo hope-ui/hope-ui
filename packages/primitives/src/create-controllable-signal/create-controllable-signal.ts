@@ -1,14 +1,14 @@
-import { access, accessWith, MaybeAccessor } from "@hope-ui/utils";
+import { accessWith } from "@hope-ui/utils";
 import { Accessor, createMemo, createSignal, untrack } from "solid-js";
 
 export interface CreateControllableSignalProps<T> {
   /** The value to be used, in controlled mode. */
-  value?: MaybeAccessor<T | undefined>;
+  value?: Accessor<T | undefined>;
 
   /** The initial value to be used, in uncontrolled mode. */
-  defaultValue?: MaybeAccessor<T | undefined>;
+  defaultValue?: Accessor<T | undefined>;
 
-  /** The callback fired when the value changes. */
+  /** A function that will be called when the value changes. */
   onChange?: (value: T) => void;
 }
 
@@ -19,11 +19,11 @@ export interface CreateControllableSignalProps<T> {
 export function createControllableSignal<T>(props: CreateControllableSignalProps<T>) {
   // Internal uncontrolled value
   // eslint-disable-next-line solid/reactivity
-  const [_value, _setValue] = createSignal(access(props.defaultValue));
+  const [_value, _setValue] = createSignal(props.defaultValue?.());
 
-  const isControlled = createMemo(() => access(props.value) !== undefined);
+  const isControlled = createMemo(() => props.value?.() !== undefined);
 
-  const value = createMemo(() => (isControlled() ? access(props.value) : _value()));
+  const value = createMemo(() => (isControlled() ? props.value?.() : _value()));
 
   const setValue = (next: Exclude<T, Function> | ((prev: T) => T)) => {
     untrack(() => {

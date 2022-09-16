@@ -30,7 +30,7 @@ describe("createControllableSignal", () => {
 
       expect(value()).toBe("newValue");
 
-      // wont invoke onChange for the same value twice in a row
+      // won't invoke onChange for the same value twice in a row
       expect(onChangeSpy).not.toHaveBeenCalled();
 
       dispose();

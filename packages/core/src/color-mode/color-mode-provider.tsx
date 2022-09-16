@@ -9,7 +9,7 @@
 import { ColorMode } from "@hope-ui/styles";
 import { createEffect, createSignal, on, onCleanup } from "solid-js";
 
-import { ColorModeContext } from "./context";
+import { ColorModeContext } from "./color-mode-context";
 import { localStorageManager } from "./storage-manager";
 import { ColorModeContextType, ColorModeProviderProps, ConfigColorMode } from "./types";
 import {

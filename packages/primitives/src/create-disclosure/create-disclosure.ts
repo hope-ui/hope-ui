@@ -9,8 +9,8 @@ export interface CreateDisclosureProps {
   /** The initial value to be used, in uncontrolled mode. */
   defaultIsOpen?: MaybeAccessor<boolean | undefined>;
 
-  /** The callback fired when `isOpen` value changes. */
-  onOpenChange?: (newValue: boolean) => void;
+  /** A function that will be called when `isOpen` value changes. */
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 /**
