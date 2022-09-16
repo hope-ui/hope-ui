@@ -9,23 +9,31 @@ import userEvent from "@testing-library/user-event";
 import { createSignal, Show } from "solid-js";
 import { fireEvent, render, screen } from "solid-testing-library";
 
-import { FocusTrap, FocusTrapProps } from "./focus-trap";
+import { FocusTrapRegion, FocusTrapRegionProps } from "./focus-trap-region";
 
-const defaultProps: FocusTrapProps = {};
+const defaultProps: FocusTrapRegionProps = {};
 
-describe("FocusTrap", () => {
-  itIsPolymorphic(FocusTrap as any, { "data-testid": "focus-trap" }, "[data-testid='focus-trap']");
-  itRendersChildren(FocusTrap as any, defaultProps);
-  itSupportsClass(FocusTrap as any, defaultProps);
-  itSupportsRef(FocusTrap as any, defaultProps, HTMLDivElement);
-  itSupportsStyle(FocusTrap as any, { "data-testid": "focus-trap" }, "[data-testid='focus-trap']");
+describe("FocusTrapRegion", () => {
+  itIsPolymorphic(
+    FocusTrapRegion as any,
+    { "data-testid": "focus-trap" },
+    "[data-testid='focus-trap']"
+  );
+  itRendersChildren(FocusTrapRegion as any, defaultProps);
+  itSupportsClass(FocusTrapRegion as any, defaultProps);
+  itSupportsRef(FocusTrapRegion as any, defaultProps, HTMLDivElement);
+  itSupportsStyle(
+    FocusTrapRegion as any,
+    { "data-testid": "focus-trap" },
+    "[data-testid='focus-trap']"
+  );
 
   it("should focus element with default 'initialFocusSelector' on mount", () => {
     render(() => (
-      <FocusTrap>
+      <FocusTrapRegion>
         <button>Button 1</button>
         <button data-autofocus>Button 2</button>
-      </FocusTrap>
+      </FocusTrapRegion>
     ));
 
     expect(screen.getByText("Button 2")).toHaveFocus();
@@ -33,10 +41,10 @@ describe("FocusTrap", () => {
 
   it("should focus element with custom 'initialFocusSelector' on mount", () => {
     render(() => (
-      <FocusTrap initialFocusSelector="#first">
+      <FocusTrapRegion initialFocusSelector="#first">
         <button>Button 1</button>
         <button id="first">Button 2</button>
-      </FocusTrap>
+      </FocusTrapRegion>
     ));
 
     expect(screen.getByText("Button 2")).toHaveFocus();
@@ -44,9 +52,9 @@ describe("FocusTrap", () => {
 
   it("should focus first focusable element on mount when 'autoFocus' is true", async () => {
     render(() => (
-      <FocusTrap autoFocus>
+      <FocusTrapRegion autoFocus>
         <button>Button</button>
-      </FocusTrap>
+      </FocusTrapRegion>
     ));
 
     expect(screen.getByText("Button")).toHaveFocus();
@@ -56,7 +64,7 @@ describe("FocusTrap", () => {
     render(() => (
       <>
         <button>Before</button>
-        <FocusTrap data-testid="focus-trap" />
+        <FocusTrapRegion data-testid="focus-trap" />
         <button>After</button>
       </>
     ));
@@ -76,9 +84,9 @@ describe("FocusTrap", () => {
     render(() => (
       <>
         <button>Before</button>
-        <FocusTrap isDisabled>
+        <FocusTrapRegion isDisabled>
           <button>Button</button>
-        </FocusTrap>
+        </FocusTrapRegion>
         <button>After</button>
       </>
     ));
@@ -101,9 +109,9 @@ describe("FocusTrap", () => {
         <>
           <button onClick={() => setIsOpen(true)}>Open</button>
           <Show when={isOpen()}>
-            <FocusTrap finalFocusSelector="#last" data-testid="focus-trap">
+            <FocusTrapRegion finalFocusSelector="#last" data-testid="focus-trap">
               <button onClick={() => setIsOpen(false)}>Close</button>
-            </FocusTrap>
+            </FocusTrapRegion>
           </Show>
           <button id="last">Last</button>
         </>
@@ -144,9 +152,9 @@ describe("FocusTrap", () => {
         <>
           <button onClick={() => setIsOpen(true)}>Open</button>
           <Show when={isOpen()}>
-            <FocusTrap restoreFocus data-testid="focus-trap">
+            <FocusTrapRegion restoreFocus data-testid="focus-trap">
               <button onClick={() => setIsOpen(false)}>Close</button>
-            </FocusTrap>
+            </FocusTrapRegion>
           </Show>
         </>
       );
@@ -186,9 +194,9 @@ describe("FocusTrap", () => {
         <>
           <button onClick={() => setIsOpen(true)}>Open</button>
           <Show when={isOpen()}>
-            <FocusTrap restoreFocus finalFocusSelector="#last" data-testid="focus-trap">
+            <FocusTrapRegion restoreFocus finalFocusSelector="#last" data-testid="focus-trap">
               <button onClick={() => setIsOpen(false)}>Close</button>
-            </FocusTrap>
+            </FocusTrapRegion>
           </Show>
           <button id="last">Last</button>
         </>

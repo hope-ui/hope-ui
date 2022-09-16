@@ -3,7 +3,7 @@
  * MIT Licensed, Copyright (c) Diego Haz.
  *
  * Credits to the Ariakit team:
- * https://github.com/ariakit/ariakit/blob/main/packages/ariakit/src/focus-trap/focus-trap-region.tsx
+ * https://github.com/ariakit/ariakit/blob/232bc79018ec20967fec1e097a9474aba3bb5be7/packages/ariakit/src/focus-trap/focus-trap-region.tsx
  */
 
 import { createHopeComponent, hope } from "@hope-ui/styles";
@@ -12,7 +12,7 @@ import { JSX, onCleanup, onMount, ParentProps, Show, splitProps } from "solid-js
 
 import { VisuallyHidden } from "../visually-hidden";
 
-export interface FocusTrapProps extends ParentProps {
+export interface FocusTrapRegionProps extends ParentProps {
   /**
    * A query selector to retrieve the element that should receive focus once `FocusTrap` mounts.
    * This value has priority over `autoFocus`.
@@ -37,9 +37,9 @@ export interface FocusTrapProps extends ParentProps {
 }
 
 /**
- * `FocusTrap` traps focus within itself.
+ * `FocusTrapRegion` traps focus within itself.
  */
-export const FocusTrap = createHopeComponent<"div", FocusTrapProps>(props => {
+export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(props => {
   let finalFocusElement: HTMLElement | null;
   let containerRef: HTMLDivElement | undefined;
 

@@ -213,7 +213,7 @@ It returns two accessors:
 - `baseClasses`: the base classes to apply on each parts of the component
 - `styleOverrides`: the style overrides for each parts of the component
 
-```tsx {15,18}
+```tsx {6,15,18}
 // alert.tsx
 
 import { Box, createHopeComponent } from "@hope-ui/core";
@@ -259,7 +259,7 @@ import { Box, createHopeComponent, StyleConfigProvider } from "@hope-ui/core";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-import { AlertParts, AlertStyleConfigProps, useAlertStyleConfig } from "./alert.styles.ts";
+import { AlertStyleConfigProps, useAlertStyleConfig } from "./alert.styles.ts";
 
 export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
@@ -284,7 +284,7 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 
 Then, in `AlertTitle` and `AlertDescription` we use the `useStyleConfigContext` to consume that _context_.
 
-```tsx {6,34,48}
+```tsx {6,11,34,48}
 // alert.tsx
 
 import {
