@@ -2,6 +2,7 @@ export * from "./array";
 export * from "./assertion";
 export * from "./dom";
 export * from "./enums";
+export * from "./focus-without-scrolling";
 export * from "./function";
 export * from "./object";
 export * from "./solid";

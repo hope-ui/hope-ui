@@ -7,7 +7,7 @@
  */
 
 import { createHopeComponent, hope } from "@hope-ui/styles";
-import { getAllTabbableIn, mergeRefs } from "@hope-ui/utils";
+import { focusWithoutScrolling, getAllTabbableIn, mergeRefs } from "@hope-ui/utils";
 import { JSX, onCleanup, onMount, ParentProps, Show, splitProps } from "solid-js";
 
 import { VisuallyHidden } from "../visually-hidden";
@@ -75,14 +75,14 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
     ) as HTMLElement | null;
 
     if (initialFocusElement) {
-      initialFocusElement.focus();
+      focusWithoutScrolling(initialFocusElement);
       return;
     }
 
     // fallback to first focusable element or container.
     if (local.autoFocus) {
-      const first = getAllTabbableIn(containerRef)[0];
-      first ? first.focus() : containerRef.focus();
+      const first = getAllTabbableIn(containerRef)[0] ?? containerRef;
+      focusWithoutScrolling(first);
     }
   };
 
@@ -97,7 +97,7 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
 
     // Fallback to the container element
     if (!tabbables.length) {
-      containerRef.focus();
+      focusWithoutScrolling(containerRef);
       return;
     }
 
@@ -105,9 +105,9 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
     const last = tabbables[tabbables.length - 1];
 
     if (event.relatedTarget === first) {
-      last?.focus();
+      focusWithoutScrolling(last);
     } else {
-      first?.focus();
+      focusWithoutScrolling(first);
     }
   };
 
@@ -120,7 +120,7 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
   });
 
   onCleanup(() => {
-    finalFocusElement?.focus();
+    finalFocusElement && focusWithoutScrolling(finalFocusElement);
   });
 
   return (

@@ -72,6 +72,21 @@ function hasNegativeTabIndex(element: Element) {
   return tabIndex < 0;
 }
 
+/**
+ * Adapted from https://github.com/testing-library/jest-dom and
+ * https://github.com/vuejs/vue-test-utils-next/.
+ * Licensed under the MIT License.
+ * @param element - Element to evaluate for display or visibility.
+ */
+function isElementVisible(element: Element, childElement?: Element): boolean {
+  return (
+    element.nodeName !== "#comment" &&
+    isStyleVisible(element) &&
+    isAttributeVisible(element, childElement) &&
+    (!element.parentElement || isElementVisible(element.parentElement, element))
+  );
+}
+
 function isStyleVisible(element: Element) {
   if (!(element instanceof HTMLElement) && !(element instanceof SVGElement)) {
     return false;
@@ -104,20 +119,5 @@ function isAttributeVisible(element: Element, childElement?: Element) {
     (element.nodeName === "DETAILS" && childElement && childElement.nodeName !== "SUMMARY"
       ? element.hasAttribute("open")
       : true)
-  );
-}
-
-/**
- * Adapted from https://github.com/testing-library/jest-dom and
- * https://github.com/vuejs/vue-test-utils-next/.
- * Licensed under the MIT License.
- * @param element - Element to evaluate for display or visibility.
- */
-function isElementVisible(element: Element, childElement?: Element): boolean {
-  return (
-    element.nodeName !== "#comment" &&
-    isStyleVisible(element) &&
-    isAttributeVisible(element, childElement) &&
-    (!element.parentElement || isElementVisible(element.parentElement, element))
   );
 }

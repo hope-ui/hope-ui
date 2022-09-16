@@ -6,11 +6,21 @@
  * https://github.com/ariakit/ariakit/blob/232bc79018ec20967fec1e097a9474aba3bb5be7/packages/ariakit/src/popover/popover-state.ts
  */
 
-import { arrow, computePosition, flip, hide, offset, shift, size } from "@floating-ui/dom";
+import {
+  arrow,
+  autoUpdate,
+  computePosition,
+  flip,
+  hide,
+  offset,
+  shift,
+  size,
+} from "@floating-ui/dom";
 import { createDisclosure } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
 import { contains, getRelatedTarget, isChildrenFunction } from "@hope-ui/utils";
 import {
+  createEffect,
   createMemo,
   createSignal,
   createUniqueId,
@@ -145,21 +155,17 @@ export function Popover(props: PopoverProps) {
   const disclosureState = createDisclosure({
     isOpen: () => props.isOpen,
     defaultIsOpen: () => !!props.defaultIsOpen,
-    onOpenChange: value => {
-      props.onOpenChange?.(value);
-      value && updatePosition();
-    },
+    onOpenChange: value => props.onOpenChange?.(value),
   });
 
   let enterTimeoutId: number | undefined;
   let exitTimeoutId: number | undefined;
 
-  const closeIfNotHover = () => {
-    !isHovered() && disclosureState.close();
-  };
-
   const openWithDelay = () => {
-    enterTimeoutId = window.setTimeout(disclosureState.open, props.openDelay);
+    enterTimeoutId = window.setTimeout(() => {
+      disclosureState.open();
+      void updatePosition();
+    }, props.openDelay);
   };
 
   const closeWithDelay = () => {
@@ -181,7 +187,10 @@ export function Popover(props: PopoverProps) {
       window.clearTimeout(enterTimeoutId);
     }
 
-    exitTimeoutId = window.setTimeout(closeIfNotHover, props.closeDelay);
+    exitTimeoutId = window.setTimeout(() => {
+      // close if trigger or content is not hovered
+      !isHovered() && disclosureState.close();
+    }, props.closeDelay);
   };
 
   const onContentFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
@@ -229,6 +238,22 @@ export function Popover(props: PopoverProps) {
   onCleanup(() => {
     window.clearTimeout(enterTimeoutId);
     window.clearTimeout(exitTimeoutId);
+  });
+
+  createEffect(() => {
+    const referenceEl = anchorRef() ?? triggerRef();
+    const popoverEl = contentRef();
+
+    if (!referenceEl || !popoverEl) {
+      return;
+    }
+
+    const cleanupAutoUpdate = autoUpdate(referenceEl, popoverEl, updatePosition, {
+      // JSDOM doesn't support ResizeObserver
+      elementResize: typeof ResizeObserver === "function",
+    });
+
+    onCleanup(cleanupAutoUpdate);
   });
 
   const context: PopoverContextValue = {
