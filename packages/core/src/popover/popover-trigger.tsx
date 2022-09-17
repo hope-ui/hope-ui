@@ -57,10 +57,10 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
   return (
     <hope.button
       ref={mergeRefs(popoverContext.setTriggerRef, local.ref)}
-      id={popoverContext.triggerId()}
+      id={`${popoverContext.popoverId()}-trigger`}
       type="button"
       aria-haspopup="dialog"
-      aria-controls={popoverContext.contentId()}
+      aria-controls={popoverContext.popoverId()}
       aria-expanded={popoverContext.isOpen()}
       onClick={triggerOnClick() ? onClick : undefined}
       onKeyDown={triggerOnHover() ? onKeyDown : undefined}

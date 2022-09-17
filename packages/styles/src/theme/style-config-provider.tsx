@@ -16,7 +16,9 @@ export function useStyleConfigContext<Parts extends string>(): StyleConfigContex
   const context = useContext(StyleConfigContext);
 
   if (context == null) {
-    throw new Error("[hope-ui]: useStyleConfigContext must be used within a StyleConfigProvider");
+    throw new Error(
+      "[hope-ui]: `useStyleConfigContext` must be used within a `StyleConfigProvider` component"
+    );
   }
 
   return context;

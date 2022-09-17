@@ -1,4 +1,10 @@
-import { Popover, PopoverContent, PopoverTrigger } from "../src";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeading,
+  PopoverTrigger,
+} from "../src";
 
 export default function App() {
   return (
@@ -175,9 +181,11 @@ export default function App() {
         voluptatem. Ab aspernatur atque magnam necessitatibus, officia quam quasi repellendus!
         Laborum quaerat, quod.
       </p>
-      <Popover hasSameWidth>
+      <Popover>
         <PopoverTrigger>Trigger</PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading>Title</PopoverHeading>
+          <PopoverDescription>Desc</PopoverDescription>
           <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis, illo?</div>
           <button>button 1</button>
           <button>button 2</button>

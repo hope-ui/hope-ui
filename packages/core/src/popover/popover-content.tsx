@@ -28,11 +28,8 @@ export const PopoverContent = createHopeComponent<"section">(props => {
   const triggerOnHover = () => popoverContext.triggerMode() === "hover";
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    if (popoverContext.closeOnEsc() && event.key === "Escape") {
-      popoverContext.closeWithDelay();
-    }
-
     callHandler(local.onKeyDown, event);
+    callHandler(popoverContext.onContentKeyDown, event);
   };
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
@@ -56,13 +53,11 @@ export const PopoverContent = createHopeComponent<"section">(props => {
         <FocusTrapRegion
           as="section"
           ref={mergeRefs(popoverContext.setContentRef, local.ref)}
-          id={popoverContext.contentId()}
+          id={popoverContext.popoverId()}
           role={triggerOnHover() ? "tooltip" : "dialog"}
-          aria-labelledby={popoverContext.hasHeading() ? popoverContext.headingId() : undefined}
-          aria-describedby={
-            popoverContext.hasDescription() ? popoverContext.descriptionId() : undefined
-          }
-          isDisabled={!popoverContext.trapFocus()}
+          aria-labelledby={popoverContext.headingId()}
+          aria-describedby={popoverContext.descriptionId()}
+          trapFocus={popoverContext.trapFocus()}
           initialFocusSelector={popoverContext.initialFocusSelector()}
           finalFocusSelector={popoverContext.finalFocusSelector()}
           autoFocus={popoverContext.autoFocus()}

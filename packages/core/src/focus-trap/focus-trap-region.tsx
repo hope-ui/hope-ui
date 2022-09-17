@@ -10,9 +10,13 @@ import { createHopeComponent, hope } from "@hope-ui/styles";
 import { focusWithoutScrolling, getAllTabbableIn, mergeRefs } from "@hope-ui/utils";
 import { JSX, onCleanup, onMount, ParentProps, Show, splitProps } from "solid-js";
 
+import { mergeDefaultProps } from "../utils";
 import { VisuallyHidden } from "../visually-hidden";
 
 export interface FocusTrapRegionProps extends ParentProps {
+  /** Whether the focus trap should be active. */
+  trapFocus?: boolean;
+
   /**
    * A query selector to retrieve the element that should receive focus once `FocusTrap` mounts.
    * This value has priority over `autoFocus`.
@@ -31,9 +35,6 @@ export interface FocusTrapRegionProps extends ParentProps {
 
   /** Whether focus should be restored to the element that triggered the `FocusTrap` once it unmounts. */
   restoreFocus?: boolean;
-
-  /** Whether the focus trap should be disabled. */
-  isDisabled?: boolean;
 }
 
 /**
@@ -43,13 +44,21 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
   let finalFocusElement: HTMLElement | null;
   let containerRef: HTMLDivElement | undefined;
 
+  props = mergeDefaultProps(
+    {
+      trapFocus: true,
+      initialFocusSelector: "[data-autofocus]",
+    },
+    props
+  );
+
   const [local, others] = splitProps(props, [
     "ref",
+    "trapFocus",
     "initialFocusSelector",
     "finalFocusSelector",
     "autoFocus",
     "restoreFocus",
-    "isDisabled",
   ]);
 
   const setFinalFocusElement = () => {
@@ -71,7 +80,7 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
     }
 
     const initialFocusElement = containerRef.querySelector(
-      local.initialFocusSelector ?? "[data-autofocus]"
+      local.initialFocusSelector!
     ) as HTMLElement | null;
 
     if (initialFocusElement) {
@@ -125,11 +134,11 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
 
   return (
     <hope.div ref={mergeRefs(el => (containerRef = el), local.ref)} tabIndex={-1} {...others}>
-      <Show when={!props.isDisabled}>
+      <Show when={local.trapFocus}>
         <FocusTrap onFocus={onTrapFocus} />
       </Show>
       {props.children}
-      <Show when={!props.isDisabled}>
+      <Show when={local.trapFocus}>
         <FocusTrap onFocus={onTrapFocus} />
       </Show>
     </hope.div>

@@ -1,6 +1,6 @@
 import type { Placement as FloatingPlacement } from "@floating-ui/dom";
 import { ComponentTheme } from "@hope-ui/styles";
-import { Accessor, JSX } from "solid-js";
+import { Accessor, JSX, Setter } from "solid-js";
 
 import { PopoverStyleConfigProps } from "./popover.styles";
 
@@ -78,23 +78,35 @@ export interface PopoverContextValue {
    */
   currentPlacement: Accessor<FloatingPlacement>;
 
-  /** The `id` of the popover content element. */
-  contentId: Accessor<string>;
+  /**
+   * The `id` of the popover content element.
+   * Also act as a prefix for others popover elements `id`.
+   */
+  popoverId: Accessor<string>;
 
   /** The `id` of the popover heading element. */
-  headingId: Accessor<string>;
+  headingId: Accessor<string | undefined>;
+
+  /** Setter for the `id` of the popover heading element. */
+  setHeadingId: Setter<string | undefined>;
 
   /** The `id` of the popover description element. */
-  descriptionId: Accessor<string>;
+  descriptionId: Accessor<string | undefined>;
 
-  /** The `id` of the popover trigger element. */
-  triggerId: Accessor<string>;
+  /** Setter for the `id` of the popover description element. */
+  setDescriptionId: Setter<string | undefined>;
 
-  /** Whether the popover should be notified that the `heading` component is rendered. */
-  hasHeading: Accessor<boolean>;
+  /** A function to assign the popover content ref. */
+  setContentRef: (el: HTMLElement) => void;
 
-  /** Whether the popover should be notified that the `description` component is rendered. */
-  hasDescription: Accessor<boolean>;
+  /** A function to assign the popover arrow ref. */
+  setArrowRef: (el: HTMLElement) => void;
+
+  /** A function to assign the popover anchor ref. */
+  setAnchorRef: (el: HTMLElement) => void;
+
+  /** A function to assign the popover trigger ref. */
+  setTriggerRef: (el: HTMLElement) => void;
 
   /** Whether the popover should close when the user hit the `Esc` key. */
   closeOnEsc: Accessor<BasePopoverState["closeOnEsc"]>;
@@ -117,11 +129,8 @@ export interface PopoverContextValue {
   /** A function to close the popover with a delay. */
   closeWithDelay: () => void;
 
-  /** A function to assign the popover content ref. */
-  setContentRef: (el: HTMLElement) => void;
-
-  /** A function to assign the popover trigger ref. */
-  setTriggerRef: (el: HTMLElement) => void;
+  /** A function that will be called when a key is pressed while the popover content has focus. */
+  onContentKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
 
   /** A function that will be called when the mouse enters the popover content. */
   onContentMouseEnter: () => void;

@@ -21,7 +21,6 @@ import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@
 import { contains, getRelatedTarget, isChildrenFunction } from "@hope-ui/utils";
 import {
   createEffect,
-  createMemo,
   createSignal,
   createUniqueId,
   JSX,
@@ -75,19 +74,20 @@ export function Popover(props: PopoverProps) {
   const [arrowRef, setArrowRef] = createSignal<HTMLElement>();
 
   const [isHovered, setIsHovered] = createSignal(false);
-  const [hasHeading, setHasHeading] = createSignal(false);
-  const [hasDescription, setHasDescription] = createSignal(false);
   const [currentPlacement, setCurrentPlacement] = createSignal(props.placement!);
+  const [headingId, setHeadingId] = createSignal<string>();
+  const [descriptionId, setDescriptionId] = createSignal<string>();
 
-  const contentId = () => props.id!;
-  const headingId = createMemo(() => `${props.id}__heading`);
-  const descriptionId = createMemo(() => `${props.id}__description`);
-  const triggerId = createMemo(() => `${props.id}__trigger`);
-
-  async function updatePosition() {
+  const getPopoverElements = () => {
     const referenceEl = anchorRef() ?? triggerRef();
     const arrowEl = arrowRef();
     const popoverEl = contentRef();
+
+    return { referenceEl, arrowEl, popoverEl };
+  };
+
+  async function updatePosition() {
+    const { referenceEl, arrowEl, popoverEl } = getPopoverElements();
 
     if (!referenceEl || !popoverEl) {
       return;
@@ -176,6 +176,12 @@ export function Popover(props: PopoverProps) {
     exitTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
   };
 
+  const onContentKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
+    if (props.closeOnEsc && event.key === "Escape") {
+      closeWithDelay();
+    }
+  };
+
   const onContentMouseEnter = () => {
     setIsHovered(true);
   };
@@ -208,11 +214,8 @@ export function Popover(props: PopoverProps) {
     disclosureState.isOpen() ? closeWithDelay() : openWithDelay();
   };
 
-  const onTriggerKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    if (event.key === "Escape") {
-      closeWithDelay();
-    }
-  };
+  // For now, it's the same code but might change in the future.
+  const onTriggerKeyDown = onContentKeyDown;
 
   const onTriggerMouseEnter = () => {
     setIsHovered(true);
@@ -241,8 +244,7 @@ export function Popover(props: PopoverProps) {
   });
 
   createEffect(() => {
-    const referenceEl = anchorRef() ?? triggerRef();
-    const popoverEl = contentRef();
+    const { referenceEl, popoverEl } = getPopoverElements();
 
     if (!referenceEl || !popoverEl) {
       return;
@@ -260,12 +262,15 @@ export function Popover(props: PopoverProps) {
     isOpen: disclosureState.isOpen,
     triggerMode: () => props.triggerMode!,
     currentPlacement,
-    contentId,
+    popoverId: () => props.id!,
     headingId,
+    setHeadingId,
     descriptionId,
-    triggerId,
-    hasHeading,
-    hasDescription,
+    setDescriptionId,
+    setContentRef,
+    setArrowRef,
+    setAnchorRef,
+    setTriggerRef,
     closeOnEsc: () => props.closeOnEsc!,
     trapFocus: () => props.trapFocus!,
     initialFocusSelector: () => props.initialFocusSelector,
@@ -273,8 +278,7 @@ export function Popover(props: PopoverProps) {
     autoFocus: () => props.autoFocus!,
     restoreFocus: () => props.restoreFocus!,
     closeWithDelay,
-    setContentRef,
-    setTriggerRef,
+    onContentKeyDown,
     onContentMouseEnter,
     onContentMouseLeave,
     onContentFocusOut,

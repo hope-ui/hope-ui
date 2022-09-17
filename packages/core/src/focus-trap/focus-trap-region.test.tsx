@@ -84,7 +84,7 @@ describe("FocusTrapRegion", () => {
     render(() => (
       <>
         <button>Before</button>
-        <FocusTrapRegion isDisabled>
+        <FocusTrapRegion trapFocus={false}>
           <button>Button</button>
         </FocusTrapRegion>
         <button>After</button>

@@ -8,7 +8,7 @@ export function usePopoverContext() {
   const context = useContext(PopoverContext);
 
   if (!context) {
-    throw new Error("[Hope UI]: `usePopoverContext` must be used within a `Popover` component");
+    throw new Error("[hope-ui]: `usePopoverContext` must be used within a `Popover` component");
   }
 
   return context;

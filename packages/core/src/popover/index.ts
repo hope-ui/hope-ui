@@ -1,5 +1,7 @@
 export * from "./popover";
 export * from "./popover-content";
+export * from "./popover-description";
+export * from "./popover-heading";
 export * from "./popover-trigger";
 export * from "./types";
 
@@ -9,9 +11,6 @@ export * from "./types";
   styleConfigOverride={{
     root: {},
     arrow: {},
-    closeButton: {},
-    heading: {},
-    description: {},
   }}
   >
   <PopoverAnchor />

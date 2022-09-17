@@ -1,6 +1,6 @@
 import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
-export type PopoverParts = "root" | "arrow" | "closeButton" | "heading" | "description";
+export type PopoverParts = "root" | "arrow";
 
 export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme => ({
   root: {
@@ -35,9 +35,6 @@ export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme =
     },
   },
   arrow: {},
-  closeButton: {},
-  heading: {},
-  description: {},
 }));
 
 export type PopoverStyleConfigProps = StyleConfigProps<typeof usePopoverStyleConfig>;
