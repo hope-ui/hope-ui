@@ -1,0 +1,71 @@
+import { Image } from "@hope-ui/core";
+
+import { Preview } from "~/components/preview";
+
+# Image
+
+Display images with fallback placeholder support.
+
+## Import
+
+```tsx
+import { Image } from "@hope-ui/core";
+```
+
+## Usage
+
+<Preview isCentered>
+  <Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" objectFit="cover" maxW="200px" />
+</Preview>
+
+```tsx
+<Image src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" objectFit="cover" maxW="200px" />
+```
+
+### Fallback placeholder
+
+`Image` allows you provide a fallback placeholder, which is displayed when:
+
+- The `fallback` or `fallbackSrc` prop is provided.
+- The image provided in `src` is currently loading.
+- An error occurred while loading the image `src`.
+- No `src` prop was passed.
+
+You can also opt out of this behavior by passing the `ignoreFallback` prop.
+
+<Preview isCentered>
+  <Image src="gibberish.png" fallbackSrc="https://via.placeholder.com/150" />
+</Preview>
+
+```tsx
+<Image src="gibberish.png" fallbackSrc="https://via.placeholder.com/150" />
+```
+
+## Usage with SSR
+
+For server side rendered applications, Hope UI provides an alternative `Img` component which uses the image directly without client side checks.
+
+```tsx
+import { Img } from "@hope-ui/core";
+
+function Demo() {
+  return <Img src="https://bit.ly/3TJwRZR" alt="Monkey D. Luffy" />;
+}
+```
+
+## Props
+
+| Name           | Type                                             | Description                                                                                                                                                                                      | Default value |
+| -------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| src            | `string`                                         | The image `src` attribute.                                                                                                                                                                       |               |
+| srcSet         | `string`                                         | The image `srcset` attribute.                                                                                                                                                                    |               |
+| sizes          | `string`                                         | The image `sizes` attribute.                                                                                                                                                                     |               |
+| crossOrigin    | `"" \| "anonymous" \| "use-credentials"`         | The key used to set the crossOrigin on the `HTMLImageElement` into which the image will be loaded. This tells the browser to request cross-origin access when trying to download the image data. |               |
+| loading        | `"eager" \| "lazy"`                              | The image loading strategy.                                                                                                                                                                      |               |
+| fallbackSrc    | `string`                                         | Fallback image `src` to show if image is loading or image fails. Using a local image is recommended.                                                                                             |               |
+| fallback       | `JSX.Element`                                    | Fallback element to show if image is loading or image fails.                                                                                                                                     |               |
+| ignoreFallback | `boolean`                                        | If `true`, opt out of the `fallbackSrc` logic.                                                                                                                                                   | false         |
+| align          | `Property.ObjectPosition`                        | How to align the image within its bounds. It maps to css `object-position` property.                                                                                                             |               |
+| fit            | `Property.ObjectFit`                             | How the image to fit within its bounds. It maps to css `object-fit` property.                                                                                                                    |               |
+| onLoad         | `JSX.EventHandlerUnion<HTMLImageElement, Event>` | A callback for when the image `src` has been loaded.                                                                                                                                             |               |
+| onError        | `JSX.EventHandlerUnion<HTMLImageElement, Event>` | A callback for when there was an error loading the image `src`.                                                                                                                                  |               |

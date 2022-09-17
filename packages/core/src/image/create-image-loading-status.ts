@@ -37,7 +37,7 @@ export interface CreateImageLoadingStatusProps {
   ignoreFallback?: boolean;
 
   /**
-   * The key used to set the crossOrigin on the HTMLImageElement into which the image will be loaded.
+   * The key used to set the crossOrigin on the `HTMLImageElement` into which the image will be loaded.
    * This tells the browser to request cross-origin access when trying to download the image data.
    */
   crossOrigin?: NativeImageProps["crossOrigin"];

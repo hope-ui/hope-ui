@@ -155,6 +155,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  /*
   {
     title: "Data entry",
     links: [
@@ -164,6 +165,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  */
   {
     title: "Data display",
     links: [
@@ -181,6 +183,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  /*
   {
     title: "Feedback",
     links: [
@@ -190,6 +193,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  */
   {
     title: "Navigation",
     links: [
@@ -199,6 +203,7 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  /*
   {
     title: "Overlays",
     links: [
@@ -208,5 +213,6 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  */
   //...CHANGELOG_NAV_SECTIONS,
 ];

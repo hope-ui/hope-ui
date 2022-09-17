@@ -17,12 +17,6 @@ import {
 } from "./create-image-loading-status";
 
 interface ImageOptions {
-  /** The native HTML `width` attribute to the passed to the `img`. */
-  htmlWidth?: string | number;
-
-  /** The native HTML `height` attribute to the passed to the `img`. */
-  htmlHeight?: string | number;
-
   /** Fallback image `src` to show if image is loading or image fails. */
   fallbackSrc?: string;
 
@@ -58,8 +52,6 @@ export const Image = createHopeComponent<"img", ImageProps>(props => {
     props,
     [
       "class",
-      "htmlWidth",
-      "htmlHeight",
       "fallbackSrc",
       "fallback",
       "src",
@@ -92,8 +84,6 @@ export const Image = createHopeComponent<"img", ImageProps>(props => {
   const sharedProps = () => ({
     objectFit: local.fit,
     objectPosition: local.align,
-    width: local.htmlWidth,
-    height: local.htmlHeight,
     ...(shouldIgnore() ? loadEventProps : {}),
     ...others,
   });
@@ -122,4 +112,14 @@ export const Image = createHopeComponent<"img", ImageProps>(props => {
       />
     </Show>
   );
+});
+
+/**
+ * Fallback component for most SSR users who want to use the native `img` with
+ * Hope UI styling features.
+ */
+export const Img = createHopeComponent<"img">(props => {
+  const [local, others] = splitProps(props, ["class"]);
+
+  return <hope.img class={clsx("hope-Image-root", local.class)} {...others} />;
 });

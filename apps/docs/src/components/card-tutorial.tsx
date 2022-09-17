@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
+import { Box, Button, Flex, Img, Text } from "@hope-ui/core";
 
 export function CardTutorial() {
   return (
@@ -15,7 +15,7 @@ export function CardTutorial() {
         bg: "neutral.900",
       }}
     >
-      <Image
+      <Img
         src="https://bit.ly/3CVFryX"
         alt="Yosemite National Park"
         objectFit="cover"
