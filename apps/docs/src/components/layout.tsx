@@ -127,7 +127,7 @@ function Header(props: HeaderProps) {
                 color: "neutral.300",
               }}
             >
-              v1.0.0-next.1
+              v1.0.0-next.2
             </hope.span>
           </HStack>
         </Flex>
