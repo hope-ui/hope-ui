@@ -1,5 +1,6 @@
 import {
   Popover,
+  PopoverArrow,
   PopoverContent,
   PopoverDescription,
   PopoverHeading,
@@ -181,9 +182,10 @@ export default function App() {
         voluptatem. Ab aspernatur atque magnam necessitatibus, officia quam quasi repellendus!
         Laborum quaerat, quod.
       </p>
-      <Popover>
+      <Popover offset={25}>
         <PopoverTrigger>Trigger</PopoverTrigger>
         <PopoverContent>
+          <PopoverArrow size={50} />
           <PopoverHeading>Title</PopoverHeading>
           <PopoverDescription>Desc</PopoverDescription>
           <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis, illo?</div>

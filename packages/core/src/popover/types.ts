@@ -96,6 +96,9 @@ export interface PopoverContextValue {
   /** Setter for the `id` of the popover description element. */
   setDescriptionId: Setter<string | undefined>;
 
+  /** The popover content element. */
+  contentRef: Accessor<HTMLElement | undefined>;
+
   /** A function to assign the popover content ref. */
   setContentRef: (el: HTMLElement) => void;
 

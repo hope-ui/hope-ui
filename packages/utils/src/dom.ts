@@ -13,6 +13,20 @@
  */
 
 /**
+ * Returns `element.ownerDocument.defaultView || window`.
+ */
+export function getWindow(node?: Node | null): Window {
+  return getDocument(node).defaultView || window;
+}
+
+/**
+ * Returns `element.ownerDocument || document`.
+ */
+export function getDocument(node?: Node | null): Document {
+  return node ? node.ownerDocument || (node as Document) : document;
+}
+
+/**
  * Checks whether a `parent` element  is/or contains a `child` element.
  */
 export function contains(parent: HTMLElement | undefined, child: HTMLElement) {

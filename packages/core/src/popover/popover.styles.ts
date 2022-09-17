@@ -34,7 +34,25 @@ export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme =
       },
     },
   },
-  arrow: {},
+  arrow: {
+    baseStyle: {
+      position: "absolute",
+      boxSize: "1em",
+      pointerEvents: "none",
+
+      "& svg": {
+        stroke: "neutral.300",
+        fill: "common.white",
+      },
+
+      _dark: {
+        "& svg": {
+          stroke: "neutral.600",
+          fill: "neutral.700",
+        },
+      },
+    },
+  },
 }));
 
 export type PopoverStyleConfigProps = StyleConfigProps<typeof usePopoverStyleConfig>;
