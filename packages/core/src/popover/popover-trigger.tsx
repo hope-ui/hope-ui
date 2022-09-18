@@ -25,11 +25,13 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
   const triggerOnHover = () => popoverContext.triggerMode() === "hover";
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+    event.stopPropagation();
     callHandler(local.onClick, event);
     popoverContext.onTriggerClick();
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
+    event.stopPropagation();
     callHandler(local.onKeyDown, event);
     callHandler(popoverContext.onTriggerKeyDown, event);
   };

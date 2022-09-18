@@ -50,6 +50,8 @@ export function Popover(props: PopoverProps) {
     {
       id: `hope-popover-${createUniqueId()}`,
       triggerMode: "click",
+      withArrow: true,
+      arrowSize: 24,
       placement: "bottom",
       offset: 12,
       arrowPadding: 12,
@@ -261,6 +263,8 @@ export function Popover(props: PopoverProps) {
   const context: PopoverContextValue = {
     isOpen: disclosureState.isOpen,
     triggerMode: () => props.triggerMode!,
+    withArrow: () => props.withArrow!,
+    arrowSize: () => props.arrowSize!,
     currentPlacement,
     popoverId: () => props.id!,
     headingId,

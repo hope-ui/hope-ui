@@ -21,19 +21,25 @@ interface BasePopoverState {
    */
   triggerMode: "hover" | "click";
 
+  /** Whether the popover should display an arrow inside it. */
+  withArrow: boolean;
+
+  /** The size of the arrow (in px). */
+  arrowSize: number;
+
   /** Placement of the popover. */
   placement: FloatingPlacement;
 
   /** Whether the popover should have the same width as the anchor element. */
   hasSameWidth: boolean;
 
-  /** Offset between the popover and the anchor element. */
+  /** Offset between the popover and the anchor element (in px). */
   offset: number;
 
-  /** The minimum padding between the arrow and the popover corner. */
+  /** The minimum padding between the arrow and the popover corner (in px). */
   arrowPadding: number;
 
-  /** The minimum padding between the popover and the viewport edge. */
+  /** The minimum padding between the popover and the viewport edge (in px). */
   overflowPadding: number;
 
   /** Delay before showing the popover (in ms). */
@@ -70,6 +76,12 @@ export interface PopoverContextValue {
 
   /** The interaction that triggers the popover. */
   triggerMode: Accessor<BasePopoverState["triggerMode"]>;
+
+  /** Whether the popover should display an arrow inside it. */
+  withArrow: Accessor<BasePopoverState["withArrow"]>;
+
+  /** The size of the arrow (in px). */
+  arrowSize: Accessor<BasePopoverState["arrowSize"]>;
 
   /**
    * The current placement of the popover content. This may be different

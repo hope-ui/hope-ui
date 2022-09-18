@@ -11,7 +11,6 @@ import { getWindow, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createRenderEffect, createSignal, splitProps } from "solid-js";
 
-import { mergeDefaultProps } from "../utils";
 import { PopoverParts } from "./popover.styles";
 import { usePopoverContext } from "./popover-context";
 import { BasePlacement } from "./types";
@@ -31,22 +30,15 @@ const ROTATE_MAP = {
   left: `rotate(90 ${HALF_ARROW_VIEWBOX_SIZE} ${HALF_ARROW_VIEWBOX_SIZE})`,
 };
 
-export interface PopoverArrowProps {
-  /** The size of the arrow (in px). */
-  size?: number;
-}
-
 /**
  * PopoverArrow renders an arrow inside a `Popover` component.
  */
-export const PopoverArrow = createHopeComponent<"div", PopoverArrowProps>(props => {
+export const PopoverArrow = createHopeComponent<"div">(props => {
   const popoverContext = usePopoverContext();
 
   const { baseClasses, styleOverrides } = useStyleConfigContext<PopoverParts>();
 
-  props = mergeDefaultProps({ size: 24 }, props);
-
-  const [local, others] = splitProps(props, ["ref", "class", "style", "children", "size"]);
+  const [local, others] = splitProps(props, ["ref", "class", "style", "children"]);
 
   const dir = () => popoverContext.currentPlacement().split("-")[0] as BasePlacement;
 
@@ -54,7 +46,9 @@ export const PopoverArrow = createHopeComponent<"div", PopoverArrowProps>(props 
   const fill = () => contentStyle()?.getPropertyValue("background-color") || "none";
   const stroke = () => contentStyle()?.getPropertyValue(`border-${dir()}-color`) || "none";
   const borderWidth = () => contentStyle()?.getPropertyValue(`border-${dir()}-width`) || "0px";
-  const strokeWidth = () => parseInt(borderWidth()) * 2 * (ARROW_VIEWBOX_SIZE / local.size!);
+  const strokeWidth = () => {
+    return parseInt(borderWidth()) * 2 * (ARROW_VIEWBOX_SIZE / popoverContext.arrowSize());
+  };
 
   return (
     <hope.div
@@ -62,7 +56,7 @@ export const PopoverArrow = createHopeComponent<"div", PopoverArrowProps>(props 
       aria-hidden="true"
       style={{
         // SSR
-        "font-size": `${local.size!}px`,
+        "font-size": `${popoverContext.arrowSize()}px`,
         fill: fill(),
         stroke: stroke(),
         "stroke-width": strokeWidth(),
