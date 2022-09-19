@@ -1,26 +1,25 @@
-import {
-  Popover,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeading,
-  PopoverTrigger,
-} from "../src";
+import { createDisclosure } from "@hope-ui/primitives";
+
+import { Box, Transition } from "../src";
+
+function Foo(props: any) {
+  console.log("rerender");
+  return <Box {...props}></Box>;
+}
 
 export default function App() {
+  const { isOpen, toggle } = createDisclosure();
+
   return (
     <>
-      <Popover trapFocus placement="left">
-        <PopoverTrigger>Trigger</PopoverTrigger>
-        <PopoverContent p={4}>
-          <PopoverHeading>Title</PopoverHeading>
-          <PopoverDescription>Desc</PopoverDescription>
-          <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis, illo?</div>
-          <button>button 1</button>
-          <button>button 2</button>
-          <PopoverCloseButton />
-        </PopoverContent>
-      </Popover>
+      <button onClick={toggle}>toggle transition</button>
+      <Transition mounted={isOpen()} transition="slide-right" duration={1000} timingFunction="ease">
+        {styles => (
+          <Foo style={styles} bg="neutral.900" color="neutral.50" h={10} w="40">
+            Your modal
+          </Foo>
+        )}
+      </Transition>
     </>
   );
 }

@@ -48,7 +48,7 @@ export type ResponsiveProps<Props> = {
   [K in keyof Props]?: ResponsiveValue<Props[K]>;
 };
 
-export type BorderProps = ResponsiveProps<{
+export type SystemStyleBorderProps = ResponsiveProps<{
   /** The CSS `border` property. */
   border: Property.Border;
 
@@ -116,7 +116,7 @@ export type BorderProps = ResponsiveProps<{
   borderY: Property.BorderTop;
 }>;
 
-export type ColorProps = ResponsiveProps<{
+export type SystemStyleColorProps = ResponsiveProps<{
   /** The CSS `color` property. */
   color: Property.Color | ColorSystemTokenName;
 
@@ -136,7 +136,7 @@ export type ColorProps = ResponsiveProps<{
   opacity: Property.Opacity;
 }>;
 
-export type FlexboxProps = ResponsiveProps<{
+export type SystemStyleFlexboxProps = ResponsiveProps<{
   /**
    * The CSS `align-items` property.
    *
@@ -270,7 +270,7 @@ export type FlexboxProps = ResponsiveProps<{
   order: Property.Order;
 }>;
 
-export type GridLayoutProps = ResponsiveProps<{
+export type SystemStyleGridProps = ResponsiveProps<{
   /**
    * The CSS `grid-template` property.
    *
@@ -471,7 +471,7 @@ export type GridLayoutProps = ResponsiveProps<{
   columnGap: Property.ColumnGap<ThemeSpace> | number;
 }>;
 
-export type LayoutProps = ResponsiveProps<{
+export type SystemStyleLayoutProps = ResponsiveProps<{
   /** The CSS `display` property. */
   display: Property.Display;
 
@@ -491,7 +491,7 @@ export type LayoutProps = ResponsiveProps<{
   overflowY: Property.OverflowY;
 }>;
 
-export type InteractivityProps = ResponsiveProps<{
+export type SystemStyleInteractivityProps = ResponsiveProps<{
   /** The CSS `appearance` property. */
   appearance: Property.Appearance;
 
@@ -517,7 +517,7 @@ export type InteractivityProps = ResponsiveProps<{
   outlineColor: Property.OutlineColor | ColorSystemTokenName;
 }>;
 
-export type MarginProps = ResponsiveProps<{
+export type SystemStyleMarginProps = ResponsiveProps<{
   /** The CSS `margin` property. */
   margin: Property.Margin<ThemeSpace> | number;
 
@@ -567,7 +567,7 @@ export type MarginProps = ResponsiveProps<{
   my: Property.MarginTop<ThemeSpace> | number;
 }>;
 
-export type PaddingProps = ResponsiveProps<{
+export type SystemStylePaddingProps = ResponsiveProps<{
   /** The CSS `padding` property. */
   padding: Property.Padding<ThemeSpace> | number;
 
@@ -617,7 +617,7 @@ export type PaddingProps = ResponsiveProps<{
   py: Property.PaddingTop<ThemeSpace> | number;
 }>;
 
-export type PositionProps = ResponsiveProps<{
+export type SystemStylePositionProps = ResponsiveProps<{
   /** The CSS `position` property. */
   position: Property.Position;
 
@@ -640,7 +640,7 @@ export type PositionProps = ResponsiveProps<{
   left: Property.Left<ThemeSpace> | number;
 }>;
 
-export type RadiiProps = ResponsiveProps<{
+export type SystemStyleRadiiProps = ResponsiveProps<{
   /** The CSS `border-radius` property. */
   borderRadius: Property.BorderRadius<ThemeRadii> | number;
 
@@ -684,7 +684,7 @@ export type RadiiProps = ResponsiveProps<{
   roundedLeft: Property.BorderTopLeftRadius<ThemeRadii> | number;
 }>;
 
-export type ShadowProps = ResponsiveProps<{
+export type SystemStyleShadowProps = ResponsiveProps<{
   /** The CSS `text-shadow` property. */
   textShadow: Property.TextShadow | ThemeShadow;
 
@@ -695,7 +695,7 @@ export type ShadowProps = ResponsiveProps<{
   shadow: Property.BoxShadow | ThemeShadow;
 }>;
 
-export type SizeProps = ResponsiveProps<{
+export type SystemStyleSizeProps = ResponsiveProps<{
   /** The CSS `width` property. */
   width: Property.Width<ThemeSize> | number;
 
@@ -736,7 +736,7 @@ export type SizeProps = ResponsiveProps<{
   boxSize: Property.Width<ThemeSize> | number;
 }>;
 
-export type TypographyProps = ResponsiveProps<{
+export type SystemStyleTypographyProps = ResponsiveProps<{
   /** The CSS `font-family` property. */
   fontFamily: Property.FontFamily | ThemeFontFamily;
 
@@ -765,7 +765,7 @@ export type TypographyProps = ResponsiveProps<{
   textDecoration: Property.TextDecoration;
 }>;
 
-export type TransformProps = ResponsiveProps<{
+export type SystemStyleTransformProps = ResponsiveProps<{
   /** The CSS `transform` property. */
   transform: Property.Transform;
 
@@ -776,7 +776,7 @@ export type TransformProps = ResponsiveProps<{
   clipPath: Property.ClipPath;
 }>;
 
-export type TransitionProps = ResponsiveProps<{
+export type SystemStyleTransitionProps = ResponsiveProps<{
   /** The CSS `transition` property. */
   transition: Property.Transition;
 
@@ -799,7 +799,7 @@ export type TransitionProps = ResponsiveProps<{
   willChange: Property.WillChange;
 }>;
 
-export type OtherStyleProps = ResponsiveProps<{
+export type SystemStyleOthersProps = ResponsiveProps<{
   /** The CSS `object-fit` property. */
   objectFit?: Property.ObjectFit;
 
@@ -807,22 +807,22 @@ export type OtherStyleProps = ResponsiveProps<{
   objectPosition?: Property.ObjectPosition;
 }>;
 
-export type BaseSystemStyleProps = BorderProps &
-  ColorProps &
-  FlexboxProps &
-  GridLayoutProps &
-  InteractivityProps &
-  LayoutProps &
-  MarginProps &
-  PaddingProps &
-  PositionProps &
-  RadiiProps &
-  ShadowProps &
-  SizeProps &
-  TransformProps &
-  TransitionProps &
-  TypographyProps &
-  OtherStyleProps;
+export type BaseSystemStyleProps = SystemStyleBorderProps &
+  SystemStyleColorProps &
+  SystemStyleFlexboxProps &
+  SystemStyleGridProps &
+  SystemStyleInteractivityProps &
+  SystemStyleLayoutProps &
+  SystemStyleMarginProps &
+  SystemStylePaddingProps &
+  SystemStylePositionProps &
+  SystemStyleRadiiProps &
+  SystemStyleShadowProps &
+  SystemStyleSizeProps &
+  SystemStyleTransformProps &
+  SystemStyleTransitionProps &
+  SystemStyleTypographyProps &
+  SystemStyleOthersProps;
 
 export type BaseSystemStyleObject = OverrideProps<CSSObject, BaseSystemStyleProps>;
 

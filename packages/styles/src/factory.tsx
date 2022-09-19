@@ -33,6 +33,7 @@ import { useTheme } from "./theme";
 import { BooleanMap, SxProp, SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
 import { pack } from "./utils";
 import { shouldApplyCompound } from "./utils/should-apply-compound";
+import { getNativeHTMLProps, prefixedHTMLPropsMap } from "./utils/prefixed-html-props";
 
 /**
  * All html and svg elements for hope components.
@@ -163,9 +164,11 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
     // generate style options classNames once.
     runOnce(theme);
 
-    const [local, styleProps, others] = splitProps(
+    const [local, prefixedHTMLProps, variantProps, styleProps, others] = splitProps(
       props,
-      ["as", "class", "sx", "__css", ...variantPropsKeys],
+      ["as", "class", "sx", "__css"],
+      [...prefixedHTMLPropsMap.keys()],
+      variantPropsKeys,
       extractStyleProps(props)
     );
 
@@ -176,7 +179,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
 
       const selectedVariants = {
         ...styleOptions?.defaultVariants,
-        ...filterUndefined(local),
+        ...filterUndefined(variantProps),
       } as HopeVariantSelection<Variants>;
 
       const { variantClassNames = {} as any, compoundVariants = [] } = styleResult;
@@ -232,6 +235,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
             local.class
           ) || undefined
         }
+        {...getNativeHTMLProps(prefixedHTMLProps)}
         {...others}
       />
     );

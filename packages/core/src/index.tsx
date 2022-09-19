@@ -25,4 +25,5 @@ export * from "./popover";
 export * from "./spacer";
 export * from "./stack";
 export * from "./text";
+export * from "./transition";
 export * from "./visually-hidden";

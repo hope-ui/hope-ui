@@ -182,7 +182,7 @@ describe("createControllableSignal", () => {
       dispose();
     }));
 
-  it("should only trigger onChange once when using using NaN", async () =>
+  it("should only trigger onChange once when using NaN", async () =>
     createRoot(async dispose => {
       const onChangeSpy = jest.fn();
 

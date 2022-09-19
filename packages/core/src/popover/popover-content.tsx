@@ -1,6 +1,5 @@
 import { createHopeComponent, useStyleConfigContext } from "@hope-ui/styles";
 import { callHandler, mergeRefs } from "@hope-ui/utils";
-import { Presence } from "@motionone/solid";
 import { clsx } from "clsx";
 import { JSX, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
@@ -52,36 +51,34 @@ export const PopoverContent = createHopeComponent<"section">(props => {
   };
 
   return (
-    <Presence exitBeforeEnter>
-      <Show when={popoverContext.isOpen()}>
-        <Portal>
-          <FocusTrapRegion
-            as="section"
-            ref={mergeRefs(popoverContext.setContentRef, local.ref)}
-            id={popoverContext.popoverId()}
-            role={triggerOnHover() ? "tooltip" : "dialog"}
-            aria-labelledby={popoverContext.headingId()}
-            aria-describedby={popoverContext.descriptionId()}
-            trapFocus={popoverContext.trapFocus()}
-            initialFocusSelector={popoverContext.initialFocusSelector()}
-            finalFocusSelector={popoverContext.finalFocusSelector()}
-            autoFocus={popoverContext.autoFocus()}
-            restoreFocus={popoverContext.restoreFocus()}
-            class={clsx(baseClasses().root, local.class)}
-            __css={styleOverrides().root}
-            onKeyDown={onKeyDown}
-            onFocusOut={onFocusOut}
-            onMouseEnter={triggerOnHover() ? onMouseEnter : undefined}
-            onMouseLeave={triggerOnHover() ? onMouseLeave : undefined}
-            {...others}
-          >
-            <Show when={popoverContext.withArrow()}>
-              <PopoverArrow />
-            </Show>
-            {local.children}
-          </FocusTrapRegion>
-        </Portal>
-      </Show>
-    </Presence>
+    <Show when={popoverContext.isOpen()}>
+      <Portal>
+        <FocusTrapRegion
+          as="section"
+          ref={mergeRefs(popoverContext.setContentRef, local.ref)}
+          id={popoverContext.popoverId()}
+          role={triggerOnHover() ? "tooltip" : "dialog"}
+          aria-labelledby={popoverContext.headingId()}
+          aria-describedby={popoverContext.descriptionId()}
+          trapFocus={popoverContext.trapFocus()}
+          initialFocusSelector={popoverContext.initialFocusSelector()}
+          finalFocusSelector={popoverContext.finalFocusSelector()}
+          autoFocus={popoverContext.autoFocus()}
+          restoreFocus={popoverContext.restoreFocus()}
+          class={clsx(baseClasses().root, local.class)}
+          __css={styleOverrides().root}
+          onKeyDown={onKeyDown}
+          onFocusOut={onFocusOut}
+          onMouseEnter={triggerOnHover() ? onMouseEnter : undefined}
+          onMouseLeave={triggerOnHover() ? onMouseLeave : undefined}
+          {...others}
+        >
+          <Show when={popoverContext.withArrow()}>
+            <PopoverArrow />
+          </Show>
+          {local.children}
+        </FocusTrapRegion>
+      </Portal>
+    </Show>
   );
 });

@@ -1,26 +1,26 @@
 import {
-  BorderProps,
-  ColorProps,
-  FlexboxProps,
-  GridLayoutProps,
-  InteractivityProps,
+  SystemStyleBorderProps,
+  SystemStyleColorProps,
+  SystemStyleFlexboxProps,
+  SystemStyleGridProps,
+  SystemStyleInteractivityProps,
   KeysOf,
-  LayoutProps,
-  MarginProps,
-  OtherStyleProps,
-  PaddingProps,
-  PositionProps,
+  SystemStyleLayoutProps,
+  SystemStyleMarginProps,
+  SystemStyleOthersProps,
+  SystemStylePaddingProps,
+  SystemStylePositionProps,
   PseudoSelectorProps,
-  RadiiProps,
-  ShadowProps,
-  SizeProps,
+  SystemStyleRadiiProps,
+  SystemStyleShadowProps,
+  SystemStyleSizeProps,
   SystemStyleProps,
-  TransformProps,
-  TransitionProps,
-  TypographyProps,
+  SystemStyleTransformProps,
+  SystemStyleTransitionProps,
+  SystemStyleTypographyProps,
 } from "../types";
 
-const borderPropNames: KeysOf<BorderProps> = {
+const borderPropNames: KeysOf<SystemStyleBorderProps> = {
   border: true,
   borderWidth: true,
   borderStyle: true,
@@ -45,7 +45,7 @@ const borderPropNames: KeysOf<BorderProps> = {
   borderY: true,
 };
 
-const colorPropNames: KeysOf<ColorProps> = {
+const colorPropNames: KeysOf<SystemStyleColorProps> = {
   color: true,
   background: true,
   bg: true,
@@ -54,7 +54,7 @@ const colorPropNames: KeysOf<ColorProps> = {
   opacity: true,
 };
 
-const flexboxPropNames: KeysOf<FlexboxProps> = {
+const flexboxPropNames: KeysOf<SystemStyleFlexboxProps> = {
   alignItems: true,
   alignContent: true,
   alignSelf: true,
@@ -70,7 +70,7 @@ const flexboxPropNames: KeysOf<FlexboxProps> = {
   order: true,
 };
 
-const gridLayoutPropNames: KeysOf<GridLayoutProps> = {
+const gridLayoutPropNames: KeysOf<SystemStyleGridProps> = {
   gridTemplate: true,
   gridTemplateColumns: true,
   gridTemplateRows: true,
@@ -93,7 +93,7 @@ const gridLayoutPropNames: KeysOf<GridLayoutProps> = {
   columnGap: true,
 };
 
-const interactivityPropNames: KeysOf<InteractivityProps> = {
+const interactivityPropNames: KeysOf<SystemStyleInteractivityProps> = {
   appearance: true,
   userSelect: true,
   pointerEvents: true,
@@ -104,7 +104,7 @@ const interactivityPropNames: KeysOf<InteractivityProps> = {
   outlineColor: true,
 };
 
-const layoutPropNames: KeysOf<LayoutProps> = {
+const layoutPropNames: KeysOf<SystemStyleLayoutProps> = {
   display: true,
   d: true,
   verticalAlign: true,
@@ -113,7 +113,7 @@ const layoutPropNames: KeysOf<LayoutProps> = {
   overflowY: true,
 };
 
-const marginPropNames: KeysOf<MarginProps> = {
+const marginPropNames: KeysOf<SystemStyleMarginProps> = {
   margin: true,
   marginTop: true,
   marginRight: true,
@@ -132,7 +132,7 @@ const marginPropNames: KeysOf<MarginProps> = {
   my: true,
 };
 
-const paddingPropNames: KeysOf<PaddingProps> = {
+const paddingPropNames: KeysOf<SystemStylePaddingProps> = {
   padding: true,
   paddingTop: true,
   paddingRight: true,
@@ -151,7 +151,7 @@ const paddingPropNames: KeysOf<PaddingProps> = {
   py: true,
 };
 
-const positionPropNames: KeysOf<PositionProps> = {
+const positionPropNames: KeysOf<SystemStylePositionProps> = {
   position: true,
   pos: true,
   zIndex: true,
@@ -161,7 +161,7 @@ const positionPropNames: KeysOf<PositionProps> = {
   left: true,
 };
 
-const radiiPropNames: KeysOf<RadiiProps> = {
+const radiiPropNames: KeysOf<SystemStyleRadiiProps> = {
   borderRadius: true,
   borderTopRightRadius: true,
   borderTopLeftRadius: true,
@@ -178,13 +178,13 @@ const radiiPropNames: KeysOf<RadiiProps> = {
   roundedLeft: true,
 };
 
-const shadowPropNames: KeysOf<ShadowProps> = {
+const shadowPropNames: KeysOf<SystemStyleShadowProps> = {
   textShadow: true,
   boxShadow: true,
   shadow: true,
 };
 
-const sizePropNames: KeysOf<SizeProps> = {
+const sizePropNames: KeysOf<SystemStyleSizeProps> = {
   width: true,
   minWidth: true,
   maxWidth: true,
@@ -200,13 +200,13 @@ const sizePropNames: KeysOf<SizeProps> = {
   boxSize: true,
 };
 
-const transformPropNames: KeysOf<TransformProps> = {
+const transformPropNames: KeysOf<SystemStyleTransformProps> = {
   transform: true,
   transformOrigin: true,
   clipPath: true,
 };
 
-const transitionPropNames: KeysOf<TransitionProps> = {
+const transitionPropNames: KeysOf<SystemStyleTransitionProps> = {
   transition: true,
   transitionProperty: true,
   transitionTimingFunction: true,
@@ -216,7 +216,7 @@ const transitionPropNames: KeysOf<TransitionProps> = {
   willChange: true,
 };
 
-const typographyPropNames: KeysOf<TypographyProps> = {
+const typographyPropNames: KeysOf<SystemStyleTypographyProps> = {
   fontFamily: true,
   fontSize: true,
   fontWeight: true,
@@ -228,7 +228,7 @@ const typographyPropNames: KeysOf<TypographyProps> = {
   textDecoration: true,
 };
 
-const otherStylePropNames: KeysOf<OtherStyleProps> = {
+const otherStylePropNames: KeysOf<SystemStyleOthersProps> = {
   objectFit: true,
   objectPosition: true,
 };

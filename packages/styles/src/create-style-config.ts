@@ -109,7 +109,7 @@ export function createStyleConfig<Parts extends string, Variants extends Record<
     const componentTheme = useComponentTheme(name);
 
     // generate static, base and theme classNames once.
-    runOnce(name, theme, componentTheme()?.styleConfig);
+    runOnce(name, theme, componentTheme()?.styleConfigOverride);
 
     const styleConfigOverride = createMemo(() => {
       return runIfFn(options.styleConfigOverride, theme);
