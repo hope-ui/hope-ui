@@ -42,7 +42,12 @@ function merge(fn: AnyFunction, ...selectors: string[]) {
   return selectors.map(fn).join(", ");
 }
 
-// TODO: use tailwind pseudo https://tailwindcss.com/docs/hover-focus-and-other-states#quick-reference
+export const LIGHT_PSEUDO_PROP = "_light";
+export const DARK_PSEUDO_PROP = "_dark";
+
+export const LIGHT_SELECTOR = `.${COLOR_MODE_CLASSNAMES.light} &:not([data-theme]), [data-theme=light] &:not([data-theme]), &[data-theme=light]`;
+export const DARK_SELECTOR = `.${COLOR_MODE_CLASSNAMES.dark} &:not([data-theme]), [data-theme=dark] &:not([data-theme]), &[data-theme=dark]`;
+
 /** Map system style pseudo props to css pseudo selectors. */
 export const PSEUDO_SELECTORS_MAP = new Map<keyof PseudoSelectorProps, string>([
   ["_hover", "&:hover, &[data-hover]"],
@@ -101,14 +106,8 @@ export const PSEUDO_SELECTORS_MAP = new Map<keyof PseudoSelectorProps, string>([
   ["_ltr", "[dir=ltr] &, &[dir=ltr]"],
   ["_mediaDark", "@media (prefers-color-scheme: dark)"],
   ["_mediaReduceMotion", "@media (prefers-reduced-motion: reduce)"],
-  [
-    "_light",
-    `.${COLOR_MODE_CLASSNAMES.light} &:not([data-theme]), [data-theme=light] &:not([data-theme]), &[data-theme=light]`,
-  ],
-  [
-    "_dark",
-    `.${COLOR_MODE_CLASSNAMES.dark} &:not([data-theme]), [data-theme=dark] &:not([data-theme]), &[data-theme=dark]`,
-  ],
+  [LIGHT_PSEUDO_PROP, LIGHT_SELECTOR],
+  [DARK_PSEUDO_PROP, DARK_SELECTOR],
 ]);
 
 /** Map system style shorthands props to css properties. */

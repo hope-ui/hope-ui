@@ -32,8 +32,8 @@ import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
 import { BooleanMap, SxProp, SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
 import { pack } from "./utils";
-import { shouldApplyCompound } from "./utils/should-apply-compound";
 import { getNativeHTMLProps, prefixedHTMLPropsMap } from "./utils/prefixed-html-props";
+import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 /**
  * All html and svg elements for hope components.
@@ -212,7 +212,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
         {},
         local.__css,
         filterUndefined(styleProps),
-        ...pack<SxProp["sx"]>(local.sx).map(partial => runIfFn(partial, theme))
+        ...pack<SxProp["sx"]>(local.sx).map(partialSx => runIfFn(partialSx, theme))
       );
 
       if (isEmptyObject(styleOverrides)) {

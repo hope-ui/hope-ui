@@ -27,18 +27,31 @@ import {
 import { ThemeVarsAndBreakpoints } from "./vars";
 
 /*
-import { Suffixed } from "./suffixed";
+type Suffixed<K extends string, T> = `${Extract<T, boolean | number | string>}${K}`;
 type MaybeImportant<T> = T | Suffixed<"!", T>;
 export type ResponsiveArray<T> = Array<MaybeImportant<T> | null>;
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeImportant<T>>>;
 type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | ResponsiveObject<T>;
 */
 
+/*
 export type ResponsiveArray<T> = Array<T | null>;
 
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 
 type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
+*/
+
+type MaybeColorModeAwareValue<T> =
+  | T
+  | `${Extract<T, boolean | number | string>}|${Extract<T, boolean | number | string>}`;
+
+export type ResponsiveArray<T> = Array<MaybeColorModeAwareValue<T> | null>;
+
+export type ResponsiveObject<T> = Partial<
+  Record<ThemeBreakpoint | string, MaybeColorModeAwareValue<T>>
+>;
+type ResponsiveValueRaw<T> = MaybeColorModeAwareValue<T> | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>

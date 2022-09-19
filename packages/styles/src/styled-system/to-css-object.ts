@@ -6,11 +6,16 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/styled-system/src/css.ts
  */
 
-import { isObject, runIfFn } from "@hope-ui/utils";
+import { isEmptyObject, isObject, isString, runIfFn } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps, SystemStyleObject, Theme } from "../types";
-import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
+import {
+  DARK_PSEUDO_PROP,
+  DARK_SELECTOR,
+  PSEUDO_SELECTORS_MAP,
+  SHORTHANDS_MAP,
+} from "./property-map";
 import { resolveTokenValue } from "./resolve-token-value";
 
 /** Return a CSSObject from a system style object. */
@@ -22,6 +27,8 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
   }
 
   const { isResponsive, toArrayValue, medias } = theme.__breakpoints;
+
+  let darkSystemStyleObject: SystemStyleObject = {};
 
   for (let key in systemStyleObject) {
     /**
@@ -65,6 +72,31 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
       }
 
       continue;
+    }
+
+    /**
+     * Extract dark mode style.
+     */
+    if (key === DARK_PSEUDO_PROP && isObject(value)) {
+      darkSystemStyleObject = {
+        ...darkSystemStyleObject,
+        ...value,
+      };
+      continue;
+    }
+
+    /**
+     * Split `light|dark` values.
+     * Assuming "light" as first/default interface.
+     */
+    if (isString(value)) {
+      const [lightValue, darkValue] = value.split("|");
+
+      value = lightValue;
+
+      if (darkValue != null) {
+        darkSystemStyleObject[key] = darkValue;
+      }
     }
 
     /**
@@ -114,6 +146,14 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
 
       computedStyles[propertyName] = value;
     }
+  }
+
+  if (!isEmptyObject(darkSystemStyleObject)) {
+    computedStyles[DARK_SELECTOR] = Object.assign(
+      {},
+      computedStyles[DARK_SELECTOR],
+      toCSSObject(darkSystemStyleObject, theme)
+    );
   }
 
   return computedStyles;
