@@ -6,28 +6,29 @@
  * https://github.com/mantinedev/mantine/blob/8546c580fdcaa9653edc6f4813103349a96cfb09/src/mantine-core/src/Transition/get-transition-styles/get-transition-styles.ts
  */
 
+import { Property } from "@hope-ui/styles";
 import { isString } from "@hope-ui/utils";
 import { JSX } from "solid-js";
 
 import { DEFAULT_TRANSITIONS } from "./default-transitions";
-import { TransitionValue } from "./types";
+import { HopeTransition, TransitionStyles } from "./types";
 
 const TRANSITION_STATUSES = {
-  entering: "in",
-  entered: "in",
-  exiting: "out",
-  exited: "out",
-  "pre-entering": "out",
-  "pre-exiting": "out",
+  beforeEnter: "out",
+  enter: "in",
+  afterEnter: "in",
+  beforeExit: "in", //"out",
+  exit: "out",
+  afterExit: "out",
 } as const;
 
 export type TransitionStatus = keyof typeof TRANSITION_STATUSES;
 
 interface GetTransitionStylesParams {
-  transition: TransitionValue;
+  transition: HopeTransition;
   status: TransitionStatus;
   duration: number;
-  timingFunction: JSX.CSSProperties["transition-timing-function"];
+  timingFunction: Property.TransitionTimingFunction;
 }
 
 export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSProperties {
@@ -44,7 +45,7 @@ export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSP
     const transitionStyles = DEFAULT_TRANSITIONS[params.transition];
 
     return {
-      "transition-property": transitionStyles.transitionProperty,
+      "transition-property": getTransitionProperty(transitionStyles),
       ...shared,
       ...transitionStyles.common,
       ...transitionStyles[TRANSITION_STATUSES[params.status]],
@@ -52,9 +53,15 @@ export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSP
   }
 
   return {
-    "transition-property": params.transition.transitionProperty,
+    "transition-property": getTransitionProperty(params.transition),
     ...shared,
     ...params.transition.common,
     ...params.transition[TRANSITION_STATUSES[params.status]],
   };
+}
+
+function getTransitionProperty(transitionStyles: TransitionStyles): string {
+  return [
+    ...new Set([...Object.keys(transitionStyles.in), ...Object.keys(transitionStyles.out)]),
+  ].join(", ");
 }

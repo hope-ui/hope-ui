@@ -7,7 +7,7 @@
  */
 
 import { createReducedMotion } from "@hope-ui/primitives";
-import { runIfFn } from "@hope-ui/utils";
+import { Property } from "@hope-ui/styles";
 import { createEffect, createSignal, on, onCleanup } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
@@ -15,40 +15,58 @@ import { TransitionStatus } from "./get-transition-styles";
 
 export interface CreateTransitionProps {
   /** Whether the component should be mounted. */
-  mounted: boolean;
+  isMounted: boolean;
 
-  /** Transition duration (in ms). */
+  /** Transitions duration (in ms). */
   duration?: number;
+
+  /** Delay before starting transitions (in ms). */
+  delay?: number;
+
+  /** Transitions timing function. */
+  easing?: Property.TransitionTimingFunction;
 
   /** Exit transition duration (in ms). */
   exitDuration?: number;
 
-  /** Transition timing function. */
-  timingFunction?: string;
+  /** Delay before starting the exit transition (in ms). */
+  exitDelay?: number;
+
+  /** Exit transition timing function. */
+  exitEasing?: Property.TransitionTimingFunction;
 
   /** Calls when enter transition starts. */
-  onEnter?: () => void;
+  onBeforeEnter?: () => void;
 
   /** Calls when enter transition ends. */
-  onEntered?: () => void;
+  onAfterEnter?: () => void;
 
   /** Calls when exit transition starts. */
-  onExit?: () => void;
+  onBeforeExit?: () => void;
 
   /** Calls when exit transition ends. */
-  onExited?: () => void;
+  onAfterExit?: () => void;
 }
 
 const DEFAULT_DURATION = 250;
+const DEFAULT_DELAY = 10;
+const DEFAULT_EASING: Property.TransitionTimingFunction = "ease";
 
 export function createTransition(props: CreateTransitionProps) {
   props = mergeDefaultProps(
     {
       duration: DEFAULT_DURATION,
+      delay: DEFAULT_DELAY,
+      easing: DEFAULT_EASING,
       get exitDuration() {
         return props.duration || DEFAULT_DURATION;
       },
-      timingFunction: "ease",
+      get exitDelay() {
+        return props.delay || DEFAULT_DELAY;
+      },
+      get exitEasing() {
+        return props.easing || DEFAULT_EASING;
+      },
     },
     props
   );
@@ -56,47 +74,56 @@ export function createTransition(props: CreateTransitionProps) {
   const reduceMotion = createReducedMotion();
 
   const [transitionStatus, setStatus] = createSignal<TransitionStatus>(
-    props.mounted ? "entered" : "exited"
+    props.isMounted ? "afterEnter" : "afterExit"
   );
 
   const [transitionDuration, setTransitionDuration] = createSignal(
     reduceMotion() ? 0 : props.duration!
   );
 
+  const [transitionTimingFunction, setTransitionTimingFunction] = createSignal(props.easing!);
+
   let timeoutId = -1;
 
   const handleStateChange = (shouldMount: boolean) => {
-    const preHandler = shouldMount ? props.onEnter : props.onExit;
-    const handler = shouldMount ? props.onEntered : props.onExited;
+    const preHandler = shouldMount ? props.onBeforeEnter : props.onBeforeExit;
+    const postHandler = shouldMount ? props.onAfterEnter : props.onAfterExit;
 
-    setStatus(shouldMount ? "pre-entering" : "pre-exiting");
+    setStatus(shouldMount ? "beforeEnter" : "beforeExit");
 
     window.clearTimeout(timeoutId);
 
-    setTransitionDuration(reduceMotion() ? 0 : shouldMount ? props.duration! : props.exitDuration!);
+    const duration = setTransitionDuration(
+      reduceMotion() ? 0 : shouldMount ? props.duration! : props.exitDuration!
+    );
 
-    if (transitionDuration() === 0) {
-      runIfFn(preHandler);
-      runIfFn(handler);
-      setStatus(shouldMount ? "entered" : "exited");
-    } else {
-      const preStateTimeout = window.setTimeout(() => {
-        runIfFn(preHandler);
-        setStatus(shouldMount ? "entering" : "exiting");
-      }, 10);
+    setTransitionTimingFunction(shouldMount ? props.easing! : props.exitEasing!);
 
-      timeoutId = window.setTimeout(() => {
-        window.clearTimeout(preStateTimeout);
-        runIfFn(handler);
-        setStatus(shouldMount ? "entered" : "exited");
-      }, transitionDuration());
+    if (duration === 0) {
+      preHandler?.();
+      postHandler?.();
+      setStatus(shouldMount ? "afterEnter" : "afterExit");
+      return;
     }
+
+    const delay = reduceMotion() ? 0 : shouldMount ? props.delay! : props.exitDelay!;
+
+    const preStateTimeoutId = window.setTimeout(() => {
+      preHandler?.();
+      setStatus(shouldMount ? "enter" : "exit");
+    }, delay);
+
+    timeoutId = window.setTimeout(() => {
+      window.clearTimeout(preStateTimeoutId);
+      postHandler?.();
+      setStatus(shouldMount ? "afterEnter" : "afterExit");
+    }, delay + duration);
   };
 
   createEffect(
     on(
-      () => props.mounted,
-      mounted => handleStateChange(mounted),
+      () => props.isMounted,
+      isMounted => handleStateChange(isMounted),
       { defer: true }
     )
   );
@@ -106,6 +133,6 @@ export function createTransition(props: CreateTransitionProps) {
   return {
     transitionDuration,
     transitionStatus,
-    transitionTimingFunction: () => props.timingFunction!,
+    transitionTimingFunction,
   };
 }

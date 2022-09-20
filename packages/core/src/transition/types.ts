@@ -9,10 +9,14 @@
 import { JSX } from "solid-js";
 
 export interface TransitionStyles {
-  common?: JSX.CSSProperties;
+  /** Styles for mounted state. */
   in: JSX.CSSProperties;
+
+  /** Styles for unmounted state. */
   out: JSX.CSSProperties;
-  transitionProperty: JSX.CSSProperties["transition-property"];
+
+  /** Styles for both mounted and unmounted states. */
+  common?: JSX.CSSProperties;
 }
 
 export type TransitionName =
@@ -34,4 +38,4 @@ export type TransitionName =
   | "pop-bottom-left"
   | "pop-bottom-right";
 
-export type TransitionValue = TransitionName | TransitionStyles;
+export type HopeTransition = TransitionName | TransitionStyles;
