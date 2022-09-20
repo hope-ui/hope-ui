@@ -1,7 +1,7 @@
 import { Heading, hope, VStack } from "@hope-ui/core";
 import { Link, useLocation } from "@solidjs/router";
 import { Accessor, createEffect, createSignal, For, onCleanup, Suspense } from "solid-js";
-import { createServerData$ } from "solid-start/server";
+import { createServerData } from "solid-start/server";
 
 import { mods } from "../root";
 
@@ -140,13 +140,11 @@ const TocRoot = hope("div", theme => ({
 export function TableOfContents() {
   const path = useLocation();
 
-  const toc = createServerData$(
+  const toc = createServerData(
+    () => path.pathname,
     async pathname => {
       const mod = mods[`./routes${pathname}.mdx`] ?? mods[`./routes${pathname}.md`];
       return mod.getHeadings().filter(h => h.depth > 1 && h.depth <= 3);
-    },
-    {
-      key: () => path.pathname,
     }
   );
 
