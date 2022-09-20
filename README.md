@@ -1,17 +1,17 @@
 # hope-ui
 
 <p>
-  <a href="https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript">
-    <img src="https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18" alt="Language grade: JavaScript"/>
+  <a href="https://lgtm.com/projects/g/hope-ui/hope-ui/context:javascript">
+    <img src="https://img.shields.io/lgtm/grade/javascript/g/hope-ui/hope-ui.svg?logo=lgtm&logoWidth=18" alt="Language grade: JavaScript"/>
   </a>
   <a href="LICENSE.md">
-    <img src="https://img.shields.io/github/license/fabien-ml/hope-ui" alt="MIT License"/>
+    <img src="https://img.shields.io/github/license/hope-ui/hope-ui" alt="MIT License"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/v/@hope-ui/solid" alt="npm - @hope-ui/solid"/>
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/v/@hope-ui/core" alt="npm - @hope-ui/core"/>
   </a>
-  <a href="https://www.npmjs.com/package/@hope-ui/solid">
-    <img src="https://img.shields.io/npm/dm/@hope-ui/solid.svg" alt="npm - downloads" height="18">
+  <a href="https://www.npmjs.com/package/@hope-ui/core">
+    <img src="https://img.shields.io/npm/dm/@hope-ui/core.svg" alt="npm - downloads" height="18">
   </a>
 </p>
 

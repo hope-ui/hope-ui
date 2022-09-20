@@ -58,48 +58,48 @@ function getRootSolidColorSchemeCompoundVariants(vars: ThemeVars) {
         colorScheme,
       },
       style: {
-        color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+        color: isWarning ? vars.colors[colorScheme]["900"] : "common.white",
         backgroundColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
         borderColor: vars.colors[colorScheme][isNeutral ? "800" : isWarning ? "300" : "500"],
 
         _hover: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : "common.white",
           backgroundColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
           borderColor: vars.colors[colorScheme][isNeutral ? "700" : isWarning ? "400" : "600"],
         },
 
         _active: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.common.white,
+          color: isWarning ? vars.colors[colorScheme]["900"] : "common.white",
           backgroundColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
           borderColor: vars.colors[colorScheme][isNeutral ? "600" : isWarning ? "500" : "700"],
         },
 
         _disabled: {
-          color: vars.colors.neutral["200"],
-          backgroundColor: vars.colors.neutral["100"],
-          borderColor: vars.colors.neutral["100"],
+          color: "neutral.200",
+          backgroundColor: "neutral.100",
+          borderColor: "neutral.100",
         },
 
         _dark: {
-          color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+          color: isWarning ? vars.colors[colorScheme]["900"] : "whiteAlpha.900",
           backgroundColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
           borderColor: vars.colors[colorScheme][isWarning ? "500" : "700"],
 
           _hover: {
-            color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+            color: isWarning ? vars.colors[colorScheme]["900"] : "whiteAlpha.900",
             backgroundColor: vars.colors[colorScheme][isWarning ? "400" : "600"],
             borderColor: vars.colors[colorScheme][isWarning ? "400" : "600"],
           },
 
           _active: {
-            color: isWarning ? vars.colors[colorScheme]["900"] : vars.colors.whiteAlpha["900"],
+            color: isWarning ? vars.colors[colorScheme]["900"] : "whiteAlpha.900",
             backgroundColor: vars.colors[colorScheme][isWarning ? "300" : "500"],
             borderColor: vars.colors[colorScheme][isWarning ? "300" : "500"],
           },
 
           _disabled: {
-            color: vars.colors.whiteAlpha["300"],
-            backgroundColor: vars.colors.whiteAlpha["100"],
+            color: "whiteAlpha.300",
+            backgroundColor: "whiteAlpha.100",
             borderColor: "transparent",
           },
         },
@@ -140,9 +140,9 @@ function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
         },
 
         _disabled: {
-          color: vars.colors.neutral["200"],
-          backgroundColor: vars.colors.neutral["50"],
-          borderColor: vars.colors.neutral["50"],
+          color: "neutral.200",
+          backgroundColor: "neutral.50",
+          borderColor: "neutral.50",
         },
 
         _dark: {
@@ -163,8 +163,8 @@ function getRootSoftColorSchemeCompoundVariants(vars: ThemeVars) {
           },
 
           _disabled: {
-            color: vars.colors.whiteAlpha["200"],
-            backgroundColor: vars.colors.whiteAlpha["50"],
+            color: "whiteAlpha.200",
+            backgroundColor: "whiteAlpha.50",
             borderColor: "transparent",
           },
         },
@@ -205,9 +205,9 @@ function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
         },
 
         _disabled: {
-          color: vars.colors.neutral["200"],
+          color: "neutral.200",
           backgroundColor: "transparent",
-          borderColor: vars.colors.neutral["100"],
+          borderColor: "neutral.100",
         },
 
         _dark: {
@@ -228,9 +228,9 @@ function getRootOutlinedColorSchemeCompoundVariants(vars: ThemeVars) {
           },
 
           _disabled: {
-            color: vars.colors.whiteAlpha["200"],
+            color: "whiteAlpha.200",
             backgroundColor: "transparent",
-            borderColor: vars.colors.whiteAlpha["50"],
+            borderColor: "whiteAlpha.50",
           },
         },
       },
@@ -270,7 +270,7 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
         },
 
         _disabled: {
-          color: vars.colors.neutral["200"],
+          color: "neutral.200",
           backgroundColor: "transparent",
           borderColor: "transparent",
         },
@@ -293,7 +293,7 @@ function getRootPlainColorSchemeCompoundVariants(vars: ThemeVars) {
           },
 
           _disabled: {
-            color: vars.colors.whiteAlpha["200"],
+            color: "whiteAlpha.200",
             backgroundColor: "transparent",
             borderColor: "transparent",
           },
@@ -378,49 +378,49 @@ export const useButtonStyleConfig = createStyleConfig<ButtonParts, ButtonVariant
       variants: {
         variant: {
           default: {
-            color: vars.colors.neutral["800"],
-            backgroundColor: vars.colors.common.white,
-            borderColor: vars.colors.neutral["300"],
+            color: "neutral.800",
+            backgroundColor: "common.white",
+            borderColor: "neutral.300",
 
             _hover: {
-              color: vars.colors.neutral["800"],
-              backgroundColor: vars.colors.neutral["100"],
-              borderColor: vars.colors.neutral["300"],
+              color: "neutral.800",
+              backgroundColor: "neutral.100",
+              borderColor: "neutral.300",
             },
 
             _active: {
-              color: vars.colors.neutral["800"],
-              backgroundColor: vars.colors.neutral["200"],
-              borderColor: vars.colors.neutral["400"],
+              color: "neutral.800",
+              backgroundColor: "neutral.200",
+              borderColor: "neutral.400",
             },
 
             _disabled: {
-              color: vars.colors.neutral["200"],
+              color: "neutral.200",
               backgroundColor: "transparent",
-              borderColor: vars.colors.neutral["100"],
+              borderColor: "neutral.100",
             },
 
             _dark: {
-              color: vars.colors.whiteAlpha["900"],
-              backgroundColor: vars.colors.whiteAlpha["50"],
-              borderColor: vars.colors.whiteAlpha["200"],
+              color: "whiteAlpha.900",
+              backgroundColor: "whiteAlpha.50",
+              borderColor: "whiteAlpha.200",
 
               _hover: {
-                color: vars.colors.whiteAlpha["900"],
-                backgroundColor: vars.colors.whiteAlpha["100"],
-                borderColor: vars.colors.whiteAlpha["200"],
+                color: "whiteAlpha.900",
+                backgroundColor: "whiteAlpha.100",
+                borderColor: "whiteAlpha.200",
               },
 
               _active: {
-                color: vars.colors.whiteAlpha["900"],
-                backgroundColor: vars.colors.whiteAlpha["200"],
-                borderColor: vars.colors.whiteAlpha["300"],
+                color: "whiteAlpha.900",
+                backgroundColor: "whiteAlpha.200",
+                borderColor: "whiteAlpha.300",
               },
 
               _disabled: {
-                color: vars.colors.whiteAlpha["200"],
+                color: "whiteAlpha.200",
                 backgroundColor: "transparent",
-                borderColor: vars.colors.whiteAlpha["50"],
+                borderColor: "whiteAlpha.50",
               },
             },
           },

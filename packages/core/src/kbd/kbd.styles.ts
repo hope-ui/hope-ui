@@ -17,13 +17,8 @@ export const useKbdStyleConfig = createStyleConfig<"root", {}>({
       lineHeight: "normal",
       whiteSpace: "nowrap",
 
-      borderColor: "neutral.300",
-      backgroundColor: "neutral.100",
-
-      _dark: {
-        borderColor: "neutral.600",
-        backgroundColor: "neutral.800",
-      },
+      borderColor: { light: "neutral.300", dark: "neutral.600" },
+      backgroundColor: { light: "neutral.100", dark: "neutral.800" },
     },
   },
 });
