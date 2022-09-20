@@ -19,9 +19,7 @@ export default defineConfig({
     }),
     solid({ adapter, extensions: [".mdx", ".md"] }),
   ],
-  /*
   ssr: {
     noExternal: ["@hope-ui/core", "@hope-ui/styles"],
   },
-  */
 });
