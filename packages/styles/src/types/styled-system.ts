@@ -27,14 +27,6 @@ import {
 import { ThemeVarsAndBreakpoints } from "./vars";
 
 /*
-type Suffixed<K extends string, T> = `${Extract<T, boolean | number | string>}${K}`;
-type MaybeImportant<T> = T | Suffixed<"!", T>;
-export type ResponsiveArray<T> = Array<MaybeImportant<T> | null>;
-export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeImportant<T>>>;
-type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | ResponsiveObject<T>;
-*/
-
-/*
 export type ResponsiveArray<T> = Array<T | null>;
 
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
@@ -42,16 +34,17 @@ export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
 */
 
-type MaybeColorModeAwareValue<T> =
-  | T
-  | `${Extract<T, boolean | number | string>}|${Extract<T, boolean | number | string>}`;
+export interface SystemStyleColorModeValue<T> {
+  light?: T;
+  dark?: T;
+}
 
-export type ResponsiveArray<T> = Array<MaybeColorModeAwareValue<T> | null>;
+type MaybeColorModeValue<T> = T | SystemStyleColorModeValue<T>;
 
-export type ResponsiveObject<T> = Partial<
-  Record<ThemeBreakpoint | string, MaybeColorModeAwareValue<T>>
->;
-type ResponsiveValueRaw<T> = MaybeColorModeAwareValue<T> | ResponsiveArray<T> | ResponsiveObject<T>;
+export type ResponsiveArray<T> = Array<MaybeColorModeValue<T> | null>;
+
+export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeColorModeValue<T>>>;
+type ResponsiveValueRaw<T> = MaybeColorModeValue<T> | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>

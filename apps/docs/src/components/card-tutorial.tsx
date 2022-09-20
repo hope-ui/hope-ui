@@ -5,15 +5,12 @@ export function CardTutorial() {
     <Flex
       direction="column"
       border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
+      borderColor={{ dark: "neutral.800" }}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
-      bg="white"
-      _dark={{
-        borderColor: "neutral.800",
-        bg: "neutral.900",
-      }}
+      bg={{ light: "white", dark: "neutral.900" }}
     >
       <Img
         src="https://bit.ly/3CVFryX"
@@ -24,20 +21,16 @@ export function CardTutorial() {
       />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold" _dark={{ color: "neutral.300" }}>
+          <Text fontWeight="semibold" color={{ dark: "neutral.300" }}>
             Yosemite National Park
           </Text>
           <Flex
             px={2}
             py={1}
             align="center"
-            bgColor="success.50"
-            color="success.800"
+            bgColor={{ light: "success.50", dark: "success.900" }}
+            color={{ light: "success.800", dark: "success.300" }}
             rounded="full"
-            _dark={{
-              bgColor: "success.900",
-              color: "success.300",
-            }}
           >
             <Text
               as="span"
@@ -50,7 +43,7 @@ export function CardTutorial() {
             </Text>
           </Flex>
         </Flex>
-        <Text size="sm" color="neutral.500" mb={3} _dark={{ color: "neutral.400" }}>
+        <Text size="sm" color={{ light: "neutral.500", dark: "neutral.400" }} mb={3}>
           Yosemite National Park is an American national park in California, surrounded on the
           southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>

@@ -8,6 +8,7 @@
 
 import { DEFAULT_THEME } from "../../theme";
 import { ThemeVarsAndBreakpoints } from "../../types";
+import { DARK_SELECTOR } from "../property-map";
 import { toCSSObject } from "../to-css-object";
 
 describe("toCSSObject", () => {
@@ -351,15 +352,15 @@ describe("toCSSObject", () => {
 
     expect(keys).toMatchInlineSnapshot(`
     Array [
-      "paddingInlineStart",
-      "paddingInlineEnd",
       "flexDirection",
-      "@media screen and (min-width: 640px)",
-      "@media screen and (min-width: 768px)",
       "color",
       "height",
+      "paddingInlineStart",
+      "paddingInlineEnd",
       "paddingTop",
       "paddingBottom",
+      "@media screen and (min-width: 640px)",
+      "@media screen and (min-width: 768px)",
     ]
   `);
   });
@@ -425,6 +426,99 @@ describe("toCSSObject", () => {
       "background": "${DEFAULT_THEME.vars.colors.primary["100"]} !important",
       "padding": "4px !important",
     }
+  `);
+  });
+
+  it("supports color mode object syntax", () => {
+    const result = toCSSObject(
+      {
+        background: { light: "white", dark: "neutral.900" },
+      },
+      DEFAULT_THEME
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+    Object {
+      "${DARK_SELECTOR}": Object {
+        "background": "${DEFAULT_THEME.vars.colors.neutral["900"]}",
+      },
+      "background": "white",
+    }
+  `);
+  });
+
+  it("merge dark mode values from color mode object syntax and '_dark' pseudo prop", () => {
+    const result = toCSSObject(
+      {
+        _dark: {
+          color: "white",
+        },
+        color: "black",
+        background: { light: "white", dark: "neutral.900" },
+      },
+      DEFAULT_THEME
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+    Object {
+      "${DARK_SELECTOR}": Object {
+        "background": "${DEFAULT_THEME.vars.colors.neutral["900"]}",
+        "color": "white",
+      },
+      "background": "white",
+      "color": "black",
+    }
+  `);
+  });
+
+  it("supports both color mode object and responsive syntax combined", () => {
+    const result = toCSSObject(
+      {
+        background: {
+          base: { light: "blue", dark: "red" },
+          sm: { light: "tomato", dark: "teal" },
+          md: { light: "green", dark: "yellow" },
+        },
+        color: [{ light: "black", dark: "white" }, null, { light: "white", dark: "black" }],
+      },
+      DEFAULT_THEME
+    );
+
+    expect(result).toMatchInlineSnapshot(`
+    Object {
+      "${DARK_SELECTOR}": Object {
+        "background": "red",
+        "color": "white",
+      },
+      "@media screen and (min-width: 640px)": Object {
+        "${DARK_SELECTOR}": Object {
+          "background": "teal",
+        },
+        "background": "tomato",
+      },
+      "@media screen and (min-width: 768px)": Object {
+        "${DARK_SELECTOR}": Object {
+          "background": "yellow",
+          "color": "black",
+        },
+        "background": "green",
+        "color": "white",
+      },
+      "background": "blue",
+      "color": "black",
+    }
+  `);
+
+    const keys = Object.keys(result);
+
+    expect(keys).toMatchInlineSnapshot(`
+    Array [
+      "background",
+      "color",
+      "${DARK_SELECTOR}",
+      "@media screen and (min-width: 640px)",
+      "@media screen and (min-width: 768px)",
+    ]
   `);
   });
 });

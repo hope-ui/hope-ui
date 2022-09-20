@@ -3,7 +3,7 @@
  * MIT Licensed, Copyright (c) 2021 Vitaly Rtishchev.
  *
  * Credits to the Mantinedev team:
- * https://github.com/mantinedev/mantine/blob/master/src/mantine-styles/src/theme/utils/to-rgba/to-rgba.ts
+ * https://github.com/mantinedev/mantine/blob/8546c580fdcaa9653edc6f4813103349a96cfb09/src/mantine-styles/src/theme/utils/to-rgba/to-rgba.ts
  */
 
 interface RGBA {
@@ -71,4 +71,9 @@ export function toRgba(hexOrRgb: string): RGBA {
     b: 0,
     a: 1,
   };
+}
+
+export function rgbColorChannel(hexOrRgb: string): string {
+  const { r, g, b } = toRgba(hexOrRgb);
+  return `${r} ${g} ${b}`;
 }

@@ -8,13 +8,17 @@ export default function App() {
       <button onClick={toggleColorMode}>toggle color mode</button>
       <Box
         mb={4}
-        p={2}
-        bg="tomato|royalblue"
-        color="black|white"
-        _dark={{
+        p={{ light: 2, dark: 4 }}
+        bg={{
+          base: { light: "blue", dark: "red" },
+          sm: { light: "tomato", dark: "teal" },
+          md: { light: "green", dark: "yellow" },
+        }}
+        color={[{ light: "black", dark: "white" }, null, { light: "white", dark: "black" }]}
+        _hover={{
           fontWeight: "bold",
-          _hover: {
-            fontSize: "2xl",
+          _dark: {
+            fontWeight: "hairline",
           },
         }}
       >

@@ -212,7 +212,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
         {},
         local.__css,
         filterUndefined(styleProps),
-        ...pack<SxProp["sx"]>(local.sx).map(partialSx => runIfFn(partialSx, theme))
+        ...pack<SxProp["sx"]>(local.sx).map(partial => runIfFn(partial, theme))
       );
 
       if (isEmptyObject(styleOverrides)) {

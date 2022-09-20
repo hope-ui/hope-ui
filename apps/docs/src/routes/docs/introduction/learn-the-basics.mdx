@@ -255,9 +255,9 @@ function Card() {
 
 ### Dark mode support
 
-We can go a step further and add dark mode support to our `Card` component. Hope UI provides a `_dark` style prop that lets you define the style to apply when the application is in dark mode.
+We can go a step further and add dark mode support to our `Card` component. Hope UI's style props accept an object has value in which you can set the `light` and/or `dark` value.
 
-```tsx {12-15,26,36-39,52}
+```tsx {7,12,23,30-31,45}
 import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 export function Card() {
@@ -265,15 +265,12 @@ export function Card() {
     <Flex
       direction="column"
       border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
+      borderColor={{ dark: "neutral.800" }}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
-      bg="white"
-      _dark={{
-        borderColor: "neutral.800",
-        bg: "neutral.900",
-      }}
+      bg={{ light: "white", dark: "neutral.900" }}
     >
       <Image
         src="https://bit.ly/3CVFryX"
@@ -284,20 +281,16 @@ export function Card() {
       />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold" _dark={{ color: "neutral.300" }}>
+          <Text fontWeight="semibold" color={{ dark: "neutral.300" }}>
             Yosemite National Park
           </Text>
           <Flex
             px={2}
             py={1}
             align="center"
-            bgColor="success.50"
-            color="success.800"
+            bgColor={{ light: "success.50", dark: "success.900" }}
+            color={{ light: "success.800", dark: "success.300" }}
             rounded="full"
-            _dark={{
-              bgColor: "success.900",
-              color: "success.300",
-            }}
           >
             <Text
               as="span"
@@ -310,7 +303,7 @@ export function Card() {
             </Text>
           </Flex>
         </Flex>
-        <Text size="sm" color="neutral.500" mb={3} _dark={{ color: "neutral.400" }}>
+        <Text size="sm" color={{ light: "neutral.500", dark: "neutral.400" }} mb={3}>
           Yosemite National Park is an American national park in California, surrounded on the
           southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
         </Text>
