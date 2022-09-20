@@ -28,15 +28,15 @@
     "start": "solid-start start"
   },
   "dependencies": {
-    "@hope-ui/core": "workspace:*",
+    "@hope-ui/core": "1.0.0-next.3",
     "@solidjs/meta": "0.28.0",
-    "@solidjs/router": "0.4.2",
+    "@solidjs/router": "0.4.3",
     "@stitches/core": "1.2.8",
     "clsx": "1.2.1"
   },
   "devDependencies": {
-    "@hope-ui/mdx": "workspace:*",
-    "babel-preset-solid": "1.5.4",
+    "@hope-ui/mdx": "1.0.0-next.3",
+    "babel-preset-solid": "1.5.5",
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",
     "node-fetch": "2.6.7",
@@ -45,14 +45,12 @@
     "remark-gfm": "3.0.1",
     "safer-buffer": "2.1.2",
     "shiki": "0.11.1",
-    "solid-js": "1.5.4",
+    "solid-js": "1.5.5",
     "solid-mdx": "0.0.6",
-    "solid-start": "0.1.0-alpha.99",
-    "solid-start-netlify": "0.1.0-alpha.99",
-    "solid-start-node": "0.1.0-alpha.99",
-    "typescript": "4.7.4",
-    "undici": "5.8.1",
-    "vite": "3.0.9"
+    "solid-start": "0.1.0-alpha.105",
+    "solid-start-netlify": "0.1.0-alpha.105",
+    "solid-start-node": "0.1.0-alpha.105",
+    "undici": "5.10.0"
   },
   "engines": {
     "node": ">=16"
