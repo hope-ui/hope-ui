@@ -6,39 +6,45 @@
  * https://github.com/mantinedev/mantine/blob/8546c580fdcaa9653edc6f4813103349a96cfb09/src/mantine-core/src/Transition/use-transition.ts
  */
 
-import { createReducedMotion } from "@hope-ui/primitives";
-import { Property } from "@hope-ui/styles";
-import { access, MaybeAccessor } from "@hope-ui/utils";
-import { Accessor, createEffect, createMemo, createSignal, JSX, on, onCleanup } from "solid-js";
+import {
+  Accessor,
+  createEffect,
+  createMemo,
+  createSignal,
+  JSX,
+  mergeProps,
+  on,
+  onCleanup,
+} from "solid-js";
 
-import { mergeDefaultProps } from "../utils";
+import { createReducedMotion } from "../create-reduce-motion";
 import { getTransitionStyles, TransitionPhase } from "./get-transition-styles";
 import { HopeTransition } from "./types";
 
-export interface CreateTransitionProps {
-  /** Predefined transition name or transition styles. */
-  transition: MaybeAccessor<HopeTransition>;
-
+export interface TransitionOptions {
   /** Whether the component should be mounted. */
-  isMounted: MaybeAccessor<boolean>;
+  shouldMount: boolean;
+
+  /** Predefined transition name or transition styles. */
+  transition: HopeTransition;
 
   /** Transitions duration (in ms). */
-  duration?: MaybeAccessor<number | undefined>;
+  duration?: number;
 
   /** Exit transition duration (in ms). */
-  exitDuration?: MaybeAccessor<number | undefined>;
+  exitDuration?: number;
 
   /** Delay before starting transitions (in ms). */
-  delay?: MaybeAccessor<number | undefined>;
+  delay?: number;
 
   /** Delay before starting the exit transition (in ms). */
-  exitDelay?: MaybeAccessor<number | undefined>;
+  exitDelay?: number;
 
   /** Transitions timing function. */
-  easing?: MaybeAccessor<Property.TransitionTimingFunction | undefined>;
+  easing?: JSX.CSSProperties["transition-timing-function"];
 
   /** Exit transition timing function. */
-  exitEasing?: MaybeAccessor<Property.TransitionTimingFunction | undefined>;
+  exitEasing?: JSX.CSSProperties["transition-timing-function"];
 
   /** Calls when enter transition starts. */
   onBeforeEnter?: () => void;
@@ -53,62 +59,66 @@ export interface CreateTransitionProps {
   onAfterExit?: () => void;
 }
 
-export interface CreateTransitionResult {
+export interface TransitionResult {
   /** Whether the element should be kept in the DOM. */
   keepMounted: Accessor<boolean>;
 
-  /** The transition styles. */
+  /** The transition style to apply on the element. */
   style: Accessor<JSX.CSSProperties>;
 }
 
 const DEFAULT_DURATION = 250;
 const DEFAULT_DELAY = 10;
-const DEFAULT_EASING: Property.TransitionTimingFunction = "ease";
+const DEFAULT_EASING: JSX.CSSProperties["transition-timing-function"] = "ease";
 
-export function createTransition(props: CreateTransitionProps): CreateTransitionResult {
-  props = mergeDefaultProps(
+/**
+ * Primitive for working with enter/exit transitions.
+ * It comes with pre-made transitions and option to create custom ones.
+ */
+export function createTransition(options: TransitionOptions): TransitionResult {
+  options = mergeProps(
     {
       duration: DEFAULT_DURATION,
       delay: DEFAULT_DELAY,
       easing: DEFAULT_EASING,
       get exitDuration() {
-        return access(props.duration) || DEFAULT_DURATION;
+        return options.duration || DEFAULT_DURATION;
       },
       get exitDelay() {
-        return access(props.delay) || DEFAULT_DELAY;
+        return options.delay || DEFAULT_DELAY;
       },
       get exitEasing() {
-        return access(props.easing) || DEFAULT_EASING;
+        return options.easing || DEFAULT_EASING;
       },
-    },
-    props
+    } as TransitionOptions,
+    options
   );
 
   const reduceMotion = createReducedMotion();
 
-  const [duration, setDuration] = createSignal(reduceMotion() ? 0 : access(props.duration)!);
+  const [duration, setDuration] = createSignal(reduceMotion() ? 0 : options.duration!);
 
   const [phase, setPhase] = createSignal<TransitionPhase>(
-    access(props.isMounted) ? "afterEnter" : "afterExit"
+    options.shouldMount ? "afterEnter" : "afterExit"
   );
 
-  const [easing, setEasing] = createSignal(access(props.easing)!);
+  const [easing, setEasing] = createSignal(options.easing!);
 
   let timeoutId = -1;
 
   const handleStateChange = (shouldMount: boolean) => {
-    const preHandler = shouldMount ? props.onBeforeEnter : props.onBeforeExit;
-    const postHandler = shouldMount ? props.onAfterEnter : props.onAfterExit;
+    const preHandler = shouldMount ? options.onBeforeEnter : options.onBeforeExit;
+    const postHandler = shouldMount ? options.onAfterEnter : options.onAfterExit;
 
     setPhase(shouldMount ? "beforeEnter" : "beforeExit");
 
     window.clearTimeout(timeoutId);
 
     const newDuration = setDuration(
-      reduceMotion() ? 0 : shouldMount ? access(props.duration)! : access(props.exitDuration)!
+      reduceMotion() ? 0 : shouldMount ? options.duration! : options.exitDuration!
     );
 
-    setEasing(shouldMount ? access(props.easing)! : access(props.exitEasing)!);
+    setEasing(shouldMount ? options.easing! : options.exitEasing!);
 
     if (newDuration === 0) {
       preHandler?.();
@@ -117,11 +127,7 @@ export function createTransition(props: CreateTransitionProps): CreateTransition
       return;
     }
 
-    const delay = reduceMotion()
-      ? 0
-      : shouldMount
-      ? access(props.delay)!
-      : access(props.exitDelay)!;
+    const delay = reduceMotion() ? 0 : shouldMount ? options.delay! : options.exitDelay!;
 
     const preStateTimeoutId = window.setTimeout(() => {
       preHandler?.();
@@ -137,7 +143,7 @@ export function createTransition(props: CreateTransitionProps): CreateTransition
 
   const style = createMemo(() =>
     getTransitionStyles({
-      transition: access(props.transition),
+      transition: options.transition,
       duration: duration(),
       phase: phase(),
       easing: easing(),
@@ -148,8 +154,8 @@ export function createTransition(props: CreateTransitionProps): CreateTransition
 
   createEffect(
     on(
-      () => access(props.isMounted),
-      isMounted => handleStateChange(isMounted),
+      () => options.shouldMount,
+      shouldMount => handleStateChange(shouldMount),
       { defer: true }
     )
   );

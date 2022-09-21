@@ -1,4 +1,5 @@
 import type { Placement as FloatingPlacement } from "@floating-ui/dom";
+import { TransitionOptions, TransitionResult } from "@hope-ui/primitives";
 import { ComponentTheme } from "@hope-ui/styles";
 import { Accessor, JSX, Setter } from "solid-js";
 
@@ -9,6 +10,9 @@ export type BasePlacement = "top" | "bottom" | "left" | "right";
 interface BasePopoverState {
   /** Whether the popover should be shown. */
   isOpen: boolean;
+
+  /** Options passed to the popover transition. */
+  transitionOptions?: Partial<Omit<TransitionOptions, "shouldMount">>;
 
   /**
    * The interaction that triggers the popover.
@@ -89,6 +93,9 @@ export interface PopoverContextValue {
    * position on the fly.
    */
   currentPlacement: Accessor<FloatingPlacement>;
+
+  /** The popover content enter/exit transition. */
+  popoverTransition: TransitionResult;
 
   /**
    * The `id` of the popover content element.
@@ -202,6 +209,7 @@ export interface PopoverProps extends PopoverStyleConfigProps, Partial<BasePopov
 
 export type PopoverTheme = ComponentTheme<
   PopoverProps,
+  | "transitionOptions"
   | "triggerMode"
   | "placement"
   | "offset"

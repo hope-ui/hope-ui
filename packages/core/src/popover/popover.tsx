@@ -16,7 +16,7 @@ import {
   shift,
   size,
 } from "@floating-ui/dom";
-import { createDisclosure } from "@hope-ui/primitives";
+import { createDisclosure, createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
 import { contains, getRelatedTarget, isChildrenFunction } from "@hope-ui/utils";
 import {
@@ -80,18 +80,63 @@ export function Popover(props: PopoverProps) {
   const [headingId, setHeadingId] = createSignal<string>();
   const [descriptionId, setDescriptionId] = createSignal<string>();
 
+  const disclosureState = createDisclosure({
+    isOpen: () => props.isOpen,
+    defaultIsOpen: () => !!props.defaultIsOpen,
+    onOpenChange: value => props.onOpenChange?.(value),
+  });
+
+  const popoverTransition = createTransition({
+    get shouldMount() {
+      return disclosureState.isOpen();
+    },
+    get transition() {
+      return props.transitionOptions?.transition ?? "pop";
+    },
+    get duration() {
+      return props.transitionOptions?.duration;
+    },
+    get exitDuration() {
+      return props.transitionOptions?.exitDuration;
+    },
+    get delay() {
+      return props.transitionOptions?.delay;
+    },
+    get exitDelay() {
+      return props.transitionOptions?.exitDelay;
+    },
+    get easing() {
+      return props.transitionOptions?.easing;
+    },
+    get exitEasing() {
+      return props.transitionOptions?.exitEasing;
+    },
+    get onBeforeEnter() {
+      return props.transitionOptions?.onBeforeEnter;
+    },
+    get onAfterEnter() {
+      return props.transitionOptions?.onAfterEnter;
+    },
+    get onBeforeExit() {
+      return props.transitionOptions?.onBeforeExit;
+    },
+    get onAfterExit() {
+      return props.transitionOptions?.onAfterExit;
+    },
+  });
+
   const getPopoverElements = () => {
     const referenceEl = anchorRef() ?? triggerRef();
     const arrowEl = arrowRef();
-    const popoverEl = contentRef();
+    const floatingEl = contentRef();
 
-    return { referenceEl, arrowEl, popoverEl };
+    return { referenceEl, arrowEl, floatingEl };
   };
 
   async function updatePosition() {
-    const { referenceEl, arrowEl, popoverEl } = getPopoverElements();
+    const { referenceEl, arrowEl, floatingEl } = getPopoverElements();
 
-    if (!referenceEl || !popoverEl) {
+    if (!referenceEl || !floatingEl) {
       return;
     }
 
@@ -105,7 +150,7 @@ export function Popover(props: PopoverProps) {
           const referenceWidth = Math.round(rects.reference.width);
 
           if (props.hasSameWidth) {
-            popoverEl.style.width = `${referenceWidth}px`;
+            floatingEl.style.width = `${referenceWidth}px`;
           }
         },
       }),
@@ -117,7 +162,7 @@ export function Popover(props: PopoverProps) {
 
     middleware.push(hide());
 
-    const pos = await computePosition(referenceEl, popoverEl, {
+    const pos = await computePosition(referenceEl, floatingEl, {
       placement: props.placement,
       middleware,
     });
@@ -126,18 +171,14 @@ export function Popover(props: PopoverProps) {
       setCurrentPlacement(pos.placement);
     }
 
-    if (!popoverEl) {
+    if (!floatingEl) {
       return;
     }
 
-    const x = Math.round(pos.x);
-    const y = Math.round(pos.y);
-
-    // https://floating-ui.com/docs/misc#subpixel-and-accelerated-positioning
-    Object.assign(popoverEl.style, {
-      top: "0",
-      left: "0",
-      transform: `translate3d(${x}px, ${y}px, 0)`,
+    // https://floating-ui.com/docs/computePosition#usage
+    Object.assign(floatingEl.style, {
+      left: `${Math.round(pos.x)}px`,
+      top: `${Math.round(pos.y)}px`,
       visibility: pos.middlewareData.hide?.referenceHidden ? "hidden" : "visible",
     });
 
@@ -154,16 +195,11 @@ export function Popover(props: PopoverProps) {
     }
   }
 
-  const disclosureState = createDisclosure({
-    isOpen: () => props.isOpen,
-    defaultIsOpen: () => !!props.defaultIsOpen,
-    onOpenChange: value => props.onOpenChange?.(value),
-  });
-
   let enterTimeoutId: number | undefined;
   let exitTimeoutId: number | undefined;
 
   const openWithDelay = () => {
+    console.log("open");
     enterTimeoutId = window.setTimeout(() => {
       disclosureState.open();
       void updatePosition();
@@ -171,9 +207,7 @@ export function Popover(props: PopoverProps) {
   };
 
   const closeWithDelay = () => {
-    if (enterTimeoutId) {
-      window.clearTimeout(enterTimeoutId);
-    }
+    window.clearTimeout(enterTimeoutId);
 
     exitTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
   };
@@ -186,14 +220,14 @@ export function Popover(props: PopoverProps) {
 
   const onContentMouseEnter = () => {
     setIsHovered(true);
+    window.clearTimeout(exitTimeoutId);
   };
 
   const onContentMouseLeave = () => {
     setIsHovered(false);
 
-    if (enterTimeoutId) {
-      window.clearTimeout(enterTimeoutId);
-    }
+    window.clearTimeout(enterTimeoutId);
+    window.clearTimeout(exitTimeoutId);
 
     exitTimeoutId = window.setTimeout(() => {
       // close if trigger or content is not hovered
@@ -246,13 +280,13 @@ export function Popover(props: PopoverProps) {
   });
 
   createEffect(() => {
-    const { referenceEl, popoverEl } = getPopoverElements();
+    const { referenceEl, floatingEl } = getPopoverElements();
 
-    if (!referenceEl || !popoverEl) {
+    if (!referenceEl || !floatingEl) {
       return;
     }
 
-    const cleanupAutoUpdate = autoUpdate(referenceEl, popoverEl, updatePosition, {
+    const cleanupAutoUpdate = autoUpdate(referenceEl, floatingEl, updatePosition, {
       // JSDOM doesn't support ResizeObserver
       elementResize: typeof ResizeObserver === "function",
     });
@@ -262,6 +296,7 @@ export function Popover(props: PopoverProps) {
 
   const context: PopoverContextValue = {
     isOpen: disclosureState.isOpen,
+    popoverTransition,
     triggerMode: () => props.triggerMode!,
     withArrow: () => props.withArrow!,
     arrowSize: () => props.arrowSize!,

@@ -1,11 +1,11 @@
+import { createTransition, TransitionOptions } from "@hope-ui/primitives";
 import { createHopeComponent, useStyleConfigContext } from "@hope-ui/styles";
 import { callHandler, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { createMemo, JSX, Show, splitProps } from "solid-js";
+import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { FocusTrapRegion } from "../focus-trap";
-import { createTransition } from "../transition";
 import { PopoverParts } from "./popover.styles";
 import { PopoverArrow } from "./popover-arrow";
 import { usePopoverContext } from "./popover-context";
@@ -57,20 +57,13 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
     callHandler(popoverContext.onContentFocusOut, event);
   };
 
-  //
-  const transition = createTransition({
-    transition: "pop",
-    isMounted: () => popoverContext.isOpen(),
-  });
-  //
-
-  const computedStyle = createMemo(() => ({
-    ...transition.style(),
+  const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
     ...local.style,
+    ...popoverContext.popoverTransition.style(),
   }));
 
   return (
-    <Show when={transition.keepMounted()}>
+    <Show when={popoverContext.popoverTransition.keepMounted()}>
       <Portal>
         <FocusTrapRegion
           as="section"

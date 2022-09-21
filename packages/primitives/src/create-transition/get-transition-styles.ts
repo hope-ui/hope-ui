@@ -6,7 +6,6 @@
  * https://github.com/mantinedev/mantine/blob/8546c580fdcaa9653edc6f4813103349a96cfb09/src/mantine-core/src/Transition/get-transition-styles/get-transition-styles.ts
  */
 
-import { Property } from "@hope-ui/styles";
 import { isString } from "@hope-ui/utils";
 import { JSX } from "solid-js";
 
@@ -28,7 +27,7 @@ interface GetTransitionStylesParams {
   transition: HopeTransition;
   phase: TransitionPhase;
   duration: number;
-  easing: Property.TransitionTimingFunction;
+  easing: JSX.CSSProperties["transition-timing-function"];
 }
 
 export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSProperties {
