@@ -170,6 +170,10 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Data display",
     links: [
       {
+        title: "Divider",
+        href: "/docs/components/divider",
+      },
+      {
         title: "Icon",
         href: "/docs/components/icon",
       },
