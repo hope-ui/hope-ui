@@ -22,6 +22,7 @@ export * from "./icon";
 export * from "./image";
 export * from "./kbd";
 export * from "./popover";
+export * from "./portal";
 export * from "./spacer";
 export * from "./stack";
 export * from "./text";

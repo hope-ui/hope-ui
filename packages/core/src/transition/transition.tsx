@@ -7,57 +7,59 @@
  */
 
 import { createHopeComponent, hope } from "@hope-ui/styles";
-import { createMemo, JSX, Show, splitProps } from "solid-js";
+import { ComponentProps, createMemo, JSX, Show, splitProps } from "solid-js";
+import { Portal } from "solid-js/web";
 
+import { OptionalPortal } from "../portal";
 import { createTransition, CreateTransitionProps } from "./create-transition";
-import { getTransitionStyles } from "./get-transition-styles";
-import { HopeTransition } from "./types";
 
 export interface TransitionProps extends CreateTransitionProps {
-  /** Predefined transition name or transition styles. */
-  animate: HopeTransition;
-
   /** The css style attribute (should be an object). */
   style?: JSX.CSSProperties;
+
+  /** Whether the component should be rendered in a `Portal`. */
+  withinPortal?: boolean;
+
+  /** Props to be passed to the `Portal` component. */
+  portalProps?: Omit<ComponentProps<typeof Portal>, "children">;
 }
 
 /**
  * `Transition` component allow to work with enter/exit transitions.
- * It comes with pre-made transitions and option to create custom ones based on CSS properties.
+ * It comes with pre-made transitions, option to create custom ones and renders a `div` by default.
  */
 export const Transition = createHopeComponent<"div", TransitionProps>(props => {
-  const [local, others] = splitProps(props, [
-    "animate",
-    "isMounted",
-    "duration",
-    "delay",
-    "easing",
-    "exitDuration",
-    "exitDelay",
-    "exitEasing",
-    "onBeforeEnter",
-    "onAfterEnter",
-    "onBeforeExit",
-    "onAfterExit",
-    "style",
-  ]);
+  const [local, transitionProps, others] = splitProps(
+    props,
+    ["style", "withinPortal", "portalProps"],
+    [
+      "transition",
+      "isMounted",
+      "duration",
+      "exitDuration",
+      "delay",
+      "exitDelay",
+      "easing",
+      "exitEasing",
+      "onBeforeEnter",
+      "onAfterEnter",
+      "onBeforeExit",
+      "onAfterExit",
+    ]
+  );
 
-  const { transitionDuration, transitionStatus, transitionTimingFunction } =
-    createTransition(local);
+  const { keepMounted, style } = createTransition(transitionProps);
 
   const computedStyle = createMemo(() => ({
-    ...getTransitionStyles({
-      transition: local.animate,
-      duration: transitionDuration(),
-      status: transitionStatus(),
-      timingFunction: transitionTimingFunction(),
-    }),
+    ...style(),
     ...local.style,
   }));
 
   return (
-    <Show when={transitionStatus() !== "afterExit"}>
-      <hope.div style={computedStyle()} {...others} />
+    <Show when={keepMounted()}>
+      <OptionalPortal withinPortal={local.withinPortal} {...local.portalProps}>
+        <hope.div style={computedStyle()} {...others} />
+      </OptionalPortal>
     </Show>
   );
 });

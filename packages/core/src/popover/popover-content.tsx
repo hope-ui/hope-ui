@@ -1,18 +1,24 @@
 import { createHopeComponent, useStyleConfigContext } from "@hope-ui/styles";
 import { callHandler, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { JSX, Show, splitProps } from "solid-js";
+import { createMemo, JSX, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { FocusTrapRegion } from "../focus-trap";
+import { createTransition } from "../transition";
 import { PopoverParts } from "./popover.styles";
 import { PopoverArrow } from "./popover-arrow";
 import { usePopoverContext } from "./popover-context";
 
+export interface PopoverContentProps {
+  /** The css style attribute (should be an object). */
+  style?: JSX.CSSProperties;
+}
+
 /**
  * The popover content wrapper.
  */
-export const PopoverContent = createHopeComponent<"section">(props => {
+export const PopoverContent = createHopeComponent<"section", PopoverContentProps>(props => {
   const popoverContext = usePopoverContext();
 
   const { baseClasses, styleOverrides } = useStyleConfigContext<PopoverParts>();
@@ -20,6 +26,7 @@ export const PopoverContent = createHopeComponent<"section">(props => {
   const [local, others] = splitProps(props, [
     "ref",
     "class",
+    "style",
     "children",
     "onKeyDown",
     "onFocusOut",
@@ -50,8 +57,20 @@ export const PopoverContent = createHopeComponent<"section">(props => {
     callHandler(popoverContext.onContentFocusOut, event);
   };
 
+  //
+  const transition = createTransition({
+    transition: "pop",
+    isMounted: () => popoverContext.isOpen(),
+  });
+  //
+
+  const computedStyle = createMemo(() => ({
+    ...transition.style(),
+    ...local.style,
+  }));
+
   return (
-    <Show when={popoverContext.isOpen()}>
+    <Show when={transition.keepMounted()}>
       <Portal>
         <FocusTrapRegion
           as="section"
@@ -66,6 +85,7 @@ export const PopoverContent = createHopeComponent<"section">(props => {
           autoFocus={popoverContext.autoFocus()}
           restoreFocus={popoverContext.restoreFocus()}
           class={clsx(baseClasses().root, local.class)}
+          style={computedStyle()}
           __css={styleOverrides().root}
           onKeyDown={onKeyDown}
           onFocusOut={onFocusOut}

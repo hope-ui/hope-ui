@@ -13,7 +13,7 @@ import { JSX } from "solid-js";
 import { DEFAULT_TRANSITIONS } from "./default-transitions";
 import { HopeTransition, TransitionStyles } from "./types";
 
-const TRANSITION_STATUSES = {
+const TRANSITION_PHASES_MAP = {
   beforeEnter: "out",
   enter: "in",
   afterEnter: "in",
@@ -22,19 +22,19 @@ const TRANSITION_STATUSES = {
   afterExit: "out",
 } as const;
 
-export type TransitionStatus = keyof typeof TRANSITION_STATUSES;
+export type TransitionPhase = keyof typeof TRANSITION_PHASES_MAP;
 
 interface GetTransitionStylesParams {
   transition: HopeTransition;
-  status: TransitionStatus;
+  phase: TransitionPhase;
   duration: number;
-  timingFunction: Property.TransitionTimingFunction;
+  easing: Property.TransitionTimingFunction;
 }
 
 export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSProperties {
   const shared: JSX.CSSProperties = {
     "transition-duration": `${params.duration}ms`,
-    "transition-timing-function": params.timingFunction,
+    "transition-timing-function": params.easing,
   };
 
   if (isString(params.transition)) {
@@ -48,7 +48,7 @@ export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSP
       "transition-property": getTransitionProperty(transitionStyles),
       ...shared,
       ...transitionStyles.common,
-      ...transitionStyles[TRANSITION_STATUSES[params.status]],
+      ...transitionStyles[TRANSITION_PHASES_MAP[params.phase]],
     };
   }
 
@@ -56,7 +56,7 @@ export function getTransitionStyles(params: GetTransitionStylesParams): JSX.CSSP
     "transition-property": getTransitionProperty(params.transition),
     ...shared,
     ...params.transition.common,
-    ...params.transition[TRANSITION_STATUSES[params.status]],
+    ...params.transition[TRANSITION_PHASES_MAP[params.phase]],
   };
 }
 

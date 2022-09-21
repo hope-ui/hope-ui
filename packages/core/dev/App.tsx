@@ -1,6 +1,6 @@
 import { createDisclosure } from "@hope-ui/primitives";
 
-import { Transition } from "../src";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "../src";
 
 export default function App() {
   const { isOpen, toggle } = createDisclosure();
@@ -8,20 +8,15 @@ export default function App() {
   return (
     <>
       <button onClick={toggle}>toggle</button>
-      <Transition
-        animate="rotate-right"
-        duration={1000}
-        exitDuration={2000}
-        easing="ease-out"
-        exitEasing="ease-in"
-        delay={1000}
-        isMounted={isOpen()}
-        bg="tomato"
-        color="white"
-        p={4}
-      >
-        Lorem ipsum dolor sit amet.
-      </Transition>
+      <Popover>
+        <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+        <PopoverContent p={4}>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi commodi cupiditate fugit
+            libero reiciendis unde, vero voluptates. Et, obcaecati officiis.
+          </p>
+        </PopoverContent>
+      </Popover>
     </>
   );
 }
