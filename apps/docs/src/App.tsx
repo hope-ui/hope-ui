@@ -1,8 +1,11 @@
 import {
+  Anchor,
+  Box,
   Center,
   Container,
   Flex,
   hope,
+  HStack,
   Progress,
   ProgressIndicator,
   Spinner,
@@ -91,18 +94,28 @@ function AppLayout() {
   return (
     <Flex direction="column">
       <Portal>
-        <Progress
-          indeterminate
-          size="xs"
-          position="fixed"
-          top="0"
-          left="0"
-          right="0"
-          zIndex="$banner"
-          d={isRouting() ? "block" : "none"}
-        >
-          <ProgressIndicator />
-        </Progress>
+        <Box position="fixed" top="0" left="0" right="0" zIndex="$banner">
+          <Progress indeterminate size="xs" d={isRouting() ? "block" : "none"}>
+            <ProgressIndicator />
+          </Progress>
+          <HStack
+            bg="$danger9"
+            color="white"
+            px="$2"
+            fontWeight="$medium"
+            fontSize="$sm"
+            lineHeight="$5"
+            _dark={{
+              bg: "$danger3",
+              color: "$danger11",
+            }}
+          >
+            Hope UI is in a rewrite process, learn more about the next major release at&nbsp;
+            <Anchor external href="http://next.hope-ui.com" fontWeight="$bold" fontStyle="italic">
+              next.hope-ui.com
+            </Anchor>
+          </HStack>
+        </Box>
       </Portal>
       <Header />
       <Container flexGrow={1}>

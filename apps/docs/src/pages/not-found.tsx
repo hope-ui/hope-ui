@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <VStack alignItems="stretch">
       <Header />
-      <Center minH="calc(100vh - 72px)">
+      <Center minH="calc(100vh - 92px)">
         <Stack direction={{ "@initial": "column", "@md": "row" }} alignItems="flex-start" mx="auto">
           <Text
             size={{ "@initial": "3xl", "@sm": "4xl", "@md": "7xl" }}

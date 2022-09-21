@@ -1,4 +1,4 @@
-import { Text } from "@hope-ui/solid";
+import { Alert, Text } from "@hope-ui/solid";
 import Prism from "prismjs";
 import { onMount } from "solid-js";
 
@@ -30,6 +30,10 @@ export default function Installation() {
   return (
     <PageLayout nextLink={nextLink} contextualNavLinks={contextualNavLinks}>
       <PageTitle>Getting Started</PageTitle>
+      <Alert status="warning" mb="$4">
+        <strong>Warning:</strong>&nbsp;Hope UI v0.x is not compatible with Solid Start and doesn't
+        support SSR.
+      </Alert>
       <SectionTitle id="installation">Installation</SectionTitle>
       <Text mb="$5">
         Inside your SolidJS project, install Hope UI by running either of the following:

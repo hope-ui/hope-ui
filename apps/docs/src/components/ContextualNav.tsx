@@ -24,14 +24,14 @@ export default function ContextualNav(props: ContextualNavProps) {
       as="nav"
       position="sticky"
       overflowY="auto"
-      top="72px"
+      top="92px"
       display={{
         "@initial": "none",
         "@xl": "block",
       }}
       flexShrink="0"
       maxW="$60"
-      height="calc(100vh - 72px)"
+      height="calc(100vh - 92px)"
       p="$6"
       {...others}
     >
