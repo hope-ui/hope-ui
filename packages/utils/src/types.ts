@@ -20,15 +20,9 @@ export type ElementType<Props = any> = DOMElements | Component<Props>;
  */
 export type OverrideProps<Source = {}, Override = {}> = Omit<Source, keyof Override> & Override;
 
-/**
- * HTML styling attributes.
- */
-export interface StylingProps {
+export interface ClassProp {
   /** The HTML `class` attribute. */
   class?: string;
-
-  /** The HTML style attribute. */
-  style?: JSX.CSSProperties; // override solid-js one to be only an object.
 }
 
 export type AnyFunction<T = any> = (...args: T[]) => any;

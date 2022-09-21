@@ -30,7 +30,15 @@ import { computeStyle } from "./styled-system/compute-style";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import { BooleanMap, SxProp, SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
+import {
+  BooleanMap,
+  HopeProps,
+  PolymorphicProps,
+  SxProp,
+  SystemStyleObject,
+  Theme,
+  ThemeVarsAndBreakpoints,
+} from "./types";
 import { pack } from "./utils";
 import { getNativeHTMLProps, prefixedHTMLPropsMap } from "./utils/prefixed-html-props";
 import { shouldApplyCompound } from "./utils/should-apply-compound";
@@ -165,7 +173,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
     runOnce(theme);
 
     const [local, prefixedHTMLProps, variantProps, styleProps, others] = splitProps(
-      props,
+      props as PolymorphicProps<T, HopeProps & HopeVariantSelection<Variants>>, // hack to have correct TS types.
       ["as", "class", "sx", "__css"],
       [...prefixedHTMLPropsMap.keys()],
       variantPropsKeys,

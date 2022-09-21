@@ -9,7 +9,7 @@
 import { createReducedMotion } from "@hope-ui/primitives";
 import { Property } from "@hope-ui/styles";
 import { access, MaybeAccessor } from "@hope-ui/utils";
-import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
+import { Accessor, createEffect, createMemo, createSignal, JSX, on, onCleanup } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 import { getTransitionStyles, TransitionPhase } from "./get-transition-styles";
@@ -53,11 +53,19 @@ export interface CreateTransitionProps {
   onAfterExit?: () => void;
 }
 
+export interface CreateTransitionResult {
+  /** Whether the element should be kept in the DOM. */
+  keepMounted: Accessor<boolean>;
+
+  /** The transition styles. */
+  style: Accessor<JSX.CSSProperties>;
+}
+
 const DEFAULT_DURATION = 250;
 const DEFAULT_DELAY = 10;
 const DEFAULT_EASING: Property.TransitionTimingFunction = "ease";
 
-export function createTransition(props: CreateTransitionProps) {
+export function createTransition(props: CreateTransitionProps): CreateTransitionResult {
   props = mergeDefaultProps(
     {
       duration: DEFAULT_DURATION,

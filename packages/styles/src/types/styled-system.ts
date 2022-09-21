@@ -6,7 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/tree/main/packages/styled-system/src/config
  */
 
-import { OverrideProps, StylingProps } from "@hope-ui/utils";
+import { ClassProp, OverrideProps } from "@hope-ui/utils";
 import { Property } from "csstype";
 
 import { CSSObject } from "../stitches.config";
@@ -1101,7 +1101,7 @@ export interface SxProp {
 }
 
 /** Hope UI specific props. */
-export interface HopeProps extends SystemStyleProps, SxProp, StylingProps {
+export interface HopeProps extends SystemStyleProps, SxProp, ClassProp {
   /**
    * The `__css` prop has the same API as the `sx` prop, but with a lower style priority.
    * Use it to apply base styles that can be overridden by `sx` and `system style` props.

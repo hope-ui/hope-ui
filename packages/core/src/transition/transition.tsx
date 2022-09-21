@@ -17,6 +17,9 @@ export interface TransitionProps extends CreateTransitionProps {
   /** The css style attribute (should be an object). */
   style?: JSX.CSSProperties;
 
+  /** Whether the component should be kept in the DOM after exit transition ends. */
+  keepAlive?: boolean;
+
   /** Whether the component should be rendered in a `Portal`. */
   withinPortal?: boolean;
 
@@ -31,7 +34,7 @@ export interface TransitionProps extends CreateTransitionProps {
 export const Transition = createHopeComponent<"div", TransitionProps>(props => {
   const [local, transitionProps, others] = splitProps(
     props,
-    ["style", "withinPortal", "portalProps"],
+    ["style", "keepAlive", "withinPortal", "portalProps"],
     [
       "transition",
       "isMounted",
@@ -56,7 +59,7 @@ export const Transition = createHopeComponent<"div", TransitionProps>(props => {
   }));
 
   return (
-    <Show when={keepMounted()}>
+    <Show when={local.keepAlive || keepMounted()}>
       <OptionalPortal withinPortal={local.withinPortal} {...local.portalProps}>
         <hope.div style={computedStyle()} {...others} />
       </OptionalPortal>

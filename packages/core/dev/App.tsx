@@ -1,6 +1,6 @@
 import { createDisclosure } from "@hope-ui/primitives";
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from "../src";
+import { Button, Popover, PopoverContent, PopoverTrigger, Transition } from "../src";
 
 export default function App() {
   const { isOpen, toggle } = createDisclosure();
@@ -17,6 +17,15 @@ export default function App() {
           </p>
         </PopoverContent>
       </Popover>
+      <Transition
+        as={Button}
+        transition="pop"
+        isMounted={isOpen()}
+        keepAlive
+        style={{ color: "red" }}
+      >
+        Button
+      </Transition>
     </>
   );
 }
