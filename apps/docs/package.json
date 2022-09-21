@@ -1,5 +1,5 @@
 {
-  "name": "hope-ui-docs",
+  "name": "@hope-ui/docs",
   "version": "0.0.1",
   "private": true,
   "description": "Documentation of the Hope UI component library",

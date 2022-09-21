@@ -47,7 +47,7 @@ export default function Header() {
     <Box
       as="header"
       position="sticky"
-      top="0"
+      top="20px"
       left="0"
       right="0"
       zIndex="$sticky"
@@ -79,7 +79,7 @@ export default function Header() {
               </hope.span>
             </Text>
             <Tag size="sm" rounded="$sm" fontWeight="$semibold">
-              v0.6.3
+              v0.6.7
             </Tag>
           </HStack>
           <HStack spacing="$2">

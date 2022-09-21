@@ -8,7 +8,7 @@ export default function MainNavigation() {
       as="nav"
       class="hide-scrollbar"
       position="sticky"
-      top="72px"
+      top="92px"
       overflowY="auto"
       display={{
         "@initial": "none",
@@ -17,7 +17,7 @@ export default function MainNavigation() {
       direction="column"
       flexShrink="0"
       maxW="$60"
-      height="calc(100vh - 72px)"
+      height="calc(100vh - 92px)"
       p="$6"
     >
       <MainNavContent />

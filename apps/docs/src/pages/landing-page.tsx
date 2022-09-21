@@ -1,10 +1,12 @@
 import {
+  Anchor,
   Box,
   Button,
   Center,
   Container,
   GridItem,
   Heading,
+  HStack,
   HTMLHopeProps,
   SimpleGrid,
   Stack,
@@ -23,11 +25,12 @@ import { IconGithub } from "@/icons/IconGithub";
 import { IconMoon } from "@/icons/IconMoon";
 import { IconPalette } from "@/icons/IconPalette";
 import { IconRocket } from "@/icons/IconRocket";
+import { Portal } from "solid-js/web";
 
 function HeroSection(props: VStackProps) {
   return (
     <VStack
-      minH="calc(100vh - 72px)"
+      minH="calc(100vh - 92px)"
       maxW="$containerLg"
       mx={{ "@initial": "$4", "@lg": "auto" }}
       textAlign="center"
@@ -88,7 +91,7 @@ function HeroSection(props: VStackProps) {
 
 function FeatureSection(props: HTMLHopeProps<"div">) {
   return (
-    <Box minH="calc(100vh - 72px)" bg="$neutral2" {...props}>
+    <Box minH="calc(100vh - 92px)" bg="$neutral2" {...props}>
       <Container>
         <VStack mx={{ "@initial": "$4", "@xl": "auto" }} py={{ "@initial": "$10", "@sm": "$20" }}>
           <Heading
@@ -300,6 +303,27 @@ function FeatureSection(props: HTMLHopeProps<"div">) {
 export default function LandingPage() {
   return (
     <VStack alignItems="stretch">
+      <Portal>
+        <Box position="fixed" top="0" left="0" right="0" zIndex="$banner">
+          <HStack
+            bg="$danger9"
+            color="white"
+            px="$2"
+            fontWeight="$medium"
+            fontSize="$sm"
+            lineHeight="$5"
+            _dark={{
+              bg: "$danger3",
+              color: "$danger11",
+            }}
+          >
+            Hope UI is in a rewrite process, learn more about the next major release at&nbsp;
+            <Anchor external href="http://next.hope-ui.com" fontWeight="$bold" fontStyle="italic">
+              next.hope-ui.com
+            </Anchor>
+          </HStack>
+        </Box>
+      </Portal>
       <Header />
       <HeroSection />
       <FeatureSection />
