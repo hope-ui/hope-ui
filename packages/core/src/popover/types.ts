@@ -66,12 +66,6 @@ interface BasePopoverState {
 
   /** A query selector to retrieve the element that should receive focus once `Popover` closes. */
   finalFocusSelector?: string;
-
-  /** Whether the first focusable element should be focused once `Popover` opens. */
-  autoFocus?: boolean;
-
-  /** Whether focus should be restored to the element that triggered the `Popover` once it closes. */
-  restoreFocus?: boolean;
 }
 
 export interface PopoverContextValue {
@@ -141,12 +135,6 @@ export interface PopoverContextValue {
 
   /** A query selector to retrieve the element that should receive focus once `Popover` closes. */
   finalFocusSelector: Accessor<BasePopoverState["finalFocusSelector"]>;
-
-  /** Whether the first focusable element should be focused once `Popover` opens. */
-  autoFocus: Accessor<BasePopoverState["autoFocus"]>;
-
-  /** Whether focus should be restored to the element that triggered the `Popover` once it closes. */
-  restoreFocus: Accessor<BasePopoverState["restoreFocus"]>;
 
   /** A function to close the popover with a delay. */
   closeWithDelay: () => void;
@@ -222,6 +210,4 @@ export type PopoverTheme = ComponentTheme<
   | "trapFocus"
   | "initialFocusSelector"
   | "finalFocusSelector"
-  | "autoFocus"
-  | "restoreFocus"
 >;

@@ -25,35 +25,53 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
   const triggerOnHover = () => popoverContext.triggerMode() === "hover";
 
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    event.stopPropagation();
     callHandler(local.onClick, event);
-    popoverContext.onTriggerClick();
+
+    if (triggerOnClick()) {
+      event.stopPropagation();
+      popoverContext.onTriggerClick();
+    }
   };
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLButtonElement, KeyboardEvent> = event => {
-    event.stopPropagation();
     callHandler(local.onKeyDown, event);
-    callHandler(popoverContext.onTriggerKeyDown, event);
+
+    if (triggerOnHover()) {
+      event.stopPropagation();
+      callHandler(popoverContext.onTriggerKeyDown, event);
+    }
   };
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     callHandler(local.onMouseEnter, event);
-    popoverContext.onTriggerMouseEnter();
+
+    if (triggerOnHover()) {
+      popoverContext.onTriggerMouseEnter();
+    }
   };
 
   const onMouseLeave: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     callHandler(local.onMouseLeave, event);
-    popoverContext.onTriggerMouseLeave();
+
+    if (triggerOnHover()) {
+      popoverContext.onTriggerMouseLeave();
+    }
   };
 
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
     callHandler(local.onFocus, event);
-    popoverContext.onTriggerFocus();
+
+    if (triggerOnHover()) {
+      popoverContext.onTriggerFocus();
+    }
   };
 
   const onBlur: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
     callHandler(local.onBlur, event);
-    callHandler(popoverContext.onTriggerBlur, event);
+
+    if (triggerOnHover()) {
+      callHandler(popoverContext.onTriggerBlur, event);
+    }
   };
 
   return (
@@ -64,12 +82,12 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
       aria-haspopup="dialog"
       aria-controls={popoverContext.popoverId()}
       aria-expanded={popoverContext.isOpen()}
-      onClick={triggerOnClick() ? onClick : undefined}
-      onKeyDown={triggerOnHover() ? onKeyDown : undefined}
-      onFocus={triggerOnHover() ? onFocus : undefined}
-      onBlur={triggerOnHover() ? onBlur : undefined}
-      onMouseEnter={triggerOnHover() ? onMouseEnter : undefined}
-      onMouseLeave={triggerOnHover() ? onMouseLeave : undefined}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
       {...others}
     />
   );

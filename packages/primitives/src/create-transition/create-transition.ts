@@ -16,6 +16,7 @@ import {
   on,
   onCleanup,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 
 import { createReducedMotion } from "../create-reduce-motion";
 import { getTransitionStyles, TransitionPhase } from "./get-transition-styles";
@@ -160,7 +161,13 @@ export function createTransition(options: TransitionOptions): TransitionResult {
     )
   );
 
-  onCleanup(() => window.clearTimeout(timeoutId));
+  onCleanup(() => {
+    if (isServer) {
+      return;
+    }
+
+    window.clearTimeout(timeoutId);
+  });
 
   return { keepMounted, style };
 }

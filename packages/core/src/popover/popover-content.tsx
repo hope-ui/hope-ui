@@ -1,4 +1,3 @@
-import { createTransition, TransitionOptions } from "@hope-ui/primitives";
 import { createHopeComponent, useStyleConfigContext } from "@hope-ui/styles";
 import { callHandler, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
@@ -44,12 +43,18 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
 
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
     callHandler(local.onMouseEnter, event);
-    popoverContext.onContentMouseEnter();
+
+    if (triggerOnHover()) {
+      popoverContext.onContentMouseEnter();
+    }
   };
 
   const onMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
     callHandler(local.onMouseLeave, event);
-    popoverContext.onContentMouseLeave();
+
+    if (triggerOnHover()) {
+      popoverContext.onContentMouseLeave();
+    }
   };
 
   const onFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
@@ -67,6 +72,8 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
       <Portal>
         <FocusTrapRegion
           as="section"
+          autoFocus
+          restoreFocus
           ref={mergeRefs(popoverContext.setContentRef, local.ref)}
           id={popoverContext.popoverId()}
           role={triggerOnHover() ? "tooltip" : "dialog"}
@@ -75,15 +82,13 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
           trapFocus={popoverContext.trapFocus()}
           initialFocusSelector={popoverContext.initialFocusSelector()}
           finalFocusSelector={popoverContext.finalFocusSelector()}
-          autoFocus={popoverContext.autoFocus()}
-          restoreFocus={popoverContext.restoreFocus()}
           class={clsx(baseClasses().root, local.class)}
           style={computedStyle()}
           __css={styleOverrides().root}
           onKeyDown={onKeyDown}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           onFocusOut={onFocusOut}
-          onMouseEnter={triggerOnHover() ? onMouseEnter : undefined}
-          onMouseLeave={triggerOnHover() ? onMouseLeave : undefined}
           {...others}
         >
           <Show when={popoverContext.withArrow()}>

@@ -203,16 +203,14 @@ export const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
-  /*
   {
     title: "Overlays",
     links: [
       {
-        title: "",
-        href: "/docs/components/",
+        title: "Popover",
+        href: "/docs/components/popover",
       },
     ],
   },
-  */
   //...CHANGELOG_NAV_SECTIONS,
 ];

@@ -28,6 +28,7 @@ import {
   Show,
   splitProps,
 } from "solid-js";
+import { isServer } from "solid-js/web";
 
 import { usePopoverStyleConfig } from "./popover.styles";
 import { PopoverContext } from "./popover-context";
@@ -60,8 +61,6 @@ export function Popover(props: PopoverProps) {
       closeOnBlur: true,
       closeOnEsc: true,
       trapFocus: false,
-      autoFocus: true,
-      restoreFocus: true,
     },
     props
   );
@@ -199,7 +198,8 @@ export function Popover(props: PopoverProps) {
   let exitTimeoutId: number | undefined;
 
   const openWithDelay = () => {
-    console.log("open");
+    window.clearTimeout(enterTimeoutId);
+
     enterTimeoutId = window.setTimeout(() => {
       disclosureState.open();
       void updatePosition();
@@ -207,7 +207,7 @@ export function Popover(props: PopoverProps) {
   };
 
   const closeWithDelay = () => {
-    window.clearTimeout(enterTimeoutId);
+    window.clearTimeout(exitTimeoutId);
 
     exitTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
   };
@@ -226,10 +226,10 @@ export function Popover(props: PopoverProps) {
   const onContentMouseLeave = () => {
     setIsHovered(false);
 
-    window.clearTimeout(enterTimeoutId);
     window.clearTimeout(exitTimeoutId);
 
     exitTimeoutId = window.setTimeout(() => {
+      console.log(isHovered());
       // close if trigger or content is not hovered
       !isHovered() && disclosureState.close();
     }, props.closeDelay);
@@ -237,6 +237,7 @@ export function Popover(props: PopoverProps) {
 
   const onContentFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
     const relatedTarget = getRelatedTarget(event);
+
     const targetIsPopover = contains(contentRef(), relatedTarget);
     const targetIsTrigger = contains(triggerRef(), relatedTarget);
     const isValidBlur = !targetIsPopover && !targetIsTrigger;
@@ -255,7 +256,12 @@ export function Popover(props: PopoverProps) {
 
   const onTriggerMouseEnter = () => {
     setIsHovered(true);
-    openWithDelay();
+
+    if (disclosureState.isOpen()) {
+      window.clearTimeout(exitTimeoutId);
+    } else {
+      openWithDelay();
+    }
   };
 
   // For now, it's the same code but might change in the future.
@@ -274,11 +280,6 @@ export function Popover(props: PopoverProps) {
     }
   };
 
-  onCleanup(() => {
-    window.clearTimeout(enterTimeoutId);
-    window.clearTimeout(exitTimeoutId);
-  });
-
   createEffect(() => {
     const { referenceEl, floatingEl } = getPopoverElements();
 
@@ -292,6 +293,15 @@ export function Popover(props: PopoverProps) {
     });
 
     onCleanup(cleanupAutoUpdate);
+  });
+
+  onCleanup(() => {
+    if (isServer) {
+      return;
+    }
+
+    window.clearTimeout(enterTimeoutId);
+    window.clearTimeout(exitTimeoutId);
   });
 
   const context: PopoverContextValue = {
@@ -315,8 +325,6 @@ export function Popover(props: PopoverProps) {
     trapFocus: () => props.trapFocus!,
     initialFocusSelector: () => props.initialFocusSelector,
     finalFocusSelector: () => props.finalFocusSelector,
-    autoFocus: () => props.autoFocus!,
-    restoreFocus: () => props.restoreFocus!,
     closeWithDelay,
     onContentKeyDown,
     onContentMouseEnter,

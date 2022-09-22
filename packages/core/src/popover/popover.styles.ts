@@ -17,7 +17,6 @@ export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme =
       justifyContent: "center",
 
       width: "100%",
-      maxWidth: "xs",
 
       outline: "none",
 
