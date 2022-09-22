@@ -170,7 +170,7 @@ When the popover closes, focus is set back to the trigger element. Use the `fina
     </Popover>
 
     <Button data-finalfocus _focus={{ color: "red" }}>
-      Final focus
+      Final focus element
     </Button>
 
   </HStack>
@@ -186,7 +186,7 @@ When the popover closes, focus is set back to the trigger element. Use the `fina
   </Popover>
 
   <Button data-finalfocus _focus={{ color: "red" }}>
-    Final focus
+    Final focus element
   </Button>
 </HStack>
 ```
@@ -219,7 +219,81 @@ Use the `trapFocus` prop to lock focus inside the `PopoverContent`.
 </Popover>
 ```
 
-### Popover placement
+### Heading and description
+
+Use `PopoverHeading` and `PopoverDescription` to add accessible heading and/or description to the popover.
+
+Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
+
+<Preview>
+  <Popover>
+    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+    <PopoverContent w="max-content" p={4}>
+      <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
+      <PopoverDescription fontSize="sm" color="neutral.600" mb={4}>
+        Description
+      </PopoverDescription>
+      <p>The content of the Popover.</p>
+    </PopoverContent>
+  </Popover>
+</Preview>
+
+```tsx
+<Popover>
+  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+  <PopoverContent w="max-content" p={4}>
+    <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
+    <PopoverDescription fontSize="sm" color="neutral.600" mb={4}>
+      Description
+    </PopoverDescription>
+    <p>The content of the Popover.</p>
+  </PopoverContent>
+</Popover>
+```
+
+### Arrow
+
+Use the `arrowSize` prop to change the popover's arrow size and the `offset` prop to adjust the distance with the trigger.
+
+<Preview>
+  <Popover arrowSize={30} offset={15}>
+    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+    <PopoverContent w="max-content" p={4}>
+      <p>The content of the Popover.</p>
+    </PopoverContent>
+  </Popover>
+</Preview>
+
+```tsx
+<Popover arrowSize={30} offset={15}>
+  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+  <PopoverContent w="max-content" p={4}>
+    <p>The content of the Popover.</p>
+  </PopoverContent>
+</Popover>
+```
+
+You can also remove the arrow by setting the `withArrow` prop to `false`.
+
+<Preview>
+  <Popover withArrow={false} offset={8}>
+    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+    <PopoverContent w="max-content" p={4}>
+      <p>The content of the Popover.</p>
+    </PopoverContent>
+  </Popover>
+</Preview>
+
+```tsx
+<Popover withArrow={false} offset={8}>
+  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
+  <PopoverContent w="max-content" p={4}>
+    <p>The content of the Popover.</p>
+  </PopoverContent>
+</Popover>
+```
+
+### Placement
 
 Use the `placement` prop to set the preferred popover placement. You can set the value to `top`, `right`, `left`, `bottom` and their `-start` or `-end` variants.
 
@@ -248,9 +322,9 @@ Use the `placement` prop to set the preferred popover placement. You can set the
   </span>
 </Callout>
 
-### Popover transition
+### Open/close transitions
 
-The `transitionOptions` prop allows to customize the popover open/close transition. You can use predefined transitions or create custom ones.
+The `transitionOptions` prop allows to customize the popover open/close transitions. You can use predefined transitions or create custom ones.
 
 <Preview>
   <Popover
@@ -322,7 +396,9 @@ In the example below, the `Button` is the trigger that opens/closes the popover 
 
 Popover provides access to its internal `isOpen` state and a `close` method that you can access via a render prop.
 
-<Preview>TODO: fail in SSR</Preview>
+<Preview>
+  <RenderPropPopoverExample />
+</Preview>
 
 ```tsx
 <Popover>

@@ -18,26 +18,13 @@ import {
 } from "@floating-ui/dom";
 import { createDisclosure, createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
-import { contains, getRelatedTarget, isChildrenFunction } from "@hope-ui/utils";
-import {
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  onCleanup,
-  Show,
-  splitProps,
-} from "solid-js";
+import { contains, getRelatedTarget, runIfFn } from "@hope-ui/utils";
+import { createEffect, createSignal, createUniqueId, JSX, onCleanup, splitProps } from "solid-js";
 import { isServer } from "solid-js/web";
 
 import { usePopoverStyleConfig } from "./popover.styles";
 import { PopoverContext } from "./popover-context";
-import {
-  BasePlacement,
-  PopoverChildrenRenderProp,
-  PopoverContextValue,
-  PopoverProps,
-} from "./types";
+import { BasePlacement, PopoverContextValue, PopoverProps } from "./types";
 
 /**
  * Popover provides context, theming, and accessibility properties
@@ -341,12 +328,10 @@ export function Popover(props: PopoverProps) {
   return (
     <StyleConfigProvider value={styleConfigResult}>
       <PopoverContext.Provider value={context}>
-        <Show when={isChildrenFunction(props)} fallback={props.children as JSX.Element}>
-          {(props.children as PopoverChildrenRenderProp)?.({
-            isOpen: disclosureState.isOpen,
-            close: closeWithDelay,
-          })}
-        </Show>
+        {runIfFn(props.children, {
+          isOpen: disclosureState.isOpen,
+          close: closeWithDelay,
+        })}
       </PopoverContext.Provider>
     </StyleConfigProvider>
   );
