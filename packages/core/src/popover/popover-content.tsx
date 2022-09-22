@@ -33,6 +33,7 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
     "onMouseLeave",
   ]);
 
+  const triggerOnClick = () => popoverContext.triggerMode() === "click";
   const triggerOnHover = () => popoverContext.triggerMode() === "hover";
 
   const onKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
@@ -73,7 +74,7 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
         <FocusTrapRegion
           as="section"
           autoFocus
-          restoreFocus
+          restoreFocus={triggerOnClick()}
           ref={mergeRefs(popoverContext.setContentRef, local.ref)}
           id={popoverContext.popoverId()}
           role={triggerOnHover() ? "tooltip" : "dialog"}

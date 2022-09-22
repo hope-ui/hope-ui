@@ -17,6 +17,7 @@ import {
   focusWithoutScrolling,
   getActiveElement,
   getAllTabbableIn,
+  isFocusable,
   isTabbable,
   mergeRefs,
 } from "@hope-ui/utils";
@@ -124,7 +125,8 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
       return false;
     }
 
-    if (!isTabbable(activeElement)) {
+    //if (!isTabbable(activeElement)) {
+    if (!isFocusable(activeElement)) {
       return false;
     }
 

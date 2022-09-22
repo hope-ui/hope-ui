@@ -156,13 +156,13 @@ You can also use a different css selector by using the `initialFocusSelector` pr
   If the popover contains no focusable element, focus is set to the `PopoverContent` itself.
 </Callout>
 
-### Final focus
+### Restore focus
 
-When the popover closes, focus is set back to the trigger element. Use the `finalFocusSelector` prop and pass in a css selector to target another element.
+When the popover closes, focus is set back to the trigger element. Use the `restoreFocusSelector` prop and pass in a css selector to target another element.
 
 <Preview>
   <HStack spacing={4}>
-    <Popover finalFocusSelector="[data-finalfocus]">
+    <Popover restoreFocusSelector="[data-finalfocus]">
       <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
       <PopoverContent w="max-content" p={4}>
         <p>The content of the Popover.</p>
@@ -178,7 +178,7 @@ When the popover closes, focus is set back to the trigger element. Use the `fina
 
 ```tsx
 <HStack spacing={4}>
-  <Popover finalFocusSelector="[data-finalfocus]">
+  <Popover restoreFocusSelector="[data-finalfocus]">
     <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
     <PopoverContent w="max-content" p={4}>
       <p>The content of the Popover.</p>
