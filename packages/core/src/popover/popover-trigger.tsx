@@ -42,22 +42,6 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
     }
   };
 
-  const onMouseEnter: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    callHandler(local.onMouseEnter, event);
-
-    if (triggerOnHover()) {
-      popoverContext.onTriggerMouseEnter();
-    }
-  };
-
-  const onMouseLeave: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
-    callHandler(local.onMouseLeave, event);
-
-    if (triggerOnHover()) {
-      popoverContext.onTriggerMouseLeave();
-    }
-  };
-
   const onFocus: JSX.EventHandlerUnion<HTMLButtonElement, FocusEvent> = event => {
     callHandler(local.onFocus, event);
 
@@ -74,6 +58,22 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
     }
   };
 
+  const onMouseEnter: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+    callHandler(local.onMouseEnter, event);
+
+    if (triggerOnHover()) {
+      popoverContext.onTriggerMouseEnter();
+    }
+  };
+
+  const onMouseLeave: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
+    callHandler(local.onMouseLeave, event);
+
+    if (triggerOnHover()) {
+      popoverContext.onTriggerMouseLeave();
+    }
+  };
+
   return (
     <hope.button
       ref={mergeRefs(popoverContext.setTriggerRef, local.ref)}
@@ -84,10 +84,10 @@ export const PopoverTrigger = createHopeComponent<"button">(props => {
       aria-expanded={popoverContext.isOpen()}
       onClick={onClick}
       onKeyDown={onKeyDown}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       onFocus={onFocus}
       onBlur={onBlur}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       {...others}
     />
   );

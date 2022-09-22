@@ -46,10 +46,10 @@ interface BasePopoverState {
   /** The minimum padding between the popover and the viewport edge (in px). */
   overflowPadding: number;
 
-  /** Delay before showing the popover (in ms). */
+  /** Delay before showing the popover on hover (in ms). */
   openDelay: number;
 
-  /** Delay before hiding the popover (in ms). */
+  /** Delay before hiding the popover on mouse leave (in ms). */
   closeDelay: number;
 
   /** Whether the popover should close when the user blur out it by clicking outside or tabbing out. */
@@ -65,8 +65,50 @@ interface BasePopoverState {
   initialFocusSelector?: string;
 
   /** A query selector to retrieve the element that should receive focus once `Popover` closes. */
-  finalFocusSelector?: string;
+  restoreFocusSelector?: string;
 }
+
+export type PopoverChildrenRenderProp = (props: {
+  /** Whether the popover should be shown. */
+  isOpen: Accessor<boolean>;
+
+  /** A function to close the popover. */
+  close: () => void;
+}) => JSX.Element;
+
+export interface PopoverProps extends PopoverStyleConfigProps, Partial<BasePopoverState> {
+  /** The id of the popover content. */
+  id?: string;
+
+  /** Whether the popover should be shown (in controlled mode). */
+  isOpen?: boolean;
+
+  /** Whether the popover should be initially shown (in uncontrolled mode). */
+  defaultIsOpen?: boolean;
+
+  /** A function that will be called when the `isOpen` state of the popover changes. */
+  onOpenChange?: (isOpen: boolean) => void;
+
+  /** Children of the popover. */
+  children?: JSX.Element | PopoverChildrenRenderProp;
+}
+
+export type PopoverTheme = ComponentTheme<
+  PopoverProps,
+  | "transitionOptions"
+  | "triggerMode"
+  | "placement"
+  | "offset"
+  | "arrowPadding"
+  | "overflowPadding"
+  | "openDelay"
+  | "closeDelay"
+  | "closeOnBlur"
+  | "closeOnEsc"
+  | "trapFocus"
+  | "initialFocusSelector"
+  | "restoreFocusSelector"
+>;
 
 export interface PopoverContextValue {
   /** Whether the popover should be shown. */
@@ -124,9 +166,6 @@ export interface PopoverContextValue {
   /** A function to assign the popover trigger ref. */
   setTriggerRef: (el: HTMLElement) => void;
 
-  /** Whether the popover should close when the user hit the `Esc` key. */
-  closeOnEsc: Accessor<BasePopoverState["closeOnEsc"]>;
-
   /** Whether the focus will be locked into the popover. */
   trapFocus: Accessor<BasePopoverState["trapFocus"]>;
 
@@ -134,22 +173,7 @@ export interface PopoverContextValue {
   initialFocusSelector: Accessor<BasePopoverState["initialFocusSelector"]>;
 
   /** A query selector to retrieve the element that should receive focus once `Popover` closes. */
-  finalFocusSelector: Accessor<BasePopoverState["finalFocusSelector"]>;
-
-  /** A function to close the popover with a delay. */
-  closeWithDelay: () => void;
-
-  /** A function that will be called when a key is pressed while the popover content has focus. */
-  onContentKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
-
-  /** A function that will be called when the mouse enters the popover content. */
-  onContentMouseEnter: () => void;
-
-  /** A function that will be called when the mouse leaves the popover content. */
-  onContentMouseLeave: () => void;
-
-  /** A function that will be called when the popover content loses focus. */
-  onContentFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+  restoreFocusSelector: Accessor<BasePopoverState["restoreFocusSelector"]>;
 
   /** A function that will be called when the popover trigger is clicked. */
   onTriggerClick: () => void;
@@ -157,57 +181,27 @@ export interface PopoverContextValue {
   /** A function that will be called when a key is pressed while the popover trigger has focus. */
   onTriggerKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
 
+  /** A function that will be called when the popover trigger receive focus. */
+  onTriggerFocus: () => void;
+
+  /** A function that will be called when the popover trigger loses focus. */
+  onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+
   /** A function that will be called when the mouse enters the popover trigger. */
   onTriggerMouseEnter: () => void;
 
   /** A function that will be called when the mouse leaves the popover trigger. */
   onTriggerMouseLeave: () => void;
 
-  /** A function that will be called when the popover trigger receive focus. */
-  onTriggerFocus: () => void;
+  /** A function that will be called when a key is pressed while the popover content has focus. */
+  onContentKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent>;
 
-  /** A function that will be called when the popover trigger loses focus. */
-  onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+  /** A function that will be called when the popover content loses focus. */
+  onContentFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent>;
+
+  /** A function that will be called when the mouse enters the popover content. */
+  onContentMouseEnter: () => void;
+
+  /** A function that will be called when the mouse leaves the popover content. */
+  onContentMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
 }
-
-export type PopoverChildrenRenderProp = (props: {
-  /** Whether the popover should be shown. */
-  isOpen: Accessor<boolean>;
-
-  /** A function to close the popover. */
-  close: () => void;
-}) => JSX.Element;
-
-export interface PopoverProps extends PopoverStyleConfigProps, Partial<BasePopoverState> {
-  /** The id of the popover content. */
-  id?: string;
-
-  /** Whether the popover should be shown (in controlled mode). */
-  isOpen?: boolean;
-
-  /** Whether the popover should be initially shown (in uncontrolled mode). */
-  defaultIsOpen?: boolean;
-
-  /** A function that will be called when the `isOpen` state of the popover changes. */
-  onOpenChange?: (isOpen: boolean) => void;
-
-  /** Children of the popover. */
-  children?: JSX.Element | PopoverChildrenRenderProp;
-}
-
-export type PopoverTheme = ComponentTheme<
-  PopoverProps,
-  | "transitionOptions"
-  | "triggerMode"
-  | "placement"
-  | "offset"
-  | "arrowPadding"
-  | "overflowPadding"
-  | "openDelay"
-  | "closeDelay"
-  | "closeOnBlur"
-  | "closeOnEsc"
-  | "trapFocus"
-  | "initialFocusSelector"
-  | "finalFocusSelector"
->;

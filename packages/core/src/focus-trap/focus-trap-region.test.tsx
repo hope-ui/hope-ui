@@ -101,7 +101,7 @@ describe("FocusTrapRegion", () => {
     expect(screen.getByText("After")).toHaveFocus();
   });
 
-  it("should focus element with 'finalFocusSelector' on unmount", async () => {
+  it("should focus element with 'restoreFocusSelector' on unmount", async () => {
     const Example = () => {
       const [isOpen, setIsOpen] = createSignal(false);
 
@@ -109,7 +109,7 @@ describe("FocusTrapRegion", () => {
         <>
           <button onClick={() => setIsOpen(true)}>Open</button>
           <Show when={isOpen()}>
-            <FocusTrapRegion finalFocusSelector="#last" data-testid="focus-trap">
+            <FocusTrapRegion restoreFocusSelector="#last" data-testid="focus-trap">
               <button onClick={() => setIsOpen(false)}>Close</button>
             </FocusTrapRegion>
           </Show>
@@ -186,7 +186,7 @@ describe("FocusTrapRegion", () => {
     expect(openButton).toHaveFocus();
   });
 
-  it("should ignore 'restoreFocus' when 'finalFocusSelector' is set", async () => {
+  it("should ignore 'restoreFocus' when 'restoreFocusSelector' is set", async () => {
     const Example = () => {
       const [isOpen, setIsOpen] = createSignal(false);
 
@@ -194,7 +194,7 @@ describe("FocusTrapRegion", () => {
         <>
           <button onClick={() => setIsOpen(true)}>Open</button>
           <Show when={isOpen()}>
-            <FocusTrapRegion restoreFocus finalFocusSelector="#last" data-testid="focus-trap">
+            <FocusTrapRegion restoreFocus restoreFocusSelector="#last" data-testid="focus-trap">
               <button onClick={() => setIsOpen(false)}>Close</button>
             </FocusTrapRegion>
           </Show>

@@ -4,6 +4,12 @@
  *
  * Credits to the Ariakit team:
  * https://github.com/ariakit/ariakit/blob/232bc79018ec20967fec1e097a9474aba3bb5be7/packages/ariakit/src/popover/popover-state.ts
+ *
+ * Portions of this file are based on code from chakra-ui.
+ * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
+ *
+ * Credits to the Chakra UI team:
+ * https://github.com/chakra-ui/chakra-ui/blob/d945b9a7da3056017cda0cdd552af40fa1426070/packages/components/popover/src/use-popover.ts
  */
 
 import {
@@ -43,8 +49,8 @@ export function Popover(props: PopoverProps) {
       placement: "bottom",
       offset: 12,
       arrowPadding: 12,
-      openDelay: 0,
-      closeDelay: 100,
+      openDelay: 200,
+      closeDelay: 200,
       closeOnBlur: true,
       closeOnEsc: true,
       trapFocus: false,
@@ -181,45 +187,63 @@ export function Popover(props: PopoverProps) {
     }
   }
 
-  let enterTimeoutId: number | undefined;
-  let exitTimeoutId: number | undefined;
+  let openTimeoutId: number | undefined;
+  let closeTimeoutId: number | undefined;
 
-  const openWithDelay = () => {
-    window.clearTimeout(enterTimeoutId);
+  const onTriggerClick = () => {
+    disclosureState.toggle();
+  };
 
-    enterTimeoutId = window.setTimeout(() => {
+  const onTriggerKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
+    if (event.key === "Escape") {
+      disclosureState.close();
+    }
+  };
+
+  const onTriggerFocus = () => {
+    // If openTimeoutId does not exist, the user is using keyboard focus (not mouse hover/click)
+    if (openTimeoutId == null) {
+      disclosureState.open();
+    }
+  };
+
+  const onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+    const relatedTarget = getRelatedTarget(event);
+    const isValidBlur = !contains(contentRef(), relatedTarget);
+
+    if (disclosureState.isOpen() && props.closeOnBlur && isValidBlur) {
+      disclosureState.close();
+    }
+  };
+
+  const onTriggerMouseEnter = () => {
+    setIsHovered(true);
+
+    openTimeoutId = window.setTimeout(() => {
       disclosureState.open();
       void updatePosition();
     }, props.openDelay);
   };
 
-  const closeWithDelay = () => {
-    window.clearTimeout(exitTimeoutId);
+  const onTriggerMouseLeave = () => {
+    setIsHovered(false);
 
-    exitTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
+    if (openTimeoutId) {
+      clearTimeout(openTimeoutId);
+      openTimeoutId = undefined;
+    }
+
+    closeTimeoutId = window.setTimeout(() => {
+      if (!isHovered()) {
+        disclosureState.close();
+      }
+    }, props.closeDelay);
   };
 
   const onContentKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
     if (props.closeOnEsc && event.key === "Escape") {
-      closeWithDelay();
+      disclosureState.close();
     }
-  };
-
-  const onContentMouseEnter = () => {
-    setIsHovered(true);
-    window.clearTimeout(exitTimeoutId);
-  };
-
-  const onContentMouseLeave = () => {
-    setIsHovered(false);
-
-    window.clearTimeout(exitTimeoutId);
-
-    exitTimeoutId = window.setTimeout(() => {
-      console.log(isHovered());
-      // close if trigger or content is not hovered
-      !isHovered() && disclosureState.close();
-    }, props.closeDelay);
   };
 
   const onContentFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
@@ -230,41 +254,23 @@ export function Popover(props: PopoverProps) {
     const isValidBlur = !targetIsPopover && !targetIsTrigger;
 
     if (disclosureState.isOpen() && props.closeOnBlur && isValidBlur) {
-      closeWithDelay();
+      disclosureState.close();
     }
   };
 
-  const onTriggerClick = () => {
-    disclosureState.isOpen() ? closeWithDelay() : openWithDelay();
-  };
-
-  // For now, it's the same code but might change in the future.
-  const onTriggerKeyDown = onContentKeyDown;
-
-  const onTriggerMouseEnter = () => {
+  const onContentMouseEnter = () => {
     setIsHovered(true);
-
-    if (disclosureState.isOpen()) {
-      window.clearTimeout(exitTimeoutId);
-    } else {
-      openWithDelay();
-    }
   };
 
-  // For now, it's the same code but might change in the future.
-  const onTriggerMouseLeave = onContentMouseLeave;
-
-  const onTriggerFocus = () => {
-    openWithDelay();
-  };
-
-  const onTriggerBlur: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    const relatedTarget = getRelatedTarget(event);
-    const isValidBlur = !contains(contentRef(), relatedTarget);
-
-    if (disclosureState.isOpen() && props.closeOnBlur && isValidBlur) {
-      closeWithDelay();
+  const onContentMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
+    // https://stackoverflow.com/questions/46831247/select-triggers-mouseleave-event-on-parent-element-in-mozilla-firefox
+    if (event.relatedTarget === null) {
+      return;
     }
+
+    setIsHovered(false);
+
+    closeTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
   };
 
   createEffect(() => {
@@ -287,8 +293,8 @@ export function Popover(props: PopoverProps) {
       return;
     }
 
-    window.clearTimeout(enterTimeoutId);
-    window.clearTimeout(exitTimeoutId);
+    window.clearTimeout(openTimeoutId);
+    window.clearTimeout(closeTimeoutId);
   });
 
   const context: PopoverContextValue = {
@@ -308,30 +314,25 @@ export function Popover(props: PopoverProps) {
     setArrowRef,
     setAnchorRef,
     setTriggerRef,
-    closeOnEsc: () => props.closeOnEsc!,
     trapFocus: () => props.trapFocus!,
     initialFocusSelector: () => props.initialFocusSelector,
-    finalFocusSelector: () => props.finalFocusSelector,
-    closeWithDelay,
-    onContentKeyDown,
-    onContentMouseEnter,
-    onContentMouseLeave,
-    onContentFocusOut,
+    restoreFocusSelector: () => props.restoreFocusSelector,
     onTriggerClick,
     onTriggerKeyDown,
-    onTriggerMouseEnter,
-    onTriggerMouseLeave,
     onTriggerFocus,
     onTriggerBlur,
+    onTriggerMouseEnter,
+    onTriggerMouseLeave,
+    onContentKeyDown,
+    onContentFocusOut,
+    onContentMouseEnter,
+    onContentMouseLeave,
   };
 
   return (
     <StyleConfigProvider value={styleConfigResult}>
       <PopoverContext.Provider value={context}>
-        {runIfFn(props.children, {
-          isOpen: disclosureState.isOpen,
-          close: closeWithDelay,
-        })}
+        {runIfFn(props.children, disclosureState)}
       </PopoverContext.Provider>
     </StyleConfigProvider>
   );

@@ -41,6 +41,11 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
     callHandler(popoverContext.onContentKeyDown, event);
   };
 
+  const onFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
+    callHandler(local.onFocusOut, event);
+    callHandler(popoverContext.onContentFocusOut, event);
+  };
+
   const onMouseEnter: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
     callHandler(local.onMouseEnter, event);
 
@@ -53,13 +58,8 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
     callHandler(local.onMouseLeave, event);
 
     if (triggerOnHover()) {
-      popoverContext.onContentMouseLeave();
+      callHandler(popoverContext.onContentMouseLeave, event);
     }
-  };
-
-  const onFocusOut: JSX.EventHandlerUnion<HTMLElement, FocusEvent> = event => {
-    callHandler(local.onFocusOut, event);
-    callHandler(popoverContext.onContentFocusOut, event);
   };
 
   const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
@@ -81,14 +81,14 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
           aria-describedby={popoverContext.descriptionId()}
           trapFocus={popoverContext.trapFocus()}
           initialFocusSelector={popoverContext.initialFocusSelector()}
-          finalFocusSelector={popoverContext.finalFocusSelector()}
+          restoreFocusSelector={popoverContext.restoreFocusSelector()}
           class={clsx(baseClasses().root, local.class)}
           style={computedStyle()}
           __css={styleOverrides().root}
           onKeyDown={onKeyDown}
+          onFocusOut={onFocusOut}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
-          onFocusOut={onFocusOut}
           {...others}
         >
           <Show when={popoverContext.withArrow()}>
