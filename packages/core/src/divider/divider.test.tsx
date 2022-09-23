@@ -14,6 +14,8 @@ import { DividerProps } from "./types";
 const defaultProps: DividerProps = {
   labelPlacement: "center",
   orientation: "horizontal",
+  variant: "solid",
+  thickness: "1px",
 };
 
 describe("Divider", () => {
@@ -21,7 +23,7 @@ describe("Divider", () => {
   itRendersChildren(Divider as any, defaultProps);
   itSupportsClass(Divider as any, defaultProps);
   itHasSemanticClass(Divider as any, defaultProps, "hope-Divider-root");
-  itSupportsRef(Divider as any, defaultProps, HTMLDivElement);
+  itSupportsRef(Divider as any, defaultProps, HTMLHRElement);
   itSupportsStyle(Divider as any, defaultProps);
 
   it("should have attribute 'role=separator' when its not a <hr> tag.", () => {
