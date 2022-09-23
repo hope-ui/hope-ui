@@ -1,172 +1,61 @@
-import { createHopeComponent, hope, PseudoSelectorValue } from "@hope-ui/styles";
-import { ComponentProps, Show, splitProps } from "solid-js";
+import { clsx } from "clsx";
+import { Box } from "../box";
+import { useDividerStyleConfig } from "./divider.styles";
+import { Show, splitProps } from "solid-js";
+import { createHopeComponent, hope, SystemStyleObject } from "@hope-ui/styles";
+import { DividerProps } from "./types";
 
-const defalutBorderStyle: PseudoSelectorValue = {
-  content: `""`,
-  position: "relative",
-  borderTop: "thin solid rgba(0, 0, 0, 0.12)",
-  width: "100%",
-  top: "50%",
-  transform: "translateY(50%)",
-  borderLeft: 0,
-};
+export const Divider = createHopeComponent<"hr", DividerProps>(props => {
+  const [local, styleConfigProps, others] = splitProps(
+    props,
+    ["class", "children"],
+    ["variant", "labelPlacement", "orientation", "thickness"]
+  );
 
-const BaseDivider = hope(
-  "div",
-  () => ({
-    baseStyle: {
-      whiteSpace: "nowrap",
+  const { orientation = "horizontal", thickness = "1px", variant = "solid" } = styleConfigProps;
+
+  const isVertical = orientation === "vertical";
+  const hasChildren = local.children ? true : false;
+  const hasVerticalChildren = isVertical && hasChildren;
+
+  const lineWidth = {
+    top: hasVerticalChildren ? 0 : thickness,
+    left: hasVerticalChildren ? thickness : 0,
+  };
+
+  const borderSide = isVertical ? "borderLeftStyle" : "borderTopStyle";
+
+  const dividingLineStyle: SystemStyleObject = {
+    [borderSide]: variant,
+    borderWidth: hasChildren ? 0 : thickness,
+    _after: {
+      [borderSide]: variant,
+      borderWidth: `${lineWidth.top} 0 0 ${lineWidth.left}`,
     },
-    variants: {
-      hasChildren: {
-        true: {
-          _after: defalutBorderStyle,
-          _before: defalutBorderStyle,
-          borderTop: 0,
-          display: "flex",
-          margin: "14px 0",
-        },
-        false: {
-          borderTop: "thin solid rgba(0, 0, 0, 0.12)",
-          margin: "24px 0",
-        },
-      },
-      textPosition: {
-        center: {},
-        left: {
-          _after: {
-            width: "90%",
-          },
-          _before: {
-            width: "10%",
-          },
-        },
-        right: {
-          _after: {
-            width: "10%",
-          },
-          _before: {
-            width: "90%",
-          },
-        },
-      },
-      dashed: {
-        // Cover all situations
-        true: {
-          borderTopStyle: "dashed",
-          borderLeftStyle: "dashed",
-          _after: {
-            borderTopStyle: "dashed",
-            borderLeftStyle: "dashed",
-          },
-          _before: {
-            borderLeftStyle: "dashed",
-            borderTopStyle: "dashed",
-          },
-        },
-      },
-      orientation: {
-        horizontal: {
-          borderLeft: 0,
-        },
-        vertical: {
-          // vertical situation only supports flex item or inline.
-          borderTop: 0,
-          height: "auto",
-          borderLeft: "thin solid rgba(0, 0, 0, 0.12)",
-          margin: "0 1em",
-          display: "inline",
-        },
-      },
-      hasVerticalChildren: {
-        // vertical with children use flex.
-        true: {
-          display: "flex",
-          flexDirection: "column",
-          borderLeft: 0,
-          _before: {
-            borderTop: 0,
-            borderLeft: "thin solid rgba(0, 0, 0, 0.12)",
-            left: "50%",
-            top: 0,
-            height: "50%",
-            transform: "none",
-          },
-          _after: {
-            borderTop: "0",
-            borderLeft: "thin solid rgba(0, 0, 0, 0.12)",
-            left: "50%",
-            top: "0",
-            height: "50%",
-            transform: "none",
-          },
-        },
-      },
+    _before: {
+      [borderSide]: variant,
+      borderWidth: `${lineWidth.top} 0 0 ${lineWidth.left}`,
     },
-    defaultVariants: {
-      dashed: false,
-      hasChildren: false,
-      textPosition: "center",
-      orientation: "horizontal",
-      hasVerticalChildren: false,
-    },
-  }),
-  "hope-Divider-root"
-);
+  };
 
-const DividerWrapper = hope(
-  "span",
-  () => ({
-    baseStyle: {
-      display: "inline-block",
-      paddingLeft: "3",
-      paddingRight: "3",
-    },
-    variants: {
-      plain: {
-        true: {
-          fontSize: "1em",
-          fontWeight: "normal",
-        },
-        false: {
-          fontWeight: "500",
-          fontSize: "1.2em",
-        },
-      },
-    },
-    defaultVariants: {
-      plain: false,
-    },
-  }),
-  "hope-Divier-wrapper"
-);
-
-export interface DividerProps extends ComponentProps<typeof BaseDivider> {
-  /** text position of Divider */
-  textPosition?: "left" | "right" | "center";
-
-  /** line in dashed style */
-  dashed?: boolean;
-
-  /** text in plain style */
-  plain?: boolean;
-
-  /** Divider direction */
-  orientation?: "vertical" | "horizontal";
-}
-
-export const Divider = createHopeComponent<"div", DividerProps>(props => {
-  const [local, others] = splitProps(props, ["plain"]);
-  const { children, orientation } = others;
-
-  const hasChildren = children ? true : false;
-  const hasVerticalChildren = orientation === "vertical" && hasChildren;
+  const { baseClasses, styleOverrides } = useDividerStyleConfig("Divider", {
+    hasChildren,
+    ...styleConfigProps,
+  });
 
   return (
-    <BaseDivider {...{ hasChildren, hasVerticalChildren, ...others }}>
+    <Box
+      as={hasChildren ? "div" : "hr"}
+      role={hasChildren ? "separator" : undefined}
+      class={clsx(baseClasses().root, local.class)}
+      __css={{ ...styleOverrides().root, ...dividingLineStyle }}
+      {...others}
+    >
       <Show fallback={null} when={hasChildren}>
-        <DividerWrapper {...local}>{children}</DividerWrapper>
+        <hope.span class={baseClasses().wrapper} __css={styleOverrides().wrapper}>
+          {local.children}
+        </hope.span>
       </Show>
-    </BaseDivider>
+    </Box>
   );
 });

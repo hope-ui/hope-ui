@@ -1,4 +1,4 @@
-import { Divider, Flex } from "@hope-ui/core";
+import { Divider, Flex, Text } from "@hope-ui/core";
 
 import { Callout } from "~/components/callout";
 import { Preview } from "~/components/preview";
@@ -15,36 +15,42 @@ import { Divider } from "@hope-ui/core";
 
 ## Usage
 
+A `Divider` renders as an `<hr>` by default.
+You can pass `variant` prop to change the line style of the divider.
+Besides, with `thickness` prop it can control the dividing line's width.
+
 <Preview>
   <Divider />
+  <Divider variant="dashed" thickness="2px" />
+  <Divider variant="dotted" thickness="3px" />
 </Preview>
 
 ```tsx
 <Divider />
+<Divider variant="dashed" thickness="2px"/>
+<Divider variant="dotted" thickness="3px"/>
 ```
 
-### Divider with content
+### Divider with label
 
-Using a `Divider` with content is normal operation.
-You can pass `textPosition` prop to decide the position of label text.
-In addition, with `plain` prop the label text will render as plain text instead of title.
+Using a `Divider` with label is normal operation.
+You can pass `labelPlacement` prop to ensure the position of label text.
+In addition, you can use `Text` or other components to render various label.
 
 <Preview>
   Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
   Planeta Terra.
-  <Divider />
+  <Divider>Label</Divider>
   Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
   Planeta Terra.
-  <Divider>CENTER</Divider>
+  <Divider labelPlacement="left">LEFT</Divider>
   Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
   Planeta Terra.
-  <Divider textPosition="left">LEFT</Divider>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
-  <Divider textPosition="right">RIGHT</Divider>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
-  <Divider plain>plain</Divider>
+  <Divider>
+    <Text color="blue" fontWeight="600">
+      Label
+    </Text>
+  </Divider>
   Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
   Planeta Terra.
 </Preview>
@@ -52,13 +58,15 @@ In addition, with `plain` prop the label text will render as plain text instead 
 <Box>
   <Divider />
   {content}
-  <Divider>CENTER</Divider>
+  <Divider>Label</Divider>
   {content}
-  <Divider textPosition="left">LEFT</Divider>
+  <Divider labelPlacement="left">LEFT</Divider>
   {content}
-  <Divider textPosition="right">RIGHT</Divider>
-  {content}
-  <Divider plain>plain</Divider>
+  <Divider>
+    <Text color="red" fontWeight="600">
+      Label
+    </Text>
+  </Divider>
   {content}
 </Box>
 ```
@@ -84,7 +92,9 @@ You can make a vertical `Divider` using the `orientation` prop.
 </Box>
 ```
 
-### Vertical divider with content
+### Vertical divider with label
+
+When you pass `vertical` to `orientation` prop, you can add children component and it will render like this.
 
 <Preview>
   <Flex>
@@ -107,11 +117,34 @@ You can make a vertical `Divider` using the `orientation` prop.
 </Flex>
 ```
 
+## Theming
+
+Use the `DividerTheme` type to override `Divider` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, DividerTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Divider: {
+      // ...overrides
+    } as DividerTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name    | Static selector        | Description   |
+| ------- | ---------------------- | ------------- |
+| root    | `hope-Divider-root`    | Root element  |
+| wrapper | `hope-Divider-wrapper` | Label element |
+
 ## Props
 
-| Name         | Type                            | Description                                     | Default value |
-| ------------ | ------------------------------- | ----------------------------------------------- | ------------- |
-| dashed       | `boolean`                       | Whether the divider line should be dashed line. | false         |
-| orientation  | `"horizontal" \| "vertical"`    | The orientation of divider.                     | horizontal    |
-| plain        | `boolean`                       | Whether the lable text should be plain text.    | false         |
-| textPosition | `"center" \| "left" \| "right"` | The position of label text                      | center        |
+| Name           | Type                                | Description                        | Default value |
+| -------------- | ----------------------------------- | ---------------------------------- | ------------- |
+| variant        | `"solid" \| "dashed" \| "dotted"`   | The style of divider line.         | solid         |
+| thickness      | `ResponsiveValue<number \| string>` | The thickness of the divider line. | 1px           |
+| orientation    | `"horizontal" \| "vertical"`        | The orientation of divider.        | horizontal    |
+| labelPlacement | `"center" \| "left" \| "right"`     | The placement of label text.       | center        |

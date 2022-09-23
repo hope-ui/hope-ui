@@ -6,13 +6,13 @@ import {
   itSupportsRef,
   itSupportsStyle,
 } from "@hope-ui/tests";
+import { render, screen } from "solid-testing-library";
 
-import { Divider, DividerProps } from "./divider";
+import { Divider } from "./divider";
+import { DividerProps } from "./types";
 
 const defaultProps: DividerProps = {
-  textPosition: "center",
-  dashed: false,
-  plain: false,
+  labelPlacement: "center",
   orientation: "horizontal",
 };
 
@@ -23,4 +23,12 @@ describe("Divider", () => {
   itHasSemanticClass(Divider as any, defaultProps, "hope-Divider-root");
   itSupportsRef(Divider as any, defaultProps, HTMLDivElement);
   itSupportsStyle(Divider as any, defaultProps);
+
+  it("should have attribute 'role=separator' when its not a <hr> tag.", () => {
+    render(() => <Divider data-testid="divider">Label</Divider>);
+
+    const divider = screen.getByTestId("divider");
+
+    expect(divider).toHaveAttribute("role", "separator");
+  });
 });
