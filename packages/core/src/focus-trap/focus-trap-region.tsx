@@ -14,6 +14,7 @@
 
 import { createHopeComponent, hope } from "@hope-ui/styles";
 import {
+  contains,
   focusWithoutScrolling,
   getActiveElement,
   getAllTabbableIn,
@@ -120,16 +121,12 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
       return false;
     }
 
-    if (containerRef.contains(activeElement)) {
+    if (contains(containerRef, activeElement)) {
       return false;
     }
 
-    if (!isFocusable(activeElement)) {
-      return false;
-    }
-
-    // don't restore focus if a tabbable element outside the container is already focused.
-    return true;
+    // don't restore focus if a focusable element outside the container is already focused.
+    return isFocusable(activeElement);
   };
 
   const onTrapFocus: JSX.EventHandlerUnion<HTMLSpanElement, FocusEvent> = event => {
@@ -166,11 +163,11 @@ export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(
   });
 
   onCleanup(() => {
-    if (preventRestoreFocus()) {
+    if (!restoreFocusElement || preventRestoreFocus()) {
       return;
     }
 
-    restoreFocusElement && focusWithoutScrolling(restoreFocusElement);
+    focusWithoutScrolling(restoreFocusElement);
   });
 
   return (

@@ -1,11 +1,11 @@
 import { createHopeComponent } from "@hope-ui/styles";
+import { callHandler } from "@hope-ui/utils";
+import { clsx } from "clsx";
+import { JSX, splitProps } from "solid-js";
 
 import { CloseButton, CloseButtonProps } from "../close-button";
-import { usePopoverContext } from "./popover-context";
-import { JSX, splitProps } from "solid-js";
-import { callHandler } from "@hope-ui/utils";
 import { mergeDefaultProps } from "../utils";
-import { clsx } from "clsx";
+import { usePopoverContext } from "./popover-context";
 
 /**
  * PopoverCloseButton is used closes the popover.
@@ -29,7 +29,7 @@ export const PopoverCloseButton = createHopeComponent<"button", CloseButtonProps
   const onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent> = event => {
     event.stopPropagation();
     callHandler(local.onClick, event);
-    popoverContext.closeWithDelay();
+    popoverContext.onCloseButtonClick();
   };
 
   return (

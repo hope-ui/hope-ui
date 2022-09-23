@@ -204,4 +204,7 @@ export interface PopoverContextValue {
 
   /** A function that will be called when the mouse leaves the popover content. */
   onContentMouseLeave: JSX.EventHandlerUnion<HTMLElement, MouseEvent>;
+
+  /** A function that will be called when the popover close button is clicked. */
+  onCloseButtonClick: () => void;
 }

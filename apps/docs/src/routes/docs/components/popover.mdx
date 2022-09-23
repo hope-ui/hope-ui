@@ -5,10 +5,9 @@ import {
   PopoverTrigger,
   PopoverAnchor,
   PopoverContent,
-  PopoverArrow,
-  PopoverCloseButton,
   PopoverHeading,
   PopoverDescription,
+  Kbd,
 } from "@hope-ui/core";
 
 import { Callout } from "~/components/callout";
@@ -28,7 +27,6 @@ import {
   PopoverTrigger,
   PopoverAnchor,
   PopoverContent,
-  PopoverArrow,
   PopoverCloseButton,
   PopoverHeading,
   PopoverDescription,
@@ -39,14 +37,13 @@ import {
 - **PopoverTrigger:** The component that opens/closes the popover.
 - **PopoverAnchor:** The component to use as positioning reference instead of the trigger.
 - **PopoverContent:** The popover itself.
-- **PopoverArrow:** A visual arrow that points to the reference (trigger or anchor) element.
 - **PopoverCloseButton:** A button to close the popover.
 - **PopoverHeading:** An optional heading for the popover.
 - **PopoverDescription:** An optional description for the popover.
 
 ## Usage
 
-`PopoverTrigger` renders an unstyled button by default. For accessibility reason, when using the `as` prop ensure the element passed in is focusable.
+`PopoverTrigger` renders an unstyled `button` by default. For accessibility reason, when using the `as` prop ensure the element passed in is focusable.
 
 <Preview>
   <Popover>
@@ -200,8 +197,8 @@ Use the `trapFocus` prop to lock focus inside the `PopoverContent`.
     <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
     <PopoverContent w="max-content" p={4}>
       <HStack spacing={4}>
-        <Button>Button 1 </Button>
-        <Button>Button 2</Button>
+        <Button>Button 1</Button>
+        <Button>Button 2</Button>s
       </HStack>
     </PopoverContent>
   </Popover>
@@ -212,7 +209,7 @@ Use the `trapFocus` prop to lock focus inside the `PopoverContent`.
   <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
   <PopoverContent w="max-content" p={4}>
     <HStack spacing={4}>
-      <Button>Button 1 </Button>
+      <Button>Button 1</Button>
       <Button>Button 2</Button>
     </HStack>
   </PopoverContent>
@@ -221,7 +218,9 @@ Use the `trapFocus` prop to lock focus inside the `PopoverContent`.
 
 ### Heading and description
 
-Use `PopoverHeading` and `PopoverDescription` to add accessible heading and/or description to the popover.
+Use `PopoverHeading` to add an accessible heading to the popover, it renders an `h2` by default.
+
+Similarly `PopoverDescription` is used add an accessible description and renders a `p` by default.
 
 Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
 
@@ -246,6 +245,32 @@ Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describ
     <PopoverDescription fontSize="sm" color="neutral.600" mb={4}>
       Description
     </PopoverDescription>
+    <p>The content of the Popover.</p>
+  </PopoverContent>
+</Popover>
+```
+
+### Same width
+
+Use `hasSameWidth` prop to make the popover take the same width as the trigger element.
+
+<Preview>
+  <Popover hasSameWidth>
+    <PopoverTrigger as={Button} w={96}>
+      Trigger
+    </PopoverTrigger>
+    <PopoverContent p={4}>
+      <p>The content of the Popover.</p>
+    </PopoverContent>
+  </Popover>
+</Preview>
+
+```tsx
+<Popover hasSameWidth>
+  <PopoverTrigger as={Button} w={96}>
+    Trigger
+  </PopoverTrigger>
+  <PopoverContent p={4}>
     <p>The content of the Popover.</p>
   </PopoverContent>
 </Popover>
@@ -364,7 +389,7 @@ To learn more about the transition API check out the [createTransition](/docs/pr
 
 ### Popover anchor
 
-Use the `PopoverAnchor` component if you want to use a different element for the popover positioning reference.
+Use the `PopoverAnchor` component if you want to use a different element for the popover positioning reference, it rendes a `div` by default.
 
 In the example below, the `Button` is the trigger that opens/closes the popover and the `Icon` is the reference element that the popover will position relative to.
 
@@ -450,9 +475,86 @@ function ControlledPopoverExample() {
 
 ## Accessibility
 
-- `PopoverTrigger` has `aria-haspopup` set to `dialog` to denote that it triggers a popover.
-- `PopoverTrigger` has `aria-controls` set to the id of the `PopoverContent`.
-- `PopoverTrigger` has `aria-expanded` synced with the open/closed state of the popover.
-- `PopoverTrigger` has `aria-labelledby` set to the id of the `PopoverHeading`.
-- `PopoverTrigger` has `aria-describedby` set to the id of the `PopoverDescription`.
-- `PopoverContent` has role set to `dialog`, when the `triggerMode` is `hover`, role is set to `tooltip`.
+### ARIA roles and attributes
+
+`PopoverTrigger` has:
+
+- `aria-haspopup` set to `dialog` to denote that it triggers a popover.
+- `aria-controls` set to the `id` of the `PopoverContent`.
+- `aria-expanded` synced with the open/closed state of the popover.
+- `aria-labelledby` set to the `id` of the `PopoverHeading`, if any.
+- `aria-describedby` set to the `id` of the `PopoverDescription`, if any.
+
+`PopoverContent` has:
+
+- `role` set to `dialog`, when the `triggerMode` is `hover`, role is set to `tooltip`.
+
+### Keyboard support (closed popover)
+
+- In `click` mode, clicking the `PopoverTrigger` or pressing <Kbd>space</Kbd> or <Kbd>enter</Kbd> when focus is on the trigger will open the popover.
+- In `hover` mode, focusing on or mousing over the `PopoverTrigger` will open the popover.
+
+### Keyboard support (opened popover)
+
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `PopoverContent`.
+- In `click` mode, clicking the `PopoverTrigger` closes the popover.
+- In `hover` mode, blurring or mousing out of the `PopoverTrigger` will close the popover. If you move your mouse into the `PopoverContent`, it'll remain visible.
+- When focus is within the `PopoverContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the popover.
+- When `closeOnBur` prop is `true`, clicking outside or blurring out of the `PopoverContent` closes the popover.
+- When the popover closes, focus returns to the `PopoverTrigger` unless another focusable element takes focus.
+
+## Theming
+
+Use the `PopoverTheme` type to override `Popover` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, PopoverTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Popover: {
+      // ...overrides
+    } as PopoverTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name  | Static selector      | Description     |
+| ----- | -------------------- | --------------- |
+| root  | `hope-Popover-root`  | Popover content |
+| arrow | `hope-Popover-arrow` | Popover arrow   |
+
+## Props
+
+### Popover
+
+| Name                 | Type                                       | Description                                                                                    | Default value |
+| -------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------- |
+| id                   | `string`                                   | The id of the popover content.                                                                 |               |
+| isOpen               | `boolean`                                  | Whether the popover should be shown (in controlled mode).                                      |               |
+| defaultIsOpen        | `boolean`                                  | Whether the popover should be initially shown (in uncontrolled mode).                          |               |
+| onOpenChange         | `(isOpen: boolean) => void`                | A function that will be called when the `isOpen` state of the popover changes.                 |               |
+| children             | `JSX.Element \| PopoverChildrenRenderProp` | Children of the popover.                                                                       |               |
+| transitionOptions    | `TransitionOptions`                        | Options passed to the popover transition.                                                      |               |
+| triggerMode          | `"hover" \| "click"`                       | The interaction that triggers the popover.                                                     | "click"       |
+| withArrow            | `boolean`                                  | Whether the popover should display an arrow inside it.                                         | true          |
+| arrowSize            | `number`                                   | The size of the arrow (in px).                                                                 | 24            |
+| arrowPadding         | `number`                                   | The minimum padding between the arrow and the popover corner (in px).                          | 12            |
+| placement            | `FloatingPlacement`                        | Placement of the popover.                                                                      | "bottom"      |
+| hasSameWidth         | `boolean`                                  | Whether the popover should have the same width as the trigger/anchor element.                  |               |
+| offset               | `number`                                   | Offset between the popover and the anchor element (in px).                                     | 12            |
+| overflowPadding      | `number`                                   | The minimum padding between the popover and the viewport edge (in px).                         |               |
+| openDelay            | `number`                                   | Delay before showing the popover on hover (in ms).                                             | 200           |
+| closeDelay           | `number`                                   | Delay before hiding the popover on mouse leave (in ms).                                        | 200           |
+| closeOnBlur          | `boolean`                                  | Whether the popover should close when the user blur out it by clicking outside or tabbing out. | true          |
+| closeOnEsc           | `boolean`                                  | Whether the popover should close when the user hit the `Esc` key.                              | true          |
+| trapFocus            | `boolean`                                  | Whether the focus will be locked into the popover.                                             | false         |
+| initialFocusSelector | `string`                                   | A query selector to retrieve the element that should receive focus once the popover opens.     |               |
+| restoreFocusSelector | `string`                                   | A query selector to retrieve the element that should receive focus once the popover closes.    |               |
+
+### Other components props
+
+- `PopoverCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `PopoverTrigger` , `PopoverAnchor`, `PopoverContent`, `PopoverHeading` and `PopoverDescription` supports commons Hope UI props (style props, `sx` and `as`).

@@ -273,6 +273,10 @@ export function Popover(props: PopoverProps) {
     closeTimeoutId = window.setTimeout(disclosureState.close, props.closeDelay);
   };
 
+  const onCloseButtonClick = () => {
+    disclosureState.close();
+  };
+
   createEffect(() => {
     const { referenceEl, floatingEl } = getPopoverElements();
 
@@ -327,6 +331,7 @@ export function Popover(props: PopoverProps) {
     onContentFocusOut,
     onContentMouseEnter,
     onContentMouseLeave,
+    onCloseButtonClick,
   };
 
   return (
