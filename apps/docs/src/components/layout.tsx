@@ -127,7 +127,7 @@ function Header(props: HeaderProps) {
                 color: "neutral.300",
               }}
             >
-              v1.0.0-next.3
+              v1.0.0-next.4
             </hope.span>
           </HStack>
         </Flex>
@@ -197,8 +197,8 @@ export function Layout(props: ParentProps) {
           maxW={{ base: "2xl", lg: "none" }}
           flex="1 1 auto"
           px={{ base: 4, xl: 16 }}
-          pr={{ lg: 0 }}
-          pl={{ lg: 8 }}
+          ps={{ lg: 8 }}
+          pe={{ lg: 0 }}
           py={16}
         >
           <article>
