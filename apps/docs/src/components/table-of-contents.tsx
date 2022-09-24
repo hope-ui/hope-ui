@@ -152,7 +152,7 @@ export function TableOfContents() {
   const currentSection = useCurrentSection(toc);
 
   return (
-    <TocRoot>
+    <TocRoot class="hide-scrollbar">
       <hope.nav aria-labelledby="on-this-page-title" w={56}>
         <Suspense>
           <Heading

@@ -6,27 +6,19 @@
  * https://github.com/chakra-ui/chakra-ui/blob/main/packages/styled-system/src/css.ts
  */
 
-import { isEmptyObject, isObject, runIfFn } from "@hope-ui/utils";
+import { isObject, runIfFn } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps, SystemStyleObject, Theme } from "../types";
-import { isColorModeObjectLike } from "../utils";
-import { expandResponsive } from "./expand-responsive";
-import {
-  DARK_PSEUDO_PROP,
-  DARK_SELECTOR,
-  PSEUDO_SELECTORS_MAP,
-  SHORTHANDS_MAP,
-} from "./property-map";
+import { expandSyntax } from "./expand-syntax";
+import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
 import { resolveTokenValue } from "./resolve-token-value";
 
 /** Return a CSSObject from a system style object. */
 export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme): CSSObject {
   const computedStyles: CSSObject = {};
 
-  const styles = expandResponsive(systemStyleObject)(theme);
-
-  let darkSystemStyleObject: SystemStyleObject = {};
+  const styles = expandSyntax(systemStyleObject)(theme);
 
   for (let key in styles) {
     /**
@@ -37,28 +29,6 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
 
     if (value == null) {
       continue;
-    }
-
-    /**
-     * Extract dark mode pseudo selector style.
-     */
-    if (key === DARK_PSEUDO_PROP && isObject(value)) {
-      darkSystemStyleObject = Object.assign({}, darkSystemStyleObject, value);
-      continue;
-    }
-
-    /**
-     * Split `light/dark` values.
-     * Assuming light a "first/default" interface.
-     */
-    if (isObject(value) && isColorModeObjectLike(value)) {
-      const { light, dark } = value;
-
-      value = light;
-
-      if (dark != null) {
-        darkSystemStyleObject[key] = dark;
-      }
     }
 
     /**
@@ -110,38 +80,5 @@ export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme):
     }
   }
 
-  if (!isEmptyObject(darkSystemStyleObject)) {
-    computedStyles[DARK_SELECTOR] = Object.assign(
-      {},
-      computedStyles[DARK_SELECTOR],
-      toCSSObject(darkSystemStyleObject, theme)
-    );
-  }
-
-  // Sort in correct CSS order.
-  return Object.keys(computedStyles)
-    .sort((a, b) => {
-      if (a.startsWith("@")) {
-        // `a` is a css "@" query => a>b.
-        return 1;
-      } else if (b.startsWith("@")) {
-        // `b` is a css "@" query => b>a.
-        return -1;
-      } else if (isObject(computedStyles[a])) {
-        // `a` is a css selector => a>b.
-        return 1;
-      } else if (isObject(computedStyles[b])) {
-        // `b` is a css selector => b>a.
-        return -1;
-      } else {
-        // both are css rules => keep order.
-        return 0;
-      }
-    })
-    .reduce((acc, key) => {
-      acc[key] = computedStyles[key];
-      return acc;
-    }, {} as any);
-
-  //return computedStyles;
+  return computedStyles;
 }
