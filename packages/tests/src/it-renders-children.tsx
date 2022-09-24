@@ -7,14 +7,17 @@
  */
 
 import { Component } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render, screen } from "solid-testing-library";
 
-export function itRendersChildren<P>(Comp: Component<P>, requiredProps: P) {
+export function itRendersChildren<P>(Comp: Component<P>, requiredProps: P, Wrapper = Fragment) {
   it("renders children", () => {
     render(() => (
-      <Comp {...requiredProps}>
-        <span data-testid="test-children">test children</span>
-      </Comp>
+      <Wrapper>
+        <Comp {...requiredProps}>
+          <span data-testid="test-children">test children</span>
+        </Comp>
+      </Wrapper>
     ));
 
     expect(screen.getByTestId("test-children")).toBeInTheDocument();

@@ -6,11 +6,13 @@ import {
   itSupportsClass,
   itSupportsRef,
   itSupportsStyle,
+  setupMatchMediaMock,
 } from "@hope-ui/tests";
 import { render, screen } from "solid-testing-library";
 
-import { createIcon } from "../icon";
-import { CloseButton, CloseButtonProps } from "./close-button";
+import { createIcon } from "../../icon";
+import { PopoverCloseButton, PopoverCloseButtonProps } from "../popover-close-button";
+import { Popover } from "../popover";
 
 const BeakerIcon = createIcon({
   path: () => (
@@ -25,22 +27,32 @@ const BeakerIcon = createIcon({
   ),
 });
 
-const defaultProps: CloseButtonProps = {
+const defaultProps: PopoverCloseButtonProps = {
   "aria-label": "test",
   children: () => <BeakerIcon />,
 };
 
-describe("CloseButton", () => {
-  checkAccessibility([<CloseButton {...defaultProps} />]);
-  itIsPolymorphic(CloseButton as any, defaultProps);
-  itRendersChildren(CloseButton as any, defaultProps);
-  itSupportsClass(CloseButton as any, defaultProps);
-  itHasSemanticClass(CloseButton as any, defaultProps, "hope-CloseButton-root");
-  itSupportsRef(CloseButton as any, defaultProps, HTMLButtonElement);
-  itSupportsStyle(CloseButton as any, defaultProps);
+setupMatchMediaMock();
+
+describe("PopoverCloseButton", () => {
+  checkAccessibility([
+    <Popover>
+      <PopoverCloseButton {...defaultProps} />
+    </Popover>,
+  ]);
+  itIsPolymorphic(PopoverCloseButton as any, defaultProps, undefined, Popover);
+  itRendersChildren(PopoverCloseButton as any, defaultProps, Popover);
+  itSupportsClass(PopoverCloseButton as any, defaultProps, Popover);
+  itHasSemanticClass(PopoverCloseButton as any, defaultProps, "hope-Popover-closeButton", Popover);
+  itSupportsRef(PopoverCloseButton as any, defaultProps, HTMLButtonElement, undefined, Popover);
+  itSupportsStyle(PopoverCloseButton as any, defaultProps, undefined, Popover);
 
   it("should have required 'aria-label'", () => {
-    render(() => <CloseButton data-testid="button" {...defaultProps} />);
+    render(() => (
+      <Popover>
+        <PopoverCloseButton data-testid="button" {...defaultProps} />
+      </Popover>
+    ));
 
     const button = screen.getByTestId("button");
 

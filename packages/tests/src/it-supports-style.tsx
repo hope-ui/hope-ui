@@ -7,9 +7,15 @@
  */
 
 import { Component } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itSupportsStyle<P>(Comp: Component<P>, requiredProps: P, selector?: string) {
+export function itSupportsStyle<P>(
+  Comp: Component<P>,
+  requiredProps: P,
+  selector?: string,
+  Wrapper = Fragment
+) {
   it("supports style property", async () => {
     const getTarget = (container: HTMLElement) => {
       return selector
@@ -18,7 +24,9 @@ export function itSupportsStyle<P>(Comp: Component<P>, requiredProps: P, selecto
     };
 
     const { container } = render(() => (
-      <Comp {...requiredProps} style={{ border: "1px solid cyan" }} />
+      <Wrapper>
+        <Comp {...requiredProps} style={{ border: "1px solid cyan" }} />
+      </Wrapper>
     ));
 
     expect(getTarget(container)).toHaveStyle({ border: "1px solid cyan" });

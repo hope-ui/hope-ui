@@ -7,13 +7,15 @@ import { CloseButton, CloseButtonProps } from "../close-button";
 import { mergeDefaultProps } from "../utils";
 import { usePopoverContext } from "./popover-context";
 
+export type PopoverCloseButtonProps = CloseButtonProps;
+
 /**
  * PopoverCloseButton is used closes the popover.
  *
  * You don't need to pass the `onClick` to it, it gets the
  * `close` action from the popover context.
  */
-export const PopoverCloseButton = createHopeComponent<"button", CloseButtonProps>(props => {
+export const PopoverCloseButton = createHopeComponent<"button", PopoverCloseButtonProps>(props => {
   const popoverContext = usePopoverContext();
 
   props = mergeDefaultProps(

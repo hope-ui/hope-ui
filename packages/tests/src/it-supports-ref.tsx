@@ -7,18 +7,24 @@
  */
 
 import { Component } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
 export function itSupportsRef<P>(
   Comp: Component<P>,
   requiredProps: P,
   refType: any,
-  refProp = "ref"
+  refProp = "ref",
+  Wrapper = Fragment
 ) {
   it(refProp ? `supports getting ref with ${refProp} prop` : "supports ref", async () => {
     let ref: typeof refType;
 
-    render(() => <Comp {...requiredProps} ref={ref} />);
+    render(() => (
+      <Wrapper>
+        <Comp {...requiredProps} ref={ref} />
+      </Wrapper>
+    ));
 
     await Promise.resolve();
 
