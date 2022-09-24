@@ -28,14 +28,14 @@
     "start": "solid-start start"
   },
   "dependencies": {
-    "@hope-ui/core": "1.0.0-next.4",
+    "@hope-ui/core": "1.0.0-next.5",
     "@solidjs/meta": "0.28.0",
     "@solidjs/router": "0.4.2",
     "@stitches/core": "1.2.8",
     "clsx": "1.2.1"
   },
   "devDependencies": {
-    "@hope-ui/mdx": "1.0.0-next.4",
+    "@hope-ui/mdx": "1.0.0-next.5",
     "babel-preset-solid": "1.5.4",
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",

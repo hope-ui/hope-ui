@@ -96,8 +96,8 @@ importers:
 
   apps/docs:
     specifiers:
-      "@hope-ui/core": 1.0.0-next.4
-      "@hope-ui/mdx": 1.0.0-next.4
+      "@hope-ui/core": 1.0.0-next.5
+      "@hope-ui/mdx": 1.0.0-next.5
       "@solidjs/meta": 0.28.0
       "@solidjs/router": 0.4.2
       "@stitches/core": 1.2.8
@@ -144,10 +144,10 @@ importers:
   packages/core:
     specifiers:
       "@floating-ui/dom": 1.0.1
-      "@hope-ui/primitives": 1.0.0-next.4
-      "@hope-ui/styles": 1.0.0-next.4
-      "@hope-ui/tests": 1.0.0-next.4
-      "@hope-ui/utils": 1.0.0-next.4
+      "@hope-ui/primitives": 1.0.0-next.5
+      "@hope-ui/styles": 1.0.0-next.5
+      "@hope-ui/tests": 1.0.0-next.5
+      "@hope-ui/utils": 1.0.0-next.5
       "@storybook/addon-a11y": 6.5.10
       "@storybook/addon-actions": 6.5.10
       "@storybook/addon-essentials": 6.5.10
@@ -204,8 +204,8 @@ importers:
 
   packages/primitives:
     specifiers:
-      "@hope-ui/tests": 1.0.0-next.4
-      "@hope-ui/utils": 1.0.0-next.4
+      "@hope-ui/tests": 1.0.0-next.5
+      "@hope-ui/utils": 1.0.0-next.5
       "@solid-primitives/media": 2.0.2
     dependencies:
       "@hope-ui/utils": link:../utils
@@ -215,7 +215,7 @@ importers:
 
   packages/styles:
     specifiers:
-      "@hope-ui/utils": 1.0.0-next.4
+      "@hope-ui/utils": 1.0.0-next.5
       csstype: 3.1.1
       dset: 3.1.2
     dependencies:
