@@ -134,6 +134,26 @@ export function DisableFocusTrapExample() {
   );
 }
 
+export function DisablePreventScrollExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
 export function HeadingAndDescriptionExample() {
   const [isOpen, setIsOpen] = createSignal(false);
 

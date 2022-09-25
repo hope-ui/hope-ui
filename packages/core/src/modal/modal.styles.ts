@@ -98,7 +98,8 @@ export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(
     baseStyle: {
       ...baseModalContentStyle,
       justifyContent: "center",
-      my: "3.75rem",
+      my: 12,
+      mx: 4,
       borderRadius: "sm",
     },
     variants: {
@@ -121,13 +122,13 @@ export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(
           "@supports(min-height: -webkit-fill-available)": {
             minHeight: "-webkit-fill-available",
           },
-          my: 0,
+          m: 0,
           borderRadius: "none",
         },
       },
       scrollBehavior: {
         inside: {
-          maxHeight: "calc(100% - 7.5rem)", // 7.5rem = my * 2
+          maxHeight: "calc(100% - 6rem)", // my * 2
         },
         outside: {
           maxHeight: "none",
