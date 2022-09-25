@@ -3,15 +3,15 @@
  * Apache License Version 2.0, Copyright 2020 Adobe.
  *
  * Credits to the React Spectrum team:
- * https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/overlays/src/usePreventScroll.ts
+ * https://github.com/adobe/react-spectrum/blob/892d41e82dc781fb4651455d0e29c324376659ed/packages/@react-aria/overlays/src/usePreventScroll.ts
  */
 
 import { access, chain, getScrollParent, isIOS, MaybeAccessor } from "@hope-ui/utils";
 import { createEffect, on, onCleanup } from "solid-js";
 
 export interface PreventScrollOptions {
-  /** Whether the scroll lock is disabled. */
-  isDisabled?: MaybeAccessor<boolean | undefined>;
+  /** Whether the scroll lock is enabled. */
+  isEnabled: MaybeAccessor<boolean>;
 }
 
 const visualViewport = typeof window !== "undefined" && window.visualViewport;
@@ -34,12 +34,12 @@ const nonTextInputTypes = new Set([
  * restores it on unmount. Also ensures that content does not
  * shift due to the scrollbars disappearing.
  */
-export function createPreventScroll(options: PreventScrollOptions = {}) {
+export function createPreventScroll(options: PreventScrollOptions) {
   createEffect(
     on(
-      () => access(options.isDisabled),
-      newValue => {
-        if (newValue) {
+      () => access(options.isEnabled),
+      isEnabled => {
+        if (!isEnabled) {
           return;
         }
 

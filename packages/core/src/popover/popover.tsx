@@ -98,10 +98,10 @@ export function Popover(props: PopoverProps) {
       return props.transitionOptions?.exitDelay;
     },
     get easing() {
-      return props.transitionOptions?.easing;
+      return props.transitionOptions?.easing ?? "ease-out";
     },
     get exitEasing() {
-      return props.transitionOptions?.exitEasing;
+      return props.transitionOptions?.exitEasing ?? "ease-in";
     },
     get onBeforeEnter() {
       return props.transitionOptions?.onBeforeEnter;

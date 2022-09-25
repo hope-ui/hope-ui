@@ -521,10 +521,12 @@ const theme = extendTheme({
 
 ### Component parts
 
-| Name  | Static selector      | Description     |
-| ----- | -------------------- | --------------- |
-| root  | `hope-Popover-root`  | Popover content |
-| arrow | `hope-Popover-arrow` | Popover arrow   |
+| Name        | Static selector            | Description         |
+| ----------- | -------------------------- | ------------------- |
+| root        | `hope-Popover-root`        | Popover content     |
+| arrow       | `hope-Popover-arrow`       | Popover arrow       |
+| heading     | `hope-Popover-heading`     | Popover heading     |
+| description | `hope-Popover-description` | Popover description |
 
 ## Props
 
@@ -537,7 +539,7 @@ const theme = extendTheme({
 | defaultIsOpen        | `boolean`                                  | Whether the popover should be initially shown (in uncontrolled mode).                          |               |
 | onOpenChange         | `(isOpen: boolean) => void`                | A function that will be called when the `isOpen` state of the popover changes.                 |               |
 | children             | `JSX.Element \| PopoverChildrenRenderProp` | Children of the popover.                                                                       |               |
-| transitionOptions    | `TransitionOptions`                        | Options passed to the popover transition.                                                      |               |
+| transitionOptions    | `TransitionOptionsOverride`                | Options passed to the popover transition.                                                      |               |
 | triggerMode          | `"hover" \| "click"`                       | The interaction that triggers the popover.                                                     | "click"       |
 | withArrow            | `boolean`                                  | Whether the popover should display an arrow inside it.                                         | true          |
 | arrowSize            | `number`                                   | The size of the arrow (in px).                                                                 | 24            |

@@ -1,6 +1,6 @@
 import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
-export type PopoverParts = "root" | "arrow";
+export type PopoverParts = "root" | "arrow" | "heading" | "description";
 
 export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme => ({
   root: {
@@ -22,18 +22,14 @@ export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme =
 
       boxShadow: "md",
       border: `1px solid ${theme.vars.colors.neutral["300"]}`,
+      borderColor: { dark: "neutral.600" },
       borderRadius: "sm",
-      backgroundColor: "common.white",
+      backgroundColor: { light: "common.white", dark: "neutral.700" },
 
       color: "inherit",
 
       _focus: {
         outline: "none",
-      },
-
-      _dark: {
-        borderColor: "neutral.600",
-        backgroundColor: "neutral.700",
       },
     },
   },
@@ -56,6 +52,8 @@ export const usePopoverStyleConfig = createStyleConfig<PopoverParts, {}>(theme =
       },
     },
   },
+  heading: {},
+  description: {},
 }));
 
 export type PopoverStyleConfigProps = StyleConfigProps<typeof usePopoverStyleConfig>;

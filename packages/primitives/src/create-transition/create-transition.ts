@@ -60,6 +60,8 @@ export interface TransitionOptions {
   onAfterExit?: () => void;
 }
 
+export type TransitionOptionsOverride = Partial<Omit<TransitionOptions, "shouldMount">>;
+
 export interface TransitionResult {
   /** Whether the element should be kept in the DOM. */
   keepMounted: Accessor<boolean>;
