@@ -1,4 +1,5 @@
-// styles
+// sub packages
+export * from "@hope-ui/primitives";
 export * from "@hope-ui/styles";
 
 // utilities

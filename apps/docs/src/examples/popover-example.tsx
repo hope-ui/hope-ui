@@ -8,7 +8,7 @@ import {
 } from "@hope-ui/core";
 import { createSignal } from "solid-js";
 
-import { TargetIcon } from "./icons";
+import { TargetIcon } from "../components/icons";
 
 export function RenderPropPopoverExample() {
   return (

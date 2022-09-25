@@ -23,7 +23,7 @@ export interface ModalProps extends ModalStyleConfigProps, ParentProps {
   /** Whether the modal should close when the overlay is clicked. */
   closeOnOverlayClick?: boolean;
 
-  /**  Whether the modal should close when the user hit the `Esc` key. */
+  /** Whether the modal should close when the user hit the `Esc` key. */
   closeOnEsc?: boolean;
 
   /** Whether the scroll should be disabled on the `body` when the modal opens. */
@@ -41,7 +41,7 @@ export interface ModalProps extends ModalStyleConfigProps, ParentProps {
   /** A function that will be called when the overlay is clicked. */
   onOverlayClick?: () => void;
 
-  /** A function that will be called when the `Esc` key is pressed and focus is within modal. */
+  /** A function that will be called when the `Esc` key is pressed and focus is within the modal. */
   onEscKeyDown?: () => void;
 }
 

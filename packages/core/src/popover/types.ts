@@ -77,7 +77,7 @@ export interface PopoverProps extends PopoverStyleConfigProps {
   /** Whether the popover should close when the user blur out it by clicking outside or tabbing out. */
   closeOnBlur?: boolean;
 
-  /**  Whether the popover should close when the user hit the `Esc` key. */
+  /** Whether the popover should close when the user hit the `Esc` key. */
   closeOnEsc?: boolean;
 
   /** Whether the focus will be locked into the popover. */

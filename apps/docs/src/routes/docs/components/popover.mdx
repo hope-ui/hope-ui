@@ -11,7 +11,7 @@ import {
 } from "@hope-ui/core";
 
 import { Callout } from "~/components/callout";
-import { RenderPropPopoverExample, ControlledPopoverExample } from "~/components/popover-example";
+import { RenderPropPopoverExample, ControlledPopoverExample } from "~/examples/popover-example.js";
 import { Preview } from "~/components/preview";
 import { TargetIcon } from "~/components/icons";
 
@@ -229,7 +229,11 @@ Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describ
     <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
     <PopoverContent w="max-content" p={4}>
       <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
-      <PopoverDescription fontSize="sm" color="neutral.600" mb={4}>
+      <PopoverDescription
+        fontSize="sm"
+        color={{ light: "neutral.600", dark: "neutral.300" }}
+        mb={4}
+      >
         Description
       </PopoverDescription>
       <p>The content of the Popover.</p>
@@ -242,7 +246,7 @@ Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describ
   <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
   <PopoverContent w="max-content" p={4}>
     <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
-    <PopoverDescription fontSize="sm" color="neutral.600" mb={4}>
+    <PopoverDescription fontSize="sm" color={{ light: "neutral.600", dark: "neutral.300" }} mb={4}>
       Description
     </PopoverDescription>
     <p>The content of the Popover.</p>
@@ -534,10 +538,10 @@ const theme = extendTheme({
 
 | Name                 | Type                                       | Description                                                                                    | Default value |
 | -------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------- |
-| id                   | `string`                                   | The id of the popover content.                                                                 |               |
 | isOpen               | `boolean`                                  | Whether the popover should be shown (in controlled mode).                                      |               |
 | defaultIsOpen        | `boolean`                                  | Whether the popover should be initially shown (in uncontrolled mode).                          |               |
 | onOpenChange         | `(isOpen: boolean) => void`                | A function that will be called when the `isOpen` state of the popover changes.                 |               |
+| id                   | `string`                                   | The id of the popover content.                                                                 |               |
 | children             | `JSX.Element \| PopoverChildrenRenderProp` | Children of the popover.                                                                       |               |
 | transitionOptions    | `TransitionOptionsOverride`                | Options passed to the popover transition.                                                      |               |
 | triggerMode          | `"hover" \| "click"`                       | The interaction that triggers the popover.                                                     | "click"       |

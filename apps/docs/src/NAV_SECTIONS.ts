@@ -207,6 +207,10 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Overlays",
     links: [
       {
+        title: "Modal",
+        href: "/docs/components/modal",
+      },
+      {
         title: "Popover",
         href: "/docs/components/popover",
       },
