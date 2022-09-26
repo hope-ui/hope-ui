@@ -97,7 +97,6 @@ export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(
   content: {
     baseStyle: {
       ...baseModalContentStyle,
-      justifyContent: "center",
       my: 12,
       mx: 4,
       borderRadius: "sm",
@@ -129,9 +128,11 @@ export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(
       scrollBehavior: {
         inside: {
           maxHeight: "calc(100% - 6rem)", // my * 2
+          overflow: "auto",
         },
         outside: {
           maxHeight: "none",
+          overflow: undefined,
         },
       },
     },

@@ -52,6 +52,7 @@ export interface FocusTrapRegionProps extends ParentProps {
 
 /**
  * `FocusTrapRegion` traps focus within itself.
+ * It renders a `div` by default.
  */
 export const FocusTrapRegion = createHopeComponent<"div", FocusTrapRegionProps>(props => {
   let restoreFocusElement: HTMLElement | null;

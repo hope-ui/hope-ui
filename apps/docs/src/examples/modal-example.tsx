@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   HStack,
   Modal,
@@ -7,10 +8,11 @@ import {
   ModalDescription,
   ModalHeading,
   ModalOverlay,
+  ModalProps,
   Text,
   VStack,
 } from "@hope-ui/core";
-import { createSignal } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 
 export function BasicUsageExample() {
   const [isOpen, setIsOpen] = createSignal(false);
@@ -177,6 +179,149 @@ export function HeadingAndDescriptionExample() {
             <ModalCloseButton />
           </HStack>
           <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export function TransitionExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        modalTransitionOptions={{
+          transition: "slide-up",
+          duration: 400,
+          exitDuration: 250,
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export function VerticallyCenteredExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} isCentered>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export function SizeExample() {
+  const [size, setSize] = createSignal<ModalProps["size"]>("md");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newSize: ModalProps["size"]) => {
+    setSize(newSize);
+    setIsOpen(true);
+  };
+
+  const sizes: Array<ModalProps["size"]> = ["xs", "sm", "md", "lg", "xl", "full"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={sizes}>{size => <Button onClick={() => handleClick(size)}>{size}</Button>}</For>
+      </HStack>
+
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
+        <Show when={size() !== "full"}>
+          <ModalOverlay />
+        </Show>
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export function CustomBackdropExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <ModalOverlay
+          sx={{
+            bg: "blackAlpha.300",
+            backdropFilter: "blur(10px) hue-rotate(90deg)",
+          }}
+        />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+export function ScrollBehaviorExample() {
+  const [scrollBehavior, setScrollBehavior] = createSignal<ModalProps["scrollBehavior"]>("outside");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newValue: ModalProps["scrollBehavior"]) => {
+    setScrollBehavior(newValue);
+    setIsOpen(true);
+  };
+
+  const scrollBehaviors: Array<ModalProps["scrollBehavior"]> = ["outside", "inside"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={scrollBehaviors}>
+          {scrollBehavior => (
+            <Button onClick={() => handleClick(scrollBehavior)}>{scrollBehavior} overflow</Button>
+          )}
+        </For>
+      </HStack>
+
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} scrollBehavior={scrollBehavior()}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <For each={Array(100).fill("")}>{() => <p>The content of the Modal.</p>}</For>
         </ModalContent>
       </Modal>
     </>

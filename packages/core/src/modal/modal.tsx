@@ -66,22 +66,22 @@ export function Modal(props: ModalProps) {
       return props.overlayTransitionOptions?.transition ?? "fade";
     },
     get duration() {
-      return props.overlayTransitionOptions?.duration;
+      return props.overlayTransitionOptions?.duration ?? 300;
     },
     get exitDuration() {
-      return props.overlayTransitionOptions?.exitDuration;
+      return props.overlayTransitionOptions?.exitDuration ?? 200;
     },
     get delay() {
-      return props.overlayTransitionOptions?.delay ?? 0;
+      return props.overlayTransitionOptions?.delay;
     },
     get exitDelay() {
-      return props.overlayTransitionOptions?.exitDelay ?? 100;
+      return props.overlayTransitionOptions?.exitDelay;
     },
     get easing() {
-      return props.overlayTransitionOptions?.easing;
+      return props.overlayTransitionOptions?.easing ?? "ease-out";
     },
     get exitEasing() {
-      return props.overlayTransitionOptions?.exitEasing;
+      return props.overlayTransitionOptions?.exitEasing ?? "ease-in";
     },
     get onBeforeEnter() {
       return props.overlayTransitionOptions?.onBeforeEnter;
@@ -105,10 +105,10 @@ export function Modal(props: ModalProps) {
       return props.modalTransitionOptions?.transition ?? "pop";
     },
     get duration() {
-      return props.modalTransitionOptions?.duration;
+      return props.modalTransitionOptions?.duration ?? 300;
     },
     get exitDuration() {
-      return props.modalTransitionOptions?.exitDuration;
+      return props.modalTransitionOptions?.exitDuration ?? 200;
     },
     get delay() {
       return props.modalTransitionOptions?.delay ?? 100;
@@ -198,6 +198,10 @@ export function Modal(props: ModalProps) {
     onContainerClick,
     onCloseButtonClick,
   };
+
+  createEffect(() => {
+    console.log(overlayTransition.keepMounted(), modalTransition.keepMounted());
+  });
 
   return (
     <Show when={overlayTransition.keepMounted() && modalTransition.keepMounted()}>

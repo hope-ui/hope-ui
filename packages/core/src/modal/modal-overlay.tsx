@@ -27,6 +27,7 @@ export const ModalOverlay = createHopeComponent<"div", ModalOverlayProps>(props 
 
   return (
     <hope.div
+      role="presentation"
       class={clsx(baseClasses().overlay, local.class)}
       style={computedStyle()}
       __css={styleOverrides().overlay}

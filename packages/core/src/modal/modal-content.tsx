@@ -1,5 +1,5 @@
 import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
-import { callHandler, mergeRefs } from "@hope-ui/utils";
+import { callHandler } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
@@ -33,33 +33,32 @@ export const ModalContent = createHopeComponent<"section", ModalContentProps>(pr
   }));
 
   return (
-    <hope.div
+    <FocusTrapRegion
+      autoFocus
+      restoreFocus
+      trapFocus={modalContext.trapFocus()}
+      initialFocusSelector={modalContext.initialFocusSelector()}
+      restoreFocusSelector={modalContext.restoreFocusSelector()}
       class={baseClasses().root}
       __css={styleOverrides().root}
-      tabIndex={-1}
       onMouseDown={modalContext.onContainerMouseDown}
       onKeyDown={modalContext.onContainerKeyDown}
       onClick={modalContext.onContainerClick}
     >
-      <FocusTrapRegion
-        as="section"
-        autoFocus
-        restoreFocus
+      <hope.section
         id={modalContext.modalId()}
+        //tabIndex={-1}
         role="dialog"
         data-ismodal="true"
         aria-modal="true"
         aria-labelledby={modalContext.headingId()}
         aria-describedby={modalContext.descriptionId()}
-        trapFocus={modalContext.trapFocus()}
-        initialFocusSelector={modalContext.initialFocusSelector()}
-        restoreFocusSelector={modalContext.restoreFocusSelector()}
         class={clsx(baseClasses().content, local.class)}
         style={computedStyle()}
         __css={styleOverrides().content}
         onClick={onContentClick}
         {...others}
       />
-    </hope.div>
+    </FocusTrapRegion>
   );
 });
