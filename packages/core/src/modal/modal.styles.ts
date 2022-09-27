@@ -1,4 +1,4 @@
-import { createStyleConfig, StyleConfigProps, SystemStyleObject } from "@hope-ui/styles";
+import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
 import { rgba } from "../utils";
 
@@ -6,20 +6,7 @@ export type ModalParts = "root" | "content" | "overlay" | "heading" | "descripti
 
 interface ModalVariants {
   /** The size of the modal. */
-  size:
-    | "xs"
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "2xl"
-    | "3xl"
-    | "4xl"
-    | "5xl"
-    | "6xl"
-    | "7xl"
-    | "8xl"
-    | "full";
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "full";
 
   /** Whether the modal should be centered on screen. */
   isCentered: boolean;
@@ -28,52 +15,28 @@ interface ModalVariants {
   scrollBehavior: "inside" | "outside";
 }
 
-const baseModalRootStyle: SystemStyleObject = {
-  zIndex: "modal",
-  position: "fixed",
-  top: 0,
-  left: 0,
-
-  display: "flex",
-
-  width: "100vw",
-  height: "100vh",
-  "@supports(height: -webkit-fill-available)": {
-    height: "-webkit-fill-available",
-  },
-
-  outline: "none",
-
-  _focus: {
-    outline: "none",
-  },
-};
-
-const baseModalContentStyle: SystemStyleObject = {
-  zIndex: "modal",
-  position: "relative",
-
-  display: "flex",
-  flexDirection: "column",
-
-  width: "100%",
-
-  outline: "none",
-  boxShadow: "lg",
-  backgroundColor: { light: "common.white", dark: "neutral.700" },
-
-  color: "inherit",
-
-  _focus: {
-    outline: "none",
-  },
-};
-
 export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(theme => ({
   root: {
     baseStyle: {
-      ...baseModalRootStyle,
+      zIndex: "modal",
+      position: "fixed",
+      top: 0,
+      left: 0,
+
+      display: "flex",
       justifyContent: "center",
+
+      width: "100vw",
+      height: "100vh",
+      "@supports(height: -webkit-fill-available)": {
+        height: "-webkit-fill-available",
+      },
+
+      outline: "none",
+
+      _focus: {
+        outline: "none",
+      },
     },
     variants: {
       isCentered: {
@@ -96,25 +59,36 @@ export const useModalStyleConfig = createStyleConfig<ModalParts, ModalVariants>(
   },
   content: {
     baseStyle: {
-      ...baseModalContentStyle,
+      zIndex: "modal",
+      position: "relative",
+
+      display: "flex",
+      flexDirection: "column",
+
+      width: "100%",
+
       my: 12,
       mx: 4,
+
+      outline: "none",
+
+      boxShadow: "lg",
       borderRadius: "sm",
+      backgroundColor: { light: "common.white", dark: "neutral.700" },
+
+      color: "inherit",
+
+      _focus: {
+        outline: "none",
+      },
     },
     variants: {
       size: {
         xs: { maxWidth: "xs" },
-        sm: { maxWidth: "sm" },
-        md: { maxWidth: "md" },
-        lg: { maxWidth: "lg" },
-        xl: { maxWidth: "xl" },
-        "2xl": { maxWidth: "2xl" },
-        "3xl": { maxWidth: "3xl" },
-        "4xl": { maxWidth: "4xl" },
-        "5xl": { maxWidth: "5xl" },
-        "6xl": { maxWidth: "6xl" },
-        "7xl": { maxWidth: "7xl" },
-        "8xl": { maxWidth: "8xl" },
+        sm: { maxWidth: "md" },
+        md: { maxWidth: "lg" },
+        lg: { maxWidth: "2xl" },
+        xl: { maxWidth: "4xl" },
         full: {
           maxWidth: "100vw",
           minHeight: "100vh",

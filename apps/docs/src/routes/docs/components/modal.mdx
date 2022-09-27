@@ -541,21 +541,24 @@ const theme = extendTheme({
 
 ### Modal
 
-| Name                                           | Type                        | Description                                                                                 | Default value |
-| ---------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------- | ------------- |
-| <RequiredIndicator>isOpen</RequiredIndicator>  | `boolean`                   | Whether the modal should be shown.                                                          |               |
-| <RequiredIndicator>onClose</RequiredIndicator> | `() => void`                | A function that will be called to close the modal.                                          |               |
-| id                                             | `string`                    | The id of the modal content.                                                                |               |
-| modalTransitionOptions                         | `TransitionOptionsOverride` | Options passed to the modal content transition.                                             |               |
-| overlayTransitionOptions                       | `TransitionOptionsOverride` | Options passed to the overlay transition.                                                   |               |
-| closeOnOverlayClick                            | `boolean`                   | Whether the modal should close when the overlay is clicked.                                 | true          |
-| closeOnEsc                                     | `boolean`                   | Whether the modal should close when the user hit the `Esc` key.                             | true          |
-| preventScroll                                  | `boolean`                   | Whether the scroll should be disabled on the `body` when the modal opens.                   | true          |
-| trapFocus                                      | `boolean`                   | Whether the focus will be locked into the modal.                                            | true          |
-| initialFocusSelector                           | `string`                    | A query selector to retrieve the element that should receive focus once the modal opens.    |               |
-| restoreFocusSelector                           | `string`                    | A query selector to retrieve the element that should receive focus once the modal closes.   |               |
-| onOverlayClick                                 | `() => void`                | A function that will be called when the overlay is clicked.                                 |               |
-| onEscKeyDown                                   | `() => void`                | A function that will be called when the `Esc` key is pressed and focus is within the modal. |               |
+| Name                                           | Type                                             | Description                                                                                 | Default value |
+| ---------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- | ------------- |
+| <RequiredIndicator>isOpen</RequiredIndicator>  | `boolean`                                        | Whether the modal should be shown.                                                          |               |
+| <RequiredIndicator>onClose</RequiredIndicator> | `() => void`                                     | A function that will be called to close the modal.                                          |               |
+| id                                             | `string`                                         | The id of the modal content.                                                                |               |
+| size                                           | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "full"` | The size of the modal.                                                                      |               |
+| isCentered                                     | `boolean`                                        | Whether the modal should be centered on screen.                                             |               |
+| scrollBehavior                                 | `"inside" \| "outside"`                          | Defines how scrolling should happen when content overflows beyond the viewport.             |               |
+| modalTransitionOptions                         | `TransitionOptionsOverride`                      | Options passed to the modal content transition.                                             |               |
+| overlayTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the overlay transition.                                                   |               |
+| closeOnOverlayClick                            | `boolean`                                        | Whether the modal should close when the overlay is clicked.                                 | true          |
+| closeOnEsc                                     | `boolean`                                        | Whether the modal should close when the user hit the `Esc` key.                             | true          |
+| preventScroll                                  | `boolean`                                        | Whether the scroll should be disabled on the `body` when the modal opens.                   | true          |
+| trapFocus                                      | `boolean`                                        | Whether the focus will be locked into the modal.                                            | true          |
+| initialFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the modal opens.    |               |
+| restoreFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the modal closes.   |               |
+| onOverlayClick                                 | `() => void`                                     | A function that will be called when the overlay is clicked.                                 |               |
+| onEscKeyDown                                   | `() => void`                                     | A function that will be called when the `Esc` key is pressed and focus is within the modal. |               |
 
 ### Other components props
 
