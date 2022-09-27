@@ -199,10 +199,6 @@ export function Modal(props: ModalProps) {
     onCloseButtonClick,
   };
 
-  createEffect(() => {
-    console.log(overlayTransition.keepMounted(), modalTransition.keepMounted());
-  });
-
   return (
     <Show when={overlayTransition.keepMounted() && modalTransition.keepMounted()}>
       <Portal>
