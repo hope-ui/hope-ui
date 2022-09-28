@@ -1,4 +1,3 @@
-import { DividerProps } from "./types";
 import { createStyleConfig, PseudoSelectorValue, StyleConfigProps } from "@hope-ui/styles";
 
 type DividerParts = "root" | "wrapper";
@@ -10,6 +9,7 @@ const verticalLineStyle: PseudoSelectorValue = {
   borderTop: 0,
   transform: "none",
 };
+
 /** horizontal line style when it has children prop. */
 const horizontalLineStyleWithChildren: PseudoSelectorValue = {
   top: "50%",
@@ -22,12 +22,21 @@ const horizontalLineStyleWithChildren: PseudoSelectorValue = {
 const tenPresentWidth = { width: "10%" };
 const nintyPresentWidth = { width: "90%" };
 
-interface DividerStyleConfig extends DividerProps {
-  /** whether Divider has a lable */
-  hasChildren?: boolean;
+interface DividerVariants {
+  /** the visual style of dividing line. */
+  variant: "solid" | "dashed" | "dotted";
+
+  /** The orientation of the divider. */
+  orientation: "vertical" | "horizontal";
+
+  /** The placement of the divider text, if any. */
+  labelPlacement: "left" | "right" | "center";
+
+  /** has children prop */
+  hasChildren: boolean;
 }
 
-export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerStyleConfig>(
+export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerVariants>(
   ({ vars }) => ({
     root: {
       baseStyle: {
@@ -115,3 +124,5 @@ export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerStyl
     labelPlacement: "center",
   }
 );
+
+export type DividerStyleConfigProps = StyleConfigProps<typeof useDividerStyleConfig>;

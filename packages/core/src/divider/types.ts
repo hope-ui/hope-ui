@@ -1,8 +1,7 @@
-import { Box } from "../box";
-import { ComponentProps } from "solid-js";
 import { ComponentTheme, ResponsiveValue } from "@hope-ui/styles";
+import { DividerStyleConfigProps } from "./divider.styles";
 
-export interface DividerProps extends ComponentProps<typeof Box> {
+export interface DividerProps extends DividerStyleConfigProps {
   /** the style of dividing line */
   variant?: "solid" | "dashed" | "dotted";
 
@@ -18,5 +17,5 @@ export interface DividerProps extends ComponentProps<typeof Box> {
 
 export type DividerTheme = ComponentTheme<
   DividerProps,
-  "labelPlacement" | "orientation" | "variant"
+  "labelPlacement" | "orientation" | "variant" | "thickness"
 >;
