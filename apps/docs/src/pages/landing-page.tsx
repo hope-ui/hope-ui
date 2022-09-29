@@ -317,10 +317,11 @@ export default function LandingPage() {
               color: "$danger11",
             }}
           >
-            Hope UI is in a rewrite process, learn more about the next major release at&nbsp;
-            <Anchor external href="http://next.hope-ui.com" fontWeight="$bold" fontStyle="italic">
-              next.hope-ui.com
+            Hope UI is in a rewrite process, learn more about the next major release on the&nbsp;
+            <Anchor external href="https://next--hope-ui.netlify.app/docs/introduction/getting-started" fontWeight="$bold" fontStyle="italic">
+              new documentation
             </Anchor>
+            .
           </HStack>
         </Box>
       </Portal>
