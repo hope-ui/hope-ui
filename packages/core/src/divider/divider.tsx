@@ -6,12 +6,6 @@ import { useDividerStyleConfig } from "./divider.styles";
 import { createHopeComponent, hope, mergeThemeProps, SystemStyleObject } from "@hope-ui/styles";
 
 export const Divider = createHopeComponent<"hr", DividerProps>(props => {
-  const [local, styleConfigProps, others] = splitProps(
-    props,
-    ["class", "children", "thickness"],
-    ["variant", "labelPlacement", "orientation", "styleConfigOverride", "unstyled"]
-  );
-
   props = mergeThemeProps(
     "Divider",
     {
@@ -22,10 +16,17 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
     props
   );
 
+  const [local, styleConfigProps, others] = splitProps(
+    props,
+    ["class", "children", "thickness"],
+    ["variant", "labelPlacement", "orientation", "styleConfigOverride", "unstyled"]
+  );
+
   const resolved = children(() => props.children);
   const isVertical = () => styleConfigProps.orientation === "vertical";
-  const hasChildren = () => (resolved() ? true : false);
+  const hasChildren = () => (props.children ? true : false);
   const hasVerticalChildren = () => isVertical() && hasChildren();
+  console.log(hasChildren());
 
   const lineWidth = {
     top: hasVerticalChildren() ? 0 : local.thickness,
