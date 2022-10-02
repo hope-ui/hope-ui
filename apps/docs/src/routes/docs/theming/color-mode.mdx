@@ -4,7 +4,7 @@ import { Preview } from "~/components/preview";
 
 # Color mode
 
-Adjust your application color scheme based on user preference.
+Adjust your application's color scheme based on user preference.
 
 ## Usage
 
@@ -34,7 +34,7 @@ function Demo() {
 
 ### Changing color mode
 
-To manage color mode in your application, Hope UI exposes the `useColorMode` primitive, it gives you an accessor to get the current color mode, and a function to toggle it.
+To manage color mode in your application, Hope UI exposes the `useColorMode` primitive. It gives you an accessor to get the current color mode and a function to toggle it.
 
 <Preview>
   <UseColorModeExample />
@@ -60,7 +60,7 @@ The `useColorModeValue` primitive can be used to change any value or style based
 
 It takes 2 arguments: the value in light and dark mode, and returns a derived signal with the correct value based on the color mode.
 
-The below example demonstrate how to change a Box's background and color using `useColorModeValue`.
+The below example demonstrates how to change a Box's background and color using `useColorModeValue`.
 
 <Preview>
   <UseColorModeValueExample />
@@ -88,7 +88,7 @@ export function UseColorModeValueExample() {
 
 ### Using `light/dark` style prop
 
-Style props accept an object has value in which you can set the `light` and/or `dark` value. The above example could also be achieved this way:
+Style props accept an object as value in which you can set the `light` and/or `dark` value. The above example could also be achieved in this way:
 
 ```tsx {10-11}
 import { Box, Button, useColorMode } from "@hope-ui/core";
