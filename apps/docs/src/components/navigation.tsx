@@ -26,11 +26,11 @@ export const Navigation = createHopeComponent<"nav", NavigationProps>(props => {
                 as="ul"
                 role="list"
                 mt={3}
-                spacing={{ base: 2, lg: 4 }}
-                alignItems="stetch"
+                spacing={4}
+                alignItems="stretch"
                 borderLeftWidth="2px"
                 borderLeftStyle="solid"
-                borderLeftColor={{ base: "neutral.100", lg: "neutral.200" }}
+                borderLeftColor="neutral.200"
                 _dark={{ borderLeftColor: "neutral.800" }}
               >
                 <For each={section.links}>

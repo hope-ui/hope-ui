@@ -29,7 +29,7 @@ export const ModalContent = createHopeComponent<"section", ModalContentProps>(pr
 
   const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
     ...local.style,
-    ...modalContext.modalTransition.style(),
+    ...modalContext.contentTransition.style(),
   }));
 
   return (
@@ -46,7 +46,7 @@ export const ModalContent = createHopeComponent<"section", ModalContentProps>(pr
       onClick={modalContext.onContainerClick}
     >
       <hope.section
-        id={modalContext.modalId()}
+        id={modalContext.contentId()}
         //tabIndex={-1}
         role="dialog"
         data-ismodal="true"

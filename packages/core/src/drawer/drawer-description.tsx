@@ -20,7 +20,7 @@ export const DrawerDescription = createHopeComponent<"p">(props => {
   const { baseClasses, styleOverrides } = useStyleConfigContext<DrawerParts>();
 
   createEffect(() => {
-    drawerContext.setDescriptionId(`${drawerContext.drawerId()}-description`);
+    drawerContext.setDescriptionId(`${drawerContext.contentId()}-description`);
     onCleanup(() => drawerContext.setDescriptionId(undefined));
   });
 

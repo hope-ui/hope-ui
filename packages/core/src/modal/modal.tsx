@@ -6,20 +6,12 @@
  * https://github.com/chakra-ui/chakra-ui/blob/d945b9a7da3056017cda0cdd552af40fa1426070/packages/components/modal/src/use-modal.ts
  */
 
-import { createDisclosure, createPreventScroll, createTransition } from "@hope-ui/primitives";
+import { createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
-import { contains, getRelatedTarget, runIfFn } from "@hope-ui/utils";
-import {
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  onCleanup,
-  Show,
-  splitProps,
-} from "solid-js";
-import { isServer, Portal } from "solid-js/web";
+import { createUniqueId, Show, splitProps } from "solid-js";
+import { Portal } from "solid-js/web";
 
+import { createModal } from "./create-modal";
 import { useModalStyleConfig } from "./modal.styles";
 import { ModalContext } from "./modal-context";
 import { ModalContextValue, ModalProps } from "./types";
@@ -55,137 +47,62 @@ export function Modal(props: ModalProps) {
 
   const styleConfigResult = useModalStyleConfig("Modal", styleConfigProps);
 
-  const [headingId, setHeadingId] = createSignal<string>();
-  const [descriptionId, setDescriptionId] = createSignal<string>();
+  const {
+    headingId,
+    setHeadingId,
+    descriptionId,
+    setDescriptionId,
+    overlayTransition,
+    onContainerMouseDown,
+    onContainerKeyDown,
+    onContainerClick,
+    onCloseButtonClick,
+  } = createModal(props);
 
-  const overlayTransition = createTransition({
+  const contentTransition = createTransition({
     get shouldMount() {
       return props.isOpen;
     },
     get transition() {
-      return props.overlayTransitionOptions?.transition ?? "fade";
+      return props.contentTransitionOptions?.transition ?? "pop";
     },
     get duration() {
-      return props.overlayTransitionOptions?.duration ?? 300;
+      return props.contentTransitionOptions?.duration ?? 300;
     },
     get exitDuration() {
-      return props.overlayTransitionOptions?.exitDuration ?? 200;
+      return props.contentTransitionOptions?.exitDuration ?? 200;
     },
     get delay() {
-      return props.overlayTransitionOptions?.delay;
+      return props.contentTransitionOptions?.delay ?? 100;
     },
     get exitDelay() {
-      return props.overlayTransitionOptions?.exitDelay;
+      return props.contentTransitionOptions?.exitDelay ?? 0;
     },
     get easing() {
-      return props.overlayTransitionOptions?.easing ?? "ease-out";
+      return props.contentTransitionOptions?.easing ?? "ease-out";
     },
     get exitEasing() {
-      return props.overlayTransitionOptions?.exitEasing ?? "ease-in";
+      return props.contentTransitionOptions?.exitEasing ?? "ease-in";
     },
     get onBeforeEnter() {
-      return props.overlayTransitionOptions?.onBeforeEnter;
+      return props.contentTransitionOptions?.onBeforeEnter;
     },
     get onAfterEnter() {
-      return props.overlayTransitionOptions?.onAfterEnter;
+      return props.contentTransitionOptions?.onAfterEnter;
     },
     get onBeforeExit() {
-      return props.overlayTransitionOptions?.onBeforeExit;
+      return props.contentTransitionOptions?.onBeforeExit;
     },
     get onAfterExit() {
-      return props.overlayTransitionOptions?.onAfterExit;
+      return props.contentTransitionOptions?.onAfterExit;
     },
-  });
-
-  const modalTransition = createTransition({
-    get shouldMount() {
-      return props.isOpen;
-    },
-    get transition() {
-      return props.modalTransitionOptions?.transition ?? "pop";
-    },
-    get duration() {
-      return props.modalTransitionOptions?.duration ?? 300;
-    },
-    get exitDuration() {
-      return props.modalTransitionOptions?.exitDuration ?? 200;
-    },
-    get delay() {
-      return props.modalTransitionOptions?.delay ?? 100;
-    },
-    get exitDelay() {
-      return props.modalTransitionOptions?.exitDelay ?? 0;
-    },
-    get easing() {
-      return props.modalTransitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.modalTransitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.modalTransitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.modalTransitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.modalTransitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.modalTransitionOptions?.onAfterExit;
-    },
-  });
-
-  let mouseDownTarget: EventTarget | undefined;
-
-  const onContainerMouseDown: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    mouseDownTarget = event.target;
-  };
-
-  const onContainerKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    if (event.key === "Escape") {
-      event.stopPropagation();
-
-      if (props.closeOnEsc) {
-        props.onClose();
-      }
-
-      props.onEscKeyDown?.();
-    }
-  };
-
-  const onContainerClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    event.stopPropagation();
-    /**
-     * Prevent the modal from closing when user
-     * start dragging from the content, and release drag outside the content.
-     *
-     * Because it is technically not a considered "click outside".
-     */
-    if (mouseDownTarget !== event.target) {
-      return;
-    }
-
-    if (props.closeOnOverlayClick) {
-      props.onClose();
-    }
-
-    props.onOverlayClick?.();
-  };
-
-  const onCloseButtonClick = () => {
-    props.onClose();
-  };
-
-  createPreventScroll({
-    isEnabled: () => props.isOpen && !!props.preventScroll,
   });
 
   const context: ModalContextValue = {
     isOpen: () => props.isOpen,
-    modalTransition,
+    contentTransition,
     overlayTransition,
-    modalId: () => props.id!,
+    contentId: () => props.id!,
     headingId,
     setHeadingId,
     descriptionId,
@@ -200,7 +117,7 @@ export function Modal(props: ModalProps) {
   };
 
   return (
-    <Show when={overlayTransition.keepMounted() && modalTransition.keepMounted()}>
+    <Show when={overlayTransition.keepMounted() && contentTransition.keepMounted()}>
       <Portal>
         <StyleConfigProvider value={styleConfigResult}>
           <ModalContext.Provider value={context}>{props.children}</ModalContext.Provider>

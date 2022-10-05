@@ -7,15 +7,9 @@
  */
 
 import { Component } from "solid-js";
-import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itIsPolymorphic<P>(
-  Comp: Component<P>,
-  requiredProps: P,
-  selector?: string,
-  Wrapper = Fragment
-) {
+export function itIsPolymorphic<P>(Comp: Component<P>, requiredProps: P, selector?: string) {
   it("is polymorphic", () => {
     const getTarget = (container: HTMLElement) => {
       return selector ? container.querySelector(selector) : (container.firstChild as HTMLElement);
@@ -26,15 +20,11 @@ export function itIsPolymorphic<P>(
     };
 
     const { container: withTag } = render(() => (
-      <Wrapper>
-        <Comp as="a" href="https://hope-ui.com" {...requiredProps} />
-      </Wrapper>
+      <Comp as="a" href="https://hope-ui.com" {...requiredProps} />
     ));
 
     const { container: withComponent } = render(() => (
-      <Wrapper>
-        <Comp as={TestComponent} {...requiredProps} />
-      </Wrapper>
+      <Comp as={TestComponent} {...requiredProps} />
     ));
 
     expect(getTarget(withTag)?.tagName).toBe("A");

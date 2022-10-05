@@ -20,7 +20,7 @@ export const DrawerHeading = createHopeComponent<"h2">(props => {
   const { baseClasses, styleOverrides } = useStyleConfigContext<DrawerParts>();
 
   createEffect(() => {
-    drawerContext.setHeadingId(`${drawerContext.drawerId()}-heading`);
+    drawerContext.setHeadingId(`${drawerContext.contentId()}-heading`);
     onCleanup(() => drawerContext.setHeadingId(undefined));
   });
 

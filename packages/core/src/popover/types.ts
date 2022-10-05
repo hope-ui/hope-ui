@@ -1,6 +1,6 @@
 import type { Placement as FloatingPlacement } from "@floating-ui/dom";
 import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
-import { ComponentTheme } from "@hope-ui/styles";
+import { ComponentTheme, HopeProps } from "@hope-ui/styles";
 import { Accessor, JSX, Setter } from "solid-js";
 
 import { PopoverStyleConfigProps } from "./popover.styles";
@@ -17,7 +17,7 @@ export type PopoverChildrenRenderProp = (props: {
   close: () => void;
 }) => JSX.Element;
 
-export interface PopoverProps extends PopoverStyleConfigProps {
+export interface PopoverProps extends Omit<PopoverStyleConfigProps, keyof HopeProps> {
   /** Whether the popover should be shown (in controlled mode). */
   isOpen?: boolean;
 
