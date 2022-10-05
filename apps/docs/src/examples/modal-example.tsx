@@ -194,7 +194,7 @@ export function TransitionExample() {
       <Modal
         isOpen={isOpen()}
         onClose={() => setIsOpen(false)}
-        modalTransitionOptions={{
+        contentTransitionOptions={{
           transition: "slide-up",
           duration: 400,
           exitDuration: 250,

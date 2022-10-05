@@ -291,7 +291,7 @@ function HeadingAndDescriptionExample() {
 
 ### Open/close transitions
 
-The `modalTransitionOptions` and `overlayTransitionOptions` props allows to customize the modal content and overlay open/close transitions. You can use predefined transitions or create custom ones.
+The `contentTransitionOptions` and `overlayTransitionOptions` props allows to customize the modal content and overlay open/close transitions. You can use predefined transitions or create custom ones.
 
 <Preview>
   <TransitionExample />
@@ -307,7 +307,7 @@ function TransitionExample() {
       <Modal
         isOpen={isOpen()}
         onClose={() => setIsOpen(false)}
-        modalTransitionOptions={{
+        contentTransitionOptions={{
           transition: "slide-up",
           duration: 400,
           exitDuration: 250,
@@ -549,7 +549,7 @@ const theme = extendTheme({
 | size                                           | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "full"` | The size of the modal.                                                                      |               |
 | isCentered                                     | `boolean`                                        | Whether the modal should be centered on screen.                                             |               |
 | scrollBehavior                                 | `"inside" \| "outside"`                          | Defines how scrolling should happen when content overflows beyond the viewport.             |               |
-| modalTransitionOptions                         | `TransitionOptionsOverride`                      | Options passed to the modal content transition.                                             |               |
+| contentTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the modal content transition.                                             |               |
 | overlayTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the overlay transition.                                                   |               |
 | closeOnOverlayClick                            | `boolean`                                        | Whether the modal should close when the overlay is clicked.                                 | true          |
 | closeOnEsc                                     | `boolean`                                        | Whether the modal should close when the user hit the `Esc` key.                             | true          |
