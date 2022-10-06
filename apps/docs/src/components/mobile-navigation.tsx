@@ -57,7 +57,7 @@ export const MobileNavigation = createHopeComponent<"button", MobileNavigationPr
       </IconButton>
       <Drawer isOpen={isOpen()} onClose={close} placement="left" size="xs">
         <DrawerOverlay />
-        <DrawerContent p={4}>
+        <DrawerContent bg={{ dark: "common.background" }} p={4}>
           <HStack justify="space-between" mb={6}>
             <HeaderLogo />
             <DrawerCloseButton ml={2} />
