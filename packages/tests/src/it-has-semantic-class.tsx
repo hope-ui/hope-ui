@@ -1,15 +1,9 @@
 import { Component } from "solid-js";
-import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itHasSemanticClass<P>(
-  Comp: Component<P>,
-  requiredProps: P,
-  semanticClass: string,
-  Wrapper = Fragment
-) {
+export function itHasSemanticClass<P>(Comp: Component<P>, requiredProps: P, semanticClass: string) {
   it("has semantic class", () => {
-    const { container } = render(() => <Wrapper>{Comp(requiredProps)}</Wrapper>);
+    const { container } = render(() => Comp(requiredProps));
 
     expect(container.querySelector(`.${semanticClass}`)).toBeInTheDocument();
   });

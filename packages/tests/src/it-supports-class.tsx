@@ -7,16 +7,11 @@
  */
 
 import { Component } from "solid-js";
-import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itSupportsClass<P>(Comp: Component<P>, requiredProps: P, Wrapper = Fragment) {
+export function itSupportsClass<P>(Comp: Component<P>, requiredProps: P) {
   it("supports class prop", () => {
-    const { container } = render(() => (
-      <Wrapper>
-        <Comp {...requiredProps} class="test-class-name" />
-      </Wrapper>
-    ));
+    const { container } = render(() => <Comp {...requiredProps} class="test-class-name" />);
 
     expect(container.querySelector(".test-class-name")).toBeInTheDocument();
   });

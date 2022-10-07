@@ -43,7 +43,7 @@ export function createPreventScroll(options: PreventScrollOptions) {
           return;
         }
 
-        if (isIOS) {
+        if (isIOS()) {
           onCleanup(preventScrollMobileSafari());
         } else {
           onCleanup(preventScrollStandard());
@@ -166,7 +166,7 @@ function preventScrollMobileSafari() {
               scrollIntoView(target);
             });
           } else {
-            // Otherwise, wait for the visual viewport to resize before scrolling so we can
+            // Otherwise, wait for the visual viewport to resize before scrolling, so we can
             // measure the correct position to scroll to.
             visualViewport.addEventListener("resize", () => scrollIntoView(target), { once: true });
           }
@@ -181,7 +181,7 @@ function preventScrollMobileSafari() {
     window.scrollTo(0, 0);
   };
 
-  // Record the original scroll position so we can restore it.
+  // Record the original scroll position, so we can restore it.
   // Then apply a negative margin to the body to offset it by the scroll position. This will
   // enable us to scroll the window to the top, which is required for the rest of this to work.
   const scrollX = window.pageXOffset;

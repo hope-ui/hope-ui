@@ -20,7 +20,7 @@ export const ModalHeading = createHopeComponent<"h2">(props => {
   const { baseClasses, styleOverrides } = useStyleConfigContext<ModalParts>();
 
   createEffect(() => {
-    modalContext.setHeadingId(`${modalContext.modalId()}-heading`);
+    modalContext.setHeadingId(`${modalContext.contentId()}-heading`);
     onCleanup(() => modalContext.setHeadingId(undefined));
   });
 

@@ -317,7 +317,11 @@ export const mdxComponents = {
   ul: Ul,
   ol: Ol,
   li: Li,
-  table: Table,
+  table: (props: any) => (
+    <hope.div overflowX="auto">
+      <Table {...props} />
+    </hope.div>
+  ),
   tr: Tr,
   th: Th,
   td: Td,

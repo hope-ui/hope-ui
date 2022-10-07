@@ -9,34 +9,34 @@
  * MIT Licensed, Copyright (c) 2019 Segun Adebayo.
  *
  * Credits to the Chakra UI team:
- * https://github.com/chakra-ui/chakra-ui/blob/b06b3cca679cc7083826b8629add6db6b8218928/packages/components/modal/tests/modal.test.tsx
+ * https://github.com/chakra-ui/chakra-ui/blob/b06b3cca679cc7083826b8629add6db6b8218928/packages/components/drawer/tests/drawer.test.tsx
  */
 
 import { setupMatchMediaMock } from "@hope-ui/tests";
 import userEvent from "@testing-library/user-event";
 import { fireEvent, render, screen } from "solid-testing-library";
 
-import { Modal } from "./modal";
-import { ModalCloseButton } from "./modal-close-button";
-import { ModalContent } from "./modal-content";
-import { ModalDescription } from "./modal-description";
-import { ModalHeading } from "./modal-heading";
-import { ModalOverlay } from "./modal-overlay";
+import { Drawer } from "./drawer";
+import { DrawerCloseButton } from "./drawer-close-button";
+import { DrawerContent } from "./drawer-content";
+import { DrawerDescription } from "./drawer-description";
+import { DrawerHeading } from "./drawer-heading";
+import { DrawerOverlay } from "./drawer-overlay";
 
 setupMatchMediaMock();
 
-describe("Modal", () => {
+describe("Drawer", () => {
   it("should have the proper 'aria-*' attributes", async () => {
     render(() => (
-      <Modal isOpen onClose={jest.fn()}>
-        <ModalOverlay />
-        <ModalContent data-testid="dialog">
-          <ModalCloseButton />
-          <ModalHeading>Title</ModalHeading>
-          <ModalDescription>Description</ModalDescription>
+      <Drawer isOpen onClose={jest.fn()}>
+        <DrawerOverlay />
+        <DrawerContent data-testid="dialog">
+          <DrawerCloseButton />
+          <DrawerHeading>Title</DrawerHeading>
+          <DrawerDescription>Description</DrawerDescription>
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     const dialog = screen.getByTestId("dialog");
@@ -51,12 +51,12 @@ describe("Modal", () => {
 
   it("should not render when 'isOpen' is false", async () => {
     render(() => (
-      <Modal isOpen={false} onClose={jest.fn()}>
-        <ModalOverlay />
-        <ModalContent data-testid="dialog">
+      <Drawer isOpen={false} onClose={jest.fn()}>
+        <DrawerOverlay />
+        <DrawerContent data-testid="dialog">
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     expect(screen.queryByTestId("dialog")).not.toBeInTheDocument();
@@ -64,13 +64,13 @@ describe("Modal", () => {
 
   it("should trap focus", async () => {
     render(() => (
-      <Modal isOpen onClose={jest.fn()}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton data-testid="close" />
+      <Drawer isOpen onClose={jest.fn()}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton data-testid="close" />
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     const closeButton = screen.getByTestId("close");
@@ -88,12 +88,12 @@ describe("Modal", () => {
     const onCloseSpy = jest.fn();
 
     render(() => (
-      <Modal isOpen onClose={onCloseSpy}>
-        <ModalOverlay />
-        <ModalContent data-testid="dialog">
+      <Drawer isOpen onClose={onCloseSpy}>
+        <DrawerOverlay />
+        <DrawerContent data-testid="dialog">
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     const dialog = screen.getByTestId("dialog");
@@ -104,38 +104,38 @@ describe("Modal", () => {
     expect(onCloseSpy).toHaveBeenCalled();
   });
 
-  it("should call the 'onClose' callback when clicking outside the modal", async () => {
+  it("should call the 'onClose' callback when clicking outside the drawer", async () => {
     const onCloseSpy = jest.fn();
 
     render(() => (
-      <Modal isOpen onClose={onCloseSpy}>
-        <ModalOverlay />
-        <ModalContent data-testid="dialog">
+      <Drawer isOpen onClose={onCloseSpy}>
+        <DrawerOverlay />
+        <DrawerContent data-testid="dialog">
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     const container = screen.getByTestId("dialog").parentElement!;
 
-    // An extra mousedown is required to get `onContainerClick` function in `modal` to work
+    // An extra mousedown is required to get `onContainerClick` function in `drawer` to work
     fireEvent.mouseDown(container);
     fireEvent.click(container);
 
     expect(onCloseSpy).toHaveBeenCalled();
   });
 
-  it("should call the 'onClose' callback when clicking on the modal close button", async () => {
+  it("should call the 'onClose' callback when clicking on the drawer close button", async () => {
     const onCloseSpy = jest.fn();
 
     render(() => (
-      <Modal isOpen onClose={onCloseSpy}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton data-testid="close" />
+      <Drawer isOpen onClose={onCloseSpy}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton data-testid="close" />
           <p>Content</p>
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     ));
 
     fireEvent.click(screen.getByTestId("close"));

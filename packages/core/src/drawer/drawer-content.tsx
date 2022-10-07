@@ -29,7 +29,7 @@ export const DrawerContent = createHopeComponent<"section", DrawerContentProps>(
 
   const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
     ...local.style,
-    ...drawerContext.drawerTransition.style(),
+    ...drawerContext.contentTransition.style(),
   }));
 
   return (
@@ -46,7 +46,7 @@ export const DrawerContent = createHopeComponent<"section", DrawerContentProps>(
       onClick={drawerContext.onContainerClick}
     >
       <hope.section
-        id={drawerContext.drawerId()}
+        id={drawerContext.contentId()}
         //tabIndex={-1}
         role="dialog"
         data-ismodal="true"

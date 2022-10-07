@@ -2,12 +2,12 @@ import { createDisclosure } from "@hope-ui/primitives";
 
 import {
   Button,
-  Drawer,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeading,
-  DrawerOverlay,
+  Modal,
+  ModalCloseButton,
+  ModalContent,
+  ModalDescription,
+  ModalHeading,
+  ModalOverlay,
   HStack,
   VStack,
 } from "../src";
@@ -17,21 +17,18 @@ export default function App() {
 
   return (
     <>
-      <Button onClick={open}>Open Drawer</Button>
-      <Drawer isOpen={isOpen()} onClose={close} size="full">
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+      <Button onClick={open}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={close}>
+        <ModalOverlay />
+        <ModalContent p={4}>
           <HStack justifyContent="space-between" alignItems="flex-start" mb={4}>
             <VStack alignItems="flex-start">
-              <DrawerHeading fontWeight="semibold">Drawer Title</DrawerHeading>
-              <DrawerDescription
-                fontSize="sm"
-                color={{ light: "neutral.600", dark: "neutral.300" }}
-              >
-                Drawer Description
-              </DrawerDescription>
+              <ModalHeading fontWeight="semibold">Modal Title</ModalHeading>
+              <ModalDescription fontSize="sm" color={{ light: "neutral.600", dark: "neutral.300" }}>
+                Modal Description
+              </ModalDescription>
             </VStack>
-            <DrawerCloseButton />
+            <ModalCloseButton />
           </HStack>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi architecto atque beatae
@@ -45,8 +42,8 @@ export default function App() {
             exercitationem laborum non numquam sint, sit sunt suscipit.
           </p>
           <button data-autofocus>First</button>
-        </DrawerContent>
-      </Drawer>
+        </ModalContent>
+      </Modal>
       <p>
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aperiam deserunt ea, eaque, eum
         expedita fuga incidunt inventore ipsum iste libero minima natus neque non odio omnis

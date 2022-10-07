@@ -6,24 +6,16 @@
  * https://github.com/chakra-ui/chakra-ui/blob/d945b9a7da3056017cda0cdd552af40fa1426070/packages/components/drawer/src/use-drawer.ts
  */
 
-import { createDisclosure, createPreventScroll, createTransition } from "@hope-ui/primitives";
+import { createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
-import { contains, getRelatedTarget, runIfFn } from "@hope-ui/utils";
-import {
-  createEffect,
-  createSignal,
-  createUniqueId,
-  JSX,
-  onCleanup,
-  Show,
-  splitProps,
-} from "solid-js";
-import { isServer, Portal } from "solid-js/web";
+import { createUniqueId, Show, splitProps } from "solid-js";
+import { Portal } from "solid-js/web";
 
+import { createModal } from "../modal/create-modal";
 import { useDrawerStyleConfig } from "./drawer.styles";
 import { DrawerContext } from "./drawer-context";
-import { DrawerContextValue, DrawerProps } from "./types";
 import { DRAWER_TRANSITION } from "./drawer-transition";
+import { DrawerContextValue, DrawerProps } from "./types";
 
 /**
  * Drawer provides context, theming, and accessibility properties
@@ -50,137 +42,62 @@ export function Drawer(props: DrawerProps) {
 
   const styleConfigResult = useDrawerStyleConfig("Drawer", styleConfigProps);
 
-  const [headingId, setHeadingId] = createSignal<string>();
-  const [descriptionId, setDescriptionId] = createSignal<string>();
+  const {
+    headingId,
+    setHeadingId,
+    descriptionId,
+    setDescriptionId,
+    overlayTransition,
+    onContainerMouseDown,
+    onContainerKeyDown,
+    onContainerClick,
+    onCloseButtonClick,
+  } = createModal(props);
 
-  const overlayTransition = createTransition({
+  const contentTransition = createTransition({
     get shouldMount() {
       return props.isOpen;
     },
     get transition() {
-      return props.overlayTransitionOptions?.transition ?? "fade";
+      return props.contentTransitionOptions?.transition ?? DRAWER_TRANSITION[props.placement!];
     },
     get duration() {
-      return props.overlayTransitionOptions?.duration ?? 300;
+      return props.contentTransitionOptions?.duration ?? 300;
     },
     get exitDuration() {
-      return props.overlayTransitionOptions?.exitDuration ?? 200;
+      return props.contentTransitionOptions?.exitDuration ?? 200;
     },
     get delay() {
-      return props.overlayTransitionOptions?.delay;
+      return props.contentTransitionOptions?.delay ?? 100;
     },
     get exitDelay() {
-      return props.overlayTransitionOptions?.exitDelay;
+      return props.contentTransitionOptions?.exitDelay ?? 0;
     },
     get easing() {
-      return props.overlayTransitionOptions?.easing ?? "ease-out";
+      return props.contentTransitionOptions?.easing ?? "ease-out";
     },
     get exitEasing() {
-      return props.overlayTransitionOptions?.exitEasing ?? "ease-in";
+      return props.contentTransitionOptions?.exitEasing ?? "ease-in";
     },
     get onBeforeEnter() {
-      return props.overlayTransitionOptions?.onBeforeEnter;
+      return props.contentTransitionOptions?.onBeforeEnter;
     },
     get onAfterEnter() {
-      return props.overlayTransitionOptions?.onAfterEnter;
+      return props.contentTransitionOptions?.onAfterEnter;
     },
     get onBeforeExit() {
-      return props.overlayTransitionOptions?.onBeforeExit;
+      return props.contentTransitionOptions?.onBeforeExit;
     },
     get onAfterExit() {
-      return props.overlayTransitionOptions?.onAfterExit;
+      return props.contentTransitionOptions?.onAfterExit;
     },
-  });
-
-  const drawerTransition = createTransition({
-    get shouldMount() {
-      return props.isOpen;
-    },
-    get transition() {
-      return props.drawerTransitionOptions?.transition ?? DRAWER_TRANSITION[props.placement!];
-    },
-    get duration() {
-      return props.drawerTransitionOptions?.duration ?? 300;
-    },
-    get exitDuration() {
-      return props.drawerTransitionOptions?.exitDuration ?? 200;
-    },
-    get delay() {
-      return props.drawerTransitionOptions?.delay ?? 100;
-    },
-    get exitDelay() {
-      return props.drawerTransitionOptions?.exitDelay ?? 0;
-    },
-    get easing() {
-      return props.drawerTransitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.drawerTransitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.drawerTransitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.drawerTransitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.drawerTransitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.drawerTransitionOptions?.onAfterExit;
-    },
-  });
-
-  let mouseDownTarget: EventTarget | undefined;
-
-  const onContainerMouseDown: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    mouseDownTarget = event.target;
-  };
-
-  const onContainerKeyDown: JSX.EventHandlerUnion<HTMLElement, KeyboardEvent> = event => {
-    if (event.key === "Escape") {
-      event.stopPropagation();
-
-      if (props.closeOnEsc) {
-        props.onClose();
-      }
-
-      props.onEscKeyDown?.();
-    }
-  };
-
-  const onContainerClick: JSX.EventHandlerUnion<HTMLElement, MouseEvent> = event => {
-    event.stopPropagation();
-    /**
-     * Prevent the drawer from closing when user
-     * start dragging from the content, and release drag outside the content.
-     *
-     * Because it is technically not a considered "click outside".
-     */
-    if (mouseDownTarget !== event.target) {
-      return;
-    }
-
-    if (props.closeOnOverlayClick) {
-      props.onClose();
-    }
-
-    props.onOverlayClick?.();
-  };
-
-  const onCloseButtonClick = () => {
-    props.onClose();
-  };
-
-  createPreventScroll({
-    isEnabled: () => props.isOpen && !!props.preventScroll,
   });
 
   const context: DrawerContextValue = {
     isOpen: () => props.isOpen,
-    drawerTransition,
+    contentTransition,
     overlayTransition,
-    drawerId: () => props.id!,
+    contentId: () => props.id!,
     headingId,
     setHeadingId,
     descriptionId,
@@ -195,7 +112,7 @@ export function Drawer(props: DrawerProps) {
   };
 
   return (
-    <Show when={overlayTransition.keepMounted() && drawerTransition.keepMounted()}>
+    <Show when={overlayTransition.keepMounted() && contentTransition.keepMounted()}>
       <Portal>
         <StyleConfigProvider value={styleConfigResult}>
           <DrawerContext.Provider value={context}>{props.children}</DrawerContext.Provider>

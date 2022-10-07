@@ -1,10 +1,10 @@
 import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
-import { ComponentTheme } from "@hope-ui/styles";
+import { ComponentTheme, HopeProps } from "@hope-ui/styles";
 import { Accessor, JSX, ParentProps, Setter } from "solid-js";
 
 import { ModalStyleConfigProps } from "./modal.styles";
 
-export interface ModalProps extends ModalStyleConfigProps, ParentProps {
+export interface BaseModalProps {
   /** Whether the modal should be shown. */
   isOpen: boolean;
 
@@ -14,8 +14,8 @@ export interface ModalProps extends ModalStyleConfigProps, ParentProps {
   /** The id of the modal content. */
   id?: string;
 
-  /** Options passed to the modal transition. */
-  modalTransitionOptions?: TransitionOptionsOverride;
+  /** Options passed to the modal content transition. */
+  contentTransitionOptions?: TransitionOptionsOverride;
 
   /** Options passed to the overlay transition. */
   overlayTransitionOptions?: TransitionOptionsOverride;
@@ -45,24 +45,29 @@ export interface ModalProps extends ModalStyleConfigProps, ParentProps {
   onEscKeyDown?: () => void;
 }
 
-export type ModalTheme = ComponentTheme<
-  ModalProps,
-  | "modalTransitionOptions"
+export interface ModalProps
+  extends BaseModalProps,
+    Omit<ModalStyleConfigProps, keyof HopeProps>,
+    ParentProps {}
+
+export type ModalThemeProps =
+  | "contentTransitionOptions"
   | "overlayTransitionOptions"
   | "closeOnOverlayClick"
   | "closeOnEsc"
   | "preventScroll"
   | "trapFocus"
   | "initialFocusSelector"
-  | "restoreFocusSelector"
->;
+  | "restoreFocusSelector";
+
+export type ModalTheme = ComponentTheme<ModalProps, ModalThemeProps>;
 
 export interface ModalContextValue {
   /** Whether the modal should be shown. */
   isOpen: Accessor<boolean>;
 
   /** The modal content enter/exit transition. */
-  modalTransition: TransitionResult;
+  contentTransition: TransitionResult;
 
   /** The overlay enter/exit transition. */
   overlayTransition: TransitionResult;
@@ -71,7 +76,7 @@ export interface ModalContextValue {
    * The `id` of the modal content element.
    * Also act as a prefix for others modal elements `id`.
    */
-  modalId: Accessor<string>;
+  contentId: Accessor<string>;
 
   /** The `id` of the modal heading element. */
   headingId: Accessor<string | undefined>;

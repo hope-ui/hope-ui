@@ -20,7 +20,7 @@ export const ModalDescription = createHopeComponent<"p">(props => {
   const { baseClasses, styleOverrides } = useStyleConfigContext<ModalParts>();
 
   createEffect(() => {
-    modalContext.setDescriptionId(`${modalContext.modalId()}-description`);
+    modalContext.setDescriptionId(`${modalContext.contentId()}-description`);
     onCleanup(() => modalContext.setDescriptionId(undefined));
   });
 
