@@ -207,12 +207,25 @@ export const NAV_SECTIONS: NavSection[] = [
     title: "Overlays",
     links: [
       {
+        title: "Drawer",
+        href: "/docs/components/drawer",
+      },
+      {
         title: "Modal",
         href: "/docs/components/modal",
       },
       {
         title: "Popover",
         href: "/docs/components/popover",
+      },
+    ],
+  },
+  {
+    title: "Primitives",
+    links: [
+      {
+        title: "createTransition",
+        href: "/docs/primitives/create-transition",
       },
     ],
   },
