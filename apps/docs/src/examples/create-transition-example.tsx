@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  createTransition,
   DEFAULT_TRANSITIONS_NAMES,
   HStack,
   Popover,
@@ -7,7 +9,29 @@ import {
   PopoverTrigger,
   TransitionName,
 } from "@hope-ui/core";
-import { For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
+
+export function BasicExample() {
+  const [show, setShow] = createSignal(false);
+
+  const { style, keepMounted } = createTransition({
+    shouldMount: show,
+    transition: "fade",
+    duration: 400,
+    easing: "ease",
+  });
+
+  return (
+    <>
+      <Button onClick={() => setShow(prev => !prev)}>{show() ? "Hide" : "Show"}</Button>
+      <Show when={keepMounted()}>
+        <Box p={4} color="white" mt="4" bg="primary.500" rounded="md" shadow="md" style={style()}>
+          Animated box.
+        </Box>
+      </Show>
+    </>
+  );
+}
 
 export function PredefinedTransitionsExample() {
   const getPlacement = (transition: TransitionName) => {
@@ -36,5 +60,31 @@ export function PredefinedTransitionsExample() {
         )}
       </For>
     </HStack>
+  );
+}
+
+export function CustomTransitionExample() {
+  const [show, setShow] = createSignal(false);
+
+  const { style, keepMounted } = createTransition({
+    shouldMount: show,
+    transition: {
+      in: { opacity: 1, transform: "scaleY(1)" },
+      out: { opacity: 0, transform: "scaleY(0)" },
+      common: { "transform-origin": "top" },
+    },
+    duration: 400,
+    easing: "ease",
+  });
+
+  return (
+    <>
+      <Button onClick={() => setShow(prev => !prev)}>{show() ? "Hide" : "Show"}</Button>
+      <Show when={keepMounted()}>
+        <Box p={4} color="white" mt="4" bg="primary.500" rounded="md" shadow="md" style={style()}>
+          Animated box.
+        </Box>
+      </Show>
+    </>
   );
 }

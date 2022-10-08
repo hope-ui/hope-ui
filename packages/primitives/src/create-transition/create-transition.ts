@@ -6,6 +6,7 @@
  * https://github.com/mantinedev/mantine/blob/8546c580fdcaa9653edc6f4813103349a96cfb09/src/mantine-core/src/Transition/use-transition.ts
  */
 
+import { access, MaybeAccessor } from "@hope-ui/utils";
 import {
   Accessor,
   createEffect,
@@ -24,7 +25,7 @@ import { HopeTransition } from "./types";
 
 export interface TransitionOptions {
   /** Whether the component should be mounted. */
-  shouldMount: boolean;
+  shouldMount: MaybeAccessor<boolean>;
 
   /** Predefined transition name or transition styles. */
   transition: HopeTransition;
@@ -102,7 +103,7 @@ export function createTransition(options: TransitionOptions): TransitionResult {
   const [duration, setDuration] = createSignal(reduceMotion() ? 0 : options.duration!);
 
   const [phase, setPhase] = createSignal<TransitionPhase>(
-    options.shouldMount ? "afterEnter" : "afterExit"
+    access(options.shouldMount) ? "afterEnter" : "afterExit"
   );
 
   const [easing, setEasing] = createSignal(options.easing!);
@@ -157,7 +158,7 @@ export function createTransition(options: TransitionOptions): TransitionResult {
 
   createEffect(
     on(
-      () => options.shouldMount,
+      () => access(options.shouldMount),
       shouldMount => handleStateChange(shouldMount),
       { defer: true }
     )
