@@ -17,7 +17,7 @@ The style config API allows you to create components with support for:
 
 - multiple parts (ex: an Alert component with a root, title, and description parts)
 - multi-variant styles (like described in the [Styled components](/docs/styles/styled-componnets) section)
-- customization at the theme level (as described in the [Customize theme](/docs/theming/customize-theme # customizing-component-theme) section)
+- customization at the theme level (as described in the [Customize theme](/docs/theming/customize-theme#customizing-component-theme) section)
 - polymorphic `as` prop, style props, and `sx`
 
 The below example shows how to create a custom `Alert` component with style config API support.
@@ -145,7 +145,7 @@ export const useAlertStyleConfig = createStyleConfig<AlertParts, AlertVariants>(
 
 ### Creating props type
 
-Using the `StyleConfigProps`` utility type, we can generate a _props type_ from the style config.
+Using the `StyleConfigProps` utility type, we can generate a _props type_ from the style config.
 
 ```tsx {2,15}
 // alert.styles.ts
@@ -177,7 +177,7 @@ Now, let's create the `Alert` components that will consume our style config.
 
 ### Creating the components
 
-We create our components with the `createHopeComponent function, which adds support for the polymorphic `as`prop, style props, and`sx`.
+We create our components with the `createHopeComponent` function, which adds support for the polymorphic `as`prop, style props, and`sx`.
 
 ```tsx
 // alert.tsx
