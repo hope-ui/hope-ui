@@ -27,9 +27,6 @@ export const useDrawerStyleConfig = createStyleConfig<DrawerParts, DrawerVariant
 
       width: "100vw",
       height: "100vh",
-      "@supports(height: -webkit-fill-available)": {
-        height: "-webkit-fill-available",
-      },
 
       outline: "none",
 
@@ -69,9 +66,6 @@ export const useDrawerStyleConfig = createStyleConfig<DrawerParts, DrawerVariant
       flexDirection: "column",
 
       maxHeight: "100vh",
-      "@supports(max-height: -webkit-fill-available)": {
-        maxHeight: "-webkit-fill-available",
-      },
       width: "100%",
 
       outline: "none",
