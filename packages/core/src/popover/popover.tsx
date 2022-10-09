@@ -31,6 +31,7 @@ import { isServer } from "solid-js/web";
 import { usePopoverStyleConfig } from "./popover.styles";
 import { PopoverContext } from "./popover-context";
 import { BasePlacement, PopoverContextValue, PopoverProps } from "./types";
+import { getAnchorElement } from "./utils";
 
 /**
  * Popover provides context, theming, and accessibility properties
@@ -42,6 +43,7 @@ export function Popover(props: PopoverProps) {
   props = mergeThemeProps(
     "Popover",
     {
+      getAnchorRect: (anchor?: HTMLElement) => anchor?.getBoundingClientRect(),
       id: `hope-popover-${createUniqueId()}`,
       triggerMode: "click",
       withArrow: true,
@@ -118,19 +120,23 @@ export function Popover(props: PopoverProps) {
   });
 
   const getPopoverElements = () => {
-    const referenceEl = anchorRef() ?? triggerRef();
+    // Popover anchor is `PopoverAnchor` or `PopoverTrigger` or a virtual element.
+    const anchorEl = getAnchorElement(anchorRef() ?? triggerRef(), props.getAnchorRect!);
     const arrowEl = arrowRef();
     const floatingEl = contentRef();
 
-    return { referenceEl, arrowEl, floatingEl };
+    return { anchorEl, arrowEl, floatingEl };
   };
 
   async function updatePosition() {
-    const { referenceEl, arrowEl, floatingEl } = getPopoverElements();
+    const { anchorEl, arrowEl, floatingEl } = getPopoverElements();
 
-    if (!referenceEl || !floatingEl) {
+    if (!anchorEl || !floatingEl) {
       return;
     }
+
+    // Virtual element doesn't work without this ¯\_(ツ)_/¯
+    anchorEl.getBoundingClientRect();
 
     const middleware = [
       offset(props.offset),
@@ -154,7 +160,7 @@ export function Popover(props: PopoverProps) {
 
     middleware.push(hide());
 
-    const pos = await computePosition(referenceEl, floatingEl, {
+    const pos = await computePosition(anchorEl, floatingEl, {
       placement: props.placement,
       middleware,
     });
@@ -278,13 +284,13 @@ export function Popover(props: PopoverProps) {
   };
 
   createEffect(() => {
-    const { referenceEl, floatingEl } = getPopoverElements();
+    const { anchorEl, floatingEl } = getPopoverElements();
 
-    if (!referenceEl || !floatingEl) {
+    if (!anchorEl || !floatingEl) {
       return;
     }
 
-    const cleanupAutoUpdate = autoUpdate(referenceEl, floatingEl, updatePosition, {
+    const cleanupAutoUpdate = autoUpdate(anchorEl, floatingEl, updatePosition, {
       // JSDOM doesn't support ResizeObserver
       elementResize: typeof ResizeObserver === "function",
     });

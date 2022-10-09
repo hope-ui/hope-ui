@@ -9,6 +9,13 @@ export type BasePlacement = "top" | "bottom" | "left" | "right";
 
 type PopoverTriggerMode = "hover" | "click";
 
+export type AnchorRect = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+};
+
 export type PopoverChildrenRenderProp = (props: {
   /** Whether the popover should be shown. */
   isOpen: Accessor<boolean>;
@@ -35,6 +42,12 @@ export interface PopoverProps extends Omit<PopoverStyleConfigProps, keyof HopePr
 
   /** Options passed to the popover transition. */
   transitionOptions?: TransitionOptionsOverride;
+
+  /**
+   * Function that returns the anchor element's DOMRect. If this is explicitly
+   * passed, it will override the anchor `getBoundingClientRect` method.
+   */
+  getAnchorRect?: (anchor?: HTMLElement) => AnchorRect | undefined;
 
   /**
    * The interaction that triggers the popover.

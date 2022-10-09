@@ -1,5 +1,7 @@
 import {
   Button,
+  Center,
+  createInteractOutside,
   HStack,
   Popover,
   PopoverAnchor,
@@ -9,6 +11,75 @@ import {
 import { createSignal } from "solid-js";
 
 import { TargetIcon } from "../components/icons";
+
+export function FollowCursorExample() {
+  const [anchorRect, setAnchorRect] = createSignal({ x: 0, y: 0 });
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Center
+        height="100px"
+        rounded="sm"
+        borderWidth="2px"
+        borderStyle="dashed"
+        borderColor="neutral.300"
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
+        onMouseMove={event => {
+          event.preventDefault();
+          setAnchorRect({ x: event.clientX, y: event.clientY });
+        }}
+      >
+        Hover the area.
+      </Center>
+      <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
+        <PopoverContent w="max-content" p={4}>
+          <p>The content of the Popover.</p>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
+export function RightClickExample() {
+  let containerRef: HTMLDivElement | undefined;
+
+  const [anchorRect, setAnchorRect] = createSignal({ x: 0, y: 0 });
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  createInteractOutside(
+    {
+      onInteractOutside: () => setIsOpen(false),
+    },
+    () => containerRef
+  );
+
+  return (
+    <>
+      <Center
+        ref={containerRef}
+        height="100px"
+        rounded="sm"
+        borderWidth="2px"
+        borderStyle="dashed"
+        borderColor="neutral.300"
+        onContextMenu={event => {
+          event.preventDefault();
+          setAnchorRect({ x: event.clientX, y: event.clientY });
+          setIsOpen(true);
+        }}
+      >
+        Right click in the area.
+      </Center>
+      <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
+        <PopoverContent w="max-content" p={4}>
+          <p>The content of the Popover.</p>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
 
 export function RenderPropPopoverExample() {
   return (
