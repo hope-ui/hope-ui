@@ -1,0 +1,150 @@
+import { Divider, Flex, Text } from "@hope-ui/core";
+
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+
+# Divider
+
+Divider is a line that separates two areas.
+
+## Import
+
+```tsx
+import { Divider } from "@hope-ui/core";
+```
+
+## Usage
+
+A `Divider` renders as an `<hr>` by default.
+You can pass `variant` prop to change the line style of the divider.
+Besides, with `thickness` prop it can control the dividing line's width.
+
+<Preview>
+  <Divider />
+  <Divider variant="dashed" thickness="2px" />
+  <Divider variant="dotted" thickness="3px" />
+</Preview>
+
+```tsx
+<Divider />
+<Divider variant="dashed" thickness="2px"/>
+<Divider variant="dotted" thickness="3px"/>
+```
+
+### Divider with label
+
+Using a `Divider` with label is normal operation.
+You can pass `labelPlacement` prop to ensure the position of label text.
+In addition, you can use `Text` or other components to render various label.
+
+<Preview>
+  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+  Planeta Terra.
+  <Divider>Label</Divider>
+  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+  Planeta Terra.
+  <Divider labelPlacement="left">LEFT</Divider>
+  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+  Planeta Terra.
+  <Divider>
+    <Text color="blue" fontWeight="600">
+      Label
+    </Text>
+  </Divider>
+  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+  Planeta Terra.
+</Preview>
+```tsx
+<Box>
+  <Divider />
+  {content}
+  <Divider>Label</Divider>
+  {content}
+  <Divider labelPlacement="left">LEFT</Divider>
+  {content}
+  <Divider>
+    <Text color="red" fontWeight="600">
+      Label
+    </Text>
+  </Divider>
+  {content}
+</Box>
+```
+
+### Divider orientation
+
+You can make a vertical `Divider` using the `orientation` prop.
+
+<Preview>
+  <a href="https://github.com/hope-ui/hope-ui">Github</a>
+  <Divider orientation="vertical" />
+  <a href="https://www.google.com/search?q=hope-ui">Google</a>
+  <Divider orientation="vertical" />
+  <a href="">HopeUI</a>
+</Preview>
+```tsx
+<Box>
+  <a href="#">Github</a>
+  <Divider orientation="vertical" />
+  <a href="#">Google</a>
+  <Divider orientation="vertical" />
+  <a href="#">MDN</a>
+</Box>
+```
+
+### Vertical divider with label
+
+When you pass `vertical` to `orientation` prop, you can add children component and it will render like this.
+
+<Preview>
+  <Flex>
+    <div>
+      Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+      Planeta Terra.
+    </div>
+    <Divider orientation="vertical" children="Vertical" />
+    <div margin-top="0">
+      Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
+      Planeta Terra.
+    </div>
+  </Flex>
+</Preview>
+```tsx
+<Flex>
+  <p>{content}</p>
+  <Divider orientation="vertical">Vertical</Divider>
+  <p>{content}</p>
+</Flex>
+```
+
+## Theming
+
+Use the `DividerTheme` type to override `Divider` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, DividerTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Divider: {
+      // ...overrides
+    } as DividerTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name    | Static selector        | Description   |
+| ------- | ---------------------- | ------------- |
+| root    | `hope-Divider-root`    | Root element  |
+| wrapper | `hope-Divider-wrapper` | Label element |
+
+## Props
+
+| Name           | Type                                | Description                        | Default value |
+| -------------- | ----------------------------------- | ---------------------------------- | ------------- |
+| variant        | `"solid" \| "dashed" \| "dotted"`   | The style of divider line.         | solid         |
+| thickness      | `ResponsiveValue<number \| string>` | The thickness of the divider line. | 1px           |
+| orientation    | `"horizontal" \| "vertical"`        | The orientation of divider.        | horizontal    |
+| labelPlacement | `"center" \| "left" \| "right"`     | The placement of label text.       | center        |

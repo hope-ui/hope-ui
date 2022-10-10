@@ -15,6 +15,7 @@ export * from "./button";
 export * from "./center";
 export * from "./close-button";
 export * from "./container";
+export * from "./divider";
 export * from "./drawer";
 export * from "./flex";
 export * from "./focus-trap";
