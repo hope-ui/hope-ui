@@ -1,21 +1,16 @@
 import { ComponentTheme, ResponsiveValue } from "@hope-ui/styles";
+
 import { DividerStyleConfigProps } from "./divider.styles";
 
-export interface DividerProps extends DividerStyleConfigProps {
-  /** the style of dividing line */
+export interface DividerProps extends Omit<DividerStyleConfigProps, "hasLabel"> {
+  /** The visual style of the divider. */
   variant?: "solid" | "dashed" | "dotted";
 
-  /** the thickness of dividing line */
+  /** The thickness of the divider (in px). */
   thickness?: ResponsiveValue<number | string>;
-
-  /** Divider direction */
-  orientation?: "vertical" | "horizontal";
-
-  /** text position of Divider */
-  labelPlacement?: "left" | "right" | "center";
 }
 
 export type DividerTheme = ComponentTheme<
   DividerProps,
-  "labelPlacement" | "orientation" | "variant" | "thickness"
+  "variant" | "thickness" | "orientation" | "labelPlacement"
 >;

@@ -1,9 +1,9 @@
-import { clsx } from "clsx";
-import { Box } from "../box";
-import { DividerProps } from "./types";
-import { children, Show, splitProps } from "solid-js";
-import { useDividerStyleConfig } from "./divider.styles";
 import { createHopeComponent, hope, mergeThemeProps, SystemStyleObject } from "@hope-ui/styles";
+import { clsx } from "clsx";
+import { Accessor, children, createMemo, Show, splitProps } from "solid-js";
+
+import { useDividerStyleConfig } from "./divider.styles";
+import { DividerProps } from "./types";
 
 export const Divider = createHopeComponent<"hr", DividerProps>(props => {
   props = mergeThemeProps(
@@ -11,55 +11,55 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
     {
       variant: "solid",
       thickness: "1px",
-      orientation: "horizontal",
     },
     props
   );
 
   const [local, styleConfigProps, others] = splitProps(
     props,
-    ["class", "children", "thickness"],
-    ["variant", "labelPlacement", "orientation", "styleConfigOverride", "unstyled"]
+    ["class", "children", "variant", "thickness"],
+    ["orientation", "labelPlacement", "styleConfigOverride", "unstyled"]
   );
 
-  const resolved = children(() => props.children);
+  const resolvedChildren = children(() => props.children);
+  const hasLabel = () => !!resolvedChildren();
+
   const isVertical = () => styleConfigProps.orientation === "vertical";
-  const hasChildren = () => (props.children ? true : false);
-  const hasVerticalChildren = () => isVertical() && hasChildren();
-  console.log(hasChildren());
+  const isVerticalWithLabel = () => isVertical() && hasLabel();
 
-  const lineWidth = {
-    top: hasVerticalChildren() ? 0 : local.thickness,
-    left: hasVerticalChildren() ? local.thickness : 0,
-  };
+  const lineStyle: Accessor<SystemStyleObject> = createMemo(() => {
+    const borderSide = isVertical() ? "borderLeftStyle" : "borderTopStyle";
 
-  const borderSide = isVertical() ? "borderLeftStyle" : "borderTopStyle";
+    const topWidth = isVerticalWithLabel() ? 0 : local.thickness;
+    const leftWidth = isVerticalWithLabel() ? local.thickness : 0;
 
-  const dividingLineStyle: SystemStyleObject = {
-    [borderSide]: styleConfigProps.variant,
-    borderWidth: hasChildren() ? 0 : local.thickness,
-    _after: {
-      [borderSide]: styleConfigProps.variant,
-      borderWidth: `${lineWidth.top} 0 0 ${lineWidth.left}`,
-    },
-    _before: {
-      [borderSide]: styleConfigProps.variant,
-      borderWidth: `${lineWidth.top} 0 0 ${lineWidth.left}`,
-    },
-  };
+    return {
+      [borderSide]: local.variant,
+      borderWidth: hasLabel() ? 0 : local.thickness,
+      _after: {
+        [borderSide]: local.variant,
+        borderWidth: 0,
+        borderTopWidth: topWidth,
+        borderLeftWidth: leftWidth,
+      },
+      _before: {
+        [borderSide]: local.variant,
+        borderWidth: 0,
+        borderTopWidth: topWidth,
+        borderLeftWidth: leftWidth,
+      },
+    };
+  });
 
   const { baseClasses, styleOverrides } = useDividerStyleConfig("Divider", {
-    get hasChildren() {
-      return hasChildren();
-    },
     get orientation() {
       return styleConfigProps.orientation;
     },
-    get variant() {
-      return styleConfigProps.variant;
-    },
     get labelPlacement() {
       return styleConfigProps.labelPlacement;
+    },
+    get hasLabel() {
+      return hasLabel();
     },
     get styleConfigOverride() {
       return styleConfigProps.styleConfigOverride;
@@ -70,19 +70,19 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
   });
 
   return (
-    <Box
-      as={hasChildren() ? "div" : "hr"}
-      role={hasChildren() ? "separator" : undefined}
+    <hope.hr
+      as={hasLabel() ? "div" : "hr"}
+      role={hasLabel() ? "separator" : undefined}
       aria-orientation={isVertical() ? "vertical" : "horizontal"}
       class={clsx(baseClasses().root, local.class)}
-      __css={{ ...styleOverrides().root, ...dividingLineStyle }}
+      __css={{ ...styleOverrides().root, ...lineStyle() }}
       {...others}
     >
-      <Show fallback={null} when={hasChildren()}>
-        <hope.span class={baseClasses().wrapper} __css={styleOverrides().wrapper}>
-          {resolved()}
+      <Show when={hasLabel()}>
+        <hope.span class={baseClasses().labelWrapper} __css={styleOverrides().labelWrapper}>
+          {resolvedChildren()}
         </hope.span>
       </Show>
-    </Box>
+    </hope.hr>
   );
 });

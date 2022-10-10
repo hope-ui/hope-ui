@@ -1,11 +1,10 @@
-import { Divider, Flex, Text } from "@hope-ui/core";
+import { Divider, Flex, HStack, Text, VStack } from "@hope-ui/core";
 
-import { Callout } from "~/components/callout";
 import { Preview } from "~/components/preview";
 
 # Divider
 
-Divider is a line that separates two areas.
+Separates two areas with a horizontal or vertical line and an optional label.
 
 ## Import
 
@@ -15,81 +14,103 @@ import { Divider } from "@hope-ui/core";
 
 ## Usage
 
-A `Divider` renders as an `<hr>` by default.
-You can pass `variant` prop to change the line style of the divider.
-Besides, with `thickness` prop it can control the dividing line's width.
+The `Divider` displays a thin horizontal or vertical line, and renders as an `<hr>` by default.
+
+### Variants
+
+Use the variant prop to change the visual style of the divider.
 
 <Preview>
-  <Divider />
-  <Divider variant="dashed" thickness="2px" />
-  <Divider variant="dotted" thickness="3px" />
+  <VStack spacing={4}>
+    <Divider variant="solid" />
+    <Divider variant="dashed" />
+    <Divider variant="dotted" />
+  </VStack>
 </Preview>
 
 ```tsx
-<Divider />
-<Divider variant="dashed" thickness="2px"/>
-<Divider variant="dotted" thickness="3px"/>
+<VStack spacing={4}>
+  <Divider variant="solid" />
+  <Divider variant="dashed" />
+  <Divider variant="dotted" />
+</VStack>
+```
+
+### Thickness
+
+Use the `thickness` prop to change the thickness of the divider.
+
+<Preview>
+  <Divider thickness="3px" />
+</Preview>
+
+```tsx
+<Divider thickness="3px" />
+```
+
+### Vertical orientation
+
+You can make a vertical `Divider` by passing `vertical` to the `orientation` prop.
+
+<Preview>
+  <HStack spacing={4}>
+    <span>One</span>
+    <Divider orientation="vertical" />
+    <span>Two</span>
+    <Divider orientation="vertical" />
+    <span>Three</span>
+  </HStack>
+</Preview>
+
+```tsx
+<HStack spacing={4}>
+  <span>One</span>
+  <Divider orientation="vertical" />
+  <span>Two</span>
+  <Divider orientation="vertical" />
+  <span>Three</span>
+</HStack>
 ```
 
 ### Divider with label
 
-Using a `Divider` with label is normal operation.
-You can pass `labelPlacement` prop to ensure the position of label text.
-In addition, you can use `Text` or other components to render various label.
+You can add a label at left, right or center of `Divider` by setting its `children` and control its placement with `labelPlacement`.
 
 <Preview>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
-  <Divider>Label</Divider>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
-  <Divider labelPlacement="left">LEFT</Divider>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
-  <Divider>
-    <Text color="blue" fontWeight="600">
-      Label
-    </Text>
-  </Divider>
-  Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-  Planeta Terra.
+  <VStack spacing={1}>
+    <Divider>Left</Divider>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris nisi ut aliquip ex ea commodo consequat.
+    </p>
+    <Divider labelPlacement="center">Center</Divider>
+    <p>
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+      pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+      mollit anim id est laborum.
+    </p>
+    <Divider labelPlacement="right">Right</Divider>
+    <p>
+      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+      laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto
+      beatae vitae dicta sunt explicabo.
+    </p>
+    <Divider labelPlacement="center">
+      <Text fontWeight="semibold" fontSize="lg">
+        <span>Custom label</span>
+      </Text>
+    </Divider>
+    <p>
+      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+      consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci
+      velit, sed quia non numquam eius modi.
+    </p>
+  </VStack>
 </Preview>
+
 ```tsx
-<Box>
-  <Divider />
-  {content}
-  <Divider>Label</Divider>
-  {content}
-  <Divider labelPlacement="left">LEFT</Divider>
-  {content}
-  <Divider>
-    <Text color="red" fontWeight="600">
-      Label
-    </Text>
-  </Divider>
-  {content}
-</Box>
-```
 
-### Divider orientation
-
-You can make a vertical `Divider` using the `orientation` prop.
-
-<Preview>
-  <a href="https://github.com/hope-ui/hope-ui">Github</a>
-  <Divider orientation="vertical" />
-  <a href="https://www.google.com/search?q=hope-ui">Google</a>
-  <Divider orientation="vertical" />
-  <a href="">HopeUI</a>
-</Preview>
-```tsx
-<Box>
-  <a href="#">Github</a>
-  <Divider orientation="vertical" />
-  <a href="#">Google</a>
-  <Divider orientation="vertical" />
-  <a href="#">MDN</a>
-</Box>
 ```
 
 ### Vertical divider with label
@@ -109,12 +130,9 @@ When you pass `vertical` to `orientation` prop, you can add children component a
     </div>
   </Flex>
 </Preview>
+
 ```tsx
-<Flex>
-  <p>{content}</p>
-  <Divider orientation="vertical">Vertical</Divider>
-  <p>{content}</p>
-</Flex>
+
 ```
 
 ## Theming
@@ -135,16 +153,16 @@ const theme = extendTheme({
 
 ### Component parts
 
-| Name    | Static selector        | Description   |
-| ------- | ---------------------- | ------------- |
-| root    | `hope-Divider-root`    | Root element  |
-| wrapper | `hope-Divider-wrapper` | Label element |
+| Name         | Static selector             | Description           |
+| ------------ | --------------------------- | --------------------- |
+| root         | `hope-Divider-root`         | Root element          |
+| labelWrapper | `hope-Divider-labelWrapper` | Wrapper arround label |
 
 ## Props
 
-| Name           | Type                                | Description                        | Default value |
-| -------------- | ----------------------------------- | ---------------------------------- | ------------- |
-| variant        | `"solid" \| "dashed" \| "dotted"`   | The style of divider line.         | solid         |
-| thickness      | `ResponsiveValue<number \| string>` | The thickness of the divider line. | 1px           |
-| orientation    | `"horizontal" \| "vertical"`        | The orientation of divider.        | horizontal    |
-| labelPlacement | `"center" \| "left" \| "right"`     | The placement of label text.       | center        |
+| Name           | Type                                | Description                           | Default value |
+| -------------- | ----------------------------------- | ------------------------------------- | ------------- |
+| variant        | `"solid" \| "dashed" \| "dotted"`   | The visual style of the divider.      | "solid"       |
+| thickness      | `ResponsiveValue<number \| string>` | The thickness of the divider (in px). | 1px           |
+| orientation    | `"horizontal" \| "vertical"`        | The orientation of the divider.       | "horizontal"  |
+| labelPlacement | `"left" \| "right" \| "center"`     | The placement of the label, if any.   | "center"      |

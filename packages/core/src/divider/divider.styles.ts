@@ -1,8 +1,20 @@
-import { createStyleConfig, PseudoSelectorValue, StyleConfigProps } from "@hope-ui/styles";
+import { createStyleConfig, StyleConfigProps, SystemStyleObject } from "@hope-ui/styles";
 
-type DividerParts = "root" | "wrapper";
+type DividerParts = "root" | "labelWrapper";
 
-const verticalLineStyle: PseudoSelectorValue = {
+interface DividerVariants {
+  /** The orientation of the divider. */
+  orientation: "vertical" | "horizontal";
+
+  /** The placement of the label, if any. */
+  labelPlacement: "left" | "right" | "center";
+
+  /** Whether the divider has a label. */
+  hasLabel: boolean;
+}
+
+const verticalLineStyleWithLabel: SystemStyleObject = {
+  content: `""`,
   top: 0,
   left: "50%",
   height: "50%",
@@ -10,31 +22,13 @@ const verticalLineStyle: PseudoSelectorValue = {
   transform: "none",
 };
 
-/** horizontal line style when it has children prop. */
-const horizontalLineStyleWithChildren: PseudoSelectorValue = {
-  top: "50%",
-  width: "100%",
+const horizontalLineStyleWithLabel: SystemStyleObject = {
   content: `""`,
   position: "relative",
+  top: "50%",
+  //width: "100%",
   transform: "translateY(50%)",
 };
-
-const tenPresentWidth = { width: "10%" };
-const nintyPresentWidth = { width: "90%" };
-
-interface DividerVariants {
-  /** the visual style of dividing line. */
-  variant: "solid" | "dashed" | "dotted";
-
-  /** The orientation of the divider. */
-  orientation: "vertical" | "horizontal";
-
-  /** The placement of the divider text, if any. */
-  labelPlacement: "left" | "right" | "center";
-
-  /** has children prop */
-  hasChildren: boolean;
-}
 
 export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerVariants>(
   ({ vars }) => ({
@@ -43,85 +37,110 @@ export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerVari
         whiteSpace: "nowrap",
         borderStyle: "none",
         borderColor: vars.colors.blackAlpha[300],
-        _after: { borderColor: vars.colors.blackAlpha[300] },
-        _before: { borderColor: vars.colors.blackAlpha[300] },
+
+        _after: {
+          borderColor: vars.colors.blackAlpha[300],
+        },
+
+        _before: {
+          borderColor: vars.colors.blackAlpha[300],
+        },
       },
       variants: {
-        hasChildren: {
-          true: {
-            margin: "14px 0",
-            display: "flex",
-            _after: horizontalLineStyleWithChildren,
-            _before: horizontalLineStyleWithChildren,
-          },
-          false: {
-            margin: "24px 0",
-            borderTopColor: vars.colors.blackAlpha[300],
-          },
-        },
-        labelPlacement: {
-          left: {
-            _before: tenPresentWidth,
-            _after: nintyPresentWidth,
-          },
-          right: {
-            _after: tenPresentWidth,
-            _before: nintyPresentWidth,
-          },
-          center: {},
-        },
         orientation: {
-          horizontal: {},
+          horizontal: {
+            width: "100%",
+          },
           vertical: {
             height: "auto",
             margin: "0 1em",
             display: "inline",
             borderTop: 0,
-            borderLeft: vars.colors.blackAlpha[300],
+            borderLeftColor: vars.colors.blackAlpha[300],
+          },
+        },
+        labelPlacement: {},
+        hasLabel: {
+          true: {
+            display: "flex",
+            mx: 4,
+            my: 0,
+          },
+          false: {
+            margin: 0,
+            borderTopColor: vars.colors.blackAlpha[300],
           },
         },
       },
       compoundVariants: [
         {
           variants: {
-            hasChildren: true,
-            orientation: "vertical",
+            orientation: "horizontal",
+            labelPlacement: "left",
+            hasLabel: true,
           },
           style: {
-            borderLeft: 0,
+            _before: {
+              ...horizontalLineStyleWithLabel,
+              width: "5%",
+            },
+            _after: {
+              ...horizontalLineStyleWithLabel,
+              width: "95%",
+            },
+          },
+        },
+        {
+          variants: {
+            orientation: "horizontal",
+            labelPlacement: "right",
+            hasLabel: true,
+          },
+          style: {
+            _before: {
+              ...horizontalLineStyleWithLabel,
+              width: "95%",
+            },
+            _after: {
+              ...horizontalLineStyleWithLabel,
+              width: "5%",
+            },
+          },
+        },
+        {
+          variants: {
+            orientation: "vertical",
+            hasLabel: true,
+          },
+          style: {
             display: "flex",
             flexDirection: "column",
-            _after: verticalLineStyle,
-            _before: verticalLineStyle,
+            borderLeft: 0,
+            _after: verticalLineStyleWithLabel,
+            _before: verticalLineStyleWithLabel,
           },
         },
       ],
     },
-    wrapper: {
+    labelWrapper: {
       baseStyle: {
         display: "inline-block",
         whiteSpace: "nowrap",
-        paddingLeft: "3",
-        paddingRight: "3",
+        px: 3,
       },
-      compoundVariants: [
-        {
-          variants: {
-            orientation: "vertical",
-            hasChildren: true,
-          },
-          style: {
-            paddingTop: "3",
-            paddingBottom: "3",
+      variants: {
+        orientation: {
+          vertical: {
+            py: 3,
           },
         },
-      ],
+      },
     },
   }),
   {
-    hasChildren: false,
     orientation: "horizontal",
-    labelPlacement: "center",
+    labelPlacement: "left",
+    hasLabel: false,
   }
 );
 
