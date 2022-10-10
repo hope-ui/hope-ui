@@ -1,4 +1,5 @@
 import { Preview } from "~/components/preview";
+import { RequiredIndicator } from "~/components/required-indicator";
 import {
   BasicExample,
   PredefinedTransitionsExample,
@@ -123,3 +124,20 @@ function UnmountOnExitExample() {
   );
 }
 ```
+
+## Props
+
+| Name                                               | Type                                              | Description                                                  | Default value |
+| -------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ | ------------- |
+| <RequiredIndicator>shouldMount</RequiredIndicator> | `boolean \| Accessor<boolean>`                    | Whether the component should be mounted.                     |               |
+| <RequiredIndicator>transition</RequiredIndicator>  | `HopeTransition`                                  | Predefined transition name or transition styles.             |               |
+| duration                                           | `number`                                          | Transitions duration (in ms).                                | 250           |
+| exitDuration                                       | `number`                                          | Exit transition duration (in ms).                            | 250           |
+| delay                                              | `number`                                          | Delay before starting transitions (in ms).                   | 10            |
+| exitDelay                                          | `number`                                          | Delay before starting the exit transition (in ms).           | 10            |
+| easing                                             | `JSX.CSSProperties["transition-timing-function"]` | Transitions timing function.                                 | ease          |
+| exitEasing                                         | `JSX.CSSProperties["transition-timing-function"]` | Exit transition timing function.                             | ease          |
+| onBeforeEnter                                      | `() => void`                                      | A function that will be called when enter transition starts. |               |
+| onAfterEnter                                       | `() => void`                                      | A function that will be called when enter transition ends.   |               |
+| onBeforeExit                                       | `() => void`                                      | A function that will be called when exit transition starts.  |               |
+| onAfterExit                                        | `() => void`                                      | A function that will be called when exit transition ends.    |               |

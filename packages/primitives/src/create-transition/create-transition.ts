@@ -48,16 +48,16 @@ export interface TransitionOptions {
   /** Exit transition timing function. */
   exitEasing?: JSX.CSSProperties["transition-timing-function"];
 
-  /** Calls when enter transition starts. */
+  /** A function that will be called when enter transition starts. */
   onBeforeEnter?: () => void;
 
-  /** Calls when enter transition ends. */
+  /** A function that will be called when enter transition ends. */
   onAfterEnter?: () => void;
 
-  /** Calls when exit transition starts. */
+  /** A function that will be called when exit transition starts. */
   onBeforeExit?: () => void;
 
-  /** Calls when exit transition ends. */
+  /** A function that will be called when exit transition ends. */
   onAfterExit?: () => void;
 }
 
