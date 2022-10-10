@@ -8,7 +8,7 @@ Extend the default Hope UI theme to match your design requirements.
 
 To override a token in the default theme, import the `extendTheme` function and add the keys you'd like to override. You can also add new values to the theme.
 
-The below example demonstrate how to override the light mode primary color palette.
+The below example demonstrates how to override the light mode primary color palette.
 
 ```tsx
 import { createPalette, extendTheme, HopeProvider } from "@hope-ui/core";
@@ -41,7 +41,7 @@ function Demo() {
 
 ## Customizing component theme
 
-The theme override object accept a `components` key allowing you to set default props and styles for each Hope UI components.
+The theme override object accepts a `components` key, allowing you to set default props and styles for each Hope UI component.
 
 ### Default props
 
@@ -76,7 +76,7 @@ const theme = extendTheme({
 
 Use the `styleConfigOverride` key to override the default styles of a component.
 
-Each key refers to a _part_ of the component, for which you can define the `baseStyle`, `variants` and `compoundVariants` like described in the [Styled components](/docs/styles/styled-components) section.
+Each key refers to a _part_ of the component for which the `baseStyle`, `variants`, and `compoundVariants` can be defined as described in the [Styled components] (/docs/styles/styled-components) section.
 
 ```tsx
 import { extendTheme, ButtonTheme } from "@hope-ui/core";
@@ -121,4 +121,4 @@ const theme = extendTheme({
 });
 ```
 
-To know which Hope UI components are themeable refers to the _theming_ section of their documentation.
+To find out which Hope UI components are themeable, refer to the _theming_ section of their documentation.

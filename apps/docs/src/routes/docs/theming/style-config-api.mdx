@@ -2,31 +2,31 @@ import { Callout } from "~/components/callout";
 
 # Style config API
 
-Create custom components with multiple parts, multi-variant styles and theme customization support.
+Create custom components with multiple parts, multi-variant styles, and theme customization support.
 
 <Callout type="warning">
   <span>
-    **Warning**: This is an advanced API used internally by Hope UI components, in most case you
+    **Warning**: This is an advanced API used internally by Hope UI components. In most cases, you
     don't need it in your application.
   </span>
 </Callout>
 
 ## Introduction
 
-The style config API allows to create components with supports for:
+The style config API allows you to create components with support for:
 
-- multiple parts (ex: an Alert component with a root, title and description parts)
+- multiple parts (ex: an Alert component with a root, title, and description parts)
 - multi-variant styles (like described in the [Styled components](/docs/styles/styled-componnets) section)
-- theme level customization (like described in the [Customize theme](/docs/theming/customize-theme#customizing-component-theme) section)
-- polymorphic `as` prop, style props and `sx`
+- customization at the theme level (as described in the [Customize theme](/docs/theming/customize-theme#customizing-component-theme) section)
+- polymorphic `as` prop, style props, and `sx`
 
-The below example show how to create a custom `Alert` component with style config API support.
+The below example shows how to create a custom `Alert` component with style config API support.
 
 ## Creating a style config
 
 ### Defining component parts
 
-First, we define which part composes our component.
+First, we define which parts compose our component.
 
 ```tsx
 // alert.styles.ts
@@ -36,7 +36,7 @@ export type AlertParts = "root" | "title" | "description";
 
 ### Defining variants
 
-Then, witch variants our component will accept, each variant will become a prop of the component.
+Then, we define which variants our component will accept. Each variant will become a prop of the component.
 
 ```tsx {4-7}
 // alert.styles.ts
@@ -53,7 +53,7 @@ interface AlertVariants {
 
 Next, we create our component's style config.
 
-The `createStyleConfig` function takes an object as first parameter where each key refers to a part of the component, and each value define the `baseStyle`, `variants` and `compoundVariants` styles of that part.
+The `createStyleConfig` function takes an object as the first parameter, in which each key refers to a part of the component, and each value defines the `baseStyle`, `variants` and `compoundVariants` styles of that part.
 
 ```tsx {2,10-50}
 // alert.styles.ts
@@ -111,8 +111,8 @@ export const useAlertStyleConfig = createStyleConfig<AlertParts, AlertVariants>(
 
 <Callout>
   <span>
-    Even if some part of your component doesn't require styles, you have to define them with an
-    empty object.
+    Even if some parts of your component don't require styles, you have to define them with an empty
+    object.
   </span>
 </Callout>
 
@@ -145,7 +145,7 @@ export const useAlertStyleConfig = createStyleConfig<AlertParts, AlertVariants>(
 
 ### Creating props type
 
-We can generate a _props type_ from the style config using the `StyleConfigProps` utility type.
+Using the `StyleConfigProps` utility type, we can generate a _props type_ from the style config.
 
 ```tsx {2,15}
 // alert.styles.ts
@@ -177,7 +177,7 @@ Now, let's create the `Alert` components that will consume our style config.
 
 ### Creating the components
 
-We create our components with the `createHopeComponent` function which add supports for the polymorphic `as` prop, style props and `sx`.
+We create our components with the `createHopeComponent` function, which adds support for the polymorphic `as` prop, style props, and `sx`.
 
 ```tsx
 // alert.tsx
@@ -206,12 +206,12 @@ Let's start by consuming our style config in the root `Alert` component.
 The `useAlertStyleConfig` we've created takes two parameters:
 
 - A name of your choice, used for theme level customization (described below)
-- The `styleConfigOverride`, `unstyled` and other variants props
+- The `styleConfigOverride`, `unstyled` and other variant props
 
 It returns two accessors:
 
-- `baseClasses`: the base classes to apply on each parts of the component
-- `styleOverrides`: the style overrides for each parts of the component
+- `baseClasses`: the base classes to apply to each part of the component
+- `styleOverrides`: the style overrides for each part of the component
 
 ```tsx {6,15,18}
 // alert.tsx
@@ -242,15 +242,15 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 ```
 
 <Callout type="warning">
-  Not that `styleOverrides` are passed to the `__css` prop, its like the `sx` prop but have lower
-  specificity. This allows to override the component styles with style props and `sx` later.
+  Note that `styleOverrides` are passed to the `__css` prop. It's like the `sx` prop but has lower
+  specificity. This allows us to override the component styles with style props and `sx` later.
 </Callout>
 
 ### Providing style config to descendants
 
 We need a way to access the `baseClasses` and `styleOverrides` in the `AlertTitle` and `AlertDescription` components.
 
-The `StyleConfigProvider` allow providing those values to children of `Alert` via a _context_.
+The `StyleConfigProvider` allows providing those values to children of `Alert` via a _context_.
 
 ```tsx {2,18,22}
 // alert.tsx
@@ -282,7 +282,7 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 // ...AlertTitle and AlertDescription components
 ```
 
-Then, in `AlertTitle` and `AlertDescription` we use the `useStyleConfigContext` to consume that _context_.
+Then, in `AlertTitle` and `AlertDescription`, we use `useStyleConfigContext` to consume that _context_.
 
 ```tsx {6,11,34,48}
 // alert.tsx
@@ -347,7 +347,7 @@ export const AlertDescription = createHopeComponent<"div">(props => {
 
 ### Creating a component theme type
 
-We need to create a _component theme_ type to get TypeScript supports in the theme object. To do that, Hope UI expose the `ComponentTheme` utility type.
+We need to create a _component theme_ type to get TypeScript support in the theme object. To do that, Hope UI exposes the `ComponentTheme` utility type.
 
 In the example below, only `variant` and `status` from the `AlertStyleConfigProps` type will be available to set in the theme default props section.
 
@@ -393,10 +393,10 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 
 We also need to allow default props from the theme to be merged in the component.
 
-To do that, use the `mergeThemeProps` function and pass it the following parameters:
+To do that, we use the `mergeThemeProps` function and pass it the following parameters:
 
 1. The name used to retrieve the component in the theme (**should be** the same used in `useAlertStyleConfig`)
-2. The fallback default props (if not provided via the theme)
+2. The fallback default props (if the theme does not provide them)
 3. The component props object
 
 ```tsx {6,18}
@@ -457,7 +457,7 @@ Finally, our `Alert` component can be used like this:
 </Alert>
 ```
 
-It also supports the polymorphic `as` prop, styles props and `sx`.
+It also supports the polymorphic `as` prop, style props, and `sx`.
 
 ```tsx
 <Alert variant="solid" status="info" as="section" p={4}>

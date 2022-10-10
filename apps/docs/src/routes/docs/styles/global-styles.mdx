@@ -2,7 +2,7 @@ import { Callout } from "~/components/callout";
 
 # Global styles
 
-A convenient way to add global styles, while keeping access to Hope UI styling features.
+A convenient way to add global styles while keeping access to Hope UI styling features.
 
 ## Import
 
@@ -12,7 +12,7 @@ import { createGlobalStyles } from "@hope-ui/core";
 
 ## Usage
 
-The `createGlobalStyles` function return another function, which you must call in your app.
+The `createGlobalStyles` function returns another function, which you must call in your app.
 
 ```jsx
 const useGlobalStyles = createGlobalStyles({
@@ -53,7 +53,7 @@ const useGlobalStyles = createGlobalStyles({
 
 ### Accessing the theme object
 
-`createGlobalStyles` can accept a _function_ as parameter which give you access to the current theme.
+`createGlobalStyles` can accept a _function_ as parameter, which gives you access to the current theme.
 
 ```jsx
 const useGlobalStyles = createGlobalStyles(theme => ({

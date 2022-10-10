@@ -6,11 +6,11 @@ import { Preview } from "~/components/preview";
 
 # Style props
 
-Define component's style simply by passing props.
+Define a component's style simply by passing props.
 
 ## Reference table
 
-The following table shows all available style props and CSS properties their map to.
+The following table shows all available style props and the CSS properties they map to.
 
 ### Margin and padding
 
@@ -23,7 +23,7 @@ import { Box } from "@hope-ui/core";
 // you can also use custom values
 <Box maxW="960px" mx="auto" />
 
-// sets margin `8px` on all viewports and `12px` from the first breakpoint and up
+// applies an `8px`` margin to all viewports and a `12px` margin from the first breakpoint upwards.
 <Box m={[2, 3]} />
 ```
 
@@ -87,7 +87,7 @@ import { Text } from "@hope-ui/core";
 // font-size `"2em"`
 <Text fontSize="2em" />
 
-// text-align `left` on all viewports and `center` from the first breakpoint and up
+// applies text-align `left` on all viewports and text-align `center` from the first breakpoint and upwards
 <Text textAlign={[ "left", "center" ]} />
 ```
 
@@ -279,7 +279,7 @@ import { Button } from "@hope-ui/core";
 // this button will have no right borderRadius
 <Button borderRightRadius={0}>Button 1</Button>
 
-// this button will have no left borderRadius*/
+// this button will have no left borderRadius
 <Button borderLeftRadius={0}>Button 2</Button>
 
 // top left and top right radius will be `theme.vars.radii.md`
@@ -473,13 +473,13 @@ For example, say you are using the `Button` component, and you need to make it a
 
 <Preview>
   <Button as="a" target="_blank" href="https://solidjs.com">
-    Go to SolidJS website
+    Go to the SolidJS website
   </Button>
 </Preview>
 
 ```tsx
 <Button as="a" target="_blank" href="https://solidjs.com">
-  Go to SolidJS website
+  Go to the SolidJS website
 </Button>
 ```
 
