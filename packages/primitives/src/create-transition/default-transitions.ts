@@ -10,7 +10,7 @@ import { TransitionName, TransitionStyles } from "./types";
 
 const popIn: TransitionStyles = {
   in: { opacity: 1, transform: "scale(1)" },
-  out: { opacity: 0, transform: "scale(.9) translateY(10px)" },
+  out: { opacity: 0, transform: "scale(0.9) translateY(10px)" },
 };
 
 export const DEFAULT_TRANSITIONS: Record<TransitionName, TransitionStyles> = {
@@ -102,11 +102,15 @@ export const DEFAULT_TRANSITIONS: Record<TransitionName, TransitionStyles> = {
 
   "pop-top-left": {
     ...popIn,
+    out: { opacity: 0, transform: "scale(0.9) translateY(-10px)" },
     common: { "transform-origin": "top left" },
   },
 
   "pop-top-right": {
     ...popIn,
+    out: { opacity: 0, transform: "scale(0.9) translateY(-10px)" },
     common: { "transform-origin": "top right" },
   },
 };
+
+export const DEFAULT_TRANSITIONS_NAMES = Object.keys(DEFAULT_TRANSITIONS) as Array<TransitionName>;

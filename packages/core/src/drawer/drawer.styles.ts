@@ -27,9 +27,6 @@ export const useDrawerStyleConfig = createStyleConfig<DrawerParts, DrawerVariant
 
       width: "100vw",
       height: "100vh",
-      "@supports(height: -webkit-fill-available)": {
-        height: "-webkit-fill-available",
-      },
 
       outline: "none",
 
