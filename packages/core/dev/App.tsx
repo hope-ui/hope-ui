@@ -1,25 +1,44 @@
-import { createDisclosure } from "@hope-ui/primitives";
-
-import { Box, Transition } from "../src";
-
-function Foo(props: any) {
-  console.log("rerender");
-  return <Box {...props}></Box>;
-}
+import { Box, Popover, PopoverContent } from "../src";
+import { createSignal } from "solid-js";
 
 export default function App() {
-  const { isOpen, toggle } = createDisclosure();
+  const [anchorRect, setAnchorRect] = createSignal({ x: 0, y: 0 });
+  const [isOpen, setIsOpen] = createSignal(false);
 
   return (
     <>
-      <button onClick={toggle}>toggle transition</button>
-      <Transition mounted={isOpen()} transition="slide-right" duration={1000} timingFunction="ease">
-        {styles => (
-          <Foo style={styles} bg="neutral.900" color="neutral.50" h={10} w="40">
-            Your modal
-          </Foo>
-        )}
-      </Transition>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "0.5rem",
+          borderWidth: "2px",
+          borderStyle: "dashed",
+          borderColor: "hsl(204 20% 88%)",
+          paddingTop: "2.5rem",
+          paddingBottom: "2.5rem",
+          paddingLeft: "4rem",
+          paddingRight: "4rem",
+        }}
+        onContextMenu={event => {
+          event.preventDefault();
+          setAnchorRect({ x: event.clientX, y: event.clientY });
+          setIsOpen(true);
+        }}
+      >
+        Right click here
+      </Box>
+      <Popover
+        isOpen={isOpen()}
+        onOpenChange={setIsOpen}
+        getAnchorRect={anchorRect}
+        closeOnBlur={false}
+      >
+        <PopoverContent w="max-content" p={4}>
+          <p>The content of the Popover.</p>
+        </PopoverContent>
+      </Popover>
     </>
   );
 }

@@ -14,5 +14,9 @@ export function getLastItem<T>(array: T[]): T | undefined {
 }
 
 export function pack<T>(value: T | T[]): Array<T> {
+  if (value == null) {
+    return [];
+  }
+
   return isArray(value) ? value : [value];
 }

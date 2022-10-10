@@ -10,60 +10,24 @@ import { isObject, runIfFn } from "@hope-ui/utils";
 
 import { CSSObject } from "../stitches.config";
 import { BaseSystemStyleProps, PseudoSelectorProps, SystemStyleObject, Theme } from "../types";
+import { expandSyntax } from "./expand-syntax";
 import { PSEUDO_SELECTORS_MAP, SHORTHANDS_MAP } from "./property-map";
 import { resolveTokenValue } from "./resolve-token-value";
 
 /** Return a CSSObject from a system style object. */
 export function toCSSObject(systemStyleObject: SystemStyleObject, theme: Theme): CSSObject {
-  let computedStyles: CSSObject = {};
+  const computedStyles: CSSObject = {};
 
-  if (!theme.__breakpoints) {
-    return computedStyles;
-  }
+  const styles = expandSyntax(systemStyleObject)(theme);
 
-  const { isResponsive, toArrayValue, medias } = theme.__breakpoints;
-
-  for (let key in systemStyleObject) {
+  for (let key in styles) {
     /**
      * allows the user to pass functional values.
      * boxShadow: theme => `0 2px 2px ${theme.vars.colors.primary["500"]}`
      */
-    let value = runIfFn(systemStyleObject[key], theme);
+    let value = runIfFn(styles[key], theme);
 
     if (value == null) {
-      continue;
-    }
-
-    /**
-     * Expands an array or object syntax responsive style.
-     * // { mx: [1, 2] }
-     * // or
-     * // { mx: { base: 1, sm: 2 } }
-     * // => { mx: 1, "@media(min-width:<sm>)": { mx: 2 } }
-     */
-    if (Array.isArray(value) || (isObject(value) && isResponsive(value))) {
-      let values = Array.isArray(value) ? value : toArrayValue(value);
-      values = values.slice(0, medias.length);
-
-      for (let index = 0; index < values.length; index++) {
-        const media = medias[index];
-        const val = values[index];
-
-        if (media) {
-          if (val == null) {
-            computedStyles[media] ??= {};
-          } else {
-            computedStyles[media] = Object.assign(
-              {},
-              computedStyles[media],
-              toCSSObject({ [key]: val }, theme)
-            );
-          }
-        } else {
-          computedStyles = Object.assign({}, toCSSObject({ [key]: val }, theme), computedStyles);
-        }
-      }
-
       continue;
     }
 

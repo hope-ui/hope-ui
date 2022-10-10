@@ -1,0 +1,566 @@
+import { Kbd } from "@hope-ui/core";
+
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+import { RequiredIndicator } from "~/components/required-indicator";
+import {
+  BasicUsageExample,
+  InitialFocusExample,
+  CustomInitialFocusExample,
+  CustomRestoreFocusExample,
+  DisableFocusTrapExample,
+  DisablePreventScrollExample,
+  HeadingAndDescriptionExample,
+  TransitionExample,
+  VerticallyCenteredExample,
+  SizeExample,
+  CustomBackdropExample,
+  ScrollBehaviorExample,
+} from "~/examples/modal-example";
+
+# Modal
+
+Display a modal dialog.
+
+## Import
+
+```tsx
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalHeading,
+  ModalDescription,
+} from "@hope-ui/core";
+```
+
+- **Modal:** The wrapper that provides props, state, and context to its children.
+- **ModalOverlay:** The backdrop behind the modal.
+- **ModalContent:** The modal itself.
+- **ModalCloseButton:** A button to close the modal.
+- **ModalHeading:** An optional heading for the modal.
+- **ModalDescription:** An optional description for the modal.
+
+## Usage
+
+<Preview>
+  <BasicUsageExample />
+</Preview>
+
+```tsx
+function BasicUsageExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Initial focus
+
+When the modal opens, focus is automatically set on the first focusable element in `ModalContent`.
+
+Use the `data-autofocus` attribute on any element to mark it as the initial focus element.
+
+<Preview>
+  <InitialFocusExample />
+</Preview>
+
+```tsx
+function InitialFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <Text mb={4}>The content of the Modal.</Text>
+          <HStack justifyContent="flex-end" spacing={4}>
+            <Button data-autofocus _focus={{ color: "red" }}>
+              Action
+            </Button>
+          </HStack>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+You can also use a different css selector by using the `initialFocusSelector` prop.
+
+<Preview>
+  <CustomInitialFocusExample />
+</Preview>
+
+```tsx
+function CustomInitialFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        initialFocusSelector="#initial-focus"
+      >
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <Text mb={4}>The content of the Modal.</Text>
+          <HStack justifyContent="flex-end" spacing={4}>
+            <Button id="initial-focus" _focus={{ color: "red" }}>
+              Action
+            </Button>
+          </HStack>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+<Callout>
+  If the modal contains no focusable element, focus is set to the `ModalContent` itself.
+</Callout>
+
+### Restore focus
+
+When the modal closes, focus is set back to the trigger element. Use the `restoreFocusSelector` prop and pass in a css selector to target another element.
+
+<Preview>
+  <CustomRestoreFocusExample />
+</Preview>
+
+```tsx
+function CustomRestoreFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <HStack spacing={4}>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        restoreFocusSelector="[data-finalfocus]"
+      >
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+
+      <Button data-finalfocus _focus={{ color: "red" }}>
+        Final focus element
+      </Button>
+    </HStack>
+  );
+}
+```
+
+### Focus trap
+
+By default, focus is lock inside the modal for accessibility reason. Set the `trapFocus` prop to `false` if you want to disable this behavior.
+
+<Preview>
+  <DisableFocusTrapExample />
+</Preview>
+
+```tsx
+function DisableFocusTrapExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Prevent scroll
+
+For accessibility reason scrolling on the main document behind the modal is blocked by default. Set the `preventScroll` prop to `false` to allow scrolling behind the modal.
+
+<Preview>
+  <DisablePreventScrollExample />
+</Preview>
+
+```tsx
+function DisablePreventScrollExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Heading and description
+
+Use `ModalHeading` to add an accessible heading to the modal, it renders an `h2` by default.
+
+Similarly `ModalDescription` is used add an accessible description and renders a `p` by default.
+
+Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
+
+<Preview>
+  <HeadingAndDescriptionExample />
+</Preview>
+
+```tsx
+function HeadingAndDescriptionExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
+            <VStack alignItems="flex-start">
+              <ModalHeading fontWeight="semibold">Title</ModalHeading>
+              <ModalDescription
+                fontSize="sm"
+                color={{ light: "neutral.600", dark: "neutral.300" }}
+                mb={4}
+              >
+                Description
+              </ModalDescription>
+            </VStack>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Open/close transitions
+
+The `contentTransitionOptions` and `overlayTransitionOptions` props allows to customize the modal content and overlay open/close transitions. You can use predefined transitions or create custom ones.
+
+<Preview>
+  <TransitionExample />
+</Preview>
+
+```tsx
+function TransitionExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        contentTransitionOptions={{
+          transition: "slide-up",
+          duration: 400,
+          exitDuration: 250,
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+To learn more about the transition API check out the [createTransition](/docs/primitives/create-transition) documentation.
+
+### Center modal vertically
+
+Use the `isCentered` prop to vertically center the modal.
+
+<Preview>
+  <VerticallyCenteredExample />
+</Preview>
+
+```tsx
+function VerticallyCenteredExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} isCentered>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Size
+
+You can change the modal width by setting the `size` prop.
+
+<Preview>
+  <SizeExample />
+</Preview>
+
+```tsx
+function SizeExample() {
+  const [size, setSize] = createSignal<ModalProps["size"]>("md");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newSize: ModalProps["size"]) => {
+    setSize(newSize);
+    setIsOpen(true);
+  };
+
+  const sizes: Array<ModalProps["size"]> = ["xs", "sm", "md", "lg", "xl", "full"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={sizes}>{size => <Button onClick={() => handleClick(size)}>{size}</Button>}</For>
+      </HStack>
+
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
+        <Show when={size() !== "full"}>
+          <ModalOverlay />
+        </Show>
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Styling the backdrop
+
+You can use style props and `sx` on the `ModalOverlay` component to customize the modal backdrop.
+
+<Preview>
+  <CustomBackdropExample />
+</Preview>
+
+```tsx
+function CustomBackdropExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <ModalOverlay
+          sx={{
+            bg: "blackAlpha.300",
+            backdropFilter: "blur(10px) hue-rotate(90deg)",
+          }}
+        />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <p>The content of the Modal.</p>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+<Callout type="warning">
+  <span>
+    Please be aware that not every browser supports the `backdrop-filter` CSS property used in the
+    example above.
+  </span>
+</Callout>
+
+### Overflow behavior
+
+If the content within the modal overflows beyond the viewport, you can use the `scrollBehavior` prop to control how scrolling should happen.
+
+- `outside`: overflow is handled by the modal wrapper.
+- `inside`: overflow is handled by the `ModalContent`.
+
+<Preview>
+  <ScrollBehaviorExample />
+</Preview>
+
+```tsx
+function ScrollBehaviorExample() {
+  const [scrollBehavior, setScrollBehavior] = createSignal<ModalProps["scrollBehavior"]>("outside");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newValue: ModalProps["scrollBehavior"]) => {
+    setScrollBehavior(newValue);
+    setIsOpen(true);
+  };
+
+  const scrollBehaviors: Array<ModalProps["scrollBehavior"]> = ["outside", "inside"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={scrollBehaviors}>
+          {scrollBehavior => (
+            <Button onClick={() => handleClick(scrollBehavior)}>{scrollBehavior} overflow</Button>
+          )}
+        </For>
+      </HStack>
+
+      <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} scrollBehavior={scrollBehavior()}>
+        <ModalOverlay />
+        <ModalContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <ModalHeading fontWeight="semibold">Title</ModalHeading>
+            <ModalCloseButton />
+          </HStack>
+          <For each={Array(100).fill("")}>{() => <p>The content of the Modal.</p>}</For>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+```
+
+## Accessibility
+
+### ARIA roles and attributes
+
+- The `ModalContent` has `aria-modal` set to `true`.
+- The `ModalContent` has `aria-labelledby` set to the `id` of the `ModalHeading`, if any.
+- The `ModalContent` has `aria-describedby` set to the `id` of the `ModalDescription`, if any.
+
+### Keyboard support and focus management
+
+- If the `trapFocus` prop is `true`, focus is locked within the modal.
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `ModalContent`.
+- When the modal closes, focus returns to the trigger element unless another focusable element takes focus.
+- If the `closeOnOverlayClick` prop is `true`, clicking on the overlay closes the modal.
+- When focus is within the `ModalContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the modal.
+- If the `preventScroll` prop is `true`, scrolling is blocked on the elements behind the modal.
+
+## Theming
+
+Use the `ModalTheme` type to override `Modal` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, ModalTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Modal: {
+      // ...overrides
+    } as ModalTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name        | Static selector          | Description            |
+| ----------- | ------------------------ | ---------------------- |
+| root        | `hope-Modal-root`        | Root element           |
+| content     | `hope-Modal-content`     | Modal content          |
+| overlay     | `hope-Modal-overlay`     | Modal overlay/backdrop |
+| heading     | `hope-Modal-heading`     | Modal heading          |
+| description | `hope-Modal-description` | Modal description      |
+
+## Props
+
+### Modal
+
+| Name                                           | Type                                             | Description                                                                                 | Default value |
+| ---------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------- | ------------- |
+| <RequiredIndicator>isOpen</RequiredIndicator>  | `boolean`                                        | Whether the modal should be shown.                                                          |               |
+| <RequiredIndicator>onClose</RequiredIndicator> | `() => void`                                     | A function that will be called to close the modal.                                          |               |
+| id                                             | `string`                                         | The id of the modal content.                                                                |               |
+| size                                           | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "full"` | The size of the modal.                                                                      |               |
+| isCentered                                     | `boolean`                                        | Whether the modal should be centered on screen.                                             |               |
+| scrollBehavior                                 | `"inside" \| "outside"`                          | Defines how scrolling should happen when content overflows beyond the viewport.             |               |
+| contentTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the modal content transition.                                             |               |
+| overlayTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the overlay transition.                                                   |               |
+| closeOnOverlayClick                            | `boolean`                                        | Whether the modal should close when the overlay is clicked.                                 | true          |
+| closeOnEsc                                     | `boolean`                                        | Whether the modal should close when the user hit the `Esc` key.                             | true          |
+| preventScroll                                  | `boolean`                                        | Whether the scroll should be disabled on the `body` when the modal opens.                   | true          |
+| trapFocus                                      | `boolean`                                        | Whether the focus will be locked into the modal.                                            | true          |
+| initialFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the modal opens.    |               |
+| restoreFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the modal closes.   |               |
+| onOverlayClick                                 | `() => void`                                     | A function that will be called when the overlay is clicked.                                 |               |
+| onEscKeyDown                                   | `() => void`                                     | A function that will be called when the `Esc` key is pressed and focus is within the modal. |               |
+
+### Other components props
+
+- `ModalCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `ModalOverlay`, `ModalContent`, `ModalHeading` and `ModalDescription` supports commons Hope UI props (style props, `sx` and `as`).

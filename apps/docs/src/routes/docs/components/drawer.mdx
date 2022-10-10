@@ -1,0 +1,533 @@
+import { Kbd } from "@hope-ui/core";
+
+import { Callout } from "~/components/callout";
+import { Preview } from "~/components/preview";
+import { RequiredIndicator } from "~/components/required-indicator";
+import {
+  BasicUsageExample,
+  InitialFocusExample,
+  CustomInitialFocusExample,
+  CustomRestoreFocusExample,
+  DisableFocusTrapExample,
+  DisablePreventScrollExample,
+  HeadingAndDescriptionExample,
+  TransitionExample,
+  PlacementExample,
+  SizeExample,
+  CustomBackdropExample,
+} from "~/examples/drawer-example";
+
+# Drawer
+
+Display a modal dialog that slides out from the edge of the screen.
+
+## Import
+
+```tsx
+import {
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeading,
+  DrawerDescription,
+} from "@hope-ui/core";
+```
+
+- **Drawer:** The wrapper that provides props, state, and context to its children.
+- **DrawerOverlay:** The backdrop behind the drawer.
+- **DrawerContent:** The drawer itself.
+- **DrawerCloseButton:** A button to close the drawer.
+- **DrawerHeading:** An optional heading for the drawer.
+- **DrawerDescription:** An optional description for the drawer.
+
+## Usage
+
+<Preview>
+  <BasicUsageExample />
+</Preview>
+
+```tsx
+function BasicUsageExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+### Initial focus
+
+When the drawer opens, focus is automatically set on the first focusable element in `DrawerContent`.
+
+Use the `data-autofocus` attribute on any element to mark it as the initial focus element.
+
+<Preview>
+  <InitialFocusExample />
+</Preview>
+
+```tsx
+function InitialFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <Text mb={4}>The content of the Drawer.</Text>
+          <HStack justifyContent="flex-end" spacing={4}>
+            <Button data-autofocus _focus={{ color: "red" }}>
+              Action
+            </Button>
+          </HStack>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+You can also use a different css selector by using the `initialFocusSelector` prop.
+
+<Preview>
+  <CustomInitialFocusExample />
+</Preview>
+
+```tsx
+function CustomInitialFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        initialFocusSelector="#initial-focus"
+      >
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <Text mb={4}>The content of the Drawer.</Text>
+          <HStack justifyContent="flex-end" spacing={4}>
+            <Button id="initial-focus" _focus={{ color: "red" }}>
+              Action
+            </Button>
+          </HStack>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+<Callout>
+  If the drawer contains no focusable element, focus is set to the `DrawerContent` itself.
+</Callout>
+
+### Restore focus
+
+When the drawer closes, focus is set back to the trigger element. Use the `restoreFocusSelector` prop and pass in a css selector to target another element.
+
+<Preview>
+  <CustomRestoreFocusExample />
+</Preview>
+
+```tsx
+function CustomRestoreFocusExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <HStack spacing={4}>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        restoreFocusSelector="[data-finalfocus]"
+      >
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+
+      <Button data-finalfocus _focus={{ color: "red" }}>
+        Final focus element
+      </Button>
+    </HStack>
+  );
+}
+```
+
+### Focus trap
+
+By default, focus is lock inside the drawer for accessibility reason. Set the `trapFocus` prop to `false` if you want to disable this behavior.
+
+<Preview>
+  <DisableFocusTrapExample />
+</Preview>
+
+```tsx
+function DisableFocusTrapExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+### Prevent scroll
+
+For accessibility reason scrolling on the main document behind the drawer is blocked by default. Set the `preventScroll` prop to `false` to allow scrolling behind the drawer.
+
+<Preview>
+  <DisablePreventScrollExample />
+</Preview>
+
+```tsx
+function DisablePreventScrollExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+### Heading and description
+
+Use `DrawerHeading` to add an accessible heading to the drawer, it renders an `h2` by default.
+
+Similarly `DrawerDescription` is used add an accessible description and renders a `p` by default.
+
+Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
+
+<Preview>
+  <HeadingAndDescriptionExample />
+</Preview>
+
+```tsx
+function HeadingAndDescriptionExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
+            <VStack alignItems="flex-start">
+              <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+              <DrawerDescription
+                fontSize="sm"
+                color={{ light: "neutral.600", dark: "neutral.300" }}
+                mb={4}
+              >
+                Description
+              </DrawerDescription>
+            </VStack>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+### Open/close transitions
+
+The `contentTransitionOptions` and `overlayTransitionOptions` props allows to customize the drawer content and overlay open/close transitions. You can use predefined transitions or create custom ones.
+
+<Preview>
+  <TransitionExample />
+</Preview>
+
+```tsx
+function TransitionExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer
+        isOpen={isOpen()}
+        onClose={() => setIsOpen(false)}
+        contentTransitionOptions={{
+          transition: "slide-up",
+          duration: 400,
+          exitDuration: 250,
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        }}
+      >
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+To learn more about the transition API check out the [createTransition](/docs/primitives/create-transition) documentation.
+
+### Placement
+
+To change the edge where the `Drawer` should appear, use the `placement` prop.
+
+<Preview>
+  <PlacementExample />
+</Preview>
+
+```tsx
+function PlacementExample() {
+  const [placement, setPlacement] = createSignal<DrawerProps["placement"]>("right");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newPlacement: DrawerProps["placement"]) => {
+    setPlacement(newPlacement);
+    setIsOpen(true);
+  };
+
+  const placements: Array<DrawerProps["placement"]> = ["top", "right", "bottom", "left"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={placements}>
+          {placement => <Button onClick={() => handleClick(placement)}>{placement}</Button>}
+        </For>
+      </HStack>
+
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} placement={placement()}>
+        <DrawerOverlay />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+### Size
+
+You can change the drawer width by setting the `size` prop.
+
+<Preview>
+  <SizeExample />
+</Preview>
+
+```tsx
+function SizeExample() {
+  const [size, setSize] = createSignal<DrawerProps["size"]>("md");
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  const handleClick = (newSize: DrawerProps["size"]) => {
+    setSize(newSize);
+    setIsOpen(true);
+  };
+
+  const sizes: Array<DrawerProps["size"]> = ["xs", "sm", "md", "lg", "xl", "full"];
+
+  return (
+    <>
+      <HStack spacing={4}>
+        <For each={sizes}>{size => <Button onClick={() => handleClick(size)}>{size}</Button>}</For>
+      </HStack>
+
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
+        <Show when={size() !== "full"}>
+          <DrawerOverlay />
+        </Show>
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+<Callout>
+  <span>The `size` prop has no effect when the placement is `top` or `bottom`.</span>
+</Callout>
+
+### Styling the backdrop
+
+You can use style props and `sx` on the `DrawerOverlay` component to customize the drawer backdrop.
+
+<Preview>
+  <CustomBackdropExample />
+</Preview>
+
+```tsx
+function CustomBackdropExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
+      <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
+        <DrawerOverlay
+          sx={{
+            bg: "blackAlpha.300",
+            backdropFilter: "blur(10px) hue-rotate(90deg)",
+          }}
+        />
+        <DrawerContent p={4}>
+          <HStack justifyContent="space-between" mb={4}>
+            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
+            <DrawerCloseButton />
+          </HStack>
+          <p>The content of the Drawer.</p>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+<Callout type="warning">
+  <span>
+    Please be aware that not every browser supports the `backdrop-filter` CSS property used in the
+    example above.
+  </span>
+</Callout>
+
+## Accessibility
+
+### ARIA roles and attributes
+
+- The `DrawerContent` has `aria-drawer` set to `true`.
+- The `DrawerContent` has `aria-labelledby` set to the `id` of the `DrawerHeading`, if any.
+- The `DrawerContent` has `aria-describedby` set to the `id` of the `DrawerDescription`, if any.
+
+### Keyboard support and focus management
+
+- If the `trapFocus` prop is `true`, focus is locked within the drawer.
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `DrawerContent`.
+- When the drawer closes, focus returns to the trigger element unless another focusable element takes focus.
+- If the `closeOnOverlayClick` prop is `true`, clicking on the overlay closes the drawer.
+- When focus is within the `DrawerContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the drawer.
+- If the `preventScroll` prop is `true`, scrolling is blocked on the elements behind the drawer.
+
+## Theming
+
+Use the `DrawerTheme` type to override `Drawer` styles and default props when extending Hope UI theme.
+
+```tsx
+import { extendTheme, DrawerTheme } from "@hope-ui/core";
+
+const theme = extendTheme({
+  components: {
+    Drawer: {
+      // ...overrides
+    } as DrawerTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name        | Static selector           | Description             |
+| ----------- | ------------------------- | ----------------------- |
+| root        | `hope-Drawer-root`        | Root element            |
+| content     | `hope-Drawer-content`     | Drawer content          |
+| overlay     | `hope-Drawer-overlay`     | Drawer overlay/backdrop |
+| heading     | `hope-Drawer-heading`     | Drawer heading          |
+| description | `hope-Drawer-description` | Drawer description      |
+
+## Props
+
+### Drawer
+
+| Name                                           | Type                                             | Description                                                                                  | Default value |
+| ---------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------- |
+| <RequiredIndicator>isOpen</RequiredIndicator>  | `boolean`                                        | Whether the drawer should be shown.                                                          |               |
+| <RequiredIndicator>onClose</RequiredIndicator> | `() => void`                                     | A function that will be called to close the drawer.                                          |               |
+| id                                             | `string`                                         | The id of the drawer content.                                                                |               |
+| size                                           | `"xs" \| "sm" \| "md" \| "lg" \| "xl" \| "full"` | The size of the drawer.                                                                      |               |
+| placement                                      | `"top" \| "right" \| "bottom" \| "left"`         | The placement of the drawer                                                                  | right         |
+| contentTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the drawer content transition.                                             |               |
+| overlayTransitionOptions                       | `TransitionOptionsOverride`                      | Options passed to the overlay transition.                                                    |               |
+| closeOnOverlayClick                            | `boolean`                                        | Whether the drawer should close when the overlay is clicked.                                 | true          |
+| closeOnEsc                                     | `boolean`                                        | Whether the drawer should close when the user hit the `Esc` key.                             | true          |
+| preventScroll                                  | `boolean`                                        | Whether the scroll should be disabled on the `body` when the drawer opens.                   | true          |
+| trapFocus                                      | `boolean`                                        | Whether the focus will be locked into the drawer.                                            | true          |
+| initialFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the drawer opens.    |               |
+| restoreFocusSelector                           | `string`                                         | A query selector to retrieve the element that should receive focus once the drawer closes.   |               |
+| onOverlayClick                                 | `() => void`                                     | A function that will be called when the overlay is clicked.                                  |               |
+| onEscKeyDown                                   | `() => void`                                     | A function that will be called when the `Esc` key is pressed and focus is within the drawer. |               |
+
+### Other components props
+
+- `DrawerCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `DrawerOverlay`, `DrawerContent`, `DrawerHeading` and `DrawerDescription` supports commons Hope UI props (style props, `sx` and `as`).

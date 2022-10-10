@@ -7,18 +7,18 @@ import { Callout } from "~/components/callout";
 Install Hope UI dependencies by running either of the following:
 
 ```bash
-npm install @hope-ui/core@next @stitches/core clsx
+npm install @hope-ui/core @stitches/core clsx
 ```
 
 ```bash
-yarn add @hope-ui/core@next @stitches/core clsx
+yarn add @hope-ui/core @stitches/core clsx
 ```
 
 ```bash
-pnpm add @hope-ui/core@next @stitches/core clsx
+pnpm add @hope-ui/core @stitches/core clsx
 ```
 
-Wrap your application root component with `HopeProvider`:
+Wrap your application's root component with `HopeProvider`:
 
 ```tsx
 import { HopeProvider } from "@hope-ui/core";
@@ -44,16 +44,16 @@ function App() {
 
 ### Dependencies explanation
 
-- `@hope-ui/core`: The core Hope UI library containing components and style engine.
-- `@stitches/core`: The CSS-in-JS library used internally by Hope UI.
-- `clsx`: Utility for constructing className strings conditionally.
+- `@hope-ui/core` - The core Hope UI library containing components and style engine.
+- `@stitches/core` - The CSS-in-JS library used internally by Hope UI.
+- `clsx` - An utility for constructing className strings conditionally.
 
 ## Usage with Solid Start
 
 <Callout type="warning">
   <span>
-    Hope UI has been tested with `solid-start@0.1.0-alpha.99`, compatibility with other versions is
-    not guaranteed.
+    Hope UI has been tested with `solid-js@1.5.7` and `solid-start@0.1.3`. Compatibility
+    with other versions is not guaranteed.
   </span>
 </Callout>
 

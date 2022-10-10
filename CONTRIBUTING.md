@@ -25,9 +25,4 @@ Thank you for showing interest in contributing to Hope UI. All of your contribut
 
 ## Get started with Hope UI locally
 
-- Fork the [Hope UI repository](https://github.com/fabien-ml/hope-ui)
-- Install the [editorconfig](https://editorconfig.org/) extension for your editor
-- Install dependencies with pnpm – `pnpm install`
-- Take an initial peek at our components by running `pnpm storybook`
-
-## TODO
+TODO

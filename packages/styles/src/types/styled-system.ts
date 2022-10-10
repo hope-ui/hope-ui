@@ -27,18 +27,24 @@ import {
 import { ThemeVarsAndBreakpoints } from "./vars";
 
 /*
-import { Suffixed } from "./suffixed";
-type MaybeImportant<T> = T | Suffixed<"!", T>;
-export type ResponsiveArray<T> = Array<MaybeImportant<T> | null>;
-export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeImportant<T>>>;
-type ResponsiveValueRaw<T> = MaybeImportant<T> | ResponsiveArray<T> | ResponsiveObject<T>;
-*/
-
 export type ResponsiveArray<T> = Array<T | null>;
 
 export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, T>>;
 
 type ResponsiveValueRaw<T> = T | ResponsiveArray<T> | ResponsiveObject<T>;
+*/
+
+export interface SystemStyleColorModeValue<T> {
+  light?: T;
+  dark?: T;
+}
+
+type MaybeColorModeValue<T> = T | SystemStyleColorModeValue<T>;
+
+export type ResponsiveArray<T> = Array<MaybeColorModeValue<T> | null>;
+
+export type ResponsiveObject<T> = Partial<Record<ThemeBreakpoint | string, MaybeColorModeValue<T>>>;
+type ResponsiveValueRaw<T> = MaybeColorModeValue<T> | ResponsiveArray<T> | ResponsiveObject<T>;
 
 export type ResponsiveValue<T> =
   | ResponsiveValueRaw<T>

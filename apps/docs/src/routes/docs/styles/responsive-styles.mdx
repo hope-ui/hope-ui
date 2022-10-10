@@ -1,14 +1,14 @@
 import { Callout } from "~/components/callout";
 import { Preview } from "~/components/preview";
-import { ResponsiveCardExample } from "~/components/responsive-card-example";
+import { ResponsiveCardExample } from "~/examples/responsive-card-example";
 
 # Responsive styles
 
-An simple syntax to add mobile-first responsive styles.
+A simple syntax to add mobile-first responsive styles.
 
 ## Usage
 
-Hope UI allows you to use an _array or object_ syntax to add mobile-first responsive styles, this relies on breakpoints defined in the Hope UI theme.
+Hope UI allows you to use an _array or object_ syntax to add mobile-first responsive styles. This relies on breakpoints defined in the Hope UI theme.
 
 The default breakpoints provided by Hope UI are listed below:
 
@@ -21,14 +21,14 @@ The default breakpoints provided by Hope UI are listed below:
 | `2xl`      | 1536px |
 
 <Callout>
-  Hope UI use the `@media(min-width)` media query to ensure your interfaces are mobile-first.
+  Hope UI uses the `@media(min-width)` media query to ensure your interfaces are mobile-first.
 </Callout>
 
 ### The array syntax
 
 All style props accept arrays as values for mobile-first responsive styles.
 
-For example to make the `width` of a `Box` responsive you can do:
+For example, to make the `width` of a `Box` responsive, you can do:
 
 ```tsx
 <Box bg="royalblue" width={[300, 400, 500]}>
@@ -43,7 +43,7 @@ Based on the default breakpoints listed above, you can interpret this syntax lik
 - `500px` from `768px` and up.
 
 <Callout>
-  <span>To skip certain breakpoints, you can pass `null` to any position in the array.</span>
+  <span>To skip certain breakpoints, you can insert `null` at any position in the array.</span>
 </Callout>
 
 ### The object syntax
@@ -56,7 +56,7 @@ The example above can also be written with an object syntax like this:
 </Box>
 ```
 
-Here each key represent a breakpoint defined in the Hope UI theme, while `base` define the base, non-responsive value.
+Here, each key represents a breakpoint defined in the Hope UI theme, while `base` defines the base, non-responsive value.
 
 <Callout>To skip certain breakpoints, just don't define them in the object.</Callout>
 
@@ -87,12 +87,12 @@ function Demo() {
 ```
 
 <Callout type="warning">
-  Make sure to use the same unit for each value, the default theme use **pixel**.
+  Make sure to use the same unit for each value. The default theme uses **pixel**.
 </Callout>
 
 ## Demo
 
-Below is a example of a card component that uses a stacked layout on small screens, and a side-by-side layout on larger screens **(resize your browser to see it in action)**.
+Below is an example of a card component that uses a stacked layout on small screens and a side-by-side layout on larger screens **(resize your browser to see it in action)**.
 
 <Preview isCentered>
   <ResponsiveCardExample />
@@ -166,13 +166,13 @@ function ResponsiveCard() {
           _dark={{ color: "neutral.400" }}
         >
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
-          The park is managed by the National Park Service and covers an area of 759,620 acres
-          (1,187 sq mi; 3,074 km2) and sits in four counties – centered in Tuolumne and Mariposa,
-          extending north and east to Mono and south to Madera County. Designated a World Heritage
-          Site in 1984, Yosemite is internationally recognized for its granite cliffs, waterfalls,
-          clear streams, giant sequoia groves, lakes, mountains, meadows, glaciers, and biological
-          diversity. Almost 95 percent of the park is designated wilderness.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest. The park is managed by the National Park Service and covers an area of 759,620
+          acres (1,187 sq mi; 3,074 km2) and sits in four counties—centered in Tuolumne and
+          Mariposa, extending north and east to Mono and south to Madera County. Designated a World
+          Heritage Site in 1984, Yosemite is internationally recognized for its granite cliffs,
+          waterfalls, clear streams, giant sequoia groves, lakes, mountains, meadows, glaciers, and
+          biological diversity. Almost 95 percent of the park is designated wilderness.
         </Text>
       </Box>
     </Flex>

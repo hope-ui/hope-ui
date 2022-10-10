@@ -6,7 +6,7 @@ export * from "./external";
 export * from "./focus-without-scrolling";
 export * from "./function";
 export * from "./object";
-export * from "./solid";
+export * from "./platform";
 export * from "./string";
 export * from "./tabbable";
 export * from "./types";

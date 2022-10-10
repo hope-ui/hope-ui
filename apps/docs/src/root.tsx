@@ -2,7 +2,13 @@
 import "./styles/index.css";
 import "./styles/code.css";
 
-import { DEFAULT_THEME, extendTheme, HopeCriticalStyle, HopeProvider } from "@hope-ui/core";
+import {
+  DEFAULT_THEME,
+  extendTheme,
+  HopeCriticalStyle,
+  HopeProvider,
+  PopoverTheme,
+} from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import { MDXProvider } from "solid-mdx";
 import {
@@ -44,6 +50,17 @@ const theme = extendTheme({
   },
   sizes: {
     "8xl": "96rem",
+  },
+  components: {
+    Popover: {
+      styleConfigOverride: {
+        root: {
+          baseStyle: {
+            zIndex: "docked",
+          },
+        },
+      },
+    } as PopoverTheme,
   },
 });
 

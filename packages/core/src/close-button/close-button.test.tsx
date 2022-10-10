@@ -1,5 +1,6 @@
 import {
   checkAccessibility,
+  itHasSemanticClass,
   itIsPolymorphic,
   itRendersChildren,
   itSupportsClass,
@@ -34,6 +35,7 @@ describe("CloseButton", () => {
   itIsPolymorphic(CloseButton as any, defaultProps);
   itRendersChildren(CloseButton as any, defaultProps);
   itSupportsClass(CloseButton as any, defaultProps);
+  itHasSemanticClass(CloseButton as any, defaultProps, "hope-CloseButton-root");
   itSupportsRef(CloseButton as any, defaultProps, HTMLButtonElement);
   itSupportsStyle(CloseButton as any, defaultProps);
 

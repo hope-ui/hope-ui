@@ -1,6 +1,8 @@
-import { createHopeComponent, hope } from "@hope-ui/styles";
-import { createEffect, onCleanup } from "solid-js";
+import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { clsx } from "clsx";
+import { createEffect, onCleanup, splitProps } from "solid-js";
 
+import { PopoverParts } from "./popover.styles";
 import { usePopoverContext } from "./popover-context";
 
 /**
@@ -13,10 +15,21 @@ import { usePopoverContext } from "./popover-context";
 export const PopoverHeading = createHopeComponent<"h2">(props => {
   const popoverContext = usePopoverContext();
 
+  const [local, others] = splitProps(props, ["class"]);
+
+  const { baseClasses, styleOverrides } = useStyleConfigContext<PopoverParts>();
+
   createEffect(() => {
     popoverContext.setHeadingId(`${popoverContext.popoverId()}-heading`);
     onCleanup(() => popoverContext.setHeadingId(undefined));
   });
 
-  return <hope.h2 id={popoverContext.headingId()} {...props} />;
+  return (
+    <hope.h2
+      id={popoverContext.headingId()}
+      class={clsx(baseClasses().heading, local.class)}
+      __css={styleOverrides().heading}
+      {...others}
+    />
+  );
 });

@@ -1,5 +1,5 @@
 import { Callout } from "~/components/callout";
-import { CardTutorial } from "~/components/card-tutorial";
+import { CardTutorial } from "~/examples/card-tutorial";
 import { Preview } from "~/components/preview";
 
 # Learn the basics
@@ -16,7 +16,7 @@ Get familiar with core Hope UI concepts by building a simple `Card` component.
 
 First, we define the structure of the `Card` using two layout components from Hope UI:
 
-- **Box:** The most abstract Hope UI component, it basically a `div` with superpowers.
+- **Box:** The most abstract Hope UI component, it is basically a `div` with superpowers.
 - **Flex:** A Box with `display: flex`.
 
 ```tsx
@@ -35,7 +35,8 @@ export function Card() {
         </Flex>
         <p>
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </p>
         <button>Learn more</button>
       </Box>
@@ -46,11 +47,11 @@ export function Card() {
 
 ### Typography
 
-We are using native HTML elements like `span` and `p` to render our text content. Let's replace them by one of Hope UI's typography components: `Text`.
+We are using native HTML elements like `span` and `p` to render our text content. Let's replace them by one of Hope UI's typography components:
 
-`Text` renders a `p` tag by default and come with a `size` prop that we can use to adjust the size of the text will keep it legible.
+`Text`.  `Text` renders a `p` tag by default and comes with a `size` prop that we can use to adjust the size of the text and keep it legible.
 
-Also, since it's a built-in Hope UI component it will also make our life easier when it comes to styling later on.
+Also, since it's a built-in Hope UI component, it will also make our life easier when it comes to styling later on.
 
 ```tsx {0,8,10-12,15-18}
 import { Box, Flex, Text } from "@hope-ui/core";
@@ -70,7 +71,8 @@ export function Card() {
         </Flex>
         <Text size="sm">
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <button>Learn more</button>
       </Box>
@@ -106,7 +108,8 @@ export function Card() {
         </Flex>
         <Text size="sm">
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
@@ -119,7 +122,7 @@ export function Card() {
 
 ### Styling
 
-Hope UI uses the concept of _"Style Props"_ popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
+Hope UI uses the concept of _"Style Props"_, popularized by [Chakra UI](https://chakra-ui.com/docs/styled-system/style-props) which allows us to apply styles simply by passing props to our components.
 
 ```tsx {5-11,16-19,21-23,25-32,37-39,45}
 import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
@@ -169,7 +172,8 @@ function Card() {
         </Flex>
         <Text size="sm" color="neutral.500" marginBottom={3}>
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
@@ -182,7 +186,7 @@ function Card() {
 
 ### Understanding theme tokens
 
-All style props above are pretty much self-explanatory, however some values are weird like:
+All the style props above are pretty much self-explanatory, but some values are weird, like:
 
 - `color="success.800"`
 - `width="full"`
@@ -191,7 +195,7 @@ All style props above are pretty much self-explanatory, however some values are 
 
 This is what we call _"Theme Tokens"_, a set of values (colors, spacing, shadows, etc...) that we can refer to when styling to keep our design consistent.
 
-We can refer to them directly as value of our style props or use the _"function form"_ (like for the `border` prop above) which gives us access to all available tokens through the `vars` property on the `theme` object.
+We can refer to them directly as values of our style props or use the _"function form"_ (like for the `border` prop above), which gives us access to all available tokens through the `vars` property on the `theme` object.
 
 ### Using shorthand style props
 
@@ -242,7 +246,8 @@ function Card() {
         </Flex>
         <Text size="sm" color="neutral.500" mb={3}>
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
@@ -255,9 +260,9 @@ function Card() {
 
 ### Dark mode support
 
-We can go a step further and add dark mode support to our `Card` component. Hope UI provides a `_dark` style prop that lets you define the style to apply when the application is in dark mode.
+We can go a step further and add dark mode support to our `Card` component. Hope UI's style props accept an object as value in which you can set the `light` and/or `dark` value.
 
-```tsx {12-15,26,36-39,52}
+```tsx {7,12,23,30-31,45}
 import { Box, Button, Flex, Image, Text } from "@hope-ui/core";
 
 export function Card() {
@@ -265,15 +270,12 @@ export function Card() {
     <Flex
       direction="column"
       border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
+      borderColor={{ dark: "neutral.800" }}
       rounded="lg"
       shadow="lg"
       w="full"
       maxW={96}
-      bg="white"
-      _dark={{
-        borderColor: "neutral.800",
-        bg: "neutral.900",
-      }}
+      bg={{ light: "white", dark: "neutral.900" }}
     >
       <Image
         src="https://bit.ly/3CVFryX"
@@ -284,20 +286,16 @@ export function Card() {
       />
       <Box p={5}>
         <Flex justify="space-between" align="center" w="full" mb={2}>
-          <Text fontWeight="semibold" _dark={{ color: "neutral.300" }}>
+          <Text fontWeight="semibold" color={{ dark: "neutral.300" }}>
             Yosemite National Park
           </Text>
           <Flex
             px={2}
             py={1}
             align="center"
-            bgColor="success.50"
-            color="success.800"
+            bgColor={{ light: "success.50", dark: "success.900" }}
+            color={{ light: "success.800", dark: "success.300" }}
             rounded="full"
-            _dark={{
-              bgColor: "success.900",
-              color: "success.300",
-            }}
           >
             <Text
               as="span"
@@ -310,9 +308,10 @@ export function Card() {
             </Text>
           </Flex>
         </Flex>
-        <Text size="sm" color="neutral.500" mb={3} _dark={{ color: "neutral.400" }}>
+        <Text size="sm" color={{ light: "neutral.500", dark: "neutral.400" }} mb={3}>
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more
@@ -323,12 +322,12 @@ export function Card() {
 }
 ```
 
-To learn more about dark mode checkout the [Color Mode](/docs/theming/color-mode) documentation.
+To learn more about dark mode, checkout the [Color Mode](/docs/theming/color-mode) documentation.
 
 ## Summary
 
 - Hope UI provides layout components to help achieve common layout scenarios (`Flex`, `Grid`, etc...).
-- Hope UI provides typography components to works with texts and headings.
-- Style props are a way to define components styles by simply passing props to them.
-- Theme tokens allows styling your application with a consistent set of colors, spacing, shadows and more.
+- Hope UI provides typography components to work with texts and headings.
+- Style props are a way to define a component's style by simply passing props to them.
+- Theme Tokens allow styling your application with a consistent set of colors, spacing, shadows, and more.
 - The `as` prop allows changing the rendered DOM element.

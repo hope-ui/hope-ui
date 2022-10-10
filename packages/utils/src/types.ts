@@ -20,8 +20,8 @@ export type ElementType<Props = any> = DOMElements | Component<Props>;
  */
 export type OverrideProps<Source = {}, Override = {}> = Omit<Source, keyof Override> & Override;
 
-/** The css `class` prop. */
 export interface ClassProp {
+  /** The HTML `class` attribute. */
   class?: string;
 }
 
