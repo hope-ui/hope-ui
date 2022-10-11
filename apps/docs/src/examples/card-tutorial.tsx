@@ -45,7 +45,8 @@ export function CardTutorial() {
         </Flex>
         <Text size="sm" color={{ light: "neutral.500", dark: "neutral.400" }} mb={3}>
           Yosemite National Park is an American national park in California, surrounded on the
-          southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
+          southeast by the Sierra National Forest and on the northwest by the Stanislaus National
+          Forest.
         </Text>
         <Button variant="soft" colorScheme="primary" isFullWidth>
           Learn more

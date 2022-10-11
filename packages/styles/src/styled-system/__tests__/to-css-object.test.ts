@@ -144,7 +144,7 @@ describe("toCSSObject", () => {
 
     expect(result).toEqual({
       width: "100%",
-      "@media screen and (min-width: 640px)": {},
+      //"@media screen and (min-width: 640px)": {},
       "@media screen and (min-width: 768px)": {
         width: "50%",
       },
@@ -353,14 +353,14 @@ describe("toCSSObject", () => {
     expect(keys).toMatchInlineSnapshot(`
     Array [
       "flexDirection",
-      "@media screen and (min-width: 640px)",
-      "@media screen and (min-width: 768px)",
       "color",
       "height",
       "paddingInlineStart",
       "paddingInlineEnd",
       "paddingTop",
       "paddingBottom",
+      "@media screen and (min-width: 640px)",
+      "@media screen and (min-width: 768px)",
     ]
   `);
   });
@@ -515,9 +515,9 @@ describe("toCSSObject", () => {
     Array [
       "background",
       "${DARK_SELECTOR}",
+      "color",
       "@media screen and (min-width: 640px)",
       "@media screen and (min-width: 768px)",
-      "color",
     ]
   `);
   });

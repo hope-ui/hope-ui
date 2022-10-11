@@ -44,7 +44,8 @@ export const expandSyntax = (styles: Dict) => (theme: Theme) => {
 
   const { isResponsive, toArrayValue, medias } = theme.__breakpoints;
 
-  const computedStyles: Dict = {};
+  const computedBaseStyles: Dict = {};
+  const computedResponsiveStyles: Dict = {};
 
   for (const key in styles) {
     let value = runIfFn(styles[key], theme);
@@ -54,7 +55,7 @@ export const expandSyntax = (styles: Dict) => (theme: Theme) => {
     }
 
     // try to expand color mode syntax and continue loop if successful.
-    if (expandColorModeSyntax(key, value, computedStyles)) {
+    if (expandColorModeSyntax(key, value, computedBaseStyles)) {
       continue;
     }
 
@@ -63,7 +64,7 @@ export const expandSyntax = (styles: Dict) => (theme: Theme) => {
 
     // not a responsive syntax = treat the value as is.
     if (!Array.isArray(value)) {
-      computedStyles[key] = value;
+      computedBaseStyles[key] = value;
       continue;
     }
 
@@ -72,29 +73,33 @@ export const expandSyntax = (styles: Dict) => (theme: Theme) => {
     // try to expand responsive syntax.
     for (let index = 0; index < queries; index += 1) {
       const media = medias?.[index];
+      const resolvedValue = value[index];
+
+      if (resolvedValue == null) {
+        continue;
+      }
 
       if (!media) {
         // try to expand color mode syntax, if fail treat the value as is.
-        if (!expandColorModeSyntax(key, value[index], computedStyles)) {
-          computedStyles[key] = value[index];
+        if (!expandColorModeSyntax(key, resolvedValue, computedBaseStyles)) {
+          computedBaseStyles[key] = resolvedValue;
         }
         continue;
       }
 
-      computedStyles[media] = computedStyles[media] || {};
-
-      if (value[index] == null) {
-        continue;
-      }
+      computedResponsiveStyles[media] = computedResponsiveStyles[media] || {};
 
       // try to expand color mode syntax, if fail treat the value as is.
-      if (!expandColorModeSyntax(key, value[index], computedStyles[media])) {
-        computedStyles[media][key] = value[index];
+      if (!expandColorModeSyntax(key, resolvedValue, computedResponsiveStyles[media])) {
+        computedResponsiveStyles[media][key] = resolvedValue;
       }
     }
   }
 
-  return computedStyles;
+  return {
+    ...computedBaseStyles,
+    ...computedResponsiveStyles,
+  };
 };
 
 /**

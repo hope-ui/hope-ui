@@ -17,37 +17,35 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
 
   const [local, styleConfigProps, others] = splitProps(
     props,
-    ["class", "children", "variant", "thickness"],
+    ["class", "children", "variant", "thickness", "labelProps"],
     ["orientation", "labelPlacement", "styleConfigOverride", "unstyled"]
   );
 
   const resolvedChildren = children(() => props.children);
-  const hasLabel = () => !!resolvedChildren();
+  const withLabel = () => !!resolvedChildren();
 
   const isVertical = () => styleConfigProps.orientation === "vertical";
-  const isVerticalWithLabel = () => isVertical() && hasLabel();
 
   const lineStyle: Accessor<SystemStyleObject> = createMemo(() => {
-    const borderSide = isVertical() ? "borderLeftStyle" : "borderTopStyle";
+    const borderSideStyle = isVertical() ? "borderLeftStyle" : "borderTopStyle";
+    const borderSideWidth = isVertical() ? "borderLeftWidth" : "borderTopWidth";
 
-    const topWidth = isVerticalWithLabel() ? 0 : local.thickness;
-    const leftWidth = isVerticalWithLabel() ? local.thickness : 0;
+    if (withLabel()) {
+      return {
+        _before: {
+          [borderSideStyle]: local.variant,
+          [borderSideWidth]: local.thickness,
+        },
+        _after: {
+          [borderSideStyle]: local.variant,
+          [borderSideWidth]: local.thickness,
+        },
+      };
+    }
 
     return {
-      [borderSide]: local.variant,
-      borderWidth: hasLabel() ? 0 : local.thickness,
-      _after: {
-        [borderSide]: local.variant,
-        borderWidth: 0,
-        borderTopWidth: topWidth,
-        borderLeftWidth: leftWidth,
-      },
-      _before: {
-        [borderSide]: local.variant,
-        borderWidth: 0,
-        borderTopWidth: topWidth,
-        borderLeftWidth: leftWidth,
-      },
+      [borderSideStyle]: local.variant,
+      [borderSideWidth]: local.thickness,
     };
   });
 
@@ -58,8 +56,8 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
     get labelPlacement() {
       return styleConfigProps.labelPlacement;
     },
-    get hasLabel() {
-      return hasLabel();
+    get withLabel() {
+      return withLabel();
     },
     get styleConfigOverride() {
       return styleConfigProps.styleConfigOverride;
@@ -71,15 +69,15 @@ export const Divider = createHopeComponent<"hr", DividerProps>(props => {
 
   return (
     <hope.hr
-      as={hasLabel() ? "div" : "hr"}
-      role={hasLabel() ? "separator" : undefined}
+      as={withLabel() ? "div" : "hr"}
+      role={withLabel() ? "separator" : undefined}
       aria-orientation={isVertical() ? "vertical" : "horizontal"}
       class={clsx(baseClasses().root, local.class)}
       __css={{ ...styleOverrides().root, ...lineStyle() }}
       {...others}
     >
-      <Show when={hasLabel()}>
-        <hope.span class={baseClasses().labelWrapper} __css={styleOverrides().labelWrapper}>
+      <Show when={withLabel()}>
+        <hope.span class={baseClasses().label} __css={styleOverrides().label} {...local.labelProps}>
           {resolvedChildren()}
         </hope.span>
       </Show>

@@ -1,6 +1,7 @@
-import { Divider, Flex, HStack, Text, VStack } from "@hope-ui/core";
+import { Divider, HStack, VStack } from "@hope-ui/core";
 
 import { Preview } from "~/components/preview";
+import { VerticalWithLabelExample, WithLabelExample } from "~/examples/divider-example";
 
 # Divider
 
@@ -18,7 +19,7 @@ The `Divider` displays a thin horizontal or vertical line, and renders as an `<h
 
 ### Variants
 
-Use the variant prop to change the visual style of the divider.
+Use the `variant` prop to change the visual style of the divider.
 
 <Preview>
   <VStack spacing={4}>
@@ -38,7 +39,7 @@ Use the variant prop to change the visual style of the divider.
 
 ### Thickness
 
-Use the `thickness` prop to change the thickness of the divider.
+You can adjust the thickness of the divider using the `thickness` prop.
 
 <Preview>
   <Divider thickness="3px" />
@@ -50,7 +51,7 @@ Use the `thickness` prop to change the thickness of the divider.
 
 ### Vertical orientation
 
-You can make a vertical `Divider` by passing `vertical` to the `orientation` prop.
+To create a vertical `Divider` set the `orientation` prop to `vertical`.
 
 <Preview>
   <HStack spacing={4}>
@@ -74,65 +75,81 @@ You can make a vertical `Divider` by passing `vertical` to the `orientation` pro
 
 ### Divider with label
 
-You can add a label at left, right or center of `Divider` by setting its `children` and control its placement with `labelPlacement`.
+You can add a label at the start, center or end of the `Divider` by setting its `children`.
+
+The `labelPlacement` prop control its placement and `labelProps` allow passing props to the underlying `<span>` element.
 
 <Preview>
-  <VStack spacing={1}>
-    <Divider>Left</Divider>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-      laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-    <Divider labelPlacement="center">Center</Divider>
-    <p>
-      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-      pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-      mollit anim id est laborum.
-    </p>
-    <Divider labelPlacement="right">Right</Divider>
-    <p>
-      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-      laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto
-      beatae vitae dicta sunt explicabo.
-    </p>
-    <Divider labelPlacement="center">
-      <Text fontWeight="semibold" fontSize="lg">
-        <span>Custom label</span>
-      </Text>
-    </Divider>
-    <p>
-      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
-      consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci
-      velit, sed quia non numquam eius modi.
-    </p>
-  </VStack>
+  <WithLabelExample />
 </Preview>
 
 ```tsx
-
+<VStack spacing={4}>
+  <Text>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+    laboris nisi ut aliquip ex ea commodo consequat.
+  </Text>
+  <Divider>Start</Divider>
+  <Text>
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+    mollit anim id est laborum.
+  </Text>
+  <Divider labelPlacement="center">Center</Divider>
+  <Text>
+    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
+    laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto
+    beatae vitae dicta sunt explicabo.
+  </Text>
+  <Divider labelPlacement="end">End</Divider>
+  <Text>
+    Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+    consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci
+    velit, sed quia non numquam eius modi.
+  </Text>
+  <Divider
+    labelPlacement="center"
+    labelProps={{
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+    }}
+  >
+    <SearchIcon boxSize={5} />
+    <Text fontWeight="semibold" fontSize="lg">
+      Custom label
+    </Text>
+  </Divider>
+  <Text>
+    At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+    deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
+    provident
+  </Text>
+</VStack>
 ```
 
-### Vertical divider with label
-
-When you pass `vertical` to `orientation` prop, you can add children component and it will render like this.
+Labels also work with vertical divider.
 
 <Preview>
-  <Flex>
-    <div>
-      Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-      Planeta Terra.
-    </div>
-    <Divider orientation="vertical" children="Vertical" />
-    <div margin-top="0">
-      Pax mundi, seu pax in Terra, est notio optimae pacis intra et inter omnes homines et gentes in
-      Planeta Terra.
-    </div>
-  </Flex>
+  <VerticalWithLabelExample />
 </Preview>
 
 ```tsx
-
+<HStack spacing={4}>
+  <Text flex={1}>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.
+  </Text>
+  <Divider orientation="vertical" labelPlacement="center">
+    Or
+  </Divider>
+  <Text flex={1}>
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+    pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+    mollit anim id est laborum.
+  </Text>
+</HStack>
 ```
 
 ## Theming
@@ -153,16 +170,17 @@ const theme = extendTheme({
 
 ### Component parts
 
-| Name         | Static selector             | Description           |
-| ------------ | --------------------------- | --------------------- |
-| root         | `hope-Divider-root`         | Root element          |
-| labelWrapper | `hope-Divider-labelWrapper` | Wrapper arround label |
+| Name  | Static selector      | Description   |
+| ----- | -------------------- | ------------- |
+| root  | `hope-Divider-root`  | Root element  |
+| label | `hope-Divider-label` | Label element |
 
 ## Props
 
-| Name           | Type                                | Description                           | Default value |
-| -------------- | ----------------------------------- | ------------------------------------- | ------------- |
-| variant        | `"solid" \| "dashed" \| "dotted"`   | The visual style of the divider.      | "solid"       |
-| thickness      | `ResponsiveValue<number \| string>` | The thickness of the divider (in px). | 1px           |
-| orientation    | `"horizontal" \| "vertical"`        | The orientation of the divider.       | "horizontal"  |
-| labelPlacement | `"left" \| "right" \| "center"`     | The placement of the label, if any.   | "center"      |
+| Name           | Type                                    | Description                                | Default value |
+| -------------- | --------------------------------------- | ------------------------------------------ | ------------- |
+| variant        | `"solid" \| "dashed" \| "dotted"`       | The visual style of the divider.           | "solid"       |
+| thickness      | `ResponsiveValue<number \| string>`     | The thickness of the divider (in px).      | 1px           |
+| orientation    | `"horizontal" \| "vertical"`            | The orientation of the divider.            | "horizontal"  |
+| labelPlacement | `"start" \| "center" \| "end"`          | The placement of the label, if any.        | "start"       |
+| labelProps     | `ComponentProps<HopeComponent<"span">>` | Props to be spread on the label component. |               |
