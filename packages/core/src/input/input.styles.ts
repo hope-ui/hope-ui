@@ -37,9 +37,21 @@ interface InputVariants {
 }
 
 const inputSizes: Record<InputVariants["size"], SystemStyleObject> = {
-  sm: { fontSize: "sm", lineHeight: 5, minHeight: 8 },
-  md: { fontSize: "base", lineHeight: 6, minHeight: 10 },
-  lg: { fontSize: "lg", lineHeight: 7, minHeight: 12 },
+  sm: {
+    fontSize: "sm",
+    lineHeight: 5,
+    minHeight: 8,
+  },
+  md: {
+    fontSize: "base",
+    lineHeight: 6,
+    minHeight: 10,
+  },
+  lg: {
+    fontSize: "lg",
+    lineHeight: 7,
+    minHeight: 12,
+  },
 };
 
 function commonOutlineAndFilledStyles(vars: ThemeVars): SystemStyleObject {
@@ -105,26 +117,6 @@ function createVariantAndSizeCompoundVariant(
       },
     },
   ];
-}
-
-interface InputAddonVariantAndSizeCompoundVariantConfig {
-  variant: InputVariants["variant"];
-  size: InputVariants["size"];
-  px: string | number;
-}
-
-function createInputAddonVariantAndSizeCompoundVariant(
-  config: InputAddonVariantAndSizeCompoundVariantConfig
-): StyleConfigCompoundVariant<InputVariants> {
-  return {
-    variants: {
-      variant: config.variant,
-      size: config.size,
-    },
-    style: {
-      px: config.px,
-    },
-  };
 }
 
 const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
@@ -337,6 +329,7 @@ const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
           plain: {
             border: "1px solid transparent",
             backgroundColor: "transparent",
+            px: 0,
           },
         },
         size: {
@@ -347,59 +340,64 @@ const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
         /* -------------------------------------------------------------------------------------------------
          * Variant - filled + size
          * -----------------------------------------------------------------------------------------------*/
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "filled",
-          size: "sm",
-          px: 2.5,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "filled",
-          size: "md",
-          px: 3,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "filled",
-          size: "lg",
-          px: 4,
-        }),
+        {
+          variants: {
+            variant: "filled",
+            size: "sm",
+          },
+          style: {
+            px: 2.5,
+          },
+        },
+        {
+          variants: {
+            variant: "filled",
+            size: "md",
+          },
+          style: {
+            px: 3,
+          },
+        },
+        {
+          variants: {
+            variant: "filled",
+            size: "lg",
+          },
+          style: {
+            px: 4,
+          },
+        },
 
         /* -------------------------------------------------------------------------------------------------
          * Variant - outlined + size
          * -----------------------------------------------------------------------------------------------*/
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "outlined",
-          size: "sm",
-          px: 2.5,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "outlined",
-          size: "md",
-          px: 3,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "outlined",
-          size: "lg",
-          px: 4,
-        }),
-
-        /* -------------------------------------------------------------------------------------------------
-         * Variant - plain + size
-         * -----------------------------------------------------------------------------------------------*/
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "plain",
-          size: "sm",
-          px: 0,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "plain",
-          size: "md",
-          px: 0,
-        }),
-        createInputAddonVariantAndSizeCompoundVariant({
-          variant: "plain",
-          size: "lg",
-          px: 0,
-        }),
+        {
+          variants: {
+            variant: "outlined",
+            size: "sm",
+          },
+          style: {
+            px: 2.5,
+          },
+        },
+        {
+          variants: {
+            variant: "outlined",
+            size: "md",
+          },
+          style: {
+            px: 3,
+          },
+        },
+        {
+          variants: {
+            variant: "outlined",
+            size: "lg",
+          },
+          style: {
+            px: 4,
+          },
+        },
       ],
     },
     leftAddon: {
