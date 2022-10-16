@@ -3,8 +3,8 @@ import {
   StyleConfigProps,
   StyleConfigVariantSelection,
   SystemStyleObject,
-  ThemeVars,
 } from "@hope-ui/styles";
+
 import { rgba } from "../utils";
 
 export type InputParts = "root";

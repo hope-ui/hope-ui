@@ -66,6 +66,11 @@ export const useInputGroupStyleConfig = createStyleConfig<InputGroupParts, Input
       },
     },
     input: {
+      baseStyle: {
+        "&:focus": {
+          zIndex: 1,
+        },
+      },
       variants: {
         hasLeftAddon: {
           true: {
@@ -111,14 +116,17 @@ export const useInputGroupStyleConfig = createStyleConfig<InputGroupParts, Input
         size: {
           sm: {
             ...INPUT_SIZES.sm,
+            height: "100%",
             width: INPUT_SIZES.sm.minHeight,
           },
           md: {
             ...INPUT_SIZES.md,
+            height: "100%",
             width: INPUT_SIZES.md.minHeight,
           },
           lg: {
             ...INPUT_SIZES.lg,
+            height: "100%",
             width: INPUT_SIZES.lg.minHeight,
           },
         },
