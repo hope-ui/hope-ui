@@ -13,7 +13,7 @@ import { splitProps } from "solid-js";
 import { ButtonParts } from "./button.styles";
 
 export const ButtonIcon = createHopeComponent<"span">(props => {
-  const [local, others] = splitProps(props, ["class"]);
+  const [local, others] = splitProps(props, ["class", "__css"]);
 
   const { baseClasses, styleOverrides } = useStyleConfigContext<ButtonParts>();
 
@@ -21,7 +21,7 @@ export const ButtonIcon = createHopeComponent<"span">(props => {
     <hope.span
       aria-hidden={true}
       class={clsx(baseClasses().icon, local.class)}
-      __css={styleOverrides().icon}
+      __css={{ ...styleOverrides().icon, ...local.__css }}
       {...others}
     />
   );

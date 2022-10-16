@@ -23,6 +23,7 @@ export * from "./grid";
 export * from "./heading";
 export * from "./icon";
 export * from "./image";
+export * from "./input";
 export * from "./kbd";
 export * from "./modal";
 export * from "./popover";

@@ -1,96 +1,99 @@
-import { Box, Image, Flex, Text } from "../src";
+import {
+  Divider,
+  HStack,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  InputLeftSection,
+  InputRightAddon,
+  InputRightSection,
+  VStack,
+} from "../src";
 
 export default function App() {
   return (
-    <Box
-      color={{
-        base: "black",
-        md: "white",
-      }}
-      bg={{
-        base: "red",
-        md: "blue",
-      }}
-    >
-      The box
-    </Box>
-  );
-
-  return (
     <>
-      <Flex
-        direction={{ base: "column", md: "row" }}
-        border={({ vars }) => `1px solid ${vars.colors.neutral["200"]}`}
-        rounded="lg"
-        shadow="lg"
-        w="full"
-        maxW={{ base: 96, md: "none" }}
-        bg="white"
-        _dark={{
-          borderColor: "neutral.800",
-          bg: "neutral.900",
-        }}
-      >
-        <Image
-          src="https://bit.ly/3CVFryX"
-          alt="Yosemite National Park"
-          objectFit="cover"
-          roundedTop={{ base: "lg", md: "none" }}
-          roundedLeft={{ md: "lg" }}
-          maxH={200}
-          maxW={{ md: 250 }}
-        />
-        <Box p={5}>
-          <Flex
-            direction={{ md: "column-reverse" }}
-            justify="space-between"
-            align={{ base: "center", md: "flex-start" }}
-            w="full"
-            mb={2}
-          >
-            <Text fontWeight="semibold" mt={{ md: 1 }} _dark={{ color: "neutral.300" }}>
-              Yosemite National Park
-            </Text>
-            <Flex
-              px={2}
-              py={1}
-              align="center"
-              bgColor="success.50"
-              color="success.800"
-              rounded="full"
-              _dark={{
-                bgColor: "success.900",
-                color: "success.300",
-              }}
-            >
-              <Text
-                as="span"
-                size="xs"
-                lineHeight="none"
-                fontWeight="semibold"
-                textTransform="uppercase"
-              >
-                Nature
-              </Text>
-            </Flex>
-          </Flex>
-          <Text
-            size="sm"
-            color="neutral.500"
-            lineClamp={{ base: 3, md: 5 }}
-            _dark={{ color: "neutral.400" }}
-          >
-            Yosemite National Park is an American national park in California, surrounded on the
-            southeast by Sierra National Forest and on the northwest by Stanislaus National Forest.
-            The park is managed by the National Park Service and covers an area of 759,620 acres
-            (1,187 sq mi; 3,074 km2) and sits in four counties – centered in Tuolumne and Mariposa,
-            extending north and east to Mono and south to Madera County. Designated a World Heritage
-            Site in 1984, Yosemite is internationally recognized for its granite cliffs, waterfalls,
-            clear streams, giant sequoia groves, lakes, mountains, meadows, glaciers, and biological
-            diversity. Almost 95 percent of the park is designated wilderness.
-          </Text>
-        </Box>
-      </Flex>
+      <HStack>
+        <VStack spacing="4" maxW={96} p={4}>
+          <Divider>Sizes</Divider>
+          <Input placeholder="Small" size="sm" />
+          <Input placeholder="Medium" size="md" />
+          <Input placeholder="Large" size="lg" />
+
+          <Divider>Variants</Divider>
+          <Input placeholder="Filled" variant="filled" />
+          <Input placeholder="Outlined" variant="outlined" />
+          <Input placeholder="Plain" variant="plain" />
+
+          <Divider>Invalid</Divider>
+          <Input placeholder="Filled" variant="filled" isInvalid />
+          <Input placeholder="Outlined" variant="outlined" isInvalid />
+          <Input placeholder="Plain" variant="plain" isInvalid />
+
+          <Divider>Disabled</Divider>
+          <Input placeholder="Filled" variant="filled" isDisabled />
+          <Input placeholder="Outlined" variant="outlined" isDisabled />
+          <Input placeholder="Plain" variant="plain" isDisabled />
+        </VStack>
+
+        <VStack spacing="4" maxW={96} p={4}>
+          <Divider>Sizes</Divider>
+          <InputGroup size="sm">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Small" />
+          </InputGroup>
+          <InputGroup size="md">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Medium" />
+          </InputGroup>
+          <InputGroup size="lg">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Large" />
+          </InputGroup>
+
+          <Divider>Variants</Divider>
+          <InputGroup variant="filled">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Filled" />
+          </InputGroup>
+          <InputGroup variant="outlined">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Outlined" />
+          </InputGroup>
+          <InputGroup variant="plain">
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Plain" />
+          </InputGroup>
+
+          <Divider>Invalid</Divider>
+          <InputGroup variant="filled" isInvalid>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Filled" />
+          </InputGroup>
+          <InputGroup variant="outlined" isInvalid>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Outlined" />
+          </InputGroup>
+          <InputGroup variant="plain" isInvalid>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Plain" />
+          </InputGroup>
+
+          <Divider>Disabled</Divider>
+          <InputGroup variant="filled" isDisabled>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Filled" />
+          </InputGroup>
+          <InputGroup variant="outlined" isDisabled>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Outlined" />
+          </InputGroup>
+          <InputGroup variant="plain" isDisabled isRequired isReadOnly isInvalid>
+            <InputLeftAddon>+234</InputLeftAddon>
+            <Input type="tel" placeholder="Plain" />
+          </InputGroup>
+        </VStack>
+      </HStack>
     </>
   );
 }
