@@ -86,7 +86,9 @@ export function UseColorModeValueExample() {
 }
 ```
 
-### Using `light/dark` style prop
+## Styling
+
+### Using the `light/dark` object syntax
 
 Style props accept an object as value in which you can set the `light` and/or `dark` value. The above example could also be achieved in this way:
 
@@ -140,4 +142,53 @@ export function UseDarkStylePropExample() {
     </>
   );
 }
+```
+
+### Caveat
+
+Both the `light/dark` object syntax and `_dark` style prop doesn't work inside css pseudo-element selector like `::before`.
+
+For example if you want to style the placeholder of an `input` in dark mode the following code will not work:
+
+```tsx {3-6,17-19}
+<input
+  sx={{
+    "&::placeholder": {
+      color: {
+        light: "neutral.500",
+        dark: "neutral.600", // ❌ Doesn't work
+      },
+    },
+  }}
+/>
+
+// Or
+
+<input
+  sx={{
+    "&::placeholder": {
+      color: "neutral.500",
+      _dark: {
+        color: "neutral.600", // ❌ Doesn't work too
+      },
+    },
+  }}
+/>
+```
+
+Instead, you have to put the css pseudo-element selector inside the `_dark` pseudo selector.
+
+```tsx {5-9}
+<input
+  sx={{
+    "&::placeholder": {
+      color: "neutral.500",
+    },
+    _dark: {
+      "&::placeholder": {
+        color: "neutral.600", // ✅ Work
+      },
+    },
+  }}
+/>
 ```
