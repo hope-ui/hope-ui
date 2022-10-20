@@ -51,8 +51,12 @@ export const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
         minWidth: 0,
 
         outline: "none",
+
         borderRadius: "sm",
+        border: "1px solid transparent",
+
         backgroundColor: "transparent",
+
         padding: 0,
 
         color: "common.foreground",
@@ -79,30 +83,49 @@ export const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
         },
 
         "&:focus": {
-          boxShadow: `0 0 0 3px ${rgba(vars.colors.primary.lightChannel, 0.75)}`,
-          borderColor: "primary.400",
+          boxShadow: {
+            light: `0 0 0 3px ${rgba(vars.colors.primary.lightChannel, 0.75)}`,
+            dark: `0 0 0 3px ${rgba(vars.colors.primary.darkChannel, 0.75)}`,
+          },
+          borderColor: {
+            light: "primary.400",
+            dark: "primary.600",
+          },
         },
 
         "&[aria-invalid=true]": {
-          borderColor: "danger.400",
+          borderColor: {
+            light: "danger.400",
+            dark: "danger.700",
+          },
         },
 
         "&[aria-invalid=true]:focus": {
-          boxShadow: `0 0 0 3px ${rgba(vars.colors.danger.lightChannel, 0.75)}`,
+          boxShadow: {
+            light: `0 0 0 3px ${rgba(vars.colors.danger.lightChannel, 0.75)}`,
+            dark: `0 0 0 3px ${rgba(vars.colors.danger.darkChannel, 0.75)}`,
+          },
         },
       },
       variants: {
         variant: {
           filled: {
-            border: "1px solid transparent",
-            backgroundColor: "neutral.100",
+            backgroundColor: {
+              light: "neutral.100",
+              dark: "neutral.800",
+            },
           },
           outlined: {
-            border: `1px solid ${vars.colors.neutral["300"]}`,
-            backgroundColor: "transparent",
+            border: {
+              light: `1px solid ${vars.colors.neutral["300"]}`,
+              dark: `1px solid ${vars.colors.neutral["700"]}`,
+            },
+            backgroundColor: {
+              light: "transparent",
+              dark: "rgb(255 255 255 / 0.02)",
+            },
           },
           plain: {
-            border: "1px solid transparent",
             backgroundColor: "transparent",
           },
         },

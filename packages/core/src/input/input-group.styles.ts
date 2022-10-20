@@ -150,6 +150,19 @@ export const useInputGroupStyleConfig = createStyleConfig<InputGroupParts, Input
         width: "auto",
         whiteSpace: "nowrap",
 
+        borderRadius: "sm",
+        border: "1px solid transparent",
+
+        backgroundColor: {
+          light: "neutral.100",
+          dark: "neutral.800",
+        },
+
+        color: {
+          light: "neutral.600",
+          dark: "neutral.400",
+        },
+
         "&[data-disabled]": {
           opacity: 0.4,
           cursor: "not-allowed",
@@ -157,21 +170,17 @@ export const useInputGroupStyleConfig = createStyleConfig<InputGroupParts, Input
       },
       variants: {
         variant: {
-          filled: {
-            borderRadius: "sm",
-            border: "1px solid transparent",
-            backgroundColor: "neutral.100",
-            color: "neutral.600",
-          },
           outlined: {
-            borderRadius: "sm",
-            border: `1px solid ${vars.colors.neutral["300"]}`,
-            backgroundColor: "neutral.100",
-            color: "neutral.600",
+            border: {
+              light: `1px solid ${vars.colors.neutral["300"]}`,
+              dark: `1px solid ${vars.colors.neutral["700"]}`,
+            },
           },
           plain: {
-            border: "1px solid transparent",
-            backgroundColor: "transparent",
+            backgroundColor: {
+              light: "transparent",
+              dark: "transparent",
+            },
           },
         },
         size: {
