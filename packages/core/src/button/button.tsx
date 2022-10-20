@@ -12,15 +12,14 @@ import {
   hope,
   mergeThemeProps,
   STYLE_CONFIG_PROP_NAMES,
-  StyleConfigProvider,
-  useStyleConfigContext,
 } from "@hope-ui/styles";
 import { mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
-import { ButtonParts, useButtonStyleConfig } from "./button.styles";
+import { useButtonStyleConfig } from "./button.styles";
+import { ButtonContext, useButtonContext } from "./button-context";
 import { useButtonGroupContext } from "./button-group";
 import { ButtonIcon } from "./button-icon";
 import { ButtonLoader } from "./button-loader";
@@ -103,7 +102,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
   });
 
   return (
-    <StyleConfigProvider value={{ baseClasses, styleOverrides }}>
+    <ButtonContext.Provider value={{ baseClasses, styleOverrides }}>
       <hope.button
         as={local.as}
         ref={mergeRefs(el => (ref = el), local.ref)}
@@ -135,23 +134,29 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
           <ButtonLoader hasLoadingText={!!local.loadingText}>{local.loader}</ButtonLoader>
         </Show>
       </hope.button>
-    </StyleConfigProvider>
+    </ButtonContext.Provider>
   );
 });
 
 function ButtonContent(props: ButtonContentProps) {
-  const { baseClasses, styleOverrides } = useStyleConfigContext<ButtonParts>();
+  const buttonContext = useButtonContext();
 
   return (
     <>
       <Show when={props.leftIcon}>
-        <ButtonIcon class={baseClasses().leftIcon} __css={styleOverrides().leftIcon}>
+        <ButtonIcon
+          class={buttonContext.baseClasses().leftIcon}
+          __css={buttonContext.styleOverrides().leftIcon}
+        >
           {props.leftIcon}
         </ButtonIcon>
       </Show>
       {props.children}
       <Show when={props.rightIcon}>
-        <ButtonIcon class={baseClasses().rightIcon} __css={styleOverrides().rightIcon}>
+        <ButtonIcon
+          class={buttonContext.baseClasses().rightIcon}
+          __css={buttonContext.styleOverrides().rightIcon}
+        >
           {props.rightIcon}
         </ButtonIcon>
       </Show>

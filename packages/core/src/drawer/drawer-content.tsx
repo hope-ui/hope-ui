@@ -1,10 +1,9 @@
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { callHandler } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
 import { FocusTrapRegion } from "../focus-trap";
-import { DrawerParts } from "./drawer.styles";
 import { useDrawerContext } from "./drawer-context";
 
 export interface DrawerContentProps {
@@ -17,8 +16,6 @@ export interface DrawerContentProps {
  */
 export const DrawerContent = createHopeComponent<"section", DrawerContentProps>(props => {
   const drawerContext = useDrawerContext();
-
-  const { baseClasses, styleOverrides } = useStyleConfigContext<DrawerParts>();
 
   const [local, others] = splitProps(props, ["class", "style", "onClick"]);
 
@@ -39,8 +36,8 @@ export const DrawerContent = createHopeComponent<"section", DrawerContentProps>(
       trapFocus={drawerContext.trapFocus()}
       initialFocusSelector={drawerContext.initialFocusSelector()}
       restoreFocusSelector={drawerContext.restoreFocusSelector()}
-      class={baseClasses().root}
-      __css={styleOverrides().root}
+      class={drawerContext.baseClasses().root}
+      __css={drawerContext.styleOverrides().root}
       onMouseDown={drawerContext.onContainerMouseDown}
       onKeyDown={drawerContext.onContainerKeyDown}
       onClick={drawerContext.onContainerClick}
@@ -53,9 +50,9 @@ export const DrawerContent = createHopeComponent<"section", DrawerContentProps>(
         aria-modal="true"
         aria-labelledby={drawerContext.headingId()}
         aria-describedby={drawerContext.descriptionId()}
-        class={clsx(baseClasses().content, local.class)}
+        class={clsx(drawerContext.baseClasses().content, local.class)}
         style={computedStyle()}
-        __css={styleOverrides().content}
+        __css={drawerContext.styleOverrides().content}
         onClick={onContentClick}
         {...others}
       />

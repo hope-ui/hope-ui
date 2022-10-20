@@ -23,7 +23,7 @@ import {
   size,
 } from "@floating-ui/dom";
 import { createDisclosure, createTransition } from "@hope-ui/primitives";
-import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
+import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
 import { contains, getRelatedTarget, runIfFn } from "@hope-ui/utils";
 import { createEffect, createSignal, createUniqueId, JSX, onCleanup, splitProps } from "solid-js";
 import { isServer } from "solid-js/web";
@@ -62,7 +62,7 @@ export function Popover(props: PopoverProps) {
 
   const [styleConfigProps] = splitProps(props, [...STYLE_CONFIG_PROP_NAMES]);
 
-  const styleConfigResult = usePopoverStyleConfig("Popover", styleConfigProps);
+  const { baseClasses, styleOverrides } = usePopoverStyleConfig("Popover", styleConfigProps);
 
   const [anchorRef, setAnchorRef] = createSignal<HTMLElement>();
   const [triggerRef, setTriggerRef] = createSignal<HTMLElement>();
@@ -308,6 +308,8 @@ export function Popover(props: PopoverProps) {
   });
 
   const context: PopoverContextValue = {
+    baseClasses,
+    styleOverrides,
     isOpen: disclosureState.isOpen,
     popoverTransition,
     triggerMode: () => props.triggerMode!,
@@ -341,10 +343,8 @@ export function Popover(props: PopoverProps) {
   };
 
   return (
-    <StyleConfigProvider value={styleConfigResult}>
-      <PopoverContext.Provider value={context}>
-        {runIfFn(props.children, disclosureState)}
-      </PopoverContext.Provider>
-    </StyleConfigProvider>
+    <PopoverContext.Provider value={context}>
+      {runIfFn(props.children, disclosureState)}
+    </PopoverContext.Provider>
   );
 }

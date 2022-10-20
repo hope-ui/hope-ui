@@ -1,8 +1,8 @@
 import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
-import { ComponentTheme, HopeProps } from "@hope-ui/styles";
+import { ComponentTheme, HopeProps, SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, JSX, ParentProps, Setter } from "solid-js";
 
-import { ModalStyleConfigProps } from "./modal.styles";
+import { ModalParts, ModalStyleConfigProps } from "./modal.styles";
 
 export interface BaseModalProps {
   /** Whether the modal should be shown. */
@@ -63,6 +63,12 @@ export type ModalThemeProps =
 export type ModalTheme = ComponentTheme<ModalProps, ModalThemeProps>;
 
 export interface ModalContextValue {
+  /** The style config base class names. */
+  baseClasses: Accessor<Record<ModalParts, string>>;
+
+  /** The style config style overrides. */
+  styleOverrides: Accessor<Record<ModalParts, SystemStyleObject>>;
+
   /** Whether the modal should be shown. */
   isOpen: Accessor<boolean>;
 

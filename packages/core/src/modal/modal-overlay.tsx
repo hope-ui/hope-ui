@@ -1,8 +1,7 @@
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
-import { ModalParts } from "./modal.styles";
 import { useModalContext } from "./modal-context";
 
 export interface ModalOverlayProps {
@@ -16,8 +15,6 @@ export interface ModalOverlayProps {
 export const ModalOverlay = createHopeComponent<"div", ModalOverlayProps>(props => {
   const modalContext = useModalContext();
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<ModalParts>();
-
   const [local, others] = splitProps(props, ["class", "style", "children"]);
 
   const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
@@ -28,9 +25,9 @@ export const ModalOverlay = createHopeComponent<"div", ModalOverlayProps>(props 
   return (
     <hope.div
       role="presentation"
-      class={clsx(baseClasses().overlay, local.class)}
+      class={clsx(modalContext.baseClasses().overlay, local.class)}
       style={computedStyle()}
-      __css={styleOverrides().overlay}
+      __css={modalContext.styleOverrides().overlay}
       {...others}
     />
   );

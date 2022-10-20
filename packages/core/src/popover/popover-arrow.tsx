@@ -6,12 +6,11 @@
  * https://github.com/ariakit/ariakit/blob/b6c7f8cf609db32e64c8d4b28b5e06ebf437a800/packages/ariakit/src/popover/popover-arrow.tsx
  */
 
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { getWindow, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createRenderEffect, createSignal, splitProps } from "solid-js";
 
-import { PopoverParts } from "./popover.styles";
 import { usePopoverContext } from "./popover-context";
 import { BasePlacement } from "./types";
 
@@ -35,8 +34,6 @@ const ROTATE_MAP = {
  */
 export const PopoverArrow = createHopeComponent<"div">(props => {
   const popoverContext = usePopoverContext();
-
-  const { baseClasses, styleOverrides } = useStyleConfigContext<PopoverParts>();
 
   const [local, others] = splitProps(props, ["ref", "class", "style", "children"]);
 
@@ -62,8 +59,8 @@ export const PopoverArrow = createHopeComponent<"div">(props => {
         "stroke-width": strokeWidth(),
         ...(local.style as any),
       }}
-      class={clsx(baseClasses().arrow, local.class)}
-      __css={styleOverrides().arrow}
+      class={clsx(popoverContext.baseClasses().arrow, local.class)}
+      __css={popoverContext.styleOverrides().arrow}
       {...others}
     >
       <svg display="block" viewBox={ARROW_VIEWBOX}>

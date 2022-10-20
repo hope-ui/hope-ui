@@ -1,7 +1,7 @@
-import { ComponentTheme } from "@hope-ui/styles";
-import { JSX } from "solid-js";
+import { ComponentTheme, SystemStyleObject } from "@hope-ui/styles";
+import { Accessor, JSX } from "solid-js";
 
-import { ButtonStyleConfigProps } from "./button.styles";
+import { ButtonParts, ButtonStyleConfigProps } from "./button.styles";
 
 export interface ButtonProps extends ButtonStyleConfigProps {
   /** The placement of the loader when `isLoading` is true. */
@@ -35,6 +35,14 @@ export interface ButtonLoaderProps {
 }
 
 export type ButtonContentProps = Pick<ButtonProps, "leftIcon" | "rightIcon" | "children">;
+
+export interface ButtonContextValue {
+  /** The style config base class names. */
+  baseClasses: Accessor<Record<ButtonParts, string>>;
+
+  /** The style config style overrides. */
+  styleOverrides: Accessor<Record<ButtonParts, SystemStyleObject>>;
+}
 
 export type ButtonTheme = ComponentTheme<
   ButtonProps,

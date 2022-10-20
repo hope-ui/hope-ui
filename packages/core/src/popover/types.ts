@@ -1,9 +1,9 @@
 import type { Placement as FloatingPlacement } from "@floating-ui/dom";
 import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
-import { ComponentTheme, HopeProps } from "@hope-ui/styles";
+import { ComponentTheme, HopeProps, SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, JSX, Setter } from "solid-js";
 
-import { PopoverStyleConfigProps } from "./popover.styles";
+import { PopoverParts, PopoverStyleConfigProps } from "./popover.styles";
 
 export type BasePlacement = "top" | "bottom" | "left" | "right";
 
@@ -121,6 +121,12 @@ export type PopoverTheme = ComponentTheme<
 >;
 
 export interface PopoverContextValue {
+  /** The style config base class names. */
+  baseClasses: Accessor<Record<PopoverParts, string>>;
+
+  /** The style config style overrides. */
+  styleOverrides: Accessor<Record<PopoverParts, SystemStyleObject>>;
+
   /** Whether the popover should be shown. */
   isOpen: Accessor<boolean>;
 

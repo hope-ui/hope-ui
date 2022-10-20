@@ -1,8 +1,7 @@
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, splitProps } from "solid-js";
 
-import { DrawerParts } from "./drawer.styles";
 import { useDrawerContext } from "./drawer-context";
 
 export interface DrawerOverlayProps {
@@ -16,8 +15,6 @@ export interface DrawerOverlayProps {
 export const DrawerOverlay = createHopeComponent<"div", DrawerOverlayProps>(props => {
   const drawerContext = useDrawerContext();
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<DrawerParts>();
-
   const [local, others] = splitProps(props, ["class", "style", "children"]);
 
   const computedStyle: Accessor<JSX.CSSProperties> = createMemo(() => ({
@@ -28,9 +25,9 @@ export const DrawerOverlay = createHopeComponent<"div", DrawerOverlayProps>(prop
   return (
     <hope.div
       role="presentation"
-      class={clsx(baseClasses().overlay, local.class)}
+      class={clsx(drawerContext.baseClasses().overlay, local.class)}
       style={computedStyle()}
-      __css={styleOverrides().overlay}
+      __css={drawerContext.styleOverrides().overlay}
       {...others}
     />
   );

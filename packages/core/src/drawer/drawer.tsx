@@ -7,7 +7,7 @@
  */
 
 import { createTransition } from "@hope-ui/primitives";
-import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
+import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
 import { createUniqueId, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
@@ -40,7 +40,7 @@ export function Drawer(props: DrawerProps) {
 
   const [styleConfigProps] = splitProps(props, [...STYLE_CONFIG_PROP_NAMES, "size", "placement"]);
 
-  const styleConfigResult = useDrawerStyleConfig("Drawer", styleConfigProps);
+  const { baseClasses, styleOverrides } = useDrawerStyleConfig("Drawer", styleConfigProps);
 
   const {
     headingId,
@@ -94,6 +94,8 @@ export function Drawer(props: DrawerProps) {
   });
 
   const context: DrawerContextValue = {
+    baseClasses,
+    styleOverrides,
     isOpen: () => props.isOpen,
     contentTransition,
     overlayTransition,
@@ -114,9 +116,7 @@ export function Drawer(props: DrawerProps) {
   return (
     <Show when={overlayTransition.keepMounted() && contentTransition.keepMounted()}>
       <Portal>
-        <StyleConfigProvider value={styleConfigResult}>
-          <DrawerContext.Provider value={context}>{props.children}</DrawerContext.Provider>
-        </StyleConfigProvider>
+        <DrawerContext.Provider value={context}>{props.children}</DrawerContext.Provider>
       </Portal>
     </Show>
   );

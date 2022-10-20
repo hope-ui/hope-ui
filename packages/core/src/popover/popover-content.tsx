@@ -1,11 +1,10 @@
-import { createHopeComponent, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent } from "@hope-ui/styles";
 import { callHandler, mergeRefs } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { Accessor, createMemo, JSX, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { FocusTrapRegion } from "../focus-trap";
-import { PopoverParts } from "./popover.styles";
 import { PopoverArrow } from "./popover-arrow";
 import { usePopoverContext } from "./popover-context";
 
@@ -19,8 +18,6 @@ export interface PopoverContentProps {
  */
 export const PopoverContent = createHopeComponent<"section", PopoverContentProps>(props => {
   const popoverContext = usePopoverContext();
-
-  const { baseClasses, styleOverrides } = useStyleConfigContext<PopoverParts>();
 
   const [local, others] = splitProps(props, [
     "ref",
@@ -83,9 +80,9 @@ export const PopoverContent = createHopeComponent<"section", PopoverContentProps
           trapFocus={popoverContext.trapFocus()}
           initialFocusSelector={popoverContext.initialFocusSelector()}
           restoreFocusSelector={popoverContext.restoreFocusSelector()}
-          class={clsx(baseClasses().root, local.class)}
+          class={clsx(popoverContext.baseClasses().root, local.class)}
           style={computedStyle()}
-          __css={styleOverrides().root}
+          __css={popoverContext.styleOverrides().root}
           onKeyDown={onKeyDown}
           onFocusOut={onFocusOut}
           onMouseEnter={onMouseEnter}

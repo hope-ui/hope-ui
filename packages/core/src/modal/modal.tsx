@@ -7,7 +7,7 @@
  */
 
 import { createTransition } from "@hope-ui/primitives";
-import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES, StyleConfigProvider } from "@hope-ui/styles";
+import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
 import { createUniqueId, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
@@ -45,7 +45,7 @@ export function Modal(props: ModalProps) {
     "scrollBehavior",
   ]);
 
-  const styleConfigResult = useModalStyleConfig("Modal", styleConfigProps);
+  const { baseClasses, styleOverrides } = useModalStyleConfig("Modal", styleConfigProps);
 
   const {
     headingId,
@@ -99,6 +99,8 @@ export function Modal(props: ModalProps) {
   });
 
   const context: ModalContextValue = {
+    baseClasses,
+    styleOverrides,
     isOpen: () => props.isOpen,
     contentTransition,
     overlayTransition,
@@ -119,9 +121,7 @@ export function Modal(props: ModalProps) {
   return (
     <Show when={overlayTransition.keepMounted() && contentTransition.keepMounted()}>
       <Portal>
-        <StyleConfigProvider value={styleConfigResult}>
-          <ModalContext.Provider value={context}>{props.children}</ModalContext.Provider>
-        </StyleConfigProvider>
+        <ModalContext.Provider value={context}>{props.children}</ModalContext.Provider>
       </Portal>
     </Show>
   );

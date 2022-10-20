@@ -1,8 +1,7 @@
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { createEffect, onCleanup, splitProps } from "solid-js";
 
-import { DrawerParts } from "./drawer.styles";
 import { useDrawerContext } from "./drawer-context";
 
 /**
@@ -17,8 +16,6 @@ export const DrawerHeading = createHopeComponent<"h2">(props => {
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<DrawerParts>();
-
   createEffect(() => {
     drawerContext.setHeadingId(`${drawerContext.contentId()}-heading`);
     onCleanup(() => drawerContext.setHeadingId(undefined));
@@ -27,8 +24,8 @@ export const DrawerHeading = createHopeComponent<"h2">(props => {
   return (
     <hope.h2
       id={drawerContext.headingId()}
-      class={clsx(baseClasses().heading, local.class)}
-      __css={styleOverrides().heading}
+      class={clsx(drawerContext.baseClasses().heading, local.class)}
+      __css={drawerContext.styleOverrides().heading}
       {...others}
     />
   );

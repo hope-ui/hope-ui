@@ -1,8 +1,7 @@
-import { createHopeComponent, hope, useStyleConfigContext } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { createEffect, onCleanup, splitProps } from "solid-js";
 
-import { ModalParts } from "./modal.styles";
 import { useModalContext } from "./modal-context";
 
 /**
@@ -17,8 +16,6 @@ export const ModalDescription = createHopeComponent<"p">(props => {
 
   const [local, others] = splitProps(props, ["class"]);
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<ModalParts>();
-
   createEffect(() => {
     modalContext.setDescriptionId(`${modalContext.contentId()}-description`);
     onCleanup(() => modalContext.setDescriptionId(undefined));
@@ -27,8 +24,8 @@ export const ModalDescription = createHopeComponent<"p">(props => {
   return (
     <hope.p
       id={modalContext.descriptionId()}
-      class={clsx(baseClasses().description, local.class)}
-      __css={styleOverrides().description}
+      class={clsx(modalContext.baseClasses().description, local.class)}
+      __css={modalContext.styleOverrides().description}
       {...others}
     />
   );
