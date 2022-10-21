@@ -248,18 +248,27 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 
 ### Providing style config to descendants
 
-We need a way to access the `baseClasses` and `styleOverrides` in the `AlertTitle` and `AlertDescription` components.
+We need a way to access the `baseClasses` and `styleOverrides` in `AlertTitle` and `AlertDescription` components. The easiest way to do that is by using a _context_.
 
-The `StyleConfigProvider` allows providing those values to children of `Alert` via a _context_.
-
-```tsx {2,18,22}
+```tsx {8-17,29,33}
 // alert.tsx
 
-import { Box, createHopeComponent, StyleConfigProvider } from "@hope-ui/core";
+import { Box, createHopeComponent, SystemStyleObject } from "@hope-ui/core";
 import { clsx } from "clsx";
-import { splitProps } from "solid-js";
+import { Accessor, createContext, useContext, splitProps } from "solid-js";
 
-import { AlertStyleConfigProps, useAlertStyleConfig } from "./alert.styles.ts";
+import { AlertParts, AlertStyleConfigProps, useAlertStyleConfig } from "./alert.styles.ts";
+
+export interface AlertContextValue {
+  baseClasses: Accessor<Record<AlertParts, string>>;
+  styleOverrides: Accessor<Record<AlertParts, SystemStyleObject>>;
+}
+
+export const AlertContext = createContext<AlertContextValue>();
+
+export function useAlertContext() {
+  return useContext(AlertContext);
+}
 
 export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => {
   const [local, styleConfigProps, others] = splitProps(
@@ -271,55 +280,28 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
   const { baseClasses, styleOverrides } = useAlertStyleConfig("Alert", styleConfigProps);
 
   return (
-    <StyleConfigProvider value={{ baseClasses, styleOverrides }}>
+    <AlertContext.Provider value={{ baseClasses, styleOverrides }}>
       <Box class={clsx(baseClasses().root, local.class)} __css={styleOverrides().root} {...others}>
         {local.children}
       </Box>
-    </StyleConfigProvider>
+    </AlertContext.Provider>
   );
 });
 
 // ...AlertTitle and AlertDescription components
 ```
 
-Then, in `AlertTitle` and `AlertDescription`, we use `useStyleConfigContext` to consume that _context_.
+Then, in `AlertTitle` and `AlertDescription`, we use `useAlertContext` to consume that _context_.
 
-```tsx {6,11,34,48}
+```tsx {7,21}
 // alert.tsx
 
-import {
-  Box,
-  createHopeComponent,
-  StyleConfigProvider,
-  useStyleConfigContext,
-} from "@hope-ui/core";
-import { clsx } from "clsx";
-import { splitProps } from "solid-js";
-
-import { AlertParts, AlertStyleConfigProps, useAlertStyleConfig } from "./alert.styles.ts";
-
-export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => {
-  const [local, styleConfigProps, others] = splitProps(
-    props,
-    ["class", "children"],
-    ["styleConfigOverride", "unstyled", "variant", "status"]
-  );
-
-  const { baseClasses, styleOverrides } = useAlertStyleConfig("Alert", styleConfigProps);
-
-  return (
-    <StyleConfigProvider value={{ baseClasses, styleOverrides }}>
-      <Box class={clsx(baseClasses().root, local.class)} __css={styleOverrides().root} {...others}>
-        {local.children}
-      </Box>
-    </StyleConfigProvider>
-  );
-});
+// ...imports, context and Alert component
 
 export const AlertTitle = createHopeComponent<"div">(props => {
   const [local, others] = splitProps(props, ["class"]);
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<AlertParts>();
+  const { baseClasses, styleOverrides } = useAlertContext();
 
   return (
     <Box
@@ -333,7 +315,7 @@ export const AlertTitle = createHopeComponent<"div">(props => {
 export const AlertDescription = createHopeComponent<"div">(props => {
   const [local, others] = splitProps(props, ["class"]);
 
-  const { baseClasses, styleOverrides } = useStyleConfigContext<AlertParts>();
+  const { baseClasses, styleOverrides } = useAlertContext();
 
   return (
     <Box
@@ -351,16 +333,10 @@ We need to create a _component theme_ type to get TypeScript support in the them
 
 In the example below, only `variant` and `status` from the `AlertStyleConfigProps` type will be available to set in the theme default props section.
 
-```tsx {4,14}
+```tsx {2,8}
 // alert.tsx
 
-import {
-  Box,
-  ComponentTheme,
-  createHopeComponent,
-  StyleConfigProvider,
-  useStyleConfigContext,
-} from "@hope-ui/core";
+import { Box, ComponentTheme, createHopeComponent } from "@hope-ui/core";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
@@ -378,11 +354,11 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
   const { baseClasses, styleOverrides } = useAlertStyleConfig("Alert", styleConfigProps);
 
   return (
-    <StyleConfigProvider value={{ baseClasses, styleOverrides }}>
+    <AlertContext.Provider value={{ baseClasses, styleOverrides }}>
       <Box class={clsx(baseClasses().root, local.class)} __css={styleOverrides().root} {...others}>
         {local.children}
       </Box>
-    </StyleConfigProvider>
+    </AlertContext.Provider>
   );
 });
 
@@ -399,17 +375,10 @@ To do that, we use the `mergeThemeProps` function and pass it the following para
 2. The fallback default props (if the theme does not provide them)
 3. The component props object
 
-```tsx {6,18}
+```tsx {2,11}
 // alert.tsx
 
-import {
-  Box,
-  ComponentTheme,
-  createHopeComponent,
-  mergeThemeProps,
-  StyleConfigProvider,
-  useStyleConfigContext,
-} from "@hope-ui/core";
+import { Box, ComponentTheme, createHopeComponent, mergeThemeProps } from "@hope-ui/core";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
@@ -429,11 +398,11 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
   const { baseClasses, styleOverrides } = useAlertStyleConfig("Alert", styleConfigProps);
 
   return (
-    <StyleConfigProvider value={{ baseClasses, styleOverrides }}>
+    <AlertContext.Provider value={{ baseClasses, styleOverrides }}>
       <Box class={clsx(baseClasses().root, local.class)} __css={styleOverrides().root} {...others}>
         {local.children}
       </Box>
-    </StyleConfigProvider>
+    </AlertContext.Provider>
   );
 });
 
