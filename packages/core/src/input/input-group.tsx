@@ -10,6 +10,7 @@ import { createSignal, splitProps } from "solid-js";
 import { InputGroupStyleConfigProps, useInputGroupStyleConfig } from "./input-group.styles";
 import { InputGroupContext, InputGroupContextValue } from "./input-group-context";
 import { InputSharedProps } from "./types";
+import { useFormControlContext } from "../form-control";
 
 export interface InputGroupProps
   extends Omit<
@@ -19,6 +20,8 @@ export interface InputGroupProps
     InputSharedProps {}
 
 export const InputGroup = createHopeComponent<"div", InputGroupProps>(props => {
+  const formControlContext = useFormControlContext();
+
   props = mergeThemeProps("InputGroup", {}, props);
 
   const [local, styleConfigProps, others] = splitProps(
@@ -60,10 +63,10 @@ export const InputGroup = createHopeComponent<"div", InputGroupProps>(props => {
   });
 
   const context: InputGroupContextValue = {
-    isRequired: () => props.isRequired,
-    isDisabled: () => props.isDisabled,
-    isReadOnly: () => props.isReadOnly,
-    isInvalid: () => props.isInvalid,
+    isRequired: () => props.isRequired ?? formControlContext?.isRequired(),
+    isDisabled: () => props.isDisabled ?? formControlContext?.isDisabled(),
+    isReadOnly: () => props.isReadOnly ?? formControlContext?.isReadOnly(),
+    isInvalid: () => props.isInvalid ?? formControlContext?.isInvalid(),
     variant: () => styleConfigProps.variant,
     size: () => styleConfigProps.size,
     unstyled: () => styleConfigProps.unstyled,

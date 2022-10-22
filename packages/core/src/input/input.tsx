@@ -7,6 +7,7 @@ import {
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
+import { useFormControlContext } from "../form-control";
 import { InputStyleConfigProps, useInputStyleConfig } from "./input.styles";
 import { useInputGroupContext } from "./input-group-context";
 import { InputSharedProps } from "./types";
@@ -17,42 +18,75 @@ export interface InputProps extends InputStyleConfigProps, InputSharedProps {
 }
 
 export const Input = createHopeComponent<"input", InputProps>(props => {
-  const context = useInputGroupContext();
+  const formControlContext = useFormControlContext();
+  const inputGroupContext = useInputGroupContext();
 
   props = mergeThemeProps("Input", {}, props);
 
   const [local, styleConfigProps, others] = splitProps(
     props,
-    ["class", "__css", "isRequired", "isDisabled", "isReadOnly", "isInvalid", "htmlSize"],
+    [
+      "id",
+      "aria-describedby",
+      "class",
+      "__css",
+      "isRequired",
+      "isDisabled",
+      "isReadOnly",
+      "isInvalid",
+      "htmlSize",
+    ],
     [...STYLE_CONFIG_PROP_NAMES, "variant", "size"]
   );
 
   const { baseClasses, styleOverrides } = useInputStyleConfig("Input", {
     get variant() {
-      return context?.variant() ?? styleConfigProps.variant;
+      return inputGroupContext?.variant() ?? styleConfigProps.variant;
     },
     get size() {
-      return context?.size() ?? styleConfigProps.size;
+      return inputGroupContext?.size() ?? styleConfigProps.size;
     },
     get styleConfigOverride() {
       return styleConfigProps.styleConfigOverride;
     },
     get unstyled() {
-      return context?.unstyled() ?? styleConfigProps.unstyled;
+      return inputGroupContext?.unstyled() ?? styleConfigProps.unstyled;
     },
   });
+
+  const isRequired = () => {
+    return local.isRequired ?? inputGroupContext?.isRequired() ?? formControlContext?.isRequired();
+  };
+
+  const isDisabled = () => {
+    return local.isDisabled ?? inputGroupContext?.isDisabled() ?? formControlContext?.isDisabled();
+  };
+
+  const isReadOnly = () => {
+    return local.isReadOnly ?? inputGroupContext?.isReadOnly() ?? formControlContext?.isReadOnly();
+  };
+
+  const isInvalid = () => {
+    return local.isInvalid ?? inputGroupContext?.isInvalid() ?? formControlContext?.isInvalid();
+  };
+
+  const ariaDescribedBy = () => {
+    return formControlContext?.mergeAriaDescribedBy(local["aria-describedby"]);
+  };
 
   return (
     <hope.input
       type="text"
-      required={local.isRequired ?? context?.isRequired()}
-      disabled={local.isDisabled ?? context?.isDisabled()}
-      readOnly={local.isReadOnly ?? context?.isReadOnly()}
-      aria-invalid={local.isInvalid ?? context?.isInvalid()}
+      id={local.id ?? formControlContext?.id()}
+      required={isRequired()}
+      disabled={isDisabled()}
+      readOnly={isReadOnly()}
+      aria-invalid={isInvalid()}
+      aria-describedby={ariaDescribedBy()}
       size={local.htmlSize}
-      class={clsx(context?.baseClasses().input, baseClasses().root, local.class)}
+      class={clsx(inputGroupContext?.baseClasses().input, baseClasses().root, local.class)}
       __css={{
-        ...context?.styleOverrides().input,
+        ...inputGroupContext?.styleOverrides().input,
         ...styleOverrides().root,
         ...local.__css,
       }}
