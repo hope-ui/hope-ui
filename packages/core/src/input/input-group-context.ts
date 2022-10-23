@@ -2,6 +2,7 @@ import { SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, createContext, Setter, useContext } from "solid-js";
 
 import { InputGroupParts, InputGroupStyleConfigProps } from "./input-group.styles";
+import { useFormControlContext } from "../form-control";
 
 export interface InputGroupContextValue {
   /** Whether the input is required. */
@@ -48,4 +49,16 @@ export const InputGroupContext = createContext<InputGroupContextValue>();
 
 export function useInputGroupContext() {
   return useContext(InputGroupContext);
+}
+
+export function useRequiredInputGroupContext() {
+  const context = useInputGroupContext();
+
+  if (!context) {
+    throw new Error(
+      "[hope-ui]: `useRequiredInputGroupContext` must be used within a `InputGroup` component"
+    );
+  }
+
+  return context;
 }

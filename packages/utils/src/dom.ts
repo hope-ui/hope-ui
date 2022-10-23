@@ -68,3 +68,17 @@ export function getScrollParent(node: Element | null): Element {
 export function isFrame(element: Element): element is HTMLIFrameElement {
   return element.tagName === "IFRAME";
 }
+
+/**
+ * Return an empty string (to apply the data attribute) if the condition is met, `undefined` otherwise.
+ */
+export function dataAttr(condition: boolean | undefined) {
+  return condition ? "" : undefined;
+}
+
+/**
+ * Return `true` (to apply the aria attribute) if the condition is met, `undefined` otherwise.
+ */
+export function ariaAttr(condition: boolean | undefined) {
+  return condition ? true : undefined;
+}

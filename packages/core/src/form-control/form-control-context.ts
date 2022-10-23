@@ -13,8 +13,8 @@ export interface FormControlContextValue {
   /** The `id` passed to the form control description. */
   descriptionId: Accessor<string>;
 
-  /** The `id` passed to the form control error message. */
-  errorMessageId: Accessor<string>;
+  /** The `id` passed to the form control error. */
+  errorId: Accessor<string>;
 
   /** Whether the form control is required. */
   isRequired: Accessor<boolean | undefined>;
@@ -43,11 +43,11 @@ export interface FormControlContextValue {
   /** Setter for whether the form control has a description. */
   setHasDescription: Setter<boolean>;
 
-  /** Whether the form control has an error message. */
-  hasErrorMessage: Accessor<boolean>;
+  /** Whether the form control has an error. */
+  hasError: Accessor<boolean>;
 
-  /** Setter for whether the form control has an error message. */
-  setHasErrorMessage: Setter<boolean>;
+  /** Setter for whether the form control has an error. */
+  setHasError: Setter<boolean>;
 
   /** Merge the form control `aria-describedby` ids with the element's own `aria-describedby` prop. */
   mergeAriaDescribedBy: (elementAriaDescribedBy?: string) => string | undefined;
@@ -57,4 +57,16 @@ export const FormControlContext = createContext<FormControlContextValue>();
 
 export function useFormControlContext() {
   return useContext(FormControlContext);
+}
+
+export function useRequiredFormControlContext() {
+  const context = useFormControlContext();
+
+  if (!context) {
+    throw new Error(
+      "[hope-ui]: `useRequiredFormControlContext` must be used within a `FormControl` component"
+    );
+  }
+
+  return context;
 }

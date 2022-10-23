@@ -6,15 +6,22 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-tests/src/it-renders-children.tsx
  */
 
-import { Component } from "solid-js";
+import { Component, ParentComponent } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render, screen } from "solid-testing-library";
 
-export function itRendersChildren<P>(Comp: Component<P>, requiredProps: P) {
+export function itRendersChildren<P>(
+  Comp: Component<P>,
+  requiredProps: P,
+  Wrapper: ParentComponent = props => <Fragment>{props.children}</Fragment>
+) {
   it("renders children", () => {
     render(() => (
-      <Comp {...requiredProps}>
-        <span data-testid="test-children">test children</span>
-      </Comp>
+      <Wrapper>
+        <Comp {...requiredProps}>
+          <span data-testid="test-children">test children</span>
+        </Comp>
+      </Wrapper>
     ));
 
     expect(screen.getByTestId("test-children")).toBeInTheDocument();

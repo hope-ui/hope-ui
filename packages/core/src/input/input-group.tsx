@@ -4,13 +4,14 @@ import {
   mergeThemeProps,
   STYLE_CONFIG_PROP_NAMES,
 } from "@hope-ui/styles";
+import { dataAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createSignal, splitProps } from "solid-js";
 
+import { useFormControlContext } from "../form-control";
 import { InputGroupStyleConfigProps, useInputGroupStyleConfig } from "./input-group.styles";
 import { InputGroupContext, InputGroupContextValue } from "./input-group-context";
 import { InputSharedProps } from "./types";
-import { useFormControlContext } from "../form-control";
 
 export interface InputGroupProps
   extends Omit<
@@ -81,10 +82,10 @@ export const InputGroup = createHopeComponent<"div", InputGroupProps>(props => {
   return (
     <InputGroupContext.Provider value={context}>
       <hope.div
-        data-required={context.isRequired() || undefined}
-        data-disabled={context.isDisabled() || undefined}
-        data-readonly={context.isReadOnly() || undefined}
-        data-invalid={context.isInvalid() || undefined}
+        data-required={dataAttr(context.isRequired())}
+        data-disabled={dataAttr(context.isDisabled())}
+        data-readonly={dataAttr(context.isReadOnly())}
+        data-invalid={dataAttr(context.isInvalid())}
         class={clsx(baseClasses().root, local.class)}
         __css={styleOverrides().root}
         {...others}

@@ -4,6 +4,7 @@ import {
   mergeThemeProps,
   STYLE_CONFIG_PROP_NAMES,
 } from "@hope-ui/styles";
+import { ariaAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
@@ -30,6 +31,9 @@ export const Input = createHopeComponent<"input", InputProps>(props => {
       "aria-describedby",
       "class",
       "__css",
+      "required",
+      "disabled",
+      "readonly",
       "isRequired",
       "isDisabled",
       "isReadOnly",
@@ -81,7 +85,7 @@ export const Input = createHopeComponent<"input", InputProps>(props => {
       required={isRequired()}
       disabled={isDisabled()}
       readOnly={isReadOnly()}
-      aria-invalid={isInvalid()}
+      aria-invalid={ariaAttr(isInvalid())}
       aria-describedby={ariaDescribedBy()}
       size={local.htmlSize}
       class={clsx(inputGroupContext?.baseClasses().input, baseClasses().root, local.class)}

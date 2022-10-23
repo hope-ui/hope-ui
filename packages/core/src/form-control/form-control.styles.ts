@@ -1,6 +1,6 @@
 import { createStyleConfig, StyleConfigProps, SystemStyleObject } from "@hope-ui/styles";
 
-export type FormControlParts = "root" | "label" | "description" | "errorMessage";
+export type FormControlParts = "root" | "label" | "description" | "error";
 
 interface FormControlVariants {
   /** Whether a required indicator (asterisk) should be shown when the form control is required. */
@@ -75,7 +75,7 @@ export const useFormControlStyleConfig = createStyleConfig<FormControlParts, For
         },
       },
     },
-    errorMessage: {
+    error: {
       baseStyle: {
         ...baseDescriptionStyles,
         color: {

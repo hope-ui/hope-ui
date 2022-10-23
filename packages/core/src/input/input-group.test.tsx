@@ -22,6 +22,7 @@ import {
 } from "@hope-ui/tests";
 import { render, screen } from "solid-testing-library";
 
+import { FormControl } from "../form-control";
 import { Input } from "./input";
 import { InputLeftAddon, InputRightAddon } from "./input-addon";
 import { InputGroup, InputGroupProps } from "./input-group";
@@ -82,6 +83,27 @@ describe("InputGroup", () => {
     expect(screen.getByText("right-addon")).toHaveAttribute("data-required");
   });
 
+  it("should forward the 'isRequired' prop from a form control", () => {
+    render(() => (
+      <FormControl isRequired>
+        <InputGroup data-testid="input-group">
+          <InputLeftAddon>left-addon</InputLeftAddon>
+          <InputLeftSection>left-section</InputLeftSection>
+          <Input data-testid="input" />
+          <InputRightSection>right-section</InputRightSection>
+          <InputRightAddon>right-addon</InputRightAddon>
+        </InputGroup>
+      </FormControl>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("required");
+    expect(screen.getByTestId("input-group")).toHaveAttribute("data-required");
+    expect(screen.getByText("left-addon")).toHaveAttribute("data-required");
+    expect(screen.getByText("left-section")).toHaveAttribute("data-required");
+    expect(screen.getByText("right-section")).toHaveAttribute("data-required");
+    expect(screen.getByText("right-addon")).toHaveAttribute("data-required");
+  });
+
   it("should forward the 'isDisabled' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isDisabled>
@@ -91,6 +113,27 @@ describe("InputGroup", () => {
         <InputRightSection>right-section</InputRightSection>
         <InputRightAddon>right-addon</InputRightAddon>
       </InputGroup>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("disabled");
+    expect(screen.getByTestId("input-group")).toHaveAttribute("data-disabled");
+    expect(screen.getByText("left-addon")).toHaveAttribute("data-disabled");
+    expect(screen.getByText("left-section")).toHaveAttribute("data-disabled");
+    expect(screen.getByText("right-section")).toHaveAttribute("data-disabled");
+    expect(screen.getByText("right-addon")).toHaveAttribute("data-disabled");
+  });
+
+  it("should forward the 'isDisabled' prop from a form control", () => {
+    render(() => (
+      <FormControl isDisabled>
+        <InputGroup data-testid="input-group">
+          <InputLeftAddon>left-addon</InputLeftAddon>
+          <InputLeftSection>left-section</InputLeftSection>
+          <Input data-testid="input" />
+          <InputRightSection>right-section</InputRightSection>
+          <InputRightAddon>right-addon</InputRightAddon>
+        </InputGroup>
+      </FormControl>
     ));
 
     expect(screen.getByTestId("input")).toHaveAttribute("disabled");
@@ -120,6 +163,27 @@ describe("InputGroup", () => {
     expect(screen.getByText("right-addon")).toHaveAttribute("data-readonly");
   });
 
+  it("should forward the 'isReadOnly' prop from a form control", () => {
+    render(() => (
+      <FormControl isReadOnly>
+        <InputGroup data-testid="input-group">
+          <InputLeftAddon>left-addon</InputLeftAddon>
+          <InputLeftSection>left-section</InputLeftSection>
+          <Input data-testid="input" />
+          <InputRightSection>right-section</InputRightSection>
+          <InputRightAddon>right-addon</InputRightAddon>
+        </InputGroup>
+      </FormControl>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("readonly");
+    expect(screen.getByTestId("input-group")).toHaveAttribute("data-readonly");
+    expect(screen.getByText("left-addon")).toHaveAttribute("data-readonly");
+    expect(screen.getByText("left-section")).toHaveAttribute("data-readonly");
+    expect(screen.getByText("right-section")).toHaveAttribute("data-readonly");
+    expect(screen.getByText("right-addon")).toHaveAttribute("data-readonly");
+  });
+
   it("should forward the 'isInvalid' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isInvalid>
@@ -129,6 +193,27 @@ describe("InputGroup", () => {
         <InputRightSection>right-section</InputRightSection>
         <InputRightAddon>right-addon</InputRightAddon>
       </InputGroup>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByTestId("input-group")).toHaveAttribute("data-invalid");
+    expect(screen.getByText("left-addon")).toHaveAttribute("data-invalid");
+    expect(screen.getByText("left-section")).toHaveAttribute("data-invalid");
+    expect(screen.getByText("right-section")).toHaveAttribute("data-invalid");
+    expect(screen.getByText("right-addon")).toHaveAttribute("data-invalid");
+  });
+
+  it("should forward the 'isInvalid' prop from a form control", () => {
+    render(() => (
+      <FormControl isInvalid>
+        <InputGroup data-testid="input-group">
+          <InputLeftAddon>left-addon</InputLeftAddon>
+          <InputLeftSection>left-section</InputLeftSection>
+          <Input data-testid="input" />
+          <InputRightSection>right-section</InputRightSection>
+          <InputRightAddon>right-addon</InputRightAddon>
+        </InputGroup>
+      </FormControl>
     ));
 
     expect(screen.getByTestId("input")).toHaveAttribute("aria-invalid", "true");

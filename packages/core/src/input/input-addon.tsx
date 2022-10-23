@@ -1,8 +1,9 @@
 import { createHopeComponent, hope } from "@hope-ui/styles";
+import { dataAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
 
-import { useInputGroupContext } from "./input-group-context";
+import { useRequiredInputGroupContext } from "./input-group-context";
 
 interface InputAddonProps {
   /** The placement of the addon outside the input. */
@@ -10,7 +11,7 @@ interface InputAddonProps {
 }
 
 const InputAddon = createHopeComponent<"div", InputAddonProps>(props => {
-  const context = useInputGroupContext();
+  const context = useRequiredInputGroupContext();
 
   const [local, others] = splitProps(props, ["class", "__css", "addonPlacement"]);
 
@@ -18,13 +19,13 @@ const InputAddon = createHopeComponent<"div", InputAddonProps>(props => {
     switch (local.addonPlacement) {
       case "left":
         return {
-          className: context?.baseClasses().leftAddon,
-          styleOverride: context?.styleOverrides().leftAddon,
+          className: context.baseClasses().leftAddon,
+          styleOverride: context.styleOverrides().leftAddon,
         };
       case "right":
         return {
-          className: context?.baseClasses().rightAddon,
-          styleOverride: context?.styleOverrides().rightAddon,
+          className: context.baseClasses().rightAddon,
+          styleOverride: context.styleOverrides().rightAddon,
         };
     }
   });
@@ -32,25 +33,25 @@ const InputAddon = createHopeComponent<"div", InputAddonProps>(props => {
   onMount(() => {
     switch (local.addonPlacement) {
       case "left":
-        context?.setHasLeftAddon(true);
-        onCleanup(() => context?.setHasLeftAddon(false));
+        context.setHasLeftAddon(true);
+        onCleanup(() => context.setHasLeftAddon(false));
         break;
       case "right":
-        context?.setHasRightAddon(true);
-        onCleanup(() => context?.setHasRightAddon(false));
+        context.setHasRightAddon(true);
+        onCleanup(() => context.setHasRightAddon(false));
         break;
     }
   });
 
   return (
     <hope.div
-      data-required={context?.isRequired() || undefined}
-      data-disabled={context?.isDisabled() || undefined}
-      data-readonly={context?.isReadOnly() || undefined}
-      data-invalid={context?.isInvalid() || undefined}
-      class={clsx(context?.baseClasses().addon, placementStyleConfig().className, local.class)}
+      data-required={dataAttr(context.isRequired())}
+      data-disabled={dataAttr(context.isDisabled())}
+      data-readonly={dataAttr(context.isReadOnly())}
+      data-invalid={dataAttr(context.isInvalid())}
+      class={clsx(context.baseClasses().addon, placementStyleConfig().className, local.class)}
       __css={{
-        ...context?.styleOverrides().addon,
+        ...context.styleOverrides().addon,
         ...placementStyleConfig().styleOverride,
         ...local.__css,
       }}

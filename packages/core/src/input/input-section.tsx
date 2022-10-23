@@ -1,8 +1,9 @@
 import { createHopeComponent, hope } from "@hope-ui/styles";
+import { dataAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
 
-import { useInputGroupContext } from "./input-group-context";
+import { useRequiredInputGroupContext } from "./input-group-context";
 
 interface InputSectionProps {
   /** The placement of the section inside the input. */
@@ -10,7 +11,7 @@ interface InputSectionProps {
 }
 
 const InputSection = createHopeComponent<"div", InputSectionProps>(props => {
-  const context = useInputGroupContext();
+  const context = useRequiredInputGroupContext();
 
   const [local, others] = splitProps(props, ["class", "__css", "sectionPlacement"]);
 
@@ -18,13 +19,13 @@ const InputSection = createHopeComponent<"div", InputSectionProps>(props => {
     switch (local.sectionPlacement) {
       case "left":
         return {
-          className: context?.baseClasses().leftSection,
-          styleOverride: context?.styleOverrides().leftSection,
+          className: context.baseClasses().leftSection,
+          styleOverride: context.styleOverrides().leftSection,
         };
       case "right":
         return {
-          className: context?.baseClasses().rightSection,
-          styleOverride: context?.styleOverrides().rightSection,
+          className: context.baseClasses().rightSection,
+          styleOverride: context.styleOverrides().rightSection,
         };
     }
   });
@@ -32,25 +33,25 @@ const InputSection = createHopeComponent<"div", InputSectionProps>(props => {
   onMount(() => {
     switch (local.sectionPlacement) {
       case "left":
-        context?.setHasLeftSection(true);
-        onCleanup(() => context?.setHasLeftSection(false));
+        context.setHasLeftSection(true);
+        onCleanup(() => context.setHasLeftSection(false));
         break;
       case "right":
-        context?.setHasRightSection(true);
-        onCleanup(() => context?.setHasRightSection(false));
+        context.setHasRightSection(true);
+        onCleanup(() => context.setHasRightSection(false));
         break;
     }
   });
 
   return (
     <hope.div
-      data-required={context?.isRequired() || undefined}
-      data-disabled={context?.isDisabled() || undefined}
-      data-readonly={context?.isReadOnly() || undefined}
-      data-invalid={context?.isInvalid() || undefined}
-      class={clsx(context?.baseClasses().section, placementStyleConfig().className, local.class)}
+      data-required={dataAttr(context.isRequired())}
+      data-disabled={dataAttr(context.isDisabled())}
+      data-readonly={dataAttr(context.isReadOnly())}
+      data-invalid={dataAttr(context.isInvalid())}
+      class={clsx(context.baseClasses().section, placementStyleConfig().className, local.class)}
       __css={{
-        ...context?.styleOverrides().section,
+        ...context.styleOverrides().section,
         ...placementStyleConfig().styleOverride,
         ...local.__css,
       }}

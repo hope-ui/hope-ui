@@ -6,10 +6,16 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-tests/src/it-is-polymorphic.tsx
  */
 
-import { Component } from "solid-js";
+import { Component, ParentComponent } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itIsPolymorphic<P>(Comp: Component<P>, requiredProps: P, selector?: string) {
+export function itIsPolymorphic<P>(
+  Comp: Component<P>,
+  requiredProps: P,
+  selector?: string,
+  Wrapper: ParentComponent = props => <Fragment>{props.children}</Fragment>
+) {
   it("is polymorphic", () => {
     const getTarget = (container: HTMLElement) => {
       return selector ? container.querySelector(selector) : (container.firstChild as HTMLElement);
@@ -20,11 +26,15 @@ export function itIsPolymorphic<P>(Comp: Component<P>, requiredProps: P, selecto
     };
 
     const { container: withTag } = render(() => (
-      <Comp as="a" href="https://hope-ui.com" {...requiredProps} />
+      <Wrapper>
+        <Comp as="a" href="https://hope-ui.com" {...requiredProps} />
+      </Wrapper>
     ));
 
     const { container: withComponent } = render(() => (
-      <Comp as={TestComponent} {...requiredProps} />
+      <Wrapper>
+        <Comp as={TestComponent} {...requiredProps} />
+      </Wrapper>
     ));
 
     expect(getTarget(withTag)?.tagName).toBe("A");

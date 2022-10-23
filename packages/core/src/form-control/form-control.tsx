@@ -5,6 +5,7 @@ import {
   mergeThemeProps,
   STYLE_CONFIG_PROP_NAMES,
 } from "@hope-ui/styles";
+import { dataAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { createSignal, createUniqueId, splitProps } from "solid-js";
 
@@ -46,7 +47,7 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
   );
 
   const [hasDescription, setHasDescription] = createSignal(false);
-  const [hasErrorMessage, setHasErrorMessage] = createSignal(false);
+  const [hasError, setHasError] = createSignal(false);
 
   const { baseClasses, styleOverrides } = useFormControlStyleConfig(
     "FormControl",
@@ -54,7 +55,7 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
   );
 
   const descriptionId = () => `${props.id!}-description`;
-  const errorMessageId = () => `${props.id!}-error-message`;
+  const errorId = () => `${props.id!}-error`;
 
   const isInvalid = () => props.isInvalid;
 
@@ -62,8 +63,8 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
     const ids = elementAriaDescribedBy ? [elementAriaDescribedBy] : [];
 
     // Error message must be described first in all scenarios.
-    if (hasErrorMessage() && isInvalid()) {
-      ids.push(errorMessageId());
+    if (hasError() && isInvalid()) {
+      ids.push(errorId());
     }
 
     if (hasDescription()) {
@@ -77,7 +78,7 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
     id: () => props.id!,
     labelId: () => `${props.id!}-label`,
     descriptionId,
-    errorMessageId,
+    errorId,
     isRequired: () => props.isRequired,
     isDisabled: () => props.isDisabled,
     isReadOnly: () => props.isReadOnly,
@@ -87,8 +88,8 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
     styleOverrides,
     hasDescription,
     setHasDescription,
-    hasErrorMessage,
-    setHasErrorMessage,
+    hasError,
+    setHasError,
     mergeAriaDescribedBy,
   };
 
@@ -96,10 +97,10 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
     <FormControlContext.Provider value={context}>
       <hope.div
         role="group"
-        data-required={context.isRequired() || undefined}
-        data-disabled={context.isDisabled() || undefined}
-        data-readonly={context.isReadOnly() || undefined}
-        data-invalid={context.isInvalid() || undefined}
+        data-required={dataAttr(context.isRequired())}
+        data-disabled={dataAttr(context.isDisabled())}
+        data-readonly={dataAttr(context.isReadOnly())}
+        data-invalid={dataAttr(context.isInvalid())}
         class={clsx(baseClasses().root, local.class)}
         __css={styleOverrides().root}
         {...others}

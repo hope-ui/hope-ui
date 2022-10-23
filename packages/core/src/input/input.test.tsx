@@ -13,7 +13,6 @@
  */
 
 import {
-  checkAccessibility,
   itHasSemanticClass,
   itIsPolymorphic,
   itRendersChildren,
@@ -23,18 +22,17 @@ import {
 } from "@hope-ui/tests";
 import { render, screen } from "solid-testing-library";
 
+import {
+  FormControl,
+  FormControlDescription,
+  FormControlError,
+  FormControlLabel,
+} from "../form-control";
 import { Input, InputProps } from "./input";
 
 const defaultProps: InputProps = {};
 
 describe("Input", () => {
-  /*
-  checkAccessibility([
-    <Input aria-label="test-input" />,
-    <Input placeholder="test-input" />,
-    <Input placeholder="test-input" isInvalid />,
-  ]);
-  */
   itIsPolymorphic(Input as any, defaultProps);
   itRendersChildren(Input as any, defaultProps);
   itSupportsClass(Input as any, defaultProps);
@@ -52,8 +50,28 @@ describe("Input", () => {
     expect(screen.getByTestId("input")).toHaveAttribute("required");
   });
 
+  it("supports setting 'required' attribute from a form control 'isRequired' prop", () => {
+    render(() => (
+      <FormControl isRequired>
+        <Input data-testid="input" />
+      </FormControl>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("required");
+  });
+
   it("supports setting 'disabled' attribute with the 'isDisabled' prop", () => {
     render(() => <Input data-testid="input" isDisabled />);
+    expect(screen.getByTestId("input")).toHaveAttribute("disabled");
+  });
+
+  it("supports setting 'disabled' attribute from a form control 'isDisabled' prop", () => {
+    render(() => (
+      <FormControl isDisabled>
+        <Input data-testid="input" />
+      </FormControl>
+    ));
+
     expect(screen.getByTestId("input")).toHaveAttribute("disabled");
   });
 
@@ -62,8 +80,47 @@ describe("Input", () => {
     expect(screen.getByTestId("input")).toHaveAttribute("readonly");
   });
 
+  it("supports setting 'readonly' attribute from a form control 'isReadOnly' prop", () => {
+    render(() => (
+      <FormControl isReadOnly>
+        <Input data-testid="input" />
+      </FormControl>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("readonly");
+  });
+
   it("supports setting invalid state with the 'isInvalid' prop", () => {
     render(() => <Input data-testid="input" isInvalid />);
     expect(screen.getByTestId("input")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("supports setting invalid state from a form control 'isInvalid' prop", () => {
+    render(() => (
+      <FormControl isInvalid>
+        <Input data-testid="input" />
+      </FormControl>
+    ));
+
+    expect(screen.getByTestId("input")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("merge 'aria-describedby' from a form control in correct order", () => {
+    render(() => (
+      <FormControl isInvalid>
+        <FormControlLabel>label</FormControlLabel>
+        <Input data-testid="input" aria-describedby="test" />
+        <FormControlDescription>description</FormControlDescription>
+        <FormControlError>error</FormControlError>
+      </FormControl>
+    ));
+
+    const descriptionId = screen.getByText("description")!.id;
+    const errorId = screen.getByText("error")!.id;
+
+    expect(screen.getByTestId("input")).toHaveAttribute(
+      "aria-describedby",
+      `test ${errorId} ${descriptionId}`
+    );
   });
 });

@@ -6,19 +6,25 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-tests/src/it-supports-ref.tsx
  */
 
-import { Component } from "solid-js";
+import { Component, ParentComponent } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
 export function itSupportsRef<P>(
   Comp: Component<P>,
   requiredProps: P,
   refType: any,
-  refProp = "ref"
+  refProp = "ref",
+  Wrapper: ParentComponent = props => <Fragment>{props.children}</Fragment>
 ) {
   it(refProp ? `supports getting ref with ${refProp} prop` : "supports ref", async () => {
     let ref: typeof refType;
 
-    render(() => <Comp {...requiredProps} ref={ref} />);
+    render(() => (
+      <Wrapper>
+        <Comp {...requiredProps} ref={ref} />
+      </Wrapper>
+    ));
 
     await Promise.resolve();
 

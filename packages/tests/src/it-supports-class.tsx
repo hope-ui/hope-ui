@@ -6,12 +6,21 @@
  * https://github.com/mantinedev/mantine/blob/master/src/mantine-tests/src/it-supports-classname.tsx
  */
 
-import { Component } from "solid-js";
+import { Component, ParentComponent } from "solid-js";
+import { Fragment } from "solid-js/h/jsx-runtime";
 import { render } from "solid-testing-library";
 
-export function itSupportsClass<P>(Comp: Component<P>, requiredProps: P) {
+export function itSupportsClass<P>(
+  Comp: Component<P>,
+  requiredProps: P,
+  Wrapper: ParentComponent = props => <Fragment>{props.children}</Fragment>
+) {
   it("supports class prop", () => {
-    const { container } = render(() => <Comp {...requiredProps} class="test-class-name" />);
+    const { container } = render(() => (
+      <Wrapper>
+        <Comp {...requiredProps} class="test-class-name" />
+      </Wrapper>
+    ));
 
     expect(container.querySelector(".test-class-name")).toBeInTheDocument();
   });

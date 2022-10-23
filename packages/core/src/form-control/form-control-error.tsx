@@ -1,28 +1,30 @@
 import { createHopeComponent, hope } from "@hope-ui/styles";
 import { dataAttr } from "@hope-ui/utils";
 import { clsx } from "clsx";
-import { splitProps } from "solid-js";
+import { onCleanup, onMount, splitProps } from "solid-js";
 
 import { useRequiredFormControlContext } from "./form-control-context";
 
-export const FormControlLabel = createHopeComponent<"label">(props => {
+export const FormControlError = createHopeComponent<"div">(props => {
   const context = useRequiredFormControlContext();
 
-  const [local, others] = splitProps(props, ["id", "for", "class", "__css"]);
+  const [local, others] = splitProps(props, ["id", "class", "__css"]);
 
-  const id = () => local.id ?? context.labelId();
-  const htmlFor = () => local.for ?? context.id();
+  const id = () => local.id ?? context.errorId();
+
+  onMount(() => context.setHasError(true));
+  onCleanup(() => context.setHasError(false));
 
   return (
-    <hope.label
+    <hope.div
+      aria-live="polite"
       id={id()}
-      for={htmlFor()}
       data-required={dataAttr(context.isRequired())}
       data-disabled={dataAttr(context.isDisabled())}
       data-readonly={dataAttr(context.isReadOnly())}
       data-invalid={dataAttr(context.isInvalid())}
-      class={clsx(context.baseClasses().label, local.class)}
-      __css={{ ...context.styleOverrides().label, ...local.__css }}
+      class={clsx(context.baseClasses().error, local.class)}
+      __css={{ ...context.styleOverrides().error, ...local.__css }}
       {...others}
     />
   );
