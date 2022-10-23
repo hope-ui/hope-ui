@@ -24,11 +24,8 @@ import { getTransitionStyles, TransitionPhase } from "./get-transition-styles";
 import { HopeTransition } from "./types";
 
 export interface TransitionOptions {
-  /** Whether the component should be mounted. */
-  shouldMount: MaybeAccessor<boolean>;
-
   /** Predefined transition name or transition styles. */
-  transition: HopeTransition;
+  transition?: HopeTransition;
 
   /** Transitions duration (in ms). */
   duration?: number;
@@ -61,8 +58,6 @@ export interface TransitionOptions {
   onAfterExit?: () => void;
 }
 
-export type TransitionOptionsOverride = Partial<Omit<TransitionOptions, "shouldMount">>;
-
 export interface TransitionResult {
   /** Whether the element should be kept in the DOM. */
   keepMounted: Accessor<boolean>;
@@ -78,21 +73,28 @@ const DEFAULT_EASING: JSX.CSSProperties["transition-timing-function"] = "ease";
 /**
  * Primitive for working with enter/exit transitions.
  * It comes with pre-made transitions and option to create custom ones.
+ *
+ * @param shouldMount Whether the component should be mounted.
+ * @param options The transition options.
  */
-export function createTransition(options: TransitionOptions): TransitionResult {
+export function createTransition(
+  shouldMount: MaybeAccessor<boolean>,
+  options: MaybeAccessor<TransitionOptions>
+): TransitionResult {
   options = mergeProps(
     {
+      transition: "fade",
       duration: DEFAULT_DURATION,
       delay: DEFAULT_DELAY,
       easing: DEFAULT_EASING,
       get exitDuration() {
-        return options.duration || DEFAULT_DURATION;
+        return access(options).duration || DEFAULT_DURATION;
       },
       get exitDelay() {
-        return options.delay || DEFAULT_DELAY;
+        return access(options).delay || DEFAULT_DELAY;
       },
       get exitEasing() {
-        return options.easing || DEFAULT_EASING;
+        return access(options).easing || DEFAULT_EASING;
       },
     } as TransitionOptions,
     options
@@ -100,29 +102,29 @@ export function createTransition(options: TransitionOptions): TransitionResult {
 
   const reduceMotion = createReducedMotion();
 
-  const [duration, setDuration] = createSignal(reduceMotion() ? 0 : options.duration!);
+  const [duration, setDuration] = createSignal(reduceMotion() ? 0 : access(options).duration!);
 
   const [phase, setPhase] = createSignal<TransitionPhase>(
-    access(options.shouldMount) ? "afterEnter" : "afterExit"
+    access(shouldMount) ? "afterEnter" : "afterExit"
   );
 
-  const [easing, setEasing] = createSignal(options.easing!);
+  const [easing, setEasing] = createSignal(access(options).easing!);
 
   let timeoutId = -1;
 
   const handleStateChange = (shouldMount: boolean) => {
-    const preHandler = shouldMount ? options.onBeforeEnter : options.onBeforeExit;
-    const postHandler = shouldMount ? options.onAfterEnter : options.onAfterExit;
+    const preHandler = shouldMount ? access(options).onBeforeEnter : access(options).onBeforeExit;
+    const postHandler = shouldMount ? access(options).onAfterEnter : access(options).onAfterExit;
 
     setPhase(shouldMount ? "beforeEnter" : "beforeExit");
 
     window.clearTimeout(timeoutId);
 
     const newDuration = setDuration(
-      reduceMotion() ? 0 : shouldMount ? options.duration! : options.exitDuration!
+      reduceMotion() ? 0 : shouldMount ? access(options).duration! : access(options).exitDuration!
     );
 
-    setEasing(shouldMount ? options.easing! : options.exitEasing!);
+    setEasing(shouldMount ? access(options).easing! : access(options).exitEasing!);
 
     if (newDuration === 0) {
       preHandler?.();
@@ -131,7 +133,11 @@ export function createTransition(options: TransitionOptions): TransitionResult {
       return;
     }
 
-    const delay = reduceMotion() ? 0 : shouldMount ? options.delay! : options.exitDelay!;
+    const delay = reduceMotion()
+      ? 0
+      : shouldMount
+      ? access(options).delay!
+      : access(options).exitDelay!;
 
     const preStateTimeoutId = window.setTimeout(() => {
       preHandler?.();
@@ -147,7 +153,7 @@ export function createTransition(options: TransitionOptions): TransitionResult {
 
   const style = createMemo(() =>
     getTransitionStyles({
-      transition: options.transition,
+      transition: access(options).transition!,
       duration: duration(),
       phase: phase(),
       easing: easing(),
@@ -158,7 +164,7 @@ export function createTransition(options: TransitionOptions): TransitionResult {
 
   createEffect(
     on(
-      () => access(options.shouldMount),
+      () => access(shouldMount),
       shouldMount => handleStateChange(shouldMount),
       { defer: true }
     )

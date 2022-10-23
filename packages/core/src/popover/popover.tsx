@@ -32,6 +32,7 @@ import { usePopoverStyleConfig } from "./popover.styles";
 import { PopoverContext } from "./popover-context";
 import { BasePlacement, PopoverContextValue, PopoverProps } from "./types";
 import { getAnchorElement } from "./utils";
+import { mergeDefaultProps } from "../utils";
 
 /**
  * Popover provides context, theming, and accessibility properties
@@ -80,44 +81,18 @@ export function Popover(props: PopoverProps) {
     onOpenChange: value => props.onOpenChange?.(value),
   });
 
-  const popoverTransition = createTransition({
-    get shouldMount() {
-      return disclosureState.isOpen();
-    },
-    get transition() {
-      return props.transitionOptions?.transition ?? "pop";
-    },
-    get duration() {
-      return props.transitionOptions?.duration;
-    },
-    get exitDuration() {
-      return props.transitionOptions?.exitDuration;
-    },
-    get delay() {
-      return props.transitionOptions?.delay;
-    },
-    get exitDelay() {
-      return props.transitionOptions?.exitDelay;
-    },
-    get easing() {
-      return props.transitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.transitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.transitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.transitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.transitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.transitionOptions?.onAfterExit;
-    },
-  });
+  const popoverTransition = createTransition(
+    () => disclosureState.isOpen(),
+    () =>
+      mergeDefaultProps(
+        {
+          transition: "pop",
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        },
+        props.transitionOptions ?? {}
+      )
+  );
 
   const getPopoverElements = () => {
     // Popover anchor is `PopoverAnchor` or `PopoverTrigger` or a virtual element.

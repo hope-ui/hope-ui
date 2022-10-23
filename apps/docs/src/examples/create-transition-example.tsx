@@ -14,8 +14,7 @@ import { createSignal, For, Show } from "solid-js";
 export function BasicExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style } = createTransition({
-    shouldMount: show,
+  const { style } = createTransition(show, {
     transition: "fade",
     duration: 400,
     easing: "ease",
@@ -64,8 +63,7 @@ export function PredefinedTransitionsExample() {
 export function CustomTransitionExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style } = createTransition({
-    shouldMount: show,
+  const { style } = createTransition(show, {
     transition: {
       in: { opacity: 1, transform: "scaleY(1)" },
       out: { opacity: 0, transform: "scaleY(0)" },
@@ -88,8 +86,7 @@ export function CustomTransitionExample() {
 export function UnmountOnExitExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style, keepMounted } = createTransition({
-    shouldMount: show,
+  const { style, keepMounted } = createTransition(show, {
     transition: "fade",
     duration: 400,
     easing: "ease",

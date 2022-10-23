@@ -6,15 +6,16 @@
  * https://github.com/chakra-ui/chakra-ui/blob/d945b9a7da3056017cda0cdd552af40fa1426070/packages/components/modal/src/use-modal.ts
  */
 
-import { createTransition } from "@hope-ui/primitives";
+import { createTransition, TransitionOptions } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
-import { createUniqueId, Show, splitProps } from "solid-js";
+import { Accessor, createMemo, createUniqueId, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { createModal } from "./create-modal";
 import { useModalStyleConfig } from "./modal.styles";
 import { ModalContext } from "./modal-context";
 import { ModalContextValue, ModalProps } from "./types";
+import { mergeDefaultProps } from "../utils";
 
 /**
  * Modal provides context, theming, and accessibility properties
@@ -59,44 +60,22 @@ export function Modal(props: ModalProps) {
     onCloseButtonClick,
   } = createModal(props);
 
-  const contentTransition = createTransition({
-    get shouldMount() {
-      return props.isOpen;
-    },
-    get transition() {
-      return props.contentTransitionOptions?.transition ?? "pop";
-    },
-    get duration() {
-      return props.contentTransitionOptions?.duration ?? 300;
-    },
-    get exitDuration() {
-      return props.contentTransitionOptions?.exitDuration ?? 200;
-    },
-    get delay() {
-      return props.contentTransitionOptions?.delay ?? 100;
-    },
-    get exitDelay() {
-      return props.contentTransitionOptions?.exitDelay ?? 0;
-    },
-    get easing() {
-      return props.contentTransitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.contentTransitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.contentTransitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.contentTransitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.contentTransitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.contentTransitionOptions?.onAfterExit;
-    },
-  });
+  const contentTransition = createTransition(
+    () => props.isOpen,
+    () =>
+      mergeDefaultProps(
+        {
+          transition: "pop",
+          duration: 300,
+          exitDuration: 200,
+          delay: 100,
+          exitDelay: 0,
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        },
+        props.contentTransitionOptions ?? {}
+      )
+  );
 
   const context: ModalContextValue = {
     baseClasses,

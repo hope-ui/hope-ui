@@ -12,6 +12,7 @@ import { createUniqueId, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { createModal } from "../modal/create-modal";
+import { mergeDefaultProps } from "../utils";
 import { useDrawerStyleConfig } from "./drawer.styles";
 import { DrawerContext } from "./drawer-context";
 import { DRAWER_TRANSITION } from "./drawer-transition";
@@ -54,44 +55,22 @@ export function Drawer(props: DrawerProps) {
     onCloseButtonClick,
   } = createModal(props);
 
-  const contentTransition = createTransition({
-    get shouldMount() {
-      return props.isOpen;
-    },
-    get transition() {
-      return props.contentTransitionOptions?.transition ?? DRAWER_TRANSITION[props.placement!];
-    },
-    get duration() {
-      return props.contentTransitionOptions?.duration ?? 300;
-    },
-    get exitDuration() {
-      return props.contentTransitionOptions?.exitDuration ?? 200;
-    },
-    get delay() {
-      return props.contentTransitionOptions?.delay ?? 100;
-    },
-    get exitDelay() {
-      return props.contentTransitionOptions?.exitDelay ?? 0;
-    },
-    get easing() {
-      return props.contentTransitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.contentTransitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.contentTransitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.contentTransitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.contentTransitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.contentTransitionOptions?.onAfterExit;
-    },
-  });
+  const contentTransition = createTransition(
+    () => props.isOpen,
+    () =>
+      mergeDefaultProps(
+        {
+          transition: DRAWER_TRANSITION[props.placement!],
+          duration: 300,
+          exitDuration: 200,
+          delay: 100,
+          exitDelay: 0,
+          easing: "ease-out",
+          exitEasing: "ease-in",
+        },
+        props.contentTransitionOptions ?? {}
+      )
+  );
 
   const context: DrawerContextValue = {
     baseClasses,

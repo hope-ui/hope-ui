@@ -19,7 +19,10 @@ import { createTransition } from "@hope-ui/core";
 
 ## Usage
 
-The `createTransition` primitive allow you to work with enter/exit transitions. It comes with predefined transitions and option to create your own based on CSS properties.
+The `createTransition` primitive allow you to work with enter/exit transitions. It takes two parameters :
+
+- A `boolean | Accessor<boolean>` used to decide whether the component should be mounted.
+- A `TransitionOptions` object used to customize the transition.
 
 <Preview>
   <BasicExample />
@@ -29,8 +32,7 @@ The `createTransition` primitive allow you to work with enter/exit transitions. 
 function BasicExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style } = createTransition({
-    shouldMount: show,
+  const { style } = createTransition(show, {
     transition: "fade",
     duration: 400,
     easing: "ease",
@@ -71,8 +73,7 @@ Instead of using a predefined transition name, you can create your own transitio
 function CustomTransitionExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style } = createTransition({
-    shouldMount: show,
+  const { style } = createTransition(show, {
     transition: {
       in: { opacity: 1, transform: "scaleY(1)" },
       out: { opacity: 0, transform: "scaleY(0)" },
@@ -105,8 +106,7 @@ The `createTransition` primitive exposes a `keepMounted` accessor which is `true
 function UnmountOnExitExample() {
   const [show, setShow] = createSignal(false);
 
-  const { style, keepMounted } = createTransition({
-    shouldMount: show,
+  const { style, keepMounted } = createTransition(show, {
     transition: "fade",
     duration: 400,
     easing: "ease",
@@ -127,17 +127,18 @@ function UnmountOnExitExample() {
 
 ## Props
 
-| Name                                               | Type                                              | Description                                                  | Default value |
-| -------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ | ------------- |
-| <RequiredIndicator>shouldMount</RequiredIndicator> | `boolean \| Accessor<boolean>`                    | Whether the component should be mounted.                     |               |
-| <RequiredIndicator>transition</RequiredIndicator>  | `HopeTransition`                                  | Predefined transition name or transition styles.             |               |
-| duration                                           | `number`                                          | Transitions duration (in ms).                                | 250           |
-| exitDuration                                       | `number`                                          | Exit transition duration (in ms).                            | 250           |
-| delay                                              | `number`                                          | Delay before starting transitions (in ms).                   | 10            |
-| exitDelay                                          | `number`                                          | Delay before starting the exit transition (in ms).           | 10            |
-| easing                                             | `JSX.CSSProperties["transition-timing-function"]` | Transitions timing function.                                 | ease          |
-| exitEasing                                         | `JSX.CSSProperties["transition-timing-function"]` | Exit transition timing function.                             | ease          |
-| onBeforeEnter                                      | `() => void`                                      | A function that will be called when enter transition starts. |               |
-| onAfterEnter                                       | `() => void`                                      | A function that will be called when enter transition ends.   |               |
-| onBeforeExit                                       | `() => void`                                      | A function that will be called when exit transition starts.  |               |
-| onAfterExit                                        | `() => void`                                      | A function that will be called when exit transition ends.    |               |
+Below are the properties available on the `TransitionOptions` type.
+
+| Name          | Type                                              | Description                                                  | Default value |
+| ------------- | ------------------------------------------------- | ------------------------------------------------------------ | ------------- |
+| transition    | `HopeTransition`                                  | Predefined transition name or transition styles.             | fade          |
+| duration      | `number`                                          | Transitions duration (in ms).                                | 250           |
+| exitDuration  | `number`                                          | Exit transition duration (in ms).                            | 250           |
+| delay         | `number`                                          | Delay before starting transitions (in ms).                   | 10            |
+| exitDelay     | `number`                                          | Delay before starting the exit transition (in ms).           | 10            |
+| easing        | `JSX.CSSProperties["transition-timing-function"]` | Transitions timing function.                                 | ease          |
+| exitEasing    | `JSX.CSSProperties["transition-timing-function"]` | Exit transition timing function.                             | ease          |
+| onBeforeEnter | `() => void`                                      | A function that will be called when enter transition starts. |               |
+| onAfterEnter  | `() => void`                                      | A function that will be called when enter transition ends.   |               |
+| onBeforeExit  | `() => void`                                      | A function that will be called when exit transition starts.  |               |
+| onAfterExit   | `() => void`                                      | A function that will be called when exit transition ends.    |               |

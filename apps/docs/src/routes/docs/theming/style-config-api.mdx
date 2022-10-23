@@ -248,7 +248,7 @@ export const Alert = createHopeComponent<"div", AlertStyleConfigProps>(props => 
 
 ### Providing style config to descendants
 
-We need a way to access the `baseClasses` and `styleOverrides` in `AlertTitle` and `AlertDescription` components. The easiest way to do that is by using a _context_.
+We need a way to access the `baseClasses` and `styleOverrides` in `AlertTitle` and `AlertDescription` components. The easiest way to do that is to use a _context_.
 
 ```tsx {8-17,29,33}
 // alert.tsx

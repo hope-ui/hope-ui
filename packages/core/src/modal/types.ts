@@ -1,4 +1,4 @@
-import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
+import { TransitionOptions, TransitionResult } from "@hope-ui/primitives";
 import { ComponentTheme, HopeProps, SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, JSX, ParentProps, Setter } from "solid-js";
 
@@ -15,10 +15,10 @@ export interface BaseModalProps {
   id?: string;
 
   /** Options passed to the modal content transition. */
-  contentTransitionOptions?: TransitionOptionsOverride;
+  contentTransitionOptions?: TransitionOptions;
 
   /** Options passed to the overlay transition. */
-  overlayTransitionOptions?: TransitionOptionsOverride;
+  overlayTransitionOptions?: TransitionOptions;
 
   /** Whether the modal should close when the overlay is clicked. */
   closeOnOverlayClick?: boolean;

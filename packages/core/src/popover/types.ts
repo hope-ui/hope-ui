@@ -1,5 +1,5 @@
 import type { Placement as FloatingPlacement } from "@floating-ui/dom";
-import { TransitionOptionsOverride, TransitionResult } from "@hope-ui/primitives";
+import { TransitionOptions, TransitionResult } from "@hope-ui/primitives";
 import { ComponentTheme, HopeProps, SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, JSX, Setter } from "solid-js";
 
@@ -41,7 +41,7 @@ export interface PopoverProps extends Omit<PopoverStyleConfigProps, keyof HopePr
   id?: string;
 
   /** Options passed to the popover transition. */
-  transitionOptions?: TransitionOptionsOverride;
+  transitionOptions?: TransitionOptions;
 
   /**
    * Function that returns the anchor element's DOMRect. If this is explicitly

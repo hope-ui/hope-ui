@@ -1,50 +1,30 @@
-import { createPreventScroll, createTransition } from "@hope-ui/primitives";
-import { createSignal, JSX } from "solid-js";
+import { createPreventScroll, createTransition, TransitionOptions } from "@hope-ui/primitives";
+import { createMemo, createSignal, JSX } from "solid-js";
 
+import { mergeDefaultProps } from "../utils";
 import { BaseModalProps } from "./types";
+
+const DEFAULT_OVERLAY_TRANSITION_OPTIONS: TransitionOptions = {
+  transition: "fade",
+  duration: 300,
+  exitDuration: 200,
+  easing: "ease-out",
+  exitEasing: "ease-in",
+};
 
 export function createModal(props: BaseModalProps) {
   const [headingId, setHeadingId] = createSignal<string>();
   const [descriptionId, setDescriptionId] = createSignal<string>();
 
-  const overlayTransition = createTransition({
-    get shouldMount() {
-      return props.isOpen;
-    },
-    get transition() {
-      return props.overlayTransitionOptions?.transition ?? "fade";
-    },
-    get duration() {
-      return props.overlayTransitionOptions?.duration ?? 300;
-    },
-    get exitDuration() {
-      return props.overlayTransitionOptions?.exitDuration ?? 200;
-    },
-    get delay() {
-      return props.overlayTransitionOptions?.delay;
-    },
-    get exitDelay() {
-      return props.overlayTransitionOptions?.exitDelay;
-    },
-    get easing() {
-      return props.overlayTransitionOptions?.easing ?? "ease-out";
-    },
-    get exitEasing() {
-      return props.overlayTransitionOptions?.exitEasing ?? "ease-in";
-    },
-    get onBeforeEnter() {
-      return props.overlayTransitionOptions?.onBeforeEnter;
-    },
-    get onAfterEnter() {
-      return props.overlayTransitionOptions?.onAfterEnter;
-    },
-    get onBeforeExit() {
-      return props.overlayTransitionOptions?.onBeforeExit;
-    },
-    get onAfterExit() {
-      return props.overlayTransitionOptions?.onAfterExit;
-    },
+  const overlayTransitionOptions = createMemo(() => {
+    if (!props.overlayTransitionOptions) {
+      return DEFAULT_OVERLAY_TRANSITION_OPTIONS;
+    }
+
+    return mergeDefaultProps(DEFAULT_OVERLAY_TRANSITION_OPTIONS, props.overlayTransitionOptions);
   });
+
+  const overlayTransition = createTransition(() => props.isOpen, overlayTransitionOptions);
 
   let mouseDownTarget: EventTarget | undefined;
 
