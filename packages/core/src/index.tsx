@@ -19,6 +19,7 @@ export * from "./divider";
 export * from "./drawer";
 export * from "./flex";
 export * from "./focus-trap";
+export * from "./form-control";
 export * from "./grid";
 export * from "./heading";
 export * from "./icon";

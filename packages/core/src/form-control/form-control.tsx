@@ -28,7 +28,7 @@ export interface FormControlProps extends FormControlStyleConfigProps {
   isInvalid?: boolean;
 }
 
-export type FormControlTheme = ComponentTheme<FormControlProps>;
+export type FormControlTheme = ComponentTheme<FormControlProps, "withRequiredIndicator">;
 
 export const FormControl = createHopeComponent<"div", FormControlProps>(props => {
   props = mergeThemeProps(
@@ -42,7 +42,7 @@ export const FormControl = createHopeComponent<"div", FormControlProps>(props =>
   const [local, styleConfigProps, others] = splitProps(
     props,
     ["id", "class", "isRequired", "isDisabled", "isReadOnly", "isInvalid"],
-    [...STYLE_CONFIG_PROP_NAMES]
+    [...STYLE_CONFIG_PROP_NAMES, "withRequiredIndicator"]
   );
 
   const [hasDescription, setHasDescription] = createSignal(false);

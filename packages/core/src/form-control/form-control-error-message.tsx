@@ -15,18 +15,16 @@ export const FormControlErrorMessage = createHopeComponent<"div">(props => {
   onCleanup(() => context?.setHasErrorMessage(false));
 
   return (
-    <Show when={context?.isInvalid()}>
-      <hope.div
-        aria-live="polite"
-        id={id()}
-        data-required={context?.isRequired() || undefined}
-        data-disabled={context?.isDisabled() || undefined}
-        data-readonly={context?.isReadOnly() || undefined}
-        data-invalid={context?.isInvalid() || undefined}
-        class={clsx(context?.baseClasses().errorMessage, local.class)}
-        __css={{ ...context?.styleOverrides().errorMessage, ...local.__css }}
-        {...others}
-      />
-    </Show>
+    <hope.div
+      aria-live="polite"
+      id={id()}
+      data-required={context?.isRequired() || undefined}
+      data-disabled={context?.isDisabled() || undefined}
+      data-readonly={context?.isReadOnly() || undefined}
+      data-invalid={context?.isInvalid() || undefined}
+      class={clsx(context?.baseClasses().errorMessage, local.class)}
+      __css={{ ...context?.styleOverrides().errorMessage, ...local.__css }}
+      {...others}
+    />
   );
 });

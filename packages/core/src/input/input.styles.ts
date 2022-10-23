@@ -96,7 +96,7 @@ export const useInputStyleConfig = createStyleConfig<InputParts, InputVariants>(
         "&[aria-invalid=true]": {
           borderColor: {
             light: "danger.400",
-            dark: "danger.700",
+            dark: "danger.600",
           },
         },
 
