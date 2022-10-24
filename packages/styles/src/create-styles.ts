@@ -12,13 +12,7 @@ import { Accessor, createMemo } from "solid-js";
 
 import { computeStyle } from "./styled-system/compute-style";
 import { useTheme } from "./theme";
-import {
-  BooleanMap,
-  SystemStyleObject,
-  Theme,
-  ThemeVarsAndBreakpoints,
-  UseStyleConfigFn,
-} from "./types";
+import { BooleanMap, SystemStyleObject, Theme, ThemeVarsAndBreakpoints } from "./types";
 import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 type HopeVariantDefinitions = Record<string, SystemStyleObject>;
@@ -69,7 +63,7 @@ export type HopeStyleResult<Variants extends HopeVariantGroups> = {
 };
 
 type UseStylesFn<Variants extends HopeVariantGroups> = (
-  variantProps: HopeVariantSelection<Variants>
+  variantProps?: HopeVariantSelection<Variants>
 ) => Accessor<string>;
 
 /** Extract the variant props type of `useStyles` primitive. */
@@ -145,7 +139,7 @@ export function createStyles<Variants extends HopeVariantGroups = {}>(
     styleResult = computeStyleOptions(styleOptions, theme);
   });
 
-  return function useStyles(variantProps: HopeVariantSelection<Variants>) {
+  return function useStyles(variantProps: HopeVariantSelection<Variants> = {}) {
     const theme = useTheme();
 
     // generate classNames once.

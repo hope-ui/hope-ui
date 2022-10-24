@@ -46,6 +46,10 @@ export const NAV_SECTIONS: NavSection[] = [
         href: "/docs/styles/sx-prop",
       },
       {
+        title: "createStyles",
+        href: "/docs/styles/create-styles",
+      },
+      {
         title: "Responsive styles",
         href: "/docs/styles/responsive-styles",
       },
