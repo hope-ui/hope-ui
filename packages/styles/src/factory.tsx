@@ -25,23 +25,22 @@ import { createMemo, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { createHopeComponent, HopeComponent } from "./create-hope-component";
+import {
+  computeStyleOptions,
+  getSelectedVariantClassNames,
+  HopeStyleOptions,
+  HopeStyleOptionsInterpolation,
+  HopeStyleResult,
+  HopeVariantGroups,
+  HopeVariantSelection,
+} from "./create-styles";
 import { css } from "./stitches.config";
-import { computeStyle } from "./styled-system/compute-style";
 import { extractStyleProps } from "./styled-system/extract-style-props";
 import { toCSSObject } from "./styled-system/to-css-object";
 import { useTheme } from "./theme";
-import {
-  BooleanMap,
-  HopeProps,
-  PolymorphicProps,
-  SxProp,
-  SystemStyleObject,
-  Theme,
-  ThemeVarsAndBreakpoints,
-} from "./types";
+import { HopeProps, PolymorphicProps, SxProp, Theme } from "./types";
 import { pack } from "./utils";
 import { getNativeHTMLProps, prefixedHTMLPropsMap } from "./utils/prefixed-html-props";
-import { shouldApplyCompound } from "./utils/should-apply-compound";
 
 /**
  * All html and svg elements for hope components.
@@ -50,81 +49,6 @@ import { shouldApplyCompound } from "./utils/should-apply-compound";
 type HTMLHopeComponents = {
   [Tag in DOMElements]: HopeComponent<Tag>;
 };
-
-type HopeVariantDefinitions = Record<string, SystemStyleObject>;
-
-type HopeVariantGroups = Record<string, HopeVariantDefinitions>;
-
-type HopeVariantSelection<Variants extends HopeVariantGroups> = {
-  [VariantGroup in keyof Variants]?: BooleanMap<keyof Variants[VariantGroup]>;
-};
-
-interface HopeCompoundVariant<Variants extends HopeVariantGroups> {
-  /** The combined variants that should apply the style. */
-  variants: HopeVariantSelection<Variants>;
-
-  /** The style to be applied. */
-  style: SystemStyleObject;
-}
-
-interface HopeStyleOptions<Variants extends HopeVariantGroups> {
-  /** The base style. */
-  baseStyle?: SystemStyleObject;
-
-  /**
-   * The variants style.
-   * Each variant will become a `prop` of the component.
-   */
-  variants?: Variants;
-
-  /** The combined variants style. */
-  compoundVariants?: Array<HopeCompoundVariant<Variants>>;
-
-  /** The default value for each variant. */
-  defaultVariants?: HopeVariantSelection<Variants>;
-}
-
-type HopeStyleOptionsInterpolation<Variants extends HopeVariantGroups> =
-  | HopeStyleOptions<Variants>
-  | ((theme: ThemeVarsAndBreakpoints) => HopeStyleOptions<Variants>);
-
-type HopeStyleResult<Variants extends HopeVariantGroups> = {
-  baseClassName: string;
-  variantClassNames: {
-    [K in keyof Variants]: {
-      [V in keyof Variants[K]]: string;
-    };
-  };
-  compoundVariants: Array<[HopeVariantSelection<Variants>, string]>;
-};
-
-/** Compute classNames from a hope style options. */
-function computeStyleOptions<Variants extends HopeVariantGroups>(
-  options: HopeStyleOptions<Variants>,
-  theme: Theme
-): HopeStyleResult<Variants> {
-  const { baseStyle = {}, variants = {}, compoundVariants = [] } = options;
-
-  return {
-    baseClassName: computeStyle(baseStyle, theme),
-    variantClassNames: Object.entries(variants).reduce((acc, [variant, definition]) => {
-      // a variant (ex: "size")
-      acc[variant] = Object.entries(definition as HopeVariantDefinitions).reduce(
-        (acc, [value, style]) => {
-          // a variant value (ex: "sm")
-          acc[value] = computeStyle(style, theme);
-          return acc;
-        },
-        {} as any
-      );
-      return acc;
-    }, {} as any),
-    compoundVariants: compoundVariants.map(compoundVariant => [
-      compoundVariant.variants,
-      computeStyle(compoundVariant.style, theme),
-    ]),
-  };
-}
 
 /**
  * Singleton stitches `cssComponent`.
@@ -190,29 +114,7 @@ function styled<T extends ElementType, Variants extends HopeVariantGroups = {}>(
         ...filterUndefined(variantProps),
       } as HopeVariantSelection<Variants>;
 
-      const { variantClassNames = {} as any, compoundVariants = [] } = styleResult;
-
-      const classNames: Array<string> = [];
-
-      // 1. add "variants" classNames.
-      for (const name in selectedVariants) {
-        const value = selectedVariants[name];
-
-        if (value == null) {
-          continue;
-        }
-
-        classNames.push(variantClassNames[name]?.[String(value)]);
-      }
-
-      // 2. add "compound variants" classNames.
-      for (const [variants, className] of compoundVariants) {
-        if (shouldApplyCompound(variants, selectedVariants)) {
-          classNames.push(className);
-        }
-      }
-
-      return classNames;
+      return getSelectedVariantClassNames(styleResult, selectedVariants);
     });
 
     const sxClassName = createMemo(() => {

@@ -1,6 +1,7 @@
 export * from "./create-global-styles";
 export * from "./create-hope-component";
 export * from "./create-style-config";
+export * from "./create-styles";
 export * from "./critical-style";
 export * from "./factory";
 export * from "./keyframes";
