@@ -10,6 +10,8 @@ import { createHopeComponent, hope, SystemStyleProps } from "@hope-ui/styles";
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
+import { GridItem } from "./grid-item";
+
 export interface GridProps {
   /** Shorthand prop for `gridAutoFlow`. */
   autoFlow?: SystemStyleProps["gridAutoFlow"];
@@ -30,11 +32,13 @@ export interface GridProps {
   templateRows?: SystemStyleProps["gridTemplateRows"];
 }
 
+type GridComposite = { Item: typeof GridItem };
+
 /**
  * `Grid` is used to create grid layouts.
  * It renders a `div` with `display: grid` and comes with helpful style shorthand.
  */
-export const Grid = createHopeComponent<"div", GridProps>(props => {
+export const Grid = createHopeComponent<"div", GridProps, GridComposite>(props => {
   const [local, others] = splitProps(props, [
     "class",
     "autoFlow",
@@ -61,3 +65,5 @@ export const Grid = createHopeComponent<"div", GridProps>(props => {
     />
   );
 });
+
+Grid.Item = GridItem;

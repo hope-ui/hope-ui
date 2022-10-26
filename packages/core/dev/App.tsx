@@ -1,20 +1,14 @@
-import {
-  FormControl,
-  FormControlDescription,
-  FormControlError,
-  FormControlLabel,
-  Input,
-} from "../src";
+import { Grid } from "../src";
 
 export default function App() {
   return (
     <>
-      <FormControl isRequired maxW={96} m={4}>
-        <FormControlLabel>Email address</FormControlLabel>
-        <Input type="email" aria-describedby="chien" />
-        <FormControlDescription>We'll never share your email.</FormControlDescription>
-        <FormControlError>Invalid email address.</FormControlError>
-      </FormControl>
+      <Grid h="200px" templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap={4}>
+        <Grid.Item rowSpan={2} colSpan={1} bg="royalblue" />
+        <Grid.Item colSpan={2} bg="lightskyblue" />
+        <Grid.Item colSpan={2} bg="lightskyblue" />
+        <Grid.Item colSpan={4} bg="royalblue" />
+      </Grid>
     </>
   );
 }

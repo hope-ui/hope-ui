@@ -25,22 +25,15 @@ Display a modal dialog.
 ## Import
 
 ```tsx
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalHeading,
-  ModalDescription,
-} from "@hope-ui/core";
+import { Modal } from "@hope-ui/core";
 ```
 
 - **Modal:** The wrapper that provides props, state, and context to its children.
-- **ModalOverlay:** The backdrop behind the modal.
-- **ModalContent:** The modal itself.
-- **ModalCloseButton:** A button to close the modal.
-- **ModalHeading:** An optional heading for the modal.
-- **ModalDescription:** An optional description for the modal.
+- **Modal.Overlay:** The backdrop behind the modal.
+- **Modal.Content:** The modal itself.
+- **Modal.CloseButton:** A button to close the modal.
+- **Modal.Heading:** An optional heading for the modal.
+- **Modal.Description:** An optional description for the modal.
 
 ## Usage
 
@@ -56,14 +49,14 @@ function BasicUsageExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -72,7 +65,7 @@ function BasicUsageExample() {
 
 ### Initial focus
 
-When the modal opens, focus is automatically set on the first focusable element in `ModalContent`.
+When the modal opens, focus is automatically set on the first focusable element in `Modal.Content`.
 
 Use the `data-autofocus` attribute on any element to mark it as the initial focus element.
 
@@ -88,11 +81,11 @@ function InitialFocusExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Modal.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -100,7 +93,7 @@ function InitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -125,11 +118,11 @@ function CustomInitialFocusExample() {
         onClose={() => setIsOpen(false)}
         initialFocusSelector="#initial-focus"
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Modal.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -137,7 +130,7 @@ function CustomInitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -145,7 +138,7 @@ function CustomInitialFocusExample() {
 ```
 
 <Callout>
-  If the modal contains no focusable element, focus is set to the `ModalContent` itself.
+  If the modal contains no focusable element, focus is set to the `Modal.Content` itself.
 </Callout>
 
 ### Restore focus
@@ -168,14 +161,14 @@ function CustomRestoreFocusExample() {
         onClose={() => setIsOpen(false)}
         restoreFocusSelector="[data-finalfocus]"
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
 
       <Button data-finalfocus _focus={{ color: "red" }}>
@@ -202,14 +195,14 @@ function DisableFocusTrapExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -232,14 +225,14 @@ function DisablePreventScrollExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -248,9 +241,9 @@ function DisablePreventScrollExample() {
 
 ### Heading and description
 
-Use `ModalHeading` to add an accessible heading to the modal, it renders an `h2` by default.
+Use `Modal.Heading` to add an accessible heading to the modal, it renders an `h2` by default.
 
-Similarly `ModalDescription` is used add an accessible description and renders a `p` by default.
+Similarly `Modal.Description` is used add an accessible description and renders a `p` by default.
 
 Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
 
@@ -266,23 +259,23 @@ function HeadingAndDescriptionExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
             <VStack alignItems="flex-start">
-              <ModalHeading fontWeight="semibold">Title</ModalHeading>
-              <ModalDescription
+              <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+              <Modal.Description
                 fontSize="sm"
                 color={{ light: "neutral.600", dark: "neutral.300" }}
                 mb={4}
               >
                 Description
-              </ModalDescription>
+              </Modal.Description>
             </VStack>
-            <ModalCloseButton />
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -315,14 +308,14 @@ function TransitionExample() {
           exitEasing: "ease-in",
         }}
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -347,14 +340,14 @@ function VerticallyCenteredExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -389,15 +382,15 @@ function SizeExample() {
 
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
         <Show when={size() !== "full"}>
-          <ModalOverlay />
+          <Modal.Overlay />
         </Show>
-        <ModalContent p={4}>
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -406,7 +399,7 @@ function SizeExample() {
 
 ### Styling the backdrop
 
-You can use style props and `sx` on the `ModalOverlay` component to customize the modal backdrop.
+You can use style props and `sx` on the `Modal.Overlay` component to customize the modal backdrop.
 
 <Preview>
   <CustomBackdropExample />
@@ -420,19 +413,19 @@ function CustomBackdropExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay
+        <Modal.Overlay
           sx={{
             bg: "blackAlpha.300",
             backdropFilter: "blur(10px) hue-rotate(90deg)",
           }}
         />
-        <ModalContent p={4}>
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -451,7 +444,7 @@ function CustomBackdropExample() {
 If the content within the modal overflows beyond the viewport, you can use the `scrollBehavior` prop to control how scrolling should happen.
 
 - `outside`: overflow is handled by the modal wrapper.
-- `inside`: overflow is handled by the `ModalContent`.
+- `inside`: overflow is handled by the `Modal.Content`.
 
 <Preview>
   <ScrollBehaviorExample />
@@ -480,14 +473,14 @@ function ScrollBehaviorExample() {
       </HStack>
 
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} scrollBehavior={scrollBehavior()}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <For each={Array(100).fill("")}>{() => <p>The content of the Modal.</p>}</For>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -498,17 +491,17 @@ function ScrollBehaviorExample() {
 
 ### ARIA roles and attributes
 
-- The `ModalContent` has `aria-modal` set to `true`.
-- The `ModalContent` has `aria-labelledby` set to the `id` of the `ModalHeading`, if any.
-- The `ModalContent` has `aria-describedby` set to the `id` of the `ModalDescription`, if any.
+- The `Modal.Content` has `aria-modal` set to `true`.
+- The `Modal.Content` has `aria-labelledby` set to the `id` of the `Modal.Heading`, if any.
+- The `Modal.Content` has `aria-describedby` set to the `id` of the `Modal.Description`, if any.
 
 ### Keyboard support and focus management
 
 - If the `trapFocus` prop is `true`, focus is locked within the modal.
-- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `ModalContent`.
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `Modal.Content`.
 - When the modal closes, focus returns to the trigger element unless another focusable element takes focus.
 - If the `closeOnOverlayClick` prop is `true`, clicking on the overlay closes the modal.
-- When focus is within the `ModalContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the modal.
+- When focus is within the `Modal.Content` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the modal.
 - If the `preventScroll` prop is `true`, scrolling is blocked on the elements behind the modal.
 
 ## Theming
@@ -562,5 +555,5 @@ const theme = extendTheme({
 
 ### Other components props
 
-- `ModalCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
-- `ModalOverlay`, `ModalContent`, `ModalHeading` and `ModalDescription` supports commons Hope UI props (style props, `sx` and `as`).
+- `Modal.CloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `Modal.Overlay`, `Modal.Content`, `Modal.Heading` and `Modal.Description` supports commons Hope UI props (style props, `sx` and `as`).

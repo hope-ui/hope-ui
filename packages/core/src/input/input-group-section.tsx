@@ -5,12 +5,12 @@ import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
 
 import { useRequiredInputGroupContext } from "./input-group-context";
 
-interface InputSectionProps {
+interface InputGroupSectionProps {
   /** The placement of the section inside the input. */
   sectionPlacement: "left" | "right";
 }
 
-const InputSection = createHopeComponent<"div", InputSectionProps>(props => {
+const InputGroupSection = createHopeComponent<"div", InputGroupSectionProps>(props => {
   const context = useRequiredInputGroupContext();
 
   const [local, others] = splitProps(props, ["class", "__css", "sectionPlacement"]);
@@ -60,10 +60,10 @@ const InputSection = createHopeComponent<"div", InputSectionProps>(props => {
   );
 });
 
-export const InputLeftSection = createHopeComponent<"div">(props => {
-  return <InputSection sectionPlacement="left" {...props} />;
+export const InputGroupLeftSection = createHopeComponent<"div">(props => {
+  return <InputGroupSection sectionPlacement="left" {...props} />;
 });
 
-export const InputRightSection = createHopeComponent<"div">(props => {
-  return <InputSection sectionPlacement="right" {...props} />;
+export const InputGroupRightSection = createHopeComponent<"div">(props => {
+  return <InputGroupSection sectionPlacement="right" {...props} />;
 });

@@ -3,23 +3,15 @@ import {
   createHopeComponent,
   createIcon,
   Drawer,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeading,
-  DrawerOverlay,
-  Flex,
-  hope,
   HStack,
   IconButton,
-  useColorMode,
 } from "@hope-ui/core";
-import { Link, useIsRouting } from "@solidjs/router";
-import { createComputed, Show } from "solid-js";
+import { useIsRouting } from "@solidjs/router";
+import { createComputed } from "solid-js";
 
 import { NavSection } from "../NAV_SECTIONS";
-import { Navigation } from "./navigation";
-import { Logo, LogoDark } from "./logo";
 import { HeaderLogo } from "./header-logo";
+import { Navigation } from "./navigation";
 
 const MenuIcon = createIcon({
   viewBox: "0 0 15 15",
@@ -56,14 +48,14 @@ export const MobileNavigation = createHopeComponent<"button", MobileNavigationPr
         <MenuIcon fontSize="1.5em" />
       </IconButton>
       <Drawer isOpen={isOpen()} onClose={close} placement="left" size="xs">
-        <DrawerOverlay />
-        <DrawerContent bg={{ dark: "common.background" }} p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content bg={{ dark: "common.background" }} p={4}>
           <HStack justify="space-between" mb={6}>
             <HeaderLogo />
-            <DrawerCloseButton ml={2} />
+            <Drawer.CloseButton ml={2} />
           </HStack>
           <Navigation sections={props.sections} />
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );

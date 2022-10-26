@@ -8,15 +8,28 @@
 
 import { createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
-import { createUniqueId, Show, splitProps } from "solid-js";
+import { createUniqueId, ParentComponent, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { createModal } from "../modal/create-modal";
 import { mergeDefaultProps } from "../utils";
 import { useDrawerStyleConfig } from "./drawer.styles";
+import { DrawerCloseButton } from "./drawer-close-button";
+import { DrawerContent } from "./drawer-content";
 import { DrawerContext } from "./drawer-context";
+import { DrawerDescription } from "./drawer-description";
+import { DrawerHeading } from "./drawer-heading";
+import { DrawerOverlay } from "./drawer-overlay";
 import { DRAWER_TRANSITION } from "./drawer-transition";
 import { DrawerContextValue, DrawerProps } from "./types";
+
+type DrawerComposite = {
+  Overlay: typeof DrawerOverlay;
+  Content: typeof DrawerContent;
+  CloseButton: typeof DrawerCloseButton;
+  Heading: typeof DrawerHeading;
+  Description: typeof DrawerDescription;
+};
 
 /**
  * Drawer provides context, theming, and accessibility properties
@@ -24,7 +37,7 @@ import { DrawerContextValue, DrawerProps } from "./types";
  *
  * It doesn't render any DOM node.
  */
-export function Drawer(props: DrawerProps) {
+export const Drawer: ParentComponent<DrawerProps> & DrawerComposite = props => {
   props = mergeThemeProps(
     "Drawer",
     {
@@ -99,4 +112,10 @@ export function Drawer(props: DrawerProps) {
       </Portal>
     </Show>
   );
-}
+};
+
+Drawer.Overlay = DrawerOverlay;
+Drawer.Content = DrawerContent;
+Drawer.CloseButton = DrawerCloseButton;
+Drawer.Heading = DrawerHeading;
+Drawer.Description = DrawerDescription;

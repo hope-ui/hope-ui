@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@hope-ui/core";
+import { Grid } from "@hope-ui/core";
 
 import { Preview } from "~/components/preview";
 
@@ -9,11 +9,11 @@ A [CSS grid layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_La
 ## Import
 
 ```ts
-import { Grid, GridItem } from "@hope-ui/core";
+import { Grid } from "@hope-ui/core";
 ```
 
 - **Grid:** A Box with `display: grid`.
-- **GridItem:** A Box used to control the span and start position within a grid.
+- **Grid.Item:** A Box used to control the span and start position within a grid.
 
 ## Usage
 
@@ -21,67 +21,67 @@ The example below demonstrate usage of the `templateColumns` prop and applying a
 
 <Preview>
   <Grid templateColumns="repeat(5, 1fr)" gap={6}>
-    <GridItem w="100%" h={10} bg="royalblue" />
-    <GridItem w="100%" h={10} bg="royalblue" />
-    <GridItem w="100%" h={10} bg="royalblue" />
-    <GridItem w="100%" h={10} bg="royalblue" />
-    <GridItem w="100%" h={10} bg="royalblue" />
+    <Grid.Item w="100%" h={10} bg="royalblue" />
+    <Grid.Item w="100%" h={10} bg="royalblue" />
+    <Grid.Item w="100%" h={10} bg="royalblue" />
+    <Grid.Item w="100%" h={10} bg="royalblue" />
+    <Grid.Item w="100%" h={10} bg="royalblue" />
   </Grid>
 </Preview>
 
 ```tsx
 <Grid templateColumns="repeat(5, 1fr)" gap={6}>
-  <GridItem w="100%" h={10} bg="royalblue" />
-  <GridItem w="100%" h={10} bg="royalblue" />
-  <GridItem w="100%" h={10} bg="royalblue" />
-  <GridItem w="100%" h={10} bg="royalblue" />
-  <GridItem w="100%" h={10} bg="royalblue" />
+  <Grid.Item w="100%" h={10} bg="royalblue" />
+  <Grid.Item w="100%" h={10} bg="royalblue" />
+  <Grid.Item w="100%" h={10} bg="royalblue" />
+  <Grid.Item w="100%" h={10} bg="royalblue" />
+  <Grid.Item w="100%" h={10} bg="royalblue" />
 </Grid>
 ```
 
 ### Spanning columns
 
-On the `GridItem` component, use the `colSpan` prop to span across columns and `rowSpan` to span across rows. You will also need to specify the `templateColumns` and `templateRows` props on the `Grid` itself.
+On the `Grid.Item` component, use the `colSpan` prop to span across columns and `rowSpan` to span across rows. You will also need to specify the `templateColumns` and `templateRows` props on the `Grid` itself.
 
 <Preview>
   <Grid h="200px" templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap={4}>
-    <GridItem rowSpan={2} colSpan={1} bg="royalblue" />
-    <GridItem colSpan={2} bg="lightskyblue" />
-    <GridItem colSpan={2} bg="lightskyblue" />
-    <GridItem colSpan={4} bg="royalblue" />
+    <Grid.Item rowSpan={2} colSpan={1} bg="royalblue" />
+    <Grid.Item colSpan={2} bg="lightskyblue" />
+    <Grid.Item colSpan={2} bg="lightskyblue" />
+    <Grid.Item colSpan={4} bg="royalblue" />
   </Grid>
 </Preview>
 
 ```tsx
 <Grid h="200px" templateRows="repeat(2, 1fr)" templateColumns="repeat(5, 1fr)" gap={4}>
-  <GridItem rowSpan={2} colSpan={1} bg="royalblue" />
-  <GridItem colSpan={2} bg="lightskyblue" />
-  <GridItem colSpan={2} bg="lightskyblue" />
-  <GridItem colSpan={4} bg="royalblue" />
+  <Grid.Item rowSpan={2} colSpan={1} bg="royalblue" />
+  <Grid.Item colSpan={2} bg="lightskyblue" />
+  <Grid.Item colSpan={2} bg="lightskyblue" />
+  <Grid.Item colSpan={4} bg="royalblue" />
 </Grid>
 ```
 
 ### Starting and ending columns
 
-Use the `colStart` and `colEnd` prop on `GridItem` to make an element start or end at the desired grid position.
+Use the `colStart` and `colEnd` prop on `Grid.Item` to make an element start or end at the desired grid position.
 
 <Preview>
   <Grid templateColumns="repeat(5, 1fr)" gap={4}>
-    <GridItem colSpan={2} h={10} bg="royalblue" />
-    <GridItem colStart={4} colEnd={6} h={10} bg="lightskyblue" />
+    <Grid.Item colSpan={2} h={10} bg="royalblue" />
+    <Grid.Item colStart={4} colEnd={6} h={10} bg="lightskyblue" />
   </Grid>
 </Preview>
 
 ```tsx
 <Grid templateColumns="repeat(5, 1fr)" gap={4}>
-  <GridItem colSpan={2} h={10} bg="royalblue" />
-  <GridItem colStart={4} colEnd={6} h={10} bg="lightskyblue" />
+  <Grid.Item colSpan={2} h={10} bg="royalblue" />
+  <Grid.Item colStart={4} colEnd={6} h={10} bg="lightskyblue" />
 </Grid>
 ```
 
 ### Template areas
 
-The `templateAreas` prop specifies areas within the grid layout. Use template literals to name the area, then you can reference areas by passing the `area` prop to `GridItem`.
+The `templateAreas` prop specifies areas within the grid layout. Use template literals to name the area, then you can reference areas by passing the `area` prop to `Grid.Item`.
 
 <Preview>
   <Grid
@@ -94,18 +94,18 @@ The `templateAreas` prop specifies areas within the grid layout. Use template li
     gap={1}
     color="black"
   >
-    <GridItem pl={2} bg="coral" area="header">
+    <Grid.Item pl={2} bg="coral" area="header">
       Header
-    </GridItem>
-    <GridItem pl={2} bg="lightpink" area="nav">
+    </Grid.Item>
+    <Grid.Item pl={2} bg="lightpink" area="nav">
       Nav
-    </GridItem>
-    <GridItem pl={2} bg="mediumseagreen" area="main">
+    </Grid.Item>
+    <Grid.Item pl={2} bg="mediumseagreen" area="main">
       Main
-    </GridItem>
-    <GridItem pl={2} bg="dodgerblue" area="footer">
+    </Grid.Item>
+    <Grid.Item pl={2} bg="dodgerblue" area="footer">
       Footer
-    </GridItem>
+    </Grid.Item>
   </Grid>
 </Preview>
 
@@ -120,18 +120,18 @@ The `templateAreas` prop specifies areas within the grid layout. Use template li
   gap={1}
   color="black"
 >
-  <GridItem pl={2} bg="coral" area="header">
+  <Grid.Item pl={2} bg="coral" area="header">
     Header
-  </GridItem>
-  <GridItem pl={2} bg="lightpink" area="nav">
+  </Grid.Item>
+  <Grid.Item pl={2} bg="lightpink" area="nav">
     Nav
-  </GridItem>
-  <GridItem pl={2} bg="mediumseagreen" area="main">
+  </Grid.Item>
+  <Grid.Item pl={2} bg="mediumseagreen" area="main">
     Main
-  </GridItem>
-  <GridItem pl={2} bg="dodgerblue" area="footer">
+  </Grid.Item>
+  <Grid.Item pl={2} bg="dodgerblue" area="footer">
     Footer
-  </GridItem>
+  </Grid.Item>
 </Grid>
 ```
 
@@ -148,7 +148,7 @@ The `templateAreas` prop specifies areas within the grid layout. Use template li
 | templateColumns | `ResponsiveValue<Property.GridTemplateColumns>` | Shorthand prop for `gridTemplateColumns`. |
 | templateRows    | `ResponsiveValue<Property.GridTemplateRows>`    | Shorthand prop for `gridTemplateRows`.    |
 
-### GridItem
+### Grid.Item
 
 | Name     | Type                                  | Description                                        |
 | -------- | ------------------------------------- | -------------------------------------------------- |

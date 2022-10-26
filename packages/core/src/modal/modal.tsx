@@ -6,16 +6,29 @@
  * https://github.com/chakra-ui/chakra-ui/blob/d945b9a7da3056017cda0cdd552af40fa1426070/packages/components/modal/src/use-modal.ts
  */
 
-import { createTransition, TransitionOptions } from "@hope-ui/primitives";
+import { createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
-import { Accessor, createMemo, createUniqueId, Show, splitProps } from "solid-js";
+import { createUniqueId, ParentComponent, Show, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
 
+import { mergeDefaultProps } from "../utils";
 import { createModal } from "./create-modal";
 import { useModalStyleConfig } from "./modal.styles";
+import { ModalCloseButton } from "./modal-close-button";
+import { ModalContent } from "./modal-content";
 import { ModalContext } from "./modal-context";
+import { ModalDescription } from "./modal-description";
+import { ModalHeading } from "./modal-heading";
+import { ModalOverlay } from "./modal-overlay";
 import { ModalContextValue, ModalProps } from "./types";
-import { mergeDefaultProps } from "../utils";
+
+type ModalComposite = {
+  Overlay: typeof ModalOverlay;
+  Content: typeof ModalContent;
+  CloseButton: typeof ModalCloseButton;
+  Heading: typeof ModalHeading;
+  Description: typeof ModalDescription;
+};
 
 /**
  * Modal provides context, theming, and accessibility properties
@@ -23,7 +36,7 @@ import { mergeDefaultProps } from "../utils";
  *
  * It doesn't render any DOM node.
  */
-export function Modal(props: ModalProps) {
+export const Modal: ParentComponent<ModalProps> & ModalComposite = props => {
   props = mergeThemeProps(
     "Modal",
     {
@@ -104,4 +117,10 @@ export function Modal(props: ModalProps) {
       </Portal>
     </Show>
   );
-}
+};
+
+Modal.Overlay = ModalOverlay;
+Modal.Content = ModalContent;
+Modal.CloseButton = ModalCloseButton;
+Modal.Heading = ModalHeading;
+Modal.Description = ModalDescription;

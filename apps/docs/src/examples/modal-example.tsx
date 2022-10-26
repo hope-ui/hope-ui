@@ -1,16 +1,4 @@
-import {
-  Button,
-  HStack,
-  Modal,
-  ModalCloseButton,
-  ModalContent,
-  ModalDescription,
-  ModalHeading,
-  ModalOverlay,
-  ModalProps,
-  Text,
-  VStack,
-} from "@hope-ui/core";
+import { Button, HStack, Modal, ModalProps, Text, VStack } from "@hope-ui/core";
 import { createSignal, For, Show } from "solid-js";
 
 export function BasicUsageExample() {
@@ -20,14 +8,14 @@ export function BasicUsageExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -40,11 +28,11 @@ export function InitialFocusExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Modal.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -52,7 +40,7 @@ export function InitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -69,11 +57,11 @@ export function CustomInitialFocusExample() {
         onClose={() => setIsOpen(false)}
         initialFocusSelector="#initial-focus"
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Modal.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -81,7 +69,7 @@ export function CustomInitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -98,14 +86,14 @@ export function CustomRestoreFocusExample() {
         onClose={() => setIsOpen(false)}
         restoreFocusSelector="[data-finalfocus]"
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
 
       <Button data-finalfocus _focus={{ color: "red" }}>
@@ -122,14 +110,14 @@ export function DisableFocusTrapExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -142,14 +130,14 @@ export function DisablePreventScrollExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -162,23 +150,23 @@ export function HeadingAndDescriptionExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
             <VStack alignItems="flex-start">
-              <ModalHeading fontWeight="semibold">Title</ModalHeading>
-              <ModalDescription
+              <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+              <Modal.Description
                 fontSize="sm"
                 color={{ light: "neutral.600", dark: "neutral.300" }}
                 mb={4}
               >
                 Description
-              </ModalDescription>
+              </Modal.Description>
             </VStack>
-            <ModalCloseButton />
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -201,14 +189,14 @@ export function TransitionExample() {
           exitEasing: "ease-in",
         }}
       >
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -221,14 +209,14 @@ export function VerticallyCenteredExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} isCentered>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -253,15 +241,15 @@ export function SizeExample() {
 
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
         <Show when={size() !== "full"}>
-          <ModalOverlay />
+          <Modal.Overlay />
         </Show>
-        <ModalContent p={4}>
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -274,19 +262,19 @@ export function CustomBackdropExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <ModalOverlay
+        <Modal.Overlay
           sx={{
             bg: "blackAlpha.300",
             backdropFilter: "blur(10px) hue-rotate(90deg)",
           }}
         />
-        <ModalContent p={4}>
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <p>The content of the Modal.</p>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );
@@ -314,14 +302,14 @@ export function ScrollBehaviorExample() {
       </HStack>
 
       <Modal isOpen={isOpen()} onClose={() => setIsOpen(false)} scrollBehavior={scrollBehavior()}>
-        <ModalOverlay />
-        <ModalContent p={4}>
+        <Modal.Overlay />
+        <Modal.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <ModalHeading fontWeight="semibold">Title</ModalHeading>
-            <ModalCloseButton />
+            <Modal.Heading fontWeight="semibold">Title</Modal.Heading>
+            <Modal.CloseButton />
           </HStack>
           <For each={Array(100).fill("")}>{() => <p>The content of the Modal.</p>}</For>
-        </ModalContent>
+        </Modal.Content>
       </Modal>
     </>
   );

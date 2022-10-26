@@ -25,14 +25,37 @@ import {
 import { createDisclosure, createTransition } from "@hope-ui/primitives";
 import { mergeThemeProps, STYLE_CONFIG_PROP_NAMES } from "@hope-ui/styles";
 import { contains, getRelatedTarget, runIfFn } from "@hope-ui/utils";
-import { createEffect, createSignal, createUniqueId, JSX, onCleanup, splitProps } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  JSX,
+  onCleanup,
+  splitProps,
+} from "solid-js";
 import { isServer } from "solid-js/web";
 
+import { mergeDefaultProps } from "../utils";
 import { usePopoverStyleConfig } from "./popover.styles";
+import { PopoverAnchor } from "./popover-anchor";
+import { PopoverCloseButton } from "./popover-close-button";
+import { PopoverContent } from "./popover-content";
 import { PopoverContext } from "./popover-context";
+import { PopoverDescription } from "./popover-description";
+import { PopoverHeading } from "./popover-heading";
+import { PopoverTrigger } from "./popover-trigger";
 import { BasePlacement, PopoverContextValue, PopoverProps } from "./types";
 import { getAnchorElement } from "./utils";
-import { mergeDefaultProps } from "../utils";
+
+type PopoverComposite = {
+  Trigger: typeof PopoverTrigger;
+  Anchor: typeof PopoverAnchor;
+  Content: typeof PopoverContent;
+  CloseButton: typeof PopoverCloseButton;
+  Heading: typeof PopoverHeading;
+  Description: typeof PopoverDescription;
+};
 
 /**
  * Popover provides context, theming, and accessibility properties
@@ -40,7 +63,7 @@ import { mergeDefaultProps } from "../utils";
  *
  * It doesn't render any DOM node.
  */
-export function Popover(props: PopoverProps) {
+export const Popover: Component<PopoverProps> & PopoverComposite = props => {
   props = mergeThemeProps(
     "Popover",
     {
@@ -322,4 +345,11 @@ export function Popover(props: PopoverProps) {
       {runIfFn(props.children, disclosureState)}
     </PopoverContext.Provider>
   );
-}
+};
+
+Popover.Trigger = PopoverTrigger;
+Popover.Anchor = PopoverAnchor;
+Popover.Content = PopoverContent;
+Popover.CloseButton = PopoverCloseButton;
+Popover.Heading = PopoverHeading;
+Popover.Description = PopoverDescription;

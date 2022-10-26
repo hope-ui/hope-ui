@@ -24,22 +24,15 @@ Display a modal dialog that slides out from the edge of the screen.
 ## Import
 
 ```tsx
-import {
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeading,
-  DrawerDescription,
-} from "@hope-ui/core";
+import { Drawer } from "@hope-ui/core";
 ```
 
 - **Drawer:** The wrapper that provides props, state, and context to its children.
-- **DrawerOverlay:** The backdrop behind the drawer.
-- **DrawerContent:** The drawer itself.
-- **DrawerCloseButton:** A button to close the drawer.
-- **DrawerHeading:** An optional heading for the drawer.
-- **DrawerDescription:** An optional description for the drawer.
+- **Drawer.Overlay:** The backdrop behind the drawer.
+- **Drawer.Content:** The drawer itself.
+- **Drawer.CloseButton:** A button to close the drawer.
+- **Drawer.Heading:** An optional heading for the drawer.
+- **Drawer.Description:** An optional description for the drawer.
 
 ## Usage
 
@@ -55,14 +48,14 @@ function BasicUsageExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -71,7 +64,7 @@ function BasicUsageExample() {
 
 ### Initial focus
 
-When the drawer opens, focus is automatically set on the first focusable element in `DrawerContent`.
+When the drawer opens, focus is automatically set on the first focusable element in `Drawer.Content`.
 
 Use the `data-autofocus` attribute on any element to mark it as the initial focus element.
 
@@ -87,11 +80,11 @@ function InitialFocusExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Drawer.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -99,7 +92,7 @@ function InitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -124,11 +117,11 @@ function CustomInitialFocusExample() {
         onClose={() => setIsOpen(false)}
         initialFocusSelector="#initial-focus"
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Drawer.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -136,7 +129,7 @@ function CustomInitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -144,7 +137,7 @@ function CustomInitialFocusExample() {
 ```
 
 <Callout>
-  If the drawer contains no focusable element, focus is set to the `DrawerContent` itself.
+  If the drawer contains no focusable element, focus is set to the `Drawer.Content` itself.
 </Callout>
 
 ### Restore focus
@@ -167,14 +160,14 @@ function CustomRestoreFocusExample() {
         onClose={() => setIsOpen(false)}
         restoreFocusSelector="[data-finalfocus]"
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
 
       <Button data-finalfocus _focus={{ color: "red" }}>
@@ -201,14 +194,14 @@ function DisableFocusTrapExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -231,14 +224,14 @@ function DisablePreventScrollExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -247,9 +240,9 @@ function DisablePreventScrollExample() {
 
 ### Heading and description
 
-Use `DrawerHeading` to add an accessible heading to the drawer, it renders an `h2` by default.
+Use `Drawer.Heading` to add an accessible heading to the drawer, it renders an `h2` by default.
 
-Similarly `DrawerDescription` is used add an accessible description and renders a `p` by default.
+Similarly `Drawer.Description` is used add an accessible description and renders a `p` by default.
 
 Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
 
@@ -265,23 +258,23 @@ function HeadingAndDescriptionExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
             <VStack alignItems="flex-start">
-              <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-              <DrawerDescription
+              <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+              <Drawer.Description
                 fontSize="sm"
                 color={{ light: "neutral.600", dark: "neutral.300" }}
                 mb={4}
               >
                 Description
-              </DrawerDescription>
+              </Drawer.Description>
             </VStack>
-            <DrawerCloseButton />
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -314,14 +307,14 @@ function TransitionExample() {
           exitEasing: "ease-in",
         }}
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -359,14 +352,14 @@ function PlacementExample() {
       </HStack>
 
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} placement={placement()}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -401,15 +394,15 @@ function SizeExample() {
 
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
         <Show when={size() !== "full"}>
-          <DrawerOverlay />
+          <Drawer.Overlay />
         </Show>
-        <DrawerContent p={4}>
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -422,7 +415,7 @@ function SizeExample() {
 
 ### Styling the backdrop
 
-You can use style props and `sx` on the `DrawerOverlay` component to customize the drawer backdrop.
+You can use style props and `sx` on the `Drawer.Overlay` component to customize the drawer backdrop.
 
 <Preview>
   <CustomBackdropExample />
@@ -436,19 +429,19 @@ function CustomBackdropExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay
+        <Drawer.Overlay
           sx={{
             bg: "blackAlpha.300",
             backdropFilter: "blur(10px) hue-rotate(90deg)",
           }}
         />
-        <DrawerContent p={4}>
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -466,17 +459,17 @@ function CustomBackdropExample() {
 
 ### ARIA roles and attributes
 
-- The `DrawerContent` has `aria-drawer` set to `true`.
-- The `DrawerContent` has `aria-labelledby` set to the `id` of the `DrawerHeading`, if any.
-- The `DrawerContent` has `aria-describedby` set to the `id` of the `DrawerDescription`, if any.
+- The `Drawer.Content` has `aria-drawer` set to `true`.
+- The `Drawer.Content` has `aria-labelledby` set to the `id` of the `Drawer.Heading`, if any.
+- The `Drawer.Content` has `aria-describedby` set to the `id` of the `Drawer.Description`, if any.
 
 ### Keyboard support and focus management
 
 - If the `trapFocus` prop is `true`, focus is locked within the drawer.
-- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `DrawerContent`.
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `Drawer.Content`.
 - When the drawer closes, focus returns to the trigger element unless another focusable element takes focus.
 - If the `closeOnOverlayClick` prop is `true`, clicking on the overlay closes the drawer.
-- When focus is within the `DrawerContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the drawer.
+- When focus is within the `Drawer.Content` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the drawer.
 - If the `preventScroll` prop is `true`, scrolling is blocked on the elements behind the drawer.
 
 ## Theming
@@ -529,5 +522,5 @@ const theme = extendTheme({
 
 ### Other components props
 
-- `DrawerCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
-- `DrawerOverlay`, `DrawerContent`, `DrawerHeading` and `DrawerDescription` supports commons Hope UI props (style props, `sx` and `as`).
+- `Drawer.CloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `Drawer.Overlay`, `Drawer.Content`, `Drawer.Heading` and `Drawer.Description` supports commons Hope UI props (style props, `sx` and `as`).

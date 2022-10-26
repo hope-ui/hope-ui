@@ -3,13 +3,15 @@ import "./styles/index.css";
 import "./styles/code.css";
 
 import {
+  cookieStorageManagerSSR,
   DEFAULT_THEME,
   extendTheme,
   HopeCriticalStyle,
   HopeProvider,
   PopoverTheme,
 } from "@hope-ui/core";
-import { Suspense } from "solid-js";
+import { Suspense, useContext } from "solid-js";
+import { isServer } from "solid-js/web";
 import { MDXProvider } from "solid-mdx";
 import {
   Body,
@@ -21,6 +23,7 @@ import {
   Meta,
   Routes,
   Scripts,
+  ServerContext,
 } from "solid-start";
 
 import { Layout } from "./components/layout";
@@ -65,8 +68,14 @@ const theme = extendTheme({
 });
 
 export default function Root() {
+  const event = useContext(ServerContext);
+
+  const cookie = () => {
+    return isServer ? event.request.headers.get("cookie") ?? "" : document.cookie;
+  };
+
   return (
-    <HopeProvider theme={theme}>
+    <HopeProvider theme={theme} storageManager={cookieStorageManagerSSR(cookie())}>
       <Html lang="en">
         <Head>
           <Meta charset="utf-8" />

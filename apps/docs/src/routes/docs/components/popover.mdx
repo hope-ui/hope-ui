@@ -1,14 +1,4 @@
-import {
-  Button,
-  HStack,
-  Popover,
-  PopoverTrigger,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverHeading,
-  PopoverDescription,
-  Kbd,
-} from "@hope-ui/core";
+import { Button, HStack, Popover, Kbd } from "@hope-ui/core";
 
 import { Callout } from "~/components/callout";
 import {
@@ -27,44 +17,36 @@ Display a non-modal dialog that floats around a trigger.
 ## Import
 
 ```tsx
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverCloseButton,
-  PopoverHeading,
-  PopoverDescription,
-} from "@hope-ui/core";
+import { Popover } from "@hope-ui/core";
 ```
 
 - **Popover:** The wrapper that provides props, state, and context to its children.
-- **PopoverTrigger:** The component that opens/closes the popover.
-- **PopoverAnchor:** The component to use as positioning reference instead of the trigger.
-- **PopoverContent:** The popover itself.
-- **PopoverCloseButton:** A button to close the popover.
-- **PopoverHeading:** An optional heading for the popover.
-- **PopoverDescription:** An optional description for the popover.
+- **Popover.Trigger:** The component that opens/closes the popover.
+- **Popover.Anchor:** The component to use as positioning reference instead of the trigger.
+- **Popover.Content:** The popover itself.
+- **Popover.CloseButton:** A button to close the popover.
+- **Popover.Heading:** An optional heading for the popover.
+- **Popover.Description:** An optional description for the popover.
 
 ## Usage
 
-`PopoverTrigger` renders an unstyled `button` by default. For accessibility reason, when using the `as` prop ensure the element passed in is focusable.
+`Popover.Trigger` renders an unstyled `button` by default. For accessibility reason, when using the `as` prop ensure the element passed in is focusable.
 
 <Preview>
   <Popover>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -74,53 +56,53 @@ Use the `triggerMode` prop to change the way of opening the popover. You can set
 
 <Preview>
   <Popover triggerMode="hover">
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover triggerMode="hover">
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
 ### Initial focus
 
-When the popover opens, focus is automatically set on the first focusable element in `PopoverContent`.
+When the popover opens, focus is automatically set on the first focusable element in `Popover.Content`.
 
 Use the `data-autofocus` attribute on any element to mark it as the initial focus element.
 
 <Preview>
   <Popover>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <HStack spacing={4}>
         <Button _focus={{ color: "red" }}>Button 1 </Button>
         <Button data-autofocus _focus={{ color: "red" }}>
           Button 2
         </Button>
       </HStack>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <HStack spacing={4}>
       <Button _focus={{ color: "red" }}>Button 1 </Button>
       <Button data-autofocus _focus={{ color: "red" }}>
         Button 2
       </Button>
     </HStack>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -128,34 +110,34 @@ You can also use a different css selector by using the `initialFocusSelector` pr
 
 <Preview>
   <Popover initialFocusSelector="#initial-focus">
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <HStack spacing={4}>
         <Button _focus={{ color: "red" }}>Button 1 </Button>
         <Button id="initial-focus" _focus={{ color: "red" }}>
           Button 2
         </Button>
       </HStack>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover initialFocusSelector="#initial-focus">
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <HStack spacing={4}>
       <Button _focus={{ color: "red" }}>Button 1 </Button>
       <Button id="initial-focus" _focus={{ color: "red" }}>
         Button 2
       </Button>
     </HStack>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
 <Callout>
-  If the popover contains no focusable element, focus is set to the `PopoverContent` itself.
+  If the popover contains no focusable element, focus is set to the `Popover.Content` itself.
 </Callout>
 
 ### Restore focus
@@ -165,10 +147,10 @@ When the popover closes, focus is set back to the trigger element. Use the `rest
 <Preview>
   <HStack spacing={4}>
     <Popover restoreFocusSelector="[data-finalfocus]">
-      <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-      <PopoverContent w="max-content" p={4}>
+      <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+      <Popover.Content w="max-content" p={4}>
         <p>The content of the Popover.</p>
-      </PopoverContent>
+      </Popover.Content>
     </Popover>
 
     <Button data-finalfocus _focus={{ color: "red" }}>
@@ -181,10 +163,10 @@ When the popover closes, focus is set back to the trigger element. Use the `rest
 ```tsx
 <HStack spacing={4}>
   <Popover restoreFocusSelector="[data-finalfocus]">
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 
   <Button data-finalfocus _focus={{ color: "red" }}>
@@ -195,67 +177,67 @@ When the popover closes, focus is set back to the trigger element. Use the `rest
 
 ### Focus trap
 
-Use the `trapFocus` prop to lock focus inside the `PopoverContent`.
+Use the `trapFocus` prop to lock focus inside the `Popover.Content`.
 
 <Preview>
   <Popover trapFocus>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <HStack spacing={4}>
         <Button>Button 1</Button>
         <Button>Button 2</Button>
       </HStack>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover trapFocus>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <HStack spacing={4}>
       <Button>Button 1</Button>
       <Button>Button 2</Button>
     </HStack>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
 ### Heading and description
 
-Use `PopoverHeading` to add an accessible heading to the popover, it renders an `h2` by default.
+Use `Popover.Heading` to add an accessible heading to the popover, it renders an `h2` by default.
 
-Similarly `PopoverDescription` is used add an accessible description and renders a `p` by default.
+Similarly `Popover.Description` is used add an accessible description and renders a `p` by default.
 
 Under the hood, Hope UI will set the correct `aria-labelledby` and `aria-describedby` attributes.
 
 <Preview>
   <Popover>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
-      <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
-      <PopoverDescription
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
+      <Popover.Heading fontWeight="semibold">Title</Popover.Heading>
+      <Popover.Description
         fontSize="sm"
         color={{ light: "neutral.600", dark: "neutral.300" }}
         mb={4}
       >
         Description
-      </PopoverDescription>
+      </Popover.Description>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
-    <PopoverHeading fontWeight="semibold">Title</PopoverHeading>
-    <PopoverDescription fontSize="sm" color={{ light: "neutral.600", dark: "neutral.300" }} mb={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
+    <Popover.Heading fontWeight="semibold">Title</Popover.Heading>
+    <Popover.Description fontSize="sm" color={{ light: "neutral.600", dark: "neutral.300" }} mb={4}>
       Description
-    </PopoverDescription>
+    </Popover.Description>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -265,23 +247,23 @@ Use `hasSameWidth` prop to make the popover take the same width as the trigger e
 
 <Preview>
   <Popover hasSameWidth>
-    <PopoverTrigger as={Button} w={96}>
+    <Popover.Trigger as={Button} w={96}>
       Trigger
-    </PopoverTrigger>
-    <PopoverContent p={4}>
+    </Popover.Trigger>
+    <Popover.Content p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover hasSameWidth>
-  <PopoverTrigger as={Button} w={96}>
+  <Popover.Trigger as={Button} w={96}>
     Trigger
-  </PopoverTrigger>
-  <PopoverContent p={4}>
+  </Popover.Trigger>
+  <Popover.Content p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -291,19 +273,19 @@ Use the `arrowSize` prop to change the popover's arrow size and the `offset` pro
 
 <Preview>
   <Popover arrowSize={30} offset={15}>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover arrowSize={30} offset={15}>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -311,19 +293,19 @@ You can also remove the arrow by setting the `withArrow` prop to `false`.
 
 <Preview>
   <Popover withArrow={false} offset={8}>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover withArrow={false} offset={8}>
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -333,19 +315,19 @@ Use the `placement` prop to set the preferred popover placement. You can set the
 
 <Preview>
   <Popover placement="top-start">
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover placement="top-start">
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -370,10 +352,10 @@ The `transitionOptions` prop allows to customize the popover open/close transiti
       exitEasing: "ease-in",
     }}
   >
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
@@ -387,10 +369,10 @@ The `transitionOptions` prop allows to customize the popover open/close transiti
     exitEasing: "ease-in",
   }}
 >
-  <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -398,31 +380,31 @@ To learn more about the transition API check out the [createTransition](/docs/pr
 
 ### Popover anchor
 
-Use the `PopoverAnchor` component if you want to use a different element for the popover positioning reference, it rendes a `div` by default.
+Use the `Popover.Anchor` component if you want to use a different element for the popover positioning reference, it rendes a `div` by default.
 
 In the example below, the `Button` is the trigger that opens/closes the popover and the `Icon` is the reference element that the popover will position relative to.
 
 <Preview>
   <Popover>
     <HStack spacing={4}>
-      <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-      <PopoverAnchor as={TargetIcon} boxSize={6} />
+      <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+      <Popover.Anchor as={TargetIcon} boxSize={6} />
     </HStack>
-    <PopoverContent w="max-content" p={4}>
+    <Popover.Content w="max-content" p={4}>
       <p>The content of the Popover.</p>
-    </PopoverContent>
+    </Popover.Content>
   </Popover>
 </Preview>
 
 ```tsx
 <Popover>
   <HStack spacing={4}>
-    <PopoverTrigger as={Button}>Trigger</PopoverTrigger>
-    <PopoverAnchor as={TargetIcon} boxSize={6} />
+    <Popover.Trigger as={Button}>Trigger</Popover.Trigger>
+    <Popover.Anchor as={TargetIcon} boxSize={6} />
   </HStack>
-  <PopoverContent w="max-content" p={4}>
+  <Popover.Content w="max-content" p={4}>
     <p>The content of the Popover.</p>
-  </PopoverContent>
+  </Popover.Content>
 </Popover>
 ```
 
@@ -459,9 +441,9 @@ function FollowCursorExample() {
         Hover the area.
       </Center>
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </>
   );
@@ -506,9 +488,9 @@ function RightClickExample() {
         Right click in the area.
       </Center>
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </>
   );
@@ -527,11 +509,11 @@ Popover provides access to its internal `isOpen` state and a `close` method that
 <Popover>
   {({ isOpen, close }) => (
     <>
-      <PopoverTrigger as={Button}>Click to {isOpen() ? "close" : "open"}</PopoverTrigger>
-      <PopoverContent w="max-content" p={4}>
+      <Popover.Trigger as={Button}>Click to {isOpen() ? "close" : "open"}</Popover.Trigger>
+      <Popover.Content w="max-content" p={4}>
         <p>The content of the Popover.</p>
         <Button onClick={close}>Close</Button>
-      </PopoverContent>
+      </Popover.Content>
     </>
   )}
 </Popover>
@@ -556,10 +538,10 @@ function ControlledPopoverExample() {
       </Button>
 
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} closeOnBlur={false}>
-        <PopoverAnchor as={TargetIcon} boxSize={6} />
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Anchor as={TargetIcon} boxSize={6} />
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </HStack>
   );
@@ -575,31 +557,31 @@ function ControlledPopoverExample() {
 
 ### ARIA roles and attributes
 
-`PopoverTrigger` has:
+`Popover.Trigger` has:
 
 - `aria-haspopup` set to `dialog` to denote that it triggers a popover.
-- `aria-controls` set to the `id` of the `PopoverContent`.
+- `aria-controls` set to the `id` of the `Popover.Content`.
 - `aria-expanded` synced with the open/closed state of the popover.
-- `aria-labelledby` set to the `id` of the `PopoverHeading`, if any.
-- `aria-describedby` set to the `id` of the `PopoverDescription`, if any.
+- `aria-labelledby` set to the `id` of the `Popover.Heading`, if any.
+- `aria-describedby` set to the `id` of the `Popover.Description`, if any.
 
-`PopoverContent` has:
+`Popover.Content` has:
 
 - `role` set to `dialog`, when the `triggerMode` is `hover`, role is set to `tooltip`.
 
 ### Keyboard support (closed popover)
 
-- In `click` mode, clicking the `PopoverTrigger` or pressing <Kbd>space</Kbd> or <Kbd>enter</Kbd> when focus is on the trigger will open the popover.
-- In `hover` mode, focusing on or mousing over the `PopoverTrigger` will open the popover.
+- In `click` mode, clicking the `Popover.Trigger` or pressing <Kbd>space</Kbd> or <Kbd>enter</Kbd> when focus is on the trigger will open the popover.
+- In `hover` mode, focusing on or mousing over the `Popover.Trigger` will open the popover.
 
 ### Keyboard support (opened popover)
 
-- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `PopoverContent`.
-- In `click` mode, clicking the `PopoverTrigger` closes the popover.
-- In `hover` mode, blurring or mousing out of the `PopoverTrigger` will close the popover. If you move your mouse into the `PopoverContent`, it'll remain visible.
-- When focus is within the `PopoverContent` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the popover.
-- When `closeOnBur` prop is `true`, clicking outside or blurring out of the `PopoverContent` closes the popover.
-- When the popover closes, focus returns to the `PopoverTrigger` unless another focusable element takes focus.
+- If the `initialFocusSelector` prop is set, focus is moved to the matching element, otherwise focus moves to the `Popover.Content`.
+- In `click` mode, clicking the `Popover.Trigger` closes the popover.
+- In `hover` mode, blurring or mousing out of the `Popover.Trigger` will close the popover. If you move your mouse into the `Popover.Content`, it'll remain visible.
+- When focus is within the `Popover.Content` and `closeOnEsc` prop is `true`, pressing <Kbd>esc</Kbd> closes the popover.
+- When `closeOnBur` prop is `true`, clicking outside or blurring out of the `Popover.Content` closes the popover.
+- When the popover closes, focus returns to the `Popover.Trigger` unless another focusable element takes focus.
 
 ## Theming
 
@@ -656,5 +638,5 @@ const theme = extendTheme({
 
 ### Other components props
 
-- `PopoverCloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
-- `PopoverTrigger` , `PopoverAnchor`, `PopoverContent`, `PopoverHeading` and `PopoverDescription` supports commons Hope UI props (style props, `sx` and `as`).
+- `Popover.CloseButton` renders a [CloseButton](/docs/components/close-button) and supports all of its props.
+- `Popover.Trigger` , `Popover.Anchor`, `Popover.Content`, `Popover.Heading` and `Popover.Description` supports commons Hope UI props (style props, `sx` and `as`).

@@ -1,13 +1,4 @@
-import {
-  Button,
-  Center,
-  createInteractOutside,
-  HStack,
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-  PopoverTrigger,
-} from "@hope-ui/core";
+import { Button, Center, createInteractOutside, HStack, Popover } from "@hope-ui/core";
 import { createSignal } from "solid-js";
 
 import { TargetIcon } from "../components/icons";
@@ -34,9 +25,9 @@ export function FollowCursorExample() {
         Hover the area.
       </Center>
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </>
   );
@@ -73,9 +64,9 @@ export function RightClickExample() {
         Right click in the area.
       </Center>
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} getAnchorRect={anchorRect}>
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </>
   );
@@ -86,11 +77,11 @@ export function RenderPropPopoverExample() {
     <Popover>
       {({ isOpen, close }) => (
         <>
-          <PopoverTrigger as={Button}>Click to {isOpen() ? "close" : "open"}</PopoverTrigger>
-          <PopoverContent w="max-content" p={4}>
+          <Popover.Trigger as={Button}>Click to {isOpen() ? "close" : "open"}</Popover.Trigger>
+          <Popover.Content w="max-content" p={4}>
             <p>The content of the Popover.</p>
             <Button onClick={close}>Close</Button>
-          </PopoverContent>
+          </Popover.Content>
         </>
       )}
     </Popover>
@@ -107,10 +98,10 @@ export function ControlledPopoverExample() {
       </Button>
 
       <Popover isOpen={isOpen()} onOpenChange={setIsOpen} closeOnBlur={false}>
-        <PopoverAnchor as={TargetIcon} boxSize={6} />
-        <PopoverContent w="max-content" p={4}>
+        <Popover.Anchor as={TargetIcon} boxSize={6} />
+        <Popover.Content w="max-content" p={4}>
           <p>The content of the Popover.</p>
-        </PopoverContent>
+        </Popover.Content>
       </Popover>
     </HStack>
   );

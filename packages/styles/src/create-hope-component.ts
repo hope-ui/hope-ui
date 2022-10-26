@@ -10,8 +10,8 @@ export type HopeComponent<DefaultType extends As, Props = {}> = PolymorphicCompo
 >;
 
 /** Create a polymorphic Hope UI component with the `as` and `system style` props support. */
-export function createHopeComponent<DefaultType extends As, Props = {}>(
+export function createHopeComponent<DefaultType extends As, Props = {}, Composite = {}>(
   component: Component<PolymorphicProps<DefaultType, OverrideProps<HopeProps, Props>>>
 ) {
-  return component as unknown as HopeComponent<DefaultType, Props>;
+  return component as unknown as HopeComponent<DefaultType, Props> & Composite;
 }

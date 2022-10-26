@@ -5,12 +5,12 @@ import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
 
 import { useRequiredInputGroupContext } from "./input-group-context";
 
-interface InputAddonProps {
+interface InputGroupAddonProps {
   /** The placement of the addon outside the input. */
   addonPlacement: "left" | "right";
 }
 
-const InputAddon = createHopeComponent<"div", InputAddonProps>(props => {
+const InputGroupAddon = createHopeComponent<"div", InputGroupAddonProps>(props => {
   const context = useRequiredInputGroupContext();
 
   const [local, others] = splitProps(props, ["class", "__css", "addonPlacement"]);
@@ -60,10 +60,10 @@ const InputAddon = createHopeComponent<"div", InputAddonProps>(props => {
   );
 });
 
-export const InputLeftAddon = createHopeComponent<"div">(props => {
-  return <InputAddon addonPlacement="left" {...props} />;
+export const InputGroupLeftAddon = createHopeComponent<"div">(props => {
+  return <InputGroupAddon addonPlacement="left" {...props} />;
 });
 
-export const InputRightAddon = createHopeComponent<"div">(props => {
-  return <InputAddon addonPlacement="right" {...props} />;
+export const InputGroupRightAddon = createHopeComponent<"div">(props => {
+  return <InputGroupAddon addonPlacement="right" {...props} />;
 });

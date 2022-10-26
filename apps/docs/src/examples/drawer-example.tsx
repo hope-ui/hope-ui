@@ -1,16 +1,4 @@
-import {
-  Button,
-  Drawer,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeading,
-  DrawerOverlay,
-  DrawerProps,
-  HStack,
-  Text,
-  VStack,
-} from "@hope-ui/core";
+import { Button, Drawer, DrawerProps, HStack, Text, VStack } from "@hope-ui/core";
 import { createSignal, For, Show } from "solid-js";
 
 export function BasicUsageExample() {
@@ -20,14 +8,14 @@ export function BasicUsageExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -40,11 +28,11 @@ export function InitialFocusExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Drawer.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -52,7 +40,7 @@ export function InitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -69,11 +57,11 @@ export function CustomInitialFocusExample() {
         onClose={() => setIsOpen(false)}
         initialFocusSelector="#initial-focus"
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <Text mb={4}>The content of the Drawer.</Text>
           <HStack justifyContent="flex-end" spacing={4}>
@@ -81,7 +69,7 @@ export function CustomInitialFocusExample() {
               Action
             </Button>
           </HStack>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -98,14 +86,14 @@ export function CustomRestoreFocusExample() {
         onClose={() => setIsOpen(false)}
         restoreFocusSelector="[data-finalfocus]"
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
 
       <Button data-finalfocus _focus={{ color: "red" }}>
@@ -122,14 +110,14 @@ export function DisableFocusTrapExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} trapFocus={false}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -142,14 +130,14 @@ export function DisablePreventScrollExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} preventScroll={false}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -162,23 +150,23 @@ export function HeadingAndDescriptionExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack alignItems="flex-start" justifyContent="space-between" mb={4}>
             <VStack alignItems="flex-start">
-              <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-              <DrawerDescription
+              <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+              <Drawer.Description
                 fontSize="sm"
                 color={{ light: "neutral.600", dark: "neutral.300" }}
                 mb={4}
               >
                 Description
-              </DrawerDescription>
+              </Drawer.Description>
             </VStack>
-            <DrawerCloseButton />
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -201,14 +189,14 @@ export function TransitionExample() {
           exitEasing: "ease-in",
         }}
       >
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -234,14 +222,14 @@ export function PlacementExample() {
       </HStack>
 
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} placement={placement()}>
-        <DrawerOverlay />
-        <DrawerContent p={4}>
+        <Drawer.Overlay />
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -266,15 +254,15 @@ export function SizeExample() {
 
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)} size={size()}>
         <Show when={size() !== "full"}>
-          <DrawerOverlay />
+          <Drawer.Overlay />
         </Show>
-        <DrawerContent p={4}>
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
@@ -287,19 +275,19 @@ export function CustomBackdropExample() {
     <>
       <Button onClick={() => setIsOpen(true)}>Open Drawer</Button>
       <Drawer isOpen={isOpen()} onClose={() => setIsOpen(false)}>
-        <DrawerOverlay
+        <Drawer.Overlay
           sx={{
             bg: "blackAlpha.300",
             backdropFilter: "blur(10px) hue-rotate(90deg)",
           }}
         />
-        <DrawerContent p={4}>
+        <Drawer.Content p={4}>
           <HStack justifyContent="space-between" mb={4}>
-            <DrawerHeading fontWeight="semibold">Title</DrawerHeading>
-            <DrawerCloseButton />
+            <Drawer.Heading fontWeight="semibold">Title</Drawer.Heading>
+            <Drawer.CloseButton />
           </HStack>
           <p>The content of the Drawer.</p>
-        </DrawerContent>
+        </Drawer.Content>
       </Drawer>
     </>
   );
