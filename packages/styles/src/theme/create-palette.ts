@@ -18,3 +18,29 @@ export function createPalette(scale: PaletteScale): PaletteRange {
     darkChannel: rgbColorChannel(scale["900"]),
   };
 }
+
+/** Utility function to create reversed color palettes. */
+export function createReversePalette(scale: PaletteScale): PaletteRange {
+  const scaleReversed = reverseScale(scale);
+
+  return {
+    ...scaleReversed,
+    mainChannel: rgbColorChannel(scaleReversed["400"]),
+    lightChannel: rgbColorChannel(scaleReversed["800"]),
+    darkChannel: rgbColorChannel(scaleReversed["50"]),
+  };
+}
+
+/** Reverse a palette scale. 50 -> 900...900 -> 50. */
+export function reverseScale(scale: PaletteScale): PaletteScale {
+  const keys = Object.keys(scale) as unknown as Array<keyof PaletteScale>;
+  const keysReversed = keys.slice().reverse() as unknown as Array<keyof PaletteScale>;
+
+  const scaleReversed = { ...scale };
+
+  for (let i = 0; i < keys.length; i++) {
+    scaleReversed[keys[i]] = scaleReversed[keysReversed[i]];
+  }
+
+  return scaleReversed;
+}
