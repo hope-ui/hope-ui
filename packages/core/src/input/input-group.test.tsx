@@ -24,9 +24,9 @@ import { render, screen } from "solid-testing-library";
 
 import { FormControl } from "../form-control";
 import { Input } from "./input";
-import { InputLeftAddon, InputRightAddon } from "./input-addon";
+import { InputGroupLeftAddon, InputGroupRightAddon } from "./input-group-addon";
 import { InputGroup, InputGroupProps } from "./input-group";
-import { InputLeftSection, InputRightSection } from "./input-section";
+import { InputGroupLeftSection, InputGroupRightSection } from "./input-group-section";
 
 const defaultProps: InputGroupProps = {};
 
@@ -41,9 +41,9 @@ describe("InputGroup", () => {
   it("renders left and right addons", () => {
     render(() => (
       <InputGroup>
-        <InputLeftAddon>left-addon</InputLeftAddon>
+        <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
         <Input />
-        <InputRightAddon>right-addon</InputRightAddon>
+        <InputGroupRightAddon>right-addon</InputGroupRightAddon>
       </InputGroup>
     ));
 
@@ -54,9 +54,9 @@ describe("InputGroup", () => {
   it("renders left and right sections", () => {
     render(() => (
       <InputGroup>
-        <InputLeftSection>left-section</InputLeftSection>
+        <InputGroupLeftSection>left-section</InputGroupLeftSection>
         <Input />
-        <InputRightSection>right-section</InputRightSection>
+        <InputGroupRightSection>right-section</InputGroupRightSection>
       </InputGroup>
     ));
 
@@ -67,11 +67,11 @@ describe("InputGroup", () => {
   it("should forward the 'isRequired' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isRequired>
-        <InputLeftAddon>left-addon</InputLeftAddon>
-        <InputLeftSection>left-section</InputLeftSection>
+        <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+        <InputGroupLeftSection>left-section</InputGroupLeftSection>
         <Input data-testid="input" />
-        <InputRightSection>right-section</InputRightSection>
-        <InputRightAddon>right-addon</InputRightAddon>
+        <InputGroupRightSection>right-section</InputGroupRightSection>
+        <InputGroupRightAddon>right-addon</InputGroupRightAddon>
       </InputGroup>
     ));
 
@@ -87,11 +87,11 @@ describe("InputGroup", () => {
     render(() => (
       <FormControl isRequired>
         <InputGroup data-testid="input-group">
-          <InputLeftAddon>left-addon</InputLeftAddon>
-          <InputLeftSection>left-section</InputLeftSection>
+          <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+          <InputGroupLeftSection>left-section</InputGroupLeftSection>
           <Input data-testid="input" />
-          <InputRightSection>right-section</InputRightSection>
-          <InputRightAddon>right-addon</InputRightAddon>
+          <InputGroupRightSection>right-section</InputGroupRightSection>
+          <InputGroupRightAddon>right-addon</InputGroupRightAddon>
         </InputGroup>
       </FormControl>
     ));
@@ -107,11 +107,11 @@ describe("InputGroup", () => {
   it("should forward the 'isDisabled' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isDisabled>
-        <InputLeftAddon>left-addon</InputLeftAddon>
-        <InputLeftSection>left-section</InputLeftSection>
+        <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+        <InputGroupLeftSection>left-section</InputGroupLeftSection>
         <Input data-testid="input" />
-        <InputRightSection>right-section</InputRightSection>
-        <InputRightAddon>right-addon</InputRightAddon>
+        <InputGroupRightSection>right-section</InputGroupRightSection>
+        <InputGroupRightAddon>right-addon</InputGroupRightAddon>
       </InputGroup>
     ));
 
@@ -127,11 +127,11 @@ describe("InputGroup", () => {
     render(() => (
       <FormControl isDisabled>
         <InputGroup data-testid="input-group">
-          <InputLeftAddon>left-addon</InputLeftAddon>
-          <InputLeftSection>left-section</InputLeftSection>
+          <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+          <InputGroupLeftSection>left-section</InputGroupLeftSection>
           <Input data-testid="input" />
-          <InputRightSection>right-section</InputRightSection>
-          <InputRightAddon>right-addon</InputRightAddon>
+          <InputGroupRightSection>right-section</InputGroupRightSection>
+          <InputGroupRightAddon>right-addon</InputGroupRightAddon>
         </InputGroup>
       </FormControl>
     ));
@@ -147,11 +147,11 @@ describe("InputGroup", () => {
   it("should forward the 'isReadOnly' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isReadOnly>
-        <InputLeftAddon>left-addon</InputLeftAddon>
-        <InputLeftSection>left-section</InputLeftSection>
+        <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+        <InputGroupLeftSection>left-section</InputGroupLeftSection>
         <Input data-testid="input" />
-        <InputRightSection>right-section</InputRightSection>
-        <InputRightAddon>right-addon</InputRightAddon>
+        <InputGroupRightSection>right-section</InputGroupRightSection>
+        <InputGroupRightAddon>right-addon</InputGroupRightAddon>
       </InputGroup>
     ));
 
@@ -167,11 +167,11 @@ describe("InputGroup", () => {
     render(() => (
       <FormControl isReadOnly>
         <InputGroup data-testid="input-group">
-          <InputLeftAddon>left-addon</InputLeftAddon>
-          <InputLeftSection>left-section</InputLeftSection>
+          <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+          <InputGroupLeftSection>left-section</InputGroupLeftSection>
           <Input data-testid="input" />
-          <InputRightSection>right-section</InputRightSection>
-          <InputRightAddon>right-addon</InputRightAddon>
+          <InputGroupRightSection>right-section</InputGroupRightSection>
+          <InputGroupRightAddon>right-addon</InputGroupRightAddon>
         </InputGroup>
       </FormControl>
     ));
@@ -187,11 +187,11 @@ describe("InputGroup", () => {
   it("should forward the 'isInvalid' prop to input, sections and addons", () => {
     render(() => (
       <InputGroup data-testid="input-group" isInvalid>
-        <InputLeftAddon>left-addon</InputLeftAddon>
-        <InputLeftSection>left-section</InputLeftSection>
+        <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+        <InputGroupLeftSection>left-section</InputGroupLeftSection>
         <Input data-testid="input" />
-        <InputRightSection>right-section</InputRightSection>
-        <InputRightAddon>right-addon</InputRightAddon>
+        <InputGroupRightSection>right-section</InputGroupRightSection>
+        <InputGroupRightAddon>right-addon</InputGroupRightAddon>
       </InputGroup>
     ));
 
@@ -207,11 +207,11 @@ describe("InputGroup", () => {
     render(() => (
       <FormControl isInvalid>
         <InputGroup data-testid="input-group">
-          <InputLeftAddon>left-addon</InputLeftAddon>
-          <InputLeftSection>left-section</InputLeftSection>
+          <InputGroupLeftAddon>left-addon</InputGroupLeftAddon>
+          <InputGroupLeftSection>left-section</InputGroupLeftSection>
           <Input data-testid="input" />
-          <InputRightSection>right-section</InputRightSection>
-          <InputRightAddon>right-addon</InputRightAddon>
+          <InputGroupRightSection>right-section</InputGroupRightSection>
+          <InputGroupRightAddon>right-addon</InputGroupRightAddon>
         </InputGroup>
       </FormControl>
     ));
