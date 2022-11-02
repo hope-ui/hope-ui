@@ -6,8 +6,8 @@ import {
   cookieStorageManagerSSR,
   DEFAULT_THEME,
   extendTheme,
-  HopeCriticalStyle,
   HopeProvider,
+  injectCriticalStyle,
   PopoverTheme,
 } from "@hope-ui/core";
 import { Suspense, useContext } from "solid-js";
@@ -74,6 +74,8 @@ export default function Root() {
     return isServer ? event.request.headers.get("cookie") ?? "" : document.cookie;
   };
 
+  injectCriticalStyle();
+
   return (
     <HopeProvider theme={theme} storageManager={cookieStorageManagerSSR(cookie())}>
       <Html lang="en">
@@ -84,7 +86,7 @@ export default function Root() {
           <Link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <Link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <Link rel="manifest" href="/site.webmanifest" />
-          <HopeCriticalStyle />
+          {/*<HopeCriticalStyle />*/}
         </Head>
         <Body>
           <Suspense>

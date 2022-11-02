@@ -3,7 +3,7 @@ import { useAssets } from "solid-js/web";
 import { getCssText } from "./stitches.config";
 
 /** Inject all critical CSS during server-side rendering. */
-export function HopeCriticalStyle() {
+export function injectCriticalStyle() {
   // eslint-disable-next-line solid/no-innerhtml
-  return useAssets(() => (<style id="stitches" innerHTML={getCssText()} $ServerOnly />) as string);
+  useAssets(() => (<style id="stitches" innerHTML={getCssText()} $ServerOnly />) as string);
 }
