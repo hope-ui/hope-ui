@@ -4,7 +4,7 @@ import "./styles/code.css";
 
 import {
   ColorModeScript,
-  createCookieStorageManagerSSR,
+  cookieStorageManagerSSR,
   DEFAULT_THEME,
   extendTheme,
   HopeProvider,
@@ -71,7 +71,7 @@ const theme = extendTheme({
 export default function Root() {
   const event = useContext(ServerContext);
 
-  const storageManager = createCookieStorageManagerSSR(
+  const storageManager = cookieStorageManagerSSR(
     isServer ? event.request.headers.get("cookie") ?? "" : document.cookie
   );
 
@@ -88,10 +88,7 @@ export default function Root() {
         <Link rel="manifest" href="/site.webmanifest" />
       </Head>
       <Body>
-        <ColorModeScript
-          initialColorMode={storageManager.get()}
-          storageType={storageManager.type}
-        />
+        <ColorModeScript storageType={storageManager.type} />
         <HopeProvider theme={theme} storageManager={storageManager}>
           <Suspense>
             <ErrorBoundary>

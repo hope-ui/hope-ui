@@ -11,25 +11,178 @@ Adjust your application's color scheme based on user preference.
 Hope UI comes with built-in support for managing color mode in your application. All components are color-mode aware.
 
 <Callout>
-  The color mode is stored in `localStorage` and appends a class to the `body` element.
+  By default, the color mode is stored in `localStorage` and appends a class to the `body` element.
+</Callout>
+
+### Color mode script
+
+The `ColorModeScript` ensures that the color mode storage sync works properly, and needs to be added before the content inside the body tag.
+
+For a standard SolidJS application, you need to add the `ColorModeScript` to the `index.tsx` (or .jsx) file.
+
+```tsx {10}
+// index.tsx
+
+import { ColorModeScript, HopeProvider } from "@hope-ui/core";
+import { render } from "solid-js/web";
+
+import App from "./App";
+
+render(
+  () => (
+    <>
+      <ColorModeScript />
+      <HopeProvider>
+        <App />
+      </HopeProvider>
+    </>
+  ),
+  document.getElementById("root") as HTMLElement
+);
+```
+
+For a SolidStart application, you need to add the `ColorModeScript` to the `root.tsx` file.
+
+```tsx {32}
+// root.tsx
+
+import {
+  ColorModeScript,
+  cookieStorageManagerSSR,
+  HopeProvider,
+  injectCriticalStyle,
+} from "@hope-ui/core";
+import { Suspense, useContext } from "solid-js";
+import {
+  Body,
+  ErrorBoundary,
+  FileRoutes,
+  Head,
+  Html,
+  Meta,
+  Routes,
+  Scripts,
+  ServerContext,
+  Title,
+} from "solid-start";
+export default function Root() {
+  injectCriticalStyle();
+
+  return (
+    <Html lang="en">
+      <Head>
+        <Title>SolidStart - Bare</Title>
+        <Meta charset="utf-8" />
+        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Body>
+        <ColorModeScript />
+        <HopeProvider>
+          <Suspense>
+            <ErrorBoundary>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </ErrorBoundary>
+          </Suspense>
+        </HopeProvider>
+        <Scripts />
+      </Body>
+    </Html>
+  );
+}
+```
+
+You can also use a cookie storage manager instead, like below.
+
+```tsx {24-26,38-39}
+// root.tsx
+import {
+  ColorModeScript,
+  cookieStorageManagerSSR,
+  HopeProvider,
+  injectCriticalStyle,
+} from "@hope-ui/core";
+import { Suspense, useContext } from "solid-js";
+import {
+  Body,
+  ErrorBoundary,
+  FileRoutes,
+  Head,
+  Html,
+  Meta,
+  Routes,
+  Scripts,
+  ServerContext,
+  Title,
+} from "solid-start";
+export default function Root() {
+  const event = useContext(ServerContext);
+
+  // or import the default `cookieStorageManager` from "@hope-ui/core"
+  const storageManager = cookieStorageManagerSSR(
+    isServer ? event.request.headers.get("cookie") ?? "" : document.cookie
+  );
+
+  injectCriticalStyle();
+
+  return (
+    <Html lang="en">
+      <Head>
+        <Title>SolidStart - Bare</Title>
+        <Meta charset="utf-8" />
+        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Body>
+        <ColorModeScript storageType="cookie" />
+        <HopeProvider storageManager={storageManager}>
+          <Suspense>
+            <ErrorBoundary>
+              <Routes>
+                <FileRoutes />
+              </Routes>
+            </ErrorBoundary>
+          </Suspense>
+        </HopeProvider>
+        <Scripts />
+      </Body>
+    </Html>
+  );
+}
+```
+
+<Callout type="warning">
+  <span>
+    To use the `ColorModeScript` on a site with strict `Content-Security-Policy`, you can use the
+    `nonce` prop that will be passed to the `script` tag.
+  </span>
 </Callout>
 
 ### Initial color mode
 
 The default color mode used by Hope UI is `system`, meaning it will adapt to user preference.
 
-To set the initial color mode your application should start with, pass the `initialColorMode` prop to `HopeProvider` with either `light`, `dark` or `system`.
+To set the initial color mode your application should start with, pass the `initialColorMode` prop to `ColorModeScript` with either `light`, `dark` or `system`.
 
-```tsx
-import { HopeProvider } from "@hope-ui/core";
+```tsx {10}
+// index.tsx
 
-function Demo() {
-  return (
-    <HopeProvider initialColorMode="dark">
-      <App />
-    </HopeProvider>
-  );
-}
+import { ColorModeScript, HopeProvider } from "@hope-ui/core";
+import { render } from "solid-js/web";
+
+import App from "./App";
+
+render(
+  () => (
+    <>
+      <ColorModeScript initialColorMode="dark" />
+      <HopeProvider>
+        <App />
+      </HopeProvider>
+    </>
+  ),
+  document.getElementById("root") as HTMLElement
+);
 ```
 
 ### Changing color mode

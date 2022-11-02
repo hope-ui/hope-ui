@@ -26,12 +26,10 @@ import {
  */
 export function ColorModeProvider(props: ColorModeProviderProps) {
   const colorModeManager = () => props.storageManager ?? localStorageManager;
-  const fallbackColorMode = () => (props.initialColorMode === "dark" ? "dark" : "light");
+
   let colorModeListenerCleanupFn: (() => unknown) | undefined;
 
-  const [colorMode, rawSetColorMode] = createSignal(
-    getInitialColorMode(colorModeManager(), fallbackColorMode())
-  );
+  const [colorMode, rawSetColorMode] = createSignal(getInitialColorMode(colorModeManager()));
 
   const applyColorMode = (value: ColorMode) => {
     rawSetColorMode(value);
@@ -60,26 +58,9 @@ export function ColorModeProvider(props: ColorModeProviderProps) {
     setColorMode(colorMode() === "dark" ? "light" : "dark");
   };
 
-  createEffect(
-    on(
-      [colorModeManager, fallbackColorMode, () => props.initialColorMode],
-      ([colorModeManager, fallbackColorMode, initialColorMode]) => {
-        const managerValue = colorModeManager.get();
-
-        if (managerValue) {
-          setColorMode(managerValue);
-          return;
-        }
-
-        if (initialColorMode === "system") {
-          setColorMode("system");
-          return;
-        }
-
-        setColorMode(fallbackColorMode);
-      }
-    )
-  );
+  createEffect(() => {
+    setColorMode(colorModeManager().get() ?? "system");
+  });
 
   onCleanup(() => {
     // ensure listener is always cleaned when component is destroyed.

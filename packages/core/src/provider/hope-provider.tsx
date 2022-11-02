@@ -8,23 +8,12 @@ import { mergeDefaultProps } from "../utils";
 export function HopeProvider(props: ColorModeProviderProps & ThemeProviderProps) {
   watchModals();
 
-  props = mergeDefaultProps(
-    {
-      initialColorMode: "system",
-      withCssReset: true,
-    },
-    props
-  );
+  props = mergeDefaultProps({ withCssReset: true }, props);
 
-  const [local, others] = splitProps(props, [
-    "initialColorMode",
-    "storageManager",
-    "disableTransitionOnChange",
-  ]);
+  const [local, others] = splitProps(props, ["storageManager", "disableTransitionOnChange"]);
 
   return (
     <ColorModeProvider
-      initialColorMode={local.initialColorMode}
       storageManager={local.storageManager}
       disableTransitionOnChange={local.disableTransitionOnChange}
     >

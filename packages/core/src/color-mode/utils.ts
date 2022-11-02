@@ -7,6 +7,7 @@
  */
 
 import { COLOR_MODE_CLASSNAMES, ColorMode } from "@hope-ui/styles";
+import { isServer } from "solid-js/web";
 
 import { ColorModeStorageManager } from "./types";
 
@@ -53,12 +54,17 @@ export function getSystemColorMode(fallback?: ColorMode): ColorMode {
   return isDark ? "dark" : "light";
 }
 
-export function getInitialColorMode(manager: ColorModeStorageManager, fallback: ColorMode) {
-  if (manager.type === "cookie" && manager.ssr) {
-    return manager.get() ?? fallback;
+export function getInitialColorMode(manager: ColorModeStorageManager): ColorMode {
+  const fallback: ColorMode = "light";
+
+  const initialColorMode = manager.get(fallback) ?? fallback;
+
+  if (initialColorMode === "system") {
+    // We can't know the client system preference in SSR so just return the fallback.
+    return isServer ? fallback : getSystemColorMode();
   }
 
-  return fallback;
+  return initialColorMode;
 }
 
 export function addColorModeListener(fn: (cm: ColorMode) => unknown) {

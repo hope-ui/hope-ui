@@ -9,25 +9,28 @@
 import { createMemo } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
-import { ColorModeScriptProps } from "./types";
+import { COLOR_MODE_STORAGE_KEY } from "./storage-manager";
+import { ColorModeScriptProps, ConfigColorMode } from "./types";
 
-const VALID_VALUES = new Set(["dark", "light", "system"]);
+const VALID_VALUES = new Set<ConfigColorMode>(["light", "dark", "system"]);
 
 /**
  * runtime safe-guard against invalid color mode values
  */
-function normalize(initialColorMode: "light" | "dark" | "system") {
-  let value = initialColorMode;
-  if (!VALID_VALUES.has(value)) value = "light";
-  return value;
+function normalize(initialColorMode: ConfigColorMode) {
+  if (!VALID_VALUES.has(initialColorMode)) {
+    return "light";
+  }
+
+  return initialColorMode;
 }
 
 export function ColorModeScript(props: ColorModeScriptProps) {
   props = mergeDefaultProps(
     {
-      initialColorMode: "light",
+      initialColorMode: "system",
       storageType: "localStorage",
-      storageKey: "hope-ui-color-mode",
+      storageKey: COLOR_MODE_STORAGE_KEY,
     },
     props
   );
@@ -36,15 +39,13 @@ export function ColorModeScript(props: ColorModeScriptProps) {
     // runtime safe-guard against invalid color mode values
     const init = normalize(props.initialColorMode!);
 
-    const isCookie = props.storageType === "cookie";
-
-    const cookieScript = `(function(){try{var a=function(o){var l="(prefers-color-scheme: dark)",v=window.matchMedia(l).matches?"dark":"light",e=o==="system"?v:o,d=document.documentElement,m=document.body,i="hope-theme-light",n="hope-theme-dark",s=e==="dark";return m.classList.add(s?n:i),m.classList.remove(s?i:n),d.style.colorScheme=e,d.dataset.hopeTheme=e,e},u=a,h="${init}",r="${props.storageKey}",t=document.cookie.match(new RegExp("(^| )".concat(r,"=([^;]+)"))),c=t?t[2]:null;c?a(c):document.cookie="".concat(r,"=").concat(a(h),"; max-age=31536000; path=/")}catch(a){}})();
+    const cookieScript = `(function(){try{var a=function(o){var l="(prefers-color-scheme: dark)",v=window.matchMedia(l).matches?"dark":"light",e=o==="system"?v:o,d=document.documentElement,m=document.body,i="hope-theme-light",n="hope-theme-dark",s=e==="dark";return m.classList.add(s?n:i),m.classList.remove(s?i:n),d.style.colorScheme=e,d.dataset.hopeTheme=e,o},u=a,h="${init}",r="${props.storageKey}",t=document.cookie.match(new RegExp("(^| )".concat(r,"=([^;]+)"))),c=t?t[2]:null;c?a(c):document.cookie="".concat(r,"=").concat(a(h),"; max-age=31536000; path=/")}catch(a){}})();
   `;
 
-    const localStorageScript = `(function(){try{var a=function(c){var v="(prefers-color-scheme: dark)",h=window.matchMedia(v).matches?"dark":"light",r=c==="system"?h:c,o=document.documentElement,s=document.body,l="hope-theme-light",d="hope-theme-dark",i=r==="dark";return s.classList.add(i?d:l),s.classList.remove(i?l:d),o.style.colorScheme=r,o.dataset.hopeTheme=r,r},n=a,m="${init}",e="${props.storageKey}",t=localStorage.getItem(e);t?a(t):localStorage.setItem(e,a(m))}catch(a){}})();
+    const localStorageScript = `(function(){try{var a=function(c){var v="(prefers-color-scheme: dark)",h=window.matchMedia(v).matches?"dark":"light",r=c==="system"?h:c,o=document.documentElement,s=document.body,l="hope-theme-light",d="hope-theme-dark",i=r==="dark";return s.classList.add(i?d:l),s.classList.remove(i?l:d),o.style.colorScheme=r,o.dataset.hopeTheme=r,c},n=a,m="${init}",e="${props.storageKey}",t=localStorage.getItem(e);t?a(t):localStorage.setItem(e,a(m))}catch(a){}})();
   `;
 
-    const fn = isCookie ? cookieScript : localStorageScript;
+    const fn = props.storageType === "cookie" ? cookieScript : localStorageScript;
 
     return `!${fn}`.trim();
   });
