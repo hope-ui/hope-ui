@@ -52,8 +52,8 @@ function App() {
 
 <Callout type="warning">
   <span>
-    Hope UI has been tested with `solid-js@1.5.7` and `solid-start@0.1.3`. Compatibility
-    with other versions is not guaranteed.
+    Hope UI has been tested with `solid-js@1.5.7` and `solid-start@0.1.3`. Compatibility with other
+    versions is not guaranteed.
   </span>
 </Callout>
 
@@ -73,12 +73,12 @@ export default defineConfig({
 });
 ```
 
-Then wrap your application root component with `HopeProvider` and add `HopeCriticalStyle` to the `Head`:
+Then update your application `root.tsx` like below:
 
-```tsx {2, 18,24,37}
+```tsx {2, 17,27,28,36}
 // root.tsx
 
-import { HopeProvider, HopeCriticalStyle } from "@hope-ui/core";
+import { ColorModeScript, HopeProvider, injectCriticalStyle } from "@hope-ui/core";
 import { Suspense } from "solid-js";
 import {
   Body,
@@ -93,16 +93,18 @@ import {
 } from "solid-start";
 
 export default function Root() {
+  injectCriticalStyle();
+
   return (
-    <HopeProvider>
-      <Html lang="en">
-        <Head>
-          <Title>SolidStart - Bare</Title>
-          <Meta charset="utf-8" />
-          <Meta name="viewport" content="width=device-width, initial-scale=1" />
-          <HopeCriticalStyle />
-        </Head>
-        <Body>
+    <Html lang="en">
+      <Head>
+        <Title>SolidStart - Bare</Title>
+        <Meta charset="utf-8" />
+        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Body>
+        <ColorModeScript />
+        <HopeProvider>
           <Suspense>
             <ErrorBoundary>
               <Routes>
@@ -110,12 +112,14 @@ export default function Root() {
               </Routes>
             </ErrorBoundary>
           </Suspense>
-          <Scripts />
-        </Body>
-      </Html>
-    </HopeProvider>
+        </HopeProvider>
+        <Scripts />
+      </Body>
+    </Html>
   );
 }
 ```
 
-`HopeCriticalStyle` will inject all critical CSS during server-side rendering.
+- `injectCriticalStyle` - inject all critical style during server-side rendering.
+- `ColorModeScript` - avoid color mode flash issue during server-side rendering.
+- `HopeProvider` - provide context and theme for all Hope UI components.

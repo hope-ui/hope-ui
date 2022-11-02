@@ -46,7 +46,7 @@ export const HeaderLogo = createHopeComponent<"div">(props => {
             color: "neutral.300",
           }}
         >
-          v1.0.0-next.6
+          v1.0.0-next.7
         </hope.span>
       </HStack>
     </Flex>

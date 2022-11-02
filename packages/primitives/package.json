@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/primitives",
-  "version": "1.0.0-next.6",
+  "version": "1.0.0-next.7",
   "private": false,
   "description": "A set of SolidJS primitives for state and UI management.",
   "keywords": [
@@ -47,11 +47,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/utils": "1.0.0-next.6",
+    "@hope-ui/utils": "1.0.0-next.7",
     "@solid-primitives/media": "2.0.2"
   },
   "devDependencies": {
-    "@hope-ui/tests": "1.0.0-next.6"
+    "@hope-ui/tests": "1.0.0-next.7"
   },
   "peerDependencies": {
     "solid-js": "^1.5.7"

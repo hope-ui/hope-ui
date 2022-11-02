@@ -11,7 +11,7 @@ import {
   injectCriticalStyle,
   PopoverTheme,
 } from "@hope-ui/core";
-import { createMemo, Suspense, useContext } from "solid-js";
+import { Suspense, useContext } from "solid-js";
 import { isServer } from "solid-js/web";
 import { MDXProvider } from "solid-mdx";
 import {
