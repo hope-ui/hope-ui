@@ -3,14 +3,15 @@ import "./styles/index.css";
 import "./styles/code.css";
 
 import {
-  cookieStorageManagerSSR,
+  ColorModeScript,
+  createCookieStorageManagerSSR,
   DEFAULT_THEME,
   extendTheme,
   HopeProvider,
   injectCriticalStyle,
   PopoverTheme,
 } from "@hope-ui/core";
-import { Suspense, useContext } from "solid-js";
+import { createMemo, Suspense, useContext } from "solid-js";
 import { isServer } from "solid-js/web";
 import { MDXProvider } from "solid-mdx";
 import {
@@ -70,25 +71,28 @@ const theme = extendTheme({
 export default function Root() {
   const event = useContext(ServerContext);
 
-  const cookie = () => {
-    return isServer ? event.request.headers.get("cookie") ?? "" : document.cookie;
-  };
+  const storageManager = createCookieStorageManagerSSR(
+    isServer ? event.request.headers.get("cookie") ?? "" : document.cookie
+  );
 
   injectCriticalStyle();
 
   return (
-    <HopeProvider theme={theme} storageManager={cookieStorageManagerSSR(cookie())}>
-      <Html lang="en">
-        <Head>
-          <Meta charset="utf-8" />
-          <Meta name="viewport" content="width=device-width, initial-scale=1" />
-          <Link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-          <Link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-          <Link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-          <Link rel="manifest" href="/site.webmanifest" />
-          {/*<HopeCriticalStyle />*/}
-        </Head>
-        <Body>
+    <Html lang="en">
+      <Head>
+        <Meta charset="utf-8" />
+        <Meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <Link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <Link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <Link rel="manifest" href="/site.webmanifest" />
+      </Head>
+      <Body>
+        <ColorModeScript
+          initialColorMode={storageManager.get()}
+          storageType={storageManager.type}
+        />
+        <HopeProvider theme={theme} storageManager={storageManager}>
           <Suspense>
             <ErrorBoundary>
               <MDXProvider components={mdxComponents}>
@@ -100,9 +104,9 @@ export default function Root() {
               </MDXProvider>
             </ErrorBoundary>
           </Suspense>
-          <Scripts />
-        </Body>
-      </Html>
-    </HopeProvider>
+        </HopeProvider>
+        <Scripts />
+      </Body>
+    </Html>
   );
 }

@@ -16,7 +16,7 @@ export function createLocalStorageManager(key: string): ColorModeStorageManager 
   return {
     ssr: false,
     type: "localStorage",
-    get: (): MaybeColorMode => {
+    get: () => {
       if (isServer) {
         return undefined;
       }
@@ -51,7 +51,7 @@ export function createCookieStorageManager(key: string, cookie?: string): ColorM
   return {
     ssr: !!cookie,
     type: "cookie",
-    get: (): MaybeColorMode => {
+    get: () => {
       if (cookie) {
         return parseCookie(cookie, key) ?? undefined;
       }
@@ -70,6 +70,6 @@ export function createCookieStorageManager(key: string, cookie?: string): ColorM
 
 export const cookieStorageManager = createCookieStorageManager(COLOR_MODE_STORAGE_KEY);
 
-export function cookieStorageManagerSSR(cookie: string) {
+export function createCookieStorageManagerSSR(cookie: string) {
   return createCookieStorageManager(COLOR_MODE_STORAGE_KEY, cookie);
 }

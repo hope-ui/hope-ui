@@ -14,9 +14,16 @@ export type ConfigColorMode = ColorMode | "system";
 export type MaybeColorMode = ColorMode | undefined;
 
 export interface ColorModeStorageManager {
+  /** The type of storage. */
   type: "cookie" | "localStorage";
+
+  /** Whether it's an SSR environment. */
   ssr?: boolean;
+
+  /** Get the color mode from the storage. */
   get: () => MaybeColorMode;
+
+  /** Save the color mode in the storage. */
   set: (value: ConfigColorMode) => void;
 }
 
@@ -38,3 +45,16 @@ export interface ColorModeOptions {
 }
 
 export type ColorModeProviderProps = ParentProps<ColorModeOptions>;
+
+export type ColorModeScriptProps = {
+  /** The initial color mode to use. */
+  initialColorMode?: ConfigColorMode;
+
+  /** The type of the color mode storage manager, either localStorage or cookie. */
+  storageType?: "localStorage" | "cookie";
+
+  /** The key used to store color mode preference in localStorage or cookie. */
+  storageKey?: string;
+
+  nonce?: string;
+};
