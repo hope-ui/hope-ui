@@ -15,7 +15,7 @@ import {
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-import { KbdStyleConfigProps, useKbdStyleConfig } from "./kbd.styles";
+import { KbdStyleConfigProps, useKbdStyleConfig } from "./kbd.runtime";
 
 export interface KbdProps extends KbdStyleConfigProps {}
 

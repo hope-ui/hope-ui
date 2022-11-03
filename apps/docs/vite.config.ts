@@ -14,11 +14,11 @@ const adapter = process.env.GITHUB_ACTIONS ? node() : netlify();
 
 export default defineConfig({
   plugins: [
-    vanillaExtractPlugin(),
     await mdx({
       rehypePlugins: [rehypePrettyCode],
       remarkPlugins: [remarkGfm],
     }),
     solid({ adapter, extensions: [".mdx", ".md"] }),
+    vanillaExtractPlugin(),
   ],
 });

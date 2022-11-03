@@ -8,6 +8,8 @@
 
 import { hope } from "@hope-ui/styles";
 
+import { centerStyles } from "./center.css";
+
 /**
  * `Center` is used to horizontally and vertically center its child.
  * It uses the popular `display: flex` centering technique.
@@ -16,9 +18,7 @@ export const Center = hope(
   "div",
   {
     baseStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
+      __staticClass: centerStyles.root,
     },
   },
   "hope-Center-root"

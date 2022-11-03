@@ -215,3 +215,7 @@ export const focusVisibleStyles = {
     },
   },
 };
+
+// !!! Important !!!
+// should be same shape as "@hope-ui/styles" DARK_SELECTOR
+export const DARK_THEME_SELECTOR = `.hope-theme-dark &:not([data-theme]), [data-theme=dark] &:not([data-theme]), &[data-theme=dark]`;
