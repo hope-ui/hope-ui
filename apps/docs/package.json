@@ -32,10 +32,12 @@
     "@solidjs/meta": "0.28.0",
     "@solidjs/router": "0.4.3",
     "@stitches/core": "1.2.8",
+    "@vanilla-extract/css": "1.9.1",
     "clsx": "1.2.1"
   },
   "devDependencies": {
     "@hope-ui/mdx": "1.0.0-next.7",
+    "@vanilla-extract/vite-plugin": "3.6.1",
     "babel-preset-solid": "1.5.7",
     "encoding": "0.1.13",
     "iconv-lite": "0.6.3",

@@ -171,13 +171,13 @@ export interface ThemeScales {
   colors: ThemeColors;
   fonts: Record<ThemeFontFamily, string>;
   fontSizes: Record<ThemeFontSize, string>;
-  fontWeights: Record<ThemeFontWeight, number>;
-  lineHeights: Record<ThemeLineHeight, string | number>;
+  fontWeights: Record<ThemeFontWeight, string>;
+  lineHeights: Record<ThemeLineHeight, string>;
   letterSpacings: Record<ThemeLetterSpacing, string>;
   space: Record<ThemeSpace, string>;
   sizes: Record<ThemeSize, string>;
   radii: Record<ThemeRadii, string>;
   shadows: Record<ThemeShadow, string>;
-  zIndices: Record<ThemeZIndice, string | number>;
+  zIndices: Record<ThemeZIndice, string>;
   breakpoints: Record<ThemeBreakpoint, string>;
 }

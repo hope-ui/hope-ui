@@ -1087,7 +1087,13 @@ export type PseudoSelectorProps = Partial<{
 
 export type SystemStyleProps = BaseSystemStyleProps & PseudoSelectorProps;
 
-export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps>;
+export type SystemStyleObject = OverrideProps<CSSObject, SystemStyleProps> & {
+  /**
+   * A static CSS class to be added.
+   * @internal
+   */
+  __staticClass?: string;
+};
 
 export type Sx = SystemStyleObject | ((theme: ThemeVarsAndBreakpoints) => SystemStyleObject);
 

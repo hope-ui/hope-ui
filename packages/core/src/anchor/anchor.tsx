@@ -15,7 +15,7 @@ import {
 import { clsx } from "clsx";
 import { splitProps } from "solid-js";
 
-import { AnchorStyleConfigProps, useAnchorStyleConfig } from "./anchor.styles";
+import { AnchorStyleConfigProps, useAnchorStyleConfig } from "./anchor.runtime";
 
 export interface AnchorProps extends AnchorStyleConfigProps {
   /** Whether the link should be opened in a new tab. */

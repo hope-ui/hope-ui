@@ -41,7 +41,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c ../../configs/rollup.config.ts",
+    "build": "rollup -c",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "storybook": "start-storybook -p 6006",
@@ -68,9 +68,12 @@
     "@storybook/html": "6.5.10",
     "@storybook/manager-webpack5": "6.5.10",
     "@storybook/theming": "6.5.10",
+    "@vanilla-extract/css": "1.9.1",
+    "@vanilla-extract/rollup-plugin": "1.2.0",
     "storybook-dark-mode": "1.1.2"
   },
   "peerDependencies": {
+    "@vanilla-extract/css": "^1.9.1",
     "solid-js": "^1.5.7"
   },
   "publishConfig": {
