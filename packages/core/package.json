@@ -70,6 +70,7 @@
     "@storybook/theming": "6.5.10",
     "@vanilla-extract/css": "1.9.1",
     "@vanilla-extract/rollup-plugin": "1.2.0",
+    "@vanilla-extract/vite-plugin": "3.6.1",
     "storybook-dark-mode": "1.1.2"
   },
   "peerDependencies": {

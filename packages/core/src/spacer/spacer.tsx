@@ -8,7 +8,7 @@
 
 import { hope } from "@hope-ui/styles";
 
-import { spacerStyles } from "./space.css";
+import { spacerStyles } from "./spacer.css";
 
 /**
  * A flexible flex spacer that expands along the major axis of its containing flex layout.

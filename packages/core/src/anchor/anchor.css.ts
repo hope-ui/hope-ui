@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { focusVisibleStyles } from "../_vanilla-extract/theme.css";
+import { focusVisibleStyles } from "../vanilla-extract.css";
 
 const root = style({
   position: "relative",
@@ -10,12 +10,15 @@ const root = style({
   textDecoration: "inherit",
   cursor: "pointer",
   transition: "text-decoration 250ms",
+  WebkitTapHighlightColor: "transparent",
 
   ":hover": {
     textDecoration: "underline",
   },
 
-  ...focusVisibleStyles,
+  selectors: {
+    ...focusVisibleStyles,
+  },
 });
 
 export const anchorStyles = {

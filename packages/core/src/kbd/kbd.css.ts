@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { DARK_THEME_SELECTOR, vars } from "../_vanilla-extract/theme.css";
+import { vars, withDarkThemeSelector } from "../vanilla-extract.css";
 
 const root = style({
   borderRadius: vars.radii.md,
@@ -22,7 +22,7 @@ const root = style({
   backgroundColor: vars.colors.neutral["100"],
 
   selectors: {
-    [DARK_THEME_SELECTOR]: {
+    [withDarkThemeSelector()]: {
       borderColor: vars.colors.neutral["600"],
       backgroundColor: vars.colors.neutral["800"],
     },

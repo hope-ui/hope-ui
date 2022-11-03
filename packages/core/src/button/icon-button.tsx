@@ -16,5 +16,5 @@ import { IconButtonProps } from "./types";
  * Since IconButton only renders an icon, you must pass the aria-label prop, so screen readers can give meaning to the button.
  */
 export const IconButton = createHopeComponent<"button", IconButtonProps>(props => {
-  return <Button isIconButton {...props} />;
+  return <Button isIconOnly {...props} />;
 });

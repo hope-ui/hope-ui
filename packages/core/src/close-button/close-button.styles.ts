@@ -1,4 +1,4 @@
-import { createStyleConfig, focusStyles, StyleConfigProps } from "@hope-ui/styles";
+import { createStyleConfig, StyleConfigProps } from "@hope-ui/styles";
 
 type CloseButtonParts = "root";
 
@@ -43,7 +43,7 @@ export const useCloseButtonStyleConfig = createStyleConfig<CloseButtonParts, Clo
           backgroundColor: "blackAlpha.200",
         },
 
-        ...focusStyles(theme.vars),
+        //...focusStyles(theme.vars),
 
         _dark: {
           color: "whiteAlpha.900",

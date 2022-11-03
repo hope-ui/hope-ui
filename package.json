@@ -22,6 +22,7 @@
     "commit": "git-cz",
     "dev": "pnpm -F @hope-ui/core dev",
     "dev:docs": "pnpm -F @hope-ui/docs dev",
+    "dev:playground": "pnpm -F @hope-ui/playground dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "next:release": "pnpm build && changeset publish --no-git-tag",
     "prepare": "husky install",

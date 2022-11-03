@@ -18,7 +18,7 @@ import { clsx } from "clsx";
 import { createMemo, createSignal, onMount, Show, splitProps } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
-import { useButtonStyleConfig } from "./button.styles";
+import { useButtonStyleConfig } from "./button.runtime";
 import { ButtonContext, useButtonContext } from "./button-context";
 import { useButtonGroupContext } from "./button-group";
 import { ButtonIcon } from "./button-icon";
@@ -75,7 +75,7 @@ export const Button = createHopeComponent<"button", ButtonProps>(props => {
       "isDisabled",
     ],
     ["children", "leftIcon", "rightIcon"],
-    [...STYLE_CONFIG_PROP_NAMES, "colorScheme", "variant", "size", "isFullWidth", "isIconButton"]
+    [...STYLE_CONFIG_PROP_NAMES, "colorScheme", "variant", "size", "isFullWidth", "isIconOnly"]
   );
 
   const tagName = createTagName(

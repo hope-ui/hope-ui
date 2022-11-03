@@ -1,7 +1,7 @@
 import { ComponentTheme, SystemStyleObject } from "@hope-ui/styles";
 import { Accessor, JSX } from "solid-js";
 
-import { ButtonParts, ButtonStyleConfigProps } from "./button.styles";
+import { ButtonParts, ButtonStyleConfigProps } from "./button.runtime";
 
 export interface ButtonProps extends ButtonStyleConfigProps {
   /** The placement of the loader when `isLoading` is true. */
@@ -57,7 +57,7 @@ export interface IconButtonProps
     | "leftIcon"
     | "rightIcon"
     | "isFullWidth"
-    | "isIconButton"
+    | "isIconOnly"
     | "children"
   > {
   /** A label that describes the button. */
