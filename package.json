@@ -94,6 +94,9 @@
   "pnpm": {
     "overrides": {
       "vite-plugin-solid": "2.3.9"
+    },
+    "patchedDependencies": {
+      "@vanilla-extract/vite-plugin@3.6.1": "patches/@vanilla-extract__vite-plugin@3.6.1.patch"
     }
   }
 }

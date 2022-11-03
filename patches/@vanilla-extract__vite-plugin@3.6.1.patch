@@ -1,0 +1,78 @@
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+index 0000000000000000000000000000000000000000..ea7ed093e5564eb3ab03d9c85fe231c9fc7b5b92
+--- /dev/null
++++ b/.idea/.gitignore
+@@ -0,0 +1,5 @@
++# Default ignored files
++/shelf/
++/workspace.xml
++# Editor-based HTTP Client requests
++/httpRequests/
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..e64c0b2ffeffc5ec71510b53e8c42150b2206e26
+--- /dev/null
++++ b/.idea/modules.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/user.iml" filepath="$PROJECT_DIR$/.idea/user.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/.idea/user.iml b/.idea/user.iml
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff88395d5124703c202ca259a23fef1cd256a870
+--- /dev/null
++++ b/.idea/user.iml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="WEB_MODULE" version="4">
++  <component name="NewModuleRootManager">
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/temp" />
++      <excludeFolder url="file://$MODULE_DIR$/.tmp" />
++      <excludeFolder url="file://$MODULE_DIR$/tmp" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+new file mode 100644
+index 0000000000000000000000000000000000000000..d12cdb6216fe459907e009f2765a9d72b3860f58
+--- /dev/null
++++ b/.idea/workspace.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectViewState">
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/dist/vanilla-extract-vite-plugin.cjs.prod.js b/dist/vanilla-extract-vite-plugin.cjs.prod.js
+index f971757416aeaa42b7110c42313f70de487ff183..78bed3b684c2288ef9a851262777b593b2b9f618 100644
+--- a/dist/vanilla-extract-vite-plugin.cjs.prod.js
++++ b/dist/vanilla-extract-vite-plugin.cjs.prod.js
+@@ -81,7 +81,13 @@ function vanillaExtractPlugin({
+   let forceEmitCssInSsrBuild = !!process.env.VITE_RSC_BUILD;
+   let packageName;
+ 
+-  const getAbsoluteVirtualFileId = source => vite.normalizePath(path__default["default"].join(config.root, source));
++  // Fixes virtual file while importing from other packages in pnpm monorepo
++  // Path should be normalized to be able to use HMR
++  const getAbsoluteVirtualFileId = (source) => source.startsWith('..')
++    ? vite.normalizePath(path__default["default"].join(config.root, source))
++    : source.startsWith('/@id/')
++      ? vite.normalizePath(path__default["default"].join(config.root, source.substring(5)))
++      : source;
+ 
+   return {
+     name: 'vanilla-extract',
