@@ -149,21 +149,21 @@ importers:
   apps/playground:
     specifiers:
       '@hope-ui/core': 1.0.0-next.7
-      '@solidjs/meta': 0.28.0
-      '@solidjs/router': 0.4.3
+      '@solidjs/meta': 0.28.2
+      '@solidjs/router': 0.5.0
       '@stitches/core': 1.2.8
       '@vanilla-extract/css': 1.9.1
       '@vanilla-extract/vite-plugin': 3.6.1
       babel-preset-solid: 1.5.7
       clsx: 1.2.1
       solid-js: 1.5.7
-      solid-start: 0.1.3
-      solid-start-node: 0.1.3
-      undici: 5.10.0
+      solid-start: 0.1.8
+      solid-start-node: 0.1.8
+      undici: 5.12.0
     dependencies:
       '@hope-ui/core': link:../../packages/core
-      '@solidjs/meta': 0.28.0_solid-js@1.5.7
-      '@solidjs/router': 0.4.3_solid-js@1.5.7
+      '@solidjs/meta': 0.28.2_solid-js@1.5.7
+      '@solidjs/router': 0.5.0_solid-js@1.5.7
       '@stitches/core': 1.2.8
       '@vanilla-extract/css': 1.9.1
       clsx: 1.2.1
@@ -171,9 +171,9 @@ importers:
       '@vanilla-extract/vite-plugin': 3.6.1_vite@3.2.2
       babel-preset-solid: 1.5.7_@babel+core@7.19.6
       solid-js: 1.5.7
-      solid-start: 0.1.3_7a2z67zqdhvqxzb64uf5aygpjq
-      solid-start-node: 0.1.3_ngybn2m4macld4c6amkogos7qm
-      undici: 5.10.0
+      solid-start: 0.1.8_jgwfdxnl5axahnwqm2w2rfl27q
+      solid-start-node: 0.1.8_rueptotgtwomamqgyinpnyr7vy
+      undici: 5.12.0
 
   packages/core:
     specifiers:
@@ -3881,10 +3881,24 @@ packages:
     dependencies:
       solid-js: 1.5.7
 
+  /@solidjs/meta/0.28.2_solid-js@1.5.7:
+    resolution: {integrity: sha512-avlLgBPdk4KVxzRGFlYp/MIJo8B5jVgXPgk6OUnUP8km21Z+ovO+DUd7ZPA7ejv8PBdWi9GE3zCzw8RU2YuV2Q==}
+    peerDependencies:
+      solid-js: '>=1.4.0'
+    dependencies:
+      solid-js: 1.5.7
+
   /@solidjs/router/0.4.3_solid-js@1.5.7:
     resolution: {integrity: sha512-mYpd4HxpH/3UZjHGTr2dhvPGXu034Ktxd05CJGA6nRjRGYCgUfhCQHRdEivyqJyb4LhHyDht4ny5xmwEOkUTaQ==}
     peerDependencies:
       solid-js: ^1.3.5
+    dependencies:
+      solid-js: 1.5.7
+
+  /@solidjs/router/0.5.0_solid-js@1.5.7:
+    resolution: {integrity: sha512-rNR07l21tWWDVmCbaapggB89rEX7jlM2XChpTLqEGEnj46LzVZ8zgvjcF6NNKScByAlLpoQUkVIjB2KHpcMi+w==}
+    peerDependencies:
+      solid-js: ^1.5.3
     dependencies:
       solid-js: 1.5.7
 
@@ -7587,6 +7601,13 @@ packages:
 
   /builtin-status-codes/3.0.0:
     resolution: {integrity: sha512-HpGFw18DgFWlncDfjTa2rcQ4W88O1mC8e8yZ2AvQY5KDaktSTwo+KRf6nHK6FRI5FyRyb/5T6+TSxfP7QyGsmQ==}
+    dev: true
+
+  /busboy/1.6.0:
+    resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
+    engines: {node: '>=10.16.0'}
+    dependencies:
+      streamsearch: 1.1.0
     dev: true
 
   /bytes/3.0.0:
@@ -16598,6 +16619,28 @@ packages:
       - supports-color
     dev: true
 
+  /solid-start-node/0.1.8_rueptotgtwomamqgyinpnyr7vy:
+    resolution: {integrity: sha512-gmX9HGMP9bDVOJUO3m32EGm3QqhRH1FgCkURwMB6tOmLTSd9S1JoG3aB5+r5JmWwJoajnZn1fcq7QLbtwZOSpQ==}
+    peerDependencies:
+      solid-start: '*'
+      undici: ^5.8.0
+      vite: '*'
+    dependencies:
+      '@rollup/plugin-commonjs': 22.0.2_rollup@2.79.1
+      '@rollup/plugin-json': 4.1.0_rollup@2.79.1
+      '@rollup/plugin-node-resolve': 13.3.0_rollup@2.79.1
+      compression: 1.7.4
+      polka: 1.0.0-next.22
+      rollup: 2.79.1
+      sirv: 2.0.2
+      solid-start: 0.1.8_jgwfdxnl5axahnwqm2w2rfl27q
+      terser: 5.15.1
+      undici: 5.12.0
+      vite: 3.2.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /solid-start/0.1.3_7a2z67zqdhvqxzb64uf5aygpjq:
     resolution: {integrity: sha512-ZzQSBn9+DbzzIiYbP9ZZwYUvKV3tmU+BEqfLHqk/Q5gs9fvq8jl8Qd5SSwGcBZ032xM/sb6tdfgCC+iyyZQGKw==}
     hasBin: true
@@ -16637,6 +16680,53 @@ packages:
       solid-js: 1.5.7
       terser: 5.15.1
       undici: 5.10.0
+      vite: 3.2.2
+      vite-plugin-inspect: 0.6.1_vite@3.2.2
+      vite-plugin-solid: 2.3.9_solid-js@1.5.7+vite@3.2.2
+      wait-on: 6.0.1_debug@4.3.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /solid-start/0.1.8_jgwfdxnl5axahnwqm2w2rfl27q:
+    resolution: {integrity: sha512-Q5GTwKbHNOP1EH9e7Ky4BrsbF7bnWCQ1ZdotwoK9xL2+IuiSBbTGoxD2RVVuIZgbXvnfgAZz9o0WGkK2wdIyGw==}
+    hasBin: true
+    peerDependencies:
+      '@solidjs/meta': ^0.28.0
+      '@solidjs/router': ^0.5.0
+      solid-js: ^1.5.8
+      vite: ^3.0.4
+    dependencies:
+      '@babel/core': 7.19.6
+      '@babel/generator': 7.20.1
+      '@babel/plugin-syntax-jsx': 7.18.6_@babel+core@7.19.6
+      '@babel/preset-env': 7.19.4_@babel+core@7.19.6
+      '@babel/preset-typescript': 7.18.6_@babel+core@7.19.6
+      '@babel/template': 7.18.10
+      '@solidjs/meta': 0.28.2_solid-js@1.5.7
+      '@solidjs/router': 0.5.0_solid-js@1.5.7
+      '@types/cookie': 0.5.1
+      '@vinxi/vite-plugin-inspect': 0.6.27_rollup@2.79.1+vite@3.2.2
+      chokidar: 3.5.3
+      compression: 1.7.4
+      connect: 3.7.0
+      debug: 4.3.4
+      dequal: 2.0.3
+      es-module-lexer: 1.1.0
+      esbuild: 0.14.54
+      esbuild-plugin-solid: 0.4.2_ngv3ltmlriftii5e5ks2ybc4ja
+      fast-glob: 3.2.12
+      get-port: 6.1.2
+      parse-multipart-data: 1.5.0
+      picocolors: 1.0.0
+      rollup: 2.79.1
+      rollup-plugin-visualizer: 5.8.3_rollup@2.79.1
+      rollup-route-manifest: 1.0.0_rollup@2.79.1
+      sade: 1.8.1
+      sirv: 2.0.2
+      solid-js: 1.5.7
+      terser: 5.15.1
+      undici: 5.12.0
       vite: 3.2.2
       vite-plugin-inspect: 0.6.1_vite@3.2.2
       vite-plugin-solid: 2.3.9_solid-js@1.5.7+vite@3.2.2
@@ -16888,6 +16978,11 @@ packages:
     resolution: {integrity: sha512-9GHUiM5hMiCi6Y03jD2ARC1ettBXkQBoQAe7nJsPknnI0ow10aXjTnew8QtYQmLjzn974BnmWEAJgCY6ZP1DeQ==}
     dependencies:
       mixme: 0.5.4
+    dev: true
+
+  /streamsearch/1.1.0:
+    resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
+    engines: {node: '>=10.0.0'}
     dev: true
 
   /string-argv/0.3.1:
@@ -17837,6 +17932,13 @@ packages:
   /undici/5.10.0:
     resolution: {integrity: sha512-c8HsD3IbwmjjbLvoZuRI26TZic+TSEe8FPMLLOkN1AfYRhdjnKBU6yL+IwcSCbdZiX4e5t0lfMDLDCqj4Sq70g==}
     engines: {node: '>=12.18'}
+    dev: true
+
+  /undici/5.12.0:
+    resolution: {integrity: sha512-zMLamCG62PGjd9HHMpo05bSLvvwWOZgGeiWlN/vlqu3+lRo3elxktVGEyLMX+IO7c2eflLjcW74AlkhEZm15mg==}
+    engines: {node: '>=12.18'}
+    dependencies:
+      busboy: 1.6.0
     dev: true
 
   /unfetch/4.2.0:
