@@ -44,7 +44,7 @@ export function setColorModeClassName(isDark: boolean) {
 
 export function setColorModeDataset(value: ColorMode, shouldPreventTransition = true) {
   const cleanup = shouldPreventTransition ? preventTransition() : undefined;
-  document.documentElement.dataset.hopeTheme = value;
+  document.documentElement.dataset.theme = value;
   document.documentElement.style.colorScheme = value;
   cleanup?.();
 }
