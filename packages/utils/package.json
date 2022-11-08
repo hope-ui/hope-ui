@@ -47,11 +47,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@solid-primitives/refs": "0.3.2",
-    "@solid-primitives/utils": "3.0.2"
+    "@solid-primitives/refs": "^0.3.4",
+    "@solid-primitives/utils": "^4.0.0"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.7"
+    "solid-js": "^1.6.1"
   },
   "publishConfig": {
     "access": "public"

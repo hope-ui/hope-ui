@@ -49,10 +49,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@floating-ui/dom": "1.0.1",
-    "@hope-ui/primitives": "1.0.0-next.7",
-    "@hope-ui/styles": "1.0.0-next.7",
-    "@hope-ui/utils": "1.0.0-next.7"
+    "@floating-ui/dom": "^1.0.4",
+    "@hope-ui/primitives": "^1.0.0-next.7",
+    "@hope-ui/styles": "^1.0.0-next.7",
+    "@hope-ui/utils": "^1.0.0-next.7"
   },
   "devDependencies": {
     "@hope-ui/tests": "1.0.0-next.7",
@@ -71,7 +71,7 @@
     "storybook-dark-mode": "1.1.2"
   },
   "peerDependencies": {
-    "solid-js": "^1.5.7"
+    "solid-js": "^1.6.1"
   },
   "publishConfig": {
     "access": "public"
