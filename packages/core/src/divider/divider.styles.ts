@@ -29,7 +29,7 @@ export const useDividerStyleConfig = createStyleConfig<DividerParts, DividerVari
           },
           vertical: {
             alignSelf: "stretch",
-            height: "100%",
+            height: "auto",
             border: 0,
             borderLeftColor: "currentColor",
           },
