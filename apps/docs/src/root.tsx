@@ -72,7 +72,7 @@ export default function Root() {
   const event = useContext(ServerContext);
 
   const storageManager = cookieStorageManagerSSR(
-    isServer ? event.request.headers.get("cookie") ?? "" : document.cookie
+    isServer ? event?.request.headers.get("cookie") ?? "" : document.cookie
   );
 
   injectCriticalStyle();

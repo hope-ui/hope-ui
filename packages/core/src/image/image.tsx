@@ -6,7 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/blob/7d7e04d53d871e324debe0a2cb3ff44d7dbf3bca/packages/components/image/src/image.tsx
  */
 
-import { createHopeComponent, hope, Property } from "@hope-ui/styles";
+import { createHopeComponent, hope } from "@hope-ui/styles";
 import { OverrideProps } from "@hope-ui/utils";
 import { clsx } from "clsx";
 import { JSX, mergeProps, Show, splitProps } from "solid-js";
@@ -36,13 +36,13 @@ interface ImageOptions {
    * How the image to fit within its bounds.
    * It maps to css `object-fit` property.
    */
-  fit?: Property.ObjectFit;
+  fit?: JSX.CSSProperties["object-fit"];
 
   /**
    * How to align the image within its bounds.
    * It maps to css `object-position` property.
    */
-  align?: Property.ObjectPosition;
+  align?: JSX.CSSProperties["object-position"];
 
   /** If `true`, opt out of the `fallbackSrc` logic and use as `img`. */
   ignoreFallback?: boolean;

@@ -7,7 +7,7 @@
  */
 
 import { ClassProp, OverrideProps } from "@hope-ui/utils";
-import { Property } from "csstype";
+import type * as Stitches from "@stitches/core";
 
 import { CSSObject } from "../stitches.config";
 import { ColorSystemTokenName } from "./color-system";
@@ -56,90 +56,90 @@ export type ResponsiveProps<Props> = {
 
 export type SystemStyleBorderProps = ResponsiveProps<{
   /** The CSS `border` property. */
-  border: Property.Border;
+  border: Stitches.CSS["border"];
 
   /** The CSS `border-width` property. */
-  borderWidth: Property.BorderWidth | number;
+  borderWidth: Stitches.CSS["borderWidth"] | number;
 
   /** The CSS `border-style` property. */
-  borderStyle: Property.BorderStyle;
+  borderStyle: Stitches.CSS["borderStyle"];
 
   /** The CSS `border-color` property. */
-  borderColor: Property.BorderColor | ColorSystemTokenName;
+  borderColor: Stitches.CSS["borderColor"] | ColorSystemTokenName;
 
   /** The CSS `border-top` property. */
-  borderTop: Property.BorderTop;
+  borderTop: Stitches.CSS["borderTop"];
 
   /** The CSS `border-top-width` property. */
-  borderTopWidth: Property.BorderTopWidth | number;
+  borderTopWidth: Stitches.CSS["borderTopWidth"] | number;
 
   /** The CSS `border-top-style` property. */
-  borderTopStyle: Property.BorderTopStyle;
+  borderTopStyle: Stitches.CSS["borderTopStyle"];
 
   /** The CSS `border-top-color` property. */
-  borderTopColor: Property.BorderTopColor | ColorSystemTokenName;
+  borderTopColor: Stitches.CSS["borderTopColor"] | ColorSystemTokenName;
 
   /** The CSS `border-right` property. */
-  borderRight: Property.BorderRight;
+  borderRight: Stitches.CSS["borderRight"];
 
   /** The CSS `border-right-width` property. */
-  borderRightWidth: Property.BorderRightWidth | number;
+  borderRightWidth: Stitches.CSS["borderRightWidth"] | number;
 
   /** The CSS `border-right-style` property. */
-  borderRightStyle: Property.BorderRightStyle;
+  borderRightStyle: Stitches.CSS["borderRightStyle"];
 
   /** The CSS `border-right-color` property. */
-  borderRightColor: Property.BorderRightColor | ColorSystemTokenName;
+  borderRightColor: Stitches.CSS["borderRightColor"] | ColorSystemTokenName;
 
   /** The CSS `border-bottom` property. */
-  borderBottom: Property.BorderBottom;
+  borderBottom: Stitches.CSS["borderBottom"];
 
   /** The CSS `border-bottom-width` property. */
-  borderBottomWidth: Property.BorderBottomWidth | number;
+  borderBottomWidth: Stitches.CSS["borderBottomWidth"] | number;
 
   /** The CSS `border-bottom-style` property. */
-  borderBottomStyle: Property.BorderBottomStyle;
+  borderBottomStyle: Stitches.CSS["borderBottomStyle"];
 
   /** The CSS `border-bottom-color` property. */
-  borderBottomColor: Property.BorderBottomColor | ColorSystemTokenName;
+  borderBottomColor: Stitches.CSS["borderBottomColor"] | ColorSystemTokenName;
 
   /** The CSS `border-left` property. */
-  borderLeft: Property.BorderLeft;
+  borderLeft: Stitches.CSS["borderLeft"];
 
   /** The CSS `border-left-width` property. */
-  borderLeftWidth: Property.BorderLeftWidth | number;
+  borderLeftWidth: Stitches.CSS["borderLeftWidth"] | number;
 
   /** The CSS `border-left-style` property. */
-  borderLeftStyle: Property.BorderLeftStyle;
+  borderLeftStyle: Stitches.CSS["borderLeftStyle"];
 
   /** The CSS `border-left-color` property. */
-  borderLeftColor: Property.BorderLeftColor | ColorSystemTokenName;
+  borderLeftColor: Stitches.CSS["borderLeftColor"] | ColorSystemTokenName;
 
   /** The CSS `border-right` and `border-left` property. */
-  borderX: Property.BorderLeft;
+  borderX: Stitches.CSS["borderLeft"];
 
   /** The CSS `border-top` and `border-bottom` property. */
-  borderY: Property.BorderTop;
+  borderY: Stitches.CSS["borderTop"];
 }>;
 
 export type SystemStyleColorProps = ResponsiveProps<{
   /** The CSS `color` property. */
-  color: Property.Color | ColorSystemTokenName;
+  color: Stitches.CSS["color"] | ColorSystemTokenName;
 
   /** The CSS `background` property. */
-  background: Property.Background<ColorSystemTokenName>;
+  background: Stitches.CSS["background"] | ColorSystemTokenName;
 
   /** The CSS `background` property. */
-  bg: Property.Background<ColorSystemTokenName>;
+  bg: Stitches.CSS["background"] | ColorSystemTokenName;
 
   /** The CSS `background-color` property. */
-  backgroundColor: Property.BackgroundColor | ColorSystemTokenName;
+  backgroundColor: Stitches.CSS["backgroundColor"] | ColorSystemTokenName;
 
   /** The CSS `background-color` property. */
-  bgColor: Property.BackgroundColor | ColorSystemTokenName;
+  bgColor: Stitches.CSS["backgroundColor"] | ColorSystemTokenName;
 
   /** The CSS `opacity` property. */
-  opacity: Property.Opacity;
+  opacity: Stitches.CSS["opacity"];
 }>;
 
 export type SystemStyleFlexboxProps = ResponsiveProps<{
@@ -153,7 +153,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-items)
    */
-  alignItems: Property.AlignItems;
+  alignItems: Stitches.CSS["alignItems"];
 
   /**
    * The CSS `align-content` property.
@@ -163,7 +163,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-content)
    */
-  alignContent: Property.AlignContent;
+  alignContent: Stitches.CSS["alignContent"];
 
   /**
    * The CSS `align-self` property.
@@ -173,7 +173,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/align-self)
    */
-  alignSelf: Property.AlignSelf;
+  alignSelf: Stitches.CSS["alignSelf"];
 
   /**
    * The CSS `justify-items` property.
@@ -184,7 +184,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/justify-items)
    */
-  justifyItems: Property.JustifyItems;
+  justifyItems: Stitches.CSS["justifyItems"];
 
   /**
    * The CSS `justify-content` property.
@@ -194,7 +194,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/justify-content)
    */
-  justifyContent: Property.JustifyContent;
+  justifyContent: Stitches.CSS["justifyContent"];
 
   /**
    * The CSS `justify-self` property.
@@ -204,7 +204,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-flow)
    */
-  justifySelf: Property.JustifySelf;
+  justifySelf: Stitches.CSS["justifySelf"];
 
   /**
    * The CSS `flex-wrap` property.
@@ -215,7 +215,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-wrap)
    */
-  flexWrap: Property.FlexWrap;
+  flexWrap: Stitches.CSS["flexWrap"];
 
   /**
    * The CSS `flex-direction` property.
@@ -225,7 +225,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-direction)
    */
-  flexDirection: Property.FlexDirection;
+  flexDirection: Stitches.CSS["flexDirection"];
 
   /**
    * The CSS `flex` property.
@@ -235,7 +235,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex)
    */
-  flex: Property.Flex;
+  flex: Stitches.CSS["flex"];
 
   /**
    * The CSS `flex-grow` property.
@@ -245,7 +245,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-grow)
    */
-  flexGrow: Property.FlexGrow;
+  flexGrow: Stitches.CSS["flexGrow"];
 
   /**
    * The CSS `flex-shrink` property.
@@ -255,7 +255,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-shrink)
    */
-  flexShrink: Property.FlexShrink;
+  flexShrink: Stitches.CSS["flexShrink"];
 
   /**
    * The CSS `flex-basis` property.
@@ -264,7 +264,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/flex-basis)
    */
-  flexBasis: Property.FlexBasis;
+  flexBasis: Stitches.CSS["flexBasis"];
 
   /**
    * The CSS `order` property.
@@ -273,7 +273,7 @@ export type SystemStyleFlexboxProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/order)
    */
-  order: Property.Order;
+  order: Stitches.CSS["order"];
 }>;
 
 export type SystemStyleGridProps = ResponsiveProps<{
@@ -284,7 +284,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template)
    */
-  gridTemplate: Property.GridTemplate;
+  gridTemplate: Stitches.CSS["gridTemplate"];
 
   /**
    * The CSS `grid-template-columns` property
@@ -293,7 +293,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-columns)
    */
-  gridTemplateColumns: Property.GridTemplateColumns;
+  gridTemplateColumns: Stitches.CSS["gridTemplateColumns"];
 
   /**
    * The CSS `grid-template-rows` property.
@@ -302,14 +302,14 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows)
    */
-  gridTemplateRows: Property.GridTemplateRows;
+  gridTemplateRows: Stitches.CSS["gridTemplateRows"];
 
   /**
    * The CSS `grid-template-areas` property.
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas)
    */
-  gridTemplateAreas: Property.GridTemplateAreas;
+  gridTemplateAreas: Stitches.CSS["gridTemplateAreas"];
 
   /**
    * The CSS `grid-area` property.
@@ -320,7 +320,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-area)
    */
-  gridArea: Property.GridArea;
+  gridArea: Stitches.CSS["gridArea"];
 
   /**
    * The CSS `grid-auto-flow` property
@@ -330,7 +330,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow)
    */
-  gridAutoFlow: Property.GridAutoFlow;
+  gridAutoFlow: Stitches.CSS["gridAutoFlow"];
 
   /**
    * The CSS `grid-auto-columns` property.
@@ -339,7 +339,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-columns)
    */
-  gridAutoColumns: Property.GridAutoColumns;
+  gridAutoColumns: Stitches.CSS["gridAutoColumns"];
 
   /**
    * The CSS `grid-auto-rows` property.
@@ -348,7 +348,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-rows)
    */
-  gridAutoRows: Property.GridAutoRows;
+  gridAutoRows: Stitches.CSS["gridAutoRows"];
 
   /**
    * The CSS `grid-column` property.
@@ -359,7 +359,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column)
    */
-  gridColumn: Property.GridColumn;
+  gridColumn: Stitches.CSS["gridColumn"];
 
   /**
    * The CSS `grid-column-start` property.
@@ -369,7 +369,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-start)
    */
-  gridColumnStart: Property.GridColumnStart;
+  gridColumnStart: Stitches.CSS["gridColumnStart"];
 
   /**
    * The CSS `grid-column-end` property
@@ -380,7 +380,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-column-end)
    */
-  gridColumnEnd: Property.GridColumnEnd;
+  gridColumnEnd: Stitches.CSS["gridColumnEnd"];
 
   /**
    * The CSS `grid-row` property
@@ -391,7 +391,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row)
    */
-  gridRow: Property.GridRow;
+  gridRow: Stitches.CSS["gridRow"];
 
   /**
    * The CSS `grid-row-start` property
@@ -402,7 +402,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-start)
    */
-  gridRowStart: Property.GridRowStart;
+  gridRowStart: Stitches.CSS["gridRowStart"];
 
   /**
    * The CSS `grid-row-end` property
@@ -413,7 +413,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/grid-row-end)
    */
-  gridRowEnd: Property.GridRowEnd;
+  gridRowEnd: Stitches.CSS["gridRowEnd"];
 
   /**
    * The CSS `place-items` property.
@@ -424,7 +424,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-items)
    */
-  placeItems: Property.PlaceItems;
+  placeItems: Stitches.CSS["placeItems"];
 
   /**
    * The CSS `place-content` property.
@@ -435,7 +435,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-content)
    */
-  placeContent: Property.PlaceContent;
+  placeContent: Stitches.CSS["placeContent"];
 
   /**
    * The CSS `place-self` property.
@@ -446,7 +446,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/place-self)
    */
-  placeSelf: Property.PlaceSelf;
+  placeSelf: Stitches.CSS["placeSelf"];
 
   /**
    * The CSS `gap` property.
@@ -456,7 +456,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/gap)
    */
-  gap: Property.Gap<ThemeSpace> | number;
+  gap: Stitches.CSS["gap"] | ThemeSpace | number;
 
   /**
    * The CSS `row-gap` property.
@@ -465,7 +465,7 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/row-gap)
    */
-  rowGap: Property.RowGap<ThemeSpace> | number;
+  rowGap: Stitches.CSS["rowGap"] | ThemeSpace | number;
 
   /**
    * The CSS `column-gap` property.
@@ -474,343 +474,343 @@ export type SystemStyleGridProps = ResponsiveProps<{
    *
    * @see [Mozilla Docs](https://developer.mozilla.org/docs/Web/CSS/column-gap)
    */
-  columnGap: Property.ColumnGap<ThemeSpace> | number;
+  columnGap: Stitches.CSS["columnGap"] | ThemeSpace | number;
 }>;
 
 export type SystemStyleLayoutProps = ResponsiveProps<{
   /** The CSS `display` property. */
-  display: Property.Display;
+  display: Stitches.CSS["display"];
 
   /** The CSS `display` property. */
-  d: Property.Display;
+  d: Stitches.CSS["display"];
 
   /** The CSS `vertical-align` property. */
-  verticalAlign: Property.VerticalAlign;
+  verticalAlign: Stitches.CSS["verticalAlign"];
 
   /** The CSS `overflow` property. */
-  overflow: Property.Overflow;
+  overflow: Stitches.CSS["overflow"];
 
   /** The CSS `overflow-x` property. */
-  overflowX: Property.OverflowX;
+  overflowX: Stitches.CSS["overflowX"];
 
   /** The CSS `overflow-y` property. */
-  overflowY: Property.OverflowY;
+  overflowY: Stitches.CSS["overflowY"];
 }>;
 
 export type SystemStyleInteractivityProps = ResponsiveProps<{
   /** The CSS `appearance` property. */
-  appearance: Property.Appearance;
+  appearance: Stitches.CSS["appearance"];
 
   /** The CSS `user-select` property. */
-  userSelect: Property.UserSelect;
+  userSelect: Stitches.CSS["userSelect"];
 
   /** The CSS `pointer-events` property. */
-  pointerEvents: Property.PointerEvents;
+  pointerEvents: Stitches.CSS["pointerEvents"];
 
   /** The CSS `resize` property. */
-  resize: Property.Resize;
+  resize: Stitches.CSS["resize"];
 
   /** The CSS `cursor` property. */
-  cursor: Property.Cursor;
+  cursor: Stitches.CSS["cursor"];
 
   /** The CSS `outline` property. */
-  outline: Property.Outline<string | 0 | number>;
+  outline: Stitches.CSS["outline"];
 
   /** The CSS `outline-offset` property. */
-  outlineOffset: Property.OutlineOffset<string | 0 | number>;
+  outlineOffset: Stitches.CSS["outlineOffset"];
 
   /** The CSS `outline-color` property. */
-  outlineColor: Property.OutlineColor | ColorSystemTokenName;
+  outlineColor: Stitches.CSS["outlineColor"] | ColorSystemTokenName;
 }>;
 
 export type SystemStyleMarginProps = ResponsiveProps<{
   /** The CSS `margin` property. */
-  margin: Property.Margin<ThemeSpace> | number;
+  margin: Stitches.CSS["margin"] | ThemeSpace | number;
 
   /** The CSS `margin-top` property. */
-  marginTop: Property.MarginTop<ThemeSpace> | number;
+  marginTop: Stitches.CSS["marginTop"] | ThemeSpace | number;
 
   /** The CSS `margin-right` property. */
-  marginRight: Property.MarginRight<ThemeSpace> | number;
+  marginRight: Stitches.CSS["marginRight"] | ThemeSpace | number;
 
   /** The CSS `margin-inline-end` property. */
-  marginEnd: Property.MarginInlineEnd<ThemeSpace> | number;
+  marginEnd: Stitches.CSS["marginInlineEnd"] | ThemeSpace | number;
 
   /** The CSS `margin-bottom` property. */
-  marginBottom: Property.MarginBottom<ThemeSpace> | number;
+  marginBottom: Stitches.CSS["marginBottom"] | ThemeSpace | number;
 
   /** The CSS `margin-left`  property. */
-  marginLeft: Property.MarginLeft<ThemeSpace> | number;
+  marginLeft: Stitches.CSS["marginLeft"] | ThemeSpace | number;
 
   /** The CSS `margin-inline-start` property. */
-  marginStart: Property.MarginInlineStart<ThemeSpace> | number;
+  marginStart: Stitches.CSS["marginInlineStart"] | ThemeSpace | number;
 
   /** The CSS `margin` property. */
-  m: Property.Margin<ThemeSpace> | number;
+  m: Stitches.CSS["margin"] | ThemeSpace | number;
 
   /** The CSS `margin-top` property. */
-  mt: Property.MarginTop<ThemeSpace> | number;
+  mt: Stitches.CSS["marginTop"] | ThemeSpace | number;
 
   /** The CSS `margin-right` property. */
-  mr: Property.MarginRight<ThemeSpace> | number;
+  mr: Stitches.CSS["marginRight"] | ThemeSpace | number;
 
   /** The CSS `margin-inline-end` property. */
-  me: Property.MarginInlineEnd<ThemeSpace> | number;
+  me: Stitches.CSS["marginInlineEnd"] | ThemeSpace | number;
 
   /** The CSS `margin-bottom` property. */
-  mb: Property.MarginBottom<ThemeSpace> | number;
+  mb: Stitches.CSS["marginBottom"] | ThemeSpace | number;
 
   /** The CSS `margin-left`  property. */
-  ml: Property.MarginLeft<ThemeSpace> | number;
+  ml: Stitches.CSS["marginLeft"] | ThemeSpace | number;
 
   /** The CSS `margin-inline-start` property. */
-  ms: Property.MarginInlineStart<ThemeSpace> | number;
+  ms: Stitches.CSS["marginInlineStart"] | ThemeSpace | number;
 
   /** The CSS `margin-inline-start` and `margin-inline-end` property. */
-  mx: Property.MarginInlineStart<ThemeSpace> | number;
+  mx: Stitches.CSS["marginInlineStart"] | ThemeSpace | number;
 
   /** The CSS `margin-top` and `margin-bottom` property. */
-  my: Property.MarginTop<ThemeSpace> | number;
+  my: Stitches.CSS["marginTop"] | ThemeSpace | number;
 }>;
 
 export type SystemStylePaddingProps = ResponsiveProps<{
   /** The CSS `padding` property. */
-  padding: Property.Padding<ThemeSpace> | number;
+  padding: Stitches.CSS["padding"] | ThemeSpace | number;
 
   /** The CSS `padding-top` property. */
-  paddingTop: Property.PaddingTop<ThemeSpace> | number;
+  paddingTop: Stitches.CSS["paddingTop"] | ThemeSpace | number;
 
   /** The CSS `padding-right` property. */
-  paddingRight: Property.PaddingRight<ThemeSpace> | number;
+  paddingRight: Stitches.CSS["paddingRight"] | ThemeSpace | number;
 
   /** The CSS `padding-inline-end` property. */
-  paddingEnd: Property.PaddingInlineEnd<ThemeSpace> | number;
+  paddingEnd: Stitches.CSS["paddingInlineEnd"] | ThemeSpace | number;
 
   /** The CSS `padding-bottom` property. */
-  paddingBottom: Property.PaddingBottom<ThemeSpace> | number;
+  paddingBottom: Stitches.CSS["paddingBottom"] | ThemeSpace | number;
 
   /** The CSS `padding-left`  property. */
-  paddingLeft: Property.PaddingLeft<ThemeSpace> | number;
+  paddingLeft: Stitches.CSS["paddingLeft"] | ThemeSpace | number;
 
   /** The CSS `padding-inline-start` property. */
-  paddingStart: Property.PaddingInlineStart<ThemeSpace> | number;
+  paddingStart: Stitches.CSS["paddingInlineStart"] | ThemeSpace | number;
 
   /** The CSS `padding` property. */
-  p: Property.Padding<ThemeSpace> | number;
+  p: Stitches.CSS["padding"] | ThemeSpace | number;
 
   /** The CSS `padding-top` property. */
-  pt: Property.PaddingTop<ThemeSpace> | number;
+  pt: Stitches.CSS["paddingTop"] | ThemeSpace | number;
 
   /** The CSS `padding-right` property. */
-  pr: Property.PaddingRight<ThemeSpace> | number;
+  pr: Stitches.CSS["paddingRight"] | ThemeSpace | number;
 
   /** The CSS `padding-inline-end` property. */
-  pe: Property.PaddingInlineEnd<ThemeSpace> | number;
+  pe: Stitches.CSS["paddingInlineEnd"] | ThemeSpace | number;
 
   /** The CSS `padding-bottom` property. */
-  pb: Property.PaddingBottom<ThemeSpace> | number;
+  pb: Stitches.CSS["paddingBottom"] | ThemeSpace | number;
 
   /** The CSS `padding-left`  property. */
-  pl: Property.PaddingLeft<ThemeSpace> | number;
+  pl: Stitches.CSS["paddingLeft"] | ThemeSpace | number;
 
   /** The CSS `padding-inline-start` property. */
-  ps: Property.PaddingInlineStart<ThemeSpace> | number;
+  ps: Stitches.CSS["paddingInlineStart"] | ThemeSpace | number;
 
   /** The CSS `padding-inline-start` and `padding-inline-end` property. */
-  px: Property.PaddingInlineStart<ThemeSpace> | number;
+  px: Stitches.CSS["paddingInlineStart"] | ThemeSpace | number;
 
   /** The CSS `padding-top` and `padding-bottom` property. */
-  py: Property.PaddingTop<ThemeSpace> | number;
+  py: Stitches.CSS["paddingTop"] | ThemeSpace | number;
 }>;
 
 export type SystemStylePositionProps = ResponsiveProps<{
   /** The CSS `position` property. */
-  position: Property.Position;
+  position: Stitches.CSS["position"];
 
   /** The CSS `position` property. */
-  pos: Property.Position;
+  pos: Stitches.CSS["position"];
 
   /** The CSS `z-index` property. */
-  zIndex: Property.ZIndex | ThemeZIndice;
+  zIndex: Stitches.CSS["zIndex"] | ThemeZIndice;
 
   /** The CSS `top` property. */
-  top: Property.Top<ThemeSpace> | number;
+  top: Stitches.CSS["top"] | ThemeSpace | number;
 
   /** The CSS `right` property. */
-  right: Property.Right<ThemeSpace> | number;
+  right: Stitches.CSS["right"] | ThemeSpace | number;
 
   /** The CSS `bottom` property. */
-  bottom: Property.Bottom<ThemeSpace> | number;
+  bottom: Stitches.CSS["bottom"] | ThemeSpace | number;
 
   /** The CSS `left` property. */
-  left: Property.Left<ThemeSpace> | number;
+  left: Stitches.CSS["left"] | ThemeSpace | number;
 }>;
 
 export type SystemStyleRadiiProps = ResponsiveProps<{
   /** The CSS `border-radius` property. */
-  borderRadius: Property.BorderRadius<ThemeRadii> | number;
+  borderRadius: Stitches.CSS["borderRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-left-radius` property. */
-  borderTopLeftRadius: Property.BorderTopLeftRadius<ThemeRadii> | number;
+  borderTopLeftRadius: Stitches.CSS["borderTopLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-right-radius` property. */
-  borderTopRightRadius: Property.BorderTopRightRadius<ThemeRadii> | number;
+  borderTopRightRadius: Stitches.CSS["borderTopRightRadius"] | ThemeRadii | number;
 
   /** The CSS `border-bottom-right-radius`  property. */
-  borderBottomRightRadius: Property.BorderBottomRightRadius<ThemeRadii> | number;
+  borderBottomRightRadius: Stitches.CSS["borderBottomRightRadius"] | ThemeRadii | number;
 
   /** The CSS  `border-bottom-left-radius` property. */
-  borderBottomLeftRadius: Property.BorderBottomLeftRadius<ThemeRadii> | number;
+  borderBottomLeftRadius: Stitches.CSS["borderBottomLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-left-radius` and `border-top-right-radius` property. */
-  borderTopRadius: Property.BorderTopLeftRadius<ThemeRadii> | number;
+  borderTopRadius: Stitches.CSS["borderTopLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-right-radius` and `border-bottom-right-radius` property. */
-  borderRightRadius: Property.BorderTopRightRadius<ThemeRadii> | number;
+  borderRightRadius: Stitches.CSS["borderTopRightRadius"] | ThemeRadii | number;
 
   /** The CSS `border-bottom-right-radius` and `border-bottom-left-radius` property. */
-  borderBottomRadius: Property.BorderBottomLeftRadius<ThemeRadii> | number;
+  borderBottomRadius: Stitches.CSS["borderBottomLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-left-radius` and `border-bottom-left-radius` property. */
-  borderLeftRadius: Property.BorderTopLeftRadius<ThemeRadii> | number;
+  borderLeftRadius: Stitches.CSS["borderTopLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-radius` property. */
-  rounded: Property.BorderRadius<ThemeRadii> | number;
+  rounded: Stitches.CSS["borderRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-left-radius` and `border-top-right-radius` property. */
-  roundedTop: Property.BorderTopLeftRadius<ThemeRadii> | number;
+  roundedTop: Stitches.CSS["borderTopLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-right-radius` and `border-bottom-right-radius` property. */
-  roundedRight: Property.BorderTopRightRadius<ThemeRadii> | number;
+  roundedRight: Stitches.CSS["borderTopRightRadius"] | ThemeRadii | number;
 
   /** The CSS `border-bottom-right-radius` and `border-bottom-left-radius` property. */
-  roundedBottom: Property.BorderBottomLeftRadius<ThemeRadii> | number;
+  roundedBottom: Stitches.CSS["borderBottomLeftRadius"] | ThemeRadii | number;
 
   /** The CSS `border-top-left-radius` and `border-bottom-left-radius` property. */
-  roundedLeft: Property.BorderTopLeftRadius<ThemeRadii> | number;
+  roundedLeft: Stitches.CSS["borderTopLeftRadius"] | ThemeRadii | number;
 }>;
 
 export type SystemStyleShadowProps = ResponsiveProps<{
   /** The CSS `text-shadow` property. */
-  textShadow: Property.TextShadow | ThemeShadow;
+  textShadow: Stitches.CSS["textShadow"] | ThemeShadow;
 
   /** The CSS `box-shadow` property. */
-  boxShadow: Property.BoxShadow | ThemeShadow;
+  boxShadow: Stitches.CSS["boxShadow"] | ThemeShadow;
 
   /** The CSS `box-shadow` property. */
-  shadow: Property.BoxShadow | ThemeShadow;
+  shadow: Stitches.CSS["boxShadow"] | ThemeShadow;
 }>;
 
 export type SystemStyleSizeProps = ResponsiveProps<{
   /** The CSS `width` property. */
-  width: Property.Width<ThemeSize> | number;
+  width: Stitches.CSS["width"] | ThemeSize | number;
 
   /** The CSS `min-width` property. */
-  minWidth: Property.MinWidth<ThemeSize> | number;
+  minWidth: Stitches.CSS["minWidth"] | ThemeSize | number;
 
   /** The CSS `max-width` property. */
-  maxWidth: Property.MaxWidth<ThemeSize> | number;
+  maxWidth: Stitches.CSS["maxWidth"] | ThemeSize | number;
 
   /** The CSS `height` property. */
-  height: Property.Height<ThemeSize> | number;
+  height: Stitches.CSS["height"] | ThemeSize | number;
 
   /** The CSS `min-height` property. */
-  minHeight: Property.MinHeight<ThemeSize> | number;
+  minHeight: Stitches.CSS["minHeight"] | ThemeSize | number;
 
   /** The CSS `max-height` property. */
-  maxHeight: Property.MaxHeight<ThemeSize> | number;
+  maxHeight: Stitches.CSS["maxHeight"] | ThemeSize | number;
 
   /** The CSS `width` property. */
-  w: Property.Width<ThemeSize> | number;
+  w: Stitches.CSS["width"] | ThemeSize | number;
 
   /** The CSS `min-width` property. */
-  minW: Property.MinWidth<ThemeSize> | number;
+  minW: Stitches.CSS["minWidth"] | ThemeSize | number;
 
   /** The CSS `max-width` property. */
-  maxW: Property.MaxWidth<ThemeSize> | number;
+  maxW: Stitches.CSS["maxWidth"] | ThemeSize | number;
 
   /** The CSS `height` property. */
-  h: Property.Height<ThemeSize> | number;
+  h: Stitches.CSS["height"] | ThemeSize | number;
 
   /** The CSS `min-height` property. */
-  minH: Property.MinHeight<ThemeSize> | number;
+  minH: Stitches.CSS["minHeight"] | ThemeSize | number;
 
   /** The CSS `max-height` property. */
-  maxH: Property.MaxHeight<ThemeSize> | number;
+  maxH: Stitches.CSS["maxHeight"] | ThemeSize | number;
 
   /** The CSS `width` and `height` property. */
-  boxSize: Property.Width<ThemeSize> | number;
+  boxSize: Stitches.CSS["width"] | ThemeSize | number;
 }>;
 
 export type SystemStyleTypographyProps = ResponsiveProps<{
   /** The CSS `font-family` property. */
-  fontFamily: Property.FontFamily | ThemeFontFamily;
+  fontFamily: Stitches.CSS["fontFamily"] | ThemeFontFamily;
 
   /** The CSS `font-size` property. */
-  fontSize: Property.FontSize<ThemeFontSize> | number;
+  fontSize: Stitches.CSS["fontSize"] | ThemeFontSize | number;
 
   /** The CSS `font-weight` property. */
-  fontWeight: Property.FontWeight | ThemeFontWeight | number;
+  fontWeight: Stitches.CSS["fontWeight"] | ThemeFontWeight | number;
 
   /** The CSS `line-height` property. */
-  lineHeight: Property.LineHeight<ThemeLineHeight> | number;
+  lineHeight: Stitches.CSS["lineHeight"] | ThemeLineHeight | number;
 
   /** The CSS `letter-spacing` property. */
-  letterSpacing: Property.LetterSpacing<ThemeLetterSpacing> | number;
+  letterSpacing: Stitches.CSS["letterSpacing"] | ThemeLetterSpacing | number;
 
   /** The CSS `text-align` property. */
-  textAlign: Property.TextAlign;
+  textAlign: Stitches.CSS["textAlign"];
 
   /** The CSS `font-style` property. */
-  fontStyle: Property.FontStyle;
+  fontStyle: Stitches.CSS["fontStyle"];
 
   /** The CSS `text-transform` property. */
-  textTransform: Property.TextTransform;
+  textTransform: Stitches.CSS["textTransform"];
 
   /** The CSS `text-decoration` property. */
-  textDecoration: Property.TextDecoration;
+  textDecoration: Stitches.CSS["textDecoration"];
 }>;
 
 export type SystemStyleTransformProps = ResponsiveProps<{
   /** The CSS `transform` property. */
-  transform: Property.Transform;
+  transform: Stitches.CSS["transform"];
 
   /** The CSS `transform-origin` property. */
-  transformOrigin: Property.TransformOrigin<ThemeSize> | number;
+  transformOrigin: Stitches.CSS["transformOrigin"] | ThemeSize | number;
 
   /** The CSS `clip-path` property. */
-  clipPath: Property.ClipPath;
+  clipPath: Stitches.CSS["clipPath"];
 }>;
 
 export type SystemStyleTransitionProps = ResponsiveProps<{
   /** The CSS `transition` property. */
-  transition: Property.Transition;
+  transition: Stitches.CSS["transition"];
 
   /** The CSS `transition-property` property. */
-  transitionProperty: Property.TransitionProperty;
+  transitionProperty: Stitches.CSS["transitionProperty"];
 
   /** The CSS `transition-timing-function` property. */
-  transitionTimingFunction: Property.TransitionTimingFunction;
+  transitionTimingFunction: Stitches.CSS["transitionTimingFunction"];
 
   /** The CSS `transition-duration` property. */
-  transitionDuration: Property.TransitionDuration;
+  transitionDuration: Stitches.CSS["transitionDuration"];
 
   /** The CSS `transition-delay` property. */
-  transitionDelay: Property.TransitionDelay;
+  transitionDelay: Stitches.CSS["transitionDelay"];
 
   /** The CSS `animation` property. */
-  animation: Property.Animation;
+  animation: Stitches.CSS["animation"];
 
   /** The CSS `will-change` property. */
-  willChange: Property.WillChange;
+  willChange: Stitches.CSS["willChange"];
 }>;
 
 export type SystemStyleOthersProps = ResponsiveProps<{
   /** The CSS `object-fit` property. */
-  objectFit?: Property.ObjectFit;
+  objectFit?: Stitches.CSS["objectFit"];
 
   /** The CSS `object-position` property. */
-  objectPosition?: Property.ObjectPosition;
+  objectPosition?: Stitches.CSS["objectPosition"];
 }>;
 
 export type BaseSystemStyleProps = SystemStyleBorderProps &

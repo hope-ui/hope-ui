@@ -10,4 +10,3 @@ export * from "./styled-system";
 export * from "./theme";
 export * from "./types";
 export * from "./utils";
-export type { Property } from "csstype";
