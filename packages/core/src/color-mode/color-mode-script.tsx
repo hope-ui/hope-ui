@@ -6,7 +6,7 @@
  * https://github.com/chakra-ui/chakra-ui/blob/132a98958be64e46619b1e280ca6405d0a833cb0/packages/components/color-mode/src/color-mode-script.tsx
  */
 
-import { createMemo, createSignal } from "solid-js";
+import { createMemo } from "solid-js";
 
 import { mergeDefaultProps } from "../utils";
 import { COLOR_MODE_STORAGE_KEY } from "./storage-manager";
@@ -27,11 +27,6 @@ function normalize(initialColorMode: ConfigColorMode) {
   return initialColorMode;
 }
 
-/** Globally managed initial color mode. */
-const [initialColorMode, setInitialColorMode] = createSignal<ConfigColorMode>(FALLBACK_VALUE);
-
-export { initialColorMode };
-
 export function ColorModeScript(props: ColorModeScriptProps) {
   props = mergeDefaultProps(
     {
@@ -42,11 +37,9 @@ export function ColorModeScript(props: ColorModeScriptProps) {
     props
   );
 
-  setInitialColorMode(normalize(props.initialColorMode!));
-
   const scriptSrc = createMemo(() => {
     // runtime safe-guard against invalid color mode values
-    const init = initialColorMode();
+    const init = normalize(props.initialColorMode!);
 
     const cookieScript = `(function(){try{var a=function(o){var l="(prefers-color-scheme: dark)",v=window.matchMedia(l).matches?"dark":"light",e=o==="system"?v:o,d=document.documentElement,m=document.body,i="hope-theme-light",n="hope-theme-dark",s=e==="dark";return m.classList.add(s?n:i),m.classList.remove(s?i:n),d.style.colorScheme=e,d.dataset.theme=e,o},u=a,h="${init}",r="${props.storageKey}",t=document.cookie.match(new RegExp("(^| )".concat(r,"=([^;]+)"))),c=t?t[2]:null;c?a(c):document.cookie="".concat(r,"=").concat(a(h),"; max-age=31536000; path=/")}catch(a){}})();`;
 

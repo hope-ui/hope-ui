@@ -10,7 +10,6 @@ import { ColorMode } from "@hope-ui/styles";
 import { createEffect, createSignal, onCleanup } from "solid-js";
 
 import { ColorModeContext } from "./color-mode-context";
-import { initialColorMode } from "./color-mode-script";
 import { localStorageManager } from "./storage-manager";
 import { ColorModeContextType, ColorModeProviderProps, ConfigColorMode } from "./types";
 import {
@@ -26,6 +25,7 @@ import {
  * Returns the color mode and function to toggle the color mode
  */
 export function ColorModeProvider(props: ColorModeProviderProps) {
+  const fallbackColorMode = () => props.initialColorMode ?? "system";
   const colorModeManager = () => props.storageManager ?? localStorageManager;
 
   let colorModeListenerCleanupFn: (() => unknown) | undefined;
@@ -60,7 +60,7 @@ export function ColorModeProvider(props: ColorModeProviderProps) {
   };
 
   createEffect(() => {
-    setColorMode(colorModeManager().get() ?? initialColorMode());
+    setColorMode(colorModeManager().get() ?? fallbackColorMode());
   });
 
   onCleanup(() => {

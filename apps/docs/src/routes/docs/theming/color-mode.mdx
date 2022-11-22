@@ -162,7 +162,7 @@ export default function Root() {
 
 The default color mode used by Hope UI is `system`, meaning it will adapt to user preference.
 
-To set the initial color mode your application should start with, pass the `initialColorMode` prop to `ColorModeScript` with either `light`, `dark` or `system`.
+To set the initial color mode your application should start with, pass the `initialColorMode` prop to `ColorModeScript` and `HopeProvider` with either `light`, `dark` or `system`.
 
 ```tsx {10}
 // index.tsx
@@ -176,7 +176,7 @@ render(
   () => (
     <>
       <ColorModeScript initialColorMode="dark" />
-      <HopeProvider>
+      <HopeProvider initialColorMode="dark">
         <App />
       </HopeProvider>
     </>

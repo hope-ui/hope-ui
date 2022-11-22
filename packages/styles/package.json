@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/styles",
-  "version": "1.0.0-next.9",
+  "version": "1.0.0-next.11",
   "private": false,
   "description": "Hope UI CSS-in-JS library built on top of stitches.",
   "keywords": [
@@ -48,7 +48,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/utils": "^1.0.0-next.9",
+    "@hope-ui/utils": "^1.0.0-next.11",
     "dset": "3.1.2"
   },
   "peerDependencies": {

@@ -34,6 +34,9 @@ export interface ColorModeContextType {
 }
 
 interface ColorModeOptions {
+  /** The initial color mode to use. */
+  initialColorMode?: ConfigColorMode;
+
   /** Whether css transitions should be disabled during the color mode changes. */
   disableTransitionOnChange?: boolean;
 
