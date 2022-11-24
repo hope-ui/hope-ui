@@ -11,6 +11,7 @@ export * from "./utils";
 export * from "./anchor";
 export * from "./aspect-ratio";
 export * from "./box";
+export * from "./breadcrumb";
 export * from "./button";
 export * from "./center";
 export * from "./close-button";
