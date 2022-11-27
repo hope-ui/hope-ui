@@ -209,6 +209,10 @@ export const NAV_SECTIONS: NavSection[] = [
         title: "Anchor",
         href: "/docs/components/anchor",
       },
+      {
+        title: "Breadcrumb",
+        href: "/docs/components/breadcrumb",
+      },
     ],
   },
   {

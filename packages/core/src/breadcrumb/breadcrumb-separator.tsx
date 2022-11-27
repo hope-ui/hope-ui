@@ -28,6 +28,7 @@ export const BreadcrumbSeparator = createHopeComponent<"span", BreadcrumbStyleCo
       <hope.span
         class={clsx(baseClasses().separator, local.class)}
         __css={{ ...styleOverrides().separator }}
+        role="presentation"
         {...others}
       >
         {state?.state.separator}

@@ -27,13 +27,7 @@ const BreadcrumbList = createHopeComponent<"ol", BreadcrumbListProps>(props => {
   const renderWithCollapse = (resovledItems: ResolvedJSXElement[]) => {
     return [
       ...resovledItems.slice(0, props.itemsBeforeCollapse),
-      <CollapseButton
-        onClick={() => {
-          setExpandable(true);
-          console.log(expandable());
-          return {};
-        }}
-      />,
+      <CollapseButton onClick={() => setExpandable(true)} />,
       <BreadcrumbSeparator />,
       ...resovledItems.slice(
         resovledItems.length - (props?.itemsAfterCollapse || 1),
