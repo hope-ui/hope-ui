@@ -8,7 +8,9 @@ export function useBreadcrumbContext() {
   const context = useContext(BreadcrumbContext);
 
   if (!context) {
-    throw new Error("[hope-ui]: `useButtonContext` must be used within a `Breadcrumb` component");
+    throw new Error(
+      "[hope-ui]: `useBreadcrumbContext` must be used within a `Breadcrumb` component"
+    );
   }
 
   return context;

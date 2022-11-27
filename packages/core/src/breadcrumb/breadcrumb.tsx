@@ -1,25 +1,73 @@
 import { createHopeComponent, hope, mergeThemeProps } from "@hope-ui/styles";
 import clsx from "clsx";
-import { splitProps } from "solid-js";
+import { children, createSignal, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
+import { ResolvedJSXElement } from "solid-js/types/reactive/signal";
 
+import { Button, ButtonProps } from "../button";
 import { useBreadcrumbStyleConfig } from "./breadcrumb.style";
 import { BreadcrumbContext } from "./breadcrumb-context";
-import { BreadcrumbProps } from "./types";
+import { BreadcrumbSeparator } from "./breadcrumb-separator";
+import { BreadcrumbListProps, BreadcrumbProps } from "./types";
+
+const CollapseButton = createHopeComponent<"button", ButtonProps>(props => {
+  return (
+    <Button height={"4"} size="xs" aria-label="Show path" {...props}>
+      ···
+    </Button>
+  );
+});
+
+const BreadcrumbList = createHopeComponent<"ol", BreadcrumbListProps>(props => {
+  const [expandable, setExpandable] = createSignal(false);
+
+  const resolved = children(() => props.children);
+  const itemsQuantity = () => resolved.toArray();
+
+  const renderWithCollapse = (resovledItems: ResolvedJSXElement[]) => {
+    return [
+      ...resovledItems.slice(0, props.itemsBeforeCollapse),
+      <CollapseButton
+        onClick={() => {
+          setExpandable(true);
+          console.log(expandable());
+          return {};
+        }}
+      />,
+      <BreadcrumbSeparator />,
+      ...resovledItems.slice(
+        resovledItems.length - (props?.itemsAfterCollapse || 1),
+        resovledItems.length
+      ),
+    ] as ResolvedJSXElement[];
+  };
+
+  return (
+    <hope.ol {...props}>
+      {expandable() || (props.maxItem && itemsQuantity().length < props.maxItem)
+        ? resolved()
+        : renderWithCollapse(itemsQuantity())}
+    </hope.ol>
+  );
+});
 
 export const Breadcrumb = createHopeComponent<"nav", BreadcrumbProps>(props => {
-  const dprops = mergeThemeProps(
+  props = mergeThemeProps(
     "Breadcrumb",
     {
+      maxItem: 5,
       separator: "/",
       spacing: "0.5rem",
+      itemsAfterCollapse: 1,
+      itemsBeforeCollapse: 1,
     },
     props
   );
 
-  const [local, styleConfigProps, others] = splitProps(
-    dprops,
-    ["class", "children", "spacing", "separator"],
+  const [local, list, styleConfigProps, others] = splitProps(
+    props,
+    ["class", "spacing", "children", "separator"],
+    ["maxItem", "itemsAfterCollapse", "itemsBeforeCollapse"],
     ["styleConfigOverride", "unstyled"]
   );
 
@@ -51,9 +99,9 @@ export const Breadcrumb = createHopeComponent<"nav", BreadcrumbProps>(props => {
         class={clsx(baseClasses().root, local.class)}
         {...others}
       >
-        <hope.ol class={clsx(baseClasses().list)} gap={state.gap}>
+        <BreadcrumbList class={clsx(baseClasses().list)} gap={state.gap} {...list}>
           {local.children}
-        </hope.ol>
+        </BreadcrumbList>
       </hope.nav>
     </BreadcrumbContext.Provider>
   );
