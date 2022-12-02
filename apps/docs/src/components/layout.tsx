@@ -90,7 +90,7 @@ function Header(props: HeaderProps) {
         </Flex>
         <HeaderLogo />
         <Box mr={[6, 8, 0]} my={({ vars }) => `calc(${vars.space[5]} * -1)`}>
-          {/*<Search />*/}
+          <div id="docsearch" />
         </Box>
         <HStack
           pos="relative"

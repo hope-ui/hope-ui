@@ -69,3 +69,7 @@ a {
 iframe {
   border: none;
 }
+
+.DocSearch-Container {
+  z-index: var(--hope-zIndices-modal);
+}

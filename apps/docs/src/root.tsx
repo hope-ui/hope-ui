@@ -25,6 +25,7 @@ import {
   Routes,
   Scripts,
   ServerContext,
+  Stylesheet,
 } from "solid-start";
 
 import { Layout } from "./components/layout";
@@ -86,6 +87,7 @@ export default function Root() {
         <Link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <Link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <Link rel="manifest" href="/site.webmanifest" />
+        <Stylesheet href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
       </Head>
       <Body>
         <ColorModeScript storageType={storageManager.type} />
@@ -102,6 +104,17 @@ export default function Root() {
             </ErrorBoundary>
           </Suspense>
         </HopeProvider>
+
+        <script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+        <script>
+          {`docsearch({
+            appId: "ZRC9HOY415",
+            apiKey: "d1d23c988118ecb0c08000a8ace9a806",
+            indexName: "next-hope-ui",
+            container: "#docsearch",
+            debug: false
+          });`}
+        </script>
         <Scripts />
       </Body>
     </Html>
