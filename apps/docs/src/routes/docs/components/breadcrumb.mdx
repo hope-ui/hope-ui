@@ -1,0 +1,353 @@
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "@hope-ui/core";
+import { SunIcon } from "~/components/icons";
+
+import { Preview } from "~/components/preview";
+import { VerticalWithLabelExample, WithLabelExample } from "~/examples/divider-example";
+
+# Breadcrumb
+
+Breadcrumbs, or a breadcrumb navigation, can help enhance how users navigate to previous page levels of a website, especially if that website has many pages or products.
+
+## Import
+
+```tsx
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "@hope-ui/core";
+```
+
+- **Breadcrumb**: The parent container for breadcrumbs.
+- **BreadcrumbItem**: Individual breadcrumb element containing a link and separator.
+- **BreadcrumbLink**: The breadcrumb link.
+- **BreadcrumbSeparator**: The visual separator between each breadcrumb.
+
+## Usage
+
+Add the `currentPage` prop to the `BreadcrumbLink` that matches the current path. When this prop is present, the `BreadcrumbLink` renders a `span` with `aria-current` set to `page` instead of an anchor element.
+
+<Preview>
+  <Breadcrumb>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+### Breadcrumb separator
+
+Use the `separator` prop to change the separator used in the breadcrumb.
+
+<Preview>
+  <Breadcrumb separator="-">
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb separator="-">
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+### Using icon as separator
+
+You can pass any JSX.Element to the separator prop.
+
+<Preview>
+  <Breadcrumb separator={<SunIcon />}>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb separator={<SunIcon />}>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+### Separator spacing
+
+Use the `spacing` prop to apply left and right margin to each separator.
+
+<Preview>
+  <Breadcrumb spacing="$4">
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb spacing="$4">
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+### Collapsed breadcrumbs
+
+<Preview>
+  <Breadcrumb separator="/" maxItem={3}>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+
+    <BreadcrumbItem>
+      <BreadcrumbLink href="">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Link</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#" currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb separator="/" maxItem={3}>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Home</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+
+  <BreadcrumbItem>
+    <BreadcrumbLink href="">Docs</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#">Link</BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#" currentPage>
+      Breadcrumb
+    </BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+## Composition
+
+Breadcrumb composes Box so you can pass all Box props to change the style of the breadcrumbs.
+
+<Preview>
+  <Breadcrumb fontWeight="$medium" fontSize="$sm" spacing="$4">
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+        Home
+      </BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+        Docs
+      </BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage _hover={{ color: "$success10" }}>
+        Breadcrumb
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+
+```tsx
+<Breadcrumb fontWeight="$medium" fontSize="$sm" spacing="$4">
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+      Home
+    </BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="#" _hover={{ color: "tomato" }}>
+      Docs
+    </BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage _hover={{ color: "$success10" }}>
+      Breadcrumb
+    </BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+## Usage with routing library
+
+To use the Breadcrumb with a routing Library like solid-app-router, all you need to do is to pass the as prop to the BreadcrumbLink component.
+
+<Preview>
+  <Breadcrumb>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Home</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="#">Docs</BreadcrumbLink>
+      <BreadcrumbSeparator />
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+      <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+    </BreadcrumbItem>
+  </Breadcrumb>
+</Preview>
+```tsx 
+import {Link} from "solid-app-router";
+
+<Breadcrumb>
+  <BreadcrumbItem>
+    <BreadcrumbLink as={Link} href="#">
+      Home
+    </BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink as={Link} href="#">
+      Docs
+    </BreadcrumbLink>
+    <BreadcrumbSeparator />
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink currentPage>Breadcrumb</BreadcrumbLink>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+## Accessibility
+
+- The Breadcrumbs are rendered in a nav to denote that it is a navigation landmark.
+- The Breadcrumb nav has aria-label set to breadcrumb.
+- The BreadcrumbLink with currentPage prop has aria-current set to page.
+- The separator has role set to presentation to denote that its for presentation purposes.
+
+## Theming
+
+Use the BreadcrumbTheme type to override Breadcrumb styles and default props when extending Hope UI theme.
+
+```ts
+import { extendTheme, BreadcrumbTheme } from "@hope-ui/core";
+const theme = extendTheme({
+  components: {
+    Breadcrumb: {
+      // ...overrides
+    } as BreadcrumbTheme,
+  },
+});
+```
+
+### Component parts
+
+| Name      | Static selector             | Description         |
+| --------- | --------------------------- | ------------------- |
+| root      | `hope-Breadcrumb-root`      | Root element        |
+| item      | `hope-Breadcrumb-item`      | item of Breadcrumbs |
+| link      | `hope-Breadcrumb-link`      | link of item        |
+| separator | `hope-Breadcrumb-separator` | separator of item   |
+
+## Props
+
+### Breadcrumb
+
+| Name                | Type                          | Description                                                                | Default value |
+| ------------------- | ----------------------------- | -------------------------------------------------------------------------- | ------------- |
+| spacing             | `SystemStyleGridProps["gap"]` | The left and right space applied to each separator.                        | '0.5rem       |
+| separator           | `string \| JSX.Element`       | The visual separator between each breadcrumb item.                         | '/'           |
+| maxItem             | `number`                      | Determines the maximum number of breadcrumbs displayed.                    | 5             |
+| itemsAfterCollapse  | `number`                      | If max items is exceeded, the number of items to show after the ellipsis.  | 1             |
+| itemsBeforeCollapse | `number`                      | If max items is exceeded, the number of items to show before the ellipsis. | 1             |
+
+### BreadcrumbLink
+
+| Name        | Type      | Description                                                                               | Default value |
+| ----------- | --------- | ----------------------------------------------------------------------------------------- | ------------- |
+| currentPage | `boolean` | If `true`, renders a span with `aria-current` set to `page` instead of an anchor element. | false         |
