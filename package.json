@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:libs": "pnpm -F \\!docs -F \\!playground build && pnpm i",
     "changeset": "changeset",
     "ci:release": "pnpm build && changeset publish",
     "ci:version": "changeset version && pnpm i --no-frozen-lockfile && git add .",
@@ -22,10 +23,9 @@
     "commit": "git-cz",
     "dev": "pnpm -F @hope-ui/core dev",
     "dev:docs": "pnpm -F @hope-ui/docs dev",
+    "dev:playground": "pnpm -F @hope-ui/playground dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
-    "next:release": "pnpm build && changeset publish --no-git-tag",
     "prepare": "husky install",
-    "storybook": "pnpm -F @hope-ui/core storybook",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },

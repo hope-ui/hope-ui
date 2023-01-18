@@ -1,0 +1,42 @@
+{
+  "name": "@hope-ui/playground",
+  "private": true,
+  "description": "A SolidJS app playground for Hope UI.",
+  "keywords": [
+    "solid",
+    "solidjs",
+    "ui",
+    "library",
+    "design-system",
+    "components"
+  ],
+  "homepage": "https://github.com/hope-ui/hope-ui/tree/main/apps/playground#readme",
+  "bugs": {
+    "url": "https://github.com/hope-ui/hope-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hope-ui/hope-ui.git"
+  },
+  "license": "MIT",
+  "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
+  "scripts": {
+    "build": "vite build",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "vite",
+    "serve": "vite preview",
+    "start": "vite"
+  },
+  "dependencies": {
+    "@hope-ui/core": "^1.0.0-rc.1",
+    "solid-js": "^1.6.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.13",
+    "postcss": "8.4.21",
+    "tailwindcss": "3.2.4",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.3",
+    "vite-plugin-solid": "^2.3.0"
+  }
+}

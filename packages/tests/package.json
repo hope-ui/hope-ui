@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/tests",
-  "version": "1.0.0-next.11",
+  "version": "1.0.0-rc.1",
   "private": true,
   "description": "Helper package that is used to contain commonly repeated tests logic.",
   "keywords": [
