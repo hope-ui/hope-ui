@@ -1,0 +1,4 @@
+@import "tailwindcss/base";
+@import "@hope-ui/core/style";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";

@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/utils",
-  "version": "1.0.0-next.11",
+  "version": "1.0.0-rc.1",
   "private": false,
   "description": "Common utilities and types for Hope UI.",
   "keywords": [
@@ -43,12 +43,7 @@
   "scripts": {
     "build": "rollup -c ../../configs/rollup.config.ts",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@solid-primitives/refs": "^0.3.4",
-    "@solid-primitives/utils": "^4.0.0"
   },
   "peerDependencies": {
     "solid-js": "^1.6.1"
