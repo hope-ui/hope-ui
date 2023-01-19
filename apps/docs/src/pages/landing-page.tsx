@@ -317,11 +317,7 @@ export default function LandingPage() {
               color: "$danger11",
             }}
           >
-            Hope UI is in a rewrite process, learn more about the next major release on the&nbsp;
-            <Anchor external href="https://next--hope-ui.netlify.app/docs/introduction/getting-started" fontWeight="$bold" fontStyle="italic">
-              new documentation
-            </Anchor>
-            .
+            Starting from 1.0 Hope UI is moving away from CSS-in-JS and the style props API, if this is something important to you please consider moving to another solution.
           </HStack>
         </Box>
       </Portal>
