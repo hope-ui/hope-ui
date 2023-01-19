@@ -30,7 +30,7 @@ Hope UI is a composable and accessible component library that gives you the foun
 
 Hope UI is in a rewrite process, focus will be on the next major version (`v1.0`) and no new feature will be added to `v0.x`.
 
-If you want to try the `1.0` prereleases learn more on the new [documentation](https://next--hope-ui.netlify.app/docs/introduction/getting-started).
+Hope UI is **moving away** from CSS-in-JS and style props (Chakra UI like) API, if this is something important to you, consider switching to another solution. 
 
 This project is not ready for production, use at your own risk.
 
