@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/core",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-beta.1",
   "private": false,
   "description": "Hope UI core components library.",
   "keywords": [
@@ -22,42 +22,43 @@
   "license": "MIT",
   "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
-      "solid": "./dist/source/index.jsx",
-      "import": "./dist/esm/index.js",
-      "browser": {
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js"
+      "solid": "./dist/index.jsx",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       },
-      "require": "./dist/cjs/index.js",
-      "node": "./dist/cjs/index.js"
+      "require": "./dist/index.cjs"
     },
     "./style": "./dist/hope-ui.css"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
+  "types": "./dist/index.d.ts",
+  "typesVersions": {},
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c ../../configs/rollup.config.ts && postcss ./src/index.css -o ./dist/hope-ui.css",
+    "build": "tsup && postcss ./src/index.css -o ./dist/hope-ui.css",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hope-ui/utils": "^1.0.0-rc.1",
-    "@kobalte/core": "^0.3.1",
-    "@kobalte/utils": "^0.3.0",
-    "@solid-primitives/refs": "^0.3.4",
+    "@hope-ui/utils": "^1.0.0-beta.1",
+    "@kobalte/core": "^0.6.0",
+    "@kobalte/utils": "^0.5.0",
+    "@solid-primitives/refs": "^0.3.6",
     "class-variance-authority": "^0.4.0"
   },
   "devDependencies": {
-    "@hope-ui/tests": "^1.0.0-rc.1",
-    "@kobalte/tailwindcss": "^0.2.0",
+    "@hope-ui/tests": "^1.0.0-beta.1",
+    "@kobalte/tailwindcss": "^0.4.1",
     "@tailwindcss/forms": "0.5.3",
     "autoprefixer": "10.4.13",
     "cssnano": "5.1.14",
@@ -66,7 +67,7 @@
     "tailwindcss": "3.2.4"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.1"
+    "solid-js": "^1.6.10"
   },
   "publishConfig": {
     "access": "public"

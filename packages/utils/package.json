@@ -1,6 +1,6 @@
 {
   "name": "@hope-ui/utils",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-beta.1",
   "private": false,
   "description": "Common utilities and types for Hope UI.",
   "keywords": [
@@ -22,31 +22,32 @@
   "license": "MIT",
   "author": "Fabien Marie-Louise <fabienml.dev@gmail.com>",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
-      "solid": "./dist/source/index.jsx",
-      "import": "./dist/esm/index.js",
-      "browser": {
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js"
+      "solid": "./dist/index.jsx",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       },
-      "require": "./dist/cjs/index.js",
-      "node": "./dist/cjs/index.js"
+      "require": "./dist/index.cjs"
     }
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "browser": {},
+  "types": "./dist/index.d.ts",
+  "typesVersions": {},
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c ../../configs/rollup.config.ts",
+    "build": "tsup",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "solid-js": "^1.6.1"
+    "solid-js": "^1.6.10"
   },
   "publishConfig": {
     "access": "public"
