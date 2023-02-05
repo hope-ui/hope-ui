@@ -26,6 +26,7 @@
     "dev:playground": "pnpm -F @hope-ui/playground dev",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "prepare": "husky install",
+    "storybook": "pnpm -F @hope-ui/core storybook",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
@@ -87,5 +88,5 @@
     "vite": "4.1.1",
     "vite-plugin-solid": "2.5.0"
   },
-  "packageManager": "pnpm@7.3.0"
+  "packageManager": "pnpm@7.26.3"
 }

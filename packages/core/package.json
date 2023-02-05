@@ -44,8 +44,10 @@
   ],
   "scripts": {
     "build": "tsup && postcss ./src/index.css -o ./dist/hope-ui.css",
+    "build-storybook": "storybook build",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "vite serve dev --host",
+    "storybook": "storybook dev -p 6006",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
@@ -59,11 +61,20 @@
   "devDependencies": {
     "@hope-ui/tests": "^1.0.0-beta.1",
     "@kobalte/tailwindcss": "^0.4.1",
+    "@storybook/addon-essentials": "7.0.0-beta.43",
+    "@storybook/addon-interactions": "7.0.0-beta.43",
+    "@storybook/addon-links": "7.0.0-beta.43",
+    "@storybook/blocks": "7.0.0-beta.43",
+    "@storybook/html": "7.0.0-beta.43",
+    "@storybook/html-vite": "7.0.0-beta.43",
     "@tailwindcss/forms": "0.5.3",
     "autoprefixer": "10.4.13",
     "cssnano": "5.1.14",
     "postcss": "8.4.21",
     "postcss-cli": "10.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "storybook": "7.0.0-beta.43",
     "tailwindcss": "3.2.4"
   },
   "peerDependencies": {
