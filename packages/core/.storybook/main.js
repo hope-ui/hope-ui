@@ -9,9 +9,6 @@ export default {
     name: "@storybook/html-vite",
     options: {},
   },
-  docs: {
-    autodocs: "tag",
-  },
   core: {
     disableTelemetry: true,
   },
