@@ -30,5 +30,10 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms"), require("@kobalte/tailwindcss")],
+  plugins: [
+    require("@tailwindcss/forms")({
+      strategy: "base",
+    }),
+    require("@kobalte/tailwindcss"),
+  ],
 };

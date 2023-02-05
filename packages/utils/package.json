@@ -35,9 +35,7 @@
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "browser": {},
   "types": "./dist/index.d.ts",
-  "typesVersions": {},
   "files": [
     "dist"
   ],
