@@ -7,8 +7,6 @@
   </a>
 </p>
 
-<h1 align="center">The SolidJS component library you've hoped for</h1>
-
 <p align="center">
   <a href="https://lgtm.com/projects/g/fabien-ml/hope-ui/context:javascript">
     <img src="https://img.shields.io/lgtm/grade/javascript/g/fabien-ml/hope-ui.svg?logo=lgtm&logoWidth=18" alt="Language grade: JavaScript"/>
@@ -24,23 +22,9 @@
   </a>
 </p>
 
-Hope UI is a composable and accessible component library that gives you the foundation to build your next SolidJS application.
-
 # ⚠️ WARNING ⚠️
 
-Hope UI is in a rewrite process, focus will be on the next major version (`v1.0`) and no new feature will be added to `v0.x`.
-
-Hope UI is **moving away** from CSS-in-JS and style props (Chakra UI like) API, if this is something important to you, consider switching to another solution. 
-
-This project is not ready for production, use at your own risk.
-
-## Why use Hope UI ?
-
-- **Ready to go**: Start your project with over 40 well designed SolidJS components.
-- **Composable**: Compose your UI with reusable building blocks.
-- **Accessible**: Hope UI follows WAI-ARIA standards, helping you to reach the largest audience possible with less effort.
-- **Themeable**: Use Hope UI's design system or customize it using the theming features.
-- **Dark mode**: Add dark mode support to your app with just a few lines of code. All components are built with dark mode in mind.
+Hope UI is no longer maintained. Focus is on the developement of it's successor: https://github.com/kobaltedev/pigment.
 
 ## Documentation
 
