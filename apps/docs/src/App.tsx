@@ -110,7 +110,7 @@ function AppLayout() {
               color: "$danger11",
             }}
           >
-            Starting from 1.0 Hope UI is moving away from CSS-in-JS and the style props API, if this is something important to you please consider moving to another solution.
+            Hope UI is no longer maintained. Focus is on the developement of it's successor: <a href="https://github.com/kobaltedev/pigment">Pigment</a>.
           </HStack>
         </Box>
       </Portal>
