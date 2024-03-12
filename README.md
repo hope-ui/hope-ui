@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://hope-ui.com">
+  <a href="https://hope-ui.netlify.app">
     <img
       alt="Hope UI | The SolidJS component library you've hoped for."
       src="./assets/banner.jpg" 
@@ -28,7 +28,7 @@ Hope UI is no longer maintained. Focus is on the developement of it's successor:
 
 ## Documentation
 
-For full documentation, visit [hope-ui.com](https://hope-ui.com/).
+For full documentation, visit [hope-ui.netlify.app](https://hope-ui.netlify.app).
 
 ## Acknowledgment
 
