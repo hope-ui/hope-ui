@@ -1,0 +1,13 @@
+packages:
+  - "packages/*"
+
+allowBuilds:
+  esbuild: true
+
+catalog:
+  solid-js: 2.0.0-beta.16
+  "@solidjs/signals": 2.0.0-beta.16
+  "@solidjs/web": 2.0.0-beta.16
+
+minimumReleaseAgeExclude:
+  - vite@8.1.4

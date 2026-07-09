@@ -1,0 +1,23 @@
+{
+  "name": "@solid-zero/internal-test-utils",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared test harness (mount + axe a11y check) used by every component package's tests",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "dependencies": {
+    "axe-core": "4.12.1"
+  },
+  "devDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}

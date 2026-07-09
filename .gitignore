@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+*.tsbuildinfo
+coverage/
+.DS_Store
+test-results/
+playwright-report/
+.vitest-attachments/
+**/__screenshots__/
+
+# MacOS
+.DS_Store
+.localized
+__MACOSX/

@@ -1,0 +1,31 @@
+{
+  "name": "@solid-zero/core",
+  "version": "0.0.0",
+  "description": "Shared behavior kernel for solid-zero components (internal use across component packages)",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "devDependencies": {
+    "@solid-zero/internal-test-utils": "workspace:*",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}
