@@ -10,12 +10,14 @@ export default defineConfig({
     passWithNoTests: true,
     projects: [
       {
-        // `hot: false` disables Vite's solid-refresh HMR wrapper for components
-        // imported from other modules — tests never need HMR, and leaving it on
-        // causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
+        // `refresh: { disabled: true }` disables Vite's solid-refresh HMR wrapper for
+        // components imported from other modules — tests never need HMR, and leaving
+        // it on causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
         // silently failing to reach the DOM) specifically for imported components
         // that don't reproduce when the component is defined inline in the test file.
-        plugins: [solid({ solid: { moduleName: "@solidjs/web" }, hot: false })],
+        plugins: [
+          solid({ solid: { moduleName: "@solidjs/web" }, refresh: { disabled: true } }),
+        ],
         test: {
           name: "unit",
           environment: "node",
@@ -24,12 +26,14 @@ export default defineConfig({
         },
       },
       {
-        // `hot: false` disables Vite's solid-refresh HMR wrapper for components
-        // imported from other modules — tests never need HMR, and leaving it on
-        // causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
+        // `refresh: { disabled: true }` disables Vite's solid-refresh HMR wrapper for
+        // components imported from other modules — tests never need HMR, and leaving
+        // it on causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
         // silently failing to reach the DOM) specifically for imported components
         // that don't reproduce when the component is defined inline in the test file.
-        plugins: [solid({ solid: { moduleName: "@solidjs/web" }, hot: false })],
+        plugins: [
+          solid({ solid: { moduleName: "@solidjs/web" }, refresh: { disabled: true } }),
+        ],
         test: {
           name: "browser",
           include: ["packages/*/src/**/*.browser.test.{ts,tsx}"],

@@ -1,2 +1,11 @@
+export { createComponentContext } from "./context";
+export type { CreateDismissableOptions } from "./dismissable";
+export { createDismissable } from "./dismissable";
+export type { CreateFocusTrapOptions } from "./focus-trap";
+export { createFocusTrap } from "./focus-trap";
+export type { CreatePresenceOptions, PresenceState, PresenceStatus } from "./presence";
+export { createPresence } from "./presence";
 export type { RenderElementOptions, RenderProp } from "./render";
 export { renderElement } from "./render";
+export type { CreateScrollLockOptions } from "./scroll-lock";
+export { createScrollLock } from "./scroll-lock";

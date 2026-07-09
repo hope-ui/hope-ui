@@ -1,6 +1,6 @@
 # solid-zero: architecture plan and roadmap
 
-## Status (as of Phase 0 completion)
+## Status (as of Phase 1 in progress — Dialog's shared primitives complete)
 
 **Phase 0 is complete and merged to `develop`.** In place: pnpm + Turborepo workspace,
 `@solid-zero/core` (behavior kernel — currently just `renderElement`), `@solid-zero/button`
@@ -9,7 +9,15 @@
 unit + Playwright browser tests → coverage/doc parity check), Changesets. Full pipeline
 verified green locally, including the coverage-parity script's fail/pass behavior.
 
-**Next up: Phase 1, starting with Dialog.** See "How to build, in order" below.
+**Phase 1, step 2 (Dialog) is in progress.** `@solid-zero/core` gained
+`createComponentContext`, `createFocusTrap`, `createDismissable`, `createScrollLock`, and
+`createPresence` — all built fresh (Base UI/React Aria as behavior reference, per the
+reference policy below), all with tests + docs. Building these forced a significant,
+unplanned but necessary detour: the build pipeline moved from `tsup`/`esbuild-plugin-solid`
+to Vite library mode/`vite-plugin-solid@3.0.0-next.5`, because the old pipeline could not
+compile a JSX `ref` attribute at all under solid-js 2.0 (see "SolidJS 2.0 (beta) — API
+differences" in `CLAUDE.md` for the full root-cause writeup). Dialog itself (the
+component) is next.
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -197,9 +205,20 @@ Concrete rules every primitive/component must follow:
   etc.) must be generated with `createUniqueId`** (deterministic, SSR-stable) — never
   `Math.random()`/a module-level counter/anything that can produce different values on
   server vs client and cause a hydration mismatch.
-- **Portals must degrade gracefully server-side** (render inline / no-op rather than
-  throwing, since there's no `document.body` to portal into during SSR) — confirm
-  `@solidjs/web`'s own `Portal` already handles this before building a custom one.
+- **Portals do NOT degrade gracefully server-side in this `@solidjs/web` beta —
+  confirmed by direct inspection, not assumed.** `@solidjs/web`'s server build
+  (`dist/server.js`) implements `Portal` as `function Portal() { throw new Error("Portal
+  is not supported on the server"); }` — calling it during SSR crashes the whole render,
+  it does not silently no-op. Every component that portals content (Dialog's
+  Backdrop/Popup) must gate its own `<Portal>` usage with `isServer` (from
+  `@solidjs/web`) as a plain `if (isServer) return null;` at the top of a small wrapper
+  component — not a reactive `<Show when={!isServer}>`, since `isServer` is a fixed
+  per-environment constant, not a runtime toggle, and a plain `if` avoids relying on
+  `Show`'s hydration-key bookkeeping for something that never actually changes within a
+  given build. This means portaled content is simply absent from the SSR HTML and mounts
+  fresh on the client after hydration — verify this doesn't produce a hydration-mismatch
+  warning with an actual `renderToStringAsync` + `hydrate` round-trip test, per the DoD
+  below, rather than assuming it's fine.
 - **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
   client-only** and should be structured so they simply don't run their DOM-touching
   logic during SSR (again, via effects) rather than crashing or needing to be manually
@@ -231,11 +250,15 @@ DoD below) — this doesn't depend on SolidStart at all.
 **Phase 1 — build in this order (each step forces the next shared primitive into
 existence before scaling to 50+ components):**
 1. ~~`Button`~~ ✅ — established the `as`/render composition pattern.
-2. **`Dialog` (next)** — forces focus-trap, dismissable, scroll-lock, presence, portal,
-   id-linking (`aria-labelledby`/`describedby`), and the context kernel. Also the first
-   real stress-test of the SSR requirements above: portal-on-the-server, effect-gated
-   focus-trap/scroll-lock, and `createUniqueId`-based id-linking all need to hold up in
-   an actual `renderToStringAsync` + `hydrate` round trip, not just in the browser.
+2. **`Dialog` (in progress)** — forces focus-trap, dismissable, scroll-lock, presence,
+   portal, id-linking (`aria-labelledby`/`describedby`), and the context kernel.
+   ~~`createComponentContext`, `createFocusTrap`, `createDismissable`,
+   `createScrollLock`, `createPresence`~~ ✅ — all in `@solid-zero/core`, tested, documented.
+   The Dialog component itself is next. Also the first real stress-test of the SSR
+   requirements above: portal-on-the-server (now known to throw, not degrade —
+   see above), effect-gated focus-trap/scroll-lock, and `createUniqueId`-based
+   id-linking all need to hold up in an actual `renderToStringAsync` + `hydrate` round
+   trip, not just in the browser.
 3. `Popover` + `Tooltip` — forces `createFloating` as independent of Dialog, proving
    the "compose, don't inherit" rule in practice (Popover's source must have no import
    from Dialog's package/module).

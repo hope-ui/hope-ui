@@ -25,7 +25,7 @@ without SolidStart itself.
 
 ```bash
 pnpm install              # install workspace deps
-pnpm build                # turbo: build all packages (tsup, ESM + per-package .d.ts)
+pnpm build                # turbo: build all packages (Vite library mode, ESM + per-package .d.ts)
 pnpm lint                 # biome check .
 pnpm format               # biome format --write .
 pnpm typecheck            # turbo: tsc --noEmit per package (each depends on that package's build)
@@ -81,11 +81,14 @@ alongside whichever component adds the first such test.
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
 - `packages/core` (`@solid-zero/core`) — the shared behavior kernel. Nothing here is
-  duplicated per-component; everything else composes it. Currently: `renderElement`,
-  the render-prop/`as`-polymorphism primitive every public component uses instead of
-  hand-rolling its own polymorphic-`as` type system (modeled on Base UI's `useRender`
-  idea, not its code — see `packages/core/src/render.md` for the API and a documented,
-  intentional type-system limitation around cross-element `render` callbacks).
+  duplicated per-component; everything else composes it. Currently: `renderElement`
+  (the render-prop/`as`-polymorphism primitive every public component uses instead of
+  hand-rolling its own polymorphic-`as` type system, modeled on Base UI's `useRender`
+  idea, not its code — see `packages/core/src/render.md`), `createComponentContext`
+  (thin `createContext`/`useContext` wrapper with a friendlier missing-Provider error),
+  `createFocusTrap`, `createDismissable`, `createScrollLock`, and `createPresence`
+  (built fresh for Dialog — see each primitive's colocated `.md` for API details, and
+  the ref/`createEffect` timing gotcha below before writing another one).
 - `packages/button` (`@solid-zero/button`) — first real component, proves the
   `as`/render pattern end-to-end.
 - `packages/internal-test-utils` (`@solid-zero/internal-test-utils`, private) — shared
@@ -117,8 +120,35 @@ actual installed package):
   `render`, `Dynamic`, `Portal`, and the `JSX` types live in **`@solidjs/web`**, not
   `solid-js` or `solid-js/web`. `jsxImportSource` must point at `@solidjs/web`
   (see `tsconfig.base.json`, and the `solid.moduleName` override in
-  `tsup.config.base.ts` / `vitest.config.ts` for `esbuild-plugin-solid` /
-  `vite-plugin-solid`, which both still default to `"solid-js/web"`).
+  `vite.config.base.ts` / `vitest.config.ts` for `vite-plugin-solid`, which defaults to
+  `"solid-js/web"`).
+- **The build pipeline is Vite library mode, not tsup.** Phase 0 used
+  `tsup`/`esbuild-plugin-solid`; both were removed at the start of Dialog's build (see
+  `vite.config.base.ts`) after discovering a hard incompatibility: `esbuild-plugin-solid`
+  (and the `vite-plugin-solid@2.x` originally pinned in Phase 0) bundle
+  `babel-preset-solid@1.x`, which compiles a JSX `ref` attribute into an import of a
+  runtime helper called `use` from the target module — a name `@solidjs/web` 2.0 renamed
+  to `ref`/`applyRef`. Since Button never used a literal `ref=` attribute, Phase 0 never
+  hit this; Dialog is the first component that needs one, and *any* `ref=` usage failed
+  to even load ("does not provide an export named 'use'") under the old pipeline.
+  `esbuild-plugin-solid` has no 2.0-compatible release; the first-party
+  `vite-plugin-solid` does, published under the npm `next` tag
+  (`vite-plugin-solid@3.0.0-next.5`, pulling a matching `babel-preset-solid@2.0.0-beta.x`
+  via its own dependency range) — confirmed against the npm registry, not assumed. Now
+  build and test share one Solid-2.0-aware compiler pipeline; `vite-plugin-dts` replaces
+  tsup's built-in `.d.ts` bundling (with `exclude` globs so test files don't leak into
+  published type output).
+- **A `createEffect(compute, effect)` compute function must never read a plain
+  (non-signal) ref accessor** (e.g. `ref: () => someLetVariable` backed by a bare
+  `let x; <div ref={x}>`). The compute function runs synchronously at the moment
+  `createEffect(...)` is *called* — which, for a primitive invoked at the top of a
+  component body, is *before* that component's own later JSX (and its `ref` callback)
+  has executed — so it captures the ref as permanently `undefined`, and since it isn't a
+  tracked signal, the effect never reruns to pick up the real value once the ref is set.
+  Read the ref inside the *effect* (second) callback instead — by the time that runs
+  (deferred, post-mount), the ref is populated. Hit and fixed in `createFocusTrap` and
+  `createDismissable` (see the comments there); `createPresence` already did this
+  correctly by construction.
 - **`mergeProps`/`splitProps` are gone from the public API.** The 2.0 idiom is `merge`
   and `omit`, imported from `solid-js` (see `packages/button/src/Button.tsx`). Prefer
   these over anything reintroducing the old names.
