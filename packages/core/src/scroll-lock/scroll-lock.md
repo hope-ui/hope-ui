@@ -1,8 +1,7 @@
 # `createScrollLock`
 
 Locks `document.body` scrolling while active, compensating for the scrollbar-width
-layout shift with a matching `padding-right`. Built fresh for solid-zero (not ported
-from Corvu's `solid-prevent-scroll` — see the repo-level reference policy).
+layout shift with a matching `padding-right`. Built fresh for solid-zero.
 
 ## API
 

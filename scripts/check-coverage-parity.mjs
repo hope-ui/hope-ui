@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Fails CI if any source file under packages/*/src is missing a matching test file
-// and/or a matching .md doc file. This is what prevents the "24 of ~59 components
-// have no test" drift Kobalte has and the "zero tests anywhere" state Corvu has.
+// and/or a matching .md doc file. This is what prevents test/doc coverage from
+// drifting as the number of components grows.
 import { readdirSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 

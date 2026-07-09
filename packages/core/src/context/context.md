@@ -3,8 +3,8 @@
 Thin wrapper around SolidJS 2.0's `createContext`/`useContext`. 2.0 already returns the
 Provider component directly (`<XContext value={...}>`, no `.Provider`) and `useContext`
 already throws by default when no Provider is mounted — so this helper doesn't need to
-reimplement any of that (unlike Kobalte's ~53 hand-rolled `XContext`/`useXContext` pairs,
-one per component family, with no shared kernel). It only adds one thing: a friendlier,
+reimplement any of that (unlike a hand-rolled `XContext`/`useXContext` pair per
+component family, with no shared kernel). It only adds one thing: a friendlier,
 component-named error message in place of `createContext`'s generic one.
 
 ## API

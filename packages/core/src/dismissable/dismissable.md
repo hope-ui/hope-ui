@@ -1,9 +1,7 @@
 # `createDismissable`
 
 Calls an `onDismiss` callback on Escape keydown and/or outside pointerdown while active.
-Built fresh for solid-zero, modeled on Base UI's/React Aria's dismiss-layer behavior
-(not ported from Kobalte's `dismissable-layer` or Corvu's `solid-dismissible` — see the
-repo-level reference policy).
+Built fresh for solid-zero, modeled on Base UI's/React Aria's dismiss-layer behavior.
 
 ## API
 

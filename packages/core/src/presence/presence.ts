@@ -26,8 +26,7 @@ function getExitAnimationDuration(element: HTMLElement): number {
 
 /**
  * Tracks mount/unmount timing across an exit CSS transition or animation, the same idea
- * as Base UI's transition-status handling (built fresh for solid-zero, not ported from
- * Corvu's `solid-presence` — see the repo-level reference policy).
+ * as Base UI's transition-status handling, built fresh for solid-zero.
  *
  * Consumers gate their DOM output on `mounted()` and use `status()` to drive a
  * `data-status` attribute for CSS (`entering`/`entered`/`exiting`/`exited`). If the

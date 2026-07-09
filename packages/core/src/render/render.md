@@ -30,10 +30,10 @@ element), but TypeScript's event-handler and `ref` contravariance means a `rende
 function that switches to a genuinely different element (button → anchor) will not
 type-check without an explicit assertion at the call site — there is no sound way to
 type one concrete props interface as simultaneously correct for arbitrary target
-elements without threading a generic type parameter through every component (the
-`Polymorphic<T>` approach Kobalte and other React libraries use, and the exact type-DX
-cost solid-zero is trying to avoid — see the architecture plan's pitfall notes). This is
-a known, accepted trade-off, not a bug: cross-element renders are real but rarer than
+elements without threading a generic type parameter through every component (a
+`Polymorphic<T>`-style approach, and the exact type-DX cost solid-zero is trying to
+avoid — see the architecture plan's pitfall notes). This is a known, accepted
+trade-off, not a bug: cross-element renders are real but rarer than
 same-element restyling, and an explicit assertion at that boundary is honest about the
 type system's actual guarantee.
 

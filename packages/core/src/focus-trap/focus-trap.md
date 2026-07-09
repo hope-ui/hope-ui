@@ -1,9 +1,7 @@
 # `createFocusTrap`
 
 Traps `Tab`/`Shift+Tab` focus cycling within a container while active. Built fresh for
-solid-zero (not ported from Kobalte's or Corvu's focus-trap code — see the repo-level
-reference policy), modeled on the behavior of Base UI's/React Aria's focus scope
-primitives.
+solid-zero, modeled on the behavior of Base UI's/React Aria's focus scope primitives.
 
 ## API
 

@@ -43,7 +43,7 @@ jobs:
         run: pnpm test
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps --only-shell
+        run: pnpm exec playwright install --with-deps --only-shell
 
       - name: Browser tests
         run: pnpm test:browser

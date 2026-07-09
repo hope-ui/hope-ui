@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { mount } from "../mount/mount";
 import { expectNoA11yViolations } from "./axe";
-import { mount } from "./mount";
 
 describe("expectNoA11yViolations", () => {
   it("resolves without throwing for accessible markup", async () => {

@@ -2,8 +2,7 @@
 
 Tracks mount/unmount timing across an exit CSS transition or animation, so a component
 can stay in the DOM long enough for an authored exit animation to finish before actually
-unmounting. Built fresh for solid-zero, modeled on Base UI's transition-status handling
-(not ported from Corvu's `solid-presence` — see the repo-level reference policy).
+unmounting. Built fresh for solid-zero, modeled on Base UI's transition-status handling.
 
 ## API
 
