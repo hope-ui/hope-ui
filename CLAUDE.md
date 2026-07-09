@@ -12,6 +12,15 @@ code/reasoning) but explicitly avoids the architectural patterns of Kobalte and 
 of" anything from either). See `docs/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
+**SSR and SolidStart support are required, not optional** — every primitive/component
+must render under SSR and hydrate cleanly, verified with `renderToStringAsync`/
+`hydrate` from `@solidjs/web`. See "SSR & hydration requirements" in `docs/plan.md` for
+the concrete rules (effect-gate DOM access, `createUniqueId` for ARIA-linking ids,
+portals must degrade gracefully server-side) and a version caveat: `@solidjs/start`
+hasn't migrated to solid-js 2.0 yet, so real SolidStart end-to-end testing is currently
+blocked on them, not on this project — SSR correctness is still fully testable now
+without SolidStart itself.
+
 ## Commands
 
 ```bash
@@ -60,6 +69,13 @@ has no automated tests at all — see `docs/plan.md` for the specifics.
 Every component/primitive test that renders real DOM should also call
 `expectNoA11yViolations` (from `@solid-zero/internal-test-utils`) at least once, so a
 baseline axe-core check runs by default.
+
+Every component (not needed for pure internal primitives with no DOM output) also
+needs an SSR/hydration round-trip test: `renderToStringAsync` (from `@solidjs/web`)
+must resolve without throwing, and `hydrate()` against the resulting HTML must produce
+no hydration-mismatch warnings. `check:coverage-parity` does not yet enforce this one
+mechanically — treat it as required anyway, and extend the script to check for it
+alongside whichever component adds the first such test.
 
 ## Architecture
 

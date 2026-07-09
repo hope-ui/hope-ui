@@ -52,6 +52,12 @@ for SolidJS — copying their **API surface** (prop patterns, composition idioms
 their React internals — explicitly avoiding the structural problems Kobalte and Corvu
 run into (see Reference policy above).
 
+**SSR and SolidStart support are required, not optional.** Every primitive and
+component must render correctly under server-side rendering and hydrate cleanly on the
+client — this is a cross-cutting, non-negotiable requirement like the Definition of
+Done, not a follow-up phase. See "SSR & hydration requirements" below for what that
+means concretely and a caveat about SolidStart's current version alignment.
+
 **Target runtime: SolidJS 2.0 (beta, first public build `v2.0.0-beta.0`, March 2026) —
 not 1.x.** This is a meaningful architectural input, not a version bump: 2.0 reworks
 reactivity (`@solidjs/signals` as a standalone reactive core decoupled from the UI/JSX
@@ -166,6 +172,50 @@ becomes an actual goal.
 Promises, `<Loading>`, `isPending`) instead of hand-rolling resource/loading-state
 plumbing.
 
+## SSR & hydration requirements (cross-cutting, non-negotiable)
+
+`@solidjs/web`'s package exports already resolve to different runtime implementations
+per environment (`browser` condition → `dist/web.js`/`dist/dev.js` with real DOM ops;
+`node`/`worker` condition → `dist/server.js` with string-based SSR ops) behind the
+*same* exported function names (`render`/`Dynamic`/`insert`/`spread`/etc.), plus
+`renderToString`/`renderToStringAsync`/`renderToStream`/`hydrate`/`isServer`. This means
+**solid-zero's packages do not need a separate SSR build** — compiling once with the
+default `generate: 'dom'` mode and importing runtime helpers from `@solidjs/web` (never
+hardcoding a specific dist file) should let the same compiled component code run
+correctly in both SSR and client/hydration contexts, resolved automatically by whatever
+bundler the consuming app (e.g. SolidStart) uses. This must be verified with an actual
+round-trip test per component, not assumed — see the DoD addition below.
+
+Concrete rules every primitive/component must follow:
+- **No unconditional DOM/`window`/`document` access outside effects.** `createEffect`/
+  `onSettled` bodies only run client-side already (Solid guarantees this), so
+  client-only concerns (focus management, scroll lock, floating-position calculation,
+  outside-click dismissal) should live there naturally rather than needing manual
+  `isServer` guards sprinkled everywhere. Reach for `isServer` (from `@solidjs/web`)
+  only for the rarer case of code that isn't naturally effect-gated.
+- **IDs used for ARIA linking (`aria-labelledby`, `aria-describedby`, `aria-controls`,
+  etc.) must be generated with `createUniqueId`** (deterministic, SSR-stable) — never
+  `Math.random()`/a module-level counter/anything that can produce different values on
+  server vs client and cause a hydration mismatch.
+- **Portals must degrade gracefully server-side** (render inline / no-op rather than
+  throwing, since there's no `document.body` to portal into during SSR) — confirm
+  `@solidjs/web`'s own `Portal` already handles this before building a custom one.
+- **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
+  client-only** and should be structured so they simply don't run their DOM-touching
+  logic during SSR (again, via effects) rather than crashing or needing to be manually
+  disabled.
+
+**SolidStart version caveat (checked directly against the npm registry, not assumed):**
+as of this writing, `@solidjs/start`'s most Solid-2.0-aligned release
+(`2.0.0-alpha.3`) still depends on `solid-js@^1.9.11`, not 2.0 — SolidStart itself has
+not yet migrated. This means **real end-to-end SolidStart integration testing is
+currently blocked** on their migration, not on anything in this project. Don't treat
+"no SolidStart example app yet" as a solid-zero gap; re-check `@solidjs/start`'s
+registry versions periodically and add a real SolidStart example once it supports 2.0.
+In the meantime, SSR/hydration correctness is fully testable and required *now* using
+`@solidjs/web`'s own framework-agnostic `renderToStringAsync`/`hydrate` directly (see
+DoD below) — this doesn't depend on SolidStart at all.
+
 ## How to build, in order
 
 **Phase 0 (done):**
@@ -182,7 +232,10 @@ plumbing.
 existence before scaling to 50+ components):**
 1. ~~`Button`~~ ✅ — established the `as`/render composition pattern.
 2. **`Dialog` (next)** — forces focus-trap, dismissable, scroll-lock, presence, portal,
-   id-linking (`aria-labelledby`/`describedby`), and the context kernel.
+   id-linking (`aria-labelledby`/`describedby`), and the context kernel. Also the first
+   real stress-test of the SSR requirements above: portal-on-the-server, effect-gated
+   focus-trap/scroll-lock, and `createUniqueId`-based id-linking all need to hold up in
+   an actual `renderToStringAsync` + `hydrate` round trip, not just in the browser.
 3. `Popover` + `Tooltip` — forces `createFloating` as independent of Dialog, proving
    the "compose, don't inherit" rule in practice (Popover's source must have no import
    from Dialog's package/module).
@@ -233,10 +286,26 @@ real-browser testing — all from day one.
    focus/selection/IME behavior).
 2. A matching `.md` doc file (API, keyboard interaction table, ARIA pattern reference),
    colocated in `src/`.
+3. **An SSR/hydration smoke test** for every component (not needed for pure internal
+   primitives with no DOM output): call `renderToStringAsync` (from `@solidjs/web`,
+   runs fine in the `unit`/node project — no browser needed for this half) and confirm
+   it resolves without throwing; then, in the `browser` project, inject that server
+   HTML into a container and call `hydrate()` against it, asserting no hydration
+   mismatch warnings are logged and that basic interactivity (e.g. a click handler)
+   still works post-hydrate. This is what actually catches SSR-only crashes (portal
+   access to `document.body`, non-deterministic IDs) instead of assuming the "one
+   build, `@solidjs/web` resolves the environment" theory holds.
 
-Both are CI-enforced via `pnpm check:coverage-parity`
+Items 1 and 2 are already CI-enforced via `pnpm check:coverage-parity`
 (`scripts/check-coverage-parity.mjs`), which fails the pipeline if any
 primitive/component under `packages/*/src/*` lacks a matching test file or `.md` doc.
+Item 3 (the SSR/hydration smoke test) is **not yet mechanically enforced** — it's a
+new requirement being added at Dialog, and `check:coverage-parity` should be extended
+alongside Dialog's work to also fail if a component's test file has no SSR-round-trip
+test (e.g. checking for a `renderToStringAsync`/`hydrate` reference), the same way it
+already enforces test/doc presence. Until that script update lands, treat item 3 as a
+manual review requirement, not a false sense of "CI already covers this."
+
 `expectNoA11yViolations` (axe-core, in `@solid-zero/internal-test-utils`) should run at
 least once per component's browser test so a baseline a11y check happens by default.
 
@@ -249,6 +318,10 @@ least once per component's browser test so a baseline a11y check happens by defa
   arrow-key navigation, typeahead) — these are exactly the interactions jsdom can't
   validate.
 - Run `pnpm check:coverage-parity` and confirm it's green.
+- Confirm each component actually survives an SSR round trip: `renderToStringAsync`
+  doesn't throw, and `hydrate()` against the resulting HTML produces no console
+  hydration-mismatch warnings. Don't skip this because "it's just Button-like" —
+  Dialog's portal/focus-trap/id-linking are exactly the parts most likely to break here.
 - Once there's more than one component package, confirm `pnpm changeset` +
   `pnpm changeset version` produces per-package-family changelogs as expected.
 - Once package grouping exists, wire up a throwaway consumer app (Vite + solid-js)
