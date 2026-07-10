@@ -253,23 +253,11 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@vitest/browser-playwright@4.1.10)(vite@8.1.4(esbuild@0.27.7))
 
-  packages/button:
+  packages/components:
     dependencies:
-      '@solid-zero/core':
+      '@solid-zero/primitives':
         specifier: workspace:*
-        version: link:../core
-    devDependencies:
-      '@solid-zero/internal-test-utils':
-        specifier: workspace:*
-        version: link:../internal-test-utils
-      '@solidjs/web':
-        specifier: 'catalog:'
-        version: 2.0.0-beta.16(solid-js@2.0.0-beta.16)
-      solid-js:
-        specifier: 'catalog:'
-        version: 2.0.0-beta.16
-
-  packages/core:
+        version: link:../primitives
     devDependencies:
       '@solid-zero/internal-test-utils':
         specifier: workspace:*
@@ -287,6 +275,18 @@ importers:
         specifier: 4.12.1
         version: 4.12.1
     devDependencies:
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.16(solid-js@2.0.0-beta.16)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.16
+
+  packages/primitives:
+    devDependencies:
+      '@solid-zero/internal-test-utils':
+        specifier: workspace:*
+        version: link:../internal-test-utils
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.16(solid-js@2.0.0-beta.16)

@@ -9,6 +9,18 @@ interface PackageJson {
   peerDependencies?: Record<string, string>;
 }
 
+export interface CreateViteConfigOptions {
+  /**
+   * Per-entry-point subpath map (output name -> source file, relative to `packageDir`),
+   * for packages that publish one subpath export per unit (e.g. `@solid-zero/components`'
+   * `./button`, `./dialog`, ...) instead of a single root export. Each entry builds to
+   * `dist/<name>/index.js` (and, via `vite-plugin-dts` mirroring `src`, `dist/<name>/index.d.ts`).
+   * Omit for the common single-entry case (`src/index.ts` -> `dist/index.js`).
+   */
+  entries?: Record<string, string>;
+  overrides?: UserConfig;
+}
+
 /**
  * Shared Vite library-mode build config for every `@solid-zero/*` package.
  *
@@ -23,7 +35,10 @@ interface PackageJson {
  * via its own dependency range). Using Vite for the production build too (instead of
  * only for tests) means build and test share one Solid-2.0-aware compiler pipeline.
  */
-export function createViteConfig(packageDir: string, overrides: UserConfig = {}): UserConfig {
+export function createViteConfig(
+  packageDir: string,
+  options: CreateViteConfigOptions = {},
+): UserConfig {
   const packageJson = JSON.parse(
     readFileSync(join(packageDir, "package.json"), "utf-8"),
   ) as PackageJson;
@@ -31,6 +46,16 @@ export function createViteConfig(packageDir: string, overrides: UserConfig = {})
     ...Object.keys(packageJson.dependencies ?? {}),
     ...Object.keys(packageJson.peerDependencies ?? {}),
   ];
+
+  const isMultiEntry = options.entries !== undefined;
+  const entry = isMultiEntry
+    ? Object.fromEntries(
+        Object.entries(options.entries as Record<string, string>).map(([name, relPath]) => [
+          name,
+          join(packageDir, relPath),
+        ]),
+      )
+    : join(packageDir, "src/index.ts");
 
   return defineConfig({
     plugins: [
@@ -47,12 +72,12 @@ export function createViteConfig(packageDir: string, overrides: UserConfig = {})
       emptyOutDir: true,
       outDir: join(packageDir, "dist"),
       lib: {
-        entry: join(packageDir, "src/index.ts"),
+        entry,
         formats: ["es"],
-        fileName: () => "index.js",
+        fileName: isMultiEntry ? (_format, entryName) => `${entryName}/index.js` : () => "index.js",
       },
       rollupOptions: { external },
     },
-    ...overrides,
+    ...options.overrides,
   });
 }

@@ -16,8 +16,12 @@ reference policy below), all with tests + docs. Building these forced a signific
 unplanned but necessary detour: the build pipeline moved from `tsup`/`esbuild-plugin-solid`
 to Vite library mode/`vite-plugin-solid@3.0.0-next.5`, because the old pipeline could not
 compile a JSX `ref` attribute at all under solid-js 2.0 (see "SolidJS 2.0 (beta) — API
-differences" in `CLAUDE.md` for the full root-cause writeup). Dialog itself (the
-component) is next.
+differences" in `CLAUDE.md` for the full root-cause writeup). A second restructure
+followed: `@solid-zero/core` was renamed to `@solid-zero/primitives`, and `@solid-zero/button`
+was absorbed into a new `@solid-zero/components` package (one subpath export per
+component — `@solid-zero/components/button`, soon `@solid-zero/components/dialog` — rather
+than the family-package plan below). See "Publishing strategy" for the full rationale.
+Dialog itself (the component) is next.
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -146,7 +150,7 @@ becomes an actual goal.
 
 **Three layers, composition over inheritance:**
 
-1. **Behavior kernel** (`@solid-zero/core`, internal, never duplicated) — Solid 2.0
+1. **Behavior kernel** (`@solid-zero/primitives`, internal, never duplicated) — Solid 2.0
    primitives, not hooks, built directly on `@solidjs/signals`/stores:
    `createListState`/`createSelectionState`/`createCollection` (port react-stately's
    *algorithms* directly from react-stately, not from Kobalte's port of them) as
@@ -171,7 +175,7 @@ becomes an actual goal.
 
 3. **Public component API** — compound components (`Dialog.Root`, `Dialog.Trigger`, …)
    built on `solid-js`'s `merge`/`omit` (2.0's replacements for `mergeProps`/
-   `splitProps`), plus `renderElement` (in `@solid-zero/core`) for the render-prop/`as`
+   `splitProps`), plus `renderElement` (in `@solid-zero/primitives`) for the render-prop/`as`
    pattern. Ref merging needs no custom utility — `ref` natively accepts an array of
    ref functions (`ref={[internalRef, props.ref]}`).
 
@@ -253,8 +257,11 @@ existence before scaling to 50+ components):**
 2. **`Dialog` (in progress)** — forces focus-trap, dismissable, scroll-lock, presence,
    portal, id-linking (`aria-labelledby`/`describedby`), and the context kernel.
    ~~`createComponentContext`, `createFocusTrap`, `createDismissable`,
-   `createScrollLock`, `createPresence`~~ ✅ — all in `@solid-zero/core`, tested, documented.
-   The Dialog component itself is next. Also the first real stress-test of the SSR
+   `createScrollLock`, `createPresence`~~ ✅ — all in `@solid-zero/primitives`, tested,
+   documented. `@solid-zero/core` was renamed to `@solid-zero/primitives` and
+   `@solid-zero/button` was absorbed into `@solid-zero/components/button` along the way
+   — see "Publishing strategy". The Dialog component itself (as
+   `@solid-zero/components/dialog`) is next. Also the first real stress-test of the SSR
    requirements above: portal-on-the-server (now known to throw, not degrade —
    see above), effect-gated focus-trap/scroll-lock, and `createUniqueId`-based
    id-linking all need to hold up in an actual `renderToStringAsync` + `hydrate` round
@@ -272,19 +279,26 @@ drift that produced Kobalte's and Corvu's gaps.
 
 ## Publishing strategy
 
-- **Package granularity:** hybrid, not Kobalte's one-giant-package nor Corvu's
-  15+-micro-packages-with-sibling-deps. `@solid-zero/core` for the behavior kernel
-  (never duplicated), then component packages grouped by **shared-primitive family**
-  once there are enough components to group — e.g. eventually `@solid-zero/overlays`
-  (dialog, popover, tooltip, alert-dialog, context-menu — share dismiss/floating/
-  presence), `@solid-zero/collections` (listbox, select, combobox, menu, tabs — share
-  list/selection/keyboard-nav), `@solid-zero/forms` (checkbox, radio, switch, slider,
-  number-field), `@solid-zero/disclosure` (accordion, collapsible). Every component
-  package depends only on `@solid-zero/core` — never on a sibling component package.
-  (`@solid-zero/button` is currently its own package as a Phase 0 pipeline proof; it
-  may move into `@solid-zero/forms` once that family exists.)
+- **Package granularity (revised from the original family-package plan):** two
+  packages total, not Kobalte's one-giant-package, not Corvu's
+  15+-micro-packages-with-sibling-deps, and not the shared-primitive-family split
+  (`@solid-zero/overlays`, `@solid-zero/collections`, `@solid-zero/forms`,
+  `@solid-zero/disclosure`) originally planned here. `@solid-zero/primitives` for the
+  behavior kernel (never duplicated), and a single `@solid-zero/components` package for
+  every public component, each as its own subpath export
+  (`@solid-zero/components/button`, `@solid-zero/components/dialog`, ...). The
+  family-package plan required remembering which family package a given component
+  shipped from before you could install/import it (`overlays` vs. `collections` vs.
+  `forms`); a single package name with per-component subpaths removes that lookup while
+  keeping the same per-component tree-shaking a family package would have given —
+  importing `@solid-zero/components/button` never pulls in Dialog's code, since each
+  subpath is its own build entry (see `vite.config.base.ts`'s `entries` option). Every
+  component subpath depends only on `@solid-zero/primitives` — never on another
+  component's subpath, which is what keeps this from becoming Kobalte's single giant
+  package in spirit despite sharing one package in name.
 - **Entry points:** subpath exports via `package.json#exports` per component rather
-  than one barrel re-exporting everything, plus `"sideEffects": false`.
+  than one barrel re-exporting everything (no root `.` export on
+  `@solid-zero/components` at all), plus `"sideEffects": false`.
 - **Monorepo tooling:** pnpm workspaces + Turborepo. Skip Nx — even Base UI itself runs
   Nx *and* Lerna together, more tooling than a greenfield library needs.
 

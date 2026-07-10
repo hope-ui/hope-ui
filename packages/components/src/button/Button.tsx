@@ -1,4 +1,4 @@
-import { type RenderProp, renderElement } from "@solid-zero/core";
+import { type RenderProp, renderElement } from "@solid-zero/primitives";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 

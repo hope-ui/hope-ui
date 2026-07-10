@@ -42,14 +42,14 @@ pnpm exec playwright install --only-shell chromium
 
 **Running a single test file or test:**
 ```bash
-pnpm exec vitest run --project=browser packages/button/src/Button.browser.test.tsx
+pnpm exec vitest run --project=browser packages/components/src/button/Button.browser.test.tsx
 pnpm exec vitest run --project=browser -t "fires onClick"
 ```
 
 **Building/typechecking a single package:**
 ```bash
-pnpm --filter @solid-zero/button build
-pnpm --filter @solid-zero/button typecheck
+pnpm --filter @solid-zero/components build
+pnpm --filter @solid-zero/components typecheck
 ```
 
 ## Definition of Done (enforced, not a guideline)
@@ -80,34 +80,47 @@ alongside whichever component adds the first such test.
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
-- `packages/core` (`@solid-zero/core`) — the shared behavior kernel. Nothing here is
-  duplicated per-component; everything else composes it. Currently: `renderElement`
-  (the render-prop/`as`-polymorphism primitive every public component uses instead of
-  hand-rolling its own polymorphic-`as` type system, modeled on Base UI's `useRender`
-  idea, not its code — see `packages/core/src/render.md`), `createComponentContext`
-  (thin `createContext`/`useContext` wrapper with a friendlier missing-Provider error),
-  `createFocusTrap`, `createDismissable`, `createScrollLock`, and `createPresence`
-  (built fresh for Dialog — see each primitive's colocated `.md` for API details, and
-  the ref/`createEffect` timing gotcha below before writing another one).
-- `packages/button` (`@solid-zero/button`) — first real component, proves the
-  `as`/render pattern end-to-end.
+- `packages/primitives` (`@solid-zero/primitives`) — the shared behavior kernel.
+  Nothing here is duplicated per-component; everything else composes it. Currently:
+  `renderElement` (the render-prop/`as`-polymorphism primitive every public component
+  uses instead of hand-rolling its own polymorphic-`as` type system, modeled on Base
+  UI's `useRender` idea, not its code — see `packages/primitives/src/render/render.md`),
+  `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
+  missing-Provider error), `createFocusTrap`, `createDismissable`, `createScrollLock`,
+  and `createPresence` (built fresh for Dialog — see each primitive's colocated `.md`
+  for API details, and the ref/`createEffect` timing gotcha below before writing
+  another one).
+- `packages/components` (`@solid-zero/components`) — every public component, one
+  subpath export each (`@solid-zero/components/button`, `@solid-zero/components/dialog`,
+  ...) rather than one package per component or per component-family. No root `.`
+  export — consumers always import a specific component's subpath, which is also what
+  keeps this from becoming a Kobalte-style single giant package: importing one
+  component's subpath never pulls in another's code. See "Publishing shape" below for
+  the full rationale.
 - `packages/internal-test-utils` (`@solid-zero/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).
 
-**Composition rule for future components:** compose shared kernel primitives, never
-depend on a sibling component package. E.g. Popover must compose
-`createFloating`/`createDismissable`/`createPresence` directly — it must never depend
-on `Dialog`, even though both are "overlay-ish." This is the specific mistake Corvu
-makes (`@corvu/popover` depends on `@corvu/dialog`) that this project avoids by design.
+**Composition rule for future components:** compose shared kernel primitives from
+`@solid-zero/primitives`, never import from another component's subpath within
+`@solid-zero/components`. E.g. Popover must compose
+`createFloating`/`createDismissable`/`createPresence` directly — it must never import
+from `@solid-zero/components/dialog`, even though both are "overlay-ish." This is the
+specific mistake Corvu makes (`@corvu/popover` depends on `@corvu/dialog`) that this
+project avoids by design, despite now sharing one package.
 
-**Publishing shape (as it scales beyond Button):** packages are grouped by
-shared-primitive family, not one-package-per-component and not one-giant-package —
-e.g. eventually `@solid-zero/overlays` (dialog/popover/tooltip/context-menu, sharing
-dismiss/floating/presence), `@solid-zero/collections` (listbox/select/combobox/menu/tabs,
-sharing list/selection/keyboard-nav). Every component package depends only on
-`@solid-zero/core`, never on a sibling component package. Subpath exports
-(`package.json#exports`) per component, `"sideEffects": false`, ESM-only builds.
+**Publishing shape:** originally planned as packages grouped by shared-primitive family
+(`@solid-zero/overlays`, `@solid-zero/collections`, etc.); revised to a single
+`@solid-zero/components` package with one subpath export per component instead. The
+family-package plan meant consumers had to remember which family package a given
+component lived in before they could install/import it; a single package name with
+per-component subpaths removes that lookup entirely while keeping the same
+per-component tree-shaking (via `package.json#exports` + `"sideEffects": false`) that
+family packages would have given. `@solid-zero/primitives` stays a fully separate
+package — every entry in `@solid-zero/components` depends on it, never on a sibling
+subpath. Each component subpath is its own Vite library-mode entry point (see
+`vite.config.base.ts`'s `entries` option), building to `dist/<component>/index.js` +
+matching `.d.ts`. ESM-only builds.
 
 ## SolidJS 2.0 (beta) — API differences from 1.x that matter here
 
@@ -150,8 +163,8 @@ actual installed package):
   `createDismissable` (see the comments there); `createPresence` already did this
   correctly by construction.
 - **`mergeProps`/`splitProps` are gone from the public API.** The 2.0 idiom is `merge`
-  and `omit`, imported from `solid-js` (see `packages/button/src/Button.tsx`). Prefer
-  these over anything reintroducing the old names.
+  and `omit`, imported from `solid-js` (see `packages/components/src/button/Button.tsx`).
+  Prefer these over anything reintroducing the old names.
 - **`onMount` → `onSettled`**, `createEffect` can take a split `(depsFn, computeFn)`
   form, `createContext` returns the Provider component directly (`<XContext value={...}>`,
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
@@ -161,9 +174,10 @@ actual installed package):
   components imported from another module** (a real bug hit during Phase 0: `children`
   silently failed to reach the DOM only when `Button` was imported from `Button.tsx`,
   not when the same component was defined inline in the test file). Fixed by setting
-  `hot: false` on the Solid Vite plugin in `vitest.config.ts` — tests never need HMR.
-  If a similar "props vanish only for imported components" symptom reappears, check
-  this setting first before assuming a merge/omit bug.
+  `refresh: { disabled: true }` on the Solid Vite plugin in `vitest.config.ts` — tests
+  never need HMR (`hot` still works but is deprecated in `vite-plugin-solid@3.x` in
+  favor of `refresh`). If a similar "props vanish only for imported components" symptom
+  reappears, check this setting first before assuming a merge/omit bug.
 - Browser tests import `page` from `vitest/browser`, not the deprecated
   `@vitest/browser/context`.
 

@@ -1,7 +1,7 @@
 {
-  "name": "@solid-zero/button",
+  "name": "@solid-zero/primitives",
   "version": "0.0.0",
-  "description": "Headless Button component for solid-zero",
+  "description": "Shared behavior kernel for solid-zero components (internal use across component packages)",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -22,9 +22,6 @@
   "peerDependencies": {
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
-  },
-  "dependencies": {
-    "@solid-zero/core": "workspace:*"
   },
   "devDependencies": {
     "@solid-zero/internal-test-utils": "workspace:*",
