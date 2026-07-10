@@ -6,9 +6,12 @@
 // Every @solid-zero/components source file additionally needs a Storybook story, a
 // `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
 // `Foo.browser.test.tsx` that really calls `hydrate()` — the two halves of the SSR round-trip
-// the Definition of Done requires. "Really calls" means outside a comment, outside a string,
-// outside an `it.skip`, and not merely imported: every one of those loopholes was live at some
-// point, and Dialog exercised three of them at once. See docs/testing.md.
+// the Definition of Done requires. And any browser test that calls `mount()` must also call
+// `expectNoA11yViolations()`.
+//
+// "Really calls" means outside a comment, outside a string, outside an `it.skip`, and not
+// merely imported: every one of those loopholes was live at some point, and Dialog exercised
+// three of them at once. See docs/testing.md.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
@@ -26,6 +29,14 @@ const REQUIRES_SSR_TEST = new Set(["components"]);
 const SSR_TEST_MARKER = "renderToStringAsync";
 const REQUIRES_HYDRATION_TEST = new Set(["components"]);
 const HYDRATION_TEST_MARKER = "hydrate";
+
+// Any browser test that puts real DOM on the page must run a baseline axe check on it.
+// "Puts real DOM on the page" is not decidable in general, but `mount()` is exactly the harness
+// that does it — so calling one obliges you to call the other. This lets a test that renders
+// nothing (`solid-contract.browser.test.tsx`, which only pokes at `@solidjs/web`'s exports) stay
+// exempt without an allowlist to maintain.
+const MOUNT_MARKER = "mount";
+const A11Y_MARKER = "expectNoA11yViolations";
 // Packages whose source files must additionally have a colocated Storybook story.
 // Components are the things a human needs to look at; pure primitives are not.
 const REQUIRES_STORY = new Set(["components"]);
@@ -293,6 +304,18 @@ for (const pkg of packageDirs) {
       missing.push(`${relPath} — missing matching .stories.tsx`);
     }
   }
+
+  // Checked per test file rather than per source file: what obliges a baseline axe run is
+  // rendering DOM, and `mount()` is what renders it.
+  for (const browserTest of testFiles.filter(isBrowserTestFile)) {
+    const source = readFileSync(browserTest, "utf8");
+    if (!hasLiveCall(source, MOUNT_MARKER)) continue;
+    if (hasLiveCall(source, A11Y_MARKER)) continue;
+
+    missing.push(
+      `${relative(repoRoot, browserTest)} — calls ${MOUNT_MARKER}() but never ${A11Y_MARKER}() (baseline a11y check required)`,
+    );
+  }
 }
 
 if (missing.length > 0) {
@@ -304,5 +327,6 @@ if (missing.length > 0) {
 
 console.log(
   "check:coverage-parity passed — every source file has a test and a doc; every component has " +
-    "a story, an executing renderToStringAsync() and an executing hydrate().",
+    "a story, an executing renderToStringAsync() and an executing hydrate(); every browser test " +
+    "that mounts DOM also runs axe.",
 );

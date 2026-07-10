@@ -1,4 +1,4 @@
-import { mount } from "@solid-zero/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@solid-zero/internal-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { renderElement } from "./render";
@@ -96,6 +96,18 @@ describe("renderElement", () => {
 
     await expect.element(page.getByRole("link", { name: "rendered" })).toBeInTheDocument();
     expect(internal).toBeInstanceOf(HTMLAnchorElement);
+    dispose();
+  });
+
+  it("has no baseline accessibility violations", async () => {
+    // Every primitive that puts real DOM on the page gets a baseline axe run, enforced by
+    // `check:coverage-parity`. `renderElement` is the one every public component's markup
+    // flows through, so a defect here is a defect in all of them.
+    const { container, dispose } = mount(() =>
+      renderElement({ as: "button", props: { type: "button" as const, children: "click" } }),
+    );
+
+    await expectNoA11yViolations(container);
     dispose();
   });
 });

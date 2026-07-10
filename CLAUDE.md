@@ -81,13 +81,17 @@ it. Don't "fix" a story by deleting it; fix the component and rename the story. 
 example: it reproduces a real, documented consequence of the pointer-blocking
 `ModalBackdrop` rather than a defect, and exists so the failure mode is visible somewhere.
 
-Every component/primitive test that renders real DOM should also call
-`expectNoA11yViolations` (from `@solid-zero/internal-test-utils`) at least once, so a
-baseline axe-core check runs by default. It fails on axe **violations** *and* on
-**`incomplete`** results — the rules axe ran but couldn't decide. When axe genuinely
-cannot judge one (`color-contrast` over an unresolvable background), name it in
-`allowIncomplete` at the call site with a reason; never silence the category. See
-`axe.md`.
+Every browser test that calls `mount()` **must** also call `expectNoA11yViolations`
+(both from `@solid-zero/internal-test-utils`) at least once, so a baseline axe-core check
+runs by default. `check:coverage-parity` enforces exactly that pairing: "renders real
+DOM" isn't mechanically decidable, but `mount()` is the harness that does it, so calling
+one obliges you to call the other. A browser test that renders nothing (e.g.
+`solid-contract.browser.test.tsx`) stays exempt without an allowlist to maintain.
+
+`expectNoA11yViolations` fails on axe **violations** *and* on **`incomplete`** results —
+the rules axe ran but couldn't decide. When axe genuinely cannot judge one
+(`color-contrast` over an unresolvable background), name it in `allowIncomplete` at the
+call site with a reason; never silence the category. See `axe.md`.
 
 `mount()` (also from `@solid-zero/internal-test-utils`) **fails the test** on a
 `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. Both were

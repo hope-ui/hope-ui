@@ -117,11 +117,6 @@ missing or stale fixture can never pass CI. Update one deliberately with
 half. Without that rule, deleting a component's entire hydration suite kept CI green — which is
 exactly how Dialog's stayed skipped for months while `CLAUDE.md` claimed it had one.
 
-`check:coverage-parity` requires a real `hydrate()` call in every component's
-`Foo.browser.test.tsx`, on the same "not in a comment, not in an `it.skip`" terms as the SSR
-half. Without that rule, deleting a component's entire hydration suite kept CI green — which is
-exactly how Dialog's stayed skipped for months while `CLAUDE.md` claimed it had one.
-
 Three things the browser half must assert, because a silent fallback to a client render looks
 identical to success otherwise:
 
@@ -148,7 +143,15 @@ browser suite used to print 170 of the first per run, which made the next real o
 and it is the only diagnostic that catches the conditionally-rendered-ref race `CLAUDE.md`
 documents at length. A *deliberate* untracked read is spelled `untrack(...)`. See `mount.md`.
 
-## `expectNoA11yViolations` fails on `incomplete` too
+## Every browser test that mounts DOM runs axe
+
+`check:coverage-parity` requires that any `*.browser.test.*` calling `mount()` also calls
+`expectNoA11yViolations()`. "Renders real DOM" isn't mechanically decidable, but `mount()` is
+the harness that does it — so calling one obliges you to call the other, and a test that renders
+nothing (`solid-contract.browser.test.tsx`) stays exempt with no allowlist to maintain.
+
+Before this rule, `render.browser.test.tsx` mounted six trees with zero a11y checks, while
+`CLAUDE.md` said every DOM-rendering test *should* run one.
 
 axe splits results three ways: `passes`, `violations`, `incomplete`. The third is "axe ran this
 rule and could not decide; a human should look". It used to be dropped on the floor. When axe
@@ -157,13 +160,22 @@ genuinely can't judge (`color-contrast` over an unresolvable background), name t
 
 ## Two guards that aren't tests
 
-- `pnpm check:coverage-parity` — every `packages/*/src` file has a colocated test and `.md` doc;
-  every component additionally has a `.stories.tsx` and a real `.ssr.test.tsx`.
-- `pnpm check:dist-imports` — no built `dist/**/*.js` imports a client-only `@solidjs/web`
-  helper. This enforces the invariant SSR silently depends on: **no component may write a
-  literal host JSX element** (`<div>`, `<span>`, an SVG arrow). Those compile to a module-scope
-  `_$template()` call, which throws at *import* on the server. Route every host element through
-  `renderElement`. Run it after `pnpm build` — it reads `dist/`.
+`pnpm check:coverage-parity` enforces the Definition of Done as *behavior*, not file presence.
+Every `packages/*/src` file has a colocated test and a `.md` doc. Every component additionally
+has a `.stories.tsx`, a `Foo.ssr.test.tsx` calling `renderToStringAsync()`, and a
+`Foo.browser.test.tsx` calling `hydrate()`. Every browser test calling `mount()` also calls
+`expectNoA11yViolations()`. In each case the call must be real — not in a comment, not in a
+string, not merely imported, not inside an `it.skip`.
+
+`pnpm check:dist-imports` asserts no built `dist/**/*.js` imports a client-only `@solidjs/web`
+helper. This enforces the invariant SSR silently depends on: **no component may write a literal
+host JSX element** (`<div>`, `<span>`, an SVG arrow). Those compile to a module-scope
+`_$template()` call, which throws at *import* on the server. Route every host element through
+`renderElement`. Run it after `pnpm build` — it reads `dist/`.
+
+The same grep is the tripwire for a `babel-preset-solid@1.x` regression in the compiler
+pipeline: 1.x emits `use` and `addEventListener`, names `@solidjs/web` 2.0 renamed to `ref` and
+`addEvent`.
 
 ## Why `unit` has no DOM at all
 

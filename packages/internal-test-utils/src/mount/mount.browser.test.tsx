@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
+import { expectNoA11yViolations } from "../axe/axe";
 import { mount } from "./mount";
 
 /** Reads a reactive value in its render body, outside any tracking scope. */
@@ -91,5 +92,18 @@ describe("mount", () => {
     expect(() => dispose()).not.toThrow();
     expect(consoleWarn).toHaveBeenCalledWith("a perfectly ordinary warning");
     consoleWarn.mockRestore();
+  });
+
+  it("has no baseline accessibility violations", async () => {
+    // `check:coverage-parity` requires this of every browser test that calls `mount()` — this
+    // file included, even though what it mounts is deliberately trivial.
+    const { container, dispose } = mount(() => {
+      const button = document.createElement("button");
+      button.textContent = "Click me";
+      return button;
+    });
+
+    await expectNoA11yViolations(container);
+    dispose();
   });
 });
