@@ -3,25 +3,44 @@
 ## Status (as of Phase 1 in progress — Dialog's shared primitives complete)
 
 **Phase 0 is complete and merged to `develop`.** In place: pnpm + Turborepo workspace,
-`@solid-zero/core` (behavior kernel — currently just `renderElement`), `@solid-zero/button`
-(first real component), `@solid-zero/internal-test-utils` (shared `mount` +
-`expectNoA11yViolations` harness), GitHub Actions CI (lint → build → typecheck → Vitest
-unit + Playwright browser tests → coverage/doc parity check), Changesets. Full pipeline
-verified green locally, including the coverage-parity script's fail/pass behavior.
+`@solid-zero/primitives` (behavior kernel — at the time, just `renderElement`),
+`@solid-zero/components/button` (first real component), `@solid-zero/internal-test-utils`
+(shared `mount` + `expectNoA11yViolations` harness), GitHub Actions CI (lint → build →
+typecheck → Vitest unit + Playwright browser tests → Storybook build → coverage/doc/story
+parity check), Changesets. Full pipeline verified green locally, including the
+coverage-parity script's fail/pass behavior.
 
-**Phase 1, step 2 (Dialog) is in progress.** `@solid-zero/core` gained
-`createComponentContext`, `createFocusTrap`, `createDismissable`, `createScrollLock`, and
-`createPresence` — all built fresh (Base UI/React Aria as behavior reference, per the
-reference policy below), all with tests + docs. Building these forced a significant,
-unplanned but necessary detour: the build pipeline moved from `tsup`/`esbuild-plugin-solid`
-to Vite library mode/`vite-plugin-solid@3.0.0-next.5`, because the old pipeline could not
-compile a JSX `ref` attribute at all under solid-js 2.0 (see "SolidJS 2.0 (beta) — API
-differences" in `CLAUDE.md` for the full root-cause writeup). A second restructure
-followed: `@solid-zero/core` was renamed to `@solid-zero/primitives`, and `@solid-zero/button`
-was absorbed into a new `@solid-zero/components` package (one subpath export per
-component — `@solid-zero/components/button`, soon `@solid-zero/components/dialog` — rather
-than the family-package plan below). See "Publishing strategy" for the full rationale.
-Dialog itself (the component) is next.
+> Phase 0 shipped as `@solid-zero/core` + `@solid-zero/button`; both were later renamed and
+> absorbed (see "Publishing strategy"). Names above are the current ones.
+
+**Nothing is published until SolidJS 2.0 ships stable.** The release model is: build on the
+pinned beta → wait for stable → fix the beta→stable breakage → publish 1.0. Everything that
+must happen at that boundary is tracked in `docs/migration-2.0-stable.md`, not in comments.
+
+**Phase 1, step 2 (Dialog) is complete**, and `@solid-zero/primitives` gained
+`createComponentContext`, `createFocusTrap`, `createDismissable`, `createScrollLock`,
+`createPresence`, and `withDefaults` — all built fresh (Base UI/React Aria as behavior
+reference, per the reference policy below), all with tests + docs. Building these forced a
+significant, unplanned but necessary detour: the build pipeline moved from
+`tsup`/`esbuild-plugin-solid` to Vite library mode/`vite-plugin-solid@3.0.0-next.5`,
+because the old pipeline could not compile a JSX `ref` attribute at all under solid-js 2.0
+(see "SolidJS 2.0 (beta) — API differences" in `CLAUDE.md` for the full root-cause
+writeup). A second restructure followed: `@solid-zero/core` was renamed to
+`@solid-zero/primitives`, and `@solid-zero/button` was absorbed into a new
+`@solid-zero/components` package (one subpath export per component). See "Publishing
+strategy" for the full rationale.
+
+**An audit then reshaped the public API before Popover could copy its mistakes.** The
+`render` prop is function-only (a JSX element could only ever *drop* the computed props);
+`renderElement` owns ref merging; defaults go through `withDefaults` rather than `merge`;
+and a component's internal ARIA values fall back to the consumer's rather than overwriting
+them. Storybook is now the visual harness, with a story required per component. Still open,
+in priority order: split focus-*restore* out of `createFocusTrap` (Popover and Tooltip are
+non-modal and need restore without a trap), make modal dialogs actually inert
+(`createAriaHideOutside`), move `createScrollLock`'s ref-count off module scope, and lift
+`composeEventHandlers` / `createControllableState` / `createRegisteredId` out of
+`Dialog.tsx` into the kernel. **Popover must not be started before those land** — it is the
+component that would otherwise replicate all five.
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -31,15 +50,18 @@ version):
   `solid.moduleName` option (for `esbuild-plugin-solid`/`vite-plugin-solid`, which both
   still default to `"solid-js/web"`) must point there.
 - `mergeProps`/`splitProps` are gone; the 2.0 idiom is `merge`/`omit` from `solid-js`.
+  But `merge` resolves keys by *presence*, so it is the wrong tool for defaults — use
+  `withDefaults` (`packages/primitives/src/defaults/defaults.md`). See CLAUDE.md.
 - Hit a real bug: Vite's `solid-refresh` HMR wrapper silently broke prop forwarding
   (`children` vanished) for components imported from another module, but not for the
-  same component defined inline in a test file. Fixed with `hot: false` in the Solid
-  Vite plugin config (`vitest.config.ts`) — tests don't need HMR.
+  same component defined inline in a test file. Fixed with `refresh: { disabled: true }`
+  in the shared Solid plugin options (`solid-babel-options.ts`) — tests don't need HMR,
+  and Storybook doesn't get it either until a story proves it's safe.
 - Confirmed a genuine, unavoidable type-system limit for the render-prop/`as` pattern:
   a component's `render` callback can't be soundly typed for an arbitrary target
   element without full generics (the `Polymorphic<T>` cost this project is explicitly
-  trying to avoid). Documented in `packages/core/src/render.md` rather than papered
-  over — an explicit type-assertion escape hatch is used at the one call site that
+  trying to avoid). Documented in `packages/primitives/src/render/render.md` rather than
+  papered over — an explicit type-assertion escape hatch is used at the one call site that
   needs cross-element rendering.
 
 ## Reference policy (important, corrects an earlier misstep in this plan's own history)
@@ -306,7 +328,11 @@ drift that produced Kobalte's and Corvu's gaps.
 
 - **ESM-only** (no CJS) — Solid is ESM-first; reversible decision if real CJS demand
   appears later.
-- **`tsup`** for builds (esbuild-based, multi-entry, per-subpath `.d.ts` bundling).
+- **Vite library mode** for builds (multi-entry via `vite.config.base.ts`'s `entries`,
+  per-subpath `.d.ts` via `vite-plugin-dts`). This replaced the originally-planned `tsup`,
+  which cannot compile Solid 2.0 JSX — see the `esbuild-plugin-solid` writeup above.
+  solid-primitives' `tsdown` + `unplugin-solid` toolchain is a deliberate *not yet*; the
+  reasoning and its revisit trigger live in `docs/migration-2.0-stable.md` §5.
 - **Changesets** for versioning — fits pnpm workspaces natively, per-package-family
   changelogs.
 

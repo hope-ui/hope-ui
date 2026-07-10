@@ -115,12 +115,11 @@ export const ModalWithoutBackdrop: Story = {
 };
 
 /**
- * KNOWN BROKEN — Wave 1 (finding 2). `Popup` merges its internal getters *after* the
- * consumer's props, so `role="alertdialog"` is silently overwritten with `"dialog"`. The
- * APG alertdialog pattern is currently unreachable. Inspect the popup element to confirm.
+ * The APG alert dialog pattern. `Popup`'s internal `role` falls back to the consumer's, so
+ * `role="alertdialog"` survives. (Before Wave 1 it was silently overwritten with `"dialog"`.)
  */
 export const AlertDialog: Story = {
-  name: "role='alertdialog' (silently ignored — known bug)",
+  name: "role='alertdialog' (APG alert dialog pattern)",
   render: () => (
     <Dialog.Root>
       <Dialog.Trigger>Delete everything</Dialog.Trigger>
@@ -137,13 +136,13 @@ export const AlertDialog: Story = {
 };
 
 /**
- * KNOWN BROKEN — Wave 1 (finding 2). With no `Dialog.Title` mounted, `context.titleId()` is
- * `undefined`, and Solid 2.0's `merge` lets that `undefined` clobber the consumer's own
- * `aria-labelledby`. The dialog ends up with no accessible name — the a11y addon panel
- * reports `aria-dialog-name` while this story's dialog is open.
+ * A dialog labelled by a heading that lives outside the popup, with no `Dialog.Title`.
+ * `Popup`'s internal `aria-labelledby` falls back to the consumer's rather than
+ * overwriting it. (Before Wave 1 the name was silently dropped and the a11y panel reported
+ * `aria-dialog-name`.)
  */
 export const LabelledByExternalHeading: Story = {
-  name: "aria-labelledby without Dialog.Title (name is lost — known bug)",
+  name: "aria-labelledby without Dialog.Title",
   render: () => (
     <Dialog.Root>
       <h2 id="external-heading">Heading outside the popup</h2>
@@ -160,10 +159,10 @@ export const LabelledByExternalHeading: Story = {
 };
 
 /**
- * KNOWN BROKEN — Wave 1 (finding 1). A wrapper forwarding an unset optional prop passes
- * `modal={undefined}`, and `merge({ modal: true }, props)` lets a *present* `undefined` key
- * beat the default. The result is a silently non-modal dialog: no focus trap, no scroll
- * lock, no `aria-modal`. Compare the popup's attributes against `Default`.
+ * A wrapper forwarding an unset optional prop passes `modal={undefined}`. `withDefaults`
+ * resolves that with `??`, so the dialog stays modal. (Before Wave 1, `merge({ modal: true },
+ * props)` let a *present* `undefined` key beat the default and silently produced a
+ * non-modal dialog: no focus trap, no scroll lock, no `aria-modal`.)
  */
 function WrappedDialog(props: { modal?: boolean }) {
   return (
@@ -174,7 +173,7 @@ function WrappedDialog(props: { modal?: boolean }) {
         <Dialog.Popup style={popupStyle}>
           <Dialog.Title>Wrapped</Dialog.Title>
           <Dialog.Description>
-            I should be modal by default, but I have no aria-modal.
+            I'm modal by default, even though my wrapper forwarded `modal={undefined}`.
           </Dialog.Description>
           <Dialog.Close>Close</Dialog.Close>
         </Dialog.Popup>
@@ -184,11 +183,32 @@ function WrappedDialog(props: { modal?: boolean }) {
 }
 
 export const WrapperForwardingUndefinedModal: Story = {
-  name: "Wrapper forwarding modal={undefined} (silently non-modal — known bug)",
+  name: "Wrapper forwarding modal={undefined} (stays modal)",
   render: () => (
     <>
       <PageBehind />
       <WrappedDialog />
     </>
+  ),
+};
+
+/**
+ * A consumer-pinned popup `id`. `Popup` registers it with `Root`, so `Trigger`'s
+ * `aria-controls` names the element that actually exists rather than a generated id.
+ */
+export const CustomPopupId: Story = {
+  name: "Consumer-supplied popup id (aria-controls follows)",
+  render: () => (
+    <Dialog.Root>
+      <Dialog.Trigger>Open dialog</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop style={backdropStyle} />
+        <Dialog.Popup id="my-popup" style={popupStyle}>
+          <Dialog.Title>Pinned id</Dialog.Title>
+          <Dialog.Description>Inspect the trigger's aria-controls.</Dialog.Description>
+          <Dialog.Close>Close</Dialog.Close>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   ),
 };

@@ -62,6 +62,26 @@ Both default to `type="button"` so they never accidentally submit a form.
 Both expose their `createPresence` status as a `data-status` attribute
 (`"entering" | "entered" | "exiting" | "exited"`) for CSS transitions.
 
+#### Prop precedence
+
+A prop you pass wins over the value the component would compute, except where the computed
+value is the whole point:
+
+| Prop on `Popup`    | Precedence                                                                |
+| ------------------ | --------------------------------------------------------------------------- |
+| `id`               | Yours. `Popup` registers it with `Root`, so `Trigger`'s `aria-controls` points at it. |
+| `role`             | Yours — this is how you reach the APG **alertdialog** pattern (`role="alertdialog"`). |
+| `aria-labelledby`  | Yours; otherwise `Dialog.Title`'s `id`, if a Title is rendered.            |
+| `aria-describedby` | Yours; otherwise `Dialog.Description`'s `id`.                              |
+| `aria-modal`       | Component-owned. Derived from `Root`'s `modal`, and must be *absent* on a non-modal dialog. |
+| `data-status`      | Component-owned. Derived from `createPresence`.                            |
+| `ref`              | Merged with the component's internal ref — both fire.                      |
+
+`Backdrop` follows the same rule: `role` defaults to `"presentation"`, and yours wins.
+
+A dialog with neither a `Dialog.Title`, an `aria-labelledby`, nor an `aria-label` has no
+accessible name. That's an authoring error the component deliberately doesn't paper over.
+
 ### `Dialog.Title` / `Dialog.Description`
 
 | Prop      | Type                                                                        | Default | Description                    |

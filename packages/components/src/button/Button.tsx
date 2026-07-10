@@ -1,4 +1,4 @@
-import { type RenderProp, renderElement } from "@solid-zero/primitives";
+import { type RenderProp, renderElement, withDefaults } from "@solid-zero/primitives";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 
@@ -11,7 +11,10 @@ export interface ButtonProps extends ButtonElementProps {
 }
 
 export const Button: Component<ButtonProps> = (props) => {
-  const merged = merge({ type: "button" as const }, props);
+  // `withDefaults`, not `merge({ type: "button" }, props)`: `merge` resolves by key
+  // presence, so `<Button type={props.type}>` with `type` unset would drop `type="button"`
+  // entirely and submit the surrounding form. See `withDefaults`' doc.
+  const merged = withDefaults(props, { type: "button" as const });
   const rest = omit(merged, "render", "disabled");
 
   const elementProps: ButtonElementProps = merge(rest, {

@@ -1,4 +1,6 @@
 export { createComponentContext } from "./context";
+export type { WithDefaults } from "./defaults";
+export { withDefaults } from "./defaults";
 export type { CreateDismissableOptions } from "./dismissable";
 export { createDismissable } from "./dismissable";
 export type { CreateFocusTrapOptions } from "./focus-trap";

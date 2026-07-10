@@ -6,6 +6,7 @@ import {
   createScrollLock,
   type RenderProp,
   renderElement,
+  withDefaults,
 } from "@solid-zero/primitives";
 import type { JSX } from "@solidjs/web";
 import { isServer, Portal as SolidPortal } from "@solidjs/web";
@@ -30,14 +31,6 @@ function callEventHandler<T, E extends Event>(
   }
 }
 
-/** Combines an internal ref-setter with a possibly-absent consumer-supplied ref. */
-function mergeRefs<T>(
-  internal: (element: T) => void,
-  external: JSX.Ref<T> | undefined,
-): JSX.Ref<T> {
-  return external === undefined ? internal : [internal, external];
-}
-
 /** Normalizes an attribute value that may be `false` (dom-expressions' "omit this
  * attribute" convention) down to `undefined`. */
 function stringOrUndefined(value: string | false | undefined): string | undefined {
@@ -48,7 +41,9 @@ interface DialogContextValue {
   open: () => boolean;
   setOpen: (open: boolean) => void;
   modal: () => boolean;
-  popupId: string;
+  /** The Popup's id: a consumer-supplied one if it registered, else a generated one. */
+  popupId: () => string;
+  setPopupId: (id: string | undefined) => void;
   titleId: () => string | undefined;
   setTitleId: (id: string | undefined) => void;
   descriptionId: () => string | undefined;
@@ -76,11 +71,19 @@ export interface DialogRootProps {
 }
 
 export const Root: Component<DialogRootProps> = (props) => {
-  const merged = merge({ defaultOpen: false, modal: true }, props);
+  // `withDefaults`, not `merge({ modal: true }, props)`: a wrapper forwarding an unset
+  // `modal` passes the key with value `undefined`, which `merge` treats as a real
+  // override — silently producing a non-modal dialog. See `withDefaults`' doc.
+  const merged = withDefaults(props, { defaultOpen: false, modal: true });
   const [uncontrolledOpen, setUncontrolledOpen] = createSignal(merged.defaultOpen);
   const [titleId, setTitleId] = createSignal<string | undefined>();
   const [descriptionId, setDescriptionId] = createSignal<string | undefined>();
-  const popupId = createUniqueId();
+
+  // `Popup` may register its own consumer-supplied `id`. `Trigger`'s `aria-controls` reads
+  // through this accessor so it always names the element that actually exists.
+  const generatedPopupId = createUniqueId();
+  const [customPopupId, setCustomPopupId] = createSignal<string | undefined>();
+  const popupId = () => customPopupId() ?? generatedPopupId;
 
   const open = () => merged.open ?? uncontrolledOpen();
   const setOpen = (value: boolean) => {
@@ -95,6 +98,7 @@ export const Root: Component<DialogRootProps> = (props) => {
         setOpen,
         modal: () => merged.modal,
         popupId,
+        setPopupId: setCustomPopupId,
         titleId,
         setTitleId,
         descriptionId,
@@ -114,7 +118,7 @@ export interface DialogTriggerProps extends JSX.ButtonHTMLAttributes<HTMLButtonE
 
 export const Trigger: Component<DialogTriggerProps> = (props) => {
   const context = useDialogContext();
-  const merged = merge({ type: "button" as const }, props);
+  const merged = withDefaults(props, { type: "button" as const });
   const rest = omit(merged, "render", "onClick");
 
   const elementProps: JSX.ButtonHTMLAttributes<HTMLButtonElement> = merge(rest, {
@@ -125,7 +129,7 @@ export const Trigger: Component<DialogTriggerProps> = (props) => {
       return context.open() ? ("true" as const) : ("false" as const);
     },
     get "aria-controls"() {
-      return context.popupId;
+      return context.popupId();
     },
     onClick: (event: MouseEvent & { currentTarget: HTMLButtonElement; target: Element }) => {
       callEventHandler(merged.onClick, event);
@@ -172,9 +176,12 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
   const [backdropEl, setBackdropEl] = createSignal<HTMLDivElement>();
   const presence = createPresence({ present: context.open, ref: backdropEl });
 
+  // Internal values fall back to the consumer's rather than overwriting them: `merge`
+  // gives the *last* source precedence, so a bare `{ get role() { return "presentation" } }`
+  // would silently discard a consumer-supplied `role`. See the same pattern in `Popup`.
   const merged = merge(props, {
     get role() {
-      return "presentation" as const;
+      return props.role ?? ("presentation" as const);
     },
     get "data-status"() {
       return presence.status();
@@ -184,10 +191,11 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
 
   return (
     <Show when={presence.mounted()}>
-      {renderElement<JSX.HTMLAttributes<HTMLDivElement>>({
+      {renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
         as: "div",
         render: merged.render,
-        props: merge(rest, { ref: mergeRefs<HTMLDivElement>(setBackdropEl, props.ref) }),
+        props: rest,
+        ref: setBackdropEl,
       })}
     </Show>
   );
@@ -220,19 +228,41 @@ export const Popup: Component<DialogPopupProps> = (props) => {
   createDismissable({ active: context.open, ref, onDismiss: () => context.setOpen(false) });
   createScrollLock({ active: () => context.open() && context.modal() });
 
+  // Register a consumer-supplied `id` with `Root`, so `Trigger`'s `aria-controls` names the
+  // element that actually exists. Deferred into `onSettled` because Solid 2.0 forbids a
+  // descendant writing to an ancestor-owned signal from its render body — the same reason
+  // `Title`/`Description` defer theirs. Safe against hydration mismatch for the same reason
+  // too: the server renders `aria-controls` from the generated id, the client's first
+  // (hydrating) render agrees, and the swap happens afterwards in an effect.
+  onSettled(() => {
+    context.setPopupId(stringOrUndefined(props.id));
+    return () => context.setPopupId(undefined);
+  });
+
+  // Internal values fall back to the consumer's rather than overwriting them. `merge` gives
+  // the *last* source precedence and treats a getter returning `undefined` as a real value,
+  // so `get "aria-labelledby"() { return context.titleId(); }` used to erase a consumer's
+  // own `aria-labelledby` whenever no `Dialog.Title` was mounted — leaving the dialog with
+  // no accessible name at all. `role` and `id` were unoverridable for the same reason,
+  // which made the APG alertdialog pattern unreachable.
+  //
+  // `aria-modal` and `data-status` stay internally owned: both are derived from state the
+  // consumer doesn't control, and `aria-modal` must be *absent* on a non-modal dialog.
   const merged = merge(props, {
-    id: context.popupId,
+    get id() {
+      return props.id ?? context.popupId();
+    },
     get role() {
-      return "dialog" as const;
+      return props.role ?? ("dialog" as const);
     },
     get "aria-modal"() {
       return context.modal() ? ("true" as const) : undefined;
     },
     get "aria-labelledby"() {
-      return context.titleId();
+      return props["aria-labelledby"] ?? context.titleId();
     },
     get "aria-describedby"() {
-      return context.descriptionId();
+      return props["aria-describedby"] ?? context.descriptionId();
     },
     get "data-status"() {
       return presence.status();
@@ -242,10 +272,11 @@ export const Popup: Component<DialogPopupProps> = (props) => {
 
   return (
     <Show when={presence.mounted()}>
-      {renderElement<JSX.HTMLAttributes<HTMLDivElement>>({
+      {renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
         as: "div",
         render: merged.render,
-        props: merge(rest, { ref: mergeRefs<HTMLDivElement>(setRef, props.ref) }),
+        props: rest,
+        ref: setRef,
       })}
     </Show>
   );
@@ -260,7 +291,10 @@ export interface DialogTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement>
 export const Title: Component<DialogTitleProps> = (props) => {
   const context = useDialogContext();
   const generatedId = createUniqueId();
-  const merged = merge({ id: generatedId }, props);
+  // `withDefaults` for the same reason as everywhere else: `<Dialog.Title id={props.id}>`
+  // with an unset `id` would otherwise resolve to `undefined`, and the dialog would end up
+  // with no `aria-labelledby` and no accessible name.
+  const merged = withDefaults(props, { id: generatedId });
 
   // Solid 2.0 forbids writing to a signal owned by an ancestor scope (here, Root's
   // titleId) directly from a descendant component's own synchronous render body
@@ -291,7 +325,7 @@ export interface DialogDescriptionProps extends JSX.HTMLAttributes<HTMLParagraph
 export const Description: Component<DialogDescriptionProps> = (props) => {
   const context = useDialogContext();
   const generatedId = createUniqueId();
-  const merged = merge({ id: generatedId }, props);
+  const merged = withDefaults(props, { id: generatedId });
 
   // See the identical comment in `Title` above for why this is deferred to `onSettled`.
   onSettled(() => {
@@ -315,7 +349,7 @@ export interface DialogCloseProps extends JSX.ButtonHTMLAttributes<HTMLButtonEle
 
 export const Close: Component<DialogCloseProps> = (props) => {
   const context = useDialogContext();
-  const merged = merge({ type: "button" as const }, props);
+  const merged = withDefaults(props, { type: "button" as const });
   const rest = omit(merged, "render", "onClick");
 
   const elementProps: JSX.ButtonHTMLAttributes<HTMLButtonElement> = merge(rest, {

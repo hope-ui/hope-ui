@@ -161,6 +161,165 @@ describe("Dialog", () => {
     void container;
   });
 
+  // ---- prop precedence: internal values must never silently discard the consumer's ----
+
+  it("stays modal when a wrapper forwards an unset `modal` prop", async () => {
+    // Regression: `merge({ modal: true }, props)` resolves by key *presence*, so
+    // `<Dialog.Root modal={props.modal}>` with `modal` unset silently produced a
+    // non-modal dialog — no focus trap, no scroll lock, no aria-modal.
+    function Wrapper(props: { modal?: boolean }) {
+      return (
+        <Dialog.Root modal={props.modal}>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Popup>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Close>Close</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      );
+    }
+
+    const { dispose } = mount(() => <Wrapper />);
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
+
+    await expect.element(page.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+    // Modal implies the focus trap ran: focus moved into the popup.
+    await expect.element(page.getByRole("button", { name: "Close" })).toHaveFocus();
+
+    dispose();
+  });
+
+  it("still lets an explicit `modal={false}` through", async () => {
+    const { dispose } = mount(() => (
+      <Dialog.Root modal={false}>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup>
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
+    expect(page.getByRole("dialog").element().hasAttribute("aria-modal")).toBe(false);
+
+    dispose();
+  });
+
+  it("keeps a consumer-supplied aria-labelledby when no Dialog.Title is rendered", async () => {
+    // Regression: `aria-labelledby` came from `context.titleId()`, which is `undefined`
+    // with no Title mounted — and `merge` let that `undefined` erase the consumer's value,
+    // leaving the dialog with no accessible name at all.
+    const { dispose } = mount(() => (
+      <Dialog.Root>
+        <h2 id="external-heading">Heading outside the popup</h2>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup aria-labelledby="external-heading">
+            <Dialog.Close>Close</Dialog.Close>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
+    await expect
+      .element(page.getByRole("dialog"))
+      .toHaveAttribute("aria-labelledby", "external-heading");
+
+    dispose();
+  });
+
+  it("lets a consumer-supplied aria-labelledby win over Dialog.Title", async () => {
+    const { dispose } = mount(() => (
+      <Dialog.Root>
+        <h2 id="external-heading">Outside</h2>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup aria-labelledby="external-heading">
+            <Dialog.Title>Inner title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
+    await expect
+      .element(page.getByRole("dialog"))
+      .toHaveAttribute("aria-labelledby", "external-heading");
+
+    dispose();
+  });
+
+  it("supports role='alertdialog' (the APG alert dialog pattern)", async () => {
+    const { dispose } = mount(() => (
+      <Dialog.Root>
+        <Dialog.Trigger>Delete everything</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup role="alertdialog">
+            <Dialog.Title>Are you sure?</Dialog.Title>
+            <Dialog.Description>This cannot be undone.</Dialog.Description>
+            <Dialog.Close>Cancel</Dialog.Close>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    await userEvent.click(page.getByRole("button", { name: "Delete everything" }));
+    await expect.element(page.getByRole("alertdialog")).toBeInTheDocument();
+    expect(page.getByRole("dialog").query()).toBeNull();
+
+    dispose();
+  });
+
+  it("lets the consumer pin the popup's id, and points aria-controls at it", async () => {
+    const { dispose } = mount(() => (
+      <Dialog.Root>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup id="my-popup">
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    const trigger = page.getByRole("button", { name: "Open dialog" });
+    // Popup registers its id with Root on mount, so aria-controls follows it even though
+    // the trigger renders before the portal.
+    await expect.element(trigger).toHaveAttribute("aria-controls", "my-popup");
+
+    await userEvent.click(trigger);
+    await expect.element(page.getByRole("dialog")).toHaveAttribute("id", "my-popup");
+
+    dispose();
+  });
+
+  it("merges a consumer `ref` on Popup with the internal one", async () => {
+    let consumerRef: HTMLElement | undefined;
+    const { dispose } = mount(() => (
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Popup ref={(el: HTMLDivElement) => (consumerRef = el)}>
+            <Dialog.Title>Title</Dialog.Title>
+            <Dialog.Close>Close</Dialog.Close>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    ));
+
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+    expect(consumerRef).toBe(page.getByRole("dialog").element());
+    // The internal ref still works: Escape only closes if createDismissable got the element.
+    await userEvent.keyboard("{Escape}");
+    expect(page.getByRole("dialog").query()).toBeNull();
+
+    dispose();
+  });
+
   // KNOWN GAP — see docs/session-handoff-dialog.md for the full investigation.
   // `renderToStringAsync` called from inside a browser test runs against the *client*
   // build of @solidjs/web, where `isServer` is hardcoded `false` — so it doesn't

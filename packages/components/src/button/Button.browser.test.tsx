@@ -23,6 +23,27 @@ describe("Button", () => {
     dispose();
   });
 
+  it("keeps type=button when a wrapper forwards an unset `type` prop", async () => {
+    // Regression: `merge({ type: "button" }, props)` resolved by key *presence*, so an
+    // explicitly-`undefined` `type` beat the default and the button became a submit button
+    // inside a form. `withDefaults` resolves with `??`. See `withDefaults`' doc.
+    const { dispose } = mount(() => <Button type={undefined}>Click me</Button>);
+
+    await expect
+      .element(page.getByRole("button", { name: "Click me" }))
+      .toHaveAttribute("type", "button");
+    dispose();
+  });
+
+  it("still lets an explicit `type` override the default", async () => {
+    const { dispose } = mount(() => <Button type="submit">Submit</Button>);
+
+    await expect
+      .element(page.getByRole("button", { name: "Submit" }))
+      .toHaveAttribute("type", "submit");
+    dispose();
+  });
+
   it("sets disabled and aria-disabled together", async () => {
     const { dispose } = mount(() => <Button disabled>Click me</Button>);
 

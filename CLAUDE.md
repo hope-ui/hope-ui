@@ -130,13 +130,14 @@ the gap as permanent.
 - `packages/primitives` (`@solid-zero/primitives`) — the shared behavior kernel.
   Nothing here is duplicated per-component; everything else composes it. Currently:
   `renderElement` (the render-prop/`as`-polymorphism primitive every public component
-  uses instead of hand-rolling its own polymorphic-`as` type system, modeled on Base
-  UI's `useRender` idea, not its code — see `packages/primitives/src/render/render.md`),
-  `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
-  missing-Provider error), `createFocusTrap`, `createDismissable`, `createScrollLock`,
-  and `createPresence` (built fresh for Dialog — see each primitive's colocated `.md`
-  for API details, and the ref/`createEffect` timing gotcha below before writing
-  another one).
+  uses instead of hand-rolling its own polymorphic-`as` type system — it also owns ref
+  merging; modeled on Base UI's `useRender` idea, not its code — see
+  `packages/primitives/src/render/render.md`), `withDefaults` (the *only* correct way to
+  apply prop defaults under 2.0 — see the `merge` bullet below), `createComponentContext`
+  (thin `createContext`/`useContext` wrapper with a friendlier missing-Provider error),
+  `createFocusTrap`, `createDismissable`, `createScrollLock`, and `createPresence` (built
+  fresh for Dialog — see each primitive's colocated `.md` for API details, and the
+  ref/`createEffect` timing gotcha below before writing another one).
 - `packages/components` (`@solid-zero/components`) — every public component, one
   subpath export each (`@solid-zero/components/button`, `@solid-zero/components/dialog`,
   ...) rather than one package per component or per component-family. No root `.`
@@ -236,11 +237,38 @@ actual installed package):
 - **`mergeProps`/`splitProps` are gone from the public API.** The 2.0 idiom is `merge`
   and `omit`, imported from `solid-js` (see `packages/components/src/button/Button.tsx`).
   Prefer these over anything reintroducing the old names.
+- **`merge` resolves a key by *presence*, not by value — never use it to apply defaults.**
+  `merge({ modal: true }, props)` looks like a default, but a later source that has the key
+  *at all* wins, even when its value is `undefined`. So `<Dialog.Root>` (key absent) gets
+  `true`, while `<Dialog.Root modal={props.modal}>` with `modal` unset gets `undefined` —
+  and silently produces a non-modal dialog with no focus trap, no scroll lock, no
+  `aria-modal`. The same bug turned `<Button type={props.type}>` into a form-submitting
+  button. Forwarding an optional prop from a wrapper is the most common thing a consumer
+  does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
+  `@solid-zero/primitives`, which resolves each defaulted key with `??`. See
+  `packages/primitives/src/defaults/defaults.md`.
+- **Internal computed props must fall back to the consumer's, not overwrite them.** Same
+  root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
+  puts the internal object last, so a getter returning `undefined` *erases* a
+  consumer-supplied `aria-labelledby`, leaving the dialog with no accessible name. Write
+  `props["aria-labelledby"] ?? context.titleId()`. Only props derived from state the
+  consumer doesn't control (`aria-modal`, `data-status`) stay component-owned. See
+  `Dialog.md`'s "Prop precedence" table for the house rule.
+- **A signal write is not visible to a plain read until the next flush — in the *client*
+  build only.** `setV(2); v()` returns the *old* value under `solid-js`'s client/dev build
+  (deterministic microtask batching) and the *new* value under its server build. Tests that
+  write a signal and read it back need `flush(() => setV(2))` (see
+  `scroll-lock.browser.test.tsx`, `defaults.test.ts`). This bites hardest when a snippet is
+  prototyped with plain `node` (which resolves the server build) and then moved into a
+  Vitest project (which resolves the client build) — the behavior silently inverts.
 - **`onMount` → `onSettled`**, `createEffect` can take a split `(depsFn, computeFn)`
   form, `createContext` returns the Provider component directly (`<XContext value={...}>`,
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
-  `undefined`. `ref` accepts an array of ref-setter functions natively — no `mergeRefs`
-  utility needed anywhere in this codebase.
+  `undefined`. `ref` accepts an array of ref-setter functions natively, and `applyRef`
+  skips falsy entries — so no `mergeRefs` utility is needed anywhere in this codebase.
+  `renderElement` owns ref merging: pass the internal setter as its `ref` option and it
+  merges with any consumer `ref` on `props`, reading the consumer's inside a getter so the
+  read lands in `spread`'s effect rather than in the component body.
 - **Solid 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` if a descendant component writes
   to a signal owned by an *ancestor* reactive scope directly from its own synchronous
   render body.** Hit in `Dialog.Title`/`Dialog.Description`, which originally called
