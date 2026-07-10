@@ -100,6 +100,12 @@ investigation if picking this up again. `Dialog.browser.test.tsx`'s hydration te
 non-overlay component) aren't affected — `renderToStringAsync` called in-browser is
 fine for them since there's no `isServer`-guarded branch to get wrong.
 
+**Retry this when SolidJS 2.0 ships stable.** Both blockers live in beta-era
+`@solidjs/web` internals (the server/client `isServer` split and hydration-key
+allocation); they may settle, or gain a first-party SSR/hydration test path, once
+`solid-js`/`@solidjs/web` leave beta. Re-attempt the skipped test then before accepting
+the gap as permanent.
+
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):

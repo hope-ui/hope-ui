@@ -191,6 +191,12 @@ describe("Dialog", () => {
   // Skipped rather than asserted red so it doesn't block the pipeline; the *actual*
   // SSR-doesn't-crash requirement is already verified for real in Dialog.test.tsx
   // (the unit project, which does correctly resolve the real server build).
+  //
+  // RETRY WHEN SolidJS 2.0 IS STABLE: both blockers above are in beta-era
+  // @solidjs/web internals (server/client `isServer` split, hydration-key allocation)
+  // and the Vitest-project module-instance interaction — worth re-attempting once
+  // solid-js/@solidjs/web ship a stable 2.0, since the internals may have settled or
+  // gained a first-party SSR-hydration test path by then.
   it.skip("hydrates cleanly with no mismatch warnings and stays interactive", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
