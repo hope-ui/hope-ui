@@ -3,6 +3,13 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    # Docs-only pushes skip CI. Content of a `.md` is never checked — `check:coverage-parity`
+    # only requires that a colocated doc *exists*. Filtering `push` but NOT `pull_request` is
+    # deliberate: a commit that *deletes* a required `packages/*/src/**/*.md` is docs-only by
+    # path yet breaks coverage-parity, so it skips here but is still caught on the develop→main
+    # PR (full pipeline, unfiltered) before it can reach `main`, and by the next non-docs push.
+    paths-ignore:
+      - "**/*.md"
   pull_request:
 
 concurrency:
