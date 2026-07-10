@@ -74,6 +74,10 @@ Every `@solid-zero/components` source file **must** have a `Foo.ssr.test.tsx` co
 `renderToStringAsync()` call — not in a comment, not in a string, not merely imported, not
 inside an `it.skip`. `check:coverage-parity` checks all four.
 
+Put the call in the wrong project and it fails loudly rather than silently: in `unit` and
+`browser`, `renderToStringAsync` is a stub that logs *"renderToStringAsync is not supported in
+the browser, returning undefined"* and returns `undefined`.
+
 ## Writing a hydration test
 
 Hydration is, by definition, two environments: the server renders, the browser takes over the
@@ -88,6 +92,11 @@ Dialog.browser.test.tsx  does     hydrate(<Dialog/>, containerWithFixture)
 
 Corrupt the fixture and **both** halves go red: the `ssr` one because the server no longer
 produces it, the `browser` one because there is nothing to hydrate against.
+
+`check:coverage-parity` requires a real `hydrate()` call in every component's
+`Foo.browser.test.tsx`, on the same "not in a comment, not in an `it.skip`" terms as the SSR
+half. Without that rule, deleting a component's entire hydration suite kept CI green — which is
+exactly how Dialog's stayed skipped for months while `CLAUDE.md` claimed it had one.
 
 Three things the browser half must assert, because a silent fallback to a client render looks
 identical to success otherwise:

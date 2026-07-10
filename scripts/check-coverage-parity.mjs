@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 // Fails CI if any source file under packages/*/src is missing a matching test file
 // and/or a matching .md doc file. This is what prevents test/doc coverage from
-// drifting as the number of components grows. Also requires an SSR round-trip test
-// reference (a `renderToStringAsync` call) and a Storybook story for every
-// @solid-zero/components source file — per CLAUDE.md's Definition of Done, components
-// (unlike pure primitives with no DOM output) need both — see docs/plan.md Item 3.
+// drifting as the number of components grows.
+//
+// Every @solid-zero/components source file additionally needs a Storybook story, a
+// `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
+// `Foo.browser.test.tsx` that really calls `hydrate()` — the two halves of the SSR round-trip
+// the Definition of Done requires. "Really calls" means outside a comment, outside a string,
+// outside an `it.skip`, and not merely imported: every one of those loopholes was live at some
+// point, and Dialog exercised three of them at once. See docs/testing.md.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
@@ -14,10 +18,14 @@ const packagesDir = join(repoRoot, "packages");
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
-// `renderToStringAsync`. That file runs in the `ssr` Vitest project — the only one resolving
-// both `solid-js` and `@solidjs/web` to their server builds. See docs/testing.md.
+// `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
+// files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
+// `ssr` is the only one resolving `solid-js` *and* `@solidjs/web` to their server builds, and
+// `browser` is the only one with a DOM. See docs/testing.md.
 const REQUIRES_SSR_TEST = new Set(["components"]);
 const SSR_TEST_MARKER = "renderToStringAsync";
+const REQUIRES_HYDRATION_TEST = new Set(["components"]);
+const HYDRATION_TEST_MARKER = "hydrate";
 // Packages whose source files must additionally have a colocated Storybook story.
 // Components are the things a human needs to look at; pure primitives are not.
 const REQUIRES_STORY = new Set(["components"]);
@@ -44,6 +52,10 @@ function isTestFile(path) {
 
 function isSsrTestFile(path) {
   return /\.ssr\.test\.tsx?$/.test(path);
+}
+
+function isBrowserTestFile(path) {
+  return /\.browser\.test\.tsx?$/.test(path);
 }
 
 /**
@@ -261,6 +273,22 @@ for (const pkg of packageDirs) {
       }
     }
 
+    if (REQUIRES_HYDRATION_TEST.has(pkg)) {
+      // The other half. Without this, deleting a component's entire hydration suite kept CI
+      // green — which is precisely how Dialog's stayed `it.skip`'d for months while CLAUDE.md
+      // claimed every component had one.
+      const browserTests = matchingTests.filter(isBrowserTestFile);
+      const hasHydrationTest = browserTests.some((t) =>
+        hasLiveCall(readFileSync(t, "utf8"), HYDRATION_TEST_MARKER),
+      );
+
+      if (!hasHydrationTest) {
+        missing.push(
+          `${relPath} — no matching *.browser.test.tsx calls ${HYDRATION_TEST_MARKER}() outside a comment and outside an it.skip (hydration round-trip test required)`,
+        );
+      }
+    }
+
     if (REQUIRES_STORY.has(pkg) && !storyFiles.has(`${base}.stories`)) {
       missing.push(`${relPath} — missing matching .stories.tsx`);
     }
@@ -275,5 +303,6 @@ if (missing.length > 0) {
 }
 
 console.log(
-  "check:coverage-parity passed — every source file has a test and a doc, and every component has a story.",
+  "check:coverage-parity passed — every source file has a test and a doc; every component has " +
+    "a story, an executing renderToStringAsync() and an executing hydrate().",
 );

@@ -96,11 +96,12 @@ A deliberate untracked read is spelled `untrack(...)`; anything still warning is
 unreviewed. See `mount.md`.
 
 Every component (not needed for pure internal primitives with no DOM output) also
-needs an SSR **and** a hydration round-trip test. Both `Button` and `Dialog` have real
-ones. `check:coverage-parity` mechanically enforces the SSR half: every
-`@solid-zero/components` source file needs a `Foo.ssr.test.tsx` that *calls*
-`renderToStringAsync` — outside a comment, outside a string, outside an `it.skip`, and
-not merely importing it.
+needs an SSR **and** a hydration round-trip test, and `check:coverage-parity` enforces
+both: a `Foo.ssr.test.tsx` that *calls* `renderToStringAsync`, and a
+`Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means outside a comment, outside a
+string, outside an `it.skip`, and not merely imported — every one of those loopholes was
+live at some point, and Dialog exercised three at once while the docs claimed it had a
+hydration test.
 
 **Read `docs/testing.md` before writing any test.** Three Vitest projects, one job and
 one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
