@@ -1,6 +1,5 @@
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
-import ssrFixture from "./__fixtures__/dialog-ssr.html?raw";
 import { Dialog } from "./Dialog";
 
 /**
@@ -62,9 +61,14 @@ describe("Dialog SSR", () => {
     // place `solid-js` *and* `@solidjs/web` both resolve to their server builds, which is what
     // makes `_hk` — the hydration key `Dialog.browser.test.tsx` hydrates against — real.
     //
+    // `toMatchFileSnapshot`, so the fixture is *generated* by a real server render rather than
+    // hand-written — nobody should ever be guessing an `_hk` key. It writes the file on first
+    // run, fails on any drift, and under `CI=true` fails rather than writing. Update it
+    // deliberately with `pnpm exec vitest run --project=ssr -u`.
+    //
     // Byte-for-byte on purpose. `hydrate()`'s `gatherHydratable()` matches on the `_hk`
     // attribute, so "contains the right text" is not enough.
     const html = await renderToStringAsync(() => <FullDialog />);
-    expect(html).toBe(ssrFixture);
+    await expect(html).toMatchFileSnapshot("./__fixtures__/dialog-ssr.html");
   });
 });

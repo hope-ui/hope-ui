@@ -86,12 +86,36 @@ DOM it produced. No single project can do both. They cooperate through a **commi
 ```
 src/dialog/__fixtures__/dialog-ssr.html   ← genuine server output, checked in
 
-Dialog.ssr.test.tsx      asserts  renderToStringAsync(...) === fixture   (byte for byte)
-Dialog.browser.test.tsx  does     hydrate(<Dialog/>, containerWithFixture)
+Dialog.ssr.test.tsx      toMatchFileSnapshot(fixture)   ← generates it, then guards it
+Dialog.browser.test.tsx  hydrate(<Dialog/>, containerWithFixture)
 ```
 
 Corrupt the fixture and **both** halves go red: the `ssr` one because the server no longer
 produces it, the `browser` one because there is nothing to hydrate against.
+
+### Adding one for a new component
+
+**Never hand-write a fixture.** `_hk` keys are a path through the component tree; guessing one
+is how you get a test that passes against markup no server would ever send.
+
+1. In `Foo.ssr.test.tsx`, render and snapshot to the fixture path:
+   ```ts
+   const html = await renderToStringAsync(() => <FullFoo />);
+   await expect(html).toMatchFileSnapshot("./__fixtures__/foo-ssr.html");
+   ```
+2. Run `pnpm test:ssr`. The file appears, written from a real server render. Read it, sanity
+   check it, commit it.
+3. In `Foo.browser.test.tsx`, `import ssrFixture from "./__fixtures__/foo-ssr.html?raw"` and
+   `hydrate()` against it.
+
+`toMatchFileSnapshot` fails on any drift, and under `CI=true` fails rather than writing — so a
+missing or stale fixture can never pass CI. Update one deliberately with
+`pnpm exec vitest run --project=ssr -u`.
+
+`check:coverage-parity` requires a real `hydrate()` call in every component's
+`Foo.browser.test.tsx`, on the same "not in a comment, not in an `it.skip`" terms as the SSR
+half. Without that rule, deleting a component's entire hydration suite kept CI green — which is
+exactly how Dialog's stayed skipped for months while `CLAUDE.md` claimed it had one.
 
 `check:coverage-parity` requires a real `hydrate()` call in every component's
 `Foo.browser.test.tsx`, on the same "not in a comment, not in an `it.skip`" terms as the SSR
