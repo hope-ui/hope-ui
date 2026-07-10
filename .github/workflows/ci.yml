@@ -48,5 +48,12 @@ jobs:
       - name: Browser tests
         run: pnpm test:browser
 
-      - name: Definition-of-Done coverage/docs check
+      # The only mechanical guard on .storybook/main.ts. It compiles every story through
+      # the same Solid pipeline as the build, so a broken framework/plugin interaction
+      # (see CLAUDE.md, "Build/test/Storybook share one Solid compiler config") fails here
+      # rather than the next time someone opens Storybook locally.
+      - name: Build Storybook
+        run: pnpm build:storybook
+
+      - name: Definition-of-Done coverage/docs/stories check
         run: pnpm check:coverage-parity

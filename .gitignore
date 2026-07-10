@@ -8,6 +8,7 @@ test-results/
 playwright-report/
 .vitest-attachments/
 **/__screenshots__/
+storybook-static/
 
 # MacOS
 .DS_Store

@@ -1,8 +1,24 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "vite.config.base.ts",
+    "solid-babel-options.ts",
+    "tsconfig.base.json",
+    "pnpm-workspace.yaml"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!src/**/*.test.ts",
+        "!src/**/*.test.tsx",
+        "!src/**/*.browser.test.ts",
+        "!src/**/*.browser.test.tsx",
+        "!src/**/*.stories.ts",
+        "!src/**/*.stories.tsx",
+        "!src/**/*.md"
+      ],
       "outputs": ["dist/**"]
     },
     "lint": {

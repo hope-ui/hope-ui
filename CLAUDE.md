@@ -31,7 +31,9 @@ pnpm format               # biome format --write .
 pnpm typecheck            # turbo: tsc --noEmit per package (each depends on that package's build)
 pnpm test                 # vitest run --project=unit   (node env, pure-logic primitives)
 pnpm test:browser         # vitest run --project=browser (real Chromium via Playwright)
-pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test or .md doc
+pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
+pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
+pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test, .md doc, or story
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
 
@@ -60,11 +62,19 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    since jsdom cannot be trusted for that).
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference)
    colocated in the same `src/` directory.
+3. **`@solid-zero/components` only:** a matching `Foo.stories.tsx`, colocated in the same
+   `src/` directory. Components are what a human has to look at; pure primitives aren't.
+   Stories are excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in
+   `vite.config.base.ts`) and from the `build` task's turbo `inputs`.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces this in CI
-and fails the build if either is missing. This exists because Kobalte's test coverage is
+and fails the build if any is missing. This exists because Kobalte's test coverage is
 inconsistent (concentrated gaps in exactly the highest a11y-risk components) and Corvu
 has no automated tests at all — see `docs/plan.md` for the specifics.
+
+Stories are also where known-but-unfixed behavior gets pinned somewhere a human can see
+it: several Dialog stories are named `(… — known bug)` and reproduce a specific finding
+on purpose. Don't "fix" a story by deleting it; fix the component and rename the story.
 
 Every component/primitive test that renders real DOM should also call
 `expectNoA11yViolations` (from `@solid-zero/internal-test-utils`) at least once, so a
@@ -105,6 +115,14 @@ fine for them since there's no `isServer`-guarded branch to get wrong.
 allocation); they may settle, or gain a first-party SSR/hydration test path, once
 `solid-js`/`@solidjs/web` leave beta. Re-attempt the skipped test then before accepting
 the gap as permanent.
+
+> **Correction pending (do not act on the "module instances" theory above).** A real
+> server render emits `<button _hk=1010 …>` — and `1010` is precisely the key in the
+> reported "Unable to find DOM nodes for hydration key" error, so the keys exist and are
+> structural, not per-module-instance. The likelier culprit is the test's own hand-rolled
+> `window._$HY = { …, r: {} }` bootstrap, which leaves the hydration registry empty where
+> a real app gets it from `generateHydrationScript()`. Try that first. See
+> `docs/migration-2.0-stable.md` §4.
 
 ## Architecture
 
@@ -254,6 +272,36 @@ actual installed package):
   reappears, check this setting first before assuming a merge/omit bug.
 - Browser tests import `page` from `vitest/browser`, not the deprecated
   `@vitest/browser/context`.
+
+## Build/test/Storybook share one Solid compiler config
+
+Three pipelines compile this repo's JSX — the library build (`vite.config.base.ts`), the
+test runs (`vitest.config.ts`), and Storybook (`.storybook/main.ts`). They must agree,
+because a mismatch surfaces as a runtime error deep inside `@solidjs/web`, not as a config
+error. All three import `solidPluginOptions()` from the root `solid-babel-options.ts`;
+don't respell the options anywhere.
+
+Two non-obvious things that config guards against, both hit for real:
+
+- **`storybook-solidjs-vite`'s framework preset adds its own, unconfigured
+  `vite-plugin-solid`** unless a plugin literally named `solid` is already in
+  `config.plugins` — and its `viteFinal` runs *before* the one in `.storybook/main.ts`.
+  So `main.ts` filters the framework's plugin out and substitutes ours. Adding ours
+  without removing theirs would double-compile every file; leaving theirs alone would
+  re-enable `solid-refresh` and resurrect the prop-forwarding bug below.
+  `Button.stories.tsx`'s "Children reach the DOM (solid-refresh canary)" story exists to
+  catch exactly that regression.
+
+- **`vite-plugin-solid` auto-injects `@testing-library/jest-dom/vitest` as a *bare* setup
+  specifier** into any non-browser Vitest project whenever it can `require.resolve` that
+  package — it's an *optional peer*. Vitest then resolves the bare specifier against the
+  repo root, where pnpm's isolated layout doesn't expose it, and the whole `unit` project
+  dies with `Cannot find module '<root>/@testing-library/jest-dom/vitest'`. Nothing here
+  depends on jest-dom; it entered the graph because `storybook` depends on it, and adding
+  Storybook was enough to break the unit suite. The plugin's only opt-out is a setup-file
+  path matching `/jest-dom/`, hence the (intentionally empty) root
+  `vitest.setup.jest-dom-optout.ts`. If a similar "a new devDependency broke an unrelated
+  test project" symptom appears, check `vite-plugin-solid`'s `config()` hook first.
 
 ## Testing stack specifics
 

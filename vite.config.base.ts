@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import solid from "vite-plugin-solid";
 import { defineConfig, type UserConfig } from "vite";
 import dts from "vite-plugin-dts";
+import solid from "vite-plugin-solid";
+import { solidPluginOptions } from "./solid-babel-options";
 
 interface PackageJson {
   dependencies?: Record<string, string>;
@@ -59,11 +60,26 @@ export function createViteConfig(
 
   return defineConfig({
     plugins: [
-      solid({ solid: { moduleName: "@solidjs/web" } }),
+      solid(solidPluginOptions()),
       dts({
         entryRoot: join(packageDir, "src"),
         outDir: join(packageDir, "dist"),
-        exclude: ["**/*.test.ts", "**/*.test.tsx", "**/*.browser.test.ts", "**/*.browser.test.tsx"],
+        // `tsconfig.base.json` turns declaration maps on, but `package.json#files` is
+        // `["dist"]` — so a published `Dialog.d.ts.map` would point at `../../src/…`,
+        // which isn't in the tarball, and every consumer "go to definition" lands on a
+        // missing file. Off for the published artifact; nothing in-repo reads them.
+        compilerOptions: { declarationMap: false },
+        // Test and story files live beside their source under `src/`, and `vite-plugin-dts`
+        // mirrors that tree — without these globs it emits `Button.stories.d.ts` &c. into
+        // the published `dist/`.
+        exclude: [
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/*.browser.test.ts",
+          "**/*.browser.test.tsx",
+          "**/*.stories.ts",
+          "**/*.stories.tsx",
+        ],
       }),
     ],
     build: {

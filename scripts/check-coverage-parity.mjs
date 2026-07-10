@@ -2,9 +2,9 @@
 // Fails CI if any source file under packages/*/src is missing a matching test file
 // and/or a matching .md doc file. This is what prevents test/doc coverage from
 // drifting as the number of components grows. Also requires an SSR round-trip test
-// reference (a `renderToStringAsync` call) for every @solid-zero/components source
-// file — per CLAUDE.md's Definition of Done, components (unlike pure internal
-// primitives with no DOM output) need this — see docs/plan.md Item 3.
+// reference (a `renderToStringAsync` call) and a Storybook story for every
+// @solid-zero/components source file — per CLAUDE.md's Definition of Done, components
+// (unlike pure primitives with no DOM output) need both — see docs/plan.md Item 3.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
@@ -17,6 +17,9 @@ const EXCLUDED_BASENAMES = new Set(["index"]);
 // (a `renderToStringAsync` reference in one of their matching test files).
 const REQUIRES_SSR_TEST = new Set(["components"]);
 const SSR_TEST_MARKER = "renderToStringAsync";
+// Packages whose source files must additionally have a colocated Storybook story.
+// Components are the things a human needs to look at; pure primitives are not.
+const REQUIRES_STORY = new Set(["components"]);
 
 /** @param {string} dir */
 function walk(dir) {
@@ -38,8 +41,12 @@ function isTestFile(path) {
   return /\.(test|browser\.test)\.tsx?$/.test(path);
 }
 
+function isStoryFile(path) {
+  return /\.stories\.tsx?$/.test(path);
+}
+
 function isSourceFile(path) {
-  if (isTestFile(path)) return false;
+  if (isTestFile(path) || isStoryFile(path)) return false;
   if (path.endsWith(".d.ts")) return false;
   return SOURCE_EXTENSIONS.has(extname(path));
 }
@@ -73,6 +80,7 @@ for (const pkg of packageDirs) {
   const sourceFiles = allFiles.filter(isSourceFile);
   const testFiles = allFiles.filter(isTestFile);
   const docFiles = new Set(allFiles.filter((f) => f.endsWith(".md")).map(baseName));
+  const storyFiles = new Set(allFiles.filter(isStoryFile).map(baseName));
 
   for (const sourceFile of sourceFiles) {
     const base = baseName(sourceFile);
@@ -100,6 +108,10 @@ for (const pkg of packageDirs) {
         );
       }
     }
+
+    if (REQUIRES_STORY.has(pkg) && !storyFiles.has(`${base}.stories`)) {
+      missing.push(`${relPath} — missing matching .stories.tsx`);
+    }
   }
 }
 
@@ -110,4 +122,6 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log("check:coverage-parity passed — every source file has a test and a doc.");
+console.log(
+  "check:coverage-parity passed — every source file has a test and a doc, and every component has a story.",
+);

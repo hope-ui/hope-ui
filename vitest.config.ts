@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { playwright } from "@vitest/browser-playwright";
 import solid from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
+import { solidPluginOptions } from "./solid-babel-options";
 
 // `@solidjs/web`'s package.json #exports resolve differently per environment (a
 // "node" condition -> `dist/server.js`, string-based SSR ops incl. `isServer: true`
@@ -15,7 +16,9 @@ import { defineConfig } from "vitest/config";
 // to the "node"-condition entry is what actually works, needed so the "unit" project
 // can test the real SSR code path (e.g. that `Portal` throws server-side) rather than
 // the client build pretending to be SSR.
-const requireFromPrimitives = createRequire(join(import.meta.dirname, "packages/primitives/package.json"));
+const requireFromPrimitives = createRequire(
+  join(import.meta.dirname, "packages/primitives/package.json"),
+);
 const solidWebServerEntry = requireFromPrimitives.resolve("@solidjs/web");
 
 // `@solid-zero/components` depends on `@solid-zero/primitives` as a real workspace
@@ -36,14 +39,7 @@ export default defineConfig({
     passWithNoTests: true,
     projects: [
       {
-        // `refresh: { disabled: true }` disables Vite's solid-refresh HMR wrapper for
-        // components imported from other modules — tests never need HMR, and leaving
-        // it on causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
-        // silently failing to reach the DOM) specifically for imported components
-        // that don't reproduce when the component is defined inline in the test file.
-        plugins: [
-          solid({ solid: { moduleName: "@solidjs/web" }, refresh: { disabled: true } }),
-        ],
+        plugins: [solid(solidPluginOptions())],
         resolve: {
           alias: {
             "@solidjs/web": solidWebServerEntry,
@@ -55,17 +51,16 @@ export default defineConfig({
           environment: "node",
           include: ["packages/*/src/**/*.test.{ts,tsx}"],
           exclude: ["**/*.browser.test.*", "**/node_modules/**", "**/dist/**"],
+          // Opts this project out of `vite-plugin-solid`'s automatic jest-dom injection,
+          // which otherwise breaks the whole project the moment any devDependency drags
+          // `@testing-library/jest-dom` into the graph. The file's *name* is what does the
+          // opting out — see the comment inside it. The browser project needs no such
+          // guard: the plugin already skips it.
+          setupFiles: ["./vitest.setup.jest-dom-optout.ts"],
         },
       },
       {
-        // `refresh: { disabled: true }` disables Vite's solid-refresh HMR wrapper for
-        // components imported from other modules — tests never need HMR, and leaving
-        // it on causes STRICT_READ_UNTRACKED-related prop-read bugs (e.g. `children`
-        // silently failing to reach the DOM) specifically for imported components
-        // that don't reproduce when the component is defined inline in the test file.
-        plugins: [
-          solid({ solid: { moduleName: "@solidjs/web" }, refresh: { disabled: true } }),
-        ],
+        plugins: [solid(solidPluginOptions())],
         resolve: {
           alias: { "@solid-zero/primitives": primitivesSrcEntry },
         },
