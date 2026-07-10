@@ -4,15 +4,20 @@ import { describe, expect, it, vi } from "vitest";
 import { createPresence } from "./presence";
 
 function TestHarness(props: { present: () => boolean; withTransition?: boolean }) {
-  let ref: HTMLDivElement | undefined;
-  const { mounted, status } = createPresence({ present: props.present, ref: () => ref });
+  // A signal-backed ref, not `let ref; ref={ref}`. `createPresence` happens to get away with
+  // the plain `let` — it only reads the ref on the *exit* edge, by which point the element
+  // exists and the variable is populated. But the pattern is wrong for every sibling
+  // primitive (see focus-trap.md), and the moment one ref is shared between them, the `let`
+  // version silently breaks the others. Not worth demonstrating anywhere.
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const { mounted, status } = createPresence({ present: props.present, ref });
 
   return (
     <Show when={mounted()}>
       <div
         data-testid="popup"
         data-presence={status()}
-        ref={ref}
+        ref={setRef}
         style={
           props.withTransition
             ? { transition: "opacity 150ms linear", opacity: status() === "exiting" ? "0" : "1" }

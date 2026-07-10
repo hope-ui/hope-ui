@@ -17,9 +17,22 @@ function createDismissable(options: {
 
 - `active` — whether the dismissable layer is currently listening.
 - `ref` — the container element; a `pointerdown` whose target is outside this element
-  triggers `onDismiss`.
+  triggers `onDismiss`. Must be a real signal accessor — see below.
 - `onDismiss` — called once per qualifying Escape keydown or outside pointerdown.
 - `dismissOnEscape` / `dismissOnOutsidePointerDown` — toggle each trigger independently.
+
+## The `ref` must be a signal
+
+If the container element is created as a reactive consequence of the same signal `active`
+derives from (e.g. it lives behind a `<Show>` gated on `open`), a plain closure over a `let`
+will be read as `undefined` on the activating edge and never re-read — `active`, the only
+other dependency, won't change again. The symptom is that Escape and outside-click silently
+do nothing, forever, and only for components whose container is conditionally rendered; this
+primitive's own isolated tests, which render the container unconditionally, never catch it.
+
+This primitive tracks `ref()` in its `compute` function for exactly that reason, which only
+works if `ref` is a real `createSignal` accessor. Same rule as `createFocusTrap` — see
+`focus-trap.md`.
 
 ## Scope
 
@@ -38,14 +51,14 @@ runs during SSR, no manual `isServer` guard needed.
 
 ```tsx
 function Dialog(props: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  let popupRef: HTMLDivElement | undefined;
+  const [popupRef, setPopupRef] = createSignal<HTMLDivElement>();
 
   createDismissable({
     active: () => props.open,
-    ref: () => popupRef,
+    ref: popupRef,
     onDismiss: () => props.onOpenChange(false),
   });
 
-  return <div ref={popupRef}>...</div>;
+  return <div ref={setPopupRef}>...</div>;
 }
 ```

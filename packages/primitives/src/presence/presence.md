@@ -56,8 +56,10 @@ initial `mounted`/`status` signal values are computed from `present()` synchrono
 
 ```tsx
 function Popup(props: { open: boolean }) {
-  // A real signal, not `let ref; ref={ref}`: the element is created as a reactive
-  // consequence of the same signal this primitive reads. See focus-trap.md.
+  // A signal-backed ref, not `let ref; ref={ref}`. `createPresence` alone would survive the
+  // plain `let` — it reads the ref only on the exit edge, by which point the element exists —
+  // but every sibling primitive that reads a ref on the *activating* edge would silently
+  // break, and refs get shared between them. See focus-trap.md.
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const { mounted, status } = createPresence({ present: () => props.open, ref });
 
