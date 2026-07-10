@@ -1,7 +1,9 @@
 import { expectNoA11yViolations, mount } from "@solid-zero/internal-test-utils";
 import type { JSX } from "@solidjs/web";
+import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
+import ssrFixture from "./__fixtures__/button-ssr.html?raw";
 import { Button } from "./Button";
 
 describe("Button", () => {
@@ -76,5 +78,88 @@ describe("Button", () => {
     const { container, dispose } = mount(() => <Button>Click me</Button>);
     await expectNoA11yViolations(container);
     dispose();
+  });
+});
+
+describe("Button hydration", () => {
+  /**
+   * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from
+   * `generateHydrationScript()`, which is a no-op (`voidFn`) in `@solidjs/web`'s client build
+   * — so a browser test has to supply it. Only three fields are read on this path:
+   * `.done`, `.completed` and `.events`. `.r` is the *resource/asset* registry consulted by
+   * `sharedConfig.load`; the element registry `getNextElement()` looks in is built separately
+   * by `gatherHydratable()`, which scans the container for `[_hk]` attributes. An empty `.r`
+   * is therefore correct, not a bug — a point `docs/migration-2.0-stable.md` §4 gets wrong.
+   */
+  function bootstrapHydration(): () => void {
+    const globals = globalThis as { _$HY?: unknown };
+    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
+    return () => {
+      globals._$HY = undefined;
+    };
+  }
+
+  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    return { container, remove: () => container.remove() };
+  }
+
+  it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
+    // The round-trip `Dialog` cannot do (see docs/migration-2.0-stable.md §4). `ssrFixture` is
+    // genuine server output — `Button.test.tsx` asserts it byte-for-byte against a real
+    // `renderToStringAsync` in the unit project, where `@solidjs/web` resolves to its server
+    // build. Here it resolves to the client build, whose `renderToStringAsync` is a stub that
+    // returns `undefined`; rendering the fixture in-process would silently hydrate the string
+    // "undefined" instead.
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
+
+    const serverButton = container.querySelector("button");
+    const dispose = hydrate(() => <Button>Click me</Button>, container);
+
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(consoleWarn).not.toHaveBeenCalled();
+
+    // Hydration reuses the server's node. If it had fallen back to a client render, there
+    // would be two buttons here, or one that isn't the node the server sent.
+    expect(container.querySelectorAll("button")).toHaveLength(1);
+    expect(container.querySelector("button")).toBe(serverButton);
+
+    dispose();
+    remove();
+    teardownHydration();
+    consoleError.mockRestore();
+    consoleWarn.mockRestore();
+  });
+
+  it("leaves the hydrated button interactive", async () => {
+    const onClick = vi.fn();
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
+
+    const dispose = hydrate(() => <Button onClick={onClick}>Click me</Button>, container);
+
+    await page.getByRole("button", { name: "Click me" }).click();
+    expect(onClick).toHaveBeenCalledOnce();
+
+    dispose();
+    remove();
+    teardownHydration();
+  });
+
+  it("has no accessibility violations after hydrating", async () => {
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
+
+    const dispose = hydrate(() => <Button>Click me</Button>, container);
+    await expectNoA11yViolations(container);
+
+    dispose();
+    remove();
+    teardownHydration();
   });
 });

@@ -33,10 +33,9 @@ const primitivesSrcEntry = join(import.meta.dirname, "packages/primitives/src/in
 
 export default defineConfig({
   test: {
-    // No pure-logic primitives need node-environment tests yet (Phase 0 only has
-    // DOM-facing components) — this stops CI failing on "no unit tests" until
-    // createListState etc. land in Phase 1.
-    passWithNoTests: true,
+    // No `passWithNoTests`. It was a Phase 0 concession, when no pure-logic primitive had a
+    // node-environment test yet; there are now 42 across 7 files, and leaving it on meant
+    // deleting every unit test kept CI green.
     projects: [
       {
         plugins: [solid(solidPluginOptions())],

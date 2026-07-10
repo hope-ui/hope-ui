@@ -34,6 +34,8 @@ pnpm test:browser         # vitest run --project=browser (real Chromium via Play
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test, .md doc, or story
+pnpm check:dist-imports   # fails if a built file imports a client-only @solidjs/web helper.
+                          # Reads packages/*/dist, so it runs after `pnpm build`.
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
 
@@ -80,51 +82,85 @@ example: it reproduces a real, documented consequence of the pointer-blocking
 
 Every component/primitive test that renders real DOM should also call
 `expectNoA11yViolations` (from `@solid-zero/internal-test-utils`) at least once, so a
-baseline axe-core check runs by default.
+baseline axe-core check runs by default. It fails on axe **violations** *and* on
+**`incomplete`** results — the rules axe ran but couldn't decide. When axe genuinely
+cannot judge one (`color-contrast` over an unresolvable background), name it in
+`allowIncomplete` at the call site with a reason; never silence the category. See
+`axe.md`.
+
+`mount()` (also from `@solid-zero/internal-test-utils`) **fails the test** on a
+`STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. Both were
+documented in prose here and emitted 170 times a run, so the next real one was invisible.
+A deliberate untracked read is spelled `untrack(...)`; anything still warning is
+unreviewed. See `mount.md`.
 
 Every component (not needed for pure internal primitives with no DOM output) also
 needs an SSR/hydration round-trip test: `renderToStringAsync` (from `@solidjs/web`)
 must resolve without throwing, and `hydrate()` against the resulting HTML must produce
 no hydration-mismatch warnings. `check:coverage-parity` mechanically enforces the first
-half of this (every `@solid-zero/components` source file must have a matching test
-that references `renderToStringAsync`) — added alongside Dialog, the first component to
-need it.
+half (every `@solid-zero/components` source file must have a matching test that *calls*
+`renderToStringAsync` — outside a comment, outside a string, outside an `it.skip`, and
+not merely importing it).
 
-The second half — a genuine in-browser `hydrate()` round-trip producing zero mismatch
-warnings — is **not** mechanically enforced, and for **Portal-using components
-specifically** (Dialog, and by extension any future Popover/Tooltip/etc.) is currently
-a known, deliberately accepted gap rather than a TODO: `renderToStringAsync` called
-*from inside* a Vitest browser test always resolves to `@solidjs/web`'s client build
-(`isServer` hardcoded `false`), so it never produces genuine server output for an
-`isServer`-guarded branch like `Dialog.Portal`'s. Two different fixes were attempted
-for Dialog and both hit real, separate blockers — a custom Vitest browser `command`
-hand-constructing the component tree hit `createUniqueId cannot be used outside of a
-reactive context`; reading a fixture (written by a genuine server-side
-`renderToStringAsync` in the "unit" project) via Vitest's built-in `readFile` browser
-command got past that, but then hit a `hydrate()` "Hydration Mismatch: Unable to find
-DOM nodes for hydration key" error even with a byte-for-byte identical component tree —
-plausibly because the "unit" and "browser" Vitest projects are separate Vite builds, so
-`@solidjs/web` (and therefore the component's own compiled module) are genuinely
-different module instances between the SSR render and the client hydrate. Neither was
-root-caused further; see `docs/session-handoff-dialog.md` finding #8 for the full
-investigation if picking this up again. `Dialog.browser.test.tsx`'s hydration test is
-`it.skip`'d, pointing back at that doc. Non-Portal components (Button, and any future
-non-overlay component) aren't affected — `renderToStringAsync` called in-browser is
-fine for them since there's no `isServer`-guarded branch to get wrong.
+The second half — a genuine `hydrate()` round-trip — is real for `Button` and blocked
+for `Dialog`. Button's lives in `src/button/__fixtures__/button-ssr.html`: genuine server
+output, asserted byte-for-byte by `Button.test.tsx` (unit project, where `@solidjs/web`
+resolves to its **server** build) and hydrated by `Button.browser.test.tsx` (browser
+project, **client** build), which checks the server's DOM node is reused rather than
+re-rendered. Neither project can do both halves: the client build's `renderToStringAsync`
+is a stub that `console.error`s and returns `undefined`.
 
-**Retry this when SolidJS 2.0 ships stable.** Both blockers live in beta-era
-`@solidjs/web` internals (the server/client `isServer` split and hydration-key
-allocation); they may settle, or gain a first-party SSR/hydration test path, once
-`solid-js`/`@solidjs/web` leave beta. Re-attempt the skipped test then before accepting
-the gap as permanent.
+**Dialog cannot round-trip, and the reason is measured, not guessed:** it calls
+`createUniqueId()`, and `solid-js`'s two builds allocate ids from different counters —
+the server build always consumes a child id, the client build consumes one only while
+`sharedConfig.hydrating`, otherwise returning `cl-${counter++}` and consuming nothing.
+`vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project but
+leaves `solid-js` on its browser build, so every hydration key after `Dialog.Root`'s
+`createUniqueId()` is off by one. This will hit every future component that generates
+ARIA ids (Popover, Tooltip, Select). `Dialog.browser.test.tsx`'s hydration test is
+`it.skip`'d with the full analysis; the fix is to make the SSR half resolve `solid-js`'s
+server build too. See `docs/migration-2.0-stable.md` §4 — which also records the two
+theories this **disproved**: it is *not* about separate Vite builds / module instances,
+and *not* about the hand-rolled `window._$HY` (`_$HY.r` is the resource registry;
+`hydrate()` builds the element registry itself with `gatherHydratable()`).
 
-> **Correction pending (do not act on the "module instances" theory above).** A real
-> server render emits `<button _hk=1010 …>` — and `1010` is precisely the key in the
-> reported "Unable to find DOM nodes for hydration key" error, so the keys exist and are
-> structural, not per-module-instance. The likelier culprit is the test's own hand-rolled
-> `window._$HY = { …, r: {} }` bootstrap, which leaves the hydration registry empty where
-> a real app gets it from `generateHydrationScript()`. Try that first. See
-> `docs/migration-2.0-stable.md` §4.
+## No component may write a literal host JSX element
+
+`vite-plugin-solid` is configured with neither `generate` nor `hydratable`, i.e.
+`generate: 'dom'`, which compiles a literal `<div>`/`<span>`/SVG into a **module-scope**
+`_$template()` call plus `_$insert()`. `@solidjs/web`'s **server** build exports
+`template`/`insert`/`spread`/`setAttribute` as `notSup` throwers ("Client-only API called
+on the server side"). So a single literal host element anywhere in a component throws *at
+import* under SSR — not at render.
+
+SSR works today only because every host element routes through `renderElement` →
+`<Dynamic>` → `createComponent`, and `Dynamic` bridges the two builds at runtime
+(`ssrElement(…, true)` server-side, `sharedConfig.hydrating ? getNextElement() :
+createElement(...)` client-side). Compile mode never matters. This was previously
+justified in `docs/plan.md` by the claim that `@solidjs/web` "exposes the same exported
+function names per environment" — that reasoning is wrong, and the invariant is what
+actually holds it up.
+
+`pnpm check:dist-imports` (`scripts/check-dist-imports.mjs`, run in CI right after
+`build`) enforces it: no `packages/*/dist/**/*.js` may import
+`template`/`insert`/`spread`/`setAttribute`/`use`/`addEventListener` from `@solidjs/web`.
+The same grep is the tripwire for a `babel-preset-solid@1.x` creeping back into the
+compiler pipeline — 1.x emits `use` and `addEventListener`, names 2.0 renamed to `ref` and
+`addEvent`, which is what makes the deferred `tsdown`/`unplugin-solid` migration safe to
+attempt (see `docs/migration-2.0-stable.md` §5).
+
+The first Popover arrow or visually-hidden label written the obvious way is what this
+catches. Route it through `renderElement`.
+
+## The Solid internals this codebase leans on are pinned
+
+`packages/primitives/src/solid-contract.test.tsx` (unit, server `@solidjs/web`) and
+`solid-contract.browser.test.tsx` (browser, client build) are characterization tests. They
+don't test solid-zero; they pin the undocumented `solid-js`/`@solidjs/web` behaviors listed
+in the section below, each with a comment naming the code that depends on it. `@solidjs/web`
+already renamed runtime helpers *within* the beta line (`use`→`ref`,
+`addEventListener`→`addEvent`), so when stable breaks one of these you get a red test with a
+pointer instead of a bug hunt. Add to them rather than re-deriving a behavior in a comment.
 
 ## Architecture
 
@@ -304,16 +340,18 @@ actual installed package):
   its return. `createControllableState` boxes its value (`{ value: T }` plus an `equals` that
   unwraps with Solid's own `isEqual`) specifically to dodge this; do the same in any other
   generic `createSignal<T>` wrapper.
-- **Sibling effects run *and clean up* in creation order — cleanups are not reversed.**
-  Verified against the installed beta. Two consequences, both live in `createFocusRestore`
-  (see `focus-restore.md`): a primitive that must snapshot state before a sibling mutates it
-  has to be *created first*; and a primitive whose cleanup must run *after* a sibling's
-  cleanup has to defer the work by a `queueMicrotask` (effect cleanups are synchronous within
-  a flush, so a microtask queued from the first cleanup lands after all of them). Focus
-  restore needs both: it snapshots `document.activeElement` before `createFocusTrap` moves
-  focus, and restores after the trap has removed its `focusin` listener — otherwise the
-  still-live trap yanks focus straight back, since `.focus()` dispatches `focusin`
-  synchronously.
+- **Sibling effects run in creation order. On *re-run* their cleanups do too — but on
+  *owner disposal* cleanups are LIFO.** Verified against the installed beta and pinned in
+  `solid-contract.test.tsx`. The re-run path is the one that matters (`active` flips false;
+  Solid walks the siblings in creation order, running each one's previous cleanup before its
+  own new body). Two consequences, both live in `createFocusRestore` (see
+  `focus-restore.md`): a primitive that must snapshot state before a sibling mutates it has
+  to be *created first*; and a primitive whose cleanup must run *after* a sibling's cleanup
+  has to defer the work by a `queueMicrotask` (effect cleanups are synchronous within a
+  flush, so a microtask queued from the first cleanup lands after all of them). Focus restore
+  needs both: it snapshots `document.activeElement` before `createFocusTrap` moves focus, and
+  restores after the trap has removed its `focusin` listener — otherwise the still-live trap
+  yanks focus straight back, since `.focus()` dispatches `focusin` synchronously.
 - **`onMount` → `onSettled`**, `createEffect` can take a split `(depsFn, computeFn)`
   form, `createContext` returns the Provider component directly (`<XContext value={...}>`,
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
@@ -417,6 +455,13 @@ Two non-obvious things that config guards against, both hit for real:
 - CI installs only `chromium-headless-shell` (`playwright install --with-deps
   --only-shell`), which is why `headless: true` is required in the browser project
   config — Playwright only picks the shell build when headless is on.
-- `unit` currently has `passWithNoTests: true` at the root `test` level (not per-project
-  — that placement matters, it's ignored inside a project block) because Phase 0 has no
-  pure-logic primitives yet; remove it once `createListState` or similar lands.
+- **The two projects resolve different builds of the same packages, on purpose.** `unit`
+  aliases `@solidjs/web` to its **server** build (so SSR is genuinely testable), but
+  `solid-js` still resolves to its **client** build via Vite's default `browser` condition.
+  That mix is what makes `flush()` necessary around signal writes in unit tests, and it is
+  also what blocks Dialog's hydration round-trip (`createUniqueId` allocates from a different
+  counter in each `solid-js` build — see above). Anything asserting on a *build-specific*
+  behavior belongs in `solid-contract.test.tsx` / `solid-contract.browser.test.tsx`, which
+  say which build they're pinning.
+- No `passWithNoTests`. It was a Phase 0 concession from when no pure-logic primitive had a
+  node-environment test; leaving it on meant deleting every unit test kept CI green.

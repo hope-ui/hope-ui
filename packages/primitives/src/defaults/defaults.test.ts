@@ -1,4 +1,4 @@
-import { createSignal, flush, merge } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { withDefaults } from "./defaults";
 
@@ -67,11 +67,8 @@ describe("withDefaults", () => {
     expect(reads).toBe(1);
   });
 
-  it("documents the `merge` behavior it exists to work around", () => {
-    // Characterization test. If SolidJS 2.0 stable changes `merge` to skip `undefined`
-    // values from later sources, this goes red and `withDefaults` becomes unnecessary.
-    // See docs/migration-2.0-stable.md §2.
-    expect(merge({ modal: true }, {}).modal).toBe(true);
-    expect(merge({ modal: true }, { modal: undefined }).modal).toBeUndefined();
-  });
+  // The `merge` behavior this primitive exists to work around — a key resolved by presence,
+  // not by value — is pinned in `../solid-contract.test.tsx`, alongside every other
+  // undocumented SolidJS internal this codebase leans on. If stable changes it, that file
+  // goes red first and `withDefaults` becomes unnecessary.
 });

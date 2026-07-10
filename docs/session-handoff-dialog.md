@@ -215,6 +215,19 @@ simulated.
 
 ### 8. KNOWN GAP (not fixed, deliberately deferred): the hydration round-trip test
 
+> **Superseded — read `docs/migration-2.0-stable.md` §4 instead.** Wave 3 reproduced this
+> against `2.0.0-beta.16` and measured the root cause. Two claims below are wrong and were
+> being acted on: the "different module instances between the SSR render and the client
+> hydrate" theory (disproved — `Button` now hydrates genuine unit-project server HTML in the
+> browser project, reusing the server's DOM node), and the reading of the hand-rolled
+> `window._$HY` bootstrap (`_$HY.r` is the *resource* registry; `hydrate()` builds the element
+> registry itself with `gatherHydratable()`). The actual blockers: (1) `@solidjs/web`'s client
+> build defines `renderToStringAsync` as a stub that `console.error`s and returns `undefined`,
+> so the test was hydrating the literal string `"undefined"`; (2) `createUniqueId()` allocates
+> from a different counter in each `solid-js` build, so any component generating an ARIA id
+> shifts every hydration key. The `isServer`/Portal analysis below is *not* the cause — even a
+> Portal-free `Dialog.Root` + `Dialog.Trigger` fails. Kept for the record of what was tried.
+
 CLAUDE.md's originally-envisioned pattern: "call `renderToStringAsync` in the
 unit/node project (no browser needed for that half)... then, in the browser project,
 inject that server HTML into a container and call `hydrate()`". In practice, **calling

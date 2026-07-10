@@ -21,17 +21,26 @@ function Child(props: {
 function Parent(props: { show?: boolean; onChange?: (elements: Element[]) => void }) {
   const [elements, setElements] = createSignal<Element[]>([]);
 
-  const publish = (next: Element[]) => {
-    setElements(next);
-    props.onChange?.(next);
+  // A functional update, not `setElements([...elements(), element])`. `register` is invoked
+  // from `createRegisteredElement`'s effect callback, and reading `elements()` there is an
+  // untracked read of a reactive value — `[STRICT_READ_UNTRACKED]`, which `mount()` now
+  // fails on. `Dialog.Root`'s `addSparedElement` is written the same way for the same reason.
+  const publish = (update: (previous: Element[]) => Element[]) => {
+    setElements((previous) => {
+      const next = update(previous);
+      props.onChange?.(next);
+      return next;
+    });
   };
 
   return (
     <div data-testid="parent" data-count={elements().length}>
       <Show when={props.show ?? true}>
         <Child
-          register={(element) => publish([...elements(), element])}
-          unregister={(element) => publish(elements().filter((entry) => entry !== element))}
+          register={(element) => publish((previous) => [...previous, element])}
+          unregister={(element) =>
+            publish((previous) => previous.filter((entry) => entry !== element))
+          }
         />
       </Show>
     </div>

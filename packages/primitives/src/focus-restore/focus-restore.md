@@ -28,7 +28,9 @@ the cross-component coupling this project exists to avoid).
 
 ## Two ordering constraints
 
-Both verified empirically against the installed `solid-js@2.0.0-beta`, not assumed.
+Both verified empirically against the installed `solid-js@2.0.0-beta`, not assumed — and
+both pinned by `../solid-contract.test.tsx`, so SolidJS 2.0 stable changing either goes red
+there first.
 
 **1. Call `createFocusRestore` before `createFocusTrap`.**
 
@@ -38,10 +40,11 @@ container — otherwise it would remember the popup's first focusable child, not
 
 **2. The restore is deferred by one microtask.**
 
-Sibling effect *cleanups* also run in creation order — **not** reverse. So this primitive's
-cleanup runs while `createFocusTrap`'s `focusin` listener is still attached. Focusing the
-trigger synchronously would dispatch `focusin` (`.focus()` dispatches it synchronously), and
-the still-live trap would yank focus straight back into its container.
+The path that matters is the effect **re-run**: `active` flips false, and Solid walks the
+sibling effects in creation order, running each one's previous cleanup before its own new
+body. So this primitive's cleanup runs while `createFocusTrap`'s `focusin` listener is still
+attached. Focusing the trigger synchronously would dispatch `focusin` (`.focus()` dispatches
+it synchronously), and the still-live trap would yank focus straight back into its container.
 
 Effect cleanups are synchronous within a flush, so a microtask queued from this one lands
 after every sibling cleanup has run and the listener is gone:
@@ -49,6 +52,11 @@ after every sibling cleanup has run and the listener is gone:
 ```
 A cleanup (sync)  →  B cleanup (removes listeners)  →  A restore (microtask)
 ```
+
+> Owner **disposal** is the opposite: cleanups there run LIFO, so the trap's would fire
+> first. Nothing depends on that — `Dialog.Popup` stays mounted while only its element
+> unmounts, so deactivation always takes the re-run path — but the two paths disagreeing is
+> exactly the sort of thing a reader assumes away. Both are pinned.
 
 Tests that assert on restored focus must therefore await a tick — `await expect.element(x).toHaveFocus()`
 already retries, so in practice this is invisible.

@@ -35,31 +35,39 @@ becomes a landmine at exactly the moment nobody is looking at `pnpm-workspace.ya
 
 ---
 
-## 2. Re-verify the `@solidjs/web` internals this codebase silently depends on
+## 2. The `solid-js` / `@solidjs/web` internals this codebase silently depends on
 
 `@solidjs/web` renamed runtime helpers *within* the beta line (`use` → `ref`,
-`addEventListener` → `addEvent`). Four undocumented runtime behaviors are load-bearing
-here. Wave 3 adds characterization tests (`solid-contract.test.ts`) that pin each one, so
-stable breaking any of them shows up as a red test with a pointer rather than as a
-mysterious component bug. Until those land, re-check by hand:
+`addEventListener` → `addEvent`). Several undocumented runtime behaviors are load-bearing
+here. **They are now pinned by characterization tests**, so stable breaking any of them shows
+up as a red test naming the code that depended on it, rather than as a mysterious component
+bug days into the migration:
 
-- [ ] `merge(defaults, props)` — a **present** key whose value is `undefined` overrides the
-      default; an **absent** key does not. Dialog's `modal`/`defaultOpen` and Button's
-      `type` defaults depend on this distinction.
-- [ ] `applyRef` (`@solidjs/web/dist/web.js`) — `r.flat(Infinity).forEach(f => f && f(el))`,
-      i.e. falsy entries in a ref array are skipped. This is why `ref={[setRef, props.ref]}`
-      is safe with an absent consumer ref and no `mergeRefs` helper is needed.
-- [ ] The server build (`dist/server.js`) exports `template`/`insert`/`spread`/
-      `setAttribute` as **throwing stubs** ("Client-only API called on the server side"),
-      while `Dynamic` → `dynamic()` → `ssrElement(c, props, undefined, true)` emits a
-      hydration key. See §3.
+- `packages/primitives/src/solid-contract.test.tsx` — unit project, where `@solidjs/web`
+  resolves to its **server** build.
+- `packages/primitives/src/solid-contract.browser.test.tsx` — browser project, where it
+  resolves to the **client** build. The asymmetry between the two files *is* the invariant
+  §3 depends on.
+
+What they pin:
+
+| Behavior | Depended on by |
+|---|---|
+| `merge` resolves a key by **presence**, not value — a present `undefined` clobbers an earlier value | `withDefaults`, and therefore every prop default |
+| `createSignal(fn)` hits the `ComputeFunction` overload and becomes a memo | `createControllableState`'s boxed value |
+| `useContext` **throws** with no Provider mounted | `createComponentContext`'s `try/catch` reword |
+| Sibling effects run in creation order; on **re-run** their cleanups do too; on **owner disposal** cleanups are LIFO | `createFocusRestore`'s creation order *and* its `queueMicrotask` deferral |
+| A microtask queued from the first cleanup lands after every sibling cleanup | `createFocusRestore`'s deferral |
+| Server build exports `template`/`insert`/`spread`/`setAttribute` as throwing stubs, while `Dynamic` → `ssrElement(…, true)` emits an `_hk` key | The whole no-literal-host-JSX invariant (§3) |
+| Client build exports those same four as real implementations | ditto — the asymmetry is the point |
+| `applyRef` does `r.flat(Infinity).forEach(f => f && f(el))`, skipping falsy entries | `renderElement`'s ref merging; why no `mergeRefs` helper exists |
+
+Still to re-check by hand at the migration, because nothing pins them:
+
 - [ ] Client `dynamic()` does `sharedConfig.hydrating ? getNextElement() : createElement(...)`,
       i.e. `Dynamic` is hydration-aware at runtime, independent of the Babel `hydratable`
-      flag.
-- [ ] `useContext` throws when no Provider is mounted. `createComponentContext`'s
-      `try/catch` (`packages/primitives/src/context/context.ts`) exists only to reword that
-      throw; if 2.0 stable returns `undefined` instead, the friendly error silently stops
-      firing and every sub-component fails later with a null-deref.
+      flag. If that stops being true, the single-build strategy dies — see §3.
+- [ ] `createUniqueId()` still diverges between `solid-js`'s server and client builds. See §4.
 
 ---
 
@@ -87,27 +95,60 @@ a visually-hidden label — breaks SSR at runtime.
 
 ---
 
-## 4. Retry the Dialog hydration round-trip test
+## 4. The Dialog hydration round-trip test — root cause, measured
 
-`Dialog.browser.test.tsx`'s hydration test is `it.skip`'d. **`CLAUDE.md`'s recorded root
-cause — "separate Vite builds, so `@solidjs/web` is a different module instance" — is
-unverified and contradicted by the evidence.** A real server render of the Dialog trigger
-emits `<button _hk=1010 type="button" …>`, and `1010` is exactly the hydration key in the
-reported "Unable to find DOM nodes for hydration key: 1010" error. The keys exist and are
-structural, not per-module-instance.
+`Dialog.browser.test.tsx`'s hydration test is still `it.skip`'d, but it is no longer a
+mystery. Wave 3 reproduced it against `2.0.0-beta.16` and **both previously recorded
+explanations are wrong**. Do not act on either:
 
-A likelier culprit is the hand-rolled bootstrap in the test itself:
+- ~~"Separate Vite builds, so `@solidjs/web` is a different module instance."~~ Disproved:
+  `Button.browser.test.tsx` now hydrates genuine server HTML, produced in the *unit* project,
+  inside the *browser* project, reusing the server's DOM node. Separate builds are a non-issue.
+- ~~"The hand-rolled `_$HY.r` is the hydration registry, and it is left empty."~~ Disproved:
+  `r` is the **resource/asset** registry (`sharedConfig.load = id => _$HY.r[id]`). The element
+  registry `getNextElement()` reads is built by `gatherHydratable()`, which scans the
+  container for `[_hk]` attributes. An empty `r` is correct. (`generateHydrationScript()` is
+  `voidFn` in the client build anyway, so it could not have been used here.)
 
-```ts
-(window as unknown as { _$HY?: unknown })._$HY = { events: [], completed: new WeakSet(), r: {} };
-```
+### What is actually going on
 
-`r` is the hydration registry, and it is left **empty**. In a real app that object is
-produced by `generateHydrationScript()`.
+**1. `renderToStringAsync` does not exist in the browser.** The client build defines it as
+`throwInBrowser(renderToStringAsync)`, which `console.error`s and **returns `undefined`**. The
+test then does `container.innerHTML = undefined`, writing the literal string `"undefined"`. No
+`_hk` nodes, hence "Unable to find DOM nodes for hydration key". The test's own `console.error`
+spy was swallowing the message that says exactly this.
 
-- [ ] Try `generateHydrationScript()` (from `@solidjs/web`) instead of the hand-rolled
-      `_$HY` before touching anything else.
-- [ ] Only if that fails, revisit the module-instance theory.
+**2. `createUniqueId()` allocates from a different counter in each build.**
+
+| build | `createUniqueId()` | consumes an id? |
+|---|---|---|
+| `solid-js` server | `getNextChildId(owner)` | yes |
+| `solid-js` client, hydrating | `sharedConfig.getNextContextId()` | yes |
+| `solid-js` client, not hydrating | `` `cl-${counter++}` `` | **no** |
+
+`vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project, but leaves
+`solid-js` resolving to its **browser** build. So the SSR render takes the `cl-…` branch and
+consumes nothing, while the browser hydrate takes `getNextContextId()` and consumes one — every
+hydration key after `Dialog.Root`'s `createUniqueId()` is off by one. Isolated to confirm: a
+single bare `createUniqueId()` added to a component that otherwise hydrates cleanly is enough to
+flip it to "Hydration Mismatch". This affects every future component that generates ARIA ids —
+Popover, Tooltip, Select.
+
+### What landed instead
+
+`Button` (no `createUniqueId`) has a **real** SSR → hydrate round-trip:
+`src/button/__fixtures__/button-ssr.html` is genuine server output, asserted byte-for-byte by
+`Button.test.tsx` and hydrated by `Button.browser.test.tsx`, which checks the server's node is
+reused rather than re-rendered. Break the fixture and both halves go red.
+
+### To unblock Dialog
+
+- [ ] Make the SSR half resolve `solid-js`'s **server** build too, not just `@solidjs/web`'s —
+      a third Vitest project (or a Node script) whose alias covers both, emitting the fixture the
+      browser test hydrates. The unit project cannot simply switch: its reactivity tests depend
+      on client-build semantics (deferred writes, real effects).
+- [ ] Re-check against stable first. If `solid-js`'s client `createUniqueId` stops branching on
+      `sharedConfig.hydrating`, or the two builds converge, this may evaporate.
 - [ ] Once green, drop the `it.skip` and delete the "retry when stable" note in CLAUDE.md.
 
 ---

@@ -45,10 +45,23 @@ blocks the pointer); `createScrollLock`'s ref count moved off module scope; and
 component would want. `Dialog.Trigger` emits `aria-controls` only while open, and respects
 `event.preventDefault()` as a cancel channel.
 
-Remaining before SolidJS 2.0 stable lands: the migration-insurance work in
-`docs/migration-2.0-stable.md` — characterization tests pinning the `solid-js`/`@solidjs/web`
-internals this codebase leans on, driving `STRICT_READ_UNTRACKED` to zero and then failing on
-it, and a CI grep enforcing the no-literal-host-JSX invariant that SSR silently depends on.
+**The migration insurance is now in place.** `solid-contract.test.tsx` and its browser
+counterpart pin every undocumented `solid-js`/`@solidjs/web` behavior this codebase leans on,
+each naming the code that depends on it. The browser suite emitted 170 `STRICT_READ_UNTRACKED`
+warnings; it now emits zero, and `mount()` fails any test that produces one (or a
+`REACTIVE_WRITE_IN_OWNED_SCOPE`). `check:dist-imports` enforces the no-literal-host-JSX
+invariant SSR silently depends on. `expectNoA11yViolations` no longer drops axe's `incomplete`
+results, `check:coverage-parity` no longer accepts a `renderToStringAsync` mention in a comment
+or an `it.skip`, and `passWithNoTests` is gone.
+
+Two records were corrected against measurement rather than inherited: the SSR rationale below,
+and Dialog's skipped hydration test — whose root cause turned out to be `createUniqueId()`
+allocating from different counters in `solid-js`'s server and client builds, not module
+instances and not the `_$HY` bootstrap. `Button` now has a real SSR → hydrate round-trip. See
+`docs/migration-2.0-stable.md` §4.
+
+Remaining before SolidJS 2.0 stable lands: Popover + Tooltip (Phase 1, step 3), then the
+migration itself.
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -239,17 +252,33 @@ plumbing.
 
 ## SSR & hydration requirements (cross-cutting, non-negotiable)
 
-`@solidjs/web`'s package exports already resolve to different runtime implementations
-per environment (`browser` condition → `dist/web.js`/`dist/dev.js` with real DOM ops;
-`node`/`worker` condition → `dist/server.js` with string-based SSR ops) behind the
-*same* exported function names (`render`/`Dynamic`/`insert`/`spread`/etc.), plus
-`renderToString`/`renderToStringAsync`/`renderToStream`/`hydrate`/`isServer`. This means
-**solid-zero's packages do not need a separate SSR build** — compiling once with the
-default `generate: 'dom'` mode and importing runtime helpers from `@solidjs/web` (never
-hardcoding a specific dist file) should let the same compiled component code run
-correctly in both SSR and client/hydration contexts, resolved automatically by whatever
-bundler the consuming app (e.g. SolidStart) uses. This must be verified with an actual
-round-trip test per component, not assumed — see the DoD addition below.
+**solid-zero's packages do not need a separate SSR build**, but the reason is narrower and
+more fragile than this document used to claim.
+
+> **Corrected.** The old rationale here was that `@solidjs/web` resolves to different runtime
+> implementations per environment "behind the *same* exported function names", so one
+> `generate: 'dom'` build works everywhere. That is false, and verified false against
+> `2.0.0-beta.16`: the **server** build exports `template`, `insert`, `spread` and
+> `setAttribute` as `notSup` stubs that throw *"Client-only API called on the server side"*.
+> `generate: 'dom'` compiles a literal host JSX element into exactly those — and `_$template()`
+> is called at **module scope**, so a single literal `<div>` in any component throws at
+> *import* under SSR, not at render.
+
+The single build works because of an invariant, not a symmetry: **no source file under
+`packages/*/src` contains a literal host JSX element.** Every host element routes through
+`renderElement` → `<Dynamic>` → `createComponent`, and `Dynamic` bridges the two builds at
+runtime — server-side `dynamic()` calls `ssrElement(component, props, undefined, true)`
+(emitting the `_hk` hydration key); client-side it calls
+`sharedConfig.hydrating ? getNextElement() : createElement(...)`. Compile mode never matters.
+
+That invariant is load-bearing and now enforced: `scripts/check-dist-imports.mjs` (CI, right
+after `build`) fails if any `packages/*/dist/**/*.js` imports
+`template`/`insert`/`spread`/`setAttribute`/`use`/`addEventListener` from `@solidjs/web`. The
+same grep is the tripwire for a `babel-preset-solid@1.x` regression in the compiler pipeline.
+The runtime behaviors it rests on are pinned by `packages/primitives/src/solid-contract.test.tsx`
+and `solid-contract.browser.test.tsx`.
+
+The first Popover arrow or visually-hidden label written the obvious way is what this catches.
 
 Concrete rules every primitive/component must follow:
 - **No unconditional DOM/`window`/`document` access outside effects.** `createEffect`/
@@ -286,6 +315,12 @@ Concrete rules every primitive/component must follow:
   fresh on the client after hydration — verify this doesn't produce a hydration-mismatch
   warning with an actual `renderToStringAsync` + `hydrate` round-trip test, per the DoD
   below, rather than assuming it's fine.
+
+  Note that Dialog's round-trip test is currently `it.skip`'d, and **not** because of the
+  Portal. `createUniqueId()` allocates ids from a different counter in each `solid-js` build,
+  so any component that generates an ARIA id cannot round-trip through the repo's two Vitest
+  projects as configured. `Button` (no `createUniqueId`) has a real round-trip against a
+  committed fixture. Full analysis, and the fix, in `docs/migration-2.0-stable.md` §4.
 - **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
   client-only** and should be structured so they simply don't run their DOM-touching
   logic during SSR (again, via effects) rather than crashing or needing to be manually

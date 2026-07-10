@@ -13,6 +13,7 @@
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "check:coverage-parity": "node scripts/check-coverage-parity.mjs",
+    "check:dist-imports": "node scripts/check-dist-imports.mjs",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
     "changeset": "changeset",

@@ -36,6 +36,13 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Must run after Build: it reads `packages/*/dist`. Enforces the invariant SSR silently
+      # depends on — no component writes a literal host JSX element — and doubles as the
+      # tripwire for a `babel-preset-solid@1.x` creeping back into the compiler pipeline.
+      # See the script's header, and CLAUDE.md.
+      - name: Assert dist imports no client-only @solidjs/web helper
+        run: pnpm check:dist-imports
+
       - name: Typecheck
         run: pnpm typecheck
 

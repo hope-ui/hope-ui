@@ -677,46 +677,50 @@ describe("Dialog", () => {
     dispose();
   });
 
-  // KNOWN GAP — see docs/session-handoff-dialog.md for the full investigation.
-  // `renderToStringAsync` called from inside a browser test runs against the *client*
-  // build of @solidjs/web, where `isServer` is hardcoded `false` — so it doesn't
-  // produce genuine server output (e.g. Dialog.Portal's `isServer` guard never takes
-  // the server branch). A real fix needs the SSR half to run under Node's real
-  // `dist/server.js` and hand the resulting HTML to this browser test.
+  // KNOWN GAP, and the root cause is now measured rather than guessed. Two independent
+  // things block this test; both were reproduced during Wave 3, and the *previously
+  // recorded* explanations ("separate Vite builds → different `@solidjs/web` module
+  // instances", and "the hand-rolled `_$HY.r` registry is empty") are both wrong. See
+  // docs/migration-2.0-stable.md §4.
   //
-  // Two approaches tried, two different blockers found (both documented in
-  // docs/session-handoff-dialog.md finding #8):
-  //  1. A custom Vitest browser `command` dynamically importing the built server/
-  //     component dist and hand-constructing the component tree (no JSX available
-  //     there) — hit `createUniqueId cannot be used outside of a reactive context`.
-  //  2. Vitest's built-in `readFile` browser command, reading a fixture written by a
-  //     real `renderToStringAsync` call in `Dialog.test.tsx` (the "unit" project,
-  //     which genuinely resolves @solidjs/web's server build via vitest.config.ts's
-  //     alias) — this got past the `createUniqueId` issue (plain top-level JSX,
-  //     no dynamic-import-inside-a-callback indirection), but hit a *different*
-  //     wall: `hydrate()` in the "browser" project throws "Hydration Mismatch.
-  //     Unable to find DOM nodes for hydration key: 1010" against that fixture, even
-  //     with a byte-for-byte identical component tree. Root cause not confirmed, but
-  //     the leading theory is that "unit" and "browser" are separate Vitest
-  //     projects/Vite builds, so `@solidjs/web` (and therefore Dialog's own compiled
-  //     module) are two genuinely different module instances between the SSR render
-  //     and the client hydrate — plausible if hydration-key allocation isn't purely
-  //     structural but depends on some per-module-instance state. Not chased further
-  //     (would need instrumenting @solidjs/web's dev.js key-allocation code directly).
+  //  1. `renderToStringAsync` does not exist in the browser. `@solidjs/web`'s client build
+  //     defines it as `throwInBrowser(renderToStringAsync)`, which `console.error`s and
+  //     **returns `undefined`**. `container.innerHTML = undefined` writes the literal string
+  //     "undefined", so there are no `_hk` nodes to hydrate against — which is the entire
+  //     "Unable to find DOM nodes for hydration key" error. The test's own `consoleError` spy
+  //     was swallowing the "not supported in the browser" message that says so.
+  //
+  //  2. Given *genuine* server HTML, Dialog still cannot round-trip through these two Vitest
+  //     projects, because it calls `createUniqueId()`. `solid-js`'s two builds allocate ids
+  //     from different counters:
+  //       - server build:  `createUniqueId()` → `getNextChildId(owner)`      (consumes a child id)
+  //       - client build:  `createUniqueId()` → `sharedConfig.hydrating`
+  //                                             ? `sharedConfig.getNextContextId()` (consumes one)
+  //                                             : `` `cl-${counter++}` ``       (consumes none)
+  //     `vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project but
+  //     leaves `solid-js` on its browser build, so the SSR render takes the `cl-…` branch and
+  //     consumes nothing, while this browser hydrate takes `getNextContextId()` and consumes
+  //     one. Every hydration key after `Dialog.Root`'s `createUniqueId()` is off by one.
+  //     Isolated to confirm: one bare `createUniqueId()` added to a component that otherwise
+  //     hydrates cleanly is enough to flip it to "Hydration Mismatch".
+  //
+  // The harness itself is fine: `Button.browser.test.tsx` now runs a real SSR → hydrate
+  // round-trip against a committed fixture, reusing the server's DOM node, with the same
+  // hand-rolled `_$HY`. Nothing about separate Vite builds prevents hydration.
+  //
+  // TO UNBLOCK: the SSR half must resolve `solid-js`'s **server** build too, not just
+  // `@solidjs/web`'s — i.e. a third Vitest project (or a Node script) whose alias covers both,
+  // producing the fixture this test would hydrate. The unit project can't simply switch: its
+  // reactivity tests depend on client-build semantics (deferred writes, real effects).
   //
   // Skipped rather than asserted red so it doesn't block the pipeline; the *actual*
-  // SSR-doesn't-crash requirement is already verified for real in Dialog.test.tsx
-  // (the unit project, which does correctly resolve the real server build).
-  //
-  // RETRY WHEN SolidJS 2.0 IS STABLE: both blockers above are in beta-era
-  // @solidjs/web internals (server/client `isServer` split, hydration-key allocation)
-  // and the Vitest-project module-instance interaction — worth re-attempting once
-  // solid-js/@solidjs/web ship a stable 2.0, since the internals may have settled or
-  // gained a first-party SSR-hydration test path by then.
+  // SSR-doesn't-crash requirement is already verified for real in Dialog.test.tsx.
   it.skip("hydrates cleanly with no mismatch warnings and stays interactive", async () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
+    // Blocker 1 above: in the browser this returns `undefined`. A working version reads a
+    // fixture produced by a genuine server render, as `Button.browser.test.tsx` does.
     const html = await renderToStringAsync(() => <FullDialog />);
     const container = document.createElement("div");
     container.innerHTML = html;

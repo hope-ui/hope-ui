@@ -1,4 +1,4 @@
-import { type Accessor, createEffect, createSignal } from "solid-js";
+import { type Accessor, createEffect, createSignal, untrack } from "solid-js";
 
 export type PresenceStatus = "entering" | "entered" | "exiting" | "exited";
 
@@ -35,10 +35,15 @@ function getExitAnimationDuration(element: HTMLElement): number {
  * end event that will never fire.
  */
 export function createPresence(options: CreatePresenceOptions): PresenceState {
-  const [mounted, setMounted] = createSignal(options.present());
-  const [status, setStatus] = createSignal<PresenceStatus>(
-    options.present() ? "entered" : "exited",
-  );
+  // `untrack`, and not because tracking here would be wrong-but-harmless: these two reads
+  // seed the initial value of a signal, so they must happen exactly once and must never
+  // re-run. Without it Solid's dev build rightly warns `[STRICT_READ_UNTRACKED]` — and
+  // labels the warning with the *caller's* component name (`<Popup>`, `<Backdrop>`),
+  // because a primitive called from a component body runs inside that component's owner.
+  // `mount()` now fails any test that emits one, so the diagnostic stays worth reading.
+  const initialPresent = untrack(options.present);
+  const [mounted, setMounted] = createSignal(initialPresent);
+  const [status, setStatus] = createSignal<PresenceStatus>(initialPresent ? "entered" : "exited");
 
   createEffect(
     () => options.present(),
@@ -51,7 +56,13 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
       }
 
       setStatus("exiting");
-      const element = options.ref();
+      // `untrack` again, and deliberately *not* the `() => [active(), ref()]`-in-compute
+      // pattern `createFocusTrap`/`createDismissable` need. Those read the ref on the
+      // *activating* edge, racing the effect that creates the element. This reads it on the
+      // exit edge, when the element has been in the document since the entering run — so a
+      // one-shot untracked read is correct, and tracking the ref would rerun this effect
+      // (re-entering the exiting branch) every time the element is replaced.
+      const element = untrack(options.ref);
       const duration = element ? getExitAnimationDuration(element) : 0;
 
       if (!element || duration <= 0) {

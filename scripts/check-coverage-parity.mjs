@@ -41,6 +41,144 @@ function isTestFile(path) {
   return /\.(test|browser\.test)\.tsx?$/.test(path);
 }
 
+/**
+ * Blanks the *contents* of comments, string/template literals and regex literals, preserving
+ * every character offset. Lets the two checks below reason about code positions only: an
+ * `it.skip("hydrates (x)")` stays paren-balanced, and a `renderToStringAsync` mentioned in a
+ * comment or inside a string is no longer mistaken for a call.
+ *
+ * This exists because the SSR requirement used to be `source.includes("renderToStringAsync")`,
+ * and `Dialog.browser.test.tsx` satisfied it twice over — once in a prose comment, once
+ * inside an `it.skip`. Neither runs.
+ *
+ * @param {string} source
+ */
+function blankNonCode(source) {
+  const out = source.split("");
+  /** The last significant code character, used to tell a regex literal from a division. */
+  let previous = "";
+  let index = 0;
+
+  /** @param {number} from @param {number} to */
+  const blank = (from, to) => {
+    for (let i = from; i < to; i++) if (out[i] !== "\n") out[i] = " ";
+  };
+
+  while (index < source.length) {
+    const char = source[index];
+    const next = source[index + 1];
+
+    if (char === "/" && next === "/") {
+      const end = source.indexOf("\n", index);
+      const stop = end === -1 ? source.length : end;
+      blank(index, stop);
+      index = stop;
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      const end = source.indexOf("*/", index + 2);
+      const stop = end === -1 ? source.length : end + 2;
+      blank(index, stop);
+      index = stop;
+      continue;
+    }
+
+    if (char === '"' || char === "'" || char === "`") {
+      let i = index + 1;
+      while (i < source.length) {
+        if (source[i] === "\\") i += 2;
+        else if (source[i] === char) break;
+        else i++;
+      }
+      blank(index + 1, Math.min(i, source.length));
+      index = Math.min(i + 1, source.length);
+      previous = char;
+      continue;
+    }
+
+    // A `/` starting an expression is a regex literal; after a value it is division.
+    if (char === "/" && (previous === "" || "(,=:[!&|?{};+-*%~^".includes(previous))) {
+      let i = index + 1;
+      let inClass = false;
+      while (i < source.length) {
+        if (source[i] === "\\") {
+          i += 2;
+        } else if (source[i] === "[") {
+          inClass = true;
+          i++;
+        } else if (source[i] === "]") {
+          inClass = false;
+          i++;
+        } else if (source[i] === "\n" || (source[i] === "/" && !inClass)) {
+          break;
+        } else {
+          i++;
+        }
+      }
+      blank(index + 1, Math.min(i, source.length));
+      index = Math.min(i + 1, source.length);
+      previous = "/";
+      continue;
+    }
+
+    if (!/\s/.test(/** @type {string} */ (char))) previous = /** @type {string} */ (char);
+    index++;
+  }
+
+  return out.join("");
+}
+
+/**
+ * Character ranges covered by a skipped block — `it.skip(...)`, `test.skip(...)`,
+ * `describe.skip(...)`, and their `.only`-style `xit`/`xdescribe` spellings.
+ * @param {string} code A `blankNonCode` result, so parens inside strings can't confuse it.
+ * @returns {Array<[number, number]>}
+ */
+function skippedRanges(code) {
+  const ranges = [];
+  const skipCall = /\b(?:it|test|describe)\.skip\s*\(|\b(?:xit|xtest|xdescribe)\s*\(/g;
+
+  for (const match of code.matchAll(skipCall)) {
+    const open = code.indexOf("(", match.index);
+    if (open === -1) continue;
+
+    let depth = 0;
+    let i = open;
+    for (; i < code.length; i++) {
+      if (code[i] === "(") depth++;
+      else if (code[i] === ")" && --depth === 0) break;
+    }
+    ranges.push([match.index, Math.min(i + 1, code.length)]);
+  }
+
+  return ranges;
+}
+
+/**
+ * Whether `callee` is *invoked* somewhere the test runner will actually reach: not in a
+ * comment, not inside a string, not inside a skipped block — and not merely imported.
+ *
+ * The "merely imported" case is not hypothetical: `Dialog.browser.test.tsx` imports
+ * `renderToStringAsync` for its `it.skip`'d hydration test, so requiring the bare name would
+ * still pass on a file whose only real call was deleted.
+ *
+ * @param {string} source
+ * @param {string} callee
+ */
+function hasLiveCall(source, callee) {
+  const code = blankNonCode(source);
+  const skipped = skippedRanges(code);
+  const call = new RegExp(`\\b${callee}\\s*\\(`, "g");
+
+  for (const match of code.matchAll(call)) {
+    const index = match.index;
+    const isSkipped = skipped.some(([start, end]) => index >= start && index < end);
+    if (!isSkipped) return true;
+  }
+  return false;
+}
+
 function isStoryFile(path) {
   return /\.stories\.tsx?$/.test(path);
 }
@@ -99,12 +237,14 @@ for (const pkg of packageDirs) {
     if (!hasDoc) missing.push(`${relPath} — missing matching .md doc`);
 
     if (hasTest && REQUIRES_SSR_TEST.has(pkg)) {
+      // `hasLiveCall`, not `.includes(...)`: a mention in a comment, an import, or a call
+      // inside an `it.skip` used to satisfy this — and `Dialog.browser.test.tsx` has all three.
       const hasSsrTest = matchingTests.some((t) =>
-        readFileSync(t, "utf8").includes(SSR_TEST_MARKER),
+        hasLiveCall(readFileSync(t, "utf8"), SSR_TEST_MARKER),
       );
       if (!hasSsrTest) {
         missing.push(
-          `${relPath} — no matching test references ${SSR_TEST_MARKER} (SSR round-trip test required)`,
+          `${relPath} — no matching test calls ${SSR_TEST_MARKER}() outside a comment and outside an it.skip (SSR round-trip test required)`,
         );
       }
     }

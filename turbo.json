@@ -17,7 +17,8 @@
         "!src/**/*.browser.test.tsx",
         "!src/**/*.stories.ts",
         "!src/**/*.stories.tsx",
-        "!src/**/*.md"
+        "!src/**/*.md",
+        "!src/**/__fixtures__/**"
       ],
       "outputs": ["dist/**"]
     },

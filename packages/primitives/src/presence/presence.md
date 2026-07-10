@@ -46,6 +46,24 @@ If the rendered element has no authored `transition`/`animation` duration,
 `getComputedStyle` reports `0s` and unmounting is immediate — this primitive never waits
 indefinitely for an end event that a plain (unstyled) headless consumer will never fire.
 
+## Its three reads are deliberately untracked
+
+All three are wrapped in `untrack(...)`, which is both correct and what keeps
+`[STRICT_READ_UNTRACKED]` at zero — `mount()` fails any test that emits one, so an untracked
+read has to be spelled out rather than merely intended.
+
+- `present()`, twice, to seed the initial `mounted`/`status` signals. Seeds must be read once
+  and never re-read. Without `untrack` Solid labels the warning with the *caller's* component
+  name (`<Popup>`, `<Backdrop>`), because a primitive called from a component body runs inside
+  that component's owner — which is why the warnings looked like they came from `Dialog`.
+- `ref()`, inside the effect's exit branch, to decide whether to wait for a transition.
+
+That last one is the opposite of what `createFocusTrap`/`createDismissable` need. They read
+the ref on the **activating** edge, racing the effect that creates the element, so they must
+track it in `compute` (see `focus-trap.md`). This reads it on the **exit** edge, when the
+element has been in the document since the entering run. Tracking it here would also rerun the
+effect — re-entering the exiting branch — every time the element is replaced.
+
 ## SSR
 
 All `window`/DOM access happens inside `createEffect`. Never runs during SSR — the
