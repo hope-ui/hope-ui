@@ -130,8 +130,9 @@ no other effect, so it's an unambiguous cancel channel:
 | `initialFocus` | `() => HTMLElement \| null \| undefined`   | —       | (`Popup` only) Explicit element to focus on open, instead of the first focusable descendant. |
 | `...rest`      | `JSX.HTMLAttributes<HTMLDivElement>`      | —       | Forwarded to the rendered element.                                   |
 
-Both expose their `createPresence` status as a `data-status` attribute
-(`"entering" | "entered" | "exiting" | "exited"`) for CSS transitions.
+Both expose their `createPresence` status as a `data-presence` attribute
+(`"entering" | "entered" | "exiting" | "exited"`) for CSS transitions. That attribute name is
+the house convention for every component composing `createPresence` — see `presence.md`.
 
 #### Prop precedence
 
@@ -145,7 +146,7 @@ value is the whole point:
 | `aria-labelledby`  | Yours; otherwise `Dialog.Title`'s `id`, if a Title is rendered.            |
 | `aria-describedby` | Yours; otherwise `Dialog.Description`'s `id`.                              |
 | `aria-modal`       | Component-owned. Derived from `Root`'s `modal`, and must be *absent* on a non-modal dialog. |
-| `data-status`      | Component-owned. Derived from `createPresence`.                            |
+| `data-presence`    | Component-owned. Derived from `createPresence`.                            |
 | `ref`              | Merged with the component's internal ref — both fire.                      |
 
 `Backdrop` follows the same rule: `role` defaults to `"presentation"`, and yours wins.

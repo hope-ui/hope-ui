@@ -139,6 +139,23 @@ describe("Dialog", () => {
     dispose();
   });
 
+  it("exposes createPresence's status as `data-presence` on Popup and Backdrop", async () => {
+    // The house convention for every component composing `createPresence` — a consumer's
+    // exit-transition CSS keys off it. Not `data-status`: see presence.md.
+    const { dispose } = mount(() => <FullDialog />);
+
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
+    const dialog = page.getByRole("dialog").element();
+    const backdrop = page.getByTestId("backdrop").element();
+
+    // `entering` on the first frame, `entered` on the next animation frame. That attribute
+    // change is what makes a CSS transition actually fire.
+    await vi.waitFor(() => expect(dialog.getAttribute("data-presence")).toBe("entered"));
+    expect(backdrop.getAttribute("data-presence")).toBe("entered");
+
+    dispose();
+  });
+
   it("closes on Escape and restores focus to the trigger", async () => {
     const { dispose } = mount(() => <FullDialog />);
 

@@ -238,7 +238,7 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
     get role() {
       return props.role ?? ("presentation" as const);
     },
-    get "data-status"() {
+    get "data-presence"() {
       return presence.status();
     },
   });
@@ -310,7 +310,7 @@ export const Popup: Component<DialogPopupProps> = (props) => {
   // no accessible name at all. `role` and `id` were unoverridable for the same reason,
   // which made the APG alertdialog pattern unreachable.
   //
-  // `aria-modal` and `data-status` stay internally owned: both are derived from state the
+  // `aria-modal` and `data-presence` stay internally owned: both are derived from state the
   // consumer doesn't control, and `aria-modal` must be *absent* on a non-modal dialog.
   const merged = merge(props, {
     get id() {
@@ -328,7 +328,7 @@ export const Popup: Component<DialogPopupProps> = (props) => {
     get "aria-describedby"() {
       return props["aria-describedby"] ?? context.descriptionId();
     },
-    get "data-status"() {
+    get "data-presence"() {
       return presence.status();
     },
   });

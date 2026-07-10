@@ -11,7 +11,7 @@ function TestHarness(props: { present: () => boolean; withTransition?: boolean }
     <Show when={mounted()}>
       <div
         data-testid="popup"
-        data-status={status()}
+        data-presence={status()}
         ref={ref}
         style={
           props.withTransition
@@ -44,7 +44,9 @@ describe("createPresence", () => {
 
     setPresent(true);
     await vi.waitFor(() => expect(popupOf(container)).toBeTruthy());
-    await vi.waitFor(() => expect(popupOf(container)?.getAttribute("data-status")).toBe("entered"));
+    await vi.waitFor(() =>
+      expect(popupOf(container)?.getAttribute("data-presence")).toBe("entered"),
+    );
 
     dispose();
   });
@@ -67,7 +69,9 @@ describe("createPresence", () => {
     await vi.waitFor(() => expect(popupOf(container)).toBeTruthy());
     setPresent(false);
 
-    await vi.waitFor(() => expect(popupOf(container)?.getAttribute("data-status")).toBe("exiting"));
+    await vi.waitFor(() =>
+      expect(popupOf(container)?.getAttribute("data-presence")).toBe("exiting"),
+    );
     expect(popupOf(container)).toBeTruthy();
 
     await vi.waitFor(() => expect(popupOf(container)).toBeNull(), { timeout: 2000 });

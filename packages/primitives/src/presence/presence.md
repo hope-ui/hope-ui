@@ -22,10 +22,23 @@ function createPresence(options: {
   end event before unmounting.
 - `mounted` — whether the consumer should render its DOM output at all. Gate rendering
   on this, not on `present` directly, so the exit animation has something to animate.
-- `status` — drives a `data-status` attribute for CSS: `"entering"` on the first frame
-  after becoming present, flipping to `"entered"` on the next animation frame (so a CSS
-  transition keyed off the `entering`→`entered` attribute change actually fires);
-  `"exiting"` immediately when `present` becomes `false`; `"exited"` once unmounted.
+- `status` — the lifecycle status: `"entering"` on the first frame after becoming present,
+  flipping to `"entered"` on the next animation frame (so a CSS transition keyed off the
+  `entering`→`entered` attribute change actually fires); `"exiting"` immediately when
+  `present` becomes `false`; `"exited"` once unmounted.
+
+## The `data-presence` attribute
+
+**Every component that composes `createPresence` exposes `status()` as `data-presence`.**
+That's the house convention, and the only reason it's written down here rather than left to
+each component: `Dialog`, and every future Popover/Tooltip/Select, must agree, or a consumer's
+stylesheet stops working the moment they swap one overlay for another.
+
+Not `data-status`. That name says neither *whose* status nor *which* status, and it leaves the
+obvious name unavailable for a component that genuinely has a domain status of its own.
+
+The attribute is **component-owned** — a consumer cannot override it, because its value is
+derived entirely from state they don't control. See `Dialog.md`'s prop-precedence table.
 
 ## Behavior
 
@@ -43,12 +56,14 @@ initial `mounted`/`status` signal values are computed from `present()` synchrono
 
 ```tsx
 function Popup(props: { open: boolean }) {
-  let ref: HTMLDivElement | undefined;
-  const { mounted, status } = createPresence({ present: () => props.open, ref: () => ref });
+  // A real signal, not `let ref; ref={ref}`: the element is created as a reactive
+  // consequence of the same signal this primitive reads. See focus-trap.md.
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const { mounted, status } = createPresence({ present: () => props.open, ref });
 
   return (
     <Show when={mounted()}>
-      <div ref={ref} data-status={status()}>
+      <div ref={setRef} data-presence={status()}>
         content
       </div>
     </Show>
@@ -57,7 +72,7 @@ function Popup(props: { open: boolean }) {
 ```
 
 ```css
-[data-status="entering"] { opacity: 0; }
-[data-status="entered"] { opacity: 1; transition: opacity 150ms; }
-[data-status="exiting"] { opacity: 0; transition: opacity 150ms; }
+[data-presence="entering"] { opacity: 0; }
+[data-presence="entered"] { opacity: 1; transition: opacity 150ms; }
+[data-presence="exiting"] { opacity: 0; transition: opacity 150ms; }
 ```

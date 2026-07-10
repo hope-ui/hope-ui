@@ -12,7 +12,7 @@ export interface CreatePresenceOptions {
 export interface PresenceState {
   /** Whether the consumer should render its DOM output at all right now. */
   mounted: Accessor<boolean>;
-  /** Fine-grained lifecycle status, meant to drive a `data-status` attribute for CSS. */
+  /** Fine-grained lifecycle status, meant to drive a `data-presence` attribute for CSS. */
   status: Accessor<PresenceStatus>;
 }
 
@@ -29,7 +29,7 @@ function getExitAnimationDuration(element: HTMLElement): number {
  * as Base UI's transition-status handling, built fresh for solid-zero.
  *
  * Consumers gate their DOM output on `mounted()` and use `status()` to drive a
- * `data-status` attribute for CSS (`entering`/`entered`/`exiting`/`exited`). If the
+ * `data-presence` attribute for CSS (`entering`/`entered`/`exiting`/`exited`). If the
  * rendered element has no authored `transition`/`animation` duration, exit is immediate
  * (`mounted` flips to `false` in the same effect run) rather than waiting forever for an
  * end event that will never fire.

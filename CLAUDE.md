@@ -288,7 +288,7 @@ actual installed package):
   puts the internal object last, so a getter returning `undefined` *erases* a
   consumer-supplied `aria-labelledby`, leaving the dialog with no accessible name. Write
   `props["aria-labelledby"] ?? context.titleId()`. Only props derived from state the
-  consumer doesn't control (`aria-modal`, `data-status`) stay component-owned. See
+  consumer doesn't control (`aria-modal`, `data-presence`) stay component-owned. See
   `Dialog.md`'s "Prop precedence" table for the house rule.
 - **A signal write is not visible to a plain read until the next flush — in the *client*
   build only.** `setV(2); v()` returns the *old* value under `solid-js`'s client/dev build
