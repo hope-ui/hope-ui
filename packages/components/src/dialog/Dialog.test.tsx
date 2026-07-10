@@ -38,6 +38,13 @@ describe("Dialog SSR", () => {
     expect(html).toMatch(/aria-expanded="false"/);
   });
 
+  it("omits aria-controls from the closed trigger, so the server HTML has no dangling IDREF", async () => {
+    // `Dialog.Portal` never renders server-side, so there is no popup element for a closed
+    // (or even a `defaultOpen`) dialog's `aria-controls` to point at in the SSR output.
+    const html = await renderToStringAsync(() => <FullDialog />);
+    expect(html).not.toMatch(/aria-controls/);
+  });
+
   it("omits portaled content from the SSR output even when defaultOpen", async () => {
     const html = await renderToStringAsync(() => <FullDialog defaultOpen />);
     expect(html).not.toContain("Dialog title");

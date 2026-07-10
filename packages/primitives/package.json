@@ -1,7 +1,7 @@
 {
   "name": "@solid-zero/primitives",
   "version": "0.0.0",
-  "description": "Shared behavior kernel for solid-zero components (internal use across component packages)",
+  "description": "Public behavior kernel for solid-zero: composable SolidJS primitives for rendering, focus, dismissal, presence, and ARIA wiring",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

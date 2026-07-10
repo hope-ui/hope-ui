@@ -28,7 +28,7 @@ pnpm install              # install workspace deps
 pnpm build                # turbo: build all packages (Vite library mode, ESM + per-package .d.ts)
 pnpm lint                 # biome check .
 pnpm format               # biome format --write .
-pnpm typecheck            # turbo: tsc --noEmit per package (each depends on that package's build)
+pnpm typecheck            # turbo: tsc --noEmit per package (reads sibling src, never dist — see below)
 pnpm test                 # vitest run --project=unit   (node env, pure-logic primitives)
 pnpm test:browser         # vitest run --project=browser (real Chromium via Playwright)
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
@@ -73,8 +73,10 @@ inconsistent (concentrated gaps in exactly the highest a11y-risk components) and
 has no automated tests at all — see `docs/plan.md` for the specifics.
 
 Stories are also where known-but-unfixed behavior gets pinned somewhere a human can see
-it: several Dialog stories are named `(… — known bug)` and reproduce a specific finding
-on purpose. Don't "fix" a story by deleting it; fix the component and rename the story.
+it. Don't "fix" a story by deleting it; fix the component and rename the story. Dialog's
+`Modal with an unpositioned Popup (content is unclickable — by design)` is the current
+example: it reproduces a real, documented consequence of the pointer-blocking
+`ModalBackdrop` rather than a defect, and exists so the failure mode is visible somewhere.
 
 Every component/primitive test that renders real DOM should also call
 `expectNoA11yViolations` (from `@solid-zero/internal-test-utils`) at least once, so a
@@ -127,17 +129,51 @@ the gap as permanent.
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
-- `packages/primitives` (`@solid-zero/primitives`) — the shared behavior kernel.
-  Nothing here is duplicated per-component; everything else composes it. Currently:
+- `packages/primitives` (`@solid-zero/primitives`) — the shared behavior kernel, and
+  **public, supported API**: its exported signatures are the public contract, not an
+  implementation detail free to churn. Consumers compose it to build components this
+  library doesn't ship. Nothing here is duplicated per-component; everything else composes
+  it. Currently:
   `renderElement` (the render-prop/`as`-polymorphism primitive every public component
   uses instead of hand-rolling its own polymorphic-`as` type system — it also owns ref
   merging; modeled on Base UI's `useRender` idea, not its code — see
   `packages/primitives/src/render/render.md`), `withDefaults` (the *only* correct way to
   apply prop defaults under 2.0 — see the `merge` bullet below), `createComponentContext`
   (thin `createContext`/`useContext` wrapper with a friendlier missing-Provider error),
-  `createFocusTrap`, `createDismissable`, `createScrollLock`, and `createPresence` (built
-  fresh for Dialog — see each primitive's colocated `.md` for API details, and the
-  ref/`createEffect` timing gotcha below before writing another one).
+  `composeEventHandlers`, `createControllableState`, `createRegisteredId`,
+  `createRegisteredElement`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`,
+  `createDismissable`, `createScrollLock`, `createPresence`, and `ModalBackdrop` (see each
+  primitive's colocated `.md` for API details, and the ref/`createEffect` timing gotcha below
+  before writing another one).
+
+  **Modality is four mechanisms, not one**, and each was verified against the installed
+  Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)
+  *and* `inert` (focus order + hit testing) to everything outside the popup; `createFocusTrap`
+  handles Tab cycling inside it; `ModalBackdrop` (the kernel's only component) blocks the
+  pointer unconditionally. None is redundant: `aria-hidden` alone leaves the background
+  focusable and clickable; `inert` alone does *not* take content out of the accessibility tree
+  as far as ARIA tooling is concerned (a role query still finds an `inert` button, but not an
+  `aria-hidden` one); and `inert` only blocks the pointer on elements the layer actually
+  marked, so an element inserted before the `MutationObserver` sees it would be clickable
+  without the backdrop. floating-ui's `markOthers` layers the same two attributes for the same
+  reason. Any future modal layer (Popover, Select) composes all four — that's why
+  `ModalBackdrop` is in the kernel rather than inside Dialog. A modal popup must be positioned,
+  or it paints beneath the backdrop; see `modal-backdrop.md`.
+
+  Two consequences that bite: `ModalBackdrop` and any consumer backdrop must be **spared** from
+  `inert` (an inert element is transparent to hit testing, so a backdrop that hid itself would
+  silently stop blocking anything), and `createHideOutside` must do **nothing** until its
+  `target` resolves — a run without the popup in the spared set makes the popup itself inert,
+  which blurs whatever the focus trap just focused and strands focus on `<body>` for good.
+
+  Because it's public API, **no primitive may keep cross-instance state at module scope.**
+  A consumer can end up with two installed copies (`dependencies` doesn't force
+  deduplication), and two module-scope ref counts each believing they own `document.body`
+  is an unreproducible field bug. `createScrollLock` and `createHideOutside` store
+  their counts on `document.body`/the element under a `Symbol.for(...)` key, which resolves
+  through the cross-realm global symbol registry, so every copy reads the same slot.
+  `scroll-lock.browser.test.tsx` pins this by importing a genuinely separate module
+  instance (`./scroll-lock?instance=2`, which Vite serves as a distinct module).
 - `packages/components` (`@solid-zero/components`) — every public component, one
   subpath export each (`@solid-zero/components/button`, `@solid-zero/components/dialog`,
   ...) rather than one package per component or per component-family. No root `.`
@@ -261,6 +297,23 @@ actual installed package):
   `scroll-lock.browser.test.tsx`, `defaults.test.ts`). This bites hardest when a snippet is
   prototyped with plain `node` (which resolves the server build) and then moved into a
   Vitest project (which resolves the client build) — the behavior silently inverts.
+- **`createSignal(fn)` creates a *memo*, not a signal holding a function.** 2.0 overloads it:
+  `createSignal<T>(value: Exclude<T, Function>, options?)` and
+  `createSignal<T>(fn: ComputeFunction<T>, options?)`. So a generic primitive that does
+  `createSignal(options.defaultValue())` silently invokes a function-typed value and stores
+  its return. `createControllableState` boxes its value (`{ value: T }` plus an `equals` that
+  unwraps with Solid's own `isEqual`) specifically to dodge this; do the same in any other
+  generic `createSignal<T>` wrapper.
+- **Sibling effects run *and clean up* in creation order — cleanups are not reversed.**
+  Verified against the installed beta. Two consequences, both live in `createFocusRestore`
+  (see `focus-restore.md`): a primitive that must snapshot state before a sibling mutates it
+  has to be *created first*; and a primitive whose cleanup must run *after* a sibling's
+  cleanup has to defer the work by a `queueMicrotask` (effect cleanups are synchronous within
+  a flush, so a microtask queued from the first cleanup lands after all of them). Focus
+  restore needs both: it snapshots `document.activeElement` before `createFocusTrap` moves
+  focus, and restores after the trap has removed its `focusin` listener — otherwise the
+  still-live trap yanks focus straight back, since `.focus()` dispatches `focusin`
+  synchronously.
 - **`onMount` → `onSettled`**, `createEffect` can take a split `(depsFn, computeFn)`
   form, `createContext` returns the Provider component directly (`<XContext value={...}>`,
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
@@ -283,7 +336,9 @@ actual installed package):
   ```
   General rule: any primitive/component where a descendant needs to register something
   into an ancestor-owned signal must do so via `onSettled` (or another deferred
-  mechanism), never directly in the descendant's synchronous render body. Watch for
+  mechanism), never directly in the descendant's synchronous render body. This is packaged
+  as `createRegisteredId` in `@solid-zero/primitives`; use it rather than re-deriving the
+  deferral. Watch for
   SSR/hydration mismatches when applying this outside a case like Dialog's, where the
   writing component (`Title`/`Description`) only ever renders inside a `Portal`-guarded
   subtree that itself never renders server-side — so there's no server-rendered
@@ -300,6 +355,28 @@ actual installed package):
   reappears, check this setting first before assuming a merge/omit bug.
 - Browser tests import `page` from `vitest/browser`, not the deprecated
   `@vitest/browser/context`.
+
+## In development, `@solid-zero/*` always resolves to `src` — never to a sibling's `dist`
+
+`package.json#exports` points at `dist/` because that's what consumers install. Nothing
+in this repo may follow it. A stale `dist/` silently masquerades as the current API: add an
+export to `@solid-zero/primitives` and, until someone rebuilds, `@solid-zero/components`
+can't see it — or worse, keeps compiling against the old implementation and its tests pass.
+
+Three places redirect to source, and all three must stay in sync when a package is added:
+- `tsconfig.base.json`'s `paths` (editor + `tsc --noEmit`). Relative paths in an inherited
+  config resolve against the config that declares them, so these are repo-root-relative.
+- `vitest.config.ts`'s `resolve.alias` (both projects).
+- `.storybook/main.ts`'s `viteFinal` alias.
+
+`turbo.json`'s `typecheck` task therefore has **no** `dependsOn: ["^build"]`. If you find
+yourself running a build to make an import resolve, the resolution config is what's wrong.
+
+The single exception is `vite-plugin-dts`, which honours `paths` when it *emits*: without
+`compilerOptions: { paths: {} }` in `vite.config.base.ts` the published `Dialog.d.ts` gets
+`import { RenderProp } from '../../packages/primitives/src/index.ts'`, a path that doesn't
+exist in the tarball. The build artifact resolves through `exports` (i.e. `dist`); only
+development resolves to source.
 
 ## Build/test/Storybook share one Solid compiler config
 

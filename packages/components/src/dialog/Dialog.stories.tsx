@@ -63,13 +63,17 @@ export const Default: Story = {
 };
 
 /**
- * KNOWN BROKEN — Wave 2 (finding 5). `modal={false}` disables the focus trap, and because
- * focus *restore* lives inside `createFocusTrap`'s cleanup, it disables restore too. Open
- * this with the keyboard, press Escape, and observe focus land on `<body>` instead of
- * returning to the trigger. `Dialog.md`'s keyboard table promises otherwise.
+ * A non-modal dialog: dismissable, and it still returns focus, but it never traps focus,
+ * locks scroll, or makes the page behind inert. The background button stays clickable and
+ * stays in the accessibility tree.
+ *
+ * Tab into the dialog, press Escape, and focus returns to the trigger. Restore lives in
+ * `createFocusRestore`, gated on `open()`; the trap is separate and gated on
+ * `open() && modal()`. (Before Wave 2 restore lived *inside* `createFocusTrap`'s cleanup, so
+ * a non-modal dialog stranded focus on `<body>` — an APG violation.)
  */
 export const NonModal: Story = {
-  name: "Non-modal (focus is not restored — known bug)",
+  name: "Non-modal (restores focus, page stays live)",
   render: () => (
     <>
       <PageBehind />
@@ -79,7 +83,8 @@ export const NonModal: Story = {
           <Dialog.Popup style={popupStyle}>
             <Dialog.Title>Non-modal</Dialog.Title>
             <Dialog.Description>
-              Escape should return focus to the trigger. It doesn't.
+              Tab to me, then press Escape: focus returns to the trigger. The background button
+              behind me still works.
             </Dialog.Description>
             <Dialog.Close>Close</Dialog.Close>
           </Dialog.Popup>
@@ -90,13 +95,17 @@ export const NonModal: Story = {
 };
 
 /**
- * KNOWN BROKEN — Wave 2 (finding 6). `Dialog.Backdrop` is optional, and nothing else makes
- * outside content inert: no `inert`, no `aria-hidden`, no pointer-event blocking. With the
- * dialog open, the background button is still clickable. `aria-modal="true"` alone does not
- * stop a pointer, and has known VoiceOver/Safari gaps for assistive tech too.
+ * A modal dialog with no `Dialog.Backdrop` at all. The page behind is still fully inert:
+ * `Dialog.Portal` always renders the kernel's invisible `ModalBackdrop` when `modal`, and
+ * `createHideOutside` marks everything outside the popup `aria-hidden` and `inert`.
+ *
+ * Try clicking the background button — nothing happens. Open the a11y addon panel: the
+ * background is out of the accessibility tree, and only the dialog is reachable.
+ * (Before Wave 2, `aria-modal="true"` was the whole story, and a mouse clicked straight
+ * through.)
  */
 export const ModalWithoutBackdrop: Story = {
-  name: "Modal without Backdrop (background is clickable — known bug)",
+  name: "Modal without Backdrop (background is inert)",
   render: () => (
     <>
       <PageBehind />
@@ -105,8 +114,40 @@ export const ModalWithoutBackdrop: Story = {
         <Dialog.Portal>
           <Dialog.Popup style={popupStyle}>
             <Dialog.Title>Modal, no backdrop</Dialog.Title>
-            <Dialog.Description>Try clicking the background button behind me.</Dialog.Description>
+            <Dialog.Description>
+              Try clicking the background button behind me. It's unreachable by pointer and by
+              assistive technology, even though I ship no backdrop.
+            </Dialog.Description>
             <Dialog.Close>Close</Dialog.Close>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
+  ),
+};
+
+/**
+ * A modal `Dialog.Popup` **must be positioned**. The pointer-blocking `ModalBackdrop` is
+ * `position: fixed`, and CSS paints positioned elements above non-positioned ones regardless
+ * of DOM order — so a `position: static` popup ends up *underneath* it and its own buttons
+ * stop responding to the mouse. Every other story positions the popup; this one doesn't, on
+ * purpose, so the failure mode is visible somewhere.
+ */
+export const UnpositionedModalPopup: Story = {
+  name: "Modal with an unpositioned Popup (content is unclickable — by design)",
+  render: () => (
+    <>
+      <PageBehind />
+      <Dialog.Root>
+        <Dialog.Trigger>Open unpositioned dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Popup style={{ "background-color": "white", color: "#111", padding: "1.5rem" }}>
+            <Dialog.Title>No position</Dialog.Title>
+            <Dialog.Description>
+              My Close button is beneath the ModalBackdrop. Escape still works. Give the popup
+              `position: fixed` and it comes back.
+            </Dialog.Description>
+            <Dialog.Close>Close (does nothing)</Dialog.Close>
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>

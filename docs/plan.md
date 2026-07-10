@@ -34,13 +34,21 @@ strategy" for the full rationale.
 `render` prop is function-only (a JSX element could only ever *drop* the computed props);
 `renderElement` owns ref merging; defaults go through `withDefaults` rather than `merge`;
 and a component's internal ARIA values fall back to the consumer's rather than overwriting
-them. Storybook is now the visual harness, with a story required per component. Still open,
-in priority order: split focus-*restore* out of `createFocusTrap` (Popover and Tooltip are
-non-modal and need restore without a trap), make modal dialogs actually inert
-(`createAriaHideOutside`), move `createScrollLock`'s ref-count off module scope, and lift
-`composeEventHandlers` / `createControllableState` / `createRegisteredId` out of
-`Dialog.tsx` into the kernel. **Popover must not be started before those land** — it is the
-component that would otherwise replicate all five.
+them. Storybook is now the visual harness, with a story required per component.
+
+**The kernel has since been reshaped, and Popover is unblocked.** Focus *restore* is its own
+primitive (Popover and Tooltip are non-modal and need restore without a trap); modal dialogs
+are genuinely inert (`createHideOutside` applies `aria-hidden` + `inert`, `ModalBackdrop`
+blocks the pointer); `createScrollLock`'s ref count moved off module scope; and
+`composeEventHandlers` / `createControllableState` / `createRegisteredId` /
+`createRegisteredElement` were lifted out of `Dialog.tsx`, which now owns no helper a second
+component would want. `Dialog.Trigger` emits `aria-controls` only while open, and respects
+`event.preventDefault()` as a cancel channel.
+
+Remaining before SolidJS 2.0 stable lands: the migration-insurance work in
+`docs/migration-2.0-stable.md` — characterization tests pinning the `solid-js`/`@solidjs/web`
+internals this codebase leans on, driving `STRICT_READ_UNTRACKED` to zero and then failing on
+it, and a CI grep enforcing the no-literal-host-JSX invariant that SSR silently depends on.
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -172,21 +180,44 @@ becomes an actual goal.
 
 **Three layers, composition over inheritance:**
 
-1. **Behavior kernel** (`@solid-zero/primitives`, internal, never duplicated) — Solid 2.0
-   primitives, not hooks, built directly on `@solidjs/signals`/stores:
+1. **Behavior kernel** (`@solid-zero/primitives`, **public API**, never duplicated) — Solid
+   2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores:
    `createListState`/`createSelectionState`/`createCollection` (port react-stately's
    *algorithms* directly from react-stately, not from Kobalte's port of them) as
    **stores** using 2.0's draft-first setters and `createProjection` for derived views,
-   `createFocusTrap`, `createDismissable`, `createRovingFocus`/`createTypeahead` (one
-   shared arrow-key/typeahead primitive, a true singleton across every list-like
-   component, not per-component-family logic), `createFloating` (wraps
-   `@floating-ui/dom`), `createScrollLock`, `createPresence`. Side-effectful wiring
-   should use 2.0's split `createEffect(depsFn, computeFn)` form and `onSettled` (not
-   `onMount`, which no longer exists in 2.0).
-   **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence`.
-   Dialog composes `createFocusTrap` + `createDismissable` + `createScrollLock` +
-   `createPresence`. Popover must never depend on Dialog — this directly avoids the
-   Corvu coupling smell above.
+   `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`,
+   `createRovingFocus`/`createTypeahead` (one shared arrow-key/typeahead primitive, a true
+   singleton across every list-like component, not per-component-family logic),
+   `createFloating` (wraps `@floating-ui/dom`), `createScrollLock`, `createPresence`,
+   `createControllableState`, `createRegisteredId`, `composeEventHandlers`, `withDefaults`,
+   `renderElement`, and `ModalBackdrop` (the one component in the kernel: the pointer-blocking
+   third of modality, alongside `createHideOutside` for assistive technology + the focus
+   order, and `createFocusTrap` for Tab cycling), plus `createRegisteredElement`.
+   Side-effectful wiring should use 2.0's split
+   `createEffect(depsFn, computeFn)` form and `onSettled` (not `onMount`, which no longer
+   exists in 2.0).
+
+   This package is **published and supported**: its exported signatures are the public
+   contract, not an implementation detail free to churn. Consumers compose it to build
+   components this library doesn't ship, exactly as `@solid-zero/components` does. Two
+   consequences the code must honour:
+   - **No primitive may keep cross-instance state at module scope.** A consumer can end up
+     with two installed copies (a plain `dependencies` entry doesn't force deduplication),
+     and two module-scope counters each believing they own the body is an unreproducible
+     field bug. `createScrollLock` and `createHideOutside` key their ref counts off
+     `document.body`/the element under a `Symbol.for`, which resolves through the
+     cross-realm global symbol registry.
+   - Every primitive needs its own colocated `.md` stating the contract, since that doc is
+     what a consumer reads.
+
+   **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence` +
+   `createFocusRestore`. Dialog composes `createFocusTrap` + `createFocusRestore` +
+   `createHideOutside` + `ModalBackdrop` + `createDismissable` + `createScrollLock` +
+   `createPresence`. Popover must never depend on Dialog — this directly avoids the Corvu
+   coupling smell above. Note that focus *restore* is deliberately a separate primitive from
+   the focus *trap*: Popover and Tooltip are non-modal and need restore without a trap, and
+   welding the two together is precisely how a non-modal Dialog came to strand focus on
+   `<body>`.
 
 2. **Component wiring kernel** — thinner than under 1.x, because 2.0's `createContext`
    already returns the Provider component directly and `useContext` already throws by
@@ -231,6 +262,16 @@ Concrete rules every primitive/component must follow:
   etc.) must be generated with `createUniqueId`** (deterministic, SSR-stable) — never
   `Math.random()`/a module-level counter/anything that can produce different values on
   server vs client and cause a hydration mismatch.
+- **An ARIA IDREF must never point at an element that isn't in the DOM.** `Dialog.Trigger`
+  therefore emits `aria-controls` **only while open**, because `Popup` is unmounted while
+  closed. The audit originally decided the opposite, on the grounds that Base UI's
+  `DialogTrigger` emits it unconditionally; that reasoning was wrong. Verified against
+  axe-core 4.12: a dangling `aria-controls` reports `aria-valid-attr-value` (as `incomplete`)
+  whether `aria-expanded` is `"true"` or `"false"`, and reports nothing once removed. Every
+  future component with an unmounted popup (Popover, Tooltip, Select) does the same.
+
+  Corollary: axe must run against the **closed** state too. An open-state-only a11y check
+  structurally cannot see this class of bug — which is exactly why it survived Phase 0.
 - **Portals do NOT degrade gracefully server-side in this `@solidjs/web` beta —
   confirmed by direct inspection, not assumed.** `@solidjs/web`'s server build
   (`dist/server.js`) implements `Portal` as `function Portal() { throw new Error("Portal

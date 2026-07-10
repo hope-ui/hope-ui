@@ -67,14 +67,21 @@ describe("createFocusTrap", () => {
     dispose();
   });
 
-  it("restores focus to the previously focused element on deactivation", async () => {
+  it("does not restore focus on deactivation — that is createFocusRestore's job", async () => {
+    // The trap used to own focus restore, behind a `returnFocus` option. Splitting them is
+    // what lets a non-modal overlay (Popover, Tooltip, `<Dialog modal={false}>`) restore
+    // focus without trapping it. See focus-restore.md.
     const { dispose } = mount(() => <TestHarness />);
 
     await userEvent.click(page.getByTestId("toggle"));
     await expect.element(page.getByTestId("first")).toHaveFocus();
 
+    // Clicking the toggle focuses it, the still-live trap pulls focus back to `first`, and
+    // only then does the click handler deactivate. Focus therefore stays inside the
+    // container: nothing returns it to the toggle.
     await userEvent.click(page.getByTestId("toggle"));
-    await expect.element(page.getByTestId("toggle")).toHaveFocus();
+    await expect.element(page.getByTestId("first")).toHaveFocus();
+    await expect.element(page.getByTestId("toggle")).not.toHaveFocus();
 
     dispose();
   });

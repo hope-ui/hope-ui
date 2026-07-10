@@ -64,11 +64,22 @@ export function createViteConfig(
       dts({
         entryRoot: join(packageDir, "src"),
         outDir: join(packageDir, "dist"),
-        // `tsconfig.base.json` turns declaration maps on, but `package.json#files` is
-        // `["dist"]` — so a published `Dialog.d.ts.map` would point at `../../src/…`,
-        // which isn't in the tarball, and every consumer "go to definition" lands on a
-        // missing file. Off for the published artifact; nothing in-repo reads them.
-        compilerOptions: { declarationMap: false },
+        compilerOptions: {
+          // `tsconfig.base.json` turns declaration maps on, but `package.json#files` is
+          // `["dist"]` — so a published `Dialog.d.ts.map` would point at `../../src/…`,
+          // which isn't in the tarball, and every consumer "go to definition" lands on a
+          // missing file. Off for the published artifact; nothing in-repo reads them.
+          declarationMap: false,
+          // The one place `@solid-zero/*` must *not* resolve to source. `tsconfig.base.json`
+          // maps those specifiers to `packages/*/src` so the editor and `tsc --noEmit` never
+          // read a stale sibling `dist/`. `vite-plugin-dts` honours `paths` when it emits,
+          // which produced `import { RenderProp } from '../../packages/primitives/src/index.ts'`
+          // inside the published `Dialog.d.ts` — a path that doesn't exist in the tarball.
+          // Clearing them here sends the emit back through `package.json#exports`, i.e. the
+          // sibling's `dist/index.d.ts`, which turbo's `build.dependsOn: ["^build"]` has
+          // already produced.
+          paths: {},
+        },
         // Test and story files live beside their source under `src/`, and `vite-plugin-dts`
         // mirrors that tree — without these globs it emits `Button.stories.d.ts` &c. into
         // the published `dist/`.

@@ -7,8 +7,6 @@ export interface CreateFocusTrapOptions {
   ref: Accessor<HTMLElement | null | undefined>;
   /** Explicit element to focus on activation, instead of the first focusable descendant. */
   initialFocus?: Accessor<HTMLElement | null | undefined>;
-  /** Whether to restore focus to the previously focused element on deactivation. Default `true`. */
-  returnFocus?: boolean;
 }
 
 const FOCUSABLE_SELECTOR = [
@@ -32,14 +30,18 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 }
 
 /**
- * Traps Tab/Shift+Tab focus cycling within a container while `active`, refocuses the
- * container if focus is moved outside it programmatically, and restores focus to the
- * previously focused element on deactivation. Gated entirely inside `createEffect`, so
- * it naturally never runs during SSR (no DOM access happens outside the effect).
+ * Traps Tab/Shift+Tab focus cycling within a container while `active`, and refocuses the
+ * container if focus is moved outside it programmatically. Gated entirely inside
+ * `createEffect`, so it naturally never runs during SSR (no DOM access happens outside the
+ * effect).
+ *
+ * **Restoring focus on deactivation is not this primitive's job** — that's
+ * `createFocusRestore`, which is a separate concern precisely because a non-modal overlay
+ * (Popover, Tooltip, a non-modal Dialog) wants focus returned *without* being trapped.
+ * Compose both, and create `createFocusRestore` first; see `focus-restore.md` for the two
+ * ordering constraints that depend on it.
  */
 export function createFocusTrap(options: CreateFocusTrapOptions): void {
-  let previouslyFocused: HTMLElement | null = null;
-
   createEffect(
     // Track both `active()` and `ref()` in the compute function. `ref` must be a real
     // signal accessor (not a closure over a plain `let`): when the container is only
@@ -52,8 +54,6 @@ export function createFocusTrap(options: CreateFocusTrapOptions): void {
     () => [options.active(), options.ref()] as const,
     ([active, container]) => {
       if (!active || !container) return;
-
-      previouslyFocused = document.activeElement as HTMLElement | null;
 
       const initial = options.initialFocus?.() ?? getFocusableElements(container)[0] ?? container;
       let addedTabIndex = false;
@@ -100,7 +100,6 @@ export function createFocusTrap(options: CreateFocusTrapOptions): void {
         document.removeEventListener("keydown", handleKeyDown);
         document.removeEventListener("focusin", handleFocusIn);
         if (addedTabIndex) container.removeAttribute("tabindex");
-        if (options.returnFocus !== false) previouslyFocused?.focus();
       };
     },
   );
