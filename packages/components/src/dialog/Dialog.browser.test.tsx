@@ -1,10 +1,20 @@
 import { expectNoA11yViolations, mount } from "@solid-zero/internal-test-utils";
-import { hydrate, renderToStringAsync } from "@solidjs/web";
+import { hydrate } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
+import ssrFixture from "./__fixtures__/dialog-ssr.html?raw";
 import { Dialog } from "./Dialog";
 
+/**
+ * Structurally identical to `Dialog.ssr.test.tsx`'s `FullDialog`, which produces the fixture
+ * the hydration tests below consume. Hydration keys are allocated by walking the component
+ * tree, so inserting a component before `Dialog.Trigger` here — even one that renders nothing
+ * — shifts the trigger's key and fails hydration.
+ *
+ * The extra props on `Backdrop`/`Popup` are safe: both live inside `Dialog.Portal`, which
+ * renders nothing server-side and nothing at all while closed.
+ */
 function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
   return (
     <Dialog.Root onOpenChange={props.onOpenChange}>
@@ -676,74 +686,86 @@ describe("Dialog", () => {
 
     dispose();
   });
+});
 
-  // KNOWN GAP, and the root cause is now measured rather than guessed. Two independent
-  // things block this test; both were reproduced during Wave 3, and the *previously
-  // recorded* explanations ("separate Vite builds → different `@solidjs/web` module
-  // instances", and "the hand-rolled `_$HY.r` registry is empty") are both wrong. See
-  // docs/migration-2.0-stable.md §4.
-  //
-  //  1. `renderToStringAsync` does not exist in the browser. `@solidjs/web`'s client build
-  //     defines it as `throwInBrowser(renderToStringAsync)`, which `console.error`s and
-  //     **returns `undefined`**. `container.innerHTML = undefined` writes the literal string
-  //     "undefined", so there are no `_hk` nodes to hydrate against — which is the entire
-  //     "Unable to find DOM nodes for hydration key" error. The test's own `consoleError` spy
-  //     was swallowing the "not supported in the browser" message that says so.
-  //
-  //  2. Given *genuine* server HTML, Dialog still cannot round-trip through these two Vitest
-  //     projects, because it calls `createUniqueId()`. `solid-js`'s two builds allocate ids
-  //     from different counters:
-  //       - server build:  `createUniqueId()` → `getNextChildId(owner)`      (consumes a child id)
-  //       - client build:  `createUniqueId()` → `sharedConfig.hydrating`
-  //                                             ? `sharedConfig.getNextContextId()` (consumes one)
-  //                                             : `` `cl-${counter++}` ``       (consumes none)
-  //     `vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project but
-  //     leaves `solid-js` on its browser build, so the SSR render takes the `cl-…` branch and
-  //     consumes nothing, while this browser hydrate takes `getNextContextId()` and consumes
-  //     one. Every hydration key after `Dialog.Root`'s `createUniqueId()` is off by one.
-  //     Isolated to confirm: one bare `createUniqueId()` added to a component that otherwise
-  //     hydrates cleanly is enough to flip it to "Hydration Mismatch".
-  //
-  // The harness itself is fine: `Button.browser.test.tsx` now runs a real SSR → hydrate
-  // round-trip against a committed fixture, reusing the server's DOM node, with the same
-  // hand-rolled `_$HY`. Nothing about separate Vite builds prevents hydration.
-  //
-  // TO UNBLOCK: the SSR half must resolve `solid-js`'s **server** build too, not just
-  // `@solidjs/web`'s — i.e. a third Vitest project (or a Node script) whose alias covers both,
-  // producing the fixture this test would hydrate. The unit project can't simply switch: its
-  // reactivity tests depend on client-build semantics (deferred writes, real effects).
-  //
-  // Skipped rather than asserted red so it doesn't block the pipeline; the *actual*
-  // SSR-doesn't-crash requirement is already verified for real in Dialog.test.tsx.
-  it.skip("hydrates cleanly with no mismatch warnings and stays interactive", async () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+describe("Dialog hydration", () => {
+  /**
+   * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from
+   * `generateHydrationScript()`, which is a no-op (`voidFn`) in `@solidjs/web`'s client build,
+   * so a browser test has to supply it. Only `.done`, `.completed` and `.events` are read on
+   * this path. `.r` is the *resource/asset* registry behind `sharedConfig.load`; the element
+   * registry `getNextElement()` consults is built separately by `gatherHydratable()`, which
+   * scans the container for `[_hk]` attributes. An empty `.r` is therefore correct.
+   */
+  function bootstrapHydration(): () => void {
+    const globals = globalThis as { _$HY?: unknown };
+    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
+    return () => {
+      globals._$HY = undefined;
+    };
+  }
 
-    // Blocker 1 above: in the browser this returns `undefined`. A working version reads a
-    // fixture produced by a genuine server render, as `Button.browser.test.tsx` does.
-    const html = await renderToStringAsync(() => <FullDialog />);
+  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
     const container = document.createElement("div");
     container.innerHTML = html;
     document.body.appendChild(container);
+    return { container, remove: () => container.remove() };
+  }
 
-    (window as unknown as { _$HY?: unknown })._$HY = {
-      events: [],
-      completed: new WeakSet(),
-      r: {},
-    };
+  it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
+    // `ssrFixture` is genuine server output: `Dialog.ssr.test.tsx` asserts it byte-for-byte
+    // against a real `renderToStringAsync` in the `ssr` project, the one place where both
+    // `solid-js` and `@solidjs/web` resolve to their server builds. Rendering it here instead
+    // would be worthless — the client build's `renderToStringAsync` returns `undefined`.
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
 
+    const serverTrigger = container.querySelector("button");
     const dispose = hydrate(() => <FullDialog />, container);
 
     expect(consoleError).not.toHaveBeenCalled();
     expect(consoleWarn).not.toHaveBeenCalled();
 
-    const trigger = page.getByRole("button", { name: "Open dialog" });
-    await userEvent.click(trigger);
+    // Hydration reuses the server's node. A fallback to a client render would leave two
+    // triggers here, or one that isn't the node the server sent.
+    expect(container.querySelectorAll("button")).toHaveLength(1);
+    expect(container.querySelector("button")).toBe(serverTrigger);
+
+    dispose();
+    remove();
+    teardownHydration();
+    consoleError.mockRestore();
+    consoleWarn.mockRestore();
+  });
+
+  it("leaves the hydrated trigger interactive, and mounts the portal client-side", async () => {
+    // The whole point of `Dialog.Portal`'s `isServer` guard: portaled content is absent from
+    // the SSR HTML, and appears on the client only once the dialog opens.
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
+
+    const dispose = hydrate(() => <FullDialog />, container);
+    expect(page.getByRole("dialog").query()).toBeNull();
+
+    await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
     dispose();
-    container.remove();
-    consoleError.mockRestore();
-    consoleWarn.mockRestore();
+    remove();
+    teardownHydration();
+  });
+
+  it("has no accessibility violations after hydrating", async () => {
+    const teardownHydration = bootstrapHydration();
+    const { container, remove } = mountServerHtml(ssrFixture);
+
+    const dispose = hydrate(() => <FullDialog />, container);
+    await expectNoA11yViolations(container);
+
+    dispose();
+    remove();
+    teardownHydration();
   });
 });

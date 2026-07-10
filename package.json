@@ -8,6 +8,7 @@
   "scripts": {
     "build": "turbo run build",
     "test": "vitest run --project=unit",
+    "test:ssr": "vitest run --project=ssr",
     "test:browser": "vitest run --project=browser",
     "lint": "biome check .",
     "format": "biome format --write .",

@@ -1,26 +1,20 @@
 # SSR fixtures
 
-`button-ssr.html` is the **genuine server output** of `renderToStringAsync(() => <Button>Click me</Button>)`.
+`button-ssr.html` is the **genuine server output** of
+`renderToStringAsync(() => <Button>Click me</Button>)`.
 
-It exists because a real SSR → hydrate round-trip cannot be written inside a single Vitest
-project. Two files consume it, and between them they make it a real test rather than a
-snapshot nobody reads:
+It exists because an SSR → hydrate round-trip cannot happen inside a single Vitest project:
+the server render needs `solid-js` and `@solidjs/web` resolved to their **server** builds, and
+the hydrate needs a real browser with their **client** builds. So two projects share one file:
 
-- `../Button.test.tsx` (unit project — `@solidjs/web` resolves to its **server** build) asserts
-  the fixture is byte-for-byte what the server actually renders today. Change `Button.tsx` in a
-  way that alters its markup and this goes red.
-- `../Button.browser.test.tsx` (browser project — `@solidjs/web` resolves to its **client**
-  build) hydrates that exact string with `hydrate()` and asserts there is no mismatch, no
-  duplicated DOM, and that the result is interactive.
-
-Neither project can do both halves: the client build's `renderToStringAsync` is a stub that
-`console.error`s and returns `undefined`, and the server build has no DOM to hydrate into.
+- `../Button.ssr.test.tsx` (the `ssr` project) asserts the fixture is byte-for-byte what the
+  server actually renders today. Change `Button.tsx` in a way that alters its markup and this
+  goes red.
+- `../Button.browser.test.tsx` (the `browser` project) hydrates that exact string and asserts
+  there is no mismatch, no duplicated DOM, and that the result is interactive.
 
 The `_hk=…` attribute is Solid's hydration key. `hydrate()` collects them with
 `gatherHydratable()`, which does `element.querySelectorAll("*[_hk]")` — so the fixture must
-keep them verbatim. Do not prettify this file.
+keep them verbatim. **Do not prettify this file, and do not add a trailing newline.**
 
-**Dialog has no such fixture**, and its hydration test is `it.skip`'d. See
-`docs/migration-2.0-stable.md` §4 for the verified reason: any component calling
-`createUniqueId()` cannot round-trip through these two projects, because `solid-js`'s server
-and client builds allocate ids from different counters.
+See `docs/testing.md`.

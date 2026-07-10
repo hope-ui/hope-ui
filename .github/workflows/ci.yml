@@ -46,13 +46,17 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit tests
+      # Three projects, one job each — see docs/testing.md.
+      - name: Unit tests (node, no DOM, pure logic)
         run: pnpm test
+
+      - name: SSR tests (node, server builds of solid-js + @solidjs/web)
+        run: pnpm test:ssr
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps --only-shell
 
-      - name: Browser tests
+      - name: Browser tests (real Chromium, DOM + hydration)
         run: pnpm test:browser
 
       # The only mechanical guard on .storybook/main.ts. It compiles every story through

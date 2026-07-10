@@ -95,28 +95,29 @@ a visually-hidden label — breaks SSR at runtime.
 
 ---
 
-## 4. The Dialog hydration round-trip test — root cause, measured
+## 4. The Dialog hydration round-trip test — solved, and what it cost
 
-`Dialog.browser.test.tsx`'s hydration test is still `it.skip`'d, but it is no longer a
-mystery. Wave 3 reproduced it against `2.0.0-beta.16` and **both previously recorded
-explanations are wrong**. Do not act on either:
+**This is done.** `Dialog.browser.test.tsx` runs a real SSR → hydrate round-trip; nothing is
+skipped. Kept here because the *diagnosis* is the reusable part, and because two recorded root
+causes were wrong for months and were actively instructing the next person.
 
-- ~~"Separate Vite builds, so `@solidjs/web` is a different module instance."~~ Disproved:
-  `Button.browser.test.tsx` now hydrates genuine server HTML, produced in the *unit* project,
-  inside the *browser* project, reusing the server's DOM node. Separate builds are a non-issue.
-- ~~"The hand-rolled `_$HY.r` is the hydration registry, and it is left empty."~~ Disproved:
-  `r` is the **resource/asset** registry (`sharedConfig.load = id => _$HY.r[id]`). The element
-  registry `getNextElement()` reads is built by `gatherHydratable()`, which scans the
-  container for `[_hk]` attributes. An empty `r` is correct. (`generateHydrationScript()` is
-  `voidFn` in the client build anyway, so it could not have been used here.)
+Both are disproved. Do not resurrect either:
 
-### What is actually going on
+- ~~"Separate Vite projects, so `@solidjs/web` is a different module instance."~~ Wrong.
+  Genuine server HTML produced in one Vitest project hydrates fine in another.
+- ~~"The hand-rolled `_$HY.r` is the hydration registry, and it is left empty."~~ Wrong. `r` is
+  the **resource/asset** registry (`sharedConfig.load = id => _$HY.r[id]`). The element registry
+  `getNextElement()` reads is built by `gatherHydratable()`, which scans the container for
+  `[_hk]` attributes. An empty `r` is correct. (`generateHydrationScript()` is `voidFn` in the
+  client build anyway, so it could never have been the fix.)
+
+### What was actually going on — three layers
 
 **1. `renderToStringAsync` does not exist in the browser.** The client build defines it as
 `throwInBrowser(renderToStringAsync)`, which `console.error`s and **returns `undefined`**. The
-test then does `container.innerHTML = undefined`, writing the literal string `"undefined"`. No
-`_hk` nodes, hence "Unable to find DOM nodes for hydration key". The test's own `console.error`
-spy was swallowing the message that says exactly this.
+test did `container.innerHTML = undefined`, writing the literal string `"undefined"`. No `_hk`
+nodes, hence *"Unable to find DOM nodes for hydration key: 1010"*. The test's own
+`console.error` spy was swallowing the message that said exactly this.
 
 **2. `createUniqueId()` allocates from a different counter in each build.**
 
@@ -126,30 +127,38 @@ spy was swallowing the message that says exactly this.
 | `solid-js` client, hydrating | `sharedConfig.getNextContextId()` | yes |
 | `solid-js` client, not hydrating | `` `cl-${counter++}` `` | **no** |
 
-`vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project, but leaves
-`solid-js` resolving to its **browser** build. So the SSR render takes the `cl-…` branch and
-consumes nothing, while the browser hydrate takes `getNextContextId()` and consumes one — every
-hydration key after `Dialog.Root`'s `createUniqueId()` is off by one. Isolated to confirm: a
-single bare `createUniqueId()` added to a component that otherwise hydrates cleanly is enough to
-flip it to "Hydration Mismatch". This affects every future component that generates ARIA ids —
-Popover, Tooltip, Select.
+The first two bottom out in the same `nextChildIdFor(owner)`, so a real server and a real
+hydrating client agree. But `vitest.config.ts` aliased only `@solidjs/web` to its server build
+and left `solid-js` on its browser build, so the SSR half took the `cl-…` branch, consumed
+nothing, and every key after `Dialog.Root`'s `createUniqueId()` was off by one. That hybrid was
+never a design — it was an incomplete alias nobody had reason to notice.
 
-### What landed instead
+**3. Aliasing both packages is not enough.** `@solidjs/web/dist/server.js` is externalized and
+loaded by Node, so *its* `import { createRoot, getOwner } from "solid-js"` bypasses Vite's
+alias entirely. Two `solid-js` instances, two module-scope `currentOwner`s, and every
+`createUniqueId()` throwing *"cannot be used outside of a reactive context"* — the **same error
+an earlier attempt hit and attributed to hand-constructing the component tree**. The fix is
+`server: { deps: { inline: ["@solidjs/web", "solid-js"] } }` on the `ssr` project.
 
-`Button` (no `createUniqueId`) has a **real** SSR → hydrate round-trip:
-`src/button/__fixtures__/button-ssr.html` is genuine server output, asserted byte-for-byte by
-`Button.test.tsx` and hydrated by `Button.browser.test.tsx`, which checks the server's node is
-reused rather than re-rendered. Break the fixture and both halves go red.
+### What landed
 
-### To unblock Dialog
+A third Vitest project, `ssr` — node, no DOM, both packages on their server builds. `unit` kept
+its client builds (its reactivity tests need real effects and deferred writes) and **lost the
+`@solidjs/web` alias entirely**, because the SSR tests that needed it moved out. Net: one weird
+alias removed, three projects that each mean one thing. See `docs/testing.md`.
 
-- [ ] Make the SSR half resolve `solid-js`'s **server** build too, not just `@solidjs/web`'s —
-      a third Vitest project (or a Node script) whose alias covers both, emitting the fixture the
-      browser test hydrates. The unit project cannot simply switch: its reactivity tests depend
-      on client-build semantics (deferred writes, real effects).
-- [ ] Re-check against stable first. If `solid-js`'s client `createUniqueId` stops branching on
-      `sharedConfig.hydrating`, or the two builds converge, this may evaporate.
-- [ ] Once green, drop the `it.skip` and delete the "retry when stable" note in CLAUDE.md.
+Both `Button` and `Dialog` now have real round-trips against committed fixtures
+(`src/*/__fixtures__/*-ssr.html`), asserted byte-for-byte by the `ssr` project and hydrated by
+the `browser` project. Corrupt a fixture and both halves go red.
+
+### Still worth re-checking at stable
+
+- [ ] `createUniqueId()` still bottoms out in the same `nextChildIdFor(owner)` in both builds.
+      `solid-contract.ssr.test.tsx` pins the server half; the client half is only observable
+      through a passing hydration test.
+- [ ] `@solidjs/web`'s server build still needs inlining. If Vitest or Vite change how
+      node_modules ESM is externalized, the symptom is `createUniqueId cannot be used outside of
+      a reactive context` — not a resolution error.
 
 ---
 

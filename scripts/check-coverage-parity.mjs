@@ -13,8 +13,9 @@ const packagesDir = join(repoRoot, "packages");
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
-// Packages whose source files must additionally have an SSR round-trip test
-// (a `renderToStringAsync` reference in one of their matching test files).
+// Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
+// `renderToStringAsync`. That file runs in the `ssr` Vitest project — the only one resolving
+// both `solid-js` and `@solidjs/web` to their server builds. See docs/testing.md.
 const REQUIRES_SSR_TEST = new Set(["components"]);
 const SSR_TEST_MARKER = "renderToStringAsync";
 // Packages whose source files must additionally have a colocated Storybook story.
@@ -38,7 +39,11 @@ function walk(dir) {
 }
 
 function isTestFile(path) {
-  return /\.(test|browser\.test)\.tsx?$/.test(path);
+  return /\.(test|ssr\.test|browser\.test)\.tsx?$/.test(path);
+}
+
+function isSsrTestFile(path) {
+  return /\.ssr\.test\.tsx?$/.test(path);
 }
 
 /**
@@ -48,8 +53,8 @@ function isTestFile(path) {
  * comment or inside a string is no longer mistaken for a call.
  *
  * This exists because the SSR requirement used to be `source.includes("renderToStringAsync")`,
- * and `Dialog.browser.test.tsx` satisfied it twice over — once in a prose comment, once
- * inside an `it.skip`. Neither runs.
+ * which `Dialog.browser.test.tsx` satisfied three ways at once — a prose comment, a bare
+ * import, and a call inside an `it.skip`. None of them ran.
  *
  * @param {string} source
  */
@@ -159,9 +164,9 @@ function skippedRanges(code) {
  * Whether `callee` is *invoked* somewhere the test runner will actually reach: not in a
  * comment, not inside a string, not inside a skipped block — and not merely imported.
  *
- * The "merely imported" case is not hypothetical: `Dialog.browser.test.tsx` imports
- * `renderToStringAsync` for its `it.skip`'d hydration test, so requiring the bare name would
- * still pass on a file whose only real call was deleted.
+ * None of those exclusions is hypothetical. Before this check was tightened,
+ * `Dialog.browser.test.tsx` satisfied the SSR requirement with a prose comment, a bare import,
+ * and a call inside an `it.skip` — while `Dialog.tsx` had no executing SSR test at all.
  *
  * @param {string} source
  * @param {string} callee
@@ -227,7 +232,11 @@ for (const pkg of packageDirs) {
 
     const matchingTests = testFiles.filter((t) => {
       const testBase = baseName(t);
-      return testBase === `${base}.test` || testBase === `${base}.browser.test`;
+      return (
+        testBase === `${base}.test` ||
+        testBase === `${base}.ssr.test` ||
+        testBase === `${base}.browser.test`
+      );
     });
     const hasTest = matchingTests.length > 0;
     const hasDoc = docFiles.has(base);
@@ -236,15 +245,18 @@ for (const pkg of packageDirs) {
     if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
     if (!hasDoc) missing.push(`${relPath} — missing matching .md doc`);
 
-    if (hasTest && REQUIRES_SSR_TEST.has(pkg)) {
-      // `hasLiveCall`, not `.includes(...)`: a mention in a comment, an import, or a call
-      // inside an `it.skip` used to satisfy this — and `Dialog.browser.test.tsx` has all three.
-      const hasSsrTest = matchingTests.some((t) =>
+    if (REQUIRES_SSR_TEST.has(pkg)) {
+      // The call must live in the `.ssr.test.*` file, because that is the only Vitest project
+      // resolving the server builds. And `hasLiveCall`, not `.includes(...)`: a mention in a
+      // comment, a bare import, or a call inside an `it.skip` used to satisfy this.
+      const ssrTests = matchingTests.filter(isSsrTestFile);
+      const hasSsrTest = ssrTests.some((t) =>
         hasLiveCall(readFileSync(t, "utf8"), SSR_TEST_MARKER),
       );
+
       if (!hasSsrTest) {
         missing.push(
-          `${relPath} — no matching test calls ${SSR_TEST_MARKER}() outside a comment and outside an it.skip (SSR round-trip test required)`,
+          `${relPath} — no matching *.ssr.test.tsx calls ${SSR_TEST_MARKER}() outside a comment and outside an it.skip (SSR round-trip test required)`,
         );
       }
     }

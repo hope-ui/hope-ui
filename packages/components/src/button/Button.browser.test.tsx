@@ -89,7 +89,7 @@ describe("Button hydration", () => {
    * `.done`, `.completed` and `.events`. `.r` is the *resource/asset* registry consulted by
    * `sharedConfig.load`; the element registry `getNextElement()` looks in is built separately
    * by `gatherHydratable()`, which scans the container for `[_hk]` attributes. An empty `.r`
-   * is therefore correct, not a bug — a point `docs/migration-2.0-stable.md` §4 gets wrong.
+   * is therefore correct, not a bug.
    */
   function bootstrapHydration(): () => void {
     const globals = globalThis as { _$HY?: unknown };
@@ -107,12 +107,11 @@ describe("Button hydration", () => {
   }
 
   it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
-    // The round-trip `Dialog` cannot do (see docs/migration-2.0-stable.md §4). `ssrFixture` is
-    // genuine server output — `Button.test.tsx` asserts it byte-for-byte against a real
-    // `renderToStringAsync` in the unit project, where `@solidjs/web` resolves to its server
-    // build. Here it resolves to the client build, whose `renderToStringAsync` is a stub that
-    // returns `undefined`; rendering the fixture in-process would silently hydrate the string
-    // "undefined" instead.
+    // `ssrFixture` is genuine server output — `Button.ssr.test.tsx` asserts it byte-for-byte
+    // against a real `renderToStringAsync` in the `ssr` project, where both `solid-js` and
+    // `@solidjs/web` resolve to their server builds. Here they resolve to the client builds,
+    // whose `renderToStringAsync` is a stub that `console.error`s and returns `undefined`;
+    // rendering the fixture in-process would silently hydrate the string "undefined".
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const teardownHydration = bootstrapHydration();

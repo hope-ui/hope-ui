@@ -45,20 +45,28 @@ blocks the pointer); `createScrollLock`'s ref count moved off module scope; and
 component would want. `Dialog.Trigger` emits `aria-controls` only while open, and respects
 `event.preventDefault()` as a cancel channel.
 
-**The migration insurance is now in place.** `solid-contract.test.tsx` and its browser
-counterpart pin every undocumented `solid-js`/`@solidjs/web` behavior this codebase leans on,
-each naming the code that depends on it. The browser suite emitted 170 `STRICT_READ_UNTRACKED`
-warnings; it now emits zero, and `mount()` fails any test that produces one (or a
+**The migration insurance is now in place.** The `solid-contract.*` tests pin every
+undocumented `solid-js`/`@solidjs/web` behavior this codebase leans on, each naming the code
+that depends on it. The browser suite emitted 170 `STRICT_READ_UNTRACKED` warnings; it now
+emits zero, and `mount()` fails any test that produces one (or a
 `REACTIVE_WRITE_IN_OWNED_SCOPE`). `check:dist-imports` enforces the no-literal-host-JSX
 invariant SSR silently depends on. `expectNoA11yViolations` no longer drops axe's `incomplete`
 results, `check:coverage-parity` no longer accepts a `renderToStringAsync` mention in a comment
 or an `it.skip`, and `passWithNoTests` is gone.
 
-Two records were corrected against measurement rather than inherited: the SSR rationale below,
-and Dialog's skipped hydration test — whose root cause turned out to be `createUniqueId()`
-allocating from different counters in `solid-js`'s server and client builds, not module
-instances and not the `_$HY` bootstrap. `Button` now has a real SSR → hydrate round-trip. See
-`docs/migration-2.0-stable.md` §4.
+**The test bench was then restructured, and the hydration gap closed.** There are now three
+Vitest projects with one job and one module resolution each — `unit` (node, no DOM, client
+builds), `ssr` (node, **server** builds of both `solid-js` and `@solidjs/web`), `browser` (real
+Chromium). The old two-project layout had SSR tests squatting in the `unit` project behind a
+half-complete alias, which rendered "server" HTML using the *browser* `createUniqueId`. That
+hybrid — not module instances, not the `_$HY` bootstrap — is what made Dialog's hydration test
+impossible. Both `Button` and `Dialog` now have real SSR → hydrate round-trips against
+committed fixtures; nothing is `it.skip`'d. See `docs/testing.md`, and
+`docs/migration-2.0-stable.md` §4 for the two disproved theories.
+
+Three recorded "facts" were corrected against measurement rather than inherited: the SSR
+rationale below, Dialog's hydration root cause, and the claim that sibling effect cleanups are
+never reversed (they are, on owner disposal).
 
 Remaining before SolidJS 2.0 stable lands: Popover + Tooltip (Phase 1, step 3), then the
 migration itself.
@@ -316,11 +324,9 @@ Concrete rules every primitive/component must follow:
   warning with an actual `renderToStringAsync` + `hydrate` round-trip test, per the DoD
   below, rather than assuming it's fine.
 
-  Note that Dialog's round-trip test is currently `it.skip`'d, and **not** because of the
-  Portal. `createUniqueId()` allocates ids from a different counter in each `solid-js` build,
-  so any component that generates an ARIA id cannot round-trip through the repo's two Vitest
-  projects as configured. `Button` (no `createUniqueId`) has a real round-trip against a
-  committed fixture. Full analysis, and the fix, in `docs/migration-2.0-stable.md` §4.
+  Verified for real: `Dialog.browser.test.tsx` hydrates a committed fixture of genuine server
+  HTML and asserts the trigger's DOM node is *reused*, then that clicking it mounts the portal
+  client-side. See `docs/testing.md` for how the `ssr` and `browser` projects cooperate.
 - **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
   client-only** and should be structured so they simply don't run their DOM-touching
   logic during SSR (again, via effects) rather than crashing or needing to be manually

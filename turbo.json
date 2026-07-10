@@ -13,6 +13,8 @@
         "$TURBO_DEFAULT$",
         "!src/**/*.test.ts",
         "!src/**/*.test.tsx",
+        "!src/**/*.ssr.test.ts",
+        "!src/**/*.ssr.test.tsx",
         "!src/**/*.browser.test.ts",
         "!src/**/*.browser.test.tsx",
         "!src/**/*.stories.ts",

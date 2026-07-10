@@ -86,6 +86,8 @@ export function createViteConfig(
         exclude: [
           "**/*.test.ts",
           "**/*.test.tsx",
+          "**/*.ssr.test.ts",
+          "**/*.ssr.test.tsx",
           "**/*.browser.test.ts",
           "**/*.browser.test.tsx",
           "**/*.stories.ts",

@@ -17,10 +17,10 @@ describe("Button SSR", () => {
   });
 
   it("matches the committed SSR fixture byte for byte", async () => {
-    // This is the half of the hydration round-trip that only the *unit* project can run:
-    // `@solidjs/web` resolves to its server build here, so this is genuine server output,
-    // hydration keys (`_hk`) and all. `Button.browser.test.tsx` hydrates the same fixture in
-    // a real browser. Neither project can do both halves — see __fixtures__/README.md.
+    // Half of the hydration round-trip, and only the `ssr` project can run it: this is the one
+    // place `solid-js` *and* `@solidjs/web` both resolve to their server builds, so this is
+    // genuine server output, hydration keys (`_hk`) and all. `Button.browser.test.tsx` hydrates
+    // the same fixture in a real browser. See __fixtures__/README.md and docs/testing.md.
     //
     // Byte-for-byte on purpose: the `_hk` key and attribute order are exactly what
     // `hydrate()`'s `gatherHydratable()` matches on, so "close enough" is not.

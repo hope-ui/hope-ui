@@ -1,4 +1,3 @@
-import { Dynamic, insert, renderToStringAsync, setAttribute, spread, template } from "@solidjs/web";
 import {
   createContext,
   createEffect,
@@ -11,28 +10,25 @@ import {
 import { describe, expect, it } from "vitest";
 
 /**
- * Characterization tests for the `solid-js` / `@solidjs/web` internals this codebase leans
- * on without any of them being documented, public API. Each one names the code that would
- * break if SolidJS 2.0 *stable* changed it.
+ * Characterization tests for the `solid-js` internals this codebase leans on without any of
+ * them being documented, public API. Each one names the code that would break if SolidJS 2.0
+ * *stable* changed it.
  *
  * They are not testing solid-zero. They exist so the beta→stable migration is a mechanical
- * diff instead of a bug hunt: `@solidjs/web` has already renamed runtime helpers *within*
- * the beta line (`use`→`ref`, `addEventListener`→`addEvent`), and if stable flips any of
- * these, the failure would otherwise surface days later as a dialog that won't label itself,
- * a ref that never fires, or an SSR crash pointing into `@solidjs/web`'s internals.
+ * diff instead of a bug hunt: `@solidjs/web` has already renamed runtime helpers *within* the
+ * beta line (`use`→`ref`, `addEventListener`→`addEvent`), and if stable flips any of these,
+ * the failure would otherwise surface days later as a dialog that won't label itself, a ref
+ * that never fires, or an SSR crash pointing into `@solidjs/web`'s internals.
  *
- * ## Which build runs here
+ * This file runs in the **unit** project: `solid-js`'s client build, real effects, deferred
+ * signal writes (hence `flush()`). Its siblings pin the same idea against the other builds:
  *
- * This file is in the **unit** project, so `vitest.config.ts` aliases `@solidjs/web` to its
- * **server** build (`dist/server.js`) — that is what makes the SSR half of this file real
- * rather than a client build pretending. `solid-js` itself resolves to its **client** build,
- * which is why every signal write below is wrapped in `flush()`.
+ * - `solid-contract.ssr.test.tsx` — server build. Why one `generate: "dom"` build survives SSR.
+ * - `solid-contract.browser.test.tsx` — client build in a real browser. `applyRef`, and the
+ *   fact that the same four DOM helpers are *not* throwing stubs there.
  *
- * The client-side half — `applyRef`, and the fact that the same four helpers are *not*
- * throwing stubs there — lives in `solid-contract.browser.test.tsx`. Splitting on the build
- * is the point: the asymmetry between the two files is the invariant.
- *
- * See `docs/migration-2.0-stable.md` §2.
+ * The asymmetry between the last two *is* the no-literal-host-JSX invariant. See
+ * `docs/testing.md` and `docs/migration-2.0-stable.md` §2.
  */
 
 describe("solid-js contract", () => {
@@ -195,48 +191,6 @@ describe("solid-js contract", () => {
       dispose();
 
       expect(order).toEqual(["second:cleanup", "first:cleanup"]);
-    });
-  });
-
-  describe("the @solidjs/web server build", () => {
-    // Depended on by: every component, and this is the entire basis of the
-    // "no literal host JSX element" invariant (CLAUDE.md; `scripts/check-dist-imports.mjs`).
-    //
-    // `vite-plugin-solid` is configured with neither `generate` nor `hydratable`, i.e.
-    // `generate: "dom"`, which compiles a literal `<div/>` into a module-scope `_$template()`
-    // call plus `_$insert()`. Those four helpers are throwing stubs on the server, so a
-    // single literal host element in any component would throw *at import* under SSR.
-    //
-    // It works today only because every host element routes through
-    // `renderElement` → `<Dynamic>` → `createComponent`, and `Dynamic` handles SSR at
-    // runtime. That invariant is load-bearing; these two tests are why.
-
-    it("exports template/insert/spread/setAttribute as throwing stubs", () => {
-      const clientOnly = { template, insert, spread, setAttribute };
-
-      for (const [name, helper] of Object.entries(clientOnly)) {
-        expect(
-          () => (helper as () => void)(),
-          `${name} should be a server-side notSup stub`,
-        ).toThrow(/Client-only API called on the server side/);
-      }
-    });
-
-    it("renders a host element through Dynamic, with a hydration key", async () => {
-      // Server-side `dynamic()` calls `ssrElement(component, props, undefined, true)` — the
-      // trailing `true` is what emits the `_hk` hydration key. If stable drops the key, the
-      // single `generate: "dom"` build stops being able to hydrate and we need a second,
-      // `generate: "ssr"` + `hydratable: true` build. See docs/migration-2.0-stable.md §3.
-      const html = await renderToStringAsync(() => (
-        <Dynamic component="span" id="pinned">
-          hi
-        </Dynamic>
-      ));
-
-      expect(html).toContain("<span");
-      expect(html).toContain('id="pinned"');
-      expect(html).toContain(">hi<");
-      expect(html).toMatch(/_hk=\d+/);
     });
   });
 });

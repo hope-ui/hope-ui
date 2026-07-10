@@ -29,8 +29,9 @@ pnpm build                # turbo: build all packages (Vite library mode, ESM + 
 pnpm lint                 # biome check .
 pnpm format               # biome format --write .
 pnpm typecheck            # turbo: tsc --noEmit per package (reads sibling src, never dist — see below)
-pnpm test                 # vitest run --project=unit   (node env, pure-logic primitives)
-pnpm test:browser         # vitest run --project=browser (real Chromium via Playwright)
+pnpm test                 # vitest run --project=unit    (node, no DOM, pure logic)
+pnpm test:ssr             # vitest run --project=ssr     (node, SERVER builds of solid-js + @solidjs/web)
+pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + hydration)
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test, .md doc, or story
@@ -95,34 +96,29 @@ A deliberate untracked read is spelled `untrack(...)`; anything still warning is
 unreviewed. See `mount.md`.
 
 Every component (not needed for pure internal primitives with no DOM output) also
-needs an SSR/hydration round-trip test: `renderToStringAsync` (from `@solidjs/web`)
-must resolve without throwing, and `hydrate()` against the resulting HTML must produce
-no hydration-mismatch warnings. `check:coverage-parity` mechanically enforces the first
-half (every `@solid-zero/components` source file must have a matching test that *calls*
+needs an SSR **and** a hydration round-trip test. Both `Button` and `Dialog` have real
+ones. `check:coverage-parity` mechanically enforces the SSR half: every
+`@solid-zero/components` source file needs a `Foo.ssr.test.tsx` that *calls*
 `renderToStringAsync` — outside a comment, outside a string, outside an `it.skip`, and
-not merely importing it).
+not merely importing it.
 
-The second half — a genuine `hydrate()` round-trip — is real for `Button` and blocked
-for `Dialog`. Button's lives in `src/button/__fixtures__/button-ssr.html`: genuine server
-output, asserted byte-for-byte by `Button.test.tsx` (unit project, where `@solidjs/web`
-resolves to its **server** build) and hydrated by `Button.browser.test.tsx` (browser
-project, **client** build), which checks the server's DOM node is reused rather than
-re-rendered. Neither project can do both halves: the client build's `renderToStringAsync`
-is a stub that `console.error`s and returns `undefined`.
+**Read `docs/testing.md` before writing any test.** Three Vitest projects, one job and
+one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
+(node, **server** builds of `solid-js` *and* `@solidjs/web`, the HTML a server sends),
+`browser` (real Chromium, client builds, DOM/focus/pointer/axe/hydration). The file
+suffix picks the project: `Foo.test.tsx`, `Foo.ssr.test.tsx`, `Foo.browser.test.tsx`.
 
-**Dialog cannot round-trip, and the reason is measured, not guessed:** it calls
-`createUniqueId()`, and `solid-js`'s two builds allocate ids from different counters —
-the server build always consumes a child id, the client build consumes one only while
-`sharedConfig.hydrating`, otherwise returning `cl-${counter++}` and consuming nothing.
-`vitest.config.ts` aliases `@solidjs/web` to its server build for the unit project but
-leaves `solid-js` on its browser build, so every hydration key after `Dialog.Root`'s
-`createUniqueId()` is off by one. This will hit every future component that generates
-ARIA ids (Popover, Tooltip, Select). `Dialog.browser.test.tsx`'s hydration test is
-`it.skip`'d with the full analysis; the fix is to make the SSR half resolve `solid-js`'s
-server build too. See `docs/migration-2.0-stable.md` §4 — which also records the two
-theories this **disproved**: it is *not* about separate Vite builds / module instances,
-and *not* about the hand-rolled `window._$HY` (`_$HY.r` is the resource registry;
-`hydrate()` builds the element registry itself with `gatherHydratable()`).
+Hydration is two environments by definition, so the two projects cooperate through a
+committed fixture: `src/<component>/__fixtures__/<component>-ssr.html` is genuine server
+output, asserted byte-for-byte by `Foo.ssr.test.tsx` and hydrated by
+`Foo.browser.test.tsx`. Corrupt the fixture and both halves go red. The browser half must
+assert no `console.error`/`console.warn`, exactly one of the element, and that the
+surviving node **is the same object** as the server's — a silent fallback to a client
+render otherwise looks identical to success.
+
+Hydration keys (`_hk`) are a path through the component tree, so the `ssr` and `browser`
+test files must define structurally identical trees. Inserting a component before
+`Dialog.Trigger` — even one that renders nothing — shifts the trigger's key.
 
 ## No component may write a literal host JSX element
 
@@ -448,20 +444,27 @@ Two non-obvious things that config guards against, both hit for real:
 
 ## Testing stack specifics
 
-- Vitest 4's `test.projects` (not the deprecated `vitest.workspace.ts` file) defines two
-  projects in `vitest.config.ts`: `unit` (node env, `*.test.{ts,tsx}`, excludes
-  `*.browser.test.*`) and `browser` (real Chromium via `@vitest/browser-playwright`,
-  `*.browser.test.{ts,tsx}` only, `headless: true`).
+**`docs/testing.md` is the full explanation. This is the compressed version.**
+
+- Vitest 4's `test.projects` (not the deprecated `vitest.workspace.ts` file) defines three
+  projects in `vitest.config.ts`, and the split is by **module resolution**, not by taste:
+  `unit` (node, no DOM, client builds), `ssr` (node, **server** builds of `solid-js` *and*
+  `@solidjs/web`), `browser` (real Chromium via `@vitest/browser-playwright`, client builds).
+  File suffix picks the project. Anything asserting on build-specific behavior belongs in the
+  `solid-contract.*` files, which say which build they pin.
+- `unit` is `environment: "node"`, **not jsdom**, deliberately: jsdom can't be trusted for
+  focus/keyboard/pointer, so those live in `browser`. With no `document` at all, writing one
+  in the wrong project is impossible rather than merely discouraged.
+- **`environment: "node"` does not change package resolution.** It swaps JS globals; Vite's
+  default `resolve.conditions` still includes `browser`. A node project silently gets browser
+  builds unless you alias them — verified empirically, and the source of a months-long bug.
+- **Aliasing `@solidjs/web` to its server build is not enough on its own.** It is externalized
+  and loaded by Node, so its own `import { createRoot } from "solid-js"` bypasses the alias,
+  producing two `solid-js` instances with two `currentOwner`s. Symptom: `createUniqueId cannot
+  be used outside of a reactive context`. Fix: `server: { deps: { inline: [...] } }` on the
+  `ssr` project. Both are commented in `vitest.config.ts`.
 - CI installs only `chromium-headless-shell` (`playwright install --with-deps
   --only-shell`), which is why `headless: true` is required in the browser project
   config — Playwright only picks the shell build when headless is on.
-- **The two projects resolve different builds of the same packages, on purpose.** `unit`
-  aliases `@solidjs/web` to its **server** build (so SSR is genuinely testable), but
-  `solid-js` still resolves to its **client** build via Vite's default `browser` condition.
-  That mix is what makes `flush()` necessary around signal writes in unit tests, and it is
-  also what blocks Dialog's hydration round-trip (`createUniqueId` allocates from a different
-  counter in each `solid-js` build — see above). Anything asserting on a *build-specific*
-  behavior belongs in `solid-contract.test.tsx` / `solid-contract.browser.test.tsx`, which
-  say which build they're pinning.
 - No `passWithNoTests`. It was a Phase 0 concession from when no pure-logic primitive had a
   node-environment test; leaving it on meant deleting every unit test kept CI green.
