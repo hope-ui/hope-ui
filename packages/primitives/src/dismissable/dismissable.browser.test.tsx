@@ -9,12 +9,12 @@ function TestHarness(props: {
   dismissOnEscape?: boolean;
   dismissOnOutsidePointerDown?: boolean;
 }) {
-  let containerRef: HTMLDivElement | undefined;
   const [active] = createSignal(true);
+  const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();
 
   createDismissable({
     active,
-    ref: () => containerRef,
+    ref: containerRef,
     onDismiss: props.onDismiss,
     dismissOnEscape: props.dismissOnEscape,
     dismissOnOutsidePointerDown: props.dismissOnOutsidePointerDown,
@@ -25,7 +25,7 @@ function TestHarness(props: {
       <button type="button" data-testid="outside">
         Outside
       </button>
-      <div data-testid="container" ref={containerRef}>
+      <div data-testid="container" ref={setContainerRef}>
         <button type="button" data-testid="inside">
           Inside
         </button>

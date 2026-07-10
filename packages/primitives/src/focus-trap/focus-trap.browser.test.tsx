@@ -5,10 +5,10 @@ import { page, userEvent } from "vitest/browser";
 import { createFocusTrap } from "./focus-trap";
 
 function TestHarness() {
-  let containerRef: HTMLDivElement | undefined;
   const [active, setActive] = createSignal(false);
+  const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();
 
-  createFocusTrap({ active, ref: () => containerRef });
+  createFocusTrap({ active, ref: containerRef });
 
   return (
     <div>
@@ -18,7 +18,7 @@ function TestHarness() {
       <button type="button" data-testid="outside-after">
         After
       </button>
-      <div data-testid="container" ref={containerRef}>
+      <div data-testid="container" ref={setContainerRef}>
         <button type="button" data-testid="first">
           First
         </button>

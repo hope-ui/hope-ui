@@ -23,12 +23,11 @@ export interface CreateDismissableOptions {
  */
 export function createDismissable(options: CreateDismissableOptions): void {
   createEffect(
-    () => options.active(),
-    (active) => {
-      // `ref()` is read here, inside the effect callback, rather than in the tracked
-      // compute function above — see the identical comment in `focus-trap.ts` for why a
-      // plain (non-signal) ref accessor must not be read from `compute`.
-      const container = options.ref();
+    // Track both `active()` and `ref()` — see the identical comment in `focus-trap.ts`
+    // for why `ref` must be a real signal accessor tracked here, not read untracked
+    // inside the effect callback.
+    () => [options.active(), options.ref()] as const,
+    ([active, container]) => {
       if (!active || !container) return;
 
       const handleKeyDown = (event: KeyboardEvent) => {

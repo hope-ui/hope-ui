@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 // Fails CI if any source file under packages/*/src is missing a matching test file
 // and/or a matching .md doc file. This is what prevents test/doc coverage from
-// drifting as the number of components grows.
-import { readdirSync, statSync } from "node:fs";
+// drifting as the number of components grows. Also requires an SSR round-trip test
+// reference (a `renderToStringAsync` call) for every @solid-zero/components source
+// file — per CLAUDE.md's Definition of Done, components (unlike pure internal
+// primitives with no DOM output) need this — see docs/plan.md Item 3.
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
@@ -10,6 +13,10 @@ const packagesDir = join(repoRoot, "packages");
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
+// Packages whose source files must additionally have an SSR round-trip test
+// (a `renderToStringAsync` reference in one of their matching test files).
+const REQUIRES_SSR_TEST = new Set(["components"]);
+const SSR_TEST_MARKER = "renderToStringAsync";
 
 /** @param {string} dir */
 function walk(dir) {
@@ -72,15 +79,27 @@ for (const pkg of packageDirs) {
     const basenameOnly = base.split("/").pop();
     if (EXCLUDED_BASENAMES.has(basenameOnly)) continue;
 
-    const hasTest = testFiles.some((t) => {
+    const matchingTests = testFiles.filter((t) => {
       const testBase = baseName(t);
       return testBase === `${base}.test` || testBase === `${base}.browser.test`;
     });
+    const hasTest = matchingTests.length > 0;
     const hasDoc = docFiles.has(base);
 
     const relPath = relative(repoRoot, sourceFile);
     if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
     if (!hasDoc) missing.push(`${relPath} — missing matching .md doc`);
+
+    if (hasTest && REQUIRES_SSR_TEST.has(pkg)) {
+      const hasSsrTest = matchingTests.some((t) =>
+        readFileSync(t, "utf8").includes(SSR_TEST_MARKER),
+      );
+      if (!hasSsrTest) {
+        missing.push(
+          `${relPath} — no matching test references ${SSR_TEST_MARKER} (SSR round-trip test required)`,
+        );
+      }
+    }
   }
 }
 

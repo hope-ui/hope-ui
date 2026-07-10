@@ -73,9 +73,32 @@ baseline axe-core check runs by default.
 Every component (not needed for pure internal primitives with no DOM output) also
 needs an SSR/hydration round-trip test: `renderToStringAsync` (from `@solidjs/web`)
 must resolve without throwing, and `hydrate()` against the resulting HTML must produce
-no hydration-mismatch warnings. `check:coverage-parity` does not yet enforce this one
-mechanically — treat it as required anyway, and extend the script to check for it
-alongside whichever component adds the first such test.
+no hydration-mismatch warnings. `check:coverage-parity` mechanically enforces the first
+half of this (every `@solid-zero/components` source file must have a matching test
+that references `renderToStringAsync`) — added alongside Dialog, the first component to
+need it.
+
+The second half — a genuine in-browser `hydrate()` round-trip producing zero mismatch
+warnings — is **not** mechanically enforced, and for **Portal-using components
+specifically** (Dialog, and by extension any future Popover/Tooltip/etc.) is currently
+a known, deliberately accepted gap rather than a TODO: `renderToStringAsync` called
+*from inside* a Vitest browser test always resolves to `@solidjs/web`'s client build
+(`isServer` hardcoded `false`), so it never produces genuine server output for an
+`isServer`-guarded branch like `Dialog.Portal`'s. Two different fixes were attempted
+for Dialog and both hit real, separate blockers — a custom Vitest browser `command`
+hand-constructing the component tree hit `createUniqueId cannot be used outside of a
+reactive context`; reading a fixture (written by a genuine server-side
+`renderToStringAsync` in the "unit" project) via Vitest's built-in `readFile` browser
+command got past that, but then hit a `hydrate()` "Hydration Mismatch: Unable to find
+DOM nodes for hydration key" error even with a byte-for-byte identical component tree —
+plausibly because the "unit" and "browser" Vitest projects are separate Vite builds, so
+`@solidjs/web` (and therefore the component's own compiled module) are genuinely
+different module instances between the SSR render and the client hydrate. Neither was
+root-caused further; see `docs/session-handoff-dialog.md` finding #8 for the full
+investigation if picking this up again. `Dialog.browser.test.tsx`'s hydration test is
+`it.skip`'d, pointing back at that doc. Non-Portal components (Button, and any future
+non-overlay component) aren't affected — `renderToStringAsync` called in-browser is
+fine for them since there's no `isServer`-guarded branch to get wrong.
 
 ## Architecture
 
@@ -162,6 +185,30 @@ actual installed package):
   (deferred, post-mount), the ref is populated. Hit and fixed in `createFocusTrap` and
   `createDismissable` (see the comments there); `createPresence` already did this
   correctly by construction.
+- **A distinct, later-discovered variant of the above: when the ref-owning element is
+  itself conditionally rendered by the same signal a primitive reacts to, the ref must
+  be a real signal *and* tracked inside `compute`** — reading it only in the effect's
+  apply phase (the fix for the previous bullet) isn't enough here. Hit wiring
+  `createFocusTrap`/`createDismissable` into Dialog's `Popup`, whose DOM element only
+  exists as a reactive consequence of `createPresence`'s `mounted()` (itself a reactive
+  consequence of `context.open()`). When `open` flips true, presence's effect (which
+  eventually creates the DOM node and assigns the ref, several reactive layers deep
+  through `Show` → `Dynamic` → `spread`'s own internal ref-assignment effect) races
+  against the focus-trap's/dismissable's own effects, which need the ref *immediately*
+  upon activation. If the ref isn't a signal the primitive's `compute` actually tracks,
+  a read mid-race can catch it still `undefined` — and since `active` (the only tracked
+  dependency) won't change again, the effect never gets a second chance to see the
+  populated ref. Symptom: Escape/outside-click/focus-trap silently do nothing, forever,
+  but *only* for components whose ref-owning element is conditionally rendered — a
+  primitive's own isolated tests (unconditionally-rendered container) won't catch it.
+  Fix: track both in `compute`, e.g.
+  `createEffect(() => [options.active(), options.ref()] as const, ([active, container]) => { ... })`,
+  with the ref always backed by `createSignal`, never `let el; ref={el}`. Live in
+  `createFocusTrap`/`createDismissable`; see `packages/components/src/dialog/Dialog.tsx`
+  (`Popup`/`Backdrop`) for the call-site pattern. Any future `createXyz({ active, ref })`-
+  shaped primitive that needs the ref the moment `active` flips true needs this same
+  pattern — `createPresence` doesn't need it (and wasn't touched) because it doesn't read
+  the ref on the activating edge.
 - **`mergeProps`/`splitProps` are gone from the public API.** The 2.0 idiom is `merge`
   and `omit`, imported from `solid-js` (see `packages/components/src/button/Button.tsx`).
   Prefer these over anything reintroducing the old names.
@@ -170,6 +217,27 @@ actual installed package):
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
   `undefined`. `ref` accepts an array of ref-setter functions natively — no `mergeRefs`
   utility needed anywhere in this codebase.
+- **Solid 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` if a descendant component writes
+  to a signal owned by an *ancestor* reactive scope directly from its own synchronous
+  render body.** Hit in `Dialog.Title`/`Dialog.Description`, which originally called
+  `context.setTitleId(id)` (a signal owned by `Root`) directly in their component body,
+  to register their id with `Root`'s context for `Popup`'s `aria-labelledby`/
+  `aria-describedby`. Fix: defer the write into `onSettled`:
+  ```tsx
+  onSettled(() => {
+    context.setTitleId(id);
+    return () => context.setTitleId(undefined);
+  });
+  ```
+  General rule: any primitive/component where a descendant needs to register something
+  into an ancestor-owned signal must do so via `onSettled` (or another deferred
+  mechanism), never directly in the descendant's synchronous render body. Watch for
+  SSR/hydration mismatches when applying this outside a case like Dialog's, where the
+  writing component (`Title`/`Description`) only ever renders inside a `Portal`-guarded
+  subtree that itself never renders server-side — so there's no server-rendered
+  `aria-labelledby` value for a later client-only write to disagree with. A component
+  that does this cross-scope write *outside* a Portal-guarded subtree would need that
+  reasoning re-checked.
 - **Vite's `solid-refresh` HMR wrapper breaks prop forwarding in dev/test mode for
   components imported from another module** (a real bug hit during Phase 0: `children`
   silently failed to reach the DOM only when `Button` was imported from `Button.tsx`,

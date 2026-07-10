@@ -41,15 +41,16 @@ export function createFocusTrap(options: CreateFocusTrapOptions): void {
   let previouslyFocused: HTMLElement | null = null;
 
   createEffect(
-    () => options.active(),
-    (active) => {
-      // `ref()` is read here, inside the effect callback, rather than in the tracked
-      // compute function above. A plain (non-signal) ref accessor read inside `compute`
-      // is captured synchronously at the moment this `createEffect` call is evaluated —
-      // which happens *before* this component's own later JSX (and its `ref` callback)
-      // has run — so it would always observe the container as not-yet-set. Reading it
-      // fresh here, in the deferred effect phase, sees the real post-mount value.
-      const container = options.ref();
+    // Track both `active()` and `ref()` in the compute function. `ref` must be a real
+    // signal accessor (not a closure over a plain `let`): when the container is only
+    // created as a reactive consequence of the same `active`/`present` signal flipping
+    // (e.g. gated behind a `<Show>`), a *sibling* effect elsewhere may create/assign it
+    // *after* this effect's first run for that change — a plain untracked `ref()` read
+    // would permanently miss it, since `active` (its only dependency) won't change
+    // again. Tracking `ref()` too means this effect reruns once the signal-backed ref
+    // actually updates, regardless of firing order relative to that sibling effect.
+    () => [options.active(), options.ref()] as const,
+    ([active, container]) => {
       if (!active || !container) return;
 
       previouslyFocused = document.activeElement as HTMLElement | null;
