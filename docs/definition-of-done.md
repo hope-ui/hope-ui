@@ -11,7 +11,7 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    `check:coverage-parity` accepts either location.
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference)
    colocated in the same `src/` directory (docs stay beside the source, not in `__tests__/`).
-3. **`@solid-zero/components` only:** a matching `Foo.stories.tsx`, colocated in the same
+3. **`@enara-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same
    `src/` directory. Components are what a human has to look at; pure primitives aren't.
    Stories are excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in
    `vite.config.base.ts`) and from the `build` task's turbo `inputs`.
@@ -28,7 +28,7 @@ example: it reproduces a real, documented consequence of the pointer-blocking
 `ModalBackdrop` rather than a defect, and exists so the failure mode is visible somewhere.
 
 Every browser test that calls `mount()` **must** also call `expectNoA11yViolations`
-(both from `@solid-zero/internal-test-utils`) at least once, so a baseline axe-core check
+(both from `@enara-ui/internal-test-utils`) at least once, so a baseline axe-core check
 runs by default. `check:coverage-parity` enforces exactly that pairing: "renders real
 DOM" isn't mechanically decidable, but `mount()` is the harness that does it, so calling
 one obliges you to call the other. A browser test that renders nothing (e.g.
@@ -39,7 +39,7 @@ the rules axe ran but couldn't decide. When axe genuinely cannot judge one
 (`color-contrast` over an unresolvable background), name it in `allowIncomplete` at the
 call site with a reason; never silence the category. See `axe.md`.
 
-`mount()` (also from `@solid-zero/internal-test-utils`) **fails the test** on a
+`mount()` (also from `@enara-ui/internal-test-utils`) **fails the test** on a
 `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. Both were
 documented in prose here and emitted 170 times a run, so the next real one was invisible.
 A deliberate untracked read is spelled `untrack(...)`; anything still warning is

@@ -267,11 +267,11 @@ importers:
 
   packages/components:
     dependencies:
-      '@solid-zero/primitives':
+      '@enara-ui/primitives':
         specifier: workspace:*
         version: link:../primitives
     devDependencies:
-      '@solid-zero/internal-test-utils':
+      '@enara-ui/internal-test-utils':
         specifier: workspace:*
         version: link:../internal-test-utils
       '@solidjs/web':
@@ -296,7 +296,7 @@ importers:
 
   packages/primitives:
     devDependencies:
-      '@solid-zero/internal-test-utils':
+      '@enara-ui/internal-test-utils':
         specifier: workspace:*
         version: link:../internal-test-utils
       '@solidjs/web':

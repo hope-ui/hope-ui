@@ -16,7 +16,7 @@ its own mount/cleanup boilerplate.
 ## Example
 
 ```ts
-import { mount } from "@solid-zero/internal-test-utils";
+import { mount } from "@enara-ui/internal-test-utils";
 
 const { container, dispose } = mount(() => <Button>Click me</Button>);
 // ...assertions against `container` or `page` (Vitest browser context)...

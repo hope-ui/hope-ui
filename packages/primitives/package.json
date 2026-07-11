@@ -1,7 +1,7 @@
 {
-  "name": "@solid-zero/primitives",
+  "name": "@enara-ui/primitives",
   "version": "0.0.0",
-  "description": "Public behavior kernel for solid-zero: composable SolidJS primitives for rendering, focus, dismissal, presence, and ARIA wiring",
+  "description": "Public behavior kernel for enara-ui: composable SolidJS primitives for rendering, focus, dismissal, presence, and ARIA wiring",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -34,7 +34,7 @@
     "solid-js": "catalog:"
   },
   "devDependencies": {
-    "@solid-zero/internal-test-utils": "workspace:*",
+    "@enara-ui/internal-test-utils": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

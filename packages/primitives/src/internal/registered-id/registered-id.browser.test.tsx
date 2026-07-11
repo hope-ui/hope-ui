@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@solid-zero/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
 import { createSignal, Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { createRegisteredId } from "./registered-id";

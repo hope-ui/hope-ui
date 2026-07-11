@@ -4,7 +4,7 @@ import { type Accessor, createEffect } from "solid-js";
  * The lock's ref count and the pre-lock style snapshot live on `document.body`, under a
  * cross-realm shared symbol — **not** at module scope.
  *
- * `@solid-zero/primitives` is public API, and `@solid-zero/components` depends on it as a
+ * `@enara-ui/primitives` is public API, and `@enara-ui/components` depends on it as a
  * plain `dependencies` entry, which does not force a single installed instance. With two
  * copies in the tree there would be two module-scope `lockCount`s: two overlays open at
  * once, and the body's `overflow` is either restored while one is still open, or never
@@ -12,7 +12,7 @@ import { type Accessor, createEffect } from "solid-js";
  * every copy of this module reads and writes the same slot. Base UI stores its lock state on
  * the element for the same reason. `createHideOutside` does the same with its own count.
  */
-const LOCK_STATE = Symbol.for("solid-zero.scroll-lock");
+const LOCK_STATE = Symbol.for("enara-ui.scroll-lock");
 
 interface ScrollLockState {
   /** How many active locks currently want the body unscrollable. */

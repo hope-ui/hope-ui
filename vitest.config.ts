@@ -47,24 +47,24 @@ function resolveServerEntry(packageName: string): string {
   return esmServerEntry;
 }
 
-// `@solid-zero/components` depends on `@solid-zero/primitives` as a real workspace package,
+// `@enara-ui/components` depends on `@enara-ui/primitives` as a real workspace package,
 // which package-resolves to its *built* `dist/index.js` — meaning editing
-// `packages/primitives/src/**` has no effect on `@solid-zero/components`' tests until
-// `@solid-zero/primitives` is rebuilt. Hit this directly: a primitive fix was edited,
+// `packages/primitives/src/**` has no effect on `@enara-ui/components`' tests until
+// `@enara-ui/primitives` is rebuilt. Hit this directly: a primitive fix was edited,
 // standalone primitive tests (which import it via a relative path within the same package)
 // went green, but Dialog's tests kept failing identically, because they were still exercising
 // the stale pre-fix `dist` build. Aliasing straight to source removes the rebuild step.
 const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 
-// `@solid-zero/primitives` publishes one subpath export per primitive folder (no root barrel),
-// so the alias is a wildcard: `@solid-zero/primitives/render` -> `.../src/render/index.ts`. The
+// `@enara-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
+// so the alias is a wildcard: `@enara-ui/primitives/render` -> `.../src/render/index.ts`. The
 // `find` is a regex with a capture group and the `$1` in `replacement` is substituted by
 // `String.replace` (what `@rollup/plugin-alias` runs under the hood). Anchored `^…/(.+)$` so it
 // stays an exact per-subpath match: a bare-prefix string `find` would also capture unrelated
 // specifiers, the trap the `solid-js` / `@solidjs/web` aliases below avoid.
-const solidZeroAlias = [
+const enaraUiAlias = [
   {
-    find: /^@solid-zero\/primitives\/(.+)$/,
+    find: /^@enara-ui\/primitives\/(.+)$/,
     replacement: join(primitivesSrcDir, "$1/index.ts"),
   },
 ];
@@ -87,7 +87,7 @@ export default defineConfig({
     projects: [
       {
         plugins: [solid(solidPluginOptions())],
-        resolve: { alias: solidZeroAlias },
+        resolve: { alias: enaraUiAlias },
         test: {
           name: "unit",
           // `node`, not `jsdom`, and deliberately: jsdom cannot be trusted for focus, keyboard
@@ -106,7 +106,7 @@ export default defineConfig({
         // `@solidjs/web` alone leaves `solid-js` on its browser build, and the two disagree
         // about `createUniqueId`, which allocates the hydration child ids. That hybrid is why
         // Dialog's hydration round-trip appeared impossible for months.
-        resolve: { alias: [...solidZeroAlias, ...serverBuildAlias] },
+        resolve: { alias: [...enaraUiAlias, ...serverBuildAlias] },
         test: {
           name: "ssr",
           environment: "node",
@@ -124,7 +124,7 @@ export default defineConfig({
       },
       {
         plugins: [solid(solidPluginOptions())],
-        resolve: { alias: solidZeroAlias },
+        resolve: { alias: enaraUiAlias },
         test: {
           name: "browser",
           include: ["packages/*/src/**/*.browser.test.{ts,tsx}"],

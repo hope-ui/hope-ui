@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@solid-zero/internal-test-utils"]
+  "ignore": ["@enara-ui/internal-test-utils"]
 }

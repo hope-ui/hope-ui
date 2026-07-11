@@ -9,15 +9,15 @@ import {
   createDialogPortal,
   createDialogTitle,
   createDialogTrigger,
-} from "@solid-zero/primitives/dialog";
-import { createComponentContext } from "@solid-zero/primitives/internal";
-import { ModalBackdrop } from "@solid-zero/primitives/modal-backdrop";
-import { type RenderProp, renderElement } from "@solid-zero/primitives/utils";
+} from "@enara-ui/primitives/dialog";
+import { createComponentContext } from "@enara-ui/primitives/internal";
+import { ModalBackdrop } from "@enara-ui/primitives/modal-backdrop";
+import { type RenderProp, renderElement } from "@enara-ui/primitives/utils";
 import type { JSX } from "@solidjs/web";
 import { isServer, Portal as SolidPortal } from "@solidjs/web";
 import { type Component, omit, Show } from "solid-js";
 
-// Dialog is a thin JSX layer over the `createDialog` hook family (`@solid-zero/primitives/dialog`).
+// Dialog is a thin JSX layer over the `createDialog` hook family (`@enara-ui/primitives/dialog`).
 // `Root` calls `createDialog` once for the shared state (open/modal/ids/spared registry) and puts
 // it on context; every other part reads that state, calls its own `createDialogX(state, props)`
 // hook — which owns that part's effects, id/element registration, and consumer-prop precedence —

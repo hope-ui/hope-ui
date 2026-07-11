@@ -3,7 +3,7 @@
 // and/or a matching .md doc file. This is what prevents test/doc coverage from
 // drifting as the number of components grows.
 //
-// Every @solid-zero/components source file additionally needs a Storybook story, a
+// Every @enara-ui/components source file additionally needs a Storybook story, a
 // `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
 // `Foo.browser.test.tsx` that really calls `hydrate()` — the two halves of the SSR round-trip
 // the Definition of Done requires. And any browser test that calls `mount()` must also call

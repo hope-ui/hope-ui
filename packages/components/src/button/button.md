@@ -21,7 +21,7 @@ rendering (e.g. as a link that looks like a button).
 ## Example
 
 ```tsx
-import { Button } from "@solid-zero/button";
+import { Button } from "@enara-ui/button";
 
 <Button onClick={() => console.log("clicked")}>Click me</Button>
 

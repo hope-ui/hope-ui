@@ -1,5 +1,5 @@
 // The `internal/` barrel: the library's `createX` behavior primitives, exported as the single
-// subpath `@solid-zero/primitives/internal`. Subfolders have no barrel of their own — only the
+// subpath `@enara-ui/primitives/internal`. Subfolders have no barrel of their own — only the
 // top-level `src/` folders do.
 export { createComponentContext } from "./context/context";
 export {

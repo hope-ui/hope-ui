@@ -3,7 +3,7 @@
 An invisible, viewport-covering element that blocks pointer interaction with everything
 behind a modal layer. Base UI ships an equivalent `InternalBackdrop` for the same reason.
 
-The only component in `@solid-zero/primitives`. It's here rather than inside `Dialog` because
+The only component in `@enara-ui/primitives`. It's here rather than inside `Dialog` because
 every modal layer needs it verbatim — a modal Popover, a modal Select — and copying fifteen
 lines of stacking-order-sensitive CSS into each is how the ordering rules below get quietly
 lost.
@@ -14,7 +14,7 @@ lost.
 function ModalBackdrop(props: { ref?: (element: HTMLDivElement) => void }): JSX.Element;
 ```
 
-It renders `<div role="presentation" aria-hidden="true" data-solid-zero-modal-backdrop
+It renders `<div role="presentation" aria-hidden="true" data-enara-ui-modal-backdrop
 style="position: fixed; inset: 0">`.
 
 **Always pass `ref`, and add the element to `createHideOutside`'s `spare` list.** An `inert`

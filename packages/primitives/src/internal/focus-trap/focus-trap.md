@@ -1,7 +1,7 @@
 # `createFocusTrap`
 
 Traps `Tab`/`Shift+Tab` focus cycling within a container while active. Built fresh for
-solid-zero, modeled on the behavior of Base UI's/React Aria's focus scope primitives.
+enara-ui, modeled on the behavior of Base UI's/React Aria's focus scope primitives.
 
 ## API
 

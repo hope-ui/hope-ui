@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@solid-zero/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
 import { createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
 import { createScrollLock } from "./scroll-lock";
@@ -60,7 +60,7 @@ describe("createScrollLock", () => {
 
   it("shares its ref count with a separate module instance of itself", async () => {
     // The reason the count lives on `document.body` rather than at module scope: nothing
-    // guarantees a consumer has only one installed copy of `@solid-zero/primitives`, and two
+    // guarantees a consumer has only one installed copy of `@enara-ui/primitives`, and two
     // module-scope counters would each believe they own the body's styles. A `?instance=2`
     // query makes Vite serve this module a second time, which is as close to "two copies in
     // node_modules" as a single test run can get.

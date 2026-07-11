@@ -1,7 +1,7 @@
 # `renderElement`
 
 Shared render-prop / `as`-polymorphism primitive used by every public component in
-solid-zero, so no component hand-rolls its own polymorphic-`as` type system — or its own
+enara-ui, so no component hand-rolls its own polymorphic-`as` type system — or its own
 ref merging.
 
 ## API
@@ -77,7 +77,7 @@ that switches to a genuinely different element (button → anchor) will not type
 without an explicit assertion at the call site — there is no sound way to type one concrete
 props interface as simultaneously correct for arbitrary target elements without threading a
 generic type parameter through every component (a `Polymorphic<T>`-style approach, and the
-exact type-DX cost solid-zero is trying to avoid — see the architecture plan's pitfall
+exact type-DX cost enara-ui is trying to avoid — see the architecture plan's pitfall
 notes). This is a known, accepted trade-off, not a bug: cross-element renders are real but
 rarer than same-element restyling, and an explicit assertion at that boundary is honest
 about the type system's actual guarantee.

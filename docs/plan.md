@@ -1,23 +1,23 @@
-# solid-zero: architecture plan and roadmap
+# enara-ui: architecture plan and roadmap
 
 ## Status (as of Phase 1 in progress — Dialog's shared primitives complete)
 
 **Phase 0 is complete and merged to `develop`.** In place: pnpm + Turborepo workspace,
-`@solid-zero/primitives` (behavior kernel — at the time, just `renderElement`),
-`@solid-zero/components/button` (first real component), `@solid-zero/internal-test-utils`
+`@enara-ui/primitives` (behavior kernel — at the time, just `renderElement`),
+`@enara-ui/components/button` (first real component), `@enara-ui/internal-test-utils`
 (shared `mount` + `expectNoA11yViolations` harness), GitHub Actions CI (lint → build →
 typecheck → Vitest unit + Playwright browser tests → Storybook build → coverage/doc/story
 parity check), Changesets. Full pipeline verified green locally, including the
 coverage-parity script's fail/pass behavior.
 
-> Phase 0 shipped as `@solid-zero/core` + `@solid-zero/button`; both were later renamed and
+> Phase 0 shipped as `@enara-ui/core` + `@enara-ui/button`; both were later renamed and
 > absorbed (see "Publishing strategy"). Names above are the current ones.
 
 **Nothing is published until SolidJS 2.0 ships stable.** The release model is: build on the
 pinned beta → wait for stable → fix the beta→stable breakage → publish 1.0. Everything that
 must happen at that boundary is tracked in `docs/migration-2.0-stable.md`, not in comments.
 
-**Phase 1, step 2 (Dialog) is complete**, and `@solid-zero/primitives` gained
+**Phase 1, step 2 (Dialog) is complete**, and `@enara-ui/primitives` gained
 `createComponentContext`, `createFocusTrap`, `createDismissable`, `createScrollLock`,
 `createPresence`, and `withDefaults` — all built fresh (Base UI/React Aria as behavior
 reference, per the reference policy below), all with tests + docs. Building these forced a
@@ -25,9 +25,9 @@ significant, unplanned but necessary detour: the build pipeline moved from
 `tsup`/`esbuild-plugin-solid` to Vite library mode/`vite-plugin-solid@3.0.0-next.5`,
 because the old pipeline could not compile a JSX `ref` attribute at all under solid-js 2.0
 (see "SolidJS 2.0 (beta) — API differences" in `CLAUDE.md` for the full root-cause
-writeup). A second restructure followed: `@solid-zero/core` was renamed to
-`@solid-zero/primitives`, and `@solid-zero/button` was absorbed into a new
-`@solid-zero/components` package (one subpath export per component). See "Publishing
+writeup). A second restructure followed: `@enara-ui/core` was renamed to
+`@enara-ui/primitives`, and `@enara-ui/button` was absorbed into a new
+`@enara-ui/components` package (one subpath export per component). See "Publishing
 strategy" for the full rationale.
 
 **An audit then reshaped the public API before Popover could copy its mistakes.** The
@@ -101,7 +101,7 @@ version):
   references to design from — cite them only as pitfall case studies (backed by direct
   source inspection, not recollection).
 - **Base UI and React Aria: active, legitimate references.** Use their code and
-  reasoning freely when designing solid-zero's public API and accessibility behavior
+  reasoning freely when designing enara-ui's public API and accessibility behavior
   (e.g. the `render`/`useRender` pattern, ARIA keyboard-interaction logic). Don't do a
   byte-per-byte copy when a from-scratch Solid idiom is straightforward — but if a
   literal port from either is genuinely unavoidable, add an attribution comment at the
@@ -119,7 +119,7 @@ version):
 
 ## Context
 
-`solid-zero` is a Base UI / React Aria–inspired headless, accessible component library
+`enara-ui` is a Base UI / React Aria–inspired headless, accessible component library
 for SolidJS — copying their **API surface** (prop patterns, composition idioms) but not
 their React internals — explicitly avoiding the structural problems Kobalte and Corvu
 run into (see Reference policy above).
@@ -168,7 +168,7 @@ were cloned and inspected directly during planning (read-only, then deleted):
   `slider`, `dismissable-layer`.
 - The `Polymorphic`/`PolymorphicProps<T>` generic `as`-prop machinery is the known
   type-DX pain point when consumers wrap components in their own polymorphic layer —
-  solid-zero hit a version of this exact tension in Phase 0 (see Status above).
+  enara-ui hit a version of this exact tension in Phase 0 (see Status above).
 
 **Corvu (per-primitive packages: dialog, popover, tooltip, drawer, accordion,
 disclosure, otp-field, resizable, calendar + shared `solid-dismissible`/
@@ -195,7 +195,7 @@ context/re-render cost. That is, structurally, a hand-built signal system. Solid
 `createStore`/`createSignal`/`createMemo` give you this for free — building an
 equivalent indirection layer in Solid would be pure waste. Base UI also has real test
 density (273 test files / ~44 components) and a clean single `useRender` hook for the
-render-prop/`asChild` composition pattern — solid-zero's `renderElement` is modeled on
+render-prop/`asChild` composition pattern — enara-ui's `renderElement` is modeled on
 this idea (not the React implementation, which needs `forwardRef`/dependency arrays
 that Solid doesn't).
 
@@ -210,7 +210,7 @@ becomes an actual goal.
 
 **Three layers, composition over inheritance:**
 
-1. **Behavior kernel** (`@solid-zero/primitives`, **public API**, never duplicated) — Solid
+1. **Behavior kernel** (`@enara-ui/primitives`, **public API**, never duplicated) — Solid
    2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores:
    `createListState`/`createSelectionState`/`createCollection` (port react-stately's
    *algorithms* directly from react-stately, not from Kobalte's port of them) as
@@ -229,7 +229,7 @@ becomes an actual goal.
 
    This package is **published and supported**: its exported signatures are the public
    contract, not an implementation detail free to churn. Consumers compose it to build
-   components this library doesn't ship, exactly as `@solid-zero/components` does. Two
+   components this library doesn't ship, exactly as `@enara-ui/components` does. Two
    consequences the code must honour:
    - **No primitive may keep cross-instance state at module scope.** A consumer can end up
      with two installed copies (a plain `dependencies` entry doesn't force deduplication),
@@ -258,7 +258,7 @@ becomes an actual goal.
 
 3. **Public component API** — compound components (`Dialog.Root`, `Dialog.Trigger`, …)
    built on `solid-js`'s `merge`/`omit` (2.0's replacements for `mergeProps`/
-   `splitProps`), plus `renderElement` (in `@solid-zero/primitives`) for the render-prop/`as`
+   `splitProps`), plus `renderElement` (in `@enara-ui/primitives`) for the render-prop/`as`
    pattern. Ref merging needs no custom utility — `ref` natively accepts an array of
    ref functions (`ref={[internalRef, props.ref]}`).
 
@@ -269,7 +269,7 @@ plumbing.
 
 ## SSR & hydration requirements (cross-cutting, non-negotiable)
 
-**solid-zero's packages do not need a separate SSR build**, but the reason is narrower and
+**enara-ui's packages do not need a separate SSR build**, but the reason is narrower and
 more fragile than this document used to claim.
 
 > **Corrected.** The old rationale here was that `@solidjs/web` resolves to different runtime
@@ -346,7 +346,7 @@ as of this writing, `@solidjs/start`'s most Solid-2.0-aligned release
 (`2.0.0-alpha.3`) still depends on `solid-js@^1.9.11`, not 2.0 — SolidStart itself has
 not yet migrated. This means **real end-to-end SolidStart integration testing is
 currently blocked** on their migration, not on anything in this project. Don't treat
-"no SolidStart example app yet" as a solid-zero gap; re-check `@solidjs/start`'s
+"no SolidStart example app yet" as a enara-ui gap; re-check `@solidjs/start`'s
 registry versions periodically and add a real SolidStart example once it supports 2.0.
 In the meantime, SSR/hydration correctness is fully testable and required *now* using
 `@solidjs/web`'s own framework-agnostic `renderToStringAsync`/`hydrate` directly (see
@@ -370,11 +370,11 @@ existence before scaling to 50+ components):**
 2. **`Dialog` (in progress)** — forces focus-trap, dismissable, scroll-lock, presence,
    portal, id-linking (`aria-labelledby`/`describedby`), and the context kernel.
    ~~`createComponentContext`, `createFocusTrap`, `createDismissable`,
-   `createScrollLock`, `createPresence`~~ ✅ — all in `@solid-zero/primitives`, tested,
-   documented. `@solid-zero/core` was renamed to `@solid-zero/primitives` and
-   `@solid-zero/button` was absorbed into `@solid-zero/components/button` along the way
+   `createScrollLock`, `createPresence`~~ ✅ — all in `@enara-ui/primitives`, tested,
+   documented. `@enara-ui/core` was renamed to `@enara-ui/primitives` and
+   `@enara-ui/button` was absorbed into `@enara-ui/components/button` along the way
    — see "Publishing strategy". The Dialog component itself (as
-   `@solid-zero/components/dialog`) is next. Also the first real stress-test of the SSR
+   `@enara-ui/components/dialog`) is next. Also the first real stress-test of the SSR
    requirements above: portal-on-the-server (now known to throw, not degrade —
    see above), effect-gated focus-trap/scroll-lock, and `createUniqueId`-based
    id-linking all need to hold up in an actual `renderToStringAsync` + `hydrate` round
@@ -395,23 +395,23 @@ drift that produced Kobalte's and Corvu's gaps.
 - **Package granularity (revised from the original family-package plan):** two
   packages total, not Kobalte's one-giant-package, not Corvu's
   15+-micro-packages-with-sibling-deps, and not the shared-primitive-family split
-  (`@solid-zero/overlays`, `@solid-zero/collections`, `@solid-zero/forms`,
-  `@solid-zero/disclosure`) originally planned here. `@solid-zero/primitives` for the
-  behavior kernel (never duplicated), and a single `@solid-zero/components` package for
+  (`@enara-ui/overlays`, `@enara-ui/collections`, `@enara-ui/forms`,
+  `@enara-ui/disclosure`) originally planned here. `@enara-ui/primitives` for the
+  behavior kernel (never duplicated), and a single `@enara-ui/components` package for
   every public component, each as its own subpath export
-  (`@solid-zero/components/button`, `@solid-zero/components/dialog`, ...). The
+  (`@enara-ui/components/button`, `@enara-ui/components/dialog`, ...). The
   family-package plan required remembering which family package a given component
   shipped from before you could install/import it (`overlays` vs. `collections` vs.
   `forms`); a single package name with per-component subpaths removes that lookup while
   keeping the same per-component tree-shaking a family package would have given —
-  importing `@solid-zero/components/button` never pulls in Dialog's code, since each
+  importing `@enara-ui/components/button` never pulls in Dialog's code, since each
   subpath is its own build entry (see `vite.config.base.ts`'s `entries` option). Every
-  component subpath depends only on `@solid-zero/primitives` — never on another
+  component subpath depends only on `@enara-ui/primitives` — never on another
   component's subpath, which is what keeps this from becoming Kobalte's single giant
   package in spirit despite sharing one package in name.
 - **Entry points:** subpath exports via `package.json#exports` per component rather
   than one barrel re-exporting everything (no root `.` export on
-  `@solid-zero/components` at all), plus `"sideEffects": false`.
+  `@enara-ui/components` at all), plus `"sideEffects": false`.
 - **Monorepo tooling:** pnpm workspaces + Turborepo. Skip Nx — even Base UI itself runs
   Nx *and* Lerna together, more tooling than a greenfield library needs.
 
@@ -460,7 +460,7 @@ test (e.g. checking for a `renderToStringAsync`/`hydrate` reference), the same w
 already enforces test/doc presence. Until that script update lands, treat item 3 as a
 manual review requirement, not a false sense of "CI already covers this."
 
-`expectNoA11yViolations` (axe-core, in `@solid-zero/internal-test-utils`) should run at
+`expectNoA11yViolations` (axe-core, in `@enara-ui/internal-test-utils`) should run at
 least once per component's browser test so a baseline a11y check happens by default.
 
 ## Verification checklist for each new phase

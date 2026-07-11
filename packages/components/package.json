@@ -1,7 +1,7 @@
 {
-  "name": "@solid-zero/components",
+  "name": "@enara-ui/components",
   "version": "0.0.0",
-  "description": "Headless, accessible components for solid-zero — import per-component subpaths (e.g. @solid-zero/components/button)",
+  "description": "Headless, accessible components for enara-ui — import per-component subpaths (e.g. @enara-ui/components/button)",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -26,10 +26,10 @@
     "solid-js": "catalog:"
   },
   "dependencies": {
-    "@solid-zero/primitives": "workspace:*"
+    "@enara-ui/primitives": "workspace:*"
   },
   "devDependencies": {
-    "@solid-zero/internal-test-utils": "workspace:*",
+    "@enara-ui/internal-test-utils": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

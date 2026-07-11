@@ -4,8 +4,8 @@ import type { PluginOption } from "vite";
 import solid from "vite-plugin-solid";
 import { solidPluginOptions } from "../solid-babel-options";
 
-// Same alias vitest.config.ts uses, for the same reason: `@solid-zero/components` depends
-// on `@solid-zero/primitives` as a real workspace package, which resolves to its *built*
+// Same alias vitest.config.ts uses, for the same reason: `@enara-ui/components` depends
+// on `@enara-ui/primitives` as a real workspace package, which resolves to its *built*
 // `dist/`. Without this, editing a primitive has no effect on a story until the package is
 // rebuilt, and stories silently exercise the last build.
 const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src");
@@ -28,8 +28,8 @@ const config: StorybookConfig = {
     ) as PluginOption[];
     plugins.push(solid(solidPluginOptions()));
 
-    // Same wildcard the `vitest.config.ts` alias uses: `@solid-zero/primitives` publishes one
-    // subpath per primitive folder, so `@solid-zero/primitives/render` -> `.../src/render/index.ts`.
+    // Same wildcard the `vitest.config.ts` alias uses: `@enara-ui/primitives` publishes one
+    // subpath per primitive folder, so `@enara-ui/primitives/render` -> `.../src/render/index.ts`.
     // A regex alias needs the array form, so normalize whatever Storybook handed us (object or
     // array) and prepend ours (first match wins in `@rollup/plugin-alias`).
     const existingAlias = config.resolve?.alias;
@@ -44,7 +44,7 @@ const config: StorybookConfig = {
         ...config.resolve,
         alias: [
           {
-            find: /^@solid-zero\/primitives\/(.+)$/,
+            find: /^@enara-ui\/primitives\/(.+)$/,
             replacement: join(primitivesSrcDir, "$1/index.ts"),
           },
           ...aliasArray,

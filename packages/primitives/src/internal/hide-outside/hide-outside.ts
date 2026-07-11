@@ -25,12 +25,12 @@ export interface CreateHideOutsideOptions {
 
 /**
  * Per-element bookkeeping, stored on the element itself under a cross-realm shared symbol
- * rather than in a module-scope `WeakMap`. `@solid-zero/primitives` is public API and is
+ * rather than in a module-scope `WeakMap`. `@enara-ui/primitives` is public API and is
  * depended on as a plain `dependencies` entry, which does not force a single installed
  * instance: two copies would keep two independent ref counts, and an inner layer's cleanup
  * would un-hide elements an outer layer still needs hidden.
  */
-const HIDDEN_STATE = Symbol.for("solid-zero.hide-outside");
+const HIDDEN_STATE = Symbol.for("enara-ui.hide-outside");
 
 interface HiddenState {
   /** How many active layers are hiding this element. */

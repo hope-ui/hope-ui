@@ -1,4 +1,4 @@
-import { type RenderProp, renderElement, withDefaults } from "@solid-zero/primitives/utils";
+import { type RenderProp, renderElement, withDefaults } from "@enara-ui/primitives/utils";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 
