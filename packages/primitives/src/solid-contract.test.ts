@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
  * them being documented, public API. Each one names the code that would break if SolidJS 2.0
  * *stable* changed it.
  *
- * They are not testing enara-ui. They exist so the beta→stable migration is a mechanical
+ * They are not testing hope-ui. They exist so the beta→stable migration is a mechanical
  * diff instead of a bug hunt: `@solidjs/web` has already renamed runtime helpers *within* the
  * beta line (`use`→`ref`, `addEventListener`→`addEvent`), and if stable flips any of these,
  * the failure would otherwise surface days later as a dialog that won't label itself, a ref

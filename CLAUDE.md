@@ -7,7 +7,7 @@ index; the deepest rationale lives in `docs/` (notably `docs/plan.md`, `docs/tes
 
 ## What this is
 
-`enara-ui` is a headless, accessible component library for SolidJS, targeting
+`hope-ui` is a headless, accessible component library for SolidJS, targeting
 **SolidJS 2.0 (beta)** — not 1.x. It is API-inspired by Base UI and React Aria (their
 public API surface and accessibility patterns — actively reference and adapt their
 code/reasoning) but explicitly avoids the architectural patterns of Kobalte and Corvu
@@ -66,8 +66,8 @@ pnpm exec vitest run --project=browser -t "fires onClick"
 
 **Building/typechecking a single package:**
 ```bash
-pnpm --filter @enara-ui/components build
-pnpm --filter @enara-ui/components typecheck
+pnpm --filter @hope-ui/components build
+pnpm --filter @hope-ui/components typecheck
 ```
 
 ## Definition of Done (enforced, not a guideline)
@@ -81,7 +81,7 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    that).
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) colocated in
    the same `src/` directory.
-3. **`@enara-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same `src/`
+3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same `src/`
    directory. Components are what a human has to look at; pure primitives aren't. Stories are
    excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in `vite.config.base.ts`) and from the
    `build` task's turbo `inputs`.
@@ -90,7 +90,7 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
 exists because Kobalte's test coverage is inconsistent, with gaps in the highest a11y-risk
 components, and Corvu has no automated tests at all — see `docs/plan.md`) and additionally requires:
 - Every browser test that calls `mount()` also calls `expectNoA11yViolations` at least once (both
-  from `@enara-ui/internal-test-utils`), running a baseline axe-core check. A browser test that
+  from `@hope-ui/internal-test-utils`), running a baseline axe-core check. A browser test that
   renders nothing (e.g. `solid-contract.browser.test.tsx`) is exempt.
 - Every component (not pure internal primitives with no DOM output) has an SSR test
   (`Foo.ssr.test.tsx` that *calls* `renderToStringAsync`) **and** a hydration test
@@ -148,7 +148,7 @@ catches. Route it through `renderElement`.
 
 `packages/primitives/src/solid-contract.test.tsx` (unit, server `@solidjs/web`) and
 `solid-contract.browser.test.tsx` (browser, client build) are characterization tests. They
-don't test enara-ui; they pin the undocumented `solid-js`/`@solidjs/web` behaviors listed
+don't test hope-ui; they pin the undocumented `solid-js`/`@solidjs/web` behaviors listed
 in `docs/solid-2.0-notes.md`, each with a comment naming the code that depends on it. `@solidjs/web`
 already renamed runtime helpers *within* the beta line (`use`→`ref`,
 `addEventListener`→`addEvent`), so when stable breaks one of these you get a red test with a
@@ -157,31 +157,31 @@ pointer instead of a bug hunt. Add to them rather than re-deriving a behavior in
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
-- `packages/primitives` (`@enara-ui/primitives`) — the shared behavior kernel, and
+- `packages/primitives` (`@hope-ui/primitives`) — the shared behavior kernel, and
   **public, supported API**: its exported signatures are the public contract, not an
   implementation detail free to churn. Consumers compose it to build components this
   library doesn't ship. Nothing here is duplicated per-component; everything else composes it.
 
   Every source file lives under exactly one **top-level `src/` folder**, and *only* top-level
   folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The four folders:
-  - `dialog/` (`@enara-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
+  - `dialog/` (`@hope-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
     state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogPopup`,
     `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
     `createDialogClose`), each in its own `dialog/<part>/dialog-<part>.ts`. Each part hook takes
     the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
     (so the effect stack lives in `createDialogPopup`, the popup's scope). This is the headless
-    shape `@enara-ui/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
+    shape `@hope-ui/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
     `useDialog`/`useOverlay*` split. See `dialog/root/dialog-root.md`.
-  - `modal-backdrop/` (`@enara-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
+  - `modal-backdrop/` (`@hope-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
     only component (it renders DOM), so it sits at `src/` beside the families rather than in
     `internal/`.
-  - `utils/` (`@enara-ui/primitives/utils`) — the non-`createX` composition helpers:
+  - `utils/` (`@hope-ui/primitives/utils`) — the non-`createX` composition helpers:
     `renderElement` (the render-prop/`as`-polymorphism primitive every public component uses
     instead of hand-rolling its own polymorphic-`as` type system — it also owns ref merging;
     modeled on Base UI's `useRender` idea, not its code — see `utils/render/render.md`),
     `withDefaults` (the *only* correct way to apply prop defaults under 2.0 — see the `merge` note
     in `docs/solid-2.0-notes.md`), and `composeEventHandlers`.
-  - `internal/` (`@enara-ui/primitives/internal`) — the `createX` behavior primitives:
+  - `internal/` (`@hope-ui/primitives/internal`) — the `createX` behavior primitives:
     `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
     missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
     `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
@@ -216,34 +216,34 @@ pointer instead of a bug hunt. Add to them rather than re-deriving a behavior in
   through the cross-realm global symbol registry, so every copy reads the same slot.
   `scroll-lock.browser.test.tsx` pins this by importing a genuinely separate module
   instance (`./scroll-lock?instance=2`, which Vite serves as a distinct module).
-- `packages/components` (`@enara-ui/components`) — every public component, one
-  subpath export each (`@enara-ui/components/button`, `@enara-ui/components/dialog`,
+- `packages/components` (`@hope-ui/components`) — every public component, one
+  subpath export each (`@hope-ui/components/button`, `@hope-ui/components/dialog`,
   ...) rather than one package per component or per component-family. No root `.`
   export — consumers always import a specific component's subpath, which is also what
   keeps this from becoming a Kobalte-style single giant package: importing one
   component's subpath never pulls in another's code. See "Publishing shape" below for
   the full rationale.
-- `packages/internal-test-utils` (`@enara-ui/internal-test-utils`, private) — shared
+- `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).
 
 **Composition rule for future components:** compose shared kernel primitives from
-`@enara-ui/primitives`, never import from another component's subpath within
-`@enara-ui/components`. E.g. Popover must compose
+`@hope-ui/primitives`, never import from another component's subpath within
+`@hope-ui/components`. E.g. Popover must compose
 `createFloating`/`createDismissable`/`createPresence` directly — it must never import
-from `@enara-ui/components/dialog`, even though both are "overlay-ish." This is the
+from `@hope-ui/components/dialog`, even though both are "overlay-ish." This is the
 specific mistake Corvu makes (`@corvu/popover` depends on `@corvu/dialog`) that this
 project avoids by design, despite now sharing one package.
 
 **Publishing shape:** originally planned as packages grouped by shared-primitive family
-(`@enara-ui/overlays`, `@enara-ui/collections`, etc.); revised to a single
-`@enara-ui/components` package with one subpath export per component instead. The
+(`@hope-ui/overlays`, `@hope-ui/collections`, etc.); revised to a single
+`@hope-ui/components` package with one subpath export per component instead. The
 family-package plan meant consumers had to remember which family package a given
 component lived in before they could install/import it; a single package name with
 per-component subpaths removes that lookup entirely while keeping the same
 per-component tree-shaking (via `package.json#exports` + `"sideEffects": false`) that
-family packages would have given. `@enara-ui/primitives` stays a fully separate
-package — every entry in `@enara-ui/components` depends on it, never on a sibling
+family packages would have given. `@hope-ui/primitives` stays a fully separate
+package — every entry in `@hope-ui/components` depends on it, never on a sibling
 subpath. Each component subpath is its own Vite library-mode entry point (see
 `vite.config.base.ts`'s `entries` option), building to `dist/<component>/index.js` +
 matching `.d.ts`. ESM-only builds.
@@ -287,11 +287,11 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
   in `vitest.config.ts`.
 - Browser tests import `page` from `vitest/browser`, not the deprecated `@vitest/browser/context`.
 
-## In development, `@enara-ui/*` always resolves to `src` — never to a sibling's `dist`
+## In development, `@hope-ui/*` always resolves to `src` — never to a sibling's `dist`
 
 `package.json#exports` points at `dist/` because that's what consumers install. Nothing
 in this repo may follow it. A stale `dist/` silently masquerades as the current API: add an
-export to `@enara-ui/primitives` and, until someone rebuilds, `@enara-ui/components`
+export to `@hope-ui/primitives` and, until someone rebuilds, `@hope-ui/components`
 can't see it — or worse, keeps compiling against the old implementation and its tests pass.
 
 Three places redirect to source, and all three must stay in sync when a package is added:

@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { type Accessor, createSignal, Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";

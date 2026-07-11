@@ -13,7 +13,7 @@ interface PackageJson {
 export interface CreateViteConfigOptions {
   /**
    * Per-entry-point subpath map (output name -> source file, relative to `packageDir`),
-   * for packages that publish one subpath export per unit (e.g. `@enara-ui/components`'
+   * for packages that publish one subpath export per unit (e.g. `@hope-ui/components`'
    * `./button`, `./dialog`, ...) instead of a single root export. Each entry builds to
    * `dist/<name>/index.js` (and, via `vite-plugin-dts` mirroring `src`, `dist/<name>/index.d.ts`).
    * Omit for the common single-entry case (`src/index.ts` -> `dist/index.js`).
@@ -23,7 +23,7 @@ export interface CreateViteConfigOptions {
 }
 
 /**
- * Shared Vite library-mode build config for every `@enara-ui/*` package.
+ * Shared Vite library-mode build config for every `@hope-ui/*` package.
  *
  * Replaces the `tsup`/`esbuild-plugin-solid` pipeline used through Phase 0: that
  * pipeline compiles Solid JSX via `babel-preset-solid@1.x` regardless of the
@@ -70,7 +70,7 @@ export function createViteConfig(
           // which isn't in the tarball, and every consumer "go to definition" lands on a
           // missing file. Off for the published artifact; nothing in-repo reads them.
           declarationMap: false,
-          // The one place `@enara-ui/*` must *not* resolve to source. `tsconfig.base.json`
+          // The one place `@hope-ui/*` must *not* resolve to source. `tsconfig.base.json`
           // maps those specifiers to `packages/*/src` so the editor and `tsc --noEmit` never
           // read a stale sibling `dist/`. `vite-plugin-dts` honours `paths` when it emits,
           // which produced `import { RenderProp } from '../../packages/primitives/src/index.ts'`

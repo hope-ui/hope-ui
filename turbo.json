@@ -7,8 +7,13 @@
     "pnpm-workspace.yaml"
   ],
   "tasks": {
+    "codegen": {
+      "inputs": ["panda.config.ts"],
+      "outputs": ["styled-system/**"],
+      "cache": false
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^codegen"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "!src/**/*.test.ts",
@@ -28,6 +33,7 @@
       "outputs": []
     },
     "typecheck": {
+      "dependsOn": ["^codegen"],
       "outputs": []
     }
   }

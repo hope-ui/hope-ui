@@ -1,12 +1,16 @@
 {
-  "name": "@enara-ui/components",
+  "name": "@hope-ui/components",
   "version": "0.0.0",
-  "description": "Headless, accessible components for enara-ui — import per-component subpaths (e.g. @enara-ui/components/button)",
+  "description": "Headless, accessible components for hope-ui — import per-component subpaths (e.g. @hope-ui/components/button)",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "files": ["dist"],
   "exports": {
+    "./box": {
+      "types": "./dist/box/index.d.ts",
+      "import": "./dist/box/index.js"
+    },
     "./button": {
       "types": "./dist/button/index.d.ts",
       "import": "./dist/button/index.js"
@@ -26,10 +30,11 @@
     "solid-js": "catalog:"
   },
   "dependencies": {
-    "@enara-ui/primitives": "workspace:*"
+    "@hope-ui/primitives": "workspace:*"
   },
   "devDependencies": {
-    "@enara-ui/internal-test-utils": "workspace:*",
+    "@hope-ui/internal-test-utils": "workspace:*",
+    "@hope-ui/styled-system": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

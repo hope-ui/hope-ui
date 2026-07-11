@@ -19,7 +19,7 @@ export interface CreateDismissableOptions {
  *
  * Doesn't manage a layered dismiss stack (only the single container passed in) — that's
  * intentionally deferred until Popover/Tooltip force a real need for stacked dismissable
- * layers, per enara-ui's phased build plan.
+ * layers, per hope-ui's phased build plan.
  */
 export function createDismissable(options: CreateDismissableOptions): void {
   createEffect(

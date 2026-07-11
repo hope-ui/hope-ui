@@ -2,7 +2,7 @@
 
 `@solid-primitives` (the `next` branch, tracking SolidJS 2.0 beta) is the community-standard,
 SolidJS-team-adjacent set of low-level primitives. It is a first-class source to adopt from — but on
-enara-ui's terms, which are stricter than most consumers'.
+hope-ui's terms, which are stricter than most consumers'.
 
 ## The practice
 
@@ -11,10 +11,10 @@ that already solves it.** Record a verdict — *adopt*, *wrap*, or *build-fresh-
 package isn't re-evaluated from scratch later. Packages:
 <https://github.com/solidjs-community/solid-primitives/tree/next/packages/>
 
-Anything adopted is **full-DoD-wrapped**: it must clear enara-ui's existing gates through the
+Anything adopted is **full-DoD-wrapped**: it must clear hope-ui's existing gates through the
 composing component — an SSR test, a **byte-for-byte hydration fixture with no mismatch**, a baseline
 axe pass, and a clean `STRICT_READ_UNTRACKED`/`REACTIVE_WRITE_IN_OWNED_SCOPE` run. Trusting upstream
-coverage is not enough; enara-ui's differentiator is that it *guarantees* this end to end.
+coverage is not enough; hope-ui's differentiator is that it *guarantees* this end to end.
 
 Two mechanical requirements for any adoption:
 
@@ -43,7 +43,7 @@ Measured directly with `controlled-signal` in `createDialog` (all four combinati
 | `node_modules` dependency (not compiled by it) | **`1010`** | **`2010`** | ❌ asymmetric |
 
 The client's runtime `hydratedCreateSignal` always consumes the id. The **server** only emits the
-matching id when the code is compiled by enara-ui's Solid pipeline; an untransformed dependency
+matching id when the code is compiled by hope-ui's Solid pipeline; an untransformed dependency
 skips it. So the packaged dep produces `1010` on the server but the client asks for `2010` — a
 divergence **no committed fixture can reconcile** (proven both ways: `fixture=2010` passes hydration
 but fails the byte-for-byte SSR assertion at `Received: 1010`).
@@ -78,12 +78,12 @@ render-body memo) are the safest bet.
   transform-boundary hazard above: server emits the Dialog trigger at `_hk=1010`, the client hydrates
   expecting `2010` — an asymmetry no fixture reconciles. Reverted. Copying the source in-repo (which
   *is* symmetric) is not an option: the package is "Adapted from Kobalte", and the never-copy-Kobalte
-  rule applies. Kept enara-ui's Base-UI-modeled boxing implementation, which is SSR-safe, zero-dep,
+  rule applies. Kept hope-ui's Base-UI-modeled boxing implementation, which is SSR-safe, zero-dep,
   and *more* capable — it stores function-valued `T` (upstream's setter treats a function as an
   updater). This is the proof the full-DoD-wrap hydration gate earns its keep: unit tests were green;
   only the hydration round-trip caught it.
 - **`createComponentContext` ← `context`: kept.** `createContextProvider` uses a factory-Provider
-  model that doesn't match enara-ui's raw-`Context` + `<Ctx value={…}>` usage, and ours already
+  model that doesn't match hope-ui's raw-`Context` + `<Ctx value={…}>` usage, and ours already
   adds the one thing of value (a friendlier missing-Provider error). Adopting is a lateral refactor
   for negative value. `createOptionalContextProvider` / `createLayeredContext` / `MultiProvider`
   remain future candidates for compound components.
@@ -97,7 +97,7 @@ render-body memo) are the safest bet.
 
 ### Tier B — overlay/modality behaviors: kept, with reasons
 solid-primitives covers more of this layer than first assumed, but each swap costs a specific
-quality decision enara-ui made deliberately:
+quality decision hope-ui made deliberately:
 - **Focus trap + restore stay split.** `focus/createFocusTrap` welds restore in; the split exists so
   a non-modal Popover/Tooltip can restore focus *without* trapping. Ours also re-queries focusables
   live per Tab, so it needs no `MutationObserver`.

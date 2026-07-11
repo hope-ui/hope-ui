@@ -2,7 +2,7 @@
 
 Tracks mount/unmount timing across an exit CSS transition or animation, so a component
 can stay in the DOM long enough for an authored exit animation to finish before actually
-unmounting. Built fresh for enara-ui, modeled on Base UI's transition-status handling.
+unmounting. Built fresh for hope-ui, modeled on Base UI's transition-status handling.
 
 ## API
 

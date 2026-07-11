@@ -16,17 +16,17 @@
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
 
-    // In-repo, `@enara-ui/*` always resolves to source — never to a sibling's `dist/`.
+    // In-repo, `@hope-ui/*` always resolves to source — never to a sibling's `dist/`.
     // `package.json#exports` points at `dist/` for consumers, which would otherwise make
     // the editor and `tsc --noEmit` read a stale build: add an export to
-    // `@enara-ui/primitives` and `@enara-ui/components` can't see it until someone
+    // `@hope-ui/primitives` and `@hope-ui/components` can't see it until someone
     // rebuilds. `vitest.config.ts` aliases to source for exactly this reason, and
-    // `@enara-ui/internal-test-utils` points its own `main`/`types` at `src/index.ts`.
+    // `@hope-ui/internal-test-utils` points its own `main`/`types` at `src/index.ts`.
     // Relative paths in an inherited config resolve against the config that declares them,
     // so these are repo-root-relative and every package inherits them unchanged.
     "paths": {
-      "@enara-ui/primitives/*": ["./packages/primitives/src/*/index.ts"],
-      "@enara-ui/internal-test-utils": ["./packages/internal-test-utils/src/index.ts"]
+      "@hope-ui/primitives/*": ["./packages/primitives/src/*/index.ts"],
+      "@hope-ui/internal-test-utils": ["./packages/internal-test-utils/src/index.ts"]
     }
   }
 }

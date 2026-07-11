@@ -1,4 +1,4 @@
-# How enara-ui is tested
+# How hope-ui is tested
 
 Three Vitest projects. **One job each, one module resolution each.** If a test doesn't
 obviously belong to exactly one of them, that's a signal the test is doing two things.
@@ -70,7 +70,7 @@ Assert on the string a server would send. `dialog.ssr.test.tsx` is the model: it
 `renderToStringAsync` resolves, that portaled content is absent, that no dangling `aria-controls`
 IDREF is emitted.
 
-Every `@enara-ui/components` source file **must** have a `Foo.ssr.test.tsx` containing a real
+Every `@hope-ui/components` source file **must** have a `Foo.ssr.test.tsx` containing a real
 `renderToStringAsync()` call — not in a comment, not in a string, not merely imported, not
 inside an `it.skip`. `check:coverage-parity` checks all four.
 
@@ -141,7 +141,7 @@ in a comment.
 
 ## `mount()` fails on Solid reactivity diagnostics
 
-`mount()` (from `@enara-ui/internal-test-utils`) throws from `dispose()` if SolidJS emitted
+`mount()` (from `@hope-ui/internal-test-utils`) throws from `dispose()` if SolidJS emitted
 `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` while the tree was mounted. The
 browser suite used to print 170 of the first per run, which made the next real one invisible —
 and it is the only diagnostic that catches the conditionally-rendered-ref race `CLAUDE.md`

@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { ModalBackdrop } from "./modal-backdrop";
@@ -13,7 +13,7 @@ describe("ModalBackdrop", () => {
   it("renders a presentational, aria-hidden, viewport-covering element", () => {
     const { container, dispose } = mount(() => <ModalBackdrop />);
 
-    const backdrop = container.querySelector("[data-enara-ui-modal-backdrop]");
+    const backdrop = container.querySelector("[data-hope-ui-modal-backdrop]");
     expect(backdrop).not.toBeNull();
     expect(backdrop?.getAttribute("role")).toBe("presentation");
     expect(backdrop?.getAttribute("aria-hidden")).toBe("true");
@@ -40,7 +40,7 @@ describe("ModalBackdrop", () => {
     const topmost = topmostElementOver(behind);
 
     expect(topmost).not.toBe(behind);
-    expect((topmost as Element).hasAttribute("data-enara-ui-modal-backdrop")).toBe(true);
+    expect((topmost as Element).hasAttribute("data-hope-ui-modal-backdrop")).toBe(true);
     expect(onBackgroundClick).not.toHaveBeenCalled();
 
     dispose();
@@ -75,7 +75,7 @@ describe("ModalBackdrop", () => {
     let received: HTMLDivElement | undefined;
     const { container, dispose } = mount(() => <ModalBackdrop ref={(el) => (received = el)} />);
 
-    expect(received).toBe(container.querySelector("[data-enara-ui-modal-backdrop]"));
+    expect(received).toBe(container.querySelector("[data-hope-ui-modal-backdrop]"));
     dispose();
   });
 

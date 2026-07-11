@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@enara-ui/internal-test-utils"]
+  "ignore": ["@hope-ui/internal-test-utils"]
 }

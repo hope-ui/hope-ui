@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Fails CI if any source file under packages/*/src is missing a matching test file
-// and/or a matching .md doc file. This is what prevents test/doc coverage from
-// drifting as the number of components grows.
+// Fails CI if a `primitives/` or `components/` source file under packages/*/src is missing a
+// matching test file and/or a matching .md doc file (see REQUIRES_TEST_AND_DOC). This is what
+// prevents test/doc coverage from drifting as the number of components grows.
 //
-// Every @enara-ui/components source file additionally needs a Storybook story, a
+// Every @hope-ui/components source file additionally needs a Storybook story, a
 // `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
 // `Foo.browser.test.tsx` that really calls `hydrate()` — the two halves of the SSR round-trip
 // the Definition of Done requires. And any browser test that calls `mount()` must also call
@@ -20,6 +20,11 @@ const packagesDir = join(repoRoot, "packages");
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
+// Only the behavior/UI packages carry the test + .md Definition of Done. The preset is pure
+// token data (Tailwind v4 values + semantic tokens) and the generated styled-system isn't
+// hand-written, so both are exempt — tokens are exercised transitively by the components that
+// consume them.
+const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
@@ -235,6 +240,7 @@ try {
 const missing = [];
 
 for (const pkg of packageDirs) {
+  if (!REQUIRES_TEST_AND_DOC.has(pkg)) continue;
   const srcDir = join(packagesDir, pkg, "src");
   let allFiles;
   try {

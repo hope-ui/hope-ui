@@ -1,0 +1,38 @@
+{
+  "name": "@hope-ui/styled-system",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Generated Panda styled-system (css/tokens/patterns runtime + types) for hope-ui, produced from @hope-ui/preset. Workspace-internal; its pure runtime is inlined into @hope-ui/components at build. Never exports the /jsx factory (Solid 1.x, literal host elements).",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./css": {
+      "types": "./styled-system/css/index.d.ts",
+      "import": "./styled-system/css/index.mjs"
+    },
+    "./tokens": {
+      "types": "./styled-system/tokens/index.d.ts",
+      "import": "./styled-system/tokens/index.mjs"
+    },
+    "./patterns": {
+      "types": "./styled-system/patterns/index.d.ts",
+      "import": "./styled-system/patterns/index.mjs"
+    },
+    "./is-valid-prop": {
+      "types": "./styled-system/jsx/is-valid-prop.d.ts",
+      "import": "./styled-system/jsx/is-valid-prop.mjs"
+    },
+    "./types": {
+      "types": "./styled-system/types/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "codegen": "panda codegen --config panda.config.ts",
+    "cssgen": "panda cssgen --config panda.config.ts --outfile styled-system/styles.css"
+  },
+  "devDependencies": {
+    "@hope-ui/preset": "workspace:*",
+    "@pandacss/dev": "^1.11.4"
+  }
+}

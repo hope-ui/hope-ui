@@ -1,7 +1,7 @@
 # `createScrollLock`
 
 Locks `document.body` scrolling while active, compensating for the scrollbar-width
-layout shift with a matching `padding-right`. Built fresh for enara-ui.
+layout shift with a matching `padding-right`. Built fresh for hope-ui.
 
 ## API
 
@@ -21,9 +21,9 @@ one's deactivation prematurely unlocking scroll for the other.
 
 ## Where the ref count lives, and why it matters
 
-On `document.body`, under `Symbol.for("enara-ui.scroll-lock")` — **not** at module scope.
+On `document.body`, under `Symbol.for("hope-ui.scroll-lock")` — **not** at module scope.
 
-`@enara-ui/primitives` is public API, and `@enara-ui/components` depends on it as a plain
+`@hope-ui/primitives` is public API, and `@hope-ui/components` depends on it as a plain
 `dependencies` entry. Neither forces a single installed instance: a consumer can end up with
 two copies of this package in their tree, at which point two module-scope counters each
 believe they own the body. The observable failure is that `overflow: hidden` is restored while

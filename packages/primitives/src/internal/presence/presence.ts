@@ -55,7 +55,7 @@ function getExitTimeoutMs(element: HTMLElement): number {
 
 /**
  * Tracks mount/unmount timing across an exit CSS transition or animation, the same idea as Base
- * UI's transition-status handling, built fresh for enara-ui.
+ * UI's transition-status handling, built fresh for hope-ui.
  *
  * Consumers gate their DOM output on `mounted()` and use `status()` to drive a `data-presence`
  * attribute for CSS (`entering`/`entered`/`exiting`/`exited`). If the rendered element has no

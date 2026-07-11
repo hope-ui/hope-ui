@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { renderElement } from "./render";

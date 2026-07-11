@@ -1,9 +1,9 @@
 # `createDialog` (dialog hook family)
 
 The headless behavior core of a modal/non-modal dialog, decomposed into one hook per part — the
-shape `@enara-ui/components`' `Dialog` is a thin JSX layer over. Modeled on React Aria's
+shape `@hope-ui/components`' `Dialog` is a thin JSX layer over. Modeled on React Aria's
 `useDialog`/`useOverlay*` split (its public surface and a11y reasoning, not its code). Exported as
-one subpath, `@enara-ui/primitives/dialog`.
+one subpath, `@hope-ui/primitives/dialog`.
 
 | Hook | Owns |
 | ---- | ---- |

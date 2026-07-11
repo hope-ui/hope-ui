@@ -1,6 +1,6 @@
 # Migration checklist: SolidJS 2.0 beta → stable
 
-`enara-ui` is built against a pinned `solid-js` / `@solidjs/signals` / `@solidjs/web`
+`hope-ui` is built against a pinned `solid-js` / `@solidjs/signals` / `@solidjs/web`
 beta (see `pnpm-workspace.yaml`'s catalog) and **is not published until SolidJS 2.0 ships
 stable**. The plan is: build on beta → wait for stable → fix the beta→stable breakage →
 publish 1.0.
@@ -164,7 +164,7 @@ hydrated by the `browser` project. Corrupt a fixture and both halves go red.
 
 ## 5. Re-evaluate the build toolchain (tsdown + unplugin-solid)
 
-`solid-primitives`' `next` branch builds with `tsdown` + `unplugin-solid`. enara-ui
+`solid-primitives`' `next` branch builds with `tsdown` + `unplugin-solid`. hope-ui
 deliberately stayed on Vite library mode. The reason, verified rather than assumed:
 
 - `unplugin-solid@1.0.0` resolves its compiler via a bare `import solid from
@@ -176,7 +176,7 @@ deliberately stayed on Vite library mode. The reason, verified rather than assum
   named 'use'"* failure that made this repo abandon `esbuild-plugin-solid`. It also emits
   `addEventListener`, which `@solidjs/web` 2.0 renamed to `addEvent`.
 - solid-primitives carries no `pnpm.overrides` to correct it, and gets away with it because
-  their packages are reactive primitives that rarely compile JSX host elements. enara-ui
+  their packages are reactive primitives that rarely compile JSX host elements. hope-ui
   ships components.
 - Critically, **Vitest compiles through a different plugin** (`vite-plugin-solid`), so
   adopting `unplugin-solid` today would ship a broken `dist/` with the entire pipeline

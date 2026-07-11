@@ -1,5 +1,5 @@
 // The `utils/` barrel: the non-`createX` composition helpers, exported as the single subpath
-// `@enara-ui/primitives/utils`. Subfolders have no barrel of their own — only the top-level
+// `@hope-ui/primitives/utils`. Subfolders have no barrel of their own — only the top-level
 // `src/` folders do.
 export { type WithDefaults, withDefaults } from "./defaults/defaults";
 export { composeEventHandlers, type EventHandlerEvent } from "./events/events";

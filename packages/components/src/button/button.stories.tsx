@@ -25,7 +25,7 @@ export const Disabled: Story = {
 /**
  * The `render` prop swaps the underlying element while keeping Button's computed props.
  * Switching element kinds (button → anchor) needs an explicit assertion, since `render` is
- * typed against Button's own props. See `@enara-ui/primitives`' `render.md`.
+ * typed against Button's own props. See `@hope-ui/primitives`' `render.md`.
  */
 export const AsAnchor: Story = {
   render: () => (

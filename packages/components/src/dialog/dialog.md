@@ -3,7 +3,7 @@
 A headless, accessible dialog (modal or non-modal). Implements the
 [WAI-ARIA Dialog (Modal) Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/),
 API-inspired by Base UI's Dialog. A thin JSX layer over the `createDialog` primitive
-(`@enara-ui/primitives/dialog`), which owns the entire behavior core — open state, the
+(`@hope-ui/primitives/dialog`), which owns the entire behavior core — open state, the
 title/description/popup ids, the spared-element registry, popup/backdrop presence, and the
 focus-restore/focus-trap/hide-outside/dismiss/scroll-lock effect stack. The component adds only
 markup, `renderElement` polymorphism, `composeEventHandlers` (so a consumer's `onClick` can
@@ -27,7 +27,7 @@ Uncontrolled by default (`defaultOpen`); pass `open`/`onOpenChange` to control i
 | `Dialog.Close`       | `button` | Closes the dialog on click. |
 
 Every part except `Root` accepts a `render` prop for polymorphic rendering (see
-`@enara-ui/primitives`'s `renderElement`).
+`@hope-ui/primitives`'s `renderElement`).
 
 ## Modality
 
@@ -52,7 +52,7 @@ measurements.
 inert. Both it and `ModalBackdrop` are *spared* from `inert` — an inert element is transparent
 to hit testing, so a backdrop that hid itself would stop blocking anything.
 
-All four live in `@enara-ui/primitives`, so a future modal Popover or Select composes the
+All four live in `@hope-ui/primitives`, so a future modal Popover or Select composes the
 same four rather than reimplementing them.
 
 With `modal={false}`, none of them apply: the page behind stays interactive and focusable,
@@ -222,7 +222,7 @@ violations.
 ## Example
 
 ```tsx
-import { Dialog } from "@enara-ui/components/dialog";
+import { Dialog } from "@hope-ui/components/dialog";
 
 <Dialog.Root>
   <Dialog.Trigger>Open dialog</Dialog.Trigger>

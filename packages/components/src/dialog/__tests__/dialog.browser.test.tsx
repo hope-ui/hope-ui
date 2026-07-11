@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { hydrate } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
@@ -416,7 +416,7 @@ describe("Dialog", () => {
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
-    const modalBackdrop = document.querySelector("[data-enara-ui-modal-backdrop]");
+    const modalBackdrop = document.querySelector("[data-hope-ui-modal-backdrop]");
     expect(modalBackdrop?.hasAttribute("inert")).toBe(false);
     expect(page.getByTestId("backdrop").element().hasAttribute("inert")).toBe(false);
 
@@ -438,7 +438,7 @@ describe("Dialog", () => {
     const topmost = topmostElementOver(background);
 
     expect(topmost).not.toBe(background);
-    expect((topmost as Element).hasAttribute("data-enara-ui-modal-backdrop")).toBe(true);
+    expect((topmost as Element).hasAttribute("data-hope-ui-modal-backdrop")).toBe(true);
     expect(onBackgroundClick).not.toHaveBeenCalled();
 
     dispose();

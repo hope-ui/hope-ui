@@ -76,7 +76,7 @@ actual installed package):
   `aria-modal`. The same bug turned `<Button type={props.type}>` into a form-submitting
   button. Forwarding an optional prop from a wrapper is the most common thing a consumer
   does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
-  `@enara-ui/primitives`, which resolves each defaulted key with `??`. See
+  `@hope-ui/primitives`, which resolves each defaulted key with `??`. See
   `packages/primitives/src/utils/defaults/defaults.md`.
 - **Internal computed props must fall back to the consumer's, not overwrite them.** Same
   root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
@@ -134,7 +134,7 @@ actual installed package):
   General rule: any primitive/component where a descendant needs to register something
   into an ancestor-owned signal must do so via `onSettled` (or another deferred
   mechanism), never directly in the descendant's synchronous render body. This is packaged
-  as `createRegisteredId` in `@enara-ui/primitives`; use it rather than re-deriving the
+  as `createRegisteredId` in `@hope-ui/primitives`; use it rather than re-deriving the
   deferral. Watch for
   SSR/hydration mismatches when applying this outside a case like Dialog's, where the
   writing component (`Title`/`Description`) only ever renders inside a `Portal`-guarded

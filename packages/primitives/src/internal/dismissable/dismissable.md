@@ -1,7 +1,7 @@
 # `createDismissable`
 
 Calls an `onDismiss` callback on Escape keydown and/or outside pointerdown while active.
-Built fresh for enara-ui, modeled on Base UI's/React Aria's dismiss-layer behavior.
+Built fresh for hope-ui, modeled on Base UI's/React Aria's dismiss-layer behavior.
 
 ## API
 
@@ -39,7 +39,7 @@ works if `ref` is a real `createSignal` accessor. Same rule as `createFocusTrap`
 This is intentionally a single-layer primitive — it does not manage a stacked
 dismiss-order across multiple simultaneously open overlays (e.g. a Popover opened from
 inside a Dialog, where only the topmost layer should dismiss on Escape). That's deferred
-until Popover/Tooltip force an actual need for it, per enara-ui's phased build plan —
+until Popover/Tooltip force an actual need for it, per hope-ui's phased build plan —
 adding it now would be speculative.
 
 ## SSR

@@ -24,7 +24,7 @@ tests" part of the Definition of Done instead of best-effort review.
 ## Example
 
 ```ts
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 
 const { container, dispose } = mount(() => <Dialog open>...</Dialog>);
 await expectNoA11yViolations(container);

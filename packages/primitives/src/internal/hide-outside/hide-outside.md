@@ -92,8 +92,8 @@ Both attributes are ref-counted per element, so two stacked layers compose: the 
 cleanup leaves them in place on elements the outer layer still needs hidden. Any pre-existing
 `aria-hidden` or `inert` the consumer set themselves is snapshotted and restored.
 
-The count lives on the element itself under `Symbol.for("enara-ui.hide-outside")`, not in a
-module-scope `WeakMap`. `@enara-ui/primitives` is public API and is depended on as a plain
+The count lives on the element itself under `Symbol.for("hope-ui.hide-outside")`, not in a
+module-scope `WeakMap`. `@hope-ui/primitives` is public API and is depended on as a plain
 `dependencies` entry, which does not force a single installed instance — two copies would keep
 two independent counts and un-hide each other's elements. `Symbol.for` resolves through the
 cross-realm global symbol registry, so every copy reads the same slot. `createScrollLock`

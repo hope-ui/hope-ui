@@ -1,4 +1,4 @@
-import { expectNoA11yViolations, mount } from "@enara-ui/internal-test-utils";
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
