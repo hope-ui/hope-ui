@@ -59,13 +59,14 @@ actual installed package):
   Fix: track both in `compute`, e.g.
   `createEffect(() => [options.active(), options.ref()] as const, ([active, container]) => { ... })`,
   with the ref always backed by `createSignal`, never `let el; ref={el}`. Live in
-  `createFocusTrap`/`createDismissable`; see `packages/components/src/dialog/Dialog.tsx`
-  (`Popup`/`Backdrop`) for the call-site pattern. Any future `createXyz({ active, ref })`-
+  `createFocusTrap`/`createDismissable`; see `createDialogPopup`/`createDialogBackdrop`
+  (`packages/primitives/src/dialog/popup/dialog-popup.ts` and `.../backdrop/dialog-backdrop.ts`)
+  for the call-site pattern. Any future `createXyz({ active, ref })`-
   shaped primitive that needs the ref the moment `active` flips true needs this same
   pattern — `createPresence` doesn't need it (and wasn't touched) because it doesn't read
   the ref on the activating edge.
 - **`mergeProps`/`splitProps` are gone from the public API.** The 2.0 idiom is `merge`
-  and `omit`, imported from `solid-js` (see `packages/components/src/button/Button.tsx`).
+  and `omit`, imported from `solid-js` (see `packages/components/src/button/button.tsx`).
   Prefer these over anything reintroducing the old names.
 - **`merge` resolves a key by *presence*, not by value — never use it to apply defaults.**
   `merge({ modal: true }, props)` looks like a default, but a later source that has the key
@@ -76,14 +77,14 @@ actual installed package):
   button. Forwarding an optional prop from a wrapper is the most common thing a consumer
   does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
   `@solid-zero/primitives`, which resolves each defaulted key with `??`. See
-  `packages/primitives/src/defaults/defaults.md`.
+  `packages/primitives/src/utils/defaults/defaults.md`.
 - **Internal computed props must fall back to the consumer's, not overwrite them.** Same
   root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
   puts the internal object last, so a getter returning `undefined` *erases* a
   consumer-supplied `aria-labelledby`, leaving the dialog with no accessible name. Write
   `props["aria-labelledby"] ?? context.titleId()`. Only props derived from state the
   consumer doesn't control (`aria-modal`, `data-presence`) stay component-owned. See
-  `Dialog.md`'s "Prop precedence" table for the house rule.
+  `dialog.md`'s "Prop precedence" table for the house rule.
 - **A signal write is not visible to a plain read until the next flush — in the *client*
   build only.** `setV(2); v()` returns the *old* value under `solid-js`'s client/dev build
   (deterministic microtask batching) and the *new* value under its server build. Tests that
@@ -143,7 +144,7 @@ actual installed package):
   reasoning re-checked.
 - **Vite's `solid-refresh` HMR wrapper breaks prop forwarding in dev/test mode for
   components imported from another module** (a real bug hit during Phase 0: `children`
-  silently failed to reach the DOM only when `Button` was imported from `Button.tsx`,
+  silently failed to reach the DOM only when `Button` was imported from `button.tsx`,
   not when the same component was defined inline in the test file). Fixed by setting
   `refresh: { disabled: true }` on the Solid Vite plugin in `vitest.config.ts` — tests
   never need HMR (`hot` still works but is deprecated in `vite-plugin-solid@3.x` in

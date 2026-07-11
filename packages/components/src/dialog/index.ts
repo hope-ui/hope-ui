@@ -7,5 +7,5 @@ export type {
   DialogRootProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "./Dialog";
-export { Dialog } from "./Dialog";
+} from "./dialog";
+export { Dialog } from "./dialog";

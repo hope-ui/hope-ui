@@ -66,7 +66,7 @@ Both fixes live in `vitest.config.ts`, commented.
 
 ## Writing an SSR test
 
-Assert on the string a server would send. `Dialog.ssr.test.tsx` is the model: it checks that
+Assert on the string a server would send. `dialog.ssr.test.tsx` is the model: it checks that
 `renderToStringAsync` resolves, that portaled content is absent, that no dangling `aria-controls`
 IDREF is emitted.
 
@@ -84,16 +84,20 @@ Hydration is, by definition, two environments: the server renders, the browser t
 DOM it produced. No single project can do both. They cooperate through a **committed fixture**:
 
 ```
-src/dialog/__fixtures__/dialog-ssr.html   ← genuine server output, checked in
+src/dialog/__tests__/__fixtures__/dialog-ssr.html   ← genuine server output, checked in
 
-Dialog.ssr.test.tsx      toMatchFileSnapshot(fixture)   ← generates it, then guards it
-Dialog.browser.test.tsx  hydrate(<Dialog/>, containerWithFixture)
+src/dialog/__tests__/dialog.ssr.test.tsx      toMatchFileSnapshot(fixture)  ← generates, guards
+src/dialog/__tests__/dialog.browser.test.tsx  hydrate(<Dialog/>, containerWithFixture)
 ```
 
 Corrupt the fixture and **both** halves go red: the `ssr` one because the server no longer
 produces it, the `browser` one because there is nothing to hydrate against.
 
 ### Adding one for a new component
+
+A component's test files live in its `__tests__/` folder (`src/foo/__tests__/`), with the fixture
+under `__tests__/__fixtures__/`. The relative paths below are written from a test inside
+`__tests__/`, so `./__fixtures__/…` resolves to that sibling folder.
 
 **Never hand-write a fixture.** `_hk` keys are a path through the component tree; guessing one
 is how you get a test that passes against markup no server would ever send.

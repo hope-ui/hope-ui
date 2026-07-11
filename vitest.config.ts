@@ -54,11 +54,20 @@ function resolveServerEntry(packageName: string): string {
 // standalone primitive tests (which import it via a relative path within the same package)
 // went green, but Dialog's tests kept failing identically, because they were still exercising
 // the stale pre-fix `dist` build. Aliasing straight to source removes the rebuild step.
-const primitivesSrcEntry = join(import.meta.dirname, "packages/primitives/src/index.ts");
+const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 
-// Exact matches. A bare string `find` is a *prefix* match in Vite, so `"solid-js"` would also
-// capture `solid-js/store` and `"@solidjs/web"` would capture `@solidjs/web/jsx-runtime`.
-const solidZeroAlias = [{ find: /^@solid-zero\/primitives$/, replacement: primitivesSrcEntry }];
+// `@solid-zero/primitives` publishes one subpath export per primitive folder (no root barrel),
+// so the alias is a wildcard: `@solid-zero/primitives/render` -> `.../src/render/index.ts`. The
+// `find` is a regex with a capture group and the `$1` in `replacement` is substituted by
+// `String.replace` (what `@rollup/plugin-alias` runs under the hood). Anchored `^…/(.+)$` so it
+// stays an exact per-subpath match: a bare-prefix string `find` would also capture unrelated
+// specifiers, the trap the `solid-js` / `@solidjs/web` aliases below avoid.
+const solidZeroAlias = [
+  {
+    find: /^@solid-zero\/primitives\/(.+)$/,
+    replacement: join(primitivesSrcDir, "$1/index.ts"),
+  },
+];
 const serverBuildAlias = [
   { find: /^solid-js$/, replacement: resolveServerEntry("solid-js") },
   { find: /^@solidjs\/web$/, replacement: resolveServerEntry("@solidjs/web") },

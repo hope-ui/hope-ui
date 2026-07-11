@@ -13,7 +13,7 @@
 // merely imported: every one of those loopholes was live at some point, and Dialog exercised
 // three of them at once. See docs/testing.md.
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { extname, join, relative } from "node:path";
+import { basename, dirname, extname, join, relative } from "node:path";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
 const packagesDir = join(repoRoot, "packages");
@@ -253,12 +253,17 @@ for (const pkg of packageDirs) {
     const basenameOnly = base.split("/").pop();
     if (EXCLUDED_BASENAMES.has(basenameOnly)) continue;
 
+    // A source file's tests may sit beside it (the primitives' layout) or be tucked into a
+    // `__tests__/` subfolder of the same directory (the components' layout — keeping the family
+    // folder free of test/fixture visual noise). Both count.
+    const testRoots = [base, join(dirname(base), "__tests__", basename(base))];
     const matchingTests = testFiles.filter((t) => {
       const testBase = baseName(t);
-      return (
-        testBase === `${base}.test` ||
-        testBase === `${base}.ssr.test` ||
-        testBase === `${base}.browser.test`
+      return testRoots.some(
+        (root) =>
+          testBase === `${root}.test` ||
+          testBase === `${root}.ssr.test` ||
+          testBase === `${root}.browser.test`,
       );
     });
     const hasTest = matchingTests.length > 0;

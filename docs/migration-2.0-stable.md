@@ -97,7 +97,7 @@ a visually-hidden label — breaks SSR at runtime.
 
 ## 4. The Dialog hydration round-trip test — solved, and what it cost
 
-**This is done.** `Dialog.browser.test.tsx` runs a real SSR → hydrate round-trip; nothing is
+**This is done.** `dialog.browser.test.tsx` runs a real SSR → hydrate round-trip; nothing is
 skipped. Kept here because the *diagnosis* is the reusable part, and because two recorded root
 causes were wrong for months and were actively instructing the next person.
 
@@ -148,8 +148,8 @@ its client builds (its reactivity tests need real effects and deferred writes) a
 alias removed, three projects that each mean one thing. See `docs/testing.md`.
 
 Both `Button` and `Dialog` now have real round-trips against committed fixtures
-(`src/*/__fixtures__/*-ssr.html`), asserted byte-for-byte by the `ssr` project and hydrated by
-the `browser` project. Corrupt a fixture and both halves go red.
+(`src/*/__tests__/__fixtures__/*-ssr.html`), asserted byte-for-byte by the `ssr` project and
+hydrated by the `browser` project. Corrupt a fixture and both halves go red.
 
 ### Still worth re-checking at stable
 

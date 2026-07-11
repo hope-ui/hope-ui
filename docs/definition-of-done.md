@@ -5,9 +5,12 @@ Full rationale for the summary in CLAUDE.md § *Definition of Done*.
 Every source file under `packages/*/src/` (except `index.ts`) must have:
 1. A matching test file: `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx`
    (real-browser — required for anything touching focus/keyboard/pointer behavior,
-   since jsdom cannot be trusted for that).
+   since jsdom cannot be trusted for that). The test may sit **beside** the source (the
+   primitives' layout) or in a sibling **`__tests__/`** folder in the same directory (the
+   components' layout — it keeps the family folder free of test/fixture visual noise).
+   `check:coverage-parity` accepts either location.
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference)
-   colocated in the same `src/` directory.
+   colocated in the same `src/` directory (docs stay beside the source, not in `__tests__/`).
 3. **`@solid-zero/components` only:** a matching `Foo.stories.tsx`, colocated in the same
    `src/` directory. Components are what a human has to look at; pure primitives aren't.
    Stories are excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in
@@ -57,9 +60,9 @@ one module resolution each: `unit` (node, no DOM, client builds, pure logic), `s
 suffix picks the project: `Foo.test.tsx`, `Foo.ssr.test.tsx`, `Foo.browser.test.tsx`.
 
 Hydration is two environments by definition, so the two projects cooperate through a
-committed fixture: `src/<component>/__fixtures__/<component>-ssr.html` is genuine server
-output, asserted byte-for-byte by `Foo.ssr.test.tsx` and hydrated by
-`Foo.browser.test.tsx`. Corrupt the fixture and both halves go red. The browser half must
+committed fixture: `src/<component>/__tests__/__fixtures__/<component>-ssr.html` is genuine
+server output, asserted byte-for-byte by `Foo.ssr.test.tsx` and hydrated by
+`Foo.browser.test.tsx` (both under the component's `__tests__/`). Corrupt the fixture and both halves go red. The browser half must
 assert no `console.error`/`console.warn`, exactly one of the element, and that the
 surviving node **is the same object** as the server's — a silent fallback to a client
 render otherwise looks identical to success.

@@ -150,20 +150,33 @@ pointer instead of a bug hunt. Add to them rather than re-deriving a behavior in
 - `packages/primitives` (`@solid-zero/primitives`) — the shared behavior kernel, and
   **public, supported API**: its exported signatures are the public contract, not an
   implementation detail free to churn. Consumers compose it to build components this
-  library doesn't ship. Nothing here is duplicated per-component; everything else composes
-  it. Currently:
-  `renderElement` (the render-prop/`as`-polymorphism primitive every public component
-  uses instead of hand-rolling its own polymorphic-`as` type system — it also owns ref
-  merging; modeled on Base UI's `useRender` idea, not its code — see
-  `packages/primitives/src/render/render.md`), `withDefaults` (the *only* correct way to
-  apply prop defaults under 2.0 — see the `merge` note in `docs/solid-2.0-notes.md`),
-  `createComponentContext`
-  (thin `createContext`/`useContext` wrapper with a friendlier missing-Provider error),
-  `composeEventHandlers`, `createControllableState`, `createRegisteredId`,
-  `createRegisteredElement`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`,
-  `createDismissable`, `createScrollLock`, `createPresence`, and `ModalBackdrop` (see each
-  primitive's colocated `.md` for API details, and the ref/`createEffect` timing gotcha in
-  `docs/solid-2.0-notes.md` before writing another one).
+  library doesn't ship. Nothing here is duplicated per-component; everything else composes it.
+
+  Every source file lives under exactly one **top-level `src/` folder**, and *only* top-level
+  folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The four folders:
+  - `dialog/` (`@solid-zero/primitives/dialog`) — the `createDialog` **hook family**: a root
+    state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogPopup`,
+    `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
+    `createDialogClose`), each in its own `dialog/<part>/dialog-<part>.ts`. Each part hook takes
+    the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
+    (so the effect stack lives in `createDialogPopup`, the popup's scope). This is the headless
+    shape `@solid-zero/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
+    `useDialog`/`useOverlay*` split. See `dialog/root/dialog-root.md`.
+  - `modal-backdrop/` (`@solid-zero/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
+    only component (it renders DOM), so it sits at `src/` beside the families rather than in
+    `internal/`.
+  - `utils/` (`@solid-zero/primitives/utils`) — the non-`createX` composition helpers:
+    `renderElement` (the render-prop/`as`-polymorphism primitive every public component uses
+    instead of hand-rolling its own polymorphic-`as` type system — it also owns ref merging;
+    modeled on Base UI's `useRender` idea, not its code — see `utils/render/render.md`),
+    `withDefaults` (the *only* correct way to apply prop defaults under 2.0 — see the `merge` note
+    in `docs/solid-2.0-notes.md`), and `composeEventHandlers`.
+  - `internal/` (`@solid-zero/primitives/internal`) — the `createX` behavior primitives:
+    `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
+    missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
+    `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
+    `createRegisteredId`, `createRegisteredElement` (see each primitive's colocated `.md`, and the
+    ref/`createEffect` timing gotcha in `docs/solid-2.0-notes.md` before writing another one).
 
   **Modality is four mechanisms, not one**, and each was verified against the installed
   Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)
@@ -282,7 +295,7 @@ yourself running a build to make an import resolve, the resolution config is wha
 
 The single exception is `vite-plugin-dts`, which honours `paths` when it *emits*: without
 `compilerOptions: { paths: {} }` in `vite.config.base.ts` the published `Dialog.d.ts` gets
-`import { RenderProp } from '../../packages/primitives/src/index.ts'`, a path that doesn't
+`import { RenderProp } from '../../packages/primitives/src/utils/index.ts'`, a path that doesn't
 exist in the tarball. The build artifact resolves through `exports` (i.e. `dist`); only
 development resolves to source.
 

@@ -8,7 +8,7 @@ import { solidPluginOptions } from "../solid-babel-options";
 // on `@solid-zero/primitives` as a real workspace package, which resolves to its *built*
 // `dist/`. Without this, editing a primitive has no effect on a story until the package is
 // rebuilt, and stories silently exercise the last build.
-const primitivesSrcEntry = join(import.meta.dirname, "../packages/primitives/src/index.ts");
+const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src");
 
 const config: StorybookConfig = {
   stories: ["../packages/*/src/**/*.stories.@(ts|tsx)"],
@@ -28,12 +28,27 @@ const config: StorybookConfig = {
     ) as PluginOption[];
     plugins.push(solid(solidPluginOptions()));
 
+    // Same wildcard the `vitest.config.ts` alias uses: `@solid-zero/primitives` publishes one
+    // subpath per primitive folder, so `@solid-zero/primitives/render` -> `.../src/render/index.ts`.
+    // A regex alias needs the array form, so normalize whatever Storybook handed us (object or
+    // array) and prepend ours (first match wins in `@rollup/plugin-alias`).
+    const existingAlias = config.resolve?.alias;
+    const aliasArray = Array.isArray(existingAlias)
+      ? existingAlias
+      : Object.entries(existingAlias ?? {}).map(([find, replacement]) => ({ find, replacement }));
+
     return {
       ...config,
       plugins,
       resolve: {
         ...config.resolve,
-        alias: { ...config.resolve?.alias, "@solid-zero/primitives": primitivesSrcEntry },
+        alias: [
+          {
+            find: /^@solid-zero\/primitives\/(.+)$/,
+            replacement: join(primitivesSrcDir, "$1/index.ts"),
+          },
+          ...aliasArray,
+        ],
       },
     };
   },

@@ -41,7 +41,7 @@ primitive (Popover and Tooltip are non-modal and need restore without a trap); m
 are genuinely inert (`createHideOutside` applies `aria-hidden` + `inert`, `ModalBackdrop`
 blocks the pointer); `createScrollLock`'s ref count moved off module scope; and
 `composeEventHandlers` / `createControllableState` / `createRegisteredId` /
-`createRegisteredElement` were lifted out of `Dialog.tsx`, which now owns no helper a second
+`createRegisteredElement` were lifted out of `dialog.tsx`, which now owns no helper a second
 component would want. `Dialog.Trigger` emits `aria-controls` only while open, and respects
 `event.preventDefault()` as a cancel channel.
 
@@ -80,7 +80,7 @@ version):
   still default to `"solid-js/web"`) must point there.
 - `mergeProps`/`splitProps` are gone; the 2.0 idiom is `merge`/`omit` from `solid-js`.
   But `merge` resolves keys by *presence*, so it is the wrong tool for defaults — use
-  `withDefaults` (`packages/primitives/src/defaults/defaults.md`). See CLAUDE.md.
+  `withDefaults` (`packages/primitives/src/utils/defaults/defaults.md`). See CLAUDE.md.
 - Hit a real bug: Vite's `solid-refresh` HMR wrapper silently broke prop forwarding
   (`children` vanished) for components imported from another module, but not for the
   same component defined inline in a test file. Fixed with `refresh: { disabled: true }`
@@ -89,7 +89,7 @@ version):
 - Confirmed a genuine, unavoidable type-system limit for the render-prop/`as` pattern:
   a component's `render` callback can't be soundly typed for an arbitrary target
   element without full generics (the `Polymorphic<T>` cost this project is explicitly
-  trying to avoid). Documented in `packages/primitives/src/render/render.md` rather than
+  trying to avoid). Documented in `packages/primitives/src/utils/render/render.md` rather than
   papered over — an explicit type-assertion escape hatch is used at the one call site that
   needs cross-element rendering.
 
@@ -324,7 +324,7 @@ Concrete rules every primitive/component must follow:
   warning with an actual `renderToStringAsync` + `hydrate` round-trip test, per the DoD
   below, rather than assuming it's fine.
 
-  Verified for real: `Dialog.browser.test.tsx` hydrates a committed fixture of genuine server
+  Verified for real: `dialog.browser.test.tsx` hydrates a committed fixture of genuine server
   HTML and asserts the trigger's DOM node is *reused*, then that clicking it mounts the portal
   client-side. See `docs/testing.md` for how the `ssr` and `browser` projects cooperate.
 - **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
