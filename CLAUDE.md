@@ -15,6 +15,16 @@ code/reasoning) but explicitly avoids the architectural patterns of Kobalte and 
 of" anything from either). See `docs/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
+`@solid-primitives` (the `next` branch) is a separate axis: a community, SolidJS-team-adjacent
+library to **adopt as a dependency**, not merely reference. Before writing a new internal primitive,
+check it for an existing solution and record a verdict — but anything adopted must clear the full
+Definition of Done through its consumer, especially the **hydration** round-trip. Hard-won hazard: an
+adopted `node_modules` primitive that creates a compute-form signal/memo (`createSignal(fn)` /
+`createMemo`) can break hydration because it isn't compiled by our `vite-plugin-solid` pipeline — the
+server skips the hydration id the client's runtime still consumes, so `_hk` diverges (server vs
+client). `controlled-signal` was rejected for exactly this. Prove any such adoption against the
+hydration fixture; effect-only primitives are the safe bet. See `docs/solid-primitives-eval.md`.
+
 **SSR and SolidStart support are required, not optional** — every primitive/component
 must render under SSR and hydrate cleanly, verified with `renderToStringAsync`/
 `hydrate` from `@solidjs/web`. See "SSR & hydration requirements" in `docs/plan.md` for

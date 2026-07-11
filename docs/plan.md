@@ -107,6 +107,15 @@ version):
   literal port from either is genuinely unavoidable, add an attribution comment at the
   top of the file, the same way Kobalte itself credits react-spectrum ("Portions of
   this file are based on code from react-spectrum").
+- **`@solid-primitives` (`next`): adopt as a dependency, don't just reference.** It's the
+  community, SolidJS-team-adjacent low-level library. Before building a new internal
+  primitive, check it first and record an *adopt / wrap / build-fresh-because* verdict.
+  Anything adopted is full-DoD-wrapped through its consumer — above all the hydration
+  round-trip. Hazard: a `node_modules` primitive creating a compute-form signal/memo isn't
+  compiled by our Solid pipeline, so the server drops a hydration id the client still
+  consumes and `_hk` diverges — this rejected `controlled-signal` (kept our zero-dep,
+  more-capable boxing impl). Full practice, the hydration-id hazard, and current per-package
+  verdicts live in `docs/solid-primitives-eval.md`.
 
 ## Context
 

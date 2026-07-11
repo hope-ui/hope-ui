@@ -5,9 +5,9 @@ allowBuilds:
   esbuild: true
 
 catalog:
-  solid-js: 2.0.0-beta.16
-  "@solidjs/signals": 2.0.0-beta.16
-  "@solidjs/web": 2.0.0-beta.16
+  solid-js: 2.0.0-beta.17
+  "@solidjs/signals": 2.0.0-beta.17
+  "@solidjs/web": 2.0.0-beta.17
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
@@ -16,3 +16,6 @@ minimumReleaseAgeExclude:
   - '@storybook/csf-plugin@10.5.0'
   - '@storybook/react-dom-shim@10.5.0'
   - storybook@10.5.0
+  - '@solidjs/signals@2.0.0-beta.17'
+  - '@solidjs/web@2.0.0-beta.17'
+  - solid-js@2.0.0-beta.17

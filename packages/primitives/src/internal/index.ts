@@ -14,8 +14,11 @@ export {
 export { type CreateFocusTrapOptions, createFocusTrap } from "./focus-trap/focus-trap";
 export { type CreateHideOutsideOptions, createHideOutside } from "./hide-outside/hide-outside";
 export {
+  type CreatePresenceItemOptions,
   type CreatePresenceOptions,
   createPresence,
+  createPresenceItem,
+  type PresenceItemState,
   type PresenceState,
   type PresenceStatus,
 } from "./presence/presence";
