@@ -36,7 +36,7 @@ consumer's own `panda codegen` over their source (add a `@hope-ui/themes/*` pres
 ```tsx
 import { Box } from "@hope-ui/components/box";
 
-<Box p="4" bg="primary" color="primary.foreground" rounded="lg">Card</Box>
+<Box p="4" bg="primary" color="text.inverse" rounded="lg">Card</Box>
 <Box as="section" display="flex" gap="2" borderWidth="1px" borderColor="border" />
 ```
 

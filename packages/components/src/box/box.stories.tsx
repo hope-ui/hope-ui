@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const StyleProps: Story = {
   render: () => (
-    <Box p="6" bg="primary" color="primary.foreground" rounded="lg">
+    <Box p="6" bg="primary" color="text.inverse" rounded="lg">
       Styled with style props
     </Box>
   ),
@@ -38,18 +38,11 @@ export const AsElement: Story = {
  */
 export const Card: Story = {
   render: () => (
-    <Box
-      bg="card"
-      color="card.foreground"
-      borderWidth="1px"
-      borderColor="border"
-      rounded="lg"
-      p="6"
-    >
+    <Box bg="surface.raised" color="text" borderWidth="1px" borderColor="border" rounded="lg" p="6">
       <Box mb="2" fontWeight="semibold">
         Card title
       </Box>
-      <Box color="muted.foreground">A surface built entirely from Box style props.</Box>
+      <Box color="text.subtle">A surface built entirely from Box style props.</Box>
     </Box>
   ),
 };

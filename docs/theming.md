@@ -57,13 +57,148 @@ would collide on recipe names, or namespacing would ship every theme's CSS in on
 
 ## Adding a theme
 
-A theme is a Panda preset built on `@hope-ui/themes/base` plus its own `semanticTokens` and, once
-components exist, its own slot recipes (same slots and variant *values* as every other theme — only
-the emitted CSS differs). First-party themes are subpaths of `@hope-ui/themes`
-(`@hope-ui/themes/nova`, …); a third party publishes its own package implementing the same
-contract. For the recipe *functions* the provider injects, prefer bundling the theme's own generated
-recipe runtime under a `hash: false` / no-prefix contract (so the class names equal the consumer's
-own codegen), exactly as `@hope-ui/styled-system` bundles `css()` today.
+A theme is a Panda preset built on `@hope-ui/themes/base` plus its own `semanticTokens` (the
+vocabulary below) and, once components exist, its own slot recipes (same slots and variant *values*
+as every other theme — only the emitted CSS differs). First-party themes are subpaths of
+`@hope-ui/themes` (`@hope-ui/themes/nova`, …); a third party publishes its own package implementing
+the same contract. For the recipe *functions* the provider injects, prefer bundling the theme's own
+generated recipe runtime under a `hash: false` / no-prefix contract (so the class names equal the
+consumer's own codegen), exactly as `@hope-ui/styled-system` bundles `css()` today.
+
+## Semantic token vocabulary
+
+The recipe contract above imposes no *token* vocabulary. This is the other half: the **semantic
+(alias) color contract** — one design-system-agnostic set of role names every theme implements, so a
+theme is a different set of values behind the same tokens. It is the token analog of the recipe
+contract's "same slots and variant values, only the CSS differs": `base` carries only raw palette
+ramps; each `@hope-ui/themes/*` supplies the semantic values; components and recipes reference the
+names. Reference implementation:
+[`nova/semantic-tokens.ts`](../packages/themes/src/nova/semantic-tokens.ts).
+
+Naming follows the Atlassian Design System's `property.role.modifier` shape
+([foundations](https://atlassian.design/foundations/tokens/design-tokens),
+[all tokens](https://atlassian.design/components/tokens/all-tokens)), adapted for brevity (no
+`elevation.`/`color.` foundation prefix). The set was designed as a **superset** of five systems'
+alias layers (MD3 color roles, Ant seed→map→alias, Fluent v9, Bootstrap 5.3, shadcn) that maps down
+to each without losing MD3/Fluent nuance.
+
+### The shape
+
+- **Surfaces are an elevation concept, not a fill** — so a background surface is never a doubled
+  `bg.bg`: `surface` (default page/card) · `surface.raised` (cards/menus) · `surface.overlay`
+  (dialogs) · `surface.sunken` (wells) · `surface.inverse` (tooltips). → `bg="surface"`.
+- **Foreground splits into `text.*` and `icon.*`** (icons often want a different tone than body
+  text). Neutral emphasis ramps `text` → `text.subtle` → `text.subtlest`, plus `text.disabled` and
+  `text.inverse`. Role/link foregrounds are property-first: `text.primary` (brand/link), `text.danger`,
+  `text.success`, `text.warning` (+ `text.warning.inverse`), `text.info`; `icon.*` mirrors them.
+- **Borders are property-first**: `border` · `border.bold` · `border.disabled` + `border.<role>`.
+- **Fills stay role-first and bare** so the common case is short (decision 01): `bg="primary"`,
+  `bg="danger"`, `bg="danger.subtle"`. Each role is `{ DEFAULT (solid fill), subtle (tonal fill) }`
+  for `primary` · `neutral` · `success` · `warning` · `danger` · `info`.
+- **Systemic**: `ring` (focus indicator) · `scrim` (the dimming layer behind modals — distinct from
+  the `surface.overlay` the dialog itself sits on).
+
+**Pairing** (the readable-on rule): the on-color for any bold fill is `text.inverse` /
+`icon.inverse` (+ `text.warning.inverse`, the yellow-fill exception where white fails); text on a
+`.subtle` fill is `text.<role>`; neutral surfaces pair with the shared `text.*` ramp.
+
+**States**: `.hovered` / `.pressed` / `.bold` are contract-reserved but unpopulated in the baseline —
+recipes derive interaction states from `color-mix` + an `opacity.*` scale (decision 02). Disabled is
+`text.disabled` / `border.disabled` + `opacity.disabled` (decision 08). Leaves are camelCase
+(`text.warning.inverse`); Panda emits the dashed CSS var (decision 09).
+
+### Token reference (nova values, light → dark intent)
+
+| token | purpose |
+|---|---|
+| `surface` · `.raised` · `.overlay` · `.sunken` · `.inverse` | page/card · elevated · dialog · well · tooltip |
+| `text` · `.subtle` · `.subtlest` · `.disabled` · `.inverse` | body → faint text; disabled; on-bold-fill |
+| `text.primary` · `.danger` · `.warning`(+`.inverse`) · `.success` · `.info` | role/link text; `.inverse` = dark text on the amber fill |
+| `icon` · `.subtle` · `.disabled` · `.inverse` · `.<role>` | icon ramp, mirrors `text` |
+| `border` · `.bold` · `.disabled` · `.<role>` | default → strong border; role-colored border |
+| `primary` · `neutral` · `success` · `warning` · `danger` · `info` (+ each `.subtle`) | solid fill + tonal fill |
+| `ring` · `scrim` | focus indicator · modal dimming layer |
+
+### Cross-system mapping
+
+`—` = no equivalent; footnotes flag lossy/approximate mappings.
+
+**Surfaces**
+
+| standardized | MD3 | Ant | Fluent | Bootstrap | shadcn |
+|---|---|---|---|---|---|
+| `surface` | `surface` | `colorBgContainer` | `colorNeutralBackground1` | `--bs-body-bg` | `background` / `card` |
+| `surface.raised` | `surface-container-high` | `colorBgElevated` | `colorNeutralCardBackground` | — | `popover` |
+| `surface.overlay` | `surface-container-highest` | `colorBgElevated` | `colorNeutralBackground1` | — | `popover` |
+| `surface.sunken` | `surface-container` / `surface-dim` | `colorBgLayout` | `colorNeutralBackground3` | `--bs-tertiary-bg` | `muted` |
+| `surface.inverse` | `inverse-surface` | `colorBgSpotlight` | `colorNeutralBackgroundInverted` | — | — |
+
+**Foreground** · `text` → MD3 `on-surface` / Ant `colorText` / Fluent `colorNeutralForeground1` /
+Bootstrap `--bs-body-color` / shadcn `foreground`; `text.subtle` → `on-surface-variant` /
+`colorTextSecondary` / `colorNeutralForeground2` / `--bs-secondary-color` / `muted-foreground`;
+`text.subtlest` → Ant `colorTextTertiary` / Fluent `colorNeutralForeground3` /
+`--bs-tertiary-color` (MD3/shadcn ship two tiers → collapses ¹); `text.inverse` →
+`inverse-on-surface` / `colorTextLightSolid` / `colorNeutralForegroundInverted` / `#fff` /
+`text-white`. `icon.*` → Fluent has no separate icon ramp; the rest reuse the text tones.
+
+**Borders** · `border` → `outline-variant` / `colorBorder` / `colorNeutralStroke1` /
+`--bs-border-color` / `border`; `border.bold` → MD3 `outline` / `colorNeutralStrokeAccessible` /
+shadcn `input`; `border.<role>` → Ant `colorErrorBorder` etc. / Fluent `colorStatusDangerBorder1` /
+Bootstrap `--bs-danger-border-subtle`.
+
+**Fills** (bare `primary`; every role identical)
+
+| standardized | MD3 | Ant | Fluent | Bootstrap | shadcn |
+|---|---|---|---|---|---|
+| `primary` (solid) | `primary` | `colorPrimary` | `colorBrandBackground` | `--bs-primary` | `primary` |
+| ↳ on-color `text.inverse` | `on-primary` | `colorTextLightSolid` | `colorNeutralForegroundOnBrand` | `#fff` | `primary-foreground` |
+| `primary.subtle` | `primary-container` | `colorPrimaryBg` | `colorBrandBackground2` | `--bs-primary-bg-subtle` | — ² |
+| ↳ on-subtle `text.primary` | `on-primary-container` | `colorPrimaryText` | `colorBrandForeground2` | `--bs-primary-text-emphasis` | — ² |
+| `border.primary` | `outline` | `colorPrimaryBorder` | `colorBrandStroke1` | `--bs-primary-border-subtle` | — |
+| `.hovered`/`.pressed` (reserved) | state layer ³ | `colorPrimaryHover`/`Active` | `…Hover`/`…Pressed` | Sass `tint/shade` | `/90` utility |
+
+**Feedback** · `success`/`warning`/`danger`/`info`, each the same fill + `text.<role>` +
+`border.<role>`. Bootstrap 5.3's `{color}`/`-bg-subtle`/`-border-subtle`/`-text-emphasis` maps 1:1
+onto `danger`(fill)/`danger.subtle`/`border.danger`/`text.danger`; Ant fills every state cell.
+**MD3 ships only `error`; shadcn only `destructive`** — those themes derive the rest from palette
+(consistent with MD3's "add custom colors"). Fluent has no `info` alias (borrows Blue). `warning`
+carries the amber-fill contrast exception (`text.warning.inverse`).
+
+**Scrim** · `scrim` → MD3 `scrim` / Ant `colorBgMask` / Fluent `colorBackgroundOverlay` / Bootstrap
+`--bs-backdrop-bg`+`-opacity` (component-scoped) / shadcn `bg-black/80` (utility). Atlassian calls
+this `color.blanket`; we use `scrim` to avoid colliding with `surface.overlay`.
+
+¹ MD3/shadcn ship two neutral text tiers → `subtlest` collapses to `subtle`. ² shadcn has no
+brand-subtle; `neutral`/`neutral.subtle` stand in. ³ MD3 uses state-layer *opacity overlays*, not
+tokens.
+
+### Extension points (documented, out of the required core)
+
+- **`surface.N` ladder** — numbered tonal elevation (`surface` = `surface.1`) for MD3/Fluent themes;
+  flat themes alias each rung to the nearest anchor.
+- **`secondary` / `tertiary`** — optional chromatic accent roles (same shape) for multi-hue themes;
+  `neutral` (always present) is the gray filled role, avoiding MD3's `secondary`-means-a-hue clash.
+- **`.bold` / `.bolder` fill emphasis** and **`.hovered` / `.pressed` states** — Atlassian-style
+  discrete tokens a theme may add when `color-mix` isn't good enough.
+- **`chart.*` / `palette.*`** — decorative/categorical color; not role-based; out of contract.
+- **`opacity.*`** — the state-layer scale (`hover .08`, `focus .10`, `pressed .12`, `disabled .40`),
+  a base-token group recipes consume via `color-mix`; added to `base` when the first recipe lands.
+
+### Decisions (resolved 2026-07-13)
+
+| # | Decision | Resolution |
+|---|---|---|
+| 01 | Ergonomic default | bare `primary`/`danger`/… = solid fill; `.subtle` = tonal fill |
+| 02 | State mechanism | `color-mix` + `opacity.*` baseline; `.hovered`/`.pressed`/`.bold` optional overrides |
+| 03 | Surface pairing | shared `text.*` ramp across surfaces; per-surface override optional |
+| 04 | Surface tiers | 5 named `surface.*` anchors required; `surface.N` ladder optional |
+| 05 | Feedback scope | all four — `success` · `warning` · `danger` · `info` |
+| 06 | Naming | `neutral` = gray role; `secondary`/`tertiary` = optional chromatic accents |
+| 07 | Chart/decorative | out of contract → `chart.*` / `palette.*` |
+| 08 | Disabled | `text.disabled`/`border.disabled` + `opacity.disabled`; dedicated fill tokens optional |
+| 09 | Casing | dot-nested, camelCase leaves; Panda emits dashed CSS var |
+| 10 | Reference theme | shadcn preset re-expressed as `@hope-ui/themes/nova` |
+| — | Naming source | Atlassian `property.role.modifier`: `surface.*` (elevation), split `text.*`/`icon.*`, `scrim` |
 
 ## SSR / hydration
 
@@ -75,6 +210,6 @@ fixture and its hydration test must both include `<ThemeProvider>` identically.
 ## Current state
 
 The contract and `@hope-ui/themes/{base,nova}` are built; `nova` ships tokens only (no recipes
-yet). No components consume `useRecipe` yet, and there is no second theme — both arrive when the
-first real component is designed. See the plan's "Implementation status & decisions" for the full
-done/deferred breakdown.
+yet), now expressed in the standardized semantic-token vocabulary above. No components consume
+`useRecipe` yet, and there is no second theme — both arrive when the first real component is
+designed. See the plan's "Implementation status & decisions" for the full done/deferred breakdown.
