@@ -2,8 +2,8 @@
 
 Guidance for Claude Code (claude.ai/code) working in this repository. This file is the operative
 index; the deepest rationale lives in `docs/` (notably `docs/plan.md`, `docs/testing.md`,
-`docs/solid-2.0-notes.md`, `docs/definition-of-done.md`) and in each primitive/component's colocated
-`.md`.
+`docs/solid-2.0-notes.md`, `docs/definition-of-done.md`, `docs/theming.md`) and in each
+primitive/component's colocated `.md`.
 
 ## What this is
 
