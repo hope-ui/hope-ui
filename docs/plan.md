@@ -49,8 +49,7 @@ component would want. `Dialog.Trigger` emits `aria-controls` only while open, an
 undocumented `solid-js`/`@solidjs/web` behavior this codebase leans on, each naming the code
 that depends on it. The browser suite emitted 170 `STRICT_READ_UNTRACKED` warnings; it now
 emits zero, and `mount()` fails any test that produces one (or a
-`REACTIVE_WRITE_IN_OWNED_SCOPE`). `check:dist-imports` enforces the no-literal-host-JSX
-invariant SSR silently depends on. `expectNoA11yViolations` no longer drops axe's `incomplete`
+`REACTIVE_WRITE_IN_OWNED_SCOPE`). `expectNoA11yViolations` no longer drops axe's `incomplete`
 results, `check:coverage-parity` no longer accepts a `renderToStringAsync` mention in a comment
 or an `it.skip`, and `passWithNoTests` is gone.
 
@@ -124,11 +123,14 @@ for SolidJS — copying their **API surface** (prop patterns, composition idioms
 their React internals — explicitly avoiding the structural problems Kobalte and Corvu
 run into (see Reference policy above).
 
-**SSR and SolidStart support are required, not optional.** Every primitive and
-component must render correctly under server-side rendering and hydrate cleanly on the
-client — this is a cross-cutting, non-negotiable requirement like the Definition of
-Done, not a follow-up phase. See "SSR & hydration requirements" below for what that
-means concretely and a caveat about SolidStart's current version alignment.
+**"SSR support" = "works in SolidStart."** Renders on the SolidStart server, hydrates
+without mismatch, runs on the client. That is the whole requirement — not a broader,
+self-imposed invariant. Every primitive and component must clear it; it is a
+cross-cutting, non-negotiable requirement like the Definition of Done, not a follow-up
+phase. See "SSR & hydration requirements" below for the concrete (and deliberately small)
+set of rules that protect it, the "Distribution model" section for how shipping source
+keeps it true without constraining how components are written, and a caveat about
+SolidStart's current version alignment.
 
 **Target runtime: SolidJS 2.0 (beta, first public build `v2.0.0-beta.0`, March 2026) —
 not 1.x.** This is a meaningful architectural input, not a version bump: 2.0 reworks
@@ -269,33 +271,31 @@ plumbing.
 
 ## SSR & hydration requirements (cross-cutting, non-negotiable)
 
-**hope-ui's packages do not need a separate SSR build**, but the reason is narrower and
-more fragile than this document used to claim.
+"SSR support" means one concrete thing: **the library works in SolidStart** — it renders
+on the SolidStart server, hydrates without mismatch, and runs on the client. Everything
+below is the small, genuine set of rules that protects that. There is no broader,
+self-imposed SSR invariant.
 
-> **Corrected.** The old rationale here was that `@solidjs/web` resolves to different runtime
-> implementations per environment "behind the *same* exported function names", so one
-> `generate: 'dom'` build works everywhere. That is false, and verified false against
-> `2.0.0-beta.16`: the **server** build exports `template`, `insert`, `spread` and
-> `setAttribute` as `notSup` stubs that throw *"Client-only API called on the server side"*.
-> `generate: 'dom'` compiles a literal host JSX element into exactly those — and `_$template()`
-> is called at **module scope**, so a single literal `<div>` in any component throws at
-> *import* under SSR, not at render.
+> **Corrected (twice).** An earlier version claimed one `generate: 'dom'` build works
+> everywhere because `@solidjs/web` "exposes the same exported function names per
+> environment." That is false: the **server** build exports `template`/`insert`/`spread`/
+> `setAttribute` as `notSup` stubs that throw *"Client-only API called on the server side"*,
+> and a single pre-compiled `generate: 'dom'` build hoists a `_$template()` call to module
+> scope, so a literal `<div>` would throw at *import* under SSR. The follow-up "correction"
+> then promoted **"no source file may contain a literal host JSX element"** to a load-bearing
+> invariant, enforced by a `dist`-import grep. That, too, was an over-reach: the crash is a
+> property of shipping a **single pre-compiled dom build**, not of SSR itself. The fix is a
+> distribution change, not a coding rule — see "Distribution model" below. The library now
+> ships JSX-preserved source under the `"solid"` export condition, the consumer's
+> `vite-plugin-solid` compiles each element per environment, and **literal host elements are
+> fine.** The grep (`scripts/check-dist-imports.mjs`) and the invariant are both gone.
 
-The single build works because of an invariant, not a symmetry: **no source file under
-`packages/*/src` contains a literal host JSX element.** Every host element routes through
-`renderElement` → `<Dynamic>` → `createComponent`, and `Dynamic` bridges the two builds at
-runtime — server-side `dynamic()` calls `ssrElement(component, props, undefined, true)`
-(emitting the `_hk` hydration key); client-side it calls
-`sharedConfig.hydrating ? getNextElement() : createElement(...)`. Compile mode never matters.
-
-That invariant is load-bearing and now enforced: `scripts/check-dist-imports.mjs` (CI, right
-after `build`) fails if any `packages/*/dist/**/*.js` imports
-`template`/`insert`/`spread`/`setAttribute`/`use`/`addEventListener` from `@solidjs/web`. The
-same grep is the tripwire for a `babel-preset-solid@1.x` regression in the compiler pipeline.
-The runtime behaviors it rests on are pinned by `packages/primitives/src/solid-contract.test.tsx`
-and `solid-contract.browser.test.tsx`.
-
-The first Popover arrow or visually-hidden label written the obvious way is what this catches.
+`renderElement` → `<Dynamic>` is kept, but for what it is actually good at: `as`/render-prop
+**polymorphism** and ref merging. `Dynamic` also emits the `_hk` hydration key for whatever
+it renders (`dynamic()` → `ssrElement(component, props, undefined, true)` server-side;
+`sharedConfig.hydrating ? getNextElement() : createElement(...)` client-side), which the
+components that render through it rely on — pinned in `solid-contract.ssr.test.tsx`. It is no
+longer a mandatory per-element SSR wrapper.
 
 Concrete rules every primitive/component must follow:
 - **No unconditional DOM/`window`/`document` access outside effects.** `createEffect`/
@@ -405,7 +405,7 @@ drift that produced Kobalte's and Corvu's gaps.
   `forms`); a single package name with per-component subpaths removes that lookup while
   keeping the same per-component tree-shaking a family package would have given —
   importing `@hope-ui/components/button` never pulls in Dialog's code, since each
-  subpath is its own build entry (see `vite.config.base.ts`'s `entries` option). Every
+  subpath is its own build entry (see each `package.json`'s `hope.entries`). Every
   component subpath depends only on `@hope-ui/primitives` — never on another
   component's subpath, which is what keeps this from becoming Kobalte's single giant
   package in spirit despite sharing one package in name.
@@ -419,13 +419,84 @@ drift that produced Kobalte's and Corvu's gaps.
 
 - **ESM-only** (no CJS) — Solid is ESM-first; reversible decision if real CJS demand
   appears later.
-- **Vite library mode** for builds (multi-entry via `vite.config.base.ts`'s `entries`,
-  per-subpath `.d.ts` via `vite-plugin-dts`). This replaced the originally-planned `tsup`,
-  which cannot compile Solid 2.0 JSX — see the `esbuild-plugin-solid` writeup above.
-  solid-primitives' `tsdown` + `unplugin-solid` toolchain is a deliberate *not yet*; the
-  reasoning and its revisit trigger live in `docs/migration-2.0-stable.md` §5.
+- **tsdown** (rolldown + oxc) builds each publishable package to JSX-preserved `.jsx` source
+  + `.d.ts` per subpath (multi-entry via each `package.json`'s `hope.entries`) — see
+  "Distribution model" below. It runs no Solid compiler, so the `babel-preset-solid@1.x`
+  hazard that rules out `tsup`/`esbuild-plugin-solid` and `unplugin-solid` for JSX
+  *compilation* (see the `esbuild-plugin-solid` writeup above and
+  `docs/migration-2.0-stable.md` §5) doesn't apply. `vite-plugin-solid` is still used for the
+  tests and Storybook, which do compile JSX.
 - **Changesets** for versioning — fits pnpm workspaces natively, per-package-family
   changelogs.
+
+## Distribution model — ship source only, under the `"solid"` condition
+
+Each publishable subpath of `@hope-ui/components` and `@hope-ui/primitives` ships **source
+only** — no dom-compiled fallback:
+
+- `"solid"` → `dist/<name>/index.jsx` — **JSX-preserved source** (TS stripped, JSX intact).
+  `vite-plugin-solid` adds `solid` to Vite's resolve conditions, so any consumer using it
+  (SolidStart, and `npm init solid`/create-solid, always do) receives this and compiles it
+  **per environment**: `generate: 'ssr'` on the server, `generate: 'dom'` + hydratable on the
+  client. Literal host elements therefore compile correctly on each side — the reason the old
+  "no literal host JSX element" rule is gone.
+- `"types"` → `dist/<name>/index.d.ts` — the bundled declarations.
+
+There is **no `"import"`/`"default"` (dom-compiled) fallback.** Every SolidJS app is Vite +
+`vite-plugin-solid`, so `"solid"` always resolves; a consumer without that plugin gets no
+matching condition and fails loudly. A pre-compiled fallback isn't worth shipping (and re-opens
+the `babel-preset-solid@1.x` question) until a Solid-2.0-stable toolchain makes it cheap — the
+library isn't published before 2.0 stable anyway.
+
+The build is **tsdown** (rolldown + oxc), configured in `tsdown.config.base.ts`
+(`createTsdownConfig`, one `tsdown.config.ts` per package). It runs with
+`transform.jsx: "preserve"` so oxc keeps JSX intact, while rolldown inlines the pure
+styled-system runtime and leaves `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external (the
+consumer resolves those — `@hope-ui/primitives` via *its own* `"solid"` condition). It runs
+**no Solid compiler**, so the `babel-preset-solid@1.x` hazard that rules out
+`tsup`/`esbuild-plugin-solid`/`rollup-preset-solid`/`unplugin-solid` for *compilation* is moot
+here. Entries come from each `package.json`'s `hope.entries`.
+
+Two build wrinkles worth knowing:
+- **dts type-bundling stops at Panda.** The `.d.ts` must inline styled-system's types
+  (`BoxProps extends JsxStyleProps`, and consumers can't resolve the private
+  `@hope-ui/styled-system`). But those types reach `@pandacss/types` → `pkg-types` →
+  `typescript`, and rolldown-plugin-dts throws bundling `typescript`'s declarations. So
+  `deps.neverBundle` keeps `@pandacss/*` (+ its `pkg-types`/`typescript` tail) external in the
+  `.d.ts` — the consumer resolves them via its own `@pandacss/dev`. Sibling `@hope-ui/*` stay
+  external there too, so no `paths`→src leakage (the old `vite-plugin-dts` `paths: {}` hazard
+  is gone).
+- **SolidStart consumers may need hope-ui in `ssr.noExternal`.** Server-side, Vite externalizes
+  `node_modules` and hands them to Node — which can't parse the `.jsx` we ship. To have the
+  consumer's `vite-plugin-solid` compile our source for the server too, list hope-ui in
+  `ssr.noExternal` (e.g. `ssr: { noExternal: ["@hope-ui/components", "@hope-ui/primitives"] }`).
+  Some setups infer this from the `solid` condition; SolidStart historically wants it explicit.
+
+This is the idiomatic SolidJS-library shape (Kobalte's solid2 branch, `@solid-primitives`),
+minus their dom fallback. It retires the literal-element rule and its `check:dist-imports`
+tripwire. It has **no** effect on Panda style-prop extraction or the multi-theme recipe layer —
+those are build-time scans of the *consumer's* JSX and behave identically regardless.
+
+## `/jsx` + `/patterns`: hope-ui owns its own (Solid 2.0), never Panda's
+
+**Decision (recorded; building them is future work).** hope-ui will hand-write its own
+`styled` factory (`/jsx`) and layout patterns (`/patterns` — `Box`, `Flex`, `Stack`, …)
+targeting **Solid 2.0**. It will **never** use Panda's generated `/jsx` + `/patterns`:
+Panda emits those for Solid **1.x**, and they write literal host elements against the 1.x
+runtime. That was a hard blocker under the old single pre-compiled `generate: 'dom'`
+distribution; it is no longer (the source-shipping model above compiles literal elements
+per environment), but the 1.x/2.0 runtime mismatch remains, so Panda's factory stays out
+regardless.
+
+This costs nothing in styling. Panda's style-prop extraction does **not** require its
+factory: with `jsxFramework: "solid"` its default `jsxStyleProps: "all"` extracts every
+style prop from any capitalized JSX component the consumer writes — proven in-repo, where
+`packages/styled-system/styled-system/styles.css` carries `.bg_primary`/`.p_4` extracted
+from `box.stories.tsx`, whose `<Box>` is hand-written and registered nowhere. Recipe
+*variants* extract via the separate `jsx: [...]` recipe tracking property (see Part B of the
+feasibility report). Now that components may emit literal host elements, a hand-written
+`/jsx` + `/patterns` layer is unobstructed. `@hope-ui/styled-system` continues to **not**
+re-export Panda's `/jsx` factory.
 
 ## Testing/a11y strategy + Definition of Done (locked-in, non-negotiable)
 

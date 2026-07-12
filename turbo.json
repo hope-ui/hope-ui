@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
-    "vite.config.base.ts",
+    "tsdown.config.base.ts",
     "solid-babel-options.ts",
     "tsconfig.base.json",
     "pnpm-workspace.yaml"

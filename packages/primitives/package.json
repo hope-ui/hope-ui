@@ -6,27 +6,35 @@
   "type": "module",
   "sideEffects": false,
   "files": ["dist"],
+  "hope": {
+    "entries": {
+      "dialog": "src/dialog/index.ts",
+      "modal-backdrop": "src/modal-backdrop/index.ts",
+      "internal": "src/internal/index.ts",
+      "utils": "src/utils/index.ts"
+    }
+  },
   "exports": {
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
-      "import": "./dist/dialog/index.js"
+      "solid": "./dist/dialog/index.jsx"
     },
     "./modal-backdrop": {
       "types": "./dist/modal-backdrop/index.d.ts",
-      "import": "./dist/modal-backdrop/index.js"
+      "solid": "./dist/modal-backdrop/index.jsx"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
-      "import": "./dist/internal/index.js"
+      "solid": "./dist/internal/index.jsx"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js"
+      "solid": "./dist/utils/index.jsx"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "tsdown",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

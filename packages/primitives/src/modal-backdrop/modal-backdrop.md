@@ -87,8 +87,9 @@ one condition is what makes that predictable rather than surprising.
 
 ## SSR
 
-Renders through `renderElement` → `<Dynamic>`, not a literal `<div>`. A literal host element
-compiles to a hoisted `_$template()` call, which `@solidjs/web`'s server build exports as a
-thrower. In practice a modal backdrop only ever renders inside a `Portal`, which doesn't
-render server-side at all — but the module would fail to *load* under SSR regardless, since
-`_$template()` is called at module scope.
+Renders through `renderElement` → `<Dynamic>` (a plain `<div>` would work too — the library
+ships source, so literal host elements compile per environment; see `docs/plan.md`,
+"Distribution model"). In practice a modal backdrop only ever renders inside a `Portal`, which
+`@solidjs/web`'s server build refuses to run at all (`Portal` throws server-side), so the
+backdrop is simply absent from the SSR HTML and mounts on the client after hydration — the
+`isServer` gate on the portal wrapper is what keeps that from crashing the render.

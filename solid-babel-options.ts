@@ -3,10 +3,13 @@ import type { Options as SolidPluginOptions } from "vite-plugin-solid";
 /**
  * The single source of truth for how `vite-plugin-solid` is configured in this repo.
  *
- * Three separate pipelines compile our JSX — the library build (`vite.config.base.ts`),
- * the test runs (`vitest.config.ts`), and Storybook (`.storybook/main.ts`) — and they
- * must agree, because a mismatch shows up as a runtime error deep inside `@solidjs/web`
- * rather than as a config error. Import this rather than spelling the options out again.
+ * Two pipelines compile our JSX with `vite-plugin-solid` — the test runs
+ * (`vitest.config.ts`) and Storybook (`.storybook/main.ts`) — and they must agree, because a
+ * mismatch shows up as a runtime error deep inside `@solidjs/web` rather than as a config
+ * error. Import this rather than spelling the options out again. (The published library build
+ * no longer compiles JSX at all: tsdown ships JSX-preserved source under the `"solid"` export
+ * condition and the *consumer's* `vite-plugin-solid` compiles it per environment — see
+ * `docs/plan.md`, "Distribution model".)
  *
  * - `solid.moduleName` — `babel-preset-solid@2.x` already defaults to `"@solidjs/web"`,
  *   so this is redundant *today*. It stays explicit because the 1.x preset defaults to

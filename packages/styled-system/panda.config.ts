@@ -11,16 +11,16 @@ import { defineConfig } from "@pandacss/dev";
  * cssgen`, used by Storybook/tests). hope-ui ships zero CSS.
  */
 export default defineConfig({
-  preflight: false,
-  include: ["../components/src/**/*.{ts,tsx}"],
-  exclude: [],
-  jsxFramework: "solid",
-  outdir: "styled-system",
   // Unhashed class names so the runtime css() output our components bundle matches
   // the class names a consumer's own codegen produces from the same preset.
   hash: false,
   // Minimal setup: `eject` drops Panda's default presets so preset-panda never merges in.
   // hopePreset supplies preset-base (the utility engine) + every hope token itself.
   eject: true,
+  preflight: true,
   presets: [hopePreset],
+  include: ["../components/src/**/*.{ts,tsx}"],
+  exclude: [],
+  outdir: "styled-system",
+  jsxFramework: "solid",
 });

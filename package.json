@@ -15,7 +15,6 @@
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "check:coverage-parity": "node scripts/check-coverage-parity.mjs",
-    "check:dist-imports": "node scripts/check-dist-imports.mjs",
     "storybook": "pnpm --filter @hope-ui/styled-system cssgen && storybook dev -p 6006",
     "build:storybook": "pnpm --filter @hope-ui/styled-system cssgen && storybook build",
     "changeset": "changeset",
@@ -40,10 +39,10 @@
     "playwright": "1.61.1",
     "storybook": "^10.5.0",
     "storybook-solidjs-vite": "^10.6.0",
+    "tsdown": "^0.22.5",
     "turbo": "2.10.4",
     "typescript": "5.9.3",
     "vite": "8.1.4",
-    "vite-plugin-dts": "5.0.3",
     "vite-plugin-solid": "3.0.0-next.5",
     "vitest": "4.1.10"
   }

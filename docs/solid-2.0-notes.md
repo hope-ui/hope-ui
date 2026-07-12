@@ -10,25 +10,22 @@ actual installed package):
 - **DOM rendering moved to a separate package.** `solid-js` is now renderer-neutral;
   `render`, `Dynamic`, `Portal`, and the `JSX` types live in **`@solidjs/web`**, not
   `solid-js` or `solid-js/web`. `jsxImportSource` must point at `@solidjs/web`
-  (see `tsconfig.base.json`, and the `solid.moduleName` override in
-  `vite.config.base.ts` / `vitest.config.ts` for `vite-plugin-solid`, which defaults to
-  `"solid-js/web"`).
-- **The build pipeline is Vite library mode, not tsup.** Phase 0 used
-  `tsup`/`esbuild-plugin-solid`; both were removed at the start of Dialog's build (see
-  `vite.config.base.ts`) after discovering a hard incompatibility: `esbuild-plugin-solid`
-  (and the `vite-plugin-solid@2.x` originally pinned in Phase 0) bundle
-  `babel-preset-solid@1.x`, which compiles a JSX `ref` attribute into an import of a
-  runtime helper called `use` from the target module — a name `@solidjs/web` 2.0 renamed
-  to `ref`/`applyRef`. Since Button never used a literal `ref=` attribute, Phase 0 never
-  hit this; Dialog is the first component that needs one, and *any* `ref=` usage failed
-  to even load ("does not provide an export named 'use'") under the old pipeline.
-  `esbuild-plugin-solid` has no 2.0-compatible release; the first-party
-  `vite-plugin-solid` does, published under the npm `next` tag
-  (`vite-plugin-solid@3.0.0-next.5`, pulling a matching `babel-preset-solid@2.0.0-beta.x`
-  via its own dependency range) — confirmed against the npm registry, not assumed. Now
-  build and test share one Solid-2.0-aware compiler pipeline; `vite-plugin-dts` replaces
-  tsup's built-in `.d.ts` bundling (with `exclude` globs so test files don't leak into
-  published type output).
+  (see `tsconfig.base.json`, and the `solid.moduleName` override in `solid-babel-options.ts`
+  — used by `vitest.config.ts` and `.storybook/main.ts` — for `vite-plugin-solid`, which
+  defaults to `"solid-js/web"`).
+- **The published build compiles no JSX at all — it ships source.** The publishable packages
+  build with **tsdown** (`transform.jsx: "preserve"`), emitting JSX-preserved `.jsx` the
+  consumer's `vite-plugin-solid` compiles per environment (see `docs/plan.md`, "Distribution
+  model"). This sidesteps a hard 2.0 incompatibility in every *compiling* Solid bundler
+  plugin: Phase 0's `tsup`/`esbuild-plugin-solid` (and `unplugin-solid`) bundle
+  `babel-preset-solid@1.x`, which compiles a JSX `ref` into an import of a helper called `use`
+  from the target module — a name `@solidjs/web` 2.0 renamed to `ref`/`applyRef` (and
+  `addEventListener` → `addEvent`). Any `ref=` usage failed to even load ("does not provide an
+  export named 'use'") under that pipeline. The **tests + Storybook** compile JSX with the
+  first-party `vite-plugin-solid@3.0.0-next.5` (pulling a matching
+  `babel-preset-solid@2.0.0-beta.x`), the one 2.0-correct compiler — confirmed against the npm
+  registry, not assumed. tsdown emits the `.d.ts` (no `vite-plugin-dts`); test/story files
+  never reach `dist/` because tsdown only builds the `hope.entries`.
 - **A `createEffect(compute, effect)` compute function must never read a plain
   (non-signal) ref accessor** (e.g. `ref: () => someLetVariable` backed by a bare
   `let x; <div ref={x}>`). The compute function runs synchronously at the moment

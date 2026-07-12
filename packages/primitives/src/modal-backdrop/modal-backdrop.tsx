@@ -44,8 +44,10 @@ export interface ModalBackdropProps {
  * - Clicking this dismisses the layer, exactly as clicking a consumer backdrop does — it's
  *   outside the popup, so `createDismissable`'s outside-pointerdown check fires.
  *
- * Rendered through `renderElement`, not a literal `<div>`: a literal host element compiles to
- * a hoisted `_$template()` call, which throws on `@solidjs/web`'s server build.
+ * Rendered through `renderElement`, which merges the consumer's `ref` with nothing here (the
+ * backdrop has no internal ref) and gives one consistent render path. A literal `<div>` would
+ * work equally now that the library ships source — `renderElement` earns its keep for `as`/
+ * render-prop polymorphism, not as an SSR wrapper — but there's no reason to churn this.
  */
 export function ModalBackdrop(props: ModalBackdropProps): JSX.Element {
   return renderElement<ModalBackdropElementProps, HTMLDivElement>({

@@ -13,8 +13,8 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    colocated in the same `src/` directory (docs stay beside the source, not in `__tests__/`).
 3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same
    `src/` directory. Components are what a human has to look at; pure primitives aren't.
-   Stories are excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in
-   `vite.config.base.ts`) and from the `build` task's turbo `inputs`.
+   Stories (and tests) never reach `dist/` — tsdown only builds the `package.json`
+   `hope.entries` files — and are excluded from the `build` task's turbo `inputs`.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces this in CI
 and fails the build if any is missing. This exists because Kobalte's test coverage is

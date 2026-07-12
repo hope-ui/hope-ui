@@ -162,7 +162,7 @@ rule and could not decide; a human should look". It used to be dropped on the fl
 genuinely can't judge (`color-contrast` over an unresolvable background), name the rule in
 `allowIncomplete` at the call site with a reason. See `axe.md`.
 
-## Two guards that aren't tests
+## The guard that isn't a test
 
 `pnpm check:coverage-parity` enforces the Definition of Done as *behavior*, not file presence.
 Every `packages/*/src` file has a colocated test and a `.md` doc. Every component additionally
@@ -171,15 +171,11 @@ has a `.stories.tsx`, a `Foo.ssr.test.tsx` calling `renderToStringAsync()`, and 
 `expectNoA11yViolations()`. In each case the call must be real — not in a comment, not in a
 string, not merely imported, not inside an `it.skip`.
 
-`pnpm check:dist-imports` asserts no built `dist/**/*.js` imports a client-only `@solidjs/web`
-helper. This enforces the invariant SSR silently depends on: **no component may write a literal
-host JSX element** (`<div>`, `<span>`, an SVG arrow). Those compile to a module-scope
-`_$template()` call, which throws at *import* on the server. Route every host element through
-`renderElement`. Run it after `pnpm build` — it reads `dist/`.
-
-The same grep is the tripwire for a `babel-preset-solid@1.x` regression in the compiler
-pipeline: 1.x emits `use` and `addEventListener`, names `@solidjs/web` 2.0 renamed to `ref` and
-`addEvent`.
+(There used to be a second guard, `check:dist-imports`, asserting no built `dist/**/*.js`
+imported a client-only `@solidjs/web` helper — the enforcement for the retired
+"no literal host JSX element" rule. It's gone: the library now ships JSX-preserved source
+under the `"solid"` condition, so literal elements compile per-environment in the consumer's
+build. See `docs/plan.md`, "Distribution model".)
 
 ## Why `unit` has no DOM at all
 

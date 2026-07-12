@@ -4,7 +4,9 @@ The foundational styled primitive — hope-ui's `<Box>`, and the end-to-end proo
 Panda toolchain. Accepts every Panda style prop directly on the JSX (`p`, `bg`, `mt`,
 `rounded`, `_hover`, `colorPalette`, `css`, …), maps them to atomic classes at render, and
 renders through the shared `renderElement` — a `<div>` by default, or any element via `as` /
-`render`. No inline styles and no literal host element, so it is SSR-safe and hydrates in
+`render` (that's what `renderElement` is for: `as`/render-prop polymorphism). No inline
+styles; the class names come from the pure, deterministic `css()` mapper, so it works in
+SolidStart — server render and client render produce identical markup and it hydrates in
 place.
 
 hope-ui ships **zero CSS**: the atomic rules these classes reference are emitted by the

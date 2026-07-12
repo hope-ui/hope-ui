@@ -43,11 +43,10 @@ here. **They are now pinned by characterization tests**, so stable breaking any 
 up as a red test naming the code that depended on it, rather than as a mysterious component
 bug days into the migration:
 
-- `packages/primitives/src/solid-contract.test.tsx` — unit project, where `@solidjs/web`
-  resolves to its **server** build.
-- `packages/primitives/src/solid-contract.browser.test.tsx` — browser project, where it
-  resolves to the **client** build. The asymmetry between the two files *is* the invariant
-  §3 depends on.
+- `packages/primitives/src/solid-contract.test.ts` — unit project, `solid-js` client build.
+- `packages/primitives/src/solid-contract.ssr.test.tsx` — `ssr` project, where both packages
+  resolve to their **server** builds.
+- `packages/primitives/src/solid-contract.browser.test.tsx` — browser project, client build.
 
 What they pin:
 
@@ -58,40 +57,48 @@ What they pin:
 | `useContext` **throws** with no Provider mounted | `createComponentContext`'s `try/catch` reword |
 | Sibling effects run in creation order; on **re-run** their cleanups do too; on **owner disposal** cleanups are LIFO | `createFocusRestore`'s creation order *and* its `queueMicrotask` deferral |
 | A microtask queued from the first cleanup lands after every sibling cleanup | `createFocusRestore`'s deferral |
-| Server build exports `template`/`insert`/`spread`/`setAttribute` as throwing stubs, while `Dynamic` → `ssrElement(…, true)` emits an `_hk` key | The whole no-literal-host-JSX invariant (§3) |
-| Client build exports those same four as real implementations | ditto — the asymmetry is the point |
+| `Dynamic` → `ssrElement(…, true)` emits an `_hk` hydration key server-side | `renderElement`; everything it renders hydrates against that key |
 | `applyRef` does `r.flat(Infinity).forEach(f => f && f(el))`, skipping falsy entries | `renderElement`'s ref merging; why no `mergeRefs` helper exists |
 
 Still to re-check by hand at the migration, because nothing pins them:
 
 - [ ] Client `dynamic()` does `sharedConfig.hydrating ? getNextElement() : createElement(...)`,
-      i.e. `Dynamic` is hydration-aware at runtime, independent of the Babel `hydratable`
-      flag. If that stops being true, the single-build strategy dies — see §3.
+      i.e. `Dynamic` is hydration-aware at runtime. If that stops being true, everything
+      `renderElement` renders stops hydrating — see §3.
 - [ ] `createUniqueId()` still diverges between `solid-js`'s server and client builds. See §4.
 
 ---
 
-## 3. Correct the record: why the single `generate: "dom"` build works
+## 3. Distribution: ship source under the `"solid"` condition (supersedes the old invariant)
 
-`docs/plan.md` claims one build suffices because `@solidjs/web` "resolves to different
-runtime implementations per environment behind the same exported function names". **That
-reasoning is wrong**, verified against the installed `2.0.0-beta.16`: the server build's
-`template`/`insert`/`spread`/`setAttribute` are `notSup` stubs that throw.
+This entry used to record two successive theories about why a *single* pre-compiled
+`generate: "dom"` build survives SSR. The first ("`@solidjs/web` exposes the same function
+names per environment") was wrong: the server build's `template`/`insert`/`spread`/
+`setAttribute` are `notSup` stubs that throw, and `generate: "dom"` hoists a `_$template()`
+call to module scope, so a literal `<div>` throws at *import* under SSR. The second promoted
+**"no source file may contain a literal host JSX element"** to a load-bearing invariant,
+enforced by a `dist`-import grep (`scripts/check-dist-imports.mjs`).
 
-The real reason SSR works is narrower and undocumented: **no source file under
-`packages/*/src` contains a literal host JSX element.** Every host element is created via
-`renderElement` → `<Dynamic>` → `createComponent`, and `Dynamic` handles both SSR
-(`ssrElement`, emitting `_hk` keys) and hydration (`getNextElement`) at *runtime*. Compiled
-`dist/**/*.js` therefore contains zero `_$template` / `_$insert` calls.
+**Both are retired.** The crash was a property of shipping *one pre-compiled dom build*, not
+of SSR. The library now ships JSX-preserved **source only** under the `"solid"` export
+condition (`dist/<name>/index.jsx`, built by **tsdown** — see `tsdown.config.base.ts`), with
+**no** dom-compiled fallback. A `vite-plugin-solid` consumer (SolidStart, create-solid — every
+Solid app) compiles the source **per environment** — `generate: "ssr"` server-side,
+`generate: "dom"` + hydratable client-side — so literal host elements compile correctly on each
+side. The grep, the invariant, and the "route every element through `renderElement`" rule are
+all gone. `renderElement` → `<Dynamic>` stays as the `as`/render-prop polymorphism helper. Full
+rationale: `docs/plan.md`, "Distribution model".
 
-The first component that writes a plain `<div>`, `<span>`, or SVG arrow — a Popover arrow,
-a visually-hidden label — breaks SSR at runtime.
-
-- [ ] Keep the CI grep asserting no built `dist/**/*.js` imports `template`/`insert`/
-      `spread`/`setAttribute`/`use`/`addEventListener` from `@solidjs/web` (Wave 3).
-- [ ] Re-verify the invariant against stable: if `Dynamic` stops being hydration-aware at
-      runtime, the single-build strategy dies and we need `generate: "ssr"` +
-      `hydratable: true` as a second build.
+- [ ] Re-verify against stable that a `vite-plugin-solid` consumer still receives the
+      `"solid"` condition and compiles our `.jsx` per environment (server `ssr`, client
+      `dom` + hydrate). If the `solid` resolve condition or per-env compilation changes,
+      revisit. There is no dom fallback, so this path is load-bearing — a real SolidStart
+      example app (once `@solidjs/start` is on 2.0) is the end-to-end check.
+- [ ] Consider whether a `"default"` dom-compiled fallback is now worth shipping (for
+      non-`vite-plugin-solid` consumers). It was dropped pre-1.0 to avoid re-opening the
+      `babel-preset-solid` compiler question; a 2.0-stable toolchain may make it cheap.
+- [ ] Re-verify `Dynamic` is still hydration-aware at runtime (below) — `renderElement`
+      relies on it to emit and consume `_hk` keys.
 
 ---
 
@@ -162,32 +169,41 @@ hydrated by the `browser` project. Corrupt a fixture and both halves go red.
 
 ---
 
-## 5. Re-evaluate the build toolchain (tsdown + unplugin-solid)
+## 5. Build toolchain: tsdown (adopted), and the compiler hazard that shapes it
 
-`solid-primitives`' `next` branch builds with `tsdown` + `unplugin-solid`. hope-ui
-deliberately stayed on Vite library mode. The reason, verified rather than assumed:
+The publishable packages build with **tsdown** (rolldown + oxc), configured in
+`tsdown.config.base.ts`. It emits **JSX-preserved source** (`transform.jsx: "preserve"`) — it
+runs *no Solid compiler*, so `babel-preset-solid`'s version never enters the published output.
+That is the whole reason tsdown is safe here where a *compiling* toolchain would not be:
 
-- `unplugin-solid@1.0.0` resolves its compiler via a bare `import solid from
-  "babel-preset-solid"`, with `dependencies: { "babel-preset-solid": "^1.9.9" }` and
-  `peerDependencies: { "solid-js": "^1.9.9" }`. Under pnpm that resolves to its own **1.x**
-  copy.
-- `babel-preset-solid@1.9.12` compiles `<div ref={el}/>` to
-  `import { use as _$use } from "@solidjs/web"` — the exact *"does not provide an export
-  named 'use'"* failure that made this repo abandon `esbuild-plugin-solid`. It also emits
-  `addEventListener`, which `@solidjs/web` 2.0 renamed to `addEvent`.
-- solid-primitives carries no `pnpm.overrides` to correct it, and gets away with it because
-  their packages are reactive primitives that rarely compile JSX host elements. hope-ui
-  ships components.
-- Critically, **Vitest compiles through a different plugin** (`vite-plugin-solid`), so
-  adopting `unplugin-solid` today would ship a broken `dist/` with the entire pipeline
-  green.
+- `unplugin-solid@1.0.0` (tsdown's usual Solid integration, and what `solid-primitives` uses)
+  resolves its compiler via a bare `import solid from "babel-preset-solid"`, with
+  `dependencies: { "babel-preset-solid": "^1.9.9" }`. Under pnpm that resolves to its own
+  **1.x** copy — and `babel-preset-solid@1.9.12` compiles `<div ref={el}/>` to
+  `import { use as _$use } from "@solidjs/web"` (verified), the exact *"does not provide an
+  export named 'use'"* failure that made this repo abandon `esbuild-plugin-solid`; it also
+  emits `addEventListener`, renamed to `addEvent` in 2.0. `esbuild-plugin-solid@0.5.0` has the
+  same `babel-preset-solid@^1.x` dep. So any toolchain that *compiles* our JSX with those
+  plugins ships a broken `dist/` under Solid 2.0.
+- hope-ui sidesteps this entirely by **not compiling** in the published build — tsdown +
+  `jsx: "preserve"` uses no Solid plugin (`unplugin-solid` is not installed). The tests +
+  Storybook compile with `vite-plugin-solid@3` (`babel-preset-solid@2.x`), the one 2.0-correct
+  compiler.
 
-**Revisit trigger:** `unplugin-solid` publishes a release depending on
-`babel-preset-solid@^2` (or peering `solid-js@^2`).
+**Revisit triggers:**
 
-- [ ] Check `npm view unplugin-solid dependencies peerDependencies` at migration time.
-- [ ] If migrating, the Wave 3 dist-grep (§3) is the tripwire that makes it safe. Do not
-      migrate without it.
+- [ ] If a `"default"` dom-compiled fallback is ever added (§3), it *will* need a real Solid
+      compiler. Use `vite-plugin-solid@3`/`babel-preset-solid@2.x` (or an `unplugin-solid`
+      release depending on `babel-preset-solid@^2` — check
+      `npm view unplugin-solid dependencies` at that time), and add a guard (grep the built
+      output for `use`/`addEventListener` from `@solidjs/web`, or import it and assert it loads)
+      so a 1.x preset can't ship a broken fallback green. The `check:dist-imports` grep that
+      once served this role was removed with the literal-element rule; the source-only build
+      doesn't need it.
+- [ ] tsdown's dts (rolldown-plugin-dts) trips over `@pandacss/types` → `pkg-types` →
+      `typescript@5.9` when bundling declarations; `deps.neverBundle` externalizes that chain
+      (§3, `tsdown.config.base.ts`). Re-check whether newer tsdown/rolldown-plugin-dts fixes the
+      underlying bug so the workaround can be narrowed.
 
 ---
 

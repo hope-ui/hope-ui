@@ -2,7 +2,7 @@
   "name": "@hope-ui/styled-system",
   "version": "0.0.0",
   "private": true,
-  "description": "Generated Panda styled-system (css/tokens/patterns runtime + types) for hope-ui, produced from @hope-ui/preset. Workspace-internal; its pure runtime is inlined into @hope-ui/components at build. Never exports the /jsx factory (Solid 1.x, literal host elements).",
+  "description": "Generated Panda styled-system (css/tokens/patterns runtime + types) for hope-ui, produced from @hope-ui/preset. Workspace-internal; its pure runtime is inlined into @hope-ui/components at build. Never exports Panda's /jsx factory (Solid 1.x); hope-ui hand-writes its own /jsx + /patterns for Solid 2.0 — see docs/plan.md.",
   "type": "module",
   "sideEffects": false,
   "exports": {

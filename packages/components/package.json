@@ -6,23 +6,30 @@
   "type": "module",
   "sideEffects": false,
   "files": ["dist"],
+  "hope": {
+    "entries": {
+      "box": "src/box/index.ts",
+      "button": "src/button/index.ts",
+      "dialog": "src/dialog/index.ts"
+    }
+  },
   "exports": {
     "./box": {
       "types": "./dist/box/index.d.ts",
-      "import": "./dist/box/index.js"
+      "solid": "./dist/box/index.jsx"
     },
     "./button": {
       "types": "./dist/button/index.d.ts",
-      "import": "./dist/button/index.js"
+      "solid": "./dist/button/index.jsx"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
-      "import": "./dist/dialog/index.js"
+      "solid": "./dist/dialog/index.jsx"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "tsdown",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {

@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    // Off for the published artifact: tsdown emits the `.d.ts` here, and with `files: ["dist"]`
+    // a `.d.ts.map` would point at `../../src` sources absent from the tarball.
+    "declarationMap": false
   },
   "include": ["src"]
 }

@@ -24,10 +24,11 @@ export interface BoxProps
  * Every Chakra-style style prop (`p`, `bg`, `mt`, `_hover`, `colorPalette`, …) is
  * accepted directly on the JSX, split out via Panda's own `isCssProperty`, compiled
  * to an atomic class name by the pure `css()` mapper, and merged with any consumer
- * `class` (consumer wins on ties). No inline styles and no literal host element — it
- * renders through `renderElement` → `<Dynamic>`, so it stays SSR-safe and hydrates
- * cleanly. hope-ui ships zero CSS: the atomic rules `css()` names are emitted by the
- * consumer's own `panda codegen` over their source.
+ * `class` (consumer wins on ties). It renders through `renderElement` for `as`/render-prop
+ * polymorphism (a `<div>` by default). The `css()` mapper is pure and deterministic, so
+ * server and client produce identical class names and it works in SolidStart. hope-ui ships
+ * zero CSS: the atomic rules `css()` names are emitted by the consumer's own `panda codegen`
+ * over their source.
  */
 export const Box: Component<BoxProps> = (props) => {
   // Which passed keys are style props? Stable for a given render; the values are read

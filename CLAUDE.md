@@ -25,20 +25,31 @@ server skips the hydration id the client's runtime still consumes, so `_hk` dive
 client). `controlled-signal` was rejected for exactly this. Prove any such adoption against the
 hydration fixture; effect-only primitives are the safe bet. See `docs/solid-primitives-eval.md`.
 
-**SSR and SolidStart support are required, not optional** — every primitive/component
-must render under SSR and hydrate cleanly, verified with `renderToStringAsync`/
-`hydrate` from `@solidjs/web`. See "SSR & hydration requirements" in `docs/plan.md` for
-the concrete rules (effect-gate DOM access, `createUniqueId` for ARIA-linking ids,
-portals must degrade gracefully server-side) and a version caveat: `@solidjs/start`
-hasn't migrated to solid-js 2.0 yet, so real SolidStart end-to-end testing is currently
-blocked on them, not on this project — SSR correctness is still fully testable now
-without SolidStart itself.
+**"SSR support" = "works in SolidStart."** Renders on the SolidStart server, hydrates
+without mismatch, runs on the client. That is the whole requirement — nothing broader.
+Every primitive/component must clear it, verified with `renderToStringAsync`/`hydrate`
+from `@solidjs/web` (the framework-agnostic pair SolidStart's server uses). The concrete
+rules that actually protect it are small and named in `docs/plan.md` ("SSR & hydration
+requirements"): effect-gate DOM access, `createUniqueId` for ARIA-linking ids, gate
+server-side `Portal` behind `isServer`, and keep an `aria-controls` IDREF only while its
+target is mounted. A version caveat: `@solidjs/start` hasn't migrated to solid-js 2.0 yet,
+so real SolidStart end-to-end testing is currently blocked on them, not on this project —
+SSR correctness is still fully testable now (per-environment compilation + the
+`renderToStringAsync`/`hydrate` round-trip) without SolidStart itself.
+
+The library ships JSX-preserved **source** only, under the `"solid"` export condition, so
+the consumer's own `vite-plugin-solid` compiles it per environment (server `ssr`, client
+`dom` + hydrate). There is deliberately **no** dom-compiled fallback: every SolidJS app
+(SolidStart, `npm init solid`) is Vite + `vite-plugin-solid`, so the `"solid"` condition
+always resolves; a consumer without that plugin gets no match and fails loudly. Components
+are therefore free to write literal host elements — see the "Distribution model" in
+`docs/plan.md`.
 
 ## Commands
 
 ```bash
 pnpm install              # install workspace deps
-pnpm build                # turbo: build all packages (Vite library mode, ESM + per-package .d.ts)
+pnpm build                # turbo: build all packages (tsdown → JSX-preserved .jsx + .d.ts per subpath)
 pnpm lint                 # biome check .
 pnpm format               # biome format --write .
 pnpm typecheck            # turbo: tsc --noEmit per package (reads sibling src, never dist — see below)
@@ -48,8 +59,6 @@ pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + h
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test, .md doc, or story
-pnpm check:dist-imports   # fails if a built file imports a client-only @solidjs/web helper.
-                          # Reads packages/*/dist, so it runs after `pnpm build`.
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
 
@@ -82,9 +91,9 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) colocated in
    the same `src/` directory.
 3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same `src/`
-   directory. Components are what a human has to look at; pure primitives aren't. Stories are
-   excluded from `dist/` (see `vite-plugin-dts`'s `exclude` in `vite.config.base.ts`) and from the
-   `build` task's turbo `inputs`.
+   directory. Components are what a human has to look at; pure primitives aren't. Stories (and
+   tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
+   and they're excluded from the `build` task's turbo `inputs`.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above in CI (it
 exists because Kobalte's test coverage is inconsistent, with gaps in the highest a11y-risk
@@ -116,43 +125,34 @@ Also required:
   trees** — hydration keys (`_hk`) are a path through the component tree, so inserting a component
   before `Dialog.Trigger` (even one that renders nothing) shifts the trigger's key.
 
-## No component may write a literal host JSX element
+## Components may write literal host elements — the library ships source
 
-`vite-plugin-solid` is configured with neither `generate` nor `hydratable`, i.e.
-`generate: 'dom'`, which compiles a literal `<div>`/`<span>`/SVG into a **module-scope**
-`_$template()` call plus `_$insert()`. `@solidjs/web`'s **server** build exports
-`template`/`insert`/`spread`/`setAttribute` as `notSup` throwers ("Client-only API called
-on the server side"). So a single literal host element anywhere in a component throws *at
-import* under SSR — not at render.
+Earlier this file carried a "no component may write a literal host JSX element" rule: a
+literal `<div>` compiles (under a single `generate: 'dom'` build) to a module-scope
+`_$template()` call that `@solidjs/web`'s **server** build throws on *at import*, so one
+literal element crashed SSR. That was never an SSR requirement — it was an artifact of the
+**distribution choice** to ship one pre-compiled dom build. The library now ships
+JSX-preserved **source** under the `"solid"` export condition (see "Distribution model" in
+`docs/plan.md`), so the consumer's `vite-plugin-solid` compiles each element per
+environment and literal host elements are fine. Write them where they read best.
 
-SSR works today only because every host element routes through `renderElement` →
-`<Dynamic>` → `createComponent`, and `Dynamic` bridges the two builds at runtime
-(`ssrElement(…, true)` server-side, `sharedConfig.hydrating ? getNextElement() :
-createElement(...)` client-side). Compile mode never matters. This was previously
-justified in `docs/plan.md` by the claim that `@solidjs/web` "exposes the same exported
-function names per environment" — that reasoning is wrong, and the invariant is what
-actually holds it up.
-
-`pnpm check:dist-imports` (`scripts/check-dist-imports.mjs`, run in CI right after
-`build`) enforces it: no `packages/*/dist/**/*.js` may import
-`template`/`insert`/`spread`/`setAttribute`/`use`/`addEventListener` from `@solidjs/web`.
-The same grep is the tripwire for a `babel-preset-solid@1.x` creeping back into the
-compiler pipeline — 1.x emits `use` and `addEventListener`, names 2.0 renamed to `ref` and
-`addEvent`, which is what makes the deferred `tsdown`/`unplugin-solid` migration safe to
-attempt (see `docs/migration-2.0-stable.md` §5).
-
-The first Popover arrow or visually-hidden label written the obvious way is what this
-catches. Route it through `renderElement`.
+`renderElement` (`@hope-ui/primitives/utils`) stays — but only as the `as`/render-prop
+**polymorphism** helper (and the owner of ref merging), which is its real job. It is no
+longer a mandatory wrapper you route every host element through for SSR's sake. Reach for
+it when a component exposes `as`/`render`; otherwise a literal element is fine.
 
 ## The Solid internals this codebase leans on are pinned
 
-`packages/primitives/src/solid-contract.test.tsx` (unit, server `@solidjs/web`) and
-`solid-contract.browser.test.tsx` (browser, client build) are characterization tests. They
-don't test hope-ui; they pin the undocumented `solid-js`/`@solidjs/web` behaviors listed
-in `docs/solid-2.0-notes.md`, each with a comment naming the code that depends on it. `@solidjs/web`
-already renamed runtime helpers *within* the beta line (`use`→`ref`,
-`addEventListener`→`addEvent`), so when stable breaks one of these you get a red test with a
-pointer instead of a bug hunt. Add to them rather than re-deriving a behavior in a comment.
+`packages/primitives/src/solid-contract.test.ts` (unit, `solid-js` client build),
+`solid-contract.ssr.test.tsx` (server builds) and `solid-contract.browser.test.tsx`
+(browser, client build) are characterization tests. They don't test hope-ui; they pin the
+undocumented `solid-js`/`@solidjs/web` behaviors listed in `docs/solid-2.0-notes.md`, each
+with a comment naming the code that depends on it (`withDefaults`, `createControllableState`,
+`createComponentContext`, `createFocusRestore`, `renderElement`'s ref merging, and the
+`Dynamic` → `_hk` hydration key `renderElement` relies on). `@solidjs/web` already renamed
+runtime helpers *within* the beta line (`use`→`ref`, `addEventListener`→`addEvent`), so when
+stable breaks one of these you get a red test with a pointer instead of a bug hunt. Add to
+them rather than re-deriving a behavior in a comment.
 
 ## Architecture
 
@@ -244,8 +244,8 @@ per-component subpaths removes that lookup entirely while keeping the same
 per-component tree-shaking (via `package.json#exports` + `"sideEffects": false`) that
 family packages would have given. `@hope-ui/primitives` stays a fully separate
 package — every entry in `@hope-ui/components` depends on it, never on a sibling
-subpath. Each component subpath is its own Vite library-mode entry point (see
-`vite.config.base.ts`'s `entries` option), building to `dist/<component>/index.js` +
+subpath. Each component subpath is its own tsdown entry (from `package.json`'s
+`hope.entries`), building to `dist/<component>/index.jsx` (JSX-preserved source) +
 matching `.d.ts`. ESM-only builds.
 
 ## SolidJS 2.0 (beta) — API differences from 1.x that matter here
@@ -257,10 +257,13 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 
 - DOM rendering moved to `@solidjs/web` (`render`, `Dynamic`, `Portal`, `JSX` types), not
   `solid-js`/`solid-js/web`; `jsxImportSource` and the `solid.moduleName` override point there.
-- Build pipeline is Vite library mode with `vite-plugin-solid@3.0.0-next.5` (+
-  `babel-preset-solid@2.0.0-beta.x`), not tsup/`esbuild-plugin-solid`; `vite-plugin-dts` emits
-  `.d.ts` (older `babel-preset-solid@1.x` emits `use`/`addEventListener` instead of 2.0's
-  `ref`/`addEvent` and fails to load `ref=`).
+- The **published** build is tsdown (rolldown + oxc) emitting JSX-preserved source — it runs
+  no Solid compiler at all, so the `babel-preset-solid` version is irrelevant to it. The
+  **tests + Storybook** still compile JSX with `vite-plugin-solid@3.0.0-next.5` (+
+  `babel-preset-solid@2.0.0-beta.x`); the 1.x preset (`tsup`/`esbuild-plugin-solid`,
+  `unplugin-solid`) emits `use`/`addEventListener` instead of 2.0's `ref`/`addEvent` and fails
+  to load `ref=`, which is why those toolchains are *not* used for JSX compilation here. See
+  `docs/plan.md` "Distribution model" and `docs/migration-2.0-stable.md` §5.
 - A `createEffect(compute, effect)` compute function must never read a plain (non-signal) ref
   accessor — read the ref in the *effect* (second) callback.
 - When the ref-owning element is conditionally rendered by the signal the primitive reacts to, back
@@ -303,19 +306,22 @@ Three places redirect to source, and all three must stay in sync when a package 
 `turbo.json`'s `typecheck` task therefore has **no** `dependsOn: ["^build"]`. If you find
 yourself running a build to make an import resolve, the resolution config is what's wrong.
 
-The single exception is `vite-plugin-dts`, which honours `paths` when it *emits*: without
-`compilerOptions: { paths: {} }` in `vite.config.base.ts` the published `Dialog.d.ts` gets
-`import { RenderProp } from '../../packages/primitives/src/utils/index.ts'`, a path that doesn't
-exist in the tarball. The build artifact resolves through `exports` (i.e. `dist`); only
-development resolves to source.
+This used to have a `vite-plugin-dts` exception (it honoured `paths` when emitting, leaking
+`import { RenderProp } from '../../packages/primitives/src/utils/index.ts'` into the published
+`Dialog.d.ts` unless `paths` was cleared). That's gone: tsdown emits the `.d.ts`, and it keeps
+sibling `@hope-ui/*` packages **external** (via `deps.neverBundle` in `tsdown.config.base.ts`),
+so the emitted declarations reference them by bare specifier (`@hope-ui/primitives/utils`) —
+resolved through the consumer's `exports`, never a src path. Nothing in the build follows
+`paths` to source; only development (editor, `tsc --noEmit`, tests, Storybook) does.
 
-## Build/test/Storybook share one Solid compiler config
+## test/Storybook share one Solid compiler config
 
-Three pipelines compile this repo's JSX — the library build (`vite.config.base.ts`), the
-test runs (`vitest.config.ts`), and Storybook (`.storybook/main.ts`). They must agree,
+The **published build no longer compiles JSX** — tsdown ships JSX-preserved source and the
+consumer's `vite-plugin-solid` compiles it. Only two pipelines here compile this repo's JSX:
+the test runs (`vitest.config.ts`) and Storybook (`.storybook/main.ts`). They must agree,
 because a mismatch surfaces as a runtime error deep inside `@solidjs/web`, not as a config
-error. All three import `solidPluginOptions()` from the root `solid-babel-options.ts`;
-don't respell the options anywhere.
+error. Both import `solidPluginOptions()` from the root `solid-babel-options.ts`; don't
+respell the options anywhere.
 
 Two non-obvious things that config guards against, both hit for real:
 

@@ -1,12 +1,11 @@
-import { applyRef, insert, setAttribute, spread, template } from "@solidjs/web";
-import { createRoot } from "solid-js";
+import { applyRef } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 
 /**
- * The client-build half of `solid-contract.test.tsx`. Same purpose — characterization tests
- * pinning undocumented `@solidjs/web` internals, each naming the code that depends on it —
- * but these must run where `@solidjs/web` resolves to `dist/web.js` rather than
- * `dist/server.js`, which is only true in the **browser** project.
+ * The client-build half of the Solid contract. Same purpose — characterization tests pinning
+ * undocumented `@solidjs/web` internals, each naming the code that depends on it — but these
+ * must run where `@solidjs/web` resolves to `dist/web.js` rather than `dist/server.js`, which
+ * is only true in the **browser** project.
  *
  * See `docs/migration-2.0-stable.md` §2.
  */
@@ -57,31 +56,6 @@ describe("@solidjs/web client-build contract", () => {
       applyRef(setter, element);
 
       expect(setter).toHaveBeenCalledExactlyOnceWith(element);
-    });
-  });
-
-  it("exports template/insert/spread/setAttribute as real implementations", () => {
-    // The mirror image of `solid-contract.test.tsx`'s "throwing stubs" test, and the reason
-    // the no-literal-host-JSX invariant exists: these four are exactly what `generate: "dom"`
-    // compiles a literal `<div>` into, they work here, and they throw on the server. One
-    // build, two environments, and only `Dynamic` bridges them.
-    //
-    // `createRoot`, because `spread` and `insert` create render effects: outside a reactive
-    // context Solid warns `[NO_OWNER_EFFECT]` and the effects are never disposed.
-    createRoot((dispose) => {
-      const element = template("<div></div>")() as HTMLDivElement;
-      expect(element.tagName).toBe("DIV");
-
-      setAttribute(element, "data-pinned", "yes");
-      expect(element.getAttribute("data-pinned")).toBe("yes");
-
-      spread(element, { id: "pinned" });
-      expect(element.id).toBe("pinned");
-
-      insert(element, "hi");
-      expect(element.textContent).toBe("hi");
-
-      dispose();
     });
   });
 });

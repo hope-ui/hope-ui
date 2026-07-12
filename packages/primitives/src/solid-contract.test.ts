@@ -23,12 +23,12 @@ import { describe, expect, it } from "vitest";
  * This file runs in the **unit** project: `solid-js`'s client build, real effects, deferred
  * signal writes (hence `flush()`). Its siblings pin the same idea against the other builds:
  *
- * - `solid-contract.ssr.test.tsx` — server build. Why one `generate: "dom"` build survives SSR.
- * - `solid-contract.browser.test.tsx` — client build in a real browser. `applyRef`, and the
- *   fact that the same four DOM helpers are *not* throwing stubs there.
+ * - `solid-contract.ssr.test.tsx` — server build. `Dynamic` emits the `_hk` hydration key that
+ *   everything `renderElement` renders hydrates against.
+ * - `solid-contract.browser.test.tsx` — client build in a real browser. `applyRef` (why no
+ *   `mergeRefs` helper is needed).
  *
- * The asymmetry between the last two *is* the no-literal-host-JSX invariant. See
- * `docs/testing.md` and `docs/migration-2.0-stable.md` §2.
+ * See `docs/testing.md` and `docs/migration-2.0-stable.md` §2.
  */
 
 describe("solid-js contract", () => {
