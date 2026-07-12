@@ -36,3 +36,6 @@ export const basePreset = definePreset({
 });
 
 export default basePreset;
+
+/** The semantic-color contract every theme's `semanticTokens.colors` must implement. */
+export type { SemanticColorContract } from "./semantic-contract";

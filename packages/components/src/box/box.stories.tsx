@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const StyleProps: Story = {
   render: () => (
-    <Box p="6" bg="primary" color="text.inverse" rounded="lg">
+    <Box p="6" bg="primary" color="text.primary.foreground" rounded="lg">
       Styled with style props
     </Box>
   ),
