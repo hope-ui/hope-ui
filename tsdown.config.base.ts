@@ -40,9 +40,14 @@ export function createTsdownConfig(packageDir: string): UserConfig {
 
   // One tsdown entry per subpath: `box` (src/box/index.ts) → the output key `box/index`, which
   // under `outDir: dist` + the `.jsx` extension lands at `dist/box/index.jsx`, with its bundled
-  // `dist/box/index.d.ts` beside it.
+  // `dist/box/index.d.ts` beside it. A `.` entry name is the package root (e.g. `@hope-ui/theming`,
+  // a single cohesive contract package rather than a bag of unrelated components) → output key
+  // `index` → `dist/index.jsx`.
   const entry = Object.fromEntries(
-    Object.entries(entries).map(([name, relPath]) => [`${name}/index`, relPath]),
+    Object.entries(entries).map(([name, relPath]) => [
+      name === "." ? "index" : `${name}/index`,
+      relPath,
+    ]),
   );
 
   return defineConfig({

@@ -20,11 +20,14 @@ const packagesDir = join(repoRoot, "packages");
 
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
-// Only the behavior/UI packages carry the test + .md Definition of Done. The preset is pure
-// token data (Tailwind v4 values + semantic tokens) and the generated styled-system isn't
-// hand-written, so both are exempt — tokens are exercised transitively by the components that
-// consume them.
-const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components"]);
+// Only the behavior/UI/contract packages carry the test + .md Definition of Done. The
+// `@hope-ui/themes` presets are pure token data (Tailwind v4 values + semantic tokens) and the
+// generated styled-system isn't hand-written, so both are exempt — tokens are exercised
+// transitively by the components that consume them. `theming` is hand-written contract + runtime,
+// so it's in — but only for
+// test + doc: it renders no DOM, so it is deliberately absent from the story / SSR / hydration
+// sets below (those are for components a human looks at and that emit hydratable markup).
+const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:

@@ -55,6 +55,7 @@ function resolveServerEntry(packageName: string): string {
 // went green, but Dialog's tests kept failing identically, because they were still exercising
 // the stale pre-fix `dist` build. Aliasing straight to source removes the rebuild step.
 const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
+const themingSrcDir = join(import.meta.dirname, "packages/theming/src");
 
 // `@hope-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
 // so the alias is a wildcard: `@hope-ui/primitives/render` -> `.../src/render/index.ts`. The
@@ -62,10 +63,22 @@ const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 // `String.replace` (what `@rollup/plugin-alias` runs under the hood). Anchored `^…/(.+)$` so it
 // stays an exact per-subpath match: a bare-prefix string `find` would also capture unrelated
 // specifiers, the trap the `solid-js` / `@solidjs/web` aliases below avoid.
+//
+// `@hope-ui/theming` has a root barrel (it's one cohesive contract package, not a bag of
+// unrelated components), so its aliases are two exact-anchored matches — the `/conformance`
+// subpath and the root — rather than a wildcard.
 const hopeUiAlias = [
   {
     find: /^@hope-ui\/primitives\/(.+)$/,
     replacement: join(primitivesSrcDir, "$1/index.ts"),
+  },
+  {
+    find: /^@hope-ui\/theming\/conformance$/,
+    replacement: join(themingSrcDir, "conformance/conformance.ts"),
+  },
+  {
+    find: /^@hope-ui\/theming$/,
+    replacement: join(themingSrcDir, "index.ts"),
   },
 ];
 const serverBuildAlias = [

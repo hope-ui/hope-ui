@@ -10,8 +10,8 @@ SolidStart — server render and client render produce identical markup and it h
 place.
 
 hope-ui ships **zero CSS**: the atomic rules these classes reference are emitted by the
-consumer's own `panda codegen` over their source (add `@hope-ui/preset` to their
-`panda.config.ts`). The runtime only maps props → class names.
+consumer's own `panda codegen` over their source (add a `@hope-ui/themes/*` preset, e.g.
+`@hope-ui/themes/nova`, to their `panda.config.ts`). The runtime only maps props → class names.
 
 ## API
 

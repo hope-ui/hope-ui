@@ -203,6 +203,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@solidjs/web':
+      specifier: 2.0.0-beta.17
+      version: 2.0.0-beta.17
+    solid-js:
+      specifier: 2.0.0-beta.17
+      version: 2.0.0-beta.17
+
 importers:
 
   .:
@@ -288,12 +297,6 @@ importers:
         specifier: 'catalog:'
         version: 2.0.0-beta.17
 
-  packages/preset:
-    devDependencies:
-      '@pandacss/dev':
-        specifier: ^1.11.4
-        version: 1.11.4(typescript@5.9.3)
-
   packages/primitives:
     devDependencies:
       '@hope-ui/internal-test-utils':
@@ -308,12 +311,34 @@ importers:
 
   packages/styled-system:
     devDependencies:
-      '@hope-ui/preset':
+      '@hope-ui/themes':
         specifier: workspace:*
-        version: link:../preset
+        version: link:../themes
       '@pandacss/dev':
         specifier: ^1.11.4
         version: 1.11.4(typescript@5.9.3)
+
+  packages/themes:
+    devDependencies:
+      '@pandacss/dev':
+        specifier: ^1.11.4
+        version: 1.11.4(typescript@5.9.3)
+
+  packages/theming:
+    dependencies:
+      '@hope-ui/primitives':
+        specifier: workspace:*
+        version: link:../primitives
+    devDependencies:
+      '@hope-ui/internal-test-utils':
+        specifier: workspace:*
+        version: link:../internal-test-utils
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17(solid-js@2.0.0-beta.17)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17
 
 packages:
 

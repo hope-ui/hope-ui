@@ -1,0 +1,29 @@
+{
+  "name": "@hope-ui/themes",
+  "version": "0.0.0",
+  "description": "hope-ui Panda CSS themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/nova, …) plus the shared @hope-ui/themes/base foundation. Add a theme to your panda.config.ts presets and run panda codegen. Ships config only; zero CSS.",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["src"],
+  "exports": {
+    "./base": {
+      "types": "./src/base/base.ts",
+      "import": "./src/base/base.ts"
+    },
+    "./nova": {
+      "types": "./src/nova/nova.ts",
+      "import": "./src/nova/nova.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "@pandacss/dev": ">=1.11.0"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "^1.11.4"
+  }
+}

@@ -9,6 +9,7 @@ import { solidPluginOptions } from "../solid-babel-options";
 // `dist/`. Without this, editing a primitive has no effect on a story until the package is
 // rebuilt, and stories silently exercise the last build.
 const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src");
+const themingSrcDir = join(import.meta.dirname, "../packages/theming/src");
 
 const config: StorybookConfig = {
   stories: ["../packages/*/src/**/*.stories.@(ts|tsx)"],
@@ -46,6 +47,15 @@ const config: StorybookConfig = {
           {
             find: /^@hope-ui\/primitives\/(.+)$/,
             replacement: join(primitivesSrcDir, "$1/index.ts"),
+          },
+          // `@hope-ui/theming` has a root barrel: two exact-anchored aliases, not a wildcard.
+          {
+            find: /^@hope-ui\/theming\/conformance$/,
+            replacement: join(themingSrcDir, "conformance/conformance.ts"),
+          },
+          {
+            find: /^@hope-ui\/theming$/,
+            replacement: join(themingSrcDir, "index.ts"),
           },
           ...aliasArray,
         ],

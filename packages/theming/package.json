@@ -1,0 +1,42 @@
+{
+  "name": "@hope-ui/theming",
+  "version": "0.0.0",
+  "description": "The hope-ui theming contract: ThemeProvider/useRecipe, the augmentable ThemeRecipes registry, neutral variant unions, slot-recipe contract types, a contract-version constant, and a conformance kit. @hope-ui/components depends on it; @hope-ui/themes/* implement and augment it.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist"],
+  "hope": {
+    "entries": {
+      ".": "src/index.ts",
+      "conformance": "src/conformance/conformance.ts"
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "solid": "./dist/index.jsx"
+    },
+    "./conformance": {
+      "types": "./dist/conformance/index.d.ts",
+      "solid": "./dist/conformance/index.jsx"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "dependencies": {
+    "@hope-ui/primitives": "workspace:*"
+  },
+  "devDependencies": {
+    "@hope-ui/internal-test-utils": "workspace:*",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}
