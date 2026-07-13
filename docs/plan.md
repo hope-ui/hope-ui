@@ -365,6 +365,11 @@ DoD below) — this doesn't depend on SolidStart at all.
 
 ## How to build, in order
 
+> **Superseded.** The phase/step ordering below (Button → Dialog → Popover/Tooltip → Listbox) was
+> set at repo creation and is no longer the plan. The current, complexity-ordered build roadmap —
+> the full Chakra v3 component surface plus the kernel primitives still needed — lives in
+> [`docs/roadmap.md`](roadmap.md). This section is kept only for the Phase 0/1 history it records.
+
 **Phase 0 (done):**
 1. ~~Repo scaffolding~~ ✅
 2. ~~pnpm workspace + Turborepo, `solid-js`/`@solidjs/signals`/`@solidjs/web` pinned via
