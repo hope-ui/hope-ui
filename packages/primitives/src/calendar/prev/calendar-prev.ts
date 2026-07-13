@@ -24,7 +24,7 @@ export function createCalendarPrev(
       return props.type ?? ("button" as const);
     },
     get "aria-label"() {
-      return props["aria-label"] ?? state.messages().previousLabel;
+      return props["aria-label"] ?? state.t("calendar.previousLabel");
     },
     get disabled() {
       return props.disabled || state.isPrevDisabled() || undefined;

@@ -59,8 +59,7 @@
   },
   "dependencies": {
     "@internationalized/date": "catalog:",
-    "@solid-primitives/a11y": "catalog:",
-    "@solid-primitives/i18n": "catalog:"
+    "@solid-primitives/a11y": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",

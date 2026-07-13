@@ -96,15 +96,20 @@ render-body memo) are the safest bet.
   registers `onCleanup`. `createCalendar` additionally guards the call on `typeof document` so the
   Node `unit` project (client build, no DOM) doesn't hit `document.createElement`. Cleared the
   calendar hydration round-trip (no console error/warn, byte-for-byte fixture).
-- **`@hope-ui/primitives/i18n` translator seam ← `@solid-primitives/i18n`: ADOPTED (re-exported).**
-  The i18n module re-exports the `@solid-primitives/i18n` `translator`/`flatten`/`resolveTemplate`
-  primitives (the same shape Kobalte's `@kobalte/core/i18n` re-exports) for consumers authoring
-  localized dictionaries. The **calendar itself uses a plain overridable message dictionary**
-  (`CalendarMessages`, English defaults) rather than running `translator` in its render path, so no
-  memoized translator participates in the calendar's hydration — the transform-boundary hazard
-  doesn't apply. The locale/direction *context* (`I18nProvider`/`useLocale`/`createDefaultLocale`)
-  is **ported from the maintainer's Kobalte i18n work**, not adopted from `@solid-primitives`; see the
-  CLAUDE.md carve-out.
+- **`@solid-primitives/i18n`: REMOVED (was re-exported; replaced by an in-house catalog + resolver).**
+  Originally the i18n module re-exported the `@solid-primitives/i18n` `translator`/`flatten`/
+  `resolveTemplate` seam. It has been dropped as a dependency in favour of hope-ui's own centralized
+  message API — a built-in en/fr catalog (`messages.ts`) plus a `t()` resolver (`translate.ts`)
+  exposed on the `I18nProvider` context — ported from the maintainer's Angular predecessor's
+  `I18nService`. Two reasons: (1) remove the runtime dependency, and (2) `@solid-primitives/i18n`'s
+  `translator` **memoizes** (a compute-form signal), and a memoized translator in a render path is
+  exactly the transform-boundary hydration hazard this doc catalogs. The in-house `t()` is a plain
+  function that reads the locale accessor on each call — never a `createMemo` — so it is hydration-safe
+  by construction and can be called directly in the calendar's render path (which previously had to
+  avoid the translator by using a plain `CalendarMessages` dictionary; that dictionary is now gone,
+  replaced by `t('calendar.*')`). The locale/direction *context*
+  (`I18nProvider`/`useLocale`/`createDefaultLocale`) remains **ported from the maintainer's Kobalte
+  i18n work**; see the CLAUDE.md carve-out.
 - **`@solid-primitives/date`: REJECTED.** Date math stays `@internationalized/date` (immutable,
   date-only `CalendarDate`, locale-aware, React Aria's substrate; every pure calendar util depends
   only on it). `@solid-primitives/date` is `Date`-based/mutable and, as a `node_modules` reactive

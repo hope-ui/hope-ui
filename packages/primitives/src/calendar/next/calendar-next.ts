@@ -24,7 +24,7 @@ export function createCalendarNext(
       return props.type ?? ("button" as const);
     },
     get "aria-label"() {
-      return props["aria-label"] ?? state.messages().nextLabel;
+      return props["aria-label"] ?? state.t("calendar.nextLabel");
     },
     get disabled() {
       return props.disabled || state.isNextDisabled() || undefined;

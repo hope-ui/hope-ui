@@ -111,15 +111,15 @@ export function createCalendarCell(
   }));
 
   const ariaLabel = () => {
-    const messages = state.messages();
+    const t = state.t;
     const parts = [state.formatCellName(date())];
-    if (isToday()) parts.push(messages.today);
+    if (isToday()) parts.push(t("calendar.today"));
     if (isRangeStart() && isRangeEnd())
-      parts.push(messages.selected); // single-day range
-    else if (isRangeStart()) parts.push(messages.rangeStart);
-    else if (isRangeEnd()) parts.push(messages.rangeEnd);
-    else if (isSelected()) parts.push(messages.selected);
-    if (isUnavailable()) parts.push(messages.unavailable);
+      parts.push(t("calendar.selected")); // single-day range
+    else if (isRangeStart()) parts.push(t("calendar.rangeStart"));
+    else if (isRangeEnd()) parts.push(t("calendar.rangeEnd"));
+    else if (isSelected()) parts.push(t("calendar.selected"));
+    if (isUnavailable()) parts.push(t("calendar.unavailable"));
     return parts.join(", ");
   };
 

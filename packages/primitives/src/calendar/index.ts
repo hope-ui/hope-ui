@@ -16,11 +16,9 @@ export {
 export { type CreateCalendarNextReturn, createCalendarNext } from "./next/calendar-next";
 export { type CreateCalendarPrevReturn, createCalendarPrev } from "./prev/calendar-prev";
 export {
-  type CalendarMessages,
   type CreateCalendarOptions,
   type CreateCalendarReturn,
   createCalendar,
-  DEFAULT_CALENDAR_MESSAGES,
   type IsDateDisabled,
 } from "./root/calendar-root";
 

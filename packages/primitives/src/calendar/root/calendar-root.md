@@ -15,9 +15,15 @@ function createCalendar(options?: CreateCalendarOptions): CreateCalendarReturn;
 `CreateCalendarOptions` — config (`locale`/`dir`/`timeZone`/`firstDayOfWeek`/`min`/`max`/
 `isDateDisabled`/`disabled`/`readOnly`/`selectionMode`), the controlled/uncontrolled selection pair
 (`value`/`defaultValue`/`onValueChange`), the roving-cursor pair (`focusedValue`/
-`defaultFocusedValue`/`onFocusedValueChange`), a `label`, and `messages` overrides.
+`defaultFocusedValue`/`onFocusedValueChange`), and a `label` (overrides the built-in `calendar.label`).
 
-`CreateCalendarReturn` — resolved config accessors; state (`view`, `visibleMonth`, `focusedDate`,
+All other localized strings — nav-button `aria-label`s, cell `aria-label` suffixes, and the
+live-region announcements — resolve through `@hope-ui/primitives/i18n` (the `t` accessor exposed on the
+return, backed by the built-in en/fr catalog). Translate them app-wide by wrapping the tree in
+`<I18nProvider locale translate messages>` — there is no per-instance `messages` prop.
+
+`CreateCalendarReturn` — resolved config accessors; the `t` message resolver (used by the part hooks
+for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `previewDate`, `rangeAnchor`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
 `prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `setPreviewDate`,

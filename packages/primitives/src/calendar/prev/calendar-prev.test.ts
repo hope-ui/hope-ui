@@ -20,7 +20,7 @@ const click = (handler: unknown) => (handler as (e: unknown) => void)({ defaultP
 const dataDisabled = (props: object) => (props as Record<string, unknown>)["data-disabled"];
 
 describe("createCalendarPrev", () => {
-  it("is a button labelled from messages", () => {
+  it("is a button labelled from the i18n defaults", () => {
     const { prev, dispose } = setup();
     expect(prev.props.type).toBe("button");
     expect(prev.props["aria-label"]).toBe("Previous");

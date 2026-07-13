@@ -24,7 +24,7 @@ Uncontrolled by default (`defaultOpen`); pass `open`/`onOpenChange` to control i
 | `Dialog.Popup`       | `div`    | The dialog surface. `role="dialog"`, dismissable while open, focus-trapped while `modal`. |
 | `Dialog.Title`       | `h2`     | Registers its `id` on `Popup`'s `aria-labelledby`. |
 | `Dialog.Description` | `p`      | Registers its `id` on `Popup`'s `aria-describedby`. |
-| `Dialog.Close`       | `button` | Closes the dialog on click. |
+| `Dialog.Close`       | `button` | Closes the dialog on click. `aria-label` defaults to the localized `dialog.close` message (consumer wins) — an icon-only close button is labelled for free. |
 
 Every part except `Root` accepts a `render` prop for polymorphic rendering (see
 `@hope-ui/primitives`'s `renderElement`).

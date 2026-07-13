@@ -13,7 +13,7 @@
 
 import { isServer } from "@solidjs/web";
 import { createMemo, createSignal, onSettled } from "solid-js";
-import { type Direction, getReadingDirection } from "./direction";
+import { type Direction, getReadingDirection } from "../direction/direction";
 
 export interface Locale {
   /** The [BCP-47](https://www.ietf.org/rfc/bcp/bcp47.txt) language code for the locale. */

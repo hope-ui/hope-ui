@@ -15,7 +15,7 @@ import {
   createUniqueId,
   untrack,
 } from "solid-js";
-import { useLocale } from "../../i18n";
+import { type TranslateFn, useLocale } from "../../i18n";
 import {
   type CreateCollectionReturn,
   type CreateListFocusReturn,
@@ -63,63 +63,8 @@ import { buildYearCells, formatYear } from "../utils/year-view";
 /** Per-date predicate (the public `isDateDisabled` option) — React Aria "unavailable" semantics. */
 export type IsDateDisabled = (date: CalendarDate) => boolean;
 
-/**
- * The localizable strings the calendar renders (button labels, cell `aria-label` suffixes, and the
- * live-region announcements). English defaults; override per-instance via `messages`, or provide a
- * fully translated set. (For app-wide translation, `@hope-ui/primitives/i18n` re-exports the
- * `@solid-primitives/i18n` translator seam — build a dictionary and pass resolved strings here.)
- */
-export interface CalendarMessages {
-  /** `role=group` accessible name. */
-  label: string;
-  /** Previous-period button `aria-label`. */
-  previousLabel: string;
-  /** Next-period button `aria-label`. */
-  nextLabel: string;
-  /** Cell `aria-label` suffix for today. */
-  today: string;
-  /** Cell `aria-label` suffix for a selected date. */
-  selected: string;
-  /** Cell `aria-label` suffix for a range start. */
-  rangeStart: string;
-  /** Cell `aria-label` suffix for a range end. */
-  rangeEnd: string;
-  /** Cell `aria-label` suffix for an unavailable (focusable-not-selectable) date. */
-  unavailable: string;
-  /** Announced view name (month view). */
-  monthView: string;
-  /** Announced view name (year view). */
-  yearView: string;
-  /** Announced view name (decade view). */
-  decadeView: string;
-  /** Announced committed single date. */
-  selectedDate: (date: string) => string;
-  /** Announced committed range. */
-  selectedRange: (start: string, end: string) => string;
-  /** Announced committed multiple selection. */
-  datesSelected: (count: number) => string;
-}
-
-/** English default messages. */
-export const DEFAULT_CALENDAR_MESSAGES: CalendarMessages = {
-  label: "Calendar",
-  previousLabel: "Previous",
-  nextLabel: "Next",
-  today: "Today",
-  selected: "selected",
-  rangeStart: "Range start",
-  rangeEnd: "Range end",
-  unavailable: "Unavailable",
-  monthView: "Month view",
-  yearView: "Year view",
-  decadeView: "Decade view",
-  selectedDate: (date) => `Selected ${date}`,
-  selectedRange: (start, end) => `Selected ${start} to ${end}`,
-  datesSelected: (count) => `${count} dates selected`,
-};
-
 export interface CreateCalendarOptions {
-  /** `role=group` accessible name. Overrides `messages.label`. */
+  /** `role=group` accessible name. Overrides the built-in `calendar.label` message. */
   label?: string;
   /** Locale for date formatting. Defaults to `useLocale()` (the `I18nProvider` / browser locale). */
   locale?: string;
@@ -154,8 +99,6 @@ export interface CreateCalendarOptions {
   defaultFocusedValue?: CalendarDate | null;
   /** Fired whenever the roving cursor moves. */
   onFocusedValueChange?: (date: CalendarDate) => void;
-  /** Localized string overrides. */
-  messages?: Partial<CalendarMessages>;
 }
 
 export interface CreateCalendarReturn {
@@ -169,7 +112,8 @@ export interface CreateCalendarReturn {
   disabled: Accessor<boolean>;
   readOnly: Accessor<boolean>;
   mode: Accessor<CalendarSelectionMode>;
-  messages: Accessor<CalendarMessages>;
+  /** The message resolver (built-in en/fr + app overlay), for the calendar's own labels/announcements. */
+  t: TranslateFn;
   groupLabel: Accessor<string>;
 
   // --- state ---
@@ -253,6 +197,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   });
 
   const i18n = useLocale();
+  const t = i18n.t;
   const locale = () => options.locale ?? i18n.locale();
   const direction = () => options.dir ?? i18n.direction();
   const timeZone = () => merged.timeZone;
@@ -263,8 +208,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const disabled = () => merged.disabled;
   const readOnly = () => merged.readOnly;
   const mode = () => merged.selectionMode;
-  const messages = () => ({ ...DEFAULT_CALENDAR_MESSAGES, ...options.messages });
-  const groupLabel = () => options.label ?? messages().label;
+  const groupLabel = () => options.label ?? t("calendar.label");
 
   // --- State ---
   const [view, setViewSignal] = createSignal<CalendarView>("month");
@@ -492,15 +436,16 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   const announceSelection = (value: CalendarValue) => {
     if (value == null) return;
-    const m = messages();
     if (Array.isArray(value)) {
-      if (value.length > 0) announce(m.datesSelected(value.length));
+      if (value.length > 0) announce(t("calendar.datesSelected", { count: value.length }));
       return;
     }
     if ("start" in value) {
-      announce(m.selectedRange(formatFull(value.start), formatFull(value.end)));
+      announce(
+        t("calendar.selectedRange", { start: formatFull(value.start), end: formatFull(value.end) }),
+      );
     } else {
-      announce(m.selectedDate(formatFull(value)));
+      announce(t("calendar.selectedDate", { date: formatFull(value) }));
     }
   };
 
@@ -555,7 +500,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       }
       if (currentView !== lastView) {
         lastView = currentView;
-        announce(`${viewName(untrack(messages), currentView)}, ${label}`);
+        announce(`${viewName(t, currentView)}, ${label}`);
       } else {
         announce(label);
       }
@@ -572,7 +517,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     disabled,
     readOnly,
     mode,
-    messages,
+    t,
     groupLabel,
     view,
     visibleMonth,
@@ -620,13 +565,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 }
 
 /** The announced name for a view. */
-function viewName(messages: CalendarMessages, view: CalendarView): string {
+function viewName(t: TranslateFn, view: CalendarView): string {
   switch (view) {
     case "month":
-      return messages.monthView;
+      return t("calendar.monthView");
     case "year":
-      return messages.yearView;
+      return t("calendar.yearView");
     case "decade":
-      return messages.decadeView;
+      return t("calendar.decadeView");
   }
 }

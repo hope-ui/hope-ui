@@ -211,9 +211,6 @@ catalogs:
     '@solid-primitives/a11y':
       specifier: 1.0.0-next.0
       version: 1.0.0-next.0
-    '@solid-primitives/i18n':
-      specifier: 3.0.0-next.2
-      version: 3.0.0-next.2
     '@solidjs/web':
       specifier: 2.0.0-beta.17
       version: 2.0.0-beta.17
@@ -320,9 +317,6 @@ importers:
       '@solid-primitives/a11y':
         specifier: 'catalog:'
         version: 1.0.0-next.0(@solidjs/web@2.0.0-beta.17(solid-js@2.0.0-beta.17))(solid-js@2.0.0-beta.17)
-      '@solid-primitives/i18n':
-        specifier: 'catalog:'
-        version: 3.0.0-next.2(@solidjs/web@2.0.0-beta.17(solid-js@2.0.0-beta.17))(solid-js@2.0.0-beta.17)
     devDependencies:
       '@hope-ui/internal-test-utils':
         specifier: workspace:*
@@ -1428,12 +1422,6 @@ packages:
 
   '@solid-primitives/a11y@1.0.0-next.0':
     resolution: {integrity: sha512-mu3WGweGsnyDe42pKarKVZTNwuBw7ufJjuwNJXwM1N17MhMIqbS1RlPMkuAG9f4ZG7QmQIyUsJuLl32aCMB8aQ==}
-    peerDependencies:
-      '@solidjs/web': ^2.0.0-beta.15
-      solid-js: ^2.0.0-beta.15
-
-  '@solid-primitives/i18n@3.0.0-next.2':
-    resolution: {integrity: sha512-8Ie5TP3lyzBMyUJk6tkQmix1vEAkloVtHv7IEFXawtUEy+SX35+RJvwNr+hscZre/QzRiEBssyn7VS9ZNnON8w==}
     peerDependencies:
       '@solidjs/web': ^2.0.0-beta.15
       solid-js: ^2.0.0-beta.15
@@ -4536,11 +4524,6 @@ snapshots:
   '@solid-primitives/a11y@1.0.0-next.0(@solidjs/web@2.0.0-beta.17(solid-js@2.0.0-beta.17))(solid-js@2.0.0-beta.17)':
     dependencies:
       '@solid-primitives/utils': 7.0.0-next.1(@solidjs/web@2.0.0-beta.17(solid-js@2.0.0-beta.17))(solid-js@2.0.0-beta.17)
-      '@solidjs/web': 2.0.0-beta.17(solid-js@2.0.0-beta.17)
-      solid-js: 2.0.0-beta.17
-
-  '@solid-primitives/i18n@3.0.0-next.2(@solidjs/web@2.0.0-beta.17(solid-js@2.0.0-beta.17))(solid-js@2.0.0-beta.17)':
-    dependencies:
       '@solidjs/web': 2.0.0-beta.17(solid-js@2.0.0-beta.17)
       solid-js: 2.0.0-beta.17
 

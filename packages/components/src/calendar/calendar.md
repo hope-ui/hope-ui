@@ -41,7 +41,11 @@ import { CalendarDate } from "@internationalized/date";
 | `isDateDisabled` | `(date) => boolean` | "Unavailable" days — focusable + announced, but not selectable. |
 | `locale` / `dir` / `timeZone` / `firstDayOfWeek` | | Default from `useLocale()` + the system zone. |
 | `readOnly` / `disabled` | `boolean` | |
-| `messages` | `Partial<CalendarMessages>` | Localized button labels + aria-label suffixes + announcements. |
+| `label` | `string` | `role="group"` accessible name. Overrides the built-in `calendar.label`. |
+
+Localized button labels, cell aria-label suffixes, and announcements come from the central
+`@hope-ui/primitives/i18n` catalog (built-in en/fr). Translate them app-wide with
+`<I18nProvider locale translate messages>` — there is no per-instance `messages` prop.
 
 ## Keyboard
 
@@ -57,7 +61,7 @@ import { CalendarDate } from "@internationalized/date";
 
 ## ARIA
 
-`role="group"` (labelled by `messages.label`, default "Calendar") wraps a `<table role="grid">` named
+`role="group"` (labelled by the `calendar.label` message, default "Calendar") wraps a `<table role="grid">` named
 via `aria-labelledby` the heading. Rows are `<tr>` (implicit `row`); cells are `<td role="gridcell">`
 with `aria-selected`, wrapping the roving `<button>` whose `aria-label` is the full localized date plus
 Today / selected / range / unavailable suffixes. Roving tabindex: only the focused cell is tabbable.
