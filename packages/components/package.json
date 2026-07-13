@@ -10,6 +10,7 @@
     "entries": {
       "box": "src/box/index.ts",
       "button": "src/button/index.ts",
+      "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts"
     }
   },
@@ -21,6 +22,10 @@
     "./button": {
       "types": "./dist/button/index.d.ts",
       "solid": "./dist/button/index.jsx"
+    },
+    "./calendar": {
+      "types": "./dist/calendar/index.d.ts",
+      "solid": "./dist/calendar/index.jsx"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
@@ -37,7 +42,8 @@
     "solid-js": "catalog:"
   },
   "dependencies": {
-    "@hope-ui/primitives": "workspace:*"
+    "@hope-ui/primitives": "workspace:*",
+    "@internationalized/date": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",

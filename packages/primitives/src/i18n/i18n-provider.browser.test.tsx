@@ -1,0 +1,55 @@
+import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import { describe, expect, it } from "vitest";
+import { I18nProvider, useLocale } from "./i18n-provider";
+
+function LocaleProbe(props: { id: string }) {
+  const { locale, direction } = useLocale();
+  return (
+    <p id={props.id} data-locale={locale()} data-direction={direction()}>
+      {locale()}
+    </p>
+  );
+}
+
+describe("I18nProvider / useLocale", () => {
+  it("provides an explicit locale and its derived direction to descendants", async () => {
+    const { container, dispose } = mount(() => (
+      <I18nProvider locale="ar-EG">
+        <LocaleProbe id="probe" />
+      </I18nProvider>
+    ));
+
+    const probe = container.querySelector("#probe") as HTMLElement;
+    expect(probe.getAttribute("data-locale")).toBe("ar-EG");
+    expect(probe.getAttribute("data-direction")).toBe("rtl");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("derives 'ltr' for a Latin-script explicit locale", async () => {
+    const { container, dispose } = mount(() => (
+      <I18nProvider locale="fr-FR">
+        <LocaleProbe id="probe" />
+      </I18nProvider>
+    ));
+
+    const probe = container.querySelector("#probe") as HTMLElement;
+    expect(probe.getAttribute("data-locale")).toBe("fr-FR");
+    expect(probe.getAttribute("data-direction")).toBe("ltr");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("falls back to the browser default outside a provider", async () => {
+    const { container, dispose } = mount(() => <LocaleProbe id="probe" />);
+
+    const probe = container.querySelector("#probe") as HTMLElement;
+    expect(typeof probe.getAttribute("data-locale")).toBe("string");
+    expect(["ltr", "rtl"]).toContain(probe.getAttribute("data-direction"));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});

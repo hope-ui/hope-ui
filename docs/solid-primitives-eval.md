@@ -86,6 +86,30 @@ render-body memo) are the safest bet.
   in-repo **effect-only / getter-based** version — ids via `createUniqueId` (symmetric), describedby
   as a plain getter, no memo — rebuilt from the pattern (not copied, if it's Kobalte-derived).
 
+### Calendar family — evaluated, decided (built 2026-07)
+
+- **`Calendar` announcer ← `a11y/createAnnounce`: ADOPTED.** The screen-reader live-region announcer
+  the calendar uses for period/view/selection changes (replaces the Angular original's CDK
+  `LiveAnnouncer`). It is **effect-only** — no render-body signal/memo — so it is on the safe side of
+  the hydration-id hazard: it builds its live regions with `document.createElement` guarded by
+  `isServer` (no-op server-side), appends them to `document.body` outside the component tree, and
+  registers `onCleanup`. `createCalendar` additionally guards the call on `typeof document` so the
+  Node `unit` project (client build, no DOM) doesn't hit `document.createElement`. Cleared the
+  calendar hydration round-trip (no console error/warn, byte-for-byte fixture).
+- **`@hope-ui/primitives/i18n` translator seam ← `@solid-primitives/i18n`: ADOPTED (re-exported).**
+  The i18n module re-exports the `@solid-primitives/i18n` `translator`/`flatten`/`resolveTemplate`
+  primitives (the same shape Kobalte's `@kobalte/core/i18n` re-exports) for consumers authoring
+  localized dictionaries. The **calendar itself uses a plain overridable message dictionary**
+  (`CalendarMessages`, English defaults) rather than running `translator` in its render path, so no
+  memoized translator participates in the calendar's hydration — the transform-boundary hazard
+  doesn't apply. The locale/direction *context* (`I18nProvider`/`useLocale`/`createDefaultLocale`)
+  is **ported from the maintainer's Kobalte i18n work**, not adopted from `@solid-primitives`; see the
+  CLAUDE.md carve-out.
+- **`@solid-primitives/date`: REJECTED.** Date math stays `@internationalized/date` (immutable,
+  date-only `CalendarDate`, locale-aware, React Aria's substrate; every pure calendar util depends
+  only on it). `@solid-primitives/date` is `Date`-based/mutable and, as a `node_modules` reactive
+  primitive, would risk the transform-boundary hazard for no benefit.
+
 ### Tier A — evaluated, kept (build-fresh / no swap)
 - **`createControllableState` ← `controlled-signal`: REJECTED (breaks hydration in this setup).**
   `createControllableSignal` backs its state with a compute-function signal

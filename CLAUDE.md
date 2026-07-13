@@ -15,6 +15,15 @@ code/reasoning) but explicitly avoids the architectural patterns of Kobalte and 
 of" anything from either). See `docs/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
+**One carve-out, by owner decision:** `packages/primitives/src/i18n/` (locale + reading-direction
+context — `I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) is **ported and
+improved from the maintainer's own Kobalte i18n contribution** (`@kobalte/core/i18n`, itself derived
+from React Spectrum/`@react-aria/i18n`, Apache-2.0). This generic i18n/direction infrastructure is
+exempt from the "never copy Kobalte" rule above — it is the maintainer's own work, not one of the
+packaging/dependency anti-patterns the rule targets. The improvements over the source are documented
+in `default-locale.ts` (SSR-safe seeding + a `Symbol.for` dual-copy registry). Do not "correct" this
+back to a hand-rolled reimplementation. The rule stands for everything else.
+
 `@solid-primitives` (the `next` branch) is a separate axis: a community, SolidJS-team-adjacent
 library to **adopt as a dependency**, not merely reference. Before writing a new internal primitive,
 check it for an existing solution and record a verdict — but anything adopted must clear the full

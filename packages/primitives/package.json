@@ -8,16 +8,26 @@
   "files": ["dist"],
   "hope": {
     "entries": {
+      "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts",
+      "i18n": "src/i18n/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "internal": "src/internal/index.ts",
       "utils": "src/utils/index.ts"
     }
   },
   "exports": {
+    "./calendar": {
+      "types": "./dist/calendar/index.d.ts",
+      "solid": "./dist/calendar/index.jsx"
+    },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
+    },
+    "./i18n": {
+      "types": "./dist/i18n/index.d.ts",
+      "solid": "./dist/i18n/index.jsx"
     },
     "./modal-backdrop": {
       "types": "./dist/modal-backdrop/index.d.ts",
@@ -46,6 +56,11 @@
     "@tanstack/virtual-core": {
       "optional": true
     }
+  },
+  "dependencies": {
+    "@internationalized/date": "catalog:",
+    "@solid-primitives/a11y": "catalog:",
+    "@solid-primitives/i18n": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",

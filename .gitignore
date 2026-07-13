@@ -14,3 +14,6 @@ storybook-static/
 .DS_Store
 .localized
 __MACOSX/
+
+#
+__origins__
