@@ -1,7 +1,7 @@
 # hope-ui theming
 
 How a hope-ui component gets its styling, and how a theme provides it. This is the orientation
-doc; per-symbol API detail lives in the colocated `.md` files under `packages/theming/src/`, and
+doc; per-symbol API detail lives in the per-file usage docs under `docs/usage/theming/`, and
 the full rationale (the multi-theme feasibility analysis) is in the approved plan referenced from
 `CLAUDE.md`.
 

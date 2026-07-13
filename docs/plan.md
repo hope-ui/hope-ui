@@ -79,7 +79,7 @@ version):
   still default to `"solid-js/web"`) must point there.
 - `mergeProps`/`splitProps` are gone; the 2.0 idiom is `merge`/`omit` from `solid-js`.
   But `merge` resolves keys by *presence*, so it is the wrong tool for defaults — use
-  `withDefaults` (`packages/primitives/src/utils/defaults/defaults.md`). See CLAUDE.md.
+  `withDefaults` (`docs/usage/primitives/utils/defaults/defaults.md`). See CLAUDE.md.
 - Hit a real bug: Vite's `solid-refresh` HMR wrapper silently broke prop forwarding
   (`children` vanished) for components imported from another module, but not for the
   same component defined inline in a test file. Fixed with `refresh: { disabled: true }`
@@ -88,7 +88,7 @@ version):
 - Confirmed a genuine, unavoidable type-system limit for the render-prop/`as` pattern:
   a component's `render` callback can't be soundly typed for an arbitrary target
   element without full generics (the `Polymorphic<T>` cost this project is explicitly
-  trying to avoid). Documented in `packages/primitives/src/utils/render/render.md` rather than
+  trying to avoid). Documented in `docs/usage/primitives/utils/render/render.md` rather than
   papered over — an explicit type-assertion escape hatch is used at the one call site that
   needs cross-element rendering.
 

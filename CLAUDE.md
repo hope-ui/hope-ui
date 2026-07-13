@@ -3,7 +3,7 @@
 Guidance for Claude Code (claude.ai/code) working in this repository. This file is the operative
 index; the deepest rationale lives in `docs/` (notably `docs/plan.md`, `docs/testing.md`,
 `docs/solid-2.0-notes.md`, `docs/definition-of-done.md`, `docs/theming.md`) and in each
-primitive/component's colocated `.md`.
+primitive/component's per-file usage doc under `docs/usage/<pkg>/<relative-src-path>/`.
 
 ## What this is
 
@@ -70,7 +70,7 @@ pnpm test:ssr             # vitest run --project=ssr     (node, SERVER builds of
 pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + hydration)
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
-pnpm check:coverage-parity  # fails if any packages/*/src file lacks a test, .md doc, or story
+pnpm check:coverage-parity  # fails if a src file lacks a test / docs/usage doc / story, OR a leaf folder has flat sprawl
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
 
@@ -81,7 +81,7 @@ pnpm exec playwright install --only-shell chromium
 
 **Running a single test file or test:**
 ```bash
-pnpm exec vitest run --project=browser packages/components/src/button/Button.browser.test.tsx
+pnpm exec vitest run --project=browser packages/components/src/button/__tests__/button.browser.test.tsx
 pnpm exec vitest run --project=browser -t "fires onClick"
 ```
 
@@ -97,16 +97,19 @@ pnpm --filter @hope-ui/components typecheck
 any test.**
 
 Every source file under `packages/*/src/` (except `index.ts`) must have:
-1. A matching test file: `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx` (real-browser —
+1. A matching test file — `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx` (real-browser —
    required for anything touching focus/keyboard/pointer behavior, since jsdom cannot be trusted for
-   that).
-2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) colocated in
-   the same `src/` directory. **Exception:** files under `packages/primitives/src/internal/` (the
-   advanced/unstable behavior kernel — see "Architecture" below) require a test but **not** a
-   consumer-facing `.md`; the composed families (`dialog`, `calendar`, `i18n`, `modal-backdrop`)
-   and `utils/` still need one.
-3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same `src/`
-   directory. Components are what a human has to look at; pure primitives aren't. Stories (and
+   that) — in a `__tests__/` subfolder of the same leaf directory (`Foo/__tests__/Foo.test.tsx`), so
+   the leaf folder stays free of test/fixture visual noise. See "Leaf source folders stay flat-free".
+2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) at
+   `docs/usage/<pkg>/<relative-src-path>/Foo.md` (out of the source tree; the path mirrors package +
+   src path so the primitives/ and components/ `dialog` docs never collide). **Exception:** files
+   under `packages/primitives/src/internal/` (the advanced/unstable behavior kernel — see
+   "Architecture" below) require a test but **not** a consumer-facing `.md`; the composed families
+   (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
+3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated **beside the source** in
+   the same `src/` leaf directory (stories are the human-facing harness, so they stay next to what
+   they render). Components are what a human has to look at; pure primitives aren't. Stories (and
    tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
    and they're excluded from the `build` task's turbo `inputs`.
 
@@ -124,21 +127,33 @@ components, and Corvu has no automated tests at all — see `docs/plan.md`) and 
 Also required:
 - `expectNoA11yViolations` fails on axe **violations** *and* on **`incomplete`** results. Name a
   genuinely undecidable one (`color-contrast` over an unresolvable background) in `allowIncomplete`
-  at the call site with a reason; never silence the category. See `axe.md`.
+  at the call site with a reason; never silence the category. See
+  `docs/usage/internal-test-utils/axe/axe.md`.
 - `mount()` **fails the test** on a `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE`
   diagnostic. A deliberate untracked read is spelled `untrack(...)`; anything still warning is
-  unreviewed. See `mount.md`.
+  unreviewed. See `docs/usage/internal-test-utils/mount/mount.md`.
 - Stories also pin known-but-unfixed behavior where a human can see it. Don't "fix" a story by
   deleting it; fix the component and rename the story. Current example: Dialog's `Modal with an
   unpositioned Popup (content is unclickable — by design)`, a documented consequence of the
   pointer-blocking `ModalBackdrop`, not a defect.
-- Hydration cooperates through a committed fixture `src/<component>/__fixtures__/<component>-ssr.html`
+- Hydration cooperates through a committed fixture
+  `src/<component>/__tests__/__fixtures__/<component>-ssr.html`
   (genuine server output): the `ssr` test asserts it byte-for-byte, the `browser` test hydrates it
   and must assert no `console.error`/`console.warn`, exactly one of the element, and that the
   surviving node **is the same object** as the server's (a silent client-render fallback otherwise
   looks identical to success). The `ssr` and `browser` files must define **structurally identical
   trees** — hydration keys (`_hk`) are a path through the component tree, so inserting a component
   before `Dialog.Trigger` (even one that renders nothing) shifts the trigger's key.
+
+## Leaf source folders stay flat-free
+
+A `src/<name>/` folder holds only its implementation file(s), `index.ts`, and — for
+`@hope-ui/components` — `<name>.stories.tsx`. Everything else has a home: tests, `__fixtures__/`,
+and `__screenshots__/` live in a `__tests__/` subfolder; the per-file usage `.md` lives under
+`docs/usage/<pkg>/<path>/`. Never drop test, fixture, or doc files flat beside source, and never
+let a leaf folder accumulate a dozen files. `pnpm check:coverage-parity` enforces this — a flat
+`*.test.*`, a flat `<name>.md`, or a flat `__fixtures__/` in any leaf under `primitives`,
+`components`, `theming`, or `internal-test-utils` fails the build.
 
 ## Components may write literal host elements — the library ships source
 
@@ -158,7 +173,7 @@ it when a component exposes `as`/`render`; otherwise a literal element is fine.
 
 ## The Solid internals this codebase leans on are pinned
 
-`packages/primitives/src/solid-contract.test.ts` (unit, `solid-js` client build),
+`packages/primitives/src/__tests__/solid-contract.test.ts` (unit, `solid-js` client build),
 `solid-contract.ssr.test.tsx` (server builds) and `solid-contract.browser.test.tsx`
 (browser, client build) are characterization tests. They don't test hope-ui; they pin the
 undocumented `solid-js`/`@solidjs/web` behaviors listed in `docs/solid-2.0-notes.md`, each
@@ -189,21 +204,22 @@ them rather than re-deriving a behavior in a comment.
     the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
     (so the effect stack lives in `createDialogPopup`, the popup's scope). This is the headless
     shape `@hope-ui/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
-    `useDialog`/`useOverlay*` split. See `dialog/root/dialog-root.md`.
+    `useDialog`/`useOverlay*` split. See `docs/usage/primitives/dialog/root/dialog-root.md`.
   - `modal-backdrop/` (`@hope-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
     only component (it renders DOM), so it sits at `src/` beside the families rather than in
     `internal/`.
   - `utils/` (`@hope-ui/primitives/utils`) — the non-`createX` composition helpers:
     `renderElement` (the render-prop/`as`-polymorphism primitive every public component uses
     instead of hand-rolling its own polymorphic-`as` type system — it also owns ref merging;
-    modeled on Base UI's `useRender` idea, not its code — see `utils/render/render.md`),
+    modeled on Base UI's `useRender` idea, not its code — see `docs/usage/primitives/utils/render/render.md`),
     `withDefaults` (the *only* correct way to apply prop defaults under 2.0 — see the `merge` note
     in `docs/solid-2.0-notes.md`), and `composeEventHandlers`.
   - `internal/` (`@hope-ui/primitives/internal`) — the `createX` behavior primitives:
     `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
     missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
     `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
-    `createRegisteredId`, `createRegisteredElement` (see each primitive's colocated `.md`, and the
+    `createRegisteredId`, `createRegisteredElement` (see each primitive's doc under
+    `docs/usage/primitives/internal/`, and the
     ref/`createEffect` timing gotcha in `docs/solid-2.0-notes.md` before writing another one). The
     `internal/` barrel also carries the list/grid/collection navigation family
     (`createListNavigation`/`createListSelection`/`createGridNavigation`/`createVirtualCollection`,
@@ -227,7 +243,7 @@ them rather than re-deriving a behavior in a comment.
   without the backdrop. floating-ui's `markOthers` layers the same two attributes for the same
   reason. Any future modal layer (Popover, Select) composes all four — that's why
   `ModalBackdrop` is in the kernel rather than inside Dialog. A modal popup must be positioned,
-  or it paints beneath the backdrop; see `modal-backdrop.md`.
+  or it paints beneath the backdrop; see `docs/usage/primitives/modal-backdrop/modal-backdrop.md`.
 
   Two consequences that bite: `ModalBackdrop` and any consumer backdrop must be **spared** from
   `inert` (an inert element is transparent to hit testing, so a backdrop that hid itself would
@@ -322,7 +338,7 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `createSignal(fn)` creates a *memo*, not a signal holding a function; box generic values as
   `createControllableState` does.
 - Sibling effects run/clean up in creation order on re-run, but LIFO on owner disposal (see
-  `createFocusRestore` / `focus-restore.md`).
+  `createFocusRestore` / `docs/usage/primitives/internal/focus-restore/focus-restore.md`).
 - `onMount` → `onSettled`; `createEffect` takes a split `(depsFn, computeFn)` form; `createContext`
   returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default; `ref`
   accepts an array and `applyRef` skips falsy (no `mergeRefs`); `renderElement` owns ref merging.

@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 // Fails CI if a `primitives/` or `components/` source file under packages/*/src is missing a
-// matching test file and/or a matching .md doc file (see REQUIRES_TEST_AND_DOC). This is what
-// prevents test/doc coverage from drifting as the number of components grows.
+// matching test file (in a `__tests__/` subfolder beside it) and/or a matching per-file usage
+// doc (under `docs/usage/<pkg>/<relative-src-path>/<name>.md`; see REQUIRES_TEST_AND_DOC). This
+// is what prevents test/doc coverage from drifting as the number of components grows.
+//
+// It ALSO fails if any leaf source folder still has flat sprawl — a `*.test.*`, a `.md`, or a
+// `__fixtures__/` sitting beside the implementation instead of tucked into `__tests__/` (tests /
+// fixtures) or moved to `docs/usage/` (docs). See NO_FLAT_SPRAWL below and CLAUDE.md
+// "Leaf source folders stay flat-free".
 //
 // Every @hope-ui/components source file additionally needs a Storybook story, a
 // `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
@@ -17,7 +23,7 @@
 // kernel, demoted from public API — see docs/plan.md "Recommended architecture") need a test but
 // NOT a consumer-facing `.md`. The composed families (dialog/calendar/i18n/modal-backdrop) and
 // utils/ still need one. See `isDocExemptSource` below.
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
@@ -270,7 +276,6 @@ for (const pkg of packageDirs) {
 
   const sourceFiles = allFiles.filter(isSourceFile);
   const testFiles = allFiles.filter(isTestFile);
-  const docFiles = new Set(allFiles.filter((f) => f.endsWith(".md")).map(baseName));
   const storyFiles = new Set(allFiles.filter(isStoryFile).map(baseName));
 
   for (const sourceFile of sourceFiles) {
@@ -292,12 +297,20 @@ for (const pkg of packageDirs) {
       );
     });
     const hasTest = matchingTests.length > 0;
-    const hasDoc = docFiles.has(base);
+    // The per-file usage doc no longer sits beside the source — it lives out of the source tree
+    // at `docs/usage/<pkg>/<relative-src-path>/<name>.md`, mirroring the package + src path (so
+    // the primitives/ and components/ `dialog` docs never collide). Resolve that exact path and
+    // check it exists.
+    const docRelDir = relative(srcDir, dirname(sourceFile));
+    const expectedDoc = join(repoRoot, "docs/usage", pkg, docRelDir, `${basename(base)}.md`);
+    const hasDoc = existsSync(expectedDoc);
     const docRequired = !isDocExemptSource(pkg, sourceFile);
 
     const relPath = relative(repoRoot, sourceFile);
     if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
-    if (docRequired && !hasDoc) missing.push(`${relPath} — missing matching .md doc`);
+    if (docRequired && !hasDoc) {
+      missing.push(`${relPath} — missing matching .md doc at ${relative(repoRoot, expectedDoc)}`);
+    }
 
     if (REQUIRES_SSR_TEST.has(pkg)) {
       // The call must live in the `.ssr.test.*` file, because that is the only Vitest project
@@ -349,15 +362,53 @@ for (const pkg of packageDirs) {
   }
 }
 
-if (missing.length > 0) {
-  console.error("Definition of Done violated — missing test/doc coverage:\n");
-  for (const line of missing) console.error(`  - ${line}`);
-  console.error(`\n${missing.length} issue(s) found.`);
+// A leaf `src/<name>/` folder must hold only its implementation, its `index.ts`, and (components)
+// its `*.stories.tsx`. Tests, `__fixtures__/`, and `__screenshots__/` belong in a `__tests__/`
+// subfolder; the per-file usage doc belongs under `docs/usage/`. Anything of those kinds sitting
+// flat beside source is the visual noise this layout exists to kill — fail loudly so it can't
+// creep back. (`__screenshots__/` is gitignored and only ever regenerates next to a test file, so
+// the flat-test rule already covers it — no separate screenshot check is needed.)
+const NO_FLAT_SPRAWL = new Set(["primitives", "components", "theming", "internal-test-utils"]);
+const underTests = (p) => /[/\\]__tests__[/\\]/.test(p);
+const sprawl = [];
+for (const pkg of packageDirs) {
+  if (!NO_FLAT_SPRAWL.has(pkg)) continue;
+  const srcDir = join(packagesDir, pkg, "src");
+  let allFiles;
+  try {
+    allFiles = walk(srcDir);
+  } catch {
+    continue;
+  }
+  for (const file of allFiles) {
+    if (underTests(file)) continue; // everything under a __tests__/ subtree is where it belongs
+    const relPath = relative(repoRoot, file);
+    if (isTestFile(file)) {
+      sprawl.push(`${relPath} — test file must live in a __tests__/ subfolder`);
+    } else if (file.endsWith(".md")) {
+      sprawl.push(`${relPath} — usage doc must live under docs/usage/${pkg}/<path>/`);
+    } else if (/[/\\]__fixtures__[/\\]/.test(file)) {
+      sprawl.push(`${relPath} — __fixtures__/ must live under a __tests__/ subfolder`);
+    }
+  }
+}
+
+if (missing.length > 0 || sprawl.length > 0) {
+  if (missing.length > 0) {
+    console.error("Definition of Done violated — missing test/doc coverage:\n");
+    for (const line of missing) console.error(`  - ${line}`);
+  }
+  if (sprawl.length > 0) {
+    console.error(`${missing.length > 0 ? "\n" : ""}Leaf source folders must stay flat-free:\n`);
+    for (const line of sprawl) console.error(`  - ${line}`);
+  }
+  console.error(`\n${missing.length + sprawl.length} issue(s) found.`);
   process.exit(1);
 }
 
 console.log(
-  "check:coverage-parity passed — every source file has a test and a doc (the internal primitives " +
-    "kernel is doc-exempt); every component has a story, an executing renderToStringAsync() and an " +
-    "executing hydrate(); every browser test that mounts DOM also runs axe.",
+  "check:coverage-parity passed — every source file has a test and a doc under docs/usage/ (the " +
+    "internal primitives kernel is doc-exempt); every component has a story, an executing " +
+    "renderToStringAsync() and an executing hydrate(); every browser test that mounts DOM also " +
+    "runs axe; and no leaf source folder has flat test/doc/fixture sprawl.",
 );

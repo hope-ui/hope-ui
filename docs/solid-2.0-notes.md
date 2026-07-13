@@ -74,7 +74,7 @@ actual installed package):
   button. Forwarding an optional prop from a wrapper is the most common thing a consumer
   does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
   `@hope-ui/primitives`, which resolves each defaulted key with `??`. See
-  `packages/primitives/src/utils/defaults/defaults.md`.
+  `docs/usage/primitives/utils/defaults/defaults.md`.
 - **Internal computed props must fall back to the consumer's, not overwrite them.** Same
   root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
   puts the internal object last, so a getter returning `undefined` *erases* a

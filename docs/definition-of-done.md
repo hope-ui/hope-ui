@@ -5,14 +5,14 @@ Full rationale for the summary in CLAUDE.md § *Definition of Done*.
 Every source file under `packages/*/src/` (except `index.ts`) must have:
 1. A matching test file: `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx`
    (real-browser — required for anything touching focus/keyboard/pointer behavior,
-   since jsdom cannot be trusted for that). The test may sit **beside** the source (the
-   primitives' layout) or in a sibling **`__tests__/`** folder in the same directory (the
-   components' layout — it keeps the family folder free of test/fixture visual noise).
-   `check:coverage-parity` accepts either location.
-2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference)
-   colocated in the same `src/` directory (docs stay beside the source, not in `__tests__/`).
-3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same
-   `src/` directory. Components are what a human has to look at; pure primitives aren't.
+   since jsdom cannot be trusted for that), in a **`__tests__/`** subfolder of the leaf
+   directory (`Foo/__tests__/Foo.test.tsx`). This keeps the leaf folder free of test/fixture
+   visual noise; `check:coverage-parity`'s flat-free rule fails a test dropped beside the source.
+2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) at
+   `docs/usage/<pkg>/<relative-src-path>/Foo.md` — out of the source tree entirely, the path
+   mirroring package + src path so the primitives/ and components/ `dialog` docs never collide.
+3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated **beside the source**
+   in the same `src/` leaf directory. Components are what a human has to look at; pure primitives aren't.
    Stories (and tests) never reach `dist/` — tsdown only builds the `package.json`
    `hope.entries` files — and are excluded from the `build` task's turbo `inputs`.
 
@@ -37,13 +37,13 @@ one obliges you to call the other. A browser test that renders nothing (e.g.
 `expectNoA11yViolations` fails on axe **violations** *and* on **`incomplete`** results —
 the rules axe ran but couldn't decide. When axe genuinely cannot judge one
 (`color-contrast` over an unresolvable background), name it in `allowIncomplete` at the
-call site with a reason; never silence the category. See `axe.md`.
+call site with a reason; never silence the category. See `docs/usage/internal-test-utils/axe/axe.md`.
 
 `mount()` (also from `@hope-ui/internal-test-utils`) **fails the test** on a
 `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. Both were
 documented in prose here and emitted 170 times a run, so the next real one was invisible.
 A deliberate untracked read is spelled `untrack(...)`; anything still warning is
-unreviewed. See `mount.md`.
+unreviewed. See `docs/usage/internal-test-utils/mount/mount.md`.
 
 Every component (not needed for pure internal primitives with no DOM output) also
 needs an SSR **and** a hydration round-trip test, and `check:coverage-parity` enforces
