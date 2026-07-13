@@ -1,5 +1,6 @@
 import {
   type CreateDialogOptions,
+  type CreateDialogPopupProps,
   type CreateDialogReturn,
   createDialog,
   createDialogBackdrop,
@@ -110,7 +111,7 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
 
 // ---------- Popup ----------
 
-export interface DialogPopupProps extends JSX.HTMLAttributes<HTMLDivElement> {
+export interface DialogPopupProps extends CreateDialogPopupProps {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 

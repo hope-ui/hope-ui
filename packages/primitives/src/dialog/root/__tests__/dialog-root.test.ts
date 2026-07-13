@@ -53,14 +53,6 @@ describe("createDialog", () => {
     expect(dialog.open()).toBe(true);
   });
 
-  it("resolves initialFocus lazily from the option accessor", () => {
-    // `unit` runs in node with no DOM; the hook only reads/stores the ref by identity, never
-    // touches it, so a placeholder object stands in for the element.
-    const element = {} as HTMLElement;
-    const dialog = createDialog({ initialFocus: () => element });
-    expect(dialog.initialFocus()).toBe(element);
-  });
-
   it("falls back to a generated popupId until one is registered", () => {
     const dialog = createDialog();
     const generated = dialog.popupId();

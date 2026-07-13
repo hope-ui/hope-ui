@@ -94,7 +94,6 @@ independent of `ModalBackdrop` — it has always been the case.
 | `defaultOpen`  | `boolean`                   | `false` | Initial open state for uncontrolled usage.                          |
 | `onOpenChange` | `(open: boolean) => void`   | —       | Called whenever the dialog would open or close.                     |
 | `modal`        | `boolean`                   | `true`  | Traps focus, locks page scroll, sets `aria-modal`, hides the page behind from assistive technology, and blocks pointer interaction with it. When `false`, the dialog is still dismissable (Escape/outside click) and still restores focus, but the page behind stays fully interactive. See "Modality". |
-| `initialFocus` | `() => HTMLElement \| null \| undefined` | — | Explicit element to focus when the dialog opens, instead of the first focusable descendant. Lives on `Root` (not `Popup`, unlike Base UI) because the focus trap is owned by `createDialog`, which `Root` creates. |
 
 ### `Dialog.Trigger` / `Dialog.Close`
 
@@ -131,6 +130,7 @@ no other effect, so it's an unambiguous cancel channel:
 | Prop           | Type                                      | Default | Description                                                        |
 | -------------- | ------------------------------------------ | ------- | -------------------------------------------------------------------- |
 | `render`       | `RenderProp<JSX.HTMLAttributes<...>>`     | —       | Render as a different element/component.                            |
+| `initialFocus` | `() => HTMLElement \| null \| undefined` | —       | **`Popup` only.** Element to focus when the dialog opens, instead of the first focusable descendant. On `Popup` (matching Base UI) because the focus trap is owned by the popup part, and it's the only consumer. A control prop, so it's not forwarded to the DOM. |
 | `...rest`      | `JSX.HTMLAttributes<HTMLDivElement>`      | —       | Forwarded to the rendered element.                                   |
 
 Both expose their `createPresence` status as a `data-presence` attribute

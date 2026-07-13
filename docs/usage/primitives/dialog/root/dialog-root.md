@@ -7,7 +7,7 @@ one subpath, `@hope-ui/primitives/dialog`.
 
 | Hook | Owns |
 | ---- | ---- |
-| `createDialog(options)` | Shared state: open/modal, the popup/title/description ids, the spared-element registry, `initialFocus`. Renders nothing. Call **once**. |
+| `createDialog(options)` | Shared state: open/modal, the popup/title/description ids, the spared-element registry. Renders nothing. Call **once**. |
 | `createDialogTrigger(state, props)` | The trigger's ARIA + open handler. |
 | `createDialogPortal(state)` | The pointer-blocking modal backdrop's spare registration + `showModalBackdrop` gate. |
 | `createDialogBackdrop(state, props)` | Optional visible backdrop: presence + spare registration. |
@@ -30,13 +30,11 @@ function createDialog(options?: {
   defaultOpen?: boolean;       // uncontrolled initial state, default false
   onOpenChange?: (open: boolean) => void;
   modal?: boolean;             // default true
-  initialFocus?: Accessor<HTMLElement | null | undefined>;
 }): {
   open: Accessor<boolean>;
   setOpen: (open: boolean) => void;
   modal: Accessor<boolean>;
   isModal: Accessor<boolean>;                 // open() && modal()
-  initialFocus: Accessor<HTMLElement | null | undefined>;
   popupId: Accessor<string>;                  // registered id, else SSR-stable generated fallback
   setPopupId: (id: string | undefined) => void;
   titleId: Accessor<string | undefined>;
@@ -56,8 +54,8 @@ function createDialog(options?: {
   (`aria-hidden` + `inert`), and blocks the pointer. `false` keeps the page behind interactive but
   still dismisses and restores focus. `isModal` = `open() && modal()`, the gate every modal-only
   behavior keys off.
-- `initialFocus` — element to focus on open instead of the first focusable descendant. Read by
-  `createDialogPopup`'s focus trap; lives at the root so it is available before the popup mounts.
+- `initialFocus` (element to focus on open) is **not** here — it's a prop of `createDialogPopup`,
+  the part that owns the focus trap and the only consumer. See `../popup/dialog-popup.md`.
 - ids — `popupId` falls back to a generated (SSR-stable) `createUniqueId`; a part publishes a
   consumer id via `setPopupId`/`setTitleId`/`setDescriptionId` (the id-registering part hooks wrap
   `createRegisteredId`, which never runs during SSR — hence the generated fallback).

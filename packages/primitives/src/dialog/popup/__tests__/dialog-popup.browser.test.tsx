@@ -87,6 +87,36 @@ describe("createDialogPopup", () => {
     dispose();
   });
 
+  it("focuses the initialFocus target on open, over the first focusable descendant", async () => {
+    let target!: HTMLButtonElement;
+    const { container, dispose } = mount(() => {
+      const state = createDialog({ defaultOpen: true, modal: true });
+      // The accessor is read lazily by the focus trap after mount, so `target` (assigned by the
+      // ref below during the same mount) is resolved by the time focus is applied.
+      const popup = createDialogPopup(state, { initialFocus: () => target });
+      return (
+        <Show when={popup.mounted()}>
+          <div
+            data-testid="popup"
+            style={{ position: "fixed" }}
+            {...popup.props}
+            ref={popup.setRef}
+          >
+            <button type="button">first</button>
+            <button type="button" ref={target}>
+              target
+            </button>
+          </div>
+        </Show>
+      );
+    });
+
+    await vi.waitFor(() => expect(document.activeElement).toBe(target));
+    // `initialFocus` is a control prop, never an attribute on the surface.
+    expect(popupOf(container)?.hasAttribute("initialfocus")).toBe(false);
+    dispose();
+  });
+
   it("dismisses on Escape", async () => {
     const { container, dispose } = mountHarness({ withTitle: true });
     expect(popupOf(container)).toBeTruthy();

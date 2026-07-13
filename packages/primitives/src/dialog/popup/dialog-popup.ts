@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { type Accessor, createSignal, merge } from "solid-js";
+import { type Accessor, createSignal, merge, omit } from "solid-js";
 import {
   createDismissable,
   createFocusRestore,
@@ -10,6 +10,16 @@ import {
   createScrollLock,
 } from "../../internal";
 import type { CreateDialogReturn } from "../root/dialog-root";
+
+export interface CreateDialogPopupProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Explicit element to focus when the dialog opens, instead of the first focusable descendant.
+   * A per-read accessor consumed by this part's focus trap — read lazily at focus time (after the
+   * popup mounts), so the target may live inside the popup. It belongs here, not on `createDialog`:
+   * the focus trap is owned by this part, and nothing else in the family reads it.
+   */
+  initialFocus?: Accessor<HTMLElement | null | undefined>;
+}
 
 export interface CreateDialogPopupReturn {
   /** Spread onto the popup surface. `id`/`role`/`aria-labelledby`/`aria-describedby` fall back to
@@ -35,7 +45,7 @@ export interface CreateDialogPopupReturn {
  */
 export function createDialogPopup(
   state: CreateDialogReturn,
-  props: JSX.HTMLAttributes<HTMLDivElement>,
+  props: CreateDialogPopupProps,
 ): CreateDialogPopupReturn {
   // A signal-backed ref, not a `let`: the popup only exists as a reactive consequence of
   // `mounted()`, so the effects below (which react to `open`/`isModal` and read this ref tracked
@@ -45,7 +55,7 @@ export function createDialogPopup(
   const presence = createPresence({ present: state.open, ref });
 
   createFocusRestore({ active: state.open });
-  createFocusTrap({ active: state.isModal, ref, initialFocus: state.initialFocus });
+  createFocusTrap({ active: state.isModal, ref, initialFocus: () => props.initialFocus?.() });
   createHideOutside({ active: state.isModal, target: ref, spare: state.sparedElements });
   createDismissable({ active: state.open, ref, onDismiss: () => state.setOpen(false) });
   createScrollLock({ active: state.isModal });
@@ -59,8 +69,9 @@ export function createDialogPopup(
   // *last* source precedence and treats a getter returning `undefined` as a real value, so a bare
   // `get "aria-labelledby"()` would erase a consumer's own value whenever no `Title` is mounted —
   // stripping the accessible name. `aria-modal`/`data-presence` stay owned here (state-derived,
-  // and `aria-modal` must be *absent* on a non-modal dialog).
-  const elementProps = merge(props, {
+  // and `aria-modal` must be *absent* on a non-modal dialog). `initialFocus` is a control prop, not
+  // an attribute, so it's dropped from what spreads onto the element.
+  const elementProps = merge(omit(props, "initialFocus"), {
     get id() {
       return props.id ?? state.popupId();
     },

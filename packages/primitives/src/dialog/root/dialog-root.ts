@@ -35,12 +35,6 @@ export interface CreateDialogOptions {
    * behind stays interactive. Default `true`.
    */
   modal?: boolean;
-  /**
-   * Explicit element to focus when the dialog opens, instead of the first focusable descendant.
-   * Read by `createDialogPopup`'s focus trap. Lives at the root (not the popup) so it is
-   * available before the popup mounts.
-   */
-  initialFocus?: Accessor<HTMLElement | null | undefined>;
 }
 
 export interface CreateDialogReturn {
@@ -52,8 +46,6 @@ export interface CreateDialogReturn {
   modal: Accessor<boolean>;
   /** `open() && modal()` — the gate every modal-only behavior keys off. */
   isModal: Accessor<boolean>;
-  /** The consumer's `initialFocus`, resolved per-read (may be absent). */
-  initialFocus: Accessor<HTMLElement | null | undefined>;
 
   /** The popup's id: a registered consumer id if any, else a generated (SSR-stable) fallback. */
   popupId: Accessor<string>;
@@ -91,7 +83,6 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   });
   const modal = () => merged.modal;
   const isModal = () => open() && modal();
-  const initialFocus = () => merged.initialFocus?.();
 
   // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
   // so a consumer-pinned id can't be registered server-side. This is the only `createUniqueId`
@@ -115,7 +106,6 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     setOpen,
     modal,
     isModal,
-    initialFocus,
     popupId,
     setPopupId: setCustomPopupId,
     titleId,

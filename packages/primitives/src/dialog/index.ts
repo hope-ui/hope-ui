@@ -4,7 +4,11 @@ export {
   type CreateDialogDescriptionReturn,
   createDialogDescription,
 } from "./description/dialog-description";
-export { type CreateDialogPopupReturn, createDialogPopup } from "./popup/dialog-popup";
+export {
+  type CreateDialogPopupProps,
+  type CreateDialogPopupReturn,
+  createDialogPopup,
+} from "./popup/dialog-popup";
 export { type CreateDialogPortalReturn, createDialogPortal } from "./portal/dialog-portal";
 export {
   type CreateDialogOptions,
