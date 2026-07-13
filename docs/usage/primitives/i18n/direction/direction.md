@@ -24,6 +24,5 @@ subtag** set (`ar`, `he`, `fa`, `ur`, …).
 
 ## Provenance
 
-Ported from the maintainer's Kobalte i18n work (`@kobalte/core/i18n`), which is derived from React
-Spectrum (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). Behavior is verbatim; this repo owns only
-the doc/formatting. See the CLAUDE.md Kobalte carve-out note for why copying this is allowed here.
+Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). See the CLAUDE.md
+i18n provenance note.

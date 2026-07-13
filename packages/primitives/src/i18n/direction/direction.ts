@@ -1,8 +1,6 @@
 /*
- * Reading-direction detection. Ported from the maintainer's Kobalte i18n work
- * (`@kobalte/core/i18n`), which is in turn derived from React Spectrum
- * (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). Kept verbatim in behavior; only the
- * doc/formatting is hope-ui's. This replaces the Angular calendar's `@angular/cdk` `Directionality`.
+ * Reading-direction detection. Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
+ * © 2020 Adobe). This replaces the Angular calendar's `@angular/cdk` `Directionality`.
  */
 
 /** The writing direction for a locale. */

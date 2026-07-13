@@ -1,6 +1,5 @@
 /*
- * Locale + reading-direction context. Ported from the maintainer's Kobalte i18n work
- * (`@kobalte/core/i18n`), derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
+ * Locale + reading-direction context. Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
  * © 2020 Adobe). Replaces the Angular calendar's `I18nService` (locale) + `Directionality`.
  */
 

@@ -13,19 +13,14 @@ Chakra-DX system — see `docs/roadmap.md`) are the product; they are built over
 headless behavior kernel (`@hope-ui/primitives`), which is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API. It is API-inspired by Base UI
 and React Aria (their public API surface and accessibility patterns — actively reference and
-adapt their code/reasoning) but explicitly avoids the architectural patterns of Kobalte and Corvu
-(cite them only as anti-pattern case studies; never copy their code or "keep the shape
-of" anything from either). See `docs/plan.md` for the full architecture rationale,
+adapt their code/reasoning). See `docs/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
-**One carve-out, by owner decision:** `packages/primitives/src/i18n/` (locale + reading-direction
-context — `I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) is **ported and
-improved from the maintainer's own Kobalte i18n contribution** (`@kobalte/core/i18n`, itself derived
-from React Spectrum/`@react-aria/i18n`, Apache-2.0). This generic i18n/direction infrastructure is
-exempt from the "never copy Kobalte" rule above — it is the maintainer's own work, not one of the
-packaging/dependency anti-patterns the rule targets. The improvements over the source are documented
-in `default-locale.ts` (SSR-safe seeding + a `Symbol.for` dual-copy registry). Do not "correct" this
-back to a hand-rolled reimplementation. The rule stands for everything else.
+**i18n provenance:** `packages/primitives/src/i18n/` (locale + reading-direction
+context — `I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) is derived
+from React Spectrum/`@react-aria/i18n` (Apache-2.0). The improvements over that source are
+documented in `default-locale.ts` (SSR-safe seeding + a `Symbol.for` dual-copy registry). Do
+not "correct" this back to a hand-rolled reimplementation.
 
 `@solid-primitives` (the `next` branch) is a separate axis: a community, SolidJS-team-adjacent
 library to **adopt as a dependency**, not merely reference. Before writing a new internal primitive,
@@ -113,9 +108,8 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
    and they're excluded from the `build` task's turbo `inputs`.
 
-`pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above in CI (it
-exists because Kobalte's test coverage is inconsistent, with gaps in the highest a11y-risk
-components, and Corvu has no automated tests at all — see `docs/plan.md`) and additionally requires:
+`pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above in CI and
+additionally requires:
 - Every browser test that calls `mount()` also calls `expectNoA11yViolations` at least once (both
   from `@hope-ui/internal-test-utils`), running a baseline axe-core check. A browser test that
   renders nothing (e.g. `solid-contract.browser.test.tsx`) is exempt.
@@ -229,7 +223,7 @@ them rather than re-deriving a behavior in a comment.
     `@internationalized/date`; same root-state-plus-per-part shape as `dialog/`.
   - `i18n/` (`@hope-ui/primitives/i18n`) — locale + reading-direction context
     (`I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) plus message
-    translation. The one Kobalte-derived carve-out, described under "What this is".
+    translation. See the i18n provenance note under "What this is".
 
   **Modality is four mechanisms, not one**, and each was verified against the installed
   Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)
@@ -264,7 +258,7 @@ them rather than re-deriving a behavior in a comment.
   subpath export each (`@hope-ui/components/button`, `@hope-ui/components/dialog`,
   ...) rather than one package per component or per component-family. No root `.`
   export — consumers always import a specific component's subpath, which is also what
-  keeps this from becoming a Kobalte-style single giant package: importing one
+  keeps this from becoming a single giant barrel package: importing one
   component's subpath never pulls in another's code. See "Publishing shape" below for
   the full rationale.
 - `packages/theming` (`@hope-ui/theming`) — the **theming contract** and dependency-inversion
@@ -289,9 +283,9 @@ them rather than re-deriving a behavior in a comment.
 `@hope-ui/primitives`, never import from another component's subpath within
 `@hope-ui/components`. E.g. Popover must compose
 `createFloating`/`createDismissable`/`createPresence` directly — it must never import
-from `@hope-ui/components/dialog`, even though both are "overlay-ish." This is the
-specific mistake Corvu makes (`@corvu/popover` depends on `@corvu/dialog`) that this
-project avoids by design, despite now sharing one package.
+from `@hope-ui/components/dialog`, even though both are "overlay-ish." A higher-level
+component depending on a sibling component's package (rather than the shared kernel) is a
+known anti-pattern this project avoids by design, despite now sharing one package.
 
 **Publishing shape:** originally planned as packages grouped by shared-primitive family
 (`@hope-ui/overlays`, `@hope-ui/collections`, etc.); revised to a single

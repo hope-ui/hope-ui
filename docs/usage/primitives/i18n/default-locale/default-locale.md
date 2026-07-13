@@ -18,13 +18,13 @@ function createDefaultLocale(): { locale: () => string; direction: () => Directi
 - `createDefaultLocale()` — a reactive `{ locale, direction }` that updates when the OS/browser
   language changes. Call inside a reactive owner (a component body / `createRoot`).
 
-## SSR / hydration (two improvements over the Kobalte source)
+## SSR / hydration (two improvements over the original source)
 
 1. **Seeded to the SSR default.** The internal client signal starts at `en-US`/`ltr` — *not* the
    detected locale — and `createMemo` returns the SSR default on the server. The detected locale is
    adopted only in `onSettled`, which runs **after** hydration. So the first client paint agrees
    with the server, and locale-derived visible text (month/weekday names) never mismatches on
-   hydrate. (The Kobalte original seeds the signal with the real locale at module load, which can
+   hydrate. (The original source seeds the signal with the real locale at module load, which can
    mismatch.)
 2. **Dual-copy-safe subscription.** The shared `languagechange` listener set + the `current`
    snapshot live in a `Symbol.for("@hope-ui/primitives/i18n:locale-registry")` slot on `globalThis`,
@@ -33,5 +33,5 @@ function createDefaultLocale(): { locale: () => string; direction: () => Directi
 
 ## Provenance
 
-Ported from the maintainer's Kobalte i18n work (`@kobalte/core/i18n`), derived from React Spectrum
-(`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). See the CLAUDE.md Kobalte carve-out note.
+Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe). See the CLAUDE.md
+i18n provenance note.

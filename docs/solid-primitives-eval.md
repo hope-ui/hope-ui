@@ -84,7 +84,7 @@ render-body memo) are the safest bet.
   describedby chain with a render-body `createMemo`, so it must clear the `Field` hydration
   round-trip (the transform-boundary hazard above) before adoption. If it fails, fall back to an
   in-repo **effect-only / getter-based** version — ids via `createUniqueId` (symmetric), describedby
-  as a plain getter, no memo — rebuilt from the pattern (not copied, if it's Kobalte-derived).
+  as a plain getter, no memo — rebuilt from the pattern, not copied.
 
 ### Calendar family — evaluated, decided (built 2026-07)
 
@@ -108,8 +108,8 @@ render-body memo) are the safest bet.
   by construction and can be called directly in the calendar's render path (which previously had to
   avoid the translator by using a plain `CalendarMessages` dictionary; that dictionary is now gone,
   replaced by `t('calendar.*')`). The locale/direction *context*
-  (`I18nProvider`/`useLocale`/`createDefaultLocale`) remains **ported from the maintainer's Kobalte
-  i18n work**; see the CLAUDE.md carve-out.
+  (`I18nProvider`/`useLocale`/`createDefaultLocale`) remains **derived from
+  React Spectrum/`@react-aria/i18n`**; see the CLAUDE.md i18n provenance note.
 - **`@solid-primitives/date`: REJECTED.** Date math stays `@internationalized/date` (immutable,
   date-only `CalendarDate`, locale-aware, React Aria's substrate; every pure calendar util depends
   only on it). `@solid-primitives/date` is `Date`-based/mutable and, as a `node_modules` reactive
@@ -120,9 +120,8 @@ render-body memo) are the safest bet.
   `createControllableSignal` backs its state with a compute-function signal
   (`createSignal(fn, { ownedWrite: true })`). Adopted as the packaged dependency, it hits the
   transform-boundary hazard above: server emits the Dialog trigger at `_hk=1010`, the client hydrates
-  expecting `2010` — an asymmetry no fixture reconciles. Reverted. Copying the source in-repo (which
-  *is* symmetric) is not an option: the package is "Adapted from Kobalte", and the never-copy-Kobalte
-  rule applies. Kept hope-ui's Base-UI-modeled boxing implementation, which is SSR-safe, zero-dep,
+  expecting `2010` — an asymmetry no fixture reconciles. Reverted. Rather than vendoring the upstream
+  source in-repo (which *is* symmetric), kept hope-ui's Base-UI-modeled boxing implementation, which is SSR-safe, zero-dep,
   and *more* capable — it stores function-valued `T` (upstream's setter treats a function as an
   updater). This is the proof the full-DoD-wrap hydration gate earns its keep: unit tests were green;
   only the hydration round-trip caught it.

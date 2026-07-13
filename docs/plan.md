@@ -92,20 +92,14 @@ version):
   papered over — an explicit type-assertion escape hatch is used at the one call site that
   needs cross-element rendering.
 
-## Reference policy (important, corrects an earlier misstep in this plan's own history)
+## Reference policy
 
-- **Kobalte and Corvu: anti-pattern references only.** Never copy their code or
-  "keep the shape of" anything from either, even in spirit. The user is Kobalte's
-  original author and a Corvu contributor, and has explicitly called out both as bad
-  references to design from — cite them only as pitfall case studies (backed by direct
-  source inspection, not recollection).
 - **Base UI and React Aria: active, legitimate references.** Use their code and
   reasoning freely when designing hope-ui's public API and accessibility behavior
   (e.g. the `render`/`useRender` pattern, ARIA keyboard-interaction logic). Don't do a
   byte-per-byte copy when a from-scratch Solid idiom is straightforward — but if a
   literal port from either is genuinely unavoidable, add an attribution comment at the
-  top of the file, the same way Kobalte itself credits react-spectrum ("Portions of
-  this file are based on code from react-spectrum").
+  top of the file (e.g. "Portions of this file are based on code from react-spectrum").
 - **`@solid-primitives` (`next`): adopt as a dependency, don't just reference.** It's the
   community, SolidJS-team-adjacent low-level library. Before building a new internal
   primitive, check it first and record an *adopt / wrap / build-fresh-because* verdict.
@@ -120,8 +114,7 @@ version):
 
 `hope-ui` is a Base UI / React Aria–inspired, batteries-included, **themed**, accessible
 component library for SolidJS — copying their **API surface** (prop patterns, composition idioms)
-but not their React internals — explicitly avoiding the structural problems Kobalte and Corvu
-run into (see Reference policy above). Ready-to-use themed components (a Panda-based Chakra-DX
+but not their React internals. Ready-to-use themed components (a Panda-based Chakra-DX
 system — see [`docs/roadmap.md`](roadmap.md)) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`). That kernel is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API — see "Recommended architecture"
@@ -152,48 +145,45 @@ catalog, and any future churn should be contained behind the Layer A kernel boun
 (see architecture section) rather than letting every component touch raw signals/store
 APIs directly.
 
-To ground the pitfall analysis in fact rather than recollection, the following repos
+To ground the analysis in fact rather than recollection, the following reference repos
 were cloned and inspected directly during planning (read-only, then deleted):
-- `kobaltedev/kobalte` — single `@kobalte/core` package
-- `corvudev/corvu` — many independent per-primitive packages
 - `mui/base-ui` — single `@base-ui/react` package (the actual "Base UI";
   `github.com/base/ui` is Coinbase's unrelated app repo — ruled out during research)
 - `adobe/react-spectrum` (`packages/react-aria`, `packages/@react-stately/*`)
 
-## Confirmed pitfalls to avoid (Kobalte/Corvu — anti-patterns only, per policy above)
+## Confirmed anti-patterns to avoid
 
-**Kobalte (`@kobalte/core`, ~59 components, one package):**
-- 53 separate hand-rolled `createContext` calls — one bespoke `XContext` +
-  `XContextValue` type + `useXContext` per component family, no shared context-factory
-  kernel. Boilerplate multiplication and consistency drift (not all components
-  integrate `FormControlContext` the same way).
-- One giant package = no independent release/versioning blast-radius control.
-- Test coverage is real but inconsistent: **24 of ~59 component dirs have no colocated
-  test file**, clustered exactly in the highest a11y-risk, keyboard/floating categories
-  — `popover`, `tooltip`, `menu`, `dropdown-menu`, `navigation-menu`, `hover-card`,
-  `slider`, `dismissable-layer`.
-- The `Polymorphic`/`PolymorphicProps<T>` generic `as`-prop machinery is the known
-  type-DX pain point when consumers wrap components in their own polymorphic layer —
-  hope-ui hit a version of this exact tension in Phase 0 (see Status above).
+Structural pitfalls observed in existing headless SolidJS component libraries. These are the
+concrete failure modes this project's architecture is designed to prevent — stated on their own
+merits, so the design rules stand without reference to any specific library:
 
-**Corvu (per-primitive packages: dialog, popover, tooltip, drawer, accordion,
-disclosure, otp-field, resizable, calendar + shared `solid-dismissible`/
-`solid-focus-trap`/`solid-presence`/`solid-prevent-scroll`/`solid-transition-size`/
-`@corvu/utils`):**
-- **Zero automated tests anywhere in the repo.** No regression safety net at all.
-- Higher-level primitives depend on *sibling component packages* rather than a shared
-  kernel: `@corvu/popover` depends on `@corvu/dialog`, `@corvu/drawer` depends on
-  `@corvu/dialog`. Popover/Drawer aren't semantically "a kind of Dialog" — this couples
-  their behavior to Dialog's internals and forces every non-modal floating consumer to
-  pull in Dialog's full machinery (scroll-lock, pinch-zoom prevention, focus-restore)
-  even when unused.
-- Each primitive hand-rolls its own dual public/internal context pair plus a bespoke
-  `createKeyedContext`/`useKeyedContext` string-registry — the same
-  boilerplate-multiplication disease as Kobalte, relocated from per-component to
-  per-package.
+- **Per-component context boilerplate.** One bespoke `XContext` + `XContextValue` type +
+  `useXContext` hand-rolled per component family, with no shared context-factory kernel,
+  multiplies boilerplate and drifts out of consistency (e.g. components integrating a shared
+  `FormControlContext` in subtly different ways). hope-ui uses one `createComponentContext`
+  factory instead.
+- **One giant package.** A single package holding every component gives no independent
+  release/versioning blast-radius control — hence the per-component subpath exports here.
+- **Inconsistent or absent test coverage.** Coverage that skips exactly the highest a11y-risk,
+  keyboard/floating components (`popover`, `tooltip`, `menu`, `dropdown-menu`,
+  `navigation-menu`, `hover-card`, `slider`, `dismissable-layer`), or is missing entirely,
+  leaves no regression safety net — hence the enforced Definition of Done and
+  `check:coverage-parity`.
+- **`Polymorphic`/`PolymorphicProps<T>` generic `as`-prop machinery** is a known type-DX pain
+  point when consumers wrap components in their own polymorphic layer — hope-ui hit a version
+  of this exact tension in Phase 0 (see Status above), and uses `renderElement` instead.
+- **Higher-level primitives depending on sibling *component* packages** rather than a shared
+  kernel (e.g. a Popover package depending on a Dialog package, a Drawer package depending on a
+  Dialog package). Popover/Drawer aren't semantically "a kind of Dialog" — such coupling ties
+  their behavior to Dialog's internals and forces every non-modal floating consumer to pull in
+  Dialog's full machinery (scroll-lock, pinch-zoom prevention, focus-restore) even when unused.
+  Popover here composes the shared kernel directly and never imports Dialog.
+- **Per-package context boilerplate.** A dual public/internal context pair plus a bespoke
+  keyed-context string-registry hand-rolled per package is the same boilerplate multiplication,
+  relocated from per-component to per-package.
 
 **Validating evidence for going Solid-native, from Base UI (active reference, best-funded
-of the four):** Base UI's own React team built a hand-rolled external `Store` class
+of the references):** Base UI's own React team built a hand-rolled external `Store` class
 (`packages/utils/src/store/Store.ts`) — `subscribe`/`getSnapshot`/`setState`/
 selector-based `use()` — plus a custom `useSyncExternalStore` wrapper and a "fastHooks"
 instance registry, specifically to get fine-grained, selector-scoped updates and dodge
@@ -265,8 +255,8 @@ becomes an actual goal.
    **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence` +
    `createFocusRestore`. Dialog composes `createFocusTrap` + `createFocusRestore` +
    `createHideOutside` + `ModalBackdrop` + `createDismissable` + `createScrollLock` +
-   `createPresence`. Popover must never depend on Dialog — this directly avoids the Corvu
-   coupling smell above. Note that focus *restore* is deliberately a separate primitive from
+   `createPresence`. Popover must never depend on Dialog — this directly avoids the
+   sibling-component coupling anti-pattern above. Note that focus *restore* is deliberately a separate primitive from
    the focus *trap*: Popover and Tooltip are non-modal and need restore without a trap, and
    welding the two together is precisely how a non-modal Dialog came to strand focus on
    `<body>`.
@@ -413,15 +403,15 @@ existence before scaling to 50+ components):**
 Each of these must ship meeting the full Definition of Done (tests in both Vitest
 projects as applicable, `.md` doc, `check:coverage-parity` passing) before moving to
 the next — don't let "we'll add tests/docs later" creep in, since that's exactly the
-drift that produced Kobalte's and Corvu's gaps.
+drift that produces the coverage gaps this project is designed to avoid.
 
 ## Publishing strategy
 
 - **Package granularity (revised from the original family-package plan):** a small fixed set
   of packages — `@hope-ui/primitives` (internal behavior kernel), `@hope-ui/components` (every
   public component), and the theming trio `@hope-ui/theming` / `@hope-ui/themes` /
-  `@hope-ui/styled-system` — **not** Kobalte's one-giant-package, not Corvu's
-  15+-micro-packages-with-sibling-deps, and not the shared-primitive-family split
+  `@hope-ui/styled-system` — **not** a single one-giant-package, not a spread of
+  15+ micro-packages with sibling deps, and not the shared-primitive-family split
   (`@hope-ui/overlays`, `@hope-ui/collections`, `@hope-ui/forms`,
   `@hope-ui/disclosure`) originally planned here. (An earlier revision of this doc said "two
   packages total"; the themed direction added the theming trio — see
@@ -436,7 +426,7 @@ drift that produced Kobalte's and Corvu's gaps.
   importing `@hope-ui/components/button` never pulls in Dialog's code, since each
   subpath is its own build entry (see each `package.json`'s `hope.entries`). Every
   component subpath depends only on `@hope-ui/primitives` — never on another
-  component's subpath, which is what keeps this from becoming Kobalte's single giant
+  component's subpath, which is what keeps this from becoming a single giant barrel
   package in spirit despite sharing one package in name.
 - **Entry points:** subpath exports via `package.json#exports` per component rather
   than one barrel re-exporting everything (no root `.` export on
@@ -501,8 +491,8 @@ Two build wrinkles worth knowing:
   `ssr.noExternal` (e.g. `ssr: { noExternal: ["@hope-ui/components", "@hope-ui/primitives"] }`).
   Some setups infer this from the `solid` condition; SolidStart historically wants it explicit.
 
-This is the idiomatic SolidJS-library shape (Kobalte's solid2 branch, `@solid-primitives`),
-minus their dom fallback. It retires the literal-element rule and its `check:dist-imports`
+This is the idiomatic SolidJS-library shape (as used by `@solid-primitives`),
+minus the dom-compiled fallback some libraries ship. It retires the literal-element rule and its `check:dist-imports`
 tripwire. It has **no** effect on Panda style-prop extraction or the multi-theme recipe layer —
 those are build-time scans of the *consumer's* JSX and behave identically regardless.
 

@@ -22,7 +22,7 @@ describe("getDefaultLocale", () => {
 describe("createDefaultLocale", () => {
   it("seeds to the SSR default (en-US/ltr) at first read", () =>
     createRoot((dispose) => {
-      // Improvement over the Kobalte source: the signal starts at the SSR default and only adopts
+      // Improvement over the original source: the signal starts at the SSR default and only adopts
       // the detected locale in `onSettled` (post-hydration), so the hydrating render matches the
       // server. The synchronous read therefore returns en-US/ltr.
       const { locale, direction } = createDefaultLocale();

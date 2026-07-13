@@ -1,14 +1,12 @@
 # Reference implementations
 
 Where to look when building or debugging a collection/navigation component. This captures the
-sources evaluated while porting the signal-based navigation kernel (see
-[`list-navigation-port-plan.md`](list-navigation-port-plan.md)) so future work doesn't re-derive the
-map.
+sources evaluated while porting the signal-based navigation kernel so future work doesn't
+re-derive the map.
 
 **References policy** (see also `CLAUDE.md`): Angular Aria, Astryx, react-aria and floating-ui-react
 are **adapt-and-credit** references — read their reasoning and public API, adapt, and credit any
-verbatim borrowing. Kobalte and Corvu are **anti-pattern case studies only** — never copy their code
-or keep the shape of anything from them.
+verbatim borrowing.
 
 ---
 
@@ -115,6 +113,5 @@ foundational `list-focus` owning the active item and the roving/activedescendant
 navigation/selection/typeahead each *injecting* that one focus instance, plus expansion and a 2D grid
 layered on top — ports almost directly to Solid's `createX` + split-`createEffect` idiom. react-aria's
 `selection` remained invaluable as the **edge-case checklist**, and Astryx's `useGridFocus` supplied
-the calendar month-flip pattern. Kobalte/Corvu were consulted only as anti-patterns (Corvu's
-`@corvu/popover` depending on `@corvu/dialog` is the cross-component-import mistake this kernel avoids
-by design).
+the calendar month-flip pattern. A higher-level primitive depending on a sibling component package
+(rather than the shared kernel) is a cross-component-import anti-pattern this kernel avoids by design.

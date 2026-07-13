@@ -1,4 +1,4 @@
-// Locale + reading-direction context (ported/improved from the maintainer's Kobalte i18n work), plus
+// Locale + reading-direction context (derived from React Spectrum's `@react-aria/i18n`), plus
 // the in-house message catalog + resolver (`t`) — hope-ui's headless port of the Angular predecessor's
 // `I18nService`. No external i18n runtime dependency.
 

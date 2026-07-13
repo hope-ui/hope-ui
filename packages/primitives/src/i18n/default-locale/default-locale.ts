@@ -1,11 +1,10 @@
 /*
- * Browser/system default locale. Ported from the maintainer's Kobalte i18n work
- * (`@kobalte/core/i18n`), derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
+ * Browser/system default locale. Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
  * © 2020 Adobe). Two hope-ui improvements over the source are called out inline:
  *   1. SSR-safe seeding — the client signal starts at the SSR default (`en-US`/`ltr`) and only
  *      adopts the detected locale in `onSettled` (post-hydration), so the first client paint
  *      matches the server and locale-derived visible text (month names, …) never mismatches on
- *      hydrate. Kobalte seeds the signal with the *real* locale at module load, which can.
+ *      hydrate. The original source seeds the signal with the *real* locale at module load, which can.
  *   2. Dual-copy safety — the shared `languagechange` subscription lives in a `Symbol.for(...)`
  *      global registry (hope-ui's `createScrollLock`/`createHideOutside` convention) instead of a
  *      bare module-scope `let`/`Set`, so two installed copies of this package observe one registry.

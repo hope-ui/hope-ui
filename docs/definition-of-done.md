@@ -17,9 +17,8 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    `hope.entries` files — and are excluded from the `build` task's turbo `inputs`.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces this in CI
-and fails the build if any is missing. This exists because Kobalte's test coverage is
-inconsistent (concentrated gaps in exactly the highest a11y-risk components) and Corvu
-has no automated tests at all — see `docs/plan.md` for the specifics.
+and fails the build if any is missing. Its purpose is to guarantee that test, doc, and
+story coverage never drifts behind the source — see `docs/plan.md` for the specifics.
 
 Stories are also where known-but-unfixed behavior gets pinned somewhere a human can see
 it. Don't "fix" a story by deleting it; fix the component and rename the story. Dialog's
