@@ -1,12 +1,12 @@
-import novaPreset from "@hope-ui/themes/nova";
+import chakraPreset from "@hope-ui/themes/chakra";
 import { defineConfig } from "@pandacss/dev";
 
 /**
  * Panda config for hope-ui's own styled-system. This produces the pure runtime
  * (`css`/`tokens`/`patterns` + `isCssProperty`) that `@hope-ui/components` imports and
  * bundles, plus the types. It is NOT a consumer-facing artifact — consumers add
- * a `@hope-ui/themes/*` preset (e.g. `@hope-ui/themes/nova`) to their own panda.config and run
- * codegen themselves.
+ * a `@hope-ui/themes/*` preset (e.g. `@hope-ui/themes/chakra`, the default) to their own
+ * panda.config and run codegen themselves.
  *
  * `include` only feeds our OWN dev stylesheet (`pnpm --filter @hope-ui/styled-system
  * cssgen`, used by Storybook/tests). hope-ui ships zero CSS.
@@ -16,10 +16,10 @@ export default defineConfig({
   // the class names a consumer's own codegen produces from the same preset.
   hash: false,
   // Minimal setup: `eject` drops Panda's default presets so preset-panda never merges in.
-  // hopePreset supplies preset-base (the utility engine) + every hope token itself.
+  // chakraPreset supplies preset-base (the utility engine) + every hope token itself.
   eject: true,
   preflight: true,
-  presets: [novaPreset],
+  presets: [chakraPreset],
   include: ["../components/src/**/*.{ts,tsx}"],
   exclude: [],
   outdir: "styled-system",

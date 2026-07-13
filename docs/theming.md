@@ -12,8 +12,8 @@ Theming spans two package axes that never mix dependencies:
 - **Runtime** (imported into app code; peer deps `solid-js` / `@solidjs/web`):
   `@hope-ui/primitives` ← `@hope-ui/theming` ← `@hope-ui/components`.
 - **Config** (consumed by the *consumer's* `panda.config.ts` + `panda codegen`; peer dep
-  `@pandacss/dev`): `@hope-ui/themes/{base,nova,…}`. Each theme depends *up* on `@hope-ui/theming`
-  for the contract types.
+  `@pandacss/dev`): `@hope-ui/themes/{base,chakra,nova,…}` (`chakra` is the default the library is
+  built and demoed against). Each theme depends *up* on `@hope-ui/theming` for the contract types.
 
 `@hope-ui/theming` is the dependency-inversion seam: components read from it, themes implement it,
 and neither knows about the other.
@@ -60,10 +60,28 @@ would collide on recipe names, or namespacing would ship every theme's CSS in on
 A theme is a Panda preset built on `@hope-ui/themes/base` plus its own `semanticTokens` (the
 vocabulary below) and, once components exist, its own slot recipes (same slots and variant *values*
 as every other theme — only the emitted CSS differs). First-party themes are subpaths of
-`@hope-ui/themes` (`@hope-ui/themes/nova`, …); a third party publishes its own package implementing
-the same contract. For the recipe *functions* the provider injects, prefer bundling the theme's own
-generated recipe runtime under a `hash: false` / no-prefix contract (so the class names equal the
-consumer's own codegen), exactly as `@hope-ui/styled-system` bundles `css()` today.
+`@hope-ui/themes` (`@hope-ui/themes/chakra` — the default — `@hope-ui/themes/nova`, …); a third
+party publishes its own package implementing the same contract. For the recipe *functions* the
+provider injects, prefer bundling the theme's own generated recipe runtime under a `hash: false` /
+no-prefix contract (so the class names equal the consumer's own codegen), exactly as
+`@hope-ui/styled-system` bundles `css()` today.
+
+**The swap-safety rule: augment `base`, never add a theme-local token.** Theme is chosen at codegen
+time and components reference token *names*, so a token key one theme has and another lacks compiles
+to an unresolved `var(--…)` the moment the preset is swapped. Therefore a theme only overrides the
+*values* of keys `base` already declares; a genuinely new token (e.g. Chakra's `2xs` radii/font-size
+rung, its `label`/`none` textStyles, its `heading` font) is added to `base`, so **every** theme
+inherits it. This is enforced, not just documented: `base`'s raw-token literals are written
+`defineTokens.x({ … } satisfies XContract)` and a theme's `theme.extend.tokens` override object is
+typed `satisfies ThemeTokenOverride` (both from `@hope-ui/themes/base`, defined in
+`base/contracts/token-contract.ts`) — a missing key fails assignability, a foreign/typo'd key fails the
+object-literal excess-property check. `BaseTokenContract` is the raw-token analog of
+`SemanticColorContract`; together they make any two presets swap-compatible by construction.
+
+`base` stays font-neutral (system-UI stacks); it exposes both `fonts.sans` and `fonts.heading` (same
+value) so a display-face theme overrides just `heading`. A future Chakra component/recipe port maps
+Chakra's font roles onto base keys: **Chakra `heading` → base `fonts.heading`, Chakra `body` → base
+`fonts.sans`** (Inter is deferred — a theme may later override those values).
 
 ## Semantic token vocabulary
 
@@ -75,7 +93,7 @@ ramps; each `@hope-ui/themes/*` supplies the semantic values; components and rec
 names. Every theme's `colors` is typed `satisfies SemanticColorContract` (exported from
 `@hope-ui/themes/base`), so a missing, misspelled, or extra token fails `tsc` instead of compiling
 to a broken `var(--colors-…)`. Reference implementation:
-[`nova/semantic-tokens.ts`](../packages/themes/src/nova/semantic-tokens.ts).
+[`nova/tokens/semantic-tokens.ts`](../packages/themes/src/nova/tokens/semantic-tokens.ts).
 
 Naming follows the Atlassian Design System's `property.role.modifier` shape
 ([foundations](https://atlassian.design/foundations/tokens/design-tokens),
@@ -225,8 +243,10 @@ fixture and its hydration test must both include `<ThemeProvider>` identically.
 
 ## Current state
 
-The contract and `@hope-ui/themes/{base,nova}` are built; `nova` ships tokens only (no recipes
-yet), now expressed in the standardized semantic-token vocabulary above and enforced by
-`SemanticColorContract`. No components consume `useRecipe` yet, and there is no second theme — both
-arrive when the first real component is designed. See the plan's "Implementation status &
-decisions" for the full done/deferred breakdown.
+The contract and `@hope-ui/themes/{base,chakra,nova}` are built. **`chakra` is the default** the
+styled-system runtime is generated from (a Chakra-UI-v3-like look in hope's own semantic
+vocabulary); `nova` is the shadcn-derived sibling, kept in place but no longer the baseline. Both
+ship tokens only (no recipes yet), expressed in the standardized semantic-token vocabulary above and
+enforced by `SemanticColorContract`; their raw-token surface is guarded by `BaseTokenContract`. No
+components consume `useRecipe` yet — recipes arrive per-component as each is designed. See the
+plan's "Implementation status & decisions" for the full done/deferred breakdown.

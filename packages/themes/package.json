@@ -1,18 +1,22 @@
 {
   "name": "@hope-ui/themes",
   "version": "0.0.0",
-  "description": "hope-ui Panda CSS themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/nova, …) plus the shared @hope-ui/themes/base foundation. Add a theme to your panda.config.ts presets and run panda codegen. Ships config only; zero CSS.",
+  "description": "hope-ui Panda CSS themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/chakra is the default, @hope-ui/themes/nova, …) plus the shared @hope-ui/themes/base foundation. Add a theme to your panda.config.ts presets and run panda codegen. Ships config only; zero CSS.",
   "type": "module",
   "sideEffects": false,
   "files": ["src"],
   "exports": {
     "./base": {
-      "types": "./src/base/base.ts",
-      "import": "./src/base/base.ts"
+      "types": "./src/base/index.ts",
+      "import": "./src/base/index.ts"
+    },
+    "./chakra": {
+      "types": "./src/chakra/index.ts",
+      "import": "./src/chakra/index.ts"
     },
     "./nova": {
-      "types": "./src/nova/nova.ts",
-      "import": "./src/nova/nova.ts"
+      "types": "./src/nova/index.ts",
+      "import": "./src/nova/index.ts"
     },
     "./package.json": "./package.json"
   },

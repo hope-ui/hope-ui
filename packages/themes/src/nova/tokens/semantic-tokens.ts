@@ -1,11 +1,12 @@
 import { defineSemanticTokens } from "@pandacss/dev";
-import type { SemanticColorContract } from "../base/semantic-contract";
+import type { SemanticColorContract } from "../../base/contracts";
 
 /**
- * hope-ui's "nova" semantic color layer — the shadcn-derived **default theme**, expressed in the
+ * hope-ui's "nova" semantic color layer — the shadcn-derived theme (sibling to the default
+ * `chakra`), expressed in the
  * standardized semantic-token vocabulary (the token-axis contract; see the "Semantic token
  * vocabulary" section of `docs/theming.md`). Light (`base`) + dark (`_dark`), over the raw Tailwind
- * v4 palette (`../base/theme/colors.ts`).
+ * v4 palette (`../../base/tokens/colors.ts`).
  *
  * `colors` is typed `satisfies SemanticColorContract` (from `@hope-ui/themes/base`) so this — and
  * every other theme — must implement the exact same token shape: a missing, misspelled, or extra
@@ -172,7 +173,7 @@ const colors = {
     subtle: { value: { base: "{colors.blue.100}", _dark: "{colors.blue.900}" } },
   },
   warning: {
-    DEFAULT: { value: { base: "{colors.amber.500}", _dark: "{colors.amber.400}" } },
+    DEFAULT: { value: { base: "{colors.amber.600}", _dark: "{colors.amber.400}" } },
     subtle: { value: { base: "{colors.amber.100}", _dark: "{colors.amber.900}" } },
   },
   destructive: {

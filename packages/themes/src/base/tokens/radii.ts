@@ -1,11 +1,14 @@
 import { defineTokens } from "@pandacss/dev";
+import type { RadiiContract } from "../contracts";
 
 /**
- * Tailwind v4 radii (`--radius-*`). Note: hope's shadcn "nova" look originally used a
- * 0.625rem base — swap this block for that if you want the nova radius back.
+ * Tailwind v4 radii (`--radius-*`), plus a `2xs` (1px) rung so Chakra-style hairline radii are
+ * available to every theme. Note: hope's shadcn "nova" look originally used a 0.625rem base —
+ * swap this block for that if you want the nova radius back.
  */
 export const radii = defineTokens.radii({
   none: { value: "0px" },
+  "2xs": { value: "0.0625rem" },
   xs: { value: "0.125rem" },
   sm: { value: "0.25rem" },
   md: { value: "0.375rem" },
@@ -15,4 +18,4 @@ export const radii = defineTokens.radii({
   "3xl": { value: "1.5rem" },
   "4xl": { value: "2rem" },
   full: { value: "9999px" },
-});
+} satisfies RadiiContract);

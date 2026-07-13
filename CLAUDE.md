@@ -270,11 +270,15 @@ them rather than re-deriving a behavior in a comment.
   into components without a dependency cycle (`components → theming → components`). See
   `docs/theming.md`.
 - `packages/themes` (`@hope-ui/themes`) — Panda CSS theme presets, per-theme subpaths
-  (`@hope-ui/themes/base` foundation, `@hope-ui/themes/nova`). Config only, zero CSS; **tokens
-  live here**.
+  (`@hope-ui/themes/base` foundation, `@hope-ui/themes/chakra` — the **default** Chakra-UI-v3-like
+  theme — and `@hope-ui/themes/nova`, the shadcn-derived sibling). Config only, zero CSS; **tokens
+  live here**. Swap-safety rule (enforced by `base/contracts/token-contract.ts`'s `BaseTokenContract` +
+  `ThemeTokenOverride`, the raw-token analog of `SemanticColorContract`): **a theme only overrides
+  values of keys `base` declares — never adds a token key; new tokens are added to `base` so every
+  theme inherits them**, or a preset swap compiles a reference to an unresolved `var(--…)`.
 - `packages/styled-system` (`@hope-ui/styled-system`, private) — the generated Panda runtime
-  (css/tokens/patterns + types), produced from `@hope-ui/themes/nova` and inlined into
-  `@hope-ui/components` at build. Not hand-written (exempt from the Definition of Done).
+  (css/tokens/patterns + types), produced from `@hope-ui/themes/chakra` (the default theme) and
+  inlined into `@hope-ui/components` at build. Not hand-written (exempt from the Definition of Done).
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).

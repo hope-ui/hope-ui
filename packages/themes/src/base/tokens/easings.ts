@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { EasingsContract } from "../contracts";
 
 /** v4 easings (`--ease-*`). */
 export const easings = defineTokens.easings({
@@ -7,4 +8,4 @@ export const easings = defineTokens.easings({
   in: { value: "cubic-bezier(0.4, 0, 1, 1)" },
   out: { value: "cubic-bezier(0, 0, 0.2, 1)" },
   "in-out": { value: "cubic-bezier(0.4, 0, 0.2, 1)" },
-});
+} satisfies EasingsContract);

@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { SizesContract } from "../contracts";
 import { spacing } from "./spacing";
 
 /**
@@ -33,4 +34,4 @@ export const sizes = defineTokens.sizes({
   lg: { value: "64rem" },
   xl: { value: "80rem" },
   "2xl": { value: "96rem" },
-});
+} satisfies SizesContract);

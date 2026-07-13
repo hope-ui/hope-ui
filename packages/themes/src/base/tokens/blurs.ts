@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { BlursContract } from "../contracts";
 
 /** Tailwind v4 blurs (`--blur-*`). */
 export const blurs = defineTokens.blurs({
@@ -9,4 +10,4 @@ export const blurs = defineTokens.blurs({
   xl: { value: "24px" },
   "2xl": { value: "40px" },
   "3xl": { value: "64px" },
-});
+} satisfies BlursContract);

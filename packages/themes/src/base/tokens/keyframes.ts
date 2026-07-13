@@ -1,4 +1,5 @@
 import { defineKeyframes, defineTokens } from "@pandacss/dev";
+import type { AnimationsContract } from "../contracts";
 
 /** Tailwind v4's built-in animation keyframes (spin/ping/pulse/bounce). */
 export const keyframes = defineKeyframes({
@@ -29,4 +30,4 @@ export const animations = defineTokens.animations({
   ping: { value: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite" },
   pulse: { value: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" },
   bounce: { value: "bounce 1s infinite" },
-});
+} satisfies AnimationsContract);

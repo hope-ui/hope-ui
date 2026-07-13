@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { ShadowsContract } from "../contracts";
 
 /** Tailwind v4 box shadows (`--shadow-*`); multi-layer values are arrays (Panda joins them). */
 export const shadows = defineTokens.shadows({
@@ -10,4 +11,4 @@ export const shadows = defineTokens.shadows({
   xl: { value: ["0 20px 25px -5px rgb(0 0 0 / 0.1)", "0 8px 10px -6px rgb(0 0 0 / 0.1)"] },
   "2xl": { value: "0 25px 50px -12px rgb(0 0 0 / 0.25)" },
   inner: { value: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)" },
-});
+} satisfies ShadowsContract);

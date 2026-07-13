@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { ColorsContract } from "../contracts";
 
 /**
  * Tailwind CSS v4's default color palette, in OKLCH, copied verbatim so hope owns its raw
@@ -7,6 +8,9 @@ import { defineTokens } from "@pandacss/dev";
  *
  * Source (kept in sync manually):
  * https://github.com/tailwindlabs/tailwindcss/blob/main/packages/tailwindcss/src/compat/colors.ts
+ *
+ * `satisfies ColorsContract` pins the palette key surface every theme shares (see
+ * `../contracts/token-contract.ts`).
  */
 export const colors = defineTokens.colors({
   inherit: { value: "inherit" },
@@ -352,4 +356,4 @@ export const colors = defineTokens.colors({
     "900": { value: "oklch(41% 0.159 10.272)" },
     "950": { value: "oklch(27.1% 0.105 12.094)" },
   },
-});
+} satisfies ColorsContract);

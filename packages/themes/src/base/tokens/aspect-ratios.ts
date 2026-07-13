@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { AspectRatiosContract } from "../contracts";
 
 /** Common aspect ratios. */
 export const aspectRatios = defineTokens.aspectRatios({
@@ -8,4 +9,4 @@ export const aspectRatios = defineTokens.aspectRatios({
   wide: { value: "16 / 9" },
   ultrawide: { value: "18 / 5" },
   golden: { value: "1.618 / 1" },
-});
+} satisfies AspectRatiosContract);

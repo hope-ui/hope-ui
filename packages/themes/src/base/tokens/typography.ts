@@ -1,11 +1,22 @@
 import { defineTextStyles, defineTokens } from "@pandacss/dev";
+import type {
+  FontSizesContract,
+  FontsContract,
+  FontWeightsContract,
+  LetterSpacingsContract,
+  LineHeightsContract,
+  TextStylesContract,
+} from "../contracts";
 
 /**
  * Typography tokens — Tailwind v4 values, Panda-style naming (`md` = base 1rem).
- * `textStyles` pair each size with v4's per-size line-height.
+ * `textStyles` pair each size with v4's per-size line-height. Each category is written
+ * `satisfies <Category>Contract` to pin the key surface every theme shares (see
+ * `../contracts/token-contract.ts`).
  */
 
 export const fontSizes = defineTokens.fontSizes({
+  "2xs": { value: "0.625rem" },
   xs: { value: "0.75rem" },
   sm: { value: "0.875rem" },
   md: { value: "1rem" },
@@ -19,7 +30,7 @@ export const fontSizes = defineTokens.fontSizes({
   "7xl": { value: "4.5rem" },
   "8xl": { value: "6rem" },
   "9xl": { value: "8rem" },
-});
+} satisfies FontSizesContract);
 
 export const fontWeights = defineTokens.fontWeights({
   thin: { value: "100" },
@@ -31,7 +42,7 @@ export const fontWeights = defineTokens.fontWeights({
   bold: { value: "700" },
   extrabold: { value: "800" },
   black: { value: "900" },
-});
+} satisfies FontWeightsContract);
 
 export const letterSpacings = defineTokens.letterSpacings({
   tighter: { value: "-0.05em" },
@@ -40,7 +51,7 @@ export const letterSpacings = defineTokens.letterSpacings({
   wide: { value: "0.025em" },
   wider: { value: "0.05em" },
   widest: { value: "0.1em" },
-});
+} satisfies LetterSpacingsContract);
 
 export const lineHeights = defineTokens.lineHeights({
   none: { value: "1" },
@@ -49,21 +60,24 @@ export const lineHeights = defineTokens.lineHeights({
   normal: { value: "1.5" },
   relaxed: { value: "1.625" },
   loose: { value: "2" },
-});
+} satisfies LineHeightsContract);
 
-// v4's default font stacks.
+// v4's default (system-UI) font stacks. `sans` doubles as the default body font; `heading`
+// aliases it (same value) so themes that want a distinct display face (e.g. Chakra maps its
+// `heading` role here) can override just that key. Kept font-neutral in `base` — no web font.
+const sansStack = [
+  "ui-sans-serif",
+  "system-ui",
+  "sans-serif",
+  '"Apple Color Emoji"',
+  '"Segoe UI Emoji"',
+  '"Segoe UI Symbol"',
+  '"Noto Color Emoji"',
+];
+
 export const fonts = defineTokens.fonts({
-  sans: {
-    value: [
-      "ui-sans-serif",
-      "system-ui",
-      "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-      '"Noto Color Emoji"',
-    ],
-  },
+  sans: { value: sansStack },
+  heading: { value: sansStack },
   serif: {
     value: ["ui-serif", "Georgia", "Cambria", '"Times New Roman"', "Times", "serif"],
   },
@@ -79,7 +93,7 @@ export const fonts = defineTokens.fonts({
       "monospace",
     ],
   },
-});
+} satisfies FontsContract);
 
 // fontSize + line-height pairs, from v4's `--text-*--line-height`.
 export const textStyles = defineTextStyles({
@@ -96,4 +110,7 @@ export const textStyles = defineTextStyles({
   "7xl": { value: { fontSize: "4.5rem", lineHeight: "1" } },
   "8xl": { value: { fontSize: "6rem", lineHeight: "1" } },
   "9xl": { value: { fontSize: "8rem", lineHeight: "1" } },
-});
+  // Chakra's preset form-label style + an empty reset, available to every theme.
+  label: { value: { fontSize: "sm", lineHeight: "1.25rem", fontWeight: "medium" } },
+  none: { value: {} },
+} satisfies TextStylesContract);

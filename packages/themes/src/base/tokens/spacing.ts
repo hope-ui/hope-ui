@@ -1,4 +1,5 @@
 import { defineTokens } from "@pandacss/dev";
+import type { SpacingContract } from "../contracts";
 
 /**
  * Tailwind's spacing scale (0.25rem steps). v4 generates these dynamically from a single
@@ -40,4 +41,4 @@ export const spacing = defineTokens.spacing({
   "72": { value: "18rem" },
   "80": { value: "20rem" },
   "96": { value: "24rem" },
-});
+} satisfies SpacingContract);
