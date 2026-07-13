@@ -79,7 +79,7 @@ const colors = {
     },
     info: {
       DEFAULT: { value: { base: "{colors.blue.600}", _dark: "{colors.blue.400}" } },
-      foreground: { value: { base: "{colors.white}", _dark: "{colors.white}" } },
+      foreground: { value: { base: "{colors.white}", _dark: "{colors.blue.950}" } },
       subtle: { foreground: { value: { base: "{colors.blue.800}", _dark: "{colors.blue.200}" } } },
     },
     warning: {
@@ -91,7 +91,7 @@ const colors = {
     },
     destructive: {
       DEFAULT: { value: { base: "{colors.red.600}", _dark: "{colors.red.400}" } },
-      foreground: { value: { base: "{colors.white}", _dark: "{colors.white}" } },
+      foreground: { value: { base: "{colors.white}", _dark: "{colors.red.950}" } },
       subtle: { foreground: { value: { base: "{colors.red.800}", _dark: "{colors.red.200}" } } },
     },
   },
@@ -125,7 +125,7 @@ const colors = {
     },
     info: {
       DEFAULT: { value: { base: "{colors.blue.600}", _dark: "{colors.blue.400}" } },
-      foreground: { value: { base: "{colors.white}", _dark: "{colors.white}" } },
+      foreground: { value: { base: "{colors.white}", _dark: "{colors.blue.950}" } },
       subtle: { foreground: { value: { base: "{colors.blue.800}", _dark: "{colors.blue.200}" } } },
     },
     warning: {
@@ -137,7 +137,7 @@ const colors = {
     },
     destructive: {
       DEFAULT: { value: { base: "{colors.red.600}", _dark: "{colors.red.400}" } },
-      foreground: { value: { base: "{colors.white}", _dark: "{colors.white}" } },
+      foreground: { value: { base: "{colors.white}", _dark: "{colors.red.950}" } },
       subtle: { foreground: { value: { base: "{colors.red.800}", _dark: "{colors.red.200}" } } },
     },
   },
@@ -164,20 +164,20 @@ const colors = {
     subtle: { value: { base: "{colors.neutral.50}", _dark: "{colors.neutral.900}" } },
   },
   success: {
-    DEFAULT: { value: { base: "{colors.green.600}", _dark: "{colors.green.500}" } },
-    subtle: { value: { base: "{colors.green.100}", _dark: "{colors.green.950}" } },
+    DEFAULT: { value: { base: "{colors.green.600}", _dark: "{colors.green.400}" } },
+    subtle: { value: { base: "{colors.green.100}", _dark: "{colors.green.900}" } },
   },
   info: {
-    DEFAULT: { value: { base: "{colors.blue.600}", _dark: "{colors.blue.500}" } },
-    subtle: { value: { base: "{colors.blue.100}", _dark: "{colors.blue.950}" } },
+    DEFAULT: { value: { base: "{colors.blue.600}", _dark: "{colors.blue.400}" } },
+    subtle: { value: { base: "{colors.blue.100}", _dark: "{colors.blue.900}" } },
   },
   warning: {
     DEFAULT: { value: { base: "{colors.amber.500}", _dark: "{colors.amber.400}" } },
-    subtle: { value: { base: "{colors.amber.100}", _dark: "{colors.amber.950}" } },
+    subtle: { value: { base: "{colors.amber.100}", _dark: "{colors.amber.900}" } },
   },
   destructive: {
-    DEFAULT: { value: { base: "{colors.red.600}", _dark: "{colors.red.500}" } },
-    subtle: { value: { base: "{colors.red.100}", _dark: "{colors.red.950}" } },
+    DEFAULT: { value: { base: "{colors.red.600}", _dark: "{colors.red.400}" } },
+    subtle: { value: { base: "{colors.red.100}", _dark: "{colors.red.900}" } },
   },
 
   // ── systemic ─────────────────────────────────────────────────────────────────

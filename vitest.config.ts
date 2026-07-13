@@ -138,6 +138,11 @@ export default defineConfig({
       {
         plugins: [solid(solidPluginOptions())],
         resolve: { alias: hopeUiAlias },
+        // Pre-bundle the virtualizer core up front. Without this, its first import mid-run triggers
+        // a Vite dependency re-optimization that reloads the page — "Vite unexpectedly reloaded a
+        // test" — which is flaky on a cold CI cache. It's `createVirtualCollection`'s only external
+        // dep, so listing it here is enough.
+        optimizeDeps: { include: ["@tanstack/virtual-core"] },
         test: {
           name: "browser",
           include: ["packages/*/src/**/*.browser.test.{ts,tsx}"],

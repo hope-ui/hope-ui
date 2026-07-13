@@ -213,18 +213,29 @@ becomes an actual goal.
 **Three layers, composition over inheritance:**
 
 1. **Behavior kernel** (`@hope-ui/primitives`, **public API**, never duplicated) — Solid
-   2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores:
-   `createListState`/`createSelectionState`/`createCollection` (port react-stately's
-   *algorithms* directly from react-stately, not from Kobalte's port of them) as
-   **stores** using 2.0's draft-first setters and `createProjection` for derived views,
-   `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`,
-   `createRovingFocus`/`createTypeahead` (one shared arrow-key/typeahead primitive, a true
-   singleton across every list-like component, not per-component-family logic),
-   `createFloating` (wraps `@floating-ui/dom`), `createScrollLock`, `createPresence`,
-   `createControllableState`, `createRegisteredId`, `composeEventHandlers`, `withDefaults`,
-   `renderElement`, and `ModalBackdrop` (the one component in the kernel: the pointer-blocking
-   third of modality, alongside `createHideOutside` for assistive technology + the focus
-   order, and `createFocusTrap` for Tab cycling), plus `createRegisteredElement`.
+   2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores. The
+   **list-navigation kernel** is a set of fine-grained, Angular-Aria-aligned primitives (its
+   signal-based `private/behaviors` port almost 1:1 to Solid; react-aria's `selection` is the
+   edge-case checklist, not the source — full map in
+   [`docs/reference-implementations.md`](reference-implementations.md)):
+   - `createCollection` / `createVirtualCollection` — the **item-source seam**: a DOM-order
+     registry (`compareDocumentPosition`-sorted, over `createRegisteredElement`) and a
+     `@tanstack/virtual-core` binding whose `items()` is the full data while `element` resolves
+     only for the mounted window. A behavior reads either interchangeably.
+   - `createListFocus` — the **foundation**: the active item + the `roving | activedescendant`
+     switch, deferring real `.focus()` until the item's element exists (shared by the
+     virtualized and activedescendant paths).
+   - `createListNavigation` / `createListTypeahead` / `createListSelection` /
+     `createListExpansion` / `createGridNavigation` — each injects one `createListFocus` (grid
+     over a 2D cell collection), exactly as Angular injects one `ListFocus`.
+
+   Alongside these: `createFocusTrap`, `createFocusRestore`, `createHideOutside`,
+   `createDismissable`, `createFloating` (wraps `@floating-ui/dom`), `createScrollLock`,
+   `createPresence`, `createControllableState`, `createRegisteredId`, `composeEventHandlers`,
+   `withDefaults`, `renderElement`, `createKeyboardHandler` (the declarative, modifier-aware
+   keymap builder in `utils/`), and `ModalBackdrop` (the one component in the kernel: the
+   pointer-blocking third of modality, alongside `createHideOutside` for assistive technology +
+   the focus order, and `createFocusTrap` for Tab cycling), plus `createRegisteredElement`.
    Side-effectful wiring should use 2.0's split
    `createEffect(depsFn, computeFn)` form and `onSettled` (not `onMount`, which no longer
    exists in 2.0).
@@ -353,6 +364,11 @@ In the meantime, SSR/hydration correctness is fully testable and required *now* 
 DoD below) — this doesn't depend on SolidStart at all.
 
 ## How to build, in order
+
+> **Superseded.** The phase/step ordering below (Button → Dialog → Popover/Tooltip → Listbox) was
+> set at repo creation and is no longer the plan. The current, complexity-ordered build roadmap —
+> the full Chakra v3 component surface plus the kernel primitives still needed — lives in
+> [`docs/roadmap.md`](roadmap.md). This section is kept only for the Phase 0/1 history it records.
 
 **Phase 0 (done):**
 1. ~~Repo scaffolding~~ ✅

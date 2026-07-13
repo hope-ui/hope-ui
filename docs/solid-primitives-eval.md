@@ -71,6 +71,21 @@ round-trip first:**
 (`createFormControl`, `createAnnounce`, `createReducedMotion`). Effect-only primitives (no
 render-body memo) are the safest bet.
 
+### Tier A — evaluated, adopt-candidate
+- **`Field`/`Fieldset` ← `a11y/createFormControl`: ADOPT (hydration-gated), not the `form` package.**
+  `@solid-primitives/a11y` exports exactly the field-ARIA wiring hope-ui's `Field` needs —
+  `createFormControl` + `createFormControlInput` + `FormControlContext`/`useFormControl`: it
+  registers label/description/error ids, computes the `aria-labelledby`/`aria-describedby` chains,
+  and exposes `data-invalid`/`data-required`/`data-disabled`/`data-readonly`. So **do not hand-roll
+  `createFormControl`.** `@solid-primitives/form` is **out of scope**: its headline `createForm`
+  (values/validation/touched/submit/`toFormData`) is a form-state engine a headless component
+  library must not own — consumers bring their own; its `createFormControl` is the same primitive as
+  a11y's, so `a11y` is the leaner dependency. **Gate:** `createFormControl` likely builds the
+  describedby chain with a render-body `createMemo`, so it must clear the `Field` hydration
+  round-trip (the transform-boundary hazard above) before adoption. If it fails, fall back to an
+  in-repo **effect-only / getter-based** version — ids via `createUniqueId` (symmetric), describedby
+  as a plain getter, no memo — rebuilt from the pattern (not copied, if it's Kobalte-derived).
+
 ### Tier A — evaluated, kept (build-fresh / no swap)
 - **`createControllableState` ← `controlled-signal`: REJECTED (breaks hydration in this setup).**
   `createControllableSignal` backs its state with a compute-function signal
