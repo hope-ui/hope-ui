@@ -39,11 +39,18 @@
   },
   "peerDependencies": {
     "@solidjs/web": "catalog:",
+    "@tanstack/virtual-core": "catalog:",
     "solid-js": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/virtual-core": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",
     "@solidjs/web": "catalog:",
+    "@tanstack/virtual-core": "catalog:",
     "solid-js": "catalog:"
   }
 }

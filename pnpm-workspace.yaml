@@ -8,6 +8,11 @@ catalog:
   solid-js: 2.0.0-beta.17
   "@solidjs/signals": 2.0.0-beta.17
   "@solidjs/web": 2.0.0-beta.17
+  # Framework-agnostic virtualizer core. Adopted (not merely referenced) by
+  # `createVirtualCollection`; an *optional* peerDependency of @hope-ui/primitives so the
+  # kernel stays zero-dependency for consumers who never virtualize. See
+  # docs/list-navigation-port-plan.md and docs/solid-primitives-eval.md.
+  "@tanstack/virtual-core": 3.17.4
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
@@ -19,3 +24,4 @@ minimumReleaseAgeExclude:
   - '@solidjs/signals@2.0.0-beta.17'
   - '@solidjs/web@2.0.0-beta.17'
   - solid-js@2.0.0-beta.17
+  - '@tanstack/virtual-core@3.17.4'

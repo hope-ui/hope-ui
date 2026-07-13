@@ -208,6 +208,9 @@ catalogs:
     '@solidjs/web':
       specifier: 2.0.0-beta.17
       version: 2.0.0-beta.17
+    '@tanstack/virtual-core':
+      specifier: 3.17.4
+      version: 3.17.4
     solid-js:
       specifier: 2.0.0-beta.17
       version: 2.0.0-beta.17
@@ -305,6 +308,9 @@ importers:
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.17(solid-js@2.0.0-beta.17)
+      '@tanstack/virtual-core':
+        specifier: 'catalog:'
+        version: 3.17.4
       solid-js:
         specifier: 'catalog:'
         version: 2.0.0-beta.17
@@ -1483,6 +1489,9 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
+
+  '@tanstack/virtual-core@3.17.4':
+    resolution: {integrity: sha512-nGm5KteqxasUdThLc2izl6dHUqLv0LQj7Nuyo5gYalTPf/U8a9ermvsl7reT+6ioBW1l8WfpP/mcU338nLXpqw==}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -4549,6 +4558,8 @@ snapshots:
       storybook: 10.5.0(@types/react@19.2.17)(prettier@2.8.8)(react@19.2.7)
     optionalDependencies:
       '@types/react': 19.2.17
+
+  '@tanstack/virtual-core@3.17.4': {}
 
   '@testing-library/dom@10.4.1':
     dependencies:
