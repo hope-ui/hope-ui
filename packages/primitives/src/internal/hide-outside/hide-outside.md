@@ -93,8 +93,9 @@ cleanup leaves them in place on elements the outer layer still needs hidden. Any
 `aria-hidden` or `inert` the consumer set themselves is snapshotted and restored.
 
 The count lives on the element itself under `Symbol.for("hope-ui.hide-outside")`, not in a
-module-scope `WeakMap`. `@hope-ui/primitives` is public API and is depended on as a plain
-`dependencies` entry, which does not force a single installed instance — two copies would keep
+module-scope `WeakMap`. `@hope-ui/primitives` is an internal/advanced package, still depended on as
+a plain `dependencies` entry (and carried transitively by `@hope-ui/components`), which does not
+force a single installed instance — two copies would keep
 two independent counts and un-hide each other's elements. `Symbol.for` resolves through the
 cross-realm global symbol registry, so every copy reads the same slot. `createScrollLock`
 stores its lock state the same way, for the same reason.

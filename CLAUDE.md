@@ -7,10 +7,13 @@ primitive/component's colocated `.md`.
 
 ## What this is
 
-`hope-ui` is a headless, accessible component library for SolidJS, targeting
-**SolidJS 2.0 (beta)** — not 1.x. It is API-inspired by Base UI and React Aria (their
-public API surface and accessibility patterns — actively reference and adapt their
-code/reasoning) but explicitly avoids the architectural patterns of Kobalte and Corvu
+`hope-ui` is a batteries-included, **themed**, accessible component library for SolidJS,
+targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use themed components (a Panda-based
+Chakra-DX system — see `docs/roadmap.md`) are the product; they are built over an **internal**
+headless behavior kernel (`@hope-ui/primitives`), which is an implementation detail and an
+advanced escape hatch, **not** a stability-promised public API. It is API-inspired by Base UI
+and React Aria (their public API surface and accessibility patterns — actively reference and
+adapt their code/reasoning) but explicitly avoids the architectural patterns of Kobalte and Corvu
 (cite them only as anti-pattern case studies; never copy their code or "keep the shape
 of" anything from either). See `docs/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
@@ -98,7 +101,10 @@ Every source file under `packages/*/src/` (except `index.ts`) must have:
    required for anything touching focus/keyboard/pointer behavior, since jsdom cannot be trusted for
    that).
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) colocated in
-   the same `src/` directory.
+   the same `src/` directory. **Exception:** files under `packages/primitives/src/internal/` (the
+   advanced/unstable behavior kernel — see "Architecture" below) require a test but **not** a
+   consumer-facing `.md`; the composed families (`dialog`, `calendar`, `i18n`, `modal-backdrop`)
+   and `utils/` still need one.
 3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated in the same `src/`
    directory. Components are what a human has to look at; pure primitives aren't. Stories (and
    tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
@@ -166,13 +172,16 @@ them rather than re-deriving a behavior in a comment.
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
-- `packages/primitives` (`@hope-ui/primitives`) — the shared behavior kernel, and
-  **public, supported API**: its exported signatures are the public contract, not an
-  implementation detail free to churn. Consumers compose it to build components this
-  library doesn't ship. Nothing here is duplicated per-component; everything else composes it.
+- `packages/primitives` (`@hope-ui/primitives`) — the shared behavior kernel, and an
+  **internal / advanced (unstable) layer**, not a marketed public product: it serves
+  `@hope-ui/theming` and `@hope-ui/components`, and is available as an escape hatch for advanced
+  consumers who build components this library doesn't ship, but its signatures may churn between
+  minors — headless composition is no longer the primary use case. Nothing here is duplicated
+  per-component; everything else composes it.
 
   Every source file lives under exactly one **top-level `src/` folder**, and *only* top-level
-  folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The four folders:
+  folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The top-level folders
+  — `dialog`, `modal-backdrop`, `utils`, `internal` (documented below), plus `calendar` and `i18n`:
   - `dialog/` (`@hope-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
     state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogPopup`,
     `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
@@ -195,7 +204,16 @@ them rather than re-deriving a behavior in a comment.
     missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
     `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
     `createRegisteredId`, `createRegisteredElement` (see each primitive's colocated `.md`, and the
-    ref/`createEffect` timing gotcha in `docs/solid-2.0-notes.md` before writing another one).
+    ref/`createEffect` timing gotcha in `docs/solid-2.0-notes.md` before writing another one). The
+    `internal/` barrel also carries the list/grid/collection navigation family
+    (`createListNavigation`/`createListSelection`/`createGridNavigation`/`createVirtualCollection`,
+    …) that the collection/floating components (Listbox, Menu, Select, …) will compose.
+  - `calendar/` (`@hope-ui/primitives/calendar`) — the `createCalendar` **hook family** (headless
+    month/year/decade calendar with single/range/multiple selection), built on
+    `@internationalized/date`; same root-state-plus-per-part shape as `dialog/`.
+  - `i18n/` (`@hope-ui/primitives/i18n`) — locale + reading-direction context
+    (`I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) plus message
+    translation. The one Kobalte-derived carve-out, described under "What this is".
 
   **Modality is four mechanisms, not one**, and each was verified against the installed
   Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)
@@ -217,7 +235,8 @@ them rather than re-deriving a behavior in a comment.
   `target` resolves — a run without the popup in the spared set makes the popup itself inert,
   which blurs whatever the focus trap just focused and strands focus on `<body>` for good.
 
-  Because it's public API, **no primitive may keep cross-instance state at module scope.**
+  As a robustness measure (cheap to keep, and it outlives the demotion to internal API),
+  **no primitive keeps cross-instance state at module scope.**
   A consumer can end up with two installed copies (`dependencies` doesn't force
   deduplication), and two module-scope ref counts each believing they own `document.body`
   is an unreproducible field bug. `createScrollLock` and `createHideOutside` store
@@ -232,6 +251,20 @@ them rather than re-deriving a behavior in a comment.
   keeps this from becoming a Kobalte-style single giant package: importing one
   component's subpath never pulls in another's code. See "Publishing shape" below for
   the full rationale.
+- `packages/theming` (`@hope-ui/theming`) — the **theming contract** and dependency-inversion
+  seam: `ThemeProvider` + `useRecipe`, the augmentable `ThemeRecipes` registry, the `SlotRecipeFn`
+  shape, and a contract-version constant, plus a conformance kit on the
+  `@hope-ui/theming/conformance` subpath. `@hope-ui/components` reads recipes through it;
+  `@hope-ui/themes/*` implement and augment it; neither knows about the other. Depends on
+  `@hope-ui/primitives` (for `createComponentContext`) — which is *why* primitives cannot fold
+  into components without a dependency cycle (`components → theming → components`). See
+  `docs/theming.md`.
+- `packages/themes` (`@hope-ui/themes`) — Panda CSS theme presets, per-theme subpaths
+  (`@hope-ui/themes/base` foundation, `@hope-ui/themes/nova`). Config only, zero CSS; **tokens
+  live here**.
+- `packages/styled-system` (`@hope-ui/styled-system`, private) — the generated Panda runtime
+  (css/tokens/patterns + types), produced from `@hope-ui/themes/nova` and inlined into
+  `@hope-ui/components` at build. Not hand-written (exempt from the Definition of Done).
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).

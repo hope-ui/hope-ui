@@ -12,6 +12,11 @@
 // "Really calls" means outside a comment, outside a string, outside an `it.skip`, and not
 // merely imported: every one of those loopholes was live at some point, and Dialog exercised
 // three of them at once. See docs/testing.md.
+//
+// One relaxation: files under `packages/primitives/src/internal/` (the advanced/unstable behavior
+// kernel, demoted from public API — see docs/plan.md "Recommended architecture") need a test but
+// NOT a consumer-facing `.md`. The composed families (dialog/calendar/i18n/modal-backdrop) and
+// utils/ still need one. See `isDocExemptSource` below.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
 
@@ -219,6 +224,17 @@ function isStoryFile(path) {
   return /\.stories\.tsx?$/.test(path);
 }
 
+/**
+ * `@hope-ui/primitives/internal` is the advanced (unstable) behavior kernel — demoted from public
+ * API (docs/plan.md "Recommended architecture"). Its files still need a test, but no longer a
+ * consumer-facing `.md` contract: nobody is meant to read those as a supported API. The composed
+ * public-ish families (dialog, calendar, i18n, modal-backdrop) and the utils/ helpers keep docs.
+ * @param {string} pkg @param {string} path
+ */
+function isDocExemptSource(pkg, path) {
+  return pkg === "primitives" && /[/\\]src[/\\]internal[/\\]/.test(path);
+}
+
 function isSourceFile(path) {
   if (isTestFile(path) || isStoryFile(path)) return false;
   if (path.endsWith(".d.ts")) return false;
@@ -277,10 +293,11 @@ for (const pkg of packageDirs) {
     });
     const hasTest = matchingTests.length > 0;
     const hasDoc = docFiles.has(base);
+    const docRequired = !isDocExemptSource(pkg, sourceFile);
 
     const relPath = relative(repoRoot, sourceFile);
     if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
-    if (!hasDoc) missing.push(`${relPath} — missing matching .md doc`);
+    if (docRequired && !hasDoc) missing.push(`${relPath} — missing matching .md doc`);
 
     if (REQUIRES_SSR_TEST.has(pkg)) {
       // The call must live in the `.ssr.test.*` file, because that is the only Vitest project
@@ -340,7 +357,7 @@ if (missing.length > 0) {
 }
 
 console.log(
-  "check:coverage-parity passed — every source file has a test and a doc; every component has " +
-    "a story, an executing renderToStringAsync() and an executing hydrate(); every browser test " +
-    "that mounts DOM also runs axe.",
+  "check:coverage-parity passed — every source file has a test and a doc (the internal primitives " +
+    "kernel is doc-exempt); every component has a story, an executing renderToStringAsync() and an " +
+    "executing hydrate(); every browser test that mounts DOM also runs axe.",
 );

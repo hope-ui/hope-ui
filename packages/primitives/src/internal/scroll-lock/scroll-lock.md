@@ -23,8 +23,8 @@ one's deactivation prematurely unlocking scroll for the other.
 
 On `document.body`, under `Symbol.for("hope-ui.scroll-lock")` — **not** at module scope.
 
-`@hope-ui/primitives` is public API, and `@hope-ui/components` depends on it as a plain
-`dependencies` entry. Neither forces a single installed instance: a consumer can end up with
+`@hope-ui/primitives` is an internal/advanced package, but `@hope-ui/components` still depends on
+it as a plain `dependencies` entry (and carries it transitively to consumers). Neither forces a single installed instance: a consumer can end up with
 two copies of this package in their tree, at which point two module-scope counters each
 believe they own the body. The observable failure is that `overflow: hidden` is restored while
 a dialog is still open, or never restored at all — the exact opposite of what the ref count

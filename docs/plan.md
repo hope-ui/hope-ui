@@ -118,10 +118,14 @@ version):
 
 ## Context
 
-`hope-ui` is a Base UI / React Aria–inspired headless, accessible component library
-for SolidJS — copying their **API surface** (prop patterns, composition idioms) but not
-their React internals — explicitly avoiding the structural problems Kobalte and Corvu
-run into (see Reference policy above).
+`hope-ui` is a Base UI / React Aria–inspired, batteries-included, **themed**, accessible
+component library for SolidJS — copying their **API surface** (prop patterns, composition idioms)
+but not their React internals — explicitly avoiding the structural problems Kobalte and Corvu
+run into (see Reference policy above). Ready-to-use themed components (a Panda-based Chakra-DX
+system — see [`docs/roadmap.md`](roadmap.md)) are the product; they are built over an **internal**
+headless behavior kernel (`@hope-ui/primitives`). That kernel is an implementation detail and an
+advanced escape hatch, **not** a stability-promised public API — see "Recommended architecture"
+below.
 
 **"SSR support" = "works in SolidStart."** Renders on the SolidStart server, hydrates
 without mismatch, runs on the client. That is the whole requirement — not a broader,
@@ -212,8 +216,8 @@ becomes an actual goal.
 
 **Three layers, composition over inheritance:**
 
-1. **Behavior kernel** (`@hope-ui/primitives`, **public API**, never duplicated) — Solid
-   2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores. The
+1. **Behavior kernel** (`@hope-ui/primitives`, **internal/advanced — not a public product**,
+   never duplicated) — Solid 2.0 primitives, not hooks, built directly on `@solidjs/signals`/stores. The
    **list-navigation kernel** is a set of fine-grained, Angular-Aria-aligned primitives (its
    signal-based `private/behaviors` port almost 1:1 to Solid; react-aria's `selection` is the
    edge-case checklist, not the source — full map in
@@ -240,18 +244,23 @@ becomes an actual goal.
    `createEffect(depsFn, computeFn)` form and `onSettled` (not `onMount`, which no longer
    exists in 2.0).
 
-   This package is **published and supported**: its exported signatures are the public
-   contract, not an implementation detail free to churn. Consumers compose it to build
-   components this library doesn't ship, exactly as `@hope-ui/components` does. Two
-   consequences the code must honour:
-   - **No primitive may keep cross-instance state at module scope.** A consumer can end up
-     with two installed copies (a plain `dependencies` entry doesn't force deduplication),
-     and two module-scope counters each believing they own the body is an unreproducible
-     field bug. `createScrollLock` and `createHideOutside` key their ref counts off
-     `document.body`/the element under a `Symbol.for`, which resolves through the
-     cross-realm global symbol registry.
-   - Every primitive needs its own colocated `.md` stating the contract, since that doc is
-     what a consumer reads.
+   This package is **shipped but internal/advanced**: it exists to serve `@hope-ui/theming`
+   and `@hope-ui/components`, and is available as an escape hatch for advanced consumers who
+   want to build components this library doesn't ship. Its signatures are **not** a
+   stability-promised public contract and may churn between minors — headless composition is no
+   longer the marketed path (themed components are). Two consequences the code still honours,
+   now as robustness rather than a public-API mandate:
+   - **No primitive keeps cross-instance state at module scope.** A consumer can still end up
+     with two installed copies (a plain `dependencies` entry doesn't force deduplication, and
+     `@hope-ui/components` carries primitives transitively), and two module-scope counters each
+     believing they own the body is an unreproducible field bug. `createScrollLock` and
+     `createHideOutside` key their ref counts off `document.body`/the element under a
+     `Symbol.for`, which resolves through the cross-realm global symbol registry. Cheap to keep;
+     worth keeping.
+   - The `internal/` behavior primitives need a test but no longer a consumer-facing `.md`
+     contract (`check:coverage-parity` no longer requires one for them). The composed families
+     (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and the `utils/` helpers still carry a
+     colocated `.md`, since those are the surface an advanced consumer actually composes.
 
    **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence` +
    `createFocusRestore`. Dialog composes `createFocusTrap` + `createFocusRestore` +
@@ -408,11 +417,15 @@ drift that produced Kobalte's and Corvu's gaps.
 
 ## Publishing strategy
 
-- **Package granularity (revised from the original family-package plan):** two
-  packages total, not Kobalte's one-giant-package, not Corvu's
+- **Package granularity (revised from the original family-package plan):** a small fixed set
+  of packages — `@hope-ui/primitives` (internal behavior kernel), `@hope-ui/components` (every
+  public component), and the theming trio `@hope-ui/theming` / `@hope-ui/themes` /
+  `@hope-ui/styled-system` — **not** Kobalte's one-giant-package, not Corvu's
   15+-micro-packages-with-sibling-deps, and not the shared-primitive-family split
   (`@hope-ui/overlays`, `@hope-ui/collections`, `@hope-ui/forms`,
-  `@hope-ui/disclosure`) originally planned here. `@hope-ui/primitives` for the
+  `@hope-ui/disclosure`) originally planned here. (An earlier revision of this doc said "two
+  packages total"; the themed direction added the theming trio — see
+  [`docs/theming.md`](theming.md).) `@hope-ui/primitives` for the
   behavior kernel (never duplicated), and a single `@hope-ui/components` package for
   every public component, each as its own subpath export
   (`@hope-ui/components/button`, `@hope-ui/components/dialog`, ...). The
