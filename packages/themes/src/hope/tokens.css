@@ -5,10 +5,15 @@
  * collision-safe `--hope-<token>` variables under `:root` (light) and `.dark`; the shared
  * `_base/theme-map.css` maps them into Tailwind's color namespace.
  *
- * STRUCTURE NOW, AESTHETIC LATER. These are functional placeholder values (approximating Tailwind's
- * palette); the final hope look is designed by editing the values here — the token names, the shared
- * mapping, and the light/dark wiring do not change. Values are literal hex rather than `var(--color-*)`
- * refs, so the theme is self-contained and never depends on which Tailwind theme vars are emitted.
+ * Values reference Tailwind's own palette variables (`var(--color-violet-600)`, `var(--color-mauve-50)`,
+ * …) rather than literal hex, so the theme rides on Tailwind's scale and stays in lockstep with it.
+ * This is safe because a theme is only ever consumed through a Tailwind entry (`@import "tailwindcss"`
+ * is always present): Tailwind emits a `--color-*` variable whenever it is used, and these tokens are
+ * used both by referencing them here (`var(--color-*)`) and by every component utility that resolves
+ * to them (`bg-primary` → `var(--hope-primary)` → `var(--color-violet-600)`), so the vars are always
+ * generated. hope's brand hue is **violet** (`primary` = `violet-600`), paired with **mauve** — Tailwind
+ * v4's violet-tinted gray — as the neutral family (surfaces, text ramp, `neutral` role, borders), so
+ * the grays echo the brand rather than fighting it the way a cool blue-gray (`slate`) would.
  *
  * Completeness — every token in `SEMANTIC_COLOR_TOKENS` (@hope-ui/theming) declared here — is asserted
  * by the conformance test in `__tests__/hope.test.ts`, which reads THIS file. A missing token compiles
@@ -16,94 +21,94 @@
  */
 :root {
   /* Surfaces (elevation) */
-  --hope-surface: #ffffff;
-  --hope-surface-raised: #ffffff;
-  --hope-surface-overlay: #ffffff;
-  --hope-surface-sunken: #f8fafc;
-  --hope-surface-inverse: #0f172a;
+  --hope-surface: var(--color-white);
+  --hope-surface-raised: var(--color-white);
+  --hope-surface-overlay: var(--color-white);
+  --hope-surface-sunken: var(--color-mauve-50);
+  --hope-surface-inverse: var(--color-mauve-900);
 
   /* Standard text ramp (on neutral surfaces) */
-  --hope-foreground: #0f172a;
-  --hope-foreground-muted: #475569;
-  --hope-foreground-subtle: #94a3b8;
-  --hope-foreground-disabled: #cbd5e1;
+  --hope-foreground: var(--color-mauve-900);
+  --hope-foreground-muted: var(--color-mauve-600);
+  --hope-foreground-subtle: var(--color-mauve-400);
+  --hope-foreground-disabled: var(--color-mauve-300);
 
   /* On-color text (readable on a role fill or the inverse surface) */
-  --hope-on-primary: #ffffff;
-  --hope-on-primary-subtle: #1d4ed8;
-  --hope-on-neutral: #ffffff;
-  --hope-on-neutral-subtle: #334155;
-  --hope-on-success: #ffffff;
-  --hope-on-success-subtle: #15803d;
-  --hope-on-info: #ffffff;
-  --hope-on-info-subtle: #0369a1;
-  --hope-on-warning: #0f172a;
-  --hope-on-warning-subtle: #92400e;
-  --hope-on-danger: #ffffff;
-  --hope-on-danger-subtle: #b91c1c;
-  --hope-on-inverse: #f8fafc;
+  --hope-on-primary: var(--color-white);
+  --hope-on-primary-subtle: var(--color-violet-700);
+  --hope-on-neutral: var(--color-white);
+  --hope-on-neutral-subtle: var(--color-mauve-700);
+  --hope-on-success: var(--color-white);
+  --hope-on-success-subtle: var(--color-green-700);
+  --hope-on-info: var(--color-white);
+  --hope-on-info-subtle: var(--color-sky-700);
+  --hope-on-warning: var(--color-taupe-900);
+  --hope-on-warning-subtle: var(--color-amber-800);
+  --hope-on-danger: var(--color-white);
+  --hope-on-danger-subtle: var(--color-red-700);
+  --hope-on-inverse: var(--color-mauve-50);
 
   /* Role fills (bare = solid, -subtle = tonal) */
-  --hope-primary: #2563eb;
-  --hope-primary-subtle: #dbeafe;
-  --hope-neutral: #334155;
-  --hope-neutral-subtle: #f1f5f9;
-  --hope-success: #16a34a;
-  --hope-success-subtle: #dcfce7;
-  --hope-info: #0284c7;
-  --hope-info-subtle: #e0f2fe;
-  --hope-warning: #fbbf24;
-  --hope-warning-subtle: #fef3c7;
-  --hope-danger: #dc2626;
-  --hope-danger-subtle: #fee2e2;
+  --hope-primary: var(--color-violet-600);
+  --hope-primary-subtle: var(--color-violet-100);
+  --hope-neutral: var(--color-mauve-700);
+  --hope-neutral-subtle: var(--color-mauve-100);
+  --hope-success: var(--color-green-600);
+  --hope-success-subtle: var(--color-green-100);
+  --hope-info: var(--color-sky-600);
+  --hope-info-subtle: var(--color-sky-100);
+  --hope-warning: var(--color-amber-400);
+  --hope-warning-subtle: var(--color-amber-100);
+  --hope-danger: var(--color-red-600);
+  --hope-danger-subtle: var(--color-red-100);
 
   /* Neutral borders (role borders reuse the role color) */
-  --hope-subtle: #e2e8f0;
-  --hope-strong: #cbd5e1;
-  --hope-disabled: #e2e8f0;
+  --hope-subtle: var(--color-mauve-200);
+  --hope-strong: var(--color-mauve-300);
+  --hope-disabled: var(--color-mauve-200);
 
   /* Systemic */
-  --hope-focus: #2563eb;
-  --hope-scrim: rgb(15 23 42 / 0.5);
+  --hope-focus: var(--color-violet-600);
+  --hope-scrim: color-mix(in oklab, var(--color-mauve-900) 50%, transparent);
 }
 
 .dark {
   /* Surfaces */
-  --hope-surface: #020617;
-  --hope-surface-raised: #0f172a;
-  --hope-surface-overlay: #0f172a;
-  --hope-surface-sunken: #000000;
-  --hope-surface-inverse: #f8fafc;
+  --hope-surface: var(--color-mauve-950);
+  --hope-surface-raised: var(--color-mauve-900);
+  --hope-surface-overlay: var(--color-mauve-900);
+  --hope-surface-sunken: var(--color-black);
+  --hope-surface-inverse: var(--color-mauve-50);
 
   /* Standard text ramp */
-  --hope-foreground: #f8fafc;
-  --hope-foreground-muted: #94a3b8;
-  --hope-foreground-subtle: #64748b;
-  --hope-foreground-disabled: #475569;
+  --hope-foreground: var(--color-mauve-50);
+  --hope-foreground-muted: var(--color-mauve-400);
+  --hope-foreground-subtle: var(--color-mauve-500);
+  --hope-foreground-disabled: var(--color-mauve-600);
 
   /* On-color text — solid on-colors carry over; subtle on-colors lighten for dark tints */
-  --hope-on-primary-subtle: #bfdbfe;
-  --hope-on-neutral-subtle: #e2e8f0;
-  --hope-on-success-subtle: #bbf7d0;
-  --hope-on-info-subtle: #bae6fd;
-  --hope-on-warning-subtle: #fde68a;
-  --hope-on-danger-subtle: #fecaca;
-  --hope-on-inverse: #0f172a;
+  --hope-on-primary-subtle: var(--color-violet-200);
+  --hope-on-neutral-subtle: var(--color-mauve-200);
+  --hope-on-success-subtle: var(--color-green-200);
+  --hope-on-info-subtle: var(--color-sky-200);
+  --hope-on-warning-subtle: var(--color-amber-200);
+  --hope-on-danger-subtle: var(--color-red-200);
+  --hope-on-inverse: var(--color-mauve-900);
 
   /* Role fills — subtle fills become dark tints */
-  --hope-primary-subtle: #172554;
-  --hope-neutral-subtle: #1e293b;
-  --hope-success-subtle: #052e16;
-  --hope-info-subtle: #082f49;
-  --hope-warning-subtle: #451a03;
-  --hope-danger-subtle: #450a0a;
+  --hope-primary-subtle: var(--color-violet-950);
+  --hope-neutral-subtle: var(--color-mauve-800);
+  --hope-success-subtle: var(--color-green-950);
+  --hope-info-subtle: var(--color-sky-950);
+  --hope-warning-subtle: var(--color-amber-950);
+  --hope-danger-subtle: var(--color-red-950);
 
   /* Neutral borders */
-  --hope-subtle: #1e293b;
-  --hope-strong: #334155;
-  --hope-disabled: #1e293b;
+  --hope-subtle: var(--color-mauve-800);
+  --hope-strong: var(--color-mauve-700);
+  --hope-disabled: var(--color-mauve-800);
 
   /* Systemic */
-  --hope-focus: #3b82f6;
-  --hope-scrim: rgb(0 0 0 / 0.7);
+  --hope-focus: var(--color-violet-500);
+  --hope-scrim: color-mix(in oklab, var(--color-black) 70%, transparent);
 }
