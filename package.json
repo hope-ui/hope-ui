@@ -5,6 +5,7 @@
   "description": "Headless, accessible component library for SolidJS",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@11.10.0",
   "scripts": {
     "build": "turbo run build",
     "test": "vitest run --project=unit",
