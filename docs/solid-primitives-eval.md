@@ -115,6 +115,28 @@ render-body memo) are the safest bet.
   only on it). `@solid-primitives/date` is `Date`-based/mutable and, as a `node_modules` reactive
   primitive, would risk the transform-boundary hazard for no benefit.
 
+### Button / pressable family — evaluated, decided (built 2026-07)
+
+- **`createPress` ← no `@solid-primitives` package: BUILD-FRESH.** There is no unified press engine
+  in the `next` branch. The closest leaf utilities (`event-listener`, `keyboard`,
+  `pointer`/`mouse-position`) are lower-level: adopting them would still leave the *entire* press
+  state machine — pointer/touch/mouse/keyboard/SR-virtual-click normalization into one `onPress`,
+  cancel-on-drag-out with re-arm, scroll cancel, focus-on-press normalization, and touch
+  text-selection suppression — to write by hand. `keyboard` is a global-shortcut/held-keys tracker,
+  not an element-scoped Enter/Space activation contract. So the press engine is built fresh,
+  API-modeled on React Aria `usePress` (its behavior, not its code). It is **effect-free** (only a
+  plain-value `createSignal(false)` for `isPressed` — not a compute-form signal/memo — plus
+  event-driven `document` listeners added imperatively during an active press and torn down on
+  `pointerup`/cancel/`onCleanup`), so it is hydration-safe by construction: `isPressed` starts
+  `false` on both server and initial client, and the consumer surfaces it as `data-pressed` only
+  when truthy, so the server and initial-client markup carry no press attribute. No module-scope
+  state (the transient press bookkeeping is a closure `let` per instance).
+- **`createButton` ← no `@solid-primitives` package: BUILD-FRESH.** The element-aware button
+  behavior layer (native `<button>` vs `render`-ed anchor/generic) is modeled on Base UI
+  `useButton` (the `native` boolean + ref-for-event-time-refinement split). No `@solid-primitives`
+  equivalent; it composes `createPress` and adds only render-time static a11y props plus a
+  client-only `createEffect` for the dev mismatch warning.
+
 ### Tier A — evaluated, kept (build-fresh / no swap)
 - **`createControllableState` ← `controlled-signal`: REJECTED (breaks hydration in this setup).**
   `createControllableSignal` backs its state with a compute-function signal
@@ -156,7 +178,7 @@ quality decision hope-ui made deliberately:
   `transitionend`/`animationend` (single source of truth = the CSS); `@solid-primitives/presence` is
   timer-driven and needs a JS duration mirroring the CSS. We ported its good ideas instead — a
   `transitioncancel`/`animationcancel` + duration-derived `setTimeout` backstop, an `initialEnter`
-  option, and a generic item-swap (`createPresenceItem`/`mountedItem`). See `presence.md`.
+  option, and a generic item-swap (`createPresenceItem`/`mountedItem`). See `create-presence.md`.
 
 ### Tier C — no equivalent
 `inert` layering specifics, `ModalBackdrop`, the composed modal orchestration — built regardless.

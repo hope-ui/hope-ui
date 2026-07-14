@@ -45,7 +45,7 @@ Aria ships `ariaHideOutside` and Base UI ships floating-ui's `markOthers`. `aria
 leaves the background focusable and clickable. `inert` fixes both of those — but only on the
 elements the layer actually marked, so `ModalBackdrop` covers the viewport unconditionally as
 a backstop. And `inert` does not remove content from the accessibility tree as far as ARIA
-tooling is concerned, so `aria-hidden` isn't redundant either. See `hide-outside.md` for the
+tooling is concerned, so `aria-hidden` isn't redundant either. See `create-hide-outside.md` for the
 measurements.
 
 `Dialog.Backdrop` is optional and purely visual; it is **not** what makes a modal dialog
@@ -135,7 +135,7 @@ no other effect, so it's an unambiguous cancel channel:
 
 Both expose their `createPresence` status as a `data-presence` attribute
 (`"entering" | "entered" | "exiting" | "exited"`) for CSS transitions. That attribute name is
-the house convention for every component composing `createPresence` — see `presence.md`.
+the house convention for every component composing `createPresence` — see `create-presence.md`.
 
 #### Prop precedence
 

@@ -101,7 +101,7 @@ actual installed package):
   `solid-contract.test.tsx`. The re-run path is the one that matters (`active` flips false;
   Solid walks the siblings in creation order, running each one's previous cleanup before its
   own new body). Two consequences, both live in `createFocusRestore` (see
-  `focus-restore.md`): a primitive that must snapshot state before a sibling mutates it has
+  `create-focus-restore.md`): a primitive that must snapshot state before a sibling mutates it has
   to be *created first*; and a primitive whose cleanup must run *after* a sibling's cleanup
   has to defer the work by a `queueMicrotask` (effect cleanups are synchronous within a
   flush, so a microtask queued from the first cleanup lands after all of them). Focus restore

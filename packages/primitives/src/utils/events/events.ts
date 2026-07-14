@@ -44,7 +44,9 @@ export function composeEventHandlers<T, E extends Event>(
 ): JSX.EventHandler<T, E> {
   return (event) => {
     for (const handler of handlers) {
-      if (event.defaultPrevented) return;
+      if (event.defaultPrevented) {
+        return;
+      }
       callEventHandler(handler, event as EventHandlerEvent<T, E>);
     }
   };

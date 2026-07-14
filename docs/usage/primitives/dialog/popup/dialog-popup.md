@@ -27,7 +27,7 @@ tears down when the popup unmounts:
   `isModal()`) → `createDismissable` (Escape / outside pointerdown) → `createScrollLock`. **Creation
   order is load-bearing**: focus-restore must precede the trap and hide-outside so its
   `activeElement` snapshot lands before focus moves and before `inert` blurs the trigger (see
-  [`focus-restore.md`](../../internal/focus-restore/focus-restore.md)).
+  [`create-focus-restore.md`](../../internal/create-focus-restore/create-focus-restore.md)).
 
 `initialFocus` (when set) is what `createFocusTrap` focuses on open, instead of the first focusable
 descendant; it's read lazily at focus time (after mount), so the target may live inside the popup.

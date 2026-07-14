@@ -2,11 +2,21 @@ import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
-import { page } from "vitest/browser";
-import { Button } from "../button";
+import { page, userEvent } from "vitest/browser";
+import { Button, type ButtonProps } from "../button";
 import ssrFixture from "./__fixtures__/button-ssr.html?raw";
 
-describe("Button", () => {
+/**
+ * Renders Button as an anchor. Passed as a **direct** `render` prop, never via a spread object:
+ * a spread-backed prop reads reactively, and Button reads `render` synchronously to build the
+ * element, which would trip `STRICT_READ_UNTRACKED` for a value that is structural and never
+ * changes. `nativeButton={false}` switches on the element-aware a11y + keyboard synthesis.
+ */
+const renderAsAnchor: NonNullable<ButtonProps["render"]> = (p) => (
+  <a href="/docs" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />
+);
+
+describe("Button — native", () => {
   it("renders a native button element with type=button", async () => {
     const { dispose } = mount(() => <Button>Click me</Button>);
 
@@ -46,36 +56,94 @@ describe("Button", () => {
     dispose();
   });
 
-  it("sets disabled and aria-disabled together", async () => {
+  it("uses the native disabled attribute without a redundant aria-disabled", async () => {
+    // The rework drops the double-up: a native disabled button already conveys the state via
+    // the native attribute, which also removes it from the tab order.
     const { dispose } = mount(() => <Button disabled>Click me</Button>);
 
     const button = page.getByRole("button", { name: "Click me" });
     await expect.element(button).toBeDisabled();
-    await expect.element(button).toHaveAttribute("aria-disabled", "true");
+    await expect.element(button).not.toHaveAttribute("aria-disabled");
     dispose();
   });
 
-  it("supports the render prop for polymorphic rendering", async () => {
-    // Rendering as a fundamentally different element (button -> anchor) is a deliberate
-    // cross-element escape hatch: the `render` prop is typed against Button's own props
-    // for the common case (wrapping/restyling a button), so switching element kinds
-    // needs an explicit assertion here, same as it would for a consumer doing this.
-    const { dispose } = mount(() => (
-      <Button
-        render={(p) => (
-          <a href="/docs" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />
-        )}
-      >
-        Link button
-      </Button>
-    ));
+  it("activates on Enter and Space", async () => {
+    const onClick = vi.fn();
+    const { dispose } = mount(() => <Button onClick={onClick}>Click me</Button>);
 
-    await expect.element(page.getByRole("link", { name: "Link button" })).toBeInTheDocument();
+    page.getByRole("button", { name: "Click me" }).element().focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
     dispose();
   });
 
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = mount(() => <Button>Click me</Button>);
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Button — render-ed as a non-native element", () => {
+  it("renders the polymorphic element and announces as a button", async () => {
+    const { dispose } = mount(() => (
+      <Button nativeButton={false} render={renderAsAnchor}>
+        Link button
+      </Button>
+    ));
+
+    // role="button" is applied over the anchor, so it announces as a button, not a link.
+    const button = page.getByRole("button", { name: "Link button" });
+    await expect.element(button).toBeInTheDocument();
+    await expect.element(button).toHaveAttribute("role", "button");
+    await expect.element(button).toHaveAttribute("tabindex", "0");
+    dispose();
+  });
+
+  it("activates via keyboard (Enter native, Space synthesized)", async () => {
+    // preventDefault so the enabled anchor's activation doesn't navigate the test iframe.
+    const onClick = vi.fn((event: MouseEvent) => event.preventDefault());
+    const { dispose } = mount(() => (
+      <Button nativeButton={false} render={renderAsAnchor} onClick={onClick}>
+        Link button
+      </Button>
+    ));
+
+    page.getByRole("button", { name: "Link button" }).element().focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    expect(onClick).toHaveBeenCalledTimes(2);
+    dispose();
+  });
+
+  it("marks aria-disabled, drops from the tab order, and blocks activation while disabled", async () => {
+    const onClick = vi.fn();
+    const { dispose } = mount(() => (
+      <Button nativeButton={false} render={renderAsAnchor} onClick={onClick} disabled>
+        Link button
+      </Button>
+    ));
+
+    const button = page.getByRole("button", { name: "Link button" });
+    await expect.element(button).toHaveAttribute("aria-disabled", "true");
+    await expect.element(button).not.toHaveAttribute("tabindex");
+
+    // Playwright won't drive a click on an aria-disabled element; dispatch a raw one (the
+    // programmatic / screen-reader path the guard must block anyway).
+    const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+    button.element().dispatchEvent(clickEvent);
+    expect(onClick).not.toHaveBeenCalled();
+    expect(clickEvent.defaultPrevented).toBe(true);
+    dispose();
+  });
+
+  it("has no baseline accessibility violations as a non-native button", async () => {
+    const { container, dispose } = mount(() => (
+      <Button nativeButton={false} render={renderAsAnchor}>
+        Link button
+      </Button>
+    ));
     await expectNoA11yViolations(container);
     dispose();
   });

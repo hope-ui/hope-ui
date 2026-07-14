@@ -107,7 +107,11 @@ function blankNonCode(source) {
 
   /** @param {number} from @param {number} to */
   const blank = (from, to) => {
-    for (let i = from; i < to; i++) if (out[i] !== "\n") out[i] = " ";
+    for (let i = from; i < to; i++) {
+      if (out[i] !== "\n") {
+        out[i] = " ";
+      }
+    }
   };
 
   while (index < source.length) {
@@ -133,9 +137,13 @@ function blankNonCode(source) {
     if (char === '"' || char === "'" || char === "`") {
       let i = index + 1;
       while (i < source.length) {
-        if (source[i] === "\\") i += 2;
-        else if (source[i] === char) break;
-        else i++;
+        if (source[i] === "\\") {
+          i += 2;
+        } else if (source[i] === char) {
+          break;
+        } else {
+          i++;
+        }
       }
       blank(index + 1, Math.min(i, source.length));
       index = Math.min(i + 1, source.length);
@@ -168,7 +176,9 @@ function blankNonCode(source) {
       continue;
     }
 
-    if (!/\s/.test(/** @type {string} */ (char))) previous = /** @type {string} */ (char);
+    if (!/\s/.test(/** @type {string} */ (char))) {
+      previous = /** @type {string} */ (char);
+    }
     index++;
   }
 
@@ -187,13 +197,18 @@ function skippedRanges(code) {
 
   for (const match of code.matchAll(skipCall)) {
     const open = code.indexOf("(", match.index);
-    if (open === -1) continue;
+    if (open === -1) {
+      continue;
+    }
 
     let depth = 0;
     let i = open;
     for (; i < code.length; i++) {
-      if (code[i] === "(") depth++;
-      else if (code[i] === ")" && --depth === 0) break;
+      if (code[i] === "(") {
+        depth++;
+      } else if (code[i] === ")" && --depth === 0) {
+        break;
+      }
     }
     ranges.push([match.index, Math.min(i + 1, code.length)]);
   }
@@ -220,7 +235,9 @@ function hasLiveCall(source, callee) {
   for (const match of code.matchAll(call)) {
     const index = match.index;
     const isSkipped = skipped.some(([start, end]) => index >= start && index < end);
-    if (!isSkipped) return true;
+    if (!isSkipped) {
+      return true;
+    }
   }
   return false;
 }
@@ -241,8 +258,12 @@ function isDocExemptSource(pkg, path) {
 }
 
 function isSourceFile(path) {
-  if (isTestFile(path) || isStoryFile(path)) return false;
-  if (path.endsWith(".d.ts")) return false;
+  if (isTestFile(path) || isStoryFile(path)) {
+    return false;
+  }
+  if (path.endsWith(".d.ts")) {
+    return false;
+  }
   return SOURCE_EXTENSIONS.has(extname(path));
 }
 
@@ -264,7 +285,9 @@ try {
 const missing = [];
 
 for (const pkg of packageDirs) {
-  if (!REQUIRES_TEST_AND_DOC.has(pkg)) continue;
+  if (!REQUIRES_TEST_AND_DOC.has(pkg)) {
+    continue;
+  }
   const srcDir = join(packagesDir, pkg, "src");
   let allFiles;
   try {
@@ -280,7 +303,9 @@ for (const pkg of packageDirs) {
   for (const sourceFile of sourceFiles) {
     const base = baseName(sourceFile);
     const basenameOnly = base.split("/").pop();
-    if (EXCLUDED_BASENAMES.has(basenameOnly)) continue;
+    if (EXCLUDED_BASENAMES.has(basenameOnly)) {
+      continue;
+    }
 
     // A source file's tests may sit beside it (the primitives' layout) or be tucked into a
     // `__tests__/` subfolder of the same directory (the components' layout — keeping the family
@@ -306,7 +331,9 @@ for (const pkg of packageDirs) {
     const docRequired = !isDocExemptSource(pkg, sourceFile);
 
     const relPath = relative(repoRoot, sourceFile);
-    if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
+    if (!hasTest) {
+      missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
+    }
     if (docRequired && !hasDoc) {
       missing.push(`${relPath} — missing matching .md doc at ${relative(repoRoot, expectedDoc)}`);
     }
@@ -352,8 +379,12 @@ for (const pkg of packageDirs) {
   // rendering DOM, and `mount()` is what renders it.
   for (const browserTest of testFiles.filter(isBrowserTestFile)) {
     const source = readFileSync(browserTest, "utf8");
-    if (!hasLiveCall(source, MOUNT_MARKER)) continue;
-    if (hasLiveCall(source, A11Y_MARKER)) continue;
+    if (!hasLiveCall(source, MOUNT_MARKER)) {
+      continue;
+    }
+    if (hasLiveCall(source, A11Y_MARKER)) {
+      continue;
+    }
 
     missing.push(
       `${relative(repoRoot, browserTest)} — calls ${MOUNT_MARKER}() but never ${A11Y_MARKER}() (baseline a11y check required)`,
@@ -371,7 +402,9 @@ const NO_FLAT_SPRAWL = new Set(["primitives", "components", "theming", "internal
 const underTests = (p) => /[/\\]__tests__[/\\]/.test(p);
 const sprawl = [];
 for (const pkg of packageDirs) {
-  if (!NO_FLAT_SPRAWL.has(pkg)) continue;
+  if (!NO_FLAT_SPRAWL.has(pkg)) {
+    continue;
+  }
   const srcDir = join(packagesDir, pkg, "src");
   let allFiles;
   try {
@@ -380,7 +413,9 @@ for (const pkg of packageDirs) {
     continue;
   }
   for (const file of allFiles) {
-    if (underTests(file)) continue; // everything under a __tests__/ subtree is where it belongs
+    if (underTests(file)) {
+      continue; // everything under a __tests__/ subtree is where it belongs
+    }
     const relPath = relative(repoRoot, file);
     if (isTestFile(file)) {
       sprawl.push(`${relPath} — test file must live in a __tests__/ subfolder`);
@@ -395,11 +430,15 @@ for (const pkg of packageDirs) {
 if (missing.length > 0 || sprawl.length > 0) {
   if (missing.length > 0) {
     console.error("Definition of Done violated — missing test/doc coverage:\n");
-    for (const line of missing) console.error(`  - ${line}`);
+    for (const line of missing) {
+      console.error(`  - ${line}`);
+    }
   }
   if (sprawl.length > 0) {
     console.error(`${missing.length > 0 ? "\n" : ""}Leaf source folders must stay flat-free:\n`);
-    for (const line of sprawl) console.error(`  - ${line}`);
+    for (const line of sprawl) {
+      console.error(`  - ${line}`);
+    }
   }
   console.error(`\n${missing.length + sprawl.length} issue(s) found.`);
   process.exit(1);

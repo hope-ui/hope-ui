@@ -15,6 +15,8 @@ function hasId(value: unknown): value is { id: unknown } {
  * for other shapes.
  */
 export function compareByIdOrReference<V>(a: V, b: V): boolean {
-  if (hasId(a) && hasId(b)) return a.id === b.id;
+  if (hasId(a) && hasId(b)) {
+    return a.id === b.id;
+  }
   return a === b;
 }

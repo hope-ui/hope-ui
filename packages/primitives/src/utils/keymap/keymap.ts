@@ -73,7 +73,9 @@ const MODIFIER_TOKENS = new Set([
 
 /** `true` on Apple platforms, where `mod` means ⌘ (Meta) rather than Ctrl. Read at event time. */
 function isApplePlatform(): boolean {
-  if (typeof navigator === "undefined") return false;
+  if (typeof navigator === "undefined") {
+    return false;
+  }
   // `userAgentData.platform` when present (Chromium), else the legacy `platform` string.
   const platform =
     (navigator as { userAgentData?: { platform?: string } }).userAgentData?.platform ??
@@ -112,14 +114,19 @@ function parseCombo<T>(combo: string, handler: (event: KeyboardEventFor<T>) => v
   };
 
   for (const modifier of modifiers) {
-    if (!MODIFIER_TOKENS.has(modifier)) continue;
+    if (!MODIFIER_TOKENS.has(modifier)) {
+      continue;
+    }
     switch (modifier) {
       case "mod":
         // Resolved once, here at build time. Keymaps are built client-side (a component body or an
         // event handler), where the platform is known and never changes, so this needs no
         // per-event recomputation.
-        if (isApplePlatform()) binding.meta = true;
-        else binding.ctrl = true;
+        if (isApplePlatform()) {
+          binding.meta = true;
+        } else {
+          binding.ctrl = true;
+        }
         break;
       case "ctrl":
       case "control":
@@ -144,7 +151,9 @@ function parseCombo<T>(combo: string, handler: (event: KeyboardEventFor<T>) => v
 }
 
 function matches<T>(binding: Binding<T>, event: KeyboardEvent): boolean {
-  if (normalizeKey(event.key) !== binding.key) return false;
+  if (normalizeKey(event.key) !== binding.key) {
+    return false;
+  }
   // Exact modifier match, so `"ArrowDown"` ignores `Shift+ArrowDown` and `"a"` never fires for
   // `mod+a`. `mod` was already resolved to the platform's ctrl/meta when the binding was parsed.
   return (

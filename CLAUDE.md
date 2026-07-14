@@ -334,7 +334,7 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `createSignal(fn)` creates a *memo*, not a signal holding a function; box generic values as
   `createControllableState` does.
 - Sibling effects run/clean up in creation order on re-run, but LIFO on owner disposal (see
-  `createFocusRestore` / `docs/usage/primitives/internal/focus-restore/focus-restore.md`).
+  `createFocusRestore` / `docs/usage/primitives/internal/create-focus-restore/create-focus-restore.md`).
 - `onMount` → `onSettled`; `createEffect` takes a split `(depsFn, computeFn)` form; `createContext`
   returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default; `ref`
   accepts an array and `applyRef` skips falsy (no `mergeRefs`); `renderElement` owns ref merging.

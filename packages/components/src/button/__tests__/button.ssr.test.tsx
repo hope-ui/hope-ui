@@ -8,11 +8,31 @@ describe("Button SSR", () => {
     expect(typeof html).toBe("string");
   });
 
-  it("renders the button label and disabled state", async () => {
+  it("renders a native disabled button with the disabled attribute and no aria-disabled", async () => {
+    // The rework drops the redundant `aria-disabled` on a native disabled button — the native
+    // `disabled` attribute already conveys the state.
     const html = await renderToStringAsync(() => <Button disabled>Click me</Button>);
     expect(html).toContain("Click me");
     expect(html).toMatch(/disabled/);
-    expect(html).toMatch(/aria-disabled="true"/);
+    expect(html).not.toMatch(/aria-disabled/);
+  });
+
+  it("computes the non-native a11y props at render time (present in server output)", async () => {
+    // `nativeButton={false}` switches to the `role`/`aria-disabled` model. These derive from the
+    // boolean at render time (no ref consulted), so they appear server-side — the whole point of
+    // the render-time split. Asserted on the default `Dynamic`-rendered element rather than a
+    // literal `<a>` because a literal host element in an SSR-compiled test module compiles to a
+    // module-scope client-only call that throws at import (see __fixtures__/README.md / CLAUDE.md).
+    const html = await renderToStringAsync(() => (
+      <Button nativeButton={false} disabled>
+        Link
+      </Button>
+    ));
+    expect(html).toContain('role="button"');
+    expect(html).toContain('aria-disabled="true"');
+    // Disabled + non-focusable → dropped from the tab order, and no native disabled attribute.
+    expect(html).not.toMatch(/tabindex/);
+    expect(html).not.toMatch(/\sdisabled/);
   });
 
   it("matches the committed SSR fixture byte for byte", async () => {

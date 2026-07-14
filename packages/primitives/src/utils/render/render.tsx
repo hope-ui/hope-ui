@@ -53,7 +53,9 @@ export function renderElement<Props extends object, El extends Element = Element
           },
         });
 
-  if (options.render !== undefined) return options.render(props as Props);
+  if (options.render !== undefined) {
+    return options.render(props as Props);
+  }
 
   return <Dynamic component={options.as} {...props} />;
 }

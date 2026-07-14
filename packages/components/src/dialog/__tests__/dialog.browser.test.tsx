@@ -151,7 +151,7 @@ describe("Dialog", () => {
 
   it("exposes createPresence's status as `data-presence` on Popup and Backdrop", async () => {
     // The house convention for every component composing `createPresence` — a consumer's
-    // exit-transition CSS keys off it. Not `data-status`: see presence.md.
+    // exit-transition CSS keys off it. Not `data-status`: see create-presence.md.
     const { dispose } = mount(() => <FullDialog />);
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));

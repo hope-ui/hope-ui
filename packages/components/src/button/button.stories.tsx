@@ -15,21 +15,23 @@ export const Default: Story = {
 };
 
 /**
- * `disabled` sets both the native attribute and `aria-disabled`. Note the native attribute
- * also removes the button from the tab order — Tab past it to confirm.
+ * A native disabled button uses the native `disabled` attribute (which also removes it from the
+ * tab order) — with no redundant `aria-disabled`. Tab past it to confirm it is skipped.
  */
 export const Disabled: Story = {
   render: () => <Button disabled>Can't click me</Button>,
 };
 
 /**
- * The `render` prop swaps the underlying element while keeping Button's computed props.
- * Switching element kinds (button → anchor) needs an explicit assertion, since `render` is
- * typed against Button's own props. See `@hope-ui/primitives`' `render.md`.
+ * The `render` prop swaps the underlying element while keeping Button's behavior. Pair it with
+ * `nativeButton={false}` for a non-`<button>` element: Button then applies `role="button"`,
+ * `tabIndex`, and synthesizes keyboard activation, so the anchor announces and behaves as a button.
+ * Enter and Space both activate it.
  */
 export const AsAnchor: Story = {
   render: () => (
     <Button
+      nativeButton={false}
       render={(p) => (
         <a href="/docs" {...(p as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} />
       )}

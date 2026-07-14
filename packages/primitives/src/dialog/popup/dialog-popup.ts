@@ -40,7 +40,7 @@ export interface CreateDialogPopupReturn {
  * created before `createFocusTrap`/`createHideOutside`: sibling effects run (and clean up on
  * re-run) in creation order, so this is what makes the restore's `document.activeElement`
  * snapshot happen before the trap moves focus and before `inert` blurs the trigger (see
- * `focus-restore.md`). Restore is gated on `open()`; the trap/hide-outside/scroll-lock on
+ * `create-focus-restore.md`). Restore is gated on `open()`; the trap/hide-outside/scroll-lock on
  * `isModal` — a non-modal dialog isn't trapped but must still hand focus back.
  */
 export function createDialogPopup(
@@ -49,7 +49,7 @@ export function createDialogPopup(
 ): CreateDialogPopupReturn {
   // A signal-backed ref, not a `let`: the popup only exists as a reactive consequence of
   // `mounted()`, so the effects below (which react to `open`/`isModal` and read this ref tracked
-  // in their compute fn) must be able to react once it's actually set. See `focus-trap.ts`.
+  // in their compute fn) must be able to react once it's actually set. See `create-focus-trap.ts`.
   const [ref, setRef] = createSignal<HTMLDivElement>();
 
   const presence = createPresence({ present: state.open, ref });

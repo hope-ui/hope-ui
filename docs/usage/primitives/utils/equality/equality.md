@@ -1,8 +1,8 @@
 # `compareByIdOrReference` / `ValueComparator`
 
 A shared value-equality helper for the primitives that hold a set of values keyed by identity —
-[`createListSelection`](../../internal/list-selection/list-selection.md) and
-[`createListExpansion`](../../internal/list-expansion/list-expansion.md). It lives in `utils/`
+[`createListSelection`](../../internal/create-list-selection/create-list-selection.md) and
+[`createListExpansion`](../../internal/create-list-expansion/create-list-expansion.md). It lives in `utils/`
 because more than one primitive needs it and neither should own it.
 
 ## API

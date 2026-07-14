@@ -48,7 +48,7 @@ describe("solid-js contract", () => {
 
   describe("createSignal(fn) is the memo overload, not a signal holding a function", () => {
     // Depended on by: `createControllableState`
-    // (packages/primitives/src/controllable/controllable.ts), which boxes its value in
+    // (packages/primitives/src/internal/create-controllable-state/create-controllable-state.ts), which boxes its value in
     // `{ value: T }` with an `equals` that unwraps via `isEqual`, solely to dodge this.
     // 2.0 overloads `createSignal` as `<T>(value: Exclude<T, Function>, options?)` and
     // `<T>(fn: ComputeFunction<T>, options?)`, so a generic `createSignal<T>(someValue)`
@@ -70,7 +70,7 @@ describe("solid-js contract", () => {
   });
 
   describe("useContext throws when no Provider is mounted", () => {
-    // Depended on by: `createComponentContext` (packages/primitives/src/context/context.ts),
+    // Depended on by: `createComponentContext` (packages/primitives/src/create-component-context/create-component-context.ts),
     // whose `try/catch` silently relies on the throw to reword it as "Dialog sub-components
     // must be rendered inside a Dialog root component." If stable returns `undefined`
     // instead, that friendly error stops firing and every sub-component fails later with a

@@ -24,7 +24,7 @@ export function createDialogBackdrop(
   props: JSX.HTMLAttributes<HTMLDivElement>,
 ): CreateDialogBackdropReturn {
   // Signal-backed ref for the same reason as the popup's — `createPresence` reads it on the exit
-  // edge, and `createRegisteredElement` reacts to it. See `focus-trap.ts`.
+  // edge, and `createRegisteredElement` reacts to it. See `create-focus-trap.ts`.
   const [ref, setRef] = createSignal<HTMLDivElement>();
 
   const presence = createPresence({ present: state.open, ref });
