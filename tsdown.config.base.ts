@@ -21,8 +21,8 @@ interface PackageJson {
  * makes a compiled fallback worth shipping. See `docs/plan.md`, "Distribution model".
  *
  * tsdown (rolldown + oxc) is used with `transform.jsx: "preserve"`: oxc's parser keeps JSX
- * intact while rolldown inlines the pure styled-system runtime and leaves
- * `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external — the consumer resolves those, and
+ * intact while rolldown leaves `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external — the
+ * consumer resolves those, and
  * `@hope-ui/primitives` via *its own* `"solid"` condition. No Solid compiler runs here at all,
  * so the `babel-preset-solid@1.x` hazard (`esbuild-plugin-solid`/`unplugin-solid`, see
  * `docs/migration-2.0-stable.md` §5) simply doesn't apply to a preserve-only build.
@@ -56,23 +56,10 @@ export function createTsdownConfig(packageDir: string): UserConfig {
     platform: "browser",
     outDir: join(packageDir, "dist"),
     // Keep `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external so the consumer resolves them
-    // (`@hope-ui/primitives` via *its own* `"solid"` condition); the private devDependency
-    // `@hope-ui/styled-system` runtime inlines. This applies to the **dts** build too, and the
-    // dts additionally must stop at the Panda *type* chain — the styled-system types reach
-    // `@pandacss/types` → `pkg-types` → `typescript`, which rolldown-plugin-dts throws on when it
-    // tries to bundle `typescript`'s declarations. Leaving `@pandacss/*` (and its `pkg-types`/
-    // `typescript` tail) external ends the type bundle at a bare import the consumer resolves via
-    // its own `@pandacss/dev` (already required to run Panda). styled-system stays *out* of this
-    // list, so its types inline into the `.d.ts` — the consumer can't resolve that private package.
+    // (`@hope-ui/primitives` via *its own* `"solid"` condition). Applies to the **dts** build too,
+    // so the emitted declarations reference those siblings by bare specifier, never a src path.
     deps: {
-      neverBundle: [
-        /^solid-js/,
-        /^@solidjs\//,
-        /^@hope-ui\/primitives/,
-        /^@pandacss\//,
-        "pkg-types",
-        "typescript",
-      ],
+      neverBundle: [/^solid-js/, /^@solidjs\//, /^@hope-ui\/primitives/],
     },
     // Ship source: keep JSX for the consumer's per-environment compile.
     inputOptions(options) {
@@ -89,10 +76,8 @@ export function createTsdownConfig(packageDir: string): UserConfig {
     outExtensions: () => ({ js: ".jsx" }),
     dts: true,
     sourcemap: false,
-    // Bundle each subpath into one `.jsx` (inlining the styled-system runtime), with common code
-    // deduped into shared `.jsx` chunks the entries import relatively — the consumer's compiler
-    // handles those the same as the entries. (`unbundle: true` would instead mirror `src/` file
-    // for file, but then couldn't inline the private styled-system runtime.)
+    // Bundle each subpath into one `.jsx`, with common code deduped into shared `.jsx` chunks the
+    // entries import relatively — the consumer's compiler handles those the same as the entries.
     unbundle: false,
   }) as UserConfig;
 }

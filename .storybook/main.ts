@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "storybook-solidjs-vite";
 import type { PluginOption } from "vite";
 import solid from "vite-plugin-solid";
@@ -28,6 +29,9 @@ const config: StorybookConfig = {
         !(plugin && typeof plugin === "object" && "name" in plugin && plugin.name === "solid"),
     ) as PluginOption[];
     plugins.push(solid(solidPluginOptions()));
+    // Tailwind v4 compiles `.storybook/tailwind.css` (the dev stylesheet), replacing the old
+    // Panda `cssgen` step. `@tailwindcss/vite`'s `@source` scans the components' source + stories.
+    plugins.push(tailwindcss());
 
     // Same wildcard the `vitest.config.ts` alias uses: `@hope-ui/primitives` publishes one
     // subpath per primitive folder, so `@hope-ui/primitives/render` -> `.../src/render/index.ts`.

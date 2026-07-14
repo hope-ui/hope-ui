@@ -1,22 +1,14 @@
 {
   "name": "@hope-ui/themes",
   "version": "0.0.0",
-  "description": "hope-ui Panda CSS themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/chakra is the default, @hope-ui/themes/nova, …) plus the shared @hope-ui/themes/base foundation. Add a theme to your panda.config.ts presets and run panda codegen. Ships config only; zero CSS.",
+  "description": "hope-ui themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/hope is the default visual identity). Each theme ships a Tailwind v4 CSS file (design tokens as --hope-* CSS variables + an @theme inline mapping to clean utilities); import it into your Tailwind entry. No JS config, no codegen.",
   "type": "module",
   "sideEffects": false,
   "files": ["src"],
   "exports": {
-    "./base": {
-      "types": "./src/base/index.ts",
-      "import": "./src/base/index.ts"
-    },
-    "./chakra": {
-      "types": "./src/chakra/index.ts",
-      "import": "./src/chakra/index.ts"
-    },
-    "./nova": {
-      "types": "./src/nova/index.ts",
-      "import": "./src/nova/index.ts"
+    "./hope": {
+      "style": "./src/hope/theme.css",
+      "default": "./src/hope/theme.css"
     },
     "./package.json": "./package.json"
   },
@@ -25,9 +17,10 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "@pandacss/dev": ">=1.11.0"
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@pandacss/dev": "^1.11.4"
+    "@hope-ui/theming": "workspace:*",
+    "@types/node": "^22.0.0"
   }
 }

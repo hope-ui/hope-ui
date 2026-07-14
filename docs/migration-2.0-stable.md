@@ -200,10 +200,11 @@ That is the whole reason tsdown is safe here where a *compiling* toolchain would
       so a 1.x preset can't ship a broken fallback green. The `check:dist-imports` grep that
       once served this role was removed with the literal-element rule; the source-only build
       doesn't need it.
-- [ ] tsdown's dts (rolldown-plugin-dts) trips over `@pandacss/types` → `pkg-types` →
-      `typescript@5.9` when bundling declarations; `deps.neverBundle` externalizes that chain
-      (§3, `tsdown.config.base.ts`). Re-check whether newer tsdown/rolldown-plugin-dts fixes the
-      underlying bug so the workaround can be narrowed.
+- [x] ~~tsdown's dts (rolldown-plugin-dts) trips over `@pandacss/types` → `pkg-types` →
+      `typescript@5.9` when bundling declarations~~ — **moot**: Panda and `@hope-ui/styled-system`
+      were removed in the Tailwind v4 migration, so the `.d.ts` no longer inlines Panda types and
+      `deps.neverBundle` dropped the `@pandacss/*`/`pkg-types`/`typescript` chain. Only
+      `solid-js`/`@solidjs/web`/`@hope-ui/primitives` stay external now (§3, `tsdown.config.base.ts`).
 
 ---
 

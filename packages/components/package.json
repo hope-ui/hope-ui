@@ -8,18 +8,12 @@
   "files": ["dist"],
   "hope": {
     "entries": {
-      "box": "src/box/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
-      "dialog": "src/dialog/index.ts",
-      "flex": "src/flex/index.ts"
+      "dialog": "src/dialog/index.ts"
     }
   },
   "exports": {
-    "./box": {
-      "types": "./dist/box/index.d.ts",
-      "solid": "./dist/box/index.jsx"
-    },
     "./button": {
       "types": "./dist/button/index.d.ts",
       "solid": "./dist/button/index.jsx"
@@ -31,10 +25,6 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
-    },
-    "./flex": {
-      "types": "./dist/flex/index.d.ts",
-      "solid": "./dist/flex/index.jsx"
     },
     "./package.json": "./package.json"
   },
@@ -52,7 +42,6 @@
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",
-    "@hope-ui/styled-system": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

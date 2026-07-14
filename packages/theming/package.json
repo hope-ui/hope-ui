@@ -32,7 +32,9 @@
     "solid-js": "catalog:"
   },
   "dependencies": {
-    "@hope-ui/primitives": "workspace:*"
+    "@hope-ui/primitives": "workspace:*",
+    "tailwind-merge": "^3.0.0",
+    "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",

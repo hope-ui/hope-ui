@@ -11,9 +11,11 @@ Theming spans two package axes that never mix dependencies:
 
 - **Runtime** (imported into app code; peer deps `solid-js` / `@solidjs/web`):
   `@hope-ui/primitives` ← `@hope-ui/theming` ← `@hope-ui/components`.
-- **Config** (consumed by the *consumer's* `panda.config.ts` + `panda codegen`; peer dep
-  `@pandacss/dev`): `@hope-ui/themes/{base,chakra,nova,…}` (`chakra` is the default the library is
-  built and demoed against). Each theme depends *up* on `@hope-ui/theming` for the contract types.
+- **Config** (imported into the consumer's Tailwind v4 entry CSS; peer dep `tailwindcss`):
+  `@hope-ui/themes/{hope,…}` — each theme is a CSS file (`@import "@hope-ui/themes/hope"`) shipping
+  design tokens as `--hope-*` variables plus an `@theme inline` mapping. `hope` is the default the
+  library is built and demoed against. Each theme depends *up* on `@hope-ui/theming` for the contract
+  (its recipes are `tailwind-variants` functions, and it runs the conformance kit).
 
 `@hope-ui/theming` is the dependency-inversion seam: components read from it, themes implement it,
 and neither knows about the other.
@@ -35,8 +37,9 @@ and neither knows about the other.
   (`checkSlotRecipeConformance` / `assertSlotRecipeConformance`) a theme runs post-`codegen` to
   prove each recipe actually emits a class for every slot at every variant combination it declares.
 
-Theme is chosen at **codegen time**; runtime theme-switching is out of scope (two ejected presets
-would collide on recipe names, or namespacing would ship every theme's CSS in one bundle).
+Theme is chosen at **build time** (which theme CSS the consumer imports). CSS variables make runtime
+theme-switching *possible* (toggle a `data-theme`/`.dark` attribute), but it is out of scope for now —
+the default path is one theme per build.
 
 ## Adding a component (the shape to follow)
 
@@ -49,41 +52,43 @@ would collide on recipe names, or namespacing would ship every theme's CSS in on
      }
    }
    ```
-3. In the component, compute `class` in a getter from `useRecipe("accordion")(props).<slot>` — the
-   `box.tsx` pattern — and render through `renderElement` for `as`/`render` polymorphism.
-4. Add the matching recipe (a Panda slot recipe with `jsx` hints, internal state authored as
-   conditions **nested inside** consumer-facing variants — never a top-level `state` axis) to each
-   theme preset under `@hope-ui/themes/*`.
+3. In the component, compute `class` in a getter from `useRecipe("accordion")(props).<slot>` and
+   render through `renderElement` for `as`/`render` polymorphism. Merge the consumer's `class`
+   through the recipe's slot function so their utilities win.
+4. Add the matching `tailwind-variants` slot recipe (authored with the shared `tv` from
+   `@hope-ui/theming`; internal state authored as conditions **nested inside** consumer-facing
+   variants — never a top-level `state` axis) to each theme under `@hope-ui/themes/*`.
 
 ## Adding a theme
 
-A theme is a Panda preset built on `@hope-ui/themes/base` plus its own `semanticTokens` (the
-vocabulary below) and, once components exist, its own slot recipes (same slots and variant *values*
-as every other theme — only the emitted CSS differs). First-party themes are subpaths of
-`@hope-ui/themes` (`@hope-ui/themes/chakra` — the default — `@hope-ui/themes/nova`, …); a third
-party publishes its own package implementing the same contract. For the recipe *functions* the
-provider injects, prefer bundling the theme's own generated recipe runtime under a `hash: false` /
-no-prefix contract (so the class names equal the consumer's own codegen), exactly as
-`@hope-ui/styled-system` bundles `css()` today.
+A theme is a **Tailwind v4 CSS file** that (a) declares hope's semantic tokens as `--hope-*` CSS
+variables under `:root` and `.dark`, (b) maps them into Tailwind's color namespace with `@theme
+inline` so utilities stay clean (`bg-primary`, `text-on-primary`, `border-subtle`, `ring-focus`),
+and (c) — once components exist — ships its own `tailwind-variants` slot recipes (same slots and
+variant *values* as every other theme; only the emitted classes differ). First-party themes are
+subpaths of `@hope-ui/themes` (`@hope-ui/themes/hope` is the default); a third party publishes its
+own package implementing the same contract. See `@hope-ui/themes/hope`'s `theme.css` for the
+reference shape.
 
-**The swap-safety rule: augment `base`, never add a theme-local token.** Theme is chosen at codegen
-time and components reference token *names*, so a token key one theme has and another lacks compiles
-to an unresolved `var(--…)` the moment the preset is swapped. Therefore a theme only overrides the
-*values* of keys `base` already declares; a genuinely new token (e.g. Chakra's `2xs` radii/font-size
-rung, its `label`/`none` textStyles, its `heading` font) is added to `base`, so **every** theme
-inherits it. This is enforced, not just documented: `base`'s raw-token literals are written
-`defineTokens.x({ … } satisfies XContract)` and a theme's `theme.extend.tokens` override object is
-typed `satisfies ThemeTokenOverride` (both from `@hope-ui/themes/base`, defined in
-`base/contracts/token-contract.ts`) — a missing key fails assignability, a foreign/typo'd key fails the
-object-literal excess-property check. `BaseTokenContract` is the raw-token analog of
-`SemanticColorContract`; together they make any two presets swap-compatible by construction.
-
-`base` stays font-neutral (system-UI stacks); it exposes both `fonts.sans` and `fonts.heading` (same
-value) so a display-face theme overrides just `heading`. A future Chakra component/recipe port maps
-Chakra's font roles onto base keys: **Chakra `heading` → base `fonts.heading`, Chakra `body` → base
-`fonts.sans`** (Inter is deferred — a theme may later override those values).
+**Swap-safety.** Raw scales (colors, spacing, radii, shadows) come from **Tailwind itself**, so their
+key surface is identical in every build by construction — nothing to police, and a theme-private
+extra (e.g. an elevation shadow) is safe because only that theme's own recipes reference it. What
+each theme *must* define is the **semantic vocabulary**: every token in `SEMANTIC_COLOR_TOKENS` as a
+`--hope-*` variable, or a referencing utility (`bg-primary`) compiles to an unresolved `var()`.
+Because CSS variables aren't `tsc`-checkable, this is enforced at the CSS level by
+`checkSemanticTokenConformance` / `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`),
+which a theme runs against its `theme.css` — the token analog of the recipe axis's
+`checkSlotRecipeConformance`.
 
 ## Semantic token vocabulary
+
+> **Naming updated for Tailwind (2026).** The authoritative, current token names live in
+> [`docs/usage/theming/semantic-tokens/semantic-tokens.md`](usage/theming/semantic-tokens/semantic-tokens.md):
+> standard text `foreground*`, on-fill/inverse `on-*`, neutral borders `subtle`/`strong`, systemic
+> `focus`/`scrim`, role `danger` (not `destructive`), and **no bare property-name tokens** (so no
+> `text-text`/`border-border`/`ring-ring`). The role *concepts* below still hold; treat the old
+> dotted style-prop spellings (`text.subtle`, `border.bold`) and the Panda/`base` mechanics as
+> historical.
 
 The recipe contract above imposes no *token* vocabulary. This is the other half: the **semantic
 (alias) color contract** — one design-system-agnostic set of role names every theme implements, so a
@@ -243,10 +248,10 @@ fixture and its hydration test must both include `<ThemeProvider>` identically.
 
 ## Current state
 
-The contract and `@hope-ui/themes/{base,chakra,nova}` are built. **`chakra` is the default** the
-styled-system runtime is generated from (a Chakra-UI-v3-like look in hope's own semantic
-vocabulary); `nova` is the shadcn-derived sibling, kept in place but no longer the baseline. Both
-ship tokens only (no recipes yet), expressed in the standardized semantic-token vocabulary above and
-enforced by `SemanticColorContract`; their raw-token surface is guarded by `BaseTokenContract`. No
-components consume `useRecipe` yet — recipes arrive per-component as each is designed. See the
-plan's "Implementation status & decisions" for the full done/deferred breakdown.
+The contract and the default theme `@hope-ui/themes/hope` are built on **Tailwind v4 +
+`tailwind-variants`**. `hope` ships the full semantic-token structure (placeholder values; final
+aesthetic later), enforced by `checkSemanticTokenConformance`. The former `base`/`chakra`/`nova`
+Panda presets and the generated `@hope-ui/styled-system` runtime have been removed. No components
+consume `useRecipe` yet — recipes (and the `tv`→`SlotRecipeFn` `slotRecipe` adapter) arrive with the
+first styled component, which proves the pattern end-to-end. See [`roadmap.md`](roadmap.md) for the
+done/deferred breakdown.

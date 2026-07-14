@@ -15,6 +15,5 @@ storybook-static/
 .localized
 __MACOSX/
 
-# 
+#
 __origins__
-__chakra__

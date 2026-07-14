@@ -13,6 +13,7 @@
  * component's own decisions, not this package's. No test-runner dependency: it returns a result
  * (or throws, via `assertSlotRecipeConformance`) so the author wraps it in whatever `it(...)` they use.
  */
+import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
 import type { SlotRecipeFn } from "../theme-recipes/theme-recipes";
 
 export interface ConformanceResult {
@@ -68,5 +69,46 @@ export function assertSlotRecipeConformance<Variants>(
   const { ok, errors } = checkSlotRecipeConformance(recipe, expectation);
   if (!ok) {
     throw new Error(`Slot recipe conformance failed:\n${errors.map((e) => `  - ${e}`).join("\n")}`);
+  }
+}
+
+/**
+ * Checks that a theme's CSS defines a `--hope-<token>` variable for every semantic color token in
+ * `tokens` (default: the full {@link SEMANTIC_COLOR_TOKENS} vocabulary). A theme is chosen at the
+ * consumer's Tailwind build time and every recipe/component references these tokens as utilities
+ * (`bg-primary` → `var(--hope-primary)`); a token the theme forgot to define compiles to an
+ * unresolved `var()` and silently breaks styling. This is the CSS-side analogue of the recipe
+ * axis's {@link checkSlotRecipeConformance}: once tokens live in CSS rather than a TS object the
+ * compile-time `satisfies` guarantee is gone, so a theme runs this against its `theme.css`.
+ *
+ * It asserts only that each token is *declared* (its light/`:root` value); dark overrides are a
+ * per-theme concern and not every token changes between modes.
+ */
+export function checkSemanticTokenConformance(
+  cssText: string,
+  tokens: readonly string[] = SEMANTIC_COLOR_TOKENS,
+): ConformanceResult {
+  const errors: string[] = [];
+  for (const token of tokens) {
+    // The `:` anchor stops a prefix token (`on-primary`) from matching a longer one
+    // (`on-primary-subtle`).
+    const declared = new RegExp(`--hope-${token}\\s*:`).test(cssText);
+    if (!declared) {
+      errors.push(`semantic token "--hope-${token}" is not defined in the theme CSS`);
+    }
+  }
+  return { ok: errors.length === 0, errors };
+}
+
+/**
+ * Like {@link checkSemanticTokenConformance}, but throws a single aggregated error when the theme
+ * CSS is missing tokens. Convenient for `it("defines every token", () => assertSemanticTokenConformance(css))`.
+ */
+export function assertSemanticTokenConformance(cssText: string, tokens?: readonly string[]): void {
+  const { ok, errors } = checkSemanticTokenConformance(cssText, tokens);
+  if (!ok) {
+    throw new Error(
+      `Semantic token conformance failed:\n${errors.map((e) => `  - ${e}`).join("\n")}`,
+    );
   }
 }

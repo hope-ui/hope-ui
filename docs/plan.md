@@ -114,8 +114,8 @@ version):
 
 `hope-ui` is a Base UI / React Aria–inspired, batteries-included, **themed**, accessible
 component library for SolidJS — copying their **API surface** (prop patterns, composition idioms)
-but not their React internals. Ready-to-use themed components (a Panda-based Chakra-DX
-system — see [`docs/roadmap.md`](roadmap.md)) are the product; they are built over an **internal**
+but not their React internals. Ready-to-use themed components (a batteries-included, Tailwind-v4 +
+tailwind-variants system — see [`docs/roadmap.md`](roadmap.md)) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`). That kernel is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API — see "Recommended architecture"
 below.
@@ -366,7 +366,7 @@ DoD below) — this doesn't depend on SolidStart at all.
 
 > **Superseded.** The phase/step ordering below (Button → Dialog → Popover/Tooltip → Listbox) was
 > set at repo creation and is no longer the plan. The current, complexity-ordered build roadmap —
-> the full Chakra v3 component surface plus the kernel primitives still needed — lives in
+> a batteries-included surface aggregated from Mantine/MUI/Ant/shadcn/Nuxt plus the kernel primitives still needed — lives in
 > [`docs/roadmap.md`](roadmap.md). This section is kept only for the Phase 0/1 history it records.
 
 **Phase 0 (done):**
@@ -409,12 +409,12 @@ drift that produces the coverage gaps this project is designed to avoid.
 
 - **Package granularity (revised from the original family-package plan):** a small fixed set
   of packages — `@hope-ui/primitives` (internal behavior kernel), `@hope-ui/components` (every
-  public component), and the theming trio `@hope-ui/theming` / `@hope-ui/themes` /
-  `@hope-ui/styled-system` — **not** a single one-giant-package, not a spread of
+  public component), and the theming pair `@hope-ui/theming` / `@hope-ui/themes` — **not** a
+  single one-giant-package, not a spread of
   15+ micro-packages with sibling deps, and not the shared-primitive-family split
   (`@hope-ui/overlays`, `@hope-ui/collections`, `@hope-ui/forms`,
   `@hope-ui/disclosure`) originally planned here. (An earlier revision of this doc said "two
-  packages total"; the themed direction added the theming trio — see
+  packages total"; the themed direction added the theming pair — see
   [`docs/theming.md`](theming.md).) `@hope-ui/primitives` for the
   behavior kernel (never duplicated), and a single `@hope-ui/components` package for
   every public component, each as its own subpath export
@@ -469,22 +469,21 @@ library isn't published before 2.0 stable anyway.
 
 The build is **tsdown** (rolldown + oxc), configured in `tsdown.config.base.ts`
 (`createTsdownConfig`, one `tsdown.config.ts` per package). It runs with
-`transform.jsx: "preserve"` so oxc keeps JSX intact, while rolldown inlines the pure
-styled-system runtime and leaves `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external (the
-consumer resolves those — `@hope-ui/primitives` via *its own* `"solid"` condition). It runs
+`transform.jsx: "preserve"` so oxc keeps JSX intact, and leaves
+`solid-js`/`@solidjs/web`/`@hope-ui/primitives` external (the consumer resolves those —
+`@hope-ui/primitives` via *its own* `"solid"` condition). Styling is **Tailwind v4 +
+`tailwind-variants`**, so there is no generated CSS runtime to inline. It runs
 **no Solid compiler**, so the `babel-preset-solid@1.x` hazard that rules out
 `tsup`/`esbuild-plugin-solid`/`rollup-preset-solid`/`unplugin-solid` for *compilation* is moot
 here. Entries come from each `package.json`'s `hope.entries`.
 
 Two build wrinkles worth knowing:
-- **dts type-bundling stops at Panda.** The `.d.ts` must inline styled-system's types
-  (`BoxProps extends JsxStyleProps`, and consumers can't resolve the private
-  `@hope-ui/styled-system`). But those types reach `@pandacss/types` → `pkg-types` →
-  `typescript`, and rolldown-plugin-dts throws bundling `typescript`'s declarations. So
-  `deps.neverBundle` keeps `@pandacss/*` (+ its `pkg-types`/`typescript` tail) external in the
-  `.d.ts` — the consumer resolves them via its own `@pandacss/dev`. Sibling `@hope-ui/*` stay
-  external there too, so no `paths`→src leakage (the old `vite-plugin-dts` `paths: {}` hazard
-  is gone).
+- **dts stays sibling-external.** `deps.neverBundle` keeps
+  `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external in the `.d.ts` too, so the declarations
+  reference siblings by bare specifier and there's no `paths`→src leakage (the old
+  `vite-plugin-dts` `paths: {}` hazard is gone). *(Historically this list also excluded
+  `@pandacss/*` + its `pkg-types`/`typescript` tail, because the styled-system types the `.d.ts`
+  inlined reached them — moot since the Panda runtime was removed.)*
 - **SolidStart consumers may need hope-ui in `ssr.noExternal`.** Server-side, Vite externalizes
   `node_modules` and hands them to Node — which can't parse the `.jsx` we ship. To have the
   consumer's `vite-plugin-solid` compile our source for the server too, list hope-ui in
@@ -493,38 +492,17 @@ Two build wrinkles worth knowing:
 
 This is the idiomatic SolidJS-library shape (as used by `@solid-primitives`),
 minus the dom-compiled fallback some libraries ship. It retires the literal-element rule and its `check:dist-imports`
-tripwire. It has **no** effect on Panda style-prop extraction or the multi-theme recipe layer —
-those are build-time scans of the *consumer's* JSX and behave identically regardless.
+tripwire. It is orthogonal to styling: under Tailwind v4 the consumer's own Tailwind build scans
+classes, and the multi-theme recipe layer is unaffected.
 
-## `/jsx`: hope-ui owns its own (Solid 2.0), never Panda's — but `/patterns` helpers are fair game
+## `/jsx` and `/patterns` (superseded — Panda removed)
 
-**Decision (recorded).** The ban is on Panda's generated **`/jsx`** layer — the `styled` factory
-and the JSX components it emits (e.g. `jsx/flex.mjs`). Panda emits those for Solid **1.x**: they
-call `createComponent`/`mergeProps` and write literal host elements against the 1.x runtime, and
-they never pass through the consumer's `vite-plugin-solid`, so they'd break the 2.0 ship-source
-model and hydration. That mismatch is intrinsic (independent of the old `generate: 'dom'`
-distribution), so hope-ui hand-writes its own Solid-2.0 components instead and
-`@hope-ui/styled-system` continues to **not** re-export Panda's `/jsx` factory.
-
-**Panda's `/patterns` helpers are a different thing and hope-ui does use them.** `flex.raw` /
-`getFlexStyle` (and the other pattern transforms) are **pure functions** — no Solid, no JSX, just
-prop → style-object/class-string mapping. `@hope-ui/components/flex` reuses `flex.raw` for its
-shorthand → canonical mapping (`align→alignItems`, …) rather than re-implementing it, which also
-guarantees hope-ui's runtime output matches what the consumer's `panda codegen` extracts from the
-**same** `flex` pattern config (`properties` + `transform`, jsxName `Flex`) shipped in every
-`@hope-ui/themes/*` preset. `Flex` is the first consumer of `/patterns`; future layout components
-(`Stack`, `Grid`, …) follow the same approach. (An earlier revision of this note said hope-ui would
-hand-write its own `/patterns` and "never use Panda's" — that over-generalized the `/jsx` ban to
-the pure helpers; corrected here.)
-
-This costs nothing in styling. Panda's style-prop extraction does **not** require its
-factory: with `jsxFramework: "solid"` its default `jsxStyleProps: "all"` extracts every
-style prop from any capitalized JSX component the consumer writes — proven in-repo, where
-`packages/styled-system/styled-system/styles.css` carries `.bg_primary`/`.p_4` extracted
-from `box.stories.tsx`, whose `<Box>` is hand-written and registered nowhere. Recipe
-*variants* extract via the separate `jsx: [...]` recipe tracking property (see Part B of the
-feasibility report). Now that components may emit literal host elements, hope-ui's hand-written
-Solid-2.0 components (which compose Panda's pure `/patterns` helpers, per above) are unobstructed.
+> **Historical.** This section recorded why hope-ui banned Panda's generated `/jsx` factory while
+> reusing its pure `/patterns` helpers (`flex.raw`, `getFlexStyle`). Panda and the generated
+> `@hope-ui/styled-system` runtime have since been **removed** in favor of **Tailwind v4 +
+> `tailwind-variants`**, and the `Box`/`Flex` layout primitives are gone (consumers compose layout
+> with Tailwind utilities). None of the `/jsx`-vs-`/patterns` reasoning applies anymore; it is kept
+> only as a record of the earlier decision. Current styling model: [`docs/theming.md`](theming.md).
 
 ## Testing/a11y strategy + Definition of Done (locked-in, non-negotiable)
 

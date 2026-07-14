@@ -1,0 +1,10 @@
+/*
+ * hope-ui's dev stylesheet for Storybook — Storybook is itself a Tailwind v4 consumer, exactly
+ * like a real app. `@tailwindcss/vite` (wired in .storybook/main.ts) compiles this; it replaces the
+ * old Panda `cssgen` step. hope-ui ships no precompiled CSS to real consumers.
+ */
+@import "tailwindcss";
+@import "@hope-ui/themes/hope";
+
+/* Scan the components' source + stories for the utility classes to generate. */
+@source "../packages/components/src";

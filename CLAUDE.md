@@ -8,8 +8,8 @@ primitive/component's per-file usage doc under `docs/usage/<pkg>/<relative-src-p
 ## What this is
 
 `hope-ui` is a batteries-included, **themed**, accessible component library for SolidJS,
-targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use themed components (a Panda-based
-Chakra-DX system — see `docs/roadmap.md`) are the product; they are built over an **internal**
+targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use themed components (a batteries-included,
+Tailwind-v4 + tailwind-variants system — see `docs/roadmap.md`) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`), which is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API. It is API-inspired by Base UI
 and React Aria (their public API surface and accessibility patterns — actively reference and
@@ -263,22 +263,20 @@ them rather than re-deriving a behavior in a comment.
   the full rationale.
 - `packages/theming` (`@hope-ui/theming`) — the **theming contract** and dependency-inversion
   seam: `ThemeProvider` + `useRecipe`, the augmentable `ThemeRecipes` registry, the `SlotRecipeFn`
-  shape, and a contract-version constant, plus a conformance kit on the
-  `@hope-ui/theming/conformance` subpath. `@hope-ui/components` reads recipes through it;
+  shape and a contract-version constant, the `SemanticColorContract` token vocabulary, and the
+  Tailwind styling seam (`tv`/`cn`/`cx` from `tailwind-variants`), plus a conformance kit (recipe +
+  semantic-token checks) on the `@hope-ui/theming/conformance` subpath. `@hope-ui/components` reads recipes through it;
   `@hope-ui/themes/*` implement and augment it; neither knows about the other. Depends on
   `@hope-ui/primitives` (for `createComponentContext`) — which is *why* primitives cannot fold
   into components without a dependency cycle (`components → theming → components`). See
   `docs/theming.md`.
-- `packages/themes` (`@hope-ui/themes`) — Panda CSS theme presets, per-theme subpaths
-  (`@hope-ui/themes/base` foundation, `@hope-ui/themes/chakra` — the **default** Chakra-UI-v3-like
-  theme — and `@hope-ui/themes/nova`, the shadcn-derived sibling). Config only, zero CSS; **tokens
-  live here**. Swap-safety rule (enforced by `base/contracts/token-contract.ts`'s `BaseTokenContract` +
-  `ThemeTokenOverride`, the raw-token analog of `SemanticColorContract`): **a theme only overrides
-  values of keys `base` declares — never adds a token key; new tokens are added to `base` so every
-  theme inherits them**, or a preset swap compiles a reference to an unresolved `var(--…)`.
-- `packages/styled-system` (`@hope-ui/styled-system`, private) — the generated Panda runtime
-  (css/tokens/patterns + types), produced from `@hope-ui/themes/chakra` (the default theme) and
-  inlined into `@hope-ui/components` at build. Not hand-written (exempt from the Definition of Done).
+- `packages/themes` (`@hope-ui/themes`) — Tailwind v4 theme CSS, per-theme subpaths
+  (`@hope-ui/themes/hope` is the **default** visual identity). Each theme ships a `theme.css`
+  (`@import "@hope-ui/themes/hope"`) declaring the semantic tokens as `--hope-*` variables under
+  `:root`/`.dark` and mapping them to clean utilities via `@theme inline`. Raw scales come from
+  Tailwind itself; swap-safety is enforced only on the shared **semantic vocabulary**, via
+  `checkSemanticTokenConformance` (`@hope-ui/theming/conformance`) run against `theme.css` — a missing
+  `--hope-*` token compiles a referencing utility to an unresolved `var(--…)`.
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).

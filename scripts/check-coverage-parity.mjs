@@ -32,12 +32,11 @@ const packagesDir = join(repoRoot, "packages");
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
 // Only the behavior/UI/contract packages carry the test + .md Definition of Done. The
-// `@hope-ui/themes` presets are pure token data (Tailwind v4 values + semantic tokens) and the
-// generated styled-system isn't hand-written, so both are exempt — tokens are exercised
-// transitively by the components that consume them. `theming` is hand-written contract + runtime,
-// so it's in — but only for
-// test + doc: it renders no DOM, so it is deliberately absent from the story / SSR / hydration
-// sets below (those are for components a human looks at and that emit hydratable markup).
+// `@hope-ui/themes` themes are pure CSS (Tailwind v4 design tokens as `--hope-*` CSS variables), so
+// they are exempt — tokens are exercised transitively by the components that consume them.
+// `theming` is hand-written contract + runtime, so it's in — but only for test + doc: it renders no
+// DOM, so it is deliberately absent from the story / SSR / hydration sets below (those are for
+// components a human looks at and that emit hydratable markup).
 const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
@@ -241,20 +240,6 @@ function isDocExemptSource(pkg, path) {
   return pkg === "primitives" && /[/\\]src[/\\]internal[/\\]/.test(path);
 }
 
-/**
- * `@hope-ui/components/src/system/` is the internal style-system glue (e.g. `renderStyled`) that
- * every component composes — the components-side analogue of `primitives/src/internal`. It is not a
- * standalone component (no subpath export, renders no markup of its own), so it needs a test but is
- * exempt from the `.md` doc, story, and SSR/hydration round-trip requirements — those are for
- * components a human looks at and that emit hydratable markup. Its behavior is exercised
- * transitively by Box's own SSR/hydration/story coverage. See CLAUDE.md and
- * `docs/usage/components/system/style-props.md`.
- * @param {string} pkg @param {string} path
- */
-function isInternalComponentHelper(pkg, path) {
-  return pkg === "components" && /[/\\]src[/\\]system[/\\]/.test(path);
-}
-
 function isSourceFile(path) {
   if (isTestFile(path) || isStoryFile(path)) return false;
   if (path.endsWith(".d.ts")) return false;
@@ -318,8 +303,7 @@ for (const pkg of packageDirs) {
     const docRelDir = relative(srcDir, dirname(sourceFile));
     const expectedDoc = join(repoRoot, "docs/usage", pkg, docRelDir, `${basename(base)}.md`);
     const hasDoc = existsSync(expectedDoc);
-    const internalHelper = isInternalComponentHelper(pkg, sourceFile);
-    const docRequired = !isDocExemptSource(pkg, sourceFile) && !internalHelper;
+    const docRequired = !isDocExemptSource(pkg, sourceFile);
 
     const relPath = relative(repoRoot, sourceFile);
     if (!hasTest) missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
@@ -327,7 +311,7 @@ for (const pkg of packageDirs) {
       missing.push(`${relPath} — missing matching .md doc at ${relative(repoRoot, expectedDoc)}`);
     }
 
-    if (REQUIRES_SSR_TEST.has(pkg) && !internalHelper) {
+    if (REQUIRES_SSR_TEST.has(pkg)) {
       // The call must live in the `.ssr.test.*` file, because that is the only Vitest project
       // resolving the server builds. And `hasLiveCall`, not `.includes(...)`: a mention in a
       // comment, a bare import, or a call inside an `it.skip` used to satisfy this.
@@ -343,7 +327,7 @@ for (const pkg of packageDirs) {
       }
     }
 
-    if (REQUIRES_HYDRATION_TEST.has(pkg) && !internalHelper) {
+    if (REQUIRES_HYDRATION_TEST.has(pkg)) {
       // The other half. Without this, deleting a component's entire hydration suite kept CI
       // green — which is precisely how Dialog's stayed `it.skip`'d for months while CLAUDE.md
       // claimed every component had one.
@@ -359,7 +343,7 @@ for (const pkg of packageDirs) {
       }
     }
 
-    if (REQUIRES_STORY.has(pkg) && !internalHelper && !storyFiles.has(`${base}.stories`)) {
+    if (REQUIRES_STORY.has(pkg) && !storyFiles.has(`${base}.stories`)) {
       missing.push(`${relPath} — missing matching .stories.tsx`);
     }
   }

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { SEMANTIC_COLOR_TOKENS } from "../../semantic-tokens/semantic-tokens";
 import type { SlotRecipeFn } from "../../theme-recipes/theme-recipes";
-import { assertSlotRecipeConformance, checkSlotRecipeConformance } from "../conformance";
+import {
+  assertSemanticTokenConformance,
+  assertSlotRecipeConformance,
+  checkSemanticTokenConformance,
+  checkSlotRecipeConformance,
+} from "../conformance";
 
 // A synthetic multi-slot recipe stands in for what a theme author would pass — the kit is generic,
 // so it needs no knowledge of any real component. `cases`/`slots` are what the author supplies.
@@ -35,5 +41,22 @@ describe("conformance kit", () => {
     expect(result.ok).toBe(false);
     expect(result.errors.some((e) => e.includes('slot "root"'))).toBe(true);
     expect(() => assertSlotRecipeConformance(broken, expectation)).toThrow(/conformance failed/);
+  });
+});
+
+describe("semantic token conformance", () => {
+  it("passes when every --hope-* token is declared", () => {
+    const css = SEMANTIC_COLOR_TOKENS.map((token) => `--hope-${token}: #000;`).join("\n");
+    expect(checkSemanticTokenConformance(css).ok).toBe(true);
+    expect(() => assertSemanticTokenConformance(css)).not.toThrow();
+  });
+
+  it("reports a token the theme CSS forgot to define", () => {
+    const result = checkSemanticTokenConformance("--hope-primary: #000;");
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((e) => e.includes("--hope-surface"))).toBe(true);
+    expect(() => assertSemanticTokenConformance("--hope-primary: #000;")).toThrow(
+      /conformance failed/,
+    );
   });
 });
