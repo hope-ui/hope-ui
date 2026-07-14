@@ -31,8 +31,12 @@ let recorded: string[] = [];
 function diagnosticIn(args: unknown[]): string | undefined {
   for (const arg of args) {
     const message = typeof arg === "string" ? arg : arg instanceof Error ? arg.message : undefined;
-    if (message === undefined) continue;
-    if (DIAGNOSTIC_CODES.some((code) => message.includes(`[${code}]`))) return message;
+    if (message === undefined) {
+      continue;
+    }
+    if (DIAGNOSTIC_CODES.some((code) => message.includes(`[${code}]`))) {
+      return message;
+    }
   }
   return undefined;
 }
@@ -45,7 +49,9 @@ function diagnosticIn(args: unknown[]): string | undefined {
  * file. `dispose()` is a checkpoint the test owns, outside any reactive flush.
  */
 function installConsoleGuard(): void {
-  if (installCount++ > 0) return;
+  if (installCount++ > 0) {
+    return;
+  }
 
   // Stored unbound, and restored unbound. `console.warn.bind(console)` would restore a
   // *different function object* than the one taken, so an install/uninstall cycle would leave
@@ -77,8 +83,12 @@ function installConsoleGuard(): void {
 }
 
 function uninstallConsoleGuard(): void {
-  if (--installCount > 0) return;
-  if (originalConsole === undefined) return;
+  if (--installCount > 0) {
+    return;
+  }
+  if (originalConsole === undefined) {
+    return;
+  }
   console.warn = originalConsole.warn;
   console.error = originalConsole.error;
   originalConsole = undefined;
@@ -92,7 +102,9 @@ function takeRecordedDiagnostics(): string[] {
 
 function assertNoDiagnostics(): void {
   const diagnostics = takeRecordedDiagnostics();
-  if (diagnostics.length === 0) return;
+  if (diagnostics.length === 0) {
+    return;
+  }
 
   const unique = [...new Set(diagnostics)];
   const summary = unique.map((message) => `  - ${message}`).join("\n");

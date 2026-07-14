@@ -55,7 +55,9 @@ export function createCalendarGrid(
     const out: GridCell<string>[] = [];
     for (const item of state.collection.items()) {
       const pos = posByKey.get(item.value());
-      if (pos) out.push({ item, rowIndex: pos.row, colIndex: pos.col });
+      if (pos) {
+        out.push({ item, rowIndex: pos.row, colIndex: pos.col });
+      }
     }
     return out;
   });
@@ -80,7 +82,9 @@ export function createCalendarGrid(
   const nudge = () => setPendingNudge(true);
   createEffect(
     () => {
-      if (!pendingNudge()) return undefined; // not armed → don't even track the cursor
+      if (!pendingNudge()) {
+        return undefined; // not armed → don't even track the cursor
+      }
       const key = state.focusedDate().toString();
       // Pick the *focusable* cell for this date. During a period cross the outgoing scope's trailing
       // outside cell shares the date key transiently — `!disabled()` skips it. Reading `element()`
@@ -92,7 +96,9 @@ export function createCalendarGrid(
       return item?.element()?.isConnected ? item : undefined;
     },
     (item) => {
-      if (!item) return; // the target cell hasn't rendered/connected yet — a later run fires
+      if (!item) {
+        return; // the target cell hasn't rendered/connected yet — a later run fires
+      }
       // `listFocus.focus` reads reactive state internally; this is a deliberate imperative move from
       // inside an effect callback, so it must be untracked.
       untrack(() => state.listFocus.focus(item));
@@ -104,22 +110,30 @@ export function createCalendarGrid(
   createEffect(
     () => state.view(),
     (_view, previous) => {
-      if (previous !== undefined) nudge();
+      if (previous !== undefined) {
+        nudge();
+      }
     },
   );
 
   // --- Keyboard beyond the grid's own keymap ---
   const pageYears = (event: KeyboardEvent, deltaYears: number) => {
-    if (state.view() !== "month") return;
+    if (state.view() !== "month") {
+      return;
+    }
     event.preventDefault();
     state.navigate(deltaYears * 12);
     nudge();
   };
   const shiftArrow = (event: KeyboardEvent, direction: ArrowDirection) => {
-    if (state.view() !== "month" || state.mode() !== "range") return;
+    if (state.view() !== "month" || state.mode() !== "range") {
+      return;
+    }
     event.preventDefault();
     const target = state.focusedDate().add({ days: arrowDelta(direction, isRtl()) });
-    if (state.isOutOfRange(target)) return;
+    if (state.isOutOfRange(target)) {
+      return;
+    }
     state.activate(target, { extend: true });
     nudge();
   };

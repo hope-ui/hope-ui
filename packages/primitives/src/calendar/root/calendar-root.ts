@@ -332,7 +332,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
   const isDateUnavailable = (date: CalendarDate) => {
-    if (view() !== "month") return false; // unavailability is a per-day concept
+    if (view() !== "month") {
+      return false; // unavailability is a per-day concept
+    }
     return isDateDisabledFn()?.(date) ?? false;
   };
   const isDateNonFocusable = (date: CalendarDate) =>
@@ -409,11 +411,15 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
 
   const prev = () => {
-    if (isPrevDisabled()) return;
+    if (isPrevDisabled()) {
+      return;
+    }
     navigateView(-1);
   };
   const next = () => {
-    if (isNextDisabled()) return;
+    if (isNextDisabled()) {
+      return;
+    }
     navigateView(1);
   };
 
@@ -433,7 +439,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
   const drillDownTo = (date: CalendarDate) => {
-    if (isDateNonFocusable(date)) return;
+    if (isDateNonFocusable(date)) {
+      return;
+    }
     switch (view()) {
       case "decade":
         return applyView("year", date);
@@ -446,9 +454,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const setView = (nextView: CalendarView) => applyView(nextView);
 
   const announceSelection = (value: CalendarValue) => {
-    if (value == null) return;
+    if (value == null) {
+      return;
+    }
     if (Array.isArray(value)) {
-      if (value.length > 0) announce(t("calendar.datesSelected", { count: value.length }));
+      if (value.length > 0) {
+        announce(t("calendar.datesSelected", { count: value.length }));
+      }
       return;
     }
     if ("start" in value) {
@@ -465,7 +477,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       drillDownTo(date);
       return;
     }
-    if (!isDateSelectable(date)) return;
+    if (!isDateSelectable(date)) {
+      return;
+    }
     const strat = strategy();
     let state = selectionState();
     if (opts?.extend && mode() === "range" && anchorDate() === null) {

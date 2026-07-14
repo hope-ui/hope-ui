@@ -14,7 +14,9 @@ describe("buildMonthCells", () => {
     const rows = buildMonthCells(new CalendarDate(2026, 1, 1), "en-US");
     expect(rows.length).toBeGreaterThanOrEqual(4);
     expect(rows.length).toBeLessThanOrEqual(6);
-    for (const row of rows) expect(row).toHaveLength(DAYS_PER_WEEK);
+    for (const row of rows) {
+      expect(row).toHaveLength(DAYS_PER_WEEK);
+    }
 
     const flat = rows.flat();
     // Every in-month day is present and not flagged outside.
@@ -31,7 +33,9 @@ describe("buildMonthCells", () => {
     const flat = buildMonthCells(new CalendarDate(2026, 1, 1), "en-US").flat();
     const outside = flat.filter((c) => c.isOutside);
     expect(outside.length).toBeGreaterThan(0);
-    for (const cell of outside) expect(cell.date.month).not.toBe(1);
+    for (const cell of outside) {
+      expect(cell.date.month).not.toBe(1);
+    }
   });
 
   it("uses the ISO date string as the track key and a localized day label", () => {

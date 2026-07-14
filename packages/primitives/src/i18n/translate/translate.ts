@@ -73,14 +73,20 @@ export function createTranslate(
     const cfg = config();
 
     const viaFn = cfg?.translate?.(key, p, loc);
-    if (viaFn != null) return viaFn;
+    if (viaFn != null) {
+      return viaFn;
+    }
 
     const override = cfg?.messages?.[loc]?.[key];
-    if (override != null) return interpolate(override, p);
+    if (override != null) {
+      return interpolate(override, p);
+    }
 
     const dict: I18nCatalog = resolveCatalog(loc);
     const entry = lookupEntry(dict, key) ?? lookupEntry(MESSAGES_EN, key);
-    if (entry == null) return warnMissing(key, warned);
+    if (entry == null) {
+      return warnMissing(key, warned);
+    }
     return typeof entry === "function"
       ? (entry as (params: unknown) => string)(p)
       : interpolate(entry, p);

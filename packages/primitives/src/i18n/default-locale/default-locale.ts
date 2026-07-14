@@ -70,7 +70,9 @@ function getRegistry(): LocaleRegistry {
 function updateLocale(): void {
   const registry = getRegistry();
   registry.current = getDefaultLocale();
-  for (const listener of registry.listeners) listener(registry.current);
+  for (const listener of registry.listeners) {
+    listener(registry.current);
+  }
 }
 
 /**

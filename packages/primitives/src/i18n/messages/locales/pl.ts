@@ -26,8 +26,11 @@ export const MESSAGES_PL: I18nCatalog = {
       const n10 = count % 10;
       const n100 = count % 100;
       let noun = "dat";
-      if (count === 1) noun = "datę";
-      else if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) noun = "daty";
+      if (count === 1) {
+        noun = "datę";
+      } else if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) {
+        noun = "daty";
+      }
       return `Wybrano ${count} ${noun}`;
     },
   },

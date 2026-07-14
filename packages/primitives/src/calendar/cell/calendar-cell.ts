@@ -113,24 +113,36 @@ export function createCalendarCell(
   const ariaLabel = () => {
     const t = state.t;
     const parts = [state.formatCellName(date())];
-    if (isToday()) parts.push(t("calendar.today"));
-    if (isRangeStart() && isRangeEnd())
+    if (isToday()) {
+      parts.push(t("calendar.today"));
+    }
+    if (isRangeStart() && isRangeEnd()) {
       parts.push(t("calendar.selected")); // single-day range
-    else if (isRangeStart()) parts.push(t("calendar.rangeStart"));
-    else if (isRangeEnd()) parts.push(t("calendar.rangeEnd"));
-    else if (isSelected()) parts.push(t("calendar.selected"));
-    if (isUnavailable()) parts.push(t("calendar.unavailable"));
+    } else if (isRangeStart()) {
+      parts.push(t("calendar.rangeStart"));
+    } else if (isRangeEnd()) {
+      parts.push(t("calendar.rangeEnd"));
+    } else if (isSelected()) {
+      parts.push(t("calendar.selected"));
+    }
+    if (isUnavailable()) {
+      parts.push(t("calendar.unavailable"));
+    }
     return parts.join(", ");
   };
 
   const onMouseDown: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (event) => {
     // A roving `tabindex` can leave an inert cell click-focusable; block that native focus so a click
     // can't land on — or cross into — an outside/out-of-range day.
-    if (state.isDateNonFocusable(date())) event.preventDefault();
+    if (state.isDateNonFocusable(date())) {
+      event.preventDefault();
+    }
   };
   const onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (event) => {
     event.preventDefault();
-    if (state.isDateNonFocusable(date())) return; // inert — never activates, even via a forced click
+    if (state.isDateNonFocusable(date())) {
+      return; // inert — never activates, even via a forced click
+    }
     state.activate(date());
   };
   const onMouseEnter: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
@@ -141,7 +153,9 @@ export function createCalendarCell(
     // this synchronously — so the reads here would run in that effect's tracking scope. This is an
     // imperative sync with real focus, never a dependency, so untrack the whole body.
     untrack(() => {
-      if (state.isDateNonFocusable(date())) return;
+      if (state.isDateNonFocusable(date())) {
+        return;
+      }
       state.setFocusedDate(date()); // keep the roving cursor synced with real focus
     });
   };

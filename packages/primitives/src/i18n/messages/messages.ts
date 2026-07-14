@@ -99,7 +99,9 @@ export type I18nCatalog = {
  * missing param leaves the placeholder untouched (surfaced by the dev-mode warning in the resolver).
  */
 export function interpolate(template: string, params?: Record<string, unknown>): string {
-  if (!params) return template;
+  if (!params) {
+    return template;
+  }
   return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, name: string) =>
     name in params ? String(params[name]) : match,
   );

@@ -55,7 +55,9 @@ export const rangeSelection: SelectionStrategy = {
   },
 
   highlightedRange(state, highlightEnd) {
-    if (state.anchor === null || highlightEnd === null) return null;
+    if (state.anchor === null || highlightEnd === null) {
+      return null;
+    }
     return order(state.anchor, highlightEnd);
   },
 

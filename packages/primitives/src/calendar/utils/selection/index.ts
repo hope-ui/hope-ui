@@ -92,8 +92,14 @@ export function selectionStrategyFor(mode: CalendarSelectionMode): SelectionStra
  * range → its start, multiple → the first selected day. Null when nothing is selected.
  */
 export function firstDateOf(value: CalendarValue): CalendarDate | null {
-  if (value == null) return null;
-  if (Array.isArray(value)) return value[0] ?? null;
-  if ("start" in value) return value.start;
+  if (value == null) {
+    return null;
+  }
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  if ("start" in value) {
+    return value.start;
+  }
   return value;
 }

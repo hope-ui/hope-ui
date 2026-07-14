@@ -6,7 +6,9 @@ describe("buildYearCells", () => {
   it("produces a 4x3 grid of the 12 months, each a month start", () => {
     const rows = buildYearCells(new CalendarDate(2026, 6, 15), "en-US", "UTC");
     expect(rows).toHaveLength(4);
-    for (const row of rows) expect(row).toHaveLength(3);
+    for (const row of rows) {
+      expect(row).toHaveLength(3);
+    }
 
     const flat = rows.flat();
     expect(flat).toHaveLength(MONTHS_PER_YEAR);

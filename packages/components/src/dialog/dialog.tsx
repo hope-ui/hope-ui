@@ -66,7 +66,9 @@ export const Portal: Component<DialogPortalProps> = (props) => {
   // @solidjs/web's Portal throws server-side ("Portal is not supported on the server") rather
   // than degrading gracefully, so this must never render it during SSR. `isServer` is a fixed
   // per-environment constant, so a plain `if` (not `<Show>`) — there's no reactive branch.
-  if (isServer) return null;
+  if (isServer) {
+    return null;
+  }
 
   const state = useDialogContext();
   const portal = createDialogPortal(state);

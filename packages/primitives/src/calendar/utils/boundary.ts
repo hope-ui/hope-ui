@@ -34,7 +34,9 @@ export function isDateOutOfRange(
  * (its last day is still < `min`), so there is nothing reachable to navigate back to. Pure.
  */
 export function isPreviousMonthDisabled(visibleMonth: CalendarDate, min?: CalendarDate): boolean {
-  if (min === undefined) return false;
+  if (min === undefined) {
+    return false;
+  }
   return endOfMonth(visibleMonth.subtract({ months: 1 })).compare(min) < 0;
 }
 
@@ -43,25 +45,33 @@ export function isPreviousMonthDisabled(visibleMonth: CalendarDate, min?: Calend
  * day is already > `max`). Pure.
  */
 export function isNextMonthDisabled(visibleMonth: CalendarDate, max?: CalendarDate): boolean {
-  if (max === undefined) return false;
+  if (max === undefined) {
+    return false;
+  }
   return startOfMonth(visibleMonth.add({ months: 1 })).compare(max) > 0;
 }
 
 /** Year view: "prev" is disabled when the whole previous year ends before `min`. Pure. */
 export function isPreviousYearDisabled(visibleMonth: CalendarDate, min?: CalendarDate): boolean {
-  if (min === undefined) return false;
+  if (min === undefined) {
+    return false;
+  }
   return endOfYear(visibleMonth.subtract({ years: 1 })).compare(min) < 0;
 }
 
 /** Year view: "next" is disabled when the whole next year starts after `max`. Pure. */
 export function isNextYearDisabled(visibleMonth: CalendarDate, max?: CalendarDate): boolean {
-  if (max === undefined) return false;
+  if (max === undefined) {
+    return false;
+  }
   return startOfYear(visibleMonth.add({ years: 1 })).compare(max) > 0;
 }
 
 /** Decade view: "prev" is disabled when the whole previous decade ends before `min`. Pure. */
 export function isPreviousDecadeDisabled(visibleMonth: CalendarDate, min?: CalendarDate): boolean {
-  if (min === undefined) return false;
+  if (min === undefined) {
+    return false;
+  }
   // The previous decade's last year is (decadeStart − 1); disabled if its Dec 31 is still < min.
   const prevDecadeLastYear = startOfYear(visibleMonth).set({
     year: decadeStart(visibleMonth.year) - 1,
@@ -71,7 +81,9 @@ export function isPreviousDecadeDisabled(visibleMonth: CalendarDate, min?: Calen
 
 /** Decade view: "next" is disabled when the whole next decade starts after `max`. Pure. */
 export function isNextDecadeDisabled(visibleMonth: CalendarDate, max?: CalendarDate): boolean {
-  if (max === undefined) return false;
+  if (max === undefined) {
+    return false;
+  }
   // The next decade's first year is (decadeStart + 10); disabled if its Jan 1 is already > max.
   const nextDecadeFirstYear = startOfYear(visibleMonth).set({
     year: decadeStart(visibleMonth.year) + YEARS_PER_DECADE,
