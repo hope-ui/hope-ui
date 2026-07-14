@@ -29,11 +29,11 @@ describe("multipleSelection", () => {
     expect(multipleSelection.isSelected(state, d(4))).toBe(false);
   });
 
-  it("has no range or preview state", () => {
+  it("has no range or highlight state", () => {
     const state: SelectionState = { value: [d(3)], anchor: null };
     expect(multipleSelection.isRangeStart(state, d(3))).toBe(false);
     expect(multipleSelection.isRangeMiddle(state, d(3))).toBe(false);
     expect(multipleSelection.isRangeEnd(state, d(3))).toBe(false);
-    expect(multipleSelection.isInPreviewRange(state, d(3), d(5))).toBe(false);
+    expect(multipleSelection.highlightedRange(state, d(5))).toBeNull();
   });
 });

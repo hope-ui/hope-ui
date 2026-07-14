@@ -22,12 +22,12 @@ describe("singleSelection", () => {
     expect(singleSelection.isSelected(state, d(11))).toBe(false);
   });
 
-  it("has no range or preview state", () => {
+  it("has no range or highlight state", () => {
     const state: SelectionState = { value: d(10), anchor: null };
     expect(singleSelection.isRangeStart(state, d(10))).toBe(false);
     expect(singleSelection.isRangeMiddle(state, d(10))).toBe(false);
     expect(singleSelection.isRangeEnd(state, d(10))).toBe(false);
-    expect(singleSelection.isInPreviewRange(state, d(10), d(12))).toBe(false);
+    expect(singleSelection.highlightedRange(state, d(12))).toBeNull();
   });
 });
 

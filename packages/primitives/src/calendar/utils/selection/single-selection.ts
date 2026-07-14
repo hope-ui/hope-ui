@@ -8,7 +8,8 @@ function asSingle(value: CalendarValue): CalendarDate | null {
 
 /**
  * Single-date selection: activating a day replaces the selection with it. There is no range, no
- * anchor, and no hover preview — every range/preview predicate is false. `extend` is ignored.
+ * anchor, and no hover highlight — every range predicate is false and `highlightedRange` is null.
+ * `extend` is ignored.
  */
 export const singleSelection: SelectionStrategy = {
   mode: "single",
@@ -27,8 +28,8 @@ export const singleSelection: SelectionStrategy = {
   isRangeEnd() {
     return false;
   },
-  isInPreviewRange() {
-    return false;
+  highlightedRange() {
+    return null;
   },
 
   select(_state, date) {

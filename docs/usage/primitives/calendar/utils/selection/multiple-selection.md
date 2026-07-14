@@ -1,7 +1,8 @@
 # `multipleSelection`
 
 Multiple `SelectionStrategy`: each activate toggles a day in/out of a set. No range, no anchor, no
-preview — the range/preview predicates are all `false` and `extend` is ignored. Pure + stateless.
+highlight — the range predicates are all `false`, `highlightedRange` is `null`, and `extend` is
+ignored. Pure + stateless.
 
 ## Shape
 

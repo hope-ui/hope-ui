@@ -1,0 +1,66 @@
+/*
+ * @hope-ui/themes — shared structural layer (`_base/`), not a published theme subpath.
+ *
+ * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-theme in `<theme>/tokens.css`) into
+ * Tailwind's color namespace, so component utilities stay clean and unprefixed: `bg-primary`,
+ * `text-foreground`, `text-on-primary`, `border-subtle`, `ring-focus`, `bg-scrim`, and role borders
+ * `border-primary` (reusing the role color).
+ *
+ * This mapping is a pure function of the fixed `SEMANTIC_COLOR_TOKENS` contract (@hope-ui/theming) —
+ * identical for every theme — which is exactly why it is shared here instead of copied into each one.
+ * Because it is `inline`, each generated utility inlines the `var(--hope-*)` value directly, so a
+ * single per-theme `--hope-*` layer drives light/dark with no extra indirection. Generates the
+ * `bg-`, `text-`, `border-`, and `ring-` families for each name (unused ones are harmless).
+ */
+@theme inline {
+  /* Surfaces */
+  --color-surface: var(--hope-surface);
+  --color-surface-raised: var(--hope-surface-raised);
+  --color-surface-overlay: var(--hope-surface-overlay);
+  --color-surface-sunken: var(--hope-surface-sunken);
+  --color-surface-inverse: var(--hope-surface-inverse);
+
+  /* Standard text ramp */
+  --color-foreground: var(--hope-foreground);
+  --color-foreground-muted: var(--hope-foreground-muted);
+  --color-foreground-subtle: var(--hope-foreground-subtle);
+  --color-foreground-disabled: var(--hope-foreground-disabled);
+
+  /* On-color text */
+  --color-on-primary: var(--hope-on-primary);
+  --color-on-primary-subtle: var(--hope-on-primary-subtle);
+  --color-on-neutral: var(--hope-on-neutral);
+  --color-on-neutral-subtle: var(--hope-on-neutral-subtle);
+  --color-on-success: var(--hope-on-success);
+  --color-on-success-subtle: var(--hope-on-success-subtle);
+  --color-on-info: var(--hope-on-info);
+  --color-on-info-subtle: var(--hope-on-info-subtle);
+  --color-on-warning: var(--hope-on-warning);
+  --color-on-warning-subtle: var(--hope-on-warning-subtle);
+  --color-on-danger: var(--hope-on-danger);
+  --color-on-danger-subtle: var(--hope-on-danger-subtle);
+  --color-on-inverse: var(--hope-on-inverse);
+
+  /* Role fills */
+  --color-primary: var(--hope-primary);
+  --color-primary-subtle: var(--hope-primary-subtle);
+  --color-neutral: var(--hope-neutral);
+  --color-neutral-subtle: var(--hope-neutral-subtle);
+  --color-success: var(--hope-success);
+  --color-success-subtle: var(--hope-success-subtle);
+  --color-info: var(--hope-info);
+  --color-info-subtle: var(--hope-info-subtle);
+  --color-warning: var(--hope-warning);
+  --color-warning-subtle: var(--hope-warning-subtle);
+  --color-danger: var(--hope-danger);
+  --color-danger-subtle: var(--hope-danger-subtle);
+
+  /* Neutral borders */
+  --color-subtle: var(--hope-subtle);
+  --color-strong: var(--hope-strong);
+  --color-disabled: var(--hope-disabled);
+
+  /* Systemic */
+  --color-focus: var(--hope-focus);
+  --color-scrim: var(--hope-scrim);
+}

@@ -42,5 +42,7 @@ Neutral surfaces pair with the `foreground*` ramp.
 ## Conformance
 
 A theme proves it defines every token with `checkSemanticTokenConformance` /
-`assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`) run against its `theme.css`.
+`assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`) run against the file that
+declares the `--hope-*` values (in `@hope-ui/themes/hope` that is `tokens.css`, the palette layer —
+`theme.css` is only the orchestrator that imports it and the shared `_base/*`).
 An undefined token compiles every referencing utility to an unresolved `var(--hope-…)`.

@@ -16,6 +16,7 @@ stateless.
 ## Predicates
 
 - `isSelected` covers the whole committed span; `isRange{Start,Middle,End}` refine endpoints for
-  corner paint; `isInPreviewRange` highlights the tentative `[anchor … preview]` span while selecting.
+  corner paint; `highlightedRange` returns the tentative `[anchor … highlightEnd]` span while
+  selecting (null otherwise), which the root derives cell membership from.
 
 Ranges are always ordered (`start <= end`). Ported verbatim from the Angular calendar.

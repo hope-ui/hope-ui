@@ -21,8 +21,8 @@ export interface CalendarDayState {
   readonly isRangeStart: boolean;
   readonly isRangeMiddle: boolean;
   readonly isRangeEnd: boolean;
-  /** Inside the range hover-preview band (range mode). */
-  readonly isPreview: boolean;
+  /** Inside the tentative hover-range band while a range selection is in progress (range mode). */
+  readonly isHighlighted: boolean;
   /** The roving cursor is on this cell. */
   readonly isFocused: boolean;
   /** `isDateDisabled` hit — focusable + announced, but not selectable. */
@@ -91,7 +91,7 @@ export function createCalendarCell(
   const isRangeStart = () => state.isRangeStart(date());
   const isRangeMiddle = () => state.isRangeMiddle(date());
   const isRangeEnd = () => state.isRangeEnd(date());
-  const isPreview = () => state.isInPreviewRange(date());
+  const isHighlighted = () => state.isHighlighted(date());
   const isUnavailable = () => state.isDateUnavailable(date());
   const isDisabledPaint = () => isUnavailable() || state.isCellOutOfRange(date());
 
@@ -104,7 +104,7 @@ export function createCalendarCell(
     isRangeStart: isRangeStart(),
     isRangeMiddle: isRangeMiddle(),
     isRangeEnd: isRangeEnd(),
-    isPreview: isPreview(),
+    isHighlighted: isHighlighted(),
     isFocused: isFocused(),
     isUnavailable: isUnavailable(),
     isDisabled: isDisabledPaint(),
@@ -134,7 +134,7 @@ export function createCalendarCell(
     state.activate(date());
   };
   const onMouseEnter: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
-    state.setPreviewDate(date());
+    state.highlightDate(date());
   };
   const onFocus: JSX.EventHandler<HTMLButtonElement, FocusEvent> = () => {
     // `createListFocus` moves DOM focus from inside its own effect (`element.focus()`), which fires
@@ -156,7 +156,7 @@ export function createCalendarCell(
     get "data-today"() {
       return isToday() ? "" : undefined;
     },
-    get "data-outside"() {
+    get "data-outside-month"() {
       return isOutside() ? "" : undefined;
     },
     get "data-disabled"() {
@@ -174,8 +174,8 @@ export function createCalendarCell(
     get "data-range-end"() {
       return isRangeEnd() ? "" : undefined;
     },
-    get "data-preview"() {
-      return isPreview() ? "" : undefined;
+    get "data-highlighted"() {
+      return isHighlighted() ? "" : undefined;
     },
     get "data-focused"() {
       return isFocused() ? "" : undefined;

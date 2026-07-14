@@ -48,6 +48,7 @@ import {
 import {
   type CalendarSelectionMode,
   type CalendarValue,
+  type DateRange,
   firstDateOf,
   type SelectionState,
   selectionStrategyFor,
@@ -121,8 +122,9 @@ export interface CreateCalendarReturn {
   visibleMonth: Accessor<CalendarDate>;
   focusedDate: Accessor<CalendarDate>;
   selectionValue: Accessor<CalendarValue>;
-  previewDate: Accessor<CalendarDate | null>;
-  rangeAnchor: Accessor<CalendarDate | null>;
+  anchorDate: Accessor<CalendarDate | null>;
+  /** Derived: the tentative highlight range while a range selection is in progress (else null). */
+  highlightedRange: Accessor<DateRange | null>;
   todayDate: Accessor<CalendarDate>;
 
   // --- computeds ---
@@ -145,8 +147,8 @@ export interface CreateCalendarReturn {
   setView: (view: CalendarView) => void;
   setFocusedDate: (date: CalendarDate) => void;
   activate: (date: CalendarDate, opts?: { extend?: boolean }) => void;
-  setPreviewDate: (date: CalendarDate | null) => void;
-  clearPreview: () => void;
+  /** Move the tentative highlight end to `date` (range mode, mid-selection); `null` clears it. */
+  highlightDate: (date: CalendarDate | null) => void;
 
   // --- per-date predicates ---
   isOutsideVisibleScope: (date: CalendarDate) => boolean;
@@ -161,7 +163,7 @@ export interface CreateCalendarReturn {
   isRangeStart: (date: CalendarDate) => boolean;
   isRangeMiddle: (date: CalendarDate) => boolean;
   isRangeEnd: (date: CalendarDate) => boolean;
-  isInPreviewRange: (date: CalendarDate) => boolean;
+  isHighlighted: (date: CalendarDate) => boolean;
   formatCellName: (date: CalendarDate) => string;
   formatFullDate: (date: CalendarDate) => string;
 
@@ -237,13 +239,15 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     value: () => options.value,
     defaultValue: () => options.defaultValue ?? null,
   });
-  const [previewDate, setPreviewDateSignal] = createSignal<CalendarDate | null>(null);
-  const [rangeAnchor, setRangeAnchor] = createSignal<CalendarDate | null>(null);
+  // The tentative highlight end (hover/focus date) while a range selection is in progress. Internal:
+  // the public surface is the derived `highlightedRange` accessor + the `highlightDate` setter.
+  const [highlightEnd, setHighlightEnd] = createSignal<CalendarDate | null>(null);
+  const [anchorDate, setAnchorDate] = createSignal<CalendarDate | null>(null);
 
   const strategy = createMemo(() => selectionStrategyFor(mode()));
   const selectionState = createMemo<SelectionState>(() => ({
     value: selectionValue(),
-    anchor: rangeAnchor(),
+    anchor: anchorDate(),
   }));
 
   // The visible scope follows the cursor when it leaves — the arrow-off-the-edge / drill crossing. One
@@ -353,8 +357,15 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const isRangeStart = (date: CalendarDate) => strategy().isRangeStart(selectionState(), date);
   const isRangeMiddle = (date: CalendarDate) => strategy().isRangeMiddle(selectionState(), date);
   const isRangeEnd = (date: CalendarDate) => strategy().isRangeEnd(selectionState(), date);
-  const isInPreviewRange = (date: CalendarDate) =>
-    strategy().isInPreviewRange(selectionState(), date, previewDate());
+  // The tentative highlight range (anchor → highlightEnd) while mid-selection; cells derive membership.
+  // A plain accessor (like the sibling predicates), NOT createMemo: an extra reactive node created in
+  // this render would advance the hydration-id counter and shift every `_hk` in the SSR tree.
+  const highlightedRange = (): DateRange | null =>
+    strategy().highlightedRange(selectionState(), highlightEnd());
+  const isHighlighted = (date: CalendarDate) => {
+    const range = highlightedRange();
+    return range !== null && date.compare(range.start) >= 0 && date.compare(range.end) <= 0;
+  };
 
   const formatCellName = (date: CalendarDate) => {
     switch (view()) {
@@ -457,12 +468,12 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     if (!isDateSelectable(date)) return;
     const strat = strategy();
     let state = selectionState();
-    if (opts?.extend && mode() === "range" && rangeAnchor() === null) {
+    if (opts?.extend && mode() === "range" && anchorDate() === null) {
       state = strat.select(state, focusedDate(), { extend: false });
     }
     const nextState = strat.select(state, date, opts);
     setSelectionValue(nextState.value);
-    setRangeAnchor(nextState.anchor);
+    setAnchorDate(nextState.anchor);
     setFocusedDate(date);
     if (nextState.anchor === null) {
       options.onValueChange?.(nextState.value);
@@ -470,8 +481,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
 
-  const setPreviewDate = (date: CalendarDate | null) => setPreviewDateSignal(date);
-  const clearPreview = () => setPreviewDateSignal(null);
+  const highlightDate = (date: CalendarDate | null) => setHighlightEnd(date);
 
   // --- Shared navigation kernel (grid + cell part hooks compose these) ---
   const collection = createCollection<string>();
@@ -523,8 +533,8 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     visibleMonth,
     focusedDate,
     selectionValue,
-    previewDate,
-    rangeAnchor,
+    anchorDate,
+    highlightedRange,
     todayDate,
     cells,
     weekdays,
@@ -541,8 +551,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     setView,
     setFocusedDate,
     activate,
-    setPreviewDate,
-    clearPreview,
+    highlightDate,
     isOutsideVisibleScope,
     isOutOfRange,
     isCellOutOfRange,
@@ -555,7 +564,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     isRangeStart,
     isRangeMiddle,
     isRangeEnd,
-    isInPreviewRange,
+    isHighlighted,
     formatCellName,
     formatFullDate: formatFull,
     collection,

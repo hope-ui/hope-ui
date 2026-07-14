@@ -131,15 +131,34 @@ describe("createCalendar — selection", () => {
     const onValueChange = vi.fn();
     const { api, dispose } = setup({ selectionMode: "range", onValueChange });
     flush(() => api.activate(new CalendarDate(2026, 1, 20)));
-    expect(api.rangeAnchor()).not.toBeNull();
+    expect(api.anchorDate()).not.toBeNull();
     expect(onValueChange).not.toHaveBeenCalled();
 
     flush(() => api.activate(new CalendarDate(2026, 1, 10)));
-    expect(api.rangeAnchor()).toBeNull();
+    expect(api.anchorDate()).toBeNull();
     const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
     expect(iso(value.start)).toBe("2026-01-10");
     expect(iso(value.end)).toBe("2026-01-20");
     expect(onValueChange).toHaveBeenCalledTimes(1);
+    dispose();
+  });
+
+  it("range: highlightDate drives highlightedRange + isHighlighted while mid-selection; null clears", () => {
+    const { api, dispose } = setup({ selectionMode: "range" });
+    // Anchor the range, then hover a later day.
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+
+    const range = api.highlightedRange();
+    expect(range).not.toBeNull();
+    expect(iso(range?.start as CalendarDate)).toBe("2026-01-10");
+    expect(iso(range?.end as CalendarDate)).toBe("2026-01-14");
+    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(api.isHighlighted(new CalendarDate(2026, 1, 15))).toBe(false);
+
+    flush(() => api.highlightDate(null));
+    expect(api.highlightedRange()).toBeNull();
+    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(false);
     dispose();
   });
 

@@ -61,12 +61,17 @@ describe("rangeSelection predicates", () => {
     expect(rangeSelection.isRangeEnd(state, d(14))).toBe(true);
   });
 
-  it("isInPreviewRange spans anchor→preview only while selecting", () => {
+  it("highlightedRange spans anchor→highlightEnd (ordered) only while selecting", () => {
     const selecting: SelectionState = { value: { start: d(10), end: d(10) }, anchor: d(10) };
-    expect(rangeSelection.isInPreviewRange(selecting, d(12), d(14))).toBe(true);
-    expect(rangeSelection.isInPreviewRange(selecting, d(15), d(14))).toBe(false);
-    // No preview date, or no anchor → false.
-    expect(rangeSelection.isInPreviewRange(selecting, d(12), null)).toBe(false);
-    expect(rangeSelection.isInPreviewRange(state, d(12), d(14))).toBe(false);
+    const forward = rangeSelection.highlightedRange(selecting, d(14));
+    expect(forward?.start.toString()).toBe("2026-01-10");
+    expect(forward?.end.toString()).toBe("2026-01-14");
+    // Reorders when the hover end precedes the anchor.
+    const backward = rangeSelection.highlightedRange(selecting, d(5));
+    expect(backward?.start.toString()).toBe("2026-01-05");
+    expect(backward?.end.toString()).toBe("2026-01-10");
+    // No highlightEnd, or no anchor (not mid-selection) → null.
+    expect(rangeSelection.highlightedRange(selecting, null)).toBeNull();
+    expect(rangeSelection.highlightedRange(state, d(14))).toBeNull();
   });
 });

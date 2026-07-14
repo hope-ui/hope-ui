@@ -187,7 +187,7 @@ export function createCalendarGrid(
     },
     get onPointerLeave() {
       return composeEventHandlers<HTMLTableElement, PointerEvent>(props.onPointerLeave, () =>
-        state.clearPreview(),
+        state.highlightDate(null),
       );
     },
   });

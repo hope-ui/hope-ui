@@ -1,0 +1,109 @@
+/*
+ * @hope-ui/themes/hope — token values (the hope palette).
+ *
+ * The swap layer: this is the file you edit to reskin hope. It declares hope-ui's semantic tokens as
+ * collision-safe `--hope-<token>` variables under `:root` (light) and `.dark`; the shared
+ * `_base/theme-map.css` maps them into Tailwind's color namespace.
+ *
+ * STRUCTURE NOW, AESTHETIC LATER. These are functional placeholder values (approximating Tailwind's
+ * palette); the final hope look is designed by editing the values here — the token names, the shared
+ * mapping, and the light/dark wiring do not change. Values are literal hex rather than `var(--color-*)`
+ * refs, so the theme is self-contained and never depends on which Tailwind theme vars are emitted.
+ *
+ * Completeness — every token in `SEMANTIC_COLOR_TOKENS` (@hope-ui/theming) declared here — is asserted
+ * by the conformance test in `__tests__/hope.test.ts`, which reads THIS file. A missing token compiles
+ * every referencing utility to an unresolved `var(--hope-…)`.
+ */
+:root {
+  /* Surfaces (elevation) */
+  --hope-surface: #ffffff;
+  --hope-surface-raised: #ffffff;
+  --hope-surface-overlay: #ffffff;
+  --hope-surface-sunken: #f8fafc;
+  --hope-surface-inverse: #0f172a;
+
+  /* Standard text ramp (on neutral surfaces) */
+  --hope-foreground: #0f172a;
+  --hope-foreground-muted: #475569;
+  --hope-foreground-subtle: #94a3b8;
+  --hope-foreground-disabled: #cbd5e1;
+
+  /* On-color text (readable on a role fill or the inverse surface) */
+  --hope-on-primary: #ffffff;
+  --hope-on-primary-subtle: #1d4ed8;
+  --hope-on-neutral: #ffffff;
+  --hope-on-neutral-subtle: #334155;
+  --hope-on-success: #ffffff;
+  --hope-on-success-subtle: #15803d;
+  --hope-on-info: #ffffff;
+  --hope-on-info-subtle: #0369a1;
+  --hope-on-warning: #0f172a;
+  --hope-on-warning-subtle: #92400e;
+  --hope-on-danger: #ffffff;
+  --hope-on-danger-subtle: #b91c1c;
+  --hope-on-inverse: #f8fafc;
+
+  /* Role fills (bare = solid, -subtle = tonal) */
+  --hope-primary: #2563eb;
+  --hope-primary-subtle: #dbeafe;
+  --hope-neutral: #334155;
+  --hope-neutral-subtle: #f1f5f9;
+  --hope-success: #16a34a;
+  --hope-success-subtle: #dcfce7;
+  --hope-info: #0284c7;
+  --hope-info-subtle: #e0f2fe;
+  --hope-warning: #fbbf24;
+  --hope-warning-subtle: #fef3c7;
+  --hope-danger: #dc2626;
+  --hope-danger-subtle: #fee2e2;
+
+  /* Neutral borders (role borders reuse the role color) */
+  --hope-subtle: #e2e8f0;
+  --hope-strong: #cbd5e1;
+  --hope-disabled: #e2e8f0;
+
+  /* Systemic */
+  --hope-focus: #2563eb;
+  --hope-scrim: rgb(15 23 42 / 0.5);
+}
+
+.dark {
+  /* Surfaces */
+  --hope-surface: #020617;
+  --hope-surface-raised: #0f172a;
+  --hope-surface-overlay: #0f172a;
+  --hope-surface-sunken: #000000;
+  --hope-surface-inverse: #f8fafc;
+
+  /* Standard text ramp */
+  --hope-foreground: #f8fafc;
+  --hope-foreground-muted: #94a3b8;
+  --hope-foreground-subtle: #64748b;
+  --hope-foreground-disabled: #475569;
+
+  /* On-color text — solid on-colors carry over; subtle on-colors lighten for dark tints */
+  --hope-on-primary-subtle: #bfdbfe;
+  --hope-on-neutral-subtle: #e2e8f0;
+  --hope-on-success-subtle: #bbf7d0;
+  --hope-on-info-subtle: #bae6fd;
+  --hope-on-warning-subtle: #fde68a;
+  --hope-on-danger-subtle: #fecaca;
+  --hope-on-inverse: #0f172a;
+
+  /* Role fills — subtle fills become dark tints */
+  --hope-primary-subtle: #172554;
+  --hope-neutral-subtle: #1e293b;
+  --hope-success-subtle: #052e16;
+  --hope-info-subtle: #082f49;
+  --hope-warning-subtle: #451a03;
+  --hope-danger-subtle: #450a0a;
+
+  /* Neutral borders */
+  --hope-subtle: #1e293b;
+  --hope-strong: #334155;
+  --hope-disabled: #1e293b;
+
+  /* Systemic */
+  --hope-focus: #3b82f6;
+  --hope-scrim: rgb(0 0 0 / 0.7);
+}

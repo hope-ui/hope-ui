@@ -24,11 +24,12 @@ return, backed by the built-in en/fr catalog). Translate them app-wide by wrappi
 
 `CreateCalendarReturn` — resolved config accessors; the `t` message resolver (used by the part hooks
 for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
-`selectionValue`, `previewDate`, `rangeAnchor`, `todayDate`); computeds (`cells`, `weekdays`,
+`selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
-`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `setPreviewDate`,
-`clearPreview`); the per-date predicates; and the shared `collection` / `listFocus` / `announce` the
-part hooks use.
+`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`);
+the per-date predicates (incl. `isHighlighted`); and the shared `collection` / `listFocus` /
+`announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
+`highlightedRange`, `highlightDate`).
 
 ## The view machine
 

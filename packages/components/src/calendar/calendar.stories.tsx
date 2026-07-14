@@ -27,14 +27,14 @@ const styles = `
 .cal-grid button { width: 40px; height: 36px; border: 0; background: transparent; border-radius: 6px; cursor: pointer; color: #111; }
 .cal-grid[data-view="month"] button { width: 36px; }
 .cal-grid button:hover { background: #f0f0f0; }
-.cal-grid td[data-outside] button { color: #bbb; }
+.cal-grid td[data-outside-month] button { color: #bbb; }
 .cal-grid td[data-today] button { outline: 1px solid #888; }
 .cal-grid button:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; }
 .cal-grid td[data-selected] button,
 .cal-grid td[data-range-start] button,
 .cal-grid td[data-range-end] button { background: #2563eb; color: #fff; }
 .cal-grid td[data-range-middle] button,
-.cal-grid td[data-preview] button { background: #dbeafe; }
+.cal-grid td[data-highlighted] button { background: #dbeafe; }
 .cal-grid button[aria-disabled="true"] { color: #ccc; text-decoration: line-through; cursor: default; }
 `;
 

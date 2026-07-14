@@ -7,9 +7,9 @@ function asMultiple(value: CalendarValue): readonly CalendarDate[] {
 }
 
 /**
- * Multiple selection: each activate toggles `date` in/out of a set. No range, no anchor, no preview —
- * the range/preview predicates are all false and `extend` is ignored. The toggled set stays sorted so
- * `onValueChange` payloads are deterministic.
+ * Multiple selection: each activate toggles `date` in/out of a set. No range, no anchor, no highlight —
+ * the range predicates are all false, `highlightedRange` is null, and `extend` is ignored. The toggled
+ * set stays sorted so `onValueChange` payloads are deterministic.
  */
 export const multipleSelection: SelectionStrategy = {
   mode: "multiple",
@@ -27,8 +27,8 @@ export const multipleSelection: SelectionStrategy = {
   isRangeEnd() {
     return false;
   },
-  isInPreviewRange() {
-    return false;
+  highlightedRange() {
+    return null;
   },
 
   select(state, date) {
