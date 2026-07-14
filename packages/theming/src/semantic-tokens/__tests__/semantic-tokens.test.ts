@@ -13,10 +13,14 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("foreground");
     has("foreground-muted");
     has("on-primary");
-    has("on-danger-subtle");
+    has("on-danger-soft");
     has("on-inverse");
     has("primary");
-    has("danger-subtle");
+    has("primary-hover");
+    has("danger-hover");
+    has("danger-soft");
+    has("primary-outline");
+    has("warning-outline");
     has("subtle");
     has("strong");
     has("focus");

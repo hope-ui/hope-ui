@@ -28,32 +28,44 @@
 
   /* On-color text */
   --color-on-primary: var(--hope-on-primary);
-  --color-on-primary-subtle: var(--hope-on-primary-subtle);
+  --color-on-primary-soft: var(--hope-on-primary-soft);
   --color-on-neutral: var(--hope-on-neutral);
-  --color-on-neutral-subtle: var(--hope-on-neutral-subtle);
+  --color-on-neutral-soft: var(--hope-on-neutral-soft);
   --color-on-success: var(--hope-on-success);
-  --color-on-success-subtle: var(--hope-on-success-subtle);
+  --color-on-success-soft: var(--hope-on-success-soft);
   --color-on-info: var(--hope-on-info);
-  --color-on-info-subtle: var(--hope-on-info-subtle);
+  --color-on-info-soft: var(--hope-on-info-soft);
   --color-on-warning: var(--hope-on-warning);
-  --color-on-warning-subtle: var(--hope-on-warning-subtle);
+  --color-on-warning-soft: var(--hope-on-warning-soft);
   --color-on-danger: var(--hope-on-danger);
-  --color-on-danger-subtle: var(--hope-on-danger-subtle);
+  --color-on-danger-soft: var(--hope-on-danger-soft);
   --color-on-inverse: var(--hope-on-inverse);
 
   /* Role fills */
   --color-primary: var(--hope-primary);
-  --color-primary-subtle: var(--hope-primary-subtle);
+  --color-primary-hover: var(--hope-primary-hover);
+  --color-primary-soft: var(--hope-primary-soft);
+  --color-primary-outline: var(--hope-primary-outline);
   --color-neutral: var(--hope-neutral);
-  --color-neutral-subtle: var(--hope-neutral-subtle);
+  --color-neutral-hover: var(--hope-neutral-hover);
+  --color-neutral-soft: var(--hope-neutral-soft);
+  --color-neutral-outline: var(--hope-neutral-outline);
   --color-success: var(--hope-success);
-  --color-success-subtle: var(--hope-success-subtle);
+  --color-success-hover: var(--hope-success-hover);
+  --color-success-soft: var(--hope-success-soft);
+  --color-success-outline: var(--hope-success-outline);
   --color-info: var(--hope-info);
-  --color-info-subtle: var(--hope-info-subtle);
+  --color-info-hover: var(--hope-info-hover);
+  --color-info-soft: var(--hope-info-soft);
+  --color-info-outline: var(--hope-info-outline);
   --color-warning: var(--hope-warning);
-  --color-warning-subtle: var(--hope-warning-subtle);
+  --color-warning-hover: var(--hope-warning-hover);
+  --color-warning-soft: var(--hope-warning-soft);
+  --color-warning-outline: var(--hope-warning-outline);
   --color-danger: var(--hope-danger);
-  --color-danger-subtle: var(--hope-danger-subtle);
+  --color-danger-hover: var(--hope-danger-hover);
+  --color-danger-soft: var(--hope-danger-soft);
+  --color-danger-outline: var(--hope-danger-outline);
 
   /* Neutral borders */
   --color-subtle: var(--hope-subtle);

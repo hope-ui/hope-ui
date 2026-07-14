@@ -11,7 +11,7 @@
  * - **Standard text** on neutral surfaces uses the `foreground*` ramp → `text-foreground`,
  *   `text-foreground-muted`, …
  * - **On-color text** that must stay readable on a colored fill or the inverse surface uses the
- *   `on-*` prefix → `text-on-primary`, `text-on-danger-subtle`, `text-on-inverse`.
+ *   `on-*` prefix → `text-on-primary`, `text-on-danger-soft`, `text-on-inverse`.
  *
  * Icons fold into these same text tokens (currentColor) — there is no separate `icon` family.
  *
@@ -32,35 +32,48 @@ export const SEMANTIC_COLOR_TOKENS = [
   "foreground-subtle",
   "foreground-disabled",
 
-  // On-color text: readable on a role's fill (solid + subtle) or the inverse surface. `text-on-*`.
+  // On-color text: readable on a role's fill (solid + soft) or the inverse surface. `text-on-*`.
   "on-primary",
-  "on-primary-subtle",
+  "on-primary-soft",
   "on-neutral",
-  "on-neutral-subtle",
+  "on-neutral-soft",
   "on-success",
-  "on-success-subtle",
+  "on-success-soft",
   "on-info",
-  "on-info-subtle",
+  "on-info-soft",
   "on-warning",
-  "on-warning-subtle",
+  "on-warning-soft",
   "on-danger",
-  "on-danger-subtle",
+  "on-danger-soft",
   "on-inverse",
 
-  // Role fills (role-first, bare = solid; `-subtle` = tonal), used as `bg-*`. Role borders reuse
-  // these same colors (`border-primary`), so they need no dedicated token.
+  // Role fills (role-first, bare = solid; `-hover` = solid hover state; `-soft` = tonal), used as
+  // `bg-*`. The solid fill doubles as the solid border color (`border-primary`); the softer
+  // outline-button border has its own token (`-outline` = a light role tint, distinct from the fill).
   "primary",
-  "primary-subtle",
+  "primary-hover",
+  "primary-soft",
+  "primary-outline",
   "neutral",
-  "neutral-subtle",
+  "neutral-hover",
+  "neutral-soft",
+  "neutral-outline",
   "success",
-  "success-subtle",
+  "success-hover",
+  "success-soft",
+  "success-outline",
   "info",
-  "info-subtle",
+  "info-hover",
+  "info-soft",
+  "info-outline",
   "warning",
-  "warning-subtle",
+  "warning-hover",
+  "warning-soft",
+  "warning-outline",
   "danger",
-  "danger-subtle",
+  "danger-hover",
+  "danger-soft",
+  "danger-outline",
 
   // Neutral borders, used as `border-*`. Emphasis levels + disabled; no bare `border` token.
   "subtle",

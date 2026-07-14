@@ -35,32 +35,45 @@
 
   /* On-color text (readable on a role fill or the inverse surface) */
   --hope-on-primary: var(--color-white);
-  --hope-on-primary-subtle: var(--color-violet-700);
+  --hope-on-primary-soft: var(--color-violet-700);
   --hope-on-neutral: var(--color-white);
-  --hope-on-neutral-subtle: var(--color-mauve-700);
+  --hope-on-neutral-soft: var(--color-mauve-700);
   --hope-on-success: var(--color-white);
-  --hope-on-success-subtle: var(--color-green-700);
+  --hope-on-success-soft: var(--color-green-700);
   --hope-on-info: var(--color-white);
-  --hope-on-info-subtle: var(--color-sky-700);
+  --hope-on-info-soft: var(--color-sky-700);
   --hope-on-warning: var(--color-taupe-900);
-  --hope-on-warning-subtle: var(--color-amber-800);
+  --hope-on-warning-soft: var(--color-amber-800);
   --hope-on-danger: var(--color-white);
-  --hope-on-danger-subtle: var(--color-red-700);
+  --hope-on-danger-soft: var(--color-red-700);
   --hope-on-inverse: var(--color-mauve-50);
 
-  /* Role fills (bare = solid, -subtle = tonal) */
+  /* Role fills (bare = solid, -hover = solid hover, -soft = tonal, -outline = soft border tint) */
   --hope-primary: var(--color-violet-600);
-  --hope-primary-subtle: var(--color-violet-100);
+  --hope-primary-hover: var(--color-violet-700);
+  --hope-primary-soft: var(--color-violet-100);
+  --hope-primary-outline: var(--color-violet-300);
   --hope-neutral: var(--color-mauve-700);
-  --hope-neutral-subtle: var(--color-mauve-100);
+  --hope-neutral-hover: var(--color-mauve-800);
+  --hope-neutral-soft: var(--color-mauve-100);
+  --hope-neutral-outline: var(--color-mauve-300);
   --hope-success: var(--color-green-600);
-  --hope-success-subtle: var(--color-green-100);
+  --hope-success-hover: var(--color-green-700);
+  --hope-success-soft: var(--color-green-100);
+  --hope-success-outline: var(--color-green-300);
   --hope-info: var(--color-sky-600);
-  --hope-info-subtle: var(--color-sky-100);
+  --hope-info-hover: var(--color-sky-700);
+  --hope-info-soft: var(--color-sky-100);
+  --hope-info-outline: var(--color-sky-300);
+  /* warning: amber-300 is too pale to read as a border on white → nudged one step to amber-400 */
   --hope-warning: var(--color-amber-400);
-  --hope-warning-subtle: var(--color-amber-100);
+  --hope-warning-hover: var(--color-amber-500);
+  --hope-warning-soft: var(--color-amber-100);
+  --hope-warning-outline: var(--color-amber-400);
   --hope-danger: var(--color-red-600);
-  --hope-danger-subtle: var(--color-red-100);
+  --hope-danger-hover: var(--color-red-700);
+  --hope-danger-soft: var(--color-red-100);
+  --hope-danger-outline: var(--color-red-300);
 
   /* Neutral borders (role borders reuse the role color) */
   --hope-subtle: var(--color-mauve-200);
@@ -86,22 +99,46 @@
   --hope-foreground-subtle: var(--color-mauve-500);
   --hope-foreground-disabled: var(--color-mauve-600);
 
-  /* On-color text — solid on-colors carry over; subtle on-colors lighten for dark tints */
-  --hope-on-primary-subtle: var(--color-violet-200);
-  --hope-on-neutral-subtle: var(--color-mauve-200);
-  --hope-on-success-subtle: var(--color-green-200);
-  --hope-on-info-subtle: var(--color-sky-200);
-  --hope-on-warning-subtle: var(--color-amber-200);
-  --hope-on-danger-subtle: var(--color-red-200);
+  /* On-color text — mirrored fills lighten, so solid on-colors flip to near-black; soft on-colors stay light */
+  --hope-on-primary: var(--color-mauve-950);
+  --hope-on-primary-soft: var(--color-violet-200);
+  --hope-on-neutral: var(--color-mauve-950);
+  --hope-on-neutral-soft: var(--color-mauve-200);
+  --hope-on-success: var(--color-mauve-950);
+  --hope-on-success-soft: var(--color-green-200);
+  --hope-on-info: var(--color-mauve-950);
+  --hope-on-info-soft: var(--color-sky-200);
+  --hope-on-warning: var(--color-mauve-950);
+  --hope-on-warning-soft: var(--color-amber-200);
+  --hope-on-danger: var(--color-mauve-950);
+  --hope-on-danger-soft: var(--color-red-200);
   --hope-on-inverse: var(--color-mauve-900);
 
-  /* Role fills — subtle fills become dark tints */
-  --hope-primary-subtle: var(--color-violet-950);
-  --hope-neutral-subtle: var(--color-mauve-800);
-  --hope-success-subtle: var(--color-green-950);
-  --hope-info-subtle: var(--color-sky-950);
-  --hope-warning-subtle: var(--color-amber-950);
-  --hope-danger-subtle: var(--color-red-950);
+  /* Role fills — mirrored across the scale (600↔400, 700↔300, 500 fixed); soft & outline mirror too */
+  --hope-primary: var(--color-violet-400);
+  --hope-primary-hover: var(--color-violet-300);
+  --hope-primary-soft: var(--color-violet-950);
+  --hope-primary-outline: var(--color-violet-700);
+  --hope-neutral: var(--color-mauve-300);
+  --hope-neutral-hover: var(--color-mauve-200);
+  --hope-neutral-soft: var(--color-mauve-800);
+  --hope-neutral-outline: var(--color-mauve-700);
+  --hope-success: var(--color-green-400);
+  --hope-success-hover: var(--color-green-300);
+  --hope-success-soft: var(--color-green-950);
+  --hope-success-outline: var(--color-green-700);
+  --hope-info: var(--color-sky-400);
+  --hope-info-hover: var(--color-sky-300);
+  --hope-info-soft: var(--color-sky-950);
+  --hope-info-outline: var(--color-sky-700);
+  --hope-warning: var(--color-amber-600);
+  --hope-warning-hover: var(--color-amber-500);
+  --hope-warning-soft: var(--color-amber-950);
+  --hope-warning-outline: var(--color-amber-600);
+  --hope-danger: var(--color-red-400);
+  --hope-danger-hover: var(--color-red-300);
+  --hope-danger-soft: var(--color-red-950);
+  --hope-danger-outline: var(--color-red-700);
 
   /* Neutral borders */
   --hope-subtle: var(--color-mauve-800);
