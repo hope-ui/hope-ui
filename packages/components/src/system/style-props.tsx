@@ -60,19 +60,23 @@ export function renderStyled<Props extends { class?: unknown }, El extends Eleme
 
   // Which passed keys are style props is stable for a given render — the KEY (`p`, `bg`) is static;
   // only its VALUE is reactive — so compute the list once and read the values lazily in the `class`
-  // getter below. That is what preserves style-prop reactivity. `isCssProperty("css")` is true, so
-  // the `css` escape-hatch prop is captured here too.
-  const styleKeys = Object.keys(props).filter((key) => isCssProperty(key));
+  // getter below. That is what preserves style-prop reactivity. `isCssProperty("css")` is true, but
+  // the `css` escape hatch is a *nested* style object, not a per-prop value: Panda's `css()` does
+  // not flatten a `css` KEY, so folding it in with the others emits garbage (`color:css_red`).
+  // Exclude it here and pass its value as a sibling `css()` argument in the getter below, which is
+  // how Panda merges it (and lets it win ties — the documented escape-hatch precedence).
+  const styleKeys = Object.keys(props).filter((key) => isCssProperty(key) && key !== "css");
 
-  // `as`/`render`/`class` and the style props never reach the element as attributes: `as`/`render`
-  // are handled by `renderElement`, `class` and the style props become the computed class. `omit`
-  // keeps the rest reactive. Stripping `as`/`render` defensively lets callers hand us a raw
-  // component props bag (Box) or a hook's output (`trigger.props`) with no ceremony.
+  // `as`/`render`/`class`/`css` and the style props never reach the element as attributes:
+  // `as`/`render` are handled by `renderElement`, `class`/`css` and the style props become the
+  // computed class. `omit` keeps the rest reactive. Stripping `as`/`render` defensively lets callers
+  // hand us a raw component props bag (Box) or a hook's output (`trigger.props`) with no ceremony.
   const rest = omit(
     props as Record<string, unknown>,
     "as",
     "render",
     "class",
+    "css",
     ...styleKeys,
   ) as Props;
 
@@ -82,7 +86,10 @@ export function renderStyled<Props extends { class?: unknown }, El extends Eleme
       for (const key of styleKeys) styles[key] = (props as Record<string, unknown>)[key];
       return cx(
         options.recipeClass?.(),
-        css(styles as SystemStyleObject),
+        css(
+          styles as SystemStyleObject,
+          (props as { css?: unknown }).css as SystemStyleObject | undefined,
+        ),
         props.class as string | undefined,
       );
     },

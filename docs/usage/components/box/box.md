@@ -47,3 +47,7 @@ import { Box } from "@hope-ui/components/box";
   requires that the consumer's own `panda codegen` sees it.
 - `class` composes with the style-prop classes via `cx`; it does not resolve equal-specificity
   atomic conflicts (order-dependent). For a guaranteed override, use the `css` prop.
+- The `css` escape hatch is merged as a **sibling** to the style props (`css(styleProps, css)`),
+  so it wins ties over an equivalent style prop (`<Box color="red.300" css={{ color: "green.400" }} />`
+  resolves to `green.400`). Like every style, it must be a statically analyzable literal for the
+  consumer's `panda codegen` to emit the rule — a runtime-computed `css={dynamicObj}` won't extract.

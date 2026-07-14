@@ -496,16 +496,26 @@ minus the dom-compiled fallback some libraries ship. It retires the literal-elem
 tripwire. It has **no** effect on Panda style-prop extraction or the multi-theme recipe layer —
 those are build-time scans of the *consumer's* JSX and behave identically regardless.
 
-## `/jsx` + `/patterns`: hope-ui owns its own (Solid 2.0), never Panda's
+## `/jsx`: hope-ui owns its own (Solid 2.0), never Panda's — but `/patterns` helpers are fair game
 
-**Decision (recorded; building them is future work).** hope-ui will hand-write its own
-`styled` factory (`/jsx`) and layout patterns (`/patterns` — `Box`, `Flex`, `Stack`, …)
-targeting **Solid 2.0**. It will **never** use Panda's generated `/jsx` + `/patterns`:
-Panda emits those for Solid **1.x**, and they write literal host elements against the 1.x
-runtime. That was a hard blocker under the old single pre-compiled `generate: 'dom'`
-distribution; it is no longer (the source-shipping model above compiles literal elements
-per environment), but the 1.x/2.0 runtime mismatch remains, so Panda's factory stays out
-regardless.
+**Decision (recorded).** The ban is on Panda's generated **`/jsx`** layer — the `styled` factory
+and the JSX components it emits (e.g. `jsx/flex.mjs`). Panda emits those for Solid **1.x**: they
+call `createComponent`/`mergeProps` and write literal host elements against the 1.x runtime, and
+they never pass through the consumer's `vite-plugin-solid`, so they'd break the 2.0 ship-source
+model and hydration. That mismatch is intrinsic (independent of the old `generate: 'dom'`
+distribution), so hope-ui hand-writes its own Solid-2.0 components instead and
+`@hope-ui/styled-system` continues to **not** re-export Panda's `/jsx` factory.
+
+**Panda's `/patterns` helpers are a different thing and hope-ui does use them.** `flex.raw` /
+`getFlexStyle` (and the other pattern transforms) are **pure functions** — no Solid, no JSX, just
+prop → style-object/class-string mapping. `@hope-ui/components/flex` reuses `flex.raw` for its
+shorthand → canonical mapping (`align→alignItems`, …) rather than re-implementing it, which also
+guarantees hope-ui's runtime output matches what the consumer's `panda codegen` extracts from the
+**same** `flex` pattern config (`properties` + `transform`, jsxName `Flex`) shipped in every
+`@hope-ui/themes/*` preset. `Flex` is the first consumer of `/patterns`; future layout components
+(`Stack`, `Grid`, …) follow the same approach. (An earlier revision of this note said hope-ui would
+hand-write its own `/patterns` and "never use Panda's" — that over-generalized the `/jsx` ban to
+the pure helpers; corrected here.)
 
 This costs nothing in styling. Panda's style-prop extraction does **not** require its
 factory: with `jsxFramework: "solid"` its default `jsxStyleProps: "all"` extracts every
@@ -513,9 +523,8 @@ style prop from any capitalized JSX component the consumer writes — proven in-
 `packages/styled-system/styled-system/styles.css` carries `.bg_primary`/`.p_4` extracted
 from `box.stories.tsx`, whose `<Box>` is hand-written and registered nowhere. Recipe
 *variants* extract via the separate `jsx: [...]` recipe tracking property (see Part B of the
-feasibility report). Now that components may emit literal host elements, a hand-written
-`/jsx` + `/patterns` layer is unobstructed. `@hope-ui/styled-system` continues to **not**
-re-export Panda's `/jsx` factory.
+feasibility report). Now that components may emit literal host elements, hope-ui's hand-written
+Solid-2.0 components (which compose Panda's pure `/patterns` helpers, per above) are unobstructed.
 
 ## Testing/a11y strategy + Definition of Done (locked-in, non-negotiable)
 

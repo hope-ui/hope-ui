@@ -11,7 +11,8 @@
       "box": "src/box/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
-      "dialog": "src/dialog/index.ts"
+      "dialog": "src/dialog/index.ts",
+      "flex": "src/flex/index.ts"
     }
   },
   "exports": {
@@ -30,6 +31,10 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
+    },
+    "./flex": {
+      "types": "./dist/flex/index.d.ts",
+      "solid": "./dist/flex/index.jsx"
     },
     "./package.json": "./package.json"
   },

@@ -33,6 +33,14 @@ export const basePreset = definePreset({
       breakpoints,
     },
   },
+  // Some display values are set by component runtime logic, not by a literal a consumer writes —
+  // so Panda's usage scan never sees them and would emit no rule. `Flex`'s `inline` prop toggles
+  // `display: inline-flex` at runtime; `d_inline-flex`/`d_flex` must therefore be pre-generated for
+  // every consumer. Kept in `base` so every theme (chakra/nova) inherits it. Not a token, so the
+  // swap-safety token contract does not apply.
+  staticCss: {
+    css: [{ properties: { display: ["flex", "inline-flex"] } }],
+  },
 });
 
 export default basePreset;

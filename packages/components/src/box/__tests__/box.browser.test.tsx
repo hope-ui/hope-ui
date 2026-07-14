@@ -34,6 +34,37 @@ describe("Box", () => {
     dispose();
   });
 
+  it("applies the `css` escape-hatch prop as real atomic classes (not a nested `css` key)", async () => {
+    // Regression guard: renderStyled must pass `css` as a *sibling* css() arg, not fold it in as a
+    // `css` KEY — otherwise Panda emits garbage like `color:css_red` that matches no rule.
+    const { container, dispose } = mount(() => (
+      <Box p="4" css={{ color: "red.300" }}>
+        Box content
+      </Box>
+    ));
+
+    const el = container.querySelector("div");
+    expect(el?.classList.contains("p_4")).toBe(true);
+    expect(el?.classList.contains("c_red.300")).toBe(true);
+    // No nested-`css`-key garbage.
+    expect(
+      Array.from(el?.classList ?? []).some((c) => c.startsWith("css_") || c.includes(":css_")),
+    ).toBe(false);
+    dispose();
+  });
+
+  it("lets the `css` prop win over an equivalent style prop", async () => {
+    const { container, dispose } = mount(() => (
+      <Box color="red.300" css={{ color: "green.400" }}>
+        Box content
+      </Box>
+    ));
+
+    const el = container.querySelector("div");
+    expect(el?.classList.contains("c_green.400")).toBe(true);
+    dispose();
+  });
+
   it("renders as a different element via `as`", async () => {
     const { container, dispose } = mount(() => (
       <Box as="section" p="2">
