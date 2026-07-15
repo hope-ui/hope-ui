@@ -19,11 +19,13 @@ export type ButtonColor = "primary" | "neutral" | "success" | "warning" | "dange
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 /**
- * Internal loading layout the component derives from its `loading` + `loaderPlacement` props:
- * `none` (not loading), `center` (overlay — hides the label, preserves width), or `start`/`end`
- * (inline). Kept out of the component's public API — it's a recipe-only axis.
+ * Where the loader sits while the button is loading: `center` (overlay — hides the label,
+ * preserves width), or `start`/`end` (inline). **Layout only** — mounting/unmounting the loader
+ * slot is the component's job (it wraps the loader in `<Show when={isLoading()}>`), so this axis
+ * never has a "hidden"/"none" member. Shared by the recipe variant and the component's public
+ * `loaderPlacement` prop.
  */
-export type ButtonLoading = "none" | "center" | "start" | "end";
+export type ButtonLoaderPlacement = "start" | "center" | "end";
 
 /** The Button recipe's variant props. */
 export interface ButtonRecipeVariants {
@@ -31,7 +33,7 @@ export interface ButtonRecipeVariants {
   color?: ButtonColor;
   size?: ButtonSize;
   fullWidth?: boolean;
-  loading?: ButtonLoading;
+  loaderPlacement?: ButtonLoaderPlacement;
 }
 
 /** The Button recipe's slots. */

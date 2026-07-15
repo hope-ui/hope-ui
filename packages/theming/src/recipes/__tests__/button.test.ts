@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type {
   ButtonColor,
-  ButtonLoading,
+  ButtonLoaderPlacement,
   ButtonRecipeVariants,
   ButtonSize,
   ButtonSlot,
@@ -18,13 +18,14 @@ const _variants: ButtonRecipeVariants = {
   color: "danger",
   size: "lg",
   fullWidth: true,
-  loading: "center",
+  loaderPlacement: "center",
 };
 void _variants;
 
-// `ButtonLoading` is a recipe-only axis (not a public component prop).
-const _loading: ButtonLoading = "none";
-void _loading;
+// `loaderPlacement` is layout only (no "hidden"/"none"): the component mounts the loader slot via
+// `<Show>`, so the recipe variant and the component prop share this three-member union.
+const _placement: ButtonLoaderPlacement = "start";
+void _placement;
 
 describe("button recipe contract", () => {
   it("names every variant, color, size, and slot the recipe implements", () => {

@@ -202,8 +202,9 @@ export const buttonRecipe = tv({
       danger: {},
       info: {},
     },
-    loading: {
-      none: { loader: "hidden" },
+    // Layout only — the component mounts/unmounts the loader slot via `<Show>`, so there is no
+    // "hidden"/"none" member here. It passes `loaderPlacement: undefined` when not loading.
+    loaderPlacement: {
       // center = overlay: label + decorators keep their width but go invisible, loader fills & centers.
       center: {
         label: "opacity-0",
@@ -221,6 +222,5 @@ export const buttonRecipe = tv({
     color: "primary",
     size: "md",
     fullWidth: false,
-    loading: "none",
   },
 });

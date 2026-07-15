@@ -17,7 +17,7 @@ flat list of named recipe types and this file owns the Button shape.
 | `ButtonVariant` | `default` · `solid` · `soft` · `outline` · `ghost` · `link` | `default` is neutral chrome and ignores `color`. |
 | `ButtonColor` | `primary` · `neutral` · `success` · `warning` · `danger` · `info` | Semantic role color. |
 | `ButtonSize` | `xs` · `sm` · `md` · `lg` · `xl` | Heights 28 / 32 / 36 / 40 / 44px. |
-| `ButtonLoading` | `none` · `center` · `start` · `end` | Internal loading layout — **not** a public component prop; the component derives it from `loading` + `loaderPlacement`. |
+| `ButtonLoaderPlacement` | `start` · `center` · `end` | **Layout only.** Where the loader sits while loading (`center` overlays it and hides the label; `start`/`end` set loader order). Mounting/unmounting the loader slot is the component's job (`<Show when={isLoading()}>`), so there is no `hidden`/`none` member. Shared by this recipe variant and the component's public `loaderPlacement` prop. |
 | `ButtonSlot` | `root` · `label` · `startDecorator` · `endDecorator` · `loader` | The recipe's slots. |
 
 ## `ButtonRecipeVariants`
@@ -30,7 +30,7 @@ interface ButtonRecipeVariants {
   color?: ButtonColor;
   size?: ButtonSize;
   fullWidth?: boolean;
-  loading?: ButtonLoading;
+  loaderPlacement?: ButtonLoaderPlacement;
 }
 ```
 

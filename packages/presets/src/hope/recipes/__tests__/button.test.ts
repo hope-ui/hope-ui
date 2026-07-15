@@ -20,8 +20,8 @@ describe("hope button recipe", () => {
       ...VARIANTS.flatMap((variant) => COLORS.map((color) => ({ variant, color }))),
       ...SIZES.map((size) => ({ size })),
       { fullWidth: true },
-      { loading: "center" as const },
-      { loading: "start" as const },
+      { loaderPlacement: "center" as const },
+      { loaderPlacement: "start" as const },
     ];
     assertSlotRecipeConformance(buttonRecipe, { cases, slots: SLOTS });
   });
@@ -62,11 +62,25 @@ describe("hope button recipe", () => {
     expect(root).not.toMatch(/(?:^|\s)(?:disabled|aria-disabled):/);
   });
 
-  it("hides the label and centers the loader while loading (center overlay)", () => {
-    const loading = buttonRecipe({ variant: "solid", color: "primary", loading: "center" });
-    expect(loading.label()).toContain("opacity-0");
-    expect(loading.loader()).toContain("absolute");
-    expect(loading.loader()).not.toContain("hidden");
+  it("hides the label and centers the loader for the center placement (overlay)", () => {
+    const centered = buttonRecipe({
+      variant: "solid",
+      color: "primary",
+      loaderPlacement: "center",
+    });
+    expect(centered.label()).toContain("opacity-0");
+    expect(centered.loader()).toContain("absolute");
+    // Layout only: `center` shows the loader (the component mounts it), never `hidden`.
+    expect(centered.loader()).not.toContain("hidden");
+  });
+
+  it("orders the loader inline for start/end placement without touching the label", () => {
+    const start = buttonRecipe({ variant: "solid", color: "primary", loaderPlacement: "start" });
+    expect(start.loader()).toContain("order-first");
+    expect(start.label()).not.toContain("opacity-0");
+
+    const end = buttonRecipe({ variant: "solid", color: "primary", loaderPlacement: "end" });
+    expect(end.loader()).toContain("order-last");
   });
 
   it("merges a consumer class through the root slot function", () => {

@@ -5,18 +5,21 @@ import {
   renderElement,
   withDefaults,
 } from "@hope-ui/primitives/utils";
-import type { ButtonColor, ButtonSize, ButtonVariant } from "@hope-ui/theming";
+import type {
+  ButtonColor,
+  ButtonLoaderPlacement,
+  ButtonSize,
+  ButtonVariant,
+} from "@hope-ui/theming";
 import { useRecipe } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, createMemo, merge, omit, Show } from "solid-js";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
-// so consumers can still import it from the component's subpath.
-export type { ButtonColor, ButtonSize, ButtonVariant };
-
-/** Where the loader sits — a component-level prop, not part of the recipe's variant vocabulary. */
-export type ButtonLoaderPlacement = "start" | "center" | "end";
+// so consumers can still import it from the component's subpath. `ButtonLoaderPlacement` is shared
+// by the recipe's `loaderPlacement` variant and this component's `loaderPlacement` prop.
+export type { ButtonColor, ButtonLoaderPlacement, ButtonSize, ButtonVariant };
 
 // `color` shadows the native HTML `color` attribute, so it is dropped from the forwarded native
 // props and redefined below as the recipe's role selector.
@@ -115,7 +118,9 @@ export const Button: Component<ButtonProps> = (props) => {
       color: merged.color,
       size: merged.size,
       fullWidth: merged.fullWidth,
-      loading: isLoading() ? effectivePlacement() : "none",
+      // Layout only, and only while loading — the loader slot itself is mounted by `<Show>` below,
+      // so an unset placement (not loading) applies nothing.
+      loaderPlacement: isLoading() ? effectivePlacement() : undefined,
     }),
   );
 
