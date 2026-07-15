@@ -25,7 +25,7 @@ import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { hope } from "@hope-ui/presets/hope";
 
 const app = definePreset(hope, {
-  tokens: { colors: { primary: { light: "violet.600", dark: "violet.400" } } },
+  tokens: { colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } } },
   components: { button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } } },
 });
 

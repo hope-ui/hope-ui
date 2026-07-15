@@ -26,7 +26,7 @@ and `components/src/button/button.tsx`.
 > **Revised per user review.** Key redirections from the first draft: (a) the concrete-theme package
 > is **renamed `@hope-ui/themes` → `@hope-ui/presets`** and its CSS entry made explicit
 > (`.../hope/tailwind.css`); (b) `ThemeProvider`/`ThemeContext` names are **kept** (a preset *is* a
-> "theme preset"); (c) token keys are **camelCase + Tailwind-color shorthand** for JS/TS ergonomics;
+> "theme preset"); (c) token keys are **camelCase**, values are **`--color-*` references**, for JS/TS ergonomics;
 > (d) the recipe's `loading` axis is a **pre-existing API flaw** and is fixed, which lets
 > `defaultProps` become **`defaultVariants` typed straight from the recipe's tv variants** — the
 > separate `DefaultableProps` contract is dropped; (e) two small utilities (`useDefaults`,
@@ -62,15 +62,15 @@ and `components/src/button/button.tsx`.
   (`hope`); theme authors bootstrap a *root* preset by passing the raw `RecipeRegistry` map (the one
   place a registry is passed).
 
-### D2 — Token overrides: ergonomic camelCase keys, Tailwind shorthand, per-token `{light,dark?}`, nested `radii`
+### D2 — Token overrides: ergonomic camelCase keys, `--color-*` references, per-token `{light,dark?}`, nested `radii`
 
 ```ts
 tokens: {
   colors: {
-    primary:      { light: "violet.600", dark: "violet.400" }, // Tailwind shorthand → var(--color-violet-600)
-    warningSoft:  "amber.100",                                  // camelCase key; string = both modes
-    onPrimary:    { light: "#fff" },                            // raw color; dark omitted → inherits base
-    foregroundMuted: { light: "mauve.600", dark: "mauve.400" },
+    primary:      { light: "--color-violet-600", dark: "--color-violet-400" }, // palette var ref → var(--color-violet-600)
+    warningSoft:  "--color-amber-100",                                        // camelCase key; string = both modes
+    onPrimary:    { light: "#fff" },                                          // raw color; dark omitted → inherits base
+    foregroundMuted: { light: "--color-mauve-600", dark: "--color-mauve-400" },
   },
   radii: { base: "0.5rem" },                                    // → --hope-radii-base (extensible)
 }
@@ -82,9 +82,14 @@ tokens: {
   *(Interpretation of "not ergonomic JS/TS": the objection is kebab keys needing quotes, not
   type-safety — so we keep the closed union + IntelliSense and switch to camelCase. Flagged for
   confirmation.)*
-- **Tailwind-color shorthand:** a `"hue.step"` value (`"violet.500"`) normalizes to
-  `var(--color-violet-500)`; values starting with `var(`/`#`/`rgb(`/`oklch(`/… pass through raw. So
-  users get Tailwind colors out of the box without writing `var(--color-…)`.
+- **`--color-*` references:** a value starting with `--` (`"--color-violet-500"`) is wrapped to
+  `var(--color-violet-500)`; values starting with `var(`/`#`/`rgb(`/`oklch(`/… pass through raw. This
+  is deliberately explicit rather than a `"hue.step"` shorthand: the literal `--color-*` string then
+  lives in the preset's build-scanned source, so Tailwind keeps that palette var instead of
+  tree-shaking it — a runtime-only `var(--color-…)` the compiler never sees would otherwise resolve
+  to nothing. A consumer preset gets this for free (its token source is auto-scanned); the shipped
+  `hope` preset declares `@source "./index.ts"` in its `tailwind.css` because its tokens ship inside
+  the installed package.
 - **Per-token `{ light, dark? }` + string shorthand** (string = both modes). `dark` omitted → **no
   `.dark` override emitted** for that token → inherits the base theme's dark value.
 - **Radii are nested and extensible:** `tokens.radii.base` → `--hope-radii-base`, leaving room for
@@ -271,7 +276,7 @@ export function isPreset(value: unknown): value is Preset;
 ```ts
 /**
  * Deterministic `<style>` text from a preset's tokens. Normalizes camelCase keys → `--hope-<kebab>`,
- * radii → `--hope-radii-<key>`, and Tailwind shorthand ("violet.500" → var(--color-violet-500)).
+ * radii → `--hope-radii-<key>`, and `--color-*` references ("--color-violet-500" → var(--color-violet-500)).
  * Iterates SEMANTIC_COLOR_TOKENS in fixed order (byte-stable). "" when no overrides. Emits a
  * `.dark`/`@media` block only for tokens with a dark value; radii go in `:root`. Throws on values
  * with CSS-breaking chars (`{ } ; < >` / newlines).
@@ -533,7 +538,7 @@ Breaking, but small (pre-1.0; no changeset/publish per [[no-changesets-until-sta
 + import { hope } from "@hope-ui/presets/hope";
 + <ThemeProvider preset={hope}>{children}</ThemeProvider>
 ```
-- `useRecipe` unchanged. To customize: `definePreset(hope, { tokens: { colors: { primary: { light: "violet.600", dark: "violet.400" } } }, components: { button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } } } })`, then `<ThemeProvider preset={app}>`.
+- `useRecipe` unchanged. To customize: `definePreset(hope, { tokens: { colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } } }, components: { button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } } } })`, then `<ThemeProvider preset={app}>`.
 - Components gain an optional `slotClasses` prop (additive). Button's `loaderPlacement` prop is unchanged
   (the fix is internal to the recipe).
 
@@ -542,8 +547,8 @@ Breaking, but small (pre-1.0; no changeset/publish per [[no-changesets-until-sta
 ## Verification
 
 - **Type/IntelliSense:** `pnpm --filter @hope-ui/theming typecheck` — unknown token keys, unknown component
-  keys, wrong slot names, wrong `defaultVariants` values are all compile errors; `"violet.500"` shorthand
-  and camelCase keys autocomplete. Run `presets`/`token-css` unit tests for merge precedence + deterministic CSS.
+  keys, wrong slot names, wrong `defaultVariants` values are all compile errors; `"--color-violet-500"`
+  references and camelCase keys autocomplete. Run `presets`/`token-css` unit tests for merge precedence + deterministic CSS.
 - **SSR:** `pnpm test:ssr` — token fixture renders deterministically (identical bytes on re-run).
 - **Hydration/browser:** `pnpm test:browser` — token fixture hydrates with no console error/warn, one
   `<style>`, same-node reuse, no axe violations; Button `defaultVariants` + `slotClasses` precedence holds.

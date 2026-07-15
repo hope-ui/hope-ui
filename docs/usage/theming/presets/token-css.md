@@ -23,10 +23,14 @@ store tokens exactly as authored.
   returns its exact zero-DOM tree). Note the default `hope` preset is **not** empty — it authors its
   full palette in TS, so it renders a token `<style>`.
 - **Key normalization.** camelCase → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`).
-- **Value normalization.** Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and
-  the scale-less Tailwind colors `"white"` / `"black"` → `var(--color-white)` / `var(--color-black)`.
-  Values already starting with `var(` / `#` / `rgb` / `hsl` / `oklch` / `oklab` / `lab(` / `lch(` /
-  `hwb(` / `color(`, or a genuine CSS keyword (`transparent`, `currentColor`), pass through raw.
+- **Value normalization.** A value beginning with `--` is a CSS custom-property *reference* and is
+  wrapped in `var(...)` — `"--color-violet-500"` → `var(--color-violet-500)`. This is the deliberate
+  way to point a token at a Tailwind palette var (`--color-*`) or any other custom property: writing
+  the literal `--color-*` reference keeps it in the preset's build-scanned source, so Tailwind's
+  scanner retains that palette var instead of tree-shaking it (a bare `"violet.500"`-style shorthand
+  would not, so the runtime `var(--color-violet-500)` would resolve to nothing). Every other value is
+  an already-formed CSS color (`"#fff"`, `"var(--x)"`, `"oklch(…)"`, `"color-mix(…)"`,
+  `"transparent"`) and passes through raw.
 - **Per-mode split.** A token's `dark` value goes in a dark block; a token with no `dark` emits no
   dark override (it inherits the base theme).
 
@@ -42,7 +46,7 @@ store tokens exactly as authored.
 
 ```ts
 renderPresetStyle(
-  { colors: { primary: { light: "violet.600", dark: "violet.400" } } },
+  { colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } } },
   ".dark",
 );
 ```

@@ -25,10 +25,10 @@ describe("renderPresetStyle — determinism & normalization", () => {
     );
   });
 
-  it("normalizes Tailwind shorthand to var(--color-…) and passes raw values through", () => {
+  it("wraps a `--` custom-property reference in var(…) and passes raw values through", () => {
     const tokens: PresetTokens = {
       colors: {
-        primary: "violet.500", // shorthand
+        primary: "--color-violet-500", // Tailwind palette var reference
         surface: "#fff", // hex
         neutral: "var(--color-mauve-500)", // already a var()
         info: "oklch(0.7 0.1 250)", // functional color
@@ -46,11 +46,11 @@ describe("renderPresetStyle — determinism & normalization", () => {
     );
   });
 
-  it("normalizes the scale-less Tailwind colors white/black to their --color-* var", () => {
+  it("wraps the scale-less Tailwind colors via their --color-* reference", () => {
     const tokens: PresetTokens = {
       colors: {
-        surface: "white", // scale-less Tailwind color → var(--color-white)
-        foreground: "black", // → var(--color-black)
+        surface: "--color-white", // → var(--color-white)
+        foreground: "--color-black", // → var(--color-black)
         scrim: "transparent", // a genuine CSS keyword still passes through untouched
       },
     };
@@ -62,10 +62,22 @@ describe("renderPresetStyle — determinism & normalization", () => {
         "}",
     );
   });
+
+  it("passes a bare CSS color keyword through untouched (no longer treated as a Tailwind color)", () => {
+    // `"white"` is a valid CSS keyword; without the `--` prefix it is a literal value, not a
+    // reference to `--color-white`. This is the deliberate consequence of dropping the `hue.step`
+    // shorthand: the only normalization is `--…` → `var(--…)`.
+    const tokens: PresetTokens = { colors: { surface: "white", foreground: "rebeccapurple" } };
+    expect(renderPresetStyle(tokens, ".dark")).toBe(
+      ":root {\n  --hope-surface: white;\n  --hope-foreground: rebeccapurple;\n}",
+    );
+  });
 });
 
 describe("renderPresetStyle — dark modes", () => {
-  const tokens: PresetTokens = { colors: { primary: { light: "violet.600", dark: "violet.400" } } };
+  const tokens: PresetTokens = {
+    colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
+  };
 
   it("emits a selector dark block by default (.dark)", () => {
     expect(renderPresetStyle(tokens, ".dark")).toBe(
@@ -95,7 +107,7 @@ describe("renderPresetStyle — dark modes", () => {
   });
 
   it("emits no dark override for a token whose dark value is omitted", () => {
-    const lightOnly: PresetTokens = { colors: { primary: { light: "violet.600" } } };
+    const lightOnly: PresetTokens = { colors: { primary: { light: "--color-violet-600" } } };
     expect(renderPresetStyle(lightOnly, ".dark")).toBe(
       ":root {\n  --hope-primary: var(--color-violet-600);\n}",
     );
@@ -105,7 +117,7 @@ describe("renderPresetStyle — dark modes", () => {
     const mixed: PresetTokens = {
       colors: {
         surface: { light: "#fff", dark: "#000" },
-        primary: "violet.500", // string → both modes, no dark override
+        primary: "--color-violet-500", // string → both modes, no dark override
       },
     };
     expect(renderPresetStyle(mixed, ".dark")).toBe(
@@ -124,7 +136,10 @@ describe("renderPresetStyle — sanitization", () => {
 
   it("throws when the offending value is a token's dark value", () => {
     expect(() =>
-      renderPresetStyle({ colors: { primary: { light: "violet.600", dark: "x;y" } } }, ".dark"),
+      renderPresetStyle(
+        { colors: { primary: { light: "--color-violet-600", dark: "x;y" } } },
+        ".dark",
+      ),
     ).toThrow(/primary/);
   });
 });

@@ -33,25 +33,33 @@ describe("definePreset — bootstrap from a raw registry", () => {
     const preset = definePreset(registry, {
       darkMode: "media",
       tokens: {
-        colors: { primary: { light: "violet.600", dark: "violet.400" } },
+        colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
       },
       components: {
         button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } },
       },
     });
     expect(preset.darkMode).toBe("media");
-    expect(preset.tokens.colors?.primary).toEqual({ light: "violet.600", dark: "violet.400" });
+    expect(preset.tokens.colors?.primary).toEqual({
+      light: "--color-violet-600",
+      dark: "--color-violet-400",
+    });
     expect(preset.components.button?.defaultVariants).toEqual({ size: "sm" });
     expect(preset.components.button?.slotClasses).toEqual({ root: "rounded-full" });
   });
 
   it("retains camelCase keys and Tailwind-shorthand values verbatim (CSS transform is token-css's job)", () => {
     const preset = definePreset(registry, {
-      tokens: { colors: { onPrimarySoft: "amber.100", foregroundMuted: { light: "mauve.600" } } },
+      tokens: {
+        colors: {
+          onPrimarySoft: "--color-amber-100",
+          foregroundMuted: { light: "--color-mauve-600" },
+        },
+      },
     });
     expect(preset.tokens.colors).toEqual({
-      onPrimarySoft: "amber.100",
-      foregroundMuted: { light: "mauve.600" },
+      onPrimarySoft: "--color-amber-100",
+      foregroundMuted: { light: "--color-mauve-600" },
     });
   });
 });
@@ -59,7 +67,7 @@ describe("definePreset — bootstrap from a raw registry", () => {
 describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   const base = definePreset(registry, {
     darkMode: "[data-theme=dark]",
-    tokens: { colors: { primary: "violet.600", neutral: "mauve.500" } },
+    tokens: { colors: { primary: "--color-violet-600", neutral: "--color-mauve-500" } },
     components: {
       button: {
         defaultVariants: { variant: "solid", size: "lg" },
@@ -69,13 +77,16 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   });
 
   it("inherits recipes from the base (config never carries recipes)", () => {
-    const derived = definePreset(base, { tokens: { colors: { primary: "indigo.600" } } });
+    const derived = definePreset(base, { tokens: { colors: { primary: "--color-indigo-600" } } });
     expect(derived.recipes).toBe(registry);
   });
 
   it("merges tokens per token — an override replaces that token, siblings are kept", () => {
-    const derived = definePreset(base, { tokens: { colors: { primary: "indigo.600" } } });
-    expect(derived.tokens.colors).toEqual({ primary: "indigo.600", neutral: "mauve.500" });
+    const derived = definePreset(base, { tokens: { colors: { primary: "--color-indigo-600" } } });
+    expect(derived.tokens.colors).toEqual({
+      primary: "--color-indigo-600",
+      neutral: "--color-mauve-500",
+    });
   });
 
   it("merges components per field — setting defaultVariants keeps the base slotClasses", () => {
@@ -104,12 +115,15 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
 
   it("does not mutate the base preset", () => {
     definePreset(base, {
-      tokens: { colors: { primary: "indigo.600" } },
+      tokens: { colors: { primary: "--color-indigo-600" } },
       components: {
         button: { defaultVariants: { size: "xs" }, slotClasses: { label: "font-bold" } },
       },
     });
-    expect(base.tokens.colors).toEqual({ primary: "violet.600", neutral: "mauve.500" });
+    expect(base.tokens.colors).toEqual({
+      primary: "--color-violet-600",
+      neutral: "--color-mauve-500",
+    });
     expect(base.components.button).toEqual({
       defaultVariants: { variant: "solid", size: "lg" },
       slotClasses: { root: "shadow" },

@@ -9,9 +9,14 @@
  *
  * It also owns every CSS-value transform, so `./presets` can store tokens exactly as authored:
  * - camelCase key → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`);
- * - Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and the scale-less Tailwind
- *   colors `"white"`/`"black"` → `var(--color-white)`/`var(--color-black)`; values already starting
- *   with `var(`/`#`/`rgb`/`hsl`/`oklch`/… (or a bare CSS keyword like `transparent`) pass through raw.
+ * - a value beginning with `--` is a CSS custom-property *reference* and is wrapped in `var(...)`
+ *   (`"--color-violet-500"` → `var(--color-violet-500)`). This is the deliberate way to point a token
+ *   at a Tailwind palette var (`--color-*`) or any other custom property. Because the literal
+ *   `--color-violet-500` string then appears in the preset's own (build-scanned) source, Tailwind's
+ *   scanner keeps that palette var instead of tree-shaking it — a bare `"violet.500"`-style shorthand
+ *   would not, so the runtime `var(--color-violet-500)` would resolve to nothing.
+ * - every other value is an already-formed CSS color (`"#fff"`, `"oklch(…)"`, `"var(--x)"`,
+ *   `"transparent"`, `"color-mix(…)"`) and passes through untouched.
  *
  * A per-token `dark` value emits into a dark block honoring `darkMode` (a selector — default
  * `".dark"` —, `"media"`, or `"none"`); a token with no `dark` emits no dark override (it inherits
@@ -22,39 +27,15 @@ import { hopeVar, SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-toke
 import type { ColorTokenKey, DarkMode, PresetTokens, TokenValue } from "./presets";
 
 /**
- * Tailwind v4's generated color custom-property namespace: the `"violet.500"` shorthand resolves to
- * `var(--color-violet-500)`, the same variable `bg-violet-500` compiles to. (hope's own `--hope-*`
- * namespace is owned by `../semantic-tokens/semantic-tokens` and consumed here via `hopeVar`.)
+ * The prefix that marks a value as a CSS custom-property *reference* rather than a literal color.
+ * A value starting with `--` (`"--color-violet-500"`, the same variable `bg-violet-500` compiles to)
+ * is wrapped in `var(...)`; anything else is an already-formed CSS value and passes through raw.
+ * (hope's own `--hope-*` namespace is owned by `../semantic-tokens/semantic-tokens`, via `hopeVar`.)
  */
-const TAILWIND_COLOR_VAR_PREFIX = "--color-";
+const CSS_VAR_REFERENCE_PREFIX = "--";
 
 /** CSS-breaking characters no legitimate token value needs — presence means a corrupt/injected value. */
 const UNSAFE_VALUE = /[{}<>;\n\r]/;
-
-/** Prefixes that mark an already-formed CSS color; such values pass through the shorthand step raw. */
-const RAW_COLOR_PREFIXES = [
-  "var(",
-  "#",
-  "rgb",
-  "hsl",
-  "oklch",
-  "oklab",
-  "lab(",
-  "lch(",
-  "hwb(",
-  "color(",
-];
-
-/** A Tailwind color shorthand: `hue.step` (`"violet.500"`, `"mauve.600"`). */
-const TAILWIND_SHORTHAND = /^[a-z][a-z0-9]*\.[a-z0-9]+$/i;
-
-/**
- * Tailwind's scale-less base colors — they have a `--color-*` var (`--color-white`, `--color-black`)
- * but no `hue.step` form, so they're normalized here by name (`"white"` → `var(--color-white)`) just
- * like `"violet.500"`. Everything else with no dot (`transparent`, `currentColor`, a raw hex) is a
- * genuine CSS value and passes through untouched.
- */
-const TAILWIND_KEYWORD_COLORS = new Set(["white", "black"]);
 
 /** kebab → camelCase, matching the `KebabToCamel` type: `"on-primary-soft"` → `"onPrimarySoft"`. */
 function kebabToCamel(token: string): string {
@@ -71,20 +52,10 @@ function assertSafeValue(value: string, token: string): void {
   }
 }
 
-/** Resolve a color value: Tailwind shorthand → `var(--color-…)`; an already-formed value passes raw. */
+/** Resolve a color value: a `--` reference → `var(--…)`; an already-formed value passes through raw. */
 function resolveColorValue(value: string): string {
   const trimmed = value.trim();
-  if (RAW_COLOR_PREFIXES.some((prefix) => trimmed.startsWith(prefix))) {
-    return trimmed;
-  }
-  if (TAILWIND_SHORTHAND.test(trimmed)) {
-    return `var(${TAILWIND_COLOR_VAR_PREFIX}${trimmed.replace(".", "-")})`;
-  }
-  if (TAILWIND_KEYWORD_COLORS.has(trimmed)) {
-    return `var(${TAILWIND_COLOR_VAR_PREFIX}${trimmed})`;
-  }
-  // A bare CSS keyword (`transparent`, `currentColor`) or other raw value — pass through.
-  return trimmed;
+  return trimmed.startsWith(CSS_VAR_REFERENCE_PREFIX) ? `var(${trimmed})` : trimmed;
 }
 
 /** Normalize a `TokenValue` to `{ light, dark? }` (a bare string is both modes). */

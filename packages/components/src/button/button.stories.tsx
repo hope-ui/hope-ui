@@ -48,7 +48,9 @@ export const Default: Story = {
 export const Variants: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-3">
-      <For each={VARIANTS}>{(variant) => <Button variant={variant}>{variant}</Button>}</For>
+      <For each={VARIANTS}>
+        {(variant) => <Button variant={variant}>Button ({variant})</Button>}
+      </For>
     </div>
   ),
 };
@@ -94,19 +96,19 @@ export const Sizes: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-3">
       <Button variant="solid" size="xs">
-        xs
+        Button (xs)
       </Button>
       <Button variant="solid" size="sm">
-        sm
+        Button (sm)
       </Button>
       <Button variant="solid" size="md">
-        md
+        Button (md)
       </Button>
       <Button variant="solid" size="lg">
-        lg
+        Button (lg)
       </Button>
       <Button variant="solid" size="xl">
-        xl
+        Button (xl)
       </Button>
     </div>
   ),

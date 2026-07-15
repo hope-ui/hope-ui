@@ -29,3 +29,15 @@
  * separately at runtime from `@hope-ui/presets/hope` and passed to `<ThemeProvider>`.
  */
 @source "./recipes";
+
+/*
+ * Token palette: hope authors its `--hope-*` values in `./index.ts` as `--color-*` references
+ * (`"--color-violet-600"` → `var(--color-violet-600)`, inlined at runtime by `<ThemeProvider>`).
+ * Tailwind v4 tree-shakes any default-palette var it doesn't see referenced in scanned source, and
+ * the runtime `<style>` is invisible to the compiler — so without this the `var(--color-*)` the
+ * tokens point at would resolve to nothing. Scanning `index.ts` puts those literal `--color-*`
+ * strings in front of the scanner, so it keeps exactly the palette shades this preset uses. A
+ * consumer preset gets this for free (their token source is auto-scanned); the shipped preset must
+ * declare it because its tokens live in the installed package (`files: ["src", …]`).
+ */
+@source "./index.ts";

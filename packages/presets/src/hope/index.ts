@@ -15,10 +15,12 @@
  * first paint / in the SSR stream) declaring the `--hope-*` custom properties. The shared
  * `_base/theme-map.css` maps those `--hope-*` names into clean Tailwind utilities (`bg-primary`, …).
  *
- * Values ride Tailwind's own palette: the `"hue.step"` shorthand (`"violet.600"`) normalizes to
- * `var(--color-violet-600)`, so the theme stays in lockstep with Tailwind's scale (see `token-css.ts`).
- * `on-warning` is paired with **taupe** and the neutrals with **mauve** — Tailwind v4's violet-tinted
- * grays — so the chrome echoes the brand hue. `scrim` is a raw `color-mix(...)` (no shorthand form).
+ * Values ride Tailwind's own palette: a `"--color-*"` value (`"--color-violet-600"`) is wrapped to
+ * `var(--color-violet-600)` on emit, so the theme stays in lockstep with Tailwind's scale (see
+ * `token-css.ts`). Writing the raw `--color-*` reference — rather than a `"hue.step"` shorthand —
+ * also keeps that literal in this build-scanned source, so Tailwind retains the palette var instead
+ * of tree-shaking it. `on-warning` is paired with **taupe** and the neutrals with **neutral**;
+ * `scrim` is a raw `color-mix(...)`.
  */
 import { definePreset, type PresetTokens } from "@hope-ui/theming";
 import { hopeRecipes } from "./recipes";
@@ -34,72 +36,72 @@ export { hopeRecipes } from "./recipes";
 const hopeTokens: PresetTokens = {
   colors: {
     // Surfaces (elevation)
-    surface: { light: "white", dark: "mauve.950" },
-    surfaceRaised: { light: "white", dark: "mauve.900" },
-    surfaceOverlay: { light: "white", dark: "mauve.900" },
-    surfaceSunken: { light: "mauve.50", dark: "black" },
-    surfaceInverse: { light: "mauve.900", dark: "mauve.50" },
+    surface: { light: "--color-white", dark: "--color-neutral-950" },
+    surfaceRaised: { light: "--color-white", dark: "--color-neutral-900" },
+    surfaceOverlay: { light: "--color-white", dark: "--color-neutral-900" },
+    surfaceSunken: { light: "--color-neutral-50", dark: "--color-black" },
+    surfaceInverse: { light: "--color-neutral-900", dark: "--color-neutral-50" },
 
     // Standard text ramp (on neutral surfaces)
-    foreground: { light: "mauve.900", dark: "mauve.50" },
-    foregroundMuted: { light: "mauve.600", dark: "mauve.400" },
-    foregroundSubtle: { light: "mauve.400", dark: "mauve.500" },
-    foregroundDisabled: { light: "mauve.300", dark: "mauve.600" },
+    foreground: { light: "--color-neutral-900", dark: "--color-neutral-50" },
+    foregroundMuted: { light: "--color-neutral-600", dark: "--color-neutral-400" },
+    foregroundSubtle: { light: "--color-neutral-400", dark: "--color-neutral-500" },
+    foregroundDisabled: { light: "--color-neutral-300", dark: "--color-neutral-600" },
 
     // On-color text (readable on a role fill or the inverse surface)
-    onPrimary: { light: "white", dark: "mauve.950" },
-    onPrimarySoft: { light: "violet.700", dark: "violet.200" },
-    onNeutral: { light: "white", dark: "mauve.950" },
-    onNeutralSoft: { light: "mauve.700", dark: "mauve.200" },
-    onSuccess: { light: "white", dark: "mauve.950" },
-    onSuccessSoft: { light: "green.700", dark: "green.200" },
-    onInfo: { light: "white", dark: "mauve.950" },
-    onInfoSoft: { light: "sky.700", dark: "sky.200" },
-    onWarning: { light: "taupe.900", dark: "mauve.950" },
-    onWarningSoft: { light: "amber.800", dark: "amber.200" },
-    onDanger: { light: "white", dark: "mauve.950" },
-    onDangerSoft: { light: "red.700", dark: "red.200" },
-    onInverse: { light: "mauve.50", dark: "mauve.900" },
+    onPrimary: { light: "--color-white", dark: "--color-neutral-950" },
+    onPrimarySoft: { light: "--color-violet-700", dark: "--color-violet-200" },
+    onNeutral: { light: "--color-white", dark: "--color-neutral-950" },
+    onNeutralSoft: { light: "--color-neutral-700", dark: "--color-neutral-200" },
+    onSuccess: { light: "--color-white", dark: "--color-neutral-950" },
+    onSuccessSoft: { light: "--color-green-700", dark: "--color-green-200" },
+    onInfo: { light: "--color-white", dark: "--color-neutral-950" },
+    onInfoSoft: { light: "--color-sky-700", dark: "--color-sky-200" },
+    onWarning: { light: "--color-taupe-900", dark: "--color-neutral-950" },
+    onWarningSoft: { light: "--color-amber-800", dark: "--color-amber-200" },
+    onDanger: { light: "--color-white", dark: "--color-neutral-950" },
+    onDangerSoft: { light: "--color-red-700", dark: "--color-red-200" },
+    onInverse: { light: "--color-neutral-50", dark: "--color-neutral-900" },
 
     // Role fills (bare = solid, -hover = solid hover, -soft = tonal, -outline = soft border tint)
-    primary: { light: "violet.600", dark: "violet.400" },
-    primaryHover: { light: "violet.700", dark: "violet.300" },
-    primarySoft: { light: "violet.100", dark: "violet.950" },
-    primaryOutline: { light: "violet.300", dark: "violet.700" },
-    neutral: { light: "mauve.700", dark: "mauve.300" },
-    neutralHover: { light: "mauve.800", dark: "mauve.200" },
-    neutralSoft: { light: "mauve.100", dark: "mauve.800" },
-    neutralOutline: { light: "mauve.300", dark: "mauve.700" },
-    success: { light: "green.600", dark: "green.400" },
-    successHover: { light: "green.700", dark: "green.300" },
-    successSoft: { light: "green.100", dark: "green.950" },
-    successOutline: { light: "green.300", dark: "green.700" },
-    info: { light: "sky.600", dark: "sky.400" },
-    infoHover: { light: "sky.700", dark: "sky.300" },
-    infoSoft: { light: "sky.100", dark: "sky.950" },
-    infoOutline: { light: "sky.300", dark: "sky.700" },
+    primary: { light: "--color-violet-600", dark: "--color-violet-400" },
+    primaryHover: { light: "--color-violet-700", dark: "--color-violet-300" },
+    primarySoft: { light: "--color-violet-100", dark: "--color-violet-950" },
+    primaryOutline: { light: "--color-violet-300", dark: "--color-violet-700" },
+    neutral: { light: "--color-neutral-700", dark: "--color-neutral-300" },
+    neutralHover: { light: "--color-neutral-800", dark: "--color-neutral-200" },
+    neutralSoft: { light: "--color-neutral-100", dark: "--color-neutral-800" },
+    neutralOutline: { light: "--color-neutral-300", dark: "--color-neutral-700" },
+    success: { light: "--color-green-600", dark: "--color-green-400" },
+    successHover: { light: "--color-green-700", dark: "--color-green-300" },
+    successSoft: { light: "--color-green-100", dark: "--color-green-950" },
+    successOutline: { light: "--color-green-300", dark: "--color-green-700" },
+    info: { light: "--color-sky-600", dark: "--color-sky-400" },
+    infoHover: { light: "--color-sky-700", dark: "--color-sky-300" },
+    infoSoft: { light: "--color-sky-100", dark: "--color-sky-950" },
+    infoOutline: { light: "--color-sky-300", dark: "--color-sky-700" },
     // warning: amber-300 is too pale to read as a border on white → nudged one step to amber-400.
-    warning: { light: "amber.400", dark: "amber.600" },
-    warningHover: { light: "amber.500", dark: "amber.500" },
-    warningSoft: { light: "amber.100", dark: "amber.950" },
-    warningOutline: { light: "amber.400", dark: "amber.600" },
-    danger: { light: "red.600", dark: "red.400" },
-    dangerHover: { light: "red.700", dark: "red.300" },
-    dangerSoft: { light: "red.100", dark: "red.950" },
-    dangerOutline: { light: "red.300", dark: "red.700" },
+    warning: { light: "--color-amber-400", dark: "--color-amber-600" },
+    warningHover: { light: "--color-amber-500", dark: "--color-amber-500" },
+    warningSoft: { light: "--color-amber-100", dark: "--color-amber-950" },
+    warningOutline: { light: "--color-amber-400", dark: "--color-amber-600" },
+    danger: { light: "--color-red-600", dark: "--color-red-400" },
+    dangerHover: { light: "--color-red-700", dark: "--color-red-300" },
+    dangerSoft: { light: "--color-red-100", dark: "--color-red-950" },
+    dangerOutline: { light: "--color-red-300", dark: "--color-red-700" },
 
     // Neutral border tints (role borders reuse the role color)
-    subtleOutline: { light: "mauve.200", dark: "mauve.800" },
-    strongOutline: { light: "mauve.300", dark: "mauve.700" },
-    disabledOutline: { light: "mauve.200", dark: "mauve.800" },
+    subtleOutline: { light: "--color-neutral-200", dark: "--color-neutral-800" },
+    strongOutline: { light: "--color-neutral-300", dark: "--color-neutral-700" },
+    disabledOutline: { light: "--color-neutral-200", dark: "--color-neutral-800" },
 
     // Disabled control fill — kept ~2 steps from foreground-disabled so the label stays legible.
-    disabled: { light: "mauve.100", dark: "mauve.800" },
+    disabled: { light: "--color-neutral-50", dark: "--color-neutral-800" },
 
     // Systemic
-    focus: { light: "violet.600", dark: "violet.500" },
+    focus: { light: "--color-violet-600", dark: "--color-violet-500" },
     scrim: {
-      light: "color-mix(in oklab, var(--color-mauve-900) 50%, transparent)",
+      light: "color-mix(in oklab, var(--color-neutral-900) 50%, transparent)",
       dark: "color-mix(in oklab, var(--color-black) 70%, transparent)",
     },
   },

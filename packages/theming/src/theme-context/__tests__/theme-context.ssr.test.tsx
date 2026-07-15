@@ -20,7 +20,7 @@ const theme = { demo } as unknown as RecipeRegistry;
 // keys line up.
 const tokenPreset = definePreset(theme, {
   tokens: {
-    colors: { primary: { light: "violet.600", dark: "violet.400" } },
+    colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
   },
 });
 

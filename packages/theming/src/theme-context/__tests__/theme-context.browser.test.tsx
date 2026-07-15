@@ -19,7 +19,7 @@ const theme = { demo } as unknown as RecipeRegistry;
 // Identical to the ssr test's preset, so the tree hydrated here matches the fixture byte-for-byte.
 const tokenPreset = definePreset(theme, {
   tokens: {
-    colors: { primary: { light: "violet.600", dark: "violet.400" } },
+    colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
   },
 });
 

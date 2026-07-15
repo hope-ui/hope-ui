@@ -71,8 +71,10 @@ export type ColorTokenKey = KebabToCamel<SemanticColorToken>;
 /**
  * One token's value: a bare string (used for **both** light and dark), or a per-mode
  * `{ light, dark? }`. `dark` omitted → no `.dark` override emitted for that token → it inherits the
- * base theme's dark value. Values are either a Tailwind color shorthand (`"violet.500"`, normalized
- * to `var(--color-violet-500)` on emit) or a raw CSS color (`"#fff"`, `"var(--x)"`, `"oklch(…)"`).
+ * base theme's dark value. A value is either a CSS custom-property reference — anything starting with
+ * `--` (`"--color-violet-500"`, wrapped to `var(--color-violet-500)` on emit; this is how a token
+ * points at a Tailwind palette var) — or an already-formed CSS color (`"#fff"`, `"var(--x)"`,
+ * `"oklch(…)"`, `"color-mix(…)"`, `"transparent"`), which passes through raw.
  */
 export type TokenValue = string | { light: string; dark?: string };
 

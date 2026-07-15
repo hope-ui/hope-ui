@@ -35,9 +35,9 @@ import { hope } from "@hope-ui/presets/hope";
 const app = definePreset(hope, {
   tokens: {
     colors: {
-      primary: { light: "violet.600", dark: "violet.400" }, // Tailwind shorthand, per-mode
-      warningSoft: "amber.100",                              // string = both modes
-      onPrimary: { light: "#fff" },                          // raw color; dark omitted → inherits base
+      primary: { light: "--color-violet-600", dark: "--color-violet-400" }, // palette var ref, per-mode
+      warningSoft: "--color-amber-100",                                     // string = both modes
+      onPrimary: { light: "#fff" },                                         // raw color; dark omitted → inherits base
     },
   },
   components: {
@@ -48,8 +48,8 @@ const app = definePreset(hope, {
 ```
 
 Token keys are the **camelCase** spelling of the fixed semantic vocabulary (`ColorTokenKey`) — a
-closed union, so an unknown key is a compile error, and `"violet.500"`/camelCase autocomplete. The
-value transforms (shorthand → `var()`, camelCase → `--hope-<kebab>`) happen at render time in
+closed union, so an unknown key is a compile error and the keys autocomplete. The value transforms
+(a `--…` reference → `var(--…)`, camelCase → `--hope-<kebab>`) happen at render time in
 [`token-css`](./token-css.md); a preset stores tokens verbatim.
 
 ### Merge precedence

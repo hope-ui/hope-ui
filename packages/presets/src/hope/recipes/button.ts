@@ -108,15 +108,15 @@ export const buttonRecipe = tv({
     // `bg-clip-padding` keeps the reserved 1px transparent border from painting the fill under it, so
     // solid↔outline never shifts by a pixel.
     root: [
-      "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
+      "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none rounded-sm",
       "cursor-pointer select-none border border-transparent bg-clip-padding outline-none",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus/50",
       "active:translate-y-px data-pressed:translate-y-px",
       // One disabled axis: `createButton` emits `data-disabled` for both native (`:disabled`) and
       // non-native (`aria-disabled`) buttons, so the recipe styles this single variant.
-      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-50",
-    ].join(" "),
+      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-90",
+    ],
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
     endDecorator: "inline-flex shrink-0 items-center justify-center",
@@ -126,41 +126,56 @@ export const buttonRecipe = tv({
       "pointer-events-none inline-flex items-center justify-center",
       "[&_svg]:origin-center [&_svg]:animate-spin",
       "motion-reduce:[&_svg]:animate-none",
-    ].join(" "),
+    ],
   },
   variants: {
     // `size` before `variant` so `link`'s `h-auto` / `px-0.5` win the tailwind-merge conflict over the
     // fixed height. Heights step an even +4 (24/28/32/36/40); radius is a uniform `rounded-sm`.
     size: {
       xs: {
-        root: "h-6 gap-1 text-xs rounded-sm",
-        startDecorator: "[&_svg]:size-3",
-        endDecorator: "[&_svg]:size-3",
-        loader: "[&_svg]:size-3",
+        root: [
+          "h-6 gap-1 text-xs px-2",
+          "has-data-[slot=button-start-decorator]:ps-1.5 has-data-[slot=button-end-decorator]:pe-1.5",
+        ],
+        startDecorator: "[&_svg]:size-4",
+        endDecorator: "[&_svg]:size-4",
+        loader: "[&_svg]:size-4",
       },
       sm: {
-        root: "h-7 gap-1 text-sm rounded-sm",
-        startDecorator: "[&_svg]:size-4",
-        endDecorator: "[&_svg]:size-4",
-        loader: "[&_svg]:size-4",
+        root: [
+          "h-7 gap-1 text-[0.8125rem] px-2.5",
+          "has-data-[slot=button-start-decorator]:ps-2 has-data-[slot=button-end-decorator]:pe-2",
+        ],
+        startDecorator: "[&_svg]:size-4.5",
+        endDecorator: "[&_svg]:size-4.5",
+        loader: "[&_svg]:size-4.5",
       },
       md: {
-        root: "h-8 gap-1.5 text-sm rounded-sm",
-        startDecorator: "[&_svg]:size-4",
-        endDecorator: "[&_svg]:size-4",
-        loader: "[&_svg]:size-4",
-      },
-      lg: {
-        root: "h-9 gap-1.5 text-sm rounded-sm",
-        startDecorator: "[&_svg]:size-4",
-        endDecorator: "[&_svg]:size-4",
-        loader: "[&_svg]:size-4",
-      },
-      xl: {
-        root: "h-10 gap-2 text-base rounded-sm",
+        root: [
+          "h-8 gap-1.5 text-sm px-3",
+          "has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5",
+        ],
         startDecorator: "[&_svg]:size-5",
         endDecorator: "[&_svg]:size-5",
         loader: "[&_svg]:size-5",
+      },
+      lg: {
+        root: [
+          "h-9 gap-1.5 text-[0.9375rem] px-3.5",
+          "has-data-[slot=button-start-decorator]:ps-3 has-data-[slot=button-end-decorator]:pe-3",
+        ],
+        startDecorator: "[&_svg]:size-5.5",
+        endDecorator: "[&_svg]:size-5.5",
+        loader: "[&_svg]:size-5.5",
+      },
+      xl: {
+        root: [
+          "h-10 gap-2 text-base px-4",
+          "has-data-[slot=button-start-decorator]:ps-3.5 has-data-[slot=button-end-decorator]:pe-3.5",
+        ],
+        startDecorator: "[&_svg]:size-6",
+        endDecorator: "[&_svg]:size-6",
+        loader: "[&_svg]:size-6",
       },
     },
     fullWidth: {
