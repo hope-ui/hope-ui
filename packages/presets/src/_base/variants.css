@@ -1,8 +1,8 @@
 /*
- * @hope-ui/themes — shared structural layer (`_base/`), not a published theme subpath.
+ * @hope-ui/presets — shared structural layer (`_base/`), not a published preset subpath.
  *
- * Custom variants used across every theme. These are contract-level, not per-theme aesthetic, so they
- * live here once and each theme's `theme.css` imports them.
+ * Custom variants used across every preset. These are contract-level, not per-preset aesthetic, so they
+ * live here once and each preset's `tailwind.css` imports them.
  *
  * ── data-* state variants ─────────────────────────────────────────────────────────────────────────
  * Style hooks for the state our `@hope-ui/primitives` emit, following the data-* attribute conventions

@@ -1,9 +1,9 @@
 /**
  * The **semantic color vocabulary** — the design-system-agnostic set of role names every
- * `@hope-ui/themes/*` theme implements, so a theme is a different set of values behind the same
+ * `@hope-ui/presets/*` preset implements, so a preset is a different set of values behind the same
  * tokens. Components and recipes reference these names (as Tailwind utilities like `bg-primary`,
- * `text-foreground`, `text-on-primary`); a theme supplies the values as `--hope-<token>` CSS
- * variables (see `@hope-ui/themes/hope`).
+ * `text-foreground`, `text-on-primary`); a preset supplies the values as `--hope-<token>` CSS
+ * variables (see `@hope-ui/presets/hope`).
  *
  * **Tailwind-ergonomic naming.** The names read cleanly *after* a Tailwind property prefix and no
  * token is ever a bare CSS property — so there is no `text-text`, `border-border`, or `ring-ring`

@@ -1,4 +1,4 @@
-import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { hopeRecipes } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";

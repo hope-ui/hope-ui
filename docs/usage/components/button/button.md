@@ -10,9 +10,9 @@ Because it reads styling from the theme, a `Button` must render under a `<ThemeP
 
 ```tsx
 import { ThemeProvider } from "@hope-ui/theming";
-import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { hopeRecipes } from "@hope-ui/presets/hope";
 import { Button } from "@hope-ui/components/button";
-// and, in your Tailwind entry CSS: @import "@hope-ui/themes/hope";
+// and, in your Tailwind entry CSS: @import "@hope-ui/presets/hope/tailwind.css";
 
 <ThemeProvider theme={hopeRecipes}>
   <Button variant="solid" color="primary">Save</Button>

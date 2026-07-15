@@ -1,10 +1,10 @@
 /*
- * @hope-ui/themes/hope — hope-ui's default theme and visual identity.
+ * @hope-ui/presets/hope/tailwind.css — hope-ui's default preset and visual identity.
  *
  * Import it into your Tailwind v4 entry, after `@import "tailwindcss"`:
  *
  *     @import "tailwindcss";
- *     @import "@hope-ui/themes/hope";
+ *     @import "@hope-ui/presets/hope/tailwind.css";
  *
  * This is a thin orchestrator: it composes the shared structural layer (`_base/`, reused by every
  * theme) with hope's own token values. Three parts, three files:
@@ -17,7 +17,7 @@
  * a second theme reuses `_base/*` unchanged and ships only its own `tokens.css` (plus `recipes/`).
  */
 
-/* Shared structural contract — identical for every @hope-ui/themes/* theme. */
+/* Shared structural contract — identical for every @hope-ui/presets/* preset. */
 @import "../_base/variants.css";
 @import "../_base/theme-map.css";
 
@@ -29,6 +29,6 @@
  * as a Tailwind content source makes the consumer's build scan the recipe files for the literal
  * utility candidates they emit (`bg-primary`, `text-on-danger-soft`, `border-warning-outline`, …),
  * so those classes actually exist in the generated CSS. The recipe *functions* are imported
- * separately at runtime from `@hope-ui/themes/hope/recipes` and passed to `<ThemeProvider>`.
+ * separately at runtime from `@hope-ui/presets/hope` and passed to `<ThemeProvider>`.
  */
 @source "./recipes";

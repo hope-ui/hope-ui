@@ -1,7 +1,7 @@
 /*
- * @hope-ui/themes — shared structural layer (`_base/`), not a published theme subpath.
+ * @hope-ui/presets — shared structural layer (`_base/`), not a published preset subpath.
  *
- * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-theme in `<theme>/tokens.css`) into
+ * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-preset in `<preset>/tokens.css`) into
  * Tailwind's color namespace, so component utilities stay clean and unprefixed: `bg-primary`,
  * `text-foreground`, `text-on-primary`, `border-subtle-outline`, `ring-focus`, `bg-scrim`, and role borders
  * `border-primary` (reusing the role color).

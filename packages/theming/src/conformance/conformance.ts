@@ -78,13 +78,13 @@ export function assertSlotRecipeConformance<Variants>(
  * Checks that a theme's CSS defines a `--hope-<token>` variable for every semantic color token in
  * `tokens` (default: the full {@link SEMANTIC_COLOR_TOKENS} vocabulary). A theme is chosen at the
  * consumer's Tailwind build time and every recipe/component references these tokens as utilities
- * (`bg-primary` → `var(--hope-primary)`); a token the theme forgot to define compiles to an
+ * (`bg-primary` → `var(--hope-primary)`); a token the preset forgot to define compiles to an
  * unresolved `var()` and silently breaks styling. This is the CSS-side analogue of the recipe
  * axis's {@link checkSlotRecipeConformance}: once tokens live in CSS rather than a TS object the
- * compile-time `satisfies` guarantee is gone, so a theme runs this against its `theme.css`.
+ * compile-time `satisfies` guarantee is gone, so a preset runs this against its `tailwind.css`.
  *
  * It asserts only that each token is *declared* (its light/`:root` value); dark overrides are a
- * per-theme concern and not every token changes between modes.
+ * per-preset concern and not every token changes between modes.
  */
 export function checkSemanticTokenConformance(
   cssText: string,

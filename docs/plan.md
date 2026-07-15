@@ -409,7 +409,7 @@ drift that produces the coverage gaps this project is designed to avoid.
 
 - **Package granularity (revised from the original family-package plan):** a small fixed set
   of packages — `@hope-ui/primitives` (internal behavior kernel), `@hope-ui/components` (every
-  public component), and the theming pair `@hope-ui/theming` / `@hope-ui/themes` — **not** a
+  public component), and the theming pair `@hope-ui/theming` / `@hope-ui/presets` — **not** a
   single one-giant-package, not a spread of
   15+ micro-packages with sibling deps, and not the shared-primitive-family split
   (`@hope-ui/overlays`, `@hope-ui/collections`, `@hope-ui/forms`,

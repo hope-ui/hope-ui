@@ -56,7 +56,7 @@ function resolveServerEntry(packageName: string): string {
 // the stale pre-fix `dist` build. Aliasing straight to source removes the rebuild step.
 const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "packages/theming/src");
-const themesSrcDir = join(import.meta.dirname, "packages/themes/src");
+const presetsSrcDir = join(import.meta.dirname, "packages/presets/src");
 
 // `@hope-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
 // so the alias is a wildcard: `@hope-ui/primitives/render` -> `.../src/render/index.ts`. The
@@ -81,11 +81,11 @@ const hopeUiAlias = [
     find: /^@hope-ui\/theming$/,
     replacement: join(themingSrcDir, "index.ts"),
   },
-  // The hope theme's runtime recipe map (the JS half of the theme, passed to `<ThemeProvider>`).
+  // The hope preset's runtime recipe map (the JS half of the preset, passed to `<ThemeProvider>`).
   // Exact match, like theming's — one subpath, not a wildcard.
   {
-    find: /^@hope-ui\/themes\/hope\/recipes$/,
-    replacement: join(themesSrcDir, "hope/recipes/index.ts"),
+    find: /^@hope-ui\/presets\/hope$/,
+    replacement: join(presetsSrcDir, "hope/index.ts"),
   },
 ];
 const serverBuildAlias = [

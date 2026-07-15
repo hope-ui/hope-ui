@@ -301,9 +301,9 @@ importers:
       '@hope-ui/internal-test-utils':
         specifier: workspace:*
         version: link:../internal-test-utils
-      '@hope-ui/themes':
+      '@hope-ui/presets':
         specifier: workspace:*
-        version: link:../themes
+        version: link:../presets
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.17(solid-js@2.0.0-beta.17)
@@ -323,6 +323,19 @@ importers:
       solid-js:
         specifier: 'catalog:'
         version: 2.0.0-beta.17
+
+  packages/presets:
+    dependencies:
+      '@hope-ui/theming':
+        specifier: workspace:*
+        version: link:../theming
+      tailwindcss:
+        specifier: ^4.0.0
+        version: 4.3.2
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
 
   packages/primitives:
     dependencies:
@@ -345,19 +358,6 @@ importers:
       solid-js:
         specifier: 'catalog:'
         version: 2.0.0-beta.17
-
-  packages/themes:
-    dependencies:
-      '@hope-ui/theming':
-        specifier: workspace:*
-        version: link:../theming
-      tailwindcss:
-        specifier: ^4.0.0
-        version: 4.3.2
-    devDependencies:
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.1
 
   packages/theming:
     dependencies:

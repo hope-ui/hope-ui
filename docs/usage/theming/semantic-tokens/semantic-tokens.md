@@ -1,8 +1,8 @@
 # Semantic color tokens (`@hope-ui/theming`)
 
-The design-system-agnostic color vocabulary every `@hope-ui/themes/*` theme implements. Components
-and recipes reference these names as Tailwind utilities; a theme supplies the values as
-`--hope-<token>` CSS variables (see `@hope-ui/themes/hope`).
+The design-system-agnostic color vocabulary every `@hope-ui/presets/*` preset implements. Components
+and recipes reference these names as Tailwind utilities; a preset supplies the values as
+`--hope-<token>` CSS variables (see `@hope-ui/presets/hope`).
 
 ## API
 
@@ -42,8 +42,8 @@ Neutral surfaces pair with the `foreground*` ramp.
 
 ## Conformance
 
-A theme proves it defines every token with `checkSemanticTokenConformance` /
+A preset proves it defines every token with `checkSemanticTokenConformance` /
 `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`) run against the file that
-declares the `--hope-*` values (in `@hope-ui/themes/hope` that is `tokens.css`, the palette layer —
-`theme.css` is only the orchestrator that imports it and the shared `_base/*`).
+declares the `--hope-*` values (in `@hope-ui/presets/hope` that is `tokens.css`, the palette layer —
+`tailwind.css` is only the orchestrator that imports it and the shared `_base/*`).
 An undefined token compiles every referencing utility to an unresolved `var(--hope-…)`.

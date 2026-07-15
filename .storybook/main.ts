@@ -11,7 +11,7 @@ import { solidPluginOptions } from "../solid-babel-options";
 // rebuilt, and stories silently exercise the last build.
 const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "../packages/theming/src");
-const themesSrcDir = join(import.meta.dirname, "../packages/themes/src");
+const presetsSrcDir = join(import.meta.dirname, "../packages/presets/src");
 
 const config: StorybookConfig = {
   stories: ["../packages/*/src/**/*.stories.@(ts|tsx)"],
@@ -62,10 +62,10 @@ const config: StorybookConfig = {
             find: /^@hope-ui\/theming$/,
             replacement: join(themingSrcDir, "index.ts"),
           },
-          // The hope theme's runtime recipe map — the JS half passed to `<ThemeProvider>`.
+          // The hope preset's runtime recipe map — the JS half passed to `<ThemeProvider>`.
           {
-            find: /^@hope-ui\/themes\/hope\/recipes$/,
-            replacement: join(themesSrcDir, "hope/recipes/index.ts"),
+            find: /^@hope-ui\/presets\/hope$/,
+            replacement: join(presetsSrcDir, "hope/index.ts"),
           },
           ...aliasArray,
         ],

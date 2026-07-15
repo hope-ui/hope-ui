@@ -12,9 +12,9 @@ Theming spans two package axes that never mix dependencies:
 - **Runtime** (imported into app code; peer deps `solid-js` / `@solidjs/web`):
   `@hope-ui/primitives` ← `@hope-ui/theming` ← `@hope-ui/components`.
 - **Config** (imported into the consumer's Tailwind v4 entry CSS; peer dep `tailwindcss`):
-  `@hope-ui/themes/{hope,…}` — each theme is a CSS file (`@import "@hope-ui/themes/hope"`) shipping
+  `@hope-ui/presets/{hope,…}` — each preset is a CSS file (`@import "@hope-ui/presets/hope/tailwind.css"`) shipping
   design tokens as `--hope-*` variables plus an `@theme inline` mapping. `hope` is the default the
-  library is built and demoed against. Each theme depends *up* on `@hope-ui/theming` for the contract
+  library is built and demoed against. Each preset depends *up* on `@hope-ui/theming` for the contract
   (its recipes are `tailwind-variants` functions, and it runs the conformance kit).
 
 `@hope-ui/theming` is the dependency-inversion seam: components read from it, themes implement it,
@@ -65,29 +65,29 @@ the default path is one theme per build.
    so their utilities win.
 4. Add the matching `tailwind-variants` slot recipe (authored with the shared `tv` from
    `@hope-ui/theming`; internal state authored as conditions **nested inside** consumer-facing
-   variants — never a top-level `state` axis) to each theme under `@hope-ui/themes/*`.
+   variants — never a top-level `state` axis) to each preset under `@hope-ui/presets/*`.
 
-## Adding a theme
+## Adding a preset
 
-A theme is a **Tailwind v4 CSS entry** the consumer imports into their Tailwind entry
-(`@import "@hope-ui/themes/hope"`). Behind that one entry the CSS is split into single-responsibility
-files — two of them **shared verbatim by every theme**, so a theme only authors what is actually
-theme-specific:
+A preset is a **Tailwind v4 CSS entry** the consumer imports into their Tailwind entry
+(`@import "@hope-ui/presets/hope/tailwind.css"`). Behind that one entry the CSS is split into single-responsibility
+files — two of them **shared verbatim by every preset**, so a preset only authors what is actually
+preset-specific:
 
 ```
-packages/themes/src/
-├── _base/                # shared structural layer — reused unchanged by every theme; not a published subpath
+packages/presets/src/
+├── _base/                # shared structural layer — reused unchanged by every preset; not a published subpath
 │   ├── variants.css      #   @custom-variant dark (+ future data-* state variants)
 │   └── theme-map.css     #   @theme inline: --hope-* → Tailwind color namespace (bg-primary, text-on-primary, …)
 └── hope/
-    ├── theme.css         # the published entry (@hope-ui/themes/hope) — a thin orchestrator, @imports only
+    ├── tailwind.css      # the published entry (@hope-ui/presets/hope/tailwind.css) — a thin orchestrator, @imports only
     ├── tokens.css        #   hope's --hope-* values under :root / .dark — the reskin layer
     └── recipes/          #   (once components exist) tailwind-variants slot recipes; registered via @source
 ```
 
 **Why the split.** The `@theme inline` mapping and the `dark` variant are a **pure function of the
-fixed `SEMANTIC_COLOR_TOKENS` contract** — byte-identical in every theme — so they live once in
-`_base/` rather than being copy-pasted per theme. The only thing a theme authors is its `tokens.css`
+fixed `SEMANTIC_COLOR_TOKENS` contract** — byte-identical in every preset — so they live once in
+`_base/` rather than being copy-pasted per preset. The only thing a preset authors is its `tokens.css`
 values (and, later, its `recipes/`). The orchestrator's `@import` order is cosmetic — Tailwind
 at-rules (`@theme`, `@custom-variant`) are collected at build time and `:root`/`.dark` custom
 properties resolve by the cascade at use time, so nothing here is order-sensitive — so it reads as
@@ -98,28 +98,28 @@ So a theme (a) declares hope's semantic tokens as `--hope-*` variables under `:r
 (`tokens.css`), (b) maps them into Tailwind's color namespace with `@theme inline` so utilities stay
 clean — `bg-primary`, `text-on-primary`, `border-subtle-outline`, `ring-focus` (`_base/theme-map.css`), and
 (c) — once components exist — ships its own `tailwind-variants` slot recipes (same slots and variant
-*values* as every other theme; only the emitted classes differ). A first-party theme is a subpath of
-`@hope-ui/themes` (`@hope-ui/themes/hope` is the default) that reuses `_base/*` and adds its own
+*values* as every other preset; only the emitted classes differ). A first-party preset is a subpath of
+`@hope-ui/presets` (`@hope-ui/presets/hope` is the default) that reuses `_base/*` and adds its own
 `hope/`-style folder; a third party publishes its own package implementing the same contract. See
-`@hope-ui/themes/hope`'s files for the reference shape.
+`@hope-ui/presets/hope`'s files for the reference shape.
 
 **Swap-safety.** Raw scales (colors, spacing, radii, shadows) come from **Tailwind itself**, so their
-key surface is identical in every build by construction — nothing to police, and a theme-private
-extra (e.g. an elevation shadow) is safe because only that theme's own recipes reference it. What
-each theme *must* define is the **semantic vocabulary**: every token in `SEMANTIC_COLOR_TOKENS` as a
+key surface is identical in every build by construction — nothing to police, and a preset-private
+extra (e.g. an elevation shadow) is safe because only that preset's own recipes reference it. What
+each preset *must* define is the **semantic vocabulary**: every token in `SEMANTIC_COLOR_TOKENS` as a
 `--hope-*` variable, or a referencing utility (`bg-primary`) compiles to an unresolved `var()`.
 Because CSS variables aren't `tsc`-checkable, this is enforced at the CSS level by
 `checkSemanticTokenConformance` / `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`),
-which a theme runs against its `tokens.css` (the file that declares the values) — the token analog of
+which a preset runs against its `tokens.css` (the file that declares the values) — the token analog of
 the recipe axis's `checkSlotRecipeConformance`.
 
 ## Semantic token vocabulary
 
 The recipe contract above imposes no *token* vocabulary. This is the other half: the **semantic
-(alias) color contract** — one design-system-agnostic set of role names every theme implements, so a
-theme is a different set of values behind the same tokens. It is the token analog of the recipe
+(alias) color contract** — one design-system-agnostic set of role names every preset implements, so a
+preset is a different set of values behind the same tokens. It is the token analog of the recipe
 contract's "same slots and variant values, only the CSS differs": raw scales come from Tailwind
-itself; each `@hope-ui/themes/*` supplies the semantic values (as `--hope-<token>` CSS variables in
+itself; each `@hope-ui/presets/*` supplies the semantic values (as `--hope-<token>` CSS variables in
 its `tokens.css`); components and recipes reference the names as Tailwind utilities (`bg-primary`,
 `text-on-primary`).
 
@@ -278,8 +278,8 @@ only that theme's own recipes reference it); the conformance check only polices 
 | 06 | Naming | `neutral` = gray role; `secondary`/`tertiary` = optional chromatic accents |
 | 07 | Chart/decorative | out of contract → `chart-*` / `palette-*` |
 | 08 | Disabled | `foreground-disabled` (text) + `disabled` (fill) + `disabled-outline` (border) + reduced opacity; fill kept legible under the text |
-| 09 | Casing | flat kebab-case names; theme ships `--hope-<token>`, `@theme inline` maps to `--color-<token>` |
-| 10 | Reference theme | shadcn-flavored baseline shipped as the default `@hope-ui/themes/hope` |
+| 09 | Casing | flat kebab-case names; preset ships `--hope-<token>`, `@theme inline` maps to `--color-<token>` |
+| 10 | Reference preset | shadcn-flavored baseline shipped as the default `@hope-ui/presets/hope` |
 | — | Naming source | Atlassian `property.role.modifier`, re-spelled flat + Tailwind-first: `surface-*` (elevation), `foreground*` + `on-*`, `scrim` |
 
 ## SSR / hydration
@@ -291,9 +291,9 @@ fixture and its hydration test must both include `<ThemeProvider>` identically.
 
 ## Current state
 
-The contract and the default theme `@hope-ui/themes/hope` are built on **Tailwind v4 +
+The contract and the default preset `@hope-ui/presets/hope` are built on **Tailwind v4 +
 `tailwind-variants`**. `hope` ships the full semantic-token structure, enforced by
 `checkSemanticTokenConformance`. `Button` is the first styled component: it consumes `useRecipe`,
-and `@hope-ui/themes/hope` implements the matching `tv` slot recipe (registered as-is — a `tv`
+and `@hope-ui/presets/hope` implements the matching `tv` slot recipe (registered as-is — a `tv`
 recipe *is* the `SlotRecipeFn` shape, no adapter). See [`roadmap.md`](roadmap.md) for the
 done/deferred breakdown.

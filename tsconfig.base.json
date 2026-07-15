@@ -28,7 +28,7 @@
       "@hope-ui/primitives/*": ["./packages/primitives/src/*/index.ts"],
       "@hope-ui/theming": ["./packages/theming/src/index.ts"],
       "@hope-ui/theming/conformance": ["./packages/theming/src/conformance/conformance.ts"],
-      "@hope-ui/themes/hope/recipes": ["./packages/themes/src/hope/recipes/index.ts"],
+      "@hope-ui/presets/hope": ["./packages/presets/src/hope/index.ts"],
       "@hope-ui/internal-test-utils": ["./packages/internal-test-utils/src/index.ts"]
     }
   }

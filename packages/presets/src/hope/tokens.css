@@ -1,5 +1,5 @@
 /*
- * @hope-ui/themes/hope — token values (the hope palette).
+ * @hope-ui/presets/hope — token values (the hope palette).
  *
  * The swap layer: this is the file you edit to reskin hope. It declares hope-ui's semantic tokens as
  * collision-safe `--hope-<token>` variables under `:root` (light) and `.dark`; the shared

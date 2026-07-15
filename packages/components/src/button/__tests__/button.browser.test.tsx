@@ -1,5 +1,5 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { hopeRecipes } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";

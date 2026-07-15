@@ -272,16 +272,16 @@ them rather than re-deriving a behavior in a comment.
   shape and a contract-version constant, the `SemanticColorContract` token vocabulary, and the
   Tailwind styling seam (`tv`/`cn`/`cx` from `tailwind-variants`), plus a conformance kit (recipe +
   semantic-token checks) on the `@hope-ui/theming/conformance` subpath. `@hope-ui/components` reads recipes through it;
-  `@hope-ui/themes/*` implement and augment it; neither knows about the other. Depends on
+  `@hope-ui/presets/*` implement and augment it; neither knows about the other. Depends on
   `@hope-ui/primitives` (for `createComponentContext`) — which is *why* primitives cannot fold
   into components without a dependency cycle (`components → theming → components`). See
   `docs/theming.md`.
-- `packages/themes` (`@hope-ui/themes`) — Tailwind v4 theme CSS, per-theme subpaths
-  (`@hope-ui/themes/hope` is the **default** visual identity). Each theme ships a `theme.css`
-  (`@import "@hope-ui/themes/hope"`) declaring the semantic tokens as `--hope-*` variables under
+- `packages/presets` (`@hope-ui/presets`) — Tailwind v4 preset CSS, per-preset subpaths
+  (`@hope-ui/presets/hope` is the **default** visual identity). Each preset ships a `tailwind.css`
+  (`@import "@hope-ui/presets/hope/tailwind.css"`) declaring the semantic tokens as `--hope-*` variables under
   `:root`/`.dark` and mapping them to clean utilities via `@theme inline`. Raw scales come from
   Tailwind itself; swap-safety is enforced only on the shared **semantic vocabulary**, via
-  `checkSemanticTokenConformance` (`@hope-ui/theming/conformance`) run against `theme.css` — a missing
+  `checkSemanticTokenConformance` (`@hope-ui/theming/conformance`) run against `tailwind.css` — a missing
   `--hope-*` token compiles a referencing utility to an unresolved `var(--…)`.
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and

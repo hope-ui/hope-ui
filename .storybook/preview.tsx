@@ -3,7 +3,7 @@
 // scanning the components' source + stories + the theme's recipes. hope-ui ships no precompiled CSS.
 import "./tailwind.css";
 import { ThemeProvider } from "@hope-ui/theming";
-import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { hopeRecipes } from "@hope-ui/presets/hope";
 import * as a11yAnnotations from "@storybook/addon-a11y/preview";
 import * as docsAnnotations from "@storybook/addon-docs/preview";
 // `/next` is the SolidJS 2.0 renderer entry; the bare export resolves to the 1.x-compatible

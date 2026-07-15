@@ -10,7 +10,7 @@ import type {
 
 // The contract is types-only; its "tests" are compile-time assignability checks verified by
 // `pnpm typecheck`, plus a runtime block that pins the vocabulary so a change is deliberate. A
-// theme's real recipe is exercised by `@hope-ui/themes/hope`'s conformance test.
+// preset's real recipe is exercised by `@hope-ui/presets/hope`'s conformance test.
 
 // Every variant prop is optional and typed to its union — a recipe/theme relies on this shape.
 const _variants: ButtonRecipeVariants = {

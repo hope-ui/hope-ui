@@ -4,7 +4,7 @@
  * old Panda `cssgen` step. hope-ui ships no precompiled CSS to real consumers.
  */
 @import "tailwindcss";
-@import "@hope-ui/themes/hope";
+@import "@hope-ui/presets/hope/tailwind.css";
 
 /* Scan the components' source + stories for the utility classes to generate. */
 @source "../packages/components/src";

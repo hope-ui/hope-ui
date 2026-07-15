@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",
-    "@hope-ui/themes": "workspace:*",
+    "@hope-ui/presets": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

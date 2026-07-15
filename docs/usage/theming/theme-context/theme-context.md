@@ -6,7 +6,7 @@ recipe name → pure slot-recipe function — into context; a component reads on
 
 ```tsx
 import { ThemeProvider, useRecipe } from "@hope-ui/theming";
-import { hopeRecipes } from "@hope-ui/themes/hope/recipes"; // the theme's recipe map
+import { hopeRecipes } from "@hope-ui/presets/hope"; // the preset's recipe map
 
 function App() {
   return (

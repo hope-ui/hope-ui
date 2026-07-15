@@ -39,7 +39,7 @@ is the render seam for a custom cell body (the same flags the default cell deriv
 - `<td>`: `role="gridcell"`, `aria-selected`, and the `data-*` paint hooks (`data-today`,
   `data-outside-month`, `data-selected`, `data-range-{start,middle,end}`, `data-highlighted` (the
   tentative hover-range band), `data-focused`, `data-disabled` — present-when-true). Names match the
-  canonical variant list in `@hope-ui/themes` `_base/variants.css`.
+  canonical variant list in `@hope-ui/presets` `_base/variants.css`.
 - `<button>`: the view-aware `aria-label` (with Today / selected / range-start / range-end / unavailable
   suffixes), `aria-disabled` for unavailable days, and `tabindex` — `0` on the focused cell, `-1`
   elsewhere. The tab stop derives from `isFocused` (a date comparison), so it is correct on the server

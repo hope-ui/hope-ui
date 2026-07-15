@@ -2,9 +2,9 @@
  * The **Button** recipe contract — its variant vocabulary, slots, and the resulting `ButtonRecipe`
  * type.
  *
- * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a theme: the
- * `@hope-ui/components` `Button` consumes it via `useRecipe("button")`, and each theme
- * (`@hope-ui/themes/*`) implements a `tailwind-variants` recipe against it. One file per component
+ * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
+ * `@hope-ui/components` `Button` consumes it via `useRecipe("button")`, and each preset
+ * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
  * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
  */
 import type { SlotRecipeFn } from "./slot-recipe";

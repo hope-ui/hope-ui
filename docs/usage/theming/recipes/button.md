@@ -3,8 +3,8 @@
 The variant vocabulary and slots of the Button recipe, owned by `@hope-ui/theming` (the look-&-feel
 authority). Types only — no runtime, no CSS.
 
-`@hope-ui/components`' `Button` consumes this contract via `useRecipe("button")`; each theme
-(`@hope-ui/themes/*`) implements a `tailwind-variants` recipe against it, checked by
+`@hope-ui/components`' `Button` consumes this contract via `useRecipe("button")`; each preset
+(`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it, checked by
 `hopeRecipes satisfies RecipeRegistry`. This file also exports the assembled recipe type
 `ButtonRecipe` (`SlotRecipeFn<ButtonRecipeVariants, ButtonSlot>`), which the
 [`registry`](./registry.md) references as its `button` entry — so the registry stays a

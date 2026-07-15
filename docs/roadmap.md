@@ -10,7 +10,7 @@ stays as the architecture/SSR/distribution reference, but the *order of work* is
 **Positioning.** hope-ui is a **batteries-included, beautiful, full-featured** component library for
 **SolidJS 2.0** — the MUI/Mantine niche the Solid ecosystem is missing, not a headless/copy-paste
 kit. You install it, import a component, and it looks great out of the box under the default
-**`@hope-ui/themes/hope`** theme. The engine underneath is **Tailwind v4 + `tailwind-variants`**
+**`@hope-ui/presets/hope`** preset. The engine underneath is **Tailwind v4 + `tailwind-variants`**
 recipes plus the multi-theme seam (`@hope-ui/theming`) — an implementation detail the consumer never
 has to think about.
 
@@ -48,7 +48,7 @@ mapped onto hope-ui's kernel. It is no longer the Chakra v3 list.
   `createRegisteredId`, `createRegisteredElement`; utils `renderElement`, `withDefaults`,
   `composeEventHandlers`, `createKeyboardHandler`, `compareByIdOrReference`.
 - Styling / theming: **Tailwind v4 + `tailwind-variants`** via `@hope-ui/theming` (`tv`/`cn`/`cx` +
-  `useRecipe` + the semantic-token contract); the default visual identity is **`@hope-ui/themes/hope`**.
+  `useRecipe` + the semantic-token contract); the default visual identity is **`@hope-ui/presets/hope`**.
   Dark mode via a `.dark` class.
 
 ---

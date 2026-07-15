@@ -32,7 +32,7 @@ const packagesDir = join(repoRoot, "packages");
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const EXCLUDED_BASENAMES = new Set(["index"]);
 // Only the behavior/UI/contract packages carry the test + .md Definition of Done. The
-// `@hope-ui/themes` themes are pure CSS (Tailwind v4 design tokens as `--hope-*` CSS variables), so
+// `@hope-ui/presets` presets are pure CSS (Tailwind v4 design tokens as `--hope-*` CSS variables), so
 // they are exempt — tokens are exercised transitively by the components that consume them.
 // `theming` is hand-written contract + runtime, so it's in — but only for test + doc: it renders no
 // DOM, so it is deliberately absent from the story / SSR / hydration sets below (those are for

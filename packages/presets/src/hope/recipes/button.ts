@@ -1,5 +1,5 @@
 /*
- * @hope-ui/themes/hope — Button slot recipe.
+ * @hope-ui/presets/hope — Button slot recipe.
  *
  * The `tailwind-variants` slot recipe the `@hope-ui/components` `Button` reads through
  * `useRecipe("button")`. It encodes hope's "vega on your tokens" look & feel: shadcn/ui's vega
@@ -8,7 +8,7 @@
  *
  * ── Why every class is a literal string ─────────────────────────────────────────────────────────
  * The consumer's Tailwind build discovers which utilities to generate by scanning this file
- * (`@source "./recipes"` in `theme.css`). A scanner only sees *literal* candidates, so the
+ * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
  * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
  * `COLOR_CLASSES` and assembled into `compoundVariants`. The literals are what makes `bg-primary`,
  * `text-on-danger-soft`, `border-warning-outline`, etc. actually exist in the emitted CSS.
