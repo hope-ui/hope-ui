@@ -25,25 +25,28 @@
  */
 
 /*
- * Radius scale — shadcn's single-knob model: one `--radius`, the full `xs`→`4xl` scale derived as
- * multiples of it. This overrides Tailwind's built-in radii so every `rounded-*` (and the button's
- * `rounded-md`) paints hope's curvature. `@theme` (not `@theme inline`) emits the variables, which
- * the button recipe reads in `rounded-[min(var(--radius-md),8px)]`.
+ * Radius scale — shadcn's single-knob model: one knob (`--hope-radii-base`), the full `xs`→`4xl`
+ * scale derived as multiples of it. This overrides Tailwind's built-in radii so every `rounded-*`
+ * (and the button's `rounded-md`) paints hope's curvature. `@theme` (not `@theme inline`) keeps the
+ * `var(--hope-radii-base)` references live, so the whole `--radius-*` scale re-resolves when the knob
+ * is overridden at runtime — a preset's `tokens.radii.base` becomes a `--hope-radii-base` declaration
+ * in the provider's injected `<style>`, and that is the end-to-end path into this scale. The button
+ * recipe reads it through `rounded-[min(var(--radius-md),8px)]`.
  */
 @theme {
-  --radius-xs: calc(var(--hope-radius) * 0.4);
-  --radius-sm: calc(var(--hope-radius) * 0.6);
-  --radius-md: calc(var(--hope-radius) * 0.8);
-  --radius-lg: var(--hope-radius);
-  --radius-xl: calc(var(--hope-radius) * 1.4);
-  --radius-2xl: calc(var(--hope-radius) * 1.8);
-  --radius-3xl: calc(var(--hope-radius) * 2.2);
-  --radius-4xl: calc(var(--hope-radius) * 2.6);
+  --radius-xs: calc(var(--hope-radii-base) * 0.4);
+  --radius-sm: calc(var(--hope-radii-base) * 0.6);
+  --radius-md: calc(var(--hope-radii-base) * 0.8);
+  --radius-lg: var(--hope-radii-base);
+  --radius-xl: calc(var(--hope-radii-base) * 1.4);
+  --radius-2xl: calc(var(--hope-radii-base) * 1.8);
+  --radius-3xl: calc(var(--hope-radii-base) * 2.2);
+  --radius-4xl: calc(var(--hope-radii-base) * 2.6);
 }
 
 :root {
   /* Radii (10px — the knob) */
-  --hope-radius: 0.625rem;
+  --hope-radii-base: 0.625rem;
 
   /* Surfaces (elevation) */
   --hope-surface: var(--color-white);
