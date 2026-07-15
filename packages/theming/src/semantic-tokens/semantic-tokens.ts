@@ -96,6 +96,20 @@ export const SEMANTIC_COLOR_TOKENS = [
 export type SemanticColorToken = (typeof SEMANTIC_COLOR_TOKENS)[number];
 
 /**
+ * hope's CSS custom-property namespace. Every semantic token is delivered as a `--hope-<name>`
+ * variable the base `tailwind.css` layer reads (`bg-primary` → `var(--hope-primary)`). This is the
+ * single source of truth for that prefix, shared by the conformance check that asserts a theme
+ * declares each var and the preset renderer that emits token overrides — so the namespace can never
+ * drift between "what we require" and "what we emit".
+ */
+export const HOPE_VAR_PREFIX = "--hope-";
+
+/** Build a hope custom-property name — `hopeVar("primary")` → `"--hope-primary"`. */
+export function hopeVar(name: string): string {
+  return `${HOPE_VAR_PREFIX}${name}`;
+}
+
+/**
  * The shape a theme's color values satisfy: every semantic token mapped to a value. Themes ship
  * these as `--hope-<token>` CSS variables rather than a JS object, but the type stays the canonical
  * description of the vocabulary (and lets a JS tool assert completeness against it).

@@ -15,7 +15,7 @@
  */
 
 import type { SlotRecipeFn } from "../recipes/slot-recipe";
-import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
+import { hopeVar, SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
 
 export interface ConformanceResult {
   ok: boolean;
@@ -94,9 +94,9 @@ export function checkSemanticTokenConformance(
   for (const token of tokens) {
     // The `:` anchor stops a prefix token (`on-primary`) from matching a longer one
     // (`on-primary-soft`).
-    const declared = new RegExp(`--hope-${token}\\s*:`).test(cssText);
+    const declared = new RegExp(`${hopeVar(token)}\\s*:`).test(cssText);
     if (!declared) {
-      errors.push(`semantic token "--hope-${token}" is not defined in the theme CSS`);
+      errors.push(`semantic token "${hopeVar(token)}" is not defined in the theme CSS`);
     }
   }
   return { ok: errors.length === 0, errors };
