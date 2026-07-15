@@ -1,6 +1,6 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { hopeRecipes } from "@hope-ui/presets/hope";
-import { ThemeProvider } from "@hope-ui/theming";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
@@ -9,11 +9,14 @@ import { Button, type ButtonProps } from "../button";
 import ssrFixture from "./__fixtures__/button-ssr.html?raw";
 
 // Button reads styling through `useRecipe("button")`, so every render sits under a
-// `<ThemeProvider>`. The hydration suite wraps the *same* tree the SSR fixture was generated from
-// (`<ThemeProvider theme={hopeRecipes}><Button>Click me</Button></ThemeProvider>`) — the provider
-// shifts `_hk` keys, so both halves must include it identically. See docs/theming.md.
+// `<ThemeProvider>`. `hope` doesn't become a preset until Phase 4, so bootstrap one inline from the
+// raw recipe map (`definePreset(hopeRecipes)`) — its empty tokens keep the provider on the zero-DOM
+// branch, so the fixture is byte-identical. The hydration suite wraps the *same* tree the SSR
+// fixture was generated from (`<ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>`)
+// — the provider shifts `_hk` keys, so both halves must include it identically. See docs/theming.md.
+const hope = definePreset(hopeRecipes);
 function Themed(props: { children: JSX.Element }): JSX.Element {
-  return <ThemeProvider theme={hopeRecipes}>{props.children}</ThemeProvider>;
+  return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
 
 /**

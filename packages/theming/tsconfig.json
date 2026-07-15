@@ -4,5 +4,5 @@
     "noEmit": true,
     "declarationMap": false
   },
-  "include": ["src"]
+  "include": ["src", "types"]
 }

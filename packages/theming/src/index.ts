@@ -19,4 +19,13 @@ export {
   type SemanticColorToken,
 } from "./semantic-tokens/semantic-tokens";
 export { cn, cx, tv } from "./styling/styling";
-export { ThemeProvider, type ThemeProviderProps, useRecipe } from "./theme-context/theme-context";
+export {
+  ThemeProvider,
+  type ThemeProviderProps,
+  type UseDefaultsOptions,
+  type UseSlotsOptions,
+  useDefaults,
+  useRecipe,
+  useSlots,
+  useTheme,
+} from "./theme-context/theme-context";

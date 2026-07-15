@@ -1,18 +1,22 @@
 import { hopeRecipes } from "@hope-ui/presets/hope";
-import { ThemeProvider } from "@hope-ui/theming";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Button } from "../button";
 
 // Button reads its styling through `useRecipe("button")`, so every render — SSR and hydration
-// alike — must sit under a `<ThemeProvider>`. Wrapping a subtree in the provider also shifts its
-// hydration keys (`_hk`), so this tree and `button.browser.test.tsx`'s hydration tree are
-// structurally identical, `<ThemeProvider>` included. See docs/theming.md "SSR / hydration".
+// alike — must sit under a `<ThemeProvider>`. `hope` doesn't become a preset until Phase 4, so
+// bootstrap one inline from the raw recipe map (`definePreset(hopeRecipes)`) — its tokens are
+// empty, so the provider takes the zero-DOM branch and emits no `<style>`, leaving the fixture
+// byte-identical. Wrapping a subtree in the provider also shifts its hydration keys (`_hk`), so
+// this tree and `button.browser.test.tsx`'s hydration tree are structurally identical,
+// `<ThemeProvider>` included. See docs/theming.md "SSR / hydration".
+const hope = definePreset(hopeRecipes);
 
 describe("Button SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button>Click me</Button>
       </ThemeProvider>
     ));
@@ -23,7 +27,7 @@ describe("Button SSR", () => {
     // The recipe is a pure, deterministic class mapper, so its classes appear in the server HTML
     // exactly as on the client — the whole of theming's SSR requirement.
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button variant="solid" color="danger">
           Delete
         </Button>
@@ -38,7 +42,7 @@ describe("Button SSR", () => {
     // The rework drops the redundant `aria-disabled` on a native disabled button — the native
     // `disabled` attribute already conveys the state.
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button disabled>Click me</Button>
       </ThemeProvider>
     ));
@@ -53,7 +57,7 @@ describe("Button SSR", () => {
     // Loading blocks activation but keeps the enabled look and tab order — conveyed by `aria-busy`,
     // never the native `disabled` attribute.
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button loading>Saving</Button>
       </ThemeProvider>
     ));
@@ -70,7 +74,7 @@ describe("Button SSR", () => {
     // literal `<a>` because a literal host element in an SSR-compiled test module compiles to a
     // module-scope client-only call that throws at import (see __fixtures__/README.md / CLAUDE.md).
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button nativeButton={false} disabled>
           Link
         </Button>
@@ -93,7 +97,7 @@ describe("Button SSR", () => {
     // hand-written — nobody should ever be guessing an `_hk` key. Update it deliberately with
     // `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => (
-      <ThemeProvider theme={hopeRecipes}>
+      <ThemeProvider preset={hope}>
         <Button>Click me</Button>
       </ThemeProvider>
     ));
