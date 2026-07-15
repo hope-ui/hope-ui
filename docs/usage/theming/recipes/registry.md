@@ -5,7 +5,7 @@ constant. Types + one constant; no runtime CSS.
 
 `@hope-ui/theming` **owns the look-&-feel contract**: every hope-authored component's recipe is
 declared here directly — one entry per component, referencing that component's contract file (e.g.
-[`button`](../recipes/button.md)) — **not** by module augmentation. A component consumes
+[`button`](./button.md)) — **not** by module augmentation. A component consumes
 `useRecipe("<name>")`; a theme implements the matching recipe and checks its map with
 `satisfies RecipeRegistry`. Neither the component nor the theme can drift the contract.
 
@@ -29,6 +29,6 @@ or the registry mechanics.
 
 ## Related
 
-- [`recipe`](../styling/recipe.md) — the `SlotRecipeFn` / `SlotClassFn` shape each entry uses.
+- [`slot-recipe`](./slot-recipe.md) — the `SlotRecipeFn` / `SlotClassFn` shape each entry uses.
 - [`theme-context`](../theme-context/theme-context.md) — `ThemeProvider` / `useRecipe` over this registry.
 - [`conformance`](../conformance/conformance.md) — the runtime drift gate.

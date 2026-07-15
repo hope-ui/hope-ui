@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SlotClassFn, SlotRecipeFn } from "../recipe";
+import type { SlotClassFn, SlotRecipeFn } from "../slot-recipe";
 
 // The recipe shape is types-only; these are compile-time assignability checks (verified by
 // `pnpm typecheck`), plus one runtime assertion so the shape can't silently change.

@@ -25,7 +25,7 @@ function MyComponent(props) {
 ```
 
 The recipe name (`button`) must be one the contract declares in
-[`registry`](../registry/registry.md); a theme's map (`hopeRecipes`) implements every entry there.
+[`registry`](../recipes/registry.md); a theme's map (`hopeRecipes`) implements every entry there.
 
 ## API
 
@@ -60,5 +60,5 @@ and its hydration test must both include `<ThemeProvider>` identically, or the k
 
 ## Related
 
-- [`registry`](../registry/registry.md) — the `RecipeRegistry` this reads; [`recipe`](../styling/recipe.md) — the `SlotRecipeFn` shape.
+- [`registry`](../recipes/registry.md) — the `RecipeRegistry` this reads; [`slot-recipe`](../recipes/slot-recipe.md) — the `SlotRecipeFn` shape.
 - [`conformance`](../conformance/conformance.md) — the kit that verifies a theme's recipes actually emit classes.

@@ -1,6 +1,6 @@
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { JSX } from "@solidjs/web";
-import type { RecipeRegistry } from "../registry/registry";
+import type { RecipeRegistry } from "../recipes/registry";
 
 /**
  * The theme context: a map of recipe name → recipe function. Built on the kernel's

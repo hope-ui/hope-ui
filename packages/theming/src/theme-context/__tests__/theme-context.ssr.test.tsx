@@ -1,7 +1,7 @@
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
-import type { RecipeRegistry } from "../../registry/registry";
-import type { SlotRecipeFn } from "../../styling/recipe";
+import type { RecipeRegistry } from "../../recipes/registry";
+import type { SlotRecipeFn } from "../../recipes/slot-recipe";
 import { ThemeProvider, useRecipe } from "../theme-context";
 
 // A synthetic single-"root"-slot recipe stands in for a real component's recipe, cast into the

@@ -5,9 +5,9 @@
  * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a theme: the
  * `@hope-ui/components` `Button` consumes it via `useRecipe("button")`, and each theme
  * (`@hope-ui/themes/*`) implements a `tailwind-variants` recipe against it. One file per component
- * keeps the registry (`../registry`) a flat list of named recipe types with no shape logic of its own.
+ * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
  */
-import type { SlotRecipeFn } from "../styling/recipe";
+import type { SlotRecipeFn } from "./slot-recipe";
 
 /** Visual style. `default` is neutral chrome (shadcn's outline) and ignores `color`. */
 export type ButtonVariant = "default" | "solid" | "soft" | "outline" | "ghost" | "link";

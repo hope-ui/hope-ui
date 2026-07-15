@@ -7,7 +7,7 @@ authority). Types only — no runtime, no CSS.
 (`@hope-ui/themes/*`) implements a `tailwind-variants` recipe against it, checked by
 `hopeRecipes satisfies RecipeRegistry`. This file also exports the assembled recipe type
 `ButtonRecipe` (`SlotRecipeFn<ButtonRecipeVariants, ButtonSlot>`), which the
-[`registry`](../registry/registry.md) references as its `button` entry — so the registry stays a
+[`registry`](./registry.md) references as its `button` entry — so the registry stays a
 flat list of named recipe types and this file owns the Button shape.
 
 ## Vocabulary

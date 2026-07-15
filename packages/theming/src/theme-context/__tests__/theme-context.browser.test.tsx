@@ -1,8 +1,8 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import type { RecipeRegistry } from "../../registry/registry";
-import type { SlotRecipeFn } from "../../styling/recipe";
+import type { RecipeRegistry } from "../../recipes/registry";
+import type { SlotRecipeFn } from "../../recipes/slot-recipe";
 import { ThemeProvider, useRecipe } from "../theme-context";
 
 // Synthetic single-"root"-slot recipe, cast into the registry — see the ssr test for the

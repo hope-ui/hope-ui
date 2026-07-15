@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SEMANTIC_COLOR_TOKENS } from "../../semantic-tokens/semantic-tokens";
-import type { SlotRecipeFn } from "../../styling/recipe";
+import type { SlotRecipeFn } from "../../recipes/slot-recipe";
 import {
   assertSemanticTokenConformance,
   assertSlotRecipeConformance,

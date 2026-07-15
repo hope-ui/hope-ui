@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { ButtonRecipeVariants, ButtonSlot } from "../../recipes/button";
-import type { SlotClassFn } from "../../styling/recipe";
+import type { ButtonRecipeVariants, ButtonSlot } from "../button";
 import { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "../registry";
+import type { SlotClassFn } from "../slot-recipe";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `button`. This is

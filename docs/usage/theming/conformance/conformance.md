@@ -51,5 +51,5 @@ Throws a single aggregated error when the recipe is non-conformant; the convenie
 
 ## Related
 
-- [`recipe`](../styling/recipe.md) / [`registry`](../registry/registry.md) — the `SlotRecipeFn` shape and the registry this checks against.
+- [`slot-recipe`](../recipes/slot-recipe.md) / [`registry`](../recipes/registry.md) — the `SlotRecipeFn` shape and the registry this checks against.
 - [`theme-context`](../theme-context/theme-context.md) — how components consume a (conformant) theme at runtime.

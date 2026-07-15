@@ -1,9 +1,9 @@
 /**
  * What a recipe *is* — the generic shape every hope-ui recipe takes, independent of any component.
  *
- * A recipe is a `tailwind-variants` slot recipe (see `./styling`'s `tv`) used **directly** (no
- * adapter): calling it with variant props returns one class *function* per slot. Each component's
- * contract under `../recipes/` specializes this with its variant vocabulary and slot names.
+ * A recipe is a `tailwind-variants` slot recipe (see `../styling/styling`'s `tv`) used **directly**
+ * (no adapter): calling it with variant props returns one class *function* per slot. Each
+ * component's contract in this folder specializes this with its variant vocabulary and slot names.
  */
 import type { ClassValue } from "tailwind-variants";
 
