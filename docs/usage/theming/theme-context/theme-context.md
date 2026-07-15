@@ -6,27 +6,26 @@ recipe name → pure slot-recipe function — into context; a component reads on
 
 ```tsx
 import { ThemeProvider, useRecipe } from "@hope-ui/theming";
-import { accordion } from "my-theme"; // generated slot-recipe fns bundled by the theme package
+import { hopeRecipes } from "@hope-ui/themes/hope/recipes"; // the theme's recipe map
 
 function App() {
   return (
-    <ThemeProvider theme={{ accordion }}>
+    <ThemeProvider theme={hopeRecipes}>
       <MyComponent />
     </ThemeProvider>
   );
 }
 
-// Inside a component (the box.tsx pattern — class computed in a getter). Every recipe is a slot
-// recipe; a single-part component uses the `root` slot:
+// Inside a component — class computed in a getter. Every recipe is a slot recipe used as-is, so
+// each slot is a class *function*; a single-part component uses the `root` slot:
 function MyComponent(props) {
-  const recipe = useRecipe("accordion");
-  return <div class={recipe({ size: props.size }).root} {...rest} />;
+  const recipe = useRecipe("button");
+  return <button class={recipe({ variant: props.variant }).root({ class: props.class })} {...rest} />;
 }
 ```
 
-`accordion` here is only an illustration — the registry ships **empty**; a recipe name is reachable
-through `useRecipe` only once a component or theme has registered it by augmentation (see
-[`theme-recipes`](../theme-recipes/theme-recipes.md)).
+The recipe name (`button`) must be one the contract declares in
+[`registry`](../registry/registry.md); a theme's map (`hopeRecipes`) implements every entry there.
 
 ## API
 
@@ -34,14 +33,14 @@ through `useRecipe` only once a component or theme has registered it by augmenta
 
 | Prop | Type | Notes |
 | --- | --- | --- |
-| `theme` | `ThemeRecipes` | Map of recipe name → pure slot-recipe function (props → `Record<slot, className>`). Injected as *functions*, not imported at build time. Theme is chosen at codegen time, so this is effectively static. |
+| `theme` | `RecipeRegistry` | Map of recipe name → slot-recipe function (variant props → per-slot class functions). Injected as *functions*, not imported at build time. Theme is chosen at build time, so this is effectively static. |
 | `children` | `JSX.Element` | — |
 
 Renders **no DOM of its own** (it is `<ThemeContext value={theme}>`). It is built on the kernel's
 isomorphic `createComponentContext`, so it is server-readable during `renderToStringAsync` — which
 is what "works in SolidStart" requires.
 
-### `useRecipe<K extends keyof ThemeRecipes>(key: K): ThemeRecipes[K]`
+### `useRecipe<K extends keyof RecipeRegistry>(key: K): RecipeRegistry[K]`
 
 Returns the slot-recipe function registered under `key` in the current theme.
 
@@ -61,5 +60,5 @@ and its hydration test must both include `<ThemeProvider>` identically, or the k
 
 ## Related
 
-- [`theme-recipes`](../theme-recipes/theme-recipes.md) — the `ThemeRecipes` registry and the `SlotRecipeFn` shape this reads.
+- [`registry`](../registry/registry.md) — the `RecipeRegistry` this reads; [`recipe`](../styling/recipe.md) — the `SlotRecipeFn` shape.
 - [`conformance`](../conformance/conformance.md) — the kit that verifies a theme's recipes actually emit classes.

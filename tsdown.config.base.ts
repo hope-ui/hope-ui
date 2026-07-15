@@ -55,11 +55,14 @@ export function createTsdownConfig(packageDir: string): UserConfig {
     format: "esm",
     platform: "browser",
     outDir: join(packageDir, "dist"),
-    // Keep `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external so the consumer resolves them
-    // (`@hope-ui/primitives` via *its own* `"solid"` condition). Applies to the **dts** build too,
-    // so the emitted declarations reference those siblings by bare specifier, never a src path.
+    // Keep `solid-js`/`@solidjs/web` and **every `@hope-ui/*` sibling** external so the consumer
+    // resolves them (each `@hope-ui/*` via *its own* `"solid"` condition). This matters wherever a
+    // published package imports another: `@hope-ui/components` → `@hope-ui/theming`, and
+    // `@hope-ui/themes/hope/recipes` → `@hope-ui/theming` (for `tv`/`slotRecipe`). Applies to the
+    // **dts** build too, so the emitted declarations reference those siblings by bare specifier,
+    // never a src path.
     deps: {
-      neverBundle: [/^solid-js/, /^@solidjs\//, /^@hope-ui\/primitives/],
+      neverBundle: [/^solid-js/, /^@solidjs\//, /^@hope-ui\//],
     },
     // Ship source: keep JSX for the consumer's per-environment compile.
     inputOptions(options) {

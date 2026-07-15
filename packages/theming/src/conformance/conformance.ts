@@ -1,20 +1,20 @@
 /**
  * The conformance kit — the runtime half of the drift gate (`@hope-ui/theming/conformance`).
  *
- * A theme author runs it in a test *after* `panda codegen`, against their generated recipe
- * functions. It complements the compile-time `satisfies ThemeRecipes` check (which the author
- * writes in their own source): `satisfies` proves the *types* line up; this proves the generated
- * *functions* actually produce a class for every slot at every variant combination the author
- * cares about. Neither can prove *mapping correctness* (that a given variant renders as this
- * theme's intended style) — that stays the job of per-theme visual/story tests.
+ * A theme author runs it in a test against their `tailwind-variants` recipe functions. It
+ * complements the compile-time `satisfies RecipeRegistry` check (which the author writes in their
+ * own source): `satisfies` proves the *types* line up; this proves the *functions* actually produce
+ * a class for every slot at every variant combination the author cares about. Neither can prove
+ * *mapping correctness* (that a given variant renders as this theme's intended style) — that stays
+ * the job of per-theme visual/story tests.
  *
- * It is **generic**: the kit knows nothing about any specific component (there are none yet). The
- * author passes the recipe plus the prop combinations and slots to exercise — those are the
- * component's own decisions, not this package's. No test-runner dependency: it returns a result
- * (or throws, via `assertSlotRecipeConformance`) so the author wraps it in whatever `it(...)` they use.
+ * It is **generic**: the kit knows nothing about any specific component. The author passes the
+ * recipe plus the prop combinations and slots to exercise — those are the component's own decisions,
+ * not this package's. No test-runner dependency: it returns a result (or throws, via
+ * `assertSlotRecipeConformance`) so the author wraps it in whatever `it(...)` they use.
  */
 import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
-import type { SlotRecipeFn } from "../theme-recipes/theme-recipes";
+import type { SlotRecipeFn } from "../styling/recipe";
 
 export interface ConformanceResult {
   ok: boolean;
@@ -49,7 +49,8 @@ export function checkSlotRecipeConformance<Variants>(
   for (const props of expectation.cases) {
     const result = recipe(props);
     for (const slot of expectation.slots) {
-      if (!isNonEmptyString(result?.[slot])) {
+      // A slot resolves to a class *function* (tailwind-variants) — call it for its class string.
+      if (!isNonEmptyString(result?.[slot]?.())) {
         errors.push(`slot "${slot}" produced no class for props ${JSON.stringify(props ?? {})}`);
       }
     }

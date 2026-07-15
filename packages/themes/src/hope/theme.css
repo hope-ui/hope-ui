@@ -10,7 +10,7 @@
  * theme) with hope's own token values. Three parts, three files:
  *   - `../_base/variants.css`  — shared custom variants (the `dark` selector). Contract-level.
  *   - `../_base/theme-map.css` — shared `@theme inline` mapping `--hope-*` into Tailwind utilities.
- *   - `./tokens.css`           — hope's `--hope-*` values for `:root`/`.dark`. The reskin layer.
+ *   - `./tokens.css`           — hope's token values (colors under `:root`/`.dark`, the radius scale).
  *
  * Import order is cosmetic (these are Tailwind at-rules + cascade-resolved custom properties, not
  * order-sensitive), so they read as two groups: the shared contract first, then this theme's values —
@@ -25,8 +25,10 @@
 @import "./tokens.css";
 
 /*
- * Recipes: when the first styled component lands, hope ships its `tailwind-variants` slot recipes
- * under `./recipes` and registers them for the consumer's Tailwind content scan:
- *   @source "./recipes";
- * (Kept as a comment until `./recipes` exists so Tailwind never scans a missing path.)
+ * Recipes: hope's `tailwind-variants` slot recipes live under `./recipes`. Registering the folder
+ * as a Tailwind content source makes the consumer's build scan the recipe files for the literal
+ * utility candidates they emit (`bg-primary`, `text-on-danger-soft`, `border-warning-outline`, …),
+ * so those classes actually exist in the generated CSS. The recipe *functions* are imported
+ * separately at runtime from `@hope-ui/themes/hope/recipes` and passed to `<ThemeProvider>`.
  */
+@source "./recipes";

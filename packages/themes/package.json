@@ -1,26 +1,39 @@
 {
   "name": "@hope-ui/themes",
   "version": "0.0.0",
-  "description": "hope-ui themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/hope is the default visual identity). Each theme ships a Tailwind v4 CSS file (design tokens as --hope-* CSS variables + an @theme inline mapping to clean utilities); import it into your Tailwind entry. No JS config, no codegen.",
+  "description": "hope-ui themes — one tree-shakable package, per-theme subpaths (@hope-ui/themes/hope is the default visual identity). Each theme ships a Tailwind v4 CSS file (design tokens as --hope-* CSS variables + an @theme inline mapping to clean utilities) plus a runtime recipe map: import the CSS into your Tailwind entry, pass the recipe map to <ThemeProvider>.",
   "type": "module",
   "sideEffects": false,
-  "files": ["src"],
+  "files": ["src", "dist"],
+  "hope": {
+    "entries": {
+      "hope/recipes": "src/hope/recipes/index.ts"
+    }
+  },
   "exports": {
     "./hope": {
       "style": "./src/hope/theme.css",
       "default": "./src/hope/theme.css"
     },
+    "./hope/recipes": {
+      "types": "./dist/hope/recipes/index.d.ts",
+      "solid": "./dist/hope/recipes/index.jsx",
+      "default": "./dist/hope/recipes/index.jsx"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
+    "build": "tsdown",
     "typecheck": "tsc --noEmit"
   },
   "license": "MIT",
   "peerDependencies": {
     "tailwindcss": "^4.0.0"
   },
+  "dependencies": {
+    "@hope-ui/theming": "workspace:*"
+  },
   "devDependencies": {
-    "@hope-ui/theming": "workspace:*",
     "@types/node": "^22.0.0"
   }
 }

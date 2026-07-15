@@ -1,10 +1,20 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Button, type ButtonProps } from "../button";
 import ssrFixture from "./__fixtures__/button-ssr.html?raw";
+
+// Button reads styling through `useRecipe("button")`, so every render sits under a
+// `<ThemeProvider>`. The hydration suite wraps the *same* tree the SSR fixture was generated from
+// (`<ThemeProvider theme={hopeRecipes}><Button>Click me</Button></ThemeProvider>`) — the provider
+// shifts `_hk` keys, so both halves must include it identically. See docs/theming.md.
+function Themed(props: { children: JSX.Element }): JSX.Element {
+  return <ThemeProvider theme={hopeRecipes}>{props.children}</ThemeProvider>;
+}
 
 /**
  * Renders Button as an anchor. Passed as a **direct** `render` prop, never via a spread object:
@@ -18,7 +28,11 @@ const renderAsAnchor: NonNullable<ButtonProps["render"]> = (p) => (
 
 describe("Button — native", () => {
   it("renders a native button element with type=button", async () => {
-    const { dispose } = mount(() => <Button>Click me</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
 
     const button = page.getByRole("button", { name: "Click me" });
     await expect.element(button).toBeInTheDocument();
@@ -26,9 +40,42 @@ describe("Button — native", () => {
     dispose();
   });
 
+  it("applies the recipe's slot classes (default neutral chrome)", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
+
+    const button = container.querySelector("button");
+    // The default variant is color-independent neutral chrome; the label sits in its own slot.
+    expect(button?.className).toContain("bg-surface-raised");
+    expect(button?.className).toContain("border-subtle");
+    expect(button?.querySelector('[data-slot="label"]')?.textContent).toBe("Click me");
+    dispose();
+  });
+
+  it("lets the consumer class win over the recipe (cn merge)", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button class="bg-red-500">Click me</Button>
+      </Themed>
+    ));
+
+    const cls = container.querySelector("button")?.className ?? "";
+    // tailwind-merge resolves the conflicting fill in the consumer's favor.
+    expect(cls).toContain("bg-red-500");
+    expect(cls).not.toContain("bg-surface-raised");
+    dispose();
+  });
+
   it("fires onClick when clicked", async () => {
     const onClick = vi.fn();
-    const { dispose } = mount(() => <Button onClick={onClick}>Click me</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button onClick={onClick}>Click me</Button>
+      </Themed>
+    ));
 
     await page.getByRole("button", { name: "Click me" }).click();
     expect(onClick).toHaveBeenCalledOnce();
@@ -39,7 +86,11 @@ describe("Button — native", () => {
     // Regression: `merge({ type: "button" }, props)` resolved by key *presence*, so an
     // explicitly-`undefined` `type` beat the default and the button became a submit button
     // inside a form. `withDefaults` resolves with `??`. See `withDefaults`' doc.
-    const { dispose } = mount(() => <Button type={undefined}>Click me</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button type={undefined}>Click me</Button>
+      </Themed>
+    ));
 
     await expect
       .element(page.getByRole("button", { name: "Click me" }))
@@ -48,7 +99,11 @@ describe("Button — native", () => {
   });
 
   it("still lets an explicit `type` override the default", async () => {
-    const { dispose } = mount(() => <Button type="submit">Submit</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button type="submit">Submit</Button>
+      </Themed>
+    ));
 
     await expect
       .element(page.getByRole("button", { name: "Submit" }))
@@ -59,7 +114,11 @@ describe("Button — native", () => {
   it("uses the native disabled attribute without a redundant aria-disabled", async () => {
     // The rework drops the double-up: a native disabled button already conveys the state via
     // the native attribute, which also removes it from the tab order.
-    const { dispose } = mount(() => <Button disabled>Click me</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button disabled>Click me</Button>
+      </Themed>
+    ));
 
     const button = page.getByRole("button", { name: "Click me" });
     await expect.element(button).toBeDisabled();
@@ -69,7 +128,11 @@ describe("Button — native", () => {
 
   it("activates on Enter and Space", async () => {
     const onClick = vi.fn();
-    const { dispose } = mount(() => <Button onClick={onClick}>Click me</Button>);
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button onClick={onClick}>Click me</Button>
+      </Themed>
+    ));
 
     page.getByRole("button", { name: "Click me" }).element().focus();
     await userEvent.keyboard("{Enter}");
@@ -78,8 +141,65 @@ describe("Button — native", () => {
     dispose();
   });
 
+  it("renders decorators in their own slots", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button
+          startDecorator={<span data-testid="start">+</span>}
+          endDecorator={<span data-testid="end">-</span>}
+        >
+          Label
+        </Button>
+      </Themed>
+    ));
+
+    const button = container.querySelector("button");
+    expect(button?.querySelector('[data-slot="start-decorator"]')).not.toBeNull();
+    expect(button?.querySelector('[data-slot="end-decorator"]')).not.toBeNull();
+    expect(button?.querySelector('[data-testid="start"]')).not.toBeNull();
+    dispose();
+  });
+
   it("has no baseline accessibility violations", async () => {
-    const { container, dispose } = mount(() => <Button>Click me</Button>);
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Button — loading", () => {
+  it("marks aria-busy, renders the loader, and blocks activation", async () => {
+    const onClick = vi.fn();
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button loading onClick={onClick}>
+          Saving
+        </Button>
+      </Themed>
+    ));
+
+    const button = page.getByRole("button", { name: "Saving" });
+    await expect.element(button).toHaveAttribute("aria-busy", "true");
+    // Not disabled: still in the tab order, keeps its enabled look.
+    await expect.element(button).not.toBeDisabled();
+    expect(container.querySelector('[data-slot="loader"]')).not.toBeNull();
+
+    // A click is blocked by the loading guard's preventDefault (the same cancel channel disabled uses).
+    await button.click();
+    expect(onClick).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("has no accessibility violations while loading", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button loading>Saving</Button>
+      </Themed>
+    ));
     await expectNoA11yViolations(container);
     dispose();
   });
@@ -88,9 +208,11 @@ describe("Button — native", () => {
 describe("Button — render-ed as a non-native element", () => {
   it("renders the polymorphic element and announces as a button", async () => {
     const { dispose } = mount(() => (
-      <Button nativeButton={false} render={renderAsAnchor}>
-        Link button
-      </Button>
+      <Themed>
+        <Button nativeButton={false} render={renderAsAnchor}>
+          Link button
+        </Button>
+      </Themed>
     ));
 
     // role="button" is applied over the anchor, so it announces as a button, not a link.
@@ -105,9 +227,11 @@ describe("Button — render-ed as a non-native element", () => {
     // preventDefault so the enabled anchor's activation doesn't navigate the test iframe.
     const onClick = vi.fn((event: MouseEvent) => event.preventDefault());
     const { dispose } = mount(() => (
-      <Button nativeButton={false} render={renderAsAnchor} onClick={onClick}>
-        Link button
-      </Button>
+      <Themed>
+        <Button nativeButton={false} render={renderAsAnchor} onClick={onClick}>
+          Link button
+        </Button>
+      </Themed>
     ));
 
     page.getByRole("button", { name: "Link button" }).element().focus();
@@ -120,9 +244,11 @@ describe("Button — render-ed as a non-native element", () => {
   it("marks aria-disabled, drops from the tab order, and blocks activation while disabled", async () => {
     const onClick = vi.fn();
     const { dispose } = mount(() => (
-      <Button nativeButton={false} render={renderAsAnchor} onClick={onClick} disabled>
-        Link button
-      </Button>
+      <Themed>
+        <Button nativeButton={false} render={renderAsAnchor} onClick={onClick} disabled>
+          Link button
+        </Button>
+      </Themed>
     ));
 
     const button = page.getByRole("button", { name: "Link button" });
@@ -140,9 +266,11 @@ describe("Button — render-ed as a non-native element", () => {
 
   it("has no baseline accessibility violations as a non-native button", async () => {
     const { container, dispose } = mount(() => (
-      <Button nativeButton={false} render={renderAsAnchor}>
-        Link button
-      </Button>
+      <Themed>
+        <Button nativeButton={false} render={renderAsAnchor}>
+          Link button
+        </Button>
+      </Themed>
     ));
     await expectNoA11yViolations(container);
     dispose();
@@ -176,17 +304,23 @@ describe("Button hydration", () => {
 
   it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
     // `ssrFixture` is genuine server output — `Button.ssr.test.tsx` asserts it byte-for-byte
-    // against a real `renderToStringAsync` in the `ssr` project, where both `solid-js` and
-    // `@solidjs/web` resolve to their server builds. Here they resolve to the client builds,
-    // whose `renderToStringAsync` is a stub that `console.error`s and returns `undefined`;
-    // rendering the fixture in-process would silently hydrate the string "undefined".
+    // against a real `renderToStringAsync` in the `ssr` project. Here `solid-js`/`@solidjs/web`
+    // resolve to their client builds, so we hydrate the fixture rather than re-render it. The
+    // tree — `<ThemeProvider>` and all — is structurally identical to the one that produced it.
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const teardownHydration = bootstrapHydration();
     const { container, remove } = mountServerHtml(ssrFixture);
 
     const serverButton = container.querySelector("button");
-    const dispose = hydrate(() => <Button>Click me</Button>, container);
+    const dispose = hydrate(
+      () => (
+        <Themed>
+          <Button>Click me</Button>
+        </Themed>
+      ),
+      container,
+    );
 
     expect(consoleError).not.toHaveBeenCalled();
     expect(consoleWarn).not.toHaveBeenCalled();
@@ -208,7 +342,14 @@ describe("Button hydration", () => {
     const teardownHydration = bootstrapHydration();
     const { container, remove } = mountServerHtml(ssrFixture);
 
-    const dispose = hydrate(() => <Button onClick={onClick}>Click me</Button>, container);
+    const dispose = hydrate(
+      () => (
+        <Themed>
+          <Button onClick={onClick}>Click me</Button>
+        </Themed>
+      ),
+      container,
+    );
 
     await page.getByRole("button", { name: "Click me" }).click();
     expect(onClick).toHaveBeenCalledOnce();
@@ -222,7 +363,14 @@ describe("Button hydration", () => {
     const teardownHydration = bootstrapHydration();
     const { container, remove } = mountServerHtml(ssrFixture);
 
-    const dispose = hydrate(() => <Button>Click me</Button>, container);
+    const dispose = hydrate(
+      () => (
+        <Themed>
+          <Button>Click me</Button>
+        </Themed>
+      ),
+      container,
+    );
     await expectNoA11yViolations(container);
 
     dispose();

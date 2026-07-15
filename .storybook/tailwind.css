@@ -8,3 +8,10 @@
 
 /* Scan the components' source + stories for the utility classes to generate. */
 @source "../packages/components/src";
+
+
+body {
+  @apply antialiased;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}

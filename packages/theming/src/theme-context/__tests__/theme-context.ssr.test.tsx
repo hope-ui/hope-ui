@@ -1,24 +1,23 @@
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
-import type { SlotRecipeFn, ThemeRecipes } from "../../theme-recipes/theme-recipes";
+import type { RecipeRegistry } from "../../registry/registry";
+import type { SlotRecipeFn } from "../../styling/recipe";
 import { ThemeProvider, useRecipe } from "../theme-context";
 
-// A synthetic single-"root"-slot recipe stands in for a real component's recipe. The registry is
-// empty by design (no components exist yet), so we cast it in. This exercises the machinery — how
-// a recipe is injected and read — without inventing any component's API or variant vocabulary.
+// A synthetic single-"root"-slot recipe stands in for a real component's recipe, cast into the
+// registry so this exercises the machinery — how a recipe is injected and read — without depending
+// on any real component's API or variant vocabulary.
 type DemoVariants = { size?: "sm" | "md" };
 const demo: SlotRecipeFn<DemoVariants> = (props) => ({
-  root: `demo demo--size_${props?.size ?? "md"}`,
+  root: () => `demo demo--size_${props?.size ?? "md"}`,
 });
-const theme = { demo } as unknown as ThemeRecipes;
+const theme = { demo } as unknown as RecipeRegistry;
 
 function Probe() {
-  const recipe = useRecipe("demo" as keyof ThemeRecipes) as SlotRecipeFn<DemoVariants>;
-  // Returns the recipe's class string as text, not on a host element. The point is only that the
-  // recipe *executes* on the server; a literal `<button>` would compile (DOM mode) to a
-  // `template()` the @solidjs/web server build stubs. A real component renders through
-  // `renderElement`/`<Dynamic>` (like Box), covered by that component's own ssr test.
-  return recipe({ size: "sm" }).root;
+  const recipe = useRecipe("demo" as keyof RecipeRegistry) as SlotRecipeFn<DemoVariants>;
+  // Returns the recipe's class string as text — the point is only that the recipe *executes* on the
+  // server, i.e. the provider's context is readable during `renderToStringAsync`.
+  return recipe({ size: "sm" }).root();
 }
 
 // SSR (node, server builds of solid-js AND @solidjs/web): proves the ThemeProvider context is

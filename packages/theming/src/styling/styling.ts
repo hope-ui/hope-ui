@@ -4,17 +4,35 @@
  * which `@hope-ui/theming` provides as a dependency — so `clsx` is never a separate dependency).
  *
  * - `tv` — a `createTV`-bound instance, the single source of truth for how hope-ui recipes merge
- *   conflicting Tailwind utilities. The shared `twMergeConfig` that registers hope's semantic color
- *   groups (so `bg-primary` and `bg-danger` are known to conflict) is added here alongside the first
- *   slot recipe, where such merges are actually exercised and testable; until then the default merge
- *   is already correct for every standard utility the codebase uses.
- * - `cn` — concatenate + tailwind-merge conflict resolution, for the rare non-recipe merge. The
- *   common consumer-`class` override is merged *through* a recipe's slot function
- *   (`recipe(v).root({ class })`), not through `cn`.
+ *   conflicting Tailwind utilities. It carries the shared `twMergeConfig` that registers hope's
+ *   semantic color vocabulary (so `bg-primary`, `bg-primary-soft`, `border-primary-outline`, and
+ *   `ring-focus` are all known colors that resolve deterministically against one another).
+ * - `cn` — concatenate + tailwind-merge conflict resolution, for the rare non-recipe merge. A
+ *   component merges a consumer `class` through the recipe's own slot function
+ *   (`recipe(v).root({ class })`), which already uses the `tv` config below — not through `cn`.
  * - `cx` — concatenate WITHOUT conflict resolution (clsx-style).
  */
 import { createTV } from "tailwind-variants";
+import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
 
 export { cn, cx } from "tailwind-variants";
 
-export const tv = createTV({ twMerge: true });
+export const tv = createTV({
+  twMerge: true,
+  twMergeConfig: {
+    extend: {
+      theme: {
+        // Register hope's semantic color vocabulary as a first-class tailwind-merge `color` scale.
+        // tailwind-merge's default `color` scale is the permissive `isAny`, so `bg-primary` and
+        // `bg-danger` already collapse to one `bg-color` group — but listing the real token names
+        // makes the merge deterministic for the hope palette (a typo'd fill isn't silently accepted
+        // as "a color") and survives a future tailwind-merge that tightens `isAny` away. Every
+        // semantic token is a color value, so the whole vocabulary registers: fills (`primary`,
+        // `primary-soft`, `primary-hover`, `primary-outline`, …), on-colors (`on-primary`,
+        // `on-primary-soft`, `on-inverse`), the `foreground*`/`surface*` ramps, neutral borders
+        // (`subtle`/`strong`/`disabled`), and the systemic `focus`/`scrim`.
+        color: [...SEMANTIC_COLOR_TOKENS],
+      },
+    },
+  },
+});

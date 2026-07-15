@@ -38,10 +38,12 @@
   },
   "dependencies": {
     "@hope-ui/primitives": "workspace:*",
+    "@hope-ui/theming": "workspace:*",
     "@internationalized/date": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",
+    "@hope-ui/themes": "workspace:*",
     "@solidjs/web": "catalog:",
     "solid-js": "catalog:"
   }

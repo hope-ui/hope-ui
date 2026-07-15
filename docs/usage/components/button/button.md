@@ -1,22 +1,56 @@
 # Button
 
-An accessible button. Renders a native `<button>` by default (with `type="button"`, so it never
-accidentally submits a form), and stays fully accessible when `render`-ed as a different element.
-Behavior is composed from the kernel's `createButton` (element-aware a11y) over `createPress`
-(the unified press engine).
+An accessible, themed button. Renders a native `<button>` by default (with `type="button"`, so it
+never accidentally submits a form), stays fully accessible when `render`-ed as a different element,
+and is styled by the active theme's `button` recipe read through `useRecipe`. Behavior is composed
+from the kernel's `createButton` (element-aware a11y) over `createPress` (the unified press engine).
+
+Because it reads styling from the theme, a `Button` must render under a `<ThemeProvider>` (see
+`@hope-ui/theming`). A consumer imports the theme's recipe map and the theme CSS:
+
+```tsx
+import { ThemeProvider } from "@hope-ui/theming";
+import { hopeRecipes } from "@hope-ui/themes/hope/recipes";
+import { Button } from "@hope-ui/components/button";
+// and, in your Tailwind entry CSS: @import "@hope-ui/themes/hope";
+
+<ThemeProvider theme={hopeRecipes}>
+  <Button variant="solid" color="primary">Save</Button>
+</ThemeProvider>;
+```
 
 ## API
 
-| Prop           | Type                                                        | Default    | Description                                                                                          |
-| -------------- | ----------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
-| `nativeButton` | `boolean`                                                   | `true`     | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism" below.      |
-| `disabled`     | `boolean`                                                   | `false`    | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element.    |
-| `render`       | `(props) => JSX.Element`                                    | —          | Render as a different element/component. The only polymorphism mechanism (there is no `as` prop).    |
-| `type`         | `'button' \| 'submit' \| 'reset'`                           | `'button'` | Native button type. Applied only to a native button.                                                 |
-| `...rest`      | `JSX.ButtonHTMLAttributes<HTMLButtonElement>`               | —          | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, …).                           |
+| Prop              | Type                                                              | Default     | Description                                                                                                    |
+| ----------------- | ----------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `variant`         | `'default' \| 'solid' \| 'soft' \| 'outline' \| 'ghost' \| 'link'`| `'default'` | Visual style. `default` is the neutral chrome button and ignores `color`.                                      |
+| `color`           | `'primary' \| 'neutral' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` | Semantic role color. Ignored by `default`. Shadows the native HTML `color` attribute (dropped from the spread).|
+| `size`            | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                            | `'md'`      | Density/scale. Heights 28 / 32 / 36 / 40 / 44px.                                                               |
+| `nativeButton`    | `boolean`                                                         | `true`      | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism".                      |
+| `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Grayed chrome.|
+| `loading`         | `boolean`                                                         | `false`     | Shows a spinner and blocks activation while keeping the enabled look + tab position. Sets `aria-busy`.          |
+| `loadingText`     | `JSX.Element`                                                     | —           | Replaces the label while loading (implies an inline `start` spinner, so the text stays visible).               |
+| `loader`          | `JSX.Element`                                                     | —           | Custom loader content. Defaults to hope's spinner.                                                             |
+| `loaderPlacement` | `'start' \| 'center' \| 'end'`                                    | `'center'`  | `center` overlays the loader and hides the label (width preserved); `start`/`end` place it inline.             |
+| `startDecorator`  | `JSX.Element`                                                     | —           | Leading slot (typically an icon), before the label.                                                            |
+| `endDecorator`    | `JSX.Element`                                                     | —           | Trailing slot (typically an icon), after the label.                                                            |
+| `fullWidth`       | `boolean`                                                         | `false`     | Stretches to the container width.                                                                              |
+| `render`          | `(props) => JSX.Element`                                          | —           | Render as a different element/component. The only polymorphism mechanism (there is no `as` prop).              |
+| `type`            | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | Native button type. Applied only to a native button.                                                           |
+| `class`           | `string`                                                         | —           | Merged over the recipe's root class (via `cn`), so the consumer's utilities win.                               |
+| `...rest`         | `Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>`      | —           | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, …).                                     |
 
-The rendered element also carries `data-pressed` (empty string) while a press is physically active
-— absent on the server and on the initial client render, so it is hydration-safe.
+The rendered element also carries `data-pressed` (empty string) while a press is physically active,
+and `aria-busy="true"` while `loading` — both absent on the server and on the initial client render,
+so they are hydration-safe.
+
+## Variants & color
+
+`solid`/`soft`/`outline`/`ghost`/`link` take a `color` role; `default` is a color-independent neutral
+chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
+`soft` its tonal fill, and `outline`/`ghost`/`link` paint on the surface using the surface-legible
+`on-{role}-soft` token so neutral and warning stay readable in both light and dark. All styling comes
+from the theme's `button` recipe; the component itself writes no utility classes.
 
 ## Polymorphism (`render` + `nativeButton`)
 
@@ -25,8 +59,6 @@ prop** — its polymorphic typing degrades IDE IntelliSense. Because a non-`<but
 of a native button's built-in behavior, you must tell Button what you rendered via `nativeButton`:
 
 ```tsx
-import { Button } from "@hope-ui/components/button";
-
 // Native button (default).
 <Button onClick={() => console.log("clicked")}>Click me</Button>
 
@@ -40,24 +72,27 @@ When `nativeButton={false}`, Button applies `role="button"`, `tabIndex={0}`, and
 keyboard activation. In dev, a mismatch between `nativeButton` and the element actually rendered logs
 a warning.
 
-## Disabled
+## Disabled & loading
 
-| Element     | Disabled representation                                              | Tab order              |
-| ----------- | ------------------------------------------------------------------- | ---------------------- |
-| Native      | native `disabled` attribute (no redundant `aria-disabled`)          | removed by the browser |
-| Non-native  | `aria-disabled="true"` + blocked click/keyboard handlers            | removed (`tabIndex` dropped) |
+| State      | Representation                                                              | Tab order              | Activation |
+| ---------- | -------------------------------------------------------------------------- | ---------------------- | ---------- |
+| `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native); grayed   | removed                | blocked    |
+| `loading`  | `aria-busy="true"` + spinner; keeps the enabled look                       | kept (stays focusable) | blocked    |
 
 A disabled `render`-ed `<a>` should also have its `href` dropped by the consumer so navigation is
-impossible; click and keyboard activation are blocked regardless. Use `focusableWhenDisabled` (via
-the kernel `createButton`) when a disabled control must stay focusable for a tooltip.
+impossible; click and keyboard activation are blocked regardless. `loading` blocks activation through
+the same `preventDefault` cancel channel the disabled guard uses (see `createPress`) — the consumer's
+`onClick` never fires while loading — but without disabling the button, so it keeps its color and tab
+position. Use `focusableWhenDisabled` (via the kernel `createButton`) when a disabled control must
+stay focusable for a tooltip.
 
 ## Keyboard interaction
 
-| Element     | Key            | Action                                                                                       |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------- |
-| Native      | `Enter`/`Space`| Browser-native activation → fires `onClick`. No extra wiring needed.                          |
-| Non-native  | `Enter`        | Activates (native for an `<a>`, synthesized otherwise) → fires `onClick`.                      |
-| Non-native  | `Space`        | Synthesized activation → fires `onClick`; page scroll is prevented.                           |
+| Element     | Key             | Action                                                                                      |
+| ----------- | --------------- | ------------------------------------------------------------------------------------------- |
+| Native      | `Enter`/`Space` | Browser-native activation → fires `onClick`. No extra wiring needed.                         |
+| Non-native  | `Enter`         | Activates (native for an `<a>`, synthesized otherwise) → fires `onClick`.                     |
+| Non-native  | `Space`         | Synthesized activation → fires `onClick`; page scroll is prevented.                          |
 
 Activation is unified through the real `click` event (see `createPress`), so a mouse click, a native
 button's Enter/Space, a touch tap, a screen-reader action, and a synthesized keyboard click all fire

@@ -9,7 +9,8 @@ import { useRecipe } from "../theme-context";
 describe("useRecipe without a ThemeProvider", () => {
   it("throws a friendly error naming ThemeProvider", () => {
     createRoot((dispose) => {
-      // The registry is empty by design (no components registered), so the key is synthetic.
+      // The key is irrelevant here — the throw happens before any lookup, because there is no
+      // provider; `as never` sidesteps the registry's key type.
       expect(() => useRecipe("anything" as never)).toThrow(/ThemeProvider/);
       dispose();
     });

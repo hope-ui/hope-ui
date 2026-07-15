@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SEMANTIC_COLOR_TOKENS } from "../../semantic-tokens/semantic-tokens";
-import type { SlotRecipeFn } from "../../theme-recipes/theme-recipes";
+import type { SlotRecipeFn } from "../../styling/recipe";
 import {
   assertSemanticTokenConformance,
   assertSlotRecipeConformance,
@@ -18,9 +18,10 @@ const expectation = {
 
 describe("conformance kit", () => {
   it("passes when every slot produces a class for every case", () => {
+    // A recipe resolves each slot to a class *function* (the tailwind-variants shape).
     const recipe: SlotRecipeFn<DemoVariants, "root" | "label"> = (props) => ({
-      root: `demo demo--variant_${props?.variant ?? "a"}`,
-      label: "demo__label",
+      root: () => `demo demo--variant_${props?.variant ?? "a"}`,
+      label: () => "demo__label",
     });
 
     const result = checkSlotRecipeConformance(recipe, expectation);
@@ -33,8 +34,8 @@ describe("conformance kit", () => {
     // Emits nothing for `root` at variant "b" — the kind of gap types can't catch (the fn still
     // *accepts* "b"; it just maps it to "").
     const broken: SlotRecipeFn<DemoVariants, "root" | "label"> = (props) => ({
-      root: props?.variant === "b" ? "" : "demo",
-      label: "demo__label",
+      root: () => (props?.variant === "b" ? "" : "demo"),
+      label: () => "demo__label",
     });
 
     const result = checkSlotRecipeConformance(broken, expectation);

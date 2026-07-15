@@ -234,6 +234,9 @@ importers:
       '@playwright/test':
         specifier: 1.61.1
         version: 1.61.1
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17(solid-js@2.0.0-beta.17)
       '@storybook/addon-a11y':
         specifier: ^10.5.0
         version: 10.5.0(storybook@10.5.0(@types/react@19.2.17)(prettier@2.8.8)(react@19.2.7))
@@ -252,6 +255,9 @@ importers:
       playwright:
         specifier: 1.61.1
         version: 1.61.1
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17
       storybook:
         specifier: ^10.5.0
         version: 10.5.0(@types/react@19.2.17)(prettier@2.8.8)(react@19.2.7)
@@ -285,6 +291,9 @@ importers:
       '@hope-ui/primitives':
         specifier: workspace:*
         version: link:../primitives
+      '@hope-ui/theming':
+        specifier: workspace:*
+        version: link:../theming
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.2
@@ -292,6 +301,9 @@ importers:
       '@hope-ui/internal-test-utils':
         specifier: workspace:*
         version: link:../internal-test-utils
+      '@hope-ui/themes':
+        specifier: workspace:*
+        version: link:../themes
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.17(solid-js@2.0.0-beta.17)
@@ -336,13 +348,13 @@ importers:
 
   packages/themes:
     dependencies:
+      '@hope-ui/theming':
+        specifier: workspace:*
+        version: link:../theming
       tailwindcss:
         specifier: ^4.0.0
         version: 4.3.2
     devDependencies:
-      '@hope-ui/theming':
-        specifier: workspace:*
-        version: link:../theming
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.1

@@ -14,15 +14,15 @@ decisions.
 
 ```ts
 import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
-import { accordion } from "../styled-system/recipes"; // this theme's generated fn
-import type { ThemeRecipes } from "@hope-ui/theming";
+import type { RecipeRegistry } from "@hope-ui/theming";
+import { accordionRecipe } from "./recipes/accordion"; // this theme's `tv` recipe
 
 it("accordion conforms", () => {
-  const theme = { accordion } satisfies ThemeRecipes; // compile-time: types line up
+  const theme = { accordion: accordionRecipe } satisfies RecipeRegistry; // compile-time: types line up
   assertSlotRecipeConformance(theme.accordion, {
     cases: [{}, { size: "sm" }, { size: "md" }], // the component's own variant combinations
     slots: ["root", "item", "trigger"], // the component's own slots
-  }); // runtime: every slot emits a class for every case
+  }); // runtime: every slot's fn emits a class for every case
 });
 ```
 
@@ -32,7 +32,7 @@ Three layers, each catching what the previous can't:
 
 | Layer | Mechanism | Catches |
 | --- | --- | --- |
-| `satisfies ThemeRecipes` (author writes it) | Types | A recipe whose *shape* doesn't match the registry entry |
+| `satisfies RecipeRegistry` (author writes it) | Types | A recipe whose *shape* doesn't match the registry entry |
 | `assertSlotRecipeConformance` (this kit) | Runtime | A slot/case whose fn returns **no class** (`""` or missing slot) |
 | Per-theme visual / story tests | Human / snapshot | **Mapping correctness** — that a variant renders as *this theme's* intended style |
 
@@ -51,5 +51,5 @@ Throws a single aggregated error when the recipe is non-conformant; the convenie
 
 ## Related
 
-- [`theme-recipes`](../theme-recipes/theme-recipes.md) — the `SlotRecipeFn` shape and registry this checks against.
+- [`recipe`](../styling/recipe.md) / [`registry`](../registry/registry.md) — the `SlotRecipeFn` shape and the registry this checks against.
 - [`theme-context`](../theme-context/theme-context.md) — how components consume a (conformant) theme at runtime.

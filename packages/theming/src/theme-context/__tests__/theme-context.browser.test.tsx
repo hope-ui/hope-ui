@@ -1,21 +1,22 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import type { SlotRecipeFn, ThemeRecipes } from "../../theme-recipes/theme-recipes";
+import type { RecipeRegistry } from "../../registry/registry";
+import type { SlotRecipeFn } from "../../styling/recipe";
 import { ThemeProvider, useRecipe } from "../theme-context";
 
-// Synthetic single-"root"-slot recipe, cast into the (intentionally empty) registry — see the
-// ssr test for the rationale. Proves the same context round-trip on the real client runtime.
+// Synthetic single-"root"-slot recipe, cast into the registry — see the ssr test for the
+// rationale. Proves the same context round-trip on the real client runtime.
 type DemoVariants = { size?: "sm" | "md" };
 const demo: SlotRecipeFn<DemoVariants> = (props) => ({
-  root: `demo demo--size_${props?.size ?? "md"}`,
+  root: () => `demo demo--size_${props?.size ?? "md"}`,
 });
-const theme = { demo } as unknown as ThemeRecipes;
+const theme = { demo } as unknown as RecipeRegistry;
 
 function Probe() {
-  const recipe = useRecipe("demo" as keyof ThemeRecipes) as SlotRecipeFn<DemoVariants>;
+  const recipe = useRecipe("demo" as keyof RecipeRegistry) as SlotRecipeFn<DemoVariants>;
   return (
-    <button type="button" class={recipe({ size: "sm" }).root}>
+    <button type="button" class={recipe({ size: "sm" }).root()}>
       go
     </button>
   );

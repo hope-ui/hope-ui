@@ -27,11 +27,14 @@ and neither knows about the other.
   `const recipe = useRecipe("<name>")` and computes its class(es) in a getter. Built on the
   isomorphic `createComponentContext`, so it is server-readable during `renderToStringAsync` —
   which is the whole of "works in SolidStart" for theming.
-- **`ThemeRecipes`** — an **empty, augmentable** registry. It seeds no component names and no
-  variant vocabulary; a recipe becomes reachable only once a component or theme registers it.
+- **`RecipeRegistry`** — the recipe registry. `@hope-ui/theming` **owns the look-&-feel contract**:
+  every hope-authored component's recipe (its variant vocabulary + slots) is declared here directly,
+  as the single source of truth. A component does not `declare module` its own recipe (no module
+  augmentation), and a theme does not invent the shape; both import the contract types from theming.
 - **`SlotRecipeFn<Variants, Slot = "root">`** — **every recipe is a slot recipe.** There is no
-  single-class recipe form: a one-part component uses the `root` slot, so a caller always deals in
-  `recipe(props).<slot>`, never a bare string for some components and a record for others.
+  single-class recipe form: a one-part component uses the `root` slot. A recipe is a
+  `tailwind-variants` recipe used as-is, so a caller always deals in `recipe(props).<slot>()` (each
+  slot is a class function), never a bare string for some components and a record for others.
 - **`THEMING_CONTRACT_VERSION`** — a constant themes assert against to catch preset↔contract drift.
 - **`@hope-ui/theming/conformance`** — a generic runtime kit
   (`checkSlotRecipeConformance` / `assertSlotRecipeConformance`) a theme runs post-`codegen` to
@@ -43,18 +46,23 @@ the default path is one theme per build.
 
 ## Adding a component (the shape to follow)
 
-1. Design the component's variants and slots — its own decision, no shared vocabulary is imposed.
-2. Register its recipe on the contract by augmentation:
+1. Design the component's variants and slots.
+2. Declare its contract in `@hope-ui/theming` — a `recipes/<component>.ts` contract file (its
+   variant/slot types) plus one entry in `RecipeRegistry` (`recipes/registry.ts`). No module
+   augmentation; the component and every theme import these types from theming:
    ```ts
-   declare module "@hope-ui/theming" {
-     interface ThemeRecipes {
-       accordion: SlotRecipeFn<{ size?: "sm" | "md" }, "root" | "item" | "trigger">;
-     }
+   // recipes/accordion.ts
+   export interface AccordionRecipeVariants { size?: "sm" | "md"; }
+   export type AccordionSlot = "root" | "item" | "trigger";
+   // recipes/registry.ts
+   interface RecipeRegistry {
+     accordion: SlotRecipeFn<AccordionRecipeVariants, AccordionSlot>;
    }
    ```
-3. In the component, compute `class` in a getter from `useRecipe("accordion")(props).<slot>` and
-   render through `renderElement` for `as`/`render` polymorphism. Merge the consumer's `class`
-   through the recipe's slot function so their utilities win.
+3. In the component, compute each slot's `class` in a getter from
+   `useRecipe("accordion")(props).<slot>()` and render through `renderElement` for `as`/`render`
+   polymorphism. Merge the consumer's `class` through the recipe's slot function (`.root({ class })`)
+   so their utilities win.
 4. Add the matching `tailwind-variants` slot recipe (authored with the shared `tv` from
    `@hope-ui/theming`; internal state authored as conditions **nested inside** consumer-facing
    variants — never a top-level `state` axis) to each theme under `@hope-ui/themes/*`.
@@ -280,9 +288,8 @@ fixture and its hydration test must both include `<ThemeProvider>` identically.
 ## Current state
 
 The contract and the default theme `@hope-ui/themes/hope` are built on **Tailwind v4 +
-`tailwind-variants`**. `hope` ships the full semantic-token structure (placeholder values; final
-aesthetic later), enforced by `checkSemanticTokenConformance`. The former `base`/`chakra`/`nova`
-Panda presets and the generated `@hope-ui/styled-system` runtime have been removed. No components
-consume `useRecipe` yet — recipes (and the `tv`→`SlotRecipeFn` `slotRecipe` adapter) arrive with the
-first styled component, which proves the pattern end-to-end. See [`roadmap.md`](roadmap.md) for the
+`tailwind-variants`**. `hope` ships the full semantic-token structure, enforced by
+`checkSemanticTokenConformance`. `Button` is the first styled component: it consumes `useRecipe`,
+and `@hope-ui/themes/hope` implements the matching `tv` slot recipe (registered as-is — a `tv`
+recipe *is* the `SlotRecipeFn` shape, no adapter). See [`roadmap.md`](roadmap.md) for the
 done/deferred breakdown.

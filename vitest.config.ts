@@ -56,6 +56,7 @@ function resolveServerEntry(packageName: string): string {
 // the stale pre-fix `dist` build. Aliasing straight to source removes the rebuild step.
 const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "packages/theming/src");
+const themesSrcDir = join(import.meta.dirname, "packages/themes/src");
 
 // `@hope-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
 // so the alias is a wildcard: `@hope-ui/primitives/render` -> `.../src/render/index.ts`. The
@@ -80,6 +81,12 @@ const hopeUiAlias = [
     find: /^@hope-ui\/theming$/,
     replacement: join(themingSrcDir, "index.ts"),
   },
+  // The hope theme's runtime recipe map (the JS half of the theme, passed to `<ThemeProvider>`).
+  // Exact match, like theming's — one subpath, not a wildcard.
+  {
+    find: /^@hope-ui\/themes\/hope\/recipes$/,
+    replacement: join(themesSrcDir, "hope/recipes/index.ts"),
+  },
 ];
 const serverBuildAlias = [
   { find: /^solid-js$/, replacement: resolveServerEntry("solid-js") },
@@ -99,6 +106,7 @@ export default defineConfig({
     // a node-environment test; leaving it on meant deleting every unit test kept CI green.
     projects: [
       {
+        // Client DOM compile, no hydration keys — pure logic, no DOM rendered here anyway.
         plugins: [solid(solidPluginOptions())],
         resolve: { alias: hopeUiAlias },
         test: {
@@ -114,7 +122,12 @@ export default defineConfig({
         },
       },
       {
-        plugins: [solid(solidPluginOptions())],
+        // The SSR project: compile JSX to **server** templates (`generate: "ssr"`) and run against
+        // the **server** builds of solid — the only faithful way to test what a server sends.
+        // Without this it compiled DOM templates (a hoisted `_$template()`) that throw at import
+        // under the server runtime, which is what forced components to route every host element
+        // through `<Dynamic>`. `hydratable: true` emits the `_hk` keys the browser project claims.
+        plugins: [solid(solidPluginOptions({ generate: "ssr", hydratable: true }))],
         // The only project that resolves the server builds. Both of them — aliasing
         // `@solidjs/web` alone leaves `solid-js` on its browser build, and the two disagree
         // about `createUniqueId`, which allocates the hydration child ids. That hybrid is why
@@ -136,7 +149,9 @@ export default defineConfig({
         },
       },
       {
-        plugins: [solid(solidPluginOptions())],
+        // Client DOM compile, but `hydratable: true` so `hydrate()` can claim the server-rendered
+        // nodes (the SSR project emits matching `_hk` keys) instead of re-creating them.
+        plugins: [solid(solidPluginOptions({ hydratable: true }))],
         resolve: { alias: hopeUiAlias },
         // Pre-bundle the virtualizer core up front. Without this, its first import mid-run triggers
         // a Vite dependency re-optimization that reloads the page — "Vite unexpectedly reloaded a
