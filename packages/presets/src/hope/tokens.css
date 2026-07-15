@@ -1,37 +1,27 @@
 /*
- * @hope-ui/presets/hope — token values (the hope palette).
+ * @hope-ui/presets/hope — the radius scale.
  *
- * The swap layer: this is the file you edit to reskin hope. It declares hope-ui's semantic tokens as
- * collision-safe `--hope-<token>` variables under `:root` (light) and `.dark`; the shared
- * `_base/theme-map.css` maps them into Tailwind's color namespace.
+ * hope's semantic token *values* (the color palette + the radius knob) are authored in TypeScript in
+ * `./index.ts` (`hopeTokens`) and delivered at runtime by `<ThemeProvider preset={hope}>`, which
+ * inlines them as `--hope-*` custom properties (a deterministic `<style>`, before first paint / in
+ * the SSR stream). This file therefore declares no token values — it keeps only the structural piece
+ * that must live in CSS: the `@theme` block that derives Tailwind's `--radius-*` scale from the
+ * `--hope-radii-base` knob (supplied at runtime), so every `rounded-*` (and the button's
+ * `rounded-md`) paints hope's curvature.
  *
- * Values reference Tailwind's own palette variables (`var(--color-violet-600)`, `var(--color-mauve-50)`,
- * …) rather than literal hex, so the theme rides on Tailwind's scale and stays in lockstep with it.
- * This is safe because a theme is only ever consumed through a Tailwind entry (`@import "tailwindcss"`
- * is always present): Tailwind emits a `--color-*` variable whenever it is used, and these tokens are
- * used both by referencing them here (`var(--color-*)`) and by every component utility that resolves
- * to them (`bg-primary` → `var(--hope-primary)` → `var(--color-violet-600)`), so the vars are always
- * generated. hope's brand hue is **violet** (`primary` = `violet-600`), paired with **mauve** — Tailwind
- * v4's violet-tinted gray — as the neutral family (surfaces, text ramp, `neutral` role, borders), so
- * the grays echo the brand rather than fighting it the way a cool blue-gray (`slate`) would.
- *
- * Completeness — every token in `SEMANTIC_COLOR_TOKENS` (@hope-ui/theming) declared here — is asserted
- * by the conformance test in `__tests__/hope.test.ts`, which reads THIS file. A missing token compiles
- * every referencing utility to an unresolved `var(--hope-…)`.
- *
- * Radii live here too (they're theme tokens): a `@theme` block sets Tailwind's own `--radius-*`
- * scale, so `rounded-*` resolves to hope's values. They're mode-independent (no light/dark split),
- * hence a single `@theme` rather than `:root`/`.dark`.
+ * The shared `_base/theme-map.css` (`@theme inline`) maps the `--hope-*` names into clean Tailwind
+ * utilities (`bg-primary`, `text-foreground`, …). That mapping generates the utilities regardless of
+ * where the `--hope-*` values come from, so authoring the values in TS leaves utility generation
+ * untouched — only their delivery moved from a CSS `:root`/`.dark` layer to the runtime `<style>`.
  */
 
 /*
- * Radius scale — shadcn's single-knob model: one knob (`--hope-radii-base`), the full `xs`→`4xl`
- * scale derived as multiples of it. This overrides Tailwind's built-in radii so every `rounded-*`
- * (and the button's `rounded-md`) paints hope's curvature. `@theme` (not `@theme inline`) keeps the
- * `var(--hope-radii-base)` references live, so the whole `--radius-*` scale re-resolves when the knob
- * is overridden at runtime — a preset's `tokens.radii.base` becomes a `--hope-radii-base` declaration
- * in the provider's injected `<style>`, and that is the end-to-end path into this scale. The button
- * recipe reads it through `rounded-[min(var(--radius-md),8px)]`.
+ * Radius scale — shadcn's single-knob model: one knob (`--hope-radii-base`, set at runtime from
+ * `hopeTokens.radii.base`), the full `xs`→`4xl` scale derived as multiples of it. This overrides
+ * Tailwind's built-in radii so every `rounded-*` paints hope's curvature. `@theme` (not
+ * `@theme inline`) keeps the `var(--hope-radii-base)` references live, so overriding the knob at
+ * runtime re-resolves the whole scale. The button recipe reads it through
+ * `rounded-[min(var(--radius-md),8px)]`.
  */
 @theme {
   --radius-xs: calc(var(--hope-radii-base) * 0.4);
@@ -42,147 +32,4 @@
   --radius-2xl: calc(var(--hope-radii-base) * 1.8);
   --radius-3xl: calc(var(--hope-radii-base) * 2.2);
   --radius-4xl: calc(var(--hope-radii-base) * 2.6);
-}
-
-:root {
-  /* Radii (10px — the knob) */
-  --hope-radii-base: 0.625rem;
-
-  /* Surfaces (elevation) */
-  --hope-surface: var(--color-white);
-  --hope-surface-raised: var(--color-white);
-  --hope-surface-overlay: var(--color-white);
-  --hope-surface-sunken: var(--color-mauve-50);
-  --hope-surface-inverse: var(--color-mauve-900);
-
-  /* Standard text ramp (on neutral surfaces) */
-  --hope-foreground: var(--color-mauve-900);
-  --hope-foreground-muted: var(--color-mauve-600);
-  --hope-foreground-subtle: var(--color-mauve-400);
-  --hope-foreground-disabled: var(--color-mauve-300);
-
-  /* On-color text (readable on a role fill or the inverse surface) */
-  --hope-on-primary: var(--color-white);
-  --hope-on-primary-soft: var(--color-violet-700);
-  --hope-on-neutral: var(--color-white);
-  --hope-on-neutral-soft: var(--color-mauve-700);
-  --hope-on-success: var(--color-white);
-  --hope-on-success-soft: var(--color-green-700);
-  --hope-on-info: var(--color-white);
-  --hope-on-info-soft: var(--color-sky-700);
-  --hope-on-warning: var(--color-taupe-900);
-  --hope-on-warning-soft: var(--color-amber-800);
-  --hope-on-danger: var(--color-white);
-  --hope-on-danger-soft: var(--color-red-700);
-  --hope-on-inverse: var(--color-mauve-50);
-
-  /* Role fills (bare = solid, -hover = solid hover, -soft = tonal, -outline = soft border tint) */
-  --hope-primary: var(--color-violet-600);
-  --hope-primary-hover: var(--color-violet-700);
-  --hope-primary-soft: var(--color-violet-100);
-  --hope-primary-outline: var(--color-violet-300);
-  --hope-neutral: var(--color-mauve-700);
-  --hope-neutral-hover: var(--color-mauve-800);
-  --hope-neutral-soft: var(--color-mauve-100);
-  --hope-neutral-outline: var(--color-mauve-300);
-  --hope-success: var(--color-green-600);
-  --hope-success-hover: var(--color-green-700);
-  --hope-success-soft: var(--color-green-100);
-  --hope-success-outline: var(--color-green-300);
-  --hope-info: var(--color-sky-600);
-  --hope-info-hover: var(--color-sky-700);
-  --hope-info-soft: var(--color-sky-100);
-  --hope-info-outline: var(--color-sky-300);
-  /* warning: amber-300 is too pale to read as a border on white → nudged one step to amber-400 */
-  --hope-warning: var(--color-amber-400);
-  --hope-warning-hover: var(--color-amber-500);
-  --hope-warning-soft: var(--color-amber-100);
-  --hope-warning-outline: var(--color-amber-400);
-  --hope-danger: var(--color-red-600);
-  --hope-danger-hover: var(--color-red-700);
-  --hope-danger-soft: var(--color-red-100);
-  --hope-danger-outline: var(--color-red-300);
-
-  /* Neutral border tints (role borders reuse the role color) */
-  --hope-subtle-outline: var(--color-mauve-200);
-  --hope-strong-outline: var(--color-mauve-300);
-  --hope-disabled-outline: var(--color-mauve-200);
-
-  /* Disabled control fill — mauve-100 keeps a ~2-step (≈9.5 L*) gap from foreground-disabled
-     (mauve-300) so the disabled label stays legible; the old mauve-200 fill sat 1 step away (≈5.7
-     L*) and blended into the text. */
-  --hope-disabled: var(--color-mauve-100);
-
-  /* Systemic */
-  --hope-focus: var(--color-violet-600);
-  --hope-scrim: color-mix(in oklab, var(--color-mauve-900) 50%, transparent);
-}
-
-.dark {
-  /* Surfaces */
-  --hope-surface: var(--color-mauve-950);
-  --hope-surface-raised: var(--color-mauve-900);
-  --hope-surface-overlay: var(--color-mauve-900);
-  --hope-surface-sunken: var(--color-black);
-  --hope-surface-inverse: var(--color-mauve-50);
-
-  /* Standard text ramp */
-  --hope-foreground: var(--color-mauve-50);
-  --hope-foreground-muted: var(--color-mauve-400);
-  --hope-foreground-subtle: var(--color-mauve-500);
-  --hope-foreground-disabled: var(--color-mauve-600);
-
-  /* On-color text — mirrored fills lighten, so solid on-colors flip to near-black; soft on-colors stay light */
-  --hope-on-primary: var(--color-mauve-950);
-  --hope-on-primary-soft: var(--color-violet-200);
-  --hope-on-neutral: var(--color-mauve-950);
-  --hope-on-neutral-soft: var(--color-mauve-200);
-  --hope-on-success: var(--color-mauve-950);
-  --hope-on-success-soft: var(--color-green-200);
-  --hope-on-info: var(--color-mauve-950);
-  --hope-on-info-soft: var(--color-sky-200);
-  --hope-on-warning: var(--color-mauve-950);
-  --hope-on-warning-soft: var(--color-amber-200);
-  --hope-on-danger: var(--color-mauve-950);
-  --hope-on-danger-soft: var(--color-red-200);
-  --hope-on-inverse: var(--color-mauve-900);
-
-  /* Role fills — mirrored across the scale (600↔400, 700↔300, 500 fixed); soft & outline mirror too */
-  --hope-primary: var(--color-violet-400);
-  --hope-primary-hover: var(--color-violet-300);
-  --hope-primary-soft: var(--color-violet-950);
-  --hope-primary-outline: var(--color-violet-700);
-  --hope-neutral: var(--color-mauve-300);
-  --hope-neutral-hover: var(--color-mauve-200);
-  --hope-neutral-soft: var(--color-mauve-800);
-  --hope-neutral-outline: var(--color-mauve-700);
-  --hope-success: var(--color-green-400);
-  --hope-success-hover: var(--color-green-300);
-  --hope-success-soft: var(--color-green-950);
-  --hope-success-outline: var(--color-green-700);
-  --hope-info: var(--color-sky-400);
-  --hope-info-hover: var(--color-sky-300);
-  --hope-info-soft: var(--color-sky-950);
-  --hope-info-outline: var(--color-sky-700);
-  --hope-warning: var(--color-amber-600);
-  --hope-warning-hover: var(--color-amber-500);
-  --hope-warning-soft: var(--color-amber-950);
-  --hope-warning-outline: var(--color-amber-600);
-  --hope-danger: var(--color-red-400);
-  --hope-danger-hover: var(--color-red-300);
-  --hope-danger-soft: var(--color-red-950);
-  --hope-danger-outline: var(--color-red-700);
-
-  /* Neutral border tints */
-  --hope-subtle-outline: var(--color-mauve-800);
-  --hope-strong-outline: var(--color-mauve-700);
-  --hope-disabled-outline: var(--color-mauve-800);
-
-  /* Disabled control fill — mauve-800 sits ~2 steps (≈17 L*) below foreground-disabled (mauve-600),
-     comfortably legible. */
-  --hope-disabled: var(--color-mauve-800);
-
-  /* Systemic */
-  --hope-focus: var(--color-violet-500);
-  --hope-scrim: color-mix(in oklab, var(--color-black) 70%, transparent);
 }

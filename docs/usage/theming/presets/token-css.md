@@ -21,12 +21,14 @@ store tokens exactly as authored.
   object's key order — and radii in sorted-key order, with constant whitespace. Same input → same
   bytes, every time.
 - **Empty → `""`.** A preset with no token overrides renders the empty string (the provider then
-  returns its exact zero-DOM tree, so non-token presets are byte-identical to today).
+  returns its exact zero-DOM tree). Note the default `hope` preset is **not** empty — it authors its
+  full palette in TS, so it renders a token `<style>`.
 - **Key normalization.** camelCase → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`);
   radii → `--hope-radii-<key>` (always `:root`, never a dark variant).
-- **Value normalization.** Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`.
+- **Value normalization.** Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and
+  the scale-less Tailwind colors `"white"` / `"black"` → `var(--color-white)` / `var(--color-black)`.
   Values already starting with `var(` / `#` / `rgb` / `hsl` / `oklch` / `oklab` / `lab(` / `lch(` /
-  `hwb(` / `color(`, or a bare keyword (`transparent`, `currentColor`), pass through raw.
+  `hwb(` / `color(`, or a genuine CSS keyword (`transparent`, `currentColor`), pass through raw.
 - **Per-mode split.** A token's `dark` value goes in a dark block; a token with no `dark` emits no
   dark override (it inherits the base theme).
 

@@ -276,13 +276,19 @@ them rather than re-deriving a behavior in a comment.
   `@hope-ui/primitives` (for `createComponentContext`) — which is *why* primitives cannot fold
   into components without a dependency cycle (`components → theming → components`). See
   `docs/theming.md`.
-- `packages/presets` (`@hope-ui/presets`) — Tailwind v4 preset CSS, per-preset subpaths
-  (`@hope-ui/presets/hope` is the **default** visual identity). Each preset ships a `tailwind.css`
-  (`@import "@hope-ui/presets/hope/tailwind.css"`) declaring the semantic tokens as `--hope-*` variables under
-  `:root`/`.dark` and mapping them to clean utilities via `@theme inline`. Raw scales come from
-  Tailwind itself; swap-safety is enforced only on the shared **semantic vocabulary**, via
-  `checkSemanticTokenConformance` (`@hope-ui/theming/conformance`) run against `tailwind.css` — a missing
-  `--hope-*` token compiles a referencing utility to an unresolved `var(--…)`.
+- `packages/presets` (`@hope-ui/presets`) — the concrete presets, per-preset subpaths
+  (`@hope-ui/presets/hope` is the **default** visual identity). A preset is a JS entry
+  (`@hope-ui/presets/hope` → `src/hope/index.ts`: `definePreset` over the recipe map + the token
+  palette) plus a `tailwind.css` (`@import "@hope-ui/presets/hope/tailwind.css"`) mapping the
+  semantic tokens to clean utilities via `@theme inline`. **hope authors its `--hope-*` token values
+  in TypeScript** (`hopeTokens` in `index.ts`), which `<ThemeProvider preset={hope}>` inlines at
+  runtime as a deterministic `<style>` under `:root`/`.dark`; hope's `tokens.css` keeps only the
+  `@theme` radius scale. (A preset may instead declare its `--hope-*` values statically in its own
+  `tokens.css` — then it stays "zero-DOM".) Raw scales come from Tailwind itself; swap-safety is
+  enforced only on the shared **semantic vocabulary**, via `checkSemanticTokenConformance`
+  (`@hope-ui/theming/conformance`) run against the token CSS a preset declares or renders — for hope,
+  the output of `renderPresetStyle(hope.tokens, …)` (see `hope.test.ts`) — a missing `--hope-*` token
+  compiles a referencing utility to an unresolved `var(--…)`.
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).

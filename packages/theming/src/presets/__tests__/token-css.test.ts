@@ -46,6 +46,23 @@ describe("renderPresetStyle — determinism & normalization", () => {
         "}",
     );
   });
+
+  it("normalizes the scale-less Tailwind colors white/black to their --color-* var", () => {
+    const tokens: PresetTokens = {
+      colors: {
+        surface: "white", // scale-less Tailwind color → var(--color-white)
+        foreground: "black", // → var(--color-black)
+        scrim: "transparent", // a genuine CSS keyword still passes through untouched
+      },
+    };
+    expect(renderPresetStyle(tokens, ".dark")).toBe(
+      ":root {\n" +
+        "  --hope-surface: var(--color-white);\n" +
+        "  --hope-foreground: var(--color-black);\n" +
+        "  --hope-scrim: transparent;\n" +
+        "}",
+    );
+  });
 });
 
 describe("renderPresetStyle — dark modes", () => {

@@ -1,7 +1,9 @@
 # SSR fixtures
 
 `button-ssr.html` is the **genuine server output** of
-`renderToStringAsync(() => <Button>Click me</Button>)`.
+`renderToStringAsync(() => <ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>)`.
+It leads with the provider's token `<style>` (`hope` authors its palette in TS, so the provider
+inlines the `--hope-*` custom properties), followed by the `<button>`.
 
 It exists because an SSR → hydrate round-trip cannot happen inside a single Vitest project: the
 server render needs `solid-js` and `@solidjs/web` resolved to their **server** builds, and the

@@ -100,15 +100,24 @@ tokens: {
   the SSR stream.
 - **Byte-stable:** declarations emitted in the fixed `SEMANTIC_COLOR_TOKENS` order (never object-key
   order), no whitespace variance → server output === client output → no hydration mismatch.
-- **Zero-DOM when empty:** a preset with no token overrides (e.g. `hope`, whose defaults live in CSS)
-  produces `""`, and the provider returns the *exact* today tree
-  (`<ThemeContext value>{children}</ThemeContext>`) — structurally identical, so existing hydration
-  fixtures are unaffected. The branch is on a static value, so server and client always agree.
+- **Zero-DOM when empty:** a preset with **no** token overrides produces `""`, and the provider
+  returns the *exact* today tree (`<ThemeContext value>{children}</ThemeContext>`) — structurally
+  identical, so a component's hydration fixture is unaffected. The branch is on a static value, so
+  server and client always agree. (The theming package's own tests exercise this empty case.)
 - Global scope (`:root`/`.dark`), consistent with `tokens.css`. Declarative → Solid-lifecycle-managed,
   no module-scope state (constraint #6).
 
 Rejected: build-time codegen (adds a build step, breaks the "author in TS, pass to provider" ergonomic)
 and inline vars on a wrapper (a single inline `style` can't express the `.dark` split; injects a wrapper).
+
+> **Post-approval deviation — `hope` authors its palette in TS.** The original plan (D1/D3) kept
+> `hope`'s token *values* in `tokens.css` so `hope.tokens` was empty and `hope` took the zero-DOM
+> branch. That was later reversed by request: `hope` now authors its full 52-token palette in
+> TypeScript (`hopeTokens` in `packages/presets/src/hope/index.ts`), exactly like a user-defined
+> preset — so `hope.tokens` is the palette (not `{}`), `renderPresetStyle(hope.tokens, …)` is
+> non-empty, and `<ThemeProvider preset={hope}>` inlines a token `<style>`. The zero-DOM branch
+> above is unchanged; `hope` simply no longer takes it. `tokens.css` keeps only the `@theme` radius
+> scale; `_base/theme-map.css` still generates the utilities.
 
 ### D4 — `slotClasses` (name), composed by a `useSlots` utility
 
@@ -342,7 +351,8 @@ Add `"slotClasses"` to the `omit(...)` list so it isn't spread onto the DOM elem
 
 ```ts
 export const hopeRecipes = { button: buttonRecipe } satisfies RecipeRegistry; // raw map (bootstrap + conformance)
-export const hope = definePreset(hopeRecipes);                                // the hope preset (empty token overrides)
+const hopeTokens: PresetTokens = { colors: { /* 52 tokens, light+dark */ }, radii: { base: "0.625rem" } };
+export const hope = definePreset(hopeRecipes, { tokens: hopeTokens });        // palette authored in TS
 ```
 
 ### Fixed `buttonRecipe` — `packages/presets/src/hope/recipes/button.ts`
@@ -467,6 +477,10 @@ coverage-parity (pure CSS/recipe map). Gate with `pnpm check:coverage-parity`, `
   `@theme` derivations to read it, so `tokens.radii.base` overrides take effect end-to-end.
 - **DoD:** confirm `hope.tokens` is empty (defaults live in CSS) → `renderPresetStyle(hope.tokens,…) === ""`;
   update hope recipes/token tests as needed (package is coverage-parity-exempt).
+  - **Superseded by the post-approval deviation above:** `hope` now authors its palette in TS, so
+    `hope.tokens` is the full palette and `renderPresetStyle(hope.tokens, …)` is non-empty; `tokens.css`
+    keeps only the `@theme` radius scale, and `hope.test.ts` asserts conformance over the *rendered*
+    token CSS.
 
 ### Phase 5 — Button consumes the preset
 - `components/src/button/button.tsx`: replace the manual `withDefaults` with `useDefaults`; replace

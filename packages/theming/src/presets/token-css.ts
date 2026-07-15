@@ -10,8 +10,9 @@
  * It also owns every CSS-value transform, so `./presets` can store tokens exactly as authored:
  * - camelCase key → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`);
  * - radii → `--hope-radii-<key>` (always in `:root`, no dark variant);
- * - Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`; values already starting
- *   with `var(`/`#`/`rgb`/`hsl`/`oklch`/… (or bare keywords like `transparent`) pass through raw.
+ * - Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and the scale-less Tailwind
+ *   colors `"white"`/`"black"` → `var(--color-white)`/`var(--color-black)`; values already starting
+ *   with `var(`/`#`/`rgb`/`hsl`/`oklch`/… (or a bare CSS keyword like `transparent`) pass through raw.
  *
  * A per-token `dark` value emits into a dark block honoring `darkMode` (a selector — default
  * `".dark"` —, `"media"`, or `"none"`); a token with no `dark` emits no dark override (it inherits
@@ -48,6 +49,14 @@ const RAW_COLOR_PREFIXES = [
 /** A Tailwind color shorthand: `hue.step` (`"violet.500"`, `"mauve.600"`). */
 const TAILWIND_SHORTHAND = /^[a-z][a-z0-9]*\.[a-z0-9]+$/i;
 
+/**
+ * Tailwind's scale-less base colors — they have a `--color-*` var (`--color-white`, `--color-black`)
+ * but no `hue.step` form, so they're normalized here by name (`"white"` → `var(--color-white)`) just
+ * like `"violet.500"`. Everything else with no dot (`transparent`, `currentColor`, a raw hex) is a
+ * genuine CSS value and passes through untouched.
+ */
+const TAILWIND_KEYWORD_COLORS = new Set(["white", "black"]);
+
 /** kebab → camelCase, matching the `KebabToCamel` type: `"on-primary-soft"` → `"onPrimarySoft"`. */
 function kebabToCamel(token: string): string {
   return token.replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
@@ -72,7 +81,10 @@ function resolveColorValue(value: string): string {
   if (TAILWIND_SHORTHAND.test(trimmed)) {
     return `var(${TAILWIND_COLOR_VAR_PREFIX}${trimmed.replace(".", "-")})`;
   }
-  // A bare keyword (`transparent`, `currentColor`, `white`) — pass through.
+  if (TAILWIND_KEYWORD_COLORS.has(trimmed)) {
+    return `var(${TAILWIND_COLOR_VAR_PREFIX}${trimmed})`;
+  }
+  // A bare CSS keyword (`transparent`, `currentColor`) or other raw value — pass through.
   return trimmed;
 }
 

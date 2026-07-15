@@ -1,28 +1,27 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { isPreset, renderPresetStyle } from "@hope-ui/theming";
+import { isPreset, renderPresetStyle, SEMANTIC_COLOR_TOKENS } from "@hope-ui/theming";
 import { assertSemanticTokenConformance } from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { hope } from "..";
 
-// The preset is CSS, so its completeness can't be checked by `satisfies`; assert it at the CSS level
-// (the analogue of a slot recipe's conformance test). An undefined token would compile every
-// referencing utility to an unresolved `var(--hope-…)`. The token *values* live in `tokens.css` (the
-// swap layer) — `tailwind.css` is just the orchestrator that imports it and the shared `_base/*` — so
-// this reads the tokens file directly.
-const tokensCss = readFileSync(fileURLToPath(new URL("../tokens.css", import.meta.url)), "utf8");
+// hope authors its token values in TypeScript (`hopeTokens` in ../index.ts), not CSS, so its
+// completeness is asserted against the CSS the preset *renders* rather than a hand-written file.
+// `renderPresetStyle` emits a `--hope-<token>:` declaration for every color token, so running the
+// conformance kit over that output proves every semantic token is present AND exercises the render
+// path. A missing token would compile every referencing utility to an unresolved `var(--hope-…)`.
+const renderedCss = renderPresetStyle(hope.tokens, hope.darkMode);
 
 describe("@hope-ui/presets/hope", () => {
-  it("defines every semantic color token as a --hope-* variable", () => {
-    assertSemanticTokenConformance(tokensCss);
+  it("defines every semantic color token (rendered from its TS token palette)", () => {
+    assertSemanticTokenConformance(renderedCss);
   });
 
-  // `hope` is a real preset (branded), but a zero-DOM one: its token *values* live in `tokens.css`,
-  // so it carries no JS token overrides. That is what keeps the provider on its zero-DOM branch and
-  // every existing component hydration fixture byte-identical — renderPresetStyle produces "".
-  it("is a valid, zero-DOM preset (empty token overrides → no injected <style>)", () => {
+  it("is a valid preset that authors its full palette in TS (emits a token <style>)", () => {
     expect(isPreset(hope)).toBe(true);
-    expect(hope.tokens).toEqual({});
-    expect(renderPresetStyle(hope.tokens, hope.darkMode)).toBe("");
+    // The closed `ColorTokenKey` union already blocks typos; this guards *completeness* — that no
+    // token was omitted from the palette.
+    expect(Object.keys(hope.tokens.colors ?? {})).toHaveLength(SEMANTIC_COLOR_TOKENS.length);
+    expect(hope.tokens.radii?.base).toBeDefined();
+    // Non-empty tokens → the provider leaves its zero-DOM branch and inlines this <style>.
+    expect(renderedCss).not.toBe("");
   });
 });

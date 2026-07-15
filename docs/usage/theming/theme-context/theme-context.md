@@ -46,12 +46,14 @@ preset.darkMode)` **once, in its render body** (not an effect), so the `--hope-*
 are present before first paint and inline in the SSR stream (no FOUC). The decision is made on the
 *static* preset, so server and client always take the same branch:
 
-- **No token overrides** (e.g. `hope`, whose values live in CSS) → `renderPresetStyle` returns `""`
-  and the provider returns the *exact* bare-provider tree — **no fragment, no `<style>` node**. A
-  component's existing SSR/hydration fixtures are therefore byte-identical, and their hydration keys
-  (`_hk`) do not shift.
+- **No token overrides** (a preset whose `tokens` are empty) → `renderPresetStyle` returns `""` and
+  the provider returns the *exact* bare-provider tree — **no fragment, no `<style>` node** — so a
+  component rendered under it keeps byte-identical SSR/hydration fixtures and unshifted hydration keys
+  (`_hk`). (The theming package's own tests exercise this empty case.)
 - **Token overrides** → a `<style>` is rendered before `children`, inside the provider. Its text is
-  deterministic (fixed token order, constant whitespace), so it hydrates without a mismatch.
+  deterministic (fixed token order, constant whitespace), so it hydrates without a mismatch. The
+  default `hope` preset authors its palette in TS, so it takes **this** branch — a component under
+  `<ThemeProvider preset={hope}>` hydrates a leading token `<style>` (see Button's fixture).
 
 **D7 guard.** A JS consumer passing a non-preset (a raw recipe map, `undefined`, an arbitrary
 object) gets a clear error naming `ThemeProvider` and `definePreset`, rather than a downstream
