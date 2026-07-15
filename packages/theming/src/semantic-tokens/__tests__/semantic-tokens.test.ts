@@ -21,8 +21,10 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("danger-soft");
     has("primary-outline");
     has("warning-outline");
-    has("subtle");
-    has("strong");
+    has("subtle-outline");
+    has("strong-outline");
+    has("disabled-outline");
+    has("disabled");
     has("focus");
     has("scrim");
   });

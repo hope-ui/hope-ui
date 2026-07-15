@@ -47,7 +47,19 @@ describe("hope button recipe", () => {
     const asDanger = buttonRecipe({ variant: "default", color: "danger" }).root();
     expect(asPrimary).toBe(asDanger);
     expect(asPrimary).toContain("bg-surface-raised");
-    expect(asPrimary).toContain("border-subtle");
+    expect(asPrimary).toContain("border-subtle-outline");
+  });
+
+  it("styles the disabled state through the single data-disabled axis (no disabled:/aria-disabled:)", () => {
+    const root = buttonRecipe({ variant: "solid", color: "primary" }).root();
+    // The fill-bearing variants swap to the dedicated disabled fill token on `data-disabled`.
+    expect(root).toContain("data-disabled:bg-disabled");
+    // The outline variant tints its border instead.
+    expect(buttonRecipe({ variant: "outline" }).root()).toContain(
+      "data-disabled:border-disabled-outline",
+    );
+    // The old two-variant spelling is gone.
+    expect(root).not.toMatch(/(?:^|\s)(?:disabled|aria-disabled):/);
   });
 
   it("hides the label and centers the loader while loading (center overlay)", () => {

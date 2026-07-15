@@ -100,10 +100,15 @@
   --hope-danger-soft: var(--color-red-100);
   --hope-danger-outline: var(--color-red-300);
 
-  /* Neutral borders (role borders reuse the role color) */
-  --hope-subtle: var(--color-mauve-200);
-  --hope-strong: var(--color-mauve-300);
-  --hope-disabled: var(--color-mauve-200);
+  /* Neutral border tints (role borders reuse the role color) */
+  --hope-subtle-outline: var(--color-mauve-200);
+  --hope-strong-outline: var(--color-mauve-300);
+  --hope-disabled-outline: var(--color-mauve-200);
+
+  /* Disabled control fill — mauve-100 keeps a ~2-step (≈9.5 L*) gap from foreground-disabled
+     (mauve-300) so the disabled label stays legible; the old mauve-200 fill sat 1 step away (≈5.7
+     L*) and blended into the text. */
+  --hope-disabled: var(--color-mauve-100);
 
   /* Systemic */
   --hope-focus: var(--color-violet-600);
@@ -165,9 +170,13 @@
   --hope-danger-soft: var(--color-red-950);
   --hope-danger-outline: var(--color-red-700);
 
-  /* Neutral borders */
-  --hope-subtle: var(--color-mauve-800);
-  --hope-strong: var(--color-mauve-700);
+  /* Neutral border tints */
+  --hope-subtle-outline: var(--color-mauve-800);
+  --hope-strong-outline: var(--color-mauve-700);
+  --hope-disabled-outline: var(--color-mauve-800);
+
+  /* Disabled control fill — mauve-800 sits ~2 steps (≈17 L*) below foreground-disabled (mauve-600),
+     comfortably legible. */
   --hope-disabled: var(--color-mauve-800);
 
   /* Systemic */

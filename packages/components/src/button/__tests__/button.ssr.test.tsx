@@ -31,7 +31,7 @@ describe("Button SSR", () => {
     ));
     expect(html).toContain("bg-danger");
     expect(html).toContain("text-on-danger");
-    expect(html).toContain('data-slot="label"');
+    expect(html).toContain('data-slot="button-label"');
   });
 
   it("renders a native disabled button with the disabled attribute and no aria-disabled", async () => {
@@ -60,7 +60,7 @@ describe("Button SSR", () => {
     expect(html).toContain('aria-busy="true"');
     // No native `disabled` attribute — loading blocks activation without disabling.
     expect(html).not.toMatch(/\sdisabled(?:=|\s|>)/);
-    expect(html).toContain('data-slot="loader"');
+    expect(html).toContain('data-slot="button-loader"');
   });
 
   it("computes the non-native a11y props at render time (present in server output)", async () => {

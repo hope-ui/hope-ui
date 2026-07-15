@@ -113,23 +113,23 @@ export const buttonRecipe = tv({
       "cursor-pointer select-none border border-transparent bg-clip-padding outline-none",
       "px-[var(--hope-button-px)]",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
-      "has-[>[data-slot=start-decorator]]:ps-[calc(var(--hope-button-px)*0.72)]",
-      "has-[>[data-slot=end-decorator]]:pe-[calc(var(--hope-button-px)*0.72)]",
+      "has-[>[data-slot=button-start-decorator]]:ps-[calc(var(--hope-button-px)*0.72)]",
+      "has-[>[data-slot=button-end-decorator]]:pe-[calc(var(--hope-button-px)*0.72)]",
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus/50",
       "active:translate-y-px data-pressed:translate-y-px",
-      "disabled:cursor-not-allowed disabled:pointer-events-none disabled:shadow-none disabled:border-transparent disabled:text-foreground-disabled",
-      "aria-disabled:cursor-not-allowed aria-disabled:shadow-none aria-disabled:border-transparent aria-disabled:text-foreground-disabled",
+      // One disabled axis: `createButton` emits `data-disabled` for both native (`:disabled`) and
+      // non-native (`aria-disabled`) buttons, so the recipe styles this single variant.
+      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-50",
     ].join(" "),
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
     endDecorator: "inline-flex shrink-0 items-center justify-center",
-    // Spinner styling lives here (not in the component JSX) so the utilities are scanned: the
-    // component's default loader marks its two SVG parts `.hope-spinner-track` / `.hope-spinner-head`.
+    // Loader styling lives here (not in the component JSX) so the utilities are scanned. The default
+    // loader is a single Lucide arc, targeted as the `svg` inside this slot — no per-part hooks.
     loader: [
       "pointer-events-none inline-flex items-center justify-center",
-      "[&_.hope-spinner-track]:opacity-25",
-      "[&_.hope-spinner-head]:origin-center [&_.hope-spinner-head]:animate-spin [&_.hope-spinner-head]:opacity-90",
-      "motion-reduce:[&_.hope-spinner-head]:animate-none",
+      "[&_svg]:origin-center [&_svg]:animate-spin",
+      "motion-reduce:[&_svg]:animate-none",
     ].join(" "),
   },
   variants: {
@@ -178,13 +178,14 @@ export const buttonRecipe = tv({
       // (ignores `color`), hover fills neutral. (Slot recipes need `{ root }` objects, not bare
       // strings — a bare string applies to no slot.)
       default: {
-        root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:bg-neutral-soft disabled:bg-disabled aria-disabled:bg-disabled",
+        root: "bg-surface-raised text-foreground border-subtle-outline shadow-xs hover:bg-neutral-soft data-disabled:bg-disabled",
       },
-      // Colored fills come from `compoundVariants`; the disabled gray is color-independent so it lives
-      // here for the fill-bearing variants (ghost/link stay transparent when disabled — muted text only).
-      solid: { root: "disabled:bg-disabled aria-disabled:bg-disabled" },
-      soft: { root: "disabled:bg-disabled aria-disabled:bg-disabled" },
-      outline: { root: "bg-transparent disabled:bg-disabled aria-disabled:bg-disabled" },
+      // Colored fills come from `compoundVariants`; the disabled fill (`bg-disabled`, a dedicated
+      // neutral fill token — not the `-outline` border tint) is color-independent so it lives here
+      // for the fill-bearing variants (ghost/link stay transparent when disabled — muted text only).
+      solid: { root: "data-disabled:bg-disabled" },
+      soft: { root: "data-disabled:bg-disabled" },
+      outline: { root: "bg-transparent data-disabled:border-disabled-outline" },
       ghost: { root: "bg-transparent" },
       link: {
         root: "h-auto bg-transparent border-transparent px-0.5 py-0.5 hover:underline underline-offset-4",

@@ -37,6 +37,9 @@ describe("createButton — native", () => {
     await expect.element(target).toHaveAttribute("type", "button");
     await expect.element(target).not.toHaveAttribute("role");
     await expect.element(target).not.toHaveAttribute("aria-disabled");
+    // Neither styling hook when idle + enabled (both byte-stable-absent for SSR too).
+    await expect.element(target).not.toHaveAttribute("data-disabled");
+    await expect.element(target).not.toHaveAttribute("data-pressed");
     dispose();
   });
 
@@ -46,6 +49,23 @@ describe("createButton — native", () => {
     const target = page.getByRole("button", { name: "Press me" });
     await expect.element(target).toBeDisabled();
     await expect.element(target).not.toHaveAttribute("aria-disabled");
+    // The single styling hook, present for a native disabled button too.
+    await expect.element(target).toHaveAttribute("data-disabled", "");
+    dispose();
+  });
+
+  it("toggles data-pressed while a pointer press is held", async () => {
+    const { dispose } = mount(() => <NativeButton />);
+
+    const target = page.getByTestId("target");
+    const el = target.element() as HTMLButtonElement;
+    const pointer = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: "mouse" };
+
+    el.dispatchEvent(new PointerEvent("pointerdown", pointer));
+    await expect.element(target).toHaveAttribute("data-pressed", "");
+
+    el.dispatchEvent(new PointerEvent("pointerup", pointer));
+    await expect.element(target).not.toHaveAttribute("data-pressed");
     dispose();
   });
 
@@ -100,6 +120,8 @@ describe("createButton — non-native (render-ed anchor)", () => {
     const target = page.getByTestId("target");
     await expect.element(target).toHaveAttribute("aria-disabled", "true");
     await expect.element(target).not.toHaveAttribute("tabindex");
+    // Same styling hook as the native case — one `data-disabled:` variant covers both.
+    await expect.element(target).toHaveAttribute("data-disabled", "");
 
     // Playwright refuses to drive a click on an aria-disabled element, so dispatch a raw one —
     // the programmatic / screen-reader path the guard must block anyway. The consumer's onClick

@@ -96,7 +96,7 @@ directory — unrelated to the removed Panda `base` preset noted under "Current 
 
 So a theme (a) declares hope's semantic tokens as `--hope-*` variables under `:root`/`.dark`
 (`tokens.css`), (b) maps them into Tailwind's color namespace with `@theme inline` so utilities stay
-clean — `bg-primary`, `text-on-primary`, `border-subtle`, `ring-focus` (`_base/theme-map.css`), and
+clean — `bg-primary`, `text-on-primary`, `border-subtle-outline`, `ring-focus` (`_base/theme-map.css`), and
 (c) — once components exist — ships its own `tailwind-variants` slot recipes (same slots and variant
 *values* as every other theme; only the emitted classes differ). A first-party theme is a subpath of
 `@hope-ui/themes` (`@hope-ui/themes/hope` is the default) that reuses `_base/*` and adds its own
@@ -157,8 +157,11 @@ nuance.
   tooltip). The role color used as *standalone* text on a neutral surface (a link, an inline error) is
   just the role utility, `text-<role>` (e.g. `text-danger`). Roles, in order: `primary` · `neutral` ·
   `success` · `info` · `warning` · `danger`.
-- **Neutral borders**: `subtle` · `strong` · `disabled` (`border-subtle`, …). Role borders reuse the
-  role color (`border-primary`), so they need no dedicated token.
+- **Neutral border tints**: `subtle-outline` · `strong-outline` · `disabled-outline`
+  (`border-subtle-outline`, …) — the `-outline` suffix keeps them from being misread as fills. Role
+  borders reuse the role color (`border-primary`), so they need no dedicated token.
+- **Disabled control fill**: `disabled` (`bg-disabled`) — a real background fill (distinct from the
+  border tints), kept a legible step away from `foreground-disabled` so the disabled label still reads.
 - **Fills stay role-first and bare** so the common case is short (decision 01): `bg-primary`,
   `bg-danger`, `bg-danger-subtle`. Each role is `{ <role> (solid fill), <role>-subtle (tonal fill) }`.
 - **Systemic**: `focus` (the focus indicator → `ring-focus` / `outline-focus`) · `scrim` (the dimming
@@ -176,8 +179,8 @@ So a primary button is `bg-primary text-on-primary`; a soft error alert is
 
 **States**: the semantic vocabulary carries no `hovered`/`pressed`/`bold` tokens — recipes derive
 interaction states from Tailwind's own opacity / `color-mix` utilities (e.g. `hover:bg-primary/90`,
-decision 02). Disabled pairs `foreground-disabled` / `border-disabled` with a reduced opacity
-(decision 08).
+decision 02). Disabled pairs `foreground-disabled` (text) / `disabled` (fill, `bg-disabled`) /
+`disabled-outline` (border) with a reduced opacity (decision 08).
 
 ### Token reference (hope values, light → dark intent)
 
@@ -186,7 +189,8 @@ decision 02). Disabled pairs `foreground-disabled` / `border-disabled` with a re
 | `surface` · `-raised` · `-overlay` · `-sunken` · `-inverse` | `bg-*` | page/card · elevated · dialog · well · tooltip |
 | `foreground` · `-muted` · `-subtle` · `-disabled` | `text-*` | body → faint text; disabled |
 | `on-<role>` · `on-<role>-subtle` · `on-inverse` | `text-*` | text on the role's solid fill; on its subtle fill; on the inverse surface |
-| `subtle` · `strong` · `disabled` | `border-*` | default → strong border; disabled (role border = `border-<role>`) |
+| `subtle-outline` · `strong-outline` · `disabled-outline` | `border-*` | default → strong border tint; disabled border (role border = `border-<role>`) |
+| `disabled` | `bg-*` | disabled control fill (kept legible under `foreground-disabled`) |
 | `primary` · `neutral` · `success` · `info` · `warning` · `danger` (+ each `-subtle`) | `bg-*` | solid fill + tonal fill |
 | `focus` · `scrim` | `ring-*` · `bg-*` | focus indicator · modal dimming layer |
 
@@ -213,8 +217,8 @@ surface) → `inverse-on-surface` / — / `colorNeutralForegroundInverted` / —
 colors (`on-<role>`, `on-<role>-subtle`) map to each system's on-fill colors — see Fills/Feedback
 below. Icons reuse the text tones (no separate ramp; Fluent likewise has none).
 
-**Borders** · `subtle` → `outline-variant` / `colorBorder` / `colorNeutralStroke1` /
-`--bs-border-color` / `border`; `strong` → MD3 `outline` / `colorNeutralStrokeAccessible` /
+**Borders** · `subtle-outline` → `outline-variant` / `colorBorder` / `colorNeutralStroke1` /
+`--bs-border-color` / `border`; `strong-outline` → MD3 `outline` / `colorNeutralStrokeAccessible` /
 shadcn `input`; `border-<role>` → Ant `colorErrorBorder` etc. / Fluent `colorStatusDangerBorder1` /
 Bootstrap `--bs-danger-border-subtle`.
 
@@ -273,7 +277,7 @@ only that theme's own recipes reference it); the conformance check only polices 
 | 05 | Feedback scope | all four — `success` · `info` · `warning` · `danger` |
 | 06 | Naming | `neutral` = gray role; `secondary`/`tertiary` = optional chromatic accents |
 | 07 | Chart/decorative | out of contract → `chart-*` / `palette-*` |
-| 08 | Disabled | `foreground-disabled`/`border-disabled` + reduced opacity; dedicated fill tokens optional |
+| 08 | Disabled | `foreground-disabled` (text) + `disabled` (fill) + `disabled-outline` (border) + reduced opacity; fill kept legible under the text |
 | 09 | Casing | flat kebab-case names; theme ships `--hope-<token>`, `@theme inline` maps to `--color-<token>` |
 | 10 | Reference theme | shadcn-flavored baseline shipped as the default `@hope-ui/themes/hope` |
 | — | Naming source | Atlassian `property.role.modifier`, re-spelled flat + Tailwind-first: `surface-*` (elevation), `foreground*` + `on-*`, `scrim` |

@@ -48,13 +48,13 @@ export interface ButtonProps extends ButtonElementProps {
    */
   disabled?: boolean;
   /**
-   * Shows a loading spinner and blocks activation, while keeping the button's normal (non-disabled)
+   * Shows a loader and blocks activation, while keeping the button's normal (non-disabled)
    * look and its place in the tab order. Sets `aria-busy`.
    */
   loading?: boolean;
-  /** Replaces the label while loading (implies an inline `start` spinner so the text stays visible). */
+  /** Replaces the label while loading (implies an inline `start` loader so the text stays visible). */
   loadingText?: JSX.Element;
-  /** Custom loader content. Defaults to hope's spinner. */
+  /** Custom loader content. Defaults to hope's loader. */
   loader?: JSX.Element;
   /** Where the loader sits. `center` (default) overlays it and hides the label, preserving width. */
   loaderPlacement?: ButtonLoaderPlacement;
@@ -69,21 +69,21 @@ export interface ButtonProps extends ButtonElementProps {
 }
 
 /**
- * hope's default spinner — two SVG parts the recipe's `loader` slot styles by hook class
- * (`.hope-spinner-track` faint, `.hope-spinner-head` spinning).
+ * hope's default loader — Lucide's `loader-circle`. A single arc the recipe's `loader` slot spins
+ * (targeting the `svg` inside `data-slot="button-loader"`), so there are no per-part hook classes.
  */
-function ButtonSpinner(): JSX.Element {
+function ButtonLoader(): JSX.Element {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="2.5"
+      stroke-width="2"
       stroke-linecap="round"
+      stroke-linejoin="round"
       aria-hidden="true"
     >
-      <circle class="hope-spinner-track" cx="12" cy="12" r="9" />
-      <path class="hope-spinner-head" d="M12 3a9 9 0 0 1 9 9" />
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   );
 }
@@ -103,7 +103,7 @@ export const Button: Component<ButtonProps> = (props) => {
   });
 
   const isLoading = () => merged.loading;
-  // `loadingText` keeps the label visible, so it implies an inline `start` spinner rather than the
+  // `loadingText` keeps the label visible, so it implies an inline `start` loader rather than the
   // label-hiding `center` overlay.
   const effectivePlacement = (): ButtonLoaderPlacement =>
     merged.loadingText != null ? "start" : merged.loaderPlacement;
@@ -173,21 +173,21 @@ export const Button: Component<ButtonProps> = (props) => {
   const children = (
     <>
       <Show when={merged.startDecorator != null}>
-        <span data-slot="start-decorator" class={styles().startDecorator()}>
+        <span data-slot="button-start-decorator" class={styles().startDecorator()}>
           {merged.startDecorator}
         </span>
       </Show>
-      <span data-slot="label" class={styles().label()}>
+      <span data-slot="button-label" class={styles().label()}>
         {isLoading() && merged.loadingText != null ? merged.loadingText : merged.children}
       </span>
       <Show when={merged.endDecorator != null}>
-        <span data-slot="end-decorator" class={styles().endDecorator()}>
+        <span data-slot="button-end-decorator" class={styles().endDecorator()}>
           {merged.endDecorator}
         </span>
       </Show>
       <Show when={isLoading()}>
-        <span data-slot="loader" class={styles().loader()} aria-hidden="true">
-          {merged.loader ?? <ButtonSpinner />}
+        <span data-slot="button-loader" class={styles().loader()} aria-hidden="true">
+          {merged.loader ?? <ButtonLoader />}
         </span>
       </Show>
     </>
@@ -204,11 +204,10 @@ export const Button: Component<ButtonProps> = (props) => {
     get "aria-busy"(): "true" | undefined {
       return isLoading() ? "true" : undefined;
     },
-    // Byte-stable: `isPressed()` is `false` on the server and initial client, so `data-pressed`
-    // is absent from both — it only ever appears client-side once a press is active.
-    get "data-pressed"(): "" | undefined {
-      return button.isPressed() ? "" : undefined;
-    },
+    // `data-disabled` and `data-pressed` are emitted by `createButton` (in `button.buttonProps`),
+    // so they're spread above — the component no longer hand-wires them here.
+    // The root's own slot marker; parts use the `button-<part>` convention (a component-prefixed slot).
+    "data-slot": "button",
     children,
   });
 

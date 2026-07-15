@@ -28,9 +28,9 @@ import { Button } from "@hope-ui/components/button";
 | `size`            | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                            | `'md'`      | Density/scale. Heights 28 / 32 / 36 / 40 / 44px.                                                               |
 | `nativeButton`    | `boolean`                                                         | `true`      | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism".                      |
 | `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Grayed chrome.|
-| `loading`         | `boolean`                                                         | `false`     | Shows a spinner and blocks activation while keeping the enabled look + tab position. Sets `aria-busy`.          |
-| `loadingText`     | `JSX.Element`                                                     | —           | Replaces the label while loading (implies an inline `start` spinner, so the text stays visible).               |
-| `loader`          | `JSX.Element`                                                     | —           | Custom loader content. Defaults to hope's spinner.                                                             |
+| `loading`         | `boolean`                                                         | `false`     | Shows a loader and blocks activation while keeping the enabled look + tab position. Sets `aria-busy`.          |
+| `loadingText`     | `JSX.Element`                                                     | —           | Replaces the label while loading (implies an inline `start` loader, so the text stays visible).               |
+| `loader`          | `JSX.Element`                                                     | —           | Custom loader content. Defaults to hope's loader (Lucide `loader-circle`).                                     |
 | `loaderPlacement` | `'start' \| 'center' \| 'end'`                                    | `'center'`  | `center` overlays the loader and hides the label (width preserved); `start`/`end` place it inline.             |
 | `startDecorator`  | `JSX.Element`                                                     | —           | Leading slot (typically an icon), before the label.                                                            |
 | `endDecorator`    | `JSX.Element`                                                     | —           | Trailing slot (typically an icon), after the label.                                                            |
@@ -40,9 +40,14 @@ import { Button } from "@hope-ui/components/button";
 | `class`           | `string`                                                         | —           | Merged over the recipe's root class (via `cn`), so the consumer's utilities win.                               |
 | `...rest`         | `Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>`      | —           | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, …).                                     |
 
-The rendered element also carries `data-pressed` (empty string) while a press is physically active,
-and `aria-busy="true"` while `loading` — both absent on the server and on the initial client render,
-so they are hydration-safe.
+The rendered root carries `data-slot="button"`; its internal parts follow the component-prefixed
+convention `data-slot="button-<part>"` — `button-label`, `button-start-decorator`,
+`button-end-decorator`, `button-loader`. It also carries `data-disabled` (empty string) while
+`disabled` and `data-pressed` (empty string) while a press is physically active — both emitted by
+`createButton` (not hand-wired here) — plus `aria-busy="true"` while `loading`.
+`data-disabled`/`data-pressed` are absent on the server and on the initial client render, so they
+are hydration-safe. The theme's recipe styles the single `data-disabled:` variant, never a
+`disabled:`/`aria-disabled:` pair.
 
 ## Variants & color
 
@@ -76,8 +81,8 @@ a warning.
 
 | State      | Representation                                                              | Tab order              | Activation |
 | ---------- | -------------------------------------------------------------------------- | ---------------------- | ---------- |
-| `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native); grayed   | removed                | blocked    |
-| `loading`  | `aria-busy="true"` + spinner; keeps the enabled look                       | kept (stays focusable) | blocked    |
+| `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native) + `data-disabled` styling hook; grayed | removed                | blocked    |
+| `loading`  | `aria-busy="true"` + loader; keeps the enabled look                        | kept (stays focusable) | blocked    |
 
 A disabled `render`-ed `<a>` should also have its `href` dropped by the consumer so navigation is
 impossible; click and keyboard activation are blocked regardless. `loading` blocks activation through

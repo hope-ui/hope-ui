@@ -50,9 +50,31 @@ describe("Button — native", () => {
     const button = container.querySelector("button");
     // The default variant is color-independent neutral chrome; the label sits in its own slot.
     expect(button?.className).toContain("bg-surface-raised");
-    expect(button?.className).toContain("border-subtle");
-    expect(button?.querySelector('[data-slot="label"]')?.textContent).toBe("Click me");
+    expect(button?.className).toContain("border-subtle-outline");
+    expect(button?.querySelector('[data-slot="button-label"]')?.textContent).toBe("Click me");
     dispose();
+  });
+
+  it("emits data-disabled as the styling hook when disabled (absent when enabled)", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button disabled>Click me</Button>
+      </Themed>
+    ));
+
+    const button = container.querySelector("button");
+    // The single hook a recipe styles — present for both native and non-native buttons.
+    expect(button?.hasAttribute("data-disabled")).toBe(true);
+    expect(button?.getAttribute("data-disabled")).toBe("");
+    dispose();
+
+    const enabled = mount(() => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
+    expect(enabled.container.querySelector("button")?.hasAttribute("data-disabled")).toBe(false);
+    enabled.dispose();
   });
 
   it("lets the consumer class win over the recipe (cn merge)", async () => {
@@ -154,8 +176,8 @@ describe("Button — native", () => {
     ));
 
     const button = container.querySelector("button");
-    expect(button?.querySelector('[data-slot="start-decorator"]')).not.toBeNull();
-    expect(button?.querySelector('[data-slot="end-decorator"]')).not.toBeNull();
+    expect(button?.querySelector('[data-slot="button-start-decorator"]')).not.toBeNull();
+    expect(button?.querySelector('[data-slot="button-end-decorator"]')).not.toBeNull();
     expect(button?.querySelector('[data-testid="start"]')).not.toBeNull();
     dispose();
   });
@@ -186,7 +208,7 @@ describe("Button — loading", () => {
     await expect.element(button).toHaveAttribute("aria-busy", "true");
     // Not disabled: still in the tab order, keeps its enabled look.
     await expect.element(button).not.toBeDisabled();
-    expect(container.querySelector('[data-slot="loader"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="button-loader"]')).not.toBeNull();
 
     // A click is blocked by the loading guard's preventDefault (the same cancel channel disabled uses).
     await button.click();

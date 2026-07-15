@@ -3,7 +3,7 @@
  *
  * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-theme in `<theme>/tokens.css`) into
  * Tailwind's color namespace, so component utilities stay clean and unprefixed: `bg-primary`,
- * `text-foreground`, `text-on-primary`, `border-subtle`, `ring-focus`, `bg-scrim`, and role borders
+ * `text-foreground`, `text-on-primary`, `border-subtle-outline`, `ring-focus`, `bg-scrim`, and role borders
  * `border-primary` (reusing the role color).
  *
  * This mapping is a pure function of the fixed `SEMANTIC_COLOR_TOKENS` contract (@hope-ui/theming) —
@@ -67,9 +67,12 @@
   --color-danger-soft: var(--hope-danger-soft);
   --color-danger-outline: var(--hope-danger-outline);
 
-  /* Neutral borders */
-  --color-subtle: var(--hope-subtle);
-  --color-strong: var(--hope-strong);
+  /* Neutral border tints */
+  --color-subtle-outline: var(--hope-subtle-outline);
+  --color-strong-outline: var(--hope-strong-outline);
+  --color-disabled-outline: var(--hope-disabled-outline);
+
+  /* Disabled control fill */
   --color-disabled: var(--hope-disabled);
 
   /* Systemic */

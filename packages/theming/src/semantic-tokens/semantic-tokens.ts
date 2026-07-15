@@ -75,9 +75,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "danger-soft",
   "danger-outline",
 
-  // Neutral borders, used as `border-*`. Emphasis levels + disabled; no bare `border` token.
-  "subtle",
-  "strong",
+  // Neutral border tints, used as `border-*`. The `-outline` suffix marks them as border tints, so
+  // `bg-subtle-outline` reads as the mistake it is — they must never be used as fills. Emphasis
+  // levels + the disabled-border tint; no bare `border` token.
+  "subtle-outline",
+  "strong-outline",
+  "disabled-outline",
+
+  // Disabled control fill — a real background (`bg-disabled`), NOT a border tint. Kept a legible
+  // step away from `foreground-disabled` (the disabled label text) so text still reads on it; this
+  // is the token the `-outline` rename above frees up from being misused as a fill.
   "disabled",
 
   // Systemic: focus indicator (`ring-focus` / `outline-focus`) and modal dimming (`bg-scrim`).

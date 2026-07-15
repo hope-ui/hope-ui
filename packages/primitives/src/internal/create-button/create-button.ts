@@ -59,6 +59,10 @@ export interface ButtonBehaviorProps<T extends HTMLElement = HTMLElement> {
   readonly tabIndex: number | undefined;
   readonly disabled: boolean | undefined;
   readonly "aria-disabled": "true" | undefined;
+  /** Present-empty (`""`) styling hook when disabled, absent otherwise — for the `data-disabled:` variant. */
+  readonly "data-disabled": "" | undefined;
+  /** Present-empty (`""`) styling hook while a press is active, absent otherwise — for the `data-pressed:` variant. */
+  readonly "data-pressed": "" | undefined;
   readonly onClick: JSX.EventHandler<T, MouseEvent>;
   readonly onKeyDown: JSX.EventHandler<T, KeyboardEvent>;
   readonly onKeyUp: JSX.EventHandler<T, KeyboardEvent>;
@@ -68,7 +72,7 @@ export interface ButtonBehaviorProps<T extends HTMLElement = HTMLElement> {
 export interface CreateButtonReturn<T extends HTMLElement = HTMLElement> {
   /** Spread onto the rendered element (via `renderElement`). All props are reactive getters. */
   buttonProps: ButtonBehaviorProps<T>;
-  /** Whether a press is currently active — surface as `data-pressed`. */
+  /** Whether a press is currently active (the reactive state; `data-pressed` is emitted in `buttonProps`). */
   isPressed: Accessor<boolean>;
   /** Ref callback for the rendered element; pass to `renderElement`'s `ref` (it merges refs). */
   setRef: (element: T) => void;
@@ -90,6 +94,8 @@ export interface CreateButtonReturn<T extends HTMLElement = HTMLElement> {
  *   the consumer so navigation is impossible — keyboard/click are blocked here regardless.
  * - **focusableWhenDisabled**: stays focusable, disabled state via `aria-disabled` (never the
  *   native attribute, which would drop it from the tab order).
+ * - **every disabled case**: a present-empty `data-disabled` attribute — the single styling hook a
+ *   recipe targets (`data-disabled:`), so it never has to pair `disabled:` with `aria-disabled:`.
  *
  * Keyboard synthesis lives in `createPress` (element-aware via the `ref` + `nativeButton`
  * hint): native buttons get browser activation; a generic `role="button"` (and an anchor on
@@ -187,6 +193,20 @@ export function createButton<T extends HTMLElement = HTMLElement>(
       // The string "true", not the boolean: Solid renders `aria-disabled={true}` as the empty
       // `aria-disabled=""`, which is not a valid ARIA token value.
       return "true";
+    },
+    // A present-empty `data-disabled` styling hook, emitted for BOTH native and non-native
+    // elements (and focusable-when-disabled). It exists so a theme's recipe styles ONE
+    // `data-disabled:` variant instead of pairing `disabled:` (native) with `aria-disabled:`
+    // (non-native). Byte-stable: `isDisabled()` is prop-derived, identical on server and client.
+    get "data-disabled"() {
+      return isDisabled() ? "" : undefined;
+    },
+    // Present-empty `data-pressed` styling hook while a press is active — the styling counterpart to
+    // the `isPressed` accessor, kept here (not hand-wired in the consumer) for the same reason as
+    // `data-disabled`. Byte-stable: `false` on the server and initial client, so it only ever
+    // appears client-side once a press begins.
+    get "data-pressed"() {
+      return press.isPressed() ? "" : undefined;
     },
     get onClick() {
       return composeEventHandlers<T, MouseEvent>(

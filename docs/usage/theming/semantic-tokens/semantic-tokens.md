@@ -23,7 +23,8 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 | Standard text | `foreground`, `foreground-muted`, `foreground-subtle`, `foreground-disabled` | `text-foreground`, … |
 | On-color text | `on-<role>`, `on-<role>-subtle`, `on-inverse` | `text-on-primary`, `text-on-danger-subtle`, `text-on-inverse` |
 | Role fills | `<role>`, `<role>-subtle` — roles: `primary`, `neutral`, `success`, `info`, `warning`, `danger` | `bg-primary`, `bg-danger-subtle` |
-| Borders | `subtle`, `strong`, `disabled` (role borders reuse the role color) | `border-subtle`, `border-strong`, `border-primary` |
+| Border tints | `subtle-outline`, `strong-outline`, `disabled-outline` (role borders reuse the role color) | `border-subtle-outline`, `border-strong-outline`, `border-primary` |
+| Disabled fill | `disabled` (a real background — kept a legible step from `foreground-disabled`) | `bg-disabled` |
 | Systemic | `focus`, `scrim` | `ring-focus`, `outline-focus`, `bg-scrim` |
 
 Icons fold into the text tokens (currentColor) — there is no separate `icon` family.
@@ -34,7 +35,7 @@ Each fill owns its on-color:
 
 - primary button → `bg-primary text-on-primary`
 - soft error alert → `bg-danger-subtle text-on-danger-subtle border-danger`
-- card → `bg-surface text-foreground border-subtle`
+- card → `bg-surface text-foreground border-subtle-outline`
 - tooltip → `bg-surface-inverse text-on-inverse`
 
 Neutral surfaces pair with the `foreground*` ramp.
