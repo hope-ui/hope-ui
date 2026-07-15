@@ -20,7 +20,6 @@ describe("@hope-ui/presets/hope", () => {
     // The closed `ColorTokenKey` union already blocks typos; this guards *completeness* — that no
     // token was omitted from the palette.
     expect(Object.keys(hope.tokens.colors ?? {})).toHaveLength(SEMANTIC_COLOR_TOKENS.length);
-    expect(hope.tokens.radii?.base).toBeDefined();
     // Non-empty tokens → the provider leaves its zero-DOM branch and inlines this <style>.
     expect(renderedCss).not.toBe("");
   });

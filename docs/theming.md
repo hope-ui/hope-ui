@@ -82,7 +82,6 @@ packages/presets/src/
 └── hope/
     ├── index.ts          # the JS preset — hope's token palette (hopeTokens, authored in TS) + definePreset over the recipe map
     ├── tailwind.css      # the published CSS entry (@hope-ui/presets/hope/tailwind.css) — a thin orchestrator, @imports only
-    ├── tokens.css        #   the @theme radius scale (--radius-* derived from --hope-radii-base); token *values* live in index.ts
     └── recipes/          #   tailwind-variants slot recipes; registered via @source
 ```
 
@@ -90,7 +89,7 @@ packages/presets/src/
 fixed `SEMANTIC_COLOR_TOKENS` contract** — byte-identical in every preset — so they live once in
 `_base/` rather than being copy-pasted per preset. The only thing a preset authors is its token
 *values* (hope authors them in **TypeScript** — `index.ts`'s `hopeTokens` — delivered at runtime by
-`<ThemeProvider>`; the CSS side keeps only the `@theme` radius scale) and its `recipes/`. The
+`<ThemeProvider>`) and its `recipes/`. The
 orchestrator's `@import` order is cosmetic — Tailwind
 at-rules (`@theme`, `@custom-variant`) are collected at build time and `:root`/`.dark` custom
 properties resolve by the cascade at use time, so nothing here is order-sensitive — so it reads as

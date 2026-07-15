@@ -76,13 +76,9 @@ export type ColorTokenKey = KebabToCamel<SemanticColorToken>;
  */
 export type TokenValue = string | { light: string; dark?: string };
 
-/** A radius token key. `"base"` for now; the union is extensible as more radius knobs are added. */
-export type RadiusToken = "base";
-
-/** A preset's typed token overrides — semantic colors (per-mode) and radii (`:root`-only). */
+/** A preset's typed token overrides — semantic colors (per-mode). */
 export interface PresetTokens {
   colors?: Partial<Record<ColorTokenKey, TokenValue>>;
-  radii?: Partial<Record<RadiusToken, string>>;
 }
 
 /**
@@ -137,13 +133,9 @@ function mergeTokens(base: PresetTokens, override: PresetTokens | undefined): Pr
     ...base.colors,
     ...override?.colors,
   };
-  const radii: Partial<Record<RadiusToken, string>> = { ...base.radii, ...override?.radii };
   const result: PresetTokens = {};
   if (Object.keys(colors).length > 0) {
     result.colors = colors;
-  }
-  if (Object.keys(radii).length > 0) {
-    result.radii = radii;
   }
   return result;
 }

@@ -14,7 +14,7 @@ runtime from a bare recipe map.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `recipes` | `RecipeRegistry` | The recipe map (`{ button: … }`). Always taken from the base. |
-| `tokens` | `PresetTokens` | Semantic color + radius overrides, **stored exactly as authored**. |
+| `tokens` | `PresetTokens` | Semantic color overrides, **stored exactly as authored**. |
 | `components` | `PresetComponentOverrides` | Per-component `defaultVariants` + global `slotClasses`. |
 | `darkMode` | `DarkMode` | `".dark"` (selector, default) · `"media"` · `"none"`. |
 
@@ -39,7 +39,6 @@ const app = definePreset(hope, {
       warningSoft: "amber.100",                              // string = both modes
       onPrimary: { light: "#fff" },                          // raw color; dark omitted → inherits base
     },
-    radii: { base: "0.5rem" },
   },
   components: {
     button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } },
@@ -86,8 +85,7 @@ isPreset({ button }); // false — a bare recipe map is not a preset
 | `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(variants) => SlotClasses<K>` (preset-only function form). |
 | `ColorTokenKey` | camelCase of the kebab `SemanticColorToken` vocabulary — a closed union. |
 | `TokenValue` | `string` (both modes) **or** `{ light: string; dark?: string }`. |
-| `RadiusToken` | `"base"` (extensible). |
-| `PresetTokens` | `{ colors?, radii? }`. |
+| `PresetTokens` | `{ colors? }`. |
 | `DarkMode` | `string` selector (default `".dark"`) · `"media"` · `"none"`. |
 | `ComponentOverride<K>` | `{ defaultVariants?, slotClasses? }` for one component. |
 | `PresetComponentOverrides` | Per-component overrides keyed by registry name. |

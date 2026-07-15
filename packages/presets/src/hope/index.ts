@@ -12,9 +12,8 @@
  * hope authors its **token values in TypeScript** (right here), exactly like a user-defined preset —
  * typed against the closed `ColorTokenKey` union (a typo is a compile error) and IntelliSense'd. So
  * `<ThemeProvider preset={hope}>` inlines a deterministic token `<style>` (`renderPresetStyle`, before
- * first paint / in the SSR stream) declaring the `--hope-*` custom properties. The CSS side
- * (`tokens.css`) keeps only the `@theme` radius scale; the shared `_base/theme-map.css` still maps
- * `--hope-*` into clean Tailwind utilities (`bg-primary`, …).
+ * first paint / in the SSR stream) declaring the `--hope-*` custom properties. The shared
+ * `_base/theme-map.css` maps those `--hope-*` names into clean Tailwind utilities (`bg-primary`, …).
  *
  * Values ride Tailwind's own palette: the `"hue.step"` shorthand (`"violet.600"`) normalizes to
  * `var(--color-violet-600)`, so the theme stays in lockstep with Tailwind's scale (see `token-css.ts`).
@@ -27,10 +26,10 @@ import { hopeRecipes } from "./recipes";
 export { hopeRecipes } from "./recipes";
 
 /**
- * hope's semantic token palette — the values that used to live in `tokens.css`'s `:root`/`.dark`
- * blocks, now the single source of truth. Every token carries an explicit light + dark value (hope
- * mirrors its scale across modes). `renderPresetStyle` emits these in the fixed `SEMANTIC_COLOR_TOKENS`
- * order, so the output is deterministic regardless of the key order here.
+ * hope's semantic token palette — the single source of truth for its `--hope-*` values. Every token
+ * carries an explicit light + dark value (hope mirrors its scale across modes). `renderPresetStyle`
+ * emits these in the fixed `SEMANTIC_COLOR_TOKENS` order, so the output is deterministic regardless of
+ * the key order here.
  */
 const hopeTokens: PresetTokens = {
   colors: {
@@ -104,8 +103,6 @@ const hopeTokens: PresetTokens = {
       dark: "color-mix(in oklab, var(--color-black) 70%, transparent)",
     },
   },
-  // The radius knob (10px). `tokens.css`'s `@theme` scale derives `--radius-*` from it at runtime.
-  radii: { base: "0.625rem" },
 };
 
 /** The hope preset — pass to `<ThemeProvider preset={hope}>`. Authors its token palette in TS (above). */

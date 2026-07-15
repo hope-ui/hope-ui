@@ -34,7 +34,6 @@ describe("definePreset — bootstrap from a raw registry", () => {
       darkMode: "media",
       tokens: {
         colors: { primary: { light: "violet.600", dark: "violet.400" } },
-        radii: { base: "0.5rem" },
       },
       components: {
         button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } },
@@ -42,7 +41,6 @@ describe("definePreset — bootstrap from a raw registry", () => {
     });
     expect(preset.darkMode).toBe("media");
     expect(preset.tokens.colors?.primary).toEqual({ light: "violet.600", dark: "violet.400" });
-    expect(preset.tokens.radii?.base).toBe("0.5rem");
     expect(preset.components.button?.defaultVariants).toEqual({ size: "sm" });
     expect(preset.components.button?.slotClasses).toEqual({ root: "rounded-full" });
   });
@@ -61,7 +59,7 @@ describe("definePreset — bootstrap from a raw registry", () => {
 describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   const base = definePreset(registry, {
     darkMode: "[data-theme=dark]",
-    tokens: { colors: { primary: "violet.600", neutral: "mauve.500" }, radii: { base: "0.5rem" } },
+    tokens: { colors: { primary: "violet.600", neutral: "mauve.500" } },
     components: {
       button: {
         defaultVariants: { variant: "solid", size: "lg" },
@@ -78,7 +76,6 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   it("merges tokens per token — an override replaces that token, siblings are kept", () => {
     const derived = definePreset(base, { tokens: { colors: { primary: "indigo.600" } } });
     expect(derived.tokens.colors).toEqual({ primary: "indigo.600", neutral: "mauve.500" });
-    expect(derived.tokens.radii).toEqual({ base: "0.5rem" }); // radii untouched
   });
 
   it("merges components per field — setting defaultVariants keeps the base slotClasses", () => {

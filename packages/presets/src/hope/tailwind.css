@@ -7,22 +7,19 @@
  *     @import "@hope-ui/presets/hope/tailwind.css";
  *
  * This is a thin orchestrator: it composes the shared structural layer (`_base/`, reused by every
- * theme) with hope's own token values. Three parts, three files:
+ * theme) and registers hope's recipe folder as a content source. Two `_base` imports:
  *   - `../_base/variants.css`  — shared custom variants (the `dark` selector). Contract-level.
  *   - `../_base/theme-map.css` — shared `@theme inline` mapping `--hope-*` into Tailwind utilities.
- *   - `./tokens.css`           — hope's token values (colors under `:root`/`.dark`, the radius scale).
  *
- * Import order is cosmetic (these are Tailwind at-rules + cascade-resolved custom properties, not
- * order-sensitive), so they read as two groups: the shared contract first, then this theme's values —
- * a second theme reuses `_base/*` unchanged and ships only its own `tokens.css` (plus `recipes/`).
+ * hope's token *values* (`--hope-*`) are authored in TypeScript (`./index.ts`) and inlined at runtime
+ * by `<ThemeProvider preset={hope}>`, so no token CSS is imported here. Import order is cosmetic
+ * (Tailwind at-rules + cascade-resolved custom properties, not order-sensitive); a second theme
+ * reuses `_base/*` unchanged and ships only its recipes plus its own token values.
  */
 
 /* Shared structural contract — identical for every @hope-ui/presets/* preset. */
 @import "../_base/variants.css";
 @import "../_base/theme-map.css";
-
-/* This theme's values — the only file a reskin edits. */
-@import "./tokens.css";
 
 /*
  * Recipes: hope's `tailwind-variants` slot recipes live under `./recipes`. Registering the folder

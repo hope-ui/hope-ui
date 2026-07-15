@@ -21,18 +21,16 @@ const theme = { demo } as unknown as RecipeRegistry;
 const tokenPreset = definePreset(theme, {
   tokens: {
     colors: { primary: { light: "violet.600", dark: "violet.400" } },
-    radii: { base: "0.5rem" },
   },
 });
 
 // The exact `<style>` text `renderPresetStyle` emits for `tokenPreset`: colors in the fixed
-// SEMANTIC_COLOR_TOKENS order, radii after them in `:root`, and a `.dark` block for the one token
-// with a dark value. Byte-for-byte, so a regression in the renderer surfaces here, not in a vague
-// hydration mismatch downstream.
+// SEMANTIC_COLOR_TOKENS order in `:root`, and a `.dark` block for the one token with a dark value.
+// Byte-for-byte, so a regression in the renderer surfaces here, not in a vague hydration mismatch
+// downstream.
 const EXPECTED_STYLE =
   ":root {\n" +
   "  --hope-primary: var(--color-violet-600);\n" +
-  "  --hope-radii-base: 0.5rem;\n" +
   "}\n" +
   ".dark {\n" +
   "  --hope-primary: var(--color-violet-400);\n" +

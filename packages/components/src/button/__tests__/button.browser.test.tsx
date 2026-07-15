@@ -316,10 +316,10 @@ describe("Button — preset defaultVariants", () => {
       </ThemeProvider>
     ));
 
-    // size `sm` → `h-8`; the built-in default is `md` → `h-9`, so `h-8` proves the preset default won.
+    // size `sm` → `h-7`; the built-in default is `md` → `h-8`, so `h-7` proves the preset default won.
     const cls = container.querySelector("button")?.className ?? "";
-    expect(cls).toContain("h-8");
-    expect(cls).not.toContain("h-9");
+    expect(cls).toContain("h-7");
+    expect(cls).not.toContain("h-8");
     await expectNoA11yViolations(container);
     dispose();
   });
@@ -331,10 +331,10 @@ describe("Button — preset defaultVariants", () => {
       </ThemeProvider>
     ));
 
-    // size `lg` → `h-10`; the instance wins over the preset's `sm`.
+    // size `lg` → `h-9`; the instance wins over the preset's `sm` (`h-7`).
     const cls = container.querySelector("button")?.className ?? "";
-    expect(cls).toContain("h-10");
-    expect(cls).not.toContain("h-8");
+    expect(cls).toContain("h-9");
+    expect(cls).not.toContain("h-7");
     await expectNoA11yViolations(container);
     dispose();
   });

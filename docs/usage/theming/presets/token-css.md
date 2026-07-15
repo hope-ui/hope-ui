@@ -18,13 +18,11 @@ store tokens exactly as authored.
 ## What it emits
 
 - **Fixed order.** Colors are emitted in the `SEMANTIC_COLOR_TOKENS` order — **never** the input
-  object's key order — and radii in sorted-key order, with constant whitespace. Same input → same
-  bytes, every time.
+  object's key order — with constant whitespace. Same input → same bytes, every time.
 - **Empty → `""`.** A preset with no token overrides renders the empty string (the provider then
   returns its exact zero-DOM tree). Note the default `hope` preset is **not** empty — it authors its
   full palette in TS, so it renders a token `<style>`.
-- **Key normalization.** camelCase → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`);
-  radii → `--hope-radii-<key>` (always `:root`, never a dark variant).
+- **Key normalization.** camelCase → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`).
 - **Value normalization.** Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and
   the scale-less Tailwind colors `"white"` / `"black"` → `var(--color-white)` / `var(--color-black)`.
   Values already starting with `var(` / `#` / `rgb` / `hsl` / `oklch` / `oklab` / `lab(` / `lch(` /
@@ -44,7 +42,7 @@ store tokens exactly as authored.
 
 ```ts
 renderPresetStyle(
-  { colors: { primary: { light: "violet.600", dark: "violet.400" } }, radii: { base: "0.5rem" } },
+  { colors: { primary: { light: "violet.600", dark: "violet.400" } } },
   ".dark",
 );
 ```
@@ -52,7 +50,6 @@ renderPresetStyle(
 ```css
 :root {
   --hope-primary: var(--color-violet-600);
-  --hope-radii-base: 0.5rem;
 }
 .dark {
   --hope-primary: var(--color-violet-400);

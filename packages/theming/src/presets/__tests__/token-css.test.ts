@@ -6,7 +6,6 @@ describe("renderPresetStyle — empty", () => {
   it("returns '' for no overrides", () => {
     expect(renderPresetStyle({}, ".dark")).toBe("");
     expect(renderPresetStyle({ colors: {} }, ".dark")).toBe("");
-    expect(renderPresetStyle({ colors: {}, radii: {} }, ".dark")).toBe("");
   });
 });
 
@@ -116,24 +115,6 @@ describe("renderPresetStyle — dark modes", () => {
   });
 });
 
-describe("renderPresetStyle — radii", () => {
-  it("emits radii as --hope-radii-<key> in :root, after colors, sorted by key", () => {
-    const tokens: PresetTokens = {
-      colors: { primary: "violet.600" },
-      radii: { base: "0.5rem" },
-    };
-    expect(renderPresetStyle(tokens, ".dark")).toBe(
-      ":root {\n  --hope-primary: var(--color-violet-600);\n  --hope-radii-base: 0.5rem;\n}",
-    );
-  });
-
-  it("emits radii even with no color overrides, and never in a dark block", () => {
-    expect(renderPresetStyle({ radii: { base: "0.75rem" } }, ".dark")).toBe(
-      ":root {\n  --hope-radii-base: 0.75rem;\n}",
-    );
-  });
-});
-
 describe("renderPresetStyle — sanitization", () => {
   it("throws on a value with CSS-breaking characters, naming the token", () => {
     for (const bad of ["red;color:blue", "red}", "{red", "a<b", "a>b", "line1\nline2"]) {
@@ -145,11 +126,5 @@ describe("renderPresetStyle — sanitization", () => {
     expect(() =>
       renderPresetStyle({ colors: { primary: { light: "violet.600", dark: "x;y" } } }, ".dark"),
     ).toThrow(/primary/);
-  });
-
-  it("throws on an unsafe radius value", () => {
-    expect(() => renderPresetStyle({ radii: { base: "0.5rem;}" } }, ".dark")).toThrow(
-      /radii\.base/,
-    );
   });
 });

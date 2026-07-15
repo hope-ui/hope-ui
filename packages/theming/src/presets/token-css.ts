@@ -4,12 +4,11 @@
  *
  * Determinism is the whole point (constraint #1 — byte-stable server === client output, no hydration
  * mismatch): colors are emitted in the fixed `SEMANTIC_COLOR_TOKENS` order (**never** object-key
- * order), radii in sorted-key order, with constant whitespace. A preset with no overrides renders
- * `""` (the provider then returns the exact zero-DOM tree).
+ * order), with constant whitespace. A preset with no overrides renders `""` (the provider then
+ * returns the exact zero-DOM tree).
  *
  * It also owns every CSS-value transform, so `./presets` can store tokens exactly as authored:
  * - camelCase key → `--hope-<kebab>` (`onPrimarySoft` → `--hope-on-primary-soft`);
- * - radii → `--hope-radii-<key>` (always in `:root`, no dark variant);
  * - Tailwind color shorthand `"violet.500"` → `var(--color-violet-500)`, and the scale-less Tailwind
  *   colors `"white"`/`"black"` → `var(--color-white)`/`var(--color-black)`; values already starting
  *   with `var(`/`#`/`rgb`/`hsl`/`oklch`/… (or a bare CSS keyword like `transparent`) pass through raw.
@@ -119,18 +118,6 @@ export function renderPresetStyle(tokens: PresetTokens, darkMode: DarkMode): str
     if (dark !== undefined) {
       assertSafeValue(dark, token);
       darkDeclarations.push(`${hopeVar(token)}: ${resolveColorValue(dark)};`);
-    }
-  }
-
-  // Radii, in sorted-key order (deterministic; never a dark variant — always `:root`).
-  if (tokens.radii) {
-    for (const key of Object.keys(tokens.radii).sort()) {
-      const value = tokens.radii[key as keyof typeof tokens.radii];
-      if (value === undefined) {
-        continue;
-      }
-      assertSafeValue(value, `radii.${key}`);
-      lightDeclarations.push(`${hopeVar(`radii-${key}`)}: ${value};`);
     }
   }
 

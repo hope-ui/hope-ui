@@ -105,16 +105,12 @@ const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColor[]).flat
  */
 export const buttonRecipe = tv({
   slots: {
-    // `--hope-button-px` (set per size) is the horizontal padding; the icon-inset trims it ×0.72 on the
-    // side a decorator sits (vega's `has-icon` rule). `bg-clip-padding` keeps the reserved 1px
-    // transparent border from painting the fill under it, so solid↔outline never shifts by a pixel.
+    // `bg-clip-padding` keeps the reserved 1px transparent border from painting the fill under it, so
+    // solid↔outline never shifts by a pixel.
     root: [
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
       "cursor-pointer select-none border border-transparent bg-clip-padding outline-none",
-      "px-[var(--hope-button-px)]",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
-      "has-[>[data-slot=button-start-decorator]]:ps-[calc(var(--hope-button-px)*0.72)]",
-      "has-[>[data-slot=button-end-decorator]]:pe-[calc(var(--hope-button-px)*0.72)]",
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus/50",
       "active:translate-y-px data-pressed:translate-y-px",
       // One disabled axis: `createButton` emits `data-disabled` for both native (`:disabled`) and
@@ -133,37 +129,35 @@ export const buttonRecipe = tv({
     ].join(" "),
   },
   variants: {
-    // `size` before `variant` so `link`'s `h-auto` / `px-0.5` win the tailwind-merge conflict over
-    // the fixed height / `--hope-button-px` padding. Heights step an even +4 (28/32/36/40/44); padding is
-    // vega-exact (8/10/10/10/12); radius is a uniform 8px (`rounded-md` = `--radius-md`), with vega's
-    // `min()` caps kept on xs/sm so a larger theme `--radius` can't pill them.
+    // `size` before `variant` so `link`'s `h-auto` / `px-0.5` win the tailwind-merge conflict over the
+    // fixed height. Heights step an even +4 (24/28/32/36/40); radius is a uniform `rounded-sm`.
     size: {
       xs: {
-        root: "h-7 gap-1 text-xs rounded-[min(var(--radius-md),8px)] [--hope-button-px:8px]",
+        root: "h-6 gap-1 text-xs rounded-sm",
         startDecorator: "[&_svg]:size-3",
         endDecorator: "[&_svg]:size-3",
         loader: "[&_svg]:size-3",
       },
       sm: {
-        root: "h-8 gap-1 text-sm rounded-[min(var(--radius-md),10px)] [--hope-button-px:10px]",
+        root: "h-7 gap-1 text-sm rounded-sm",
         startDecorator: "[&_svg]:size-4",
         endDecorator: "[&_svg]:size-4",
         loader: "[&_svg]:size-4",
       },
       md: {
-        root: "h-9 gap-1.5 text-sm rounded-md [--hope-button-px:10px]",
+        root: "h-8 gap-1.5 text-sm rounded-sm",
         startDecorator: "[&_svg]:size-4",
         endDecorator: "[&_svg]:size-4",
         loader: "[&_svg]:size-4",
       },
       lg: {
-        root: "h-10 gap-1.5 text-sm rounded-md [--hope-button-px:10px]",
+        root: "h-9 gap-1.5 text-sm rounded-sm",
         startDecorator: "[&_svg]:size-4",
         endDecorator: "[&_svg]:size-4",
         loader: "[&_svg]:size-4",
       },
       xl: {
-        root: "h-11 gap-2 text-base rounded-md [--hope-button-px:12px]",
+        root: "h-10 gap-2 text-base rounded-sm",
         startDecorator: "[&_svg]:size-5",
         endDecorator: "[&_svg]:size-5",
         loader: "[&_svg]:size-5",

@@ -1,7 +1,8 @@
 /*
  * @hope-ui/presets — shared structural layer (`_base/`), not a published preset subpath.
  *
- * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-preset in `<preset>/tokens.css`) into
+ * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-preset — at runtime by
+ * `<ThemeProvider>` for a TS-authored palette, or in the preset's own CSS) into
  * Tailwind's color namespace, so component utilities stay clean and unprefixed: `bg-primary`,
  * `text-foreground`, `text-on-primary`, `border-subtle-outline`, `ring-focus`, `bg-scrim`, and role borders
  * `border-primary` (reusing the role color).
@@ -46,22 +47,27 @@
   --color-primary-hover: var(--hope-primary-hover);
   --color-primary-soft: var(--hope-primary-soft);
   --color-primary-outline: var(--hope-primary-outline);
+  
   --color-neutral: var(--hope-neutral);
   --color-neutral-hover: var(--hope-neutral-hover);
   --color-neutral-soft: var(--hope-neutral-soft);
   --color-neutral-outline: var(--hope-neutral-outline);
+
   --color-success: var(--hope-success);
   --color-success-hover: var(--hope-success-hover);
   --color-success-soft: var(--hope-success-soft);
   --color-success-outline: var(--hope-success-outline);
+
   --color-info: var(--hope-info);
   --color-info-hover: var(--hope-info-hover);
   --color-info-soft: var(--hope-info-soft);
   --color-info-outline: var(--hope-info-outline);
+
   --color-warning: var(--hope-warning);
   --color-warning-hover: var(--hope-warning-hover);
   --color-warning-soft: var(--hope-warning-soft);
   --color-warning-outline: var(--hope-warning-outline);
+
   --color-danger: var(--hope-danger);
   --color-danger-hover: var(--hope-danger-hover);
   --color-danger-soft: var(--hope-danger-soft);
