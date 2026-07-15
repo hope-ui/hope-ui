@@ -1,17 +1,15 @@
-import { hopeRecipes } from "@hope-ui/presets/hope";
-import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Button } from "../button";
 
-// Button reads its styling through `useRecipe("button")`, so every render — SSR and hydration
-// alike — must sit under a `<ThemeProvider>`. `hope` doesn't become a preset until Phase 4, so
-// bootstrap one inline from the raw recipe map (`definePreset(hopeRecipes)`) — its tokens are
-// empty, so the provider takes the zero-DOM branch and emits no `<style>`, leaving the fixture
-// byte-identical. Wrapping a subtree in the provider also shifts its hydration keys (`_hk`), so
-// this tree and `button.browser.test.tsx`'s hydration tree are structurally identical,
-// `<ThemeProvider>` included. See docs/theming.md "SSR / hydration".
-const hope = definePreset(hopeRecipes);
+// Button reads its styling through `useSlots`/`useRecipe`, so every render — SSR and hydration
+// alike — must sit under a `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are
+// empty (its values live in CSS), so the provider takes the zero-DOM branch and emits no `<style>`,
+// leaving the fixture byte-identical. Wrapping a subtree in the provider also shifts its hydration
+// keys (`_hk`), so this tree and `button.browser.test.tsx`'s hydration tree are structurally
+// identical, `<ThemeProvider>` included. See docs/theming.md "SSR / hydration".
 
 describe("Button SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {

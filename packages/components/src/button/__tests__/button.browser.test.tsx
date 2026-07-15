@@ -1,5 +1,5 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { hopeRecipes } from "@hope-ui/presets/hope";
+import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { hydrate } from "@solidjs/web";
@@ -8,13 +8,12 @@ import { page, userEvent } from "vitest/browser";
 import { Button, type ButtonProps } from "../button";
 import ssrFixture from "./__fixtures__/button-ssr.html?raw";
 
-// Button reads styling through `useRecipe("button")`, so every render sits under a
-// `<ThemeProvider>`. `hope` doesn't become a preset until Phase 4, so bootstrap one inline from the
-// raw recipe map (`definePreset(hopeRecipes)`) — its empty tokens keep the provider on the zero-DOM
-// branch, so the fixture is byte-identical. The hydration suite wraps the *same* tree the SSR
-// fixture was generated from (`<ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>`)
-// — the provider shifts `_hk` keys, so both halves must include it identically. See docs/theming.md.
-const hope = definePreset(hopeRecipes);
+// Button reads styling through `useSlots`/`useRecipe`, so every render sits under a
+// `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are empty (its values live in
+// CSS), so the provider stays on the zero-DOM branch and the fixture is byte-identical. The
+// hydration suite wraps the *same* tree the SSR fixture was generated from
+// (`<ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>`) — the provider shifts
+// `_hk` keys, so both halves must include it identically. See docs/theming.md.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -297,6 +296,110 @@ describe("Button — render-ed as a non-native element", () => {
         </Button>
       </Themed>
     ));
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Button — preset defaultVariants", () => {
+  // A preset can set app-wide default variants; the component's built-in defaults are the fallback,
+  // and an explicit instance prop still wins (precedence: instance ?? preset ?? builtin), all wired
+  // through `useDefaults`. `hope` sets none, so extend it with one.
+  const smallByDefault = definePreset(hope, {
+    components: { button: { defaultVariants: { size: "sm" } } },
+  });
+
+  it("applies the preset's defaultVariants when the instance leaves the prop unset", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={smallByDefault}>
+        <Button>Click me</Button>
+      </ThemeProvider>
+    ));
+
+    // size `sm` → `h-8`; the built-in default is `md` → `h-9`, so `h-8` proves the preset default won.
+    const cls = container.querySelector("button")?.className ?? "";
+    expect(cls).toContain("h-8");
+    expect(cls).not.toContain("h-9");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("lets an explicit instance prop override the preset default", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={smallByDefault}>
+        <Button size="lg">Click me</Button>
+      </ThemeProvider>
+    ));
+
+    // size `lg` → `h-10`; the instance wins over the preset's `sm`.
+    const cls = container.querySelector("button")?.className ?? "";
+    expect(cls).toContain("h-10");
+    expect(cls).not.toContain("h-8");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Button — slotClasses", () => {
+  // The full override chain is recipe base → preset `slotClasses` → instance `slotClasses` → `class`
+  // (root only), folded in by `useSlots`; the final tailwind-merge (inside the recipe's `{ class }`
+  // seam) means a later utility wins a conflict.
+  it("applies a preset's global slotClasses to the matching slots", async () => {
+    const preset = definePreset(hope, {
+      components: { button: { slotClasses: { root: "rounded-full", label: "tracking-wide" } } },
+    });
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={preset}>
+        <Button>Click me</Button>
+      </ThemeProvider>
+    ));
+
+    const button = container.querySelector("button");
+    expect(button?.className).toContain("rounded-full");
+    expect(button?.querySelector('[data-slot="button-label"]')?.className).toContain(
+      "tracking-wide",
+    );
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("folds instance slotClasses in after the preset's, letting the instance win a conflict", async () => {
+    const preset = definePreset(hope, {
+      components: { button: { slotClasses: { root: "rounded-full" } } },
+    });
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={preset}>
+        <Button slotClasses={{ root: "rounded-none", label: "italic" }}>Click me</Button>
+      </ThemeProvider>
+    ));
+
+    const button = container.querySelector("button");
+    // Instance `rounded-none` is applied after the preset's `rounded-full` → tailwind-merge keeps it.
+    expect(button?.className).toContain("rounded-none");
+    expect(button?.className).not.toContain("rounded-full");
+    // A slot the preset didn't touch still receives the instance override.
+    expect(button?.querySelector('[data-slot="button-label"]')?.className).toContain("italic");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("applies the root `class` last, after both preset and instance slotClasses", async () => {
+    const preset = definePreset(hope, {
+      components: { button: { slotClasses: { root: "rounded-full" } } },
+    });
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={preset}>
+        <Button slotClasses={{ root: "rounded-none" }} class="rounded-sm">
+          Click me
+        </Button>
+      </ThemeProvider>
+    ));
+
+    // Order is preset → instance slotClasses → `class`; the last conflicting radius (`class`) wins.
+    const cls = container.querySelector("button")?.className ?? "";
+    expect(cls).toContain("rounded-sm");
+    expect(cls).not.toContain("rounded-full");
+    expect(cls).not.toContain("rounded-none");
     await expectNoA11yViolations(container);
     dispose();
   });

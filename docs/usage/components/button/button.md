@@ -2,19 +2,20 @@
 
 An accessible, themed button. Renders a native `<button>` by default (with `type="button"`, so it
 never accidentally submits a form), stays fully accessible when `render`-ed as a different element,
-and is styled by the active theme's `button` recipe read through `useRecipe`. Behavior is composed
-from the kernel's `createButton` (element-aware a11y) over `createPress` (the unified press engine).
+and is styled by the active preset's `button` recipe, resolved through `useSlots` (over `useRecipe`).
+Behavior is composed from the kernel's `createButton` (element-aware a11y) over `createPress` (the
+unified press engine).
 
-Because it reads styling from the theme, a `Button` must render under a `<ThemeProvider>` (see
-`@hope-ui/theming`). A consumer imports the theme's recipe map and the theme CSS:
+Because it reads styling from the preset, a `Button` must render under a `<ThemeProvider>` (see
+`@hope-ui/theming`). A consumer passes the `hope` preset and imports its CSS:
 
 ```tsx
 import { ThemeProvider } from "@hope-ui/theming";
-import { hopeRecipes } from "@hope-ui/presets/hope";
+import { hope } from "@hope-ui/presets/hope";
 import { Button } from "@hope-ui/components/button";
 // and, in your Tailwind entry CSS: @import "@hope-ui/presets/hope/tailwind.css";
 
-<ThemeProvider theme={hopeRecipes}>
+<ThemeProvider preset={hope}>
   <Button variant="solid" color="primary">Save</Button>
 </ThemeProvider>;
 ```
@@ -37,7 +38,8 @@ import { Button } from "@hope-ui/components/button";
 | `fullWidth`       | `boolean`                                                         | `false`     | Stretches to the container width.                                                                              |
 | `render`          | `(props) => JSX.Element`                                          | —           | Render as a different element/component. The only polymorphism mechanism (there is no `as` prop).              |
 | `type`            | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | Native button type. Applied only to a native button.                                                           |
-| `class`           | `string`                                                         | —           | Merged over the recipe's root class (via `cn`), so the consumer's utilities win.                               |
+| `class`           | `string`                                                         | —           | Merged over the recipe's root class (applied last), so the consumer's utilities win.                           |
+| `slotClasses`     | `SlotClasses<'button'>` (`{ root?, label?, startDecorator?, endDecorator?, loader? }`) | — | Per-instance class overrides per slot. Folded in after the recipe base and the preset's global `slotClasses`, before `class` (root only). Use literal classes so Tailwind can scan them. |
 | `...rest`         | `Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>`      | —           | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, …).                                     |
 
 The rendered root carries `data-slot="button"`; its internal parts follow the component-prefixed

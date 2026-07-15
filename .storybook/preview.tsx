@@ -3,7 +3,7 @@
 // scanning the components' source + stories + the theme's recipes. hope-ui ships no precompiled CSS.
 import "./tailwind.css";
 import { ThemeProvider } from "@hope-ui/theming";
-import { hopeRecipes } from "@hope-ui/presets/hope";
+import { hope } from "@hope-ui/presets/hope";
 import * as a11yAnnotations from "@storybook/addon-a11y/preview";
 import * as docsAnnotations from "@storybook/addon-docs/preview";
 // `/next` is the SolidJS 2.0 renderer entry; the bare export resolves to the 1.x-compatible
@@ -11,11 +11,11 @@ import * as docsAnnotations from "@storybook/addon-docs/preview";
 import { createJSXDecorator, definePreview } from "storybook-solidjs-vite/next";
 
 // Every hope-ui component reads its styling through `useRecipe(...)`, which requires a
-// `<ThemeProvider>` above it. This global decorator provides the default `hope` theme's recipe map
-// to every story. `createJSXDecorator` mounts the wrapper once per story (not on every control
-// update), which is what Solid's run-once component model expects.
+// `<ThemeProvider>` above it. This global decorator provides the default `hope` preset to every
+// story. `createJSXDecorator` mounts the wrapper once per story (not on every control update),
+// which is what Solid's run-once component model expects.
 const withHopeTheme = createJSXDecorator((Story) => (
-  <ThemeProvider theme={hopeRecipes}>
+  <ThemeProvider preset={hope}>
     <Story />
   </ThemeProvider>
 ));

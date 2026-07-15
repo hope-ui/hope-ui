@@ -129,6 +129,30 @@ export const Decorators: Story = {
   ),
 };
 
+/**
+ * Per-instance `slotClasses` targets individual slots with **literal** Tailwind classes (so the
+ * consumer's build can scan them). They fold in after the recipe base and any preset-level
+ * `slotClasses`, before `class` — a later utility wins a Tailwind conflict (here `rounded-full`
+ * overrides the recipe's `rounded-md`).
+ */
+export const SlotClasses: Story = {
+  render: () => (
+    <div class="flex flex-wrap items-center gap-3">
+      <Button variant="solid" slotClasses={{ root: "rounded-full" }}>
+        Pill
+      </Button>
+      <Button
+        variant="soft"
+        color="success"
+        startDecorator={<CheckIcon />}
+        slotClasses={{ label: "uppercase tracking-wide" }}
+      >
+        Saved
+      </Button>
+    </div>
+  ),
+};
+
 /** Loading: centered overlay (default) keeps width and hides the label; `loadingText` stays inline. */
 export const Loading: Story = {
   render: () => (

@@ -1,19 +1,15 @@
 import { type ButtonType, createButton } from "@hope-ui/primitives/internal";
-import {
-  composeEventHandlers,
-  type RenderProp,
-  renderElement,
-  withDefaults,
-} from "@hope-ui/primitives/utils";
+import { composeEventHandlers, type RenderProp, renderElement } from "@hope-ui/primitives/utils";
 import type {
   ButtonColor,
   ButtonLoaderPlacement,
   ButtonSize,
   ButtonVariant,
+  SlotClasses,
 } from "@hope-ui/theming";
-import { useRecipe } from "@hope-ui/theming";
+import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Component, createMemo, merge, omit, Show } from "solid-js";
+import { type Component, merge, omit, Show } from "solid-js";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -69,6 +65,13 @@ export interface ButtonProps extends ButtonElementProps {
   fullWidth?: boolean;
   /** Merged over the recipe's root class so the consumer's utilities win (via `cn`). */
   class?: string;
+  /**
+   * Per-instance class overrides, keyed by slot (`root`, `label`, `startDecorator`, `endDecorator`,
+   * `loader`). Folded in after the recipe base and the preset's global `slotClasses`, before `class`
+   * (root only) — so a later utility wins a Tailwind conflict. Use literal class strings so the
+   * consumer's Tailwind scanner can see them.
+   */
+  slotClasses?: SlotClasses<"button">;
 }
 
 /**
@@ -92,17 +95,23 @@ function ButtonLoader(): JSX.Element {
 }
 
 export const Button: Component<ButtonProps> = (props) => {
-  // `withDefaults`, not `merge({...}, props)`: `merge` resolves by key presence, so a wrapper
-  // forwarding an unset `type`/`variant`/… would drop the default. See `withDefaults`' doc.
-  const merged = withDefaults(props, {
-    type: "button" as const,
-    nativeButton: true,
-    variant: "default" as const,
-    size: "md" as const,
-    color: "primary" as const,
-    loaderPlacement: "center" as const,
-    loading: false,
-    fullWidth: false,
+  // `useDefaults` folds the preset's per-component `defaultVariants` in between the instance props
+  // and these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with
+  // `??` (never `merge`, which resolves by key *presence* — a wrapper forwarding an unset
+  // `type`/`variant`/… would drop the default). See `useDefaults`' doc in @hope-ui/theming.
+  const merged = useDefaults({
+    recipe: "button",
+    props,
+    defaults: {
+      type: "button" as const,
+      nativeButton: true,
+      variant: "default" as const,
+      size: "md" as const,
+      color: "primary" as const,
+      loaderPlacement: "center" as const,
+      loading: false,
+      fullWidth: false,
+    },
   });
 
   const isLoading = () => merged.loading;
@@ -111,9 +120,12 @@ export const Button: Component<ButtonProps> = (props) => {
   const effectivePlacement = (): ButtonLoaderPlacement =>
     merged.loadingText != null ? "start" : merged.loaderPlacement;
 
-  const recipe = useRecipe("button");
-  const styles = createMemo(() =>
-    recipe({
+  // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
+  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
+  // props are read lazily on every slot-fn call, so variant/loading changes flow through.
+  const slots = useSlots({
+    recipe: "button",
+    variants: () => ({
       variant: merged.variant,
       color: merged.color,
       size: merged.size,
@@ -122,7 +134,9 @@ export const Button: Component<ButtonProps> = (props) => {
       // so an unset placement (not loading) applies nothing.
       loaderPlacement: isLoading() ? effectivePlacement() : undefined,
     }),
-  );
+    slotClasses: () => merged.slotClasses,
+    class: () => merged.class,
+  });
 
   // `createButton` owns the element-aware a11y props, the disabled-gating, and the press engine.
   // The consumer's `onClick` is wrapped with a loading guard first: while loading, it
@@ -170,6 +184,7 @@ export const Button: Component<ButtonProps> = (props) => {
     "endDecorator",
     "fullWidth",
     "class",
+    "slotClasses",
     "children",
   );
 
@@ -178,20 +193,20 @@ export const Button: Component<ButtonProps> = (props) => {
   const children = (
     <>
       <Show when={merged.startDecorator != null}>
-        <span data-slot="button-start-decorator" class={styles().startDecorator()}>
+        <span data-slot="button-start-decorator" class={slots.startDecorator()}>
           {merged.startDecorator}
         </span>
       </Show>
-      <span data-slot="button-label" class={styles().label()}>
+      <span data-slot="button-label" class={slots.label()}>
         {isLoading() && merged.loadingText != null ? merged.loadingText : merged.children}
       </span>
       <Show when={merged.endDecorator != null}>
-        <span data-slot="button-end-decorator" class={styles().endDecorator()}>
+        <span data-slot="button-end-decorator" class={slots.endDecorator()}>
           {merged.endDecorator}
         </span>
       </Show>
       <Show when={isLoading()}>
-        <span data-slot="button-loader" class={styles().loader()} aria-hidden="true">
+        <span data-slot="button-loader" class={slots.loader()} aria-hidden="true">
           {merged.loader ?? <ButtonLoader />}
         </span>
       </Show>
@@ -200,9 +215,10 @@ export const Button: Component<ButtonProps> = (props) => {
 
   const elementProps = merge(rest, button.buttonProps, {
     get class(): string {
-      // The recipe's own slot function merges the consumer's `class` last, through the `tv`
-      // tailwind-merge config — so their utilities win a conflict without a separate `cn`.
-      return styles().root({ class: merged.class });
+      // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
+      // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
+      // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
+      return slots.root();
     },
     // `aria-busy` is the accessible loading signal. Byte-stable: `loading` is the same value on the
     // server and initial client, so a non-loading button emits no `aria-busy` on either.
