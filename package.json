@@ -7,6 +7,7 @@
   "type": "module",
   "packageManager": "pnpm@11.10.0",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
     "build": "turbo run build",
     "test": "vitest run --project=unit",
     "test:ssr": "vitest run --project=ssr",
@@ -24,7 +25,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.10.0",
+      "version": "11.10.0",
       "onFail": "download"
     }
   },

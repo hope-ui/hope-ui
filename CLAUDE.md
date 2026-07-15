@@ -86,6 +86,12 @@ pnpm --filter @hope-ui/components build
 pnpm --filter @hope-ui/components typecheck
 ```
 
+## Git conventions
+
+**Never add a `Co-Authored-By: Claude` (or any `Co-authored-by` / "Generated with Claude
+Code") trailer or attribution line to commit messages.** Commit messages carry the change
+rationale only — no tool or assistant attribution, in any form.
+
 ## Definition of Done (enforced, not a guideline)
 
 **Full rationale and history: `docs/definition-of-done.md`. Read `docs/testing.md` before writing

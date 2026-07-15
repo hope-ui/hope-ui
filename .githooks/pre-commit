@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Auto-format staged files and apply Biome safe fixes, then re-stage them so the
+# commit is always clean and CI's `biome check` can't fail on formatting.
+#
+# Installed via core.hooksPath=.githooks, set by the package.json "prepare" script
+# on `pnpm install`. Run `git config core.hooksPath .githooks` to activate manually.
+#
+# Skip with `git commit --no-verify` in a pinch.
+set -eu
+
+# Files staged for this commit (Added/Copied/Modified/Renamed — never Deleted).
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+# `--staged` scopes Biome to the staged set; `--write` applies formatting + safe
+# fixes. An unfixable lint error exits non-zero here and (via `set -e`) aborts the
+# commit — which is what we want. `--files-ignore-unknown` skips non-JS/TS files.
+pnpm exec biome check --write --staged --no-errors-on-unmatched --files-ignore-unknown=true .
+
+# Re-stage exactly the files we started with, picking up any rewrites Biome made.
+printf '%s\n' "$staged" | xargs git add --

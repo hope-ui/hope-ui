@@ -59,7 +59,13 @@ describe("createButton — native", () => {
 
     const target = page.getByTestId("target");
     const el = target.element() as HTMLButtonElement;
-    const pointer = { bubbles: true, cancelable: true, button: 0, pointerId: 1, pointerType: "mouse" };
+    const pointer = {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      pointerId: 1,
+      pointerType: "mouse",
+    };
 
     el.dispatchEvent(new PointerEvent("pointerdown", pointer));
     await expect.element(target).toHaveAttribute("data-pressed", "");

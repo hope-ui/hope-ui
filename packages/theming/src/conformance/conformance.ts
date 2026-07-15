@@ -13,8 +13,9 @@
  * not this package's. No test-runner dependency: it returns a result (or throws, via
  * `assertSlotRecipeConformance`) so the author wraps it in whatever `it(...)` they use.
  */
-import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
+
 import type { SlotRecipeFn } from "../recipes/slot-recipe";
+import { SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
 
 export interface ConformanceResult {
   ok: boolean;
