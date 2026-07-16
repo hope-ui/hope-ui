@@ -201,7 +201,7 @@ maps down to each without losing MD3/Fluent nuance.
 - **On-state text** (`on-*`, `text-*`): `on-inverse` (on `surface-inverse`, e.g. a tooltip),
   `on-active` (on the transient collection highlight), `on-selected` (on the persistent selection).
 - **Neutral borders**: `subtle` · `strong` (`border-subtle`, `border-strong`) — emphasis levels only;
-  no bare `border` token. (The disabled outline border reuses `border-subtle`.)
+  no bare `border` token. (A recipe that tints a disabled outline can reuse `border-subtle`.)
 - **Collection states**: `active` (transient — hover / roving / activedescendant) and `selected`
   (persistent — chosen), both `bg-*`, each paired with its `on-*` text above.
 - **Disabled control fill**: `disabled` (`bg-disabled`) — a real background fill, kept a legible step
@@ -218,17 +218,21 @@ fill stay readable in both themes — a single global "inverse" can't serve both
 *and* the fixed chromatic fills, which is why e.g. `on-warning` is dark in both themes (white fails on
 amber).
 
-So a primary button is `bg-primary text-on-primary hover:bg-primary-hovered
-data-pressed:bg-primary-pressed`; a soft error alert is `bg-danger-soft text-danger-emphasis
+So a primary button is `bg-primary text-on-primary [&:hover:not([data-pressed])]:bg-primary-hovered
+data-pressed:bg-primary-pressed` (the hope button recipe guards the hover wash against the pressed
+state so the two never fight); a soft error alert is `bg-danger-soft text-danger-emphasis
 border-danger-line`.
 
 **States are tokens, not computed** (decision 02): every `(role × variant × state)` is its own
 finished token, so a recipe reads intent literally (`hover:bg-primary-soft-hovered`,
-`data-pressed:text-primary-link-pressed`) and never mixes a color. Disabled pairs `foreground-disabled`
-(text) / `disabled` (fill) / `border-subtle` (border) with the `opacity-disabled` token (decision 08).
+`data-pressed:text-primary-link-pressed`) and never mixes a color. The disabled *color* tokens —
+`foreground-disabled` (text) / `disabled` (fill) / `border-subtle` (border) — stay in the contract for
+a recipe that wants a full grayed treatment (decision 08); the reference hope button recipe instead
+dims via `opacity-disabled` alone (and loading via `opacity-loading` on the `aria-busy` axis).
 The **opacity axis** — `opacity-disabled` (0.4) and `opacity-loading` (0.2) — is a separate contract
 from color: Tailwind v4 has no `--opacity-*` namespace, so these reach utilities through
-`_base/opacity.css`'s `@utility` layer, and exist so a recipe never hardcodes a magic `opacity-90`.
+`_base/opacity.css`'s `@utility` layer, and exist so a recipe never hardcodes a magic `opacity-90`
+(the hope button consumes both — `data-disabled:opacity-disabled` and `aria-busy:opacity-loading`).
 
 ### Token reference (111 color + 2 opacity)
 
@@ -348,7 +352,7 @@ only that theme's own recipes reference it); the conformance check only polices 
 | 05 | Feedback scope | all four — `success` · `info` · `warning` · `danger` |
 | 06 | Naming | `neutral` = gray role; `secondary`/`tertiary` = optional chromatic accents |
 | 07 | Chart/decorative | out of contract → `chart-*` / `palette-*` |
-| 08 | Disabled | `foreground-disabled` (text) + `disabled` (fill) + `border-subtle` (border) + the `opacity-disabled` token (0.4); fill kept legible under the text |
+| 08 | Disabled | color tokens `foreground-disabled` (text) + `disabled` (fill) + `border-subtle` (border) available for a full grayed treatment, paired with `opacity-disabled` (0.4); the reference hope button dims via `opacity-disabled` alone (loading via `opacity-loading` on `aria-busy`) |
 | 09 | Casing | flat kebab-case names; preset ships `--hope-<token>`, color `@theme inline` maps to `--color-<token>`, opacity via `@utility` (no `--opacity-*` namespace in Tailwind v4) |
 | 10 | Reference preset | shadcn-flavored baseline shipped as the default `@hope-ui/presets/hope` |
 | 11 | Recipe purity | recipes reference *finished* tokens only — no `color-mix`, alpha modifier (`bg-x/50`), or magic opacity (`opacity-90`); derived colors (`focus-halo`, `scrim`) are authored in the preset's `tokens.css`. Enforced by `pnpm check:recipe-purity` |

@@ -40,31 +40,32 @@ describe("hope button recipe", () => {
     expect(buttonRecipe({ variant: "solid", colorScheme: "danger" }).root()).toContain(
       "text-on-danger",
     );
-    // Solid interaction ladder: `-hover` renamed to `-hovered`, and press is now a colorable state.
+    // Solid interaction ladder: the hover wash is guarded against the pressed state
+    // (`[&:hover:not([data-pressed])]:`) so it never fights the press color; press is its own token.
     const solidPrimary = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
-    expect(solidPrimary).toContain("hover:bg-primary-hovered");
+    expect(solidPrimary).toContain("[&:hover:not([data-pressed])]:bg-primary-hovered");
     expect(solidPrimary).toContain("data-pressed:bg-primary-pressed");
     // Soft label is the role's content color (`-emphasis`, renamed from `on-{role}-soft`); its fill
-    // has its own hovered/pressed ladder instead of a computed mix.
+    // has its own (pressed-guarded) hovered ladder + pressed token instead of a computed mix.
     const softSuccess = buttonRecipe({ variant: "soft", colorScheme: "success" }).root();
     expect(softSuccess).toContain("bg-success-soft");
     expect(softSuccess).toContain("text-success-emphasis");
-    expect(softSuccess).toContain("hover:bg-success-soft-hovered");
+    expect(softSuccess).toContain("[&:hover:not([data-pressed])]:bg-success-soft-hovered");
     expect(softSuccess).toContain("data-pressed:bg-success-soft-pressed");
     // Outline border is the dedicated `-line` tint (renamed from `-outline`), with its own wash ladder.
     const outlineWarning = buttonRecipe({ variant: "outline", colorScheme: "warning" }).root();
     expect(outlineWarning).toContain("border-warning-line");
-    expect(outlineWarning).toContain("hover:bg-warning-outline-hovered");
+    expect(outlineWarning).toContain("[&:hover:not([data-pressed])]:bg-warning-outline-hovered");
     expect(outlineWarning).toContain("data-pressed:bg-warning-outline-pressed");
     // Ghost label is `-emphasis` too; its wash is its own token, not borrowed from soft/outline.
     const ghostInfo = buttonRecipe({ variant: "ghost", colorScheme: "info" }).root();
     expect(ghostInfo).toContain("text-info-emphasis");
-    expect(ghostInfo).toContain("hover:bg-info-ghost-hovered");
+    expect(ghostInfo).toContain("[&:hover:not([data-pressed])]:bg-info-ghost-hovered");
     expect(ghostInfo).toContain("data-pressed:bg-info-ghost-pressed");
     // Link text walks its own color ladder.
     const linkPrimary = buttonRecipe({ variant: "link", colorScheme: "primary" }).root();
     expect(linkPrimary).toContain("text-primary-emphasis");
-    expect(linkPrimary).toContain("hover:text-primary-link-hovered");
+    expect(linkPrimary).toContain("[&:hover:not([data-pressed])]:text-primary-link-hovered");
     expect(linkPrimary).toContain("data-pressed:text-primary-link-pressed");
   });
 
@@ -86,8 +87,9 @@ describe("hope button recipe", () => {
         expect(root).not.toMatch(/\bopacity-([1-9]|[1-9]\d)\b/);
       }
     }
-    // The disabled dim is the opacity token, not a magic value.
+    // Both dims are opacity tokens, not magic values.
     expect(buttonRecipe({ variant: "solid" }).root()).toContain("data-disabled:opacity-disabled");
+    expect(buttonRecipe({ variant: "solid" }).root()).toContain("aria-busy:opacity-loading");
     // The focus halo is the finished token, not an alpha modifier over `focus`.
     expect(buttonRecipe({}).root()).toContain("focus-visible:ring-focus-halo");
   });
@@ -98,18 +100,49 @@ describe("hope button recipe", () => {
     expect(asPrimary).toBe(asDanger);
     expect(asPrimary).toContain("bg-surface-raised");
     expect(asPrimary).toContain("border-subtle");
-    expect(asPrimary).toContain("hover:bg-surface-raised-hovered");
+    // `default` guards its hover against the pressed state too — consistent with the colored variants.
+    expect(asPrimary).toContain("[&:hover:not([data-pressed])]:bg-surface-raised-hovered");
     expect(asPrimary).toContain("data-pressed:bg-surface-raised-pressed");
   });
 
-  it("styles the disabled state through the single data-disabled axis (no disabled:/aria-disabled:)", () => {
+  it("dims the disabled state via opacity only — no color swap, single data-disabled axis", () => {
     const root = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
-    // The fill-bearing variants swap to the dedicated disabled fill token on `data-disabled`.
-    expect(root).toContain("data-disabled:bg-disabled");
-    // The outline variant drops its role border to the neutral `border-subtle` tint instead.
-    expect(buttonRecipe({ variant: "outline" }).root()).toContain("data-disabled:border-subtle");
-    // The old two-variant spelling is gone.
+    // Disabled neutralises chrome (cursor/pointer/shadow) and dims to the opacity token — it no
+    // longer swaps the fill/text/border to dedicated disabled colors.
+    expect(root).toContain("data-disabled:opacity-disabled");
+    expect(root).toContain("data-disabled:cursor-not-allowed");
+    expect(root).toContain("data-disabled:pointer-events-none");
+    expect(root).toContain("data-disabled:shadow-none");
+    // The old color-swap treatment is gone: no fill token, no muted-text token, and the outline
+    // variant no longer drops its role border to `border-subtle`.
+    expect(root).not.toContain("data-disabled:bg-disabled");
+    expect(root).not.toContain("data-disabled:text-foreground-disabled");
+    expect(buttonRecipe({ variant: "outline" }).root()).not.toContain(
+      "data-disabled:border-subtle",
+    );
+    // Still one axis: `data-disabled`, never a `disabled:`/`aria-disabled:` pair.
     expect(root).not.toMatch(/(?:^|\s)(?:disabled|aria-disabled):/);
+  });
+
+  it("dims the loading state via aria-busy — mirrors disabled but with the loading opacity token", () => {
+    const root = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
+    // Same neutralised chrome as the disabled axis...
+    expect(root).toContain("aria-busy:cursor-not-allowed");
+    expect(root).toContain("aria-busy:pointer-events-none");
+    expect(root).toContain("aria-busy:shadow-none");
+    // ...but its own, deeper dim (`opacity-loading` = 0.2), never the disabled token.
+    expect(root).toContain("aria-busy:opacity-loading");
+    expect(root).not.toContain("aria-busy:opacity-disabled");
+  });
+
+  it("guards every variant's hover wash against the pressed state (no plain hover: color)", () => {
+    for (const variant of VARIANTS) {
+      const root = buttonRecipe({ variant, colorScheme: "primary" }).root();
+      // The colored hover always carries the `:not([data-pressed])` guard, so the press color wins.
+      expect(root).toMatch(/\[&:hover:not\(\[data-pressed\]\)\]:(?:bg|text)-/);
+      // No plain `hover:bg-*`/`hover:text-*` color wash survives (link's `hover:underline` is layout).
+      expect(root).not.toMatch(/(?:^|\s)hover:(?:bg|text)-/);
+    }
   });
 
   it("hides the label and centers the loader for the center placement (overlay)", () => {

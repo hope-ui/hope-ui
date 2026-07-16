@@ -126,6 +126,15 @@ Root base changes: `ring-focus/50` → `ring-focus-halo`; `data-disabled:opacity
 modifier, no magic opacity anywhere. (The arbitrary font sizes `text-[0.8125rem]`/`text-[0.9375rem]`
 are **not colors** → out of scope for this rule; leave as-is.)
 
+> **Post-redesign note.** The shipped hope button recipe iterated past this sketch (the token
+> vocabulary above is unchanged — only the recipe's use of it moved on): the hover wash is now
+> guarded against the pressed state (`[&:hover:not([data-pressed])]:bg-{role}-hovered`) on every
+> variant, `default` included, so hover never fights the press color; disabled dims via
+> `opacity-disabled` **alone**, dropping the `disabled`/`foreground-disabled`/`border-subtle` color
+> swaps; loading dims via `opacity-loading` on the `aria-busy` axis (its first consumer — the
+> `opacity-loading` row above); and the root base drops `active:translate-y-px`, keeping only
+> `data-pressed:translate-y-px`. See `docs/theming.md` and the recipe for the current shape.
+
 ## Files to change (by phase — each phase leaves the repo green)
 
 ### Phase A — vocabulary + values + mapping + conformance (atomic; conformance ties them together)

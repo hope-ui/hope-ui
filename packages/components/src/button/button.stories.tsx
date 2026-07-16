@@ -155,7 +155,10 @@ export const SlotClasses: Story = {
   ),
 };
 
-/** Loading: centered overlay (default) keeps width and hides the label; `loadingText` stays inline. */
+/**
+ * Loading: centered overlay (default) keeps width and hides the label; `loadingText` stays inline.
+ * The whole button dims via the `aria-busy` axis (`opacity-loading`, 0.2) — the spinner included.
+ */
 export const Loading: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-3">
@@ -165,14 +168,14 @@ export const Loading: Story = {
       <Button variant="soft" colorScheme="neutral" loading loadingText="Uploading…">
         Upload
       </Button>
-      <Button variant="outline" colorScheme="danger" loading loaderPlacement="start">
+      <Button variant="outline" colorScheme="danger" loading loaderPlacement="end">
         Deleting
       </Button>
     </div>
   ),
 };
 
-/** Disabled is always neutral grayed chrome, regardless of variant/color. */
+/** Disabled dims each variant to `opacity-disabled` (0.4), keeping its own color — not a neutral gray. */
 export const Disabled: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-3">

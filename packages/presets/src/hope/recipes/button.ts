@@ -15,13 +15,14 @@
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
  * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
- * interaction state is a *finished* token too — `hover:bg-primary-hovered`,
- * `data-pressed:bg-primary-pressed`, `hover:text-primary-link-hovered`, `focus-visible:ring-focus-halo`,
- * `data-disabled:opacity-disabled`. The recipe computes no color: no `color-mix`, no alpha modifier
- * (`bg-x/50`), no magic opacity, so a preset that redefines a shade changes the painted result
- * predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`). Interaction
- * *triggers* are still Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/
- * `data-disabled` variants.
+ * interaction state is a *finished* token too — the hover wash (guarded against the pressed state,
+ * `[&:hover:not([data-pressed])]:bg-primary-hovered`, so it never fights the press color),
+ * `data-pressed:bg-primary-pressed`, `focus-visible:ring-focus-halo`, and the dim-only state axes
+ * `data-disabled:opacity-disabled` / `aria-busy:opacity-loading`. The recipe computes no color: no
+ * `color-mix`, no alpha modifier (`bg-x/50`), no magic opacity, so a preset that redefines a shade
+ * changes the painted result predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`).
+ * Interaction *triggers* are still Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/
+ * `data-disabled`/`aria-busy` variants.
  */
 
 import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
@@ -48,57 +49,64 @@ const COLOR_CLASSES: Record<
   Record<Exclude<ButtonVariant, "default">, string>
 > = {
   primary: {
-    solid: "bg-primary text-on-primary hover:bg-primary-hovered data-pressed:bg-primary-pressed",
-    soft: "bg-primary-soft text-primary-emphasis hover:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
+    solid:
+      "bg-primary text-on-primary [&:hover:not([data-pressed])]:bg-primary-hovered data-pressed:bg-primary-pressed",
+    soft: "bg-primary-soft text-primary-emphasis [&:hover:not([data-pressed])]:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
     outline:
-      "text-primary-emphasis border-primary-line hover:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
+      "text-primary-emphasis border-primary-line [&:hover:not([data-pressed])]:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
     ghost:
-      "text-primary-emphasis hover:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
-    link: "text-primary-emphasis hover:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
+      "text-primary-emphasis [&:hover:not([data-pressed])]:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
+    link: "text-primary-emphasis [&:hover:not([data-pressed])]:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
   },
   neutral: {
-    solid: "bg-neutral text-on-neutral hover:bg-neutral-hovered data-pressed:bg-neutral-pressed",
-    soft: "bg-neutral-soft text-neutral-emphasis hover:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
+    solid:
+      "bg-neutral text-on-neutral [&:hover:not([data-pressed])]:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+    soft: "bg-neutral-soft text-neutral-emphasis [&:hover:not([data-pressed])]:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
     outline:
-      "text-neutral-emphasis border-strong hover:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
+      "text-neutral-emphasis border-strong [&:hover:not([data-pressed])]:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
     ghost:
-      "text-neutral-emphasis hover:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
-    link: "text-neutral-emphasis hover:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
+      "text-neutral-emphasis [&:hover:not([data-pressed])]:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
+    link: "text-neutral-emphasis [&:hover:not([data-pressed])]:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
   },
   success: {
-    solid: "bg-success text-on-success hover:bg-success-hovered data-pressed:bg-success-pressed",
-    soft: "bg-success-soft text-success-emphasis hover:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
+    solid:
+      "bg-success text-on-success [&:hover:not([data-pressed])]:bg-success-hovered data-pressed:bg-success-pressed",
+    soft: "bg-success-soft text-success-emphasis [&:hover:not([data-pressed])]:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
     outline:
-      "text-success-emphasis border-success-line hover:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
+      "text-success-emphasis border-success-line [&:hover:not([data-pressed])]:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
     ghost:
-      "text-success-emphasis hover:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
-    link: "text-success-emphasis hover:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
+      "text-success-emphasis [&:hover:not([data-pressed])]:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
+    link: "text-success-emphasis [&:hover:not([data-pressed])]:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
   },
   warning: {
-    solid: "bg-warning text-on-warning hover:bg-warning-hovered data-pressed:bg-warning-pressed",
-    soft: "bg-warning-soft text-warning-emphasis hover:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
+    solid:
+      "bg-warning text-on-warning [&:hover:not([data-pressed])]:bg-warning-hovered data-pressed:bg-warning-pressed",
+    soft: "bg-warning-soft text-warning-emphasis [&:hover:not([data-pressed])]:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
     outline:
-      "text-warning-emphasis border-warning-line hover:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
+      "text-warning-emphasis border-warning-line [&:hover:not([data-pressed])]:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
     ghost:
-      "text-warning-emphasis hover:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
-    link: "text-warning-emphasis hover:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
+      "text-warning-emphasis [&:hover:not([data-pressed])]:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
+    link: "text-warning-emphasis [&:hover:not([data-pressed])]:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
   },
   danger: {
-    solid: "bg-danger text-on-danger hover:bg-danger-hovered data-pressed:bg-danger-pressed",
-    soft: "bg-danger-soft text-danger-emphasis hover:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
+    solid:
+      "bg-danger text-on-danger [&:hover:not([data-pressed])]:bg-danger-hovered data-pressed:bg-danger-pressed",
+    soft: "bg-danger-soft text-danger-emphasis [&:hover:not([data-pressed])]:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
     outline:
-      "text-danger-emphasis border-danger-line hover:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
+      "text-danger-emphasis border-danger-line [&:hover:not([data-pressed])]:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
     ghost:
-      "text-danger-emphasis hover:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
-    link: "text-danger-emphasis hover:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
+      "text-danger-emphasis [&:hover:not([data-pressed])]:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
+    link: "text-danger-emphasis [&:hover:not([data-pressed])]:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
   },
   info: {
-    solid: "bg-info text-on-info hover:bg-info-hovered data-pressed:bg-info-pressed",
-    soft: "bg-info-soft text-info-emphasis hover:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
+    solid:
+      "bg-info text-on-info [&:hover:not([data-pressed])]:bg-info-hovered data-pressed:bg-info-pressed",
+    soft: "bg-info-soft text-info-emphasis [&:hover:not([data-pressed])]:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
     outline:
-      "text-info-emphasis border-info-line hover:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
-    ghost: "text-info-emphasis hover:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
-    link: "text-info-emphasis hover:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
+      "text-info-emphasis border-info-line [&:hover:not([data-pressed])]:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
+    ghost:
+      "text-info-emphasis [&:hover:not([data-pressed])]:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
+    link: "text-info-emphasis [&:hover:not([data-pressed])]:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
   },
 };
 
@@ -130,16 +138,19 @@ export const buttonRecipe = tv({
     // solid↔outline never shifts by a pixel.
     root: [
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none rounded-sm",
-      "cursor-pointer select-none border border-transparent bg-clip-padding outline-none",
+      "select-none border border-transparent bg-clip-padding outline-none",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
       // Focus halo is the finished `focus-halo` token (a preset-authored translucent color), not an
       // alpha modifier over `focus` — recipes never compute (recipe-purity rule).
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo",
-      "active:translate-y-px data-pressed:translate-y-px",
-      // One disabled axis: `createButton` emits `data-disabled` for both native (`:disabled`) and
-      // non-native (`aria-disabled`) buttons, so the recipe styles this single variant. The dim is
-      // the `opacity-disabled` token (0.4), not a magic `opacity-90`.
-      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-disabled",
+      "data-pressed:translate-y-px",
+      // Two dim-only state axes, styled identically bar the opacity token. `createButton` emits
+      // `data-disabled` for both native (`:disabled`) and non-native (`aria-disabled`) buttons; the
+      // component sets `aria-busy` while loading. Neither swaps color — each just neutralises chrome
+      // (no cursor/pointer/shadow) and dims: disabled to `opacity-disabled` (0.4), loading to its own
+      // `opacity-loading` token (0.2). Both are finished tokens, never a magic `opacity-90`.
+      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled",
+      "aria-busy:cursor-not-allowed aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading",
     ],
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
@@ -211,15 +222,11 @@ export const buttonRecipe = tv({
       // (ignores `color`); rest → hover → press walk the `surface-raised` elevation ladder. (Slot
       // recipes need `{ root }` objects, not bare strings — a bare string applies to no slot.)
       default: {
-        root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed data-disabled:bg-disabled",
+        root: "bg-surface-raised text-foreground border-subtle shadow-xs [&:hover:not([data-pressed])]:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       },
-      // Colored fills come from `compoundVariants`; the disabled fill (`bg-disabled`, a dedicated
-      // neutral fill token) is color-independent so it lives here for the fill-bearing variants
-      // (ghost/link stay transparent when disabled — muted text only).
-      solid: { root: "data-disabled:bg-disabled" },
-      soft: { root: "data-disabled:bg-disabled" },
-      // Disabled outline drops its role border to the neutral `border-subtle` tint.
-      outline: { root: "bg-transparent data-disabled:border-subtle" },
+      solid: { root: "" },
+      soft: { root: "" },
+      outline: { root: "bg-transparent" },
       ghost: { root: "bg-transparent" },
       // Layout only; the color ladder + underline live per-role in `COLOR_CLASSES.link`.
       link: {

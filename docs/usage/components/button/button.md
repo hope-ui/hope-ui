@@ -28,8 +28,8 @@ import { Button } from "@hope-ui/components/button";
 | `colorScheme`     | `'primary' \| 'neutral' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` | Semantic role color scheme. Ignored by `default`. Named `colorScheme` (not `color`) so it never shadows the native HTML `color` attribute, which passes through `...rest` untouched.|
 | `size`            | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                            | `'md'`      | Density/scale. Heights 28 / 32 / 36 / 40 / 44px.                                                               |
 | `nativeButton`    | `boolean`                                                         | `true`      | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism".                      |
-| `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Grayed chrome regardless of `variant`/`colorScheme`.|
-| `loading`         | `boolean`                                                         | `false`     | Shows a loader and blocks activation while keeping the enabled look + tab position. Sets `aria-busy`.          |
+| `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Keeps its `variant`/`colorScheme` colors, dimmed via `opacity-disabled`.|
+| `loading`         | `boolean`                                                         | `false`     | Shows a loader and blocks activation while keeping its tab position. Dims the chrome via `opacity-loading` (its own, deeper dim). Sets `aria-busy`.          |
 | `loadingText`     | `JSX.Element`                                                     | —           | Replaces the label while loading (implies an inline `start` loader, so the text stays visible).               |
 | `loader`          | `JSX.Element`                                                     | —           | Custom loader content. Defaults to hope's loader (Lucide `loader-circle`).                                     |
 | `loaderPlacement` | `'start' \| 'center' \| 'end'`                                    | `'center'`  | `center` overlays the loader and hides the label (width preserved); `start`/`end` place it inline.             |
@@ -48,8 +48,8 @@ convention `data-slot="button-<part>"` — `button-label`, `button-start-decorat
 `disabled` and `data-pressed` (empty string) while a press is physically active — both emitted by
 `createButton` (not hand-wired here) — plus `aria-busy="true"` while `loading`.
 `data-disabled`/`data-pressed` are absent on the server and on the initial client render, so they
-are hydration-safe. The theme's recipe styles the single `data-disabled:` variant, never a
-`disabled:`/`aria-disabled:` pair.
+are hydration-safe. The theme's recipe styles two dim-only state axes — `data-disabled:` and
+`aria-busy:` (loading) — never a `disabled:`/`aria-disabled:` pair.
 
 ## Variants & color scheme
 
@@ -57,9 +57,10 @@ are hydration-safe. The theme's recipe styles the single `data-disabled:` varian
 neutral chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
 `soft` its tonal fill, and `soft`/`outline`/`ghost`/`link` label with the role's legible *content*
 color `text-{role}-emphasis` so neutral and warning stay readable in both light and dark. Each
-variant walks its own finished interaction ladder (`hover:`/`data-pressed:` → `-hovered`/`-pressed`
-tokens); the recipe computes no color. All styling comes from the theme's `button` recipe; the
-component itself writes no utility classes.
+variant walks its own finished interaction ladder — a pressed-guarded hover wash
+(`[&:hover:not([data-pressed])]:` → `-hovered`, so hover never fights the press color) plus
+`data-pressed:` → `-pressed`; the recipe computes no color. All styling comes from the theme's
+`button` recipe; the component itself writes no utility classes.
 
 ## Polymorphism (`render` + `nativeButton`)
 
@@ -85,15 +86,15 @@ a warning.
 
 | State      | Representation                                                              | Tab order              | Activation |
 | ---------- | -------------------------------------------------------------------------- | ---------------------- | ---------- |
-| `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native) + `data-disabled` styling hook; grayed | removed                | blocked    |
-| `loading`  | `aria-busy="true"` + loader; keeps the enabled look                        | kept (stays focusable) | blocked    |
+| `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native) + `data-disabled` styling hook; dimmed (`opacity-disabled`, 0.4) | removed                | blocked    |
+| `loading`  | `aria-busy="true"` + loader; dimmed (`opacity-loading`, 0.2)               | kept (stays focusable) | blocked    |
 
 A disabled `render`-ed `<a>` should also have its `href` dropped by the consumer so navigation is
 impossible; click and keyboard activation are blocked regardless. `loading` blocks activation through
 the same `preventDefault` cancel channel the disabled guard uses (see `createPress`) — the consumer's
-`onClick` never fires while loading — but without disabling the button, so it keeps its color and tab
-position. Use `focusableWhenDisabled` (via the kernel `createButton`) when a disabled control must
-stay focusable for a tooltip.
+`onClick` never fires while loading — but without disabling the button, so it keeps its color hue and
+tab position (dimmed via `opacity-loading`, 0.2). Use `focusableWhenDisabled` (via the kernel
+`createButton`) when a disabled control must stay focusable for a tooltip.
 
 ## Keyboard interaction
 

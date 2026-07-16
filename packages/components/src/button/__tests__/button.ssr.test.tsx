@@ -54,8 +54,8 @@ describe("Button SSR", () => {
   });
 
   it("marks aria-busy while loading without disabling the button", async () => {
-    // Loading blocks activation but keeps the enabled look and tab order — conveyed by `aria-busy`,
-    // never the native `disabled` attribute.
+    // Loading blocks activation and dims the chrome via the `aria-busy` axis (`opacity-loading`),
+    // but keeps its tab order and is conveyed by `aria-busy`, never the native `disabled` attribute.
     const html = await renderToStringAsync(() => (
       <ThemeProvider preset={hope}>
         <Button loading>Saving</Button>
@@ -101,7 +101,7 @@ describe("Button SSR", () => {
     // hydrates cannot drift. Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<button _hk=00e0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium rounded-sm cursor-pointer select-none border bg-clip-padding outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo active:translate-y-px data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-disabled h-8 gap-1.5 text-sm px-3 has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle shadow-xs hover:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed data-disabled:bg-disabled" data-slot="button" ><span _hk=004 data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
+      `"<button _hk=00e0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium rounded-sm select-none border bg-clip-padding outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled aria-busy:cursor-not-allowed aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading h-8 gap-1.5 text-sm px-3 has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle shadow-xs [&amp;:hover:not([data-pressed])]:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed" data-slot="button" ><span _hk=004 data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
     );
   });
 });

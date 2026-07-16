@@ -214,13 +214,17 @@ describe("Button — loading", () => {
 
     const button = page.getByRole("button", { name: "Saving" });
     await expect.element(button).toHaveAttribute("aria-busy", "true");
-    // Not disabled: still in the tab order, keeps its enabled look.
+    // Not disabled: dimmed via the `aria-busy` axis, but still focusable and in the tab order.
     await expect.element(button).not.toBeDisabled();
     expect(container.querySelector('[data-slot="button-loader"]')).not.toBeNull();
 
-    // A click is blocked by the loading guard's preventDefault (the same cancel channel disabled uses).
-    await button.click();
+    // `aria-busy:pointer-events-none` blocks Playwright's click actionability (as disabled does), so
+    // dispatch a raw click — the programmatic path the loading guard's `preventDefault` must block via
+    // the same cancel channel disabled uses.
+    const clickEvent = new MouseEvent("click", { bubbles: true, cancelable: true });
+    button.element().dispatchEvent(clickEvent);
     expect(onClick).not.toHaveBeenCalled();
+    expect(clickEvent.defaultPrevented).toBe(true);
     dispose();
   });
 

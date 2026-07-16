@@ -52,12 +52,13 @@ export interface ButtonProps
   /**
    * Disables the button. A native button uses the `disabled` attribute; a non-native element
    * uses `aria-disabled` and blocked handlers (and should also drop its `href` if it's a link).
-   * Rendered as a neutral, grayed-out chrome regardless of `variant`/`colorScheme`.
+   * Keeps its `variant`/`colorScheme` colors, dimmed via the `opacity-disabled` token.
    */
   disabled?: boolean;
   /**
-   * Shows a loader and blocks activation, while keeping the button's normal (non-disabled)
-   * look and its place in the tab order. Sets `aria-busy`.
+   * Shows a loader and blocks activation while keeping its place in the tab order. Dims the chrome
+   * via the `opacity-loading` token (its own, deeper dim than disabled) instead of the native
+   * `disabled` attribute. Sets `aria-busy`.
    */
   loading?: boolean;
   /**
