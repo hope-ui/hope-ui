@@ -1,19 +1,26 @@
 # Reference implementations
 
-Where to look when building or debugging a collection/navigation component. This captures the
-sources evaluated while porting the signal-based navigation kernel so future work doesn't
+Where to look when building or debugging a kernel primitive. This captures the sources evaluated
+while porting the signal-based navigation kernel — and the sources chosen for the overlay
+primitives still to build (`createFloating`, `createHoverIntent`) — so future work doesn't
 re-derive the map.
 
-**References policy** (see also `CLAUDE.md`): Angular Aria, Astryx, react-aria and floating-ui-react
-are **adapt-and-credit** references — read their reasoning and public API, adapt, and credit any
-verbatim borrowing.
+**References policy** (see also `CLAUDE.md`): Angular Aria, Astryx, react-aria, floating-ui (both
+the `@floating-ui/react` and `@floating-ui/vue` ports) and Base UI are **adapt-and-credit**
+references — read their reasoning and public API, adapt, and credit any verbatim borrowing. When a
+reference exists in more than one framework port, prefer the **fine-grained-reactive** one (Vue,
+Angular signals) over the re-render one (React): its lifecycle
+(`ref`/`computed`/`watch`/`onScopeDispose`) ports to Solid's
+`createSignal`/`createMemo`/`createEffect`/`onCleanup` almost 1:1 — the same reason Angular Aria
+won the navigation bake-off (§3).
 
 ---
 
 ## 1. Per-behavior source map
 
 The kernel primitives live in `packages/primitives/src/internal/` (and `utils/`). For each, the
-reference file(s) that informed it.
+reference file(s) that informed it. Entries marked **(planned)** are not built yet — the source
+map is recorded up front so the build doesn't re-derive it.
 
 ### `createListFocus` — the foundation
 
@@ -69,6 +76,47 @@ reference file(s) that informed it.
 
 - **Angular Aria** `private/behaviors/event-manager` — the declarative, modifier-aware keymap idea.
 
+### `createFloating` (planned) — overlay positioning
+
+Wraps `@floating-ui/dom` (placement, flip/shift, offset, arrow, autoUpdate); adopted as an optional
+peer dependency, same pattern as `@tanstack/virtual-core`. Positioning only — interaction concerns
+(dismiss, hover intent) are separate primitives, exactly as floating-ui splits its own packages.
+
+- **floating-ui `@floating-ui/vue`** `packages/vue/src/useFloating.ts` — **primary structural
+  reference.** Vue 3's fine-grained reactivity maps to Solid almost 1:1: `ref`/`shallowRef` →
+  `createSignal`, `computed` → `createMemo`, `watch(…, { flush: 'sync' })` →
+  `createEffect(depsFn, computeFn)`, `toValue` (ref-or-plain option) → accessor-or-value via
+  `runIfFunction`, `onScopeDispose` (autoUpdate teardown) → `onCleanup`. Prefer this over the React
+  port (`@floating-ui/react-dom` `src/useFloating.ts`), whose `useState`/`useLayoutEffect`/
+  memoization machinery is re-render bookkeeping you'd have to reverse out.
+- **floating-ui `@floating-ui/vue`** `packages/vue/src/arrow.ts` — the reactive ref-binding for the
+  `arrow` middleware. `createFloating` owns arrow **measurement** only (`middlewareData.arrow` =
+  `{x, y, centerOffset}` + the derived static side); the visual 45° rotation / static-side pinning
+  is CSS the themed component writes, not a number the kernel owns.
+- **Base UI** `packages/react/src/utils/useAnchorPositioning.ts` — the **API-vocabulary** reference
+  (not wiring): `side`/`align`/`sideOffset`/`alignOffset`/collision padding and the anchor↔positioner
+  split. React is irrelevant here — only its option surface is borrowed.
+
+Two Solid-2.0 hazards the Vue port won't flag (see `docs/solid-2.0-notes.md`): the watched
+reference/floating **elements** are conditionally rendered, so back them with `createSignal` and
+track them in the `compute` callback (never read a plain ref accessor there); and `autoUpdate`/
+`computePosition` are client-only — effect-gate them (nothing runs under `renderToStringAsync`).
+
+### `createHoverIntent` (planned) — hover open/close intent + safe triangle
+
+The pointer-tracking grace area (the "safe triangle") that keeps a hover-triggered popup open while
+the cursor travels diagonally from anchor into popup. **Deliberately separate from `createFloating`**
+— positioning vs interaction, the same split floating-ui itself draws (`arrow` lives in the
+positioning core; the safe polygon lives in the interaction layer). A click-triggered Popover
+composes `createFloating` alone; a hover-triggered Menu/HoverCard composes both.
+
+- **Astryx** `packages/core/src/hooks/useMenuHover` — **primary port** for the wiring (already a
+  Solid-adjacent signal shape: open/close intent, submenu safe-triangle).
+- **floating-ui `@floating-ui/react`** `packages/react/src/safePolygon.ts` — the framework-agnostic
+  **geometry** (builds the polygon from cursor + popup rect, `pointInPolygon` hit-testing). Port the
+  math, not `hooks/useHover.ts`'s React lifecycle. floating-ui generalizes the classic triangle to a
+  polygon (accounts for placement, gap, buffer) — same concept.
+
 ---
 
 ## 2. Per-component pointers
@@ -98,7 +146,8 @@ Consolidated verdicts from the evaluation.
 |---|---|
 | list-focus / navigation / selection / typeahead / expansion / grid | **Ported** (this work) — Angular Aria signal behaviors |
 | `announce` (live-region) | **Future port** — Astryx `useAnnounce` |
-| menu-hover intent | **Future port** — Astryx `useMenuHover` |
+| overlay positioning (placement/flip/shift/arrow/autoUpdate) | **Wrap** `@floating-ui/dom`; port `@floating-ui/vue` `useFloating`/`arrow` + Base UI `useAnchorPositioning` (API vocab) — see §1 `createFloating` |
+| menu-hover intent / safe triangle | **Future port** — Astryx `useMenuHover` (wiring) + floating-ui `safePolygon.ts` (geometry) — see §1 `createHoverIntent` |
 | input-container (combobox text sync) | **Future port** — Astryx `useInputContainer` |
 | media-query / hotkeys / overflow observers | **Adopt** `@solid-primitives/*` (see `solid-primitives-eval.md`) |
 | focus-trap / scroll-lock / presence | **Already have** in the kernel |
