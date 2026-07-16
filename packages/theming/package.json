@@ -1,7 +1,7 @@
 {
   "name": "@hope-ui/theming",
   "version": "0.0.0",
-  "description": "The hope-ui theming contract: ThemeProvider/useRecipe, the augmentable ThemeRecipes registry, neutral variant unions, slot-recipe contract types, a contract-version constant, and a conformance kit. @hope-ui/components depends on it; @hope-ui/presets/* implement and augment it.",
+  "description": "The hope-ui theming contract: ThemeProvider/useRecipe, the closed hand-declared RecipeRegistry and parallel ThemeablePropsRegistry (per-component defaultProps), neutral variant unions, slot-recipe contract types, a contract-version constant, and a conformance kit. @hope-ui/components depends on it; @hope-ui/presets/* implement it.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

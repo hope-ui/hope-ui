@@ -152,6 +152,23 @@ and inline vars on a wrapper (a single inline `style` can't express the `.dark` 
 
 ### D5 — Fix the recipe `loading` flaw → `defaultVariants` from tv variants; drop `DefaultableProps`
 
+> **Reversed in part (2026-07).** The override is no longer variants-only `defaultVariants`. It was
+> renamed to **`defaultProps`** and re-typed to a **curated themeable-props surface** —
+> `ThemeablePropsOf<K>`, which resolves to a per-component `<Component>ThemeableProps` type (recipe
+> variants **plus** durable behavioral policy + component chrome content) registered in a new
+> type-only `ThemeablePropsRegistry`, else falls back to `RecipeVariantsOf<K>`. This revives a
+> **scoped** version of the `DefaultableProps`/`DefaultablePropsRegistry` idea D5 dropped, but
+> declared in `@hope-ui/theming` itself (**no** module augmentation — which would degrade silently in
+> the presets package and theming tests, where component types are out of scope), non-exhaustive (the
+> `RecipeVariantsOf` fallback keeps it incremental), and curated (behavioral policy + chrome content,
+> never full `Partial<ComponentProps>`). Chrome content is a reuse-safe factory (`() => JSX.Element`).
+> The `slotClasses` function-form input widened to `ThemeablePropsOf<K>` too. The recipe `loading` →
+> `loaderPlacement` fix below is unchanged and still current. Authoritative model:
+> [`docs/theming.md`](./theming.md) and
+> [`themeable-props-registry`](./usage/theming/recipes/registry/themeable-props-registry.md). The rest
+> of this section is kept as design history — the reasoning that made `RecipeVariantsOf` a clean
+> subset of component props is exactly what let the surface widen cleanly.
+
 The recipe's `loading` axis (`none|center|start|end`, with `none → loader: "hidden"`) is a
 **pre-existing API design flaw**: showing/hiding the loader slot is the **component's** job (it already
 wraps the loader in `<Show when={isLoading()}>`), not CSS's. Fixing it:

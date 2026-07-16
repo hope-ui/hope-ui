@@ -32,6 +32,17 @@ and neither knows about the other.
   every hope-authored component's recipe (its variant vocabulary + slots) is declared here directly,
   as the single source of truth. A component does not `declare module` its own recipe (no module
   augmentation), and a theme does not invent the shape; both import the contract types from theming.
+- **`defaultProps` + `ThemeablePropsRegistry`** — a preset's per-component `defaultProps` (in
+  `definePreset`'s `components` overrides) sets app-wide defaults typed to that component's
+  **themeable-props surface**: recipe variants **plus** durable behavioral policy and component chrome
+  content (for Button, `nativeButton`/`type` + `loader`/`loadingText`, chrome content as reuse-safe
+  factories). That surface is declared as a `<Component>ThemeableProps` type in theming, registered in
+  a parallel, type-only `ThemeablePropsRegistry` (also closed and hand-declared — **no** module
+  augmentation). The registry is **intentionally non-exhaustive**: a component that only wants
+  variant-level defaults declares no entry and `defaultProps` falls back to its recipe variants
+  (`ThemeablePropsOf<K>`). The runtime merges `defaultProps` in at `instance ?? preset ?? builtin`
+  precedence (`useDefaults`). See
+  [`themeable-props-registry`](usage/theming/recipes/registry/themeable-props-registry.md).
 - **`SlotRecipeFn<Variants, Slot = "root">`** — **every recipe is a slot recipe.** There is no
   single-class recipe form: a one-part component uses the `root` slot. A recipe is a
   `tailwind-variants` recipe used as-is, so a caller always deals in `recipe(props).<slot>()` (each
@@ -49,17 +60,26 @@ the default path is one theme per build.
 
 1. Design the component's variants and slots.
 2. Declare its contract in `@hope-ui/theming` — a `recipes/<component>.ts` contract file (its
-   variant/slot types) plus one entry in `RecipeRegistry` (`recipes/registry.ts`). No module
-   augmentation; the component and every theme import these types from theming:
+   variant/slot types) plus one entry in `RecipeRegistry` (`recipes/registry/recipe-registry.ts`). No
+   module augmentation; the component and every theme import these types from theming:
    ```ts
    // recipes/accordion.ts
    export interface AccordionRecipeVariants { size?: "sm" | "md"; }
    export type AccordionSlot = "root" | "item" | "trigger";
-   // recipes/registry.ts
+   // recipes/registry/recipe-registry.ts
    interface RecipeRegistry {
      accordion: SlotRecipeFn<AccordionRecipeVariants, AccordionSlot>;
    }
    ```
+   **Optional — behavioral/chrome defaults.** If the component wants a preset to default *non-variant*
+   props app-wide (a behavioral toggle, a piece of brand chrome), also declare a
+   `<Component>ThemeableProps` type (in the same contract file, `extends <Component>RecipeVariants`)
+   and register it in `recipes/registry/themeable-props-registry.ts`. Type chrome content as a factory
+   (`() => JSX.Element`, resolved via `runIfFunction`), never a bare `JSX.Element` — a shared preset
+   default must render a fresh subtree per instance. Then add a compile-time drift guard in the
+   component keeping its real props and the themeable surface aligned (see `Button` for the pattern).
+   A component that only needs variant-level defaults skips this entirely — `defaultProps` falls back
+   to its recipe variants.
 3. In the component, compute each slot's `class` in a getter from
    `useRecipe("accordion")(props).<slot>()` and render through `renderElement` for `as`/`render`
    polymorphism. Merge the consumer's `class` through the recipe's slot function (`.root({ class })`)

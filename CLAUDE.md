@@ -271,14 +271,15 @@ them rather than re-deriving a behavior in a comment.
   component's subpath never pulls in another's code. See "Publishing shape" below for
   the full rationale.
 - `packages/theming` (`@hope-ui/theming`) — the **theming contract** and dependency-inversion
-  seam: `ThemeProvider` + `useRecipe`, the augmentable `ThemeRecipes` registry, the `SlotRecipeFn`
-  shape and a contract-version constant, the `SemanticColorContract` token vocabulary, and the
-  Tailwind styling seam (`tv`/`cn`/`cx` from `tailwind-variants`), plus a conformance kit (recipe +
-  semantic-token checks) on the `@hope-ui/theming/conformance` subpath. `@hope-ui/components` reads recipes through it;
-  `@hope-ui/presets/*` implement and augment it; neither knows about the other. Depends on
-  `@hope-ui/primitives` (for `createComponentContext`) — which is *why* primitives cannot fold
-  into components without a dependency cycle (`components → theming → components`). See
-  `docs/theming.md`.
+  seam: `ThemeProvider` + `useRecipe`, the closed, hand-declared `RecipeRegistry` (plus the parallel,
+  type-only `ThemeablePropsRegistry` for per-component `defaultProps` — both declared, **not** module-
+  augmented), the `SlotRecipeFn` shape and a contract-version constant, the `SemanticColorContract`
+  token vocabulary, and the Tailwind styling seam (`tv`/`cn`/`cx` from `tailwind-variants`), plus a
+  conformance kit (recipe + semantic-token checks) on the `@hope-ui/theming/conformance` subpath.
+  `@hope-ui/components` reads recipes through it; `@hope-ui/presets/*` implement it; neither knows
+  about the other. Depends on `@hope-ui/primitives` (for `createComponentContext`) — which is *why*
+  primitives cannot fold into components without a dependency cycle (`components → theming →
+  components`). See `docs/theming.md`.
 - `packages/presets` (`@hope-ui/presets`) — the concrete presets, per-preset subpaths
   (`@hope-ui/presets/hope` is the **default** visual identity). A preset is a JS entry
   (`@hope-ui/presets/hope` → `src/hope/index.ts`: `definePreset` over the recipe map) plus a
