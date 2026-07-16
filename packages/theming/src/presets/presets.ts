@@ -17,17 +17,31 @@
  * `@hope-ui/theming` is recognized by another.
  */
 import type { ClassValue } from "tailwind-variants";
-import type { RecipeRegistry } from "../recipes/registry";
+import type { RecipeRegistry, ThemeablePropsRegistry } from "../recipes/registry";
 
 /**
  * The variant props a registered recipe accepts — extracted straight from the recipe's own
- * signature, so a preset's per-component `defaultVariants` (and the `slotClasses` function form) are
- * typed exactly to what the recipe understands. `NonNullable` drops the `| undefined` from the
- * optional first parameter.
+ * signature. `NonNullable` drops the `| undefined` from the optional first parameter. It is the
+ * variants-only floor for {@link ThemeablePropsOf} (the surface a preset may default), and the input
+ * type the recipe function itself understands.
  */
 export type RecipeVariantsOf<K extends keyof RecipeRegistry> = NonNullable<
   Parameters<RecipeRegistry[K]>[0]
 >;
+
+/**
+ * The props a preset may default app-wide for component `K` via `ComponentOverride.defaultProps`: its
+ * opted-in themeable props if it registers a {@link ThemeablePropsRegistry} entry (recipe variants +
+ * durable behavioral policy + chrome content), otherwise just its recipe variants.
+ *
+ * A **superset of {@link RecipeVariantsOf}** by construction (a registered `…ThemeableProps` type
+ * `extends` its `…RecipeVariants`), so the rename from the old variants-only `defaultVariants` loses
+ * nothing. The `K extends keyof ThemeablePropsRegistry ? … : RecipeVariantsOf<K>` fallback is
+ * load-bearing: `ThemeablePropsRegistry` is intentionally non-exhaustive, so a component that hasn't
+ * opted in still resolves to a valid (variants-only) surface, keeping the feature incremental.
+ */
+export type ThemeablePropsOf<K extends keyof RecipeRegistry> =
+  K extends keyof ThemeablePropsRegistry ? ThemeablePropsRegistry[K] : RecipeVariantsOf<K>;
 
 /** The slot names a registered recipe returns — the keys of its per-slot class-function record. */
 export type RecipeSlotsOf<K extends keyof RecipeRegistry> = keyof ReturnType<RecipeRegistry[K]> &
@@ -40,18 +54,24 @@ export type SlotClasses<K extends keyof RecipeRegistry> = Partial<
 
 /**
  * A preset's global `slotClasses` for a component: either a static per-slot record (the common,
- * fully-Tailwind-scannable case) or a function of the recipe's variant props. **Only the function
- * form's literal class *substrings* are Tailwind-scannable** — a constructed string (`` `px-${n}` ``)
- * is never generated.
+ * fully-Tailwind-scannable case) or a function of the component's {@link ThemeablePropsOf} — the
+ * recipe variants **and** its behavioral props (e.g. `nativeButton`), so a global slot class can
+ * react to behavioral policy, not only visual variants. Slot *keys* stay recipe-owned
+ * ({@link SlotClasses}). **Only the function form's literal class *substrings* are Tailwind-scannable**
+ * — a constructed string (`` `px-${n}` ``) is never generated.
  */
 export type SlotClassesInput<K extends keyof RecipeRegistry> =
   | SlotClasses<K>
-  | ((variants: RecipeVariantsOf<K>) => SlotClasses<K>);
+  | ((props: ThemeablePropsOf<K>) => SlotClasses<K>);
 
-/** A preset's per-component overrides: app-wide default variants and global slot classes. */
+/** A preset's per-component overrides: app-wide default props and global slot classes. */
 export interface ComponentOverride<K extends keyof RecipeRegistry> {
-  /** Overrides the recipe's own `defaultVariants` app-wide — typed to the recipe's variant props. */
-  defaultVariants?: Partial<RecipeVariantsOf<K>>;
+  /**
+   * Overrides the component's props app-wide — typed to its {@link ThemeablePropsOf} (recipe variants
+   * + durable behavioral policy + chrome content). Merged in at `instance ?? preset ?? builtin`
+   * precedence by `useDefaults`. A superset of the old variants-only `defaultVariants`.
+   */
+  defaultProps?: Partial<ThemeablePropsOf<K>>;
   /** Global per-slot classes, folded in before per-instance `slotClasses` (see the provider phase). */
   slotClasses?: SlotClassesInput<K>;
 }
@@ -87,10 +107,12 @@ export interface Preset {
 type AnyComponentOverride = ComponentOverride<keyof RecipeRegistry>;
 
 /**
- * Merge two component-override maps **per component, per field** (config wins): `defaultVariants` is
- * deep-merged per variant key (so overriding one default keeps the base's others), while
- * `slotClasses` is replaced wholesale (config's if present, else base's — the function form cannot be
- * deep-merged, so both forms follow one predictable rule).
+ * Merge two component-override maps **per component, per field** (config wins): `defaultProps` is
+ * deep-merged per key (so overriding one default keeps the base's others — every themeable prop is a
+ * top-level value, primitive or factory function, never a nested object, so a shallow `{ ...b, ...o }`
+ * replaces one key wholesale while keeping the rest), while `slotClasses` is replaced wholesale
+ * (config's if present, else base's — the function form cannot be deep-merged, so both forms follow
+ * one predictable rule).
  */
 function mergeComponentOverrides(
   base: PresetComponentOverrides,
@@ -107,9 +129,9 @@ function mergeComponentOverrides(
     const o = overrideMap[key];
     if (b && o) {
       const merged: AnyComponentOverride = {};
-      const defaultVariants = { ...b.defaultVariants, ...o.defaultVariants };
-      if (Object.keys(defaultVariants).length > 0) {
-        merged.defaultVariants = defaultVariants;
+      const defaultProps = { ...b.defaultProps, ...o.defaultProps };
+      if (Object.keys(defaultProps).length > 0) {
+        merged.defaultProps = defaultProps;
       }
       const slotClasses = o.slotClasses ?? b.slotClasses;
       if (slotClasses !== undefined) {

@@ -2,5 +2,9 @@
 // provide, and each hope-authored component's recipe contract. One `export *` per component keeps
 // the package barrel (`../index.ts`) to a single `export * from "./recipes"` as the catalog grows.
 export * from "./button";
-export { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "./registry";
+export {
+  type RecipeRegistry,
+  THEMING_CONTRACT_VERSION,
+  type ThemeablePropsRegistry,
+} from "./registry";
 export type { SlotClassFn, SlotRecipeFn } from "./slot-recipe";

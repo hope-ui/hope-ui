@@ -7,8 +7,10 @@ authority). Types only — no runtime, no CSS.
 (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it, checked by
 `hopeRecipes satisfies RecipeRegistry`. This file also exports the assembled recipe type
 `ButtonRecipe` (`SlotRecipeFn<ButtonRecipeVariants, ButtonSlot>`), which the
-[`registry`](./registry.md) references as its `button` entry — so the registry stays a
-flat list of named recipe types and this file owns the Button shape.
+[`recipe-registry`](./registry/recipe-registry.md) references as its `button` entry — so the registry
+stays a flat list of named recipe types and this file owns the Button shape. It additionally exports
+[`ButtonThemeableProps`](#buttonthemeableprops), the `button` entry of the
+[`themeable-props-registry`](./registry/themeable-props-registry.md).
 
 ## Vocabulary
 
@@ -36,3 +38,37 @@ interface ButtonRecipeVariants {
 
 A theme's recipe accepts these and returns one class function per `ButtonSlot`
 (`recipe(props).root()`), the standard slot-recipe shape.
+
+## `ButtonThemeableProps`
+
+The curated Button props a preset may default app-wide via `ComponentOverride.defaultProps` — the
+`button` entry of the [`themeable-props-registry`](./registry/themeable-props-registry.md). A
+**superset of `ButtonRecipeVariants`** by construction (`extends`), so the rename from the old
+variants-only `defaultVariants` loses nothing:
+
+```ts
+interface ButtonThemeableProps extends ButtonRecipeVariants {
+  nativeButton?: boolean; // behavioral policy
+  type?: ButtonType; // behavioral policy (from @hope-ui/primitives)
+  loader?: () => JSX.Element; // chrome content, as a factory
+  loadingText?: () => JSX.Element; // chrome content, as a factory
+}
+```
+
+| Group | Keys | Why themeable |
+| --- | --- | --- |
+| Recipe variants | `variant` · `color` · `size` · `fullWidth` · `loaderPlacement` | Visual axes; inherited from `ButtonRecipeVariants`. |
+| Behavioral policy | `nativeButton` · `type` | Durable config a design system legitimately sets once. |
+| Chrome content | `loader` · `loadingText` | Content the component renders itself; a design system sets the brand loader once. |
+
+**Deliberately excluded:** per-instance payload content (`children`, `startDecorator`/`endDecorator`),
+transient state (`loading`, `disabled`), styling (`class`, `slotClasses`), events, and DOM attributes.
+
+**Chrome content is a factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset value is one
+object shared by every instance, and a Solid `JSX.Element` is an already-built node that would *move* if
+reused — so a factory (called per instance) is what keeps two simultaneously-loading buttons from
+fighting over one loader node. The component prop widens to `JSX.Element | (() => JSX.Element)` (a bare
+element still works per-instance) and resolves the two forms through
+[`runIfFunction`](../../primitives/utils/run-if-function/run-if-function.md). A components-side
+compile-time drift guard keeps `ButtonProps` and `ButtonThemeableProps` aligned (themeable ⊆ component
+props).

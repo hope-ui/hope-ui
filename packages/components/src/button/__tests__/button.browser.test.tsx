@@ -304,15 +304,16 @@ describe("Button — render-ed as a non-native element", () => {
   });
 });
 
-describe("Button — preset defaultVariants", () => {
-  // A preset can set app-wide default variants; the component's built-in defaults are the fallback,
-  // and an explicit instance prop still wins (precedence: instance ?? preset ?? builtin), all wired
-  // through `useDefaults`. `hope` sets none, so extend it with one.
+describe("Button — preset defaultProps (variants)", () => {
+  // A preset can set app-wide defaults; the component's built-in defaults are the fallback, and an
+  // explicit instance prop still wins (precedence: instance ?? preset ?? builtin), all wired through
+  // `useDefaults`. `hope` sets none, so extend it with one. (`defaultProps` is the renamed, widened
+  // successor of `defaultVariants`; a variant default is still the common case.)
   const smallByDefault = definePreset(hope, {
-    components: { button: { defaultVariants: { size: "sm" } } },
+    components: { button: { defaultProps: { size: "sm" } } },
   });
 
-  it("applies the preset's defaultVariants when the instance leaves the prop unset", async () => {
+  it("applies the preset's defaultProps when the instance leaves the prop unset", async () => {
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={smallByDefault}>
         <Button>Click me</Button>
@@ -403,6 +404,129 @@ describe("Button — slotClasses", () => {
     expect(cls).toContain("rounded-sm");
     expect(cls).not.toContain("rounded-full");
     expect(cls).not.toContain("rounded-none");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Button — preset defaultProps (behavioral policy + chrome content)", () => {
+  // These are capabilities that did not exist before the themeable-props widening: the old
+  // variants-only `defaultVariants` could not express a behavioral toggle or a chrome-content default.
+  // They are the definitive proof that `defaultProps` now defaults the curated themeable surface.
+
+  it("defaults a behavioral prop (nativeButton) app-wide, with the instance still winning", async () => {
+    const nonNativeByDefault = definePreset(hope, {
+      components: { button: { defaultProps: { nativeButton: false } } },
+    });
+
+    // A polymorphic (anchor) button with NO instance `nativeButton`: the preset default supplies
+    // `nativeButton: false`, so the non-native a11y model applies and the anchor announces as a button
+    // via role + tabindex. (Without the default it would fall back to the built-in `true`, mismatching
+    // the anchor.) Pairing with a non-native `render` is what keeps `nativeButton: false` correct.
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={nonNativeByDefault}>
+        <Button render={renderAsAnchor}>Link button</Button>
+      </ThemeProvider>
+    ));
+    const button = page.getByRole("button", { name: "Link button" });
+    await expect.element(button).toHaveAttribute("role", "button");
+    await expect.element(button).toHaveAttribute("tabindex", "0");
+    await expectNoA11yViolations(container);
+    dispose();
+
+    // An explicit instance `nativeButton` overrides the preset default (instance ?? preset ?? builtin):
+    // a plain native button under the same preset stays native — no role, no tabindex.
+    const overridden = mount(() => (
+      <ThemeProvider preset={nonNativeByDefault}>
+        <Button nativeButton={true}>Native</Button>
+      </ThemeProvider>
+    ));
+    const native = page.getByRole("button", { name: "Native" });
+    await expect.element(native).not.toHaveAttribute("role");
+    await expect.element(native).not.toHaveAttribute("tabindex");
+    await expectNoA11yViolations(overridden.container);
+    overridden.dispose();
+  });
+
+  it("defaults the loader (chrome content) app-wide via a factory, with the instance still winning", async () => {
+    const brandLoader = definePreset(hope, {
+      components: {
+        button: { defaultProps: { loader: () => <span data-testid="brand-loader" /> } },
+      },
+    });
+
+    // A loading button with no instance `loader` renders the preset's brand loader — not hope's
+    // built-in <svg> loader.
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={brandLoader}>
+        <Button loading>Saving</Button>
+      </ThemeProvider>
+    ));
+    const loaderSlot = container.querySelector('[data-slot="button-loader"]');
+    expect(loaderSlot?.querySelector('[data-testid="brand-loader"]')).not.toBeNull();
+    // hope's default loader is an <svg>; the brand default replaces it entirely.
+    expect(loaderSlot?.querySelector("svg")).toBeNull();
+    await expectNoA11yViolations(container);
+    dispose();
+
+    // An explicit instance `loader` overrides the preset's brand default.
+    const overridden = mount(() => (
+      <ThemeProvider preset={brandLoader}>
+        <Button loading loader={<span data-testid="instance-loader" />}>
+          Saving
+        </Button>
+      </ThemeProvider>
+    ));
+    const overriddenSlot = overridden.container.querySelector('[data-slot="button-loader"]');
+    expect(overriddenSlot?.querySelector('[data-testid="instance-loader"]')).not.toBeNull();
+    expect(overriddenSlot?.querySelector('[data-testid="brand-loader"]')).toBeNull();
+    await expectNoA11yViolations(overridden.container);
+    overridden.dispose();
+  });
+
+  it("defaults the loadingText (chrome content) app-wide via a factory", async () => {
+    const brandLoadingText = definePreset(hope, {
+      components: {
+        button: {
+          defaultProps: {
+            loadingText: () => <span data-testid="brand-loading-text">Working…</span>,
+          },
+        },
+      },
+    });
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={brandLoadingText}>
+        <Button loading>Save</Button>
+      </ThemeProvider>
+    ));
+    // The label shows the preset's brand loading text, not the instance children.
+    const label = container.querySelector('[data-slot="button-label"]');
+    expect(label?.querySelector('[data-testid="brand-loading-text"]')).not.toBeNull();
+    expect(label?.textContent).toContain("Working…");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("renders an independent loader subtree per instance from one shared preset factory (reuse-safe)", async () => {
+    // The correctness proof for the factory form: two loading buttons under one provider whose
+    // `defaultProps.loader` is a single shared factory each get their OWN brand-loader node. A bare
+    // shared `JSX.Element` default would be one already-built node that *moves*, appearing under only
+    // one of the two — which is why the themeable type demands a `() => JSX.Element` factory.
+    const brandLoader = definePreset(hope, {
+      components: {
+        button: { defaultProps: { loader: () => <span data-testid="brand-loader" /> } },
+      },
+    });
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={brandLoader}>
+        <Button loading>First</Button>
+        <Button loading>Second</Button>
+      </ThemeProvider>
+    ));
+
+    expect(container.querySelectorAll('[data-testid="brand-loader"]').length).toBe(2);
     await expectNoA11yViolations(container);
     dispose();
   });

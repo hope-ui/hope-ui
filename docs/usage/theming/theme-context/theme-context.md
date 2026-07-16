@@ -26,7 +26,7 @@ import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { hope } from "@hope-ui/presets/hope";
 
 const app = definePreset(hope, {
-  components: { button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } } },
+  components: { button: { defaultProps: { size: "sm", nativeButton: false }, slotClasses: { root: "rounded-full" } } },
 });
 
 <ThemeProvider preset={app}>{/* … */}</ThemeProvider>;
@@ -72,47 +72,57 @@ pure prop→className mapper, so its classes are **byte-stable across server and
 
 ### `useDefaults({ recipe, props, defaults })`
 
-Applies the preset's per-component `defaultVariants`, then the component's built-in `defaults`, in
-one call. Returns the merged props (lazy getters); the keys present in `defaults` become **required**
-on the result (`WithDefaults<P, D>` from `@hope-ui/primitives/utils`).
+Applies the preset's per-component `defaultProps`, then the component's built-in `defaults`, in one
+call. Returns the merged props (lazy getters); the keys present in `defaults` become **required** on
+the result (`WithDefaults<P, D>` from `@hope-ui/primitives/utils`).
 
 | Option | Type | Notes |
 | --- | --- | --- |
-| `recipe` | `K extends keyof RecipeRegistry` | The recipe whose preset `defaultVariants` are the middle layer. |
+| `recipe` | `K extends keyof RecipeRegistry` | The recipe whose preset `defaultProps` are the middle layer. |
 | `props` | `P extends object` | The component's own props (highest precedence). |
 | `defaults` | `D extends Partial<P>` | The component's built-in defaults (lowest precedence). |
+
+`defaultProps` is typed to the curated themeable surface (`ThemeablePropsOf<K>` — variants +
+behavioral policy + chrome content), but it is merged into the component's *full* props `P`: an
+internal `as Partial<P>` cast is what lets a behavioral default flow through unchanged.
 
 **Merge precedence — `instance ?? preset ?? builtin`:**
 
 | Source | Precedence | Where it comes from |
 | --- | --- | --- |
 | Instance prop | highest | `props[key]` |
-| Preset default | middle | `useTheme().components[recipe]?.defaultVariants[key]` |
+| Preset default | middle | `useTheme().components[recipe]?.defaultProps[key]` |
 | Built-in default | lowest | `defaults[key]` |
 
-Implemented as `withDefaults(withDefaults(props, presetDefaultVariants), defaults)`. `withDefaults`
-resolves each key with `??` (never `merge` — see `docs/solid-2.0-notes.md`), so only a genuinely
-present, non-nullish value wins, and each key resolves independently.
+Implemented as `withDefaults(withDefaults(props, presetDefaults), defaults)`. `withDefaults` resolves
+each key with `??` (never `merge` — see `docs/solid-2.0-notes.md`), so only a genuinely present,
+non-nullish value wins, and each key resolves independently.
 
-### `useSlots({ recipe, variants, slotClasses?, class? })`
+### `useSlots({ recipe, themeableProps, slotClasses?, class? })`
 
 Returns one ready-to-call class function per slot — `Record<RecipeSlotsOf<K>, () => string>` — each
 folding in the full override chain. Call `slots.root()` etc. inside a `class={…}` binding; each fn
-reads `variants()` / `slotClasses()` / `class()` when called, so it tracks exactly those inputs.
+reads `themeableProps()` / `slotClasses()` / `class()` when called, so it tracks exactly those inputs.
 
 | Option | Type | Notes |
 | --- | --- | --- |
 | `recipe` | `K extends keyof RecipeRegistry` | The recipe whose base classes + preset `slotClasses` seed every slot. |
-| `variants` | `Accessor<RecipeVariantsOf<K>>` | The recipe's variant props; re-read per slot-fn call. |
+| `themeableProps` | `Accessor<ThemeablePropsOf<K>>` | The component's themeable props — variant props **and** behavioral props (e.g. `nativeButton`); re-read per slot-fn call. Renamed from `variants` (now a misnomer). |
 | `slotClasses?` | `Accessor<SlotClasses<K> \| undefined>` | Per-instance slot overrides. |
 | `class?` | `Accessor<string \| undefined>` | The consumer's root `class`, applied **last** and to the `root` slot only. |
+
+The wider `themeableProps()` object is passed to **both** the recipe and the preset's `slotClasses`
+function form: `tailwind-variants` reads only its declared variant keys and ignores the behavioral
+ones (so recipe output is unchanged), while a global `slotClasses` function can now react to
+behavioral props too. Content factories (`loader`/`loadingText`) are irrelevant to class computation
+and are not threaded in.
 
 **Merge precedence — `recipe base → preset slotClasses → instance slotClasses → class` (root only):**
 
 | Layer | Source |
 | --- | --- |
-| Recipe base | `recipe(variants())[slot]()` |
-| Preset `slotClasses` | `useTheme().components[recipe]?.slotClasses` (its **function form** is called with `variants()`) |
+| Recipe base | `recipe(themeableProps())[slot]()` |
+| Preset `slotClasses` | `useTheme().components[recipe]?.slotClasses` (its **function form** is called with `themeableProps()`) |
 | Instance `slotClasses` | `slotClasses?.()?.[slot]` |
 | `class` (root only) | `class?.()` |
 
@@ -137,6 +147,8 @@ stylesheet with no runtime injection and no FOUC.
 
 - [`presets`](../presets/presets.md) — `definePreset`/`isPreset`, the `Preset` type + the `components`
   override vocabulary.
-- [`registry`](../recipes/registry.md) — the `RecipeRegistry` `useRecipe` reads;
-  [`slot-recipe`](../recipes/slot-recipe.md) — the `SlotRecipeFn` shape.
+- [`recipe-registry`](../recipes/registry/recipe-registry.md) — the `RecipeRegistry` `useRecipe`
+  reads; [`themeable-props-registry`](../recipes/registry/themeable-props-registry.md) — the
+  `defaultProps`/`themeableProps` vocabulary; [`slot-recipe`](../recipes/slot-recipe.md) — the
+  `SlotRecipeFn` shape.
 - [`conformance`](../conformance/conformance.md) — the kit that verifies a preset's recipes actually emit classes, and that its token CSS defines every `--hope-*` var.

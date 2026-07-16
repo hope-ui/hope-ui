@@ -1,9 +1,15 @@
 import { type ButtonType, createButton } from "@hope-ui/primitives/internal";
-import { composeEventHandlers, type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import {
+  composeEventHandlers,
+  type RenderProp,
+  renderElement,
+  runIfFunction,
+} from "@hope-ui/primitives/utils";
 import type {
   ButtonColor,
   ButtonLoaderPlacement,
   ButtonSize,
+  ButtonThemeableProps,
   ButtonVariant,
   SlotClasses,
 } from "@hope-ui/theming";
@@ -51,10 +57,19 @@ export interface ButtonProps extends ButtonElementProps {
    * look and its place in the tab order. Sets `aria-busy`.
    */
   loading?: boolean;
-  /** Replaces the label while loading (implies an inline `start` loader so the text stays visible). */
-  loadingText?: JSX.Element;
-  /** Custom loader content. Defaults to hope's loader. */
-  loader?: JSX.Element;
+  /**
+   * Replaces the label while loading (implies an inline `start` loader so the text stays visible).
+   * Accepts a bare element (per-instance) or a factory `() => JSX.Element` — the factory form is what
+   * a preset supplies as an app-wide `defaultProps.loadingText`, so a shared default renders a fresh
+   * subtree per instance rather than moving one node between buttons (resolved via `runIfFunction`).
+   */
+  loadingText?: JSX.Element | (() => JSX.Element);
+  /**
+   * Custom loader content. Defaults to hope's loader. Accepts a bare element (per-instance) or a
+   * factory `() => JSX.Element` — the factory form is what a preset supplies as an app-wide
+   * `defaultProps.loader` (reuse-safe; see `loadingText`).
+   */
+  loader?: JSX.Element | (() => JSX.Element);
   /** Where the loader sits. `center` (default) overlays it and hides the label, preserving width. */
   loaderPlacement?: ButtonLoaderPlacement;
   /** Leading slot (typically an icon), before the label. */
@@ -73,6 +88,17 @@ export interface ButtonProps extends ButtonElementProps {
    */
   slotClasses?: SlotClasses<"button">;
 }
+
+// Compile-time drift guard (erased at build, enforced by `pnpm typecheck`): keep `ButtonProps` and
+// the theming-declared `ButtonThemeableProps` aligned. Direction is **themeable ⊆ component props** —
+// a preset `defaultProps` is merged in and read as `ButtonProps`, so every themeable key must exist on
+// `ButtonProps` (1) and every themeable value must be a valid prop default (2). E.g. if `loader` were
+// narrowed back to `JSX.Element` (dropping the factory), (2) would fail here, at the exact site.
+type _MissingThemeableKeys = Exclude<keyof ButtonThemeableProps, keyof ButtonProps>;
+const _noMissingThemeableKeys: _MissingThemeableKeys extends never ? true : never = true; // (1)
+const _themeablePropsAreValidPropDefaults = (t: ButtonThemeableProps): ButtonProps => t; // (2)
+void _noMissingThemeableKeys;
+void _themeablePropsAreValidPropDefaults;
 
 /**
  * hope's default loader — Lucide's `loader-circle`. A single arc the recipe's `loader` slot spins
@@ -95,7 +121,7 @@ function ButtonLoader(): JSX.Element {
 }
 
 export const Button: Component<ButtonProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultVariants` in between the instance props
+  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props
   // and these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with
   // `??` (never `merge`, which resolves by key *presence* — a wrapper forwarding an unset
   // `type`/`variant`/… would drop the default). See `useDefaults`' doc in @hope-ui/theming.
@@ -121,11 +147,14 @@ export const Button: Component<ButtonProps> = (props) => {
     merged.loadingText != null ? "start" : merged.loaderPlacement;
 
   // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
-  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
-  // props are read lazily on every slot-fn call, so variant/loading changes flow through.
+  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The themeable
+  // props are read lazily on every slot-fn call, so variant/loading changes flow through. Behavioral
+  // props (`nativeButton`/`type`) are threaded too so a preset `slotClasses` *function* can react to
+  // them; the recipe reads only its declared variant keys and ignores the rest. Content factories
+  // (`loader`/`loadingText`) are irrelevant to class computation, so they're deliberately not passed.
   const slots = useSlots({
     recipe: "button",
-    variants: () => ({
+    themeableProps: () => ({
       variant: merged.variant,
       color: merged.color,
       size: merged.size,
@@ -133,6 +162,11 @@ export const Button: Component<ButtonProps> = (props) => {
       // Layout only, and only while loading — the loader slot itself is mounted by `<Show>` below,
       // so an unset placement (not loading) applies nothing.
       loaderPlacement: isLoading() ? effectivePlacement() : undefined,
+      nativeButton: merged.nativeButton,
+      // `ButtonProps.type` (Solid's `ButtonHTMLAttributes`) is wider than `ButtonType`; narrow it the
+      // same way the `createButton` call above does. The recipe ignores `type` anyway; it's threaded
+      // only so a preset `slotClasses` function can read it.
+      type: merged.type as ButtonType,
     }),
     slotClasses: () => merged.slotClasses,
     class: () => merged.class,
@@ -198,7 +232,9 @@ export const Button: Component<ButtonProps> = (props) => {
         </span>
       </Show>
       <span data-slot="button-label" class={slots.label()}>
-        {isLoading() && merged.loadingText != null ? merged.loadingText : merged.children}
+        {isLoading() && merged.loadingText != null
+          ? runIfFunction(merged.loadingText)
+          : merged.children}
       </span>
       <Show when={merged.endDecorator != null}>
         <span data-slot="button-end-decorator" class={slots.endDecorator()}>
@@ -207,7 +243,7 @@ export const Button: Component<ButtonProps> = (props) => {
       </Show>
       <Show when={isLoading()}>
         <span data-slot="button-loader" class={slots.loader()} aria-hidden="true">
-          {merged.loader ?? <ButtonLoader />}
+          {runIfFunction(merged.loader) ?? <ButtonLoader />}
         </span>
       </Show>
     </>

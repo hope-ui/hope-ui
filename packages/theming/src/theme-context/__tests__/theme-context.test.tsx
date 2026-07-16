@@ -27,7 +27,11 @@ const demo: SlotRecipeFn<DemoVariants, DemoSlot> = () => ({
   label: (o) => join("base-label", o?.class),
 });
 const registry = { demo } as unknown as RecipeRegistry;
-// "demo" isn't a real registry key; cast at the call boundary the way the ssr/browser tests do.
+// "demo" isn't a real registry key; cast at the call boundary the way the ssr/browser tests do. It
+// deliberately declares no `ThemeablePropsRegistry` entry, so it stands in for a component that never
+// opted into behavioral defaults and whose `defaultProps`/`themeableProps` fall back to the recipe
+// variants (`ThemeablePropsOf`'s `RecipeVariantsOf` branch). Keep it synthetic — don't "fix" it to a
+// registered component later, or that fallback path stops being exercised.
 const recipe = "demo" as keyof RecipeRegistry;
 
 /** Build a demo preset from the synthetic registry; `config` is cast (its keys are synthetic). */
@@ -130,8 +134,8 @@ describe("useDefaults — precedence instance ?? preset ?? builtin", () => {
     expect(size).toBe("md");
   });
 
-  it("uses the preset defaultVariants over the built-in when the instance is unset", () => {
-    const preset = demoPreset({ components: { demo: { defaultVariants: { size: "sm" } } } });
+  it("uses the preset defaultProps over the built-in when the instance is unset", () => {
+    const preset = demoPreset({ components: { demo: { defaultProps: { size: "sm" } } } });
     const size = inProvider(
       preset,
       () =>
@@ -141,7 +145,7 @@ describe("useDefaults — precedence instance ?? preset ?? builtin", () => {
   });
 
   it("uses the instance prop over both preset and built-in", () => {
-    const preset = demoPreset({ components: { demo: { defaultVariants: { size: "sm" } } } });
+    const preset = demoPreset({ components: { demo: { defaultProps: { size: "sm" } } } });
     const size = inProvider(
       preset,
       () =>
@@ -155,7 +159,7 @@ describe("useDefaults — precedence instance ?? preset ?? builtin", () => {
   });
 
   it("resolves each key independently (preset fills one, builtin the other)", () => {
-    const preset = demoPreset({ components: { demo: { defaultVariants: { size: "sm" } } } });
+    const preset = demoPreset({ components: { demo: { defaultProps: { size: "sm" } } } });
     const out = inProvider(preset, () => {
       const merged = useDefaults({
         recipe,
@@ -177,7 +181,7 @@ describe("useSlots — precedence recipe base → preset → instance → class"
     const out = inProvider(preset, () => {
       const slots = useSlots({
         recipe,
-        variants: () => ({ size: "sm" }),
+        themeableProps: () => ({ size: "sm" }),
         slotClasses: () => ({ root: "instance-root" }),
         class: () => "consumer-class",
       });
@@ -189,7 +193,7 @@ describe("useSlots — precedence recipe base → preset → instance → class"
     expect(out.label).toBe("base-label preset-label");
   });
 
-  it("resolves the preset slotClasses function form with the current variants", () => {
+  it("resolves the preset slotClasses function form with the current themeableProps", () => {
     const preset = demoPreset({
       components: {
         demo: {
@@ -198,14 +202,32 @@ describe("useSlots — precedence recipe base → preset → instance → class"
       },
     });
     const root = inProvider(preset, () =>
-      useSlots({ recipe, variants: () => ({ size: "sm" }) }).root(),
+      useSlots({ recipe, themeableProps: () => ({ size: "sm" }) }).root(),
     );
     expect(root).toBe("base-root sm-root");
   });
 
+  it("threads behavioral themeable props (not just variants) into the slotClasses function", () => {
+    // The function-form input widened from variants-only to `ThemeablePropsOf`, and `useSlots` threads
+    // the whole `themeableProps()` object — so a global slot class can react to a behavioral prop like
+    // `nativeButton`, proving the widened input is passed at runtime (not just typed).
+    const preset = demoPreset({
+      components: {
+        demo: {
+          slotClasses: (p: { nativeButton?: boolean }) =>
+            p.nativeButton === false ? { root: "non-native-root" } : { root: "native-root" },
+        },
+      },
+    });
+    const root = inProvider(preset, () =>
+      useSlots({ recipe, themeableProps: () => ({ nativeButton: false }) }).root(),
+    );
+    expect(root).toBe("base-root non-native-root");
+  });
+
   it("emits just the recipe base when the preset has no slotClasses and no instance overrides", () => {
     const root = inProvider(demoPreset(), () =>
-      useSlots({ recipe, variants: () => ({ size: "md" }) }).root(),
+      useSlots({ recipe, themeableProps: () => ({ size: "md" }) }).root(),
     );
     expect(root).toBe("base-root");
   });

@@ -19,7 +19,7 @@ distinguishable at runtime from a bare recipe map.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `recipes` | `RecipeRegistry` | The recipe map (`{ button: … }`). Always taken from the base. |
-| `components` | `PresetComponentOverrides` | Per-component `defaultVariants` + global `slotClasses`. |
+| `components` | `PresetComponentOverrides` | Per-component `defaultProps` + global `slotClasses`. |
 
 `components` is always a present object (possibly empty). The brand is `Symbol.for("hope-ui.preset")`
 — resolved through the cross-realm global symbol registry, so a preset built by one installed copy of
@@ -37,7 +37,12 @@ import { hope } from "@hope-ui/presets/hope";
 
 const app = definePreset(hope, {
   components: {
-    button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } },
+    button: {
+      // `defaultProps` = the curated themeable surface: recipe variants + behavioral policy + chrome
+      // content (chrome content as a factory). A superset of the old variants-only `defaultVariants`.
+      defaultProps: { size: "sm", nativeButton: false, loader: () => <MyBrandSpinner /> },
+      slotClasses: { root: "rounded-full" },
+    },
   },
 });
 ```
@@ -50,7 +55,7 @@ app's stylesheet) — tokens are not part of the `definePreset` config.
 | Slice | Rule |
 | --- | --- |
 | `recipes` | Always the base's — a `config` never carries recipes. |
-| `components[k].defaultVariants` | Deep-merged **per variant key** — overriding one default keeps the base's others. |
+| `components[k].defaultProps` | Deep-merged **per key** — overriding one default keeps the base's others (every themeable prop is a top-level value, primitive or factory, never a nested object). |
 | `components[k].slotClasses` | Replaced **wholesale** (config's if present, else base's) — the function form can't be deep-merged, so both forms follow one rule. |
 
 `definePreset` never mutates the base; each call returns a fresh, normalized preset.
@@ -71,11 +76,12 @@ isPreset({ button }); // false — a bare recipe map is not a preset
 | Type | Meaning |
 | --- | --- |
 | `RecipeVariantsOf<K>` | The variant props recipe `K` accepts (extracted from its signature). |
+| `ThemeablePropsOf<K>` | The props a preset may default for `K`: its [`ThemeablePropsRegistry`](../recipes/registry/themeable-props-registry.md) entry (variants + behavioral policy + chrome content) if it opted in, else `RecipeVariantsOf<K>`. A superset of `RecipeVariantsOf<K>`. |
 | `RecipeSlotsOf<K>` | The slot names recipe `K` returns. |
 | `SlotClasses<K>` | `Partial<Record<slot, ClassValue>>` — a per-slot class record. |
-| `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(variants) => SlotClasses<K>` (preset-only function form). |
-| `ComponentOverride<K>` | `{ defaultVariants?, slotClasses? }` for one component. |
-| `PresetComponentOverrides` | Per-component overrides keyed by registry name. |
+| `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(props: ThemeablePropsOf<K>) => SlotClasses<K>` (preset-only function form — its input widened from variants-only, so a global slot class can react to behavioral props too; slot *keys* stay recipe-owned). |
+| `ComponentOverride<K>` | `{ defaultProps?, slotClasses? }` for one component. |
+| `PresetComponentOverrides` | Per-component overrides keyed by registry name (`keyof RecipeRegistry`). |
 | `PresetConfig` | The authoring shape passed to `definePreset` (`{ components? }`). |
 
 ## Scannability caveat
