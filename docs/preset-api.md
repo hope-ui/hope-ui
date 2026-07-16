@@ -165,7 +165,7 @@ and inline vars on a wrapper (a single inline `style` can't express the `.dark` 
 > The `slotClasses` function-form input widened to `ThemeablePropsOf<K>` too. The recipe `loading` →
 > `loaderPlacement` fix below is unchanged and still current. Authoritative model:
 > [`docs/theming.md`](./theming.md) and
-> [`themeable-props-registry`](./usage/theming/recipes/registry/themeable-props-registry.md). The rest
+> [`themeable-props-registry`](./usage/theming/registry/themeable-props-registry.md). The rest
 > of this section is kept as design history — the reasoning that made `RecipeVariantsOf` a clean
 > subset of component props is exactly what let the surface widen cleanly.
 

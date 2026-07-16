@@ -1,8 +1,8 @@
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { definePreset, type Preset, type PresetConfig } from "../../presets";
-import type { RecipeRegistry } from "../../recipes/registry";
 import type { SlotRecipeFn } from "../../recipes/slot-recipe";
+import type { RecipeRegistry } from "../../registry";
 import { ThemeProvider, useDefaults, useRecipe, useSlots, useTheme } from "../theme-context";
 
 // Unit (node, client build): the pure-logic half of the provider — the `use*` hooks reading a

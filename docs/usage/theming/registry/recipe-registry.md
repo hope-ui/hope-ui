@@ -1,14 +1,16 @@
 # `recipe-registry` — the recipe registry
 
 `RecipeRegistry` is the set of recipes a hope-ui theme must provide, plus the contract-version
-constant. Types + one constant; no runtime CSS. It lives in the `registry/` folder alongside its
-behavioral/chrome counterpart, [`themeable-props-registry`](./themeable-props-registry.md), so the
-two contracts scale independently as the component catalog grows. The import specifier is unchanged
-from when this was a single `registry.ts` — `../recipes/registry` resolves to the folder barrel.
+constant. Types + one constant; no runtime CSS. It lives in the top-level `registry/` folder — the
+contract seam, a sibling of `recipes`/`presets`/`theme-context` — alongside its behavioral/chrome
+counterpart, [`themeable-props-registry`](./themeable-props-registry.md), so the two contracts scale
+independently as the component catalog grows. Consumers import from `@hope-ui/theming` (the root
+barrel re-exports the folder); within the package the specifier is `../registry`.
 
 `@hope-ui/theming` **owns the look-&-feel contract**: every hope-authored component's recipe is
-declared here directly — one entry per component, referencing that component's contract file (e.g.
-[`button`](../button.md)) — **not** by module augmentation. A component consumes
+declared here directly — one entry per component, referencing that component's contract file (in the
+sibling `recipes/` folder, e.g. [`button`](../recipes/button.md)) — **not** by module augmentation. A
+component consumes
 `useRecipe("<name>")`; a theme implements the matching recipe and checks its map with
 `satisfies RecipeRegistry`. Neither the component nor the theme can drift the contract.
 
@@ -37,6 +39,6 @@ authoring vocabulary*, not any recipe/slot shape.
 
 - [`themeable-props-registry`](./themeable-props-registry.md) — the parallel, type-only registry of
   per-component behavioral/chrome default vocabulary.
-- [`slot-recipe`](../slot-recipe.md) — the `SlotRecipeFn` / `SlotClassFn` shape each entry uses.
-- [`theme-context`](../../theme-context/theme-context.md) — `ThemeProvider` / `useRecipe` over this registry.
-- [`conformance`](../../conformance/conformance.md) — the runtime drift gate.
+- [`slot-recipe`](../recipes/slot-recipe.md) — the `SlotRecipeFn` / `SlotClassFn` shape each entry uses.
+- [`theme-context`](../theme-context/theme-context.md) — `ThemeProvider` / `useRecipe` over this registry.
+- [`conformance`](../conformance/conformance.md) — the runtime drift gate.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ButtonRecipeVariants, ButtonThemeableProps } from "../../button";
+import type { ButtonRecipeVariants, ButtonThemeableProps } from "../../recipes/button";
 import type { ThemeablePropsRegistry } from "../themeable-props-registry";
 
 // The themeable-props registry is types-only; its "tests" are compile-time assignability checks

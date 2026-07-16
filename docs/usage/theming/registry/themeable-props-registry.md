@@ -20,15 +20,15 @@ interface ThemeablePropsRegistry {
 }
 ```
 
-Each entry is that component's `<Component>ThemeableProps` type from its contract file (e.g.
-[`ButtonThemeableProps`](../button.md)), declared `extends <Component>RecipeVariants` so it is a
-superset of the variants by construction.
+Each entry is that component's `<Component>ThemeableProps` type from its contract file (in the sibling
+`recipes/` folder, e.g. [`ButtonThemeableProps`](../recipes/button.md)), declared
+`extends <Component>RecipeVariants` so it is a superset of the variants by construction.
 
 ## Intentionally non-exhaustive
 
 Unlike `RecipeRegistry`, this registry is **not** exhaustive over `keyof RecipeRegistry`. A component
 that only wants variants-only defaults declares *no* entry here. The resolver
-[`ThemeablePropsOf<K>`](../../presets/presets.md) handles that:
+[`ThemeablePropsOf<K>`](../presets/presets.md) handles that:
 
 ```ts
 type ThemeablePropsOf<K extends keyof RecipeRegistry> =
@@ -51,12 +51,12 @@ state (`open`, `value`, `id`, `ref`); polymorphism/styling/events (`render`/`as`
 Chrome content is typed as a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset
 value is one object shared by every instance, and a Solid `JSX.Element` is an already-built node that
 would *move* if reused. The factory (called per instance) yields a fresh subtree — see
-[`runIfFunction`](../../../primitives/utils/run-if-function/run-if-function.md) and
-[`RenderProp`](../../../primitives/utils/render/render.md).
+[`runIfFunction`](../../primitives/utils/run-if-function/run-if-function.md) and
+[`RenderProp`](../../primitives/utils/render/render.md).
 
 ## Related
 
 - [`recipe-registry`](./recipe-registry.md) — the recipe/slot contract this parallels.
-- [`button`](../button.md) — `ButtonThemeableProps`, the `button` entry.
-- [`presets`](../../presets/presets.md) — `ThemeablePropsOf<K>`, `ComponentOverride.defaultProps`, and
+- [`button`](../recipes/button.md) — `ButtonThemeableProps`, the `button` entry.
+- [`presets`](../presets/presets.md) — `ThemeablePropsOf<K>`, `ComponentOverride.defaultProps`, and
   the widened `slotClasses` function input.

@@ -42,7 +42,7 @@ and neither knows about the other.
   variant-level defaults declares no entry and `defaultProps` falls back to its recipe variants
   (`ThemeablePropsOf<K>`). The runtime merges `defaultProps` in at `instance ?? preset ?? builtin`
   precedence (`useDefaults`). See
-  [`themeable-props-registry`](usage/theming/recipes/registry/themeable-props-registry.md).
+  [`themeable-props-registry`](usage/theming/registry/themeable-props-registry.md).
 - **`SlotRecipeFn<Variants, Slot = "root">`** — **every recipe is a slot recipe.** There is no
   single-class recipe form: a one-part component uses the `root` slot. A recipe is a
   `tailwind-variants` recipe used as-is, so a caller always deals in `recipe(props).<slot>()` (each
@@ -60,13 +60,13 @@ the default path is one theme per build.
 
 1. Design the component's variants and slots.
 2. Declare its contract in `@hope-ui/theming` — a `recipes/<component>.ts` contract file (its
-   variant/slot types) plus one entry in `RecipeRegistry` (`recipes/registry/recipe-registry.ts`). No
+   variant/slot types) plus one entry in `RecipeRegistry` (`registry/recipe-registry.ts`). No
    module augmentation; the component and every theme import these types from theming:
    ```ts
    // recipes/accordion.ts
    export interface AccordionRecipeVariants { size?: "sm" | "md"; }
    export type AccordionSlot = "root" | "item" | "trigger";
-   // recipes/registry/recipe-registry.ts
+   // registry/recipe-registry.ts
    interface RecipeRegistry {
      accordion: SlotRecipeFn<AccordionRecipeVariants, AccordionSlot>;
    }
@@ -74,7 +74,7 @@ the default path is one theme per build.
    **Optional — behavioral/chrome defaults.** If the component wants a preset to default *non-variant*
    props app-wide (a behavioral toggle, a piece of brand chrome), also declare a
    `<Component>ThemeableProps` type (in the same contract file, `extends <Component>RecipeVariants`)
-   and register it in `recipes/registry/themeable-props-registry.ts`. Type chrome content as a factory
+   and register it in `registry/themeable-props-registry.ts`. Type chrome content as a factory
    (`() => JSX.Element`, resolved via `runIfFunction`), never a bare `JSX.Element` — a shared preset
    default must render a fresh subtree per instance. Then add a compile-time drift guard in the
    component keeping its real props and the themeable surface aligned (see `Button` for the pattern).

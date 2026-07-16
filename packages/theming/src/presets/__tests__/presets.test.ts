@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ButtonRecipe } from "../../recipes/button";
-import type { RecipeRegistry } from "../../recipes/registry";
+import type { RecipeRegistry } from "../../registry";
 import { definePreset, isPreset, type Preset } from "../presets";
 
 // A minimal, self-contained recipe map — the theming package must not depend on `@hope-ui/presets`.

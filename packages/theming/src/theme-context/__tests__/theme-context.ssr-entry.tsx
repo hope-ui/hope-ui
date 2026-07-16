@@ -1,8 +1,8 @@
 import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { definePreset } from "../../presets";
-import type { RecipeRegistry } from "../../recipes/registry";
 import type { SlotRecipeFn } from "../../recipes/slot-recipe";
+import type { RecipeRegistry } from "../../registry";
 import { ThemeProvider, useRecipe } from "../theme-context";
 
 // The single source of truth for the ThemeProvider SSR → hydration round-trip tree, shared by

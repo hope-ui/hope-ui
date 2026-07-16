@@ -9,8 +9,8 @@ import {
   type SlotClasses,
   type ThemeablePropsOf,
 } from "../presets";
-import type { RecipeRegistry } from "../recipes/registry";
 import type { SlotClassFn } from "../recipes/slot-recipe";
+import type { RecipeRegistry } from "../registry";
 import { cx } from "../styling/styling";
 
 /**

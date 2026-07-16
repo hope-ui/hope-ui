@@ -76,7 +76,7 @@ isPreset({ button }); // false — a bare recipe map is not a preset
 | Type | Meaning |
 | --- | --- |
 | `RecipeVariantsOf<K>` | The variant props recipe `K` accepts (extracted from its signature). |
-| `ThemeablePropsOf<K>` | The props a preset may default for `K`: its [`ThemeablePropsRegistry`](../recipes/registry/themeable-props-registry.md) entry (variants + behavioral policy + chrome content) if it opted in, else `RecipeVariantsOf<K>`. A superset of `RecipeVariantsOf<K>`. |
+| `ThemeablePropsOf<K>` | The props a preset may default for `K`: its [`ThemeablePropsRegistry`](../registry/themeable-props-registry.md) entry (variants + behavioral policy + chrome content) if it opted in, else `RecipeVariantsOf<K>`. A superset of `RecipeVariantsOf<K>`. |
 | `RecipeSlotsOf<K>` | The slot names recipe `K` returns. |
 | `SlotClasses<K>` | `Partial<Record<slot, ClassValue>>` — a per-slot class record. |
 | `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(props: ThemeablePropsOf<K>) => SlotClasses<K>` (preset-only function form — its input widened from variants-only, so a global slot class can react to behavioral props too; slot *keys* stay recipe-owned). |

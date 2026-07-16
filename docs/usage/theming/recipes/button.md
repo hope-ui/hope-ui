@@ -7,10 +7,10 @@ authority). Types only — no runtime, no CSS.
 (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it, checked by
 `hopeRecipes satisfies RecipeRegistry`. This file also exports the assembled recipe type
 `ButtonRecipe` (`SlotRecipeFn<ButtonRecipeVariants, ButtonSlot>`), which the
-[`recipe-registry`](./registry/recipe-registry.md) references as its `button` entry — so the registry
+[`recipe-registry`](../registry/recipe-registry.md) references as its `button` entry — so the registry
 stays a flat list of named recipe types and this file owns the Button shape. It additionally exports
 [`ButtonThemeableProps`](#buttonthemeableprops), the `button` entry of the
-[`themeable-props-registry`](./registry/themeable-props-registry.md).
+[`themeable-props-registry`](../registry/themeable-props-registry.md).
 
 ## Vocabulary
 
@@ -42,7 +42,7 @@ A theme's recipe accepts these and returns one class function per `ButtonSlot`
 ## `ButtonThemeableProps`
 
 The curated Button props a preset may default app-wide via `ComponentOverride.defaultProps` — the
-`button` entry of the [`themeable-props-registry`](./registry/themeable-props-registry.md). A
+`button` entry of the [`themeable-props-registry`](../registry/themeable-props-registry.md). A
 **superset of `ButtonRecipeVariants`** by construction (`extends`), so the rename from the old
 variants-only `defaultVariants` loses nothing:
 

@@ -3,14 +3,16 @@
  *
  * `@hope-ui/theming` owns the look-&-feel contract: every hope-authored component's recipe is
  * declared here — one entry per component, whose type is that component's own `…Recipe` from its
- * contract file in the parent folder — **not** by module augmentation. This file stays a flat list of
- * named recipe types with no shape logic of its own. A component consumes `useRecipe("<name>")`; a
- * theme implements the matching recipe and checks its map with `satisfies RecipeRegistry`.
+ * contract file in the sibling `recipes/` folder — **not** by module augmentation. This file stays a
+ * flat list of named recipe types with no shape logic of its own. A component consumes
+ * `useRecipe("<name>")`; a theme implements the matching recipe and checks its map with
+ * `satisfies RecipeRegistry`.
  *
- * This lives in the `registry/` folder alongside {@link ThemeablePropsRegistry} (its behavioral/chrome
- * counterpart) so the two contracts scale independently as the component catalog grows.
+ * This is the top-level `registry/` folder (the contract seam, parallel to `presets`/`theme-context`/
+ * `styling`), holding {@link RecipeRegistry} alongside {@link ThemeablePropsRegistry} (its
+ * behavioral/chrome counterpart) so the two contracts scale independently as the catalog grows.
  */
-import type { ButtonRecipe } from "../button";
+import type { ButtonRecipe } from "../recipes/button";
 
 /**
  * The theming contract version. A theme asserts against it (e.g. in its conformance test) so a

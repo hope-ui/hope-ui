@@ -15,7 +15,7 @@ import type { SlotRecipeFn } from "./slot-recipe";
 export type ButtonVariant = "default" | "solid" | "soft" | "outline" | "ghost" | "link";
 
 /** Semantic role color. Ignored by the `default` variant. */
-export type ButtonColor = "primary" | "neutral" | "success" | "warning" | "danger" | "info";
+export type ButtonColor = "primary" | "neutral" | "success" | "info" | "warning" | "danger";
 
 /** Density/scale — heights 28 / 32 / 36 / 40 / 44px for xs→xl. */
 export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";

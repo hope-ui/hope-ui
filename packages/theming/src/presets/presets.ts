@@ -17,7 +17,7 @@
  * `@hope-ui/theming` is recognized by another.
  */
 import type { ClassValue } from "tailwind-variants";
-import type { RecipeRegistry, ThemeablePropsRegistry } from "../recipes/registry";
+import type { RecipeRegistry, ThemeablePropsRegistry } from "../registry";
 
 /**
  * The variant props a registered recipe accepts — extracted straight from the recipe's own

@@ -14,7 +14,7 @@ props returns one class *function* per slot.
 Because this is exactly the shape `tv({ slots, … })` returns, a theme registers its `tv` recipe
 as-is — see [`styling`](./styling.md). The per-component contracts
 ([`button`](./button.md), …) specialize this with their variant vocabulary and slots;
-[`recipe-registry`](./registry/recipe-registry.md) lists which components a theme must provide.
+[`recipe-registry`](../registry/recipe-registry.md) lists which components a theme must provide.
 
 ## Usage in a component
 

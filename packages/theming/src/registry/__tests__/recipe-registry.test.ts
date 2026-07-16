@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ButtonRecipeVariants, ButtonSlot } from "../../button";
-import type { SlotClassFn } from "../../slot-recipe";
+import type { ButtonRecipeVariants, ButtonSlot } from "../../recipes/button";
+import type { SlotClassFn } from "../../recipes/slot-recipe";
 import { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "../recipe-registry";
 
 // The registry declares each hope-authored component's recipe contract directly (no module

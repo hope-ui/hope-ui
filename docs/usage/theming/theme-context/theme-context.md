@@ -147,8 +147,8 @@ stylesheet with no runtime injection and no FOUC.
 
 - [`presets`](../presets/presets.md) — `definePreset`/`isPreset`, the `Preset` type + the `components`
   override vocabulary.
-- [`recipe-registry`](../recipes/registry/recipe-registry.md) — the `RecipeRegistry` `useRecipe`
-  reads; [`themeable-props-registry`](../recipes/registry/themeable-props-registry.md) — the
+- [`recipe-registry`](../registry/recipe-registry.md) — the `RecipeRegistry` `useRecipe`
+  reads; [`themeable-props-registry`](../registry/themeable-props-registry.md) — the
   `defaultProps`/`themeableProps` vocabulary; [`slot-recipe`](../recipes/slot-recipe.md) — the
   `SlotRecipeFn` shape.
 - [`conformance`](../conformance/conformance.md) — the kit that verifies a preset's recipes actually emit classes, and that its token CSS defines every `--hope-*` var.

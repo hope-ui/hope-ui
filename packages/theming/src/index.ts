@@ -1,7 +1,9 @@
 // The @hope-ui/theming contract kernel:
-// - the recipe contract — the `SlotRecipeFn`/`SlotClassFn` shape, the `RecipeRegistry`, and each
-//   hope-authored component's recipe types (re-exported wholesale from `./recipes`, so this stays
-//   short as the component catalog grows);
+// - the registry contract — the `RecipeRegistry` (+ `THEMING_CONTRACT_VERSION`) and the parallel,
+//   type-only `ThemeablePropsRegistry` (from the top-level `./registry` folder);
+// - the recipe contract — the `SlotRecipeFn`/`SlotClassFn` shape and each hope-authored component's
+//   recipe/themeable-props types (re-exported wholesale from `./recipes`, so this stays short as the
+//   component catalog grows);
 // - the preset machinery — `definePreset`/`isPreset`, the `Preset` type + the typed component-
 //   override vocabulary (from `./presets`). Token *values* are authored in CSS, not here;
 // - the styling seam (`tv`/`cn`/`cx`);
@@ -13,6 +15,7 @@
 
 export * from "./presets";
 export * from "./recipes";
+export * from "./registry";
 export {
   SEMANTIC_COLOR_TOKENS,
   type SemanticColorContract,

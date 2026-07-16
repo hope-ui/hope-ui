@@ -12,7 +12,7 @@
  * `ThemeablePropsOf` in `../../presets/presets`, whose `K extends keyof ThemeablePropsRegistry ? … :
  * RecipeVariantsOf<K>` fallback is what keeps this feature incremental.
  */
-import type { ButtonThemeableProps } from "../button";
+import type { ButtonThemeableProps } from "../recipes/button";
 
 /** One entry per component that opts into behavioral/chrome (non-variant) app-wide defaults. */
 export interface ThemeablePropsRegistry {
