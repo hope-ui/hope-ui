@@ -1,7 +1,6 @@
-import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { I18nProvider } from "@hope-ui/primitives/i18n";
 import { CalendarDate } from "@internationalized/date";
-import { hydrate } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -164,50 +163,17 @@ describe("Calendar", () => {
 });
 
 describe("Calendar hydration", () => {
-  /** See dialog.browser.test.tsx: `hydrate()` reads `globalThis._$HY` unconditionally. */
-  function bootstrapHydration(): () => void {
-    const globals = globalThis as { _$HY?: unknown };
-    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
-    return () => {
-      globals._$HY = undefined;
-    };
-  }
-
-  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    document.body.appendChild(container);
-    return { container, remove: () => container.remove() };
-  }
-
-  it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
-    // `ssrFixture` is genuine server output (`calendar.ssr.test.tsx` asserts it byte-for-byte).
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const serverGrid = container.querySelector("table");
-    const dispose = hydrate(() => <FullCalendar />, container);
-
-    expect(consoleError).not.toHaveBeenCalled();
-    expect(consoleWarn).not.toHaveBeenCalled();
-
-    // Hydration reuses the server's grid node, rather than falling back to a client render.
-    expect(container.querySelectorAll("table")).toHaveLength(1);
-    expect(container.querySelector("table")).toBe(serverGrid);
-
+  // `ssrFixture` is genuine server output (`calendar.ssr.test.tsx` asserts it byte-for-byte).
+  // `FullCalendar` must stay structurally identical to the ssr test's — hydration keys are a path
+  // through the tree. `hydrateFixture` proves hydration was silent and reused *every* server node
+  // (the whole grid), not just the `<table>`.
+  it("hydrates the server HTML in place, without a mismatch or a second render", () => {
+    const { dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
     dispose();
-    remove();
-    teardownHydration();
-    consoleError.mockRestore();
-    consoleWarn.mockRestore();
   });
 
   it("is interactive after hydrating", async () => {
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-    const dispose = hydrate(() => <FullCalendar />, container);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
 
     const headingButton = container.querySelector<HTMLElement>("button[id]") as HTMLElement;
     (
@@ -216,19 +182,12 @@ describe("Calendar hydration", () => {
     await vi.waitFor(() => expect(headingButton.textContent).toBe("February 2020"));
 
     dispose();
-    remove();
-    teardownHydration();
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-    const dispose = hydrate(() => <FullCalendar />, container);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
 
     await expectNoA11yViolations(container);
-
     dispose();
-    remove();
-    teardownHydration();
   });
 });

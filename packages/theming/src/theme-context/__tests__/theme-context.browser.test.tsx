@@ -1,6 +1,5 @@
-import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { hydrate } from "@solidjs/web";
-import { describe, expect, it, vi } from "vitest";
+import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
+import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 import { definePreset } from "../../presets";
 import type { RecipeRegistry } from "../../recipes/registry";
@@ -49,59 +48,25 @@ describe("ThemeProvider + useRecipe on the client", () => {
 });
 
 describe("ThemeProvider zero-DOM hydration", () => {
-  /** See `Button.browser.test.tsx` for why `_$HY` must be seeded by hand in a client-build test. */
-  function bootstrapHydration(): () => void {
-    const globals = globalThis as { _$HY?: unknown };
-    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
-    return () => {
-      globals._$HY = undefined;
-    };
-  }
-
-  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    document.body.appendChild(container);
-    return { container, remove: () => container.remove() };
-  }
-
   it("hydrates the server HTML in place, reusing the server node without a mismatch", async () => {
     // `ssrFixture` is genuine server output — the ssr test asserts it byte-for-byte against a real
-    // `renderToStringAsync`. Here `solid-js`/`@solidjs/web` resolve to their client builds, so we
-    // hydrate the fixture rather than re-render it. The zero-DOM provider contributes no node, so the
-    // fixture is exactly the probe `<button>`; hydration must reuse it, not re-render a second one.
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
+    // `renderToStringAsync`. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
+    // `hydrateFixture` hydrates the fixture rather than re-rendering it. The zero-DOM provider
+    // contributes no node, so the fixture is exactly the probe `<button>`, and the tree hydrated here
+    // must stay structurally identical to the ssr test's. `hydrateFixture` proves hydration was silent
+    // and reused the server node in place.
+    const { container, dispose } = hydrateFixture(ssrFixture, () => (
+      <ThemeProvider preset={preset}>
+        <Probe />
+      </ThemeProvider>
+    ));
 
-    const serverButton = container.querySelector("button");
-    const dispose = hydrate(
-      () => (
-        <ThemeProvider preset={preset}>
-          <Probe />
-        </ThemeProvider>
-      ),
-      container,
-    );
-
-    expect(consoleError).not.toHaveBeenCalled();
-    expect(consoleWarn).not.toHaveBeenCalled();
-
-    // One `<button>`, and it is the *same node* the server sent — a silent client-render fallback
-    // would leave two, or one that isn't the server's. The provider injects no `<style>`.
-    expect(container.querySelectorAll("button")).toHaveLength(1);
-    expect(container.querySelector("button")).toBe(serverButton);
+    // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
     expect(container.querySelector("style")).toBeNull();
 
-    // Baseline a11y over the hydrated tree — doubles as the byte-stability proof (constraint #1):
-    // an unclean hydration would have logged above.
+    // Baseline a11y over the hydrated tree.
     await expectNoA11yViolations(container);
 
     dispose();
-    remove();
-    teardownHydration();
-    consoleError.mockRestore();
-    consoleWarn.mockRestore();
   });
 });

@@ -1,8 +1,7 @@
-import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { hydrate } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Button, type ButtonProps } from "../button";
@@ -406,107 +405,48 @@ describe("Button — slotClasses", () => {
 });
 
 describe("Button hydration", () => {
-  /**
-   * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from
-   * `generateHydrationScript()`, which is a no-op (`voidFn`) in `@solidjs/web`'s client build
-   * — so a browser test has to supply it. Only three fields are read on this path:
-   * `.done`, `.completed` and `.events`. `.r` is the *resource/asset* registry consulted by
-   * `sharedConfig.load`; the element registry `getNextElement()` looks in is built separately
-   * by `gatherHydratable()`, which scans the container for `[_hk]` attributes. An empty `.r`
-   * is therefore correct, not a bug.
-   */
-  function bootstrapHydration(): () => void {
-    const globals = globalThis as { _$HY?: unknown };
-    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
-    return () => {
-      globals._$HY = undefined;
-    };
-  }
+  // `ssrFixture` is genuine server output — `Button.ssr.test.tsx` asserts it byte-for-byte against a
+  // real `renderToStringAsync` in the `ssr` project. Here `solid-js`/`@solidjs/web` resolve to their
+  // client builds, so `hydrateFixture` hydrates the fixture rather than re-rendering it (the client
+  // build's `renderToStringAsync` returns `undefined`). The tree — `<ThemeProvider>` and all — must
+  // stay structurally identical to the one the ssr test renders: hydration keys are a path through
+  // the component tree. `hope` authors its palette in CSS and the provider is zero-DOM, so the fixture
+  // is just the `<button>`. `hydrateFixture` proves hydration was silent and reused every server node.
+  it("hydrates the server HTML in place, without a mismatch or a second render", () => {
+    const { container, dispose } = hydrateFixture(ssrFixture, () => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
 
-  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    document.body.appendChild(container);
-    return { container, remove: () => container.remove() };
-  }
-
-  it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
-    // `ssrFixture` is genuine server output — `Button.ssr.test.tsx` asserts it byte-for-byte
-    // against a real `renderToStringAsync` in the `ssr` project. Here `solid-js`/`@solidjs/web`
-    // resolve to their client builds, so we hydrate the fixture rather than re-render it. The
-    // tree — `<ThemeProvider>` and all — is structurally identical to the one that produced it.
-    // `hope` authors its token palette in CSS and the provider is zero-DOM, so the fixture is just
-    // the `<button>`; hydration must reuse it, not re-render a second one.
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const serverButton = container.querySelector("button");
-    const dispose = hydrate(
-      () => (
-        <Themed>
-          <Button>Click me</Button>
-        </Themed>
-      ),
-      container,
-    );
-
-    expect(consoleError).not.toHaveBeenCalled();
-    expect(consoleWarn).not.toHaveBeenCalled();
-
-    // Hydration reuses the server's node. If it had fallen back to a client render, there would be
-    // two buttons here, or one that isn't the node the server sent. The zero-DOM provider injects
-    // no `<style>`.
-    expect(container.querySelectorAll("button")).toHaveLength(1);
-    expect(container.querySelector("button")).toBe(serverButton);
+    // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
     expect(container.querySelector("style")).toBeNull();
 
     dispose();
-    remove();
-    teardownHydration();
-    consoleError.mockRestore();
-    consoleWarn.mockRestore();
   });
 
   it("leaves the hydrated button interactive", async () => {
     const onClick = vi.fn();
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const dispose = hydrate(
-      () => (
-        <Themed>
-          <Button onClick={onClick}>Click me</Button>
-        </Themed>
-      ),
-      container,
-    );
+    const { dispose } = hydrateFixture(ssrFixture, () => (
+      <Themed>
+        <Button onClick={onClick}>Click me</Button>
+      </Themed>
+    ));
 
     await page.getByRole("button", { name: "Click me" }).click();
     expect(onClick).toHaveBeenCalledOnce();
 
     dispose();
-    remove();
-    teardownHydration();
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => (
+      <Themed>
+        <Button>Click me</Button>
+      </Themed>
+    ));
 
-    const dispose = hydrate(
-      () => (
-        <Themed>
-          <Button>Click me</Button>
-        </Themed>
-      ),
-      container,
-    );
     await expectNoA11yViolations(container);
-
     dispose();
-    remove();
-    teardownHydration();
   });
 });

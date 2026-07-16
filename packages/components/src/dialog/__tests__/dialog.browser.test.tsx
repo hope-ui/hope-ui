@@ -1,5 +1,4 @@
-import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { hydrate } from "@solidjs/web";
+import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -689,83 +688,33 @@ describe("Dialog", () => {
 });
 
 describe("Dialog hydration", () => {
-  /**
-   * `hydrate()` reads `globalThis._$HY` unconditionally. A real app gets it from
-   * `generateHydrationScript()`, which is a no-op (`voidFn`) in `@solidjs/web`'s client build,
-   * so a browser test has to supply it. Only `.done`, `.completed` and `.events` are read on
-   * this path. `.r` is the *resource/asset* registry behind `sharedConfig.load`; the element
-   * registry `getNextElement()` consults is built separately by `gatherHydratable()`, which
-   * scans the container for `[_hk]` attributes. An empty `.r` is therefore correct.
-   */
-  function bootstrapHydration(): () => void {
-    const globals = globalThis as { _$HY?: unknown };
-    globals._$HY = { events: [], completed: new WeakSet(), r: {} };
-    return () => {
-      globals._$HY = undefined;
-    };
-  }
-
-  function mountServerHtml(html: string): { container: HTMLElement; remove: () => void } {
-    const container = document.createElement("div");
-    container.innerHTML = html;
-    document.body.appendChild(container);
-    return { container, remove: () => container.remove() };
-  }
-
-  it("hydrates the server HTML in place, without a mismatch or a second render", async () => {
-    // `ssrFixture` is genuine server output: `Dialog.ssr.test.tsx` asserts it byte-for-byte
-    // against a real `renderToStringAsync` in the `ssr` project, the one place where both
-    // `solid-js` and `@solidjs/web` resolve to their server builds. Rendering it here instead
-    // would be worthless — the client build's `renderToStringAsync` returns `undefined`.
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
-    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const serverTrigger = container.querySelector("button");
-    const dispose = hydrate(() => <FullDialog />, container);
-
-    expect(consoleError).not.toHaveBeenCalled();
-    expect(consoleWarn).not.toHaveBeenCalled();
-
-    // Hydration reuses the server's node. A fallback to a client render would leave two
-    // triggers here, or one that isn't the node the server sent.
-    expect(container.querySelectorAll("button")).toHaveLength(1);
-    expect(container.querySelector("button")).toBe(serverTrigger);
-
+  // `ssrFixture` is genuine server output: `Dialog.ssr.test.tsx` asserts it byte-for-byte against a
+  // real `renderToStringAsync` in the `ssr` project (the one place both `solid-js` and `@solidjs/web`
+  // resolve to their server builds). Rendering it here would be worthless — the client build's
+  // `renderToStringAsync` returns `undefined`. `FullDialog` must stay structurally identical to the
+  // ssr test's: hydration keys are a path through the tree, so inserting anything before
+  // `Dialog.Trigger` — even a component that renders nothing — shifts the trigger's key.
+  // `hydrateFixture` proves hydration was silent and reused every server node.
+  it("hydrates the server HTML in place, without a mismatch or a second render", () => {
+    const { dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
     dispose();
-    remove();
-    teardownHydration();
-    consoleError.mockRestore();
-    consoleWarn.mockRestore();
   });
 
   it("leaves the hydrated trigger interactive, and mounts the portal client-side", async () => {
     // The whole point of `Dialog.Portal`'s `isServer` guard: portaled content is absent from
     // the SSR HTML, and appears on the client only once the dialog opens.
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const dispose = hydrate(() => <FullDialog />, container);
+    const { dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
     expect(page.getByRole("dialog").query()).toBeNull();
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
 
     dispose();
-    remove();
-    teardownHydration();
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(ssrFixture);
-
-    const dispose = hydrate(() => <FullDialog />, container);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
     await expectNoA11yViolations(container);
-
     dispose();
-    remove();
-    teardownHydration();
   });
 });

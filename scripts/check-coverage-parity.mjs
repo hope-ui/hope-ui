@@ -46,7 +46,11 @@ const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming"]);
 const REQUIRES_SSR_TEST = new Set(["components"]);
 const SSR_TEST_MARKER = "renderToStringAsync";
 const REQUIRES_HYDRATION_TEST = new Set(["components"]);
-const HYDRATION_TEST_MARKER = "hydrate";
+// A component's browser test satisfies this by calling `hydrate()` directly, or the shared
+// `hydrateFixture()` helper (`@hope-ui/internal-test-utils`), which calls `hydrate()` internally.
+// The `hasLiveCall` regex `\bhydrate\s*\(` does *not* match `hydrateFixture(`, so both spellings
+// are listed explicitly.
+const HYDRATION_TEST_MARKERS = ["hydrate", "hydrateFixture"];
 
 // Any browser test that puts real DOM on the page must run a baseline axe check on it.
 // "Puts real DOM on the page" is not decidable in general, but `mount()` is exactly the harness
@@ -359,13 +363,14 @@ for (const pkg of packageDirs) {
       // green — which is precisely how Dialog's stayed `it.skip`'d for months while CLAUDE.md
       // claimed every component had one.
       const browserTests = matchingTests.filter(isBrowserTestFile);
-      const hasHydrationTest = browserTests.some((t) =>
-        hasLiveCall(readFileSync(t, "utf8"), HYDRATION_TEST_MARKER),
-      );
+      const hasHydrationTest = browserTests.some((t) => {
+        const source = readFileSync(t, "utf8");
+        return HYDRATION_TEST_MARKERS.some((marker) => hasLiveCall(source, marker));
+      });
 
       if (!hasHydrationTest) {
         missing.push(
-          `${relPath} — no matching *.browser.test.tsx calls ${HYDRATION_TEST_MARKER}() outside a comment and outside an it.skip (hydration round-trip test required)`,
+          `${relPath} — no matching *.browser.test.tsx calls ${HYDRATION_TEST_MARKERS.join("() or ")}() outside a comment and outside an it.skip (hydration round-trip test required)`,
         );
       }
     }
