@@ -13,9 +13,10 @@ Theming spans two package axes that never mix dependencies:
   `@hope-ui/primitives` ← `@hope-ui/theming` ← `@hope-ui/components`.
 - **Config** (imported into the consumer's Tailwind v4 entry CSS; peer dep `tailwindcss`):
   `@hope-ui/presets/{hope,…}` — each preset is a CSS file (`@import "@hope-ui/presets/hope/tailwind.css"`) shipping
-  design tokens as `--hope-*` variables plus an `@theme inline` mapping. `hope` is the default the
-  library is built and demoed against. Each preset depends *up* on `@hope-ui/theming` for the contract
-  (its recipes are `tailwind-variants` functions, and it runs the conformance kit).
+  design tokens as `--hope-*` variables (in its `tokens.css`) plus an `@theme inline` mapping. `hope`
+  is the default the library is built and demoed against. Each preset depends *up* on
+  `@hope-ui/theming` for the contract (its recipes are `tailwind-variants` functions, and it runs the
+  conformance kit).
 
 `@hope-ui/theming` is the dependency-inversion seam: components read from it, themes implement it,
 and neither knows about the other.
@@ -80,7 +81,8 @@ packages/presets/src/
 │   ├── variants.css      #   @custom-variant dark (+ future data-* state variants)
 │   └── theme-map.css     #   @theme inline: --hope-* → Tailwind color namespace (bg-primary, text-on-primary, …)
 └── hope/
-    ├── index.ts          # the JS preset — hope's token palette (hopeTokens, authored in TS) + definePreset over the recipe map
+    ├── index.ts          # the JS preset — definePreset over the recipe map (no token values here)
+    ├── tokens.css        # hope's --hope-* token values (:root + .dark), authored in CSS
     ├── tailwind.css      # the published CSS entry (@hope-ui/presets/hope/tailwind.css) — a thin orchestrator, @imports only
     └── recipes/          #   tailwind-variants slot recipes; registered via @source
 ```
@@ -88,18 +90,16 @@ packages/presets/src/
 **Why the split.** The `@theme inline` mapping and the `dark` variant are a **pure function of the
 fixed `SEMANTIC_COLOR_TOKENS` contract** — byte-identical in every preset — so they live once in
 `_base/` rather than being copy-pasted per preset. The only thing a preset authors is its token
-*values* (hope authors them in **TypeScript** — `index.ts`'s `hopeTokens` — delivered at runtime by
-`<ThemeProvider>`) and its `recipes/`. The
-orchestrator's `@import` order is cosmetic — Tailwind
+*values* (hope authors them in **CSS** — `tokens.css`'s `:root`/`.dark` `--hope-*` declarations) and
+its `recipes/`. The orchestrator's `@import` order is cosmetic — Tailwind
 at-rules (`@theme`, `@custom-variant`) are collected at build time and `:root`/`.dark` custom
 properties resolve by the cascade at use time, so nothing here is order-sensitive — so it reads as
-two labelled groups: the shared contract first, then this theme's values. (`_base/` is a CSS partials
-directory — unrelated to the removed Panda `base` preset noted under "Current state".)
+labelled groups: the shared contract, this theme's token values, then its recipes. (`_base/` is a CSS
+partials directory — unrelated to the removed Panda `base` preset noted under "Current state".)
 
-So a theme (a) authors hope's semantic token values (hope authors them in TS — `index.ts`'s
-`hopeTokens` — which `<ThemeProvider>` delivers at runtime as `--hope-*` variables under
-`:root`/`.dark`; a preset may instead declare them in its own `tokens.css`), (b) maps them into
-Tailwind's color namespace with `@theme inline` so utilities stay clean — `bg-primary`,
+So a theme (a) authors hope's semantic token values as `--hope-*` variables under `:root`/`.dark` in
+its own `tokens.css` (so `<ThemeProvider>` renders no DOM — hope is a zero-DOM preset), (b) maps them
+into Tailwind's color namespace with `@theme inline` so utilities stay clean — `bg-primary`,
 `text-on-primary`, `border-subtle-outline`, `ring-focus` (`_base/theme-map.css`), and
 (c) — once components exist — ships its own `tailwind-variants` slot recipes (same slots and variant
 *values* as every other preset; only the emitted classes differ). A first-party preset is a subpath of
@@ -114,9 +114,8 @@ each preset *must* define is the **semantic vocabulary**: every token in `SEMANT
 `--hope-*` variable, or a referencing utility (`bg-primary`) compiles to an unresolved `var()`.
 Because CSS variables aren't `tsc`-checkable, this is enforced at the CSS level by
 `checkSemanticTokenConformance` / `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`),
-which a preset runs against its token CSS — for hope, the CSS that `renderPresetStyle(hope.tokens, …)`
-emits from its TS palette (see `hope.test.ts`); for a CSS-authoring preset, its `tokens.css`. It's the
-token analog of the recipe axis's `checkSlotRecipeConformance`.
+which a preset runs against its token CSS — for hope, its `tokens.css` (read as a string in
+`hope.test.ts`). It's the token analog of the recipe axis's `checkSlotRecipeConformance`.
 
 ## Semantic token vocabulary
 
@@ -124,10 +123,9 @@ The recipe contract above imposes no *token* vocabulary. This is the other half:
 (alias) color contract** — one design-system-agnostic set of role names every preset implements, so a
 preset is a different set of values behind the same tokens. It is the token analog of the recipe
 contract's "same slots and variant values, only the CSS differs": raw scales come from Tailwind
-itself; each `@hope-ui/presets/*` supplies the semantic values (hope authors them in TS and the
-provider emits `--hope-<token>` variables at runtime; a preset may instead declare them in its own
-`tokens.css`); components and recipes reference the names as Tailwind utilities (`bg-primary`,
-`text-on-primary`).
+itself; each `@hope-ui/presets/*` supplies the semantic values as `--hope-<token>` variables in its
+own `tokens.css` (hope's live in `hope/tokens.css`); components and recipes reference the names as
+Tailwind utilities (`bg-primary`, `text-on-primary`).
 
 The runtime source of truth is `SEMANTIC_COLOR_TOKENS` in `@hope-ui/theming`
 ([`semantic-tokens.ts`](../packages/theming/src/semantic-tokens/semantic-tokens.ts)); its

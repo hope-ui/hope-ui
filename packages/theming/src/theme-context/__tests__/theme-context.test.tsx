@@ -101,7 +101,7 @@ describe("ThemeProvider preset guard (D7)", () => {
 
 describe("useTheme / useRecipe under a provider", () => {
   it("useTheme returns the mounted preset", () => {
-    const preset = demoPreset({ darkMode: "media" });
+    const preset = demoPreset();
     expect(inProvider(preset, () => useTheme())).toBe(preset);
   });
 

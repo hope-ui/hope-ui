@@ -2,8 +2,8 @@
 // - the recipe contract — the `SlotRecipeFn`/`SlotClassFn` shape, the `RecipeRegistry`, and each
 //   hope-authored component's recipe types (re-exported wholesale from `./recipes`, so this stays
 //   short as the component catalog grows);
-// - the preset machinery — `definePreset`/`isPreset`, the `Preset` type + typed token/component-
-//   override vocabulary, and the deterministic `renderPresetStyle` CSS renderer (from `./presets`);
+// - the preset machinery — `definePreset`/`isPreset`, the `Preset` type + the typed component-
+//   override vocabulary (from `./presets`). Token *values* are authored in CSS, not here;
 // - the styling seam (`tv`/`cn`/`cx`);
 // - the semantic color token vocabulary;
 // - `ThemeProvider`/`useRecipe` runtime.

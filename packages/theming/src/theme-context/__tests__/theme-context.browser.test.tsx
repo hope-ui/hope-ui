@@ -6,10 +6,11 @@ import { definePreset } from "../../presets";
 import type { RecipeRegistry } from "../../recipes/registry";
 import type { SlotRecipeFn } from "../../recipes/slot-recipe";
 import { ThemeProvider, useRecipe } from "../theme-context";
-import tokensSsrFixture from "./__fixtures__/theme-context-tokens-ssr.html?raw";
+import ssrFixture from "./__fixtures__/theme-context-ssr.html?raw";
 
 // Synthetic single-"root"-slot recipe, cast into the registry — see the ssr test for the rationale.
-// Proves the same context round-trip on the real client runtime, plus the token `<style>` hydrating.
+// Proves the same context round-trip on the real client runtime, plus that the zero-DOM provider is
+// transparent to hydration (the child hydrates in place, no mismatch).
 type DemoVariants = { size?: "sm" | "md" };
 const demo: SlotRecipeFn<DemoVariants> = (props) => ({
   root: () => `demo demo--size_${props?.size ?? "md"}`,
@@ -17,11 +18,7 @@ const demo: SlotRecipeFn<DemoVariants> = (props) => ({
 const theme = { demo } as unknown as RecipeRegistry;
 
 // Identical to the ssr test's preset, so the tree hydrated here matches the fixture byte-for-byte.
-const tokenPreset = definePreset(theme, {
-  tokens: {
-    colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
-  },
-});
+const preset = definePreset(theme);
 
 function Probe() {
   const recipe = useRecipe("demo" as keyof RecipeRegistry) as SlotRecipeFn<DemoVariants>;
@@ -33,9 +30,9 @@ function Probe() {
 }
 
 describe("ThemeProvider + useRecipe on the client", () => {
-  it("client-reads the injected recipe and applies its class to the DOM (no-token preset)", async () => {
+  it("client-reads the injected recipe and applies its class to the DOM, injecting no <style>", async () => {
     const { container, dispose } = mount(() => (
-      <ThemeProvider preset={definePreset(theme)}>
+      <ThemeProvider preset={preset}>
         <Probe />
       </ThemeProvider>
     ));
@@ -43,7 +40,7 @@ describe("ThemeProvider + useRecipe on the client", () => {
     const button = page.getByRole("button", { name: "go" });
     await expect.element(button).toBeInTheDocument();
     expect(container.querySelector("button")?.className).toContain("demo--size_sm");
-    // The zero-DOM branch injects no `<style>` for a token-free preset.
+    // Zero-DOM provider: no `<style>` is injected for any preset.
     expect(container.querySelector("style")).toBeNull();
 
     await expectNoA11yViolations(container);
@@ -51,7 +48,7 @@ describe("ThemeProvider + useRecipe on the client", () => {
   });
 });
 
-describe("ThemeProvider token <style> hydration", () => {
+describe("ThemeProvider zero-DOM hydration", () => {
   /** See `Button.browser.test.tsx` for why `_$HY` must be seeded by hand in a client-build test. */
   function bootstrapHydration(): () => void {
     const globals = globalThis as { _$HY?: unknown };
@@ -68,20 +65,20 @@ describe("ThemeProvider token <style> hydration", () => {
     return { container, remove: () => container.remove() };
   }
 
-  it("hydrates the inlined token <style> in place, reusing the server node without a mismatch", async () => {
-    // `tokensSsrFixture` is genuine server output — the ssr test asserts it byte-for-byte against a
-    // real `renderToStringAsync`. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
-    // we hydrate the fixture rather than re-render it. Because the deterministic `<style>` bytes are
-    // identical on both sides (constraint #1), hydration reuses the server node silently.
+  it("hydrates the server HTML in place, reusing the server node without a mismatch", async () => {
+    // `ssrFixture` is genuine server output — the ssr test asserts it byte-for-byte against a real
+    // `renderToStringAsync`. Here `solid-js`/`@solidjs/web` resolve to their client builds, so we
+    // hydrate the fixture rather than re-render it. The zero-DOM provider contributes no node, so the
+    // fixture is exactly the probe `<button>`; hydration must reuse it, not re-render a second one.
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const teardownHydration = bootstrapHydration();
-    const { container, remove } = mountServerHtml(tokensSsrFixture);
+    const { container, remove } = mountServerHtml(ssrFixture);
 
-    const serverStyle = container.querySelector("style");
+    const serverButton = container.querySelector("button");
     const dispose = hydrate(
       () => (
-        <ThemeProvider preset={tokenPreset}>
+        <ThemeProvider preset={preset}>
           <Probe />
         </ThemeProvider>
       ),
@@ -91,10 +88,11 @@ describe("ThemeProvider token <style> hydration", () => {
     expect(consoleError).not.toHaveBeenCalled();
     expect(consoleWarn).not.toHaveBeenCalled();
 
-    // One `<style>`, and it is the *same node* the server sent — a silent client-render fallback
-    // would leave two, or one that isn't the server's.
-    expect(container.querySelectorAll("style")).toHaveLength(1);
-    expect(container.querySelector("style")).toBe(serverStyle);
+    // One `<button>`, and it is the *same node* the server sent — a silent client-render fallback
+    // would leave two, or one that isn't the server's. The provider injects no `<style>`.
+    expect(container.querySelectorAll("button")).toHaveLength(1);
+    expect(container.querySelector("button")).toBe(serverButton);
+    expect(container.querySelector("style")).toBeNull();
 
     // Baseline a11y over the hydrated tree — doubles as the byte-stability proof (constraint #1):
     // an unclean hydration would have logged above.

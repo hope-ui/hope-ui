@@ -7,19 +7,27 @@
  *     @import "@hope-ui/presets/hope/tailwind.css";
  *
  * This is a thin orchestrator: it composes the shared structural layer (`_base/`, reused by every
- * theme) and registers hope's recipe folder as a content source. Two `_base` imports:
+ * theme), hope's token values, and registers hope's recipe folder as a content source. Imports:
  *   - `../_base/variants.css`  — shared custom variants (the `dark` selector). Contract-level.
  *   - `../_base/theme-map.css` — shared `@theme inline` mapping `--hope-*` into Tailwind utilities.
+ *   - `./tokens.css`           — hope's `--hope-*` values (`:root` + `.dark`), authored in CSS.
  *
- * hope's token *values* (`--hope-*`) are authored in TypeScript (`./index.ts`) and inlined at runtime
- * by `<ThemeProvider preset={hope}>`, so no token CSS is imported here. Import order is cosmetic
- * (Tailwind at-rules + cascade-resolved custom properties, not order-sensitive); a second theme
- * reuses `_base/*` unchanged and ships only its recipes plus its own token values.
+ * hope is a **zero-DOM preset**: its token *values* live in `./tokens.css` (not TypeScript, not a
+ * runtime `<style>`), so `<ThemeProvider preset={hope}>` renders no markup of its own. Import order
+ * is cosmetic (Tailwind at-rules + cascade-resolved custom properties, not order-sensitive); a
+ * second theme reuses `_base/*` unchanged and ships only its recipes plus its own token values.
  */
 
 /* Shared structural contract — identical for every @hope-ui/presets/* preset. */
 @import "../_base/variants.css";
 @import "../_base/theme-map.css";
+
+/*
+ * Token values: hope's `--hope-*` custom properties, as `var(--color-*)` references. Because these
+ * references are literally in the compiled CSS, Tailwind v4 keeps the palette shades this preset
+ * uses instead of tree-shaking them — so no `@source` scan trick is needed to preserve them.
+ */
+@import "./tokens.css";
 
 /*
  * Recipes: hope's `tailwind-variants` slot recipes live under `./recipes`. Registering the folder
@@ -29,15 +37,3 @@
  * separately at runtime from `@hope-ui/presets/hope` and passed to `<ThemeProvider>`.
  */
 @source "./recipes";
-
-/*
- * Token palette: hope authors its `--hope-*` values in `./index.ts` as `--color-*` references
- * (`"--color-violet-600"` → `var(--color-violet-600)`, inlined at runtime by `<ThemeProvider>`).
- * Tailwind v4 tree-shakes any default-palette var it doesn't see referenced in scanned source, and
- * the runtime `<style>` is invisible to the compiler — so without this the `var(--color-*)` the
- * tokens point at would resolve to nothing. Scanning `index.ts` puts those literal `--color-*`
- * strings in front of the scanner, so it keeps exactly the palette shades this preset uses. A
- * consumer preset gets this for free (their token source is auto-scanned); the shipped preset must
- * declare it because its tokens live in the installed package (`files: ["src", …]`).
- */
-@source "./index.ts";

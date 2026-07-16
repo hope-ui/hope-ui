@@ -14,32 +14,16 @@ const demo: SlotRecipeFn<DemoVariants> = (props) => ({
 });
 const theme = { demo } as unknown as RecipeRegistry;
 
-// The token preset shared with `theme-context.browser.test.tsx`: its `renderPresetStyle` output is
-// deterministic, so the browser test hydrates the exact bytes this file snapshots. Both files build
-// the identical tree (`<ThemeProvider preset={tokenPreset}><Probe/></ThemeProvider>`), so hydration
-// keys line up.
-const tokenPreset = definePreset(theme, {
-  tokens: {
-    colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
-  },
-});
-
-// The exact `<style>` text `renderPresetStyle` emits for `tokenPreset`: colors in the fixed
-// SEMANTIC_COLOR_TOKENS order in `:root`, and a `.dark` block for the one token with a dark value.
-// Byte-for-byte, so a regression in the renderer surfaces here, not in a vague hydration mismatch
-// downstream.
-const EXPECTED_STYLE =
-  ":root {\n" +
-  "  --hope-primary: var(--color-violet-600);\n" +
-  "}\n" +
-  ".dark {\n" +
-  "  --hope-primary: var(--color-violet-400);\n" +
-  "}";
+// The preset shared with `theme-context.browser.test.tsx`: `ThemeProvider` is zero-DOM (token values
+// live in a preset's CSS, not a runtime `<style>`), so the SSR output is exactly the probe `<button>`.
+// Both files build the identical tree (`<ThemeProvider preset={preset}><Probe/></ThemeProvider>`), so
+// hydration keys line up.
+const preset = definePreset(theme);
 
 function Probe() {
   const recipe = useRecipe("demo" as keyof RecipeRegistry) as SlotRecipeFn<DemoVariants>;
-  // A real element so the token case produces a hydratable node; the class proves the recipe
-  // *executes* on the server, i.e. the provider's context is readable during renderToStringAsync.
+  // A real element so the render produces a hydratable node; the class proves the recipe *executes*
+  // on the server, i.e. the provider's context is readable during renderToStringAsync.
   return (
     <button type="button" class={recipe({ size: "sm" }).root()}>
       go
@@ -52,28 +36,25 @@ function Probe() {
 // establishes, so a provider wrapping the server render delivers the recipe on the server. This is
 // the "works in SolidStart" half for theming.
 describe("ThemeProvider + useRecipe on the server", () => {
-  it("server-reads the injected recipe and emits its class string (no-token preset)", async () => {
-    // A token-free preset takes the zero-DOM branch — no `<style>` in the output at all.
+  it("server-reads the injected recipe and emits its class string, with no <style> of its own", async () => {
     const html = await renderToStringAsync(() => (
-      <ThemeProvider preset={definePreset(theme)}>
+      <ThemeProvider preset={preset}>
         <Probe />
       </ThemeProvider>
     ));
     expect(html).toMatch(/\bdemo--size_sm\b/);
+    // Zero-DOM provider: it contributes no markup, so nothing but the probe is emitted.
     expect(html).not.toContain("<style");
   });
 
-  it("inlines a deterministic token <style> and still server-reads the recipe", async () => {
+  it("matches the committed SSR fixture byte for byte", async () => {
+    // Genuine server output — the byte source the browser test hydrates. `_hk` keys and all.
+    // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => (
-      <ThemeProvider preset={tokenPreset}>
+      <ThemeProvider preset={preset}>
         <Probe />
       </ThemeProvider>
     ));
-    // The exact `<style>` text, and the recipe class alongside it.
-    expect(html).toContain(EXPECTED_STYLE);
-    expect(html).toMatch(/\bdemo--size_sm\b/);
-    // Genuine server output — the byte source the browser test hydrates. `_hk` keys and all.
-    // Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
-    await expect(html).toMatchFileSnapshot("./__fixtures__/theme-context-tokens-ssr.html");
+    await expect(html).toMatchFileSnapshot("./__fixtures__/theme-context-ssr.html");
   });
 });

@@ -1,5 +1,16 @@
 # Design: a TypeScript-first "preset" theming API
 
+> **Partially superseded (2026-07).** The **token-values** half of this design was implemented and
+> then removed. Semantic tokens are no longer authored in TypeScript or delivered by a runtime
+> `<style>`: `@hope-ui/presets/hope` authors its `--hope-*` values in CSS (`src/hope/tokens.css`,
+> imported by `tailwind.css`), and `ThemeProvider` is **zero-DOM**. So `PresetTokens`, `TokenValue`,
+> `ColorTokenKey`, `DarkMode`, the `tokens`/`darkMode` fields on `Preset`/`PresetConfig`, and
+> `renderPresetStyle`/`token-css.ts` (the "D3" runtime `<style>` and the `@source "./index.ts"`
+> palette trick below) **no longer exist**. The **component-override** half — `definePreset`,
+> per-component `defaultVariants`, and `slotClasses` — shipped and remains current. Sections describing
+> the removed token API are kept below as design history; the authoritative current model is
+> [`docs/theming.md`](./theming.md).
+
 ## Context
 
 Today a hope-ui "theme" spans two axes that never share a dependency: a **CSS axis**
@@ -97,6 +108,10 @@ tokens: {
   knob `--hope-radius` → `--hope-radii-base` (Phase 4).
 
 ### D3 — Token delivery: runtime server-rendered `<style>`, injected only when overrides exist (user-chosen)
+
+> **Removed.** This runtime-`<style>` mechanism (and the `@source "./index.ts"` trick above that it
+> required) was implemented and later removed — tokens now live in a preset's CSS and `ThemeProvider`
+> is zero-DOM. See the banner at the top and [`docs/theming.md`](./theming.md). Kept as history.
 
 `ThemeProvider` renders a **deterministic `<style>`** derived purely from the preset:
 `:root{--hope-primary:VAL;--hope-radii-base:VAL}.dark{--hope-primary:DARKVAL}`.
@@ -214,6 +229,12 @@ export type ButtonRecipe = SlotRecipeFn<ButtonRecipeVariants, ButtonSlot>;
 
 ### Preset types + `definePreset` — `packages/theming/src/presets/presets.ts`
 
+> **Partly removed.** The token-values types below — `KebabToCamel`, `ColorTokenKey`, `TokenValue`,
+> `RadiusToken`, `PresetTokens`, `DarkMode`, and the `tokens`/`darkMode` fields on `PresetConfig`/
+> `Preset` — were deleted. `definePreset`/`isPreset`/`Preset`, the `RecipeVariantsOf`/`RecipeSlotsOf`/
+> `SlotClasses`/`SlotClassesInput` helpers, and the `components` override machinery remain. See the
+> banner at the top.
+
 ```ts
 import type { ClassValue } from "tailwind-variants";
 import type { SemanticColorToken } from "../semantic-tokens/semantic-tokens";
@@ -272,6 +293,9 @@ export function isPreset(value: unknown): value is Preset;
 ```
 
 ### Pure token-CSS renderer — `packages/theming/src/presets/token-css.ts`
+
+> **Removed.** `token-css.ts` / `renderPresetStyle` were deleted along with the runtime `<style>`
+> (D3). A preset's tokens are plain CSS now; there is nothing to render. Kept as history.
 
 ```ts
 /**

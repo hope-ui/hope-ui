@@ -435,14 +435,13 @@ describe("Button hydration", () => {
     // against a real `renderToStringAsync` in the `ssr` project. Here `solid-js`/`@solidjs/web`
     // resolve to their client builds, so we hydrate the fixture rather than re-render it. The
     // tree — `<ThemeProvider>` and all — is structurally identical to the one that produced it.
-    // `hope` authors its token palette in TS, so that tree leads with the provider's token
-    // `<style>` (the fixture is `<style>…</style><button…>`); hydration must reuse both nodes.
+    // `hope` authors its token palette in CSS and the provider is zero-DOM, so the fixture is just
+    // the `<button>`; hydration must reuse it, not re-render a second one.
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
     const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const teardownHydration = bootstrapHydration();
     const { container, remove } = mountServerHtml(ssrFixture);
 
-    const serverStyle = container.querySelector("style");
     const serverButton = container.querySelector("button");
     const dispose = hydrate(
       () => (
@@ -456,13 +455,12 @@ describe("Button hydration", () => {
     expect(consoleError).not.toHaveBeenCalled();
     expect(consoleWarn).not.toHaveBeenCalled();
 
-    // Hydration reuses the server's nodes. If it had fallen back to a client render, there
-    // would be two buttons (or styles) here, or ones that aren't the nodes the server sent.
+    // Hydration reuses the server's node. If it had fallen back to a client render, there would be
+    // two buttons here, or one that isn't the node the server sent. The zero-DOM provider injects
+    // no `<style>`.
     expect(container.querySelectorAll("button")).toHaveLength(1);
     expect(container.querySelector("button")).toBe(serverButton);
-    // The provider's token <style> is the same node, not a re-inserted duplicate.
-    expect(container.querySelectorAll("style")).toHaveLength(1);
-    expect(container.querySelector("style")).toBe(serverStyle);
+    expect(container.querySelector("style")).toBeNull();
 
     dispose();
     remove();

@@ -7,7 +7,6 @@ import {
   type Preset,
   type RecipeSlotsOf,
   type RecipeVariantsOf,
-  renderPresetStyle,
   type SlotClasses,
 } from "../presets";
 import type { RecipeRegistry } from "../recipes/registry";
@@ -26,7 +25,7 @@ const [ThemeContext, useThemeContext] = createComponentContext<Preset>("ThemePro
 export interface ThemeProviderProps {
   /**
    * The preset — the single object the runtime consumes (see {@link Preset}): the `recipes` map
-   * **plus** the typed token/component overrides. Author it with `definePreset` (extend `hope`, or
+   * **plus** the typed `components` overrides. Author it with `definePreset` (extend `hope`, or
    * bootstrap from a raw recipe map). The preset is chosen at build time; this value is static.
    */
   preset: Preset;
@@ -34,21 +33,14 @@ export interface ThemeProviderProps {
 }
 
 /**
- * Provides a preset to everything below it, and — when the preset carries token overrides — inlines
- * a deterministic `<style>` (D3) so the `--hope-*` custom properties are present before first paint
- * and in the SSR stream (no FOUC). `ThemeContext` is the Provider component directly (SolidJS 2.0).
+ * Provides a preset to everything below it. **Zero-DOM**: it renders no markup of its own — token
+ * *values* live in the preset's CSS (`--hope-*` custom properties; see `@hope-ui/presets/hope`), not
+ * in a runtime `<style>`. `ThemeContext` is the Provider component directly (SolidJS 2.0), so it is
+ * server-readable during `renderToStringAsync` (the whole of "works in SolidStart" for theming).
  *
- * The `<style>` decision is made **once, on the static preset**, so the server and client always
- * take the same branch and produce identical markup:
- * - **No token overrides** (e.g. `hope`, whose values live in CSS) → `renderPresetStyle` returns
- *   `""` and this returns the *exact* bare-provider tree — no fragment, no `<style>`. Existing
- *   component hydration fixtures (whose presets have empty tokens) are therefore byte-identical to
- *   before this phase; their hydration keys (`_hk`) do not shift.
- * - **Token overrides** → a `<style>` is rendered before `children`, inside the provider.
- *
- * Wrapping a subtree in `<ThemeProvider>` shifts that subtree's hydration keys either way (keys are
- * a path through the component tree), so a component's SSR and hydration fixtures must both include
- * it identically.
+ * Wrapping a subtree in `<ThemeProvider>` still shifts that subtree's hydration keys (`_hk` is a path
+ * through the component tree), so a component's SSR and hydration fixtures must both include it
+ * identically — but the provider itself contributes no node, so SSR output is exactly `children`.
  */
 export function ThemeProvider(props: ThemeProviderProps): JSX.Element {
   // D7: a JS consumer bypassing the types (or forwarding a raw recipe map) gets a clear error here,
@@ -61,26 +53,12 @@ export function ThemeProvider(props: ThemeProviderProps): JSX.Element {
     );
   }
 
-  // Computed from the *static* preset in the render body (not an effect): present before first
-  // paint, and — being a static value — the branch below is identical on server and client.
-  const css = renderPresetStyle(props.preset.tokens, props.preset.darkMode);
-
-  // Zero-DOM branch (D3): the exact today tree, structurally unchanged, so nothing downstream shifts.
-  if (css === "") {
-    return <ThemeContext value={props.preset}>{props.children}</ThemeContext>;
-  }
-
-  return (
-    <ThemeContext value={props.preset}>
-      <style>{css}</style>
-      {props.children}
-    </ThemeContext>
-  );
+  return <ThemeContext value={props.preset}>{props.children}</ThemeContext>;
 }
 
 /**
  * Returns the current preset — the advanced escape hatch for reading the whole {@link Preset}
- * (recipes + token/component overrides). Most components should reach for {@link useDefaults} /
+ * (recipes + component overrides). Most components should reach for {@link useDefaults} /
  * {@link useSlots} / {@link useRecipe} instead.
  *
  * @throws if called outside a `<ThemeProvider>` (friendly, provider-naming message).

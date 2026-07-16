@@ -22,52 +22,24 @@ describe("definePreset — bootstrap from a raw registry", () => {
     expect(preset.recipes.button).toBe(stubRecipe);
   });
 
-  it("normalizes empty overrides — no tokens, no components, default darkMode", () => {
+  it("normalizes empty overrides — an empty components object", () => {
     const preset = definePreset(registry);
-    expect(preset.tokens).toEqual({});
     expect(preset.components).toEqual({});
-    expect(preset.darkMode).toBe(".dark");
   });
 
-  it("applies a config's tokens, components, and darkMode", () => {
+  it("applies a config's components", () => {
     const preset = definePreset(registry, {
-      darkMode: "media",
-      tokens: {
-        colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } },
-      },
       components: {
         button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } },
       },
     });
-    expect(preset.darkMode).toBe("media");
-    expect(preset.tokens.colors?.primary).toEqual({
-      light: "--color-violet-600",
-      dark: "--color-violet-400",
-    });
     expect(preset.components.button?.defaultVariants).toEqual({ size: "sm" });
     expect(preset.components.button?.slotClasses).toEqual({ root: "rounded-full" });
-  });
-
-  it("retains camelCase keys and Tailwind-shorthand values verbatim (CSS transform is token-css's job)", () => {
-    const preset = definePreset(registry, {
-      tokens: {
-        colors: {
-          onPrimarySoft: "--color-amber-100",
-          foregroundMuted: { light: "--color-mauve-600" },
-        },
-      },
-    });
-    expect(preset.tokens.colors).toEqual({
-      onPrimarySoft: "--color-amber-100",
-      foregroundMuted: { light: "--color-mauve-600" },
-    });
   });
 });
 
 describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   const base = definePreset(registry, {
-    darkMode: "[data-theme=dark]",
-    tokens: { colors: { primary: "--color-violet-600", neutral: "--color-mauve-500" } },
     components: {
       button: {
         defaultVariants: { variant: "solid", size: "lg" },
@@ -77,16 +49,10 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
   });
 
   it("inherits recipes from the base (config never carries recipes)", () => {
-    const derived = definePreset(base, { tokens: { colors: { primary: "--color-indigo-600" } } });
-    expect(derived.recipes).toBe(registry);
-  });
-
-  it("merges tokens per token — an override replaces that token, siblings are kept", () => {
-    const derived = definePreset(base, { tokens: { colors: { primary: "--color-indigo-600" } } });
-    expect(derived.tokens.colors).toEqual({
-      primary: "--color-indigo-600",
-      neutral: "--color-mauve-500",
+    const derived = definePreset(base, {
+      components: { button: { defaultVariants: { size: "xs" } } },
     });
+    expect(derived.recipes).toBe(registry);
   });
 
   it("merges components per field — setting defaultVariants keeps the base slotClasses", () => {
@@ -107,22 +73,11 @@ describe("definePreset — extend a preset (deep-merge, config wins)", () => {
     expect(derived.components.button?.defaultVariants).toEqual({ variant: "solid", size: "lg" });
   });
 
-  it("resolves darkMode as config ?? base ?? '.dark'", () => {
-    expect(definePreset(base).darkMode).toBe("[data-theme=dark]"); // inherit base
-    expect(definePreset(base, { darkMode: "media" }).darkMode).toBe("media"); // config wins
-    expect(definePreset(registry).darkMode).toBe(".dark"); // bootstrap default
-  });
-
   it("does not mutate the base preset", () => {
     definePreset(base, {
-      tokens: { colors: { primary: "--color-indigo-600" } },
       components: {
         button: { defaultVariants: { size: "xs" }, slotClasses: { label: "font-bold" } },
       },
-    });
-    expect(base.tokens.colors).toEqual({
-      primary: "--color-violet-600",
-      neutral: "--color-mauve-500",
     });
     expect(base.components.button).toEqual({
       defaultVariants: { variant: "solid", size: "lg" },
@@ -149,9 +104,7 @@ describe("isPreset", () => {
     const foreign = {
       [Symbol.for("hope-ui.preset")]: true,
       recipes: registry,
-      tokens: {},
       components: {},
-      darkMode: ".dark",
     } satisfies Record<symbol | string, unknown> as unknown as Preset;
     expect(isPreset(foreign)).toBe(true);
   });

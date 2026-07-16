@@ -4,7 +4,7 @@
  * (it would also drag in `import.meta.env` and the whole asset-module surface, none of which a
  * theming contract package should see).
  *
- * Used by `theme-context.browser.test.tsx` to hydrate the token `<style>` fixture that
+ * Used by `theme-context.browser.test.tsx` to hydrate the zero-DOM SSR fixture that
  * `theme-context.ssr.test.tsx` generates — see `src/theme-context/__tests__/__fixtures__/`.
  */
 declare module "*.html?raw" {

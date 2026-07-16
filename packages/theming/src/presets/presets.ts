@@ -2,16 +2,15 @@
  * The **preset machinery** — the pure, DOM-free core of hope-ui's preset theming API.
  *
  * A `Preset` is the single object `ThemeProvider` consumes: it owns everything the runtime needs —
- * the `recipes` (a {@link RecipeRegistry}) **plus** typed overrides (`tokens`, `components`,
- * `darkMode`). `RecipeRegistry` is demoted to an internal building block (the type of a preset's
- * `recipes` field). Consumers derive a preset with {@link definePreset}: extend an existing preset
- * (normally `hope`) with typed overrides, or bootstrap a *root* preset from a raw recipe map.
+ * the `recipes` (a {@link RecipeRegistry}) **plus** typed `components` overrides. `RecipeRegistry`
+ * is demoted to an internal building block (the type of a preset's `recipes` field). Consumers
+ * derive a preset with {@link definePreset}: extend an existing preset (normally `hope`) with typed
+ * overrides, or bootstrap a *root* preset from a raw recipe map.
  *
- * This module is types + two pure functions (`definePreset`, `isPreset`) only — no DOM, no CSS
- * emission (that is `./token-css`), no Solid runtime (that is `../theme-context`). The CSS-value
- * transforms (camelCase→kebab, Tailwind shorthand→`var()`) live entirely in `./token-css`; here a
- * preset's `tokens` are stored **exactly as authored** (camelCase keys, shorthand/raw values) so the
- * renderer is the one place those transforms happen.
+ * Semantic token *values* are **not** part of this API — a preset authors them in CSS (as `--hope-*`
+ * custom properties; see `@hope-ui/presets/hope`'s `tokens.css`), so `ThemeProvider` renders no DOM.
+ * This module is types + two pure functions (`definePreset`, `isPreset`) only — no DOM, no Solid
+ * runtime (that is `../theme-context`).
  *
  * **No module-scope state** (constraint #6): the only module constant is the brand symbol, resolved
  * through the cross-realm global registry (`Symbol.for`), so a preset built by one installed copy of
@@ -19,7 +18,6 @@
  */
 import type { ClassValue } from "tailwind-variants";
 import type { RecipeRegistry } from "../recipes/registry";
-import type { SemanticColorToken } from "../semantic-tokens/semantic-tokens";
 
 /**
  * The variant props a registered recipe accepts — extracted straight from the recipe's own
@@ -50,46 +48,6 @@ export type SlotClassesInput<K extends keyof RecipeRegistry> =
   | SlotClasses<K>
   | ((variants: RecipeVariantsOf<K>) => SlotClasses<K>);
 
-/**
- * camelCase of a kebab string — `"on-primary-soft"` → `"onPrimarySoft"`. Used to derive the
- * ergonomic {@link ColorTokenKey} vocabulary from the fixed kebab `SemanticColorToken` names while
- * keeping it a **closed union** (a typo is a compile error, so `checkSemanticTokenConformance` stays
- * meaningful — constraint #3).
- */
-type KebabToCamel<S extends string> = S extends `${infer Head}-${infer Tail}`
-  ? `${Head}${Capitalize<KebabToCamel<Tail>>}`
-  : S;
-
-/**
- * The ergonomic, type-safe color-token keys a preset overrides: the camelCase spelling of the fixed
- * kebab `SemanticColorToken` vocabulary (`"warningSoft"`, `"onPrimary"`, `"foregroundMuted"`, …).
- * Still a closed union — an unknown key is a compile error — normalized back to `--hope-<kebab>` on
- * emit by `./token-css`.
- */
-export type ColorTokenKey = KebabToCamel<SemanticColorToken>;
-
-/**
- * One token's value: a bare string (used for **both** light and dark), or a per-mode
- * `{ light, dark? }`. `dark` omitted → no `.dark` override emitted for that token → it inherits the
- * base theme's dark value. A value is either a CSS custom-property reference — anything starting with
- * `--` (`"--color-violet-500"`, wrapped to `var(--color-violet-500)` on emit; this is how a token
- * points at a Tailwind palette var) — or an already-formed CSS color (`"#fff"`, `"var(--x)"`,
- * `"oklch(…)"`, `"color-mix(…)"`, `"transparent"`), which passes through raw.
- */
-export type TokenValue = string | { light: string; dark?: string };
-
-/** A preset's typed token overrides — semantic colors (per-mode). */
-export interface PresetTokens {
-  colors?: Partial<Record<ColorTokenKey, TokenValue>>;
-}
-
-/**
- * How dark mode is delivered: a **selector** the base theme's dark variant matches (default
- * `".dark"`), `"media"` (a `prefers-color-scheme: dark` query), or `"none"` (never emit a dark
- * override block).
- */
-export type DarkMode = string | "media" | "none";
-
 /** A preset's per-component overrides: app-wide default variants and global slot classes. */
 export interface ComponentOverride<K extends keyof RecipeRegistry> {
   /** Overrides the recipe's own `defaultVariants` app-wide — typed to the recipe's variant props. */
@@ -103,8 +61,6 @@ export type PresetComponentOverrides = { [K in keyof RecipeRegistry]?: Component
 
 /** The authoring shape passed to {@link definePreset} — every field optional, deep-merged over the base. */
 export interface PresetConfig {
-  darkMode?: DarkMode;
-  tokens?: PresetTokens;
   components?: PresetComponentOverrides;
 }
 
@@ -118,28 +74,13 @@ const PRESET_BRAND = Symbol.for("hope-ui.preset");
 
 /**
  * A resolved preset — the object `ThemeProvider` consumes. Branded (see {@link PRESET_BRAND}) so it
- * is distinguishable at runtime from a bare `RecipeRegistry`. All fields are normalized:
- * `tokens`/`components` are always present objects (possibly empty), `darkMode` always resolved.
+ * is distinguishable at runtime from a bare `RecipeRegistry`. `components` is always a present object
+ * (possibly empty). Token *values* are not carried here — a preset authors them in CSS.
  */
 export interface Preset {
   readonly [PRESET_BRAND]: true;
   readonly recipes: RecipeRegistry;
-  readonly tokens: PresetTokens;
   readonly components: PresetComponentOverrides;
-  readonly darkMode: DarkMode;
-}
-
-/** Merge two token maps, config winning **per token** (a token value is replaced, not deep-merged). */
-function mergeTokens(base: PresetTokens, override: PresetTokens | undefined): PresetTokens {
-  const colors: Partial<Record<ColorTokenKey, TokenValue>> = {
-    ...base.colors,
-    ...override?.colors,
-  };
-  const result: PresetTokens = {};
-  if (Object.keys(colors).length > 0) {
-    result.colors = colors;
-  }
-  return result;
 }
 
 /** A component override at the widest key — internal merge machinery over the open registry. */
@@ -186,24 +127,19 @@ function mergeComponentOverrides(
 /**
  * Derive a preset. `base` is normally a `Preset` (e.g. `hope`); theme authors bootstrap a **root**
  * preset by passing a raw `RecipeRegistry` (the one place a registry is passed directly). `config`
- * deep-merges over the base, config winning: **tokens per-token**, **components per-component-per-
- * field**, and `darkMode = config ?? base ?? ".dark"`. Recipes always come from `base` (a config
- * never carries recipes). Token values are stored as authored — CSS normalization is `./token-css`'s
- * job.
+ * deep-merges over the base, config winning **per component, per field**. Recipes always come from
+ * `base` (a config never carries recipes). Token *values* are not part of the config — a preset
+ * authors them in CSS (`--hope-*` custom properties; see `@hope-ui/presets/hope`).
  */
 export function definePreset(base: Preset | RecipeRegistry, config?: PresetConfig): Preset {
   const baseIsPreset = isPreset(base);
   const baseRecipes = baseIsPreset ? base.recipes : base;
-  const baseTokens = baseIsPreset ? base.tokens : {};
   const baseComponents = baseIsPreset ? base.components : {};
-  const baseDarkMode = baseIsPreset ? base.darkMode : undefined;
 
   return {
     [PRESET_BRAND]: true,
     recipes: baseRecipes,
-    tokens: mergeTokens(baseTokens, config?.tokens),
     components: mergeComponentOverrides(baseComponents, config?.components),
-    darkMode: config?.darkMode ?? baseDarkMode ?? ".dark",
   };
 }
 

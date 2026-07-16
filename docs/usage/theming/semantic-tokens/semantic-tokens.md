@@ -44,7 +44,6 @@ Neutral surfaces pair with the `foreground*` ramp.
 
 A preset proves it defines every token with `checkSemanticTokenConformance` /
 `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`) run against the CSS that
-declares the `--hope-*` values. `@hope-ui/presets/hope` authors its palette in TS (`index.ts`'s
-`hopeTokens`), so `hope.test.ts` runs the check over the CSS that `renderPresetStyle(hope.tokens, …)`
-emits; a preset that instead declares values in a `tokens.css` runs it over that file.
-An undefined token compiles every referencing utility to an unresolved `var(--hope-…)`.
+declares the `--hope-*` values. `@hope-ui/presets/hope` authors its palette in `hope/tokens.css`, so
+`hope.test.ts` reads that file and runs the check over it. An undefined token compiles every
+referencing utility to an unresolved `var(--hope-…)`.

@@ -1,9 +1,10 @@
 # `ThemeProvider` / `useTheme` / `useRecipe` / `useDefaults` / `useSlots`
 
 The runtime seam of the preset theming system. A `ThemeProvider` injects a **preset** — the single
-object the runtime consumes (recipes **plus** typed token/component overrides — see
-[`presets`](../presets/presets.md)) — into context, and, when the preset carries token overrides,
-inlines a deterministic `<style>`. Components read the preset back out with the `use*` hooks.
+object the runtime consumes (recipes **plus** typed `components` overrides — see
+[`presets`](../presets/presets.md)) — into context. It is **zero-DOM**: it renders no markup of its
+own (token values live in the preset's CSS, not a runtime `<style>`). Components read the preset back
+out with the `use*` hooks.
 
 ```tsx
 import { ThemeProvider } from "@hope-ui/theming";
@@ -18,19 +19,20 @@ function App() {
 }
 ```
 
-To customize, derive a preset with `definePreset` and pass that instead:
+To customize component defaults, derive a preset with `definePreset` and pass that instead:
 
 ```tsx
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { hope } from "@hope-ui/presets/hope";
 
 const app = definePreset(hope, {
-  tokens: { colors: { primary: { light: "--color-violet-600", dark: "--color-violet-400" } } },
   components: { button: { defaultVariants: { size: "sm" }, slotClasses: { root: "rounded-full" } } },
 });
 
 <ThemeProvider preset={app}>{/* … */}</ThemeProvider>;
 ```
+
+To change token *values*, author your own `--hope-*` CSS — tokens aren't part of the preset object.
 
 ## API
 
@@ -41,19 +43,12 @@ const app = definePreset(hope, {
 | `preset` | `Preset` | The preset the subtree consumes. Author it with `definePreset`; **a bare recipe map is rejected** (D7 — see below). Chosen at build time, so effectively static. |
 | `children` | `JSX.Element` | — |
 
-**Token `<style>` injection (D3).** The provider computes `renderPresetStyle(preset.tokens,
-preset.darkMode)` **once, in its render body** (not an effect), so the `--hope-*` custom properties
-are present before first paint and inline in the SSR stream (no FOUC). The decision is made on the
-*static* preset, so server and client always take the same branch:
-
-- **No token overrides** (a preset whose `tokens` are empty) → `renderPresetStyle` returns `""` and
-  the provider returns the *exact* bare-provider tree — **no fragment, no `<style>` node** — so a
-  component rendered under it keeps byte-identical SSR/hydration fixtures and unshifted hydration keys
-  (`_hk`). (The theming package's own tests exercise this empty case.)
-- **Token overrides** → a `<style>` is rendered before `children`, inside the provider. Its text is
-  deterministic (fixed token order, constant whitespace), so it hydrates without a mismatch. The
-  default `hope` preset authors its palette in TS, so it takes **this** branch — a component under
-  `<ThemeProvider preset={hope}>` hydrates a leading token `<style>` (see Button's fixture).
+**Zero-DOM.** The provider renders no markup of its own — it returns the *exact* bare-context tree
+(`<ThemeContext value={preset}>{children}</ThemeContext>`). Token values live in the preset's CSS
+(`--hope-*` custom properties; see [`@hope-ui/presets/hope`](../../../theming.md)'s `tokens.css`),
+so there is no runtime `<style>` to inline and nothing to diverge between server and client. A
+component rendered under the provider therefore keeps byte-identical SSR/hydration fixtures — its
+markup is exactly what it would be without the wrapper (only the hydration keys shift; see below).
 
 **D7 guard.** A JS consumer passing a non-preset (a raw recipe map, `undefined`, an arbitrary
 object) gets a clear error naming `ThemeProvider` and `definePreset`, rather than a downstream
@@ -125,41 +120,23 @@ reads `variants()` / `slotClasses()` / `class()` when called, so it tracks exact
 `{ class }` seam**, so a later utility beats an earlier conflicting one. The `class` prop reaches
 the `root` slot only.
 
-## Why the `<style>` is inline, not in `<head>`
-
-The token `<style>` is rendered **as an ordinary element in the tree** (a sibling of `children`
-inside the provider), not portalled into `document.head`. This is deliberate, and it is what makes
-the SSR story work:
-
-- **The server has no `document.head`.** Reaching `<head>` needs a `Portal` (which must be gated
-  behind `isServer`, so it emits nothing in the SSR stream) or a post-mount effect — either way the
-  `--hope-*` overrides would be absent on first paint (FOUC) and injected client-side, reintroducing
-  a hydration divergence and imperative, ref-counted head state. A declarative in-tree element is
-  present in the SSR stream, hydrates in place, and needs no module-scope bookkeeping.
-- **Cascade order works in your favour.** The override and the base `@import ".../tailwind.css"`
-  both declare `:root { --hope-* }` (equal specificity); the tie breaks on document order. A body
-  `<style>` always follows the head import, so the override wins **without** depending on import
-  ordering.
-
-A `<style>` element is `display:none` (UA default): it paints nothing and is **not** a flex/grid
-item, so it never affects layout. The one caveat is structural pseudo-classes — as a sibling of your
-content it is counted by `:nth-child`/`:first-child` on the shared parent. `ThemeProvider` normally
-sits at the app root, so this rarely bites; if it matters, give the provider its own wrapper element.
-
 ## SSR / hydration note
 
-`ThemeProvider` emits markup **only when the preset carries token overrides** (the `<style>`); a
-token-free preset emits nothing of its own. Either way, **wrapping a subtree in it shifts that
-subtree's hydration keys (`_hk`)** — hydration keys are a path through the component tree. So a
-component's SSR fixture and its hydration test must both include `<ThemeProvider>` identically, or
-the keys diverge. The token `<style>` itself hydrates in place (same node, no mismatch) because its
-bytes are deterministic — pinned by `theme-context.ssr.test.tsx` (the committed token fixture) and
+`ThemeProvider` emits no markup of its own (zero-DOM), so SSR output is exactly `children`. But
+**wrapping a subtree in it still shifts that subtree's hydration keys (`_hk`)** — hydration keys are
+a path through the component tree, and the provider is a node on that path. So a component's SSR
+fixture and its hydration test must both include `<ThemeProvider>` identically, or the keys diverge.
+This is pinned by `theme-context.ssr.test.tsx` (the committed zero-DOM fixture) and
 `theme-context.browser.test.tsx` (the hydration round-trip).
+
+Token values reach the page through the preset's CSS (`--hope-*` custom properties in the theme's
+`tailwind.css`/`tokens.css`, imported into the consumer's Tailwind entry), present in the first
+stylesheet with no runtime injection and no FOUC.
 
 ## Related
 
-- [`presets`](../presets/presets.md) — `definePreset`/`isPreset`, the `Preset` type + token/component
-  vocabulary; [`token-css`](../presets/token-css.md) — the `renderPresetStyle` renderer the `<style>` uses.
+- [`presets`](../presets/presets.md) — `definePreset`/`isPreset`, the `Preset` type + the `components`
+  override vocabulary.
 - [`registry`](../recipes/registry.md) — the `RecipeRegistry` `useRecipe` reads;
   [`slot-recipe`](../recipes/slot-recipe.md) — the `SlotRecipeFn` shape.
-- [`conformance`](../conformance/conformance.md) — the kit that verifies a preset's recipes actually emit classes.
+- [`conformance`](../conformance/conformance.md) — the kit that verifies a preset's recipes actually emit classes, and that its token CSS defines every `--hope-*` var.
