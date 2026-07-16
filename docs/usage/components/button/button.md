@@ -16,7 +16,7 @@ import { Button } from "@hope-ui/components/button";
 // and, in your Tailwind entry CSS: @import "@hope-ui/presets/hope/tailwind.css";
 
 <ThemeProvider preset={hope}>
-  <Button variant="solid" color="primary">Save</Button>
+  <Button variant="solid" colorScheme="primary">Save</Button>
 </ThemeProvider>;
 ```
 
@@ -24,11 +24,11 @@ import { Button } from "@hope-ui/components/button";
 
 | Prop              | Type                                                              | Default     | Description                                                                                                    |
 | ----------------- | ----------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
-| `variant`         | `'default' \| 'solid' \| 'soft' \| 'outline' \| 'ghost' \| 'link'`| `'default'` | Visual style. `default` is the neutral chrome button and ignores `color`.                                      |
-| `color`           | `'primary' \| 'neutral' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` | Semantic role color. Ignored by `default`. Shadows the native HTML `color` attribute (dropped from the spread).|
+| `variant`         | `'default' \| 'solid' \| 'soft' \| 'outline' \| 'ghost' \| 'link'`| `'default'` | Visual style. `default` is the neutral chrome button and ignores `colorScheme`.                                |
+| `colorScheme`     | `'primary' \| 'neutral' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` | Semantic role color scheme. Ignored by `default`. Named `colorScheme` (not `color`) so it never shadows the native HTML `color` attribute, which passes through `...rest` untouched.|
 | `size`            | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                            | `'md'`      | Density/scale. Heights 28 / 32 / 36 / 40 / 44px.                                                               |
 | `nativeButton`    | `boolean`                                                         | `true`      | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism".                      |
-| `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Grayed chrome.|
+| `disabled`        | `boolean`                                                         | `false`     | Native `disabled` on a native button; `aria-disabled` + blocked handlers on a non-native element. Grayed chrome regardless of `variant`/`colorScheme`.|
 | `loading`         | `boolean`                                                         | `false`     | Shows a loader and blocks activation while keeping the enabled look + tab position. Sets `aria-busy`.          |
 | `loadingText`     | `JSX.Element`                                                     | —           | Replaces the label while loading (implies an inline `start` loader, so the text stays visible).               |
 | `loader`          | `JSX.Element`                                                     | —           | Custom loader content. Defaults to hope's loader (Lucide `loader-circle`).                                     |
@@ -40,7 +40,7 @@ import { Button } from "@hope-ui/components/button";
 | `type`            | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | Native button type. Applied only to a native button.                                                           |
 | `class`           | `string`                                                         | —           | Merged over the recipe's root class (applied last), so the consumer's utilities win.                           |
 | `slotClasses`     | `SlotClasses<'button'>` (`{ root?, label?, startDecorator?, endDecorator?, loader? }`) | — | Per-instance class overrides per slot. Folded in after the recipe base and the preset's global `slotClasses`, before `class` (root only). Use literal classes so Tailwind can scan them. |
-| `...rest`         | `Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>`      | —           | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, …).                                     |
+| `...rest`         | `JSX.ButtonHTMLAttributes<HTMLButtonElement>`                     | —           | Forwarded to the rendered element (`onClick`, `form`, `ref`, `aria-*`, the native `color`, …).                 |
 
 The rendered root carries `data-slot="button"`; its internal parts follow the component-prefixed
 convention `data-slot="button-<part>"` — `button-label`, `button-start-decorator`,
@@ -51,10 +51,10 @@ convention `data-slot="button-<part>"` — `button-label`, `button-start-decorat
 are hydration-safe. The theme's recipe styles the single `data-disabled:` variant, never a
 `disabled:`/`aria-disabled:` pair.
 
-## Variants & color
+## Variants & color scheme
 
-`solid`/`soft`/`outline`/`ghost`/`link` take a `color` role; `default` is a color-independent neutral
-chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
+`solid`/`soft`/`outline`/`ghost`/`link` take a `colorScheme` role; `default` is a color-independent
+neutral chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
 `soft` its tonal fill, and `outline`/`ghost`/`link` paint on the surface using the surface-legible
 `on-{role}-soft` token so neutral and warning stay readable in both light and dark. All styling comes
 from the theme's `button` recipe; the component itself writes no utility classes.

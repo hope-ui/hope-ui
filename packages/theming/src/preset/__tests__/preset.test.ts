@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ButtonRecipe } from "../../recipes/button";
 import type { RecipeRegistry } from "../../registry";
-import { definePreset, isPreset, type Preset } from "../presets";
+import { definePreset, isPreset, type Preset } from "../preset";
 
 // A minimal, self-contained recipe map — the theming package must not depend on `@hope-ui/presets`.
 // The class functions are stubs; these tests exercise the *machinery* (merge + brand), not styling.
@@ -37,24 +37,26 @@ describe("definePreset — bootstrap from a raw registry", () => {
     expect(preset.components.button?.slotClasses).toEqual({ root: "rounded-full" });
   });
 
-  it("round-trips a behavioral defaultProps (not just a variant)", () => {
-    // `defaultProps` widened from variants-only to the curated themeable surface, so a behavioral
-    // policy prop (`nativeButton`) — not a recipe variant — is now expressible and carried verbatim.
+  it("round-trips a chrome-content defaultProps (not just a variant)", () => {
+    // `defaultProps` widened from variants-only to the curated themeable surface, so a chrome-content
+    // prop (`loader`, a factory) — not a recipe variant — is now expressible and carried verbatim.
+    const brandLoader = () => null;
     const preset = definePreset(registry, {
-      components: { button: { defaultProps: { nativeButton: false } } },
+      components: { button: { defaultProps: { loader: brandLoader } } },
     });
-    expect(preset.components.button?.defaultProps).toEqual({ nativeButton: false });
+    expect(preset.components.button?.defaultProps).toEqual({ loader: brandLoader });
   });
 
-  it("deep-merges a behavioral defaultProps per key alongside a variant default", () => {
+  it("deep-merges a chrome-content defaultProps per key alongside a variant default", () => {
+    const brandLoader = () => null;
     const base = definePreset(registry, {
       components: { button: { defaultProps: { size: "lg" } } },
     });
     const derived = definePreset(base, {
-      components: { button: { defaultProps: { nativeButton: false } } },
+      components: { button: { defaultProps: { loader: brandLoader } } },
     });
-    // The variant default from the base survives; the behavioral one from the override is added.
-    expect(derived.components.button?.defaultProps).toEqual({ size: "lg", nativeButton: false });
+    // The variant default from the base survives; the chrome-content one from the override is added.
+    expect(derived.components.button?.defaultProps).toEqual({ size: "lg", loader: brandLoader });
   });
 });
 

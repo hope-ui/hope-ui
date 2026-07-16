@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
-import { definePreset } from "../../presets";
+import { definePreset } from "../../preset";
 import type { SlotRecipeFn } from "../../recipes/slot-recipe";
 import type { RecipeRegistry } from "../../registry";
 import { ThemeProvider, useRecipe } from "../theme-context";

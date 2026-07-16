@@ -409,44 +409,12 @@ describe("Button — slotClasses", () => {
   });
 });
 
-describe("Button — preset defaultProps (behavioral policy + chrome content)", () => {
+describe("Button — preset defaultProps (chrome content)", () => {
   // These are capabilities that did not exist before the themeable-props widening: the old
-  // variants-only `defaultVariants` could not express a behavioral toggle or a chrome-content default.
-  // They are the definitive proof that `defaultProps` now defaults the curated themeable surface.
-
-  it("defaults a behavioral prop (nativeButton) app-wide, with the instance still winning", async () => {
-    const nonNativeByDefault = definePreset(hope, {
-      components: { button: { defaultProps: { nativeButton: false } } },
-    });
-
-    // A polymorphic (anchor) button with NO instance `nativeButton`: the preset default supplies
-    // `nativeButton: false`, so the non-native a11y model applies and the anchor announces as a button
-    // via role + tabindex. (Without the default it would fall back to the built-in `true`, mismatching
-    // the anchor.) Pairing with a non-native `render` is what keeps `nativeButton: false` correct.
-    const { container, dispose } = mount(() => (
-      <ThemeProvider preset={nonNativeByDefault}>
-        <Button render={renderAsAnchor}>Link button</Button>
-      </ThemeProvider>
-    ));
-    const button = page.getByRole("button", { name: "Link button" });
-    await expect.element(button).toHaveAttribute("role", "button");
-    await expect.element(button).toHaveAttribute("tabindex", "0");
-    await expectNoA11yViolations(container);
-    dispose();
-
-    // An explicit instance `nativeButton` overrides the preset default (instance ?? preset ?? builtin):
-    // a plain native button under the same preset stays native — no role, no tabindex.
-    const overridden = mount(() => (
-      <ThemeProvider preset={nonNativeByDefault}>
-        <Button nativeButton={true}>Native</Button>
-      </ThemeProvider>
-    ));
-    const native = page.getByRole("button", { name: "Native" });
-    await expect.element(native).not.toHaveAttribute("role");
-    await expect.element(native).not.toHaveAttribute("tabindex");
-    await expectNoA11yViolations(overridden.container);
-    overridden.dispose();
-  });
+  // variants-only `defaultVariants` could not express a chrome-content default. They are the
+  // definitive proof that `defaultProps` now defaults the curated themeable surface. (Per-usage
+  // behavioral props like `nativeButton`/`type` are intentionally NOT themeable, so there is no
+  // "default a behavioral prop app-wide" case — defaulting them would be meaningless.)
 
   it("defaults the loader (chrome content) app-wide via a factory, with the instance still winning", async () => {
     const brandLoader = definePreset(hope, {

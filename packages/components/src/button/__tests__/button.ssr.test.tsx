@@ -28,7 +28,7 @@ describe("Button SSR", () => {
     // exactly as on the client — the whole of theming's SSR requirement.
     const html = await renderToStringAsync(() => (
       <ThemeProvider preset={hope}>
-        <Button variant="solid" color="danger">
+        <Button variant="solid" colorScheme="danger">
           Delete
         </Button>
       </ThemeProvider>

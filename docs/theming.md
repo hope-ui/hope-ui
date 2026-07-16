@@ -34,9 +34,10 @@ and neither knows about the other.
   augmentation), and a theme does not invent the shape; both import the contract types from theming.
 - **`defaultProps` + `ThemeablePropsRegistry`** — a preset's per-component `defaultProps` (in
   `definePreset`'s `components` overrides) sets app-wide defaults typed to that component's
-  **themeable-props surface**: recipe variants **plus** durable behavioral policy and component chrome
-  content (for Button, `nativeButton`/`type` + `loader`/`loadingText`, chrome content as reuse-safe
-  factories). That surface is declared as a `<Component>ThemeableProps` type in theming, registered in
+  **themeable-props surface**: recipe variants **plus** component chrome content (for Button,
+  `loader`/`loadingText` as reuse-safe factories). Per-usage behavioral props (Button's
+  `nativeButton`/`type`) are deliberately **not** themeable — they describe what a given button *is*,
+  not a design-system-wide policy. That surface is declared as a `<Component>ThemeableProps` type in theming, registered in
   a parallel, type-only `ThemeablePropsRegistry` (also closed and hand-declared — **no** module
   augmentation). The registry is **intentionally non-exhaustive**: a component that only wants
   variant-level defaults declares no entry and `defaultProps` falls back to its recipe variants

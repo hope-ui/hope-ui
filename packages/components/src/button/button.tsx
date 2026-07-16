@@ -6,7 +6,7 @@ import {
   runIfFunction,
 } from "@hope-ui/primitives/utils";
 import type {
-  ButtonColor,
+  ButtonColorScheme,
   ButtonLoaderPlacement,
   ButtonSize,
   ButtonThemeableProps,
@@ -21,19 +21,22 @@ import { type Component, merge, omit, Show } from "solid-js";
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
 // so consumers can still import it from the component's subpath. `ButtonLoaderPlacement` is shared
 // by the recipe's `loaderPlacement` variant and this component's `loaderPlacement` prop.
-export type { ButtonColor, ButtonLoaderPlacement, ButtonSize, ButtonVariant };
+export type { ButtonColorScheme, ButtonLoaderPlacement, ButtonSize, ButtonVariant };
 
-// `color` shadows the native HTML `color` attribute, so it is dropped from the forwarded native
-// props and redefined below as the recipe's role selector.
-type ButtonElementProps = Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, "color">;
+// The role selector is `colorScheme`, **not** `color`: a `color` prop would shadow the native HTML
+// `color` attribute. With the rename, native `color` is left untouched and forwarded through `...rest`.
+type ButtonElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export interface ButtonProps extends ButtonElementProps {
-  /** Visual style. `default` is the neutral chrome button (shadcn's outline) and ignores `color`. */
-  variant?: ButtonVariant;
-  /** Density/scale. Heights 28/32/36/40/44px for xs→xl. */
-  size?: ButtonSize;
-  /** Semantic role color. Ignored by the `default` variant. */
-  color?: ButtonColor;
+// `ButtonProps` = the native element props **plus** the themeable surface (`ButtonThemeableProps`:
+// recipe variants + chrome content, owned by `@hope-ui/theming`) **plus** the per-instance-only props
+// below. Extending `ButtonThemeableProps` (instead of re-declaring the variants) is what keeps the two
+// in lockstep by construction — a themeable key is, by definition, also a component prop. The two
+// chrome-content keys are the exception: the themeable surface narrows them to a **factory**
+// (reuse-safe app-wide default), while a per-instance prop also accepts a bare `JSX.Element`, so they
+// are `Omit`-ted here and re-declared wider below.
+export interface ButtonProps
+  extends ButtonElementProps,
+    Omit<ButtonThemeableProps, "loader" | "loadingText"> {
   /**
    * Renders as a different element/component while keeping Button's computed props. The only
    * polymorphism mechanism (there is no `as` prop).
@@ -43,13 +46,13 @@ export interface ButtonProps extends ButtonElementProps {
    * Set `false` when `render`-ing a non-`<button>` element (an `<a>`, a `<div>`). It switches
    * the accessibility model to `role="button"` + `tabIndex` + `aria-disabled` and synthesizes
    * keyboard activation, since those elements have none of a native button's built-in behavior.
-   * Default `true`.
+   * Default `true`. Per-usage, so it is **not** a themeable app-wide default.
    */
   nativeButton?: boolean;
   /**
    * Disables the button. A native button uses the `disabled` attribute; a non-native element
    * uses `aria-disabled` and blocked handlers (and should also drop its `href` if it's a link).
-   * Rendered as a neutral, grayed-out chrome regardless of `variant`/`color`.
+   * Rendered as a neutral, grayed-out chrome regardless of `variant`/`colorScheme`.
    */
   disabled?: boolean;
   /**
@@ -70,14 +73,10 @@ export interface ButtonProps extends ButtonElementProps {
    * `defaultProps.loader` (reuse-safe; see `loadingText`).
    */
   loader?: JSX.Element | (() => JSX.Element);
-  /** Where the loader sits. `center` (default) overlays it and hides the label, preserving width. */
-  loaderPlacement?: ButtonLoaderPlacement;
   /** Leading slot (typically an icon), before the label. */
   startDecorator?: JSX.Element;
   /** Trailing slot (typically an icon), after the label. */
   endDecorator?: JSX.Element;
-  /** Stretches the button to the full width of its container. */
-  fullWidth?: boolean;
   /** Merged over the recipe's root class so the consumer's utilities win (via `cn`). */
   class?: string;
   /**
@@ -88,17 +87,6 @@ export interface ButtonProps extends ButtonElementProps {
    */
   slotClasses?: SlotClasses<"button">;
 }
-
-// Compile-time drift guard (erased at build, enforced by `pnpm typecheck`): keep `ButtonProps` and
-// the theming-declared `ButtonThemeableProps` aligned. Direction is **themeable ⊆ component props** —
-// a preset `defaultProps` is merged in and read as `ButtonProps`, so every themeable key must exist on
-// `ButtonProps` (1) and every themeable value must be a valid prop default (2). E.g. if `loader` were
-// narrowed back to `JSX.Element` (dropping the factory), (2) would fail here, at the exact site.
-type _MissingThemeableKeys = Exclude<keyof ButtonThemeableProps, keyof ButtonProps>;
-const _noMissingThemeableKeys: _MissingThemeableKeys extends never ? true : never = true; // (1)
-const _themeablePropsAreValidPropDefaults = (t: ButtonThemeableProps): ButtonProps => t; // (2)
-void _noMissingThemeableKeys;
-void _themeablePropsAreValidPropDefaults;
 
 /**
  * hope's default loader — Lucide's `loader-circle`. A single arc the recipe's `loader` slot spins
@@ -133,7 +121,7 @@ export const Button: Component<ButtonProps> = (props) => {
       nativeButton: true,
       variant: "default" as const,
       size: "md" as const,
-      color: "primary" as const,
+      colorScheme: "primary" as const,
       loaderPlacement: "center" as const,
       loading: false,
       fullWidth: false,
@@ -143,30 +131,25 @@ export const Button: Component<ButtonProps> = (props) => {
   const isLoading = () => merged.loading;
   // `loadingText` keeps the label visible, so it implies an inline `start` loader rather than the
   // label-hiding `center` overlay.
-  const effectivePlacement = (): ButtonLoaderPlacement =>
+  const loaderEffectivePlacement = (): ButtonLoaderPlacement =>
     merged.loadingText != null ? "start" : merged.loaderPlacement;
 
   // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
-  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The themeable
-  // props are read lazily on every slot-fn call, so variant/loading changes flow through. Behavioral
-  // props (`nativeButton`/`type`) are threaded too so a preset `slotClasses` *function* can react to
-  // them; the recipe reads only its declared variant keys and ignores the rest. Content factories
-  // (`loader`/`loadingText`) are irrelevant to class computation, so they're deliberately not passed.
+  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
+  // props are read lazily on every slot-fn call, so variant/loading changes flow through. Only the
+  // recipe variants are passed — they're the sole styling axis both the recipe and a preset
+  // `slotClasses` function read. Chrome content (`loader`/`loadingText`) isn't style, and runtime
+  // state reaches the recipe through its `data-*`/`aria-*` variants, so neither is passed here.
   const slots = useSlots({
     recipe: "button",
-    themeableProps: () => ({
+    variantsProps: () => ({
       variant: merged.variant,
-      color: merged.color,
+      colorScheme: merged.colorScheme,
       size: merged.size,
       fullWidth: merged.fullWidth,
       // Layout only, and only while loading — the loader slot itself is mounted by `<Show>` below,
       // so an unset placement (not loading) applies nothing.
-      loaderPlacement: isLoading() ? effectivePlacement() : undefined,
-      nativeButton: merged.nativeButton,
-      // `ButtonProps.type` (Solid's `ButtonHTMLAttributes`) is wider than `ButtonType`; narrow it the
-      // same way the `createButton` call above does. The recipe ignores `type` anyway; it's threaded
-      // only so a preset `slotClasses` function can read it.
-      type: merged.type as ButtonType,
+      loaderPlacement: isLoading() ? loaderEffectivePlacement() : undefined,
     }),
     slotClasses: () => merged.slotClasses,
     class: () => merged.class,
@@ -209,7 +192,7 @@ export const Button: Component<ButtonProps> = (props) => {
     "onPointerDown",
     "variant",
     "size",
-    "color",
+    "colorScheme",
     "loading",
     "loadingText",
     "loader",

@@ -1,15 +1,16 @@
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import { type WithDefaults, withDefaults } from "@hope-ui/primitives/utils";
 import type { JSX } from "@solidjs/web";
-import { type Accessor, untrack } from "solid-js";
+import type { Accessor } from "solid-js";
 import {
+  type CompleteVariantsOf,
   isPreset,
   type Preset,
   type RecipeSlotsOf,
+  type RecipeVariantsOf,
   type SlotClasses,
-  type ThemeablePropsOf,
-} from "../presets";
-import type { SlotClassFn } from "../recipes/slot-recipe";
+} from "../preset";
+import type { SlotRecipeFn } from "../recipes/slot-recipe";
 import type { RecipeRegistry } from "../registry";
 import { cx } from "../styling/styling";
 
@@ -129,12 +130,21 @@ export interface UseSlotsOptions<K extends keyof RecipeRegistry> {
   /** The recipe key whose base classes and preset `slotClasses` seed every slot. */
   recipe: K;
   /**
-   * The component's themeable props — variant props **and** behavioral props (e.g. `nativeButton`),
-   * re-read on every slot-fn call so changes flow through. Passed to the recipe (which reads only its
-   * declared variant keys and ignores the rest) and to the preset's `slotClasses` function form, so a
-   * global slot class can react to behavioral props too. Renamed from `variants` (now a misnomer).
+   * The recipe's variant props, re-read on every slot-fn call so a variant change flows through. These
+   * are the only styling inputs, and both consumers take exactly them: the recipe is a
+   * `tailwind-variants` function that understands variant props and nothing else, and the preset's
+   * `slotClasses` function form receives the same object (the one thing a global slot class can branch
+   * on). The wider *themeable* surface (`ThemeablePropsOf` — variants + chrome content) is a
+   * preset-`defaultProps` concept only; chrome content never affects classes, and runtime state
+   * (`disabled`/`loading`) is reached through the recipe's `data-*`/`aria-*` Tailwind variants, so
+   * neither is accepted here.
+   *
+   * Typed {@link CompleteVariantsOf} (every variant key **required to be present**; values may be
+   * `undefined`), not the all-optional `RecipeVariantsOf` — so a component can't silently omit a
+   * variant, which would make the recipe fall back to its `defaultVariants` and hand a preset's
+   * `slotClasses` function `undefined` for that key. The omission is a compile error here instead.
    */
-  themeableProps: Accessor<ThemeablePropsOf<K>>;
+  variantsProps: Accessor<CompleteVariantsOf<K>>;
   /** Per-instance slot overrides, folded in after the preset's global `slotClasses`. */
   slotClasses?: Accessor<SlotClasses<K> | undefined>;
   /** The consumer's root `class`, applied **last** and to the `root` slot only. */
@@ -146,9 +156,9 @@ export interface UseSlotsOptions<K extends keyof RecipeRegistry> {
  * **recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only)**. `cx`
  * orders the overrides (later wins); the final tailwind-merge happens inside the recipe's own
  * `{ class }` seam, so a later utility beats an earlier conflicting one. The preset's global
- * `slotClasses` is resolved per call — its function form is invoked with the current `themeableProps()`.
+ * `slotClasses` is resolved per call — its function form is invoked with the current `variantsProps()`.
  *
- * Each returned fn reads `themeableProps()`/`slotClasses()`/`class()` when called, so calling it
+ * Each returned fn reads `variantsProps()`/`slotClasses()`/`class()` when called, so calling it
  * inside a `class={slots.root()}` binding tracks exactly those inputs.
  */
 export function useSlots<K extends keyof RecipeRegistry>(
@@ -156,22 +166,25 @@ export function useSlots<K extends keyof RecipeRegistry>(
 ): Record<RecipeSlotsOf<K>, () => string> {
   const preset = useTheme();
   // Cast to the concrete callable shape: `RecipeRegistry[K]` for a generic `K` is an indexed-access
-  // type TS won't treat as callable, but every registry entry is exactly this `SlotRecipeFn` shape.
-  // The recipe is fed the wider themeable-props object; `tailwind-variants` reads only its declared
-  // variant keys and ignores the behavioral ones, so recipe output is unchanged.
-  const recipe = useRecipe(options.recipe) as unknown as (
-    props: ThemeablePropsOf<K>,
-  ) => Record<RecipeSlotsOf<K>, SlotClassFn>;
+  // type TS won't treat as callable, but every registry entry is exactly a `SlotRecipeFn`. A recipe
+  // built with `tailwind-variants` also carries its declared slots on an optional `.slots` property
+  // (see tailwind-variants' `TVReturnType`) — typed here so slot names are readable without invoking
+  // it. It is called with the recipe's variant props — the only input a `tailwind-variants` recipe reads.
+  const recipe = useRecipe(options.recipe) as unknown as SlotRecipeFn<
+    RecipeVariantsOf<K>,
+    RecipeSlotsOf<K>
+  > & { readonly slots?: Record<RecipeSlotsOf<K>, unknown> };
 
-  // Slot names are static for a recipe (tv slots don't depend on variant *values*), so read them
-  // once, untracked — a plain `themeableProps()` read in this non-tracking body would trip STRICT_READ.
-  const slotNames = Object.keys(
-    untrack(() => recipe(options.themeableProps())),
-  ) as RecipeSlotsOf<K>[];
+  // Slot names are static for a recipe (tv slots don't depend on variant *values*), so read them off
+  // the recipe's `.slots` metadata rather than invoking it just to enumerate keys. `.slots` is a
+  // tailwind-variants convenience, so fall back to one invocation for a hand-rolled `SlotRecipeFn` that
+  // exposes no metadata. Either branch reads nothing reactive — so, unlike a `variantsProps()` read in
+  // this non-tracking body, there is no STRICT_READ risk and no untrack is needed.
+  const slotNames = Object.keys(recipe.slots ?? recipe()) as RecipeSlotsOf<K>[];
 
   const resolvePresetSlotClasses = (): SlotClasses<K> | undefined => {
     const input = preset.components[options.recipe]?.slotClasses;
-    return typeof input === "function" ? input(options.themeableProps()) : input;
+    return typeof input === "function" ? input(options.variantsProps()) : input;
   };
 
   const slots = {} as Record<RecipeSlotsOf<K>, () => string>;
@@ -180,7 +193,7 @@ export function useSlots<K extends keyof RecipeRegistry>(
       const presetSlot = resolvePresetSlotClasses()?.[slot];
       const instanceSlot = options.slotClasses?.()?.[slot];
       const rootClass = slot === "root" ? options.class?.() : undefined;
-      return recipe(options.themeableProps())[slot]({
+      return recipe(options.variantsProps())[slot]({
         class: cx(presetSlot, instanceSlot, rootClass),
       });
     };

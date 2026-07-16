@@ -5,7 +5,7 @@
 //   recipe/themeable-props types (re-exported wholesale from `./recipes`, so this stays short as the
 //   component catalog grows);
 // - the preset machinery — `definePreset`/`isPreset`, the `Preset` type + the typed component-
-//   override vocabulary (from `./presets`). Token *values* are authored in CSS, not here;
+//   override vocabulary (from `./preset`). Token *values* are authored in CSS, not here;
 // - the styling seam (`tv`/`cn`/`cx`);
 // - the semantic color token vocabulary;
 // - `ThemeProvider`/`useRecipe` runtime.
@@ -13,7 +13,7 @@
 // The conformance kit is intentionally NOT re-exported here — it lives on the separate
 // `@hope-ui/theming/conformance` subpath so it never enters a runtime consumer's bundle.
 
-export * from "./presets";
+export * from "./preset";
 export * from "./recipes";
 export * from "./registry";
 export {

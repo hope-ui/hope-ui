@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { For } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Button, type ButtonColor, type ButtonVariant } from "./button";
+import { Button, type ButtonColorScheme, type ButtonVariant } from "./button";
 
 const meta = {
   title: "Components/Button",
@@ -38,7 +38,7 @@ const COLORED_VARIANTS: Exclude<ButtonVariant, "default">[] = [
   "ghost",
   "link",
 ];
-const COLORS: ButtonColor[] = ["primary", "neutral", "success", "warning", "danger", "info"];
+const COLORS: ButtonColorScheme[] = ["primary", "neutral", "success", "warning", "danger", "info"];
 
 export const Default: Story = {
   render: () => <Button>Button</Button>,
@@ -78,7 +78,7 @@ export const VariantColorMatrix: Story = {
             <For each={COLORS}>
               {(color) => (
                 <div class="flex w-24 justify-center">
-                  <Button variant={variant} color={color}>
+                  <Button variant={variant} colorScheme={color}>
                     Button
                   </Button>
                 </div>
@@ -124,7 +124,7 @@ export const Decorators: Story = {
       <Button variant="default" endDecorator={<ArrowRightIcon />}>
         Continue
       </Button>
-      <Button variant="soft" color="success" startDecorator={<CheckIcon />}>
+      <Button variant="soft" colorScheme="success" startDecorator={<CheckIcon />}>
         Saved
       </Button>
     </div>
@@ -145,7 +145,7 @@ export const SlotClasses: Story = {
       </Button>
       <Button
         variant="soft"
-        color="success"
+        colorScheme="success"
         startDecorator={<CheckIcon />}
         slotClasses={{ label: "uppercase tracking-wide" }}
       >
@@ -162,10 +162,10 @@ export const Loading: Story = {
       <Button variant="solid" loading>
         Saving
       </Button>
-      <Button variant="soft" color="neutral" loading loadingText="Uploading…">
+      <Button variant="soft" colorScheme="neutral" loading loadingText="Uploading…">
         Upload
       </Button>
-      <Button variant="outline" color="danger" loading loaderPlacement="start">
+      <Button variant="outline" colorScheme="danger" loading loaderPlacement="start">
         Deleting
       </Button>
     </div>
@@ -178,7 +178,7 @@ export const Disabled: Story = {
     <div class="flex flex-wrap items-center gap-3">
       <For each={VARIANTS}>
         {(variant) => (
-          <Button variant={variant} color="primary" disabled>
+          <Button variant={variant} colorScheme="primary" disabled>
             {variant}
           </Button>
         )}
@@ -213,7 +213,7 @@ export const LightAndDark: Story = {
         <div class="flex flex-wrap items-center gap-3">
           <For each={COLORS}>
             {(color) => (
-              <Button variant="solid" color={color}>
+              <Button variant="solid" colorScheme={color}>
                 {color}
               </Button>
             )}
@@ -223,7 +223,7 @@ export const LightAndDark: Story = {
           <Button variant="solid" startDecorator={<PlusIcon />}>
             New
           </Button>
-          <Button variant="soft" color="success" startDecorator={<CheckIcon />}>
+          <Button variant="soft" colorScheme="success" startDecorator={<CheckIcon />}>
             Saved
           </Button>
           <Button variant="solid" loading>

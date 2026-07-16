@@ -1,4 +1,4 @@
-# `presets` — the preset machinery
+# `preset` — the preset machinery
 
 The pure, DOM-free core of hope-ui's preset theming API: the `Preset` type, `definePreset`/`isPreset`,
 and the typed component-override vocabulary. No DOM, no CSS emission, no Solid runtime (that is
@@ -38,9 +38,10 @@ import { hope } from "@hope-ui/presets/hope";
 const app = definePreset(hope, {
   components: {
     button: {
-      // `defaultProps` = the curated themeable surface: recipe variants + behavioral policy + chrome
-      // content (chrome content as a factory). A superset of the old variants-only `defaultVariants`.
-      defaultProps: { size: "sm", nativeButton: false, loader: () => <MyBrandSpinner /> },
+      // `defaultProps` = the curated themeable surface: recipe variants + chrome content (the latter
+      // as a factory). A superset of the old variants-only `defaultVariants`. Per-usage behavioral
+      // props (`nativeButton`/`type`) are NOT themeable, so they can't be defaulted here.
+      defaultProps: { size: "sm", loader: () => <MyBrandSpinner /> },
       slotClasses: { root: "rounded-full" },
     },
   },
@@ -75,11 +76,12 @@ isPreset({ button }); // false — a bare recipe map is not a preset
 
 | Type | Meaning |
 | --- | --- |
-| `RecipeVariantsOf<K>` | The variant props recipe `K` accepts (extracted from its signature). |
-| `ThemeablePropsOf<K>` | The props a preset may default for `K`: its [`ThemeablePropsRegistry`](../registry/themeable-props-registry.md) entry (variants + behavioral policy + chrome content) if it opted in, else `RecipeVariantsOf<K>`. A superset of `RecipeVariantsOf<K>`. |
+| `RecipeVariantsOf<K>` | The variant props recipe `K` accepts (extracted from its signature). All keys optional (the recipe tolerates a partial). |
+| `CompleteVariantsOf<K>` | `RecipeVariantsOf<K>` with **every key required to be present** (values may still be `undefined`). What `useSlots`' `variantsProps` demands and a `slotClasses` function receives, so a component can't *silently omit* a variant (which would make the recipe fall back to `defaultVariants` and hand the function `undefined`). |
+| `ThemeablePropsOf<K>` | The props a preset may default for `K`: its [`ThemeablePropsRegistry`](../registry/themeable-props-registry.md) entry (variants + chrome content) if it opted in, else `RecipeVariantsOf<K>`. A superset of `RecipeVariantsOf<K>`. |
 | `RecipeSlotsOf<K>` | The slot names recipe `K` returns. |
 | `SlotClasses<K>` | `Partial<Record<slot, ClassValue>>` — a per-slot class record. |
-| `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(props: ThemeablePropsOf<K>) => SlotClasses<K>` (preset-only function form — its input widened from variants-only, so a global slot class can react to behavioral props too; slot *keys* stay recipe-owned). |
+| `SlotClassesInput<K>` | `SlotClasses<K>` **or** `(props: CompleteVariantsOf<K>) => SlotClasses<K>` (preset-only function form — its input is the recipe's variant props, every key present, the only axis a global slot class can branch on; slot *keys* stay recipe-owned). |
 | `ComponentOverride<K>` | `{ defaultProps?, slotClasses? }` for one component. |
 | `PresetComponentOverrides` | Per-component overrides keyed by registry name (`keyof RecipeRegistry`). |
 | `PresetConfig` | The authoring shape passed to `definePreset` (`{ components? }`). |

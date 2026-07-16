@@ -8,7 +8,7 @@
  * `useRecipe("<name>")`; a theme implements the matching recipe and checks its map with
  * `satisfies RecipeRegistry`.
  *
- * This is the top-level `registry/` folder (the contract seam, parallel to `presets`/`theme-context`/
+ * This is the top-level `registry/` folder (the contract seam, parallel to `preset`/`theme-context`/
  * `styling`), holding {@link RecipeRegistry} alongside {@link ThemeablePropsRegistry} (its
  * behavioral/chrome counterpart) so the two contracts scale independently as the catalog grows.
  */

@@ -30,6 +30,21 @@ export type RecipeVariantsOf<K extends keyof RecipeRegistry> = NonNullable<
 >;
 
 /**
+ * {@link RecipeVariantsOf} with **every key required to be present** — each value may still be
+ * `undefined`. This (not the all-optional `RecipeVariantsOf`) is what {@link useSlots}' `variantsProps`
+ * demands and what a `slotClasses` function receives, so a component can never *silently omit* a
+ * variant: an omitted key would make the recipe fall back to its `defaultVariants` **and** hand a
+ * `slotClasses` function `undefined` for that key — both without any diagnostic. Requiring presence
+ * (while still allowing an explicit `undefined` value, e.g. Button's `loaderPlacement` when it is not
+ * loading) turns "forgot a variant" into a compile error at the `useSlots` call site. The mapping over
+ * `keyof Required<…>` is deliberately non-homomorphic: it makes every key present without stripping
+ * `undefined` from the value (which `Required<…>` would).
+ */
+export type CompleteVariantsOf<K extends keyof RecipeRegistry> = {
+  [P in keyof Required<RecipeVariantsOf<K>>]: RecipeVariantsOf<K>[P];
+};
+
+/**
  * The props a preset may default app-wide for component `K` via `ComponentOverride.defaultProps`: its
  * opted-in themeable props if it registers a {@link ThemeablePropsRegistry} entry (recipe variants +
  * durable behavioral policy + chrome content), otherwise just its recipe variants.
@@ -54,15 +69,17 @@ export type SlotClasses<K extends keyof RecipeRegistry> = Partial<
 
 /**
  * A preset's global `slotClasses` for a component: either a static per-slot record (the common,
- * fully-Tailwind-scannable case) or a function of the component's {@link ThemeablePropsOf} — the
- * recipe variants **and** its behavioral props (e.g. `nativeButton`), so a global slot class can
- * react to behavioral policy, not only visual variants. Slot *keys* stay recipe-owned
- * ({@link SlotClasses}). **Only the function form's literal class *substrings* are Tailwind-scannable**
- * — a constructed string (`` `px-${n}` ``) is never generated.
+ * fully-Tailwind-scannable case) or a function of the component's {@link CompleteVariantsOf} — every
+ * recipe variant, each key guaranteed present (see that type), which are the only axis a global slot
+ * class can meaningfully branch on. (Chrome content isn't style; runtime state like `disabled`/
+ * `loading` is reached through the recipe's `data-*`/`aria-*` Tailwind variants in the class strings
+ * themselves — no function argument needed.) Slot *keys* stay recipe-owned ({@link SlotClasses}).
+ * **Only the function form's literal class *substrings* are Tailwind-scannable** — a constructed string
+ * (`` `px-${n}` ``) is never generated.
  */
 export type SlotClassesInput<K extends keyof RecipeRegistry> =
   | SlotClasses<K>
-  | ((props: ThemeablePropsOf<K>) => SlotClasses<K>);
+  | ((props: CompleteVariantsOf<K>) => SlotClasses<K>);
 
 /** A preset's per-component overrides: app-wide default props and global slot classes. */
 export interface ComponentOverride<K extends keyof RecipeRegistry> {

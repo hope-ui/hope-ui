@@ -21,7 +21,7 @@
  * state tokens (theming decision 02).
  */
 
-import type { ButtonColor, ButtonVariant } from "@hope-ui/theming";
+import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
 // The Button recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
 // implements it. `hopeRecipes` (in `./index`) checks the finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
@@ -37,7 +37,10 @@ import { tv } from "@hope-ui/theming";
  * outline/ghost/link use `on-{role}-soft` (surface-legible) rather than the fill, so neutral &
  * warning stay readable in both themes instead of looking disabled.
  */
-const COLOR_CLASSES: Record<ButtonColor, Record<Exclude<ButtonVariant, "default">, string>> = {
+const COLOR_CLASSES: Record<
+  ButtonColorScheme,
+  Record<Exclude<ButtonVariant, "default">, string>
+> = {
   primary: {
     solid: "bg-primary text-on-primary hover:bg-primary-hover",
     soft: "bg-primary-soft text-on-primary-soft hover:bg-[color-mix(in_oklch,var(--hope-primary-soft),var(--hope-primary)_12%)]",
@@ -90,13 +93,14 @@ const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default">> = [
   "link",
 ];
 
-/** variant × color → the literal fill on the `root` slot (default variant is color-independent). */
-const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColor[]).flatMap((color) =>
-  COLOR_VARIANTS.map((variant) => ({
-    variant,
-    color,
-    class: { root: COLOR_CLASSES[color][variant] },
-  })),
+/** variant × colorScheme → the literal fill on the `root` slot (default variant is color-independent). */
+const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]).flatMap(
+  (colorScheme) =>
+    COLOR_VARIANTS.map((variant) => ({
+      variant,
+      colorScheme,
+      class: { root: COLOR_CLASSES[colorScheme][variant] },
+    })),
 );
 
 /**
@@ -200,10 +204,10 @@ export const buttonRecipe = tv({
         root: "h-auto bg-transparent border-transparent px-0.5 py-0.5 hover:underline underline-offset-4",
       },
     },
-    // `color` carries no base classes of its own — every fill is variant×color-specific and lives in
-    // `compoundVariants`. It's declared here (with empty slots) so it's a real, typed variant the
-    // compound entries can match on, rather than an untyped prop.
-    color: {
+    // `colorScheme` carries no base classes of its own — every fill is variant×colorScheme-specific
+    // and lives in `compoundVariants`. It's declared here (with empty slots) so it's a real, typed
+    // variant the compound entries can match on, rather than an untyped prop.
+    colorScheme: {
       primary: {},
       neutral: {},
       success: {},
@@ -228,7 +232,7 @@ export const buttonRecipe = tv({
   compoundVariants: colorCompoundVariants,
   defaultVariants: {
     variant: "default",
-    color: "primary",
+    colorScheme: "primary",
     size: "md",
     fullWidth: false,
   },

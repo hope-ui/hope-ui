@@ -9,7 +9,7 @@
  *
  * **Intentionally non-exhaustive** over `keyof RecipeRegistry`: a component that only wants
  * variants-only defaults declares *no* entry here and falls back to `RecipeVariantsOf` — see
- * `ThemeablePropsOf` in `../../presets/presets`, whose `K extends keyof ThemeablePropsRegistry ? … :
+ * `ThemeablePropsOf` in `../../preset/preset`, whose `K extends keyof ThemeablePropsRegistry ? … :
  * RecipeVariantsOf<K>` fallback is what keeps this feature incremental.
  */
 import type { ButtonThemeableProps } from "../recipes/button";
