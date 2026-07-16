@@ -11,14 +11,17 @@
  * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
  * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
  * `COLOR_CLASSES` and assembled into `compoundVariants`. The literals are what makes `bg-primary`,
- * `text-on-danger-soft`, `border-warning-outline`, etc. actually exist in the emitted CSS.
+ * `text-primary-emphasis`, `border-warning-line`, etc. actually exist in the emitted CSS.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
- * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). The
- * soft-hover mix references the raw `--hope-*` custom properties directly because `@theme inline`
- * does not emit the `--color-*` names as usable variables. Interaction states use Tailwind's own
- * `hover:`/`active:`/`disabled:`/`aria-disabled:` and hope's `data-pressed` variant — no dedicated
- * state tokens (theming decision 02).
+ * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
+ * interaction state is a *finished* token too — `hover:bg-primary-hovered`,
+ * `data-pressed:bg-primary-pressed`, `hover:text-primary-link-hovered`, `focus-visible:ring-focus-halo`,
+ * `data-disabled:opacity-disabled`. The recipe computes no color: no `color-mix`, no alpha modifier
+ * (`bg-x/50`), no magic opacity, so a preset that redefines a shade changes the painted result
+ * predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`). Interaction
+ * *triggers* are still Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/
+ * `data-disabled` variants.
  */
 
 import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
@@ -27,61 +30,75 @@ import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
 import { tv } from "@hope-ui/theming";
 
 /*
- * Per-color, per-variant fills — literal so Tailwind's `@source` scan emits them.
- *  - solid   : `bg-{role}` + `text-on-{role}`, hover → the real `bg-{role}-hover` token.
- *  - soft    : `bg-{role}-soft` + `text-on-{role}-soft`, hover → soft mixed 12% toward the fill.
- *  - outline : transparent bg + `text-on-{role}-soft` + the dedicated `border-{role}-outline` tint,
- *              hover fills with `bg-{role}-soft`.
- *  - ghost   : like outline without the border.
- *  - link    : `text-on-{role}-soft`, underline on hover (layout handled in the `variant` axis).
- * outline/ghost/link use `on-{role}-soft` (surface-legible) rather than the fill, so neutral &
- * warning stay readable in both themes instead of looking disabled.
+ * Per-color, per-variant fills — literal so Tailwind's `@source` scan emits them. Every
+ * (role × variant × state) is its own finished token; nothing is computed and nothing is borrowed
+ * from a sibling variant.
+ *  - solid   : `bg-{role}` + `text-on-{role}`, hovered/pressed → `bg-{role}-hovered`/`-pressed`.
+ *  - soft    : `bg-{role}-soft` + `text-{role}-emphasis`, hovered/pressed → `bg-{role}-soft-hovered`/`-pressed`.
+ *  - outline : transparent bg + `text-{role}-emphasis` + the `border-{role}-line` tint (neutral has
+ *              no `-line` → `border-strong`); hovered/pressed wash → `bg-{role}-outline-hovered`/`-pressed`.
+ *  - ghost   : like outline without the border; wash → `bg-{role}-ghost-hovered`/`-pressed`.
+ *  - link    : `text-{role}-emphasis`, hovered/pressed text → `text-{role}-link-hovered`/`-pressed`,
+ *              underline on hover.
+ * The soft/outline/ghost/link label is `{role}-emphasis` — the role's legible *content* color — so
+ * neutral & warning read correctly in both themes rather than looking disabled.
  */
 const COLOR_CLASSES: Record<
   ButtonColorScheme,
   Record<Exclude<ButtonVariant, "default">, string>
 > = {
   primary: {
-    solid: "bg-primary text-on-primary hover:bg-primary-hover",
-    soft: "bg-primary-soft text-on-primary-soft hover:bg-[color-mix(in_oklch,var(--hope-primary-soft),var(--hope-primary)_12%)]",
-    outline: "text-on-primary-soft border-primary-outline hover:bg-primary-soft",
-    ghost: "text-on-primary-soft hover:bg-primary-soft",
-    link: "text-on-primary-soft",
+    solid: "bg-primary text-on-primary hover:bg-primary-hovered data-pressed:bg-primary-pressed",
+    soft: "bg-primary-soft text-primary-emphasis hover:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
+    outline:
+      "text-primary-emphasis border-primary-line hover:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
+    ghost:
+      "text-primary-emphasis hover:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
+    link: "text-primary-emphasis hover:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
   },
   neutral: {
-    solid: "bg-neutral text-on-neutral hover:bg-neutral-hover",
-    soft: "bg-neutral-soft text-on-neutral-soft hover:bg-[color-mix(in_oklch,var(--hope-neutral-soft),var(--hope-neutral)_12%)]",
-    outline: "text-on-neutral-soft border-neutral-outline hover:bg-neutral-soft",
-    ghost: "text-on-neutral-soft hover:bg-neutral-soft",
-    link: "text-on-neutral-soft",
+    solid: "bg-neutral text-on-neutral hover:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+    soft: "bg-neutral-soft text-neutral-emphasis hover:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
+    outline:
+      "text-neutral-emphasis border-strong hover:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
+    ghost:
+      "text-neutral-emphasis hover:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
+    link: "text-neutral-emphasis hover:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
   },
   success: {
-    solid: "bg-success text-on-success hover:bg-success-hover",
-    soft: "bg-success-soft text-on-success-soft hover:bg-[color-mix(in_oklch,var(--hope-success-soft),var(--hope-success)_12%)]",
-    outline: "text-on-success-soft border-success-outline hover:bg-success-soft",
-    ghost: "text-on-success-soft hover:bg-success-soft",
-    link: "text-on-success-soft",
+    solid: "bg-success text-on-success hover:bg-success-hovered data-pressed:bg-success-pressed",
+    soft: "bg-success-soft text-success-emphasis hover:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
+    outline:
+      "text-success-emphasis border-success-line hover:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
+    ghost:
+      "text-success-emphasis hover:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
+    link: "text-success-emphasis hover:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
   },
   warning: {
-    solid: "bg-warning text-on-warning hover:bg-warning-hover",
-    soft: "bg-warning-soft text-on-warning-soft hover:bg-[color-mix(in_oklch,var(--hope-warning-soft),var(--hope-warning)_12%)]",
-    outline: "text-on-warning-soft border-warning-outline hover:bg-warning-soft",
-    ghost: "text-on-warning-soft hover:bg-warning-soft",
-    link: "text-on-warning-soft",
+    solid: "bg-warning text-on-warning hover:bg-warning-hovered data-pressed:bg-warning-pressed",
+    soft: "bg-warning-soft text-warning-emphasis hover:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
+    outline:
+      "text-warning-emphasis border-warning-line hover:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
+    ghost:
+      "text-warning-emphasis hover:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
+    link: "text-warning-emphasis hover:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
   },
   danger: {
-    solid: "bg-danger text-on-danger hover:bg-danger-hover",
-    soft: "bg-danger-soft text-on-danger-soft hover:bg-[color-mix(in_oklch,var(--hope-danger-soft),var(--hope-danger)_12%)]",
-    outline: "text-on-danger-soft border-danger-outline hover:bg-danger-soft",
-    ghost: "text-on-danger-soft hover:bg-danger-soft",
-    link: "text-on-danger-soft",
+    solid: "bg-danger text-on-danger hover:bg-danger-hovered data-pressed:bg-danger-pressed",
+    soft: "bg-danger-soft text-danger-emphasis hover:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
+    outline:
+      "text-danger-emphasis border-danger-line hover:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
+    ghost:
+      "text-danger-emphasis hover:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
+    link: "text-danger-emphasis hover:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
   },
   info: {
-    solid: "bg-info text-on-info hover:bg-info-hover",
-    soft: "bg-info-soft text-on-info-soft hover:bg-[color-mix(in_oklch,var(--hope-info-soft),var(--hope-info)_12%)]",
-    outline: "text-on-info-soft border-info-outline hover:bg-info-soft",
-    ghost: "text-on-info-soft hover:bg-info-soft",
-    link: "text-on-info-soft",
+    solid: "bg-info text-on-info hover:bg-info-hovered data-pressed:bg-info-pressed",
+    soft: "bg-info-soft text-info-emphasis hover:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
+    outline:
+      "text-info-emphasis border-info-line hover:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
+    ghost: "text-info-emphasis hover:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
+    link: "text-info-emphasis hover:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
   },
 };
 
@@ -115,11 +132,14 @@ export const buttonRecipe = tv({
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none rounded-sm",
       "cursor-pointer select-none border border-transparent bg-clip-padding outline-none",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
-      "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus/50",
+      // Focus halo is the finished `focus-halo` token (a preset-authored translucent color), not an
+      // alpha modifier over `focus` — recipes never compute (recipe-purity rule).
+      "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo",
       "active:translate-y-px data-pressed:translate-y-px",
       // One disabled axis: `createButton` emits `data-disabled` for both native (`:disabled`) and
-      // non-native (`aria-disabled`) buttons, so the recipe styles this single variant.
-      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-90",
+      // non-native (`aria-disabled`) buttons, so the recipe styles this single variant. The dim is
+      // the `opacity-disabled` token (0.4), not a magic `opacity-90`.
+      "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-disabled",
     ],
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
@@ -188,20 +208,22 @@ export const buttonRecipe = tv({
     },
     variant: {
       // shadcn's outline button: surface fill, subtle gray border, faint shadow — color-independent
-      // (ignores `color`), hover fills neutral. (Slot recipes need `{ root }` objects, not bare
-      // strings — a bare string applies to no slot.)
+      // (ignores `color`); rest → hover → press walk the `surface-raised` elevation ladder. (Slot
+      // recipes need `{ root }` objects, not bare strings — a bare string applies to no slot.)
       default: {
-        root: "bg-surface-raised text-foreground border-subtle-outline shadow-xs hover:bg-neutral-soft data-disabled:bg-disabled",
+        root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed data-disabled:bg-disabled",
       },
       // Colored fills come from `compoundVariants`; the disabled fill (`bg-disabled`, a dedicated
-      // neutral fill token — not the `-outline` border tint) is color-independent so it lives here
-      // for the fill-bearing variants (ghost/link stay transparent when disabled — muted text only).
+      // neutral fill token) is color-independent so it lives here for the fill-bearing variants
+      // (ghost/link stay transparent when disabled — muted text only).
       solid: { root: "data-disabled:bg-disabled" },
       soft: { root: "data-disabled:bg-disabled" },
-      outline: { root: "bg-transparent data-disabled:border-disabled-outline" },
+      // Disabled outline drops its role border to the neutral `border-subtle` tint.
+      outline: { root: "bg-transparent data-disabled:border-subtle" },
       ghost: { root: "bg-transparent" },
+      // Layout only; the color ladder + underline live per-role in `COLOR_CLASSES.link`.
       link: {
-        root: "h-auto bg-transparent border-transparent px-0.5 py-0.5 hover:underline underline-offset-4",
+        root: "h-auto bg-transparent border-transparent px-0.5 py-0.5",
       },
     },
     // `colorScheme` carries no base classes of its own — every fill is variant×colorScheme-specific

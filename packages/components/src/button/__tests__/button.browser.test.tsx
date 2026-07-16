@@ -55,7 +55,7 @@ describe("Button — native", () => {
     const button = container.querySelector("button");
     // The default variant is color-independent neutral chrome; the label sits in its own slot.
     expect(button?.className).toContain("bg-surface-raised");
-    expect(button?.className).toContain("border-subtle-outline");
+    expect(button?.className).toContain("border-subtle");
     expect(button?.querySelector('[data-slot="button-label"]')?.textContent).toBe("Click me");
     dispose();
   });
@@ -92,7 +92,10 @@ describe("Button — native", () => {
     const cls = container.querySelector("button")?.className ?? "";
     // tailwind-merge resolves the conflicting fill in the consumer's favor.
     expect(cls).toContain("bg-red-500");
-    expect(cls).not.toContain("bg-surface-raised");
+    // The base `bg-surface-raised` fill is dropped — matched as a standalone class token so the
+    // interaction-state utilities that share the prefix (`bg-surface-raised-hovered`/`-pressed`,
+    // which don't conflict with `bg-red-500`) don't register as a false positive.
+    expect(cls).not.toMatch(/(?:^|\s)bg-surface-raised(?:\s|$)/);
     dispose();
   });
 
