@@ -10,3 +10,4 @@ export {
   type KeyboardHandler,
 } from "./keymap/keymap";
 export { type RenderElementOptions, type RenderProp, renderElement } from "./render/render";
+export { runIfFunction } from "./run-if-function/run-if-function";
