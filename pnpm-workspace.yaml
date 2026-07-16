@@ -1,13 +1,18 @@
 packages:
   - "packages/*"
+  - "apps/*"
 
 allowBuilds:
   esbuild: true
 
 catalog:
-  solid-js: 2.0.0-beta.17
-  "@solidjs/signals": 2.0.0-beta.17
-  "@solidjs/web": 2.0.0-beta.17
+  # The solid trio moves in lockstep (CLAUDE.md requires a single solid version). Bumped
+  # beta.17 -> beta.19 because `@tanstack/solid-router` (a docs-app dep) hard-depends on
+  # `@solidjs/web@2.0.0-beta.19`; a version skew breaks context/hydration, so the whole repo
+  # moves together. See apps/docs and the PLAN handoff.
+  solid-js: 2.0.0-beta.19
+  "@solidjs/signals": 2.0.0-beta.19
+  "@solidjs/web": 2.0.0-beta.19
   # Framework-agnostic virtualizer core. Adopted (not merely referenced) by
   # `createVirtualCollection`; an *optional* peerDependency of @hope-ui/primitives so the
   # kernel stays zero-dependency for consumers who never virtualize. See
@@ -30,9 +35,19 @@ minimumReleaseAgeExclude:
   - '@storybook/csf-plugin@10.5.0'
   - '@storybook/react-dom-shim@10.5.0'
   - storybook@10.5.0
-  - '@solidjs/signals@2.0.0-beta.17'
-  - '@solidjs/web@2.0.0-beta.17'
-  - solid-js@2.0.0-beta.17
+  - '@solidjs/signals@2.0.0-beta.19'
+  - '@solidjs/web@2.0.0-beta.19'
+  - solid-js@2.0.0-beta.19
   - '@tanstack/virtual-core@3.17.4'
   - '@internationalized/date@3.12.2'
   - '@solid-primitives/a11y@1.0.0-next.0'
+  # apps/docs (TanStack Start) deps still in cooldown — excluded so `pnpm install` isn't gated.
+  - '@tanstack/solid-router@2.0.0-beta.24'
+  - '@tanstack/solid-start@2.0.0-beta.25'
+  - '@tanstack/solid-start-client@2.0.0-beta.24'
+  - '@tanstack/solid-start-server@2.0.0-beta.24'
+  - '@tanstack/start-static-server-functions@1.167.18'
+  - 'vite-plugin-solid@3.0.0-next.11'
+  - 'babel-preset-solid@2.0.0-beta.19'
+  # Name pattern (no version): pnpm forbids a version union on a wildcard name.
+  - '@dom-expressions/*'

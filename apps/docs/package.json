@@ -1,0 +1,33 @@
+{
+  "name": "@hope-ui/docs",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hope-ui/components": "workspace:*",
+    "@hope-ui/presets": "workspace:*",
+    "@hope-ui/theming": "workspace:*",
+    "@mdx-js/rollup": "^3.1.0",
+    "@solidjs/web": "catalog:",
+    "@tanstack/solid-router": "^2.0.0-beta.24",
+    "@tanstack/solid-start": "^2.0.0-beta.25",
+    "@tanstack/start-static-server-functions": "^1.167.18",
+    "solid-js": "catalog:",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^22.5.4",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.14",
+    "vite-plugin-solid": "^3.0.0-next.11",
+    "vite-tsconfig-paths": "^5.1.3"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "@hope-ui/components",
   "version": "0.0.0",
-  "description": "Headless, accessible components for hope-ui — import per-component subpaths (e.g. @hope-ui/components/button)",
+  "description": "Batteries-included, themed, accessible components for hope-ui — import per-component subpaths (e.g. @hope-ui/components/button)",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

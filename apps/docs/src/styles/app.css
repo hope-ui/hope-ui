@@ -1,0 +1,24 @@
+@import "tailwindcss" source("../");
+
+/* hope-ui's default preset: semantic-token @theme map, token values, and the
+   `@source "./recipes"` that emits the component utility classes. */
+@import "@hope-ui/presets/hope/tailwind.css";
+
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
+
+@layer base {
+  /* Tailwind v4 defaults the border color to `currentColor`; pin it to a neutral
+     so bordered elements (e.g. the nav) keep a subtle line without per-element utilities. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  html,
+  body {
+    @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
+  }
+}

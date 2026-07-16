@@ -1,7 +1,7 @@
 {
   "name": "@hope-ui/primitives",
   "version": "0.0.0",
-  "description": "Public behavior kernel for hope-ui: composable SolidJS primitives for rendering, focus, dismissal, presence, and ARIA wiring",
+  "description": "Internal behavior kernel for hope-ui (advanced/unstable escape hatch, not a stability-promised public API): composable SolidJS primitives for rendering, focus, dismissal, presence, and ARIA wiring",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,

@@ -2,12 +2,13 @@
   "name": "hope-ui",
   "version": "0.0.0",
   "private": true,
-  "description": "Headless, accessible component library for SolidJS",
+  "description": "Batteries-included, themed, accessible component library for SolidJS",
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@11.10.0",
   "scripts": {
     "prepare": "git config core.hooksPath .githooks || true",
+    "dev:docs": "pnpm --filter=@hope-ui/docs dev",
     "build": "turbo run build",
     "test": "vitest run --project=unit",
     "test:ssr": "vitest run --project=ssr",
@@ -21,7 +22,7 @@
     "build:storybook": "storybook build",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build --filter='./packages/*' && changeset publish"
   },
   "devEngines": {
     "packageManager": {

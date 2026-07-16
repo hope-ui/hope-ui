@@ -1,0 +1,23 @@
+{
+  "//": "Self-contained — deliberately does NOT extend ../../tsconfig.base.json. The base config carries `@hope-ui/* -> packages/*/src` paths (the 'always resolve to src in dev' invariant); inheriting them here would defeat the 'dist for build' decision, since `tsc --noEmit` (run inside `build`) must type against the published dist `.d.ts` a real consumer sees, resolved via node_modules -> package `exports`.",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "noEmit": true
+  }
+}

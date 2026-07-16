@@ -3,6 +3,12 @@ dist/
 .turbo/
 *.tsbuildinfo
 coverage/
+
+# TanStack Start / Nitro / Vite build artifacts (apps/docs)
+.output/
+.tanstack/
+.nitro/
+apps/docs/src/routeTree.gen.ts
 .DS_Store
 test-results/
 playwright-report/
