@@ -13,12 +13,14 @@ function hydrateFixture(
 ): { container: HTMLElement; dispose: () => void };
 ```
 
-- `serverHtml` — genuine server output (real `_hk` hydration keys). In a component's browser
-  test this is the committed `?raw` fixture; once the SSR generation bridge lands it is the
-  freshly-generated string.
-- `ui` — the client tree, **structurally identical** to the one that produced `serverHtml`
-  (hydration keys are a path through the component tree, so any structural difference — even a
-  component that renders nothing — shifts the keys and breaks hydration).
+- `serverHtml` — genuine server output (real `_hk` hydration keys), obtained from the
+  hydration-fixture bridge: `import ssr from "virtual:hydration-fixture?id=<subject>"` renders the
+  subject's `Tree` fresh in-process each run (no committed `.html`). See `vitest-hydration-bridge.ts`
+  and `docs/testing.md`.
+- `ui` — the client tree, **structurally identical** to the one that produced `serverHtml` — in
+  practice the *same* `Tree` from the subject's `<subject>.ssr-entry.tsx`, which is exactly what
+  guarantees it (hydration keys are a path through the component tree, so any structural difference
+  — even a component that renders nothing — shifts the keys and breaks hydration).
 
 Returns `{ container, dispose }`. Drive interaction or run `expectNoA11yViolations(container)`
 against the hydrated tree, then call `dispose()` to unmount, remove the container, and clear
@@ -28,13 +30,10 @@ the `_$HY` bootstrap.
 
 ```ts
 import { expectNoA11yViolations, hydrateFixture } from "@hope-ui/internal-test-utils";
-import ssrFixture from "./__fixtures__/button-ssr.html?raw";
+import { Tree } from "./button.ssr-entry";
+import ssrFixture from "virtual:hydration-fixture?id=button";
 
-const { container, dispose } = hydrateFixture(ssrFixture, () => (
-  <Themed>
-    <Button>Click me</Button>
-  </Themed>
-));
+const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
 // reuse + no-console-output are already asserted by the helper.
 await expectNoA11yViolations(container);
@@ -75,5 +74,8 @@ scanning the container for `[_hk]` attributes.
 
 Hydration is two module-resolution environments: SSR needs the **server** builds of `solid-js`
 and `@solidjs/web`, the client hydrate needs the **client** builds. They cannot coexist in one
-Vitest project (and jsdom is deliberately not used), so the server HTML is produced elsewhere
-and handed in as a string — see `docs/testing.md`.
+Vitest project (and jsdom is deliberately not used), so the server HTML is produced by the
+generation bridge — a nested Vite SSR server, configured like the `ssr` project, that the
+`browser` project calls through the `virtual:hydration-fixture` module — and handed in as a
+string. It is always regenerated, never cached or committed, so it can never go stale. See
+`docs/testing.md`.

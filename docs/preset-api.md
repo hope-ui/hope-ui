@@ -472,8 +472,8 @@ coverage-parity (pure CSS/recipe map). Gate with `pnpm check:coverage-parity`, `
   pass `loaderPlacement: isLoading() ? effectivePlacement() : undefined` to the recipe.
 - **DoD:** update `recipes/__tests__/button.test.ts` + `docs/usage/theming/recipes/button.md`; update
   hope's `recipes/__tests__/button.test.ts`; update Button unit/browser tests + `Button.stories.tsx`
-  (loading stories). `button-ssr.html` should be **byte-identical** (non-loading render unaffected) —
-  regenerate with `-u` only if it actually changed.
+  (loading stories). Button's SSR **inline snapshot** should be **byte-identical** (non-loading render
+  unaffected) — regenerate with `-u` only if it actually changed.
 
 ### Phase 2 — Presets module (pure, no DOM)
 - Add `presets/presets.ts` (`definePreset`, `isPreset`, `Preset`, `PresetConfig`, extractors,
@@ -494,10 +494,12 @@ coverage-parity (pure CSS/recipe map). Gate with `pnpm check:coverage-parity`, `
 - **DoD:**
   - Unit `theme-context.test.tsx`: `useRecipe`/`useDefaults`/`useSlots`, missing-provider copy.
   - `theme-context.ssr.test.tsx`: keep no-token case; **add** a token-preset case asserting the `<style>`
-    text and generating `__tests__/__fixtures__/theme-context-tokens-ssr.html` via `toMatchFileSnapshot`.
-  - `theme-context.browser.test.tsx`: **hydrate** the token fixture (`?raw` + `hydrate`); assert no
-    `console.error`/`warn`, single `<style>`, same-node reuse, `expectNoA11yViolations` (constraint-#1
-    byte-stability proof — voluntary for theming, required by spec).
+    text and `toMatchInlineSnapshot()`ing the render (add a token-preset render entry + `HYDRATION_ENTRIES`
+    id if it will be hydrated — no committed fixture).
+  - `theme-context.browser.test.tsx`: **hydrate** the token render via
+    `hydrateFixture(<virtual:hydration-fixture?id=…>, () => <Tree/>)`; assert no `console.error`/`warn`,
+    single `<style>`, same-node reuse, `expectNoA11yViolations` (constraint-#1 byte-stability proof —
+    voluntary for theming, required by spec).
   - Update `docs/usage/theming/theme-context/theme-context.md`.
 
 ### Phase 4 — `hope` becomes a preset

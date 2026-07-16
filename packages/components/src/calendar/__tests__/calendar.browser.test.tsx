@@ -1,3 +1,4 @@
+import ssrFixture from "virtual:hydration-fixture?id=calendar";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { I18nProvider } from "@hope-ui/primitives/i18n";
 import { CalendarDate } from "@internationalized/date";
@@ -5,27 +6,11 @@ import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { Calendar } from "../calendar";
-import ssrFixture from "./__fixtures__/calendar-ssr.html?raw";
-
-/**
- * Structurally identical to `calendar.ssr.test.tsx`'s `FullCalendar`, which produces the fixture the
- * hydration tests below consume. Hydration keys are allocated by walking the tree, so any structural
- * change here must be mirrored there (and the fixture regenerated) or hydration fails.
- */
-function FullCalendar() {
-  return (
-    <I18nProvider locale="en-US">
-      <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC">
-        <Calendar.Header>
-          <Calendar.PrevButton aria-label="Previous month">‹</Calendar.PrevButton>
-          <Calendar.Heading />
-          <Calendar.NextButton aria-label="Next month">›</Calendar.NextButton>
-        </Calendar.Header>
-        <Calendar.Grid />
-      </Calendar.Root>
-    </I18nProvider>
-  );
-}
+// `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
+// inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
+// committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
+// there is no second hand-kept-identical copy to drift.
+import { Tree } from "./calendar.ssr-entry";
 
 // Queries are scoped to the mount's own container (the calendar renders 35+ buttons, so a
 // document-wide `page.getByRole` with its default substring name-match is hopelessly ambiguous).
@@ -37,7 +22,7 @@ const chromeButton = (root: ParentNode, label: string) =>
 
 describe("Calendar", () => {
   it("renders the month grid with the heading label and weekday headers", async () => {
-    const { container, dispose } = mount(() => <FullCalendar />);
+    const { container, dispose } = mount(() => <Tree />);
     expect(heading(container).textContent).toBe("January 2020");
     expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
     expect(dayButton(container, "Wednesday, January 15, 2020")).not.toBeNull();
@@ -45,7 +30,7 @@ describe("Calendar", () => {
   });
 
   it("roves focus with the arrow keys", async () => {
-    const { container, dispose } = mount(() => <FullCalendar />);
+    const { container, dispose } = mount(() => <Tree />);
     dayButton(container, "Wednesday, January 15, 2020").focus();
     await expect.element(dayButton(container, "Wednesday, January 15, 2020")).toHaveFocus();
 
@@ -81,7 +66,7 @@ describe("Calendar", () => {
   });
 
   it("pages months with the next/prev buttons", async () => {
-    const { container, dispose } = mount(() => <FullCalendar />);
+    const { container, dispose } = mount(() => <Tree />);
     chromeButton(container, "Next month").click();
     await vi.waitFor(() => expect(heading(container).textContent).toBe("February 2020"));
     chromeButton(container, "Previous month").click();
@@ -90,7 +75,7 @@ describe("Calendar", () => {
   });
 
   it("drills up to the year view when the heading is clicked", async () => {
-    const { container, dispose } = mount(() => <FullCalendar />);
+    const { container, dispose } = mount(() => <Tree />);
     heading(container).click();
     // Year view: the heading shows the year and the grid shows month cells.
     await vi.waitFor(() => expect(heading(container).textContent).toBe("2020"));
@@ -155,7 +140,7 @@ describe("Calendar", () => {
   });
 
   it("has no baseline accessibility violations", async () => {
-    const { container, dispose } = mount(() => <FullCalendar />);
+    const { container, dispose } = mount(() => <Tree />);
     expect(heading(container).textContent).toBe("January 2020");
     await expectNoA11yViolations(container);
     dispose();
@@ -163,17 +148,18 @@ describe("Calendar", () => {
 });
 
 describe("Calendar hydration", () => {
-  // `ssrFixture` is genuine server output (`calendar.ssr.test.tsx` asserts it byte-for-byte).
-  // `FullCalendar` must stay structurally identical to the ssr test's — hydration keys are a path
-  // through the tree. `hydrateFixture` proves hydration was silent and reused *every* server node
-  // (the whole grid), not just the `<table>`.
+  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` server-side
+  // and `calendar.ssr.test.tsx` inline-snapshots that same render, so they agree byte-for-byte.
+  // Hydrating with the shared `Tree` keeps the client structurally identical to the server (keys are
+  // a path through the tree). `hydrateFixture` proves hydration was silent and reused *every* server
+  // node (the whole grid), not just the `<table>`.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
-    const { dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
+    const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
   });
 
   it("is interactive after hydrating", async () => {
-    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     const headingButton = container.querySelector<HTMLElement>("button[id]") as HTMLElement;
     (
@@ -185,7 +171,7 @@ describe("Calendar hydration", () => {
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullCalendar />);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     await expectNoA11yViolations(container);
     dispose();

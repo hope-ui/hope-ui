@@ -214,10 +214,11 @@ server rather than degrading gracefully, so this is a manual `isServer` guard ra
 a primitive's own concern. Everything else renders normally during SSR (`Trigger`'s
 `aria-expanded` reflects the initial `open`/`defaultOpen` state). `Dialog.ssr.test.tsx`
 (the `ssr` project, `renderToStringAsync` under the real server build of `@solidjs/web` — not
-simulated) pins the server output byte-for-byte against `__fixtures__/dialog-ssr.html`, and
-`Dialog.browser.test.tsx` (the `browser` project) hydrates that fixture and asserts a clean,
-in-place round-trip: no mismatch, the server node reused rather than re-rendered, and no a11y
-violations.
+simulated) pins the server output byte-for-byte with an inline snapshot of the shared `Tree`
+(`dialog.ssr-entry.tsx`), and `Dialog.browser.test.tsx` (the `browser` project) hydrates that same
+`Tree` against genuine server HTML served fresh by the hydration-fixture bridge (no committed
+fixture) and asserts a clean, in-place round-trip: no mismatch, the server node reused rather than
+re-rendered, and no a11y violations. See `docs/testing.md`.
 
 ## Example
 

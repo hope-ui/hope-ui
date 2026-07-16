@@ -3,13 +3,15 @@ import { ThemeProvider } from "@hope-ui/theming";
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
 import { Button } from "../button";
+import { Tree } from "./button.ssr-entry";
 
 // Button reads its styling through `useSlots`/`useRecipe`, so every render — SSR and hydration
 // alike — must sit under a `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are
 // empty (its values live in CSS), so the provider takes the zero-DOM branch and emits no `<style>`,
-// leaving the fixture byte-identical. Wrapping a subtree in the provider also shifts its hydration
-// keys (`_hk`), so this tree and `button.browser.test.tsx`'s hydration tree are structurally
-// identical, `<ThemeProvider>` included. See docs/theming.md "SSR / hydration".
+// leaving the output byte-identical. Wrapping a subtree in the provider also shifts its hydration
+// keys (`_hk`), so this render and the one `button.browser.test.tsx` hydrates must be structurally
+// identical, `<ThemeProvider>` included — which is enforced by construction here: both import the
+// same `Tree` from `button.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
 
 describe("Button SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {
@@ -85,20 +87,21 @@ describe("Button SSR", () => {
     expect(html).not.toMatch(/\sdisabled(?:=|\s|>)/);
   });
 
-  it("matches the committed SSR fixture byte for byte", async () => {
-    // Half of the hydration round-trip, and only the `ssr` project can run it: this is the one
-    // place `solid-js` *and* `@solidjs/web` both resolve to their server builds, so this is
-    // genuine server output, hydration keys (`_hk`) and all. `Button.browser.test.tsx` hydrates
-    // the same file — under the same `<ThemeProvider>` — in a real browser. See docs/testing.md.
+  it("matches its server output byte for byte", async () => {
+    // The byte-exact half of the hydration round-trip, and only the `ssr` project can produce it:
+    // this is the one place `solid-js` *and* `@solidjs/web` both resolve to their server builds, so
+    // this is genuine server output, hydration keys (`_hk`) and all. Byte-exact on purpose —
+    // `hydrate()`'s `gatherHydratable()` matches on `_hk`, so "contains the right text" is not
+    // enough.
     //
-    // `toMatchFileSnapshot`, so the fixture is *generated* by a real server render rather than
-    // hand-written — nobody should ever be guessing an `_hk` key. Update it deliberately with
-    // `pnpm exec vitest run --project=ssr -u`.
-    const html = await renderToStringAsync(() => (
-      <ThemeProvider preset={hope}>
-        <Button>Click me</Button>
-      </ThemeProvider>
-    ));
-    await expect(html).toMatchFileSnapshot("./__fixtures__/button-ssr.html");
+    // An **inline** snapshot, not a committed `.html` file: the regression guard lives in this
+    // `.tsx`, so a hydration subject adds zero committed fixture files at any scale. The exact same
+    // `<Tree />` is rendered fresh into the `browser` project by the hydration-fixture bridge (see
+    // `vitest-hydration-bridge.ts`), so the snapshot below and what `button.browser.test.tsx`
+    // hydrates cannot drift. Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
+    const html = await renderToStringAsync(() => <Tree />);
+    expect(html).toMatchInlineSnapshot(
+      `"<button _hk=00e0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium rounded-sm cursor-pointer select-none border bg-clip-padding outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus/50 active:translate-y-px data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:border-transparent data-disabled:text-foreground-disabled data-disabled:opacity-90 h-8 gap-1.5 text-sm px-3 has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle-outline shadow-xs hover:bg-neutral-soft data-disabled:bg-disabled" data-slot="button" ><span _hk=004 data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
+    );
   });
 });

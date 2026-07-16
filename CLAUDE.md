@@ -136,14 +136,17 @@ Also required:
   deleting it; fix the component and rename the story. Current example: Dialog's `Modal with an
   unpositioned Popup (content is unclickable — by design)`, a documented consequence of the
   pointer-blocking `ModalBackdrop`, not a defect.
-- Hydration cooperates through a committed fixture
-  `src/<component>/__tests__/__fixtures__/<component>-ssr.html`
-  (genuine server output): the `ssr` test asserts it byte-for-byte, the `browser` test hydrates it
-  and must assert no `console.error`/`console.warn`, exactly one of the element, and that the
-  surviving node **is the same object** as the server's (a silent client-render fallback otherwise
-  looks identical to success). The `ssr` and `browser` files must define **structurally identical
-  trees** — hydration keys (`_hk`) are a path through the component tree, so inserting a component
-  before `Dialog.Trigger` (even one that renders nothing) shifts the trigger's key.
+- Hydration cooperates through a shared **render entry** `src/<component>/__tests__/<component>.ssr-entry.tsx`
+  (exports the `Tree` it renders) — **no committed fixture file**. The `ssr` test renders `Tree` and
+  `toMatchInlineSnapshot()`s the bytes; the `browser` test hydrates that same `Tree` (via
+  `hydrateFixture`) against genuine server HTML served fresh, in-process, by the hydration-fixture
+  bridge (`import ssr from "virtual:hydration-fixture?id=<component>"` — see `vitest-hydration-bridge.ts`).
+  `hydrateFixture` asserts no `console.error`/`console.warn`, no element added or dropped, and that
+  every surviving node **is the same object** as the server's (a silent client-render fallback
+  otherwise looks identical to success). Sharing one `Tree` is what keeps the `ssr` and `browser`
+  halves **structurally identical** — hydration keys (`_hk`) are a path through the component tree, so
+  a component inserted before `Dialog.Trigger` (even one that renders nothing) shifts the trigger's
+  key. Adding a component adds **zero** committed fixture files at any scale. See `docs/testing.md`.
 
 ## Leaf source folders stay flat-free
 

@@ -58,14 +58,19 @@ one module resolution each: `unit` (node, no DOM, client builds, pure logic), `s
 `browser` (real Chromium, client builds, DOM/focus/pointer/axe/hydration). The file
 suffix picks the project: `Foo.test.tsx`, `Foo.ssr.test.tsx`, `Foo.browser.test.tsx`.
 
-Hydration is two environments by definition, so the two projects cooperate through a
-committed fixture: `src/<component>/__tests__/__fixtures__/<component>-ssr.html` is genuine
-server output, asserted byte-for-byte by `Foo.ssr.test.tsx` and hydrated by
-`Foo.browser.test.tsx` (both under the component's `__tests__/`). Corrupt the fixture and both halves go red. The browser half must
-assert no `console.error`/`console.warn`, exactly one of the element, and that the
-surviving node **is the same object** as the server's — a silent fallback to a client
-render otherwise looks identical to success.
+Hydration is two environments by definition, and the two halves are decoupled so neither needs
+a committed file. Each subject has a **render entry**,
+`src/<component>/__tests__/<component>.ssr-entry.tsx`, exporting the `Tree` it renders. The `ssr`
+test `toMatchInlineSnapshot()`s that render (byte-exact regression, living inside the `.tsx`), and
+the `browser` test hydrates the *same* `Tree` against genuine server HTML served fresh by the
+hydration-fixture bridge — `import ssr from "virtual:hydration-fixture?id=<component>"`, rendered
+in-process by a nested SSR server (see `vitest-hydration-bridge.ts` and `docs/testing.md`). Sharing
+one `Tree` keeps the two halves structurally identical by construction, and there are **zero
+committed fixture files at any component count**. The browser half (via `hydrateFixture` from
+`@hope-ui/internal-test-utils`) asserts no `console.error`/`console.warn`, no element added or
+dropped, and that every server node **is the same object** as before — a silent fallback to a
+client render otherwise looks identical to success.
 
-Hydration keys (`_hk`) are a path through the component tree, so the `ssr` and `browser`
-test files must define structurally identical trees. Inserting a component before
-`Dialog.Trigger` — even one that renders nothing — shifts the trigger's key.
+Hydration keys (`_hk`) are a path through the component tree, so a component inserted before
+`Dialog.Trigger` — even one that renders nothing — shifts the trigger's key. The shared `Tree` is
+what makes the server render and the client hydrate impossible to drift apart.

@@ -1,40 +1,19 @@
+import ssrFixture from "virtual:hydration-fixture?id=theme-context";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import { definePreset } from "../../presets";
-import type { RecipeRegistry } from "../../recipes/registry";
-import type { SlotRecipeFn } from "../../recipes/slot-recipe";
-import { ThemeProvider, useRecipe } from "../theme-context";
-import ssrFixture from "./__fixtures__/theme-context-ssr.html?raw";
+import { Tree } from "./theme-context.ssr-entry";
 
-// Synthetic single-"root"-slot recipe, cast into the registry — see the ssr test for the rationale.
-// Proves the same context round-trip on the real client runtime, plus that the zero-DOM provider is
-// transparent to hydration (the child hydrates in place, no mismatch).
-type DemoVariants = { size?: "sm" | "md" };
-const demo: SlotRecipeFn<DemoVariants> = (props) => ({
-  root: () => `demo demo--size_${props?.size ?? "md"}`,
-});
-const theme = { demo } as unknown as RecipeRegistry;
-
-// Identical to the ssr test's preset, so the tree hydrated here matches the fixture byte-for-byte.
-const preset = definePreset(theme);
-
-function Probe() {
-  const recipe = useRecipe("demo" as keyof RecipeRegistry) as SlotRecipeFn<DemoVariants>;
-  return (
-    <button type="button" class={recipe({ size: "sm" }).root()}>
-      go
-    </button>
-  );
-}
+// `Tree` (from `theme-context.ssr-entry.tsx`) is the single source of truth: a `<ThemeProvider>`
+// wrapping a `Probe` that reads a synthetic recipe. `theme-context.ssr.test.tsx` inline-snapshots its
+// server render, and the hydration-fixture bridge renders it fresh into this project (no committed
+// `.html`), so the hydration input and the client tree cannot diverge. These tests prove the same
+// context round-trip on the real client runtime, plus that the zero-DOM provider is transparent to
+// hydration (the child hydrates in place, no mismatch).
 
 describe("ThemeProvider + useRecipe on the client", () => {
   it("client-reads the injected recipe and applies its class to the DOM, injecting no <style>", async () => {
-    const { container, dispose } = mount(() => (
-      <ThemeProvider preset={preset}>
-        <Probe />
-      </ThemeProvider>
-    ));
+    const { container, dispose } = mount(() => <Tree />);
 
     const button = page.getByRole("button", { name: "go" });
     await expect.element(button).toBeInTheDocument();
@@ -49,17 +28,12 @@ describe("ThemeProvider + useRecipe on the client", () => {
 
 describe("ThemeProvider zero-DOM hydration", () => {
   it("hydrates the server HTML in place, reusing the server node without a mismatch", async () => {
-    // `ssrFixture` is genuine server output — the ssr test asserts it byte-for-byte against a real
-    // `renderToStringAsync`. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
-    // `hydrateFixture` hydrates the fixture rather than re-rendering it. The zero-DOM provider
-    // contributes no node, so the fixture is exactly the probe `<button>`, and the tree hydrated here
-    // must stay structurally identical to the ssr test's. `hydrateFixture` proves hydration was silent
-    // and reused the server node in place.
-    const { container, dispose } = hydrateFixture(ssrFixture, () => (
-      <ThemeProvider preset={preset}>
-        <Probe />
-      </ThemeProvider>
-    ));
+    // `ssrFixture` is genuine server output — the ssr test inline-snapshots the same `<Tree />` render
+    // the bridge produces here. On the client `solid-js`/`@solidjs/web` resolve to their client builds,
+    // so `hydrateFixture` hydrates that HTML rather than re-rendering it. The zero-DOM provider
+    // contributes no node, so the fixture is exactly the probe `<button>`. `hydrateFixture` proves
+    // hydration was silent and reused the server node in place.
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
     expect(container.querySelector("style")).toBeNull();

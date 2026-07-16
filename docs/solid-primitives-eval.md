@@ -45,8 +45,10 @@ Measured directly with `controlled-signal` in `createDialog` (all four combinati
 The client's runtime `hydratedCreateSignal` always consumes the id. The **server** only emits the
 matching id when the code is compiled by hope-ui's Solid pipeline; an untransformed dependency
 skips it. So the packaged dep produces `1010` on the server but the client asks for `2010` — a
-divergence **no committed fixture can reconcile** (proven both ways: `fixture=2010` passes hydration
-but fails the byte-for-byte SSR assertion at `Received: 1010`).
+divergence **no fixture can reconcile** (proven both ways: a client tree expecting `2010` passes
+hydration but fails the byte-for-byte SSR assertion at `Received: 1010`). This holds however the
+server HTML is produced — the generation bridge renders through the same server pipeline, so it
+reproduces the `1010` the inline SSR snapshot pins.
 
 It is **not yet certain** whether this is a general property of our SSR harness (manual server-build
 alias + selective `inline`, not a full SolidStart graph) or something a real SolidStart build would

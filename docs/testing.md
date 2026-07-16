@@ -80,64 +80,93 @@ the browser, returning undefined"* and returns `undefined`.
 
 ## Writing a hydration test
 
-Hydration is, by definition, two environments: the server renders, the browser takes over the
-DOM it produced. No single project can do both. They cooperate through a **committed fixture**:
+Hydration is, by definition, two environments: the server renders, the browser takes over the DOM
+it produced. No single project can do both. But **neither half needs a committed file**. A
+committed `.html` fixture used to bundle two independent guarantees; split them and each gets a
+zero-file home, so a hydration subject adds no committed fixtures at any component count:
 
+| Guarantee | Where it lives now |
+|---|---|
+| **Hydration correctness** — server HTML hydrates with node reuse, no mismatch, `_hk` agreement | the `browser` test hydrates HTML from an always-fresh **generation bridge** |
+| **Byte-exact SSR regression** — a reviewable guard against `_hk`-affecting drift | `toMatchInlineSnapshot()` in the `ssr` test — inside the `.tsx`, zero files |
+
+Why no committed file, and why always-fresh: at 40+ components, one auto-generated `.html` per
+subject churns on every `_hk`-affecting structural change until the diffs stop being reviewed
+(snapshot-rot). A persisted or gitignored *cache* would be worse — a stale one is a silent
+wrong-green. So the server HTML is regenerated in-process every run.
+
+### One tree, three consumers: the render entry
+
+Each subject has a **render entry** beside its tests, `__tests__/<subject>.ssr-entry.tsx`,
+exporting the `Tree` it renders plus a `renderFixture()`:
+
+```ts
+// button.ssr-entry.tsx
+export function Tree() {
+  return <ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>;
+}
+export function renderFixture() {
+  return renderToStringAsync(() => <Tree />);
+}
 ```
-src/dialog/__tests__/__fixtures__/dialog-ssr.html   ← genuine server output, checked in
 
-src/dialog/__tests__/dialog.ssr.test.tsx      toMatchFileSnapshot(fixture)  ← generates, guards
-src/dialog/__tests__/dialog.browser.test.tsx  hydrate(<Dialog/>, containerWithFixture)
-```
+`Tree` is the single source of truth. Three consumers share it, so the server render and the client
+hydrate **cannot** structurally diverge (hydration keys are a path through the tree — a shape
+mismatch fails hydration):
 
-Corrupt the fixture and **both** halves go red: the `ssr` one because the server no longer
-produces it, the `browser` one because there is nothing to hydrate against.
+- `<subject>.ssr.test.tsx` renders `Tree` and `toMatchInlineSnapshot()`s the bytes;
+- `<subject>.browser.test.tsx` passes `Tree` to `hydrateFixture` as the client tree;
+- the **generation bridge** renders `Tree` server-side to produce the HTML the browser test hydrates.
+
+That is a strict improvement on the old rule of two hand-kept-identical trees each carrying a
+"structurally identical" comment.
+
+### The generation bridge
+
+`vitest-hydration-bridge.ts` (wired into the `browser` project in `vitest.config.ts`) serves a
+virtual module: `import ssr from "virtual:hydration-fixture?id=<subject>"` resolves to genuine
+server HTML, rendered **fresh in-process** each run. It is vite-inside-vite — the plugin runs in the
+`browser` project (client builds) yet spins up one nested Vite **SSR** server configured exactly
+like the `ssr` project (server-build aliases, `generate: "ssr"`, `ssr.noExternal`), `ssrLoadModule`s
+the subject's entry, and calls `renderFixture()`. Same config in, so its bytes equal what the `ssr`
+project's inline snapshot pins — the two halves can't drift.
+
+### `hydrateFixture` asserts the whole contract
+
+`hydrateFixture(serverHtml, ui)` (`@hope-ui/internal-test-utils`) injects the server HTML into a
+document-attached container, hydrates `ui` against it in real Chromium, and asserts — because a
+silent fallback to a client render otherwise looks identical to success:
+
+1. no `console.error` / `console.warn` (mismatch warnings land there),
+2. no element added or dropped (a fallback duplicates or replaces nodes),
+3. every server node is reused as the **same object**, in document order.
+
+It returns `{ container, dispose }` for follow-up interaction or `expectNoA11yViolations`. It also
+hand-rolls the `globalThis._$HY` bootstrap `hydrate()` reads (a real app gets it from
+`generateHydrationScript()`, a no-op in the client build); only `.done`/`.completed`/`.events` are
+read — `.r` is the resource registry, not the element registry, which `hydrate()` builds itself by
+scanning the container for `[_hk]`.
 
 ### Adding one for a new component
 
-A component's test files live in its `__tests__/` folder (`src/foo/__tests__/`), with the fixture
-under `__tests__/__fixtures__/`. The relative paths below are written from a test inside
-`__tests__/`, so `./__fixtures__/…` resolves to that sibling folder.
+1. Write `__tests__/<subject>.ssr-entry.tsx` exporting `Tree` + `renderFixture`. **Never hand-write
+   `_hk` markup** — a guessed key passes against markup no server would send.
+2. Register the entry in `HYDRATION_ENTRIES` in `vitest-hydration-bridge.ts`, and (per package) add
+   the `virtual:hydration-fixture?id=*` ambient type under `types/` if not present.
+3. In `<subject>.ssr.test.tsx`: `const html = await renderToStringAsync(() => <Tree />); expect(html).toMatchInlineSnapshot();`
+   then `pnpm exec vitest run --project=ssr -u` to fill the snapshot. Read it, sanity-check it.
+4. In `<subject>.browser.test.tsx`: `import ssr from "virtual:hydration-fixture?id=<subject>"` and
+   `hydrateFixture(ssr, () => <Tree />)`.
 
-**Never hand-write a fixture.** `_hk` keys are a path through the component tree; guessing one
-is how you get a test that passes against markup no server would ever send.
+A snapshot mismatch fails the test, and under `CI=true` fails rather than rewriting, so stale bytes
+can't pass CI. `check:coverage-parity` still requires a real `renderToStringAsync()` in the `ssr`
+test and a real `hydrate()` / `hydrateFixture()` in the `browser` test, on the same "not in a
+comment, not in an `it.skip`" terms — deleting a hydration suite must not stay green (Dialog's sat
+`it.skip`'d for months while `CLAUDE.md` claimed it had one).
 
-1. In `Foo.ssr.test.tsx`, render and snapshot to the fixture path:
-   ```ts
-   const html = await renderToStringAsync(() => <FullFoo />);
-   await expect(html).toMatchFileSnapshot("./__fixtures__/foo-ssr.html");
-   ```
-2. Run `pnpm test:ssr`. The file appears, written from a real server render. Read it, sanity
-   check it, commit it.
-3. In `Foo.browser.test.tsx`, `import ssrFixture from "./__fixtures__/foo-ssr.html?raw"` and
-   `hydrate()` against it.
-
-`toMatchFileSnapshot` fails on any drift, and under `CI=true` fails rather than writing — so a
-missing or stale fixture can never pass CI. Update one deliberately with
-`pnpm exec vitest run --project=ssr -u`.
-
-`check:coverage-parity` requires a real `hydrate()` call in every component's
-`Foo.browser.test.tsx`, on the same "not in a comment, not in an `it.skip`" terms as the SSR
-half. Without that rule, deleting a component's entire hydration suite kept CI green — which is
-exactly how Dialog's stayed skipped for months while `CLAUDE.md` claimed it had one.
-
-Three things the browser half must assert, because a silent fallback to a client render looks
-identical to success otherwise:
-
-1. no `console.error` / `console.warn` (mismatch warnings land there),
-2. exactly one of the element (a fallback leaves two),
-3. the surviving node is *the same object* as the server's node.
-
-`hydrate()` also reads `globalThis._$HY`, which a real app gets from
-`generateHydrationScript()` — a no-op in the client build. Test files hand-roll it. Only
-`.done`, `.completed` and `.events` are read; `.r` is the resource registry, not the element
-registry. `hydrate()` builds the element registry itself by scanning the container for `[_hk]`
-attributes.
-
-**Hydration keys are a path through the component tree.** Inserting a component before
-`Dialog.Trigger` — even one that renders nothing — shifts the trigger's key. The `ssr` and
-`browser` test files therefore define structurally identical component trees, and both say so
-in a comment.
+**Hydration keys are a path through the component tree.** Prepending anything before a subtree —
+even a component that renders nothing — shifts its key and breaks hydration. The `hydrateFixture`
+suite pins that failure directly: a prepended element makes `hydrate()` throw `Hydration Mismatch`.
 
 ## `mount()` fails on Solid reactivity diagnostics
 

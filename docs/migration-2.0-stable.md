@@ -154,9 +154,10 @@ its client builds (its reactivity tests need real effects and deferred writes) a
 `@solidjs/web` alias entirely**, because the SSR tests that needed it moved out. Net: one weird
 alias removed, three projects that each mean one thing. See `docs/testing.md`.
 
-Both `Button` and `Dialog` now have real round-trips against committed fixtures
-(`src/*/__tests__/__fixtures__/*-ssr.html`), asserted byte-for-byte by the `ssr` project and
-hydrated by the `browser` project. Corrupt a fixture and both halves go red.
+Both `Button` and `Dialog` now have real round-trips with **no committed fixtures**: the `ssr`
+project inline-snapshots the shared `Tree` (`*.ssr-entry.tsx`) byte-for-byte, and the `browser`
+project hydrates that same `Tree` against genuine server HTML rendered fresh by the
+hydration-fixture bridge (`virtual:hydration-fixture?id=<subject>`). See `docs/testing.md`.
 
 ### Still worth re-checking at stable
 

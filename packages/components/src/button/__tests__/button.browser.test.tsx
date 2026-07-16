@@ -1,3 +1,4 @@
+import ssrFixture from "virtual:hydration-fixture?id=button";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
@@ -5,7 +6,10 @@ import type { JSX } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Button, type ButtonProps } from "../button";
-import ssrFixture from "./__fixtures__/button-ssr.html?raw";
+// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
+// `.html`). `Tree` is the same tree `button.ssr.test.tsx` inline-snapshots and the bridge renders —
+// one source of truth, so the hydration input and the client tree cannot structurally diverge.
+import { Tree } from "./button.ssr-entry";
 
 // Button reads styling through `useSlots`/`useRecipe`, so every render sits under a
 // `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are empty (its values live in
@@ -405,19 +409,16 @@ describe("Button — slotClasses", () => {
 });
 
 describe("Button hydration", () => {
-  // `ssrFixture` is genuine server output — `Button.ssr.test.tsx` asserts it byte-for-byte against a
-  // real `renderToStringAsync` in the `ssr` project. Here `solid-js`/`@solidjs/web` resolve to their
-  // client builds, so `hydrateFixture` hydrates the fixture rather than re-rendering it (the client
-  // build's `renderToStringAsync` returns `undefined`). The tree — `<ThemeProvider>` and all — must
-  // stay structurally identical to the one the ssr test renders: hydration keys are a path through
-  // the component tree. `hope` authors its palette in CSS and the provider is zero-DOM, so the fixture
-  // is just the `<button>`. `hydrateFixture` proves hydration was silent and reused every server node.
+  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
+  // nested SSR server (server solid builds) and `button.ssr.test.tsx` inline-snapshots that same
+  // render, so the two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client
+  // builds, so `hydrateFixture` hydrates that HTML rather than re-rendering it (the client build's
+  // `renderToStringAsync` returns `undefined`). The client tree must stay structurally identical to
+  // the server's — hydration keys are a path through the component tree — which is guaranteed by
+  // reusing the same `Tree`. `hope` authors its palette in CSS and the provider is zero-DOM, so the
+  // fixture is just the `<button>`. `hydrateFixture` proves hydration was silent and reused every node.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
-    const { container, dispose } = hydrateFixture(ssrFixture, () => (
-      <Themed>
-        <Button>Click me</Button>
-      </Themed>
-    ));
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     // The zero-DOM provider injects no `<style>` — not something the reuse check covers.
     expect(container.querySelector("style")).toBeNull();
@@ -427,11 +428,9 @@ describe("Button hydration", () => {
 
   it("leaves the hydrated button interactive", async () => {
     const onClick = vi.fn();
-    const { dispose } = hydrateFixture(ssrFixture, () => (
-      <Themed>
-        <Button onClick={onClick}>Click me</Button>
-      </Themed>
-    ));
+    // `onClick` adds an event binding, not an element or a server attribute, so the tree stays
+    // structurally (and byte-) identical to the fixture — hydration still reuses every node.
+    const { dispose } = hydrateFixture(ssrFixture, () => <Tree onClick={onClick} />);
 
     await page.getByRole("button", { name: "Click me" }).click();
     expect(onClick).toHaveBeenCalledOnce();
@@ -440,11 +439,7 @@ describe("Button hydration", () => {
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const { container, dispose } = hydrateFixture(ssrFixture, () => (
-      <Themed>
-        <Button>Click me</Button>
-      </Themed>
-    ));
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 
     await expectNoA11yViolations(container);
     dispose();

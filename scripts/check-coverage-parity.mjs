@@ -261,11 +261,22 @@ function isDocExemptSource(pkg, path) {
   return pkg === "primitives" && /[/\\]src[/\\]internal[/\\]/.test(path);
 }
 
+/** Whether a path lives inside a `__tests__/` subtree (tests + their support modules + fixtures). */
+const underTests = (p) => /[/\\]__tests__[/\\]/.test(p);
+
 function isSourceFile(path) {
   if (isTestFile(path) || isStoryFile(path)) {
     return false;
   }
   if (path.endsWith(".d.ts")) {
+    return false;
+  }
+  // A non-test `.ts(x)` under `__tests__/` (e.g. a `*.ssr-entry.tsx` render entry shared by a
+  // component's ssr + browser tests and the hydration-fixture bridge) is test *support*, not
+  // shippable source: tsdown only builds the `hope.entries` files, so nothing here ever reaches
+  // `dist/`. Requiring it to carry its own test/doc/story/SSR/hydration set would be nonsense — it
+  // has no public API. The flat-free rule below still keeps such files inside `__tests__/`.
+  if (underTests(path)) {
     return false;
   }
   return SOURCE_EXTENSIONS.has(extname(path));
@@ -404,7 +415,6 @@ for (const pkg of packageDirs) {
 // creep back. (`__screenshots__/` is gitignored and only ever regenerates next to a test file, so
 // the flat-test rule already covers it — no separate screenshot check is needed.)
 const NO_FLAT_SPRAWL = new Set(["primitives", "components", "theming", "internal-test-utils"]);
-const underTests = (p) => /[/\\]__tests__[/\\]/.test(p);
 const sprawl = [];
 for (const pkg of packageDirs) {
   if (!NO_FLAT_SPRAWL.has(pkg)) {

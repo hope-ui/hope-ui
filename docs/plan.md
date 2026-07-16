@@ -59,9 +59,9 @@ builds), `ssr` (node, **server** builds of both `solid-js` and `@solidjs/web`), 
 Chromium). The old two-project layout had SSR tests squatting in the `unit` project behind a
 half-complete alias, which rendered "server" HTML using the *browser* `createUniqueId`. That
 hybrid — not module instances, not the `_$HY` bootstrap — is what made Dialog's hydration test
-impossible. Both `Button` and `Dialog` now have real SSR → hydrate round-trips against
-committed fixtures; nothing is `it.skip`'d. See `docs/testing.md`, and
-`docs/migration-2.0-stable.md` §4 for the two disproved theories.
+impossible. Both `Button` and `Dialog` now have real SSR → hydrate round-trips (inline SSR
+snapshots + an always-fresh generation bridge, no committed fixtures); nothing is `it.skip`'d.
+See `docs/testing.md`, and `docs/migration-2.0-stable.md` §4 for the two disproved theories.
 
 Three recorded "facts" were corrected against measurement rather than inherited: the SSR
 rationale below, Dialog's hydration root cause, and the claim that sibling effect cleanups are
@@ -343,9 +343,9 @@ Concrete rules every primitive/component must follow:
   warning with an actual `renderToStringAsync` + `hydrate` round-trip test, per the DoD
   below, rather than assuming it's fine.
 
-  Verified for real: `dialog.browser.test.tsx` hydrates a committed fixture of genuine server
-  HTML and asserts the trigger's DOM node is *reused*, then that clicking it mounts the portal
-  client-side. See `docs/testing.md` for how the `ssr` and `browser` projects cooperate.
+  Verified for real: `dialog.browser.test.tsx` hydrates genuine server HTML (served fresh by the
+  generation bridge) and asserts the trigger's DOM node is *reused*, then that clicking it mounts
+  the portal client-side. See `docs/testing.md` for how the `ssr` and `browser` projects cooperate.
 - **Focus-trap/scroll-lock/dismissable/floating-position primitives are inherently
   client-only** and should be structured so they simply don't run their DOM-touching
   logic during SSR (again, via effects) rather than crashing or needing to be manually

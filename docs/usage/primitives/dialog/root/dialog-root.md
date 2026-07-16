@@ -71,5 +71,5 @@ the id, so the registration's cleanup is scoped to that part's unmount.
 
 Host-element-free and effect-gated: every `document` touch is inside a part hook's `createEffect`,
 which never runs during SSR. The generated `popupId` is an SSR-stable `createUniqueId`, and the one
-the root consumes — it fixes the trigger's hydration key (see the `Dialog` component's
-`__fixtures__/README.md`).
+the root consumes — it fixes the trigger's hydration key (see `docs/testing.md` on how `_hk` keys
+and the SSR → hydrate round-trip are pinned).

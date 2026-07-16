@@ -1,9 +1,14 @@
+import ssrFixture from "virtual:hydration-fixture?id=dialog";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Dialog } from "../dialog";
-import ssrFixture from "./__fixtures__/dialog-ssr.html?raw";
+// Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
+// `.html`). `Tree` is the same tree `dialog.ssr.test.tsx` inline-snapshots and the bridge renders,
+// so the hydration input and the client tree cannot structurally diverge. The interaction tests
+// below keep their own richer `FullDialog` (testids + positioning) — they `mount()`, they don't hydrate.
+import { Tree } from "./dialog.ssr-entry";
 
 /**
  * Structurally identical to `Dialog.ssr.test.tsx`'s `FullDialog`, which produces the fixture
@@ -688,22 +693,22 @@ describe("Dialog", () => {
 });
 
 describe("Dialog hydration", () => {
-  // `ssrFixture` is genuine server output: `Dialog.ssr.test.tsx` asserts it byte-for-byte against a
-  // real `renderToStringAsync` in the `ssr` project (the one place both `solid-js` and `@solidjs/web`
-  // resolve to their server builds). Rendering it here would be worthless — the client build's
-  // `renderToStringAsync` returns `undefined`. `FullDialog` must stay structurally identical to the
-  // ssr test's: hydration keys are a path through the tree, so inserting anything before
-  // `Dialog.Trigger` — even a component that renders nothing — shifts the trigger's key.
-  // `hydrateFixture` proves hydration was silent and reused every server node.
+  // `ssrFixture` is genuine server output: the hydration-fixture bridge renders `Tree` through a
+  // nested SSR server and `dialog.ssr.test.tsx` inline-snapshots that same render, so they agree
+  // byte-for-byte. Rendering it here would be worthless — the client build's `renderToStringAsync`
+  // returns `undefined`. Reusing `Tree` (rather than a hand-kept-identical copy) keeps the client
+  // tree structurally identical to the server's: hydration keys are a path through the tree, so
+  // inserting anything before `Dialog.Trigger` — even a component that renders nothing — would shift
+  // the trigger's key. `hydrateFixture` proves hydration was silent and reused every server node.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
-    const { dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
+    const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     dispose();
   });
 
   it("leaves the hydrated trigger interactive, and mounts the portal client-side", async () => {
     // The whole point of `Dialog.Portal`'s `isServer` guard: portaled content is absent from
     // the SSR HTML, and appears on the client only once the dialog opens.
-    const { dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
+    const { dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     expect(page.getByRole("dialog").query()).toBeNull();
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -713,7 +718,7 @@ describe("Dialog hydration", () => {
   });
 
   it("has no accessibility violations after hydrating", async () => {
-    const { container, dispose } = hydrateFixture(ssrFixture, () => <FullDialog />);
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
     await expectNoA11yViolations(container);
     dispose();
   });
