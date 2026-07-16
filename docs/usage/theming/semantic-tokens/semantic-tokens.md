@@ -4,46 +4,103 @@ The design-system-agnostic color vocabulary every `@hope-ui/presets/*` preset im
 and recipes reference these names as Tailwind utilities; a preset supplies the values as
 `--hope-<token>` CSS variables (see `@hope-ui/presets/hope`).
 
+Tokens are named by **identity, not context** — `role + variant + state`, nothing about *where* a
+token sits. Every `(role × variant × state)` a recipe paints is its own **flat** token (no borrowing
+across variants, no `--hope-{component}-*` tokens), so every painted value is an independent knob.
+
 ## API
 
-- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic token name. The runtime source of
-  truth; `checkSemanticTokenConformance` iterates it.
-- `SemanticColorToken` — the union of the token names.
+- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic **color** token name (111). The runtime
+  source of truth; `checkSemanticTokenConformance` iterates it.
+- `SemanticColorToken` — the union of the color token names.
 - `SemanticColorContract` — `Record<SemanticColorToken, string>`, the completeness shape a JS tool
   can assert against.
+- `SEMANTIC_OPACITY_TOKENS` — readonly array of the opacity-axis token names (`opacity-disabled`,
+  `opacity-loading`). A **separate contract** from color (see "Opacity axis" below).
+- `SemanticOpacityToken` / `SemanticOpacityContract` — the opacity-axis analogues of the two color types.
 
 ## Naming (Tailwind-ergonomic)
 
 No token is ever a bare CSS property, so utilities never double up (`text-text`, `border-border`,
-`ring-ring`).
+`ring-ring`). The five naming rules:
+
+1. **The Tailwind prefix is the layer** — a token carries role + variant + state only.
+2. **Name by identity, not context** — `{role}-emphasis` is the role's legible *content* color
+   (soft/outline/ghost/link label, inline role text); `on-{role}` names a context *only* for content
+   on the solid fill.
+3. **Recipes never compute** — no `color-mix` / alpha-modifier / hardcoded value in a recipe; a
+   derived value is a token authored in the preset's `tokens.css` (the `focus-halo`/`scrim` precedent).
+4. **Overridability unit = (role × variant × state)** — every variant owns its full rest / `-hovered`
+   / `-pressed` ladder; press is a colorable state; nothing is borrowed from a sibling variant.
+5. **Collection state splits `active`** (transient: hover / roving / activedescendant) **from
+   `selected`** (persistent: chosen), each with an `on-*`.
+
+### Per role — `{role}` ∈ `primary` · `neutral` · `success` · `info` · `warning` · `danger`
+
+15 tokens per chromatic role; `neutral` has 14 (no `-line` — its outline border uses `border-strong`).
+
+| Token | Reads as | Purpose |
+|---|---|---|
+| `{role}` | `bg-{role}` · `border-{role}` | solid fill (rest); full-strength role border |
+| `{role}-hovered` · `{role}-pressed` | `bg-*` | solid fill, hovered / pressed |
+| `{role}-soft` | `bg-{role}-soft` | tonal fill (rest) |
+| `{role}-soft-hovered` · `{role}-soft-pressed` | `bg-*` | tonal fill, hovered / pressed |
+| `{role}-outline-hovered` · `{role}-outline-pressed` | `bg-*` | outline-variant wash (rest transparent) |
+| `{role}-ghost-hovered` · `{role}-ghost-pressed` | `bg-*` | ghost-variant wash (rest transparent) |
+| `{role}-line` | `border-{role}-line` | outline-variant border (rest) — **chromatic only** |
+| `{role}-emphasis` | `text-{role}-emphasis` | role content color (soft/outline/ghost/link label, inline role text) |
+| `{role}-link-hovered` · `{role}-link-pressed` | `text-*` | link text, hovered / pressed (rest = `{role}-emphasis`) |
+| `on-{role}` | `text-on-{role}` | content on the solid fill |
+
+### Non-role (22)
 
 | Group | Tokens | Reads as |
 |---|---|---|
-| Surfaces | `surface`, `surface-raised`, `surface-overlay`, `surface-sunken`, `surface-inverse` | `bg-surface`, … |
-| Standard text | `foreground`, `foreground-muted`, `foreground-subtle`, `foreground-disabled` | `text-foreground`, … |
-| On-color text | `on-<role>`, `on-<role>-subtle`, `on-inverse` | `text-on-primary`, `text-on-danger-subtle`, `text-on-inverse` |
-| Role fills | `<role>`, `<role>-subtle` — roles: `primary`, `neutral`, `success`, `info`, `warning`, `danger` | `bg-primary`, `bg-danger-subtle` |
-| Border tints | `subtle-outline`, `strong-outline`, `disabled-outline` (role borders reuse the role color) | `border-subtle-outline`, `border-strong-outline`, `border-primary` |
+| Surfaces | `surface`, `surface-raised`, `surface-raised-hovered`, `surface-raised-pressed`, `surface-overlay`, `surface-sunken`, `surface-inverse` | `bg-*` |
+| Standard text | `foreground`, `foreground-muted`, `foreground-subtle`, `foreground-disabled` | `text-*` |
+| On-state | `on-inverse`, `on-active`, `on-selected` | `text-*` |
+| Borders | `subtle`, `strong` | `border-*` |
+| Collections | `active`, `selected` | `bg-*` |
 | Disabled fill | `disabled` (a real background — kept a legible step from `foreground-disabled`) | `bg-disabled` |
-| Systemic | `focus`, `scrim` | `ring-focus`, `outline-focus`, `bg-scrim` |
+| Systemic | `focus`, `focus-halo`, `scrim` | `border-*`/`ring-*` · `ring-*` · `bg-*` |
 
-Icons fold into the text tokens (currentColor) — there is no separate `icon` family.
+**Total color = 89 role + 22 non-role = 111.** Icons fold into the text tokens (currentColor) — there
+is no separate `icon` family.
+
+## Opacity axis (separate contract)
+
+Tailwind v4.3.2 has **no `--opacity-*` theme namespace**, so opacity is not mapped via `@theme inline`
+like colors; a preset defines `--hope-opacity-*` and the shared `_base/opacity.css` wires each to a
+custom `@utility`. These exist so a recipe never hardcodes a magic opacity (`opacity-90`).
+
+| Token | Reads as | hope default | Purpose |
+|---|---|---|---|
+| `opacity-disabled` | `opacity-disabled` | `0.4` | dim applied to a disabled control |
+| `opacity-loading` | `opacity-loading` | `0.2` | dim applied to content obscured while loading |
 
 ## Pairing (readable-on)
 
-Each fill owns its on-color:
+Each fill owns its content color:
 
-- primary button → `bg-primary text-on-primary`
-- soft error alert → `bg-danger-subtle text-on-danger-subtle border-danger`
-- card → `bg-surface text-foreground border-subtle-outline`
+- primary button → `bg-primary text-on-primary hover:bg-primary-hovered data-pressed:bg-primary-pressed`
+- soft error alert → `bg-danger-soft text-danger-emphasis border-danger-line`
+- card → `bg-surface text-foreground border-subtle`
 - tooltip → `bg-surface-inverse text-on-inverse`
+- selected list option → `bg-selected text-on-selected`; highlighted (roving) option → `bg-active text-on-active`
 
-Neutral surfaces pair with the `foreground*` ramp.
+Neutral surfaces pair with the `foreground*` ramp; the soft/outline/ghost/link label is
+`{role}-emphasis` (the role's legible content color), not an on-fill color.
 
 ## Conformance
 
-A preset proves it defines every token with `checkSemanticTokenConformance` /
-`assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`) run against the CSS that
-declares the `--hope-*` values. `@hope-ui/presets/hope` authors its palette in `hope/tokens.css`, so
-`hope.test.ts` reads that file and runs the check over it. An undefined token compiles every
-referencing utility to an unresolved `var(--hope-…)`.
+A preset proves it defines every token with the conformance kit (from `@hope-ui/theming/conformance`)
+run against the CSS that declares the `--hope-*` values:
+
+- `checkSemanticTokenConformance` / `assertSemanticTokenConformance` — the 111 color tokens.
+- `checkOpacityTokenConformance` / `assertOpacityTokenConformance` — the 2 opacity tokens (same
+  `--hope-<token>:` regex; the `--hope-` namespace is shared).
+
+`@hope-ui/presets/hope` authors its palette in `hope/tokens.css`, so `hope.test.ts` reads that file
+and runs **both** checks over it. An undefined token compiles every referencing utility (or the
+opacity `@utility`) to an unresolved `var(--hope-…)`. Conformance checks the `:root` values only;
+a preset keeps its `.dark` block in lockstep by hand (for hope, 111 color tokens in each block).

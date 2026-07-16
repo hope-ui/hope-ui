@@ -100,7 +100,8 @@ preset-specific:
 packages/presets/src/
 ├── _base/                # shared structural layer — reused unchanged by every preset; not a published subpath
 │   ├── variants.css      #   @custom-variant dark (+ future data-* state variants)
-│   └── theme-map.css     #   @theme inline: --hope-* → Tailwind color namespace (bg-primary, text-on-primary, …)
+│   ├── theme-map.css     #   @theme inline: color --hope-* → Tailwind color namespace (bg-primary, text-on-primary, …)
+│   └── opacity.css       #   @utility opacity-disabled / opacity-loading → var(--hope-opacity-*)
 └── hope/
     ├── index.ts          # the JS preset — definePreset over the recipe map (no token values here)
     ├── tokens.css        # hope's --hope-* token values (:root + .dark), authored in CSS
@@ -108,11 +109,11 @@ packages/presets/src/
     └── recipes/          #   tailwind-variants slot recipes; registered via @source
 ```
 
-**Why the split.** The `@theme inline` mapping and the `dark` variant are a **pure function of the
-fixed `SEMANTIC_COLOR_TOKENS` contract** — byte-identical in every preset — so they live once in
-`_base/` rather than being copy-pasted per preset. The only thing a preset authors is its token
-*values* (hope authors them in **CSS** — `tokens.css`'s `:root`/`.dark` `--hope-*` declarations) and
-its `recipes/`. The orchestrator's `@import` order is cosmetic — Tailwind
+**Why the split.** The `@theme inline` color mapping, the opacity `@utility` layer, and the `dark`
+variant are a **pure function of the fixed token contract** (`SEMANTIC_COLOR_TOKENS` +
+`SEMANTIC_OPACITY_TOKENS`) — byte-identical in every preset — so they live once in `_base/` rather
+than being copy-pasted per preset. The only thing a preset authors is its token *values* (hope
+authors them in **CSS** — `tokens.css`'s `:root`/`.dark` `--hope-*` declarations) and its `recipes/`. The orchestrator's `@import` order is cosmetic — Tailwind
 at-rules (`@theme`, `@custom-variant`) are collected at build time and `:root`/`.dark` custom
 properties resolve by the cascade at use time, so nothing here is order-sensitive — so it reads as
 labelled groups: the shared contract, this theme's token values, then its recipes. (`_base/` is a CSS
@@ -121,7 +122,8 @@ partials directory — unrelated to the removed Panda `base` preset noted under 
 So a theme (a) authors hope's semantic token values as `--hope-*` variables under `:root`/`.dark` in
 its own `tokens.css` (so `<ThemeProvider>` renders no DOM — hope is a zero-DOM preset), (b) maps them
 into Tailwind's color namespace with `@theme inline` so utilities stay clean — `bg-primary`,
-`text-on-primary`, `border-subtle-outline`, `ring-focus` (`_base/theme-map.css`), and
+`text-on-primary`, `border-subtle`, `ring-focus` (`_base/theme-map.css`) — plus the opacity axis via
+`_base/opacity.css` (`@utility`, since Tailwind v4 has no `--opacity-*` namespace), and
 (c) — once components exist — ships its own `tailwind-variants` slot recipes (same slots and variant
 *values* as every other preset; only the emitted classes differ). A first-party preset is a subpath of
 `@hope-ui/presets` (`@hope-ui/presets/hope` is the default) that reuses `_base/*` and adds its own
@@ -136,7 +138,9 @@ each preset *must* define is the **semantic vocabulary**: every token in `SEMANT
 Because CSS variables aren't `tsc`-checkable, this is enforced at the CSS level by
 `checkSemanticTokenConformance` / `assertSemanticTokenConformance` (from `@hope-ui/theming/conformance`),
 which a preset runs against its token CSS — for hope, its `tokens.css` (read as a string in
-`hope.test.ts`). It's the token analog of the recipe axis's `checkSlotRecipeConformance`.
+`hope.test.ts`). The separate **opacity axis** (`SEMANTIC_OPACITY_TOKENS`) has the same requirement
+and its own mirror check, `checkOpacityTokenConformance` / `assertOpacityTokenConformance`, run over
+the same CSS. Both are the token analog of the recipe axis's `checkSlotRecipeConformance`.
 
 ## Semantic token vocabulary
 
@@ -158,66 +162,105 @@ it reads as — is
 [`docs/usage/theming/semantic-tokens/semantic-tokens.md`](usage/theming/semantic-tokens/semantic-tokens.md);
 this section is the design rationale and cross-system provenance behind it.
 
-**Tailwind-first naming.** No token is ever a bare CSS property, so utilities never double up (no
-`text-text` / `border-border` / `ring-ring`): standard text is the `foreground*` ramp, on-fill/inverse
-text is `on-*`, neutral borders are `subtle`/`strong`, systemic is `focus`/`scrim`, and the error role
-is `danger` (not `destructive`). The role *concepts* follow the Atlassian Design System's
-`property.role.modifier` shape ([foundations](https://atlassian.design/foundations/tokens/design-tokens),
-[all tokens](https://atlassian.design/components/tokens/all-tokens)), re-spelled flat and Tailwind-first.
-The set was designed as a **superset** of five systems' alias layers (MD3 color roles, Ant
-seed→map→alias, Fluent v9, Bootstrap 5.3, shadcn) that maps down to each without losing MD3/Fluent
-nuance.
+**Name by identity, not context (the 5 rules).** A token carries `role + variant + state` and nothing
+about *where* it sits. (1) The Tailwind prefix is the layer, so no token is ever a bare CSS property
+and utilities never double up (`text-text` / `border-border` / `ring-ring`). (2) Name by identity:
+`{role}-emphasis` is the role's legible *content* color (the soft/outline/ghost/link label, inline
+role text), while `on-{role}` names a context *only* for content on the solid fill. (3) Recipes never
+compute — no `color-mix`/alpha-modifier/hardcoded value; a derived color is a token authored in the
+preset's `tokens.css` (`focus-halo`, `scrim`). (4) The overridability unit is `(role × variant ×
+state)`: every variant owns its full rest / `-hovered` / `-pressed` ladder (press is a colorable
+state), nothing borrowed from a sibling. (5) Collection state splits `active` (transient) from
+`selected` (persistent), each with an `on-*`. Standard text is the `foreground*` ramp; neutral borders
+are `subtle`/`strong`; the outline-variant border is `{role}-line`; systemic is
+`focus`/`focus-halo`/`scrim`; the error role is `danger` (not `destructive`).
+
+The role *concepts* follow the Atlassian Design System's `property.role.modifier` shape
+([foundations](https://atlassian.design/foundations/tokens/design-tokens),
+[all tokens](https://atlassian.design/components/tokens/all-tokens)), re-spelled flat and Tailwind-first
+(the opacity axis adapts Atlassian's opacity tokens). The set was designed as a **superset** of five
+systems' alias layers (MD3 color roles, Ant seed→map→alias, Fluent v9, Bootstrap 5.3, shadcn) that
+maps down to each without losing MD3/Fluent nuance.
 
 ### The shape
 
 - **Surfaces are an elevation concept, not a fill** — so a background surface is never a doubled
-  `bg-bg`: `surface` (default page/card) · `surface-raised` (cards/menus) · `surface-overlay`
-  (dialogs) · `surface-sunken` (wells) · `surface-inverse` (tooltips). → `bg-surface`.
+  `bg-bg`: `surface` (default page/card) · `surface-raised` (cards/menus, with its own
+  `-raised-hovered`/`-raised-pressed` interaction ladder) · `surface-overlay` (dialogs) ·
+  `surface-sunken` (wells) · `surface-inverse` (tooltips). → `bg-surface`.
 - **Standard text is the `foreground*` ramp** on neutral surfaces: `foreground` → `foreground-muted`
   → `foreground-subtle`, plus `foreground-disabled`. Icons fold into these via `currentColor` — there
   is no separate `icon` family.
-- **On-color text** stays readable on a colored fill or the inverse surface, under the `on-*` prefix:
-  `on-<role>` (text on the role's SOLID fill → `text-on-primary`), `on-<role>-subtle` (text on its
-  SUBTLE fill → `text-on-primary-subtle`), and `on-inverse` (text on `surface-inverse`, e.g. a
-  tooltip). The role color used as *standalone* text on a neutral surface (a link, an inline error) is
-  just the role utility, `text-<role>` (e.g. `text-danger`). Roles, in order: `primary` · `neutral` ·
-  `success` · `info` · `warning` · `danger`.
-- **Neutral border tints**: `subtle-outline` · `strong-outline` · `disabled-outline`
-  (`border-subtle-outline`, …) — the `-outline` suffix keeps them from being misread as fills. Role
-  borders reuse the role color (`border-primary`), so they need no dedicated token.
-- **Disabled control fill**: `disabled` (`bg-disabled`) — a real background fill (distinct from the
-  border tints), kept a legible step away from `foreground-disabled` so the disabled label still reads.
-- **Fills stay role-first and bare** so the common case is short (decision 01): `bg-primary`,
-  `bg-danger`, `bg-danger-subtle`. Each role is `{ <role> (solid fill), <role>-subtle (tonal fill) }`.
-- **Systemic**: `focus` (the focus indicator → `ring-focus` / `outline-focus`) · `scrim` (the dimming
-  layer behind modals — distinct from the `surface-overlay` the dialog itself sits on → `bg-scrim`).
+- **Roles** (`primary` · `neutral` · `success` · `info` · `warning` · `danger`) each carry a fully
+  decomposed set: the solid fill `{role}` (also the full-strength border `border-{role}`) with a
+  `-hovered`/`-pressed` ladder; the tonal fill `{role}-soft` with its own ladder; per-variant wash
+  ladders `{role}-outline-hovered/-pressed` and `{role}-ghost-hovered/-pressed`; the outline-variant
+  border `{role}-line` (chromatic only — `neutral` uses `border-strong`); the role content color
+  `{role}-emphasis` (the soft/outline/ghost/link label, inline role text → `text-{role}-emphasis`)
+  with a link ladder `{role}-link-hovered/-pressed`; and `on-{role}` (content on the solid fill).
+- **On-state text** (`on-*`, `text-*`): `on-inverse` (on `surface-inverse`, e.g. a tooltip),
+  `on-active` (on the transient collection highlight), `on-selected` (on the persistent selection).
+- **Neutral borders**: `subtle` · `strong` (`border-subtle`, `border-strong`) — emphasis levels only;
+  no bare `border` token. (The disabled outline border reuses `border-subtle`.)
+- **Collection states**: `active` (transient — hover / roving / activedescendant) and `selected`
+  (persistent — chosen), both `bg-*`, each paired with its `on-*` text above.
+- **Disabled control fill**: `disabled` (`bg-disabled`) — a real background fill, kept a legible step
+  away from `foreground-disabled` so the disabled label still reads.
+- **Systemic**: `focus` (the focus indicator → `ring-focus` / `border-focus`) · `focus-halo` (its
+  translucent ring → `ring-focus-halo`, a preset-authored derived color) · `scrim` (the dimming layer
+  behind modals — distinct from the `surface-overlay` the dialog itself sits on → `bg-scrim`).
 
-**Pairing** (the readable-on rule): each fill owns its on-color. Text on a role's solid fill is
-`text-on-<role>`; text on its subtle fill is `text-on-<role>-subtle`. Neutral surfaces pair with the
-shared `foreground*` ramp; `on-inverse` is only the on-color for `surface-inverse` (tooltip). Per-fill
-on-colors are what let every fill stay readable in both themes — a single global "inverse" can't serve
-both the flipping neutrals *and* the fixed chromatic fills, which is why e.g. `on-warning` is dark in
-both themes (white fails on amber).
+**Pairing** (the readable-on rule): each fill owns its content color. The solid fill pairs with
+`on-{role}`; the soft/outline/ghost/link variants label with `{role}-emphasis`; neutral surfaces pair
+with the shared `foreground*` ramp; `on-inverse` is only the on-color for `surface-inverse` (tooltip),
+and `on-active`/`on-selected` for the collection states. Per-fill content colors are what let every
+fill stay readable in both themes — a single global "inverse" can't serve both the flipping neutrals
+*and* the fixed chromatic fills, which is why e.g. `on-warning` is dark in both themes (white fails on
+amber).
 
-So a primary button is `bg-primary text-on-primary`; a soft error alert is
-`bg-danger-subtle text-on-danger-subtle border-danger`.
+So a primary button is `bg-primary text-on-primary hover:bg-primary-hovered
+data-pressed:bg-primary-pressed`; a soft error alert is `bg-danger-soft text-danger-emphasis
+border-danger-line`.
 
-**States**: the semantic vocabulary carries no `hovered`/`pressed`/`bold` tokens — recipes derive
-interaction states from Tailwind's own opacity / `color-mix` utilities (e.g. `hover:bg-primary/90`,
-decision 02). Disabled pairs `foreground-disabled` (text) / `disabled` (fill, `bg-disabled`) /
-`disabled-outline` (border) with a reduced opacity (decision 08).
+**States are tokens, not computed** (decision 02): every `(role × variant × state)` is its own
+finished token, so a recipe reads intent literally (`hover:bg-primary-soft-hovered`,
+`data-pressed:text-primary-link-pressed`) and never mixes a color. Disabled pairs `foreground-disabled`
+(text) / `disabled` (fill) / `border-subtle` (border) with the `opacity-disabled` token (decision 08).
+The **opacity axis** — `opacity-disabled` (0.4) and `opacity-loading` (0.2) — is a separate contract
+from color: Tailwind v4 has no `--opacity-*` namespace, so these reach utilities through
+`_base/opacity.css`'s `@utility` layer, and exist so a recipe never hardcodes a magic `opacity-90`.
 
-### Token reference (hope values, light → dark intent)
+### Token reference (111 color + 2 opacity)
+
+The full, authoritative list with every utility is
+[`docs/usage/theming/semantic-tokens/semantic-tokens.md`](usage/theming/semantic-tokens/semantic-tokens.md);
+this is the grouped summary. **Per role** (`primary` · `neutral` · `success` · `info` · `warning` ·
+`danger` — 15 each, `neutral` = 14 with no `-line`):
 
 | token | reads as | purpose |
 |---|---|---|
-| `surface` · `-raised` · `-overlay` · `-sunken` · `-inverse` | `bg-*` | page/card · elevated · dialog · well · tooltip |
+| `{role}` · `{role}-hovered` · `{role}-pressed` | `bg-*` · `border-{role}` | solid fill ladder; full-strength role border |
+| `{role}-soft` · `{role}-soft-hovered` · `{role}-soft-pressed` | `bg-*` | tonal fill ladder |
+| `{role}-outline-hovered` · `{role}-outline-pressed` | `bg-*` | outline-variant wash (rest transparent) |
+| `{role}-ghost-hovered` · `{role}-ghost-pressed` | `bg-*` | ghost-variant wash (rest transparent) |
+| `{role}-line` | `border-{role}-line` | outline-variant border (rest) — chromatic only |
+| `{role}-emphasis` · `{role}-link-hovered` · `{role}-link-pressed` | `text-*` | role content color + link ladder |
+| `on-{role}` | `text-on-{role}` | content on the solid fill |
+
+**Non-role (22):**
+
+| token | reads as | purpose |
+|---|---|---|
+| `surface` · `-raised` · `-raised-hovered` · `-raised-pressed` · `-overlay` · `-sunken` · `-inverse` | `bg-*` | page/card · elevated (+ ladder) · dialog · well · tooltip |
 | `foreground` · `-muted` · `-subtle` · `-disabled` | `text-*` | body → faint text; disabled |
-| `on-<role>` · `on-<role>-subtle` · `on-inverse` | `text-*` | text on the role's solid fill; on its subtle fill; on the inverse surface |
-| `subtle-outline` · `strong-outline` · `disabled-outline` | `border-*` | default → strong border tint; disabled border (role border = `border-<role>`) |
+| `on-inverse` · `on-active` · `on-selected` | `text-*` | on the inverse surface / on collection states |
+| `subtle` · `strong` | `border-*` | default → strong border tint |
+| `active` · `selected` | `bg-*` | transient highlight · persistent selection |
 | `disabled` | `bg-*` | disabled control fill (kept legible under `foreground-disabled`) |
-| `primary` · `neutral` · `success` · `info` · `warning` · `danger` (+ each `-subtle`) | `bg-*` | solid fill + tonal fill |
-| `focus` · `scrim` | `ring-*` · `bg-*` | focus indicator · modal dimming layer |
+| `focus` · `focus-halo` · `scrim` | `ring-*`/`border-*` · `ring-*` · `bg-*` | focus indicator · translucent halo · modal dimming |
+
+**Opacity axis (separate contract):** `opacity-disabled` (0.4) · `opacity-loading` (0.2) →
+`opacity-disabled`, `opacity-loading` (via `_base/opacity.css`).
 
 ### Cross-system mapping
 
@@ -238,13 +281,14 @@ Bootstrap `--bs-body-color` / shadcn `foreground`; `foreground-muted` → `on-su
 `colorTextSecondary` / `colorNeutralForeground2` / `--bs-secondary-color` / `muted-foreground`;
 `foreground-subtle` → Ant `colorTextTertiary` / Fluent `colorNeutralForeground3` /
 `--bs-tertiary-color` (MD3/shadcn ship two tiers → collapses ¹); `on-inverse` (on the inverse
-surface) → `inverse-on-surface` / — / `colorNeutralForegroundInverted` / — / —. The per-role on-fill
-colors (`on-<role>`, `on-<role>-subtle`) map to each system's on-fill colors — see Fills/Feedback
-below. Icons reuse the text tones (no separate ramp; Fluent likewise has none).
+surface) → `inverse-on-surface` / — / `colorNeutralForegroundInverted` / — / —. The role content
+color `{role}-emphasis` and the on-fill color `on-{role}` map to each system's on-fill/content colors
+— see Fills/Feedback below. Icons reuse the text tones (no separate ramp; Fluent likewise has none).
 
-**Borders** · `subtle-outline` → `outline-variant` / `colorBorder` / `colorNeutralStroke1` /
-`--bs-border-color` / `border`; `strong-outline` → MD3 `outline` / `colorNeutralStrokeAccessible` /
-shadcn `input`; `border-<role>` → Ant `colorErrorBorder` etc. / Fluent `colorStatusDangerBorder1` /
+**Borders** · `subtle` → `outline-variant` / `colorBorder` / `colorNeutralStroke1` /
+`--bs-border-color` / `border`; `strong` → MD3 `outline` / `colorNeutralStrokeAccessible` /
+shadcn `input`; the full-strength role border `border-{role}` and the outline-variant border
+`{role}-line` → Ant `colorErrorBorder` etc. / Fluent `colorStatusDangerBorder1` /
 Bootstrap `--bs-danger-border-subtle`.
 
 **Fills** (bare `primary`; every role identical)
@@ -253,19 +297,20 @@ Bootstrap `--bs-danger-border-subtle`.
 |---|---|---|---|---|---|
 | `primary` (solid) | `primary` | `colorPrimary` | `colorBrandBackground` | `--bs-primary` | `primary` |
 | ↳ `on-primary` | `on-primary` | `colorTextLightSolid` | `colorNeutralForegroundOnBrand` | `#fff` | `primary-foreground` |
-| `primary-subtle` | `primary-container` | `colorPrimaryBg` | `colorBrandBackground2` | `--bs-primary-bg-subtle` | — ² |
-| ↳ `on-primary-subtle` | `on-primary-container` | `colorPrimaryText` | `colorBrandForeground2` | `--bs-primary-text-emphasis` | — ² |
-| `text-primary` (on neutral) | `primary` | `colorPrimaryText` | `colorBrandForeground1` | `--bs-link-color` | `primary` |
-| `border-primary` | `outline` | `colorPrimaryBorder` | `colorBrandStroke1` | `--bs-primary-border-subtle` | — |
+| `primary-soft` | `primary-container` | `colorPrimaryBg` | `colorBrandBackground2` | `--bs-primary-bg-subtle` | — ² |
+| ↳ `primary-emphasis` (soft label / inline) | `on-primary-container` | `colorPrimaryText` | `colorBrandForeground2` | `--bs-primary-text-emphasis` | — ² |
+| `text-primary-emphasis` (on neutral) | `primary` | `colorPrimaryText` | `colorBrandForeground1` | `--bs-link-color` | `primary` |
+| `border-primary-line` | `outline` | `colorPrimaryBorder` | `colorBrandStroke1` | `--bs-primary-border-subtle` | — |
 
-Interaction states (`hover`/`active`) are not tokens — recipes use utilities (`hover:bg-primary/90`),
-where MD3 uses state-layer opacity overlays, Ant `colorPrimaryHover`/`Active`, Fluent `…Hover`/`…Pressed`,
-Bootstrap Sass `tint/shade`, shadcn a `/90` utility.
+Interaction states here **are** tokens (`{role}-hovered`/`-pressed` and the per-variant soft/outline/
+ghost/link ladders) — where MD3 uses state-layer opacity overlays, Ant `colorPrimaryHover`/`Active`,
+Fluent `…Hover`/`…Pressed`, Bootstrap Sass `tint/shade`, shadcn a `/90` utility, hope resolves each to
+a finished shade so the recipe reads intent literally and never mixes a color.
 
-**Feedback** · `success`/`info`/`warning`/`danger`, each the same fill + `text-<role>` (on neutral) +
-`on-<role>` / `on-<role>-subtle` + `border-<role>`. Bootstrap 5.3's
+**Feedback** · `success`/`info`/`warning`/`danger`, each the same fill + `text-{role}-emphasis` (soft
+label / inline) + `on-{role}` + `{role}-line`. Bootstrap 5.3's
 `{color}`/`-bg-subtle`/`-border-subtle`/`-text-emphasis` maps 1:1 onto
-`danger` / `danger-subtle` / `border-danger` / `on-danger-subtle`;
+`danger` / `danger-soft` / `danger-line` / `danger-emphasis`;
 Ant fills every state cell. **MD3 ships only `error`; shadcn only `destructive`** — those themes
 derive the rest from palette (consistent with MD3's "add custom colors"). Fluent has no `info` alias
 (borrows Blue). `on-warning` (text on the solid warning fill) is dark in both themes (white fails on
@@ -276,7 +321,7 @@ amber).
 this `color.blanket`; we use `scrim` to avoid colliding with `surface-overlay`.
 
 ¹ MD3/shadcn ship two neutral text tiers → `foreground-subtle` collapses to `foreground-muted`. ²
-shadcn has no brand-subtle; `neutral`/`neutral-subtle` stand in.
+shadcn has no brand-soft; `neutral`/`neutral-soft` stand in.
 
 ### Extension points (documented, out of the required core)
 
@@ -284,8 +329,9 @@ shadcn has no brand-subtle; `neutral`/`neutral-subtle` stand in.
   flat themes alias each rung to the nearest anchor.
 - **`secondary` / `tertiary`** — optional chromatic accent roles (same shape) for multi-hue themes;
   `neutral` (always present) is the gray filled role, avoiding MD3's `secondary`-means-a-hue clash.
-- **discrete emphasis / state tokens** (`-bold`, `-hovered`, `-pressed`) — Atlassian-style variants a
-  theme may add when Tailwind's opacity / `color-mix` utilities aren't good enough.
+- **extra emphasis tokens** (`-bold`, and other Atlassian-style prominence steps) — a theme may add
+  these beyond the required set. (The `-hovered`/`-pressed` interaction ladders are now **core**, not
+  an extension — every variant owns its full ladder.)
 - **`chart-*` / `palette-*`** — decorative/categorical color; not role-based; out of contract.
 
 A theme adds any of these as extra `--hope-*` variables (a theme-private extra is swap-safe because
@@ -295,17 +341,19 @@ only that theme's own recipes reference it); the conformance check only polices 
 
 | # | Decision | Resolution |
 |---|---|---|
-| 01 | Ergonomic default | bare `primary`/`danger`/… = solid fill; `-subtle` = tonal fill; on-colors are `on-<role>`/`on-<role>-subtle` |
-| 02 | State mechanism | Tailwind opacity / `color-mix` utilities (e.g. `hover:bg-primary/90`); no dedicated state tokens |
+| 01 | Ergonomic default | bare `primary`/`danger`/… = solid fill; `-soft` = tonal fill; the soft/outline/ghost/link label is `{role}-emphasis` (role content color); `on-{role}` is only the solid-fill content color |
+| 02 | State mechanism | every `(role × variant × state)` is its own finished token (`{role}-hovered`/`-pressed`, per-variant soft/outline/ghost/link ladders; press is colorable). Supersedes the earlier "no state tokens / use `hover:bg-primary/90`" — recipes never compute a color |
 | 03 | Surface pairing | shared `foreground*` ramp across surfaces; per-surface override optional |
-| 04 | Surface tiers | 5 named `surface*` anchors required; `surface-N` ladder optional |
+| 04 | Surface tiers | 5 named `surface*` anchors required (`surface-raised` carries a hovered/pressed ladder); `surface-N` ladder optional |
 | 05 | Feedback scope | all four — `success` · `info` · `warning` · `danger` |
 | 06 | Naming | `neutral` = gray role; `secondary`/`tertiary` = optional chromatic accents |
 | 07 | Chart/decorative | out of contract → `chart-*` / `palette-*` |
-| 08 | Disabled | `foreground-disabled` (text) + `disabled` (fill) + `disabled-outline` (border) + reduced opacity; fill kept legible under the text |
-| 09 | Casing | flat kebab-case names; preset ships `--hope-<token>`, `@theme inline` maps to `--color-<token>` |
+| 08 | Disabled | `foreground-disabled` (text) + `disabled` (fill) + `border-subtle` (border) + the `opacity-disabled` token (0.4); fill kept legible under the text |
+| 09 | Casing | flat kebab-case names; preset ships `--hope-<token>`, color `@theme inline` maps to `--color-<token>`, opacity via `@utility` (no `--opacity-*` namespace in Tailwind v4) |
 | 10 | Reference preset | shadcn-flavored baseline shipped as the default `@hope-ui/presets/hope` |
-| — | Naming source | Atlassian `property.role.modifier`, re-spelled flat + Tailwind-first: `surface-*` (elevation), `foreground*` + `on-*`, `scrim` |
+| 11 | Recipe purity | recipes reference *finished* tokens only — no `color-mix`, alpha modifier (`bg-x/50`), or magic opacity (`opacity-90`); derived colors (`focus-halo`, `scrim`) are authored in the preset's `tokens.css`. Enforced by `pnpm check:recipe-purity` |
+| 12 | Opacity axis | `opacity-disabled` (0.4) / `opacity-loading` (0.2) — a separate contract (`SEMANTIC_OPACITY_TOKENS`) so recipes never hardcode a magic opacity; adapts Atlassian's opacity tokens |
+| — | Naming source | Atlassian `property.role.modifier`, re-spelled flat + Tailwind-first: `surface-*` (elevation), `foreground*` + `{role}-emphasis`/`on-*`, `scrim` |
 
 ## SSR / hydration
 

@@ -55,9 +55,11 @@ are hydration-safe. The theme's recipe styles the single `data-disabled:` varian
 
 `solid`/`soft`/`outline`/`ghost`/`link` take a `colorScheme` role; `default` is a color-independent
 neutral chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
-`soft` its tonal fill, and `outline`/`ghost`/`link` paint on the surface using the surface-legible
-`on-{role}-soft` token so neutral and warning stay readable in both light and dark. All styling comes
-from the theme's `button` recipe; the component itself writes no utility classes.
+`soft` its tonal fill, and `soft`/`outline`/`ghost`/`link` label with the role's legible *content*
+color `text-{role}-emphasis` so neutral and warning stay readable in both light and dark. Each
+variant walks its own finished interaction ladder (`hover:`/`data-pressed:` → `-hovered`/`-pressed`
+tokens); the recipe computes no color. All styling comes from the theme's `button` recipe; the
+component itself writes no utility classes.
 
 ## Polymorphism (`render` + `nativeButton`)
 

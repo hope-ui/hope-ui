@@ -34,8 +34,8 @@ both of two conflicting utilities.
 `tv` extends tailwind-merge's `color` theme scale with the full `SEMANTIC_COLOR_TOKENS` vocabulary.
 tailwind-merge's default `color` scale is the permissive `isAny`, so semantic fills already collapse
 into one `bg-color` / `text-color` / `border-color` / `ring-color` group — but registering the real
-token names (`primary`, `primary-soft`, `primary-hover`, `primary-outline`, `on-primary`,
-`foreground-muted`, `surface-raised`, `subtle`, `focus`, …) makes conflict resolution deterministic
-for the hope palette instead of relying on that fallback, and keeps working if a future
-tailwind-merge tightens `isAny`. So within a recipe a base fill (`bg-primary`) is cleanly overridden
-by a later variant fill (`bg-danger`) rather than both surviving.
+token names (`primary`, `primary-soft`, `primary-hovered`, `primary-pressed`, `primary-line`,
+`primary-emphasis`, `on-primary`, `foreground-muted`, `surface-raised`, `subtle`, `focus-halo`, …)
+makes conflict resolution deterministic for the hope palette instead of relying on that fallback,
+and keeps working if a future tailwind-merge tightens `isAny`. So within a recipe a base fill
+(`bg-primary`) is cleanly overridden by a later variant fill (`bg-danger`) rather than both surviving.

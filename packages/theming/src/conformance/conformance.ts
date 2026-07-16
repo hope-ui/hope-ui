@@ -96,8 +96,8 @@ export function checkSemanticTokenConformance(
 ): ConformanceResult {
   const errors: string[] = [];
   for (const token of tokens) {
-    // The `:` anchor stops a prefix token (`on-primary`) from matching a longer one
-    // (`on-primary-soft`).
+    // The `:` anchor stops a prefix token (`focus`) from matching a longer one
+    // (`focus-halo`), or `primary` from matching `primary-soft`.
     const declared = new RegExp(`${hopeVar(token)}\\s*:`).test(cssText);
     if (!declared) {
       errors.push(`semantic token "${hopeVar(token)}" is not defined in the theme CSS`);
