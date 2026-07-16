@@ -1,22 +1,27 @@
 /*
  * @hope-ui/presets — shared structural layer (`_base/`), not a published preset subpath.
  *
- * Maps hope-ui's semantic tokens (`--hope-<token>`, declared per-preset — at runtime by
- * `<ThemeProvider>` for a TS-authored palette, or in the preset's own CSS) into
- * Tailwind's color namespace, so component utilities stay clean and unprefixed: `bg-primary`,
- * `text-foreground`, `text-on-primary`, `border-subtle-outline`, `ring-focus`, `bg-scrim`, and role borders
- * `border-primary` (reusing the role color).
+ * Maps hope-ui's semantic color tokens (`--hope-<token>`, declared per-preset — at runtime by
+ * `<ThemeProvider>` for a TS-authored palette, or in the preset's own CSS) into Tailwind's color
+ * namespace, so component utilities stay clean and unprefixed: `bg-primary`, `text-foreground`,
+ * `text-on-primary`, `text-primary-emphasis`, `border-primary-line`, `border-subtle`, `ring-focus`,
+ * `ring-focus-halo`, `bg-scrim`, and the full role border `border-primary` (the role color itself).
  *
  * This mapping is a pure function of the fixed `SEMANTIC_COLOR_TOKENS` contract (@hope-ui/theming) —
  * identical for every theme — which is exactly why it is shared here instead of copied into each one.
  * Because it is `inline`, each generated utility inlines the `var(--hope-*)` value directly, so a
  * single per-theme `--hope-*` layer drives light/dark with no extra indirection. Generates the
  * `bg-`, `text-`, `border-`, and `ring-` families for each name (unused ones are harmless).
+ *
+ * The opacity axis (`opacity-disabled`/`opacity-loading`) is NOT here: Tailwind v4.3.2 has no
+ * `--opacity-*` theme namespace, so those reach utilities through `_base/opacity.css` instead.
  */
 @theme inline {
-  /* Surfaces */
+  /* Surfaces (elevation) */
   --color-surface: var(--hope-surface);
   --color-surface-raised: var(--hope-surface-raised);
+  --color-surface-raised-hovered: var(--hope-surface-raised-hovered);
+  --color-surface-raised-pressed: var(--hope-surface-raised-pressed);
   --color-surface-overlay: var(--hope-surface-overlay);
   --color-surface-sunken: var(--hope-surface-sunken);
   --color-surface-inverse: var(--hope-surface-inverse);
@@ -27,61 +32,125 @@
   --color-foreground-subtle: var(--hope-foreground-subtle);
   --color-foreground-disabled: var(--hope-foreground-disabled);
 
-  /* On-color text */
-  --color-on-primary: var(--hope-on-primary);
-  --color-on-primary-soft: var(--hope-on-primary-soft);
-  --color-on-neutral: var(--hope-on-neutral);
-  --color-on-neutral-soft: var(--hope-on-neutral-soft);
-  --color-on-success: var(--hope-on-success);
-  --color-on-success-soft: var(--hope-on-success-soft);
-  --color-on-info: var(--hope-on-info);
-  --color-on-info-soft: var(--hope-on-info-soft);
-  --color-on-warning: var(--hope-on-warning);
-  --color-on-warning-soft: var(--hope-on-warning-soft);
-  --color-on-danger: var(--hope-on-danger);
-  --color-on-danger-soft: var(--hope-on-danger-soft);
+  /* On-state text (inverse surface + collection states) */
   --color-on-inverse: var(--hope-on-inverse);
+  --color-on-active: var(--hope-on-active);
+  --color-on-selected: var(--hope-on-selected);
 
-  /* Role fills */
+  /* primary */
   --color-primary: var(--hope-primary);
-  --color-primary-hover: var(--hope-primary-hover);
+  --color-primary-hovered: var(--hope-primary-hovered);
+  --color-primary-pressed: var(--hope-primary-pressed);
   --color-primary-soft: var(--hope-primary-soft);
-  --color-primary-outline: var(--hope-primary-outline);
-  
+  --color-primary-soft-hovered: var(--hope-primary-soft-hovered);
+  --color-primary-soft-pressed: var(--hope-primary-soft-pressed);
+  --color-primary-outline-hovered: var(--hope-primary-outline-hovered);
+  --color-primary-outline-pressed: var(--hope-primary-outline-pressed);
+  --color-primary-ghost-hovered: var(--hope-primary-ghost-hovered);
+  --color-primary-ghost-pressed: var(--hope-primary-ghost-pressed);
+  --color-primary-line: var(--hope-primary-line);
+  --color-primary-emphasis: var(--hope-primary-emphasis);
+  --color-primary-link-hovered: var(--hope-primary-link-hovered);
+  --color-primary-link-pressed: var(--hope-primary-link-pressed);
+  --color-on-primary: var(--hope-on-primary);
+
+  /* neutral (no `-line`; outline borders use `border-strong`) */
   --color-neutral: var(--hope-neutral);
-  --color-neutral-hover: var(--hope-neutral-hover);
+  --color-neutral-hovered: var(--hope-neutral-hovered);
+  --color-neutral-pressed: var(--hope-neutral-pressed);
   --color-neutral-soft: var(--hope-neutral-soft);
-  --color-neutral-outline: var(--hope-neutral-outline);
+  --color-neutral-soft-hovered: var(--hope-neutral-soft-hovered);
+  --color-neutral-soft-pressed: var(--hope-neutral-soft-pressed);
+  --color-neutral-outline-hovered: var(--hope-neutral-outline-hovered);
+  --color-neutral-outline-pressed: var(--hope-neutral-outline-pressed);
+  --color-neutral-ghost-hovered: var(--hope-neutral-ghost-hovered);
+  --color-neutral-ghost-pressed: var(--hope-neutral-ghost-pressed);
+  --color-neutral-emphasis: var(--hope-neutral-emphasis);
+  --color-neutral-link-hovered: var(--hope-neutral-link-hovered);
+  --color-neutral-link-pressed: var(--hope-neutral-link-pressed);
+  --color-on-neutral: var(--hope-on-neutral);
 
+  /* success */
   --color-success: var(--hope-success);
-  --color-success-hover: var(--hope-success-hover);
+  --color-success-hovered: var(--hope-success-hovered);
+  --color-success-pressed: var(--hope-success-pressed);
   --color-success-soft: var(--hope-success-soft);
-  --color-success-outline: var(--hope-success-outline);
+  --color-success-soft-hovered: var(--hope-success-soft-hovered);
+  --color-success-soft-pressed: var(--hope-success-soft-pressed);
+  --color-success-outline-hovered: var(--hope-success-outline-hovered);
+  --color-success-outline-pressed: var(--hope-success-outline-pressed);
+  --color-success-ghost-hovered: var(--hope-success-ghost-hovered);
+  --color-success-ghost-pressed: var(--hope-success-ghost-pressed);
+  --color-success-line: var(--hope-success-line);
+  --color-success-emphasis: var(--hope-success-emphasis);
+  --color-success-link-hovered: var(--hope-success-link-hovered);
+  --color-success-link-pressed: var(--hope-success-link-pressed);
+  --color-on-success: var(--hope-on-success);
 
+  /* info */
   --color-info: var(--hope-info);
-  --color-info-hover: var(--hope-info-hover);
+  --color-info-hovered: var(--hope-info-hovered);
+  --color-info-pressed: var(--hope-info-pressed);
   --color-info-soft: var(--hope-info-soft);
-  --color-info-outline: var(--hope-info-outline);
+  --color-info-soft-hovered: var(--hope-info-soft-hovered);
+  --color-info-soft-pressed: var(--hope-info-soft-pressed);
+  --color-info-outline-hovered: var(--hope-info-outline-hovered);
+  --color-info-outline-pressed: var(--hope-info-outline-pressed);
+  --color-info-ghost-hovered: var(--hope-info-ghost-hovered);
+  --color-info-ghost-pressed: var(--hope-info-ghost-pressed);
+  --color-info-line: var(--hope-info-line);
+  --color-info-emphasis: var(--hope-info-emphasis);
+  --color-info-link-hovered: var(--hope-info-link-hovered);
+  --color-info-link-pressed: var(--hope-info-link-pressed);
+  --color-on-info: var(--hope-on-info);
 
+  /* warning */
   --color-warning: var(--hope-warning);
-  --color-warning-hover: var(--hope-warning-hover);
+  --color-warning-hovered: var(--hope-warning-hovered);
+  --color-warning-pressed: var(--hope-warning-pressed);
   --color-warning-soft: var(--hope-warning-soft);
-  --color-warning-outline: var(--hope-warning-outline);
+  --color-warning-soft-hovered: var(--hope-warning-soft-hovered);
+  --color-warning-soft-pressed: var(--hope-warning-soft-pressed);
+  --color-warning-outline-hovered: var(--hope-warning-outline-hovered);
+  --color-warning-outline-pressed: var(--hope-warning-outline-pressed);
+  --color-warning-ghost-hovered: var(--hope-warning-ghost-hovered);
+  --color-warning-ghost-pressed: var(--hope-warning-ghost-pressed);
+  --color-warning-line: var(--hope-warning-line);
+  --color-warning-emphasis: var(--hope-warning-emphasis);
+  --color-warning-link-hovered: var(--hope-warning-link-hovered);
+  --color-warning-link-pressed: var(--hope-warning-link-pressed);
+  --color-on-warning: var(--hope-on-warning);
 
+  /* danger */
   --color-danger: var(--hope-danger);
-  --color-danger-hover: var(--hope-danger-hover);
+  --color-danger-hovered: var(--hope-danger-hovered);
+  --color-danger-pressed: var(--hope-danger-pressed);
   --color-danger-soft: var(--hope-danger-soft);
-  --color-danger-outline: var(--hope-danger-outline);
+  --color-danger-soft-hovered: var(--hope-danger-soft-hovered);
+  --color-danger-soft-pressed: var(--hope-danger-soft-pressed);
+  --color-danger-outline-hovered: var(--hope-danger-outline-hovered);
+  --color-danger-outline-pressed: var(--hope-danger-outline-pressed);
+  --color-danger-ghost-hovered: var(--hope-danger-ghost-hovered);
+  --color-danger-ghost-pressed: var(--hope-danger-ghost-pressed);
+  --color-danger-line: var(--hope-danger-line);
+  --color-danger-emphasis: var(--hope-danger-emphasis);
+  --color-danger-link-hovered: var(--hope-danger-link-hovered);
+  --color-danger-link-pressed: var(--hope-danger-link-pressed);
+  --color-on-danger: var(--hope-on-danger);
 
-  /* Neutral border tints */
-  --color-subtle-outline: var(--hope-subtle-outline);
-  --color-strong-outline: var(--hope-strong-outline);
-  --color-disabled-outline: var(--hope-disabled-outline);
+  /* Neutral borders */
+  --color-subtle: var(--hope-subtle);
+  --color-strong: var(--hope-strong);
+
+  /* Collection-state fills */
+  --color-active: var(--hope-active);
+  --color-selected: var(--hope-selected);
 
   /* Disabled control fill */
   --color-disabled: var(--hope-disabled);
 
   /* Systemic */
   --color-focus: var(--hope-focus);
+  --color-focus-halo: var(--hope-focus-halo);
   --color-scrim: var(--hope-scrim);
 }

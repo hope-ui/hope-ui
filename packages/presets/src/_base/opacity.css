@@ -1,0 +1,19 @@
+/*
+ * @hope-ui/presets — shared structural layer (`_base/`): the opacity-token axis.
+ *
+ * The color vocabulary reaches utilities through `@theme inline` (`_base/theme-map.css`), but
+ * Tailwind v4.3.2 has **no `--opacity-*` theme namespace** (verified), so an `@theme` mapping would
+ * produce nothing usable. Instead each semantic opacity token is exposed as a custom `@utility`
+ * reading the preset's `--hope-opacity-*` variable — the opacity-axis analogue of the color mapping,
+ * identical for every `@hope-ui/presets/*` preset and therefore shared here.
+ *
+ * These exist so a recipe never hardcodes a magic opacity (`opacity-90`); the dim applied to a
+ * disabled control or to content obscured while loading is a knob the preset owns in `tokens.css`.
+ */
+@utility opacity-disabled {
+  opacity: var(--hope-opacity-disabled);
+}
+
+@utility opacity-loading {
+  opacity: var(--hope-opacity-loading);
+}

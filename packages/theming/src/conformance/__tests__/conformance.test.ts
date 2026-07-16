@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { SlotRecipeFn } from "../../recipes/slot-recipe";
-import { SEMANTIC_COLOR_TOKENS } from "../../semantic-tokens/semantic-tokens";
 import {
+  SEMANTIC_COLOR_TOKENS,
+  SEMANTIC_OPACITY_TOKENS,
+} from "../../semantic-tokens/semantic-tokens";
+import {
+  assertOpacityTokenConformance,
   assertSemanticTokenConformance,
   assertSlotRecipeConformance,
+  checkOpacityTokenConformance,
   checkSemanticTokenConformance,
   checkSlotRecipeConformance,
 } from "../conformance";
@@ -58,6 +63,23 @@ describe("semantic token conformance", () => {
     expect(result.errors.some((e) => e.includes("--hope-surface"))).toBe(true);
     expect(() => assertSemanticTokenConformance("--hope-primary: #000;")).toThrow(
       /conformance failed/,
+    );
+  });
+});
+
+describe("opacity token conformance", () => {
+  it("passes when every --hope-opacity-* token is declared", () => {
+    const css = SEMANTIC_OPACITY_TOKENS.map((token) => `--hope-${token}: 0.5;`).join("\n");
+    expect(checkOpacityTokenConformance(css).ok).toBe(true);
+    expect(() => assertOpacityTokenConformance(css)).not.toThrow();
+  });
+
+  it("reports an opacity token the theme CSS forgot to define", () => {
+    const result = checkOpacityTokenConformance("--hope-opacity-disabled: 0.4;");
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((e) => e.includes("--hope-opacity-loading"))).toBe(true);
+    expect(() => assertOpacityTokenConformance("--hope-opacity-disabled: 0.4;")).toThrow(
+      /Opacity token conformance failed/,
     );
   });
 });

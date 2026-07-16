@@ -15,7 +15,11 @@
  */
 
 import type { SlotRecipeFn } from "../recipes/slot-recipe";
-import { hopeVar, SEMANTIC_COLOR_TOKENS } from "../semantic-tokens/semantic-tokens";
+import {
+  hopeVar,
+  SEMANTIC_COLOR_TOKENS,
+  SEMANTIC_OPACITY_TOKENS,
+} from "../semantic-tokens/semantic-tokens";
 
 export interface ConformanceResult {
   ok: boolean;
@@ -111,6 +115,42 @@ export function assertSemanticTokenConformance(cssText: string, tokens?: readonl
   if (!ok) {
     throw new Error(
       `Semantic token conformance failed:\n${errors.map((e) => `  - ${e}`).join("\n")}`,
+    );
+  }
+}
+
+/**
+ * The opacity-axis analogue of {@link checkSemanticTokenConformance}: checks that a theme's CSS
+ * defines a `--hope-<token>` variable for every semantic opacity token in `tokens` (default: the
+ * full {@link SEMANTIC_OPACITY_TOKENS} axis). Opacity is a separate contract from color — Tailwind
+ * v4.3.2 has no `--opacity-*` theme namespace, so the values reach utilities through the shared
+ * `_base/opacity.css` `@utility` layer rather than `@theme inline` — but the CSS-side completeness
+ * requirement is the same: a token the preset forgot to define compiles its `@utility` to an
+ * unresolved `var()`. The `--hope-` namespace is shared, so it reuses the same `--hope-<token>:` regex.
+ */
+export function checkOpacityTokenConformance(
+  cssText: string,
+  tokens: readonly string[] = SEMANTIC_OPACITY_TOKENS,
+): ConformanceResult {
+  const errors: string[] = [];
+  for (const token of tokens) {
+    const declared = new RegExp(`${hopeVar(token)}\\s*:`).test(cssText);
+    if (!declared) {
+      errors.push(`opacity token "${hopeVar(token)}" is not defined in the theme CSS`);
+    }
+  }
+  return { ok: errors.length === 0, errors };
+}
+
+/**
+ * Like {@link checkOpacityTokenConformance}, but throws a single aggregated error when the theme CSS
+ * is missing opacity tokens. Convenient for `it("defines every opacity token", () => assertOpacityTokenConformance(css))`.
+ */
+export function assertOpacityTokenConformance(cssText: string, tokens?: readonly string[]): void {
+  const { ok, errors } = checkOpacityTokenConformance(cssText, tokens);
+  if (!ok) {
+    throw new Error(
+      `Opacity token conformance failed:\n${errors.map((e) => `  - ${e}`).join("\n")}`,
     );
   }
 }

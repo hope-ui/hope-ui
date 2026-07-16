@@ -18,8 +18,11 @@ export * from "./recipes";
 export * from "./registry";
 export {
   SEMANTIC_COLOR_TOKENS,
+  SEMANTIC_OPACITY_TOKENS,
   type SemanticColorContract,
   type SemanticColorToken,
+  type SemanticOpacityContract,
+  type SemanticOpacityToken,
 } from "./semantic-tokens/semantic-tokens";
 export { cn, cx, tv } from "./styling/styling";
 export {
