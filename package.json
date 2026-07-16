@@ -16,6 +16,7 @@
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "check:coverage-parity": "node scripts/check-coverage-parity.mjs",
+    "check:recipe-purity": "node scripts/check-recipe-purity.mjs",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build",
     "changeset": "changeset",

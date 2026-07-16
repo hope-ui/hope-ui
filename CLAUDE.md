@@ -66,6 +66,7 @@ pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + h
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # fails if a src file lacks a test / docs/usage doc / story, OR a leaf folder has flat sprawl
+pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
 
@@ -132,6 +133,11 @@ Also required:
 - `mount()` **fails the test** on a `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE`
   diagnostic. A deliberate untracked read is spelled `untrack(...)`; anything still warning is
   unreviewed. See `docs/usage/internal-test-utils/mount/mount.md`.
+- **Recipe purity:** a preset recipe (`packages/presets/**/recipes/`) references *finished*
+  `--hope-*` tokens only — never `color-mix`, an alpha modifier (`bg-x/50`), or a magic opacity
+  (`opacity-90`). Derived colors (the focus halo, the scrim) are authored as tokens in the preset's
+  `tokens.css`, where it owns the raw scale. `pnpm check:recipe-purity`
+  (`scripts/check-recipe-purity.mjs`) enforces this in CI. See `docs/theming.md`.
 - Stories also pin known-but-unfixed behavior where a human can see it. Don't "fix" a story by
   deleting it; fix the component and rename the story. Current example: Dialog's `Modal with an
   unpositioned Popup (content is unclickable — by design)`, a documented consequence of the

@@ -68,3 +68,9 @@ jobs:
 
       - name: Definition-of-Done coverage/docs/stories check
         run: pnpm check:coverage-parity
+
+      # Recipes reference finished --hope-* tokens only — no color-mix, alpha modifier, or magic
+      # opacity. A computed color applies a fixed rule to a base the recipe doesn't own, so a
+      # consumer that redefines that base silently breaks. See docs/theming.md ("recipe purity").
+      - name: Recipe purity check
+        run: pnpm check:recipe-purity
