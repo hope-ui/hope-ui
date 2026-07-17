@@ -1,6 +1,7 @@
 import { Dynamic } from "@solidjs/web";
 import type { Component } from "solid-js";
 import { CodeBlock } from "~/components/CodeBlock";
+import { Preview } from "~/components/Preview";
 
 // MDX funnels every intrinsic element through `_components.<tag>` and calls it
 // as a component. Its built-in defaults map each tag to a STRING ("h1"), which
@@ -53,6 +54,11 @@ for (const tag of HTML_TAGS) {
 
 // Code blocks: swap the bare <pre> passthrough for the copy-button wrapper.
 hostComponents.pre = CodeBlock as Component<AnyProps>;
+
+// Doc primitives usable in any .mdx without an explicit import (MDX routes any
+// capitalized name it can't resolve locally through this provider). `Preview` is
+// the centered live-demo canvas that fuses with a following code block.
+hostComponents.Preview = Preview as Component<AnyProps>;
 
 // rehype-pretty-code wraps every code block in <figure data-rehype-pretty-code-figure>.
 // It's the only source of <figure> here (markdown images don't produce one), so always

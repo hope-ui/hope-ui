@@ -1,3 +1,4 @@
+import { Button } from "@hope-ui/components/button";
 import { ButtonDemo } from "~/components/ButtonDemo";
 
 export const description =
@@ -10,11 +11,21 @@ preset, so it matches your theme automatically.
 
 ## Examples
 
-<ButtonDemo />
+<Preview>
+  <ButtonDemo />
+</Preview>
 
 ## Variants
 
 Combine a `variant` with a `colorScheme`:
+
+<Preview>
+  <Button variant="solid" colorScheme="primary">Solid</Button>
+  <Button variant="soft" colorScheme="success">Soft</Button>
+  <Button variant="outline" colorScheme="danger">Outline</Button>
+  <Button variant="ghost">Ghost</Button>
+  <Button variant="link">Link</Button>
+</Preview>
 
 ```tsx title="Button variants"
 <Button variant="solid" colorScheme="primary">Solid</Button>
@@ -31,6 +42,12 @@ Combine a `variant` with a `colorScheme`:
 - **loading** — shows a loader and disables the button while an action is in flight
 
 ## Loading state
+
+<Preview>
+  <Button variant="solid" colorScheme="primary" loading>
+    Saving…
+  </Button>
+</Preview>
 
 ```tsx
 <Button variant="solid" colorScheme="primary" loading>

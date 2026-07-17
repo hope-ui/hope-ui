@@ -168,3 +168,46 @@
 .prose :where(code):not(:where([data-rehype-pretty-code-figure] *))::after {
   content: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Preview canvas: the site's polka-dot motif as a background texture.
+
+   `<Preview>` (see Preview.tsx) sets the surface color (`bg-surface-raised`); this
+   layers the polka dots on top so a borderless, near-surface-colored component
+   (e.g. a white/ghost element) still reads as a distinct shape against a plainly
+   patterned field. Two offset radial-gradient layers reproduce the same tile as
+   the `.dots-fade` hero texture (circles at 0,0 and 10,10 in a 20px tile), colored
+   with the shared `--hope-strong` token (what `.dots-fade` uses via `bg-strong`) so
+   the dots stay theme-aware in light and dark. Background-image paints above the
+   utility-set background-color and below the demo content, which covers the dots
+   beneath it — that occlusion is exactly what makes the component's silhouette pop.
+   Unlayered (like the rules above) so it wins over the Tailwind utility layer. */
+.doc-preview {
+  --preview-dot: color-mix(in oklab, var(--hope-strong) 60%, transparent);
+  background-image:
+    radial-gradient(var(--preview-dot) 1.5px, transparent 1.5px),
+    radial-gradient(var(--preview-dot) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    10px 10px;
+}
+
+/* ---------------------------------------------------------------------------
+   Preview + code block: fuse into one card.
+
+   When a `<Preview>` is immediately followed by a highlighted code figure, the two
+   should read as a SINGLE uniform piece rather than two rounded cards separated by
+   a margin. We square the corners that meet, close the gap, and drop the doubled
+   border so exactly one divider sits between the live demo and its source. */
+.doc-preview:has(+ [data-rehype-pretty-code-figure]) {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.doc-preview:has(+ [data-rehype-pretty-code-figure]) + [data-rehype-pretty-code-figure] {
+  margin-top: 0;
+  border-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
