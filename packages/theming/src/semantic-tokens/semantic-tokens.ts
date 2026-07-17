@@ -166,9 +166,9 @@ export const SEMANTIC_COLOR_TOKENS = [
   "active",
   "selected",
 
-  // ── Disabled control fill — a real background (`bg-disabled`), kept a legible step away from
-  // `foreground-disabled` (the disabled label text) so text still reads on it.
-  "disabled",
+  // ── Disabled state has no fill token: hope-ui dims a disabled control via the `opacity-disabled`
+  // axis (see SEMANTIC_OPACITY_TOKENS) rather than swapping to a dedicated background color. The
+  // disabled *label* still has its own text token (`foreground-disabled`, in the ramp above).
 
   // ── Systemic: focus indicator (`ring-focus` / `border-focus`), its translucent halo
   // (`ring-focus-halo`, a preset-authored derived color), and modal dimming (`bg-scrim`).

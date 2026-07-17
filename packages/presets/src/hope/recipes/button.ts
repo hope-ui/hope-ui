@@ -16,7 +16,7 @@
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
  * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
  * interaction state is a *finished* token too — the hover wash (guarded against the pressed state,
- * `[&:hover:not([data-pressed])]:bg-primary-hovered`, so it never fights the press color),
+ * `hover:not-data-pressed:bg-primary-hovered`, so it never fights the press color),
  * `data-pressed:bg-primary-pressed`, `focus-visible:ring-focus-halo`, and the dim-only state axes
  * `data-disabled:opacity-disabled` / `aria-busy:opacity-loading`. The recipe computes no color: no
  * `color-mix`, no alpha modifier (`bg-x/50`), no magic opacity, so a preset that redefines a shade
@@ -50,63 +50,63 @@ const COLOR_CLASSES: Record<
 > = {
   primary: {
     solid:
-      "bg-primary text-on-primary [&:hover:not([data-pressed])]:bg-primary-hovered data-pressed:bg-primary-pressed",
-    soft: "bg-primary-soft text-primary-emphasis [&:hover:not([data-pressed])]:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
+      "bg-primary text-on-primary hover:not-data-pressed:bg-primary-hovered data-pressed:bg-primary-pressed",
+    soft: "bg-primary-soft text-primary-emphasis hover:not-data-pressed:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
     outline:
-      "text-primary-emphasis border-primary-line [&:hover:not([data-pressed])]:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
+      "text-primary-emphasis border-primary-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
     ghost:
-      "text-primary-emphasis [&:hover:not([data-pressed])]:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
-    link: "text-primary-emphasis [&:hover:not([data-pressed])]:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
+      "text-primary-emphasis hover:not-data-pressed:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
+    link: "text-primary-emphasis hover:not-data-pressed:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
   },
   neutral: {
     solid:
-      "bg-neutral text-on-neutral [&:hover:not([data-pressed])]:bg-neutral-hovered data-pressed:bg-neutral-pressed",
-    soft: "bg-neutral-soft text-neutral-emphasis [&:hover:not([data-pressed])]:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
+      "bg-neutral text-on-neutral hover:not-data-pressed:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+    soft: "bg-neutral-soft text-neutral-emphasis hover:not-data-pressed:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
     outline:
-      "text-neutral-emphasis border-strong [&:hover:not([data-pressed])]:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
+      "text-neutral-emphasis border-strong hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
     ghost:
-      "text-neutral-emphasis [&:hover:not([data-pressed])]:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
-    link: "text-neutral-emphasis [&:hover:not([data-pressed])]:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
+      "text-neutral-emphasis hover:not-data-pressed:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
+    link: "text-neutral-emphasis hover:not-data-pressed:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
   },
   success: {
     solid:
-      "bg-success text-on-success [&:hover:not([data-pressed])]:bg-success-hovered data-pressed:bg-success-pressed",
-    soft: "bg-success-soft text-success-emphasis [&:hover:not([data-pressed])]:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
+      "bg-success text-on-success hover:not-data-pressed:bg-success-hovered data-pressed:bg-success-pressed",
+    soft: "bg-success-soft text-success-emphasis hover:not-data-pressed:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
     outline:
-      "text-success-emphasis border-success-line [&:hover:not([data-pressed])]:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
+      "text-success-emphasis border-success-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
     ghost:
-      "text-success-emphasis [&:hover:not([data-pressed])]:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
-    link: "text-success-emphasis [&:hover:not([data-pressed])]:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
+      "text-success-emphasis hover:not-data-pressed:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
+    link: "text-success-emphasis hover:not-data-pressed:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
   },
   warning: {
     solid:
-      "bg-warning text-on-warning [&:hover:not([data-pressed])]:bg-warning-hovered data-pressed:bg-warning-pressed",
-    soft: "bg-warning-soft text-warning-emphasis [&:hover:not([data-pressed])]:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
+      "bg-warning text-on-warning hover:not-data-pressed:bg-warning-hovered data-pressed:bg-warning-pressed",
+    soft: "bg-warning-soft text-warning-emphasis hover:not-data-pressed:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
     outline:
-      "text-warning-emphasis border-warning-line [&:hover:not([data-pressed])]:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
+      "text-warning-emphasis border-warning-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
     ghost:
-      "text-warning-emphasis [&:hover:not([data-pressed])]:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
-    link: "text-warning-emphasis [&:hover:not([data-pressed])]:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
+      "text-warning-emphasis hover:not-data-pressed:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
+    link: "text-warning-emphasis hover:not-data-pressed:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
   },
   danger: {
     solid:
-      "bg-danger text-on-danger [&:hover:not([data-pressed])]:bg-danger-hovered data-pressed:bg-danger-pressed",
-    soft: "bg-danger-soft text-danger-emphasis [&:hover:not([data-pressed])]:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
+      "bg-danger text-on-danger hover:not-data-pressed:bg-danger-hovered data-pressed:bg-danger-pressed",
+    soft: "bg-danger-soft text-danger-emphasis hover:not-data-pressed:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
     outline:
-      "text-danger-emphasis border-danger-line [&:hover:not([data-pressed])]:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
+      "text-danger-emphasis border-danger-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
     ghost:
-      "text-danger-emphasis [&:hover:not([data-pressed])]:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
-    link: "text-danger-emphasis [&:hover:not([data-pressed])]:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
+      "text-danger-emphasis hover:not-data-pressed:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
+    link: "text-danger-emphasis hover:not-data-pressed:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
   },
   info: {
     solid:
-      "bg-info text-on-info [&:hover:not([data-pressed])]:bg-info-hovered data-pressed:bg-info-pressed",
-    soft: "bg-info-soft text-info-emphasis [&:hover:not([data-pressed])]:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
+      "bg-info text-on-info hover:not-data-pressed:bg-info-hovered data-pressed:bg-info-pressed",
+    soft: "bg-info-soft text-info-emphasis hover:not-data-pressed:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
     outline:
-      "text-info-emphasis border-info-line [&:hover:not([data-pressed])]:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
+      "text-info-emphasis border-info-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
     ghost:
-      "text-info-emphasis [&:hover:not([data-pressed])]:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
-    link: "text-info-emphasis [&:hover:not([data-pressed])]:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
+      "text-info-emphasis hover:not-data-pressed:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
+    link: "text-info-emphasis hover:not-data-pressed:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
   },
 };
 
@@ -137,7 +137,7 @@ export const buttonRecipe = tv({
     // `bg-clip-padding` keeps the reserved 1px transparent border from painting the fill under it, so
     // solid↔outline never shifts by a pixel.
     root: [
-      "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none rounded-sm",
+      "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
       "select-none border border-transparent bg-clip-padding outline-none",
       "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
       // Focus halo is the finished `focus-halo` token (a preset-authored translucent color), not an
@@ -147,10 +147,11 @@ export const buttonRecipe = tv({
       // Two dim-only state axes, styled identically bar the opacity token. `createButton` emits
       // `data-disabled` for both native (`:disabled`) and non-native (`aria-disabled`) buttons; the
       // component sets `aria-busy` while loading. Neither swaps color — each just neutralises chrome
-      // (no cursor/pointer/shadow) and dims: disabled to `opacity-disabled` (0.4), loading to its own
-      // `opacity-loading` token (0.2). Both are finished tokens, never a magic `opacity-90`.
+      // (no cursor/pointer/shadow) and dims via a finished opacity token: `opacity-disabled` for
+      // disabled, `opacity-loading` for loading. Both are preset-owned knobs (hope dims disabled to
+      // 0.4 and leaves loading at full opacity — the loader arc conveys it), never a magic `opacity-90`.
       "data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled",
-      "aria-busy:cursor-not-allowed aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading",
+      "aria-busy:cursor-progress aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading",
     ],
     label: "inline-flex items-center",
     startDecorator: "inline-flex shrink-0 items-center justify-center",
@@ -165,11 +166,12 @@ export const buttonRecipe = tv({
   },
   variants: {
     // `size` before `variant` so `link`'s `h-auto` / `px-0.5` win the tailwind-merge conflict over the
-    // fixed height. Heights step an even +4 (24/28/32/36/40); radius is a uniform `rounded-sm`.
+    // fixed height. Heights step an even +4 (24/28/32/36/40); radius tracks size off the shadcn scale —
+    // xs/sm cap at a `min()` of `--radius-md` so they never over-round, md+ use `rounded-lg`.
     size: {
       xs: {
         root: [
-          "h-6 gap-1 text-xs px-2",
+          "h-6 gap-1 text-xs px-2 rounded-[min(var(--radius-md),10px)]",
           "has-data-[slot=button-start-decorator]:ps-1.5 has-data-[slot=button-end-decorator]:pe-1.5",
         ],
         startDecorator: "[&_svg]:size-4",
@@ -178,7 +180,7 @@ export const buttonRecipe = tv({
       },
       sm: {
         root: [
-          "h-7 gap-1 text-[0.8125rem] px-2.5",
+          "h-7 gap-1 text-[0.8125rem] px-2.5 rounded-[min(var(--radius-md),12px)]",
           "has-data-[slot=button-start-decorator]:ps-2 has-data-[slot=button-end-decorator]:pe-2",
         ],
         startDecorator: "[&_svg]:size-4.5",
@@ -187,7 +189,7 @@ export const buttonRecipe = tv({
       },
       md: {
         root: [
-          "h-8 gap-1.5 text-sm px-3",
+          "h-8 gap-1.5 text-sm px-3 rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5",
         ],
         startDecorator: "[&_svg]:size-5",
@@ -196,7 +198,7 @@ export const buttonRecipe = tv({
       },
       lg: {
         root: [
-          "h-9 gap-1.5 text-[0.9375rem] px-3.5",
+          "h-9 gap-1.5 text-[0.9375rem] px-3.5 rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3 has-data-[slot=button-end-decorator]:pe-3",
         ],
         startDecorator: "[&_svg]:size-5.5",
@@ -205,7 +207,7 @@ export const buttonRecipe = tv({
       },
       xl: {
         root: [
-          "h-10 gap-2 text-base px-4",
+          "h-10 gap-2 text-base px-4 rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3.5 has-data-[slot=button-end-decorator]:pe-3.5",
         ],
         startDecorator: "[&_svg]:size-6",
@@ -222,7 +224,7 @@ export const buttonRecipe = tv({
       // (ignores `color`); rest → hover → press walk the `surface-raised` elevation ladder. (Slot
       // recipes need `{ root }` objects, not bare strings — a bare string applies to no slot.)
       default: {
-        root: "bg-surface-raised text-foreground border-subtle shadow-xs [&:hover:not([data-pressed])]:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
+        root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       },
       solid: { root: "" },
       soft: { root: "" },

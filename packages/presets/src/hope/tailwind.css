@@ -25,6 +25,26 @@
 @import "../_base/theme-map.css";
 
 /*
+ * Radius scale — shadcn/ui's radii, driven by the single `--hope-radius` knob (its base is shadcn's
+ * `0.625rem`, authored in `./tokens.css`). shadcn defines four sizes as px offsets from the base
+ * (`sm = base − 4px`, `md = base − 2px`, `lg = base`, `xl = base + 4px`); hope keeps its full
+ * `xs…4xl` surface by continuing the same offset pattern (−2px per step below `lg`, +4px per step
+ * above `xl`), so the whole scale stays a pure function of `--hope-radius`. `@theme` (not
+ * `@theme inline`) so each `rounded-*` utility stays a `var(--radius-*)` reference the knob drives.
+ */
+@theme {
+  --radius-xs: calc(var(--hope-radius) - 6px);
+  --radius-sm: calc(var(--hope-radius) - 4px);
+  --radius-md: calc(var(--hope-radius) - 2px);
+  --radius-lg: var(--hope-radius);
+  --radius-xl: calc(var(--hope-radius) + 4px);
+  --radius-2xl: calc(var(--hope-radius) + 8px);
+  --radius-3xl: calc(var(--hope-radius) + 12px);
+  --radius-4xl: calc(var(--hope-radius) + 16px);
+}
+
+
+/*
  * Token values: hope's `--hope-*` custom properties, as `var(--color-*)` references. Because these
  * references are literally in the compiled CSS, Tailwind v4 keeps the palette shades this preset
  * uses instead of tree-shaking them — so no `@source` scan trick is needed to preserve them.

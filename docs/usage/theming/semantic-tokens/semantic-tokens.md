@@ -10,7 +10,7 @@ across variants, no `--hope-{component}-*` tokens), so every painted value is an
 
 ## API
 
-- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic **color** token name (111). The runtime
+- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic **color** token name (110). The runtime
   source of truth; `checkSemanticTokenConformance` iterates it.
 - `SemanticColorToken` — the union of the color token names.
 - `SemanticColorContract` — `Record<SemanticColorToken, string>`, the completeness shape a JS tool
@@ -52,7 +52,7 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 | `{role}-link-hovered` · `{role}-link-pressed` | `text-*` | link text, hovered / pressed (rest = `{role}-emphasis`) |
 | `on-{role}` | `text-on-{role}` | content on the solid fill |
 
-### Non-role (22)
+### Non-role (21)
 
 | Group | Tokens | Reads as |
 |---|---|---|
@@ -61,11 +61,11 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 | On-state | `on-inverse`, `on-active`, `on-selected` | `text-*` |
 | Borders | `subtle`, `strong` | `border-*` |
 | Collections | `active`, `selected` | `bg-*` |
-| Disabled fill | `disabled` (a real background — kept a legible step from `foreground-disabled`) | `bg-disabled` |
 | Systemic | `focus`, `focus-halo`, `scrim` | `border-*`/`ring-*` · `ring-*` · `bg-*` |
 
-**Total color = 89 role + 22 non-role = 111.** Icons fold into the text tokens (currentColor) — there
-is no separate `icon` family.
+**Total color = 89 role + 21 non-role = 110.** There is no disabled *fill* token — a disabled control
+dims via the `opacity-disabled` axis (below), keeping only `foreground-disabled` for the label. Icons
+fold into the text tokens (currentColor) — there is no separate `icon` family.
 
 ## Opacity axis (separate contract)
 
@@ -76,7 +76,7 @@ custom `@utility`. These exist so a recipe never hardcodes a magic opacity (`opa
 | Token | Reads as | hope default | Purpose |
 |---|---|---|---|
 | `opacity-disabled` | `opacity-disabled` | `0.4` | dim applied to a disabled control |
-| `opacity-loading` | `opacity-loading` | `0.2` | dim applied to content obscured while loading |
+| `opacity-loading` | `opacity-loading` | `1` | dim applied to content obscured while loading (hope leaves it undimmed — the loader arc conveys the state) |
 
 ## Pairing (readable-on)
 
@@ -96,11 +96,11 @@ Neutral surfaces pair with the `foreground*` ramp; the soft/outline/ghost/link l
 A preset proves it defines every token with the conformance kit (from `@hope-ui/theming/conformance`)
 run against the CSS that declares the `--hope-*` values:
 
-- `checkSemanticTokenConformance` / `assertSemanticTokenConformance` — the 111 color tokens.
+- `checkSemanticTokenConformance` / `assertSemanticTokenConformance` — the 110 color tokens.
 - `checkOpacityTokenConformance` / `assertOpacityTokenConformance` — the 2 opacity tokens (same
   `--hope-<token>:` regex; the `--hope-` namespace is shared).
 
 `@hope-ui/presets/hope` authors its palette in `hope/tokens.css`, so `hope.test.ts` reads that file
 and runs **both** checks over it. An undefined token compiles every referencing utility (or the
 opacity `@utility`) to an unresolved `var(--hope-…)`. Conformance checks the `:root` values only;
-a preset keeps its `.dark` block in lockstep by hand (for hope, 111 color tokens in each block).
+a preset keeps its `.dark` block in lockstep by hand (for hope, 110 color tokens in each block).

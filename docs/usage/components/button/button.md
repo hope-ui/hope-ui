@@ -58,7 +58,7 @@ neutral chrome button (shadcn's outline). `solid` paints the role's solid fill (
 `soft` its tonal fill, and `soft`/`outline`/`ghost`/`link` label with the role's legible *content*
 color `text-{role}-emphasis` so neutral and warning stay readable in both light and dark. Each
 variant walks its own finished interaction ladder — a pressed-guarded hover wash
-(`[&:hover:not([data-pressed])]:` → `-hovered`, so hover never fights the press color) plus
+(`hover:not-data-pressed:` → `-hovered`, so hover never fights the press color) plus
 `data-pressed:` → `-pressed`; the recipe computes no color. All styling comes from the theme's
 `button` recipe; the component itself writes no utility classes.
 
@@ -87,13 +87,14 @@ a warning.
 | State      | Representation                                                              | Tab order              | Activation |
 | ---------- | -------------------------------------------------------------------------- | ---------------------- | ---------- |
 | `disabled` | native `disabled` (native) / `aria-disabled="true"` (non-native) + `data-disabled` styling hook; dimmed (`opacity-disabled`, 0.4) | removed                | blocked    |
-| `loading`  | `aria-busy="true"` + loader; dimmed (`opacity-loading`, 0.2)               | kept (stays focusable) | blocked    |
+| `loading`  | `aria-busy="true"` + loader; `opacity-loading` applied (hope ships it at 1, so the loader arc conveys the state without dimming) | kept (stays focusable) | blocked    |
 
 A disabled `render`-ed `<a>` should also have its `href` dropped by the consumer so navigation is
 impossible; click and keyboard activation are blocked regardless. `loading` blocks activation through
 the same `preventDefault` cancel channel the disabled guard uses (see `createPress`) — the consumer's
 `onClick` never fires while loading — but without disabling the button, so it keeps its color hue and
-tab position (dimmed via `opacity-loading`, 0.2). Use `focusableWhenDisabled` (via the kernel
+tab position (the `opacity-loading` utility is applied; hope sets that token to 1, so the loader arc
+alone conveys the state). Use `focusableWhenDisabled` (via the kernel
 `createButton`) when a disabled control must stay focusable for a tooltip.
 
 ## Keyboard interaction

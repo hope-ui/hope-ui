@@ -11,8 +11,8 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     expect(new Set(SEMANTIC_COLOR_TOKENS).size).toBe(SEMANTIC_COLOR_TOKENS.length);
   });
 
-  it("is the full 111-token vocabulary", () => {
-    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(111);
+  it("is the full 110-token vocabulary", () => {
+    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(110);
   });
 
   it("includes the surfaces, text ramp, on-state, role ladders, borders, collections and systemic tokens", () => {
@@ -58,8 +58,7 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     // Collection-state fills.
     has("active");
     has("selected");
-    // Disabled + systemic (incl. the new focus halo).
-    has("disabled");
+    // Systemic (incl. the focus halo). No disabled *fill* token — disabled dims via the opacity axis.
     has("focus");
     has("focus-halo");
     has("scrim");
@@ -67,6 +66,12 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
 
   it("has no `-line` token for neutral (its outline border uses `border-strong`)", () => {
     expect(SEMANTIC_COLOR_TOKENS as readonly string[]).not.toContain("neutral-line");
+  });
+
+  it("has no `disabled` fill token (a disabled control dims via the `opacity-disabled` axis)", () => {
+    expect(SEMANTIC_COLOR_TOKENS as readonly string[]).not.toContain("disabled");
+    // The disabled *label text* keeps its ramp token, though.
+    expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain("foreground-disabled");
   });
 
   it("dropped the context-encoded and reused tokens the redesign removed", () => {
