@@ -14,13 +14,18 @@
     "@hope-ui/theming": "workspace:*",
     "@mdx-js/rollup": "^3.1.0",
     "@solidjs/web": "catalog:",
+    "@stefanprobst/rehype-extract-toc": "^3.0.0",
     "@tanstack/solid-router": "^2.0.0-beta.24",
     "@tanstack/solid-start": "^2.0.0-beta.25",
     "@tanstack/start-static-server-functions": "^1.167.18",
+    "rehype-pretty-code": "^0.14.4",
+    "rehype-slug": "^6.0.0",
+    "shiki": "^4.3.1",
     "solid-js": "catalog:",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.2.2",
     "@types/mdx": "^2.0.13",
     "@types/node": "^22.5.4",

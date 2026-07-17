@@ -13,7 +13,7 @@ function Home() {
       </p>
       <div class="mt-8 flex justify-center gap-3">
         <Link
-          to="/docs"
+          to="/get-started"
           class="inline-flex items-center rounded-sm bg-primary px-4 py-2 text-sm font-medium text-on-primary"
         >
           Get started

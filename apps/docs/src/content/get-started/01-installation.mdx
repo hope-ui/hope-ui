@@ -1,21 +1,21 @@
-import { ButtonDemo } from "~/components/ButtonDemo";
-
-# Getting started
+# Installation
 
 hope-ui is a batteries-included, themed, accessible component library for SolidJS.
 Components ship ready to use and are styled through a Tailwind v4 preset, so you get
 a coherent look out of the box while keeping full control over your design tokens.
 
-## Installation
+## Install
 
 ```bash
 pnpm add @hope-ui/components @hope-ui/theming @hope-ui/presets
 ```
 
+## Set up the provider
+
 Wrap your app in a `ThemeProvider` with a preset, then import components from their
 own subpath:
 
-```tsx
+```tsx title="App.tsx" showLineNumbers {8-10}
 import { ThemeProvider } from "@hope-ui/theming";
 import { hope } from "@hope-ui/presets/hope";
 import { Button } from "@hope-ui/components/button";
@@ -31,12 +31,7 @@ function App() {
 }
 ```
 
-## Buttons
+## Next steps
 
-Every component reads its styling from the active preset. The `Button` below is the
-real `@hope-ui/components` `Button`, themed by the `hope` preset:
-
-<ButtonDemo />
-
-Buttons combine a `variant` (`solid`, `soft`, `outline`, `ghost`, `link`) with a
-`colorScheme` (`primary`, `success`, `danger`, …), and support states like `loading`.
+Head to [Theming](/get-started/theming) to make it yours, or browse the
+[Components](/components) for live examples.

@@ -1,0 +1,24 @@
+# Calendar
+
+An accessible, internationalized calendar for selecting a single date, a range, or
+multiple dates. Built on `@internationalized/date` and the headless
+`@hope-ui/primitives` calendar kernel.
+
+## Usage
+
+```tsx title="Calendar"
+import { Calendar } from "@hope-ui/components/calendar";
+
+<Calendar selectionMode="single" />;
+```
+
+## Selection modes
+
+- **single** — one date
+- **range** — a start and end date
+- **multiple** — any number of individual dates
+
+## Accessibility
+
+- Full keyboard grid navigation (arrows, `PageUp`/`PageDown`, `Home`/`End`).
+- Locale-aware first day of week and reading direction.

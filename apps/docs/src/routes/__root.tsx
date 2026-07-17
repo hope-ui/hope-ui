@@ -57,8 +57,14 @@ function RootLayout({ children }: { children: JSX.Element }) {
           <Link to="/" activeProps={{ class: "font-bold" }} activeOptions={{ exact: true }}>
             Home
           </Link>
-          <Link to="/docs" activeProps={{ class: "font-bold" }}>
-            Docs
+          <Link to="/get-started" activeProps={{ class: "font-bold" }}>
+            Get started
+          </Link>
+          <Link to="/components" activeProps={{ class: "font-bold" }}>
+            Components
+          </Link>
+          <Link to="/changelog" activeProps={{ class: "font-bold" }}>
+            Changelog
           </Link>
         </div>
         {children}

@@ -1,8 +1,12 @@
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import mdx from "@mdx-js/rollup";
+import withToc from "@stefanprobst/rehype-extract-toc";
+import withTocExport from "@stefanprobst/rehype-extract-toc/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
+import rehypePrettyCode from "rehype-pretty-code";
+import rehypeSlug from "rehype-slug";
 import { defineConfig } from "vite";
 import viteSolid from "vite-plugin-solid";
 // Reuse the canonical `@hope-ui/* -> packages/*/src` alias array (dev only). Sharing the
@@ -69,7 +73,32 @@ export default defineConfig(({ command }) => ({
       // Solid compiler. providerImportSource -> supply Solid components for
       // intrinsic tags (see src/mdx-components.tsx) instead of MDX's string
       // defaults, which Solid can't call as components.
-      ...mdx({ jsx: true, providerImportSource: "~/mdx-components" }),
+      ...mdx({
+        jsx: true,
+        providerImportSource: "~/mdx-components",
+        // MDX defaults element attributes to REACT casing, which rewrites the
+        // `class` that rehype-pretty-code / Shiki emit to `className`. Under the
+        // Solid compiler `className` becomes a literal attribute, so every Shiki
+        // CSS selector silently fails to match and highlighting is invisible with
+        // no error. Force HTML casing; keep style keys as valid CSS too. Both only
+        // affect markdown-derived HTML, never author-written JSX (<ButtonDemo/>).
+        elementAttributeNameCase: "html",
+        stylePropertyNameCase: "css",
+        // Build-time pipeline (pure SSG — highlighting is baked into the compiled
+        // .mdx module, no client-side highlighter). rehype-pretty-code highlights
+        // fenced code (order-independent); the slug -> extract -> export chain is
+        // strictly ordered: rehype-slug adds heading ids, withToc collects them,
+        // withTocExport emits `export const tableOfContents` from the MDX module.
+        rehypePlugins: [
+          [
+            rehypePrettyCode,
+            { theme: { light: "github-light", dark: "github-dark" }, keepBackground: true },
+          ],
+          rehypeSlug,
+          withToc,
+          withTocExport,
+        ],
+      }),
     },
     tanstackStart({
       // Pure SSG for docs: full-document SSR of every route into static HTML

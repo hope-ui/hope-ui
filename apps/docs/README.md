@@ -40,12 +40,63 @@ pnpm build --filter=@hope-ui/docs...
 5. **Explicit `~` alias.** Vite's native `tsconfigPaths` rewrites `~/…` only for TS/JS importers,
    not for imports originating inside a `.mdx` file, so `resolve.alias` carries an explicit entry.
 
+## Adding & organizing content
+
+Docs pages are **content-driven**: one MDX file under `src/content/` is one page. `src/lib/content.ts`
+globs `content/**/*.mdx` and derives every route's `$slug`, its sidebar entry, and its table of
+contents — so you rarely touch a route file.
+
+### Add a page
+
+Drop a file at `src/content/<section>/<slug>.mdx`. It appears at `/<section>/<slug>`, in the section
+sidebar, and (if it has `##`/`###` headings) in the "On this page" ToC. The page **title** is its H1.
+
+- **Order:** prefix the filename with `NN-` (`01-installation.mdx`) to order it; the prefix is
+  stripped from the slug/URL. Unprefixed pages sort after, by title.
+- **Slugs** must be unique within a section.
+
+### Group the sidebar by category
+
+Put pages in a `NN-<category>/` **subfolder**: `content/components/20-overlays/dialog.mdx` renders
+under an **Overlays** header (label humanized from the folder — `data-display` → "Data display"),
+groups ordered by the `NN-` prefix. URLs stay flat (`/components/dialog`) — the folder is
+sidebar-only. Sections without subfolders (e.g. `get-started`) render a flat, header-less list.
+
+### Changelog is special
+
+Changelog **auto-groups by the major version** parsed from the slug — keep files flat
+(`content/changelog/2.0.0.mdx`) and they land under `v2` / `v1` / … headers, newest major first and
+newest release within. No folders. A non-version slug (e.g. `unreleased.mdx`) renders ungrouped and
+pinned on top. (See `resolveGroup` in `src/lib/content.ts`.)
+
+### MDX authoring
+
+- Fenced code is highlighted at build time (Shiki via `rehype-pretty-code`); a copy button is added
+  automatically. Use the meta string for extras:
+  ` ```tsx title="App.tsx" showLineNumbers {8-10} `.
+- Heading ids (`rehype-slug`) and the `tableOfContents` export (`@stefanprobst/rehype-extract-toc`)
+  are added by the MDX pipeline in `vite.config.ts` — the ToC is generated, not hand-written.
+- Import live demo components from `~/components/…` and render them inline (see
+  `content/components/10-forms/button.mdx`).
+
+### Add a whole section
+
+1. Create `src/content/<section>/`.
+2. Add three route files mirroring an existing section — copy `components.tsx`, `components.index.tsx`,
+   and `components.$slug.tsx`, swapping the `kind` / section string and the overview title.
+3. Add a link in the top nav (`src/routes/__root.tsx`).
+
+Shared UI lives in `src/components/`: `DocsSection` (grouped sidebar + `<Outlet/>`), `SectionOverview`
+(index page), `MdxDoc` (article + ToC), `TableOfContents`, `CodeBlock`, and `PathLink` (a thin retype
+of TanStack's `Link` for the content-driven concrete paths).
+
 ## Deploy (static hosting)
 
 Pure SSG → static hosting (no Worker/server).
 
 - **Build command:** `pnpm install && pnpm build --filter=@hope-ui/docs...`
 - **Build output directory:** `apps/docs/dist/client`
-- Clean URLs (`/docs` → `docs/index.html`) require every route to be prerendered (`crawlLinks`
-  follows the nav; add an explicit `pages` list for any unlinked route) — there is no server
-  fallback, so an un-prerendered route 404s.
+- Clean URLs (`/components/button` → `components/button/index.html`) require every route to be
+  prerendered. `crawlLinks` follows the sidebar — which links every content page — so pages are
+  discovered automatically; add an explicit `pages` list only for an unlinked route. There is no
+  server fallback, so an un-prerendered route 404s.

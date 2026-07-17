@@ -1,0 +1,36 @@
+import { ButtonDemo } from "~/components/ButtonDemo";
+
+# Button
+
+Buttons trigger an action or event. Every `Button` reads its styling from the active
+preset, so it matches your theme automatically.
+
+## Examples
+
+<ButtonDemo />
+
+## Variants
+
+Combine a `variant` with a `colorScheme`:
+
+```tsx title="Button variants"
+<Button variant="solid" colorScheme="primary">Solid</Button>
+<Button variant="soft" colorScheme="success">Soft</Button>
+<Button variant="outline" colorScheme="danger">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+```
+
+## Props
+
+- **variant** — `solid`, `soft`, `outline`, `ghost`, `link`
+- **colorScheme** — `primary`, `success`, `danger`, `info`, `warning`, `neutral`
+- **loading** — shows a loader and disables the button while an action is in flight
+
+## Loading state
+
+```tsx
+<Button variant="solid" colorScheme="primary" loading>
+  Saving…
+</Button>
+```

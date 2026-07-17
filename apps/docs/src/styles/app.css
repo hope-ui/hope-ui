@@ -4,6 +4,11 @@
    `@source "./recipes"` that emits the component utility classes. */
 @import "@hope-ui/presets/hope/tailwind.css";
 
+/* Styles markdown prose (headings, paragraphs, lists, tables). Legacy JS plugin
+   loaded via Tailwind v4's `@plugin` directive; must sit after the @imports.
+   The docs `<article>` opts in with `class="prose dark:prose-invert"`. */
+@plugin "@tailwindcss/typography";
+
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
 @layer base {
@@ -21,4 +26,95 @@
   body {
     @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Code blocks (rehype-pretty-code / Shiki).
+
+   These rules are intentionally UNLAYERED (outside every @layer) so they win
+   over the typography plugin's prose styles without needing `!important`. The
+   highlighted <figure> is also marked `not-prose` (see mdx-components.tsx), so
+   the code block is fully owned here. Dual light/dark theming is keyed on the
+   `.dark` ancestor to match the preset's
+   `@custom-variant dark (&:where(.dark, .dark *))`; rehype-pretty-code emits
+   `--shiki-light` / `--shiki-dark` (+ `-bg`) custom properties on the elements.
+   --------------------------------------------------------------------------- */
+[data-rehype-pretty-code-figure] {
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-gray-200);
+}
+.dark [data-rehype-pretty-code-figure] {
+  border-color: var(--color-gray-800);
+}
+
+/* Optional filename/title bar: ```tsx title="App.tsx" */
+[data-rehype-pretty-code-figure] figcaption[data-rehype-pretty-code-title] {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--color-gray-200);
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+.dark [data-rehype-pretty-code-figure] figcaption[data-rehype-pretty-code-title] {
+  border-bottom-color: var(--color-gray-800);
+  background-color: var(--color-gray-900);
+  color: var(--color-gray-300);
+}
+
+[data-rehype-pretty-code-figure] pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 0.875rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  background-color: var(--shiki-light-bg);
+}
+.dark [data-rehype-pretty-code-figure] pre {
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Grid layout gives each line its own row (needed for line numbers/highlights). */
+[data-rehype-pretty-code-figure] pre code {
+  display: grid;
+  background-color: transparent;
+  font-family: inherit;
+}
+[data-rehype-pretty-code-figure] [data-line] {
+  padding: 0 1rem;
+}
+[data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-light);
+}
+.dark [data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-dark);
+}
+
+/* Per-line highlight: ```tsx {2-4} */
+[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
+  box-shadow: inset 2px 0 0 var(--color-primary);
+}
+
+/* Line numbers: ```tsx showLineNumbers (kept out of textContent, so Copy stays clean) */
+[data-rehype-pretty-code-figure] code[data-line-numbers] {
+  counter-reset: line;
+}
+[data-rehype-pretty-code-figure] code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1.25rem;
+  text-align: right;
+  color: var(--color-gray-400);
+}
+
+/* Inline `code` in prose: drop the backtick quotes typography adds, without
+   touching the highlighted code inside a figure. */
+.prose :where(code):not(:where([data-rehype-pretty-code-figure] *))::before,
+.prose :where(code):not(:where([data-rehype-pretty-code-figure] *))::after {
+  content: none;
 }

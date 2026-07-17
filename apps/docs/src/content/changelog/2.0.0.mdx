@@ -1,0 +1,13 @@
+# 2.0.0
+
+Targets **SolidJS 2.0**.
+
+## Added
+
+- `Dialog` and `Calendar`, built on the headless `@hope-ui/primitives` kernel.
+
+## Changed
+
+- Presets now author token values in CSS (`tokens.css`), so `ThemeProvider` renders no DOM.
+- The library ships JSX-preserved source under the `solid` export condition; the consumer's
+  `vite-plugin-solid` compiles it per environment.

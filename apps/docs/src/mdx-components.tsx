@@ -1,5 +1,6 @@
 import { Dynamic } from "@solidjs/web";
 import type { Component } from "solid-js";
+import { CodeBlock } from "~/components/CodeBlock";
 
 // MDX funnels every intrinsic element through `_components.<tag>` and calls it
 // as a component. Its built-in defaults map each tag to a STRING ("h1"), which
@@ -16,6 +17,8 @@ const HTML_TAGS = [
   "br",
   "code",
   "em",
+  "figcaption",
+  "figure",
   "h1",
   "h2",
   "h3",
@@ -25,6 +28,7 @@ const HTML_TAGS = [
   "hr",
   "img",
   "li",
+  "mark",
   "ol",
   "p",
   "pre",
@@ -46,6 +50,21 @@ const hostComponents: Record<string, Component<AnyProps>> = {};
 for (const tag of HTML_TAGS) {
   hostComponents[tag] = (props) => <Dynamic component={tag} {...props} />;
 }
+
+// Code blocks: swap the bare <pre> passthrough for the copy-button wrapper.
+hostComponents.pre = CodeBlock as Component<AnyProps>;
+
+// rehype-pretty-code wraps every code block in <figure data-rehype-pretty-code-figure>.
+// It's the only source of <figure> here (markdown images don't produce one), so always
+// mark it `not-prose` — otherwise @tailwindcss/typography restyles the highlighted
+// <pre>/<code> and fights Shiki. The incoming class (if any) is preserved.
+hostComponents.figure = (props) => (
+  <Dynamic
+    component="figure"
+    {...props}
+    class={["not-prose", props.class].filter(Boolean).join(" ")}
+  />
+);
 
 export function useMDXComponents(
   extra?: Record<string, Component<AnyProps>>,

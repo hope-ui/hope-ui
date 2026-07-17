@@ -1,0 +1,37 @@
+# Theming
+
+Every hope-ui component reads its styling from the active **preset** through
+`ThemeProvider`. A preset maps a small, fixed vocabulary of semantic tokens
+(surfaces, text, per-role color ladders) to CSS, so swapping presets restyles the
+whole app without touching component code.
+
+## Using a preset
+
+The default `hope` preset is a zero-DOM, Tailwind v4 theme:
+
+```tsx title="Theming with a preset"
+import { ThemeProvider } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+<ThemeProvider preset={hope}>
+  {/* your app */}
+</ThemeProvider>;
+```
+
+Import the preset's stylesheet once in your global CSS:
+
+```css title="app.css"
+@import "tailwindcss";
+@import "@hope-ui/presets/hope/tailwind.css";
+```
+
+## Semantic tokens
+
+Components never hard-code colors — they reference finished tokens like
+`bg-primary`, `text-foreground`, or `border-subtle`. A preset owns the raw scale
+and the token values, which is what makes presets swap-safe.
+
+## Dark mode
+
+The `hope` preset ships light and dark token values keyed to a `.dark` class, so
+toggling dark mode is a single class on an ancestor element.
