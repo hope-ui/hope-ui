@@ -91,8 +91,8 @@ export function TableOfContents(props: { entries: TocEntry[]; class?: string }) 
     <Show when={items.length > 0}>
       <aside class={props.class}>
         <nav aria-label="Table of contents" class="sticky top-6 text-sm">
-          <p class="mb-3 font-semibold text-gray-900 dark:text-gray-100">On this page</p>
-          <ul class="border-l border-gray-200 dark:border-gray-800">
+          <p class="mb-3 font-semibold text-foreground">On this page</p>
+          <ul class="border-l border-subtle">
             <For each={items}>
               {(item) => (
                 <li>
@@ -103,7 +103,7 @@ export function TableOfContents(props: { entries: TocEntry[]; class?: string }) 
                     class={`block py-1 leading-snug transition-colors ${
                       activeId() === item.id
                         ? "text-primary font-medium"
-                        : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        : "text-foreground-muted hover:text-foreground"
                     }`}
                     style={{ "padding-left": `${(item.depth - 2) * 0.75 + 0.75}rem` }}
                   >

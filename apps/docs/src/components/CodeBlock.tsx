@@ -34,7 +34,7 @@ export function CodeBlock(props: AnyProps) {
         type="button"
         onClick={copy}
         aria-label={copied() ? "Code copied to clipboard" : "Copy code to clipboard"}
-        class="absolute right-2 top-2 z-10 rounded-md border border-gray-300 bg-gray-100/80 px-2 py-1 text-xs font-medium text-gray-600 opacity-0 backdrop-blur transition-opacity hover:bg-gray-200 focus-visible:opacity-100 group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800/80 dark:text-gray-300 dark:hover:bg-gray-700"
+        class="absolute right-2 top-2 z-10 rounded-md border border-strong bg-surface-raised-hovered/80 px-2 py-1 text-xs font-medium text-foreground-muted opacity-0 backdrop-blur transition-opacity hover:bg-surface-raised-pressed focus-visible:opacity-100 group-hover:opacity-100"
       >
         {copied() ? "Copied" : "Copy"}
       </button>

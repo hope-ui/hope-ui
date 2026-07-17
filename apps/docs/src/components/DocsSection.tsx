@@ -11,7 +11,7 @@ import { groupedNavFor } from "~/lib/content";
 export function DocsSection(props: { kind: string; children: JSX.Element }) {
   return (
     <div class="mx-auto flex w-full max-w-360 px-6">
-      <aside class="hidden w-60 shrink-0 border-gray-200 md:block md:border-r dark:border-gray-800">
+      <aside class="hidden w-60 shrink-0 border-subtle md:block md:border-r">
         <nav
           class="sticky top-14 max-h-[calc(100vh-3.5rem)] space-y-6 overflow-y-auto py-8 pr-4"
           aria-label={`${props.kind} pages`}
@@ -21,7 +21,7 @@ export function DocsSection(props: { kind: string; children: JSX.Element }) {
               <div>
                 <Show when={group.group}>
                   {(name) => (
-                    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                    <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-foreground-subtle">
                       {name()}
                     </p>
                   )}
@@ -32,9 +32,9 @@ export function DocsSection(props: { kind: string; children: JSX.Element }) {
                       <li>
                         <PathLink
                           to={item.path}
-                          class="block rounded-md px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                          class="block rounded-md px-3 py-1.5 text-sm text-foreground-muted transition-colors hover:bg-surface-raised-hovered hover:text-foreground"
                           activeProps={{
-                            class: "bg-primary/10 font-medium text-primary dark:bg-primary/15",
+                            class: "bg-primary/10 font-medium text-primary",
                           }}
                           activeOptions={{ exact: true }}
                         >

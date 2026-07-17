@@ -7,6 +7,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/solid-r
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
 import { SiteHeader } from "~/components/SiteHeader";
+import { SITE } from "~/config";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
@@ -16,8 +17,8 @@ export const Route = createRootRoute({
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       ...seo({
-        title: "hope-ui",
-        description: "Batteries-included, themed, accessible components for SolidJS.",
+        title: SITE.name,
+        description: SITE.description,
       }),
     ],
     links: [
@@ -67,16 +68,18 @@ function RootLayout({ children }: { children: JSX.Element }) {
             `bg-*` sets the dot color (the pattern itself is a CSS mask — see app.css). */}
         <div
           aria-hidden="true"
-          class="dots-fade pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-80 bg-gray-300 dark:bg-gray-700"
+          class="dots-fade pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-80 bg-strong"
         />
         <SiteHeader />
         <main class="flex-1">{children}</main>
         {/* Opaque page-colored bg so the decorative dots never sit behind the footer
             text (they read only in the content area above it). */}
-        <footer class="relative border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
-          <div class="mx-auto flex max-w-360 flex-col gap-1 px-6 py-8 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between dark:text-gray-400">
-            <p>Batteries-included, themed, accessible components for SolidJS.</p>
-            <p>Built with hope-ui + SolidJS 2.0</p>
+        <footer class="relative border-t border-subtle bg-surface-sunken">
+          <div class="mx-auto flex max-w-360 flex-col gap-1 px-6 py-8 text-sm text-foreground-muted sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              {SITE.name} &bull; {SITE.description}
+            </p>
+            <p>&copy; 2026-present Fabien MARIE-LOUISE.</p>
           </div>
         </footer>
         <Scripts />

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/solid-router";
 import { createSignal, For, onSettled, Show } from "solid-js";
-import { MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
+import { BrandLogoIcon, MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
+import { SITE } from "~/config";
 
 // The primary top navigation bar: brand + version badge on the left, the section
 // tabs (active tab rendered as a filled pill), and a search field + theme toggle
@@ -20,9 +21,8 @@ const NAV = [
 // `not-data-[status=active]` so hovering the *active* tab keeps its filled pill instead
 // of reverting to the idle-hover background.
 const TAB = [
-  "rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors dark:text-gray-300",
-  "not-data-[status=active]:hover:bg-gray-100 not-data-[status=active]:hover:text-gray-900",
-  "dark:not-data-[status=active]:hover:bg-gray-800 dark:not-data-[status=active]:hover:text-white",
+  "rounded-md px-3 py-1.5 text-sm font-medium text-foreground-muted transition-colors",
+  "not-data-[status=active]:hover:bg-surface-raised-hovered not-data-[status=active]:hover:text-foreground",
   "data-[status=active]:bg-primary data-[status=active]:text-on-primary",
 ].join(" ");
 
@@ -53,7 +53,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      class="grid size-9 place-items-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      class="grid size-9 place-items-center rounded-md text-foreground-muted transition-colors hover:bg-surface-raised-hovered hover:text-foreground"
       aria-label="Toggle dark mode"
     >
       <Show when={dark()} fallback={<MoonIcon class="size-4.5" />}>
@@ -65,17 +65,13 @@ function ThemeToggle() {
 
 export function SiteHeader() {
   return (
-    <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/85 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/85">
+    <header class="sticky top-0 z-40 border-b border-subtle bg-surface/85 backdrop-blur-sm">
       <div class="mx-auto flex h-14 max-w-360 items-center gap-3 px-6">
         <Link to="/" class="flex items-center gap-2.5" aria-label="hope-ui home">
-          <span class="grid size-7 place-items-center rounded-lg bg-primary text-sm font-bold text-on-primary">
-            H
-          </span>
-          <span class="text-[15px] font-semibold tracking-tight text-gray-900 dark:text-white">
-            hope-ui
-          </span>
-          <span class="rounded-full border border-gray-200 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:text-gray-400">
-            beta
+          <BrandLogoIcon class="size-10" />
+          <span class="text-base font-semibold tracking-tight text-foreground">{SITE.name}</span>
+          <span class="rounded-full border border-primary-line bg-primary-soft px-1.5 py-0.5 font-medium font-mono text-[10px] text-primary-emphasis">
+            {SITE.version}
           </span>
         </Link>
 
@@ -94,11 +90,11 @@ export function SiteHeader() {
             type="button"
             title="Search is coming soon"
             aria-label="Search (coming soon)"
-            class="hidden w-56 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm text-gray-400 transition-colors hover:border-gray-300 sm:flex dark:border-gray-800 dark:bg-gray-900 dark:text-gray-500 dark:hover:border-gray-700"
+            class="hidden w-56 items-center gap-2 rounded-lg border border-subtle bg-surface-sunken px-3 py-1.5 text-sm text-foreground-subtle transition-colors hover:border-strong sm:flex"
           >
             <SearchIcon class="size-4 shrink-0" />
             <span>Search…</span>
-            <kbd class="ml-auto rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500">
+            <kbd class="ml-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-subtle">
               ⌘K
             </kbd>
           </button>

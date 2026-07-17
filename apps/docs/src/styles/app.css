@@ -6,28 +6,56 @@
 
 /* Styles markdown prose (headings, paragraphs, lists, tables). Legacy JS plugin
    loaded via Tailwind v4's `@plugin` directive; must sit after the @imports.
-   The docs `<article>` opts in with `class="prose dark:prose-invert"`. */
+   The docs `<article>` opts in with `class="prose"`. */
 @plugin "@tailwindcss/typography";
 
 @source "../**/*.{js,ts,jsx,tsx,mdx}";
 
+/* Map the typography plugin's prose palette onto hope-ui's semantic tokens, so the
+   article body themes through the same tokens as the rest of the site. Each `--hope-*`
+   token carries its own `.dark` value, so this one set drives both light and dark —
+   which is why the <article> no longer needs `dark:prose-invert`. Unlayered so it wins
+   over the plugin's layered `.prose` variable defaults without `!important` (the same
+   reason the code-block rules below are unlayered). Highlighted code blocks are marked
+   `not-prose` (see mdx-components.tsx) and styled separately, so `pre`/`code` prose vars
+   only reach inline code. */
+.prose {
+  --tw-prose-body: var(--hope-foreground);
+  --tw-prose-headings: var(--hope-foreground);
+  --tw-prose-lead: var(--hope-foreground-muted);
+  --tw-prose-links: var(--hope-primary);
+  --tw-prose-bold: var(--hope-foreground);
+  --tw-prose-counters: var(--hope-foreground-subtle);
+  --tw-prose-bullets: var(--hope-foreground-subtle);
+  --tw-prose-hr: var(--hope-subtle);
+  --tw-prose-quotes: var(--hope-foreground-muted);
+  --tw-prose-quote-borders: var(--hope-subtle);
+  --tw-prose-captions: var(--hope-foreground-muted);
+  --tw-prose-code: var(--hope-foreground);
+  --tw-prose-pre-code: var(--hope-foreground);
+  --tw-prose-pre-bg: var(--hope-surface-sunken);
+  --tw-prose-th-borders: var(--hope-strong);
+  --tw-prose-td-borders: var(--hope-subtle);
+}
+
 @layer base {
-  /* Tailwind v4 defaults the border color to `currentColor`; pin it to a neutral
-     so bordered elements (e.g. the nav) keep a subtle line without per-element utilities. */
+  /* Tailwind v4 defaults the border color to `currentColor`; pin it to hope-ui's
+     semantic `subtle` border token so bordered elements (e.g. the nav) keep a subtle
+     line without per-element utilities. The token carries its own dark value, so this
+     adapts automatically. Hand-written CSS references the `--hope-*` variables (emitted
+     to :root/.dark by the preset's tokens.css) rather than the `--color-*` theme aliases,
+     which the preset maps with `@theme inline` and so never emits as custom properties. */
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    @apply border-subtle
   }
 
   html,
   body {
-    @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
-    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
+    @apply text-foreground bg-surface-sunken font-sans antialiased;
   }
 }
 
@@ -73,10 +101,7 @@
   margin: 1.5rem 0;
   overflow: hidden;
   border-radius: 0.5rem;
-  border: 1px solid var(--color-gray-200);
-}
-.dark [data-rehype-pretty-code-figure] {
-  border-color: var(--color-gray-800);
+  border: 1px solid var(--hope-subtle);
 }
 
 /* Optional filename/title bar: ```tsx title="App.tsx" */
@@ -84,14 +109,9 @@
   padding: 0.5rem 1rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  border-bottom: 1px solid var(--color-gray-200);
-  background-color: var(--color-gray-100);
-  color: var(--color-gray-600);
-}
-.dark [data-rehype-pretty-code-figure] figcaption[data-rehype-pretty-code-title] {
-  border-bottom-color: var(--color-gray-800);
-  background-color: var(--color-gray-900);
-  color: var(--color-gray-300);
+  border-bottom: 1px solid var(--hope-neutral-soft-hovered);
+  background-color: var(--hope-surface-raised-hovered);
+  color: var(--hope-foreground-muted);
 }
 
 [data-rehype-pretty-code-figure] pre {
@@ -124,8 +144,8 @@
 
 /* Per-line highlight: ```tsx {2-4} */
 [data-rehype-pretty-code-figure] [data-highlighted-line] {
-  background-color: color-mix(in oklab, var(--color-primary) 12%, transparent);
-  box-shadow: inset 2px 0 0 var(--color-primary);
+  background-color: color-mix(in oklab, var(--hope-primary) 12%, transparent);
+  box-shadow: inset 2px 0 0 var(--hope-primary);
 }
 
 /* Line numbers: ```tsx showLineNumbers (kept out of textContent, so Copy stays clean) */
@@ -139,7 +159,7 @@
   width: 1rem;
   margin-right: 1.25rem;
   text-align: right;
-  color: var(--color-gray-400);
+  color: var(--hope-foreground-subtle);
 }
 
 /* Inline `code` in prose: drop the backtick quotes typography adds, without

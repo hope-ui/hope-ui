@@ -23,6 +23,41 @@ const base = {
   "stroke-linejoin": "round",
 } as const;
 
+export function BrandLogoIcon(props: IconProps) {
+  return (
+    <svg
+      width="1200"
+      height="1200"
+      viewBox="0 0 1200 1200"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      class={props.class}
+    >
+      <path
+        d="M475.599 636.395L248.801 1129L504.372 980.034L501.679 947.87L475.599 636.395Z"
+        fill="#8B5CF6"
+      />
+      <path d="M927.504 683.794L475.599 636.395L501.679 947.87L927.504 683.794Z" fill="#6D28D9" />
+      <path
+        d="M475.599 636.395L597.461 219.966L74.4711 71L254.619 324.92L421.555 560.219L475.599 636.395Z"
+        fill="#7C3AED"
+      />
+      <path
+        d="M475.599 636.395L927.504 683.794L769.71 462.037L597.461 219.966L475.599 636.395Z"
+        fill="#8B5CF6"
+      />
+      <path d="M927.504 683.794L900.423 377.397L769.71 462.037L927.504 683.794Z" fill="#7C3AED" />
+      <path
+        d="M900.423 377.397L927.504 683.794L1021.87 480.658L1083.22 348.619L900.423 377.397Z"
+        fill="#8B5CF6"
+      />
+      <path d="M1200 453.573L1083.22 348.619L1021.87 480.658L1200 453.573Z" fill="#6D28D9" />
+      <path d="M0 380.782L421.555 560.219L254.619 324.92L0 380.782Z" fill="#6D28D9" />
+    </svg>
+  );
+}
+
 export function SearchIcon(props: IconProps) {
   return (
     <svg {...base} aria-hidden="true" class={props.class}>

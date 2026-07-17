@@ -13,19 +13,19 @@ function Pager(props: { prev?: DocMeta; next?: DocMeta }) {
     <Show when={props.prev || props.next}>
       <nav
         aria-label="Pagination"
-        class="not-prose mt-12 grid grid-cols-2 gap-4 border-t border-gray-200 pt-6 dark:border-gray-800"
+        class="not-prose mt-12 grid grid-cols-2 gap-4 border-t border-subtle pt-6"
       >
         <Show when={props.prev} fallback={<span />}>
           {(prev) => (
             <PathLink
               to={prev().path}
-              class="group flex flex-col items-start rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-primary/50 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary/60"
+              class="group flex flex-col items-start rounded-lg border border-subtle bg-surface-raised p-4 transition-colors hover:border-primary/60"
             >
-              <span class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span class="text-xs font-medium uppercase tracking-wide text-foreground-muted">
                 Previous
               </span>
-              <span class="mt-1 flex items-center gap-1.5 font-medium text-gray-900 group-hover:text-primary dark:text-gray-100">
-                <span class="shrink-0 text-gray-400 group-hover:text-primary">
+              <span class="mt-1 flex items-center gap-1.5 font-medium text-foreground group-hover:text-primary">
+                <span class="shrink-0 text-foreground-subtle group-hover:text-primary">
                   <ChevronLeftIcon class="size-4" />
                 </span>
                 {prev().title}
@@ -37,14 +37,14 @@ function Pager(props: { prev?: DocMeta; next?: DocMeta }) {
           {(next) => (
             <PathLink
               to={next().path}
-              class="group flex flex-col items-end rounded-lg border border-gray-200 bg-white p-4 text-right transition-colors hover:border-primary/50 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary/60"
+              class="group flex flex-col items-end rounded-lg border border-subtle bg-surface-raised p-4 text-right transition-colors hover:border-primary/60"
             >
-              <span class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              <span class="text-xs font-medium uppercase tracking-wide text-foreground-muted">
                 Next
               </span>
-              <span class="mt-1 flex items-center gap-1.5 font-medium text-gray-900 group-hover:text-primary dark:text-gray-100">
+              <span class="mt-1 flex items-center gap-1.5 font-medium text-foreground group-hover:text-primary">
                 {next().title}
-                <span class="shrink-0 text-gray-400 group-hover:text-primary">
+                <span class="shrink-0 text-foreground-subtle group-hover:text-primary">
                   <ChevronRightIcon class="size-4" />
                 </span>
               </span>
@@ -72,7 +72,7 @@ export function MdxDoc(props: {
           readable content is capped at an optimal reading measure (~75ch). */}
       <div class="min-w-0 flex-1">
         <div class="max-w-3xl">
-          <article class="prose max-w-none dark:prose-invert">
+          <article class="prose max-w-none">
             <Dynamic component={props.content} />
           </article>
           <Pager prev={siblings().prev} next={siblings().next} />
