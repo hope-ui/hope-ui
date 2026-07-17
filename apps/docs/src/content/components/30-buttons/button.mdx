@@ -1,56 +1,501 @@
 import { Button } from "@hope-ui/components/button";
-import { ButtonDemo } from "~/components/ButtonDemo";
+import { hope } from "@hope-ui/presets/hope";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { Link } from "@tanstack/solid-router";
+import { ButtonIconsDemo } from "~/components/demos/button/ButtonIconsDemo";
+import { ButtonMatrixDemo } from "~/components/demos/button/ButtonMatrixDemo";
+import { InfoIcon } from "~/components/Icons";
+import { PropsTable } from "~/components/PropsTable";
 
 export const description =
-  "A themeable, accessible trigger for actions and events, with variants, color schemes, and a built-in loading state.";
+  "A themeable, accessible trigger for actions and events, with variants, color schemes, sizes, decorators, and a built-in loading state.";
 
 # Button
 
-Buttons trigger an action or event. Every `Button` reads its styling from the active
-preset, so it matches your theme automatically.
+{description}
 
-## Examples
+## Import
+
+```tsx
+import { Button } from "@hope-ui/components/button";
+```
+
+## Usage
 
 <Preview>
-  <ButtonDemo />
+  <Button>Button</Button>
 </Preview>
+
+```tsx
+<Button>Button</Button>
+```
 
 ## Variants
 
-Combine a `variant` with a `colorScheme`:
+The `variant` prop sets the visual style. `default` is neutral, color-independent chrome (it
+ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the colored variants.
 
 <Preview>
-  <Button variant="solid" colorScheme="primary">Solid</Button>
-  <Button variant="soft" colorScheme="success">Soft</Button>
-  <Button variant="outline" colorScheme="danger">Outline</Button>
+  <Button variant="default">Default</Button>
+  <Button variant="solid">Solid</Button>
+  <Button variant="soft">Soft</Button>
+  <Button variant="outline">Outline</Button>
   <Button variant="ghost">Ghost</Button>
   <Button variant="link">Link</Button>
 </Preview>
 
-```tsx title="Button variants"
-<Button variant="solid" colorScheme="primary">Solid</Button>
-<Button variant="soft" colorScheme="success">Soft</Button>
-<Button variant="outline" colorScheme="danger">Outline</Button>
+```tsx
+<Button variant="default">Default</Button>
+<Button variant="solid">Solid</Button>
+<Button variant="soft">Soft</Button>
+<Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="link">Link</Button>
 ```
 
-## Props
+## Color schemes
 
-- **variant** — `solid`, `soft`, `outline`, `ghost`, `link`
-- **colorScheme** — `primary`, `success`, `danger`, `info`, `warning`, `neutral`
-- **loading** — shows a loader and disables the button while an action is in flight
-
-## Loading state
+Pair a colored variant with a `colorScheme` — one of the six semantic roles. The `default`
+variant is color-independent and ignores it.
 
 <Preview>
-  <Button variant="solid" colorScheme="primary" loading>
-    Saving…
+  <ButtonMatrixDemo />
+</Preview>
+
+```tsx title="The list below is non-exhaustive"
+<Button variant="solid" colorScheme="primary">Primary</Button>
+<Button variant="soft" colorScheme="success">Success</Button>
+<Button variant="outline" colorScheme="info">Info</Button>
+<Button variant="ghost" colorScheme="warning">Warning</Button>
+<Button variant="link" colorScheme="danger">Danger</Button>
+```
+
+## Sizes
+
+Five sizes, from `xs` to `xl` (heights step from 24px to 40px). The recipe scales padding, text,
+radius, and any decorator icon to match.
+
+<Preview>
+  <Button variant="solid" size="xs">Extra small</Button>
+  <Button variant="solid" size="sm">Small</Button>
+  <Button variant="solid" size="md">Medium</Button>
+  <Button variant="solid" size="lg">Large</Button>
+  <Button variant="solid" size="xl">Extra large</Button>
+</Preview>
+
+```tsx
+<Button variant="solid" size="xs">Extra small</Button>
+<Button variant="solid" size="sm">Small</Button>
+<Button variant="solid" size="md">Medium</Button>
+<Button variant="solid" size="lg">Large</Button>
+<Button variant="solid" size="xl">Extra large</Button>
+```
+
+## Full width
+
+`fullWidth` stretches the button to fill its container — useful for forms and mobile layouts.
+
+<Preview>
+  <div class="w-full">
+    <Button variant="solid" fullWidth>Continue</Button>
+  </div>
+</Preview>
+
+```tsx
+<Button variant="solid" fullWidth>Continue</Button>
+```
+
+## Icons & decorators
+
+Put content before or after the label with `startDecorator` and `endDecorator`. Both accept any
+JSX — an inline `<svg>`, or an icon from your icon set. The recipe sizes decorator SVGs to the
+button's size for you.
+
+<Preview>
+  <ButtonIconsDemo />
+</Preview>
+
+```tsx
+<Button variant="solid" startDecorator={<CheckIcon />}>
+  Save
+</Button>
+
+<Button variant="default" endDecorator={<ArrowRightIcon />}>
+  Continue
+</Button>
+```
+
+## Loading
+
+`loading` shows a loader, sets `aria-busy`, and blocks activation — while keeping the button in
+the tab order (it does not use the native `disabled` attribute). By default the loader overlays
+and hides the label (`loaderPlacement="center"`), preserving the button's width. Pass
+`loadingText` to swap the label for a message instead — this keeps the text visible with an inline
+loader. Use `loaderPlacement` (`start` / `end`) to place an inline loader yourself.
+
+<Preview>
+  <Button variant="solid" loading>Save</Button>
+  <Button variant="soft" colorScheme="neutral" loading loadingText="Uploading…">Upload</Button>
+  <Button variant="outline" colorScheme="danger" loading loaderPlacement="end">Delete</Button>
+</Preview>
+
+```tsx
+<Button variant="solid" loading>
+  Save
+</Button>
+
+<Button variant="soft" colorScheme="neutral" loading loadingText="Uploading…">
+  Upload
+</Button>
+
+<Button variant="outline" colorScheme="danger" loading loaderPlacement="end">
+  Delete
+</Button>
+```
+
+## Disabled
+
+`disabled` blocks the button and dims it via the `opacity-disabled` token, keeping its own
+variant color rather than turning grey. A native `<button>` uses the `disabled` attribute (and
+drops out of the tab order); a non-native button (see [Polymorphism](#polymorphism)) instead
+gets `aria-disabled` with blocked handlers.
+
+<Preview>
+  <Button variant="default" disabled>Default</Button>
+  <Button variant="solid" disabled>Solid</Button>
+  <Button variant="soft" disabled>Soft</Button>
+  <Button variant="outline" disabled>Outline</Button>
+  <Button variant="ghost" disabled>Ghost</Button>
+  <Button variant="link" disabled>Link</Button>
+</Preview>
+
+```tsx
+<Button disabled>Default</Button>
+```
+
+## Polymorphism
+
+Render Button as a different element or component with the `render` prop — a function that
+receives Button's fully-computed props and spreads them onto your element. This is how you make a
+link that looks and behaves like a button. There is **no `as` prop**; `render` is the single
+polymorphism API.
+
+<Preview>
+  <Button
+    variant="solid"
+    colorScheme="primary"
+    nativeButton={false}
+    render={(props) => <a href="#" {...props} />}
+  >
+    Anchor that acts as a button
+  </Button>
+</Preview>
+
+```tsx title="Render as an anchor"
+<Button
+  variant="solid"
+  colorScheme="primary"
+  nativeButton={false}
+  render={(props) => <a href="#" {...props} />}
+>
+  Anchor that acts as a button
+</Button>
+```
+
+It also works with a **component** target — for example your router's `Link`. Button merges its
+internal ref with the rendered element's into a single function ref, which a router `Link` honours,
+so you get hope-ui's styling and press behavior with real client-side navigation.
+
+<Preview>
+  <Button
+    variant="solid"
+    colorScheme="primary"
+    nativeButton={false}
+    render={(props) => <Link {...props} to="/" />}
+  >
+    Back to Home
+  </Button>
+</Preview>
+
+```tsx title="Render as a router Link"
+import type { ComponentProps } from "solid-js";
+import { Link } from "@tanstack/solid-router";
+import { Button } from "@hope-ui/components/button";
+
+<Button
+  variant="solid"
+  colorScheme="primary"
+  nativeButton={false}
+  render={(props) => 
+    <Link {...(props as unknown as ComponentProps<typeof Link>)} to="/" />
+  }
+>
+  Back to Home
+</Button>
+```
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    When you render anything other than a native <code>button</code>, set <code>nativeButton</code>
+    to <code>false</code>. Button then applies <code>role="button"</code>, manages the tab order,
+    and synthesizes keyboard activation (Space and Enter) — the behavior a real button has for
+    free. The <code>as unknown as</code> cast on the spread is only needed to satisfy TypeScript
+    when switching to a different element type; the runtime behavior is unaffected.
+  </div>
+</div>
+
+## Theming
+
+Button's look comes from the active preset's recipe. You can override it at three levels, applied
+in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance
+`slotClasses` → `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`.
+
+<PropsTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    { slot: "root", attr: "button", description: "The rendered element (a native button by default)." },
+    { slot: "label", attr: "button-label", description: "Wraps the children — or the loadingText while loading." },
+    { slot: "startDecorator", attr: "button-start-decorator", description: "Leading decorator wrapper. Rendered only when startDecorator is set." },
+    { slot: "endDecorator", attr: "button-end-decorator", description: "Trailing decorator wrapper. Rendered only when endDecorator is set." },
+    { slot: "loader", attr: "button-loader", description: "Loader wrapper. Rendered only while loading; marked aria-hidden." },
+  ]}
+/>
+
+### Overriding one button
+
+`class` merges onto the root slot (your utilities win conflicts). `slotClasses` targets any slot
+by name. Use literal class strings so your Tailwind build can see them.
+
+<Preview>
+  <Button variant="solid" slotClasses={{ root: "rounded-full px-6" }}>Pill</Button>
+  <Button variant="soft" colorScheme="success" slotClasses={{ label: "uppercase tracking-wide" }}>
+    deploy!
   </Button>
 </Preview>
 
 ```tsx
-<Button variant="solid" colorScheme="primary" loading>
-  Saving…
+<Button variant="solid" slotClasses={{ root: "rounded-full px-6" }}>
+  Pill
+</Button>
+
+<Button 
+  variant="soft" 
+  colorScheme="success" 
+  slotClasses={{ 
+    label: "uppercase tracking-wide" 
+  }}
+>
+  deploy!
 </Button>
 ```
+
+### App-wide defaults & overrides
+
+Set defaults and global part classes for **every** Button through the theme with `definePreset`,
+then pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at **instance ??
+preset ?? builtin** precedence, so an explicit prop on a single button always wins.
+
+<Preview>
+  <ThemeProvider
+    preset={definePreset(hope, {
+      components: {
+        button: {
+          defaultProps: { size: "lg" },
+          slotClasses: { root: "rounded-full" },
+        },
+      },
+    })}
+  >
+    <Button variant="solid" colorScheme="primary">Branded</Button>
+    <Button variant="soft" colorScheme="neutral">Branded</Button>
+  </ThemeProvider>
+</Preview>
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    button: {
+      // Every recipe variant is defaultable.
+      defaultProps: { size: "lg" },
+      // Global part classes, folded in before per-instance slotClasses.
+      slotClasses: { root: "rounded-full" },
+    },
+  },
+});
+```
+
+```tsx title="App.tsx"
+import { ThemeProvider } from "@hope-ui/theming";
+import { myPreset } from "./theme";
+
+<ThemeProvider preset={myPreset}>
+  {/* every Button below is large & pill-shaped */}
+</ThemeProvider>
+```
+
+Defaultable through `defaultProps`: `variant`, `colorScheme`, `size`, `fullWidth`,
+`loaderPlacement`, and the chrome content `loader` / `loadingText` (as `() => JSX.Element`
+factories, so each instance gets a fresh node). 
+
+Transient state (`loading`, `disabled`) and per-usage behavior (`nativeButton`, `type`) 
+are intentionally **not** defaultable app-wide.
+
+## API
+
+### Props
+
+`Button` accepts every native `<button>` attribute in addition to the props below.
+
+<PropsTable
+  columns={[
+    { key: "prop", label: "Prop", code: true },
+    { key: "type", label: "Type", code: true },
+    { key: "default", label: "Default", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      prop: "variant",
+      type: "ButtonVariant",
+      default: '"default"',
+      description: "Visual style: default, solid, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme.",
+    },
+    {
+      prop: "colorScheme",
+      type: "ButtonColorScheme",
+      default: '"primary"',
+      description: "Semantic role color: primary, neutral, success, info, warning, danger. Applied by the colored variants; ignored by default.",
+    },
+    {
+      prop: "size",
+      type: "ButtonSize",
+      default: '"md"',
+      description: "Density scale: xs, sm, md, lg, xl (heights 24–40px).",
+    },
+    {
+      prop: "fullWidth",
+      type: "boolean",
+      default: "false",
+      description: "Stretches the button to fill its container's width.",
+    },
+    {
+      prop: "loading",
+      type: "boolean",
+      default: "false",
+      description: "Shows a loader and sets aria-busy. Blocks activation but keeps the button in the tab order — it does not use the disabled attribute.",
+    },
+    {
+      prop: "loadingText",
+      type: "JSX.Element | (() => JSX.Element)",
+      default: "",
+      description: "Replaces the label while loading, kept visible by an inline start loader. A factory is reuse-safe as an app-wide default.",
+    },
+    {
+      prop: "loader",
+      type: "JSX.Element | (() => JSX.Element)",
+      default: "",
+      description: "Custom loader content. Defaults to hope's spinner. A factory is reuse-safe as an app-wide default.",
+    },
+    {
+      prop: "loaderPlacement",
+      type: '"center" | "start" | "end"',
+      default: '"center"',
+      description: "Where the loader sits while loading. center overlays it and hides the label, preserving width.",
+    },
+    {
+      prop: "startDecorator",
+      type: "JSX.Element",
+      default: "",
+      description: "Leading content before the label — typically an icon.",
+    },
+    {
+      prop: "endDecorator",
+      type: "JSX.Element",
+      default: "",
+      description: "Trailing content after the label — typically an icon.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Disables the button. Native buttons use the disabled attribute; a non-native element uses aria-disabled and blocked handlers. Keeps its variant color, dimmed.",
+    },
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      default: "true",
+      description: "Whether the rendered element is a real button. Set false when rendering another element so Button supplies role, tabIndex, and keyboard activation.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render Button as another element or component. Receives Button's computed props. The only polymorphism mechanism — there is no as prop.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"button">',
+      default: "",
+      description: "Per-slot class overrides, keyed by root, label, startDecorator, endDecorator, loader.",
+    },
+    {
+      prop: "type",
+      type: '"button" | "submit" | "reset"',
+      default: '"button"',
+      description: "Native button type.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The button label.",
+    },
+  ]}
+/>
+
+## Accessibility
+
+`Button` renders a real `<button>` by default, so it is keyboard- and screen-reader-accessible
+out of the box. When you `render` it as another element with `nativeButton={false}`, it supplies
+the missing semantics itself: `role="button"`, tab-order management, and synthesized keyboard
+activation.
+
+<PropsTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "action", label: "Action" },
+  ]}
+  rows={[
+    { key: "Enter", action: "Activates the button (native and rendered-as elements)." },
+    { key: "Space", action: "Activates the button (synthesized for rendered-as elements; page scroll is prevented)." },
+    { key: "Tab", action: "Moves focus. A disabled native button is skipped; a loading button keeps its place." },
+  ]}
+/>
+
+- **Loading** sets `aria-busy="true"` and blocks activation while keeping focus and tab position,
+  so a screen reader announces the busy state without the control vanishing.
+- **Disabled** uses the native `disabled` attribute on a `<button>` (no redundant `aria-disabled`),
+  and `aria-disabled` on a non-native button.
+- **Icon-only** buttons have no visible text — give them an `aria-label` (or `aria-labelledby`) so
+  they have an accessible name.

@@ -193,8 +193,8 @@ function Hero() {
       {/* Layered decorative background: faint grid + two drifting glow blobs. */}
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
         <div class="hope-grid absolute inset-0" />
-        <div class="hope-glow absolute -top-24 left-1/4 size-[32rem] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
-        <div class="hope-glow absolute -top-10 right-0 size-[26rem] rounded-full bg-info/15 blur-3xl [animation-delay:2s]" />
+        <div class="hope-glow absolute -top-24 left-1/4 size-128 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+        <div class="hope-glow absolute -top-10 right-0 size-104 rounded-full bg-info/15 blur-3xl [animation-delay:2s]" />
       </div>
 
       <div class="mx-auto grid max-w-7xl items-center gap-14 px-6 py-20 lg:grid-cols-2 lg:gap-10 lg:py-28">
@@ -387,7 +387,7 @@ function ComponentShowcase() {
     <section class="relative overflow-x-clip border-y border-subtle bg-surface-sunken/60 py-20 sm:py-28">
       <div
         aria-hidden="true"
-        class="hope-glow pointer-events-none absolute left-1/2 top-0 -z-10 size-[36rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+        class="hope-glow pointer-events-none absolute left-1/2 top-0 -z-10 size-144 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
       />
       <div class="mx-auto max-w-7xl px-6">
         <div class="hope-reveal mx-auto max-w-2xl text-center">
