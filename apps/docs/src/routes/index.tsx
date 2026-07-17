@@ -1,7 +1,7 @@
 import { Button } from "@hope-ui/components/button";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute, Link } from "@tanstack/solid-router";
-import { type Component, createSignal, For, onSettled, Show } from "solid-js";
+import { type Component, type ComponentProps, createSignal, For, onSettled, Show } from "solid-js";
 import {
   AccessibilityIcon,
   ArrowRightIcon,
@@ -73,36 +73,35 @@ function CopyCommand(props: { command: string; class?: string }) {
   );
 }
 
-// The CTAs navigate, so they are real router Links (client-side nav + preloading),
-// styled to match hope-ui's Button recipe with the same semantic tokens the Button
-// itself uses. (A router Link exposes a getter-only `ref`, so it can't be driven
-// through Button's `render` polymorphism — which merges a ref — hence the parity
-// styling here instead.) The live Button component is showcased for real further
-// down the page and inside the hero panel.
-const CTA_BASE =
-  "group inline-flex h-11 select-none items-center justify-center gap-2 rounded-md px-5 text-base font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
-const CTA_VARIANTS = {
-  primary:
-    "bg-primary text-on-primary shadow-sm hover:bg-primary-hovered active:bg-primary-pressed",
-  neutral:
-    "bg-neutral-soft text-neutral-emphasis hover:bg-neutral-soft-hovered active:bg-neutral-soft-pressed",
-} as const;
-
+// The CTAs navigate, so they render a real router Link (client-side nav + preloading) — but
+// driven through hope-ui's own Button. Button's `render` polymorphism merges its internal ref
+// with the rendered element's into a single function ref, which TanStack's Link honours, so
+// these are the live Button component (recipe styling + press behavior) rendered as an <a>.
+// `nativeButton={false}` switches Button to the anchor a11y model (role/tabIndex + keyboard
+// synthesis) for the swapped-in element; the button→anchor prop cast is the documented
+// cross-element `render` boundary (see docs/usage/primitives/utils/render/render.md).
 function CtaButton(props: {
   to: string;
   children: JSX.Element;
-  tone?: keyof typeof CTA_VARIANTS;
+  tone?: "primary" | "neutral";
   class?: string;
 }) {
   return (
-    <Link
-      to={props.to}
-      class={[CTA_BASE, CTA_VARIANTS[props.tone ?? "primary"], props.class]
-        .filter(Boolean)
-        .join(" ")}
+    <Button
+      nativeButton={false}
+      variant={props.tone === "neutral" ? "soft" : "solid"}
+      colorScheme={props.tone === "neutral" ? "neutral" : "primary"}
+      size="xl"
+      class={props.class}
+      render={(buttonProps) => (
+        // Button types `render`'s props against its own element (a <button>); Link wants
+        // link-shaped props. Casting at this button→anchor boundary is the documented
+        // cross-element `render` trade-off (see render.md). `to` is Link-managed, so it wins.
+        <Link {...(buttonProps as unknown as ComponentProps<typeof Link>)} to={props.to} />
+      )}
     >
       {props.children}
-    </Link>
+    </Button>
   );
 }
 

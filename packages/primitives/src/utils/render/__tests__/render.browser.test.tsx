@@ -1,4 +1,5 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
+import { omit } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { renderElement } from "../render";
@@ -96,6 +97,43 @@ describe("renderElement", () => {
 
     await expect.element(page.getByRole("link", { name: "rendered" })).toBeInTheDocument();
     expect(internal).toBeInstanceOf(HTMLAnchorElement);
+    dispose();
+  });
+
+  it("merges refs onto a component that only honours function refs (TanStack `Link` shape)", async () => {
+    // The regression guard for the array-ref flaw. Every other ref test above renders into a host
+    // element (`<a>`/`<button>`), whose compiler flattens a ref array via `applyRef` — so they pass
+    // even when the merge output is an array. A user *component*, however, receives `props.ref`
+    // verbatim and composes it itself. `@tanstack/solid-router`'s `Link` (and most libraries) only
+    // honour a *function* ref: `if (typeof r === "function") r(el)`. This mock reproduces that
+    // exactly — it reads `props.ref`, applies it only when callable, and never spreads `ref` onto
+    // its host `<a>`. An array `[internalRef, consumerRef]` fails that guard and drops BOTH refs;
+    // a single merged function ref satisfies it and both fire.
+    function LinkLike(props: { ref?: unknown; children?: string }) {
+      const applyFunctionRefOnly = (element: HTMLAnchorElement) => {
+        const consumerRef = props.ref;
+        if (typeof consumerRef === "function") {
+          (consumerRef as (element: HTMLElement) => void)(element);
+        }
+      };
+      return <a href="/docs" {...omit(props, "ref")} ref={applyFunctionRefOnly} />;
+    }
+
+    let internal: HTMLElement | undefined;
+    let consumer: HTMLElement | undefined;
+
+    const { dispose } = mount(() =>
+      renderElement<{ children: string; ref?: (el: HTMLElement) => void }, HTMLElement>({
+        as: "a",
+        props: { children: "link ref", ref: (el) => (consumer = el) },
+        render: (p) => <LinkLike {...p} />,
+        ref: (el) => (internal = el),
+      }),
+    );
+
+    await expect.element(page.getByRole("link", { name: "link ref" })).toBeInTheDocument();
+    expect(internal).toBeInstanceOf(HTMLAnchorElement);
+    expect(consumer).toBe(internal);
     dispose();
   });
 

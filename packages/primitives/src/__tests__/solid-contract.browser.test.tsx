@@ -12,12 +12,14 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("@solidjs/web client-build contract", () => {
   describe("applyRef flattens a ref array and skips falsy entries", () => {
-    // Depended on by: `renderElement` (packages/primitives/src/render/render.tsx), which
-    // merges a component's internal ref setter with the consumer's by handing `spread` the
-    // array `[internalRef, consumerRef]`. Because `applyRef` does
-    // `r.flat(Infinity).forEach(f => f && f(element))`, an absent consumer ref is a non-issue
-    // and **no `mergeRefs` helper is needed anywhere in this codebase** — an invariant
-    // CLAUDE.md and `render.md` both state, and which one component had already broken once.
+    // Depended on by: `renderElement` (packages/primitives/src/utils/render/render.tsx), which
+    // merges a component's internal ref setter with the consumer's into a SINGLE function ref and
+    // calls `applyRef([internalRef, consumerRef], element)` inside it. Because `applyRef` does
+    // `r.flat(Infinity).forEach(f => f && f(element))`, an absent consumer ref (or one that is
+    // itself an array) is a non-issue, so **no `mergeRefs` helper is needed anywhere in this
+    // codebase** — an invariant CLAUDE.md and `render.md` both state. Exposing the merge as one
+    // function (rather than handing the raw array to the render target) is what lets it wrap a
+    // consumer *component* that only honours function refs, not just host elements.
 
     it("calls every function in a flat array", () => {
       const first = vi.fn();

@@ -1,5 +1,5 @@
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { Dynamic } from "@solidjs/web";
+import { applyRef, Dynamic } from "@solidjs/web";
 import { merge } from "solid-js";
 
 /**
@@ -24,8 +24,12 @@ export interface RenderElementOptions<Props extends object, El extends Element =
   render?: RenderProp<Props>;
   /**
    * A component-internal ref setter. Merged with whatever `ref` the consumer already put on
-   * `props`, so no component hand-rolls a `mergeRefs` helper. `@solidjs/web`'s `applyRef`
-   * flattens ref arrays and skips falsy entries, so an absent consumer ref is a non-issue.
+   * `props` into a **single function ref**, so no component hand-rolls a `mergeRefs` helper.
+   * The merge delegates flattening to `@solidjs/web`'s `applyRef` (which flattens ref arrays and
+   * skips falsy entries), so an absent consumer ref — or a consumer ref that is itself an array —
+   * is a non-issue. Handing over a single function (rather than the raw array) is what makes the
+   * merge work when `render` targets a *component* that reads `props.ref` itself and only honours
+   * function refs (e.g. TanStack Router's `Link`), not just host elements.
    */
   ref?: JSX.RefCallback<El>;
 }
@@ -33,23 +37,39 @@ export interface RenderElementOptions<Props extends object, El extends Element =
 /**
  * Shared "render prop" / `as`-polymorphism primitive used by every public component.
  * Unlike a React `useRender` hook, this needs no memoization or ref-forwarding dance:
- * Solid components run once, and `ref` natively accepts an array of ref-setter functions.
+ * Solid components run once, and the internal + consumer refs are merged into one function ref
+ * (see the merge below) that any render target — host element or component — honours.
  */
 export function renderElement<Props extends object, El extends Element = Element>(
   options: RenderElementOptions<Props, El>,
 ): JSX.Element {
   const internalRef = options.ref;
 
-  // The consumer's `ref` is read inside a getter rather than here, so `spread`'s own
-  // ref-handling effect is what triggers the read. Reading `options.props.ref` eagerly in
-  // a component body is an untracked prop read, which Solid's dev build rightly warns about.
+  // Merge the internal ref with any consumer `ref` into a SINGLE function ref. A single callback
+  // is honoured by every kind of render target: a host element (Solid's `spread` accepts a
+  // `typeof r === "function"` ref), a component using a plain function ref, and — crucially — a
+  // component that composes refs but ignores non-function values (e.g. TanStack Router's `Link`
+  // does `if (typeof r === "function") r(el)`). Handing over the raw array `[internalRef,
+  // consumerRef]` only worked for host elements, whose compiler flattens it via `applyRef`; a
+  // user component that reads `props.ref` itself dropped it silently.
+  //
+  // `applyRef` does the flatten + falsy-skip, so an absent consumer ref (or a consumer ref that is
+  // itself an array) is a non-issue — but a bare `applyRef(undefined, el)` throws, so the consumer
+  // ref is passed *inside* the array, never on its own. The consumer's `ref` is read INSIDE the
+  // callback (not eagerly in the body), so the read lands in the render target's ref effect rather
+  // than being an untracked prop read Solid's dev build warns about.
   const props =
     internalRef === undefined
       ? options.props
       : merge(options.props, {
-          get ref(): JSX.Ref<El> {
+          ref: (element: El) => {
             const consumerRef = (options.props as { ref?: JSX.Ref<El> }).ref;
-            return consumerRef === undefined ? internalRef : [internalRef, consumerRef];
+            // `applyRef` types its refs against `Element`; ours are typed against the narrower `El`,
+            // so the array needs a cast at the boundary (as the props access above already does).
+            applyRef(
+              [internalRef, consumerRef] as unknown as Parameters<typeof applyRef>[0],
+              element,
+            );
           },
         });
 

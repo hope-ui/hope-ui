@@ -58,7 +58,7 @@ What they pin:
 | Sibling effects run in creation order; on **re-run** their cleanups do too; on **owner disposal** cleanups are LIFO | `createFocusRestore`'s creation order *and* its `queueMicrotask` deferral |
 | A microtask queued from the first cleanup lands after every sibling cleanup | `createFocusRestore`'s deferral |
 | `Dynamic` → `ssrElement(…, true)` emits an `_hk` hydration key server-side | `renderElement`; everything it renders hydrates against that key |
-| `applyRef` does `r.flat(Infinity).forEach(f => f && f(el))`, skipping falsy entries | `renderElement`'s ref merging; why no `mergeRefs` helper exists |
+| `applyRef` does `r.flat(Infinity).forEach(f => f && f(el))`, skipping falsy entries | `renderElement`'s ref merging calls `applyRef([internalRef, consumerRef], el)` inside its single merged function ref; why no `mergeRefs` helper exists |
 
 Still to re-check by hand at the migration, because nothing pins them:
 

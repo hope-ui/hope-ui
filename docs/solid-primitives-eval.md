@@ -157,7 +157,9 @@ render-body memo) are the safest bet.
 - **`composeEventHandlers` ← `props.combineHandlers`: kept.** A runtime dependency for a ~5-line
   helper is net-negative. `props.combineProps` (smart `on*`/`class`/`style` merge) is a candidate for
   `renderElement`'s prop-merge later.
-- **`renderElement` ref-merge ← `refs.mergeRefs`: kept for now**, a future consideration only.
+- **`renderElement` ref-merge ← `refs.mergeRefs`: kept**, a future consideration only.
+  `renderElement` merges to a single function ref via `applyRef`, so no `mergeRefs` dependency is
+  warranted.
 - **`withDefaults` ← `props.combineProps`: kept.** `combineProps` resolves by key *presence*, not
   `??` — wrong for defaults.
 - **`createRegisteredId` / `createRegisteredElement`: kept.** No equivalent.
