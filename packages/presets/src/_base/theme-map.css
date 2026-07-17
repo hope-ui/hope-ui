@@ -146,9 +146,6 @@
   --color-active: var(--hope-active);
   --color-selected: var(--hope-selected);
 
-  /* Disabled control fill */
-  --color-disabled: var(--hope-disabled);
-
   /* Systemic */
   --color-focus: var(--hope-focus);
   --color-focus-halo: var(--hope-focus-halo);

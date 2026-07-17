@@ -307,7 +307,7 @@ function FeatureIcon(props: { icon: Component<{ class?: string }>; class?: strin
   // A host <div> chip wrapping the icon component keeps the icon out of any
   // control-flow boundary's first-child slot.
   return (
-    <div class="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary-emphasis ring-1 ring-primary-line/60">
+    <div class="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary-emphasis">
       <props.icon class={props.class ?? "size-5.5"} />
     </div>
   );
@@ -328,7 +328,7 @@ function BentoFeatures() {
       <div class="mt-14 grid gap-4 lg:grid-cols-3">
         {/* "Themeable" — full-width banner across the top: copy on the left, the
             live semantic role palette on the right (stacks on mobile). */}
-        <article class="hope-card hope-reveal group flex flex-col items-start gap-8 rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl lg:col-span-3 lg:flex-row lg:items-center lg:gap-12">
+        <article class="hope-card hope-reveal group flex flex-col items-start gap-8 rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all! hover:-translate-y-1 hover:shadow-xl lg:col-span-3 lg:flex-row lg:items-center lg:gap-12">
           <div class="lg:max-w-sm lg:shrink-0">
             <FeatureIcon icon={PaletteIcon} />
             <h3 class="mt-5 text-xl font-semibold text-foreground">Themeable to the core</h3>
@@ -370,7 +370,7 @@ function BentoFeatures() {
         {/* Three uniform feature cards in a row below the banner. */}
         <For each={FEATURES}>
           {(feature) => (
-            <article class="hope-card hope-reveal group flex flex-col rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+            <article class="hope-card hope-reveal group flex flex-col rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all! hover:-translate-y-1 hover:shadow-xl">
               <FeatureIcon icon={feature.icon} />
               <h3 class="mt-5 text-lg font-semibold text-foreground">{feature.title}</h3>
               <p class="mt-2 text-sm leading-relaxed text-foreground-muted">{feature.desc}</p>
