@@ -13,5 +13,5 @@ export const SITE = {
   /** One-line product description — SEO meta, homepage tagline, and footer. */
   description: "Elegant, themeable, accessible components for SolidJS.",
   /** Product version shown in the header badge. */
-  version: "0.1.0",
+  version: "early-preview",
 } as const;
