@@ -278,8 +278,8 @@ function FeatureMarquee() {
   );
 }
 
-// The two cards stacked beside the big "Themeable" card. "Tailwind v4 + variants"
-// is a full-width banner below (see BentoFeatures); "Themeable" is custom.
+// The three uniform feature cards shown in a row beneath the full-width
+// "Themeable" banner (which is custom — see BentoFeatures).
 const FEATURES: {
   icon: Component<{ class?: string }>;
   title: string;
@@ -294,6 +294,11 @@ const FEATURES: {
     icon: ZapIcon,
     title: "Built for SolidJS 2.0",
     desc: "Fine-grained reactivity with clean server rendering and hydration, characterized against the 2.0 beta so upgrades never surprise you.",
+  },
+  {
+    icon: LayersIcon,
+    title: "Tailwind v4 + variants",
+    desc: "Styling flows through tailwind-variants recipes into clean, unprefixed utilities — no runtime CSS-in-JS, no style tags to hydrate.",
   },
 ];
 
@@ -319,20 +324,23 @@ function BentoFeatures() {
         </p>
       </div>
 
-      <div class="mt-14 grid gap-4 lg:grid-cols-6">
-        {/* Big "Themeable" card. */}
-        <article class="hope-card hope-reveal group flex flex-col overflow-hidden rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm hover:-translate-y-1 hover:shadow-xl lg:col-span-4 lg:row-span-2">
-          <FeatureIcon icon={PaletteIcon} />
-          <h3 class="mt-5 text-xl font-semibold text-foreground">Themeable to the core</h3>
-          <p class="mt-2 max-w-lg text-foreground-muted">
-            Every color, surface, and interaction state resolves through one semantic token
-            vocabulary. Flip to dark mode or swap a preset, and your entire UI follows — no
-            per-component overrides.
-          </p>
+      <div class="mt-14 grid gap-4 lg:grid-cols-3">
+        {/* "Themeable" — full-width banner across the top: copy on the left, the
+            live semantic role palette on the right (stacks on mobile). */}
+        <article class="hope-card hope-reveal group flex flex-col items-start gap-8 rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl lg:col-span-3 lg:flex-row lg:items-center lg:gap-12">
+          <div class="lg:max-w-sm lg:shrink-0">
+            <FeatureIcon icon={PaletteIcon} />
+            <h3 class="mt-5 text-xl font-semibold text-foreground">Themeable to the core</h3>
+            <p class="mt-2 text-foreground-muted">
+              Every color, surface, and interaction state resolves through one semantic token
+              vocabulary. Flip to dark mode or swap a preset, and your entire UI follows — no
+              per-component overrides.
+            </p>
+          </div>
 
           {/* Visual: the semantic role palette (solid + soft), which restyles itself
               in light and dark purely through the tokens. */}
-          <div class="mt-auto pt-8">
+          <div class="w-full lg:flex-1">
             <div class="grid grid-cols-3 gap-3 sm:grid-cols-6">
               <For
                 each={[
@@ -346,7 +354,7 @@ function BentoFeatures() {
               >
                 {(role) => (
                   <div class="space-y-1.5">
-                    <div class={`h-10 rounded-lg ${role.solid} shadow-sm ring-1 ring-black/5`} />
+                    <div class={`h-12 rounded-lg ${role.solid} shadow-sm ring-1 ring-black/5`} />
                     <div class={`h-4 rounded-md ${role.soft}`} />
                     <div class="text-center font-mono text-[10px] text-foreground-subtle">
                       {role.name}
@@ -358,28 +366,16 @@ function BentoFeatures() {
           </div>
         </article>
 
-        {/* Two cards stacked to the right of the big card. */}
+        {/* Three uniform feature cards in a row below the banner. */}
         <For each={FEATURES}>
           {(feature) => (
-            <article class="hope-card hope-reveal group flex flex-col rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl lg:col-span-2">
+            <article class="hope-card hope-reveal group flex flex-col rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
               <FeatureIcon icon={feature.icon} />
               <h3 class="mt-5 text-lg font-semibold text-foreground">{feature.title}</h3>
               <p class="mt-2 text-sm leading-relaxed text-foreground-muted">{feature.desc}</p>
             </article>
           )}
         </For>
-
-        {/* Full-width banner card, spanning the bottom row (horizontal layout). */}
-        <article class="hope-card hope-reveal group flex flex-col gap-5 rounded-2xl border border-subtle bg-surface-raised p-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl sm:flex-row sm:items-center lg:col-span-6">
-          <FeatureIcon icon={LayersIcon} />
-          <div>
-            <h3 class="text-lg font-semibold text-foreground">Tailwind v4 + variants</h3>
-            <p class="mt-1.5 max-w-2xl text-sm leading-relaxed text-foreground-muted">
-              Styling flows through tailwind-variants recipes into clean, unprefixed utilities — no
-              runtime CSS-in-JS, and no style tags to hydrate.
-            </p>
-          </div>
-        </article>
       </div>
     </section>
   );
@@ -604,7 +600,11 @@ function ThemingSpotlight() {
 function FinalCta() {
   return (
     <section class="mx-auto max-w-7xl px-6 pb-24">
-      <div class="hope-reveal relative overflow-hidden rounded-3xl border border-subtle bg-surface-raised px-6 py-16 text-center shadow-xl sm:px-16">
+      {/* `isolate` forces a permanent stacking context so the `-z-10` glow/grid
+          backdrop always paints above the card's opaque background. Without it the
+          backdrop only shows while the reveal's transform creates a temporary
+          context, then vanishes when the transform is removed. */}
+      <div class="hope-reveal relative isolate overflow-hidden rounded-3xl border border-subtle bg-surface-raised px-6 py-16 text-center shadow-xl sm:px-16">
         {/* Rich glow backdrop. */}
         <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
           <div class="hope-glow absolute -left-20 -top-24 size-96 rounded-full bg-primary/25 blur-3xl" />
