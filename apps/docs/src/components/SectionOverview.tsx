@@ -35,7 +35,7 @@ export function SectionOverview(props: {
     <div class="flex gap-10">
       <div class="min-w-0 flex-1">
         {/* Main content capped at an optimal reading measure (~75ch), matching the doc pages. */}
-        <div class="max-w-3xl">
+        <div class="max-w-3xl mx-auto">
           {/* Decorative hero gradient — the one deliberate exception to the semantic-token
               rule. This is a hand-tuned multi-stop gradient (primary tint fading into the
               neutral surface) whose exact per-mode stops are kept as literal palette

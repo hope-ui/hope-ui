@@ -71,7 +71,7 @@ export function MdxDoc(props: {
       {/* The content column fills the space (keeping the ToC at the right edge), but the
           readable content is capped at an optimal reading measure (~75ch). */}
       <div class="min-w-0 flex-1">
-        <div class="max-w-3xl">
+        <div class="max-w-3xl mx-auto">
           <article class="prose max-w-none">
             <Dynamic component={props.content} />
           </article>
