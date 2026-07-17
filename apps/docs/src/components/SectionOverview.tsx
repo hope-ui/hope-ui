@@ -56,7 +56,7 @@ export function SectionOverview(props: {
 
           <Show when={props.callout}>
             {(callout) => (
-              <div class="mt-6 flex gap-3 rounded-xl border border-subtle bg-surface-sunken/70 p-4 text-sm leading-relaxed text-foreground-muted">
+              <div class="mt-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
                 {/* The icon is wrapped in a plain <span> so the FIRST child of this
                   hydration-keyed <Show> element is a host element, not a component —
                   a component there trips @solidjs/web's getNextSibling hydration walk

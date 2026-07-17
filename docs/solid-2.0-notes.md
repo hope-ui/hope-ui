@@ -111,11 +111,14 @@ actual installed package):
 - **`onMount` → `onSettled`**, `createEffect` can take a split `(depsFn, computeFn)`
   form, `createContext` returns the Provider component directly (`<XContext value={...}>`,
   not `<XContext.Provider>`), and `useContext` throws by default instead of returning
-  `undefined`. `ref` accepts an array of ref-setter functions natively, and `applyRef`
-  skips falsy entries — so no `mergeRefs` utility is needed anywhere in this codebase.
-  `renderElement` owns ref merging: pass the internal setter as its `ref` option and it
-  merges with any consumer `ref` on `props`, reading the consumer's inside a getter so the
-  read lands in `spread`'s effect rather than in the component body.
+  `undefined`. `applyRef` flattens ref arrays and skips falsy entries — so no `mergeRefs`
+  utility is needed anywhere in this codebase. `renderElement` owns ref merging: pass the
+  internal setter as its `ref` option and it merges with any consumer `ref` on `props` into a
+  **single function ref** (calling `applyRef([internalRef, consumerRef], element)` inside it),
+  reading the consumer's ref inside that callback so the read lands in the render target's ref
+  effect rather than in the component body. Merging to one function — not handing the raw array
+  to the render target — is what lets it wrap a consumer *component* that only honours function
+  refs (e.g. TanStack Router's `Link`), not just host elements whose compiler flattens arrays.
 - **Solid 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` if a descendant component writes
   to a signal owned by an *ancestor* reactive scope directly from its own synchronous
   render body.** Hit in `Dialog.Title`/`Dialog.Description`, which originally called

@@ -136,8 +136,8 @@ layer, deterministic microtask batching), stores (draft-first mutable setters,
 `createProjection` for read-only derived stores, `storePath()` as an opt-in path-style
 helper), effects (`createEffect` split into separate compute/apply), lifecycle
 (`onMount` → `onSettled`), context (`createContext` returns the Provider component
-directly, `useContext` throws by default when no provider is found), refs (native ref
-arrays, no `mergeRefs` needed), and async (native Promise support in `createMemo`,
+directly, `useContext` throws by default when no provider is found), refs (native array
+flattening via `applyRef`, no `mergeRefs` needed), and async (native Promise support in `createMemo`,
 `<Loading>`, `isPending`, `action`/`createOptimisticStore`). It's beta and
 `@solidjs/signals` is explicitly still "stabilizing but may have breaking changes
 before final release" — the exact beta version is pinned via the `pnpm-workspace.yaml`
@@ -271,8 +271,10 @@ becomes an actual goal.
 3. **Public component API** — compound components (`Dialog.Root`, `Dialog.Trigger`, …)
    built on `solid-js`'s `merge`/`omit` (2.0's replacements for `mergeProps`/
    `splitProps`), plus `renderElement` (in `@hope-ui/primitives`) for the render-prop/`as`
-   pattern. Ref merging needs no custom utility — `ref` natively accepts an array of
-   ref functions (`ref={[internalRef, props.ref]}`).
+   pattern. Ref merging needs no custom utility — `renderElement` collapses the internal and
+   consumer refs into a single function ref that delegates flatten/falsy to `applyRef`
+   (`applyRef([internalRef, props.ref], element)`), so it works with any render target, not just
+   host elements.
 
 **Async-loaded components** (Combobox with remote options, Toast queues, any
 "loading…" state): lean on 2.0's native async support (`createMemo` accepting

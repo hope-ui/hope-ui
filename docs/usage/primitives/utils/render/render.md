@@ -60,12 +60,20 @@ renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
 });
 ```
 
-No `mergeRefs` utility exists or is needed. SolidJS 2.0's `ref` attribute natively accepts
-an array of ref-setter functions, and `@solidjs/web`'s `applyRef` flattens the array and
-skips falsy entries — so an absent consumer ref costs nothing. The consumer's ref is read
-inside a getter, not eagerly in the component body, so `spread`'s own ref-handling effect
-is what triggers the read (an eager read would be an untracked prop read, which Solid's
-dev build warns about).
+No `mergeRefs` utility exists or is needed. `renderElement` merges the internal setter and any
+consumer `ref` into a **single function ref**, and inside that callback delegates the flatten +
+falsy-skip to `@solidjs/web`'s `applyRef` (`applyRef([internalRef, consumerRef], element)`) — so
+an absent consumer ref, or a consumer ref that is itself an array, costs nothing.
+
+Exposing the merge as one function (rather than handing the raw array `[internalRef, consumerRef]`
+to whatever `render` returns) is what makes it work with **any** render target. A host element's
+compiler flattens an array ref for you, but a consumer *component* that reads `props.ref` itself —
+like TanStack Router's `Link`, which does `if (typeof r === "function") r(el)` — silently drops a
+non-function ref. A single function satisfies that near-universal guard.
+
+The consumer's `ref` is read *inside* the merged callback, not eagerly in the component body, so
+the read lands in the render target's ref-handling effect (an eager read would be an untracked prop
+read, which Solid's dev build warns about).
 
 ## Known limitation: cross-element `render` typing
 

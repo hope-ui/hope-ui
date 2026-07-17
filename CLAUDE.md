@@ -358,8 +358,10 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - Sibling effects run/clean up in creation order on re-run, but LIFO on owner disposal (see
   `createFocusRestore` / `docs/usage/primitives/internal/create-focus-restore/create-focus-restore.md`).
 - `onMount` → `onSettled`; `createEffect` takes a split `(depsFn, computeFn)` form; `createContext`
-  returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default; `ref`
-  accepts an array and `applyRef` skips falsy (no `mergeRefs`); `renderElement` owns ref merging.
+  returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default;
+  `applyRef` flattens ref arrays and skips falsy (no `mergeRefs`); `renderElement` owns ref merging,
+  collapsing the internal + consumer refs into a single function ref (so it works with any render
+  target, not just host elements — see `docs/usage/primitives/utils/render/render.md`).
 - A descendant writing an ancestor-owned signal in its synchronous render body throws
   `[REACTIVE_WRITE_IN_OWNED_SCOPE]` — defer via `onSettled` / use `createRegisteredId`.
 - `solid-refresh` HMR breaks prop forwarding for imported components; `refresh: { disabled: true }`
