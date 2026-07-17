@@ -8,7 +8,7 @@ navigation, modality, and ARIA wiring. Everything else in the workspace composes
 
 > **Internal / advanced escape hatch — not a stability-promised public API.** The kernel is shipped
 > so advanced consumers can build components hope-ui doesn't, but its signatures may churn between
-> minors; themed components are the marketed path, not headless composition. Treat these subpaths as
+> minors; themeable components are the marketed path, not headless composition. Treat these subpaths as
 > unstable.
 
 If a **true headless library** is what you're after — a stable, styling-agnostic API to build your

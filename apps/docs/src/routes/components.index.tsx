@@ -6,7 +6,7 @@ export const Route = createFileRoute("/components/")({
     <SectionOverview
       kind="components"
       title="Components"
-      description="Ready-to-use, themed, accessible components. Pick one to see usage, props, and live examples."
+      description="Ready-to-use, themeable, accessible components. Pick one to see usage, props, and live examples."
       callout={
         <>
           hope-ui is in active development for <strong>SolidJS 2.0</strong>. More components are on

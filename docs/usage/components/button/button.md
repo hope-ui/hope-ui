@@ -1,6 +1,6 @@
 # Button
 
-An accessible, themed button. Renders a native `<button>` by default (with `type="button"`, so it
+An accessible, themeable button. Renders a native `<button>` by default (with `type="button"`, so it
 never accidentally submits a form), stays fully accessible when `render`-ed as a different element,
 and is styled by the active preset's `button` recipe, resolved through `useSlots` (over `useRecipe`).
 Behavior is composed from the kernel's `createButton` (element-aware a11y) over `createPress` (the

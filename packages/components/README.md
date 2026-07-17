@@ -1,6 +1,6 @@
 # @hope-ui/components
 
-The public, themed, accessible components of [hope-ui](../../README.md) for **SolidJS 2.0**. This
+The public, themeable, accessible components of [hope-ui](../../README.md) for **SolidJS 2.0**. This
 is the product: components that look right out of the box under the default
 [`@hope-ui/presets/hope`](../presets/README.md) preset, styled with Tailwind v4 +
 `tailwind-variants`. Each component is a thin JSX layer over the headless

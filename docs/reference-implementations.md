@@ -92,7 +92,7 @@ peer dependency, same pattern as `@tanstack/virtual-core`. Positioning only — 
 - **floating-ui `@floating-ui/vue`** `packages/vue/src/arrow.ts` — the reactive ref-binding for the
   `arrow` middleware. `createFloating` owns arrow **measurement** only (`middlewareData.arrow` =
   `{x, y, centerOffset}` + the derived static side); the visual 45° rotation / static-side pinning
-  is CSS the themed component writes, not a number the kernel owns.
+  is CSS the themeable component writes, not a number the kernel owns.
 - **Base UI** `packages/react/src/utils/useAnchorPositioning.ts` — the **API-vocabulary** reference
   (not wiring): `side`/`align`/`sideOffset`/`alignOffset`/collision padding and the anchor↔positioner
   split. React is irrelevant here — only its option surface is borrowed.

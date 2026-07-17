@@ -112,9 +112,9 @@ version):
 
 ## Context
 
-`hope-ui` is a Base UI / React Aria–inspired, batteries-included, **themed**, accessible
+`hope-ui` is a Base UI / React Aria–inspired, **elegant, themeable**, accessible
 component library for SolidJS — copying their **API surface** (prop patterns, composition idioms)
-but not their React internals. Ready-to-use themed components (a batteries-included, Tailwind-v4 +
+but not their React internals. Ready-to-use, themeable components (a full-featured, Tailwind-v4 +
 tailwind-variants system — see [`docs/roadmap.md`](roadmap.md)) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`). That kernel is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API — see "Recommended architecture"
@@ -238,7 +238,7 @@ becomes an actual goal.
    and `@hope-ui/components`, and is available as an escape hatch for advanced consumers who
    want to build components this library doesn't ship. Its signatures are **not** a
    stability-promised public contract and may churn between minors — headless composition is no
-   longer the marketed path (themed components are). Two consequences the code still honours,
+   longer the marketed path (themeable components are). Two consequences the code still honours,
    now as robustness rather than a public-API mandate:
    - **No primitive keeps cross-instance state at module scope.** A consumer can still end up
      with two installed copies (a plain `dependencies` entry doesn't force deduplication, and
@@ -366,7 +366,7 @@ DoD below) — this doesn't depend on SolidStart at all.
 
 > **Superseded.** The phase/step ordering below (Button → Dialog → Popover/Tooltip → Listbox) was
 > set at repo creation and is no longer the plan. The current, complexity-ordered build roadmap —
-> a batteries-included surface aggregated from Mantine/MUI/Ant/shadcn/Nuxt plus the kernel primitives still needed — lives in
+> a comprehensive surface aggregated from Mantine/MUI/Ant/shadcn/Nuxt plus the kernel primitives still needed — lives in
 > [`docs/roadmap.md`](roadmap.md). This section is kept only for the Phase 0/1 history it records.
 
 **Phase 0 (done):**
@@ -414,7 +414,7 @@ drift that produces the coverage gaps this project is designed to avoid.
   15+ micro-packages with sibling deps, and not the shared-primitive-family split
   (`@hope-ui/overlays`, `@hope-ui/collections`, `@hope-ui/forms`,
   `@hope-ui/disclosure`) originally planned here. (An earlier revision of this doc said "two
-  packages total"; the themed direction added the theming pair — see
+  packages total"; the themeable direction added the theming pair — see
   [`docs/theming.md`](theming.md).) `@hope-ui/primitives` for the
   behavior kernel (never duplicated), and a single `@hope-ui/components` package for
   every public component, each as its own subpath export

@@ -7,7 +7,7 @@ This **supersedes the phase/build-order roadmap in [`docs/plan.md`](plan.md)** (
 Popover/Tooltip → Listbox"). That ordering was set at repo creation and no longer holds — `plan.md`
 stays as the architecture/SSR/distribution reference, but the *order of work* is defined here.
 
-**Positioning.** hope-ui is a **batteries-included, beautiful, full-featured** component library for
+**Positioning.** hope-ui is an **elegant, themeable, full-featured** component library for
 **SolidJS 2.0** — the MUI/Mantine niche the Solid ecosystem is missing, not a headless/copy-paste
 kit. You install it, import a component, and it looks great out of the box under the default
 **`@hope-ui/presets/hope`** preset. The engine underneath is **Tailwind v4 + `tailwind-variants`**

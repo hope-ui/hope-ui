@@ -11,7 +11,7 @@ export const SITE = {
   /** Canonical brand name — the header wordmark, page titles, and homepage hero. */
   name: "hope-ui",
   /** One-line product description — SEO meta, homepage tagline, and footer. */
-  description: "Batteries-included, themed, accessible components for SolidJS.",
+  description: "Elegant, themeable, accessible components for SolidJS.",
   /** Product version shown in the header badge. */
   version: "0.1.0",
 } as const;

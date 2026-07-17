@@ -2,7 +2,7 @@
 
 **hope-ui** is a component library for [SolidJS](https://www.solidjs.com/) 2.0. Import a component
 and it works — accessible, keyboard-friendly, and styled out of the box. It's the
-batteries-included option (in the spirit of MUI or Mantine) that the Solid ecosystem has been
+all-in-one option (in the spirit of MUI or Mantine) that the Solid ecosystem has been
 missing, not a headless or copy-paste kit.
 
 Components are styled with **Tailwind v4** and built on an internal headless kernel that handles the

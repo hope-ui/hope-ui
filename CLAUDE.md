@@ -7,8 +7,8 @@ primitive/component's per-file usage doc under `docs/usage/<pkg>/<relative-src-p
 
 ## What this is
 
-`hope-ui` is a batteries-included, **themed**, accessible component library for SolidJS,
-targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use themed components (a batteries-included,
+`hope-ui` is an **elegant, themeable**, accessible component library for SolidJS,
+targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use, themeable components (a full-featured,
 Tailwind-v4 + tailwind-variants system — see `docs/roadmap.md`) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`), which is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API. It is API-inspired by Base UI
