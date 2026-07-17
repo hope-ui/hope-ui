@@ -3,9 +3,10 @@
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/solid-router";
+import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/solid-router";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
+import { SiteHeader } from "~/components/SiteHeader";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 
@@ -19,7 +20,15 @@ export const Route = createRootRoute({
         description: "Batteries-included, themed, accessible components for SolidJS.",
       }),
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      // Inter — the docs typeface. Loaded client-side; the prerendered HTML just
+      // carries the <link>, so SSG is unaffected. `display=swap` avoids blocking.
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
   }),
   errorComponent: (props) => (
     <RootLayout>
@@ -52,22 +61,24 @@ function RootLayout({ children }: { children: JSX.Element }) {
       <head>
         <HeadContent />
       </head>
-      <body>
-        <div class="p-2 flex gap-4 text-lg border-b">
-          <Link to="/" activeProps={{ class: "font-bold" }} activeOptions={{ exact: true }}>
-            Home
-          </Link>
-          <Link to="/get-started" activeProps={{ class: "font-bold" }}>
-            Get started
-          </Link>
-          <Link to="/components" activeProps={{ class: "font-bold" }}>
-            Components
-          </Link>
-          <Link to="/changelog" activeProps={{ class: "font-bold" }}>
-            Changelog
-          </Link>
-        </div>
-        {children}
+      <body class="relative isolate flex min-h-screen flex-col">
+        {/* Decorative polka-dot texture fading in at the very bottom of the page.
+            Pinned to the body's bottom, behind all content (-z-10), non-interactive;
+            `bg-*` sets the dot color (the pattern itself is a CSS mask — see app.css). */}
+        <div
+          aria-hidden="true"
+          class="dots-fade pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-80 bg-gray-300 dark:bg-gray-700"
+        />
+        <SiteHeader />
+        <main class="flex-1">{children}</main>
+        {/* Opaque page-colored bg so the decorative dots never sit behind the footer
+            text (they read only in the content area above it). */}
+        <footer class="relative border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
+          <div class="mx-auto flex max-w-360 flex-col gap-1 px-6 py-8 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between dark:text-gray-400">
+            <p>Batteries-included, themed, accessible components for SolidJS.</p>
+            <p>Built with hope-ui + SolidJS 2.0</p>
+          </div>
+        </footer>
         <Scripts />
       </body>
     </html>

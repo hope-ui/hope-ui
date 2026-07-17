@@ -25,7 +25,37 @@
   html,
   body {
     @apply text-gray-900 bg-gray-50 dark:bg-gray-950 dark:text-gray-200;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Decorative Hero Patterns "Polka Dots" (heropatterns.com), used as a full-bleed
+   texture at the page bottom (see __root.tsx).
+
+   The dot tile is a *mask*, not a background image, so the dots take the element's
+   own color — set with a theme-aware `bg-*` utility, so it adapts to light/dark.
+   A second linear-gradient mask fades them toward the top, composited with
+   `intersect` so a pixel shows only where a dot AND the gradient are opaque. That
+   soft fade — plus a sub-1 gradient alpha so the dots never reach full strength —
+   is what keeps it a gentle texture instead of a hard, brute tiled edge.
+   --------------------------------------------------------------------------- */
+.dots-fade {
+  /* Mask shapes are WHITE on transparent, and the fade gradient is white→transparent:
+     white is opaque whether the engine reads the mask by alpha or by luminance (black
+     would read as fully masked-out under luminance — which is why the dots were
+     invisible). */
+  --dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='3' cy='3' r='3' fill='%23fff'/%3E%3Ccircle cx='13' cy='13' r='3' fill='%23fff'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--dots), linear-gradient(to top, rgba(255, 255, 255, 0.3), transparent 70%);
+  mask-image: var(--dots), linear-gradient(to top, rgba(255, 255, 255, 0.3), transparent 70%);
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-size: 20px 20px, 100% 100%;
+  mask-size: 20px 20px, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
 /* ---------------------------------------------------------------------------

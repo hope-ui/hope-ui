@@ -17,4 +17,9 @@ declare module "*.mdx" {
   // vite.config.ts). Always defined — an empty array when the page has no
   // headings — so consumers can pass it straight through.
   export const tableOfContents: TocEntry[];
+
+  // Optional one-line page summary, authored as a plain MDX named export
+  // (`export const description = "…"`) at the top of the file. Drives the
+  // overview cards (see lib/content.ts). Undefined when a page omits it.
+  export const description: string | undefined;
 }

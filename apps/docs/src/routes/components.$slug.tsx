@@ -13,7 +13,14 @@ function ComponentDoc() {
   const doc = () => docFor("components", params().slug);
   return (
     <Show when={doc()} fallback={<NotFound />}>
-      {(mod) => <MdxDoc content={mod().default} toc={mod().tableOfContents} />}
+      {(mod) => (
+        <MdxDoc
+          content={mod().default}
+          toc={mod().tableOfContents}
+          section="components"
+          slug={params().slug}
+        />
+      )}
     </Show>
   );
 }

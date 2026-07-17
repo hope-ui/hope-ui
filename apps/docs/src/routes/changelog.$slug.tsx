@@ -13,7 +13,14 @@ function ChangelogEntry() {
   const doc = () => docFor("changelog", params().slug);
   return (
     <Show when={doc()} fallback={<NotFound />}>
-      {(mod) => <MdxDoc content={mod().default} toc={mod().tableOfContents} />}
+      {(mod) => (
+        <MdxDoc
+          content={mod().default}
+          toc={mod().tableOfContents}
+          section="changelog"
+          slug={params().slug}
+        />
+      )}
     </Show>
   );
 }

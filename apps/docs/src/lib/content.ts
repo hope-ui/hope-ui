@@ -2,12 +2,13 @@
 import type { Component } from "solid-js";
 import type { TocEntry } from "~/components/TableOfContents";
 
-type DocModule = { default: Component; tableOfContents: TocEntry[] };
+type DocModule = { default: Component; tableOfContents: TocEntry[]; description?: string };
 
 export type DocMeta = {
   section: string;
   slug: string;
   title: string;
+  description?: string;
   path: string;
   order: number;
   group?: string;
@@ -102,6 +103,10 @@ for (const [key, mod] of Object.entries(modules)) {
     group,
     groupOrder,
     title: titleOf(mod.tableOfContents ?? [], slug),
+    // Optional one-line summary, authored as `export const description` at the top
+    // of the .mdx (a plain MDX named export — no frontmatter plugin needed). Drives
+    // the overview cards; absent -> card shows the title alone.
+    description: mod.description,
     path: `/${parsed.section}/${slug}`,
   };
   const list = metaBySection.get(parsed.section) ?? [];
@@ -144,4 +149,18 @@ export function groupedNavFor(section: string): NavGroup[] {
 /** The MDX module (component + ToC) for a given section/slug, or undefined. */
 export function docFor(section: string, slug: string): DocModule | undefined {
   return moduleByPath.get(`${section}/${slug}`);
+}
+
+/**
+ * The pages immediately before/after `slug` in its section's ordered list — the same
+ * flat order the sidebar uses, so prev/next flows across category groups in reading
+ * order. Either side is undefined at the ends of the section (or if the slug is unknown).
+ */
+export function siblingsFor(section: string, slug: string): { prev?: DocMeta; next?: DocMeta } {
+  const list = navFor(section);
+  const index = list.findIndex((meta) => meta.slug === slug);
+  if (index === -1) {
+    return {};
+  }
+  return { prev: list[index - 1], next: list[index + 1] };
 }
