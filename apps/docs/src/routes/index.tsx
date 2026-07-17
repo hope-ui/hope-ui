@@ -6,6 +6,7 @@ import {
   AccessibilityIcon,
   ArrowRightIcon,
   BoxIcon,
+  BrandLogoIcon,
   CheckIcon,
   CopyIcon,
   FeatherIcon,
@@ -141,8 +142,8 @@ function HeroPanel() {
               <FeatherIcon class="size-5" />
             </div>
             <div class="min-w-0">
-              <div class="truncate text-sm font-semibold text-foreground">Ada Lovelace</div>
-              <div class="truncate text-xs text-foreground-muted">Building with hope-ui</div>
+              <div class="truncate text-sm font-semibold text-foreground">Fabien MARIE-LOUISE</div>
+              <div class="truncate text-xs text-foreground-muted">@verstaple</div>
             </div>
             <span class="ml-auto rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success-emphasis">
               Active
@@ -202,7 +203,7 @@ function Hero() {
         <div class="text-center lg:text-left">
           <span class="hope-fade-up inline-flex items-center gap-2 rounded-full border border-primary-line bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary-emphasis backdrop-blur-sm">
             <SparklesIcon class="size-3.5" />
-            Now in {SITE.version.replace(/-/g, " ")} · SolidJS 2.0
+            Now in {SITE.version.replace(/-/g, " ")}
           </span>
 
           <h1 class="hope-fade-up mt-6 text-balance text-5xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl [animation-delay:80ms]">
@@ -253,7 +254,7 @@ const MARQUEE_ITEMS = [
   "TypeScript-first",
   "Tailwind v4",
   "Themeable presets",
-  "Zero runtime CSS",
+  "SolidJS 2.0",
 ] as const;
 
 function FeatureMarquee() {
@@ -575,18 +576,21 @@ function ThemingSpotlight() {
             <div class="grid grid-cols-3 gap-3">
               <For
                 each={[
-                  { name: "sunken", cls: "bg-surface-sunken" },
+                  { name: "sunken", cls: "bg-surface-sunken shadow-inner" },
                   { name: "surface", cls: "bg-surface" },
-                  { name: "raised", cls: "bg-surface-raised" },
+                  { name: "raised", cls: "bg-surface-raised shadow-sm" },
                 ]}
               >
                 {(s) => (
-                  <div class="rounded-xl border border-subtle p-3 shadow-sm">
-                    <div class={`h-12 rounded-lg border border-subtle ${s.cls}`} />
-                    <div class="mt-2 text-center font-mono text-[11px] text-foreground-subtle">
-                      {s.name}
+                  <>
+                    <div
+                      class={`flex flex-col justify-end h-16 rounded-xl border border-subtle p-3 ${s.cls}`}
+                    >
+                      <div class="text-center font-mono text-xs text-foreground-subtle">
+                        {s.name}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </For>
             </div>
@@ -613,7 +617,7 @@ function FinalCta() {
         </div>
 
         <div class="mx-auto grid size-14 place-items-center rounded-2xl border border-primary-line bg-primary-soft text-primary-emphasis shadow-sm">
-          <FeatherIcon class="size-7" />
+          <BrandLogoIcon class="size-10" />
         </div>
         <h2 class="mt-6 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Start building with{" "}
