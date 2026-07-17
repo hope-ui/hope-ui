@@ -211,3 +211,189 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+/* ===========================================================================
+   Landing page (routes/index.tsx) — decorative motion & backgrounds.
+
+   All of this is ornamental and pure CSS, so the prerendered (SSG) homepage
+   animates with ZERO client JS and nothing extra to hydrate. Colors reference the
+   preset's `--hope-*` semantic tokens (emitted to :root/.dark), so every texture
+   and glow is theme-aware in light and dark without a single `dark:` override.
+   The whole block is neutralized under `prefers-reduced-motion: reduce` at the end.
+   =========================================================================== */
+
+/* Faint engineering grid, radially masked so it fades to nothing at the edges —
+   a backdrop for the hero. Lines use the `subtle` border token. */
+.hope-grid {
+  background-image:
+    linear-gradient(to right, var(--hope-subtle) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hope-subtle) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+  -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 78%);
+}
+
+/* Keyframes ---------------------------------------------------------------- */
+@keyframes hope-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hope-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.85rem);
+  }
+}
+/* Opacity-only pulse. Deliberately does NOT animate transform/scale: these are
+   applied to large `blur-3xl` glow layers, and scaling a blurred element forces the
+   blur to re-rasterize every frame — expensive on the GPU and enough to stall
+   headless capture. Opacity is composited cheaply. */
+@keyframes hope-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+@keyframes hope-gradient-x {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes hope-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes hope-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ambient animation utilities --------------------------------------------- */
+.hope-fade-up {
+  animation: hope-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hope-float {
+  animation: hope-float 6s ease-in-out infinite;
+}
+.hope-float-slow {
+  animation: hope-float 8.5s ease-in-out infinite;
+}
+.hope-glow {
+  animation: hope-glow 9s ease-in-out infinite;
+}
+.hope-spin-slow {
+  animation: hope-spin-slow 24s linear infinite;
+}
+
+/* Animated gradient text: pair with `bg-clip-text text-transparent` and a
+   `bg-linear-*` utility. The oversized background pans back and forth for a slow
+   liquid-sheen effect. */
+.hope-gradient-text {
+  background-size: 220% auto;
+  animation: hope-gradient-x 7s ease-in-out infinite;
+}
+
+/* Marquee: the track holds two identical copies side by side and slides exactly
+   one copy's width, so the loop is seamless. Edge-faded with a horizontal mask. */
+.hope-marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+.hope-marquee-track {
+  animation: hope-marquee 32s linear infinite;
+}
+
+/* Scroll reveal (progressive-enhancement, SSR-safe).
+
+   With no JS the `.hope-reveal` elements have NO special style, so the prerendered
+   page shows everything. After hydration the route's onSettled stamps
+   `data-reveal-root` on the container and observes each element — only THEN do they
+   start hidden and transition in as they enter the viewport. Because the hidden
+   state is gated behind the JS-set attribute, a no-JS visitor never sees blank
+   sections. */
+[data-reveal-root] .hope-reveal {
+  opacity: 0;
+  transform: translateY(1.75rem);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-reveal-root] .hope-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Card hover sheen: a soft radial highlight that follows in on hover, layered over
+   the card surface. Uses the primary token so it tints correctly per theme. */
+.hope-card {
+  position: relative;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hope-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--hope-primary) 55%, transparent),
+    transparent 45%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.hope-card:hover::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hope-fade-up,
+  .hope-float,
+  .hope-float-slow,
+  .hope-glow,
+  .hope-spin-slow,
+  .hope-gradient-text,
+  .hope-marquee-track {
+    animation: none !important;
+  }
+  .hope-fade-up {
+    opacity: 1;
+    transform: none;
+  }
+  [data-reveal-root] .hope-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
