@@ -288,6 +288,25 @@
     transform: rotate(360deg);
   }
 }
+/* Mobile-nav drawer entrance: scrim fades in, panel slides from the left edge. */
+@keyframes hope-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes hope-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
 /* Ambient animation utilities --------------------------------------------- */
 .hope-fade-up {
@@ -304,6 +323,12 @@
 }
 .hope-spin-slow {
   animation: hope-spin-slow 24s linear infinite;
+}
+.hope-scrim-in {
+  animation: hope-scrim-in 0.2s ease-out both;
+}
+.hope-drawer-in {
+  animation: hope-drawer-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Animated gradient text: pair with `bg-clip-text text-transparent` and a
@@ -384,7 +409,9 @@
   .hope-glow,
   .hope-spin-slow,
   .hope-gradient-text,
-  .hope-marquee-track {
+  .hope-marquee-track,
+  .hope-scrim-in,
+  .hope-drawer-in {
     animation: none !important;
   }
   .hope-fade-up {

@@ -52,7 +52,7 @@ function CopyCommand(props: { command: string; class?: string }) {
       <span aria-hidden="true" class="select-none text-primary">
         $
       </span>
-      <span>{props.command}</span>
+      <span class="text-xs sm:text-sm">{props.command}</span>
       {/* Icon swap wrapped in host <span>s so the first child of the <Show>
           boundary is a host element, not a component (hydration-safe walk). */}
       <span class="ml-1 grid size-5 shrink-0 place-items-center text-foreground-subtle transition-colors group-hover:text-foreground">
@@ -219,7 +219,7 @@ function Hero() {
             component is themeable, accessible, and SSR-ready out of the box.
           </p>
 
-          <div class="hope-fade-up mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start [animation-delay:240ms]">
+          <div class="hope-fade-up mt-8 flex flex-row justify-center items-center gap-3 lg:justify-start [animation-delay:240ms]">
             <CtaButton to="/get-started">
               Get started
               <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -530,7 +530,12 @@ function ThemingSpotlight() {
   return (
     <section class="mx-auto max-w-7xl px-6 py-20 sm:py-28">
       <div class="grid items-center gap-12 lg:grid-cols-2">
-        <div class="hope-reveal">
+        {/* min-w-0 on both grid items: a grid item defaults to min-width:auto, so
+            below `lg` (single implicit track) the UsageSnippet's long code line would
+            size the track to its min-content (~449px) and overflow the viewport,
+            dragging the text column wide with it. min-w-0 lets the track shrink to the
+            container and the <pre>'s overflow-x-auto scroll instead. */}
+        <div class="hope-reveal min-w-0">
           <span class="inline-flex items-center gap-2 rounded-full border border-primary-line bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary-emphasis">
             <PaletteIcon class="size-3.5" />
             Theming
@@ -567,7 +572,7 @@ function ThemingSpotlight() {
           </div>
         </div>
 
-        <div class="hope-reveal space-y-4">
+        <div class="hope-reveal min-w-0 space-y-4">
           <UsageSnippet />
 
           {/* Elevation surfaces demo. */}
@@ -629,7 +634,7 @@ function FinalCta() {
           themeable and accessible from the very first line.
         </p>
         <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <CtaButton to="/get-started">
+          <CtaButton to="/get-started" class="w-full sm:w-auto">
             Get started
             <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
           </CtaButton>
