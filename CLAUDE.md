@@ -27,10 +27,15 @@ library to **adopt as a dependency**, not merely reference. Before writing a new
 check it for an existing solution and record a verdict — but anything adopted must clear the full
 Definition of Done through its consumer, especially the **hydration** round-trip. Hard-won hazard: an
 adopted `node_modules` primitive that creates a compute-form signal/memo (`createSignal(fn)` /
-`createMemo`) can break hydration because it isn't compiled by our `vite-plugin-solid` pipeline — the
-server skips the hydration id the client's runtime still consumes, so `_hk` diverges (server vs
-client). `controlled-signal` was rejected for exactly this. Prove any such adoption against the
-hydration fixture; effect-only primitives are the safe bet. See `docs/solid-primitives-eval.md`.
+`createMemo`) must be **inlined** in the SSR harness (`server.deps.inline` + the bridge's
+`ssr.noExternal` both carry `/@solid-primitives\//`). Externalized, its own `import … from "solid-js"`
+escapes the server-build alias and resolves a *second* `solid-js` copy, so the compute-form signal
+skips its hydration id on the *server* only, `_hk` shifts down one, and hydration silently mismatches —
+the same "two `solid-js` instances" trap `@solidjs/web` needs inlining for, one level out. This once
+mis-flagged `controlled-signal` as "breaks hydration"; that was the harness-config artifact, **not** a
+defect (`controlled-signal` is un-adopted only because ours is zero-dep and more capable). Still prove
+any such adoption against the hydration round-trip; effect-only primitives never hit it and are the
+safe bet. See `docs/solid-primitives-eval.md`.
 
 **"SSR support" = "works in SolidStart."** Renders on the SolidStart server, hydrates
 without mismatch, runs on the client. That is the whole requirement — nothing broader.

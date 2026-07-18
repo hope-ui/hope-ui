@@ -69,7 +69,20 @@ export default defineConfig({
           // with two separate `currentOwner`s, and every `createUniqueId()` throws
           // "cannot be used outside of a reactive context" because the owner was set on the
           // other copy. Inlining routes those imports back through Vite's resolver.
-          server: { deps: { inline: ["@solidjs/web", "solid-js"] } },
+          //
+          // `/^@solid-primitives\//` is the *same trap, one level out*, for any adopted
+          // pre-compiled dependency. Externalized, an adopted primitive's own
+          // `import { createSignal } from "solid-js"` bypasses the server-build alias and
+          // Node resolves a second `solid-js` copy — so a render-body compute-form signal
+          // (`createSignal(fn)` / `createMemo`) fails to consume its hydration id on the
+          // server, the root drops from `_hk=1` to `_hk=0`, and every subsequent `_hk` shifts
+          // down one versus the client. That silent asymmetry is what mis-flagged
+          // `@solid-primitives/controlled-signal` as "breaks hydration" (docs/solid-primitives-eval.md);
+          // it disappears the moment the dep is inlined here. See docs/solid-primitives-eval.md.
+          // Non-anchored: Vitest tests this against the dep's *resolved absolute path*
+          // (`…/node_modules/@solid-primitives/controlled-signal/…`), so an anchored `^` never
+          // matches. The slash keeps it scoped to the org.
+          server: { deps: { inline: ["@solidjs/web", "solid-js", /@solid-primitives\//] } },
         },
       },
       {
