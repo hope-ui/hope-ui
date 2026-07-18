@@ -27,36 +27,52 @@ Two mechanical requirements for any adoption:
   loads a second `solid-js` copy (symptom: `createUniqueId cannot be used outside of a reactive
   context`).
 
-## ⚠️ The hydration-id / transform-boundary hazard (measured, the hard way)
+## ⚠️ The compute-form-signal hydration hazard — and why it was a harness-config artifact, not a real defect
 
 A primitive that creates a **compute-function signal or memo** in the component body —
 `createSignal(fn)` / `createMemo(fn)` — participates in Solid's hydration id allocation
 (`hydratedCreateSignal`/`hydratedCreateMemo`), consuming an id and **shifting every subsequent
-`_hk`**. That alone is fine *if server and client shift together*. The hazard is that **they don't,
-when the code lives in an un-transformed `node_modules` dependency:**
+`_hk`**. That is fine as long as server and client shift together. This was originally recorded as a
+"transform-boundary hazard" — the claim that an *un-transformed* `node_modules` dependency skips the
+id on the server while the client consumes it. **That framing was wrong.** (Verified 2026-07 by
+spiking the published `@solid-primitives/controlled-signal@1.0.0-next.2` dist through both a faithful
+real-consumer harness and our own `ssr` + `browser` projects.)
 
-Measured directly with `controlled-signal` in `createDialog` (all four combinations):
+**What was actually happening.** Our SSR harness (the `ssr` Vitest project and the hydration-fixture
+bridge) aliases `solid-js`/`@solidjs/web` to their *server* builds, but by default **externalizes**
+third-party deps. An externalized dep's own `import { createSignal } from "solid-js"` never sees that
+alias — Node resolves a *second* `solid-js` copy — so the dep's compute-form signal runs against a
+different runtime than the app and **fails to consume its hydration id on the server**. The root
+drops from `_hk=1` to `_hk=0` and every subsequent `_hk` shifts down one versus the client. This is
+the **same "two `solid-js` instances" trap** the config already documents for `@solidjs/web` itself
+([`vitest.config.ts`], [`vitest-aliases.ts`]), one level out — it has nothing to do with JSX
+compilation (a `create*` primitive has no JSX for `vite-plugin-solid` to transform anyway).
 
-| Where the `createSignal(fn)` lives | Server `_hk` (SSR render) | Client `_hk` (hydration) | Round-trip |
+Measured directly with the published `controlled-signal` dist, `createSignal(fn, { ownedWrite: true })`:
+
+| How our SSR harness loads the dep | Server root `_hk` | Client root `_hk` | Round-trip |
 | --- | --- | --- | --- |
-| In-repo `src` (compiled by our `vite-plugin-solid`) | `2010` | `2010` | ✅ symmetric |
-| `node_modules` dependency (not compiled by it) | **`1010`** | **`2010`** | ❌ asymmetric |
+| **Externalized** (old default) | **`_hk=0`** | `_hk=1` | ❌ asymmetric (the false alarm) |
+| **Inlined** (`server.deps.inline` / `ssr.noExternal` += `/@solid-primitives\//`) | `_hk=1` | `_hk=1` | ✅ symmetric |
+| Faithful real-consumer render (subprocess, real dist, no aliases) | `_hk=1` | `_hk=1` | ✅ symmetric |
 
-The client's runtime `hydratedCreateSignal` always consumes the id. The **server** only emits the
-matching id when the code is compiled by hope-ui's Solid pipeline; an untransformed dependency
-skips it. So the packaged dep produces `1010` on the server but the client asks for `2010` — a
-divergence **no fixture can reconcile** (proven both ways: a client tree expecting `2010` passes
-hydration but fails the byte-for-byte SSR assertion at `Received: 1010`). This holds however the
-server HTML is produced — the generation bridge renders through the same server pipeline, so it
-reproduces the `1010` the inline SSR snapshot pins.
+**The fix** is one line, kept in lockstep in two places: add `/@solid-primitives\//` to the `ssr`
+project's `server.deps.inline` and to the bridge's `ssr.noExternal`. (Non-anchored on purpose:
+Vitest matches `server.deps.inline` against the dep's resolved absolute *path*, so a `^`-anchored
+pattern silently never matches — itself a wrong-red footgun.) With that, the published dist
+round-trips cleanly through our real `ssr` + `browser` projects (silent hydration, full node reuse,
+no a11y violations).
 
-It is **not yet certain** whether this is a general property of our SSR harness (manual server-build
-alias + selective `inline`, not a full SolidStart graph) or something a real SolidStart build would
-also hit — but in this repo's setup it is disqualifying. **Lesson: any adopted `node_modules`
-primitive that creates a compute-form signal/memo must be proven against the hydration round-trip
-before adoption; source that looks SSR-innocent can still fail it.** (I initially misread this twice —
-first as a plain rejection, then as "SSR-safe, just regenerate the fixture" from an in-repo mimic that
-wasn't faithful to the packaged dep. The table above is the settled result.)
+**Lesson (revised).** The hazard is real but **cheap to neutralise**: any adopted dep that creates a
+render-body compute-form signal/memo must be **inlined** in the SSR harness *and* proven against the
+hydration round-trip — it is not "un-reconcilable" and does not disqualify adoption. Effect-only
+deps (no render-body signal/memo, e.g. `a11y/createAnnounce`) never hit it, which is why the calendar
+adopted a11y without issue while `controlled-signal` looked broken: same root cause, opposite
+outcome. **Do not repeat the original mistake of measuring an externalized dep and blaming the
+primitive.**
+
+> A guard worth adding: cross-check the bridge's server render against a pristine-subprocess render
+> so a mis-configured inline fails as a hard error instead of a silent asymmetric `_hk`.
 
 ## Current verdicts
 
@@ -140,15 +156,20 @@ render-body memo) are the safest bet.
   client-only `createEffect` for the dev mismatch warning.
 
 ### Tier A — evaluated, kept (build-fresh / no swap)
-- **`createControllableState` ← `controlled-signal`: REJECTED (breaks hydration in this setup).**
+- **`createControllableState` ← `controlled-signal`: KEPT (not adopted) — hydration objection
+  retracted; ours is simply better for our needs.**
   `createControllableSignal` backs its state with a compute-function signal
-  (`createSignal(fn, { ownedWrite: true })`). Adopted as the packaged dependency, it hits the
-  transform-boundary hazard above: server emits the Dialog trigger at `_hk=1010`, the client hydrates
-  expecting `2010` — an asymmetry no fixture reconciles. Reverted. Rather than vendoring the upstream
-  source in-repo (which *is* symmetric), kept hope-ui's Base-UI-modeled boxing implementation, which is SSR-safe, zero-dep,
-  and *more* capable — it stores function-valued `T` (upstream's setter treats a function as an
-  updater). This is the proof the full-DoD-wrap hydration gate earns its keep: unit tests were green;
-  only the hydration round-trip caught it.
+  (`createSignal(fn, { ownedWrite: true })`). This was originally recorded as REJECTED because the
+  packaged dep "broke hydration" (`_hk=1010` server vs `2010` client). **That was a harness-config
+  artifact, not a defect** — the dep was *externalized*, so its `solid-js` escaped our server-build
+  alias (see the corrected hazard section above). Re-spiked 2026-07: the published
+  `1.0.0-next.2` dist round-trips cleanly through our real `ssr` + `browser` projects once
+  `@solid-primitives/*` is inlined, and through a faithful subprocess-render harness with no config
+  at all. So adoption is **viable**. It is still **not adopted**, for the same standing reason it was
+  never a swap worth making: hope-ui's Base-UI-modeled boxing implementation is zero-dep and *more*
+  capable — it stores function-valued `T` (upstream's setter treats a function as an updater and
+  cannot). The lasting takeaway is about the **harness**, not the primitive: inline adopted
+  compute-form-signal deps, and never blame a primitive for an externalization artifact.
 - **`createComponentContext` ← `context`: kept.** `createContextProvider` uses a factory-Provider
   model that doesn't match hope-ui's raw-`Context` + `<Ctx value={…}>` usage, and ours already
   adds the one thing of value (a friendlier missing-Provider error). Adopting is a lateral refactor

@@ -73,7 +73,13 @@ function getSsrServer(): Promise<ViteDevServer> {
       optimizeDeps: { noDiscovery: true, include: [] },
       plugins: [solid(solidPluginOptions({ generate: "ssr", hydratable: true }))],
       resolve: { alias: [...hopeUiAlias, ...serverBuildAlias] },
-      ssr: { noExternal: ["@solidjs/web", "solid-js"] },
+      // `/@solid-primitives\//`: an adopted pre-compiled dep must be inlined for the same
+      // reason `@solidjs/web`/`solid-js` are — externalized, its own `import ... from "solid-js"`
+      // escapes the server-build alias and resolves a *second* `solid-js` copy, so a render-body
+      // compute-form signal skips its hydration id on the server (`_hk` shifts down one vs the
+      // client) and hydration silently mismatches. This must stay in lockstep with the `ssr`
+      // project's `server.deps.inline` in vitest.config.ts. See docs/solid-primitives-eval.md.
+      ssr: { noExternal: ["@solidjs/web", "solid-js", /@solid-primitives\//] },
     });
   }
   return ssrServerPromise;
