@@ -28,6 +28,7 @@ describe("hope button recipe", () => {
         COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme })),
       ),
       ...SIZES.map((size) => ({ size })),
+      ...SIZES.map((size) => ({ iconOnly: true, size })),
       { fullWidth: true },
       { loaderPlacement: "center" as const },
       { loaderPlacement: "start" as const },
@@ -187,5 +188,28 @@ describe("hope button recipe", () => {
     const link = buttonRecipe({ variant: "link", colorScheme: "primary", size: "md" }).root();
     expect(link).toContain("h-auto");
     expect(link).not.toContain("h-9");
+  });
+
+  it("renders a square, icon-only button with no horizontal padding and a per-size icon", () => {
+    const md = buttonRecipe({ iconOnly: true, size: "md" });
+    // Square: `aspect-square` + the size's `h-*` locks the width to the height.
+    expect(md.root()).toContain("aspect-square");
+    // No `px-*` ever competes on an icon-only button — the padding compounds skip it entirely.
+    expect(md.root()).not.toMatch(/(?:^|\s)px-[\d.]/);
+    // The icon sits in the `label` slot (as `children`); the recipe sizes it per button size.
+    expect(md.label()).toContain("[&_svg]:size-5");
+    expect(buttonRecipe({ iconOnly: true, size: "xs" }).label()).toContain("[&_svg]:size-4");
+    expect(buttonRecipe({ iconOnly: true, size: "xl" }).label()).toContain("[&_svg]:size-6");
+  });
+
+  it("keeps normal buttons padded (from the compound) and square-free; link keeps its own px-0.5", () => {
+    // Padding moved off the `size` base into a (size × iconOnly:false) compound — still present.
+    const md = buttonRecipe({ size: "md" }).root();
+    expect(md).toContain("px-3");
+    expect(md).not.toContain("aspect-square");
+    // link is excluded from the size-padding compounds, so it keeps only its own `px-0.5`.
+    const link = buttonRecipe({ variant: "link", size: "md" }).root();
+    expect(link).toContain("px-0.5");
+    expect(link).not.toContain("px-3");
   });
 });

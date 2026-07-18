@@ -15,7 +15,7 @@ import type {
 } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Component, merge, omit, Show } from "solid-js";
+import { type Component, createEffect, merge, omit, Show } from "solid-js";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -126,8 +126,30 @@ export const Button: Component<ButtonProps> = (props) => {
       loaderPlacement: "center" as const,
       loading: false,
       fullWidth: false,
+      iconOnly: false,
     },
   });
+
+  // Dev-only accessibility guard: an icon-only button has no visible text, so it needs an
+  // `aria-label` (or `aria-labelledby`) or it announces as an unnamed button. Client-only — a
+  // `createEffect` never runs during SSR, so it never spams the server log; the check is pure-props
+  // (no DOM ref needed). Deps are read in the tracking function, not the callback, to avoid
+  // `STRICT_READ_UNTRACKED`. Mirrors the element/`nativeButton` mismatch warning in `createButton`.
+  createEffect(
+    () => [merged.iconOnly, merged["aria-label"], merged["aria-labelledby"]] as const,
+    ([iconOnly, ariaLabel, ariaLabelledby]) => {
+      const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV;
+      if (!isDev || !iconOnly) {
+        return;
+      }
+      if (ariaLabel == null && ariaLabelledby == null) {
+        console.warn(
+          "[hope-ui] Button: an icon-only button (iconOnly) has no accessible name. " +
+            "Pass an `aria-label` (or `aria-labelledby`) so assistive tech can announce it.",
+        );
+      }
+    },
+  );
 
   const isLoading = () => merged.loading;
   // `loadingText` keeps the label visible, so it implies an inline `start` loader rather than the
@@ -148,6 +170,7 @@ export const Button: Component<ButtonProps> = (props) => {
       colorScheme: merged.colorScheme,
       size: merged.size,
       fullWidth: merged.fullWidth,
+      iconOnly: merged.iconOnly,
       // Layout only, and only while loading — the loader slot itself is mounted by `<Show>` below,
       // so an unset placement (not loading) applies nothing.
       loaderPlacement: isLoading() ? loaderEffectivePlacement() : undefined,
@@ -201,6 +224,7 @@ export const Button: Component<ButtonProps> = (props) => {
     "startDecorator",
     "endDecorator",
     "fullWidth",
+    "iconOnly",
     "class",
     "slotClasses",
     "children",

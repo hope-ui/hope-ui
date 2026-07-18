@@ -25,7 +25,7 @@
  * `data-disabled`/`aria-busy` variants.
  */
 
-import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
+import type { ButtonColorScheme, ButtonSize, ButtonVariant } from "@hope-ui/theming";
 // The Button recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
 // implements it. `hopeRecipes` (in `./index`) checks the finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
@@ -129,6 +129,58 @@ const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]
     })),
 );
 
+/*
+ * ── Horizontal padding lives in compoundVariants, never on the `size` base ──────────────────────
+ * So no button ever carries two competing `px-*` classes for tailwind-merge to resolve, and nothing
+ * depends on variant declaration order: a text button gets its `px-*` from the (size × iconOnly:false)
+ * compound; an icon-only button gets no `px-*` at all (it's square and centered). The `:has()`-scoped
+ * decorator overrides (the `has-...:ps` and `pe` inline-padding utilities) stay on the `size` base —
+ * a different modifier, so they never twMerge against these. `link` is excluded from these compounds: it
+ * owns `px-0.5` in the `variant` map, so a link button matches no padding compound and there is never
+ * a px-vs-px conflict. Every value is a literal (Tailwind's `@source` scan needs literal candidates).
+ */
+const TEXT_PADDING_VARIANTS: Array<Exclude<ButtonVariant, "link">> = [
+  "default",
+  "solid",
+  "soft",
+  "outline",
+  "ghost",
+];
+const SIZE_PADDING: Record<ButtonSize, string> = {
+  xs: "px-2",
+  sm: "px-2.5",
+  md: "px-3",
+  lg: "px-3.5",
+  xl: "px-4",
+};
+// The icon-only button's icon lands in the `label` slot (as `children`), which has no
+// `[&_svg]:size-*` otherwise — size it here, per button size. Full literals so they're scannable.
+const ICON_ONLY_LABEL_SVG: Record<ButtonSize, string> = {
+  xs: "[&_svg]:size-4",
+  sm: "[&_svg]:size-4.5",
+  md: "[&_svg]:size-5",
+  lg: "[&_svg]:size-5.5",
+  xl: "[&_svg]:size-6",
+};
+const BUTTON_SIZES: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
+
+const paddingCompoundVariants = [
+  // Text buttons: per-size horizontal padding, for every non-link chrome variant.
+  ...BUTTON_SIZES.map((size) => ({
+    iconOnly: false,
+    variant: TEXT_PADDING_VARIANTS,
+    size,
+    class: { root: SIZE_PADDING[size] },
+  })),
+  // Icon-only buttons: `aspect-square` + the size's fixed `h-*` yields a square (width computes from
+  // height under border-box); no `px-*`, so the icon centers via the root's `justify-center`.
+  ...BUTTON_SIZES.map((size) => ({
+    iconOnly: true,
+    size,
+    class: { root: "aspect-square", label: ICON_ONLY_LABEL_SVG[size] },
+  })),
+];
+
 /**
  * hope's Button slot recipe — used as-is by the component (`recipe(props).root()`), no adapter.
  * `hopeRecipes` (in `./index`) checks it against the `button` contract in `@hope-ui/theming`.
@@ -172,7 +224,7 @@ export const buttonRecipe = tv({
     size: {
       xs: {
         root: [
-          "h-6 gap-1 text-xs px-2 rounded-[min(var(--radius-md),10px)]",
+          "h-6 gap-1 text-xs rounded-[min(var(--radius-md),10px)]",
           "has-data-[slot=button-start-decorator]:ps-1.5 has-data-[slot=button-end-decorator]:pe-1.5",
         ],
         startDecorator: "[&_svg]:size-4",
@@ -181,7 +233,7 @@ export const buttonRecipe = tv({
       },
       sm: {
         root: [
-          "h-7 gap-1 text-[0.8125rem] px-2.5 rounded-[min(var(--radius-md),12px)]",
+          "h-7 gap-1 text-[0.8125rem] rounded-[min(var(--radius-md),12px)]",
           "has-data-[slot=button-start-decorator]:ps-2 has-data-[slot=button-end-decorator]:pe-2",
         ],
         startDecorator: "[&_svg]:size-4.5",
@@ -190,7 +242,7 @@ export const buttonRecipe = tv({
       },
       md: {
         root: [
-          "h-8 gap-1.5 text-sm px-3 rounded-lg",
+          "h-8 gap-1.5 text-sm rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5",
         ],
         startDecorator: "[&_svg]:size-5",
@@ -199,7 +251,7 @@ export const buttonRecipe = tv({
       },
       lg: {
         root: [
-          "h-9 gap-1.5 text-[0.9375rem] px-3.5 rounded-lg",
+          "h-9 gap-1.5 text-[0.9375rem] rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3 has-data-[slot=button-end-decorator]:pe-3",
         ],
         startDecorator: "[&_svg]:size-5.5",
@@ -208,7 +260,7 @@ export const buttonRecipe = tv({
       },
       xl: {
         root: [
-          "h-10 gap-2 text-base px-4 rounded-lg",
+          "h-10 gap-2 text-base rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3.5 has-data-[slot=button-end-decorator]:pe-3.5",
         ],
         startDecorator: "[&_svg]:size-6",
@@ -219,6 +271,13 @@ export const buttonRecipe = tv({
     fullWidth: {
       true: { root: "w-full" },
       false: { root: "" },
+    },
+    // Typed axis with no classes of its own — the square metrics (and the removal of horizontal
+    // padding) live entirely in `paddingCompoundVariants` above, keyed by (size × iconOnly), so
+    // nothing relies on tailwind-merge out-ordering a base `px-*`.
+    iconOnly: {
+      true: {},
+      false: {},
     },
     variant: {
       // shadcn's outline button: surface fill, subtle gray border, faint shadow — color-independent
@@ -261,11 +320,12 @@ export const buttonRecipe = tv({
       end: { loader: "order-last" },
     },
   },
-  compoundVariants: colorCompoundVariants,
+  compoundVariants: [...colorCompoundVariants, ...paddingCompoundVariants],
   defaultVariants: {
     variant: "default",
     colorScheme: "primary",
     size: "md",
     fullWidth: false,
+    iconOnly: false,
   },
 });

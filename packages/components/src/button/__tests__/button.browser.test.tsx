@@ -311,6 +311,83 @@ describe("Button — render-ed as a non-native element", () => {
   });
 });
 
+describe("Button — icon-only", () => {
+  const Icon = (): JSX.Element => (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+
+  it("renders a square icon-only button (aspect-square, no horizontal padding, sized icon)", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button iconOnly aria-label="Add">
+          <Icon />
+        </Button>
+      </Themed>
+    ));
+
+    const cls = container.querySelector("button")?.className ?? "";
+    // The square metric reaches the root through the recipe variant…
+    expect(cls).toContain("aspect-square");
+    // …and an icon-only button never carries a horizontal `px-*`.
+    expect(cls).not.toMatch(/(?:^|\s)px-[\d.]/);
+    // The icon sits in the label slot (as children); the recipe sizes it per size (md → size-5).
+    const label = container.querySelector('[data-slot="button-label"]');
+    expect(label?.className).toContain("[&_svg]:size-5");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("warns in dev when an icon-only button has no accessible name", async () => {
+    // `mount` intercepts console.warn to fail on Solid diagnostics, so spy+mock before mounting
+    // (same shape as create-button's mismatch-warning test). The warning fires from a client-only
+    // `createEffect`, hence `vi.waitFor`.
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { dispose } = mount(() => (
+      <Themed>
+        <Button iconOnly>
+          <Icon />
+        </Button>
+      </Themed>
+    ));
+
+    await vi.waitFor(() =>
+      expect(consoleWarn).toHaveBeenCalledWith(expect.stringContaining("no accessible name")),
+    );
+    dispose();
+    consoleWarn.mockRestore();
+  });
+
+  it("does not warn when an accessible name is provided (aria-label or aria-labelledby)", async () => {
+    const consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const labelled = mount(() => (
+      <Themed>
+        <Button iconOnly aria-label="Add">
+          <Icon />
+        </Button>
+      </Themed>
+    ));
+    await expect.element(page.getByRole("button", { name: "Add" })).toBeInTheDocument();
+
+    const labelledBy = mount(() => (
+      <Themed>
+        <span id="icon-btn-label">Add item</span>
+        <Button iconOnly aria-labelledby="icon-btn-label">
+          <Icon />
+        </Button>
+      </Themed>
+    ));
+    await expect.element(page.getByRole("button", { name: "Add item" })).toBeInTheDocument();
+
+    expect(consoleWarn).not.toHaveBeenCalled();
+    labelled.dispose();
+    labelledBy.dispose();
+    consoleWarn.mockRestore();
+  });
+});
+
 describe("Button — preset defaultProps (variants)", () => {
   // A preset can set app-wide defaults; the component's built-in defaults are the fallback, and an
   // explicit instance prop still wins (precedence: instance ?? preset ?? builtin), all wired through

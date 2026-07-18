@@ -132,6 +132,51 @@ export const Decorators: Story = {
 };
 
 /**
+ * `iconOnly` renders a square button (sized to its height per `size`) with the icon — passed as
+ * `children` — centered and sized automatically. There is no visible text, so always pass an
+ * `aria-label`; in dev, an icon-only button with no accessible name logs a warning.
+ */
+export const IconOnly: Story = {
+  render: () => (
+    <div class="flex flex-col gap-4">
+      {/* Every size is a genuine square. */}
+      <div class="flex flex-wrap items-center gap-3">
+        <Button iconOnly size="xs" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="sm" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="md" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="lg" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="xl" aria-label="Add">
+          <PlusIcon />
+        </Button>
+      </div>
+      {/* Works across the chrome variants. */}
+      <div class="flex flex-wrap items-center gap-3">
+        <Button iconOnly variant="solid" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly variant="soft" colorScheme="success" aria-label="Confirm">
+          <CheckIcon />
+        </Button>
+        <Button iconOnly variant="outline" aria-label="Next">
+          <ArrowRightIcon />
+        </Button>
+        <Button iconOnly variant="ghost" aria-label="Add">
+          <PlusIcon />
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
+/**
  * Per-instance `slotClasses` targets individual slots with **literal** Tailwind classes (so the
  * consumer's build can scan them). They fold in after the recipe base and any preset-level
  * `slotClasses`, before `class` — a later utility wins a Tailwind conflict (here `rounded-full`

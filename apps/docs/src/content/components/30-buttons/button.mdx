@@ -2,6 +2,7 @@ import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { Link } from "@tanstack/solid-router";
+import { ButtonIconOnlyDemo } from "~/components/demos/button/ButtonIconOnlyDemo";
 import { ButtonIconsDemo } from "~/components/demos/button/ButtonIconsDemo";
 import { ButtonMatrixDemo } from "~/components/demos/button/ButtonMatrixDemo";
 import { InfoIcon } from "~/components/Icons";
@@ -127,6 +128,34 @@ button's size for you.
   Continue
 </Button>
 ```
+
+## Icon-only
+
+Set `iconOnly` and pass a single icon as the children to get a **square** button: the recipe locks
+the width to the size's height, drops the horizontal padding, and sizes the icon for you (the same
+per-size scale the decorators use). Without `iconOnly`, an icon in the children is laid out like a
+text label — a wide rectangle.
+
+An icon-only button has no visible text, so it needs an accessible name: always pass an `aria-label`
+(or `aria-labelledby`). In development, an icon-only button with neither logs a warning; the check
+is client-only and compiles out of production builds.
+
+<Preview>
+  <ButtonIconOnlyDemo />
+</Preview>
+
+```tsx
+<Button iconOnly aria-label="Add">
+  <PlusIcon />
+</Button>
+
+<Button iconOnly variant="soft" colorScheme="success" aria-label="Confirm">
+  <CheckIcon />
+</Button>
+```
+
+`iconOnly` is meant for the chrome variants (`default`, `solid`, `soft`, `outline`, `ghost`).
+Combining it with `fullWidth` or `variant="link"` is unsupported — those fight the square shape.
 
 ## Loading
 
@@ -431,6 +460,12 @@ are intentionally **not** defaultable app-wide.
       type: "JSX.Element",
       default: "",
       description: "Trailing content after the label — typically an icon.",
+    },
+    {
+      prop: "iconOnly",
+      type: "boolean",
+      default: "false",
+      description: "Renders a square, icon-only button (icon passed as children, sized and centered per size). Needs an aria-label for an accessible name. Not for use with fullWidth or the link variant.",
     },
     {
       prop: "disabled",

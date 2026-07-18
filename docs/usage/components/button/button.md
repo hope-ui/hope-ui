@@ -35,6 +35,7 @@ import { Button } from "@hope-ui/components/button";
 | `loaderPlacement` | `'start' \| 'center' \| 'end'`                                    | `'center'`  | `center` overlays the loader and hides the label (width preserved); `start`/`end` place it inline.             |
 | `startDecorator`  | `JSX.Element`                                                     | —           | Leading slot (typically an icon), before the label.                                                            |
 | `endDecorator`    | `JSX.Element`                                                     | —           | Trailing slot (typically an icon), after the label.                                                            |
+| `iconOnly`        | `boolean`                                                         | `false`     | Renders a square, icon-only button (icon passed as `children`, sized & centered per `size`). Requires an `aria-label`. See "Icon-only buttons".|
 | `fullWidth`       | `boolean`                                                         | `false`     | Stretches to the container width.                                                                              |
 | `render`          | `(props) => JSX.Element`                                          | —           | Render as a different element/component. The only polymorphism mechanism (there is no `as` prop).              |
 | `type`            | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | Native button type. Applied only to a native button.                                                           |
@@ -61,6 +62,28 @@ variant walks its own finished interaction ladder — a pressed-guarded hover wa
 (`hover:not-data-pressed:` → `-hovered`, so hover never fights the press color) plus
 `data-pressed:` → `-pressed`; the recipe computes no color. All styling comes from the theme's
 `button` recipe; the component itself writes no utility classes.
+
+## Icon-only buttons
+
+Pass a single icon as `children` and set `iconOnly` to get a **square** button: the recipe locks the
+width to the size's height (`aspect-square`), drops the horizontal padding, and sizes the icon per
+`size` (the same scale the decorators use). Without `iconOnly` an icon in `children` is laid out like
+a text label, giving a wide rectangle.
+
+Because there is no visible text, an icon-only button has no accessible name unless you provide one —
+always pass an `aria-label` (or `aria-labelledby`). In dev, an icon-only button with neither logs a
+warning (`[hope-ui] Button: an icon-only button (iconOnly) has no accessible name.`); the check is
+client-only and compiles out of a production build.
+
+```tsx
+<Button iconOnly aria-label="Add item">
+  <PlusIcon />
+</Button>
+```
+
+`iconOnly` is meant for the chrome variants (`default`/`solid`/`soft`/`outline`/`ghost`). Combining it
+with `fullWidth` (which stretches to the container) or `variant="link"` (which drops the fixed height)
+is unsupported — those fight the square metrics.
 
 ## Polymorphism (`render` + `nativeButton`)
 

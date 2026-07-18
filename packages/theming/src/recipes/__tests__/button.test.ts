@@ -19,6 +19,7 @@ const _variants: ButtonRecipeVariants = {
   colorScheme: "danger",
   size: "lg",
   fullWidth: true,
+  iconOnly: true,
   loaderPlacement: "center",
 };
 void _variants;
@@ -43,6 +44,7 @@ const _themeable: ButtonThemeableProps = {
   colorScheme: "primary",
   size: "md",
   fullWidth: false,
+  iconOnly: false,
   loaderPlacement: "center",
   loader: () => null,
   loadingText: () => null,
