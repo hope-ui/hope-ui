@@ -52,9 +52,10 @@ describe("hope button recipe", () => {
     expect(softSuccess).toContain("text-success-emphasis");
     expect(softSuccess).toContain("hover:not-data-pressed:bg-success-soft-hovered");
     expect(softSuccess).toContain("data-pressed:bg-success-soft-pressed");
-    // Outline border is the dedicated `-line` tint (renamed from `-outline`), with its own wash ladder.
+    // Outline border is the soft `-subtle-line` tint (the softer of the two role-border tiers), with
+    // its own wash ladder.
     const outlineWarning = buttonRecipe({ variant: "outline", colorScheme: "warning" }).root();
-    expect(outlineWarning).toContain("border-warning-line");
+    expect(outlineWarning).toContain("border-warning-subtle-line");
     expect(outlineWarning).toContain("hover:not-data-pressed:bg-warning-outline-hovered");
     expect(outlineWarning).toContain("data-pressed:bg-warning-outline-pressed");
     // Ghost label is `-emphasis` too; its wash is its own token, not borrowed from soft/outline.
@@ -69,10 +70,10 @@ describe("hope button recipe", () => {
     expect(linkPrimary).toContain("data-pressed:text-primary-link-pressed");
   });
 
-  it("gives neutral's outline variant the neutral border-strong (it has no role `-line` token)", () => {
+  it("gives neutral's outline variant the soft neutral-subtle-line border (its own role tier, not border-strong)", () => {
     const outlineNeutral = buttonRecipe({ variant: "outline", colorScheme: "neutral" }).root();
-    expect(outlineNeutral).toContain("border-strong");
-    expect(outlineNeutral).not.toContain("border-neutral-line");
+    expect(outlineNeutral).toContain("border-neutral-subtle-line");
+    expect(outlineNeutral).not.toContain("border-strong");
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {

@@ -11,7 +11,7 @@
  * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
  * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
  * `COLOR_CLASSES` and assembled into `compoundVariants`. The literals are what makes `bg-primary`,
- * `text-primary-emphasis`, `border-warning-line`, etc. actually exist in the emitted CSS.
+ * `text-primary-emphasis`, `border-warning-subtle-line`, etc. actually exist in the emitted CSS.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
  * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
@@ -36,8 +36,9 @@ import { tv } from "@hope-ui/theming";
  * from a sibling variant.
  *  - solid   : `bg-{role}` + `text-on-{role}`, hovered/pressed → `bg-{role}-hovered`/`-pressed`.
  *  - soft    : `bg-{role}-soft` + `text-{role}-emphasis`, hovered/pressed → `bg-{role}-soft-hovered`/`-pressed`.
- *  - outline : transparent bg + `text-{role}-emphasis` + the `border-{role}-line` tint (neutral has
- *              no `-line` → `border-strong`); hovered/pressed wash → `bg-{role}-outline-hovered`/`-pressed`.
+ *  - outline : transparent bg + `text-{role}-emphasis` + the soft `border-{role}-subtle-line` tint
+ *              (neutral uses `border-neutral-subtle-line`); hovered/pressed wash →
+ *              `bg-{role}-outline-hovered`/`-pressed`.
  *  - ghost   : like outline without the border; wash → `bg-{role}-ghost-hovered`/`-pressed`.
  *  - link    : `text-{role}-emphasis`, hovered/pressed text → `text-{role}-link-hovered`/`-pressed`,
  *              underline on hover.
@@ -53,7 +54,7 @@ const COLOR_CLASSES: Record<
       "bg-primary text-on-primary hover:not-data-pressed:bg-primary-hovered data-pressed:bg-primary-pressed",
     soft: "bg-primary-soft text-primary-emphasis hover:not-data-pressed:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
     outline:
-      "text-primary-emphasis border-primary-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
+      "text-primary-emphasis border-primary-subtle-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
     ghost:
       "text-primary-emphasis hover:not-data-pressed:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
     link: "text-primary-emphasis hover:not-data-pressed:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
@@ -63,7 +64,7 @@ const COLOR_CLASSES: Record<
       "bg-neutral text-on-neutral hover:not-data-pressed:bg-neutral-hovered data-pressed:bg-neutral-pressed",
     soft: "bg-neutral-soft text-neutral-emphasis hover:not-data-pressed:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
     outline:
-      "text-neutral-emphasis border-strong hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
+      "text-neutral-emphasis border-neutral-subtle-line hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
     ghost:
       "text-neutral-emphasis hover:not-data-pressed:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
     link: "text-neutral-emphasis hover:not-data-pressed:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
@@ -73,7 +74,7 @@ const COLOR_CLASSES: Record<
       "bg-success text-on-success hover:not-data-pressed:bg-success-hovered data-pressed:bg-success-pressed",
     soft: "bg-success-soft text-success-emphasis hover:not-data-pressed:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
     outline:
-      "text-success-emphasis border-success-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
+      "text-success-emphasis border-success-subtle-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
     ghost:
       "text-success-emphasis hover:not-data-pressed:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
     link: "text-success-emphasis hover:not-data-pressed:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
@@ -83,7 +84,7 @@ const COLOR_CLASSES: Record<
       "bg-warning text-on-warning hover:not-data-pressed:bg-warning-hovered data-pressed:bg-warning-pressed",
     soft: "bg-warning-soft text-warning-emphasis hover:not-data-pressed:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
     outline:
-      "text-warning-emphasis border-warning-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
+      "text-warning-emphasis border-warning-subtle-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
     ghost:
       "text-warning-emphasis hover:not-data-pressed:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
     link: "text-warning-emphasis hover:not-data-pressed:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
@@ -93,7 +94,7 @@ const COLOR_CLASSES: Record<
       "bg-danger text-on-danger hover:not-data-pressed:bg-danger-hovered data-pressed:bg-danger-pressed",
     soft: "bg-danger-soft text-danger-emphasis hover:not-data-pressed:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
     outline:
-      "text-danger-emphasis border-danger-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
+      "text-danger-emphasis border-danger-subtle-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
     ghost:
       "text-danger-emphasis hover:not-data-pressed:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
     link: "text-danger-emphasis hover:not-data-pressed:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
@@ -103,7 +104,7 @@ const COLOR_CLASSES: Record<
       "bg-info text-on-info hover:not-data-pressed:bg-info-hovered data-pressed:bg-info-pressed",
     soft: "bg-info-soft text-info-emphasis hover:not-data-pressed:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
     outline:
-      "text-info-emphasis border-info-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
+      "text-info-emphasis border-info-subtle-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
     ghost:
       "text-info-emphasis hover:not-data-pressed:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
     link: "text-info-emphasis hover:not-data-pressed:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
