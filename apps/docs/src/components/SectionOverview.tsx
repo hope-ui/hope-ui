@@ -1,5 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { For, Show } from "solid-js";
+import { ComponentVisual } from "~/components/component-visuals";
 import { ChevronRightIcon, InfoIcon } from "~/components/Icons";
 import { PathLink } from "~/components/PathLink";
 import { TableOfContents, type TocEntry } from "~/components/TableOfContents";
@@ -86,21 +87,28 @@ export function SectionOverview(props: {
                         <li>
                           <PathLink
                             to={item.path}
-                            class="group flex h-full flex-col rounded-xl border border-subtle bg-surface-raised p-5 transition-all hover:border-primary/60 hover:shadow-sm"
+                            class="group flex h-full flex-col overflow-hidden rounded-xl border border-subtle bg-surface-raised transition-all hover:border-primary/60 hover:shadow-sm"
                           >
-                            <div class="flex items-center justify-between gap-2">
-                              <span class="font-semibold text-foreground transition-colors group-hover:text-primary">
-                                {item.title}
-                              </span>
-                              <ChevronRightIcon class="size-4 shrink-0 text-foreground-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-                            </div>
-                            <Show when={item.description}>
-                              {(d) => (
-                                <p class="mt-1.5 text-sm leading-relaxed text-foreground-muted">
-                                  {d()}
-                                </p>
-                              )}
+                            {/* Components get a primary-palette illustration of the
+                                component atop the card; other sections stay text-only. */}
+                            <Show when={props.kind === "components"}>
+                              <ComponentVisual slug={item.slug} />
                             </Show>
+                            <div class="flex flex-1 flex-col p-5">
+                              <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-foreground transition-colors group-hover:text-primary">
+                                  {item.title}
+                                </span>
+                                <ChevronRightIcon class="size-4 shrink-0 text-foreground-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                              </div>
+                              <Show when={item.description}>
+                                {(d) => (
+                                  <p class="mt-1.5 text-sm leading-relaxed text-foreground-muted">
+                                    {d()}
+                                  </p>
+                                )}
+                              </Show>
+                            </div>
                           </PathLink>
                         </li>
                       )}
