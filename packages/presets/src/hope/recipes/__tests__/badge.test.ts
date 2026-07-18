@@ -103,6 +103,25 @@ describe("hope badge recipe", () => {
     expect(circle).not.toContain("px-2.5");
   });
 
+  it("tightens the decorator-side padding optically per size (matching Button), only when a decorator is mounted", () => {
+    // Each size drops the decorator side one 2px step below its symmetric text-edge `px`, gated on the
+    // decorator part being present (`has-data-[slot=badge-{start,end}-decorator]:`).
+    const steps = {
+      xs: "1",
+      sm: "1.5",
+      md: "2",
+      lg: "2.5",
+    } as const;
+    for (const [size, step] of Object.entries(steps) as [BadgeSize, string][]) {
+      const root = badgeRecipe({ size }).root();
+      expect(root).toContain(`has-data-[slot=badge-start-decorator]:ps-${step}`);
+      expect(root).toContain(`has-data-[slot=badge-end-decorator]:pe-${step}`);
+      // The gate is `has-data-`, so a decorator-less badge never pays the tighter padding.
+      expect(root).not.toMatch(/(?:^|\s)ps-\d/);
+      expect(root).not.toMatch(/(?:^|\s)pe-\d/);
+    }
+  });
+
   it("stretches to full width when asked", () => {
     expect(badgeRecipe({ fullWidth: true }).root()).toContain("w-full");
     expect(badgeRecipe({ fullWidth: false }).root()).not.toContain("w-full");

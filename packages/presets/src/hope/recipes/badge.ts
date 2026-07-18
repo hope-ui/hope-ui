@@ -144,27 +144,43 @@ export const badgeRecipe = tv({
   variants: {
     // `size` before `shape` so `shape` wins the radius/padding tailwind-merge conflict — `circle`'s
     // `px-0` must beat the size padding, and `shape` owns the radius entirely (size sets none).
+    // Optical padding (matching Button): when a decorator is present on a side, tighten that side's
+    // padding one 2px step below the text-edge `px`, so an icon doesn't look over-spaced against the
+    // chip edge. `has-data-[slot=badge-{start,end}-decorator]:` only fires when the part is mounted;
+    // a plain (decorator-less) badge keeps the symmetric `px`.
     size: {
       xs: {
-        root: "h-4 gap-1 px-1.5 text-[0.6875rem]",
+        root: [
+          "h-4 gap-1 px-1.5 text-[0.625rem]",
+          "has-data-[slot=badge-start-decorator]:ps-1 has-data-[slot=badge-end-decorator]:pe-1",
+        ],
         startDecorator: "[&_svg]:size-3",
         endDecorator: "[&_svg]:size-3",
         dot: "size-1.5",
       },
       sm: {
-        root: "h-5 gap-1 px-2 text-xs",
+        root: [
+          "h-5 gap-1 px-2 text-xs",
+          "has-data-[slot=badge-start-decorator]:ps-1.5 has-data-[slot=badge-end-decorator]:pe-1.5",
+        ],
         startDecorator: "[&_svg]:size-3.5",
         endDecorator: "[&_svg]:size-3.5",
         dot: "size-2",
       },
       md: {
-        root: "h-6 gap-1.5 px-2.5 text-sm",
+        root: [
+          "h-6 gap-1.5 px-2.5 text-sm",
+          "has-data-[slot=badge-start-decorator]:ps-2 has-data-[slot=badge-end-decorator]:pe-2",
+        ],
         startDecorator: "[&_svg]:size-4",
         endDecorator: "[&_svg]:size-4",
         dot: "size-2",
       },
       lg: {
-        root: "h-7 gap-1.5 px-3 text-sm",
+        root: [
+          "h-7 gap-1.5 px-3 text-sm",
+          "has-data-[slot=badge-start-decorator]:ps-2.5 has-data-[slot=badge-end-decorator]:pe-2.5",
+        ],
         startDecorator: "[&_svg]:size-4.5",
         endDecorator: "[&_svg]:size-4.5",
         dot: "size-2.5",
