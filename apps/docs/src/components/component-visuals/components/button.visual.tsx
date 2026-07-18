@@ -1,4 +1,4 @@
-import { Cursor, VisualCanvas } from "./canvas";
+import { Cursor, VisualCanvas } from "../canvas";
 
 // Button: a focal solid button flanked by two faded variant chips (outline + soft),
 // with a pointer hovering it — communicating "an action trigger, with variants".
