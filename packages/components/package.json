@@ -8,12 +8,17 @@
   "files": ["dist"],
   "hope": {
     "entries": {
+      "badge": "src/badge/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts"
     }
   },
   "exports": {
+    "./badge": {
+      "types": "./dist/badge/index.d.ts",
+      "solid": "./dist/badge/index.jsx"
+    },
     "./button": {
       "types": "./dist/button/index.d.ts",
       "solid": "./dist/button/index.jsx"
