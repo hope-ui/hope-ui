@@ -1,4 +1,4 @@
-import { createSignal, For, onSettled, Show } from "solid-js";
+import { createSignal, For, onSettled, Show, untrack } from "solid-js";
 
 // Mirrors the shape emitted by @stefanprobst/rehype-extract-toc (and the ambient
 // `tableOfContents` export declared in src/mdx.d.ts). Structurally compatible, so
@@ -33,8 +33,11 @@ function flatten(entries: TocEntry[]): TocEntry[] {
 // export. The list itself is server-rendered (pure SSG); scroll-spy is a
 // client-only enhancement wired in `onSettled` (never runs during SSR).
 export function TableOfContents(props: { entries: TocEntry[]; class?: string }) {
-  // `entries` comes from a static module import and never changes, so read it once.
-  const items = flatten(props.entries);
+  // `entries` comes from a static module import and is fixed for this instance's
+  // lifetime (the doc subtree remounts per page), so read it once, untracked — a
+  // deliberate one-time read that otherwise trips `[STRICT_READ_UNTRACKED]` in the
+  // (non-tracking) component body on every navigation.
+  const items = flatten(untrack(() => props.entries));
   const [activeId, setActiveId] = createSignal<string | undefined>(items[0]?.id);
 
   onSettled(() => {

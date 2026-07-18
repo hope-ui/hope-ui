@@ -1,6 +1,6 @@
 import { Portal } from "@solidjs/web";
 import { useLocation } from "@tanstack/solid-router";
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { createEffect, createSignal, For, Show, untrack } from "solid-js";
 import { BrandLogoIcon, CloseIcon, MenuIcon } from "~/components/Icons";
 import { PathLink } from "~/components/PathLink";
 import { SectionNav } from "~/components/SectionNav";
@@ -42,7 +42,11 @@ export function MobileNav() {
   // including desktop ones and the initial mount) never steals focus when the
   // drawer wasn't open. Only a real close restores focus to the trigger.
   const close = () => {
-    if (!open()) {
+    // `close` runs imperatively — from the route-change effect callback below and
+    // from event handlers — never as a reactive dependency, so this read is a
+    // deliberate `untrack`. Without it, the effect callback (a non-tracking scope)
+    // reading `open()` trips `[STRICT_READ_UNTRACKED]` on every navigation.
+    if (!untrack(open)) {
       return;
     }
     setOpen(false);
