@@ -1,0 +1,204 @@
+import { Badge } from "@hope-ui/components/badge";
+import { Button } from "@hope-ui/components/button";
+import { Link } from "@tanstack/solid-router";
+import { InfoIcon } from "~/components/Icons";
+import { PropsTable } from "~/components/PropsTable";
+
+export const summary = "Render components as other elements.";
+
+export const description =
+  "Render any hope-ui component as a different element or component with the render prop — there is no as prop.";
+
+
+# Polymorphism
+
+{description}
+
+## The `render` prop
+
+Every hope-ui component has a single polymorphism API: the **`render`** prop. It's a function that
+receives the component's fully-computed props and spreads them onto the element you return.
+
+```tsx
+<Badge render={(props) => <a href="/tags/new" {...props} />}>Linkable</Badge>
+```
+
+`render` is a **function, never an element** — and there is deliberately **no `as` prop**. An element
+form could only ever *drop* the component's computed props, so it would silently render something
+unstyled and inert. A function forces you to spread them, so the styling and behavior always reach
+your element.
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    There's no <code>as</code> prop on purpose: its polymorphic typing degrades IDE IntelliSense on
+    every component. <code>render</code> keeps completions and error messages honest without a
+    <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit cast for a cross-element
+    render (see <a href="#typing">Typing</a>).
+  </div>
+</div>
+
+## Render as a link
+
+The most common use is turning a component into a link while keeping its look. Because **Badge** is a
+static label with no behavior of its own, an anchor is all you need — the anchor brings its own link
+semantics, and Badge just contributes its computed `class` and merges refs.
+
+<Preview>
+  <Badge
+    variant="soft"
+    colorScheme="primary"
+    render={(props) => <a href="#" {...props} />}
+  >
+    Linkable tag
+  </Badge>
+</Preview>
+
+```tsx title="Badge as an anchor"
+<Badge
+  variant="soft"
+  colorScheme="primary"
+  render={(props) => <a href="/tags/new" {...props} />}
+>
+  Linkable tag
+</Badge>
+```
+
+## Preserve behavior with an interactive component
+
+An interactive component is different. A native `<button>` carries behavior an `<a>` doesn't —
+`role`, tab order, and Space/Enter activation. When you render **Button** as anything other than a
+button, set **`nativeButton={false}`** so Button re-supplies that behavior itself: `role="button"`,
+tab-order management, and synthesized keyboard activation.
+
+<Preview>
+  <Button
+    variant="solid"
+    colorScheme="primary"
+    nativeButton={false}
+    render={(props) => <a href="#" {...props} />}
+  >
+    Link that acts as a button
+  </Button>
+</Preview>
+
+```tsx title="Button as an anchor"
+<Button
+  variant="solid"
+  colorScheme="primary"
+  nativeButton={false}
+  render={(props) => <a href="/docs" {...props} />}
+>
+  Link that acts as a button
+</Button>
+```
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    Forget to set <code>nativeButton</code> to <code>false</code> on a non-button and you get an
+    element that looks right but isn't keyboard-operable. Button logs a warning in development when it
+    detects the mismatch; the check compiles out of production builds.
+  </div>
+</div>
+
+## Render as a component
+
+`render` also targets a **component**, not just host elements — for example your router's `Link`.
+hope-ui merges its own internal ref with the rendered element's into a single function ref, which a
+router `Link` honors, so you get hope-ui's styling and press behavior together with real
+client-side navigation.
+
+<Preview>
+  <Button
+    variant="solid"
+    colorScheme="primary"
+    nativeButton={false}
+    render={(props) => <Link {...props} to="/" />}
+  >
+    Back to home
+  </Button>
+</Preview>
+
+```tsx title="Render as a router Link"
+import type { ComponentProps } from "solid-js";
+import { Link } from "@tanstack/solid-router";
+import { Button } from "@hope-ui/components/button";
+
+<Button
+  variant="solid"
+  colorScheme="primary"
+  nativeButton={false}
+  render={(props) => (
+    <Link {...(props as unknown as ComponentProps<typeof Link>)} to="/" />
+  )}
+>
+  Back to home
+</Button>
+```
+
+## Ref merging
+
+You never wire up refs yourself. `render` collapses the component's internal ref and any `ref` you
+pass into **one function ref** (it delegates to `@solidjs/web`'s `applyRef`, which flattens arrays
+and skips falsy values). There is no `mergeRefs` helper to reach for — merging is automatic, and it
+works with any render target.
+
+```tsx
+let anchor: HTMLAnchorElement | undefined;
+
+<Button
+  nativeButton={false}
+  ref={anchor}
+  render={(props) => <a href="/docs" {...props} />}
+>
+  Both refs resolve to the same anchor
+</Button>
+```
+
+## Typing
+
+Each component types its `render` against its **own** element's attributes — Button's `render`
+receives button attributes, Badge's receives span attributes. Rendering as a *different* element
+(button → anchor) type-checks once you assert the props at the spread:
+
+```tsx
+<Button
+  nativeButton={false}
+  render={(props) => (
+    <a {...(props as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} href="/docs" />
+  )}
+>
+  Docs
+</Button>
+```
+
+This is a deliberate trade-off: hope-ui avoids a `Polymorphic<T>` generic — and the IntelliSense
+cost that comes with it — so a cross-element `render` needs one explicit cast. The runtime behavior
+is unaffected.
+
+## At a glance
+
+<PropsTable
+  columns={[
+    { key: "prop", label: "Prop", code: true },
+    { key: "type", label: "Type", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      description: "Render the component as another element or component. Receives the computed props to spread. The only polymorphism mechanism — there is no as prop.",
+    },
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      description: "On interactive components like Button: set false when rendering a non-button so the component supplies role, tabIndex, and keyboard activation. Static components like Badge don't need it.",
+    },
+  ]}
+/>
