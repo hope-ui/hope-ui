@@ -193,7 +193,11 @@ export function useSlots<K extends keyof RecipeRegistry>(
       const presetSlot = resolvePresetSlotClasses()?.[slot];
       const instanceSlot = options.slotClasses?.()?.[slot];
       const rootClass = slot === "root" ? options.class?.() : undefined;
-      return recipe(options.variantsProps())[slot]({
+      // `CompleteVariantsOf<K>` is `RecipeVariantsOf<K>` with every key required-*present* (values may
+      // be `undefined`), so it is always a valid recipe argument. The cast only bridges the generic
+      // indexed access: across a multi-recipe registry TS can't prove the per-`K` variant unions line
+      // up (a single-entry registry collapsed them, hiding this) — the runtime call is unaffected.
+      return recipe(options.variantsProps() as RecipeVariantsOf<K>)[slot]({
         class: cx(presetSlot, instanceSlot, rootClass),
       });
     };

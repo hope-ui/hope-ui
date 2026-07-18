@@ -12,6 +12,7 @@
  * `styling`), holding {@link RecipeRegistry} alongside {@link ThemeablePropsRegistry} (its
  * behavioral/chrome counterpart) so the two contracts scale independently as the catalog grows.
  */
+import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
 
 /**
@@ -27,5 +28,6 @@ export const THEMING_CONTRACT_VERSION = 1 as const;
  * exports its `…Recipe` type) and one entry here.
  */
 export interface RecipeRegistry {
+  badge: BadgeRecipe;
   button: ButtonRecipe;
 }

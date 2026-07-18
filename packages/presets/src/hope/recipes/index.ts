@@ -12,9 +12,11 @@
  * contract requires is present and shaped correctly — while keeping each recipe's precise type.
  */
 import type { RecipeRegistry } from "@hope-ui/theming";
+import { badgeRecipe } from "./badge";
 import { buttonRecipe } from "./button";
 
 /** The hope preset's recipe map — every component recipe hope implements, keyed by component name. */
 export const hopeRecipes = {
+  badge: badgeRecipe,
   button: buttonRecipe,
 } satisfies RecipeRegistry;
