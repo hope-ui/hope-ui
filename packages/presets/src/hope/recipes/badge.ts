@@ -165,7 +165,7 @@ export const badgeRecipe = tv({
         ],
         startDecorator: "[&_svg]:size-3.5",
         endDecorator: "[&_svg]:size-3.5",
-        dot: "size-2",
+        dot: "size-1.5",
       },
       md: {
         root: [
@@ -183,7 +183,7 @@ export const badgeRecipe = tv({
         ],
         startDecorator: "[&_svg]:size-4.5",
         endDecorator: "[&_svg]:size-4.5",
-        dot: "size-2.5",
+        dot: "size-2",
       },
     },
     // `shape` owns the radius; declared after `size` so it wins the merge. `circle` also squares the
