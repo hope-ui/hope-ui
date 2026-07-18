@@ -10,7 +10,7 @@ across variants, no `--hope-{component}-*` tokens), so every painted value is an
 
 ## API
 
-- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic **color** token name (110). The runtime
+- `SEMANTIC_COLOR_TOKENS` — readonly array of every semantic **color** token name (117). The runtime
   source of truth; `checkSemanticTokenConformance` iterates it.
 - `SemanticColorToken` — the union of the color token names.
 - `SemanticColorContract` — `Record<SemanticColorToken, string>`, the completeness shape a JS tool
@@ -37,7 +37,8 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 
 ### Per role — `{role}` ∈ `primary` · `neutral` · `success` · `info` · `warning` · `danger`
 
-15 tokens per chromatic role; `neutral` has 14 (no `-line` — its outline border uses `border-strong`).
+16 tokens per role, now uniform across all 6: the role border is **two-tier** — `-line` (strong) and
+`-subtle-line` (soft) — and `neutral` carries both, like the chromatic roles.
 
 | Token | Reads as | Purpose |
 |---|---|---|
@@ -47,7 +48,8 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 | `{role}-soft-hovered` · `{role}-soft-pressed` | `bg-*` | tonal fill, hovered / pressed |
 | `{role}-outline-hovered` · `{role}-outline-pressed` | `bg-*` | outline-variant wash (rest transparent) |
 | `{role}-ghost-hovered` · `{role}-ghost-pressed` | `bg-*` | ghost-variant wash (rest transparent) |
-| `{role}-line` | `border-{role}-line` | outline-variant border (rest) — **chromatic only** |
+| `{role}-line` | `border-{role}-line` | role border, **strong** tier (rest) |
+| `{role}-subtle-line` | `border-{role}-subtle-line` | role border, **soft** tier (rest) |
 | `{role}-emphasis` | `text-{role}-emphasis` | role content color (soft/outline/ghost/link label, inline role text) |
 | `{role}-link-hovered` · `{role}-link-pressed` | `text-*` | link text, hovered / pressed (rest = `{role}-emphasis`) |
 | `on-{role}` | `text-on-{role}` | content on the solid fill |
@@ -63,7 +65,7 @@ No token is ever a bare CSS property, so utilities never double up (`text-text`,
 | Collections | `active`, `selected` | `bg-*` |
 | Systemic | `focus`, `focus-halo`, `scrim` | `border-*`/`ring-*` · `ring-*` · `bg-*` |
 
-**Total color = 89 role + 21 non-role = 110.** There is no disabled *fill* token — a disabled control
+**Total color = 96 role + 21 non-role = 117.** There is no disabled *fill* token — a disabled control
 dims via the `opacity-disabled` axis (below), keeping only `foreground-disabled` for the label. Icons
 fold into the text tokens (currentColor) — there is no separate `icon` family.
 
@@ -96,11 +98,11 @@ Neutral surfaces pair with the `foreground*` ramp; the soft/outline/ghost/link l
 A preset proves it defines every token with the conformance kit (from `@hope-ui/theming/conformance`)
 run against the CSS that declares the `--hope-*` values:
 
-- `checkSemanticTokenConformance` / `assertSemanticTokenConformance` — the 110 color tokens.
+- `checkSemanticTokenConformance` / `assertSemanticTokenConformance` — the 117 color tokens.
 - `checkOpacityTokenConformance` / `assertOpacityTokenConformance` — the 2 opacity tokens (same
   `--hope-<token>:` regex; the `--hope-` namespace is shared).
 
 `@hope-ui/presets/hope` authors its palette in `hope/tokens.css`, so `hope.test.ts` reads that file
 and runs **both** checks over it. An undefined token compiles every referencing utility (or the
 opacity `@utility`) to an unresolved `var(--hope-…)`. Conformance checks the `:root` values only;
-a preset keeps its `.dark` block in lockstep by hand (for hope, 110 color tokens in each block).
+a preset keeps its `.dark` block in lockstep by hand (for hope, 117 color tokens in each block).

@@ -49,12 +49,13 @@
   --color-primary-ghost-hovered: var(--hope-primary-ghost-hovered);
   --color-primary-ghost-pressed: var(--hope-primary-ghost-pressed);
   --color-primary-line: var(--hope-primary-line);
+  --color-primary-subtle-line: var(--hope-primary-subtle-line);
   --color-primary-emphasis: var(--hope-primary-emphasis);
   --color-primary-link-hovered: var(--hope-primary-link-hovered);
   --color-primary-link-pressed: var(--hope-primary-link-pressed);
   --color-on-primary: var(--hope-on-primary);
 
-  /* neutral (no `-line`; outline borders use `border-strong`) */
+  /* neutral (two-tier role border like the chromatic roles: `-line` strong + `-subtle-line` soft) */
   --color-neutral: var(--hope-neutral);
   --color-neutral-hovered: var(--hope-neutral-hovered);
   --color-neutral-pressed: var(--hope-neutral-pressed);
@@ -65,6 +66,8 @@
   --color-neutral-outline-pressed: var(--hope-neutral-outline-pressed);
   --color-neutral-ghost-hovered: var(--hope-neutral-ghost-hovered);
   --color-neutral-ghost-pressed: var(--hope-neutral-ghost-pressed);
+  --color-neutral-line: var(--hope-neutral-line);
+  --color-neutral-subtle-line: var(--hope-neutral-subtle-line);
   --color-neutral-emphasis: var(--hope-neutral-emphasis);
   --color-neutral-link-hovered: var(--hope-neutral-link-hovered);
   --color-neutral-link-pressed: var(--hope-neutral-link-pressed);
@@ -82,6 +85,7 @@
   --color-success-ghost-hovered: var(--hope-success-ghost-hovered);
   --color-success-ghost-pressed: var(--hope-success-ghost-pressed);
   --color-success-line: var(--hope-success-line);
+  --color-success-subtle-line: var(--hope-success-subtle-line);
   --color-success-emphasis: var(--hope-success-emphasis);
   --color-success-link-hovered: var(--hope-success-link-hovered);
   --color-success-link-pressed: var(--hope-success-link-pressed);
@@ -99,6 +103,7 @@
   --color-info-ghost-hovered: var(--hope-info-ghost-hovered);
   --color-info-ghost-pressed: var(--hope-info-ghost-pressed);
   --color-info-line: var(--hope-info-line);
+  --color-info-subtle-line: var(--hope-info-subtle-line);
   --color-info-emphasis: var(--hope-info-emphasis);
   --color-info-link-hovered: var(--hope-info-link-hovered);
   --color-info-link-pressed: var(--hope-info-link-pressed);
@@ -116,6 +121,7 @@
   --color-warning-ghost-hovered: var(--hope-warning-ghost-hovered);
   --color-warning-ghost-pressed: var(--hope-warning-ghost-pressed);
   --color-warning-line: var(--hope-warning-line);
+  --color-warning-subtle-line: var(--hope-warning-subtle-line);
   --color-warning-emphasis: var(--hope-warning-emphasis);
   --color-warning-link-hovered: var(--hope-warning-link-hovered);
   --color-warning-link-pressed: var(--hope-warning-link-pressed);
@@ -133,6 +139,7 @@
   --color-danger-ghost-hovered: var(--hope-danger-ghost-hovered);
   --color-danger-ghost-pressed: var(--hope-danger-ghost-pressed);
   --color-danger-line: var(--hope-danger-line);
+  --color-danger-subtle-line: var(--hope-danger-subtle-line);
   --color-danger-emphasis: var(--hope-danger-emphasis);
   --color-danger-link-hovered: var(--hope-danger-link-hovered);
   --color-danger-link-pressed: var(--hope-danger-link-pressed);

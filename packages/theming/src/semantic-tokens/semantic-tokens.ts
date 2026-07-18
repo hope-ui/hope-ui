@@ -55,8 +55,9 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-selected",
 
   // ── primary — full rest/hovered/pressed ladder per variant. `{role}` is both the solid fill and
-  // the full-strength role border; `-line` is the outline-variant border; `-emphasis` is the role's
-  // content color; `-link-*` is the link text ladder (rest = `-emphasis`); `on-{role}` sits on the fill.
+  // the full-strength role border; the role border is two-tier — `-line` (strong) and `-subtle-line`
+  // (soft) — both complete across all 6 roles; `-emphasis` is the role's content color; `-link-*` is
+  // the link text ladder (rest = `-emphasis`); `on-{role}` sits on the fill.
   "primary",
   "primary-hovered",
   "primary-pressed",
@@ -68,12 +69,14 @@ export const SEMANTIC_COLOR_TOKENS = [
   "primary-ghost-hovered",
   "primary-ghost-pressed",
   "primary-line",
+  "primary-subtle-line",
   "primary-emphasis",
   "primary-link-hovered",
   "primary-link-pressed",
   "on-primary",
 
-  // ── neutral — no `-line` (the outline variant uses `border-strong`); otherwise identical in shape.
+  // ── neutral — now carries the two-tier role border like the chromatic roles: `-line` (strong) is
+  // backfilled here and `-subtle-line` (soft) is new; otherwise identical in shape.
   "neutral",
   "neutral-hovered",
   "neutral-pressed",
@@ -84,6 +87,8 @@ export const SEMANTIC_COLOR_TOKENS = [
   "neutral-outline-pressed",
   "neutral-ghost-hovered",
   "neutral-ghost-pressed",
+  "neutral-line",
+  "neutral-subtle-line",
   "neutral-emphasis",
   "neutral-link-hovered",
   "neutral-link-pressed",
@@ -101,6 +106,7 @@ export const SEMANTIC_COLOR_TOKENS = [
   "success-ghost-hovered",
   "success-ghost-pressed",
   "success-line",
+  "success-subtle-line",
   "success-emphasis",
   "success-link-hovered",
   "success-link-pressed",
@@ -118,6 +124,7 @@ export const SEMANTIC_COLOR_TOKENS = [
   "info-ghost-hovered",
   "info-ghost-pressed",
   "info-line",
+  "info-subtle-line",
   "info-emphasis",
   "info-link-hovered",
   "info-link-pressed",
@@ -135,6 +142,7 @@ export const SEMANTIC_COLOR_TOKENS = [
   "warning-ghost-hovered",
   "warning-ghost-pressed",
   "warning-line",
+  "warning-subtle-line",
   "warning-emphasis",
   "warning-link-hovered",
   "warning-link-pressed",
@@ -152,6 +160,7 @@ export const SEMANTIC_COLOR_TOKENS = [
   "danger-ghost-hovered",
   "danger-ghost-pressed",
   "danger-line",
+  "danger-subtle-line",
   "danger-emphasis",
   "danger-link-hovered",
   "danger-link-pressed",
