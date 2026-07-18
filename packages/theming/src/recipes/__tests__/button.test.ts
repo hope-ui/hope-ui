@@ -62,7 +62,15 @@ void _behavioralExcluded;
 
 describe("button recipe contract", () => {
   it("names every variant, colorScheme, size, and slot the recipe implements", () => {
-    const variants: ButtonVariant[] = ["default", "solid", "soft", "outline", "ghost", "link"];
+    const variants: ButtonVariant[] = [
+      "default",
+      "solid",
+      "inverted",
+      "soft",
+      "outline",
+      "ghost",
+      "link",
+    ];
     const colorSchemes: ButtonColorScheme[] = [
       "primary",
       "neutral",
@@ -74,7 +82,7 @@ describe("button recipe contract", () => {
     const sizes: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
     const slots: ButtonSlot[] = ["root", "label", "startDecorator", "endDecorator", "loader"];
 
-    expect(variants).toHaveLength(6);
+    expect(variants).toHaveLength(7);
     expect(colorSchemes).toHaveLength(6);
     expect(sizes).toHaveLength(5);
     expect(slots).toHaveLength(5);

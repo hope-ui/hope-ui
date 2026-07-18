@@ -71,7 +71,7 @@ describe("Badge", () => {
     dispose();
   });
 
-  it("wires the inverted variant to the swapped pair (on-color fill + role text)", async () => {
+  it("wires the inverted variant to its own dedicated swap tokens", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
         <Badge variant="inverted" colorScheme="primary">
@@ -81,8 +81,8 @@ describe("Badge", () => {
     ));
 
     const cls = container.querySelector('[data-slot="badge"]')?.className ?? "";
-    expect(cls).toContain("bg-on-primary");
-    expect(cls).toContain("text-primary");
+    expect(cls).toContain("bg-primary-inverted");
+    expect(cls).toContain("text-on-primary-inverted");
     dispose();
   });
 

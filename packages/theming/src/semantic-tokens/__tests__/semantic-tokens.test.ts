@@ -11,8 +11,8 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     expect(new Set(SEMANTIC_COLOR_TOKENS).size).toBe(SEMANTIC_COLOR_TOKENS.length);
   });
 
-  it("is the full 117-token vocabulary", () => {
-    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(117);
+  it("is the full 141-token vocabulary", () => {
+    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(141);
   });
 
   it("includes the surfaces, text ramp, on-state, role ladders, borders, collections and systemic tokens", () => {
@@ -41,6 +41,13 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("primary-outline-pressed");
     has("primary-ghost-hovered");
     has("primary-ghost-pressed");
+    // The `inverted` variant's own fill ladder + on-content (the swap of solid, on dedicated tokens).
+    has("primary-inverted");
+    has("primary-inverted-hovered");
+    has("primary-inverted-pressed");
+    has("on-primary-inverted");
+    has("warning-inverted");
+    has("on-warning-inverted");
     // Role content color + link ladder (renamed `on-{role}-soft` → `{role}-emphasis`).
     has("primary-emphasis");
     has("warning-emphasis");
@@ -75,6 +82,15 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     for (const role of ["primary", "neutral", "success", "info", "warning", "danger"]) {
       expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`${role}-line`);
       expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`${role}-subtle-line`);
+    }
+  });
+
+  it("carries the full `inverted` variant family across all 6 roles (fill ladder + on-content)", () => {
+    for (const role of ["primary", "neutral", "success", "info", "warning", "danger"]) {
+      expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`${role}-inverted`);
+      expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`${role}-inverted-hovered`);
+      expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`${role}-inverted-pressed`);
+      expect(SEMANTIC_COLOR_TOKENS as readonly string[]).toContain(`on-${role}-inverted`);
     }
   });
 

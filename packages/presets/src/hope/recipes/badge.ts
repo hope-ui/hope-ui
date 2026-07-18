@@ -22,8 +22,10 @@
  *
  * ── The six variants ────────────────────────────────────────────────────────────────────────────
  *  - solid    : `bg-{role}` + `text-on-{role}`.
- *  - inverted : the literal swap of solid — `bg-on-{role}` + `text-{role}` (legible by construction;
- *               warning honestly inverts to a dark chip).
+ *  - inverted : the swap of solid on its own dedicated tokens — `bg-{role}-inverted` +
+ *               `text-on-{role}-inverted`. The hope defaults reproduce the on-color/role swap (so it
+ *               stays legible, and warning defaults to a dark chip) but as independent, tunable knobs
+ *               rather than borrowing solid's `on-{role}`/`{role}`.
  *  - soft     : `bg-{role}-soft` + `text-{role}-emphasis`.
  *  - subtle   : soft plus the soft role border `border-{role}-subtle-line`.
  *  - outline  : transparent fill + `text-{role}-emphasis` + `border-{role}-subtle-line`.
@@ -50,42 +52,42 @@ type ColoredBadgeVariant = "solid" | "inverted" | "soft" | "subtle" | "outline";
 const COLOR_CLASSES: Record<BadgeColorScheme, Record<ColoredBadgeVariant, string>> = {
   primary: {
     solid: "bg-primary text-on-primary",
-    inverted: "bg-on-primary text-primary",
+    inverted: "bg-primary-inverted text-on-primary-inverted",
     soft: "bg-primary-soft text-primary-emphasis",
     subtle: "bg-primary-soft text-primary-emphasis border-primary-subtle-line",
     outline: "bg-transparent text-primary-emphasis border-primary-subtle-line",
   },
   neutral: {
     solid: "bg-neutral text-on-neutral",
-    inverted: "bg-on-neutral text-neutral",
+    inverted: "bg-neutral-inverted text-on-neutral-inverted",
     soft: "bg-neutral-soft text-neutral-emphasis",
     subtle: "bg-neutral-soft text-neutral-emphasis border-neutral-subtle-line",
     outline: "bg-transparent text-neutral-emphasis border-neutral-subtle-line",
   },
   success: {
     solid: "bg-success text-on-success",
-    inverted: "bg-on-success text-success",
+    inverted: "bg-success-inverted text-on-success-inverted",
     soft: "bg-success-soft text-success-emphasis",
     subtle: "bg-success-soft text-success-emphasis border-success-subtle-line",
     outline: "bg-transparent text-success-emphasis border-success-subtle-line",
   },
   info: {
     solid: "bg-info text-on-info",
-    inverted: "bg-on-info text-info",
+    inverted: "bg-info-inverted text-on-info-inverted",
     soft: "bg-info-soft text-info-emphasis",
     subtle: "bg-info-soft text-info-emphasis border-info-subtle-line",
     outline: "bg-transparent text-info-emphasis border-info-subtle-line",
   },
   warning: {
     solid: "bg-warning text-on-warning",
-    inverted: "bg-on-warning text-warning",
+    inverted: "bg-warning-inverted text-on-warning-inverted",
     soft: "bg-warning-soft text-warning-emphasis",
     subtle: "bg-warning-soft text-warning-emphasis border-warning-subtle-line",
     outline: "bg-transparent text-warning-emphasis border-warning-subtle-line",
   },
   danger: {
     solid: "bg-danger text-on-danger",
-    inverted: "bg-on-danger text-danger",
+    inverted: "bg-danger-inverted text-on-danger-inverted",
     soft: "bg-danger-soft text-danger-emphasis",
     subtle: "bg-danger-soft text-danger-emphasis border-danger-subtle-line",
     outline: "bg-transparent text-danger-emphasis border-danger-subtle-line",

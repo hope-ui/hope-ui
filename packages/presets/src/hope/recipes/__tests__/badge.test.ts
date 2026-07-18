@@ -42,13 +42,13 @@ describe("hope badge recipe", () => {
     expect(solid).toContain("text-on-danger");
   });
 
-  it("wires inverted to the literal swap of the solid pair (on-color fill + role text)", () => {
+  it("wires inverted to its own dedicated swap tokens (never borrowing solid's on-{role}/{role})", () => {
     const inverted = badgeRecipe({ variant: "inverted", colorScheme: "primary" }).root();
-    expect(inverted).toContain("bg-on-primary");
-    expect(inverted).toContain("text-primary");
-    // It is not the solid pair — the fill/text are swapped.
-    expect(inverted).not.toContain("bg-primary ");
-    expect(inverted).not.toContain("text-on-primary");
+    expect(inverted).toContain("bg-primary-inverted");
+    expect(inverted).toContain("text-on-primary-inverted");
+    // It no longer reuses solid's tokens as the swap — it paints its own `-inverted` family.
+    expect(inverted).not.toContain("bg-on-primary");
+    expect(inverted).not.toContain("text-primary ");
   });
 
   it("wires soft to the tonal fill + role content color", () => {

@@ -60,6 +60,24 @@ describe("Button — native", () => {
     dispose();
   });
 
+  it("wires the inverted variant to its own dedicated swap tokens (fill + on-content + wash)", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Button variant="inverted" colorScheme="primary">
+          On a toolbar
+        </Button>
+      </Themed>
+    ));
+
+    const cls = container.querySelector("button")?.className ?? "";
+    // The swap of solid on dedicated tokens — never borrowing solid's `on-primary`/`primary`.
+    expect(cls).toContain("bg-primary-inverted");
+    expect(cls).toContain("text-on-primary-inverted");
+    expect(cls).toContain("hover:not-data-pressed:bg-primary-inverted-hovered");
+    expect(cls).toContain("data-pressed:bg-primary-inverted-pressed");
+    dispose();
+  });
+
   it("emits data-disabled as the styling hook when disabled (absent when enabled)", async () => {
     const { container, dispose } = mount(() => (
       <Themed>

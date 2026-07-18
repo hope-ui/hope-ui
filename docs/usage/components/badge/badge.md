@@ -46,7 +46,7 @@ node. Badge writes no state `data-*`/`aria-*` attributes of its own — it is st
 | Variant    | Fill              | Text                   | Border                        | Notes                                        |
 | ---------- | ----------------- | ---------------------- | ----------------------------- | -------------------------------------------- |
 | `solid`    | `bg-{role}`       | `text-on-{role}`       | —                             | The role's solid fill.                       |
-| `inverted` | `bg-on-{role}`    | `text-{role}`          | —                             | The literal swap of `solid` (see below).     |
+| `inverted` | `bg-{role}-inverted` | `text-on-{role}-inverted` | —                        | The swap of `solid`, on its own tokens (see below). |
 | `soft`     | `bg-{role}-soft`  | `text-{role}-emphasis` | —                             | Tonal fill.                                  |
 | `subtle`   | `bg-{role}-soft`  | `text-{role}-emphasis` | `border-{role}-subtle-line`   | `soft` plus a soft role border.              |
 | `outline`  | transparent       | `text-{role}-emphasis` | `border-{role}-subtle-line`   | Border-only.                                 |
@@ -56,14 +56,16 @@ The `soft`/`subtle`/`outline` label is `text-{role}-emphasis` — the role's leg
 so neutral and warning stay readable in both light and dark. `dot` is a **variant**, not a separate
 prop: it renders neutral chrome with the role color moved onto the `badge-dot` slot.
 
-### `inverted` — the honest swap
+### `inverted` — the swap of `solid`, on its own tokens
 
-`inverted` is exactly the `solid` pair with fill and text exchanged: the on-color becomes the fill
-(`bg-on-{role}`) and the role color becomes the text (`text-{role}`). This needs **no new token** and
-is legible by construction — `solid`'s contrast is symmetric, so swapping the two keeps it. Because
-`warning` is a light-fill role (its `on-warning` is dark), `warning` honestly inverts to a **dark
-chip** with amber text — the documented consequence of a symmetric swap, not a special case. Use
-`inverted` on a solid, colored surface where a `solid` chip would disappear.
+`inverted` is the `solid` pair swapped — a light fill with role-colored text — but it paints its
+**own** dedicated `{role}-inverted` token family (`bg-{role}-inverted` / `text-on-{role}-inverted`)
+rather than reusing `solid`'s `on-{role}`/`{role}` in place. That makes its legibility guaranteed by
+the theme (not an accident of `solid` being a symmetric pair) and independently tunable by a preset.
+In hope's default palette the values reproduce the on-color/role swap, so `warning` (whose on-color is
+dark) renders as a **dark chip** with amber text — the honest, symmetric result. Use `inverted` on a
+solid, colored surface where a `solid` chip would disappear. (Button shares this same
+`{role}-inverted` family, adding the interactive hover/press rungs Badge doesn't need.)
 
 ## Polymorphism (`render`)
 

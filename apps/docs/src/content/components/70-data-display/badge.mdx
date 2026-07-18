@@ -60,10 +60,10 @@ are tonal; `outline` is a hollow chip; `dot` is neutral chrome with a role-color
 
 ### On solid surfaces
 
-`inverted` is the literal swap of `solid` — the on-color becomes the fill and the role becomes the
-text — so it is designed to sit on a **solid, colored surface** (a toolbar, a banner) rather than
-the page background. `warning` honestly inverts to a dark chip, the documented consequence of a
-symmetric swap.
+`inverted` is the swap of `solid` — a light fill with role-colored text — so it is designed to sit on
+a **solid, colored surface** (a toolbar, a banner) rather than the page background. It paints its own
+dedicated `{role}-inverted` tokens (which default to the swapped values), so it stays legible by
+design. `warning` renders as a dark chip, the honest result of a symmetric swap.
 
 <Preview>
   <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">

@@ -38,6 +38,7 @@ import { Button } from "@hope-ui/components/button";
 
 The `variant` prop sets the visual style. `default` is neutral, color-independent chrome (it
 ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the colored variants.
+`inverted` is a filled variant for solid surfaces — shown [below](#on-solid-surfaces).
 
 <Preview>
   <Button variant="default">Default</Button>
@@ -55,6 +56,30 @@ ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the 
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="link">Link</Button>
+```
+
+### On solid surfaces
+
+`inverted` is the swap of `solid` — a light fill with role-colored text — so it stays legible on a
+**solid, colored, or dark surface** (a toolbar, a banner) where a `solid` button would disappear. It
+paints its own dedicated `{role}-inverted` tokens, so it is a first-class variant with its own
+hover/press states, not a fragile on-the-fly swap. `warning` renders as a dark chip with amber text —
+the honest, symmetric result. On the plain page background its light fill is near-invisible by design.
+
+<Preview>
+  <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">
+    <Button variant="inverted" colorScheme="primary">Primary</Button>
+    <Button variant="inverted" colorScheme="neutral">Neutral</Button>
+    <Button variant="inverted" colorScheme="success">Success</Button>
+    <Button variant="inverted" colorScheme="danger">Danger</Button>
+  </div>
+</Preview>
+
+```tsx
+<div class="bg-surface-inverse p-6">
+  <Button variant="inverted" colorScheme="primary">Primary</Button>
+  <Button variant="inverted" colorScheme="success">Success</Button>
+</div>
 ```
 
 ## Color schemes
@@ -405,7 +430,7 @@ are intentionally **not** defaultable app-wide.
       prop: "variant",
       type: "ButtonVariant",
       default: '"default"',
-      description: "Visual style: default, solid, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme.",
+      description: "Visual style: default, solid, inverted, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme; inverted is the swap of solid for solid surfaces.",
     },
     {
       prop: "colorScheme",

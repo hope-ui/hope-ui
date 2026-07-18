@@ -35,6 +35,10 @@ import { tv } from "@hope-ui/theming";
  * (role × variant × state) is its own finished token; nothing is computed and nothing is borrowed
  * from a sibling variant.
  *  - solid   : `bg-{role}` + `text-on-{role}`, hovered/pressed → `bg-{role}-hovered`/`-pressed`.
+ *  - inverted: the swap of solid on its own dedicated tokens — `bg-{role}-inverted` +
+ *              `text-on-{role}-inverted`, hovered/pressed → `bg-{role}-inverted-hovered`/`-pressed`.
+ *              For solid/colored surfaces; the hope defaults reproduce the on-color/role swap but as
+ *              independent, tunable knobs (no borrowing of solid's `on-{role}`/`{role}`).
  *  - soft    : `bg-{role}-soft` + `text-{role}-emphasis`, hovered/pressed → `bg-{role}-soft-hovered`/`-pressed`.
  *  - outline : transparent bg + `text-{role}-emphasis` + the soft `border-{role}-subtle-line` tint
  *              (neutral uses `border-neutral-subtle-line`); hovered/pressed wash →
@@ -52,6 +56,8 @@ const COLOR_CLASSES: Record<
   primary: {
     solid:
       "bg-primary text-on-primary hover:not-data-pressed:bg-primary-hovered data-pressed:bg-primary-pressed",
+    inverted:
+      "bg-primary-inverted text-on-primary-inverted hover:not-data-pressed:bg-primary-inverted-hovered data-pressed:bg-primary-inverted-pressed",
     soft: "bg-primary-soft text-primary-emphasis hover:not-data-pressed:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
     outline:
       "text-primary-emphasis border-primary-subtle-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
@@ -62,6 +68,8 @@ const COLOR_CLASSES: Record<
   neutral: {
     solid:
       "bg-neutral text-on-neutral hover:not-data-pressed:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+    inverted:
+      "bg-neutral-inverted text-on-neutral-inverted hover:not-data-pressed:bg-neutral-inverted-hovered data-pressed:bg-neutral-inverted-pressed",
     soft: "bg-neutral-soft text-neutral-emphasis hover:not-data-pressed:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
     outline:
       "text-neutral-emphasis border-neutral-subtle-line hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
@@ -72,6 +80,8 @@ const COLOR_CLASSES: Record<
   success: {
     solid:
       "bg-success text-on-success hover:not-data-pressed:bg-success-hovered data-pressed:bg-success-pressed",
+    inverted:
+      "bg-success-inverted text-on-success-inverted hover:not-data-pressed:bg-success-inverted-hovered data-pressed:bg-success-inverted-pressed",
     soft: "bg-success-soft text-success-emphasis hover:not-data-pressed:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
     outline:
       "text-success-emphasis border-success-subtle-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
@@ -82,6 +92,8 @@ const COLOR_CLASSES: Record<
   warning: {
     solid:
       "bg-warning text-on-warning hover:not-data-pressed:bg-warning-hovered data-pressed:bg-warning-pressed",
+    inverted:
+      "bg-warning-inverted text-on-warning-inverted hover:not-data-pressed:bg-warning-inverted-hovered data-pressed:bg-warning-inverted-pressed",
     soft: "bg-warning-soft text-warning-emphasis hover:not-data-pressed:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
     outline:
       "text-warning-emphasis border-warning-subtle-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
@@ -92,6 +104,8 @@ const COLOR_CLASSES: Record<
   danger: {
     solid:
       "bg-danger text-on-danger hover:not-data-pressed:bg-danger-hovered data-pressed:bg-danger-pressed",
+    inverted:
+      "bg-danger-inverted text-on-danger-inverted hover:not-data-pressed:bg-danger-inverted-hovered data-pressed:bg-danger-inverted-pressed",
     soft: "bg-danger-soft text-danger-emphasis hover:not-data-pressed:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
     outline:
       "text-danger-emphasis border-danger-subtle-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
@@ -102,6 +116,8 @@ const COLOR_CLASSES: Record<
   info: {
     solid:
       "bg-info text-on-info hover:not-data-pressed:bg-info-hovered data-pressed:bg-info-pressed",
+    inverted:
+      "bg-info-inverted text-on-info-inverted hover:not-data-pressed:bg-info-inverted-hovered data-pressed:bg-info-inverted-pressed",
     soft: "bg-info-soft text-info-emphasis hover:not-data-pressed:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
     outline:
       "text-info-emphasis border-info-subtle-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
@@ -113,6 +129,7 @@ const COLOR_CLASSES: Record<
 
 const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default">> = [
   "solid",
+  "inverted",
   "soft",
   "outline",
   "ghost",
@@ -142,6 +159,7 @@ const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]
 const TEXT_PADDING_VARIANTS: Array<Exclude<ButtonVariant, "link">> = [
   "default",
   "solid",
+  "inverted",
   "soft",
   "outline",
   "ghost",
@@ -287,6 +305,8 @@ export const buttonRecipe = tv({
         root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       },
       solid: { root: "" },
+      // Color (fill + on-content + wash) lives per-role in `COLOR_CLASSES.inverted`, like `solid`.
+      inverted: { root: "" },
       soft: { root: "" },
       outline: { root: "bg-transparent" },
       ghost: { root: "bg-transparent" },

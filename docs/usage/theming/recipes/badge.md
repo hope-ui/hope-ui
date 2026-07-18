@@ -20,7 +20,7 @@ are purely visual.
 
 | Type | Members | Notes |
 | --- | --- | --- |
-| `BadgeVariant` | `solid` · `inverted` · `soft` · `subtle` · `outline` · `dot` | Every variant honors `colorScheme`. `inverted` is the literal swap of the `solid` pair; `subtle` is `soft` plus a soft role border; `dot` is neutral chrome with a role-colored dot. |
+| `BadgeVariant` | `solid` · `inverted` · `soft` · `subtle` · `outline` · `dot` | Every variant honors `colorScheme`. `inverted` is the swap of `solid` on its own dedicated `{role}-inverted` tokens (which default to the swapped values); `subtle` is `soft` plus a soft role border; `dot` is neutral chrome with a role-colored dot. |
 | `BadgeColorScheme` | `primary` · `neutral` · `success` · `info` · `warning` · `danger` | Semantic role color scheme. |
 | `BadgeSize` | `xs` · `sm` · `md` · `lg` | Density/scale. |
 | `BadgeShape` | `sharp` · `rounded` · `pill` · `circle` | Corner treatment. `circle` is fully rounded + square aspect, for a single glyph/count. |

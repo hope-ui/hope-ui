@@ -8,7 +8,15 @@ import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { buttonRecipe } from "../button";
 
-const VARIANTS: ButtonVariant[] = ["default", "solid", "soft", "outline", "ghost", "link"];
+const VARIANTS: ButtonVariant[] = [
+  "default",
+  "solid",
+  "inverted",
+  "soft",
+  "outline",
+  "ghost",
+  "link",
+];
 const COLOR_SCHEMES: ButtonColorScheme[] = [
   "primary",
   "neutral",
@@ -46,6 +54,15 @@ describe("hope button recipe", () => {
     const solidPrimary = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
     expect(solidPrimary).toContain("hover:not-data-pressed:bg-primary-hovered");
     expect(solidPrimary).toContain("data-pressed:bg-primary-pressed");
+    // Inverted is the swap of solid on its own dedicated tokens (fill `{role}-inverted`, content
+    // `on-{role}-inverted`), never borrowing solid's `on-{role}`/`{role}`; it carries its own wash.
+    const invertedPrimary = buttonRecipe({ variant: "inverted", colorScheme: "primary" }).root();
+    expect(invertedPrimary).toContain("bg-primary-inverted");
+    expect(invertedPrimary).toContain("text-on-primary-inverted");
+    expect(invertedPrimary).toContain("hover:not-data-pressed:bg-primary-inverted-hovered");
+    expect(invertedPrimary).toContain("data-pressed:bg-primary-inverted-pressed");
+    expect(invertedPrimary).not.toContain("bg-on-primary");
+    expect(invertedPrimary).not.toContain("text-primary ");
     // Soft label is the role's content color (`-emphasis`, renamed from `on-{role}-soft`); its fill
     // has its own (pressed-guarded) hovered ladder + pressed token instead of a computed mix.
     const softSuccess = buttonRecipe({ variant: "soft", colorScheme: "success" }).root();
@@ -79,7 +96,7 @@ describe("hope button recipe", () => {
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {
     // Exercise every colored fill and assert the rendered class string is free of computed color.
-    for (const variant of ["solid", "soft", "outline", "ghost", "link"] as const) {
+    for (const variant of ["solid", "inverted", "soft", "outline", "ghost", "link"] as const) {
       for (const colorScheme of COLOR_SCHEMES) {
         const root = buttonRecipe({ variant, colorScheme }).root();
         expect(root).not.toContain("color-mix");
