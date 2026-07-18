@@ -1,0 +1,479 @@
+import { Badge } from "@hope-ui/components/badge";
+import { hope } from "@hope-ui/presets/hope";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { BadgeCountDemo } from "~/components/demos/badge/BadgeCountDemo";
+import { BadgeDecoratorsDemo } from "~/components/demos/badge/BadgeDecoratorsDemo";
+import { BadgeMatrixDemo } from "~/components/demos/badge/BadgeMatrixDemo";
+import { BadgeStatusDemo } from "~/components/demos/badge/BadgeStatusDemo";
+import { InfoIcon } from "~/components/Icons";
+import { PropsTable } from "~/components/PropsTable";
+
+export const summary = "Inline label for statuses and counts.";
+
+export const description =
+  "An inline label for statuses, categories, and counts — with variants, color schemes, sizes, shapes, decorators, and a status dot.";
+
+
+# Badge
+
+{description}
+
+## Import
+
+```tsx
+import { Badge } from "@hope-ui/components/badge";
+```
+
+## Usage
+
+Badge is a static, non-interactive label — a styled `<span>`. Drop text in and it inherits the
+default `soft` / `neutral` look.
+
+<Preview>
+  <Badge>Badge</Badge>
+</Preview>
+
+```tsx
+<Badge>Badge</Badge>
+```
+
+## Variants
+
+The `variant` prop sets the visual style. `solid` and `inverted` are filled; `soft` and `subtle`
+are tonal; `outline` is a hollow chip; `dot` is neutral chrome with a role-colored status pip.
+
+<Preview>
+  <Badge variant="solid">solid</Badge>
+  <Badge variant="soft">soft</Badge>
+  <Badge variant="subtle">subtle</Badge>
+  <Badge variant="outline">outline</Badge>
+  <Badge variant="dot">dot</Badge>
+</Preview>
+
+```tsx
+<Badge variant="solid">solid</Badge>
+<Badge variant="soft">soft</Badge>
+<Badge variant="subtle">subtle</Badge>
+<Badge variant="outline">outline</Badge>
+<Badge variant="dot">dot</Badge>
+```
+
+### On solid surfaces
+
+`inverted` is the literal swap of `solid` — the on-color becomes the fill and the role becomes the
+text — so it is designed to sit on a **solid, colored surface** (a toolbar, a banner) rather than
+the page background. `warning` honestly inverts to a dark chip, the documented consequence of a
+symmetric swap.
+
+<Preview>
+  <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">
+    <Badge variant="inverted" colorScheme="primary">primary</Badge>
+    <Badge variant="inverted" colorScheme="neutral">neutral</Badge>
+    <Badge variant="inverted" colorScheme="success">success</Badge>
+    <Badge variant="inverted" colorScheme="danger">danger</Badge>
+  </div>
+</Preview>
+
+```tsx
+<div class="bg-surface-inverse p-6">
+  <Badge variant="inverted" colorScheme="primary">primary</Badge>
+  <Badge variant="inverted" colorScheme="success">success</Badge>
+</div>
+```
+
+## Color schemes
+
+Pair a variant with a `colorScheme` — one of the six semantic roles. Every variant is
+role-aware: even `dot` keeps neutral chrome while coloring only its status pip.
+
+<Preview>
+  <BadgeMatrixDemo />
+</Preview>
+
+```tsx title="The list below is non-exhaustive"
+<Badge variant="solid" colorScheme="primary">Primary</Badge>
+<Badge variant="soft" colorScheme="success">Success</Badge>
+<Badge variant="subtle" colorScheme="info">Info</Badge>
+<Badge variant="outline" colorScheme="warning">Warning</Badge>
+<Badge variant="dot" colorScheme="danger">Danger</Badge>
+```
+
+## Sizes
+
+Four sizes, from `xs` to `lg` (heights step from 16px to 28px). The recipe scales padding, text,
+radius, the status dot, and any decorator icon to match.
+
+<Preview>
+  <Badge variant="solid" size="xs">Extra small</Badge>
+  <Badge variant="solid" size="sm">Small</Badge>
+  <Badge variant="solid" size="md">Medium</Badge>
+  <Badge variant="solid" size="lg">Large</Badge>
+</Preview>
+
+```tsx
+<Badge variant="solid" size="xs">Extra small</Badge>
+<Badge variant="solid" size="sm">Small</Badge>
+<Badge variant="solid" size="md">Medium</Badge>
+<Badge variant="solid" size="lg">Large</Badge>
+```
+
+## Shapes
+
+`shape` controls the corner radius: `sharp`, `rounded` (default), and `pill`. `circle` squares the
+aspect and drops the horizontal padding — the shape for a single glyph or count.
+
+<Preview>
+  <Badge variant="soft" shape="sharp">sharp</Badge>
+  <Badge variant="soft" shape="rounded">rounded</Badge>
+  <Badge variant="soft" shape="pill">pill</Badge>
+  <Badge variant="solid" colorScheme="danger" shape="circle" size="md">3</Badge>
+</Preview>
+
+```tsx
+<Badge variant="soft" shape="sharp">sharp</Badge>
+<Badge variant="soft" shape="rounded">rounded</Badge>
+<Badge variant="soft" shape="pill">pill</Badge>
+<Badge variant="solid" colorScheme="danger" shape="circle" size="md">3</Badge>
+```
+
+## Status
+
+The `dot` variant renders role-neutral chrome with a single role-colored pip — the natural fit for
+a status indicator, where the label carries the meaning and the color reinforces it. It works
+across every role.
+
+<Preview>
+  <Badge variant="dot" colorScheme="success">Live</Badge>
+  <Badge variant="dot" colorScheme="warning">Deploying</Badge>
+  <Badge variant="dot" colorScheme="danger">Failed</Badge>
+  <Badge variant="dot" colorScheme="neutral">Paused</Badge>
+</Preview>
+
+```tsx
+<Badge variant="dot" colorScheme="success">Live</Badge>
+<Badge variant="dot" colorScheme="warning">Deploying</Badge>
+<Badge variant="dot" colorScheme="danger">Failed</Badge>
+<Badge variant="dot" colorScheme="neutral">Paused</Badge>
+```
+
+In context — a status column reads cleanly because each row states its state in words, with the pip
+as a scannable second channel.
+
+<Preview>
+  <BadgeStatusDemo />
+</Preview>
+
+```tsx
+<Badge variant="dot" colorScheme="success">Live</Badge>
+<Badge variant="dot" colorScheme="warning">Deploying</Badge>
+<Badge variant="dot" colorScheme="danger">Failed</Badge>
+```
+
+## Icons & decorators
+
+Put content before or after the label with `startDecorator` and `endDecorator`. Both accept any
+JSX — an inline `<svg>`, or an icon from your icon set. The recipe sizes decorator SVGs to the
+badge's size and tightens the padding on the decorated side so the icon isn't over-spaced.
+
+<Preview>
+  <BadgeDecoratorsDemo />
+</Preview>
+
+```tsx
+<Badge variant="soft" colorScheme="success" startDecorator={<CheckIcon />}>
+  Verified
+</Badge>
+
+<Badge variant="outline" colorScheme="danger" endDecorator={<CloseIcon />}>
+  Remove
+</Badge>
+```
+
+## Counts & notifications
+
+The `circle` shape turns a badge into a round count pip. Anchor one to the corner of an icon with
+`class` (a `ring` in the surface color lifts it off the element beneath), and give it an
+`aria-label` so the count is announced.
+
+<Preview>
+  <BadgeCountDemo />
+</Preview>
+
+```tsx
+<Badge variant="solid" colorScheme="danger" shape="circle" size="sm">3</Badge>
+
+<div class="relative inline-flex">
+  <BellIcon class="size-7" />
+  <Badge
+    variant="solid"
+    colorScheme="danger"
+    shape="circle"
+    size="xs"
+    class="absolute -top-1.5 -right-2 ring-2 ring-surface-raised"
+    aria-label="5 unread notifications"
+  >
+    5
+  </Badge>
+</div>
+```
+
+## Full width
+
+`fullWidth` stretches the badge to fill its container — useful as a block-level status ribbon.
+
+<Preview>
+  <div class="w-72">
+    <Badge variant="soft" colorScheme="info" fullWidth>Full width</Badge>
+  </div>
+</Preview>
+
+```tsx
+<Badge variant="soft" colorScheme="info" fullWidth>Full width</Badge>
+```
+
+## Polymorphism
+
+Render Badge as a different element or component with the `render` prop — a function that receives
+Badge's fully-computed props and spreads them onto your element. This is how you make a **linkable
+tag** without losing Badge's styling. There is **no `as` prop**; `render` is the single
+polymorphism API.
+
+<Preview>
+  <Badge
+    variant="soft"
+    colorScheme="primary"
+    render={(props) => <a href="#" {...props} />}
+  >
+    Linkable tag
+  </Badge>
+</Preview>
+
+```tsx title="Render as an anchor"
+<Badge
+  variant="soft"
+  colorScheme="primary"
+  render={(props) => <a href="#" {...props} />}
+>
+  Linkable tag
+</Badge>
+```
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    Badge is a static label with no behavior of its own, so — unlike Button — rendering it as an
+    anchor needs no extra flags: the anchor brings its own link semantics, and Badge just contributes
+    its computed <code>class</code> and merges refs. Spreading Badge's <code>span</code> props onto a
+    different element may need an <code>as unknown as</code> cast to satisfy TypeScript; the runtime
+    behavior is unaffected.
+  </div>
+</div>
+
+## Theming
+
+Badge's look comes from the active preset's recipe. You can override it at three levels, applied
+in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance
+`slotClasses` → `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`.
+
+<PropsTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    { slot: "root", attr: "badge", description: "The rendered element (a span by default)." },
+    { slot: "label", attr: "badge-label", description: "Wraps the children. Rendered only when children is set." },
+    { slot: "startDecorator", attr: "badge-start-decorator", description: "Leading decorator wrapper. Rendered only when startDecorator is set." },
+    { slot: "endDecorator", attr: "badge-end-decorator", description: "Trailing decorator wrapper. Rendered only when endDecorator is set." },
+    { slot: "dot", attr: "badge-dot", description: "The status pip. Rendered only for the dot variant; marked aria-hidden." },
+  ]}
+/>
+
+### Overriding one badge
+
+`class` merges onto the root slot (your utilities win conflicts). `slotClasses` targets any slot
+by name. Use literal class strings so your Tailwind build can see them.
+
+<Preview>
+  <Badge variant="solid" colorScheme="primary" slotClasses={{ root: "px-4 tracking-wide uppercase" }}>
+    New
+  </Badge>
+  <Badge variant="soft" colorScheme="success" class="rounded-none border-l-4 border-success">
+    Ribbon
+  </Badge>
+</Preview>
+
+```tsx
+<Badge
+  variant="solid"
+  colorScheme="primary"
+  slotClasses={{ root: "px-4 tracking-wide uppercase" }}
+>
+  New
+</Badge>
+
+<Badge variant="soft" colorScheme="success" class="rounded-none border-l-4 border-success">
+  Ribbon
+</Badge>
+```
+
+### App-wide defaults & overrides
+
+Set defaults and global part classes for **every** Badge through the theme with `definePreset`,
+then pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at **instance ??
+preset ?? builtin** precedence, so an explicit prop on a single badge always wins.
+
+<Preview>
+  <ThemeProvider
+    preset={definePreset(hope, {
+      components: {
+        badge: {
+          defaultProps: { shape: "pill" },
+          slotClasses: { root: "uppercase tracking-wide" },
+        },
+      },
+    })}
+  >
+    <Badge variant="solid" colorScheme="primary">Branded</Badge>
+    <Badge variant="soft" colorScheme="success">Branded</Badge>
+  </ThemeProvider>
+</Preview>
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    badge: {
+      // Every recipe variant is defaultable.
+      defaultProps: { shape: "pill" },
+      // Global part classes, folded in before per-instance slotClasses.
+      slotClasses: { root: "uppercase tracking-wide" },
+    },
+  },
+});
+```
+
+```tsx title="App.tsx"
+import { ThemeProvider } from "@hope-ui/theming";
+import { myPreset } from "./theme";
+
+<ThemeProvider preset={myPreset}>
+  {/* every Badge below is pill-shaped & uppercase */}
+</ThemeProvider>
+```
+
+Because Badge is a static label, **every** styling axis is defaultable through `defaultProps`:
+`variant`, `colorScheme`, `size`, `shape`, and `fullWidth`. There is no transient state (no
+`loading`/`disabled`) to exclude.
+
+## API
+
+### Props
+
+`Badge` accepts every native `<span>` attribute in addition to the props below.
+
+<PropsTable
+  columns={[
+    { key: "prop", label: "Prop", code: true },
+    { key: "type", label: "Type", code: true },
+    { key: "default", label: "Default", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      prop: "variant",
+      type: "BadgeVariant",
+      default: '"soft"',
+      description: "Visual style: solid, inverted, soft, subtle, outline, dot. inverted is the on-color swap of solid, for solid surfaces.",
+    },
+    {
+      prop: "colorScheme",
+      type: "BadgeColorScheme",
+      default: '"neutral"',
+      description: "Semantic role color: primary, neutral, success, info, warning, danger. Every variant is role-aware.",
+    },
+    {
+      prop: "size",
+      type: "BadgeSize",
+      default: '"sm"',
+      description: "Density scale: xs, sm, md, lg (heights 16–28px).",
+    },
+    {
+      prop: "shape",
+      type: "BadgeShape",
+      default: '"rounded"',
+      description: "Corner shape: sharp, rounded, pill, circle. circle squares the aspect for a single glyph or count.",
+    },
+    {
+      prop: "fullWidth",
+      type: "boolean",
+      default: "false",
+      description: "Stretches the badge to fill its container's width.",
+    },
+    {
+      prop: "startDecorator",
+      type: "JSX.Element",
+      default: "",
+      description: "Leading content before the label — typically an icon. Sized to the badge by the recipe.",
+    },
+    {
+      prop: "endDecorator",
+      type: "JSX.Element",
+      default: "",
+      description: "Trailing content after the label — typically an icon.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render Badge as another element or component. Receives Badge's computed props. The only polymorphism mechanism — there is no as prop.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"badge">',
+      default: "",
+      description: "Per-slot class overrides, keyed by root, label, startDecorator, endDecorator, dot.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The badge label.",
+    },
+  ]}
+/>
+
+## Accessibility
+
+`Badge` renders a plain `<span>` with no ARIA role, so it is read as inline text in the document
+flow — the right default for a label. That puts the burden on **content**: the badge's meaning must
+live in its text, not its color.
+
+- **Never rely on color alone.** Every `colorScheme` is a distinct token, but color is a second
+  channel, not the message (WCAG 1.4.1). Pair the warning color with the word "Deploying", not a
+  bare colored dot. The `dot` variant's pip is decorative (`aria-hidden`) precisely so the label
+  carries the state.
+- **Give count and icon-only badges an accessible name.** A count sitting on the corner of an icon
+  has no surrounding text, so add an `aria-label` (e.g. `aria-label="5 unread notifications"`) that
+  states what the number means.
+- **Announce live counts.** If a badge's number updates in place, put `aria-live="polite"` on it
+  (or a wrapping region) so assistive tech announces the change without stealing focus.
+- **Rendered as a link,** via `render`, the badge inherits the anchor's semantics and becomes
+  focusable and keyboard-operable for free — no extra work needed, since Badge adds no behavior of
+  its own.
