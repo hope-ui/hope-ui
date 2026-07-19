@@ -1,4 +1,4 @@
-import type { AlertColorScheme } from "@hope-ui/theming";
+import type { AlertColorScheme, AlertStatusIconKey } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 
 // hope's built-in status glyphs — hand-inlined Lucide paths (hope ships no icon-library dependency),
@@ -71,10 +71,10 @@ export const BUILTIN_STATUS_ICONS: Record<AlertColorScheme, (() => JSX.Element) 
   danger: CircleXIcon,
 };
 
-/** The `AlertThemeableProps` factory key that supplies a preset-level default glyph, per role. */
-export type StatusIconKey = "infoIcon" | "successIcon" | "warningIcon" | "dangerIcon";
-
-export const STATUS_ICON_KEYS: Record<AlertColorScheme, StatusIconKey | undefined> = {
+// `AlertStatusIconKey` (the `{role}Icon` factory keys) is owned by `@hope-ui/theming`, constructed
+// there from `AlertStatusRole`. Typing the values against it means renaming a status role in the
+// theming contract is a **compile error** here (a value literal stops matching), never a silent miss.
+export const STATUS_ICON_KEYS: Record<AlertColorScheme, AlertStatusIconKey | undefined> = {
   primary: undefined,
   neutral: undefined,
   info: "infoIcon",

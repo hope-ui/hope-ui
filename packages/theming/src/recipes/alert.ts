@@ -23,8 +23,20 @@ import type { SlotRecipeFn } from "./slot-recipe";
  */
 export type AlertVariant = "default" | "solid" | "soft" | "subtle" | "outline";
 
-/** Semantic role color scheme. */
-export type AlertColorScheme = "primary" | "neutral" | "success" | "info" | "warning" | "danger";
+/**
+ * The roles that carry a status glyph — the ones for which a preset-overridable `{role}Icon` factory
+ * exists. **The single source of truth:** {@link AlertColorScheme} is composed from it (plus the two
+ * glyph-less roles), {@link AlertStatusIconKey} and the `AlertThemeableProps` icon factories are
+ * *constructed* from it, and the component's status-icon maps key off it — so renaming a role updates
+ * the color schemes, the factory props, their key type, and the runtime maps together.
+ */
+export type AlertStatusRole = "info" | "success" | "warning" | "danger";
+
+/** Semantic role color scheme — the {@link AlertStatusRole}s plus the two roles that ship no glyph. */
+export type AlertColorScheme = AlertStatusRole | "primary" | "neutral";
+
+/** The `{role}Icon` preset default-glyph factory keys, one per {@link AlertStatusRole}. */
+export type AlertStatusIconKey = `${AlertStatusRole}Icon`;
 
 /** Density/scale. */
 export type AlertSize = "sm" | "md" | "lg";
@@ -40,29 +52,27 @@ export interface AlertRecipeVariants {
 }
 
 /**
- * The curated Alert props a preset may default app-wide via `ComponentOverride.defaultProps`: the
- * recipe variants **plus** the four preset-overridable default status glyphs. A superset of
- * {@link AlertRecipeVariants} by construction (`extends`), so it registers in `ThemeablePropsRegistry`
- * and `ThemeablePropsOf<"alert">` widens the variants-only surface without dropping anything.
+ * One preset-overridable default-glyph factory per {@link AlertStatusRole}, keyed `{role}Icon`
+ * (`infoIcon`/`successIcon`/`warningIcon`/`dangerIcon`) — the icon slice of {@link AlertThemeableProps},
+ * constructed from {@link AlertStatusIconKey} so the key set can't drift from the roles.
  *
- * The status glyphs are **flat, discrete factory keys** (`infoIcon`/…), never a nested `statusIcons`
- * map: `mergeComponentOverrides` merges `defaultProps` shallowly per key, so a nested map would drop a
+ * The glyphs are **flat, discrete factory keys**, never a nested `statusIcons` map:
+ * `mergeComponentOverrides` merges `defaultProps` shallowly per key, so a nested map would drop a
  * partial override. Each is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset
  * value is one object shared by every instance, and a Solid `JSX.Element` is an already-built node that
  * would *move* if reused — so a factory (called per instance, via `runIfFunction`) is what lets a
- * preset swap the app-wide default icon for a role. Only the four status roles carry a built-in glyph;
- * `primary`/`neutral` ship none (they need an explicit `icon`).
+ * preset swap the app-wide default icon for a role.
  */
-export interface AlertThemeableProps extends AlertRecipeVariants {
-  /** App-wide default glyph for the `info` role, as a factory. Falls back to hope's built-in. */
-  infoIcon?: () => JSX.Element;
-  /** App-wide default glyph for the `success` role, as a factory. Falls back to hope's built-in. */
-  successIcon?: () => JSX.Element;
-  /** App-wide default glyph for the `warning` role, as a factory. Falls back to hope's built-in. */
-  warningIcon?: () => JSX.Element;
-  /** App-wide default glyph for the `danger` role, as a factory. Falls back to hope's built-in. */
-  dangerIcon?: () => JSX.Element;
-}
+type AlertStatusGlyphs = { [Key in AlertStatusIconKey]?: () => JSX.Element };
+
+/**
+ * The curated Alert props a preset may default app-wide via `ComponentOverride.defaultProps`: the
+ * recipe variants **plus** the per-role status glyphs ({@link AlertStatusGlyphs}). A superset of
+ * {@link AlertRecipeVariants} by construction (`extends`), so it registers in `ThemeablePropsRegistry`
+ * and `ThemeablePropsOf<"alert">` widens the variants-only surface without dropping anything. Only the
+ * status roles carry a built-in glyph; `primary`/`neutral` ship none (they need an explicit `icon`).
+ */
+export interface AlertThemeableProps extends AlertRecipeVariants, AlertStatusGlyphs {}
 
 /** The Alert recipe's slots. */
 export type AlertSlot = "root" | "icon" | "content" | "title" | "description" | "actions" | "close";

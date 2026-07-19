@@ -3,6 +3,7 @@ import { type RenderProp, renderElement, runIfFunction } from "@hope-ui/primitiv
 import type {
   AlertColorScheme,
   AlertSize,
+  AlertStatusIconKey,
   AlertThemeableProps,
   AlertVariant,
   SlotClasses,
@@ -89,11 +90,19 @@ type MergedAlertProps = AlertProps &
   Required<Pick<AlertProps, "variant" | "colorScheme" | "size" | "role" | "closable">>;
 
 /**
+ * The slice of the resolved (merged) Alert props {@link resolveStatusIcon} actually reads: the
+ * per-instance `icon`, the `colorScheme` role (required — it indexes the status maps), and the four
+ * preset status-icon factories. Kept a `Pick` of `MergedAlertProps` so it can't drift from the real
+ * props while still declaring exactly what the function depends on.
+ */
+type StatusIconInput = Pick<MergedAlertProps, "icon" | "colorScheme" | AlertStatusIconKey>;
+
+/**
  * instance `icon` ?? preset `{role}Icon` factory ?? built-in status glyph. `false` hides it. Pure and
  * module-scope: the caller wraps it in `children(() => resolveStatusIcon(merged))`, which memoizes the
  * *result*.
  */
-function resolveStatusIcon(merged: MergedAlertProps): JSX.Element | null {
+function resolveStatusIcon(merged: StatusIconInput): JSX.Element | null {
   // Read the instance `icon` **exactly once**. It is a component-valued prop, so each read of the raw
   // getter re-runs `createComponent` (the `children()` multi-read hazard) — the caller's
   // `children(() => resolveStatusIcon(...))` memoizes the *result*, not this internal read. Binding it
@@ -108,7 +117,9 @@ function resolveStatusIcon(merged: MergedAlertProps): JSX.Element | null {
   }
   const factoryKey = STATUS_ICON_KEYS[merged.colorScheme];
   if (factoryKey) {
-    const factory = merged[factoryKey] as (() => JSX.Element) | undefined;
+    // `merged[factoryKey]` is exactly `(() => JSX.Element) | undefined` now that the input is the
+    // narrow `StatusIconInput` (the factory keys carry that value type), so no cast is needed.
+    const factory = merged[factoryKey];
     if (factory != null) {
       return runIfFunction(factory) ?? null;
     }
