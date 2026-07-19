@@ -65,11 +65,10 @@ describe("CloseButton", () => {
 
     const cls = container.querySelector('[data-slot="close-button"]')?.className ?? "";
     expect(cls).toContain("size-6"); // sm default
-    expect(cls).toContain("hover:not-data-pressed:bg-close-overlay-hovered");
-    expect(cls).toContain("data-pressed:bg-close-overlay-pressed");
-    expect(cls).toContain("focus-visible:ring-close-focus");
-    // Never the violet focus halo — that would clash on a colored surface.
-    expect(cls).not.toContain("focus-halo");
+    expect(cls).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
+    expect(cls).toContain("data-pressed:bg-surface-adaptive-pressed");
+    // Focus is the shared halo ring, the same indicator every other focusable control uses.
+    expect(cls).toContain("focus-visible:ring-focus-halo");
     dispose();
   });
 
@@ -268,9 +267,9 @@ describe("CloseButton", () => {
   });
 
   it("resolves the currentColor-derived wash per element (bundled Chromium)", () => {
-    // The browser project doesn't compile Tailwind, so `bg-close-overlay-hovered` carries no style
+    // The browser project doesn't compile Tailwind, so `bg-surface-adaptive-hovered` carries no style
     // here. Assert instead the *mechanism* the token relies on: the exact `color-mix` value
-    // `--hope-close-overlay-hovered` expands to, applied to two elements with different inherited
+    // `--hope-surface-adaptive-hovered` expands to, applied to two elements with different inherited
     // `color`, must resolve to two different, real background colors that track each element's color.
     // This is what makes CloseButton surface-adaptive with no colorScheme.
     const wash = "color-mix(in oklab, currentColor 10%, transparent)";

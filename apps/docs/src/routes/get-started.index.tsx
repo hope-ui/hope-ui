@@ -5,7 +5,7 @@ export const Route = createFileRoute("/get-started/")({
   component: () => (
     <SectionOverview
       kind="get-started"
-      title="Get started"
+      title="Get Started"
       description="Everything you need to add hope-ui to your app — installation, theming, and core concepts."
     />
   ),

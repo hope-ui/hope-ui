@@ -13,13 +13,14 @@
  *
  * ── currentColor, not a role token ──────────────────────────────────────────────────────────────
  * The glyph sets **no** text-color class, so it inherits `currentColor` from the surface it sits on.
- * The hover/press wash and focus ring are *finished* tokens derived from `currentColor` in hope's
- * `tokens.css` (`--hope-close-overlay-hovered/-pressed`, `--hope-close-focus` → `bg-close-overlay-*`
- * / `ring-close-focus` via `_base/theme-map.css`). So a close button reads correctly on solid / soft
- * / light / dark surfaces with zero configuration, and the recipe still computes no color: no
+ * The hover/press wash is the shared, surface-family `surface-adaptive-*` token — a *finished* token
+ * derived from `currentColor` in hope's `tokens.css` (`--hope-surface-adaptive-hovered/-pressed` →
+ * `bg-surface-adaptive-*` via `_base/theme-map.css`). So a close button reads correctly on solid /
+ * soft / light / dark surfaces with zero configuration, and the recipe still computes no color: no
  * `color-mix`, no alpha modifier, no magic opacity (the recipe-purity rule — `pnpm check:recipe-purity`).
- * Interaction *triggers* are Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/
- * `data-disabled` variants (emitted by the `createButton` primitive).
+ * Focus is the shared `focus-halo` ring, same as Button — not a bespoke close ring. Interaction
+ * *triggers* are Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/`data-disabled`
+ * variants (emitted by the `createButton` primitive).
  */
 
 import type { CloseButtonSize } from "@hope-ui/theming";
@@ -45,10 +46,9 @@ export const closeButtonRecipe = tv({
       "transition-[background-color,box-shadow] duration-150 ease-out",
       // Surface-adaptive wash — guarded against the pressed state so it never fights the press color.
       // Both are finished currentColor-derived tokens (never an alpha modifier — recipe-purity).
-      "hover:not-data-pressed:bg-close-overlay-hovered data-pressed:bg-close-overlay-pressed",
-      // Focus ring is the finished, currentColor-derived `close-focus` token (not the violet
-      // `focus-halo`, which would clash on a colored/solid surface).
-      "focus-visible:ring-3 focus-visible:ring-close-focus",
+      "hover:not-data-pressed:bg-surface-adaptive-hovered data-pressed:bg-surface-adaptive-pressed",
+      // Focus ring is the shared `focus-halo` — the same indicator every focusable control uses.
+      "focus-visible:ring-3 focus-visible:ring-focus-halo",
       // Dim-only disabled axis (mirrors Button): `createButton` emits `data-disabled` for both native
       // (`:disabled`) and non-native (`aria-disabled`) buttons. No color swap — just neutralise chrome
       // and dim via the finished `opacity-disabled` token, never a magic `opacity-90`.

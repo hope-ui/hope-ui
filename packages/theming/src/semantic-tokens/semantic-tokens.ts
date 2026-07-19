@@ -214,13 +214,14 @@ export const SEMANTIC_COLOR_TOKENS = [
   "focus-halo",
   "scrim",
 
-  // ── Surface-adaptive close affordance (see `@hope-ui/components/close-button`): the hover/press
-  // wash (`bg-close-overlay-hovered` / `bg-close-overlay-pressed`) and focus ring (`ring-close-focus`)
-  // of a close button. A preset authors these as *finished* tokens derived from `currentColor`, so a
-  // close button defers to whatever surface it sits on rather than asserting a colorScheme.
-  "close-overlay-hovered",
-  "close-overlay-pressed",
-  "close-focus",
+  // ── Surface-adaptive interaction wash (part of the surface family): the hover/press tint
+  // (`bg-surface-adaptive-hovered` / `bg-surface-adaptive-pressed`) a control with no rest background
+  // of its own — an icon-only button such as CloseButton — lays over whatever surface it sits on. A
+  // preset authors these as *finished* tokens derived from `currentColor`, so the control defers to
+  // its surface rather than asserting a colorScheme. Focus is not special-cased — such a control uses
+  // the shared `focus-halo` ring.
+  "surface-adaptive-hovered",
+  "surface-adaptive-pressed",
 ] as const;
 
 /** One semantic color token name (e.g. `"primary"`, `"on-primary"`, `"primary-emphasis"`). */

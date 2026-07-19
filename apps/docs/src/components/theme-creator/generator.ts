@@ -1,8 +1,8 @@
 // Theme Creator — the generator (pure).
 //
 // Ports hope's exact token-derivation ladder from `packages/presets/src/hope/tokens.css`. Given a
-// `ThemeConfig` (one family per role + a radius) it produces the full 144-color + close/opacity/
-// radius token set for `:root` and `.dark`. Two exports:
+// `ThemeConfig` (one family per role + a radius) it produces the full 143-color + opacity/radius
+// token set for `:root` and `.dark`. Two exports:
 //   - `deriveTokens(config)` → { light, dark } maps (bare token name → CSS value). Used to paint the
 //     live preview via inline style, and by `toCss`.
 //   - `toCss(config)` → the paste-ready `theme.css` string (`:root {…}` + `.dark {…}`), values as
@@ -291,23 +291,18 @@ function buildSections(config: ThemeConfig): Section[] {
     ],
   });
 
-  // Surface-adaptive close affordance — currentColor-derived, so no `.dark` counterpart.
+  // Surface-adaptive interaction wash — currentColor-derived, so no `.dark` counterpart.
   sections.push({
-    comment: "Surface-adaptive close affordance (currentColor-derived — no .dark needed)",
+    comment: "Surface-adaptive interaction wash (currentColor-derived — no .dark needed)",
     rows: [
       {
-        name: "close-overlay-hovered",
+        name: "surface-adaptive-hovered",
         light: "color-mix(in oklab, currentColor 10%, transparent)",
         dark: null,
       },
       {
-        name: "close-overlay-pressed",
+        name: "surface-adaptive-pressed",
         light: "color-mix(in oklab, currentColor 15%, transparent)",
-        dark: null,
-      },
-      {
-        name: "close-focus",
-        light: "color-mix(in oklab, currentColor 40%, transparent)",
         dark: null,
       },
     ],

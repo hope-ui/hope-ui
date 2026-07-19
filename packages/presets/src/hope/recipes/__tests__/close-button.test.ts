@@ -43,13 +43,12 @@ describe("hope closeButton recipe", () => {
     }
   });
 
-  it("derives the hover/press wash + focus ring from the currentColor `close-*` tokens", () => {
+  it("derives the hover/press wash from the surface-adaptive tokens and focuses via the shared focus-halo", () => {
     const root = closeButtonRecipe({}).root();
-    expect(root).toContain("hover:not-data-pressed:bg-close-overlay-hovered");
-    expect(root).toContain("data-pressed:bg-close-overlay-pressed");
-    expect(root).toContain("focus-visible:ring-close-focus");
-    // Never the violet focus halo — that would clash on a colored/solid surface.
-    expect(root).not.toContain("focus-halo");
+    expect(root).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
+    expect(root).toContain("data-pressed:bg-surface-adaptive-pressed");
+    // Focus is the shared halo ring, the same indicator every other focusable control uses.
+    expect(root).toContain("focus-visible:ring-focus-halo");
   });
 
   it("dims a disabled close button via the opacity axis, with no color swap", () => {

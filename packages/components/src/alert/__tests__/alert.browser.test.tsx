@@ -309,7 +309,7 @@ describe("Alert", () => {
     // Placement from the alert `close` slot ...
     expect(close?.className).toContain("ms-auto");
     // ... and CloseButton's own recipe chrome is still present.
-    expect(close?.className).toContain("focus-visible:ring-close-focus");
+    expect(close?.className).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
     dispose();
   });
 

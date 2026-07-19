@@ -182,8 +182,7 @@
   --color-focus-halo: var(--hope-focus-halo);
   --color-scrim: var(--hope-scrim);
 
-  /* Surface-adaptive close affordance (currentColor-derived — see hope's tokens.css) */
-  --color-close-overlay-hovered: var(--hope-close-overlay-hovered);
-  --color-close-overlay-pressed: var(--hope-close-overlay-pressed);
-  --color-close-focus: var(--hope-close-focus);
+  /* Surface-adaptive interaction wash (currentColor-derived — see hope's tokens.css) */
+  --color-surface-adaptive-hovered: var(--hope-surface-adaptive-hovered);
+  --color-surface-adaptive-pressed: var(--hope-surface-adaptive-pressed);
 }
