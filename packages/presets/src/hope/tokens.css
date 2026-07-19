@@ -22,7 +22,7 @@
  *
  * `.dark` follows `:root`: both selectors have equal specificity, so source order decides, and the
  * dark overrides win whenever the `.dark` class (see `_base/variants.css`) is present. Conformance
- * checks only `:root`, so the two blocks are kept in lockstep by hand — 110 color tokens each.
+ * checks only `:root`, so the two blocks are kept in lockstep by hand — 141 color tokens each.
  */
 
 :root {
@@ -57,13 +57,18 @@
   --hope-primary-outline-pressed: var(--color-violet-100);
   --hope-primary-ghost-hovered: var(--color-violet-100);
   --hope-primary-ghost-pressed: var(--color-violet-100);
+  --hope-primary-inverted: var(--color-white);
+  --hope-primary-inverted-hovered: var(--color-neutral-100);
+  --hope-primary-inverted-pressed: var(--color-neutral-100);
   --hope-primary-line: var(--color-violet-300);
+  --hope-primary-subtle-line: var(--color-violet-200);
   --hope-primary-emphasis: var(--color-violet-700);
   --hope-primary-link-hovered: var(--color-violet-800);
   --hope-primary-link-pressed: var(--color-violet-800);
   --hope-on-primary: var(--color-white);
+  --hope-on-primary-inverted: var(--color-violet-600);
 
-  /* neutral (no `-line`; outline borders use `border-strong`) */
+  /* neutral (two-tier role border: `-line` strong + `-subtle-line` soft) */
   --hope-neutral: var(--color-neutral-700);
   --hope-neutral-hovered: var(--color-neutral-800);
   --hope-neutral-pressed: var(--color-neutral-800);
@@ -74,10 +79,16 @@
   --hope-neutral-outline-pressed: var(--color-neutral-100);
   --hope-neutral-ghost-hovered: var(--color-neutral-100);
   --hope-neutral-ghost-pressed: var(--color-neutral-100);
+  --hope-neutral-inverted: var(--color-white);
+  --hope-neutral-inverted-hovered: var(--color-neutral-100);
+  --hope-neutral-inverted-pressed: var(--color-neutral-100);
+  --hope-neutral-line: var(--color-neutral-300);
+  --hope-neutral-subtle-line: var(--color-neutral-200);
   --hope-neutral-emphasis: var(--color-neutral-700);
   --hope-neutral-link-hovered: var(--color-neutral-800);
   --hope-neutral-link-pressed: var(--color-neutral-800);
   --hope-on-neutral: var(--color-white);
+  --hope-on-neutral-inverted: var(--color-neutral-700);
 
   /* success (green) */
   --hope-success: var(--color-green-600);
@@ -90,11 +101,16 @@
   --hope-success-outline-pressed: var(--color-green-100);
   --hope-success-ghost-hovered: var(--color-green-100);
   --hope-success-ghost-pressed: var(--color-green-100);
+  --hope-success-inverted: var(--color-white);
+  --hope-success-inverted-hovered: var(--color-neutral-100);
+  --hope-success-inverted-pressed: var(--color-neutral-100);
   --hope-success-line: var(--color-green-300);
+  --hope-success-subtle-line: var(--color-green-200);
   --hope-success-emphasis: var(--color-green-700);
   --hope-success-link-hovered: var(--color-green-800);
   --hope-success-link-pressed: var(--color-green-800);
   --hope-on-success: var(--color-white);
+  --hope-on-success-inverted: var(--color-green-600);
 
   /* info (sky) */
   --hope-info: var(--color-sky-600);
@@ -107,11 +123,16 @@
   --hope-info-outline-pressed: var(--color-sky-100);
   --hope-info-ghost-hovered: var(--color-sky-100);
   --hope-info-ghost-pressed: var(--color-sky-100);
+  --hope-info-inverted: var(--color-white);
+  --hope-info-inverted-hovered: var(--color-neutral-100);
+  --hope-info-inverted-pressed: var(--color-neutral-100);
   --hope-info-line: var(--color-sky-300);
+  --hope-info-subtle-line: var(--color-sky-200);
   --hope-info-emphasis: var(--color-sky-700);
   --hope-info-link-hovered: var(--color-sky-800);
   --hope-info-link-pressed: var(--color-sky-800);
   --hope-on-info: var(--color-white);
+  --hope-on-info-inverted: var(--color-sky-600);
 
   /* warning (amber) — a light fill, so `on-warning` is dark and the emphasis ramp sits deeper */
   --hope-warning: var(--color-amber-400);
@@ -124,11 +145,18 @@
   --hope-warning-outline-pressed: var(--color-amber-100);
   --hope-warning-ghost-hovered: var(--color-amber-100);
   --hope-warning-ghost-pressed: var(--color-amber-100);
+  /* warning's on-color is dark (taupe-900), so its inverted fill is a dark chip that *lightens* on
+     interaction; the content is amber (the role color) — the honest, symmetric swap of solid. */
+  --hope-warning-inverted: var(--color-taupe-900);
+  --hope-warning-inverted-hovered: var(--color-taupe-800);
+  --hope-warning-inverted-pressed: var(--color-taupe-800);
   --hope-warning-line: var(--color-amber-400);
+  --hope-warning-subtle-line: var(--color-amber-300);
   --hope-warning-emphasis: var(--color-amber-800);
   --hope-warning-link-hovered: var(--color-amber-900);
   --hope-warning-link-pressed: var(--color-amber-900);
   --hope-on-warning: var(--color-taupe-900);
+  --hope-on-warning-inverted: var(--color-amber-400);
 
   /* danger (red) */
   --hope-danger: var(--color-red-600);
@@ -141,11 +169,16 @@
   --hope-danger-outline-pressed: var(--color-red-100);
   --hope-danger-ghost-hovered: var(--color-red-100);
   --hope-danger-ghost-pressed: var(--color-red-100);
+  --hope-danger-inverted: var(--color-white);
+  --hope-danger-inverted-hovered: var(--color-neutral-100);
+  --hope-danger-inverted-pressed: var(--color-neutral-100);
   --hope-danger-line: var(--color-red-300);
+  --hope-danger-subtle-line: var(--color-red-200);
   --hope-danger-emphasis: var(--color-red-700);
   --hope-danger-link-hovered: var(--color-red-800);
   --hope-danger-link-pressed: var(--color-red-800);
   --hope-on-danger: var(--color-white);
+  --hope-on-danger-inverted: var(--color-red-600);
 
   /* Neutral borders */
   --hope-subtle: var(--color-neutral-200);
@@ -200,13 +233,18 @@
   --hope-primary-outline-pressed: var(--color-violet-950);
   --hope-primary-ghost-hovered: var(--color-violet-950);
   --hope-primary-ghost-pressed: var(--color-violet-950);
+  --hope-primary-inverted: var(--color-neutral-950);
+  --hope-primary-inverted-hovered: var(--color-neutral-900);
+  --hope-primary-inverted-pressed: var(--color-neutral-900);
   --hope-primary-line: var(--color-violet-700);
+  --hope-primary-subtle-line: var(--color-violet-800);
   --hope-primary-emphasis: var(--color-violet-200);
   --hope-primary-link-hovered: var(--color-violet-100);
   --hope-primary-link-pressed: var(--color-violet-100);
   --hope-on-primary: var(--color-neutral-950);
+  --hope-on-primary-inverted: var(--color-violet-400);
 
-  /* neutral (no `-line`; outline borders use `border-strong`) */
+  /* neutral (two-tier role border: `-line` strong + `-subtle-line` soft) */
   --hope-neutral: var(--color-neutral-300);
   --hope-neutral-hovered: var(--color-neutral-200);
   --hope-neutral-pressed: var(--color-neutral-200);
@@ -217,10 +255,16 @@
   --hope-neutral-outline-pressed: var(--color-neutral-800);
   --hope-neutral-ghost-hovered: var(--color-neutral-800);
   --hope-neutral-ghost-pressed: var(--color-neutral-800);
+  --hope-neutral-inverted: var(--color-neutral-950);
+  --hope-neutral-inverted-hovered: var(--color-neutral-900);
+  --hope-neutral-inverted-pressed: var(--color-neutral-900);
+  --hope-neutral-line: var(--color-neutral-700);
+  --hope-neutral-subtle-line: var(--color-neutral-800);
   --hope-neutral-emphasis: var(--color-neutral-200);
   --hope-neutral-link-hovered: var(--color-neutral-100);
   --hope-neutral-link-pressed: var(--color-neutral-100);
   --hope-on-neutral: var(--color-neutral-950);
+  --hope-on-neutral-inverted: var(--color-neutral-300);
 
   /* success (green) */
   --hope-success: var(--color-green-400);
@@ -233,11 +277,16 @@
   --hope-success-outline-pressed: var(--color-green-950);
   --hope-success-ghost-hovered: var(--color-green-950);
   --hope-success-ghost-pressed: var(--color-green-950);
+  --hope-success-inverted: var(--color-neutral-950);
+  --hope-success-inverted-hovered: var(--color-neutral-900);
+  --hope-success-inverted-pressed: var(--color-neutral-900);
   --hope-success-line: var(--color-green-700);
+  --hope-success-subtle-line: var(--color-green-800);
   --hope-success-emphasis: var(--color-green-200);
   --hope-success-link-hovered: var(--color-green-100);
   --hope-success-link-pressed: var(--color-green-100);
   --hope-on-success: var(--color-neutral-950);
+  --hope-on-success-inverted: var(--color-green-400);
 
   /* info (sky) */
   --hope-info: var(--color-sky-400);
@@ -250,11 +299,16 @@
   --hope-info-outline-pressed: var(--color-sky-950);
   --hope-info-ghost-hovered: var(--color-sky-950);
   --hope-info-ghost-pressed: var(--color-sky-950);
+  --hope-info-inverted: var(--color-neutral-950);
+  --hope-info-inverted-hovered: var(--color-neutral-900);
+  --hope-info-inverted-pressed: var(--color-neutral-900);
   --hope-info-line: var(--color-sky-700);
+  --hope-info-subtle-line: var(--color-sky-800);
   --hope-info-emphasis: var(--color-sky-200);
   --hope-info-link-hovered: var(--color-sky-100);
   --hope-info-link-pressed: var(--color-sky-100);
   --hope-on-info: var(--color-neutral-950);
+  --hope-on-info-inverted: var(--color-sky-400);
 
   /* warning (amber) */
   --hope-warning: var(--color-amber-600);
@@ -267,11 +321,16 @@
   --hope-warning-outline-pressed: var(--color-amber-950);
   --hope-warning-ghost-hovered: var(--color-amber-950);
   --hope-warning-ghost-pressed: var(--color-amber-950);
+  --hope-warning-inverted: var(--color-neutral-950);
+  --hope-warning-inverted-hovered: var(--color-neutral-900);
+  --hope-warning-inverted-pressed: var(--color-neutral-900);
   --hope-warning-line: var(--color-amber-600);
+  --hope-warning-subtle-line: var(--color-amber-700);
   --hope-warning-emphasis: var(--color-amber-200);
   --hope-warning-link-hovered: var(--color-amber-100);
   --hope-warning-link-pressed: var(--color-amber-100);
   --hope-on-warning: var(--color-neutral-950);
+  --hope-on-warning-inverted: var(--color-amber-600);
 
   /* danger (red) */
   --hope-danger: var(--color-red-400);
@@ -284,11 +343,16 @@
   --hope-danger-outline-pressed: var(--color-red-950);
   --hope-danger-ghost-hovered: var(--color-red-950);
   --hope-danger-ghost-pressed: var(--color-red-950);
+  --hope-danger-inverted: var(--color-neutral-950);
+  --hope-danger-inverted-hovered: var(--color-neutral-900);
+  --hope-danger-inverted-pressed: var(--color-neutral-900);
   --hope-danger-line: var(--color-red-700);
+  --hope-danger-subtle-line: var(--color-red-800);
   --hope-danger-emphasis: var(--color-red-200);
   --hope-danger-link-hovered: var(--color-red-100);
   --hope-danger-link-pressed: var(--color-red-100);
   --hope-on-danger: var(--color-neutral-950);
+  --hope-on-danger-inverted: var(--color-red-400);
 
   /* Neutral borders */
   --hope-subtle: var(--color-neutral-800);

@@ -2,13 +2,17 @@ import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { Link } from "@tanstack/solid-router";
+import { ButtonIconOnlyDemo } from "~/components/demos/button/ButtonIconOnlyDemo";
 import { ButtonIconsDemo } from "~/components/demos/button/ButtonIconsDemo";
 import { ButtonMatrixDemo } from "~/components/demos/button/ButtonMatrixDemo";
 import { InfoIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
 
+export const summary = "Trigger for actions and events.";
+
 export const description =
-  "A themeable, accessible trigger for actions and events, with variants, color schemes, sizes, decorators, and a built-in loading state.";
+  "A trigger for actions and events, with variants, color schemes, sizes, decorators, and a built-in loading state.";
+
 
 # Button
 
@@ -34,6 +38,7 @@ import { Button } from "@hope-ui/components/button";
 
 The `variant` prop sets the visual style. `default` is neutral, color-independent chrome (it
 ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the colored variants.
+`inverted` is a filled variant for solid surfaces — shown [below](#on-solid-surfaces).
 
 <Preview>
   <Button variant="default">Default</Button>
@@ -51,6 +56,30 @@ ignores `colorScheme`); `solid`, `soft`, `outline`, `ghost`, and `link` are the 
 <Button variant="outline">Outline</Button>
 <Button variant="ghost">Ghost</Button>
 <Button variant="link">Link</Button>
+```
+
+### On solid surfaces
+
+`inverted` is the swap of `solid` — a light fill with role-colored text — so it stays legible on a
+**solid, colored, or dark surface** (a toolbar, a banner) where a `solid` button would disappear. It
+paints its own dedicated `{role}-inverted` tokens, so it is a first-class variant with its own
+hover/press states, not a fragile on-the-fly swap. `warning` renders as a dark chip with amber text —
+the honest, symmetric result. On the plain page background its light fill is near-invisible by design.
+
+<Preview>
+  <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">
+    <Button variant="inverted" colorScheme="primary">Primary</Button>
+    <Button variant="inverted" colorScheme="neutral">Neutral</Button>
+    <Button variant="inverted" colorScheme="success">Success</Button>
+    <Button variant="inverted" colorScheme="danger">Danger</Button>
+  </div>
+</Preview>
+
+```tsx
+<div class="bg-surface-inverse p-6">
+  <Button variant="inverted" colorScheme="primary">Primary</Button>
+  <Button variant="inverted" colorScheme="success">Success</Button>
+</div>
 ```
 
 ## Color schemes
@@ -124,6 +153,34 @@ button's size for you.
   Continue
 </Button>
 ```
+
+## Icon-only
+
+Set `iconOnly` and pass a single icon as the children to get a **square** button: the recipe locks
+the width to the size's height, drops the horizontal padding, and sizes the icon for you (the same
+per-size scale the decorators use). Without `iconOnly`, an icon in the children is laid out like a
+text label — a wide rectangle.
+
+An icon-only button has no visible text, so it needs an accessible name: always pass an `aria-label`
+(or `aria-labelledby`). In development, an icon-only button with neither logs a warning; the check
+is client-only and compiles out of production builds.
+
+<Preview>
+  <ButtonIconOnlyDemo />
+</Preview>
+
+```tsx
+<Button iconOnly aria-label="Add">
+  <PlusIcon />
+</Button>
+
+<Button iconOnly variant="soft" colorScheme="success" aria-label="Confirm">
+  <CheckIcon />
+</Button>
+```
+
+`iconOnly` is meant for the chrome variants (`default`, `solid`, `soft`, `outline`, `ghost`).
+Combining it with `fullWidth` or `variant="link"` is unsupported — those fight the square shape.
 
 ## Loading
 
@@ -373,7 +430,7 @@ are intentionally **not** defaultable app-wide.
       prop: "variant",
       type: "ButtonVariant",
       default: '"default"',
-      description: "Visual style: default, solid, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme.",
+      description: "Visual style: default, solid, inverted, soft, outline, ghost, link. default is neutral chrome and ignores colorScheme; inverted is the swap of solid for solid surfaces.",
     },
     {
       prop: "colorScheme",
@@ -428,6 +485,12 @@ are intentionally **not** defaultable app-wide.
       type: "JSX.Element",
       default: "",
       description: "Trailing content after the label — typically an icon.",
+    },
+    {
+      prop: "iconOnly",
+      type: "boolean",
+      default: "false",
+      description: "Renders a square, icon-only button (icon passed as children, sized and centered per size). Needs an aria-label for an accessible name. Not for use with fullWidth or the link variant.",
     },
     {
       prop: "disabled",

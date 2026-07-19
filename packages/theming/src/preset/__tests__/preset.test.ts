@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { BadgeRecipe } from "../../recipes/badge";
 import type { ButtonRecipe } from "../../recipes/button";
 import type { RecipeRegistry } from "../../registry";
 import { definePreset, isPreset, type Preset } from "../preset";
@@ -12,7 +13,14 @@ const stubRecipe: ButtonRecipe = () => ({
   endDecorator: () => "",
   loader: () => "",
 });
-const registry: RecipeRegistry = { button: stubRecipe };
+const stubBadgeRecipe: BadgeRecipe = () => ({
+  root: () => "",
+  label: () => "",
+  startDecorator: () => "",
+  endDecorator: () => "",
+  dot: () => "",
+});
+const registry: RecipeRegistry = { badge: stubBadgeRecipe, button: stubRecipe };
 
 describe("definePreset — bootstrap from a raw registry", () => {
   it("brands the result and carries the registry as `recipes`", () => {

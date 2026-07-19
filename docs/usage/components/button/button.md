@@ -24,7 +24,7 @@ import { Button } from "@hope-ui/components/button";
 
 | Prop              | Type                                                              | Default     | Description                                                                                                    |
 | ----------------- | ----------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
-| `variant`         | `'default' \| 'solid' \| 'soft' \| 'outline' \| 'ghost' \| 'link'`| `'default'` | Visual style. `default` is the neutral chrome button and ignores `colorScheme`.                                |
+| `variant`         | `'default' \| 'solid' \| 'inverted' \| 'soft' \| 'outline' \| 'ghost' \| 'link'`| `'default'` | Visual style. `default` is the neutral chrome button and ignores `colorScheme`. `inverted` is the swap of `solid` for solid/colored surfaces — see below.  |
 | `colorScheme`     | `'primary' \| 'neutral' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` | Semantic role color scheme. Ignored by `default`. Named `colorScheme` (not `color`) so it never shadows the native HTML `color` attribute, which passes through `...rest` untouched.|
 | `size`            | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                            | `'md'`      | Density/scale. Heights 28 / 32 / 36 / 40 / 44px.                                                               |
 | `nativeButton`    | `boolean`                                                         | `true`      | Set `false` when `render`-ing a non-`<button>` (an `<a>`, a `<div>`). See "Polymorphism".                      |
@@ -35,6 +35,7 @@ import { Button } from "@hope-ui/components/button";
 | `loaderPlacement` | `'start' \| 'center' \| 'end'`                                    | `'center'`  | `center` overlays the loader and hides the label (width preserved); `start`/`end` place it inline.             |
 | `startDecorator`  | `JSX.Element`                                                     | —           | Leading slot (typically an icon), before the label.                                                            |
 | `endDecorator`    | `JSX.Element`                                                     | —           | Trailing slot (typically an icon), after the label.                                                            |
+| `iconOnly`        | `boolean`                                                         | `false`     | Renders a square, icon-only button (icon passed as `children`, sized & centered per `size`). Requires an `aria-label`. See "Icon-only buttons".|
 | `fullWidth`       | `boolean`                                                         | `false`     | Stretches to the container width.                                                                              |
 | `render`          | `(props) => JSX.Element`                                          | —           | Render as a different element/component. The only polymorphism mechanism (there is no `as` prop).              |
 | `type`            | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | Native button type. Applied only to a native button.                                                           |
@@ -53,14 +54,48 @@ are hydration-safe. The theme's recipe styles two dim-only state axes — `data-
 
 ## Variants & color scheme
 
-`solid`/`soft`/`outline`/`ghost`/`link` take a `colorScheme` role; `default` is a color-independent
-neutral chrome button (shadcn's outline). `solid` paints the role's solid fill (`bg-{role}` / `text-on-{role}`),
-`soft` its tonal fill, and `soft`/`outline`/`ghost`/`link` label with the role's legible *content*
-color `text-{role}-emphasis` so neutral and warning stay readable in both light and dark. Each
-variant walks its own finished interaction ladder — a pressed-guarded hover wash
-(`hover:not-data-pressed:` → `-hovered`, so hover never fights the press color) plus
+`solid`/`inverted`/`soft`/`outline`/`ghost`/`link` take a `colorScheme` role; `default` is a
+color-independent neutral chrome button (shadcn's outline). `solid` paints the role's solid fill
+(`bg-{role}` / `text-on-{role}`), `soft` its tonal fill, and `soft`/`outline`/`ghost`/`link` label
+with the role's legible *content* color `text-{role}-emphasis` so neutral and warning stay readable in
+both light and dark. Each variant walks its own finished interaction ladder — a pressed-guarded hover
+wash (`hover:not-data-pressed:` → `-hovered`, so hover never fights the press color) plus
 `data-pressed:` → `-pressed`; the recipe computes no color. All styling comes from the theme's
 `button` recipe; the component itself writes no utility classes.
+
+### `inverted` — for solid surfaces
+
+`inverted` is the swap of `solid` — a light fill with role-colored text (`bg-{role}-inverted` /
+`text-on-{role}-inverted`) — so it stays legible where a `solid` button would disappear: on a solid,
+colored, or dark surface (a toolbar, a banner). It walks the same interaction ladder as the other
+variants (`bg-{role}-inverted-hovered`/`-pressed`). Unlike a literal on-the-fly swap of `solid`'s
+tokens, `inverted` paints its **own** dedicated `{role}-inverted` token family, so its legibility is
+guaranteed by the theme rather than by accident, and a preset can tune it independently. In hope's
+default palette the values reproduce the on-color/role swap, so `warning` (whose on-color is dark)
+renders as a **dark chip** with amber text — the honest, symmetric result. On the plain page
+background `inverted`'s light fill is near-invisible by design; place it on a colored surface.
+
+## Icon-only buttons
+
+Pass a single icon as `children` and set `iconOnly` to get a **square** button: the recipe locks the
+width to the size's height (`aspect-square`), drops the horizontal padding, and sizes the icon per
+`size` (the same scale the decorators use). Without `iconOnly` an icon in `children` is laid out like
+a text label, giving a wide rectangle.
+
+Because there is no visible text, an icon-only button has no accessible name unless you provide one —
+always pass an `aria-label` (or `aria-labelledby`). In dev, an icon-only button with neither logs a
+warning (`[hope-ui] Button: an icon-only button (iconOnly) has no accessible name.`); the check is
+client-only and compiles out of a production build.
+
+```tsx
+<Button iconOnly aria-label="Add item">
+  <PlusIcon />
+</Button>
+```
+
+`iconOnly` is meant for the chrome variants (`default`/`solid`/`inverted`/`soft`/`outline`/`ghost`). Combining it
+with `fullWidth` (which stretches to the container) or `variant="link"` (which drops the fixed height)
+is unsupported — those fight the square metrics.
 
 ## Polymorphism (`render` + `nativeButton`)
 

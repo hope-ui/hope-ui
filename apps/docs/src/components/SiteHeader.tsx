@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/solid-router";
 import { createSignal, For, onSettled, Show } from "solid-js";
 import { BrandLogoIcon, MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
+import { MobileNav } from "~/components/MobileNav";
 import { SITE } from "~/config";
+import { PRIMARY_NAV } from "~/lib/nav";
 
 // The primary top navigation bar: brand + version badge on the left, the section
 // tabs (active tab rendered as a filled pill), and a search field + theme toggle
@@ -9,12 +11,10 @@ import { SITE } from "~/config";
 // the ThemeProvider (it uses only Tailwind utilities, never useTheme()), so it also
 // renders on the error/not-found boundaries.
 //
-// There is no "Home" tab — the brand wordmark links there, so a tab would be redundant.
-const NAV = [
-  { to: "/get-started", label: "Get started" },
-  { to: "/components", label: "Components" },
-  { to: "/changelog", label: "Changelog" },
-] as const;
+// The section tabs collapse below `md`; on small viewports MobileNav (the hamburger
+// + drawer, rendered in the right cluster) is the sole navigation. Both read the
+// section list from the shared PRIMARY_NAV. There is no "Home" tab — the brand
+// wordmark links there, so a tab would be redundant.
 
 // Tab styling driven entirely by the `data-status="active"` attribute TanStack Link
 // emits (no `activeProps`). The idle hover styles are guarded with
@@ -75,8 +75,8 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="Primary">
-          <For each={NAV}>
+        <nav class="ml-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
+          <For each={PRIMARY_NAV}>
             {(item) => (
               <Link to={item.to} class={TAB}>
                 {item.label}
@@ -99,6 +99,7 @@ export function SiteHeader() {
             </kbd>
           </button>
           <ThemeToggle />
+          <MobileNav />
         </div>
       </div>
     </header>

@@ -1,5 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { For, Show } from "solid-js";
+import { hasSectionVisuals, SectionVisual } from "~/components/component-visuals";
 import { ChevronRightIcon, InfoIcon } from "~/components/Icons";
 import { PathLink } from "~/components/PathLink";
 import { TableOfContents, type TocEntry } from "~/components/TableOfContents";
@@ -80,27 +81,37 @@ export function SectionOverview(props: {
                       </h2>
                     )}
                   </Show>
-                  <ul class="grid gap-4 sm:grid-cols-2">
+                  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <For each={group.items}>
                       {(item) => (
                         <li>
                           <PathLink
                             to={item.path}
-                            class="group flex h-full flex-col rounded-xl border border-subtle bg-surface-raised p-5 transition-all hover:border-primary/60 hover:shadow-sm"
+                            class="group flex h-full flex-col overflow-hidden rounded-xl border border-subtle bg-surface-raised transition-all hover:border-primary/60 hover:shadow-sm"
                           >
-                            <div class="flex items-center justify-between gap-2">
-                              <span class="font-semibold text-foreground transition-colors group-hover:text-primary">
-                                {item.title}
-                              </span>
-                              <ChevronRightIcon class="size-4 shrink-0 text-foreground-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-                            </div>
-                            <Show when={item.description}>
-                              {(d) => (
-                                <p class="mt-1.5 text-sm leading-relaxed text-foreground-muted">
-                                  {d()}
-                                </p>
-                              )}
+                            {/* Illustrated sections (components, get-started) get a
+                                primary-palette illustration atop the card; sections
+                                without visuals (e.g. changelog) stay text-only. */}
+                            <Show when={hasSectionVisuals(props.kind)}>
+                              <SectionVisual section={props.kind} slug={item.slug} />
                             </Show>
+                            <div class="flex flex-1 flex-col p-4">
+                              <div class="flex items-center justify-between gap-2">
+                                <span class="font-semibold text-foreground transition-colors group-hover:text-primary">
+                                  {item.title}
+                                </span>
+                                <ChevronRightIcon class="size-4 shrink-0 text-foreground-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                              </div>
+                              {/* Prefer the short one-line `summary` on the card; the full
+                                  `description` stays on the doc page (fall back to it, then nothing). */}
+                              <Show when={item.summary ?? item.description}>
+                                {(d) => (
+                                  <p class="mt-1 text-sm leading-snug text-foreground-muted">
+                                    {d()}
+                                  </p>
+                                )}
+                              </Show>
+                            </div>
                           </PathLink>
                         </li>
                       )}

@@ -11,7 +11,7 @@
  * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
  * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
  * `COLOR_CLASSES` and assembled into `compoundVariants`. The literals are what makes `bg-primary`,
- * `text-primary-emphasis`, `border-warning-line`, etc. actually exist in the emitted CSS.
+ * `text-primary-emphasis`, `border-warning-subtle-line`, etc. actually exist in the emitted CSS.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
  * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
@@ -25,7 +25,7 @@
  * `data-disabled`/`aria-busy` variants.
  */
 
-import type { ButtonColorScheme, ButtonVariant } from "@hope-ui/theming";
+import type { ButtonColorScheme, ButtonSize, ButtonVariant } from "@hope-ui/theming";
 // The Button recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
 // implements it. `hopeRecipes` (in `./index`) checks the finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
@@ -35,9 +35,14 @@ import { tv } from "@hope-ui/theming";
  * (role × variant × state) is its own finished token; nothing is computed and nothing is borrowed
  * from a sibling variant.
  *  - solid   : `bg-{role}` + `text-on-{role}`, hovered/pressed → `bg-{role}-hovered`/`-pressed`.
+ *  - inverted: the swap of solid on its own dedicated tokens — `bg-{role}-inverted` +
+ *              `text-on-{role}-inverted`, hovered/pressed → `bg-{role}-inverted-hovered`/`-pressed`.
+ *              For solid/colored surfaces; the hope defaults reproduce the on-color/role swap but as
+ *              independent, tunable knobs (no borrowing of solid's `on-{role}`/`{role}`).
  *  - soft    : `bg-{role}-soft` + `text-{role}-emphasis`, hovered/pressed → `bg-{role}-soft-hovered`/`-pressed`.
- *  - outline : transparent bg + `text-{role}-emphasis` + the `border-{role}-line` tint (neutral has
- *              no `-line` → `border-strong`); hovered/pressed wash → `bg-{role}-outline-hovered`/`-pressed`.
+ *  - outline : transparent bg + `text-{role}-emphasis` + the soft `border-{role}-subtle-line` tint
+ *              (neutral uses `border-neutral-subtle-line`); hovered/pressed wash →
+ *              `bg-{role}-outline-hovered`/`-pressed`.
  *  - ghost   : like outline without the border; wash → `bg-{role}-ghost-hovered`/`-pressed`.
  *  - link    : `text-{role}-emphasis`, hovered/pressed text → `text-{role}-link-hovered`/`-pressed`,
  *              underline on hover.
@@ -51,9 +56,11 @@ const COLOR_CLASSES: Record<
   primary: {
     solid:
       "bg-primary text-on-primary hover:not-data-pressed:bg-primary-hovered data-pressed:bg-primary-pressed",
+    inverted:
+      "bg-primary-inverted text-on-primary-inverted hover:not-data-pressed:bg-primary-inverted-hovered data-pressed:bg-primary-inverted-pressed",
     soft: "bg-primary-soft text-primary-emphasis hover:not-data-pressed:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
     outline:
-      "text-primary-emphasis border-primary-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
+      "text-primary-emphasis border-primary-subtle-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
     ghost:
       "text-primary-emphasis hover:not-data-pressed:bg-primary-ghost-hovered data-pressed:bg-primary-ghost-pressed",
     link: "text-primary-emphasis hover:not-data-pressed:text-primary-link-hovered data-pressed:text-primary-link-pressed hover:underline underline-offset-4",
@@ -61,9 +68,11 @@ const COLOR_CLASSES: Record<
   neutral: {
     solid:
       "bg-neutral text-on-neutral hover:not-data-pressed:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+    inverted:
+      "bg-neutral-inverted text-on-neutral-inverted hover:not-data-pressed:bg-neutral-inverted-hovered data-pressed:bg-neutral-inverted-pressed",
     soft: "bg-neutral-soft text-neutral-emphasis hover:not-data-pressed:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
     outline:
-      "text-neutral-emphasis border-strong hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
+      "text-neutral-emphasis border-neutral-subtle-line hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
     ghost:
       "text-neutral-emphasis hover:not-data-pressed:bg-neutral-ghost-hovered data-pressed:bg-neutral-ghost-pressed",
     link: "text-neutral-emphasis hover:not-data-pressed:text-neutral-link-hovered data-pressed:text-neutral-link-pressed hover:underline underline-offset-4",
@@ -71,9 +80,11 @@ const COLOR_CLASSES: Record<
   success: {
     solid:
       "bg-success text-on-success hover:not-data-pressed:bg-success-hovered data-pressed:bg-success-pressed",
+    inverted:
+      "bg-success-inverted text-on-success-inverted hover:not-data-pressed:bg-success-inverted-hovered data-pressed:bg-success-inverted-pressed",
     soft: "bg-success-soft text-success-emphasis hover:not-data-pressed:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
     outline:
-      "text-success-emphasis border-success-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
+      "text-success-emphasis border-success-subtle-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
     ghost:
       "text-success-emphasis hover:not-data-pressed:bg-success-ghost-hovered data-pressed:bg-success-ghost-pressed",
     link: "text-success-emphasis hover:not-data-pressed:text-success-link-hovered data-pressed:text-success-link-pressed hover:underline underline-offset-4",
@@ -81,9 +92,11 @@ const COLOR_CLASSES: Record<
   warning: {
     solid:
       "bg-warning text-on-warning hover:not-data-pressed:bg-warning-hovered data-pressed:bg-warning-pressed",
+    inverted:
+      "bg-warning-inverted text-on-warning-inverted hover:not-data-pressed:bg-warning-inverted-hovered data-pressed:bg-warning-inverted-pressed",
     soft: "bg-warning-soft text-warning-emphasis hover:not-data-pressed:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
     outline:
-      "text-warning-emphasis border-warning-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
+      "text-warning-emphasis border-warning-subtle-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
     ghost:
       "text-warning-emphasis hover:not-data-pressed:bg-warning-ghost-hovered data-pressed:bg-warning-ghost-pressed",
     link: "text-warning-emphasis hover:not-data-pressed:text-warning-link-hovered data-pressed:text-warning-link-pressed hover:underline underline-offset-4",
@@ -91,9 +104,11 @@ const COLOR_CLASSES: Record<
   danger: {
     solid:
       "bg-danger text-on-danger hover:not-data-pressed:bg-danger-hovered data-pressed:bg-danger-pressed",
+    inverted:
+      "bg-danger-inverted text-on-danger-inverted hover:not-data-pressed:bg-danger-inverted-hovered data-pressed:bg-danger-inverted-pressed",
     soft: "bg-danger-soft text-danger-emphasis hover:not-data-pressed:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
     outline:
-      "text-danger-emphasis border-danger-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
+      "text-danger-emphasis border-danger-subtle-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
     ghost:
       "text-danger-emphasis hover:not-data-pressed:bg-danger-ghost-hovered data-pressed:bg-danger-ghost-pressed",
     link: "text-danger-emphasis hover:not-data-pressed:text-danger-link-hovered data-pressed:text-danger-link-pressed hover:underline underline-offset-4",
@@ -101,9 +116,11 @@ const COLOR_CLASSES: Record<
   info: {
     solid:
       "bg-info text-on-info hover:not-data-pressed:bg-info-hovered data-pressed:bg-info-pressed",
+    inverted:
+      "bg-info-inverted text-on-info-inverted hover:not-data-pressed:bg-info-inverted-hovered data-pressed:bg-info-inverted-pressed",
     soft: "bg-info-soft text-info-emphasis hover:not-data-pressed:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
     outline:
-      "text-info-emphasis border-info-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
+      "text-info-emphasis border-info-subtle-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
     ghost:
       "text-info-emphasis hover:not-data-pressed:bg-info-ghost-hovered data-pressed:bg-info-ghost-pressed",
     link: "text-info-emphasis hover:not-data-pressed:text-info-link-hovered data-pressed:text-info-link-pressed hover:underline underline-offset-4",
@@ -112,6 +129,7 @@ const COLOR_CLASSES: Record<
 
 const COLOR_VARIANTS: Array<Exclude<ButtonVariant, "default">> = [
   "solid",
+  "inverted",
   "soft",
   "outline",
   "ghost",
@@ -127,6 +145,59 @@ const colorCompoundVariants = (Object.keys(COLOR_CLASSES) as ButtonColorScheme[]
       class: { root: COLOR_CLASSES[colorScheme][variant] },
     })),
 );
+
+/*
+ * ── Horizontal padding lives in compoundVariants, never on the `size` base ──────────────────────
+ * So no button ever carries two competing `px-*` classes for tailwind-merge to resolve, and nothing
+ * depends on variant declaration order: a text button gets its `px-*` from the (size × iconOnly:false)
+ * compound; an icon-only button gets no `px-*` at all (it's square and centered). The `:has()`-scoped
+ * decorator overrides (the `has-...:ps` and `pe` inline-padding utilities) stay on the `size` base —
+ * a different modifier, so they never twMerge against these. `link` is excluded from these compounds: it
+ * owns `px-0.5` in the `variant` map, so a link button matches no padding compound and there is never
+ * a px-vs-px conflict. Every value is a literal (Tailwind's `@source` scan needs literal candidates).
+ */
+const TEXT_PADDING_VARIANTS: Array<Exclude<ButtonVariant, "link">> = [
+  "default",
+  "solid",
+  "inverted",
+  "soft",
+  "outline",
+  "ghost",
+];
+const SIZE_PADDING: Record<ButtonSize, string> = {
+  xs: "px-2",
+  sm: "px-2.5",
+  md: "px-3",
+  lg: "px-3.5",
+  xl: "px-4",
+};
+// The icon-only button's icon lands in the `label` slot (as `children`), which has no
+// `[&_svg]:size-*` otherwise — size it here, per button size. Full literals so they're scannable.
+const ICON_ONLY_LABEL_SVG: Record<ButtonSize, string> = {
+  xs: "[&_svg]:size-4",
+  sm: "[&_svg]:size-4.5",
+  md: "[&_svg]:size-5",
+  lg: "[&_svg]:size-5.5",
+  xl: "[&_svg]:size-6",
+};
+const BUTTON_SIZES: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
+
+const paddingCompoundVariants = [
+  // Text buttons: per-size horizontal padding, for every non-link chrome variant.
+  ...BUTTON_SIZES.map((size) => ({
+    iconOnly: false,
+    variant: TEXT_PADDING_VARIANTS,
+    size,
+    class: { root: SIZE_PADDING[size] },
+  })),
+  // Icon-only buttons: `aspect-square` + the size's fixed `h-*` yields a square (width computes from
+  // height under border-box); no `px-*`, so the icon centers via the root's `justify-center`.
+  ...BUTTON_SIZES.map((size) => ({
+    iconOnly: true,
+    size,
+    class: { root: "aspect-square", label: ICON_ONLY_LABEL_SVG[size] },
+  })),
+];
 
 /**
  * hope's Button slot recipe — used as-is by the component (`recipe(props).root()`), no adapter.
@@ -171,7 +242,7 @@ export const buttonRecipe = tv({
     size: {
       xs: {
         root: [
-          "h-6 gap-1 text-xs px-2 rounded-[min(var(--radius-md),10px)]",
+          "h-6 gap-1 text-xs rounded-[min(var(--radius-md),10px)]",
           "has-data-[slot=button-start-decorator]:ps-1.5 has-data-[slot=button-end-decorator]:pe-1.5",
         ],
         startDecorator: "[&_svg]:size-4",
@@ -180,7 +251,7 @@ export const buttonRecipe = tv({
       },
       sm: {
         root: [
-          "h-7 gap-1 text-[0.8125rem] px-2.5 rounded-[min(var(--radius-md),12px)]",
+          "h-7 gap-1 text-[0.8125rem] rounded-[min(var(--radius-md),12px)]",
           "has-data-[slot=button-start-decorator]:ps-2 has-data-[slot=button-end-decorator]:pe-2",
         ],
         startDecorator: "[&_svg]:size-4.5",
@@ -189,7 +260,7 @@ export const buttonRecipe = tv({
       },
       md: {
         root: [
-          "h-8 gap-1.5 text-sm px-3 rounded-lg",
+          "h-8 gap-1.5 text-sm rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5",
         ],
         startDecorator: "[&_svg]:size-5",
@@ -198,7 +269,7 @@ export const buttonRecipe = tv({
       },
       lg: {
         root: [
-          "h-9 gap-1.5 text-[0.9375rem] px-3.5 rounded-lg",
+          "h-9 gap-1.5 text-[0.9375rem] rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3 has-data-[slot=button-end-decorator]:pe-3",
         ],
         startDecorator: "[&_svg]:size-5.5",
@@ -207,7 +278,7 @@ export const buttonRecipe = tv({
       },
       xl: {
         root: [
-          "h-10 gap-2 text-base px-4 rounded-lg",
+          "h-10 gap-2 text-base rounded-lg",
           "has-data-[slot=button-start-decorator]:ps-3.5 has-data-[slot=button-end-decorator]:pe-3.5",
         ],
         startDecorator: "[&_svg]:size-6",
@@ -219,6 +290,13 @@ export const buttonRecipe = tv({
       true: { root: "w-full" },
       false: { root: "" },
     },
+    // Typed axis with no classes of its own — the square metrics (and the removal of horizontal
+    // padding) live entirely in `paddingCompoundVariants` above, keyed by (size × iconOnly), so
+    // nothing relies on tailwind-merge out-ordering a base `px-*`.
+    iconOnly: {
+      true: {},
+      false: {},
+    },
     variant: {
       // shadcn's outline button: surface fill, subtle gray border, faint shadow — color-independent
       // (ignores `color`); rest → hover → press walk the `surface-raised` elevation ladder. (Slot
@@ -227,6 +305,8 @@ export const buttonRecipe = tv({
         root: "bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed",
       },
       solid: { root: "" },
+      // Color (fill + on-content + wash) lives per-role in `COLOR_CLASSES.inverted`, like `solid`.
+      inverted: { root: "" },
       soft: { root: "" },
       outline: { root: "bg-transparent" },
       ghost: { root: "bg-transparent" },
@@ -260,11 +340,12 @@ export const buttonRecipe = tv({
       end: { loader: "order-last" },
     },
   },
-  compoundVariants: colorCompoundVariants,
+  compoundVariants: [...colorCompoundVariants, ...paddingCompoundVariants],
   defaultVariants: {
     variant: "default",
     colorScheme: "primary",
     size: "md",
     fullWidth: false,
+    iconOnly: false,
   },
 });

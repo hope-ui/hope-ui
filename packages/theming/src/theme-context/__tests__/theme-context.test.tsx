@@ -47,6 +47,7 @@ const fullVariants: CompleteVariantsOf<"button"> = {
   colorScheme: undefined,
   size: undefined,
   fullWidth: undefined,
+  iconOnly: undefined,
   loaderPlacement: undefined,
 };
 

@@ -2,13 +2,21 @@
 import type { Component } from "solid-js";
 import type { TocEntry } from "~/components/TableOfContents";
 
-type DocModule = { default: Component; tableOfContents: TocEntry[]; description?: string };
+type DocModule = {
+  default: Component;
+  tableOfContents: TocEntry[];
+  description?: string;
+  summary?: string;
+};
 
 export type DocMeta = {
   section: string;
   slug: string;
   title: string;
   description?: string;
+  // A short, one-line card blurb (the full `description` stays on the doc page). Falls
+  // back to `description` on the overview card when a page doesn't declare one.
+  summary?: string;
   path: string;
   order: number;
   group?: string;
@@ -103,10 +111,12 @@ for (const [key, mod] of Object.entries(modules)) {
     group,
     groupOrder,
     title: titleOf(mod.tableOfContents ?? [], slug),
-    // Optional one-line summary, authored as `export const description` at the top
-    // of the .mdx (a plain MDX named export — no frontmatter plugin needed). Drives
-    // the overview cards; absent -> card shows the title alone.
+    // Optional descriptions, authored as plain MDX named exports (no frontmatter
+    // plugin needed). `description` is the full blurb the doc page renders; `summary`
+    // is the short one-liner the overview card prefers (falling back to `description`,
+    // then to the title alone).
     description: mod.description,
+    summary: mod.summary,
     path: `/${parsed.section}/${slug}`,
   };
   const list = metaBySection.get(parsed.section) ?? [];

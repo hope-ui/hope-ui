@@ -1,0 +1,125 @@
+import { Button } from "@hope-ui/components/button";
+import { InfoIcon } from "~/components/Icons";
+
+export const summary = "Add hope-ui to your app.";
+
+export const description =
+  "Add hope-ui to a SolidJS app and render your first themeable component in minutes.";
+
+
+# Installation
+
+{description}
+
+## Prerequisites
+
+hope-ui targets **SolidJS 2.0** and **Tailwind CSS v4**. Before you start, you need:
+
+- A SolidJS 2.0 app built with **Vite** and **`vite-plugin-solid`** — a plain Vite + Solid SPA or a
+  TanStack Start app both work. (SolidStart works too, once it moves to Solid 2.0 — see
+  [Framework notes](#framework-notes).)
+- **Tailwind CSS v4** wired into that app.
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    hope-ui is in <strong>early preview</strong> and isn't on npm yet — it publishes as <code>1.0</code>
+    once SolidJS 2.0 stable lands. The commands below describe the intended install for that release.
+  </div>
+</div>
+
+## Install
+
+Add the three packages you consume directly:
+
+```bash
+pnpm add @hope-ui/components @hope-ui/theming @hope-ui/presets
+# or: npm install @hope-ui/components @hope-ui/theming @hope-ui/presets
+# or: yarn add @hope-ui/components @hope-ui/theming @hope-ui/presets
+```
+
+They rely on peers you likely already have in a Solid 2.0 app: `solid-js` and `@solidjs/web` (the
+runtime), and `tailwindcss` `^4`.
+
+## Add the preset styles
+
+In your Tailwind entry CSS, import Tailwind and then the `hope` preset:
+
+```css title="app.css"
+@import "tailwindcss";
+@import "@hope-ui/presets/hope/tailwind.css";
+```
+
+The preset supplies the `--hope-*` design tokens and maps them to clean utilities (`bg-primary`,
+`text-on-primary`, `border-subtle`, …). `hope` is a **zero-DOM preset**: it ships CSS, not markup.
+
+## Wrap your app
+
+Wrap your app once in `ThemeProvider`, passing the preset. Every component reads its recipes from it.
+
+```tsx title="App.tsx"
+import { ThemeProvider } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+import { Button } from "@hope-ui/components/button";
+
+export function App() {
+  return (
+    <ThemeProvider preset={hope}>
+      <Button variant="solid" colorScheme="primary">Save</Button>
+    </ThemeProvider>
+  );
+}
+```
+
+Solid context follows the owner graph, so `ThemeProvider` must sit **above** the components that use
+it in the same tree — for a router, wrap the `Outlet` directly. A component rendered outside any
+`ThemeProvider` throws a clear error.
+
+## Render your first component
+
+With the provider in place, drop in a component:
+
+<Preview>
+  <Button variant="solid" colorScheme="primary">Save</Button>
+</Preview>
+
+```tsx
+<Button variant="solid" colorScheme="primary">Save</Button>
+```
+
+From here, restyle everything through [Theming](/get-started/theming), or render components as other
+elements with [Polymorphism](/get-started/polymorphism).
+
+## Framework notes
+
+hope-ui ships **JSX-preserved source** under the `"solid"` export condition — your app's
+`vite-plugin-solid` compiles it per environment (client and server). Every SolidJS app already has
+that plugin, so the condition resolves automatically; an app without it gets no match and fails
+loudly, by design.
+
+For a server-rendered setup, tell Vite to run hope-ui's source through the Solid compiler instead of
+importing the raw `.jsx` in Node:
+
+```ts title="vite.config.ts"
+export default defineConfig({
+  // Compile hope-ui's JSX source in SSR instead of importing it as-is in Node.
+  ssr: { noExternal: [/^@hope-ui\//] },
+  // Keep esbuild from pre-bundling the JSX as if it were React.
+  optimizeDeps: {
+    exclude: ["@hope-ui/components", "@hope-ui/theming", "@hope-ui/presets"],
+  },
+});
+```
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <InfoIcon class="size-5" />
+  </span>
+  <div>
+    SolidStart hasn't migrated to SolidJS 2.0 yet, so a full SolidStart app is blocked on that
+    upstream work — not on hope-ui. Until it lands, a plain <strong>Vite + Solid 2.0 SPA</strong> (or
+    TanStack Start, which this documentation site itself is built on) is the supported path.
+  </div>
+</div>

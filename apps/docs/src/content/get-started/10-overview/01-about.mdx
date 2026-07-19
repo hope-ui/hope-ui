@@ -1,0 +1,85 @@
+import { Button } from "@hope-ui/components/button";
+import { Badge } from "@hope-ui/components/badge";
+import { PropsTable } from "~/components/PropsTable";
+
+export const summary = "What hope-ui is, and the ideas behind it.";
+
+export const description =
+  "An elegant, themeable, accessible component library for SolidJS 2.0 — the all-in-one option, styled out of the box.";
+
+
+# About Hope UI
+
+{description}
+
+## What is hope-ui
+
+hope-ui is a component library for **SolidJS 2.0**. Import a component and it works — accessible,
+keyboard-friendly, and styled out of the box under the default `hope` preset. It's the all-in-one
+option (in the spirit of MUI or Mantine) that the Solid ecosystem has been missing — **not** a
+headless or copy-paste kit.
+
+Components are styled with **Tailwind v4** and a `tailwind-variants` recipe system, and themed
+through a fixed vocabulary of **semantic tokens** — so you can restyle an entire app by swapping a
+single preset.
+
+<Preview>
+  <Button variant="solid" colorScheme="primary">Get started</Button>
+  <Button variant="soft" colorScheme="neutral">Read the docs</Button>
+  <Button variant="outline">Outline</Button>
+  <Badge variant="soft" colorScheme="success">Accessible</Badge>
+  <Badge variant="dot" colorScheme="primary">SolidJS 2.0</Badge>
+</Preview>
+
+## What's in the box
+
+hope-ui ships as a few focused packages — install these three and you're set.
+
+<PropsTable
+  columns={[
+    { key: "pkg", label: "Package", code: true },
+    { key: "role", label: "What it's for" },
+  ]}
+  rows={[
+    { pkg: "@hope-ui/components", role: "The components themselves — one import per component (e.g. @hope-ui/components/button)." },
+    { pkg: "@hope-ui/theming", role: "The theming contract: ThemeProvider, definePreset, and the semantic-token vocabulary components read from." },
+    { pkg: "@hope-ui/presets", role: "Ready-made visual identities. @hope-ui/presets/hope is the default look." },
+  ]}
+/>
+
+See [Installation](/get-started/installation) to wire these into an app.
+
+## Principles
+
+- **Accessible by default.** Every component ships with the right roles, keyboard behavior, and
+  focus management — and each is checked against axe-core in CI, so accessibility is a build gate,
+  not an afterthought.
+- **Themeable, not hard-coded.** Components paint from a fixed set of semantic tokens
+  (`bg-primary`, `text-on-primary`, `border-subtle`, `ring-focus`, …). Repoint the tokens or swap
+  the preset and the whole app follows. See [Theming](/get-started/theming).
+- **SSR-safe.** Components render on the server and hydrate on the client without mismatch.
+- **One way to be polymorphic.** Render any component as a different element or component with the
+  `render` prop. There is no `as` prop. See [Polymorphism](/get-started/polymorphism).
+
+## Status
+
+hope-ui is in **early preview**, built on the SolidJS 2.0 **beta**. It isn't on npm yet — it
+publishes as `1.0` once SolidJS 2.0 stable lands. For now, these docs are the preview: browse the
+components and guides to see how hope-ui works, what the API looks like, and where it's headed. The
+install steps describe how it will work when `1.0` ships.
+
+## Credits
+
+hope-ui stands on a lot of prior art. It borrows the parts each of these got right and adapts them
+for SolidJS 2.0.
+
+**Component API design & patterns.** The public component surface — prop names, variant vocabulary,
+decorator slots — is aggregated from the libraries that already solved this well: **Chakra UI**,
+**Mantine**, **Nuxt UI**, **Ant Design**, and **MUI Joy**. The `colorScheme` role prop echoes
+Chakra; the `startDecorator` / `endDecorator` slots and the `variant` scale echo Joy UI.
+
+**Accessibility patterns.** The keyboard interaction and ARIA behavior underneath the components
+follow the patterns established by **Base UI**, **React Aria**, and **Angular Aria**.
+
+**Design tokens.** The semantic-token naming — roles, states, and modifiers as a flat, Tailwind-first
+vocabulary — takes its lead from the **Atlassian Design System**.

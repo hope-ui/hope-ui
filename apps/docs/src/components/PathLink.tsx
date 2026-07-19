@@ -12,5 +12,6 @@ export const PathLink = Link as unknown as Component<{
   class?: string;
   activeProps?: { class?: string };
   activeOptions?: { exact?: boolean };
+  onClick?: (event: MouseEvent) => void;
   children: JSX.Element;
 }>;

@@ -30,9 +30,18 @@ const PlusIcon = () => strokeIcon("M12 5v14M5 12h14");
 const ArrowRightIcon = () => strokeIcon("M5 12h14M13 6l6 6-6 6");
 const CheckIcon = () => strokeIcon("M20 6 9 17l-5-5");
 
-const VARIANTS: ButtonVariant[] = ["default", "solid", "soft", "outline", "ghost", "link"];
+const VARIANTS: ButtonVariant[] = [
+  "default",
+  "solid",
+  "inverted",
+  "soft",
+  "outline",
+  "ghost",
+  "link",
+];
 const COLORED_VARIANTS: Exclude<ButtonVariant, "default">[] = [
   "solid",
+  "inverted",
   "soft",
   "outline",
   "ghost",
@@ -44,7 +53,10 @@ export const Default: Story = {
   render: () => <Button>Button</Button>,
 };
 
-/** The six variants at their default `primary` color (`default` is color-independent chrome). */
+/**
+ * The variants at their default `primary` color (`default` is color-independent chrome). `inverted`
+ * gets its own solid-surface story — on the light page background its light fill is near-invisible.
+ */
 export const Variants: Story = {
   render: () => (
     <div class="flex flex-wrap items-center gap-3">
@@ -55,12 +67,33 @@ export const Variants: Story = {
   ),
 };
 
+/**
+ * `inverted` is the swap of `solid` (a light fill with role-colored text), on its own dedicated
+ * `{role}-inverted` tokens. It is designed to sit on a **solid, colored surface**, so it is shown here
+ * on a dark panel. `warning` defaults to a dark chip — the honest, symmetric swap, not a special case.
+ */
+export const Inverted: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">
+      <For each={COLORS}>
+        {(color) => (
+          <Button variant="inverted" colorScheme={color}>
+            Button
+          </Button>
+        )}
+      </For>
+    </div>
+  ),
+};
+
 /** variant × color — the validated matrix (mirrors the look-&-feel mockup). */
 export const VariantColorMatrix: Story = {
   parameters: { layout: "padded" },
   // Each `<For>` callback returns a single element (a flex row, or one cell) — never a fragment
   // wrapping another `<For>`, which produces a variable node count per row and breaks Solid's
-  // `<For>` DOM tracking (`nextSibling` of null). Flex rows keep the columns aligned.
+  // `<For>` DOM tracking (`nextSibling` of null). Flex rows keep the columns aligned. The `inverted`
+  // row sits on a dark strip so its light fills stay visible.
   render: () => (
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-3">
@@ -73,7 +106,9 @@ export const VariantColorMatrix: Story = {
       </div>
       <For each={COLORED_VARIANTS}>
         {(variant) => (
-          <div class="flex items-center gap-3">
+          <div
+            class={`flex items-center gap-3 rounded-md ${variant === "inverted" ? "bg-surface-inverse py-2" : ""}`}
+          >
             <span class="w-16 text-right font-mono text-xs text-foreground-muted">{variant}</span>
             <For each={COLORS}>
               {(color) => (
@@ -127,6 +162,51 @@ export const Decorators: Story = {
       <Button variant="soft" colorScheme="success" startDecorator={<CheckIcon />}>
         Saved
       </Button>
+    </div>
+  ),
+};
+
+/**
+ * `iconOnly` renders a square button (sized to its height per `size`) with the icon — passed as
+ * `children` — centered and sized automatically. There is no visible text, so always pass an
+ * `aria-label`; in dev, an icon-only button with no accessible name logs a warning.
+ */
+export const IconOnly: Story = {
+  render: () => (
+    <div class="flex flex-col gap-4">
+      {/* Every size is a genuine square. */}
+      <div class="flex flex-wrap items-center gap-3">
+        <Button iconOnly size="xs" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="sm" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="md" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="lg" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly size="xl" aria-label="Add">
+          <PlusIcon />
+        </Button>
+      </div>
+      {/* Works across the chrome variants. */}
+      <div class="flex flex-wrap items-center gap-3">
+        <Button iconOnly variant="solid" aria-label="Add">
+          <PlusIcon />
+        </Button>
+        <Button iconOnly variant="soft" colorScheme="success" aria-label="Confirm">
+          <CheckIcon />
+        </Button>
+        <Button iconOnly variant="outline" aria-label="Next">
+          <ArrowRightIcon />
+        </Button>
+        <Button iconOnly variant="ghost" aria-label="Add">
+          <PlusIcon />
+        </Button>
+      </div>
     </div>
   ),
 };

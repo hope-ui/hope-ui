@@ -58,6 +58,25 @@ export function BrandLogoIcon(props: IconProps) {
   );
 }
 
+export function MenuIcon(props: IconProps) {
+  return (
+    <svg {...base} aria-hidden="true" class={props.class}>
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+    </svg>
+  );
+}
+
+export function CloseIcon(props: IconProps) {
+  return (
+    <svg {...base} aria-hidden="true" class={props.class}>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
+
 export function SearchIcon(props: IconProps) {
   return (
     <svg {...base} aria-hidden="true" class={props.class}>

@@ -16,7 +16,7 @@ stays a flat list of named recipe types and this file owns the Button shape. It 
 
 | Type | Members | Notes |
 | --- | --- | --- |
-| `ButtonVariant` | `default` · `solid` · `soft` · `outline` · `ghost` · `link` | `default` is neutral chrome and ignores `colorScheme`. |
+| `ButtonVariant` | `default` · `solid` · `inverted` · `soft` · `outline` · `ghost` · `link` | `default` is neutral chrome and ignores `colorScheme`. `inverted` is the swap of `solid` (fill `{role}-inverted`, content `on-{role}-inverted`) on its own dedicated tokens, for solid/colored surfaces. |
 | `ButtonColorScheme` | `primary` · `neutral` · `success` · `warning` · `danger` · `info` | Semantic role color scheme. |
 | `ButtonSize` | `xs` · `sm` · `md` · `lg` · `xl` | Heights 28 / 32 / 36 / 40 / 44px. |
 | `ButtonLoaderPlacement` | `start` · `center` · `end` | **Layout only.** Where the loader sits while loading (`center` overlays it and hides the label; `start`/`end` set loader order). Mounting/unmounting the loader slot is the component's job (`<Show when={isLoading()}>`), so there is no `hidden`/`none` member. Shared by this recipe variant and the component's public `loaderPlacement` prop. |

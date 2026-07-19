@@ -46,6 +46,20 @@ export default defineConfig(({ command }) => ({
     noExternal: [/^@hope-ui\//],
   },
   optimizeDeps: {
+    // Vite 8's rolldown dependency SCANNER runs with JSX disabled, so it throws
+    // `Unexpected JSX expression` the moment it walks into any first-party .tsx/.mdx
+    // source (e.g. component-visuals/index.tsx). At startup Vite catches this and just
+    // skips pre-bundling, but the automatic re-discovery that fires whenever an edit
+    // introduces a new import re-runs that same scan mid-session — and *that* takes the
+    // dev server down (the symptom: "dev crashes after every change; a rebuild/restart
+    // fixes it"). This app is SSR/SSG-first and runs fine with pre-bundling skipped, so
+    // turn discovery OFF: no scan, no crash. This matches the behaviour we already had
+    // (the failed scan skipped pre-bundling and the app ran fine) — it just removes the
+    // crash. Deps are served lazily; if dev ever feels slow, list plain-JS deps here in
+    // an `include: [...]` (never our JSX-source @hope-ui/* packages).
+    noDiscovery: true,
+    // @hope-ui/* ships JSX-preserved SOURCE (compiled by vite-plugin-solid), so it must
+    // never be pre-bundled as if it were plain JS.
     exclude: ["@hope-ui/components", "@hope-ui/theming", "@hope-ui/presets", "@hope-ui/primitives"],
   },
   resolve: {

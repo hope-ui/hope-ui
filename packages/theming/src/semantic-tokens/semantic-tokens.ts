@@ -22,6 +22,9 @@
  *   `text-primary-emphasis`, and its interactive link ladder `text-{role}-link-hovered/-pressed`.
  * - **On-color text** that must stay readable on a colored solid fill, the inverse surface, or a
  *   collection state uses the `on-*` prefix → `text-on-primary`, `text-on-inverse`, `text-on-selected`.
+ *   `on-{role}-inverted` is the content color for the `inverted` variant's own solid fill
+ *   (`{role}-inverted`) — a real fill context, unlike the removed `on-{role}-soft` (soft renders no
+ *   solid fill), which is why this `on-*` name is justified where that one wasn't.
  *
  * Icons fold into these same text tokens (currentColor) — there is no separate `icon` family.
  *
@@ -55,8 +58,11 @@ export const SEMANTIC_COLOR_TOKENS = [
   "on-selected",
 
   // ── primary — full rest/hovered/pressed ladder per variant. `{role}` is both the solid fill and
-  // the full-strength role border; `-line` is the outline-variant border; `-emphasis` is the role's
-  // content color; `-link-*` is the link text ladder (rest = `-emphasis`); `on-{role}` sits on the fill.
+  // the full-strength role border; the role border is two-tier — `-line` (strong) and `-subtle-line`
+  // (soft) — both complete across all 6 roles; `-emphasis` is the role's content color; `-link-*` is
+  // the link text ladder (rest = `-emphasis`); `on-{role}` sits on the fill. `{role}-inverted*` is the
+  // `inverted` variant's own fill ladder (its rest/hovered/pressed), paired with `on-{role}-inverted`
+  // for the content that sits on it — the swap of `solid`, but on dedicated tokens (no borrowing).
   "primary",
   "primary-hovered",
   "primary-pressed",
@@ -67,13 +73,19 @@ export const SEMANTIC_COLOR_TOKENS = [
   "primary-outline-pressed",
   "primary-ghost-hovered",
   "primary-ghost-pressed",
+  "primary-inverted",
+  "primary-inverted-hovered",
+  "primary-inverted-pressed",
   "primary-line",
+  "primary-subtle-line",
   "primary-emphasis",
   "primary-link-hovered",
   "primary-link-pressed",
   "on-primary",
+  "on-primary-inverted",
 
-  // ── neutral — no `-line` (the outline variant uses `border-strong`); otherwise identical in shape.
+  // ── neutral — now carries the two-tier role border like the chromatic roles: `-line` (strong) is
+  // backfilled here and `-subtle-line` (soft) is new; otherwise identical in shape.
   "neutral",
   "neutral-hovered",
   "neutral-pressed",
@@ -84,10 +96,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "neutral-outline-pressed",
   "neutral-ghost-hovered",
   "neutral-ghost-pressed",
+  "neutral-inverted",
+  "neutral-inverted-hovered",
+  "neutral-inverted-pressed",
+  "neutral-line",
+  "neutral-subtle-line",
   "neutral-emphasis",
   "neutral-link-hovered",
   "neutral-link-pressed",
   "on-neutral",
+  "on-neutral-inverted",
 
   // ── success
   "success",
@@ -100,11 +118,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "success-outline-pressed",
   "success-ghost-hovered",
   "success-ghost-pressed",
+  "success-inverted",
+  "success-inverted-hovered",
+  "success-inverted-pressed",
   "success-line",
+  "success-subtle-line",
   "success-emphasis",
   "success-link-hovered",
   "success-link-pressed",
   "on-success",
+  "on-success-inverted",
 
   // ── info
   "info",
@@ -117,11 +140,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "info-outline-pressed",
   "info-ghost-hovered",
   "info-ghost-pressed",
+  "info-inverted",
+  "info-inverted-hovered",
+  "info-inverted-pressed",
   "info-line",
+  "info-subtle-line",
   "info-emphasis",
   "info-link-hovered",
   "info-link-pressed",
   "on-info",
+  "on-info-inverted",
 
   // ── warning
   "warning",
@@ -134,11 +162,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "warning-outline-pressed",
   "warning-ghost-hovered",
   "warning-ghost-pressed",
+  "warning-inverted",
+  "warning-inverted-hovered",
+  "warning-inverted-pressed",
   "warning-line",
+  "warning-subtle-line",
   "warning-emphasis",
   "warning-link-hovered",
   "warning-link-pressed",
   "on-warning",
+  "on-warning-inverted",
 
   // ── danger
   "danger",
@@ -151,11 +184,16 @@ export const SEMANTIC_COLOR_TOKENS = [
   "danger-outline-pressed",
   "danger-ghost-hovered",
   "danger-ghost-pressed",
+  "danger-inverted",
+  "danger-inverted-hovered",
+  "danger-inverted-pressed",
   "danger-line",
+  "danger-subtle-line",
   "danger-emphasis",
   "danger-link-hovered",
   "danger-link-pressed",
   "on-danger",
+  "on-danger-inverted",
 
   // ── Neutral borders, used as `border-*`. Emphasis levels only; no bare `border` token.
   "subtle",
