@@ -58,7 +58,7 @@ describe("Alert SSR", () => {
     expect(html).toContain("<svg");
   });
 
-  it("wires the live-region role and the aria label/description links in the server HTML", async () => {
+  it("wires the live-region role in server HTML but defers the aria links to the client", async () => {
     const html = await renderToStringAsync(() => (
       <ThemeProvider preset={hope}>
         <Alert.Root colorScheme="info" title="Note" description="Read this." />
@@ -66,9 +66,11 @@ describe("Alert SSR", () => {
     ));
     expect(html).toContain('role="alert"');
     expect(html).toContain('data-state="entered"');
-    // The auto-composed title/description ids are linked directly in the server markup.
-    expect(html).toContain("aria-labelledby");
-    expect(html).toContain("aria-describedby");
+    // The title/description parts self-register their ids via `createRegisteredId` (`onSettled`), which
+    // never runs during SSR — so `aria-labelledby`/`aria-describedby` are absent from the server markup
+    // and land only after hydration. Both the auto-compose and compound paths behave this way.
+    expect(html).not.toContain("aria-labelledby");
+    expect(html).not.toContain("aria-describedby");
   });
 
   it("matches its server output byte for byte", async () => {
@@ -79,7 +81,7 @@ describe("Alert SSR", () => {
     // `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<div _hk=0040290 class="relative flex w-full items-start rounded-xl border bg-clip-padding transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none data-[state=exiting]:opacity-0 data-[state=exiting]:-translate-y-1 gap-3 p-4 text-sm bg-surface-raised text-foreground border-subtle" data-slot="alert" data-state="entered" role="alert" aria-labelledby="002" aria-describedby="003" ><span _hk=00402930 data-slot="alert-icon" class="inline-flex shrink-0 items-center justify-center [&amp;_svg]:size-5 text-info-emphasis" aria-hidden="true"><svg _hk=0040223 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle _hk=0040220 cx="12" cy="12" r="10"></circle><path _hk=0040221 d="M12 16v-4"></path><path _hk=0040222 d="M12 8h.01"></path></svg></span><div _hk=00402960 data-slot="alert-content" class="flex min-w-0 flex-1 flex-col gap-1"><!--$--><div _hk=004029630 data-slot="alert-title" id="002" class="font-medium text-info-emphasis">Update available</div><!--/--><!--$--><div _hk=004029660 data-slot="alert-description" id="003" class="">A new version is ready to install.</div><!--/--></div><button _hk=004029940 type="button" class="relative inline-flex items-center justify-center select-none outline-none transition-[background-color,box-shadow] duration-150 ease-out hover:not-data-pressed:bg-close-overlay-hovered data-pressed:bg-close-overlay-pressed focus-visible:ring-3 focus-visible:ring-close-focus data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:opacity-disabled size-6 rounded-md -me-1 -mt-1 ms-auto shrink-0" aria-label="Close" data-slot="close-button" ><span _hk=00402991 data-slot="close-button-icon" class="pointer-events-none inline-flex items-center justify-center [&amp;_svg]:size-4"><svg _hk=004029920 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span></button></div>"`,
+      `"<div _hk=0020290 class="relative flex w-full items-start rounded-xl border bg-clip-padding transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none data-[state=exiting]:opacity-0 data-[state=exiting]:-translate-y-1 gap-3 p-4 text-sm bg-surface-raised text-foreground border-subtle" data-slot="alert" data-state="entered" role="alert" ><span _hk=002029310 class="inline-flex shrink-0 items-center justify-center [&amp;_svg]:size-5 text-info-emphasis" data-slot="alert-icon" aria-hidden="true"><svg _hk=0020223 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle _hk=0020220 cx="12" cy="12" r="10"></circle><path _hk=0020221 d="M12 16v-4"></path><path _hk=0020222 d="M12 8h.01"></path></svg></span><div _hk=002029610 class="flex min-w-0 flex-1 flex-col gap-1" data-slot="alert-content"><div _hk=00202961330 id="0020296130" class="font-medium text-info-emphasis" data-slot="alert-title">Update available</div><p _hk=00202961630 id="0020296160" class="" data-slot="alert-description">A new version is ready to install.</p></div><button _hk=002029940 type="button" class="relative inline-flex items-center justify-center select-none outline-none transition-[background-color,box-shadow] duration-150 ease-out hover:not-data-pressed:bg-close-overlay-hovered data-pressed:bg-close-overlay-pressed focus-visible:ring-3 focus-visible:ring-close-focus data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:opacity-disabled size-6 rounded-md -me-1 -mt-1 ms-auto shrink-0" aria-label="Close" data-slot="close-button" ><span _hk=00202991 data-slot="close-button-icon" class="pointer-events-none inline-flex items-center justify-center [&amp;_svg]:size-4"><svg _hk=002029920 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span></button></div>"`,
     );
   });
 });

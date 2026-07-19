@@ -78,9 +78,14 @@ describe("Alert", () => {
     const alert = container.querySelector('[data-slot="alert"]');
     const title = alert?.querySelector('[data-slot="alert-title"]');
     const description = alert?.querySelector('[data-slot="alert-description"]');
-    expect(alert?.getAttribute("aria-labelledby")).toBe(title?.id);
-    expect(alert?.getAttribute("aria-describedby")).toBe(description?.id);
-    expect(title?.id).toBeTruthy();
+    // The auto path reuses `Alert.Title`/`Alert.Description`, which register their ids via
+    // `createRegisteredId` (onSettled), so the link appears just after mount — the same deferral as the
+    // compound path below; wait for the reactive attributes to catch up.
+    await vi.waitFor(() => {
+      expect(alert?.getAttribute("aria-labelledby")).toBe(title?.id);
+      expect(alert?.getAttribute("aria-describedby")).toBe(description?.id);
+      expect(title?.id).toBeTruthy();
+    });
     dispose();
   });
 

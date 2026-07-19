@@ -14,15 +14,18 @@ import {
   children,
   createEffect,
   createSignal,
-  createUniqueId,
   merge,
   omit,
   Show,
   untrack,
 } from "solid-js";
 import { Close } from "./alert-close";
+import { Content } from "./alert-content";
 import { AlertContext, type AlertContextValue } from "./alert-context";
+import { Description } from "./alert-description";
+import { Icon } from "./alert-icon";
 import { BUILTIN_STATUS_ICONS, STATUS_ICON_KEYS } from "./alert-icons";
+import { Title } from "./alert-title";
 
 type AlertElementProps = JSX.HTMLAttributes<HTMLDivElement>;
 
@@ -81,6 +84,39 @@ export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, A
   children?: JSX.Element;
 }
 
+/** `merged` after `useDefaults` — the five defaulted keys are now guaranteed present. */
+type MergedAlertProps = AlertProps &
+  Required<Pick<AlertProps, "variant" | "colorScheme" | "size" | "role" | "closable">>;
+
+/**
+ * instance `icon` ?? preset `{role}Icon` factory ?? built-in status glyph. `false` hides it. Pure and
+ * module-scope: the caller wraps it in `children(() => resolveStatusIcon(merged))`, which memoizes the
+ * *result*.
+ */
+function resolveStatusIcon(merged: MergedAlertProps): JSX.Element | null {
+  // Read the instance `icon` **exactly once**. It is a component-valued prop, so each read of the raw
+  // getter re-runs `createComponent` (the `children()` multi-read hazard) — the caller's
+  // `children(() => resolveStatusIcon(...))` memoizes the *result*, not this internal read. Binding it
+  // to a local is the single-read fix the codified rule calls for ("a slot read exactly once needs
+  // nothing"); a consumer `icon={<MyIcon/>}` is then built once, not three times.
+  const instanceIcon = merged.icon;
+  if (instanceIcon === false) {
+    return null;
+  }
+  if (instanceIcon != null) {
+    return instanceIcon;
+  }
+  const factoryKey = STATUS_ICON_KEYS[merged.colorScheme];
+  if (factoryKey) {
+    const factory = merged[factoryKey] as (() => JSX.Element) | undefined;
+    if (factory != null) {
+      return runIfFunction(factory) ?? null;
+    }
+  }
+  const builtin = BUILTIN_STATUS_ICONS[merged.colorScheme];
+  return builtin ? builtin() : null;
+}
+
 export const Root: Component<AlertProps> = (props) => {
   // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
   // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
@@ -110,9 +146,9 @@ export const Root: Component<AlertProps> = (props) => {
   // Controlled/uncontrolled open state → presence-driven mount. `defaultOpen` defaults to `true`, so a
   // plain `<Alert>` renders. `setOpen` is what `Alert.Close` calls; `onOpenChange` fires either way.
   const [open, setOpen] = createControllableState({
-    value: () => props.open,
-    defaultValue: () => props.defaultOpen ?? true,
-    onChange: (value) => props.onOpenChange?.(value),
+    value: () => merged.open,
+    defaultValue: () => merged.defaultOpen ?? true,
+    onChange: (value) => merged.onOpenChange?.(value),
   });
 
   // A signal-backed root ref feeds both `renderElement`'s ref merge and `createPresence` (which reads
@@ -140,38 +176,9 @@ export const Root: Component<AlertProps> = (props) => {
     },
   );
 
-  /** instance `icon` ?? preset `{role}Icon` factory ?? built-in status glyph. `false` hides it. */
-  function resolveIcon(): JSX.Element | null {
-    // Read the instance `icon` **exactly once**. It is a component-valued prop, so each read of the
-    // raw getter re-runs `createComponent` (the `children()` multi-read hazard) — the outer
-    // `children(() => resolveIcon())` memoizes the *result*, not these internal reads. Binding it to a
-    // local is the single-read fix the codified rule calls for ("a slot read exactly once needs
-    // nothing"); a consumer `icon={<MyIcon/>}` is then built once, not three times.
-    const instanceIcon = merged.icon;
-    if (instanceIcon === false) {
-      return null;
-    }
-    if (instanceIcon != null) {
-      return instanceIcon;
-    }
-    const factoryKey = STATUS_ICON_KEYS[merged.colorScheme];
-    if (factoryKey) {
-      const factory = merged[factoryKey] as (() => JSX.Element) | undefined;
-      if (factory != null) {
-        return runIfFunction(factory) ?? null;
-      }
-    }
-    const builtin = BUILTIN_STATUS_ICONS[merged.colorScheme];
-    return builtin ? builtin() : null;
-  }
-
-  // Auto-compose ids: generated here (SSR-stable via `createUniqueId`) and written directly onto both
-  // the title/description hosts and the root's `aria-*` — so the link is present in the server HTML
-  // (unlike the compound path's `createRegisteredId`, which is client-only after `onSettled`).
-  const autoTitleId = createUniqueId();
-  const autoDescriptionId = createUniqueId();
-
-  // The compound parts publish their ids here; Root reads them for `aria-*` in the compound path.
+  // The compound parts publish their ids here; `AlertBody` reads them back for `aria-*`. Registered
+  // client-side via `createRegisteredId` (`onSettled`), so the links land after hydration for every
+  // Alert — the auto-compose path reuses the same parts, so it registers the same way.
   const [registeredTitleId, setRegisteredTitleId] = createSignal<string | undefined>(undefined);
   const [registeredDescriptionId, setRegisteredDescriptionId] = createSignal<string | undefined>(
     undefined,
@@ -210,68 +217,54 @@ export const Root: Component<AlertProps> = (props) => {
     "aria-describedby",
   );
 
-  // The alert surface, rendered as a child of the context provider (below). *This* is where the
-  // consumer's compound parts are created, so their `useAlertContext()` resolves: `children(() =>
-  // merged.children)` computes eagerly on creation, so it has to run in the provider's owner — never in
-  // Root's own (context-less) body. Splitting it into its own component is what places that owner.
-  const AlertSurface: Component = () => {
+  // The rendered alert surface. A real component (not a `<Show>` render-callback), so its body runs
+  // once, untracked — no `untrack`/`_present` hack. Declared inside `Root` so it closes over the
+  // locals above (nothing is threaded through props), and rendered under `<Show>` under
+  // `<AlertContext>` so `children(() => merged.children)` resolves in an owner UNDER the provider —
+  // the consumer's compound parts see `useAlertContext()`.
+  function AlertBody(): JSX.Element {
     // Compound (consumer `children`) vs auto-compose (convenience props): resolved once via
-    // `children()`, so `composed()` (used for aria linking) re-reads the memo without re-creating the
-    // parts, and the body reads that same resolved node.
+    // `children()`, so the body reads that resolved node without re-creating the parts.
     const resolvedChildren = children(() => merged.children);
-    const composed = (): boolean => resolvedChildren() != null;
 
     // Each convenience slot is read in a `<Show>` `when` gate AND its body below (a multi-read), so the
-    // raw prop is resolved once with `children()` — which also fixes the `when`-gate hydration hazard
-    // (a raw `when={x != null}` builds and discards a component whose `_hk` the client and server place
+    // raw prop is resolved once with `children()` — which also fixes the `when`-gate hydration hazard (a
+    // raw `when={x != null}` builds and discards a component whose `_hk` the client and server place
     // differently). See CLAUDE.md / docs/solid-2.0-notes.md ("children() decision procedure").
-    const icon = children(() => resolveIcon());
+    const icon = children(() => resolveStatusIcon(merged));
     const title = children(() => merged.title);
     const description = children(() => merged.description);
 
+    // One aria path for both compound and auto: the parts (`Alert.Title`/`Alert.Description`, reused by
+    // `autoBody`) self-register their ids via `createRegisteredId` (`onSettled`, client-only), and a
+    // consumer override always wins. The links land after hydration — never in the server HTML.
     const labelledBy = (): string | undefined => {
-      const consumer = props["aria-labelledby"];
-      if (typeof consumer === "string") {
-        return consumer;
-      }
-      return composed() ? registeredTitleId() : title() != null ? autoTitleId : undefined;
+      const consumer = merged["aria-labelledby"];
+      return typeof consumer === "string" ? consumer : registeredTitleId();
     };
     const describedBy = (): string | undefined => {
-      const consumer = props["aria-describedby"];
-      if (typeof consumer === "string") {
-        return consumer;
-      }
-      return composed()
-        ? registeredDescriptionId()
-        : description() != null
-          ? autoDescriptionId
-          : undefined;
+      const consumer = merged["aria-describedby"];
+      return typeof consumer === "string" ? consumer : registeredDescriptionId();
     };
 
-    // The auto-composed body — literal host-element wrappers, mirroring Badge: the keyed root's first
-    // DOM child is always a host node (a `<span>`/`<div>`), never a bare component, and the glyph (a
-    // component) sits INSIDE the host `alert-icon` span (the `solid2-first-child-component-hydration`
-    // hazard). Built lazily (only when `children` is absent), so a compound Alert pays for none of it.
+    // The auto-composed body, built from the real `Alert.*` parts — so the `data-slot` + slot-class
+    // wiring (and the parts' id self-registration) lives in one place instead of being duplicated here.
+    // No `id=` is passed; the parts generate and register their own. Built lazily (only when `children`
+    // is absent), so a compound Alert pays for none of it.
     const autoBody = (): JSX.Element => (
       <>
         <Show when={icon() != null}>
-          <span data-slot="alert-icon" class={slots.icon()} aria-hidden="true">
-            {icon()}
-          </span>
+          <Icon>{icon()}</Icon>
         </Show>
         <Show when={title() != null || description() != null}>
-          <div data-slot="alert-content" class={slots.content()}>
+          <Content>
             <Show when={title() != null}>
-              <div data-slot="alert-title" id={autoTitleId} class={slots.title()}>
-                {title()}
-              </div>
+              <Title>{title()}</Title>
             </Show>
             <Show when={description() != null}>
-              <div data-slot="alert-description" id={autoDescriptionId} class={slots.description()}>
-                {description()}
-              </div>
+              <Description>{description()}</Description>
             </Show>
-          </div>
+          </Content>
         </Show>
         <Show when={merged.closable}>
           <Close />
@@ -307,12 +300,12 @@ export const Root: Component<AlertProps> = (props) => {
       props: elementProps as unknown as AlertElementProps,
       ref: setRootEl,
     });
-  };
+  }
 
   return (
     <AlertContext value={context}>
       <Show when={presence.mounted()}>
-        <AlertSurface />
+        <AlertBody />
       </Show>
     </AlertContext>
   );
