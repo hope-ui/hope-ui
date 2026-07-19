@@ -134,7 +134,10 @@ export const alertRecipe = tv({
     icon: "inline-flex shrink-0 items-center justify-center",
     content: "flex min-w-0 flex-1 flex-col",
     title: "font-medium",
-    description: "",
+    // The body prose. A comfortable line height for multi-line text — deliberately **color-neutral**
+    // (no `text-*`) so it inherits the root's content color: `text-foreground` in `default`, and the
+    // role/on-color the colored variants set on the root (`text-success-emphasis`, `text-on-success`, …).
+    description: "leading-relaxed",
     actions: "flex flex-wrap items-center",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
