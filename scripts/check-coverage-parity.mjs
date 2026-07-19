@@ -1,19 +1,24 @@
 #!/usr/bin/env node
-// Fails CI if a `primitives/` or `components/` source file under packages/*/src is missing a
-// matching test file (in a `__tests__/` subfolder beside it) and/or a matching per-file usage
-// doc (under `docs/usage/<pkg>/<relative-src-path>/<name>.md`; see REQUIRES_TEST_AND_DOC). This
-// is what prevents test/doc coverage from drifting as the number of components grows.
+// Fails CI if the Definition of Done is missing coverage. Enforcement differs by package:
+//
+//   • `primitives` / `theming` — PER SOURCE FILE: each source file needs a matching test (in a
+//     `__tests__/` subfolder beside it) and a matching usage doc (under
+//     `docs/usage/<pkg>/<relative-src-path>/<name>.md`). See the `else` branch below.
+//
+//   • `components` — PER COMPONENT FOLDER (see PER_FOLDER_DOD): a leaf `src/<name>/` folder is one
+//     component, even when its compound parts (Alert, Dialog, …) are split across many files. The
+//     folder collectively needs a test, a `.md` usage doc (any `.md` under
+//     `docs/usage/components/<name>/`), a colocated Storybook `*.stories.tsx`, a `*.ssr.test.tsx`
+//     that really calls `renderToStringAsync()`, and a `*.browser.test.tsx` that really calls
+//     `hydrate()` (the two halves of the SSR round-trip). Requiring the whole set per part file
+//     would only manufacture boilerplate, so it is not required.
+//
+// Any browser test that calls `mount()` must also call `expectNoA11yViolations()` (all packages).
 //
 // It ALSO fails if any leaf source folder still has flat sprawl — a `*.test.*`, a `.md`, or a
 // `__fixtures__/` sitting beside the implementation instead of tucked into `__tests__/` (tests /
 // fixtures) or moved to `docs/usage/` (docs). See NO_FLAT_SPRAWL below and CLAUDE.md
 // "Leaf source folders stay flat-free".
-//
-// Every @hope-ui/components source file additionally needs a Storybook story, a
-// `Foo.ssr.test.tsx` that really calls `renderToStringAsync()`, and a
-// `Foo.browser.test.tsx` that really calls `hydrate()` — the two halves of the SSR round-trip
-// the Definition of Done requires. And any browser test that calls `mount()` must also call
-// `expectNoA11yViolations()`.
 //
 // "Really calls" means outside a comment, outside a string, outside an `it.skip`, and not
 // merely imported: every one of those loopholes was live at some point, and Dialog exercised
@@ -24,7 +29,7 @@
 // NOT a consumer-facing `.md`. The composed families (dialog/calendar/i18n/modal-backdrop) and
 // utils/ still need one. See `isDocExemptSource` below.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, extname, join, relative } from "node:path";
+import { basename, dirname, extname, join, relative, sep } from "node:path";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
 const packagesDir = join(repoRoot, "packages");
@@ -62,6 +67,12 @@ const A11Y_MARKER = "expectNoA11yViolations";
 // Packages whose source files must additionally have a colocated Storybook story.
 // Components are the things a human needs to look at; pure primitives are not.
 const REQUIRES_STORY = new Set(["components"]);
+// Packages whose Definition-of-Done set (a test, a doc, a story, an SSR test, and a hydration test)
+// is enforced PER COMPONENT FOLDER rather than per source file. A compound component (Alert, Dialog,
+// …) splits its parts across many files in one leaf `src/<name>/` folder; they are collectively one
+// component, exercised by one shared test suite / doc / story, so requiring the whole set per part
+// file would only manufacture boilerplate. `primitives`/`theming` stay per-file (a test + a doc each).
+const PER_FOLDER_DOD = new Set(["components"]);
 
 /** @param {string} dir */
 function walk(dir) {
@@ -264,6 +275,17 @@ function isDocExemptSource(pkg, path) {
 /** Whether a path lives inside a `__tests__/` subtree (tests + their support modules + fixtures). */
 const underTests = (p) => /[/\\]__tests__[/\\]/.test(p);
 
+/** Whether `dir` exists and contains at least one `.md` file (the per-folder doc requirement). */
+function dirHasMarkdown(dir) {
+  try {
+    return readdirSync(dir).some(
+      (entry) => entry.endsWith(".md") && statSync(join(dir, entry)).isFile(),
+    );
+  } catch {
+    return false;
+  }
+}
+
 function isSourceFile(path) {
   if (isTestFile(path) || isStoryFile(path)) {
     return false;
@@ -313,81 +335,102 @@ for (const pkg of packageDirs) {
 
   const sourceFiles = allFiles.filter(isSourceFile);
   const testFiles = allFiles.filter(isTestFile);
-  const storyFiles = new Set(allFiles.filter(isStoryFile).map(baseName));
+  const storyFiles = allFiles.filter(isStoryFile);
 
-  for (const sourceFile of sourceFiles) {
-    const base = baseName(sourceFile);
-    const basenameOnly = base.split("/").pop();
-    if (EXCLUDED_BASENAMES.has(basenameOnly)) {
-      continue;
-    }
-
-    // A source file's tests may sit beside it (the primitives' layout) or be tucked into a
-    // `__tests__/` subfolder of the same directory (the components' layout — keeping the family
-    // folder free of test/fixture visual noise). Both count.
-    const testRoots = [base, join(dirname(base), "__tests__", basename(base))];
-    const matchingTests = testFiles.filter((t) => {
-      const testBase = baseName(t);
-      return testRoots.some(
-        (root) =>
-          testBase === `${root}.test` ||
-          testBase === `${root}.ssr.test` ||
-          testBase === `${root}.browser.test`,
-      );
-    });
-    const hasTest = matchingTests.length > 0;
-    // The per-file usage doc no longer sits beside the source — it lives out of the source tree
-    // at `docs/usage/<pkg>/<relative-src-path>/<name>.md`, mirroring the package + src path (so
-    // the primitives/ and components/ `dialog` docs never collide). Resolve that exact path and
-    // check it exists.
-    const docRelDir = relative(srcDir, dirname(sourceFile));
-    const expectedDoc = join(repoRoot, "docs/usage", pkg, docRelDir, `${basename(base)}.md`);
-    const hasDoc = existsSync(expectedDoc);
-    const docRequired = !isDocExemptSource(pkg, sourceFile);
-
-    const relPath = relative(repoRoot, sourceFile);
-    if (!hasTest) {
-      missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
-    }
-    if (docRequired && !hasDoc) {
-      missing.push(`${relPath} — missing matching .md doc at ${relative(repoRoot, expectedDoc)}`);
-    }
-
-    if (REQUIRES_SSR_TEST.has(pkg)) {
-      // The call must live in the `.ssr.test.*` file, because that is the only Vitest project
-      // resolving the server builds. And `hasLiveCall`, not `.includes(...)`: a mention in a
-      // comment, a bare import, or a call inside an `it.skip` used to satisfy this.
-      const ssrTests = matchingTests.filter(isSsrTestFile);
-      const hasSsrTest = ssrTests.some((t) =>
-        hasLiveCall(readFileSync(t, "utf8"), SSR_TEST_MARKER),
-      );
-
-      if (!hasSsrTest) {
-        missing.push(
-          `${relPath} — no matching *.ssr.test.tsx calls ${SSR_TEST_MARKER}() outside a comment and outside an it.skip (SSR round-trip test required)`,
-        );
+  if (PER_FOLDER_DOD.has(pkg)) {
+    // @hope-ui/components: the full Definition-of-Done set — a test, a doc, a story, an SSR test, and
+    // a hydration test — is enforced PER COMPONENT FOLDER, not per source file. A compound component
+    // (Alert, Dialog, …) splits its parts across many files in one leaf `src/<name>/` folder; they
+    // are collectively one component, exercised by one shared test suite / doc / story. (Leaf folders
+    // still stay flat-free via NO_FLAT_SPRAWL below, and each browser test that mounts still runs axe.)
+    const componentDirs = new Set();
+    for (const f of sourceFiles) {
+      // A folder of only `index.ts` is a barrel, not a component; a folder with any other source file
+      // is a component folder.
+      if (!EXCLUDED_BASENAMES.has(basename(baseName(f)))) {
+        componentDirs.add(dirname(f));
       }
     }
 
-    if (REQUIRES_HYDRATION_TEST.has(pkg)) {
-      // The other half. Without this, deleting a component's entire hydration suite kept CI
-      // green — which is precisely how Dialog's stayed `it.skip`'d for months while CLAUDE.md
-      // claimed every component had one.
-      const browserTests = matchingTests.filter(isBrowserTestFile);
-      const hasHydrationTest = browserTests.some((t) => {
+    for (const dir of componentDirs) {
+      const relDir = relative(srcDir, dir);
+      const label = relative(repoRoot, dir);
+      // Tests live in the folder's `__tests__/` subtree; any there counts toward the whole folder.
+      const folderTests = testFiles.filter((t) => t.startsWith(`${dir}${sep}`) && underTests(t));
+
+      const hasTest = folderTests.length > 0;
+      // Per-folder doc: at least one `.md` under `docs/usage/<pkg>/<relDir>/` (the folder's usage doc).
+      const docDir = join(repoRoot, "docs/usage", pkg, relDir);
+      const hasDoc = dirHasMarkdown(docDir);
+      const hasStory = storyFiles.some((s) => dirname(s) === dir);
+      // `hasLiveCall`, not `.includes(...)`: a mention in a comment, a bare import, or a call inside
+      // an `it.skip` must not satisfy the SSR / hydration round-trip requirements.
+      const hasSsr = folderTests
+        .filter(isSsrTestFile)
+        .some((t) => hasLiveCall(readFileSync(t, "utf8"), SSR_TEST_MARKER));
+      const hasHydration = folderTests.filter(isBrowserTestFile).some((t) => {
         const source = readFileSync(t, "utf8");
         return HYDRATION_TEST_MARKERS.some((marker) => hasLiveCall(source, marker));
       });
 
-      if (!hasHydrationTest) {
+      if (!hasTest) {
+        missing.push(`${label} — component folder has no test in a __tests__/ subfolder`);
+      }
+      if (!hasDoc) {
         missing.push(
-          `${relPath} — no matching *.browser.test.tsx calls ${HYDRATION_TEST_MARKERS.join("() or ")}() outside a comment and outside an it.skip (hydration round-trip test required)`,
+          `${label} — component folder has no .md usage doc under ${relative(repoRoot, docDir)}/`,
+        );
+      }
+      if (REQUIRES_STORY.has(pkg) && !hasStory) {
+        missing.push(`${label} — component folder has no colocated *.stories.tsx`);
+      }
+      if (REQUIRES_SSR_TEST.has(pkg) && !hasSsr) {
+        missing.push(
+          `${label} — no *.ssr.test.tsx in the folder calls ${SSR_TEST_MARKER}() outside a comment and outside an it.skip (SSR round-trip test required)`,
+        );
+      }
+      if (REQUIRES_HYDRATION_TEST.has(pkg) && !hasHydration) {
+        missing.push(
+          `${label} — no *.browser.test.tsx in the folder calls ${HYDRATION_TEST_MARKERS.join("() or ")}() outside a comment and outside an it.skip (hydration round-trip test required)`,
         );
       }
     }
+  } else {
+    // primitives / theming: a test + a doc PER source file (they render no story / SSR / hydration).
+    for (const sourceFile of sourceFiles) {
+      const base = baseName(sourceFile);
+      const basenameOnly = base.split("/").pop();
+      if (EXCLUDED_BASENAMES.has(basenameOnly)) {
+        continue;
+      }
 
-    if (REQUIRES_STORY.has(pkg) && !storyFiles.has(`${base}.stories`)) {
-      missing.push(`${relPath} — missing matching .stories.tsx`);
+      // A source file's tests may sit beside it (the primitives' layout) or be tucked into a
+      // `__tests__/` subfolder of the same directory. Both count.
+      const testRoots = [base, join(dirname(base), "__tests__", basename(base))];
+      const hasTest = testFiles.some((t) => {
+        const testBase = baseName(t);
+        return testRoots.some(
+          (root) =>
+            testBase === `${root}.test` ||
+            testBase === `${root}.ssr.test` ||
+            testBase === `${root}.browser.test`,
+        );
+      });
+      // The per-file usage doc lives out of the source tree at
+      // `docs/usage/<pkg>/<relative-src-path>/<name>.md`, mirroring the package + src path (so the
+      // primitives/ and components/ `dialog` docs never collide). Resolve it and check it exists.
+      const docRelDir = relative(srcDir, dirname(sourceFile));
+      const expectedDoc = join(repoRoot, "docs/usage", pkg, docRelDir, `${basename(base)}.md`);
+      const hasDoc = existsSync(expectedDoc);
+      const docRequired = !isDocExemptSource(pkg, sourceFile);
+
+      const relPath = relative(repoRoot, sourceFile);
+      if (!hasTest) {
+        missing.push(`${relPath} — missing *.test.tsx or *.browser.test.tsx`);
+      }
+      if (docRequired && !hasDoc) {
+        missing.push(`${relPath} — missing matching .md doc at ${relative(repoRoot, expectedDoc)}`);
+      }
     }
   }
 
@@ -460,8 +503,8 @@ if (missing.length > 0 || sprawl.length > 0) {
 }
 
 console.log(
-  "check:coverage-parity passed — every source file has a test and a doc under docs/usage/ (the " +
-    "internal primitives kernel is doc-exempt); every component has a story, an executing " +
-    "renderToStringAsync() and an executing hydrate(); every browser test that mounts DOM also " +
-    "runs axe; and no leaf source folder has flat test/doc/fixture sprawl.",
+  "check:coverage-parity passed — every primitives/theming source file has a test and a doc under " +
+    "docs/usage/ (the internal primitives kernel is doc-exempt); every component FOLDER has a test, " +
+    "a doc, a story, an executing renderToStringAsync() and an executing hydrate(); every browser " +
+    "test that mounts DOM also runs axe; and no leaf source folder has flat test/doc/fixture sprawl.",
 );

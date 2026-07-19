@@ -2,19 +2,33 @@
 
 Full rationale for the summary in CLAUDE.md § *Definition of Done*.
 
-Every source file under `packages/*/src/` (except `index.ts`) must have:
+The DoD is enforced at two granularities, so a compound component (`Alert`, `Dialog`) can split its
+parts across many files in one leaf folder without multiplying the test/doc/story burden:
+
+- **`@hope-ui/primitives` / `@hope-ui/theming` — PER SOURCE FILE.** Each source file (except
+  `index.ts`) needs items 1–2.
+- **`@hope-ui/components` — PER COMPONENT FOLDER.** A leaf `src/<name>/` folder is **one** component,
+  even when its parts live in many `src/<name>/<name>-<part>.tsx` files with the namespace object
+  assembled in the barrel `index.ts` (`export const Foo = { Root, … }`). The **folder** collectively
+  needs items 1–4. A part file carries no test/doc/story requirement of its own.
+
+The set:
 1. A matching test file: `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx`
    (real-browser — required for anything touching focus/keyboard/pointer behavior,
    since jsdom cannot be trusted for that), in a **`__tests__/`** subfolder of the leaf
-   directory (`Foo/__tests__/Foo.test.tsx`). This keeps the leaf folder free of test/fixture
-   visual noise; `check:coverage-parity`'s flat-free rule fails a test dropped beside the source.
+   directory. This keeps the leaf folder free of test/fixture visual noise;
+   `check:coverage-parity`'s flat-free rule fails a test dropped beside the source.
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) at
    `docs/usage/<pkg>/<relative-src-path>/Foo.md` — out of the source tree entirely, the path
-   mirroring package + src path so the primitives/ and components/ `dialog` docs never collide.
-3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated **beside the source**
-   in the same `src/` leaf directory. Components are what a human has to look at; pure primitives aren't.
-   Stories (and tests) never reach `dist/` — tsdown only builds the `package.json`
-   `hope.entries` files — and are excluded from the `build` task's turbo `inputs`.
+   mirroring package + src path so the primitives/ and components/ `dialog` docs never collide. For a
+   component folder, at least one `.md` under `docs/usage/components/<name>/`.
+3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (one per
+   folder). Components are what a human has to look at; pure primitives aren't. Stories (and tests)
+   never reach `dist/` — tsdown only builds the `package.json` `hope.entries` files — and are excluded
+   from the `build` task's turbo `inputs`.
+4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` calling `renderToStringAsync`) and a
+   hydration test (`*.browser.test.tsx` calling `hydrate`) — one of each per folder (see the SSR round
+   trip below).
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces this in CI
 and fails the build if any is missing. Its purpose is to guarantee that test, doc, and

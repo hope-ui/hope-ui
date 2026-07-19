@@ -70,7 +70,7 @@ pnpm test:ssr             # vitest run --project=ssr     (node, SERVER builds of
 pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + hydration)
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
-pnpm check:coverage-parity  # fails if a src file lacks a test / docs/usage doc / story, OR a leaf folder has flat sprawl
+pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
 pnpm changeset            # add a changeset before a PR that changes a published package
 ```
@@ -103,32 +103,44 @@ rationale only — no tool or assistant attribution, in any form.
 **Full rationale and history: `docs/definition-of-done.md`. Read `docs/testing.md` before writing
 any test.**
 
-Every source file under `packages/*/src/` (except `index.ts`) must have:
+The DoD is enforced at two granularities, because a compound component (`Alert`, `Dialog`) may split
+its parts across many files in one leaf folder:
+
+- **`@hope-ui/primitives` / `@hope-ui/theming` — PER SOURCE FILE.** Every source file (except
+  `index.ts`) needs a matching test and doc (items 1–2 below).
+- **`@hope-ui/components` — PER COMPONENT FOLDER.** A leaf `src/<name>/` folder is **one** component,
+  even when its parts live in many `src/<name>/<name>-<part>.tsx` files with the namespace object
+  (`export const Foo = { Root, … }`) assembled in the barrel `index.ts`. The **folder** — not each
+  part file — needs the full set (items 1–4). Splitting a part into its own file adds **no** new
+  test/doc/story burden.
+
+The set:
 1. A matching test file — `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx` (real-browser —
    required for anything touching focus/keyboard/pointer behavior, since jsdom cannot be trusted for
-   that) — in a `__tests__/` subfolder of the same leaf directory (`Foo/__tests__/Foo.test.tsx`), so
-   the leaf folder stays free of test/fixture visual noise. See "Leaf source folders stay flat-free".
+   that) — in a `__tests__/` subfolder of the leaf directory (`<name>/__tests__/`), so the leaf
+   folder stays free of test/fixture visual noise. See "Leaf source folders stay flat-free".
 2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) at
-   `docs/usage/<pkg>/<relative-src-path>/Foo.md` (out of the source tree; the path mirrors package +
-   src path so the primitives/ and components/ `dialog` docs never collide). **Exception:** files
-   under `packages/primitives/src/internal/` (the advanced/unstable behavior kernel — see
-   "Architecture" below) require a test but **not** a consumer-facing `.md`; the composed families
-   (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
-3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated **beside the source** in
-   the same `src/` leaf directory (stories are the human-facing harness, so they stay next to what
-   they render). Components are what a human has to look at; pure primitives aren't. Stories (and
-   tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
-   and they're excluded from the `build` task's turbo `inputs`.
+   `docs/usage/<pkg>/<relative-src-path>/Foo.md` — for a component folder, at least one `.md` under
+   `docs/usage/components/<name>/` (out of the source tree; the path mirrors package + src path so the
+   primitives/ and components/ `dialog` docs never collide). **Exception:** files under
+   `packages/primitives/src/internal/` (the advanced/unstable behavior kernel — see "Architecture"
+   below) require a test but **not** a consumer-facing `.md`; the composed families (`dialog`,
+   `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
+3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (stories
+   are the human-facing harness, so they stay next to what they render). One per folder. Components are
+   what a human has to look at; pure primitives aren't. Stories (and tests) never reach `dist/` because
+   tsdown only builds the `package.json` `hope.entries` files, and they're excluded from the `build`
+   task's turbo `inputs`.
+4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` that *calls* `renderToStringAsync`)
+   **and** a hydration test (`*.browser.test.tsx` that *calls* `hydrate`) — one of each per folder.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above in CI and
 additionally requires:
 - Every browser test that calls `mount()` also calls `expectNoA11yViolations` at least once (both
   from `@hope-ui/internal-test-utils`), running a baseline axe-core check. A browser test that
   renders nothing (e.g. `solid-contract.browser.test.tsx`) is exempt.
-- Every component (not pure internal primitives with no DOM output) has an SSR test
-  (`Foo.ssr.test.tsx` that *calls* `renderToStringAsync`) **and** a hydration test
-  (`Foo.browser.test.tsx` that *calls* `hydrate`). "Calls" means outside a comment, string, or
-  `it.skip`, and not merely imported.
+- "Calls" (for the SSR/hydration requirement) means outside a comment, string, or `it.skip`, and not
+  merely imported.
 
 Also required:
 - `expectNoA11yViolations` fails on axe **violations** *and* on **`incomplete`** results. Name a
@@ -162,10 +174,13 @@ Also required:
 ## Leaf source folders stay flat-free
 
 A `src/<name>/` folder holds only its implementation file(s), `index.ts`, and — for
-`@hope-ui/components` — `<name>.stories.tsx`. Everything else has a home: tests, `__fixtures__/`,
-and `__screenshots__/` live in a `__tests__/` subfolder; the per-file usage `.md` lives under
-`docs/usage/<pkg>/<path>/`. Never drop test, fixture, or doc files flat beside source, and never
-let a leaf folder accumulate a dozen files. `pnpm check:coverage-parity` enforces this — a flat
+`@hope-ui/components` — its `*.stories.tsx`. A compound component **splits its parts across files**
+here (`<name>-root.tsx`, `<name>-icon.tsx`, a shared `<name>-context.ts`, …), with the namespace
+object assembled in the barrel `index.ts` (`export const Foo = { Root, … }`) — no subfolders. That is
+encouraged, not sprawl: keeping a single 600-line file is worse. Everything non-source still has a
+home: tests, `__fixtures__/`, and `__screenshots__/` live in a `__tests__/` subfolder; the usage
+`.md` lives under `docs/usage/<pkg>/<path>/`. Never drop test, fixture, or doc files flat beside
+source. `pnpm check:coverage-parity` enforces this — a flat
 `*.test.*`, a flat `<name>.md`, or a flat `__fixtures__/` in any leaf under `primitives`,
 `components`, `theming`, or `internal-test-utils` fails the build.
 
