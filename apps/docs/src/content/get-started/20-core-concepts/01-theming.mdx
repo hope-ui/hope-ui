@@ -1,7 +1,7 @@
 import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
-import { InfoIcon } from "~/components/Icons";
+import { InfoIcon, PaletteIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
 
 export const summary = "Restyle your app with presets.";
@@ -135,6 +135,18 @@ Each component's page documents which props are defaultable and which parts it e
 [Button](/components/button) for a worked example.
 
 ### Token values
+
+<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
+  <span class="mt-0.5 shrink-0">
+    <PaletteIcon class="size-5" />
+  </span>
+  <div>
+    <strong>Don't want to hand-write 100+ variables?</strong> The{" "}
+    <a href="/theme-creator" class="font-medium underline underline-offset-2 hover:opacity-80">Theme Creator</a>{" "}
+    lets you pick a color family per role plus a radius, preview it live across real components, and
+    copy a complete <code>theme.css</code> with every token filled in.
+  </div>
+</div>
 
 To change the actual colors, author your own `--hope-*` CSS. Redefine any token under `:root` (and
 `.dark` for dark mode); every utility that references it updates at once.

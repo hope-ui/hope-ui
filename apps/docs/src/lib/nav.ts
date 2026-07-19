@@ -6,6 +6,7 @@
 export const PRIMARY_NAV = [
   { to: "/get-started", label: "Get started" },
   { to: "/components", label: "Components" },
+  { to: "/theme-creator", label: "Theme Creator" },
   { to: "/changelog", label: "Changelog" },
 ] as const;
 

@@ -1,0 +1,49 @@
+/*
+ * Palette keepalive — required by the Theme Creator (/theme-creator). Do not delete.
+ *
+ * Tailwind v4 tree-shakes any `--color-*` theme variable not referenced by a generated utility or by
+ * a `var()` in the compiled CSS (verified: an unreferenced family emits zero vars). The Theme Creator
+ * paints its live preview by setting `--hope-*` tokens to `var(--color-<family>-<shade>)` at RUNTIME
+ * (inline style, family chosen by the visitor), so NOTHING at build time references the family a
+ * visitor might pick. Without this file those shades are absent and the preview renders unresolved
+ * (empty) colors.
+ *
+ * Referencing every shade of the full default palette here keeps them all emitted to `:root` — the
+ * same mechanism hope's own `tokens.css` relies on to preserve the shades it uses. The references sit
+ * inside one custom property on a selector that never matches an element (a reference inside a custom
+ * property is enough — also verified); it adds the palette vars plus one inert, unused rule, nothing
+ * more. Regenerate if the offered families change (this is the full Tailwind v4 palette; superset of
+ * palette.ts `ALL_FAMILIES`).
+ */
+@layer base {
+  .hope-theme-creator-palette-keepalive {
+    --hope-tc-keepalive:
+      var(--color-red-50) 
+      var(--color-red-100) var(--color-red-200) var(--color-red-300) var(--color-red-400) var(--color-red-500) var(--color-red-600) var(--color-red-700) var(--color-red-800) var(--color-red-900) var(--color-red-950)
+      var(--color-orange-50) var(--color-orange-100) var(--color-orange-200) var(--color-orange-300) var(--color-orange-400) var(--color-orange-500) var(--color-orange-600) var(--color-orange-700) var(--color-orange-800) var(--color-orange-900) var(--color-orange-950)
+      var(--color-amber-50) var(--color-amber-100) var(--color-amber-200) var(--color-amber-300) var(--color-amber-400) var(--color-amber-500) var(--color-amber-600) var(--color-amber-700) var(--color-amber-800) var(--color-amber-900) var(--color-amber-950)
+      var(--color-yellow-50) var(--color-yellow-100) var(--color-yellow-200) var(--color-yellow-300) var(--color-yellow-400) var(--color-yellow-500) var(--color-yellow-600) var(--color-yellow-700) var(--color-yellow-800) var(--color-yellow-900) var(--color-yellow-950)
+      var(--color-lime-50) var(--color-lime-100) var(--color-lime-200) var(--color-lime-300) var(--color-lime-400) var(--color-lime-500) var(--color-lime-600) var(--color-lime-700) var(--color-lime-800) var(--color-lime-900) var(--color-lime-950)
+      var(--color-green-50) var(--color-green-100) var(--color-green-200) var(--color-green-300) var(--color-green-400) var(--color-green-500) var(--color-green-600) var(--color-green-700) var(--color-green-800) var(--color-green-900) var(--color-green-950)
+      var(--color-emerald-50) var(--color-emerald-100) var(--color-emerald-200) var(--color-emerald-300) var(--color-emerald-400) var(--color-emerald-500) var(--color-emerald-600) var(--color-emerald-700) var(--color-emerald-800) var(--color-emerald-900) var(--color-emerald-950)
+      var(--color-teal-50) var(--color-teal-100) var(--color-teal-200) var(--color-teal-300) var(--color-teal-400) var(--color-teal-500) var(--color-teal-600) var(--color-teal-700) var(--color-teal-800) var(--color-teal-900) var(--color-teal-950)
+      var(--color-cyan-50) var(--color-cyan-100) var(--color-cyan-200) var(--color-cyan-300) var(--color-cyan-400) var(--color-cyan-500) var(--color-cyan-600) var(--color-cyan-700) var(--color-cyan-800) var(--color-cyan-900) var(--color-cyan-950)
+      var(--color-sky-50) var(--color-sky-100) var(--color-sky-200) var(--color-sky-300) var(--color-sky-400) var(--color-sky-500) var(--color-sky-600) var(--color-sky-700) var(--color-sky-800) var(--color-sky-900) var(--color-sky-950)
+      var(--color-blue-50) var(--color-blue-100) var(--color-blue-200) var(--color-blue-300) var(--color-blue-400) var(--color-blue-500) var(--color-blue-600) var(--color-blue-700) var(--color-blue-800) var(--color-blue-900) var(--color-blue-950)
+      var(--color-indigo-50) var(--color-indigo-100) var(--color-indigo-200) var(--color-indigo-300) var(--color-indigo-400) var(--color-indigo-500) var(--color-indigo-600) var(--color-indigo-700) var(--color-indigo-800) var(--color-indigo-900) var(--color-indigo-950)
+      var(--color-violet-50) var(--color-violet-100) var(--color-violet-200) var(--color-violet-300) var(--color-violet-400) var(--color-violet-500) var(--color-violet-600) var(--color-violet-700) var(--color-violet-800) var(--color-violet-900) var(--color-violet-950)
+      var(--color-purple-50) var(--color-purple-100) var(--color-purple-200) var(--color-purple-300) var(--color-purple-400) var(--color-purple-500) var(--color-purple-600) var(--color-purple-700) var(--color-purple-800) var(--color-purple-900) var(--color-purple-950)
+      var(--color-fuchsia-50) var(--color-fuchsia-100) var(--color-fuchsia-200) var(--color-fuchsia-300) var(--color-fuchsia-400) var(--color-fuchsia-500) var(--color-fuchsia-600) var(--color-fuchsia-700) var(--color-fuchsia-800) var(--color-fuchsia-900) var(--color-fuchsia-950)
+      var(--color-pink-50) var(--color-pink-100) var(--color-pink-200) var(--color-pink-300) var(--color-pink-400) var(--color-pink-500) var(--color-pink-600) var(--color-pink-700) var(--color-pink-800) var(--color-pink-900) var(--color-pink-950)
+      var(--color-rose-50) var(--color-rose-100) var(--color-rose-200) var(--color-rose-300) var(--color-rose-400) var(--color-rose-500) var(--color-rose-600) var(--color-rose-700) var(--color-rose-800) var(--color-rose-900) var(--color-rose-950)
+      var(--color-slate-50) var(--color-slate-100) var(--color-slate-200) var(--color-slate-300) var(--color-slate-400) var(--color-slate-500) var(--color-slate-600) var(--color-slate-700) var(--color-slate-800) var(--color-slate-900) var(--color-slate-950)
+      var(--color-gray-50) var(--color-gray-100) var(--color-gray-200) var(--color-gray-300) var(--color-gray-400) var(--color-gray-500) var(--color-gray-600) var(--color-gray-700) var(--color-gray-800) var(--color-gray-900) var(--color-gray-950)
+      var(--color-zinc-50) var(--color-zinc-100) var(--color-zinc-200) var(--color-zinc-300) var(--color-zinc-400) var(--color-zinc-500) var(--color-zinc-600) var(--color-zinc-700) var(--color-zinc-800) var(--color-zinc-900) var(--color-zinc-950)
+      var(--color-neutral-50) var(--color-neutral-100) var(--color-neutral-200) var(--color-neutral-300) var(--color-neutral-400) var(--color-neutral-500) var(--color-neutral-600) var(--color-neutral-700) var(--color-neutral-800) var(--color-neutral-900) var(--color-neutral-950)
+      var(--color-stone-50) var(--color-stone-100) var(--color-stone-200) var(--color-stone-300) var(--color-stone-400) var(--color-stone-500) var(--color-stone-600) var(--color-stone-700) var(--color-stone-800) var(--color-stone-900) var(--color-stone-950)
+      var(--color-mauve-50) var(--color-mauve-100) var(--color-mauve-200) var(--color-mauve-300) var(--color-mauve-400) var(--color-mauve-500) var(--color-mauve-600) var(--color-mauve-700) var(--color-mauve-800) var(--color-mauve-900) var(--color-mauve-950)
+      var(--color-taupe-50) var(--color-taupe-100) var(--color-taupe-200) var(--color-taupe-300) var(--color-taupe-400) var(--color-taupe-500) var(--color-taupe-600) var(--color-taupe-700) var(--color-taupe-800) var(--color-taupe-900) var(--color-taupe-950)
+      var(--color-mist-50) var(--color-mist-100) var(--color-mist-200) var(--color-mist-300) var(--color-mist-400) var(--color-mist-500) var(--color-mist-600) var(--color-mist-700) var(--color-mist-800) var(--color-mist-900) var(--color-mist-950)
+      var(--color-olive-50) var(--color-olive-100) var(--color-olive-200) var(--color-olive-300) var(--color-olive-400) var(--color-olive-500) var(--color-olive-600) var(--color-olive-700) var(--color-olive-800) var(--color-olive-900) var(--color-olive-950);
+  }
+}
