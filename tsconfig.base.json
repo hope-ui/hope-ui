@@ -25,6 +25,7 @@
     // Relative paths in an inherited config resolve against the config that declares them,
     // so these are repo-root-relative and every package inherits them unchanged.
     "paths": {
+      "@hope-ui/components/*": ["./packages/components/src/*/index.ts"],
       "@hope-ui/primitives/*": ["./packages/primitives/src/*/index.ts"],
       "@hope-ui/theming": ["./packages/theming/src/index.ts"],
       "@hope-ui/theming/conformance": ["./packages/theming/src/conformance/conformance.ts"],

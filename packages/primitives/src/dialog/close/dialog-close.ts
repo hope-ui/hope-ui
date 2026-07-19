@@ -1,35 +1,36 @@
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
-import { useLocale } from "../../i18n";
-import { composeEventHandlers, withDefaults } from "../../utils";
+import { composeEventHandlers } from "../../utils";
 import type { CreateDialogReturn } from "../root/dialog-root";
 
 export interface CreateDialogCloseReturn {
-  /** Spread onto the close button. `type` defaults to `"button"`, `aria-label` to the localized
-   * `dialog.close` message (consumer `aria-label` wins), plus an `onClick` that closes (composed in
-   * front of the consumer's, so their `preventDefault()` cancels). */
+  /** Spread onto the close button. Carries an `onClick` that closes the dialog — composed in **front**
+   * of the consumer's, so their `preventDefault()` cancels the close — plus the consumer's other props
+   * unchanged. The accessible name (`common.close`) and the `type="button"` default now come from the
+   * `CloseButton` component (over `createButton`) this composes with, not from here. */
   props: JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 }
 
 /**
- * The close part: a button that closes the dialog. As on the trigger, the consumer's `onClick`
- * runs first and `event.preventDefault()` cancels the close. Defaults `aria-label` to the localized
- * `dialog.close` message (so an icon-only close button is labelled); a consumer `aria-label` wins.
+ * The close part: injects the dialog's close behavior onto a button, and nothing else. The consumer's
+ * `onClick` runs first and `event.preventDefault()` cancels the close (via `composeEventHandlers`'
+ * cancel channel).
+ *
+ * This is deliberately **minimal**: it owns only the close `onClick`. The label default
+ * (`common.close`) and `type="button"` are owned by the `CloseButton` component that `@hope-ui/components`'
+ * `Dialog.Close` renders (over the `createButton` primitive), so this hook no longer sets them — a
+ * single source for each, no double-ownership. (This is a lower-level escape hatch than it once was; a
+ * headless consumer wiring `createDialogClose` onto a bare `<button>` supplies its own label/type.)
  */
 export function createDialogClose(
   state: CreateDialogReturn,
   props: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
 ): CreateDialogCloseReturn {
-  const i18n = useLocale();
-  const merged = withDefaults(props, { type: "button" as const });
-  const rest = omit(merged, "onClick");
+  const rest = omit(props, "onClick");
 
   const elementProps: JSX.ButtonHTMLAttributes<HTMLButtonElement> = merge(rest, {
-    get "aria-label"() {
-      return props["aria-label"] ?? i18n.t("dialog.close");
-    },
     get onClick() {
-      return composeEventHandlers<HTMLButtonElement, MouseEvent>(merged.onClick, () =>
+      return composeEventHandlers<HTMLButtonElement, MouseEvent>(props.onClick, () =>
         state.setOpen(false),
       );
     },

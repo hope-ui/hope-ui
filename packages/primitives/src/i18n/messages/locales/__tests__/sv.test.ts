@@ -3,7 +3,7 @@ import { MESSAGES_SV } from "../sv";
 
 describe("MESSAGES_SV", () => {
   it("carries the Swedish translations", () => {
-    expect(MESSAGES_SV.dialog.close).toBe("Stäng");
+    expect(MESSAGES_SV.common.close).toBe("Stäng");
     expect(MESSAGES_SV.calendar.label).toBe("Kalender");
     expect(MESSAGES_SV.calendar.today).toBe("Idag");
   });

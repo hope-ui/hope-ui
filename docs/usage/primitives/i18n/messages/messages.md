@@ -13,7 +13,7 @@ An internal **nested** `I18nMessageMap` groups keys by component and gives each 
 
 ```ts
 interface I18nMessageMap {
-  dialog: { close: undefined };
+  common: { close: undefined };
   calendar: { label: undefined; /* … */ selectedDate: { date: string }; datesSelected: { count: number } };
 }
 ```
@@ -22,10 +22,10 @@ Everything else is **derived** from it, so a key is declared exactly once:
 
 | Symbol | Derived as | Purpose |
 | --- | --- | --- |
-| `I18nMessageKey` | dotted paths of the map | The union `t()` accepts — `"dialog.close"`, `"calendar.today"`, … |
+| `I18nMessageKey` | dotted paths of the map | The union `t()` accepts — `"common.close"`, `"calendar.today"`, … |
 | `ParamsFor<K>` | the map leaf for `K` | The params object for a key, or `undefined`. |
 | `I18nMessageEntry<K>` | from `ParamsFor<K>` | `string` (optionally with `{{param}}`) or `(params) => string` (plural rule). |
-| `I18nCatalog` | nested mirror of the map | `{ dialog: { close: … }, calendar: { … } }` — the shape each locale catalog in `./locales/` is typed against. |
+| `I18nCatalog` | nested mirror of the map | `{ common: { close: … }, calendar: { … } }` — the shape each locale catalog in `./locales/` is typed against. |
 | `interpolate(template, params?)` | — | Replace `{{name}}` placeholders, coercing each param to a string. |
 
 The catalogs `MESSAGES_EN` / `MESSAGES_FR` are exported from `locales/en.ts` and

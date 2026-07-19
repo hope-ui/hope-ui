@@ -181,4 +181,9 @@
   --color-focus: var(--hope-focus);
   --color-focus-halo: var(--hope-focus-halo);
   --color-scrim: var(--hope-scrim);
+
+  /* Surface-adaptive close affordance (currentColor-derived — see hope's tokens.css) */
+  --color-close-overlay-hovered: var(--hope-close-overlay-hovered);
+  --color-close-overlay-pressed: var(--hope-close-overlay-pressed);
+  --color-close-focus: var(--hope-close-focus);
 }

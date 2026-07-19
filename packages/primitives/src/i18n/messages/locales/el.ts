@@ -2,7 +2,7 @@ import type { I18nCatalog } from "../messages";
 
 /** Built-in **Greek** (`el`) catalog. Contract + shape: `../messages.ts`; registered in `catalogs.ts`. */
 export const MESSAGES_EL: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Κλείσιμο",
   },
   calendar: {

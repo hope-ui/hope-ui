@@ -13,6 +13,10 @@ behavior each contributes. Dialog owns none of them.
 
 Uncontrolled by default (`defaultOpen`); pass `open`/`onOpenChange` to control it.
 
+The dialog's **behavior** is headless (it ships no styles for the trigger, backdrop, popup, title, or
+description — style them yourself). The one exception is `Dialog.Close`, which renders a themed
+[`CloseButton`](../close-button/close-button.md) and therefore requires a `<ThemeProvider>` ancestor.
+
 ## Parts
 
 | Part                 | Renders  | Purpose                                                                 |
@@ -24,7 +28,7 @@ Uncontrolled by default (`defaultOpen`); pass `open`/`onOpenChange` to control i
 | `Dialog.Popup`       | `div`    | The dialog surface. `role="dialog"`, dismissable while open, focus-trapped while `modal`. |
 | `Dialog.Title`       | `h2`     | Registers its `id` on `Popup`'s `aria-labelledby`. |
 | `Dialog.Description` | `p`      | Registers its `id` on `Popup`'s `aria-describedby`. |
-| `Dialog.Close`       | `button` | Closes the dialog on click. `aria-label` defaults to the localized `dialog.close` message (consumer wins) — an icon-only close button is labelled for free. |
+| `Dialog.Close`       | `button` | Closes the dialog on click. Renders a [`CloseButton`](../close-button/close-button.md) — a themed, icon-only X, self-labelled from `common.close` (consumer `aria-label` wins). Because it is recipe-styled, it **requires a `<ThemeProvider>`** ancestor. Accepts all `CloseButton` props (`size`, `icon`, `class`, `slotClasses`, …). |
 
 Every part except `Root` accepts a `render` prop for polymorphic rendering (see
 `@hope-ui/primitives`'s `renderElement`).
@@ -95,14 +99,14 @@ independent of `ModalBackdrop` — it has always been the case.
 | `onOpenChange` | `(open: boolean) => void`   | —       | Called whenever the dialog would open or close.                     |
 | `modal`        | `boolean`                   | `true`  | Traps focus, locks page scroll, sets `aria-modal`, hides the page behind from assistive technology, and blocks pointer interaction with it. When `false`, the dialog is still dismissable (Escape/outside click) and still restores focus, but the page behind stays fully interactive. See "Modality". |
 
-### `Dialog.Trigger` / `Dialog.Close`
+### `Dialog.Trigger`
 
 | Prop      | Type                                           | Default  | Description                              |
 | --------- | ----------------------------------------------- | -------- | ------------------------------------------ |
 | `render`  | `RenderProp<JSX.ButtonHTMLAttributes<...>>`     | —        | Render as a different element/component. |
 | `...rest` | `JSX.ButtonHTMLAttributes<HTMLButtonElement>`   | —        | Forwarded to the rendered element.       |
 
-Both default to `type="button"` so they never accidentally submit a form.
+Defaults to `type="button"` so it never accidentally submits a form.
 
 `Trigger` only ever **opens** the dialog — it never toggles (matching Base UI). Close it with
 `Dialog.Close`, Escape, an outside click, or a controlled `open`.
@@ -117,7 +121,23 @@ no other effect, so it's an unambiguous cancel channel:
 </Dialog.Trigger>
 ```
 
-`Dialog.Close` works the same way, cancelling the close.
+### `Dialog.Close`
+
+`Dialog.Close` **is** a [`CloseButton`](../close-button/close-button.md) with the dialog's close
+wiring — so it renders the themed, icon-only X by default, self-labels from `common.close`, and
+accepts every `CloseButton` prop (`size`, `icon`, `render`, `class`, `slotClasses`, `disabled`, and
+native button attrs). `type="button"` comes from the underlying `createButton`. Because it is
+recipe-styled, `Dialog.Close` **requires a `<ThemeProvider>`** ancestor (unlike the behavior-only
+parts, which are unstyled).
+
+```tsx
+<Dialog.Close />                    {/* the default X */}
+<Dialog.Close size="lg" />          {/* larger */}
+<Dialog.Close icon={<MyGlyph />} /> {/* custom glyph */}
+```
+
+It cancels the same way as `Trigger`: your `onClick` runs first, and `event.preventDefault()`
+cancels the close.
 
 ### `Dialog.Portal`
 
@@ -222,20 +242,26 @@ re-rendered, and no a11y violations. See `docs/testing.md`.
 
 ## Example
 
+`Dialog.Close` renders a themed `CloseButton`, so the tree must sit under a `<ThemeProvider>`:
+
 ```tsx
+import { ThemeProvider } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
 import { Dialog } from "@hope-ui/components/dialog";
 
-<Dialog.Root>
-  <Dialog.Trigger>Open dialog</Dialog.Trigger>
-  <Dialog.Portal>
-    <Dialog.Backdrop />
-    <Dialog.Popup>
-      <Dialog.Title>Dialog title</Dialog.Title>
-      <Dialog.Description>Dialog description</Dialog.Description>
-      <Dialog.Close>Close</Dialog.Close>
-    </Dialog.Popup>
-  </Dialog.Portal>
-</Dialog.Root>;
+<ThemeProvider preset={hope}>
+  <Dialog.Root>
+    <Dialog.Trigger>Open dialog</Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Backdrop />
+      <Dialog.Popup>
+        <Dialog.Title>Dialog title</Dialog.Title>
+        <Dialog.Description>Dialog description</Dialog.Description>
+        <Dialog.Close />
+      </Dialog.Popup>
+    </Dialog.Portal>
+  </Dialog.Root>
+</ThemeProvider>;
 ```
 
 Controlled:

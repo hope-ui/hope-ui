@@ -22,8 +22,8 @@
  * `./locales/` (`en.ts`, `fr.ts`, …).
  */
 interface I18nMessageMap {
-  dialog: {
-    /** Close-button `aria-label`. */
+  common: {
+    /** Generic close-affordance `aria-label` (CloseButton; Dialog/Popover/Sheet/Alert close parts). */
     close: undefined;
   };
   calendar: {
@@ -58,7 +58,7 @@ interface I18nMessageMap {
   };
 }
 
-/** Dotted, component-namespaced message keys — `"calendar.today"`, `"dialog.close"`, … (derived). */
+/** Dotted, component-namespaced message keys — `"calendar.today"`, `"common.close"`, … (derived). */
 export type I18nMessageKey = {
   [G in keyof I18nMessageMap]: {
     [N in keyof I18nMessageMap[G]]: `${G & string}.${N & string}`;

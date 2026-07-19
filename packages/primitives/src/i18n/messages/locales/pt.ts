@@ -2,7 +2,7 @@ import type { I18nCatalog } from "../messages";
 
 /** Built-in **Portuguese** (`pt`) catalog. Contract + shape: `../messages.ts`; registered in `catalogs.ts`. */
 export const MESSAGES_PT: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Fechar",
   },
   calendar: {

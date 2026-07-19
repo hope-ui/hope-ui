@@ -5,7 +5,7 @@ import type { I18nCatalog } from "../messages";
  * Polish has three plural forms; `datesSelected` implements the standard rule (see `pl.md`).
  */
 export const MESSAGES_PL: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Zamknij",
   },
   calendar: {

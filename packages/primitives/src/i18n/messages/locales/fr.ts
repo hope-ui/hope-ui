@@ -6,7 +6,7 @@ import type { I18nCatalog } from "../messages";
  * every key in `en.ts` (enforced by the `I18nCatalog` type + the parity test). Contract: `../messages.ts`.
  */
 export const MESSAGES_FR: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Fermer",
   },
   calendar: {

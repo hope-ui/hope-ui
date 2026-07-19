@@ -3,7 +3,7 @@ import { MESSAGES_DA } from "../da";
 
 describe("MESSAGES_DA", () => {
   it("carries the Danish translations", () => {
-    expect(MESSAGES_DA.dialog.close).toBe("Luk");
+    expect(MESSAGES_DA.common.close).toBe("Luk");
     expect(MESSAGES_DA.calendar.label).toBe("Kalender");
     expect(MESSAGES_DA.calendar.today).toBe("I dag");
   });

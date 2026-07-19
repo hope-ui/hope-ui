@@ -37,7 +37,13 @@ const registry = { demo } as unknown as RecipeRegistry;
 // opted into chrome-content defaults and whose `defaultProps` fall back to the recipe variants
 // (`ThemeablePropsOf`'s `RecipeVariantsOf` branch). Keep it synthetic — don't "fix" it to a
 // registered component later, or that fallback path stops being exercised.
-const recipe = "demo" as keyof RecipeRegistry;
+// Type-punned to the `button` key (see `fullVariants` below): a concrete multi-slot recipe with a
+// `label` slot and the full variant set, so `useSlots({ recipe })` resolves to `Record<"root" |
+// "label" | …, …>` and `variantsProps` demands every key. Pinning to a single key (not the
+// `keyof RecipeRegistry` union) is what keeps this stable as recipes are added — a union collapses
+// `RecipeSlotsOf`/`CompleteVariantsOf` to the intersection across *all* recipes (just `root`/`size`
+// once a two-slot, one-variant recipe like `closeButton` joins). Runtime value stays `"demo"`.
+const recipe = "demo" as unknown as "button";
 
 // `useSlots`' `variantsProps` demands `CompleteVariantsOf` (every variant key present). The demo is
 // type-punned to the `button` key, so spread this all-`undefined` base and override only the key a

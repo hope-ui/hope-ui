@@ -3,7 +3,7 @@ import { MESSAGES_PL } from "../pl";
 
 describe("MESSAGES_PL", () => {
   it("carries the Polish translations", () => {
-    expect(MESSAGES_PL.dialog.close).toBe("Zamknij");
+    expect(MESSAGES_PL.common.close).toBe("Zamknij");
     expect(MESSAGES_PL.calendar.label).toBe("Kalendarz");
     expect(MESSAGES_PL.calendar.today).toBe("Dziś");
   });

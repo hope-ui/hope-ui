@@ -5,4 +5,5 @@
 // recipes, not a recipe.)
 export * from "./badge";
 export * from "./button";
+export * from "./close-button";
 export type { SlotClassFn, SlotRecipeFn } from "./slot-recipe";

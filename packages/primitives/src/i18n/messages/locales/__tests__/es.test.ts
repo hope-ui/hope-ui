@@ -3,7 +3,7 @@ import { MESSAGES_ES } from "../es";
 
 describe("MESSAGES_ES", () => {
   it("carries the Spanish translations", () => {
-    expect(MESSAGES_ES.dialog.close).toBe("Cerrar");
+    expect(MESSAGES_ES.common.close).toBe("Cerrar");
     expect(MESSAGES_ES.calendar.label).toBe("Calendario");
     expect(MESSAGES_ES.calendar.today).toBe("Hoy");
   });

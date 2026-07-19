@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { BadgeRecipe } from "../../recipes/badge";
 import type { ButtonRecipe } from "../../recipes/button";
+import type { CloseButtonRecipe } from "../../recipes/close-button";
 import type { RecipeRegistry } from "../../registry";
 import { definePreset, isPreset, type Preset } from "../preset";
 
@@ -20,7 +21,15 @@ const stubBadgeRecipe: BadgeRecipe = () => ({
   endDecorator: () => "",
   dot: () => "",
 });
-const registry: RecipeRegistry = { badge: stubBadgeRecipe, button: stubRecipe };
+const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
+  root: () => "",
+  icon: () => "",
+});
+const registry: RecipeRegistry = {
+  badge: stubBadgeRecipe,
+  button: stubRecipe,
+  closeButton: stubCloseButtonRecipe,
+};
 
 describe("definePreset — bootstrap from a raw registry", () => {
   it("brands the result and carries the registry as `recipes`", () => {

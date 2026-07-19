@@ -14,6 +14,7 @@
  */
 import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
+import type { CloseButtonRecipe } from "../recipes/close-button";
 
 /**
  * The theming contract version. A theme asserts against it (e.g. in its conformance test) so a
@@ -30,4 +31,5 @@ export const THEMING_CONTRACT_VERSION = 1 as const;
 export interface RecipeRegistry {
   badge: BadgeRecipe;
   button: ButtonRecipe;
+  closeButton: CloseButtonRecipe;
 }

@@ -2,7 +2,7 @@ import type { I18nCatalog } from "../messages";
 
 /** Built-in **Swedish** (`sv`) catalog. Contract + shape: `../messages.ts`; registered in `catalogs.ts`. */
 export const MESSAGES_SV: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Stäng",
   },
   calendar: {

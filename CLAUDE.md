@@ -308,13 +308,18 @@ them rather than re-deriving a behavior in a comment.
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).
 
-**Composition rule for future components:** compose shared kernel primitives from
-`@hope-ui/primitives`, never import from another component's subpath within
-`@hope-ui/components`. E.g. Popover must compose
-`createFloating`/`createDismissable`/`createPresence` directly — it must never import
-from `@hope-ui/components/dialog`, even though both are "overlay-ish." A higher-level
-component depending on a sibling component's package (rather than the shared kernel) is a
-known anti-pattern this project avoids by design, despite now sharing one package.
+**Composition rule for future components:** compose shared *behavior* from
+`@hope-ui/primitives` and styling through `@hope-ui/theming`. A component **may** import and
+reuse a sibling component's subpath (e.g. `Dialog.Close` renders `@hope-ui/components/close-button`,
+and later Popover/Sheet/Alert close parts do too) — a reusable leaf shouldn't be re-implemented.
+Two constraints remain: **no circular** component imports, and don't couple a component's
+*behavior* to a heavier sibling. E.g. Popover must compose
+`createFloating`/`createDismissable`/`createPresence` directly rather than depend on Dialog's
+modal machinery — Popover isn't "a kind of Dialog", so wiring its behavior through Dialog would
+force every non-modal floating consumer to pull in scroll-lock/hide-outside it never uses. Reusing
+a presentational leaf like `CloseButton` is fine; coupling behavior to a heavier sibling is not.
+Sibling subpaths stay external in the tsdown build (`neverBundle: [/^@hope-ui\//]`), so reuse is
+deduped, not inlined.
 
 **Publishing shape:** originally planned as packages grouped by shared-primitive family
 (`@hope-ui/overlays`, `@hope-ui/collections`, etc.); revised to a single
@@ -324,8 +329,8 @@ component lived in before they could install/import it; a single package name wi
 per-component subpaths removes that lookup entirely while keeping the same
 per-component tree-shaking (via `package.json#exports` + `"sideEffects": false`) that
 family packages would have given. `@hope-ui/primitives` stays a fully separate
-package — every entry in `@hope-ui/components` depends on it, never on a sibling
-subpath. Each component subpath is its own tsdown entry (from `package.json`'s
+package — every entry in `@hope-ui/components` depends on it, and may also depend on a
+sibling component subpath (kept external in the build). Each component subpath is its own tsdown entry (from `package.json`'s
 `hope.entries`), building to `dist/<component>/index.jsx` (JSX-preserved source) +
 matching `.d.ts`. ESM-only builds.
 

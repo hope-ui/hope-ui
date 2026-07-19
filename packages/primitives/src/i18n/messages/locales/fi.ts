@@ -5,7 +5,7 @@ import type { I18nCatalog } from "../messages";
  * A count other than 1 takes the partitive singular (`päivämäärää`); see `fi.md`.
  */
 export const MESSAGES_FI: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Sulje",
   },
   calendar: {

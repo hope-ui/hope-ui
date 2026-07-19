@@ -3,7 +3,7 @@ import { MESSAGES_EL } from "../el";
 
 describe("MESSAGES_EL", () => {
   it("carries the Greek translations", () => {
-    expect(MESSAGES_EL.dialog.close).toBe("Κλείσιμο");
+    expect(MESSAGES_EL.common.close).toBe("Κλείσιμο");
     expect(MESSAGES_EL.calendar.label).toBe("Ημερολόγιο");
     expect(MESSAGES_EL.calendar.today).toBe("Σήμερα");
   });

@@ -172,12 +172,13 @@ merits, so the design rules stand without reference to any specific library:
 - **`Polymorphic`/`PolymorphicProps<T>` generic `as`-prop machinery** is a known type-DX pain
   point when consumers wrap components in their own polymorphic layer — hope-ui hit a version
   of this exact tension in Phase 0 (see Status above), and uses `renderElement` instead.
-- **Higher-level primitives depending on sibling *component* packages** rather than a shared
-  kernel (e.g. a Popover package depending on a Dialog package, a Drawer package depending on a
-  Dialog package). Popover/Drawer aren't semantically "a kind of Dialog" — such coupling ties
-  their behavior to Dialog's internals and forces every non-modal floating consumer to pull in
-  Dialog's full machinery (scroll-lock, pinch-zoom prevention, focus-restore) even when unused.
-  Popover here composes the shared kernel directly and never imports Dialog.
+- **Coupling a component's *behavior* to a heavier sibling** rather than the shared kernel
+  (e.g. Popover or Drawer wiring their overlay behavior through Dialog). Popover/Drawer aren't
+  semantically "a kind of Dialog" — such coupling ties their behavior to Dialog's internals and
+  forces every non-modal floating consumer to pull in Dialog's full machinery (scroll-lock,
+  pinch-zoom prevention, focus-restore) even when unused. Popover composes the shared kernel
+  directly. (Reusing a *presentational leaf* like `CloseButton` across components is fine and
+  encouraged — the anti-pattern is behavioral coupling and circular imports, not reuse.)
 - **Per-package context boilerplate.** A dual public/internal context pair plus a bespoke
   keyed-context string-registry hand-rolled per package is the same boilerplate multiplication,
   relocated from per-component to per-package.
@@ -255,8 +256,9 @@ becomes an actual goal.
    **Rule:** Popover composes `createFloating` + `createDismissable` + `createPresence` +
    `createFocusRestore`. Dialog composes `createFocusTrap` + `createFocusRestore` +
    `createHideOutside` + `ModalBackdrop` + `createDismissable` + `createScrollLock` +
-   `createPresence`. Popover must never depend on Dialog — this directly avoids the
-   sibling-component coupling anti-pattern above. Note that focus *restore* is deliberately a separate primitive from
+   `createPresence`. Popover composes the kernel directly rather than routing its behavior through
+   Dialog's modal machinery — the anti-pattern above is behavioral coupling (and circular imports),
+   not reusing a presentational leaf like `CloseButton`. Note that focus *restore* is deliberately a separate primitive from
    the focus *trap*: Popover and Tooltip are non-modal and need restore without a trap, and
    welding the two together is precisely how a non-modal Dialog came to strand focus on
    `<body>`.

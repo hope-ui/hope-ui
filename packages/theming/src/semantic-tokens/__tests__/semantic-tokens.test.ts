@@ -11,8 +11,8 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     expect(new Set(SEMANTIC_COLOR_TOKENS).size).toBe(SEMANTIC_COLOR_TOKENS.length);
   });
 
-  it("is the full 141-token vocabulary", () => {
-    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(141);
+  it("is the full 144-token vocabulary", () => {
+    expect(SEMANTIC_COLOR_TOKENS).toHaveLength(144);
   });
 
   it("includes the surfaces, text ramp, on-state, role ladders, borders, collections and systemic tokens", () => {
@@ -76,6 +76,10 @@ describe("SEMANTIC_COLOR_TOKENS", () => {
     has("focus");
     has("focus-halo");
     has("scrim");
+    // Surface-adaptive close affordance (currentColor-derived wash + focus ring).
+    has("close-overlay-hovered");
+    has("close-overlay-pressed");
+    has("close-focus");
   });
 
   it("carries the two-tier role border across all 6 roles (`-line` strong + `-subtle-line` soft)", () => {

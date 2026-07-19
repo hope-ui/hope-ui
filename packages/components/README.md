@@ -97,10 +97,11 @@ model when you render a non-`<button>` element:
 - Compose behavior from `@hope-ui/primitives`; compute styling through `@hope-ui/theming`
   (`useRecipe`/`useSlots`/`useDefaults`). A component never declares its own recipe contract — the
   `RecipeRegistry` in theming is the single source of truth (no module augmentation).
-- **Never import from another component's subpath.** A higher-level component (e.g. Popover) must
-  compose the shared kernel directly — never `@hope-ui/components/dialog`, even when both are
-  "overlay-ish". This avoids the sibling-component coupling anti-pattern documented in
-  [`docs/plan.md`](../../docs/plan.md).
+- **You may reuse a sibling component** (e.g. `Dialog.Close` renders `@hope-ui/components/close-button`) —
+  a reusable leaf shouldn't be re-implemented; sibling subpaths stay external in the build, so reuse is
+  deduped. Two limits: no **circular** imports, and don't wire a component's *behavior* through a heavier
+  sibling — Popover composes the shared kernel (`createFloating`/`createDismissable`/…) directly rather
+  than depending on Dialog's modal machinery. See [`docs/plan.md`](../../docs/plan.md).
 
 ## Docs
 

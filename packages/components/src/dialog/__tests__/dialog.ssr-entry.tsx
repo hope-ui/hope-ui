@@ -1,3 +1,5 @@
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
 import { Dialog } from "../dialog";
@@ -11,7 +13,10 @@ import { Dialog } from "../dialog";
 //
 // `Dialog.Portal` renders nothing server-side and nothing while closed, so the server fixture is
 // just the trigger `<button>`; the Backdrop/Popup subtree still matters because it appears on the
-// client once the dialog opens.
+// client once the dialog opens. `Dialog.Close` now renders a recipe-styled `CloseButton`, so the tree
+// sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in CSS),
+// so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so it
+// must be present identically everywhere. See docs/theming.md.
 
 /**
  * `defaultOpen` is optional so the ssr test can also exercise the open server render (its `Portal`
@@ -20,17 +25,19 @@ import { Dialog } from "../dialog";
  */
 export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
   return (
-    <Dialog.Root defaultOpen={props?.defaultOpen}>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop />
-        <Dialog.Popup>
-          <Dialog.Title>Dialog title</Dialog.Title>
-          <Dialog.Description>Dialog description</Dialog.Description>
-          <Dialog.Close>Close</Dialog.Close>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <ThemeProvider preset={hope}>
+      <Dialog.Root defaultOpen={props?.defaultOpen}>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Popup>
+            <Dialog.Title>Dialog title</Dialog.Title>
+            <Dialog.Description>Dialog description</Dialog.Description>
+            <Dialog.Close />
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </ThemeProvider>
   );
 }
 

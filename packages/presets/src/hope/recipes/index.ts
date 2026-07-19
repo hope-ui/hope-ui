@@ -14,9 +14,11 @@
 import type { RecipeRegistry } from "@hope-ui/theming";
 import { badgeRecipe } from "./badge";
 import { buttonRecipe } from "./button";
+import { closeButtonRecipe } from "./close-button";
 
 /** The hope preset's recipe map — every component recipe hope implements, keyed by component name. */
 export const hopeRecipes = {
   badge: badgeRecipe,
   button: buttonRecipe,
+  closeButton: closeButtonRecipe,
 } satisfies RecipeRegistry;

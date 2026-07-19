@@ -1,3 +1,4 @@
+import { CloseButton, type CloseButtonProps } from "@hope-ui/components/close-button";
 import {
   type CreateDialogOptions,
   type CreateDialogPopupProps,
@@ -169,19 +170,25 @@ export const Description: Component<DialogDescriptionProps> = (props) => {
 
 // ---------- Close ----------
 
-export interface DialogCloseProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
-  render?: RenderProp<JSX.ButtonHTMLAttributes<HTMLButtonElement>>;
-}
+// `Dialog.Close` is a `CloseButton` with the dialog's close wiring — so it inherits
+// `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free, and shows the themed X by
+// default. Because it renders a recipe-styled `CloseButton`, `Dialog.Close` now **requires a
+// `<ThemeProvider>`** ancestor, like every other styled component (see `Dialog.md`).
+export interface DialogCloseProps extends CloseButtonProps {}
 
 export const Close: Component<DialogCloseProps> = (props) => {
   const state = useDialogContext();
+  // The primitive owns only the close `onClick` (composed in front of the consumer's, so their
+  // `preventDefault()` cancels the close). The label + visual + `type` default come from `CloseButton`.
+  // `render` is passed to `CloseButton` directly (not through the spread) — it is read synchronously
+  // to build the element, so a reactive spread-read would trip `STRICT_READ_UNTRACKED`.
   const close = createDialogClose(state, omit(props, "render"));
 
-  return renderElement<JSX.ButtonHTMLAttributes<HTMLButtonElement>>({
-    as: "button",
-    render: props.render,
-    props: close.props,
-  });
+  // `close.props` is typed as the primitive's `JSX.ButtonHTMLAttributes` (the hook can't reference the
+  // component's `CloseButtonProps` without a layering cycle), which widens `disabled` to Solid's
+  // `boolean | ""`. It still carries the consumer's `size`/`icon`/etc. at runtime, so cast back to the
+  // component surface for the spread.
+  return <CloseButton {...(close.props as CloseButtonProps)} render={props.render} />;
 };
 
 export const Dialog = { Root, Trigger, Portal, Backdrop, Popup, Title, Description, Close };

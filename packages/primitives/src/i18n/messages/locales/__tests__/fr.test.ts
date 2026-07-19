@@ -15,7 +15,7 @@ describe("MESSAGES_FR", () => {
   });
 
   it("carries the French translations", () => {
-    expect(MESSAGES_FR.dialog.close).toBe("Fermer");
+    expect(MESSAGES_FR.common.close).toBe("Fermer");
     expect(MESSAGES_FR.calendar.label).toBe("Calendrier");
     expect(MESSAGES_FR.calendar.today).toBe("Aujourd'hui");
     expect(MESSAGES_FR.calendar.previousLabel).toBe("Précédent");

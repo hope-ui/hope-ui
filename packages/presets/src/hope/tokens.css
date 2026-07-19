@@ -193,6 +193,18 @@
   --hope-focus-halo: color-mix(in oklab, var(--color-violet-600) 50%, transparent);
   --hope-scrim: color-mix(in oklab, var(--color-neutral-900) 50%, transparent);
 
+  /*
+   * Surface-adaptive close affordance (see `@hope-ui/components/close-button`). Unlike every token
+   * above, these mix against `currentColor` — the glyph's inherited color — not a fixed shade, so a
+   * close button reads correctly on any surface (solid / soft / light / dark) without a colorScheme.
+   * `currentColor` resolves at the use site, so there is deliberately **no `.dark` counterpart** —
+   * it already flips per surface. The `color-mix` lives here (the preset owns raw color math); the
+   * recipe references only the finished `bg-close-overlay-*` / `ring-close-focus` utilities.
+   */
+  --hope-close-overlay-hovered: color-mix(in oklab, currentColor 10%, transparent);
+  --hope-close-overlay-pressed: color-mix(in oklab, currentColor 15%, transparent);
+  --hope-close-focus: color-mix(in oklab, currentColor 40%, transparent);
+
   /* Opacity axis (dim applied to a disabled control / to content obscured while loading) */
   --hope-opacity-disabled: 0.4;
   --hope-opacity-loading: 1;

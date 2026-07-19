@@ -1,6 +1,7 @@
 # `createDialogClose`
 
-The close part of the [dialog hook family](../root/dialog-root.md). A button that closes the dialog.
+The close part of the [dialog hook family](../root/dialog-root.md). Injects the dialog's
+close-on-click behavior onto a button — and nothing else.
 
 ```ts
 function createDialogClose(
@@ -9,14 +10,20 @@ function createDialogClose(
 ): { props: JSX.ButtonHTMLAttributes<HTMLButtonElement> };
 ```
 
-Returns merged button `props`: `type` defaults to `"button"`, and an `onClick` that closes the
-dialog, composed **behind** the consumer's own `onClick` (via `composeEventHandlers`) so
-`event.preventDefault()` cancels the close — the mirror of `createDialogTrigger`.
+Returns merged button `props`: an `onClick` that closes the dialog, composed **in front of** the
+consumer's own `onClick` (via `composeEventHandlers`) so `event.preventDefault()` cancels the close —
+the mirror of `createDialogTrigger`. Every other prop passes through unchanged.
 
-## Accessible name
+## Minimal by design — no label, no `type` default
 
-`aria-label` defaults to the localized `dialog.close` message ("Close" / "Fermer", via
-`@hope-ui/primitives/i18n`), so an **icon-only** close button is labelled with no extra work. A
-consumer `aria-label` wins. If the button carries its own visible text, pass a matching `aria-label`
-(or accept that the localized default becomes the accessible name) to avoid a label-in-name mismatch.
+This hook is deliberately **minimal**: it owns only the close `onClick`. It sets **no**
+`aria-label` and **no** `type="button"` of its own. Those defaults live one layer up, in the
+[`CloseButton`](../../../components/close-button/close-button.md) component (over the
+[`createButton`](../../internal/create-button/create-button.md) primitive) that
+`@hope-ui/components`' `Dialog.Close` renders — so each default has a single owner and there is no
+double-ownership between the hook and the component.
 
+The accessible name is therefore still the localized `common.close` message ("Close" / "Fermer"), but
+it is `CloseButton` that provides it, not this hook. A **headless** consumer wiring `createDialogClose`
+directly onto a bare `<button>` (rather than through `CloseButton`) supplies its own `aria-label` and
+`type="button"`.

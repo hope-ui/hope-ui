@@ -45,6 +45,10 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
     repoRoot,
     "packages/components/src/button/__tests__/button-icons.ssr-entry.tsx",
   ),
+  "close-button": join(
+    repoRoot,
+    "packages/components/src/close-button/__tests__/close-button.ssr-entry.tsx",
+  ),
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
   calendar: join(repoRoot, "packages/components/src/calendar/__tests__/calendar.ssr-entry.tsx"),
   "theme-context": join(

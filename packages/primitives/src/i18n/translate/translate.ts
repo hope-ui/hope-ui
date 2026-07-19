@@ -35,7 +35,7 @@ export interface I18nMessagesConfig {
   /** Delegate to the app pipeline. Return `null`/`undefined` on a miss to use the built-in default. */
   translate?: I18nTranslateOverride;
   /**
-   * Coarse per-locale, per-key override without a pipeline: `{ fr: { "dialog.close": "Fermer" } }`.
+   * Coarse per-locale, per-key override without a pipeline: `{ fr: { "common.close": "Fermer" } }`.
    * Values use `{{param}}` placeholders. Consulted after {@link I18nMessagesConfig.translate}, before
    * the built-in catalog.
    */

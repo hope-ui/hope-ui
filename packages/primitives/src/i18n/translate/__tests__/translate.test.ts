@@ -7,13 +7,13 @@ const fr = () => "fr-FR";
 describe("createTranslate — resolution order", () => {
   it("falls back to the built-in English catalog with no config", () => {
     const t = createTranslate(en, () => undefined);
-    expect(t("dialog.close")).toBe("Close");
+    expect(t("common.close")).toBe("Close");
     expect(t("calendar.today")).toBe("Today");
   });
 
   it("selects the French catalog for a locale starting with 'fr'", () => {
     const t = createTranslate(fr, () => undefined);
-    expect(t("dialog.close")).toBe("Fermer");
+    expect(t("common.close")).toBe("Fermer");
     expect(t("calendar.today")).toBe("Aujourd'hui");
   });
 
@@ -24,9 +24,9 @@ describe("createTranslate — resolution order", () => {
   });
 
   it("lets a per-key `messages` override win over the built-in catalog", () => {
-    const config: I18nMessagesConfig = { messages: { "en-US": { "dialog.close": "Dismiss" } } };
+    const config: I18nMessagesConfig = { messages: { "en-US": { "common.close": "Dismiss" } } };
     const t = createTranslate(en, () => config);
-    expect(t("dialog.close")).toBe("Dismiss");
+    expect(t("common.close")).toBe("Dismiss");
     // A key without an override still falls through to the built-in.
     expect(t("calendar.today")).toBe("Today");
   });
@@ -40,9 +40,9 @@ describe("createTranslate — resolution order", () => {
   });
 
   it("lets the `translate` overlay win over everything, and falls through on null", () => {
-    const translate = vi.fn((key: string) => (key === "dialog.close" ? "X" : null));
+    const translate = vi.fn((key: string) => (key === "common.close" ? "X" : null));
     const t = createTranslate(en, () => ({ translate }));
-    expect(t("dialog.close")).toBe("X"); // overlay hit
+    expect(t("common.close")).toBe("X"); // overlay hit
     expect(t("calendar.today")).toBe("Today"); // overlay returned null → built-in
     expect(translate).toHaveBeenCalledWith("calendar.today", undefined, "en-US");
   });
@@ -53,8 +53,8 @@ describe("createTranslate — resolution order", () => {
       () => locale,
       () => undefined,
     );
-    expect(t("dialog.close")).toBe("Close");
+    expect(t("common.close")).toBe("Close");
     locale = "fr-FR";
-    expect(t("dialog.close")).toBe("Fermer");
+    expect(t("common.close")).toBe("Fermer");
   });
 });

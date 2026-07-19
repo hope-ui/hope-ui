@@ -11,6 +11,7 @@
       "badge": "src/badge/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
+      "close-button": "src/close-button/index.ts",
       "dialog": "src/dialog/index.ts"
     }
   },
@@ -26,6 +27,10 @@
     "./calendar": {
       "types": "./dist/calendar/index.d.ts",
       "solid": "./dist/calendar/index.jsx"
+    },
+    "./close-button": {
+      "types": "./dist/close-button/index.d.ts",
+      "solid": "./dist/close-button/index.jsx"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",

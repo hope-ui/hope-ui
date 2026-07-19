@@ -2,7 +2,7 @@ import type { I18nCatalog } from "../messages";
 
 /** Built-in **Danish** (`da`) catalog. Contract + shape: `../messages.ts`; registered in `catalogs.ts`. */
 export const MESSAGES_DA: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Luk",
   },
   calendar: {

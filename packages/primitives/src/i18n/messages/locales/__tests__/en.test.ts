@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { MESSAGES_EN } from "../en";
 
 describe("MESSAGES_EN", () => {
-  it("keeps hope-ui's current English calendar/dialog string values", () => {
+  it("keeps hope-ui's current English calendar/common string values", () => {
     // These feed the committed calendar SSR fixture (pinned to en-US) — they must not drift.
-    expect(MESSAGES_EN.dialog.close).toBe("Close");
+    expect(MESSAGES_EN.common.close).toBe("Close");
     expect(MESSAGES_EN.calendar.label).toBe("Calendar");
     expect(MESSAGES_EN.calendar.previousLabel).toBe("Previous");
     expect(MESSAGES_EN.calendar.nextLabel).toBe("Next");

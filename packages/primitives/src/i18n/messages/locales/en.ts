@@ -6,7 +6,7 @@ import type { I18nCatalog } from "../messages";
  * strings into its own translation pipeline's catalog. Contract + shape: `../messages.ts`.
  */
 export const MESSAGES_EN: I18nCatalog = {
-  dialog: {
+  common: {
     close: "Close",
   },
   calendar: {

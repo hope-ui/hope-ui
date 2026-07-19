@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { BadgeRecipeVariants, BadgeSlot } from "../../recipes/badge";
 import type { ButtonRecipeVariants, ButtonSlot } from "../../recipes/button";
+import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../../recipes/close-button";
 import type { SlotClassFn } from "../../recipes/slot-recipe";
 import { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "../recipe-registry";
 
@@ -21,6 +22,10 @@ const _theme = {
     startDecorator: () => "btn__start",
     endDecorator: () => "btn__end",
     loader: () => "btn__loader",
+  }),
+  closeButton: (props?: CloseButtonRecipeVariants): Record<CloseButtonSlot, SlotClassFn> => ({
+    root: () => `close close--${props?.size ?? "sm"}`,
+    icon: () => "close__icon",
   }),
 } satisfies RecipeRegistry;
 void _theme;

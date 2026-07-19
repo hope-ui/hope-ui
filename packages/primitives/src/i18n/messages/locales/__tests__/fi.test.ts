@@ -3,7 +3,7 @@ import { MESSAGES_FI } from "../fi";
 
 describe("MESSAGES_FI", () => {
   it("carries the Finnish translations", () => {
-    expect(MESSAGES_FI.dialog.close).toBe("Sulje");
+    expect(MESSAGES_FI.common.close).toBe("Sulje");
     expect(MESSAGES_FI.calendar.label).toBe("Kalenteri");
     expect(MESSAGES_FI.calendar.today).toBe("Tänään");
   });

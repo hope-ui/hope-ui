@@ -1,9 +1,22 @@
 import ssrFixture from "virtual:hydration-fixture?id=dialog";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
+import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Dialog } from "../dialog";
+
+// `Dialog.Close` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
+// `common.close` → accessible name "Close"), so any tree that renders it must sit under a
+// `<ThemeProvider>` fed the `hope` preset. It is a zero-DOM provider (its token values live in CSS).
+// The Close button is still located by its accessible name — `getByRole("button", { name: "Close" })`
+// — which the default `aria-label` keeps stable, so the interaction assertions are unchanged.
+function Themed(props: { children: JSX.Element }): JSX.Element {
+  return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
+}
+
 // Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
 // `.html`). `Tree` is the same tree `dialog.ssr.test.tsx` inline-snapshots and the bridge renders,
 // so the hydration input and the client tree cannot structurally diverge. The interaction tests
@@ -21,21 +34,23 @@ import { Tree } from "./dialog.ssr-entry";
  */
 function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
   return (
-    <Dialog.Root onOpenChange={props.onOpenChange}>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        {/* Headless: no default styles. Given real positioning/dimensions here so
-        real clicks land where a consumer's own CSS would put them in practice — a
-        `position: fixed` backdrop otherwise paints above a non-positioned (static)
-        Popup regardless of DOM order, which would make Popup's own content unclickable. */}
-        <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-        <Dialog.Popup style={{ position: "relative" }}>
-          <Dialog.Title>Dialog title</Dialog.Title>
-          <Dialog.Description>Dialog description</Dialog.Description>
-          <Dialog.Close>Close</Dialog.Close>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <Themed>
+      <Dialog.Root onOpenChange={props.onOpenChange}>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          {/* Backdrop/Popup given real positioning/dimensions here so real clicks land where a
+          consumer's own CSS would put them in practice — a `position: fixed` backdrop otherwise paints
+          above a non-positioned (static) Popup regardless of DOM order, which would make Popup's own
+          content unclickable. */}
+          <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+          <Dialog.Popup style={{ position: "relative" }}>
+            <Dialog.Title>Dialog title</Dialog.Title>
+            <Dialog.Description>Dialog description</Dialog.Description>
+            <Dialog.Close />
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </Themed>
   );
 }
 
@@ -47,7 +62,7 @@ function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
  */
 function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () => void }) {
   return (
-    <>
+    <Themed>
       <p>
         <button type="button" data-testid="background-button" onClick={props.onBackgroundClick}>
           Background button
@@ -58,11 +73,11 @@ function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () =
         <Dialog.Portal>
           <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
             <Dialog.Title>Dialog title</Dialog.Title>
-            <Dialog.Close>Close</Dialog.Close>
+            <Dialog.Close />
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
-    </>
+    </Themed>
   );
 }
 
@@ -269,15 +284,17 @@ describe("Dialog", () => {
     // non-modal dialog — no focus trap, no scroll lock, no aria-modal.
     function Wrapper(props: { modal?: boolean }) {
       return (
-        <Dialog.Root modal={props.modal}>
-          <Dialog.Trigger>Open dialog</Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Popup>
-              <Dialog.Title>Title</Dialog.Title>
-              <Dialog.Close>Close</Dialog.Close>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <Themed>
+          <Dialog.Root modal={props.modal}>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Popup>
+                <Dialog.Title>Title</Dialog.Title>
+                <Dialog.Close />
+              </Dialog.Popup>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </Themed>
       );
     }
 
@@ -543,16 +560,18 @@ describe("Dialog", () => {
 
   it("lets a consumer's onClick cancel the close with preventDefault", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          {/* Positioned, because a modal dialog always renders a `position: fixed`
-          `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md. */}
-          <Dialog.Popup style={{ position: "fixed" }}>
-            <Dialog.Title>Title</Dialog.Title>
-            <Dialog.Close onClick={(event) => event.preventDefault()}>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            {/* Positioned, because a modal dialog always renders a `position: fixed`
+            `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md. */}
+            <Dialog.Popup style={{ position: "fixed" }}>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Close onClick={(event) => event.preventDefault()} />
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Close" }));
@@ -582,15 +601,17 @@ describe("Dialog", () => {
     // with no Title mounted — and `merge` let that `undefined` erase the consumer's value,
     // leaving the dialog with no accessible name at all.
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <h2 id="external-heading">Heading outside the popup</h2>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup aria-labelledby="external-heading">
-            <Dialog.Close>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <h2 id="external-heading">Heading outside the popup</h2>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Popup aria-labelledby="external-heading">
+              <Dialog.Close />
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -624,16 +645,18 @@ describe("Dialog", () => {
 
   it("supports role='alertdialog' (the APG alert dialog pattern)", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Delete everything</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup role="alertdialog">
-            <Dialog.Title>Are you sure?</Dialog.Title>
-            <Dialog.Description>This cannot be undone.</Dialog.Description>
-            <Dialog.Close>Cancel</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger>Delete everything</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Popup role="alertdialog">
+              <Dialog.Title>Are you sure?</Dialog.Title>
+              <Dialog.Description>This cannot be undone.</Dialog.Description>
+              <Dialog.Close />
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Delete everything" }));
@@ -672,14 +695,16 @@ describe("Dialog", () => {
   it("merges a consumer `ref` on Popup with the internal one", async () => {
     let consumerRef: HTMLElement | undefined;
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Popup ref={(el: HTMLDivElement) => (consumerRef = el)}>
-            <Dialog.Title>Title</Dialog.Title>
-            <Dialog.Close>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Popup ref={(el: HTMLDivElement) => (consumerRef = el)}>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Close />
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
