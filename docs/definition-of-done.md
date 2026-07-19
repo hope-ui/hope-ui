@@ -52,6 +52,22 @@ string, outside an `it.skip`, and not merely imported — every one of those loo
 live at some point, and Dialog exercised three at once while the docs claimed it had a
 hydration test.
 
+**Component-capable slots carry an extra, conditional obligation** (author discipline —
+`check:coverage-parity` can't detect it, since it needs type + control-flow analysis). A slot
+whose content can be a component arriving via a **prop/getter** (`startDecorator={<Icon/>}`,
+`loadingText`) is created lazily on every read, so resolve it once with `children()` and read the
+resolved accessor everywhere — and prove the guarantee that applies:
+- Read **inside a `<Show>`** — the SSR + hydration round-trip above already covers it (a lazy
+  component there mis-keys and mis-hydrates without the fix; `button-icons`/`badge-icons`).
+- Read **more than once** in a render (a `!= null` gate + the render, a placement decision, …) —
+  add a **single-creation test** that counts real constructions, like
+  `button-slot-resolution.browser.test.tsx`. Without it a reintroduced raw multi-read silently
+  builds the component `N` times and passes every other check.
+
+Neither applies to a slot read exactly once, unconditionally, or to a static/directly-written
+child — a reflexive `children()` there only adds a memo and shifts `_hk`. Full decision procedure:
+`docs/solid-2.0-notes.md` (search "rendered lazily inside a `<Show>`").
+
 **Read `docs/testing.md` before writing any test.** Three Vitest projects, one job and
 one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
 (node, **server** builds of `solid-js` *and* `@solidjs/web`, the HTML a server sends),

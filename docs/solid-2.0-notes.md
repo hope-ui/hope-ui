@@ -179,3 +179,22 @@ actual installed package):
   a *second* component instance, which double-claims the server node on hydrate and silently
   drops it. Pinned in `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` and
   regression-tested by `button-icons`/`badge-icons` (`packages/components/src/{button,badge}/__tests__/`).
+- **A JSX-element *prop* read more than once is built more than once — `children()` also fixes
+  this, independently of `<Show>`/SSR.** The double-read above is one instance of a broader axis:
+  a consumer's `x={<Icon/>}` compiles to a getter that runs `createComponent(Icon)` on **every**
+  read, so reading the same prop in `N` places within one render — a `!= null` gate, a placement
+  decision, and the render, say — builds it `N` times and discards `N−1`. This bites with **no**
+  `<Show>` and **no** SSR involved; it is pure wasted work (and lost internal state) on the client.
+  Button's `loadingText` (`JSX.Element | (() => JSX.Element)`) was the real case: read three ways
+  (loader-placement, label gate, label render), so a loading render constructed it three times.
+  **Fix is the same** `children()`-once-then-read-the-accessor. Two caveats that matter when
+  deciding whether a slot needs it: (1) a **static element child** (`<Button><Icon/></Button>`) is
+  compiled to a value created **once** — not a getter — so it never multiplies and needs nothing;
+  only *props* carrying JSX are lazy getters. (2) `children()` is **lazy and per-mount**: it
+  memoizes within a mount but does **not** survive unmount/remount, so a conditionally-rendered
+  slot (e.g. `loadingText`, shown only while loading) is still legitimately re-created each time it
+  re-enters — that is Solid's normal conditional-render model, not a leak, and `children()` does not
+  (and should not) change it. So: use `children()` for a component-capable slot read inside a
+  `<Show>` (hydration) **or** read more than once (single creation); a slot read exactly once,
+  unconditionally, needs neither — a reflexive `children()` only adds a memo and shifts `_hk`.
+  Regression-tested by `button-slot-resolution.browser.test.tsx` (counts real constructions).

@@ -372,6 +372,12 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `solid-refresh` HMR breaks prop forwarding for imported components; `refresh: { disabled: true }`
   in `vitest.config.ts`.
 - Browser tests import `page` from `vitest/browser`, not the deprecated `@vitest/browser/context`.
+- A component arriving via a **prop/getter** (`startDecorator={<Icon/>}`, `loadingText`) is created
+  lazily on *every* read. Resolve it once with `children()` in the body — and read the resolved
+  accessor everywhere — when it's read **inside a `<Show>`** (else hydration keys misalign) **or**
+  read **more than once** (else it's constructed repeatedly). Not for a slot read once,
+  unconditionally, nor for a static/directly-written child. Full decision procedure + non-triggers:
+  `docs/solid-2.0-notes.md` (search "rendered lazily inside a `<Show>`").
 
 ## In development, `@hope-ui/*` always resolves to `src` — never to a sibling's `dist`
 
