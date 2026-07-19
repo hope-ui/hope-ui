@@ -379,10 +379,14 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - Browser tests import `page` from `vitest/browser`, not the deprecated `@vitest/browser/context`.
 - A component arriving via a **prop/getter** (`startDecorator={<Icon/>}`, `loadingText`) is created
   lazily on *every* read. Resolve it once with `children()` in the body — and read the resolved
-  accessor everywhere — when it's read **inside a `<Show>`** (else hydration keys misalign) **or**
-  read **more than once** (else it's constructed repeatedly). Not for a slot read once,
-  unconditionally, nor for a static/directly-written child. Full decision procedure + non-triggers:
-  `docs/solid-2.0-notes.md` (search "rendered lazily inside a `<Show>`").
+  accessor everywhere — **iff it is read more than once** in a render. That single axis covers both
+  reasons: repeated construction (waste), and the one hydration case — the `<Show when={x != null}>`
+  + `{x}` idiom, whose `when`-gate read builds and discards a component whose `_hk` the client and
+  server place differently, so `children()` is *load-bearing* there, not just an optimization. A
+  slot read **exactly once — `<Show>` or not — needs nothing** (a single read inside a `<Show>`
+  hydrates fine; it is the second, `when`-gate read that misaligns, not the `<Show>`). Also nothing
+  for a static/directly-written child. Full decision procedure + non-triggers:
+  `docs/solid-2.0-notes.md` (search "`children()` decision procedure").
 
 ## In development, `@hope-ui/*` always resolves to `src` — never to a sibling's `dist`
 

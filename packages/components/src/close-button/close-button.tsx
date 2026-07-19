@@ -144,8 +144,10 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
   // The glyph is a **component** (the built-in `<CloseIcon/>` or a consumer `icon={<MyIcon/>}`/factory),
   // rendered **once, unconditionally** — there is always exactly one glyph and no `<Show>` — and
   // `merged.icon` is read **exactly once** here. Per the codified `children()` decision procedure
-  // (CLAUDE.md / docs/solid-2.0-notes.md), neither trigger applies (no `<Show>`-gated read, no
-  // multi-read), so `children()` is deliberately NOT used — it would only add a memo and shift `_hk`.
+  // (CLAUDE.md / docs/solid-2.0-notes.md), the trigger is a component-valued prop read *more than
+  // once*; a single read needs nothing (and a lone read wouldn't hit the hydration case even inside
+  // a `<Show>` — that is the `when`+body double read). So `children()` is deliberately NOT used — it
+  // would only add a memo and shift `_hk`.
   //
   // First-child safety: the glyph is wrapped in a host `<span>`, so the hydration-keyed `<button>`'s
   // first child is always a host element, never the component (the `solid2-first-child-component-

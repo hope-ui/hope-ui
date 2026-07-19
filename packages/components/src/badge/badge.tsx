@@ -96,17 +96,17 @@ export const Badge: Component<BadgeProps> = (props) => {
     "children",
   );
 
-  // A slot whose content is a **component** (a consumer's `startDecorator={<Icon/>}` compiles to a
-  // lazy getter that runs `createComponent` where the prop is read) must be created **eagerly**, in
-  // the component body — never lazily inside a `<Show>`-gated slot span's reactive `insert`. A
-  // component created lazily inside a `<Show>` computes a hydration key one off from the server's and
-  // fails to hydrate (an upstream `@solidjs/web` beta asymmetry — see `docs/solid-2.0-notes.md`).
-  // Solid's `children` helper resolves each slot's content once (eagerly, matching a direct child
-  // element, which hydrates cleanly) and memoizes it. Each `<Show>` then gates on the **resolved**
-  // accessor — the raw prop must be read only once (a second read, e.g. a `!= null` gate, would run
-  // the consumer getter again and create a *second* component instance, which double-claims the
-  // server node on hydrate). Unlike Button, Badge's label is `<Show>`-gated too, so it needs the same
-  // treatment as the decorators. See docs/solid-2.0-notes.md.
+  // Each of these slots is read in a `<Show>`'s `when` gate AND in its body below, so the raw prop
+  // would be read **more than once** — the operative `children()` trigger. A consumer's
+  // `startDecorator={<Icon/>}` compiles to a lazy getter that runs `createComponent` on every read;
+  // `children` resolves each slot once and memoizes it, so both read sites share one node. That also
+  // fixes hydration: the *gate* read is the hazard — a raw-prop `when={x != null}` builds and
+  // discards a component whose hydration key the client and server place differently (an upstream
+  // `@solidjs/web` beta asymmetry — see `docs/solid-2.0-notes.md`), so the body node mis-hydrates.
+  // Gating on the **resolved** accessor (`when={startDecorator() != null}`) removes that phantom
+  // build; the single resolved component is created in the ambient owner like a direct child. (A
+  // single read inside a `<Show>` would need nothing — it is the `when`+body pair that does.) Unlike
+  // Button, Badge's label is `<Show>`-gated too, so it gets the same treatment as the decorators.
   const startDecorator = children(() => merged.startDecorator);
   const label = children(() => merged.children);
   const endDecorator = children(() => merged.endDecorator);

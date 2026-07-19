@@ -155,18 +155,21 @@ export const Button: Component<ButtonProps> = (props) => {
 
   // Every slot whose content can be a **component** is resolved **once**, here in the component body,
   // through Solid's `children` helper — and every read site below uses the resolved accessor, never
-  // the raw prop. This buys two distinct guarantees:
-  //   1. Hydration. A consumer's `startDecorator={<Icon/>}` compiles to a lazy getter that runs
-  //      `createComponent` where the prop is read. Read *inside* a `<Show>`-gated slot span, that
-  //      component computes a hydration key one off from the server's and fails to hydrate (an
-  //      upstream `@solidjs/web` beta asymmetry — see `docs/solid-2.0-notes.md`). `children` resolves
-  //      it eagerly in the ambient owner (matching a direct child element, which hydrates cleanly).
-  //   2. Single creation. A JSX-element prop getter re-runs `createComponent` on *every* read, so a
+  // the raw prop. The operative trigger is that each of these is read **more than once** in this
+  // render; `children` memoizes the resolution so every accessor read returns the same node. That
+  // buys two guarantees on that one axis:
+  //   1. Single creation. A JSX-element prop getter re-runs `createComponent` on *every* read, so a
   //      prop read in more than one place — a `!= null` gate plus the render, or across a reactive
-  //      re-run — would construct the component two or more times and discard the extras. `children`
-  //      memoizes the resolution, so every accessor read returns the same node. This is why
+  //      re-run — would construct the component two or more times and discard the extras. This is why
   //      `loadingText` (read three ways: the loader-placement decision, the label gate, and the label
   //      render) and the `label` itself go through `children` too, not only the decorators.
+  //   2. Hydration (the decorators specifically). A decorator is read in a `<Show>`'s `when` gate
+  //      (`when={startDecorator() != null}`) AND in its body — the double read whose *gate* half is
+  //      the hazard. A raw-prop `when` read builds and discards a component whose hydration key the
+  //      client and server place differently (an upstream `@solidjs/web` beta asymmetry — see
+  //      `docs/solid-2.0-notes.md`), so the body node mis-hydrates. Reading the **resolved** accessor
+  //      in the gate removes the phantom build. (A single read inside a `<Show>` would be fine; it is
+  //      the `when`+body pair that isn't.)
   const startDecorator = children(() => merged.startDecorator);
   const endDecorator = children(() => merged.endDecorator);
   const loader = children(() => runIfFunction(merged.loader) ?? <ButtonLoader />);

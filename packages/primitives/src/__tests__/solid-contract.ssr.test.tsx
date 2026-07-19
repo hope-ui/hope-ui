@@ -67,38 +67,47 @@ describe("solid-js server-build contract", () => {
   });
 });
 
-describe("solid-js server-build contract: component inside <Show> and the children() realignment", () => {
+describe("solid-js server-build contract: the <Show> `when`-gate read is the extra hydration key", () => {
   // Depended on by: `@hope-ui/components` Button and Badge slot rendering
-  // (packages/components/src/{button,badge}/*.tsx). This pins the upstream behavior behind the
-  // long-standing "component inside a <Show> breaks hydration" bug (solidjs/solid#2384,
-  // solidjs/solid-start#1089), still present in the 2.0 beta line.
+  // (packages/components/src/{button,badge}/*.tsx). This pins the *server* half of the long-standing
+  // "component inside a <Show> breaks hydration" bug (solidjs/solid#2384, solidjs/solid-start#1089),
+  // still present in the 2.0 beta line — and, crucially, isolates the actual cause.
   //
-  // A component passed as a prop and read inside a <Show>-gated element is created LAZILY: the
-  // consumer's `x={<Icon/>}` compiles to a getter that runs `createComponent(Icon)` where the prop
-  // is *read* — inside the <Show>'s reactive `insert`. On the SERVER, `createComponent(Comp) ===
-  // Comp()` with no owner, so the component's root element allocates its hydration key from the
-  // ambient owner. On the CLIENT (dev build) `createComponent` wraps `Comp` in a transparent
-  // `createRoot`, and the client <Show> nests children under memo/insert-effect owners the server
-  // <Show> does not — so the component's `_hk` comes out one off and `hydrate()` claims the wrong
-  // node. A *directly-written* child element (`<span><Icon/></span>`) escapes this because it is
-  // created eagerly during the span's construction, in the ambient owner — matching the server.
+  // A component passed as a prop is created LAZILY: the consumer's `x={<Icon/>}` compiles to a getter
+  // that runs `createComponent(Icon)` where the prop is *read*. What breaks hydration is NOT merely
+  // reading it inside a <Show> — it is reading it in the <Show>'s `when` gate AND again in its body
+  // (the idiomatic `when={x != null}` + `{x}`). The `when` read builds a component only to test
+  // truthiness and discards it, but still allocates a hydration key; the client evaluates `when`
+  // under a memo/insert-effect owner the server does not, so that discarded key lands at a different
+  // position on each side and the real body node comes out one `_hk` off. Isolated round-trips (see
+  // the browser suite / button-icons / badge-icons) confirm the split: a single read inside a <Show>
+  // hydrates cleanly, and a double read that does not touch the `when` gate (both reads in the body,
+  // or no <Show> at all) hydrates cleanly — only `when`+body fails.
   //
-  // Solid's `children()` helper is the fix Button/Badge use: it resolves the slot's content once,
-  // eagerly, in the component body (like a direct child) and memoizes it, so the component's key is
-  // allocated in the ambient owner and hydration realigns. These pins characterize the *server*
-  // half — that `createComponent` keys the component's root inside a <Show>, and that resolving the
-  // same content through `children()` changes where that key is allocated. They fail if a future
-  // solid changes `createComponent`'s owner treatment (i.e. the day the upstream bug is fixed and
+  // These are *server*-side pins of the mechanism: the sole difference between `WhenGateAndBody` and
+  // `BodyOnly` is the extra `when`-gate read, and it shows up as exactly one extra allocated `_hk`.
+  // `children()` (the Button/Badge fix) resolves the slot once in the ambient owner, so the `when`
+  // gate reads the memoized accessor — no phantom build — and the key relocates. They fail if a
+  // future solid changes `createComponent`'s owner treatment (the day the upstream bug is fixed and
   // the `children()` indirection can be dropped).
 
   const Icon = (): JSX.Element => <svg data-icon="1" />;
 
-  // A component passed as a prop and read inside a <Show>, the two ways it can be rendered.
-  const Lazy = (props: { icon?: JSX.Element }): JSX.Element => (
+  // The failing idiom: the prop is read in the `when` gate AND the body.
+  const WhenGateAndBody = (props: { icon?: JSX.Element }): JSX.Element => (
     <Show when={props.icon != null}>
       <span data-slot="s">{props.icon}</span>
     </Show>
   );
+  // The control: the <Show> gates on an unrelated flag, so the prop is read exactly ONCE, in the
+  // body. Same <Show>, but no `when`-gate read — this is the shape that hydrates cleanly, and it
+  // proves the <Show> itself is not the cause.
+  const BodyOnly = (props: { icon?: JSX.Element; show?: boolean }): JSX.Element => (
+    <Show when={props.show}>
+      <span data-slot="s">{props.icon}</span>
+    </Show>
+  );
+  // The fix: resolve once with `children()`, read the accessor in both the gate and the body.
   const Eager = (props: { icon?: JSX.Element }): JSX.Element => {
     const icon = children(() => props.icon);
     return (
@@ -108,22 +117,30 @@ describe("solid-js server-build contract: component inside <Show> and the childr
     );
   };
 
-  it("keys the component's root <svg> inside a <Show> both ways, but at a different position", async () => {
-    const lazy = await renderToStringAsync(() => <Lazy icon={<Icon />} />);
+  it("keys the body <svg> one position later when the prop is also read in the `when` gate", async () => {
+    const whenGateAndBody = await renderToStringAsync(() => <WhenGateAndBody icon={<Icon />} />);
+    const bodyOnly = await renderToStringAsync(() => <BodyOnly icon={<Icon />} show={true} />);
     const eager = await renderToStringAsync(() => <Eager icon={<Icon />} />);
 
-    // Same rendered structure: a keyed decorator span wrapping the component's keyed root <svg>.
-    for (const html of [lazy, eager]) {
+    // All three render the same structure: a keyed span wrapping the component's keyed root <svg>.
+    for (const html of [whenGateAndBody, bodyOnly, eager]) {
       expect(html).toMatch(/<span _hk=\S+ data-slot="s"><svg _hk=\S+ data-icon="1">/);
     }
 
-    // The pin: the svg (component root) carries its own `_hk` in both forms — `createComponent`
-    // keys the root even nested in a <Show> — yet the eager `children()` form allocates that key at
-    // a different position than the lazy prop-insert form. That relocation (into the ambient owner,
-    // ahead of the span) is exactly what lets the eager form hydrate where the lazy one cannot.
     const svgKey = (html: string) => html.match(/<svg _hk=(\S+) /)?.[1];
-    expect(svgKey(lazy)).toBeDefined();
+
+    // Isolation pin: `WhenGateAndBody` and `BodyOnly` are identical except for the extra `when`-gate
+    // read, and both sit inside a <Show> — so the <Show> is NOT the variable. The `when`-gate read
+    // (a built-then-discarded component) burns exactly one extra hydration key, so the rendered body
+    // <svg> keys one position later than the single-read control.
+    expect(svgKey(whenGateAndBody)).toBeDefined();
+    expect(svgKey(bodyOnly)).toBeDefined();
+    expect(svgKey(whenGateAndBody)).not.toBe(svgKey(bodyOnly));
+    expect(Number(svgKey(whenGateAndBody))).toBe(Number(svgKey(bodyOnly)) + 1);
+
+    // The fix relocates the key: `children()` allocates the component in the ambient owner (ahead of
+    // the span), a different position than either raw-prop form — which is what lets it hydrate.
     expect(svgKey(eager)).toBeDefined();
-    expect(svgKey(eager)).not.toBe(svgKey(lazy));
+    expect(svgKey(eager)).not.toBe(svgKey(whenGateAndBody));
   });
 });

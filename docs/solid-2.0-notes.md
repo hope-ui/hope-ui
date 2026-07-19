@@ -152,49 +152,49 @@ actual installed package):
   reappears, check this setting first before assuming a merge/omit bug.
 - Browser tests import `page` from `vitest/browser`, not the deprecated
   `@vitest/browser/context`.
-- **A *component* rendered lazily inside a `<Show>` fails to hydrate — resolve it eagerly
-  with `children()`.** Symptom: `Hydration tag mismatch for key "…": expected <svg> but
-  found <span>` (and historically a `getNextSibling` null crash), caught by the route error
-  boundary, which then silently client-renders — the console fills with errors and the SSR
-  benefit is lost. Trigger is a *conjunction*: (1) the content is a **component** created
-  **lazily** — a consumer's `startDecorator={<Icon/>}` compiles to a getter that runs
-  `createComponent(Icon)` where the prop is *read*, i.e. inside the slot's reactive `insert`
-  — **and** (2) that read happens inside a `<Show>` (keyed or not). Neither alone triggers
-  it: a lazy component in an *unconditional* slot hydrates fine (which is why Button's
-  unconditional label was always immune), and a *directly-written* child (`<span><Icon/></span>`)
-  inside a `<Show>` hydrates fine (it is created eagerly during the span's construction, in
-  the ambient owner). Root cause is an upstream `@solidjs/web` beta asymmetry (present through
-  at least `2.0.0-beta.20`; byte-identical between beta.19 and beta.20 in the relevant code):
-  on the **server** `createComponent(Comp) === Comp()` with no owner, so the component's root
-  keys off the ambient owner; on the **client** `createComponent` wraps `Comp` in a transparent
-  `createRoot`, and the client `<Show>` nests children under memo/insert-effect owners the
-  server `<Show>` does not — so the component's `_hk` comes out one off and `hydrate()` claims
-  the wrong node. This is the long-standing, still-open upstream bug (solidjs/solid#2384,
-  solidjs/solid-start#1089). **Fix (Button/Badge slots):** resolve each slot's content once,
-  eagerly, in the component body with Solid's `children()` helper, then render the resolved
-  accessor inside the `<Show>` — the component is then created in the ambient owner, exactly
-  like a direct child, and hydration realigns. Read the raw prop **only once**: gate the
-  `<Show>` on the *resolved* accessor (`when={startDecorator() != null}`), not the raw prop —
-  a second read (e.g. a `!= null` gate on the raw prop) re-runs the consumer getter and creates
-  a *second* component instance, which double-claims the server node on hydrate and silently
-  drops it. Pinned in `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` and
-  regression-tested by `button-icons`/`badge-icons` (`packages/components/src/{button,badge}/__tests__/`).
-- **A JSX-element *prop* read more than once is built more than once — `children()` also fixes
-  this, independently of `<Show>`/SSR.** The double-read above is one instance of a broader axis:
-  a consumer's `x={<Icon/>}` compiles to a getter that runs `createComponent(Icon)` on **every**
-  read, so reading the same prop in `N` places within one render — a `!= null` gate, a placement
-  decision, and the render, say — builds it `N` times and discards `N−1`. This bites with **no**
-  `<Show>` and **no** SSR involved; it is pure wasted work (and lost internal state) on the client.
-  Button's `loadingText` (`JSX.Element | (() => JSX.Element)`) was the real case: read three ways
-  (loader-placement, label gate, label render), so a loading render constructed it three times.
-  **Fix is the same** `children()`-once-then-read-the-accessor. Two caveats that matter when
-  deciding whether a slot needs it: (1) a **static element child** (`<Button><Icon/></Button>`) is
-  compiled to a value created **once** — not a getter — so it never multiplies and needs nothing;
-  only *props* carrying JSX are lazy getters. (2) `children()` is **lazy and per-mount**: it
-  memoizes within a mount but does **not** survive unmount/remount, so a conditionally-rendered
-  slot (e.g. `loadingText`, shown only while loading) is still legitimately re-created each time it
-  re-enters — that is Solid's normal conditional-render model, not a leak, and `children()` does not
-  (and should not) change it. So: use `children()` for a component-capable slot read inside a
-  `<Show>` (hydration) **or** read more than once (single creation); a slot read exactly once,
-  unconditionally, needs neither — a reflexive `children()` only adds a memo and shifts `_hk`.
-  Regression-tested by `button-slot-resolution.browser.test.tsx` (counts real constructions).
+- **The trigger for `children()` is a component-valued *prop* read more than once in a render —
+  and the `<Show>` `when`+body idiom is the special case where it is load-bearing for hydration.**
+  A consumer's `startDecorator={<Icon/>}` compiles to a getter that runs `createComponent(Icon)`
+  on **every** read, so reading the same prop in `N` places within one render builds it `N` times
+  and discards `N−1`. Resolve it **once** with Solid's `children()` in the component body and read
+  the memoized accessor everywhere. Two distinct guarantees, on two axes:
+  - **Single creation (always, no `<Show>`/SSR needed).** Button's `loadingText`
+    (`JSX.Element | (() => JSX.Element)`) was read three ways — the loader-placement decision, the
+    label gate, and the label render — so a loading render constructed it three times. Pure wasted
+    work (and lost internal state) on the client. `children()` collapses it to one construction.
+  - **Hydration (the `<Show>` `when`+body case).** `<Show when={x != null}>…{x}…</Show>` reads `x`
+    **twice**: once in the `when` gate and once in the body. The `when` read builds a component just
+    to test truthiness and **throws it away** — but it still allocates a hydration key, and `<Show>`
+    evaluates its `when` in a *different owner on the client than the server* (the client wraps it in
+    a memo/insert-effect owner; the server's `createComponent(Comp) === Comp()` runs in the ambient
+    owner). So the discarded component's key lands at a different position on each side and the real
+    body node comes out one `_hk` off: `Hydration tag mismatch for key "…": expected <svg> but found
+    <span>` (historically also a `getNextSibling` null crash), caught by the route error boundary,
+    which then silently client-renders — console fills with errors and the SSR benefit is lost.
+    Upstream `@solidjs/web` beta asymmetry, still open through at least `2.0.0-beta.20`
+    (solidjs/solid#2384, solidjs/solid-start#1089). `children()` fixes it because the `when` gate
+    then reads the **resolved** accessor (`when={startDecorator() != null}`) — no phantom build in
+    the gate, and the single resolved component is allocated in the ambient owner like a direct
+    child, so hydration realigns.
+- **What does *not* need `children()` — established with isolated SSR→hydrate round-trips, not just
+  reasoning:**
+  - **A single read — even inside a `<Show>`.** `<Show when={someFlag()}>{x}</Show>` reading `x`
+    once hydrates cleanly. It is **not** "read inside a `<Show>`" that breaks hydration (an earlier,
+    wrong framing); it is the *second* read, in the `when` gate. A `<Show>` on its own does not move
+    the key.
+  - **A double read that does not straddle the `when` gate.** Two reads confined to the body
+    (`{x != null ? x : null}`), or two reads with **no** `<Show>` at all, hydrate fine — the extra
+    build lands in the *same* owner on both sides, so the burned key is symmetric. (They still waste
+    a construction, so the single-creation axis may still want `children()` — just not for hydration.)
+  - **A static / directly-written child** (`<Button><Icon/></Button>`): compiled to a value created
+    **once**, not a getter, so it never multiplies. Only *props* carrying JSX are lazy getters.
+  - `children()` is also **lazy and per-mount**: it memoizes within a mount but does **not** survive
+    unmount/remount, so a conditionally-shown slot (e.g. `loadingText`) is legitimately re-created
+    each time it re-enters — Solid's normal conditional-render model, not a leak.
+  **`children()` decision procedure:** resolve once and read the accessor **iff the component-valued
+  prop is read more than once** in a render; a slot read exactly once — `<Show>` or not — needs
+  neither (a reflexive `children()` only adds a memo and shifts `_hk`). Pinned in
+  `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` (the `when`-gate read is the extra
+  key; a single body read inside a `<Show>` is not) and regression-tested by `button-icons`/
+  `badge-icons` (hydration round-trip) and `button-slot-resolution.browser.test.tsx` (counts real
+  constructions).

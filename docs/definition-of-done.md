@@ -55,18 +55,22 @@ hydration test.
 **Component-capable slots carry an extra, conditional obligation** (author discipline —
 `check:coverage-parity` can't detect it, since it needs type + control-flow analysis). A slot
 whose content can be a component arriving via a **prop/getter** (`startDecorator={<Icon/>}`,
-`loadingText`) is created lazily on every read, so resolve it once with `children()` and read the
-resolved accessor everywhere — and prove the guarantee that applies:
-- Read **inside a `<Show>`** — the SSR + hydration round-trip above already covers it (a lazy
-  component there mis-keys and mis-hydrates without the fix; `button-icons`/`badge-icons`).
-- Read **more than once** in a render (a `!= null` gate + the render, a placement decision, …) —
-  add a **single-creation test** that counts real constructions, like
+`loadingText`) is created lazily on every read. The single operative trigger is **read more than
+once** in a render; resolve it once with `children()`, read the resolved accessor everywhere, and
+prove the guarantee(s) that apply:
+- Multi-read that is the **`<Show when={x != null}>` + `{x}` idiom** — the SSR + hydration
+  round-trip above already covers it (without the fix the `when`-gate read mis-keys the body node
+  and it mis-hydrates; `button-icons`/`badge-icons`).
+- Any **multi-read** (a `!= null` gate + the render, a placement decision, …) — also add a
+  **single-creation test** that counts real constructions, like
   `button-slot-resolution.browser.test.tsx`. Without it a reintroduced raw multi-read silently
   builds the component `N` times and passes every other check.
 
-Neither applies to a slot read exactly once, unconditionally, or to a static/directly-written
-child — a reflexive `children()` there only adds a memo and shifts `_hk`. Full decision procedure:
-`docs/solid-2.0-notes.md` (search "rendered lazily inside a `<Show>`").
+A slot read **exactly once — inside a `<Show>` or not — needs nothing** (a single read inside a
+`<Show>` hydrates cleanly; the hydration hazard is the *second*, `when`-gate read, not the
+`<Show>`), nor does a static/directly-written child — a reflexive `children()` there only adds a
+memo and shifts `_hk`. Full decision procedure: `docs/solid-2.0-notes.md` (search "`children()`
+decision procedure").
 
 **Read `docs/testing.md` before writing any test.** Three Vitest projects, one job and
 one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
