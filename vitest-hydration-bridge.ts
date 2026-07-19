@@ -35,6 +35,7 @@ const repoRoot = import.meta.dirname;
  * no committed fixture file, ever.
  */
 export const HYDRATION_ENTRIES: Record<string, string> = {
+  alert: join(repoRoot, "packages/components/src/alert/__tests__/alert.ssr-entry.tsx"),
   badge: join(repoRoot, "packages/components/src/badge/__tests__/badge.ssr-entry.tsx"),
   "badge-icons": join(
     repoRoot,

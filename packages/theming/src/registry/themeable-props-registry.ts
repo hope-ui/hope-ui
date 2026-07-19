@@ -12,12 +12,14 @@
  * `ThemeablePropsOf` in `../../preset/preset`, whose `K extends keyof ThemeablePropsRegistry ? … :
  * RecipeVariantsOf<K>` fallback is what keeps this feature incremental.
  */
+import type { AlertThemeableProps } from "../recipes/alert";
 import type { BadgeThemeableProps } from "../recipes/badge";
 import type { ButtonThemeableProps } from "../recipes/button";
 import type { CloseButtonThemeableProps } from "../recipes/close-button";
 
 /** One entry per component that opts into behavioral/chrome (non-variant) app-wide defaults. */
 export interface ThemeablePropsRegistry {
+  alert: AlertThemeableProps;
   badge: BadgeThemeableProps;
   button: ButtonThemeableProps;
   closeButton: CloseButtonThemeableProps;

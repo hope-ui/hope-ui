@@ -3,6 +3,7 @@
 // `export * from "./recipes"` as the catalog grows. (The registries live in the top-level
 // `../registry` folder, re-exported by the root barrel directly — they are the contract *of* the
 // recipes, not a recipe.)
+export * from "./alert";
 export * from "./badge";
 export * from "./button";
 export * from "./close-button";

@@ -8,6 +8,7 @@
   "files": ["dist"],
   "hope": {
     "entries": {
+      "alert": "src/alert/index.ts",
       "badge": "src/badge/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
@@ -16,6 +17,10 @@
     }
   },
   "exports": {
+    "./alert": {
+      "types": "./dist/alert/index.d.ts",
+      "solid": "./dist/alert/index.jsx"
+    },
     "./badge": {
       "types": "./dist/badge/index.d.ts",
       "solid": "./dist/badge/index.jsx"

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { AlertRecipe } from "../../recipes/alert";
 import type { BadgeRecipe } from "../../recipes/badge";
 import type { ButtonRecipe } from "../../recipes/button";
 import type { CloseButtonRecipe } from "../../recipes/close-button";
@@ -14,6 +15,15 @@ const stubRecipe: ButtonRecipe = () => ({
   endDecorator: () => "",
   loader: () => "",
 });
+const stubAlertRecipe: AlertRecipe = () => ({
+  root: () => "",
+  icon: () => "",
+  content: () => "",
+  title: () => "",
+  description: () => "",
+  actions: () => "",
+  close: () => "",
+});
 const stubBadgeRecipe: BadgeRecipe = () => ({
   root: () => "",
   label: () => "",
@@ -26,6 +36,7 @@ const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
   icon: () => "",
 });
 const registry: RecipeRegistry = {
+  alert: stubAlertRecipe,
   badge: stubBadgeRecipe,
   button: stubRecipe,
   closeButton: stubCloseButtonRecipe,
