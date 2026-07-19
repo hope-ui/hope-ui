@@ -36,7 +36,15 @@ const repoRoot = import.meta.dirname;
  */
 export const HYDRATION_ENTRIES: Record<string, string> = {
   badge: join(repoRoot, "packages/components/src/badge/__tests__/badge.ssr-entry.tsx"),
+  "badge-icons": join(
+    repoRoot,
+    "packages/components/src/badge/__tests__/badge-icons.ssr-entry.tsx",
+  ),
   button: join(repoRoot, "packages/components/src/button/__tests__/button.ssr-entry.tsx"),
+  "button-icons": join(
+    repoRoot,
+    "packages/components/src/button/__tests__/button-icons.ssr-entry.tsx",
+  ),
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
   calendar: join(repoRoot, "packages/components/src/calendar/__tests__/calendar.ssr-entry.tsx"),
   "theme-context": join(

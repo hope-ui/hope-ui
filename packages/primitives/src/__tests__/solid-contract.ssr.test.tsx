@@ -1,5 +1,5 @@
-import { Dynamic, renderToStringAsync } from "@solidjs/web";
-import { createUniqueId } from "solid-js";
+import { Dynamic, type JSX, renderToStringAsync } from "@solidjs/web";
+import { children, createUniqueId, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -64,5 +64,66 @@ describe("solid-js server-build contract", () => {
     expect(keyOf(withoutId)).toBeDefined();
     expect(keyOf(withId)).toBeDefined();
     expect(keyOf(withId)).not.toBe(keyOf(withoutId));
+  });
+});
+
+describe("solid-js server-build contract: component inside <Show> and the children() realignment", () => {
+  // Depended on by: `@hope-ui/components` Button and Badge slot rendering
+  // (packages/components/src/{button,badge}/*.tsx). This pins the upstream behavior behind the
+  // long-standing "component inside a <Show> breaks hydration" bug (solidjs/solid#2384,
+  // solidjs/solid-start#1089), still present in the 2.0 beta line.
+  //
+  // A component passed as a prop and read inside a <Show>-gated element is created LAZILY: the
+  // consumer's `x={<Icon/>}` compiles to a getter that runs `createComponent(Icon)` where the prop
+  // is *read* — inside the <Show>'s reactive `insert`. On the SERVER, `createComponent(Comp) ===
+  // Comp()` with no owner, so the component's root element allocates its hydration key from the
+  // ambient owner. On the CLIENT (dev build) `createComponent` wraps `Comp` in a transparent
+  // `createRoot`, and the client <Show> nests children under memo/insert-effect owners the server
+  // <Show> does not — so the component's `_hk` comes out one off and `hydrate()` claims the wrong
+  // node. A *directly-written* child element (`<span><Icon/></span>`) escapes this because it is
+  // created eagerly during the span's construction, in the ambient owner — matching the server.
+  //
+  // Solid's `children()` helper is the fix Button/Badge use: it resolves the slot's content once,
+  // eagerly, in the component body (like a direct child) and memoizes it, so the component's key is
+  // allocated in the ambient owner and hydration realigns. These pins characterize the *server*
+  // half — that `createComponent` keys the component's root inside a <Show>, and that resolving the
+  // same content through `children()` changes where that key is allocated. They fail if a future
+  // solid changes `createComponent`'s owner treatment (i.e. the day the upstream bug is fixed and
+  // the `children()` indirection can be dropped).
+
+  const Icon = (): JSX.Element => <svg data-icon="1" />;
+
+  // A component passed as a prop and read inside a <Show>, the two ways it can be rendered.
+  const Lazy = (props: { icon?: JSX.Element }): JSX.Element => (
+    <Show when={props.icon != null}>
+      <span data-slot="s">{props.icon}</span>
+    </Show>
+  );
+  const Eager = (props: { icon?: JSX.Element }): JSX.Element => {
+    const icon = children(() => props.icon);
+    return (
+      <Show when={icon() != null}>
+        <span data-slot="s">{icon()}</span>
+      </Show>
+    );
+  };
+
+  it("keys the component's root <svg> inside a <Show> both ways, but at a different position", async () => {
+    const lazy = await renderToStringAsync(() => <Lazy icon={<Icon />} />);
+    const eager = await renderToStringAsync(() => <Eager icon={<Icon />} />);
+
+    // Same rendered structure: a keyed decorator span wrapping the component's keyed root <svg>.
+    for (const html of [lazy, eager]) {
+      expect(html).toMatch(/<span _hk=\S+ data-slot="s"><svg _hk=\S+ data-icon="1">/);
+    }
+
+    // The pin: the svg (component root) carries its own `_hk` in both forms — `createComponent`
+    // keys the root even nested in a <Show> — yet the eager `children()` form allocates that key at
+    // a different position than the lazy prop-insert form. That relocation (into the ambient owner,
+    // ahead of the span) is exactly what lets the eager form hydrate where the lazy one cannot.
+    const svgKey = (html: string) => html.match(/<svg _hk=(\S+) /)?.[1];
+    expect(svgKey(lazy)).toBeDefined();
+    expect(svgKey(eager)).toBeDefined();
+    expect(svgKey(eager)).not.toBe(svgKey(lazy));
   });
 });

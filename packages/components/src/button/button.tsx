@@ -15,7 +15,7 @@ import type {
 } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Component, createEffect, merge, omit, Show } from "solid-js";
+import { type Component, children, createEffect, merge, omit, Show } from "solid-js";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -230,13 +230,27 @@ export const Button: Component<ButtonProps> = (props) => {
     "children",
   );
 
+  // A slot whose content is a **component** (a consumer's `startDecorator={<Icon/>}` compiles to a
+  // lazy getter that runs `createComponent` where the prop is read) must be created **eagerly**, in
+  // the component body — never lazily inside a `<Show>`-gated slot span's reactive `insert`. A
+  // component created lazily inside a `<Show>` computes a hydration key one off from the server's and
+  // fails to hydrate (an upstream `@solidjs/web` beta asymmetry: the server `<Show>` renders children
+  // flatly in the ambient owner, the client wraps them in memo/insert-effect owners — see
+  // `docs/solid-2.0-notes.md`). Solid's `children` helper is the idiomatic fix: it eagerly resolves
+  // each slot's content once (matching a direct child element, which hydrates cleanly) and memoizes
+  // it so it isn't recreated on unrelated re-renders. The `<Show>` gates on the raw prop exactly as
+  // before; only the rendered *content* is the resolved accessor.
+  const startDecorator = children(() => merged.startDecorator);
+  const endDecorator = children(() => merged.endDecorator);
+  const loader = children(() => runIfFunction(merged.loader) ?? <ButtonLoader />);
+
   // Only the root goes through `renderElement` (it owns `render`/`as` polymorphism + ref merging).
   // The internal parts are always plain spans, so they're written as literal elements.
-  const children = (
+  const content = (
     <>
-      <Show when={merged.startDecorator != null}>
+      <Show when={startDecorator() != null}>
         <span data-slot="button-start-decorator" class={slots.startDecorator()}>
-          {merged.startDecorator}
+          {startDecorator()}
         </span>
       </Show>
       <span data-slot="button-label" class={slots.label()}>
@@ -244,14 +258,14 @@ export const Button: Component<ButtonProps> = (props) => {
           ? runIfFunction(merged.loadingText)
           : merged.children}
       </span>
-      <Show when={merged.endDecorator != null}>
+      <Show when={endDecorator() != null}>
         <span data-slot="button-end-decorator" class={slots.endDecorator()}>
-          {merged.endDecorator}
+          {endDecorator()}
         </span>
       </Show>
       <Show when={isLoading()}>
         <span data-slot="button-loader" class={slots.loader()} aria-hidden="true">
-          {runIfFunction(merged.loader) ?? <ButtonLoader />}
+          {loader()}
         </span>
       </Show>
     </>
@@ -273,7 +287,7 @@ export const Button: Component<ButtonProps> = (props) => {
     // so they're spread above — the component no longer hand-wires them here.
     // The root's own slot marker; parts use the `button-<part>` convention (a component-prefixed slot).
     "data-slot": "button",
-    children,
+    children: content,
   });
 
   return renderElement<ButtonElementProps, HTMLButtonElement>({

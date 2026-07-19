@@ -152,3 +152,30 @@ actual installed package):
   reappears, check this setting first before assuming a merge/omit bug.
 - Browser tests import `page` from `vitest/browser`, not the deprecated
   `@vitest/browser/context`.
+- **A *component* rendered lazily inside a `<Show>` fails to hydrate — resolve it eagerly
+  with `children()`.** Symptom: `Hydration tag mismatch for key "…": expected <svg> but
+  found <span>` (and historically a `getNextSibling` null crash), caught by the route error
+  boundary, which then silently client-renders — the console fills with errors and the SSR
+  benefit is lost. Trigger is a *conjunction*: (1) the content is a **component** created
+  **lazily** — a consumer's `startDecorator={<Icon/>}` compiles to a getter that runs
+  `createComponent(Icon)` where the prop is *read*, i.e. inside the slot's reactive `insert`
+  — **and** (2) that read happens inside a `<Show>` (keyed or not). Neither alone triggers
+  it: a lazy component in an *unconditional* slot hydrates fine (which is why Button's
+  unconditional label was always immune), and a *directly-written* child (`<span><Icon/></span>`)
+  inside a `<Show>` hydrates fine (it is created eagerly during the span's construction, in
+  the ambient owner). Root cause is an upstream `@solidjs/web` beta asymmetry (present through
+  at least `2.0.0-beta.20`; byte-identical between beta.19 and beta.20 in the relevant code):
+  on the **server** `createComponent(Comp) === Comp()` with no owner, so the component's root
+  keys off the ambient owner; on the **client** `createComponent` wraps `Comp` in a transparent
+  `createRoot`, and the client `<Show>` nests children under memo/insert-effect owners the
+  server `<Show>` does not — so the component's `_hk` comes out one off and `hydrate()` claims
+  the wrong node. This is the long-standing, still-open upstream bug (solidjs/solid#2384,
+  solidjs/solid-start#1089). **Fix (Button/Badge slots):** resolve each slot's content once,
+  eagerly, in the component body with Solid's `children()` helper, then render the resolved
+  accessor inside the `<Show>` — the component is then created in the ambient owner, exactly
+  like a direct child, and hydration realigns. Read the raw prop **only once**: gate the
+  `<Show>` on the *resolved* accessor (`when={startDecorator() != null}`), not the raw prop —
+  a second read (e.g. a `!= null` gate on the raw prop) re-runs the consumer getter and creates
+  a *second* component instance, which double-claims the server node on hydrate and silently
+  drops it. Pinned in `packages/primitives/src/__tests__/solid-contract.ssr.test.tsx` and
+  regression-tested by `button-icons`/`badge-icons` (`packages/components/src/{button,badge}/__tests__/`).

@@ -9,7 +9,7 @@ import type {
 } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Component, merge, omit, Show } from "solid-js";
+import { type Component, children, merge, omit, Show } from "solid-js";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -96,28 +96,43 @@ export const Badge: Component<BadgeProps> = (props) => {
     "children",
   );
 
+  // A slot whose content is a **component** (a consumer's `startDecorator={<Icon/>}` compiles to a
+  // lazy getter that runs `createComponent` where the prop is read) must be created **eagerly**, in
+  // the component body — never lazily inside a `<Show>`-gated slot span's reactive `insert`. A
+  // component created lazily inside a `<Show>` computes a hydration key one off from the server's and
+  // fails to hydrate (an upstream `@solidjs/web` beta asymmetry — see `docs/solid-2.0-notes.md`).
+  // Solid's `children` helper resolves each slot's content once (eagerly, matching a direct child
+  // element, which hydrates cleanly) and memoizes it. Each `<Show>` then gates on the **resolved**
+  // accessor — the raw prop must be read only once (a second read, e.g. a `!= null` gate, would run
+  // the consumer getter again and create a *second* component instance, which double-claims the
+  // server node on hydrate). Unlike Button, Badge's label is `<Show>`-gated too, so it needs the same
+  // treatment as the decorators. See docs/solid-2.0-notes.md.
+  const startDecorator = children(() => merged.startDecorator);
+  const label = children(() => merged.children);
+  const endDecorator = children(() => merged.endDecorator);
+
   // Only the root goes through `renderElement` (it owns `render`/`as` polymorphism + ref merging).
   // The internal parts are always plain spans, so they're written as literal elements. The role dot
   // is rendered only for the `dot` variant and leads the content; the label/decorators are `<Show>`-
   // gated so an empty part contributes no node (keeping the tree minimal and hydration-stable).
-  const children = (
+  const content = (
     <>
       <Show when={merged.variant === "dot"}>
         <span data-slot="badge-dot" class={slots.dot()} aria-hidden="true" />
       </Show>
-      <Show when={merged.startDecorator != null}>
+      <Show when={startDecorator() != null}>
         <span data-slot="badge-start-decorator" class={slots.startDecorator()}>
-          {merged.startDecorator}
+          {startDecorator()}
         </span>
       </Show>
-      <Show when={merged.children != null}>
+      <Show when={label() != null}>
         <span data-slot="badge-label" class={slots.label()}>
-          {merged.children}
+          {label()}
         </span>
       </Show>
-      <Show when={merged.endDecorator != null}>
+      <Show when={endDecorator() != null}>
         <span data-slot="badge-end-decorator" class={slots.endDecorator()}>
-          {merged.endDecorator}
+          {endDecorator()}
         </span>
       </Show>
     </>
@@ -132,7 +147,7 @@ export const Badge: Component<BadgeProps> = (props) => {
     },
     // The root's own slot marker; parts use the `badge-<part>` convention (a component-prefixed slot).
     "data-slot": "badge",
-    children,
+    children: content,
   });
 
   return renderElement<BadgeElementProps, HTMLSpanElement>({
