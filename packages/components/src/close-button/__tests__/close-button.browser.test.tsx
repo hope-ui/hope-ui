@@ -2,7 +2,7 @@ import ssrFixture from "virtual:hydration-fixture?id=close-button";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
 import { I18nProvider } from "@hope-ui/primitives/i18n";
-import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { type CloseButtonThemeableProps, definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -128,6 +128,38 @@ describe("CloseButton", () => {
     expect(container.querySelector('[data-slot="close-button"]')?.getAttribute("aria-label")).toBe(
       "Dismiss dialog",
     );
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("falls back to a preset's defaultProps aria-label, but a per-instance one still wins", async () => {
+    // The label fallback resolves through `merged` (instance ?? preset ?? localized `common.close`),
+    // NOT raw `props` — so a preset-level default beats the localized "Close". `aria-label` is a
+    // *behavioral* default outside the curated themeable surface (`CloseButtonThemeableProps` is
+    // size + icon only), so the literal is cast; `useDefaults` folds it in via its runtime
+    // `as Partial<P>` merge. A `props`-based fallback would ignore it and read "Close" here.
+    const withAriaLabel = definePreset(hope, {
+      components: {
+        closeButton: {
+          defaultProps: { "aria-label": "Preset dismiss" } as Partial<CloseButtonThemeableProps>,
+        },
+      },
+    });
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={withAriaLabel}>
+        <div>
+          <CloseButton />
+          <CloseButton aria-label="Instance dismiss" />
+        </div>
+      </ThemeProvider>
+    ));
+
+    const buttons = container.querySelectorAll('[data-slot="close-button"]');
+    // No instance aria-label → the preset default wins over the localized "Close".
+    expect(buttons[0]?.getAttribute("aria-label")).toBe("Preset dismiss");
+    // A per-instance aria-label still beats the preset default.
+    expect(buttons[1]?.getAttribute("aria-label")).toBe("Instance dismiss");
     await expectNoA11yViolations(container);
     dispose();
   });
