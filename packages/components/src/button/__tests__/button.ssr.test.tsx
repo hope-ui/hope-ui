@@ -11,7 +11,7 @@ import { Tree } from "./button.ssr-entry";
 // leaving the output byte-identical. Wrapping a subtree in the provider also shifts its hydration
 // keys (`_hk`), so this render and the one `button.browser.test.tsx` hydrates must be structurally
 // identical, `<ThemeProvider>` included — which is enforced by construction here: both import the
-// same `Tree` from `button.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
+// same `Tree` from `button.ssr-entry.tsx`, the single source of truth. See __internal__/theming.md.
 
 describe("Button SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {

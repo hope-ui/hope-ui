@@ -10,7 +10,7 @@ import { Tree } from "./alert.ssr-entry";
 // values live in CSS), so the provider takes the zero-DOM branch and emits no `<style>`, leaving the
 // output byte-identical. This render and the one `alert.browser.test.tsx` hydrates must be
 // structurally identical, `<ThemeProvider>` included — enforced by construction: both import the same
-// `Tree` from `alert.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
+// `Tree` from `alert.ssr-entry.tsx`, the single source of truth. See __internal__/theming.md.
 
 describe("Alert SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {

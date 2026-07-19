@@ -11,7 +11,7 @@ import { Tree } from "./badge.ssr-entry";
 // output byte-identical. Wrapping a subtree in the provider also shifts its hydration keys (`_hk`),
 // so this render and the one `badge.browser.test.tsx` hydrates must be structurally identical,
 // `<ThemeProvider>` included — enforced by construction here: both import the same `Tree` from
-// `badge.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
+// `badge.ssr-entry.tsx`, the single source of truth. See __internal__/theming.md.
 
 describe("Badge SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {

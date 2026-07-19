@@ -6,7 +6,7 @@ import { Badge } from "../badge";
 
 // The second source of truth for Badge's SSR → hydration round-trip: a Badge whose decorator slots
 // AND label hold **components**, not host elements / text. This is the regression subject for the
-// `<Show>`-gated lazy-component hydration bug (see docs/solid-2.0-notes.md). Unlike Button, Badge's
+// `<Show>`-gated lazy-component hydration bug (see __internal__/solid-2.0-notes.md). Unlike Button, Badge's
 // label is itself `<Show>`-gated, so a component in the label is as much at risk as one in a
 // decorator. Shared by three consumers exactly like `badge.ssr-entry.tsx`:
 //   - badge-icons.ssr.test.tsx      inline-snapshots the server bytes

@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
  * must run where `@solidjs/web` resolves to `dist/web.js` rather than `dist/server.js`, which
  * is only true in the **browser** project.
  *
- * See `docs/migration-2.0-stable.md` §2.
+ * See `__internal__/migration-2.0-stable.md` §2.
  */
 
 describe("@solidjs/web client-build contract", () => {

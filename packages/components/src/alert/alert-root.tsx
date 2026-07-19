@@ -241,7 +241,7 @@ export const Root: Component<AlertProps> = (props) => {
     // Each convenience slot is read in a `<Show>` `when` gate AND its body below (a multi-read), so the
     // raw prop is resolved once with `children()` — which also fixes the `when`-gate hydration hazard (a
     // raw `when={x != null}` builds and discards a component whose `_hk` the client and server place
-    // differently). See CLAUDE.md / docs/solid-2.0-notes.md ("children() decision procedure").
+    // differently). See CLAUDE.md / __internal__/solid-2.0-notes.md ("children() decision procedure").
     const icon = children(() => resolveStatusIcon(merged));
     const title = children(() => merged.title);
     const description = children(() => merged.description);

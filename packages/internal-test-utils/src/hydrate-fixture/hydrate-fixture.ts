@@ -59,7 +59,7 @@ function recordConsole(): { restore: () => string[] } {
 /**
  * Hydrates `serverHtml` (genuine server output) with `ui` (the structurally identical client
  * tree) in a real browser, and asserts the full hydration contract — a silent fallback to a
- * client render otherwise looks identical to success (see docs/testing.md):
+ * client render otherwise looks identical to success (see __internal__/testing.md):
  *
  *  1. hydration logs no `console.error`/`console.warn` (mismatch warnings land there);
  *  2. no element is added or dropped (a fallback duplicates or replaces nodes);

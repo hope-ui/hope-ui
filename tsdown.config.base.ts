@@ -18,14 +18,14 @@ interface PackageJson {
  * **no** dom-compiled fallback — every SolidJS app (SolidStart, `npm init solid`) is Vite +
  * `vite-plugin-solid`, so the `"solid"` condition always resolves. A non-`vite-plugin-solid`
  * consumer gets no match and fails loudly; that's acceptable until a Solid-2.0-stable toolchain
- * makes a compiled fallback worth shipping. See `docs/plan.md`, "Distribution model".
+ * makes a compiled fallback worth shipping. See `__internal__/plan.md`, "Distribution model".
  *
  * tsdown (rolldown + oxc) is used with `transform.jsx: "preserve"`: oxc's parser keeps JSX
  * intact while rolldown leaves `solid-js`/`@solidjs/web`/`@hope-ui/primitives` external — the
  * consumer resolves those, and
  * `@hope-ui/primitives` via *its own* `"solid"` condition. No Solid compiler runs here at all,
  * so the `babel-preset-solid@1.x` hazard (`esbuild-plugin-solid`/`unplugin-solid`, see
- * `docs/migration-2.0-stable.md` §5) simply doesn't apply to a preserve-only build.
+ * `__internal__/migration-2.0-stable.md` §5) simply doesn't apply to a preserve-only build.
  *
  * Entries come from `package.json`'s `hope.entries`; one `dist/<name>/index.jsx` (source) plus
  * `dist/<name>/index.d.ts` (types) per subpath.

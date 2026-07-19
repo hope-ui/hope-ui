@@ -14,7 +14,7 @@ import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases";
 //
 // The mechanism is vite-inside-vite. Hydration is two environments by definition (server render +
 // client hydrate) and no single Vitest project can be both — `ssr` resolves the *server* solid
-// builds, `browser` the *client* ones (see docs/testing.md). This plugin runs in the `browser`
+// builds, `browser` the *client* ones (see __internal__/testing.md). This plugin runs in the `browser`
 // project (client builds) but spins up one nested Vite SSR server configured exactly like the `ssr`
 // project — server-build aliases, `generate: "ssr"`, `ssr.noExternal` — and renders the subject's
 // tree through it. Same config in, so the bytes match what the `ssr` project's inline snapshot pins,
@@ -91,7 +91,7 @@ function getSsrServer(): Promise<ViteDevServer> {
       // escapes the server-build alias and resolves a *second* `solid-js` copy, so a render-body
       // compute-form signal skips its hydration id on the server (`_hk` shifts down one vs the
       // client) and hydration silently mismatches. This must stay in lockstep with the `ssr`
-      // project's `server.deps.inline` in vitest.config.ts. See docs/solid-primitives-eval.md.
+      // project's `server.deps.inline` in vitest.config.ts. See __internal__/solid-primitives-eval.md.
       ssr: { noExternal: ["@solidjs/web", "solid-js", /@solid-primitives\//] },
     });
   }

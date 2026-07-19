@@ -5,7 +5,7 @@
 // (a translucent halo, a mixed wash) as its own token in `tokens.css`. A recipe that reaches for
 // `color-mix(...)`, an alpha modifier (`ring-focus/50`), or a magic opacity (`opacity-90`) applies a
 // fixed rule to a base it does not own — so a consumer that redefines that base silently gets a
-// broken color. See docs/theming.md ("recipe purity") and docs/semantic-color-token-redesign.md.
+// broken color. See __internal__/theming.md ("recipe purity") and __internal__/semantic-color-token-redesign.md.
 //
 // Scope: `packages/presets/**/recipes/**` source files (`.ts`/`.tsx`) — the concrete recipes that
 // paint tokens. NOT `packages/theming/src/recipes` (that is the type-only recipe *contract*), and

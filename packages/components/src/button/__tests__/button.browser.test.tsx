@@ -16,7 +16,7 @@ import { Tree } from "./button.ssr-entry";
 // CSS), so the provider stays on the zero-DOM branch and the fixture is byte-identical. The
 // hydration suite wraps the *same* tree the SSR fixture was generated from
 // (`<ThemeProvider preset={hope}><Button>Click me</Button></ThemeProvider>`) — the provider shifts
-// `_hk` keys, so both halves must include it identically. See docs/theming.md.
+// `_hk` keys, so both halves must include it identically. See __internal__/theming.md.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }

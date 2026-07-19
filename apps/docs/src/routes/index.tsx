@@ -79,7 +79,7 @@ function CopyCommand(props: { command: string; class?: string }) {
 // these are the live Button component (recipe styling + press behavior) rendered as an <a>.
 // `nativeButton={false}` switches Button to the anchor a11y model (role/tabIndex + keyboard
 // synthesis) for the swapped-in element; the button→anchor prop cast is the documented
-// cross-element `render` boundary (see docs/usage/primitives/utils/render/render.md).
+// cross-element `render` boundary (see __internal__/primitives/utils/render/render.md).
 function CtaButton(props: {
   to: string;
   children: JSX.Element;

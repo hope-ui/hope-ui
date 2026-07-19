@@ -11,7 +11,7 @@ import { hydrationFixtureBridge } from "./vitest-hydration-bridge";
 // Three projects, one job each. Keep them that way — the previous two-project layout put
 // pure-logic tests and SSR tests in the same "unit" project, which forced a module-resolution
 // compromise that silently made every SSR test render against half the wrong build. See
-// `docs/testing.md`.
+// `__internal__/testing.md`.
 //
 //   unit     node, no DOM.      Pure logic. Client builds (real effects, deferred writes).
 //   ssr      node, no DOM.      Server output. Server builds of solid-js *and* @solidjs/web.
@@ -77,8 +77,8 @@ export default defineConfig({
           // (`createSignal(fn)` / `createMemo`) fails to consume its hydration id on the
           // server, the root drops from `_hk=1` to `_hk=0`, and every subsequent `_hk` shifts
           // down one versus the client. That silent asymmetry is what mis-flagged
-          // `@solid-primitives/controlled-signal` as "breaks hydration" (docs/solid-primitives-eval.md);
-          // it disappears the moment the dep is inlined here. See docs/solid-primitives-eval.md.
+          // `@solid-primitives/controlled-signal` as "breaks hydration" (__internal__/solid-primitives-eval.md);
+          // it disappears the moment the dep is inlined here. See __internal__/solid-primitives-eval.md.
           // Non-anchored: Vitest tests this against the dep's *resolved absolute path*
           // (`…/node_modules/@solid-primitives/controlled-signal/…`), so an anchored `^` never
           // matches. The slash keeps it scoped to the org.

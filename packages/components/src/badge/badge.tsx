@@ -102,7 +102,7 @@ export const Badge: Component<BadgeProps> = (props) => {
   // `children` resolves each slot once and memoizes it, so both read sites share one node. That also
   // fixes hydration: the *gate* read is the hazard — a raw-prop `when={x != null}` builds and
   // discards a component whose hydration key the client and server place differently (an upstream
-  // `@solidjs/web` beta asymmetry — see `docs/solid-2.0-notes.md`), so the body node mis-hydrates.
+  // `@solidjs/web` beta asymmetry — see `__internal__/solid-2.0-notes.md`), so the body node mis-hydrates.
   // Gating on the **resolved** accessor (`when={startDecorator() != null}`) removes that phantom
   // build; the single resolved component is created in the ambient owner like a direct child. (A
   // single read inside a `<Show>` would need nothing — it is the `when`+body pair that does.) Unlike

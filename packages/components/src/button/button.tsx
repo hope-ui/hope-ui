@@ -167,7 +167,7 @@ export const Button: Component<ButtonProps> = (props) => {
   //      (`when={startDecorator() != null}`) AND in its body — the double read whose *gate* half is
   //      the hazard. A raw-prop `when` read builds and discards a component whose hydration key the
   //      client and server place differently (an upstream `@solidjs/web` beta asymmetry — see
-  //      `docs/solid-2.0-notes.md`), so the body node mis-hydrates. Reading the **resolved** accessor
+  //      `__internal__/solid-2.0-notes.md`), so the body node mis-hydrates. Reading the **resolved** accessor
   //      in the gate removes the phantom build. (A single read inside a `<Show>` would be fine; it is
   //      the `when`+body pair that isn't.)
   const startDecorator = children(() => merged.startDecorator);

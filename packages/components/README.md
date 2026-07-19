@@ -77,7 +77,7 @@ import { Dialog } from "@hope-ui/components/dialog";
 ```
 
 A modal `Dialog.Popup` must be positioned (`fixed`/`absolute`/`relative`), or it paints beneath the
-pointer-blocking backdrop — see [the Dialog usage doc](../../docs/usage/components/dialog/dialog.md).
+pointer-blocking backdrop — see the Dialog page in the doc website (`apps/docs/`).
 
 ## Polymorphism: `render`, not `as`
 
@@ -101,13 +101,13 @@ model when you render a non-`<button>` element:
   a reusable leaf shouldn't be re-implemented; sibling subpaths stay external in the build, so reuse is
   deduped. Two limits: no **circular** imports, and don't wire a component's *behavior* through a heavier
   sibling — Popover composes the shared kernel (`createFloating`/`createDismissable`/…) directly rather
-  than depending on Dialog's modal machinery. See [`docs/plan.md`](../../docs/plan.md).
+  than depending on Dialog's modal machinery. See [`__internal__/plan.md`](../../__internal__/plan.md).
 
 ## Docs
 
-- Per-component API, keyboard tables, and ARIA references: [`docs/usage/components/`](../../docs/usage/components/).
-- Theming model and semantic tokens: [`docs/theming.md`](../../docs/theming.md).
-- Component backlog and complexity tiers: [`docs/roadmap.md`](../../docs/roadmap.md).
+- Per-component API, keyboard tables, and ARIA references: the doc website (`apps/docs/`).
+- Theming model and semantic tokens: [`__internal__/theming.md`](../../__internal__/theming.md).
+- Component backlog and complexity tiers: [`__internal__/roadmap.md`](../../__internal__/roadmap.md).
 
 ## License
 

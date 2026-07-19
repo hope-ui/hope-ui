@@ -13,7 +13,7 @@ import { Tree } from "./badge.ssr-entry";
 
 // Badge reads styling through `useSlots`/`useRecipe`, so every render sits under a `<ThemeProvider>`
 // fed the `hope` preset. `hope`'s token overrides are empty (its values live in CSS), so the provider
-// stays on the zero-DOM branch and the fixture is byte-identical. See docs/theming.md.
+// stays on the zero-DOM branch and the fixture is byte-identical. See __internal__/theming.md.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }

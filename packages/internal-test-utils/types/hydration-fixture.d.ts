@@ -2,7 +2,7 @@
  * The hydration-fixture bridge (`vitest-hydration-bridge.ts`, wired into the `browser` Vitest
  * project) serves genuine, freshly-rendered server HTML as the default export of
  * `virtual:hydration-fixture?id=<subject>`. `hydrateFixture`'s own suite imports the
- * `hydrate-fixture` subject to pin its success and reuse-failure paths — see `docs/testing.md`.
+ * `hydrate-fixture` subject to pin its success and reuse-failure paths — see `__internal__/testing.md`.
  *
  * The type lives here (an ambient `.d.ts`, not an inline `declare module`) because a `declare
  * module` inside a test file — which is itself a module — is read as *augmentation* of a module

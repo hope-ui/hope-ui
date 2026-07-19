@@ -17,7 +17,7 @@ import { CloseButton } from "../close-button";
 // `useSlots`/`useRecipe`, so the tree sits under a `<ThemeProvider>` fed the `hope` preset; `hope`'s
 // token overrides are empty (values live in CSS), so the provider stays on the zero-DOM branch and
 // emits no `<style>`. The provider still shifts `_hk` keys, so it must be present identically. See
-// docs/theming.md.
+// __internal__/theming.md.
 
 /** A consumer-supplied glyph expressed as a **component** — the custom-`icon` round-trip subject. */
 function CustomIcon(): JSX.Element {

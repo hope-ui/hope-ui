@@ -13,7 +13,7 @@ import { Tree } from "./alert.ssr-entry";
 
 // Alert reads styling through `useSlots`/`useRecipe`, so every render sits under a `<ThemeProvider>`
 // fed the `hope` preset. `hope`'s token overrides are empty (values live in CSS), so the provider
-// stays on the zero-DOM branch and the fixture is byte-identical. See docs/theming.md.
+// stays on the zero-DOM branch and the fixture is byte-identical. See __internal__/theming.md.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -364,7 +364,7 @@ describe("Alert hydration", () => {
   // SSR server (server solid builds) and `alert.ssr.test.tsx` inline-snapshots that same render, so the
   // two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
   // `hydrateFixture` hydrates that HTML rather than re-rendering it — the component-in-slot (status
-  // glyph + CloseButton) auto-composed path. See docs/solid-2.0-notes.md.
+  // glyph + CloseButton) auto-composed path. See __internal__/solid-2.0-notes.md.
   it("hydrates the server HTML in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 

@@ -17,8 +17,8 @@ about any of it to use them.
 Pre-release and **not published yet**. hope-ui targets `solid-js@2.0.0-beta.x` (pinned via the
 `pnpm-workspace.yaml` catalog), and the release model is: build on the pinned beta → wait for
 SolidJS 2.0 stable → fix the beta→stable breakage → publish 1.0. Nothing ships to npm before 2.0
-stable lands. See [`docs/plan.md`](docs/plan.md) for the architecture and phased plan, and
-[`docs/roadmap.md`](docs/roadmap.md) for the component backlog.
+stable lands. See [`__internal__/plan.md`](__internal__/plan.md) for the architecture and phased plan, and
+[`__internal__/roadmap.md`](__internal__/roadmap.md) for the component backlog.
 
 ## Packages
 
@@ -70,7 +70,7 @@ function App() {
 `@import "@hope-ui/presets/hope/tailwind.css"` supplies the `--hope-*` design tokens and their
 mapping to clean utilities (`bg-primary`, `text-on-primary`, …); `<ThemeProvider preset={hope}>`
 gives components their recipes at runtime. `hope` is a **zero-DOM preset** — the provider renders
-no markup of its own. See [`docs/theming.md`](docs/theming.md).
+no markup of its own. See [`__internal__/theming.md`](__internal__/theming.md).
 
 ## Development
 
@@ -103,7 +103,7 @@ pnpm exec vitest run --project=browser packages/components/src/button/__tests__/
 pnpm exec vitest run --project=browser -t "fires onClick"
 ```
 
-See [`docs/testing.md`](docs/testing.md) before writing any test.
+See [`__internal__/testing.md`](__internal__/testing.md) before writing any test.
 
 ## Repository layout
 
@@ -114,20 +114,25 @@ packages/
   theming/               @hope-ui/theming     — theming contract + conformance kit
   presets/               @hope-ui/presets     — presets (hope = default)
   internal-test-utils/   @hope-ui/internal-test-utils — private test harness
-docs/                    architecture, theming, testing, roadmap, and per-file usage docs
-  usage/<pkg>/<path>/     per-source-file API docs, mirroring package + src path
+apps/
+  docs/                  @hope-ui/docs — the end-user documentation website
+__internal__/            internal contributor docs — architecture, theming, testing, roadmap
+  primitives/<path>/     per-source-file API docs for the primitives kernel (mirrors src path)
+  internal-test-utils/   per-helper docs for the private test harness
 scripts/                 check-coverage-parity.mjs and other repo tooling
 .storybook/              Storybook config (shares one Solid compiler config with the tests)
 ```
 
 ## Contributing
 
-Every source file under `packages/*/src/` (except `index.ts`) ships with a matching test, a usage
-`.md` under `docs/usage/`, and — for `@hope-ui/components` — a colocated Storybook story. This
+Every source file under `packages/*/src/` (except `index.ts`) ships with a matching test;
+`@hope-ui/primitives` files also ship a usage `.md` under `__internal__/primitives/`, and
+`@hope-ui/components` folders add a colocated Storybook story. (Component and theming API docs live
+in the doc website, `apps/docs/`.) This
 **Definition of Done** is CI-enforced by `pnpm check:coverage-parity`; the full rules and rationale
-are in [`docs/definition-of-done.md`](docs/definition-of-done.md), [`docs/testing.md`](docs/testing.md),
-and [`CLAUDE.md`](CLAUDE.md). Deeper background lives in [`docs/plan.md`](docs/plan.md),
-[`docs/theming.md`](docs/theming.md), and [`docs/solid-2.0-notes.md`](docs/solid-2.0-notes.md).
+are in [`__internal__/definition-of-done.md`](__internal__/definition-of-done.md), [`__internal__/testing.md`](__internal__/testing.md),
+and [`CLAUDE.md`](CLAUDE.md). Deeper background lives in [`__internal__/plan.md`](__internal__/plan.md),
+[`__internal__/theming.md`](__internal__/theming.md), and [`__internal__/solid-2.0-notes.md`](__internal__/solid-2.0-notes.md).
 
 Commit messages carry the change rationale only — no tool/assistant attribution trailers. Don't add
 changesets or bump published-package versions until SolidJS 2.0 ships stable.

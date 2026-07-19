@@ -15,7 +15,7 @@ import { Button } from "../button";
 // Button reads styling through `useSlots`/`useRecipe`, so the tree sits under a `<ThemeProvider>` fed
 // the `hope` preset. `hope`'s token overrides are empty (its values live in CSS), so the provider
 // stays on the zero-DOM branch and emits no `<style>` — the fixture is just the `<button>`. The
-// provider still shifts `_hk` keys, so it must be present identically everywhere. See docs/theming.md.
+// provider still shifts `_hk` keys, so it must be present identically everywhere. See __internal__/theming.md.
 
 /**
  * Button's hydration tree. `onClick` is optional so the "interactive after hydrating" test can

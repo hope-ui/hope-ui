@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
  *
  * Its sibling `solid-contract.browser.test.tsx` pins the client-build behaviors (`applyRef`).
  *
- * See `docs/testing.md` and `docs/migration-2.0-stable.md` §2.
+ * See `__internal__/testing.md` and `__internal__/migration-2.0-stable.md` §2.
  */
 
 describe("@solidjs/web server-build contract", () => {
@@ -19,7 +19,7 @@ describe("@solidjs/web server-build contract", () => {
     // server-side `dynamic()` calls `ssrElement(component, props, undefined, true)` — the
     // trailing `true` is what emits the `_hk` hydration key those elements hydrate against. If
     // stable drops the key, elements rendered through `renderElement` stop hydrating. See
-    // docs/migration-2.0-stable.md §3.
+    // __internal__/migration-2.0-stable.md §3.
     const html = await renderToStringAsync(() => (
       <Dynamic component="span" id="pinned">
         hi

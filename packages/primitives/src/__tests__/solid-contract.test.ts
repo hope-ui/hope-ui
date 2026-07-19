@@ -28,7 +28,7 @@ import { describe, expect, it } from "vitest";
  * - `solid-contract.browser.test.tsx` — client build in a real browser. `applyRef` (why no
  *   `mergeRefs` helper is needed).
  *
- * See `docs/testing.md` and `docs/migration-2.0-stable.md` §2.
+ * See `__internal__/testing.md` and `__internal__/migration-2.0-stable.md` §2.
  */
 
 describe("solid-js contract", () => {

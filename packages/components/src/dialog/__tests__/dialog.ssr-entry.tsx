@@ -16,7 +16,7 @@ import { Dialog } from "../dialog";
 // client once the dialog opens. `Dialog.Close` now renders a recipe-styled `CloseButton`, so the tree
 // sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in CSS),
 // so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so it
-// must be present identically everywhere. See docs/theming.md.
+// must be present identically everywhere. See __internal__/theming.md.
 
 /**
  * `defaultOpen` is optional so the ssr test can also exercise the open server render (its `Portal`

@@ -7,7 +7,7 @@
  * the `locale`
  * accessor on every call, so it is reactive inside JSX **and** returns the current value for imperative
  * callers (e.g. the live-region announcer). It is a plain function — never a `createMemo` — so it never
- * participates in a hydration key (see `docs/solid-primitives-eval.md`).
+ * participates in a hydration key (see `__internal__/solid-primitives-eval.md`).
  */
 import type { Accessor } from "solid-js";
 import { resolveCatalog } from "../messages/locales/catalogs";

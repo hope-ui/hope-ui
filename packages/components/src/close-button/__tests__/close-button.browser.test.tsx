@@ -14,7 +14,7 @@ import { Tree } from "./close-button.ssr-entry";
 
 // CloseButton reads styling through `useSlots`/`useRecipe`, so every render sits under a
 // `<ThemeProvider>` fed the `hope` preset. `hope`'s token overrides are empty (values live in CSS), so
-// the provider stays on the zero-DOM branch. See docs/theming.md.
+// the provider stays on the zero-DOM branch. See __internal__/theming.md.
 function Themed(props: { children: JSX.Element }): JSX.Element {
   return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
 }
@@ -308,7 +308,7 @@ describe("CloseButton hydration", () => {
   // so the two agree byte-for-byte. Here `solid-js`/`@solidjs/web` resolve to their client builds, so
   // `hydrateFixture` hydrates that HTML rather than re-rendering it. It proves hydration was silent and
   // reused every node — the component-in-slot path (built-in X *and* a custom-icon component) that used
-  // to break under the `@solidjs/web` beta. See docs/solid-2.0-notes.md.
+  // to break under the `@solidjs/web` beta. See __internal__/solid-2.0-notes.md.
   it("hydrates both close buttons in place, without a mismatch or a second render", () => {
     const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
 

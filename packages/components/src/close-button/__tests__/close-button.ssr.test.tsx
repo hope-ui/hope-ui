@@ -11,7 +11,7 @@ import { Tree } from "./close-button.ssr-entry";
 // output byte-identical. Wrapping a subtree in the provider also shifts its hydration keys (`_hk`), so
 // this render and the one `close-button.browser.test.tsx` hydrates must be structurally identical,
 // `<ThemeProvider>` included — enforced by construction: both import the same `Tree` from
-// `close-button.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
+// `close-button.ssr-entry.tsx`, the single source of truth. See __internal__/theming.md.
 
 describe("CloseButton SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {

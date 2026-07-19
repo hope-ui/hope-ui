@@ -6,7 +6,7 @@ import { Button } from "../button";
 
 // The second source of truth for Button's SSR → hydration round-trip: a Button whose decorator slots
 // hold an **icon component** (`<PlusIcon/>`), not a raw host element. This is the regression subject
-// for the `<Show>`-gated lazy-component hydration bug (see docs/solid-2.0-notes.md): a component
+// for the `<Show>`-gated lazy-component hydration bug (see __internal__/solid-2.0-notes.md): a component
 // arriving via a consumer prop getter and read inside a `<Show>`-gated slot span used to compute a
 // hydration key one off from the server's, so `hydrate()` looked up the wrong node. The label span
 // (unconditional) was always immune; the decorators (inside `<Show>`) were not. Shared by three
