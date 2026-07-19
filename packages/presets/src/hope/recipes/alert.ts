@@ -123,7 +123,7 @@ export const alertRecipe = tv({
     // presence status the component writes to `data-state`); `motion-reduce` drops it. `opacity-0` is
     // full-transparent (allowed); only magic `opacity-1..99` violates recipe purity.
     root: [
-      "relative flex w-full items-start",
+      "relative flex w-full items-start rounded-xl",
       "border border-transparent bg-clip-padding",
       "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
       "data-[state=exiting]:opacity-0 data-[state=exiting]:-translate-y-1",
@@ -134,7 +134,7 @@ export const alertRecipe = tv({
     icon: "inline-flex shrink-0 items-center justify-center",
     content: "flex min-w-0 flex-1 flex-col",
     title: "font-medium",
-    description: "leading-normal",
+    description: "",
     actions: "flex flex-wrap items-center",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
@@ -143,28 +143,22 @@ export const alertRecipe = tv({
   variants: {
     size: {
       sm: {
-        root: "gap-2.5 rounded-md p-3 text-sm",
-        icon: "[&_svg]:size-4",
+        root: "gap-2 p-3 text-sm",
+        icon: "[&_svg]:size-4 mt-0.5",
         content: "gap-0.5",
-        title: "text-sm",
-        description: "text-sm",
         actions: "mt-2 gap-2",
       },
       md: {
-        root: "gap-3 rounded-lg p-4 text-sm",
+        root: "gap-3 p-4 text-sm",
         icon: "[&_svg]:size-5",
         content: "gap-1",
-        title: "text-sm",
-        description: "text-sm",
         actions: "mt-3 gap-3",
       },
       lg: {
-        root: "gap-4 rounded-lg p-5 text-base",
+        root: "gap-4 p-5 text-base",
         icon: "[&_svg]:size-6",
         content: "gap-1",
-        title: "text-base",
-        description: "text-sm",
-        actions: "mt-3 gap-3",
+        actions: "mt-4 gap-4",
       },
     },
     variant: {
