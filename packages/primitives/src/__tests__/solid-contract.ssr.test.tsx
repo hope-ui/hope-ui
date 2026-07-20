@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
 
 describe("@solidjs/web server-build contract", () => {
   it("renders a host element through Dynamic, with a hydration key", async () => {
-    // Depended on by: `renderElement` (packages/primitives/src/utils/render/render.tsx), the
+    // Depended on by: `renderElement` (packages/primitives/src/utils/render.tsx), the
     // `as`/render-prop polymorphism helper. Everything it renders goes through `<Dynamic>`, and
     // server-side `dynamic()` calls `ssrElement(component, props, undefined, true)` — the
     // trailing `true` is what emits the `_hk` hydration key those elements hydrate against. If

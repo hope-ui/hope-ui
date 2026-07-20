@@ -162,7 +162,7 @@ export const WithActions: Story = {
 };
 
 /**
- * `closable` renders an `Alert.Close`. Dismissing plays the exit transition (opacity + slide), then
+ * `closable` renders an `Alert.CloseTrigger`. Dismissing plays the exit transition (opacity + slide), then
  * unmounts and fires `onExitComplete`. "Show again" re-opens it (controlled `open`).
  */
 export const Dismissible: Story = {

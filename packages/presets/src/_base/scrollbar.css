@@ -1,0 +1,19 @@
+/*
+ * @hope-ui/presets — shared structural layer (`_base/`): scrollbar utilities.
+ *
+ * `no-scrollbar` hides the scrollbar on a scroll container while keeping it scrollable (wheel,
+ * touch, keyboard). Token-free layout only — identical for every `@hope-ui/presets/*` preset, so it
+ * lives here rather than in a theme. Used by the Dialog `inside`-scroll body, where the card is the
+ * chrome and a native scrollbar gutter would break the padding symmetry.
+ *
+ * `scrollbar-width`/`-ms-overflow-style` cover the standard + legacy engines; the WebKit
+ * pseudo-element covers Chromium/Safari, which ignore `scrollbar-width`.
+ */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

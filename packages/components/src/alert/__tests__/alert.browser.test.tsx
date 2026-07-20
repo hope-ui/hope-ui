@@ -43,7 +43,7 @@ describe("Alert", () => {
     const alert = container.querySelector('[data-slot="alert"]');
     expect(alert?.tagName).toBe("DIV");
     expect(alert?.getAttribute("role")).toBe("alert");
-    expect(alert?.getAttribute("data-state")).toBe("entered");
+    expect(alert?.getAttribute("data-presence")).toBe("entered");
     await expectNoA11yViolations(container);
     dispose();
   });
@@ -284,7 +284,7 @@ describe("Alert", () => {
           <Alert.Content>
             <Alert.Title>Persistent</Alert.Title>
           </Alert.Content>
-          <Alert.Close onClick={(event) => event.preventDefault()} />
+          <Alert.CloseTrigger onClick={(event) => event.preventDefault()} />
         </Alert.Root>
       </Themed>
     ));
@@ -297,16 +297,18 @@ describe("Alert", () => {
     dispose();
   });
 
-  it("positions Alert.Close via the recipe's close slot, over CloseButton's own chrome", async () => {
+  it("positions Alert.CloseTrigger via the recipe's closeTrigger slot, over CloseButton's own chrome", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
         <Alert.Root title="With close" closable />
       </Themed>
     ));
 
-    const close = container.querySelector('[data-slot="close-button"]');
+    const close = container.querySelector('[data-slot="alert-close-trigger"]');
     expect(close).not.toBeNull();
-    // Placement from the alert `close` slot ...
+    // The generic CloseButton root marker is re-scoped away.
+    expect(container.querySelector('[data-slot="close-button"]')).toBeNull();
+    // Placement from the alert `closeTrigger` slot ...
     expect(close?.className).toContain("ms-auto");
     // ... and CloseButton's own recipe chrome is still present.
     expect(close?.className).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");
@@ -375,7 +377,7 @@ describe("Alert hydration", () => {
     );
     // The status glyph survived hydration inside its host icon span, and the close button hydrated too.
     expect(container.querySelector('[data-slot="alert-icon"] svg')).not.toBeNull();
-    expect(container.querySelector('[data-slot="close-button"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="alert-close-trigger"]')).not.toBeNull();
     dispose();
   });
 

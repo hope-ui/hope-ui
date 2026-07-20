@@ -395,7 +395,9 @@ for (const pkg of packageDirs) {
       }
 
       // A source file's tests may sit beside it (the primitives' layout) or be tucked into a
-      // `__tests__/` subfolder of the same directory. Both count.
+      // `__tests__/` subfolder of the same directory. Both count. Every source file — including one
+      // in a kept sub-folder (`calendar/utils/`, `i18n/locales/`, `theming/recipes/`) — keeps its
+      // test in its OWN directory's `__tests__/`, so same-directory matching is all that's needed.
       const testRoots = [base, join(dirname(base), "__tests__", basename(base))];
       const hasTest = testFiles.some((t) => {
         const testBase = baseName(t);

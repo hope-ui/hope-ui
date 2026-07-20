@@ -20,7 +20,7 @@ import {
   Show,
   untrack,
 } from "solid-js";
-import { Close } from "./alert-close";
+import { CloseTrigger } from "./alert-close-trigger";
 import { Content } from "./alert-content";
 import { AlertContext, type AlertContextValue } from "./alert-context";
 import { Description } from "./alert-description";
@@ -58,7 +58,7 @@ export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, A
    * Auto-composed into the `alert-icon` slot when Root has no `children`.
    */
   icon?: JSX.Element | false;
-  /** Convenience: render an `Alert.Close` dismiss button. Requires a `<ThemeProvider>` ancestor. */
+  /** Convenience: render an `Alert.CloseTrigger` dismiss button. Requires a `<ThemeProvider>` ancestor. */
   closable?: boolean;
   /** Controlled open state. Uncontrolled defaults to `defaultOpen`. */
   open?: boolean;
@@ -77,7 +77,7 @@ export interface AlertProps extends Omit<AlertElementProps, "role" | "title">, A
   class?: string;
   /**
    * Per-instance class overrides, keyed by slot (`root`, `icon`, `content`, `title`, `description`,
-   * `actions`, `close`). Folded in after the recipe base and the preset's global `slotClasses`, before
+   * `actions`, `closeTrigger`). Folded in after the recipe base and the preset's global `slotClasses`, before
    * `class` (root only). Use literal class strings so the consumer's Tailwind scanner can see them.
    */
   slotClasses?: SlotClasses<"alert">;
@@ -155,7 +155,7 @@ export const Root: Component<AlertProps> = (props) => {
   });
 
   // Controlled/uncontrolled open state → presence-driven mount. `defaultOpen` defaults to `true`, so a
-  // plain `<Alert>` renders. `setOpen` is what `Alert.Close` calls; `onOpenChange` fires either way.
+  // plain `<Alert>` renders. `setOpen` is what `Alert.CloseTrigger` calls; `onOpenChange` fires either way.
   const [open, setOpen] = createControllableState({
     value: () => merged.open,
     defaultValue: () => merged.defaultOpen ?? true,
@@ -278,7 +278,7 @@ export const Root: Component<AlertProps> = (props) => {
           </Content>
         </Show>
         <Show when={merged.closable}>
-          <Close />
+          <CloseTrigger />
         </Show>
       </>
     );
@@ -288,7 +288,7 @@ export const Root: Component<AlertProps> = (props) => {
         return slots.root();
       },
       "data-slot": "alert",
-      get "data-state"(): string {
+      get "data-presence"(): string {
         return presence.status();
       },
       get role(): AlertRole | undefined {

@@ -23,7 +23,8 @@
  * Every fill is a *finished* `--hope-*` token (`bg-primary` → `var(--color-primary)` →
  * `var(--hope-primary)`); the recipe computes no color — no `color-mix`, no alpha modifier, no magic
  * opacity. The exit fade uses `opacity-0` (full transparent — allowed; only magic `opacity-1..99` is
- * not) keyed on `data-[state=exiting]`, the presence status the component writes to `data-state`.
+ * not) keyed on the `data-exiting:` variant (→ `[data-presence="exiting"]`), the presence status the
+ * component writes to `data-presence`.
  * (`pnpm check:recipe-purity` enforces this.)
  */
 
@@ -117,16 +118,19 @@ const defaultRoleCompoundVariants = COLOR_SCHEMES.map((colorScheme) => ({
  */
 export const alertRecipe = tv({
   slots: {
-    // A horizontal flex row: icon, content (flex-1), close. `items-start` top-aligns the icon with the
-    // first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so the
-    // bordered variants never shift a pixel. The exit fade is keyed on `data-[state=exiting]` (the
-    // presence status the component writes to `data-state`); `motion-reduce` drops it. `opacity-0` is
+    // A horizontal flex row: icon, content (flex-1), close trigger. `items-start` top-aligns the icon
+    // with the first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so
+    // the bordered variants never shift a pixel. The exit fade+slide is keyed on the `data-exiting:`
+    // custom variant (→ `[data-presence="exiting"]`, the presence status the component writes to
+    // `data-presence`); `motion-reduce` drops it. Transition `opacity` + `translate`, NOT `transform`:
+    // Tailwind v4 compiles `-translate-y-1` to the standalone `translate` CSS property (not `transform`),
+    // so `transition-transform` would never animate the 4px slide — only the fade. `opacity-0` is
     // full-transparent (allowed); only magic `opacity-1..99` violates recipe purity.
     root: [
       "relative flex w-full items-start rounded-xl",
       "border border-transparent bg-clip-padding",
-      "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
-      "data-[state=exiting]:opacity-0 data-[state=exiting]:-translate-y-1",
+      "transition-[opacity,translate] duration-200 ease-out motion-reduce:transition-none",
+      "data-exiting:opacity-0 data-exiting:-translate-y-1",
     ],
     // The host `<span>` wrapping the glyph (keeps the hydration-keyed root's first child a host
     // element). Its color comes from the variant (role-emphasis in `default`, inherited otherwise);
@@ -141,7 +145,7 @@ export const alertRecipe = tv({
     actions: "flex flex-wrap items-center",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
-    close: "-me-1 -mt-1 ms-auto shrink-0",
+    closeTrigger: "-me-1 -mt-1 ms-auto shrink-0",
   },
   variants: {
     size: {

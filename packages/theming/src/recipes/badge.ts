@@ -10,7 +10,7 @@
  * Badge is a **static, non-interactive** inline label (a styled `<span>`), so — unlike Button — its
  * recipe has no interaction ladder, no loader, and no chrome content. Its axes are purely visual.
  */
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
  * Visual style. `inverted` is the literal swap of the `solid` pair (the on-color as fill, the role
@@ -50,7 +50,7 @@ export interface BadgeRecipeVariants {
  * has **no** non-variant themeable props (no chrome content, no durable behavioral policy), so this
  * is an exact, empty extension of {@link BadgeRecipeVariants}. It exists for **contract uniformity**
  * with Button: every component's contract file exports a `…ThemeableProps` that the components layer
- * can `extends`, and the [`themeable-props-registry`](../registry/themeable-props-registry.md)
+ * can `extends`, and the [`themeable-props-registry`](../themeable-props-registry.md)
  * carries a `badge` entry — so the mechanism stays identical across components even where the
  * curated surface happens to equal the recipe variants.
  */

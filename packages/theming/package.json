@@ -9,7 +9,7 @@
   "hope": {
     "entries": {
       ".": "src/index.ts",
-      "conformance": "src/conformance/conformance.ts"
+      "conformance": "src/conformance.ts"
     }
   },
   "exports": {

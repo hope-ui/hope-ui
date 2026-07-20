@@ -14,7 +14,7 @@
  * `root` (see the preset recipe's `compoundVariants`).
  */
 import type { JSX } from "@solidjs/web";
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
  * Visual style. `default` is a role-neutral raised surface whose *icon + title* carry the role color;
@@ -75,7 +75,14 @@ type AlertStatusGlyphs = { [Key in AlertStatusIconKey]?: () => JSX.Element };
 export interface AlertThemeableProps extends AlertRecipeVariants, AlertStatusGlyphs {}
 
 /** The Alert recipe's slots. */
-export type AlertSlot = "root" | "icon" | "content" | "title" | "description" | "actions" | "close";
+export type AlertSlot =
+  | "root"
+  | "icon"
+  | "content"
+  | "title"
+  | "description"
+  | "actions"
+  | "closeTrigger";
 
 /** The Alert recipe: variant props → one class function per slot. The registry entry for `alert`. */
 export type AlertRecipe = SlotRecipeFn<AlertRecipeVariants, AlertSlot>;

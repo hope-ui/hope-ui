@@ -64,10 +64,10 @@ decomposes into a root state hook plus one hook per part, so `@hope-ui/component
 thin JSX layer over it:
 
 ```ts
-import { createDialog, createDialogPopup } from "@hope-ui/primitives/dialog";
+import { createDialog, createDialogContent } from "@hope-ui/primitives/dialog";
 
-const state = createDialog({ modal: true });      // call once, in an owner scope
-const popup = createDialogPopup(state, props);     // owns the focus-trap/dismiss/scroll-lock stack
+const state = createDialog({ modal: true });        // call once, in an owner scope
+const content = createDialogContent(state, props);  // owns the focus-trap/dismiss/scroll-lock stack
 ```
 
 ## Design notes worth knowing
