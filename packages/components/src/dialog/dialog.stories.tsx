@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Dialog } from "./dialog";
+import { Dialog } from ".";
 
 const meta = {
   title: "Components/Dialog",
@@ -162,11 +162,11 @@ export const UnpositionedModalPopup: Story = {
 export const AlertDialog: Story = {
   name: "role='alertdialog' (APG alert dialog pattern)",
   render: () => (
-    <Dialog.Root>
+    <Dialog.Root role="alertdialog">
       <Dialog.Trigger>Delete everything</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Content role="alertdialog" style={popupStyle}>
+        <Dialog.Content style={popupStyle}>
           <Dialog.Title>Are you sure?</Dialog.Title>
           <Dialog.Description>This cannot be undone.</Dialog.Description>
           <Dialog.CloseTrigger />

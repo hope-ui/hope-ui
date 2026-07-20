@@ -6,7 +6,7 @@ import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
-import { Dialog } from "../dialog";
+import { Dialog } from "../index";
 
 // `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
 // `common.close` → accessible name "Close"), so any tree that renders it must sit under a
@@ -251,14 +251,16 @@ describe("Dialog", () => {
   it("supports controlled open state", async () => {
     const [open, setOpen] = createSignal(false);
     const { dispose } = mount(() => (
-      <Dialog.Root open={open()} onOpenChange={setOpen}>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root open={open()} onOpenChange={setOpen}>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     expect(page.getByRole("dialog").query()).toBeNull();
@@ -310,14 +312,16 @@ describe("Dialog", () => {
 
   it("still lets an explicit `modal={false}` through", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root modal={false}>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root modal={false}>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -425,14 +429,16 @@ describe("Dialog", () => {
     // would silently stop blocking the pointer, and a consumer's `Dialog.Backdrop` would lose
     // its hover styles and pointer handlers.
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-          <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+            <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
@@ -476,19 +482,21 @@ describe("Dialog", () => {
     // true with or without a `ModalBackdrop` — see Dialog.md.
     const onBackdropPointerDown = vi.fn();
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Backdrop
-            data-testid="backdrop"
-            onPointerDown={onBackdropPointerDown}
-            style={{ position: "fixed", inset: "0" }}
-          />
-          <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Backdrop
+              data-testid="backdrop"
+              onPointerDown={onBackdropPointerDown}
+              style={{ position: "fixed", inset: "0" }}
+            />
+            <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -522,14 +530,16 @@ describe("Dialog", () => {
 
   it("lets a consumer's onClick cancel the open with preventDefault", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger onClick={(event) => event.preventDefault()}>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger onClick={(event) => event.preventDefault()}>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -541,14 +551,16 @@ describe("Dialog", () => {
   it("runs a consumer's onClick before opening, and still opens without preventDefault", async () => {
     const order: string[] = [];
     const { dispose } = mount(() => (
-      <Dialog.Root onOpenChange={() => order.push("open")}>
-        <Dialog.Trigger onClick={() => order.push("consumer")}>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root onOpenChange={() => order.push("open")}>
+          <Dialog.Trigger onClick={() => order.push("consumer")}>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -624,15 +636,17 @@ describe("Dialog", () => {
 
   it("lets a consumer-supplied aria-labelledby win over Dialog.Title", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <h2 id="external-heading">Outside</h2>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content aria-labelledby="external-heading">
-            <Dialog.Title>Inner title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <h2 id="external-heading">Outside</h2>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content aria-labelledby="external-heading">
+              <Dialog.Title>Inner title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -646,10 +660,10 @@ describe("Dialog", () => {
   it("supports role='alertdialog' (the APG alert dialog pattern)", async () => {
     const { dispose } = mount(() => (
       <Themed>
-        <Dialog.Root>
+        <Dialog.Root role="alertdialog">
           <Dialog.Trigger>Delete everything</Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Content role="alertdialog">
+            <Dialog.Content>
               <Dialog.Title>Are you sure?</Dialog.Title>
               <Dialog.Description>This cannot be undone.</Dialog.Description>
               <Dialog.CloseTrigger />
@@ -668,14 +682,16 @@ describe("Dialog", () => {
 
   it("lets the consumer pin the popup's id, and points aria-controls at it", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content id="my-popup">
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Content id="my-popup">
+              <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     const trigger = page.getByRole("button", { name: "Open dialog" });

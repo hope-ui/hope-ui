@@ -2,7 +2,7 @@ import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";
-import { Dialog } from "../dialog";
+import { Dialog } from "../index";
 
 // The single source of truth for Dialog's SSR → hydration round-trip tree, shared by
 // `dialog.ssr.test.tsx` (renders it, inline-snapshots the bytes), `dialog.browser.test.tsx` (passes
