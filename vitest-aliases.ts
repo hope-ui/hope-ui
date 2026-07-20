@@ -76,7 +76,7 @@ export const hopeUiAlias = [
   },
   {
     find: /^@hope-ui\/theming\/conformance$/,
-    replacement: join(themingSrcDir, "conformance/conformance.ts"),
+    replacement: join(themingSrcDir, "conformance.ts"),
   },
   {
     find: /^@hope-ui\/theming$/,

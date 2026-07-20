@@ -57,7 +57,7 @@ actual installed package):
   `createEffect(() => [options.active(), options.ref()] as const, ([active, container]) => { ... })`,
   with the ref always backed by `createSignal`, never `let el; ref={el}`. Live in
   `createFocusTrap`/`createDismissable`; see `createDialogContent`/`createDialogBackdrop`
-  (`packages/primitives/src/dialog/content/dialog-content.ts` and `.../backdrop/dialog-backdrop.ts`)
+  (`packages/primitives/src/dialog/dialog-content.ts` and `.../dialog-backdrop.ts`)
   for the call-site pattern. Any future `createXyz({ active, ref })`-
   shaped primitive that needs the ref the moment `active` flips true needs this same
   pattern — `createPresence` doesn't need it (and wasn't touched) because it doesn't read
@@ -74,7 +74,7 @@ actual installed package):
   button. Forwarding an optional prop from a wrapper is the most common thing a consumer
   does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
   `@hope-ui/primitives`, which resolves each defaulted key with `??`. See
-  `__internal__/primitives/utils/defaults/defaults.md`.
+  `__internal__/primitives/utils/defaults.md`.
 - **Internal computed props must fall back to the consumer's, not overwrite them.** Same
   root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
   puts the internal object last, so a getter returning `undefined` *erases* a

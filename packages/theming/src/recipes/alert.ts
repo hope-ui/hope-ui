@@ -14,7 +14,7 @@
  * `root` (see the preset recipe's `compoundVariants`).
  */
 import type { JSX } from "@solidjs/web";
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
  * Visual style. `default` is a role-neutral raised surface whose *icon + title* carry the role color;

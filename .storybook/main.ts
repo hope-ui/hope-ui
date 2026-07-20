@@ -61,7 +61,7 @@ const config: StorybookConfig = {
           // `@hope-ui/theming` has a root barrel: two exact-anchored aliases, not a wildcard.
           {
             find: /^@hope-ui\/theming\/conformance$/,
-            replacement: join(themingSrcDir, "conformance/conformance.ts"),
+            replacement: join(themingSrcDir, "conformance.ts"),
           },
           {
             find: /^@hope-ui\/theming$/,

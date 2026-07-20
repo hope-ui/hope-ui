@@ -14,8 +14,8 @@
 // `@hope-ui/theming/conformance` subpath so it never enters a runtime consumer's bundle.
 
 export * from "./preset";
+export * from "./recipe-registry";
 export * from "./recipes";
-export * from "./registry";
 export {
   SEMANTIC_COLOR_TOKENS,
   SEMANTIC_OPACITY_TOKENS,
@@ -23,8 +23,8 @@ export {
   type SemanticColorToken,
   type SemanticOpacityContract,
   type SemanticOpacityToken,
-} from "./semantic-tokens/semantic-tokens";
-export { cn, cx, tv } from "./styling/styling";
+} from "./semantic-tokens";
+export { cn, cx, tv } from "./styling";
 export {
   ThemeProvider,
   type ThemeProviderProps,
@@ -34,4 +34,5 @@ export {
   useRecipe,
   useSlots,
   useTheme,
-} from "./theme-context/theme-context";
+} from "./theme-context";
+export type * from "./themeable-props-registry";

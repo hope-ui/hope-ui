@@ -19,7 +19,7 @@
  * `[data-presence="…"]`, the status the parts write to `data-presence`), never on arbitrary
  * `data-[state=…]`; every color is a finished `--hope-*` token (recipe purity). See `theming.md`.
  */
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
  * The surface width scale. `xs…xl` size the centered card; the two edge sizes fill the viewport and

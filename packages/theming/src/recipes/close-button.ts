@@ -14,7 +14,7 @@
  * from `currentColor` (finished tokens the preset authors). Its only axis is `size`.
  */
 import type { JSX } from "@solidjs/web";
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /** Density/scale — a compact corner affordance. */
 export type CloseButtonSize = "sm" | "md" | "lg";

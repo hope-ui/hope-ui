@@ -48,7 +48,7 @@ describe("solid-js contract", () => {
 
   describe("createSignal(fn) is the memo overload, not a signal holding a function", () => {
     // Depended on by: `createControllableState`
-    // (packages/primitives/src/internal/create-controllable-state/create-controllable-state.ts), which boxes its value in
+    // (packages/primitives/src/internal/create-controllable-state.ts), which boxes its value in
     // `{ value: T }` with an `equals` that unwraps via `isEqual`, solely to dodge this.
     // 2.0 overloads `createSignal` as `<T>(value: Exclude<T, Function>, options?)` and
     // `<T>(fn: ComputeFunction<T>, options?)`, so a generic `createSignal<T>(someValue)`

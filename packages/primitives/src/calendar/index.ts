@@ -7,20 +7,20 @@ export {
   type CreateCalendarCellOptions,
   type CreateCalendarCellReturn,
   createCalendarCell,
-} from "./cell/calendar-cell";
-export { type CreateCalendarGridReturn, createCalendarGrid } from "./grid/calendar-grid";
+} from "./calendar-cell";
+export { type CreateCalendarGridReturn, createCalendarGrid } from "./calendar-grid";
 export {
   type CreateCalendarHeadingReturn,
   createCalendarHeading,
-} from "./heading/calendar-heading";
-export { type CreateCalendarNextReturn, createCalendarNext } from "./next/calendar-next";
-export { type CreateCalendarPrevReturn, createCalendarPrev } from "./prev/calendar-prev";
+} from "./calendar-heading";
+export { type CreateCalendarNextReturn, createCalendarNext } from "./calendar-next";
+export { type CreateCalendarPrevReturn, createCalendarPrev } from "./calendar-prev";
 export {
   type CreateCalendarOptions,
   type CreateCalendarReturn,
   createCalendar,
   type IsDateDisabled,
-} from "./root/calendar-root";
+} from "./calendar-root";
 
 // Pure date math + view geometry (a headless consumer composing the family may need these).
 export {
