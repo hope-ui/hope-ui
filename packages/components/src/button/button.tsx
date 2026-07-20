@@ -152,10 +152,34 @@ export const Button: Component<ButtonProps> = (props) => {
   );
 
   const isLoading = () => merged.loading;
+
+  // Every slot whose content can be a **component** is resolved **once**, here in the component body,
+  // through Solid's `children` helper — and every read site below uses the resolved accessor, never
+  // the raw prop. The operative trigger is that each of these is read **more than once** in this
+  // render; `children` memoizes the resolution so every accessor read returns the same node. That
+  // buys two guarantees on that one axis:
+  //   1. Single creation. A JSX-element prop getter re-runs `createComponent` on *every* read, so a
+  //      prop read in more than one place — a `!= null` gate plus the render, or across a reactive
+  //      re-run — would construct the component two or more times and discard the extras. This is why
+  //      `loadingText` (read three ways: the loader-placement decision, the label gate, and the label
+  //      render) and the `label` itself go through `children` too, not only the decorators.
+  //   2. Hydration (the decorators specifically). A decorator is read in a `<Show>`'s `when` gate
+  //      (`when={startDecorator() != null}`) AND in its body — the double read whose *gate* half is
+  //      the hazard. A raw-prop `when` read builds and discards a component whose hydration key the
+  //      client and server place differently (an upstream `@solidjs/web` beta asymmetry — see
+  //      `__internal__/solid-2.0-notes.md`), so the body node mis-hydrates. Reading the **resolved** accessor
+  //      in the gate removes the phantom build. (A single read inside a `<Show>` would be fine; it is
+  //      the `when`+body pair that isn't.)
+  const startDecorator = children(() => merged.startDecorator);
+  const endDecorator = children(() => merged.endDecorator);
+  const loader = children(() => runIfFunction(merged.loader) ?? <ButtonLoader />);
+  const loadingText = children(() => runIfFunction(merged.loadingText));
+  const label = children(() => merged.children);
+
   // `loadingText` keeps the label visible, so it implies an inline `start` loader rather than the
   // label-hiding `center` overlay.
   const loaderEffectivePlacement = (): ButtonLoaderPlacement =>
-    merged.loadingText != null ? "start" : merged.loaderPlacement;
+    loadingText() != null ? "start" : merged.loaderPlacement;
 
   // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
   // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
@@ -230,20 +254,6 @@ export const Button: Component<ButtonProps> = (props) => {
     "children",
   );
 
-  // A slot whose content is a **component** (a consumer's `startDecorator={<Icon/>}` compiles to a
-  // lazy getter that runs `createComponent` where the prop is read) must be created **eagerly**, in
-  // the component body — never lazily inside a `<Show>`-gated slot span's reactive `insert`. A
-  // component created lazily inside a `<Show>` computes a hydration key one off from the server's and
-  // fails to hydrate (an upstream `@solidjs/web` beta asymmetry: the server `<Show>` renders children
-  // flatly in the ambient owner, the client wraps them in memo/insert-effect owners — see
-  // `docs/solid-2.0-notes.md`). Solid's `children` helper is the idiomatic fix: it eagerly resolves
-  // each slot's content once (matching a direct child element, which hydrates cleanly) and memoizes
-  // it so it isn't recreated on unrelated re-renders. The `<Show>` gates on the raw prop exactly as
-  // before; only the rendered *content* is the resolved accessor.
-  const startDecorator = children(() => merged.startDecorator);
-  const endDecorator = children(() => merged.endDecorator);
-  const loader = children(() => runIfFunction(merged.loader) ?? <ButtonLoader />);
-
   // Only the root goes through `renderElement` (it owns `render`/`as` polymorphism + ref merging).
   // The internal parts are always plain spans, so they're written as literal elements.
   const content = (
@@ -254,9 +264,7 @@ export const Button: Component<ButtonProps> = (props) => {
         </span>
       </Show>
       <span data-slot="button-label" class={slots.label()}>
-        {isLoading() && merged.loadingText != null
-          ? runIfFunction(merged.loadingText)
-          : merged.children}
+        {isLoading() && loadingText() != null ? loadingText() : label()}
       </span>
       <Show when={endDecorator() != null}>
         <span data-slot="button-end-decorator" class={slots.endDecorator()}>

@@ -25,7 +25,7 @@ export interface SolidCompileOverrides {
  * error. Import this rather than spelling the options out again. (The published library build
  * no longer compiles JSX at all: tsdown ships JSX-preserved source under the `"solid"` export
  * condition and the *consumer's* `vite-plugin-solid` compiles it per environment — see
- * `docs/plan.md`, "Distribution model".)
+ * `__internal__/plan.md`, "Distribution model".)
  *
  * - `solid.moduleName` — `babel-preset-solid@2.x` already defaults to `"@solidjs/web"`,
  *   so this is redundant *today*. It stays explicit because the 1.x preset defaults to

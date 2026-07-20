@@ -1,19 +1,21 @@
 # CLAUDE.md
 
 Guidance for Claude Code (claude.ai/code) working in this repository. This file is the operative
-index; the deepest rationale lives in `docs/` (notably `docs/plan.md`, `docs/testing.md`,
-`docs/solid-2.0-notes.md`, `docs/definition-of-done.md`, `docs/theming.md`) and in each
-primitive/component's per-file usage doc under `docs/usage/<pkg>/<relative-src-path>/`.
+index; the deepest rationale lives in `__internal__/` (the internal contributor docs — notably
+`__internal__/plan.md`, `__internal__/testing.md`, `__internal__/solid-2.0-notes.md`,
+`__internal__/definition-of-done.md`, `__internal__/theming.md`) and in each primitive's per-file
+usage doc under `__internal__/primitives/<relative-src-path>/`. The **end-user** documentation is a
+separate thing — the doc website in `apps/docs/` (package `@hope-ui/docs`).
 
 ## What this is
 
 `hope-ui` is an **elegant, themeable**, accessible component library for SolidJS,
 targeting **SolidJS 2.0 (beta)** — not 1.x. Ready-to-use, themeable components (a full-featured,
-Tailwind-v4 + tailwind-variants system — see `docs/roadmap.md`) are the product; they are built over an **internal**
+Tailwind-v4 + tailwind-variants system — see `__internal__/roadmap.md`) are the product; they are built over an **internal**
 headless behavior kernel (`@hope-ui/primitives`), which is an implementation detail and an
 advanced escape hatch, **not** a stability-promised public API. It is API-inspired by Base UI
 and React Aria (their public API surface and accessibility patterns — actively reference and
-adapt their code/reasoning). See `docs/plan.md` for the full architecture rationale,
+adapt their code/reasoning). See `__internal__/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
 **i18n provenance:** `packages/primitives/src/i18n/` (locale + reading-direction
@@ -35,13 +37,13 @@ the same "two `solid-js` instances" trap `@solidjs/web` needs inlining for, one 
 mis-flagged `controlled-signal` as "breaks hydration"; that was the harness-config artifact, **not** a
 defect (`controlled-signal` is un-adopted only because ours is zero-dep and more capable). Still prove
 any such adoption against the hydration round-trip; effect-only primitives never hit it and are the
-safe bet. See `docs/solid-primitives-eval.md`.
+safe bet. See `__internal__/solid-primitives-eval.md`.
 
 **"SSR support" = "works in SolidStart."** Renders on the SolidStart server, hydrates
 without mismatch, runs on the client. That is the whole requirement — nothing broader.
 Every primitive/component must clear it, verified with `renderToStringAsync`/`hydrate`
 from `@solidjs/web` (the framework-agnostic pair SolidStart's server uses). The concrete
-rules that actually protect it are small and named in `docs/plan.md` ("SSR & hydration
+rules that actually protect it are small and named in `__internal__/plan.md` ("SSR & hydration
 requirements"): effect-gate DOM access, `createUniqueId` for ARIA-linking ids, gate
 server-side `Portal` behind `isServer`, and keep an `aria-controls` IDREF only while its
 target is mounted. A version caveat: `@solidjs/start` hasn't migrated to solid-js 2.0 yet,
@@ -55,7 +57,7 @@ the consumer's own `vite-plugin-solid` compiles it per environment (server `ssr`
 (SolidStart, `npm init solid`) is Vite + `vite-plugin-solid`, so the `"solid"` condition
 always resolves; a consumer without that plugin gets no match and fails loudly. Components
 are therefore free to write literal host elements — see the "Distribution model" in
-`docs/plan.md`.
+`__internal__/plan.md`.
 
 ## Commands
 
@@ -70,9 +72,9 @@ pnpm test:ssr             # vitest run --project=ssr     (node, SERVER builds of
 pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + hydration)
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
-pnpm check:coverage-parity  # fails if a src file lacks a test / docs/usage doc / story, OR a leaf folder has flat sprawl
+pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
-pnpm changeset            # add a changeset before a PR that changes a published package
+pnpm changeset            # NOT needed while the repo is at v0.0.0 — see "Changesets" below
 ```
 
 Playwright's browser needs to be installed once (CI does this automatically):
@@ -98,51 +100,77 @@ pnpm --filter @hope-ui/components typecheck
 Code") trailer or attribution line to commit messages.** Commit messages carry the change
 rationale only — no tool or assistant attribution, in any form.
 
+## Changesets
+
+**While the repo is at `v0.0.0`, do NOT create a changeset — not on any commit or PR — unless
+the user expressly asks for one.** Nothing is published yet, so there is no released version to
+bump or changelog to accrue; a changeset per change is pure noise until the first real release.
+Do not proactively add one or nudge the user to; when they explicitly ask, run `pnpm changeset`.
+Once the repo leaves `v0.0.0`, revert to the normal rule (a changeset accompanies every PR that
+changes a published package).
+
 ## Definition of Done (enforced, not a guideline)
 
-**Full rationale and history: `docs/definition-of-done.md`. Read `docs/testing.md` before writing
+**Full rationale and history: `__internal__/definition-of-done.md`. Read `__internal__/testing.md` before writing
 any test.**
 
-Every source file under `packages/*/src/` (except `index.ts`) must have:
+The DoD is enforced at two granularities, because a compound component (`Alert`, `Dialog`) may split
+its parts across many files in one leaf folder:
+
+- **`@hope-ui/primitives` / `@hope-ui/theming` — PER SOURCE FILE.** Every source file (except
+  `index.ts`) needs a matching test (item 1). `@hope-ui/primitives` additionally needs a matching
+  usage doc (item 2); `@hope-ui/theming` does **not** — its public API is documented in the doc
+  website (`apps/docs/`).
+- **`@hope-ui/components` — PER COMPONENT FOLDER.** A leaf `src/<name>/` folder is **one** component,
+  even when its parts live in many `src/<name>/<name>-<part>.tsx` files with the namespace object
+  (`export const Foo = { Root, … }`) assembled in the barrel `index.ts`. The **folder** — not each
+  part file — needs the set (items 1, 3–4; **no** repo usage doc — component API lives in the doc
+  website). Splitting a part into its own file adds **no** new test/story burden.
+
+The set:
 1. A matching test file — `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx` (real-browser —
    required for anything touching focus/keyboard/pointer behavior, since jsdom cannot be trusted for
-   that) — in a `__tests__/` subfolder of the same leaf directory (`Foo/__tests__/Foo.test.tsx`), so
-   the leaf folder stays free of test/fixture visual noise. See "Leaf source folders stay flat-free".
-2. A matching `Foo.md` doc (API, keyboard interaction table, ARIA pattern reference) at
-   `docs/usage/<pkg>/<relative-src-path>/Foo.md` (out of the source tree; the path mirrors package +
-   src path so the primitives/ and components/ `dialog` docs never collide). **Exception:** files
-   under `packages/primitives/src/internal/` (the advanced/unstable behavior kernel — see
-   "Architecture" below) require a test but **not** a consumer-facing `.md`; the composed families
-   (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
-3. **`@hope-ui/components` only:** a matching `Foo.stories.tsx`, colocated **beside the source** in
-   the same `src/` leaf directory (stories are the human-facing harness, so they stay next to what
-   they render). Components are what a human has to look at; pure primitives aren't. Stories (and
-   tests) never reach `dist/` because tsdown only builds the `package.json` `hope.entries` files,
-   and they're excluded from the `build` task's turbo `inputs`.
+   that) — in a `__tests__/` subfolder of the source file's OWN directory (components: `<name>/__tests__/`;
+   primitives/theming: the family/`src`-level `__tests__/`, e.g. `dialog/__tests__/`, `theming/src/__tests__/`,
+   and each kept sub-folder keeps its own — `calendar/utils/__tests__/`, `i18n/locales/__tests__/`,
+   `theming/src/recipes/__tests__/`), so the source folder stays free of test/fixture visual noise. See
+   "Leaf source folders stay flat-free".
+2. **`@hope-ui/primitives` only:** a matching `Foo.md` usage doc (API, keyboard interaction table,
+   ARIA pattern reference) at `__internal__/primitives/<relative-src-path>/Foo.md`, out of the source
+   tree and mirroring the src path. `@hope-ui/theming` and `@hope-ui/components` carry **no** repo
+   usage doc — their public API is documented in the doc website (`apps/docs/`), so a duplicate here
+   was redundant. **Exception:** files under `packages/primitives/src/internal/` (the
+   advanced/unstable behavior kernel — see "Architecture" below) require a test but **not** a `.md`;
+   the composed families (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
+3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (stories
+   are the human-facing harness, so they stay next to what they render). One per folder. Components are
+   what a human has to look at; pure primitives aren't. Stories (and tests) never reach `dist/` because
+   tsdown only builds the `package.json` `hope.entries` files, and they're excluded from the `build`
+   task's turbo `inputs`.
+4. **`@hope-ui/components` only:** an SSR test (`*.ssr.test.tsx` that *calls* `renderToStringAsync`)
+   **and** a hydration test (`*.browser.test.tsx` that *calls* `hydrate`) — one of each per folder.
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces the above in CI and
 additionally requires:
 - Every browser test that calls `mount()` also calls `expectNoA11yViolations` at least once (both
   from `@hope-ui/internal-test-utils`), running a baseline axe-core check. A browser test that
   renders nothing (e.g. `solid-contract.browser.test.tsx`) is exempt.
-- Every component (not pure internal primitives with no DOM output) has an SSR test
-  (`Foo.ssr.test.tsx` that *calls* `renderToStringAsync`) **and** a hydration test
-  (`Foo.browser.test.tsx` that *calls* `hydrate`). "Calls" means outside a comment, string, or
-  `it.skip`, and not merely imported.
+- "Calls" (for the SSR/hydration requirement) means outside a comment, string, or `it.skip`, and not
+  merely imported.
 
 Also required:
 - `expectNoA11yViolations` fails on axe **violations** *and* on **`incomplete`** results. Name a
   genuinely undecidable one (`color-contrast` over an unresolvable background) in `allowIncomplete`
   at the call site with a reason; never silence the category. See
-  `docs/usage/internal-test-utils/axe/axe.md`.
+  `__internal__/internal-test-utils/axe/axe.md`.
 - `mount()` **fails the test** on a `STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE`
   diagnostic. A deliberate untracked read is spelled `untrack(...)`; anything still warning is
-  unreviewed. See `docs/usage/internal-test-utils/mount/mount.md`.
+  unreviewed. See `__internal__/internal-test-utils/mount/mount.md`.
 - **Recipe purity:** a preset recipe (`packages/presets/**/recipes/`) references *finished*
   `--hope-*` tokens only — never `color-mix`, an alpha modifier (`bg-x/50`), or a magic opacity
   (`opacity-90`). Derived colors (the focus halo, the scrim) are authored as tokens in the preset's
   `tokens.css`, where it owns the raw scale. `pnpm check:recipe-purity`
-  (`scripts/check-recipe-purity.mjs`) enforces this in CI. See `docs/theming.md`.
+  (`scripts/check-recipe-purity.mjs`) enforces this in CI. See `__internal__/theming.md`.
 - Stories also pin known-but-unfixed behavior where a human can see it. Don't "fix" a story by
   deleting it; fix the component and rename the story. Current example: Dialog's `Modal with an
   unpositioned Popup (content is unclickable — by design)`, a documented consequence of the
@@ -157,15 +185,24 @@ Also required:
   otherwise looks identical to success). Sharing one `Tree` is what keeps the `ssr` and `browser`
   halves **structurally identical** — hydration keys (`_hk`) are a path through the component tree, so
   a component inserted before `Dialog.Trigger` (even one that renders nothing) shifts the trigger's
-  key. Adding a component adds **zero** committed fixture files at any scale. See `docs/testing.md`.
+  key. Adding a component adds **zero** committed fixture files at any scale. See `__internal__/testing.md`.
 
 ## Leaf source folders stay flat-free
 
 A `src/<name>/` folder holds only its implementation file(s), `index.ts`, and — for
-`@hope-ui/components` — `<name>.stories.tsx`. Everything else has a home: tests, `__fixtures__/`,
-and `__screenshots__/` live in a `__tests__/` subfolder; the per-file usage `.md` lives under
-`docs/usage/<pkg>/<path>/`. Never drop test, fixture, or doc files flat beside source, and never
-let a leaf folder accumulate a dozen files. `pnpm check:coverage-parity` enforces this — a flat
+`@hope-ui/components` — its `*.stories.tsx`. A compound component **splits its parts across files**
+here (`<name>-root.tsx`, `<name>-icon.tsx`, a shared `<name>-context.ts`, …), with the namespace
+object assembled in the barrel `index.ts` (`export const Foo = { Root, … }`) — no subfolders. That is
+encouraged, not sprawl: keeping a single 600-line file is worse. The `@hope-ui/primitives` /
+`@hope-ui/theming` families follow the same discipline one level up: every part file sits **flat** in
+its top-level folder (`dialog/dialog-content.ts`, `internal/create-focus-trap.ts`,
+`theming/src/preset.ts`) with the whole family's tests consolidated in that folder's single
+`__tests__/`. The only nested source sub-folders are a handful of deliberately-kept data/util
+groupings — `calendar/utils/`, `i18n/locales/`, `theming/src/recipes/`, each with its **own**
+`__tests__/` for its files — never a per-part folder. Everything non-source still has a
+home: tests, `__fixtures__/`, and `__screenshots__/` live in a `__tests__/` subfolder; the
+primitives usage `.md` lives under `__internal__/primitives/<path>/`. Never drop test, fixture, or doc files flat beside
+source. `pnpm check:coverage-parity` enforces this — a flat
 `*.test.*`, a flat `<name>.md`, or a flat `__fixtures__/` in any leaf under `primitives`,
 `components`, `theming`, or `internal-test-utils` fails the build.
 
@@ -177,7 +214,7 @@ literal `<div>` compiles (under a single `generate: 'dom'` build) to a module-sc
 literal element crashed SSR. That was never an SSR requirement — it was an artifact of the
 **distribution choice** to ship one pre-compiled dom build. The library now ships
 JSX-preserved **source** under the `"solid"` export condition (see "Distribution model" in
-`docs/plan.md`), so the consumer's `vite-plugin-solid` compiles each element per
+`__internal__/plan.md`), so the consumer's `vite-plugin-solid` compiles each element per
 environment and literal host elements are fine. Write them where they read best.
 
 `renderElement` (`@hope-ui/primitives/utils`) stays — but only as the `as`/render-prop
@@ -190,7 +227,7 @@ it when a component exposes `as`/`render`; otherwise a literal element is fine.
 `packages/primitives/src/__tests__/solid-contract.test.ts` (unit, `solid-js` client build),
 `solid-contract.ssr.test.tsx` (server builds) and `solid-contract.browser.test.tsx`
 (browser, client build) are characterization tests. They don't test hope-ui; they pin the
-undocumented `solid-js`/`@solidjs/web` behaviors listed in `docs/solid-2.0-notes.md`, each
+undocumented `solid-js`/`@solidjs/web` behaviors listed in `__internal__/solid-2.0-notes.md`, each
 with a comment naming the code that depends on it (`withDefaults`, `createControllableState`,
 `createComponentContext`, `createFocusRestore`, `renderElement`'s ref merging, and the
 `Dynamic` → `_hk` hydration key `renderElement` relies on). `@solidjs/web` already renamed
@@ -212,29 +249,30 @@ them rather than re-deriving a behavior in a comment.
   folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The top-level folders
   — `dialog`, `modal-backdrop`, `utils`, `internal` (documented below), plus `calendar` and `i18n`:
   - `dialog/` (`@hope-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
-    state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogPopup`,
+    state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogContent`,
     `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
-    `createDialogClose`), each in its own `dialog/<part>/dialog-<part>.ts`. Each part hook takes
-    the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
-    (so the effect stack lives in `createDialogPopup`, the popup's scope). This is the headless
+    `createDialogCloseTrigger`), each in its own flat `dialog/dialog-<part>.ts` file (all parts sit
+    directly in the family folder, with the tests consolidated in `dialog/__tests__/`). Each part hook
+    takes the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
+    (so the effect stack lives in `createDialogContent`, the content's scope). This is the headless
     shape `@hope-ui/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
-    `useDialog`/`useOverlay*` split. See `docs/usage/primitives/dialog/root/dialog-root.md`.
+    `useDialog`/`useOverlay*` split. See `__internal__/primitives/dialog/dialog-root.md`.
   - `modal-backdrop/` (`@hope-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
     only component (it renders DOM), so it sits at `src/` beside the families rather than in
     `internal/`.
   - `utils/` (`@hope-ui/primitives/utils`) — the non-`createX` composition helpers:
     `renderElement` (the render-prop/`as`-polymorphism primitive every public component uses
     instead of hand-rolling its own polymorphic-`as` type system — it also owns ref merging;
-    modeled on Base UI's `useRender` idea, not its code — see `docs/usage/primitives/utils/render/render.md`),
+    modeled on Base UI's `useRender` idea, not its code — see `__internal__/primitives/utils/render.md`),
     `withDefaults` (the *only* correct way to apply prop defaults under 2.0 — see the `merge` note
-    in `docs/solid-2.0-notes.md`), and `composeEventHandlers`.
+    in `__internal__/solid-2.0-notes.md`), and `composeEventHandlers`.
   - `internal/` (`@hope-ui/primitives/internal`) — the `createX` behavior primitives:
     `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
     missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
     `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`,
     `createRegisteredId`, `createRegisteredElement` (see each primitive's doc under
-    `docs/usage/primitives/internal/`, and the
-    ref/`createEffect` timing gotcha in `docs/solid-2.0-notes.md` before writing another one). The
+    `__internal__/primitives/internal/`, and the
+    ref/`createEffect` timing gotcha in `__internal__/solid-2.0-notes.md` before writing another one). The
     `internal/` barrel also carries the list/grid/collection navigation family
     (`createListNavigation`/`createListSelection`/`createGridNavigation`/`createVirtualCollection`,
     …) that the collection/floating components (Listbox, Menu, Select, …) will compose.
@@ -257,7 +295,7 @@ them rather than re-deriving a behavior in a comment.
   without the backdrop. floating-ui's `markOthers` layers the same two attributes for the same
   reason. Any future modal layer (Popover, Select) composes all four — that's why
   `ModalBackdrop` is in the kernel rather than inside Dialog. A modal popup must be positioned,
-  or it paints beneath the backdrop; see `docs/usage/primitives/modal-backdrop/modal-backdrop.md`.
+  or it paints beneath the backdrop; see `__internal__/primitives/modal-backdrop/modal-backdrop.md`.
 
   Two consequences that bite: `ModalBackdrop` and any consumer backdrop must be **spared** from
   `inert` (an inert element is transparent to hit testing, so a backdrop that hid itself would
@@ -290,7 +328,7 @@ them rather than re-deriving a behavior in a comment.
   `@hope-ui/components` reads recipes through it; `@hope-ui/presets/*` implement it; neither knows
   about the other. Depends on `@hope-ui/primitives` (for `createComponentContext`) — which is *why*
   primitives cannot fold into components without a dependency cycle (`components → theming →
-  components`). See `docs/theming.md`.
+  components`). See `__internal__/theming.md`.
 - `packages/presets` (`@hope-ui/presets`) — the concrete presets, per-preset subpaths
   (`@hope-ui/presets/hope` is the **default** visual identity). A preset is a JS entry
   (`@hope-ui/presets/hope` → `src/hope/index.ts`: `definePreset` over the recipe map) plus a
@@ -308,13 +346,18 @@ them rather than re-deriving a behavior in a comment.
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).
 
-**Composition rule for future components:** compose shared kernel primitives from
-`@hope-ui/primitives`, never import from another component's subpath within
-`@hope-ui/components`. E.g. Popover must compose
-`createFloating`/`createDismissable`/`createPresence` directly — it must never import
-from `@hope-ui/components/dialog`, even though both are "overlay-ish." A higher-level
-component depending on a sibling component's package (rather than the shared kernel) is a
-known anti-pattern this project avoids by design, despite now sharing one package.
+**Composition rule for future components:** compose shared *behavior* from
+`@hope-ui/primitives` and styling through `@hope-ui/theming`. A component **may** import and
+reuse a sibling component's subpath (e.g. `Dialog.CloseTrigger` renders `@hope-ui/components/close-button`,
+and later Popover/Sheet/Alert close parts do too) — a reusable leaf shouldn't be re-implemented.
+Two constraints remain: **no circular** component imports, and don't couple a component's
+*behavior* to a heavier sibling. E.g. Popover must compose
+`createFloating`/`createDismissable`/`createPresence` directly rather than depend on Dialog's
+modal machinery — Popover isn't "a kind of Dialog", so wiring its behavior through Dialog would
+force every non-modal floating consumer to pull in scroll-lock/hide-outside it never uses. Reusing
+a presentational leaf like `CloseButton` is fine; coupling behavior to a heavier sibling is not.
+Sibling subpaths stay external in the tsdown build (`neverBundle: [/^@hope-ui\//]`), so reuse is
+deduped, not inlined.
 
 **Publishing shape:** originally planned as packages grouped by shared-primitive family
 (`@hope-ui/overlays`, `@hope-ui/collections`, etc.); revised to a single
@@ -324,8 +367,8 @@ component lived in before they could install/import it; a single package name wi
 per-component subpaths removes that lookup entirely while keeping the same
 per-component tree-shaking (via `package.json#exports` + `"sideEffects": false`) that
 family packages would have given. `@hope-ui/primitives` stays a fully separate
-package — every entry in `@hope-ui/components` depends on it, never on a sibling
-subpath. Each component subpath is its own tsdown entry (from `package.json`'s
+package — every entry in `@hope-ui/components` depends on it, and may also depend on a
+sibling component subpath (kept external in the build). Each component subpath is its own tsdown entry (from `package.json`'s
 `hope.entries`), building to `dist/<component>/index.jsx` (JSX-preserved source) +
 matching `.d.ts`. ESM-only builds.
 
@@ -334,7 +377,7 @@ matching `.d.ts`. ESM-only builds.
 Targets `2.0.0-beta.x` (pinned via the `pnpm-workspace.yaml` catalog, kept in lockstep across
 `solid-js` / `@solidjs/signals` / `@solidjs/web`), discovered building Phase 0 and verified against
 the installed package. **Full rationale, repros, fixes, and code for every item below:
-`docs/solid-2.0-notes.md`.** The gotchas at a glance:
+`__internal__/solid-2.0-notes.md`.** The gotchas at a glance:
 
 - DOM rendering moved to `@solidjs/web` (`render`, `Dynamic`, `Portal`, `JSX` types), not
   `solid-js`/`solid-js/web`; `jsxImportSource` and the `solid.moduleName` override point there.
@@ -344,7 +387,7 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
   `babel-preset-solid@2.0.0-beta.x`); the 1.x preset (`tsup`/`esbuild-plugin-solid`,
   `unplugin-solid`) emits `use`/`addEventListener` instead of 2.0's `ref`/`addEvent` and fails
   to load `ref=`, which is why those toolchains are *not* used for JSX compilation here. See
-  `docs/plan.md` "Distribution model" and `docs/migration-2.0-stable.md` §5.
+  `__internal__/plan.md` "Distribution model" and `__internal__/migration-2.0-stable.md` §5.
 - A `createEffect(compute, effect)` compute function must never read a plain (non-signal) ref
   accessor — read the ref in the *effect* (second) callback.
 - When the ref-owning element is conditionally rendered by the signal the primitive reacts to, back
@@ -353,6 +396,17 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `mergeProps`/`splitProps` are gone → use `merge` and `omit` from `solid-js`.
 - `merge` resolves keys by *presence*, not value — never use it for defaults; use
   `withDefaults(props, { ... })` (resolves each key with `??`).
+- **Merged props are the source of truth — never touch raw `props` again after merging.** Once you
+  `withDefaults(props, …)` (or any `useDefault`-style merge), the returned object is the *only* props
+  object for the rest of the body. Merge once at the top, then feed **that** result to every
+  downstream op — `omit`/`splitProps`, `{...spread}`, destructure, computed props, event compose.
+  Reaching back to the original `props` for a defaulted key silently reads `undefined`: `withDefaults`
+  copies nothing, it exposes defaults as *getters over a new object* (`props[key] ?? defaults[key]`),
+  so the default lives nowhere but that merged object — the raw `props` is untouched. `omit(props, …)`
+  drops the default; `omit(merged, …)` carries it. This is the same presence-vs-value trap
+  `withDefaults` exists to close, re-created one layer up, and it's silent — no type error, no test
+  failure unless a test exercises the prop-omitted path. See `dialog-trigger.ts` (`omit(merged, …)`,
+  `merged.onClick`) for the correct shape.
 - Internal computed props must fall back to the consumer's (`props["aria-labelledby"] ??
   context.titleId()`), never overwrite; only consumer-uncontrolled props (`aria-modal`,
   `data-presence`) stay component-owned.
@@ -361,17 +415,27 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `createSignal(fn)` creates a *memo*, not a signal holding a function; box generic values as
   `createControllableState` does.
 - Sibling effects run/clean up in creation order on re-run, but LIFO on owner disposal (see
-  `createFocusRestore` / `docs/usage/primitives/internal/create-focus-restore/create-focus-restore.md`).
+  `createFocusRestore` / `__internal__/primitives/internal/create-focus-restore/create-focus-restore.md`).
 - `onMount` → `onSettled`; `createEffect` takes a split `(depsFn, computeFn)` form; `createContext`
   returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default;
   `applyRef` flattens ref arrays and skips falsy (no `mergeRefs`); `renderElement` owns ref merging,
   collapsing the internal + consumer refs into a single function ref (so it works with any render
-  target, not just host elements — see `docs/usage/primitives/utils/render/render.md`).
+  target, not just host elements — see `__internal__/primitives/utils/render/render.md`).
 - A descendant writing an ancestor-owned signal in its synchronous render body throws
   `[REACTIVE_WRITE_IN_OWNED_SCOPE]` — defer via `onSettled` / use `createRegisteredId`.
 - `solid-refresh` HMR breaks prop forwarding for imported components; `refresh: { disabled: true }`
   in `vitest.config.ts`.
 - Browser tests import `page` from `vitest/browser`, not the deprecated `@vitest/browser/context`.
+- A component arriving via a **prop/getter** (`startDecorator={<Icon/>}`, `loadingText`) is created
+  lazily on *every* read. Resolve it once with `children()` in the body — and read the resolved
+  accessor everywhere — **iff it is read more than once** in a render. That single axis covers both
+  reasons: repeated construction (waste), and the one hydration case — the `<Show when={x != null}>`
+  + `{x}` idiom, whose `when`-gate read builds and discards a component whose `_hk` the client and
+  server place differently, so `children()` is *load-bearing* there, not just an optimization. A
+  slot read **exactly once — `<Show>` or not — needs nothing** (a single read inside a `<Show>`
+  hydrates fine; it is the second, `when`-gate read that misaligns, not the `<Show>`). Also nothing
+  for a static/directly-written child. Full decision procedure + non-triggers:
+  `__internal__/solid-2.0-notes.md` (search "`children()` decision procedure").
 
 ## In development, `@hope-ui/*` always resolves to `src` — never to a sibling's `dist`
 
@@ -430,7 +494,7 @@ Two non-obvious things that config guards against, both hit for real:
 
 ## Testing stack specifics
 
-**`docs/testing.md` is the full explanation. This is the compressed version.**
+**`__internal__/testing.md` is the full explanation. This is the compressed version.**
 
 - Vitest 4's `test.projects` (not the deprecated `vitest.workspace.ts` file) defines three
   projects in `vitest.config.ts`, and the split is by **module resolution**, not by taste:

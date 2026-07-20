@@ -10,7 +10,7 @@ import { Tree } from "./button-icons.ssr-entry";
 // full contract — silent hydration, no node added/dropped, every server node reused — so a silent
 // client-render fallback (which would look fine visually) still fails the test. `ssrFixture` is
 // genuine server HTML rendered fresh by the hydration-fixture bridge from the same `Tree`. See
-// docs/solid-2.0-notes.md and docs/testing.md.
+// __internal__/solid-2.0-notes.md and __internal__/testing.md.
 
 describe("Button (icon components) hydration", () => {
   it("hydrates component decorators in place, without a mismatch or a second render", () => {

@@ -49,6 +49,7 @@ export function resolveServerEntry(packageName: string): string {
 const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "packages/theming/src");
 const presetsSrcDir = join(import.meta.dirname, "packages/presets/src");
+const componentsSrcDir = join(import.meta.dirname, "packages/components/src");
 
 // `@hope-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
 // so the alias is a wildcard: `@hope-ui/primitives/render` -> `.../src/render/index.ts`. The
@@ -61,13 +62,21 @@ const presetsSrcDir = join(import.meta.dirname, "packages/presets/src");
 // unrelated components), so its aliases are two exact-anchored matches — the `/conformance`
 // subpath and the root — rather than a wildcard.
 export const hopeUiAlias = [
+  // `@hope-ui/components` publishes one subpath per component folder (like primitives, no root
+  // barrel), so a wildcard: `@hope-ui/components/close-button` -> `.../src/close-button/index.ts`.
+  // A component may reuse a sibling (e.g. `Dialog.CloseTrigger` renders `CloseButton`); this resolves that
+  // to src in dev/test so it never reads the sibling's stale `dist`.
+  {
+    find: /^@hope-ui\/components\/(.+)$/,
+    replacement: join(componentsSrcDir, "$1/index.ts"),
+  },
   {
     find: /^@hope-ui\/primitives\/(.+)$/,
     replacement: join(primitivesSrcDir, "$1/index.ts"),
   },
   {
     find: /^@hope-ui\/theming\/conformance$/,
-    replacement: join(themingSrcDir, "conformance/conformance.ts"),
+    replacement: join(themingSrcDir, "conformance.ts"),
   },
   {
     find: /^@hope-ui\/theming$/,

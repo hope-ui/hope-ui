@@ -8,13 +8,19 @@
   "files": ["dist"],
   "hope": {
     "entries": {
+      "alert": "src/alert/index.ts",
       "badge": "src/badge/index.ts",
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
+      "close-button": "src/close-button/index.ts",
       "dialog": "src/dialog/index.ts"
     }
   },
   "exports": {
+    "./alert": {
+      "types": "./dist/alert/index.d.ts",
+      "solid": "./dist/alert/index.jsx"
+    },
     "./badge": {
       "types": "./dist/badge/index.d.ts",
       "solid": "./dist/badge/index.jsx"
@@ -26,6 +32,10 @@
     "./calendar": {
       "types": "./dist/calendar/index.d.ts",
       "solid": "./dist/calendar/index.jsx"
+    },
+    "./close-button": {
+      "types": "./dist/close-button/index.d.ts",
+      "solid": "./dist/close-button/index.jsx"
     },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",

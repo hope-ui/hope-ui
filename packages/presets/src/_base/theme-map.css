@@ -181,4 +181,8 @@
   --color-focus: var(--hope-focus);
   --color-focus-halo: var(--hope-focus-halo);
   --color-scrim: var(--hope-scrim);
+
+  /* Surface-adaptive interaction wash (currentColor-derived — see hope's tokens.css) */
+  --color-surface-adaptive-hovered: var(--hope-surface-adaptive-hovered);
+  --color-surface-adaptive-pressed: var(--hope-surface-adaptive-pressed);
 }

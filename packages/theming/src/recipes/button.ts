@@ -8,7 +8,7 @@
  * keeps the registry (`./registry`) a flat list of named recipe types with no shape logic of its own.
  */
 import type { JSX } from "@solidjs/web";
-import type { SlotRecipeFn } from "./slot-recipe";
+import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
  * Visual style. `default` is neutral chrome (shadcn's outline) and ignores `colorScheme`. `inverted`

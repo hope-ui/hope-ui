@@ -1,3 +1,4 @@
+import { Alert } from "@hope-ui/components/alert";
 import { Badge } from "@hope-ui/components/badge";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
@@ -258,18 +259,21 @@ polymorphism API.
 </Badge>
 ```
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <InfoIcon class="size-5" />
-  </span>
-  <div>
-    Badge is a static label with no behavior of its own, so — unlike Button — rendering it as an
-    anchor needs no extra flags: the anchor brings its own link semantics, and Badge just contributes
-    its computed <code>class</code> and merges refs. Spreading Badge's <code>span</code> props onto a
-    different element may need an <code>as unknown as</code> cast to satisfy TypeScript; the runtime
-    behavior is unaffected.
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<InfoIcon class="mt-0.5"/>} 
+  description={
+    <div>
+      Badge is a static label with no behavior of its own, so — unlike Button — rendering it as an
+      anchor needs no extra flags: the anchor brings its own link semantics, and Badge just contributes
+      its computed <code>class</code> and merges refs. Spreading Badge's <code>span</code> props onto a
+      different element may need an <code>as unknown as</code> cast to satisfy TypeScript; the runtime
+      behavior is unaffected.
+    </div>
+  } 
+/>
 
 ## Theming
 

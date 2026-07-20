@@ -1,3 +1,4 @@
+import { Alert } from "@hope-ui/components/alert";
 import { Badge } from "@hope-ui/components/badge";
 import { Button } from "@hope-ui/components/button";
 import { Link } from "@tanstack/solid-router";
@@ -28,17 +29,20 @@ form could only ever *drop* the component's computed props, so it would silently
 unstyled and inert. A function forces you to spread them, so the styling and behavior always reach
 your element.
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <InfoIcon class="size-5" />
-  </span>
-  <div>
-    There's no <code>as</code> prop on purpose: its polymorphic typing degrades IDE IntelliSense on
-    every component. <code>render</code> keeps completions and error messages honest without a
-    <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit cast for a cross-element
-    render (see <a href="#typing">Typing</a>).
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<InfoIcon class="mt-0.5"/>} 
+  description={
+    <div>
+      There's no <code>as</code> prop on purpose: its polymorphic typing degrades IDE IntelliSense on
+      every component. <code>render</code> keeps completions and error messages honest without a
+      <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit cast for a cross-element
+      render (see <a href="#typing">Typing</a>).
+    </div>
+  } 
+/>
 
 ## Render as a link
 
@@ -95,16 +99,19 @@ tab-order management, and synthesized keyboard activation.
 </Button>
 ```
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <InfoIcon class="size-5" />
-  </span>
-  <div>
-    Forget to set <code>nativeButton</code> to <code>false</code> on a non-button and you get an
-    element that looks right but isn't keyboard-operable. Button logs a warning in development when it
-    detects the mismatch; the check compiles out of production builds.
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<InfoIcon class="mt-0.5"/>} 
+  description={
+    <div>
+      Forget to set <code>nativeButton</code> to <code>false</code> on a non-button and you get an
+      element that looks right but isn't keyboard-operable. Button logs a warning in development when it
+      detects the mismatch; the check compiles out of production builds.
+    </div>
+  } 
+/>
 
 ## Render as a component
 

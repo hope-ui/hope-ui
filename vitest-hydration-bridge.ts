@@ -14,7 +14,7 @@ import { hopeUiAlias, serverBuildAlias } from "./vitest-aliases";
 //
 // The mechanism is vite-inside-vite. Hydration is two environments by definition (server render +
 // client hydrate) and no single Vitest project can be both — `ssr` resolves the *server* solid
-// builds, `browser` the *client* ones (see docs/testing.md). This plugin runs in the `browser`
+// builds, `browser` the *client* ones (see __internal__/testing.md). This plugin runs in the `browser`
 // project (client builds) but spins up one nested Vite SSR server configured exactly like the `ssr`
 // project — server-build aliases, `generate: "ssr"`, `ssr.noExternal` — and renders the subject's
 // tree through it. Same config in, so the bytes match what the `ssr` project's inline snapshot pins,
@@ -35,6 +35,7 @@ const repoRoot = import.meta.dirname;
  * no committed fixture file, ever.
  */
 export const HYDRATION_ENTRIES: Record<string, string> = {
+  alert: join(repoRoot, "packages/components/src/alert/__tests__/alert.ssr-entry.tsx"),
   badge: join(repoRoot, "packages/components/src/badge/__tests__/badge.ssr-entry.tsx"),
   "badge-icons": join(
     repoRoot,
@@ -45,12 +46,13 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
     repoRoot,
     "packages/components/src/button/__tests__/button-icons.ssr-entry.tsx",
   ),
+  "close-button": join(
+    repoRoot,
+    "packages/components/src/close-button/__tests__/close-button.ssr-entry.tsx",
+  ),
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
   calendar: join(repoRoot, "packages/components/src/calendar/__tests__/calendar.ssr-entry.tsx"),
-  "theme-context": join(
-    repoRoot,
-    "packages/theming/src/theme-context/__tests__/theme-context.ssr-entry.tsx",
-  ),
+  "theme-context": join(repoRoot, "packages/theming/src/__tests__/theme-context.ssr-entry.tsx"),
   // A component-free keyed tree the `hydrateFixture` helper's own suite hydrates to pin its
   // success and reuse-failure paths against genuine `_hk` markup.
   "hydrate-fixture": join(
@@ -86,7 +88,7 @@ function getSsrServer(): Promise<ViteDevServer> {
       // escapes the server-build alias and resolves a *second* `solid-js` copy, so a render-body
       // compute-form signal skips its hydration id on the server (`_hk` shifts down one vs the
       // client) and hydration silently mismatches. This must stay in lockstep with the `ssr`
-      // project's `server.deps.inline` in vitest.config.ts. See docs/solid-primitives-eval.md.
+      // project's `server.deps.inline` in vitest.config.ts. See __internal__/solid-primitives-eval.md.
       ssr: { noExternal: ["@solidjs/web", "solid-js", /@solid-primitives\//] },
     });
   }

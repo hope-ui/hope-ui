@@ -11,7 +11,7 @@ import { Tree } from "./button.ssr-entry";
 // leaving the output byte-identical. Wrapping a subtree in the provider also shifts its hydration
 // keys (`_hk`), so this render and the one `button.browser.test.tsx` hydrates must be structurally
 // identical, `<ThemeProvider>` included — which is enforced by construction here: both import the
-// same `Tree` from `button.ssr-entry.tsx`, the single source of truth. See docs/theming.md.
+// same `Tree` from `button.ssr-entry.tsx`, the single source of truth. See __internal__/theming.md.
 
 describe("Button SSR", () => {
   it("resolves renderToStringAsync without throwing", async () => {
@@ -101,7 +101,7 @@ describe("Button SSR", () => {
     // hydrates cannot drift. Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<button _hk=00l0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium select-none border bg-clip-padding outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled aria-busy:cursor-progress aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading h-8 gap-1.5 text-sm rounded-lg has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed px-3" data-slot="button" ><span _hk=00b data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
+      `"<button _hk=00p0 type="button" class="relative inline-flex items-center justify-center whitespace-nowrap font-medium select-none border bg-clip-padding outline-none transition-[color,background-color,border-color,box-shadow,translate] duration-150 ease-out focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo data-pressed:translate-y-px data-disabled:cursor-not-allowed data-disabled:pointer-events-none data-disabled:shadow-none data-disabled:opacity-disabled aria-busy:cursor-progress aria-busy:pointer-events-none aria-busy:shadow-none aria-busy:opacity-loading h-8 gap-1.5 text-sm rounded-lg has-data-[slot=button-start-decorator]:ps-2.5 has-data-[slot=button-end-decorator]:pe-2.5 bg-surface-raised text-foreground border-subtle shadow-xs hover:not-data-pressed:bg-surface-raised-hovered data-pressed:bg-surface-raised-pressed px-3" data-slot="button" ><span _hk=00f data-slot="button-label" class="inline-flex items-center">Click me</span></button>"`,
     );
   });
 });

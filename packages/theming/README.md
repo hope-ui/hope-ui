@@ -81,10 +81,9 @@ interface RecipeRegistry {
 
 ## Docs
 
-Per-symbol API detail lives under [`docs/usage/theming/`](../../docs/usage/theming/) (including the
-authoritative [semantic-token reference](../../docs/usage/theming/semantic-tokens/semantic-tokens.md)).
-The orientation doc — the two axes, the contract, and how a preset implements it — is
-[`docs/theming.md`](../../docs/theming.md).
+Per-symbol API detail — including the authoritative semantic-token reference — lives in the doc
+website (`apps/docs/`). The orientation doc — the two axes, the contract, and how a preset
+implements it — is [`__internal__/theming.md`](../../__internal__/theming.md).
 
 ## License
 

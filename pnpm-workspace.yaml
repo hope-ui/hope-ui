@@ -16,15 +16,15 @@ catalog:
   # Framework-agnostic virtualizer core. Adopted (not merely referenced) by
   # `createVirtualCollection`; an *optional* peerDependency of @hope-ui/primitives so the
   # kernel stays zero-dependency for consumers who never virtualize. See
-  # docs/solid-primitives-eval.md.
+  # __internal__/solid-primitives-eval.md.
   "@tanstack/virtual-core": 3.17.4
   # Immutable, locale-aware date-only value types (`CalendarDate`) — the substrate the
-  # calendar family is built on, same as React Aria. See docs/solid-primitives-eval.md and
+  # calendar family is built on, same as React Aria. See __internal__/solid-primitives-eval.md and
   # packages/primitives/src/calendar/.
   "@internationalized/date": 3.12.2
   # SolidJS 2.0 (`next`-branch) community primitive adopted by the calendar family:
   # `@solid-primitives/a11y` (`createAnnounce` — the screen-reader live-region announcer). Peers on
-  # solid-js/@solidjs/web ^2.0.0-beta. Adoption verdict: docs/solid-primitives-eval.md.
+  # solid-js/@solidjs/web ^2.0.0-beta. Adoption verdict: __internal__/solid-primitives-eval.md.
   # (`@solid-primitives/i18n` was dropped — hope-ui's i18n module now ships its own catalog+resolver.)
   "@solid-primitives/a11y": 1.0.0-next.0
 

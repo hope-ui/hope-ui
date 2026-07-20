@@ -79,9 +79,9 @@ against the preset's token CSS read as a string — see `src/hope/__tests__/`.
 
 ## Docs
 
-- Theming model, the two axes, and adding a preset: [`docs/theming.md`](../../docs/theming.md).
-- Preset API surface: [`docs/preset-api.md`](../../docs/preset-api.md).
-- Semantic-token reference: [`docs/usage/theming/semantic-tokens/semantic-tokens.md`](../../docs/usage/theming/semantic-tokens/semantic-tokens.md).
+- Theming model, the two axes, and adding a preset: [`__internal__/theming.md`](../../__internal__/theming.md).
+- Preset API surface: [`__internal__/preset-api.md`](../../__internal__/preset-api.md).
+- Semantic-token reference: the doc website (`apps/docs/`).
 
 ## License
 

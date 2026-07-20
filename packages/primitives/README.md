@@ -64,10 +64,10 @@ decomposes into a root state hook plus one hook per part, so `@hope-ui/component
 thin JSX layer over it:
 
 ```ts
-import { createDialog, createDialogPopup } from "@hope-ui/primitives/dialog";
+import { createDialog, createDialogContent } from "@hope-ui/primitives/dialog";
 
-const state = createDialog({ modal: true });      // call once, in an owner scope
-const popup = createDialogPopup(state, props);     // owns the focus-trap/dismiss/scroll-lock stack
+const state = createDialog({ modal: true });        // call once, in an owner scope
+const content = createDialogContent(state, props);  // owns the focus-trap/dismiss/scroll-lock stack
 ```
 
 ## Design notes worth knowing
@@ -75,29 +75,29 @@ const popup = createDialogPopup(state, props);     // owns the focus-trap/dismis
 - **Modality is four mechanisms, not one.** `createHideOutside` applies `aria-hidden` **and**
   `inert` outside the popup; `createFocusTrap` cycles Tab inside it; `ModalBackdrop` blocks the
   pointer unconditionally. None is redundant — see [`CLAUDE.md`](../../CLAUDE.md) and the
-  [`modal-backdrop` usage doc](../../docs/usage/primitives/modal-backdrop/modal-backdrop.md).
+  [`modal-backdrop` usage doc](../../__internal__/primitives/modal-backdrop/modal-backdrop.md).
 - **No primitive keeps cross-instance state at module scope.** `createScrollLock` and
   `createHideOutside` key their ref counts off `document.body`/the element under a `Symbol.for(...)`,
   which resolves through the cross-realm global symbol registry, so two installed copies read the
   same slot.
 - **SolidJS 2.0 idioms are load-bearing.** Split `createEffect(depsFn, computeFn)`, `merge`/`omit`
   (not `mergeProps`/`splitProps`), `onSettled` (not `onMount`), `withDefaults` (not `merge`) for
-  defaults. See [`docs/solid-2.0-notes.md`](../../docs/solid-2.0-notes.md).
+  defaults. See [`__internal__/solid-2.0-notes.md`](../../__internal__/solid-2.0-notes.md).
 
 ## Reference / composition policy
 
 Base UI and React Aria are active behavior references (public API + a11y reasoning, not their React
 internals). `@solid-primitives` (the `next` branch) is adopted as a dependency where it fits, gated
 on the full Definition of Done — above all the hydration round-trip. Do **not** copy code from other
-Solid headless libraries. See [`docs/reference-implementations.md`](../../docs/reference-implementations.md)
-and [`docs/solid-primitives-eval.md`](../../docs/solid-primitives-eval.md).
+Solid headless libraries. See [`__internal__/reference-implementations.md`](../../__internal__/reference-implementations.md)
+and [`__internal__/solid-primitives-eval.md`](../../__internal__/solid-primitives-eval.md).
 
 ## Docs
 
-Per-primitive usage docs live under [`docs/usage/primitives/`](../../docs/usage/primitives/). The
+Per-primitive usage docs live under [`__internal__/primitives/`](../../__internal__/primitives/). The
 composed families (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` helpers each carry a
 usage `.md`; the `internal/` behavior primitives require a test but not a consumer-facing doc.
-Architecture rationale: [`docs/plan.md`](../../docs/plan.md).
+Architecture rationale: [`__internal__/plan.md`](../../__internal__/plan.md).
 
 ## License
 

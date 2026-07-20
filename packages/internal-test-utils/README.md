@@ -34,10 +34,10 @@ enforced by `pnpm check:coverage-parity`.
 
 ## Docs
 
-Per-helper docs: [`docs/usage/internal-test-utils/`](../../docs/usage/internal-test-utils/)
+Per-helper docs: [`__internal__/internal-test-utils/`](../../__internal__/internal-test-utils/)
 (`mount`, `axe`). The testing stack, the three Vitest projects, and the hydration bridge are
-explained in [`docs/testing.md`](../../docs/testing.md); the enforced rules are in
-[`docs/definition-of-done.md`](../../docs/definition-of-done.md).
+explained in [`__internal__/testing.md`](../../__internal__/testing.md); the enforced rules are in
+[`__internal__/definition-of-done.md`](../../__internal__/definition-of-done.md).
 
 ## License
 

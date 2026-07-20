@@ -1,9 +1,22 @@
 import ssrFixture from "virtual:hydration-fixture?id=dialog";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
+import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
-import { Dialog } from "../dialog";
+import { Dialog } from "../index";
+
+// `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
+// `common.close` → accessible name "Close"), so any tree that renders it must sit under a
+// `<ThemeProvider>` fed the `hope` preset. It is a zero-DOM provider (its token values live in CSS).
+// The Close button is still located by its accessible name — `getByRole("button", { name: "Close" })`
+// — which the default `aria-label` keeps stable, so the interaction assertions are unchanged.
+function Themed(props: { children: JSX.Element }): JSX.Element {
+  return <ThemeProvider preset={hope}>{props.children}</ThemeProvider>;
+}
+
 // Genuine server output, rendered fresh in-process by the hydration-fixture bridge (no committed
 // `.html`). `Tree` is the same tree `dialog.ssr.test.tsx` inline-snapshots and the bridge renders,
 // so the hydration input and the client tree cannot structurally diverge. The interaction tests
@@ -21,21 +34,25 @@ import { Tree } from "./dialog.ssr-entry";
  */
 function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
   return (
-    <Dialog.Root onOpenChange={props.onOpenChange}>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        {/* Headless: no default styles. Given real positioning/dimensions here so
-        real clicks land where a consumer's own CSS would put them in practice — a
-        `position: fixed` backdrop otherwise paints above a non-positioned (static)
-        Popup regardless of DOM order, which would make Popup's own content unclickable. */}
-        <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-        <Dialog.Popup style={{ position: "relative" }}>
-          <Dialog.Title>Dialog title</Dialog.Title>
-          <Dialog.Description>Dialog description</Dialog.Description>
-          <Dialog.Close>Close</Dialog.Close>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <Themed>
+      <Dialog.Root onOpenChange={props.onOpenChange}>
+        <Dialog.Trigger>Open dialog</Dialog.Trigger>
+        <Dialog.Portal>
+          {/* Backdrop/Popup given real positioning/dimensions here so real clicks land where a
+          consumer's own CSS would put them in practice — a `position: fixed` backdrop otherwise paints
+          above a non-positioned (static) Popup regardless of DOM order, which would make Popup's own
+          content unclickable. */}
+          <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+          {/* No explicit CloseTrigger — `Content` auto-renders one (showCloseButton defaults true). */}
+          <Dialog.Positioner>
+            <Dialog.Content style={{ position: "relative" }}>
+              <Dialog.Title>Dialog title</Dialog.Title>
+              <Dialog.Description>Dialog description</Dialog.Description>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </Themed>
   );
 }
 
@@ -47,7 +64,7 @@ function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
  */
 function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () => void }) {
   return (
-    <>
+    <Themed>
       <p>
         <button type="button" data-testid="background-button" onClick={props.onBackgroundClick}>
           Background button
@@ -56,13 +73,14 @@ function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () =
       <Dialog.Root modal={props.modal}>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
-            <Dialog.Title>Dialog title</Dialog.Title>
-            <Dialog.Close>Close</Dialog.Close>
-          </Dialog.Popup>
+          <Dialog.Positioner>
+            <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+              <Dialog.Title>Dialog title</Dialog.Title>
+            </Dialog.Content>
+          </Dialog.Positioner>
         </Dialog.Portal>
       </Dialog.Root>
-    </>
+    </Themed>
   );
 }
 
@@ -196,7 +214,7 @@ describe("Dialog", () => {
     dispose();
   });
 
-  it("closes when Dialog.Close is clicked", async () => {
+  it("closes when Dialog.CloseTrigger is clicked", async () => {
     const { dispose } = mount(() => <FullDialog />);
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -236,14 +254,18 @@ describe("Dialog", () => {
   it("supports controlled open state", async () => {
     const [open, setOpen] = createSignal(false);
     const { dispose } = mount(() => (
-      <Dialog.Root open={open()} onOpenChange={setOpen}>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root open={open()} onOpenChange={setOpen}>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     expect(page.getByRole("dialog").query()).toBeNull();
@@ -269,15 +291,18 @@ describe("Dialog", () => {
     // non-modal dialog — no focus trap, no scroll lock, no aria-modal.
     function Wrapper(props: { modal?: boolean }) {
       return (
-        <Dialog.Root modal={props.modal}>
-          <Dialog.Trigger>Open dialog</Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Popup>
-              <Dialog.Title>Title</Dialog.Title>
-              <Dialog.Close>Close</Dialog.Close>
-            </Dialog.Popup>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <Themed>
+          <Dialog.Root modal={props.modal}>
+            <Dialog.Trigger>Open dialog</Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Positioner>
+                <Dialog.Content>
+                  <Dialog.Title>Title</Dialog.Title>
+                </Dialog.Content>
+              </Dialog.Positioner>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </Themed>
       );
     }
 
@@ -293,14 +318,18 @@ describe("Dialog", () => {
 
   it("still lets an explicit `modal={false}` through", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root modal={false}>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root modal={false}>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -408,14 +437,18 @@ describe("Dialog", () => {
     // would silently stop blocking the pointer, and a consumer's `Dialog.Backdrop` would lose
     // its hover styles and pointer handlers.
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+            <Dialog.Positioner>
+              <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
@@ -459,19 +492,23 @@ describe("Dialog", () => {
     // true with or without a `ModalBackdrop` — see Dialog.md.
     const onBackdropPointerDown = vi.fn();
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Backdrop
-            data-testid="backdrop"
-            onPointerDown={onBackdropPointerDown}
-            style={{ position: "fixed", inset: "0" }}
-          />
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Backdrop
+              data-testid="backdrop"
+              onPointerDown={onBackdropPointerDown}
+              style={{ position: "fixed", inset: "0" }}
+            />
+            <Dialog.Positioner>
+              <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -505,14 +542,18 @@ describe("Dialog", () => {
 
   it("lets a consumer's onClick cancel the open with preventDefault", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger onClick={(event) => event.preventDefault()}>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger onClick={(event) => event.preventDefault()}>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -524,14 +565,18 @@ describe("Dialog", () => {
   it("runs a consumer's onClick before opening, and still opens without preventDefault", async () => {
     const order: string[] = [];
     const { dispose } = mount(() => (
-      <Dialog.Root onOpenChange={() => order.push("open")}>
-        <Dialog.Trigger onClick={() => order.push("consumer")}>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup>
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root onOpenChange={() => order.push("open")}>
+          <Dialog.Trigger onClick={() => order.push("consumer")}>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -543,16 +588,21 @@ describe("Dialog", () => {
 
   it("lets a consumer's onClick cancel the close with preventDefault", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          {/* Positioned, because a modal dialog always renders a `position: fixed`
-          `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md. */}
-          <Dialog.Popup style={{ position: "fixed" }}>
-            <Dialog.Title>Title</Dialog.Title>
-            <Dialog.Close onClick={(event) => event.preventDefault()}>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            {/* Positioned, because a modal dialog always renders a `position: fixed`
+            `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md.
+            `showCloseButton={false}` so the only Close button is the explicit one under test. */}
+            <Dialog.Positioner>
+              <Dialog.Content showCloseButton={false} style={{ position: "fixed" }}>
+                <Dialog.Title>Title</Dialog.Title>
+                <Dialog.CloseTrigger onClick={(event) => event.preventDefault()} />
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Close" }));
@@ -582,15 +632,17 @@ describe("Dialog", () => {
     // with no Title mounted — and `merge` let that `undefined` erase the consumer's value,
     // leaving the dialog with no accessible name at all.
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <h2 id="external-heading">Heading outside the popup</h2>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup aria-labelledby="external-heading">
-            <Dialog.Close>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <h2 id="external-heading">Heading outside the popup</h2>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content aria-labelledby="external-heading" />
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -603,15 +655,19 @@ describe("Dialog", () => {
 
   it("lets a consumer-supplied aria-labelledby win over Dialog.Title", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <h2 id="external-heading">Outside</h2>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup aria-labelledby="external-heading">
-            <Dialog.Title>Inner title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <h2 id="external-heading">Outside</h2>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content aria-labelledby="external-heading">
+                <Dialog.Title>Inner title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -624,16 +680,19 @@ describe("Dialog", () => {
 
   it("supports role='alertdialog' (the APG alert dialog pattern)", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Delete everything</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup role="alertdialog">
-            <Dialog.Title>Are you sure?</Dialog.Title>
-            <Dialog.Description>This cannot be undone.</Dialog.Description>
-            <Dialog.Close>Cancel</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root role="alertdialog">
+          <Dialog.Trigger>Delete everything</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Are you sure?</Dialog.Title>
+                <Dialog.Description>This cannot be undone.</Dialog.Description>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await userEvent.click(page.getByRole("button", { name: "Delete everything" }));
@@ -645,14 +704,18 @@ describe("Dialog", () => {
 
   it("lets the consumer pin the popup's id, and points aria-controls at it", async () => {
     const { dispose } = mount(() => (
-      <Dialog.Root>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Popup id="my-popup">
-            <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root>
+          <Dialog.Trigger>Open dialog</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content id="my-popup">
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     const trigger = page.getByRole("button", { name: "Open dialog" });
@@ -672,14 +735,17 @@ describe("Dialog", () => {
   it("merges a consumer `ref` on Popup with the internal one", async () => {
     let consumerRef: HTMLElement | undefined;
     const { dispose } = mount(() => (
-      <Dialog.Root defaultOpen>
-        <Dialog.Portal>
-          <Dialog.Popup ref={(el: HTMLDivElement) => (consumerRef = el)}>
-            <Dialog.Title>Title</Dialog.Title>
-            <Dialog.Close>Close</Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content ref={(el: HTMLDivElement) => (consumerRef = el)}>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
     ));
 
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
@@ -688,6 +754,128 @@ describe("Dialog", () => {
     await userEvent.keyboard("{Escape}");
     expect(page.getByRole("dialog").query()).toBeNull();
 
+    dispose();
+  });
+
+  // ---- styled layer: recipe slots, showCloseButton, dismissal toggles (from Root) ----
+
+  /**
+   * A full styled dialog with the structural parts, so the recipe slots are all exercised. The
+   * recipe's positioning classes have no CSS in the test environment (there is no Tailwind here — the
+   * other tests position inline for the same reason), so `Content` is positioned inline to keep it —
+   * and its corner Close button — above the pointer-blocking `ModalBackdrop`.
+   */
+  function StyledDialog(props: { showCloseButton?: boolean }) {
+    return (
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+            <Dialog.Positioner>
+              <Dialog.Content
+                showCloseButton={props.showCloseButton}
+                style={{ position: "fixed", top: "0", left: "0" }}
+              >
+                <Dialog.Header>
+                  <Dialog.Title>Delete project</Dialog.Title>
+                  <Dialog.Description>This cannot be undone.</Dialog.Description>
+                </Dialog.Header>
+                <Dialog.Body>Body content</Dialog.Body>
+                <Dialog.Footer>Footer content</Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
+    );
+  }
+
+  it("marks each styled part with its data-slot, and has no a11y violations", async () => {
+    const { dispose } = mount(() => <StyledDialog />);
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+
+    // The parts portal to `document.body`, so query the whole document, not the mount container.
+    for (const slot of [
+      "dialog-backdrop",
+      "dialog-positioner",
+      "dialog-content",
+      "dialog-header",
+      "dialog-body",
+      "dialog-footer",
+      "dialog-title",
+      "dialog-description",
+    ]) {
+      expect(document.querySelector(`[data-slot="${slot}"]`)).toBeTruthy();
+    }
+    // The auto CloseTrigger renders a `CloseButton` re-scoped to the `dialog-close-trigger` slot.
+    expect(document.querySelector('[data-slot="dialog-close-trigger"]')).toBeTruthy();
+    // …and no longer leaks CloseButton's generic root marker.
+    expect(document.querySelector('[data-slot="close-button"]')).toBeNull();
+
+    await expectNoA11yViolations(document.body);
+    dispose();
+  });
+
+  it("auto-renders a corner CloseTrigger by default, which closes the dialog", async () => {
+    const { dispose } = mount(() => <StyledDialog />);
+    const close = page.getByRole("button", { name: "Close" });
+    await expect.element(close).toBeInTheDocument();
+
+    await userEvent.click(close);
+    expect(page.getByRole("dialog").query()).toBeNull();
+    dispose();
+  });
+
+  it("omits the auto CloseTrigger when showCloseButton={false}", async () => {
+    const { dispose } = mount(() => <StyledDialog showCloseButton={false} />);
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+    expect(page.getByRole("button", { name: "Close" }).query()).toBeNull();
+    dispose();
+  });
+
+  it("does not close on Escape when Root sets closeOnEscape={false}", async () => {
+    const { dispose } = mount(() => (
+      <Themed>
+        <Dialog.Root defaultOpen closeOnEscape={false}>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
+    ));
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+
+    await userEvent.keyboard("{Escape}");
+    // A frame for the (suppressed) dismiss path before asserting the dialog survived.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+    dispose();
+  });
+
+  it("does not close on an outside pointerdown when Root sets closeOnInteractOutside={false}", async () => {
+    const { dispose } = mount(() => (
+      <Themed>
+        <Dialog.Root defaultOpen closeOnInteractOutside={false}>
+          <Dialog.Portal>
+            <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
+            <Dialog.Positioner>
+              <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
+                <Dialog.Title>Title</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
+    ));
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+
+    await userEvent.click(page.getByTestId("backdrop"));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
     dispose();
   });
 });

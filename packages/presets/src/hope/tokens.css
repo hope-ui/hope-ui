@@ -193,6 +193,19 @@
   --hope-focus-halo: color-mix(in oklab, var(--color-violet-600) 50%, transparent);
   --hope-scrim: color-mix(in oklab, var(--color-neutral-900) 50%, transparent);
 
+  /*
+   * Surface-adaptive interaction wash (part of the surface family). Unlike every token above, these
+   * mix against `currentColor` — the inherited text color — not a fixed shade, so a control with no
+   * rest background of its own (an icon-only button such as CloseButton) tints correctly on any
+   * surface (solid / soft / light / dark) without a colorScheme. `currentColor` resolves at the use
+   * site, so there is deliberately **no `.dark` counterpart** — it already flips per surface. The
+   * `color-mix` lives here (the preset owns raw color math); recipes reference only the finished
+   * `bg-surface-adaptive-*` utilities. Focus is not special-cased — a surface-adaptive control uses
+   * the shared `focus-halo` ring, same as Button.
+   */
+  --hope-surface-adaptive-hovered: color-mix(in oklab, currentColor 10%, transparent);
+  --hope-surface-adaptive-pressed: color-mix(in oklab, currentColor 15%, transparent);
+
   /* Opacity axis (dim applied to a disabled control / to content obscured while loading) */
   --hope-opacity-disabled: 0.4;
   --hope-opacity-loading: 1;

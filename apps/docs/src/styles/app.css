@@ -4,6 +4,11 @@
    `@source "./recipes"` that emits the component utility classes. */
 @import "@hope-ui/presets/hope/tailwind.css";
 
+/* Keeps the full Tailwind color palette emitted so the Theme Creator's live preview
+   (/theme-creator) can resolve any `var(--color-<family>-<shade>)` it sets at runtime.
+   See the file header for why this is required. */
+@import "./palette-keepalive.css";
+
 /* Styles markdown prose (headings, paragraphs, lists, tables). Legacy JS plugin
    loaded via Tailwind v4's `@plugin` directive; must sit after the @imports.
    The docs `<article>` opts in with `class="prose"`. */

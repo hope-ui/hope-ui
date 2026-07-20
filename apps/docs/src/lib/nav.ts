@@ -4,8 +4,9 @@
 // routes; `label` is the display name. There is deliberately no "Home" entry —
 // the brand wordmark links there (see SiteHeader).
 export const PRIMARY_NAV = [
-  { to: "/get-started", label: "Get started" },
+  { to: "/get-started", label: "Get Started" },
   { to: "/components", label: "Components" },
+  { to: "/theme-creator", label: "Theme Creator" },
   { to: "/changelog", label: "Changelog" },
 ] as const;
 

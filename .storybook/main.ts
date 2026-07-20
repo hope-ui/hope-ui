@@ -12,6 +12,7 @@ import { solidPluginOptions } from "../solid-babel-options";
 const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "../packages/theming/src");
 const presetsSrcDir = join(import.meta.dirname, "../packages/presets/src");
+const componentsSrcDir = join(import.meta.dirname, "../packages/components/src");
 
 const config: StorybookConfig = {
   stories: ["../packages/*/src/**/*.stories.@(ts|tsx)"],
@@ -50,13 +51,17 @@ const config: StorybookConfig = {
         ...config.resolve,
         alias: [
           {
+            find: /^@hope-ui\/components\/(.+)$/,
+            replacement: join(componentsSrcDir, "$1/index.ts"),
+          },
+          {
             find: /^@hope-ui\/primitives\/(.+)$/,
             replacement: join(primitivesSrcDir, "$1/index.ts"),
           },
           // `@hope-ui/theming` has a root barrel: two exact-anchored aliases, not a wildcard.
           {
             find: /^@hope-ui\/theming\/conformance$/,
-            replacement: join(themingSrcDir, "conformance/conformance.ts"),
+            replacement: join(themingSrcDir, "conformance.ts"),
           },
           {
             find: /^@hope-ui\/theming$/,
