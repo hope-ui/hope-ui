@@ -81,11 +81,11 @@ describe("hope alert recipe", () => {
     expect(root).not.toContain("shadow");
   });
 
-  it("carries the exit-transition chrome keyed on data-state", () => {
+  it("carries the exit-transition chrome keyed on data-presence", () => {
     const root = alertRecipe({}).root();
     expect(root).toContain("transition-[opacity,transform]");
     expect(root).toContain("motion-reduce:transition-none");
-    expect(root).toContain("data-[state=exiting]:opacity-0");
+    expect(root).toContain("data-exiting:opacity-0");
   });
 
   it("reserves a transparent border on the root so bordered variants never shift a pixel", () => {

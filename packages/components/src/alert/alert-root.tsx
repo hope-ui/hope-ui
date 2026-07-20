@@ -288,7 +288,7 @@ export const Root: Component<AlertProps> = (props) => {
         return slots.root();
       },
       "data-slot": "alert",
-      get "data-state"(): string {
+      get "data-presence"(): string {
         return presence.status();
       },
       get role(): AlertRole | undefined {

@@ -43,7 +43,7 @@ describe("Alert", () => {
     const alert = container.querySelector('[data-slot="alert"]');
     expect(alert?.tagName).toBe("DIV");
     expect(alert?.getAttribute("role")).toBe("alert");
-    expect(alert?.getAttribute("data-state")).toBe("entered");
+    expect(alert?.getAttribute("data-presence")).toBe("entered");
     await expectNoA11yViolations(container);
     dispose();
   });
