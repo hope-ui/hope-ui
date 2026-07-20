@@ -56,8 +56,8 @@ actual installed package):
   Fix: track both in `compute`, e.g.
   `createEffect(() => [options.active(), options.ref()] as const, ([active, container]) => { ... })`,
   with the ref always backed by `createSignal`, never `let el; ref={el}`. Live in
-  `createFocusTrap`/`createDismissable`; see `createDialogPopup`/`createDialogBackdrop`
-  (`packages/primitives/src/dialog/popup/dialog-popup.ts` and `.../backdrop/dialog-backdrop.ts`)
+  `createFocusTrap`/`createDismissable`; see `createDialogContent`/`createDialogBackdrop`
+  (`packages/primitives/src/dialog/content/dialog-content.ts` and `.../backdrop/dialog-backdrop.ts`)
   for the call-site pattern. Any future `createXyz({ active, ref })`-
   shaped primitive that needs the ref the moment `active` flips true needs this same
   pattern — `createPresence` doesn't need it (and wasn't touched) because it doesn't read

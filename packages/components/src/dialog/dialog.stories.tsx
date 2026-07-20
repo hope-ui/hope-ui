@@ -51,11 +51,11 @@ export const Default: Story = {
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Backdrop style={backdropStyle} />
-          <Dialog.Popup style={popupStyle}>
+          <Dialog.Content style={popupStyle}>
             <Dialog.Title>Dialog title</Dialog.Title>
             <Dialog.Description>Dialog description</Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </>
@@ -80,14 +80,14 @@ export const NonModal: Story = {
       <Dialog.Root modal={false}>
         <Dialog.Trigger>Open non-modal dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup style={popupStyle}>
+          <Dialog.Content style={popupStyle}>
             <Dialog.Title>Non-modal</Dialog.Title>
             <Dialog.Description>
               Tab to me, then press Escape: focus returns to the trigger. The background button
               behind me still works.
             </Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </>
@@ -112,14 +112,14 @@ export const ModalWithoutBackdrop: Story = {
       <Dialog.Root>
         <Dialog.Trigger>Open modal dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup style={popupStyle}>
+          <Dialog.Content style={popupStyle}>
             <Dialog.Title>Modal, no backdrop</Dialog.Title>
             <Dialog.Description>
               Try clicking the background button behind me. It's unreachable by pointer and by
               assistive technology, even though I ship no backdrop.
             </Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </>
@@ -127,7 +127,7 @@ export const ModalWithoutBackdrop: Story = {
 };
 
 /**
- * A modal `Dialog.Popup` **must be positioned**. The pointer-blocking `ModalBackdrop` is
+ * A modal `Dialog.Content` **must be positioned**. The pointer-blocking `ModalBackdrop` is
  * `position: fixed`, and CSS paints positioned elements above non-positioned ones regardless
  * of DOM order — so a `position: static` popup ends up *underneath* it and its own buttons
  * stop responding to the mouse. Every other story positions the popup; this one doesn't, on
@@ -141,14 +141,14 @@ export const UnpositionedModalPopup: Story = {
       <Dialog.Root>
         <Dialog.Trigger>Open unpositioned dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup style={{ "background-color": "white", color: "#111", padding: "1.5rem" }}>
+          <Dialog.Content style={{ "background-color": "white", color: "#111", padding: "1.5rem" }}>
             <Dialog.Title>No position</Dialog.Title>
             <Dialog.Description>
               My Close button is beneath the ModalBackdrop. Escape still works. Give the popup
               `position: fixed` and it comes back.
             </Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </>
@@ -166,11 +166,11 @@ export const AlertDialog: Story = {
       <Dialog.Trigger>Delete everything</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Popup role="alertdialog" style={popupStyle}>
+        <Dialog.Content role="alertdialog" style={popupStyle}>
           <Dialog.Title>Are you sure?</Dialog.Title>
           <Dialog.Description>This cannot be undone.</Dialog.Description>
-          <Dialog.Close />
-        </Dialog.Popup>
+          <Dialog.CloseTrigger />
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   ),
@@ -190,10 +190,10 @@ export const LabelledByExternalHeading: Story = {
       <Dialog.Trigger>Open dialog</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Popup aria-labelledby="external-heading" style={popupStyle}>
+        <Dialog.Content aria-labelledby="external-heading" style={popupStyle}>
           <Dialog.Description>My accessible name should come from outside.</Dialog.Description>
-          <Dialog.Close />
-        </Dialog.Popup>
+          <Dialog.CloseTrigger />
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   ),
@@ -211,13 +211,13 @@ function WrappedDialog(props: { modal?: boolean }) {
       <Dialog.Trigger>Open wrapped dialog</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Popup style={popupStyle}>
+        <Dialog.Content style={popupStyle}>
           <Dialog.Title>Wrapped</Dialog.Title>
           <Dialog.Description>
             I'm modal by default, even though my wrapper forwarded `modal={undefined}`.
           </Dialog.Description>
-          <Dialog.Close />
-        </Dialog.Popup>
+          <Dialog.CloseTrigger />
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
@@ -244,11 +244,11 @@ export const CustomPopupId: Story = {
       <Dialog.Trigger>Open dialog</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Popup id="my-popup" style={popupStyle}>
+        <Dialog.Content id="my-popup" style={popupStyle}>
           <Dialog.Title>Pinned id</Dialog.Title>
           <Dialog.Description>Inspect the trigger's aria-controls.</Dialog.Description>
-          <Dialog.Close />
-        </Dialog.Popup>
+          <Dialog.CloseTrigger />
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   ),

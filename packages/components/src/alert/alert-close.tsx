@@ -17,7 +17,7 @@ export const Close: Component<AlertCloseProps> = (props) => {
   const elementProps = merge(rest, {
     get onClick() {
       // Composed in FRONT of the consumer's, so their `event.preventDefault()` cancels the close (the
-      // cancel channel in `composeEventHandlers`). Mirrors `createDialogClose`.
+      // cancel channel in `composeEventHandlers`). Mirrors `createDialogCloseTrigger`.
       return composeEventHandlers<HTMLButtonElement, MouseEvent>(props.onClick, () =>
         ctx.setOpen(false),
       );
@@ -30,6 +30,6 @@ export const Close: Component<AlertCloseProps> = (props) => {
   });
 
   // `render` is passed to `CloseButton` directly (not through the spread) — it is read synchronously to
-  // build the element, so a reactive spread-read would trip `STRICT_READ_UNTRACKED`. Mirrors `Dialog.Close`.
+  // build the element, so a reactive spread-read would trip `STRICT_READ_UNTRACKED`. Mirrors `Dialog.CloseTrigger`.
   return <CloseButton {...(elementProps as CloseButtonProps)} render={props.render} />;
 };

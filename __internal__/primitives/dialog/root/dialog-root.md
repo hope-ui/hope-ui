@@ -7,20 +7,20 @@ one subpath, `@hope-ui/primitives/dialog`.
 
 | Hook | Owns |
 | ---- | ---- |
-| `createDialog(options)` | Shared state: open/modal, the popup/title/description ids, the spared-element registry. Renders nothing. Call **once**. |
+| `createDialog(options)` | Shared state: open/modal, the content/title/description ids, the spared-element registry. Renders nothing. Call **once**. |
 | `createDialogTrigger(state, props)` | The trigger's ARIA + open handler. |
 | `createDialogPortal(state)` | The pointer-blocking modal backdrop's spare registration + `showModalBackdrop` gate. |
 | `createDialogBackdrop(state, props)` | Optional visible backdrop: presence + spare registration. |
-| `createDialogPopup(state, props)` | The surface, and the effect hub: presence + focus-restore/focus-trap/hide-outside/dismiss/scroll-lock. |
-| `createDialogTitle(state, props)` | Registers its id on the popup's `aria-labelledby`. |
-| `createDialogDescription(state, props)` | Registers its id on the popup's `aria-describedby`. |
-| `createDialogClose(state, props)` | The close handler. |
+| `createDialogContent(state, props)` | The surface, and the effect hub: presence + focus-restore/focus-trap/hide-outside/dismiss/scroll-lock. |
+| `createDialogTitle(state, props)` | Registers its id on the content's `aria-labelledby`. |
+| `createDialogDescription(state, props)` | Registers its id on the content's `aria-describedby`. |
+| `createDialogCloseTrigger(state, props)` | The close handler. |
 
 Each part hook takes the `createDialog` return (`state`) plus its own props, owns that part's
 effects / id-and-element registration / consumer-prop precedence, and returns spreadable `props`
-(plus a `setRef` and a presence `mounted` accessor for the popup/backdrop). This is why the effect
-stack lives in `createDialogPopup` (the popup's scope), not the root: each effect tears down when the
-popup unmounts.
+(plus a `setRef` and a presence `mounted` accessor for the content/backdrop). This is why the effect
+stack lives in `createDialogContent` (the content's scope), not the root: each effect tears down when
+the content unmounts.
 
 ## `createDialog(options)`
 
@@ -54,8 +54,8 @@ function createDialog(options?: {
   (`aria-hidden` + `inert`), and blocks the pointer. `false` keeps the page behind interactive but
   still dismisses and restores focus. `isModal` = `open() && modal()`, the gate every modal-only
   behavior keys off.
-- `initialFocus` (element to focus on open) is **not** here — it's a prop of `createDialogPopup`,
-  the part that owns the focus trap and the only consumer. See `../popup/dialog-popup.md`.
+- `initialFocus` (element to focus on open) is **not** here — it's a prop of `createDialogContent`,
+  the part that owns the focus trap and the only consumer. See `../content/dialog-content.md`.
 - ids — `popupId` falls back to a generated (SSR-stable) `createUniqueId`; a part publishes a
   consumer id via `setPopupId`/`setTitleId`/`setDescriptionId` (the id-registering part hooks wrap
   `createRegisteredId`, which never runs during SSR — hence the generated fallback).

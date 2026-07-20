@@ -169,7 +169,7 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
     },
     get "aria-label"() {
       // The consumer's `aria-label` (or `aria-labelledby`, which wins at the ARIA level) takes
-      // precedence; otherwise fall back to the localized `common.close`. Mirrors `createDialogClose`.
+      // precedence; otherwise fall back to the localized `common.close`. Mirrors `createDialogCloseTrigger`.
       return merged["aria-label"] ?? i18n.t("common.close");
     },
     // The root's own slot marker; the glyph wrapper uses the `close-button-<part>` convention.

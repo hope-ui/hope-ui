@@ -104,7 +104,7 @@ describe("solid-js contract", () => {
     // the trap's `focusin` listener is detached and the trigger is no longer `inert`.
     // Focusing synchronously would fire `focusin` into a still-live trap.
     //
-    // `Dialog.Popup` is the only caller today. Popover, Tooltip and Select will all be.
+    // `Dialog.Content` is the only caller today. Popover, Tooltip and Select will all be.
 
     /** Two sibling effects on one signal, each logging its run and its cleanup. */
     function createOrderedSiblings(): {
@@ -181,7 +181,7 @@ describe("solid-js contract", () => {
 
     it("runs sibling cleanups in REVERSE creation order when the owner is disposed", () => {
       // The other path, and it is the opposite. Owner disposal is LIFO. Nothing depends on
-      // this today — `Dialog.Popup`'s primitives deactivate via the re-run path above, since
+      // this today — `Dialog.Content`'s primitives deactivate via the re-run path above, since
       // `Popup` stays mounted while only its element unmounts. Pinned because the two paths
       // disagreeing is exactly the sort of thing a reader assumes away, and because a modal
       // that unmounts *while open* takes this one.

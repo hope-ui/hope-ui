@@ -1,13 +1,13 @@
 import { CloseButton, type CloseButtonProps } from "@hope-ui/components/close-button";
 import {
+  type CreateDialogContentProps,
   type CreateDialogOptions,
-  type CreateDialogPopupProps,
   type CreateDialogReturn,
   createDialog,
   createDialogBackdrop,
-  createDialogClose,
+  createDialogCloseTrigger,
+  createDialogContent,
   createDialogDescription,
-  createDialogPopup,
   createDialogPortal,
   createDialogTitle,
   createDialogTrigger,
@@ -58,7 +58,7 @@ export const Trigger: Component<DialogTriggerProps> = (props) => {
 // ---------- Portal ----------
 
 export interface DialogPortalProps {
-  /** Where to portal Backdrop/Popup. Defaults to `document.body`. */
+  /** Where to portal Backdrop/Content. Defaults to `document.body`. */
   mount?: Element;
   children?: JSX.Element;
 }
@@ -78,9 +78,9 @@ export const Portal: Component<DialogPortalProps> = (props) => {
     <SolidPortal mount={props.mount}>
       {/* `ModalBackdrop` covers the viewport unconditionally, so an element inserted before
       hide-outside's MutationObserver marks it `inert` is still unreachable by pointer. It's the
-      Portal's *first* child — before a consumer `Dialog.Backdrop` and the `Dialog.Popup` — so it
+      Portal's *first* child — before a consumer `Dialog.Backdrop` and the `Dialog.Content` — so it
       blocks the page behind while leaving both interactive above it. Its ref is spared from
-      hide-outside by `createDialogPortal`. A modal `Popup` must be positioned; see
+      hide-outside by `createDialogPortal`. A modal `Content` must be positioned; see
       `modal-backdrop.md`. */}
       <Show when={portal.showModalBackdrop()}>
         <ModalBackdrop ref={portal.setModalBackdropRef} />
@@ -112,23 +112,23 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
   );
 };
 
-// ---------- Popup ----------
+// ---------- Content ----------
 
-export interface DialogPopupProps extends CreateDialogPopupProps {
+export interface DialogContentProps extends CreateDialogContentProps {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
 }
 
-export const Popup: Component<DialogPopupProps> = (props) => {
+export const Content: Component<DialogContentProps> = (props) => {
   const state = useDialogContext();
-  const popup = createDialogPopup(state, omit(props, "render"));
+  const content = createDialogContent(state, omit(props, "render"));
 
   return (
-    <Show when={popup.mounted()}>
+    <Show when={content.mounted()}>
       {renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
         as: "div",
         render: props.render,
-        props: popup.props,
-        ref: popup.setRef,
+        props: content.props,
+        ref: content.setRef,
       })}
     </Show>
   );
@@ -168,21 +168,21 @@ export const Description: Component<DialogDescriptionProps> = (props) => {
   });
 };
 
-// ---------- Close ----------
+// ---------- CloseTrigger ----------
 
-// `Dialog.Close` is a `CloseButton` with the dialog's close wiring — so it inherits
+// `Dialog.CloseTrigger` is a `CloseButton` with the dialog's close wiring — so it inherits
 // `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free, and shows the themed X by
-// default. Because it renders a recipe-styled `CloseButton`, `Dialog.Close` now **requires a
+// default. Because it renders a recipe-styled `CloseButton`, `Dialog.CloseTrigger` now **requires a
 // `<ThemeProvider>`** ancestor, like every other styled component (see `Dialog.md`).
-export interface DialogCloseProps extends CloseButtonProps {}
+export interface DialogCloseTriggerProps extends CloseButtonProps {}
 
-export const Close: Component<DialogCloseProps> = (props) => {
+export const CloseTrigger: Component<DialogCloseTriggerProps> = (props) => {
   const state = useDialogContext();
   // The primitive owns only the close `onClick` (composed in front of the consumer's, so their
   // `preventDefault()` cancels the close). The label + visual + `type` default come from `CloseButton`.
   // `render` is passed to `CloseButton` directly (not through the spread) — it is read synchronously
   // to build the element, so a reactive spread-read would trip `STRICT_READ_UNTRACKED`.
-  const close = createDialogClose(state, omit(props, "render"));
+  const close = createDialogCloseTrigger(state, omit(props, "render"));
 
   // `close.props` is typed as the primitive's `JSX.ButtonHTMLAttributes` (the hook can't reference the
   // component's `CloseButtonProps` without a layering cycle), which widens `disabled` to Solid's
@@ -191,4 +191,13 @@ export const Close: Component<DialogCloseProps> = (props) => {
   return <CloseButton {...(close.props as CloseButtonProps)} render={props.render} />;
 };
 
-export const Dialog = { Root, Trigger, Portal, Backdrop, Popup, Title, Description, Close };
+export const Dialog = {
+  Root,
+  Trigger,
+  Portal,
+  Backdrop,
+  Content,
+  Title,
+  Description,
+  CloseTrigger,
+};

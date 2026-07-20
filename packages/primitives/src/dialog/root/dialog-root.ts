@@ -5,15 +5,15 @@ import { withDefaults } from "../../utils";
 /**
  * The shared state kernel of a dialog — the one call at the root of the tree. It owns open
  * state, the popup/title/description ids, and the spared-element registry, and it renders **no
- * JSX and no host element**. The per-part hooks (`createDialogTrigger`, `createDialogPopup`,
- * `createDialogBackdrop`, `createDialogPortal`, `createDialogClose`, `createDialogTitle`,
+ * JSX and no host element**. The per-part hooks (`createDialogTrigger`, `createDialogContent`,
+ * `createDialogBackdrop`, `createDialogPortal`, `createDialogCloseTrigger`, `createDialogTitle`,
  * `createDialogDescription`) each take this state plus their own props and own the rest — their
  * effects, their id/element registration, and their consumer-prop precedence. `Dialog.Root` calls
  * this once and shares the return on context; a headless consumer holds it and threads it into
  * whichever part hooks it needs.
  *
  * Deliberately does **not** own presence, refs, or the focus/dismiss/hide-outside/scroll effect
- * stack: those belong to the part that renders the corresponding element (`createDialogPopup` /
+ * stack: those belong to the part that renders the corresponding element (`createDialogContent` /
  * `createDialogBackdrop`), so each effect lives in that element's own scope and tears down when it
  * unmounts. This split mirrors React Aria's `useDialog`/`useOverlay*` decomposition (its public
  * surface and a11y reasoning, not its code).
@@ -50,7 +50,7 @@ export interface CreateDialogReturn {
   /** The popup's id: a registered consumer id if any, else a generated (SSR-stable) fallback. */
   popupId: Accessor<string>;
   /** Register a consumer-supplied popup id (feeds the trigger's `aria-controls`). Called by
-   * `createDialogPopup` from the popup's own scope, via `createRegisteredId`. */
+   * `createDialogContent` from the content's own scope, via `createRegisteredId`. */
   setPopupId: (id: string | undefined) => void;
   /** The registered title id, or `undefined` — the popup's `aria-labelledby` fallback. */
   titleId: Accessor<string | undefined>;
@@ -61,7 +61,7 @@ export interface CreateDialogReturn {
   /** Register a description id. Called by `createDialogDescription` from its own scope. */
   setDescriptionId: (id: string | undefined) => void;
 
-  /** Elements `createDialogPopup`'s hide-outside must spare beside the popup while modal: the
+  /** Elements `createDialogContent`'s hide-outside must spare beside the content while modal: the
    * pointer-blocking modal backdrop and any consumer backdrop. */
   sparedElements: Accessor<Element[]>;
   /** Add an element to the spared set (idempotent). */

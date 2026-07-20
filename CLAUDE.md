@@ -240,11 +240,11 @@ them rather than re-deriving a behavior in a comment.
   folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The top-level folders
   — `dialog`, `modal-backdrop`, `utils`, `internal` (documented below), plus `calendar` and `i18n`:
   - `dialog/` (`@hope-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
-    state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogPopup`,
+    state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogContent`,
     `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
-    `createDialogClose`), each in its own `dialog/<part>/dialog-<part>.ts`. Each part hook takes
+    `createDialogCloseTrigger`), each in its own `dialog/<part>/dialog-<part>.ts`. Each part hook takes
     the `createDialog` state + its props and owns that part's effects/registration/prop-precedence
-    (so the effect stack lives in `createDialogPopup`, the popup's scope). This is the headless
+    (so the effect stack lives in `createDialogContent`, the content's scope). This is the headless
     shape `@hope-ui/components`' `Dialog` is a thin JSX layer over — modeled on React Aria's
     `useDialog`/`useOverlay*` split. See `__internal__/primitives/dialog/root/dialog-root.md`.
   - `modal-backdrop/` (`@hope-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
@@ -338,7 +338,7 @@ them rather than re-deriving a behavior in a comment.
 
 **Composition rule for future components:** compose shared *behavior* from
 `@hope-ui/primitives` and styling through `@hope-ui/theming`. A component **may** import and
-reuse a sibling component's subpath (e.g. `Dialog.Close` renders `@hope-ui/components/close-button`,
+reuse a sibling component's subpath (e.g. `Dialog.CloseTrigger` renders `@hope-ui/components/close-button`,
 and later Popover/Sheet/Alert close parts do too) — a reusable leaf shouldn't be re-implemented.
 Two constraints remain: **no circular** component imports, and don't couple a component's
 *behavior* to a heavier sibling. E.g. Popover must compose

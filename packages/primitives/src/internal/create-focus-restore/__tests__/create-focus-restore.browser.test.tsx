@@ -7,7 +7,7 @@ import { createFocusRestore } from "../create-focus-restore";
 
 /**
  * `trap` composes `createFocusTrap` on the same `active` signal — the arrangement
- * `Dialog.Popup` uses for a modal dialog, and the one the two ordering constraints in
+ * `Dialog.Content` uses for a modal dialog, and the one the two ordering constraints in
  * `create-focus-restore.md` exist for.
  */
 function TestHarness(props: { active: Accessor<boolean>; trap?: boolean }) {

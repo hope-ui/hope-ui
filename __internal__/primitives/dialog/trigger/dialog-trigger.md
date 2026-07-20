@@ -15,4 +15,4 @@ Returns fully-merged button `props`: `type` defaults to `"button"`, `aria-haspop
 open** (a dangling IDREF while closed is an invalid attribute value — axe `aria-valid-attr-value`).
 The returned `onClick` opens the dialog, composed **behind** the consumer's own `onClick` (via
 `composeEventHandlers`), so `event.preventDefault()` cancels the open. The trigger only ever opens —
-never toggles (matching Base UI); close via `createDialogClose` or controlled `open`.
+never toggles (matching Base UI); close via `createDialogCloseTrigger` or controlled `open`.

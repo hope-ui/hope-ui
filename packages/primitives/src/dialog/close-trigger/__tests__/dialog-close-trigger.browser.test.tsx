@@ -3,19 +3,19 @@ import { Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { createDialog } from "../../root/dialog-root";
-import { createDialogClose } from "../dialog-close";
+import { createDialogCloseTrigger } from "../dialog-close-trigger";
 
-// `createDialogClose` is now **minimal**: it injects only the close `onClick` (composed in front of
-// the consumer's, so their `preventDefault()` cancels the close). The accessible name (`common.close`)
+// `createDialogCloseTrigger` is now **minimal**: it injects only the close `onClick` (composed in front
+// of the consumer's, so their `preventDefault()` cancels the close). The accessible name (`common.close`)
 // and the `type="button"` default moved down into the `CloseButton` component that
-// `@hope-ui/components`' `Dialog.Close` renders — so those are covered by CloseButton's own tests, and
-// these tests cover exactly what the hook still owns: closing, and honoring a consumer's cancel.
+// `@hope-ui/components`' `Dialog.CloseTrigger` renders — so those are covered by CloseButton's own tests,
+// and these tests cover exactly what the hook still owns: closing, and honoring a consumer's cancel.
 
 // A minimal open dialog: a close button (with a visible label so it has an accessible name), and a
 // marker gated on `open()` so the test can observe that clicking Close actually closed the dialog.
 function Harness(props: { onClick?: (event: MouseEvent) => void }) {
   const state = createDialog({ defaultOpen: true });
-  const close = createDialogClose(state, { onClick: props.onClick });
+  const close = createDialogCloseTrigger(state, { onClick: props.onClick });
   return (
     <>
       <button type="button" data-testid="close" {...close.props}>
@@ -32,11 +32,11 @@ function Harness(props: { onClick?: (event: MouseEvent) => void }) {
 // them through unchanged rather than owning a default of its own.
 function PassthroughHarness() {
   const state = createDialog({ defaultOpen: true });
-  const close = createDialogClose(state, { "aria-label": "Custom label", type: "submit" });
+  const close = createDialogCloseTrigger(state, { "aria-label": "Custom label", type: "submit" });
   return <button data-testid="close" {...close.props} />;
 }
 
-describe("createDialogClose", () => {
+describe("createDialogCloseTrigger", () => {
   it("closes on click", async () => {
     const { container, dispose } = mount(() => <Harness />);
     expect(container.querySelector('[data-testid="open-marker"]')).toBeTruthy();

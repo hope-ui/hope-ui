@@ -11,30 +11,30 @@ import {
 } from "../../internal";
 import type { CreateDialogReturn } from "../root/dialog-root";
 
-export interface CreateDialogPopupProps extends JSX.HTMLAttributes<HTMLDivElement> {
+export interface CreateDialogContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
   /**
    * Explicit element to focus when the dialog opens, instead of the first focusable descendant.
    * A per-read accessor consumed by this part's focus trap — read lazily at focus time (after the
-   * popup mounts), so the target may live inside the popup. It belongs here, not on `createDialog`:
+   * content mounts), so the target may live inside the content. It belongs here, not on `createDialog`:
    * the focus trap is owned by this part, and nothing else in the family reads it.
    */
   initialFocus?: Accessor<HTMLElement | null | undefined>;
 }
 
-export interface CreateDialogPopupReturn {
-  /** Spread onto the popup surface. `id`/`role`/`aria-labelledby`/`aria-describedby` fall back to
+export interface CreateDialogContentReturn {
+  /** Spread onto the content surface. `id`/`role`/`aria-labelledby`/`aria-describedby` fall back to
    * the consumer's; `aria-modal` and `data-presence` are owned here. */
   props: JSX.HTMLAttributes<HTMLDivElement> & { "data-presence": string };
-  /** Gate the popup's render on this — it stays mounted through an exit transition. */
+  /** Gate the content's render on this — it stays mounted through an exit transition. */
   mounted: Accessor<boolean>;
-  /** Hand to the popup element's `ref`; wires presence + the focus/dismiss/hide-outside effects. */
+  /** Hand to the content element's `ref`; wires presence + the focus/dismiss/hide-outside effects. */
   setRef: (element: HTMLDivElement) => void;
 }
 
 /**
- * The popup part: the dialog surface itself, and the behavior hub. Owns presence and the full
+ * The content part: the dialog surface itself, and the behavior hub. Owns presence and the full
  * effect stack — focus restore, focus trap, hide-outside, dismiss, and scroll lock — all created
- * in this scope (the popup's), so each tears down when the popup unmounts.
+ * in this scope (the content's), so each tears down when the content unmounts.
  *
  * The effect creation order is load-bearing, not stylistic. `createFocusRestore` **must** be
  * created before `createFocusTrap`/`createHideOutside`: sibling effects run (and clean up on
@@ -43,11 +43,11 @@ export interface CreateDialogPopupReturn {
  * `create-focus-restore.md`). Restore is gated on `open()`; the trap/hide-outside/scroll-lock on
  * `isModal` — a non-modal dialog isn't trapped but must still hand focus back.
  */
-export function createDialogPopup(
+export function createDialogContent(
   state: CreateDialogReturn,
-  props: CreateDialogPopupProps,
-): CreateDialogPopupReturn {
-  // A signal-backed ref, not a `let`: the popup only exists as a reactive consequence of
+  props: CreateDialogContentProps,
+): CreateDialogContentReturn {
+  // A signal-backed ref, not a `let`: the content only exists as a reactive consequence of
   // `mounted()`, so the effects below (which react to `open`/`isModal` and read this ref tracked
   // in their compute fn) must be able to react once it's actually set. See `create-focus-trap.ts`.
   const [ref, setRef] = createSignal<HTMLDivElement>();
@@ -62,7 +62,7 @@ export function createDialogPopup(
 
   // Publish a consumer-supplied `id` up so the trigger's `aria-controls` names the element that
   // actually exists. `createRegisteredId` defers the write past Solid 2.0's
-  // `[REACTIVE_WRITE_IN_OWNED_SCOPE]` ban; running it here scopes cleanup to the popup's unmount.
+  // `[REACTIVE_WRITE_IN_OWNED_SCOPE]` ban; running it here scopes cleanup to the content's unmount.
   createRegisteredId({ id: () => props.id, register: state.setPopupId });
 
   // Internal values fall back to the consumer's rather than overwriting them: `merge` gives the

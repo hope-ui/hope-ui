@@ -5,9 +5,9 @@ import { userEvent } from "vitest/browser";
 import type { CreateDialogReturn } from "../../root/dialog-root";
 import { createDialog } from "../../root/dialog-root";
 import { createDialogTitle } from "../../title/dialog-title";
-import { createDialogPopup } from "../dialog-popup";
+import { createDialogContent } from "../dialog-content";
 
-function TitleInPopup(props: { state: CreateDialogReturn }) {
+function TitleInContent(props: { state: CreateDialogReturn }) {
   const title = createDialogTitle(props.state, {});
   return (
     <h2 data-testid="title" {...title.props}>
@@ -25,11 +25,16 @@ function mountHarness(props: {
   let state!: CreateDialogReturn;
   const result = mount(() => {
     state = createDialog({ defaultOpen: props.open ?? true, modal: props.modal });
-    const popup = createDialogPopup(state, { "aria-labelledby": props.ariaLabelledby });
+    const content = createDialogContent(state, { "aria-labelledby": props.ariaLabelledby });
     return (
-      <Show when={popup.mounted()}>
-        <div data-testid="popup" style={{ position: "fixed" }} {...popup.props} ref={popup.setRef}>
-          {props.withTitle ? <TitleInPopup state={state} /> : null}
+      <Show when={content.mounted()}>
+        <div
+          data-testid="content"
+          style={{ position: "fixed" }}
+          {...content.props}
+          ref={content.setRef}
+        >
+          {props.withTitle ? <TitleInContent state={state} /> : null}
           <p>Body</p>
         </div>
       </Show>
@@ -38,30 +43,30 @@ function mountHarness(props: {
   return { ...result, state: () => state };
 }
 
-const popupOf = (container: Element) =>
-  container.querySelector('[data-testid="popup"]') as HTMLElement | null;
+const contentOf = (container: Element) =>
+  container.querySelector('[data-testid="content"]') as HTMLElement | null;
 
-describe("createDialogPopup", () => {
+describe("createDialogContent", () => {
   it("is not mounted while closed, and mounts (role=dialog, data-presence) while open", () => {
     const closed = mountHarness({ open: false });
-    expect(popupOf(closed.container)).toBeNull();
+    expect(contentOf(closed.container)).toBeNull();
     closed.dispose();
 
     const open = mountHarness({});
-    const popup = popupOf(open.container) as HTMLElement;
-    expect(popup).toBeTruthy();
-    expect(popup.getAttribute("role")).toBe("dialog");
-    expect(popup.getAttribute("data-presence")).toBeTruthy();
+    const content = contentOf(open.container) as HTMLElement;
+    expect(content).toBeTruthy();
+    expect(content.getAttribute("role")).toBe("dialog");
+    expect(content.getAttribute("data-presence")).toBeTruthy();
     open.dispose();
   });
 
   it("sets aria-modal only while modal", () => {
     const modal = mountHarness({ modal: true });
-    expect(popupOf(modal.container)?.getAttribute("aria-modal")).toBe("true");
+    expect(contentOf(modal.container)?.getAttribute("aria-modal")).toBe("true");
     modal.dispose();
 
     const nonModal = mountHarness({ modal: false });
-    expect(popupOf(nonModal.container)?.getAttribute("aria-modal")).toBeNull();
+    expect(contentOf(nonModal.container)?.getAttribute("aria-modal")).toBeNull();
     nonModal.dispose();
   });
 
@@ -70,7 +75,7 @@ describe("createDialogPopup", () => {
     const titleId = (container.querySelector('[data-testid="title"]') as HTMLElement).id;
 
     await vi.waitFor(() =>
-      expect(popupOf(container)?.getAttribute("aria-labelledby")).toBe(titleId),
+      expect(contentOf(container)?.getAttribute("aria-labelledby")).toBe(titleId),
     );
     dispose();
   });
@@ -82,7 +87,7 @@ describe("createDialogPopup", () => {
       ariaLabelledby: "external-heading",
     });
     await vi.waitFor(() =>
-      expect(popupOf(container)?.getAttribute("aria-labelledby")).toBe("external-heading"),
+      expect(contentOf(container)?.getAttribute("aria-labelledby")).toBe("external-heading"),
     );
     dispose();
   });
@@ -93,14 +98,14 @@ describe("createDialogPopup", () => {
       const state = createDialog({ defaultOpen: true, modal: true });
       // The accessor is read lazily by the focus trap after mount, so `target` (assigned by the
       // ref below during the same mount) is resolved by the time focus is applied.
-      const popup = createDialogPopup(state, { initialFocus: () => target });
+      const content = createDialogContent(state, { initialFocus: () => target });
       return (
-        <Show when={popup.mounted()}>
+        <Show when={content.mounted()}>
           <div
-            data-testid="popup"
+            data-testid="content"
             style={{ position: "fixed" }}
-            {...popup.props}
-            ref={popup.setRef}
+            {...content.props}
+            ref={content.setRef}
           >
             <button type="button">first</button>
             <button type="button" ref={target}>
@@ -113,16 +118,16 @@ describe("createDialogPopup", () => {
 
     await vi.waitFor(() => expect(document.activeElement).toBe(target));
     // `initialFocus` is a control prop, never an attribute on the surface.
-    expect(popupOf(container)?.hasAttribute("initialfocus")).toBe(false);
+    expect(contentOf(container)?.hasAttribute("initialfocus")).toBe(false);
     dispose();
   });
 
   it("dismisses on Escape", async () => {
     const { container, dispose } = mountHarness({ withTitle: true });
-    expect(popupOf(container)).toBeTruthy();
+    expect(contentOf(container)).toBeTruthy();
 
     await userEvent.keyboard("{Escape}");
-    await vi.waitFor(() => expect(popupOf(container)).toBeNull());
+    await vi.waitFor(() => expect(contentOf(container)).toBeNull());
     dispose();
   });
 

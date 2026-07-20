@@ -1,14 +1,17 @@
 export { type CreateDialogBackdropReturn, createDialogBackdrop } from "./backdrop/dialog-backdrop";
-export { type CreateDialogCloseReturn, createDialogClose } from "./close/dialog-close";
+export {
+  type CreateDialogCloseTriggerReturn,
+  createDialogCloseTrigger,
+} from "./close-trigger/dialog-close-trigger";
+export {
+  type CreateDialogContentProps,
+  type CreateDialogContentReturn,
+  createDialogContent,
+} from "./content/dialog-content";
 export {
   type CreateDialogDescriptionReturn,
   createDialogDescription,
 } from "./description/dialog-description";
-export {
-  type CreateDialogPopupProps,
-  type CreateDialogPopupReturn,
-  createDialogPopup,
-} from "./popup/dialog-popup";
 export { type CreateDialogPortalReturn, createDialogPortal } from "./portal/dialog-portal";
 export {
   type CreateDialogOptions,

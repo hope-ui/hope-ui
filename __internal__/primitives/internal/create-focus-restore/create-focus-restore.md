@@ -54,7 +54,7 @@ A cleanup (sync)  →  B cleanup (removes listeners)  →  A restore (microtask)
 ```
 
 > Owner **disposal** is the opposite: cleanups there run LIFO, so the trap's would fire
-> first. Nothing depends on that — `Dialog.Popup` stays mounted while only its element
+> first. Nothing depends on that — `Dialog.Content` stays mounted while only its element
 > unmounts, so deactivation always takes the re-run path — but the two paths disagreeing is
 > exactly the sort of thing a reader assumes away. Both are pinned.
 

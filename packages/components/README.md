@@ -30,7 +30,7 @@ keeps it tree-shakable).
 | Import | Component |
 | ------ | --------- |
 | `@hope-ui/components/button` | `Button` (+ `ButtonProps` and its variant vocabulary) |
-| `@hope-ui/components/dialog` | `Dialog` compound (`Dialog.Root`, `Dialog.Trigger`, `Dialog.Portal`, `Dialog.Backdrop`, `Dialog.Popup`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`) |
+| `@hope-ui/components/dialog` | `Dialog` compound (`Dialog.Root`, `Dialog.Trigger`, `Dialog.Portal`, `Dialog.Backdrop`, `Dialog.Content`, `Dialog.Title`, `Dialog.Description`, `Dialog.CloseTrigger`) |
 | `@hope-ui/components/calendar` | `Calendar` compound |
 
 ## Usage
@@ -67,16 +67,16 @@ import { Dialog } from "@hope-ui/components/dialog";
   <Dialog.Trigger>Open</Dialog.Trigger>
   <Dialog.Portal>
     <Dialog.Backdrop />
-    <Dialog.Popup class="fixed inset-0 m-auto h-fit w-fit">
+    <Dialog.Content class="fixed inset-0 m-auto h-fit w-fit">
       <Dialog.Title>Confirm</Dialog.Title>
       <Dialog.Description>This can't be undone.</Dialog.Description>
-      <Dialog.Close>Cancel</Dialog.Close>
-    </Dialog.Popup>
+      <Dialog.CloseTrigger />
+    </Dialog.Content>
   </Dialog.Portal>
 </Dialog.Root>;
 ```
 
-A modal `Dialog.Popup` must be positioned (`fixed`/`absolute`/`relative`), or it paints beneath the
+A modal `Dialog.Content` must be positioned (`fixed`/`absolute`/`relative`), or it paints beneath the
 pointer-blocking backdrop — see the Dialog page in the doc website (`apps/docs/`).
 
 ## Polymorphism: `render`, not `as`
@@ -97,7 +97,7 @@ model when you render a non-`<button>` element:
 - Compose behavior from `@hope-ui/primitives`; compute styling through `@hope-ui/theming`
   (`useRecipe`/`useSlots`/`useDefaults`). A component never declares its own recipe contract — the
   `RecipeRegistry` in theming is the single source of truth (no module augmentation).
-- **You may reuse a sibling component** (e.g. `Dialog.Close` renders `@hope-ui/components/close-button`) —
+- **You may reuse a sibling component** (e.g. `Dialog.CloseTrigger` renders `@hope-ui/components/close-button`) —
   a reusable leaf shouldn't be re-implemented; sibling subpaths stay external in the build, so reuse is
   deduped. Two limits: no **circular** imports, and don't wire a component's *behavior* through a heavier
   sibling — Popover composes the shared kernel (`createFloating`/`createDismissable`/…) directly rather

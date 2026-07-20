@@ -1,8 +1,8 @@
 # `createRegisteredId`
 
 Publishes a descendant's `id` into an ancestor's context, so the ancestor can point an ARIA
-relationship at an element it doesn't own — `Dialog.Popup`'s `aria-labelledby` naming
-`Dialog.Title`'s `id`, `Dialog.Trigger`'s `aria-controls` naming `Dialog.Popup`'s.
+relationship at an element it doesn't own — `Dialog.Content`'s `aria-labelledby` naming
+`Dialog.Title`'s `id`, `Dialog.Trigger`'s `aria-controls` naming `Dialog.Content`'s.
 
 ## API
 

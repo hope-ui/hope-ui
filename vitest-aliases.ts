@@ -64,7 +64,7 @@ const componentsSrcDir = join(import.meta.dirname, "packages/components/src");
 export const hopeUiAlias = [
   // `@hope-ui/components` publishes one subpath per component folder (like primitives, no root
   // barrel), so a wildcard: `@hope-ui/components/close-button` -> `.../src/close-button/index.ts`.
-  // A component may reuse a sibling (e.g. `Dialog.Close` renders `CloseButton`); this resolves that
+  // A component may reuse a sibling (e.g. `Dialog.CloseTrigger` renders `CloseButton`); this resolves that
   // to src in dev/test so it never reads the sibling's stale `dist`.
   {
     find: /^@hope-ui\/components\/(.+)$/,

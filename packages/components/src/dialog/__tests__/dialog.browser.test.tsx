@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { Dialog } from "../dialog";
 
-// `Dialog.Close` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
+// `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton` (an icon-only X, self-labelled
 // `common.close` → accessible name "Close"), so any tree that renders it must sit under a
 // `<ThemeProvider>` fed the `hope` preset. It is a zero-DOM provider (its token values live in CSS).
 // The Close button is still located by its accessible name — `getByRole("button", { name: "Close" })`
@@ -43,11 +43,11 @@ function FullDialog(props: { onOpenChange?: (open: boolean) => void }) {
           above a non-positioned (static) Popup regardless of DOM order, which would make Popup's own
           content unclickable. */}
           <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-          <Dialog.Popup style={{ position: "relative" }}>
+          <Dialog.Content style={{ position: "relative" }}>
             <Dialog.Title>Dialog title</Dialog.Title>
             <Dialog.Description>Dialog description</Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </Themed>
@@ -71,10 +71,10 @@ function DialogWithBackground(props: { modal?: boolean; onBackgroundClick?: () =
       <Dialog.Root modal={props.modal}>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
+          <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
             <Dialog.Title>Dialog title</Dialog.Title>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </Themed>
@@ -211,7 +211,7 @@ describe("Dialog", () => {
     dispose();
   });
 
-  it("closes when Dialog.Close is clicked", async () => {
+  it("closes when Dialog.CloseTrigger is clicked", async () => {
     const { dispose } = mount(() => <FullDialog />);
 
     await userEvent.click(page.getByRole("button", { name: "Open dialog" }));
@@ -254,9 +254,9 @@ describe("Dialog", () => {
       <Dialog.Root open={open()} onOpenChange={setOpen}>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup>
+          <Dialog.Content>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -288,10 +288,10 @@ describe("Dialog", () => {
           <Dialog.Root modal={props.modal}>
             <Dialog.Trigger>Open dialog</Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Popup>
+              <Dialog.Content>
                 <Dialog.Title>Title</Dialog.Title>
-                <Dialog.Close />
-              </Dialog.Popup>
+                <Dialog.CloseTrigger />
+              </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>
         </Themed>
@@ -313,9 +313,9 @@ describe("Dialog", () => {
       <Dialog.Root modal={false}>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup>
+          <Dialog.Content>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -428,9 +428,9 @@ describe("Dialog", () => {
       <Dialog.Root defaultOpen>
         <Dialog.Portal>
           <Dialog.Backdrop data-testid="backdrop" style={{ position: "fixed", inset: "0" }} />
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
+          <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -484,9 +484,9 @@ describe("Dialog", () => {
             onPointerDown={onBackdropPointerDown}
             style={{ position: "fixed", inset: "0" }}
           />
-          <Dialog.Popup style={{ position: "fixed", bottom: "0", right: "0" }}>
+          <Dialog.Content style={{ position: "fixed", bottom: "0", right: "0" }}>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -525,9 +525,9 @@ describe("Dialog", () => {
       <Dialog.Root>
         <Dialog.Trigger onClick={(event) => event.preventDefault()}>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup>
+          <Dialog.Content>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -544,9 +544,9 @@ describe("Dialog", () => {
       <Dialog.Root onOpenChange={() => order.push("open")}>
         <Dialog.Trigger onClick={() => order.push("consumer")}>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup>
+          <Dialog.Content>
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -565,10 +565,10 @@ describe("Dialog", () => {
           <Dialog.Portal>
             {/* Positioned, because a modal dialog always renders a `position: fixed`
             `ModalBackdrop` and a `position: static` popup paints beneath it. See Dialog.md. */}
-            <Dialog.Popup style={{ position: "fixed" }}>
+            <Dialog.Content style={{ position: "fixed" }}>
               <Dialog.Title>Title</Dialog.Title>
-              <Dialog.Close onClick={(event) => event.preventDefault()} />
-            </Dialog.Popup>
+              <Dialog.CloseTrigger onClick={(event) => event.preventDefault()} />
+            </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
       </Themed>
@@ -606,9 +606,9 @@ describe("Dialog", () => {
           <h2 id="external-heading">Heading outside the popup</h2>
           <Dialog.Trigger>Open dialog</Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Popup aria-labelledby="external-heading">
-              <Dialog.Close />
-            </Dialog.Popup>
+            <Dialog.Content aria-labelledby="external-heading">
+              <Dialog.CloseTrigger />
+            </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
       </Themed>
@@ -628,9 +628,9 @@ describe("Dialog", () => {
         <h2 id="external-heading">Outside</h2>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup aria-labelledby="external-heading">
+          <Dialog.Content aria-labelledby="external-heading">
             <Dialog.Title>Inner title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -649,11 +649,11 @@ describe("Dialog", () => {
         <Dialog.Root>
           <Dialog.Trigger>Delete everything</Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Popup role="alertdialog">
+            <Dialog.Content role="alertdialog">
               <Dialog.Title>Are you sure?</Dialog.Title>
               <Dialog.Description>This cannot be undone.</Dialog.Description>
-              <Dialog.Close />
-            </Dialog.Popup>
+              <Dialog.CloseTrigger />
+            </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
       </Themed>
@@ -671,9 +671,9 @@ describe("Dialog", () => {
       <Dialog.Root>
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Popup id="my-popup">
+          <Dialog.Content id="my-popup">
             <Dialog.Title>Title</Dialog.Title>
-          </Dialog.Popup>
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     ));
@@ -698,10 +698,10 @@ describe("Dialog", () => {
       <Themed>
         <Dialog.Root defaultOpen>
           <Dialog.Portal>
-            <Dialog.Popup ref={(el: HTMLDivElement) => (consumerRef = el)}>
+            <Dialog.Content ref={(el: HTMLDivElement) => (consumerRef = el)}>
               <Dialog.Title>Title</Dialog.Title>
-              <Dialog.Close />
-            </Dialog.Popup>
+              <Dialog.CloseTrigger />
+            </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
       </Themed>

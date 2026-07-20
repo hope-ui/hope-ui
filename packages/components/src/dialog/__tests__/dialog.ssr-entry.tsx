@@ -12,11 +12,11 @@ import { Dialog } from "../dialog";
 // `Dialog.Trigger`, even one that renders nothing, would shift the trigger's key.
 //
 // `Dialog.Portal` renders nothing server-side and nothing while closed, so the server fixture is
-// just the trigger `<button>`; the Backdrop/Popup subtree still matters because it appears on the
-// client once the dialog opens. `Dialog.Close` now renders a recipe-styled `CloseButton`, so the tree
-// sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in CSS),
-// so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so it
-// must be present identically everywhere. See __internal__/theming.md.
+// just the trigger `<button>`; the Backdrop/Content subtree still matters because it appears on the
+// client once the dialog opens. `Dialog.CloseTrigger` now renders a recipe-styled `CloseButton`, so the
+// tree sits under a `<ThemeProvider>` fed the `hope` preset — a zero-DOM provider (its values live in
+// CSS), so the closed server output is still just the trigger, but the provider shifts `_hk` keys, so
+// it must be present identically everywhere. See __internal__/theming.md.
 
 /**
  * `defaultOpen` is optional so the ssr test can also exercise the open server render (its `Portal`
@@ -30,11 +30,11 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
         <Dialog.Trigger>Open dialog</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Backdrop />
-          <Dialog.Popup>
+          <Dialog.Content>
             <Dialog.Title>Dialog title</Dialog.Title>
             <Dialog.Description>Dialog description</Dialog.Description>
-            <Dialog.Close />
-          </Dialog.Popup>
+            <Dialog.CloseTrigger />
+          </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
     </ThemeProvider>
