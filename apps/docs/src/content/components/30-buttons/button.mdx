@@ -1,3 +1,4 @@
+import { Alert } from "@hope-ui/components/alert";
 import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
@@ -291,18 +292,21 @@ import { Button } from "@hope-ui/components/button";
 </Button>
 ```
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <InfoIcon class="size-5" />
-  </span>
-  <div>
-    When you render anything other than a native <code>button</code>, set <code>nativeButton</code>
-    to <code>false</code>. Button then applies <code>role="button"</code>, manages the tab order,
-    and synthesizes keyboard activation (Space and Enter) — the behavior a real button has for
-    free. The <code>as unknown as</code> cast on the spread is only needed to satisfy TypeScript
-    when switching to a different element type; the runtime behavior is unaffected.
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<InfoIcon class="mt-0.5"/>} 
+  description={
+    <div>
+      When you render anything other than a native <code>button</code>, set <code>nativeButton</code>
+      to <code>false</code>. Button then applies <code>role="button"</code>, manages the tab order,
+      and synthesizes keyboard activation (Space and Enter) — the behavior a real button has for
+      free. The <code>as unknown as</code> cast on the spread is only needed to satisfy TypeScript
+      when switching to a different element type; the runtime behavior is unaffected.
+    </div>
+  } 
+/>
 
 ## Theming
 

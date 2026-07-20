@@ -1,3 +1,4 @@
+import { Alert } from "@hope-ui/components/alert";
 import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
@@ -8,7 +9,6 @@ export const summary = "Restyle your app with presets.";
 
 export const description =
   "Swap the whole app's look by changing the preset — a fixed vocabulary of semantic tokens maps to your design.";
-
 
 # Theming
 
@@ -136,17 +136,20 @@ Each component's page documents which props are defaultable and which parts it e
 
 ### Token values
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <PaletteIcon class="size-5" />
-  </span>
-  <div>
-    <strong>Don't want to hand-write 100+ variables?</strong> The{" "}
-    <a href="/theme-creator" class="font-medium underline underline-offset-2 hover:opacity-80">Theme Creator</a>{" "}
-    lets you pick a color family per role plus a radius, preview it live across real components, and
-    copy a complete <code>theme.css</code> with every token filled in.
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<PaletteIcon />} 
+  title={<strong>Don't want to hand-write 100+ variables?</strong>}
+  description={
+    <div>
+      The{" "}<a href="/theme-creator" class="font-medium underline underline-offset-2 hover:opacity-80">Theme Creator</a>{" "}
+      lets you pick a color family per role plus a radius, preview it live across real components, and
+      copy a complete <code>theme.css</code> with every token filled in.
+    </div>
+  } 
+/>
 
 To change the actual colors, author your own `--hope-*` CSS. Redefine any token under `:root` (and
 `.dark` for dark mode); every utility that references it updates at once.
@@ -173,15 +176,18 @@ preset and still carry a full palette.
 
 ## Recipes (going further)
 
-<div class="not-prose my-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-  <span class="mt-0.5 shrink-0">
-    <InfoIcon class="size-5" />
-  </span>
-  <div>
-    Under the hood, each component's styling is a <code>tailwind-variants</code> recipe — a pure
-    prop→className function. You rarely author recipes directly; <code>slotClasses</code>,
-    <code>class</code>, and <code>definePreset</code> cover almost everything. Presets keep recipes
-    <strong> pure</strong> (they reference finished tokens only, never a computed color), which is
-    what makes swapping a preset safe.
-  </div>
-</div>
+<Alert.Root 
+  variant="soft" 
+  colorScheme="primary" 
+  class="not-prose" 
+  icon={<InfoIcon class="mt-0.5"/>} 
+  description={
+    <div>
+      Under the hood, each component's styling is a <code>tailwind-variants</code> recipe — a pure
+      prop→className function. You rarely author recipes directly; <code>slotClasses</code>,
+      <code>class</code>, and <code>definePreset</code> cover almost everything. Presets keep recipes
+      <strong> pure</strong> (they reference finished tokens only, never a computed color), which is
+      what makes swapping a preset safe.
+    </div>
+  } 
+/>
