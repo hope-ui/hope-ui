@@ -28,7 +28,7 @@ export const Content: Component<DialogContentProps> = (props) => {
 
   const content = createDialogContent(
     ctx,
-    merge(omit(props, "render", "class", "showCloseButton"), {
+    merge(omit(merged, "render", "class", "showCloseButton"), {
       get role() {
         return ctx.role();
       },
@@ -37,7 +37,7 @@ export const Content: Component<DialogContentProps> = (props) => {
 
   const elementProps = merge(content.props, {
     get class(): string {
-      return cx(ctx.slots.content(), props.class) ?? "";
+      return cx(ctx.slots.content(), merged.class) ?? "";
     },
     "data-slot": "dialog-content",
     get children(): JSX.Element {
@@ -60,7 +60,7 @@ export const Content: Component<DialogContentProps> = (props) => {
     <Show when={content.mounted()}>
       {renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
         as: "div",
-        render: props.render,
+        render: merged.render,
         props: elementProps,
         // Publish the element to context (for `Dialog.Positioner`'s exit timing) alongside the
         // primitive's own ref. `renderElement` already merges any consumer `ref`.

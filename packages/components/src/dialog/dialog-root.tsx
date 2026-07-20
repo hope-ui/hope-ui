@@ -80,18 +80,19 @@ export const Root: Component<DialogRootProps> = (props) => {
   // off the Content's transition rather than its own (the Positioner has none).
   const [contentElement, setContentElement] = createSignal<HTMLElement>();
 
-  // `createDialog` reads only its own option keys off `props` (open/defaultOpen/onOpenChange/modal/
-  // closeOn*) — the layout axes ride along harmlessly. Pass the raw `props` (not `merged`) so the
-  // controllable-state getters stay live.
+  // `createDialog` reads only its own option keys off `merged` (open/defaultOpen/onOpenChange/modal/
+  // closeOn*) — the defaulted layout axes ride along harmlessly. Pass `merged`, not raw `props`:
+  // `useDefaults` exposes its defaults as getters over `props`, so `merged` stays just as lazy and
+  // reactive (the controllable-state getters stay live) while remaining the single source of truth.
   const context: DialogContextValue = {
-    ...createDialog(props),
+    ...createDialog(merged),
     slots,
     role: () => merged.role,
     contentElement,
     setContentElement: (el) => setContentElement(el),
   };
 
-  return <DialogContext value={context}>{props.children}</DialogContext>;
+  return <DialogContext value={context}>{merged.children}</DialogContext>;
 };
 
 // Re-export the recipe vocabulary so consumers can import it from the component's subpath.

@@ -200,17 +200,17 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   const i18n = useLocale();
   const t = i18n.t;
-  const locale = () => options.locale ?? i18n.locale();
-  const direction = () => options.dir ?? i18n.direction();
+  const locale = () => merged.locale ?? i18n.locale();
+  const direction = () => merged.dir ?? i18n.direction();
   const timeZone = () => merged.timeZone;
-  const firstDayOfWeek = () => options.firstDayOfWeek;
-  const min = () => options.min;
-  const max = () => options.max;
-  const isDateDisabledFn = () => options.isDateDisabled;
+  const firstDayOfWeek = () => merged.firstDayOfWeek;
+  const min = () => merged.min;
+  const max = () => merged.max;
+  const isDateDisabledFn = () => merged.isDateDisabled;
   const disabled = () => merged.disabled;
   const readOnly = () => merged.readOnly;
   const mode = () => merged.selectionMode;
-  const groupLabel = () => options.label ?? t("calendar.label");
+  const groupLabel = () => merged.label ?? t("calendar.label");
 
   // --- State ---
   const [view, setViewSignal] = createSignal<CalendarView>("month");
@@ -218,8 +218,8 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   // Seed the cursor + visible month once: an explicit default, else a value-derived date, else today.
   const seed =
-    options.defaultFocusedValue ??
-    firstDateOf(options.value ?? options.defaultValue ?? null) ??
+    merged.defaultFocusedValue ??
+    firstDateOf(merged.value ?? merged.defaultValue ?? null) ??
     today(untrack(timeZone));
 
   const [visibleMonth, setVisibleMonth] = createSignal<CalendarDate>(startOfMonth(seed));
@@ -227,17 +227,17 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // The raw controllable cursor; `focusedDate` normalizes it to the view granularity so a rendered
   // cell always matches under `isSameDay`. `onFocusedValueChange` fires on every cursor move.
   const [rawFocused, setRawFocused] = createControllableState<CalendarDate>({
-    value: () => options.focusedValue ?? undefined,
+    value: () => merged.focusedValue ?? undefined,
     defaultValue: () => seed,
-    onChange: (date) => options.onFocusedValueChange?.(date),
+    onChange: (date) => merged.onFocusedValueChange?.(date),
   });
   const focusedDate = createMemo(() => normalizeFocusForView(view(), rawFocused()));
 
   // The committed selection (union keyed by mode). `onValueChange` is fired manually on *commit*
   // (below), not through `createControllableState`, so a range emits only on completion.
   const [selectionValue, setSelectionValue] = createControllableState<CalendarValue>({
-    value: () => options.value,
-    defaultValue: () => options.defaultValue ?? null,
+    value: () => merged.value,
+    defaultValue: () => merged.defaultValue ?? null,
   });
   // The tentative highlight end (hover/focus date) while a range selection is in progress. Internal:
   // the public surface is the derived `highlightedRange` accessor + the `highlightDate` setter.
@@ -490,7 +490,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     setAnchorDate(nextState.anchor);
     setFocusedDate(date);
     if (nextState.anchor === null) {
-      options.onValueChange?.(nextState.value);
+      merged.onValueChange?.(nextState.value);
       announceSelection(nextState.value);
     }
   };
