@@ -1,6 +1,8 @@
+import { Button, type ButtonProps } from "@hope-ui/components/button";
 import type { JSX } from "@solidjs/web";
+import { createSignal, For } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Dialog } from ".";
+import { Dialog, type DialogPlacement, type DialogScrollBehavior, type DialogSize } from ".";
 
 const meta = {
   title: "Components/Dialog",
@@ -11,31 +13,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Dialog is headless — it ships no styles at all. Stories supply the minimum needed to see
-// and click things. `Popup` must be positioned: a `position: fixed` Backdrop creates a
-// stacking context and paints above a static Popup regardless of DOM order.
-const backdropStyle: JSX.CSSProperties = {
-  position: "fixed",
-  inset: "0",
-  "background-color": "rgb(0 0 0 / 50%)",
-};
+// Dialog now ships its own visual identity (the hope `dialog` recipe), so the stories no longer
+// hand-position the parts — the global `withHopeTheme` decorator (`.storybook/preview.tsx`) provides
+// the preset, and Storybook's Tailwind build compiles the recipe's utilities.
 
-const popupStyle: JSX.CSSProperties = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  "background-color": "white",
-  color: "#111",
-  padding: "1.5rem",
-  "border-radius": "0.5rem",
-  "min-width": "20rem",
-};
+/**
+ * Renders a hope `Button` as the `Dialog.Trigger` via its `render` prop. Solid types a native
+ * button's `disabled` wider than `Button` does (`boolean | ""` vs `boolean`), so the spread is cast —
+ * the same bridge `Dialog.CloseTrigger` makes when it spreads onto `CloseButton`.
+ */
+function buttonTrigger(label: string) {
+  return (p: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <Button {...(p as ButtonProps)}>{label}</Button>
+  );
+}
 
 /** Background content, so click-through and focus-restore behavior are observable. */
 function PageBehind() {
   return (
-    <p>
+    <p style={{ padding: "1rem" }}>
       <button type="button" onClick={() => alert("You clicked the background.")}>
         Background button
       </button>
@@ -43,53 +39,186 @@ function PageBehind() {
   );
 }
 
+/** A short paragraph, repeated, so `scrollBehavior` has something to scroll. */
+function LongBody() {
+  return (
+    <For each={Array.from({ length: 16 })}>
+      {(_, i) => (
+        <p>
+          {i() + 1}. The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor
+          jugs.
+        </p>
+      )}
+    </For>
+  );
+}
+
+/**
+ * The canonical styled dialog: trigger → portal → scrim → a centered card with a header, body, and a
+ * muted footer action row. `showCloseButton` defaults `true`, so a corner ✕ appears with no wiring.
+ * Controlled here so the footer's Cancel/Delete can close it (v1 has no context escape hatch).
+ */
+function DialogDemo(props: {
+  size?: DialogSize;
+  placement?: DialogPlacement;
+  scrollBehavior?: DialogScrollBehavior;
+  role?: "dialog" | "alertdialog";
+  showCloseButton?: boolean;
+  modal?: boolean;
+  longBody?: boolean;
+  triggerLabel?: string;
+}) {
+  const [open, setOpen] = createSignal(false);
+  return (
+    <Dialog.Root
+      open={open()}
+      onOpenChange={setOpen}
+      size={props.size}
+      placement={props.placement}
+      scrollBehavior={props.scrollBehavior}
+      role={props.role}
+      modal={props.modal}
+    >
+      <Dialog.Trigger render={buttonTrigger(props.triggerLabel ?? "Open dialog")} />
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Content showCloseButton={props.showCloseButton}>
+          <Dialog.Header>
+            <Dialog.Title>Delete project</Dialog.Title>
+            <Dialog.Description>
+              This action cannot be undone. This permanently deletes the project and everything in
+              it.
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Body>
+            {props.longBody ? (
+              <LongBody />
+            ) : (
+              <p>Everything inside the project will be removed for all members.</p>
+            )}
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button colorScheme="danger" onClick={() => setOpen(false)}>
+              Delete
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+/** The default: `md`, centered, inside-scroll, with the auto corner ✕. */
 export const Default: Story = {
   render: () => (
     <>
       <PageBehind />
-      <Dialog.Root>
-        <Dialog.Trigger>Open dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Backdrop style={backdropStyle} />
-          <Dialog.Content style={popupStyle}>
-            <Dialog.Title>Dialog title</Dialog.Title>
-            <Dialog.Description>Dialog description</Dialog.Description>
-            <Dialog.CloseTrigger />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <DialogDemo />
     </>
   ),
 };
 
+const SIZES: DialogSize[] = ["xs", "sm", "md", "lg", "xl", "cover", "full"];
+
 /**
- * A non-modal dialog: dismissable, and it still returns focus, but it never traps focus,
- * locks scroll, or makes the page behind inert. The background button stays clickable and
- * stays in the accessibility tree.
- *
- * Tab into the dialog, press Escape, and focus returns to the trigger. Restore lives in
- * `createFocusRestore`, gated on `open()`; the trap is separate and gated on
- * `open() && modal()`. (Before Wave 2 restore lived *inside* `createFocusTrap`'s cleanup, so
- * a non-modal dialog stranded focus on `<body>` — an APG violation.)
+ * The `size` scale. `xs…xl` size the centered card; `cover` fills the viewport minus a margin
+ * (keeping the radius), and `full` goes edge-to-edge with no radius — both ignore `placement`.
+ */
+export const Sizes: Story = {
+  render: () => (
+    <div style={{ display: "flex", "flex-wrap": "wrap", gap: "0.75rem", padding: "1rem" }}>
+      <For each={SIZES}>{(size) => <DialogDemo size={size} triggerLabel={size} />}</For>
+    </div>
+  ),
+};
+
+/** `placement="top"` anchors the card near the top of the viewport instead of dead-center. */
+export const PlacementTop: Story = {
+  name: "placement='top'",
+  render: () => <DialogDemo placement="top" />,
+};
+
+/**
+ * `scrollBehavior="inside"` (the default) caps the card height and scrolls the `body`, so the
+ * header and footer stay pinned. The common case for long content.
+ */
+export const ScrollInside: Story = {
+  name: "scrollBehavior='inside' (body scrolls, header/footer pinned)",
+  render: () => <DialogDemo scrollBehavior="inside" longBody />,
+};
+
+/** `scrollBehavior="outside"` scrolls the whole card within the viewport instead. */
+export const ScrollOutside: Story = {
+  name: "scrollBehavior='outside' (whole card scrolls)",
+  render: () => <DialogDemo scrollBehavior="outside" longBody />,
+};
+
+/** The APG alert dialog pattern. `role` is set on `Root` and threaded to `Content`. */
+export const AlertDialog: Story = {
+  name: "role='alertdialog'",
+  render: () => <DialogDemo role="alertdialog" triggerLabel="Delete everything" />,
+};
+
+/** `showCloseButton={false}` omits the auto corner ✕ — the footer buttons are the only way out. */
+export const WithoutCloseButton: Story = {
+  name: "showCloseButton={false}",
+  render: () => <DialogDemo showCloseButton={false} />,
+};
+
+/**
+ * A non-dismissible dialog: `closeOnEscape={false}` + `closeOnInteractOutside={false}` (both set on
+ * `Root`, forwarded to the primitive's dismiss layer). Neither Escape nor a scrim click closes it —
+ * only the footer buttons and the corner ✕ do.
+ */
+export const NonDismissible: Story = {
+  name: "Non-dismissible (closeOnEscape/closeOnInteractOutside false)",
+  render: () => {
+    const [open, setOpen] = createSignal(false);
+    return (
+      <Dialog.Root
+        open={open()}
+        onOpenChange={setOpen}
+        closeOnEscape={false}
+        closeOnInteractOutside={false}
+      >
+        <Dialog.Trigger render={buttonTrigger("Open non-dismissible")} />
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Confirm your choice</Dialog.Title>
+              <Dialog.Description>Escape and outside clicks are disabled here.</Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Body>You must use a button to leave.</Dialog.Body>
+            <Dialog.Footer>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="danger" onClick={() => setOpen(false)}>
+                Confirm
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  },
+};
+
+/**
+ * A non-modal dialog: dismissable, and it still returns focus, but it never traps focus, locks
+ * scroll, or makes the page behind inert. The background button stays clickable and in the
+ * accessibility tree. Tab in, press Escape, and focus returns to the trigger.
  */
 export const NonModal: Story = {
   name: "Non-modal (restores focus, page stays live)",
   render: () => (
     <>
       <PageBehind />
-      <Dialog.Root modal={false}>
-        <Dialog.Trigger>Open non-modal dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content style={popupStyle}>
-            <Dialog.Title>Non-modal</Dialog.Title>
-            <Dialog.Description>
-              Tab to me, then press Escape: focus returns to the trigger. The background button
-              behind me still works.
-            </Dialog.Description>
-            <Dialog.CloseTrigger />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <DialogDemo modal={false} triggerLabel="Open non-modal dialog" />
     </>
   ),
 };
@@ -97,28 +226,63 @@ export const NonModal: Story = {
 /**
  * A modal dialog with no `Dialog.Backdrop` at all. The page behind is still fully inert:
  * `Dialog.Portal` always renders the kernel's invisible `ModalBackdrop` when `modal`, and
- * `createHideOutside` marks everything outside the popup `aria-hidden` and `inert`.
- *
- * Try clicking the background button — nothing happens. Open the a11y addon panel: the
- * background is out of the accessibility tree, and only the dialog is reachable.
- * (Before Wave 2, `aria-modal="true"` was the whole story, and a mouse clicked straight
- * through.)
+ * `createHideOutside` marks everything outside the content `aria-hidden` and `inert`. Try clicking
+ * the background button — nothing happens.
  */
 export const ModalWithoutBackdrop: Story = {
   name: "Modal without Backdrop (background is inert)",
+  render: () => {
+    const [open, setOpen] = createSignal(false);
+    return (
+      <>
+        <PageBehind />
+        <Dialog.Root open={open()} onOpenChange={setOpen}>
+          <Dialog.Trigger render={buttonTrigger("Open modal dialog")} />
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Modal, no backdrop</Dialog.Title>
+                <Dialog.Description>
+                  The background button behind me is unreachable by pointer and by assistive
+                  technology, even though I ship no backdrop.
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Footer>
+                <Button variant="ghost" onClick={() => setOpen(false)}>
+                  Close
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </>
+    );
+  },
+};
+
+/**
+ * A modal `Dialog.Content` **must be positioned** — which the recipe does by default. This story
+ * deliberately cancels that (`position: static`) to pin the failure mode: the pointer-blocking
+ * `ModalBackdrop` is `position: fixed`, and CSS paints positioned elements above non-positioned ones
+ * regardless of DOM order, so a static content ends up *beneath* it and its buttons stop responding
+ * to the mouse. Escape still works. Don't "fix" this by deleting it — it documents the contract.
+ */
+export const UnpositionedContent: Story = {
+  name: "Modal with an unpositioned Content (content is unclickable — by design)",
   render: () => (
     <>
       <PageBehind />
       <Dialog.Root>
-        <Dialog.Trigger>Open modal dialog</Dialog.Trigger>
+        <Dialog.Trigger render={buttonTrigger("Open unpositioned dialog")} />
         <Dialog.Portal>
-          <Dialog.Content style={popupStyle}>
-            <Dialog.Title>Modal, no backdrop</Dialog.Title>
-            <Dialog.Description>
-              Try clicking the background button behind me. It's unreachable by pointer and by
-              assistive technology, even though I ship no backdrop.
-            </Dialog.Description>
-            <Dialog.CloseTrigger />
+          <Dialog.Content style={{ position: "static", inset: "auto", transform: "none" }}>
+            <Dialog.Header>
+              <Dialog.Title>No position</Dialog.Title>
+              <Dialog.Description>
+                My corner ✕ is beneath the ModalBackdrop. Escape still works. Remove the inline
+                `position: static` and the recipe's centering brings it back.
+              </Dialog.Description>
+            </Dialog.Header>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
@@ -127,100 +291,12 @@ export const ModalWithoutBackdrop: Story = {
 };
 
 /**
- * A modal `Dialog.Content` **must be positioned**. The pointer-blocking `ModalBackdrop` is
- * `position: fixed`, and CSS paints positioned elements above non-positioned ones regardless
- * of DOM order — so a `position: static` popup ends up *underneath* it and its own buttons
- * stop responding to the mouse. Every other story positions the popup; this one doesn't, on
- * purpose, so the failure mode is visible somewhere.
- */
-export const UnpositionedModalPopup: Story = {
-  name: "Modal with an unpositioned Popup (content is unclickable — by design)",
-  render: () => (
-    <>
-      <PageBehind />
-      <Dialog.Root>
-        <Dialog.Trigger>Open unpositioned dialog</Dialog.Trigger>
-        <Dialog.Portal>
-          <Dialog.Content style={{ "background-color": "white", color: "#111", padding: "1.5rem" }}>
-            <Dialog.Title>No position</Dialog.Title>
-            <Dialog.Description>
-              My Close button is beneath the ModalBackdrop. Escape still works. Give the popup
-              `position: fixed` and it comes back.
-            </Dialog.Description>
-            <Dialog.CloseTrigger />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </>
-  ),
-};
-
-/**
- * The APG alert dialog pattern. `Popup`'s internal `role` falls back to the consumer's, so
- * `role="alertdialog"` survives. (Before Wave 1 it was silently overwritten with `"dialog"`.)
- */
-export const AlertDialog: Story = {
-  name: "role='alertdialog' (APG alert dialog pattern)",
-  render: () => (
-    <Dialog.Root role="alertdialog">
-      <Dialog.Trigger>Delete everything</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Content style={popupStyle}>
-          <Dialog.Title>Are you sure?</Dialog.Title>
-          <Dialog.Description>This cannot be undone.</Dialog.Description>
-          <Dialog.CloseTrigger />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  ),
-};
-
-/**
- * A dialog labelled by a heading that lives outside the popup, with no `Dialog.Title`.
- * `Popup`'s internal `aria-labelledby` falls back to the consumer's rather than
- * overwriting it. (Before Wave 1 the name was silently dropped and the a11y panel reported
- * `aria-dialog-name`.)
- */
-export const LabelledByExternalHeading: Story = {
-  name: "aria-labelledby without Dialog.Title",
-  render: () => (
-    <Dialog.Root>
-      <h2 id="external-heading">Heading outside the popup</h2>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Content aria-labelledby="external-heading" style={popupStyle}>
-          <Dialog.Description>My accessible name should come from outside.</Dialog.Description>
-          <Dialog.CloseTrigger />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  ),
-};
-
-/**
- * A wrapper forwarding an unset optional prop passes `modal={undefined}`. `withDefaults`
- * resolves that with `??`, so the dialog stays modal. (Before Wave 1, `merge({ modal: true },
- * props)` let a *present* `undefined` key beat the default and silently produced a
- * non-modal dialog: no focus trap, no scroll lock, no `aria-modal`.)
+ * A wrapper forwarding an unset optional prop passes `modal={undefined}`. `withDefaults` resolves
+ * that with `??`, so the dialog stays modal. (Before Wave 1, `merge({ modal: true }, props)` let a
+ * *present* `undefined` key beat the default and silently produced a non-modal dialog.)
  */
 function WrappedDialog(props: { modal?: boolean }) {
-  return (
-    <Dialog.Root modal={props.modal}>
-      <Dialog.Trigger>Open wrapped dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Content style={popupStyle}>
-          <Dialog.Title>Wrapped</Dialog.Title>
-          <Dialog.Description>
-            I'm modal by default, even though my wrapper forwarded `modal={undefined}`.
-          </Dialog.Description>
-          <Dialog.CloseTrigger />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
+  return <DialogDemo modal={props.modal} triggerLabel="Open wrapped dialog" />;
 }
 
 export const WrapperForwardingUndefinedModal: Story = {
@@ -234,22 +310,29 @@ export const WrapperForwardingUndefinedModal: Story = {
 };
 
 /**
- * A consumer-pinned popup `id`. `Popup` registers it with `Root`, so `Trigger`'s
- * `aria-controls` names the element that actually exists rather than a generated id.
+ * A dialog labelled by a heading that lives outside the content, with no `Dialog.Title`. `Content`'s
+ * internal `aria-labelledby` falls back to the consumer's rather than overwriting it.
  */
-export const CustomPopupId: Story = {
-  name: "Consumer-supplied popup id (aria-controls follows)",
-  render: () => (
-    <Dialog.Root>
-      <Dialog.Trigger>Open dialog</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Backdrop style={backdropStyle} />
-        <Dialog.Content id="my-popup" style={popupStyle}>
-          <Dialog.Title>Pinned id</Dialog.Title>
-          <Dialog.Description>Inspect the trigger's aria-controls.</Dialog.Description>
-          <Dialog.CloseTrigger />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  ),
+export const LabelledByExternalHeading: Story = {
+  name: "aria-labelledby without Dialog.Title",
+  render: () => {
+    const [open, setOpen] = createSignal(false);
+    return (
+      <Dialog.Root open={open()} onOpenChange={setOpen}>
+        <h2 id="external-heading">Heading outside the content</h2>
+        <Dialog.Trigger render={buttonTrigger("Open dialog")} />
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Content aria-labelledby="external-heading">
+            <Dialog.Body>My accessible name comes from the heading outside me.</Dialog.Body>
+            <Dialog.Footer>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Close
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  },
 };

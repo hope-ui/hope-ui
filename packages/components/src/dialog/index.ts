@@ -3,9 +3,12 @@
 // the context that distributes the recipe slot fns + `role`); this barrel is the one place the
 // namespace object is assembled — the component's single subpath export. Mirrors `src/alert/`.
 import { Backdrop } from "./dialog-backdrop";
+import { Body } from "./dialog-body";
 import { CloseTrigger } from "./dialog-close-trigger";
 import { Content } from "./dialog-content";
 import { Description } from "./dialog-description";
+import { Footer } from "./dialog-footer";
+import { Header } from "./dialog-header";
 import { Portal } from "./dialog-portal";
 import { Root } from "./dialog-root";
 import { Title } from "./dialog-title";
@@ -17,15 +20,21 @@ export const Dialog = {
   Portal,
   Backdrop,
   Content,
+  Header,
+  Body,
+  Footer,
   Title,
   Description,
   CloseTrigger,
 };
 
 export type { DialogBackdropProps } from "./dialog-backdrop";
+export type { DialogBodyProps } from "./dialog-body";
 export type { DialogCloseTriggerProps } from "./dialog-close-trigger";
 export type { DialogContentProps } from "./dialog-content";
 export type { DialogDescriptionProps } from "./dialog-description";
+export type { DialogFooterProps } from "./dialog-footer";
+export type { DialogHeaderProps } from "./dialog-header";
 export type { DialogPortalProps } from "./dialog-portal";
 export type {
   DialogPlacement,

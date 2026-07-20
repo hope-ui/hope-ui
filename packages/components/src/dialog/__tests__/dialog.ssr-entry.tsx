@@ -31,9 +31,13 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
         <Dialog.Portal>
           <Dialog.Backdrop />
           <Dialog.Content>
-            <Dialog.Title>Dialog title</Dialog.Title>
-            <Dialog.Description>Dialog description</Dialog.Description>
-            <Dialog.CloseTrigger />
+            <Dialog.Header>
+              <Dialog.Title>Dialog title</Dialog.Title>
+              <Dialog.Description>Dialog description</Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Body>Dialog body</Dialog.Body>
+            {/* No explicit CloseTrigger — `Content` auto-renders one (showCloseButton defaults true).
+            An explicit one too would give the dialog two "Close" buttons. */}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
