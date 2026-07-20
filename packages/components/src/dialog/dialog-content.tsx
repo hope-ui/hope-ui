@@ -62,7 +62,12 @@ export const Content: Component<DialogContentProps> = (props) => {
         as: "div",
         render: props.render,
         props: elementProps,
-        ref: content.setRef,
+        // Publish the element to context (for `Dialog.Positioner`'s exit timing) alongside the
+        // primitive's own ref. `renderElement` already merges any consumer `ref`.
+        ref: (el) => {
+          content.setRef(el);
+          ctx.setContentElement(el ?? undefined);
+        },
       })}
     </Show>
   );

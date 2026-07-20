@@ -11,6 +11,7 @@
  *   - `../_base/variants.css`  — shared custom variants (the `dark` selector). Contract-level.
  *   - `../_base/theme-map.css` — shared `@theme inline` mapping color `--hope-*` into Tailwind utilities.
  *   - `../_base/opacity.css`   — shared `@utility` layer exposing the `--hope-opacity-*` axis.
+ *   - `../_base/scrollbar.css` — shared `@utility` layer for scrollbar control (`no-scrollbar`).
  *   - `./tokens.css`           — hope's `--hope-*` values (`:root` + `.dark`), authored in CSS.
  *
  * hope is a **zero-DOM preset**: its token *values* live in `./tokens.css` (not TypeScript, not a
@@ -22,6 +23,7 @@
 /* Shared structural contract — identical for every @hope-ui/presets/* preset. */
 @import "../_base/variants.css";
 @import "../_base/opacity.css";
+@import "../_base/scrollbar.css";
 @import "../_base/theme-map.css";
 
 /*

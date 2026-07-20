@@ -304,8 +304,10 @@ describe("Alert", () => {
       </Themed>
     ));
 
-    const close = container.querySelector('[data-slot="close-button"]');
+    const close = container.querySelector('[data-slot="alert-close-trigger"]');
     expect(close).not.toBeNull();
+    // The generic CloseButton root marker is re-scoped away.
+    expect(container.querySelector('[data-slot="close-button"]')).toBeNull();
     // Placement from the alert `closeTrigger` slot ...
     expect(close?.className).toContain("ms-auto");
     // ... and CloseButton's own recipe chrome is still present.
@@ -375,7 +377,7 @@ describe("Alert hydration", () => {
     );
     // The status glyph survived hydration inside its host icon span, and the close button hydrated too.
     expect(container.querySelector('[data-slot="alert-icon"] svg')).not.toBeNull();
-    expect(container.querySelector('[data-slot="close-button"]')).not.toBeNull();
+    expect(container.querySelector('[data-slot="alert-close-trigger"]')).not.toBeNull();
     dispose();
   });
 

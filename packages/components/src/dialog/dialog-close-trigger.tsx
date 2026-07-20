@@ -22,6 +22,8 @@ export const CloseTrigger: Component<DialogCloseTriggerProps> = (props) => {
       // (which wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's chrome.
       return cx(ctx.slots.closeTrigger(), props.class) ?? "";
     },
+    // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
+    "data-slot": "dialog-close-trigger",
   });
 
   // `close.props` is typed as the primitive's `JSX.ButtonHTMLAttributes` (the hook can't reference the

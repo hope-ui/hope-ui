@@ -1,6 +1,9 @@
 # Dialog: fix `scrollBehavior` + add `Dialog.Positioner`
 
-Status: **planned, not yet implemented.** This doc is the implementation brief for the fix.
+Status: **implemented.** This doc is the implementation brief; the "Changes" and "Verification"
+sections below were carried out verbatim (theming contract + hope preset recipe + `@hope-ui/components`
+Dialog, with the new `Dialog.Positioner` part). All checks in "Verification" pass; the inside/outside
+scroll and centered-short-card mechanics were confirmed by eye in Storybook.
 
 ## Kickoff prompt (starting brief)
 

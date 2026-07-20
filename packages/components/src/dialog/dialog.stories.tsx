@@ -69,29 +69,31 @@ function DialogDemo(props: {
       <Dialog.Trigger render={buttonTrigger(props.triggerLabel ?? "Open dialog")} />
       <Dialog.Portal>
         <Dialog.Backdrop />
-        <Dialog.Content showCloseButton={props.showCloseButton}>
-          <Dialog.Header>
-            <Dialog.Title>Delete project</Dialog.Title>
-            <Dialog.Description>
-              This permanently deletes <b>Acme Marketing Site</b> and everything inside it.
-            </Dialog.Description>
-          </Dialog.Header>
-          <Dialog.Body>
-            {props.longBody ? (
-              <LongBody />
-            ) : (
-              <p>Removed for every member of the workspace. This action cannot be undone.</p>
-            )}
-          </Dialog.Body>
-          <Dialog.Footer>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button colorScheme="danger" onClick={() => setOpen(false)}>
-              Delete project
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
+        <Dialog.Positioner>
+          <Dialog.Content showCloseButton={props.showCloseButton}>
+            <Dialog.Header>
+              <Dialog.Title>Delete project</Dialog.Title>
+              <Dialog.Description>
+                This permanently deletes <b>Acme Marketing Site</b> and everything inside it.
+              </Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Body>
+              {props.longBody ? (
+                <LongBody />
+              ) : (
+                <p>Removed for every member of the workspace. This action cannot be undone.</p>
+              )}
+            </Dialog.Body>
+            <Dialog.Footer>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="danger" onClick={() => setOpen(false)}>
+                Delete project
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
       </Dialog.Portal>
     </Dialog.Root>
   );
@@ -143,7 +145,11 @@ export const ScrollInside: Story = {
   ),
 };
 
-/** `scrollBehavior="outside"` scrolls the whole card within the viewport instead. */
+/**
+ * `scrollBehavior="outside"` makes the `Dialog.Positioner` (the fixed full-viewport frame) the scroll
+ * container instead, so the whole card scrolls within the viewport while the card keeps its natural
+ * height. A short card stays centered; a tall one anchors to the top and is fully scroll-reachable.
+ */
 export const ScrollOutside: Story = {
   name: "scrollBehavior='outside' (whole card scrolls)",
   render: () => (
@@ -177,22 +183,24 @@ export const AlertDialog: Story = {
           <Dialog.Trigger render={buttonTrigger("Delete account")} />
           <Dialog.Portal>
             <Dialog.Backdrop />
-            <Dialog.Content showCloseButton={false}>
-              <Dialog.Header>
-                <Dialog.Title>Delete your account?</Dialog.Title>
-                <Dialog.Description>
-                  This erases your profile, projects, and billing history. It cannot be undone.
-                </Dialog.Description>
-              </Dialog.Header>
-              <Dialog.Footer>
-                <Button variant="ghost" onClick={() => setOpen(false)}>
-                  Keep account
-                </Button>
-                <Button colorScheme="danger" onClick={() => setOpen(false)}>
-                  Delete account
-                </Button>
-              </Dialog.Footer>
-            </Dialog.Content>
+            <Dialog.Positioner>
+              <Dialog.Content showCloseButton={false}>
+                <Dialog.Header>
+                  <Dialog.Title>Delete your account?</Dialog.Title>
+                  <Dialog.Description>
+                    This erases your profile, projects, and billing history. It cannot be undone.
+                  </Dialog.Description>
+                </Dialog.Header>
+                <Dialog.Footer>
+                  <Button variant="ghost" onClick={() => setOpen(false)}>
+                    Keep account
+                  </Button>
+                  <Button colorScheme="danger" onClick={() => setOpen(false)}>
+                    Delete account
+                  </Button>
+                </Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
           </Dialog.Portal>
         </Dialog.Root>
       </div>
@@ -217,41 +225,43 @@ export const WithForm: Story = {
           <Dialog.Trigger render={buttonTrigger("Edit profile")} />
           <Dialog.Portal>
             <Dialog.Backdrop />
-            <Dialog.Content>
-              <Dialog.Header>
-                <Dialog.Title>Edit profile</Dialog.Title>
-                <Dialog.Description>
-                  Update your details. Changes save on submit.
-                </Dialog.Description>
-              </Dialog.Header>
-              <Dialog.Body>
-                <form
-                  id="edit-profile-form"
-                  class="flex flex-col gap-3"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    setOpen(false);
-                  }}
-                >
-                  <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
-                    Name
-                    <input class={field} value="Ada Lovelace" />
-                  </label>
-                  <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
-                    Email
-                    <input class={field} type="email" value="ada@example.com" />
-                  </label>
-                </form>
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" form="edit-profile-form">
-                  Save changes
-                </Button>
-              </Dialog.Footer>
-            </Dialog.Content>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Header>
+                  <Dialog.Title>Edit profile</Dialog.Title>
+                  <Dialog.Description>
+                    Update your details. Changes save on submit.
+                  </Dialog.Description>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <form
+                    id="edit-profile-form"
+                    class="flex flex-col gap-3"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      setOpen(false);
+                    }}
+                  >
+                    <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
+                      Name
+                      <input class={field} value="Ada Lovelace" />
+                    </label>
+                    <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
+                      Email
+                      <input class={field} type="email" value="ada@example.com" />
+                    </label>
+                  </form>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" form="edit-profile-form">
+                    Save changes
+                  </Button>
+                </Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
           </Dialog.Portal>
         </Dialog.Root>
       </div>
@@ -279,23 +289,25 @@ export const NonDismissible: Story = {
           <Dialog.Trigger render={buttonTrigger("Accept the terms")} />
           <Dialog.Portal>
             <Dialog.Backdrop />
-            <Dialog.Content showCloseButton={false}>
-              <Dialog.Header>
-                <Dialog.Title>Before you continue</Dialog.Title>
-                <Dialog.Description>
-                  Escape and outside clicks are disabled — you must choose a button.
-                </Dialog.Description>
-              </Dialog.Header>
-              <Dialog.Body>
-                <p>By continuing you agree to the terms of service and privacy policy.</p>
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Button variant="ghost" onClick={() => setOpen(false)}>
-                  Decline
-                </Button>
-                <Button onClick={() => setOpen(false)}>Accept</Button>
-              </Dialog.Footer>
-            </Dialog.Content>
+            <Dialog.Positioner>
+              <Dialog.Content showCloseButton={false}>
+                <Dialog.Header>
+                  <Dialog.Title>Before you continue</Dialog.Title>
+                  <Dialog.Description>
+                    Escape and outside clicks are disabled — you must choose a button.
+                  </Dialog.Description>
+                </Dialog.Header>
+                <Dialog.Body>
+                  <p>By continuing you agree to the terms of service and privacy policy.</p>
+                </Dialog.Body>
+                <Dialog.Footer>
+                  <Button variant="ghost" onClick={() => setOpen(false)}>
+                    Decline
+                  </Button>
+                  <Button onClick={() => setOpen(false)}>Accept</Button>
+                </Dialog.Footer>
+              </Dialog.Content>
+            </Dialog.Positioner>
           </Dialog.Portal>
         </Dialog.Root>
       </div>

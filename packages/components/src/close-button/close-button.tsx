@@ -172,8 +172,11 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
       // precedence; otherwise fall back to the localized `common.close`. Mirrors `createDialogCloseTrigger`.
       return merged["aria-label"] ?? i18n.t("common.close");
     },
-    // The root's own slot marker; the glyph wrapper uses the `close-button-<part>` convention.
-    "data-slot": "close-button",
+    // The root's own slot marker; the glyph wrapper uses the `close-button-<part>` convention. A
+    // consumer (Dialog.CloseTrigger, Alert.CloseTrigger) may re-scope it to its own value.
+    get "data-slot"() {
+      return (merged as { "data-slot"?: string })["data-slot"] ?? "close-button";
+    },
     children: content,
   });
 

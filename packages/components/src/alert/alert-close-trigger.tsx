@@ -27,6 +27,8 @@ export const CloseTrigger: Component<AlertCloseTriggerProps> = (props) => {
       // wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's own chrome.
       return cx(ctx.slots.closeTrigger(), props.class) ?? "";
     },
+    // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
+    "data-slot": "alert-close-trigger",
   });
 
   // `render` is passed to `CloseButton` directly (not through the spread) — it is read synchronously to

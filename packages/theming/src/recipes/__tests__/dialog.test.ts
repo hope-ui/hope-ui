@@ -35,6 +35,7 @@ describe("dialog recipe contract", () => {
     const scrollBehaviors: DialogScrollBehavior[] = ["inside", "outside"];
     const slots: DialogSlot[] = [
       "backdrop",
+      "positioner",
       "content",
       "header",
       "body",
@@ -47,6 +48,6 @@ describe("dialog recipe contract", () => {
     expect(sizes).toHaveLength(7);
     expect(placements).toHaveLength(2);
     expect(scrollBehaviors).toHaveLength(2);
-    expect(slots).toHaveLength(8);
+    expect(slots).toHaveLength(9);
   });
 });

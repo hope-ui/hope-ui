@@ -7,7 +7,7 @@ import type {
 } from "@hope-ui/theming";
 import { type DialogThemeableProps, useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import type { Component } from "solid-js";
+import { type Component, createSignal } from "solid-js";
 import { DialogContext, type DialogContextValue } from "./dialog-context";
 
 /** The ARIA role of the dialog. `alertdialog` is the APG destructive-confirmation pattern. */
@@ -76,6 +76,10 @@ export const Root: Component<DialogRootProps> = (props) => {
     class: () => merged.class,
   });
 
+  // Published by `Dialog.Content` (via its composed ref) so `Dialog.Positioner` can time its exit
+  // off the Content's transition rather than its own (the Positioner has none).
+  const [contentElement, setContentElement] = createSignal<HTMLElement>();
+
   // `createDialog` reads only its own option keys off `props` (open/defaultOpen/onOpenChange/modal/
   // closeOn*) — the layout axes ride along harmlessly. Pass the raw `props` (not `merged`) so the
   // controllable-state getters stay live.
@@ -83,6 +87,8 @@ export const Root: Component<DialogRootProps> = (props) => {
     ...createDialog(props),
     slots,
     role: () => merged.role,
+    contentElement,
+    setContentElement: (el) => setContentElement(el),
   };
 
   return <DialogContext value={context}>{props.children}</DialogContext>;

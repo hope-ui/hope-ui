@@ -38,6 +38,7 @@ const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
 });
 const stubDialogRecipe: DialogRecipe = () => ({
   backdrop: () => "",
+  positioner: () => "",
   content: () => "",
   header: () => "",
   body: () => "",

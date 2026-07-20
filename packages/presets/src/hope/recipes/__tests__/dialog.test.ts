@@ -13,6 +13,7 @@ const PLACEMENTS: DialogPlacement[] = ["center", "top"];
 const SCROLL_BEHAVIORS: DialogScrollBehavior[] = ["inside", "outside"];
 const SLOTS = [
   "backdrop",
+  "positioner",
   "content",
   "header",
   "body",
@@ -41,9 +42,18 @@ describe("hope dialog recipe", () => {
     expect(backdrop).toContain("data-exiting:opacity-0");
   });
 
-  it("renders the content as a fixed card on a surface-overlay with a subtle border", () => {
+  it("renders the positioner as a fixed full-viewport flex frame wrapping the content card", () => {
+    const positioner = dialogRecipe({}).positioner();
+    expect(positioner).toContain("fixed");
+    expect(positioner).toContain("inset-0");
+    expect(positioner).toContain("flex");
+
+    // The card is a flow child now (relative, not fixed) but keeps its chrome + transitions.
     const content = dialogRecipe({}).content();
-    expect(content).toContain("fixed");
+    expect(content).toContain("relative");
+    expect(content).toContain("flex");
+    expect(content).toContain("flex-col");
+    expect(content).not.toContain("fixed");
     expect(content).toContain("bg-surface-overlay");
     expect(content).toContain("border-subtle");
     expect(content).toContain("rounded-xl");
@@ -71,18 +81,17 @@ describe("hope dialog recipe", () => {
     expect(description).toContain("[&_a]:underline");
   });
 
-  it("centers by default and anchors near the top for placement=top", () => {
-    const center = dialogRecipe({ placement: "center" }).content();
-    expect(center).toContain("left-1/2");
-    expect(center).toContain("top-1/2");
-    expect(center).toContain("-translate-y-1/2");
+  it("centers by default via auto margins and anchors near the top for placement=top", () => {
+    // Centering is auto margins on the card within the `items-start justify-center` frame.
+    const center = dialogRecipe({ placement: "center" });
+    expect(center.content()).toContain("my-auto");
+    expect(center.positioner()).toContain("items-start");
+    expect(center.positioner()).toContain("justify-center");
 
-    const top = dialogRecipe({ placement: "top" }).content();
-    expect(top).toContain("top-4");
-    expect(top).toContain("sm:top-16");
-    // horizontally centered, but not vertically.
-    expect(top).toContain("-translate-x-1/2");
-    expect(top).not.toContain("-translate-y-1/2");
+    // `top` nudges the positioner's top gutter down; the card gets no `my-auto`.
+    const top = dialogRecipe({ placement: "top" });
+    expect(top.positioner()).toContain("sm:pt-16");
+    expect(top.content()).not.toContain("my-auto");
   });
 
   it("scales the centered card width per size, honoring the xs→xs / xl→2xl endpoints", () => {
@@ -92,52 +101,56 @@ describe("hope dialog recipe", () => {
   });
 
   it("makes cover a pseudo-fullscreen card that keeps its radius and cancels the centering", () => {
-    const cover = dialogRecipe({ size: "cover", placement: "center" }).content();
-    expect(cover).toContain("inset-4");
-    expect(cover).toContain("sm:inset-8");
-    expect(cover).toContain("max-w-none");
-    expect(cover).toContain("rounded-xl");
-    expect(cover).not.toContain("rounded-none");
-    // The centered positioning `placement` set is removed by tailwind-merge (inset > left/top,
-    // translate-x-0 > -translate-x-1/2).
-    expect(cover).not.toContain("left-1/2");
-    expect(cover).not.toContain("top-1/2");
-    expect(cover).not.toContain("-translate-x-1/2");
+    const cover = dialogRecipe({ size: "cover", placement: "center" });
+    // The positioner shrinks its padding; the card fills it and keeps the radius.
+    expect(cover.positioner()).toContain("sm:p-8");
+    expect(cover.content()).toContain("h-full");
+    expect(cover.content()).toContain("max-w-none");
+    expect(cover.content()).toContain("rounded-xl");
+    expect(cover.content()).not.toContain("rounded-none");
+    // `my-0` (size, declared last) cancels `placement:center`'s `my-auto` — same `my` group.
+    expect(cover.content()).toContain("my-0");
+    expect(cover.content()).not.toContain("my-auto");
   });
 
-  it("makes full a true edge-to-edge fullscreen with no radius or height cap", () => {
+  it("makes full a true edge-to-edge fullscreen with no radius or positioner gutter", () => {
     const full = dialogRecipe({
       size: "full",
       placement: "center",
       scrollBehavior: "inside",
-    }).content();
-    expect(full).toContain("inset-0");
-    expect(full).toContain("rounded-none");
-    expect(full).toContain("max-w-none");
-    // `max-h-none` wins over scrollBehavior=inside's height cap so it fills the viewport.
-    expect(full).toContain("max-h-none");
-    expect(full).not.toContain("rounded-xl");
-    expect(full).not.toContain("left-1/2");
+    });
+    // `p-0`/`sm:p-0` drop the positioner gutter so the card reaches every edge.
+    expect(full.positioner()).toContain("p-0");
+    expect(full.content()).toContain("h-full");
+    expect(full.content()).toContain("rounded-none");
+    expect(full.content()).toContain("max-w-none");
+    expect(full.content()).not.toContain("rounded-xl");
+    expect(full.content()).toContain("my-0");
   });
 
-  it("caps content height and scrolls the body for scrollBehavior=inside", () => {
+  it("caps the card and scrolls the body (scrollbar hidden) for scrollBehavior=inside", () => {
     const parts = dialogRecipe({ scrollBehavior: "inside" });
-    expect(parts.content()).toContain("max-h-[calc(100dvh-2rem)]");
+    expect(parts.positioner()).toContain("overflow-hidden");
+    expect(parts.content()).toContain("max-h-full");
     expect(parts.body()).toContain("overflow-y-auto");
+    // The body scrolls but hides its scrollbar (the base `no-scrollbar` @utility).
+    expect(parts.body()).toContain("no-scrollbar");
   });
 
-  it("scrolls the whole content block for scrollBehavior=outside", () => {
+  it("scrolls the positioner (not the card) for scrollBehavior=outside", () => {
     const parts = dialogRecipe({ scrollBehavior: "outside" });
-    expect(parts.content()).toContain("max-h-[calc(100dvh-2rem)]");
-    expect(parts.content()).toContain("overflow-y-auto");
+    expect(parts.positioner()).toContain("overflow-y-auto");
+    expect(parts.content()).not.toContain("max-h");
+    expect(parts.content()).not.toContain("overflow");
     expect(parts.body()).not.toContain("overflow-y-auto");
   });
 
   it("defaults to md / center / inside", () => {
     const parts = dialogRecipe({});
     expect(parts.content()).toContain("sm:max-w-lg"); // md
-    expect(parts.content()).toContain("left-1/2"); // center
-    expect(parts.content()).toContain("max-h-[calc(100dvh-2rem)]"); // inside
+    expect(parts.content()).toContain("my-auto"); // center
+    expect(parts.content()).toContain("max-h-full"); // inside
+    expect(parts.positioner()).toContain("overflow-hidden"); // inside
     expect(parts.body()).toContain("overflow-y-auto"); // inside
   });
 

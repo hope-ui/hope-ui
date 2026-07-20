@@ -57,12 +57,15 @@ export interface DialogRecipeVariants {
 export interface DialogThemeableProps extends DialogRecipeVariants {}
 
 /**
- * The Dialog recipe's slots. `backdrop`/`content` are the two portaled layers; `header`/`body`/
- * `footer` the structural regions; `title`/`description` the labelled text; `closeTrigger` the corner
- * dismiss button's placement (its chrome comes from `CloseButton`'s own recipe, merged under this).
+ * The Dialog recipe's slots. `backdrop`/`positioner` are the two portaled layers (the scrim, and the
+ * fixed full-viewport flex frame that positions and scrolls the card); `content` is the card itself;
+ * `header`/`body`/`footer` the structural regions; `title`/`description` the labelled text;
+ * `closeTrigger` the corner dismiss button's placement (its chrome comes from `CloseButton`'s own
+ * recipe, merged under this).
  */
 export type DialogSlot =
   | "backdrop"
+  | "positioner"
   | "content"
   | "header"
   | "body"

@@ -10,6 +10,7 @@ import { Description } from "./dialog-description";
 import { Footer } from "./dialog-footer";
 import { Header } from "./dialog-header";
 import { Portal } from "./dialog-portal";
+import { Positioner } from "./dialog-positioner";
 import { Root } from "./dialog-root";
 import { Title } from "./dialog-title";
 import { Trigger } from "./dialog-trigger";
@@ -19,6 +20,7 @@ export const Dialog = {
   Trigger,
   Portal,
   Backdrop,
+  Positioner,
   Content,
   Header,
   Body,
@@ -36,6 +38,7 @@ export type { DialogDescriptionProps } from "./dialog-description";
 export type { DialogFooterProps } from "./dialog-footer";
 export type { DialogHeaderProps } from "./dialog-header";
 export type { DialogPortalProps } from "./dialog-portal";
+export type { DialogPositionerProps } from "./dialog-positioner";
 export type {
   DialogPlacement,
   DialogRole,

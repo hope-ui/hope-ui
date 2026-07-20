@@ -41,6 +41,7 @@ const _theme = {
   }),
   dialog: (props?: DialogRecipeVariants): Record<DialogSlot, SlotClassFn> => ({
     backdrop: () => "dialog__backdrop",
+    positioner: () => "dialog__positioner",
     content: () => `dialog__content dialog__content--${props?.size ?? "md"}`,
     header: () => "dialog__header",
     body: () => "dialog__body",

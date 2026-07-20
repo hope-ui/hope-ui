@@ -1,6 +1,7 @@
 import type { CreateDialogReturn } from "@hope-ui/primitives/dialog";
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { DialogSlot } from "@hope-ui/theming";
+import type { Accessor } from "solid-js";
 
 /**
  * The value every Dialog part reads. An **intersection** of the primitive's `CreateDialogReturn`
@@ -15,6 +16,9 @@ export interface DialogContextValue extends CreateDialogReturn {
   slots: Record<DialogSlot, () => string>;
   /** The ARIA role, set on `Root` and read by `Content` (`"dialog"` or `"alertdialog"`). */
   role: () => "dialog" | "alertdialog";
+  /** The Content element, published by `Dialog.Content` so `Dialog.Positioner` can time its exit. */
+  contentElement: Accessor<HTMLElement | undefined>;
+  setContentElement: (el: HTMLElement | undefined) => void;
 }
 
 export const [DialogContext, useDialogContext] =
