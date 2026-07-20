@@ -74,7 +74,7 @@ pnpm storybook            # visual harness on :6006 (the only non-test feedback 
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
-pnpm changeset            # add a changeset before a PR that changes a published package
+pnpm changeset            # NOT needed while the repo is at v0.0.0 — see "Changesets" below
 ```
 
 Playwright's browser needs to be installed once (CI does this automatically):
@@ -99,6 +99,15 @@ pnpm --filter @hope-ui/components typecheck
 **Never add a `Co-Authored-By: Claude` (or any `Co-authored-by` / "Generated with Claude
 Code") trailer or attribution line to commit messages.** Commit messages carry the change
 rationale only — no tool or assistant attribution, in any form.
+
+## Changesets
+
+**While the repo is at `v0.0.0`, do NOT create a changeset — not on any commit or PR — unless
+the user expressly asks for one.** Nothing is published yet, so there is no released version to
+bump or changelog to accrue; a changeset per change is pure noise until the first real release.
+Do not proactively add one or nudge the user to; when they explicitly ask, run `pnpm changeset`.
+Once the repo leaves `v0.0.0`, revert to the normal rule (a changeset accompanies every PR that
+changes a published package).
 
 ## Definition of Done (enforced, not a guideline)
 
