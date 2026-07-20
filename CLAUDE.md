@@ -386,6 +386,17 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
 - `mergeProps`/`splitProps` are gone → use `merge` and `omit` from `solid-js`.
 - `merge` resolves keys by *presence*, not value — never use it for defaults; use
   `withDefaults(props, { ... })` (resolves each key with `??`).
+- **Merged props are the source of truth — never touch raw `props` again after merging.** Once you
+  `withDefaults(props, …)` (or any `useDefault`-style merge), the returned object is the *only* props
+  object for the rest of the body. Merge once at the top, then feed **that** result to every
+  downstream op — `omit`/`splitProps`, `{...spread}`, destructure, computed props, event compose.
+  Reaching back to the original `props` for a defaulted key silently reads `undefined`: `withDefaults`
+  copies nothing, it exposes defaults as *getters over a new object* (`props[key] ?? defaults[key]`),
+  so the default lives nowhere but that merged object — the raw `props` is untouched. `omit(props, …)`
+  drops the default; `omit(merged, …)` carries it. This is the same presence-vs-value trap
+  `withDefaults` exists to close, re-created one layer up, and it's silent — no type error, no test
+  failure unless a test exercises the prop-omitted path. See `dialog-trigger.ts` (`omit(merged, …)`,
+  `merged.onClick`) for the correct shape.
 - Internal computed props must fall back to the consumer's (`props["aria-labelledby"] ??
   context.titleId()`), never overwrite; only consumer-uncontrolled props (`aria-modal`,
   `data-presence`) stay component-owned.
