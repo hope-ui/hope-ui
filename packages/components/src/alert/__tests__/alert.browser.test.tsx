@@ -284,7 +284,7 @@ describe("Alert", () => {
           <Alert.Content>
             <Alert.Title>Persistent</Alert.Title>
           </Alert.Content>
-          <Alert.Close onClick={(event) => event.preventDefault()} />
+          <Alert.CloseTrigger onClick={(event) => event.preventDefault()} />
         </Alert.Root>
       </Themed>
     ));
@@ -297,7 +297,7 @@ describe("Alert", () => {
     dispose();
   });
 
-  it("positions Alert.Close via the recipe's close slot, over CloseButton's own chrome", async () => {
+  it("positions Alert.CloseTrigger via the recipe's closeTrigger slot, over CloseButton's own chrome", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
         <Alert.Root title="With close" closable />
@@ -306,7 +306,7 @@ describe("Alert", () => {
 
     const close = container.querySelector('[data-slot="close-button"]');
     expect(close).not.toBeNull();
-    // Placement from the alert `close` slot ...
+    // Placement from the alert `closeTrigger` slot ...
     expect(close?.className).toContain("ms-auto");
     // ... and CloseButton's own recipe chrome is still present.
     expect(close?.className).toContain("hover:not-data-pressed:bg-surface-adaptive-hovered");

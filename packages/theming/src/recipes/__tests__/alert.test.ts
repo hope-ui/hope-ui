@@ -55,7 +55,7 @@ describe("alert recipe contract", () => {
       "title",
       "description",
       "actions",
-      "close",
+      "closeTrigger",
     ];
 
     expect(variants).toHaveLength(5);

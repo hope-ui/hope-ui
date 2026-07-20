@@ -4,13 +4,13 @@ import { cx } from "@hope-ui/theming";
 import { type Component, merge, omit } from "solid-js";
 import { useAlertContext } from "./alert-context";
 
-// `Alert.Close` is a `CloseButton` with the alert's dismiss wiring — so it inherits
+// `Alert.CloseTrigger` is a `CloseButton` with the alert's dismiss wiring — so it inherits
 // `size`/`icon`/`render`/`class`/`slotClasses`/native attrs for free and shows the themed X by
 // default. Because it renders a recipe-styled `CloseButton`, any closable Alert **requires a
 // `<ThemeProvider>`** ancestor (see `Alert.md`).
-export interface AlertCloseProps extends CloseButtonProps {}
+export interface AlertCloseTriggerProps extends CloseButtonProps {}
 
-export const Close: Component<AlertCloseProps> = (props) => {
+export const CloseTrigger: Component<AlertCloseTriggerProps> = (props) => {
   const ctx = useAlertContext();
   const rest = omit(props, "render");
 
@@ -23,9 +23,9 @@ export const Close: Component<AlertCloseProps> = (props) => {
       );
     },
     get class(): string {
-      // Placement from the alert recipe's `close` slot, merged with any consumer `class` (which wins
-      // via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's own chrome.
-      return cx(ctx.slots.close(), props.class) ?? "";
+      // Placement from the alert recipe's `closeTrigger` slot, merged with any consumer `class` (which
+      // wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's own chrome.
+      return cx(ctx.slots.closeTrigger(), props.class) ?? "";
     },
   });
 

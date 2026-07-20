@@ -2,17 +2,17 @@
 // `alert-context.ts` carries the context, `alert-icons.tsx` the built-in status glyphs); this barrel
 // is the one place the namespace object is assembled — the component's single subpath export.
 import { Actions } from "./alert-actions";
-import { Close } from "./alert-close";
+import { CloseTrigger } from "./alert-close-trigger";
 import { Content } from "./alert-content";
 import { Description } from "./alert-description";
 import { Icon } from "./alert-icon";
 import { Root } from "./alert-root";
 import { Title } from "./alert-title";
 
-export const Alert = { Root, Icon, Content, Title, Description, Actions, Close };
+export const Alert = { Root, Icon, Content, Title, Description, Actions, CloseTrigger };
 
 export type { AlertActionsProps } from "./alert-actions";
-export type { AlertCloseProps } from "./alert-close";
+export type { AlertCloseTriggerProps } from "./alert-close-trigger";
 export type { AlertContentProps } from "./alert-content";
 export type { AlertDescriptionProps } from "./alert-description";
 export type { AlertIconProps } from "./alert-icon";

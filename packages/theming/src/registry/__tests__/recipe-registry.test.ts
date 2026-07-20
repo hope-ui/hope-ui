@@ -19,7 +19,7 @@ const _theme = {
     title: () => "alert__title",
     description: () => "alert__description",
     actions: () => "alert__actions",
-    close: () => "alert__close",
+    closeTrigger: () => "alert__close",
   }),
   badge: (props?: BadgeRecipeVariants): Record<BadgeSlot, SlotClassFn> => ({
     root: () => `badge badge--${props?.variant ?? "soft"}`,

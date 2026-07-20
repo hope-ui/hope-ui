@@ -23,7 +23,7 @@ const stubAlertRecipe: AlertRecipe = () => ({
   title: () => "",
   description: () => "",
   actions: () => "",
-  close: () => "",
+  closeTrigger: () => "",
 });
 const stubBadgeRecipe: BadgeRecipe = () => ({
   root: () => "",

@@ -75,7 +75,14 @@ type AlertStatusGlyphs = { [Key in AlertStatusIconKey]?: () => JSX.Element };
 export interface AlertThemeableProps extends AlertRecipeVariants, AlertStatusGlyphs {}
 
 /** The Alert recipe's slots. */
-export type AlertSlot = "root" | "icon" | "content" | "title" | "description" | "actions" | "close";
+export type AlertSlot =
+  | "root"
+  | "icon"
+  | "content"
+  | "title"
+  | "description"
+  | "actions"
+  | "closeTrigger";
 
 /** The Alert recipe: variant props → one class function per slot. The registry entry for `alert`. */
 export type AlertRecipe = SlotRecipeFn<AlertRecipeVariants, AlertSlot>;

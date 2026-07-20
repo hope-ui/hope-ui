@@ -18,7 +18,15 @@ const COLOR_SCHEMES: AlertColorScheme[] = [
   "danger",
 ];
 const SIZES: AlertSize[] = ["sm", "md", "lg"];
-const SLOTS = ["root", "icon", "content", "title", "description", "actions", "close"] as const;
+const SLOTS = [
+  "root",
+  "icon",
+  "content",
+  "title",
+  "description",
+  "actions",
+  "closeTrigger",
+] as const;
 
 describe("hope alert recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {

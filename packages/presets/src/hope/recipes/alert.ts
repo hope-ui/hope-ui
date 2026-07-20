@@ -118,9 +118,9 @@ const defaultRoleCompoundVariants = COLOR_SCHEMES.map((colorScheme) => ({
  */
 export const alertRecipe = tv({
   slots: {
-    // A horizontal flex row: icon, content (flex-1), close. `items-start` top-aligns the icon with the
-    // first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so the
-    // bordered variants never shift a pixel. The exit fade is keyed on the `data-exiting:` custom
+    // A horizontal flex row: icon, content (flex-1), close trigger. `items-start` top-aligns the icon
+    // with the first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so
+    // the bordered variants never shift a pixel. The exit fade is keyed on the `data-exiting:` custom
     // variant (→ `[data-presence="exiting"]`, the presence status the component writes to
     // `data-presence`); `motion-reduce` drops it. `opacity-0` is full-transparent (allowed); only magic
     // `opacity-1..99` violates recipe purity.
@@ -143,7 +143,7 @@ export const alertRecipe = tv({
     actions: "flex flex-wrap items-center",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
-    close: "-me-1 -mt-1 ms-auto shrink-0",
+    closeTrigger: "-me-1 -mt-1 ms-auto shrink-0",
   },
   variants: {
     size: {
