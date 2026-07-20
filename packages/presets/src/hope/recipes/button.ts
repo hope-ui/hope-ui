@@ -210,7 +210,10 @@ export const buttonRecipe = tv({
     root: [
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
       "select-none border border-transparent bg-clip-padding outline-none",
-      "transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-out",
+      // Transition `translate`, NOT `transform`: Tailwind v4 compiles `translate-y-px` (the pressed
+      // sink) to the standalone `translate` CSS property, so `transition-transform` would never animate
+      // the sink — it would snap. Colors/border/shadow round out the list.
+      "transition-[color,background-color,border-color,box-shadow,translate] duration-150 ease-out",
       // Focus halo is the finished `focus-halo` token (a preset-authored translucent color), not an
       // alpha modifier over `focus` — recipes never compute (recipe-purity rule).
       "focus-visible:border-focus focus-visible:ring-3 focus-visible:ring-focus-halo",

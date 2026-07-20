@@ -120,14 +120,16 @@ export const alertRecipe = tv({
   slots: {
     // A horizontal flex row: icon, content (flex-1), close trigger. `items-start` top-aligns the icon
     // with the first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so
-    // the bordered variants never shift a pixel. The exit fade is keyed on the `data-exiting:` custom
-    // variant (→ `[data-presence="exiting"]`, the presence status the component writes to
-    // `data-presence`); `motion-reduce` drops it. `opacity-0` is full-transparent (allowed); only magic
-    // `opacity-1..99` violates recipe purity.
+    // the bordered variants never shift a pixel. The exit fade+slide is keyed on the `data-exiting:`
+    // custom variant (→ `[data-presence="exiting"]`, the presence status the component writes to
+    // `data-presence`); `motion-reduce` drops it. Transition `opacity` + `translate`, NOT `transform`:
+    // Tailwind v4 compiles `-translate-y-1` to the standalone `translate` CSS property (not `transform`),
+    // so `transition-transform` would never animate the 4px slide — only the fade. `opacity-0` is
+    // full-transparent (allowed); only magic `opacity-1..99` violates recipe purity.
     root: [
       "relative flex w-full items-start rounded-xl",
       "border border-transparent bg-clip-padding",
-      "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+      "transition-[opacity,translate] duration-200 ease-out motion-reduce:transition-none",
       "data-exiting:opacity-0 data-exiting:-translate-y-1",
     ],
     // The host `<span>` wrapping the glyph (keeps the hydration-keyed root's first child a host

@@ -91,7 +91,7 @@ describe("hope alert recipe", () => {
 
   it("carries the exit-transition chrome keyed on data-presence", () => {
     const root = alertRecipe({}).root();
-    expect(root).toContain("transition-[opacity,transform]");
+    expect(root).toContain("transition-[opacity,translate]");
     expect(root).toContain("motion-reduce:transition-none");
     expect(root).toContain("data-exiting:opacity-0");
   });
