@@ -33,10 +33,11 @@ describe("hope dialog recipe", () => {
     assertSlotRecipeConformance(dialogRecipe, { cases, slots: SLOTS });
   });
 
-  it("dims the backdrop with the finished scrim token and fades it on exit", () => {
+  it("dims the backdrop with the finished scrim token and fades it in and out", () => {
     const backdrop = dialogRecipe({}).backdrop();
     expect(backdrop).toContain("fixed");
     expect(backdrop).toContain("bg-scrim");
+    expect(backdrop).toContain("data-entering:opacity-0");
     expect(backdrop).toContain("data-exiting:opacity-0");
   });
 
@@ -47,8 +48,11 @@ describe("hope dialog recipe", () => {
     expect(content).toContain("border-subtle");
     expect(content).toContain("rounded-xl");
     expect(content).toContain("shadow-lg");
-    // Enter/exit chrome keyed on data-presence, the Alert pattern.
-    expect(content).toContain("transition-[opacity,transform]");
+    // Symmetric enter/exit zoom+fade, keyed on data-presence. Transitions `scale` (Tailwind v4's
+    // standalone property), not `transform`, or the zoom would snap.
+    expect(content).toContain("transition-[opacity,scale]");
+    expect(content).toContain("data-entering:opacity-0");
+    expect(content).toContain("data-entering:scale-95");
     expect(content).toContain("data-exiting:opacity-0");
     expect(content).toContain("data-exiting:scale-95");
   });

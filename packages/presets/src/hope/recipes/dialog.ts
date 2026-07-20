@@ -12,8 +12,9 @@
  * `check:recipe-purity` forbids; each is re-expressed as a finished `--hope-*` token: `bg-scrim`
  * (the dimming layer), `bg-surface-overlay` (the card), `bg-surface-sunken` (the footer bar),
  * `border-subtle` (hairlines). The recipe computes no color — no `color-mix`, no alpha modifier, no
- * magic opacity. Enter/exit uses `opacity-0`/`scale-95` (both allowed) keyed on the `data-exiting:`
- * custom variant (→ `[data-presence="exiting"]`, the status the parts write to `data-presence`).
+ * magic opacity. Enter *and* exit use `opacity-0`/`scale-95` (both allowed) keyed on the
+ * `data-entering:`/`data-exiting:` custom variants (→ `[data-presence="entering"|"exiting"]`, the
+ * statuses the parts write to `data-presence`): the card zooms+fades in on open and back out on close.
  * `shadow-lg` is a raw Tailwind utility (unpoliced). Every class is a literal string so the consumer's
  * `@source` scan can see it.
  *
@@ -43,7 +44,9 @@ export const dialogRecipe = tv({
     backdrop: [
       "fixed inset-0 z-50 bg-scrim supports-[backdrop-filter]:backdrop-blur-xs",
       "transition-opacity duration-200 ease-out motion-reduce:transition-none",
-      "data-exiting:opacity-0",
+      // Symmetric fade: hidden on the `entering` frame, visible once `entered` (the class no longer
+      // matches, so it falls back to the base opacity) — and back to hidden on `exiting`.
+      "data-entering:opacity-0 data-exiting:opacity-0",
     ],
     // The card. Positioning (left/top/translate) is intentionally NOT here — it is owned by the
     // `placement` + `size` variants so the edge sizes can cancel it cleanly (see the header note).
@@ -52,8 +55,16 @@ export const dialogRecipe = tv({
     content: [
       "fixed z-50 grid gap-4 rounded-xl border border-subtle bg-surface-overlay p-4",
       "text-sm text-foreground shadow-lg outline-none max-w-[calc(100%-2rem)]",
-      "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
-      "data-exiting:opacity-0 data-exiting:scale-95",
+      // Transition `opacity` + `scale`, NOT `transform`: Tailwind v4 compiles `scale-*` to the
+      // standalone `scale` CSS property (not `transform`), so `transition-transform` would never
+      // animate the zoom. The placement `-translate-*` is constant between entering/entered, so it
+      // needs no transition.
+      "transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none",
+      // The zoom+fade runs both ways: `createPresence` paints the `entering` frame (opacity-0
+      // scale-95), then flips to `entered` (base opacity-100 scale-100) a frame later — that attribute
+      // change is what fires the transition. `scale-95` and the placement `-translate-*` are separate
+      // CSS properties in v4, so they coexist and a centered card zooms in place.
+      "data-entering:opacity-0 data-entering:scale-95 data-exiting:opacity-0 data-exiting:scale-95",
     ],
     header: "flex flex-col gap-2",
     // The main region. `flex-1` lets it take the slack; `scrollBehavior=inside` adds its own scroll.

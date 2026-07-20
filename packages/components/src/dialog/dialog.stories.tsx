@@ -4,6 +4,12 @@ import { createSignal, For } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Dialog, type DialogPlacement, type DialogScrollBehavior, type DialogSize } from ".";
 
+/**
+ * `Dialog` ships its own visual identity (the hope `dialog` recipe), so these stories use the parts
+ * as a consumer would — no hand-positioning. The global `withHopeTheme` decorator
+ * (`.storybook/preview.tsx`) provides the preset, and Storybook's Tailwind build compiles the recipe
+ * utilities. Opening a dialog zooms+fades it in; closing reverses it.
+ */
 const meta = {
   title: "Components/Dialog",
   component: Dialog.Root,
@@ -12,10 +18,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-// Dialog now ships its own visual identity (the hope `dialog` recipe), so the stories no longer
-// hand-position the parts — the global `withHopeTheme` decorator (`.storybook/preview.tsx`) provides
-// the preset, and Storybook's Tailwind build compiles the recipe's utilities.
 
 /**
  * Renders a hope `Button` as the `Dialog.Trigger` via its `render` prop. Solid types a native
@@ -28,18 +30,7 @@ function buttonTrigger(label: string) {
   );
 }
 
-/** Background content, so click-through and focus-restore behavior are observable. */
-function PageBehind() {
-  return (
-    <p style={{ padding: "1rem" }}>
-      <button type="button" onClick={() => alert("You clicked the background.")}>
-        Background button
-      </button>
-    </p>
-  );
-}
-
-/** A short paragraph, repeated, so `scrollBehavior` has something to scroll. */
+/** Sixteen lines of filler, so `scrollBehavior` has something to scroll. */
 function LongBody() {
   return (
     <For each={Array.from({ length: 16 })}>
@@ -54,17 +45,15 @@ function LongBody() {
 }
 
 /**
- * The canonical styled dialog: trigger → portal → scrim → a centered card with a header, body, and a
- * muted footer action row. `showCloseButton` defaults `true`, so a corner ✕ appears with no wiring.
- * Controlled here so the footer's Cancel/Delete can close it (v1 has no context escape hatch).
+ * The canonical styled dialog — trigger → scrim → a centered card with a header (title +
+ * description), a body, and a muted footer action row, plus the auto corner ✕ (`showCloseButton`
+ * defaults `true`). Controlled so the footer's Cancel/Delete can close it.
  */
 function DialogDemo(props: {
   size?: DialogSize;
   placement?: DialogPlacement;
   scrollBehavior?: DialogScrollBehavior;
-  role?: "dialog" | "alertdialog";
   showCloseButton?: boolean;
-  modal?: boolean;
   longBody?: boolean;
   triggerLabel?: string;
 }) {
@@ -76,8 +65,6 @@ function DialogDemo(props: {
       size={props.size}
       placement={props.placement}
       scrollBehavior={props.scrollBehavior}
-      role={props.role}
-      modal={props.modal}
     >
       <Dialog.Trigger render={buttonTrigger(props.triggerLabel ?? "Open dialog")} />
       <Dialog.Portal>
@@ -86,15 +73,14 @@ function DialogDemo(props: {
           <Dialog.Header>
             <Dialog.Title>Delete project</Dialog.Title>
             <Dialog.Description>
-              This action cannot be undone. This permanently deletes the project and everything in
-              it.
+              This permanently deletes <b>Acme Marketing Site</b> and everything inside it.
             </Dialog.Description>
           </Dialog.Header>
           <Dialog.Body>
             {props.longBody ? (
               <LongBody />
             ) : (
-              <p>Everything inside the project will be removed for all members.</p>
+              <p>Removed for every member of the workspace. This action cannot be undone.</p>
             )}
           </Dialog.Body>
           <Dialog.Footer>
@@ -102,7 +88,7 @@ function DialogDemo(props: {
               Cancel
             </Button>
             <Button colorScheme="danger" onClick={() => setOpen(false)}>
-              Delete
+              Delete project
             </Button>
           </Dialog.Footer>
         </Dialog.Content>
@@ -111,25 +97,24 @@ function DialogDemo(props: {
   );
 }
 
-/** The default: `md`, centered, inside-scroll, with the auto corner ✕. */
+/** The default look: `md`, centered, inside-scroll, with a header, body, footer, and the corner ✕. */
 export const Default: Story = {
   render: () => (
-    <>
-      <PageBehind />
+    <div style={{ padding: "2rem" }}>
       <DialogDemo />
-    </>
+    </div>
   ),
 };
 
 const SIZES: DialogSize[] = ["xs", "sm", "md", "lg", "xl", "cover", "full"];
 
 /**
- * The `size` scale. `xs…xl` size the centered card; `cover` fills the viewport minus a margin
- * (keeping the radius), and `full` goes edge-to-edge with no radius — both ignore `placement`.
+ * The `size` scale. `xs…xl` widen the centered card; `cover` fills the viewport minus a margin
+ * (keeping the radius) and `full` goes edge-to-edge with no radius — both ignore `placement`.
  */
 export const Sizes: Story = {
   render: () => (
-    <div style={{ display: "flex", "flex-wrap": "wrap", gap: "0.75rem", padding: "1rem" }}>
+    <div style={{ display: "flex", "flex-wrap": "wrap", gap: "0.75rem", padding: "2rem" }}>
       <For each={SIZES}>{(size) => <DialogDemo size={size} triggerLabel={size} />}</For>
     </div>
   ),
@@ -138,201 +123,182 @@ export const Sizes: Story = {
 /** `placement="top"` anchors the card near the top of the viewport instead of dead-center. */
 export const PlacementTop: Story = {
   name: "placement='top'",
-  render: () => <DialogDemo placement="top" />,
+  render: () => (
+    <div style={{ padding: "2rem" }}>
+      <DialogDemo placement="top" triggerLabel="Open top-placed dialog" />
+    </div>
+  ),
 };
 
 /**
- * `scrollBehavior="inside"` (the default) caps the card height and scrolls the `body`, so the
- * header and footer stay pinned. The common case for long content.
+ * `scrollBehavior="inside"` (the default) caps the card height and scrolls the body, so the header
+ * and footer stay pinned while long content scrolls between them.
  */
 export const ScrollInside: Story = {
   name: "scrollBehavior='inside' (body scrolls, header/footer pinned)",
-  render: () => <DialogDemo scrollBehavior="inside" longBody />,
+  render: () => (
+    <div style={{ padding: "2rem" }}>
+      <DialogDemo scrollBehavior="inside" longBody triggerLabel="Open long dialog" />
+    </div>
+  ),
 };
 
 /** `scrollBehavior="outside"` scrolls the whole card within the viewport instead. */
 export const ScrollOutside: Story = {
   name: "scrollBehavior='outside' (whole card scrolls)",
-  render: () => <DialogDemo scrollBehavior="outside" longBody />,
+  render: () => (
+    <div style={{ padding: "2rem" }}>
+      <DialogDemo scrollBehavior="outside" longBody triggerLabel="Open long dialog" />
+    </div>
+  ),
 };
 
-/** The APG alert dialog pattern. `role` is set on `Root` and threaded to `Content`. */
-export const AlertDialog: Story = {
-  name: "role='alertdialog'",
-  render: () => <DialogDemo role="alertdialog" triggerLabel="Delete everything" />,
-};
-
-/** `showCloseButton={false}` omits the auto corner ✕ — the footer buttons are the only way out. */
+/** `showCloseButton={false}` drops the auto corner ✕ — the footer buttons are the only way out. */
 export const WithoutCloseButton: Story = {
   name: "showCloseButton={false}",
-  render: () => <DialogDemo showCloseButton={false} />,
+  render: () => (
+    <div style={{ padding: "2rem" }}>
+      <DialogDemo showCloseButton={false} />
+    </div>
+  ),
+};
+
+/**
+ * The APG alert dialog pattern for a destructive confirmation: `role="alertdialog"` (set on `Root`,
+ * threaded to `Content`), no corner ✕, and the two footer actions as the only exits.
+ */
+export const AlertDialog: Story = {
+  name: "role='alertdialog' (destructive confirmation)",
+  render: () => {
+    const [open, setOpen] = createSignal(false);
+    return (
+      <div style={{ padding: "2rem" }}>
+        <Dialog.Root role="alertdialog" open={open()} onOpenChange={setOpen}>
+          <Dialog.Trigger render={buttonTrigger("Delete account")} />
+          <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Content showCloseButton={false}>
+              <Dialog.Header>
+                <Dialog.Title>Delete your account?</Dialog.Title>
+                <Dialog.Description>
+                  This erases your profile, projects, and billing history. It cannot be undone.
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Footer>
+                <Button variant="ghost" onClick={() => setOpen(false)}>
+                  Keep account
+                </Button>
+                <Button colorScheme="danger" onClick={() => setOpen(false)}>
+                  Delete account
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </div>
+    );
+  },
+};
+
+/**
+ * A realistic form dialog. The fields live in a `<form>` in the body; the footer's Save button is
+ * linked to it via the `form` attribute, so it submits from outside the `<form>` element. The first
+ * field receives focus on open (the focus trap's first-focusable default), and Tab cycles the card.
+ */
+export const WithForm: Story = {
+  name: "With a form",
+  render: () => {
+    const [open, setOpen] = createSignal(false);
+    const field =
+      "w-full rounded-md border border-subtle bg-transparent px-3 py-2 text-sm text-foreground outline-none";
+    return (
+      <div style={{ padding: "2rem" }}>
+        <Dialog.Root open={open()} onOpenChange={setOpen} size="sm">
+          <Dialog.Trigger render={buttonTrigger("Edit profile")} />
+          <Dialog.Portal>
+            <Dialog.Backdrop />
+            <Dialog.Content>
+              <Dialog.Header>
+                <Dialog.Title>Edit profile</Dialog.Title>
+                <Dialog.Description>
+                  Update your details. Changes save on submit.
+                </Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <form
+                  id="edit-profile-form"
+                  class="flex flex-col gap-3"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    setOpen(false);
+                  }}
+                >
+                  <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
+                    Name
+                    <input class={field} value="Ada Lovelace" />
+                  </label>
+                  <label class="flex flex-col gap-1 text-sm font-medium text-foreground">
+                    Email
+                    <input class={field} type="email" value="ada@example.com" />
+                  </label>
+                </form>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" form="edit-profile-form">
+                  Save changes
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </div>
+    );
+  },
 };
 
 /**
  * A non-dismissible dialog: `closeOnEscape={false}` + `closeOnInteractOutside={false}` (both set on
  * `Root`, forwarded to the primitive's dismiss layer). Neither Escape nor a scrim click closes it —
- * only the footer buttons and the corner ✕ do.
+ * only a footer button does.
  */
 export const NonDismissible: Story = {
   name: "Non-dismissible (closeOnEscape/closeOnInteractOutside false)",
   render: () => {
     const [open, setOpen] = createSignal(false);
     return (
-      <Dialog.Root
-        open={open()}
-        onOpenChange={setOpen}
-        closeOnEscape={false}
-        closeOnInteractOutside={false}
-      >
-        <Dialog.Trigger render={buttonTrigger("Open non-dismissible")} />
-        <Dialog.Portal>
-          <Dialog.Backdrop />
-          <Dialog.Content>
-            <Dialog.Header>
-              <Dialog.Title>Confirm your choice</Dialog.Title>
-              <Dialog.Description>Escape and outside clicks are disabled here.</Dialog.Description>
-            </Dialog.Header>
-            <Dialog.Body>You must use a button to leave.</Dialog.Body>
-            <Dialog.Footer>
-              <Button variant="ghost" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button colorScheme="danger" onClick={() => setOpen(false)}>
-                Confirm
-              </Button>
-            </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    );
-  },
-};
-
-/**
- * A non-modal dialog: dismissable, and it still returns focus, but it never traps focus, locks
- * scroll, or makes the page behind inert. The background button stays clickable and in the
- * accessibility tree. Tab in, press Escape, and focus returns to the trigger.
- */
-export const NonModal: Story = {
-  name: "Non-modal (restores focus, page stays live)",
-  render: () => (
-    <>
-      <PageBehind />
-      <DialogDemo modal={false} triggerLabel="Open non-modal dialog" />
-    </>
-  ),
-};
-
-/**
- * A modal dialog with no `Dialog.Backdrop` at all. The page behind is still fully inert:
- * `Dialog.Portal` always renders the kernel's invisible `ModalBackdrop` when `modal`, and
- * `createHideOutside` marks everything outside the content `aria-hidden` and `inert`. Try clicking
- * the background button — nothing happens.
- */
-export const ModalWithoutBackdrop: Story = {
-  name: "Modal without Backdrop (background is inert)",
-  render: () => {
-    const [open, setOpen] = createSignal(false);
-    return (
-      <>
-        <PageBehind />
-        <Dialog.Root open={open()} onOpenChange={setOpen}>
-          <Dialog.Trigger render={buttonTrigger("Open modal dialog")} />
+      <div style={{ padding: "2rem" }}>
+        <Dialog.Root
+          open={open()}
+          onOpenChange={setOpen}
+          closeOnEscape={false}
+          closeOnInteractOutside={false}
+        >
+          <Dialog.Trigger render={buttonTrigger("Accept the terms")} />
           <Dialog.Portal>
-            <Dialog.Content>
+            <Dialog.Backdrop />
+            <Dialog.Content showCloseButton={false}>
               <Dialog.Header>
-                <Dialog.Title>Modal, no backdrop</Dialog.Title>
+                <Dialog.Title>Before you continue</Dialog.Title>
                 <Dialog.Description>
-                  The background button behind me is unreachable by pointer and by assistive
-                  technology, even though I ship no backdrop.
+                  Escape and outside clicks are disabled — you must choose a button.
                 </Dialog.Description>
               </Dialog.Header>
+              <Dialog.Body>
+                <p>By continuing you agree to the terms of service and privacy policy.</p>
+              </Dialog.Body>
               <Dialog.Footer>
                 <Button variant="ghost" onClick={() => setOpen(false)}>
-                  Close
+                  Decline
                 </Button>
+                <Button onClick={() => setOpen(false)}>Accept</Button>
               </Dialog.Footer>
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
-      </>
-    );
-  },
-};
-
-/**
- * A modal `Dialog.Content` **must be positioned** — which the recipe does by default. This story
- * deliberately cancels that (`position: static`) to pin the failure mode: the pointer-blocking
- * `ModalBackdrop` is `position: fixed`, and CSS paints positioned elements above non-positioned ones
- * regardless of DOM order, so a static content ends up *beneath* it and its buttons stop responding
- * to the mouse. Escape still works. Don't "fix" this by deleting it — it documents the contract.
- */
-export const UnpositionedContent: Story = {
-  name: "Modal with an unpositioned Content (content is unclickable — by design)",
-  render: () => (
-    <>
-      <PageBehind />
-      <Dialog.Root>
-        <Dialog.Trigger render={buttonTrigger("Open unpositioned dialog")} />
-        <Dialog.Portal>
-          <Dialog.Content style={{ position: "static", inset: "auto", transform: "none" }}>
-            <Dialog.Header>
-              <Dialog.Title>No position</Dialog.Title>
-              <Dialog.Description>
-                My corner ✕ is beneath the ModalBackdrop. Escape still works. Remove the inline
-                `position: static` and the recipe's centering brings it back.
-              </Dialog.Description>
-            </Dialog.Header>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </>
-  ),
-};
-
-/**
- * A wrapper forwarding an unset optional prop passes `modal={undefined}`. `withDefaults` resolves
- * that with `??`, so the dialog stays modal. (Before Wave 1, `merge({ modal: true }, props)` let a
- * *present* `undefined` key beat the default and silently produced a non-modal dialog.)
- */
-function WrappedDialog(props: { modal?: boolean }) {
-  return <DialogDemo modal={props.modal} triggerLabel="Open wrapped dialog" />;
-}
-
-export const WrapperForwardingUndefinedModal: Story = {
-  name: "Wrapper forwarding modal={undefined} (stays modal)",
-  render: () => (
-    <>
-      <PageBehind />
-      <WrappedDialog />
-    </>
-  ),
-};
-
-/**
- * A dialog labelled by a heading that lives outside the content, with no `Dialog.Title`. `Content`'s
- * internal `aria-labelledby` falls back to the consumer's rather than overwriting it.
- */
-export const LabelledByExternalHeading: Story = {
-  name: "aria-labelledby without Dialog.Title",
-  render: () => {
-    const [open, setOpen] = createSignal(false);
-    return (
-      <Dialog.Root open={open()} onOpenChange={setOpen}>
-        <h2 id="external-heading">Heading outside the content</h2>
-        <Dialog.Trigger render={buttonTrigger("Open dialog")} />
-        <Dialog.Portal>
-          <Dialog.Backdrop />
-          <Dialog.Content aria-labelledby="external-heading">
-            <Dialog.Body>My accessible name comes from the heading outside me.</Dialog.Body>
-            <Dialog.Footer>
-              <Button variant="ghost" onClick={() => setOpen(false)}>
-                Close
-              </Button>
-            </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      </div>
     );
   },
 };
