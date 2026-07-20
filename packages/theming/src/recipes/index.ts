@@ -7,4 +7,5 @@ export * from "./alert";
 export * from "./badge";
 export * from "./button";
 export * from "./close-button";
+export * from "./dialog";
 export type { SlotClassFn, SlotRecipeFn } from "./slot-recipe";

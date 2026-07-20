@@ -16,6 +16,7 @@ import type { AlertRecipe } from "../recipes/alert";
 import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
 import type { CloseButtonRecipe } from "../recipes/close-button";
+import type { DialogRecipe } from "../recipes/dialog";
 
 /**
  * The theming contract version. A theme asserts against it (e.g. in its conformance test) so a
@@ -34,4 +35,5 @@ export interface RecipeRegistry {
   badge: BadgeRecipe;
   button: ButtonRecipe;
   closeButton: CloseButtonRecipe;
+  dialog: DialogRecipe;
 }

@@ -3,6 +3,7 @@ import type { AlertRecipe } from "../../recipes/alert";
 import type { BadgeRecipe } from "../../recipes/badge";
 import type { ButtonRecipe } from "../../recipes/button";
 import type { CloseButtonRecipe } from "../../recipes/close-button";
+import type { DialogRecipe } from "../../recipes/dialog";
 import type { RecipeRegistry } from "../../registry";
 import { definePreset, isPreset, type Preset } from "../preset";
 
@@ -35,11 +36,22 @@ const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
   root: () => "",
   icon: () => "",
 });
+const stubDialogRecipe: DialogRecipe = () => ({
+  backdrop: () => "",
+  content: () => "",
+  header: () => "",
+  body: () => "",
+  footer: () => "",
+  title: () => "",
+  description: () => "",
+  closeTrigger: () => "",
+});
 const registry: RecipeRegistry = {
   alert: stubAlertRecipe,
   badge: stubBadgeRecipe,
   button: stubRecipe,
   closeButton: stubCloseButtonRecipe,
+  dialog: stubDialogRecipe,
 };
 
 describe("definePreset — bootstrap from a raw registry", () => {

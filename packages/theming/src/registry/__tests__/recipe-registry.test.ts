@@ -3,12 +3,14 @@ import type { AlertRecipeVariants, AlertSlot } from "../../recipes/alert";
 import type { BadgeRecipeVariants, BadgeSlot } from "../../recipes/badge";
 import type { ButtonRecipeVariants, ButtonSlot } from "../../recipes/button";
 import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../../recipes/close-button";
+import type { DialogRecipeVariants, DialogSlot } from "../../recipes/dialog";
 import type { SlotClassFn } from "../../recipes/slot-recipe";
 import { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "../recipe-registry";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, and `closeButton`. This is a compile-time assignability check (verified by `pnpm typecheck`).
+// `button`, `closeButton`, and `dialog`. This is a compile-time assignability check (verified by
+// `pnpm typecheck`).
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,
@@ -36,6 +38,16 @@ const _theme = {
   closeButton: (props?: CloseButtonRecipeVariants): Record<CloseButtonSlot, SlotClassFn> => ({
     root: () => `close close--${props?.size ?? "sm"}`,
     icon: () => "close__icon",
+  }),
+  dialog: (props?: DialogRecipeVariants): Record<DialogSlot, SlotClassFn> => ({
+    backdrop: () => "dialog__backdrop",
+    content: () => `dialog__content dialog__content--${props?.size ?? "md"}`,
+    header: () => "dialog__header",
+    body: () => "dialog__body",
+    footer: () => "dialog__footer",
+    title: () => "dialog__title",
+    description: () => "dialog__description",
+    closeTrigger: () => "dialog__close-trigger",
   }),
 } satisfies RecipeRegistry;
 void _theme;
