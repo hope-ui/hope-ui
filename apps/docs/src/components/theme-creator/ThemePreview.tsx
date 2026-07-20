@@ -104,175 +104,179 @@ export function ThemePreview(props: { config: ThemeConfig }) {
         <ModeToggle mode={mode()} onChange={setMode} />
       </div>
 
-      {/* Themed canvas — every hope component below reads its color from these inline tokens. */}
-      <div class="space-y-8 p-6 sm:p-8" style={style()}>
-        <Group title="Buttons · variants">
-          <div class="flex flex-wrap items-center gap-3">
-            <Button variant="solid" colorScheme="primary">
-              Solid
-            </Button>
-            <Button variant="soft" colorScheme="primary">
-              Soft
-            </Button>
-            <Button variant="outline" colorScheme="primary">
-              Outline
-            </Button>
-            <Button variant="ghost" colorScheme="primary">
-              Ghost
-            </Button>
-            <Button variant="link" colorScheme="primary">
-              Link
-            </Button>
-          </div>
-        </Group>
-
-        <Group title="Buttons · roles">
-          <div class="flex flex-wrap items-center gap-3">
-            <Button variant="solid" colorScheme="primary">
-              Primary
-            </Button>
-            <Button variant="solid" colorScheme="success">
-              Success
-            </Button>
-            <Button variant="solid" colorScheme="info">
-              Info
-            </Button>
-            <Button variant="solid" colorScheme="warning">
-              Warning
-            </Button>
-            <Button variant="solid" colorScheme="danger">
-              Danger
-            </Button>
-            <Button variant="soft" colorScheme="neutral">
-              Neutral
-            </Button>
-          </div>
-        </Group>
-
-        <Group title="Buttons · sizes & states">
-          <div class="flex flex-wrap items-center gap-3">
-            <Button size="xs" variant="soft" colorScheme="primary">
-              XS
-            </Button>
-            <Button size="sm" variant="soft" colorScheme="primary">
-              SM
-            </Button>
-            <Button size="md" variant="solid" colorScheme="primary">
-              MD
-            </Button>
-            <Button size="lg" variant="solid" colorScheme="primary" loading>
-              Loading
-            </Button>
-            <Button size="lg" variant="outline" colorScheme="neutral" disabled>
-              Disabled
-            </Button>
-          </div>
-        </Group>
-
-        <Group title="Badges">
-          <div class="flex flex-wrap items-center gap-2">
-            <Badge variant="solid" colorScheme="primary">
-              Solid
-            </Badge>
-            <Badge variant="soft" colorScheme="primary">
-              Soft
-            </Badge>
-            <Badge variant="subtle" colorScheme="primary">
-              Subtle
-            </Badge>
-            <Badge variant="outline" colorScheme="primary">
-              Outline
-            </Badge>
-            <Badge variant="dot" colorScheme="success">
-              Live
-            </Badge>
-            <Badge variant="dot" colorScheme="warning">
-              Pending
-            </Badge>
-            <Badge variant="dot" colorScheme="danger">
-              Error
-            </Badge>
-            <Badge variant="solid" colorScheme="danger" shape="circle" size="sm">
-              7
-            </Badge>
-          </div>
-        </Group>
-
-        <Group title="Alerts">
-          <div class="space-y-3">
-            <Alert.Root
-              colorScheme="info"
-              variant="soft"
-              title="Heads up"
-              description="This is an informational alert, themed live."
-            />
-            <Alert.Root
-              colorScheme="success"
-              variant="soft"
-              title="Saved"
-              description="Your changes have been stored."
-            />
-            <Alert.Root
-              colorScheme="warning"
-              variant="soft"
-              title="Careful"
-              description="This action needs your attention."
-              closable
-            />
-            <Alert.Root
-              colorScheme="danger"
-              variant="solid"
-              title="Something went wrong"
-              description="We couldn't complete the request."
-            />
-          </div>
-        </Group>
-
-        <Group title="Close button · surface-adaptive">
-          {/* CloseButton takes its color from the surface it sits on (currentColor), so it reads on a
-              plain surface and on a solid role fill alike. */}
-          <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-2 rounded-lg border border-subtle bg-surface-raised px-3 py-2 text-foreground">
-              <span class="text-sm">On a surface</span>
-              <CloseButton size="sm" />
-              <CloseButton size="md" />
-              <CloseButton size="lg" />
+      {/* Themed canvas — every hope component below reads its color from these inline tokens. The
+          canvas paints edge-to-edge (so the mode switch fills the panel), but the showcase content
+          is capped and centered so it stays readable now that the panel spans the page. */}
+      <div class="p-6 sm:p-8" style={style()}>
+        <div class="mx-auto max-w-3xl space-y-8">
+          <Group title="Buttons · variants">
+            <div class="flex flex-wrap items-center gap-3">
+              <Button variant="solid" colorScheme="primary">
+                Solid
+              </Button>
+              <Button variant="soft" colorScheme="primary">
+                Soft
+              </Button>
+              <Button variant="outline" colorScheme="primary">
+                Outline
+              </Button>
+              <Button variant="ghost" colorScheme="primary">
+                Ghost
+              </Button>
+              <Button variant="link" colorScheme="primary">
+                Link
+              </Button>
             </div>
-            <div class="flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-on-primary">
-              <span class="text-sm">On primary</span>
-              <CloseButton size="md" />
-            </div>
-          </div>
-        </Group>
+          </Group>
 
-        {/* Composed surface card — surfaces + foreground ramp + borders + role fills together. */}
-        <Group title="Composed surface">
-          <div class="rounded-xl border border-subtle bg-surface-raised p-4 shadow-sm">
-            <div class="flex items-center gap-3">
-              <div class="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-on-primary shadow-sm">
-                <SunIcon class="size-5" />
-              </div>
-              <div class="min-w-0">
-                <div class="truncate text-sm font-semibold text-foreground">Project theme</div>
-                <div class="truncate text-xs text-foreground-muted">Preview across surfaces</div>
-              </div>
-              <Badge class="ml-auto" variant="soft" colorScheme="success">
-                Ready
+          <Group title="Buttons · roles">
+            <div class="flex flex-wrap items-center gap-3">
+              <Button variant="solid" colorScheme="primary">
+                Primary
+              </Button>
+              <Button variant="solid" colorScheme="success">
+                Success
+              </Button>
+              <Button variant="solid" colorScheme="info">
+                Info
+              </Button>
+              <Button variant="solid" colorScheme="warning">
+                Warning
+              </Button>
+              <Button variant="solid" colorScheme="danger">
+                Danger
+              </Button>
+              <Button variant="soft" colorScheme="neutral">
+                Neutral
+              </Button>
+            </div>
+          </Group>
+
+          <Group title="Buttons · sizes & states">
+            <div class="flex flex-wrap items-center gap-3">
+              <Button size="xs" variant="soft" colorScheme="primary">
+                XS
+              </Button>
+              <Button size="sm" variant="soft" colorScheme="primary">
+                SM
+              </Button>
+              <Button size="md" variant="solid" colorScheme="primary">
+                MD
+              </Button>
+              <Button size="lg" variant="solid" colorScheme="primary" loading>
+                Loading
+              </Button>
+              <Button size="lg" variant="outline" colorScheme="neutral" disabled>
+                Disabled
+              </Button>
+            </div>
+          </Group>
+
+          <Group title="Badges">
+            <div class="flex flex-wrap items-center gap-2">
+              <Badge variant="solid" colorScheme="primary">
+                Solid
+              </Badge>
+              <Badge variant="soft" colorScheme="primary">
+                Soft
+              </Badge>
+              <Badge variant="subtle" colorScheme="primary">
+                Subtle
+              </Badge>
+              <Badge variant="outline" colorScheme="primary">
+                Outline
+              </Badge>
+              <Badge variant="dot" colorScheme="success">
+                Live
+              </Badge>
+              <Badge variant="dot" colorScheme="warning">
+                Pending
+              </Badge>
+              <Badge variant="dot" colorScheme="danger">
+                Error
+              </Badge>
+              <Badge variant="solid" colorScheme="danger" shape="circle" size="sm">
+                7
               </Badge>
             </div>
-            <p class="mt-3 text-sm text-foreground-muted">
-              Elevation, text ramp, borders and role colors all resolve from the tokens you picked.
-            </p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" variant="solid" colorScheme="primary">
-                Confirm
-              </Button>
-              <Button size="sm" variant="soft" colorScheme="neutral">
-                Cancel
-              </Button>
+          </Group>
+
+          <Group title="Alerts">
+            <div class="space-y-3">
+              <Alert.Root
+                colorScheme="info"
+                variant="soft"
+                title="Heads up"
+                description="This is an informational alert, themed live."
+              />
+              <Alert.Root
+                colorScheme="success"
+                variant="soft"
+                title="Saved"
+                description="Your changes have been stored."
+              />
+              <Alert.Root
+                colorScheme="warning"
+                variant="soft"
+                title="Careful"
+                description="This action needs your attention."
+              />
+              <Alert.Root
+                colorScheme="danger"
+                variant="soft"
+                title="Something went wrong"
+                description="We couldn't complete the request."
+              />
             </div>
-          </div>
-        </Group>
+          </Group>
+
+          <Group title="Close button · surface-adaptive">
+            {/* CloseButton takes its color from the surface it sits on (currentColor), so it reads on a
+              plain surface and on a solid role fill alike. */}
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2 rounded-lg border border-subtle bg-surface-raised px-3 py-2 text-foreground">
+                <span class="text-sm">On a surface</span>
+                <CloseButton size="sm" />
+                <CloseButton size="md" />
+                <CloseButton size="lg" />
+              </div>
+              <div class="flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-on-primary">
+                <span class="text-sm">On primary</span>
+                <CloseButton size="md" />
+              </div>
+            </div>
+          </Group>
+
+          {/* Composed surface card — surfaces + foreground ramp + borders + role fills together. */}
+          <Group title="Composed surface">
+            <div class="rounded-xl border border-subtle bg-surface-raised p-4 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="grid size-10 shrink-0 place-items-center rounded-full bg-primary text-on-primary shadow-sm">
+                  <SunIcon class="size-5" />
+                </div>
+                <div class="min-w-0">
+                  <div class="truncate text-sm font-semibold text-foreground">Project theme</div>
+                  <div class="truncate text-xs text-foreground-muted">Preview across surfaces</div>
+                </div>
+                <Badge class="ml-auto" variant="soft" colorScheme="success">
+                  Ready
+                </Badge>
+              </div>
+              <p class="mt-3 text-sm text-foreground-muted">
+                Elevation, text ramp, borders and role colors all resolve from the tokens you
+                picked.
+              </p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <Button size="sm" variant="solid" colorScheme="primary">
+                  Confirm
+                </Button>
+                <Button size="sm" variant="soft" colorScheme="neutral">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </Group>
+        </div>
       </div>
     </div>
   );

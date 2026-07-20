@@ -1,7 +1,7 @@
 import { Button } from "@hope-ui/components/button";
 import { createSignal, For, onSettled } from "solid-js";
 import { ChevronRightIcon, PaletteIcon } from "~/components/Icons";
-import { CssOutput } from "./CssOutput";
+import { ExportThemeDialog } from "./ExportThemeDialog";
 import { ALL_FAMILIES, BRAND_FAMILIES, NEUTRAL_FAMILIES } from "./palette";
 import { RadiusControl } from "./RadiusControl";
 import { RolePicker } from "./RolePicker";
@@ -15,9 +15,11 @@ import {
 } from "./theme-config";
 
 // The Theme Creator page shell. It owns the single `config` signal (seeded to hope's defaults so the
-// prerendered SSG markup is deterministic) and wires the three regions: controls → live preview →
-// generated CSS. Persistence to localStorage is opt-in and strictly client-side — read once in
-// `onSettled`, written only on a user action (never during render), so hydration stays clean.
+// prerendered SSG markup is deterministic) and wires two regions — controls → live preview — with the
+// generated CSS one click away behind the header's Export button (`ExportThemeDialog`), so the preview
+// claims the width the CSS column used to hold. Persistence to localStorage is opt-in and strictly
+// client-side — read once in `onSettled`, written only on a user action (never during render), so
+// hydration stays clean.
 
 const STORAGE_KEY = "hope-theme-creator-config";
 
@@ -82,7 +84,7 @@ export function ThemeCreator() {
 
   return (
     <div class="mx-auto max-w-360 px-6 py-10 sm:py-14">
-      <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-2xl">
           <span class="inline-flex items-center gap-2 rounded-full border border-primary-line bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary-emphasis">
             <PaletteIcon class="size-3.5" />
@@ -93,21 +95,13 @@ export function ThemeCreator() {
           </h1>
           <p class="mt-3 text-pretty text-lg leading-relaxed text-foreground-muted">
             Pick a color family per role and a corner radius. See it render live across real hope
-            components, then copy a ready-to-paste <code class="text-foreground">theme.css</code>{" "}
+            components, then export a ready-to-paste <code class="text-foreground">theme.css</code>{" "}
             that redefines every token.
           </p>
         </div>
-        <Button
-          variant="ghost"
-          colorScheme="neutral"
-          size="sm"
-          onClick={() => update(HOPE_DEFAULT_CONFIG)}
-        >
-          Reset to hope defaults
-        </Button>
       </header>
 
-      <div class="mt-10 grid gap-6 xl:grid-cols-[minmax(280px,320px)_minmax(0,1fr)_minmax(320px,400px)]">
+      <div class="mt-10 grid gap-6 xl:grid-cols-[minmax(280px,320px)_minmax(0,1fr)]">
         {/* ── Controls ─────────────────────────────────────────────────────────── */}
         <div class="space-y-6 rounded-2xl border border-subtle bg-surface-raised p-5 shadow-sm xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:self-start xl:overflow-auto">
           <RolePicker
@@ -129,7 +123,7 @@ export function ThemeCreator() {
           />
 
           {/* Status roles under a native disclosure so the default UI stays small. */}
-          <details class="group border-t border-subtle pt-4">
+          <details class="group border-t border-subtle pt-4 mb-4">
             <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-foreground [&::-webkit-details-marker]:hidden">
               <span>Advanced — status colors</span>
               <ChevronRightIcon class="size-4 text-foreground-subtle transition-transform group-open:rotate-90" />
@@ -158,15 +152,17 @@ export function ThemeCreator() {
               onChange={(r) => update({ ...config(), radius: r })}
             />
           </div>
+
+          <div class="flex flex-wrap items-center gap-3 border-t border-subtle p-4 -mx-5 -mb-5 bg-surface-sunken rounded-b-xl">
+            <Button fullWidth size="lg" onClick={() => update(HOPE_DEFAULT_CONFIG)}>
+              Reset configuration
+            </Button>
+            <ExportThemeDialog config={config()} />
+          </div>
         </div>
 
         {/* ── Live preview ─────────────────────────────────────────────────────── */}
         <ThemePreview config={config()} />
-
-        {/* ── Generated CSS ────────────────────────────────────────────────────── */}
-        <div class="xl:sticky xl:top-20 xl:self-start">
-          <CssOutput config={config()} />
-        </div>
       </div>
     </div>
   );

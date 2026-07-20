@@ -85,6 +85,7 @@ function CtaButton(props: {
   children: JSX.Element;
   tone?: "primary" | "neutral";
   class?: string;
+  endDecorator?: JSX.Element;
 }) {
   return (
     <Button
@@ -93,6 +94,7 @@ function CtaButton(props: {
       colorScheme={props.tone === "neutral" ? "neutral" : "primary"}
       size="xl"
       class={props.class}
+      endDecorator={props.endDecorator}
       render={(buttonProps) => (
         // Button types `render`'s props against its own element (a <button>); Link wants
         // link-shaped props. Casting at this button→anchor boundary is the documented
@@ -220,9 +222,14 @@ function Hero() {
           </p>
 
           <div class="hope-fade-up mt-8 flex flex-row justify-center items-center gap-3 lg:justify-start [animation-delay:240ms]">
-            <CtaButton to="/get-started">
+            <CtaButton
+              to="/get-started"
+              class="group"
+              endDecorator={
+                <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
+              }
+            >
               Get started
-              <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
             </CtaButton>
             <CtaButton to="/components" tone="neutral">
               Browse components
@@ -634,9 +641,14 @@ function FinalCta() {
           themeable and accessible from the very first line.
         </p>
         <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <CtaButton to="/get-started" class="w-full sm:w-auto">
+          <CtaButton
+            to="/get-started"
+            class="group w-full sm:w-auto"
+            endDecorator={
+              <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
+            }
+          >
             Get started
-            <ArrowRightIcon class="size-4 transition-transform group-hover:translate-x-0.5" />
           </CtaButton>
           <CopyCommand command="npm i @hope-ui/components" />
         </div>
