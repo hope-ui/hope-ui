@@ -30,11 +30,15 @@ function createDialog(options?: {
   defaultOpen?: boolean;       // uncontrolled initial state, default false
   onOpenChange?: (open: boolean) => void;
   modal?: boolean;             // default true
+  closeOnEscape?: boolean;            // Escape dismisses, default true
+  closeOnInteractOutside?: boolean;   // outside pointerdown dismisses, default true
 }): {
   open: Accessor<boolean>;
   setOpen: (open: boolean) => void;
   modal: Accessor<boolean>;
   isModal: Accessor<boolean>;                 // open() && modal()
+  closeOnEscape: Accessor<boolean>;           // read by createDialogContent's createDismissable
+  closeOnInteractOutside: Accessor<boolean>;  // read by createDialogContent's createDismissable
   popupId: Accessor<string>;                  // registered id, else SSR-stable generated fallback
   setPopupId: (id: string | undefined) => void;
   titleId: Accessor<string | undefined>;
@@ -54,6 +58,11 @@ function createDialog(options?: {
   (`aria-hidden` + `inert`), and blocks the pointer. `false` keeps the page behind interactive but
   still dismisses and restores focus. `isModal` = `open() && modal()`, the gate every modal-only
   behavior keys off.
+- `closeOnEscape` / `closeOnInteractOutside` — the two dismissal toggles, both default `true`. They
+  live on the root (a consumer sets them once) but are consumed by `createDialogContent`, which
+  forwards them to its `createDismissable` as `dismissOnEscape` / `dismissOnOutsidePointerDown`. The
+  returned `closeOnEscape` / `closeOnInteractOutside` accessors exist for that forwarding. See
+  `../content/dialog-content.md`.
 - `initialFocus` (element to focus on open) is **not** here — it's a prop of `createDialogContent`,
   the part that owns the focus trap and the only consumer. See `../content/dialog-content.md`.
 - ids — `popupId` falls back to a generated (SSR-stable) `createUniqueId`; a part publishes a

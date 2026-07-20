@@ -35,6 +35,16 @@ export interface CreateDialogOptions {
    * behind stays interactive. Default `true`.
    */
   modal?: boolean;
+  /**
+   * Whether pressing Escape closes the dialog. Forwarded by `createDialogContent` to
+   * `createDismissable`'s `dismissOnEscape`. Default `true`.
+   */
+  closeOnEscape?: boolean;
+  /**
+   * Whether a pointerdown outside the content closes the dialog. Forwarded by `createDialogContent`
+   * to `createDismissable`'s `dismissOnOutsidePointerDown`. Default `true`.
+   */
+  closeOnInteractOutside?: boolean;
 }
 
 export interface CreateDialogReturn {
@@ -46,6 +56,10 @@ export interface CreateDialogReturn {
   modal: Accessor<boolean>;
   /** `open() && modal()` — the gate every modal-only behavior keys off. */
   isModal: Accessor<boolean>;
+  /** Whether Escape closes the dialog. Read by `createDialogContent`'s `createDismissable`. */
+  closeOnEscape: Accessor<boolean>;
+  /** Whether an outside pointerdown closes the dialog. Read by `createDialogContent`'s `createDismissable`. */
+  closeOnInteractOutside: Accessor<boolean>;
 
   /** The popup's id: a registered consumer id if any, else a generated (SSR-stable) fallback. */
   popupId: Accessor<string>;
@@ -74,7 +88,12 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   // `withDefaults`, not `merge({ modal: true }, options)`: `merge` resolves by key *presence*, so
   // a wrapper forwarding an unset `modal`/`defaultOpen` (the key present with value `undefined`)
   // would silently beat the default. See `withDefaults`' doc.
-  const merged = withDefaults(options, { defaultOpen: false, modal: true });
+  const merged = withDefaults(options, {
+    defaultOpen: false,
+    modal: true,
+    closeOnEscape: true,
+    closeOnInteractOutside: true,
+  });
 
   const [open, setOpen] = createControllableState<boolean>({
     value: () => merged.open,
@@ -83,6 +102,8 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   });
   const modal = () => merged.modal;
   const isModal = () => open() && modal();
+  const closeOnEscape = () => merged.closeOnEscape;
+  const closeOnInteractOutside = () => merged.closeOnInteractOutside;
 
   // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
   // so a consumer-pinned id can't be registered server-side. This is the only `createUniqueId`
@@ -106,6 +127,8 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     setOpen,
     modal,
     isModal,
+    closeOnEscape,
+    closeOnInteractOutside,
     popupId,
     setPopupId: setCustomPopupId,
     titleId,

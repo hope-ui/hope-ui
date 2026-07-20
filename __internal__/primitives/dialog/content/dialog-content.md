@@ -29,6 +29,14 @@ tears down when the content unmounts:
   `activeElement` snapshot lands before focus moves and before `inert` blurs the trigger (see
   [`create-focus-restore.md`](../../internal/create-focus-restore/create-focus-restore.md)).
 
+The two dismissal toggles come from the root state, not this part's props: `createDismissable`'s
+`dismissOnEscape` / `dismissOnOutsidePointerDown` are forwarded from `state.closeOnEscape()` /
+`state.closeOnInteractOutside()` (both default `true` on `createDialog`), so a consumer sets them
+**once** on `createDialog` / `Dialog.Root`. They are forwarded as getters, not a one-time read:
+`createDismissable` reads them live inside its keydown/pointerdown handlers, so a getter keeps them
+reactive (and avoids a `STRICT_READ_UNTRACKED` read in this hook body). See
+[`dialog-root.md`](../root/dialog-root.md).
+
 `initialFocus` (when set) is what `createFocusTrap` focuses on open, instead of the first focusable
 descendant; it's read lazily at focus time (after mount), so the target may live inside the content.
 It belongs here, not on `createDialog` — the focus trap is owned by this part, and no other part

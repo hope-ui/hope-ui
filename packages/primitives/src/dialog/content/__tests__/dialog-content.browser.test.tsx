@@ -21,10 +21,17 @@ function mountHarness(props: {
   modal?: boolean;
   withTitle?: boolean;
   ariaLabelledby?: string;
+  closeOnEscape?: boolean;
+  closeOnInteractOutside?: boolean;
 }) {
   let state!: CreateDialogReturn;
   const result = mount(() => {
-    state = createDialog({ defaultOpen: props.open ?? true, modal: props.modal });
+    state = createDialog({
+      defaultOpen: props.open ?? true,
+      modal: props.modal,
+      closeOnEscape: props.closeOnEscape,
+      closeOnInteractOutside: props.closeOnInteractOutside,
+    });
     const content = createDialogContent(state, { "aria-labelledby": props.ariaLabelledby });
     return (
       <Show when={content.mounted()}>
@@ -128,6 +135,44 @@ describe("createDialogContent", () => {
 
     await userEvent.keyboard("{Escape}");
     await vi.waitFor(() => expect(contentOf(container)).toBeNull());
+    dispose();
+  });
+
+  it("dismisses on an outside pointerdown", async () => {
+    // `document.body` sits outside the content, so `createDismissable`'s capture-phase pointerdown
+    // handler (which dismisses unless the target is inside the content) fires. This is the positive
+    // control the `closeOnInteractOutside={false}` case below negates.
+    const { container, dispose } = mountHarness({ withTitle: true });
+    expect(contentOf(container)).toBeTruthy();
+
+    document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    await vi.waitFor(() => expect(contentOf(container)).toBeNull());
+    dispose();
+  });
+
+  it("does NOT dismiss on Escape when closeOnEscape is false", async () => {
+    // `Dialog.Root`/`createDialog` sets the toggle once; `createDialogContent` forwards it to
+    // `createDismissable`'s `dismissOnEscape` as a getter (so it stays reactive).
+    const { container, dispose } = mountHarness({ withTitle: true, closeOnEscape: false });
+    expect(contentOf(container)).toBeTruthy();
+
+    await userEvent.keyboard("{Escape}");
+    // Give the dismiss path a frame to (not) run before asserting the content survived.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(contentOf(container)).toBeTruthy();
+    dispose();
+  });
+
+  it("does NOT dismiss on an outside pointerdown when closeOnInteractOutside is false", async () => {
+    const { container, dispose } = mountHarness({
+      withTitle: true,
+      closeOnInteractOutside: false,
+    });
+    expect(contentOf(container)).toBeTruthy();
+
+    document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(contentOf(container)).toBeTruthy();
     dispose();
   });
 

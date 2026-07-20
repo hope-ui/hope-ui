@@ -57,7 +57,21 @@ export function createDialogContent(
   createFocusRestore({ active: state.open });
   createFocusTrap({ active: state.isModal, ref, initialFocus: () => props.initialFocus?.() });
   createHideOutside({ active: state.isModal, target: ref, spare: state.sparedElements });
-  createDismissable({ active: state.open, ref, onDismiss: () => state.setOpen(false) });
+  // The two dismissal toggles come from the root state, so a consumer sets them once on
+  // `createDialog` / `Dialog.Root` and this part forwards them (both default `true` on the root).
+  // Getters, not a one-time read: `createDismissable` reads these live inside its keydown/pointerdown
+  // handlers, so a getter keeps them reactive (and avoids a `STRICT_READ_UNTRACKED` read here).
+  createDismissable({
+    active: state.open,
+    ref,
+    onDismiss: () => state.setOpen(false),
+    get dismissOnEscape() {
+      return state.closeOnEscape();
+    },
+    get dismissOnOutsidePointerDown() {
+      return state.closeOnInteractOutside();
+    },
+  });
   createScrollLock({ active: state.isModal });
 
   // Publish a consumer-supplied `id` up so the trigger's `aria-controls` names the element that
