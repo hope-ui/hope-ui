@@ -167,10 +167,10 @@ describe("hope badge recipe", () => {
     }
   });
 
-  it("defaults to soft / neutral / sm / rounded", () => {
+  it("defaults to soft / primary / sm / rounded", () => {
     const root = badgeRecipe({}).root();
-    expect(root).toContain("bg-neutral-soft");
-    expect(root).toContain("text-neutral-emphasis");
+    expect(root).toContain("bg-primary-soft");
+    expect(root).toContain("text-primary-emphasis");
     expect(root).toContain("rounded-md");
   });
 

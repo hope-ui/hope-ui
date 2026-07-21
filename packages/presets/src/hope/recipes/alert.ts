@@ -198,7 +198,7 @@ export const alertRecipe = tv({
   compoundVariants: [...colorCompoundVariants, ...defaultRoleCompoundVariants],
   defaultVariants: {
     variant: "default",
-    colorScheme: "neutral",
+    colorScheme: "primary",
     size: "md",
   },
 });

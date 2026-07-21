@@ -77,7 +77,7 @@ describe("Badge SSR", () => {
     // cannot drift. Regenerate deliberately with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<span _hk=00j0 class="inline-flex items-center justify-center whitespace-nowrap align-middle font-medium select-none border h-5 gap-1 px-2 text-xs has-data-[slot=badge-start-decorator]:ps-1.5 has-data-[slot=badge-end-decorator]:pe-1.5 rounded-md bg-neutral-soft text-neutral-emphasis border-neutral-soft" data-slot="badge" ><span _hk=00e0 data-slot="badge-label" class="inline-flex items-center">New</span></span>"`,
+      `"<span _hk=00j0 class="inline-flex items-center justify-center whitespace-nowrap align-middle font-medium select-none border h-5 gap-1 px-2 text-xs has-data-[slot=badge-start-decorator]:ps-1.5 has-data-[slot=badge-end-decorator]:pe-1.5 rounded-md bg-primary-soft text-primary-emphasis border-primary-soft" data-slot="badge" ><span _hk=00e0 data-slot="badge-label" class="inline-flex items-center">New</span></span>"`,
     );
   });
 });

@@ -162,12 +162,12 @@ describe("hope alert recipe", () => {
     }
   });
 
-  it("defaults to default / neutral / md", () => {
+  it("defaults to default / primary / md", () => {
     const parts = alertRecipe({});
     expect(parts.root()).toContain("bg-surface-raised");
     expect(parts.root()).toMatch(/(?:^|\s)p-3(?:\s|$)/); // md
-    // neutral default variant colors the icon/title neutral-emphasis.
-    expect(parts.icon()).toContain("text-neutral-emphasis");
+    // primary default colorScheme colors the icon/title primary-emphasis.
+    expect(parts.icon()).toContain("text-primary-emphasis");
   });
 
   it("keeps description a present but unstyled slot (declared, no default class)", () => {

@@ -137,7 +137,7 @@ export const Root: Component<AlertProps> = (props) => {
     props,
     defaults: {
       variant: "default" as const,
-      colorScheme: "neutral" as const,
+      colorScheme: "primary" as const,
       size: "md" as const,
       role: "alert" as const,
       closable: false,

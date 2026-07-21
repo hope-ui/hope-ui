@@ -216,7 +216,9 @@ export const badgeRecipe = tv({
       subtle: { root: "" },
       outline: { root: "bg-transparent" },
       // dot: neutral chrome; the role color is on the `dot` slot (per-role compound variants).
-      dot: { root: "bg-transparent text-foreground border-neutral-subtle-line" },
+      dot: {
+        root: "bg-surface-raised text-foreground border-neutral-subtle-line",
+      },
     },
     // `colorScheme` carries no base classes of its own — every fill is variant×colorScheme-specific
     // and lives in `compoundVariants`. It's declared here (with empty slots) so it's a real, typed
@@ -233,7 +235,7 @@ export const badgeRecipe = tv({
   compoundVariants: [...colorCompoundVariants, ...dotCompoundVariants],
   defaultVariants: {
     variant: "soft",
-    colorScheme: "neutral",
+    colorScheme: "primary",
     size: "sm",
     shape: "rounded",
     fullWidth: false,

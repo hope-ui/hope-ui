@@ -43,7 +43,7 @@ describe("Badge", () => {
     dispose();
   });
 
-  it("applies the default recipe slot classes (soft neutral)", async () => {
+  it("applies the default recipe slot classes (soft primary)", async () => {
     const { container, dispose } = mount(() => (
       <Themed>
         <Badge>New</Badge>
@@ -51,8 +51,8 @@ describe("Badge", () => {
     ));
 
     const badge = container.querySelector('[data-slot="badge"]');
-    expect(badge?.className).toContain("bg-neutral-soft");
-    expect(badge?.className).toContain("text-neutral-emphasis");
+    expect(badge?.className).toContain("bg-primary-soft");
+    expect(badge?.className).toContain("text-primary-emphasis");
     dispose();
   });
 

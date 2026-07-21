@@ -57,7 +57,7 @@ export const Badge: Component<BadgeProps> = (props) => {
     props,
     defaults: {
       variant: "soft" as const,
-      colorScheme: "neutral" as const,
+      colorScheme: "primary" as const,
       size: "sm" as const,
       shape: "rounded" as const,
       fullWidth: false,
