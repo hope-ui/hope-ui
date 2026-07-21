@@ -5,6 +5,7 @@ import { AlertActionsDemo } from "~/components/demos/alert/AlertActionsDemo";
 import { AlertColorSchemesDemo } from "~/components/demos/alert/AlertColorSchemesDemo";
 import { AlertDismissibleDemo } from "~/components/demos/alert/AlertDismissibleDemo";
 import { AlertPolymorphismDemo } from "~/components/demos/alert/AlertPolymorphismDemo";
+import { AlertSolidActionsDemo } from "~/components/demos/alert/AlertSolidActionsDemo";
 import { InfoIcon, SparklesIcon } from "~/components/Icons";
 import { Anatomy } from "~/components/Anatomy";
 import { PropsTable } from "~/components/PropsTable";
@@ -362,6 +363,36 @@ the convenience props give way to the compound anatomy.
       </Button>
       <Button variant="ghost" colorScheme="warning" size="sm">
         Remind me later
+      </Button>
+    </Alert.Actions>
+  </Alert.Content>
+</Alert.Root>
+```
+
+### On a solid alert
+
+A `solid` alert is a filled, role-colored banner, so a `solid` action button would blend into it.
+Reach for the Button [`inverted`](/components/button#on-solid-surfaces) variant instead — a
+contrasting fill built to stay legible on a solid, colored surface.
+
+<Preview>
+  <AlertSolidActionsDemo />
+</Preview>
+
+```tsx
+<Alert.Root variant="solid" colorScheme="danger">
+  <Alert.Icon>
+    <WarningIcon />
+  </Alert.Icon>
+  <Alert.Content>
+    <Alert.Title>Your payment failed</Alert.Title>
+    <Alert.Description>Update your card to keep your subscription active.</Alert.Description>
+    <Alert.Actions>
+      <Button variant="inverted" colorScheme="danger" size="sm">
+        Update payment
+      </Button>
+      <Button variant="inverted" colorScheme="neutral" size="sm">
+        Dismiss
       </Button>
     </Alert.Actions>
   </Alert.Content>
