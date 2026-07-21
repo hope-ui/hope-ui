@@ -55,8 +55,16 @@ export function createDialogContent(
   const presence = createPresence({ present: state.open, ref });
 
   createFocusRestore({ active: state.open });
-  createFocusTrap({ active: state.isModal, ref, initialFocus: () => props.initialFocus?.() });
-  createHideOutside({ active: state.isModal, target: ref, spare: state.sparedElements });
+  createFocusTrap({
+    active: state.isModal,
+    ref,
+    initialFocus: () => props.initialFocus?.(),
+  });
+  createHideOutside({
+    active: state.isModal,
+    target: ref,
+    spare: state.sparedElements,
+  });
   // The two dismissal toggles come from the root state, so a consumer sets them once on
   // `createDialog` / `Dialog.Root` and this part forwards them (both default `true` on the root).
   // Getters, not a one-time read: `createDismissable` reads these live inside its keydown/pointerdown

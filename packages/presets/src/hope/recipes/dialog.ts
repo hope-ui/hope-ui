@@ -130,7 +130,11 @@ export const dialogRecipe = tv({
       // Pseudo-fullscreen: fills the viewport minus a margin, KEEPS the radius. `h-full` fills the
       // padded positioner; `max-w-none` drops the width cap; `my-0` cancels `placement:center`. The
       // body scrolls its own overflow so the card can't overrun.
-      cover: { positioner: "sm:p-8", content: "h-full max-w-none my-0", body: "overflow-y-auto" },
+      cover: {
+        positioner: "sm:p-8",
+        content: "h-full max-w-none my-0",
+        body: "overflow-y-auto",
+      },
       // True fullscreen: edge-to-edge, NO radius/margin. `p-0` drops the positioner gutter (and beats
       // `placement:top`'s `sm:pt-16`); `rounded-none` + `h-full` + `max-w-none` fill it edge-to-edge.
       full: {
