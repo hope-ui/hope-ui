@@ -45,6 +45,40 @@ describe("conformance kit", () => {
     expect(result.errors.some((e) => e.includes('slot "root"'))).toBe(true);
     expect(() => assertSlotRecipeConformance(broken, expectation)).toThrow(/conformance failed/);
   });
+
+  it("allows an intentionally-unstyled slot to produce no class via `unstyledSlots`", () => {
+    // `hint` is declared but carries no default classes (like Alert's description). tailwind-variants
+    // resolves an empty `""` slot base to `undefined`, so the slot function returns nothing — that is
+    // exactly what an unstyled slot is, and it must not be reported.
+    const recipe: SlotRecipeFn<DemoVariants, "root" | "hint"> = () => ({
+      root: () => "demo",
+      hint: () => undefined as unknown as string,
+    });
+
+    const withUnstyled = { cases: expectation.cases, slots: ["root"], unstyledSlots: ["hint"] };
+    expect(checkSlotRecipeConformance(recipe, withUnstyled).ok).toBe(true);
+
+    // The same unstyled slot listed under the strict `slots` set still fails — `unstyledSlots` is the
+    // only way to exempt it from the non-empty requirement.
+    const asStrict = { cases: expectation.cases, slots: ["root", "hint"] };
+    expect(checkSlotRecipeConformance(recipe, asStrict).ok).toBe(false);
+  });
+
+  it("reports an unstyled slot the recipe never declared (a real gap, not a styling choice)", () => {
+    // The point of listing a slot as unstyled is to prove it EXISTS so `ctx.slots.<slot>()` is safe.
+    // A recipe that forgot to declare `hint` altogether resolves it to `undefined` (not a function).
+    const missing: SlotRecipeFn<DemoVariants, "root"> = () => ({ root: () => "demo" });
+
+    const result = checkSlotRecipeConformance(missing as SlotRecipeFn<DemoVariants, string>, {
+      cases: expectation.cases,
+      slots: ["root"],
+      unstyledSlots: ["hint"],
+    });
+    expect(result.ok).toBe(false);
+    expect(
+      result.errors.some((e) => e.includes('unstyled slot "hint" is not a declared slot')),
+    ).toBe(true);
+  });
 });
 
 describe("semantic token conformance", () => {

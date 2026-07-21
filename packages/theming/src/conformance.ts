@@ -31,6 +31,16 @@ export interface SlotRecipeExpectation<Variants> {
   cases: ReadonlyArray<Variants | undefined>;
   /** Every slot the recipe must produce a non-empty class for (a single-part component → `["root"]`). */
   slots: readonly string[];
+  /**
+   * Slots the recipe declares but leaves **intentionally unstyled** by default (e.g. a description
+   * that only inherits the root's text metrics). Each must still be a *declared* slot — the recipe
+   * resolves it to a class **function** — so the component can safely call `ctx.slots.<slot>()`, but
+   * that function may produce no class (tailwind-variants collapses an empty `""` slot base to
+   * `undefined`). Such a slot is therefore exempt from the non-empty requirement `slots` enforces. Use
+   * this instead of dropping the slot from the expectation entirely, which would stop verifying it
+   * exists at all.
+   */
+  unstyledSlots?: readonly string[];
 }
 
 function isNonEmptyString(value: unknown): value is string {
@@ -38,8 +48,9 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 /**
- * Checks that `recipe` produces a non-empty class for every `slot` across every `case` in
- * `expectation`. Never throws — collects every failure so a caller can report them all at once.
+ * Checks that `recipe` produces a non-empty class for every `slot`, and that every `unstyledSlot` is a
+ * declared (callable) slot — which may produce no class — across every `case` in `expectation`. Never
+ * throws — collects every failure so a caller can report them all at once.
  */
 export function checkSlotRecipeConformance<Variants>(
   recipe: SlotRecipeFn<Variants, string>,
@@ -53,6 +64,24 @@ export function checkSlotRecipeConformance<Variants>(
       // A slot resolves to a class *function* (tailwind-variants) — call it for its class string.
       if (!isNonEmptyString(result?.[slot]?.())) {
         errors.push(`slot "${slot}" produced no class for props ${JSON.stringify(props ?? {})}`);
+      }
+    }
+    // Unstyled slots need only be *declared* (a callable slot). Their class may be empty — an empty
+    // tailwind-variants slot base resolves to `undefined` — but the slot must exist so the component
+    // can call it. A non-string, non-nullish result would mean the slot isn't a real class function.
+    for (const slot of expectation.unstyledSlots ?? []) {
+      const slotFn = result?.[slot];
+      if (typeof slotFn !== "function") {
+        errors.push(
+          `unstyled slot "${slot}" is not a declared slot for props ${JSON.stringify(props ?? {})}`,
+        );
+        continue;
+      }
+      const value = slotFn();
+      if (value != null && typeof value !== "string") {
+        errors.push(
+          `unstyled slot "${slot}" resolved to a ${typeof value}, not a class string, for props ${JSON.stringify(props ?? {})}`,
+        );
       }
     }
   }
