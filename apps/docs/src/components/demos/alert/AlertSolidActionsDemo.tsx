@@ -9,19 +9,19 @@ import { InfoIcon } from "~/components/Icons";
 export function AlertSolidActionsDemo() {
   return (
     <div class="not-prose w-full max-w-lg">
-      <Alert.Root variant="solid" colorScheme="danger">
+      <Alert.Root variant="solid" colorScheme="info">
         <Alert.Icon>
           <InfoIcon />
         </Alert.Icon>
         <Alert.Content>
-          <Alert.Title>Your payment failed</Alert.Title>
-          <Alert.Description>Update your card to keep your subscription active.</Alert.Description>
+          <Alert.Title>A new version is available</Alert.Title>
+          <Alert.Description>Reload to get the latest features and fixes.</Alert.Description>
           <Alert.Actions>
-            <Button variant="inverted" colorScheme="danger" size="sm">
-              Update payment
+            <Button variant="inverted" colorScheme="info" size="sm">
+              Reload
             </Button>
             <Button variant="inverted" colorScheme="neutral" size="sm">
-              Dismiss
+              Later
             </Button>
           </Alert.Actions>
         </Alert.Content>
