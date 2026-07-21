@@ -1,0 +1,663 @@
+import { Alert } from "@hope-ui/components/alert";
+import { hope } from "@hope-ui/presets/hope";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { DialogAlertDialogDemo } from "~/components/demos/dialog/DialogAlertDialogDemo";
+import { DialogBasicDemo } from "~/components/demos/dialog/DialogBasicDemo";
+import { DialogControlledDemo } from "~/components/demos/dialog/DialogControlledDemo";
+import { DialogFormDemo } from "~/components/demos/dialog/DialogFormDemo";
+import { DialogNonDismissibleDemo } from "~/components/demos/dialog/DialogNonDismissibleDemo";
+import { DialogPlacementDemo } from "~/components/demos/dialog/DialogPlacementDemo";
+import { DialogScrollDemo } from "~/components/demos/dialog/DialogScrollDemo";
+import { DialogSizesDemo } from "~/components/demos/dialog/DialogSizesDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Modal overlay for focused tasks and confirmations.";
+
+export const description =
+  "A modal overlay that interrupts the page for a focused task or confirmation. It traps focus, locks page scroll, dims and blocks everything behind it, and returns focus to the trigger on close — with the anatomy composed from parts you arrange.";
+
+# Dialog
+
+{description}
+
+## Import
+
+```tsx
+import { Dialog } from "@hope-ui/components/dialog";
+```
+
+`Dialog` is a **compound** component — a namespace object whose parts you arrange yourself; there is
+no auto-composed shortcut. See the [Anatomy](#anatomy) below for every part and how they nest.
+
+## Usage
+
+`Dialog.Root` owns the state (open/close, focus, ARIA) and renders **no element** of its own.
+`Dialog.Trigger` opens the dialog; everything inside `Dialog.Portal` renders into a portal at the
+end of `<body>`, above the rest of the page. A corner ✕ (`Dialog.CloseTrigger`) is added
+automatically.
+
+<Preview>
+  <DialogBasicDemo />
+</Preview>
+
+```tsx
+const [open, setOpen] = createSignal(false);
+
+<Dialog.Root open={open()} onOpenChange={setOpen}>
+  <Dialog.Trigger render={(p) => <Button {...p}>Delete project</Button>} />
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Positioner>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>Delete project</Dialog.Title>
+          <Dialog.Description>
+            This permanently deletes Acme Marketing Site and everything inside it.
+          </Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Body>
+          <p>Removed for every member of the workspace. This action cannot be undone.</p>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button colorScheme="danger" onClick={() => setOpen(false)}>
+            Delete project
+          </Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Portal>
+</Dialog.Root>;
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  description={
+    <div>
+      Because Dialog reads a recipe (and <code>Dialog.CloseTrigger</code> renders a
+      themed <code>CloseButton</code>), a Dialog needs a{" "}
+      <code>&lt;ThemeProvider&gt;</code> ancestor fed a preset — as every styled
+      hope-ui component does.
+    </div>
+  }
+/>
+
+## Anatomy
+
+The structure is a fixed nesting, modeled on the Base&nbsp;UI / Ark / Chakra shape. `Portal` renders
+the pointer-blocking modal layer and portals its children to `<body>`; `Positioner` is the fixed,
+full-viewport frame that places the card and is the scroll container; `Content` is the card itself.
+
+<Anatomy
+  root={{
+    name: "Dialog.Root",
+    children: [
+      { name: "Dialog.Trigger" },
+      {
+        name: "Dialog.Portal",
+        children: [
+          { name: "Dialog.Backdrop" },
+          {
+            name: "Dialog.Positioner",
+            children: [
+              {
+                name: "Dialog.Content",
+                children: [
+                  { name: "Dialog.CloseTrigger", note: "auto · showCloseButton" },
+                  {
+                    name: "Dialog.Header",
+                    children: [{ name: "Dialog.Title" }, { name: "Dialog.Description" }],
+                  },
+                  { name: "Dialog.Body" },
+                  { name: "Dialog.Footer" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Dialog.Root",
+      element: "—",
+      description:
+        "State owner: open/close, focus, ids, and the resolved recipe. Renders no host element — just a context provider.",
+    },
+    {
+      part: "Dialog.Trigger",
+      element: "button",
+      description:
+        "Opens the dialog. Wires aria-haspopup / aria-expanded / aria-controls. Usually rendered as your own Button via render.",
+    },
+    {
+      part: "Dialog.Portal",
+      element: "—",
+      description:
+        "Portals Backdrop + Positioner to document.body (client-only) and renders the pointer-blocking modal layer beneath them.",
+    },
+    {
+      part: "Dialog.Backdrop",
+      element: "div",
+      description:
+        "The decorative scrim that dims the page and fades in/out. Optional — the modal layer does the pointer blocking either way.",
+    },
+    {
+      part: "Dialog.Positioner",
+      element: "div",
+      description:
+        "The fixed, full-viewport frame that positions the card (placement) and is the viewport scroll container.",
+    },
+    {
+      part: "Dialog.Content",
+      element: "div",
+      description:
+        "The card. Owns the focus trap, dismissal, aria-modal, and the ARIA role. Renders the auto corner ✕.",
+    },
+    {
+      part: "Dialog.Header",
+      element: "div",
+      description: "Layout container for the title and description.",
+    },
+    {
+      part: "Dialog.Body",
+      element: "div",
+      description: "The main content region. Scrolls under scrollBehavior=inside.",
+    },
+    {
+      part: "Dialog.Footer",
+      element: "div",
+      description: "The action row — a sunken bar that right-aligns its buttons on wider viewports.",
+    },
+    {
+      part: "Dialog.Title",
+      element: "h2",
+      description: "The heading. Self-registers its id as the dialog's aria-labelledby.",
+    },
+    {
+      part: "Dialog.Description",
+      element: "p",
+      description: "The supporting prose. Self-registers its id as the dialog's aria-describedby.",
+    },
+    {
+      part: "Dialog.CloseTrigger",
+      element: "button",
+      description:
+        "A CloseButton wired to close the dialog. Rendered automatically in the corner unless showCloseButton is false.",
+    },
+  ]}
+/>
+
+## Open state
+
+Drive `open` as a controlled signal and handle `onOpenChange` to react to every close path — the
+trigger, the corner ✕, Escape, an outside click, and your own footer buttons all route through it.
+
+<Preview>
+  <DialogControlledDemo />
+</Preview>
+
+```tsx
+const [open, setOpen] = createSignal(false);
+
+<Dialog.Root open={open()} onOpenChange={setOpen}>
+  {/* … */}
+</Dialog.Root>;
+```
+
+Left uncontrolled, a Dialog manages its own open state: `Dialog.Trigger` opens it, and the corner ✕,
+Escape, or an outside click close it. Set `defaultOpen` to have it start open.
+
+```tsx title="Uncontrolled"
+<Dialog.Root defaultOpen>
+  <Dialog.Trigger render={(p) => <Button {...p}>Open</Button>} />
+  {/* … */}
+</Dialog.Root>
+```
+
+## Sizes
+
+The `size` prop scales the card. `xs`…`xl` widen a centered card; `cover` fills the viewport minus a
+margin (keeping the corner radius) and `full` goes edge-to-edge with no radius — both ignore
+`placement`. The default is `md`.
+
+<Preview>
+  <DialogSizesDemo />
+</Preview>
+
+```tsx
+<Dialog.Root size="sm">…</Dialog.Root>
+<Dialog.Root size="lg">…</Dialog.Root>
+<Dialog.Root size="cover">…</Dialog.Root>
+<Dialog.Root size="full">…</Dialog.Root>
+```
+
+## Placement
+
+`placement` positions the card within the viewport frame: `center` (the default) centers it, and
+`top` anchors it near the top. `cover` and `full` sizes fill the frame and ignore this axis.
+
+<Preview>
+  <DialogPlacementDemo />
+</Preview>
+
+```tsx
+<Dialog.Root placement="center">…</Dialog.Root>
+<Dialog.Root placement="top">…</Dialog.Root>
+```
+
+## Scroll behavior
+
+When content is taller than the viewport, `scrollBehavior` decides what scrolls. `inside` (the
+default) caps the card height and scrolls the **body**, so the header and footer stay pinned;
+`outside` lets the **whole card** scroll within the viewport at its natural height.
+
+<Preview>
+  <DialogScrollDemo />
+</Preview>
+
+```tsx
+<Dialog.Root scrollBehavior="inside">…</Dialog.Root>
+<Dialog.Root scrollBehavior="outside">…</Dialog.Root>
+```
+
+## The close button
+
+`Dialog.Content` renders a `Dialog.CloseTrigger` in the corner automatically. Pass
+`showCloseButton={false}` to drop it (as the alert dialog and non-dismissible examples below do), then
+place your own `Dialog.CloseTrigger` anywhere inside the content for full control over its position
+and label.
+
+```tsx title="Opt out, place your own"
+<Dialog.Content showCloseButton={false}>
+  <Dialog.CloseTrigger size="sm" />
+  {/* … */}
+</Dialog.Content>
+```
+
+`Dialog.CloseTrigger` is a [`CloseButton`](/components/close-button) with the dialog's close wiring
+pre-attached — it inherits every `CloseButton` prop (`size`, `icon`, `class`, `render`). Its close
+handler runs in front of your own `onClick`, so calling `event.preventDefault()` cancels the close.
+
+## Dismissal
+
+By default a Dialog light-dismisses: **Escape** closes it and a **pointer-down outside** the card
+closes it. Turn either off with `closeOnEscape` and `closeOnInteractOutside` when the user must make
+a deliberate choice.
+
+<Preview>
+  <DialogNonDismissibleDemo />
+</Preview>
+
+```tsx
+<Dialog.Root closeOnEscape={false} closeOnInteractOutside={false}>
+  {/* only a footer button closes it */}
+</Dialog.Root>
+```
+
+## Modality
+
+A Dialog is **modal** by default: it traps focus inside the card, locks page scroll, sets
+`aria-modal`, hides the rest of the page from assistive technology, and blocks pointer interaction
+behind it. Set `modal={false}` for a non-modal overlay — still dismissable and still focus-restoring,
+but the page behind stays interactive and scrollable.
+
+```tsx
+<Dialog.Root modal={false}>…</Dialog.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      A modal card <strong>must be positioned</strong> — that's why{" "}
+      <code>Dialog.Content</code> lives inside <code>Dialog.Positioner</code>. An
+      unpositioned popup paints beneath the pointer-blocking modal layer and becomes
+      unclickable.
+    </div>
+  }
+/>
+
+## Alert dialog
+
+For a destructive confirmation, set `role="alertdialog"` on `Dialog.Root`. This is the WAI-ARIA APG
+alert-dialog pattern: the role is threaded to `Dialog.Content`, and you typically drop the corner ✕
+(`showCloseButton={false}`) so the explicit footer actions are the only way out.
+
+<Preview>
+  <DialogAlertDialogDemo />
+</Preview>
+
+```tsx
+<Dialog.Root role="alertdialog" open={open()} onOpenChange={setOpen}>
+  <Dialog.Trigger render={(p) => <Button colorScheme="danger" {...p}>Delete account</Button>} />
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Positioner>
+      <Dialog.Content showCloseButton={false}>
+        <Dialog.Header>
+          <Dialog.Title>Delete your account?</Dialog.Title>
+          <Dialog.Description>This cannot be undone.</Dialog.Description>
+        </Dialog.Header>
+        <Dialog.Footer>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Keep account</Button>
+          <Button colorScheme="danger" onClick={() => setOpen(false)}>Delete account</Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+## With a form
+
+Put a `<form>` in `Dialog.Body` and link the footer's submit button to it with the native `form`
+attribute — the button sits outside the `<form>` element but still submits it. On open, the focus
+trap moves focus to the first field; Tab cycles within the card.
+
+<Preview>
+  <DialogFormDemo />
+</Preview>
+
+```tsx
+<Dialog.Body>
+  <form id="edit-profile-form" onSubmit={handleSubmit}>
+    {/* fields */}
+  </form>
+</Dialog.Body>
+<Dialog.Footer>
+  <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
+    Cancel
+  </Button>
+  <Button type="submit" form="edit-profile-form">
+    Save changes
+  </Button>
+</Dialog.Footer>
+```
+
+## Polymorphism
+
+Render a part as a different element or component with the `render` prop — a function that receives
+the computed props and spreads them onto your element. This is how `Dialog.Trigger` becomes your own
+`Button`. There is **no `as` prop**; `render` is the single polymorphism API.
+
+```tsx title="Trigger as a Button"
+<Dialog.Trigger render={(props) => <Button {...props}>Open</Button>} />
+```
+
+```tsx title="Positioner as a section"
+<Dialog.Positioner render={(props) => <section {...props} />} />
+```
+
+## Theming
+
+Dialog's look comes from the active preset's recipe. Dialog is a **neutral container** — it has no
+color axis; role accents belong on the footer's action `Button`, not the chrome. Override styling at
+three levels, applied in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses`
+→ instance `slotClasses` / part `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`. There is no `root` slot — `Dialog.Root` renders no element.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "backdrop",
+      attr: "dialog-backdrop",
+      description: "The dimming scrim (fades in/out).",
+    },
+    {
+      slot: "positioner",
+      attr: "dialog-positioner",
+      description: "The fixed full-viewport frame + scroll container.",
+    },
+    { slot: "content", attr: "dialog-content", description: "The card surface." },
+    { slot: "header", attr: "dialog-header", description: "The title/description column." },
+    { slot: "body", attr: "dialog-body", description: "The main content region." },
+    { slot: "footer", attr: "dialog-footer", description: "The action-button bar." },
+    { slot: "title", attr: "dialog-title", description: "The heading line." },
+    { slot: "description", attr: "dialog-description", description: "The supporting prose." },
+    {
+      slot: "closeTrigger",
+      attr: "dialog-close-trigger",
+      description: "Placement of the corner ✕ (its chrome comes from CloseButton).",
+    },
+  ]}
+/>
+
+### Overriding one dialog
+
+Set `slotClasses` on `Dialog.Root` to reach any slot from one place, or put `class` on an individual
+part. Use literal class strings so your Tailwind build can see them.
+
+```tsx
+<Dialog.Root slotClasses={{ content: "max-w-md rounded-none", footer: "bg-transparent" }}>
+  {/* … */}
+</Dialog.Root>
+
+// …or per part:
+<Dialog.Content class="max-w-md rounded-none">…</Dialog.Content>
+```
+
+### App-wide defaults & overrides
+
+Set defaults and global part classes for **every** Dialog through the theme with `definePreset`, then
+pass the derived preset to `ThemeProvider`. `defaultProps` resolve at **instance ?? preset ??
+builtin** precedence, so an explicit prop on a single dialog always wins.
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    dialog: {
+      // Every recipe variant is defaultable.
+      defaultProps: { size: "sm", placement: "top" },
+      // Global part classes, folded in before per-instance slotClasses.
+      slotClasses: { content: "rounded-none" },
+    },
+  },
+});
+```
+
+Defaultable through `defaultProps`: `size`, `placement`, `scrollBehavior`, and `role`. Per-usage
+props — `open`, `defaultOpen`, `modal`, the `closeOn*` flags, and event handlers — are intentionally
+**not** defaultable app-wide.
+
+## API
+
+### Dialog.Root
+
+`Dialog.Root` renders no host element, so it takes no native attributes — only the props below.
+
+<PropsTable
+  rows={[
+    {
+      prop: "size",
+      type: "DialogSize",
+      default: '"md"',
+      description:
+        "Card size: xs, sm, md, lg, xl, cover, full. cover/full fill the viewport and ignore placement.",
+    },
+    {
+      prop: "placement",
+      type: "DialogPlacement",
+      default: '"center"',
+      description: "Position within the viewport frame: center or top.",
+    },
+    {
+      prop: "scrollBehavior",
+      type: "DialogScrollBehavior",
+      default: '"inside"',
+      description:
+        "What scrolls when content overflows: inside (body scrolls, header/footer pinned) or outside (whole card scrolls).",
+    },
+    {
+      prop: "role",
+      type: '"dialog" | "alertdialog"',
+      default: '"dialog"',
+      description:
+        "ARIA role, threaded to Content. Use alertdialog for a destructive confirmation (APG pattern).",
+    },
+    {
+      prop: "open",
+      type: "boolean",
+      default: "",
+      description: "Controlled open state. Leave unset for uncontrolled (defaults to defaultOpen).",
+    },
+    {
+      prop: "defaultOpen",
+      type: "boolean",
+      default: "false",
+      description: "Initial open state when uncontrolled.",
+    },
+    {
+      prop: "onOpenChange",
+      type: "(open: boolean) => void",
+      default: "",
+      description: "Called on every open/close request (trigger, ✕, Escape, outside click).",
+    },
+    {
+      prop: "modal",
+      type: "boolean",
+      default: "true",
+      description:
+        "Trap focus, lock scroll, set aria-modal, hide the page from AT, and block pointer behind. false keeps the page interactive.",
+    },
+    {
+      prop: "closeOnEscape",
+      type: "boolean",
+      default: "true",
+      description: "Whether Escape closes the dialog.",
+    },
+    {
+      prop: "closeOnInteractOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether a pointer-down outside the card closes the dialog.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"dialog">',
+      default: "",
+      description:
+        "Per-slot class overrides, keyed by backdrop, positioner, content, header, body, footer, title, description, closeTrigger.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description:
+        "Forwarded to the recipe. Dialog has no root slot, so prefer per-part class or slotClasses.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The dialog anatomy (Trigger + Portal > …).",
+    },
+  ]}
+/>
+
+### Dialog.Content
+
+<PropsTable
+  rows={[
+    {
+      prop: "showCloseButton",
+      type: "boolean",
+      default: "true",
+      description:
+        "Auto-render a corner Dialog.CloseTrigger before your children. false to drop it and place your own.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render Content as another element or component. Receives Content's computed props.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the content slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+Plus every native `<div>` attribute.
+
+### Dialog.Portal
+
+<PropsTable
+  rows={[
+    {
+      prop: "mount",
+      type: "Element",
+      default: "document.body",
+      description: "Where to portal the Backdrop and Positioner.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Backdrop + Positioner subtree.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Dialog.Trigger`, `Dialog.Backdrop`, `Dialog.Positioner`, `Dialog.Header`, `Dialog.Body`,
+`Dialog.Footer`, `Dialog.Title`, and `Dialog.Description` each accept their native element attributes
+plus a `render` prop and a `class`. `Dialog.CloseTrigger` accepts every
+[`CloseButton`](/components/close-button) prop; its close handler is pre-wired (call
+`event.preventDefault()` in your own `onClick` to cancel the close).
+
+## Accessibility
+
+Dialog implements the WAI-ARIA [dialog (modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+pattern; `role="alertdialog"` switches to the alert-dialog variant.
+
+- **Focus is trapped and restored.** On open, focus moves into the card (the first focusable element);
+  Tab and Shift+Tab cycle within it and cannot escape to the page behind. On close, focus returns to
+  the element that opened the dialog.
+- **The rest of the page is hidden and inert.** A modal dialog marks everything outside the card
+  `aria-hidden` + `inert` and blocks the pointer, so assistive tech and mouse both stay within the
+  dialog.
+- **It has an accessible name and description.** `Dialog.Title` self-registers as `aria-labelledby`
+  and `Dialog.Description` as `aria-describedby`. Always include a `Dialog.Title`; add a
+  `Dialog.Description` when a supporting sentence helps.
+- **Escape and outside click dismiss by default.** Keep them on unless the task genuinely requires a
+  deliberate choice; when you disable them, provide an obvious in-dialog way out.
+- **Use `alertdialog` for destructive confirmations.** It tells assistive tech the dialog conveys an
+  important message needing a response, and pairs well with dropping the corner ✕.
+- **The close button is labeled.** `Dialog.CloseTrigger` is a `CloseButton`, which self-labels with a
+  localized `"Close"` accessible name and is fully keyboard-operable (Enter and Space).
+- **Motion is reduced-motion aware.** The zoom-and-fade transition drops to an instant open/close when
+  the user has `prefers-reduced-motion` enabled.

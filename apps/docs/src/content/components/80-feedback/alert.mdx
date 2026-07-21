@@ -6,6 +6,7 @@ import { AlertColorSchemesDemo } from "~/components/demos/alert/AlertColorScheme
 import { AlertDismissibleDemo } from "~/components/demos/alert/AlertDismissibleDemo";
 import { AlertPolymorphismDemo } from "~/components/demos/alert/AlertPolymorphismDemo";
 import { InfoIcon, SparklesIcon } from "~/components/Icons";
+import { Anatomy } from "~/components/Anatomy";
 import { PropsTable } from "~/components/PropsTable";
 import { DataTable } from "~/components/DataTable";
 
@@ -24,9 +25,8 @@ export const description =
 import { Alert } from "@hope-ui/components/alert";
 ```
 
-`Alert` is a **compound** component — a namespace object whose parts you compose:
-`Alert.Root`, `Alert.Icon`, `Alert.Content`, `Alert.Title`, `Alert.Description`, `Alert.Actions`,
-and `Alert.CloseTrigger`.
+`Alert` is a **compound** component — a namespace object whose parts you compose. For the common case
+you don't touch them (see [Usage](#usage) below); the full part tree is in the [Anatomy](#anatomy).
 
 ## Usage
 
@@ -51,6 +51,125 @@ and description — picking the matching status glyph automatically.
   description="A new version is ready to install."
 />
 ```
+
+## Anatomy
+
+The convenience props (`title`/`description`/`icon`/`closable`) are a shortcut: when `Alert.Root`
+has **no `children`**, it auto-composes the parts below for you. Supply `children` and you take full
+control of the structure — the convenience props are then ignored. Both paths produce the same
+markup and the same accessibility wiring.
+
+<Anatomy
+  root={{
+    name: "Alert.Root",
+    children: [
+      { name: "Alert.Icon" },
+      {
+        name: "Alert.Content",
+        children: [
+          { name: "Alert.Title" },
+          { name: "Alert.Description" },
+          { name: "Alert.Actions" },
+        ],
+      },
+      { name: "Alert.CloseTrigger", note: "auto · closable" },
+    ],
+  }}
+/>
+
+<Preview>
+  <div class="flex w-full max-w-md flex-col gap-3">
+    <Alert.Root
+      colorScheme="info"
+      title="Convenience"
+      description="Auto-composed from title / description / icon props."
+    />
+    <Alert.Root colorScheme="info">
+      <Alert.Icon>
+        <InfoIcon />
+      </Alert.Icon>
+      <Alert.Content>
+        <Alert.Title>Compound</Alert.Title>
+        <Alert.Description>
+          Built from Alert.Icon / Content / Title / Description.
+        </Alert.Description>
+      </Alert.Content>
+    </Alert.Root>
+  </div>
+</Preview>
+
+```tsx title="Convenience — Root auto-composes"
+<Alert.Root
+  colorScheme="info"
+  title="Convenience"
+  description="Auto-composed from title / description / icon props."
+/>
+```
+
+```tsx title="Compound — you compose the parts"
+<Alert.Root colorScheme="info">
+  <Alert.Icon>
+    <InfoIcon />
+  </Alert.Icon>
+  <Alert.Content>
+    <Alert.Title>Compound</Alert.Title>
+    <Alert.Description>
+      Built from Alert.Icon / Content / Title / Description.
+    </Alert.Description>
+  </Alert.Content>
+</Alert.Root>
+```
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Alert.Root",
+      element: "div",
+      description:
+        "The alert surface and the state owner (open/dismiss, variant styling, ARIA wiring). Renders the live region.",
+    },
+    {
+      part: "Alert.Icon",
+      element: "span",
+      description:
+        "Wraps the leading glyph. Marked aria-hidden by default (decorative).",
+    },
+    {
+      part: "Alert.Content",
+      element: "div",
+      description: "Column wrapper for the title, description, and actions.",
+    },
+    {
+      part: "Alert.Title",
+      element: "div",
+      description:
+        "The heading. Self-registers its id as the alert's aria-labelledby.",
+    },
+    {
+      part: "Alert.Description",
+      element: "p",
+      description:
+        "The body prose. Self-registers its id as the alert's aria-describedby.",
+    },
+    {
+      part: "Alert.Actions",
+      element: "div",
+      description:
+        "A flex row for action buttons, placed inside Alert.Content below the text.",
+    },
+    {
+      part: "Alert.CloseTrigger",
+      element: "button",
+      description:
+        "A CloseButton wired to dismiss the alert. Rendered automatically by the closable prop.",
+    },
+  ]}
+/>
 
 ## Status
 
@@ -248,103 +367,6 @@ the convenience props give way to the compound anatomy.
   </Alert.Content>
 </Alert.Root>
 ```
-
-## Anatomy
-
-The convenience props (`title`/`description`/`icon`/`closable`) are a shortcut: when `Alert.Root`
-has **no `children`**, it auto-composes the parts below for you. Supply `children` and you take full
-control of the structure — the convenience props are then ignored. Both paths produce the same
-markup and the same accessibility wiring.
-
-<Preview>
-  <div class="flex w-full max-w-md flex-col gap-3">
-    <Alert.Root
-      colorScheme="info"
-      title="Convenience"
-      description="Auto-composed from title / description / icon props."
-    />
-    <Alert.Root colorScheme="info">
-      <Alert.Icon>
-        <InfoIcon />
-      </Alert.Icon>
-      <Alert.Content>
-        <Alert.Title>Compound</Alert.Title>
-        <Alert.Description>
-          Built from Alert.Icon / Content / Title / Description.
-        </Alert.Description>
-      </Alert.Content>
-    </Alert.Root>
-  </div>
-</Preview>
-
-```tsx title="Convenience — Root auto-composes"
-<Alert.Root colorScheme="info" title="Convenience" description="…" />
-```
-
-```tsx title="Compound — you compose the parts"
-<Alert.Root colorScheme="info">
-  <Alert.Icon>
-    <InfoIcon />
-  </Alert.Icon>
-  <Alert.Content>
-    <Alert.Title>Compound</Alert.Title>
-    <Alert.Description>
-      Built from Alert.Icon / Content / Title / Description.
-    </Alert.Description>
-  </Alert.Content>
-</Alert.Root>
-```
-
-<DataTable
-  columns={[
-    { key: "part", label: "Part", code: true },
-    { key: "element", label: "Element", code: true },
-    { key: "description", label: "Description" },
-  ]}
-  rows={[
-    {
-      part: "Alert.Root",
-      element: "div",
-      description:
-        "The alert surface and the state owner (open/dismiss, variant styling, ARIA wiring). Renders the live region.",
-    },
-    {
-      part: "Alert.Icon",
-      element: "span",
-      description:
-        "Wraps the leading glyph. Marked aria-hidden by default (decorative).",
-    },
-    {
-      part: "Alert.Content",
-      element: "div",
-      description: "Column wrapper for the title, description, and actions.",
-    },
-    {
-      part: "Alert.Title",
-      element: "div",
-      description:
-        "The heading. Self-registers its id as the alert's aria-labelledby.",
-    },
-    {
-      part: "Alert.Description",
-      element: "p",
-      description:
-        "The body prose. Self-registers its id as the alert's aria-describedby.",
-    },
-    {
-      part: "Alert.Actions",
-      element: "div",
-      description:
-        "A flex row for action buttons, placed inside Alert.Content below the text.",
-    },
-    {
-      part: "Alert.CloseTrigger",
-      element: "button",
-      description:
-        "A CloseButton wired to dismiss the alert. Rendered automatically by the closable prop.",
-    },
-  ]}
-/>
 
 ## Dismissible
 
@@ -633,7 +655,7 @@ below) in addition to the props below.
     {
       prop: "colorScheme",
       type: "AlertColorScheme",
-      default: '"neutral"',
+      default: '"primary"',
       description:
         "Semantic role: primary, neutral, info, success, warning, danger. info/success/warning/danger carry a built-in glyph; primary/neutral ship none.",
     },
