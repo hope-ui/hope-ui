@@ -3,7 +3,7 @@ import { Button } from "@hope-ui/components/button";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { InfoIcon, PaletteIcon } from "~/components/Icons";
-import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
 
 export const summary = "Restyle your app with presets.";
 
@@ -71,7 +71,7 @@ Color is organized into six **roles**, each a meaning rather than a hue:
 Each role expands into a small, predictable set of modifiers, all exposed as Tailwind utilities
 (`{role}` is any of the six above):
 
-<PropsTable
+<DataTable
   columns={[
     { key: "util", label: "Utility", code: true },
     { key: "paints", label: "What it paints" },
@@ -93,7 +93,7 @@ Each role expands into a small, predictable set of modifiers, all exposed as Tai
 
 Alongside the roles, a neutral vocabulary covers surfaces, text, borders, and system colors:
 
-<PropsTable
+<DataTable
   columns={[
     { key: "util", label: "Utility", code: true },
     { key: "paints", label: "What it paints" },

@@ -1,62 +1,41 @@
 import type { JSX } from "@solidjs/web";
+import { DataTable } from "./DataTable";
 
-// A compact, themeable data table for docs — the props/API, slots, and keyboard
-// tables all render through this one component.
-//
-// Why a component rather than a markdown table: this MDX pipeline has no
-// `remark-gfm`, so pipe-syntax tables never parse. Authoring the table as JSX (a
-// capitalized component the MDX imports) sidesteps that entirely, and gives full
-// control over styling with hope's semantic tokens.
-//
-// It is marked `not-prose` and owns its own styling, so @tailwindcss/typography
-// never restyles the cells; the horizontal `overflow-x-auto` wrapper keeps a wide
-// table from pushing the page body sideways on narrow viewports.
+// The API props table: three columns — Prop, Default, and Type — where the Type
+// cell stacks the type signature *above* its description rather than beside it,
+// so long descriptions get the full column width and the table stays readable on
+// narrow viewports. Built over `DataTable`, so it shares the table chrome,
+// em-dash empties, and code styling.
 
-/** One column: its data `key`, header `label`, and whether string cells render as `<code>`. */
-export type Column = { key: string; label: string; code?: boolean };
+/** One documented prop: its name, type, optional default, and optional description. */
+export type PropRow = {
+  prop: string;
+  type: string;
+  default?: string;
+  description?: string;
+};
 
-/** One row: a value per column key. A missing/empty value renders as an em dash. */
-export type Row = Record<string, string | JSX.Element>;
-
-// Cells default to plain strings (deterministic, hydration-safe). A `code` column
-// wraps a bare string in mono `<code>`; an already-built JSX cell passes through.
-function renderCell(value: string | JSX.Element | undefined, code: boolean): JSX.Element {
-  if (value == null || value === "") {
-    return <span class="text-foreground-subtle">—</span>;
-  }
-  if (code && typeof value === "string") {
-    return (
-      <code class="whitespace-nowrap rounded bg-surface-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
-        {value}
-      </code>
-    );
-  }
-  return value;
-}
-
-export function PropsTable(props: { columns: Column[]; rows: Row[] }): JSX.Element {
+export function PropsTable(props: { rows: PropRow[] }): JSX.Element {
   return (
-    <div class="not-prose my-6 overflow-x-auto rounded-lg border border-subtle">
-      <table class="w-full border-collapse text-left text-sm">
-        <thead>
-          <tr class="border-b border-subtle bg-surface-raised">
-            {props.columns.map((col) => (
-              <th class="px-4 py-2.5 font-semibold text-foreground">{col.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody class="bg-surface">
-          {props.rows.map((row) => (
-            <tr class="border-b border-subtle align-top last:border-0">
-              {props.columns.map((col) => (
-                <td class="px-4 py-2.5 leading-relaxed text-foreground-muted">
-                  {renderCell(row[col.key], col.code ?? false)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      columns={[
+        { key: "prop", label: "Prop", code: true },
+        { key: "default", label: "Default", code: true },
+        { key: "type", label: "Type" },
+      ]}
+      rows={props.rows.map((row) => ({
+        prop: row.prop,
+        default: row.default,
+        // Type on top (mono, emphasized), description stacked below (muted, wraps).
+        type: (
+          <div class="flex flex-col gap-1.5">
+            <code class="w-fit whitespace-nowrap rounded bg-surface-sunken px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground">
+              {row.type}
+            </code>
+            {row.description ? <span>{row.description}</span> : null}
+          </div>
+        ),
+      }))}
+    />
   );
 }

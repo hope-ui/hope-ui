@@ -8,6 +8,7 @@ import { BadgeMatrixDemo } from "~/components/demos/badge/BadgeMatrixDemo";
 import { BadgeStatusDemo } from "~/components/demos/badge/BadgeStatusDemo";
 import { InfoIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
 
 export const summary = "Inline label for statuses and counts.";
 
@@ -326,7 +327,7 @@ in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses
 Every part carries a `data-slot` attribute you can target, and each is addressable by name through
 `slotClasses`.
 
-<PropsTable
+<DataTable
   columns={[
     { key: "slot", label: "Slot", code: true },
     { key: "attr", label: "data-slot", code: true },
@@ -462,12 +463,6 @@ Because Badge is a static label, **every** styling axis is defaultable through `
 `Badge` accepts every native `<span>` attribute in addition to the props below.
 
 <PropsTable
-  columns={[
-    { key: "prop", label: "Prop", code: true },
-    { key: "type", label: "Type", code: true },
-    { key: "default", label: "Default", code: true },
-    { key: "description", label: "Description" },
-  ]}
   rows={[
     {
       prop: "variant",

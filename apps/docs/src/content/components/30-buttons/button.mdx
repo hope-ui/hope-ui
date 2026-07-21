@@ -8,6 +8,7 @@ import { ButtonIconsDemo } from "~/components/demos/button/ButtonIconsDemo";
 import { ButtonMatrixDemo } from "~/components/demos/button/ButtonMatrixDemo";
 import { InfoIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
 
 export const summary = "Trigger for actions and events.";
 
@@ -365,7 +366,7 @@ in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses
 Every part carries a `data-slot` attribute you can target, and each is addressable by name through
 `slotClasses`.
 
-<PropsTable
+<DataTable
   columns={[
     { key: "slot", label: "Slot", code: true },
     { key: "attr", label: "data-slot", code: true },
@@ -502,12 +503,6 @@ are intentionally **not** defaultable app-wide.
 `Button` accepts every native `<button>` attribute in addition to the props below.
 
 <PropsTable
-  columns={[
-    { key: "prop", label: "Prop", code: true },
-    { key: "type", label: "Type", code: true },
-    { key: "default", label: "Default", code: true },
-    { key: "description", label: "Description" },
-  ]}
   rows={[
     {
       prop: "variant",
@@ -639,7 +634,7 @@ out of the box. When you `render` it as another element with `nativeButton={fals
 the missing semantics itself: `role="button"`, tab-order management, and synthesized keyboard
 activation.
 
-<PropsTable
+<DataTable
   columns={[
     { key: "key", label: "Key", code: true },
     { key: "action", label: "Action" },
