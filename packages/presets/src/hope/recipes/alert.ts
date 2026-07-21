@@ -38,43 +38,46 @@ type ColoredAlertVariant = "solid" | "soft" | "subtle" | "outline";
 
 /*
  * Per-color, per-variant fills on the `root` slot — literal so Tailwind's `@source` scan emits them.
- * Identical to Badge's solid/soft/subtle/outline fills. The reserved 1px transparent border in the
- * `root` base means the bordered variants (subtle/outline) never shift a pixel relative to the others.
+ * Every variant carries an explicit border color so the `root` base's reserved 1px border is never a
+ * transparent gap to the page background: `solid`/`soft` match their own fill (`border-{role}` /
+ * `border-{role}-soft`), and `subtle`/`outline` carry the darker `-subtle-line` as a visible edge.
+ * (This is where Alert diverges from Badge, which still rides a transparent reserved border.) The 1px
+ * width is constant across every variant, so bordered and unbordered ones never shift a pixel.
  */
 const COLOR_CLASSES: Record<AlertColorScheme, Record<ColoredAlertVariant, string>> = {
   primary: {
-    solid: "bg-primary text-on-primary",
-    soft: "bg-primary-soft text-primary-emphasis",
+    solid: "bg-primary text-on-primary border-primary",
+    soft: "bg-primary-soft text-primary-emphasis border-primary-soft",
     subtle: "bg-primary-soft text-primary-emphasis border-primary-subtle-line",
     outline: "bg-transparent text-primary-emphasis border-primary-subtle-line",
   },
   neutral: {
-    solid: "bg-neutral text-on-neutral",
-    soft: "bg-neutral-soft text-neutral-emphasis",
+    solid: "bg-neutral text-on-neutral border-neutral",
+    soft: "bg-neutral-soft text-neutral-emphasis border-neutral-soft",
     subtle: "bg-neutral-soft text-neutral-emphasis border-neutral-subtle-line",
     outline: "bg-transparent text-neutral-emphasis border-neutral-subtle-line",
   },
   success: {
-    solid: "bg-success text-on-success",
-    soft: "bg-success-soft text-success-emphasis",
+    solid: "bg-success text-on-success border-success",
+    soft: "bg-success-soft text-success-emphasis border-success-soft",
     subtle: "bg-success-soft text-success-emphasis border-success-subtle-line",
     outline: "bg-transparent text-success-emphasis border-success-subtle-line",
   },
   info: {
-    solid: "bg-info text-on-info",
-    soft: "bg-info-soft text-info-emphasis",
+    solid: "bg-info text-on-info border-info",
+    soft: "bg-info-soft text-info-emphasis border-info-soft",
     subtle: "bg-info-soft text-info-emphasis border-info-subtle-line",
     outline: "bg-transparent text-info-emphasis border-info-subtle-line",
   },
   warning: {
-    solid: "bg-warning text-on-warning",
-    soft: "bg-warning-soft text-warning-emphasis",
+    solid: "bg-warning text-on-warning border-warning",
+    soft: "bg-warning-soft text-warning-emphasis border-warning-soft",
     subtle: "bg-warning-soft text-warning-emphasis border-warning-subtle-line",
     outline: "bg-transparent text-warning-emphasis border-warning-subtle-line",
   },
   danger: {
-    solid: "bg-danger text-on-danger",
-    soft: "bg-danger-soft text-danger-emphasis",
+    solid: "bg-danger text-on-danger border-danger",
+    soft: "bg-danger-soft text-danger-emphasis border-danger-soft",
     subtle: "bg-danger-soft text-danger-emphasis border-danger-subtle-line",
     outline: "bg-transparent text-danger-emphasis border-danger-subtle-line",
   },
@@ -119,16 +122,18 @@ const defaultRoleCompoundVariants = COLOR_SCHEMES.map((colorScheme) => ({
 export const alertRecipe = tv({
   slots: {
     // A horizontal flex row: icon, content (flex-1), close trigger. `items-start` top-aligns the icon
-    // with the first line of text. `border border-transparent bg-clip-padding` reserves a 1px border so
-    // the bordered variants never shift a pixel. The exit fade+slide is keyed on the `data-exiting:`
-    // custom variant (→ `[data-presence="exiting"]`, the presence status the component writes to
-    // `data-presence`); `motion-reduce` drops it. Transition `opacity` + `translate`, NOT `transform`:
-    // Tailwind v4 compiles `-translate-y-1` to the standalone `translate` CSS property (not `transform`),
-    // so `transition-transform` would never animate the 4px slide — only the fade. `opacity-0` is
-    // full-transparent (allowed); only magic `opacity-1..99` violates recipe purity.
+    // with the first line of text. The bare `border` reserves a 1px border WIDTH so bordered and
+    // unbordered variants never shift a pixel; the border COLOR is supplied by every variant (see
+    // `COLOR_CLASSES` and the `default` variant), so the reserved edge is a real, fill-matched line
+    // rather than a transparent gap to the page background — no `bg-clip-padding` needed. The exit
+    // fade+slide is keyed on the `data-exiting:` custom variant (→ `[data-presence="exiting"]`, the
+    // presence status the component writes to `data-presence`); `motion-reduce` drops it. Transition
+    // `opacity` + `translate`, NOT `transform`: Tailwind v4 compiles `-translate-y-1` to the standalone
+    // `translate` CSS property (not `transform`), so `transition-transform` would never animate the 4px
+    // slide — only the fade. `opacity-0` is full-transparent (allowed); only magic `opacity-1..99`
+    // violates recipe purity.
     root: [
-      "relative flex w-full items-start rounded-xl",
-      "border border-transparent bg-clip-padding",
+      "relative flex w-full items-start rounded-lg border",
       "transition-[opacity,translate] duration-200 ease-out motion-reduce:transition-none",
       "data-exiting:opacity-0 data-exiting:-translate-y-1",
     ],
@@ -138,11 +143,8 @@ export const alertRecipe = tv({
     icon: "inline-flex shrink-0 items-center justify-center",
     content: "flex min-w-0 flex-1 flex-col",
     title: "font-medium",
-    // The body prose. A comfortable line height for multi-line text — deliberately **color-neutral**
-    // (no `text-*`) so it inherits the root's content color: `text-foreground` in `default`, and the
-    // role/on-color the colored variants set on the root (`text-success-emphasis`, `text-on-success`, …).
-    description: "leading-relaxed",
-    actions: "flex flex-wrap items-center",
+    description: null,
+    actions: "flex flex-wrap items-center mt-2 gap-2",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
     closeTrigger: "-me-1 -mt-1 ms-auto shrink-0",
@@ -150,22 +152,19 @@ export const alertRecipe = tv({
   variants: {
     size: {
       sm: {
-        root: "gap-2 p-3 text-sm",
-        icon: "[&_svg]:size-4 mt-0.5",
+        root: "gap-2.5 p-3.5 text-xs",
+        icon: "[&_svg]:size-4",
         content: "gap-0.5",
-        actions: "mt-2 gap-2",
       },
       md: {
         root: "gap-3 p-4 text-sm",
         icon: "[&_svg]:size-5",
-        content: "gap-1",
-        actions: "mt-3 gap-3",
+        content: "gap-0.5",
       },
       lg: {
-        root: "gap-4 p-5 text-base",
+        root: "gap-3.5 p-4.5 text-base",
         icon: "[&_svg]:size-6",
-        content: "gap-1",
-        actions: "mt-4 gap-4",
+        content: "gap-0.5",
       },
     },
     variant: {

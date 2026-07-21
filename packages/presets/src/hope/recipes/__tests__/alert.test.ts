@@ -40,17 +40,21 @@ describe("hope alert recipe", () => {
     assertSlotRecipeConformance(alertRecipe, { cases, slots: SLOTS });
   });
 
-  it("wires solid to the role fill + on-color text on root", () => {
+  it("wires solid to the role fill + on-color text + a fill-matched border on root", () => {
     const solid = alertRecipe({ variant: "solid", colorScheme: "danger" }).root();
     expect(solid).toContain("bg-danger");
     expect(solid).toContain("text-on-danger");
+    // solid's reserved border is the role color itself, so the fill reaches the outer edge cleanly.
+    expect(solid).toContain("border-danger");
   });
 
-  it("wires soft to the tonal fill + role content color on root", () => {
+  it("wires soft to the tonal fill + role content color + a fill-matched border on root", () => {
     const soft = alertRecipe({ variant: "soft", colorScheme: "primary" }).root();
     expect(soft).toContain("bg-primary-soft");
     expect(soft).toContain("text-primary-emphasis");
-    // soft has no border tint — that is the `subtle` variant.
+    // soft's reserved border matches its own fill (closing the page-bg gap), not the darker
+    // `-subtle-line` edge the `subtle` variant uses.
+    expect(soft).toContain("border-primary-soft");
     expect(soft).not.toContain("border-primary-subtle-line");
   });
 
@@ -96,11 +100,20 @@ describe("hope alert recipe", () => {
     expect(root).toContain("data-exiting:opacity-0");
   });
 
-  it("reserves a transparent border on the root so bordered variants never shift a pixel", () => {
+  it("reserves a fill-matched 1px border on every variant so none shifts a pixel (no transparent gap)", () => {
+    // The reserved border is now a real, fill-matched color — never a transparent gap to the page bg,
+    // so `bg-clip-padding` is gone too.
     const solid = alertRecipe({ variant: "solid", colorScheme: "primary" }).root();
-    expect(solid).toContain("border");
-    expect(solid).toContain("border-transparent");
-    expect(solid).toContain("bg-clip-padding");
+    expect(solid).toMatch(/(?:^|\s)border(?:\s|$)/); // the 1px width utility from the base
+    expect(solid).toContain("border-primary");
+    expect(solid).not.toContain("border-transparent");
+    expect(solid).not.toContain("bg-clip-padding");
+    // Every variant carries a 1px border width, so bordered and unbordered ones align to the pixel.
+    for (const variant of VARIANTS) {
+      expect(alertRecipe({ variant, colorScheme: "primary" }).root()).toMatch(
+        /(?:^|\s)border(?:\s|$)/,
+      );
+    }
   });
 
   it("scales the box + glyph per size", () => {

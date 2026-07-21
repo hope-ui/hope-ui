@@ -133,6 +133,8 @@ describe("Alert", () => {
     const cls = container.querySelector('[data-slot="alert"]')?.className ?? "";
     expect(cls).toContain("bg-danger");
     expect(cls).toContain("text-on-danger");
+    // The reserved border matches the fill, so the solid surface reaches the outer edge cleanly.
+    expect(cls).toContain("border-danger");
     dispose();
   });
 
