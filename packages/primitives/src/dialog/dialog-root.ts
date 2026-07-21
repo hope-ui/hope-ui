@@ -1,5 +1,5 @@
 import { type Accessor, createSignal, createUniqueId } from "solid-js";
-import { createControllableState } from "../internal";
+import { createControllableState, createPresence, type PresenceState } from "../internal";
 import { withDefaults } from "../utils";
 
 /**
@@ -12,14 +12,27 @@ import { withDefaults } from "../utils";
  * this once and shares the return on context; a headless consumer holds it and threads it into
  * whichever part hooks it needs.
  *
- * Deliberately does **not** own presence, refs, or the focus/dismiss/hide-outside/scroll effect
- * stack: those belong to the part that renders the corresponding element (`createDialogContent` /
- * `createDialogBackdrop`), so each effect lives in that element's own scope and tears down when it
+ * Owns the **shared overlay presence** (`contentPresence`) and the content element ref
+ * (`contentElement`), because these are the one piece of dialog behavior that must be created
+ * *eagerly* (while closed) and shared across parts. `Dialog.Content` is mounted lazily — only once
+ * open — so a presence created inside `createDialogContent` would see `present` already `true` on
+ * its first run and latch straight to `"entered"`, skipping the enter animation. Created here, its
+ * first run observes `open === false`, so opening drives `entering → entered`. Both the content and
+ * the (transition-less) positioner consume this one presence; `createDialogBackdrop` keeps its own
+ * (the backdrop is mounted eagerly, so per-part is correct there). Mirrors Ark UI's split.
+ *
+ * Deliberately does **not** own the focus/dismiss/hide-outside/scroll effect **stack**, nor the
+ * per-part refs those effects read: those belong to the part that renders the element
+ * (`createDialogContent`), so each effect lives in that element's own scope and tears down when it
  * unmounts. This split mirrors React Aria's `useDialog`/`useOverlay*` decomposition (its public
  * surface and a11y reasoning, not its code).
  *
  * Call it **once**, inside a reactive owner scope (a component body, or a `createRoot`).
  */
+
+/** The dialog's ARIA role. `alertdialog` is the APG destructive-confirmation pattern. */
+export type DialogRole = "dialog" | "alertdialog";
+
 export interface CreateDialogOptions {
   /** Controlled open state. Omit for uncontrolled use via `defaultOpen`. For reactive control,
    * pass a getter (`get open() { return signal(); }`), exactly as a component prop would. */
@@ -45,6 +58,12 @@ export interface CreateDialogOptions {
    * to `createDismissable`'s `dismissOnOutsidePointerDown`. Default `true`.
    */
   closeOnInteractOutside?: boolean;
+  /**
+   * ARIA role — `"dialog"` (default) or `"alertdialog"` (the APG destructive-confirmation pattern).
+   * An accessibility concern, so it lives on the state hook (not the styling layer): `createDialogContent`
+   * reads it for the surface's `role` attribute.
+   */
+  role?: DialogRole;
 }
 
 export interface CreateDialogReturn {
@@ -54,6 +73,8 @@ export interface CreateDialogReturn {
   setOpen: (open: boolean) => void;
   /** Whether the dialog is modal. */
   modal: Accessor<boolean>;
+  /** The ARIA role (`"dialog"` | `"alertdialog"`). Read by `createDialogContent` for the surface. */
+  role: Accessor<DialogRole>;
   /** `open() && modal()` — the gate every modal-only behavior keys off. */
   isModal: Accessor<boolean>;
   /** Whether Escape closes the dialog. Read by `createDialogContent`'s `createDismissable`. */
@@ -82,6 +103,16 @@ export interface CreateDialogReturn {
   addSparedElement: (element: Element) => void;
   /** Remove an element from the spared set. */
   removeSparedElement: (element: Element) => void;
+
+  /** The content element. Set via `createDialogContent`'s `setRef`; read by the shared presence
+   * (exit timing) and the content's focus/dismiss effects. */
+  contentElement: Accessor<HTMLElement | undefined>;
+  /** Register the content element. Wired to `createDialogContent`'s `setRef`. */
+  setContentElement: (element: HTMLElement | undefined) => void;
+  /** The **shared** overlay presence for `Content` + `Positioner` (see this hook's doc). Gate their
+   * render on `mounted()` and drive `data-presence` off `status()`. Created eagerly here so the
+   * enter animation fires. `Backdrop` keeps its own. */
+  contentPresence: PresenceState;
 }
 
 export function createDialog(options: CreateDialogOptions = {}): CreateDialogReturn {
@@ -93,6 +124,7 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     modal: true,
     closeOnEscape: true,
     closeOnInteractOutside: true,
+    role: "dialog" as DialogRole,
   });
 
   const [open, setOpen] = createControllableState<boolean>({
@@ -104,6 +136,7 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   const isModal = () => open() && modal();
   const closeOnEscape = () => merged.closeOnEscape;
   const closeOnInteractOutside = () => merged.closeOnInteractOutside;
+  const role = () => merged.role;
 
   // The generated id is the server-visible fallback: `createRegisteredId` never runs during SSR,
   // so a consumer-pinned id can't be registered server-side. This is the only `createUniqueId`
@@ -122,6 +155,12 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
   const removeSparedElement = (element: Element) =>
     setSparedElements((previous) => previous.filter((candidate) => candidate !== element));
 
+  // The content element + the ONE shared overlay presence. Created after `createUniqueId` above so
+  // the trigger's SSR hydration key is unaffected by the id `createPresence` reserves. Eager
+  // (created while `open` is `false`) so opening drives `entering → entered` — see this hook's doc.
+  const [contentElement, setContentElement] = createSignal<HTMLElement>();
+  const contentPresence = createPresence({ present: open, ref: contentElement });
+
   return {
     open,
     setOpen,
@@ -129,6 +168,7 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     isModal,
     closeOnEscape,
     closeOnInteractOutside,
+    role,
     popupId,
     setPopupId: setCustomPopupId,
     titleId,
@@ -138,5 +178,8 @@ export function createDialog(options: CreateDialogOptions = {}): CreateDialogRet
     sparedElements,
     addSparedElement,
     removeSparedElement,
+    contentElement,
+    setContentElement: (element) => setContentElement(element),
+    contentPresence,
   };
 }

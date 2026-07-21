@@ -13,16 +13,24 @@ function createDialogContent(
   },
 ): {
   props: JSX.HTMLAttributes<HTMLDivElement> & { "data-presence": string };
-  mounted: Accessor<boolean>;               // gate the content's render on this
-  setRef: (element: HTMLDivElement) => void; // hand to the content element's ref
+  mounted: Accessor<boolean>;                 // gate the content's render on this
+  setRef: (element: HTMLDivElement) => void;  // registers the element on `state`
 };
 ```
 
-Owns presence and the full effect stack, all created in this hook's (the content's) scope so each
-tears down when the content unmounts:
+**Reflects the shared presence; does not create one.** `createDialog` owns the single shared overlay
+presence (`state.contentPresence`) eagerly; this hook *mirrors* it — `mounted` and the `data-presence`
+attribute come straight from `state.contentPresence`, and `setRef` registers the element on
+`state.setContentElement` so that presence can time its exit off it. Creating a presence *here* would
+break the enter animation: this part is mounted lazily on open, so a presence created here would see
+`present` already `true` on its first run and latch straight to `entered` (never `entering`), so the
+CSS enter transition never fires. The Positioner consumes the same `state.contentPresence`;
+`createDialogBackdrop` (eagerly mounted) keeps its own. Mirrors Ark. See
+[`create-presence.md`](../../internal/create-presence.md) and [`dialog-root.md`](./dialog-root.md).
 
-- `createPresence` — drives `mounted()` (stays mounted through an exit transition) and the
-  `data-presence` attribute.
+Owns the full effect stack, all created in this hook's (the content's) scope so each tears down when
+the content unmounts:
+
 - `createFocusRestore` (gated on `open()`) → `createFocusTrap` → `createHideOutside` (both gated on
   `isModal()`) → `createDismissable` (Escape / outside pointerdown) → `createScrollLock`. **Creation
   order is load-bearing**: focus-restore must precede the trap and hide-outside so its
@@ -45,8 +53,10 @@ reads it.
 Also registers a consumer-supplied `props.id` as the content id (feeds the trigger's `aria-controls`)
 via `createRegisteredId`.
 
-Returned `props`: `id`/`role`/`aria-labelledby`/`aria-describedby` fall back to the consumer's value
-with `??` against the resolved state accessors (a blind default would strip a consumer's accessible
-name); `aria-modal` (present only while modal) and `data-presence` are owned here. `role` defaults to
-`"dialog"` but honors a consumer `role="alertdialog"` — the styled `@hope-ui/components` `Dialog`
-lifts `role` to `Dialog.Root` and threads it here via context.
+Returned `props`: `id`/`aria-labelledby`/`aria-describedby` fall back to the consumer's value with `??`
+against the resolved state accessors (a blind default would strip a consumer's accessible name);
+`aria-modal` (present only while modal) and `data-presence` (mirroring `state.contentPresence.status()`)
+are owned here. `role` is `props.role ?? state.role()` — a direct consumer `role` on the content still
+wins, otherwise it comes from `createDialog`'s `role` option (default `"dialog"`, or `"alertdialog"`).
+The styled `@hope-ui/components` `Dialog` sets `role` once on `Dialog.Root` (→ `createDialog`), so the
+component layer threads nothing.

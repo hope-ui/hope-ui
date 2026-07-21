@@ -11,7 +11,7 @@ export interface DialogTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement>
 
 export const Title: Component<DialogTitleProps> = (props) => {
   const ctx = useDialogContext();
-  const title = createDialogTitle(ctx, omit(props, "render", "class"));
+  const title = createDialogTitle(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(title.props, {
     get class(): string {

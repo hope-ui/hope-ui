@@ -362,6 +362,27 @@ them rather than re-deriving a behavior in a comment.
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).
 
+**Primitives own ALL the a11y + business logic; components are assembly + theme only.** The rule of
+thumb: a primitive family (`@hope-ui/primitives`) must be built so that the *same* accessibility and
+behavior experience a `@hope-ui/components` component ships can be reproduced with the **primitives
+alone** — no behavior smuggled into the component layer. That means `@hope-ui/components` is *only*
+(a) assembly of the primitive part-hooks into JSX, and (b) recipe/theme consumption
+(`useRecipe`/`useSlots`/`cx`). Concretely:
+- **Presence, focus, dismissal, scroll-lock, ids, ARIA roles/attributes, controlled state — all live
+  in the primitive.** If you catch yourself creating a `createPresence`/`createFocusTrap`/etc. or
+  computing an ARIA attribute (e.g. `role`) *in the component*, it's in the wrong layer — move it into
+  the `createX` hook (a per-part hook, or the root state hook when it must be shared/eager). A test
+  running in node is **not** a reason to keep logic out of a primitive: convert the test to a browser
+  test (`*.browser.test.tsx`) instead — the environment follows the design, never the reverse.
+  (Worked example: the Dialog overlay presence must be created *eagerly* and shared by Content +
+  Positioner, so it lives in `createDialog` — the root state hook — not in `Dialog.Root`; `createDialog`'s
+  test moved node→browser as a result. A per-part, eagerly-mounted presence like the backdrop's stays
+  in its own part hook, `createDialogBackdrop`.)
+- **Prefer composition over inheritance.** A component context *holds* the primitive state as a field
+  (`{ state: CreateDialogReturn; slots }`), it does **not** `extends CreateDialogReturn`. Parts read
+  `ctx.state.*` for behavior and `ctx.slots.*` for classes, so the styling layer never masquerades as
+  the primitive return, and the "what's behavior vs. what's theme" split stays visible at every call site.
+
 **Composition rule for future components:** compose shared *behavior* from
 `@hope-ui/primitives` and styling through `@hope-ui/theming`. A component **may** import and
 reuse a sibling component's subpath (e.g. `Dialog.CloseTrigger` renders `@hope-ui/components/close-button`,

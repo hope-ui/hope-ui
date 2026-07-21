@@ -1,4 +1,8 @@
-import { type CreateDialogOptions, createDialog } from "@hope-ui/primitives/dialog";
+import {
+  type CreateDialogOptions,
+  createDialog,
+  type DialogRole,
+} from "@hope-ui/primitives/dialog";
 import type {
   DialogPlacement,
   DialogScrollBehavior,
@@ -7,11 +11,8 @@ import type {
 } from "@hope-ui/theming";
 import { type DialogThemeableProps, useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { type Component, createSignal } from "solid-js";
+import type { Component } from "solid-js";
 import { DialogContext, type DialogContextValue } from "./dialog-context";
-
-/** The ARIA role of the dialog. `alertdialog` is the APG destructive-confirmation pattern. */
-export type DialogRole = "dialog" | "alertdialog";
 
 /**
  * `DialogRootProps` = the primitive's `CreateDialogOptions` (open/modal/dismissal behavior) **plus**
@@ -20,11 +21,12 @@ export type DialogRole = "dialog" | "alertdialog";
  * the recipe variants and this surface in lockstep by construction.
  *
  * `Root` renders **no host element** — it resolves the recipe variants once and shares the slot class
- * fns (and `role`) on context, exactly as `Alert.Root` distributes its `slots`. Every styled part
- * reads `ctx.slots.<slot>()` through its own `class` getter.
+ * fns on context, exactly as `Alert.Root` distributes its `slots`. Every styled part reads
+ * `ctx.slots.<slot>()` through its own `class` getter.
  */
 export interface DialogRootProps extends CreateDialogOptions, DialogThemeableProps {
-  /** ARIA role. `alertdialog` for a destructive confirmation. Default `dialog`. Threaded to `Content`. */
+  /** ARIA role. `alertdialog` for a destructive confirmation. Default `dialog`. Read by `Content`
+   * off `ctx.state.role()` — `role` is a `CreateDialogOptions` field (an a11y concern on the state). */
   role?: DialogRole;
   /**
    * Per-instance class overrides, keyed by slot (`backdrop`/`content`/`header`/`body`/`footer`/
@@ -39,10 +41,11 @@ export interface DialogRootProps extends CreateDialogOptions, DialogThemeablePro
 }
 
 /**
- * The Dialog root. Calls `createDialog` once for the shared state (open/modal/ids/spared registry),
- * resolves the recipe variants via `useDefaults` + `useSlots`, and puts both — state, slot class fns,
- * and `role` — on context. Renders only the provider (no host element), so the trigger's SSR
- * hydration key is unaffected.
+ * The Dialog root. Calls `createDialog` once for the shared state (open/modal/role/ids/spared
+ * registry + the shared overlay presence), resolves the recipe variants via `useDefaults` +
+ * `useSlots`, and puts the state and slot class fns on context (composition — `ctx.state` + `ctx.slots`,
+ * not an extended state). Renders only the provider (no host element), so the trigger's SSR hydration
+ * key is unaffected.
  *
  * Because it reads a recipe, a `Dialog.Root` now **requires a `<ThemeProvider>`** ancestor (fed a
  * preset), like every other styled component.
@@ -63,11 +66,7 @@ export const Root: Component<DialogRootProps> = (props) => {
 
   const slots = useSlots({
     recipe: "dialog",
-    variantsProps: (): {
-      size: DialogSize;
-      placement: DialogPlacement;
-      scrollBehavior: DialogScrollBehavior;
-    } => ({
+    variantsProps: () => ({
       size: merged.size,
       placement: merged.placement,
       scrollBehavior: merged.scrollBehavior,
@@ -76,24 +75,23 @@ export const Root: Component<DialogRootProps> = (props) => {
     class: () => merged.class,
   });
 
-  // Published by `Dialog.Content` (via its composed ref) so `Dialog.Positioner` can time its exit
-  // off the Content's transition rather than its own (the Positioner has none).
-  const [contentElement, setContentElement] = createSignal<HTMLElement>();
-
   // `createDialog` reads only its own option keys off `merged` (open/defaultOpen/onOpenChange/modal/
-  // closeOn*) — the defaulted layout axes ride along harmlessly. Pass `merged`, not raw `props`:
+  // role/closeOn*) — the defaulted layout axes ride along harmlessly. Pass `merged`, not raw `props`:
   // `useDefaults` exposes its defaults as getters over `props`, so `merged` stays just as lazy and
   // reactive (the controllable-state getters stay live) while remaining the single source of truth.
+  //
+  // Composition, not inheritance: the context *holds* the primitive state as `state`. All a11y +
+  // behavior — open/modal/role, ids, and the shared overlay presence + content-element ref — lives
+  // there (the kernel). This component contributes only `slots` (recipe/theme). `Content`/`Positioner`
+  // read `ctx.state.contentPresence`; `Backdrop` owns its own presence.
   const context: DialogContextValue = {
-    ...createDialog(merged),
+    state: createDialog(merged),
     slots,
-    role: () => merged.role,
-    contentElement,
-    setContentElement: (el) => setContentElement(el),
   };
 
   return <DialogContext value={context}>{merged.children}</DialogContext>;
 };
 
-// Re-export the recipe vocabulary so consumers can import it from the component's subpath.
-export type { DialogPlacement, DialogScrollBehavior, DialogSize };
+// Re-export the recipe vocabulary + the ARIA role type so consumers can import them from the
+// component's subpath (`DialogRole` originates in the primitive, an a11y concern).
+export type { DialogPlacement, DialogRole, DialogScrollBehavior, DialogSize };

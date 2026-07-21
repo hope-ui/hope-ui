@@ -11,8 +11,8 @@ export interface DialogTriggerProps extends JSX.ButtonHTMLAttributes<HTMLButtonE
 // The trigger carries no recipe slot — a consumer usually renders their own `Button` via `render`, so
 // the dialog chrome stays on the surface parts. It only wires the primitive's ARIA + open handler.
 export const Trigger: Component<DialogTriggerProps> = (props) => {
-  const state = useDialogContext();
-  const trigger = createDialogTrigger(state, omit(props, "render"));
+  const ctx = useDialogContext();
+  const trigger = createDialogTrigger(ctx.state, omit(props, "render"));
 
   return renderElement<JSX.ButtonHTMLAttributes<HTMLButtonElement>>({
     as: "button",

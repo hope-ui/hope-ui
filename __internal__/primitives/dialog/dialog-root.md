@@ -10,17 +10,34 @@ one subpath, `@hope-ui/primitives/dialog`.
 | `createDialog(options)` | Shared state: open/modal, the content/title/description ids, the spared-element registry. Renders nothing. Call **once**. |
 | `createDialogTrigger(state, props)` | The trigger's ARIA + open handler. |
 | `createDialogPortal(state)` | The pointer-blocking modal backdrop's spare registration + `showModalBackdrop` gate. |
-| `createDialogBackdrop(state, props)` | Optional visible backdrop: presence + spare registration. |
-| `createDialogContent(state, props)` | The surface, and the effect hub: presence + focus-restore/focus-trap/hide-outside/dismiss/scroll-lock. |
+| `createDialogBackdrop(state, props)` | Optional visible backdrop: owns its **own** presence + spare registration. |
+| `createDialogContent(state, props)` | The surface, and the effect hub: focus-restore/focus-trap/hide-outside/dismiss/scroll-lock. Does **not** own presence (see below). |
 | `createDialogTitle(state, props)` | Registers its id on the content's `aria-labelledby`. |
 | `createDialogDescription(state, props)` | Registers its id on the content's `aria-describedby`. |
 | `createDialogCloseTrigger(state, props)` | The close handler. |
 
 Each part hook takes the `createDialog` return (`state`) plus its own props, owns that part's
 effects / id-and-element registration / consumer-prop precedence, and returns spreadable `props`
-(plus a `setRef` and a presence `mounted` accessor for the content/backdrop). This is why the effect
-stack lives in `createDialogContent` (the content's scope), not the root: each effect tears down when
-the content unmounts.
+(plus a `setRef` for the content/backdrop). This is why the effect stack lives in
+`createDialogContent` (the content's scope), not the root: each effect tears down when the content
+unmounts.
+
+**The shared overlay presence lives on `createDialog` itself**, not a part hook. The content is
+mounted lazily (only once open), so a presence created inside `createDialogContent` would see
+`present` already `true` on its first run and latch straight to `entered` — the card would never
+animate in. So the root hook creates **one** shared presence eagerly
+(`createPresence({ present: open, ref: contentElement })`) and exposes it as `contentPresence` (plus
+the `contentElement` ref it times off). `createDialogContent` and the Positioner both consume it —
+gate render on `contentPresence.mounted()`, drive `data-presence` off `contentPresence.status()`.
+`createDialogBackdrop` keeps its **own** presence (the backdrop is mounted eagerly, so its first run
+correctly sees `present === false`). This split — shared Content/Positioner presence on the root,
+separate Backdrop presence per-part — mirrors Ark UI. Because presence is a11y/behavior it belongs in
+the kernel, so `createDialog`'s test is a browser test (`createPresence` needs a DOM + owner + rAF) —
+the test environment follows the responsibility split, not the reverse.
+
+`role` lives here too (`CreateDialogOptions.role` → `state.role()`): it is an **ARIA** concern, so
+`createDialogContent` reads it for the surface's `role` attribute rather than the component threading
+it in. The component layer contributes only recipe classes.
 
 ## `createDialog(options)`
 

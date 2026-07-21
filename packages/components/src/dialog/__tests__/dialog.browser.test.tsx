@@ -180,10 +180,15 @@ describe("Dialog", () => {
     const dialog = page.getByRole("dialog").element();
     const backdrop = page.getByTestId("backdrop").element();
 
-    // `entering` on the first frame, `entered` on the next animation frame. That attribute
-    // change is what makes a CSS transition actually fire.
-    await vi.waitFor(() => expect(dialog.getAttribute("data-presence")).toBe("entered"));
-    expect(backdrop.getAttribute("data-presence")).toBe("entered");
+    // `entering` first, then `entered` once the browser has painted the entering frame (a double
+    // rAF — see create-presence.md), which is what makes the enter CSS transition actually fire.
+    // Popup and Backdrop are *independent* `createPresence` instances, so their flips to `entered`
+    // aren't guaranteed to land in the same tick — wait for both rather than asserting one off the
+    // other's timing.
+    await vi.waitFor(() => {
+      expect(dialog.getAttribute("data-presence")).toBe("entered");
+      expect(backdrop.getAttribute("data-presence")).toBe("entered");
+    });
 
     dispose();
   });

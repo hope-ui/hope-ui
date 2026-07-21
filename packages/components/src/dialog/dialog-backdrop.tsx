@@ -13,7 +13,7 @@ export interface DialogBackdropProps extends JSX.HTMLAttributes<HTMLDivElement> 
 // the recipe's `backdrop` slot merged with any consumer `class` (which wins via tailwind-merge).
 export const Backdrop: Component<DialogBackdropProps> = (props) => {
   const ctx = useDialogContext();
-  const backdrop = createDialogBackdrop(ctx, omit(props, "render", "class"));
+  const backdrop = createDialogBackdrop(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(backdrop.props, {
     get class(): string {

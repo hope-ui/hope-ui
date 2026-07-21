@@ -1,4 +1,3 @@
-import { createPresence } from "@hope-ui/primitives/internal";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
@@ -11,12 +10,13 @@ export interface DialogPositionerProps extends JSX.HTMLAttributes<HTMLDivElement
 
 // The fixed, full-viewport scroll container that centers/positions the Content card. Required wrapper:
 // Portal > Backdrop + Positioner > Content. Because it is `fixed inset-0`, it unmounts when closed (an
-// empty full-viewport wrapper would block the page). Its presence is timed off the Content element
-// (published on context), NOT its own — the Positioner has no transition of its own, so a self-timed
-// createPresence would report exit-done immediately and cut the Content's exit animation short.
+// empty full-viewport wrapper would block the page). It shares the Content's presence
+// (`ctx.state.contentPresence`, owned by `createDialog` and timed off the Content element), NOT its
+// own — the Positioner has no transition of its own, so a self-timed presence would report exit-done
+// immediately and cut the Content's exit animation short. Sharing it also keeps the frame mounted
+// exactly as long as the card, and is what lets that card animate in (see `dialog-context.ts`).
 export const Positioner: Component<DialogPositionerProps> = (props) => {
   const ctx = useDialogContext();
-  const presence = createPresence({ present: ctx.open, ref: ctx.contentElement });
 
   const elementProps = merge(omit(props, "render", "class"), {
     get class(): string {
@@ -24,12 +24,12 @@ export const Positioner: Component<DialogPositionerProps> = (props) => {
     },
     "data-slot": "dialog-positioner",
     get "data-presence"(): string {
-      return presence.status();
+      return ctx.state.contentPresence.status();
     },
   });
 
   return (
-    <Show when={presence.mounted()}>
+    <Show when={ctx.state.contentPresence.mounted()}>
       {renderElement<JSX.HTMLAttributes<HTMLDivElement>, HTMLDivElement>({
         as: "div",
         render: props.render,

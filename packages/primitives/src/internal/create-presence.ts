@@ -97,8 +97,26 @@ export function createPresence(options: CreatePresenceOptions): PresenceState {
           return;
         }
         setStatus("entering");
-        const frame = requestAnimationFrame(() => setStatus("entered"));
-        return () => cancelAnimationFrame(frame);
+        // Flip to `entered` only after the browser has painted the `entering` frame, so an authored
+        // CSS *transition* has a prior value to animate from. A SINGLE rAF is not enough here: the
+        // element is inserted (as `entering`) and the rAF is scheduled in the *same task*, so the
+        // rAF runs at the next frame's rendering step *before* that frame's first style recalc — the
+        // element's first-ever computed style is already `entered`, and a transition with no painted
+        // prior value never fires (the "content appears instantly, enter animation skipped" bug).
+        // The inner rAF flips a frame later, after `entering` has been recalculated and painted, so
+        // `entering → entered` is a real change the transition animates. Keyframe *animations* (à la
+        // reka-ui) run on mount without a prior value and wouldn't need this; base-ui, which uses
+        // transitions like us, gets away with one rAF only because React commits/paints the starting
+        // frame in a cycle *before* the rAF — mount and rAF don't share a task there. See
+        // create-presence.md.
+        let innerFrame = 0;
+        const outerFrame = requestAnimationFrame(() => {
+          innerFrame = requestAnimationFrame(() => setStatus("entered"));
+        });
+        return () => {
+          cancelAnimationFrame(outerFrame);
+          cancelAnimationFrame(innerFrame);
+        };
       }
 
       setStatus("exiting");

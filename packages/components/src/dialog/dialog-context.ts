@@ -1,24 +1,21 @@
 import type { CreateDialogReturn } from "@hope-ui/primitives/dialog";
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { DialogSlot } from "@hope-ui/theming";
-import type { Accessor } from "solid-js";
 
 /**
- * The value every Dialog part reads. An **intersection** of the primitive's `CreateDialogReturn`
- * (open/modal/ids/spared-element registry) with the styling layer `Dialog.Root` adds: `slots` (one
- * ready-to-call class fn per recipe slot, from `useSlots`) and `role` (the ARIA role lifted to
- * `Dialog.Root` and threaded to `Dialog.Content`). Because it extends `CreateDialogReturn`, a part
- * passes the whole context straight into its `createDialogX(state, …)` hook — the hook reads only the
- * `CreateDialogReturn` fields and ignores the two styling additions.
+ * The value every Dialog part reads. **Composition, not inheritance**: it *holds* the primitive
+ * state as `state` (open/modal/role/ids/spared registry, the content-element ref, and the shared
+ * `contentPresence`) rather than extending `CreateDialogReturn`, so the styling layer never
+ * masquerades as the primitive return. A part passes `ctx.state` into its `createDialogX(state, …)`
+ * hook, and reads recipe classes off `ctx.slots`. All a11y/behavior (including `role`) lives on
+ * `ctx.state`; the component layer contributes only `slots`.
  */
-export interface DialogContextValue extends CreateDialogReturn {
+export interface DialogContextValue {
+  /** The primitive dialog state — open/modal/role/ids/spared registry, the content-element ref, and
+   * the shared overlay `contentPresence`. Passed straight into each part's `createDialogX(state, …)`. */
+  state: CreateDialogReturn;
   /** One ready-to-call class fn per Dialog slot, resolved once on `Root` and shared here. */
   slots: Record<DialogSlot, () => string>;
-  /** The ARIA role, set on `Root` and read by `Content` (`"dialog"` or `"alertdialog"`). */
-  role: () => "dialog" | "alertdialog";
-  /** The Content element, published by `Dialog.Content` so `Dialog.Positioner` can time its exit. */
-  contentElement: Accessor<HTMLElement | undefined>;
-  setContentElement: (el: HTMLElement | undefined) => void;
 }
 
 export const [DialogContext, useDialogContext] =

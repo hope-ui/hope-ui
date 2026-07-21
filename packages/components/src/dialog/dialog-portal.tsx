@@ -21,8 +21,8 @@ export const Portal: Component<DialogPortalProps> = (props) => {
     return null;
   }
 
-  const state = useDialogContext();
-  const portal = createDialogPortal(state);
+  const ctx = useDialogContext();
+  const portal = createDialogPortal(ctx.state);
 
   return (
     <SolidPortal mount={props.mount}>

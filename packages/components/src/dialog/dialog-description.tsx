@@ -11,7 +11,7 @@ export interface DialogDescriptionProps extends JSX.HTMLAttributes<HTMLParagraph
 
 export const Description: Component<DialogDescriptionProps> = (props) => {
   const ctx = useDialogContext();
-  const description = createDialogDescription(ctx, omit(props, "render", "class"));
+  const description = createDialogDescription(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(description.props, {
     get class(): string {

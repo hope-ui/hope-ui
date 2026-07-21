@@ -1,11 +1,10 @@
 import type { JSX } from "@solidjs/web";
-import { type Accessor, createSignal, merge, omit } from "solid-js";
+import { type Accessor, merge, omit } from "solid-js";
 import {
   createDismissable,
   createFocusRestore,
   createFocusTrap,
   createHideOutside,
-  createPresence,
   createRegisteredId,
   createScrollLock,
 } from "../internal";
@@ -23,18 +22,30 @@ export interface CreateDialogContentProps extends JSX.HTMLAttributes<HTMLDivElem
 
 export interface CreateDialogContentReturn {
   /** Spread onto the content surface. `id`/`role`/`aria-labelledby`/`aria-describedby` fall back to
-   * the consumer's; `aria-modal` and `data-presence` are owned here. */
+   * the consumer's; `aria-modal` and `data-presence` are owned here (`data-presence` mirrors the
+   * shared overlay presence `state` owns). */
   props: JSX.HTMLAttributes<HTMLDivElement> & { "data-presence": string };
-  /** Gate the content's render on this — it stays mounted through an exit transition. */
+  /** Gate the content's render on this — the shared presence keeps it mounted through the exit
+   * transition. */
   mounted: Accessor<boolean>;
-  /** Hand to the content element's `ref`; wires presence + the focus/dismiss/hide-outside effects. */
+  /** Hand to the content element's `ref`; registers it on `state` (for the shared presence's exit
+   * timing) and wires the focus/dismiss/hide-outside/scroll effects. */
   setRef: (element: HTMLDivElement) => void;
 }
 
 /**
- * The content part: the dialog surface itself, and the behavior hub. Owns presence and the full
- * effect stack — focus restore, focus trap, hide-outside, dismiss, and scroll lock — all created
- * in this scope (the content's), so each tears down when the content unmounts.
+ * The content part: the dialog surface itself, and the behavior hub. Owns the full effect stack —
+ * focus restore, focus trap, hide-outside, dismiss, and scroll lock — all created in this scope (the
+ * content's), so each tears down when the content unmounts.
+ *
+ * It does **not** create presence — `createDialog` owns the single shared overlay presence
+ * (`state.contentPresence`) eagerly, and this part *reflects* it: `mounted` and `data-presence` come
+ * straight from `state.contentPresence`, and the Positioner consumes the same one. Creating a
+ * presence here instead would recreate the enter-animation bug — this part is mounted lazily on
+ * open, so its own presence would see `present` already `true` on the first run and latch straight to
+ * `entered`. Mirrors Ark, where `Content`/`Positioner` share one presence and only `Backdrop` (which
+ * is mounted eagerly) keeps its own. The content element is likewise registered on `state`
+ * (`setRef` → `state.setContentElement`) so the shared presence can time its exit off it.
  *
  * The effect creation order is load-bearing, not stylistic. `createFocusRestore` **must** be
  * created before `createFocusTrap`/`createHideOutside`: sibling effects run (and clean up on
@@ -47,12 +58,10 @@ export function createDialogContent(
   state: CreateDialogReturn,
   props: CreateDialogContentProps,
 ): CreateDialogContentReturn {
-  // A signal-backed ref, not a `let`: the content only exists as a reactive consequence of
-  // `mounted()`, so the effects below (which react to `open`/`isModal` and read this ref tracked
-  // in their compute fn) must be able to react once it's actually set. See `create-focus-trap.ts`.
-  const [ref, setRef] = createSignal<HTMLDivElement>();
-
-  const presence = createPresence({ present: state.open, ref });
+  // The content element lives on `state` (a signal), shared with the presence that times its exit
+  // off it. The effects below react to `open`/`isModal` and read this ref tracked in their compute
+  // fn, so it must be a signal they can react to once it's actually set. See `create-focus-trap.ts`.
+  const ref = state.contentElement;
 
   createFocusRestore({ active: state.open });
   createFocusTrap({
@@ -90,15 +99,15 @@ export function createDialogContent(
   // Internal values fall back to the consumer's rather than overwriting them: `merge` gives the
   // *last* source precedence and treats a getter returning `undefined` as a real value, so a bare
   // `get "aria-labelledby"()` would erase a consumer's own value whenever no `Title` is mounted —
-  // stripping the accessible name. `aria-modal`/`data-presence` stay owned here (state-derived,
-  // and `aria-modal` must be *absent* on a non-modal dialog). `initialFocus` is a control prop, not
-  // an attribute, so it's dropped from what spreads onto the element.
+  // stripping the accessible name. `aria-modal` (state-derived, and *absent* on a non-modal dialog)
+  // and `data-presence` (mirroring the shared presence `state` owns) are owned here. `initialFocus`
+  // is a control prop, not an attribute, so it's dropped from the spread.
   const elementProps = merge(omit(props, "initialFocus"), {
     get id() {
       return props.id ?? state.popupId();
     },
     get role() {
-      return props.role ?? ("dialog" as const);
+      return props.role ?? state.role();
     },
     get "aria-modal"() {
       return state.modal() ? ("true" as const) : undefined;
@@ -110,9 +119,13 @@ export function createDialogContent(
       return props["aria-describedby"] ?? state.descriptionId();
     },
     get "data-presence"() {
-      return presence.status();
+      return state.contentPresence.status();
     },
   });
 
-  return { props: elementProps, mounted: presence.mounted, setRef };
+  return {
+    props: elementProps,
+    mounted: state.contentPresence.mounted,
+    setRef: (element) => state.setContentElement(element),
+  };
 }

@@ -17,6 +17,7 @@ export {
   type CreateDialogOptions,
   type CreateDialogReturn,
   createDialog,
+  type DialogRole,
 } from "./dialog-root";
 export { type CreateDialogTitleReturn, createDialogTitle } from "./dialog-title";
 export { type CreateDialogTriggerReturn, createDialogTrigger } from "./dialog-trigger";

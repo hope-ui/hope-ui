@@ -25,10 +25,10 @@ function createPresence(options: {
   `true`, instead of appearing already `"entered"`. Off by default (see below).
 - `mounted` — whether the consumer should render its DOM output at all. Gate rendering
   on this, not on `present` directly, so the exit animation has something to animate.
-- `status` — the lifecycle status: `"entering"` on the first frame after becoming present,
-  flipping to `"entered"` on the next animation frame (so a CSS transition keyed off the
-  `entering`→`entered` attribute change actually fires); `"exiting"` immediately when
-  `present` becomes `false`; `"exited"` once unmounted.
+- `status` — the lifecycle status: `"entering"` on the frame the element mounts, flipping to
+  `"entered"` after the browser has painted the `entering` frame (see "Enter timing"), so a CSS
+  transition keyed off the `entering`→`entered` attribute change actually fires; `"exiting"`
+  immediately when `present` becomes `false`; `"exited"` once unmounted.
 
 ## First mount and `initialEnter`
 
@@ -36,8 +36,35 @@ The split `createEffect(compute, effect)` runs its effect for the initial value 
 in `solid-contract.test.ts`). By default the first run is latched so an already-present
 element lands directly on `"entered"` — a `defaultOpen` Dialog paints in its final state
 rather than replaying its transition on load. Pass `initialEnter: true` to opt into the
-enter animation on that first mount (start `"entering"`, flip to `"entered"` next frame).
+enter animation on that first mount (start `"entering"`, then flip to `"entered"` — see below).
 Every *subsequent* becoming-present is a real open and always animates regardless.
+
+## Enter timing — why the flip is a *double* `requestAnimationFrame`
+
+Becoming present sets `mounted` (which mounts the element as `"entering"`) and schedules the flip to
+`"entered"`. That flip runs on a **double** `requestAnimationFrame`, not a single one, and this is
+load-bearing for CSS **transitions**.
+
+The element is inserted *and* the rAF is scheduled in the **same task**. A single rAF fires at the
+very start of the next frame's rendering step — *before* that frame's first style recalc/paint. So
+the element's first-ever computed style would already be `"entered"`, and a `transition` with no
+painted prior value never fires: the content appears instantly at its final state, enter animation
+skipped. The outer rAF lets the browser recalc and **paint** the `"entering"` frame; the inner rAF
+(one frame later) flips to `"entered"`, making `entering → entered` a real change the transition
+animates from.
+
+Two contrasts with the references this was modeled against:
+
+- **reka-ui** drives presence off CSS **`@keyframes` animations** (it watches `animationName` +
+  `animationstart`/`animationend`). Keyframe animations run on mount without a prior value, so they
+  need no rAF dance — the price is you author animations, not transitions.
+- **base-ui** uses transitions like we do and clears its `"starting"` status on a *single* rAF —
+  but only because React commits and paints the starting frame in an earlier cycle than the rAF
+  (mount and rAF don't share a task there). Our Solid effect mounts and schedules in one task, so it
+  needs the extra frame itself.
+
+Both rAFs are cancelled on the effect's cleanup, so an open-then-immediately-close within a frame
+can't strand a pending flip.
 
 ## The `data-presence` attribute
 

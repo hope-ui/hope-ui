@@ -14,7 +14,7 @@ export const CloseTrigger: Component<DialogCloseTriggerProps> = (props) => {
   const ctx = useDialogContext();
   // The primitive owns only the close `onClick` (composed in front of the consumer's, so their
   // `preventDefault()` cancels the close). The label + visual + `type` default come from `CloseButton`.
-  const close = createDialogCloseTrigger(ctx, omit(props, "render", "class"));
+  const close = createDialogCloseTrigger(ctx.state, omit(props, "render", "class"));
 
   const elementProps = merge(close.props, {
     get class(): string {

@@ -27,15 +27,16 @@ export const Content: Component<DialogContentProps> = (props) => {
   // omitted from what the hook (and the surface) receives.
   const merged = withDefaults(props, { showCloseButton: true });
 
+  // `role` is not threaded here — it lives on `ctx.state` (an a11y concern), and `createDialogContent`
+  // reads `state.role()` for the surface's `role` attribute. This layer is pure assembly.
   const content = createDialogContent(
-    ctx,
-    merge(omit(merged, "render", "class", "showCloseButton"), {
-      get role() {
-        return ctx.role();
-      },
-    }),
+    ctx.state,
+    omit(merged, "render", "class", "showCloseButton"),
   );
 
+  // `content.props` already carries `data-presence` (the hook mirrors the shared overlay presence
+  // `Dialog.Root`/`createDialog` owns — that's what lets the card animate in). This layer only adds
+  // the recipe `class` + the auto CloseTrigger.
   const elementProps = merge(content.props, {
     get class(): string {
       return cx(ctx.slots.content(), merged.class) ?? "";
@@ -63,12 +64,10 @@ export const Content: Component<DialogContentProps> = (props) => {
         as: "div",
         render: merged.render,
         props: elementProps,
-        // Publish the element to context (for `Dialog.Positioner`'s exit timing) alongside the
-        // primitive's own ref. `renderElement` already merges any consumer `ref`.
-        ref: (el) => {
-          content.setRef(el);
-          ctx.setContentElement(el ?? undefined);
-        },
+        // `content.setRef` registers the element on the shared state, so the overlay presence can
+        // time its exit off the card's transition (and `Dialog.Positioner` rides along) and the
+        // focus/dismiss effects can read it. `renderElement` already merges any consumer `ref`.
+        ref: content.setRef,
       })}
     </Show>
   );

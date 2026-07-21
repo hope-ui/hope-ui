@@ -51,7 +51,7 @@ describe("Dialog SSR", () => {
     // what the browser test hydrates cannot drift. Regenerate with `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<button _hk=001010 type="button" aria-haspopup="dialog" aria-expanded="false" >Open dialog</button>"`,
+      `"<button _hk=002010 type="button" aria-haspopup="dialog" aria-expanded="false" >Open dialog</button>"`,
     );
   });
 });

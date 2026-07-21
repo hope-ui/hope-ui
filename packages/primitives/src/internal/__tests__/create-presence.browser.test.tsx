@@ -47,6 +47,30 @@ function TestHarness(props: {
   );
 }
 
+// A harness with a real *enter* transition: opacity 0 on `entering`, 1 once `entered`. Unlike
+// `TestHarness` (opacity only drops on `exiting`), the `entering`→`entered` flip here is an actual
+// property change, so a working enter animation shows up as a running CSS transition.
+function EnterHarness(props: { present: () => boolean; transitionMs: number }) {
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const { mounted, status } = createPresence({ present: props.present, ref });
+
+  return (
+    <Show when={mounted()}>
+      <div
+        data-testid="popup"
+        data-presence={status()}
+        ref={setRef}
+        style={{
+          transition: `opacity ${props.transitionMs}ms linear`,
+          opacity: status() === "entering" ? "0" : "1",
+        }}
+      >
+        content
+      </div>
+    </Show>
+  );
+}
+
 function ItemHarness(props: { item: () => string | undefined; transitionMs?: number }) {
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const { mounted, status, mountedItem } = createPresenceItem<string>({
@@ -124,6 +148,32 @@ describe("createPresence", () => {
     await vi.waitFor(() =>
       expect(popupOf(container)?.getAttribute("data-presence")).toBe("entered"),
     );
+
+    dispose();
+  });
+
+  it("paints the 'entering' frame before flipping to 'entered', so the enter transition actually runs", async () => {
+    const [present, setPresent] = createSignal(false);
+    const { container, dispose } = mount(() => (
+      <EnterHarness present={present} transitionMs={300} />
+    ));
+
+    setPresent(true);
+    const popup = await vi.waitFor(() => {
+      const el = popupOf(container);
+      expect(el).toBeTruthy();
+      return el as HTMLElement;
+    });
+
+    // Once status reaches "entered", the opacity 0→1 transition must be *running*. A single rAF
+    // coalesces the mount and the flip — the element's first computed style is already opacity:1,
+    // so the browser has no before-change value and never starts a transition (the "enter animation
+    // skipped, content appears instantly" bug). `getAnimations()` reports the live transition; it
+    // stays empty under the bug, so this waitFor would time out.
+    await vi.waitFor(() => {
+      expect(popup.getAttribute("data-presence")).toBe("entered");
+      expect(popup.getAnimations().length).toBeGreaterThan(0);
+    });
 
     dispose();
   });
