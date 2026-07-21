@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { renderElement } from "../utils";
+import { renderElement } from "../render";
 
 /** Marks the element for debugging, and lets tests identify what a hit test landed on. */
 const MARKER = "data-hope-ui-modal-backdrop";

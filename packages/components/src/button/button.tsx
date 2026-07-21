@@ -1,10 +1,6 @@
 import { type ButtonType, createButton } from "@hope-ui/primitives/internal";
-import {
-  composeEventHandlers,
-  type RenderProp,
-  renderElement,
-  runIfFunction,
-} from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { composeEventHandlers, runIfFunction } from "@hope-ui/primitives/utils";
 import type {
   ButtonColorScheme,
   ButtonLoaderPlacement,

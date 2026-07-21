@@ -1,5 +1,5 @@
 import { createDialogBackdrop } from "@hope-ui/primitives/dialog";
-import { type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit, Show } from "solid-js";

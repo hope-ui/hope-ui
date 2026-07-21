@@ -1,5 +1,5 @@
 import { createRegisteredId } from "@hope-ui/primitives/internal";
-import { type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import type { JSX } from "@solidjs/web";
 import { type Component, createUniqueId, merge, omit } from "solid-js";
 import { useAlertContext } from "./alert-context";

@@ -10,7 +10,7 @@ import {
   createCalendarPrev,
 } from "@hope-ui/primitives/calendar";
 import { createComponentContext } from "@hope-ui/primitives/internal";
-import { type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { Dynamic, type JSX } from "@solidjs/web";
 import { type Component, For, merge, omit, Show } from "solid-js";
 

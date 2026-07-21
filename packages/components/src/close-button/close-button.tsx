@@ -1,6 +1,7 @@
 import { useLocale } from "@hope-ui/i18n";
 import { type ButtonType, createButton } from "@hope-ui/primitives/internal";
-import { type RenderProp, renderElement, runIfFunction } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { CloseButtonSize, CloseButtonThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";

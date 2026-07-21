@@ -1,5 +1,5 @@
 import { createDialogTrigger } from "@hope-ui/primitives/dialog";
-import { type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import type { JSX } from "@solidjs/web";
 import { type Component, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";

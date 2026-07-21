@@ -1,4 +1,4 @@
-import { type RenderProp, renderElement } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import type {
   BadgeColorScheme,
   BadgeShape,

@@ -35,7 +35,8 @@ Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
 
 | Import | Contents |
 | ------ | -------- |
-| `@hope-ui/primitives/utils` | Non-`createX` composition helpers: `renderElement` (the `render`/`as` polymorphism primitive + ref merging), `withDefaults` (the correct way to apply defaults under 2.0), `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`. |
+| `@hope-ui/primitives/render` | `renderElement` — the `render`/`as` polymorphism primitive (+ ref merging) every public component routes its parts through. |
+| `@hope-ui/primitives/utils` | The remaining non-`createX` composition helpers: `withDefaults` (the correct way to apply defaults under 2.0), `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`. |
 | `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
 | `@hope-ui/primitives/dialog` | The `createDialog` hook family (root state + one hook per part). |
 | `@hope-ui/primitives/calendar` | The `createCalendar` hook family (headless month/year/decade calendar, built on `@internationalized/date`). |

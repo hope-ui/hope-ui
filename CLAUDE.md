@@ -221,7 +221,7 @@ JSX-preserved **source** under the `"solid"` export condition (see "Distribution
 `__internal__/plan.md`), so the consumer's `vite-plugin-solid` compiles each element per
 environment and literal host elements are fine. Write them where they read best.
 
-`renderElement` (`@hope-ui/primitives/utils`) stays — but only as the `as`/render-prop
+`renderElement` (`@hope-ui/primitives/render`) stays — but only as the `as`/render-prop
 **polymorphism** helper (and the owner of ref merging), which is its real job. It is no
 longer a mandatory wrapper you route every host element through for SSR's sake. Reach for
 it when a component exposes `as`/`render`; otherwise a literal element is fine.
@@ -271,12 +271,16 @@ them rather than re-deriving a behavior in a comment.
   - `modal-backdrop/` (`@hope-ui/primitives/modal-backdrop`) — `ModalBackdrop`, the kernel's
     only component (it renders DOM), so it sits at `src/` beside the families rather than in
     `internal/`.
-  - `utils/` (`@hope-ui/primitives/utils`) — the non-`createX` composition helpers:
-    `renderElement` (the render-prop/`as`-polymorphism primitive every public component uses
-    instead of hand-rolling its own polymorphic-`as` type system — it also owns ref merging;
-    modeled on Base UI's `useRender` idea, not its code — see `__internal__/primitives/utils/render.md`),
+  - `render/` (`@hope-ui/primitives/render`) — `renderElement`, the render-prop/`as`-polymorphism
+    primitive every public component routes its parts through (instead of hand-rolling its own
+    polymorphic-`as` type system — it also owns ref merging; modeled on Base UI's `useRender` idea,
+    not its code — see `__internal__/primitives/render/render.md`). It earns its own top-level folder
+    and subpath rather than living under `utils/`: it is the marquee composition primitive — used in
+    essentially every component part — not a bare utility.
+  - `utils/` (`@hope-ui/primitives/utils`) — the remaining non-`createX` composition helpers:
     `withDefaults` (the *only* correct way to apply prop defaults under 2.0 — see the `merge` note
-    in `__internal__/solid-2.0-notes.md`), and `composeEventHandlers`.
+    in `__internal__/solid-2.0-notes.md`), `composeEventHandlers`, `createKeyboardHandler`,
+    `runIfFunction`, and `compareByIdOrReference`.
   - `internal/` (`@hope-ui/primitives/internal`) — the `createX` behavior primitives:
     `createComponentContext` (thin `createContext`/`useContext` wrapper with a friendlier
     missing-Provider error), `createControllableState`, `createPresence`, `createFocusTrap`,
@@ -432,7 +436,7 @@ the installed package. **Full rationale, repros, fixes, and code for every item 
   returns the Provider directly (`<XContext value={...}>`); `useContext` throws by default;
   `applyRef` flattens ref arrays and skips falsy (no `mergeRefs`); `renderElement` owns ref merging,
   collapsing the internal + consumer refs into a single function ref (so it works with any render
-  target, not just host elements — see `__internal__/primitives/utils/render/render.md`).
+  target, not just host elements — see `__internal__/primitives/render/render.md`).
 - A descendant writing an ancestor-owned signal in its synchronous render body throws
   `[REACTIVE_WRITE_IN_OWNED_SCOPE]` — defer via `onSettled` / use `createRegisteredId`.
 - `solid-refresh` HMR breaks prop forwarding for imported components; `refresh: { disabled: true }`

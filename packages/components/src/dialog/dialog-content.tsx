@@ -1,5 +1,6 @@
 import { type CreateDialogContentProps, createDialogContent } from "@hope-ui/primitives/dialog";
-import { type RenderProp, renderElement, withDefaults } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { withDefaults } from "@hope-ui/primitives/utils";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit, Show } from "solid-js";

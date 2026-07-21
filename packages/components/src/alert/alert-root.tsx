@@ -1,5 +1,6 @@
 import { createControllableState, createPresence } from "@hope-ui/primitives/internal";
-import { type RenderProp, renderElement, runIfFunction } from "@hope-ui/primitives/utils";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { runIfFunction } from "@hope-ui/primitives/utils";
 import type {
   AlertColorScheme,
   AlertSize,

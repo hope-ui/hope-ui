@@ -9,5 +9,4 @@ export {
   type KeyboardEventFor,
   type KeyboardHandler,
 } from "./keymap";
-export { type RenderElementOptions, type RenderProp, renderElement } from "./render";
 export { runIfFunction } from "./run-if-function";

@@ -12,6 +12,7 @@
       "dialog": "src/dialog/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "internal": "src/internal/index.ts",
+      "render": "src/render/index.ts",
       "utils": "src/utils/index.ts"
     }
   },
@@ -31,6 +32,10 @@
     "./internal": {
       "types": "./dist/internal/index.d.ts",
       "solid": "./dist/internal/index.jsx"
+    },
+    "./render": {
+      "types": "./dist/render/index.d.ts",
+      "solid": "./dist/render/index.jsx"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",

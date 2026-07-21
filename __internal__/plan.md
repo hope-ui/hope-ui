@@ -88,7 +88,7 @@ version):
 - Confirmed a genuine, unavoidable type-system limit for the render-prop/`as` pattern:
   a component's `render` callback can't be soundly typed for an arbitrary target
   element without full generics (the `Polymorphic<T>` cost this project is explicitly
-  trying to avoid). Documented in `__internal__/primitives/utils/render.md` rather than
+  trying to avoid). Documented in `__internal__/primitives/render/render.md` rather than
   papered over — an explicit type-assertion escape hatch is used at the one call site that
   needs cross-element rendering.
 

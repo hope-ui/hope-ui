@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from "vitest";
 
 describe("@solidjs/web client-build contract", () => {
   describe("applyRef flattens a ref array and skips falsy entries", () => {
-    // Depended on by: `renderElement` (packages/primitives/src/utils/render.tsx), which
+    // Depended on by: `renderElement` (packages/primitives/src/render/render.tsx), which
     // merges a component's internal ref setter with the consumer's into a SINGLE function ref and
     // calls `applyRef([internalRef, consumerRef], element)` inside it. Because `applyRef` does
     // `r.flat(Infinity).forEach(f => f && f(element))`, an absent consumer ref (or one that is
