@@ -143,7 +143,11 @@ export const alertRecipe = tv({
     icon: "inline-flex shrink-0 items-center justify-center",
     content: "flex min-w-0 flex-1 flex-col",
     title: "font-medium",
-    description: null,
+    // Intentionally unstyled by default: the description inherits the root's content color and the
+    // body font metrics; consumers restyle it via `slotClasses.description`. An empty base is the
+    // tailwind-variants idiom for a slot with no default classes — the slot stays present/callable so
+    // the component can read `ctx.slots.description()` and consumers can target it.
+    description: "",
     actions: "flex flex-wrap items-center mt-2 gap-2",
     // Placement only (pulled into the padding, pushed to the trailing edge, never shrinks); the button
     // chrome comes from CloseButton's own recipe, merged under this via its `class` prop.
@@ -152,17 +156,17 @@ export const alertRecipe = tv({
   variants: {
     size: {
       sm: {
-        root: "gap-2.5 p-3.5 text-xs",
+        root: "gap-2 p-2 text-xs",
         icon: "[&_svg]:size-4",
         content: "gap-0.5",
       },
       md: {
-        root: "gap-3 p-4 text-sm",
+        root: "gap-2.5 p-3 text-sm",
         icon: "[&_svg]:size-5",
         content: "gap-0.5",
       },
       lg: {
-        root: "gap-3.5 p-4.5 text-base",
+        root: "gap-3.5 p-4 text-base",
         icon: "[&_svg]:size-6",
         content: "gap-0.5",
       },

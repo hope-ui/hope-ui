@@ -28,8 +28,13 @@ const SLOTS = [
   "closeTrigger",
 ] as const;
 
+// `description` is intentionally unstyled by default (it inherits the root's content color and body
+// metrics), so it's checked for presence via `unstyledSlots` rather than the non-empty `slots` set.
+const STYLED_SLOTS = SLOTS.filter((slot) => slot !== "description");
+const UNSTYLED_SLOTS = ["description"] as const;
+
 describe("hope alert recipe", () => {
-  it("produces a class for every slot across the full variant matrix", () => {
+  it("produces a class for every styled slot (description stays a present, unstyled slot)", () => {
     const cases: AlertRecipeVariants[] = [
       undefined as unknown as AlertRecipeVariants,
       ...VARIANTS.flatMap((variant) =>
@@ -37,7 +42,11 @@ describe("hope alert recipe", () => {
       ),
       ...SIZES.map((size) => ({ size })),
     ];
-    assertSlotRecipeConformance(alertRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(alertRecipe, {
+      cases,
+      slots: STYLED_SLOTS,
+      unstyledSlots: UNSTYLED_SLOTS,
+    });
   });
 
   it("wires solid to the role fill + on-color text + a fill-matched border on root", () => {
@@ -84,8 +93,9 @@ describe("hope alert recipe", () => {
     // the role color rides the icon + title slots.
     expect(parts.icon()).toContain("text-danger-emphasis");
     expect(parts.title()).toContain("text-danger-emphasis");
-    // the description inherits the body color (no role class of its own), so text stays foreground.
-    expect(parts.description()).not.toContain("text-danger-emphasis");
+    // the description is an intentionally-unstyled slot — it carries no class of its own (it inherits
+    // the root's content color), so it never picks up the role color.
+    expect(parts.description() ?? "").toBe("");
   });
 
   it("keeps the default variant shadow-free (unlike Button's default)", () => {
@@ -117,11 +127,12 @@ describe("hope alert recipe", () => {
   });
 
   it("scales the box + glyph per size", () => {
-    expect(alertRecipe({ size: "sm" }).root()).toContain("p-3");
+    // Word-boundary matches so a `gap-N` never accidentally satisfies the `p-N` padding assertion.
+    expect(alertRecipe({ size: "sm" }).root()).toMatch(/(?:^|\s)p-2(?:\s|$)/);
     expect(alertRecipe({ size: "sm" }).icon()).toContain("[&_svg]:size-4");
-    expect(alertRecipe({ size: "md" }).root()).toContain("p-4");
+    expect(alertRecipe({ size: "md" }).root()).toMatch(/(?:^|\s)p-3(?:\s|$)/);
     expect(alertRecipe({ size: "md" }).icon()).toContain("[&_svg]:size-5");
-    expect(alertRecipe({ size: "lg" }).root()).toContain("p-5");
+    expect(alertRecipe({ size: "lg" }).root()).toMatch(/(?:^|\s)p-4(?:\s|$)/);
     expect(alertRecipe({ size: "lg" }).icon()).toContain("[&_svg]:size-6");
   });
 
@@ -139,7 +150,8 @@ describe("hope alert recipe", () => {
       for (const colorScheme of COLOR_SCHEMES) {
         const parts = alertRecipe({ variant, colorScheme });
         for (const slot of SLOTS) {
-          const cls = parts[slot]();
+          // `description` is an unstyled slot: an empty tv base resolves to `undefined`, so coerce.
+          const cls = parts[slot]() ?? "";
           expect(cls).not.toContain("color-mix");
           // Alpha modifier on a color utility (`bg-x/50`).
           expect(cls).not.toMatch(/\b(?:bg|text|border|ring)-[\w-]+\/\d{1,3}\b/);
@@ -153,9 +165,20 @@ describe("hope alert recipe", () => {
   it("defaults to default / neutral / md", () => {
     const parts = alertRecipe({});
     expect(parts.root()).toContain("bg-surface-raised");
-    expect(parts.root()).toContain("p-4"); // md
+    expect(parts.root()).toMatch(/(?:^|\s)p-3(?:\s|$)/); // md
     // neutral default variant colors the icon/title neutral-emphasis.
     expect(parts.icon()).toContain("text-neutral-emphasis");
+  });
+
+  it("keeps description a present but unstyled slot (declared, no default class)", () => {
+    // The slot is declared across variants — so the component can safely call `ctx.slots.description()`
+    // and consumers can target it via `slotClasses.description` — but it carries no default classes.
+    // An empty tailwind-variants slot base resolves to `undefined`, which is the "no class" result.
+    for (const variant of VARIANTS) {
+      const parts = alertRecipe({ variant, colorScheme: "primary" });
+      expect(typeof parts.description).toBe("function");
+      expect(parts.description() ?? "").toBe("");
+    }
   });
 
   it("merges a consumer class through the root slot function", () => {
