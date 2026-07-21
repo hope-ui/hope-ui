@@ -253,8 +253,9 @@ describe("createListSelection — follow focus", () => {
 });
 
 // ─── Object values ──────────────────────────────────────────────────────────────────────────────
-// A value need not be a primitive or a reference-stable object: the default comparator matches on
-// `id`, and `compareWith` overrides it entirely.
+// A value need not be a primitive or a reference-stable object: `itemToValue` maps each value to an
+// identity key compared with `===`, and `isItemEqualToValue` overrides the rule entirely (the Base
+// UI model, replacing the retired Angular `compareWith`).
 
 interface Fruit {
   id: number;
@@ -270,7 +271,8 @@ interface ObjApi {
 function ObjHarness(props: {
   fruits: Fruit[];
   value?: Accessor<Fruit[]>;
-  compareWith?: (a: Fruit, b: Fruit) => boolean;
+  itemToValue?: (fruit: Fruit) => unknown;
+  isItemEqualToValue?: (a: Fruit, b: Fruit) => boolean;
   onReady: (api: ObjApi) => void;
 }) {
   const collection = createCollection<Fruit>();
@@ -279,7 +281,8 @@ function ObjHarness(props: {
     focus,
     selectionMode: () => "multiple",
     value: props.value,
-    compareWith: props.compareWith,
+    itemToValue: props.itemToValue,
+    isItemEqualToValue: props.isItemEqualToValue,
   });
   props.onReady({ collection, focus, selection });
   return (
@@ -320,24 +323,26 @@ describe("createListSelection — object values", () => {
     { id: 3, name: "Cherry" },
   ];
 
-  it("selects the matching option when a controlled value carries the same id but a fresh reference", async () => {
+  const byId = (fruit: Fruit) => fruit.id;
+
+  it("selects the matching option when a controlled value maps to the same itemToValue key but a fresh reference", async () => {
     let api!: ObjApi;
-    // A brand-new object, NOT the registered `Banana` reference — only the id matches.
+    // A brand-new object, NOT the registered `Banana` reference — only the id key matches.
     const value = () => [{ id: 2, name: "Banana (from server)" }];
     const { container, dispose } = mount(() => (
-      <ObjHarness fruits={FRUITS} value={value} onReady={(a) => (api = a)} />
+      <ObjHarness fruits={FRUITS} value={value} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
 
-    // Reference equality would miss this; the id-based default comparator matches it.
+    // Reference equality would miss this; the id-key `itemToValue` matches it.
     await vi.waitFor(() => expect(selectedIds(container)).toEqual(["2"]));
     dispose();
   });
 
-  it("toggles object values through the id comparator", async () => {
+  it("toggles object values through the itemToValue key", async () => {
     let api!: ObjApi;
     const { container, dispose } = mount(() => (
-      <ObjHarness fruits={FRUITS} onReady={(a) => (api = a)} />
+      <ObjHarness fruits={FRUITS} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
 
@@ -350,16 +355,31 @@ describe("createListSelection — object values", () => {
     dispose();
   });
 
-  it("honors a custom compareWith", async () => {
+  it("defaults to reference/=== equality when no itemToValue is given", async () => {
+    let api!: ObjApi;
+    // A fresh object with the same id does NOT match under the default identity `itemToValue`,
+    // because the default equality is plain `===` on the value itself.
+    const value = () => [{ id: 2, name: "Banana (from server)" }];
+    const { container, dispose } = mount(() => (
+      <ObjHarness fruits={FRUITS} value={value} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    // Nothing selected: the controlled value is a different reference than any registered fruit.
+    await vi.waitFor(() => expect(selectedIds(container)).toEqual([]));
+    dispose();
+  });
+
+  it("honors a custom isItemEqualToValue", async () => {
     let api!: ObjApi;
     // Compare by name instead of id: a value with a different id but matching name selects Apple.
     const value = () => [{ id: 99, name: "Apple" }];
-    const compareWith = (a: Fruit, b: Fruit) => a.name === b.name;
+    const isItemEqualToValue = (a: Fruit, b: Fruit) => a.name === b.name;
     const { container, dispose } = mount(() => (
       <ObjHarness
         fruits={FRUITS}
         value={value}
-        compareWith={compareWith}
+        isItemEqualToValue={isItemEqualToValue}
         onReady={(a) => (api = a)}
       />
     ));
@@ -372,7 +392,7 @@ describe("createListSelection — object values", () => {
   it("has no baseline accessibility violations", async () => {
     let api!: ObjApi;
     const { container, dispose } = mount(() => (
-      <ObjHarness fruits={FRUITS} onReady={(a) => (api = a)} />
+      <ObjHarness fruits={FRUITS} itemToValue={byId} onReady={(a) => (api = a)} />
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
     await expectNoA11yViolations(container);

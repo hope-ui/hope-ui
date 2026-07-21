@@ -5,11 +5,13 @@ multiple, explicit or follow-focus, with Shift range extension from an anchor. M
 Aria's `list-selection`; the behavior checklist (select-on-focus, Ctrl+A, Shift-extend from an
 anchor) is cross-checked against react-aria's `useSelectableCollection`/`useSelectableItem`.
 
-Object values are supported. By default two values are equal when both are objects sharing an `id`
-(`a.id === b.id`), falling back to strict `===` for primitives or objects without an `id` — so a
-consumer can pass a fresh `{ id, name }` object each render (or a controlled value straight from a
-server) and it still matches the registered item. Override the rule entirely with `compareWith`, the
-same escape hatch as Angular Material's `compareWith`.
+Object values are supported through the Base UI **`itemToValue`** model: each value maps to an
+identity key, and two values are equal when their keys are `===`. Pass `itemToValue: (v) => v.id` and
+a fresh `{ id, name }` object each render (or a controlled value straight from a server) still matches
+the registered item. Override the rule entirely with `isItemEqualToValue`. This replaces the retired
+Angular-idiom `compareWith` default (`compareByIdOrReference`) — `createListSelection` has no
+consumer yet, so the change carries no migration. `createListbox` threads its own `itemToValue`
+(default `String(item)`) through here.
 
 ## API
 
@@ -22,7 +24,8 @@ function createListSelection<V>(options: {
   onChange?: (value: V[]) => void;
   selectionBehavior?: Accessor<"explicit" | "follow">;        // default "explicit"
   shouldFollowFocus?: Accessor<boolean>;                      // gate for follow, e.g. !isTyping()
-  compareWith?: (a: V, b: V) => boolean;                      // default compareByIdOrReference
+  itemToValue?: (value: V) => unknown;                        // identity key, default (v) => v
+  isItemEqualToValue?: (a: V, b: V) => boolean;               // default key(a) === key(b)
 }): {
   value: Accessor<V[]>;
   isSelected(item): boolean;
@@ -42,8 +45,10 @@ function createListSelection<V>(options: {
 function selectionRange(fromIndex: number, toIndex: number): number[];
 ```
 
-The default comparator, `compareByIdOrReference`, and the `ValueComparator<V>` type live in
-[`@hope-ui/primitives/utils`](../../utils/equality.md).
+Equality precedence: an explicit `isItemEqualToValue` wins outright; otherwise the default compares
+`itemToValue(a) === itemToValue(b)`; with neither, `itemToValue` is identity so it collapses to plain
+`===`. (The older `compareByIdOrReference` / `ValueComparator<V>` in
+[`@hope-ui/primitives/utils`](../../utils/equality.md) is retained only for `createListExpansion`.)
 
 ## Modes and behaviors
 

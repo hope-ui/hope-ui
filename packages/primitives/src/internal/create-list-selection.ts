@@ -1,5 +1,4 @@
 import { type Accessor, createEffect, createSignal, untrack } from "solid-js";
-import { compareByIdOrReference, type ValueComparator } from "../utils/equality";
 import type { CollectionItem } from "./create-collection";
 import { createControllableState } from "./create-controllable-state";
 import type { CreateListFocusReturn } from "./create-list-focus";
@@ -31,12 +30,21 @@ export interface CreateListSelectionOptions<V> {
    */
   shouldFollowFocus?: Accessor<boolean>;
   /**
-   * How two values are compared for equality — the escape hatch for object values that aren't
-   * reference-stable (a fresh `{ id, name }` each render). Defaults to `compareByIdOrReference`
-   * (`utils/equality`): `a.id === b.id` when both values are objects carrying an `id`, else
-   * `a === b`. Modeled on Angular Material's `compareWith`.
+   * Maps a value to its **identity key** — the Base UI `itemToValue` model. Two values are equal
+   * when their keys are `===` (see {@link isItemEqualToValue}), so object values need not be
+   * reference-stable: a fresh `{ id, name }` each render, or a controlled value straight from a
+   * server, still matches the registered item when it maps to the same key. Default: identity
+   * (`(value) => value`), i.e. plain `===` — fine for primitive values. Consumers with object
+   * values pass e.g. `(fruit) => fruit.id`. `createListbox` threads its own `itemToValue` through
+   * here.
    */
-  compareWith?: ValueComparator<V>;
+  itemToValue?: (value: V) => unknown;
+  /**
+   * Full override of the equality rule, for shapes `itemToValue` can't express. Defaults to
+   * `(a, b) => itemToValue(a) === itemToValue(b)`. When given, `itemToValue` is ignored. Base UI's
+   * `isItemEqualToValue`, replacing the Angular-idiom `compareWith` this primitive used to expose.
+   */
+  isItemEqualToValue?: (a: V, b: V) => boolean;
 }
 
 export interface CreateListSelectionReturn<V> {
@@ -87,15 +95,22 @@ export function selectionRange(fromIndex: number, toIndex: number): number[] {
  * `list-selection`; the behavior checklist (select-on-focus, Ctrl+A, Shift-extend from an anchor)
  * is cross-checked against react-aria's `useSelectableCollection`/`useSelectableItem`.
  *
- * Object values are supported: pass `compareWith` (or rely on the id-based
- * {@link compareByIdOrReference} default) so values need not be reference-stable.
+ * Object values are supported through the Base UI `itemToValue` model: pass `itemToValue` (map to
+ * an identity key compared with `===`) or a full `isItemEqualToValue` override, so values need not
+ * be reference-stable.
  */
 export function createListSelection<V>(
   options: CreateListSelectionOptions<V>,
 ): CreateListSelectionReturn<V> {
   const { focus } = options;
   const mode = () => options.selectionMode?.() ?? "single";
-  const compare = (a: V, b: V) => (options.compareWith ?? compareByIdOrReference)(a, b);
+  // `itemToValue` maps to an identity key; the default equality is `key(a) === key(b)`. An explicit
+  // `isItemEqualToValue` wins outright (Base UI's precedence). Resolved once — these are config, not
+  // reactive inputs.
+  const itemToValue = options.itemToValue ?? ((value: V) => value);
+  const areEqual =
+    options.isItemEqualToValue ?? ((a: V, b: V) => itemToValue(a) === itemToValue(b));
+  const compare = (a: V, b: V) => areEqual(a, b);
 
   const [value, setValue] = createControllableState<V[]>({
     value: () => options.value?.(),

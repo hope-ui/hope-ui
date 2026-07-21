@@ -10,6 +10,7 @@
     "entries": {
       "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts",
+      "listbox": "src/listbox/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "internal": "src/internal/index.ts",
       "render": "src/render/index.ts",
@@ -24,6 +25,10 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
+    },
+    "./listbox": {
+      "types": "./dist/listbox/index.d.ts",
+      "solid": "./dist/listbox/index.jsx"
     },
     "./modal-backdrop": {
       "types": "./dist/modal-backdrop/index.d.ts",

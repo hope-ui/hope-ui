@@ -39,6 +39,7 @@ Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
 | `@hope-ui/primitives/utils` | The remaining non-`createX` composition helpers: `withDefaults` (the correct way to apply defaults under 2.0), `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`. |
 | `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
 | `@hope-ui/primitives/dialog` | The `createDialog` hook family (root state + one hook per part). |
+| `@hope-ui/primitives/listbox` | The `createListbox` hook family (root state + item/group/group-label/separator hooks) — composes the `internal/` list kernel; collection + virtual source modes, roving + activedescendant focus. |
 | `@hope-ui/primitives/calendar` | The `createCalendar` hook family (headless month/year/decade calendar, built on `@internationalized/date`). |
 | `@hope-ui/primitives/modal-backdrop` | `ModalBackdrop` — the kernel's only DOM-rendering component, the pointer-blocking third of modality. |
 
