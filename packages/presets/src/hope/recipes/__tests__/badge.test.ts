@@ -81,7 +81,7 @@ describe("hope badge recipe", () => {
   it("gives dot neutral chrome on root and the role color on the dot slot", () => {
     const dot = badgeRecipe({ variant: "dot", colorScheme: "success" });
     const root = dot.root();
-    expect(root).toContain("bg-transparent");
+    expect(root).toContain("bg-surface-raised");
     expect(root).toContain("text-foreground");
     expect(root).toContain("border-neutral-subtle-line");
     // The role color rides the dot slot, never the root.
