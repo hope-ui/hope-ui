@@ -20,7 +20,7 @@ Theming has two axes that stay cleanly separated:
 
 - **Runtime** — `<ThemeProvider preset={…}>` hands components their recipes at render time.
 - **Config** — the preset's stylesheet (`@import "@hope-ui/presets/hope/tailwind.css"`) defines the
-  `--hope-*` token *values* and the utilities that read them, at build time.
+  `--hope-*` token _values_ and the utilities that read them, at build time.
 
 `@hope-ui/theming` is the seam between the two: components read from it, presets implement it, and
 neither imports the other. That's what lets you restyle everything without touching component code.
@@ -37,7 +37,7 @@ import { hope } from "@hope-ui/presets/hope";
 
 <ThemeProvider preset={hope}>
   {/* every component below inherits this preset */}
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ## Semantic color tokens
@@ -47,12 +47,24 @@ Color is organized into six **roles**, each a meaning rather than a hue:
 
 <Preview>
   <div class="grid w-full max-w-md grid-cols-2 gap-2 sm:grid-cols-3">
-    <div class="rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-on-primary">primary</div>
-    <div class="rounded-md bg-neutral px-4 py-2 text-center text-sm font-medium text-on-neutral">neutral</div>
-    <div class="rounded-md bg-success px-4 py-2 text-center text-sm font-medium text-on-success">success</div>
-    <div class="rounded-md bg-info px-4 py-2 text-center text-sm font-medium text-on-info">info</div>
-    <div class="rounded-md bg-warning px-4 py-2 text-center text-sm font-medium text-on-warning">warning</div>
-    <div class="rounded-md bg-danger px-4 py-2 text-center text-sm font-medium text-on-danger">danger</div>
+    <div class="rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-on-primary">
+      primary
+    </div>
+    <div class="rounded-md bg-neutral px-4 py-2 text-center text-sm font-medium text-on-neutral">
+      neutral
+    </div>
+    <div class="rounded-md bg-success px-4 py-2 text-center text-sm font-medium text-on-success">
+      success
+    </div>
+    <div class="rounded-md bg-info px-4 py-2 text-center text-sm font-medium text-on-info">
+      info
+    </div>
+    <div class="rounded-md bg-warning px-4 py-2 text-center text-sm font-medium text-on-warning">
+      warning
+    </div>
+    <div class="rounded-md bg-danger px-4 py-2 text-center text-sm font-medium text-on-danger">
+      danger
+    </div>
   </div>
 </Preview>
 
@@ -66,9 +78,15 @@ Each role expands into a small, predictable set of modifiers, all exposed as Tai
   ]}
   rows={[
     { util: "bg-{role}", paints: "The solid role fill (e.g. bg-primary)." },
-    { util: "text-on-{role}", paints: "Text/icon color that stays legible on the solid fill." },
+    {
+      util: "text-on-{role}",
+      paints: "Text/icon color that stays legible on the solid fill.",
+    },
     { util: "bg-{role}-soft", paints: "The tonal, low-emphasis fill." },
-    { util: "text-{role}-emphasis", paints: "Role-colored text on a neutral surface." },
+    {
+      util: "text-{role}-emphasis",
+      paints: "Role-colored text on a neutral surface.",
+    },
     { util: "border-{role}-line", paints: "The role's border color." },
   ]}
 />
@@ -81,9 +99,19 @@ Alongside the roles, a neutral vocabulary covers surfaces, text, borders, and sy
     { key: "paints", label: "What it paints" },
   ]}
   rows={[
-    { util: "bg-surface / -raised / -sunken / -inverse", paints: "Elevation — the page, a raised card, a sunken well, an inverse surface." },
-    { util: "text-foreground / -muted / -subtle", paints: "The neutral text ramp, strongest to faintest." },
-    { util: "border-subtle / -strong", paints: "Neutral borders and dividers." },
+    {
+      util: "bg-surface / -raised / -sunken / -inverse",
+      paints:
+        "Elevation — the page, a raised card, a sunken well, an inverse surface.",
+    },
+    {
+      util: "text-foreground / -muted / -subtle",
+      paints: "The neutral text ramp, strongest to faintest.",
+    },
+    {
+      util: "border-subtle / -strong",
+      paints: "Neutral borders and dividers.",
+    },
     { util: "ring-focus", paints: "The focus ring." },
   ]}
 />
@@ -110,8 +138,12 @@ builtin** precedence, so an explicit prop on one instance always wins.
       },
     })}
   >
-    <Button variant="solid" colorScheme="primary">Branded</Button>
-    <Button variant="soft" colorScheme="neutral">Branded</Button>
+    <Button variant="solid" colorScheme="primary">
+      Branded
+    </Button>
+    <Button variant="soft" colorScheme="neutral">
+      Branded
+    </Button>
   </ThemeProvider>
 </Preview>
 
@@ -136,19 +168,26 @@ Each component's page documents which props are defaultable and which parts it e
 
 ### Token values
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<PaletteIcon />} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<PaletteIcon />}
   title={<strong>Don't want to hand-write 100+ variables?</strong>}
   description={
     <div>
-      The{" "}<a href="/theme-creator" class="font-medium underline underline-offset-2 hover:opacity-80">Theme Creator</a>{" "}
-      lets you pick a color family per role plus a radius, preview it live across real components, and
-      copy a complete <code>theme.css</code> with every token filled in.
+      The{" "}
+      <a
+        href="/theme-creator"
+        class="font-medium underline underline-offset-2 hover:opacity-80"
+      >
+        Theme Creator
+      </a>{" "}
+      lets you pick a color family per role plus a radius, preview it live
+      across real components, and copy a complete <code>theme.css</code> with
+      every token filled in.
     </div>
-  } 
+  }
 />
 
 To change the actual colors, author your own `--hope-*` CSS. Redefine any token under `:root` (and
@@ -171,23 +210,25 @@ preset and still carry a full palette.
 
 ## Dark mode
 
-`hope` ships light *and* dark values for every token. Toggle the `.dark` class on a root element
+`hope` ships light _and_ dark values for every token. Toggle the `.dark` class on a root element
 (typically `<html>`) and the whole token set swaps — no component or utility changes needed.
 
 ## Recipes (going further)
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <div>
-      Under the hood, each component's styling is a <code>tailwind-variants</code> recipe — a pure
-      prop→className function. You rarely author recipes directly; <code>slotClasses</code>,
-      <code>class</code>, and <code>definePreset</code> cover almost everything. Presets keep recipes
-      <strong> pure</strong> (they reference finished tokens only, never a computed color), which is
-      what makes swapping a preset safe.
+      Under the hood, each component's styling is a{" "}
+      <code>tailwind-variants</code> recipe — a pure prop→className function.
+      You rarely author recipes directly; <code>slotClasses</code>,
+      <code>class</code>, and <code>definePreset</code> cover almost everything.
+      Presets keep recipes
+      <strong> pure</strong> (they reference finished tokens only, never a
+      computed color), which is what makes swapping a preset safe.
     </div>
-  } 
+  }
 />

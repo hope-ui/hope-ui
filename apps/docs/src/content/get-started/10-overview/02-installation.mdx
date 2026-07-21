@@ -7,7 +7,6 @@ export const summary = "Add hope-ui to your app.";
 export const description =
   "Add hope-ui to a SolidJS app and render your first themeable component in minutes.";
 
-
 # Installation
 
 {description}
@@ -21,17 +20,18 @@ hope-ui targets **SolidJS 2.0** and **Tailwind CSS v4**. Before you start, you n
   [Framework notes](#framework-notes).)
 - **Tailwind CSS v4** wired into that app.
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <span>
-      hope-ui is in <strong>early preview</strong> and isn't on npm yet — it publishes as <code>1.0</code> once SolidJS 2.0 stable lands.
-      The commands below describe the intended install for that release.
+      hope-ui is in <strong>early preview</strong> and isn't on npm yet — it
+      publishes as <code>1.0</code> once SolidJS 2.0 stable lands. The commands
+      below describe the intended install for that release.
     </span>
-  } 
+  }
 />
 
 ## Install
@@ -71,7 +71,9 @@ import { Button } from "@hope-ui/components/button";
 export function App() {
   return (
     <ThemeProvider preset={hope}>
-      <Button variant="solid" colorScheme="primary">Save</Button>
+      <Button variant="solid" colorScheme="primary">
+        Save
+      </Button>
     </ThemeProvider>
   );
 }
@@ -86,11 +88,15 @@ it in the same tree — for a router, wrap the `Outlet` directly. A component re
 With the provider in place, drop in a component:
 
 <Preview>
-  <Button variant="solid" colorScheme="primary">Save</Button>
+  <Button variant="solid" colorScheme="primary">
+    Save
+  </Button>
 </Preview>
 
 ```tsx
-<Button variant="solid" colorScheme="primary">Save</Button>
+<Button variant="solid" colorScheme="primary">
+  Save
+</Button>
 ```
 
 From here, restyle everything through [Theming](/get-started/theming), or render components as other
@@ -117,16 +123,17 @@ export default defineConfig({
 });
 ```
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <div>
-      SolidStart hasn't migrated to SolidJS 2.0 yet, so a full SolidStart app is blocked on that
-      upstream work — not on hope-ui. Until it lands, a plain <strong>Vite + Solid 2.0 SPA</strong> (or
-      TanStack Start, which this documentation site itself is built on) is the supported path.
+      SolidStart hasn't migrated to SolidJS 2.0 yet, so a full SolidStart app is
+      blocked on that upstream work — not on hope-ui. Until it lands, a plain{" "}
+      <strong>Vite + Solid 2.0 SPA</strong> (or TanStack Start, which this
+      documentation site itself is built on) is the supported path.
     </div>
-  } 
+  }
 />

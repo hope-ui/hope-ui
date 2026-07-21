@@ -1,0 +1,387 @@
+import { Alert } from "@hope-ui/components/alert";
+import { CloseButton } from "@hope-ui/components/close-button";
+import { hope } from "@hope-ui/presets/hope";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { CloseButtonCustomIconDemo } from "~/components/demos/close-button/CloseButtonCustomIconDemo";
+import { CloseButtonInContextDemo } from "~/components/demos/close-button/CloseButtonInContextDemo";
+import { CloseButtonSurfacesDemo } from "~/components/demos/close-button/CloseButtonSurfacesDemo";
+import { InfoIcon } from "~/components/Icons";
+import { PropsTable } from "~/components/PropsTable";
+
+export const summary = "Icon button for dismissing a surface.";
+
+export const description =
+  "An always-icon-only button for dismissing overlays, banners, and chips. It ships a built-in X, self-labels for screen readers, and adapts to whatever surface it sits on — no color or variant to choose.";
+
+# Close Button
+
+{description}
+
+## Import
+
+```tsx
+import { CloseButton } from "@hope-ui/components/close-button";
+```
+
+## Usage
+
+`CloseButton` needs nothing to render: it draws hope's built-in **X** glyph and gives itself a
+localized accessible name (`"Close"`). Wire up `onClick` to dismiss whatever it belongs to.
+
+<Preview>
+  <CloseButton />
+</Preview>
+
+```tsx
+<CloseButton onClick={() => setOpen(false)} />
+```
+
+## Sizes
+
+Three sizes — `sm` (the default), `md`, and `lg` — scaling the box and the glyph together. It stays
+a compact, square corner affordance at every size.
+
+<Preview>
+  <CloseButton size="sm" />
+  <CloseButton size="md" />
+  <CloseButton size="lg" />
+</Preview>
+
+```tsx
+<CloseButton size="sm" />
+<CloseButton size="md" />
+<CloseButton size="lg" />
+```
+
+## Adapts to the surface
+
+This is the whole point: CloseButton asserts **no color of its own**. Unlike [Button](/components/button),
+it has no `variant` or `colorScheme`. The glyph inherits `currentColor`, and its hover/press wash and
+focus ring are derived from that — so a single component reads correctly on any surface (light,
+soft-tinted, solid-colored, dark) with zero configuration. Hover or focus each row to see the wash
+and ring pick up that surface's text color.
+
+<Preview>
+  <CloseButtonSurfacesDemo />
+</Preview>
+
+```tsx title="The same <CloseButton /> on four surfaces"
+<div class="bg-surface text-foreground">…<CloseButton /></div>
+<div class="bg-primary-soft text-primary-emphasis">…<CloseButton /></div>
+<div class="bg-primary text-on-primary">…<CloseButton /></div>
+<div class="bg-surface-inverse text-on-inverse">…<CloseButton /></div>
+```
+
+## In context
+
+The everyday job: sit in the corner of a transient surface and remove it on click. `onClick` is an
+ordinary handler — CloseButton is a real button underneath.
+
+<Preview>
+  <CloseButtonInContextDemo />
+</Preview>
+
+```tsx
+<div class="relative rounded-lg border border-subtle bg-surface-raised p-4">
+  <div>
+    <p class="font-medium">Changes saved</p>
+    <p class="text-foreground-muted">Your preferences were updated.</p>
+  </div>
+  <CloseButton
+    aria-label="Dismiss notification"
+    onClick={() => setOpen(false)}
+  />
+</div>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
+  description={
+    <div>
+      Compound components already include one. <code>Dialog.CloseTrigger</code>,{" "}
+      <code>Alert.CloseTrigger</code>, and friends render a CloseButton wired to
+      their own dismiss behavior — reach for a standalone{" "}
+      <code>CloseButton</code> for your own dismissible surfaces.
+    </div>
+  }
+/>
+
+## Custom icon
+
+`icon` overrides the built-in X — per instance, or app-wide via a preset (see
+[App-wide defaults](#app-wide-defaults-amp-overrides)). The glyph inherits `currentColor`, so a
+stroked SVG needs no color of its own. When the icon changes the **meaning** of the affordance
+(here, "remove" rather than "close"), pass a matching `aria-label` — the default name is `"Close"`.
+
+<Preview>
+  <CloseButtonCustomIconDemo />
+</Preview>
+
+```tsx
+<CloseButton aria-label="Remove" icon={<TrashIcon />} />
+```
+
+## Disabled
+
+`disabled` blocks interaction and dims the button via the `opacity-disabled` token. A native
+`<button>` uses the `disabled` attribute (and drops out of the tab order); a non-native element (see
+[Polymorphism](#polymorphism)) instead gets `aria-disabled` with blocked handlers.
+
+<Preview>
+  <CloseButton disabled />
+  <CloseButton size="md" disabled />
+  <CloseButton size="lg" disabled />
+</Preview>
+
+```tsx
+<CloseButton disabled />
+```
+
+## Polymorphism
+
+Render CloseButton as a different element or component with the `render` prop — a function that
+receives CloseButton's fully-computed props and spreads them onto your element. There is **no `as`
+prop**; `render` is the single polymorphism API.
+
+<Preview>
+  <CloseButton
+    nativeButton={false}
+    render={(props) => <a href="#" {...props} />}
+  />
+</Preview>
+
+```tsx title="Render as an anchor"
+<CloseButton
+  nativeButton={false}
+  render={(props) => <a href="#" {...props} />}
+/>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
+  description={
+    <div>
+      When you render anything other than a native <code>button</code>, set{" "}
+      <code>nativeButton</code>
+      to <code>false</code>. CloseButton then applies <code>role="button"</code>
+      , manages the tab order, and synthesizes keyboard activation (Space and
+      Enter) — the behavior a real button has for free.
+    </div>
+  }
+/>
+
+## Theming
+
+CloseButton's look comes from the active preset's recipe. You can override it at three levels,
+applied in order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance
+`slotClasses` → `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`.
+
+<PropsTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "root",
+      attr: "close-button",
+      description:
+        "The rendered element (a native button by default). Compound consumers may re-scope this value.",
+    },
+    {
+      slot: "icon",
+      attr: "close-button-icon",
+      description:
+        "The host span wrapping the glyph. Keeps the glyph from becoming the pointer target.",
+    },
+  ]}
+/>
+
+### Overriding one button
+
+`class` merges onto the root slot (your utilities win conflicts). `slotClasses` targets any slot by
+name. Use literal class strings so your Tailwind build can see them.
+
+<Preview>
+  <CloseButton slotClasses={{ root: "rounded-full bg-surface-sunken" }} />
+  <CloseButton size="lg" class="rounded-full ring-1 ring-subtle" />
+</Preview>
+
+```tsx
+<CloseButton slotClasses={{ root: "rounded-full bg-surface-sunken" }} />
+
+<CloseButton size="lg" class="rounded-full ring-1 ring-subtle" />
+```
+
+### App-wide defaults & overrides
+
+Set defaults and global part classes for **every** CloseButton through the theme with
+`definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at
+**instance ?? preset ?? builtin** precedence, so an explicit prop on a single button always wins.
+
+<Preview>
+  <ThemeProvider
+    preset={definePreset(hope, {
+      components: {
+        closeButton: {
+          defaultProps: { size: "lg" },
+          slotClasses: { root: "rounded-full" },
+        },
+      },
+    })}
+  >
+    <CloseButton />
+    <CloseButton size="sm" />
+  </ThemeProvider>
+</Preview>
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    closeButton: {
+      // Every recipe variant is defaultable.
+      defaultProps: { size: "lg" },
+      // Global part classes, folded in before per-instance slotClasses.
+      slotClasses: { root: "rounded-full" },
+    },
+  },
+});
+```
+
+The glyph is defaultable app-wide too — but as a **factory** (`() => JSX.Element`), never a bare
+element. A preset value is one object shared by every instance, and a built Solid node would _move_
+between them; a factory is called fresh per instance, so every close button gets its own glyph.
+
+```tsx title="A preset-wide close glyph"
+definePreset(hope, {
+  components: {
+    closeButton: {
+      // A factory, not <MyIcon /> — reuse-safe across every instance.
+      defaultProps: { icon: () => <MyIcon /> },
+    },
+  },
+});
+```
+
+Defaultable through `defaultProps`: `size` and the `icon` factory. Per-usage props — `disabled`,
+`nativeButton`, and event handlers — are intentionally **not** defaultable app-wide.
+
+## API
+
+### Props
+
+`CloseButton` accepts every native `<button>` attribute in addition to the props below.
+
+<PropsTable
+  columns={[
+    { key: "prop", label: "Prop", code: true },
+    { key: "type", label: "Type", code: true },
+    { key: "default", label: "Default", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      prop: "size",
+      type: "CloseButtonSize",
+      default: '"sm"',
+      description:
+        "Density scale: sm, md, lg. Scales the box and glyph together. The only visual axis — there is no variant or colorScheme.",
+    },
+    {
+      prop: "icon",
+      type: "JSX.Element | (() => JSX.Element)",
+      default: "hope's X",
+      description:
+        "The glyph. A bare element per instance, or a factory as an app-wide preset default. Inherits currentColor.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description:
+        "Disables the button. Native buttons use the disabled attribute; a non-native element uses aria-disabled and blocked handlers. Dimmed via opacity-disabled.",
+    },
+    {
+      prop: "nativeButton",
+      type: "boolean",
+      default: "true",
+      description:
+        "Whether the rendered element is a real button. Set false when rendering another element so CloseButton supplies role, tabIndex, and keyboard activation.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render CloseButton as another element or component. Receives CloseButton's computed props. The only polymorphism mechanism — there is no as prop.",
+    },
+    {
+      prop: "aria-label",
+      type: "string",
+      default: '"Close" (localized)',
+      description:
+        "Accessible name. Defaults to the localized common.close message; override it whenever the affordance means something other than close.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description:
+        "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"closeButton">',
+      default: "",
+      description: "Per-slot class overrides, keyed by root and icon.",
+    },
+  ]}
+/>
+
+## Accessibility
+
+`CloseButton` renders a real `<button>` by default and — unlike an ordinary icon-only button — can
+**never be nameless**: it falls back to a localized `"Close"` accessible name, so it is
+screen-reader-ready out of the box. Provide `aria-label` (or `aria-labelledby`) when the affordance
+means something more specific than "close".
+
+<PropsTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "action", label: "Action" },
+  ]}
+  rows={[
+    {
+      key: "Enter",
+      action: "Activates the button (native and rendered-as elements).",
+    },
+    {
+      key: "Space",
+      action:
+        "Activates the button (synthesized for rendered-as elements; page scroll is prevented).",
+    },
+    { key: "Tab", action: "Moves focus. A disabled native button is skipped." },
+  ]}
+/>
+
+- **Self-labeling** — the localized `"Close"` name means it is never an unlabeled icon button.
+  Override `aria-label` when the glyph changes the meaning (e.g. a trash icon for "remove").
+- **Focus is keyboard-only** — a pointer press does not leave a lingering focus ring; the `:focus-visible`
+  ring appears for keyboard focus, matching every other hope control.
+- **Disabled** uses the native `disabled` attribute on a `<button>` (no redundant `aria-disabled`),
+  and `aria-disabled` on a non-native element rendered via `render` + `nativeButton={false}`.

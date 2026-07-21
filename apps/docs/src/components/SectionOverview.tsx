@@ -1,5 +1,6 @@
+import { Alert } from "@hope-ui/components/alert";
 import type { JSX } from "@solidjs/web";
-import { For, Show } from "solid-js";
+import { children, For, Show } from "solid-js";
 import { hasSectionVisuals, SectionVisual } from "~/components/component-visuals";
 import { ChevronRightIcon, InfoIcon } from "~/components/Icons";
 import { PathLink } from "~/components/PathLink";
@@ -26,11 +27,22 @@ export function SectionOverview(props: {
   callout?: JSX.Element;
 }) {
   const groups = groupedNavFor(props.kind);
+  // Resolve the callout JSX **once** into a stable memo. `props.callout` is a component-valued
+  // prop, and the `<Show when={…}>` + `{…}` idiom reads it twice (the `when` gate, then the body).
+  // Each raw read of the prop reconstructs the fragment, and the throwaway construction in the
+  // `when` gate places its hydration keys (`_hk`) differently on the server vs the client — a
+  // Hydration Mismatch. `children()` builds it a single time and hands both reads the same nodes.
+  // See CLAUDE.md's `children()` decision procedure.
+  const callout = children(() => props.callout);
   // The ToC lists only the named category groups (an ungrouped section — e.g.
   // Get started — produces no entries, so TableOfContents renders nothing).
   const tocEntries: TocEntry[] = groups
     .filter((g) => g.group)
-    .map((g) => ({ value: g.group as string, depth: 2, id: slugify(g.group as string) }));
+    .map((g) => ({
+      value: g.group as string,
+      depth: 2,
+      id: slugify(g.group as string),
+    }));
 
   return (
     <div class="flex gap-10">
@@ -55,19 +67,14 @@ export function SectionOverview(props: {
             </Show>
           </div>
 
-          <Show when={props.callout}>
-            {(callout) => (
-              <div class="mt-6 flex gap-3 rounded-xl bg-primary-soft p-4 text-sm leading-relaxed text-primary-emphasis">
-                {/* The icon is wrapped in a plain <span> so the FIRST child of this
-                  hydration-keyed <Show> element is a host element, not a component —
-                  a component there trips @solidjs/web's getNextSibling hydration walk
-                  (see [[solid2-first-child-component-hydration]]). */}
-                <span class="mt-0.5 shrink-0 text-primary">
-                  <InfoIcon class="size-5" />
-                </span>
-                <div>{callout()}</div>
-              </div>
-            )}
+          <Show when={callout()}>
+            <Alert.Root
+              variant="soft"
+              colorScheme="primary"
+              icon={<InfoIcon />}
+              description={callout()}
+              class="mt-6"
+            />
           </Show>
 
           <div class="mt-10 space-y-10">

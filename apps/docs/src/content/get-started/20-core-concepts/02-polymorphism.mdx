@@ -10,7 +10,6 @@ export const summary = "Render components as other elements.";
 export const description =
   "Render any hope-ui component as a different element or component with the render prop — there is no as prop.";
 
-
 # Polymorphism
 
 {description}
@@ -25,23 +24,24 @@ receives the component's fully-computed props and spreads them onto the element 
 ```
 
 `render` is a **function, never an element** — and there is deliberately **no `as` prop**. An element
-form could only ever *drop* the component's computed props, so it would silently render something
+form could only ever _drop_ the component's computed props, so it would silently render something
 unstyled and inert. A function forces you to spread them, so the styling and behavior always reach
 your element.
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <div>
-      There's no <code>as</code> prop on purpose: its polymorphic typing degrades IDE IntelliSense on
-      every component. <code>render</code> keeps completions and error messages honest without a
-      <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit cast for a cross-element
-      render (see <a href="#typing">Typing</a>).
+      There's no <code>as</code> prop on purpose: its polymorphic typing
+      degrades IDE IntelliSense on every component. <code>render</code> keeps
+      completions and error messages honest without a
+      <code> Polymorphic&lt;T&gt;</code> generic — at the cost of one explicit
+      cast for a cross-element render (see <a href="#typing">Typing</a>).
     </div>
-  } 
+  }
 />
 
 ## Render as a link
@@ -99,18 +99,19 @@ tab-order management, and synthesized keyboard activation.
 </Button>
 ```
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <div>
-      Forget to set <code>nativeButton</code> to <code>false</code> on a non-button and you get an
-      element that looks right but isn't keyboard-operable. Button logs a warning in development when it
-      detects the mismatch; the check compiles out of production builds.
+      Forget to set <code>nativeButton</code> to <code>false</code> on a
+      non-button and you get an element that looks right but isn't
+      keyboard-operable. Button logs a warning in development when it detects
+      the mismatch; the check compiles out of production builds.
     </div>
-  } 
+  }
 />
 
 ## Render as a component
@@ -145,7 +146,7 @@ import { Button } from "@hope-ui/components/button";
   )}
 >
   Back to home
-</Button>
+</Button>;
 ```
 
 ## Ref merging
@@ -164,20 +165,23 @@ let anchor: HTMLAnchorElement | undefined;
   render={(props) => <a href="/docs" {...props} />}
 >
   Both refs resolve to the same anchor
-</Button>
+</Button>;
 ```
 
 ## Typing
 
 Each component types its `render` against its **own** element's attributes — Button's `render`
-receives button attributes, Badge's receives span attributes. Rendering as a *different* element
+receives button attributes, Badge's receives span attributes. Rendering as a _different_ element
 (button → anchor) type-checks once you assert the props at the spread:
 
 ```tsx
 <Button
   nativeButton={false}
   render={(props) => (
-    <a {...(props as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)} href="/docs" />
+    <a
+      {...(props as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)}
+      href="/docs"
+    />
   )}
 >
   Docs
@@ -200,12 +204,14 @@ is unaffected.
     {
       prop: "render",
       type: "(props) => JSX.Element",
-      description: "Render the component as another element or component. Receives the computed props to spread. The only polymorphism mechanism — there is no as prop.",
+      description:
+        "Render the component as another element or component. Receives the computed props to spread. The only polymorphism mechanism — there is no as prop.",
     },
     {
       prop: "nativeButton",
       type: "boolean",
-      description: "On interactive components like Button: set false when rendering a non-button so the component supplies role, tabIndex, and keyboard activation. Static components like Badge don't need it.",
+      description:
+        "On interactive components like Button: set false when rendering a non-button so the component supplies role, tabIndex, and keyboard activation. Static components like Badge don't need it.",
     },
   ]}
 />

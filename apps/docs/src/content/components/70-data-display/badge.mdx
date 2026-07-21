@@ -14,7 +14,6 @@ export const summary = "Inline label for statuses and counts.";
 export const description =
   "An inline label for statuses, categories, and counts — with variants, color schemes, sizes, shapes, decorators, and a status dot.";
 
-
 # Badge
 
 {description}
@@ -68,17 +67,29 @@ design. `warning` renders as a dark chip, the honest result of a symmetric swap.
 
 <Preview>
   <div class="flex flex-wrap items-center gap-3 rounded-lg bg-surface-inverse p-6">
-    <Badge variant="inverted" colorScheme="primary">primary</Badge>
-    <Badge variant="inverted" colorScheme="neutral">neutral</Badge>
-    <Badge variant="inverted" colorScheme="success">success</Badge>
-    <Badge variant="inverted" colorScheme="danger">danger</Badge>
+    <Badge variant="inverted" colorScheme="primary">
+      primary
+    </Badge>
+    <Badge variant="inverted" colorScheme="neutral">
+      neutral
+    </Badge>
+    <Badge variant="inverted" colorScheme="success">
+      success
+    </Badge>
+    <Badge variant="inverted" colorScheme="danger">
+      danger
+    </Badge>
   </div>
 </Preview>
 
 ```tsx
 <div class="bg-surface-inverse p-6">
-  <Badge variant="inverted" colorScheme="primary">primary</Badge>
-  <Badge variant="inverted" colorScheme="success">success</Badge>
+  <Badge variant="inverted" colorScheme="primary">
+    primary
+  </Badge>
+  <Badge variant="inverted" colorScheme="success">
+    success
+  </Badge>
 </div>
 ```
 
@@ -105,10 +116,18 @@ Four sizes, from `xs` to `lg` (heights step from 16px to 28px). The recipe scale
 radius, the status dot, and any decorator icon to match.
 
 <Preview>
-  <Badge variant="solid" size="xs">Extra small</Badge>
-  <Badge variant="solid" size="sm">Small</Badge>
-  <Badge variant="solid" size="md">Medium</Badge>
-  <Badge variant="solid" size="lg">Large</Badge>
+  <Badge variant="solid" size="xs">
+    Extra small
+  </Badge>
+  <Badge variant="solid" size="sm">
+    Small
+  </Badge>
+  <Badge variant="solid" size="md">
+    Medium
+  </Badge>
+  <Badge variant="solid" size="lg">
+    Large
+  </Badge>
 </Preview>
 
 ```tsx
@@ -124,10 +143,18 @@ radius, the status dot, and any decorator icon to match.
 aspect and drops the horizontal padding — the shape for a single glyph or count.
 
 <Preview>
-  <Badge variant="soft" shape="sharp">sharp</Badge>
-  <Badge variant="soft" shape="rounded">rounded</Badge>
-  <Badge variant="soft" shape="pill">pill</Badge>
-  <Badge variant="solid" colorScheme="danger" shape="circle" size="md">3</Badge>
+  <Badge variant="soft" shape="sharp">
+    sharp
+  </Badge>
+  <Badge variant="soft" shape="rounded">
+    rounded
+  </Badge>
+  <Badge variant="soft" shape="pill">
+    pill
+  </Badge>
+  <Badge variant="solid" colorScheme="danger" shape="circle" size="md">
+    3
+  </Badge>
 </Preview>
 
 ```tsx
@@ -144,10 +171,18 @@ a status indicator, where the label carries the meaning and the color reinforces
 across every role.
 
 <Preview>
-  <Badge variant="dot" colorScheme="success">Live</Badge>
-  <Badge variant="dot" colorScheme="warning">Deploying</Badge>
-  <Badge variant="dot" colorScheme="danger">Failed</Badge>
-  <Badge variant="dot" colorScheme="neutral">Paused</Badge>
+  <Badge variant="dot" colorScheme="success">
+    Live
+  </Badge>
+  <Badge variant="dot" colorScheme="warning">
+    Deploying
+  </Badge>
+  <Badge variant="dot" colorScheme="danger">
+    Failed
+  </Badge>
+  <Badge variant="dot" colorScheme="neutral">
+    Paused
+  </Badge>
 </Preview>
 
 ```tsx
@@ -224,12 +259,16 @@ The `circle` shape turns a badge into a round count pip. Anchor one to the corne
 
 <Preview>
   <div class="w-72">
-    <Badge variant="soft" colorScheme="info" fullWidth>Full width</Badge>
+    <Badge variant="soft" colorScheme="info" fullWidth>
+      Full width
+    </Badge>
   </div>
 </Preview>
 
 ```tsx
-<Badge variant="soft" colorScheme="info" fullWidth>Full width</Badge>
+<Badge variant="soft" colorScheme="info" fullWidth>
+  Full width
+</Badge>
 ```
 
 ## Polymorphism
@@ -259,20 +298,21 @@ polymorphism API.
 </Badge>
 ```
 
-<Alert.Root 
-  variant="soft" 
-  colorScheme="primary" 
-  class="not-prose" 
-  icon={<InfoIcon class="mt-0.5"/>} 
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
   description={
     <div>
-      Badge is a static label with no behavior of its own, so — unlike Button — rendering it as an
-      anchor needs no extra flags: the anchor brings its own link semantics, and Badge just contributes
-      its computed <code>class</code> and merges refs. Spreading Badge's <code>span</code> props onto a
-      different element may need an <code>as unknown as</code> cast to satisfy TypeScript; the runtime
-      behavior is unaffected.
+      Badge is a static label with no behavior of its own, so — unlike Button —
+      rendering it as an anchor needs no extra flags: the anchor brings its own
+      link semantics, and Badge just contributes its computed <code>class</code>{" "}
+      and merges refs. Spreading Badge's <code>span</code> props onto a
+      different element may need an <code>as unknown as</code> cast to satisfy
+      TypeScript; the runtime behavior is unaffected.
     </div>
-  } 
+  }
 />
 
 ## Theming
@@ -293,11 +333,34 @@ Every part carries a `data-slot` attribute you can target, and each is addressab
     { key: "description", label: "Description" },
   ]}
   rows={[
-    { slot: "root", attr: "badge", description: "The rendered element (a span by default)." },
-    { slot: "label", attr: "badge-label", description: "Wraps the children. Rendered only when children is set." },
-    { slot: "startDecorator", attr: "badge-start-decorator", description: "Leading decorator wrapper. Rendered only when startDecorator is set." },
-    { slot: "endDecorator", attr: "badge-end-decorator", description: "Trailing decorator wrapper. Rendered only when endDecorator is set." },
-    { slot: "dot", attr: "badge-dot", description: "The status pip. Rendered only for the dot variant; marked aria-hidden." },
+    {
+      slot: "root",
+      attr: "badge",
+      description: "The rendered element (a span by default).",
+    },
+    {
+      slot: "label",
+      attr: "badge-label",
+      description: "Wraps the children. Rendered only when children is set.",
+    },
+    {
+      slot: "startDecorator",
+      attr: "badge-start-decorator",
+      description:
+        "Leading decorator wrapper. Rendered only when startDecorator is set.",
+    },
+    {
+      slot: "endDecorator",
+      attr: "badge-end-decorator",
+      description:
+        "Trailing decorator wrapper. Rendered only when endDecorator is set.",
+    },
+    {
+      slot: "dot",
+      attr: "badge-dot",
+      description:
+        "The status pip. Rendered only for the dot variant; marked aria-hidden.",
+    },
   ]}
 />
 
@@ -307,10 +370,18 @@ Every part carries a `data-slot` attribute you can target, and each is addressab
 by name. Use literal class strings so your Tailwind build can see them.
 
 <Preview>
-  <Badge variant="solid" colorScheme="primary" slotClasses={{ root: "px-4 tracking-wide uppercase" }}>
+  <Badge
+    variant="solid"
+    colorScheme="primary"
+    slotClasses={{ root: "px-4 tracking-wide uppercase" }}
+  >
     New
   </Badge>
-  <Badge variant="soft" colorScheme="success" class="rounded-none border-l-4 border-success">
+  <Badge
+    variant="soft"
+    colorScheme="success"
+    class="rounded-none border-l-4 border-success"
+  >
     Ribbon
   </Badge>
 </Preview>
@@ -346,8 +417,12 @@ preset ?? builtin** precedence, so an explicit prop on a single badge always win
       },
     })}
   >
-    <Badge variant="solid" colorScheme="primary">Branded</Badge>
-    <Badge variant="soft" colorScheme="success">Branded</Badge>
+    <Badge variant="solid" colorScheme="primary">
+      Branded
+    </Badge>
+    <Badge variant="soft" colorScheme="success">
+      Branded
+    </Badge>
   </ThemeProvider>
 </Preview>
 
@@ -373,7 +448,7 @@ import { myPreset } from "./theme";
 
 <ThemeProvider preset={myPreset}>
   {/* every Badge below is pill-shaped & uppercase */}
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 Because Badge is a static label, **every** styling axis is defaultable through `defaultProps`:
@@ -398,13 +473,15 @@ Because Badge is a static label, **every** styling axis is defaultable through `
       prop: "variant",
       type: "BadgeVariant",
       default: '"soft"',
-      description: "Visual style: solid, inverted, soft, subtle, outline, dot. inverted is the on-color swap of solid, for solid surfaces.",
+      description:
+        "Visual style: solid, inverted, soft, subtle, outline, dot. inverted is the on-color swap of solid, for solid surfaces.",
     },
     {
       prop: "colorScheme",
       type: "BadgeColorScheme",
       default: '"neutral"',
-      description: "Semantic role color: primary, neutral, success, info, warning, danger. Every variant is role-aware.",
+      description:
+        "Semantic role color: primary, neutral, success, info, warning, danger. Every variant is role-aware.",
     },
     {
       prop: "size",
@@ -416,7 +493,8 @@ Because Badge is a static label, **every** styling axis is defaultable through `
       prop: "shape",
       type: "BadgeShape",
       default: '"rounded"',
-      description: "Corner shape: sharp, rounded, pill, circle. circle squares the aspect for a single glyph or count.",
+      description:
+        "Corner shape: sharp, rounded, pill, circle. circle squares the aspect for a single glyph or count.",
     },
     {
       prop: "fullWidth",
@@ -428,7 +506,8 @@ Because Badge is a static label, **every** styling axis is defaultable through `
       prop: "startDecorator",
       type: "JSX.Element",
       default: "",
-      description: "Leading content before the label — typically an icon. Sized to the badge by the recipe.",
+      description:
+        "Leading content before the label — typically an icon. Sized to the badge by the recipe.",
     },
     {
       prop: "endDecorator",
@@ -440,19 +519,22 @@ Because Badge is a static label, **every** styling axis is defaultable through `
       prop: "render",
       type: "(props) => JSX.Element",
       default: "",
-      description: "Render Badge as another element or component. Receives Badge's computed props. The only polymorphism mechanism — there is no as prop.",
+      description:
+        "Render Badge as another element or component. Receives Badge's computed props. The only polymorphism mechanism — there is no as prop.",
     },
     {
       prop: "class",
       type: "string",
       default: "",
-      description: "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
+      description:
+        "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
     },
     {
       prop: "slotClasses",
       type: 'SlotClasses<"badge">',
       default: "",
-      description: "Per-slot class overrides, keyed by root, label, startDecorator, endDecorator, dot.",
+      description:
+        "Per-slot class overrides, keyed by root, label, startDecorator, endDecorator, dot.",
     },
     {
       prop: "children",
