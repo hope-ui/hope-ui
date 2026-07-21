@@ -54,6 +54,10 @@ describe("hope button recipe", () => {
     const solidPrimary = buttonRecipe({ variant: "solid", colorScheme: "primary" }).root();
     expect(solidPrimary).toContain("hover:not-data-pressed:bg-primary-hovered");
     expect(solidPrimary).toContain("data-pressed:bg-primary-pressed");
+    // Solid's border matches its fill and tracks it across states (no transparent gap to the page bg).
+    expect(solidPrimary).toContain("border-primary");
+    expect(solidPrimary).toContain("hover:not-data-pressed:border-primary-hovered");
+    expect(solidPrimary).toContain("data-pressed:border-primary-pressed");
     // Inverted is the swap of solid on its own dedicated tokens (fill `{role}-inverted`, content
     // `on-{role}-inverted`), never borrowing solid's `on-{role}`/`{role}`; it carries its own wash.
     const invertedPrimary = buttonRecipe({ variant: "inverted", colorScheme: "primary" }).root();
@@ -61,6 +65,10 @@ describe("hope button recipe", () => {
     expect(invertedPrimary).toContain("text-on-primary-inverted");
     expect(invertedPrimary).toContain("hover:not-data-pressed:bg-primary-inverted-hovered");
     expect(invertedPrimary).toContain("data-pressed:bg-primary-inverted-pressed");
+    // Border matches the inverted fill and tracks it across states.
+    expect(invertedPrimary).toContain("border-primary-inverted");
+    expect(invertedPrimary).toContain("hover:not-data-pressed:border-primary-inverted-hovered");
+    expect(invertedPrimary).toContain("data-pressed:border-primary-inverted-pressed");
     expect(invertedPrimary).not.toContain("bg-on-primary");
     expect(invertedPrimary).not.toContain("text-primary ");
     // Soft label is the role's content color (`-emphasis`, renamed from `on-{role}-soft`); its fill
@@ -70,6 +78,10 @@ describe("hope button recipe", () => {
     expect(softSuccess).toContain("text-success-emphasis");
     expect(softSuccess).toContain("hover:not-data-pressed:bg-success-soft-hovered");
     expect(softSuccess).toContain("data-pressed:bg-success-soft-pressed");
+    // Border matches the soft fill and tracks it across states.
+    expect(softSuccess).toContain("border-success-soft");
+    expect(softSuccess).toContain("hover:not-data-pressed:border-success-soft-hovered");
+    expect(softSuccess).toContain("data-pressed:border-success-soft-pressed");
     // Outline border is the soft `-subtle-line` tint (the softer of the two role-border tiers), with
     // its own wash ladder.
     const outlineWarning = buttonRecipe({ variant: "outline", colorScheme: "warning" }).root();
@@ -92,6 +104,31 @@ describe("hope button recipe", () => {
     const outlineNeutral = buttonRecipe({ variant: "outline", colorScheme: "neutral" }).root();
     expect(outlineNeutral).toContain("border-neutral-subtle-line");
     expect(outlineNeutral).not.toContain("border-strong");
+  });
+
+  it("reserves a 1px border width on every variant and keeps ghost/link borderless (no transparent gap on fills)", () => {
+    // The base carries no border COLOR now, so every variant owns one. Filled variants match their
+    // fill; ghost/link opt out explicitly with `border-transparent`; the 1px width is always present
+    // so nothing shifts a pixel between bordered and borderless variants.
+    for (const variant of VARIANTS) {
+      expect(buttonRecipe({ variant, colorScheme: "primary" }).root()).toMatch(
+        /(?:^|\s)border(?:\s|$)/,
+      );
+    }
+    expect(buttonRecipe({ variant: "ghost", colorScheme: "primary" }).root()).toContain(
+      "border-transparent",
+    );
+    expect(buttonRecipe({ variant: "link", colorScheme: "primary" }).root()).toContain(
+      "border-transparent",
+    );
+    // A filled variant never falls back to a transparent border (the gap the borders close).
+    expect(buttonRecipe({ variant: "solid", colorScheme: "primary" }).root()).not.toContain(
+      "border-transparent",
+    );
+    // The reserved-border no longer needs `bg-clip-padding` (the border is a real, opaque color).
+    expect(buttonRecipe({ variant: "solid", colorScheme: "primary" }).root()).not.toContain(
+      "bg-clip-padding",
+    );
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {

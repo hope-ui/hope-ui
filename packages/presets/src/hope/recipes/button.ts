@@ -48,6 +48,12 @@ import { tv } from "@hope-ui/theming";
  *              underline on hover.
  * The soft/outline/ghost/link label is `{role}-emphasis` — the role's legible *content* color — so
  * neutral & warning read correctly in both themes rather than looking disabled.
+ *
+ * The filled variants (solid/inverted/soft) also carry a border that MATCHES their fill and tracks it
+ * across states (`border-{…}` at rest, `-hovered`/`-pressed` under the same pressed-guarded triggers as
+ * the fill), so the reserved 1px edge is a clean continuation of the fill rather than a transparent gap
+ * to the page background — and the base's `border-color` transition animates it in step. `ghost`/`link`
+ * stay borderless (they set `border-transparent`); `focus-visible:border-focus` still wins on focus.
  */
 const COLOR_CLASSES: Record<
   ButtonColorScheme,
@@ -55,10 +61,10 @@ const COLOR_CLASSES: Record<
 > = {
   primary: {
     solid:
-      "bg-primary text-on-primary hover:not-data-pressed:bg-primary-hovered data-pressed:bg-primary-pressed",
+      "bg-primary text-on-primary border-primary hover:not-data-pressed:bg-primary-hovered hover:not-data-pressed:border-primary-hovered data-pressed:bg-primary-pressed data-pressed:border-primary-pressed",
     inverted:
-      "bg-primary-inverted text-on-primary-inverted hover:not-data-pressed:bg-primary-inverted-hovered data-pressed:bg-primary-inverted-pressed",
-    soft: "bg-primary-soft text-primary-emphasis hover:not-data-pressed:bg-primary-soft-hovered data-pressed:bg-primary-soft-pressed",
+      "bg-primary-inverted text-on-primary-inverted border-primary-inverted hover:not-data-pressed:bg-primary-inverted-hovered hover:not-data-pressed:border-primary-inverted-hovered data-pressed:bg-primary-inverted-pressed data-pressed:border-primary-inverted-pressed",
+    soft: "bg-primary-soft text-primary-emphasis border-primary-soft hover:not-data-pressed:bg-primary-soft-hovered hover:not-data-pressed:border-primary-soft-hovered data-pressed:bg-primary-soft-pressed data-pressed:border-primary-soft-pressed",
     outline:
       "text-primary-emphasis border-primary-subtle-line hover:not-data-pressed:bg-primary-outline-hovered data-pressed:bg-primary-outline-pressed",
     ghost:
@@ -67,10 +73,10 @@ const COLOR_CLASSES: Record<
   },
   neutral: {
     solid:
-      "bg-neutral text-on-neutral hover:not-data-pressed:bg-neutral-hovered data-pressed:bg-neutral-pressed",
+      "bg-neutral text-on-neutral border-neutral hover:not-data-pressed:bg-neutral-hovered hover:not-data-pressed:border-neutral-hovered data-pressed:bg-neutral-pressed data-pressed:border-neutral-pressed",
     inverted:
-      "bg-neutral-inverted text-on-neutral-inverted hover:not-data-pressed:bg-neutral-inverted-hovered data-pressed:bg-neutral-inverted-pressed",
-    soft: "bg-neutral-soft text-neutral-emphasis hover:not-data-pressed:bg-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed",
+      "bg-neutral-inverted text-on-neutral-inverted border-neutral-inverted hover:not-data-pressed:bg-neutral-inverted-hovered hover:not-data-pressed:border-neutral-inverted-hovered data-pressed:bg-neutral-inverted-pressed data-pressed:border-neutral-inverted-pressed",
+    soft: "bg-neutral-soft text-neutral-emphasis border-neutral-soft hover:not-data-pressed:bg-neutral-soft-hovered hover:not-data-pressed:border-neutral-soft-hovered data-pressed:bg-neutral-soft-pressed data-pressed:border-neutral-soft-pressed",
     outline:
       "text-neutral-emphasis border-neutral-subtle-line hover:not-data-pressed:bg-neutral-outline-hovered data-pressed:bg-neutral-outline-pressed",
     ghost:
@@ -79,10 +85,10 @@ const COLOR_CLASSES: Record<
   },
   success: {
     solid:
-      "bg-success text-on-success hover:not-data-pressed:bg-success-hovered data-pressed:bg-success-pressed",
+      "bg-success text-on-success border-success hover:not-data-pressed:bg-success-hovered hover:not-data-pressed:border-success-hovered data-pressed:bg-success-pressed data-pressed:border-success-pressed",
     inverted:
-      "bg-success-inverted text-on-success-inverted hover:not-data-pressed:bg-success-inverted-hovered data-pressed:bg-success-inverted-pressed",
-    soft: "bg-success-soft text-success-emphasis hover:not-data-pressed:bg-success-soft-hovered data-pressed:bg-success-soft-pressed",
+      "bg-success-inverted text-on-success-inverted border-success-inverted hover:not-data-pressed:bg-success-inverted-hovered hover:not-data-pressed:border-success-inverted-hovered data-pressed:bg-success-inverted-pressed data-pressed:border-success-inverted-pressed",
+    soft: "bg-success-soft text-success-emphasis border-success-soft hover:not-data-pressed:bg-success-soft-hovered hover:not-data-pressed:border-success-soft-hovered data-pressed:bg-success-soft-pressed data-pressed:border-success-soft-pressed",
     outline:
       "text-success-emphasis border-success-subtle-line hover:not-data-pressed:bg-success-outline-hovered data-pressed:bg-success-outline-pressed",
     ghost:
@@ -91,10 +97,10 @@ const COLOR_CLASSES: Record<
   },
   warning: {
     solid:
-      "bg-warning text-on-warning hover:not-data-pressed:bg-warning-hovered data-pressed:bg-warning-pressed",
+      "bg-warning text-on-warning border-warning hover:not-data-pressed:bg-warning-hovered hover:not-data-pressed:border-warning-hovered data-pressed:bg-warning-pressed data-pressed:border-warning-pressed",
     inverted:
-      "bg-warning-inverted text-on-warning-inverted hover:not-data-pressed:bg-warning-inverted-hovered data-pressed:bg-warning-inverted-pressed",
-    soft: "bg-warning-soft text-warning-emphasis hover:not-data-pressed:bg-warning-soft-hovered data-pressed:bg-warning-soft-pressed",
+      "bg-warning-inverted text-on-warning-inverted border-warning-inverted hover:not-data-pressed:bg-warning-inverted-hovered hover:not-data-pressed:border-warning-inverted-hovered data-pressed:bg-warning-inverted-pressed data-pressed:border-warning-inverted-pressed",
+    soft: "bg-warning-soft text-warning-emphasis border-warning-soft hover:not-data-pressed:bg-warning-soft-hovered hover:not-data-pressed:border-warning-soft-hovered data-pressed:bg-warning-soft-pressed data-pressed:border-warning-soft-pressed",
     outline:
       "text-warning-emphasis border-warning-subtle-line hover:not-data-pressed:bg-warning-outline-hovered data-pressed:bg-warning-outline-pressed",
     ghost:
@@ -103,10 +109,10 @@ const COLOR_CLASSES: Record<
   },
   danger: {
     solid:
-      "bg-danger text-on-danger hover:not-data-pressed:bg-danger-hovered data-pressed:bg-danger-pressed",
+      "bg-danger text-on-danger border-danger hover:not-data-pressed:bg-danger-hovered hover:not-data-pressed:border-danger-hovered data-pressed:bg-danger-pressed data-pressed:border-danger-pressed",
     inverted:
-      "bg-danger-inverted text-on-danger-inverted hover:not-data-pressed:bg-danger-inverted-hovered data-pressed:bg-danger-inverted-pressed",
-    soft: "bg-danger-soft text-danger-emphasis hover:not-data-pressed:bg-danger-soft-hovered data-pressed:bg-danger-soft-pressed",
+      "bg-danger-inverted text-on-danger-inverted border-danger-inverted hover:not-data-pressed:bg-danger-inverted-hovered hover:not-data-pressed:border-danger-inverted-hovered data-pressed:bg-danger-inverted-pressed data-pressed:border-danger-inverted-pressed",
+    soft: "bg-danger-soft text-danger-emphasis border-danger-soft hover:not-data-pressed:bg-danger-soft-hovered hover:not-data-pressed:border-danger-soft-hovered data-pressed:bg-danger-soft-pressed data-pressed:border-danger-soft-pressed",
     outline:
       "text-danger-emphasis border-danger-subtle-line hover:not-data-pressed:bg-danger-outline-hovered data-pressed:bg-danger-outline-pressed",
     ghost:
@@ -115,10 +121,10 @@ const COLOR_CLASSES: Record<
   },
   info: {
     solid:
-      "bg-info text-on-info hover:not-data-pressed:bg-info-hovered data-pressed:bg-info-pressed",
+      "bg-info text-on-info border-info hover:not-data-pressed:bg-info-hovered hover:not-data-pressed:border-info-hovered data-pressed:bg-info-pressed data-pressed:border-info-pressed",
     inverted:
-      "bg-info-inverted text-on-info-inverted hover:not-data-pressed:bg-info-inverted-hovered data-pressed:bg-info-inverted-pressed",
-    soft: "bg-info-soft text-info-emphasis hover:not-data-pressed:bg-info-soft-hovered data-pressed:bg-info-soft-pressed",
+      "bg-info-inverted text-on-info-inverted border-info-inverted hover:not-data-pressed:bg-info-inverted-hovered hover:not-data-pressed:border-info-inverted-hovered data-pressed:bg-info-inverted-pressed data-pressed:border-info-inverted-pressed",
+    soft: "bg-info-soft text-info-emphasis border-info-soft hover:not-data-pressed:bg-info-soft-hovered hover:not-data-pressed:border-info-soft-hovered data-pressed:bg-info-soft-pressed data-pressed:border-info-soft-pressed",
     outline:
       "text-info-emphasis border-info-subtle-line hover:not-data-pressed:bg-info-outline-hovered data-pressed:bg-info-outline-pressed",
     ghost:
@@ -205,11 +211,14 @@ const paddingCompoundVariants = [
  */
 export const buttonRecipe = tv({
   slots: {
-    // `bg-clip-padding` keeps the reserved 1px transparent border from painting the fill under it, so
-    // solid↔outline never shifts by a pixel.
+    // The bare `border` reserves a 1px border WIDTH so solid↔outline never shifts by a pixel; the
+    // border COLOR is supplied by every variant (filled variants match their own fill across states,
+    // `default`/`outline` carry a real edge, `ghost`/`link` stay transparent), so the reserved edge is
+    // a clean, fill-matched line rather than a transparent gap to the page background — no
+    // `bg-clip-padding` needed. The `border-color` transition below animates it alongside the fill.
     root: [
       "relative inline-flex items-center justify-center whitespace-nowrap font-medium leading-none",
-      "select-none border border-transparent bg-clip-padding outline-none",
+      "select-none border outline-none",
       // Transition `translate`, NOT `transform`: Tailwind v4 compiles `translate-y-px` (the pressed
       // sink) to the standalone `translate` CSS property, so `transition-transform` would never animate
       // the sink — it would snap. Colors/border/shadow round out the list.
@@ -312,7 +321,9 @@ export const buttonRecipe = tv({
       inverted: { root: "" },
       soft: { root: "" },
       outline: { root: "bg-transparent" },
-      ghost: { root: "bg-transparent" },
+      // Borderless: `ghost`/`link` set `border-transparent` explicitly now that the base carries no
+      // border color (the bare `border` there would otherwise default to `currentColor`).
+      ghost: { root: "bg-transparent border-transparent" },
       // Layout only; the color ladder + underline live per-role in `COLOR_CLASSES.link`.
       link: {
         root: "h-auto bg-transparent border-transparent px-0.5 py-0.5",

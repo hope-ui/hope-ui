@@ -36,26 +36,31 @@ describe("hope badge recipe", () => {
     assertSlotRecipeConformance(badgeRecipe, { cases, slots: SLOTS });
   });
 
-  it("wires solid to the role fill + on-color text", () => {
+  it("wires solid to the role fill + on-color text + a fill-matched border", () => {
     const solid = badgeRecipe({ variant: "solid", colorScheme: "danger" }).root();
     expect(solid).toContain("bg-danger");
     expect(solid).toContain("text-on-danger");
+    // The reserved border matches the fill, so the chip has no transparent gap to the page bg.
+    expect(solid).toContain("border-danger");
   });
 
   it("wires inverted to its own dedicated swap tokens (never borrowing solid's on-{role}/{role})", () => {
     const inverted = badgeRecipe({ variant: "inverted", colorScheme: "primary" }).root();
     expect(inverted).toContain("bg-primary-inverted");
     expect(inverted).toContain("text-on-primary-inverted");
+    // Its reserved border matches the inverted fill on its own `-inverted` family.
+    expect(inverted).toContain("border-primary-inverted");
     // It no longer reuses solid's tokens as the swap — it paints its own `-inverted` family.
     expect(inverted).not.toContain("bg-on-primary");
     expect(inverted).not.toContain("text-primary ");
   });
 
-  it("wires soft to the tonal fill + role content color", () => {
+  it("wires soft to the tonal fill + role content color + a fill-matched border", () => {
     const soft = badgeRecipe({ variant: "soft", colorScheme: "primary" }).root();
     expect(soft).toContain("bg-primary-soft");
     expect(soft).toContain("text-primary-emphasis");
-    // soft has no border tint — that is the `subtle` variant.
+    // soft's border matches its own fill (`-soft`), not the darker `-subtle-line` the subtle variant uses.
+    expect(soft).toContain("border-primary-soft");
     expect(soft).not.toContain("border-primary-subtle-line");
   });
 
@@ -84,11 +89,20 @@ describe("hope badge recipe", () => {
     expect(root).not.toContain("bg-success");
   });
 
-  it("reserves a transparent border on the root so bordered variants never shift a pixel", () => {
+  it("reserves a fill-matched 1px border on every variant so none shifts a pixel (no transparent gap)", () => {
+    // The reserved border is now a real, fill-matched color — never a transparent gap to the page bg,
+    // so `bg-clip-padding` is gone too.
     const solid = badgeRecipe({ variant: "solid", colorScheme: "primary" }).root();
-    expect(solid).toContain("border");
-    expect(solid).toContain("border-transparent");
-    expect(solid).toContain("bg-clip-padding");
+    expect(solid).toMatch(/(?:^|\s)border(?:\s|$)/); // the 1px width utility from the base
+    expect(solid).toContain("border-primary");
+    expect(solid).not.toContain("border-transparent");
+    expect(solid).not.toContain("bg-clip-padding");
+    // Every variant carries a 1px border width, so bordered and unbordered ones align to the pixel.
+    for (const variant of VARIANTS) {
+      expect(badgeRecipe({ variant, colorScheme: "primary" }).root()).toMatch(
+        /(?:^|\s)border(?:\s|$)/,
+      );
+    }
   });
 
   it("owns the radius through `shape`, with circle squaring the aspect and dropping padding", () => {
