@@ -1,14 +1,17 @@
 /*
- * @hope-ui/presets/hope/tokens.css — hope's semantic token *values*.
+ * @hope-ui/presets/hope/theme.css — hope's semantic token *values* (the default look).
  *
  * hope authors its `--hope-*` custom properties directly in CSS (here), not in TypeScript. Each
  * value points at a Tailwind palette var via `var(--color-*)`, so the theme stays in lockstep with
  * Tailwind's scale; the derived colors (`focus-halo`, `scrim`) are `color-mix(...)` — authoring a
  * derived value in the preset is allowed (the preset owns the raw scale); recipes stay pure. The
- * shared `_base/theme-map.css` maps the color `--hope-*` names into clean Tailwind utilities
- * (`bg-primary`, `text-primary-emphasis`, …); `_base/opacity.css` exposes the opacity axis.
+ * shared `_base/_theme-map.css` maps the color `--hope-*` names into clean Tailwind utilities
+ * (`bg-primary`, `text-primary-emphasis`, …); `_base/_opacity.css` exposes the opacity axis.
  *
- * Imported by `./tailwind.css`, so these declarations land in the consumer's compiled stylesheet:
+ * This is a **standalone subpath** (`@hope-ui/presets/hope/theme.css`), imported by the consumer
+ * directly, *after* `./tailwind.css` — not from within it — so the token layer is opt-out: skip it
+ * and import your own `theme.css` to restyle every token. Its declarations land in the consumer's
+ * compiled stylesheet, where:
  *   - the `var(--color-*)` references keep Tailwind v4 from tree-shaking the palette shades this
  *     preset uses (no `@source` scan trick needed — the references are literally in the CSS), and
  *   - `<ThemeProvider preset={hope}>` renders no DOM of its own (hope is a zero-DOM preset).
@@ -21,7 +24,7 @@
  * 700); in dark mode it lightens (rest 400 → hovered/pressed 300).
  *
  * `.dark` follows `:root`: both selectors have equal specificity, so source order decides, and the
- * dark overrides win whenever the `.dark` class (see `_base/variants.css`) is present. Conformance
+ * dark overrides win whenever the `.dark` class (see `_base/_variants.css`) is present. Conformance
  * checks only `:root`, so the two blocks are kept in lockstep by hand — 141 color tokens each.
  */
 

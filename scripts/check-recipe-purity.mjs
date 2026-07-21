@@ -2,7 +2,7 @@
 // Fails CI if a preset recipe *computes* a color instead of referencing a finished token. Recipes
 // reference `--hope-*` tokens only, as clean Tailwind utilities (`bg-primary`, `hover:bg-primary-hovered`,
 // `focus-visible:ring-focus-halo`); the preset owns the raw scale and authors any derived value
-// (a translucent halo, a mixed wash) as its own token in `tokens.css`. A recipe that reaches for
+// (a translucent halo, a mixed wash) as its own token in `theme.css`. A recipe that reaches for
 // `color-mix(...)`, an alpha modifier (`ring-focus/50`), or a magic opacity (`opacity-90`) applies a
 // fixed rule to a base it does not own — so a consumer that redefines that base silently gets a
 // broken color. See __internal__/theming.md ("recipe purity") and __internal__/semantic-color-token-redesign.md.
@@ -154,7 +154,7 @@ const PATTERNS = [
   {
     label: "color-mix()",
     re: /color-mix\s*\(/g,
-    hint: "author the derived color as a token in tokens.css (the scrim/focus-halo precedent)",
+    hint: "author the derived color as a token in theme.css (the scrim/focus-halo precedent)",
   },
   {
     label: "arbitrary value referencing --hope-* or color-mix",

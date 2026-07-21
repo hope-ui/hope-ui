@@ -149,7 +149,7 @@ export function assertSemanticTokenConformance(cssText: string, tokens?: readonl
  * defines a `--hope-<token>` variable for every semantic opacity token in `tokens` (default: the
  * full {@link SEMANTIC_OPACITY_TOKENS} axis). Opacity is a separate contract from color — Tailwind
  * v4.3.2 has no `--opacity-*` theme namespace, so the values reach utilities through the shared
- * `_base/opacity.css` `@utility` layer rather than `@theme inline` — but the CSS-side completeness
+ * `_base/_opacity.css` `@utility` layer rather than `@theme inline` — but the CSS-side completeness
  * requirement is the same: a token the preset forgot to define compiles its `@utility` to an
  * unresolved `var()`. The `--hope-` namespace is shared, so it reuses the same `--hope-<token>:` regex.
  */

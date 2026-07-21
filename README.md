@@ -50,7 +50,8 @@ provider:
 ```tsx
 // app entry CSS (imported by your Tailwind v4 entry)
 // @import "tailwindcss";
-// @import "@hope-ui/presets/hope/tailwind.css";
+// @import "@hope-ui/presets/hope/tailwind.css";  // structure
+// @import "@hope-ui/presets/hope/theme.css";     // hope's token values (or your own)
 
 import { ThemeProvider } from "@hope-ui/theming";
 import { hope } from "@hope-ui/presets/hope";
@@ -67,8 +68,9 @@ function App() {
 }
 ```
 
-`@import "@hope-ui/presets/hope/tailwind.css"` supplies the `--hope-*` design tokens and their
-mapping to clean utilities (`bg-primary`, `text-on-primary`, …); `<ThemeProvider preset={hope}>`
+`@import "@hope-ui/presets/hope/tailwind.css"` maps the `--hope-*` design tokens to clean utilities
+(`bg-primary`, `text-on-primary`, …), and `@import "@hope-ui/presets/hope/theme.css"` supplies their
+values (a separate, opt-out import — swap in your own to restyle); `<ThemeProvider preset={hope}>`
 gives components their recipes at runtime. `hope` is a **zero-DOM preset** — the provider renders
 no markup of its own. See [`__internal__/theming.md`](__internal__/theming.md).
 

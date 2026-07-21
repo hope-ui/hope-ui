@@ -28,14 +28,16 @@ implements.
 | Import | Kind | Purpose |
 | ------ | ---- | ------- |
 | `@hope-ui/presets/hope` | JS | `hope` (the `Preset`) and `hopeRecipes` (the raw recipe map). |
-| `@hope-ui/presets/hope/tailwind.css` | CSS | The Tailwind v4 entry — `--hope-*` token values + the `@theme inline` mapping. |
+| `@hope-ui/presets/hope/tailwind.css` | CSS | The structural entry — the `@theme inline` token→utility mapping, radius scale, and recipe `@source`. No token values. |
+| `@hope-ui/presets/hope/theme.css` | CSS | hope's `--hope-*` token values (`:root` + `.dark`). A separate, opt-out import — skip it to bring your own. |
 
 ## Usage
 
 ```css
 /* your Tailwind entry */
 @import "tailwindcss";
-@import "@hope-ui/presets/hope/tailwind.css";
+@import "@hope-ui/presets/hope/tailwind.css"; /* structure */
+@import "@hope-ui/presets/hope/theme.css"; /* hope's token values — or import your own instead */
 ```
 
 ```tsx
@@ -45,7 +47,7 @@ import { hope } from "@hope-ui/presets/hope";
 <ThemeProvider preset={hope}>{/* app */}</ThemeProvider>;
 ```
 
-`hope` is a **zero-DOM preset**: its token *values* are authored in CSS (`src/hope/tokens.css` —
+`hope` is a **zero-DOM preset**: its token *values* are authored in CSS (`src/hope/theme.css` —
 `:root` + `.dark`), so `<ThemeProvider preset={hope}>` renders no runtime token `<style>`. Dark mode
 is a `.dark` class. Theme is chosen at **build time** (which preset CSS you import); runtime
 theme-switching is possible via `data-theme`/`.dark` but out of scope for now.
@@ -55,12 +57,15 @@ theme-switching is possible via `data-theme`/`.dark` but out of scope for now.
 ```
 src/
 ├── _base/                # shared structural layer — reused unchanged by every preset (not a subpath)
-│   ├── variants.css      #   @custom-variant dark
-│   └── theme-map.css     #   @theme inline: --hope-* → Tailwind color namespace
+│   ├── base.css          #   the single entry — aggregates the partials below (imported by tailwind.css)
+│   ├── _variants.css     #   @custom-variant dark + data-* states
+│   ├── _opacity.css      #   @utility opacity-disabled/loading (--hope-opacity-* axis)
+│   ├── _scrollbar.css    #   @utility no-scrollbar
+│   └── _theme-map.css    #   @theme inline: --hope-* → Tailwind color namespace
 └── hope/
     ├── index.ts          # the JS preset — definePreset over the recipe map (no token values here)
-    ├── tokens.css        # hope's --hope-* token values (:root + .dark)
-    ├── tailwind.css      # the published CSS entry — a thin orchestrator of @imports
+    ├── tailwind.css      # structural CSS entry — @import _base/base.css, radius scale, @source recipes
+    ├── theme.css         # hope's --hope-* token values (:root + .dark) — a separate, opt-out import
     └── recipes/          # tailwind-variants slot recipes; registered via @source
 ```
 

@@ -8,7 +8,7 @@
  * overrides, or bootstrap a *root* preset from a raw recipe map.
  *
  * Semantic token *values* are **not** part of this API — a preset authors them in CSS (as `--hope-*`
- * custom properties; see `@hope-ui/presets/hope`'s `tokens.css`), so `ThemeProvider` renders no DOM.
+ * custom properties; see `@hope-ui/presets/hope`'s `theme.css`), so `ThemeProvider` renders no DOM.
  * This module is types + two pure functions (`definePreset`, `isPreset`) only — no DOM, no Solid
  * runtime (that is `../theme-context`).
  *

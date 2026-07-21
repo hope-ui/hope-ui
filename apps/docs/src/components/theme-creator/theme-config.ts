@@ -89,7 +89,7 @@ export interface ThemeConfig {
 
 /**
  * hope's own family map + radius. Feeding this through the generator reproduces the shipped
- * `packages/presets/src/hope/tokens.css` (the one intentional deviation: hope tints `warning`'s
+ * `packages/presets/src/hope/theme.css` (the one intentional deviation: hope tints `warning`'s
  * on-color with `taupe`, while the generator uses the chosen neutral family — see `generator.ts`).
  * Every `config` signal initialises here so the prerendered (SSG) markup is deterministic.
  */

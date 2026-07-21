@@ -3,6 +3,11 @@
 > **Status: approved, not yet implemented.** This is the authoritative spec for the work. Execute it
 > phase by phase (Phase A → D); each phase leaves the repo green and is committed separately after
 > review. All decisions below are locked.
+>
+> **Filename note (post-dates this spec):** the CSS files named below were later reorganized — hope's
+> `tokens.css` was renamed `theme.css` and split out of `tailwind.css` as a separate opt-out import,
+> and the `_base/*.css` files became `_`-prefixed partials behind a single `_base/base.css`. Read the
+> file names below as their historical spellings; the current layout is in [`theming.md`](./theming.md).
 
 ## Context
 

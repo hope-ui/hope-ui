@@ -169,7 +169,7 @@ Also required:
 - **Recipe purity:** a preset recipe (`packages/presets/**/recipes/`) references *finished*
   `--hope-*` tokens only — never `color-mix`, an alpha modifier (`bg-x/50`), or a magic opacity
   (`opacity-90`). Derived colors (the focus halo, the scrim) are authored as tokens in the preset's
-  `tokens.css`, where it owns the raw scale. `pnpm check:recipe-purity`
+  `theme.css`, where it owns the raw scale. `pnpm check:recipe-purity`
   (`scripts/check-recipe-purity.mjs`) enforces this in CI. See `__internal__/theming.md`.
 - Stories also pin known-but-unfixed behavior where a human can see it. Don't "fix" a story by
   deleting it; fix the component and rename the story. Current example: Dialog's `Modal with an
@@ -332,16 +332,19 @@ them rather than re-deriving a behavior in a comment.
 - `packages/presets` (`@hope-ui/presets`) — the concrete presets, per-preset subpaths
   (`@hope-ui/presets/hope` is the **default** visual identity). A preset is a JS entry
   (`@hope-ui/presets/hope` → `src/hope/index.ts`: `definePreset` over the recipe map) plus a
-  `tailwind.css` (`@import "@hope-ui/presets/hope/tailwind.css"`) mapping the semantic tokens to clean
-  utilities via `@theme inline`. **hope authors its `--hope-*` token values in CSS** (`src/hope/tokens.css`
-  — `:root` + `.dark`, each `var(--color-*)`, imported by `tailwind.css`), so `<ThemeProvider preset={hope}>`
-  renders no DOM (hope is a **zero-DOM preset**; token values are not carried on the `Preset` object).
-  Because those `var(--color-*)` references live in the compiled CSS, Tailwind keeps the palette shades
-  the preset uses — no `@source` scan trick. Raw scales come from Tailwind itself; swap-safety is
-  enforced only on the shared **semantic vocabulary**, via `checkSemanticTokenConformance`
-  (`@hope-ui/theming/conformance`) run against a preset's token CSS — for hope, its `tokens.css` read as
-  a string (see `hope.test.ts`) — a missing `--hope-*` token compiles a referencing utility to an
-  unresolved `var(--…)`.
+  structural `tailwind.css` (`@import "@hope-ui/presets/hope/tailwind.css"`) mapping the semantic
+  tokens to clean utilities via `@theme inline`, plus a separate `theme.css`. **hope authors its
+  `--hope-*` token values in CSS** (`src/hope/theme.css` — `:root` + `.dark`, each `var(--color-*)`),
+  so `<ThemeProvider preset={hope}>` renders no DOM (hope is a **zero-DOM preset**; token values are
+  not carried on the `Preset` object). `theme.css` is a **separate, opt-out import**
+  (`@import "@hope-ui/presets/hope/theme.css"`) so a consumer can skip it and import their own token
+  layer (e.g. the doc site's Theme Creator output) without shipping hope's defaults as dead weight;
+  `tailwind.css` deliberately does **not** import it. Because those `var(--color-*)` references live
+  in the compiled CSS, Tailwind keeps the palette shades the preset uses — no `@source` scan trick.
+  Raw scales come from Tailwind itself; swap-safety is enforced only on the shared **semantic
+  vocabulary**, via `checkSemanticTokenConformance` (`@hope-ui/theming/conformance`) run against a
+  preset's token CSS — for hope, its `theme.css` read as a string (see `hope.test.ts`) — a missing
+  `--hope-*` token compiles a referencing utility to an unresolved `var(--…)`.
 - `packages/internal-test-utils` (`@hope-ui/internal-test-utils`, private) — shared
   test harness: `mount()` (renders into a detached, document-attached container) and
   `expectNoA11yViolations()` (axe-core against a mounted container).

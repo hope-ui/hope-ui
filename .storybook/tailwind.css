@@ -5,6 +5,8 @@
  */
 @import "tailwindcss";
 @import "@hope-ui/presets/hope/tailwind.css";
+/* hope's token values are a separate, opt-out import (structure vs. theme); load the defaults. */
+@import "@hope-ui/presets/hope/theme.css";
 
 /* Scan the components' source + stories for the utility classes to generate. */
 @source "../packages/components/src";

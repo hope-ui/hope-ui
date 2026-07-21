@@ -1,7 +1,7 @@
 {
   "name": "@hope-ui/presets",
   "version": "0.0.0",
-  "description": "hope-ui presets — one tree-shakable package, per-preset subpaths (@hope-ui/presets/hope is the default visual identity). Each preset ships a Tailwind v4 CSS file (design tokens as --hope-* CSS variables + an @theme inline mapping to clean utilities) plus a runtime recipe map: import the CSS into your Tailwind entry, pass the recipe map to <ThemeProvider>.",
+  "description": "hope-ui presets — one tree-shakable package, per-preset subpaths (@hope-ui/presets/hope is the default visual identity). Each preset ships two Tailwind v4 CSS files — tailwind.css (structure: the @theme inline mapping to clean utilities) and theme.css (the --hope-* design-token values, opt-out so you can bring your own) — plus a runtime recipe map: import the CSS into your Tailwind entry, pass the recipe map to <ThemeProvider>.",
   "type": "module",
   "sideEffects": false,
   "files": ["src", "dist"],
@@ -19,6 +19,10 @@
     "./hope/tailwind.css": {
       "style": "./src/hope/tailwind.css",
       "default": "./src/hope/tailwind.css"
+    },
+    "./hope/theme.css": {
+      "style": "./src/hope/theme.css",
+      "default": "./src/hope/theme.css"
     },
     "./package.json": "./package.json"
   },

@@ -14,7 +14,7 @@
  * `bg-`, `text-`, `border-`, and `ring-` families for each name (unused ones are harmless).
  *
  * The opacity axis (`opacity-disabled`/`opacity-loading`) is NOT here: Tailwind v4.3.2 has no
- * `--opacity-*` theme namespace, so those reach utilities through `_base/opacity.css` instead.
+ * `--opacity-*` theme namespace, so those reach utilities through `_base/_opacity.css` instead.
  */
 @theme inline {
   /* Surfaces (elevation) */
@@ -182,7 +182,7 @@
   --color-focus-halo: var(--hope-focus-halo);
   --color-scrim: var(--hope-scrim);
 
-  /* Surface-adaptive interaction wash (currentColor-derived — see hope's tokens.css) */
+  /* Surface-adaptive interaction wash (currentColor-derived — see hope's theme.css) */
   --color-surface-adaptive-hovered: var(--hope-surface-adaptive-hovered);
   --color-surface-adaptive-pressed: var(--hope-surface-adaptive-pressed);
 }

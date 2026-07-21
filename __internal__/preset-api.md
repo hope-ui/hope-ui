@@ -2,8 +2,9 @@
 
 > **Partially superseded (2026-07).** The **token-values** half of this design was implemented and
 > then removed. Semantic tokens are no longer authored in TypeScript or delivered by a runtime
-> `<style>`: `@hope-ui/presets/hope` authors its `--hope-*` values in CSS (`src/hope/tokens.css`,
-> imported by `tailwind.css`), and `ThemeProvider` is **zero-DOM**. So `PresetTokens`, `TokenValue`,
+> `<style>`: `@hope-ui/presets/hope` authors its `--hope-*` values in CSS (`src/hope/theme.css` — a
+> separate, opt-out import alongside `tailwind.css`, **not** imported by it; renamed from the former
+> `tokens.css`), and `ThemeProvider` is **zero-DOM**. So `PresetTokens`, `TokenValue`,
 > `ColorTokenKey`, `DarkMode`, the `tokens`/`darkMode` fields on `Preset`/`PresetConfig`, and
 > `renderPresetStyle`/`token-css.ts` (the "D3" runtime `<style>` and the `@source "./index.ts"`
 > palette trick below) **no longer exist**. The **component-override** half — `definePreset`,

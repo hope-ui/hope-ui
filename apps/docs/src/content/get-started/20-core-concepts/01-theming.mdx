@@ -19,8 +19,9 @@ export const description =
 Theming has two axes that stay cleanly separated:
 
 - **Runtime** — `<ThemeProvider preset={…}>` hands components their recipes at render time.
-- **Config** — the preset's stylesheet (`@import "@hope-ui/presets/hope/tailwind.css"`) defines the
-  `--hope-*` token _values_ and the utilities that read them, at build time.
+- **Config** — the preset's stylesheets define, at build time, the utilities that read the `--hope-*`
+  tokens (`@import "@hope-ui/presets/hope/tailwind.css"`) and their _values_
+  (`@import "@hope-ui/presets/hope/theme.css"` — opt-out, so you can supply your own).
 
 `@hope-ui/theming` is the seam between the two: components read from it, presets implement it, and
 neither imports the other. That's what lets you restyle everything without touching component code.
@@ -191,10 +192,11 @@ Each component's page documents which props are defaultable and which parts it e
 />
 
 To change the actual colors, author your own `--hope-*` CSS. Redefine any token under `:root` (and
-`.dark` for dark mode); every utility that references it updates at once.
+`.dark` for dark mode); every utility that references it updates at once. To tweak a few tokens,
+import a small override _after_ `hope/theme.css` so it wins:
 
 ```css title="brand.css"
-/* imported AFTER the preset's tailwind.css, so these win */
+/* imported AFTER @hope-ui/presets/hope/theme.css, so these win */
 :root {
   --hope-primary: var(--color-emerald-600);
   --hope-primary-hovered: var(--color-emerald-700);
@@ -205,8 +207,10 @@ To change the actual colors, author your own `--hope-*` CSS. Redefine any token 
 }
 ```
 
-Token values live in CSS, not on the preset object — which is exactly why `hope` can be a zero-DOM
-preset and still carry a full palette.
+To restyle the whole palette, skip `hope/theme.css` entirely and import your own `theme.css` in its
+place — a complete `:root`/`.dark` token set, exactly what the [Theme Creator](/theme-creator) copies
+out. Either way, token values live in CSS, not on the preset object — which is why `hope` can be a
+zero-DOM preset and still carry a full palette.
 
 ## Dark mode
 

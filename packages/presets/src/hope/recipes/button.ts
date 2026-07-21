@@ -14,7 +14,7 @@
  * `text-primary-emphasis`, `border-warning-subtle-line`, etc. actually exist in the emitted CSS.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
- * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
+ * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`). Every
  * interaction state is a *finished* token too — the hover wash (guarded against the pressed state,
  * `hover:not-data-pressed:bg-primary-hovered`, so it never fights the press color),
  * `data-pressed:bg-primary-pressed`, `focus-visible:ring-focus-halo`, and the dim-only state axes

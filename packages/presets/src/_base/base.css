@@ -1,0 +1,20 @@
+/*
+ * @hope-ui/presets — shared structural layer (`_base/`), not a published preset subpath.
+ *
+ * `base.css` is the single entry point into `_base/`: every preset's `tailwind.css` imports just this
+ * file, and it aggregates the underscore-prefixed partials that make up the structural contract. The
+ * partials are internal — reach them only through here, never individually. Import order is cosmetic
+ * (Tailwind at-rules + cascade-resolved custom properties, not order-sensitive).
+ *   - `./_variants.css`  — shared `@custom-variant`s (the `dark` selector + the `data-*` state set). Contract-level.
+ *   - `./_opacity.css`   — shared `@utility` layer exposing the `--hope-opacity-*` axis.
+ *   - `./_scrollbar.css` — shared `@utility` layer for scrollbar control (`no-scrollbar`).
+ *   - `./_theme-map.css` — shared `@theme inline` mapping color `--hope-*` into Tailwind utilities.
+ *
+ * These are the parts identical for every `@hope-ui/presets/*` preset (a pure function of the fixed
+ * semantic-token contract), which is why they live here once instead of being copied per preset. A
+ * preset supplies only its own token *values* (its `theme.css`) and its `recipes/`.
+ */
+@import "./_variants.css";
+@import "./_opacity.css";
+@import "./_scrollbar.css";
+@import "./_theme-map.css";

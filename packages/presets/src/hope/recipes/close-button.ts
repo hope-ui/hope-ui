@@ -14,8 +14,8 @@
  * ── currentColor, not a role token ──────────────────────────────────────────────────────────────
  * The glyph sets **no** text-color class, so it inherits `currentColor` from the surface it sits on.
  * The hover/press wash is the shared, surface-family `surface-adaptive-*` token — a *finished* token
- * derived from `currentColor` in hope's `tokens.css` (`--hope-surface-adaptive-hovered/-pressed` →
- * `bg-surface-adaptive-*` via `_base/theme-map.css`). So a close button reads correctly on solid /
+ * derived from `currentColor` in hope's `theme.css` (`--hope-surface-adaptive-hovered/-pressed` →
+ * `bg-surface-adaptive-*` via `_base/_theme-map.css`). So a close button reads correctly on solid /
  * soft / light / dark surfaces with zero configuration, and the recipe still computes no color: no
  * `color-mix`, no alpha modifier, no magic opacity (the recipe-purity rule — `pnpm check:recipe-purity`).
  * Focus is the shared `focus-halo` ring, same as Button — not a bespoke close ring. Interaction

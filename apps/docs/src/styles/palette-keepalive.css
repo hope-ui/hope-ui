@@ -9,7 +9,7 @@
  * (empty) colors.
  *
  * Referencing every shade of the full default palette here keeps them all emitted to `:root` — the
- * same mechanism hope's own `tokens.css` relies on to preserve the shades it uses. The references sit
+ * same mechanism hope's own `theme.css` relies on to preserve the shades it uses. The references sit
  * inside one custom property on a selector that never matches an element (a reference inside a custom
  * property is enough — also verified); it adds the palette vars plus one inert, unused rule, nothing
  * more. Regenerate if the offered families change (this is the full Tailwind v4 palette; superset of

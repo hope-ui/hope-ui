@@ -41,7 +41,8 @@ entry, and provide the preset object to `<ThemeProvider>`:
 ```css
 /* your Tailwind entry, e.g. app.css */
 @import "tailwindcss";
-@import "@hope-ui/presets/hope/tailwind.css";
+@import "@hope-ui/presets/hope/tailwind.css"; /* structure */
+@import "@hope-ui/presets/hope/theme.css"; /* hope's token values — or your own instead */
 ```
 
 ```tsx

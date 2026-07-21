@@ -49,15 +49,19 @@ runtime), and `tailwindcss` `^4`.
 
 ## Add the preset styles
 
-In your Tailwind entry CSS, import Tailwind and then the `hope` preset:
+In your Tailwind entry CSS, import Tailwind, then the `hope` preset's structure, then its theme:
 
 ```css title="app.css"
 @import "tailwindcss";
 @import "@hope-ui/presets/hope/tailwind.css";
+@import "@hope-ui/presets/hope/theme.css";
 ```
 
-The preset supplies the `--hope-*` design tokens and maps them to clean utilities (`bg-primary`,
-`text-on-primary`, `border-subtle`, …). `hope` is a **zero-DOM preset**: it ships CSS, not markup.
+The preset comes in two parts. `tailwind.css` is the **structure** — it maps the `--hope-*` design
+tokens to clean utilities (`bg-primary`, `text-on-primary`, `border-subtle`, …). `theme.css` supplies
+the **token values** (hope's default look). They're separate imports on purpose: `theme.css` is
+opt-out, so you can swap hope's defaults for your own — the [Theme Creator](/theme-creator) generates
+a drop-in `theme.css` you import in its place. `hope` is a **zero-DOM preset**: it ships CSS, not markup.
 
 ## Wrap your app
 

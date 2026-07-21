@@ -52,9 +52,9 @@ export function ExportThemeDialog(props: { config: ThemeConfig }) {
             <Dialog.Header>
               <Dialog.Title>Export theme</Dialog.Title>
               <Dialog.Description>
-                Import after{" "}
-                <code class="text-foreground-muted">@hope-ui/presets/hope/tailwind.css</code> so
-                these values win.
+                Import in place of{" "}
+                <code class="text-foreground-muted">@hope-ui/presets/hope/theme.css</code>, after{" "}
+                <code class="text-foreground-muted">@hope-ui/presets/hope/tailwind.css</code>.
               </Dialog.Description>
             </Dialog.Header>
 

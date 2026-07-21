@@ -30,7 +30,7 @@
  *
  * **Recipe purity.** Recipes reference *finished* tokens only — never `color-mix`, an alpha modifier
  * (`bg-x/50`), or a magic value. A derived color (e.g. the focus halo, the scrim) is authored as its
- * own token in the preset's `tokens.css`, where the preset owns the raw scale.
+ * own token in the preset's `theme.css`, where the preset owns the raw scale.
  *
  * `SEMANTIC_COLOR_TOKENS` is the runtime source of truth (used by `checkSemanticTokenConformance`
  * in `@hope-ui/theming/conformance` to prove a theme's CSS defines every `--hope-<token>` var).
@@ -230,7 +230,7 @@ export type SemanticColorToken = (typeof SEMANTIC_COLOR_TOKENS)[number];
 /**
  * The **opacity axis** — a separate contract from the color vocabulary. Tailwind v4.3.2 has no
  * `--opacity-*` theme namespace, so these are not exposed via `@theme inline` like colors are;
- * a preset defines the `--hope-opacity-*` variable and the shared `_base/opacity.css` layer wires
+ * a preset defines the `--hope-opacity-*` variable and the shared `_base/_opacity.css` layer wires
  * each to a custom `@utility` (`opacity-disabled` → `opacity: var(--hope-opacity-disabled)`). They
  * exist so a recipe never hardcodes a magic opacity (`opacity-90`): the dim is a knob the preset owns.
  */

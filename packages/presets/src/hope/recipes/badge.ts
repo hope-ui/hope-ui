@@ -15,7 +15,7 @@
  * exist in the emitted CSS.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
- * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/theme-map.css`). Every
+ * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`). Every
  * fill is a *finished* token; the recipe computes no color: no `color-mix`, no alpha modifier
  * (`bg-x/50`), no magic opacity, so a preset that redefines a shade changes the painted result
  * predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`).
