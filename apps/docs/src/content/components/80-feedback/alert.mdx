@@ -1,0 +1,766 @@
+import { Alert } from "@hope-ui/components/alert";
+import { hope } from "@hope-ui/presets/hope";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
+import { AlertActionsDemo } from "~/components/demos/alert/AlertActionsDemo";
+import { AlertColorSchemesDemo } from "~/components/demos/alert/AlertColorSchemesDemo";
+import { AlertDismissibleDemo } from "~/components/demos/alert/AlertDismissibleDemo";
+import { AlertPolymorphismDemo } from "~/components/demos/alert/AlertPolymorphismDemo";
+import { InfoIcon, SparklesIcon } from "~/components/Icons";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Contextual status message for a page or region.";
+
+export const description =
+  "A contextual status message — an inline banner that surfaces feedback in place, with semantic roles, a built-in status glyph, an optional actions row, and one-line dismissal.";
+
+# Alert
+
+{description}
+
+## Import
+
+```tsx
+import { Alert } from "@hope-ui/components/alert";
+```
+
+`Alert` is a **compound** component — a namespace object whose parts you compose:
+`Alert.Root`, `Alert.Icon`, `Alert.Content`, `Alert.Title`, `Alert.Description`, `Alert.Actions`,
+and `Alert.CloseTrigger`.
+
+## Usage
+
+For the common case, you don't touch the parts at all. Pass `title`, `description`, and a
+`colorScheme` to `Alert.Root` and it **auto-composes** the anatomy for you — icon, content, title,
+and description — picking the matching status glyph automatically.
+
+<Preview>
+  <div class="w-full max-w-md">
+    <Alert.Root
+      colorScheme="info"
+      title="Update available"
+      description="A new version is ready to install."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root
+  colorScheme="info"
+  title="Update available"
+  description="A new version is ready to install."
+/>
+```
+
+## Status
+
+`colorScheme` sets the semantic role. The four status roles — `info`, `success`, `warning`, and
+`danger` — each carry a **built-in glyph**, so omitting `icon` gives you the right one for free.
+The color and glyph are reinforcing second channels; the meaning lives in the text.
+
+<Preview>
+  <AlertColorSchemesDemo />
+</Preview>
+
+```tsx
+<Alert.Root variant="soft" colorScheme="info" title="Heads up" description="…" />
+<Alert.Root variant="soft" colorScheme="success" title="Payment received" description="…" />
+<Alert.Root variant="soft" colorScheme="warning" title="Storage almost full" description="…" />
+<Alert.Root variant="soft" colorScheme="danger" title="Deployment failed" description="…" />
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
+  description={
+    <div>
+      The two remaining roles — <code>primary</code> and <code>neutral</code> —
+      ship <strong>no</strong> built-in glyph. Pass an explicit{" "}
+      <code>icon</code> (or set an app-wide default) when you use them, or leave
+      the icon off entirely.
+    </div>
+  }
+/>
+
+## Variants
+
+The `variant` prop sets the visual treatment. `default` is a role-neutral raised surface whose
+**icon and title** carry the role color (the body stays foreground); `solid` is a filled banner;
+`soft` and `subtle` are tonal; `outline` is a hollow bordered notice.
+
+<Preview>
+  <div class="flex w-full max-w-md flex-col gap-3">
+    <Alert.Root
+      variant="default"
+      colorScheme="info"
+      title="default"
+      description="A short description line."
+    />
+    <Alert.Root
+      variant="solid"
+      colorScheme="info"
+      title="solid"
+      description="A short description line."
+    />
+    <Alert.Root
+      variant="soft"
+      colorScheme="info"
+      title="soft"
+      description="A short description line."
+    />
+    <Alert.Root
+      variant="subtle"
+      colorScheme="info"
+      title="subtle"
+      description="A short description line."
+    />
+    <Alert.Root
+      variant="outline"
+      colorScheme="info"
+      title="outline"
+      description="A short description line."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root variant="default" colorScheme="info" title="default" description="…" />
+<Alert.Root variant="solid" colorScheme="info" title="solid" description="…" />
+<Alert.Root variant="soft" colorScheme="info" title="soft" description="…" />
+<Alert.Root variant="subtle" colorScheme="info" title="subtle" description="…" />
+<Alert.Root variant="outline" colorScheme="info" title="outline" description="…" />
+```
+
+## Sizes
+
+Three sizes — `sm`, `md` (the default), and `lg` — scale the padding, gap, text, and the status
+glyph together.
+
+<Preview>
+  <div class="flex w-full max-w-md flex-col gap-3">
+    <Alert.Root
+      size="sm"
+      colorScheme="success"
+      title="Small"
+      description="Compact density (sm)."
+    />
+    <Alert.Root
+      size="md"
+      colorScheme="success"
+      title="Medium"
+      description="Default density (md)."
+    />
+    <Alert.Root
+      size="lg"
+      colorScheme="success"
+      title="Large"
+      description="Roomy density (lg)."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root size="sm" colorScheme="success" title="Small" description="…" />
+<Alert.Root size="md" colorScheme="success" title="Medium" description="…" />
+<Alert.Root size="lg" colorScheme="success" title="Large" description="…" />
+```
+
+## Icons
+
+The `icon` prop overrides the role's default glyph per instance. It accepts any JSX — an inline
+`<svg>` or an icon from your set. The glyph inherits `currentColor`, so a stroked SVG needs no color
+of its own.
+
+<Preview>
+  <div class="w-full max-w-md">
+    <Alert.Root
+      colorScheme="primary"
+      icon={<SparklesIcon />}
+      title="Now with sparkles"
+      description="An explicit icon prop wins over the role default."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root
+  colorScheme="primary"
+  icon={<SparklesIcon />}
+  title="Now with sparkles"
+  description="An explicit icon prop wins over the role default."
+/>
+```
+
+Pass `icon={false}` to drop the glyph entirely — a text-only notice.
+
+<Preview>
+  <div class="w-full max-w-md">
+    <Alert.Root
+      variant="soft"
+      colorScheme="neutral"
+      icon={false}
+      title="No icon"
+      description="Just the message, no leading glyph."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root
+  variant="soft"
+  colorScheme="neutral"
+  icon={false}
+  title="No icon"
+  description="…"
+/>
+```
+
+## Actions
+
+For an alert the user can act on, add an `Alert.Actions` row. Because actions belong with the copy
+(not the icon), place it **inside `Alert.Content`**, below the description. This is the point where
+the convenience props give way to the compound anatomy.
+
+<Preview>
+  <AlertActionsDemo />
+</Preview>
+
+```tsx
+<Alert.Root colorScheme="warning">
+  <Alert.Icon>
+    <WarningIcon />
+  </Alert.Icon>
+  <Alert.Content>
+    <Alert.Title>Your trial ends in 3 days</Alert.Title>
+    <Alert.Description>
+      Upgrade now to keep your projects, integrations, and history.
+    </Alert.Description>
+    <Alert.Actions>
+      <Button variant="solid" colorScheme="warning" size="sm">
+        Upgrade plan
+      </Button>
+      <Button variant="ghost" colorScheme="warning" size="sm">
+        Remind me later
+      </Button>
+    </Alert.Actions>
+  </Alert.Content>
+</Alert.Root>
+```
+
+## Anatomy
+
+The convenience props (`title`/`description`/`icon`/`closable`) are a shortcut: when `Alert.Root`
+has **no `children`**, it auto-composes the parts below for you. Supply `children` and you take full
+control of the structure — the convenience props are then ignored. Both paths produce the same
+markup and the same accessibility wiring.
+
+<Preview>
+  <div class="flex w-full max-w-md flex-col gap-3">
+    <Alert.Root
+      colorScheme="info"
+      title="Convenience"
+      description="Auto-composed from title / description / icon props."
+    />
+    <Alert.Root colorScheme="info">
+      <Alert.Icon>
+        <InfoIcon />
+      </Alert.Icon>
+      <Alert.Content>
+        <Alert.Title>Compound</Alert.Title>
+        <Alert.Description>
+          Built from Alert.Icon / Content / Title / Description.
+        </Alert.Description>
+      </Alert.Content>
+    </Alert.Root>
+  </div>
+</Preview>
+
+```tsx title="Convenience — Root auto-composes"
+<Alert.Root colorScheme="info" title="Convenience" description="…" />
+```
+
+```tsx title="Compound — you compose the parts"
+<Alert.Root colorScheme="info">
+  <Alert.Icon>
+    <InfoIcon />
+  </Alert.Icon>
+  <Alert.Content>
+    <Alert.Title>Compound</Alert.Title>
+    <Alert.Description>
+      Built from Alert.Icon / Content / Title / Description.
+    </Alert.Description>
+  </Alert.Content>
+</Alert.Root>
+```
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Alert.Root",
+      element: "div",
+      description:
+        "The alert surface and the state owner (open/dismiss, variant styling, ARIA wiring). Renders the live region.",
+    },
+    {
+      part: "Alert.Icon",
+      element: "span",
+      description:
+        "Wraps the leading glyph. Marked aria-hidden by default (decorative).",
+    },
+    {
+      part: "Alert.Content",
+      element: "div",
+      description: "Column wrapper for the title, description, and actions.",
+    },
+    {
+      part: "Alert.Title",
+      element: "div",
+      description:
+        "The heading. Self-registers its id as the alert's aria-labelledby.",
+    },
+    {
+      part: "Alert.Description",
+      element: "p",
+      description:
+        "The body prose. Self-registers its id as the alert's aria-describedby.",
+    },
+    {
+      part: "Alert.Actions",
+      element: "div",
+      description:
+        "A flex row for action buttons, placed inside Alert.Content below the text.",
+    },
+    {
+      part: "Alert.CloseTrigger",
+      element: "button",
+      description:
+        "A CloseButton wired to dismiss the alert. Rendered automatically by the closable prop.",
+    },
+  ]}
+/>
+
+## Dismissible
+
+Set `closable` to render an `Alert.CloseTrigger` in the corner. Dismissing plays the exit transition
+(a fade and slide), then unmounts. Drive `open` as a controlled signal to bring it back; `onExitComplete`
+fires once the exit animation has finished and the alert has left the DOM.
+
+<Preview>
+  <AlertDismissibleDemo />
+</Preview>
+
+```tsx
+const [open, setOpen] = createSignal(true);
+
+<Alert.Root
+  open={open()}
+  onOpenChange={setOpen}
+  closable
+  variant="soft"
+  colorScheme="success"
+  title="Changes saved"
+  description="Dismiss me — I fade and slide out."
+/>;
+```
+
+Left uncontrolled, an alert manages its own open state: it starts open (`defaultOpen` is `true`) and
+`closable` dismisses it on click.
+
+```tsx title="Uncontrolled — dismisses itself"
+<Alert.Root closable colorScheme="success" title="Saved" description="…" />
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
+  description={
+    <div>
+      The exit transition honors <code>prefers-reduced-motion</code> — it drops
+      to an instant unmount when the user has reduced motion enabled. And
+      because <code>Alert.CloseTrigger</code> renders a themed{" "}
+      <code>CloseButton</code>, a closable alert needs a{" "}
+      <code>&lt;ThemeProvider&gt;</code> ancestor (as every styled hope-ui
+      component does).
+    </div>
+  }
+/>
+
+## Live region & role
+
+An alert is a **live region**: assistive tech announces its content when it appears. The `role` prop
+picks the politeness.
+
+<DataTable
+  columns={[
+    { key: "role", label: "role", code: true },
+    { key: "aria", label: "ARIA", code: true },
+    { key: "when", label: "When to use" },
+  ]}
+  rows={[
+    {
+      role: '"alert"',
+      aria: 'role="alert"',
+      when: "Assertive — announced immediately, interrupting the user. The default; for errors and time-sensitive messages.",
+    },
+    {
+      role: '"status"',
+      aria: 'role="status"',
+      when: "Polite — announced at the next opportunity, without interrupting. For confirmations and passive updates.",
+    },
+    {
+      role: '"none"',
+      aria: "—",
+      when: "No role — a purely visual notice that is not announced. For decorative or redundant messaging.",
+    },
+  ]}
+/>
+
+```tsx
+<Alert.Root role="status" colorScheme="success" title="Saved" description="…" />
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      A live region only announces content that <em>appears after</em> the
+      region exists. An alert already on the page at first paint is{" "}
+      <strong>not</strong> announced. To announce a dynamic message, render the
+      alert in response to the event (e.g. conditionally, after a form submit)
+      rather than hiding an always-present one with CSS.
+    </div>
+  }
+/>
+
+## Polymorphism
+
+Render `Alert.Root` (or any part) as a different element or component with the `render` prop — a
+function that receives the computed props and spreads them onto your element. There is **no `as`
+prop**; `render` is the single polymorphism API.
+
+<Preview>
+  <AlertPolymorphismDemo />
+</Preview>
+
+```tsx title="Render Root as a section"
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  title="Rendered as a section"
+  description="…"
+  render={(props) => <section {...props} />}
+/>
+```
+
+## Theming
+
+Alert's look comes from the active preset's recipe. You can override it at three levels, applied in
+order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance `slotClasses`
+→ `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "root",
+      attr: "alert",
+      description: "The alert surface (a div by default).",
+    },
+    {
+      slot: "icon",
+      attr: "alert-icon",
+      description:
+        "The span wrapping the glyph. Sizes the SVG per size; colored per variant.",
+    },
+    {
+      slot: "content",
+      attr: "alert-content",
+      description: "The column wrapping title, description, and actions.",
+    },
+    { slot: "title", attr: "alert-title", description: "The heading line." },
+    {
+      slot: "description",
+      attr: "alert-description",
+      description: "The body prose.",
+    },
+    {
+      slot: "actions",
+      attr: "alert-actions",
+      description: "The action-button row.",
+    },
+    {
+      slot: "closeTrigger",
+      attr: "alert-close-trigger",
+      description:
+        "Placement of the dismiss button (chrome comes from CloseButton).",
+    },
+  ]}
+/>
+
+### Overriding one alert
+
+`class` merges onto the root slot (your utilities win conflicts). `slotClasses` targets any slot by
+name. Use literal class strings so your Tailwind build can see them.
+
+<Preview>
+  <div class="w-full max-w-md">
+    <Alert.Root
+      variant="soft"
+      colorScheme="info"
+      class="rounded-none border-l-4 border-info"
+      slotClasses={{ title: "uppercase tracking-wide" }}
+      title="Custom accent"
+      description="A thicker leading rule and squared corners."
+    />
+  </div>
+</Preview>
+
+```tsx
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="rounded-none border-l-4 border-info"
+  slotClasses={{ title: "uppercase tracking-wide" }}
+  title="Custom accent"
+  description="A thicker leading rule and squared corners."
+/>
+```
+
+### App-wide defaults & overrides
+
+Set defaults and global part classes for **every** Alert through the theme with `definePreset`, then
+pass the derived preset to `ThemeProvider`. `defaultProps` are resolved at **instance ?? preset ??
+builtin** precedence, so an explicit prop on a single alert always wins.
+
+<Preview>
+  <ThemeProvider
+    preset={definePreset(hope, {
+      components: {
+        alert: {
+          defaultProps: { variant: "soft" },
+          slotClasses: { root: "rounded-none" },
+        },
+      },
+    })}
+  >
+    <div class="flex w-full max-w-md flex-col gap-3">
+      <Alert.Root
+        colorScheme="success"
+        title="Branded"
+        description="Soft & square by default."
+      />
+      <Alert.Root
+        colorScheme="danger"
+        title="Branded"
+        description="Soft & square by default."
+      />
+    </div>
+  </ThemeProvider>
+</Preview>
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    alert: {
+      // Every recipe variant is defaultable.
+      defaultProps: { variant: "soft" },
+      // Global part classes, folded in before per-instance slotClasses.
+      slotClasses: { root: "rounded-none" },
+    },
+  },
+});
+```
+
+The status glyphs are defaultable app-wide too — but as **factories** (`() => JSX.Element`), never a
+bare element. A preset value is one object shared by every instance, and a built Solid node would
+_move_ between them; a factory is called fresh per instance. Each role has its own key:
+`infoIcon`, `successIcon`, `warningIcon`, `dangerIcon`.
+
+```tsx title="Swap the default success glyph"
+definePreset(hope, {
+  components: {
+    alert: {
+      // A factory, not <MyCheck /> — reuse-safe across every instance.
+      defaultProps: { successIcon: () => <MyCheck /> },
+    },
+  },
+});
+```
+
+Defaultable through `defaultProps`: `variant`, `colorScheme`, `size`, and the four status-glyph
+factories. Per-usage props — `title`, `description`, `icon`, `closable`, `open`, `role`, and event
+handlers — are intentionally **not** defaultable app-wide.
+
+## API
+
+### Alert.Root
+
+`Alert.Root` accepts every native `<div>` attribute (except `role` and `title`, which are re-declared
+below) in addition to the props below.
+
+<PropsTable
+  rows={[
+    {
+      prop: "variant",
+      type: "AlertVariant",
+      default: '"default"',
+      description:
+        "Visual style: default, solid, soft, subtle, outline. default is a role-neutral surface whose icon + title carry the role color.",
+    },
+    {
+      prop: "colorScheme",
+      type: "AlertColorScheme",
+      default: '"neutral"',
+      description:
+        "Semantic role: primary, neutral, info, success, warning, danger. info/success/warning/danger carry a built-in glyph; primary/neutral ship none.",
+    },
+    {
+      prop: "size",
+      type: "AlertSize",
+      default: '"md"',
+      description:
+        "Density scale: sm, md, lg. Scales padding, gap, text, and the glyph together.",
+    },
+    {
+      prop: "role",
+      type: '"alert" | "status" | "none"',
+      default: '"alert"',
+      description:
+        "Live-region politeness. alert is assertive, status is polite, none renders no role (a purely visual notice).",
+    },
+    {
+      prop: "title",
+      type: "JSX.Element",
+      default: "",
+      description:
+        "Convenience: the alert title. Auto-composed into Alert.Title when Root has no children.",
+    },
+    {
+      prop: "description",
+      type: "JSX.Element",
+      default: "",
+      description:
+        "Convenience: the body. Auto-composed into Alert.Description when Root has no children.",
+    },
+    {
+      prop: "icon",
+      type: "JSX.Element | false",
+      default: "role default",
+      description:
+        "Convenience: the leading glyph. false hides it; omit it to fall back to the preset {role}Icon default, then hope's built-in status glyph.",
+    },
+    {
+      prop: "closable",
+      type: "boolean",
+      default: "false",
+      description:
+        "Renders an Alert.CloseTrigger dismiss button. Requires a <ThemeProvider> ancestor.",
+    },
+    {
+      prop: "open",
+      type: "boolean",
+      default: "",
+      description:
+        "Controlled open state. Leave unset for uncontrolled (defaults to defaultOpen).",
+    },
+    {
+      prop: "defaultOpen",
+      type: "boolean",
+      default: "true",
+      description: "Initial open state when uncontrolled.",
+    },
+    {
+      prop: "onOpenChange",
+      type: "(open: boolean) => void",
+      default: "",
+      description:
+        "Called whenever the open state should change (e.g. a dismiss click).",
+    },
+    {
+      prop: "onExitComplete",
+      type: "() => void",
+      default: "",
+      description:
+        "Fires after the exit transition finishes and the alert has unmounted.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render Alert.Root as another element or component. Receives Root's computed props. The only polymorphism mechanism — there is no as prop.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description:
+        "Extra classes merged onto the root slot; your utilities win conflicts via tailwind-merge.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"alert">',
+      default: "",
+      description:
+        "Per-slot class overrides, keyed by root, icon, content, title, description, actions, closeTrigger.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description:
+        "The compound anatomy (Alert.Icon / Content / …). When set, the convenience props are ignored.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Alert.Icon`, `Alert.Content`, `Alert.Title`, `Alert.Description`, and `Alert.Actions` each accept
+their native element attributes plus a `render` prop. `Alert.CloseTrigger` accepts every
+[`CloseButton`](/components/close-button) prop; its dismiss handler is pre-wired (call
+`event.preventDefault()` in your own `onClick` to cancel the close).
+
+## Accessibility
+
+`Alert.Root` renders a `role="alert"` (or `role="status"`) **live region**, so its message is
+announced to assistive tech when it appears. The title and description are wired to the region as its
+accessible name and description automatically.
+
+- **Live regions announce changes, not initial content.** An alert present at first paint is not
+  announced. Render the alert in response to the event (conditionally, after the action) so it is
+  _inserted_ into a region that already exists.
+- **Choose politeness deliberately.** `role="alert"` interrupts the user — reserve it for errors and
+  time-sensitive messages. Use `role="status"` for confirmations and passive updates, and
+  `role="none"` for a purely visual notice that shouldn't be announced.
+- **Never rely on color alone.** Each `colorScheme` is a distinct token, but color is a second
+  channel, not the message (WCAG 1.4.1). The status glyph is decorative (`aria-hidden`), so the
+  meaning must live in the title and description text.
+- **The dismiss button is labeled.** `Alert.CloseTrigger` is a `CloseButton`, which self-labels with
+  a localized `"Close"` accessible name and is fully keyboard-operable (Enter and Space).
+- **Give a custom icon its meaning in text, not the glyph.** Because the icon is `aria-hidden`,
+  swapping it never changes what a screen reader hears — keep the title and description carrying the
+  message.
