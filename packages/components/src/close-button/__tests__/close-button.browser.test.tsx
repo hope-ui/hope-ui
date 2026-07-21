@@ -1,7 +1,7 @@
 import ssrFixture from "virtual:hydration-fixture?id=close-button";
+import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
-import { I18nProvider } from "@hope-ui/primitives/i18n";
 import { type CloseButtonThemeableProps, definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { describe, expect, it, vi } from "vitest";

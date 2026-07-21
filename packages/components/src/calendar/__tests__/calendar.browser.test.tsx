@@ -1,6 +1,6 @@
 import ssrFixture from "virtual:hydration-fixture?id=calendar";
+import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
-import { I18nProvider } from "@hope-ui/primitives/i18n";
 import { CalendarDate } from "@internationalized/date";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";

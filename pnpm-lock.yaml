@@ -291,6 +291,9 @@ importers:
       '@hope-ui/components':
         specifier: workspace:*
         version: link:../../packages/components
+      '@hope-ui/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@hope-ui/presets':
         specifier: workspace:*
         version: link:../../packages/presets
@@ -361,6 +364,9 @@ importers:
 
   packages/components:
     dependencies:
+      '@hope-ui/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@hope-ui/primitives':
         specifier: workspace:*
         version: link:../primitives
@@ -377,6 +383,18 @@ importers:
       '@hope-ui/presets':
         specifier: workspace:*
         version: link:../presets
+      '@solidjs/web':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.19(solid-js@2.0.0-beta.19)
+      solid-js:
+        specifier: 'catalog:'
+        version: 2.0.0-beta.19
+
+  packages/i18n:
+    devDependencies:
+      '@hope-ui/internal-test-utils':
+        specifier: workspace:*
+        version: link:../internal-test-utils
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.19(solid-js@2.0.0-beta.19)
@@ -412,6 +430,9 @@ importers:
 
   packages/primitives:
     dependencies:
+      '@hope-ui/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.2

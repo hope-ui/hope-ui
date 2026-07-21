@@ -43,7 +43,7 @@ export function getDefaultLocale(): Locale {
 
 /**
  * Process-wide locale registry, keyed through the cross-realm global symbol registry so two
- * installed copies of `@hope-ui/primitives` share one `languagechange` subscription and one
+ * installed copies of `@hope-ui/i18n` share one `languagechange` subscription and one
  * `current` snapshot — the same reasoning as `createScrollLock`'s `document.body` symbol slot.
  */
 interface LocaleRegistry {
@@ -52,7 +52,7 @@ interface LocaleRegistry {
   subscribed: boolean;
 }
 
-const REGISTRY_KEY = Symbol.for("@hope-ui/primitives/i18n:locale-registry");
+const REGISTRY_KEY = Symbol.for("@hope-ui/i18n:locale-registry");
 
 function getRegistry(): LocaleRegistry {
   const globalScope = globalThis as typeof globalThis & {

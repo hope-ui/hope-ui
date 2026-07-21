@@ -46,13 +46,16 @@ const EXCLUDED_BASENAMES = new Set(["index"]);
 // `theming` is hand-written contract + runtime, so it's in — but only for its test (and the a11y
 // loop): it renders no DOM, so it is deliberately absent from the story / SSR / hydration sets
 // below (those are for components a human looks at and that emit hydratable markup), and its
-// per-file usage doc was retired (documented in the doc website — see REQUIRES_DOC).
-const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming"]);
-// Packages whose source files must ALSO carry an enforced per-file usage doc. Only the internal
-// `primitives` kernel keeps one: the public component/theming API is documented in the doc website
-// (apps/docs), so those per-symbol docs were retired. Decoupled from REQUIRES_TEST_AND_DOC so a
-// package can require a test without requiring a doc.
-const REQUIRES_DOC = new Set(["primitives"]);
+// per-file usage doc was retired (documented in the doc website — see REQUIRES_DOC). `i18n` is the
+// standalone locale/direction/messages module (lifted out of the primitives kernel); it's headless
+// behavior like primitives, so it keeps the per-file test + `.md` treatment.
+const REQUIRES_TEST_AND_DOC = new Set(["primitives", "components", "theming", "i18n"]);
+// Packages whose source files must ALSO carry an enforced per-file usage doc. The internal
+// `primitives` kernel and the headless `i18n` module keep theirs (contributor references for
+// behavior, not visual components); the public component/theming API is documented in the doc
+// website (apps/docs), so those per-symbol docs were retired. Decoupled from REQUIRES_TEST_AND_DOC
+// so a package can require a test without requiring a doc.
+const REQUIRES_DOC = new Set(["primitives", "i18n"]);
 // Packages whose source files must additionally have a `Foo.ssr.test.tsx` that really calls
 // `renderToStringAsync`, and a `Foo.browser.test.tsx` that really calls `hydrate`. Those two
 // files are the two halves of the SSR → hydrate round-trip, and neither project can do both:
@@ -449,7 +452,13 @@ for (const pkg of packageDirs) {
 // flat beside source is the visual noise this layout exists to kill — fail loudly so it can't
 // creep back. (`__screenshots__/` is gitignored and only ever regenerates next to a test file, so
 // the flat-test rule already covers it — no separate screenshot check is needed.)
-const NO_FLAT_SPRAWL = new Set(["primitives", "components", "theming", "internal-test-utils"]);
+const NO_FLAT_SPRAWL = new Set([
+  "primitives",
+  "components",
+  "theming",
+  "internal-test-utils",
+  "i18n",
+]);
 const sprawl = [];
 for (const pkg of packageDirs) {
   if (!NO_FLAT_SPRAWL.has(pkg)) {

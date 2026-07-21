@@ -1,0 +1,34 @@
+{
+  "name": "@hope-ui/i18n",
+  "version": "0.0.0",
+  "description": "Locale + reading-direction context and the built-in component-message catalog/resolver for hope-ui: I18nProvider, useLocale, getReadingDirection, and translation. A standalone, dependency-free layer both @hope-ui/primitives and @hope-ui/components build on.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": ["dist"],
+  "hope": {
+    "entries": {
+      ".": "src/index.ts"
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "solid": "./dist/index.jsx"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  },
+  "devDependencies": {
+    "@hope-ui/internal-test-utils": "workspace:*",
+    "@solidjs/web": "catalog:",
+    "solid-js": "catalog:"
+  }
+}

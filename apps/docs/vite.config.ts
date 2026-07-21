@@ -60,7 +60,13 @@ export default defineConfig(({ command }) => ({
     noDiscovery: true,
     // @hope-ui/* ships JSX-preserved SOURCE (compiled by vite-plugin-solid), so it must
     // never be pre-bundled as if it were plain JS.
-    exclude: ["@hope-ui/components", "@hope-ui/theming", "@hope-ui/presets", "@hope-ui/primitives"],
+    exclude: [
+      "@hope-ui/components",
+      "@hope-ui/theming",
+      "@hope-ui/presets",
+      "@hope-ui/primitives",
+      "@hope-ui/i18n",
+    ],
   },
   resolve: {
     // Vite 8's native tsconfigPaths only rewrites `~/…` for TS/JS importers,

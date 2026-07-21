@@ -52,6 +52,7 @@
     "solid-js": "catalog:"
   },
   "dependencies": {
+    "@hope-ui/i18n": "workspace:*",
     "@hope-ui/primitives": "workspace:*",
     "@hope-ui/theming": "workspace:*",
     "@internationalized/date": "catalog:"

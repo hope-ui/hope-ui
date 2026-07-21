@@ -7,7 +7,7 @@ picks one for a given locale. This is the single place that enumerates the shipp
 
 | Symbol | Purpose |
 | --- | --- |
-| `CATALOGS` | `Record<string, I18nCatalog>` keyed by primary subtag (`en`, `fr`, `de`, `it`, `es`, `pt`, `pl`, `sv`, `fi`, `da`, `el`). |
+| `CATALOGS` | `Record<string, I18nCatalog>` keyed by primary subtag (`en`, `fr`, `de`, `it`, `es`, `pt`, `pl`, `sv`, `fi`, `da`, `el`, `ar`). |
 | `resolveCatalog(locale)` | Select a catalog by primary subtag, case-insensitively (`"de-AT"` → `de`, `"PT-BR"` → `pt`); falls back to `MESSAGES_EN` for any unshipped locale. |
 
 The resolver in `../../translate/translate.ts` calls `resolveCatalog(locale())`, then falls back to

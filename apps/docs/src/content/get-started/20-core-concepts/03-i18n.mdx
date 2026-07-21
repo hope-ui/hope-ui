@@ -1,0 +1,231 @@
+import { Alert } from "@hope-ui/components/alert";
+import { CupSodaIcon, InfoIcon } from "~/components/Icons";
+import { DataTable } from "~/components/DataTable";
+import { PropsTable } from "~/components/PropsTable";
+import { I18nLocaleSwitcherDemo } from "~/components/demos/i18n/I18nLocaleSwitcherDemo";
+
+export const summary = "Localize component chrome and reading direction.";
+
+export const description =
+  "hope-ui components carry their own accessible labels in the user's language and adapt to reading direction — with no setup, and a single provider when you want to take control.";
+
+# Internationalization
+
+{description}
+
+## What i18n covers
+
+hope-ui components emit a small amount of user-facing text you never wrote — screen-reader labels
+and live-region announcements, like a `CloseButton`'s accessible name or a calendar's "Today". The
+i18n layer is what keeps that text **accessible and localized**, and it hands every component three
+things through one context:
+
+- **Locale** — the active [BCP-47](https://www.ietf.org/rfc/bcp/bcp47.txt) language code (`en-US`,
+  `fr-FR`, …), which also feeds date/number formatting.
+- **Reading direction** — `ltr` or `rtl`, derived from the locale.
+- **Messages** — a resolver (`t`) that turns a message key into a localized string.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<InfoIcon />}
+  description={
+    <span>
+      i18n localizes <strong>component chrome</strong> — the labels hope-ui
+      supplies — not your own content. Your headings and copy stay yours to
+      translate; hope-ui only makes sure the built-in affordances speak the same
+      language.
+    </span>
+  }
+/>
+
+## See it work
+
+Switch the locale below. The `CloseButton` renders with no `aria-label`, so it adopts the translated
+accessible name for the active language; the surface's reading direction flips for right-to-left
+locales; and the readout shows exactly what any descendant receives from `useLocale()`.
+
+<Preview>
+  <I18nLocaleSwitcherDemo />
+</Preview>
+
+## Zero configuration
+
+Every component is localized **out of the box**. With no provider mounted, `useLocale()` falls back
+to a default context that reads the browser locale and resolves against the built-in catalog — so a
+`CloseButton` is already named "Close" (or "Fermer", "Schließen", …) with nothing to set up:
+
+```tsx
+import { CloseButton } from "@hope-ui/components/close-button";
+
+// No aria-label, no provider — still gets a localized accessible name.
+<CloseButton />;
+```
+
+hope-ui ships built-in catalogs for these locales; any other locale falls back to English per key:
+
+<DataTable
+  columns={[
+    { key: "code", label: "Code", code: true },
+    { key: "lang", label: "Language" },
+  ]}
+  rows={[
+    { code: "en", lang: "English (the fallback for any unlisted locale)" },
+    { code: "ar", lang: "Arabic (right-to-left)" },
+    { code: "da", lang: "Danish" },
+    { code: "de", lang: "German" },
+    { code: "el", lang: "Greek" },
+    { code: "es", lang: "Spanish" },
+    { code: "fi", lang: "Finnish" },
+    { code: "fr", lang: "French" },
+    { code: "it", lang: "Italian" },
+    { code: "pl", lang: "Polish" },
+    { code: "pt", lang: "Portuguese" },
+    { code: "sv", lang: "Swedish" },
+  ]}
+/>
+
+## Set the locale
+
+To take control — pin a locale, follow your app's language switcher, or make SSR deterministic — wrap
+your app (or any subtree) in **`I18nProvider`** and pass a `locale`. Import it from `@hope-ui/i18n`:
+
+```tsx title="app.tsx"
+import { I18nProvider } from "@hope-ui/i18n";
+
+<I18nProvider locale="fr-FR">
+  <App />
+</I18nProvider>;
+```
+
+The `locale` prop is **reactive** — pass a signal-derived value and the whole tree re-localizes when
+it changes. There is deliberately no `setLocale`; the prop is the only control:
+
+```tsx title="Follow a language switcher"
+const [locale, setLocale] = createSignal("en-US");
+
+<I18nProvider locale={locale()}>
+  <App />
+</I18nProvider>;
+```
+
+Omit `locale` entirely and the provider tracks the browser/system language, updating live if it
+changes.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="primary"
+  class="not-prose"
+  icon={<CupSodaIcon />}
+  title={<strong>SSR-safe by design</strong>}
+  description={
+    <span>
+      Under server rendering, <code>I18nProvider</code> emits <code>en-US</code>
+      /<code>ltr</code> on the server and the first client render, then adopts
+      the detected locale after hydration settles — so locale-derived text never
+      causes a hydration mismatch. For SSR, always mount a provider (or pass an
+      explicit <code>locale</code>) rather than relying on the eager no-provider
+      default.
+    </span>
+  }
+/>
+
+## Reading direction
+
+The provider derives reading direction from the locale, and every component consumes it — so RTL
+locales lay out correctly with no per-component flag. Read it yourself with `useLocale().direction`,
+and set it once on your document root so native layout follows:
+
+```tsx
+import { getReadingDirection } from "@hope-ui/i18n";
+
+// e.g. getReadingDirection("ar-EG") -> "rtl"
+document.documentElement.dir = getReadingDirection(locale());
+```
+
+## Override or add messages
+
+Two provider props overlay the built-in catalogs. Reach for **`messages`** for a quick per-key
+override or to add a language hope-ui doesn't ship; reach for **`translate`** to route messages
+through your app's own i18n pipeline (i18next, `@solid-primitives/i18n`, …).
+
+```tsx title="Per-key override / add a language"
+<I18nProvider
+  locale={locale()}
+  messages={{
+    "fr-FR": { "common.close": "Fermer la fenêtre" },
+    "ja-JP": { "common.close": "閉じる" },
+  }}
+>
+  <App />
+</I18nProvider>
+```
+
+```tsx title="Delegate to your app's pipeline"
+<I18nProvider
+  locale={locale()}
+  // Return a string to use it; return null/undefined to fall through to hope-ui's built-in default.
+  translate={(key, params, locale) =>
+    myI18n.resolve(key, params, locale) ?? null
+  }
+>
+  <App />
+</I18nProvider>
+```
+
+Resolution runs in a fixed order, and the **first non-null wins** — so a partial override is safe:
+anything you don't provide falls through to the guaranteed English floor.
+
+<DataTable
+  columns={[
+    { key: "step", label: "Order" },
+    { key: "source", label: "Source" },
+  ]}
+  rows={[
+    {
+      step: "1",
+      source: "translate — your app pipeline (via the translate prop)",
+    },
+    { step: "2", source: "messages — the per-locale, per-key override map" },
+    {
+      step: "3",
+      source: "Built-in catalog for the locale (English per missing key)",
+    },
+    {
+      step: "4",
+      source: "The key itself (dev-warned once) — a last-resort safety net",
+    },
+  ]}
+/>
+
+## At a glance
+
+<PropsTable
+  rows={[
+    {
+      prop: "I18nProvider.locale",
+      type: "string",
+      description:
+        "Reactive BCP-47 locale for descendants. Omit to track the browser/system language. Direction is derived from it.",
+    },
+    {
+      prop: "I18nProvider.messages",
+      type: "Record<locale, Record<key, string>>",
+      description:
+        "Per-locale, per-key override map. Add a language or replace a single string; supports {{param}} placeholders.",
+    },
+    {
+      prop: "I18nProvider.translate",
+      type: "(key, params, locale) => string | null",
+      description:
+        "Delegate a key to your own i18n pipeline. Return null/undefined to fall through to the built-in default.",
+    },
+    {
+      prop: "useLocale()",
+      type: "{ locale, direction, t }",
+      description:
+        "Read the current locale + direction accessors and the reactive t(key, …params) message resolver from any descendant.",
+    },
+  ]}
+/>

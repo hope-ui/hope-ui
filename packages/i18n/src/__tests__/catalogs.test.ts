@@ -15,7 +15,7 @@ const LOCALES = Object.keys(CATALOGS);
 describe("CATALOGS registry", () => {
   it("ships the expected locales", () => {
     expect(LOCALES.sort()).toEqual(
-      ["da", "de", "el", "en", "es", "fi", "fr", "it", "pl", "pt", "sv"].sort(),
+      ["ar", "da", "de", "el", "en", "es", "fi", "fr", "it", "pl", "pt", "sv"].sort(),
     );
   });
 
@@ -32,6 +32,7 @@ describe("resolveCatalog", () => {
     expect(resolveCatalog("de-AT")).toBe(CATALOGS.de);
     expect(resolveCatalog("DE")).toBe(CATALOGS.de);
     expect(resolveCatalog("pt-BR")).toBe(CATALOGS.pt);
+    expect(resolveCatalog("ar-EG")).toBe(CATALOGS.ar);
     expect(resolveCatalog("el-GR")).toBe(CATALOGS.el);
     expect(resolveCatalog("sv_SE")).toBe(CATALOGS.sv);
   });

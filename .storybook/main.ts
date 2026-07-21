@@ -13,6 +13,7 @@ const primitivesSrcDir = join(import.meta.dirname, "../packages/primitives/src")
 const themingSrcDir = join(import.meta.dirname, "../packages/theming/src");
 const presetsSrcDir = join(import.meta.dirname, "../packages/presets/src");
 const componentsSrcDir = join(import.meta.dirname, "../packages/components/src");
+const i18nSrcDir = join(import.meta.dirname, "../packages/i18n/src");
 
 const config: StorybookConfig = {
   stories: ["../packages/*/src/**/*.stories.@(ts|tsx)"],
@@ -57,6 +58,11 @@ const config: StorybookConfig = {
           {
             find: /^@hope-ui\/primitives\/(.+)$/,
             replacement: join(primitivesSrcDir, "$1/index.ts"),
+          },
+          // `@hope-ui/i18n` has a root barrel: one exact-anchored alias, not a wildcard.
+          {
+            find: /^@hope-ui\/i18n$/,
+            replacement: join(i18nSrcDir, "index.ts"),
           },
           // `@hope-ui/theming` has a root barrel: two exact-anchored aliases, not a wildcard.
           {

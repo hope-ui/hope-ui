@@ -27,6 +27,7 @@
     "paths": {
       "@hope-ui/components/*": ["./packages/components/src/*/index.ts"],
       "@hope-ui/primitives/*": ["./packages/primitives/src/*/index.ts"],
+      "@hope-ui/i18n": ["./packages/i18n/src/index.ts"],
       "@hope-ui/theming": ["./packages/theming/src/index.ts"],
       "@hope-ui/theming/conformance": ["./packages/theming/src/conformance.ts"],
       "@hope-ui/presets/hope": ["./packages/presets/src/hope/index.ts"],

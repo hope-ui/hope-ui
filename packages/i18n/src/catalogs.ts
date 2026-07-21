@@ -1,14 +1,4 @@
-import { MESSAGES_DA } from "./locales/da";
-import { MESSAGES_DE } from "./locales/de";
-import { MESSAGES_EL } from "./locales/el";
-import { MESSAGES_EN } from "./locales/en";
-import { MESSAGES_ES } from "./locales/es";
-import { MESSAGES_FI } from "./locales/fi";
-import { MESSAGES_FR } from "./locales/fr";
-import { MESSAGES_IT } from "./locales/it";
-import { MESSAGES_PL } from "./locales/pl";
-import { MESSAGES_PT } from "./locales/pt";
-import { MESSAGES_SV } from "./locales/sv";
+import * as locales from "./locales";
 import type { I18nCatalog } from "./messages";
 
 /**
@@ -17,17 +7,18 @@ import type { I18nCatalog } from "./messages";
  * locale by creating `<code>.ts` (a full {@link I18nCatalog}) and registering it here.
  */
 export const CATALOGS: Record<string, I18nCatalog> = {
-  en: MESSAGES_EN,
-  fr: MESSAGES_FR,
-  de: MESSAGES_DE,
-  it: MESSAGES_IT,
-  es: MESSAGES_ES,
-  pt: MESSAGES_PT,
-  pl: MESSAGES_PL,
-  sv: MESSAGES_SV,
-  fi: MESSAGES_FI,
-  da: MESSAGES_DA,
-  el: MESSAGES_EL,
+  en: locales.MESSAGES_EN,
+  fr: locales.MESSAGES_FR,
+  de: locales.MESSAGES_DE,
+  it: locales.MESSAGES_IT,
+  es: locales.MESSAGES_ES,
+  pt: locales.MESSAGES_PT,
+  pl: locales.MESSAGES_PL,
+  sv: locales.MESSAGES_SV,
+  fi: locales.MESSAGES_FI,
+  da: locales.MESSAGES_DA,
+  el: locales.MESSAGES_EL,
+  ar: locales.MESSAGES_AR,
 };
 
 /**
@@ -36,5 +27,5 @@ export const CATALOGS: Record<string, I18nCatalog> = {
  */
 export function resolveCatalog(locale: string): I18nCatalog {
   const primary = locale.toLowerCase().split(/[-_]/)[0] ?? "";
-  return CATALOGS[primary] ?? MESSAGES_EN;
+  return CATALOGS[primary] ?? locales.MESSAGES_EN;
 }

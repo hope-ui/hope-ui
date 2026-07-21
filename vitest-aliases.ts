@@ -50,6 +50,7 @@ const primitivesSrcDir = join(import.meta.dirname, "packages/primitives/src");
 const themingSrcDir = join(import.meta.dirname, "packages/theming/src");
 const presetsSrcDir = join(import.meta.dirname, "packages/presets/src");
 const componentsSrcDir = join(import.meta.dirname, "packages/components/src");
+const i18nSrcDir = join(import.meta.dirname, "packages/i18n/src");
 
 // `@hope-ui/primitives` publishes one subpath export per primitive folder (no root barrel),
 // so the alias is a wildcard: `@hope-ui/primitives/render` -> `.../src/render/index.ts`. The
@@ -73,6 +74,12 @@ export const hopeUiAlias = [
   {
     find: /^@hope-ui\/primitives\/(.+)$/,
     replacement: join(primitivesSrcDir, "$1/index.ts"),
+  },
+  // `@hope-ui/i18n` is a single cohesive module with a root barrel (like theming), so an
+  // exact-anchored match, not a wildcard.
+  {
+    find: /^@hope-ui\/i18n$/,
+    replacement: join(i18nSrcDir, "index.ts"),
   },
   {
     find: /^@hope-ui\/theming\/conformance$/,

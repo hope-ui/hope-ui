@@ -1,3 +1,4 @@
+import { type TranslateFn, useLocale } from "@hope-ui/i18n";
 import {
   type CalendarDate,
   getLocalTimeZone,
@@ -15,7 +16,6 @@ import {
   createUniqueId,
   untrack,
 } from "solid-js";
-import { type TranslateFn, useLocale } from "../i18n";
 import {
   type CreateCollectionReturn,
   type CreateListFocusReturn,

@@ -10,7 +10,6 @@
     "entries": {
       "calendar": "src/calendar/index.ts",
       "dialog": "src/dialog/index.ts",
-      "i18n": "src/i18n/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "internal": "src/internal/index.ts",
       "utils": "src/utils/index.ts"
@@ -24,10 +23,6 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
-    },
-    "./i18n": {
-      "types": "./dist/i18n/index.d.ts",
-      "solid": "./dist/i18n/index.jsx"
     },
     "./modal-backdrop": {
       "types": "./dist/modal-backdrop/index.d.ts",
@@ -58,6 +53,7 @@
     }
   },
   "dependencies": {
+    "@hope-ui/i18n": "workspace:*",
     "@internationalized/date": "catalog:",
     "@solid-primitives/a11y": "catalog:"
   },

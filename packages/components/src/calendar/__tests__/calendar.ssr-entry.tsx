@@ -1,4 +1,4 @@
-import { I18nProvider } from "@hope-ui/primitives/i18n";
+import { I18nProvider } from "@hope-ui/i18n";
 import { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
 import { renderToStringAsync } from "@solidjs/web";

@@ -33,7 +33,8 @@ single preset.
 
 ## What's in the box
 
-hope-ui ships as a few focused packages — install these three and you're set.
+hope-ui ships as a few focused packages — install these three and you're set, plus one optional
+package for internationalization.
 
 <DataTable
   columns={[
@@ -44,6 +45,7 @@ hope-ui ships as a few focused packages — install these three and you're set.
     { pkg: "@hope-ui/components", role: "The components themselves — one import per component (e.g. @hope-ui/components/button)." },
     { pkg: "@hope-ui/theming", role: "The theming contract: ThemeProvider, definePreset, and the semantic-token vocabulary components read from." },
     { pkg: "@hope-ui/presets", role: "Ready-made visual identities. @hope-ui/presets/hope is the default look." },
+    { pkg: "@hope-ui/i18n", role: "Optional. Locale, reading direction, and message translation — I18nProvider + useLocale. Components are localized out of the box; add this only to control the locale or override strings." },
   ]}
 />
 

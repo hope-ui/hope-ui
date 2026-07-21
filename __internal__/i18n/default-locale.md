@@ -27,8 +27,8 @@ function createDefaultLocale(): { locale: () => string; direction: () => Directi
    hydrate. (The original source seeds the signal with the real locale at module load, which can
    mismatch.)
 2. **Dual-copy-safe subscription.** The shared `languagechange` listener set + the `current`
-   snapshot live in a `Symbol.for("@hope-ui/primitives/i18n:locale-registry")` slot on `globalThis`,
-   so two installed copies of `@hope-ui/primitives` observe one registry — the same reasoning as
+   snapshot live in a `Symbol.for("@hope-ui/i18n:locale-registry")` slot on `globalThis`,
+   so two installed copies of `@hope-ui/i18n` observe one registry — the same reasoning as
    `createScrollLock`/`createHideOutside` storing their counts under a global symbol.
 
 ## Provenance

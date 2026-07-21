@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hope-ui/components": "workspace:*",
+    "@hope-ui/i18n": "workspace:*",
     "@hope-ui/presets": "workspace:*",
     "@hope-ui/theming": "workspace:*",
     "@mdx-js/rollup": "^3.1.0",

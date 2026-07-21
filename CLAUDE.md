@@ -18,11 +18,14 @@ and React Aria (their public API surface and accessibility patterns — actively
 adapt their code/reasoning). See `__internal__/plan.md` for the full architecture rationale,
 pitfall analysis, and phased build plan.
 
-**i18n provenance:** `packages/primitives/src/i18n/` (locale + reading-direction
-context — `I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) is derived
-from React Spectrum/`@react-aria/i18n` (Apache-2.0). The improvements over that source are
+**i18n provenance:** `packages/i18n/src/` — its own standalone package `@hope-ui/i18n` (locale +
+reading-direction context — `I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`)
+is derived from React Spectrum/`@react-aria/i18n` (Apache-2.0). The improvements over that source are
 documented in `default-locale.ts` (SSR-safe seeding + a `Symbol.for` dual-copy registry). Do
-not "correct" this back to a hand-rolled reimplementation.
+not "correct" this back to a hand-rolled reimplementation. It was lifted out of `@hope-ui/primitives`
+(it imports nothing from the kernel — only `solid-js`/`@solidjs/web`) so it can be a stable public
+layer both the kernel (calendar) and `@hope-ui/components` (close-button) depend on, rather than an
+unstable-escape-hatch subpath re-exported one-to-one.
 
 `@solid-primitives` (the `next` branch) is a separate axis: a community, SolidJS-team-adjacent
 library to **adopt as a dependency**, not merely reference. Before writing a new internal primitive,
@@ -131,17 +134,18 @@ The set:
 1. A matching test file — `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx` (real-browser —
    required for anything touching focus/keyboard/pointer behavior, since jsdom cannot be trusted for
    that) — in a `__tests__/` subfolder of the source file's OWN directory (components: `<name>/__tests__/`;
-   primitives/theming: the family/`src`-level `__tests__/`, e.g. `dialog/__tests__/`, `theming/src/__tests__/`,
-   and each kept sub-folder keeps its own — `calendar/utils/__tests__/`, `i18n/locales/__tests__/`,
-   `theming/src/recipes/__tests__/`), so the source folder stays free of test/fixture visual noise. See
+   primitives/theming/i18n: the family/`src`-level `__tests__/`, e.g. `dialog/__tests__/`, `theming/src/__tests__/`,
+   `i18n/src/__tests__/`, and each kept sub-folder keeps its own — `calendar/utils/__tests__/`, `i18n`'s
+   `locales/__tests__/`, `theming/src/recipes/__tests__/`), so the source folder stays free of test/fixture visual noise. See
    "Leaf source folders stay flat-free".
-2. **`@hope-ui/primitives` only:** a matching `Foo.md` usage doc (API, keyboard interaction table,
-   ARIA pattern reference) at `__internal__/primitives/<relative-src-path>/Foo.md`, out of the source
-   tree and mirroring the src path. `@hope-ui/theming` and `@hope-ui/components` carry **no** repo
-   usage doc — their public API is documented in the doc website (`apps/docs/`), so a duplicate here
-   was redundant. **Exception:** files under `packages/primitives/src/internal/` (the
-   advanced/unstable behavior kernel — see "Architecture" below) require a test but **not** a `.md`;
-   the composed families (`dialog`, `calendar`, `i18n`, `modal-backdrop`) and `utils/` still need one.
+2. **`@hope-ui/primitives` and `@hope-ui/i18n` only:** a matching `Foo.md` usage doc (API, keyboard
+   interaction table, ARIA pattern reference) at `__internal__/<pkg>/<relative-src-path>/Foo.md`
+   (`__internal__/primitives/…` / `__internal__/i18n/…`), out of the source tree and mirroring the src
+   path. `@hope-ui/theming` and `@hope-ui/components` carry **no** repo usage doc — their public API is
+   documented in the doc website (`apps/docs/`), so a duplicate here was redundant. **Exception:** files
+   under `packages/primitives/src/internal/` (the advanced/unstable behavior kernel — see "Architecture"
+   below) require a test but **not** a `.md`; the composed families (`dialog`, `calendar`,
+   `modal-backdrop`) and `utils/` still need one.
 3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (stories
    are the human-facing harness, so they stay next to what they render). One per folder. Components are
    what a human has to look at; pure primitives aren't. Stories (and tests) never reach `dist/` because
@@ -194,17 +198,17 @@ A `src/<name>/` folder holds only its implementation file(s), `index.ts`, and �
 here (`<name>-root.tsx`, `<name>-icon.tsx`, a shared `<name>-context.ts`, …), with the namespace
 object assembled in the barrel `index.ts` (`export const Foo = { Root, … }`) — no subfolders. That is
 encouraged, not sprawl: keeping a single 600-line file is worse. The `@hope-ui/primitives` /
-`@hope-ui/theming` families follow the same discipline one level up: every part file sits **flat** in
-its top-level folder (`dialog/dialog-content.ts`, `internal/create-focus-trap.ts`,
-`theming/src/preset.ts`) with the whole family's tests consolidated in that folder's single
+`@hope-ui/theming` / `@hope-ui/i18n` families follow the same discipline one level up: every part file
+sits **flat** in its top-level folder (`dialog/dialog-content.ts`, `internal/create-focus-trap.ts`,
+`theming/src/preset.ts`, `i18n/src/translate.ts`) with the whole family's tests consolidated in that folder's single
 `__tests__/`. The only nested source sub-folders are a handful of deliberately-kept data/util
 groupings — `calendar/utils/`, `i18n/locales/`, `theming/src/recipes/`, each with its **own**
 `__tests__/` for its files — never a per-part folder. Everything non-source still has a
 home: tests, `__fixtures__/`, and `__screenshots__/` live in a `__tests__/` subfolder; the
-primitives usage `.md` lives under `__internal__/primitives/<path>/`. Never drop test, fixture, or doc files flat beside
+each primitives or i18n usage `.md` lives under `__internal__/<pkg>/<path>/`. Never drop test, fixture, or doc files flat beside
 source. `pnpm check:coverage-parity` enforces this — a flat
 `*.test.*`, a flat `<name>.md`, or a flat `__fixtures__/` in any leaf under `primitives`,
-`components`, `theming`, or `internal-test-utils` fails the build.
+`components`, `theming`, `i18n`, or `internal-test-utils` fails the build.
 
 ## Components may write literal host elements — the library ships source
 
@@ -238,6 +242,13 @@ them rather than re-deriving a behavior in a comment.
 ## Architecture
 
 **Package layout** (pnpm workspace, Turborepo pipeline):
+- `packages/i18n` (`@hope-ui/i18n`) — the foundational, **dependency-free** locale layer:
+  locale + reading-direction context (`I18nProvider`/`useLocale`/`getReadingDirection`) plus the
+  built-in component-message catalog + resolver (`t`). Imports nothing from any `@hope-ui/*` package
+  (only `solid-js`/`@solidjs/web`), so it sits at the bottom of the graph — both `@hope-ui/primitives`
+  (calendar) and `@hope-ui/components` (close-button) depend on it, and end users import
+  `I18nProvider` from here directly. A single cohesive root barrel (`@hope-ui/i18n`), not per-file
+  subpaths. See the i18n provenance note under "What this is" and `__internal__/i18n/`.
 - `packages/primitives` (`@hope-ui/primitives`) — the shared behavior kernel, and an
   **internal / advanced (unstable) layer**, not a marketed public product: it serves
   `@hope-ui/theming` and `@hope-ui/components`, and is available as an escape hatch for advanced
@@ -247,7 +258,7 @@ them rather than re-deriving a behavior in a comment.
 
   Every source file lives under exactly one **top-level `src/` folder**, and *only* top-level
   folders carry a barrel (`index.ts`) and a subpath export — nothing deeper. The top-level folders
-  — `dialog`, `modal-backdrop`, `utils`, `internal` (documented below), plus `calendar` and `i18n`:
+  — `dialog`, `modal-backdrop`, `utils`, `internal` (documented below), plus `calendar`:
   - `dialog/` (`@hope-ui/primitives/dialog`) — the `createDialog` **hook family**: a root
     state hook `createDialog` plus one hook per part (`createDialogTrigger`, `createDialogContent`,
     `createDialogBackdrop`, `createDialogPortal`, `createDialogTitle`, `createDialogDescription`,
@@ -278,10 +289,8 @@ them rather than re-deriving a behavior in a comment.
     …) that the collection/floating components (Listbox, Menu, Select, …) will compose.
   - `calendar/` (`@hope-ui/primitives/calendar`) — the `createCalendar` **hook family** (headless
     month/year/decade calendar with single/range/multiple selection), built on
-    `@internationalized/date`; same root-state-plus-per-part shape as `dialog/`.
-  - `i18n/` (`@hope-ui/primitives/i18n`) — locale + reading-direction context
-    (`I18nProvider`/`useLocale`/`createDefaultLocale`/`getReadingDirection`) plus message
-    translation. See the i18n provenance note under "What this is".
+    `@internationalized/date`; same root-state-plus-per-part shape as `dialog/`. Reads locale +
+    `t` from `@hope-ui/i18n` (its own package — see the Package layout above).
 
   **Modality is four mechanisms, not one**, and each was verified against the installed
   Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)

@@ -40,7 +40,11 @@ Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
 | `@hope-ui/primitives/dialog` | The `createDialog` hook family (root state + one hook per part). |
 | `@hope-ui/primitives/calendar` | The `createCalendar` hook family (headless month/year/decade calendar, built on `@internationalized/date`). |
 | `@hope-ui/primitives/modal-backdrop` | `ModalBackdrop` — the kernel's only DOM-rendering component, the pointer-blocking third of modality. |
-| `@hope-ui/primitives/i18n` | Locale + reading-direction context: `I18nProvider`, `useLocale`, `createDefaultLocale`, `getReadingDirection`, and message translation. |
+
+> Locale + reading-direction context (`I18nProvider`, `useLocale`, `getReadingDirection`, message
+> translation) now lives in its own standalone package, **`@hope-ui/i18n`** — the kernel's calendar
+> depends on it. It was lifted out of here so it can be a stable public layer rather than an
+> unstable-escape-hatch subpath.
 
 ## Usage
 
