@@ -5,12 +5,13 @@ import type { BadgeRecipeVariants, BadgeSlot } from "../recipes/badge";
 import type { ButtonRecipeVariants, ButtonSlot } from "../recipes/button";
 import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../recipes/close-button";
 import type { DialogRecipeVariants, DialogSlot } from "../recipes/dialog";
+import type { ListboxRecipeVariants, ListboxSlot } from "../recipes/listbox";
 import type { SlotClassFn } from "../slot-recipe";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, `closeButton`, and `dialog`. This is a compile-time assignability check (verified by
-// `pnpm typecheck`).
+// `button`, `closeButton`, `dialog`, and `listbox`. This is a compile-time assignability check
+// (verified by `pnpm typecheck`).
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,
@@ -49,6 +50,14 @@ const _theme = {
     title: () => "dialog__title",
     description: () => "dialog__description",
     closeTrigger: () => "dialog__close-trigger",
+  }),
+  listbox: (props?: ListboxRecipeVariants): Record<ListboxSlot, SlotClassFn> => ({
+    root: () => `listbox listbox--${props?.size ?? "md"}`,
+    item: () => "listbox__item",
+    itemIndicator: () => "listbox__item-indicator",
+    group: () => "listbox__group",
+    groupLabel: () => "listbox__group-label",
+    separator: () => "listbox__separator",
   }),
 } satisfies RecipeRegistry;
 void _theme;

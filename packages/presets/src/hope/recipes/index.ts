@@ -17,6 +17,7 @@ import { badgeRecipe } from "./badge";
 import { buttonRecipe } from "./button";
 import { closeButtonRecipe } from "./close-button";
 import { dialogRecipe } from "./dialog";
+import { listboxRecipe } from "./listbox";
 
 /** The hope preset's recipe map — every component recipe hope implements, keyed by component name. */
 export const hopeRecipes = {
@@ -25,4 +26,5 @@ export const hopeRecipes = {
   button: buttonRecipe,
   closeButton: closeButtonRecipe,
   dialog: dialogRecipe,
+  listbox: listboxRecipe,
 } satisfies RecipeRegistry;

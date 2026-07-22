@@ -17,6 +17,7 @@ import type { BadgeThemeableProps } from "./recipes/badge";
 import type { ButtonThemeableProps } from "./recipes/button";
 import type { CloseButtonThemeableProps } from "./recipes/close-button";
 import type { DialogThemeableProps } from "./recipes/dialog";
+import type { ListboxThemeableProps } from "./recipes/listbox";
 
 /** One entry per component that opts into behavioral/chrome (non-variant) app-wide defaults. */
 export interface ThemeablePropsRegistry {
@@ -25,4 +26,5 @@ export interface ThemeablePropsRegistry {
   button: ButtonThemeableProps;
   closeButton: CloseButtonThemeableProps;
   dialog: DialogThemeableProps;
+  listbox: ListboxThemeableProps;
 }

@@ -6,6 +6,7 @@ import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
 import type { CloseButtonRecipe } from "../recipes/close-button";
 import type { DialogRecipe } from "../recipes/dialog";
+import type { ListboxRecipe } from "../recipes/listbox";
 
 // A minimal, self-contained recipe map — the theming package must not depend on `@hope-ui/presets`.
 // The class functions are stubs; these tests exercise the *machinery* (merge + brand), not styling.
@@ -47,12 +48,21 @@ const stubDialogRecipe: DialogRecipe = () => ({
   description: () => "",
   closeTrigger: () => "",
 });
+const stubListboxRecipe: ListboxRecipe = () => ({
+  root: () => "",
+  item: () => "",
+  itemIndicator: () => "",
+  group: () => "",
+  groupLabel: () => "",
+  separator: () => "",
+});
 const registry: RecipeRegistry = {
   alert: stubAlertRecipe,
   badge: stubBadgeRecipe,
   button: stubRecipe,
   closeButton: stubCloseButtonRecipe,
   dialog: stubDialogRecipe,
+  listbox: stubListboxRecipe,
 };
 
 describe("definePreset — bootstrap from a raw registry", () => {
