@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { createSignal, For } from "solid-js";
+import { type Accessor, createSignal, For } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Listbox, type ListboxSize } from ".";
 
@@ -197,8 +197,8 @@ export const Sizes: Story = {
 };
 
 /**
- * Both focus modes side by side. **Roving** (default) moves real DOM focus onto the active `<li>` and
- * makes it the single tab stop. **Activedescendant** keeps DOM focus on the `<ul>` container and points
+ * Both focus modes side by side. **Roving** (default) moves real DOM focus onto the active option and
+ * makes it the single tab stop. **Activedescendant** keeps DOM focus on the listbox container and points
  * `aria-activedescendant` at the active option — the model a future Select needs (focus stays on the
  * trigger/input). Tab into each and arrow through it.
  */
@@ -236,7 +236,7 @@ export const FocusModes: Story = {
 
 /**
  * Native form submission, opt-in via `name`: the listbox renders hidden fields (siblings of the
- * `<ul>`) valued `itemToValue(item)` for each selected row, so a plain `<form>` submit carries the
+ * list element) valued `itemToValue(item)` for each selected row, so a plain `<form>` submit carries the
  * selection. Submit and watch the captured `FormData` render below.
  */
 export const FormSubmission: Story = {
@@ -271,6 +271,85 @@ export const FormSubmission: Story = {
           {submitted() ? `Submitted fruit=[${submitted()?.join(", ")}]` : "Not submitted yet"}
         </output>
       </form>
+    );
+  },
+};
+
+// The viewport a scrolling list needs: a fixed height + the recipe's own `overflow-y-auto`, plus the
+// elevated `PANEL` chrome. Virtual rows are 32px, matching the `estimateSize` below.
+const VIRTUAL_PANEL = `${PANEL} h-72 w-56`;
+
+function makeRows(count: number): Fruit[] {
+  return Array.from({ length: count }, (_, index) => ({ id: index, name: `Item ${index}` }));
+}
+
+/**
+ * **Virtualization** — pass `items` (the full array) + `estimateSize` and a **render-prop** child
+ * `(item, index) => <Listbox.Item index={index}>…`. The list element becomes the scroll container; only
+ * a window of rows mounts, so 10,000 rows scroll and navigate smoothly (try End, or type to jump). The
+ * same `createListbox` state drives selection/focus/typeahead over the **full** set. Flat lists only —
+ * no groups in virtual mode.
+ *
+ * The virtual path requires the consumer to install `@tanstack/virtual-core` (an **optional** peer of
+ * `@hope-ui/primitives`, so a non-virtualizing install stays dependency-free).
+ */
+export const VirtualLargeList: Story = {
+  name: "virtual (10k rows)",
+  render: () => {
+    const items = makeRows(10_000);
+    const [value, setValue] = createSignal<Fruit[]>([items[42] as Fruit]);
+    return (
+      <div style={{ padding: "2rem" }}>
+        <Listbox.Root
+          aria-label="Ten thousand rows"
+          class={VIRTUAL_PANEL}
+          items={items}
+          estimateSize={() => 32}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          value={value()}
+          onChange={setValue}
+        >
+          {(item: Fruit, index: Accessor<number>) => (
+            <Listbox.Item index={index} style={{ height: "2rem" }}>
+              <Listbox.ItemIndicator />
+              {item.name}
+            </Listbox.Item>
+          )}
+        </Listbox.Root>
+      </div>
+    );
+  },
+};
+
+/** Virtual mode with `selectionMode="multiple"` — every chosen row keeps its check glyph, and the
+ *  selection persists across scrolling (it lives on the full-set state, not the mounted window). */
+export const VirtualMultiple: Story = {
+  name: "virtual multi-select",
+  render: () => {
+    const items = makeRows(2_000);
+    const [value, setValue] = createSignal<Fruit[]>([items[1] as Fruit, items[5] as Fruit]);
+    return (
+      <div style={{ padding: "2rem" }}>
+        <Listbox.Root
+          aria-label="Choose rows"
+          class={VIRTUAL_PANEL}
+          selectionMode="multiple"
+          items={items}
+          estimateSize={() => 32}
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          value={value()}
+          onChange={setValue}
+        >
+          {(item: Fruit, index: Accessor<number>) => (
+            <Listbox.Item index={index} style={{ height: "2rem" }}>
+              <Listbox.ItemIndicator />
+              {item.name}
+            </Listbox.Item>
+          )}
+        </Listbox.Root>
+      </div>
     );
   },
 };

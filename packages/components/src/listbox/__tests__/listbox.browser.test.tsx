@@ -407,7 +407,7 @@ describe("Listbox — native form submission", () => {
     await userEvent.click(nth(options(container), 2)); // Cherry (id 3)
     await vi.waitFor(() => expect(selectedValues(container).sort()).toEqual(["Apple", "Cherry"]));
 
-    // The hidden fields are siblings of the <ul>, inside the <form> — never inside the listbox.
+    // The hidden fields are siblings of the list element, inside the <form> — never inside the listbox.
     expect(listbox(container).querySelector('input[type="hidden"]')).toBeNull();
 
     await userEvent.click(page.getByRole("button", { name: "Submit" }));
