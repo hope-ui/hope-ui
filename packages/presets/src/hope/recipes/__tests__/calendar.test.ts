@@ -50,29 +50,52 @@ describe("hope calendar recipe", () => {
     expect(cell).toContain("data-range-middle:text-on-selected");
     expect(cell).toContain("data-highlighted:bg-selected");
     expect(cell).toContain("data-today:bg-active");
-    // The only real hover is the neutral surface wash (a day under the pointer); it must not paint any
-    // selection color, and there is no bare-focus background.
-    expect(cell).toContain("hover:bg-surface-raised-hovered");
+    // The hover wash is written zero-specificity (`:where(:hover)`) so it ranks equal to the `data-*`
+    // fills and, placed before them, loses to any selection/range/today paint under the pointer — a
+    // bare `hover:` would outrank them all. It must not paint any selection color, and there is no
+    // bare-focus background.
+    expect(cell).toContain("[&:where(:hover)]:bg-surface-raised-hovered");
     expect(cell).not.toContain("hover:bg-primary");
     expect(cell).not.toContain("hover:bg-selected");
     expect(cell).not.toContain("focus:bg-");
+    // The zero-spec hover must sit before every state fill so source order lets the fills win.
+    expect(cell.indexOf("[&:where(:hover)]")).toBeLessThan(
+      cell.indexOf("data-selected:bg-primary"),
+    );
   });
 
   it("orders day state so the later utility wins the zero-specificity cascade", () => {
     const cell = calendarRecipe({}).cellTrigger();
     // `today` is a soft tint that a real selection must override → it comes before `selected`.
     expect(cell.indexOf("data-today:")).toBeLessThan(cell.indexOf("data-selected:bg-primary"));
-    // The range middle band must lose to the solid endpoints → it comes before range-start/-end.
+    // The tentative preview comes before `selected` so the range anchor (selected AND highlighted)
+    // stays the solid pill, not the light band.
+    expect(cell.indexOf("data-highlighted:")).toBeLessThan(
+      cell.indexOf("data-selected:bg-primary"),
+    );
+    // The range middle band comes after `selected` (a middle day that also reports selected reads as
+    // the band) but before the solid endpoints (which must beat the middle).
+    expect(cell.indexOf("data-selected:bg-primary")).toBeLessThan(
+      cell.indexOf("data-range-middle:"),
+    );
     expect(cell.indexOf("data-range-middle:")).toBeLessThan(cell.indexOf("data-range-start:"));
     expect(cell.indexOf("data-range-middle:")).toBeLessThan(cell.indexOf("data-range-end:"));
   });
 
-  it("rounds the range endpoints and squares the middle for a continuous band", () => {
+  it("rounds the range endpoints and squares the middle for a continuous band (logical, RTL-safe)", () => {
     const cell = calendarRecipe({}).cellTrigger();
     expect(cell).toContain("rounded-md"); // the isolated single-day base
-    expect(cell).toContain("data-range-start:rounded-l-md");
-    expect(cell).toContain("data-range-end:rounded-r-md");
+    // Logical radii so the band rounds on the leading edge under RTL: the endpoints round their outer
+    // side and square their inner side to sit flush against the middle band.
+    expect(cell).toContain("data-range-start:rounded-s-md");
+    expect(cell).toContain("data-range-start:rounded-e-none");
+    expect(cell).toContain("data-range-end:rounded-e-md");
+    expect(cell).toContain("data-range-end:rounded-s-none");
     expect(cell).toContain("data-range-middle:rounded-none");
+    // The tentative preview is squared too, so it reads as one continuous band, not separate pills.
+    expect(cell).toContain("data-highlighted:rounded-none");
+    // A single-day range re-rounds both sides.
+    expect(cell).toContain("[&[data-range-start][data-range-end]]:rounded-md");
   });
 
   it("mutes outside-month days and strikes unavailable ones through tokens", () => {
@@ -88,10 +111,11 @@ describe("hope calendar recipe", () => {
     expect(cell).toContain("data-disabled:opacity-disabled");
   });
 
-  it("gives the day trigger the shared roving focus ring (reused from Button)", () => {
+  it("gives the day trigger the shared roving focus ring + border (reused from Button)", () => {
     const cell = calendarRecipe({}).cellTrigger();
     expect(cell).toContain("focus-visible:outline-none");
-    expect(cell).toContain("focus-visible:ring-[3px]");
+    expect(cell).toContain("focus-visible:border-focus");
+    expect(cell).toContain("focus-visible:ring-3");
     expect(cell).toContain("focus-visible:ring-focus-halo");
   });
 
@@ -112,30 +136,47 @@ describe("hope calendar recipe", () => {
       // Ghost: no solid fill of its own.
       expect(cls).not.toContain("bg-primary");
     }
+    // The heading is the flexible caption — it fills the header width between the nav buttons.
+    expect(parts.heading()).toContain("flex-1");
   });
 
-  it("scales day-cell + nav-button density per size, each size self-contained", () => {
-    // sm: 32px day box, tighter nav button.
+  it("keeps one grid footprint across views (table-fixed at the month width)", () => {
+    const grid = calendarRecipe({}).grid();
+    expect(grid).toContain("table-fixed");
+    expect(grid).toContain("w-[calc(var(--cell-size)*7)]");
+    expect(grid).toContain("border-collapse");
+    // No per-view branching — one width for month/year/decade, so year/decade keep the month footprint.
+    expect(grid).not.toContain("data-view");
+  });
+
+  it("scales density per size via --cell-size on root, each size self-contained", () => {
+    // sm: 32px day box (via --cell-size), tighter nav button.
     const sm = calendarRecipe({ size: "sm" });
-    expect(sm.cellTrigger()).toContain("size-8");
+    expect(sm.root()).toContain("[--cell-size:2rem]");
     expect(sm.cellTrigger()).toContain("text-xs");
     expect(sm.prevButton()).toContain("size-7");
 
     // lg: 40px day box, roomier nav button.
     const lg = calendarRecipe({ size: "lg" });
-    expect(lg.cellTrigger()).toContain("size-10");
+    expect(lg.root()).toContain("[--cell-size:2.5rem]");
     expect(lg.cellTrigger()).toContain("text-base");
     expect(lg.prevButton()).toContain("size-9");
+
+    // The day box is view-independent: the button fills its column (width = --cell-size), so it carries
+    // no per-size `size-N` — only the text size changes.
+    expect(sm.cellTrigger()).toContain("h-(--cell-size)");
+    expect(sm.cellTrigger()).toContain("w-full");
+    expect(sm.cellTrigger()).not.toMatch(/\bsize-\d/);
   });
 
   it("defaults to the md size when no size is passed", () => {
     const parts = calendarRecipe({});
-    expect(parts.cellTrigger()).toContain("size-9"); // md, 36px
+    expect(parts.root()).toContain("[--cell-size:2.25rem]"); // md, 36px
     expect(parts.cellTrigger()).toContain("text-sm"); // md
     expect(parts.prevButton()).toContain("size-8"); // md
-    // Only the md density is applied — no sm/lg day-box endpoints leak in.
-    expect(parts.cellTrigger()).not.toContain("size-8");
-    expect(parts.cellTrigger()).not.toContain("size-10");
+    // Only the md density is applied — no sm/lg cell-size endpoints leak in.
+    expect(parts.root()).not.toContain("[--cell-size:2rem]");
+    expect(parts.root()).not.toContain("[--cell-size:2.5rem]");
     expect(parts.cellTrigger()).not.toContain("text-base");
   });
 
