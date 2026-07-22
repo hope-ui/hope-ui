@@ -380,6 +380,59 @@ describe("createListbox — virtual source mode", () => {
     dispose();
   });
 
+  it("PageDown pages through the list, scrolling an offscreen row in and focusing it (roving)", async () => {
+    let state!: CreateListboxReturn<number>;
+    const { container, dispose } = mount(() => (
+      <VirtualListbox count={COUNT} onReady={(s) => (state = s)} />
+    ));
+    await vi.waitFor(() => expect(mountedIndices(container).length).toBeGreaterThan(0));
+
+    state.focus.focusIndex(0);
+    await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(0));
+
+    // Default page is 10, so two PageDowns reach index 20 — offscreen for a ~10-row viewport.
+    await userEvent.keyboard("{PageDown}{PageDown}");
+    await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(20));
+    await vi.waitFor(() => expect(container.querySelector('[data-index="20"]')).not.toBeNull());
+    await expect
+      .element(container.querySelector<HTMLElement>('[data-index="20"]') as HTMLElement)
+      .toHaveFocus();
+    dispose();
+  });
+
+  it("recovers focus to the container when the roving-focused row is scrolled out of the window", async () => {
+    let state!: CreateListboxReturn<number>;
+    const { container, dispose } = mount(() => (
+      <VirtualListbox count={COUNT} onReady={(s) => (state = s)} />
+    ));
+    await vi.waitFor(() => expect(mountedIndices(container).length).toBeGreaterThan(0));
+
+    const list = listbox(container);
+    state.focus.focusIndex(0);
+    await expect
+      .element(container.querySelector<HTMLElement>('[data-index="0"]') as HTMLElement)
+      .toHaveFocus();
+
+    // Scroll far down by hand — a wheel/scrollbar gesture, NOT keyboard nav — so the focused row 0
+    // unmounts. Without recovery the browser drops focus to <body> and keyboard nav dies (the
+    // container's key handler only sees events bubbling up from a focused descendant).
+    list.scrollTop = 4000;
+    list.dispatchEvent(new Event("scroll"));
+
+    await vi.waitFor(() => expect(container.querySelector('[data-index="0"]')).toBeNull());
+    // Focus was pulled back to the container, so keydowns keep arriving.
+    await expect.element(list).toHaveFocus();
+
+    // Keyboard nav is alive again: ArrowDown re-homes onto a mounted option.
+    await userEvent.keyboard("{ArrowDown}");
+    await vi.waitFor(() => expect(state.focus.activeIndex()).toBe(1));
+    await vi.waitFor(() => expect(container.querySelector('[data-index="1"]')).not.toBeNull());
+    await expect
+      .element(container.querySelector<HTMLElement>('[data-index="1"]') as HTMLElement)
+      .toHaveFocus();
+    dispose();
+  });
+
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = mount(() => <VirtualListbox count={COUNT} />);
     await vi.waitFor(() => expect(mountedIndices(container).length).toBeGreaterThan(0));

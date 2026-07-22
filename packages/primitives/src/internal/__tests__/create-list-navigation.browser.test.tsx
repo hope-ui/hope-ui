@@ -63,6 +63,7 @@ function NavHarness(props: {
   orientation?: Accessor<Orientation>;
   wrap?: Accessor<boolean>;
   textDirection?: Accessor<TextDirection>;
+  page?: Accessor<number>;
   onReady: (api: HarnessApi) => void;
 }) {
   const collection = createCollection<string>();
@@ -73,6 +74,7 @@ function NavHarness(props: {
     orientation: props.orientation,
     wrap: props.wrap,
     textDirection: props.textDirection,
+    page: props.page,
   });
   props.onReady({ collection, focus, navigation });
   return (
@@ -203,6 +205,87 @@ describe("createListNavigation — vertical (default)", () => {
       <NavHarness values={["a", "b", "c"]} onReady={(a) => (api = a)} />
     ));
     await ready(() => api, 3);
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("createListNavigation — page navigation", () => {
+  const LONG = Array.from({ length: 25 }, (_, index) => `i${index}`);
+
+  it("PageDown/PageUp move by a page of items (default 10)", async () => {
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => (
+      <NavHarness values={LONG} onReady={(a) => (api = a)} />
+    ));
+    await ready(() => api, 25);
+
+    api.focus.focusIndex(0);
+    await expect.element(nth(optionEls(container), 0)).toHaveFocus();
+
+    await userEvent.keyboard("{PageDown}");
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(10));
+    await expect.element(nth(optionEls(container), 10)).toHaveFocus();
+
+    await userEvent.keyboard("{PageDown}");
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(20));
+
+    await userEvent.keyboard("{PageUp}");
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(10));
+    dispose();
+  });
+
+  it("PageDown clamps at the last item (like End); PageUp clamps at the first", async () => {
+    let api!: HarnessApi;
+    const { dispose } = mount(() => <NavHarness values={LONG} onReady={(a) => (api = a)} />);
+    await ready(() => api, 25);
+
+    api.focus.focusIndex(20);
+    await userEvent.keyboard("{PageDown}"); // 20 + 10 → clamp to last (24)
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(24));
+
+    api.focus.focusIndex(4);
+    await userEvent.keyboard("{PageUp}"); // 4 - 10 → clamp to first (0)
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(0));
+    dispose();
+  });
+
+  it("lands on the nearest focusable when the page target is disabled", async () => {
+    let api!: HarnessApi;
+    // Disable the tail (i22, i23, i24) so a PageDown from 20 can't land on 24.
+    const { dispose } = mount(() => (
+      <NavHarness values={LONG} disabledValues={["i22", "i23", "i24"]} onReady={(a) => (api = a)} />
+    ));
+    await ready(() => api, 25);
+
+    api.focus.focusIndex(20);
+    await userEvent.keyboard("{PageDown}"); // target 24 disabled → scans back to the last focusable (21)
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(21));
+    dispose();
+  });
+
+  it("honors a custom page size", async () => {
+    let api!: HarnessApi;
+    const page = () => 3;
+    const { dispose } = mount(() => (
+      <NavHarness values={LONG} page={page} onReady={(a) => (api = a)} />
+    ));
+    await ready(() => api, 25);
+
+    api.focus.focusIndex(0);
+    await userEvent.keyboard("{PageDown}");
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(3));
+    await userEvent.keyboard("{PageDown}");
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(6));
+    dispose();
+  });
+
+  it("has no baseline accessibility violations", async () => {
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => (
+      <NavHarness values={LONG} onReady={(a) => (api = a)} />
+    ));
+    await ready(() => api, 25);
     await expectNoA11yViolations(container);
     dispose();
   });

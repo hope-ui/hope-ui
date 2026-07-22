@@ -37,6 +37,23 @@ are not in the DOM yet. `focusIndex` therefore:
 Activedescendant mode never moves DOM focus, so it uses the same "the element may be absent"
 plumbing for free — which is why focus lives here, in one primitive, rather than in each component.
 
+## Roving + virtualization: focus recovery
+
+Deferred focus handles *navigating to* an unmounted row. The reverse also happens: in roving mode the
+active option holds real DOM focus, and a virtualized source can **unmount that option when it scrolls
+out of the window** — by PageDown, the mouse wheel, or dragging the scrollbar, none of which change
+the active index. The browser then drops focus to `<body>`, and since the container's key handler only
+sees events that *bubble up from a focused descendant*, keyboard navigation would silently die.
+
+An effect guards this: when the element roving last focused disappears **and** focus fell back to
+`<body>` as a direct result, it pulls focus to the container (`options.element`) so keydowns keep
+arriving; the next arrow/typeahead then re-homes onto a mounted option. It is gated tightly so it never
+*steals* focus — only the element we focused, only when no navigation is mid-flight (that path
+re-focuses the target itself), and only when focus actually landed on `<body>` (not when the user moved
+it elsewhere). It is a no-op in collection mode (nothing unmounts) and in activedescendant mode (focus
+already lives on the container). Note that page navigation `preventDefault`s the native scroll, so the
+common trigger is the wheel/scrollbar; Page keys move the active index and thus focus normally.
+
 ## API
 
 ```ts

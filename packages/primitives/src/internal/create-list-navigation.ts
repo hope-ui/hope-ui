@@ -15,6 +15,12 @@ export interface CreateListNavigationOptions<V = unknown> {
   wrap?: Accessor<boolean>;
   /** Text direction. In `"rtl"` a horizontal list swaps Left/Right. Default `"ltr"`. Reactive. */
   textDirection?: Accessor<TextDirection>;
+  /**
+   * How many items PageDown/PageUp jump by. Default `10`. Reactive, so a consumer can derive it from
+   * the viewport (`visible rows`) if it wants a true "page"; otherwise the fixed default matches the
+   * common listbox convention. Page navigation never wraps.
+   */
+  page?: Accessor<number>;
 }
 
 export interface CreateListNavigationReturn {
@@ -26,6 +32,10 @@ export interface CreateListNavigationReturn {
   first(): void;
   /** Move to the last focusable item. */
   last(): void;
+  /** Move a page (see the `page` option) toward the end, landing on a focusable item. */
+  pageNext(): void;
+  /** Move a page toward the start, landing on a focusable item. */
+  pagePrev(): void;
   /** The index `next()` would move to, without moving. `-1` if there is nowhere to go. */
   peekNext(): number;
   /** The index `prev()` would move to, without moving. `-1` if there is nowhere to go. */
@@ -57,6 +67,7 @@ export function createListNavigation<V = unknown>(
   const orientation = () => options.orientation?.() ?? "vertical";
   const wrap = () => options.wrap?.() ?? false;
   const isRtl = () => (options.textDirection?.() ?? "ltr") === "rtl";
+  const page = () => Math.max(1, Math.floor(options.page?.() ?? 10));
 
   const firstFocusable = (): number => {
     const items = focus.items();
@@ -113,6 +124,28 @@ export function createListNavigation<V = unknown>(
     return -1;
   };
 
+  // The focusable index a page-jump lands on: clamp `current ± page` to the ends, then scan **back
+  // toward `current`** for the nearest focusable so a page of disabled tail items doesn't overshoot
+  // (and a PageDown near the end lands on the last focusable, like End). Never wraps. `-1` = no move.
+  const stepPage = (direction: 1 | -1): number => {
+    const items = focus.items();
+    const length = items.length;
+    if (length === 0) {
+      return -1;
+    }
+    const current = focus.activeIndex();
+    // From nothing active, page from just outside the near end so the first jump lands in-range.
+    const from = current < 0 ? (direction > 0 ? -1 : length) : current;
+    const target = Math.max(0, Math.min(length - 1, from + direction * page()));
+    for (let index = target; direction > 0 ? index > from : index < from; index -= direction) {
+      const item = items[index];
+      if (item && focus.isFocusable(item)) {
+        return index;
+      }
+    }
+    return -1;
+  };
+
   const peekNext = () => step(1);
   const peekPrev = () => step(-1);
 
@@ -126,6 +159,8 @@ export function createListNavigation<V = unknown>(
   const prev = () => goto(peekPrev());
   const first = () => goto(firstFocusable());
   const last = () => goto(lastFocusable());
+  const pageNext = () => goto(stepPage(1));
+  const pagePrev = () => goto(stepPage(-1));
 
   const keys = createKeyboardHandler<HTMLElement>()
     .on("ArrowDown", (event) => {
@@ -163,6 +198,17 @@ export function createListNavigation<V = unknown>(
     .on("End", (event) => {
       event.preventDefault();
       last();
+    })
+    // Page keys move by a page in **both** orientations (they page through list order, not an axis) and
+    // always `preventDefault` — this is also what stops the native scroll that would otherwise push a
+    // roving-focused row out of a virtualized window and drop DOM focus (see `createListFocus`).
+    .on("PageDown", (event) => {
+      event.preventDefault();
+      pageNext();
+    })
+    .on("PageUp", (event) => {
+      event.preventDefault();
+      pagePrev();
     });
 
   return {
@@ -170,6 +216,8 @@ export function createListNavigation<V = unknown>(
     prev,
     first,
     last,
+    pageNext,
+    pagePrev,
     peekNext,
     peekPrev,
     onKeyDown: keys.onKeyDown,

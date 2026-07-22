@@ -1,4 +1,4 @@
-import { type Accessor, createEffect, createMemo, createSignal } from "solid-js";
+import { type Accessor, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import type { CollectionItem, ItemSource } from "./create-collection";
 import { createControllableState } from "./create-controllable-state";
 
@@ -136,6 +136,9 @@ export function createListFocus<V = unknown>(
   // Deferred focus target. Set to an index by `focusIndex`; an effect focuses the element once it
   // exists (immediately for a mounted item, after mount for a virtualized one), then clears itself.
   const [pendingFocus, setPendingFocus] = createSignal<number | null>(null);
+  // The element roving focus last moved DOM focus to. Tracked only to recognize *that same* element
+  // later disappearing — a virtualized row scrolled out of the window — so focus can be recovered.
+  let rovingFocusedElement: HTMLElement | null | undefined;
   createEffect(
     () => {
       const index = pendingFocus();
@@ -149,8 +152,41 @@ export function createListFocus<V = unknown>(
         return; // element not mounted yet — a later run fires once it is
       }
       element.focus();
+      rovingFocusedElement = element;
       setPendingFocus(null);
     },
+  );
+
+  // Roving + virtualization focus recovery. In roving mode DOM focus sits on the active option, but a
+  // virtualized source unmounts that option when it scrolls out of the window — by PageDown, the mouse
+  // wheel, or dragging the scrollbar (all of which change scroll without changing the active index).
+  // The browser then drops focus to `<body>`, and because the container's key handler only sees events
+  // that *bubble up from a focused descendant*, keyboard navigation would silently die. When the very
+  // element roving last focused disappears **and** focus fell back to `<body>` as a result, pull focus
+  // to the container so keydowns keep arriving; the next arrow/typeahead re-homes onto a mounted option.
+  //
+  // Tightly gated so it never *steals* focus: only the element we actually focused, only when a
+  // navigation isn't already mid-flight (that path re-focuses the target itself via `pendingFocus`),
+  // and only when focus truly landed on `<body>` (not when the user moved it elsewhere). It is a no-op
+  // in collection mode (nothing unmounts) and in activedescendant mode (focus lives on the container).
+  createEffect(
+    () => activeItem()?.element(),
+    (element) =>
+      untrack(() => {
+        if (element != null || focusMode() !== "roving" || pendingFocus() != null) {
+          return;
+        }
+        const lost = rovingFocusedElement;
+        const container = options.element?.();
+        if (lost == null || !container) {
+          return;
+        }
+        const doc = container.ownerDocument;
+        if (doc.activeElement == null || doc.activeElement === doc.body) {
+          rovingFocusedElement = undefined;
+          container.focus();
+        }
+      }),
   );
 
   const setActive = (index: number) => {

@@ -18,11 +18,14 @@ function createListNavigation<V = unknown>(options: {
   orientation?: Accessor<"vertical" | "horizontal">; // default "vertical"
   wrap?: Accessor<boolean>;                          // default false
   textDirection?: Accessor<"ltr" | "rtl">;           // default "ltr"
+  page?: Accessor<number>;                           // items per PageUp/PageDown, default 10
 }): {
   next(): void;
   prev(): void;
   first(): void;
   last(): void;
+  pageNext(): void;   // move a page toward the end, landing on a focusable item
+  pagePrev(): void;   // move a page toward the start
   peekNext(): number; // target index without moving; -1 if nowhere to go
   peekPrev(): number;
   onKeyDown: JSX.EventHandler<HTMLElement, KeyboardEvent>;
@@ -39,9 +42,14 @@ function createListNavigation<V = unknown>(options: {
 | ArrowLeft | — | prev | next |
 | Home | first | first | first |
 | End | last | last | last |
+| PageDown | pageNext | pageNext | pageNext |
+| PageUp | pagePrev | pagePrev | pagePrev |
 
 `onKeyDown` calls `preventDefault()` **only** on keys it acts on, so an off-axis arrow (ArrowDown in
-a horizontal list) still scrolls the page. It's built with
+a horizontal list) still scrolls the page. Page keys act in **both** orientations (they page through
+list order, not an axis) and always `preventDefault` — which is also what stops the native scroll that
+would otherwise push a roving-focused row out of a virtualized window and drop DOM focus (see
+[`createListFocus`](../create-list-focus/create-list-focus.md)'s focus-recovery note). It's built with
 [`createKeyboardHandler`](../../utils/keymap.md); compose it with the consumer's handler (and
 with typeahead/selection handlers) via `composeEventHandlers`.
 
@@ -53,6 +61,10 @@ with typeahead/selection handlers) via `composeEventHandlers`.
   cycles. A list with a single focusable item never moves.
 - **From no active item** — `next`/ArrowDown goes to the first focusable item, `prev`/ArrowUp to the
   last. This is the typical "widget just received focus, press down" entry.
+- **Page navigation** — `pageNext`/`pagePrev` jump by `page` items (default 10; pass a reactive
+  accessor to derive a true "page" from the viewport). The jump clamps to the ends (so PageDown near
+  the bottom lands on the last item, like End) and, if the clamped target is disabled, scans **back
+  toward the current item** for the nearest focusable so a disabled tail can't overshoot. Never wraps.
 - **`peekNext`/`peekPrev`** report where a move would land without performing it (`-1` = nowhere) —
   useful for a component that must decide whether an arrow should navigate or defer to a parent
   (e.g. a submenu, or a grid handing off to `createGridNavigation`).
