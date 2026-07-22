@@ -93,7 +93,13 @@ export function TableOfContents(props: { entries: TocEntry[]; class?: string }) 
   return (
     <Show when={items.length > 0}>
       <aside class={props.class}>
-        <nav aria-label="Table of contents" class="sticky top-6 text-sm">
+        {/* Sticky below the 3.5rem header (matching the left SectionNav's `top-14`),
+            capped to the viewport-minus-header height and self-scrolling so a long ToC
+            never clips its final entries under the fold. */}
+        <nav
+          aria-label="Table of contents"
+          class="sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto py-8 text-sm"
+        >
           <p class="mb-3 font-semibold text-foreground">On this page</p>
           <ul class="border-l border-subtle">
             <For each={items}>
