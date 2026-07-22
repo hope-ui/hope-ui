@@ -69,7 +69,7 @@ export const listboxRecipe = tv({
     itemIndicator: "absolute right-2 flex items-center justify-center [&_svg]:size-4",
     // A `role="group"` section wrapper — a little vertical rhythm around each labelled section; no
     // horizontal inset, so grouped rows stay aligned with ungrouped ones.
-    group: "py-1",
+    group: "not-last:pb-1",
     // The group's label — small, muted, non-interactive.
     groupLabel: "px-1.5 py-1 text-xs text-foreground-muted",
     // A hairline divider between sections — full width of its container; it never takes the pointer.
