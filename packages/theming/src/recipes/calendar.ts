@@ -23,6 +23,7 @@
  * pointer and keyboard share one visual state. Every color is a finished `--hope-*` token (recipe
  * purity). See `theming.md`.
  */
+import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
@@ -38,12 +39,26 @@ export interface CalendarRecipeVariants {
 }
 
 /**
- * The curated Calendar props a preset may default app-wide via `ComponentOverride.defaultProps`.
- * Calendar carries no non-variant chrome content, so this is exactly the recipe variants — a strict
- * superset of {@link CalendarRecipeVariants} by construction (`extends`), so it registers in
- * `ThemeablePropsRegistry` and `ThemeablePropsOf<"calendar">` widens nothing away.
+ * The curated Calendar props a preset may default app-wide via `ComponentOverride.defaultProps`: the
+ * recipe variants **plus** the two navigation glyphs. A strict superset of {@link CalendarRecipeVariants}
+ * by construction (`extends`), so it registers in `ThemeablePropsRegistry` and
+ * `ThemeablePropsOf<"calendar">` widens the variants-only surface without dropping anything.
+ *
+ * Each glyph is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset value is one
+ * object shared by every instance, and a Solid `JSX.Element` is an already-built node that would
+ * *move* if reused, so a factory (called per instance) is what lets a preset swap the app-wide nav
+ * icons without two calendars fighting over one node. Mirrors CloseButton's `icon`. Calendar is a
+ * multi-part component, so its themeable surface stays on the **root** (no per-part themeable props):
+ * `Calendar.Root` resolves these through `runIfFunction` and flows them to the `PrevButton` /
+ * `NextButton` parts via context, where they are the default child. The **per-instance** override is
+ * that part's own `children`.
  */
-export interface CalendarThemeableProps extends CalendarRecipeVariants {}
+export interface CalendarThemeableProps extends CalendarRecipeVariants {
+  /** App-wide default previous-period glyph, as a factory. Falls back to hope's built-in chevron. */
+  prevIcon?: () => JSX.Element;
+  /** App-wide default next-period glyph, as a factory. Falls back to hope's built-in chevron. */
+  nextIcon?: () => JSX.Element;
+}
 
 /**
  * The Calendar recipe's slots. `root` is the `role="group"` container; `header` the navigation row;

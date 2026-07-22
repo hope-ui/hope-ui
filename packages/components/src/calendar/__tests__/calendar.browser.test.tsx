@@ -2,8 +2,9 @@ import ssrFixture from "virtual:hydration-fixture?id=calendar";
 import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
-import { ThemeProvider } from "@hope-ui/theming";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
+import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -22,12 +23,55 @@ const heading = (root: ParentNode) => root.querySelector<HTMLElement>("button[id
 const chromeButton = (root: ParentNode, label: string) =>
   root.querySelector<HTMLElement>(`button[aria-label="${label}"]`) as HTMLElement;
 
+// A recognizable custom nav glyph for the override tests, tagged so it's distinguishable from hope's
+// built-in chevron and from its sibling (`mark` = "prev"/"next").
+function CustomIcon(props: { mark: string }): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" data-custom-icon={props.mark}>
+      <path d="M4 4h16v16H4z" />
+    </svg>
+  );
+}
+
 describe("Calendar", () => {
   it("renders the month grid with the heading label and weekday headers", async () => {
     const { container, dispose } = mount(() => <Tree />);
     expect(heading(container).textContent).toBe("January 2020");
     expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
     expect(dayButton(container, "Wednesday, January 15, 2020")).not.toBeNull();
+    dispose();
+  });
+
+  it("auto-renders the default chrome and grid when given no children", async () => {
+    // The Phase-4 convenience API: a bare `<Calendar.Root/>` with no compound parts. Root's internal
+    // `DefaultCalendar` supplies the whole anatomy (header + chevron nav + heading, then the grid).
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    // Heading label, weekday head and day buttons all render with no explicit children.
+    expect(heading(container).textContent).toBe("January 2020");
+    expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
+    expect(dayButton(container, "Wednesday, January 15, 2020")).not.toBeNull();
+
+    // The built-in nav buttons carry the localized default aria-labels + an inline chevron glyph.
+    const prev = chromeButton(container, "Previous");
+    const next = chromeButton(container, "Next");
+    expect(prev.querySelector("svg")).not.toBeNull();
+    expect(next.querySelector("svg")).not.toBeNull();
+
+    // Nav works: paging forward advances the month, back returns.
+    next.click();
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("February 2020"));
+    prev.click();
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    // The auto-composed default chrome is accessible out of the box.
+    await expectNoA11yViolations(container);
     dispose();
   });
 
@@ -177,6 +221,96 @@ describe("Calendar", () => {
     const { container, dispose } = mount(() => <Tree />);
     expect(heading(container).textContent).toBe("January 2020");
     await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("Calendar navigation glyphs", () => {
+  // The prev/next glyph is built into the part itself: a bare `Calendar.PrevButton`/`NextButton` (even
+  // in a compound calendar, not just the auto-chrome) renders hope's chevron with no children, and it
+  // is overridable per instance via `children` or app-wide via the preset's `defaultProps`.
+  const bare = (): JSX.Element => (
+    <ThemeProvider preset={hope}>
+      <I18nProvider locale="en-US">
+        <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC">
+          <Calendar.Header>
+            <Calendar.PrevButton />
+            <Calendar.NextButton />
+          </Calendar.Header>
+        </Calendar.Root>
+      </I18nProvider>
+    </ThemeProvider>
+  );
+
+  it("ships a built-in chevron in a bare compound PrevButton/NextButton", () => {
+    const { container, dispose } = mount(() => bare());
+    // No children passed, yet each nav button carries an inline glyph — the built-in default flows
+    // from Root through context into the part.
+    expect(chromeButton(container, "Previous").querySelector("svg")).not.toBeNull();
+    expect(chromeButton(container, "Next").querySelector("svg")).not.toBeNull();
+    dispose();
+  });
+
+  it("lets a per-instance child override the built-in glyph", () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC">
+            <Calendar.Header>
+              <Calendar.PrevButton aria-label="Previous">PREV</Calendar.PrevButton>
+              <Calendar.NextButton aria-label="Next">
+                <CustomIcon mark="next" />
+              </Calendar.NextButton>
+            </Calendar.Header>
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    const prev = chromeButton(container, "Previous");
+    // Text child wins — no built-in chevron.
+    expect(prev.textContent).toBe("PREV");
+    expect(prev.querySelector("svg")).toBeNull();
+    // Custom element child wins over the built-in chevron.
+    const next = chromeButton(container, "Next");
+    expect(next.querySelector('svg[data-custom-icon="next"]')).not.toBeNull();
+    dispose();
+  });
+
+  it("takes app-wide nav glyphs from a preset's defaultProps.calendar", () => {
+    // `hope` sets no calendar defaultProps, so extend it: a preset supplies the app-wide glyphs as
+    // reuse-safe factories, resolved by Root's `useDefaults` and flowed to the bare parts.
+    const withNavIcons = definePreset(hope, {
+      components: {
+        calendar: {
+          defaultProps: {
+            prevIcon: () => <CustomIcon mark="prev" />,
+            nextIcon: () => <CustomIcon mark="next" />,
+          },
+        },
+      },
+    });
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={withNavIcons}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC">
+            <Calendar.Header>
+              <Calendar.PrevButton />
+              <Calendar.NextButton />
+            </Calendar.Header>
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    // The preset's factory glyphs, not hope's built-in chevrons.
+    expect(
+      chromeButton(container, "Previous").querySelector('svg[data-custom-icon="prev"]'),
+    ).not.toBeNull();
+    expect(
+      chromeButton(container, "Next").querySelector('svg[data-custom-icon="next"]'),
+    ).not.toBeNull();
     dispose();
   });
 });

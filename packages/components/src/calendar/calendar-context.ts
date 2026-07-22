@@ -1,6 +1,7 @@
 import type { CreateCalendarReturn } from "@hope-ui/primitives/calendar";
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { CalendarSlot } from "@hope-ui/theming";
+import type { JSX } from "@solidjs/web";
 
 /**
  * The value every Calendar part reads. **Composition, not inheritance**: it *holds* the primitive
@@ -16,6 +17,14 @@ export interface CalendarContextValue {
   state: CreateCalendarReturn;
   /** One ready-to-call class fn per Calendar slot, resolved once on `Root` and shared here. */
   slots: Record<CalendarSlot, () => string>;
+  /**
+   * The resolved default navigation glyphs (instance `prevIcon`/`nextIcon` ?? preset `defaultProps` ??
+   * hope's built-in chevrons), resolved once on `Root` (the multi-part component keeps its themeable
+   * surface on the root) and flowed here. `Calendar.PrevButton`/`NextButton` render these when given no
+   * `children`. Accessors, so each read builds a **fresh** element — never a reused, movable node.
+   */
+  prevIcon: () => JSX.Element;
+  nextIcon: () => JSX.Element;
 }
 
 export const [CalendarContext, useCalendarContext] =

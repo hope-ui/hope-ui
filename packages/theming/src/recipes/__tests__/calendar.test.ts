@@ -16,13 +16,30 @@ const _variants: CalendarRecipeVariants = {
 };
 void _variants;
 
-// `CalendarThemeableProps` is the curated surface a preset may default app-wide. Calendar carries no
-// non-variant chrome content, so it is exactly the recipe variants — a strict superset by
-// construction, so a bare variants object is still assignable to it (and vice versa).
+// `CalendarThemeableProps` is a **superset** of the recipe variants (like CloseButton/Button): every
+// variants object is a valid themeable-props object, and it carries the two navigation glyphs
+// (`prevIcon`/`nextIcon`) on top in **factory** form — a bare element is *not* assignable, which is
+// what forces a reuse-safe preset default. Calendar is a multi-part component, so its themeable
+// surface stays on the root (no per-part themeable props); the parts read the resolved glyph off context.
 const _variantsAreThemeable = (v: CalendarRecipeVariants): CalendarThemeableProps => v;
 void _variantsAreThemeable;
-const _themeableAreVariants = (v: CalendarThemeableProps): CalendarRecipeVariants => v;
-void _themeableAreVariants;
+const _themeable: CalendarThemeableProps = {
+  size: "md",
+  prevIcon: () => null,
+  nextIcon: () => null,
+};
+void _themeable;
+
+// Negative pin: each nav glyph must be a factory, not a bare element (a shared preset node would move
+// if reused). If `prevIcon`/`nextIcon` ever widen to accept a bare `JSX.Element`, this stops erroring
+// and `pnpm typecheck` fails on the stale `@ts-expect-error`.
+const _navIconsAreFactoryOnly: CalendarThemeableProps = {
+  // @ts-expect-error a preset-wide `prevIcon` default must be a `() => JSX.Element` factory, never a node.
+  prevIcon: null,
+  // @ts-expect-error a preset-wide `nextIcon` default must be a `() => JSX.Element` factory, never a node.
+  nextIcon: null,
+};
+void _navIconsAreFactoryOnly;
 
 describe("calendar recipe contract", () => {
   it("names every size and slot the recipe implements", () => {
