@@ -5,7 +5,6 @@ import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import { CloseButtonCustomIconDemo } from "~/components/demos/close-button/CloseButtonCustomIconDemo";
 import { CloseButtonInContextDemo } from "~/components/demos/close-button/CloseButtonInContextDemo";
 import { CloseButtonSurfacesDemo } from "~/components/demos/close-button/CloseButtonSurfacesDemo";
-import { InfoIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
 import { DataTable } from "~/components/DataTable";
 
@@ -97,9 +96,8 @@ ordinary handler — CloseButton is a real button underneath.
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <div>
       Compound components already include one. <code>Dialog.CloseTrigger</code>,{" "}
@@ -163,9 +161,8 @@ prop**; `render` is the single polymorphism API.
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <div>
       When you render anything other than a native <code>button</code>, set{" "}

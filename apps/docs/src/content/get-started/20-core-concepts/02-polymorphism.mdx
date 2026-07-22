@@ -2,7 +2,6 @@ import { Alert } from "@hope-ui/components/alert";
 import { Badge } from "@hope-ui/components/badge";
 import { Button } from "@hope-ui/components/button";
 import { Link } from "@tanstack/solid-router";
-import { InfoIcon } from "~/components/Icons";
 import { PropsTable } from "~/components/PropsTable";
 
 export const summary = "Render components as other elements.";
@@ -30,9 +29,8 @@ your element.
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <div>
       There's no <code>as</code> prop on purpose: its polymorphic typing
@@ -101,9 +99,8 @@ tab-order management, and synthesized keyboard activation.
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <div>
       Forget to set <code>nativeButton</code> to <code>false</code> on a

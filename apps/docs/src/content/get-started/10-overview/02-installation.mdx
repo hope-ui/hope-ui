@@ -1,6 +1,5 @@
 import { Alert } from "@hope-ui/components/alert";
 import { Button } from "@hope-ui/components/button";
-import { InfoIcon } from "~/components/Icons";
 
 export const summary = "Add hope-ui to your app.";
 
@@ -22,9 +21,8 @@ hope-ui targets **SolidJS 2.0** and **Tailwind CSS v4**. Before you start, you n
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <span>
       hope-ui is in <strong>early preview</strong> and isn't on npm yet — it
@@ -129,9 +127,8 @@ export default defineConfig({
 
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
-  icon={<InfoIcon />}
   description={
     <div>
       SolidStart hasn't migrated to SolidJS 2.0 yet, so a full SolidStart app is

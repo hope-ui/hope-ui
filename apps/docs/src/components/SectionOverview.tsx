@@ -2,7 +2,7 @@ import { Alert } from "@hope-ui/components/alert";
 import type { JSX } from "@solidjs/web";
 import { children, For, Show } from "solid-js";
 import { hasSectionVisuals, SectionVisual } from "~/components/component-visuals";
-import { ChevronRightIcon, InfoIcon } from "~/components/Icons";
+import { ChevronRightIcon } from "~/components/Icons";
 import { PathLink } from "~/components/PathLink";
 import { TableOfContents, type TocEntry } from "~/components/TableOfContents";
 import { groupedNavFor } from "~/lib/content";
@@ -68,13 +68,7 @@ export function SectionOverview(props: {
           </div>
 
           <Show when={callout()}>
-            <Alert.Root
-              variant="soft"
-              colorScheme="primary"
-              icon={<InfoIcon />}
-              description={callout()}
-              class="mt-6"
-            />
+            <Alert.Root variant="soft" colorScheme="info" description={callout()} class="mt-6" />
           </Show>
 
           <div class="mt-10 space-y-10">

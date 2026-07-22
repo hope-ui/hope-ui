@@ -1,0 +1,676 @@
+import { Alert } from "@hope-ui/components/alert";
+import { ListboxBasicDemo } from "~/components/demos/listbox/ListboxBasicDemo";
+import { ListboxMultipleDemo } from "~/components/demos/listbox/ListboxMultipleDemo";
+import { ListboxNoneDemo } from "~/components/demos/listbox/ListboxNoneDemo";
+import { ListboxGroupedDemo } from "~/components/demos/listbox/ListboxGroupedDemo";
+import { ListboxSizesDemo } from "~/components/demos/listbox/ListboxSizesDemo";
+import { ListboxDisabledDemo } from "~/components/demos/listbox/ListboxDisabledDemo";
+import { ListboxVirtualDemo } from "~/components/demos/listbox/ListboxVirtualDemo";
+import { ListboxFormDemo } from "~/components/demos/listbox/ListboxFormDemo";
+import { ListboxFocusModesDemo } from "~/components/demos/listbox/ListboxFocusModesDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Keyboard-navigable list of options you select from.";
+
+export const description =
+  "An accessible list of options you select from — single, multiple, or no selection, with roving or active-descendant focus, type-ahead, grouping, native form submission, and optional virtualization for very long lists.";
+
+# Listbox
+
+{description}
+
+## Import
+
+```tsx
+import { Listbox } from "@hope-ui/components/listbox";
+```
+
+`Listbox` is a **compound** component — a namespace object whose parts you compose yourself. See the
+[Anatomy](#anatomy) below for every part and how they nest.
+
+## Usage
+
+`Listbox.Root` owns the state (selection, focus, keyboard navigation, type-ahead, ARIA) and renders
+the `role="listbox"` element. Each `Listbox.Item` is an option that self-registers, and
+`Listbox.ItemIndicator` paints a check on the selected row. Map each item to a stable string with
+`itemToValue` (the selection identity) and to its display / type-ahead text with `itemToLabel`.
+
+<Preview>
+  <ListboxBasicDemo />
+</Preview>
+
+```tsx
+const [value, setValue] = createSignal<Fruit[]>([]);
+
+<Listbox.Root
+  aria-label="Choose a fruit"
+  // The recipe's root is chrome-free — add your own elevated surface.
+  class="rounded-lg border border-subtle bg-surface-overlay shadow-md p-1"
+  itemToValue={(fruit) => String(fruit.id)}
+  itemToLabel={(fruit) => fruit.name}
+  value={value()}
+  onChange={setValue}
+>
+  <For each={fruits}>
+    {(fruit) => (
+      <Listbox.Item value={fruit}>
+        {fruit.name}
+        <Listbox.ItemIndicator />
+      </Listbox.Item>
+    )}
+  </For>
+</Listbox.Root>;
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Listbox is <strong>standalone-first</strong>: the recipe's <code>root</code> slot carries{" "}
+      <strong>no popup chrome</strong> (no background, border, shadow, or padding), so a bare list
+      sits in the page flow. Add the elevated-surface look yourself with a <code>class</code> — the
+      demos on this page do, exactly as a <code>Select</code> / popover consumer would. And because
+      Listbox reads a recipe, it needs a <code>&lt;ThemeProvider&gt;</code> ancestor fed a preset,
+      as every styled hope-ui component does.
+    </div>
+  }
+/>
+
+## Anatomy
+
+`Listbox.Root` renders the list element; `Listbox.Item` is one option (with an optional
+`Listbox.ItemIndicator` check inside). `Listbox.Group` + `Listbox.GroupLabel` name a section, and
+`Listbox.Separator` divides sections — all collection mode only.
+
+<Anatomy
+  root={{
+    name: "Listbox.Root",
+    children: [
+      {
+        name: "Listbox.Item",
+        children: [{ name: "Listbox.ItemIndicator" }],
+      },
+      {
+        name: "Listbox.Group",
+        children: [
+          { name: "Listbox.GroupLabel" },
+          {
+            name: "Listbox.Item",
+            children: [{ name: "Listbox.ItemIndicator" }],
+          },
+        ],
+      },
+      { name: "Listbox.Separator" },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Listbox.Root",
+      element: "div[role=listbox]",
+      description:
+        "State owner and the list element (the scroll container in virtual mode). Owns selection, focus, keyboard, type-ahead, ids, and the resolved recipe.",
+    },
+    {
+      part: "Listbox.Item",
+      element: "div[role=option]",
+      description:
+        "One option. Self-registers and owns aria-selected, the active/disabled data attributes, and the click/pointer handlers. Give it value (collection) or index (virtual).",
+    },
+    {
+      part: "Listbox.ItemIndicator",
+      element: "span",
+      description:
+        "The selection check, shown only while its row is selected. Defaults to a built-in check; pass children for a custom glyph.",
+    },
+    {
+      part: "Listbox.Group",
+      element: "div[role=group]",
+      description: "A labelled section, named by its GroupLabel via aria-labelledby. Collection mode only.",
+    },
+    {
+      part: "Listbox.GroupLabel",
+      element: "div",
+      description: "Names its Group. Self-registers its id as the group's aria-labelledby. Collection mode only.",
+    },
+    {
+      part: "Listbox.Separator",
+      element: "div[role=presentation]",
+      description: "A decorative hairline between sections (aria-hidden — never reported as an option). Collection mode only.",
+    },
+  ]}
+/>
+
+## Selection modes
+
+`selectionMode` controls how many options can be chosen at once:
+
+- **`single`** (default) — one option; choosing another replaces it. (shown in [Usage](#usage) above)
+- **`multiple`** — a set; Space or a click toggles each. `Shift`+Arrow extends the selection and
+  `⌘`/`Ctrl`+`A` selects all.
+- **`none`** — nothing is ever selected; arrows and type-ahead still move the highlight — a browsing
+  or command list.
+
+Selection is an **array in every mode** (`onChange` receives `V[]`), and the value items are your own
+objects — Listbox never forces you to key by string.
+
+<Preview>
+  <ListboxMultipleDemo />
+</Preview>
+
+```tsx title="multiple"
+<Listbox.Root selectionMode="multiple" value={value()} onChange={setValue}>
+  {/* … */}
+</Listbox.Root>
+```
+
+<Preview>
+  <ListboxNoneDemo />
+</Preview>
+
+```tsx title="none"
+<Listbox.Root selectionMode="none">{/* … */}</Listbox.Root>
+```
+
+## Groups and separators
+
+Wrap sections in a `Listbox.Group` with a `Listbox.GroupLabel`, and divide them with a
+`Listbox.Separator`. The group is a `role="group"` named by its label (`aria-labelledby`); the
+separator is decorative (`role="presentation"`). Keyboard navigation flows across groups as one list
+— arrows skip the labels and the separator. Grouping is **collection mode only** — a virtual listbox
+is flat.
+
+<Preview>
+  <ListboxGroupedDemo />
+</Preview>
+
+```tsx
+<Listbox.Root aria-label="Choose a fruit" itemToValue={itemToValue} itemToLabel={itemToLabel}>
+  <Listbox.Group>
+    <Listbox.GroupLabel>Citrus</Listbox.GroupLabel>
+    <For each={citrus}>
+      {(fruit) => <FruitItem fruit={fruit} />}
+    </For>
+  </Listbox.Group>
+  <Listbox.Separator />
+  <Listbox.Group>
+    <Listbox.GroupLabel>Berries</Listbox.GroupLabel>
+    <For each={berries}>
+      {(fruit) => <FruitItem fruit={fruit} />}
+    </For>
+  </Listbox.Group>
+</Listbox.Root>
+```
+
+## Sizes
+
+The `size` prop scales density — the row text, padding, gap, and the panel's min width — across `sm`,
+`md` (the default), and `lg`. It carries no color axis; Listbox is a neutral collection surface.
+
+<Preview>
+  <div class="flex flex-row gap-6">
+    <ListboxSizesDemo />
+  </div>
+</Preview>
+
+```tsx
+<Listbox.Root size="sm">…</Listbox.Root>
+<Listbox.Root size="md">…</Listbox.Root>
+<Listbox.Root size="lg">…</Listbox.Root>
+```
+
+## Disabled items
+
+Mark a row `disabled` and it is dimmed and skipped by keyboard navigation and type-ahead. `skipDisabled`
+(default `true`) governs the skipping; set it `false` to let the highlight land on disabled rows —
+they still can't be selected. Disable the **whole** list with `disabled` on `Listbox.Root`.
+
+<Preview>
+  <ListboxDisabledDemo />
+</Preview>
+
+```tsx
+<Listbox.Item value={fruit} disabled>
+  {fruit.name}
+  <Listbox.ItemIndicator />
+</Listbox.Item>
+```
+
+## Virtualization
+
+For very long lists, pass `items` (the full array) and `estimateSize`, and give `Listbox.Root` a
+**render-prop** child `(item, index) => <Listbox.Item index={index}>…`. The list element becomes the
+scroll container; only a window of rows mounts, so 10,000 rows scroll and navigate smoothly — try
+`End`, or type to jump to a row. Selection, focus, and type-ahead all run over the **full** set, so
+offscreen selections survive scrolling and submit with a form.
+
+<Preview>
+  <ListboxVirtualDemo />
+</Preview>
+
+```tsx
+const items = Array.from({ length: 10_000 }, (_, i) => ({ id: i, name: `Item ${i}` }));
+
+<Listbox.Root
+  aria-label="Ten thousand rows"
+  class="rounded-lg border border-subtle bg-surface-overlay shadow-md p-1 h-72 w-56"
+  items={items}
+  estimateSize={() => 32}
+  itemToValue={(item) => String(item.id)}
+  itemToLabel={(item) => item.name}
+>
+  {(item, index) => (
+    <Listbox.Item index={index} style={{ height: "2rem" }}>
+      {item.name}
+      <Listbox.ItemIndicator />
+    </Listbox.Item>
+  )}
+</Listbox.Root>;
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      The virtual path is windowed with <code>@tanstack/virtual-core</code>, an{" "}
+      <strong>optional peer</strong> of <code>@hope-ui/primitives</code> — install it in your app to
+      use virtualization (a non-virtualizing install stays dependency-free). Virtual lists are{" "}
+      <strong>flat</strong>: no <code>Group</code> / <code>Separator</code>.
+    </div>
+  }
+/>
+
+## Native form submission
+
+Set `name` and the listbox renders hidden inputs (siblings of the list element) valued
+`itemToValue(item)` for each selected row — so a plain `<form>` submit carries the selection with no
+extra wiring. The submitted strings are the `itemToValue` values (here, the fruit ids), and in
+virtual multi-select even offscreen selections are included. Add `form` to associate the inputs with
+a form by id, and `required` for native validation.
+
+<Preview>
+  <ListboxFormDemo />
+</Preview>
+
+```tsx
+<form onSubmit={handleSubmit}>
+  <Listbox.Root 
+    name="fruit" 
+    selectionMode="multiple" 
+    itemToValue={(f) => String(f.id)}
+  >
+    <For each={fruits}>
+      {(fruit) => <FruitItem fruit={fruit} />}
+    </For>
+  </Listbox.Root>
+  <Button type="submit">Submit</Button>
+</form>
+```
+
+## Focus modes
+
+`focusMode` decides where DOM focus lives. **`roving`** (the default) moves real focus onto the
+active option and makes it the single tab stop — right for a standalone list. **`activedescendant`**
+keeps focus on the listbox container and points `aria-activedescendant` at the active option — the
+model a future `Select` / `Combobox` needs, where focus stays on the trigger or input while the
+arrows drive the list. Tab into each below and arrow through it.
+
+<Preview>
+  <ListboxFocusModesDemo />
+</Preview>
+
+```tsx
+<Listbox.Root focusMode="roving">…</Listbox.Root>
+<Listbox.Root focusMode="activedescendant">…</Listbox.Root>
+```
+
+## Keyboard interactions
+
+Listbox implements the WAI-ARIA listbox keyboard pattern. Navigation follows `orientation` (the
+vertical arrows are shown; a horizontal listbox uses `←` / `→`).
+
+<DataTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "description", label: "Action" },
+  ]}
+  rows={[
+    { key: "↓ / ↑", description: "Move the highlight to the next / previous option (disabled rows are skipped)." },
+    { key: "Home / End", description: "Move to the first / last option." },
+    { key: "PageDown / PageUp", description: "Move by a page toward the end / start — useful in long or virtual lists." },
+    { key: "Enter", description: "Select the highlighted option." },
+    { key: "Space", description: "Select the highlighted option (single) or toggle it (multiple)." },
+    { key: "Shift + ↓ / ↑", description: "Extend the selection to the next / previous option (multiple)." },
+    { key: "⌘ / Ctrl + A", description: "Select every option (multiple)." },
+    { key: "type to search", description: "Jump to the next option whose label starts with the typed characters (type-ahead)." },
+  ]}
+/>
+
+## Polymorphism
+
+Render a part as a different element or component with the `render` prop — a function that receives
+the part's computed props and spreads them onto your element. `Listbox.Item`, `Listbox.Group`,
+`Listbox.GroupLabel`, and `Listbox.Separator` all accept it. There is **no `as` prop**; `render` is
+the single polymorphism API.
+
+```tsx title="Item as a link row"
+<Listbox.Item value={item} render={(props) => <a href={item.href} {...props} />}>
+  {item.name}
+  <Listbox.ItemIndicator />
+</Listbox.Item>
+```
+
+## Theming
+
+Listbox's look comes from the active preset's recipe. It is a **neutral collection surface** — no
+color axis; the only accents are the transient highlight and the persistent selection, both driven by
+tokens. Override styling at three levels, applied in order (later wins a Tailwind conflict): **recipe
+base → preset `slotClasses` → instance `slotClasses` / part `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`. The `root` slot deliberately carries **no popup chrome** — layer the elevated surface
+yourself (see the note in [Usage](#usage)).
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    { slot: "root", attr: "listbox", description: "The list element (and scroll container in virtual mode)." },
+    { slot: "item", attr: "listbox-item", description: "An option row — carries the highlight and selected/disabled state." },
+    { slot: "itemIndicator", attr: "listbox-item-indicator", description: "The selection check's placement in the trailing gutter." },
+    { slot: "group", attr: "listbox-group", description: "A labelled section wrapper." },
+    { slot: "groupLabel", attr: "listbox-group-label", description: "The small, muted section label." },
+    { slot: "separator", attr: "listbox-separator", description: "The hairline divider between sections." },
+  ]}
+/>
+
+### Overriding one listbox
+
+Set `slotClasses` on `Listbox.Root` to reach any slot from one place, or put `class` on an individual
+part. `class` on `Listbox.Root` merges onto the `root` slot — this is where the elevated-panel look
+goes. Use literal class strings so your Tailwind build can see them.
+
+```tsx
+<Listbox.Root
+  class="rounded-lg border border-subtle bg-surface-overlay shadow-md p-1"
+  slotClasses={{ item: "rounded-md", separator: "bg-strong/40" }}
+>
+  {/* … */}
+</Listbox.Root>
+```
+
+### App-wide defaults & overrides
+
+Set the default `size` and global part classes for **every** Listbox through the theme with
+`definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` resolve at **instance
+?? preset ?? builtin** precedence, so an explicit prop on a single listbox always wins.
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    listbox: {
+      defaultProps: { size: "sm" },
+      slotClasses: { root: "rounded-lg border border-subtle shadow-md p-1" },
+    },
+  },
+});
+```
+
+## API
+
+### Listbox.Root
+
+`Listbox.Root<V>` is generic in your item type `V`. It accepts the props below plus every native
+`<div>` attribute (`aria-label`, `style`, `data-*`, …) so the list can be named and styled.
+
+<PropsTable
+  rows={[
+    {
+      prop: "itemToValue",
+      type: "(item: V) => string",
+      default: "String",
+      description:
+        "Maps an item to its selection identity — compared for equality, submitted to a form, and used as the item id in virtual mode. Must be unique per item.",
+    },
+    {
+      prop: "itemToLabel",
+      type: "(item: V) => string",
+      default: "",
+      description:
+        "Maps an item to its type-ahead / display text. In collection mode it falls back to the row's textContent; virtual mode needs it for offscreen type-ahead.",
+    },
+    {
+      prop: "value",
+      type: "V[]",
+      default: "",
+      description: "Controlled selection (an array in every mode). Omit for uncontrolled use via defaultValue.",
+    },
+    {
+      prop: "defaultValue",
+      type: "V[]",
+      default: "[]",
+      description: "Initial selection when uncontrolled.",
+    },
+    {
+      prop: "onChange",
+      type: "(value: V[]) => void",
+      default: "",
+      description: "Called on every selection change with the new value array.",
+    },
+    {
+      prop: "selectionMode",
+      type: '"single" | "multiple" | "none"',
+      default: '"single"',
+      description: "How many options can be selected at once.",
+    },
+    {
+      prop: "focusMode",
+      type: '"roving" | "activedescendant"',
+      default: '"roving"',
+      description:
+        "Whether the active option holds real DOM focus (roving) or the container holds focus and points aria-activedescendant at it.",
+    },
+    {
+      prop: "size",
+      type: '"sm" | "md" | "lg"',
+      default: '"md"',
+      description: "The density scale — row text, padding, gap, and the panel's min width.",
+    },
+    {
+      prop: "orientation",
+      type: '"vertical" | "horizontal"',
+      default: '"vertical"',
+      description: "The arrow-key axis and aria-orientation.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Disable the whole list — nothing tabbable, aria-disabled set.",
+    },
+    {
+      prop: "skipDisabled",
+      type: "boolean",
+      default: "true",
+      description: "Whether keyboard navigation and type-ahead skip disabled items.",
+    },
+    {
+      prop: "wrap",
+      type: "boolean",
+      default: "false",
+      description: "Whether arrow navigation wraps past the ends.",
+    },
+    {
+      prop: "isItemEqualToValue",
+      type: "(a: V, b: V) => boolean",
+      default: "by itemToValue",
+      description: "Full override of value equality. Defaults to comparing itemToValue(a) === itemToValue(b).",
+    },
+    {
+      prop: "getItemDisabled",
+      type: "(item: V) => boolean",
+      default: "",
+      description: "Virtual mode: whether the item at an index is disabled (collection mode uses the item's disabled prop).",
+    },
+    {
+      prop: "items",
+      type: "readonly V[]",
+      default: "",
+      description: "Virtual mode: the full data array. Supply with estimateSize to enable windowing.",
+    },
+    {
+      prop: "estimateSize",
+      type: "(index: number) => number",
+      default: "",
+      description: "Virtual mode: estimated row size in px by index. Its presence (with items) selects virtual mode.",
+    },
+    {
+      prop: "overscan",
+      type: "number",
+      default: "5",
+      description: "Virtual mode: extra rows rendered beyond the visible window.",
+    },
+    {
+      prop: "name",
+      type: "string",
+      default: "",
+      description: "Native form field name. When set, hidden inputs are rendered from the selection.",
+    },
+    {
+      prop: "form",
+      type: "string",
+      default: "",
+      description: "Associates the hidden field(s) with a form by id.",
+    },
+    {
+      prop: "required",
+      type: "boolean",
+      default: "false",
+      description: "Marks the field required for native validation.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"listbox">',
+      default: "",
+      description: "Per-slot class overrides, keyed by root, item, itemIndicator, group, groupLabel, separator.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Merged onto the root slot (applied last) — where the elevated-panel look goes.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element | ((item: V, index: Accessor<number>) => JSX.Element)",
+      default: "",
+      description: "The Item/Group children (collection), or a render-prop invoked per windowed row (virtual).",
+    },
+  ]}
+/>
+
+### Listbox.Item
+
+Provide **exactly one** of `value` (collection mode) or `index` (virtual mode). Plus every native
+`<div>` attribute.
+
+<PropsTable
+  rows={[
+    {
+      prop: "value",
+      type: "V",
+      default: "",
+      description: "Collection mode: this option's selection identity. Required in collection mode; ignored in virtual mode.",
+    },
+    {
+      prop: "index",
+      type: "Accessor<number>",
+      default: "",
+      description: "Virtual mode: this row's index into the full items array (as an accessor). Its presence selects the virtual path.",
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Whether this option is disabled (skipped by focus/navigation and dimmed).",
+    },
+    {
+      prop: "textValue",
+      type: "string",
+      default: "",
+      description: "Explicit type-ahead text, overriding itemToLabel / the row's textContent.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render the option as another element or component. Receives the Item's computed props.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the item slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+### Listbox.ItemIndicator
+
+<PropsTable
+  rows={[
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "built-in check",
+      description: "A custom selection glyph. Shown only while the row is selected.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Listbox.Group`, `Listbox.GroupLabel`, and `Listbox.Separator` each accept their native `<div>`
+attributes plus a `render` prop and a `class`. All three are collection mode only.
+
+## Accessibility
+
+Listbox implements the WAI-ARIA
+[Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) pattern.
+
+- **Roles and state are wired for you.** The list is `role="listbox"`, each option `role="option"`
+  with `aria-selected`, groups `role="group"`, and the separator `role="presentation"`. Multi-select
+  sets `aria-multiselectable` on the list.
+- **Give the list an accessible name.** There's no built-in label, so pass `aria-label` (or
+  `aria-labelledby` pointing at your own heading) on `Listbox.Root`.
+- **Two focus models.** `roving` moves DOM focus to the active option (the standalone default);
+  `activedescendant` keeps focus on the container and points `aria-activedescendant` at the active
+  option — what a trigger-owned `Select` needs.
+- **One highlight, keyboard and pointer.** Arrows and the pointer share a single active option, so the
+  cursor and the keyboard never paint two highlights; selection (the check) is separate from the
+  transient highlight.
+- **Disabled options stay discoverable.** A disabled row keeps `aria-disabled` and, by default, is
+  skipped by navigation; it can never be selected.
+- **Type-ahead.** Typing focuses the next option whose label matches — from `itemToLabel`, an
+  explicit `textValue`, or the row's text.
