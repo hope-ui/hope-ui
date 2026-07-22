@@ -40,62 +40,72 @@ describe("hope calendar recipe", () => {
     expect(root).not.toContain("rounded");
   });
 
-  it("paints day selection through the data-* state hooks, never hover/bare-focus", () => {
-    const cell = calendarRecipe({}).cellTrigger();
-    // Selection + range are the registered day-state variants — the cursor's position never paints
-    // them.
-    expect(cell).toContain("data-selected:bg-primary");
-    expect(cell).toContain("data-selected:text-on-primary");
+  it("splits day-state paint: continuous band on the cell, pills on the trigger", () => {
+    const parts = calendarRecipe({});
+    const cell = parts.cell();
+    const trigger = parts.cellTrigger();
+    // The continuous range / tentative band is painted on the <td> so it spans columns seamlessly.
+    expect(cell).toContain("data-range-start:bg-selected");
     expect(cell).toContain("data-range-middle:bg-selected");
-    expect(cell).toContain("data-range-middle:text-on-selected");
+    expect(cell).toContain("data-range-end:bg-selected");
     expect(cell).toContain("data-highlighted:bg-selected");
-    expect(cell).toContain("data-today:bg-active");
-    // The hover wash is written zero-specificity (`:where(:hover)`) so it ranks equal to the `data-*`
-    // fills and, placed before them, loses to any selection/range/today paint under the pointer — a
-    // bare `hover:` would outrank them all. It must not paint any selection color, and there is no
-    // bare-focus background.
-    expect(cell).toContain("[&:where(:hover)]:bg-surface-raised-hovered");
-    expect(cell).not.toContain("hover:bg-primary");
-    expect(cell).not.toContain("hover:bg-selected");
-    expect(cell).not.toContain("focus:bg-");
-    // The zero-spec hover must sit before every state fill so source order lets the fills win.
-    expect(cell.indexOf("[&:where(:hover)]")).toBeLessThan(
-      cell.indexOf("data-selected:bg-primary"),
+    // The trigger paints the solid endpoint pills + single selection; its band interior/preview are
+    // transparent so the cell band shows through, and today is a soft tint.
+    expect(trigger).toContain("data-selected:bg-primary");
+    expect(trigger).toContain("data-selected:text-on-primary");
+    expect(trigger).toContain("data-range-start:bg-primary");
+    expect(trigger).toContain("data-range-end:bg-primary");
+    expect(trigger).toContain("data-range-middle:bg-transparent");
+    expect(trigger).toContain("data-highlighted:bg-transparent");
+    expect(trigger).toContain("data-today:bg-active");
+    // The hover wash is zero-specificity (`:where(:hover)`) so a later data-* fill wins by source
+    // order; it never paints a selection color and there is no bare-focus background.
+    expect(trigger).toContain("[&:where(:hover)]:bg-surface-raised-hovered");
+    expect(trigger).not.toContain("hover:bg-primary");
+    expect(trigger).not.toContain("hover:bg-selected");
+    expect(trigger).not.toContain("focus:bg-");
+    expect(trigger.indexOf("[&:where(:hover)]")).toBeLessThan(
+      trigger.indexOf("data-selected:bg-primary"),
     );
   });
 
-  it("orders day state so the later utility wins the zero-specificity cascade", () => {
-    const cell = calendarRecipe({}).cellTrigger();
-    // `today` is a soft tint that a real selection must override → it comes before `selected`.
-    expect(cell.indexOf("data-today:")).toBeLessThan(cell.indexOf("data-selected:bg-primary"));
-    // The tentative preview comes before `selected` so the range anchor (selected AND highlighted)
-    // stays the solid pill, not the light band.
-    expect(cell.indexOf("data-highlighted:")).toBeLessThan(
-      cell.indexOf("data-selected:bg-primary"),
+  it("orders trigger state so the later utility wins the zero-specificity cascade", () => {
+    const trigger = calendarRecipe({}).cellTrigger();
+    // `today` is a soft tint a real selection must override → before `selected`.
+    expect(trigger.indexOf("data-today:")).toBeLessThan(
+      trigger.indexOf("data-selected:bg-primary"),
     );
-    // The range middle band comes after `selected` (a middle day that also reports selected reads as
-    // the band) but before the solid endpoints (which must beat the middle).
-    expect(cell.indexOf("data-selected:bg-primary")).toBeLessThan(
-      cell.indexOf("data-range-middle:"),
+    // Preview transparency comes before `selected` so the anchor (selected AND highlighted) stays a
+    // solid pill while the rest of the preview shows the cell band through its transparent trigger.
+    expect(trigger.indexOf("data-highlighted:")).toBeLessThan(
+      trigger.indexOf("data-selected:bg-primary"),
     );
-    expect(cell.indexOf("data-range-middle:")).toBeLessThan(cell.indexOf("data-range-start:"));
-    expect(cell.indexOf("data-range-middle:")).toBeLessThan(cell.indexOf("data-range-end:"));
+    // The transparent middle comes after `selected` (a middle that also reports selected shows the
+    // band) but before the solid endpoints (which must beat the middle).
+    expect(trigger.indexOf("data-selected:bg-primary")).toBeLessThan(
+      trigger.indexOf("data-range-middle:"),
+    );
+    expect(trigger.indexOf("data-range-middle:")).toBeLessThan(
+      trigger.indexOf("data-range-start:"),
+    );
+    expect(trigger.indexOf("data-range-middle:")).toBeLessThan(trigger.indexOf("data-range-end:"));
   });
 
-  it("rounds the range endpoints and squares the middle for a continuous band (logical, RTL-safe)", () => {
-    const cell = calendarRecipe({}).cellTrigger();
-    expect(cell).toContain("rounded-md"); // the isolated single-day base
-    // Logical radii so the band rounds on the leading edge under RTL: the endpoints round their outer
-    // side and square their inner side to sit flush against the middle band.
-    expect(cell).toContain("data-range-start:rounded-s-md");
+  it("rounds the band + pills logically (RTL-safe) for a continuous shape", () => {
+    const parts = calendarRecipe({});
+    const cell = parts.cell();
+    const trigger = parts.cellTrigger();
+    // The cell band rounds its leading/trailing ends and squares the interior (+ single-day both ends).
     expect(cell).toContain("data-range-start:rounded-e-none");
-    expect(cell).toContain("data-range-end:rounded-e-md");
     expect(cell).toContain("data-range-end:rounded-s-none");
     expect(cell).toContain("data-range-middle:rounded-none");
-    // The tentative preview is squared too, so it reads as one continuous band, not separate pills.
     expect(cell).toContain("data-highlighted:rounded-none");
-    // A single-day range re-rounds both sides.
     expect(cell).toContain("[&[data-range-start][data-range-end]]:rounded-md");
+    // The endpoint pills mirror the band: rounded outer side, square inner side.
+    expect(trigger).toContain("data-range-start:rounded-s-md");
+    expect(trigger).toContain("data-range-start:rounded-e-none");
+    expect(trigger).toContain("data-range-end:rounded-e-md");
+    expect(trigger).toContain("data-range-end:rounded-s-none");
   });
 
   it("mutes outside-month days and strikes unavailable ones through tokens", () => {
@@ -111,12 +121,19 @@ describe("hope calendar recipe", () => {
     expect(cell).toContain("data-disabled:opacity-disabled");
   });
 
-  it("gives the day trigger the shared roving focus ring + border (reused from Button)", () => {
-    const cell = calendarRecipe({}).cellTrigger();
-    expect(cell).toContain("focus-visible:outline-none");
-    expect(cell).toContain("focus-visible:border-focus");
-    expect(cell).toContain("focus-visible:ring-3");
-    expect(cell).toContain("focus-visible:ring-focus-halo");
+  it("drives the roving focus ring from data-focused, gated on the grid holding focus", () => {
+    const parts = calendarRecipe({});
+    const trigger = parts.cellTrigger();
+    // No :focus-visible on the day trigger — the ring keys off the primitive's data-focused (the
+    // roving cursor), shown only while the grid is focus-within, so a programmatic arrow-nav focus
+    // can't defeat it. The UA outline is dropped since real focus still lands on the button.
+    expect(trigger).not.toContain("focus-visible:");
+    expect(trigger).toContain("outline-none");
+    expect(trigger).toContain("group-focus-within/grid:data-focused:border-focus");
+    expect(trigger).toContain("group-focus-within/grid:data-focused:ring-3");
+    expect(trigger).toContain("group-focus-within/grid:data-focused:ring-focus-halo");
+    // The grid provides the focus-within group the ring is gated on.
+    expect(parts.grid()).toContain("group/grid");
   });
 
   it("mutes the weekday head at the fixed nova text size", () => {

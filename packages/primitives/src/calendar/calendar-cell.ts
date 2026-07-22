@@ -63,12 +63,14 @@ export interface CreateCalendarCellReturn {
  * - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells.
  * - `onMouseEnter` feeds the range hover preview.
  *
- * The `<td>` carries only the grid semantics — `role="gridcell"` + `aria-selected`. **The `data-*`
- * paint hooks live on the inner `<button>`** (alongside its view-aware `aria-label`, `aria-disabled`,
- * and roving `tabindex`), because the button is the element a styled recipe paints (`cellTrigger`),
- * and the registered day-state custom variants are self-based (`&:where([data-today])`) — a
- * `data-today` on the `<td>` would never light up a `data-today:` utility on its child button. The tab
- * stop is the focused cell (`tabindex` from `isFocused`), which is correct on the server too (it
+ * The registered day-state custom variants are self-based (`&:where([data-range-middle])`), so an
+ * attribute only lights a utility on the element that carries it. That splits the paint across the two
+ * elements: the `<td>` carries the ARIA grid semantics (`role="gridcell"` + `aria-selected`) **and**
+ * the band-level range/tentative-highlight hooks, so the `cell` slot paints the continuous range band
+ * that spans cells; the inner `<button>` carries the full per-day set (plus `aria-label`,
+ * `aria-disabled`, roving `tabindex`, `data-focused`), so the `cellTrigger` slot paints the solid
+ * endpoint pills and marks on top of that band. The shared range flags are therefore emitted on both.
+ * The tab stop is the focused cell (`tabindex` from `isFocused`), correct on the server too (it
  * compares dates, and doesn't depend on the client-only collection).
  */
 export function createCalendarCell(
@@ -167,12 +169,26 @@ export function createCalendarCell(
     });
   };
 
-  // The `<td role="gridcell">` — grid semantics only. `aria-selected` is the ARIA selection state and
-  // belongs on the gridcell; the visual `data-*` paint hooks live on the button below.
-  const props: JSX.HTMLAttributes<HTMLTableCellElement> = {
-    role: "gridcell",
+  // The `<td role="gridcell">` — ARIA grid semantics + the band-level range/highlight hooks the `cell`
+  // slot paints (the continuous band that spans cells). `aria-selected` is the ARIA selection state;
+  // the solid endpoint pills + per-day marks are painted on the button below, above the band. Not
+  // annotated `JSX.*` inline: the `data-*` keys would trip the excess-property check on a fresh literal.
+  const props = {
+    role: "gridcell" as const,
     get "aria-selected"() {
       return isSelected() ? "true" : undefined;
+    },
+    get "data-range-start"() {
+      return isRangeStart() ? "" : undefined;
+    },
+    get "data-range-middle"() {
+      return isRangeMiddle() ? "" : undefined;
+    },
+    get "data-range-end"() {
+      return isRangeEnd() ? "" : undefined;
+    },
+    get "data-highlighted"() {
+      return isHighlighted() ? "" : undefined;
     },
   };
 

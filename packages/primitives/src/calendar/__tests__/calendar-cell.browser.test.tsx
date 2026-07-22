@@ -104,6 +104,25 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
+  it("mirrors the band-level range hooks onto the <td> so the band can span cells", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-10").click();
+    // The anchor write must flush before the second click reads it (Solid 2.0 flush timing — real
+    // clicks are separated by flushes; two synchronous ones in a test are not).
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
+    dayButton(container, "2026-01-14").click();
+    // The band paints on the cell (spanning columns); the middle day's <td> carries data-range-middle.
+    await vi.waitFor(() => {
+      const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
+      expect(midCell.getAttribute("data-range-middle")).toBe("");
+    });
+    // The band-level hooks reach the <td>, but the single ARIA selection flag does not.
+    const startCell = dayButton(container, "2026-01-10").closest("td") as HTMLElement;
+    expect(startCell.getAttribute("data-range-start")).toBe("");
+    expect(startCell.getAttribute("data-selected")).toBeNull();
+    dispose();
+  });
+
   it("gives the focused date the roving tab stop and the rest tabindex -1", async () => {
     const { container, dispose } = await mountCalendar();
     expect(dayButton(container, "2026-01-15").getAttribute("tabindex")).toBe("0");
