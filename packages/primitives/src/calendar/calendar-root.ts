@@ -100,6 +100,16 @@ export interface CreateCalendarOptions {
   defaultFocusedValue?: CalendarDate | null;
   /** Fired whenever the roving cursor moves. */
   onFocusedValueChange?: (date: CalendarDate) => void;
+
+  // --- native form ---
+  /** Native form field name. When set, the styled component renders hidden `<input>`(s) from
+   * `formValues()`. Opt-in — nothing is submitted without it. */
+  name?: string;
+  /** Associates the hidden field(s) with a `<form>` by id (the input's `form` attribute), for inputs
+   * rendered outside that form. */
+  form?: string;
+  /** Marks the field required for native form validation. Default `false`. */
+  required?: boolean;
 }
 
 export interface CreateCalendarReturn {
@@ -116,6 +126,24 @@ export interface CreateCalendarReturn {
   /** The message resolver (built-in en/fr + app overlay), for the calendar's own labels/announcements. */
   t: TranslateFn;
   groupLabel: Accessor<string>;
+
+  // --- native form (consumed by the styled component's hidden inputs) ---
+  /** The native form field name, if set. */
+  name: Accessor<string | undefined>;
+  /** The associated `<form>` id, if set. */
+  form: Accessor<string | undefined>;
+  /** Whether the field is required for native validation. */
+  required: Accessor<boolean>;
+  /**
+   * The hidden-`<input>` entries a native `<form>` submits, derived from `selectionValue()` as ISO
+   * `YYYY-MM-DD` strings (`CalendarDate.toString()`). Empty (`[]`) when `name` is unset, so the
+   * component can render nothing until the calendar opts into form submission:
+   *  - **single** → `[{ name, value }]` (empty when the value is `null`)
+   *  - **multiple** → one entry per selected date, all sharing `name`
+   *  - **range** → `[{ name: `${name}Start`, value }, { name: `${name}End`, value }]`, empty until
+   *    the range is complete (mid-selection, while `anchorDate()` is set, it stays empty)
+   */
+  formValues: Accessor<{ name: string; value: string }[]>;
 
   // --- state ---
   view: Accessor<CalendarView>;
@@ -195,6 +223,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     selectionMode: "single" as CalendarSelectionMode,
     disabled: false,
     readOnly: false,
+    required: false,
     timeZone: getLocalTimeZone(),
   });
 
@@ -211,6 +240,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const readOnly = () => merged.readOnly;
   const mode = () => merged.selectionMode;
   const groupLabel = () => merged.label ?? t("calendar.label");
+  const name = () => merged.name;
+  const form = () => merged.form;
+  const required = () => merged.required;
 
   // --- State ---
   const [view, setViewSignal] = createSignal<CalendarView>("month");
@@ -497,6 +529,39 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   const highlightDate = (date: CalendarDate | null) => setHighlightEnd(date);
 
+  // --- Native form ---
+  // The hidden-input entries a native `<form>` submits, derived from the committed selection as ISO
+  // strings. A plain accessor (like `highlightedRange` / the sibling predicates, and the listbox
+  // `formValues`), NOT a `createMemo`: it is read inside the component's `<For>`, recomputes cheaply,
+  // and adds no reactive node to the render.
+  const formValues = (): { name: string; value: string }[] => {
+    const fieldName = merged.name;
+    if (fieldName == null) {
+      return [];
+    }
+    const value = selectionValue();
+    if (value == null) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      // multiple: one field per selected date, all sharing the name.
+      return value.map((date) => ({ name: fieldName, value: date.toString() }));
+    }
+    if ("start" in value) {
+      // range: paired `${name}Start` / `${name}End` fields, emitted only once the range is complete —
+      // mid-selection the value is a degenerate `{ start, end }` with the anchor still set.
+      if (anchorDate() !== null) {
+        return [];
+      }
+      return [
+        { name: `${fieldName}Start`, value: value.start.toString() },
+        { name: `${fieldName}End`, value: value.end.toString() },
+      ];
+    }
+    // single
+    return [{ name: fieldName, value: value.toString() }];
+  };
+
   // --- Shared navigation kernel (grid + cell part hooks compose these) ---
   const collection = createCollection<string>();
   const listFocus = createListFocus<string>({
@@ -543,6 +608,10 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     mode,
     t,
     groupLabel,
+    name,
+    form,
+    required,
+    formValues,
     view,
     visibleMonth,
     focusedDate,

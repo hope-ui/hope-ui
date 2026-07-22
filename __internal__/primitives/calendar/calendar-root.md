@@ -15,14 +15,16 @@ function createCalendar(options?: CreateCalendarOptions): CreateCalendarReturn;
 `CreateCalendarOptions` — config (`locale`/`dir`/`timeZone`/`firstDayOfWeek`/`min`/`max`/
 `isDateDisabled`/`disabled`/`readOnly`/`selectionMode`), the controlled/uncontrolled selection pair
 (`value`/`defaultValue`/`onValueChange`), the roving-cursor pair (`focusedValue`/
-`defaultFocusedValue`/`onFocusedValueChange`), and a `label` (overrides the built-in `calendar.label`).
+`defaultFocusedValue`/`onFocusedValueChange`), a `label` (overrides the built-in `calendar.label`), and
+the native-form trio (`name`/`form`/`required`) documented under **Native form** below.
 
 All other localized strings — nav-button `aria-label`s, cell `aria-label` suffixes, and the
 live-region announcements — resolve through `@hope-ui/i18n` (the `t` accessor exposed on the
 return, backed by the built-in catalogs). Translate them app-wide by wrapping the tree in
 `<I18nProvider locale translate messages>` — there is no per-instance `messages` prop.
 
-`CreateCalendarReturn` — resolved config accessors; the `t` message resolver (used by the part hooks
+`CreateCalendarReturn` — resolved config accessors (incl. the native-form `name`/`form`/`required` +
+the derived `formValues`); the `t` message resolver (used by the part hooks
 for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
@@ -30,6 +32,31 @@ for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 the per-date predicates (incl. `isHighlighted`); and the shared `collection` / `listFocus` /
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
 `highlightedRange`, `highlightDate`).
+
+## Native form
+
+Opt-in native `<form>` submission, mirroring the shipped Listbox pattern. The primitive renders no DOM
+itself — it only exposes the state the styled component's hidden `<input>`s consume:
+
+- **`name?: string`** — the form field name. **Opt-in**: with `name` unset, `formValues()` is `[]` and
+  nothing is submitted.
+- **`form?: string`** — associates the hidden field(s) with a `<form>` by id (the input's `form`
+  attribute), for inputs rendered outside that form.
+- **`required?: boolean`** (default `false`) — marks the field required for native validation.
+
+`formValues(): { name: string; value: string }[]` derives one entry per hidden input from
+`selectionValue()`, with each `value` an ISO `YYYY-MM-DD` string (`CalendarDate.toString()`):
+
+- **single** → `[{ name, value }]` — empty (`[]`) when the value is `null`.
+- **multiple** → one entry per selected date, all sharing `name` (sorted, as the selection is).
+- **range** → `[{ name: `${name}Start`, value: startISO }, { name: `${name}End`, value: endISO }]`.
+  Empty until the range **completes**: mid-selection (while `anchorDate()` is set) the value is a
+  degenerate `{ start, end }`, so `formValues()` deliberately stays `[]` until the second endpoint
+  commits and the anchor clears.
+
+`formValues` is a plain accessor (not a `createMemo`) — like `highlightedRange`, the sibling
+predicates, and the Listbox `formValues` — so it adds no reactive node to the render and stays
+hydration-neutral.
 
 ## The view machine
 

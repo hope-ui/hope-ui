@@ -194,6 +194,62 @@ describe("createCalendar — selection", () => {
   });
 });
 
+describe("createCalendar — native form", () => {
+  it("exposes name/form/required accessors, defaulting required to false", () => {
+    const { api, dispose } = setup();
+    expect(api.name()).toBeUndefined();
+    expect(api.form()).toBeUndefined();
+    expect(api.required()).toBe(false);
+    expect(api.formValues()).toEqual([]); // nothing to submit without a name
+    dispose();
+
+    const custom = setup({ name: "date", form: "signup", required: true });
+    expect(custom.api.name()).toBe("date");
+    expect(custom.api.form()).toBe("signup");
+    expect(custom.api.required()).toBe(true);
+    custom.dispose();
+  });
+
+  it("single: formValues carries the ISO date; empty without a name or a selection", () => {
+    // A selection with no `name` still submits nothing (form support is opt-in via `name`).
+    const anon = setup({ defaultValue: new CalendarDate(2026, 1, 20) });
+    expect(anon.api.formValues()).toEqual([]);
+    anon.dispose();
+
+    const { api, dispose } = setup({ name: "date" });
+    expect(api.formValues()).toEqual([]); // no selection yet
+    flush(() => api.activate(new CalendarDate(2026, 1, 20)));
+    expect(api.formValues()).toEqual([{ name: "date", value: "2026-01-20" }]);
+    dispose();
+  });
+
+  it("multiple: one entry per selected date, all sharing the name", () => {
+    const { api, dispose } = setup({ name: "days", selectionMode: "multiple" });
+    flush(() => api.activate(new CalendarDate(2026, 1, 20)));
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    expect(api.formValues()).toEqual([
+      { name: "days", value: "2026-01-10" },
+      { name: "days", value: "2026-01-20" },
+    ]);
+    dispose();
+  });
+
+  it("range: empty mid-selection, paired Start/End once complete", () => {
+    const { api, dispose } = setup({ name: "trip", selectionMode: "range" });
+    flush(() => api.activate(new CalendarDate(2026, 1, 20))); // anchor set — in progress
+    expect(api.anchorDate()).not.toBeNull();
+    expect(api.formValues()).toEqual([]); // empty until the range completes
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 10))); // completes (ordered)
+    expect(api.anchorDate()).toBeNull();
+    expect(api.formValues()).toEqual([
+      { name: "tripStart", value: "2026-01-10" },
+      { name: "tripEnd", value: "2026-01-20" },
+    ]);
+    dispose();
+  });
+});
+
 describe("createCalendar — per-date predicates", () => {
   it("classifies non-focusable (outside/out-of-range) vs unavailable", () => {
     const { api, dispose } = setup({
