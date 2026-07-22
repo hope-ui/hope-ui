@@ -8,6 +8,7 @@ export type { SlotClassFn, SlotRecipeFn } from "../slot-recipe";
 export * from "./alert";
 export * from "./badge";
 export * from "./button";
+export * from "./calendar";
 export * from "./close-button";
 export * from "./dialog";
 export * from "./listbox";

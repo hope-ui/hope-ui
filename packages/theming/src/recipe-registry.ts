@@ -15,6 +15,7 @@
 import type { AlertRecipe } from "./recipes/alert";
 import type { BadgeRecipe } from "./recipes/badge";
 import type { ButtonRecipe } from "./recipes/button";
+import type { CalendarRecipe } from "./recipes/calendar";
 import type { CloseButtonRecipe } from "./recipes/close-button";
 import type { DialogRecipe } from "./recipes/dialog";
 import type { ListboxRecipe } from "./recipes/listbox";
@@ -35,6 +36,7 @@ export interface RecipeRegistry {
   alert: AlertRecipe;
   badge: BadgeRecipe;
   button: ButtonRecipe;
+  calendar: CalendarRecipe;
   closeButton: CloseButtonRecipe;
   dialog: DialogRecipe;
   listbox: ListboxRecipe;

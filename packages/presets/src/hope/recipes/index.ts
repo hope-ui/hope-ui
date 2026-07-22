@@ -15,6 +15,7 @@ import type { RecipeRegistry } from "@hope-ui/theming";
 import { alertRecipe } from "./alert";
 import { badgeRecipe } from "./badge";
 import { buttonRecipe } from "./button";
+import { calendarRecipe } from "./calendar";
 import { closeButtonRecipe } from "./close-button";
 import { dialogRecipe } from "./dialog";
 import { listboxRecipe } from "./listbox";
@@ -24,6 +25,7 @@ export const hopeRecipes = {
   alert: alertRecipe,
   badge: badgeRecipe,
   button: buttonRecipe,
+  calendar: calendarRecipe,
   closeButton: closeButtonRecipe,
   dialog: dialogRecipe,
   listbox: listboxRecipe,

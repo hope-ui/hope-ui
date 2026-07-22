@@ -4,6 +4,7 @@ import type { RecipeRegistry } from "../recipe-registry";
 import type { AlertRecipe } from "../recipes/alert";
 import type { BadgeRecipe } from "../recipes/badge";
 import type { ButtonRecipe } from "../recipes/button";
+import type { CalendarRecipe } from "../recipes/calendar";
 import type { CloseButtonRecipe } from "../recipes/close-button";
 import type { DialogRecipe } from "../recipes/dialog";
 import type { ListboxRecipe } from "../recipes/listbox";
@@ -33,6 +34,17 @@ const stubBadgeRecipe: BadgeRecipe = () => ({
   endDecorator: () => "",
   dot: () => "",
 });
+const stubCalendarRecipe: CalendarRecipe = () => ({
+  root: () => "",
+  header: () => "",
+  heading: () => "",
+  prevButton: () => "",
+  nextButton: () => "",
+  grid: () => "",
+  weekday: () => "",
+  cell: () => "",
+  cellTrigger: () => "",
+});
 const stubCloseButtonRecipe: CloseButtonRecipe = () => ({
   root: () => "",
   icon: () => "",
@@ -60,6 +72,7 @@ const registry: RecipeRegistry = {
   alert: stubAlertRecipe,
   badge: stubBadgeRecipe,
   button: stubRecipe,
+  calendar: stubCalendarRecipe,
   closeButton: stubCloseButtonRecipe,
   dialog: stubDialogRecipe,
   listbox: stubListboxRecipe,

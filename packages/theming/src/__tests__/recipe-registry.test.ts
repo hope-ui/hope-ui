@@ -3,6 +3,7 @@ import { type RecipeRegistry, THEMING_CONTRACT_VERSION } from "../recipe-registr
 import type { AlertRecipeVariants, AlertSlot } from "../recipes/alert";
 import type { BadgeRecipeVariants, BadgeSlot } from "../recipes/badge";
 import type { ButtonRecipeVariants, ButtonSlot } from "../recipes/button";
+import type { CalendarRecipeVariants, CalendarSlot } from "../recipes/calendar";
 import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../recipes/close-button";
 import type { DialogRecipeVariants, DialogSlot } from "../recipes/dialog";
 import type { ListboxRecipeVariants, ListboxSlot } from "../recipes/listbox";
@@ -10,8 +11,8 @@ import type { SlotClassFn } from "../slot-recipe";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, `closeButton`, `dialog`, and `listbox`. This is a compile-time assignability check
-// (verified by `pnpm typecheck`).
+// `button`, `calendar`, `closeButton`, `dialog`, and `listbox`. This is a compile-time assignability
+// check (verified by `pnpm typecheck`).
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,
@@ -35,6 +36,17 @@ const _theme = {
     startDecorator: () => "btn__start",
     endDecorator: () => "btn__end",
     loader: () => "btn__loader",
+  }),
+  calendar: (props?: CalendarRecipeVariants): Record<CalendarSlot, SlotClassFn> => ({
+    root: () => `calendar calendar--${props?.size ?? "md"}`,
+    header: () => "calendar__header",
+    heading: () => "calendar__heading",
+    prevButton: () => "calendar__prev-button",
+    nextButton: () => "calendar__next-button",
+    grid: () => "calendar__grid",
+    weekday: () => "calendar__weekday",
+    cell: () => "calendar__cell",
+    cellTrigger: () => "calendar__cell-trigger",
   }),
   closeButton: (props?: CloseButtonRecipeVariants): Record<CloseButtonSlot, SlotClassFn> => ({
     root: () => `close close--${props?.size ?? "sm"}`,

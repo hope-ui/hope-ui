@@ -15,6 +15,7 @@
 import type { AlertThemeableProps } from "./recipes/alert";
 import type { BadgeThemeableProps } from "./recipes/badge";
 import type { ButtonThemeableProps } from "./recipes/button";
+import type { CalendarThemeableProps } from "./recipes/calendar";
 import type { CloseButtonThemeableProps } from "./recipes/close-button";
 import type { DialogThemeableProps } from "./recipes/dialog";
 import type { ListboxThemeableProps } from "./recipes/listbox";
@@ -24,6 +25,7 @@ export interface ThemeablePropsRegistry {
   alert: AlertThemeableProps;
   badge: BadgeThemeableProps;
   button: ButtonThemeableProps;
+  calendar: CalendarThemeableProps;
   closeButton: CloseButtonThemeableProps;
   dialog: DialogThemeableProps;
   listbox: ListboxThemeableProps;
