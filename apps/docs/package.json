@@ -13,6 +13,7 @@
     "@hope-ui/i18n": "workspace:*",
     "@hope-ui/presets": "workspace:*",
     "@hope-ui/theming": "workspace:*",
+    "@internationalized/date": "catalog:",
     "@mdx-js/rollup": "^3.1.0",
     "@solidjs/web": "catalog:",
     "@stefanprobst/rehype-extract-toc": "^3.0.0",

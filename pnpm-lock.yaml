@@ -300,6 +300,9 @@ importers:
       '@hope-ui/theming':
         specifier: workspace:*
         version: link:../../packages/theming
+      '@internationalized/date':
+        specifier: 'catalog:'
+        version: 3.12.2
       '@mdx-js/rollup':
         specifier: ^3.1.0
         version: 3.1.1(rollup@4.62.2)

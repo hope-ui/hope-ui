@@ -1,0 +1,645 @@
+import { Alert } from "@hope-ui/components/alert";
+import { CalendarBasicDemo } from "~/components/demos/calendar/CalendarBasicDemo";
+import { CalendarConvenienceDemo } from "~/components/demos/calendar/CalendarConvenienceDemo";
+import { CalendarRangeDemo } from "~/components/demos/calendar/CalendarRangeDemo";
+import { CalendarMultipleDemo } from "~/components/demos/calendar/CalendarMultipleDemo";
+import { CalendarSizesDemo } from "~/components/demos/calendar/CalendarSizesDemo";
+import { CalendarBoundedDemo } from "~/components/demos/calendar/CalendarBoundedDemo";
+import { CalendarUnavailableDemo } from "~/components/demos/calendar/CalendarUnavailableDemo";
+import { CalendarFormDemo } from "~/components/demos/calendar/CalendarFormDemo";
+import { CalendarRtlDemo } from "~/components/demos/calendar/CalendarRtlDemo";
+import { CalendarFirstDayOfWeekDemo } from "~/components/demos/calendar/CalendarFirstDayOfWeekDemo";
+import { CalendarNonGregorianDemo } from "~/components/demos/calendar/CalendarNonGregorianDemo";
+import { CalendarLocaleFormattingDemo } from "~/components/demos/calendar/CalendarLocaleFormattingDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "A themeable date grid — single, range, or multiple selection.";
+
+export const description =
+  "An accessible calendar for choosing dates — single, range, or multiple selection, with full keyboard navigation, month/year/decade drill-down, min/max bounds, unavailable dates, native form submission, and deep localization (RTL and non-Gregorian calendar systems included).";
+
+# Calendar
+
+{description}
+
+## Import
+
+```tsx
+import { Calendar } from "@hope-ui/components/calendar";
+```
+
+`Calendar` is a **compound** component — a namespace object whose parts you compose yourself, with a
+zero-config convenience mode when you don't. See the [Anatomy](#anatomy) for every part, and
+[Convenience & compound](#convenience--compound) for the two ways to render it.
+
+## Usage
+
+`Calendar.Root` owns the state (the selection, the roving focus cursor, month/year/decade view,
+date math, ARIA, and — opt-in — a native form value) and renders the `role="group"` container. Inside
+it, `Calendar.Header` holds the navigation (`Calendar.PrevButton`, the `Calendar.Heading` caption, and
+`Calendar.NextButton`), and `Calendar.Grid` draws the weekday head and the month's day cells. Choose a
+day with a click, `Enter`, or `Space`.
+
+<Preview>
+  <CalendarBasicDemo />
+</Preview>
+
+```tsx
+const [value, setValue] = createSignal<CalendarValue>(null);
+
+<Calendar.Root defaultValue={value()} onValueChange={setValue}>
+  <Calendar.Header>
+    <Calendar.PrevButton />
+    <Calendar.Heading />
+    <Calendar.NextButton />
+  </Calendar.Header>
+  <Calendar.Grid />
+</Calendar.Root>;
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Calendar reads its look from a recipe, so it needs a <code>&lt;ThemeProvider&gt;</code> ancestor
+      fed a preset, as every styled hope-ui component does. Dates are{" "}
+      <code>CalendarDate</code> values from <code>@internationalized/date</code> — a calendar-system-aware
+      date type — so selection, bounds, and formatting stay correct across time zones and calendar
+      systems with no <code>Date</code> parsing on your side.
+    </div>
+  }
+/>
+
+## Anatomy
+
+`Calendar.Root` wraps a `Calendar.Header` (the navigation row) over a `Calendar.Grid` (the day grid).
+`Calendar.Heading` is itself a **button**: clicking it climbs from the month view to a year grid, then a
+decade grid — and clicking a year or a month drills back down. `Calendar.Grid` renders the weekday head
+and every day cell internally, so you never assemble rows or cells yourself.
+
+<Anatomy
+  root={{
+    name: "Calendar.Root",
+    children: [
+      {
+        name: "Calendar.Header",
+        children: [
+          { name: "Calendar.PrevButton" },
+          { name: "Calendar.Heading" },
+          { name: "Calendar.NextButton" },
+        ],
+      },
+      { name: "Calendar.Grid", note: "weekday head + day cells, internally" },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Calendar.Root",
+      element: "div[role=group]",
+      description:
+        "State owner and the group container. Owns selection, roving focus, the month/year/decade view machine, date math, ARIA, ids, the resolved recipe, and (opt-in) the hidden native form input.",
+    },
+    {
+      part: "Calendar.Header",
+      element: "div",
+      description: "The navigation row — lays out the prev/heading/next controls. Layout only.",
+    },
+    {
+      part: "Calendar.PrevButton",
+      element: "button",
+      description:
+        "Steps to the previous period (month / year / decade, following the view). Renders the preset's chevron by default; disables at a min bound.",
+    },
+    {
+      part: "Calendar.Heading",
+      element: "button",
+      description:
+        "The center caption (e.g. “June 2026”). Click it to zoom out to the year, then decade view. Shows the localized period label unless you pass children.",
+    },
+    {
+      part: "Calendar.NextButton",
+      element: "button",
+      description:
+        "Steps to the next period. Renders the preset's chevron by default; disables at a max bound.",
+    },
+    {
+      part: "Calendar.Grid",
+      element: "table[role=grid]",
+      description:
+        "The day grid. Renders the weekday header row and the day cells (each a gridcell wrapping a roving day button) for the active view.",
+    },
+  ]}
+/>
+
+## Convenience & compound
+
+`Calendar.Root` renders two ways. Give it the parts above for **full compound control** — a custom
+heading, extra chrome, a differently-composed layout. Or give it **no children at all** and it
+auto-renders the built-in default chrome (the navigation header with the preset's chevrons, then the
+grid). Same recipe, same behavior; the bare form is just less to type.
+
+<Preview>
+  <CalendarConvenienceDemo />
+</Preview>
+
+```tsx
+// Zero children — Root auto-renders the header + grid.
+<Calendar.Root defaultValue={value()} onValueChange={setValue} />
+```
+
+The rest of this page uses the bare convenience form for brevity — every example works identically as
+the composed parts.
+
+## Selection modes
+
+`selectionMode` sets how many dates can be chosen:
+
+- **`single`** (default) — one date; choosing another replaces it. (shown in [Usage](#usage))
+- **`range`** — a start and an end; the days between paint as a band. `onValueChange` fires only when
+  the range **completes**, and the value is a `{ start, end }` object.
+- **`multiple`** — an independent set; each click or `Space` toggles a day. The value is a
+  `CalendarDate[]`.
+
+<Preview>
+  <CalendarRangeDemo />
+</Preview>
+
+```tsx title="range"
+<Calendar.Root selectionMode="range" onValueChange={setValue} />
+```
+
+<Preview>
+  <CalendarMultipleDemo />
+</Preview>
+
+```tsx title="multiple"
+<Calendar.Root selectionMode="multiple" onValueChange={setValue} />
+```
+
+## Sizes
+
+The `size` prop scales density — the day-cell box, its text, and the navigation buttons — across `sm`,
+`md` (the default), and `lg`. It carries no color axis; the calendar is a neutral date surface, and
+selection always paints with the `primary` / `selected` tokens.
+
+<Preview>
+  <CalendarSizesDemo />
+</Preview>
+
+```tsx
+<Calendar.Root size="sm" />
+<Calendar.Root size="md" />
+<Calendar.Root size="lg" />
+```
+
+## Date boundaries
+
+`min` and `max` bound the selectable and reachable range (inclusive). Days outside the window are
+disabled and never focusable, and the `Calendar.PrevButton` / `Calendar.NextButton` disable at the
+edges so navigation can't leave the window.
+
+<Preview>
+  <CalendarBoundedDemo />
+</Preview>
+
+```tsx
+<Calendar.Root min={new CalendarDate(2026, 6, 5)} max={new CalendarDate(2026, 6, 24)} />
+```
+
+## Unavailable dates
+
+`isDateDisabled` marks individual dates **unavailable** — here every weekend. Unavailable days differ
+from out-of-range ones: they stay focusable and are announced to screen readers, but render struck
+through and can never be selected (React Aria's "unavailable" semantics).
+
+<Preview>
+  <CalendarUnavailableDemo />
+</Preview>
+
+```tsx
+<Calendar.Root
+  isDateDisabled={(date) => {
+    const weekday = date.toDate("UTC").getUTCDay();
+    return weekday === 0 || weekday === 6; // Sun / Sat
+  }}
+/>
+```
+
+## Native form submission
+
+Set `name` and the calendar renders a hidden `<input>` (a sibling of the group) valued as the selected
+date's ISO `YYYY-MM-DD` string, so a plain `<form>` submit carries the value with no extra wiring. Add
+`form` to associate the input with a form by id, and `required` for native validation.
+
+The shape follows the selection mode: **single** submits one field; **multiple** submits one field per
+selected date (all sharing `name`); **range** submits a paired `${name}Start` / `${name}End`, emitted
+only once the range is complete.
+
+<Preview>
+  <CalendarFormDemo />
+</Preview>
+
+```tsx
+<form onSubmit={handleSubmit}>
+  <Calendar.Root name="date" defaultValue={new CalendarDate(2026, 6, 15)} />
+  <Button type="submit">Submit</Button>
+</form>
+```
+
+## Localization & i18n
+
+Calendar localizes through [`@hope-ui/i18n`](/get-started/i18n): wrap a subtree in an `I18nProvider`
+and pass a `locale`, and the heading, weekday names, day numbers, reading direction, and screen-reader
+announcements all follow — no per-component flags. Everything below changes **only** the provider's
+`locale` (and, for RTL, a `dir` on the layout).
+
+### Reading direction (LTR & RTL)
+
+An RTL locale mirrors the whole calendar: the chrome flips (Prev on the right, Next on the left),
+arrow-key navigation reverses, and the day numbers render in the locale's numbering system — Arabic-Indic
+digits here, for free.
+
+<Preview>
+  <CalendarRtlDemo />
+</Preview>
+
+```tsx
+<div dir="rtl">
+  <I18nProvider locale="ar-EG">
+    <Calendar.Root />
+  </I18nProvider>
+</div>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="neutral"
+  class="not-prose"
+  description={
+    <div>
+      The provider supplies the reading direction (so arrow keys and the day numbers flip); the{" "}
+      <code>dir="rtl"</code> on an ancestor is what mirrors the CSS layout. Set{" "}
+      <code>dir</code> once on your document root — see{" "}
+      <a href="#">Reading direction</a> in the i18n guide — and the whole app follows.
+    </div>
+  }
+/>
+
+### First day of week
+
+The first column follows the locale by default (`en-US` → Sunday, `fr-FR` → Monday). Override it
+explicitly with `firstDayOfWeek` — the weekday header and the day columns shift together.
+
+<Preview>
+  <CalendarFirstDayOfWeekDemo />
+</Preview>
+
+```tsx
+<Calendar.Root firstDayOfWeek="sun" />
+<Calendar.Root firstDayOfWeek="mon" />
+```
+
+### Non-Gregorian calendars
+
+Pass a `CalendarDate` in another calendar system — build it with `toCalendar` from
+`@internationalized/date` — and pair it with a matching `-u-ca-` locale. The heading, weekday names,
+era, and day numbers then all render in that system: because the day numbers are formatted from the
+date's **own** calendar (not the locale's default), the grid and heading always agree.
+
+<Preview>
+  <CalendarNonGregorianDemo />
+</Preview>
+
+```tsx
+import { toCalendar, IslamicUmalquraCalendar } from "@internationalized/date";
+
+<I18nProvider locale="ar-SA-u-ca-islamic-umalqura">
+  <Calendar.Root defaultFocusedValue={toCalendar(today(getLocalTimeZone()), new IslamicUmalquraCalendar())} />
+</I18nProvider>;
+```
+
+### Locale-driven formatting
+
+With no other config, the same month renders its heading, weekday names, and day numbers in the active
+locale — French (Monday-first) and Japanese (Sunday-first, `2026年6月`) below.
+
+<Preview>
+  <CalendarLocaleFormattingDemo />
+</Preview>
+
+```tsx
+<I18nProvider locale="fr-FR"><Calendar.Root /></I18nProvider>
+<I18nProvider locale="ja-JP"><Calendar.Root /></I18nProvider>
+```
+
+## Keyboard interactions
+
+Calendar implements the WAI-ARIA
+[grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) keyboard pattern for a date picker. Arrow
+directions respect the reading direction (they reverse under RTL).
+
+<DataTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "description", label: "Action" },
+  ]}
+  rows={[
+    { key: "← / →", description: "Move focus to the previous / next day (reversed under RTL)." },
+    { key: "↑ / ↓", description: "Move focus to the same weekday in the previous / next week." },
+    { key: "Home / End", description: "Move to the first / last day of the week." },
+    { key: "PageUp / PageDown", description: "Move to the previous / next month." },
+    { key: "Enter / Space", description: "Select the focused day (or, in year/decade view, drill into it)." },
+    { key: "Escape", description: "In range mode, cancel a range in progress." },
+  ]}
+/>
+
+## Theming
+
+Calendar's look comes from the active preset's recipe. It is a **neutral date surface** — no color
+axis; the only accents are the selection (the `primary` tokens) and the range / hover band (the
+`selected` tokens), all token-driven. Override styling at three levels, applied in order (later wins a
+Tailwind conflict): **recipe base → preset `slotClasses` → instance `slotClasses` / part `class`**.
+
+### Parts
+
+Every part carries a `data-slot` attribute you can target, and each is addressable by name through
+`slotClasses`. The day-cell state (today, outside-month, selected, range endpoints/middle, tentative
+highlight, disabled) is painted on `cellTrigger` through the preset's registered `data-*` variants, so
+pointer and keyboard share one visual state.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    { slot: "root", attr: "calendar", description: "The role=group container." },
+    { slot: "header", attr: "calendar-header", description: "The navigation row." },
+    { slot: "prevButton", attr: "calendar-prev-button", description: "The previous-period button." },
+    { slot: "heading", attr: "calendar-heading", description: "The center caption button (drills up to year/decade)." },
+    { slot: "nextButton", attr: "calendar-next-button", description: "The next-period button." },
+    { slot: "grid", attr: "calendar-grid", description: "The table[role=grid] day grid." },
+    { slot: "weekday", attr: "calendar-weekday", description: "A weekday header cell (th)." },
+    { slot: "cell", attr: "calendar-cell", description: "A day cell (td[role=gridcell])." },
+    { slot: "cellTrigger", attr: "calendar-cell-trigger", description: "The roving day button — carries all the day-state data-* attributes." },
+  ]}
+/>
+
+### Overriding one calendar
+
+Set `slotClasses` on `Calendar.Root` to reach any slot from one place, or put `class` on an individual
+part. `class` on `Calendar.Root` merges onto the `root` slot. Use literal class strings so your
+Tailwind build can see them.
+
+```tsx
+<Calendar.Root
+  class="rounded-xl border border-subtle bg-surface-raised p-3 shadow-sm"
+  slotClasses={{ cellTrigger: "rounded-full", heading: "font-semibold" }}
+/>
+```
+
+### App-wide defaults & overrides
+
+Set the default `size`, the navigation glyphs (`prevIcon` / `nextIcon`), and global part classes for
+**every** Calendar through the theme with `definePreset`, then pass the derived preset to
+`ThemeProvider`. `defaultProps` resolve at **instance ?? preset ?? builtin** precedence, so an explicit
+prop on a single calendar always wins.
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    calendar: {
+      defaultProps: {
+        size: "sm",
+        prevIcon: () => <ArrowLeftIcon />,
+        nextIcon: () => <ArrowRightIcon />,
+      },
+      slotClasses: { root: "rounded-xl border border-subtle p-3 shadow-sm" },
+    },
+  },
+});
+```
+
+## API
+
+### Calendar.Root
+
+Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, …). Dates are
+`CalendarDate` values from `@internationalized/date`.
+
+<PropsTable
+  rows={[
+    {
+      prop: "selectionMode",
+      type: '"single" | "range" | "multiple"',
+      default: '"single"',
+      description: "How many dates can be selected, and the shape of value.",
+    },
+    {
+      prop: "value",
+      type: "CalendarDate | DateRange | CalendarDate[] | null",
+      default: "",
+      description: "Controlled selection, keyed by selectionMode. Omit for uncontrolled use via defaultValue.",
+    },
+    {
+      prop: "defaultValue",
+      type: "CalendarDate | DateRange | CalendarDate[] | null",
+      default: "null",
+      description: "Initial selection when uncontrolled.",
+    },
+    {
+      prop: "onValueChange",
+      type: "(value) => void",
+      default: "",
+      description: "Called when the selection commits (range: only on completion).",
+    },
+    {
+      prop: "defaultFocusedValue",
+      type: "CalendarDate | null",
+      default: "value / today",
+      description: "Initial focus cursor (uncontrolled) — seeds the visible month. Pass a stable value for deterministic SSR.",
+    },
+    {
+      prop: "focusedValue",
+      type: "CalendarDate | null",
+      default: "",
+      description: "Controlled roving-focus cursor.",
+    },
+    {
+      prop: "onFocusedValueChange",
+      type: "(date: CalendarDate) => void",
+      default: "",
+      description: "Called whenever the roving cursor moves.",
+    },
+    {
+      prop: "min",
+      type: "CalendarDate",
+      default: "",
+      description: "Earliest selectable / reachable date (inclusive).",
+    },
+    {
+      prop: "max",
+      type: "CalendarDate",
+      default: "",
+      description: "Latest selectable / reachable date (inclusive).",
+    },
+    {
+      prop: "isDateDisabled",
+      type: "(date: CalendarDate) => boolean",
+      default: "",
+      description: "Per-date unavailable predicate — focusable and announced, but not selectable.",
+    },
+    {
+      prop: "firstDayOfWeek",
+      type: '"sun" | "mon" | … | "sat"',
+      default: "locale-derived",
+      description: "Week-start override. Defaults to the locale's convention.",
+    },
+    {
+      prop: "locale",
+      type: "string",
+      default: "useLocale()",
+      description: "BCP-47 locale for date formatting. Defaults to the nearest I18nProvider / browser locale.",
+    },
+    {
+      prop: "dir",
+      type: '"ltr" | "rtl"',
+      default: "useLocale()",
+      description: "Reading direction. Defaults to the locale's. Drives the arrow-key flip.",
+    },
+    {
+      prop: "timeZone",
+      type: "string",
+      default: "system zone",
+      description: 'IANA time zone for "today" and formatting.',
+    },
+    {
+      prop: "disabled",
+      type: "boolean",
+      default: "false",
+      description: "Disable the whole calendar.",
+    },
+    {
+      prop: "readOnly",
+      type: "boolean",
+      default: "false",
+      description: "Navigable and focusable, but not selectable.",
+    },
+    {
+      prop: "size",
+      type: '"sm" | "md" | "lg"',
+      default: '"md"',
+      description: "The density scale — day-cell box, text, and navigation buttons.",
+    },
+    {
+      prop: "prevIcon",
+      type: "() => JSX.Element",
+      default: "chevron",
+      description: "Factory for the PrevButton's default glyph. Overridable app-wide via the preset.",
+    },
+    {
+      prop: "nextIcon",
+      type: "() => JSX.Element",
+      default: "chevron",
+      description: "Factory for the NextButton's default glyph. Overridable app-wide via the preset.",
+    },
+    {
+      prop: "name",
+      type: "string",
+      default: "",
+      description: "Native form field name. When set, hidden input(s) render from the selection.",
+    },
+    {
+      prop: "form",
+      type: "string",
+      default: "",
+      description: "Associates the hidden field(s) with a form by id.",
+    },
+    {
+      prop: "required",
+      type: "boolean",
+      default: "false",
+      description: "Marks the field required for native validation.",
+    },
+    {
+      prop: "label",
+      type: "string",
+      default: "localized",
+      description: "The group's accessible name. Defaults to the localized calendar.label message.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"calendar">',
+      default: "",
+      description: "Per-slot class overrides, keyed by root/header/heading/prevButton/nextButton/grid/weekday/cell/cellTrigger.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Merged onto the root slot (applied last).",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "auto chrome",
+      description: "The compound parts. Omit for the built-in default chrome (see Convenience & compound).",
+    },
+  ]}
+/>
+
+### Parts
+
+`Calendar.PrevButton`, `Calendar.NextButton`, and `Calendar.Heading` each accept their native
+`<button>` attributes, a `render` prop, a `class`, and `children` (which overrides the built-in
+glyph / period label). `Calendar.Header` and `Calendar.Grid` accept their native element attributes
+plus `class`. All host elements are rendered through the `render` prop where offered — the single
+polymorphism API, as elsewhere in hope-ui.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="neutral"
+  class="not-prose"
+  title={<strong>On the roadmap</strong>}
+  description={
+    <div>
+      Core v1 styles a single visible month. Not yet shipped — they need multi-grid focus and
+      cell-builder work in the behavior layer: <code>numberOfMonths</code> (multi-month),{" "}
+      <code>showOutsideDays</code>, <code>fixedWeeks</code>, <code>weekNumbers</code>, a dropdown{" "}
+      <code>captionLayout</code>, and a formal per-day <code>renderDay</code>.
+    </div>
+  }
+/>
+
+## Accessibility
+
+Calendar implements the WAI-ARIA [grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/) date-picker
+pattern.
+
+- **Roles and state are wired for you.** The container is `role="group"` with an accessible name, the
+  grid is `role="grid"` labelled by the heading, each day is a `role="gridcell"` button, and selected /
+  today / disabled / unavailable state is exposed through `aria-*` and `data-*`.
+- **One roving tab stop.** The grid is a single tab stop; arrows move focus between days, and pointer
+  and keyboard share one focused day, so the cursor and the keyboard never paint two highlights.
+- **Unavailable days stay discoverable.** A date marked unavailable keeps focus and is announced, but
+  can never be selected — distinct from an out-of-range day, which is fully disabled.
+- **Selections are announced.** Committing a date or completing a range announces the localized result
+  through a live region; navigating months / views announces the new period.
+- **Localized and directional.** The accessible names, weekday labels, and day numbers come from the
+  active locale, and arrow-key navigation follows the reading direction.
