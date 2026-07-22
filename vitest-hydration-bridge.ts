@@ -51,6 +51,7 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
     "packages/components/src/close-button/__tests__/close-button.ssr-entry.tsx",
   ),
   dialog: join(repoRoot, "packages/components/src/dialog/__tests__/dialog.ssr-entry.tsx"),
+  listbox: join(repoRoot, "packages/components/src/listbox/__tests__/listbox.ssr-entry.tsx"),
   calendar: join(repoRoot, "packages/components/src/calendar/__tests__/calendar.ssr-entry.tsx"),
   "theme-context": join(repoRoot, "packages/theming/src/__tests__/theme-context.ssr-entry.tsx"),
   // A component-free keyed tree the `hydrateFixture` helper's own suite hydrates to pin its

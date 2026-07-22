@@ -13,7 +13,8 @@
       "button": "src/button/index.ts",
       "calendar": "src/calendar/index.ts",
       "close-button": "src/close-button/index.ts",
-      "dialog": "src/dialog/index.ts"
+      "dialog": "src/dialog/index.ts",
+      "listbox": "src/listbox/index.ts"
     }
   },
   "exports": {
@@ -40,6 +41,10 @@
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "solid": "./dist/dialog/index.jsx"
+    },
+    "./listbox": {
+      "types": "./dist/listbox/index.d.ts",
+      "solid": "./dist/listbox/index.jsx"
     },
     "./package.json": "./package.json"
   },
