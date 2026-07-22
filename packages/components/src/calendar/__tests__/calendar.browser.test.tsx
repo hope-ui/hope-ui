@@ -1,11 +1,13 @@
 import ssrFixture from "virtual:hydration-fixture?id=calendar";
 import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import { Calendar } from "../calendar";
+import { Calendar } from "../index";
 // `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
 // inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
 // committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
@@ -44,15 +46,17 @@ describe("Calendar", () => {
   it("selects a day on click and calls onValueChange", async () => {
     let value: CalendarDate | undefined;
     const { container, dispose } = mount(() => (
-      <I18nProvider locale="en-US">
-        <Calendar.Root
-          defaultFocusedValue={new CalendarDate(2020, 1, 15)}
-          timeZone="UTC"
-          onValueChange={(v) => (value = v as CalendarDate)}
-        >
-          <Calendar.Grid />
-        </Calendar.Root>
-      </I18nProvider>
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onValueChange={(v) => (value = v as CalendarDate)}
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
     ));
 
     dayButton(container, "Friday, January 10, 2020").click();
@@ -87,18 +91,20 @@ describe("Calendar", () => {
     type Range = { start: CalendarDate; end: CalendarDate };
     let value: unknown = null;
     const { container, dispose } = mount(() => (
-      <I18nProvider locale="en-US">
-        <Calendar.Root
-          selectionMode="range"
-          defaultFocusedValue={new CalendarDate(2020, 1, 15)}
-          timeZone="UTC"
-          onValueChange={(v) => {
-            value = v;
-          }}
-        >
-          <Calendar.Grid />
-        </Calendar.Root>
-      </I18nProvider>
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            selectionMode="range"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onValueChange={(v) => {
+              value = v;
+            }}
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
     ));
 
     dayButton(container, "Friday, January 10, 2020").click(); // anchor
@@ -117,16 +123,18 @@ describe("Calendar", () => {
   it("supports controlled value", async () => {
     const [value, setValue] = createSignal<CalendarDate | null>(null);
     const { container, dispose } = mount(() => (
-      <I18nProvider locale="en-US">
-        <Calendar.Root
-          value={value()}
-          onValueChange={(v) => setValue(v as CalendarDate)}
-          defaultFocusedValue={new CalendarDate(2020, 1, 15)}
-          timeZone="UTC"
-        >
-          <Calendar.Grid />
-        </Calendar.Root>
-      </I18nProvider>
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            value={value()}
+            onValueChange={(v) => setValue(v as CalendarDate)}
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
     ));
 
     setValue(new CalendarDate(2020, 1, 20));
@@ -135,6 +143,32 @@ describe("Calendar", () => {
       expect(cell?.querySelector("button")?.getAttribute("aria-label")).toContain(
         "January 20, 2020",
       );
+    });
+    dispose();
+  });
+
+  it("renders a hidden native input from the selection when name is set", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            name="date"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    // Opt-in, but nothing selected yet → no hidden field.
+    expect(container.querySelector('input[type="hidden"][name="date"]')).toBeNull();
+
+    dayButton(container, "Friday, January 10, 2020").click();
+    await vi.waitFor(() => {
+      const input = container.querySelector<HTMLInputElement>('input[type="hidden"][name="date"]');
+      expect(input?.value).toBe("2020-01-10");
     });
     dispose();
   });

@@ -85,7 +85,7 @@ async function mountCalendar(options?: CreateCalendarOptions) {
 }
 
 describe("createCalendarCell", () => {
-  it("selects a day on click and reflects it with data-selected + aria-selected", async () => {
+  it("selects a day on click and reflects it with data-selected (button) + aria-selected (cell)", async () => {
     let selected: unknown;
     const { container, dispose } = await mountCalendar({
       onValueChange: (value) => (selected = value),
@@ -95,9 +95,12 @@ describe("createCalendarCell", () => {
     jan20.click();
 
     await vi.waitFor(() => expect((selected as CalendarDate)?.toString()).toBe("2026-01-20"));
+    // The paint hook is on the button (where the recipe's `cellTrigger` reads it); the ARIA selection
+    // state stays on the `<td role="gridcell">`.
+    await vi.waitFor(() => expect(jan20.getAttribute("data-selected")).toBe(""));
     const cell = jan20.closest("td") as HTMLElement;
-    await vi.waitFor(() => expect(cell.getAttribute("data-selected")).toBe(""));
     expect(cell.getAttribute("aria-selected")).toBe("true");
+    expect(cell.getAttribute("data-selected")).toBeNull();
     dispose();
   });
 
@@ -132,15 +135,30 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
-  it("marks an unavailable day aria-disabled but keeps it focusable", async () => {
+  it("marks an unavailable day aria-disabled + data-unavailable, but keeps it focusable and un-dimmed", async () => {
     const { container, dispose } = await mountCalendar({
       isDateDisabled: (date) => date.day === 20,
     });
     const jan20 = dayButton(container, "2026-01-20");
     expect(jan20.getAttribute("aria-disabled")).toBe("true");
+    // Painted `data-unavailable` (strike-through), NOT `data-disabled` — an unavailable day stays
+    // interactive (focusable, hover-previewable), distinct from an inert out-of-range day.
+    expect(jan20.getAttribute("data-unavailable")).toBe("");
+    expect(jan20.getAttribute("data-disabled")).toBeNull();
     // Focusable (unlike inert days): focusing it works and does not throw.
     jan20.focus();
     await expect.element(jan20).toHaveFocus();
+    dispose();
+  });
+
+  it("marks an out-of-range day data-disabled (inert), not data-unavailable", async () => {
+    const { container, dispose } = await mountCalendar({
+      min: new CalendarDate(2026, 1, 10),
+    });
+    // Jan 5 is before `min` → a whole out-of-range period: inert + dimmed, not merely unavailable.
+    const jan5 = dayButton(container, "2026-01-05");
+    expect(jan5.getAttribute("data-disabled")).toBe("");
+    expect(jan5.getAttribute("data-unavailable")).toBeNull();
     dispose();
   });
 

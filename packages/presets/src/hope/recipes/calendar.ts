@@ -11,18 +11,20 @@
  * range / tentative-hover bands, all driven by tokens, not a variant.
  *
  * ── Day-cell state is `data-*` ONLY — never `hover:` / bare `:focus` for selection ────────────────
- * `createCalendarCell` emits the canonical registered day-state hooks — `data-today`,
- * `data-outside-month`, `data-selected`, `data-range-start`/`-middle`/`-end`, `data-highlighted` (the
- * tentative hover-range band), `data-disabled` — so the cell is painted by those custom variants, not
- * by the cursor's physical position. Only the plain surface wash (`hover:bg-surface-raised-hovered`)
- * is a real hover — it reads a day under the pointer without competing with the selection state.
+ * `createCalendarCell` emits the canonical registered day-state hooks **on the day trigger** (`data-today`,
+ * `data-outside-month`, `data-unavailable`, `data-selected`, `data-range-start`/`-middle`/`-end`,
+ * `data-highlighted` (the tentative hover-range band), `data-disabled`) — so the cell is painted by those
+ * custom variants, not by the cursor's physical position. Only the plain surface wash
+ * (`hover:bg-surface-raised-hovered`) is a real hover — it reads a day under the pointer without
+ * competing with the selection state.
  *
  * The `data-*` utilities are ordered so the **later** one wins the zero-specificity `:where(...)`
  * cascade (see `_base/_variants.css`): `data-today` (a soft tint) comes first, then the range middle /
  * tentative band, then the solid selected endpoints last — so a day that is both today and selected,
- * or an endpoint that is also a middle, reads as the stronger state. (`data-unavailable` is a
- * registered hook the primitive does not yet emit; its strike-through style is authored here anyway —
- * a pure, harmless no-op until Phase 3 reconciles the cell's emitted attributes.)
+ * or an endpoint that is also a middle, reads as the stronger state. `data-unavailable` (the
+ * `isDateDisabled` predicate hit) strikes the day through; it is emitted by `createCalendarCell` on the
+ * cell trigger, distinct from `data-disabled` (a whole out-of-range period — dimmed + non-interactive),
+ * so the two never stack on one day.
  *
  * ── Recipe purity ───────────────────────────────────────────────────────────────────────────────
  * Every color is a finished `--hope-*` token: `bg-primary`/`text-on-primary` (the solid selection),

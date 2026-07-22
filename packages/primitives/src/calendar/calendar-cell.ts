@@ -25,9 +25,10 @@ export interface CalendarDayState {
   readonly isHighlighted: boolean;
   /** The roving cursor is on this cell. */
   readonly isFocused: boolean;
-  /** `isDateDisabled` hit — focusable + announced, but not selectable. */
+  /** `isDateDisabled` hit — focusable + announced, but not selectable (painted `data-unavailable`). */
   readonly isUnavailable: boolean;
-  /** The dimmed/blocked look (unavailable or a whole out-of-range period). */
+  /** A whole out-of-range period — inert (not focusable, not selectable), painted `data-disabled`.
+   * Distinct from {@link isUnavailable} (React-Aria's split): an unavailable day stays interactive. */
   readonly isDisabled: boolean;
 }
 
@@ -62,10 +63,13 @@ export interface CreateCalendarCellReturn {
  * - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells.
  * - `onMouseEnter` feeds the range hover preview.
  *
- * The `<td>` carries the `data-*` paint hooks + `aria-selected`; the `<button>` carries the view-aware
- * `aria-label` (with Today / selected / range / unavailable suffixes) and `aria-disabled` for
- * unavailable days. The tab stop is the focused cell (`tabindex` from `isFocused`), which is correct on
- * the server too (it compares dates, and doesn't depend on the client-only collection).
+ * The `<td>` carries only the grid semantics — `role="gridcell"` + `aria-selected`. **The `data-*`
+ * paint hooks live on the inner `<button>`** (alongside its view-aware `aria-label`, `aria-disabled`,
+ * and roving `tabindex`), because the button is the element a styled recipe paints (`cellTrigger`),
+ * and the registered day-state custom variants are self-based (`&:where([data-today])`) — a
+ * `data-today` on the `<td>` would never light up a `data-today:` utility on its child button. The tab
+ * stop is the focused cell (`tabindex` from `isFocused`), which is correct on the server too (it
+ * compares dates, and doesn't depend on the client-only collection).
  */
 export function createCalendarCell(
   state: CreateCalendarReturn,
@@ -93,7 +97,10 @@ export function createCalendarCell(
   const isRangeEnd = () => state.isRangeEnd(date());
   const isHighlighted = () => state.isHighlighted(date());
   const isUnavailable = () => state.isDateUnavailable(date());
-  const isDisabledPaint = () => isUnavailable() || state.isCellOutOfRange(date());
+  // `data-disabled` marks only the truly-inert out-of-range days (dim + no pointer). Unavailable days
+  // are painted separately (`data-unavailable`) and stay interactive — React-Aria's isDisabled vs
+  // isUnavailable split — so the two never double-apply (a struck-out day is not also dimmed).
+  const isDisabled = () => state.isCellOutOfRange(date());
 
   const dayState = createMemo<CalendarDayState>(() => ({
     date: date(),
@@ -107,7 +114,7 @@ export function createCalendarCell(
     isHighlighted: isHighlighted(),
     isFocused: isFocused(),
     isUnavailable: isUnavailable(),
-    isDisabled: isDisabledPaint(),
+    isDisabled: isDisabled(),
   }));
 
   const ariaLabel = () => {
@@ -160,12 +167,31 @@ export function createCalendarCell(
     });
   };
 
-  // Not annotated as `JSX.HTMLAttributes` inline: the `data-*` keys would trip the excess-property
-  // check on a fresh literal. As a variable it assigns structurally to the return type below.
-  const props = {
-    role: "gridcell" as const,
+  // The `<td role="gridcell">` — grid semantics only. `aria-selected` is the ARIA selection state and
+  // belongs on the gridcell; the visual `data-*` paint hooks live on the button below.
+  const props: JSX.HTMLAttributes<HTMLTableCellElement> = {
+    role: "gridcell",
     get "aria-selected"() {
       return isSelected() ? "true" : undefined;
+    },
+  };
+
+  // The inner `<button>` — the roving focus target AND the painted element. It carries the view-aware
+  // `aria-label` / `aria-disabled` / `tabindex` plus every `data-*` day-state hook, so a recipe styling
+  // `cellTrigger` (the button) sees them — the registered custom variants are self-based, so a hook on
+  // the `<td>` would never fire a `data-*:` utility on the button. Not annotated as `JSX.*` inline: the
+  // `data-*` keys would trip the excess-property check on a fresh literal; as a variable it assigns
+  // structurally to the return type below.
+  const triggerProps = {
+    type: "button" as const,
+    get tabindex() {
+      return isFocused() ? 0 : -1;
+    },
+    get "aria-label"() {
+      return ariaLabel();
+    },
+    get "aria-disabled"() {
+      return isUnavailable() ? "true" : undefined;
     },
     get "data-today"() {
       return isToday() ? "" : undefined;
@@ -173,8 +199,11 @@ export function createCalendarCell(
     get "data-outside-month"() {
       return isOutside() ? "" : undefined;
     },
+    get "data-unavailable"() {
+      return isUnavailable() ? "" : undefined;
+    },
     get "data-disabled"() {
-      return isDisabledPaint() ? "" : undefined;
+      return isDisabled() ? "" : undefined;
     },
     get "data-selected"() {
       return isSelected() ? "" : undefined;
@@ -193,19 +222,6 @@ export function createCalendarCell(
     },
     get "data-focused"() {
       return isFocused() ? "" : undefined;
-    },
-  };
-
-  const triggerProps: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {
-    type: "button",
-    get tabindex() {
-      return isFocused() ? 0 : -1;
-    },
-    get "aria-label"() {
-      return ariaLabel();
-    },
-    get "aria-disabled"() {
-      return isUnavailable() ? "true" : undefined;
     },
     onMouseDown,
     onMouseEnter,
