@@ -1,6 +1,7 @@
 // The `Alert` compound component. Each part lives in its own `alert-<part>.tsx` file (a shared
-// `alert-context.ts` carries the context, `alert-icons.tsx` the built-in status glyphs); this barrel
-// is the one place the namespace object is assembled — the component's single subpath export.
+// `alert-context.ts` carries the context, `alert-icons.tsx` the status-role → glyph mapping over the
+// shared `../icons` set); this barrel is the one place the namespace object is assembled — the
+// component's single subpath export.
 import { Actions } from "./alert-actions";
 import { CloseTrigger } from "./alert-close-trigger";
 import { Content } from "./alert-content";

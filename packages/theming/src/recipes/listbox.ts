@@ -24,6 +24,7 @@
  * highlight (keyboard and pointer share one active item; see the primitive family's pointer/keyboard
  * invariant). Every color is a finished `--hope-*` token (recipe purity). See `theming.md`.
  */
+import type { JSX } from "@solidjs/web";
 import type { SlotRecipeFn } from "../slot-recipe";
 
 /**
@@ -39,12 +40,24 @@ export interface ListboxRecipeVariants {
 }
 
 /**
- * The curated Listbox props a preset may default app-wide via `ComponentOverride.defaultProps`.
- * Listbox carries no non-variant chrome content, so this is exactly the recipe variants — a strict
- * superset of {@link ListboxRecipeVariants} by construction (`extends`), so it registers in
- * `ThemeablePropsRegistry` and `ThemeablePropsOf<"listbox">` widens nothing away.
+ * The curated Listbox props a preset may default app-wide via `ComponentOverride.defaultProps`: the
+ * recipe variants **plus** the selection-check glyph. A strict superset of {@link ListboxRecipeVariants}
+ * by construction (`extends`), so it registers in `ThemeablePropsRegistry` and
+ * `ThemeablePropsOf<"listbox">` widens the variants-only surface without dropping anything.
+ *
+ * The glyph is a **factory** (`() => JSX.Element`), never a bare `JSX.Element`: a preset value is one
+ * object shared by every instance, and a Solid `JSX.Element` is an already-built node that would
+ * *move* if reused, so a factory (called per instance) is what lets a preset swap the app-wide check
+ * icon without two listboxes fighting over one node. Mirrors Calendar's `prevIcon`/`nextIcon` and
+ * CloseButton's `icon`. Listbox is a multi-part component, so its themeable surface stays on the
+ * **root** (no per-part themeable props): `Listbox.Root` resolves this through `runIfFunction` and
+ * flows it to the `ItemIndicator` part via context, where it is the default child. The **per-instance**
+ * override is that part's own `children`.
  */
-export interface ListboxThemeableProps extends ListboxRecipeVariants {}
+export interface ListboxThemeableProps extends ListboxRecipeVariants {
+  /** App-wide default selection-check glyph, as a factory. Falls back to hope's built-in check. */
+  checkIcon?: () => JSX.Element;
+}
 
 /**
  * The Listbox recipe's slots. `root` is the `role="listbox"` scroll container (also the scroll

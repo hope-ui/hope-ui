@@ -1,7 +1,7 @@
 import ssrFixture from "virtual:hydration-fixture?id=listbox";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
-import { ThemeProvider } from "@hope-ui/theming";
+import { definePreset, ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { For } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
@@ -29,6 +29,15 @@ const FRUITS: Fruit[] = [
 
 const itemToValue = (fruit: Fruit) => String(fruit.id);
 const itemToLabel = (fruit: Fruit) => fruit.name;
+
+/** A recognizable stand-in glyph, tagged so a query can tell it apart from hope's built-in check. */
+function CustomIcon(props: { mark: string }): JSX.Element {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" data-custom-icon={props.mark}>
+      <path d="M4 4h16v16H4z" />
+    </svg>
+  );
+}
 
 const modKey = /mac|iphone|ipad/i.test(navigator.platform) ? "Meta" : "Control";
 
@@ -278,6 +287,83 @@ describe("Listbox — selection", () => {
     await userEvent.keyboard("{Enter} ");
     expect(selectedValues(container)).toEqual([]);
     expect(nth(options(container), 0).hasAttribute("aria-selected")).toBe(false);
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+// ─── Selection glyph (ItemIndicator) ────────────────────────────────────────────────────────────
+
+describe("Listbox selection glyph", () => {
+  // The check glyph is built into the `ItemIndicator` part: a bare `Listbox.ItemIndicator` renders
+  // hope's built-in check with no children, and it is overridable per instance via `children` or
+  // app-wide via the preset's `defaultProps.listbox.checkIcon` — the Calendar `prevIcon`/`nextIcon`
+  // shape, so the SVG is never hard-coded in the component layer.
+
+  /** Selects the third row (Cherry) and returns the svg inside its now-visible indicator. */
+  async function indicatorSvgAfterSelecting(container: HTMLElement): Promise<SVGElement | null> {
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    await userEvent.click(nth(options(container), 2));
+    await vi.waitFor(() =>
+      expect(container.querySelector('[data-slot="listbox-item-indicator"] svg')).not.toBeNull(),
+    );
+    return nth(options(container), 2).querySelector<SVGElement>(
+      '[data-slot="listbox-item-indicator"] svg',
+    );
+  }
+
+  it("lets a per-instance ItemIndicator child override the built-in check", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
+          <For each={FRUITS}>
+            {(fruit) => (
+              <Listbox.Item value={fruit} data-value={fruit.name}>
+                <Listbox.ItemIndicator>
+                  <CustomIcon mark="custom" />
+                </Listbox.ItemIndicator>
+                {fruit.name}
+              </Listbox.Item>
+            )}
+          </For>
+        </Listbox.Root>
+      </Themed>
+    ));
+
+    const svg = await indicatorSvgAfterSelecting(container);
+    // The per-instance child wins over the built-in check.
+    expect(svg?.getAttribute("data-custom-icon")).toBe("custom");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("takes an app-wide check glyph from a preset's defaultProps.listbox", async () => {
+    // `hope` sets no listbox defaultProps, so extend it: a preset supplies the app-wide glyph as a
+    // reuse-safe factory, resolved by Root's `useDefaults` and flowed to the bare `ItemIndicator`.
+    const withCheckIcon = definePreset(hope, {
+      components: {
+        listbox: { defaultProps: { checkIcon: () => <CustomIcon mark="preset" /> } },
+      },
+    });
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={withCheckIcon}>
+        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
+          <For each={FRUITS}>
+            {(fruit) => (
+              <Listbox.Item value={fruit} data-value={fruit.name}>
+                <Listbox.ItemIndicator />
+                {fruit.name}
+              </Listbox.Item>
+            )}
+          </For>
+        </Listbox.Root>
+      </ThemeProvider>
+    ));
+
+    const svg = await indicatorSvgAfterSelecting(container);
+    // The preset's factory glyph, not hope's built-in check.
+    expect(svg?.getAttribute("data-custom-icon")).toBe("preset");
     await expectNoA11yViolations(container);
     dispose();
   });

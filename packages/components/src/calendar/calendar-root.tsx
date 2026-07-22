@@ -4,6 +4,7 @@ import type { CalendarSize, CalendarThemeableProps, SlotClasses } from "@hope-ui
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { For, Show } from "solid-js";
+import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import { CalendarContext, type CalendarContextValue } from "./calendar-context";
 import { Grid } from "./calendar-grid";
 import { Header } from "./calendar-header";
@@ -33,47 +34,6 @@ export interface CalendarRootProps extends CreateCalendarOptions, CalendarThemea
    * take full compound control (custom heading, extra chrome, a differently-composed layout).
    */
   children?: JSX.Element;
-}
-
-/**
- * hope's default navigation glyphs — Lucide's `chevron-left` / `chevron-right`, hand-inlined (hope
- * ships no icon-library dependency). `stroke="currentColor"` so they inherit the nav button's text
- * color, and the `calendar` recipe sizes them per `size` via `[&_svg]:size-*` on the nav-button slots
- * (so a bare `<svg>` needs no width/height of its own). These are the **built-in fallback** for the
- * `prevIcon`/`nextIcon` themeable factories (see `useDefaults` below): every `Calendar.PrevButton` /
- * `NextButton` renders one by default (compound or auto-chrome), overridable per instance via the
- * part's `children` or app-wide via the preset's `defaultProps.calendar.prevIcon`/`nextIcon`.
- */
-function ChevronLeftIcon(): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m15 18-6-6 6-6" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon(): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
 }
 
 /**

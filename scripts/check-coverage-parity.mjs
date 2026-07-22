@@ -86,6 +86,12 @@ const REQUIRES_STORY = new Set(["components"]);
 // component, exercised by one shared test suite / doc / story, so requiring the whole set per part
 // file would only manufacture boilerplate. `primitives`/`theming` stay per-file (a test + a doc each).
 const PER_FOLDER_DOD = new Set(["components"]);
+// Leaf folders directly under a PER_FOLDER_DOD package's `src/` that hold shared **resources**, not a
+// component: they ship no hydratable UI of their own — just reusable assets (the built-in icon set)
+// imported by the real components — so they carry no per-folder test/story/SSR/hydration set. The
+// flat-free rule (NO_FLAT_SPRAWL) still applies, so they can hold only source + `index.ts`. Keyed by
+// package so the exemption can't leak across packages.
+const RESOURCE_DIRS = { components: new Set(["icons"]) };
 
 /** @param {string} dir */
 function walk(dir) {
@@ -346,12 +352,19 @@ for (const pkg of packageDirs) {
     // are collectively one component, exercised by one shared test suite / doc / story. (Leaf folders
     // still stay flat-free via NO_FLAT_SPRAWL below, and each browser test that mounts still runs axe.)
     const componentDirs = new Set();
+    const resourceDirs = new Set([...(RESOURCE_DIRS[pkg] ?? [])].map((name) => join(srcDir, name)));
     for (const f of sourceFiles) {
       // A folder of only `index.ts` is a barrel, not a component; a folder with any other source file
-      // is a component folder.
-      if (!EXCLUDED_BASENAMES.has(basename(baseName(f)))) {
-        componentDirs.add(dirname(f));
+      // is a component folder — unless it's a declared shared-resource folder (e.g. `icons/`), which
+      // ships assets, not a hydratable component, so it carries no per-folder DoD set.
+      if (EXCLUDED_BASENAMES.has(basename(baseName(f)))) {
+        continue;
       }
+      const dir = dirname(f);
+      if (resourceDirs.has(dir)) {
+        continue;
+      }
+      componentDirs.add(dir);
     }
 
     for (const dir of componentDirs) {

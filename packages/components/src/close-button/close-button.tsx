@@ -6,6 +6,7 @@ import type { CloseButtonSize, CloseButtonThemeableProps, SlotClasses } from "@h
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
+import { XIcon } from "../icons";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -60,27 +61,6 @@ export interface CloseButtonProps
    * conflict. Use literal class strings so the consumer's Tailwind scanner can see them.
    */
   slotClasses?: SlotClasses<"closeButton">;
-}
-
-/**
- * hope's default close glyph — Lucide's `x`. Hand-inlined (hope ships no icon-library dependency),
- * `stroke="currentColor"` so it adopts the surface color; the recipe's `icon` slot sizes it per `size`.
- */
-function CloseIcon(): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
 }
 
 export const CloseButton: Component<CloseButtonProps> = (props) => {
@@ -142,7 +122,7 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
     "children",
   );
 
-  // The glyph is a **component** (the built-in `<CloseIcon/>` or a consumer `icon={<MyIcon/>}`/factory),
+  // The glyph is a **component** (the built-in `<XIcon/>` or a consumer `icon={<MyIcon/>}`/factory),
   // rendered **once, unconditionally** — there is always exactly one glyph and no `<Show>` — and
   // `merged.icon` is read **exactly once** here. Per the codified `children()` decision procedure
   // (CLAUDE.md / __internal__/solid-2.0-notes.md), the trigger is a component-valued prop read *more than
@@ -155,7 +135,7 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
   // hydration` hazard). The `class` binding stays reactive, so a `size` change reflows the glyph size.
   const content = (
     <span data-slot="close-button-icon" class={slots.icon()}>
-      {runIfFunction(merged.icon) ?? <CloseIcon />}
+      {runIfFunction(merged.icon) ?? <XIcon />}
     </span>
   );
 

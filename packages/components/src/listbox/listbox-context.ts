@@ -1,6 +1,7 @@
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { CreateListboxGroupReturn, CreateListboxReturn } from "@hope-ui/primitives/listbox";
 import type { ListboxSlot } from "@hope-ui/theming";
+import type { JSX } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 
 /**
@@ -25,6 +26,13 @@ export interface ListboxContextValue {
   state: CreateListboxReturn<unknown>;
   /** One ready-to-call class fn per Listbox slot, resolved once on `Root` and shared here. */
   slots: Record<ListboxSlot, () => string>;
+  /**
+   * The resolved default selection-check glyph (instance `checkIcon` ?? preset `defaultProps.listbox.checkIcon`
+   * ?? hope's built-in check), resolved once on `Root` (the multi-part component keeps its themeable
+   * surface on the root) and flowed here. `Listbox.ItemIndicator` renders this when given no `children`.
+   * An accessor, so each read builds a **fresh** element — never a reused, movable node.
+   */
+  checkIcon: () => JSX.Element;
 }
 
 export const [ListboxContext, useListboxContext] =

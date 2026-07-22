@@ -12,6 +12,7 @@ import type {
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, children, createEffect, merge, omit, Show } from "solid-js";
+import { LoaderCircleIcon } from "../icons";
 
 // The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
 // consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
@@ -85,26 +86,6 @@ export interface ButtonProps
   slotClasses?: SlotClasses<"button">;
 }
 
-/**
- * hope's default loader — Lucide's `loader-circle`. A single arc the recipe's `loader` slot spins
- * (targeting the `svg` inside `data-slot="button-loader"`), so there are no per-part hook classes.
- */
-function ButtonLoader(): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
-}
-
 export const Button: Component<ButtonProps> = (props) => {
   // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props
   // and these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with
@@ -168,7 +149,7 @@ export const Button: Component<ButtonProps> = (props) => {
   //      the `when`+body pair that isn't.)
   const startDecorator = children(() => merged.startDecorator);
   const endDecorator = children(() => merged.endDecorator);
-  const loader = children(() => runIfFunction(merged.loader) ?? <ButtonLoader />);
+  const loader = children(() => runIfFunction(merged.loader) ?? <LoaderCircleIcon />);
   const loadingText = children(() => runIfFunction(merged.loadingText));
   const label = children(() => merged.children);
 

@@ -4,10 +4,12 @@ import {
   createListbox,
 } from "@hope-ui/primitives/listbox";
 import { renderElement } from "@hope-ui/primitives/render";
+import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { ListboxSize, ListboxThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, For, merge, omit, Show } from "solid-js";
+import { CheckIcon } from "../icons";
 import { ListboxContext, type ListboxContextValue } from "./listbox-context";
 
 /**
@@ -89,12 +91,15 @@ export interface ListboxRootProps<V = unknown>
  */
 export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props and
-  // this built-in default (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
+  // these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with `??`.
+  // The `checkIcon` factory defaults to hope's built-in check; a preset's `defaultProps.listbox` swaps
+  // it app-wide (and a per-`Listbox.Root` `checkIcon` prop wins over that).
   const merged = useDefaults({
     recipe: "listbox",
     props,
     defaults: {
       size: "md" as const,
+      checkIcon: () => <CheckIcon />,
     },
   });
 
@@ -115,9 +120,13 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // stays just as lazy and reactive (the controllable-state getters stay live) while being the single
   // source of truth. Cast into the provider — the `<V>` cannot flow through Solid context.
   const state = createListbox<V>(merged);
+  // The parts read behavior off `state`, classes off `slots`, and — when the `ItemIndicator` is given
+  // no `children` — its default glyph off `checkIcon`. An accessor (via `runIfFunction`), so each read
+  // builds a fresh glyph element from the resolved factory (instance ?? preset ?? built-in check).
   const context: ListboxContextValue = {
     state: state as unknown as CreateListboxReturn<unknown>,
     slots,
+    checkIcon: () => runIfFunction(merged.checkIcon),
   };
 
   // The passthrough native attributes: everything not consumed as a `createListbox` option, a recipe
@@ -126,6 +135,7 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   const rest = omit(
     merged,
     "size",
+    "checkIcon",
     "slotClasses",
     "class",
     "children",
