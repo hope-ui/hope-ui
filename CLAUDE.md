@@ -103,6 +103,22 @@ pnpm --filter @hope-ui/components typecheck
 Code") trailer or attribution line to commit messages.** Commit messages carry the change
 rationale only — no tool or assistant attribution, in any form.
 
+## Code style
+
+Optimize for the reader. The names carry the meaning; comments are the exception, not the
+running narration.
+
+- **Meaningful, unabbreviated names.** `getBackground()` not `o = getBg()`, `previousFocus`
+  not `pf`, `isDismissable` not `flag`. A name should say what the thing is or does with no
+  comment beside it. Single letters only for trivial loop indices or math (`i`, `x`, `y`).
+- **Comments explain _why_, not _what_.** The code already states what it does; a comment that
+  restates the next line is noise — delete it. Reserve comments for rationale, non-obvious
+  constraints, spec/issue links, and the hazards this repo already tracks (SSR/hydration,
+  Solid 2.0 gotchas). Those are _why_ comments and stay.
+- **If a function needs a paragraph of comment to be understood, the function is the problem,
+  not the missing comment.** Extract named helpers, split responsibilities, and rename until
+  the body reads top-to-bottom on its own. Refactor the code instead of annotating it.
+
 ## Changesets
 
 **While the repo is at `v0.0.0`, do NOT create a changeset — not on any commit or PR — unless
