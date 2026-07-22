@@ -18,7 +18,13 @@ export function buildYearCells(
   timeZone: string,
 ): CalendarCellModel[][] {
   const first = startOfYear(visibleMonth);
-  const monthName = new Intl.DateTimeFormat(locale, { month: "short", timeZone });
+  // Format in the date's own calendar system (see `month-view.ts` `formatMonthYear`), so the 12 cells
+  // read out the visible calendar's months — a no-op for the common Gregorian case.
+  const monthName = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    timeZone,
+    calendar: visibleMonth.calendar.identifier,
+  });
   const rows: CalendarCellModel[][] = [];
   for (let row = 0; row < MONTHS_PER_YEAR / YEAR_GRID_COLUMNS; row++) {
     const cells: CalendarCellModel[] = [];
@@ -36,9 +42,11 @@ export function buildYearCells(
   return rows;
 }
 
-/** Year-view heading label ("2026"), localized digits. */
+/** Year-view heading label ("2026"), localized digits, in the date's own calendar system. */
 export function formatYear(date: CalendarDate, locale: string, timeZone: string): string {
-  return new Intl.DateTimeFormat(locale, { year: "numeric", timeZone }).format(
-    date.toDate(timeZone),
-  );
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    timeZone,
+    calendar: date.calendar.identifier,
+  }).format(date.toDate(timeZone));
 }

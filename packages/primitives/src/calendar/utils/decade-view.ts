@@ -19,7 +19,13 @@ export function buildDecadeCells(
 ): CalendarCellModel[][] {
   const base = startOfYear(visibleMonth);
   const ds = decadeStart(visibleMonth.year);
-  const yearLabel = new Intl.DateTimeFormat(locale, { year: "numeric", timeZone });
+  // Format in the date's own calendar system (see `month-view.ts` `formatMonthYear`) — a no-op for the
+  // common Gregorian case.
+  const yearLabel = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    timeZone,
+    calendar: visibleMonth.calendar.identifier,
+  });
   const rows: CalendarCellModel[][] = [];
   for (let row = 0; row < DECADE_GRID_CELLS / DECADE_GRID_COLUMNS; row++) {
     const cells: CalendarCellModel[] = [];
@@ -49,8 +55,9 @@ export function formatDecadeRange(
   const ds = decadeStart(visibleMonth.year);
   const start = base.set({ year: ds });
   const end = base.set({ year: ds + YEARS_PER_DECADE - 1 });
-  return new Intl.DateTimeFormat(locale, { year: "numeric", timeZone }).formatRange(
-    start.toDate(timeZone),
-    end.toDate(timeZone),
-  );
+  return new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    timeZone,
+    calendar: base.calendar.identifier,
+  }).formatRange(start.toDate(timeZone), end.toDate(timeZone));
 }

@@ -1,4 +1,4 @@
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, IslamicUmalquraCalendar, toCalendar } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import {
   buildMonthCells,
@@ -89,5 +89,14 @@ describe("formatFullDate / formatMonthYear", () => {
     const date = new CalendarDate(2026, 1, 1);
     expect(formatFullDate(date, "en-US", "UTC")).toBe("Thursday, January 1, 2026");
     expect(formatMonthYear(date, "en-US", "UTC")).toBe("January 2026");
+  });
+
+  it("formats in the date's own (non-Gregorian) calendar system, not the locale default", () => {
+    // The same absolute instant as 2026-01-15, but as an Islamic (Umm al-Qura) date it is Rajab 26,
+    // 1447 AH. The heading + full name must read the Islamic month/year/era — matching the grid's
+    // Islamic day numbers — even under a plain (non `-u-ca-`) locale, not the Gregorian "January 2026".
+    const islamic = toCalendar(new CalendarDate(2026, 1, 15), new IslamicUmalquraCalendar());
+    expect(formatMonthYear(islamic, "en-US", "UTC")).toBe("Rajab 1447 AH");
+    expect(formatFullDate(islamic, "en-US", "UTC")).toBe("Thursday, Rajab 26, 1447 AH");
   });
 });

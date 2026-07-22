@@ -83,6 +83,8 @@ export interface Weekday {
 /**
  * The 7 localized weekday names rotated by `firstDayOfWeek`. `@internationalized/date` doesn't format
  * names, so this uses `Intl.DateTimeFormat` over a reference week (any week — names don't vary by date).
+ * No `calendar` option: the 7-day week is shared across calendar systems, so weekday names don't depend
+ * on it (unlike month/year/era — see `formatMonthYear`).
  */
 export function getWeekdays(
   locale: string,
@@ -101,7 +103,14 @@ export function getWeekdays(
   return out;
 }
 
-/** Full localized day name for a cell's `aria-label` ("Thursday, January 1, 2026"). */
+/**
+ * Full localized day name for a cell's `aria-label` ("Thursday, January 1, 2026").
+ *
+ * The `calendar` is derived from the date's own calendar system (`date.calendar.identifier`), not left
+ * to the locale's default — so an Islamic/Japanese/Buddhist `CalendarDate` reads out its own month/
+ * year/era (matching the grid's day numbers), and a Gregorian date over a non-Gregorian-default locale
+ * (e.g. `fa-IR`) still reads Gregorian. React-Aria style; a no-op for the common Gregorian case.
+ */
 export function formatFullDate(date: CalendarDate, locale: string, timeZone: string): string {
   return new Intl.DateTimeFormat(locale, {
     weekday: "long",
@@ -109,12 +118,16 @@ export function formatFullDate(date: CalendarDate, locale: string, timeZone: str
     month: "long",
     day: "numeric",
     timeZone,
+    calendar: date.calendar.identifier,
   }).format(date.toDate(timeZone));
 }
 
-/** Month-view heading label ("January 2026"). */
+/** Month-view heading label ("January 2026"), in the date's own calendar system (see `formatFullDate`). */
 export function formatMonthYear(date: CalendarDate, locale: string, timeZone: string): string {
-  return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone }).format(
-    date.toDate(timeZone),
-  );
+  return new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone,
+    calendar: date.calendar.identifier,
+  }).format(date.toDate(timeZone));
 }

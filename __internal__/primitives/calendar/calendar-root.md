@@ -58,6 +58,27 @@ itself — it only exposes the state the styled component's hidden `<input>`s co
 predicates, and the Listbox `formValues` — so it adds no reactive node to the render and stays
 hydration-neutral.
 
+## Calendar-aware formatting (non-Gregorian systems)
+
+The grid **math** is already calendar-system-aware (`@internationalized/date`'s
+`startOfWeek`/`getWeeksInMonth`/`add`/`isSameMonth` respect a `CalendarDate`'s calendar) and day
+numbers localize to the numbering system. The `Intl.DateTimeFormat` formatters
+(`utils/month-view.ts`'s `formatMonthYear`/`formatFullDate`, plus the year/decade formatters) also
+derive their **`calendar` from the date itself** (`date.calendar.identifier`), React-Aria style —
+they are **not** left to the locale's default calendar. This means:
+
+- An Islamic / Japanese / Buddhist `CalendarDate` (built via `toCalendar(today(tz), …)`) reads out its
+  **own** month/year/era in the heading + `aria-label` — matching the grid's day numbers — **even under
+  a plain locale** without a `-u-ca-` extension (e.g. `en-US` → "Rajab 1447 AH", not "January 2026").
+- A Gregorian date under a non-Gregorian-default locale (e.g. `fa-IR`, whose default is Persian) still
+  reads Gregorian, matching its Gregorian day numbers.
+- It is a **no-op for the common Gregorian case** (`calendar: "gregory"` ≡ omitting it for `en-US`).
+
+`getWeekdays` takes **no** `calendar` option: the 7-day week is shared across calendar systems, so
+weekday names don't depend on it (only month/year/era do). For the fully-localized experience, still
+pair a non-Gregorian date with a matching `-u-ca-` locale (e.g. `ar-SA-u-ca-islamic-umalqura`) so the
+numbering system and directionality line up too — but the calendar system alone no longer requires it.
+
 ## The view machine
 
 `view` selects what `visibleMonth` is shown *as*; `cells`/`headingLabel`/boundary math/predicates all

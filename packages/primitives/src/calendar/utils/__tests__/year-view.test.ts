@@ -1,4 +1,4 @@
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, IslamicUmalquraCalendar, toCalendar } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import { buildYearCells, formatYear, MONTHS_PER_YEAR } from "../year-view";
 
@@ -25,10 +25,21 @@ describe("buildYearCells", () => {
     expect(flat[0]?.label).toBe("Jan");
     expect(flat[11]?.label).toBe("Dec");
   });
+
+  it("labels months in the date's own (non-Gregorian) calendar system", () => {
+    // As an Islamic (Umm al-Qura) date this is year 1447; its first month is Muharram, not January.
+    const islamic = toCalendar(new CalendarDate(2026, 1, 15), new IslamicUmalquraCalendar());
+    expect(buildYearCells(islamic, "en-US", "UTC").flat()[0]?.label).toBe("Muh.");
+  });
 });
 
 describe("formatYear", () => {
   it("formats the year heading", () => {
     expect(formatYear(new CalendarDate(2026, 6, 1), "en-US", "UTC")).toBe("2026");
+  });
+
+  it("formats the year heading in the date's own calendar system", () => {
+    const islamic = toCalendar(new CalendarDate(2026, 1, 15), new IslamicUmalquraCalendar());
+    expect(formatYear(islamic, "en-US", "UTC")).toBe("1447 AH");
   });
 });
