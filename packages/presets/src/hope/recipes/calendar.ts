@@ -58,12 +58,16 @@ export const calendarRecipe = tv({
       // A one-day range is start AND end — squared on both sides by the two rules above, which would
       // leave a square band peeking around the rounded pill. Two attributes, so it wins on specificity.
       "[&[data-range-start][data-range-end]]:rounded-md",
-
-      "data-highlighted:bg-selected data-highlighted:rounded-none",
-      "data-highlighted:first:rounded-s-md data-highlighted:last:rounded-e-md",
+      // An endpoint that lands on a row edge is its row's whole band segment: round its outer corner so
+      // the segment closes, mirroring the middle-cell row-wrap rounding below (`:first`/`:last`, `md`).
+      "data-range-start:last:rounded-e-md",
+      "data-range-end:first:rounded-s-md",
 
       "data-range-middle:bg-selected data-range-middle:rounded-none",
       "data-range-middle:first:rounded-s-md data-range-middle:last:rounded-e-md",
+
+      "data-highlighted:bg-selected data-highlighted:rounded-none",
+      "data-highlighted:first:rounded-s-md data-highlighted:last:rounded-e-md",
     ],
     // The roving day `<button>`, `z-10` above the cell band. Fills its column (`h-(--cell-size) w-full`);
     // the reserved transparent border is colored on focus. The roving ring is driven by the primitive's
@@ -73,15 +77,36 @@ export const calendarRecipe = tv({
     cellTrigger: [
       "relative z-10 flex h-(--cell-size) w-full items-center justify-center rounded-md border border-transparent font-normal outline-none select-none",
       "transition-[color,background-color,border-color,box-shadow]",
-      "group-focus-within/grid:data-focused:border-focus group-focus-within/grid:data-focused:ring-3 group-focus-within/grid:data-focused:ring-focus-halo",
-      "data-today:text-primary",
-      "data-outside-month:text-foreground-subtle",
-      "data-unavailable:line-through data-unavailable:text-foreground-disabled",
+
+      // Text color is painted by exactly ONE rule: each rule excludes every state above it, so the guard
+      // chain IS the whole precedence — never class/emit order. (tailwind-merge keeps these differently-
+      // guarded arbitrary variants side by side, so array order can't decide between two matches anyway;
+      // making them mutually exclusive is what removes the dependence on order entirely.)
+      // High→low: disabled › selected endpoint › band (range-middle | highlighted) › unavailable › today › outside.
       "data-disabled:pointer-events-none data-disabled:opacity-disabled data-disabled:text-foreground-disabled",
-      "[&[data-selected]:not([data-range-middle])]:bg-primary",
-      "[&[data-selected]:not([data-range-middle])]:text-on-primary",
-      "data-highlighted:text-on-selected",
-      "data-range-middle:text-on-selected",
+
+      // Solid endpoint pill (bg painted here; the continuous band lives on the <td>). Stays a pill while
+      // it is the preview anchor, so it deliberately does NOT exclude data-highlighted.
+      "[&[data-selected]:not([data-range-middle]):not([data-disabled])]:bg-primary [&[data-selected]:not([data-range-middle]):not([data-disabled])]:text-on-primary",
+
+      // Sitting on the band (committed middle, or tentative preview) — legible on bg-selected.
+      "[&[data-range-middle]:not([data-disabled])]:text-on-selected",
+      "[&[data-highlighted]:not([data-selected]):not([data-disabled])]:text-on-selected",
+
+      // Unavailable: the strike always shows; the muted color yields only to a band the day sits on.
+      "data-unavailable:line-through",
+      "[&[data-unavailable]:not([data-selected]):not([data-highlighted]):not([data-disabled])]:text-foreground-disabled",
+
+      // Today / outside-month tints — lowest, so they never fight the band or the unavailable mark.
+      "[&[data-today]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-disabled])]:text-primary",
+      "[&[data-outside-month]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
+
+      // Hover wash only on a plain, actionable day (unavailable stays interactive, so exclude it too).
+      "[&:not([data-disabled]):not([data-unavailable]):not([data-highlighted]):not([data-range-middle]):not([data-selected]):hover]:bg-surface-raised-hovered",
+
+      // Roving ring: keyed off the primitive's data-focused (the roving cursor), gated on the grid
+      // holding focus (group-focus-within/grid) — no :focus-visible dependence, so arrow-nav shows it.
+      "group-focus-within/grid:data-focused:border-focus group-focus-within/grid:data-focused:ring-3 group-focus-within/grid:data-focused:ring-focus-halo",
     ],
   },
   variants: {
