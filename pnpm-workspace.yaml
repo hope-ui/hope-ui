@@ -34,6 +34,14 @@ catalog:
   "@zag-js/core": 1.42.0
   "@zag-js/types": 1.42.0
   "@zag-js/utils": 1.42.0
+  # The dialog machine + the three utility packages it pulls in, consumed by the `ZagDialog`
+  # spike (`packages/components/src/zag-dialog/`). Same lockstep rule: a machine and the core
+  # that interprets it are one unit, so these stay pinned to the forked adapter's version.
+  "@zag-js/aria-hidden": 1.42.0
+  "@zag-js/dialog": 1.42.0
+  "@zag-js/dismissable": 1.42.0
+  "@zag-js/focus-trap": 1.42.0
+  "@zag-js/remove-scroll": 1.42.0
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
@@ -51,6 +59,11 @@ minimumReleaseAgeExclude:
   - '@zag-js/core@1.42.0'
   - '@zag-js/types@1.42.0'
   - '@zag-js/utils@1.42.0'
+  - '@zag-js/aria-hidden@1.42.0'
+  - '@zag-js/dialog@1.42.0'
+  - '@zag-js/dismissable@1.42.0'
+  - '@zag-js/focus-trap@1.42.0'
+  - '@zag-js/remove-scroll@1.42.0'
   # apps/docs (TanStack Start) deps still in cooldown — excluded so `pnpm install` isn't gated.
   - '@tanstack/solid-router@2.0.0-beta.24'
   - '@tanstack/solid-start@2.0.0-beta.25'

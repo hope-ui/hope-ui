@@ -220,6 +220,12 @@ catalogs:
     '@zag-js/core':
       specifier: 1.42.0
       version: 1.42.0
+    '@zag-js/dialog':
+      specifier: 1.42.0
+      version: 1.42.0
+    '@zag-js/dismissable':
+      specifier: 1.42.0
+      version: 1.42.0
     '@zag-js/types':
       specifier: 1.42.0
       version: 1.42.0
@@ -388,6 +394,9 @@ importers:
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.2
+      '@zag-js/dialog':
+        specifier: 'catalog:'
+        version: 1.42.0
     devDependencies:
       '@hope-ui/internal-test-utils':
         specifier: workspace:*
@@ -398,6 +407,9 @@ importers:
       '@solidjs/web':
         specifier: 'catalog:'
         version: 2.0.0-beta.19(solid-js@2.0.0-beta.19)
+      '@zag-js/dismissable':
+        specifier: 'catalog:'
+        version: 1.42.0
       solid-js:
         specifier: 'catalog:'
         version: 2.0.0-beta.19
@@ -2253,11 +2265,32 @@ packages:
   '@yuku-toolchain/types@0.5.43':
     resolution: {integrity: sha512-kSpvPntnXw5+lYjO71ffBEnQ5ycQ74KGIYknh0TS4xeyCuBkOqxyJumxZkMhLBBUCLjDAbx2+Icnr3Zh4ftjpQ==}
 
+  '@zag-js/anatomy@1.42.0':
+    resolution: {integrity: sha512-F6kRAPxgBZRZmuV5SLywcrGNSclKcAcPAAgSrEdr2Z2dzFgQngbvS4dmdQyGau/vtQ42OlCI48Ri4t0hZxXkMw==}
+
+  '@zag-js/aria-hidden@1.42.0':
+    resolution: {integrity: sha512-ao1RyEbHbglJtLLR4sJLPiD3hWF1CacuN5eqvODh/7HcntWULrkUHo8DIdzYgFL9GUHDyDmpaechMX5wL3kdPg==}
+
   '@zag-js/core@1.42.0':
     resolution: {integrity: sha512-jE/sbpZvbD+/etbawzhL/L2lP1pPefed5d919je+K5h9b6GAK3lUThleaDUCww3bT53B1L7O5gtqBapW37N1ug==}
 
+  '@zag-js/dialog@1.42.0':
+    resolution: {integrity: sha512-2KpLQASTjr2JUR0XvqsMueVo+AAPeanD9ShFCY/YKv2qp6WRHo1Ig/tRj6pInsSBiHFo7QXyAD4SDax6C0zDcw==}
+
+  '@zag-js/dismissable@1.42.0':
+    resolution: {integrity: sha512-Cx/FAQ2MuQy3kecdmswrFk94Zie1ieBa1Pnt/2ECI5FR914EJd3DwY9Krsmlrq4Z15Wm+pVtfLXgakDewVgsiQ==}
+
   '@zag-js/dom-query@1.42.0':
     resolution: {integrity: sha512-JgCNfp7F+YNFNb7Xmt6rXQr3N3V9Mp+pFRvZ8j5BTC3/G8ZYj/enrgOcuVwPlXPBGtA7ysvjig2x1c0Uou/6kg==}
+
+  '@zag-js/focus-trap@1.42.0':
+    resolution: {integrity: sha512-47O/OpLUm9o8CZd3ez0ntAOUKZEQ1zFj7e86fpYuQ+fNtBlpYMFHQxMRftPkiU5Ysjrz5x8RYV8A8uJ9cboNig==}
+
+  '@zag-js/interact-outside@1.42.0':
+    resolution: {integrity: sha512-CNNT1OtASacXEst8NMWDGmDwkOQgVQ0Ahc2SpPjSBZoVpxQIfhZ9FoeqcggDX7Nvze7kl6/OwA7pPi5TGQTVZQ==}
+
+  '@zag-js/remove-scroll@1.42.0':
+    resolution: {integrity: sha512-RP1SzQuVDk+np5knkEz/mRasLHZUbO6f3xgq4M2u4SQhpOe34uJybd+14f4ElBntAJQWVeMhohpW4n0pNUW6WQ==}
 
   '@zag-js/types@1.42.0':
     resolution: {integrity: sha512-4ghao1wuLouepdYMheEYtyOlKpVsvL0Eg9tf//5VyAf7S9zC7cgGxD6ttGTlIMxqKqnAuxIMsYHG76qkb8tv1w==}
@@ -5596,14 +5629,51 @@ snapshots:
 
   '@yuku-toolchain/types@0.5.43': {}
 
+  '@zag-js/anatomy@1.42.0': {}
+
+  '@zag-js/aria-hidden@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+
   '@zag-js/core@1.42.0':
     dependencies:
       '@zag-js/dom-query': 1.42.0
       '@zag-js/utils': 1.42.0
 
+  '@zag-js/dialog@1.42.0':
+    dependencies:
+      '@zag-js/anatomy': 1.42.0
+      '@zag-js/aria-hidden': 1.42.0
+      '@zag-js/core': 1.42.0
+      '@zag-js/dismissable': 1.42.0
+      '@zag-js/dom-query': 1.42.0
+      '@zag-js/focus-trap': 1.42.0
+      '@zag-js/remove-scroll': 1.42.0
+      '@zag-js/types': 1.42.0
+      '@zag-js/utils': 1.42.0
+
+  '@zag-js/dismissable@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+      '@zag-js/interact-outside': 1.42.0
+      '@zag-js/utils': 1.42.0
+
   '@zag-js/dom-query@1.42.0':
     dependencies:
       '@zag-js/types': 1.42.0
+
+  '@zag-js/focus-trap@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+
+  '@zag-js/interact-outside@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+      '@zag-js/utils': 1.42.0
+
+  '@zag-js/remove-scroll@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
 
   '@zag-js/types@1.42.0':
     dependencies:
