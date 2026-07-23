@@ -30,9 +30,11 @@ together: the adapter and the core it adapts are one unit.
 | `onMount(() => { … })`              | `onSettled(() => { … })`                     | `onMount` is gone in 2.0. `onSettled` takes a *returned* teardown instead of an inner `onCleanup`. |
 | `mergeProps(a, b)` (from `solid-js`) | `merge(a, b)`                               | `mergeProps` is gone. Both call sites only *add* method keys, so `merge`'s presence-based key resolution is equivalent there. |
 | `createEffect(fn)`                  | `createEffect(compute, effect)`              | 2.0 rejects the single-argument form outright (`[MISSING_EFFECT_FN]`). See `track.md`, `bindable.md`. |
+| `effect()` in `createTrack`         | `untrack(effect)`                            | A `track` callback is a side effect, not a subscription, but machines read `prop(...)` inside it (dialog's `toggleVisibility`). 2.0's effect phase is strict-read-labelled, so an unwrapped call emits `[STRICT_READ_UNTRACKED]` on every controlled open/close. See `track.md`. |
 | `createSignal(initial)` in `bindable` | a boxed `createSignal<{ value: T }>`       | 2.0's `createSignal(fn)` is the *memo* overload, so a function-valued state would be invoked instead of stored. See `bindable.md`. |
 | `function flush(fn) { fn() }`       | `flush` from `solid-js`                      | Upstream's no-op was correct only because Solid 1.x propagated writes synchronously. See "The flush" below. |
 | `import type { JSX } from "solid-js"` | `from "@solidjs/web"`                      | 2.0 moved the DOM/JSX types there; it is also this repo's `jsxImportSource`. |
+| a boolean `aria-*` value passes through `normalizeProps` unchanged | stringified (`false` → `"false"`) | **The one bug fix in the fork, not a migration.** Solid's `setAttribute` writes `true` as `""` and *removes* the attribute for `false`, so `aria-modal={true}` shipped `aria-modal=""` (axe: `aria-valid-attr-value`) and `aria-expanded={false}` shipped nothing at all. Upstream has the same bug — it is invisible there because React's DOM layer stringifies `aria-*` for you. Found by `ZagDialog`; see `normalize-props.md` and `__internal__/spikes/zag-dialog-findings.md`. Upstreaming it is the real fix. |
 
 ## API
 

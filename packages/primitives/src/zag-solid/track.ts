@@ -1,5 +1,5 @@
 import { isEqual, isFunction } from "@zag-js/utils";
-import { createEffect } from "solid-js";
+import { createEffect, untrack } from "solid-js";
 
 function access<T>(v: T | (() => T)): T {
   if (isFunction(v)) {
@@ -27,7 +27,13 @@ export const createTrack = (deps: any[], effect: VoidFunction) => {
       }
       const changed = current.some((value, index) => !isEqual(value, previous[index]));
       if (changed) {
-        effect();
+        // `untrack`: a Zag `track` callback is a side effect, not a subscription — `deps` above is
+        // the whole of its reactive input. The callbacks machines pass here read `prop(...)` and
+        // `context.get(...)` freely (dialog's `toggleVisibility` reads `prop("open")` to decide
+        // which controlled event to send), and 2.0 runs an effect's second callback in a
+        // strict-read-labelled phase, so an unwrapped call emits `[STRICT_READ_UNTRACKED]`. Solid
+        // 1.x had no such phase, so upstream never had to spell this.
+        untrack(effect);
       }
     },
   );

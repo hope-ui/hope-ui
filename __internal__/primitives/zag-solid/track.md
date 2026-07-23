@@ -52,3 +52,15 @@ The compute returns a fresh array each run, so it is always reference-unequal an
 always notified when a dep changes; the deep comparison then decides whether to actually run.
 Splitting this way also keeps every tracking read inside the compute, which is what the
 `STRICT_READ_UNTRACKED` diagnostic wants.
+
+## The callback runs `untrack`ed
+
+`effect()` is called as `untrack(effect)`. A `track` callback is a **side effect, not a
+subscription** — `deps` is the whole of its reactive input, by construction. But the callbacks
+machines actually pass read machine state freely: `@zag-js/dialog`'s `watch` tracks `prop("open")`
+and then runs `toggleVisibility`, which reads `prop("open")` again to decide whether to send
+`CONTROLLED.OPEN` or `CONTROLLED.CLOSE`. Solid 2.0 runs an effect's second callback in a
+strict-read-labelled phase, so that read emits `[STRICT_READ_UNTRACKED]` — one per controlled
+open/close — and `mount()` fails the test on it. Solid 1.x had no such phase, so upstream does not
+spell this. Found by `ZagDialog`'s controlled-state test; see
+`__internal__/spikes/zag-dialog-findings.md`.

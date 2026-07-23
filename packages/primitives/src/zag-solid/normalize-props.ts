@@ -40,6 +40,22 @@ export const normalizeProps = createNormalizer<PropTypes>((props: Dict) => {
       continue;
     }
 
+    // Zag emits ARIA state as real booleans (`aria-expanded: false`, `aria-modal: true`), which is
+    // correct for React — its DOM layer stringifies `aria-*`. Solid's does not: `setAttribute` is
+    // `value == null || value === false ? removeAttribute(name) : setAttribute(name, value === true
+    // ? "" : value)`, and the SSR serializer agrees. So an unconverted boolean ships as
+    // `aria-modal=""` (not a valid value for an enumerated ARIA attribute — axe raises
+    // `aria-valid-attr-value`) or, when false, as no attribute at all, which silently loses the
+    // state. Same class of bug as the `readOnly` rule above, and the reason for it is the same.
+    //
+    // A **deviation from upstream**, which has this bug too (invisible there because no Zag Solid
+    // component is exercised against axe). Upstreaming it is the right fix; until then it lives
+    // here, because every Solid Zag consumer hits it. See `machine.md`'s deviation table.
+    if (typeof value === "boolean" && key.startsWith("aria-")) {
+      normalized[key] = String(value);
+      continue;
+    }
+
     if (key === "style" && isObject(value)) {
       normalized["style"] = cssify(value);
       continue;

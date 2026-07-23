@@ -13,7 +13,8 @@
  * - `mergeProps` → `merge` (`machine`). Both call sites only add method keys, so `merge`'s
  *   presence-based key resolution is equivalent there.
  * - Single-argument `createEffect` → the split `(compute, effect)` pair (`track`, `bindable`);
- *   2.0 rejects the one-argument form outright.
+ *   2.0 rejects the one-argument form outright. `track` additionally runs its callback `untrack`ed,
+ *   because machines read `prop(...)` inside it and 2.0's effect phase is strict-read-labelled.
  * - `bindable`'s signal is **boxed** (`{ value: T }` + an unwrapping `equals`), because 2.0's
  *   `createSignal(fn)` is the memo overload and would invoke a function-valued state instead of
  *   storing it. `use-sync-external-store`'s snapshot is boxed for the same reason.
@@ -21,6 +22,10 @@
  *   synchronously; 2.0's client build defers them to the next flush, so the machine's state write
  *   is drained at the call site — the same thing the React adapter does with `flushSync`.
  * - `JSX` types come from `@solidjs/web` (2.0's DOM package, and this repo's `jsxImportSource`).
+ * - `normalizeProps` **stringifies boolean `aria-*` values** — the fork's one bug fix rather than a
+ *   migration. Solid's `setAttribute` writes `true` as `""` and removes the attribute for `false`,
+ *   so Zag's boolean ARIA state shipped as `aria-modal=""` or as nothing at all. Upstream has the
+ *   same bug (React stringifies `aria-*`, so it never surfaces there).
  *
  * See `__internal__/primitives/zag-solid/machine.md`.
  */

@@ -31,16 +31,46 @@ describe("normalizeProps", () => {
   it("passes unmapped props through untouched", () => {
     const props = normalizeProps.element({
       id: "trigger",
-      "aria-expanded": false,
       "data-state": "open",
       onClick: undefined,
     } as any) as Record<string, unknown>;
 
     expect(props).toEqual({
       id: "trigger",
-      "aria-expanded": false,
       "data-state": "open",
       onClick: undefined,
+    });
+  });
+
+  it("stringifies boolean `aria-*` values, in both directions", () => {
+    // Zag emits ARIA state as real booleans. Solid's `setAttribute` writes `true` as `""` and
+    // removes the attribute for `false`, so an unconverted boolean ships either an invalid
+    // enumerated value (axe: `aria-valid-attr-value`) or no state at all. A deviation from
+    // upstream — see `normalize-props.md`.
+    expect(
+      normalizeProps.element({
+        "aria-expanded": false,
+        "aria-modal": true,
+      } as any),
+    ).toEqual({
+      "aria-expanded": "false",
+      "aria-modal": "true",
+    });
+  });
+
+  it("leaves non-`aria-` booleans and non-boolean `aria-` values alone", () => {
+    expect(
+      normalizeProps.element({
+        "data-open": true,
+        disabled: false,
+        "aria-label": "Close",
+        "aria-level": 2,
+      } as any),
+    ).toEqual({
+      "data-open": true,
+      disabled: false,
+      "aria-label": "Close",
+      "aria-level": 2,
     });
   });
 
