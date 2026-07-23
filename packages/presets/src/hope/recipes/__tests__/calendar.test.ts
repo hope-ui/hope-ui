@@ -95,6 +95,9 @@ describe("hope calendar recipe", () => {
     expect(cell).toContain("data-range-middle:last:rounded-e-md");
     expect(cell).toContain("data-highlighted:first:rounded-s-md");
     expect(cell).toContain("data-highlighted:last:rounded-e-md");
+    // A one-day range reports start AND end; without this it squares both sides and the band shows
+    // as corners around the rounded pill (every range selection passes through this state).
+    expect(cell).toContain("[&[data-range-start][data-range-end]]:rounded-md");
     // Logical sides only (`-s-`/`-e-`), never physical, so RTL mirrors for free.
     expect(cell).not.toMatch(/rounded-(?:tl|tr|bl|br|l|r)-/);
     // The pill on top stays uniformly rounded — the band, not the trigger, carries the range shape.

@@ -55,6 +55,9 @@ export const calendarRecipe = tv({
 
       "data-range-start:bg-selected data-range-start:rounded-e-none",
       "data-range-end:bg-selected data-range-end:rounded-s-none",
+      // A one-day range is start AND end — squared on both sides by the two rules above, which would
+      // leave a square band peeking around the rounded pill. Two attributes, so it wins on specificity.
+      "[&[data-range-start][data-range-end]]:rounded-md",
 
       "data-highlighted:bg-selected data-highlighted:rounded-none",
       "data-highlighted:first:rounded-s-md data-highlighted:last:rounded-e-md",
