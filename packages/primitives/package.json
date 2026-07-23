@@ -14,7 +14,8 @@
       "modal-backdrop": "src/modal-backdrop/index.ts",
       "internal": "src/internal/index.ts",
       "render": "src/render/index.ts",
-      "utils": "src/utils/index.ts"
+      "utils": "src/utils/index.ts",
+      "zag-solid": "src/zag-solid/index.ts"
     }
   },
   "exports": {
@@ -46,6 +47,10 @@
       "types": "./dist/utils/index.d.ts",
       "solid": "./dist/utils/index.jsx"
     },
+    "./zag-solid": {
+      "types": "./dist/zag-solid/index.d.ts",
+      "solid": "./dist/zag-solid/index.jsx"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -65,7 +70,10 @@
   "dependencies": {
     "@hope-ui/i18n": "workspace:*",
     "@internationalized/date": "catalog:",
-    "@solid-primitives/a11y": "catalog:"
+    "@solid-primitives/a11y": "catalog:",
+    "@zag-js/core": "catalog:",
+    "@zag-js/types": "catalog:",
+    "@zag-js/utils": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",

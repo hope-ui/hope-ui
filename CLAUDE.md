@@ -311,6 +311,18 @@ them rather than re-deriving a behavior in a comment.
     month/year/decade calendar with single/range/multiple selection), built on
     `@internationalized/date`; same root-state-plus-per-part shape as `dialog/`. Reads locale +
     `t` from `@hope-ui/i18n` (its own package — see the Package layout above).
+  - `zag-solid/` (`@hope-ui/primitives/zag-solid`) — a **temporary vendored fork** of
+    `@zag-js/solid@1.42.0` (`chakra-ui/zag`, MIT), migrated to SolidJS 2.0: the `useMachine`
+    adapter that binds a Zag.js machine to Solid reactivity, plus its prop
+    normalize/merge helpers. The official adapter targets Solid 1.x; this exists **only** until
+    upstream ships a 2.0-compatible release, at which point the folder is deleted and
+    `@zag-js/solid` is installed in its place. It is therefore a **minimal-diff fork** — upstream's
+    file layout and public API are preserved verbatim, and only what 2.0 forces was changed
+    (`onMount`→`onSettled`, `mergeProps`→`merge`, the split `createEffect`, a boxed `bindable`
+    signal, a real `flush`, `JSX` from `@solidjs/web`, and no `Key` re-export). Do not refactor it
+    toward house style. `@zag-js/{core,types,utils}` are pinned in lockstep with the forked
+    adapter's version. Full rationale + deviation table:
+    `__internal__/primitives/zag-solid/machine.md`.
 
   **Modality is four mechanisms, not one**, and each was verified against the installed
   Chromium rather than assumed. `createHideOutside` applies `aria-hidden` (accessibility tree)

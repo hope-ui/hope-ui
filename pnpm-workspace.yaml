@@ -27,6 +27,13 @@ catalog:
   # solid-js/@solidjs/web ^2.0.0-beta. Adoption verdict: __internal__/solid-primitives-eval.md.
   # (`@solid-primitives/i18n` was dropped — hope-ui's i18n module now ships its own catalog+resolver.)
   "@solid-primitives/a11y": 1.0.0-next.0
+  # The Zag.js core trio, framework-agnostic pure TS (they import no framework). Consumed by the
+  # vendored `@zag-js/solid` fork at `packages/primitives/src/zag-solid/`, which must stay pinned
+  # to the exact adapter version it was forked from — so these move in lockstep, like the solid
+  # trio. See `__internal__/primitives/zag-solid/machine.md`.
+  "@zag-js/core": 1.42.0
+  "@zag-js/types": 1.42.0
+  "@zag-js/utils": 1.42.0
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
@@ -41,6 +48,9 @@ minimumReleaseAgeExclude:
   - '@tanstack/virtual-core@3.17.4'
   - '@internationalized/date@3.12.2'
   - '@solid-primitives/a11y@1.0.0-next.0'
+  - '@zag-js/core@1.42.0'
+  - '@zag-js/types@1.42.0'
+  - '@zag-js/utils@1.42.0'
   # apps/docs (TanStack Start) deps still in cooldown — excluded so `pnpm install` isn't gated.
   - '@tanstack/solid-router@2.0.0-beta.24'
   - '@tanstack/solid-start@2.0.0-beta.25'

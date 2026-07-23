@@ -217,6 +217,15 @@ catalogs:
     '@tanstack/virtual-core':
       specifier: 3.17.4
       version: 3.17.4
+    '@zag-js/core':
+      specifier: 1.42.0
+      version: 1.42.0
+    '@zag-js/types':
+      specifier: 1.42.0
+      version: 1.42.0
+    '@zag-js/utils':
+      specifier: 1.42.0
+      version: 1.42.0
     solid-js:
       specifier: 2.0.0-beta.19
       version: 2.0.0-beta.19
@@ -442,6 +451,15 @@ importers:
       '@solid-primitives/a11y':
         specifier: 'catalog:'
         version: 1.0.0-next.0(@solidjs/web@2.0.0-beta.19(solid-js@2.0.0-beta.19))(solid-js@2.0.0-beta.19)
+      '@zag-js/core':
+        specifier: 'catalog:'
+        version: 1.42.0
+      '@zag-js/types':
+        specifier: 'catalog:'
+        version: 1.42.0
+      '@zag-js/utils':
+        specifier: 'catalog:'
+        version: 1.42.0
     devDependencies:
       '@hope-ui/internal-test-utils':
         specifier: workspace:*
@@ -2234,6 +2252,18 @@ packages:
 
   '@yuku-toolchain/types@0.5.43':
     resolution: {integrity: sha512-kSpvPntnXw5+lYjO71ffBEnQ5ycQ74KGIYknh0TS4xeyCuBkOqxyJumxZkMhLBBUCLjDAbx2+Icnr3Zh4ftjpQ==}
+
+  '@zag-js/core@1.42.0':
+    resolution: {integrity: sha512-jE/sbpZvbD+/etbawzhL/L2lP1pPefed5d919je+K5h9b6GAK3lUThleaDUCww3bT53B1L7O5gtqBapW37N1ug==}
+
+  '@zag-js/dom-query@1.42.0':
+    resolution: {integrity: sha512-JgCNfp7F+YNFNb7Xmt6rXQr3N3V9Mp+pFRvZ8j5BTC3/G8ZYj/enrgOcuVwPlXPBGtA7ysvjig2x1c0Uou/6kg==}
+
+  '@zag-js/types@1.42.0':
+    resolution: {integrity: sha512-4ghao1wuLouepdYMheEYtyOlKpVsvL0Eg9tf//5VyAf7S9zC7cgGxD6ttGTlIMxqKqnAuxIMsYHG76qkb8tv1w==}
+
+  '@zag-js/utils@1.42.0':
+    resolution: {integrity: sha512-Km0r9hY+f6/oCJXrO4nqCIuo+4gTqbloD0V0q7B8Jq8qeWte7HN+YJSagVlk8tfADqFMRgEW4Rug0bYHzrGbVA==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -5565,6 +5595,21 @@ snapshots:
     optional: true
 
   '@yuku-toolchain/types@0.5.43': {}
+
+  '@zag-js/core@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+      '@zag-js/utils': 1.42.0
+
+  '@zag-js/dom-query@1.42.0':
+    dependencies:
+      '@zag-js/types': 1.42.0
+
+  '@zag-js/types@1.42.0':
+    dependencies:
+      csstype: 3.2.3
+
+  '@zag-js/utils@1.42.0': {}
 
   acorn-jsx@5.3.2(acorn@8.17.0):
     dependencies:

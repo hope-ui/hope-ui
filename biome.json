@@ -36,6 +36,21 @@
   },
   "overrides": [
     {
+      "includes": ["packages/primitives/src/zag-solid/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noDoubleEquals": "off"
+          },
+          "complexity": {
+            "useOptionalChain": "off",
+            "useLiteralKeys": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/*.browser.test.tsx"],
       "linter": {
         "rules": {
