@@ -48,7 +48,7 @@ would be visible and countable. Each is code hope-ui would own forever under ado
 | C3 | `ModalBackdrop` — a real element blocking the pointer, deliberately spared from `inert`; a consumer `Dialog.Backdrop` hit-tests above it and keeps its handlers. | `pointer-events: none` + `data-inert` on `<body>`, with `auto` restored on the **layer node only** — the content. `Backdrop` and `Positioner` are `layerStyleTargets`, which get `--layer-index`/`--z-index` bookkeeping and no pointer restoration. | **Regression, and a subtle one.** A consumer's `ZagDialog.Backdrop` receives no `pointerdown`, no `click` and no `:hover` while modal — its handlers are simply dead. Dismissal still works (Zag listens on the document), so nothing looks broken. Every outside-click test had to be re-aimed at `<html>`. Upside: one fewer element, no backdrop-vs-`inert` interaction to get wrong. |
 | C4 | `aria-labelledby`/`aria-describedby` come from ids **registered by the parts that actually mount**, so they are never dangling. | DOM-sniffed: `checkRenderedElements` runs in a `raf` after open with `rendered` defaulting to `{title: true, description: true}`. | **Regression, time-boxed.** A dialog with no `Description` advertises a dangling `aria-describedby` for ≥1 frame. Pinned by a new test with no Dialog counterpart. |
 | C5 | Non-modal: focus is **not** moved into the dialog, and Escape restores it to the trigger (`createFocusRestore`, gated on `open()` alone — a deliberate fix). | Zag derives `trapFocus` from `modal`, and honours `restoreFocus` *inside the trap* (`returnFocusOnDeactivate`). A non-modal dialog therefore never restores — while its `setInitialFocus` action still moves focus in. Escape leaves focus on `<body>`. | **Regression**, and exactly the bug hope fixed by lifting restore out of the focus trap. |
-| C6 | A consumer `id` on `Content` is honoured, and `aria-controls` points at it. | Impossible. Every part id is `dialog:<scope>:<part>` and the machine finds its own elements with `getElementById`; letting a consumer `id` through breaks the dismiss layer, the focus trap and the aria-hiding at once. | **Regression.** Each part now drops `id` from the consumer's props outright. The supported route is the machine's `ids` prop on `Root` — a Root-level prop for a Content-level concern. |
+| C6 | A consumer `id` on `Content` is honoured, and `aria-controls` points at it. | ~~Impossible.~~ **See correction G1 — this row was wrong.** Zag's `ids` prop does exactly this, correctly. | ~~Regression~~ → **Delta, ergonomic only.** |
 | C7 | Synchronous state (`createControllableState`). | `send` is `queueMicrotask`-deferred by design, and a controlled change routes `watch` → `toggleVisibility` → `CONTROLLED.OPEN`. | **Neutral-to-worse.** Every observation of a state change in the ported suite became a `vi.waitFor`. No user-visible defect found. |
 | C8 | `initialFocus` on `Content`. | `initialFocusEl` is a machine prop, so it moves to `Root`. | **Public API delta** — the only one. Docs/examples would need the change. |
 | C9 | `aria-modal` omitted when non-modal. | Stated explicitly as `aria-modal="false"`. | **Delta, arguably better.** Both are correct ARIA. |
@@ -57,6 +57,10 @@ would be visible and countable. Each is code hope-ui would own forever under ado
 | C12 | — | Unexposed Zag extras: `finalFocusEl`, `restoreFocus`, `trapFocus`, `preventScroll`, `persistentElements`, `triggerValue`/multi-trigger, `aria-label`, `ids`, `dir`. | **Extra.** `persistentElements` and multi-trigger are genuinely useful and have no hope equivalent. |
 
 ## D. The one that stopped the port
+
+> **⚠️ D1 was retracted in Phase 3 — see correction G2. It is left below verbatim because the
+> retraction is itself the finding.** Its central claim (a persistent module-scope leak, "one route
+> change away in a real app") is **not supported by measurement**. Do not cite it.
 
 | # | Finding |
 | - | ------- |
@@ -93,6 +97,78 @@ Not yet the full accounting — Phase 3 owns that. Raw numbers as built:
 | | Lines |
 | - | ---- |
 | `packages/components/src/zag-dialog/` (15 source files, excl. tests/stories) | 730 |
-| `packages/primitives/src/zag-solid/` (forked adapter — permanently owned) | 746 |
+| `packages/primitives/src/zag-solid/` (forked adapter — ~~permanently~~ **temporarily** owned, see G3) | 746 |
 | `create-presence.ts` (still required — B1) | 249 |
 | Handmade baseline: `primitives/dialog` + kernel primitives + `components/dialog` | ≈ 2130 |
+
+---
+
+## G. Phase 3 corrections — three rows above are wrong
+
+Two were flagged by the maintainer; re-verifying turned up a third. All three were **measured**, not
+re-reasoned. Every one of them moved the verdict, and two of them moved it toward Zag.
+
+### G1 — `C6`/`B7` were a misuse of the API, not a limitation
+
+**The `ids` prop is the sanctioned mechanism and it works end-to-end.** Measured against a raw
+machine (bypassing `ZagDialog.Root`) with `ids: { content: "my-content", title: "my-title" }`:
+
+| Observation | Result |
+| --- | --- |
+| `document.getElementById("my-content")` | exists |
+| its `role` | `dialog` |
+| its `aria-labelledby` | `my-title` — the custom title id |
+| `document.getElementById("my-title")` | exists |
+| Escape still dismisses | **yes** — the machine's own element lookup follows the custom ids |
+
+The reason it cannot break is structural: `dialog.dom.mjs` resolves **every** id as
+`ctx.ids?.<part> ?? \`dialog:${ctx.id}:<part>\``, and `dialog.connect.mjs` emits each part's `id`
+through those **same** resolvers (`dom.getContentId`, `dom.getTitleId`, …) that `getContentEl` /
+`getTitleEl` use for lookup. Attribute and lookup cannot diverge.
+
+So `C6`'s claim — that honouring a consumer id "breaks the dismiss layer, the focus trap and the
+aria-hiding at once" — is true **only of the naive route** the spike took: letting the consumer's
+`id` win inside the merged element props, which changes the DOM attribute while the machine keeps
+looking for its own. It is not true of Zag. `ZagDialogRootProps` simply never forwarded `ids` to
+`useMachine`, and each part stripped `id` (`B7`) to paper over that.
+
+**Corrected verdict:** not a regression and not impossible. The residual delta is **ergonomic**:
+Zag takes one `ids` map on `Root`; hope takes `id` on the part that owns it. Both are coherent; the
+Zag shape is worse for composition-by-part and is what Ark exposes too.
+
+### G2 — `D1` does not reproduce; the leak claim is retracted
+
+`D1` was the spike's blocker and Phase 3's decisive axis. **It does not survive measurement.**
+
+| Experiment | Result |
+| --- | --- |
+| `unmounting an open dialog poisons the next one`, **run in isolation** (`-t`) | **FAILS** — the dialog it mounts dismisses normally. The test only ever recorded state inherited from earlier tests in the file. |
+| Dispose a dialog **while open**, then inspect | `data-inert` absent, `body.style.pointerEvents` restored to `""`, zero `[data-part="content"]` left. **Clean.** |
+| Mount a second dialog straight after that dispose, press Escape | **Dismisses.** Not poisoned. |
+| Escape after 0 / 1 rAF / 2 rAF / `waitFor(data-inert)` on a `defaultOpen` dialog | Dismisses in **all four**. No registration race. |
+| A canary — mount a throwaway dialog, Escape it, dispose — after **every** test in the committed file | **Never once found a poisoned dialog.** With the canary in place, `unmounting an open dialog poisons the next one` *fails*, because its premise no longer holds. |
+
+There is no persistent, module-scope poisoning, and nothing that a route change would trigger. What
+does exist is a **transient, order-dependent interference between adjacent mounts in the same tick**,
+which a single tick clears.
+
+**Likely mechanism — inferred from the source, not proven:** `layerStack.remove(node)` adds the node
+to a `recentlyRemoved` set and clears it on `nextTick`, and `isInNestedLayer()` returns `true`
+whenever `recentlyRemoved.size > 0`. So for one tick after *any* layer is removed, every outside
+interaction is treated as "inside a nested layer" and swallowed. That matches "passes in isolation,
+fails in sequence" exactly, and it evaporates on its own.
+
+**Consequences:** the four skipped tests are skipped for a **harness-timing** reason, not a product
+defect, and are very likely fixable with a tick between them — that is now an open item, not a
+blocker. The module-scope-state *observation* stands (`layerStack`, `lockMap`, `trapStack` are real,
+and are the kind of state CLAUDE.md forbids in the kernel); the *impact* attributed to it does not.
+
+### G3 — the fork is temporary, on record
+
+The Zag.js team has stated they will publish a SolidJS 2.0 adapter **once SolidJS 2.0 is stable**.
+`packages/primitives/src/zag-solid/` is therefore bounded scaffolding, not a permanent liability —
+and the bound coincides with hope-ui's own release gate, since this repo targets 2.0 **beta** and
+does not publish before stable either (`@solidjs/start` is blocked on the same thing). `A1` and `A2`
+become upstream bug reports against an adapter that will exist, rather than deviations owned forever.
+
+`F`'s "permanently owned" label and every downstream conclusion drawn from it are wrong.
