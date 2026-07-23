@@ -49,63 +49,58 @@ describe("hope calendar recipe", () => {
     expect(cell).toContain("data-range-middle:bg-selected");
     expect(cell).toContain("data-range-end:bg-selected");
     expect(cell).toContain("data-highlighted:bg-selected");
-    // The trigger paints the solid endpoint pills + single selection; its band interior/preview are
-    // transparent so the cell band shows through, and today is a soft tint.
-    expect(trigger).toContain("data-selected:bg-primary");
-    expect(trigger).toContain("data-selected:text-on-primary");
-    expect(trigger).toContain("data-range-start:bg-primary");
-    expect(trigger).toContain("data-range-end:bg-primary");
-    expect(trigger).toContain("data-range-middle:bg-transparent");
-    expect(trigger).toContain("data-highlighted:bg-transparent");
-    expect(trigger).toContain("data-today:bg-active");
-    // The hover wash is zero-specificity (`:where(:hover)`) so a later data-* fill wins by source
-    // order; it never paints a selection color and there is no bare-focus background.
-    expect(trigger).toContain("[&:where(:hover)]:bg-surface-raised-hovered");
-    expect(trigger).not.toContain("hover:bg-primary");
-    expect(trigger).not.toContain("hover:bg-selected");
+    // The trigger paints one solid pill — any selected day that is not a band interior, which covers
+    // single selection and both range endpoints in a single rule. The `:not([data-range-middle])`
+    // guard (not source order) is what keeps the interior unfilled so the cell band shows through.
+    expect(trigger).toContain("[&[data-selected]:not([data-range-middle])]:bg-primary");
+    expect(trigger).toContain("[&[data-selected]:not([data-range-middle])]:text-on-primary");
+    // The band interior and the tentative preview carry contrast text only — no fill of their own.
+    expect(trigger).toContain("data-range-middle:text-on-selected");
+    expect(trigger).toContain("data-highlighted:text-on-selected");
+    expect(trigger).not.toContain("data-range-middle:bg-");
+    expect(trigger).not.toContain("data-highlighted:bg-");
+    // Today is a text mark, not a fill, so it never competes with the selection pill.
+    expect(trigger).toContain("data-today:text-primary");
+    expect(trigger).not.toContain("data-today:bg-");
+    // No hover or bare-focus background on the day: the band + pill are the only fills.
+    expect(trigger).not.toContain("hover:bg-");
     expect(trigger).not.toContain("focus:bg-");
-    expect(trigger.indexOf("[&:where(:hover)]")).toBeLessThan(
-      trigger.indexOf("data-selected:bg-primary"),
-    );
   });
 
-  it("orders trigger state so the later utility wins the zero-specificity cascade", () => {
+  it("resolves overlapping day state by guard + specificity, not source order", () => {
     const trigger = calendarRecipe({}).cellTrigger();
-    // `today` is a soft tint a real selection must override → before `selected`.
-    expect(trigger.indexOf("data-today:")).toBeLessThan(
-      trigger.indexOf("data-selected:bg-primary"),
-    );
-    // Preview transparency comes before `selected` so the anchor (selected AND highlighted) stays a
-    // solid pill while the rest of the preview shows the cell band through its transparent trigger.
-    expect(trigger.indexOf("data-highlighted:")).toBeLessThan(
-      trigger.indexOf("data-selected:bg-primary"),
-    );
-    // The transparent middle comes after `selected` (a middle that also reports selected shows the
-    // band) but before the solid endpoints (which must beat the middle).
-    expect(trigger.indexOf("data-selected:bg-primary")).toBeLessThan(
-      trigger.indexOf("data-range-middle:"),
-    );
-    expect(trigger.indexOf("data-range-middle:")).toBeLessThan(
-      trigger.indexOf("data-range-start:"),
-    );
-    expect(trigger.indexOf("data-range-middle:")).toBeLessThan(trigger.indexOf("data-range-end:"));
+    const pill = "[&[data-selected]:not([data-range-middle])]:text-on-primary";
+    // A day is routinely several states at once (today AND selected, selected AND highlighted, a
+    // middle that also reports selected). The pill rule is a two-attribute compound, so it outranks
+    // every single-attribute `data-*:` text utility regardless of where they sit in the string —
+    // the one thing source order must still guarantee is that today's mark loses to the pill.
+    expect(trigger.indexOf("data-today:text-primary")).toBeLessThan(trigger.indexOf(pill));
+    // The interior/preview text rules may follow the pill precisely because the guard, not their
+    // position, decides: a band interior is excluded from the pill by `:not([data-range-middle])`.
+    expect(trigger.indexOf(pill)).toBeLessThan(trigger.indexOf("data-range-middle:"));
+    expect(trigger.indexOf(pill)).toBeLessThan(trigger.indexOf("data-highlighted:"));
   });
 
-  it("rounds the band + pills logically (RTL-safe) for a continuous shape", () => {
+  it("rounds the band logically (RTL-safe) for a continuous shape", () => {
     const parts = calendarRecipe({});
     const cell = parts.cell();
     const trigger = parts.cellTrigger();
-    // The cell band rounds its leading/trailing ends and squares the interior (+ single-day both ends).
+    // The band rounds its leading/trailing ends and squares the interior, then rounds again at a row
+    // wrap (`first`/`last`) so a range spanning weeks reads as one shape per row.
     expect(cell).toContain("data-range-start:rounded-e-none");
     expect(cell).toContain("data-range-end:rounded-s-none");
     expect(cell).toContain("data-range-middle:rounded-none");
     expect(cell).toContain("data-highlighted:rounded-none");
-    expect(cell).toContain("[&[data-range-start][data-range-end]]:rounded-md");
-    // The endpoint pills mirror the band: rounded outer side, square inner side.
-    expect(trigger).toContain("data-range-start:rounded-s-md");
-    expect(trigger).toContain("data-range-start:rounded-e-none");
-    expect(trigger).toContain("data-range-end:rounded-e-md");
-    expect(trigger).toContain("data-range-end:rounded-s-none");
+    expect(cell).toContain("data-range-middle:first:rounded-s-md");
+    expect(cell).toContain("data-range-middle:last:rounded-e-md");
+    expect(cell).toContain("data-highlighted:first:rounded-s-md");
+    expect(cell).toContain("data-highlighted:last:rounded-e-md");
+    // Logical sides only (`-s-`/`-e-`), never physical, so RTL mirrors for free.
+    expect(cell).not.toMatch(/rounded-(?:tl|tr|bl|br|l|r)-/);
+    // The pill on top stays uniformly rounded — the band, not the trigger, carries the range shape.
+    expect(trigger).toContain("rounded-md");
+    expect(trigger).not.toContain("data-range-start:rounded");
+    expect(trigger).not.toContain("data-range-end:rounded");
   });
 
   it("mutes outside-month days and strikes unavailable ones through tokens", () => {
@@ -161,7 +156,11 @@ describe("hope calendar recipe", () => {
     const grid = calendarRecipe({}).grid();
     expect(grid).toContain("table-fixed");
     expect(grid).toContain("w-[calc(var(--cell-size)*7)]");
-    expect(grid).toContain("border-collapse");
+    // `border-separate` with zero horizontal spacing: the band still runs flush across a row, while
+    // the vertical spacing separates the week rows.
+    expect(grid).toContain("border-separate");
+    expect(grid).toContain("border-spacing-x-0");
+    expect(grid).toContain("border-spacing-y-2");
     // No per-view branching — one width for month/year/decade, so year/decade keep the month footprint.
     expect(grid).not.toContain("data-view");
   });
