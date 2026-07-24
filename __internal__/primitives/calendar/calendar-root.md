@@ -13,7 +13,8 @@ function createCalendar(options?: CreateCalendarOptions): CreateCalendarReturn;
 ```
 
 `CreateCalendarOptions` — config (`locale`/`dir`/`timeZone`/`firstDayOfWeek`/`min`/`max`/
-`isDateDisabled`/`disabled`/`readOnly`/`selectionMode`), the controlled/uncontrolled selection pair
+`isDateDisabled`/`allowsNonContiguousRanges`/`disabled`/`readOnly`/`selectionMode`), the
+controlled/uncontrolled selection pair
 (`value`/`defaultValue`/`onValueChange`), the roving-cursor pair (`focusedValue`/
 `defaultFocusedValue`/`onFocusedValueChange`), a `label` (overrides the built-in `calendar.label`), and
 the native-form trio (`name`/`form`/`required`) documented under **Native form** below.
@@ -56,6 +57,61 @@ moves an already-stored cursor a second time.
 
 Without this, `prev()` from Feb 3 with `min` Jan 10 left the cursor on Jan 3: `isDateNonFocusable`
 *and* `isFocused` at once — a roving tab stop stranded on a cell the arrows skip.
+
+## Contiguous ranges: the bounds narrow around the anchor
+
+```ts
+allowsNonContiguousRanges?: boolean; // default false
+min(): CalendarDate | undefined;     // = maxDate(options.min, availableRange?.start)
+max(): CalendarDate | undefined;     // = minDate(options.max, availableRange?.end)
+```
+
+With `isDateDisabled` set, a range must not straddle an unavailable day. While a range is **anchored**,
+the calendar therefore narrows its **own** bounds to `availableRange` — the run of consecutive available
+days containing the anchor, derived by calling `lastAvailableDateFrom` (`utils/boundary.ts`) once per
+direction. This is React Aria's model verbatim (`useRangeCalendarState`'s `getAvailableRange`, folded
+into the `min`/`max` it hands its inner `useCalendarState`).
+
+Narrowing the **bounds** rather than adding a guard at the commit is the entire point: every downstream
+predicate inherits the constraint for free — `isCellOutOfRange` → `isCellDisabled` →
+`isDateNonFocusable` (so the arrows skip and the cells go `aria-disabled` + `data-disabled`),
+`isDateSelectable`, and the cursor clamp above, which the tentative band rides. A commit-time guard
+alone would still let the arrows cross the unavailable day and paint a band with a hole in it.
+
+Details worth knowing:
+
+- **`min()`/`max()` report the effective bounds**, not the options as given. Either side falls back to
+  the configured one when the run is unbounded there (`undefined`), and the **stricter** of the two
+  always wins (`maxDate`/`minDate`).
+- **The run is read through the raw `isDateDisabled`**, not `isDateUnavailable` — which reports false
+  outside month view. Which days are available is a property of the days, not of the view being looked
+  at, so drilling up mid-selection must not silently widen the window.
+- **The search spans one month either way.** Beyond that the run reads as unbounded; see
+  `utils/boundary.md`.
+- **`activate` clamps into the run.** Activating past the run's edge ends the range *at* the edge
+  rather than doing nothing — React Aria clamps the same way in `selectDate`. Only this narrowing is
+  clamped away: with no anchored run the date is passed through untouched, so activating a genuinely
+  out-of-range or unavailable day stays the outright refusal it has always been. (React Aria also runs
+  its `previousAvailableDate` back-off at that point; hope-ui does not port it, because it would turn
+  that documented refusal into a silent selection of a *neighbouring* day.)
+- **`prev()`/`next()` disable while anchored inside a bounded run**, because `isPrevDisabled` /
+  `isNextDisabled` read the same narrowed bounds. This is visible (with weekends unavailable, no run is
+  longer than five days, so the month cannot be paged mid-selection) and it is correct — nothing outside
+  the run is selectable, so there is nothing to page *to*. React Aria behaves identically, for the same
+  reason. Where the run is unbounded on a side, the configured bound is what remains and paging works.
+- **`allowsNonContiguousRanges: true`** disables the narrowing entirely, restoring the plain
+  `min`/`max`. The range may then span unavailable days — which the selection paint still cuts out of
+  the band (see below), exactly as React Aria renders them.
+- **It is gated on `mode() === "range"`, not on the anchor alone.** Nothing clears `anchorDate` when
+  `selectionMode` changes, so a stale anchor from an abandoned range would otherwise keep the bounds
+  clamped for good — inert cells and dead nav in a mode that has no ranges at all.
+- **`availableRange` is a `createMemo`** — unlike `highlightedRange` and `formValues`, which are plain
+  accessors to stay hydration-neutral. `min`/`max` are read twice per cell per predicate, and each read
+  would otherwise walk up to a month of days through the consumer's `isDateDisabled`: tens of thousands
+  of callbacks per pointer move once unavailable days are sparse. That earns the one reactive node, at
+  the measured price of shifting every `_hk` in the SSR tree (and `headingId`) by one — which is why
+  `calendar.ssr.test.tsx`'s inline snapshot was re-recorded with this change, with `hydrateFixture`
+  proving the client allocates the same keys.
 
 ## The tentative range band rides the roving cursor
 
@@ -150,6 +206,11 @@ does this for both internal roving moves and controlled `focusedValue` updates.
   arrow-skipped without being repainted dim over their own `data-outside-month` tint.
 - **unavailable** = the `isDateDisabled` predicate (month view only) → stays focusable + announced,
   blocked only in `activate`.
+
+The first and third are **independent, not exclusive**: an unavailable day that the bounds also put out
+of range is both, and carries `data-disabled` *and* `data-unavailable` (struck *and* dimmed). Because a
+contiguous range narrows the bounds to the anchor's available run, that is the normal state of the
+unavailable day bounding the run, for as long as the range is in progress — see § Contiguous ranges.
 
 `aria-disabled` is emitted for RA's `!isSelectable` — non-focusable **or** unavailable — so it covers
 all three (see `calendar-cell.md`).

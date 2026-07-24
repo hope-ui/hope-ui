@@ -237,6 +237,22 @@ through and can never be selected (React Aria's "unavailable" semantics).
 />
 ```
 
+In **range** mode, unavailable dates also bound the selection: once you pick the first endpoint, the
+calendar clamps to the run of available days around it, so a range can never span an unavailable day.
+Everything past the nearest one goes inert until the range completes. Pass `allowsNonContiguousRanges`
+to opt out and let a range span them — the unavailable days still drop out of the painted band.
+
+```tsx
+<Calendar.Root
+  selectionMode="range"
+  allowsNonContiguousRanges
+  isDateDisabled={(date) => {
+    const weekday = date.toDate("UTC").getUTCDay();
+    return weekday === 0 || weekday === 6; // Sun / Sat
+  }}
+/>
+```
+
 ## Native form submission
 
 Set `name` and the calendar renders a hidden `<input>` (a sibling of the group) valued as the selected
@@ -504,6 +520,12 @@ Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, 
       type: "(date: CalendarDate) => boolean",
       default: "",
       description: "Per-date unavailable predicate — focusable and announced, but not selectable.",
+    },
+    {
+      prop: "allowsNonContiguousRanges",
+      type: "boolean",
+      default: "false",
+      description: "Range mode: let a selection span unavailable days. By default a range in progress clamps at the nearest unavailable day.",
     },
     {
       prop: "firstDayOfWeek",

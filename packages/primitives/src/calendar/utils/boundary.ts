@@ -1,5 +1,6 @@
 import {
   type CalendarDate,
+  type DateDuration,
   endOfMonth,
   endOfYear,
   maxDate,
@@ -14,7 +15,8 @@ import { decadeStart, YEARS_PER_DECADE } from "./view";
  * behavior; all are total (an absent bound ⇒ that side is unbounded). The day-level
  * {@link isDateOutOfRange} is view-agnostic; the prev/next pair + the whole-period out-of-range tests
  * come in one-per-view flavors (month / year / decade) selected by the calendar state.
- * {@link constrainDate} is the only non-predicate: it *moves* a date back into the bounds.
+ * {@link constrainDate} is the only non-predicate: it *moves* a date back into the bounds, and
+ * {@link lastAvailableDateFrom} is the only helper that derives a bound rather than applying one.
  */
 
 /**
@@ -46,6 +48,39 @@ export function constrainDate(
   // so the result is always a `CalendarDate`.
   const lowerBounded = min === undefined ? date : (maxDate(date, min) as CalendarDate);
   return max === undefined ? lowerBounded : (minDate(lowerBounded, max) as CalendarDate);
+}
+
+/**
+ * The far end of the run of consecutive **available** days that contains `anchor` and extends in
+ * `direction` (`1` forward, `-1` backward) — the last day reachable from the anchor without crossing an
+ * unavailable one. `undefined` when no unavailable day turns up within a month of the anchor: that side
+ * of the run is simply unbounded, and the caller's own `min`/`max` is what remains.
+ *
+ * React Aria's `nextUnavailableDate`, renamed for what it returns (RA names it for the day it stops
+ * *at*, then hands back the one before). `createCalendar` calls it once per direction to derive the
+ * bounds a contiguous range selection may not cross — see `calendar-root.md`. Pure.
+ */
+export function lastAvailableDateFrom(
+  anchor: CalendarDate,
+  direction: 1 | -1,
+  isDateUnavailable: (date: CalendarDate) => boolean,
+  searchSpan: DateDuration = { months: 1 },
+): CalendarDate | undefined {
+  const searchLimit = direction < 0 ? anchor.subtract(searchSpan) : anchor.add(searchSpan);
+  const isWithinSearch = (date: CalendarDate) =>
+    direction < 0 ? date.compare(searchLimit) >= 0 : date.compare(searchLimit) <= 0;
+
+  let candidate = anchor.add({ days: direction });
+  while (isWithinSearch(candidate) && !isDateUnavailable(candidate)) {
+    candidate = candidate.add({ days: direction });
+  }
+  // Two ways out: `candidate` is the first unavailable day, or it stepped one past the window. React
+  // Aria tests that out-of-window day as well, so a run filling the whole window is still reported
+  // bounded when the very next day is unavailable — kept verbatim. The `||` short-circuits, so
+  // `isDateUnavailable` (a consumer callback, with no purity contract) is never asked about the same
+  // day twice.
+  const stoppedOnUnavailableDay = isWithinSearch(candidate) || isDateUnavailable(candidate);
+  return stoppedOnUnavailableDay ? candidate.add({ days: -direction }) : undefined;
 }
 
 /**

@@ -392,6 +392,152 @@ describe("createCalendar — the selection paint", () => {
   });
 });
 
+describe("createCalendar — contiguous ranges", () => {
+  // Jan 5 and Jan 17 unavailable ⇒ the run around an anchor of Jan 10 is Jan 6 … Jan 16.
+  const contiguousRange = {
+    selectionMode: "range" as const,
+    isDateDisabled: (date: CalendarDate) => date.day === 5 || date.day === 17,
+  };
+  const anchor = new CalendarDate(2026, 1, 10);
+  const pastTheRun = new CalendarDate(2026, 1, 18);
+
+  it("narrows the bounds to the anchor's available run, and restores them on commit", () => {
+    const { api, dispose } = setup(contiguousRange);
+    expect(api.min()).toBeUndefined();
+    expect(api.max()).toBeUndefined();
+
+    flush(() => api.activate(anchor));
+    expect(iso(api.min() as DateValue)).toBe("2026-01-06");
+    expect(iso(api.max() as DateValue)).toBe("2026-01-16");
+    // Narrowing the bounds is what makes every downstream predicate inherit the constraint.
+    expect(api.isCellDisabled(pastTheRun)).toBe(true);
+    expect(api.isDateNonFocusable(pastTheRun)).toBe(true);
+    expect(api.isDateSelectable(pastTheRun)).toBe(false);
+    // Including the nav: nothing outside the run is selectable, so there is nowhere to page to.
+    expect(api.isPrevDisabled()).toBe(true);
+    expect(api.isNextDisabled()).toBe(true);
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 14)));
+    expect(api.anchorDate()).toBeNull();
+    expect(api.min()).toBeUndefined();
+    expect(api.isCellDisabled(pastTheRun)).toBe(false);
+    expect(api.isPrevDisabled()).toBe(false);
+    dispose();
+  });
+
+  it("caps the tentative band at the unavailable day, whichever way the cursor moves", () => {
+    const { api, dispose } = setup(contiguousRange);
+    flush(() => api.activate(anchor));
+
+    // The cursor clamp is the same one the band rides, so hover and keyboard cap identically.
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 25)));
+    expect(iso(api.focusedDate())).toBe("2026-01-16");
+    expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-16");
+    expect(api.isHighlighted(pastTheRun)).toBe(false);
+
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 1)));
+    expect(iso(api.focusedDate())).toBe("2026-01-06");
+    expect(iso(api.highlightedRange()?.start as CalendarDate)).toBe("2026-01-06");
+    dispose();
+  });
+
+  it("commits at the run's edge when activated past it", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ ...contiguousRange, onValueChange });
+    flush(() => api.activate(anchor));
+    flush(() => api.activate(new CalendarDate(2026, 1, 25)));
+
+    const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(iso(value.start)).toBe("2026-01-10");
+    expect(iso(value.end)).toBe("2026-01-16");
+    expect(iso(api.focusedDate())).toBe("2026-01-16");
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    dispose();
+  });
+
+  it("keeps the outright refusal outside an anchored run", () => {
+    // No anchor ⇒ no narrowing ⇒ no clamp: an out-of-range activation is still a no-op, not a commit
+    // at `max`. Only the narrowing this option introduces is clamped away.
+    const { api, dispose } = setup({ ...contiguousRange, max: new CalendarDate(2026, 1, 25) });
+    flush(() => api.activate(new CalendarDate(2026, 1, 26)));
+    expect(api.selectionValue()).toBeNull();
+    expect(api.anchorDate()).toBeNull();
+    dispose();
+  });
+
+  it("tightens the consumer's own bounds rather than replacing them", () => {
+    const { api, dispose } = setup({
+      ...contiguousRange,
+      min: new CalendarDate(2026, 1, 8),
+      max: new CalendarDate(2026, 1, 20),
+    });
+    flush(() => api.activate(anchor));
+    // Whichever side is stricter wins: `min` from the consumer, `max` from the run.
+    expect(iso(api.min() as DateValue)).toBe("2026-01-08");
+    expect(iso(api.max() as DateValue)).toBe("2026-01-16");
+    dispose();
+  });
+
+  it("allowsNonContiguousRanges leaves the bounds alone", () => {
+    const { api, dispose } = setup({ ...contiguousRange, allowsNonContiguousRanges: true });
+    flush(() => api.activate(anchor));
+    expect(api.min()).toBeUndefined();
+    expect(api.max()).toBeUndefined();
+    expect(api.isCellDisabled(pastTheRun)).toBe(false);
+
+    // The band spans the unavailable day, which the paint still cuts out of it.
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 25)));
+    expect(api.isHighlighted(pastTheRun)).toBe(true);
+    flush(() => api.activate(new CalendarDate(2026, 1, 25)));
+    const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(iso(value.end)).toBe("2026-01-25");
+    expect(api.isSelected(new CalendarDate(2026, 1, 17))).toBe(false);
+    dispose();
+  });
+
+  it("is inert without an isDateDisabled predicate, and in the anchorless modes", () => {
+    const { api, dispose } = setup({ selectionMode: "range" });
+    flush(() => api.activate(anchor));
+    expect(api.min()).toBeUndefined();
+    dispose();
+
+    for (const selectionMode of ["single", "multiple"] as const) {
+      const anchorless = setup({ ...contiguousRange, selectionMode });
+      flush(() => anchorless.api.activate(anchor));
+      expect(anchorless.api.min()).toBeUndefined();
+      expect(anchorless.api.max()).toBeUndefined();
+      anchorless.dispose();
+    }
+  });
+
+  it("releases the bounds when selectionMode leaves range mid-selection", () => {
+    // Nothing clears `anchorDate` on a mode switch, so gating only on the anchor would leave the
+    // calendar clamped to a five-day window in a mode that has no ranges at all.
+    // Its own root: `setup` spreads its options, which would flatten the reactive getter.
+    const [selectionMode, setSelectionMode] = createSignal<"range" | "single">("range");
+    let api!: CreateCalendarReturn;
+    let dispose!: () => void;
+    createRoot((d) => {
+      dispose = d;
+      api = createCalendar({
+        defaultFocusedValue: new CalendarDate(2026, 1, 15),
+        isDateDisabled: contiguousRange.isDateDisabled,
+        get selectionMode() {
+          return selectionMode();
+        },
+      });
+    });
+    flush(() => api.activate(anchor));
+    expect(iso(api.max() as DateValue)).toBe("2026-01-16");
+
+    flush(() => setSelectionMode("single"));
+    expect(api.anchorDate()).not.toBeNull(); // the stale anchor is still there…
+    expect(api.max()).toBeUndefined(); // …but it no longer bounds anything
+    expect(api.isCellDisabled(pastTheRun)).toBe(false);
+    dispose();
+  });
+});
+
 describe("createCalendar — native form", () => {
   it("exposes name/form/required accessors, defaulting required to false", () => {
     const { api, dispose } = setup();

@@ -110,8 +110,13 @@ export function createCalendarCell(
   const isNonFocusable = () => state.isDateNonFocusable(date());
   // `data-disabled` marks only the truly-inert days — out-of-range, or the whole calendar disabled
   // (dim + no pointer). Unavailable days are painted separately (`data-unavailable`) and stay
-  // interactive — React-Aria's isDisabled vs isUnavailable split — so the two never double-apply (a
-  // struck-out day is not also dimmed).
+  // interactive — React-Aria's isDisabled vs isUnavailable split.
+  //
+  // The two are independent, not exclusive: an unavailable day the bounds also put out of range
+  // carries both (struck *and* dimmed). That is any unavailable day outside `[min, max]`, and — since
+  // a contiguous range narrows the bounds to the anchor's available run — routinely the unavailable
+  // day that bounds the run, for as long as the range is in progress. A recipe must therefore make the
+  // two readable together rather than assume one excludes the other.
   const isDisabled = () => state.isCellDisabled(date());
   // React Aria's `isSelectable` — the gate behind `aria-disabled` and the hover preview. A day is
   // selectable when the calendar neither makes it inert nor marks it unavailable. The roving tab stop

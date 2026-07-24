@@ -70,6 +70,23 @@ export const Unavailable: Story = {
   ),
 };
 
+// The same unavailable weekends, in range mode: pick a weekday and the calendar clamps to that week's
+// available run — every day past the neighbouring weekend goes inert, so a range can never straddle an
+// unavailable day. Pass `allowsNonContiguousRanges` to opt out and let a range span them (the
+// unavailable days still drop out of the paint).
+export const UnavailableRange: Story = {
+  render: () => (
+    <CalendarDemo
+      selectionMode="range"
+      defaultFocusedValue={june}
+      isDateDisabled={(date) => {
+        const weekday = date.toDate("UTC").getUTCDay();
+        return weekday === 0 || weekday === 6;
+      }}
+    />
+  ),
+};
+
 // The whole calendar off: every cell is inert (`aria-disabled` + `data-disabled`, no tab stop) and
 // both nav buttons are disabled, so the month can't be paged either. It has a `defaultValue`, which
 // deliberately paints nothing: `disabled` makes every cell non-selectable, and React Aria drops

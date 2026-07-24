@@ -313,6 +313,37 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
+  it("turns the days past an anchored range's unavailable day inert, and back again on commit", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      isDateDisabled: (date) => date.day === 17,
+    });
+    const jan20 = dayButton(container, "2026-01-20");
+    // Nothing is anchored yet, so Jan 20 is an ordinary selectable day.
+    expect(jan20.getAttribute("aria-disabled")).toBeNull();
+
+    dayButton(container, "2026-01-10").click(); // anchor
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
+
+    // Jan 17 is unavailable, so the range cannot reach past it: everything beyond is out of range —
+    // inert on both elements, dimmed, and out of the roving order.
+    await vi.waitFor(() => expect(jan20.getAttribute("aria-disabled")).toBe("true"));
+    expect(jan20.closest("td")?.getAttribute("aria-disabled")).toBe("true");
+    expect(jan20.getAttribute("data-disabled")).toBe("");
+    expect(jan20.getAttribute("tabindex")).toBe("-1");
+    // Jan 17 is now both: still `data-unavailable`, and `data-disabled` because the narrowed `max`
+    // stops at Jan 16. The two hooks are independent, not exclusive (see `calendar-cell.ts`).
+    const jan17 = dayButton(container, "2026-01-17");
+    expect(jan17.getAttribute("data-unavailable")).toBe("");
+    expect(jan17.getAttribute("data-disabled")).toBe("");
+
+    dayButton(container, "2026-01-14").click(); // commit
+    await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
+    expect(jan20.getAttribute("aria-disabled")).toBeNull();
+    expect(jan20.getAttribute("data-disabled")).toBeNull();
+    dispose();
+  });
+
   it("makes every day inert when the whole calendar is disabled", async () => {
     let changed = false;
     const { container, dispose } = await mountCalendar({

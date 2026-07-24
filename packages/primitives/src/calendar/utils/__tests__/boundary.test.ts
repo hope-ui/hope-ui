@@ -11,6 +11,7 @@ import {
   isPreviousMonthDisabled,
   isPreviousYearDisabled,
   isYearOutOfRange,
+  lastAvailableDateFrom,
 } from "../boundary";
 
 const min = new CalendarDate(2026, 2, 1);
@@ -51,6 +52,49 @@ describe("constrainDate", () => {
   it("is idempotent", () => {
     const once = constrainDate(new CalendarDate(2025, 12, 31), min, max);
     expect(iso(constrainDate(once, min, max))).toBe(iso(once));
+  });
+});
+
+describe("lastAvailableDateFrom", () => {
+  const iso = (date: CalendarDate | undefined) => date?.toString();
+  const anchor = new CalendarDate(2026, 2, 10);
+  const unavailableOn =
+    (...days: number[]) =>
+    (date: CalendarDate) =>
+      days.includes(date.day);
+
+  it("stops on the day before the nearest unavailable one, in either direction", () => {
+    expect(iso(lastAvailableDateFrom(anchor, 1, unavailableOn(17)))).toBe("2026-02-16");
+    expect(iso(lastAvailableDateFrom(anchor, -1, unavailableOn(5)))).toBe("2026-02-06");
+  });
+
+  it("returns the anchor itself when the very next day is unavailable", () => {
+    expect(iso(lastAvailableDateFrom(anchor, 1, unavailableOn(11)))).toBe("2026-02-10");
+    expect(iso(lastAvailableDateFrom(anchor, -1, unavailableOn(9)))).toBe("2026-02-10");
+  });
+
+  it("crosses the month boundary — the run is a property of the days, not of the visible month", () => {
+    expect(iso(lastAvailableDateFrom(new CalendarDate(2026, 2, 26), 1, unavailableOn(4)))).toBe(
+      "2026-03-03",
+    );
+  });
+
+  it("reports an unbounded side as undefined when nothing is unavailable in reach", () => {
+    expect(lastAvailableDateFrom(anchor, 1, () => false)).toBeUndefined();
+    expect(lastAvailableDateFrom(anchor, -1, () => false)).toBeUndefined();
+  });
+
+  it("searches only one month either way by default", () => {
+    // April 1 is beyond a month from February 10, so that side reads as unbounded.
+    const aprilFirst = (date: CalendarDate) => date.month === 4 && date.day === 1;
+    expect(lastAvailableDateFrom(anchor, 1, aprilFirst)).toBeUndefined();
+  });
+
+  it("honors a narrower search span", () => {
+    expect(lastAvailableDateFrom(anchor, 1, unavailableOn(17), { days: 3 })).toBeUndefined();
+    expect(iso(lastAvailableDateFrom(anchor, 1, unavailableOn(17), { days: 7 }))).toBe(
+      "2026-02-16",
+    );
   });
 });
 

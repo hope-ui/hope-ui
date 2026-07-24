@@ -4,6 +4,8 @@ import {
   getLocalTimeZone,
   isSameDay,
   isSameMonth,
+  maxDate,
+  minDate,
   startOfMonth,
   today,
 } from "@internationalized/date";
@@ -35,6 +37,7 @@ import {
   isPreviousMonthDisabled,
   isPreviousYearDisabled,
   isYearOutOfRange,
+  lastAvailableDateFrom,
 } from "./utils/boundary";
 import { buildDecadeCells, formatDecadeRange } from "./utils/decade-view";
 import {
@@ -82,6 +85,12 @@ export interface CreateCalendarOptions {
   max?: CalendarDate;
   /** Custom per-date "unavailable" predicate — focusable + announced, but not selectable. */
   isDateDisabled?: IsDateDisabled;
+  /**
+   * Range mode + `isDateDisabled`: let a range span unavailable days. Default `false` — while a range
+   * is anchored the bounds narrow to the run of available days around the anchor, so a selection can
+   * never straddle an unavailable day. Inert without `isDateDisabled`.
+   */
+  allowsNonContiguousRanges?: boolean;
   /** Disable the whole calendar. Default `false`. */
   disabled?: boolean;
   /** Read-only: navigable + focusable, but not selectable. Default `false`. */
@@ -119,7 +128,10 @@ export interface CreateCalendarReturn {
   direction: Accessor<"ltr" | "rtl">;
   timeZone: Accessor<string>;
   firstDayOfWeek: Accessor<FirstDayOfWeek | undefined>;
+  /** The **effective** lower bound: the `min` option, raised to the anchored range's available run
+   * while a contiguous range selection is in progress. */
   min: Accessor<CalendarDate | undefined>;
+  /** The **effective** upper bound — the mirror of {@link min}. */
   max: Accessor<CalendarDate | undefined>;
   disabled: Accessor<boolean>;
   readOnly: Accessor<boolean>;
@@ -235,6 +247,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     disabled: false,
     readOnly: false,
     required: false,
+    allowsNonContiguousRanges: false,
     timeZone: getLocalTimeZone(),
   });
 
@@ -244,9 +257,10 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const direction = () => merged.dir ?? i18n.direction();
   const timeZone = () => merged.timeZone;
   const firstDayOfWeek = () => merged.firstDayOfWeek;
-  const min = () => merged.min;
-  const max = () => merged.max;
+  const configuredMin = () => merged.min;
+  const configuredMax = () => merged.max;
   const isDateDisabledFn = () => merged.isDateDisabled;
+  const allowsNonContiguousRanges = () => merged.allowsNonContiguousRanges;
   const disabled = () => merged.disabled;
   const readOnly = () => merged.readOnly;
   const mode = () => merged.selectionMode;
@@ -258,6 +272,59 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // --- State ---
   const [view, setViewSignal] = createSignal<CalendarView>("month");
   const todayDate = createMemo(() => today(timeZone()));
+
+  // The in-progress range endpoint. Declared here rather than beside `selectionValue` below, because
+  // `min`/`max` read it: while a range is anchored, the calendar's own bounds narrow around the anchor.
+  const [anchorDate, setAnchorDate] = createSignal<CalendarDate | null>(null);
+
+  // React Aria's contiguity model (`useRangeCalendarState`'s `getAvailableRange`, folded into the
+  // calendar's own `min`/`max`): while a range is anchored, the selectable window shrinks to the run of
+  // consecutive available days containing the anchor, so a range can never straddle an unavailable day.
+  //
+  // Narrowing the **bounds** rather than adding a guard at the commit is the whole point: every
+  // downstream predicate — `isCellOutOfRange` → `isCellDisabled` → `isDateNonFocusable`,
+  // `isDateSelectable`, the cursor clamp and with it the tentative band — inherits the constraint for
+  // free. A commit-time guard alone would still let the arrows cross the unavailable day and preview a
+  // band with a hole punched in it.
+  //
+  // Either side is `undefined` when no unavailable day turns up within a month of the anchor — the run
+  // is unbounded there, and the consumer's own bound is what remains. The run is read through the
+  // **raw** `isDateDisabled` rather than `isDateUnavailable`, which reports false outside month view:
+  // which days are available is a property of the days, not of the view being looked at, so drilling up
+  // mid-selection must not silently widen the window.
+  //
+  // A `createMemo` and not a plain accessor, unlike `highlightedRange` and `formValues`: `min`/`max`
+  // are read twice per cell per predicate, and each read would otherwise walk up to a month of days
+  // through the consumer's `isDateDisabled` — tens of thousands of callbacks per pointer move once
+  // unavailable days are sparse. That earns the one reactive node, at the measured price of shifting
+  // every `_hk` in the SSR tree (and `headingId`) by one, which is why the calendar's inline snapshot
+  // was re-recorded with this change.
+  //
+  // Gated on range mode, not on `anchorDate` alone: nothing clears the anchor when `selectionMode`
+  // changes, and a stale anchor left over from an abandoned range would otherwise keep the bounds
+  // clamped for good — inert cells and dead nav in a mode that has no ranges at all.
+  const availableRange = createMemo<{ start?: CalendarDate; end?: CalendarDate } | null>(() => {
+    const anchor = anchorDate();
+    const isDateUnavailable = isDateDisabledFn();
+    if (
+      anchor === null ||
+      isDateUnavailable === undefined ||
+      mode() !== "range" ||
+      allowsNonContiguousRanges()
+    ) {
+      return null;
+    }
+    return {
+      start: lastAvailableDateFrom(anchor, -1, isDateUnavailable),
+      end: lastAvailableDateFrom(anchor, 1, isDateUnavailable),
+    };
+  });
+
+  // The effective bounds every predicate below reads: the configured ones, tightened by the anchored
+  // range's available run. `maxDate`/`minDate` keep whichever side is present, so an absent bound on
+  // either input leaves the other untouched.
+  const min = () => maxDate(configuredMin(), availableRange()?.start) ?? undefined;
+  const max = () => minDate(configuredMax(), availableRange()?.end) ?? undefined;
 
   // Seed the cursor + visible month once: an explicit default, else a value-derived date, else today.
   // Constrained here rather than left to the render-time clamp below, because `visibleMonth` is derived
@@ -302,7 +369,6 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     value: () => merged.value,
     defaultValue: () => merged.defaultValue ?? null,
   });
-  const [anchorDate, setAnchorDate] = createSignal<CalendarDate | null>(null);
 
   const strategy = createMemo(() => selectionStrategyFor(mode()));
   const selectionState = createMemo<SelectionState>(() => ({
@@ -588,7 +654,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       drillDownTo(date);
       return;
     }
-    if (!isDateSelectable(date)) {
+    // While a range is anchored the bounds have narrowed to the available run around the anchor, so
+    // activating past the run's edge means "end the range at the edge" rather than nothing at all —
+    // React Aria clamps the same way in `selectDate`. Only that narrowing is clamped away: with no
+    // anchored run the date is passed through untouched, so activating a genuinely out-of-range or
+    // unavailable day stays the outright refusal it has always been.
+    const isAnchoredRun = availableRange() !== null;
+    const target = isAnchoredRun ? constrainDate(date, min(), max()) : date;
+    if (!isDateSelectable(target)) {
       return;
     }
     const strat = strategy();
@@ -596,10 +669,10 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     if (opts?.extend && mode() === "range" && anchorDate() === null) {
       state = strat.select(state, focusedDate(), { extend: false });
     }
-    const nextState = strat.select(state, date, opts);
+    const nextState = strat.select(state, target, opts);
     setSelectionValue(nextState.value);
     setAnchorDate(nextState.anchor);
-    setFocusedDate(date);
+    setFocusedDate(target);
     if (nextState.anchor === null) {
       merged.onValueChange?.(nextState.value);
       announceSelection(nextState.value);
