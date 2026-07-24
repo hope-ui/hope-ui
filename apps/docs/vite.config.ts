@@ -36,6 +36,7 @@ const componentsSrcAlias = {
 export default defineConfig(({ command }) => ({
   server: {
     port: 3000,
+    open: true,
   },
   // @hope-ui/* ships JSX-preserved SOURCE under the "solid" export condition, so
   // the consumer's vite-plugin-solid must compile it. Two consequences:

@@ -9,8 +9,8 @@ export function CalendarBoundedDemo() {
   return (
     <Calendar.Root
       defaultFocusedValue={REFERENCE_DATE}
-      min={new CalendarDate(2026, 6, 5)}
-      max={new CalendarDate(2026, 6, 24)}
+      min={new CalendarDate(2020, 9, 1)}
+      max={new CalendarDate(2020, 9, 15)}
     />
   );
 }

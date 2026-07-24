@@ -49,7 +49,13 @@ day with a click, `Enter`, or `Space`.
 ```tsx
 const [value, setValue] = createSignal<CalendarValue>(null);
 
-<Calendar.Root defaultValue={value()} onValueChange={setValue}>
+// `defaultFocusedValue` seeds the visible month — pass a stable date so a prerendered/SSR page and the
+// client render the same grid (leaving it to today() would mismatch on hydration).
+<Calendar.Root
+  defaultFocusedValue={new CalendarDate(2020, 9, 7)}
+  value={value()}
+  onValueChange={setValue}
+>
   <Calendar.Header>
     <Calendar.PrevButton />
     <Calendar.Heading />
@@ -65,8 +71,7 @@ const [value, setValue] = createSignal<CalendarValue>(null);
   class="not-prose"
   description={
     <div>
-      Calendar reads its look from a recipe, so it needs a <code>&lt;ThemeProvider&gt;</code> ancestor
-      fed a preset, as every styled hope-ui component does. Dates are{" "}
+      Dates are{" "}
       <code>CalendarDate</code> values from <code>@internationalized/date</code> — a calendar-system-aware
       date type — so selection, bounds, and formatting stay correct across time zones and calendar
       systems with no <code>Date</code> parsing on your side.
@@ -156,7 +161,7 @@ grid). Same recipe, same behavior; the bare form is just less to type.
 
 ```tsx
 // Zero children — Root auto-renders the header + grid.
-<Calendar.Root defaultValue={value()} onValueChange={setValue} />
+<Calendar.Root />
 ```
 
 The rest of this page uses the bare convenience form for brevity — every example works identically as
@@ -177,7 +182,7 @@ the composed parts.
 </Preview>
 
 ```tsx title="range"
-<Calendar.Root selectionMode="range" onValueChange={setValue} />
+<Calendar.Root selectionMode="range" />
 ```
 
 <Preview>
@@ -185,7 +190,7 @@ the composed parts.
 </Preview>
 
 ```tsx title="multiple"
-<Calendar.Root selectionMode="multiple" onValueChange={setValue} />
+<Calendar.Root selectionMode="multiple" />
 ```
 
 ## Sizes
@@ -215,7 +220,10 @@ edges so navigation can't leave the window.
 </Preview>
 
 ```tsx
-<Calendar.Root min={new CalendarDate(2026, 6, 5)} max={new CalendarDate(2026, 6, 24)} />
+<Calendar.Root 
+  min={new CalendarDate(2020, 9, 1)} 
+  max={new CalendarDate(2020, 9, 15)}
+/>
 ```
 
 ## Unavailable dates
@@ -269,7 +277,7 @@ only once the range is complete.
 
 ```tsx
 <form onSubmit={handleSubmit}>
-  <Calendar.Root name="date" defaultValue={new CalendarDate(2026, 6, 15)} />
+  <Calendar.Root name="date" />
   <Button type="submit">Submit</Button>
 </form>
 ```
@@ -339,10 +347,14 @@ date's **own** calendar (not the locale's default), the grid and heading always 
 </Preview>
 
 ```tsx
-import { toCalendar, IslamicUmalquraCalendar } from "@internationalized/date";
+import { CalendarDate, IslamicUmalquraCalendar, toCalendar } from "@internationalized/date";
+
+// Reproject a Gregorian date into the target system, then pair it with a matching `-u-ca-` locale so
+// the heading, era, weekday names, and day numbers all render in that system.
+const date = toCalendar(new CalendarDate(2020, 9, 7), new IslamicUmalquraCalendar());
 
 <I18nProvider locale="ar-SA-u-ca-islamic-umalqura">
-  <Calendar.Root defaultFocusedValue={toCalendar(today(getLocalTimeZone()), new IslamicUmalquraCalendar())} />
+  <Calendar.Root defaultFocusedValue={date} />
 </I18nProvider>;
 ```
 
@@ -356,8 +368,13 @@ locale — French (Monday-first) and Japanese (Sunday-first, `2026年6月`) belo
 </Preview>
 
 ```tsx
-<I18nProvider locale="fr-FR"><Calendar.Root /></I18nProvider>
-<I18nProvider locale="ja-JP"><Calendar.Root /></I18nProvider>
+<I18nProvider locale="fr-FR">
+  <Calendar.Root />
+</I18nProvider>
+
+<I18nProvider locale="ja-JP">
+  <Calendar.Root />
+</I18nProvider>
 ```
 
 ## Keyboard interactions
@@ -641,21 +658,6 @@ Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, 
 glyph / period label). `Calendar.Header` and `Calendar.Grid` accept their native element attributes
 plus `class`. All host elements are rendered through the `render` prop where offered — the single
 polymorphism API, as elsewhere in hope-ui.
-
-<Alert.Root
-  variant="soft"
-  colorScheme="neutral"
-  class="not-prose"
-  title={<strong>On the roadmap</strong>}
-  description={
-    <div>
-      Core v1 styles a single visible month. Not yet shipped — they need multi-grid focus and
-      cell-builder work in the behavior layer: <code>numberOfMonths</code> (multi-month),{" "}
-      <code>showOutsideDays</code>, <code>fixedWeeks</code>, <code>weekNumbers</code>, a dropdown{" "}
-      <code>captionLayout</code>, and a formal per-day <code>renderDay</code>.
-    </div>
-  }
-/>
 
 ## Accessibility
 

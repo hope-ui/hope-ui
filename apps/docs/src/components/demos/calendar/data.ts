@@ -4,7 +4,7 @@ import { CalendarDate } from "@internationalized/date";
 // `defaultFocusedValue`; leaving it to `today()` would differ between build time (this SSG site is
 // prerendered) and view time, so the server HTML and the hydrated client would disagree on the whole
 // grid — a hydration mismatch. A stable date keeps the prerendered markup and the client identical.
-export const REFERENCE_DATE = new CalendarDate(2026, 6, 15);
+export const REFERENCE_DATE = new CalendarDate(2020, 9, 7);
 
 // The value union the calendar hands `onValueChange`, described structurally so the demos read it
 // without importing `@hope-ui/primitives` — the themeable component is the public surface.

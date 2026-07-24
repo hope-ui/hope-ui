@@ -17,11 +17,7 @@ export function CalendarFormDemo() {
         setSubmitted(String(new FormData(event.currentTarget).get("date") ?? ""));
       }}
     >
-      <Calendar.Root
-        name="date"
-        defaultValue={REFERENCE_DATE}
-        defaultFocusedValue={REFERENCE_DATE}
-      />
+      <Calendar.Root name="date" defaultFocusedValue={REFERENCE_DATE} />
       <Button type="submit" size="sm">
         Submit
       </Button>

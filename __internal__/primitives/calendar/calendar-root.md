@@ -29,12 +29,13 @@ the derived `formValues`); the `t` message resolver (used by the part hooks
 for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
-`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`,
-plus the abandonment trio `clearAnchor` / `commitSelection` / `clearSelection`);
-the per-date predicates (incl. `isCellDisabled`, `isHighlighted` and the tentative band's
-`isHighlightedStart` / `isHighlightedEnd`); and the shared `collection` / `listFocus` /
-`announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
-`highlightedRange`, `highlightDate`).
+`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`,
+`focusNearestAvailableDate`, `highlightDate`, plus the abandonment trio `clearAnchor` /
+`commitSelection` / `clearSelection`); the per-date predicates (incl. `isCellDisabled`, `isSelected` and
+the band endpoints `isSelectionStart` / `isSelectionEnd`); the shared `collection` / `listFocus` /
+`announce` the part hooks use, plus the deferred-cursor-focus flag `pendingCursorFocus` /
+`setPendingCursorFocus` (see below). Range naming mirrors React Aria's `RangeCalendarState`
+(`anchorDate`, `highlightedRange`, `highlightDate`).
 
 ## The roving cursor never leaves `[min, max]`
 
@@ -123,27 +124,51 @@ Details worth knowing:
   `calendar.ssr.test.tsx`'s inline snapshot was re-recorded with this change, with `hydrateFixture`
   proving the client allocates the same keys.
 
-## The tentative range band rides the roving cursor
+## `highlightedRange`: one field, two phases
 
 ```ts
-highlightedRange(): DateRange | null; // = strategy.highlightedRange({ value, anchor }, focusedDate())
+highlightedRange(): DateRange | null; // = strategy.highlightedRange({ value, anchor, endpoint: focusedDate() })
 highlightDate(date: CalendarDate): void; // = if (anchorDate() !== null) setFocusedDate(date)
 ```
 
-There is **one** moving endpoint, and it is `focusedDate` — React Aria's contract
-(`useRangeCalendarState`: `highlightedRange = anchorDate ? makeRange(anchorDate, focusedDate) : …`).
-Hover and keyboard are therefore the same code path: `highlightDate` *is* a cursor move, so the band
-can never disagree with the cell the user is on. Consequences worth knowing:
+`highlightedRange` is the **one** band range mode paints, in React Aria's one-field-two-phases shape
+(`useRangeCalendarState`: `highlightedRange = anchorDate ? makeRange(anchorDate, focusedDate) : (value && …)`):
+
+- **Tentative** while a range is anchored — `anchorDate` → the roving cursor.
+- **The committed value** when it is not — so once the range completes (or before any range is started),
+  the band simply *is* the committed selection.
+- **Null** outside range mode entirely, and while range mode has nothing selected.
+
+The three paint predicates (`isSelected` / `isSelectionStart` / `isSelectionEnd`) are membership in
+*this* single band, which is why there is **one** attribute vocabulary
+(`data-selected` + `data-selection-{start,end}`, with the middle derived — see `calendar-cell.md`) and
+no "highlight vs. selection" to disambiguate. The strategy derives the whole band from a
+`SelectionState` snapshot alone — `{ value, anchor, endpoint }`, where **`endpoint` is the roving
+cursor** (`focusedDate`), the range's moving end while anchored — so no predicate takes a second
+argument, exactly as React Aria's `isSelected` reads its own state object's `highlightedRange`. See
+`utils/range-selection.md`.
+
+**The decided trade-off:** while a new range is being dragged, the previously committed range **stops
+painting** — the band always shows the selection the next activate would produce. React Aria behaves
+identically. (Dropping the anchor without completing — `clearAnchor` / `Escape` — brings the committed
+range straight back, since `highlightedRange` falls back to `value` the moment `anchor` is `null`.)
+
+There is **one** moving endpoint and it is `focusedDate`, so hover and keyboard are the same code path:
+`highlightDate` *is* a cursor move, and the band can never disagree with the cell the user is on.
+Consequences worth knowing:
 
 - **Anchoring alone opens a one-day band** on the anchor (the cursor is already there), so the anchor
-  carries `data-highlighted` + both `data-highlighted-{start,end}` under its `data-selected` pill.
+  carries both `data-selection-{start,end}` under its `data-selected` pill until the cursor moves.
 - **Arrow keys grow the band.** There is no separate hover signal to be missing, which is what used to
-  make the keyboard show no preview at all.
+  make the keyboard show no preview at all — and the keyboard auto-advance (`focusNearestAvailableDate`,
+  below) steps the cursor off the anchor the instant a keyboard press anchors, so the band reads as two
+  days even before an arrow.
 - **The band survives the pointer leaving the grid** — it belongs to the anchor, not to a hover. The
   grid deliberately handles no `pointerleave` (see `calendar-grid.md`).
 - **`highlightDate` is inert with no anchor**, in every mode. Hover therefore never steals the roving
-  tab stop outside an in-progress range, and is a complete no-op in single/multiple (where `anchor` is
-  always `null`, so `highlightedRange` is too).
+  tab stop outside an in-progress range, and is a complete no-op in single/multiple, where `anchor` is
+  always `null` and those strategies' `highlightedRange` is always `null` (their paint reads `value`
+  directly, not the band).
 - **Accepted RA side effect:** while anchored, hovering *does* move the roving tab stop. That is the
   price of one endpoint, and it is what keeps pointer and keyboard from painting two different bands.
 
@@ -151,11 +176,42 @@ can never disagree with the cell the user is on. Consequences worth knowing:
 `isDateNonFocusable` or `isDateUnavailable` skips it — so a day the range could not actually end on
 never previews a range the matching click would refuse.
 
+## Keyboard range auto-advance
+
+```ts
+activate(date, opts?): boolean;                    // returns whether it *began a range*
+focusNearestAvailableDate(anchor: CalendarDate): void;
+pendingCursorFocus(): boolean;
+setPendingCursorFocus(pending: boolean): void;
+```
+
+`activate` returns **whether it began a range** — no anchor before, one after. The cell hook needs that
+fact to gate the keyboard-only auto-advance and cannot recover it by re-reading `anchorDate`: under
+solid-js 2.0's client build a signal write is invisible to a plain read until the next flush, so the
+anchor still reads `null` immediately after `activate` returns. The bit is `false` for a single/multiple
+selection, a refused day, and a year/decade drill — anything that is *not* "a range just started".
+
+`focusNearestAvailableDate` is React Aria's affordance (`useRangeCalendarState`): after a **keyboard**
+press anchors a range, step the cursor one day past the anchor (+1, falling back to −1, staying put when
+neither is selectable) so the band reads as "range in progress" rather than a committed single date. A
+pointer gets that signal from hover, so `createCalendarCell` calls this only for a keyboard press —
+never for a screen reader's virtual click. RA's two-term available-run test collapses to one
+`isDateSelectable` call here, because the run's edge *is* the first unavailable day in each direction
+for a one-day step (see § Contiguous ranges), and `order()` in the strategy normalizes the backwards
+case where stepping to −1 makes the anchor the range's *end*.
+
+`pendingCursorFocus` is the deferred-cursor-focus flag — "bring DOM focus to wherever the cursor
+settles". It lives on the **root state**, not on the grid, because both the grid's own arrow/page/drill
+navigation *and* `focusNearestAvailableDate` (which a cell calls, and a cell has no reference to the grid
+hook) must arm it. The **grid** consumes it: it owns the effect that waits for the target cell to mount,
+then moves DOM focus and clears the flag (see `calendar-grid.md`). It is a plain-value `createSignal`,
+so it consumes no hydration id and does not shift `_hk`.
+
 ## A range abandoned mid-selection
 
 ```ts
 commitBehavior?: "select" | "reset" | "clear"; // default "select"
-clearAnchor(): void;      // "reset" — drop the anchor, restore the selection from before it
+clearAnchor(): void;      // "reset" — drop the anchor
 commitSelection(): void;  // "select" — complete the tentative range at the roving cursor
 clearSelection(): void;   // "clear" — empty the selection
 ```
@@ -165,12 +221,11 @@ The three verbs are React Aria's (`RangeCalendarState`), and `createCalendarGrou
 `Escape` (on the grid) is always `clearAnchor`, never the policy. See `calendar-group.md` for both
 triggers; what is decided *here* is what each verb does:
 
-- **`clearAnchor` restores, it does not merely un-anchor.** React Aria's `setAnchorDate(null)` is
-  enough for it because RA leaves `value` untouched until a range completes. hope-ui writes the
-  degenerate `{ date, date }` on the first click (see below), so dropping the anchor alone would leave
-  that stand-in behind as if it were a real one-day selection. A snapshot of the committed value is
-  therefore taken as the range anchors, and put back here. It emits nothing: the consumer was never
-  told about the in-progress value, so restoring it is not a change.
+- **`clearAnchor` just drops the anchor** — React Aria's `setAnchorDate(null)`, verbatim. It needs
+  nothing more because `value` is never written while a range is in progress (see below): the selection
+  committed before the range began is still sitting in `value`, so the moment `anchor` goes `null`,
+  `highlightedRange` falls back to it and it resumes painting on its own. There is nothing to restore
+  and nothing to emit — the consumer was never told about an in-progress value.
 - **`commitSelection` is `activate(focusedDate())`** — so it emits `onValueChange` and announces, like
   any other completing activate. It falls back to `clearAnchor` in the two cases where there is nothing
   to commit, rather than doing nothing: this runs *because* the calendar already lost the pointer or
@@ -183,8 +238,9 @@ triggers; what is decided *here* is what each verb does:
   - **The calendar has been drilled up.** `activate` *descends a view* outside month view, so
     committing there would silently drill and still leave the range anchored.
 - **`clearSelection` emits `onValueChange(null)`** — or `[]` in multiple mode — **unless the consumer's
-  last-known value was already empty.** Mid-selection that last-known value is the pre-anchor snapshot,
-  not the degenerate one, so clearing a range merely *started* on an empty calendar emits nothing.
+  last-known value was already empty.** Because `value` is never written mid-selection, it *is* the
+  consumer's last-known value in every phase, so clearing a range merely *started* on an empty calendar
+  emits nothing.
 
 ### Extending a range (`activate(date, { extend: true })`)
 
@@ -202,15 +258,21 @@ Seeding at the cursor *unconditionally* is the bug this shape replaced — it re
 committed range and collapsed it to the two days around the cursor, which also left the strategy's
 no-anchor branch unreachable from the component.
 
-### The degenerate in-progress value is deliberate
+### `value` is written on exactly one transition
 
-The first activate of a range writes `value = { start: date, end: date }` alongside the anchor
-(`utils/range-selection.ts`). React Aria never writes it — and it was worth keeping anyway: it is what
-gives the anchor its solid `data-selected` pill *under* the tentative band, so the committed paint and
-the preview paint are the same two layers before and after the second click. What made it a hazard was
-abandonment — a range walked away from left that stand-in looking like a real selection, and
-`formValues()` had to special-case it. Both are now closed: every exit resolves the anchor, and
-`clearAnchor` restores what the stand-in overwrote.
+Range mode writes `value` **only** on the completing activate — the second click, or the plain
+`Enter`/click after a `Shift`+`Arrow` extension. The first activate anchors and leaves `value`
+untouched; the band is derived from the anchor and the roving cursor through `highlightedRange`, not
+from `value`. This is React Aria's contract (`utils/range-selection.md`).
+
+It also closes a real bug in the model this replaced. hope-ui used to write a degenerate
+`value = { start: date, end: date }` on the first click so the anchor carried a solid `data-selected`
+pill; `activate` correctly withheld `onValueChange` for it, but a **controlled** consumer's
+`createControllableState` then held a value its owner was never told about, for the entire duration of a
+range selection — and abandonment left that stand-in looking like a real one-day selection, forcing
+`clearAnchor` to snapshot-and-restore and `formValues()` to special-case it. Not writing `value` until
+commit removes all three at once: no untold-value window, nothing to restore on abandonment (see above),
+and `formValues()` needs no mid-selection guard (see Native form below).
 
 ## Native form
 
@@ -228,10 +290,11 @@ itself — it only exposes the state the styled component's hidden `<input>`s co
 
 - **single** → `[{ name, value }]` — empty (`[]`) when the value is `null`.
 - **multiple** → one entry per selected date, all sharing `name` (sorted, as the selection is).
-- **range** → `[{ name: `${name}Start`, value: startISO }, { name: `${name}End`, value: endISO }]`.
-  Empty until the range **completes**: mid-selection (while `anchorDate()` is set) the value is a
-  degenerate `{ start, end }`, so `formValues()` deliberately stays `[]` until the second endpoint
-  commits and the anchor clears.
+- **range** → `[{ name: `${name}Start`, value: startISO }, { name: `${name}End`, value: endISO }]`, or
+  `[]` when no range is committed. No mid-selection guard is needed: `value` is never written while a
+  range is in progress (see above), so whatever is in `value` is always a genuinely committed range —
+  during a *new* in-progress range the still-committed previous range is what submits, and withholding
+  it would drop a real value from the form for as long as the user drags a new one.
 
 `formValues` is a plain accessor (not a `createMemo`) — like `highlightedRange`, the sibling
 predicates, and the Listbox `formValues` — so it adds no reactive node to the render and stays
@@ -310,7 +373,7 @@ through `createControllableState`'s `onChange`.
 
 ### The paint excludes days the calendar cannot select
 
-`isSelected` / `isRangeStart` / `isRangeMiddle` / `isRangeEnd` are each gated on
+`isSelected` / `isSelectionStart` / `isSelectionEnd` are each gated on
 `!isCellDisabled(date) && !isDateUnavailable(date)` before the strategy is consulted — React Aria's
 own gate (`useCalendarState`'s `isSelected` returns false for either). The committed **value** is
 never touched; only the paint is. So a range committed while it was legal and later narrowed — by a
@@ -341,9 +404,10 @@ and the end corner on March. Tested by the month's first day alone — as it was
 February took the start corner.
 
 Month view's period is the degenerate `{date, date}`, on which every predicate collapses to the
-day-level test it generalizes, so month view is bit-for-bit unchanged. The `isHighlighted*` trio reads
-the same period for the same reason: a range anchored in month view survives a drill up, and its
-tentative band must not skip the month its own anchor sits in.
+day-level test it generalizes, so month view is bit-for-bit unchanged. The band predicates
+(`isSelected` / `isSelectionStart` / `isSelectionEnd`) read the same period for the same reason: a range
+anchored in month view survives a drill up, and its tentative band must not skip the month its own
+anchor sits in.
 
 The `paintsSelection` gate above composes *in front of* this, unchanged and still keyed on the cell's
 representative date — `isCellDisabled` is already per-view (`isMonthOutOfRange` / `isYearOutOfRange`

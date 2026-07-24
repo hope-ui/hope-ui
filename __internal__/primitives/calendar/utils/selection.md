@@ -1,11 +1,11 @@
 # `selection`
 
 The shared selection contract for the calendar family: the `SelectionStrategy` interface plus the
-`CalendarSelectionMode` / `CalendarValue` / `DateRange` / `SelectionState` / `SelectOptions` types, and
-the `selectionStrategyFor(mode)` / `firstDateOf(value)` helpers. Cells and nav call the stable
-`SelectionStrategy` interface and **never branch on `mode`** — the active mode's strategy
-(`singleSelection` / `rangeSelection` / `multipleSelection`) implements it. Every strategy method is
-pure, so the whole seam unit-tests as plain functions.
+`CalendarSelectionMode` / `CalendarValue` / `DateRange` / `SelectionState` / `SelectionResult` /
+`SelectOptions` types, and the `selectionStrategyFor(mode)` / `firstDateOf(value)` helpers. Cells and
+nav call the stable `SelectionStrategy` interface and **never branch on `mode`** — the active mode's
+strategy (`singleSelection` / `rangeSelection` / `multipleSelection`) implements it. Every strategy
+method is pure, so the whole seam unit-tests as plain functions.
 
 ## Shape
 
@@ -14,10 +14,35 @@ selectionStrategyFor(mode)   // → the pure, stateless strategy singleton for "
 firstDateOf(value)           // → a representative seed date (single → date, range → start, multiple → first), or null
 ```
 
+### `SelectionState` — what a strategy reads
+
+```ts
+interface SelectionState {
+  value: CalendarValue;          // the committed selection (union keyed by mode)
+  anchor: CalendarDate | null;   // range mode: the in-progress endpoint (null once complete / in single·multiple)
+  endpoint: CalendarDate | null; // the roving cursor — the range's *moving* end while anchored
+}
+```
+
+`endpoint` is the calendar's roving cursor (`focusedDate`), carried in the snapshot so a strategy can
+derive the whole painted band — anchor → endpoint while anchored, the committed value otherwise — from
+the state **alone**, with no second argument. That mirrors React Aria, where `isSelected` reads its
+state object's own `highlightedRange`.
+
+### `SelectionResult` — what a `select` transition returns
+
+```ts
+type SelectionResult = Pick<SelectionState, "value" | "anchor">;
+```
+
+Deliberately narrower than `SelectionState`: the roving cursor is the calendar's to move, never the
+strategy's, so a `select` transition returns only the next `value` + `anchor` and can never return an
+`endpoint`.
+
 ## The paint predicates take a period, not a date
 
-`isSelected` / `isRangeStart` / `isRangeMiddle` / `isRangeEnd` are asked about the **period a cell
-stands for** (`cellPeriod(view, date)` — see `utils/view.md`), so they are overlap tests:
+`isSelected` / `isSelectionStart` / `isSelectionEnd` are asked about the **period a cell stands for**
+(`cellPeriod(view, date)` — see `utils/view.md`), so they are overlap tests:
 
 | view | a cell's period | `isSelected` means |
 | --- | --- | --- |
@@ -25,11 +50,13 @@ stands for** (`cellPeriod(view, date)` — see `utils/view.md`), so they are ove
 | year | the whole month | the selection reaches into that month |
 | decade | the whole year | the selection reaches into that year |
 
-`isRange{Start,End}` ask which period **holds** the endpoint (one period can hold both, when the range
-fits inside it); `isRangeMiddle` is "overlaps but holds neither". The degenerate month-view period
-collapses every one of them back to the day-level test it generalizes, so month view is unchanged. Only
-these four take a period — `highlightedRange`'s `endpoint` and `select`'s `date` stay `CalendarDate`,
-since a moving endpoint and an activated cell are single days in every view.
+`isSelection{Start,End}` ask which period **holds** the band's corresponding endpoint (one period can
+hold both, when the band fits inside it — as it always does on a one-day band). There is **no** middle
+predicate: range mode paints exactly one band, so a consumer derives the interior as
+`isSelected && !isSelectionStart && !isSelectionEnd`. The degenerate month-view period collapses every
+one of them back to the day-level test it generalizes, so month view is unchanged. Only these three take
+a period — the `endpoint` on `SelectionState` and `select`'s `date` stay bare `CalendarDate`, since a
+moving endpoint and an activated cell are single days in every view.
 
 `SelectionStrategy` is explicitly an **unstable seam** (`CLAUDE.md` § Architecture); this signature
 change is sanctioned churn, not an accident.
