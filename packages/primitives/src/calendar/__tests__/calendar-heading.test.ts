@@ -2,15 +2,19 @@ import { CalendarDate } from "@internationalized/date";
 import { createRoot, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { createCalendarHeading } from "../calendar-heading";
-import { type CreateCalendarReturn, createCalendar } from "../calendar-root";
+import {
+  type CreateCalendarOptions,
+  type CreateCalendarReturn,
+  createCalendar,
+} from "../calendar-root";
 
-function setup() {
+function setup(options: CreateCalendarOptions = {}) {
   let api!: CreateCalendarReturn;
   let heading!: ReturnType<typeof createCalendarHeading>;
   let dispose!: () => void;
   createRoot((d) => {
     dispose = d;
-    api = createCalendar({ defaultFocusedValue: new CalendarDate(2026, 6, 15) });
+    api = createCalendar({ defaultFocusedValue: new CalendarDate(2026, 6, 15), ...options });
     heading = createCalendarHeading(api, {});
   });
   return { api, heading, dispose };
@@ -41,6 +45,15 @@ describe("createCalendarHeading", () => {
     flush(() => api.setView("decade"));
     expect(heading.props.disabled).toBe(true);
     expect(dataDisabled(heading.props)).toBe("true");
+    dispose();
+  });
+
+  it("is disabled on a disabled calendar, which drills nowhere even on a forced click", () => {
+    const { api, heading, dispose } = setup({ disabled: true });
+    expect(heading.props.disabled).toBe(true);
+    expect(dataDisabled(heading.props)).toBe("true");
+    flush(() => click(heading.props.onClick));
+    expect(api.view()).toBe("month");
     dispose();
   });
 });

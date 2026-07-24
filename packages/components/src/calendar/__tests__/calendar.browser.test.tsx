@@ -217,6 +217,100 @@ describe("Calendar", () => {
     dispose();
   });
 
+  it("hides the weekday header row from assistive technology", async () => {
+    // Each day button's accessible name already leads with its weekday, so an exposed column header
+    // makes a screen reader read it twice (React Aria's `headerProps`).
+    const { container, dispose } = mount(() => <Tree />);
+    expect(container.querySelector("thead")?.getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector('th[scope="col"][aria-label="Sunday"]')).not.toBeNull();
+    expect(dayButton(container, "Wednesday, January 15, 2020")).not.toBeNull();
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("renders a disabled calendar inert, down to the nav buttons", async () => {
+    let value: CalendarDate | undefined;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            disabled
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onValueChange={(v) => (value = v as CalendarDate)}
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    expect(grid.getAttribute("aria-disabled")).toBe("true");
+    expect((chromeButton(container, "Previous") as HTMLButtonElement).disabled).toBe(true);
+    expect((chromeButton(container, "Next") as HTMLButtonElement).disabled).toBe(true);
+
+    const day = dayButton(container, "Friday, January 10, 2020");
+    expect(day.getAttribute("aria-disabled")).toBe("true");
+    expect(day.getAttribute("tabindex")).toBe("-1");
+    day.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(value).toBeUndefined();
+    expect(heading(container).textContent).toBe("January 2020"); // nav did nothing either
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("renders a read-only calendar navigable but not selectable", async () => {
+    let value: CalendarDate | undefined;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            readOnly
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onValueChange={(v) => (value = v as CalendarDate)}
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    expect(grid.getAttribute("aria-readonly")).toBe("true");
+    expect(grid.getAttribute("aria-disabled")).toBeNull();
+
+    // Days stay reachable and undimmed…
+    const day = dayButton(container, "Friday, January 10, 2020");
+    expect(day.getAttribute("aria-disabled")).toBeNull();
+    day.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(value).toBeUndefined(); // …but nothing commits
+
+    // …and paging still works.
+    chromeButton(container, "Next").click();
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("February 2020"));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("marks a range grid multiselectable", () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            selectionMode="range"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    const grid = container.querySelector('[role="grid"]') as HTMLElement;
+    expect(grid.getAttribute("aria-multiselectable")).toBe("true");
+    dispose();
+  });
+
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = mount(() => <Tree />);
     expect(heading(container).textContent).toBe("January 2020");

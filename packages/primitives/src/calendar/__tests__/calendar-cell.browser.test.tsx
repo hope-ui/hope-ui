@@ -29,7 +29,7 @@ function CalendarHarness(props: {
       <button {...heading.props}>{state.headingLabel()}</button>
       <table {...grid.props}>
         <Show when={state.view() === "month"}>
-          <thead>
+          <thead {...grid.headerProps}>
             <tr>
               <For each={state.weekdays()}>
                 {(weekday) => (
@@ -247,6 +247,68 @@ describe("createCalendarCell", () => {
     const jan5 = dayButton(container, "2026-01-05");
     expect(jan5.getAttribute("data-disabled")).toBe("");
     expect(jan5.getAttribute("data-unavailable")).toBeNull();
+    dispose();
+  });
+
+  it("reports aria-disabled on both the gridcell and its button for every non-selectable day", async () => {
+    const { container, dispose } = await mountCalendar({
+      min: new CalendarDate(2026, 1, 10),
+      isDateDisabled: (date) => date.day === 20,
+    });
+    const ariaDisabledPair = (iso: string) => {
+      const button = dayButton(container, iso);
+      return [
+        button.closest("td")?.getAttribute("aria-disabled"),
+        button.getAttribute("aria-disabled"),
+      ];
+    };
+    // React Aria's `!isSelectable`, mirrored on both elements: out-of-range, outside-month, and
+    // unavailable all report it — a selectable day reports nothing.
+    expect(ariaDisabledPair("2026-01-05")).toEqual(["true", "true"]); // before min
+    expect(ariaDisabledPair("2025-12-30")).toEqual(["true", "true"]); // outside the visible month
+    expect(ariaDisabledPair("2026-01-20")).toEqual(["true", "true"]); // unavailable
+    expect(ariaDisabledPair("2026-01-15")).toEqual([null, null]);
+    dispose();
+  });
+
+  it("makes every day inert when the whole calendar is disabled", async () => {
+    let changed = false;
+    const { container, dispose } = await mountCalendar({
+      disabled: true,
+      onValueChange: () => (changed = true),
+    });
+
+    const jan15 = dayButton(container, "2026-01-15"); // the focused day, so the tab stop would be here
+    expect(jan15.getAttribute("aria-disabled")).toBe("true");
+    expect(jan15.closest("td")?.getAttribute("aria-disabled")).toBe("true");
+    expect(jan15.getAttribute("data-disabled")).toBe("");
+    // No cell may hold the roving tab stop — the arrows skip them all.
+    expect(jan15.getAttribute("tabindex")).toBe("-1");
+    expect(container.querySelector('[data-testdate][tabindex="0"]')).toBeNull();
+
+    jan15.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(changed).toBe(false);
+    dispose();
+  });
+
+  it("keeps a read-only calendar reachable but never selectable", async () => {
+    let changed = false;
+    const { container, dispose } = await mountCalendar({
+      readOnly: true,
+      onValueChange: () => (changed = true),
+    });
+
+    // Read-only is not disabled: the days stay focusable, undimmed and un-`aria-disabled` (the state
+    // lives on the grid as `aria-readonly`), but activation is refused.
+    const jan15 = dayButton(container, "2026-01-15");
+    expect(jan15.getAttribute("tabindex")).toBe("0");
+    expect(jan15.getAttribute("aria-disabled")).toBeNull();
+    expect(jan15.getAttribute("data-disabled")).toBeNull();
+
+    dayButton(container, "2026-01-20").click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(changed).toBe(false);
     dispose();
   });
 

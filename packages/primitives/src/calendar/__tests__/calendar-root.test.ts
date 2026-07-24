@@ -387,6 +387,43 @@ describe("createCalendar — native form", () => {
   });
 });
 
+describe("createCalendar — whole-calendar disabled", () => {
+  it("makes every cell inert and both nav buttons disabled", () => {
+    const { api, dispose } = setup({ disabled: true });
+    const jan15 = new CalendarDate(2026, 1, 15);
+    expect(api.isCellDisabled(jan15)).toBe(true);
+    expect(api.isDateNonFocusable(jan15)).toBe(true);
+    expect(api.isDateSelectable(jan15)).toBe(false);
+    // Nav is as inert as the cells — otherwise a disabled calendar still pages.
+    expect(api.isPrevDisabled()).toBe(true);
+    expect(api.isNextDisabled()).toBe(true);
+    flush(() => api.next());
+    expect(iso(api.visibleMonth())).toBe("2026-01-01");
+    dispose();
+  });
+
+  it("leaves an enabled calendar's in-range days untouched", () => {
+    const { api, dispose } = setup();
+    expect(api.isCellDisabled(new CalendarDate(2026, 1, 15))).toBe(false);
+    expect(api.isPrevDisabled()).toBe(false);
+    expect(api.isNextDisabled()).toBe(false);
+    dispose();
+  });
+
+  it("keeps isCellDisabled to the calendar's own bounds, not the visible scope", () => {
+    // The outside-month filler days are non-focusable, but not `isCellDisabled`: they keep their
+    // `data-outside-month` tint instead of being repainted dim.
+    const { api, dispose } = setup({ min: new CalendarDate(2026, 1, 10) });
+    const nextMonth = new CalendarDate(2026, 2, 3);
+    expect(api.isOutsideVisibleScope(nextMonth)).toBe(true);
+    expect(api.isCellDisabled(nextMonth)).toBe(false);
+    expect(api.isDateNonFocusable(nextMonth)).toBe(true);
+    // A day before `min` is out of range — inert *and* dimmed.
+    expect(api.isCellDisabled(new CalendarDate(2026, 1, 5))).toBe(true);
+    dispose();
+  });
+});
+
 describe("createCalendar — per-date predicates", () => {
   it("classifies non-focusable (outside/out-of-range) vs unavailable", () => {
     const { api, dispose } = setup({

@@ -38,7 +38,7 @@ function CalendarHarness(props: {
       </div>
       <table {...grid.props}>
         <Show when={state.view() === "month"}>
-          <thead>
+          <thead {...grid.headerProps}>
             <tr>
               <For each={state.weekdays()}>
                 {(weekday) => (
@@ -173,6 +173,47 @@ describe("createCalendarGrid — roving arrow navigation", () => {
 
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = await mountCalendar();
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("createCalendarGrid — grid ARIA", () => {
+  const grid = (container: HTMLElement) => container.querySelector("table") as HTMLElement;
+
+  it("omits the state flags a plain single-select calendar does not carry", async () => {
+    const { container, dispose } = await mountCalendar();
+    expect(grid(container).getAttribute("aria-readonly")).toBeNull();
+    expect(grid(container).getAttribute("aria-disabled")).toBeNull();
+    expect(grid(container).getAttribute("aria-multiselectable")).toBeNull();
+    dispose();
+  });
+
+  it("reflects readOnly, disabled and a non-single selection mode", async () => {
+    const { container, dispose } = await mountCalendar({
+      readOnly: true,
+      disabled: true,
+      selectionMode: "range",
+    });
+    expect(grid(container).getAttribute("aria-readonly")).toBe("true");
+    expect(grid(container).getAttribute("aria-disabled")).toBe("true");
+    expect(grid(container).getAttribute("aria-multiselectable")).toBe("true");
+    // The container tab stop goes too, so a disabled calendar is skipped entirely by Tab.
+    expect(grid(container).getAttribute("tabindex")).toBe("-1");
+    dispose();
+  });
+
+  it("marks multiple-selection calendars multiselectable too", async () => {
+    const { container, dispose } = await mountCalendar({ selectionMode: "multiple" });
+    expect(grid(container).getAttribute("aria-multiselectable")).toBe("true");
+    dispose();
+  });
+
+  it("hides the weekday header row, which every cell's aria-label already names", async () => {
+    const { container, dispose } = await mountCalendar();
+    expect(container.querySelector("thead")?.getAttribute("aria-hidden")).toBe("true");
+    // The weekday is not lost — it leads each day's accessible name.
+    expect(dayButton(container, "2026-01-15").getAttribute("aria-label")).toContain("Thursday");
     await expectNoA11yViolations(container);
     dispose();
   });

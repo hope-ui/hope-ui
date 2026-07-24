@@ -15,6 +15,9 @@ const ARROW_KEYS: Record<string, ArrowDirection> = {
 export interface CreateCalendarGridReturn {
   /** Spread onto the `<table role="grid">`. The component renders the rows/cells inside it. */
   props: JSX.HTMLAttributes<HTMLTableElement>;
+  /** Spread onto the weekday `<thead>`. `aria-hidden`: every cell's `aria-label` already names its
+   * weekday, so an exposed column header makes a screen reader announce it twice. */
+  headerProps: JSX.HTMLAttributes<HTMLTableSectionElement>;
 }
 
 /**
@@ -36,6 +39,9 @@ export interface CreateCalendarGridReturn {
  * - **Deferred focus** replaces the Angular `afterNextRender` nudge: after a cross / page / drill, the
  *   target cell is focused once it mounts, via `createListFocus`'s built-in deferral. It is armed only
  *   by user navigation, never on the initial render (so the calendar doesn't steal focus on mount).
+ *
+ * It also owns the grid's own ARIA state (`aria-readonly` / `aria-disabled` / `aria-multiselectable`)
+ * and `headerProps` for the weekday `<thead>` — both React Aria's `useCalendarGrid`.
  */
 export function createCalendarGrid(
   state: CreateCalendarReturn,
@@ -192,6 +198,18 @@ export function createCalendarGrid(
     get "aria-labelledby"() {
       return state.headingId();
     },
+    // The grid's own ARIA state, present only when true (each defaults to false in ARIA, so emitting
+    // `"false"` would be noise). `aria-multiselectable` covers both non-single modes: a range and a
+    // multiple-date calendar are equally "more than one cell may be selected".
+    get "aria-readonly"() {
+      return state.readOnly() ? "true" : undefined;
+    },
+    get "aria-disabled"() {
+      return state.disabled() ? "true" : undefined;
+    },
+    get "aria-multiselectable"() {
+      return state.mode() !== "single" ? "true" : undefined;
+    },
     get "data-view"() {
       return state.view();
     },
@@ -203,5 +221,5 @@ export function createCalendarGrid(
     },
   });
 
-  return { props: elementProps };
+  return { props: elementProps, headerProps: { "aria-hidden": "true" } };
 }

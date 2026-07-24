@@ -29,8 +29,8 @@ for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
 `prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`);
-the per-date predicates (incl. `isHighlighted` and the tentative band's `isHighlightedStart` /
-`isHighlightedEnd`); and the shared `collection` / `listFocus` /
+the per-date predicates (incl. `isCellDisabled`, `isHighlighted` and the tentative band's
+`isHighlightedStart` / `isHighlightedEnd`); and the shared `collection` / `listFocus` /
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
 `highlightedRange`, `highlightDate`).
 
@@ -140,12 +140,35 @@ to the active view's cell granularity** (`normalizeFocusForView`), so `isFocused
 `isSameDay` in every view, and the visible scope **follows the cursor** when it leaves — one effect
 does this for both internal roving moves and controlled `focusedValue` updates.
 
-## Two disabled states (React Aria)
+## Three disabled states (React Aria)
 
-- **non-focusable** = outside the visible scope OR a whole out-of-range period (`isDateNonFocusable`)
-  → the cell registers `disabled: true` (grid skips it) and click is guarded.
+- **cell-disabled** = the whole calendar `disabled` OR a whole out-of-range period (`isCellDisabled`,
+  RA's predicate of the same name) → the cell paints `data-disabled` (inert *and* dimmed).
+- **non-focusable** = `isCellDisabled` OR outside the visible scope (`isDateNonFocusable`) → the cell
+  registers `disabled: true` (grid skips it), holds no roving tab stop, and click/focus/hover are
+  guarded. The outside-scope days are *only* here, never in `isCellDisabled`: they must stay
+  arrow-skipped without being repainted dim over their own `data-outside-month` tint.
 - **unavailable** = the `isDateDisabled` predicate (month view only) → stays focusable + announced,
   blocked only in `activate`.
+
+`aria-disabled` is emitted for RA's `!isSelectable` — non-focusable **or** unavailable — so it covers
+all three (see `calendar-cell.md`).
+
+## `disabled` vs `readOnly`
+
+Both refuse selection (`isDateSelectable` is false under either), but they are different affordances,
+and hope-ui reflects each where React Aria does:
+
+| | `disabled` | `readOnly` |
+| --- | --- | --- |
+| Cells | inert: `isCellDisabled`, `aria-disabled`, `data-disabled`, no tab stop | untouched — reachable, undimmed, normal paint |
+| Grid | `aria-disabled="true"` + `tabindex="-1"` | `aria-readonly="true"` |
+| `prev()` / `next()` / `drillUp()` | all three no-op — a disabled calendar navigates nowhere | unaffected |
+
+`isPrevDisabled` / `isNextDisabled` therefore short-circuit on `disabled()` **before** the per-view
+`min`/`max` boundary math, and the heading part folds it in alongside `canDrillUp` (see
+`calendar-heading.md`). Without that, `disabled: true` rendered a calendar identical to an enabled
+one: fully pageable, fully tabbable, and reporting nothing to assistive technology.
 
 ## Selection
 

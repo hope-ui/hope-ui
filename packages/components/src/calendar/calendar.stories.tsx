@@ -70,6 +70,19 @@ export const Unavailable: Story = {
   ),
 };
 
+// The whole calendar off: every cell is inert (`aria-disabled` + `data-disabled`, no tab stop) and
+// both nav buttons are disabled, so the month can't be paged either. Contrast with `ReadOnly` below —
+// a disabled calendar looks unavailable; a read-only one looks normal but refuses to change.
+export const Disabled: Story = {
+  render: () => <CalendarDemo defaultFocusedValue={june} defaultValue={june} disabled />,
+};
+
+// Navigable and focusable, but not selectable: the grid carries `aria-readonly`, the days keep their
+// normal paint and roving tab stop, and clicking one changes nothing.
+export const ReadOnly: Story = {
+  render: () => <CalendarDemo defaultFocusedValue={june} defaultValue={june} readOnly />,
+};
+
 export const WeekStartsMonday: Story = {
   render: () => <CalendarDemo defaultFocusedValue={june} firstDayOfWeek="mon" />,
 };

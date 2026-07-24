@@ -185,6 +185,9 @@ export interface CreateCalendarReturn {
   isOutsideVisibleScope: (date: CalendarDate) => boolean;
   isOutOfRange: (date: CalendarDate) => boolean;
   isCellOutOfRange: (date: CalendarDate) => boolean;
+  /** The calendar itself makes this cell inert: the whole calendar is `disabled`, or the cell's
+   * period falls outside `[min, max]`. React Aria's `isCellDisabled`. */
+  isCellDisabled: (date: CalendarDate) => boolean;
   isDateUnavailable: (date: CalendarDate) => boolean;
   isDateNonFocusable: (date: CalendarDate) => boolean;
   isDateSelectable: (date: CalendarDate) => boolean;
@@ -349,7 +352,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
         return formatDecadeRange(visibleMonth(), locale(), timeZone());
     }
   });
+  // A disabled calendar cannot be paged either — the nav buttons are as inert as the cells, which is
+  // what keeps `disabled` from rendering an otherwise fully operable calendar (React Aria gates the
+  // same two on `isDisabled`).
   const isPrevDisabled = createMemo(() => {
+    if (disabled()) {
+      return true;
+    }
     switch (view()) {
       case "month":
         return isPreviousMonthDisabled(visibleMonth(), min());
@@ -360,6 +369,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   });
   const isNextDisabled = createMemo(() => {
+    if (disabled()) {
+      return true;
+    }
     switch (view()) {
       case "month":
         return isNextMonthDisabled(visibleMonth(), max());
@@ -391,8 +403,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
     return isDateDisabledFn()?.(date) ?? false;
   };
+  // React Aria's `isCellDisabled`: the calendar-level inertness — the whole calendar `disabled`, or a
+  // period outside `[min, max]`. It deliberately excludes the outside-scope filler days that
+  // `isDateNonFocusable` adds on top, so `data-disabled` keeps meaning "inert *and* dimmed" and a
+  // leading/trailing day of an adjacent month keeps its own `data-outside-month` tint instead.
+  const isCellDisabled = (date: CalendarDate) => disabled() || isCellOutOfRange(date);
   const isDateNonFocusable = (date: CalendarDate) =>
-    isOutsideVisibleScope(date) || isCellOutOfRange(date);
+    isOutsideVisibleScope(date) || isCellDisabled(date);
   const isDateSelectable = (date: CalendarDate) =>
     !disabled() && !readOnly() && !isOutOfRange(date) && !isDateUnavailable(date);
 
@@ -499,6 +516,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
 
   const drillUp = () => {
+    if (disabled()) {
+      return; // as inert as prev/next — a disabled calendar navigates nowhere
+    }
     switch (view()) {
       case "month":
         return applyView("year");
@@ -683,6 +703,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     isOutsideVisibleScope,
     isOutOfRange,
     isCellOutOfRange,
+    isCellDisabled,
     isDateUnavailable,
     isDateNonFocusable,
     isDateSelectable,

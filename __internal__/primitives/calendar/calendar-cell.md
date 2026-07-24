@@ -27,30 +27,42 @@ is the render seam for a custom cell body (the same flags the default cell deriv
 ## Behavior
 
 - Registers the button into the calendar's shared collection, `disabled` when the date is
-  non-focusable (outside-scope / whole out-of-range), so the grid skips it.
+  non-focusable (outside-scope / whole out-of-range / whole calendar `disabled`), so the grid skips it.
 - `onClick` (which native `Enter`/`Space`/pointer all fire) → `activate`, refused on an inert cell.
 - `onMouseDown` prevents native click-focus landing on an inert cell.
 - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells. It is untracked
   because `createListFocus` may fire it synchronously from inside its own effect.
 - `onMouseEnter` → `highlightDate`, which moves the **roving cursor** (the tentative band's moving
-  endpoint — see `calendar-root.md`). Gated on React Aria's `isSelectable`: a non-focusable or
-  unavailable day is skipped, so hovering a day the range could not end on neither previews a range
-  the click would refuse nor drags the tab stop onto an inert cell.
+  endpoint — see `calendar-root.md`). Gated on `isSelectable`: a non-focusable or unavailable day is
+  skipped, so hovering a day the range could not end on neither previews a range the click would
+  refuse nor drags the tab stop onto an inert cell.
+
+## `isSelectable`
+
+React Aria's single gate — `!isDateNonFocusable(date) && !isDateUnavailable(date)` — behind both
+`aria-disabled` and the hover preview. It is true for a day this calendar could actually select, so it
+is false for out-of-range, outside-month, unavailable **and** whole-calendar-`disabled` days alike.
+
+The roving tab stop is gated one notch looser, on `isDateNonFocusable` alone: an *unavailable* day is
+still reachable (that is the whole point of the unavailable/disabled split), so it can hold the cursor.
 
 ## Attributes
 
-- `<td>`: `role="gridcell"` and `aria-selected` — the ARIA grid-cell semantics — **plus the
-  band-level hooks only**: `data-range-{start,middle,end}`, `data-highlighted` (the tentative
-  anchor → cursor band) and its endpoints `data-highlighted-{start,end}`. The per-day hooks
+- `<td>`: `role="gridcell"`, `aria-selected` and `aria-disabled` — the ARIA grid-cell semantics —
+  **plus the band-level hooks only**: `data-range-{start,middle,end}`, `data-highlighted` (the
+  tentative anchor → cursor band) and its endpoints `data-highlighted-{start,end}`. The per-day hooks
   (`data-selected`, `data-today`, …) deliberately stay off it.
 - `<button>`: the view-aware `aria-label` (with Today / selected / range-start / range-end / unavailable
-  suffixes), `aria-disabled` for unavailable days, `tabindex` — `0` on the focused cell, `-1` elsewhere
-  (the tab stop derives from `isFocused`, a date comparison, so it is correct on the server too,
+  suffixes), `aria-disabled` again, `tabindex` — `0` on the focused cell, `-1` elsewhere and on **every**
+  non-focusable cell (both halves are date comparisons, so the tab stop is correct on the server too,
   independent of the client-only collection) — **and every `data-*` day-state paint hook**: `data-today`,
   `data-outside-month`, `data-unavailable` (the `isDateDisabled` predicate hit — struck through, still
-  interactive), `data-disabled` (a whole out-of-range period — inert + dimmed), `data-selected`,
-  `data-range-{start,middle,end}`, `data-highlighted`, `data-highlighted-{start,end}`, `data-focused`
-  (present-when-true).
+  interactive), `data-disabled` (`isCellDisabled` — a whole out-of-range period, or the whole calendar
+  `disabled`: inert + dimmed), `data-selected`, `data-range-{start,middle,end}`, `data-highlighted`,
+  `data-highlighted-{start,end}`, `data-focused` (present-when-true).
+
+`aria-disabled` lands on **both** elements, as React Aria does, so the state reads the same whether an
+assistive technology lands on the grid cell or on its inner control.
 
 The split is what lets one range read as one shape: the registered day-state custom variants in
 `@hope-ui/presets` `_base/_variants.css` are **self-based** (`&:where([data-today])`), so a hook fires
@@ -65,5 +77,5 @@ leaving it squared off mid-drag.
 
 `data-unavailable` and `data-disabled` are **distinct** (React-Aria's `isUnavailable` vs `isDisabled`
 split), never both on one day: an unavailable day is focusable + announced (aria-disabled) but stays
-pointer-interactive; an out-of-range day is fully inert. So a recipe can strike the former and dim the
-latter without the two treatments stacking.
+pointer-interactive; an out-of-range or whole-calendar-disabled day is fully inert. So a recipe can
+strike the former and dim the latter without the two treatments stacking.

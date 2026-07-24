@@ -9,12 +9,32 @@ calendar's shared `createListFocus` + `createCollection`) and layers the calenda
 function createCalendarGrid(
   state: CreateCalendarReturn,
   props: JSX.HTMLAttributes<HTMLTableElement>,
-): { props: JSX.HTMLAttributes<HTMLTableElement> };
+): {
+  props: JSX.HTMLAttributes<HTMLTableElement>;             // the <table role="grid">
+  headerProps: JSX.HTMLAttributes<HTMLTableSectionElement>; // the weekday <thead>
+};
 ```
 
 Spread `props` onto the `<table>`. The component renders the rows/cells inside it; the returned props
-carry `role="grid"`, `aria-labelledby` (the heading id), `data-view`, the container `tabindex`, and the
-composed `onKeyDown`.
+carry `role="grid"`, `aria-labelledby` (the heading id), `data-view`, the container `tabindex`, the
+composed `onKeyDown`, and the grid's ARIA state below.
+
+## Grid ARIA state
+
+Each is emitted **only when true** — all three default to false in ARIA, so a `"false"` would be noise:
+
+| Attribute | Source |
+| --- | --- |
+| `aria-readonly` | `state.readOnly()` — navigable and focusable, but nothing commits. |
+| `aria-disabled` | `state.disabled()` — pairs with the container `tabindex="-1"` `createListFocus` already returns, so Tab skips the calendar entirely. |
+| `aria-multiselectable` | `state.mode() !== "single"` — a range and a multiple-date calendar are equally "more than one cell may be selected". |
+
+`headerProps` is `aria-hidden` (React Aria's `useCalendarGrid`): every day button's accessible name
+already **leads with its weekday**, so an exposed column header makes a screen reader announce the
+weekday twice per cell. It is a plain static object, but the component still routes the `<thead>`
+through `renderElement` — spreading *any* hook props object onto a literal host element allocates its
+subtree's `_hk` differently on client vs server (measured: all seven `<th>` came back unclaimed on
+hydrate).
 
 **No `onPointerLeave`.** The tentative range band is derived from the roving cursor
 (`calendar-root.md`), so it belongs to the anchor, not to a hover: clearing it when the pointer leaves

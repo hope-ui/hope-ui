@@ -30,8 +30,9 @@ export interface CalendarDayState {
   readonly isFocused: boolean;
   /** `isDateDisabled` hit — focusable + announced, but not selectable (painted `data-unavailable`). */
   readonly isUnavailable: boolean;
-  /** A whole out-of-range period — inert (not focusable, not selectable), painted `data-disabled`.
-   * Distinct from {@link isUnavailable} (React-Aria's split): an unavailable day stays interactive. */
+  /** The calendar makes this cell inert — a whole out-of-range period, or the whole calendar
+   * `disabled`. Not focusable, not selectable, painted `data-disabled`. Distinct from
+   * {@link isUnavailable} (React-Aria's split): an unavailable day stays interactive. */
   readonly isDisabled: boolean;
 }
 
@@ -69,13 +70,14 @@ export interface CreateCalendarCellReturn {
  *
  * The registered day-state custom variants are self-based (`&:where([data-range-middle])`), so an
  * attribute only lights a utility on the element that carries it. That splits the paint across the two
- * elements: the `<td>` carries the ARIA grid semantics (`role="gridcell"` + `aria-selected`) **and**
- * the band-level range/tentative-highlight hooks, so the `cell` slot paints the continuous range band
- * that spans cells; the inner `<button>` carries the full per-day set (plus `aria-label`,
- * `aria-disabled`, roving `tabindex`, `data-focused`), so the `cellTrigger` slot paints the solid
- * endpoint pills and marks on top of that band. The shared range flags are therefore emitted on both.
- * The tab stop is the focused cell (`tabindex` from `isFocused`), correct on the server too (it
- * compares dates, and doesn't depend on the client-only collection).
+ * elements: the `<td>` carries the ARIA grid semantics (`role="gridcell"` + `aria-selected` +
+ * `aria-disabled`) **and** the band-level range/tentative-highlight hooks, so the `cell` slot paints
+ * the continuous range band that spans cells; the inner `<button>` carries the full per-day set (plus
+ * `aria-label`, roving `tabindex`, `data-focused`), so the `cellTrigger` slot paints the solid
+ * endpoint pills and marks on top of that band. The shared range flags — and `aria-disabled`, which
+ * React Aria mirrors — are therefore emitted on both. The tab stop is the focused *focusable* cell,
+ * correct on the server too (both halves compare dates, and neither depends on the client-only
+ * collection).
  */
 export function createCalendarCell(
   state: CreateCalendarReturn,
@@ -105,10 +107,16 @@ export function createCalendarCell(
   const isHighlightedStart = () => state.isHighlightedStart(date());
   const isHighlightedEnd = () => state.isHighlightedEnd(date());
   const isUnavailable = () => state.isDateUnavailable(date());
-  // `data-disabled` marks only the truly-inert out-of-range days (dim + no pointer). Unavailable days
-  // are painted separately (`data-unavailable`) and stay interactive — React-Aria's isDisabled vs
-  // isUnavailable split — so the two never double-apply (a struck-out day is not also dimmed).
-  const isDisabled = () => state.isCellOutOfRange(date());
+  const isNonFocusable = () => state.isDateNonFocusable(date());
+  // `data-disabled` marks only the truly-inert days — out-of-range, or the whole calendar disabled
+  // (dim + no pointer). Unavailable days are painted separately (`data-unavailable`) and stay
+  // interactive — React-Aria's isDisabled vs isUnavailable split — so the two never double-apply (a
+  // struck-out day is not also dimmed).
+  const isDisabled = () => state.isCellDisabled(date());
+  // React Aria's `isSelectable` — the gate behind `aria-disabled` and the hover preview. A day is
+  // selectable when the calendar neither makes it inert nor marks it unavailable. The roving tab stop
+  // is gated on `isNonFocusable` instead, one notch looser: an unavailable day is still reachable.
+  const isSelectable = () => !isNonFocusable() && !isUnavailable();
 
   const dayState = createMemo<CalendarDayState>(() => ({
     date: date(),
@@ -150,24 +158,24 @@ export function createCalendarCell(
 
   const onMouseDown: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (event) => {
     // A roving `tabindex` can leave an inert cell click-focusable; block that native focus so a click
-    // can't land on — or cross into — an outside/out-of-range day.
-    if (state.isDateNonFocusable(date())) {
+    // can't land on — or cross into — an outside/out-of-range/disabled day.
+    if (isNonFocusable()) {
       event.preventDefault();
     }
   };
   const onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (event) => {
     event.preventDefault();
-    if (state.isDateNonFocusable(date())) {
+    if (isNonFocusable()) {
       return; // inert — never activates, even via a forced click
     }
     state.activate(date());
   };
   const onMouseEnter: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
-    // Only a day the range could actually end on may move the tentative band (React Aria's
-    // `isSelectable` gate). Without it, hovering an outside-month or unavailable day would preview a
-    // range that the matching click refuses to commit — and, since the band now rides the roving
-    // cursor, would strand the tab stop on an inert cell.
-    if (state.isDateNonFocusable(date()) || state.isDateUnavailable(date())) {
+    // Only a day the range could actually end on may move the tentative band. Without this gate,
+    // hovering an outside-month or unavailable day would preview a range that the matching click
+    // refuses to commit — and, since the band now rides the roving cursor, would strand the tab stop
+    // on an inert cell.
+    if (!isSelectable()) {
       return;
     }
     state.highlightDate(date());
@@ -177,7 +185,7 @@ export function createCalendarCell(
     // this synchronously — so the reads here would run in that effect's tracking scope. This is an
     // imperative sync with real focus, never a dependency, so untrack the whole body.
     untrack(() => {
-      if (state.isDateNonFocusable(date())) {
+      if (isNonFocusable()) {
         return;
       }
       state.setFocusedDate(date()); // keep the roving cursor synced with real focus
@@ -192,6 +200,11 @@ export function createCalendarCell(
     role: "gridcell" as const,
     get "aria-selected"() {
       return isSelected() ? "true" : undefined;
+    },
+    // Mirrored onto the button below: React Aria puts `!isSelectable` on both, so the state is
+    // readable whether an assistive technology lands on the grid cell or on its inner control.
+    get "aria-disabled"() {
+      return isSelectable() ? undefined : "true";
     },
     get "data-range-start"() {
       return isRangeStart() ? "" : undefined;
@@ -222,13 +235,15 @@ export function createCalendarCell(
   const triggerProps = {
     type: "button" as const,
     get tabindex() {
-      return isFocused() ? 0 : -1;
+      // The tab stop is the focused cell — but never a cell the arrows skip, or the roving stop
+      // strands on a dead cell (a whole-calendar `disabled` would otherwise leave one tabbable).
+      return isFocused() && !isNonFocusable() ? 0 : -1;
     },
     get "aria-label"() {
       return ariaLabel();
     },
     get "aria-disabled"() {
-      return isUnavailable() ? "true" : undefined;
+      return isSelectable() ? undefined : "true";
     },
     get "data-today"() {
       return isToday() ? "" : undefined;

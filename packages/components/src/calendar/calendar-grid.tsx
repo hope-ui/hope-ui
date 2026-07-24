@@ -17,35 +17,51 @@ export interface CalendarGridProps extends JSX.HTMLAttributes<HTMLTableElement> 
  * internally — a consumer can't hand-author 42 reactive cells. The weekday `<th>` carries the `weekday`
  * slot; each `<td>`/`<button>` carries `cell`/`cellTrigger` (via `CalendarCell`). Pure assembly + theme.
  *
- * The `<table>` goes through `renderElement`, but the structural `<thead>`/`<tr>`/`<th>`/`<tbody>` are
- * plain literals. The distinction is hydration-key stability: the `<table>` spreads the getter-laden
- * `grid.props` and has reactive children, and a getter-spread on a literal host element allocates `_hk`
- * differently under the server (`ssr`) vs client (`dom`) Solid compile — so it must be a `<Dynamic>` (a
- * component call), which allocates identically on both. The structural tags carry no such spread, so a
- * literal is correct — and clearer — there.
+ * The `<table>` and the `<thead>` go through `renderElement`; the remaining `<tr>`/`<th>`/`<tbody>` are
+ * plain literals. The distinction is hydration-key stability: an element that **spreads a props object
+ * from the primitive hook** allocates `_hk` differently for its subtree under the server (`ssr`) vs the
+ * client (`dom`) Solid compile — measured, not assumed: spreading `headerProps` onto a literal `<thead>`
+ * left all seven `<th>` unclaimed on hydrate. `renderElement` → `<Dynamic>` (a component call)
+ * allocates identically on both. The remaining tags spread nothing, so a literal is correct — and
+ * clearer — there.
  */
 export function Grid(props: CalendarGridProps): JSX.Element {
   const ctx = useCalendarContext();
   const grid = createCalendarGrid(ctx.state, props);
+
+  /** The weekday `<thead>`. Its own component so `grid.headerProps` reaches it through
+   * `renderElement`: a spread on a *literal* `<thead>` makes the client compile allocate its subtree's
+   * `_hk` differently from the server's, and the seven `<th>` come back unclaimed on hydrate. */
+  function WeekdayHead(): JSX.Element {
+    return renderElement<JSX.HTMLAttributes<HTMLTableSectionElement>>({
+      as: "thead",
+      props: merge(grid.headerProps, {
+        get children(): JSX.Element {
+          return (
+            <tr>
+              <For each={ctx.state.weekdays()}>
+                {(weekday) => (
+                  <th
+                    scope="col"
+                    aria-label={weekday.long}
+                    data-slot="calendar-weekday"
+                    class={ctx.slots.weekday()}
+                  >
+                    {weekday.short}
+                  </th>
+                )}
+              </For>
+            </tr>
+          );
+        },
+      }),
+    });
+  }
+
   const children = (
     <>
       <Show when={ctx.state.view() === "month"}>
-        <thead>
-          <tr>
-            <For each={ctx.state.weekdays()}>
-              {(weekday) => (
-                <th
-                  scope="col"
-                  aria-label={weekday.long}
-                  data-slot="calendar-weekday"
-                  class={ctx.slots.weekday()}
-                >
-                  {weekday.short}
-                </th>
-              )}
-            </For>
-          </tr>
-        </thead>
+        <WeekdayHead />
       </Show>
       <tbody>
         <For each={ctx.state.cells()}>
