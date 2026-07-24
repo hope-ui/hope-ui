@@ -49,8 +49,7 @@ day with a click, `Enter`, or `Space`.
 ```tsx
 const [value, setValue] = createSignal<CalendarValue>(null);
 
-// `defaultFocusedValue` seeds the visible month — pass a stable date so a prerendered/SSR page and the
-// client render the same grid (leaving it to today() would mismatch on hydration).
+// `defaultFocusedValue` seeds the visible month; a stable date keeps SSR deterministic (see below).
 <Calendar.Root
   defaultFocusedValue={new CalendarDate(2020, 9, 7)}
   value={value()}
@@ -64,6 +63,12 @@ const [value, setValue] = createSignal<CalendarValue>(null);
   <Calendar.Grid />
 </Calendar.Root>;
 ```
+
+`defaultFocusedValue` sets which month opens first. In a client-rendered app you can omit it — it
+defaults to today. Under SSR or static prerendering, pass a stable date (or a `today()` computed once on
+the server) so the server and client seed the **same** month: the grid is a variable 4–6 rows, so a
+build-time `today()` landing in a different month than view-time would mismatch on hydration. This page
+is prerendered, so every demo pins a fixed reference date.
 
 <Alert.Root
   variant="soft"
