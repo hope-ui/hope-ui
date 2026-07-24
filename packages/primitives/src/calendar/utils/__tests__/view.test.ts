@@ -1,9 +1,12 @@
 import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import {
+  cellPeriod,
   decadeStart,
   isInViewScope,
   normalizeFocusForView,
+  periodContains,
+  periodsOverlap,
   VIEW_COLUMNS,
   YEARS_PER_DECADE,
 } from "../view";
@@ -36,6 +39,56 @@ describe("normalizeFocusForView", () => {
   });
   it("snaps to Jan 1 in decade view", () => {
     expect(normalizeFocusForView("decade", date).toString()).toBe("2026-01-01");
+  });
+});
+
+describe("cellPeriod", () => {
+  const date = new CalendarDate(2026, 2, 15);
+  const span = (view: "month" | "year" | "decade") => {
+    const period = cellPeriod(view, date);
+    return [period.start.toString(), period.end.toString()];
+  };
+
+  it("is the single day in month view", () => {
+    expect(span("month")).toEqual(["2026-02-15", "2026-02-15"]);
+  });
+  it("is the whole month in year view — leap February included", () => {
+    expect(span("year")).toEqual(["2026-02-01", "2026-02-28"]);
+    const leap = cellPeriod("year", new CalendarDate(2024, 2, 15));
+    expect(leap.end.toString()).toBe("2024-02-29");
+  });
+  it("is the whole year in decade view", () => {
+    expect(span("decade")).toEqual(["2026-01-01", "2026-12-31"]);
+  });
+});
+
+describe("periodContains / periodsOverlap", () => {
+  const jan = { start: new CalendarDate(2026, 1, 1), end: new CalendarDate(2026, 1, 31) };
+  const d = (day: number) => new CalendarDate(2026, 1, day);
+
+  it("periodContains is inclusive at both ends", () => {
+    expect(periodContains(jan, d(1))).toBe(true);
+    expect(periodContains(jan, d(31))).toBe(true);
+    expect(periodContains(jan, new CalendarDate(2025, 12, 31))).toBe(false);
+    expect(periodContains(jan, new CalendarDate(2026, 2, 1))).toBe(false);
+  });
+
+  it("periodContains collapses to a same-day test on a degenerate period", () => {
+    const oneDay = cellPeriod("month", d(10));
+    expect(periodContains(oneDay, d(10))).toBe(true);
+    expect(periodContains(oneDay, d(11))).toBe(false);
+  });
+
+  it("periodsOverlap is true for any shared day, false for adjacency", () => {
+    expect(periodsOverlap(jan, { start: d(31), end: new CalendarDate(2026, 3, 1) })).toBe(true);
+    expect(periodsOverlap(jan, { start: d(5), end: d(6) })).toBe(true); // fully inside
+    expect(periodsOverlap({ start: d(5), end: d(6) }, jan)).toBe(true); // symmetric
+    expect(
+      periodsOverlap(jan, {
+        start: new CalendarDate(2026, 2, 1),
+        end: new CalendarDate(2026, 2, 28),
+      }),
+    ).toBe(false); // touching but disjoint
   });
 });
 

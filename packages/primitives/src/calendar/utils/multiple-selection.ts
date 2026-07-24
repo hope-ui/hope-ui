@@ -1,5 +1,6 @@
 import { type CalendarDate, isSameDay } from "@internationalized/date";
 import type { CalendarValue, SelectionStrategy } from "./selection";
+import { periodContains } from "./view";
 
 /** Narrow a {@link CalendarValue} to the multiple mode's `CalendarDate[]` (empty for null/non-array). */
 function asMultiple(value: CalendarValue): readonly CalendarDate[] {
@@ -10,12 +11,16 @@ function asMultiple(value: CalendarValue): readonly CalendarDate[] {
  * Multiple selection: each activate toggles `date` in/out of a set. No range, no anchor, no highlight —
  * the range predicates are all false, `highlightedRange` is null, and `extend` is ignored. The toggled
  * set stays sorted so `onValueChange` payloads are deterministic.
+ *
+ * `isSelected` asks whether *any* selected day falls in the cell's period (`cellPeriod`), so a year
+ * cell lights up for every month holding a selected day. In month view the period is the degenerate
+ * `{ date, date }`, i.e. the same-day membership test this replaced.
  */
 export const multipleSelection: SelectionStrategy = {
   mode: "multiple",
 
-  isSelected(state, date) {
-    return asMultiple(state.value).some((d) => isSameDay(d, date));
+  isSelected(state, period) {
+    return asMultiple(state.value).some((date) => periodContains(period, date));
   },
 
   isRangeStart() {

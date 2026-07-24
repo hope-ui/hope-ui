@@ -1,5 +1,6 @@
 import type { CalendarDate } from "@internationalized/date";
 import type { CalendarValue, DateRange, SelectionStrategy } from "./selection";
+import { periodContains, periodsOverlap } from "./view";
 
 /** Narrow a {@link CalendarValue} to a {@link DateRange} (or null). */
 function asRange(value: CalendarValue): DateRange | null {
@@ -9,11 +10,6 @@ function asRange(value: CalendarValue): DateRange | null {
 /** Order two dates into an inclusive `{ start, end }` (start <= end). */
 function order(a: CalendarDate, b: CalendarDate): DateRange {
   return a.compare(b) <= 0 ? { start: a, end: b } : { start: b, end: a };
-}
-
-/** Inclusive containment: `start <= date <= end`. */
-function within(range: DateRange, date: CalendarDate): boolean {
-  return date.compare(range.start) >= 0 && date.compare(range.end) <= 0;
 }
 
 /**
@@ -30,28 +26,39 @@ function within(range: DateRange, date: CalendarDate): boolean {
  * `isSelected` covers the whole committed range (highlight); `isRange{Start,Middle,End}` refine the
  * endpoints for corner paint. `highlightedRange` returns the tentative `[anchor … endpoint]` span while
  * selecting, where the caller's `endpoint` is the calendar's roving cursor. Pure.
+ *
+ * The four predicates read the **period a cell stands for** (`cellPeriod`), so they are overlap tests:
+ * in year/decade view a month/year cell paints as soon as the range passes through it, and it carries
+ * the start/end corner when it is the period the endpoint falls in. Month view's degenerate
+ * `{ date, date }` period collapses each of them back to the day-level test it generalizes — overlap to
+ * containment, and "holds neither endpoint" to "strictly between them".
  */
 export const rangeSelection: SelectionStrategy = {
   mode: "range",
 
-  isSelected(state, date) {
+  isSelected(state, period) {
     const range = asRange(state.value);
-    return range !== null && within(range, date);
+    return range !== null && periodsOverlap(range, period);
   },
 
-  isRangeStart(state, date) {
+  isRangeStart(state, period) {
     const range = asRange(state.value);
-    return range !== null && date.compare(range.start) === 0;
+    return range !== null && periodContains(period, range.start);
   },
 
-  isRangeMiddle(state, date) {
+  isRangeMiddle(state, period) {
     const range = asRange(state.value);
-    return range !== null && date.compare(range.start) > 0 && date.compare(range.end) < 0;
+    return (
+      range !== null &&
+      periodsOverlap(range, period) &&
+      !periodContains(period, range.start) &&
+      !periodContains(period, range.end)
+    );
   },
 
-  isRangeEnd(state, date) {
+  isRangeEnd(state, period) {
     const range = asRange(state.value);
-    return range !== null && date.compare(range.end) === 0;
+    return range !== null && periodContains(period, range.end);
   },
 
   highlightedRange(state, endpoint) {

@@ -49,17 +49,22 @@ export interface SelectOptions {
  * `multipleSelection`). Every method is **pure**: predicates read a {@link SelectionState} snapshot,
  * and `select` returns the next snapshot (the strategy decides the transition). `isRange*` are all
  * false outside range mode; `highlightedRange` is null unless range mode is mid-selection.
+ *
+ * The four paint predicates take the **period a cell stands for** (`cellPeriod(view, date)` — a single
+ * day in month view, a whole month in year view, a whole year in decade view) rather than a bare date,
+ * so a year/decade cell paints whenever the selection *overlaps* it. Month view passes the degenerate
+ * `{ date, date }`, which collapses every test back to the day-level one it generalizes.
  */
 export interface SelectionStrategy {
   readonly mode: CalendarSelectionMode;
-  /** Is `date` part of the (committed) selection — drives `data-selected` + the aria-label suffix. */
-  isSelected(state: SelectionState, date: CalendarDate): boolean;
-  /** Is `date` the range's start endpoint (range mode only). */
-  isRangeStart(state: SelectionState, date: CalendarDate): boolean;
-  /** Is `date` strictly inside the range (range mode only). */
-  isRangeMiddle(state: SelectionState, date: CalendarDate): boolean;
-  /** Is `date` the range's end endpoint (range mode only). */
-  isRangeEnd(state: SelectionState, date: CalendarDate): boolean;
+  /** Does the selection reach into `period` — drives `data-selected` + the aria-label suffix. */
+  isSelected(state: SelectionState, period: DateRange): boolean;
+  /** Does `period` hold the range's start endpoint (range mode only). */
+  isRangeStart(state: SelectionState, period: DateRange): boolean;
+  /** Does `period` sit strictly inside the range, holding neither endpoint (range mode only). */
+  isRangeMiddle(state: SelectionState, period: DateRange): boolean;
+  /** Does `period` hold the range's end endpoint (range mode only). */
+  isRangeEnd(state: SelectionState, period: DateRange): boolean;
   /**
    * The tentative highlight range while a range selection is in progress — from the anchor to
    * `endpoint`, the range's moving end (ordered). The calendar passes its **roving cursor**, so the

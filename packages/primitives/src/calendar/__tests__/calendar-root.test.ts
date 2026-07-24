@@ -523,6 +523,83 @@ describe("createCalendar — the selection paint", () => {
   });
 });
 
+describe("createCalendar — the selection paint in year / decade view", () => {
+  const monthCell = (month: number) => new CalendarDate(2026, month, 1);
+  const yearCell = (year: number) => new CalendarDate(year, 1, 1);
+  const spanningRange = {
+    selectionMode: "range" as const,
+    defaultValue: { start: new CalendarDate(2026, 1, 15), end: new CalendarDate(2026, 3, 10) },
+  };
+
+  it("lights every month the range passes through, not only the ones it starts on", () => {
+    // A year cell stands for the whole month, so membership is an overlap test. Tested by its first day
+    // alone — as it used to be — January stayed dark for a range beginning on the 15th.
+    const { api, dispose } = setup(spanningRange);
+    flush(() => api.setView("year"));
+    expect(api.isSelected(monthCell(1))).toBe(true);
+    expect(api.isSelected(monthCell(2))).toBe(true);
+    expect(api.isSelected(monthCell(3))).toBe(true);
+    expect(api.isSelected(monthCell(4))).toBe(false);
+    dispose();
+  });
+
+  it("puts each range corner on the month holding that endpoint", () => {
+    const { api, dispose } = setup(spanningRange);
+    flush(() => api.setView("year"));
+    expect(api.isRangeStart(monthCell(1))).toBe(true);
+    expect(api.isRangeMiddle(monthCell(1))).toBe(false);
+    expect(api.isRangeStart(monthCell(2))).toBe(false);
+    expect(api.isRangeMiddle(monthCell(2))).toBe(true);
+    expect(api.isRangeEnd(monthCell(3))).toBe(true);
+    expect(api.isRangeMiddle(monthCell(3))).toBe(false);
+    dispose();
+  });
+
+  it("lights every year the range passes through in decade view", () => {
+    const { api, dispose } = setup({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 6, 10), end: new CalendarDate(2028, 2, 3) },
+    });
+    flush(() => api.setView("decade"));
+    expect(api.isSelected(yearCell(2025))).toBe(false);
+    expect(api.isSelected(yearCell(2026))).toBe(true);
+    expect(api.isSelected(yearCell(2027))).toBe(true);
+    expect(api.isSelected(yearCell(2028))).toBe(true);
+    expect(api.isRangeStart(yearCell(2026))).toBe(true);
+    expect(api.isRangeMiddle(yearCell(2027))).toBe(true);
+    expect(api.isRangeEnd(yearCell(2028))).toBe(true);
+    dispose();
+  });
+
+  it("lights the month holding each day of a multiple selection", () => {
+    const { api, dispose } = setup({
+      selectionMode: "multiple",
+      defaultValue: [new CalendarDate(2026, 1, 3), new CalendarDate(2026, 3, 20)],
+    });
+    flush(() => api.setView("year"));
+    expect(api.isSelected(monthCell(1))).toBe(true);
+    expect(api.isSelected(monthCell(2))).toBe(false);
+    expect(api.isSelected(monthCell(3))).toBe(true);
+    dispose();
+  });
+
+  it("carries the tentative band up under the same overlap rule", () => {
+    // A range anchored in month view survives a drill up, so its preview has to follow the same rule as
+    // the committed paint — otherwise the band would skip the month its own anchor sits in.
+    const { api, dispose } = setup({ selectionMode: "range" });
+    flush(() => api.activate(new CalendarDate(2026, 1, 15)));
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 3, 10)));
+    flush(() => api.setView("year"));
+    expect(api.isHighlighted(monthCell(1))).toBe(true);
+    expect(api.isHighlighted(monthCell(2))).toBe(true);
+    expect(api.isHighlighted(monthCell(3))).toBe(true);
+    expect(api.isHighlighted(monthCell(4))).toBe(false);
+    expect(api.isHighlightedStart(monthCell(1))).toBe(true);
+    expect(api.isHighlightedEnd(monthCell(3))).toBe(true);
+    dispose();
+  });
+});
+
 describe("createCalendar — contiguous ranges", () => {
   // Jan 5 and Jan 17 unavailable ⇒ the run around an anchor of Jan 10 is Jan 6 … Jan 16.
   const contiguousRange = {

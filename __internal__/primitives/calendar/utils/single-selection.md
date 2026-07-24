@@ -8,10 +8,14 @@ ignored. Pure + stateless (a shared singleton).
 
 ```ts
 singleSelection.select(state, date)            // → { value: date, anchor: null }
-singleSelection.isSelected(state, date)        // isSameDay(date, state.value)
+singleSelection.isSelected(state, period)      // the selected day falls in the cell's period
 singleSelection.isRange{Start,Middle,End}(…)   // always false
 singleSelection.highlightedRange(…)            // always null
 ```
+
+`period` is what the cell stands for (`cellPeriod` — see `utils/view.md`): in year/decade view the
+month/year holding the selected day lights up, and in month view the degenerate `{date, date}` period
+makes `isSelected` the same-day test it has always been.
 
 The `SelectionStrategy` interface + `CalendarValue`/`SelectionState` types, and the
 `selectionStrategyFor(mode)` / `firstDateOf(value)` helpers, live in the sibling `selection.ts` module

@@ -1,10 +1,17 @@
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, endOfMonth } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
-import type { SelectionState } from "../selection";
+import type { DateRange, SelectionState } from "../selection";
 import { singleSelection } from "../single-selection";
 
 const empty: SelectionState = { value: null, anchor: null };
 const d = (day: number) => new CalendarDate(2026, 1, day);
+/** A month-view cell's period: the degenerate one-day span the predicates collapse on. */
+const on = (day: number): DateRange => ({ start: d(day), end: d(day) });
+/** A year-view cell's period: the whole month of 2026. */
+const monthOf = (month: number): DateRange => ({
+  start: new CalendarDate(2026, month, 1),
+  end: endOfMonth(new CalendarDate(2026, month, 1)),
+});
 
 describe("singleSelection", () => {
   it("replaces the selection on activate, never sets an anchor", () => {
@@ -18,15 +25,21 @@ describe("singleSelection", () => {
 
   it("isSelected matches the one selected day", () => {
     const state: SelectionState = { value: d(10), anchor: null };
-    expect(singleSelection.isSelected(state, d(10))).toBe(true);
-    expect(singleSelection.isSelected(state, d(11))).toBe(false);
+    expect(singleSelection.isSelected(state, on(10))).toBe(true);
+    expect(singleSelection.isSelected(state, on(11))).toBe(false);
+  });
+
+  it("isSelected lights the wider period holding the selected day (year / decade cells)", () => {
+    const state: SelectionState = { value: d(10), anchor: null };
+    expect(singleSelection.isSelected(state, monthOf(1))).toBe(true);
+    expect(singleSelection.isSelected(state, monthOf(2))).toBe(false);
   });
 
   it("has no range or highlight state", () => {
     const state: SelectionState = { value: d(10), anchor: null };
-    expect(singleSelection.isRangeStart(state, d(10))).toBe(false);
-    expect(singleSelection.isRangeMiddle(state, d(10))).toBe(false);
-    expect(singleSelection.isRangeEnd(state, d(10))).toBe(false);
+    expect(singleSelection.isRangeStart(state, on(10))).toBe(false);
+    expect(singleSelection.isRangeMiddle(state, on(10))).toBe(false);
+    expect(singleSelection.isRangeEnd(state, on(10))).toBe(false);
     expect(singleSelection.highlightedRange(state, d(12))).toBeNull();
   });
 });

@@ -313,6 +313,27 @@ Three boundaries are deliberate:
   current value stays fully visible. `disabled` is the first arm of `isCellDisabled`, so — matching
   React Aria — a wholly disabled calendar paints no selection at all.
 
+### Year / decade cells paint by overlap
+
+A cell in year view stands for a whole month, and in decade view a whole year, so membership cannot be
+a test on the cell's representative date. Every date reaching a strategy predicate is first mapped
+through `cellPeriod(view(), date)` (`utils/view.md`), and the predicates are overlap tests over that
+period: a Jan 15 – Mar 10 range lights **January, February and March**, with the start corner on January
+and the end corner on March. Tested by the month's first day alone — as it was — January stayed dark and
+February took the start corner.
+
+Month view's period is the degenerate `{date, date}`, on which every predicate collapses to the
+day-level test it generalizes, so month view is bit-for-bit unchanged. The `isHighlighted*` trio reads
+the same period for the same reason: a range anchored in month view survives a drill up, and its
+tentative band must not skip the month its own anchor sits in.
+
+The `paintsSelection` gate above composes *in front of* this, unchanged and still keyed on the cell's
+representative date — `isCellDisabled` is already per-view (`isMonthOutOfRange` / `isYearOutOfRange`
+are whole-period tests of their own).
+
+React Aria has no year or decade view, so this generalization — and the `SelectionStrategy` signature
+that carries it — is hope-ui's own. The seam is explicitly unstable (`CLAUDE.md` § Architecture).
+
 ## SSR / hydration
 
 - The month grid is **variable 4–6 weeks**, so its row count depends on `visibleMonth`. `visibleMonth`

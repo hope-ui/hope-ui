@@ -1,4 +1,4 @@
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, endOfMonth } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import { rangeSelection } from "../range-selection";
 import type { DateRange, SelectionState } from "../selection";
@@ -6,6 +6,13 @@ import type { DateRange, SelectionState } from "../selection";
 const empty: SelectionState = { value: null, anchor: null };
 const d = (day: number) => new CalendarDate(2026, 1, day);
 const asRange = (state: SelectionState) => state.value as DateRange;
+/** A month-view cell's period: the degenerate one-day span the predicates collapse on. */
+const on = (day: number): DateRange => ({ start: d(day), end: d(day) });
+/** A year-view cell's period: the whole month of 2026. */
+const monthOf = (month: number): DateRange => ({
+  start: new CalendarDate(2026, month, 1),
+  end: endOfMonth(new CalendarDate(2026, month, 1)),
+});
 
 describe("rangeSelection.select", () => {
   it("first activate anchors a collapsed range (not yet committed)", () => {
@@ -47,18 +54,18 @@ describe("rangeSelection predicates", () => {
   const state: SelectionState = { value: { start: d(10), end: d(14) }, anchor: null };
 
   it("isSelected covers the whole committed span", () => {
-    expect(rangeSelection.isSelected(state, d(9))).toBe(false);
-    expect(rangeSelection.isSelected(state, d(10))).toBe(true);
-    expect(rangeSelection.isSelected(state, d(12))).toBe(true);
-    expect(rangeSelection.isSelected(state, d(14))).toBe(true);
-    expect(rangeSelection.isSelected(state, d(15))).toBe(false);
+    expect(rangeSelection.isSelected(state, on(9))).toBe(false);
+    expect(rangeSelection.isSelected(state, on(10))).toBe(true);
+    expect(rangeSelection.isSelected(state, on(12))).toBe(true);
+    expect(rangeSelection.isSelected(state, on(14))).toBe(true);
+    expect(rangeSelection.isSelected(state, on(15))).toBe(false);
   });
 
   it("distinguishes start / middle / end", () => {
-    expect(rangeSelection.isRangeStart(state, d(10))).toBe(true);
-    expect(rangeSelection.isRangeMiddle(state, d(12))).toBe(true);
-    expect(rangeSelection.isRangeMiddle(state, d(10))).toBe(false);
-    expect(rangeSelection.isRangeEnd(state, d(14))).toBe(true);
+    expect(rangeSelection.isRangeStart(state, on(10))).toBe(true);
+    expect(rangeSelection.isRangeMiddle(state, on(12))).toBe(true);
+    expect(rangeSelection.isRangeMiddle(state, on(10))).toBe(false);
+    expect(rangeSelection.isRangeEnd(state, on(14))).toBe(true);
   });
 
   it("highlightedRange spans anchor→highlightEnd (ordered) only while selecting", () => {
@@ -73,5 +80,37 @@ describe("rangeSelection predicates", () => {
     // No highlightEnd, or no anchor (not mid-selection) → null.
     expect(rangeSelection.highlightedRange(selecting, null)).toBeNull();
     expect(rangeSelection.highlightedRange(state, d(14))).toBeNull();
+  });
+});
+
+describe("rangeSelection predicates over a wide period (year / decade cells)", () => {
+  // Jan 15 → Mar 10: the range starts and ends *mid-month*, so a month cell tested by its first day
+  // alone would leave January dark and hand February the start corner.
+  const state: SelectionState = {
+    value: { start: new CalendarDate(2026, 1, 15), end: new CalendarDate(2026, 3, 10) },
+    anchor: null,
+  };
+
+  it("selects every period the range passes through", () => {
+    expect(rangeSelection.isSelected(state, monthOf(1))).toBe(true);
+    expect(rangeSelection.isSelected(state, monthOf(2))).toBe(true);
+    expect(rangeSelection.isSelected(state, monthOf(3))).toBe(true);
+    expect(rangeSelection.isSelected(state, monthOf(4))).toBe(false);
+  });
+
+  it("puts each corner on the period holding that endpoint", () => {
+    expect(rangeSelection.isRangeStart(state, monthOf(1))).toBe(true);
+    expect(rangeSelection.isRangeEnd(state, monthOf(1))).toBe(false);
+    expect(rangeSelection.isRangeMiddle(state, monthOf(2))).toBe(true);
+    expect(rangeSelection.isRangeStart(state, monthOf(2))).toBe(false);
+    expect(rangeSelection.isRangeEnd(state, monthOf(3))).toBe(true);
+    expect(rangeSelection.isRangeMiddle(state, monthOf(3))).toBe(false);
+  });
+
+  it("gives one period both corners when the range fits inside it", () => {
+    const withinJanuary: SelectionState = { value: { start: d(5), end: d(20) }, anchor: null };
+    expect(rangeSelection.isRangeStart(withinJanuary, monthOf(1))).toBe(true);
+    expect(rangeSelection.isRangeEnd(withinJanuary, monthOf(1))).toBe(true);
+    expect(rangeSelection.isRangeMiddle(withinJanuary, monthOf(1))).toBe(false);
   });
 });

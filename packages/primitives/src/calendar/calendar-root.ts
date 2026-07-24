@@ -59,9 +59,12 @@ import {
 } from "./utils/selection";
 import {
   type CalendarView,
+  cellPeriod,
   type FirstDayOfWeek,
   isInViewScope,
   normalizeFocusForView,
+  periodContains,
+  periodsOverlap,
 } from "./utils/view";
 import { buildYearCells, formatYear } from "./utils/year-view";
 
@@ -547,14 +550,19 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   //   sides. (React Aria folds the visible range into its own `isCellDisabled`, but it renders no
   //   filler days at all, so it has no band to keep continuous.)
   const paintsSelection = (date: CalendarDate) => !isCellDisabled(date) && !isDateUnavailable(date);
+  // What a cell *covers* in the active view, which is what the selection is tested against: a year cell
+  // must paint for a range merely passing through the month, not only for one starting on the 1st. In
+  // month view the period is the degenerate `{ date, date }`, so every predicate below is bit-for-bit
+  // what it was. React Aria has no year/decade view, so this generalization is hope-ui's own.
+  const periodOf = (date: CalendarDate) => cellPeriod(view(), date);
   const isSelected = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isSelected(selectionState(), date);
+    paintsSelection(date) && strategy().isSelected(selectionState(), periodOf(date));
   const isRangeStart = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeStart(selectionState(), date);
+    paintsSelection(date) && strategy().isRangeStart(selectionState(), periodOf(date));
   const isRangeMiddle = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeMiddle(selectionState(), date);
+    paintsSelection(date) && strategy().isRangeMiddle(selectionState(), periodOf(date));
   const isRangeEnd = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeEnd(selectionState(), date);
+    paintsSelection(date) && strategy().isRangeEnd(selectionState(), periodOf(date));
   // The tentative range while mid-selection: anchor → the roving cursor, exactly as React Aria derives
   // it (`useRangeCalendarState`). Deriving it from the *cursor* rather than a separate hover signal is
   // what makes hover and keyboard one code path — hover moves the cursor (`highlightDate`), so the band
@@ -563,19 +571,21 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // shift every `_hk` in the SSR tree.
   const highlightedRange = (): DateRange | null =>
     strategy().highlightedRange(selectionState(), focusedDate());
+  // The band reads the cell's period for the same reason the committed paint does: a range anchored in
+  // month view survives a drill up, and its preview must light every month it passes through there too.
   const isHighlighted = (date: CalendarDate) => {
     const range = highlightedRange();
-    return range !== null && date.compare(range.start) >= 0 && date.compare(range.end) <= 0;
+    return range !== null && periodsOverlap(range, periodOf(date));
   };
   // The tentative band's own endpoints, so a recipe can cap the preview the way it caps the committed
   // range. Both are true on the same date when the preview is one day (hovering the anchor itself).
   const isHighlightedStart = (date: CalendarDate) => {
     const range = highlightedRange();
-    return range !== null && date.compare(range.start) === 0;
+    return range !== null && periodContains(periodOf(date), range.start);
   };
   const isHighlightedEnd = (date: CalendarDate) => {
     const range = highlightedRange();
-    return range !== null && date.compare(range.end) === 0;
+    return range !== null && periodContains(periodOf(date), range.end);
   };
 
   const formatCellName = (date: CalendarDate) => {
