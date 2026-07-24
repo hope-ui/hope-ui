@@ -1,9 +1,14 @@
-import { type CreateCalendarOptions, createCalendar } from "@hope-ui/primitives/calendar";
+import {
+  type CreateCalendarOptions,
+  createCalendar,
+  createCalendarGroup,
+} from "@hope-ui/primitives/calendar";
+import { renderElement } from "@hope-ui/primitives/render";
 import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { CalendarSize, CalendarThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { For, Show } from "solid-js";
+import { For, merge, Show } from "solid-js";
 import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import { CalendarContext, type CalendarContextValue } from "./calendar-context";
 import { Grid } from "./calendar-grid";
@@ -80,6 +85,10 @@ export function Root(props: CalendarRootProps): JSX.Element {
   // stays just as lazy and reactive (the controllable-state getters stay live) while being the single
   // source of truth.
   const state = createCalendar(merged);
+  // The container part: the group's ARIA + state `data-*`, and the abandonment policy
+  // (`commitBehavior`) for a range the user walks away from. It takes no consumer props — `Root` does
+  // not forward native `<div>` attributes — so its whole surface is the primitive's.
+  const group = createCalendarGroup(state);
   // The parts read behavior off `state`, classes off `slots`, and — when given no `children` — their
   // default glyph off `prevIcon`/`nextIcon`. Accessors (via `runIfFunction`), so each read builds a
   // fresh glyph element from the resolved factory (instance ?? preset ?? built-in chevron).
@@ -112,29 +121,34 @@ export function Root(props: CalendarRootProps): JSX.Element {
     );
   }
 
-  // The `role="group"` container. `aria-label` is the primitive's group label (from the `label`
-  // option, else the i18n `calendar.label`); the `data-*` reflect the calendar-wide flags (`disabled`/
-  // `readOnly`/`required`). The recipe `root` slot is applied last, and the chrome renders inside.
+  // The `role="group"` container — its ARIA and state `data-*` come from `createCalendarGroup`, which
+  // also wires the abandonment policy and takes the element's ref. The recipe `root` slot is applied
+  // last, and the chrome renders inside.
+  //
+  // Through `renderElement`, not a literal `<div>`: it now spreads a getter-laden props object from a
+  // primitive hook, and such a spread on a literal host element allocates its subtree's `_hk`
+  // differently under the server (`ssr`) vs client (`dom`) Solid compile — the same measured hazard
+  // documented on `Calendar.Grid`'s `<table>`/`<thead>` and `CalendarCell`.
   return (
     <CalendarContext value={context}>
-      {/* biome-ignore lint/a11y/useSemanticElements: a calendar is an ARIA "group" container (WAI-ARIA
-      APG / React-Aria `useCalendar`), deliberately not a form `<fieldset>`. */}
-      <div
-        role="group"
-        aria-label={state.groupLabel()}
-        data-disabled={state.disabled() ? "" : undefined}
-        data-readonly={state.readOnly() ? "" : undefined}
-        data-required={state.required() ? "" : undefined}
-        data-slot="calendar"
-        class={slots.root()}
-      >
-        {/* Compound (consumer children) vs convenience (auto-chrome): a **single** read of
-        `merged.children`, evaluated here under the provider (like the Phase-3 direct render), with a
-        nullish fallback to the built-in `<DefaultCalendar />`. One read, so no `children()` is needed
-        — the multi-read / `<Show>`-`when`-gate hydration hazard never arises — and `??` short-circuits,
-        so a compound consumer never constructs `DefaultCalendar`. */}
-        {merged.children ?? <DefaultCalendar />}
-      </div>
+      {renderElement<JSX.HTMLAttributes<HTMLElement>, HTMLElement>({
+        as: "div",
+        props: merge(group.props, {
+          "data-slot": "calendar",
+          get class(): string {
+            return slots.root();
+          },
+          /* Compound (consumer children) vs convenience (auto-chrome): a **single** read of
+          `merged.children`, in a getter so it stays evaluated under the provider, with a nullish
+          fallback to the built-in `<DefaultCalendar />`. One read, so no `children()` is needed — the
+          multi-read / `<Show>`-`when`-gate hydration hazard never arises — and `??` short-circuits, so
+          a compound consumer never constructs `DefaultCalendar`. */
+          get children(): JSX.Element {
+            return merged.children ?? <DefaultCalendar />;
+          },
+        }),
+        ref: group.setRef,
+      })}
       {/* Native form submission, opt-in via `name`: one hidden field per submitted ISO value, keyed by
       the primitive's `formValues()` (single → one field; multiple → one per date; range → paired
       `${name}Start`/`${name}End`). Siblings of the group, so an `<input>` never nests in the grid.

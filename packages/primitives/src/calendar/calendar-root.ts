@@ -68,6 +68,15 @@ import { buildYearCells, formatYear } from "./utils/year-view";
 /** Per-date predicate (the public `isDateDisabled` option) — React Aria "unavailable" semantics. */
 export type IsDateDisabled = (date: CalendarDate) => boolean;
 
+/**
+ * What becomes of a range abandoned mid-selection — React Aria's `commitBehavior`
+ * (`useRangeCalendar`):
+ *  - `"select"` (default) — commit the tentative range at the roving cursor.
+ *  - `"reset"` — drop the anchor and restore the selection that was committed before it.
+ *  - `"clear"` — empty the selection.
+ */
+export type CalendarCommitBehavior = "select" | "reset" | "clear";
+
 export interface CreateCalendarOptions {
   /** `role=group` accessible name. Overrides the built-in `calendar.label` message. */
   label?: string;
@@ -91,6 +100,12 @@ export interface CreateCalendarOptions {
    * never straddle an unavailable day. Inert without `isDateDisabled`.
    */
   allowsNonContiguousRanges?: boolean;
+  /**
+   * Range mode: what happens to a range abandoned mid-selection — the pointer released outside the
+   * calendar, or focus leaving it. Default `"select"`. Applied by `createCalendarGroup`; `Escape`
+   * always cancels (`"reset"`) regardless.
+   */
+  commitBehavior?: CalendarCommitBehavior;
   /** Disable the whole calendar. Default `false`. */
   disabled?: boolean;
   /** Read-only: navigable + focusable, but not selectable. Default `false`. */
@@ -136,6 +151,8 @@ export interface CreateCalendarReturn {
   disabled: Accessor<boolean>;
   readOnly: Accessor<boolean>;
   mode: Accessor<CalendarSelectionMode>;
+  /** The resolved abandonment policy `createCalendarGroup` applies. Default `"select"`. */
+  commitBehavior: Accessor<CalendarCommitBehavior>;
   /** The message resolver (built-in en/fr + app overlay), for the calendar's own labels/announcements. */
   t: TranslateFn;
   groupLabel: Accessor<string>;
@@ -192,6 +209,25 @@ export interface CreateCalendarReturn {
   /** Move the tentative range's moving endpoint to `date` — i.e. move the roving cursor, but only
    * while a range selection is anchored. A no-op otherwise. */
   highlightDate: (date: CalendarDate) => void;
+  /**
+   * Abandon the range in progress: drop the anchor **and** restore the selection committed before it
+   * anchored (React Aria's `setAnchorDate(null)`, plus the restore hope-ui's degenerate in-progress
+   * value makes necessary — see `calendar-root.md`). Emits nothing: the consumer was never told about
+   * the in-progress value. A no-op with no anchor.
+   */
+  clearAnchor: () => void;
+  /**
+   * Complete the range in progress at the roving cursor (React Aria's `commitSelection`), emitting
+   * `onValueChange` as any other completing activate does. A no-op with no anchor; falls back to
+   * {@link clearAnchor} when the cursor sits on a day that cannot be selected, so a range in progress
+   * is never left behind.
+   */
+  commitSelection: () => void;
+  /**
+   * Empty the selection and drop any anchor (React Aria's `clearSelection`) — `null`, or `[]` in
+   * multiple mode. Emits `onValueChange` unless the consumer's last-known value was already empty.
+   */
+  clearSelection: () => void;
 
   // --- per-date predicates ---
   isOutsideVisibleScope: (date: CalendarDate) => boolean;
@@ -248,6 +284,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     readOnly: false,
     required: false,
     allowsNonContiguousRanges: false,
+    commitBehavior: "select" as CalendarCommitBehavior,
     timeZone: getLocalTimeZone(),
   });
 
@@ -264,6 +301,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const disabled = () => merged.disabled;
   const readOnly = () => merged.readOnly;
   const mode = () => merged.selectionMode;
+  const commitBehavior = () => merged.commitBehavior;
   const groupLabel = () => merged.label ?? t("calendar.label");
   const name = () => merged.name;
   const form = () => merged.form;
@@ -649,6 +687,12 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
 
+  // The selection as it stood when the current range anchored. React Aria needs no such snapshot — it
+  // leaves `value` untouched until the range completes — but hope-ui deliberately writes the
+  // degenerate `{ date, date }` on the first click so the anchor carries a solid `data-selected` pill
+  // under the tentative band. Without the snapshot, `clearAnchor` could only restore that stand-in.
+  let valueBeforeAnchor: CalendarValue = null;
+
   const activate = (date: CalendarDate, opts?: { extend?: boolean }) => {
     if (view() !== "month") {
       drillDownTo(date);
@@ -665,11 +709,17 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       return;
     }
     const strat = strategy();
-    let state = selectionState();
+    const previous = selectionState();
+    let state = previous;
     if (opts?.extend && mode() === "range" && anchorDate() === null) {
       state = strat.select(state, focusedDate(), { extend: false });
     }
     const nextState = strat.select(state, target, opts);
+    // A range begins here: snapshot what was committed before it, because the very next line
+    // overwrites the value with the degenerate in-progress `{ date, date }` (see `clearAnchor`).
+    if (previous.anchor === null && nextState.anchor !== null) {
+      valueBeforeAnchor = previous.value;
+    }
     setSelectionValue(nextState.value);
     setAnchorDate(nextState.anchor);
     setFocusedDate(target);
@@ -685,6 +735,44 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const highlightDate = (date: CalendarDate) => {
     if (anchorDate() !== null) {
       setFocusedDate(date);
+    }
+  };
+
+  // --- Abandoning a range in progress (React Aria's `commitBehavior` verbs) ---
+  const clearAnchor = () => {
+    if (anchorDate() === null) {
+      return;
+    }
+    setAnchorDate(null);
+    setSelectionValue(valueBeforeAnchor);
+  };
+
+  const commitSelection = () => {
+    if (anchorDate() === null) {
+      return;
+    }
+    const cursor = focusedDate();
+    // Two ways there is nothing to commit: the cursor is on a day this calendar refuses (React Aria
+    // backs off to the previous available date there; hope-ui refuses instead — see `activate`), or
+    // the calendar has been drilled up, where `activate` would descend a view rather than select. This
+    // runs *because* the calendar already lost the pointer or the focus that would let anyone finish,
+    // so abandoning is the only outcome — leaving a range in progress behind is never one.
+    if (view() !== "month" || !isDateSelectable(cursor)) {
+      clearAnchor();
+      return;
+    }
+    activate(cursor);
+  };
+
+  const clearSelection = () => {
+    // Mid-selection the consumer's last-known value is the pre-anchor snapshot, never the degenerate
+    // in-progress one — so clearing an empty calendar the user merely anchored in emits nothing.
+    const lastEmitted = anchorDate() !== null ? valueBeforeAnchor : selectionValue();
+    const empty: CalendarValue = mode() === "multiple" ? [] : null;
+    setAnchorDate(null);
+    setSelectionValue(empty);
+    if (!isEmptySelection(lastEmitted)) {
+      merged.onValueChange?.(empty);
     }
   };
 
@@ -765,6 +853,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     disabled,
     readOnly,
     mode,
+    commitBehavior,
     t,
     groupLabel,
     name,
@@ -794,6 +883,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     setFocusedDate,
     activate,
     highlightDate,
+    clearAnchor,
+    commitSelection,
+    clearSelection,
     isOutsideVisibleScope,
     isOutOfRange,
     isCellOutOfRange,
@@ -816,6 +908,11 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     listFocus,
     announce,
   };
+}
+
+/** Nothing selected — `null` in single/range, an empty array in multiple. */
+function isEmptySelection(value: CalendarValue): boolean {
+  return value == null || (Array.isArray(value) && value.length === 0);
 }
 
 /** The announced name for a view. */

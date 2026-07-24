@@ -164,6 +164,46 @@ describe("Calendar", () => {
     dispose();
   });
 
+  it("commits a range abandoned mid-selection once focus leaves the calendar", async () => {
+    // End-to-end proof that `Calendar.Root` wires `createCalendarGroup`: the policy itself is
+    // exercised in the primitive's own browser test, this is the assembly.
+    let value: unknown = null;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            selectionMode="range"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onValueChange={(v) => {
+              value = v;
+            }}
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+          <button type="button" data-testid="outside">
+            Outside
+          </button>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    const anchor = dayButton(container, "Friday, January 10, 2020");
+    anchor.focus();
+    anchor.click();
+    await vi.waitFor(() =>
+      expect(container.querySelector('td[aria-selected="true"]')).not.toBeNull(),
+    );
+    expect(value).toBeNull(); // anchored, nothing committed yet
+
+    (container.querySelector('[data-testid="outside"]') as HTMLElement).focus();
+
+    await vi.waitFor(() =>
+      expect((value as { start: CalendarDate } | null)?.start.toString()).toBe("2020-01-10"),
+    );
+    dispose();
+  });
+
   it("supports controlled value", async () => {
     const [value, setValue] = createSignal<CalendarDate | null>(null);
     const { container, dispose } = mount(() => (

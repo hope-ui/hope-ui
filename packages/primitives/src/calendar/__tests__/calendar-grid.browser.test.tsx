@@ -163,6 +163,56 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     dispose();
   });
 
+  it("Escape cancels the range in progress and puts the previous selection back", async () => {
+    const onValueChange = vi.fn();
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 1, 2), end: new CalendarDate(2026, 1, 4) },
+      onValueChange,
+    });
+    dayButton(container, "2026-01-15").focus();
+    await userEvent.keyboard("{Enter}"); // anchor
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await userEvent.keyboard("{ArrowRight}");
+    const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
+    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""));
+
+    // Capture phase, so the assertion still sees the event when the handler stops it propagating.
+    const seen: KeyboardEvent[] = [];
+    const spy = (event: KeyboardEvent) => seen.push(event);
+    document.addEventListener("keydown", spy, true);
+    await userEvent.keyboard("{Escape}");
+    document.removeEventListener("keydown", spy, true);
+
+    await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
+    expect(state.highlightedRange()).toBeNull();
+    expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBeNull();
+    // The range committed before the abandoned one comes back, and nothing was emitted: the consumer
+    // was never told about the in-progress value in the first place.
+    const value = state.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(value.start.toString()).toBe("2026-01-02");
+    expect(value.end.toString()).toBe("2026-01-04");
+    expect(onValueChange).not.toHaveBeenCalled();
+    // Consumed, so the same keypress can't also close the popover the calendar sits in.
+    expect(seen.at(-1)?.defaultPrevented).toBe(true);
+    dispose();
+  });
+
+  it("leaves Escape alone when there is no range to cancel", async () => {
+    const { container, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-15").focus();
+
+    const seen: KeyboardEvent[] = [];
+    const spy = (event: KeyboardEvent) => seen.push(event);
+    document.addEventListener("keydown", spy, true);
+    await userEvent.keyboard("{Escape}");
+    document.removeEventListener("keydown", spy, true);
+
+    // Untouched, so an enclosing popover/dialog still gets to close on it.
+    expect(seen.at(-1)?.defaultPrevented).toBe(false);
+    dispose();
+  });
+
   it("PageDown pages to the next month", async () => {
     const { container, state, dispose } = await mountCalendar();
     dayButton(container, "2026-01-15").focus();

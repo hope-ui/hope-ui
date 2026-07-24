@@ -377,7 +377,7 @@ directions respect the reading direction (they reverse under RTL).
     { key: "Home / End", description: "Move to the first / last day of the week." },
     { key: "PageUp / PageDown", description: "Move to the previous / next month." },
     { key: "Enter / Space", description: "Select the focused day (or, in year/decade view, drill into it)." },
-    { key: "Escape", description: "In range mode, cancel a range in progress." },
+    { key: "Escape", description: "In range mode, cancel a range in progress — the previously selected range comes back. Passes through untouched when there is nothing to cancel, so an enclosing popover still closes on it." },
   ]}
 />
 
@@ -526,6 +526,12 @@ Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, 
       type: "boolean",
       default: "false",
       description: "Range mode: let a selection span unavailable days. By default a range in progress clamps at the nearest unavailable day.",
+    },
+    {
+      prop: "commitBehavior",
+      type: '"select" | "reset" | "clear"',
+      default: '"select"',
+      description: "Range mode: what happens to a range abandoned mid-selection — the pointer released outside the calendar, or focus leaving it. select completes it at the focused day, reset restores the previous range, clear empties the selection. Escape always cancels, whatever this is set to.",
     },
     {
       prop: "firstDayOfWeek",

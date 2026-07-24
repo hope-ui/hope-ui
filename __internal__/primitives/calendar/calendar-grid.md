@@ -51,7 +51,15 @@ consumer's own `onPointerLeave` passes through untouched.
 | `PageUp` / `PageDown` | Page one period (±month / ±year / ±decade by view). |
 | `Shift`+`PageUp` / `PageDown` | ±1 year in month view (APG). |
 | `Shift`+`Arrow` | Extend a range (month view + range mode). |
+| `Escape` | Cancel the range in progress — `state.clearAnchor()`, so the previously committed range comes back. |
 | `Enter` / `Space` | The cell button's native activation (handled by the cell, not here). |
+
+`Escape` consumes the key (`preventDefault` + `stopPropagation`) **only when there was a range to
+cancel**; with no anchor the event is left entirely untouched, so it still reaches an enclosing
+popover or dialog. When there *is* one, stopping it is the point: the same keypress must not also close
+the surface the user is still selecting in. It is always a cancel and never consults the calendar's
+`commitBehavior` — that policy is for *walking away* (see `calendar-group.md`), while `Escape` is an
+explicit refusal. React Aria splits it the same way (`useCalendarGrid` → `setAnchorDate(null)`).
 
 ## Crossing + deferred focus
 

@@ -6,6 +6,7 @@ import {
   type CreateCalendarReturn,
   createCalendar,
 } from "../calendar-root";
+import type { CalendarValue } from "../utils/selection";
 
 // The state machine injects nothing DOM-ish (the announcer no-ops without `document`), so it drives
 // entirely in a `createRoot`. `flush()` wraps writes because solid-js's *client* build defers them.
@@ -327,6 +328,136 @@ describe("createCalendar — selection", () => {
     expect(api.selectionValue()).toBeNull();
     flush(() => api.activate(new CalendarDate(2026, 1, 26))); // out of range
     expect(api.selectionValue()).toBeNull();
+    dispose();
+  });
+});
+
+describe("createCalendar — abandoning a range in progress", () => {
+  const range = { selectionMode: "range" as const };
+  const committed = {
+    ...range,
+    defaultValue: { start: new CalendarDate(2026, 1, 2), end: new CalendarDate(2026, 1, 4) },
+  };
+  const asRange = (value: CalendarValue) => value as { start: CalendarDate; end: CalendarDate };
+
+  it("defaults commitBehavior to select, and reports the configured one", () => {
+    const { api, dispose } = setup(range);
+    expect(api.commitBehavior()).toBe("select");
+    dispose();
+    const clearing = setup({ ...range, commitBehavior: "clear" });
+    expect(clearing.api.commitBehavior()).toBe("clear");
+    clearing.dispose();
+  });
+
+  it("clearAnchor restores the range committed before the abandoned one, silently", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ ...committed, onValueChange });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    // Mid-selection the value is the degenerate in-progress `{ anchor, anchor }` — deliberate, and
+    // exactly why the pre-anchor snapshot exists.
+    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-10");
+
+    flush(() => api.clearAnchor());
+    expect(api.anchorDate()).toBeNull();
+    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-02");
+    expect(iso(asRange(api.selectionValue()).end)).toBe("2026-01-04");
+    // The consumer was never told about the in-progress value, so putting it back is not a change.
+    expect(onValueChange).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("clearAnchor leaves an untouched calendar empty, and is inert with no anchor", () => {
+    const { api, dispose } = setup(range);
+    flush(() => api.clearAnchor()); // nothing anchored — a no-op
+    expect(api.selectionValue()).toBeNull();
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.clearAnchor());
+    expect(api.anchorDate()).toBeNull();
+    expect(api.selectionValue()).toBeNull();
+    expect(api.highlightedRange()).toBeNull();
+    dispose();
+  });
+
+  it("commitSelection completes the tentative range at the cursor", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ ...range, onValueChange });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 14)));
+
+    flush(() => api.commitSelection());
+    expect(api.anchorDate()).toBeNull();
+    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-10");
+    expect(iso(asRange(api.selectionValue()).end)).toBe("2026-01-14");
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+
+    flush(() => api.commitSelection()); // no anchor left — inert
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    dispose();
+  });
+
+  it("commitSelection abandons rather than leave a range in progress on an unselectable cursor", () => {
+    // Only reachable with the contiguity narrowing off: otherwise the bounds keep the cursor inside
+    // the anchor's available run, so it can never land on an unavailable day.
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({
+      ...range,
+      allowsNonContiguousRanges: true,
+      isDateDisabled: (date) => date.day === 17,
+      onValueChange,
+    });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 17)));
+
+    flush(() => api.commitSelection());
+    expect(api.anchorDate()).toBeNull();
+    expect(api.selectionValue()).toBeNull();
+    expect(onValueChange).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("commitSelection abandons rather than drill when the calendar is not in month view", () => {
+    // `activate` descends a view outside month view, so committing there would silently drill *and*
+    // leave the range in progress.
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ ...committed, onValueChange });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.drillUp());
+    expect(api.view()).toBe("year");
+
+    flush(() => api.commitSelection());
+    expect(api.view()).toBe("year");
+    expect(api.anchorDate()).toBeNull();
+    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-02");
+    expect(onValueChange).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it("clearSelection empties the selection and emits — once, and never for an already-empty one", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ ...committed, onValueChange });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+
+    flush(() => api.clearSelection());
+    expect(api.anchorDate()).toBeNull();
+    expect(api.selectionValue()).toBeNull();
+    expect(onValueChange).toHaveBeenCalledWith(null);
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+
+    // The consumer already knows it is empty — anchoring and clearing again changes nothing for them.
+    flush(() => api.activate(new CalendarDate(2026, 1, 12)));
+    flush(() => api.clearSelection());
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    dispose();
+  });
+
+  it("clearSelection empties a multiple-selection calendar to []", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ selectionMode: "multiple", onValueChange });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    flush(() => api.clearSelection());
+    expect(api.selectionValue()).toEqual([]);
+    expect(onValueChange).toHaveBeenLastCalledWith([]);
     dispose();
   });
 });

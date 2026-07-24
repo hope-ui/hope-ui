@@ -13,7 +13,7 @@ function createCalendar(options?: CreateCalendarOptions): CreateCalendarReturn;
 ```
 
 `CreateCalendarOptions` — config (`locale`/`dir`/`timeZone`/`firstDayOfWeek`/`min`/`max`/
-`isDateDisabled`/`allowsNonContiguousRanges`/`disabled`/`readOnly`/`selectionMode`), the
+`isDateDisabled`/`allowsNonContiguousRanges`/`commitBehavior`/`disabled`/`readOnly`/`selectionMode`), the
 controlled/uncontrolled selection pair
 (`value`/`defaultValue`/`onValueChange`), the roving-cursor pair (`focusedValue`/
 `defaultFocusedValue`/`onFocusedValueChange`), a `label` (overrides the built-in `calendar.label`), and
@@ -29,7 +29,8 @@ the derived `formValues`); the `t` message resolver (used by the part hooks
 for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
-`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`);
+`prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`,
+plus the abandonment trio `clearAnchor` / `commitSelection` / `clearSelection`);
 the per-date predicates (incl. `isCellDisabled`, `isHighlighted` and the tentative band's
 `isHighlightedStart` / `isHighlightedEnd`); and the shared `collection` / `listFocus` /
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
@@ -99,6 +100,13 @@ Details worth knowing:
   longer than five days, so the month cannot be paged mid-selection) and it is correct — nothing outside
   the run is selectable, so there is nothing to page *to*. React Aria behaves identically, for the same
   reason. Where the run is unbounded on a side, the configured bound is what remains and paging works.
+- **`drillUp()` stays ungated while the bounds are narrowed**, and the abandonment verbs above do not
+  change that. Clearing the anchor on a drill-up was considered and rejected: with no `isDateDisabled`
+  there is no narrowing at all, and drilling up to reach a far month is then a legitimate way to draw a
+  range across several of them — abandoning it there would break the flow for every calendar that has
+  no unavailable days. Where a run *is* narrow, the year/decade view showing mostly-inert cells is the
+  bounds telling the truth: nothing outside the run is selectable, so nothing outside it should be
+  reachable, in any view. Leaving the range is what `Escape` and `commitBehavior` are for.
 - **`allowsNonContiguousRanges: true`** disables the narrowing entirely, restoring the plain
   `min`/`max`. The range may then span unavailable days — which the selection paint still cuts out of
   the band (see below), exactly as React Aria renders them.
@@ -140,6 +148,51 @@ can never disagree with the cell the user is on. Consequences worth knowing:
 `highlightDate`'s caller (`createCalendarCell`'s `onMouseEnter`) gates on RA's `isSelectable` —
 `isDateNonFocusable` or `isDateUnavailable` skips it — so a day the range could not actually end on
 never previews a range the matching click would refuse.
+
+## A range abandoned mid-selection
+
+```ts
+commitBehavior?: "select" | "reset" | "clear"; // default "select"
+clearAnchor(): void;      // "reset" — drop the anchor, restore the selection from before it
+commitSelection(): void;  // "select" — complete the tentative range at the roving cursor
+clearSelection(): void;   // "clear" — empty the selection
+```
+
+The three verbs are React Aria's (`RangeCalendarState`), and `createCalendarGroup` is what maps
+`commitBehavior` onto them when the user walks away — a pointer released outside, or focus leaving.
+`Escape` (on the grid) is always `clearAnchor`, never the policy. See `calendar-group.md` for both
+triggers; what is decided *here* is what each verb does:
+
+- **`clearAnchor` restores, it does not merely un-anchor.** React Aria's `setAnchorDate(null)` is
+  enough for it because RA leaves `value` untouched until a range completes. hope-ui writes the
+  degenerate `{ date, date }` on the first click (see below), so dropping the anchor alone would leave
+  that stand-in behind as if it were a real one-day selection. A snapshot of the committed value is
+  therefore taken as the range anchors, and put back here. It emits nothing: the consumer was never
+  told about the in-progress value, so restoring it is not a change.
+- **`commitSelection` is `activate(focusedDate())`** — so it emits `onValueChange` and announces, like
+  any other completing activate. It falls back to `clearAnchor` in the two cases where there is nothing
+  to commit, rather than doing nothing: this runs *because* the calendar already lost the pointer or
+  the focus that would let anyone finish, so leaving a range in progress behind is the one outcome that
+  is never acceptable.
+  - **The cursor is on a day the calendar refuses.** (React Aria instead backs off to the previous
+    available date; hope-ui does not, for the same reason `activate` doesn't — see § Contiguous
+    ranges.) Reachable only with `allowsNonContiguousRanges: true`; otherwise the narrowed bounds keep
+    the cursor inside the anchor's available run.
+  - **The calendar has been drilled up.** `activate` *descends a view* outside month view, so
+    committing there would silently drill and still leave the range anchored.
+- **`clearSelection` emits `onValueChange(null)`** — or `[]` in multiple mode — **unless the consumer's
+  last-known value was already empty.** Mid-selection that last-known value is the pre-anchor snapshot,
+  not the degenerate one, so clearing a range merely *started* on an empty calendar emits nothing.
+
+### The degenerate in-progress value is deliberate
+
+The first activate of a range writes `value = { start: date, end: date }` alongside the anchor
+(`utils/range-selection.ts`). React Aria never writes it — and it was worth keeping anyway: it is what
+gives the anchor its solid `data-selected` pill *under* the tentative band, so the committed paint and
+the preview paint are the same two layers before and after the second click. What made it a hazard was
+abandonment — a range walked away from left that stand-in looking like a real selection, and
+`formValues()` had to special-case it. Both are now closed: every exit resolves the anchor, and
+`clearAnchor` restores what the stand-in overwrote.
 
 ## Native form
 

@@ -34,7 +34,8 @@ export interface CreateCalendarGridReturn {
  *   cursor is a single source of truth, there is no `event.target` disambiguation (unlike the Angular
  *   original's two same-element listeners).
  * - **`PageUp`/`PageDown`** page one period; **`Shift+PageUp`/`Down`** page ±1 year in month view
- *   (APG); **`Shift+Arrow`** extends a range (month view + range mode only). `Enter`/`Space` are the
+ *   (APG); **`Shift+Arrow`** extends a range (month view + range mode only); **`Escape`** cancels a
+ *   range in progress, consuming the key only when there was one to cancel. `Enter`/`Space` are the
  *   cell button's native activation — not handled here.
  * - **Deferred focus** replaces the Angular `afterNextRender` nudge: after a cross / page / drill, the
  *   target cell is focused once it mounts, via `createListFocus`'s built-in deferral. It is armed only
@@ -160,7 +161,20 @@ export function createCalendarGrid(
     .on("shift+ArrowUp", (event) => shiftArrow(event, "up"))
     .on("shift+ArrowDown", (event) => shiftArrow(event, "down"))
     .on("shift+ArrowLeft", (event) => shiftArrow(event, "left"))
-    .on("shift+ArrowRight", (event) => shiftArrow(event, "right"));
+    .on("shift+ArrowRight", (event) => shiftArrow(event, "right"))
+    // Cancel a range in progress, as React Aria's `useCalendarGrid` does — always a cancel, never the
+    // calendar's `commitBehavior` (that policy is for *walking away*; Escape is an explicit refusal).
+    // With nothing to cancel the event is left entirely alone, so Escape still reaches an enclosing
+    // popover/dialog — and when there *is* a range in progress, propagation stops so the same keypress
+    // doesn't also close the surface the user is still selecting in.
+    .on("Escape", (event) => {
+      if (state.anchorDate() === null) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      state.clearAnchor();
+    });
 
   const handleKeyDown: JSX.EventHandler<HTMLTableElement, KeyboardEvent> = (event) => {
     const direction = ARROW_KEYS[event.key];

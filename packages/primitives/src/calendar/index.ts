@@ -9,6 +9,7 @@ export {
   createCalendarCell,
 } from "./calendar-cell";
 export { type CreateCalendarGridReturn, createCalendarGrid } from "./calendar-grid";
+export { type CreateCalendarGroupReturn, createCalendarGroup } from "./calendar-group";
 export {
   type CreateCalendarHeadingReturn,
   createCalendarHeading,
@@ -16,6 +17,7 @@ export {
 export { type CreateCalendarNextReturn, createCalendarNext } from "./calendar-next";
 export { type CreateCalendarPrevReturn, createCalendarPrev } from "./calendar-prev";
 export {
+  type CalendarCommitBehavior,
   type CreateCalendarOptions,
   type CreateCalendarReturn,
   createCalendar,
