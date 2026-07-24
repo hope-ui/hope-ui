@@ -376,6 +376,8 @@ directions respect the reading direction (they reverse under RTL).
     { key: "↑ / ↓", description: "Move focus to the same weekday in the previous / next week." },
     { key: "Home / End", description: "Move to the first / last day of the week." },
     { key: "PageUp / PageDown", description: "Move to the previous / next month." },
+    { key: "Shift + PageUp / PageDown", description: "Move to the same month one year back / forward." },
+    { key: "Shift + ← / → / ↑ / ↓", description: "In range mode, extend the range by a day (or a week) from the focused day. Unavailable days stop the extension, unless allowsNonContiguousRanges lets it step over them." },
     { key: "Enter / Space", description: "Select the focused day (or, in year/decade view, drill into it)." },
     { key: "Escape", description: "In range mode, cancel a range in progress — the previously selected range comes back. Passes through untouched when there is nothing to cancel, so an enclosing popover still closes on it." },
   ]}

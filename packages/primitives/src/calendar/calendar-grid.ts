@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, merge, omit, untrack } from "so
 import { createGridNavigation, type GridCell } from "../internal";
 import { composeEventHandlers, createKeyboardHandler } from "../utils";
 import type { CreateCalendarReturn } from "./calendar-root";
+import { firstSelectableDateFrom } from "./utils/boundary";
 import { type ArrowDirection, arrowDelta, resolveViewArrowMove } from "./utils/navigation";
 
 const ARROW_KEYS: Record<string, ArrowDirection> = {
@@ -34,9 +35,10 @@ export interface CreateCalendarGridReturn {
  *   cursor is a single source of truth, there is no `event.target` disambiguation (unlike the Angular
  *   original's two same-element listeners).
  * - **`PageUp`/`PageDown`** page one period; **`Shift+PageUp`/`Down`** page ±1 year in month view
- *   (APG); **`Shift+Arrow`** extends a range (month view + range mode only); **`Escape`** cancels a
- *   range in progress, consuming the key only when there was one to cancel. `Enter`/`Space` are the
- *   cell button's native activation — not handled here.
+ *   (APG); **`Shift+Arrow`** extends a range (month view + range mode only), stepping past unavailable
+ *   days where the range is allowed to contain them; **`Escape`** cancels a range in progress,
+ *   consuming the key only when there was one to cancel. `Enter`/`Space` are the cell button's native
+ *   activation — not handled here.
  * - **Deferred focus** replaces the Angular `afterNextRender` nudge: after a cross / page / drill, the
  *   target cell is focused once it mounts, via `createListFocus`'s built-in deferral. It is armed only
  *   by user navigation, never on the initial render (so the calendar doesn't steal focus on mount).
@@ -137,8 +139,17 @@ export function createCalendarGrid(
       return;
     }
     event.preventDefault();
-    const target = state.focusedDate().add({ days: arrowDelta(direction, isRtl()) });
-    if (state.isOutOfRange(target)) {
+    const delta = arrowDelta(direction, isRtl());
+    const step = state.focusedDate().add({ days: delta });
+    // Land on a day the range can actually end on. Stepping *past* an unavailable day (rather than
+    // dead-stopping on it, which used to freeze the cursor entirely) is only sound where the range is
+    // allowed to contain one: a contiguous range would have to swallow every day it skipped, so it
+    // stops at the edge of the anchor's available run instead — which the bounds narrowed around the
+    // anchor already report as unselectable, so both cases fall out of one predicate.
+    const target = state.allowsNonContiguousRanges()
+      ? firstSelectableDateFrom(step, delta > 0 ? 1 : -1, state.isDateSelectable)
+      : step;
+    if (target === undefined || !state.isDateSelectable(target)) {
       return;
     }
     state.activate(target, { extend: true });

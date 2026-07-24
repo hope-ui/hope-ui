@@ -50,7 +50,7 @@ consumer's own `onPointerLeave` passes through untouched.
 | `Ctrl`/`Cmd`+`Home` / `End` | First / last cell of the grid. |
 | `PageUp` / `PageDown` | Page one period (±month / ±year / ±decade by view). |
 | `Shift`+`PageUp` / `PageDown` | ±1 year in month view (APG). |
-| `Shift`+`Arrow` | Extend a range (month view + range mode). |
+| `Shift`+`Arrow` | Extend a range (month view + range mode) — see below. |
 | `Escape` | Cancel the range in progress — `state.clearAnchor()`, so the previously committed range comes back. |
 | `Enter` / `Space` | The cell button's native activation (handled by the cell, not here). |
 
@@ -60,6 +60,30 @@ popover or dialog. When there *is* one, stopping it is the point: the same keypr
 the surface the user is still selecting in. It is always a cancel and never consults the calendar's
 `commitBehavior` — that policy is for *walking away* (see `calendar-group.md`), while `Escape` is an
 explicit refusal. React Aria splits it the same way (`useCalendarGrid` → `setAnchorDate(null)`).
+
+## `Shift`+`Arrow` extension
+
+One arrow step from the roving cursor (±1 day horizontally, ±7 vertically, RTL-flipped), handed to
+`state.activate(target, { extend: true })` — so the anchor stays put and repeated presses grow the
+range from it, and a later plain `Enter` / click commits. What each press does with a day the calendar
+would refuse depends on whether the range is allowed to contain one:
+
+- **Contiguous (the default).** The extension stops: the target has to be selectable as it stands.
+  Once a range is anchored, `min`/`max` have narrowed to the anchor's available run
+  (`calendar-root.md` § Contiguous ranges), so "the run's edge" and "not selectable" are the same
+  answer and one predicate covers both.
+- **`allowsNonContiguousRanges: true`.** The extension **steps past** unavailable days, landing on the
+  first selectable one in that direction (`firstSelectableDateFrom`, `utils/boundary.md`). Skipping is
+  only sound here: a contiguous range would have to swallow every day it skipped over.
+
+Either way the cursor and the extension move together or not at all. Before this, an unavailable
+target passed the grid's `isOutOfRange` check and was then refused by `activate`, so the cursor did not
+move **at all** — with the key already `preventDefault`ed, `Shift`+`Arrow` was simply dead from any day
+next to an unavailable one, in both modes.
+
+With nothing selected yet, the first press opens the range at the cursor — the day it is extending
+*from* — rather than at the day it lands on; with a range already committed it re-opens **that** range
+from its start. Both live in `activate` / `rangeSelection`, not here: see `calendar-root.md`.
 
 ## Crossing + deferred focus
 

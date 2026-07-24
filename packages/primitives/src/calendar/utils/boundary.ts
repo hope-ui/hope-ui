@@ -15,8 +15,9 @@ import { decadeStart, YEARS_PER_DECADE } from "./view";
  * behavior; all are total (an absent bound ⇒ that side is unbounded). The day-level
  * {@link isDateOutOfRange} is view-agnostic; the prev/next pair + the whole-period out-of-range tests
  * come in one-per-view flavors (month / year / decade) selected by the calendar state.
- * {@link constrainDate} is the only non-predicate: it *moves* a date back into the bounds, and
- * {@link lastAvailableDateFrom} is the only helper that derives a bound rather than applying one.
+ * {@link constrainDate} is the only non-predicate: it *moves* a date back into the bounds,
+ * {@link lastAvailableDateFrom} is the only helper that derives a bound rather than applying one, and
+ * {@link firstSelectableDateFrom} is its mirror — where the *next* usable run begins.
  */
 
 /**
@@ -81,6 +82,38 @@ export function lastAvailableDateFrom(
   // day twice.
   const stoppedOnUnavailableDay = isWithinSearch(candidate) || isDateUnavailable(candidate);
   return stoppedOnUnavailableDay ? candidate.add({ days: -direction }) : undefined;
+}
+
+/**
+ * The first day at or beyond `from`, walking in `direction`, that `isSelectable` accepts — so a caller
+ * stepping onto a day the calendar refuses can continue to the next one it would take, instead of
+ * dead-stopping there. `undefined` when nothing selectable turns up within `searchSpan` of `from`,
+ * which is what keeps the walk finite when *every* day is refused (an unbounded calendar with a
+ * blanket `isDateDisabled`).
+ *
+ * The mirror of {@link lastAvailableDateFrom}: that one reports where the run containing a date *ends*,
+ * this one where the next usable run *begins*. `createCalendarGrid` is the caller — Shift+Arrow steps
+ * past unavailable days with it — and it passes the calendar's own `isDateSelectable`, so the bounds
+ * end the walk too rather than needing a second `min`/`max` argument here. Pure.
+ */
+export function firstSelectableDateFrom(
+  from: CalendarDate,
+  direction: 1 | -1,
+  isSelectable: (date: CalendarDate) => boolean,
+  searchSpan: DateDuration = { months: 1 },
+): CalendarDate | undefined {
+  const searchLimit = direction < 0 ? from.subtract(searchSpan) : from.add(searchSpan);
+  const isWithinSearch = (date: CalendarDate) =>
+    direction < 0 ? date.compare(searchLimit) >= 0 : date.compare(searchLimit) <= 0;
+
+  let candidate = from;
+  while (isWithinSearch(candidate)) {
+    if (isSelectable(candidate)) {
+      return candidate;
+    }
+    candidate = candidate.add({ days: direction });
+  }
+  return undefined;
 }
 
 /**

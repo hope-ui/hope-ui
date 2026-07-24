@@ -47,6 +47,19 @@ describe("rangeSelection.select", () => {
     const reopened = rangeSelection.select(committed, d(12), { extend: true });
     expect(reopened.anchor?.toString()).toBe("2026-01-05");
     expect(asRange(reopened).end.toString()).toBe("2026-01-12");
+    // The four days already committed stay inside the range being grown — the branch a caller reaches
+    // by Shift+Arrow-ing out of a completed range.
+    expect(asRange(reopened).start.toString()).toBe("2026-01-05");
+  });
+
+  it("extend with nothing to extend anchors at the date itself", () => {
+    // The strategy is total, so it still answers with no anchor *and* no committed range. `activate`
+    // never reaches this: it seeds the range at the roving cursor first, which the strategy — knowing
+    // only a value and an anchor — cannot do (see `calendar-root.md`).
+    const opened = rangeSelection.select(empty, d(12), { extend: true });
+    expect(opened.anchor?.toString()).toBe("2026-01-12");
+    expect(asRange(opened).start.toString()).toBe("2026-01-12");
+    expect(asRange(opened).end.toString()).toBe("2026-01-12");
   });
 });
 

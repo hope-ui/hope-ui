@@ -154,6 +154,10 @@ export interface CreateCalendarReturn {
   disabled: Accessor<boolean>;
   readOnly: Accessor<boolean>;
   mode: Accessor<CalendarSelectionMode>;
+  /** Whether a range may span unavailable days — the resolved option. Default `false`, which is what
+   * narrows {@link min}/{@link max} around the anchor. Read by the grid to decide whether Shift+Arrow
+   * may step *past* an unavailable day or must stop at it. */
+  allowsNonContiguousRanges: Accessor<boolean>;
   /** The resolved abandonment policy `createCalendarGroup` applies. Default `"select"`. */
   commitBehavior: Accessor<CalendarCommitBehavior>;
   /** The message resolver (built-in en/fr + app overlay), for the calendar's own labels/announcements. */
@@ -721,7 +725,12 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     const strat = strategy();
     const previous = selectionState();
     let state = previous;
-    if (opts?.extend && mode() === "range" && anchorDate() === null) {
+    // Shift+Arrow on an empty calendar has no range to re-open, so the extension opens one **at the
+    // cursor** — the day it is extending *from*, which the strategy has no way to know. Gating it on an
+    // empty selection is the whole point: once a range is committed, the strategy's own no-anchor
+    // branch re-opens it from that range's start, and seeding here unconditionally would throw the
+    // range away and collapse it to the two days around the cursor.
+    if (opts?.extend && mode() === "range" && previous.anchor === null && previous.value == null) {
       state = strat.select(state, focusedDate(), { extend: false });
     }
     const nextState = strat.select(state, target, opts);
@@ -863,6 +872,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     disabled,
     readOnly,
     mode,
+    allowsNonContiguousRanges,
     commitBehavior,
     t,
     groupLabel,

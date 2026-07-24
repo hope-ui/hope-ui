@@ -213,6 +213,77 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     dispose();
   });
 
+  it("Shift+Arrow extends the range from the roving cursor", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-15").focus();
+
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    // Nothing was selected, so the range opens on the day it extends *from* and grows to the target.
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await expect.element(dayButton(container, "2026-01-16")).toHaveFocus();
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-16");
+
+    await userEvent.keyboard("{Shift>}{ArrowDown}{/Shift}"); // a week on, from the same anchor
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-23"));
+    expect(state.anchorDate()?.toString()).toBe("2026-01-15");
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-23");
+    dispose();
+  });
+
+  it("Shift+Arrow steps past unavailable days when the range may contain them", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      allowsNonContiguousRanges: true,
+      isDateDisabled: (date) => date.day === 16 || date.day === 17,
+    });
+    dayButton(container, "2026-01-15").focus();
+
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    // Jan 16 and 17 are unavailable: the cursor steps over both rather than freezing on the first.
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-18"));
+    await expect.element(dayButton(container, "2026-01-18")).toHaveFocus();
+    expect(state.highlightedRange()?.start.toString()).toBe("2026-01-15");
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-18");
+    dispose();
+  });
+
+  it("Shift+Arrow stops at an unavailable day when the range must stay contiguous", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      isDateDisabled: (date) => date.day === 17,
+    });
+    dayButton(container, "2026-01-15").focus();
+
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-16"));
+
+    // Jan 17 ends the anchor's available run, and a contiguous range cannot swallow it — so the
+    // extension stays put instead of hopping to Jan 18.
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    expect(state.focusedDate().toString()).toBe("2026-01-16");
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-16");
+    await expect.element(dayButton(container, "2026-01-16")).toHaveFocus();
+    dispose();
+  });
+
+  it("Shift+Arrow re-opens a committed range from its start", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 1, 5), end: new CalendarDate(2026, 1, 9) },
+      defaultFocusedValue: new CalendarDate(2026, 1, 9),
+    });
+    dayButton(container, "2026-01-09").focus();
+
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    // The whole committed range grows by a day; it is not collapsed to the two days at the cursor.
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-05"));
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-10");
+    const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
+    expect(cellOf("2026-01-07").getAttribute("data-highlighted")).toBe("");
+    expect(cellOf("2026-01-05").getAttribute("data-highlighted-start")).toBe("");
+    dispose();
+  });
+
   it("PageDown pages to the next month", async () => {
     const { container, state, dispose } = await mountCalendar();
     dayButton(container, "2026-01-15").focus();

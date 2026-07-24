@@ -11,7 +11,12 @@ stateless.
   `anchor = null`. The caller emits the committed, ordered range.
 - **`extend`** (Shift+Arrow): keeps the anchor and slides the moving endpoint, staying "selecting" so
   repeated extensions grow from one anchor; a later plain activate commits. With no anchor it re-opens
-  from the committed start.
+  the **committed** range, anchoring at its `start` — so extending out of a finished range grows it
+  instead of replacing it. That branch is what `createCalendar`'s `activate` reaches on the first
+  `Shift`+`Arrow` after a range completes; with nothing committed at all, `activate` seeds the range at
+  its roving cursor *before* calling here, because the strategy sees no cursor and would otherwise
+  anchor on the day being moved to (the `?? date` fallback that keeps this function total). See
+  `calendar-root.md` § Extending a range.
 
 ## Predicates
 

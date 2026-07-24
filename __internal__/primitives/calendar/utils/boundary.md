@@ -12,6 +12,10 @@ function lastAvailableDateFrom(                                    // derives a 
   anchor, direction: 1 | -1, isDateUnavailable, searchSpan?,
 ): CalendarDate | undefined;
 
+function firstSelectableDateFrom(                                  // where the next usable run begins
+  from, direction: 1 | -1, isSelectable, searchSpan?,
+): CalendarDate | undefined;
+
 function isDateOutOfRange(date, min?, max?): boolean;              // day-level, view-agnostic
 
 function isPreviousMonthDisabled(visibleMonth, min?): boolean;
@@ -46,6 +50,15 @@ function isYearOutOfRange(yearStart, min?, max?): boolean;         // whole-peri
   reaches the edge of the window is still reported **bounded** when the very next day is unavailable.
   That is the safe direction to err in — reporting a bound that exists is never worse than reporting
   none.
+- `firstSelectableDateFrom` — the mirror of the above: the first day at or beyond `from`, walking in
+  `direction`, that `isSelectable` accepts. `lastAvailableDateFrom` reports where the run containing a
+  date *ends*; this one reports where the next usable run *begins*, so a caller that stepped onto a day
+  the calendar refuses can continue to the next one it would take. `createCalendarGrid` is the caller —
+  `Shift`+`Arrow` steps past unavailable days with it (see `calendar-grid.md`) — and it passes the
+  calendar's own `isDateSelectable`, which is why there is no second `min`/`max` argument here: the
+  bounds already end the walk through that predicate. `undefined` when nothing selectable turns up
+  within `searchSpan` (default one month, as above), which is also what keeps the walk finite on an
+  unbounded calendar whose `isDateDisabled` refuses everything.
 - `isDateOutOfRange` — a single day is strictly before `min` / after `max` (the hard, non-focusable,
   arrow-skipped state — distinct from "unavailable", which stays focusable). The exact predicate
   `constrainDate` exists to keep false for `focusedDate()`.
@@ -56,4 +69,5 @@ function isYearOutOfRange(yearStart, min?, max?): boolean;         // whole-peri
   state picks the right flavor per view; don't compare raw days in year/decade.
 
 The predicates are ported verbatim from the Angular calendar's `utils/boundary.ts`; `constrainDate` and
-`lastAvailableDateFrom` are new, from React Aria.
+`lastAvailableDateFrom` are new, from React Aria. `firstSelectableDateFrom` has no React Aria
+counterpart — RA has no Shift+Arrow extension to walk for.

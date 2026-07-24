@@ -249,6 +249,40 @@ describe("createCalendar — selection", () => {
     dispose();
   });
 
+  it("range: extending an empty calendar opens the range at the cursor it extends from", () => {
+    const { api, dispose } = setup({ selectionMode: "range" }); // cursor seeded on Jan 15
+    flush(() => api.activate(new CalendarDate(2026, 1, 16), { extend: true }));
+    expect(iso(api.anchorDate() as CalendarDate)).toBe("2026-01-15");
+    const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(iso(value.start)).toBe("2026-01-15");
+    expect(iso(value.end)).toBe("2026-01-16");
+    dispose();
+  });
+
+  it("range: extending re-opens a committed range from its start instead of collapsing it", () => {
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 1, 5), end: new CalendarDate(2026, 1, 9) },
+      defaultFocusedValue: new CalendarDate(2026, 1, 9),
+      onValueChange,
+    });
+    flush(() => api.activate(new CalendarDate(2026, 1, 10), { extend: true }));
+    // The anchor is the committed range's start, not the cursor: the four days already selected stay
+    // in the range being grown.
+    expect(iso(api.anchorDate() as CalendarDate)).toBe("2026-01-05");
+    const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(iso(value.start)).toBe("2026-01-05");
+    expect(iso(value.end)).toBe("2026-01-10");
+    expect(onValueChange).not.toHaveBeenCalled(); // still in progress
+
+    // A plain activate then commits the grown range, as any second activate does.
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    expect(api.anchorDate()).toBeNull();
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    dispose();
+  });
+
   it("highlightDate is inert with no anchor — hover never steals the roving cursor", () => {
     const { api, dispose } = setup({ selectionMode: "range" });
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 22)));
@@ -688,6 +722,9 @@ describe("createCalendar — contiguous ranges", () => {
 
   it("allowsNonContiguousRanges leaves the bounds alone", () => {
     const { api, dispose } = setup({ ...contiguousRange, allowsNonContiguousRanges: true });
+    // Reported on the return, because the grid reads it to decide whether Shift+Arrow may step past
+    // an unavailable day or has to stop at it.
+    expect(api.allowsNonContiguousRanges()).toBe(true);
     flush(() => api.activate(anchor));
     expect(api.min()).toBeUndefined();
     expect(api.max()).toBeUndefined();
@@ -705,6 +742,7 @@ describe("createCalendar — contiguous ranges", () => {
 
   it("is inert without an isDateDisabled predicate, and in the anchorless modes", () => {
     const { api, dispose } = setup({ selectionMode: "range" });
+    expect(api.allowsNonContiguousRanges()).toBe(false); // the default
     flush(() => api.activate(anchor));
     expect(api.min()).toBeUndefined();
     dispose();

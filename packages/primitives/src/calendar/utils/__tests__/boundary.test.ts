@@ -2,6 +2,7 @@ import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import {
   constrainDate,
+  firstSelectableDateFrom,
   isDateOutOfRange,
   isMonthOutOfRange,
   isNextDecadeDisabled,
@@ -94,6 +95,44 @@ describe("lastAvailableDateFrom", () => {
     expect(lastAvailableDateFrom(anchor, 1, unavailableOn(17), { days: 3 })).toBeUndefined();
     expect(iso(lastAvailableDateFrom(anchor, 1, unavailableOn(17), { days: 7 }))).toBe(
       "2026-02-16",
+    );
+  });
+});
+
+describe("firstSelectableDateFrom", () => {
+  const iso = (date: CalendarDate | undefined) => date?.toString();
+  const from = new CalendarDate(2026, 2, 10);
+  const selectableExcept =
+    (...days: number[]) =>
+    (date: CalendarDate) =>
+      !days.includes(date.day);
+
+  it("returns the starting day itself when it is already selectable", () => {
+    expect(iso(firstSelectableDateFrom(from, 1, () => true))).toBe("2026-02-10");
+    expect(iso(firstSelectableDateFrom(from, -1, () => true))).toBe("2026-02-10");
+  });
+
+  it("steps past a whole run of refused days, in either direction", () => {
+    expect(iso(firstSelectableDateFrom(from, 1, selectableExcept(10, 11, 12)))).toBe("2026-02-13");
+    expect(iso(firstSelectableDateFrom(from, -1, selectableExcept(10, 9)))).toBe("2026-02-08");
+  });
+
+  it("crosses the month boundary — the next usable run is not confined to one month", () => {
+    expect(
+      iso(firstSelectableDateFrom(new CalendarDate(2026, 2, 27), 1, selectableExcept(27, 28))),
+    ).toBe("2026-03-01");
+  });
+
+  it("gives up rather than run off when nothing in reach is selectable", () => {
+    expect(firstSelectableDateFrom(from, 1, () => false)).toBeUndefined();
+    expect(firstSelectableDateFrom(from, -1, () => false)).toBeUndefined();
+  });
+
+  it("honors a narrower search span", () => {
+    const span = { days: 2 };
+    expect(firstSelectableDateFrom(from, 1, selectableExcept(10, 11, 12), span)).toBeUndefined();
+    expect(iso(firstSelectableDateFrom(from, 1, selectableExcept(10, 11), span))).toBe(
+      "2026-02-12",
     );
   });
 });

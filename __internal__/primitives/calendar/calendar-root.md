@@ -109,7 +109,9 @@ Details worth knowing:
   reachable, in any view. Leaving the range is what `Escape` and `commitBehavior` are for.
 - **`allowsNonContiguousRanges: true`** disables the narrowing entirely, restoring the plain
   `min`/`max`. The range may then span unavailable days — which the selection paint still cuts out of
-  the band (see below), exactly as React Aria renders them.
+  the band (see below), exactly as React Aria renders them. The resolved option is on the **return**
+  as well, because it is also what tells the grid whether `Shift`+`Arrow` may step past an unavailable
+  day or has to stop at it (`calendar-grid.md`).
 - **It is gated on `mode() === "range"`, not on the anchor alone.** Nothing clears `anchorDate` when
   `selectionMode` changes, so a stale anchor from an abandoned range would otherwise keep the bounds
   clamped for good — inert cells and dead nav in a mode that has no ranges at all.
@@ -183,6 +185,22 @@ triggers; what is decided *here* is what each verb does:
 - **`clearSelection` emits `onValueChange(null)`** — or `[]` in multiple mode — **unless the consumer's
   last-known value was already empty.** Mid-selection that last-known value is the pre-anchor snapshot,
   not the degenerate one, so clearing a range merely *started* on an empty calendar emits nothing.
+
+### Extending a range (`activate(date, { extend: true })`)
+
+The `Shift`+`Arrow` path (`calendar-grid.md`). It keeps the anchor and slides the moving endpoint, so
+repeated presses grow one range and a later plain activate commits it. What it does with **no anchor**
+depends on what is already committed, and the split is the point:
+
+- **A range is committed** → the strategy's own no-anchor branch re-opens **that** range, anchoring at
+  its `start` (`utils/range-selection.md`). The days already selected stay inside the range being
+  grown.
+- **Nothing is selected** → `activate` first seeds a fresh range at `focusedDate()`, then extends it.
+  The strategy cannot do this itself: it sees only a value and an anchor, never the cursor.
+
+Seeding at the cursor *unconditionally* is the bug this shape replaced — it re-anchored on top of a
+committed range and collapsed it to the two days around the cursor, which also left the strategy's
+no-anchor branch unreachable from the component.
 
 ### The degenerate in-progress value is deliberate
 
