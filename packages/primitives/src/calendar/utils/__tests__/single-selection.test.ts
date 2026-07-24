@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { DateRange, SelectionState } from "../selection";
 import { singleSelection } from "../single-selection";
 
-const empty: SelectionState = { value: null, anchor: null };
+const empty: SelectionState = { value: null, anchor: null, endpoint: null };
 const d = (day: number) => new CalendarDate(2026, 1, day);
 /** A month-view cell's period: the degenerate one-day span the predicates collapse on. */
 const on = (day: number): DateRange => ({ start: d(day), end: d(day) });
@@ -19,27 +19,26 @@ describe("singleSelection", () => {
     expect(next.anchor).toBeNull();
     expect((next.value as CalendarDate).toString()).toBe("2026-01-10");
 
-    const replaced = singleSelection.select(next, d(20));
+    const replaced = singleSelection.select({ ...empty, ...next }, d(20));
     expect((replaced.value as CalendarDate).toString()).toBe("2026-01-20");
   });
 
   it("isSelected matches the one selected day", () => {
-    const state: SelectionState = { value: d(10), anchor: null };
+    const state: SelectionState = { value: d(10), anchor: null, endpoint: null };
     expect(singleSelection.isSelected(state, on(10))).toBe(true);
     expect(singleSelection.isSelected(state, on(11))).toBe(false);
   });
 
   it("isSelected lights the wider period holding the selected day (year / decade cells)", () => {
-    const state: SelectionState = { value: d(10), anchor: null };
+    const state: SelectionState = { value: d(10), anchor: null, endpoint: null };
     expect(singleSelection.isSelected(state, monthOf(1))).toBe(true);
     expect(singleSelection.isSelected(state, monthOf(2))).toBe(false);
   });
 
-  it("has no range or highlight state", () => {
-    const state: SelectionState = { value: d(10), anchor: null };
-    expect(singleSelection.isRangeStart(state, on(10))).toBe(false);
-    expect(singleSelection.isRangeMiddle(state, on(10))).toBe(false);
-    expect(singleSelection.isRangeEnd(state, on(10))).toBe(false);
-    expect(singleSelection.highlightedRange(state, d(12))).toBeNull();
+  it("caps both ends of its degenerate one-day band, and has no tentative range", () => {
+    const state: SelectionState = { value: d(10), anchor: null, endpoint: null };
+    expect(singleSelection.isSelectionStart(state, on(10))).toBe(true);
+    expect(singleSelection.isSelectionEnd(state, on(10))).toBe(true);
+    expect(singleSelection.highlightedRange(state)).toBeNull();
   });
 });

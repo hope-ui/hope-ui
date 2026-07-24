@@ -29,14 +29,27 @@ export interface DateRange {
 export type CalendarValue = CalendarDate | DateRange | CalendarDate[] | null;
 
 /**
- * The internal selection snapshot a {@link SelectionStrategy} reads and returns — pure, so the
- * strategies unit-test as plain functions. `anchor` is the in-progress range endpoint (range mode:
- * non-null while "selecting", null once complete; always null in single/multiple).
+ * The internal selection snapshot a {@link SelectionStrategy} reads — pure, so the strategies
+ * unit-test as plain functions.
+ *
+ * `anchor` is the in-progress range endpoint (range mode: non-null while "selecting", null once
+ * complete; always null in single/multiple). `endpoint` is the calendar's **roving cursor**, which is
+ * the range's moving end while anchored — so the band a range paints is derivable from this snapshot
+ * alone, with no second argument. That mirrors React Aria, where `isSelected` reads the state
+ * object's own `highlightedRange`.
  */
 export interface SelectionState {
   readonly value: CalendarValue;
   readonly anchor: CalendarDate | null;
+  readonly endpoint: CalendarDate | null;
 }
+
+/**
+ * What a {@link SelectionStrategy.select} transition produces. Deliberately narrower than
+ * {@link SelectionState}: the roving cursor is the calendar's to move, never the strategy's, so a
+ * strategy cannot return one.
+ */
+export type SelectionResult = Pick<SelectionState, "value" | "anchor">;
 
 /** `select` options. `extend` = the Shift+Arrow keyboard extension (range mode only). */
 export interface SelectOptions {
@@ -50,30 +63,34 @@ export interface SelectOptions {
  * and `select` returns the next snapshot (the strategy decides the transition). `isRange*` are all
  * false outside range mode; `highlightedRange` is null unless range mode is mid-selection.
  *
- * The four paint predicates take the **period a cell stands for** (`cellPeriod(view, date)` — a single
+ * The three paint predicates take the **period a cell stands for** (`cellPeriod(view, date)` — a single
  * day in month view, a whole month in year view, a whole year in decade view) rather than a bare date,
  * so a year/decade cell paints whenever the selection *overlaps* it. Month view passes the degenerate
  * `{ date, date }`, which collapses every test back to the day-level one it generalizes.
+ *
+ * There is deliberately **no** "middle" predicate, and the vocabulary is "selection", not "range":
+ * range mode paints exactly **one** band — tentative while anchored, committed when idle — so a
+ * consumer derives the middle as `isSelected && !isSelectionStart && !isSelectionEnd`. This is React
+ * Aria's model (`react-aria-components`' `data-selected`/`data-selection-start`/`data-selection-end`,
+ * with the middle derived in CSS); see `__internal__/calendar-react-aria-parity.md`.
  */
 export interface SelectionStrategy {
   readonly mode: CalendarSelectionMode;
-  /** Does the selection reach into `period` — drives `data-selected` + the aria-label suffix. */
+  /** Does the painted band reach into `period` — drives `data-selected` + the aria-label suffix. */
   isSelected(state: SelectionState, period: DateRange): boolean;
-  /** Does `period` hold the range's start endpoint (range mode only). */
-  isRangeStart(state: SelectionState, period: DateRange): boolean;
-  /** Does `period` sit strictly inside the range, holding neither endpoint (range mode only). */
-  isRangeMiddle(state: SelectionState, period: DateRange): boolean;
-  /** Does `period` hold the range's end endpoint (range mode only). */
-  isRangeEnd(state: SelectionState, period: DateRange): boolean;
+  /** Does `period` hold the band's start endpoint (range mode only). */
+  isSelectionStart(state: SelectionState, period: DateRange): boolean;
+  /** Does `period` hold the band's end endpoint (range mode only). */
+  isSelectionEnd(state: SelectionState, period: DateRange): boolean;
   /**
-   * The tentative highlight range while a range selection is in progress — from the anchor to
-   * `endpoint`, the range's moving end (ordered). The calendar passes its **roving cursor**, so the
-   * band is the same for hover and keyboard, as in React Aria's `RangeCalendarState.highlightedRange`.
-   * Null in single/multiple, or in range mode when not mid-selecting or with no `endpoint`.
+   * The band range mode paints, in React Aria's one-field-two-phases shape
+   * (`RangeCalendarState.highlightedRange`): anchor → the roving `endpoint` while a selection is in
+   * progress, and the committed value once it is not. The three predicates above are membership in
+   * *this*. Always null in single/multiple.
    */
-  highlightedRange(state: SelectionState, endpoint: CalendarDate | null): DateRange | null;
+  highlightedRange(state: SelectionState): DateRange | null;
   /** Compute the next selection from activating `date`. Pure — the caller commits the result. */
-  select(state: SelectionState, date: CalendarDate, opts?: SelectOptions): SelectionState;
+  select(state: SelectionState, date: CalendarDate, opts?: SelectOptions): SelectionResult;
 }
 
 export { multipleSelection } from "./multiple-selection";

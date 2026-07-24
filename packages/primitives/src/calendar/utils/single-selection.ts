@@ -1,5 +1,5 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { CalendarValue, SelectionStrategy } from "./selection";
+import type { CalendarValue, DateRange, SelectionState, SelectionStrategy } from "./selection";
 import { periodContains } from "./view";
 
 /** Narrow a {@link CalendarValue} to the single mode's `CalendarDate | null`. */
@@ -7,9 +7,14 @@ function asSingle(value: CalendarValue): CalendarDate | null {
   return value != null && !Array.isArray(value) && !("start" in value) ? value : null;
 }
 
+function holdsSelection(state: SelectionState, period: DateRange): boolean {
+  const selected = asSingle(state.value);
+  return selected !== null && periodContains(period, selected);
+}
+
 /**
- * Single-date selection: activating a day replaces the selection with it. There is no range, no
- * anchor, and no hover highlight — every range predicate is false and `highlightedRange` is null.
+ * Single-date selection: activating a day replaces the selection with it. There is no band, no
+ * anchor, and no hover preview — both endpoint predicates are false and `highlightedRange` is null.
  * `extend` is ignored.
  *
  * `isSelected` asks whether the selected day falls in the cell's period (`cellPeriod`), so the year
@@ -19,20 +24,15 @@ function asSingle(value: CalendarValue): CalendarDate | null {
 export const singleSelection: SelectionStrategy = {
   mode: "single",
 
-  isSelected(state, period) {
-    const selected = asSingle(state.value);
-    return selected !== null && periodContains(period, selected);
-  },
+  isSelected: holdsSelection,
 
-  isRangeStart() {
-    return false;
-  },
-  isRangeMiddle() {
-    return false;
-  },
-  isRangeEnd() {
-    return false;
-  },
+  // A single selection is a degenerate one-day band, so the selected day caps **both** ends. That is
+  // what keeps the derived middle — `isSelected && !isSelectionStart && !isSelectionEnd`, which is how
+  // both a consumer and the preset's `data-selection-middle` variant compute it — empty in this mode.
+  // Reporting no endpoints here would make every single-mode selection read as band interior and lose
+  // its endpoint paint.
+  isSelectionStart: holdsSelection,
+  isSelectionEnd: holdsSelection,
   highlightedRange() {
     return null;
   },

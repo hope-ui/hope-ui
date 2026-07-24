@@ -1,6 +1,7 @@
 import type { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createMemo, createSignal, untrack } from "solid-js";
+import { createPress } from "../internal";
 import type { CreateCalendarReturn } from "./calendar-root";
 
 /**
@@ -16,16 +17,16 @@ export interface CalendarDayState {
   readonly isToday: boolean;
   /** A leading/trailing filler cell outside the visible scope. */
   readonly isOutside: boolean;
-  /** Part of the committed selection (any mode). */
+  /**
+   * Inside the painted band (any mode). In range mode that band is tentative while a selection is in
+   * progress (anchor → roving cursor) and committed when it is not — one band, so there is no separate
+   * "highlighted" flag. A "middle" cell is `isSelected && !isSelectionStart && !isSelectionEnd`.
+   */
   readonly isSelected: boolean;
-  readonly isRangeStart: boolean;
-  readonly isRangeMiddle: boolean;
-  readonly isRangeEnd: boolean;
-  /** Inside the tentative band (anchor → roving cursor) while a range selection is in progress. */
-  readonly isHighlighted: boolean;
-  /** The tentative band's endpoints — both true at once when the preview spans a single day. */
-  readonly isHighlightedStart: boolean;
-  readonly isHighlightedEnd: boolean;
+  /** Holds the band's start endpoint. Both endpoints are true on a one-day band. */
+  readonly isSelectionStart: boolean;
+  /** Holds the band's end endpoint. */
+  readonly isSelectionEnd: boolean;
   /** The roving cursor is on this cell. */
   readonly isFocused: boolean;
   /** `isDateDisabled` hit — focusable + announced, but not selectable (painted `data-unavailable`). */
@@ -62,22 +63,26 @@ export interface CreateCalendarCellReturn {
  * non-focusable, so the grid skips it), and owns activation + the roving-cursor sync + the inert-cell
  * guards:
  *
- * - `onClick` (which native `Enter`/`Space`/pointer all fire) → `activate`, refused on an inert cell.
+ * - `createPress` → `activate` (plus the keyboard-only range auto-advance), inert while non-focusable.
  * - `onMouseDown` prevents native click-focus landing on an inert cell.
  * - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells.
  * - `onMouseEnter` moves the range preview (`highlightDate` — the roving cursor), guarded off cells the
  *   range could not end on.
  *
- * The registered day-state custom variants are self-based (`&:where([data-range-middle])`), so an
+ * The registered day-state custom variants are self-based (`&:where([data-selected])`), so an
  * attribute only lights a utility on the element that carries it. That splits the paint across the two
  * elements: the `<td>` carries the ARIA grid semantics (`role="gridcell"` + `aria-selected` +
- * `aria-disabled`) **and** the band-level range/tentative-highlight hooks, so the `cell` slot paints
- * the continuous range band that spans cells; the inner `<button>` carries the full per-day set (plus
- * `aria-label`, roving `tabindex`, `data-focused`), so the `cellTrigger` slot paints the solid
- * endpoint pills and marks on top of that band. The shared range flags — and `aria-disabled`, which
- * React Aria mirrors — are therefore emitted on both. The tab stop is the focused *focusable* cell,
- * correct on the server too (both halves compare dates, and neither depends on the client-only
- * collection).
+ * `aria-disabled`) **and** the band hooks, so the `cell` slot paints the continuous band that spans
+ * cells; the inner `<button>` carries the full per-day set (plus `aria-label`, roving `tabindex`,
+ * `data-focused`, `data-pressed`), so the `cellTrigger` slot paints the solid endpoint pills and marks
+ * on top of that band. The shared band flags — and `aria-disabled`, which React Aria mirrors — are
+ * therefore emitted on both. The tab stop is the focused *focusable* cell, correct on the server too
+ * (both halves compare dates, and neither depends on the client-only collection).
+ *
+ * The band vocabulary is React Aria's: `data-selected` + `data-selection-start` + `data-selection-end`,
+ * with no middle attribute — a recipe derives the middle in CSS
+ * (`[data-selected]:not([data-selection-start]):not([data-selection-end])`). Range mode paints exactly
+ * one band, tentative while anchored and committed when idle, so nothing needs disambiguating.
  */
 export function createCalendarCell(
   state: CreateCalendarReturn,
@@ -100,12 +105,8 @@ export function createCalendarCell(
   const isToday = () => state.isToday(date());
   const isFocused = () => state.isFocused(date());
   const isSelected = () => state.isSelected(date());
-  const isRangeStart = () => state.isRangeStart(date());
-  const isRangeMiddle = () => state.isRangeMiddle(date());
-  const isRangeEnd = () => state.isRangeEnd(date());
-  const isHighlighted = () => state.isHighlighted(date());
-  const isHighlightedStart = () => state.isHighlightedStart(date());
-  const isHighlightedEnd = () => state.isHighlightedEnd(date());
+  const isSelectionStart = () => state.isSelectionStart(date());
+  const isSelectionEnd = () => state.isSelectionEnd(date());
   const isUnavailable = () => state.isDateUnavailable(date());
   const isNonFocusable = () => state.isDateNonFocusable(date());
   // `data-disabled` marks only the truly-inert days — out-of-range, or the whole calendar disabled
@@ -129,12 +130,8 @@ export function createCalendarCell(
     isToday: isToday(),
     isOutside: isOutside(),
     isSelected: isSelected(),
-    isRangeStart: isRangeStart(),
-    isRangeMiddle: isRangeMiddle(),
-    isRangeEnd: isRangeEnd(),
-    isHighlighted: isHighlighted(),
-    isHighlightedStart: isHighlightedStart(),
-    isHighlightedEnd: isHighlightedEnd(),
+    isSelectionStart: isSelectionStart(),
+    isSelectionEnd: isSelectionEnd(),
     isFocused: isFocused(),
     isUnavailable: isUnavailable(),
     isDisabled: isDisabled(),
@@ -146,11 +143,11 @@ export function createCalendarCell(
     if (isToday()) {
       parts.push(t("calendar.today"));
     }
-    if (isRangeStart() && isRangeEnd()) {
-      parts.push(t("calendar.selected")); // single-day range
-    } else if (isRangeStart()) {
+    if (isSelectionStart() && isSelectionEnd()) {
+      parts.push(t("calendar.selected")); // single-day band
+    } else if (isSelectionStart()) {
       parts.push(t("calendar.rangeStart"));
-    } else if (isRangeEnd()) {
+    } else if (isSelectionEnd()) {
       parts.push(t("calendar.rangeEnd"));
     } else if (isSelected()) {
       parts.push(t("calendar.selected"));
@@ -168,13 +165,36 @@ export function createCalendarCell(
       event.preventDefault();
     }
   };
-  const onClick: JSX.EventHandler<HTMLButtonElement, MouseEvent> = (event) => {
-    event.preventDefault();
-    if (isNonFocusable()) {
-      return; // inert — never activates, even via a forced click
-    }
-    state.activate(date());
-  };
+  // Activation goes through the shared press engine rather than a raw `onClick`, because the *pointer
+  // type* is what gates the keyboard auto-advance below — and that cannot be recovered from the click
+  // event alone. A screen reader's virtual click carries `detail === 0` exactly as Enter does, and
+  // React Aria deliberately routes it down a different branch (select, but do **not** move the cursor);
+  // gating on `detail` would have silently given AT users the sighted-keyboard behavior. See the
+  // porting rule in `__internal__/reference-implementations.md`.
+  //
+  // `disabled` carries the old inline guard: `createPress` short-circuits every interaction — including
+  // the click — while it is true, so an inert cell still never activates via a forced click. The
+  // previous handler's unconditional `preventDefault()` is deliberately gone: a `<button type="button">`
+  // has no default click action to suppress, and `defaultPrevented` is `createPress`'s cancel channel,
+  // so keeping it would have cancelled every activation.
+  const press = createPress<HTMLButtonElement>({
+    ref: triggerRef,
+    nativeButton: () => true,
+    disabled: isNonFocusable,
+    onPress: (event) => {
+      // React Aria gates the advance on `!state.anchorDate` read *before* selecting. Ours takes the
+      // fact from `activate` itself, for two reasons: `createCalendar` is one hook for all three
+      // selection modes where RA has a separate range state object (so "there was no anchor" is not
+      // the same as "a range began" — single/multiple, a refused day, and a year/decade drill all
+      // clear that first bar), and re-reading `anchorDate()` afterwards would not work anyway, since a
+      // solid-js 2.0 signal write is invisible to a plain read until the next flush.
+      const beganRange = state.activate(date());
+      if (event.pointerType === "keyboard" && beganRange) {
+        state.focusNearestAvailableDate(date());
+      }
+    },
+  });
+
   const onMouseEnter: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
     // Only a day the range could actually end on may move the tentative band. Without this gate,
     // hovering an outside-month or unavailable day would preview a range that the matching click
@@ -211,23 +231,14 @@ export function createCalendarCell(
     get "aria-disabled"() {
       return isSelectable() ? undefined : "true";
     },
-    get "data-range-start"() {
-      return isRangeStart() ? "" : undefined;
+    get "data-selected"() {
+      return isSelected() ? "" : undefined;
     },
-    get "data-range-middle"() {
-      return isRangeMiddle() ? "" : undefined;
+    get "data-selection-start"() {
+      return isSelectionStart() ? "" : undefined;
     },
-    get "data-range-end"() {
-      return isRangeEnd() ? "" : undefined;
-    },
-    get "data-highlighted"() {
-      return isHighlighted() ? "" : undefined;
-    },
-    get "data-highlighted-start"() {
-      return isHighlightedStart() ? "" : undefined;
-    },
-    get "data-highlighted-end"() {
-      return isHighlightedEnd() ? "" : undefined;
+    get "data-selection-end"() {
+      return isSelectionEnd() ? "" : undefined;
     },
   };
 
@@ -265,30 +276,21 @@ export function createCalendarCell(
     get "data-selected"() {
       return isSelected() ? "" : undefined;
     },
-    get "data-range-start"() {
-      return isRangeStart() ? "" : undefined;
+    get "data-selection-start"() {
+      return isSelectionStart() ? "" : undefined;
     },
-    get "data-range-middle"() {
-      return isRangeMiddle() ? "" : undefined;
-    },
-    get "data-range-end"() {
-      return isRangeEnd() ? "" : undefined;
-    },
-    get "data-highlighted"() {
-      return isHighlighted() ? "" : undefined;
-    },
-    get "data-highlighted-start"() {
-      return isHighlightedStart() ? "" : undefined;
-    },
-    get "data-highlighted-end"() {
-      return isHighlightedEnd() ? "" : undefined;
+    get "data-selection-end"() {
+      return isSelectionEnd() ? "" : undefined;
     },
     get "data-focused"() {
       return isFocused() ? "" : undefined;
     },
+    get "data-pressed"() {
+      return press.isPressed() ? "" : undefined;
+    },
+    ...press.pressProps,
     onMouseDown,
     onMouseEnter,
-    onClick,
     onFocus,
   };
 

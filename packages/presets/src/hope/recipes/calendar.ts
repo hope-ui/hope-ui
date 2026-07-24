@@ -3,9 +3,13 @@
  *
  * Standalone-first: no popup chrome by default (a DatePicker popover layers its own surface). Day
  * state is painted from the `data-*` hooks `createCalendarCell` emits, split across two elements: the
- * `<td>` (`cell`) paints the continuous range/preview band that spans cells; the `<button>`
- * (`cellTrigger`, `z-10`) paints the solid endpoint pills and per-day marks on top. Both carry the
- * range flags because the custom variants are self-based (`:where([data-*])`).
+ * `<td>` (`cell`) paints the continuous band that spans cells; the `<button>` (`cellTrigger`, `z-10`)
+ * paints the solid endpoint pills and per-day marks on top. Both carry the band flags because the
+ * custom variants are self-based (`:where([data-*])`).
+ *
+ * The band vocabulary is React Aria's `data-selected` / `data-selection-start` / `data-selection-end`,
+ * and there is exactly one band — tentative while a range is anchored, committed when it is not. The
+ * interior is derived (`data-selection-middle`, registered in `_base/_variants.css`), never emitted.
  *
  * Recipe purity: every color is a finished `--hope-*` token; `--cell-size`, `calc()`, `ring-3` are
  * lengths, and every class is a literal for the `@source` scan.
@@ -48,34 +52,30 @@ export const calendarRecipe = tv({
     // column width comes from `--cell-size`), so its text stays fixed at the nova `0.8rem`.
     weekday: "text-[0.8rem] font-normal text-foreground-muted select-none",
     // A `<td role="gridcell">` wrapping the day trigger. No padding, so the `w-full` trigger fills the
-    // column. It paints the continuous range/tentative band off its own `data-range-*`/`data-highlighted`
-    // — spanning cells seamlessly under the pills — with logical rounding at the ends and at row wraps.
+    // column. It paints the continuous band off its own `data-selected`/`data-selection-*` — spanning
+    // cells seamlessly under the pills — with logical rounding at the ends and at row wraps.
+    //
+    // There is exactly ONE band (tentative while a range is anchored, committed when it is not), so the
+    // endpoint and interior rules below are mutually exclusive by construction — the second set of
+    // rules and the exclusion chains a separate tentative-highlight vocabulary needed are simply gone.
     cell: [
       "relative rounded-md p-0 text-center align-middle select-none outline-none",
 
-      "data-range-start:bg-selected data-range-start:rounded-e-none",
-      "data-range-end:bg-selected data-range-end:rounded-s-none",
-      // A one-day range is start AND end — squared on both sides by the two rules above, which would
+      "data-selection-start:bg-selected data-selection-start:rounded-e-none",
+      "data-selection-end:bg-selected data-selection-end:rounded-s-none",
+      // A one-day band is start AND end — squared on both sides by the two rules above, which would
       // leave a square band peeking around the rounded pill. Two attributes, so it wins on specificity.
-      "[&[data-range-start][data-range-end]]:rounded-md",
+      "[&[data-selection-start][data-selection-end]]:rounded-md",
       // An endpoint that lands on a row edge is its row's whole band segment: round its outer corner so
       // the segment closes, mirroring the middle-cell row-wrap rounding below (`:first`/`:last`, `md`).
-      "data-range-start:last:rounded-e-md",
-      "data-range-end:first:rounded-s-md",
+      "data-selection-start:last:rounded-e-md",
+      "data-selection-end:first:rounded-s-md",
 
-      "data-range-middle:bg-selected data-range-middle:rounded-none",
-      "data-range-middle:first:rounded-s-md data-range-middle:last:rounded-e-md",
-
-      "data-highlighted:bg-selected data-highlighted:rounded-none",
-      "data-highlighted:first:rounded-s-md data-highlighted:last:rounded-e-md",
-      // The tentative band's own end caps, so a range-in-progress closes like the committed one (the
-      // interior stays square from the rule above). Written as attribute-arbitrary variants for the
-      // specificity bump: a registered `data-highlighted-start:` is `:where()`-wrapped — zero added
-      // specificity — and would TIE with `data-highlighted:rounded-none`, leaving the winner to emit
-      // order. Purely additive, so a one-day preview (start AND end on one cell) rounds both sides
-      // with no repair rule, unlike the committed band's `[&[data-range-start][data-range-end]]`.
-      "[&[data-highlighted-start]]:rounded-s-md",
-      "[&[data-highlighted-end]]:rounded-e-md",
+      // `data-selection-middle` is derived, not emitted: the preset registers it as
+      // `[data-selected]:not([data-selection-start]):not([data-selection-end])`, so it can never
+      // overlap the two endpoint rules above.
+      "data-selection-middle:bg-selected data-selection-middle:rounded-none",
+      "data-selection-middle:first:rounded-s-md data-selection-middle:last:rounded-e-md",
     ],
     // The roving day `<button>`, `z-10` above the cell band. Fills its column (`h-(--cell-size) w-full`);
     // the reserved transparent border is colored on focus. The roving ring is driven by the primitive's
@@ -90,27 +90,30 @@ export const calendarRecipe = tv({
       // chain IS the whole precedence — never class/emit order. (tailwind-merge keeps these differently-
       // guarded arbitrary variants side by side, so array order can't decide between two matches anyway;
       // making them mutually exclusive is what removes the dependence on order entirely.)
-      // High→low: disabled › selected endpoint › band (range-middle | highlighted) › unavailable › today › outside.
+      // High→low: disabled › band endpoint › band interior › unavailable › today › outside.
       "data-disabled:pointer-events-none data-disabled:opacity-disabled data-disabled:text-foreground-disabled",
 
-      // Solid endpoint pill (bg painted here; the continuous band lives on the <td>). Stays a pill while
-      // it is the preview anchor, so it deliberately does NOT exclude data-highlighted.
-      "[&[data-selected]:not([data-range-middle]):not([data-disabled])]:bg-primary [&[data-selected]:not([data-range-middle]):not([data-disabled])]:text-on-primary",
+      // Solid endpoint pill (bg painted here; the continuous band lives on the <td>). One band, so an
+      // endpoint is an endpoint whether the range is tentative or committed — and a single/multiple
+      // selection caps both ends of its own one-day band, which is what gives it a pill here too.
+      "[&[data-selection-start]:not([data-disabled])]:bg-primary [&[data-selection-start]:not([data-disabled])]:text-on-primary",
+      "[&[data-selection-end]:not([data-disabled])]:bg-primary [&[data-selection-end]:not([data-disabled])]:text-on-primary",
 
-      // Sitting on the band (committed middle, or tentative preview) — legible on bg-selected.
-      "[&[data-range-middle]:not([data-disabled])]:text-on-selected",
-      "[&[data-highlighted]:not([data-selected]):not([data-disabled])]:text-on-selected",
+      // Sitting on the band's interior — legible on bg-selected. Spelled out rather than written as the
+      // registered `data-selection-middle:` variant, because these guarded arbitrary variants are what keep
+      // the cascade order-independent.
+      "[&[data-selected]:not([data-selection-start]):not([data-selection-end]):not([data-disabled])]:text-on-selected",
 
       // Unavailable: the strike always shows; the muted color yields only to a band the day sits on.
       "data-unavailable:line-through",
-      "[&[data-unavailable]:not([data-selected]):not([data-highlighted]):not([data-disabled])]:text-foreground-disabled",
+      "[&[data-unavailable]:not([data-selected]):not([data-disabled])]:text-foreground-disabled",
 
       // Today / outside-month tints — lowest, so they never fight the band or the unavailable mark.
-      "[&[data-today]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-disabled])]:text-primary",
-      "[&[data-outside-month]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
+      "[&[data-today]:not([data-selected]):not([data-unavailable]):not([data-disabled])]:text-primary",
+      "[&[data-outside-month]:not([data-selected]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
 
       // Hover wash only on a plain, actionable day (unavailable stays interactive, so exclude it too).
-      "[&:not([data-disabled]):not([data-unavailable]):not([data-highlighted]):not([data-range-middle]):not([data-selected]):hover]:bg-surface-raised-hovered",
+      "[&:not([data-disabled]):not([data-unavailable]):not([data-selected]):hover]:bg-surface-raised-hovered",
 
       // Roving ring: keyed off the primitive's data-focused (the roving cursor), gated on the grid
       // holding focus (group-focus-within/grid) — no :focus-visible dependence, so arrow-nav shows it.

@@ -107,7 +107,10 @@ async function anchorAndAim(container: HTMLElement, state: CreateCalendarReturn)
   dayButton(container, "2026-01-10").focus();
   await userEvent.keyboard("{Enter}");
   await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
-  await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}{ArrowRight}");
+  // A keyboard anchor auto-advances the cursor one day (React Aria's `focusNearestAvailableDate`), so
+  // the aim starts from the 11th, not the 10th.
+  await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-11"));
+  await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}");
   await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-14"));
 }
 

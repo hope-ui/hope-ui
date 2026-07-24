@@ -63,8 +63,6 @@ import {
   type FirstDayOfWeek,
   isInViewScope,
   normalizeFocusForView,
-  periodContains,
-  periodsOverlap,
 } from "./utils/view";
 import { buildYearCells, formatYear } from "./utils/year-view";
 
@@ -188,8 +186,11 @@ export interface CreateCalendarReturn {
   focusedDate: Accessor<CalendarDate>;
   selectionValue: Accessor<CalendarValue>;
   anchorDate: Accessor<CalendarDate | null>;
-  /** Derived: the tentative range `anchorDate` → `focusedDate` while a range selection is in
-   * progress (else null). */
+  /**
+   * Derived: the **one** band range mode paints — `anchorDate` → `focusedDate` while a range selection
+   * is in progress, and the committed range when it is not (React Aria's `highlightedRange`). Null
+   * outside range mode, and while range mode has nothing selected.
+   */
   highlightedRange: Accessor<DateRange | null>;
   todayDate: Accessor<CalendarDate>;
 
@@ -212,7 +213,20 @@ export interface CreateCalendarReturn {
   drillDownTo: (date: CalendarDate) => void;
   setView: (view: CalendarView) => void;
   setFocusedDate: (date: CalendarDate) => void;
-  activate: (date: CalendarDate, opts?: { extend?: boolean }) => void;
+  /**
+   * Apply an activation. Returns whether it **began a range** — no anchor before, one after. The cell
+   * hook needs that fact to gate the keyboard auto-advance and cannot recover it by re-reading
+   * {@link anchorDate}: under solid-js 2.0's client build a signal write is invisible to a plain read
+   * until the next flush, so the anchor still reads `null` immediately after this returns.
+   */
+  activate: (date: CalendarDate, opts?: { extend?: boolean }) => boolean;
+  /**
+   * Step the cursor one day past a just-anchored range (+1, falling back to −1, staying put when
+   * neither is selectable) — React Aria's `focusNearestAvailableDate`. The affordance that tells a
+   * **keyboard** user they are selecting a range rather than a single date; the pointer gets the same
+   * signal from hover, so `createCalendarCell` calls this only for a keyboard press.
+   */
+  focusNearestAvailableDate: (anchor: CalendarDate) => void;
   /** Move the tentative range's moving endpoint to `date` — i.e. move the roving cursor, but only
    * while a range selection is anchored. A no-op otherwise. */
   highlightDate: (date: CalendarDate) => void;
@@ -248,22 +262,27 @@ export interface CreateCalendarReturn {
   isDateSelectable: (date: CalendarDate) => boolean;
   isToday: (date: CalendarDate) => boolean;
   isFocused: (date: CalendarDate) => boolean;
-  /** Part of the committed selection **and** paintable: a day the calendar makes inert
-   * (`isCellDisabled`) or marks unavailable is excluded, as React Aria's `isSelected` is. The three
-   * `isRange*` below carry the same guard. */
+  /** Inside the painted band ({@link highlightedRange} in range mode) **and** paintable: a day the
+   * calendar makes inert (`isCellDisabled`) or marks unavailable is excluded, as React Aria's
+   * `isSelected` is. The two endpoint predicates below carry the same guard. */
   isSelected: (date: CalendarDate) => boolean;
-  isRangeStart: (date: CalendarDate) => boolean;
-  isRangeMiddle: (date: CalendarDate) => boolean;
-  isRangeEnd: (date: CalendarDate) => boolean;
-  isHighlighted: (date: CalendarDate) => boolean;
-  isHighlightedStart: (date: CalendarDate) => boolean;
-  isHighlightedEnd: (date: CalendarDate) => boolean;
+  /** Holds the band's start endpoint. Both endpoints are true on a one-day band. */
+  isSelectionStart: (date: CalendarDate) => boolean;
+  /** Holds the band's end endpoint. */
+  isSelectionEnd: (date: CalendarDate) => boolean;
   formatCellName: (date: CalendarDate) => string;
   formatFullDate: (date: CalendarDate) => string;
 
   // --- shared navigation kernel (consumed by the grid + cell part hooks) ---
   collection: CreateCollectionReturn<string>;
   listFocus: CreateListFocusReturn<string>;
+  /**
+   * Whether something has asked DOM focus to follow the roving cursor to wherever it settles. Armed by
+   * the grid's own navigation and by {@link focusNearestAvailableDate}; consumed (and cleared) by the
+   * grid, which owns the effect that waits for the target cell to mount before focusing it.
+   */
+  pendingCursorFocus: Accessor<boolean>;
+  setPendingCursorFocus: (pending: boolean) => void;
   /** Announce a string via the screen-reader live region (client-only). */
   announce: (message: string) => void;
 }
@@ -315,6 +334,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const required = () => merged.required;
 
   // --- State ---
+  // "Bring DOM focus to wherever the cursor settles." Armed by whoever moves the cursor
+  // programmatically — the grid's arrow/page/drill navigation, and the keyboard range auto-advance
+  // below — and consumed by the grid, which owns the effect that waits for the target cell to mount
+  // before focusing it. The flag lives here rather than in the grid because the *cell* has to arm it
+  // too, and a cell has no reference to the grid hook. A plain-value signal, so it consumes no
+  // hydration id and does not shift `_hk`.
+  const [pendingCursorFocus, setPendingCursorFocus] = createSignal(false);
+
   const [view, setViewSignal] = createSignal<CalendarView>("month");
   const todayDate = createMemo(() => today(timeZone()));
 
@@ -416,9 +443,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   });
 
   const strategy = createMemo(() => selectionStrategyFor(mode()));
+  // The snapshot every strategy call reads. `endpoint` is the roving cursor, which is the range's
+  // moving end while anchored — carrying it here is what lets the paint predicates derive the band
+  // from the snapshot alone, exactly as React Aria's `isSelected` reads its state object's own
+  // `highlightedRange`. An existing memo gaining a third field, so no reactive node is added.
   const selectionState = createMemo<SelectionState>(() => ({
     value: selectionValue(),
     anchor: anchorDate(),
+    endpoint: focusedDate(),
   }));
 
   // The visible scope follows the cursor when it leaves — the arrow-off-the-edge / drill crossing. One
@@ -559,38 +591,20 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // month view the period is the degenerate `{ date, date }`, so every predicate below is bit-for-bit
   // what it was. React Aria has no year/decade view, so this generalization is hope-ui's own.
   const periodOf = (date: CalendarDate) => cellPeriod(view(), date);
+  // One band, three predicates — React Aria's vocabulary. Range mode resolves them against
+  // `highlightedRange` (tentative while anchored, committed when idle), so hover and keyboard share one
+  // code path: hover moves the cursor (`highlightDate`), and the band can never disagree with the cell
+  // the user is on. A consumer wanting the middle derives it — `isSelected && !start && !end` — which
+  // is what `data-selection-middle` is repointed at in the preset.
   const isSelected = (date: CalendarDate) =>
     paintsSelection(date) && strategy().isSelected(selectionState(), periodOf(date));
-  const isRangeStart = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeStart(selectionState(), periodOf(date));
-  const isRangeMiddle = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeMiddle(selectionState(), periodOf(date));
-  const isRangeEnd = (date: CalendarDate) =>
-    paintsSelection(date) && strategy().isRangeEnd(selectionState(), periodOf(date));
-  // The tentative range while mid-selection: anchor → the roving cursor, exactly as React Aria derives
-  // it (`useRangeCalendarState`). Deriving it from the *cursor* rather than a separate hover signal is
-  // what makes hover and keyboard one code path — hover moves the cursor (`highlightDate`), so the band
-  // can never disagree with the cell the user is on. A plain accessor (like the sibling predicates), NOT
-  // createMemo: an extra reactive node created in this render would advance the hydration-id counter and
-  // shift every `_hk` in the SSR tree.
-  const highlightedRange = (): DateRange | null =>
-    strategy().highlightedRange(selectionState(), focusedDate());
-  // The band reads the cell's period for the same reason the committed paint does: a range anchored in
-  // month view survives a drill up, and its preview must light every month it passes through there too.
-  const isHighlighted = (date: CalendarDate) => {
-    const range = highlightedRange();
-    return range !== null && periodsOverlap(range, periodOf(date));
-  };
-  // The tentative band's own endpoints, so a recipe can cap the preview the way it caps the committed
-  // range. Both are true on the same date when the preview is one day (hovering the anchor itself).
-  const isHighlightedStart = (date: CalendarDate) => {
-    const range = highlightedRange();
-    return range !== null && periodContains(periodOf(date), range.start);
-  };
-  const isHighlightedEnd = (date: CalendarDate) => {
-    const range = highlightedRange();
-    return range !== null && periodContains(periodOf(date), range.end);
-  };
+  const isSelectionStart = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isSelectionStart(selectionState(), periodOf(date));
+  const isSelectionEnd = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isSelectionEnd(selectionState(), periodOf(date));
+  // A plain accessor (like the sibling predicates), NOT createMemo: an extra reactive node created in
+  // this render would advance the hydration-id counter and shift every `_hk` in the SSR tree.
+  const highlightedRange = (): DateRange | null => strategy().highlightedRange(selectionState());
 
   const formatCellName = (date: CalendarDate) => {
     switch (view()) {
@@ -612,6 +626,30 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     // `highlightDate`), so this is the one place the bound has to hold. The effect above pulls
     // `visibleMonth` along if this leaves the scope.
     setRawFocused(normalizeFocusForView(view(), constrainDate(date, min(), max())));
+  };
+
+  // React Aria's `focusNearestAvailableDate` (`useRangeCalendarState`), called after a **keyboard**
+  // activate anchors a range: step the cursor one day past the anchor so the band reads as "range in
+  // progress" rather than a committed single date. +1 day, falling back to −1, and staying put when
+  // neither is selectable.
+  //
+  // RA's two-term invalid test collapses to one `isDateSelectable` here. RA's second term bounds the
+  // step by the anchor's contiguous available run; for a **one-day** step that is exactly the
+  // `isDateUnavailable` check `isDateSelectable` already makes, since the run's edge *is* the first
+  // unavailable day in each direction. (It could not read the narrowed bounds anyway: `availableRange`
+  // derives from the `anchorDate` write this runs on the heels of, which a plain read cannot see until
+  // the next flush.) `order()` in the strategy normalizes the backwards case, where stepping to −1
+  // makes the anchor the range's *end*.
+  //
+  // DOM focus has to come along, or the next Enter would land on the still-focused anchor cell and
+  // commit a one-day range instead of the two-day band the user can see.
+  const focusNearestAvailableDate = (anchor: CalendarDate) => {
+    const next = anchor.add({ days: 1 });
+    const target = isDateSelectable(next) ? next : anchor.subtract({ days: 1 });
+    if (isDateSelectable(target)) {
+      setFocusedDate(target);
+      setPendingCursorFocus(true);
+    }
   };
 
   const navigate = (deltaMonths: number) => {
@@ -701,16 +739,10 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
 
-  // The selection as it stood when the current range anchored. React Aria needs no such snapshot — it
-  // leaves `value` untouched until the range completes — but hope-ui deliberately writes the
-  // degenerate `{ date, date }` on the first click so the anchor carries a solid `data-selected` pill
-  // under the tentative band. Without the snapshot, `clearAnchor` could only restore that stand-in.
-  let valueBeforeAnchor: CalendarValue = null;
-
-  const activate = (date: CalendarDate, opts?: { extend?: boolean }) => {
+  const activate = (date: CalendarDate, opts?: { extend?: boolean }): boolean => {
     if (view() !== "month") {
       drillDownTo(date);
-      return;
+      return false;
     }
     // While a range is anchored the bounds have narrowed to the available run around the anchor, so
     // activating past the run's edge means "end the range at the edge" rather than nothing at all —
@@ -720,25 +752,20 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     const isAnchoredRun = availableRange() !== null;
     const target = isAnchoredRun ? constrainDate(date, min(), max()) : date;
     if (!isDateSelectable(target)) {
-      return;
+      return false;
     }
     const strat = strategy();
     const previous = selectionState();
-    let state = previous;
+    let state: SelectionState = previous;
     // Shift+Arrow on an empty calendar has no range to re-open, so the extension opens one **at the
     // cursor** — the day it is extending *from*, which the strategy has no way to know. Gating it on an
     // empty selection is the whole point: once a range is committed, the strategy's own no-anchor
     // branch re-opens it from that range's start, and seeding here unconditionally would throw the
     // range away and collapse it to the two days around the cursor.
     if (opts?.extend && mode() === "range" && previous.anchor === null && previous.value == null) {
-      state = strat.select(state, focusedDate(), { extend: false });
+      state = { ...state, ...strat.select(state, focusedDate(), { extend: false }) };
     }
     const nextState = strat.select(state, target, opts);
-    // A range begins here: snapshot what was committed before it, because the very next line
-    // overwrites the value with the degenerate in-progress `{ date, date }` (see `clearAnchor`).
-    if (previous.anchor === null && nextState.anchor !== null) {
-      valueBeforeAnchor = previous.value;
-    }
     setSelectionValue(nextState.value);
     setAnchorDate(nextState.anchor);
     setFocusedDate(target);
@@ -746,6 +773,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       merged.onValueChange?.(nextState.value);
       announceSelection(nextState.value);
     }
+    return previous.anchor === null && nextState.anchor !== null;
   };
 
   // Hovering a day *is* moving the cursor while a range is anchored (React Aria's `highlightDate`), so
@@ -758,13 +786,10 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
 
   // --- Abandoning a range in progress (React Aria's `commitBehavior` verbs) ---
-  const clearAnchor = () => {
-    if (anchorDate() === null) {
-      return;
-    }
-    setAnchorDate(null);
-    setSelectionValue(valueBeforeAnchor);
-  };
+  // Dropping the anchor is the whole operation, as in React Aria's `setAnchorDate(null)`: nothing was
+  // written to `value` when the range anchored, so the selection committed before it is still there and
+  // simply resumes painting.
+  const clearAnchor = () => setAnchorDate(null);
 
   const commitSelection = () => {
     if (anchorDate() === null) {
@@ -784,9 +809,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
 
   const clearSelection = () => {
-    // Mid-selection the consumer's last-known value is the pre-anchor snapshot, never the degenerate
-    // in-progress one — so clearing an empty calendar the user merely anchored in emits nothing.
-    const lastEmitted = anchorDate() !== null ? valueBeforeAnchor : selectionValue();
+    // `value` is never written mid-selection, so it *is* the consumer's last-known value in every
+    // phase — clearing an empty calendar the user merely anchored in still emits nothing.
+    const lastEmitted = selectionValue();
     const empty: CalendarValue = mode() === "multiple" ? [] : null;
     setAnchorDate(null);
     setSelectionValue(empty);
@@ -814,11 +839,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
       return value.map((date) => ({ name: fieldName, value: date.toString() }));
     }
     if ("start" in value) {
-      // range: paired `${name}Start` / `${name}End` fields, emitted only once the range is complete —
-      // mid-selection the value is a degenerate `{ start, end }` with the anchor still set.
-      if (anchorDate() !== null) {
-        return [];
-      }
+      // range: paired `${name}Start` / `${name}End` fields. No mid-selection guard is needed — a range
+      // in progress writes nothing to `value`, so whatever is here is a genuinely committed range and
+      // withholding it would drop a real value from the form for as long as the user drags a new one.
       return [
         { name: `${fieldName}Start`, value: value.start.toString() },
         { name: `${fieldName}End`, value: value.end.toString() },
@@ -902,6 +925,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     setView,
     setFocusedDate,
     activate,
+    focusNearestAvailableDate,
     highlightDate,
     clearAnchor,
     commitSelection,
@@ -916,16 +940,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     isToday,
     isFocused,
     isSelected,
-    isRangeStart,
-    isRangeMiddle,
-    isRangeEnd,
-    isHighlighted,
-    isHighlightedStart,
-    isHighlightedEnd,
+    isSelectionStart,
+    isSelectionEnd,
     formatCellName,
     formatFullDate: formatFull,
     collection,
     listFocus,
+    pendingCursorFocus,
+    setPendingCursorFocus,
     announce,
   };
 }

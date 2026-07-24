@@ -16,11 +16,13 @@
  * the navigation buttons) a consumer sets once on `Calendar.Root`, the same way `button`/`badge`/
  * `listbox` scale sizes.
  *
- * The day-cell state (today / outside-month / selected / range endpoints + middle / tentative
- * highlight / disabled) is styled by the preset's **registered `data-*` custom variants** — the
- * canonical `data-today`/`data-outside-month`/`data-range-*`/`data-highlighted`/`data-selected`/
- * `data-disabled` hooks `createCalendarCell` emits — never a `hover:` / bare `:focus` background, so
- * pointer and keyboard share one visual state. Every color is a finished `--hope-*` token (recipe
+ * The day-cell state (today / outside-month / selected / band endpoints / disabled) is styled by the
+ * preset's **registered `data-*` custom variants** — the canonical
+ * `data-today`/`data-outside-month`/`data-selected`/`data-selection-start`/`data-selection-end`/
+ * `data-disabled` hooks `createCalendarCell` emits, plus the derived `data-selection-middle` — never a
+ * `hover:` / bare `:focus` background, so pointer and keyboard share one visual state. Range mode
+ * paints a single band (tentative while anchored, committed when idle), which is why there is one
+ * selection vocabulary rather than a separate tentative-highlight set. Every color is a finished `--hope-*` token (recipe
  * purity). See `theming.md`.
  */
 import type { JSX } from "@solidjs/web";

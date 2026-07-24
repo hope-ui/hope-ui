@@ -44,30 +44,26 @@ describe("hope calendar recipe", () => {
     const parts = calendarRecipe({});
     const cell = parts.cell();
     const trigger = parts.cellTrigger();
-    // The continuous range / tentative band is painted on the <td> so it spans columns seamlessly.
-    expect(cell).toContain("data-range-start:bg-selected");
-    expect(cell).toContain("data-range-middle:bg-selected");
-    expect(cell).toContain("data-range-end:bg-selected");
-    expect(cell).toContain("data-highlighted:bg-selected");
-    // The trigger paints one solid pill — any selected day that is not a band interior, which covers
-    // single selection and both range endpoints in a single rule. `:not([data-range-middle])` keeps the
-    // interior unfilled so the cell band shows through; `:not([data-disabled])` keeps a disabled day off it.
+    // The continuous band is painted on the <td> so it spans columns seamlessly. One band, so the
+    // tentative and committed phases share these rules rather than needing a parallel set.
+    expect(cell).toContain("data-selection-start:bg-selected");
+    expect(cell).toContain("data-selection-end:bg-selected");
+    expect(cell).toContain("data-selection-middle:bg-selected");
+    // The trigger paints one solid pill on the band's endpoints. A single/multiple selection caps both
+    // ends of its own one-day band, so the same two rules give it a pill too; `:not([data-disabled])`
+    // keeps a disabled day off it.
+    expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:bg-primary");
+    expect(trigger).toContain("[&[data-selection-end]:not([data-disabled])]:bg-primary");
+    expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:text-on-primary");
+    expect(trigger).toContain("[&[data-selection-end]:not([data-disabled])]:text-on-primary");
+    // The band interior carries contrast text only — no fill of its own, so the cell band shows through.
     expect(trigger).toContain(
-      "[&[data-selected]:not([data-range-middle]):not([data-disabled])]:bg-primary",
+      "[&[data-selected]:not([data-selection-start]):not([data-selection-end]):not([data-disabled])]:text-on-selected",
     );
-    expect(trigger).toContain(
-      "[&[data-selected]:not([data-range-middle]):not([data-disabled])]:text-on-primary",
-    );
-    // The band interior and the tentative preview carry contrast text only — no fill of their own.
-    expect(trigger).toContain("[&[data-range-middle]:not([data-disabled])]:text-on-selected");
-    expect(trigger).toContain(
-      "[&[data-highlighted]:not([data-selected]):not([data-disabled])]:text-on-selected",
-    );
-    expect(trigger).not.toContain("data-range-middle:bg-");
-    expect(trigger).not.toContain("data-highlighted:bg-");
+    expect(trigger).not.toContain("data-selection-middle:bg-");
     // Today is a text mark, not a fill, so it never competes with the selection pill.
     expect(trigger).toContain(
-      "[&[data-today]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-disabled])]:text-primary",
+      "[&[data-today]:not([data-selected]):not([data-unavailable]):not([data-disabled])]:text-primary",
     );
     expect(trigger).not.toContain("data-today:bg-");
     // The only day fills are the pill and a guarded hover wash on a plain, actionable day — never an
@@ -80,28 +76,26 @@ describe("hope calendar recipe", () => {
 
   it("resolves overlapping day state by mutually-exclusive guards, not source order", () => {
     const trigger = calendarRecipe({}).cellTrigger();
-    // A day is routinely several states at once (today AND selected, a middle that also reports selected,
-    // today inside a live preview). Precedence is encoded so that exactly ONE text-color rule can match:
-    // each lower-priority rule excludes every state above it, so the winner never depends on class/emit
-    // order. High→low: selected endpoint › band (range-middle | highlighted) › unavailable › today › outside.
+    // A day is routinely several states at once (today AND selected, an interior that also reports
+    // selected). Precedence is encoded so that exactly ONE text-color rule can match: each
+    // lower-priority rule excludes every state above it, so the winner never depends on class/emit
+    // order. High→low: band endpoint › band interior › unavailable › today › outside.
+    expect(trigger).toContain("[&[data-selection-start]:not([data-disabled])]:text-on-primary");
+    // The interior excludes both endpoints, so an endpoint keeps its pill text rather than band text.
     expect(trigger).toContain(
-      "[&[data-selected]:not([data-range-middle]):not([data-disabled])]:text-on-primary",
-    );
-    // The preview text excludes a committed selection, so an endpoint stays a pill under a live preview.
-    expect(trigger).toContain(
-      "[&[data-highlighted]:not([data-selected]):not([data-disabled])]:text-on-selected",
+      "[&[data-selected]:not([data-selection-start]):not([data-selection-end]):not([data-disabled])]:text-on-selected",
     );
     // Today loses to a pill, a band, and the unavailable mark — encoded in its guard, not its position.
     expect(trigger).toContain(
-      "[&[data-today]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-disabled])]:text-primary",
+      "[&[data-today]:not([data-selected]):not([data-unavailable]):not([data-disabled])]:text-primary",
     );
     // Outside-month is the lowest tint, so it also yields to today.
     expect(trigger).toContain(
-      "[&[data-outside-month]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
+      "[&[data-outside-month]:not([data-selected]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
     );
     // Unavailable's color yields to a band it sits on (the strike still shows) but beats today/outside.
     expect(trigger).toContain(
-      "[&[data-unavailable]:not([data-selected]):not([data-highlighted]):not([data-disabled])]:text-foreground-disabled",
+      "[&[data-unavailable]:not([data-selected]):not([data-disabled])]:text-foreground-disabled",
     );
     // The order-dependent single-attribute tints the guards replace are gone.
     expect(trigger).not.toContain("data-today:text-primary");
@@ -114,43 +108,36 @@ describe("hope calendar recipe", () => {
     const trigger = parts.cellTrigger();
     // The band rounds its leading/trailing ends and squares the interior, then rounds again at a row
     // wrap (`first`/`last`) so a range spanning weeks reads as one shape per row.
-    expect(cell).toContain("data-range-start:rounded-e-none");
-    expect(cell).toContain("data-range-end:rounded-s-none");
-    expect(cell).toContain("data-range-middle:rounded-none");
-    expect(cell).toContain("data-highlighted:rounded-none");
-    expect(cell).toContain("data-range-middle:first:rounded-s-md");
-    expect(cell).toContain("data-range-middle:last:rounded-e-md");
-    expect(cell).toContain("data-highlighted:first:rounded-s-md");
-    expect(cell).toContain("data-highlighted:last:rounded-e-md");
-    // A one-day range reports start AND end; without this it squares both sides and the band shows
-    // as corners around the rounded pill (every range selection passes through this state).
-    expect(cell).toContain("[&[data-range-start][data-range-end]]:rounded-md");
+    expect(cell).toContain("data-selection-start:rounded-e-none");
+    expect(cell).toContain("data-selection-end:rounded-s-none");
+    expect(cell).toContain("data-selection-middle:rounded-none");
+    expect(cell).toContain("data-selection-middle:first:rounded-s-md");
+    expect(cell).toContain("data-selection-middle:last:rounded-e-md");
+    // A one-day band reports start AND end; without this it squares both sides and the band shows
+    // as corners around the rounded pill (every range selection passes through this state, and every
+    // single/multiple selection sits in it permanently).
+    expect(cell).toContain("[&[data-selection-start][data-selection-end]]:rounded-md");
     // An endpoint that lands on a row edge is its whole row segment, so it rounds its outer corner too —
     // mirroring the middle-cell row-wrap rounding, which otherwise only fires on interior cells.
-    expect(cell).toContain("data-range-start:last:rounded-e-md");
-    expect(cell).toContain("data-range-end:first:rounded-s-md");
-    // The tentative band gets the same caps from its own endpoint hooks. Attribute-arbitrary (not the
-    // registered `data-highlighted-start:` variant, which is zero-specificity and would tie with
-    // `data-highlighted:rounded-none`), and additive — a one-day preview carries both and rounds fully.
-    expect(cell).toContain("[&[data-highlighted-start]]:rounded-s-md");
-    expect(cell).toContain("[&[data-highlighted-end]]:rounded-e-md");
+    expect(cell).toContain("data-selection-start:last:rounded-e-md");
+    expect(cell).toContain("data-selection-end:first:rounded-s-md");
     // Logical sides only (`-s-`/`-e-`), never physical, so RTL mirrors for free.
     expect(cell).not.toMatch(/rounded-(?:tl|tr|bl|br|l|r)-/);
     // The pill on top stays uniformly rounded — the band, not the trigger, carries the range shape.
     expect(trigger).toContain("rounded-md");
-    expect(trigger).not.toContain("data-range-start:rounded");
-    expect(trigger).not.toContain("data-range-end:rounded");
+    expect(trigger).not.toContain("data-selection-start:rounded");
+    expect(trigger).not.toContain("data-selection-end:rounded");
   });
 
   it("mutes outside-month days and strikes unavailable ones through tokens", () => {
     const cell = calendarRecipe({}).cellTrigger();
     expect(cell).toContain(
-      "[&[data-outside-month]:not([data-selected]):not([data-highlighted]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
+      "[&[data-outside-month]:not([data-selected]):not([data-unavailable]):not([data-today]):not([data-disabled])]:text-foreground-subtle",
     );
     // The strike is unconditional; only the muted color is guarded (it yields to a band the day sits on).
     expect(cell).toContain("data-unavailable:line-through");
     expect(cell).toContain(
-      "[&[data-unavailable]:not([data-selected]):not([data-highlighted]):not([data-disabled])]:text-foreground-disabled",
+      "[&[data-unavailable]:not([data-selected]):not([data-disabled])]:text-foreground-disabled",
     );
   });
 

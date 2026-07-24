@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { createEffect, createMemo, createSignal, merge, omit, untrack } from "solid-js";
+import { createEffect, createMemo, merge, omit, untrack } from "solid-js";
 import { createGridNavigation, type GridCell } from "../internal";
 import { composeEventHandlers, createKeyboardHandler } from "../utils";
 import type { CreateCalendarReturn } from "./calendar-root";
@@ -87,11 +87,14 @@ export function createCalendarGrid(
   // because the client build defers the `setFocusedDate` write, so the value isn't updated yet. The
   // effect reads `focusedDate` reactively (only while armed), so it re-runs as the write + re-render
   // settle, then focuses and disarms.
-  const [pendingNudge, setPendingNudge] = createSignal(false);
-  const nudge = () => setPendingNudge(true);
+  //
+  // The flag itself lives on the root state, not here: the *cell* arms it too, for the keyboard range
+  // auto-advance (`focusNearestAvailableDate`), and a cell has no reference to this hook. The effect
+  // that consumes it stays here, where the grid's own navigation already relies on it.
+  const nudge = () => state.setPendingCursorFocus(true);
   createEffect(
     () => {
-      if (!pendingNudge()) {
+      if (!state.pendingCursorFocus()) {
         return undefined; // not armed → don't even track the cursor
       }
       const key = state.focusedDate().toString();
@@ -111,7 +114,7 @@ export function createCalendarGrid(
       // `listFocus.focus` reads reactive state internally; this is a deliberate imperative move from
       // inside an effect callback, so it must be untracked.
       untrack(() => state.listFocus.focus(item));
-      setPendingNudge(false);
+      state.setPendingCursorFocus(false);
     },
   );
 

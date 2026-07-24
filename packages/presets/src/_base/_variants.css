@@ -69,20 +69,13 @@
 @custom-variant data-today (&:where([data-today]:not([data-today="false"]), [data-state="today"]));
 @custom-variant data-outside-month (&:where([data-outside-month]:not([data-outside-month="false"]), [data-state="outside-month"]));
 @custom-variant data-unavailable (&:where([data-unavailable]:not([data-unavailable="false"]), [data-state="unavailable"]));
-@custom-variant data-range-start (&:where([data-range-start]:not([data-range-start="false"]), [data-state="range-start"]));
-@custom-variant data-range-middle (&:where([data-range-middle]:not([data-range-middle="false"]), [data-state="range-middle"]));
-@custom-variant data-range-end (&:where([data-range-end]:not([data-range-end="false"]), [data-state="range-end"]));
 @custom-variant data-selection-start (&:where([data-selection-start]:not([data-selection-start="false"]), [data-state="selection-start"]));
 @custom-variant data-selection-end (&:where([data-selection-end]:not([data-selection-end="false"]), [data-state="selection-end"]));
-/* Shared "actively highlighted" hook: the calendar's tentative hover-range band (Calendar) AND the
- * active/highlighted item in a listbox/menu/select (Collection, forthcoming). */
-@custom-variant data-highlighted (&:where([data-highlighted]:not([data-highlighted="false"]), [data-state="highlighted"]));
-/* The endpoints of that tentative band, so a recipe can cap the preview the way it caps the committed
- * range. Zero added specificity like every variant here, so a rule that must beat a plain
- * `data-highlighted:` utility is written as an attribute-arbitrary variant instead — see the `cell`
- * slot in hope's calendar recipe. */
-@custom-variant data-highlighted-start (&:where([data-highlighted-start]:not([data-highlighted-start="false"]), [data-state="highlighted-start"]));
-@custom-variant data-highlighted-end (&:where([data-highlighted-end]:not([data-highlighted-end="false"]), [data-state="highlighted-end"]));
+/* The band's interior — the only one of the three that is DERIVED rather than emitted. React Aria has
+ * no middle attribute: the calendar paints ONE band (tentative while a range is anchored, committed
+ * when it is not), so the interior is exactly "selected, and neither endpoint". Deriving it here keeps
+ * every recipe from respelling that chain, at zero DOM cost. */
+@custom-variant data-selection-middle (&:where([data-selected]:not([data-selection-start]):not([data-selection-end])));
 
 /* Collection (createCollection / list + grid navigation) */
 @custom-variant data-first (&:where([data-first]:not([data-first="false"]), [data-state="first"]));

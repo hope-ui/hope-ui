@@ -2,6 +2,7 @@ import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { CalendarDate } from "@internationalized/date";
 import { For, Show } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 import { createCalendarCell } from "../calendar-cell";
 import { createCalendarGrid } from "../calendar-grid";
 import { createCalendarHeading } from "../calendar-heading";
@@ -100,30 +101,39 @@ describe("createCalendarCell", () => {
     await vi.waitFor(() => expect(jan20.getAttribute("data-selected")).toBe(""));
     const cell = jan20.closest("td") as HTMLElement;
     expect(cell.getAttribute("aria-selected")).toBe("true");
-    expect(cell.getAttribute("data-selected")).toBeNull();
+    // The `<td>` carries `data-selected` too — required for the CSS-derived band interior
+    // (`[data-selected]:not([data-selection-start]):not([data-selection-end])`), and what React Aria
+    // emits. A single selection caps both ends of its own one-day band, so it is never that interior.
+    expect(cell.getAttribute("data-selected")).toBe("");
+    expect(cell.getAttribute("data-selection-start")).toBe("");
+    expect(cell.getAttribute("data-selection-end")).toBe("");
     dispose();
   });
 
-  it("mirrors the band-level range hooks onto the <td> so the band can span cells", async () => {
+  it("mirrors the band hooks onto the <td> so the band can span cells", async () => {
     const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
     dayButton(container, "2026-01-10").click();
     // The anchor write must flush before the second click reads it (Solid 2.0 flush timing — real
     // clicks are separated by flushes; two synchronous ones in a test are not).
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
     dayButton(container, "2026-01-14").click();
-    // The band paints on the cell (spanning columns); the middle day's <td> carries data-range-middle.
+    // The band paints on the cell (spanning columns). There is no middle attribute — the interior is
+    // "selected, and neither endpoint", which is what the preset's `data-selection-middle` variant derives.
     await vi.waitFor(() => {
       const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
-      expect(midCell.getAttribute("data-range-middle")).toBe("");
+      expect(midCell.getAttribute("data-selected")).toBe("");
     });
-    // The band-level hooks reach the <td>, but the single ARIA selection flag does not.
+    const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
+    expect(midCell.getAttribute("data-selection-start")).toBeNull();
+    expect(midCell.getAttribute("data-selection-end")).toBeNull();
+
     const startCell = dayButton(container, "2026-01-10").closest("td") as HTMLElement;
-    expect(startCell.getAttribute("data-range-start")).toBe("");
-    expect(startCell.getAttribute("data-selected")).toBeNull();
+    expect(startCell.getAttribute("data-selection-start")).toBe("");
+    expect(startCell.getAttribute("data-selected")).toBe("");
     dispose();
   });
 
-  it("caps the tentative band with data-highlighted-start/end while hovering mid-selection", async () => {
+  it("caps the tentative band with data-selection-start/end while hovering mid-selection", async () => {
     const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
     dayButton(container, "2026-01-10").click(); // anchor
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
@@ -132,18 +142,18 @@ describe("createCalendarCell", () => {
 
     const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
     await vi.waitFor(() =>
-      expect(cellOf("2026-01-14").getAttribute("data-highlighted-end")).toBe(""),
+      expect(cellOf("2026-01-14").getAttribute("data-selection-end")).toBe(""),
     );
     // The anchor opens the band; the hovered day closes it. Both hooks reach the <td> (where the band
     // is painted) and the button (where a recipe may cap the trigger).
-    expect(cellOf("2026-01-10").getAttribute("data-highlighted-start")).toBe("");
-    expect(dayButton(container, "2026-01-10").getAttribute("data-highlighted-start")).toBe("");
-    expect(dayButton(container, "2026-01-14").getAttribute("data-highlighted-end")).toBe("");
+    expect(cellOf("2026-01-10").getAttribute("data-selection-start")).toBe("");
+    expect(dayButton(container, "2026-01-10").getAttribute("data-selection-start")).toBe("");
+    expect(dayButton(container, "2026-01-14").getAttribute("data-selection-end")).toBe("");
     // The interior is in the band but caps neither end.
     const midCell = cellOf("2026-01-12");
-    expect(midCell.getAttribute("data-highlighted")).toBe("");
-    expect(midCell.getAttribute("data-highlighted-start")).toBeNull();
-    expect(midCell.getAttribute("data-highlighted-end")).toBeNull();
+    expect(midCell.getAttribute("data-selected")).toBe("");
+    expect(midCell.getAttribute("data-selection-start")).toBeNull();
+    expect(midCell.getAttribute("data-selection-end")).toBeNull();
     dispose();
   });
 
@@ -154,13 +164,13 @@ describe("createCalendarCell", () => {
     dayButton(container, "2026-01-14").dispatchEvent(new MouseEvent("mouseenter"));
 
     const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
-    await vi.waitFor(() => expect(midCell.getAttribute("data-highlighted")).toBe(""));
+    await vi.waitFor(() => expect(midCell.getAttribute("data-selected")).toBe(""));
 
     const grid = container.querySelector("table") as HTMLElement;
     grid.dispatchEvent(new PointerEvent("pointerleave", { bubbles: false }));
 
     await new Promise((resolve) => setTimeout(resolve, 20)); // let any (incorrect) clear settle
-    expect(midCell.getAttribute("data-highlighted")).toBe("");
+    expect(midCell.getAttribute("data-selected")).toBe("");
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-14");
     dispose();
   });
@@ -183,10 +193,10 @@ describe("createCalendarCell", () => {
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-14"); // band never moved
     expect(state.focusedDate().toString()).toBe("2026-01-14"); // nor did the roving cursor
-    expect(dayButton(container, "2025-12-30").closest("td")?.getAttribute("data-highlighted")).toBe(
+    expect(dayButton(container, "2025-12-30").closest("td")?.getAttribute("data-selected")).toBe(
       null,
     );
-    expect(dayButton(container, "2026-01-22").closest("td")?.getAttribute("data-highlighted")).toBe(
+    expect(dayButton(container, "2026-01-22").closest("td")?.getAttribute("data-selected")).toBe(
       null,
     );
     dispose();
@@ -207,28 +217,32 @@ describe("createCalendarCell", () => {
       const cell = button.closest("td") as HTMLElement;
       return {
         ariaSelected: cell.getAttribute("aria-selected"),
-        rangeMiddle: cell.getAttribute("data-range-middle"),
+        // The band interior, derived the way the preset's `data-selection-middle` variant derives it.
+        isInterior:
+          cell.getAttribute("data-selected") !== null &&
+          cell.getAttribute("data-selection-start") === null &&
+          cell.getAttribute("data-selection-end") === null,
         selected: button.getAttribute("data-selected"),
       };
     };
 
-    expect(paintOf("2026-01-12")).toEqual({ ariaSelected: "true", rangeMiddle: "", selected: "" });
+    expect(paintOf("2026-01-12")).toEqual({ ariaSelected: "true", isInterior: true, selected: "" });
     // Unavailable: struck through, never selected.
     expect(paintOf("2026-01-15")).toEqual({
       ariaSelected: null,
-      rangeMiddle: null,
+      isInterior: false,
       selected: null,
     });
     expect(dayButton(container, "2026-01-15").getAttribute("data-unavailable")).toBe("");
     // Past `max`: inert, and so is the range's own end.
     expect(paintOf("2026-01-20")).toEqual({
       ariaSelected: null,
-      rangeMiddle: null,
+      isInterior: false,
       selected: null,
     });
-    expect(dayButton(container, "2026-01-20").closest("td")?.getAttribute("data-range-end")).toBe(
-      null,
-    );
+    expect(
+      dayButton(container, "2026-01-20").closest("td")?.getAttribute("data-selection-end"),
+    ).toBe(null);
     // The `aria-label` follows the paint — no "selected" suffix on a day that is not.
     expect(dayButton(container, "2026-01-15").getAttribute("aria-label")).not.toContain("selected");
     dispose();
@@ -388,6 +402,144 @@ describe("createCalendarCell", () => {
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = await mountCalendar();
     await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+/**
+ * React Aria's range auto-advance (`useCalendarCell` + `focusNearestAvailableDate`): anchoring a range
+ * from the **keyboard** steps the cursor one day on, so the band reads as "range in progress" rather
+ * than a committed single date. The pointer gets that signal from hover instead, so it must not move.
+ *
+ * The gate is `createPress`'s `pointerType`, which is exactly why the press engine is here — the click
+ * event alone cannot separate Enter from a screen reader's virtual click.
+ */
+describe("createCalendarCell — keyboard range auto-advance", () => {
+  const cellOf = (container: HTMLElement, iso: string) =>
+    dayButton(container, iso).closest("td") as HTMLElement;
+
+  it("advances the cursor one day and paints a two-day band on a keyboard anchor", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-15").focus();
+    await userEvent.keyboard("{Enter}");
+
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-16"));
+    // Two days, both endpoints — visibly a range being built, not a single selection.
+    expect(cellOf(container, "2026-01-15").getAttribute("data-selection-start")).toBe("");
+    expect(cellOf(container, "2026-01-16").getAttribute("data-selection-end")).toBe("");
+    expect(cellOf(container, "2026-01-17").getAttribute("data-selected")).toBeNull();
+    dispose();
+  });
+
+  it("does not advance on a mouse press — hover already shows the range", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-15").click();
+
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await new Promise((resolve) => setTimeout(resolve, 20)); // let any (incorrect) advance settle
+    expect(state.focusedDate().toString()).toBe("2026-01-15");
+    expect(cellOf(container, "2026-01-16").getAttribute("data-selected")).toBeNull();
+    dispose();
+  });
+
+  it("does not advance when the press only completes a range", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-10").focus();
+    await userEvent.keyboard("{Enter}"); // anchors, and advances to the 11th
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-11"));
+
+    await userEvent.keyboard("{Enter}"); // commits at the 11th — nothing to advance past
+    await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(state.focusedDate().toString()).toBe("2026-01-11");
+    const value = state.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(value.start.toString()).toBe("2026-01-10");
+    expect(value.end.toString()).toBe("2026-01-11");
+    dispose();
+  });
+
+  it("falls back to the previous day when the next one is unavailable", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      isDateDisabled: (date) => date.day === 16,
+    });
+    dayButton(container, "2026-01-15").focus();
+    await userEvent.keyboard("{Enter}");
+
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await vi.waitFor(() => expect(state.focusedDate().toString()).toBe("2026-01-14"));
+    // Stepping backwards makes the anchor the range's *end* — `order()` normalizes it, so the band is
+    // still painted the right way round.
+    expect(cellOf(container, "2026-01-14").getAttribute("data-selection-start")).toBe("");
+    expect(cellOf(container, "2026-01-15").getAttribute("data-selection-end")).toBe("");
+    dispose();
+  });
+
+  it("stays put when neither neighbour is selectable", async () => {
+    // A one-day available island: the anchored run narrows `min`/`max` to the 15th alone, so +1 and −1
+    // are both out of range and the cursor has nowhere to go.
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      isDateDisabled: (date) => date.day === 14 || date.day === 16,
+    });
+    dayButton(container, "2026-01-15").focus();
+    await userEvent.keyboard("{Enter}");
+
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(state.focusedDate().toString()).toBe("2026-01-15");
+    dispose();
+  });
+
+  it("never advances outside range mode", async () => {
+    for (const selectionMode of ["single", "multiple"] as const) {
+      const { container, state, dispose } = await mountCalendar({ selectionMode });
+      dayButton(container, "2026-01-15").focus();
+      await userEvent.keyboard("{Enter}");
+
+      await vi.waitFor(() => expect(state.selectionValue()).not.toBeNull());
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      // No anchor is ever set in these modes, so the transition the advance is gated on never happens.
+      expect(state.focusedDate().toString()).toBe("2026-01-15");
+      dispose();
+    }
+  });
+
+  it("leaves the value untouched until a keyboard range completes", async () => {
+    const onValueChange = vi.fn();
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      onValueChange,
+    });
+    dayButton(container, "2026-01-10").focus();
+    await userEvent.keyboard("{Enter}");
+    await vi.waitFor(() => expect(state.anchorDate()).not.toBeNull());
+    expect(state.selectionValue()).toBeNull();
+    expect(onValueChange).not.toHaveBeenCalled();
+
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}{Enter}");
+    await vi.waitFor(() => expect(onValueChange).toHaveBeenCalledTimes(1));
+    const value = state.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(value.start.toString()).toBe("2026-01-10");
+    expect(value.end.toString()).toBe("2026-01-13");
+    dispose();
+  });
+
+  it("surfaces the press state as data-pressed", async () => {
+    const { container, dispose } = await mountCalendar();
+    const jan15 = dayButton(container, "2026-01-15");
+    expect(jan15.getAttribute("data-pressed")).toBeNull();
+
+    jan15.dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, button: 0, pointerId: 1 }),
+    );
+    await vi.waitFor(() => expect(jan15.getAttribute("data-pressed")).toBe(""));
+
+    document.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, button: 0, pointerId: 1 }),
+    );
+    await vi.waitFor(() => expect(jan15.getAttribute("data-pressed")).toBeNull());
     dispose();
   });
 });

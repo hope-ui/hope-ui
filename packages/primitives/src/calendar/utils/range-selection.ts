@@ -1,5 +1,5 @@
 import type { CalendarDate } from "@internationalized/date";
-import type { CalendarValue, DateRange, SelectionStrategy } from "./selection";
+import type { CalendarValue, DateRange, SelectionState, SelectionStrategy } from "./selection";
 import { periodContains, periodsOverlap } from "./view";
 
 /** Narrow a {@link CalendarValue} to a {@link DateRange} (or null). */
@@ -13,76 +13,79 @@ function order(a: CalendarDate, b: CalendarDate): DateRange {
 }
 
 /**
+ * The one band range mode paints — React Aria's `RangeCalendarState.highlightedRange`, a single field
+ * with two phases: **tentative** while a selection is anchored (anchor → the roving cursor), and the
+ * **committed** value when it is not. Every paint predicate below is membership in this, which is why
+ * there is one attribute vocabulary and no ambiguity about which band a "start" belongs to.
+ *
+ * The consequence, and it is intended: while a new range is being dragged, the previously committed
+ * range stops painting. React Aria behaves the same way — the band always shows the selection the
+ * next activate would produce.
+ */
+function currentRange(state: SelectionState): DateRange | null {
+  if (state.anchor === null) {
+    return asRange(state.value);
+  }
+  return state.endpoint === null ? null : order(state.anchor, state.endpoint);
+}
+
+/**
  * Range selection — anchor → complete, with hover preview and Shift+Arrow extension:
  *
- *  - **First activate** (no anchor): begins a range at `date` (`value = {date, date}`, `anchor =
- *    date`) — "selecting". The caller emits nothing yet (anchor is set).
+ *  - **First activate** (no anchor): anchors at `date` — "selecting". `value` is **not** written; the
+ *    band is derived from the anchor and the cursor. The caller emits nothing yet.
  *  - **Second activate** (anchor set, `extend` false): completes — `value = order(anchor, date)`,
  *    `anchor = null`. The caller emits the committed range.
- *  - **`extend`** (Shift+Arrow): keeps the anchor and slides the moving endpoint to `date`, staying
+ *  - **`extend`** (Shift+Arrow): keeps the anchor and lets the caller slide the cursor, staying
  *    "selecting" so repeated extensions grow from the same anchor; a later non-extend activate (Enter
  *    / click) commits. With no anchor it re-anchors at the existing range's start (or `date`).
  *
- * `isSelected` covers the whole committed range (highlight); `isRange{Start,Middle,End}` refine the
- * endpoints for corner paint. `highlightedRange` returns the tentative `[anchor … endpoint]` span while
- * selecting, where the caller's `endpoint` is the calendar's roving cursor. Pure.
+ * `value` is therefore written on **exactly one** transition — the completing activate. That is React
+ * Aria's contract, and it is what keeps a controlled consumer from holding a value it was never told
+ * about for the whole duration of a range selection.
  *
- * The four predicates read the **period a cell stands for** (`cellPeriod`), so they are overlap tests:
- * in year/decade view a month/year cell paints as soon as the range passes through it, and it carries
- * the start/end corner when it is the period the endpoint falls in. Month view's degenerate
- * `{ date, date }` period collapses each of them back to the day-level test it generalizes — overlap to
- * containment, and "holds neither endpoint" to "strictly between them".
+ * The three predicates read the **period a cell stands for** (`cellPeriod`), so they are overlap tests:
+ * in year/decade view a month/year cell paints as soon as the band passes through it, and it carries
+ * the start/end corner when it is the period that endpoint falls in. Month view's degenerate
+ * `{ date, date }` period collapses each of them back to the day-level test it generalizes. Pure.
  */
 export const rangeSelection: SelectionStrategy = {
   mode: "range",
 
   isSelected(state, period) {
-    const range = asRange(state.value);
+    const range = currentRange(state);
     return range !== null && periodsOverlap(range, period);
   },
 
-  isRangeStart(state, period) {
-    const range = asRange(state.value);
+  isSelectionStart(state, period) {
+    const range = currentRange(state);
     return range !== null && periodContains(period, range.start);
   },
 
-  isRangeMiddle(state, period) {
-    const range = asRange(state.value);
-    return (
-      range !== null &&
-      periodsOverlap(range, period) &&
-      !periodContains(period, range.start) &&
-      !periodContains(period, range.end)
-    );
-  },
-
-  isRangeEnd(state, period) {
-    const range = asRange(state.value);
+  isSelectionEnd(state, period) {
+    const range = currentRange(state);
     return range !== null && periodContains(period, range.end);
   },
 
-  highlightedRange(state, endpoint) {
-    if (state.anchor === null || endpoint === null) {
-      return null;
-    }
-    return order(state.anchor, endpoint);
-  },
+  highlightedRange: currentRange,
 
   select(state, date, opts) {
     const extend = opts?.extend ?? false;
 
     if (state.anchor !== null) {
-      // Mid-selection: a non-extend activate commits; an extend keeps selecting.
-      return { value: order(state.anchor, date), anchor: extend ? state.anchor : null };
+      // Mid-selection: a non-extend activate commits. An extend keeps selecting and leaves `value`
+      // alone — the caller moves the cursor, and the band follows it from the unchanged anchor.
+      return extend
+        ? { value: state.value, anchor: state.anchor }
+        : { value: order(state.anchor, date), anchor: null };
     }
 
     if (extend) {
       // Shift+Arrow with no in-progress anchor: re-open from the committed start (or anchor at date).
-      const base = asRange(state.value)?.start ?? date;
-      return { value: order(base, date), anchor: base };
+      return { value: state.value, anchor: asRange(state.value)?.start ?? date };
     }
 
-    // Begin a fresh range.
-    return { value: { start: date, end: date }, anchor: date };
+    // Begin a fresh range: anchor only. The committed `value` stands until this range completes.
+    return { value: state.value, anchor: date };
   },
 };

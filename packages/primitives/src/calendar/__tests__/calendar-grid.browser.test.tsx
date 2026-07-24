@@ -151,14 +151,14 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     await expect.element(dayButton(container, "2026-01-16")).toHaveFocus();
 
     const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
-    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""));
-    expect(cellOf("2026-01-16").getAttribute("data-highlighted-end")).toBe("");
-    expect(cellOf("2026-01-15").getAttribute("data-highlighted-start")).toBe("");
+    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-selected")).toBe(""));
+    expect(cellOf("2026-01-16").getAttribute("data-selection-end")).toBe("");
+    expect(cellOf("2026-01-15").getAttribute("data-selection-start")).toBe("");
 
     await userEvent.keyboard("{ArrowRight}");
-    await vi.waitFor(() => expect(cellOf("2026-01-17").getAttribute("data-highlighted")).toBe(""));
-    expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""); // now the interior
-    expect(cellOf("2026-01-16").getAttribute("data-highlighted-end")).toBeNull();
+    await vi.waitFor(() => expect(cellOf("2026-01-17").getAttribute("data-selected")).toBe(""));
+    expect(cellOf("2026-01-16").getAttribute("data-selected")).toBe(""); // now the interior
+    expect(cellOf("2026-01-16").getAttribute("data-selection-end")).toBeNull();
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-17");
     dispose();
   });
@@ -175,7 +175,7 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
     await userEvent.keyboard("{ArrowRight}");
     const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
-    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""));
+    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-selected")).toBe(""));
 
     // Capture phase, so the assertion still sees the event when the handler stops it propagating.
     const seen: KeyboardEvent[] = [];
@@ -185,10 +185,12 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     document.removeEventListener("keydown", spy, true);
 
     await vi.waitFor(() => expect(state.anchorDate()).toBeNull());
-    expect(state.highlightedRange()).toBeNull();
-    expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBeNull();
-    // The range committed before the abandoned one comes back, and nothing was emitted: the consumer
-    // was never told about the in-progress value in the first place.
+    expect(cellOf("2026-01-16").getAttribute("data-selected")).toBeNull();
+    // The band snaps back to the committed range — one field, two phases, so dropping the anchor is
+    // the whole cancel. Nothing was emitted: the consumer was never told about a value at all, because
+    // a range in progress never writes one.
+    expect(state.highlightedRange()?.start.toString()).toBe("2026-01-02");
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-04");
     const value = state.selectionValue() as { start: CalendarDate; end: CalendarDate };
     expect(value.start.toString()).toBe("2026-01-02");
     expect(value.end.toString()).toBe("2026-01-04");
@@ -279,8 +281,8 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-05"));
     expect(state.highlightedRange()?.end.toString()).toBe("2026-01-10");
     const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
-    expect(cellOf("2026-01-07").getAttribute("data-highlighted")).toBe("");
-    expect(cellOf("2026-01-05").getAttribute("data-highlighted-start")).toBe("");
+    expect(cellOf("2026-01-07").getAttribute("data-selected")).toBe("");
+    expect(cellOf("2026-01-05").getAttribute("data-selection-start")).toBe("");
     dispose();
   });
 

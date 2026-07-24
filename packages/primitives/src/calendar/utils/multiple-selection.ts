@@ -1,5 +1,5 @@
 import { type CalendarDate, isSameDay } from "@internationalized/date";
-import type { CalendarValue, SelectionStrategy } from "./selection";
+import type { CalendarValue, DateRange, SelectionState, SelectionStrategy } from "./selection";
 import { periodContains } from "./view";
 
 /** Narrow a {@link CalendarValue} to the multiple mode's `CalendarDate[]` (empty for null/non-array). */
@@ -7,9 +7,13 @@ function asMultiple(value: CalendarValue): readonly CalendarDate[] {
   return Array.isArray(value) ? value : [];
 }
 
+function holdsSelection(state: SelectionState, period: DateRange): boolean {
+  return asMultiple(state.value).some((date) => periodContains(period, date));
+}
+
 /**
- * Multiple selection: each activate toggles `date` in/out of a set. No range, no anchor, no highlight —
- * the range predicates are all false, `highlightedRange` is null, and `extend` is ignored. The toggled
+ * Multiple selection: each activate toggles `date` in/out of a set. No band, no anchor, no preview —
+ * both endpoint predicates are false, `highlightedRange` is null, and `extend` is ignored. The toggled
  * set stays sorted so `onValueChange` payloads are deterministic.
  *
  * `isSelected` asks whether *any* selected day falls in the cell's period (`cellPeriod`), so a year
@@ -19,19 +23,13 @@ function asMultiple(value: CalendarValue): readonly CalendarDate[] {
 export const multipleSelection: SelectionStrategy = {
   mode: "multiple",
 
-  isSelected(state, period) {
-    return asMultiple(state.value).some((date) => periodContains(period, date));
-  },
+  isSelected: holdsSelection,
 
-  isRangeStart() {
-    return false;
-  },
-  isRangeMiddle() {
-    return false;
-  },
-  isRangeEnd() {
-    return false;
-  },
+  // Each selected day is its own degenerate one-day band, so it caps both ends — the same reasoning as
+  // single mode, and what keeps the derived middle empty here so every selection paints as a discrete
+  // pill rather than band interior.
+  isSelectionStart: holdsSelection,
+  isSelectionEnd: holdsSelection,
   highlightedRange() {
     return null;
   },

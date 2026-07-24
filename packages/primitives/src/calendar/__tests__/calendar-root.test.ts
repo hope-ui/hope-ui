@@ -25,6 +25,13 @@ function setup(options: CreateCalendarOptions = {}): {
 
 const iso = (date: DateValue) => date.toString();
 
+/**
+ * The middle of the band, derived exactly as a recipe derives it — there is deliberately no
+ * `isRangeMiddle` on the return, matching React Aria's attribute vocabulary.
+ */
+const isMiddle = (api: CreateCalendarReturn, date: CalendarDate) =>
+  api.isSelected(date) && !api.isSelectionStart(date) && !api.isSelectionEnd(date);
+
 describe("createCalendar — initial state", () => {
   it("starts in month view, seeded from defaultFocusedValue", () => {
     const { api, dispose } = setup();
@@ -233,19 +240,69 @@ describe("createCalendar — selection", () => {
     const range = api.highlightedRange();
     expect(iso(range?.start as CalendarDate)).toBe("2026-01-10");
     expect(iso(range?.end as CalendarDate)).toBe("2026-01-14");
-    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(true);
-    expect(api.isHighlighted(new CalendarDate(2026, 1, 15))).toBe(false);
+    expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(api.isSelected(new CalendarDate(2026, 1, 15))).toBe(false);
 
     // `highlightDate` (the hover path) is the same move, so the two can never disagree.
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 18)));
     expect(iso(api.focusedDate())).toBe("2026-01-18");
     expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-18");
 
-    // Completing the range clears the anchor, and with it the tentative band.
+    // Completing the range clears the anchor; the band stays, now reading off the committed value —
+    // one field, two phases, so the paint never blinks at the commit.
     flush(() => api.activate(new CalendarDate(2026, 1, 18)));
     expect(api.anchorDate()).toBeNull();
-    expect(api.highlightedRange()).toBeNull();
-    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(false);
+    expect(iso(api.highlightedRange()?.start as CalendarDate)).toBe("2026-01-10");
+    expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-18");
+    expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
+    // …and it stops tracking the cursor, which is what "committed" means.
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 25)));
+    expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-18");
+    dispose();
+  });
+
+  it("range: a new range in progress replaces the committed one in the paint", () => {
+    // The one accepted user-visible regression of the one-band model, and the point of it: while a new
+    // range is being dragged the old one goes dark, because the band always shows what the next
+    // activate would produce. React Aria behaves the same way.
+    const { api, dispose } = setup({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 1, 4), end: new CalendarDate(2026, 1, 6) },
+    });
+    expect(api.isSelected(new CalendarDate(2026, 1, 5))).toBe(true);
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 20)));
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 22)));
+    expect(api.isSelected(new CalendarDate(2026, 1, 21))).toBe(true);
+    expect(api.isSelected(new CalendarDate(2026, 1, 5))).toBe(false);
+
+    // Abandoning it brings the committed range straight back — nothing was ever overwritten.
+    flush(() => api.clearAnchor());
+    expect(api.isSelected(new CalendarDate(2026, 1, 5))).toBe(true);
+    expect(api.isSelected(new CalendarDate(2026, 1, 21))).toBe(false);
+    dispose();
+  });
+
+  it("range: leaves `value` untouched until the range completes", () => {
+    // The controlled-consumer bug the one-band model closes: hope-ui used to write a degenerate
+    // `{date, date}` on the first activate, so `createControllableState` held a value the owner was
+    // never told about for the whole duration of a range selection.
+    const onValueChange = vi.fn();
+    const { api, dispose } = setup({ selectionMode: "range", onValueChange });
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 10)));
+    expect(api.anchorDate()).not.toBeNull();
+    expect(api.selectionValue()).toBeNull();
+    expect(onValueChange).not.toHaveBeenCalled();
+
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+    expect(api.selectionValue()).toBeNull();
+
+    flush(() => api.activate(new CalendarDate(2026, 1, 14)));
+    const committed = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
+    expect(iso(committed.start)).toBe("2026-01-10");
+    expect(iso(committed.end)).toBe("2026-01-14");
+    expect(onValueChange).toHaveBeenCalledTimes(1);
     dispose();
   });
 
@@ -253,9 +310,11 @@ describe("createCalendar — selection", () => {
     const { api, dispose } = setup({ selectionMode: "range" }); // cursor seeded on Jan 15
     flush(() => api.activate(new CalendarDate(2026, 1, 16), { extend: true }));
     expect(iso(api.anchorDate() as CalendarDate)).toBe("2026-01-15");
-    const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
-    expect(iso(value.start)).toBe("2026-01-15");
-    expect(iso(value.end)).toBe("2026-01-16");
+    // Still uncommitted, so the band — not `value` — is what shows the extension.
+    expect(api.selectionValue()).toBeNull();
+    const band = api.highlightedRange();
+    expect(iso(band?.start as CalendarDate)).toBe("2026-01-15");
+    expect(iso(band?.end as CalendarDate)).toBe("2026-01-16");
     dispose();
   });
 
@@ -271,9 +330,12 @@ describe("createCalendar — selection", () => {
     // The anchor is the committed range's start, not the cursor: the four days already selected stay
     // in the range being grown.
     expect(iso(api.anchorDate() as CalendarDate)).toBe("2026-01-05");
+    // The grown range shows in the band; `value` still holds the committed one until this completes.
+    const band = api.highlightedRange();
+    expect(iso(band?.start as CalendarDate)).toBe("2026-01-05");
+    expect(iso(band?.end as CalendarDate)).toBe("2026-01-10");
     const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
-    expect(iso(value.start)).toBe("2026-01-05");
-    expect(iso(value.end)).toBe("2026-01-10");
+    expect(iso(value.end)).toBe("2026-01-09");
     expect(onValueChange).not.toHaveBeenCalled(); // still in progress
 
     // A plain activate then commits the grown range, as any second activate does.
@@ -298,23 +360,23 @@ describe("createCalendar — selection", () => {
 
     // Moving forward: the anchor opens the band, the cursor's day closes it.
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
-    expect(api.isHighlightedStart(anchor)).toBe(true);
-    expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(true);
+    expect(api.isSelectionStart(anchor)).toBe(true);
+    expect(api.isSelectionEnd(new CalendarDate(2026, 1, 14))).toBe(true);
     // The interior is in the band but caps neither end.
-    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(true);
-    expect(api.isHighlightedStart(new CalendarDate(2026, 1, 12))).toBe(false);
-    expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 12))).toBe(false);
+    expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(api.isSelectionStart(new CalendarDate(2026, 1, 12))).toBe(false);
+    expect(api.isSelectionEnd(new CalendarDate(2026, 1, 12))).toBe(false);
 
     // Moving back past the anchor swaps which end each date caps (the range is ordered).
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 6)));
-    expect(api.isHighlightedStart(new CalendarDate(2026, 1, 6))).toBe(true);
-    expect(api.isHighlightedEnd(anchor)).toBe(true);
-    expect(api.isHighlightedStart(anchor)).toBe(false);
+    expect(api.isSelectionStart(new CalendarDate(2026, 1, 6))).toBe(true);
+    expect(api.isSelectionEnd(anchor)).toBe(true);
+    expect(api.isSelectionStart(anchor)).toBe(false);
 
     // Back on the anchor itself: a one-day band, so it is both endpoints at once.
     flush(() => api.highlightDate(anchor));
-    expect(api.isHighlightedStart(anchor)).toBe(true);
-    expect(api.isHighlightedEnd(anchor)).toBe(true);
+    expect(api.isSelectionStart(anchor)).toBe(true);
+    expect(api.isSelectionEnd(anchor)).toBe(true);
     dispose();
   });
 
@@ -325,11 +387,27 @@ describe("createCalendar — selection", () => {
       flush(() => api.activate(date));
       flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 14)));
       expect(api.highlightedRange()).toBeNull();
-      expect(api.isHighlightedStart(date)).toBe(false);
-      expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(false);
+      // The cursor's day is not dragged into any band — there is none to drag it into.
+      expect(api.isSelected(new CalendarDate(2026, 1, 14))).toBe(false);
+      expect(api.isSelectionEnd(new CalendarDate(2026, 1, 14))).toBe(false);
       // With no anchor to preview, hover is a no-op in these modes — the cursor stays put.
       flush(() => api.highlightDate(new CalendarDate(2026, 1, 22)));
       expect(iso(api.focusedDate())).toBe("2026-01-14");
+      dispose();
+    }
+  });
+
+  it("single/multiple: a selected day caps both ends of its own one-day band", () => {
+    // What keeps the derived middle (`selected && !start && !end`) empty outside range mode — and with
+    // it, the endpoint pill these modes paint. Both endpoints on one day, never an interior.
+    for (const selectionMode of ["single", "multiple"] as const) {
+      const { api, dispose } = setup({ selectionMode });
+      const date = new CalendarDate(2026, 1, 10);
+      flush(() => api.activate(date));
+      expect(api.isSelected(date)).toBe(true);
+      expect(api.isSelectionStart(date)).toBe(true);
+      expect(api.isSelectionEnd(date)).toBe(true);
+      expect(isMiddle(api, date)).toBe(false);
       dispose();
     }
   });
@@ -383,13 +461,13 @@ describe("createCalendar — abandoning a range in progress", () => {
     clearing.dispose();
   });
 
-  it("clearAnchor restores the range committed before the abandoned one, silently", () => {
+  it("clearAnchor leaves the range committed before the abandoned one, silently", () => {
     const onValueChange = vi.fn();
     const { api, dispose } = setup({ ...committed, onValueChange });
     flush(() => api.activate(new CalendarDate(2026, 1, 10)));
-    // Mid-selection the value is the degenerate in-progress `{ anchor, anchor }` — deliberate, and
-    // exactly why the pre-anchor snapshot exists.
-    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-10");
+    // Nothing is written to `value` while a range is in progress, so there is no snapshot to keep and
+    // nothing to restore — the committed range simply never left.
+    expect(iso(asRange(api.selectionValue()).start)).toBe("2026-01-02");
 
     flush(() => api.clearAnchor());
     expect(api.anchorDate()).toBeNull();
@@ -506,10 +584,10 @@ describe("createCalendar — the selection paint", () => {
     const { api, dispose } = setup({ ...committedRange, isDateDisabled: (d) => d.day === 15 });
     // The interior paints as it always did…
     expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
-    expect(api.isRangeMiddle(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(isMiddle(api, new CalendarDate(2026, 1, 12))).toBe(true);
     // …but the unavailable day is not selectable, so it must not read as selected either.
     expect(api.isSelected(new CalendarDate(2026, 1, 15))).toBe(false);
-    expect(api.isRangeMiddle(new CalendarDate(2026, 1, 15))).toBe(false);
+    expect(isMiddle(api, new CalendarDate(2026, 1, 15))).toBe(false);
     dispose();
   });
 
@@ -517,11 +595,11 @@ describe("createCalendar — the selection paint", () => {
     // `max` narrowed after the range was committed: everything past it is inert, so nothing past it
     // may paint, including the range's own end.
     const { api, dispose } = setup({ ...committedRange, max: new CalendarDate(2026, 1, 18) });
-    expect(api.isRangeStart(new CalendarDate(2026, 1, 10))).toBe(true);
+    expect(api.isSelectionStart(new CalendarDate(2026, 1, 10))).toBe(true);
     expect(api.isSelected(new CalendarDate(2026, 1, 18))).toBe(true);
     expect(api.isSelected(new CalendarDate(2026, 1, 19))).toBe(false);
     expect(api.isSelected(new CalendarDate(2026, 1, 20))).toBe(false);
-    expect(api.isRangeEnd(new CalendarDate(2026, 1, 20))).toBe(false);
+    expect(api.isSelectionEnd(new CalendarDate(2026, 1, 20))).toBe(false);
     dispose();
   });
 
@@ -535,7 +613,7 @@ describe("createCalendar — the selection paint", () => {
     const dec30 = new CalendarDate(2025, 12, 30);
     expect(api.isOutsideVisibleScope(dec30)).toBe(true);
     expect(api.isSelected(dec30)).toBe(true);
-    expect(api.isRangeMiddle(dec30)).toBe(true);
+    expect(isMiddle(api, dec30)).toBe(true);
     dispose();
   });
 
@@ -580,12 +658,12 @@ describe("createCalendar — the selection paint in year / decade view", () => {
   it("puts each range corner on the month holding that endpoint", () => {
     const { api, dispose } = setup(spanningRange);
     flush(() => api.setView("year"));
-    expect(api.isRangeStart(monthCell(1))).toBe(true);
-    expect(api.isRangeMiddle(monthCell(1))).toBe(false);
-    expect(api.isRangeStart(monthCell(2))).toBe(false);
-    expect(api.isRangeMiddle(monthCell(2))).toBe(true);
-    expect(api.isRangeEnd(monthCell(3))).toBe(true);
-    expect(api.isRangeMiddle(monthCell(3))).toBe(false);
+    expect(api.isSelectionStart(monthCell(1))).toBe(true);
+    expect(isMiddle(api, monthCell(1))).toBe(false);
+    expect(api.isSelectionStart(monthCell(2))).toBe(false);
+    expect(isMiddle(api, monthCell(2))).toBe(true);
+    expect(api.isSelectionEnd(monthCell(3))).toBe(true);
+    expect(isMiddle(api, monthCell(3))).toBe(false);
     dispose();
   });
 
@@ -599,9 +677,9 @@ describe("createCalendar — the selection paint in year / decade view", () => {
     expect(api.isSelected(yearCell(2026))).toBe(true);
     expect(api.isSelected(yearCell(2027))).toBe(true);
     expect(api.isSelected(yearCell(2028))).toBe(true);
-    expect(api.isRangeStart(yearCell(2026))).toBe(true);
-    expect(api.isRangeMiddle(yearCell(2027))).toBe(true);
-    expect(api.isRangeEnd(yearCell(2028))).toBe(true);
+    expect(api.isSelectionStart(yearCell(2026))).toBe(true);
+    expect(isMiddle(api, yearCell(2027))).toBe(true);
+    expect(api.isSelectionEnd(yearCell(2028))).toBe(true);
     dispose();
   });
 
@@ -624,12 +702,12 @@ describe("createCalendar — the selection paint in year / decade view", () => {
     flush(() => api.activate(new CalendarDate(2026, 1, 15)));
     flush(() => api.setFocusedDate(new CalendarDate(2026, 3, 10)));
     flush(() => api.setView("year"));
-    expect(api.isHighlighted(monthCell(1))).toBe(true);
-    expect(api.isHighlighted(monthCell(2))).toBe(true);
-    expect(api.isHighlighted(monthCell(3))).toBe(true);
-    expect(api.isHighlighted(monthCell(4))).toBe(false);
-    expect(api.isHighlightedStart(monthCell(1))).toBe(true);
-    expect(api.isHighlightedEnd(monthCell(3))).toBe(true);
+    expect(api.isSelected(monthCell(1))).toBe(true);
+    expect(api.isSelected(monthCell(2))).toBe(true);
+    expect(api.isSelected(monthCell(3))).toBe(true);
+    expect(api.isSelected(monthCell(4))).toBe(false);
+    expect(api.isSelectionStart(monthCell(1))).toBe(true);
+    expect(api.isSelectionEnd(monthCell(3))).toBe(true);
     dispose();
   });
 });
@@ -675,7 +753,7 @@ describe("createCalendar — contiguous ranges", () => {
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 25)));
     expect(iso(api.focusedDate())).toBe("2026-01-16");
     expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-16");
-    expect(api.isHighlighted(pastTheRun)).toBe(false);
+    expect(api.isSelected(pastTheRun)).toBe(false);
 
     flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 1)));
     expect(iso(api.focusedDate())).toBe("2026-01-06");
@@ -732,7 +810,7 @@ describe("createCalendar — contiguous ranges", () => {
 
     // The band spans the unavailable day, which the paint still cuts out of it.
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 25)));
-    expect(api.isHighlighted(pastTheRun)).toBe(true);
+    expect(api.isSelected(pastTheRun)).toBe(true);
     flush(() => api.activate(new CalendarDate(2026, 1, 25)));
     const value = api.selectionValue() as { start: CalendarDate; end: CalendarDate };
     expect(iso(value.end)).toBe("2026-01-25");
