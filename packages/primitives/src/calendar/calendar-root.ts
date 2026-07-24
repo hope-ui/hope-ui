@@ -25,6 +25,7 @@ import {
 } from "../internal";
 import { withDefaults } from "../utils";
 import {
+  constrainDate,
   isDateOutOfRange,
   isMonthOutOfRange,
   isNextDecadeDisabled,
@@ -253,21 +254,41 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const todayDate = createMemo(() => today(timeZone()));
 
   // Seed the cursor + visible month once: an explicit default, else a value-derived date, else today.
-  const seed =
-    merged.defaultFocusedValue ??
-    firstDateOf(merged.value ?? merged.defaultValue ?? null) ??
-    today(untrack(timeZone));
+  // Constrained here rather than left to the render-time clamp below, because `visibleMonth` is derived
+  // from the *seed*: an out-of-range `defaultFocusedValue` would otherwise open the calendar on a month
+  // the cursor is immediately pushed out of, and the month grid is a variable 4–6 rows — a structural
+  // server/client disagreement, not a reactive one.
+  // Every read here is one-time, so the whole expression is untracked — a consumer's `min`/`max`/
+  // `timeZone` may be signal-backed getters, and the seed must not subscribe to them.
+  const seed = untrack(() =>
+    constrainDate(
+      merged.defaultFocusedValue ??
+        firstDateOf(merged.value ?? merged.defaultValue ?? null) ??
+        today(timeZone()),
+      min(),
+      max(),
+    ),
+  );
 
   const [visibleMonth, setVisibleMonth] = createSignal<CalendarDate>(startOfMonth(seed));
 
-  // The raw controllable cursor; `focusedDate` normalizes it to the view granularity so a rendered
-  // cell always matches under `isSameDay`. `onFocusedValueChange` fires on every cursor move.
+  // The raw controllable cursor; `focusedDate` clamps it into `[min, max]` and normalizes it to the
+  // view granularity so a rendered cell always matches under `isSameDay`. `onFocusedValueChange` fires
+  // on every cursor move.
+  //
+  // Clamping *here* as well as in `setFocusedDate` is React Aria's "constrain again at render": it is
+  // what catches the two cursors the setter never sees — a controlled `focusedValue` outside the
+  // bounds, and a `min`/`max` that narrows after mount. Constrain **before** normalize, because the
+  // clamp is day-level: re-flooring afterwards keeps a year/decade cursor on a cell that exists. The
+  // pair is a fixed point, so re-applying it to an already-stored cursor never moves it again.
   const [rawFocused, setRawFocused] = createControllableState<CalendarDate>({
     value: () => merged.focusedValue ?? undefined,
     defaultValue: () => seed,
     onChange: (date) => merged.onFocusedValueChange?.(date),
   });
-  const focusedDate = createMemo(() => normalizeFocusForView(view(), rawFocused()));
+  const focusedDate = createMemo(() =>
+    normalizeFocusForView(view(), constrainDate(rawFocused(), min(), max())),
+  );
 
   // The committed selection (union keyed by mode). `onValueChange` is fired manually on *commit*
   // (below), not through `createControllableState`, so a range emits only on completion.
@@ -429,9 +450,12 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   // --- Navigation ---
   const setFocusedDate = (date: CalendarDate) => {
-    // Normalize before storing, so the cursor (and `onFocusedValueChange`) stay at view granularity;
-    // the effect above pulls `visibleMonth` along if this leaves the scope.
-    setRawFocused(normalizeFocusForView(view(), date));
+    // Constrain then normalize before storing (React Aria's `focusCell`), so the cursor — and
+    // `onFocusedValueChange` — report a date that is both inside `[min, max]` and at view granularity.
+    // Every move funnels through here (`navigate`, `shiftYears`, `applyView`, `activate`,
+    // `highlightDate`), so this is the one place the bound has to hold. The effect above pulls
+    // `visibleMonth` along if this leaves the scope.
+    setRawFocused(normalizeFocusForView(view(), constrainDate(date, min(), max())));
   };
 
   const navigate = (deltaMonths: number) => {

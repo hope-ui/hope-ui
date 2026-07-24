@@ -34,6 +34,29 @@ the per-date predicates (incl. `isHighlighted` and the tentative band's `isHighl
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
 `highlightedRange`, `highlightDate`).
 
+## The roving cursor never leaves `[min, max]`
+
+`focusedDate()` is clamped with `constrainDate` (`utils/boundary.ts` — React Aria's `constrainValue`)
+at all three of the points RA clamps at:
+
+- **On every move** — `setFocusedDate` is the funnel every other verb goes through (`navigate`,
+  `shiftYears`, `applyView`, `activate`, `highlightDate`), so clamping there covers them all, and
+  `onFocusedValueChange` reports the date actually focused rather than the one requested.
+- **On the seed** — `visibleMonth` is derived from the seed, not from `focusedDate`. An out-of-range
+  `defaultFocusedValue` would otherwise open the calendar on a month the cursor is immediately pushed
+  out of; the month grid is a variable 4–6 rows, so that is a *structural* server/client disagreement,
+  not a reactive one.
+- **Again at render** (inside the `focusedDate` memo) — the two cursors the setter never sees: a
+  controlled `focusedValue` outside the bounds, and a `min`/`max` that narrows after mount.
+
+Order matters: **constrain, then normalize**. The clamp is day-level, so re-flooring to the view's cell
+granularity afterwards is what keeps a year/decade cursor on a cell that actually renders (`min` Mar 10
+in year view ⇒ cursor Mar 1, not Mar 10). The pair is a fixed point, so the render-time clamp never
+moves an already-stored cursor a second time.
+
+Without this, `prev()` from Feb 3 with `min` Jan 10 left the cursor on Jan 3: `isDateNonFocusable`
+*and* `isFocused` at once — a roving tab stop stranded on a cell the arrows skip.
+
 ## The tentative range band rides the roving cursor
 
 ```ts
@@ -133,7 +156,8 @@ through `createControllableState`'s `onChange`.
 ## SSR / hydration
 
 - The month grid is **variable 4–6 weeks**, so its row count depends on `visibleMonth`. `visibleMonth`
-  seeds from `defaultFocusedValue ?? firstDateOf(value ?? defaultValue) ?? today(timeZone)`. When it
+  seeds from `constrainDate(defaultFocusedValue ?? firstDateOf(value ?? defaultValue) ??
+  today(timeZone), min, max)` — clamped at the seed for exactly this reason (see above). When it
   derives from a prop it is deterministic; the bare `today()` fallback can disagree across a
   server/client midnight boundary. **For SSR, pass a stable `defaultFocusedValue`** (the fixture pins
   one). `today()`-derived attributes (`data-today`) are reactive, re-evaluated on hydrate — never

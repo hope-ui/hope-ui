@@ -2,16 +2,19 @@ import {
   type CalendarDate,
   endOfMonth,
   endOfYear,
+  maxDate,
+  minDate,
   startOfMonth,
   startOfYear,
 } from "@internationalized/date";
 import { decadeStart, YEARS_PER_DECADE } from "./view";
 
 /**
- * `min`/`max` bound the selectable + reachable range. These pure predicates drive the calendar's
- * boundary behavior; all are total (an absent bound ⇒ that side is unbounded). The day-level
+ * `min`/`max` bound the selectable + reachable range. These pure helpers drive the calendar's boundary
+ * behavior; all are total (an absent bound ⇒ that side is unbounded). The day-level
  * {@link isDateOutOfRange} is view-agnostic; the prev/next pair + the whole-period out-of-range tests
  * come in one-per-view flavors (month / year / decade) selected by the calendar state.
+ * {@link constrainDate} is the only non-predicate: it *moves* a date back into the bounds.
  */
 
 /**
@@ -27,6 +30,22 @@ export function isDateOutOfRange(
   return (
     (min !== undefined && date.compare(min) < 0) || (max !== undefined && date.compare(max) > 0)
   );
+}
+
+/**
+ * Clamp `date` into `[min, max]` — React Aria's `constrainValue`, which it applies to the roving cursor
+ * on every move, on the seed, and again at render. Without it the cursor lands on a hard out-of-range
+ * cell that is non-focusable and arrow-skipped, stranding the roving tab stop. Pure.
+ */
+export function constrainDate(
+  date: CalendarDate,
+  min?: CalendarDate,
+  max?: CalendarDate,
+): CalendarDate {
+  // `maxDate`/`minDate` are typed nullable in *and* out; inside each guard both operands are present,
+  // so the result is always a `CalendarDate`.
+  const lowerBounded = min === undefined ? date : (maxDate(date, min) as CalendarDate);
+  return max === undefined ? lowerBounded : (minDate(lowerBounded, max) as CalendarDate);
 }
 
 /**

@@ -1,6 +1,7 @@
 import { CalendarDate } from "@internationalized/date";
 import { describe, expect, it } from "vitest";
 import {
+  constrainDate,
   isDateOutOfRange,
   isMonthOutOfRange,
   isNextDecadeDisabled,
@@ -24,6 +25,32 @@ describe("isDateOutOfRange", () => {
     expect(isDateOutOfRange(new CalendarDate(2026, 1, 31), min, max)).toBe(true);
     expect(isDateOutOfRange(new CalendarDate(2026, 3, 1), min, max)).toBe(true);
     expect(isDateOutOfRange(new CalendarDate(2026, 2, 15), min, max)).toBe(false);
+  });
+});
+
+describe("constrainDate", () => {
+  const iso = (date: CalendarDate) => date.toString();
+
+  it("leaves an in-range date alone, including on either bound", () => {
+    expect(iso(constrainDate(new CalendarDate(2026, 2, 15), min, max))).toBe("2026-02-15");
+    expect(iso(constrainDate(min, min, max))).toBe("2026-02-01");
+    expect(iso(constrainDate(max, min, max))).toBe("2026-02-28");
+  });
+
+  it("clamps up to min and down to max", () => {
+    expect(iso(constrainDate(new CalendarDate(2025, 12, 31), min, max))).toBe("2026-02-01");
+    expect(iso(constrainDate(new CalendarDate(2026, 6, 9), min, max))).toBe("2026-02-28");
+  });
+
+  it("leaves an absent bound unbounded", () => {
+    expect(iso(constrainDate(new CalendarDate(1900, 1, 1)))).toBe("1900-01-01");
+    expect(iso(constrainDate(new CalendarDate(1900, 1, 1), undefined, max))).toBe("1900-01-01");
+    expect(iso(constrainDate(new CalendarDate(2200, 1, 1), min))).toBe("2200-01-01");
+  });
+
+  it("is idempotent", () => {
+    const once = constrainDate(new CalendarDate(2025, 12, 31), min, max);
+    expect(iso(constrainDate(once, min, max))).toBe(iso(once));
   });
 });
 

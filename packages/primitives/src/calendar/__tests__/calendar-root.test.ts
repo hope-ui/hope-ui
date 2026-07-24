@@ -1,5 +1,5 @@
 import { CalendarDate, type DateValue } from "@internationalized/date";
-import { createRoot, flush } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import {
   type CreateCalendarOptions,
@@ -103,6 +103,84 @@ describe("createCalendar — view machine", () => {
     expect(iso(api.focusedDate())).toBe("2026-06-01"); // month start
     flush(() => api.setView("decade"));
     expect(iso(api.focusedDate())).toBe("2026-01-01"); // year start
+    dispose();
+  });
+});
+
+describe("createCalendar — cursor constraining", () => {
+  it("lands prev() on min rather than stranding the cursor out of range", () => {
+    // Without the clamp, Feb 3 → Jan 3, which is before min: non-focusable, arrow-skipped, yet still
+    // the roving tab stop.
+    const { api, dispose } = setup({
+      defaultFocusedValue: new CalendarDate(2026, 2, 3),
+      min: new CalendarDate(2026, 1, 10),
+    });
+    flush(() => api.prev());
+    expect(iso(api.visibleMonth())).toBe("2026-01-01");
+    expect(iso(api.focusedDate())).toBe("2026-01-10");
+    expect(api.isDateNonFocusable(api.focusedDate())).toBe(false);
+    dispose();
+  });
+
+  it("clamps every cursor move to max", () => {
+    const { api, dispose } = setup({ max: new CalendarDate(2026, 1, 25) });
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 31)));
+    expect(iso(api.focusedDate())).toBe("2026-01-25");
+    dispose();
+  });
+
+  it("clamps an out-of-range defaultFocusedValue on mount, before it seeds the visible month", () => {
+    // Read without a flush: the visible month here comes from the seed, not from the scope effect —
+    // the month grid is a variable 4–6 rows, so a post-mount correction would be a hydration mismatch.
+    const { api, dispose } = setup({
+      defaultFocusedValue: new CalendarDate(2025, 12, 5),
+      min: new CalendarDate(2026, 1, 10),
+    });
+    expect(iso(api.focusedDate())).toBe("2026-01-10");
+    expect(iso(api.visibleMonth())).toBe("2026-01-01");
+    dispose();
+  });
+
+  it("clamps a controlled focusedValue that sits outside the bounds", () => {
+    const { api, dispose } = setup({
+      focusedValue: new CalendarDate(2026, 1, 3),
+      min: new CalendarDate(2026, 1, 10),
+    });
+    expect(iso(api.focusedDate())).toBe("2026-01-10");
+    dispose();
+  });
+
+  it("re-clamps the cursor when the bounds narrow after mount", () => {
+    // Its own root: `setup` spreads its options, which would flatten the reactive `min` getter.
+    const [min, setMin] = createSignal(new CalendarDate(2026, 1, 1));
+    let api!: CreateCalendarReturn;
+    let dispose!: () => void;
+    createRoot((d) => {
+      dispose = d;
+      api = createCalendar({
+        defaultFocusedValue: new CalendarDate(2026, 1, 15),
+        get min() {
+          return min();
+        },
+      });
+    });
+    expect(iso(api.focusedDate())).toBe("2026-01-15");
+    flush(() => setMin(new CalendarDate(2026, 1, 20)));
+    expect(iso(api.focusedDate())).toBe("2026-01-20");
+    dispose();
+  });
+
+  it("keeps a clamped year/decade cursor on a cell that exists", () => {
+    // The clamp is day-level, so it must be re-floored to the view's granularity — otherwise the
+    // cursor sits on min's *day* and no rendered month/year cell matches it under `isSameDay`.
+    const { api, dispose } = setup({ min: new CalendarDate(2026, 3, 10) });
+    flush(() => api.setView("year"));
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 1)));
+    expect(iso(api.focusedDate())).toBe("2026-03-01");
+
+    flush(() => api.setView("decade"));
+    flush(() => api.setFocusedDate(new CalendarDate(2020, 1, 1)));
+    expect(iso(api.focusedDate())).toBe("2026-01-01");
     dispose();
   });
 });
