@@ -28,8 +28,8 @@ function within(range: DateRange, date: CalendarDate): boolean {
  *    / click) commits. With no anchor it re-anchors at the existing range's start (or `date`).
  *
  * `isSelected` covers the whole committed range (highlight); `isRange{Start,Middle,End}` refine the
- * endpoints for corner paint. `highlightedRange` returns the tentative `[anchor … highlightEnd]` span
- * while selecting. Pure.
+ * endpoints for corner paint. `highlightedRange` returns the tentative `[anchor … endpoint]` span while
+ * selecting, where the caller's `endpoint` is the calendar's roving cursor. Pure.
  */
 export const rangeSelection: SelectionStrategy = {
   mode: "range",
@@ -54,11 +54,11 @@ export const rangeSelection: SelectionStrategy = {
     return range !== null && date.compare(range.end) === 0;
   },
 
-  highlightedRange(state, highlightEnd) {
-    if (state.anchor === null || highlightEnd === null) {
+  highlightedRange(state, endpoint) {
+    if (state.anchor === null || endpoint === null) {
       return null;
     }
-    return order(state.anchor, highlightEnd);
+    return order(state.anchor, endpoint);
   },
 
   select(state, date, opts) {

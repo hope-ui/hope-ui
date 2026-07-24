@@ -141,6 +141,28 @@ describe("createCalendarGrid — roving arrow navigation", () => {
     dispose();
   });
 
+  it("grows the tentative range band as the arrow keys move the cursor", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-15").click(); // anchor, with the pointer never leaving that cell
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-15"));
+
+    dayButton(container, "2026-01-15").focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.element(dayButton(container, "2026-01-16")).toHaveFocus();
+
+    const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
+    await vi.waitFor(() => expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""));
+    expect(cellOf("2026-01-16").getAttribute("data-highlighted-end")).toBe("");
+    expect(cellOf("2026-01-15").getAttribute("data-highlighted-start")).toBe("");
+
+    await userEvent.keyboard("{ArrowRight}");
+    await vi.waitFor(() => expect(cellOf("2026-01-17").getAttribute("data-highlighted")).toBe(""));
+    expect(cellOf("2026-01-16").getAttribute("data-highlighted")).toBe(""); // now the interior
+    expect(cellOf("2026-01-16").getAttribute("data-highlighted-end")).toBeNull();
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-17");
+    dispose();
+  });
+
   it("PageDown pages to the next month", async () => {
     const { container, state, dispose } = await mountCalendar();
     dayButton(container, "2026-01-15").focus();

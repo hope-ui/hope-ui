@@ -14,7 +14,12 @@ function createCalendarGrid(
 
 Spread `props` onto the `<table>`. The component renders the rows/cells inside it; the returned props
 carry `role="grid"`, `aria-labelledby` (the heading id), `data-view`, the container `tabindex`, and the
-composed `onKeyDown` / `onPointerLeave`.
+composed `onKeyDown`.
+
+**No `onPointerLeave`.** The tentative range band is derived from the roving cursor
+(`calendar-root.md`), so it belongs to the anchor, not to a hover: clearing it when the pointer leaves
+the grid would erase a band the user is still drawing — and would erase it for the keyboard too. A
+consumer's own `onPointerLeave` passes through untouched.
 
 ## Keyboard
 

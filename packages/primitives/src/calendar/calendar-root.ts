@@ -151,7 +151,8 @@ export interface CreateCalendarReturn {
   focusedDate: Accessor<CalendarDate>;
   selectionValue: Accessor<CalendarValue>;
   anchorDate: Accessor<CalendarDate | null>;
-  /** Derived: the tentative highlight range while a range selection is in progress (else null). */
+  /** Derived: the tentative range `anchorDate` → `focusedDate` while a range selection is in
+   * progress (else null). */
   highlightedRange: Accessor<DateRange | null>;
   todayDate: Accessor<CalendarDate>;
 
@@ -175,8 +176,9 @@ export interface CreateCalendarReturn {
   setView: (view: CalendarView) => void;
   setFocusedDate: (date: CalendarDate) => void;
   activate: (date: CalendarDate, opts?: { extend?: boolean }) => void;
-  /** Move the tentative highlight end to `date` (range mode, mid-selection); `null` clears it. */
-  highlightDate: (date: CalendarDate | null) => void;
+  /** Move the tentative range's moving endpoint to `date` — i.e. move the roving cursor, but only
+   * while a range selection is anchored. A no-op otherwise. */
+  highlightDate: (date: CalendarDate) => void;
 
   // --- per-date predicates ---
   isOutsideVisibleScope: (date: CalendarDate) => boolean;
@@ -273,9 +275,6 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     value: () => merged.value,
     defaultValue: () => merged.defaultValue ?? null,
   });
-  // The tentative highlight end (hover/focus date) while a range selection is in progress. Internal:
-  // the public surface is the derived `highlightedRange` accessor + the `highlightDate` setter.
-  const [highlightEnd, setHighlightEnd] = createSignal<CalendarDate | null>(null);
   const [anchorDate, setAnchorDate] = createSignal<CalendarDate | null>(null);
 
   const strategy = createMemo(() => selectionStrategyFor(mode()));
@@ -393,11 +392,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const isRangeStart = (date: CalendarDate) => strategy().isRangeStart(selectionState(), date);
   const isRangeMiddle = (date: CalendarDate) => strategy().isRangeMiddle(selectionState(), date);
   const isRangeEnd = (date: CalendarDate) => strategy().isRangeEnd(selectionState(), date);
-  // The tentative highlight range (anchor → highlightEnd) while mid-selection; cells derive membership.
-  // A plain accessor (like the sibling predicates), NOT createMemo: an extra reactive node created in
-  // this render would advance the hydration-id counter and shift every `_hk` in the SSR tree.
+  // The tentative range while mid-selection: anchor → the roving cursor, exactly as React Aria derives
+  // it (`useRangeCalendarState`). Deriving it from the *cursor* rather than a separate hover signal is
+  // what makes hover and keyboard one code path — hover moves the cursor (`highlightDate`), so the band
+  // can never disagree with the cell the user is on. A plain accessor (like the sibling predicates), NOT
+  // createMemo: an extra reactive node created in this render would advance the hydration-id counter and
+  // shift every `_hk` in the SSR tree.
   const highlightedRange = (): DateRange | null =>
-    strategy().highlightedRange(selectionState(), highlightEnd());
+    strategy().highlightedRange(selectionState(), focusedDate());
   const isHighlighted = (date: CalendarDate) => {
     const range = highlightedRange();
     return range !== null && date.compare(range.start) >= 0 && date.compare(range.end) <= 0;
@@ -539,7 +541,14 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     }
   };
 
-  const highlightDate = (date: CalendarDate | null) => setHighlightEnd(date);
+  // Hovering a day *is* moving the cursor while a range is anchored (React Aria's `highlightDate`), so
+  // the band follows the pointer through the same signal the keyboard drives. With no anchor there is
+  // nothing to preview, and hover must not steal the roving tab stop — hence the guard.
+  const highlightDate = (date: CalendarDate) => {
+    if (anchorDate() !== null) {
+      setFocusedDate(date);
+    }
+  };
 
   // --- Native form ---
   // The hidden-input entries a native `<form>` submits, derived from the committed selection as ISO

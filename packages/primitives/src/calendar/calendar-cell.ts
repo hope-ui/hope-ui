@@ -21,7 +21,7 @@ export interface CalendarDayState {
   readonly isRangeStart: boolean;
   readonly isRangeMiddle: boolean;
   readonly isRangeEnd: boolean;
-  /** Inside the tentative hover-range band while a range selection is in progress (range mode). */
+  /** Inside the tentative band (anchor → roving cursor) while a range selection is in progress. */
   readonly isHighlighted: boolean;
   /** The tentative band's endpoints — both true at once when the preview spans a single day. */
   readonly isHighlightedStart: boolean;
@@ -64,7 +64,8 @@ export interface CreateCalendarCellReturn {
  * - `onClick` (which native `Enter`/`Space`/pointer all fire) → `activate`, refused on an inert cell.
  * - `onMouseDown` prevents native click-focus landing on an inert cell.
  * - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells.
- * - `onMouseEnter` feeds the range hover preview.
+ * - `onMouseEnter` moves the range preview (`highlightDate` — the roving cursor), guarded off cells the
+ *   range could not end on.
  *
  * The registered day-state custom variants are self-based (`&:where([data-range-middle])`), so an
  * attribute only lights a utility on the element that carries it. That splits the paint across the two
@@ -162,6 +163,13 @@ export function createCalendarCell(
     state.activate(date());
   };
   const onMouseEnter: JSX.EventHandler<HTMLButtonElement, MouseEvent> = () => {
+    // Only a day the range could actually end on may move the tentative band (React Aria's
+    // `isSelectable` gate). Without it, hovering an outside-month or unavailable day would preview a
+    // range that the matching click refuses to commit — and, since the band now rides the roving
+    // cursor, would strand the tab stop on an inert cell.
+    if (state.isDateNonFocusable(date()) || state.isDateUnavailable(date())) {
+      return;
+    }
     state.highlightDate(date());
   };
   const onFocus: JSX.EventHandler<HTMLButtonElement, FocusEvent> = () => {

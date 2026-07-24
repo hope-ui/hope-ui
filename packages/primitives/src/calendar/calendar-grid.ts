@@ -184,7 +184,9 @@ export function createCalendarGrid(
     keymap.onKeyDown(event);
   };
 
-  const rest = omit(props, "onKeyDown", "onPointerLeave");
+  // No `onPointerLeave` handling: the tentative band is derived from the roving cursor, so it must
+  // survive the pointer leaving the grid — clearing it there would erase a band the anchor still owns.
+  const rest = omit(props, "onKeyDown");
   const elementProps = merge(rest, {
     role: "grid" as const,
     get "aria-labelledby"() {
@@ -198,11 +200,6 @@ export function createCalendarGrid(
     },
     get onKeyDown() {
       return composeEventHandlers<HTMLTableElement, KeyboardEvent>(props.onKeyDown, handleKeyDown);
-    },
-    get onPointerLeave() {
-      return composeEventHandlers<HTMLTableElement, PointerEvent>(props.onPointerLeave, () =>
-        state.highlightDate(null),
-      );
     },
   });
 

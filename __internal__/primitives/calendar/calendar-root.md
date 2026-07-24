@@ -34,6 +34,34 @@ the per-date predicates (incl. `isHighlighted` and the tentative band's `isHighl
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
 `highlightedRange`, `highlightDate`).
 
+## The tentative range band rides the roving cursor
+
+```ts
+highlightedRange(): DateRange | null; // = strategy.highlightedRange({ value, anchor }, focusedDate())
+highlightDate(date: CalendarDate): void; // = if (anchorDate() !== null) setFocusedDate(date)
+```
+
+There is **one** moving endpoint, and it is `focusedDate` — React Aria's contract
+(`useRangeCalendarState`: `highlightedRange = anchorDate ? makeRange(anchorDate, focusedDate) : …`).
+Hover and keyboard are therefore the same code path: `highlightDate` *is* a cursor move, so the band
+can never disagree with the cell the user is on. Consequences worth knowing:
+
+- **Anchoring alone opens a one-day band** on the anchor (the cursor is already there), so the anchor
+  carries `data-highlighted` + both `data-highlighted-{start,end}` under its `data-selected` pill.
+- **Arrow keys grow the band.** There is no separate hover signal to be missing, which is what used to
+  make the keyboard show no preview at all.
+- **The band survives the pointer leaving the grid** — it belongs to the anchor, not to a hover. The
+  grid deliberately handles no `pointerleave` (see `calendar-grid.md`).
+- **`highlightDate` is inert with no anchor**, in every mode. Hover therefore never steals the roving
+  tab stop outside an in-progress range, and is a complete no-op in single/multiple (where `anchor` is
+  always `null`, so `highlightedRange` is too).
+- **Accepted RA side effect:** while anchored, hovering *does* move the roving tab stop. That is the
+  price of one endpoint, and it is what keeps pointer and keyboard from painting two different bands.
+
+`highlightDate`'s caller (`createCalendarCell`'s `onMouseEnter`) gates on RA's `isSelectable` —
+`isDateNonFocusable` or `isDateUnavailable` skips it — so a day the range could not actually end on
+never previews a range the matching click would refuse.
+
 ## Native form
 
 Opt-in native `<form>` submission, mirroring the shipped Listbox pattern. The primitive renders no DOM

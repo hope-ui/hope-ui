@@ -32,13 +32,16 @@ is the render seam for a custom cell body (the same flags the default cell deriv
 - `onMouseDown` prevents native click-focus landing on an inert cell.
 - `onFocus` syncs the roving cursor (`setFocusedDate`), guarded off inert cells. It is untracked
   because `createListFocus` may fire it synchronously from inside its own effect.
-- `onMouseEnter` feeds the range hover preview.
+- `onMouseEnter` → `highlightDate`, which moves the **roving cursor** (the tentative band's moving
+  endpoint — see `calendar-root.md`). Gated on React Aria's `isSelectable`: a non-focusable or
+  unavailable day is skipped, so hovering a day the range could not end on neither previews a range
+  the click would refuse nor drags the tab stop onto an inert cell.
 
 ## Attributes
 
 - `<td>`: `role="gridcell"` and `aria-selected` — the ARIA grid-cell semantics — **plus the
   band-level hooks only**: `data-range-{start,middle,end}`, `data-highlighted` (the tentative
-  hover-range band) and its endpoints `data-highlighted-{start,end}`. The per-day hooks
+  anchor → cursor band) and its endpoints `data-highlighted-{start,end}`. The per-day hooks
   (`data-selected`, `data-today`, …) deliberately stay off it.
 - `<button>`: the view-aware `aria-label` (with Today / selected / range-start / range-end / unavailable
   suffixes), `aria-disabled` for unavailable days, `tabindex` — `0` on the focused cell, `-1` elsewhere
@@ -56,8 +59,9 @@ spans cells — hence the range/highlight hooks are mirrored there — while the
 paints the solid endpoint pills and per-day marks on top of it. Names match that canonical variant list.
 
 `data-highlighted-start` / `data-highlighted-end` mark the tentative band's two ends (both land on the
-same date when the preview is one day, i.e. hovering the anchor), so a recipe can cap the preview the
-way it caps the committed range instead of leaving it squared off mid-drag.
+same date when the preview is one day — on the anchor the moment it is set, and again whenever the
+cursor returns to it), so a recipe can cap the preview the way it caps the committed range instead of
+leaving it squared off mid-drag.
 
 `data-unavailable` and `data-disabled` are **distinct** (React-Aria's `isUnavailable` vs `isDisabled`
 split), never both on one day: an unavailable day is focusable + announced (aria-disabled) but stays

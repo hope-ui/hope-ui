@@ -147,6 +147,51 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
+  it("survives the pointer leaving the grid — the band belongs to the anchor, not the hover", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-10").click(); // anchor
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
+    dayButton(container, "2026-01-14").dispatchEvent(new MouseEvent("mouseenter"));
+
+    const midCell = dayButton(container, "2026-01-12").closest("td") as HTMLElement;
+    await vi.waitFor(() => expect(midCell.getAttribute("data-highlighted")).toBe(""));
+
+    const grid = container.querySelector("table") as HTMLElement;
+    grid.dispatchEvent(new PointerEvent("pointerleave", { bubbles: false }));
+
+    await new Promise((resolve) => setTimeout(resolve, 20)); // let any (incorrect) clear settle
+    expect(midCell.getAttribute("data-highlighted")).toBe("");
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-14");
+    dispose();
+  });
+
+  it("ignores hover on a day the range could not end on (outside-month / unavailable)", async () => {
+    const { container, state, dispose } = await mountCalendar({
+      selectionMode: "range",
+      isDateDisabled: (date) => date.day === 22,
+    });
+    dayButton(container, "2026-01-10").click(); // anchor
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
+    dayButton(container, "2026-01-14").dispatchEvent(new MouseEvent("mouseenter"));
+    await vi.waitFor(() => expect(state.highlightedRange()?.end.toString()).toBe("2026-01-14"));
+
+    // A leading filler day from the previous month — clicking it is refused, so it must not preview.
+    dayButton(container, "2025-12-30").dispatchEvent(new MouseEvent("mouseenter"));
+    // An unavailable day — same: focusable and announced, but never a range endpoint.
+    dayButton(container, "2026-01-22").dispatchEvent(new MouseEvent("mouseenter"));
+
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(state.highlightedRange()?.end.toString()).toBe("2026-01-14"); // band never moved
+    expect(state.focusedDate().toString()).toBe("2026-01-14"); // nor did the roving cursor
+    expect(dayButton(container, "2025-12-30").closest("td")?.getAttribute("data-highlighted")).toBe(
+      null,
+    );
+    expect(dayButton(container, "2026-01-22").closest("td")?.getAttribute("data-highlighted")).toBe(
+      null,
+    );
+    dispose();
+  });
+
   it("gives the focused date the roving tab stop and the rest tabindex -1", async () => {
     const { container, dispose } = await mountCalendar();
     expect(dayButton(container, "2026-01-15").getAttribute("tabindex")).toBe("0");

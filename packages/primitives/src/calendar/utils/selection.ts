@@ -48,7 +48,7 @@ export interface SelectOptions {
  * interface, which the active mode implements (`singleSelection` / `rangeSelection` /
  * `multipleSelection`). Every method is **pure**: predicates read a {@link SelectionState} snapshot,
  * and `select` returns the next snapshot (the strategy decides the transition). `isRange*` are all
- * false outside range mode; `highlightedRange` is null unless range mode is mid-selection with a hover.
+ * false outside range mode; `highlightedRange` is null unless range mode is mid-selection.
  */
 export interface SelectionStrategy {
   readonly mode: CalendarSelectionMode;
@@ -61,11 +61,12 @@ export interface SelectionStrategy {
   /** Is `date` the range's end endpoint (range mode only). */
   isRangeEnd(state: SelectionState, date: CalendarDate): boolean;
   /**
-   * The tentative highlight range while a range selection is in progress — from the anchor to the
-   * `highlightEnd` hover/focus date (ordered). Null in single/multiple, or in range mode when not
-   * mid-selecting or with no `highlightEnd`. Mirrors React Aria's `RangeCalendarState.highlightedRange`.
+   * The tentative highlight range while a range selection is in progress — from the anchor to
+   * `endpoint`, the range's moving end (ordered). The calendar passes its **roving cursor**, so the
+   * band is the same for hover and keyboard, as in React Aria's `RangeCalendarState.highlightedRange`.
+   * Null in single/multiple, or in range mode when not mid-selecting or with no `endpoint`.
    */
-  highlightedRange(state: SelectionState, highlightEnd: CalendarDate | null): DateRange | null;
+  highlightedRange(state: SelectionState, endpoint: CalendarDate | null): DateRange | null;
   /** Compute the next selection from activating `date`. Pure — the caller commits the result. */
   select(state: SelectionState, date: CalendarDate, opts?: SelectOptions): SelectionState;
 }

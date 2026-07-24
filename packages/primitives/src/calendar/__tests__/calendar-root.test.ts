@@ -143,22 +143,38 @@ describe("createCalendar — selection", () => {
     dispose();
   });
 
-  it("range: highlightDate drives highlightedRange + isHighlighted while mid-selection; null clears", () => {
+  it("range: the tentative band tracks the roving cursor, however the cursor moved", () => {
     const { api, dispose } = setup({ selectionMode: "range" });
-    // Anchor the range, then hover a later day.
     flush(() => api.activate(new CalendarDate(2026, 1, 10)));
-    flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+    // Anchoring alone opens a one-day band on the anchor — the cursor is already there.
+    expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-10");
 
+    // A keyboard move (setFocusedDate) grows the band, with no hover involved at all.
+    flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 14)));
     const range = api.highlightedRange();
-    expect(range).not.toBeNull();
     expect(iso(range?.start as CalendarDate)).toBe("2026-01-10");
     expect(iso(range?.end as CalendarDate)).toBe("2026-01-14");
     expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(true);
     expect(api.isHighlighted(new CalendarDate(2026, 1, 15))).toBe(false);
 
-    flush(() => api.highlightDate(null));
+    // `highlightDate` (the hover path) is the same move, so the two can never disagree.
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 18)));
+    expect(iso(api.focusedDate())).toBe("2026-01-18");
+    expect(iso(api.highlightedRange()?.end as CalendarDate)).toBe("2026-01-18");
+
+    // Completing the range clears the anchor, and with it the tentative band.
+    flush(() => api.activate(new CalendarDate(2026, 1, 18)));
+    expect(api.anchorDate()).toBeNull();
     expect(api.highlightedRange()).toBeNull();
     expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(false);
+    dispose();
+  });
+
+  it("highlightDate is inert with no anchor — hover never steals the roving cursor", () => {
+    const { api, dispose } = setup({ selectionMode: "range" });
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 22)));
+    expect(iso(api.focusedDate())).toBe("2026-01-15"); // the seed, untouched
+    expect(api.highlightedRange()).toBeNull();
     dispose();
   });
 
@@ -167,7 +183,7 @@ describe("createCalendar — selection", () => {
     const anchor = new CalendarDate(2026, 1, 10);
     flush(() => api.activate(anchor));
 
-    // Hovering forward: the anchor opens the band, the hovered day closes it.
+    // Moving forward: the anchor opens the band, the cursor's day closes it.
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
     expect(api.isHighlightedStart(anchor)).toBe(true);
     expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(true);
@@ -176,32 +192,31 @@ describe("createCalendar — selection", () => {
     expect(api.isHighlightedStart(new CalendarDate(2026, 1, 12))).toBe(false);
     expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 12))).toBe(false);
 
-    // Hovering backward past the anchor swaps which end each date caps (the range is ordered).
+    // Moving back past the anchor swaps which end each date caps (the range is ordered).
     flush(() => api.highlightDate(new CalendarDate(2026, 1, 6)));
     expect(api.isHighlightedStart(new CalendarDate(2026, 1, 6))).toBe(true);
     expect(api.isHighlightedEnd(anchor)).toBe(true);
     expect(api.isHighlightedStart(anchor)).toBe(false);
 
-    // Hovering the anchor itself: a one-day band, so it is both endpoints at once.
+    // Back on the anchor itself: a one-day band, so it is both endpoints at once.
     flush(() => api.highlightDate(anchor));
     expect(api.isHighlightedStart(anchor)).toBe(true);
     expect(api.isHighlightedEnd(anchor)).toBe(true);
-
-    flush(() => api.highlightDate(null));
-    expect(api.isHighlightedStart(anchor)).toBe(false);
-    expect(api.isHighlightedEnd(anchor)).toBe(false);
     dispose();
   });
 
-  it("single/multiple: never report a tentative band endpoint", () => {
+  it("single/multiple: never report a tentative band, whatever the cursor does", () => {
     for (const selectionMode of ["single", "multiple"] as const) {
       const { api, dispose } = setup({ selectionMode });
       const date = new CalendarDate(2026, 1, 10);
       flush(() => api.activate(date));
-      flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+      flush(() => api.setFocusedDate(new CalendarDate(2026, 1, 14)));
       expect(api.highlightedRange()).toBeNull();
       expect(api.isHighlightedStart(date)).toBe(false);
       expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(false);
+      // With no anchor to preview, hover is a no-op in these modes — the cursor stays put.
+      flush(() => api.highlightDate(new CalendarDate(2026, 1, 22)));
+      expect(iso(api.focusedDate())).toBe("2026-01-14");
       dispose();
     }
   });
