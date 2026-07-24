@@ -29,7 +29,8 @@ for their labels/announcements); state (`view`, `visibleMonth`, `focusedDate`,
 `selectionValue`, `anchorDate`, `highlightedRange`, `todayDate`); computeds (`cells`, `weekdays`,
 `headingLabel`, `isPrev/NextDisabled`, `canDrillUp`); `headingId`; the navigation verbs (`navigate`,
 `prev`, `next`, `drillUp`, `drillDownTo`, `setView`, `setFocusedDate`, `activate`, `highlightDate`);
-the per-date predicates (incl. `isHighlighted`); and the shared `collection` / `listFocus` /
+the per-date predicates (incl. `isHighlighted` and the tentative band's `isHighlightedStart` /
+`isHighlightedEnd`); and the shared `collection` / `listFocus` /
 `announce` the part hooks use. Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`,
 `highlightedRange`, `highlightDate`).
 

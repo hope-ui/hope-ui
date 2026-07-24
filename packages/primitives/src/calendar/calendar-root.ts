@@ -192,6 +192,8 @@ export interface CreateCalendarReturn {
   isRangeMiddle: (date: CalendarDate) => boolean;
   isRangeEnd: (date: CalendarDate) => boolean;
   isHighlighted: (date: CalendarDate) => boolean;
+  isHighlightedStart: (date: CalendarDate) => boolean;
+  isHighlightedEnd: (date: CalendarDate) => boolean;
   formatCellName: (date: CalendarDate) => string;
   formatFullDate: (date: CalendarDate) => string;
 
@@ -399,6 +401,16 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const isHighlighted = (date: CalendarDate) => {
     const range = highlightedRange();
     return range !== null && date.compare(range.start) >= 0 && date.compare(range.end) <= 0;
+  };
+  // The tentative band's own endpoints, so a recipe can cap the preview the way it caps the committed
+  // range. Both are true on the same date when the preview is one day (hovering the anchor itself).
+  const isHighlightedStart = (date: CalendarDate) => {
+    const range = highlightedRange();
+    return range !== null && date.compare(range.start) === 0;
+  };
+  const isHighlightedEnd = (date: CalendarDate) => {
+    const range = highlightedRange();
+    return range !== null && date.compare(range.end) === 0;
   };
 
   const formatCellName = (date: CalendarDate) => {
@@ -648,6 +660,8 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
     isRangeMiddle,
     isRangeEnd,
     isHighlighted,
+    isHighlightedStart,
+    isHighlightedEnd,
     formatCellName,
     formatFullDate: formatFull,
     collection,

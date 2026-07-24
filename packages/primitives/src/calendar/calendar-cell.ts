@@ -23,6 +23,9 @@ export interface CalendarDayState {
   readonly isRangeEnd: boolean;
   /** Inside the tentative hover-range band while a range selection is in progress (range mode). */
   readonly isHighlighted: boolean;
+  /** The tentative band's endpoints — both true at once when the preview spans a single day. */
+  readonly isHighlightedStart: boolean;
+  readonly isHighlightedEnd: boolean;
   /** The roving cursor is on this cell. */
   readonly isFocused: boolean;
   /** `isDateDisabled` hit — focusable + announced, but not selectable (painted `data-unavailable`). */
@@ -98,6 +101,8 @@ export function createCalendarCell(
   const isRangeMiddle = () => state.isRangeMiddle(date());
   const isRangeEnd = () => state.isRangeEnd(date());
   const isHighlighted = () => state.isHighlighted(date());
+  const isHighlightedStart = () => state.isHighlightedStart(date());
+  const isHighlightedEnd = () => state.isHighlightedEnd(date());
   const isUnavailable = () => state.isDateUnavailable(date());
   // `data-disabled` marks only the truly-inert out-of-range days (dim + no pointer). Unavailable days
   // are painted separately (`data-unavailable`) and stay interactive — React-Aria's isDisabled vs
@@ -114,6 +119,8 @@ export function createCalendarCell(
     isRangeMiddle: isRangeMiddle(),
     isRangeEnd: isRangeEnd(),
     isHighlighted: isHighlighted(),
+    isHighlightedStart: isHighlightedStart(),
+    isHighlightedEnd: isHighlightedEnd(),
     isFocused: isFocused(),
     isUnavailable: isUnavailable(),
     isDisabled: isDisabled(),
@@ -190,6 +197,12 @@ export function createCalendarCell(
     get "data-highlighted"() {
       return isHighlighted() ? "" : undefined;
     },
+    get "data-highlighted-start"() {
+      return isHighlightedStart() ? "" : undefined;
+    },
+    get "data-highlighted-end"() {
+      return isHighlightedEnd() ? "" : undefined;
+    },
   };
 
   // The inner `<button>` — the roving focus target AND the painted element. It carries the view-aware
@@ -235,6 +248,12 @@ export function createCalendarCell(
     },
     get "data-highlighted"() {
       return isHighlighted() ? "" : undefined;
+    },
+    get "data-highlighted-start"() {
+      return isHighlightedStart() ? "" : undefined;
+    },
+    get "data-highlighted-end"() {
+      return isHighlightedEnd() ? "" : undefined;
     },
     get "data-focused"() {
       return isFocused() ? "" : undefined;

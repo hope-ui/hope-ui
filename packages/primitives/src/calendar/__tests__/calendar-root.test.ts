@@ -162,6 +162,50 @@ describe("createCalendar — selection", () => {
     dispose();
   });
 
+  it("range: marks the tentative band's endpoints, in whichever direction it was drawn", () => {
+    const { api, dispose } = setup({ selectionMode: "range" });
+    const anchor = new CalendarDate(2026, 1, 10);
+    flush(() => api.activate(anchor));
+
+    // Hovering forward: the anchor opens the band, the hovered day closes it.
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+    expect(api.isHighlightedStart(anchor)).toBe(true);
+    expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(true);
+    // The interior is in the band but caps neither end.
+    expect(api.isHighlighted(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(api.isHighlightedStart(new CalendarDate(2026, 1, 12))).toBe(false);
+    expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 12))).toBe(false);
+
+    // Hovering backward past the anchor swaps which end each date caps (the range is ordered).
+    flush(() => api.highlightDate(new CalendarDate(2026, 1, 6)));
+    expect(api.isHighlightedStart(new CalendarDate(2026, 1, 6))).toBe(true);
+    expect(api.isHighlightedEnd(anchor)).toBe(true);
+    expect(api.isHighlightedStart(anchor)).toBe(false);
+
+    // Hovering the anchor itself: a one-day band, so it is both endpoints at once.
+    flush(() => api.highlightDate(anchor));
+    expect(api.isHighlightedStart(anchor)).toBe(true);
+    expect(api.isHighlightedEnd(anchor)).toBe(true);
+
+    flush(() => api.highlightDate(null));
+    expect(api.isHighlightedStart(anchor)).toBe(false);
+    expect(api.isHighlightedEnd(anchor)).toBe(false);
+    dispose();
+  });
+
+  it("single/multiple: never report a tentative band endpoint", () => {
+    for (const selectionMode of ["single", "multiple"] as const) {
+      const { api, dispose } = setup({ selectionMode });
+      const date = new CalendarDate(2026, 1, 10);
+      flush(() => api.activate(date));
+      flush(() => api.highlightDate(new CalendarDate(2026, 1, 14)));
+      expect(api.highlightedRange()).toBeNull();
+      expect(api.isHighlightedStart(date)).toBe(false);
+      expect(api.isHighlightedEnd(new CalendarDate(2026, 1, 14))).toBe(false);
+      dispose();
+    }
+  });
+
   it("multiple: toggles a sorted set", () => {
     const { api, dispose } = setup({ selectionMode: "multiple" });
     flush(() => api.activate(new CalendarDate(2026, 1, 20)));

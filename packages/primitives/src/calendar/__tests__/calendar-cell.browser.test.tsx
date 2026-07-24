@@ -123,6 +123,30 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
+  it("caps the tentative band with data-highlighted-start/end while hovering mid-selection", async () => {
+    const { container, state, dispose } = await mountCalendar({ selectionMode: "range" });
+    dayButton(container, "2026-01-10").click(); // anchor
+    await vi.waitFor(() => expect(state.anchorDate()?.toString()).toBe("2026-01-10"));
+
+    dayButton(container, "2026-01-14").dispatchEvent(new MouseEvent("mouseenter"));
+
+    const cellOf = (iso: string) => dayButton(container, iso).closest("td") as HTMLElement;
+    await vi.waitFor(() =>
+      expect(cellOf("2026-01-14").getAttribute("data-highlighted-end")).toBe(""),
+    );
+    // The anchor opens the band; the hovered day closes it. Both hooks reach the <td> (where the band
+    // is painted) and the button (where a recipe may cap the trigger).
+    expect(cellOf("2026-01-10").getAttribute("data-highlighted-start")).toBe("");
+    expect(dayButton(container, "2026-01-10").getAttribute("data-highlighted-start")).toBe("");
+    expect(dayButton(container, "2026-01-14").getAttribute("data-highlighted-end")).toBe("");
+    // The interior is in the band but caps neither end.
+    const midCell = cellOf("2026-01-12");
+    expect(midCell.getAttribute("data-highlighted")).toBe("");
+    expect(midCell.getAttribute("data-highlighted-start")).toBeNull();
+    expect(midCell.getAttribute("data-highlighted-end")).toBeNull();
+    dispose();
+  });
+
   it("gives the focused date the roving tab stop and the rest tabindex -1", async () => {
     const { container, dispose } = await mountCalendar();
     expect(dayButton(container, "2026-01-15").getAttribute("tabindex")).toBe("0");

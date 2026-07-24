@@ -77,6 +77,12 @@
 /* Shared "actively highlighted" hook: the calendar's tentative hover-range band (Calendar) AND the
  * active/highlighted item in a listbox/menu/select (Collection, forthcoming). */
 @custom-variant data-highlighted (&:where([data-highlighted]:not([data-highlighted="false"]), [data-state="highlighted"]));
+/* The endpoints of that tentative band, so a recipe can cap the preview the way it caps the committed
+ * range. Zero added specificity like every variant here, so a rule that must beat a plain
+ * `data-highlighted:` utility is written as an attribute-arbitrary variant instead — see the `cell`
+ * slot in hope's calendar recipe. */
+@custom-variant data-highlighted-start (&:where([data-highlighted-start]:not([data-highlighted-start="false"]), [data-state="highlighted-start"]));
+@custom-variant data-highlighted-end (&:where([data-highlighted-end]:not([data-highlighted-end="false"]), [data-state="highlighted-end"]));
 
 /* Collection (createCollection / list + grid navigation) */
 @custom-variant data-first (&:where([data-first]:not([data-first="false"]), [data-state="first"]));

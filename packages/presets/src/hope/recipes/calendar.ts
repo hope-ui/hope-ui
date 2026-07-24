@@ -68,6 +68,14 @@ export const calendarRecipe = tv({
 
       "data-highlighted:bg-selected data-highlighted:rounded-none",
       "data-highlighted:first:rounded-s-md data-highlighted:last:rounded-e-md",
+      // The tentative band's own end caps, so a range-in-progress closes like the committed one (the
+      // interior stays square from the rule above). Written as attribute-arbitrary variants for the
+      // specificity bump: a registered `data-highlighted-start:` is `:where()`-wrapped — zero added
+      // specificity — and would TIE with `data-highlighted:rounded-none`, leaving the winner to emit
+      // order. Purely additive, so a one-day preview (start AND end on one cell) rounds both sides
+      // with no repair rule, unlike the committed band's `[&[data-range-start][data-range-end]]`.
+      "[&[data-highlighted-start]]:rounded-s-md",
+      "[&[data-highlighted-end]]:rounded-e-md",
     ],
     // The roving day `<button>`, `z-10` above the cell band. Fills its column (`h-(--cell-size) w-full`);
     // the reserved transparent border is colored on focus. The roving ring is driven by the primitive's

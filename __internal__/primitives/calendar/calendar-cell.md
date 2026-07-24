@@ -36,21 +36,28 @@ is the render seam for a custom cell body (the same flags the default cell deriv
 
 ## Attributes
 
-- `<td>`: `role="gridcell"` and `aria-selected` — the ARIA grid-cell semantics only. **No `data-*`
-  paint hooks live here.**
+- `<td>`: `role="gridcell"` and `aria-selected` — the ARIA grid-cell semantics — **plus the
+  band-level hooks only**: `data-range-{start,middle,end}`, `data-highlighted` (the tentative
+  hover-range band) and its endpoints `data-highlighted-{start,end}`. The per-day hooks
+  (`data-selected`, `data-today`, …) deliberately stay off it.
 - `<button>`: the view-aware `aria-label` (with Today / selected / range-start / range-end / unavailable
   suffixes), `aria-disabled` for unavailable days, `tabindex` — `0` on the focused cell, `-1` elsewhere
   (the tab stop derives from `isFocused`, a date comparison, so it is correct on the server too,
   independent of the client-only collection) — **and every `data-*` day-state paint hook**: `data-today`,
   `data-outside-month`, `data-unavailable` (the `isDateDisabled` predicate hit — struck through, still
   interactive), `data-disabled` (a whole out-of-range period — inert + dimmed), `data-selected`,
-  `data-range-{start,middle,end}`, `data-highlighted` (the tentative hover-range band), `data-focused`
+  `data-range-{start,middle,end}`, `data-highlighted`, `data-highlighted-{start,end}`, `data-focused`
   (present-when-true).
 
-The paint hooks live on the **button**, not the `<td>`, on purpose: a styled recipe paints the day on
-the button (`cellTrigger`), and the registered day-state custom variants in `@hope-ui/presets`
-`_base/_variants.css` are **self-based** (`&:where([data-today])`) — a hook on the `<td>` would never
-fire a `data-today:` utility on its child button. Names match that canonical variant list.
+The split is what lets one range read as one shape: the registered day-state custom variants in
+`@hope-ui/presets` `_base/_variants.css` are **self-based** (`&:where([data-today])`), so a hook fires
+utilities only on the element carrying it. The `<td>` (`cell` slot) paints the continuous band that
+spans cells — hence the range/highlight hooks are mirrored there — while the `<button>` (`cellTrigger`)
+paints the solid endpoint pills and per-day marks on top of it. Names match that canonical variant list.
+
+`data-highlighted-start` / `data-highlighted-end` mark the tentative band's two ends (both land on the
+same date when the preview is one day, i.e. hovering the anchor), so a recipe can cap the preview the
+way it caps the committed range instead of leaving it squared off mid-drag.
 
 `data-unavailable` and `data-disabled` are **distinct** (React-Aria's `isUnavailable` vs `isDisabled`
 split), never both on one day: an unavailable day is focusable + announced (aria-disabled) but stays

@@ -129,6 +129,11 @@ describe("hope calendar recipe", () => {
     // mirroring the middle-cell row-wrap rounding, which otherwise only fires on interior cells.
     expect(cell).toContain("data-range-start:last:rounded-e-md");
     expect(cell).toContain("data-range-end:first:rounded-s-md");
+    // The tentative band gets the same caps from its own endpoint hooks. Attribute-arbitrary (not the
+    // registered `data-highlighted-start:` variant, which is zero-specificity and would tie with
+    // `data-highlighted:rounded-none`), and additive — a one-day preview carries both and rounds fully.
+    expect(cell).toContain("[&[data-highlighted-start]]:rounded-s-md");
+    expect(cell).toContain("[&[data-highlighted-end]]:rounded-e-md");
     // Logical sides only (`-s-`/`-e-`), never physical, so RTL mirrors for free.
     expect(cell).not.toMatch(/rounded-(?:tl|tr|bl|br|l|r)-/);
     // The pill on top stays uniformly rounded — the band, not the trigger, carries the range shape.
