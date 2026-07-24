@@ -62,6 +62,10 @@ import { CloseButton } from "@hope-ui/components/close-button";
 <CloseButton />;
 ```
 
+This holds under server side rendering too — detection is hydration-aware, not merely eager. See
+[Server side rendering](/get-started/i18n#server-side-rendering) for what that means and when to pass
+an explicit `locale` anyway.
+
 hope-ui ships built-in catalogs for these locales; any other locale falls back to English per key:
 
 <DataTable
@@ -112,22 +116,65 @@ const [locale, setLocale] = createSignal("en-US");
 Omit `locale` entirely and the provider tracks the browser/system language, updating live if it
 changes.
 
+## Server side rendering
+
+A server has no `navigator`, so it can only render `en-US`. The browser that picks that markup up may
+well be `fr-FR` — and hydration **reuses** the server's DOM rather than re-deriving it. So a component
+that reported its own locale mid-hydration would leave markup contradicting its own state, with no
+warning and no replaced node: a Sunday-first grid driven by a Monday-first model, where clicking *20*
+selects the 21st.
+
+hope-ui closes that by gating detection on the hydration pass. While one is in flight, every
+component reports `en-US`/`ltr` — matching the markup it is hydrating — and the moment the pass ends,
+the real locale takes over and locale-derived text re-renders. **This applies with or without a
+provider**, so zero configuration is safe under server side rendering.
+
+A client-only app pays nothing for the gate: with no hydration pass, the very first read is already
+the visitor's locale, and nothing re-renders.
+
 <Alert.Root
   variant="soft"
-  colorScheme="primary"
+  colorScheme="info"
   class="not-prose"
   icon={<CupSodaIcon />}
-  title={<strong>SSR-safe by design</strong>}
+  title={<strong>Prefer an explicit locale when you can name it</strong>}
   description={
     <span>
-      Under server rendering, <code>I18nProvider</code> emits <code>en-US</code>
-      /<code>ltr</code> on the server and the first client render, then adopts
-      the detected locale after hydration settles — so locale-derived text never
-      causes a hydration mismatch. For SSR, always mount a provider (or pass an
-      explicit <code>locale</code>) rather than relying on the eager no-provider
-      default.
+      Detection still costs one re-render just after hydration. Passing{" "}
+      <code>locale</code> skips detection entirely — server and client render the
+      same thing and nothing swaps. It's the better default whenever the locale
+      is something your app decides (a route segment, a user setting, a
+      single-language site), and it matters most for date-heavy UI like{" "}
+      <a href="/components/calendar">Calendar</a>, where that re-render rebuilds
+      a whole grid.
     </span>
   }
+/>
+
+Which form to use:
+
+<DataTable
+  columns={[
+    { key: "form", label: "Form", code: true },
+    { key: "verdict", label: "Under SSR" },
+  ]}
+  rows={[
+    {
+      form: '<I18nProvider locale="fr-FR">',
+      verdict:
+        "Best. Fully deterministic — server and client render the same locale, no post-hydration re-render. Use it whenever the locale is something you decide rather than detect.",
+    },
+    {
+      form: "<I18nProvider>",
+      verdict:
+        "Safe. Renders en-US through hydration, then re-renders in the visitor's locale. Use it to scope messages or a translate override while still following the browser.",
+    },
+    {
+      form: "no provider",
+      verdict:
+        "Safe, and identical to the row above — the same gate backs the zero-config default. Mount a provider to choose a locale, not to make one correct.",
+    },
+  ]}
 />
 
 ## Reading direction
@@ -224,7 +271,7 @@ anything you don't provide falls through to the guaranteed English floor.
       prop: "useLocale()",
       type: "{ locale, direction, t }",
       description:
-        "Read the current locale + direction accessors and the reactive t(key, …params) message resolver from any descendant.",
+        "Read the current locale + direction accessors and the reactive t(key, …params) message resolver. Works with no provider mounted — it falls back to the detected browser locale and the built-in catalog.",
     },
   ]}
 />

@@ -1,4 +1,6 @@
 import ssrFixture from "virtual:hydration-fixture?id=calendar";
+import detectedLocaleFixture from "virtual:hydration-fixture?id=calendar-detected-locale";
+import noProviderFixture from "virtual:hydration-fixture?id=calendar-no-provider";
 import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
@@ -12,8 +14,11 @@ import { Calendar } from "../index";
 // `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
 // inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
 // committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
-// there is no second hand-kept-identical copy to drift.
+// there is no second hand-kept-identical copy to drift. The two `*LocaleTree`s are the same tree with
+// only the locale plumbing varied — see "Calendar locale hydration" at the bottom of this file.
 import { Tree } from "./calendar.ssr-entry";
+import { Tree as DetectedLocaleTree } from "./calendar-detected-locale.ssr-entry";
+import { Tree as NoProviderTree } from "./calendar-no-provider.ssr-entry";
 
 // Queries are scoped to the mount's own container (the calendar renders 35+ buttons, so a
 // document-wide `page.getByRole` with its default substring name-match is hopelessly ambiguous).
@@ -477,5 +482,118 @@ describe("Calendar hydration", () => {
 
     await expectNoA11yViolations(container);
     dispose();
+  });
+
+  it("moves the single selection off the server-painted defaultValue on the first click", async () => {
+    // `Tree` ships `defaultValue` Jan 10, so the *server* HTML already carries `data-selected` +
+    // `aria-selected` on that day. Selecting another day in single mode must move the paint, not add a
+    // second one: a hydrated attribute the client never re-derives would leave Jan 10 lit alongside
+    // Jan 20 — visually two selected days for one selection.
+    const { container, dispose } = hydrateFixture(ssrFixture, () => <Tree />);
+
+    expect(dayButton(container, "Friday, January 10, 2020").hasAttribute("data-selected")).toBe(
+      true,
+    );
+
+    dayButton(container, "Monday, January 20, 2020").click();
+    await vi.waitFor(() =>
+      expect(dayButton(container, "Monday, January 20, 2020").hasAttribute("data-selected")).toBe(
+        true,
+      ),
+    );
+
+    const painted = [...container.querySelectorAll("button[data-selected]")].map((button) =>
+      button.getAttribute("aria-label"),
+    );
+    expect(painted).toEqual(["Monday, January 20, 2020, selected"]);
+
+    const announced = [...container.querySelectorAll('td[aria-selected="true"]')].map((cell) =>
+      cell.querySelector("button")?.getAttribute("aria-label"),
+    );
+    expect(announced).toEqual(["Monday, January 20, 2020, selected"]);
+
+    dispose();
+  });
+});
+
+describe("Calendar locale hydration", () => {
+  // The round-trip above pins `locale="en-US"` on both halves, so it never exercises the case a real
+  // deployment hits constantly: a prerendered page (no `navigator` → `en-US`) opened by a visitor whose
+  // browser is something else. A Monday-first locale shifts the whole month grid by a day — and January
+  // 2020 spans 35 cells under *either* first-day-of-week, so a client that rendered its own locale
+  // during hydration would reuse every node, warn about nothing, and leave the markup silently
+  // disagreeing with the model about what each cell is. It regressed exactly that way once: clicking
+  // "20" selected the 21st and `defaultValue`'s cell stayed painted beside it.
+  //
+  // `readDetectedLocale`'s hydration gate is what prevents it. Both entries render the same calendar
+  // and differ only in locale plumbing — zero-config vs a provider with no `locale` prop — so the pair
+  // proves the gate covers both, rather than proving something about the calendar.
+  const withBrowserLocale = async (locale: string, body: () => Promise<void>) => {
+    const languageDescriptor = Object.getOwnPropertyDescriptor(
+      Navigator.prototype,
+      "language",
+    ) as PropertyDescriptor;
+    Object.defineProperty(navigator, "language", { value: locale, configurable: true });
+    // The detected locale is read once into a `Symbol.for` registry, so the stub only takes effect
+    // once that slot is cleared — and the slot must be cleared again afterwards, since it now holds a
+    // signal seeded from the stubbed value.
+    const registryKey = Symbol.for("@hope-ui/i18n:locale-registry");
+    const globalScope = globalThis as Record<symbol, unknown>;
+    delete globalScope[registryKey];
+
+    try {
+      await body();
+    } finally {
+      Object.defineProperty(navigator, "language", languageDescriptor);
+      delete globalScope[registryKey];
+    }
+  };
+
+  const painted = (container: HTMLElement) => [
+    ...container.querySelectorAll("button[data-selected]"),
+  ];
+
+  // Hydration adopts the visitor's locale by *replacing* every locale-derived node, so the strict
+  // node-identity assertion can't apply; console silence and element count still do, and they are what
+  // separates this deliberate re-render from a silent client-render fallback.
+  const expectLocalizedRoundTrip = async (
+    serverHtml: string,
+    ui: () => JSX.Element,
+  ): Promise<void> => {
+    const { container, dispose } = hydrateFixture(serverHtml, ui, { expectNodeReuse: false });
+    try {
+      // The gate opens on the first microtask after the hydration pass ends, so the localized
+      // re-render lands a tick later — still before paint, but not synchronously with `hydrate()`.
+      // The server's `en-US` markup (Sunday-first, English) becomes Monday-first and French, with
+      // markup and model agreeing.
+      await vi.waitFor(() =>
+        expect(container.querySelector("thead")?.textContent).toBe("lun.mar.mer.jeu.ven.sam.dim."),
+      );
+      expect(heading(container).textContent).toBe("janvier 2020");
+      expect(painted(container).map((day) => day.getAttribute("aria-label"))).toEqual([
+        "vendredi 10 janvier 2020, sélectionné",
+      ]);
+
+      // And selecting moves the paint to exactly the day that was clicked — no ghost left behind,
+      // which is the regression this pair exists to catch.
+      const clicked = dayButton(container, "lundi 20 janvier 2020");
+      clicked.click();
+      await vi.waitFor(() => expect(clicked.hasAttribute("data-selected")).toBe(true));
+      expect(painted(container)).toEqual([clicked]);
+    } finally {
+      dispose();
+    }
+  };
+
+  it("localizes the whole grid through hydration with no I18nProvider mounted", async () => {
+    await withBrowserLocale("fr-FR", () =>
+      expectLocalizedRoundTrip(noProviderFixture, () => <NoProviderTree />),
+    );
+  });
+
+  it("localizes the whole grid through hydration with an I18nProvider and no locale prop", async () => {
+    await withBrowserLocale("fr-FR", () =>
+      expectLocalizedRoundTrip(detectedLocaleFixture, () => <DetectedLocaleTree />),
+    );
   });
 });

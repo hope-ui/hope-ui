@@ -6,6 +6,19 @@ export interface HydratedComponent {
   dispose: () => void;
 }
 
+export interface HydrateFixtureOptions {
+  /**
+   * Whether every server node must survive as the **same object** (default `true`).
+   *
+   * Set `false` only for a tree that legitimately re-renders part of itself the instant hydration
+   * settles, where node replacement is the feature under test rather than a fallback. The one case
+   * today is `I18nProvider` with no `locale`: it deliberately renders the server's `en-US` and then
+   * adopts the visitor's locale, which rebuilds every locale-derived node. The console-silence and
+   * element-count checks still run — they are what still separates a re-render from a fallback.
+   */
+  expectNodeReuse?: boolean;
+}
+
 interface HydrationGlobals {
   _$HY?: unknown;
 }
@@ -75,7 +88,11 @@ function recordConsole(): { restore: () => string[] } {
  * the client hydrate build; there is no server render here (the client build's
  * `renderToStringAsync` returns `undefined`), which is why `serverHtml` is passed in.
  */
-export function hydrateFixture(serverHtml: string, ui: () => JSX.Element): HydratedComponent {
+export function hydrateFixture(
+  serverHtml: string,
+  ui: () => JSX.Element,
+  options: HydrateFixtureOptions = {},
+): HydratedComponent {
   const teardownHydration = bootstrapHydration();
 
   const container = document.createElement("div");
@@ -119,7 +136,7 @@ export function hydrateFixture(serverHtml: string, ui: () => JSX.Element): Hydra
         "client render duplicates or drops nodes instead of reusing the server's.",
     );
   }
-  for (let index = 0; index < before.length; index++) {
+  for (let index = 0; options.expectNodeReuse !== false && index < before.length; index++) {
     const serverNode = before[index];
     if (after[index] !== serverNode) {
       cleanup();

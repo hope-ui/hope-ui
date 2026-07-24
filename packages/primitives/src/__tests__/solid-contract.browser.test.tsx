@@ -1,4 +1,7 @@
-import { applyRef } from "@solidjs/web";
+import { applyRef, hydrate } from "@solidjs/web";
+// `sharedConfig` is re-exported by `@solidjs/web`'s *types* but not by its runtime bundle — importing
+// it from there fails at load. It lives in `solid-js`.
+import { sharedConfig } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 /**
@@ -58,6 +61,40 @@ describe("@solidjs/web client-build contract", () => {
       applyRef(setter, element);
 
       expect(setter).toHaveBeenCalledExactlyOnceWith(element);
+    });
+  });
+
+  describe("sharedConfig.hydrating marks the hydration pass, and only it", () => {
+    // Depended on by: `@hope-ui/i18n`'s `readDetectedLocale`
+    // (packages/i18n/src/default-locale.ts), which reports the server's `en-US` for exactly as long
+    // as this flag is set and the detected browser locale otherwise. That gate is what makes
+    // zero-config i18n SSR-safe *without* costing a client-only app the en-US first paint — so if
+    // this flag is renamed (1.x spelled it `sharedConfig.context`) or stops covering component
+    // bodies, the locale silently disagrees with the server's markup again.
+
+    it("is falsy outside any hydration", () => {
+      expect(sharedConfig.hydrating).toBeFalsy();
+    });
+
+    it("is set while a component body runs during hydrate(), and cleared after", () => {
+      const globals = globalThis as { _$HY?: unknown };
+      globals._$HY = { events: [], completed: new WeakSet(), r: {} };
+      const container = document.createElement("div");
+      container.innerHTML = "<span>hi</span>";
+      document.body.appendChild(container);
+
+      let duringComponentBody: unknown;
+      const dispose = hydrate(() => {
+        duringComponentBody = sharedConfig.hydrating;
+        return <span>hi</span>;
+      }, container);
+
+      expect(duringComponentBody).toBeTruthy();
+      expect(sharedConfig.hydrating).toBeFalsy();
+
+      dispose();
+      container.remove();
+      globals._$HY = undefined;
     });
   });
 });

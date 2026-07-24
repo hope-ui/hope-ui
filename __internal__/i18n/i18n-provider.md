@@ -38,13 +38,17 @@ to a single reactive `locale` prop: the prop is already reactive, so passing a s
 
 ## SSR / hydration
 
-Wrap the app (or subtree) in `<I18nProvider>` for the SSR-safe path: it renders `en-US`/`ltr` on the
-server and during the hydrating client render, then adopts the detected locale after hydration
-settles — so locale-derived visible text never mismatches. See `default-locale.md`.
+Both the provider (with no `locale` prop) and the **no-provider context default** read the same gated
+accessor, `readDetectedLocale` — `en-US`/`ltr` while a hydration pass is in flight, the detected
+locale immediately otherwise. So mounting a provider is how you *choose* a locale, not how you make
+one correct: zero-config is SSR-safe on its own. See `default-locale.md` for the gate and the silent
+mismatch it prevents.
 
-The **no-provider default** reads the browser locale eagerly (per access), which is *not*
-hydration-safe for locale-derived visible text. For SSR, either mount an `I18nProvider` or pass an
-explicit `locale`/`dir` to the component (the calendar accepts both).
+Passing an explicit `locale` bypasses detection entirely, which is the fully deterministic form: the
+server and client render the same locale and nothing re-renders after hydration. Prefer it whenever
+the locale is something the app decides rather than something it detects — most so for date-heavy UI,
+where the post-hydration re-render rebuilds a whole grid. A component may also take the locale
+directly (the calendar accepts `locale`/`dir`).
 
 ## Provenance
 

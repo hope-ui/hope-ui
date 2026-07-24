@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+import { I18nProvider } from "@hope-ui/i18n";
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
@@ -46,11 +47,21 @@ function RootComponent() {
   // Outlet as `children` puts the Outlet in the parent's owner scope, above the
   // provider — so useTheme() in a routed component can't see the context and
   // throws "must be rendered inside a ThemeProvider root". Context flows through
-  // Solid's owner graph, not the DOM tree.
+  // Solid's owner graph, not the DOM tree. I18nProvider is subject to the same
+  // rule, hence both here rather than in RootLayout.
+  //
+  // The explicit `locale` is this site following its own advice (get-started/i18n,
+  // "Server side rendering"): every page is prerendered, and pinning the locale is
+  // the deterministic form — no detection, so nothing re-renders after hydration and a
+  // demo's readout never disagrees with the prose around it. `en-US` matches the
+  // site's English copy and `<html lang>`; demos showcasing other locales nest
+  // their own provider.
   return (
     <RootLayout>
       <ThemeProvider preset={hope}>
-        <Outlet />
+        <I18nProvider locale="en-US">
+          <Outlet />
+        </I18nProvider>
       </ThemeProvider>
     </RootLayout>
   );

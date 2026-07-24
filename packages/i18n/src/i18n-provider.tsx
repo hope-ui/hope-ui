@@ -5,7 +5,7 @@
 
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createContext, useContext } from "solid-js";
-import { createDefaultLocale, getDefaultLocale } from "./default-locale";
+import { createDefaultLocale, readDetectedLocale } from "./default-locale";
 import { type Direction, getReadingDirection } from "./direction";
 import { createTranslate, type I18nMessagesConfig, type TranslateFn } from "./translate";
 
@@ -29,16 +29,16 @@ export interface I18nProviderProps extends I18nMessagesConfig {
 }
 
 /**
- * Context default (no `I18nProvider` mounted): reads the detected browser locale per-access, and
- * resolves messages against the built-in catalog for that locale. This is eager — for the
- * SSR/hydration-safe path (first client paint = server's `en-US`), wrap the tree in `<I18nProvider>`
- * (which defers detection to `onSettled`) or pass an explicit `locale`.
+ * Context default (no `I18nProvider` mounted): the detected browser locale, resolving messages against
+ * the built-in catalog for it. Safe to server-render — `readDetectedLocale` reports the server's
+ * `en-US`/`ltr` for as long as a hydration pass is in flight, then flips — so zero-config works under
+ * SSR as well as on the client. Mount a provider to *choose* the locale, not to make it correct.
  */
 const I18nContext = createContext<I18nContextValue>({
-  locale: () => getDefaultLocale().locale,
-  direction: () => getDefaultLocale().direction,
+  locale: () => readDetectedLocale().locale,
+  direction: () => readDetectedLocale().direction,
   t: createTranslate(
-    () => getDefaultLocale().locale,
+    () => readDetectedLocale().locale,
     () => undefined,
   ),
 });
@@ -46,9 +46,11 @@ const I18nContext = createContext<I18nContextValue>({
 /**
  * Provides the locale + reading direction + message resolver (`t`) to descendant components (calendar,
  * dialog, and any future locale-aware component). With no `locale` prop it tracks the browser locale
- * via `createDefaultLocale` (SSR-safe: `en-US`/`ltr` until hydration settles); with a `locale` prop it
- * derives direction from it. `translate`/`messages` overlay the built-in catalog (see `translate.ts`).
- * In SolidJS 2.0 `createContext` returns the Provider directly.
+ * via `createDefaultLocale` — the same hydration-gated accessor the context default reads, so mounting
+ * a provider without a `locale` changes nothing about correctness; with a `locale` prop it derives
+ * direction from it and detection is bypassed entirely (the fully deterministic form under SSR).
+ * `translate`/`messages` overlay the built-in catalog (see `translate.ts`). In SolidJS 2.0
+ * `createContext` returns the Provider directly.
  */
 export function I18nProvider(props: I18nProviderProps): JSX.Element {
   const defaultLocale = createDefaultLocale();
