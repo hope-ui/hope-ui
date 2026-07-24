@@ -71,8 +71,11 @@ export const Unavailable: Story = {
 };
 
 // The whole calendar off: every cell is inert (`aria-disabled` + `data-disabled`, no tab stop) and
-// both nav buttons are disabled, so the month can't be paged either. Contrast with `ReadOnly` below —
-// a disabled calendar looks unavailable; a read-only one looks normal but refuses to change.
+// both nav buttons are disabled, so the month can't be paged either. It has a `defaultValue`, which
+// deliberately paints nothing: `disabled` makes every cell non-selectable, and React Aria drops
+// non-selectable days out of the selection paint. Contrast with `ReadOnly` below — a disabled
+// calendar looks unavailable; a read-only one looks normal, keeps showing its value, and refuses to
+// change it.
 export const Disabled: Story = {
   render: () => <CalendarDemo defaultFocusedValue={june} defaultValue={june} disabled />,
 };

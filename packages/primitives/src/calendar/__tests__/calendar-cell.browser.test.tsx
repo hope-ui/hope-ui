@@ -192,6 +192,48 @@ describe("createCalendarCell", () => {
     dispose();
   });
 
+  it("drops the non-selectable days inside a committed range out of the paint", async () => {
+    // A range committed while it was legal, then narrowed by `max` and holed by `isDateDisabled` —
+    // the audit's own scenario. The band must break around both, rather than claiming a selection the
+    // matching click would refuse.
+    const { container, dispose } = await mountCalendar({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2026, 1, 10), end: new CalendarDate(2026, 1, 20) },
+      max: new CalendarDate(2026, 1, 18),
+      isDateDisabled: (date) => date.day === 15,
+    });
+    const paintOf = (iso: string) => {
+      const button = dayButton(container, iso);
+      const cell = button.closest("td") as HTMLElement;
+      return {
+        ariaSelected: cell.getAttribute("aria-selected"),
+        rangeMiddle: cell.getAttribute("data-range-middle"),
+        selected: button.getAttribute("data-selected"),
+      };
+    };
+
+    expect(paintOf("2026-01-12")).toEqual({ ariaSelected: "true", rangeMiddle: "", selected: "" });
+    // Unavailable: struck through, never selected.
+    expect(paintOf("2026-01-15")).toEqual({
+      ariaSelected: null,
+      rangeMiddle: null,
+      selected: null,
+    });
+    expect(dayButton(container, "2026-01-15").getAttribute("data-unavailable")).toBe("");
+    // Past `max`: inert, and so is the range's own end.
+    expect(paintOf("2026-01-20")).toEqual({
+      ariaSelected: null,
+      rangeMiddle: null,
+      selected: null,
+    });
+    expect(dayButton(container, "2026-01-20").closest("td")?.getAttribute("data-range-end")).toBe(
+      null,
+    );
+    // The `aria-label` follows the paint — no "selected" suffix on a day that is not.
+    expect(dayButton(container, "2026-01-15").getAttribute("aria-label")).not.toContain("selected");
+    dispose();
+  });
+
   it("gives the focused date the roving tab stop and the rest tabindex -1", async () => {
     const { container, dispose } = await mountCalendar();
     expect(dayButton(container, "2026-01-15").getAttribute("tabindex")).toBe("0");

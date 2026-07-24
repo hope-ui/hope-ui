@@ -176,6 +176,29 @@ one: fully pageable, fully tabbable, and reporting nothing to assistive technolo
 range **completion** (not the in-progress anchor). This is why the value pair is not wired straight
 through `createControllableState`'s `onChange`.
 
+### The paint excludes days the calendar cannot select
+
+`isSelected` / `isRangeStart` / `isRangeMiddle` / `isRangeEnd` are each gated on
+`!isCellDisabled(date) && !isDateUnavailable(date)` before the strategy is consulted — React Aria's
+own gate (`useCalendarState`'s `isSelected` returns false for either). The committed **value** is
+never touched; only the paint is. So a range committed while it was legal and later narrowed — by a
+`max` that moved, or by an `isDateDisabled` day inside it — renders with those days **cut out of the
+band** rather than claiming a selection the matching click would refuse, and `aria-selected` never
+announces one.
+
+Three boundaries are deliberate:
+
+- **The guard lives in `createCalendar`, not in the strategies.** `singleSelection` /
+  `rangeSelection` / `multipleSelection` stay pure, mode-only and day-based: they know nothing of
+  `min`/`max`, `disabled` or availability, and their unit tests assert the raw set membership.
+- **It reads `isCellDisabled`, not `isDateNonFocusable`.** The outside-scope filler days keep their
+  paint, so a range straddling a month boundary still renders as one continuous band on both sides.
+  (React Aria folds the visible range into its own `isCellDisabled`, but it renders no filler cells at
+  all, so it has no band to keep continuous.)
+- **`readOnly` does not affect the paint; `disabled` does.** Read-only refuses *changes*, so the
+  current value stays fully visible. `disabled` is the first arm of `isCellDisabled`, so — matching
+  React Aria — a wholly disabled calendar paints no selection at all.
+
 ## SSR / hydration
 
 - The month grid is **variable 4–6 weeks**, so its row count depends on `visibleMonth`. `visibleMonth`

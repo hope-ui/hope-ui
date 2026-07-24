@@ -75,6 +75,13 @@ same date when the preview is one day — on the anchor the moment it is set, an
 cursor returns to it), so a recipe can cap the preview the way it caps the committed range instead of
 leaving it squared off mid-drag.
 
+The selection hooks — `aria-selected`, `data-selected`, `data-range-{start,middle,end}` and the
+`aria-label`'s "selected" / range-endpoint suffixes — are **absent on a day the calendar cannot
+select**, because `createCalendar` gates all four predicates on `!isCellDisabled && !isDateUnavailable`
+(see `calendar-root.md`). An unavailable or out-of-range day inside a committed range therefore reads
+`data-unavailable` / `data-disabled` alone, and the band visibly breaks around it. The outside-month
+filler days are *not* gated out, so a range crossing the month boundary still paints as one band.
+
 `data-unavailable` and `data-disabled` are **distinct** (React-Aria's `isUnavailable` vs `isDisabled`
 split), never both on one day: an unavailable day is focusable + announced (aria-disabled) but stays
 pointer-interactive; an out-of-range or whole-calendar-disabled day is fully inert. So a recipe can

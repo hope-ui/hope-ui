@@ -331,6 +331,67 @@ describe("createCalendar — selection", () => {
   });
 });
 
+describe("createCalendar — the selection paint", () => {
+  const committedRange = {
+    selectionMode: "range" as const,
+    defaultValue: { start: new CalendarDate(2026, 1, 10), end: new CalendarDate(2026, 1, 20) },
+  };
+
+  it("cuts an unavailable day out of a committed range", () => {
+    const { api, dispose } = setup({ ...committedRange, isDateDisabled: (d) => d.day === 15 });
+    // The interior paints as it always did…
+    expect(api.isSelected(new CalendarDate(2026, 1, 12))).toBe(true);
+    expect(api.isRangeMiddle(new CalendarDate(2026, 1, 12))).toBe(true);
+    // …but the unavailable day is not selectable, so it must not read as selected either.
+    expect(api.isSelected(new CalendarDate(2026, 1, 15))).toBe(false);
+    expect(api.isRangeMiddle(new CalendarDate(2026, 1, 15))).toBe(false);
+    dispose();
+  });
+
+  it("cuts an out-of-range day — and the endpoint beyond it — out of a committed range", () => {
+    // `max` narrowed after the range was committed: everything past it is inert, so nothing past it
+    // may paint, including the range's own end.
+    const { api, dispose } = setup({ ...committedRange, max: new CalendarDate(2026, 1, 18) });
+    expect(api.isRangeStart(new CalendarDate(2026, 1, 10))).toBe(true);
+    expect(api.isSelected(new CalendarDate(2026, 1, 18))).toBe(true);
+    expect(api.isSelected(new CalendarDate(2026, 1, 19))).toBe(false);
+    expect(api.isSelected(new CalendarDate(2026, 1, 20))).toBe(false);
+    expect(api.isRangeEnd(new CalendarDate(2026, 1, 20))).toBe(false);
+    dispose();
+  });
+
+  it("keeps the band continuous across the month boundary", () => {
+    // The outside-scope filler days are non-focusable but not `isCellDisabled`, so they stay painted —
+    // otherwise a range straddling two months would render with a hole at the seam.
+    const { api, dispose } = setup({
+      selectionMode: "range",
+      defaultValue: { start: new CalendarDate(2025, 12, 28), end: new CalendarDate(2026, 1, 5) },
+    });
+    const dec30 = new CalendarDate(2025, 12, 30);
+    expect(api.isOutsideVisibleScope(dec30)).toBe(true);
+    expect(api.isSelected(dec30)).toBe(true);
+    expect(api.isRangeMiddle(dec30)).toBe(true);
+    dispose();
+  });
+
+  it("keeps a read-only calendar's selection visible", () => {
+    // `readOnly` refuses *changes*; it does not make the current value non-selectable, so — unlike
+    // `disabled` — it leaves the paint alone.
+    const { api, dispose } = setup({ readOnly: true, defaultValue: new CalendarDate(2026, 1, 20) });
+    expect(api.isSelected(new CalendarDate(2026, 1, 20))).toBe(true);
+    dispose();
+  });
+
+  it("paints nothing when the whole calendar is disabled", () => {
+    // React Aria parity: `disabled` is the first arm of `isCellDisabled`, and `isSelected` is false
+    // for every cell-disabled day — a disabled calendar shows no selection at all.
+    const { api, dispose } = setup({ disabled: true, defaultValue: new CalendarDate(2026, 1, 20) });
+    expect(api.selectionValue()).not.toBeNull(); // the value itself is untouched
+    expect(api.isSelected(new CalendarDate(2026, 1, 20))).toBe(false);
+    dispose();
+  });
+});
+
 describe("createCalendar — native form", () => {
   it("exposes name/form/required accessors, defaulting required to false", () => {
     const { api, dispose } = setup();

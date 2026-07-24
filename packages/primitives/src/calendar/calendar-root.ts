@@ -193,6 +193,9 @@ export interface CreateCalendarReturn {
   isDateSelectable: (date: CalendarDate) => boolean;
   isToday: (date: CalendarDate) => boolean;
   isFocused: (date: CalendarDate) => boolean;
+  /** Part of the committed selection **and** paintable: a day the calendar makes inert
+   * (`isCellDisabled`) or marks unavailable is excluded, as React Aria's `isSelected` is. The three
+   * `isRange*` below carry the same guard. */
   isSelected: (date: CalendarDate) => boolean;
   isRangeStart: (date: CalendarDate) => boolean;
   isRangeMiddle: (date: CalendarDate) => boolean;
@@ -426,10 +429,28 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
   const isFocused = (date: CalendarDate) => isSameDay(date, focusedDate());
 
-  const isSelected = (date: CalendarDate) => strategy().isSelected(selectionState(), date);
-  const isRangeStart = (date: CalendarDate) => strategy().isRangeStart(selectionState(), date);
-  const isRangeMiddle = (date: CalendarDate) => strategy().isRangeMiddle(selectionState(), date);
-  const isRangeEnd = (date: CalendarDate) => strategy().isRangeEnd(selectionState(), date);
+  // React Aria's gate on the whole selection paint (`useCalendarState`'s `isSelected` returns false
+  // when `isCellDisabled(date) || isCellUnavailable(date)`): a day this calendar cannot select must
+  // never *look* selected. Otherwise a range committed before `max` narrowed — or one spanning an
+  // `isDateDisabled` day — paints a band the click refuses to reproduce, and `aria-selected` claims a
+  // value that is not one. Such a day is simply cut out of the band.
+  //
+  // Two deliberate boundaries:
+  // - It lives here, not in the strategies: those stay pure, mode-only and day-based, with no notion
+  //   of the calendar's bounds or availability.
+  // - It reads `isCellDisabled`, **not** `isDateNonFocusable` — the outside-scope filler days keep
+  //   their paint, so a range crossing a month boundary still renders as one continuous band on both
+  //   sides. (React Aria folds the visible range into its own `isCellDisabled`, but it renders no
+  //   filler days at all, so it has no band to keep continuous.)
+  const paintsSelection = (date: CalendarDate) => !isCellDisabled(date) && !isDateUnavailable(date);
+  const isSelected = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isSelected(selectionState(), date);
+  const isRangeStart = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isRangeStart(selectionState(), date);
+  const isRangeMiddle = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isRangeMiddle(selectionState(), date);
+  const isRangeEnd = (date: CalendarDate) =>
+    paintsSelection(date) && strategy().isRangeEnd(selectionState(), date);
   // The tentative range while mid-selection: anchor → the roving cursor, exactly as React Aria derives
   // it (`useRangeCalendarState`). Deriving it from the *cursor* rather than a separate hover signal is
   // what makes hover and keyboard one code path — hover moves the cursor (`highlightDate`), so the band
