@@ -1,6 +1,6 @@
 import { Listbox } from "@hope-ui/components/listbox";
 import { For } from "solid-js";
-import { FRUITS, FruitItem, itemToLabel, itemToValue, PANEL } from "./data";
+import { FRUITS, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Both focus modes side by side. **Roving** (default) moves real DOM focus onto the active option
 // and makes it the single tab stop. **Activedescendant** keeps DOM focus on the listbox container
@@ -13,7 +13,6 @@ export function ListboxFocusModesDemo() {
         <span class="text-xs font-medium text-foreground-muted">roving</span>
         <Listbox.Root
           aria-label="Roving listbox"
-          class={PANEL}
           focusMode="roving"
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}
@@ -25,7 +24,6 @@ export function ListboxFocusModesDemo() {
         <span class="text-xs font-medium text-foreground-muted">activedescendant</span>
         <Listbox.Root
           aria-label="Activedescendant listbox"
-          class={PANEL}
           focusMode="activedescendant"
           itemToValue={itemToValue}
           itemToLabel={itemToLabel}

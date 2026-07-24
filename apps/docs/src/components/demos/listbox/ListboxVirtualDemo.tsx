@@ -1,6 +1,6 @@
 import { Listbox } from "@hope-ui/components/listbox";
 import { type Accessor, createSignal } from "solid-js";
-import { type Fruit, itemToLabel, itemToValue, PANEL } from "./data";
+import { type Fruit, itemToLabel, itemToValue } from "./data";
 
 // **Virtualization** — pass `items` (the full array) + `estimateSize`, and give `Listbox.Root` a
 // render-prop child `(item, index) => <Listbox.Item index={index}>…`. The list element becomes the
@@ -15,9 +15,9 @@ const ITEMS: Fruit[] = Array.from({ length: 10_000 }, (_, index) => ({
   name: `Item ${index}`,
 }));
 
-// A fixed height + width turns the chrome-free list into a scrolling viewport; rows are 32px,
-// matching `estimateSize`.
-const VIRTUAL_PANEL = `${PANEL} h-72 w-56`;
+// A fixed height + width turns the list into a scrolling viewport; rows are 32px, matching
+// `estimateSize`. Pure sizing — no container chrome, since the recipe's root paints none.
+const VIEWPORT = "h-72 w-56";
 
 export function ListboxVirtualDemo() {
   const [value, setValue] = createSignal<Fruit[]>([ITEMS[42]]);
@@ -25,7 +25,7 @@ export function ListboxVirtualDemo() {
   return (
     <Listbox.Root
       aria-label="Ten thousand rows"
-      class={VIRTUAL_PANEL}
+      class={VIEWPORT}
       items={ITEMS}
       estimateSize={() => 32}
       itemToValue={itemToValue}

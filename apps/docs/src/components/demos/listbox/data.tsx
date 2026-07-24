@@ -22,12 +22,6 @@ export const FRUITS: Fruit[] = [
 export const itemToValue = (fruit: Fruit) => String(fruit.id);
 export const itemToLabel = (fruit: Fruit) => fruit.name;
 
-// The elevated-surface look a floating consumer (a Select / popover, or the future Combobox) layers
-// on the standalone list. The recipe's `root` slot is deliberately chrome-free — a standalone list
-// sits in the page flow — so the demos add the panel (border, overlay background, shadow, rounded
-// corners, padding) themselves, exactly as the Storybook stories do.
-export const PANEL = "rounded-lg border border-subtle bg-surface-overlay shadow-md p-1";
-
 // One option row: the check `ItemIndicator` (painted only while the row is selected) plus its label.
 export function FruitItem(props: { fruit: Fruit }): JSX.Element {
   return (

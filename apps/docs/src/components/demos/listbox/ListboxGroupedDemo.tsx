@@ -1,6 +1,6 @@
 import { Listbox } from "@hope-ui/components/listbox";
 import { createSignal, For } from "solid-js";
-import { type Fruit, FruitItem, itemToLabel, itemToValue, PANEL } from "./data";
+import { type Fruit, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Grouped sections, each named by a `Listbox.GroupLabel`, with a `Listbox.Separator` hairline
 // between them. Grouping is collection mode only — a virtual listbox is flat. Selection and keyboard
@@ -23,7 +23,6 @@ export function ListboxGroupedDemo() {
   return (
     <Listbox.Root
       aria-label="Choose a fruit"
-      class={PANEL}
       itemToValue={itemToValue}
       itemToLabel={itemToLabel}
       value={value()}

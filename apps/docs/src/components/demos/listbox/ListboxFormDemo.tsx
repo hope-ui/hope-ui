@@ -1,7 +1,7 @@
 import { Button } from "@hope-ui/components/button";
 import { Listbox } from "@hope-ui/components/listbox";
 import { createSignal, For } from "solid-js";
-import { FRUITS, type Fruit, FruitItem, itemToLabel, itemToValue, PANEL } from "./data";
+import { FRUITS, type Fruit, FruitItem, itemToLabel, itemToValue } from "./data";
 
 // Native form submission, opt-in via `name`: the listbox renders hidden fields (siblings of the list
 // element) valued `itemToValue(item)` for each selected row, so a plain `<form>` submit carries the
@@ -21,7 +21,6 @@ export function ListboxFormDemo() {
     >
       <Listbox.Root
         aria-label="Choose fruits"
-        class={PANEL}
         selectionMode="multiple"
         name="fruit"
         itemToValue={itemToValue}

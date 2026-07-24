@@ -46,8 +46,6 @@ const [value, setValue] = createSignal<Fruit[]>([]);
 
 <Listbox.Root
   aria-label="Choose a fruit"
-  // The recipe's root is chrome-free — add your own elevated surface.
-  class="rounded-lg border border-subtle bg-surface-overlay shadow-md p-1"
   itemToValue={(fruit) => String(fruit.id)}
   itemToLabel={(fruit) => fruit.name}
   value={value()}
@@ -72,10 +70,12 @@ const [value, setValue] = createSignal<Fruit[]>([]);
     <div>
       Listbox is <strong>standalone-first</strong>: the recipe's <code>root</code> slot carries{" "}
       <strong>no popup chrome</strong> (no background, border, shadow, or padding), so a bare list
-      sits in the page flow. Add the elevated-surface look yourself with a <code>class</code> — the
-      demos on this page do, exactly as a <code>Select</code> / popover consumer would. And because
-      Listbox reads a recipe, it needs a <code>&lt;ThemeProvider&gt;</code> ancestor fed a preset,
-      as every styled hope-ui component does.
+      sits in the page flow — that's exactly what the demos on this page show. A floating consumer
+      (a <code>Select</code> / popover, or the future Combobox) is what layers the elevated surface
+      on top; you can do the same yourself with a <code>class</code> (see{" "}
+      <a href="#theming">Theming</a>). And because Listbox reads a recipe, it needs a{" "}
+      <code>&lt;ThemeProvider&gt;</code> ancestor fed a preset, as every styled hope-ui component
+      does.
     </div>
   }
 />
@@ -264,7 +264,8 @@ const items = Array.from({ length: 10_000 }, (_, i) => ({ id: i, name: `Item ${i
 
 <Listbox.Root
   aria-label="Ten thousand rows"
-  class="rounded-lg border border-subtle bg-surface-overlay shadow-md p-1 h-72 w-56"
+  // Pure sizing — the fixed height/width makes the list a scroll viewport; no container chrome.
+  class="h-72 w-56"
   items={items}
   estimateSize={() => 32}
   itemToValue={(item) => String(item.id)}
