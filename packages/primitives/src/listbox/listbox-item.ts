@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { type Accessor, merge, omit } from "solid-js";
+import { type Accessor, merge, omit, untrack } from "solid-js";
 import { type CollectionItem, createRegisteredElement } from "../internal";
 import { composeEventHandlers, withDefaults } from "../utils";
 import type { CreateListboxReturn } from "./listbox-root";
@@ -91,9 +91,13 @@ export function createListboxItem<V = unknown>(
     getItem = () => registered;
   }
 
+  // "Highlighted" = the active item **and** the widget holds focus — react-aria's
+  // `manager.isFocused && manager.focusedKey === key`. Gating on focus is what stops the highlight from
+  // lingering after focus leaves the list, and (paired with the `onFocus` sync below) what paints the
+  // row that takes focus when the list is entered. `data-active` is this, not the bare active index.
   const isActive = () => {
     const item = getItem();
-    return item ? state.focus.isActive(item) : false;
+    return item ? state.focus.isActive(item) && state.focus.isFocused() : false;
   };
   const isSelected = () => {
     const item = getItem();
@@ -138,6 +142,7 @@ export function createListboxItem<V = unknown>(
     "textValue",
     "onClick",
     "onPointerMove",
+    "onFocus",
   );
 
   const elementProps = merge(rest, {
@@ -186,6 +191,24 @@ export function createListboxItem<V = unknown>(
           return;
         }
         activate();
+      });
+    },
+    get onFocus() {
+      // Real DOM focus is the truth in roving mode, so syncing the active index to it paints the row
+      // that actually took focus — tabbing in, clicking, or any programmatic `.focus()`. React-aria's
+      // item-level `manager.setFocusedKey(key)`. No `getEventTarget(e) === ref.current` guard is needed
+      // (unlike react-aria): Solid's `onFocus` is the non-bubbling native `focus`, so a focusable child
+      // inside the option cannot reach this handler. `untrack` the whole body (`isDisabled` included)
+      // because `createListFocus` moves DOM focus from inside its own effect — this can run in that
+      // effect's tracking scope, and every read here is an imperative sync with real focus, never a
+      // dependency (same hazard, same fix, as `createCalendarCell.onFocus`).
+      return composeEventHandlers<HTMLElement, FocusEvent>(merged.onFocus, () => {
+        untrack(() => {
+          if (isDisabled()) {
+            return;
+          }
+          activate();
+        });
       });
     },
   });

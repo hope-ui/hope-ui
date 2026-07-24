@@ -140,3 +140,32 @@ describe("createListboxItem — pointer / click", () => {
     dispose();
   });
 });
+
+describe("createListboxItem — highlight follows focus", () => {
+  it("clears data-active when focus leaves the list, keeps the active index, and repaints on return", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    state.focus.focusIndex(0);
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
+
+    // Blur moves DOM focus to <body>, outside the list — the highlight must not linger.
+    nth(options(container), 0).blur();
+    await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
+    // Only the paint gate closed; the active index is retained (react-aria keeps focusedKey on blur).
+    expect(state.focus.activeIndex()).toBe(0);
+
+    // Returning focus repaints the same row.
+    nth(options(container), 0).focus();
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
+    dispose();
+  });
+});

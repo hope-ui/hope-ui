@@ -53,6 +53,7 @@ function FocusHarness(props: {
   disabledValues?: string[];
   focusMode?: Accessor<FocusMode>;
   disabled?: Accessor<boolean>;
+  entryIndex?: Accessor<number>;
   onReady: (api: HarnessApi) => void;
 }) {
   const collection = createCollection<string>();
@@ -61,6 +62,7 @@ function FocusHarness(props: {
     source: collection,
     focusMode: props.focusMode,
     disabled: props.disabled,
+    entryIndex: props.entryIndex,
     element: containerRef,
   });
   props.onReady({ collection, focus });
@@ -146,6 +148,58 @@ describe("createListFocus — roving mode", () => {
     ));
     await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
     await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+describe("createListFocus — focus gate + entry item", () => {
+  it("isFocused defaults to false and round-trips through setFocused", async () => {
+    let api!: HarnessApi;
+    const { dispose } = mount(() => (
+      <FocusHarness values={["a", "b", "c"]} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    expect(api.focus.isFocused()).toBe(false);
+    api.focus.setFocused(true);
+    await vi.waitFor(() => expect(api.focus.isFocused()).toBe(true));
+    api.focus.setFocused(false);
+    await vi.waitFor(() => expect(api.focus.isFocused()).toBe(false));
+    dispose();
+  });
+
+  it("makes the entry index the tab stop and what focusEntry activates", async () => {
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => (
+      <FocusHarness values={["a", "b", "c"]} entryIndex={() => 2} onReady={(a) => (api = a)} />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    // Before any navigation the entry index (2) is the single tab stop — Tab lands there directly.
+    expect(tabindexes(container)).toEqual(["-1", "-1", "0"]);
+
+    api.focus.focusEntry();
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(2));
+    await expect.element(nth(options(container), 2)).toHaveFocus();
+    dispose();
+  });
+
+  it("falls back to the first focusable item when the entry index is not focusable", async () => {
+    let api!: HarnessApi;
+    const { container, dispose } = mount(() => (
+      <FocusHarness
+        values={["a", "b", "c"]}
+        disabledValues={["a"]}
+        entryIndex={() => 0}
+        onReady={(a) => (api = a)}
+      />
+    ));
+    await vi.waitFor(() => expect(api.collection.items()).toHaveLength(3));
+
+    // Entry index 0 is disabled, so both the tab stop and focusEntry fall back to the first focusable ("b").
+    expect(tabindexes(container)).toEqual(["-1", "0", "-1"]);
+    api.focus.focusEntry();
+    await vi.waitFor(() => expect(api.focus.activeIndex()).toBe(1));
     dispose();
   });
 });

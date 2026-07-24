@@ -29,6 +29,7 @@ function createListSelection<V>(options: {
 }): {
   value: Accessor<V[]>;
   isSelected(item): boolean;
+  firstSelectedIndex(): number; // lowest selected index in focus.items(), else -1; the entry row
   select(item): void;      // add (single replaces); sets anchor
   deselect(item): void;
   toggle(item): void;      // flip; sets anchor

@@ -128,6 +128,9 @@ export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
 
   return (
     <div>
+      {/* The Select seam: DOM focus lives on the input, so *it* drives the highlight gate directly
+          (zag's `INPUT.FOCUS` — set the flag, no entry auto-highlight), not the listbox container's
+          focus-in/out. */}
       <input
         ref={(element) => state.setListboxElement(element)}
         role="combobox"
@@ -135,6 +138,8 @@ export function SelectListbox<V>(props: SelectListboxProps<V>): JSX.Element {
         aria-controls={state.id()}
         aria-activedescendant={state.focus.activeDescendant()}
         aria-label="choose a fruit"
+        onFocus={() => state.focus.setFocused(true)}
+        onBlur={() => state.focus.setFocused(false)}
         onKeyDown={composeEventHandlers(state.navigation.onKeyDown, state.typeahead.onKeyDown)}
       />
       {/* Passive container: focus + activedescendant live on the input above, so the list is a

@@ -28,6 +28,13 @@ export interface CreateListFocusOptions<V = unknown> {
   skipDisabled?: Accessor<boolean>;
   /** The container element, as a signal accessor. Used to restore DOM focus in activedescendant mode. */
   element?: Accessor<HTMLElement | null | undefined>;
+  /**
+   * The index the widget should enter on when focus arrives with nothing active — APG: "if an option
+   * is selected before the listbox receives focus, focus is set on the selected option". `createListbox`
+   * feeds the first selected row here. Ignored when it does not resolve to a focusable item (a
+   * selected-but-disabled row), which falls back to the first focusable item. Default `-1`.
+   */
+  entryIndex?: Accessor<number>;
   /** Controlled active index into `source.items()`. Omit for uncontrolled use. `-1` means none. */
   activeIndex?: Accessor<number | undefined>;
   /** Initial active index, uncontrolled. Default `-1` (nothing active). */
@@ -49,6 +56,15 @@ export interface CreateListFocusReturn<V = unknown> {
   skipDisabled: Accessor<boolean>;
   /** The current focus mode. */
   focusMode: Accessor<FocusMode>;
+  /**
+   * Whether the widget currently holds focus. This is the **paint gate**, not a focus mover: it never
+   * moves DOM focus, it only records whether the widget is focused so the highlight can be shown only
+   * while it is. `createListbox` drives it from the container's focus-in/out, and a Select whose focus
+   * owner is its own input drives it directly (react-aria's `manager.isFocused`; zag's `focused`).
+   */
+  isFocused: Accessor<boolean>;
+  /** Set the focused flag. See {@link isFocused} — the caller owns focus tracking; this only records it. */
+  setFocused(value: boolean): void;
 
   /**
    * Make the item at `index` active. In roving mode this moves real DOM focus to the item —
@@ -62,6 +78,12 @@ export interface CreateListFocusReturn<V = unknown> {
   focus(item: CollectionItem<V>): void;
   /** Re-apply focus to the currently active item (roving) or the container (activedescendant). */
   focusActive(): void;
+  /**
+   * Activate the entry item — the first selected row (`entryIndex`), else the first focusable one.
+   * Called by the container when focus arrives with nothing active. Shares its rule with the roving
+   * tab stop, so the item Tab lands on and the item that highlights are the same.
+   */
+  focusEntry(): void;
 
   /** Whether `item` is the active one. */
   isActive(item: CollectionItem<V>): boolean;
@@ -108,6 +130,10 @@ export function createListFocus<V = unknown>(
     onChange: (value) => options.onActiveChange?.(value),
   });
 
+  // The paint gate — see `isFocused`'s doc. Not a controllable state: nothing controls it, the widget
+  // sets it from its own focus in/out.
+  const [isFocused, setFocused] = createSignal(false);
+
   const isFocusable = (item: CollectionItem<V>) => !item.disabled() || !skipDisabled();
 
   const activeItem = () => {
@@ -115,9 +141,6 @@ export function createListFocus<V = unknown>(
     return index >= 0 ? items()[index] : undefined;
   };
 
-  // The roving tab stop: the active item once navigation has happened, else the first focusable
-  // item, so the widget is reachable by Tab before any arrow press (the APG roving requirement —
-  // exactly one item must be tabbable). A memo because it scans the list.
   const firstFocusableIndex = createMemo(() => {
     const list = items();
     for (let index = 0; index < list.length; index++) {
@@ -128,9 +151,22 @@ export function createListFocus<V = unknown>(
     }
     return -1;
   });
+
+  // The item the widget enters on when nothing is active yet: the caller's preferred `entryIndex`
+  // (the first selected row, per APG), but only when it resolves to a focusable item — a
+  // selected-but-disabled row falls back to the first focusable one.
+  const entryIndex = () => {
+    const preferred = options.entryIndex?.() ?? -1;
+    const item = preferred >= 0 ? items()[preferred] : undefined;
+    return item && isFocusable(item) ? preferred : firstFocusableIndex();
+  };
+
+  // The roving tab stop: the active item once navigation has happened, else the entry item, so the
+  // widget is reachable by Tab before any arrow press (the APG roving requirement — exactly one item
+  // must be tabbable) and Tab lands on the same row `focusEntry` highlights (no post-focus jump).
   const rovingTabStopIndex = () => {
     const active = activeIndex();
-    return active >= 0 ? active : firstFocusableIndex();
+    return active >= 0 ? active : entryIndex();
   };
 
   // Deferred focus target. Set to an index by `focusIndex`; an effect focuses the element once it
@@ -219,6 +255,8 @@ export function createListFocus<V = unknown>(
     }
   };
 
+  const focusEntry = () => setActive(entryIndex());
+
   const isActive = (item: CollectionItem<V>) => activeItem() === item;
 
   const getListTabIndex = () => {
@@ -249,9 +287,12 @@ export function createListFocus<V = unknown>(
     disabled,
     skipDisabled,
     focusMode,
+    isFocused,
+    setFocused,
     focusIndex,
     focus,
     focusActive,
+    focusEntry,
     isActive,
     isFocusable,
     getListTabIndex,

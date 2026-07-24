@@ -189,6 +189,26 @@ describe("Listbox — roving focus mode", () => {
   });
 });
 
+// ─── Highlight follows focus (the two reported bugs) ────────────────────────────────────────────
+
+describe("Listbox — highlight follows focus", () => {
+  it("highlights the entry row when focus enters, and clears it when focus leaves", async () => {
+    const { container, dispose } = mount(() => <FruitListbox />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    // Bug 2: no row is highlighted before the list has focus.
+    expect(activeValues(container)).toEqual([]);
+
+    await userEvent.tab(); // focus enters, landing on the roving tab stop (Apple)
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
+
+    // Bug 1: focus leaves the list — the highlight must not stay painted.
+    (document.activeElement as HTMLElement).blur();
+    await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
+    dispose();
+  });
+});
+
 // ─── Activedescendant focus mode ────────────────────────────────────────────────────────────────
 
 describe("Listbox — activedescendant focus mode", () => {

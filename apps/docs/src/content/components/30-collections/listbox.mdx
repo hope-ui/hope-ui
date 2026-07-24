@@ -670,6 +670,9 @@ Listbox implements the WAI-ARIA
 - **One highlight, keyboard and pointer.** Arrows and the pointer share a single active option, so the
   cursor and the keyboard never paint two highlights; selection (the check) is separate from the
   transient highlight.
+- **The highlight follows focus.** The active option is highlighted only while the list has focus, so
+  it never lingers after you tab away. Entering the list highlights the selected option if there is
+  one, otherwise the first — and Tab lands there directly.
 - **Disabled options stay discoverable.** A disabled row keeps `aria-disabled` and, by default, is
   skipped by navigation; it can never be selected.
 - **Type-ahead.** Typing focuses the next option whose label matches — from `itemToLabel`, an

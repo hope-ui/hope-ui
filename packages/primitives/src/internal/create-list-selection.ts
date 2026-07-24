@@ -52,6 +52,12 @@ export interface CreateListSelectionReturn<V> {
   value: Accessor<V[]>;
   /** Whether `item` is selected. */
   isSelected(item: CollectionItem<V>): boolean;
+  /**
+   * The lowest index in `focus.items()` that is selected, or `-1` when nothing is. This is the row a
+   * list should enter on — `createListbox` threads it into `createListFocus`'s `entryIndex` so Tab
+   * lands on the selected option (APG), and a future Select opens on it.
+   */
+  firstSelectedIndex(): number;
   /** Add `item` to the selection (single mode replaces). Sets the range anchor. */
   select(item: CollectionItem<V>): void;
   /** Remove `item` from the selection. */
@@ -122,6 +128,14 @@ export function createListSelection<V>(
 
   const contains = (values: V[], candidate: V) => values.some((entry) => compare(entry, candidate));
   const isSelected = (item: CollectionItem<V>) => contains(value(), item.value());
+
+  const firstSelectedIndex = () => {
+    const current = value();
+    if (current.length === 0) {
+      return -1;
+    }
+    return focus.items().findIndex((item) => contains(current, item.value()));
+  };
 
   const add = (values: V[], candidate: V) =>
     contains(values, candidate) ? values : [...values, candidate];
@@ -232,6 +246,7 @@ export function createListSelection<V>(
   return {
     value,
     isSelected,
+    firstSelectedIndex,
     select,
     deselect,
     toggle,

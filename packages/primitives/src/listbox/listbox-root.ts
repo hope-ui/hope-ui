@@ -1,5 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import { type Accessor, createSignal, createUniqueId } from "solid-js";
+import { type Accessor, createSignal, createUniqueId, untrack } from "solid-js";
 import {
   type CreateCollectionReturn,
   type CreateListFocusReturn,
@@ -245,15 +245,23 @@ export function createListbox<V = unknown>(
     source = collection;
   }
 
-  const focus = createListFocus<V>({
+  // Both annotated explicitly: `entryIndex` forward-references `selection`, so without the annotations
+  // TypeScript sees a cyclic initializer (`focus` → `entryIndex` → `selection` → `focus`) and widens
+  // both to `any`. The reference itself is safe — see the `entryIndex` note below.
+  const focus: CreateListFocusReturn<V> = createListFocus<V>({
     source,
     focusMode,
     disabled,
     skipDisabled: () => merged.skipDisabled,
     element: listboxElement,
+    // The row the list enters on (APG: focus the selected option). `selection` is declared just below;
+    // this accessor only ever *reads* it later (from a focus handler / a tabindex getter), never during
+    // construction, so the forward reference is safe. The kernel's dependency direction is otherwise
+    // strictly selection → focus.
+    entryIndex: () => selection.firstSelectedIndex(),
   });
 
-  const selection = createListSelection<V>({
+  const selection: CreateListSelectionReturn<V> = createListSelection<V>({
     focus,
     selectionMode,
     value: () => merged.value,
@@ -324,6 +332,42 @@ export function createListbox<V = unknown>(
     typeahead.onKeyDown,
   );
 
+  // Focus tracking on the container drives the highlight gate (`focus.isFocused()`): the row only
+  // paints `data-active` while the widget holds focus. `focusin`/`focusout` (not `focus`/`blur`)
+  // because they bubble — in roving mode DOM focus lands on an item, and this must still see it.
+  const onFocusIn: JSX.EventHandler<HTMLElement, FocusEvent> = (event) => {
+    // Roving mode moves DOM focus from inside `createListFocus`'s own effect (`element.focus()`), which
+    // dispatches this synchronously — so the reactive reads/writes below would land in that effect's
+    // tracking scope. This is an imperative sync with real focus, never a dependency: untrack the body
+    // (same as `createCalendarCell.onFocus`).
+    const enteredContainer = event.target === event.currentTarget;
+    untrack(() => {
+      focus.setFocused(true);
+      // Only the container itself receiving focus — never an item's focus bubbling up — runs the entry
+      // rule. An item's own `onFocus` (see `createListboxItem`) already set the active index, and that
+      // write is not visible to a synchronous `activeIndex()` read in this same task (the Solid 2.0
+      // flush rule), so re-deciding here would race; splitting on *where focus landed* is deterministic.
+      // The container branch is a click on the roving list's padding (a `tabindex=-1` container is still
+      // click-focusable) and the whole entry path in activedescendant mode. Skip it when something is
+      // already active, so returning to the list restores the prior position instead of resetting it.
+      if (enteredContainer && focus.activeIndex() < 0) {
+        focus.focusEntry();
+      }
+    });
+  };
+
+  const onFocusOut: JSX.EventHandler<HTMLElement, FocusEvent> = (event) => {
+    const owner = event.currentTarget;
+    // Decide on the next task, not from `relatedTarget`: a virtualized row destroyed under the user
+    // blurs with a null `relatedTarget`, indistinguishable at this instant from tabbing away, and the
+    // roving focus-recovery effect re-homes focus in the same flush. Same shape as `calendar-group`.
+    setTimeout(() => {
+      if (owner.isConnected && !owner.contains(owner.ownerDocument.activeElement)) {
+        focus.setFocused(false);
+      }
+    });
+  };
+
   const rootProps: Omit<JSX.HTMLAttributes<HTMLElement>, "ref"> = {
     get id() {
       return id();
@@ -350,6 +394,8 @@ export function createListbox<V = unknown>(
       return focus.getListTabIndex();
     },
     onKeyDown,
+    onFocusIn,
+    onFocusOut,
   };
 
   return {

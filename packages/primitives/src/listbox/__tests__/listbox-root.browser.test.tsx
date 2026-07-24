@@ -121,6 +121,76 @@ describe("createListbox — roving focus mode", () => {
   });
 });
 
+// ─── Highlight follows focus ──────────────────────────────────────────────────────────────────
+
+describe("createListbox — highlight follows focus", () => {
+  it("paints the entry row on focus in and clears every highlight on focus out (roving)", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    // Nothing highlighted before the widget has focus (the reported second bug).
+    expect(activeValues(container)).toEqual([]);
+
+    await userEvent.tab(); // enters on the roving tab stop (Apple)
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Apple"]));
+    await expect.element(nth(options(container), 0)).toHaveFocus();
+
+    // Focus leaves the list — the highlight must not linger (the reported first bug).
+    (document.activeElement as HTMLElement).blur();
+    await vi.waitFor(() => expect(activeValues(container)).toEqual([]));
+    expect(state.focus.activeIndex()).toBe(0); // active index retained across blur
+    dispose();
+  });
+
+  it("enters on the selected row (APG): the tab stop and the highlight agree", async () => {
+    const { container, dispose } = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={{ ...fruitOptions(), defaultValue: [nth(FRUITS, 1)] }}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    // Before any navigation the selected row (Banana) is the single tab stop.
+    expect(tabindexes(container)).toEqual(["-1", "0", "-1", "-1"]);
+
+    await userEvent.tab();
+    await vi.waitFor(() => expect(activeValues(container)).toEqual(["Banana"]));
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+    dispose();
+  });
+
+  it("activates the entry row when the container itself is focused in activedescendant mode", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={{ ...fruitOptions(), focusMode: "activedescendant" }}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    listbox(container).focus();
+    await vi.waitFor(() => {
+      expect(state.focus.activeIndex()).toBe(0);
+      expect(activeValues(container)).toEqual(["Apple"]);
+      expect(listbox(container).getAttribute("aria-activedescendant")).toBe(
+        nth(state.focus.items(), 0).id,
+      );
+    });
+    dispose();
+  });
+});
+
 // ─── Activedescendant focus mode ────────────────────────────────────────────────────────────────
 
 describe("createListbox — activedescendant focus mode", () => {
@@ -191,6 +261,33 @@ describe("createListbox — external focus owner (Select shape)", () => {
     await expect.element(input).toHaveFocus();
 
     await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("opens the highlight gate from the input's focus without auto-highlighting an entry", async () => {
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <SelectListbox
+        values={FRUITS}
+        labelOf={label}
+        options={fruitOptions()}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    const input = container.querySelector<HTMLInputElement>(
+      '[role="combobox"]',
+    ) as HTMLInputElement;
+
+    input.focus();
+    await vi.waitFor(() => expect(state.focus.isFocused()).toBe(true));
+    // Focusing the input sets the flag but does NOT run the entry rule (zag's `INPUT.FOCUS`): the
+    // list opens un-highlighted until the first arrow/typeahead.
+    expect(state.focus.activeIndex()).toBe(-1);
+    expect(activeValues(container)).toEqual([]);
+
+    input.blur();
+    await vi.waitFor(() => expect(state.focus.isFocused()).toBe(false));
     dispose();
   });
 });

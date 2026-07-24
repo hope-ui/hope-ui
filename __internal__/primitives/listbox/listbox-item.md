@@ -12,7 +12,7 @@ source modes:
 
 The `<li>`/`<div>` gets `role="option"`, `aria-selected` (omitted in `selectionMode="none"`),
 `aria-disabled`, `data-active`/`data-selected`/`data-disabled`, the roving/activedescendant
-`tabindex`, and composed `onClick` / `onPointerMove` handlers.
+`tabindex`, and composed `onClick` / `onPointerMove` / `onFocus` handlers.
 
 ## API
 
@@ -49,6 +49,15 @@ function createListboxItem<V = unknown>(
   movement**, guarded by `state.pointerMoved(clientX, clientY)`. A spurious `pointermove` at
   unchanged coords (the list scrolling under a still cursor after a keyboard arrow) is ignored, so a
   keyboard arrow is never overridden. Disabled items ignore pointer moves.
+- **Focus** — `onFocus` syncs the active index to real DOM focus (`untrack`ed, since focus is moved
+  from inside `createListFocus`'s own effect). This paints the row that takes focus when the list is
+  entered — tabbing in, clicking, or a programmatic `.focus()`. No `getEventTarget` guard is needed:
+  Solid's `onFocus` is the non-bubbling native `focus`.
+- **The highlight follows focus** — `data-active` (and the returned `isActive`) is
+  `focus.isActive(item) && focus.isFocused()`: the active item **only while the widget holds focus**
+  (react-aria's `manager.isFocused && manager.focusedKey === key`). So the highlight never lingers
+  after focus leaves the list. `isFocused` is tracked by `createListbox`'s container `onFocusIn`/
+  `onFocusOut` — see `listbox-root.md`.
 - **One active item** — because both click/pointer and keyboard write the *same* active index, there
   is exactly one `data-active` item at all times, and the highlight is styled by `data-active` only.
 

@@ -61,6 +61,24 @@ two never diverge into a hovered item *and* a separately keyboard-active item. G
   when the pointer *actually moved*, so a spurious `pointermove` fired by the list scrolling under a
   still cursor (after a keyboard arrow) cannot yank the active item back. See `pointerMoved`.
 
+## The highlight follows focus
+
+The active item paints `data-active` **only while the widget holds focus** — active *and* focused, i.e.
+react-aria's `manager.isFocused && manager.focusedKey === key`. `rootProps` wires this on the container:
+
+- `onFocusIn` sets `focus.setFocused(true)` (opening the paint gate) and, **only when focus lands on
+  the container itself** (`event.target === event.currentTarget`) with nothing active, calls
+  `focus.focusEntry()` to activate the entry row (first selected, else first focusable). In roving mode
+  Tab lands on an *item*, whose own `onFocus` syncs the active index, so the container branch is skipped
+  there; it is the entry path for activedescendant mode and for a click on the list's padding.
+- `onFocusOut` defers to the next task and clears `focus.setFocused(false)` only if focus actually left
+  the container — never from `relatedTarget`, which is null when a virtualized row is destroyed under
+  the user (same reasoning as `calendar-group`). The **active index is kept**, so returning to the list
+  restores the prior position (react-aria keeps `focusedKey` on blur).
+
+A Select whose focus owner is its own input drives `focus.setFocused` from that input instead (zag's
+`INPUT.FOCUS` — set the flag, no entry auto-highlight).
+
 ## Value & form model (Base UI `itemToValue`, not a comparator)
 
 - **`itemToValue(item) => string`** — the primitive value: selection identity (compared `===`), the

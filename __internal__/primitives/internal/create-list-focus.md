@@ -63,19 +63,32 @@ function createListFocus<V = unknown>(options: {
   disabled?: Accessor<boolean>;                         // default false
   skipDisabled?: Accessor<boolean>;                     // default true
   element?: Accessor<HTMLElement | null | undefined>;   // container, for AD focus restore
+  entryIndex?: Accessor<number>;                        // the row focus enters on; default -1
   activeIndex?: Accessor<number | undefined>;           // controlled; -1 = none
   defaultActiveIndex?: number;                          // default -1
   onActiveChange?: (index: number) => void;
 }): CreateListFocusReturn<V>;
 ```
 
-Returned surface: `items`, `activeIndex`, `activeItem`, `disabled`, `skipDisabled`, `focusMode`;
-`focusIndex(index)`, `focus(item)`, `focusActive()`; `isActive(item)`, `isFocusable(item)`;
-`getListTabIndex()`, `getItemTabIndex(item)`, `activeDescendant()`.
+Returned surface: `items`, `activeIndex`, `activeItem`, `disabled`, `skipDisabled`, `focusMode`,
+`isFocused`; `setFocused(value)`, `focusIndex(index)`, `focus(item)`, `focusActive()`, `focusEntry()`;
+`isActive(item)`, `isFocusable(item)`; `getListTabIndex()`, `getItemTabIndex(item)`,
+`activeDescendant()`.
 
 - **Roving tab stop before navigation.** APG requires exactly one tabbable element. Before any
-  arrow press (`activeIndex === -1`), the *first focusable* item gets `tabindex=0`, so Tab reaches
-  the widget. After navigation the active item is the tab stop.
+  arrow press (`activeIndex === -1`), the *entry item* gets `tabindex=0`, so Tab reaches the widget.
+  After navigation the active item is the tab stop.
+- **The entry item.** When focus arrives with nothing active, `focusEntry()` activates the entry item;
+  the tab stop resolves to the same index, so Tab lands directly on it with no post-focus jump. The
+  entry item is `entryIndex` (the first selected row, per APG's "focus is set on the selected option")
+  when it is focusable, else the first focusable item. `createListbox` feeds `entryIndex` from its
+  selection.
+- **`isFocused` is a paint gate, not a focus mover.** It records whether the widget holds focus so the
+  highlight can be shown only while it does — react-aria's `manager.isFocused`, zag's `focused`. It
+  never moves DOM focus. The *consumer* owns focus tracking and calls `setFocused(true/false)`
+  (`createListbox` does this from the container's focus-in/out; a Select drives it from its input).
+  The highlight itself (`data-active`) is `isActive(item) && isFocused()`, computed one layer up — this
+  primitive keeps `isActive` meaning "is the active item", so nothing that layers on focus is disturbed.
 - **`isFocusable`** is `!item.disabled() || !skipDisabled()` — with `skipDisabled` off (menus),
   disabled items stay focusable but selection/activation should still refuse them.
 - **`disabled` list** forces every `tabindex` to `-1` and suppresses `aria-activedescendant`.
