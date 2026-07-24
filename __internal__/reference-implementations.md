@@ -14,6 +14,27 @@ Angular signals) over the re-render one (React): its lifecycle
 `createSignal`/`createMemo`/`createEffect`/`onCleanup` almost 1:1 — the same reason Angular Aria
 won the navigation bake-off (§3).
 
+**Port the hooks a reference composes; do not stand in for them.** When the source you are porting
+calls a hook this kernel does not have, port that hook first — as its own primitive, in
+`internal/`, with its own Definition of Done — and only then write the consumer over it. A narrower
+hand-rolled substitute is not a cheaper route to the same behavior; it is a *different* behavior
+that happens to satisfy the case you were looking at. If a port needs `useLongPress`, build
+`createLongPress`; don't approximate it with a `setTimeout` in the consumer. And before building
+anything, **check `internal/` first** — the hook may already be here.
+
+The rule exists because the calendar/React Aria parity work
+(`__internal__/calendar-react-aria-parity.md`) nearly shipped without it. RA's range-calendar
+auto-advance is gated on `e.pointerType === 'keyboard'` (`useCalendarCell.ts:300`), a value produced
+by `usePress`. Two substitutes were proposed and rejected: an ad-hoc `onKeyDown` handler, and
+`event.detail === 0`. The latter is the instructive one — `detail === 0` is also true of a screen
+reader's virtual click, and RA routes *that* down a deliberately different branch: select the date,
+but do **not** advance the focused date (`useCalendarCell.ts:307`). Either hatch would have silently
+shipped the wrong behavior for AT users, and no sighted-keyboard test would have caught it. The real
+primitive — `packages/primitives/src/internal/create-press.ts`, which already models
+`mouse | pen | touch | keyboard | virtual` — had existed for the whole design discussion and was
+nearly missed. Missing hooks are visible; missing *distinctions inside* a hook are not, which is
+why the substitute has to be refused on principle rather than judged case by case.
+
 ---
 
 ## 1. Per-behavior source map

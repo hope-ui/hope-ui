@@ -412,6 +412,17 @@ a presentational leaf like `CloseButton` is fine; coupling behavior to a heavier
 Sibling subpaths stay external in the tsdown build (`neverBundle: [/^@hope-ui\//]`), so reuse is
 deduped, not inlined.
 
+**Porting rule — port the hooks a reference composes.** When the source being adapted (React Aria,
+Angular Aria, floating-ui, Base UI) calls a hook this kernel doesn't have, **port that hook first**,
+as its own primitive with its own DoD; never substitute a narrower hand-rolled stand-in. Needing
+`useLongPress` means building `createLongPress`, not a `setTimeout` in the consumer — the substitute
+isn't the same behavior, it's a different one that passes the case you were looking at. (The
+calendar's keyboard auto-advance nearly shipped gated on `event.detail === 0`, which conflates
+keyboard with a screen reader's *virtual* click — a case React Aria deliberately routes elsewhere —
+and would have broken AT users silently.) Check `packages/primitives/src/internal/` before inventing
+a mechanism; the hook may already be there. Full rationale: the References policy at the top of
+`__internal__/reference-implementations.md`.
+
 **Publishing shape:** originally planned as packages grouped by shared-primitive family
 (`@hope-ui/overlays`, `@hope-ui/collections`, etc.); revised to a single
 `@hope-ui/components` package with one subpath export per component instead. The
