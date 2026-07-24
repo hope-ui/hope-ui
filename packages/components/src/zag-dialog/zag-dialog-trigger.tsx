@@ -1,8 +1,8 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { mergeProps } from "@hope-ui/primitives/zag-solid";
 import type { JSX } from "@solidjs/web";
 import { type Component, omit } from "solid-js";
 import { useZagDialogContext } from "./zag-dialog-context";
-import { mergePartProps } from "./zag-dialog-merge-props";
 
 export interface ZagDialogTriggerProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
   render?: RenderProp<JSX.ButtonHTMLAttributes<HTMLButtonElement>>;
@@ -21,7 +21,7 @@ export const Trigger: Component<ZagDialogTriggerProps> = (props) => {
   const ctx = useZagDialogContext();
   const rest = omit(props, "render", "id");
 
-  const elementProps = mergePartProps(
+  const elementProps = mergeProps(
     () => ctx.api().getTriggerProps(),
     () => rest,
   );

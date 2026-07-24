@@ -14,14 +14,7 @@ import {
   type OpenChangeDetails,
   type Props as ZagDialogMachineProps,
 } from "@zag-js/dialog";
-import {
-  type Accessor,
-  type Component,
-  createMemo,
-  createSignal,
-  createUniqueId,
-  untrack,
-} from "solid-js";
+import { type Accessor, type Component, createMemo, createSignal, createUniqueId } from "solid-js";
 import { ZagDialogContext, type ZagDialogContextValue } from "./zag-dialog-context";
 
 /** The dialog's ARIA role. `alertdialog` is the APG destructive-confirmation pattern. */
@@ -114,38 +107,29 @@ export const Root: Component<ZagDialogRootProps> = (props) => {
   // handed — so the machine needs an id, and it has to survive the SSR → hydrate round-trip.
   const scopeId = createUniqueId();
 
-  // `untrack`, and it is load-bearing rather than cosmetic. The adapter seeds the machine's
-  // bindables by reading its props **memo** straight from the render body — `initialState({ prop })`
-  // for the state cell, `prop("triggerValue")`/`prop("defaultTriggerValue")` for the context cell.
-  // They are genuine one-time seed reads (Zag re-reads props reactively through `prop()` inside
-  // guards, actions and effects), but Solid 2.0's dev build cannot tell a seed read from a mistake,
-  // so an unwrapped call emits `[STRICT_READ_UNTRACKED]` thirteen times per `Root` and `mount()`
-  // fails the test. Upstream's Solid 1.x adapter never had to spell this out; see the findings ledger.
-  const service = untrack(() =>
-    useMachine(dialogMachine, () => ({
-      id: scopeId,
-      open: merged.open,
-      defaultOpen: merged.defaultOpen,
-      modal: merged.modal,
-      role: merged.role,
-      closeOnEscape: merged.closeOnEscape,
-      // Passed explicitly, always: Zag defaults this to `modal && !alertDialog`, so an
-      // `role="alertdialog"` would silently stop closing on an outside click. hope's semantics are
-      // "the consumer decides, default `true`", and `compact()` would drop an omitted key.
-      closeOnInteractOutside: merged.closeOnInteractOutside,
-      onOpenChange: (details: OpenChangeDetails) => merged.onOpenChange?.(details.open),
-      // Also always a function, for the mirror-image reason: Zag defaults `initialFocusEl` to the
-      // close trigger under `role="alertdialog"`, and hope's default is "first focusable descendant"
-      // for both roles. `undefined` is the only value `@zag-js/focus-trap` reads as "no preference"
-      // (`getNodeForOption` returns early on it and falls through to the first tabbable node); a
-      // `null` return *throws* there. The cast is required because Zag types the return as
-      // `MaybeElement` = `HTMLElement | null`, which excludes the one value its own implementation
-      // needs — see the findings ledger.
-      initialFocusEl: (() => merged.initialFocus?.() ?? undefined) as NonNullable<
-        ZagDialogMachineProps["initialFocusEl"]
-      >,
-    })),
-  );
+  const service = useMachine(dialogMachine, () => ({
+    id: scopeId,
+    open: merged.open,
+    defaultOpen: merged.defaultOpen,
+    modal: merged.modal,
+    role: merged.role,
+    closeOnEscape: merged.closeOnEscape,
+    // Passed explicitly, always: Zag defaults this to `modal && !alertDialog`, so an
+    // `role="alertdialog"` would silently stop closing on an outside click. hope's semantics are
+    // "the consumer decides, default `true`", and `compact()` would drop an omitted key.
+    closeOnInteractOutside: merged.closeOnInteractOutside,
+    onOpenChange: (details: OpenChangeDetails) => merged.onOpenChange?.(details.open),
+    // Also always a function, for the mirror-image reason: Zag defaults `initialFocusEl` to the
+    // close trigger under `role="alertdialog"`, and hope's default is "first focusable descendant"
+    // for both roles. `undefined` is the only value `@zag-js/focus-trap` reads as "no preference"
+    // (`getNodeForOption` returns early on it and falls through to the first tabbable node); a
+    // `null` return *throws* there. The cast is required because Zag types the return as
+    // `MaybeElement` = `HTMLElement | null`, which excludes the one value its own implementation
+    // needs — see the findings ledger.
+    initialFocusEl: (() => merged.initialFocus?.() ?? undefined) as NonNullable<
+      ZagDialogMachineProps["initialFocusEl"]
+    >,
+  }));
 
   const api = createMemo(() => connect(service, normalizeProps));
 

@@ -20,37 +20,47 @@ What changed:
 
 | | Before | After |
 | --- | --- | --- |
-| The 746-line forked interpreter | permanently owned | **temporary** — upstream will ship a Solid 2.0 adapter when Solid 2.0 is stable, which is also hope-ui's own release gate (`G3`) |
+| The forked interpreter (746 raw / **598 code**) | permanently owned | **temporary** — upstream will ship a Solid 2.0 adapter when Solid 2.0 is stable, which is also hope-ui's own release gate (`G3`) |
 | `C6` — consumer `id` on a part | "impossible; breaks three mechanisms at once" | **works** via the machine's `ids` prop; the spike never forwarded it (`G1`) |
 | `D1` — unmount-while-open poisons the session | shipping blocker, unfixable | **does not reproduce.** Retracted (`G2`) |
 
+> **Second revision note (`ZagListbox`).** Axis 10 below was scored **decisive**, on the premise
+> that the reconciling seam is paid again by every component adopted. The experiment this document
+> demanded — port a second component — has since been run against a 200-item collection
+> (`__internal__/spikes/zag-listbox-findings.md`), and **the premise did not hold**: the seam
+> amortized, and the granularity mechanism behind it was half wrong. Axis 10 and the Recommendation
+> are updated; the other nine axes are as scored.
+
 Removing those leaves **no blocker standing**. What remains are three real costs:
 
-1. **SolidJS idiom (axis 10) — the decisive axis.** Zag is framework-agnostic by construction, which
-   forces its API down to a *render-and-snapshot* shape — React's model, and the one thing Solid
-   exists to avoid. The seam that reconciles the two is permanent, unfixable without Zag abandoning
-   portability, and paid again by every component adopted. Measured: **12 `untrack` calls** across
-   the Zag path against **0** on the handmade one, and **8** element lookups by DOM id where hope
-   holds a ref.
+1. ~~**SolidJS idiom (axis 10) — the decisive axis.**~~ **Downgraded, see axis 10.** Zag is
+   framework-agnostic by construction, which forces its API down to a *render-and-snapshot* shape —
+   React's model, and the one thing Solid exists to avoid. Measured here: **12 `untrack` calls**
+   across the Zag path against **0** on the handmade one, and **8** element lookups by DOM id where
+   hope holds a ref. Called permanent and per-component at the time; `ZagListbox` measured component
+   #2 at **one** `untrack` and **zero** new seam lines.
 2. **Accessibility (axis 4).** Zag has no `inert`: verified, `@zag-js/aria-hidden@1.42.0` contains
    the string zero times. `Dialog` runs 4 axe assertions with **zero** allowances; `ZagDialog` runs
    6 and needs one on **all six**, including `aria-hidden-focus` (serious) on every open modal.
-   Fixable in hope's layer at a known price: keep `createHideOutside` (255 lines) and
-   `createFocusRestore` (55), plus an `aria-controls` override getter (~3 lines).
+   Fixable in hope's layer at a known price: keep `createHideOutside` (255 raw / **128 code**) and
+   `createFocusRestore` (55 / **26**), plus an `aria-controls` override getter (~3 lines).
 3. **Bundle (axis 9).** +13.4 KB gzipped per consumer, and 11 new packages. Not fixable at all.
 
 **The trade, stated plainly:** hope-ui stops owning dialog *behavior* — the state machine, the
 transitions, the edge cases, which is the workload that motivated the question — in exchange for
-~310 retained kernel lines, ~13 KB of gzipped JavaScript per consumer, and a permanent
+~310 retained raw kernel lines (**~154 code**), ~13 KB of gzipped JavaScript per consumer, and a permanent
 Solid-hostile seam. Steady state after the official adapter lands, with the accessibility work
 priced in: **−39% owned lines.**
 
-**But axis 10 discounts that −39%.** hope-ui stops owning behavior; it does *not* stop owning the
-impedance layer, and that layer is the part a contributor has to re-derive rather than read. The
-line count overstates the relief.
+**Axis 10 was scored as discounting that −39%** — hope-ui stops owning behavior but not the
+impedance layer, and that layer is the part a contributor re-derives rather than reads. That still
+describes the *kind* of code, but the **size** of the discount has been measured and it is small:
+component #2 added 405 code lines of assembly, one `untrack`, and no new impedance layer at all.
 
-That is a genuine call, not a clear answer, and it is the maintainer's to make — and the right
-place to make it is **component #6, not Dialog**, because the seam is the one cost that compounds.
+That is a genuine call, not a clear answer, and it is the maintainer's to make. ~~The right place to
+make it is component #6, not Dialog.~~ Component #2 has now been built (`ZagListbox`), and it
+answered the seam question; what is left to decide is not a measurement but a direction — see the
+Recommendation.
 
 ---
 
@@ -94,39 +104,56 @@ fixable in hope's layer at a known price.
 
 ## 2. Code volume — owned vs. depended-on
 
+> **Recounted.** These figures were originally raw `wc -l`, which counts comments and blank lines —
+> unsound in a repo that mandates dense *why*-comments, because it rewards whichever side is worse
+> documented. **Code lines** below are exact (TypeScript's own scanner; a line with code plus a
+> trailing comment counts as code). Two of the three scenarios are unchanged; **the interim row was
+> materially wrong** and is corrected.
+
 ### Owned (lines hope-ui writes, reviews, and maintains)
 
-| | Lines |
-| --- | ---: |
-| **Handmade — today** | |
-| `packages/primitives/src/dialog/` | 560 |
-| `packages/components/src/dialog/` (excl. stories) | 560 |
-| Kernel primitives used, dialog-exclusive: `create-{focus-trap,hide-outside,dismissable,scroll-lock,focus-restore}` + `modal-backdrop` | 649 |
-| Kernel primitives used but **shared** — `create-presence` (Alert), `create-registered-id` (Alert, Listbox), `create-controllable-state` (Alert, Calendar) | 361 *(not attributable)* |
-| **Total, dialog-attributable** | **1769** |
+| | Raw | **Code** | Comment % |
+| --- | ---: | ---: | ---: |
+| **Handmade — today** | | | |
+| `packages/primitives/src/dialog/` | 560 | 317 | 35% |
+| `packages/components/src/dialog/` (excl. stories) | 560 | 384 | 22% |
+| Kernel primitives used, dialog-exclusive: `create-{focus-trap,hide-outside,dismissable,scroll-lock,focus-restore}` + `modal-backdrop` | 651 | 367 | 34% |
+| Kernel primitives used but **shared** — `create-presence` (Alert), `create-registered-id` (Alert, Listbox), `create-controllable-state` (Alert, Calendar) | 361 | 183 | *(not attributable)* |
+| **Total, dialog-attributable** | **1771** | **1068** | 31% |
+| | | | |
+| `packages/components/src/zag-dialog/` | 731 | 473 | 27% |
+| `packages/primitives/src/zag-solid/` (the fork) | 746 | **598** | **11%** |
 
 ### Three scenarios, because the fork is temporary (`G3`)
 
-| Scenario | Owned | vs. 1769 |
-| --- | ---: | ---: |
-| **Interim** — as built today, fork included | 730 + 746 = **1476** | −17% |
-| **Steady state** — official adapter, a11y gaps left as-is | **730** | **−59%** |
-| **Steady state, honest** — official adapter, a11y fixed in hope's layer (keep `createHideOutside` 255 + `createFocusRestore` 55 + ~40 wiring) | **1080** | **−39%** |
+| Scenario | Raw | vs. 1771 | **Code** | **vs. 1068** |
+| --- | ---: | ---: | ---: | ---: |
+| **Interim** — as built today, fork included | 1477 | −17% | **1071** | **±0% — a wash** |
+| **Steady state** — official adapter, a11y gaps left as-is | 731 | −59% | **473** | **−56%** |
+| **Steady state, honest** — official adapter, a11y fixed in hope's layer (keep `createHideOutside` + `createFocusRestore` + wiring) | 1081 | −39% | **652** | **−39%** |
 
-The third row is the number to plan against. It is a real reduction, and the *kind* of code it
-removes matters more than the count: what goes is dialog **behavior** — the state machine, the
-transitions, the ordering hazards this repo has spent months finding. What stays is assembly,
-theming, and the two a11y primitives hope already owns and trusts.
+**The headline number survives exactly: −39% either way.** The row that moved is the **interim**,
+and it moved from a modest win to **dead even** — because the vendored fork is deliberately a
+minimal-diff copy and carries only **11%** comments against hope's 31%. In code terms the fork is
+**598 lines: more than `ZagDialog` itself (473), and nearly double hope's entire `primitives/dialog`
+family (317).** So until upstream ships its adapter, adoption buys no volume relief at all; it only
+*relocates* the code, from behavior hope wrote to a runtime hope transcribed.
+
+The "steady state, honest" row is still the number to plan against, and the *kind* of code it removes
+matters more than the count: what goes is dialog **behavior** — the state machine, the transitions,
+the ordering hazards this repo has spent months finding. What stays is assembly, theming, and the two
+a11y primitives hope already owns and trusts.
 
 Two caveats that survive:
 
-- **`create-presence.ts` (249 lines) is not removed by adoption** (`B1`). Zag ships no presence for
-  dialog, and `@zag-js/presence` is animation-name based while the hope recipe uses transitions.
-  Adopting Zag's presence would mean rewriting every recipe's exit animation as `@keyframes`.
-- **The interim is real but self-liquidating**, and hope-ui already carries the fork today
-  (committed at `e235acf`) regardless of this decision.
+- **`create-presence.ts` (249 raw / 143 code) is not removed by adoption** (`B1`). Zag ships no
+  presence for dialog, and `@zag-js/presence` is animation-name based while the hope recipe uses
+  transitions. Adopting Zag's presence would mean rewriting every recipe's exit animation as
+  `@keyframes`.
+- **The interim is self-liquidating**, and hope-ui already carries the fork today (committed at
+  `e235acf`) regardless of this decision.
 
-**Score: ✅ — a genuine reduction, once the fork retires.**
+**Score: ✅ — a genuine reduction, but only *after* the fork retires; before that it is a wash.**
 
 ---
 
@@ -205,16 +232,16 @@ So the fix is hope-side, and it is bounded:
 
 | Gap | Fix | Cost |
 | --- | --- | ---: |
-| `C1` `aria-controls` | an override getter in `mergePartProps`'s `overrides` source (last-defined wins for plain keys) | ~3 lines |
-| `C2` no `inert` | keep `createHideOutside`, run it beside the machine | 255 lines retained |
-| `C5` non-modal restore | keep `createFocusRestore`, gated on `open()` | 55 lines retained |
+| `C1` `aria-controls` | an override getter in `mergeProps`' `overrides` source (last-defined wins for plain keys) | ~3 lines |
+| `C2` no `inert` | keep `createHideOutside`, run it beside the machine | 255 raw / **128 code** retained |
+| `C5` non-modal restore | keep `createFocusRestore`, gated on `open()` | 55 raw / **26 code** retained |
 | `C3` dead consumer Backdrop | a `pointer-events: auto` override, fighting Zag's `MutationObserver` on `style` | messy — the one with no clean fix |
 
 `C3` is the residue: it has no tidy answer, and it means a consumer-authored interactive scrim is
 not supported the way it is today.
 
 **Score: ❌ worse than the handmade kernel — the largest cost, but a priceable one.** Three of the
-four gaps close for ~310 retained lines, which is exactly what the axis-2 "steady state, honest" row
+four gaps close for ~310 retained raw lines (~154 code), which is exactly what the axis-2 "steady state, honest" row
 prices in. Because it has a known fix at a known price, axis 10 outranks it as the decisive one.
 
 ---
@@ -268,7 +295,7 @@ Three permanent seams:
    `omit(…, "hidden")` in both `Backdrop` and `Content`. Separately, Zag writes
    `--layer-index`/`--z-index` **imperatively** into the same `style` Solid binds reactively, and
    `pointer-event-outside.mjs` runs a `MutationObserver` on `style` to re-apply `pointer-events`.
-   Two writers on one attribute, one watching the other. It works because `mergePartProps` composes
+   Two writers on one attribute, one watching the other. It works because `mergeProps` composes
    `style` across sources — a seam hope-ui would own for every future Zag component.
 
 **Score: ⚠️ — no visual difference; three permanent seams.**
@@ -282,8 +309,8 @@ Three permanent seams:
 | `A1` | Stringify boolean `aria-*` | upstream PR (affects 1.x too) | Fixed in the fork; **file upstream now** |
 | `A2` | `untrack` the `track` callback | upstream, into the coming 2.0 adapter | Fixed in the fork; carry until it lands |
 | `C1` | `aria-controls` only while open | component-layer override getter | Available, ~3 lines. Not taken by the spike |
-| `C2` | `inert` alongside `aria-hidden` | keep `createHideOutside` beside the machine; upstream is the real fix | Available, 255 lines retained |
-| `C5` | Non-modal focus restore | keep `createFocusRestore` | Available, 55 lines retained |
+| `C2` | `inert` alongside `aria-hidden` | keep `createHideOutside` beside the machine; upstream is the real fix | Available, 255 raw / **128 code** retained |
+| `C5` | Non-modal focus restore | keep `createFocusRestore` | Available, 55 raw / **26 code** retained |
 | `C3` | Pointer-live consumer `Backdrop` | override fighting Zag's `MutationObserver`, or fork | **No clean option** |
 | `C6` | Consumer `id` on a part | **the `ids` prop — supported, works** (`G1`) | Expose `ids` on `Root` |
 | `B3`/`B4` | Hold hope's `alertdialog` defaults | pass explicitly, always (`compact()` drops omitted keys) | Prop, on every render |
@@ -304,7 +331,7 @@ that premise.
 
 ### What adoption actually commits to
 
-1. **A 746-line forked interpreter, for a bounded interval.** `@zag-js/core` ships **no**
+1. **A forked interpreter (746 raw / 598 code), for a bounded interval.** `@zag-js/core` ships **no**
    interpreter — the runtime *is* the adapter (313–391 lines in every framework upstream ships), so
    "thin adapter" is false and adoption does mean owning a runtime. But upstream will publish a
    Solid 2.0 adapter once Solid 2.0 is stable, and **hope-ui does not publish before then either** —
@@ -370,11 +397,18 @@ Note this cost does **not** shrink when the fork retires — and unlike axis 4 i
 
 ---
 
-## 10. SolidJS idiom — **the decisive axis**
+## 10. SolidJS idiom — ~~the decisive axis~~ **downgraded by the second data point**
 
 Not in the original brief. It emerged from reading both stacks side by side after the corrections,
-and it is the strongest surviving argument against adoption — the only remaining cost that is both
-**structural** (no fix exists) and **compounding** (paid again per component).
+and it was scored as the strongest surviving argument against adoption — the only remaining cost that
+is both **structural** (no fix exists) and **compounding** (paid again per component).
+
+> **Second data point — `ZagListbox`, `__internal__/spikes/zag-listbox-findings.md`.** This axis
+> named its own experiment: *"whether the seam costs less the second time or more … nothing about
+> Dialog alone answers it, and the answer is the decision."* That experiment has now been run, on a
+> **collection**-driven component (200 items) rather than the Popover this section suggested, because
+> a collection is what actually exposes the granularity claim. **It amortizes.** The recommendation
+> at the foot of this document is updated accordingly; the other nine axes are untouched.
 
 ### The root cause: portability forces React's shape
 
@@ -401,7 +435,7 @@ mean forking every machine package — which is strictly worse than the interpre
 ### Five symptoms
 
 1. **The reactivity seam is a retrofit.** `createMemo(() => connect(service, normalizeProps))`
-   recomputes *every* part's whole prop object on every state change; `mergePartProps` then
+   recomputes *every* part's whole prop object on every state change; `mergeProps` then
    re-lazifies each key into a getter over that snapshot. A diff-shaped pipeline bolted onto a
    fine-grained runtime. Both `untrack`s exist purely to silence a `[STRICT_READ_UNTRACKED]` that is
    diagnosing the mismatch accurately (`B5`, `B6`).
@@ -438,7 +472,7 @@ The cost is not wrong output — it is that every seam is one a contributor must
 than read, and that the compiler and `[STRICT_READ_UNTRACKED]` stop helping once they have been
 `untrack`ed into silence.
 
-### Why this is decisive
+### Why this *was* scored decisive
 
 Apply the test used throughout: *if this alone were fixed, would the answer be go?*
 
@@ -446,12 +480,72 @@ Apply the test used throughout: *if this alone were fixed, would the answer be g
 - **Fix axis 10** (a Solid-native, signal-based `connect`) → axis 4 is closable for 310 lines and
   axis 9 is a flat 13 KB. That reads as a go.
 
-Axis 4 has a known fix at a known price. Axis 9 is a fixed toll. **Axis 10 is the only remaining
-cost that is structural, unpriceable, and multiplied by every component adopted** — and it is the
-one that quietly discounts axis 2's −39%, because the impedance layer is not among the lines that go
-away.
+Axis 4 has a known fix at a known price. Axis 9 is a fixed toll. Axis 10 looked like the only
+remaining cost that is structural, unpriceable, and multiplied by every component adopted — the one
+that quietly discounts axis 2's −39%, because the impedance layer is not among the lines that go away.
 
-**Score: ❌ decisive — the argument that survived every correction.**
+### What `ZagListbox` measured
+
+**The seam did not compound.** Every pre-registered "amortizes if" clause held, and every "compounds
+if" clause failed to occur:
+
+| | ZagDialog (7 singleton parts) | ZagListbox (8 parts, one instantiated 200×) |
+| --- | ---: | ---: |
+| `untrack` call sites in the component layer | 2 | **1** |
+| The merge seam | a `mergePartProps` wrapper, 48 raw / **15 code**, written in the component layer | **0** — its `untrack` moved into the fork, and the wrapper was deleted; both components now call `mergeProps` directly |
+| New seam machinery / per-item helper / store mirror | — | **none** |
+| Defects found in the vendored adapter | 2 (`A1`, `A2`) | **0** |
+| Component source, raw / **code** (excl. stories/tests) | 731 / **473** | 609 / **405** |
+
+Adding component #2 cost **405 code lines of assembly and one `untrack`**. The seam is a fixed cost paid
+once, with a small recurring floor of **three** rows, ~5 lines each, each a different *class* of
+collision:
+
+- `B2`/`B3` — Zag's `hidden` loses to the explicit `display` hope's recipes set on nearly every slot
+  (a **styling-convention** collision);
+- `C1`/`C2` — an unconditional labelling IDREF that dangles, because Zag derives ids from a scope
+  rather than registering them, so "does the target exist?" is unanswerable (an **id-strategy**
+  collision);
+- `B7` — **new, and it broke the deliverable**: `@zag-js/focus-visible` reads
+  `HTMLElement.prototype.focus` *off the prototype*, which Storybook 10.5 has replaced with an
+  accessor whose getter assumes an element receiver, so every story died with
+  `[REACTIVITY_HALTED] TypeError: Illegal invocation` (a **host-environment** collision). Fixed with
+  a 3-line warm-up. It applies to every Zag machine that tracks focus visibility — `listbox`,
+  `select`, `combobox`, `menu`, `tabs` — and **no test could see it**, because Vitest does not patch
+  `focus`.
+
+The floor is real, it *grew* between component #1 and component #2, and it grows by category rather
+than by line count — which is the honest reason not to extrapolate a flat per-component number from
+two data points.
+
+**And the granularity mechanism this section rests on was half wrong.** The claim above is that a
+snapshot-shaped `connect()` is O(N) per state change where Solid's fine-grained updates are O(1).
+Measured on 200 rows, one arrow-key move:
+
+| | ZagListbox | hope `Listbox` |
+| --- | ---: | ---: |
+| item prop-set recomputations | 400 (2/row) | **200 (1/row)** |
+| `getItemProps` / `getItemState` calls | **8 004** | 0 |
+| DOM attribute writes | 6 | 4 |
+
+hope is **O(N) too**. Solid's `spread` is one effect per *element* reading all of that element's
+props, and every row subscribes to the shared active signal through its own `data-active` — so every
+row re-runs on every highlight move, in both stacks. Fine-grained-ness is per element, not per
+attribute.
+
+What is real is the **40× constant** on each recomputation: `mergeProps` defines one lazy getter
+per key, and each getter re-invokes its whole source, so one prop-set read of an item calls
+`getItemProps` once per key (~20), twice per state change. That constant belongs to **the reconciling
+helper**, not to Zag's framework-agnosticism — a helper that memoised `getItemProps` per
+`(item, state)` would collapse it toward 1. So the axis is *less structural* than scored (it has a
+fix, inside hope's own layer) and *more consequential at scale* than Dialog could show (8 000 full
+item-state rebuilds per keystroke), with **nothing user-visible** either way: the DOM writes are 6
+against 4, because Solid's `spread` diffs before writing.
+
+**Score: ⚠️ real, priceable, does not compound.** A fixed seam cost already paid, a three-row
+recurring floor per component (~15 lines, three different collision classes), and one scaling
+constant that hope's own merge helper controls. **No longer decisive** — see the updated
+recommendation.
 
 ---
 
@@ -460,15 +554,15 @@ away.
 | Axis | First draft | Corrected |
 | --- | --- | --- |
 | 1. Feature parity | ✅ / ❌ four regressions + one impossible | ✅ / ⚠️ four regressions, priced |
-| 2. Code volume | ➖ wash (−14%) | ✅ **−39%** steady state, honest |
+| 2. Code volume | ➖ wash (−14%) | ✅ **−39%** steady state, honest — but **±0% until the fork retires** |
 | 3. Public API delta | ⚠️ one silent contract break | ✅ two documented moves |
-| 4. Accessibility | ❌ independent blocker | ❌ real, but priced at ~310 lines |
+| 4. Accessibility | ❌ independent blocker | ❌ real, but priced at ~154 code lines retained |
 | 5. SSR + hydration | ✅ | ✅ |
 | 6. Theming friction | ⚠️ | ⚠️ |
 | 7. Escape hatches | ❌ 5 of 9 dead-end | ✅ 8 of 9 have an option |
 | 8. Maintenance | ❌ **decisive** | ⚠️ acceptable — fork is bounded |
 | 9. Bundle size | ❌ | ❌ a fixed toll, no remedy |
-| 10. SolidJS idiom | *(not scored)* | ❌ **decisive** — structural and compounding |
+| 10. SolidJS idiom | *(not scored)* | ~~❌ decisive~~ → ⚠️ **priceable, does not compound** (`ZagListbox`) |
 
 ---
 
@@ -477,23 +571,30 @@ away.
 **Withdraw the NO-GO.** Zag.js is a viable foundation for hope-ui's overlay layer, and Dialog — its
 best case, with no collection axis — clears every bar that actually blocks shipping.
 
-**Decisive axis: 10 (SolidJS idiom).** Every other cost is bounded or priceable — axis 4 closes for
-~310 retained kernel lines (`createHideOutside` + `createFocusRestore` plus a 3-line `aria-controls`
-override, returning every axe assertion to zero allowances); axis 9 is a flat 13 KB toll; axis 8's
-fork retires on a date upstream has committed to. Axis 10 is the one that does none of those things:
-it is structural to Zag's framework-agnosticism, unfixable without forking every machine package,
-and paid again by every component adopted.
+~~**Decisive axis: 10 (SolidJS idiom).**~~ **Superseded — no axis is decisive any more.** The
+axis-10 experiment this document called for has been run (`ZagListbox`, a 200-item collection
+component, `__internal__/spikes/zag-listbox-findings.md`), and the seam **amortized**: component #2
+cost 405 code lines of assembly, **one** `untrack`, **zero** lines of new seam machinery, and **zero**
+adapter defects — and the one fork change it did make **deleted** a per-component workaround (the
+`mergePartProps` wrapper) rather than adding one. What remains of axis 10 is a three-row,
+~15-line recurring floor per component (`hidden` vs. the recipe's `display`; an unconditional
+labelling IDREF; and a Storybook crash from Zag's focus-visible tracking) plus a 40× recomputation
+constant that belongs to hope's own merge helper, is invisible in the DOM, and is fixable inside
+hope's layer.
 
-The trade, in one line: **hope-ui stops owning dialog behavior (−39% owned lines, and the removed
-lines are the hard ones) in exchange for ~13 KB gzipped per consumer, a scrim that can no longer
-carry its own handlers, and a permanent Solid-hostile seam that the −39% does not include.**
+So every cost on the board is now bounded or priceable: axis 4 closes for ~154 retained kernel code lines
+(and **does not generalise at all** — it belonged to the modality stack; ZagListbox's axe is clean
+with zero allowances); axis 9 is a per-component toll that shrinks as the closure is shared (+13.4 KB
+gz for Dialog, +9.7 KB for Listbox, 4 of 8 packages already installed); axis 8's fork retires on a
+date upstream has committed to; axis 10 is a fixed cost already paid.
 
-**So decide it on component #6, not on Dialog.** The behavior relief is per-component and roughly
-linear; the seam is per-component too, but it is cognitive rather than countable, and Dialog — one
-component, freshly built, with the reasoning still warm — is exactly where that cost is least
-visible. Two candidates that would expose it: Popover, whose floating/positioning layer multiplies
-the imperative-`style`-vs-reactive-binding conflict from axis 6, and Select, where `@zag-js/collection`
-already sank the earlier spike.
+The trade, in one line: **hope-ui stops owning component behavior — −39% for Dialog, −66% for
+Listbox (code lines, comments excluded), and the removed lines are the hard ones — in exchange for ~10–13 KB gzipped per
+component graph, a public-API migration, and a seam that is now measured rather than feared.**
+
+**What would actually decide it now is not a seam question but an identity one:** whether hope-ui
+wants to be a Solid-native library or a Solid binding over a portable behavior kernel. That is the
+maintainer's call, and no further spike will answer it.
 
 ### Do this next, in order
 
@@ -507,14 +608,14 @@ already sank the earlier spike.
    allowances. If they go green, axes 4 and 9 are priced exactly as above and stop being variables.
 4. **Expose `ids` on `ZagDialog.Root`** and drop the `id`-stripping in the seven parts (`B7`), which
    `G1` shows was never necessary.
-5. **Then, and only then, port a second component** — Popover, not another dialog-shaped one. That
-   is the axis-10 experiment, and it is the only one that can actually be run: whether the seam
-   costs less the second time (a reusable `mergePartProps`, familiar `untrack` sites) or more (a
-   floating layer writing `style` imperatively against a reactive binding). Nothing about Dialog
-   alone answers it, and the answer is the decision.
+5. ~~**Port a second component.**~~ **Done** — `ZagListbox`, and it moved axis 10 (above).
+6. **If the question is still live, the remaining unknown is a *floating* component** — Popover or
+   Select. Neither spike touched the imperative-`style`-vs-reactive-binding conflict of axis 6 under
+   a positioning layer, and that is the one seam a collection could not expose. It is no longer the
+   deciding experiment, though; it is due diligence on axis 6.
 
-Steps 1–4 retire the priceable costs. Step 5 is the one that decides. **Adoption remains a separate
-phase** — nothing here authorises it.
+Steps 1–4 retire the priceable costs. **Adoption remains a separate phase** — nothing here
+authorises it.
 
 ### Keep regardless of the outcome
 

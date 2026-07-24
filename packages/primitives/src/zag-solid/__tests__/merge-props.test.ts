@@ -1,4 +1,4 @@
-import { createSignal, flush, merge } from "solid-js";
+import { createMemo, createRoot, createSignal, flush, merge } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { mergeProps } from "../merge-props";
 
@@ -134,5 +134,74 @@ describe("mergeProps", () => {
 
     expect(merged.value).toBe("updated");
     expect(merged.class).toBe("base-class override-class");
+  });
+});
+
+/**
+ * The lazy-proxy half of the rewrite. Upstream built a fixed key set at construction, with a getter
+ * per key; these pin what replacing it with a proxy bought, and the one thing it costs.
+ */
+describe("mergeProps — laziness", () => {
+  it("picks up a key that only appears later", () => {
+    const [source, setSource] = createSignal<any>({ id: "base" });
+
+    const merged = mergeProps(source, { class: "x" });
+    expect(Object.keys(merged)).toEqual(["id", "class"]);
+
+    flush(() => setSource({ id: "base", "aria-expanded": "true" }));
+
+    expect(Object.keys(merged)).toEqual(["id", "aria-expanded", "class"]);
+    expect((merged as any)["aria-expanded"]).toBe("true");
+  });
+
+  it("resolves each accessor source once per change, however many keys are read", () => {
+    const [value, setValue] = createSignal("a");
+    const source = vi.fn(() => ({ id: value(), role: "option", "data-value": value() }));
+
+    const merged = mergeProps(source, { class: "x" });
+
+    const dispose = createRoot((disposeRoot) => {
+      createMemo(() => Object.keys(merged).map((key) => (merged as any)[key]));
+      return disposeRoot;
+    });
+    flush();
+
+    // Without the per-source memo this is one call per key, twice over — Solid's `merge` asks
+    // `key in source` before `source[key]`, and each of those re-invoked the accessor.
+    expect(source).toHaveBeenCalledOnce();
+
+    flush(() => setValue("b"));
+
+    expect(source).toHaveBeenCalledTimes(2);
+    dispose();
+  });
+
+  it("does not subscribe its reader to a structural query", () => {
+    // The regression this exists for: `Dynamic` resolves `props.component` and `spread` re-reads
+    // `props.children` — both `in` checks — from scopes that decide DOM *shape*. When those
+    // subscribed to the source, one machine transition re-created the whole subtree, taking focus
+    // and every event binding with it.
+    const [value, setValue] = createSignal("a");
+    const merged = mergeProps(() => ({ id: value() }), { class: "x" });
+
+    const structuralReads = vi.fn(() => "id" in merged);
+    const values = vi.fn(() => (merged as any).id);
+
+    const dispose = createRoot((disposeRoot) => {
+      createMemo(structuralReads);
+      createMemo(values);
+      return disposeRoot;
+    });
+    flush();
+    expect(structuralReads).toHaveBeenCalledOnce();
+    expect(values).toHaveBeenCalledOnce();
+
+    flush(() => setValue("b"));
+
+    expect(structuralReads).toHaveBeenCalledOnce();
+    // A *value* read is still fully reactive — that half is the point of the proxy.
+    expect(values).toHaveBeenCalledTimes(2);
+
+    dispose();
   });
 });

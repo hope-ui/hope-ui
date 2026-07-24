@@ -1,10 +1,10 @@
 import { createPresence } from "@hope-ui/primitives/internal";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { mergeProps } from "@hope-ui/primitives/zag-solid";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, createSignal, omit, Show } from "solid-js";
 import { useZagDialogContext } from "./zag-dialog-context";
-import { mergePartProps } from "./zag-dialog-merge-props";
 
 export interface ZagDialogBackdropProps extends JSX.HTMLAttributes<HTMLDivElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
@@ -27,7 +27,7 @@ export const Backdrop: Component<ZagDialogBackdropProps> = (props) => {
   const [ref, setRef] = createSignal<HTMLDivElement>();
   const presence = createPresence({ present: () => ctx.api().open, ref });
 
-  const elementProps = mergePartProps(
+  const elementProps = mergeProps(
     () => omit(ctx.api().getBackdropProps(), "hidden"),
     () => rest,
     {

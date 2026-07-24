@@ -1,35 +1,39 @@
 /**
- * A vendored fork of `@zag-js/solid@1.42.0` (`chakra-ui/zag`, `packages/frameworks/solid`, MIT),
- * migrated to SolidJS 2.0. **Temporary**: the official adapter targets Solid 1.x, and this
- * subpath exists only until upstream ships a 2.0-compatible release, at which point it is
- * deleted and `@zag-js/solid` is installed in its place. So it is a *minimal-diff* fork —
- * upstream's file layout and public API are preserved verbatim, and only what Solid 2.0 forces
- * was changed:
+ * The SolidJS 2.0 adapter for Zag.js machines — `useMachine`, plus the prop normalize/merge helpers
+ * a Zag-backed component needs.
  *
- * - `Key` (from `@solid-primitives/keyed`) is **not** re-exported. It is an uninstalled community
- *   control-flow component used only at component-render time, and no Zag component is ported yet.
- * - `onMount` → `onSettled` (`machine`, `use-sync-external-store`), which takes a *returned*
- *   teardown rather than an inner `onCleanup`.
- * - `mergeProps` → `merge` (`machine`). Both call sites only add method keys, so `merge`'s
- *   presence-based key resolution is equivalent there.
- * - Single-argument `createEffect` → the split `(compute, effect)` pair (`track`, `bindable`);
- *   2.0 rejects the one-argument form outright. `track` additionally runs its callback `untrack`ed,
- *   because machines read `prop(...)` inside it and 2.0's effect phase is strict-read-labelled.
- * - `bindable`'s signal is **boxed** (`{ value: T }` + an unwrapping `equals`), because 2.0's
- *   `createSignal(fn)` is the memo overload and would invoke a function-valued state instead of
- *   storing it. `use-sync-external-store`'s snapshot is boxed for the same reason.
- * - `flush` is Solid 2.0's real `flush`, not upstream's no-op. Solid 1.x propagated writes
- *   synchronously; 2.0's client build defers them to the next flush, so the machine's state write
- *   is drained at the call site — the same thing the React adapter does with `flushSync`.
- * - `JSX` types come from `@solidjs/web` (2.0's DOM package, and this repo's `jsxImportSource`).
- * - `normalizeProps` **stringifies boolean `aria-*` values** — the fork's one bug fix rather than a
- *   migration. Solid's `setAttribute` writes `true` as `""` and removes the attribute for `false`,
- *   so Zag's boolean ARIA state shipped as `aria-modal=""` or as nothing at all. Upstream has the
- *   same bug (React stringifies `aria-*`, so it never surfaces there).
+ * **Provenance:** started as a vendored fork of `@zag-js/solid@1.42.0` (`chakra-ui/zag`,
+ * `packages/frameworks/solid`, MIT), because the official adapter targets Solid 1.x. It began as a
+ * *minimal-diff* fork so the eventual swap back would be a drop-in; **that constraint has been
+ * lifted**, and the adapter is now written the way SolidJS 2.0 wants rather than the way Solid 1.x
+ * did. The public API (`useMachine`, `mergeProps`, `normalizeProps`) is unchanged, so a component
+ * written against it still ports, but the internals are ours:
+ *
+ * - **`mergeProps` is a lazy proxy** (`$PROXY` + traps), the shape SolidJS's own `merge` uses,
+ *   rather than an eager key-set enumeration with a getter per key. Nothing is read at construction,
+ *   so there is no untracked read to explain away, and the key set is no longer frozen. Its
+ *   structural traps (`has`/`ownKeys`) are deliberately untracked — see `merge-props.ts`.
+ * - **Seed reads are named.** `useMachine` runs the machine's construction callbacks through
+ *   `seedFromProps`, so a consumer writes a bare `useMachine(...)` in a render body instead of
+ *   wrapping it in an `untrack` of its own (both `ZagDialog` and `ZagListbox` used to).
+ * - **No React-shaped state.** `{ current }` ref boxes are plain closure variables; `bindable`
+ *   memoizes its params instead of rebuilding them on every read; `useSyncExternalStore` is gone
+ *   (it existed only for 1:1 API parity and nothing consumed it).
+ * - `onMount` → `onSettled`, `mergeProps` → `merge`, and the split `createEffect(compute, effect)`
+ *   pair, because 2.0 removed the alternatives outright.
+ * - **`bindable`'s signal is boxed** (`{ value: T }` + an unwrapping `equals`): 2.0's
+ *   `createSignal(fn)` is the memo overload and would invoke a function-valued state.
+ * - **`flush` is Solid 2.0's real `flush`**, not upstream's no-op. 1.x propagated writes
+ *   synchronously; 2.0's client build defers them, so the machine's state write is drained at the
+ *   call site — what the React adapter spells `flushSync`.
+ * - **`normalizeProps` stringifies boolean `aria-*` values** — a bug fix rather than a migration.
+ *   Solid's `setAttribute` writes `true` as `""` and drops the attribute for `false`, so Zag's
+ *   boolean ARIA state shipped as `aria-modal=""` or as nothing at all. Upstream has the same bug.
+ * - `Key` (from `@solid-primitives/keyed`) is not re-exported: uninstalled, and no Zag component
+ *   needs keyed rendering yet.
  *
  * See `__internal__/primitives/zag-solid/machine.md`.
  */
 export * from "./machine";
 export { mergeProps } from "./merge-props";
 export * from "./normalize-props";
-export * from "./use-sync-external-store";

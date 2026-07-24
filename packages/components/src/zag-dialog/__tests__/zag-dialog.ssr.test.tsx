@@ -55,7 +55,7 @@ describe("ZagDialog SSR", () => {
     // `pnpm exec vitest run --project=ssr -u`.
     const html = await renderToStringAsync(() => <Tree />);
     expect(html).toMatchInlineSnapshot(
-      `"<button _hk=00d010 data-scope="dialog" data-part="trigger" id="dialog:000:trigger" data-ownedby="000" aria-haspopup="dialog" type="button" aria-expanded="false" data-state="closed" aria-controls="dialog:000:content" >Open dialog</button>"`,
+      `"<button _hk=00g030 data-scope="dialog" data-part="trigger" id="dialog:000:trigger" data-ownedby="000" aria-haspopup="dialog" type="button" aria-expanded="false" data-state="closed" aria-controls="dialog:000:content" >Open dialog</button>"`,
     );
   });
 });

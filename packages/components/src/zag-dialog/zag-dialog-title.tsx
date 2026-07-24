@@ -1,9 +1,9 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
+import { mergeProps } from "@hope-ui/primitives/zag-solid";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, omit } from "solid-js";
 import { useZagDialogContext } from "./zag-dialog-context";
-import { mergePartProps } from "./zag-dialog-merge-props";
 
 export interface ZagDialogTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLHeadingElement>>;
@@ -18,7 +18,7 @@ export const Title: Component<ZagDialogTitleProps> = (props) => {
   const ctx = useZagDialogContext();
   const rest = omit(props, "render", "class", "id");
 
-  const elementProps = mergePartProps(
+  const elementProps = mergeProps(
     () => ctx.api().getTitleProps(),
     () => rest,
     {

@@ -26,12 +26,48 @@ import { createBindable } from "./bindable";
 import { createRefs } from "./refs";
 import { createTrack } from "./track";
 
+function resolve<T>(value: T | Accessor<T>): T {
+  return isFunction(value) ? value() : value;
+}
+
+const KIND_LABEL = { actions: "action", guards: "guard", effects: "effect" } as const;
+
+/**
+ * Runs one of the machine's **construction** callbacks — the ones that read props to derive a
+ * starting value: `context()` (listbox derives `initialValue` and its selected-item map there),
+ * `refs()`, and the state cell's `initialState({ prop })`.
+ *
+ * Those reads are one-shot by definition; Zag re-reads everything reactively afterwards, through
+ * `prop()` inside guards, actions, effects and `track` deps. They also happen in a component render
+ * body, the phase Solid 2.0 labels strict-read, so `untrack` is how the intent gets spelled instead
+ * of warned about. Doing it here — rather than at the call site — is what lets a consumer write a
+ * bare `useMachine(...)` in its render body.
+ *
+ * Deliberately not applied to `machine.watch?.()`: that one only *registers* `track` effects, whose
+ * deps are collected in their own tracking scope. A machine that reads props directly there has a
+ * real bug, and should keep getting the diagnostic.
+ */
+function seedFromProps<T>(read: () => T): T {
+  return untrack(read);
+}
+
+/**
+ * Binds a Zag.js machine to SolidJS reactivity: a scope, a reactive state cell, reactive props,
+ * per-state effects and a teardown. `@zag-js/core` is framework-agnostic pure TS; this is the
+ * whole of the framework adapter.
+ *
+ * Pass `userProps` as an **accessor** whenever a prop comes from a signal — it is re-read through a
+ * memo, so guards, actions and computed values see current values.
+ *
+ * The machine starts in `onSettled` and stops in `onCleanup`; outside that window `send` is a
+ * no-op, which is what makes an event fired from a torn-down effect harmless.
+ */
 export function useMachine<T extends MachineSchema>(
   machine: Machine<T>,
   userProps: Partial<T["props"]> | Accessor<Partial<T["props"]>> = {},
 ): Service<T> {
   const scope = createMemo(() => {
-    const { id, ids, getRootNode } = access(userProps) as any;
+    const { id, ids, getRootNode } = resolve(userProps) as any;
     return createScope({ id, ids, getRootNode });
   });
 
@@ -44,35 +80,37 @@ export function useMachine<T extends MachineSchema>(
   const props = createMemo(
     () =>
       machine.props?.({
-        props: compact(access(userProps)),
+        props: compact(resolve(userProps)),
         scope: scope(),
-      }) ?? access(userProps),
+      }) ?? resolve(userProps),
   );
 
-  const prop: any = createProp(props);
+  const prop: any = (key: string) => (props() as any)[key];
 
-  const context: any = machine.context?.({
-    prop,
-    bindable: createBindable,
-    get scope() {
-      return scope();
-    },
-    flush,
-    getContext() {
-      return ctx as any;
-    },
-    getComputed() {
-      return computed as any;
-    },
-    getRefs() {
-      return refs as any;
-    },
-    getEvent() {
-      return getEvent();
-    },
-  });
+  const context: any = seedFromProps(() =>
+    machine.context?.({
+      prop,
+      bindable: createBindable,
+      get scope() {
+        return scope();
+      },
+      flush,
+      getContext() {
+        return contextCells as any;
+      },
+      getComputed() {
+        return computed as any;
+      },
+      getRefs() {
+        return refs as any;
+      },
+      getEvent() {
+        return getEvent();
+      },
+    }),
+  );
 
-  const ctx: BindableContext<T> = {
+  const contextCells: BindableContext<T> = {
     get(key) {
       return context?.[key].get();
     },
@@ -88,21 +126,25 @@ export function useMachine<T extends MachineSchema>(
     },
   };
 
-  const effects = { current: new Map<string, VoidFunction>() };
-  const transitionRef: { current: any } = { current: null };
+  const refs = createRefs(
+    seedFromProps(() => machine.refs?.({ prop, context: contextCells })) ?? {},
+  );
 
-  const previousEventRef: { current: any } = { current: null };
-  const eventRef: { current: any } = { current: { type: "" } };
+  /** Cleanups for the effects of every state currently entered, keyed by state path. */
+  let effectCleanups = new Map<string, VoidFunction>();
+  let currentTransition: any = null;
+  let currentEvent: any = { type: "" };
+  let previousEvent: any = null;
 
   // `merge` is 2.0's `mergeProps`. Both call sites only *add* method keys to an object, so
   // `merge`'s presence-based (rather than value-based) key resolution can't bite here.
   const getEvent = (): any =>
-    merge(eventRef.current, {
+    merge(currentEvent, {
       current() {
-        return eventRef.current;
+        return currentEvent;
       },
       previous() {
-        return previousEventRef.current;
+        return previousEvent;
       },
     });
 
@@ -113,16 +155,13 @@ export function useMachine<T extends MachineSchema>(
         return values.some((value) => matchesState(current as string, value as string));
       },
       hasTag(tag: T["tag"]) {
-        const current = state.get();
-        return hasTag(machine, current, tag);
+        return hasTag(machine, state.get(), tag);
       },
     });
 
-  const refs = createRefs(machine.refs?.({ prop, context: ctx }) ?? {});
-
   const getParams = (): Params<T> => ({
     state: getState(),
-    context: ctx,
+    context: contextCells,
     event: getEvent(),
     prop,
     send,
@@ -138,129 +177,120 @@ export function useMachine<T extends MachineSchema>(
     choose,
   });
 
-  const action = (keys: ActionsOrFn<T> | undefined) => {
-    const strs = isFunction(keys) ? keys(getParams()) : keys;
-    if (!strs) {
+  /** Looks a name up in the machine's implementations, warning (as upstream does) when it is absent. */
+  const implementationOf = (kind: "actions" | "guards" | "effects", name: string): any => {
+    const found = (machine.implementations?.[kind] as any)?.[name];
+    if (!found) {
+      warn(`[zag-js] No implementation found for ${KIND_LABEL[kind]} "${JSON.stringify(name)}"`);
+    }
+    return found;
+  };
+
+  const action = (actions: ActionsOrFn<T> | undefined) => {
+    const names = isFunction(actions) ? actions(getParams()) : actions;
+    if (!names) {
       return;
     }
-    const fns = strs.map((s) => {
-      const fn = machine.implementations?.actions?.[s];
-      if (!fn) {
-        warn(`[zag-js] No implementation found for action "${JSON.stringify(s)}"`);
-      }
-      return fn;
-    });
-    for (const fn of fns) {
-      fn?.(getParams());
+    for (const name of names) {
+      implementationOf("actions", name as string)?.(getParams());
     }
   };
 
-  const guard = (str: T["guard"] | GuardFn<T>) => {
-    if (isFunction(str)) {
-      return str(getParams());
+  const guard = (guardOrFn: T["guard"] | GuardFn<T>) => {
+    if (isFunction(guardOrFn)) {
+      return guardOrFn(getParams());
     }
-    const fn = machine.implementations?.guards?.[str];
-    if (!fn) {
-      warn(`[zag-js] No implementation found for guard "${JSON.stringify(str)}"`);
-    }
-    return fn?.(getParams());
+    return implementationOf("guards", guardOrFn as string)?.(getParams());
   };
 
-  const effect = (keys: EffectsOrFn<T> | undefined) => {
-    const strs = isFunction(keys) ? keys(getParams()) : keys;
-    if (!strs) {
+  /** Starts a state's effects and returns the one cleanup that stops all of them. */
+  const startEffects = (effects: EffectsOrFn<T> | undefined) => {
+    const names = isFunction(effects) ? effects(getParams()) : effects;
+    if (!names) {
       return;
     }
-    const fns = strs.map((s) => {
-      const fn = machine.implementations?.effects?.[s];
-      if (!fn) {
-        warn(`[zag-js] No implementation found for effect "${JSON.stringify(s)}"`);
-      }
-      return fn;
-    });
     const cleanups: VoidFunction[] = [];
-    for (const fn of fns) {
-      const cleanup = fn?.(getParams());
+    for (const name of names) {
+      const cleanup = implementationOf("effects", name as string)?.(getParams());
       if (cleanup) {
         cleanups.push(cleanup);
       }
     }
     return () => {
-      cleanups.forEach((fn) => {
-        fn?.();
-      });
+      for (const cleanup of cleanups) {
+        cleanup?.();
+      }
     };
   };
 
-  const choose: ChooseFn<T> = (transitions) => {
-    return toArray(transitions).find((t) => {
-      let result = !t.guard;
-      if (isString(t.guard)) {
-        result = !!guard(t.guard);
-      } else if (isFunction(t.guard)) {
-        result = t.guard(getParams());
-      }
-      return result;
-    });
+  const rememberCleanup = (path: string, cleanup: VoidFunction | undefined) => {
+    if (!cleanup) {
+      return;
+    }
+    const existing = effectCleanups.get(path);
+    effectCleanups.set(path, existing ? callAll(existing, cleanup) : cleanup);
   };
+
+  const choose: ChooseFn<T> = (transitions) =>
+    toArray(transitions).find((transition) => {
+      if (isString(transition.guard)) {
+        return !!guard(transition.guard);
+      }
+      if (isFunction(transition.guard)) {
+        return transition.guard(getParams());
+      }
+      return !transition.guard;
+    });
 
   const computed: ComputedFn<T> = (key) => {
     ensure(machine.computed, () => `[zag-js] No computed object found on machine`);
-    const fn = machine.computed[key];
-    return fn({
-      context: ctx,
-      event: eventRef.current,
+    return machine.computed[key]({
+      context: contextCells,
+      event: currentEvent,
       prop,
       refs,
       scope: scope(),
-      computed: computed,
+      computed,
     });
   };
 
-  const state = createBindable(() => ({
-    defaultValue: resolveStateValue(machine, machine.initialState({ prop })),
-    onChange(nextState, prevState) {
-      const { exiting, entering } = getExitEnterStates(
-        machine,
-        prevState,
-        nextState,
-        transitionRef.current?.reenter,
-      );
+  const state = seedFromProps(() =>
+    createBindable(() => ({
+      defaultValue: resolveStateValue(machine, machine.initialState({ prop })),
+      onChange(nextState, prevState) {
+        const { exiting, entering } = getExitEnterStates(
+          machine,
+          prevState,
+          nextState,
+          currentTransition?.reenter,
+        );
 
-      exiting.forEach((item) => {
-        const exitEffects = effects.current.get(item.path);
-        exitEffects?.();
-        effects.current.delete(item.path);
-      });
-
-      exiting.forEach((item) => {
-        action(item.state?.exit);
-      });
-
-      action(transitionRef.current?.actions);
-
-      entering.forEach((item) => {
-        const cleanup = effect(item.state?.effects);
-        if (cleanup) {
-          const existing = effects.current.get(item.path);
-          effects.current.set(item.path, existing ? callAll(existing, cleanup) : cleanup);
+        for (const item of exiting) {
+          effectCleanups.get(item.path)?.();
+          effectCleanups.delete(item.path);
         }
-      });
 
-      if (prevState === INIT_STATE) {
-        action(machine.entry);
-        const cleanup = effect(machine.effects);
-        if (cleanup) {
-          const existing = effects.current.get(INIT_STATE);
-          effects.current.set(INIT_STATE, existing ? callAll(existing, cleanup) : cleanup);
+        for (const item of exiting) {
+          action(item.state?.exit);
         }
-      }
 
-      entering.forEach((item) => {
-        action(item.state?.entry);
-      });
-    },
-  }));
+        action(currentTransition?.actions);
+
+        for (const item of entering) {
+          rememberCleanup(item.path, startEffects(item.state?.effects));
+        }
+
+        if (prevState === INIT_STATE) {
+          action(machine.entry);
+          rememberCleanup(INIT_STATE, startEffects(machine.effects));
+        }
+
+        for (const item of entering) {
+          action(item.state?.entry);
+        }
+      },
+    })),
+  );
 
   let status = MachineStatus.NotStarted;
 
@@ -275,26 +305,28 @@ export function useMachine<T extends MachineSchema>(
     debug("unmounting...");
     status = MachineStatus.Stopped;
 
-    const fns = effects.current;
-    fns.forEach((fn) => {
-      fn?.();
-    });
-    effects.current = new Map();
-    transitionRef.current = null;
+    for (const cleanup of effectCleanups.values()) {
+      cleanup?.();
+    }
+    effectCleanups = new Map();
+    currentTransition = null;
 
     action(machine.exit);
   });
 
+  // Deferred by a microtask, upstream's design: an action that sends is not re-entrant with the
+  // transition that triggered it. That also puts the body outside every reactive phase, which is
+  // why the state read below needs no `untrack`.
   const send = (event: any) => {
     queueMicrotask(() => {
       if (status !== MachineStatus.Started) {
         return;
       }
 
-      previousEventRef.current = eventRef.current;
-      eventRef.current = event;
+      previousEvent = currentEvent;
+      currentEvent = event;
 
-      const currentState = untrack(() => state.get());
+      const currentState = state.get();
 
       const { transitions, source } = findTransition(machine, currentState, event.type as string);
       const transition = choose(transitions);
@@ -302,24 +334,20 @@ export function useMachine<T extends MachineSchema>(
         return;
       }
 
-      // save current transition
-      transitionRef.current = transition;
+      currentTransition = transition;
       const target = resolveStateValue(machine, transition.target ?? currentState, source);
 
       debug("transition", event.type, transition.target || currentState, `(${transition.actions})`);
 
-      const changed = target !== currentState;
-      if (changed) {
+      if (target !== currentState) {
         // State change is high priority, and under Solid 2.0 that now needs saying: a plain write
         // is invisible to a plain read until the next flush (client build), so two events queued
         // back-to-back would both transition from the *pre*-transition state. `flush` drains here
         // exactly like the React adapter's `flushSync(() => state.set(target))`.
         flush(() => state.set(target));
       } else if (transition.reenter) {
-        // reenter will re-invoke the current state
         state.invoke(currentState, currentState);
       } else {
-        // call transition actions
         action(transition.actions);
       }
     });
@@ -330,7 +358,7 @@ export function useMachine<T extends MachineSchema>(
   return {
     state: getState(),
     send,
-    context: ctx,
+    context: contextCells,
     prop,
     get scope() {
       return scope();
@@ -340,14 +368,4 @@ export function useMachine<T extends MachineSchema>(
     event: getEvent(),
     getStatus: () => status,
   } as unknown as Service<T>;
-}
-
-function access<T>(value: T | Accessor<T>) {
-  return isFunction(value) ? value() : value;
-}
-
-function createProp<T>(value: Accessor<T>) {
-  return function get<K extends keyof T>(key: K): T[K] {
-    return value()[key];
-  };
 }

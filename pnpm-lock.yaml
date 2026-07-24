@@ -217,6 +217,9 @@ catalogs:
     '@tanstack/virtual-core':
       specifier: 3.17.4
       version: 3.17.4
+    '@zag-js/collection':
+      specifier: 1.42.0
+      version: 1.42.0
     '@zag-js/core':
       specifier: 1.42.0
       version: 1.42.0
@@ -224,6 +227,12 @@ catalogs:
       specifier: 1.42.0
       version: 1.42.0
     '@zag-js/dismissable':
+      specifier: 1.42.0
+      version: 1.42.0
+    '@zag-js/focus-visible':
+      specifier: 1.42.0
+      version: 1.42.0
+    '@zag-js/listbox':
       specifier: 1.42.0
       version: 1.42.0
     '@zag-js/types':
@@ -394,7 +403,13 @@ importers:
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.2
+      '@zag-js/collection':
+        specifier: 'catalog:'
+        version: 1.42.0
       '@zag-js/dialog':
+        specifier: 'catalog:'
+        version: 1.42.0
+      '@zag-js/listbox':
         specifier: 'catalog:'
         version: 1.42.0
     devDependencies:
@@ -408,6 +423,9 @@ importers:
         specifier: 'catalog:'
         version: 2.0.0-beta.19(solid-js@2.0.0-beta.19)
       '@zag-js/dismissable':
+        specifier: 'catalog:'
+        version: 1.42.0
+      '@zag-js/focus-visible':
         specifier: 'catalog:'
         version: 1.42.0
       solid-js:
@@ -2271,6 +2289,9 @@ packages:
   '@zag-js/aria-hidden@1.42.0':
     resolution: {integrity: sha512-ao1RyEbHbglJtLLR4sJLPiD3hWF1CacuN5eqvODh/7HcntWULrkUHo8DIdzYgFL9GUHDyDmpaechMX5wL3kdPg==}
 
+  '@zag-js/collection@1.42.0':
+    resolution: {integrity: sha512-+Bhj/2zqVVzmS788lsg/xK1ezksMc2pfVg2oO6MnipLCo8KrgzuuvhUahUzK+uIOc9ljBW4zl9Wcm3G248gh0A==}
+
   '@zag-js/core@1.42.0':
     resolution: {integrity: sha512-jE/sbpZvbD+/etbawzhL/L2lP1pPefed5d919je+K5h9b6GAK3lUThleaDUCww3bT53B1L7O5gtqBapW37N1ug==}
 
@@ -2286,8 +2307,14 @@ packages:
   '@zag-js/focus-trap@1.42.0':
     resolution: {integrity: sha512-47O/OpLUm9o8CZd3ez0ntAOUKZEQ1zFj7e86fpYuQ+fNtBlpYMFHQxMRftPkiU5Ysjrz5x8RYV8A8uJ9cboNig==}
 
+  '@zag-js/focus-visible@1.42.0':
+    resolution: {integrity: sha512-zT1Fk+8m6x6hzoD5fOIEV4JQIX33pwkBzANqwruQwaSqkOYtI2FmsG71YHnzKvrBppG2okPrRHEMyZEgfshIcQ==}
+
   '@zag-js/interact-outside@1.42.0':
     resolution: {integrity: sha512-CNNT1OtASacXEst8NMWDGmDwkOQgVQ0Ahc2SpPjSBZoVpxQIfhZ9FoeqcggDX7Nvze7kl6/OwA7pPi5TGQTVZQ==}
+
+  '@zag-js/listbox@1.42.0':
+    resolution: {integrity: sha512-nt842jgTaBYTgkqu3y+4l88wpmoyesXkS+Bc3Uvuc7ze9IB04vicSiRi+vstYyA20s/EjOr2tR9Kq7dNoROLaQ==}
 
   '@zag-js/remove-scroll@1.42.0':
     resolution: {integrity: sha512-RP1SzQuVDk+np5knkEz/mRasLHZUbO6f3xgq4M2u4SQhpOe34uJybd+14f4ElBntAJQWVeMhohpW4n0pNUW6WQ==}
@@ -5635,6 +5662,10 @@ snapshots:
     dependencies:
       '@zag-js/dom-query': 1.42.0
 
+  '@zag-js/collection@1.42.0':
+    dependencies:
+      '@zag-js/utils': 1.42.0
+
   '@zag-js/core@1.42.0':
     dependencies:
       '@zag-js/dom-query': 1.42.0
@@ -5666,9 +5697,23 @@ snapshots:
     dependencies:
       '@zag-js/dom-query': 1.42.0
 
+  '@zag-js/focus-visible@1.42.0':
+    dependencies:
+      '@zag-js/dom-query': 1.42.0
+
   '@zag-js/interact-outside@1.42.0':
     dependencies:
       '@zag-js/dom-query': 1.42.0
+      '@zag-js/utils': 1.42.0
+
+  '@zag-js/listbox@1.42.0':
+    dependencies:
+      '@zag-js/anatomy': 1.42.0
+      '@zag-js/collection': 1.42.0
+      '@zag-js/core': 1.42.0
+      '@zag-js/dom-query': 1.42.0
+      '@zag-js/focus-visible': 1.42.0
+      '@zag-js/types': 1.42.0
       '@zag-js/utils': 1.42.0
 
   '@zag-js/remove-scroll@1.42.0':

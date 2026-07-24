@@ -36,7 +36,7 @@ would be visible and countable. Each is code hope-ui would own forever under ado
 | B3 | **`closeOnInteractOutside` is passed explicitly on every render.** | Zag defaults it to `modal && !alertDialog`, so `role="alertdialog"` silently stops closing on an outside click. `compact()` drops an omitted key, so "explicitly, always" is the only way to hold hope's semantics. Regression-guarded by `keeps role='alertdialog' dismissable on an outside click`. |
 | B4 | **`initialFocusEl` is passed explicitly on every render**, as a function returning `undefined`, behind a cast. | Same shape as B3: Zag defaults `initialFocusEl` to the close trigger under `role="alertdialog"`, where hope focuses the first focusable for both roles. `undefined` is the only value `@zag-js/focus-trap` reads as "no preference" — a `null` return **throws** in `getNodeForOption`. Zag types the return as `MaybeElement` = `HTMLElement \| null`, which **excludes the one value its own implementation needs**, hence the cast. |
 | B5 | **`untrack` around `useMachine(...)` in `Root`.** | The adapter seeds the machine's bindables by reading its props memo straight from the render body — `initialState({ prop })` for the state cell, `prop("triggerValue")`/`prop("defaultTriggerValue")` for the context cell. Thirteen `[STRICT_READ_UNTRACKED]` per `Root` otherwise. (Left in the component, not the fork: unlike A2 these are genuine one-time seed reads that a *caller* can legitimately scope.) |
-| B6 | **`mergePartProps`** (`zag-dialog-merge-props.ts`) — the adapter's `mergeProps` wrapped in `untrack`. | `connect()` returns a plain object computed eagerly, so it cannot be spread without freezing state. The adapter's `mergeProps` is the bridge, but it calls each source once at construction to enumerate keys — a reactive read in a render body, one diagnostic per part. |
+| B6 | ~~**`mergePartProps`** (`zag-dialog-merge-props.ts`) — the adapter's `mergeProps` wrapped in `untrack`.~~ **Retracted as a component-layer workaround: the wrapper has been deleted and the `untrack` moved into the fork** (`merge-props.ts`; see `A3` in `zag-listbox-findings.md`). Both Zag-backed components now call `mergeProps` directly and own **no** merge machinery. | `connect()` returns a plain object computed eagerly, so it cannot be spread without freezing state. The adapter's `mergeProps` is the bridge, but it calls each source once at construction to enumerate keys — a reactive read in a render body, one diagnostic per part. That read is one-shot and structural, so untracking it belongs in the adapter, exactly like `A2` — which is where it now lives. Upstream needs none of it: Solid 1.x has no strict-read phase (verified against the published tarball). |
 | B7 | **`id` is stripped from the consumer's props in all seven Zag-backed parts.** | See C6. |
 
 ## C. Behavior / API deltas, measured
@@ -92,14 +92,20 @@ Two structural results are worth calling out on their own:
 
 ## F. Volume (for Phase 3's axis 2)
 
-Not yet the full accounting — Phase 3 owns that. Raw numbers as built:
+Not yet the full accounting — Phase 3 owns that. **Raw `wc -l` counts comments and blank lines, which
+is unsound in this repo** (mandated *why*-comments mean a raw count rewards whichever side is worse
+documented); the `code` column was added later and is what axis 2 now scores on.
 
-| | Lines |
-| - | ---- |
-| `packages/components/src/zag-dialog/` (15 source files, excl. tests/stories) | 730 |
-| `packages/primitives/src/zag-solid/` (forked adapter — ~~permanently~~ **temporarily** owned, see G3) | 746 |
-| `create-presence.ts` (still required — B1) | 249 |
-| Handmade baseline: `primitives/dialog` + kernel primitives + `components/dialog` | ≈ 2130 |
+| | Raw | **Code** | Comment % |
+| - | ---: | ---: | ---: |
+| `packages/components/src/zag-dialog/` (15 source files, excl. tests/stories) | 731 | 473 | 27% |
+| `packages/primitives/src/zag-solid/` (forked adapter — ~~permanently~~ **temporarily** owned, see G3) | 746 | **598** | **11%** |
+| `create-presence.ts` (still required — B1) | 249 | 143 | 33% |
+| Handmade baseline: `primitives/dialog` + kernel primitives + `components/dialog` | 1771 | 1068 | 31% |
+
+The fork's 11% comment density is the reason the correction matters: it is a deliberate minimal-diff
+vendored copy, so in **code** terms it is 598 lines — more than `ZagDialog` itself, and nearly double
+hope's whole `primitives/dialog` family. See axis 2 of the comparison for the scenario it flips.
 
 ---
 

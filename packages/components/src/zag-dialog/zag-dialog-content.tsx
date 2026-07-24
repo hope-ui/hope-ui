@@ -1,11 +1,11 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { withDefaults } from "@hope-ui/primitives/utils";
+import { mergeProps } from "@hope-ui/primitives/zag-solid";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, omit, Show } from "solid-js";
 import { CloseTrigger } from "./zag-dialog-close-trigger";
 import { useZagDialogContext } from "./zag-dialog-context";
-import { mergePartProps } from "./zag-dialog-merge-props";
 
 export interface ZagDialogContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
   render?: RenderProp<JSX.HTMLAttributes<HTMLDivElement>>;
@@ -33,7 +33,7 @@ export const Content: Component<ZagDialogContentProps> = (props) => {
   const merged = withDefaults(props, { showCloseButton: true });
   const rest = omit(merged, "render", "class", "showCloseButton", "id");
 
-  const elementProps = mergePartProps(
+  const elementProps = mergeProps(
     () => omit(ctx.api().getContentProps(), "hidden"),
     () => rest,
     {

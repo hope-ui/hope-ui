@@ -42,6 +42,17 @@ catalog:
   "@zag-js/dismissable": 1.42.0
   "@zag-js/focus-trap": 1.42.0
   "@zag-js/remove-scroll": 1.42.0
+  # The listbox machine + its collection model, consumed by the `ZagListbox` spike
+  # (`packages/components/src/zag-listbox/`). Same lockstep rule. `@zag-js/listbox` pulls in
+  # `anatomy`/`dom-query`/`collection`/`focus-visible` and — deliberately — **no**
+  # dismissable/focus-trap/aria-hidden/popper, which is what isolates the collection axis from the
+  # overlay machinery ZagDialog already measured.
+  "@zag-js/collection": 1.42.0
+  "@zag-js/listbox": 1.42.0
+  # Already in `@zag-js/listbox`'s closure; pinned as a direct dependency only so the ZagListbox
+  # stories can *warm it up* before Storybook patches `HTMLElement.prototype.focus`. See the
+  # module-scope comment in `zag-listbox.stories.tsx` and row `B7` of the findings ledger.
+  "@zag-js/focus-visible": 1.42.0
 
 minimumReleaseAgeExclude:
   - vite@8.1.4
@@ -64,6 +75,9 @@ minimumReleaseAgeExclude:
   - '@zag-js/dismissable@1.42.0'
   - '@zag-js/focus-trap@1.42.0'
   - '@zag-js/remove-scroll@1.42.0'
+  - '@zag-js/collection@1.42.0'
+  - '@zag-js/listbox@1.42.0'
+  - '@zag-js/focus-visible@1.42.0'
   # apps/docs (TanStack Start) deps still in cooldown — excluded so `pnpm install` isn't gated.
   - '@tanstack/solid-router@2.0.0-beta.24'
   - '@tanstack/solid-start@2.0.0-beta.25'

@@ -34,7 +34,22 @@ together: the adapter and the core it adapts are one unit.
 | `createSignal(initial)` in `bindable` | a boxed `createSignal<{ value: T }>`       | 2.0's `createSignal(fn)` is the *memo* overload, so a function-valued state would be invoked instead of stored. See `bindable.md`. |
 | `function flush(fn) { fn() }`       | `flush` from `solid-js`                      | Upstream's no-op was correct only because Solid 1.x propagated writes synchronously. See "The flush" below. |
 | `import type { JSX } from "solid-js"` | `from "@solidjs/web"`                      | 2.0 moved the DOM/JSX types there; it is also this repo's `jsxImportSource`. |
+| `mergeProps` builds its getter set with a plain read of each source | construction wrapped in `untrack` | Enumerating the key set calls each accessor source once — a reactive read, and a Zag part calls this from a *component render body*, a strict-read-labelled phase in 2.0. One `[STRICT_READ_UNTRACKED]` per merged part; `mount()` fails a test on it. The read is one-shot and structural (the per-key getters stay reactive — `untrack` covers only synchronous construction), so this is the same false positive, and the same fix, as `createTrack` above. **Verified against the published tarball:** upstream's `merge-props.ts` imports only `@zag-js/core` and has no `untrack` — Solid 1.x has no strict-read phase, so the identical read is silent there. See `merge-props.md`. |
 | a boolean `aria-*` value passes through `normalizeProps` unchanged | stringified (`false` → `"false"`) | **The one bug fix in the fork, not a migration.** Solid's `setAttribute` writes `true` as `""` and *removes* the attribute for `false`, so `aria-modal={true}` shipped `aria-modal=""` (axe: `aria-valid-attr-value`) and `aria-expanded={false}` shipped nothing at all. Upstream has the same bug — it is invisible there because React's DOM layer stringifies `aria-*` for you. Found by `ZagDialog`; see `normalize-props.md` and `__internal__/spikes/zag-dialog-findings.md`. Upstreaming it is the real fix. |
+
+### The second consumer found no new *defects*, and moved one workaround in
+
+`ZagDialog` — the fork's first consumer — turned up the `aria-*` and `createTrack` rows. The second,
+`ZagListbox` (`@zag-js/listbox`, a collection machine sharing none of dialog's concerns), found
+**zero new defects**, while depending on both fixes: its SSR test's `aria-selected="false"`
+assertions are green only because of the `aria-*` stringification, and `mount()` is silent only
+because `createTrack` runs `untrack`ed.
+
+It did move one workaround **into** the fork, where it belonged: the `mergeProps` `untrack` row.
+`ZagDialog` had solved that in its own component folder (a local `mergePartProps` wrapper), which
+meant every future Zag-backed component would import or re-derive it. It is the same false positive
+`createTrack` fixes, one layer down — so a consumer now needs **no** `untrack` at all to merge part
+props. See `merge-props.md` and `__internal__/spikes/zag-listbox-findings.md` §A/§B1.
 
 ## API
 

@@ -57,6 +57,10 @@ export const HYDRATION_ENTRIES: Record<string, string> = {
     repoRoot,
     "packages/components/src/zag-dialog/__tests__/zag-dialog.ssr-entry.tsx",
   ),
+  "zag-listbox": join(
+    repoRoot,
+    "packages/components/src/zag-listbox/__tests__/zag-listbox.ssr-entry.tsx",
+  ),
   "theme-context": join(repoRoot, "packages/theming/src/__tests__/theme-context.ssr-entry.tsx"),
   // A component-free keyed tree the `hydrateFixture` helper's own suite hydrates to pin its
   // success and reuse-failure paths against genuine `_hk` markup.

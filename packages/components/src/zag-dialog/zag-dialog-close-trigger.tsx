@@ -1,8 +1,8 @@
 import { CloseButton, type CloseButtonProps } from "@hope-ui/components/close-button";
+import { mergeProps } from "@hope-ui/primitives/zag-solid";
 import { cx } from "@hope-ui/theming";
 import { type Component, omit } from "solid-js";
 import { useZagDialogContext } from "./zag-dialog-context";
-import { mergePartProps } from "./zag-dialog-merge-props";
 
 // A `CloseButton` with the machine's close wiring — so it inherits `size`/`icon`/`render`/`class`/
 // `slotClasses`/native attrs for free, and shows the themed X by default. Because it renders a
@@ -13,7 +13,7 @@ export const CloseTrigger: Component<ZagDialogCloseTriggerProps> = (props) => {
   const ctx = useZagDialogContext();
   const rest = omit(props, "render", "class", "id");
 
-  const elementProps = mergePartProps(
+  const elementProps = mergeProps(
     () => ctx.api().getCloseTriggerProps(),
     () => rest,
     {

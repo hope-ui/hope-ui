@@ -15,7 +15,8 @@
       "close-button": "src/close-button/index.ts",
       "dialog": "src/dialog/index.ts",
       "listbox": "src/listbox/index.ts",
-      "zag-dialog": "src/zag-dialog/index.ts"
+      "zag-dialog": "src/zag-dialog/index.ts",
+      "zag-listbox": "src/zag-listbox/index.ts"
     }
   },
   "exports": {
@@ -51,6 +52,10 @@
       "types": "./dist/zag-dialog/index.d.ts",
       "solid": "./dist/zag-dialog/index.jsx"
     },
+    "./zag-listbox": {
+      "types": "./dist/zag-listbox/index.d.ts",
+      "solid": "./dist/zag-listbox/index.jsx"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -66,13 +71,16 @@
     "@hope-ui/primitives": "workspace:*",
     "@hope-ui/theming": "workspace:*",
     "@internationalized/date": "catalog:",
-    "@zag-js/dialog": "catalog:"
+    "@zag-js/collection": "catalog:",
+    "@zag-js/dialog": "catalog:",
+    "@zag-js/listbox": "catalog:"
   },
   "devDependencies": {
     "@hope-ui/internal-test-utils": "workspace:*",
     "@hope-ui/presets": "workspace:*",
     "@solidjs/web": "catalog:",
     "@zag-js/dismissable": "catalog:",
+    "@zag-js/focus-visible": "catalog:",
     "solid-js": "catalog:"
   }
 }
