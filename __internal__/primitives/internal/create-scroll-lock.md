@@ -27,12 +27,20 @@ code exists to absorb — silently, and in every RTL locale. The logical propert
 edge the scrollbar actually occupied. This is the same rule the recipes follow
 (`__internal__/theming.md`, "RTL-aware recipes", enforced by `pnpm check:rtl-safety`).
 
-**Test coverage note.** The compensation *arithmetic* has no browser coverage: it only runs when
-`window.innerWidth - document.documentElement.clientWidth` is positive, and that is structurally 0
-in the `browser` project — Chromium's headless shell uses overlay scrollbars, and
-`documentElement.clientWidth` reports the viewport rather than the element box, so it cannot be
-faked either. What the tests pin is the property the lock snapshots and restores through, which is
-the part that regressed.
+**Test coverage note.** The compensation *arithmetic* is covered, and only became coverable once the
+browser project stopped hiding its scrollbars. It runs when `window.innerWidth -
+document.documentElement.clientWidth` is positive, which measured 0 for as long as the project took
+Playwright's launch defaults: Playwright pushes `--hide-scrollbars` on **every** headless launch
+(`_innerDefaultArgs`, gated on `options.headless`). Overlay scrollbars were never the cause, and
+`--disable-features=OverlayScrollbar` changes nothing here. `vitest.config.ts` drops the arg with
+`launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] }`, which yields a real 15px gutter in the
+`chromium-headless-shell` build CI installs — not a full-Chromium-only capability — and left all 553
+browser tests passing.
+
+The tests therefore pin the arithmetic (`current + scrollbarWidth`, additive over an existing
+`padding-inline-end`) **and** the edge it lands on: `padding-right` under `ltr`, `padding-left` under
+`dir="rtl"`. Each one first asserts `gutter > 0`, so if the launch arg ever comes back the tests fail
+loudly instead of passing vacuously.
 
 ## Where the ref count lives, and why it matters
 

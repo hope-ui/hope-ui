@@ -22,5 +22,4 @@ storybook-static/
 __MACOSX/
 
 #
-__react-spectrum__
-__base-ui__
+__reference-impl__

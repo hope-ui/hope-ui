@@ -182,3 +182,23 @@ an `it.skip`. The enforced set is in `__internal__/definition-of-done.md`.
 Not jsdom, and deliberately. jsdom cannot be trusted for focus, keyboard or pointer behavior, so
 those tests belong in `browser` against real Chromium. With no `document` in `unit`, writing one in
 the wrong place is *impossible* rather than merely discouraged.
+
+## The `browser` project keeps its scrollbars
+
+Playwright pushes `--hide-scrollbars` on **every** headless launch (`_innerDefaultArgs`, gated on
+`options.headless`), so the project used to run with no scrollbar gutter at all:
+`window.innerWidth - document.documentElement.clientWidth` measured 0 with the document overflowing.
+That is precisely the quantity `createScrollLock` compensates, so its arithmetic branch was
+unreachable — a test could only pin *which property* the lock wrote, never the value.
+
+`vitest.config.ts` drops the arg via `launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] }`.
+Two things worth knowing before touching it:
+
+- **It works in `chromium-headless-shell`**, the only build CI installs (`playwright install
+  --with-deps --only-shell`) — a measured 15px gutter, not a full-Chromium-only capability.
+- **Overlay scrollbars were a red herring.** `--disable-features=OverlayScrollbar` on its own leaves
+  the gutter at 0, because `--hide-scrollbars` is what removes it.
+
+A real gutter is also the more faithful environment — it is what a desktop reader has — and every
+gutter assertion in `create-scroll-lock.browser.test.tsx` opens with `expect(gutter)
+.toBeGreaterThan(0)` so that re-adding the arg fails loudly rather than passing vacuously.

@@ -15,19 +15,32 @@ function CopyTestHarness(props: { active: () => boolean; create: typeof createSc
 }
 
 /*
- * ── What the two tests below can and cannot reach ───────────────────────────────────────────────
+ * ── Why a gutter exists here at all ─────────────────────────────────────────────────────────────
  * `createScrollLock` only writes padding when `window.innerWidth - document.documentElement
- * .clientWidth` is positive — a classic scrollbar's gutter. **That is structurally 0 in this
- * project**, twice over: Chromium's headless shell uses overlay scrollbars (measured: `innerWidth`
- * 414 against a `clientWidth` of 414, with the document overflowing at `scrollHeight` 2688 vs
- * `clientHeight` 896), and `documentElement.clientWidth` returns the *viewport* rather than the
- * element's own box, so narrowing `<html>` cannot fake it either.
+ * .clientWidth` is positive — a classic scrollbar's gutter. That measured 0 until the browser
+ * project stopped passing Playwright's default `--hide-scrollbars`
+ * (`vitest.config.ts` → `ignoreDefaultArgs`), which every headless launch used to add; overlay
+ * scrollbars were never the cause. With the arg dropped the headless *shell* build CI installs
+ * draws a real 15px gutter, so the compensation arithmetic is reachable and asserted below.
  *
- * So the arithmetic (`current + scrollbarWidth`) has no browser coverage here. What these pin is
- * the part that actually regressed and *is* observable without a gutter: **which property the lock
- * snapshots and restores through**. A `padding-right` implementation snapshots and restores a
- * different property than the one under test, so it fails the round-trip below.
+ * `gutterOf` re-measures per test rather than hard-coding 15: the width is a platform detail, and
+ * the assertions only care that the lock adds *exactly what collapsed* to the edge the text ends on.
  */
+
+/**
+ * Makes the document overflow so `<body>`'s overflow — which propagates to the viewport in HTML —
+ * actually draws a scrollbar, and reports the gutter that the lock will have to compensate.
+ */
+function withOverflowingDocument() {
+  const spacer = document.createElement("div");
+  spacer.style.height = "3000px";
+  document.body.append(spacer);
+
+  return {
+    gutter: window.innerWidth - document.documentElement.clientWidth,
+    removeSpacer: () => spacer.remove(),
+  };
+}
 
 describe("createScrollLock", () => {
   afterEach(() => {
@@ -145,6 +158,75 @@ describe("createScrollLock", () => {
     expect(Number.parseFloat(restored.paddingRight)).toBe(0);
 
     dispose();
+  });
+
+  it("compensates the collapsing gutter with an equal padding-inline-end", () => {
+    const { gutter, removeSpacer } = withOverflowingDocument();
+    // The environment guard. With `--hide-scrollbars` back in the launch args this is 0, the
+    // `scrollbarWidth > 0` branch never runs, and every assertion below would pass vacuously.
+    expect(gutter).toBeGreaterThan(0);
+
+    const [active, setActive] = createSignal(true);
+    const { dispose } = mount(() => <TestHarness active={active} />);
+
+    expect(Number.parseFloat(document.body.style.paddingInlineEnd)).toBe(gutter);
+
+    flush(() => setActive(false));
+    expect(document.body.style.paddingInlineEnd).toBe("");
+
+    dispose();
+    removeSpacer();
+  });
+
+  it("adds the gutter to the body's existing padding instead of replacing it", () => {
+    document.body.style.paddingInlineEnd = "10px";
+    const { gutter, removeSpacer } = withOverflowingDocument();
+    expect(gutter).toBeGreaterThan(0);
+
+    const [active, setActive] = createSignal(true);
+    const { dispose } = mount(() => <TestHarness active={active} />);
+
+    expect(Number.parseFloat(document.body.style.paddingInlineEnd)).toBe(10 + gutter);
+
+    flush(() => setActive(false));
+    expect(document.body.style.paddingInlineEnd).toBe("10px");
+
+    dispose();
+    removeSpacer();
+  });
+
+  it("compensates the RIGHT edge under LTR", () => {
+    document.documentElement.dir = "ltr";
+    const { gutter, removeSpacer } = withOverflowingDocument();
+    expect(gutter).toBeGreaterThan(0);
+
+    const [active] = createSignal(true);
+    const { dispose } = mount(() => <TestHarness active={active} />);
+
+    const held = window.getComputedStyle(document.body);
+    expect(Number.parseFloat(held.paddingRight)).toBe(gutter);
+    expect(Number.parseFloat(held.paddingLeft)).toBe(0);
+
+    dispose();
+    removeSpacer();
+  });
+
+  it("compensates the LEFT edge under RTL, where the viewport scrollbar actually was", () => {
+    document.documentElement.dir = "rtl";
+    const { gutter, removeSpacer } = withOverflowingDocument();
+    expect(gutter).toBeGreaterThan(0);
+
+    const [active] = createSignal(true);
+    const { dispose } = mount(() => <TestHarness active={active} />);
+
+    // A `padding-right` implementation pads the edge that never held the scrollbar: the page keeps
+    // the width the collapsing gutter freed *and* gains the compensation — the shift, doubled.
+    const held = window.getComputedStyle(document.body);
+    expect(Number.parseFloat(held.paddingLeft)).toBe(gutter);
+    expect(Number.parseFloat(held.paddingRight)).toBe(0);
+
+    dispose();
+    removeSpacer();
   });
 
   it("has no baseline accessibility violations", async () => {

@@ -118,7 +118,19 @@ export default defineConfig({
             // "chromium-headless-shell" build (`playwright install --with-deps
             // --only-shell`), which Playwright only picks up when headless is on.
             headless: true,
-            provider: playwright(),
+            // `--hide-scrollbars` is Playwright's own default for *every* headless launch
+            // (`_innerDefaultArgs`, gated on `options.headless`), and it collapses the classic
+            // scrollbar gutter to nothing: `window.innerWidth - documentElement.clientWidth`
+            // measures 0 with the document overflowing. That is the exact quantity
+            // `createScrollLock` compensates, so its arithmetic branch was unreachable and
+            // silently untested — and the gutter is what a real desktop reader has. Dropping the
+            // arg restores a 15px gutter in the headless *shell* build CI installs (measured),
+            // so this is not a full-Chromium-only capability. `ignoreDefaultArgs` filters by
+            // exact string match; `--disable-features=OverlayScrollbar` does nothing here,
+            // overlay scrollbars were never the cause.
+            provider: playwright({
+              launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] },
+            }),
             instances: [{ browser: "chromium" }],
           },
         },
