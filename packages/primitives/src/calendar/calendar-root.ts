@@ -289,19 +289,12 @@ export interface CreateCalendarReturn {
 
 /**
  * The shared state kernel of a calendar — the one call at the root of the tree, modeled on
- * `createDialog`. It owns the view state machine (month / year / decade), the roving cursor, the
- * selection (via the pure `SelectionStrategy` seam), all the date math + predicates, the shared
- * navigation kernel (`createCollection` + `createListFocus`, which the grid + cell part hooks compose),
- * and the live-region announcer. It renders **no JSX and no host element**.
+ * `createDialog`. Owns the view machine (month / year / decade), the roving cursor, the selection
+ * (via the pure `SelectionStrategy` seam), the date math + predicates, the navigation kernel the
+ * grid + cell part hooks compose, and the live-region announcer. Renders no JSX and no host element.
  *
- * The view machine: `view` selects what `visibleMonth` is shown *as*; `cells`/`headingLabel`/boundary
- * math/predicates switch on it. `drillUp` climbs month→year→decade; `drillDownTo` descends; `activate`
- * *selects* in month view but *drills* in year/decade. The cursor (`focusedDate`) is kept normalized to
- * the active view's cell granularity so `isFocused` is a plain `isSameDay` everywhere, and the visible
- * scope follows the cursor when it leaves (arrow-off-the-edge crossing) via one effect.
- *
- * Ported from the Angular calendar's `CalendarContext` + root directive; the controlled/uncontrolled
- * `value`/`focusedValue` pairs use `createControllableState`.
+ * Ported from the Angular calendar's `CalendarContext` + root directive. Full model:
+ * `__internal__/primitives/calendar/calendar-root.md`.
  */
 export function createCalendar(options: CreateCalendarOptions = {}): CreateCalendarReturn {
   const merged = withDefaults(options, {
@@ -335,11 +328,9 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
 
   // --- State ---
   // "Bring DOM focus to wherever the cursor settles." Armed by whoever moves the cursor
-  // programmatically — the grid's arrow/page/drill navigation, and the keyboard range auto-advance
-  // below — and consumed by the grid, which owns the effect that waits for the target cell to mount
-  // before focusing it. The flag lives here rather than in the grid because the *cell* has to arm it
-  // too, and a cell has no reference to the grid hook. A plain-value signal, so it consumes no
-  // hydration id and does not shift `_hk`.
+  // programmatically, consumed by the grid (which waits for the target cell to mount before
+  // focusing). It lives here rather than in the grid because a *cell* has to arm it too, and a cell
+  // has no reference to the grid hook. A plain-value signal, so it consumes no hydration id.
   const [pendingCursorFocus, setPendingCursorFocus] = createSignal(false);
 
   const [view, setViewSignal] = createSignal<CalendarView>("month");
@@ -350,31 +341,20 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const [anchorDate, setAnchorDate] = createSignal<CalendarDate | null>(null);
 
   // React Aria's contiguity model (`useRangeCalendarState`'s `getAvailableRange`, folded into the
-  // calendar's own `min`/`max`): while a range is anchored, the selectable window shrinks to the run of
-  // consecutive available days containing the anchor, so a range can never straddle an unavailable day.
+  // calendar's own `min`/`max`): while a range is anchored, the selectable window shrinks to the run
+  // of consecutive available days containing the anchor. Narrowing the *bounds* rather than guarding
+  // at the commit is the point — every downstream predicate inherits the constraint for free, where a
+  // commit-time guard would still let the arrows cross the unavailable day. Details:
+  // `__internal__/primitives/calendar/calendar-root.md` § Contiguous ranges. Three choices to keep:
   //
-  // Narrowing the **bounds** rather than adding a guard at the commit is the whole point: every
-  // downstream predicate — `isCellOutOfRange` → `isCellDisabled` → `isDateNonFocusable`,
-  // `isDateSelectable`, the cursor clamp and with it the tentative band — inherits the constraint for
-  // free. A commit-time guard alone would still let the arrows cross the unavailable day and preview a
-  // band with a hole punched in it.
-  //
-  // Either side is `undefined` when no unavailable day turns up within a month of the anchor — the run
-  // is unbounded there, and the consumer's own bound is what remains. The run is read through the
-  // **raw** `isDateDisabled` rather than `isDateUnavailable`, which reports false outside month view:
-  // which days are available is a property of the days, not of the view being looked at, so drilling up
-  // mid-selection must not silently widen the window.
-  //
-  // A `createMemo` and not a plain accessor, unlike `highlightedRange` and `formValues`: `min`/`max`
-  // are read twice per cell per predicate, and each read would otherwise walk up to a month of days
-  // through the consumer's `isDateDisabled` — tens of thousands of callbacks per pointer move once
-  // unavailable days are sparse. That earns the one reactive node, at the measured price of shifting
-  // every `_hk` in the SSR tree (and `headingId`) by one, which is why the calendar's inline snapshot
-  // was re-recorded with this change.
-  //
-  // Gated on range mode, not on `anchorDate` alone: nothing clears the anchor when `selectionMode`
-  // changes, and a stale anchor left over from an abandoned range would otherwise keep the bounds
-  // clamped for good — inert cells and dead nav in a mode that has no ranges at all.
+  //  - Read through the **raw** `isDateDisabled`, not `isDateUnavailable`, which reports false
+  //    outside month view — availability is a property of the days, not of the view, so drilling up
+  //    mid-selection must not silently widen the window.
+  //  - A `createMemo`, unlike `highlightedRange`/`formValues`: `min`/`max` are read twice per cell
+  //    per predicate, each read otherwise walking a month of days through the consumer's callback.
+  //    Costs one reactive node, which shifts every `_hk` in the SSR tree by one.
+  //  - Gated on range mode, not on `anchorDate` alone: nothing clears the anchor when `selectionMode`
+  //    changes, so a stale anchor would keep the bounds clamped for good.
   const availableRange = createMemo<{ start?: CalendarDate; end?: CalendarDate } | null>(() => {
     const anchor = anchorDate();
     const isDateUnavailable = isDateDisabledFn();
@@ -418,14 +398,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const [visibleMonth, setVisibleMonth] = createSignal<CalendarDate>(startOfMonth(seed));
 
   // The raw controllable cursor; `focusedDate` clamps it into `[min, max]` and normalizes it to the
-  // view granularity so a rendered cell always matches under `isSameDay`. `onFocusedValueChange` fires
-  // on every cursor move.
+  // view granularity so a rendered cell always matches under `isSameDay`.
   //
-  // Clamping *here* as well as in `setFocusedDate` is React Aria's "constrain again at render": it is
-  // what catches the two cursors the setter never sees — a controlled `focusedValue` outside the
-  // bounds, and a `min`/`max` that narrows after mount. Constrain **before** normalize, because the
-  // clamp is day-level: re-flooring afterwards keeps a year/decade cursor on a cell that exists. The
-  // pair is a fixed point, so re-applying it to an already-stored cursor never moves it again.
+  // Clamping here *as well as* in `setFocusedDate` is React Aria's "constrain again at render",
+  // catching the two cursors the setter never sees: a controlled `focusedValue` outside the bounds,
+  // and a `min`/`max` that narrows after mount. Constrain **before** normalize — the clamp is
+  // day-level, so re-flooring afterwards keeps a year/decade cursor on a cell that exists. The pair
+  // is a fixed point, so re-applying it never moves an already-stored cursor again.
   const [rawFocused, setRawFocused] = createControllableState<CalendarDate>({
     value: () => merged.focusedValue ?? undefined,
     defaultValue: () => seed,
@@ -572,29 +551,21 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   };
   const isFocused = (date: CalendarDate) => isSameDay(date, focusedDate());
 
-  // React Aria's gate on the whole selection paint (`useCalendarState`'s `isSelected` returns false
-  // when `isCellDisabled(date) || isCellUnavailable(date)`): a day this calendar cannot select must
-  // never *look* selected. Otherwise a range committed before `max` narrowed — or one spanning an
-  // `isDateDisabled` day — paints a band the click refuses to reproduce, and `aria-selected` claims a
-  // value that is not one. Such a day is simply cut out of the band.
-  //
-  // Two deliberate boundaries:
+  // React Aria's gate on the whole selection paint (`useCalendarState`'s `isSelected`): a day this
+  // calendar cannot select must never *look* selected, so it is cut out of the band rather than
+  // painting one the matching click would refuse. Two boundaries to keep:
   // - It lives here, not in the strategies: those stay pure, mode-only and day-based, with no notion
   //   of the calendar's bounds or availability.
-  // - It reads `isCellDisabled`, **not** `isDateNonFocusable` — the outside-scope filler days keep
-  //   their paint, so a range crossing a month boundary still renders as one continuous band on both
-  //   sides. (React Aria folds the visible range into its own `isCellDisabled`, but it renders no
-  //   filler days at all, so it has no band to keep continuous.)
+  // - It reads `isCellDisabled`, not `isDateNonFocusable` — the outside-scope filler days keep their
+  //   paint, so a range crossing a month boundary renders as one continuous band on both sides.
   const paintsSelection = (date: CalendarDate) => !isCellDisabled(date) && !isDateUnavailable(date);
-  // What a cell *covers* in the active view, which is what the selection is tested against: a year cell
-  // must paint for a range merely passing through the month, not only for one starting on the 1st. In
-  // month view the period is the degenerate `{ date, date }`, so every predicate below is bit-for-bit
-  // what it was. React Aria has no year/decade view, so this generalization is hope-ui's own.
+  // What a cell *covers* in the active view, which is what the selection is tested against: a year
+  // cell must paint for a range merely passing through the month, not only one starting on the 1st.
+  // Month view's period is the degenerate `{ date, date }`, so its predicates are unchanged.
   const periodOf = (date: CalendarDate) => cellPeriod(view(), date);
   // One band, three predicates — React Aria's vocabulary. Range mode resolves them against
-  // `highlightedRange` (tentative while anchored, committed when idle), so hover and keyboard share one
-  // code path: hover moves the cursor (`highlightDate`), and the band can never disagree with the cell
-  // the user is on. A consumer wanting the middle derives it — `isSelected && !start && !end` — which
+  // `highlightedRange` (tentative while anchored, committed when idle), so hover and keyboard share
+  // one code path. A consumer wanting the middle derives it (`isSelected && !start && !end`), which
   // is what `data-selection-middle` is repointed at in the preset.
   const isSelected = (date: CalendarDate) =>
     paintsSelection(date) && strategy().isSelected(selectionState(), periodOf(date));
@@ -621,10 +592,8 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // --- Navigation ---
   const setFocusedDate = (date: CalendarDate) => {
     // Constrain then normalize before storing (React Aria's `focusCell`), so the cursor — and
-    // `onFocusedValueChange` — report a date that is both inside `[min, max]` and at view granularity.
-    // Every move funnels through here (`navigate`, `shiftYears`, `applyView`, `activate`,
-    // `highlightDate`), so this is the one place the bound has to hold. The effect above pulls
-    // `visibleMonth` along if this leaves the scope.
+    // `onFocusedValueChange` — report a date both inside `[min, max]` and at view granularity. Every
+    // move funnels through here, so this is the one place the bound has to hold.
     setRawFocused(normalizeFocusForView(view(), constrainDate(date, min(), max())));
   };
 
@@ -633,13 +602,13 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   // progress" rather than a committed single date. +1 day, falling back to −1, and staying put when
   // neither is selectable.
   //
-  // RA's two-term invalid test collapses to one `isDateSelectable` here. RA's second term bounds the
-  // step by the anchor's contiguous available run; for a **one-day** step that is exactly the
+  // RA's two-term invalid test collapses to one `isDateSelectable` here: its second term bounds the
+  // step by the anchor's contiguous available run, which for a **one-day** step is exactly the
   // `isDateUnavailable` check `isDateSelectable` already makes, since the run's edge *is* the first
-  // unavailable day in each direction. (It could not read the narrowed bounds anyway: `availableRange`
-  // derives from the `anchorDate` write this runs on the heels of, which a plain read cannot see until
-  // the next flush.) `order()` in the strategy normalizes the backwards case, where stepping to −1
-  // makes the anchor the range's *end*.
+  // unavailable day in each direction. It could not read the narrowed bounds anyway — `availableRange`
+  // derives from the `anchorDate` write this runs on the heels of, invisible to a plain read until the
+  // next flush. `order()` in the strategy normalizes the backwards case, where stepping to −1 makes
+  // the anchor the range's *end*.
   //
   // DOM focus has to come along, or the next Enter would land on the still-focused anchor cell and
   // commit a one-day range instead of the two-day band the user can see.

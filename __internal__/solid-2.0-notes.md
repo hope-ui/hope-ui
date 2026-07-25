@@ -2,10 +2,9 @@
 
 Full rationale for the checklist in CLAUDE.md § *SolidJS 2.0 (beta)*.
 
-This project targets `2.0.0-beta.x` (pinned via the `pnpm-workspace.yaml` catalog, kept
-in lockstep across `solid-js` / `@solidjs/signals` / `@solidjs/web`). Key differences
-from 1.x, discovered while building Phase 0 (not just from docs — verified against the
-actual installed package):
+This project targets `2.0.0-beta.x` (pinned via the `pnpm-workspace.yaml` catalog, kept in lockstep
+across `solid-js` / `@solidjs/signals` / `@solidjs/web`). Every difference below is verified against
+the installed package, not read from docs.
 
 - **DOM rendering moved to a separate package.** `solid-js` is now renderer-neutral;
   `render`, `Dynamic`, `Portal`, and the `JSX` types live in **`@solidjs/web`**, not
@@ -17,15 +16,14 @@ actual installed package):
   build with **tsdown** (`transform.jsx: "preserve"`), emitting JSX-preserved `.jsx` the
   consumer's `vite-plugin-solid` compiles per environment (see `__internal__/plan.md`, "Distribution
   model"). This sidesteps a hard 2.0 incompatibility in every *compiling* Solid bundler
-  plugin: Phase 0's `tsup`/`esbuild-plugin-solid` (and `unplugin-solid`) bundle
+  plugin: `tsup`/`esbuild-plugin-solid` and `unplugin-solid` bundle
   `babel-preset-solid@1.x`, which compiles a JSX `ref` into an import of a helper called `use`
   from the target module — a name `@solidjs/web` 2.0 renamed to `ref`/`applyRef` (and
   `addEventListener` → `addEvent`). Any `ref=` usage failed to even load ("does not provide an
   export named 'use'") under that pipeline. The **tests + Storybook** compile JSX with the
   first-party `vite-plugin-solid@3.0.0-next.5` (pulling a matching
-  `babel-preset-solid@2.0.0-beta.x`), the one 2.0-correct compiler — confirmed against the npm
-  registry, not assumed. tsdown emits the `.d.ts` (no `vite-plugin-dts`); test/story files
-  never reach `dist/` because tsdown only builds the `hope.entries`.
+  `babel-preset-solid@2.0.0-beta.x`), the one 2.0-correct compiler. tsdown emits the `.d.ts`;
+  test/story files never reach `dist/` because tsdown only builds the `hope.entries`.
 - **A `createEffect(compute, effect)` compute function must never read a plain
   (non-signal) ref accessor** (e.g. `ref: () => someLetVariable` backed by a bare
   `let x; <div ref={x}>`). The compute function runs synchronously at the moment
@@ -33,11 +31,10 @@ actual installed package):
   component body, is *before* that component's own later JSX (and its `ref` callback)
   has executed — so it captures the ref as permanently `undefined`, and since it isn't a
   tracked signal, the effect never reruns to pick up the real value once the ref is set.
-  Read the ref inside the *effect* (second) callback instead — by the time that runs
-  (deferred, post-mount), the ref is populated. Hit and fixed in `createFocusTrap` and
-  `createDismissable` (see the comments there); `createPresence` already did this
-  correctly by construction.
-- **A distinct, later-discovered variant of the above: when the ref-owning element is
+  Read the ref inside the *effect* (second) callback instead — by the time that runs (deferred,
+  post-mount), the ref is populated. Live in `createFocusTrap` and `createDismissable`;
+  `createPresence` is correct by construction.
+- **A variant: when the ref-owning element is
   itself conditionally rendered by the same signal a primitive reacts to, the ref must
   be a real signal *and* tracked inside `compute`** — reading it only in the effect's
   apply phase (the fix for the previous bullet) isn't enough here. Hit wiring
@@ -70,10 +67,10 @@ actual installed package):
   *at all* wins, even when its value is `undefined`. So `<Dialog.Root>` (key absent) gets
   `true`, while `<Dialog.Root modal={props.modal}>` with `modal` unset gets `undefined` —
   and silently produces a non-modal dialog with no focus trap, no scroll lock, no
-  `aria-modal`. The same bug turned `<Button type={props.type}>` into a form-submitting
-  button. Forwarding an optional prop from a wrapper is the most common thing a consumer
-  does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
-  `@hope-ui/primitives`, which resolves each defaulted key with `??`. See
+  `aria-modal`. The same shape turns `<Button type={props.type}>` into a form-submitting button.
+  Forwarding an optional prop from a wrapper is the most common thing a consumer does, and it hits
+  the broken case every time. Use `withDefaults(props, { ... })` from `@hope-ui/primitives`, which
+  resolves each defaulted key with `??`. See
   `__internal__/primitives/utils/defaults.md`.
 - **Merged props are the source of truth — never touch raw `props` again after merging.** Once you
   `withDefaults(props, …)` (or any `useDefault`-style merge), the returned object is the *only* props
@@ -135,10 +132,9 @@ actual installed package):
   refs (e.g. TanStack Router's `Link`), not just host elements whose compiler flattens arrays.
 - **Solid 2.0 throws `[REACTIVE_WRITE_IN_OWNED_SCOPE]` if a descendant component writes
   to a signal owned by an *ancestor* reactive scope directly from its own synchronous
-  render body.** Hit in `Dialog.Title`/`Dialog.Description`, which originally called
-  `context.setTitleId(id)` (a signal owned by `Root`) directly in their component body,
-  to register their id with `Root`'s context for `Popup`'s `aria-labelledby`/
-  `aria-describedby`. Fix: defer the write into `onSettled`:
+  render body.** Worked case: `Dialog.Title`/`Dialog.Description` register their id into `Root`'s
+  context for `Popup`'s `aria-labelledby`/`aria-describedby` — a `context.setTitleId(id)` call on a
+  signal owned by `Root`. Defer the write into `onSettled`:
   ```tsx
   onSettled(() => {
     context.setTitleId(id);
@@ -156,16 +152,13 @@ actual installed package):
   `aria-labelledby` value for a later client-only write to disagree with. A component
   that does this cross-scope write *outside* a Portal-guarded subtree would need that
   reasoning re-checked.
-- **Vite's `solid-refresh` HMR wrapper breaks prop forwarding in dev/test mode for
-  components imported from another module** (a real bug hit during Phase 0: `children`
-  silently failed to reach the DOM only when `Button` was imported from `button.tsx`,
-  not when the same component was defined inline in the test file). Fixed by setting
-  `refresh: { disabled: true }` on the Solid Vite plugin in `vitest.config.ts` — tests
-  never need HMR (`hot` still works but is deprecated in `vite-plugin-solid@3.x` in
-  favor of `refresh`). If a similar "props vanish only for imported components" symptom
-  reappears, check this setting first before assuming a merge/omit bug.
-- Browser tests import `page` from `vitest/browser`, not the deprecated
-  `@vitest/browser/context`.
+- **Vite's `solid-refresh` HMR wrapper breaks prop forwarding in dev/test mode for components
+  imported from another module.** Symptom: `children` silently fails to reach the DOM only when
+  `Button` is imported from `button.tsx`, not when the same component is defined inline in the test
+  file. Fixed by `refresh: { disabled: true }` on the Solid Vite plugin in `vitest.config.ts` — tests
+  never need HMR. If a "props vanish only for imported components" symptom reappears, check this
+  setting before assuming a merge/omit bug.
+- Browser tests import `page` from `vitest/browser`.
 - **The trigger for `children()` is a component-valued *prop* read more than once in a render —
   and the `<Show>` `when`+body idiom is the special case where it is load-bearing for hydration.**
   A consumer's `startDecorator={<Icon/>}` compiles to a getter that runs `createComponent(Icon)`
@@ -183,8 +176,8 @@ actual installed package):
     a memo/insert-effect owner; the server's `createComponent(Comp) === Comp()` runs in the ambient
     owner). So the discarded component's key lands at a different position on each side and the real
     body node comes out one `_hk` off: `Hydration tag mismatch for key "…": expected <svg> but found
-    <span>` (historically also a `getNextSibling` null crash), caught by the route error boundary,
-    which then silently client-renders — console fills with errors and the SSR benefit is lost.
+    <span>`, caught by the route error boundary, which then silently client-renders — console fills
+    with errors and the SSR benefit is lost.
     Upstream `@solidjs/web` beta asymmetry, still open through at least `2.0.0-beta.20`
     (solidjs/solid#2384, solidjs/solid-start#1089). `children()` fixes it because the `when` gate
     then reads the **resolved** accessor (`when={startDecorator() != null}`) — no phantom build in
@@ -193,9 +186,8 @@ actual installed package):
 - **What does *not* need `children()` — established with isolated SSR→hydrate round-trips, not just
   reasoning:**
   - **A single read — even inside a `<Show>`.** `<Show when={someFlag()}>{x}</Show>` reading `x`
-    once hydrates cleanly. It is **not** "read inside a `<Show>`" that breaks hydration (an earlier,
-    wrong framing); it is the *second* read, in the `when` gate. A `<Show>` on its own does not move
-    the key.
+    once hydrates cleanly. What breaks hydration is the *second* read, in the `when` gate; a
+    `<Show>` on its own does not move the key.
   - **A double read that does not straddle the `when` gate.** Two reads confined to the body
     (`{x != null ? x : null}`), or two reads with **no** `<Show>` at all, hydrate fine — the extra
     build lands in the *same* owner on both sides, so the burned key is symmetric. (They still waste

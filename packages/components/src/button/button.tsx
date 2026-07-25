@@ -14,23 +14,18 @@ import type { JSX } from "@solidjs/web";
 import { type Component, children, createEffect, merge, omit, Show } from "solid-js";
 import { LoaderCircleIcon } from "../icons";
 
-// The recipe contract (variant vocabulary + slots) is owned by `@hope-ui/theming` — the component
-// consumes it via `useRecipe`, never declares it (no module augmentation). Re-export the vocabulary
-// so consumers can still import it from the component's subpath. `ButtonLoaderPlacement` is shared
-// by the recipe's `loaderPlacement` variant and this component's `loaderPlacement` prop.
+// The recipe contract is owned by `@hope-ui/theming`; re-exported here so consumers can import the
+// vocabulary from the component's subpath.
 export type { ButtonColorScheme, ButtonLoaderPlacement, ButtonSize, ButtonVariant };
 
-// The role selector is `colorScheme`, **not** `color`: a `color` prop would shadow the native HTML
-// `color` attribute. With the rename, native `color` is left untouched and forwarded through `...rest`.
+// The role selector is `colorScheme`, not `color`: a `color` prop would shadow the native HTML
+// `color` attribute, which is left untouched and forwarded through `...rest`.
 type ButtonElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement>;
 
-// `ButtonProps` = the native element props **plus** the themeable surface (`ButtonThemeableProps`:
-// recipe variants + chrome content, owned by `@hope-ui/theming`) **plus** the per-instance-only props
-// below. Extending `ButtonThemeableProps` (instead of re-declaring the variants) is what keeps the two
-// in lockstep by construction — a themeable key is, by definition, also a component prop. The two
-// chrome-content keys are the exception: the themeable surface narrows them to a **factory**
-// (reuse-safe app-wide default), while a per-instance prop also accepts a bare `JSX.Element`, so they
-// are `Omit`-ted here and re-declared wider below.
+// Extending `ButtonThemeableProps` (rather than re-declaring the variants) keeps the component props
+// and the themeable surface in lockstep by construction. The two chrome-content keys are `Omit`-ted
+// and re-declared wider below: the themeable surface narrows them to a factory (reuse-safe as an
+// app-wide default), while a per-instance prop also accepts a bare `JSX.Element`.
 export interface ButtonProps
   extends ButtonElementProps,
     Omit<ButtonThemeableProps, "loader" | "loadingText"> {
@@ -60,16 +55,12 @@ export interface ButtonProps
   loading?: boolean;
   /**
    * Replaces the label while loading (implies an inline `start` loader so the text stays visible).
-   * Accepts a bare element (per-instance) or a factory `() => JSX.Element` — the factory form is what
-   * a preset supplies as an app-wide `defaultProps.loadingText`, so a shared default renders a fresh
-   * subtree per instance rather than moving one node between buttons (resolved via `runIfFunction`).
+   * A bare element is per-instance; the factory form is what a preset supplies as an app-wide
+   * `defaultProps.loadingText`, so a shared default renders a fresh subtree per instance rather than
+   * moving one node between buttons (resolved via `runIfFunction`).
    */
   loadingText?: JSX.Element | (() => JSX.Element);
-  /**
-   * Custom loader content. Defaults to hope's loader. Accepts a bare element (per-instance) or a
-   * factory `() => JSX.Element` — the factory form is what a preset supplies as an app-wide
-   * `defaultProps.loader` (reuse-safe; see `loadingText`).
-   */
+  /** Custom loader content; defaults to hope's loader. Same element/factory split as `loadingText`. */
   loader?: JSX.Element | (() => JSX.Element);
   /** Leading slot (typically an icon), before the label. */
   startDecorator?: JSX.Element;
@@ -87,10 +78,7 @@ export interface ButtonProps
 }
 
 export const Button: Component<ButtonProps> = (props) => {
-  // `useDefaults` folds the preset's per-component `defaultProps` in between the instance props
-  // and these built-in defaults (precedence: instance ?? preset ?? builtin), resolving each key with
-  // `??` (never `merge`, which resolves by key *presence* — a wrapper forwarding an unset
-  // `type`/`variant`/… would drop the default). See `useDefaults`' doc in @hope-ui/theming.
+  // Precedence: instance ?? preset `defaultProps` ?? builtin, each key resolved with `??`.
   const merged = useDefaults({
     recipe: "button",
     props,
@@ -107,11 +95,9 @@ export const Button: Component<ButtonProps> = (props) => {
     },
   });
 
-  // Dev-only accessibility guard: an icon-only button has no visible text, so it needs an
-  // `aria-label` (or `aria-labelledby`) or it announces as an unnamed button. Client-only — a
-  // `createEffect` never runs during SSR, so it never spams the server log; the check is pure-props
-  // (no DOM ref needed). Deps are read in the tracking function, not the callback, to avoid
-  // `STRICT_READ_UNTRACKED`. Mirrors the element/`nativeButton` mismatch warning in `createButton`.
+  // Dev-only guard: an icon-only button has no visible text, so without `aria-label`/`aria-labelledby`
+  // it announces as an unnamed button. In a `createEffect` so it never runs during SSR; deps are read
+  // in the tracking function, not the callback, to avoid `STRICT_READ_UNTRACKED`.
   createEffect(
     () => [merged.iconOnly, merged["aria-label"], merged["aria-labelledby"]] as const,
     ([iconOnly, ariaLabel, ariaLabelledby]) => {
@@ -130,23 +116,11 @@ export const Button: Component<ButtonProps> = (props) => {
 
   const isLoading = () => merged.loading;
 
-  // Every slot whose content can be a **component** is resolved **once**, here in the component body,
-  // through Solid's `children` helper — and every read site below uses the resolved accessor, never
-  // the raw prop. The operative trigger is that each of these is read **more than once** in this
-  // render; `children` memoizes the resolution so every accessor read returns the same node. That
-  // buys two guarantees on that one axis:
-  //   1. Single creation. A JSX-element prop getter re-runs `createComponent` on *every* read, so a
-  //      prop read in more than one place — a `!= null` gate plus the render, or across a reactive
-  //      re-run — would construct the component two or more times and discard the extras. This is why
-  //      `loadingText` (read three ways: the loader-placement decision, the label gate, and the label
-  //      render) and the `label` itself go through `children` too, not only the decorators.
-  //   2. Hydration (the decorators specifically). A decorator is read in a `<Show>`'s `when` gate
-  //      (`when={startDecorator() != null}`) AND in its body — the double read whose *gate* half is
-  //      the hazard. A raw-prop `when` read builds and discards a component whose hydration key the
-  //      client and server place differently (an upstream `@solidjs/web` beta asymmetry — see
-  //      `__internal__/solid-2.0-notes.md`), so the body node mis-hydrates. Reading the **resolved** accessor
-  //      in the gate removes the phantom build. (A single read inside a `<Show>` would be fine; it is
-  //      the `when`+body pair that isn't.)
+  // Each of these component-valued props is read more than once below, so it is resolved once here
+  // and every read site uses the resolved accessor. Two guarantees: single construction (a JSX-prop
+  // getter re-runs `createComponent` on every read), and correct hydration for the decorators, whose
+  // `<Show>` `when`-gate read would otherwise build and discard a component the client and server
+  // key differently. Decision procedure: `__internal__/solid-2.0-notes.md` § children().
   const startDecorator = children(() => merged.startDecorator);
   const endDecorator = children(() => merged.endDecorator);
   const loader = children(() => runIfFunction(merged.loader) ?? <LoaderCircleIcon />);
@@ -158,12 +132,9 @@ export const Button: Component<ButtonProps> = (props) => {
   const loaderEffectivePlacement = (): ButtonLoaderPlacement =>
     loadingText() != null ? "start" : merged.loaderPlacement;
 
-  // `useSlots` returns one ready-to-call class fn per slot, each folding the full override chain:
-  // recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root only). The variant
-  // props are read lazily on every slot-fn call, so variant/loading changes flow through. Only the
-  // recipe variants are passed — they're the sole styling axis both the recipe and a preset
-  // `slotClasses` function read. Chrome content (`loader`/`loadingText`) isn't style, and runtime
-  // state reaches the recipe through its `data-*`/`aria-*` variants, so neither is passed here.
+  // One class fn per slot, each folding the override chain: recipe base → preset `slotClasses` →
+  // instance `slotClasses` → `class` (root only). Only the recipe variants are passed — chrome
+  // content isn't style, and runtime state reaches the recipe through its `data-*`/`aria-*` variants.
   const slots = useSlots({
     recipe: "button",
     variantsProps: () => ({
@@ -180,11 +151,11 @@ export const Button: Component<ButtonProps> = (props) => {
     class: () => merged.class,
   });
 
-  // `createButton` owns the element-aware a11y props, the disabled-gating, and the press engine.
-  // The consumer's `onClick` is wrapped with a loading guard first: while loading, it
-  // `preventDefault()`s, which — through `composeEventHandlers`' cancel channel — stops the
-  // consumer's handler AND the press engine's click-driven `onPress`, so activation is blocked
-  // without the disabled attribute (the button keeps its enabled look and tab position).
+  // `createButton` owns the element-aware a11y props, disabled-gating, and the press engine. The
+  // loading guard wraps the consumer's `onClick`: its `preventDefault()` travels
+  // `composeEventHandlers`' cancel channel to stop both the consumer's handler and the press
+  // engine's `onPress`, blocking activation without the disabled attribute — so the button keeps its
+  // enabled look and tab position.
   const button = createButton<HTMLButtonElement>({
     disabled: () => merged.disabled ?? false,
     nativeButton: () => merged.nativeButton,
@@ -231,8 +202,8 @@ export const Button: Component<ButtonProps> = (props) => {
     "children",
   );
 
-  // Only the root goes through `renderElement` (it owns `render`/`as` polymorphism + ref merging).
-  // The internal parts are always plain spans, so they're written as literal elements.
+  // Only the root goes through `renderElement` (it owns `render` polymorphism + ref merging); the
+  // internal parts are always plain spans.
   const content = (
     <>
       <Show when={startDecorator() != null}>
@@ -258,19 +229,15 @@ export const Button: Component<ButtonProps> = (props) => {
 
   const elementProps = merge(rest, button.buttonProps, {
     get class(): string {
-      // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
-      // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
-      // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
       return slots.root();
     },
-    // `aria-busy` is the accessible loading signal. Byte-stable: `loading` is the same value on the
-    // server and initial client, so a non-loading button emits no `aria-busy` on either.
+    // The accessible loading signal. Byte-stable: `loading` is the same on the server and initial
+    // client, so a non-loading button emits no `aria-busy` on either.
     get "aria-busy"(): "true" | undefined {
       return isLoading() ? "true" : undefined;
     },
-    // `data-disabled` and `data-pressed` are emitted by `createButton` (in `button.buttonProps`),
-    // so they're spread above — the component no longer hand-wires them here.
-    // The root's own slot marker; parts use the `button-<part>` convention (a component-prefixed slot).
+    // Parts use the `button-<part>` convention; `data-disabled`/`data-pressed` come from
+    // `button.buttonProps` above.
     "data-slot": "button",
     children: content,
   });

@@ -19,20 +19,19 @@ deviations (SSR-safe seeding, `Symbol.for` dual-copy registry) are deliberate an
 `default-locale.ts`.
 
 **`@solid-primitives` (`next` branch) is a dependency to adopt, not just reference.** Before writing
-a new internal primitive, check it and record an *adopt / wrap / build-fresh-because* verdict.
-Anything adopted clears the full DoD through its consumer, including the hydration round-trip.
-**Hazard:** an adopted dep creating a compute-form signal/memo (`createSignal(fn)` / `createMemo`)
-must be **inlined** in the SSR harness — `server.deps.inline` and the bridge's `ssr.noExternal` both
-carry `/@solid-primitives\//`. Externalized, it resolves a second `solid-js` copy and `_hk`
-diverges. Effect-only primitives are the safe bet. Verdicts:
-`__internal__/solid-primitives-eval.md`.
+a new internal primitive, check it and record an *adopt / wrap / build-fresh-because* verdict
+(`__internal__/solid-primitives-eval.md`). Anything adopted clears the full DoD through its consumer,
+including the hydration round-trip. **Hazard:** an adopted dep creating a compute-form signal/memo
+(`createSignal(fn)` / `createMemo`) must be **inlined** in the SSR harness — externalized, it resolves
+a second `solid-js` copy and `_hk` diverges. `server.deps.inline` and the bridge's `ssr.noExternal`
+both carry `/@solid-primitives\//`. Effect-only primitives are the safe bet.
 
 **"SSR support" = "works in SolidStart"** — renders on the server, hydrates without mismatch, runs on
-the client. Nothing broader. Verified with `renderToStringAsync`/`hydrate` from `@solidjs/web`. Four
-rules protect it: effect-gate DOM access; `createUniqueId` for ARIA-linking ids; gate server-side
-`Portal` behind `isServer`; keep an `aria-controls` IDREF only while its target is mounted. Details:
-`__internal__/plan.md` § SSR & hydration requirements. `@solidjs/start` is not on solid-js 2.0 yet,
-so end-to-end SolidStart testing is blocked on them; the round-trip covers correctness now.
+the client. Nothing broader. Verified with `renderToStringAsync`/`hydrate` from `@solidjs/web`;
+`@solidjs/start` is not on solid-js 2.0 yet, so that round-trip is the coverage. Four rules protect
+it: effect-gate DOM access; `createUniqueId` for ARIA-linking ids; gate server-side `Portal` behind
+`isServer`; keep an `aria-controls` IDREF only while its target is mounted. Details:
+`__internal__/plan.md` § SSR & hydration requirements.
 
 **Ships JSX-preserved source only**, under the `"solid"` export condition — the consumer's
 `vite-plugin-solid` compiles per environment. No dom-compiled fallback: a consumer without that
@@ -168,21 +167,20 @@ Tests, `__fixtures__/`, `__screenshots__/` go under `__tests__/`; primitives/i18
 
 ## Components may write literal host elements
 
-Write literal host elements where they read best. `renderElement`
-(`@hope-ui/primitives/render`) is **not** a per-element SSR wrapper — it is the `as`/render-prop
-polymorphism helper and the owner of ref merging. Reach for it when a component exposes
-`as`/`render`.
+Write literal host elements where they read best. `renderElement` (`@hope-ui/primitives/render`) is
+the `as`/render-prop polymorphism helper and the owner of ref merging — reach for it when a component
+exposes `as`/`render`, not per element.
 
 ## The Solid internals this codebase leans on are pinned
 
 `packages/primitives/src/__tests__/solid-contract.test.ts` (unit, client build),
 `solid-contract.ssr.test.tsx` (server builds), `solid-contract.browser.test.tsx` (browser, client
-build) are characterization tests. They pin the undocumented `solid-js`/`@solidjs/web` behaviors
-listed in `__internal__/solid-2.0-notes.md`, each with a comment naming the code that depends on it
+build) are characterization tests pinning the undocumented `solid-js`/`@solidjs/web` behaviors listed
+in `__internal__/solid-2.0-notes.md`, each with a comment naming the code that depends on it
 (`withDefaults`, `createControllableState`, `createComponentContext`, `createFocusRestore`,
-`renderElement`'s ref merging, `Dynamic` → `_hk`). `@solidjs/web` already renamed runtime helpers
-within the beta line (`use`→`ref`, `addEventListener`→`addEvent`), so a stable-release break shows up
-as a red test with a pointer. **Add to them rather than re-deriving a behavior in a comment.**
+`renderElement`'s ref merging, `Dynamic` → `_hk`). `@solidjs/web` renames runtime helpers within the
+beta line (`use`→`ref`, `addEventListener`→`addEvent`), so a stable-release break surfaces as a red
+test with a pointer. **Add to them rather than re-deriving a behavior in a comment.**
 
 ## Architecture
 
@@ -279,10 +277,10 @@ pnpm workspace, Turborepo pipeline.
 - **`packages/internal-test-utils`** (private) — `mount()` (renders into a detached,
   document-attached container) and `expectNoA11yViolations()` (axe-core against a mounted container).
 
-**Primitives own ALL a11y + business logic; components are assembly + theme only.** A primitive
-family must be buildable such that the *same* accessibility and behavior a component ships is
-reproducible with the **primitives alone**. So `@hope-ui/components` is only (a) assembly of primitive
-part-hooks into JSX and (b) recipe/theme consumption (`useRecipe`/`useSlots`/`cx`).
+**Primitives own ALL a11y + business logic; components are assembly + theme only.** The a11y and
+behavior a component ships must be reproducible with the **primitives alone** — so
+`@hope-ui/components` is only (a) assembly of primitive part-hooks into JSX and (b) recipe/theme
+consumption (`useRecipe`/`useSlots`/`cx`).
 
 - **Presence, focus, dismissal, scroll-lock, ids, ARIA roles/attributes, controlled state live in the
   primitive.** Creating a `createPresence`/`createFocusTrap` or computing an ARIA attribute *in the

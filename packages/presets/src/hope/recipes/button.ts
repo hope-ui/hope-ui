@@ -8,52 +8,37 @@
  *
  * ── Why every class is a literal string ─────────────────────────────────────────────────────────
  * The consumer's Tailwind build discovers which utilities to generate by scanning this file
- * (`@source "./recipes"` in `tailwind.css`). A scanner only sees *literal* candidates, so the
+ * (`@source "./recipes"` in `tailwind.css`), and a scanner only sees *literal* candidates. So the
  * per-color utilities cannot be built with `bg-${role}` template strings — they are written out in
- * `COLOR_CLASSES` and assembled into `compoundVariants`. The literals are what makes `bg-primary`,
- * `text-primary-emphasis`, `border-warning-subtle-line`, etc. actually exist in the emitted CSS.
+ * `COLOR_CLASSES` and assembled into `compoundVariants`.
  *
  * ── Where the semantic tokens come from ─────────────────────────────────────────────────────────
  * `bg-primary` → `var(--color-primary)` → `var(--hope-primary)` (via `_base/_theme-map.css`). Every
- * interaction state is a *finished* token too — the hover wash (guarded against the pressed state,
- * `hover:not-data-pressed:bg-primary-hovered`, so it never fights the press color),
- * `data-pressed:bg-primary-pressed`, `focus-visible:ring-focus-halo`, and the dim-only state axes
- * `data-disabled:opacity-disabled` / `aria-busy:opacity-loading`. The recipe computes no color: no
- * `color-mix`, no alpha modifier (`bg-x/50`), no magic opacity, so a preset that redefines a shade
- * changes the painted result predictably (the recipe-purity rule — enforced by `pnpm check:recipe-purity`).
- * Interaction *triggers* are still Tailwind's own `hover:`/`focus-visible:` and hope's `data-pressed`/
- * `data-disabled`/`aria-busy` variants.
+ * interaction state is a *finished* token too, so the recipe computes no color — no `color-mix`, no
+ * alpha modifier, no magic opacity — and a preset redefining a shade changes the painted result
+ * predictably (recipe purity, enforced by `pnpm check:recipe-purity`). The hover wash is guarded
+ * against the pressed state (`hover:not-data-pressed:bg-primary-hovered`) so the two never fight.
+ * Interaction *triggers* stay Tailwind's own `hover:`/`focus-visible:` plus hope's
+ * `data-pressed`/`data-disabled`/`aria-busy` variants.
  */
 
 import type { ButtonColorScheme, ButtonSize, ButtonVariant } from "@hope-ui/theming";
-// The Button recipe's variant vocabulary is owned by `@hope-ui/theming` (the contract); this theme
-// implements it. `hopeRecipes` (in `./index`) checks the finished recipe against `RecipeRegistry`.
+// The variant vocabulary is owned by `@hope-ui/theming`; `hopeRecipes` (in `./index`) checks the
+// finished recipe against `RecipeRegistry`.
 import { tv } from "@hope-ui/theming";
 
 /*
- * Per-color, per-variant fills — literal so Tailwind's `@source` scan emits them. Every
- * (role × variant × state) is its own finished token; nothing is computed and nothing is borrowed
- * from a sibling variant.
- *  - solid   : `bg-{role}` + `text-on-{role}`, hovered/pressed → `bg-{role}-hovered`/`-pressed`.
- *  - inverted: the swap of solid on its own dedicated tokens — `bg-{role}-inverted` +
- *              `text-on-{role}-inverted`, hovered/pressed → `bg-{role}-inverted-hovered`/`-pressed`.
- *              For solid/colored surfaces; the hope defaults reproduce the on-color/role swap but as
- *              independent, tunable knobs (no borrowing of solid's `on-{role}`/`{role}`).
- *  - soft    : `bg-{role}-soft` + `text-{role}-emphasis`, hovered/pressed → `bg-{role}-soft-hovered`/`-pressed`.
- *  - outline : transparent bg + `text-{role}-emphasis` + the soft `border-{role}-subtle-line` tint
- *              (neutral uses `border-neutral-subtle-line`); hovered/pressed wash →
- *              `bg-{role}-outline-hovered`/`-pressed`.
- *  - ghost   : like outline without the border; wash → `bg-{role}-ghost-hovered`/`-pressed`.
- *  - link    : `text-{role}-emphasis`, hovered/pressed text → `text-{role}-link-hovered`/`-pressed`,
- *              underline on hover.
- * The soft/outline/ghost/link label is `{role}-emphasis` — the role's legible *content* color — so
+ * Per-color, per-variant fills. Every (role × variant × state) is its own finished token; nothing is
+ * computed and nothing is borrowed from a sibling variant — `inverted` gets its own
+ * `{role}-inverted*` ladder rather than reusing solid's `on-{role}`/`{role}`.
+ *
+ * The soft/outline/ghost/link label is `{role}-emphasis`, the role's legible *content* color, so
  * neutral & warning read correctly in both themes rather than looking disabled.
  *
- * The filled variants (solid/inverted/soft) also carry a border that MATCHES their fill and tracks it
- * across states (`border-{…}` at rest, `-hovered`/`-pressed` under the same pressed-guarded triggers as
- * the fill), so the reserved 1px edge is a clean continuation of the fill rather than a transparent gap
- * to the page background — and the base's `border-color` transition animates it in step. `ghost`/`link`
- * stay borderless (they set `border-transparent`); `focus-visible:border-focus` still wins on focus.
+ * The filled variants (solid/inverted/soft) carry a border MATCHING their fill and tracking it across
+ * states, so the base's reserved 1px edge continues the fill instead of showing a transparent gap to
+ * the page background — and the base's `border-color` transition animates it in step. `ghost`/`link`
+ * stay borderless; `focus-visible:border-focus` still wins on focus.
  */
 const COLOR_CLASSES: Record<
   ButtonColorScheme,

@@ -41,7 +41,7 @@ The set:
    still carry one, since those are the surface an advanced consumer actually composes.
 
    `@hope-ui/theming` and `@hope-ui/components` carry **no** repo usage doc; their public API is
-   documented in the doc website (`apps/docs/`), so a duplicate here was redundant.
+   documented in the doc website (`apps/docs/`).
 3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (one per
    folder). Components are what a human has to look at; pure primitives aren't. Stories (and tests)
    never reach `dist/` — tsdown only builds the `package.json` `hope.entries` files — and are excluded
@@ -99,10 +99,9 @@ the rules axe ran but couldn't decide. When axe genuinely cannot judge one
 call site with a reason; never silence the category. See `__internal__/internal-test-utils/axe/axe.md`.
 
 `mount()` (also from `@hope-ui/internal-test-utils`) **fails the test** on a
-`STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. Both were
-documented in prose here and emitted 170 times a run, so the next real one was invisible.
-A deliberate untracked read is spelled `untrack(...)`; anything still warning is
-unreviewed. See `__internal__/internal-test-utils/mount/mount.md`.
+`STRICT_READ_UNTRACKED` or `REACTIVE_WRITE_IN_OWNED_SCOPE` diagnostic. A deliberate untracked read is
+spelled `untrack(...)`; anything still warning is unreviewed. See
+`__internal__/internal-test-utils/mount/mount.md`.
 
 **Recipe purity** (`pnpm check:recipe-purity`, `scripts/check-recipe-purity.mjs`): a preset recipe
 under `packages/presets/**/recipes/` references *finished* `--hope-*` tokens only — never
@@ -111,13 +110,10 @@ a color applies a fixed rule to a base it doesn't own, so a consumer redefining 
 broken result. Derived colors (`focus-halo`, `scrim`) are authored as tokens in the preset's
 `theme.css`, where it owns the raw scale. See `__internal__/theming.md`.
 
-Every component (not needed for pure internal primitives with no DOM output) also
-needs an SSR **and** a hydration round-trip test, and `check:coverage-parity` enforces
-both: a `Foo.ssr.test.tsx` that *calls* `renderToStringAsync`, and a
-`Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means outside a comment, outside a
-string, outside an `it.skip`, and not merely imported — every one of those loopholes was
-live at some point, and Dialog exercised three at once while the docs claimed it had a
-hydration test.
+Every component (not pure internal primitives with no DOM output) also needs an SSR **and** a
+hydration round-trip test, and `check:coverage-parity` enforces both: a `Foo.ssr.test.tsx` that
+*calls* `renderToStringAsync`, and a `Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means
+outside a comment, outside a string, outside an `it.skip`, and not merely imported.
 
 **Component-capable slots carry an extra, conditional obligation** (author discipline —
 `check:coverage-parity` can't detect it, since it needs type + control-flow analysis). A slot
@@ -141,23 +137,18 @@ decision procedure").
 
 ## The three test projects, and the SSR round trip
 
-**Read `__internal__/testing.md` before writing any test.** Three Vitest projects, one job and
-one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
-(node, **server** builds of `solid-js` *and* `@solidjs/web`, the HTML a server sends),
-`browser` (real Chromium, client builds, DOM/focus/pointer/axe/hydration). The file
-suffix picks the project: `Foo.test.tsx`, `Foo.ssr.test.tsx`, `Foo.browser.test.tsx`.
+**Read `__internal__/testing.md` before writing any test.** Three Vitest projects, one job and one
+module resolution each; the file suffix picks the project (`Foo.test.tsx`, `Foo.ssr.test.tsx`,
+`Foo.browser.test.tsx`).
 
-Hydration is two environments by definition, and the two halves are decoupled so neither needs a
-committed file. Each subject has a **render entry**,
-`src/<component>/__tests__/<component>.ssr-entry.tsx`, exporting the `Tree` it renders; the `ssr`
-test inline-snapshots that render and the `browser` test hydrates the *same* `Tree` against genuine
-server HTML rendered fresh in-process by the hydration-fixture bridge. Sharing one `Tree` keeps the
-two halves structurally identical by construction, and there are **zero committed fixture files at
-any component count**.
+Each subject has a **render entry**, `src/<component>/__tests__/<component>.ssr-entry.tsx`, exporting
+the `Tree` it renders; the `ssr` test inline-snapshots that render and the `browser` test hydrates the
+*same* `Tree` against genuine server HTML rendered fresh in-process by the hydration-fixture bridge.
+Sharing one `Tree` keeps the two halves structurally identical by construction, with **zero committed
+fixture files at any component count**.
 
 That matters because **hydration keys (`_hk`) are a path through the component tree**: a component
-inserted before `Dialog.Trigger` — even one that renders nothing — shifts the trigger's key. The
-shared `Tree` is what makes the server render and the client hydrate impossible to drift apart.
+inserted before `Dialog.Trigger` — even one that renders nothing — shifts the trigger's key.
 
 Mechanics — the bridge, everything `hydrateFixture` asserts, and the step-by-step for adding a
 round-trip to a new component — are in `__internal__/testing.md` § *Writing a hydration test*.
