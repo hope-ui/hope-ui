@@ -55,11 +55,13 @@
 // padding/margin/border property *writes*, where it has no false positives at all.
 //
 // Also correctly physical, and out of scope by construction: `_base/_variants.css`'s
-// `data-placement-left` / `data-placement-right` custom variants (`data-placement` reports the side a
-// floating layer LANDED on after `flip`, which is a physical fact — the inline-relative hook a recipe
-// may want is the derived `data-placement-inline-start`/`-end` pair beside them), and
-// `origin-left`/`origin-right` — `transform-origin` has no portable logical keyword, so there is no
-// replacement to point at and flagging it would only be noise.
+// `data-side-left` / `data-side-right` custom variants (`data-side` reports the side a floating layer
+// LANDED on after `flip`, which is a physical fact — there is deliberately no inline-relative
+// `data-side-*` pair beside them, because a recipe wanting that hook writes `ltr:`/`rtl:`-scoped
+// rules over these two, which is the sanctioned escape hatch and passes both this check and
+// `assertLogicalPropertyConformance`), and `origin-left`/`origin-right` — `transform-origin` has no
+// portable logical keyword, so there is no replacement to point at and flagging it would only be
+// noise.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { blankNonCode, lineAt, stringInteriors } from "./lib/source-projection.mjs";
