@@ -2,8 +2,10 @@
 
 Where to look when building or debugging a kernel primitive. This captures the sources evaluated
 while porting the signal-based navigation kernel and `createFloating` — and the sources chosen for
-the overlay primitives still to build (`createHoverIntent`) — so future work doesn't re-derive the
-map.
+the overlay work still to build (`createHoverIntent`, nested-overlay ordering) — so future work
+doesn't re-derive the map. **Negative results are recorded too**: §1's nested-overlay entry exists
+mostly to stop the next reader re-surveying three references that turn out not to implement it at
+all.
 
 **References policy** (see also `CLAUDE.md`): Angular Aria, Astryx, react-aria, floating-ui (both
 the `@floating-ui/react` and `@floating-ui/vue` ports) and Base UI are **adapt-and-credit**
@@ -165,6 +167,71 @@ composes `createFloating` alone; a hover-triggered Menu/HoverCard composes both.
   math, not `hooks/useHover.ts`'s React lifecycle. floating-ui generalizes the classic triangle to a
   polygon (accounts for placement, gap, buffer) — same concept.
 
+### Nested overlay ordering (planned) — `createDismissable` + `createHideOutside`
+
+Both primitives currently handle exactly one layer. Popover is the first consumer that stacks a
+second one on Dialog, and it breaks them in two distinct ways:
+
+- **Escape and outside-pointerdown reach every open layer.** `create-dismissable.ts` attaches its
+  listeners to `document` per instance with no ordering guard, so dismissing a Popover inside a
+  Dialog closes both.
+- **The Dialog's `MutationObserver` hides the Popover.** A portaled popup lands on `document.body`
+  after the Dialog's `createHideOutside` is already observing; it isn't in that layer's static
+  `spare` array, so it gets `aria-hidden` + `inert`.
+
+**Two registries, not one.** They answer different questions and merging them is a bug: a Dialog with
+`dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape.
+react-aria keeps them fully separate (`visibleOverlays` in `useOverlay`, `observerStack` in
+`ariaHideOutside`, `focusScopeTree` in `FocusScope`) and never centralizes them into one overlay
+manager — which is also the argument against `roadmap.md`'s speculative `createOverlayStack` row.
+Each registry lives on `document` under a `Symbol.for(…)` key, per CLAUDE.md's no-module-scope rule.
+
+**The policy shortcut does not apply here.** Prefer-the-fine-grained-reactive-port has no candidate:
+
+| Source | Nested-overlay handling |
+|---|---|
+| **Astryx** `packages/core/src/hooks` | **None.** 53 files — `useFocusTrap`, `useScrollLock`, `useMenuHover`, `useListFocus` — with no dismiss, overlay, or layer hook of any kind |
+| **Angular Aria** `private/behaviors/popup` | **None.** `open`/`close`/`toggle` over one `expanded` signal + ARIA wiring; single popup only |
+| **floating-ui `@floating-ui/vue`** | **None.** Positioning only (`useFloating.ts`, `arrow.ts`, `types.ts`, `index.ts`) — the interaction layer exists solely in the React port |
+
+react-aria and Base UI are therefore not a fallback, they are the only implementations.
+
+**`createHideOutside` → react-aria `ariaHideOutside`.** Already its source (the TreeWalker
+accept/skip/reject strategy and the `MutationObserver` rationale are credited in the file's own
+comments), so this is finishing a port rather than choosing one. The per-element ref count is
+already here; three pieces are not:
+- `react-aria/src/overlays/ariaHideOutside.ts:39` `observerStack` — a new call disconnects the
+  previous observer (`:166`) and cleanup restarts it (`:288`), so only the innermost layer observes.
+- `:299` `keepVisible(element)` — dynamic registration into the *current topmost* layer's
+  `visibleNodes`, returning an undo. hope-ui's `spare` is static and per-layer, so it cannot express
+  "spare this in whichever layer is on top right now".
+- `:21` `isAlwaysVisibleNode` — a declarative `data-*` opt-out (`data-react-aria-top-layer`,
+  `data-live-announcer`) checked inside the observer, so content appearing later is spared with no
+  registration at all.
+
+**`createDismissable` → react-aria `useOverlay` for the mechanism, Base UI `useDismiss` for the API
+vocabulary.**
+- `react-aria/src/overlays/useOverlay.ts:61` — a flat mount-order array, topmost wins (`:95`). The
+  pointer path is two-phase (`:100`–`:126`): capture the topmost at pointerdown *start*, dismiss only
+  if the same layer is still topmost when the interaction completes.
+- One asymmetry worth knowing before porting: react-aria's Escape is **element-scoped** (`useKeyboard`
+  → `keyboardProps` spread on the overlay, `:129`), so it only fires with focus inside; only
+  outside-press is document-level (`react-aria/src/interactions/useInteractOutside.ts:80`). hope-ui's
+  Escape *is* document-level, so the stack carries more weight here than it does upstream.
+- **Base UI** `floating-ui-react/hooks/useDismiss.ts` — the `bubbles` option, normalized per event
+  type (`escapeKey` / `outsidePress`). "Should Escape on the nested Popover also close the Dialog?"
+  is a genuine consumer choice and react-aria has no name for it. API surface only, same borrowing
+  as `useAnchorPositioning` above.
+
+**Rejected for now: the layer *tree*.** Base UI vendors floating-ui-react's
+`FloatingTree`/`FloatingTreeStore`, and `useDismiss` asks `getNodeChildren` whether a descendant is
+open. Real ancestry, but it costs `<FloatingTree>` + `<FloatingNode>` JSX wiring in a kernel that is
+hooks-only by design (`ModalBackdrop` is deliberately its one DOM-rendering component), and it forces
+every overlay component to declare its node. A flat stack needs no consumer wiring and survives
+portals for free, because mount order does not depend on DOM ancestry. **Revisit at Menu**, where
+submenu chains make `getNodeChildren` load-bearing — the tree composes with the flat stack rather
+than replacing it, exactly as floating-ui-react's own `useDismiss` uses both.
+
 ---
 
 ## 2. Per-component pointers
@@ -175,6 +242,7 @@ kernel above is what they compose.)
 | Component | References, ranked |
 |---|---|
 | **Listbox** | Angular Aria `listbox` (canonical) · react-aria `useListBox` · Base UI `listbox` |
+| **Popover** | Base UI `popover` (anatomy + API surface) · react-aria `usePopover`/`useOverlay` · over `createFloating` + `createDismissable` — **not** over Dialog's modal machinery |
 | **Menu** | Angular Aria `menu` (+ `expansion`/`popup`) · Base UI `menu` · Astryx `useMenuHover` |
 | **Select / Combobox** | Angular Aria `combobox` (pluggable-widget popup) · react-aria `useComboBox`/`useSelect` · Base UI |
 | **Tabs** | Angular Aria `tabs` (roving + follow-focus selection) |
@@ -196,6 +264,10 @@ Consolidated verdicts from the evaluation.
 | `announce` (live-region) | **Future port** — Astryx `useAnnounce` |
 | overlay positioning (placement/flip/shift/arrow/autoUpdate) | **Wrapped** — `internal/create-floating.ts`, over `@floating-ui/dom` (optional peer); ported from `@floating-ui/vue` `useFloating`/`arrow` with Base UI `useAnchorPositioning`'s API vocab — see §1 `createFloating` |
 | menu-hover intent / safe triangle | **Future port** — Astryx `useMenuHover` (wiring) + floating-ui `safePolygon.ts` (geometry) — see §1 `createHoverIntent` |
+| nested dismissal ordering (Escape / outside-press across layers) | **Future port** into the existing `internal/create-dismissable.ts` — react-aria `useOverlay`'s `visibleOverlays` + two-phase pointer guard (mechanism) with Base UI `useDismiss`'s `bubbles` (API vocab). **Not** Astryx / Angular Aria / `@floating-ui/vue` — none implement it — see §1 |
+| nested `aria-hidden` + `inert` (portaled child of a modal) | **Finish the port** into the existing `internal/create-hide-outside.ts` — react-aria `ariaHideOutside`'s `observerStack`, `keepVisible`, and `data-*` top-layer opt-out — see §1 |
+| overlay layer *tree* (submenu chains) | **Deferred to Menu** — Base UI `FloatingTree`/`FloatingTreeStore` + `getNodeChildren`. Composes with the flat stack, doesn't replace it; rejected for Popover on consumer-wiring cost — see §1 |
+| unified overlay manager / `createOverlayStack` | **Skip as specified.** `roadmap.md` #14 is a placeholder name with no reference behind it; react-aria keeps three independent registries and centralizes nothing — see §1 |
 | input-container (combobox text sync) | **Future port** — Astryx `useInputContainer` |
 | media-query / hotkeys / overflow observers | **Adopt** `@solid-primitives/*` (see `solid-primitives-eval.md`) |
 | focus-trap / scroll-lock / presence | **Already have** in the kernel |
