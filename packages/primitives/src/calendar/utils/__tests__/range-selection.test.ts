@@ -125,7 +125,7 @@ describe("rangeSelection predicates — the tentative phase", () => {
     expect(rangeSelection.isSelectionStart(forward, on(10))).toBe(true);
     expect(rangeSelection.isSelectionEnd(forward, on(14))).toBe(true);
     // The accepted trade-off: one band at a time, so the old range goes dark mid-drag (React Aria's
-    // behavior — see `__internal__/calendar-react-aria-parity.md`).
+    // behavior — see `__internal__/primitives/calendar/utils/range-selection.md`).
     expect(rangeSelection.isSelected(forward, on(2))).toBe(false);
 
     // Reorders when the cursor precedes the anchor.

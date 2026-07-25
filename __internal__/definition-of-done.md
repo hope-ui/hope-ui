@@ -18,14 +18,30 @@ parts across many files in one leaf folder without multiplying the test/doc/stor
 The set:
 1. A matching test file: `Foo.test.tsx` (unit/node) and/or `Foo.browser.test.tsx`
    (real-browser — required for anything touching focus/keyboard/pointer behavior,
-   since jsdom cannot be trusted for that), in a **`__tests__/`** subfolder of the leaf
+   since jsdom cannot be trusted for that), in a **`__tests__/`** subfolder of the source file's own
    directory. This keeps the leaf folder free of test/fixture visual noise;
-   `check:coverage-parity`'s flat-free rule fails a test dropped beside the source.
-2. **`@hope-ui/primitives` only:** a matching `Foo.md` usage doc (API, keyboard interaction table,
-   ARIA pattern reference) at `__internal__/primitives/<relative-src-path>/Foo.md` — out of the
-   source tree entirely, mirroring the src path. `@hope-ui/theming` and `@hope-ui/components` carry
-   **no** repo usage doc; their public API is documented in the doc website (`apps/docs/`), so a
-   duplicate here was redundant.
+   `check:coverage-parity`'s flat-free rule fails a test dropped beside the source. Where
+   `__tests__/` sits per package:
+
+   | Package | `__tests__/` lives at |
+   |---|---|
+   | `@hope-ui/components` | the component leaf — `src/<name>/__tests__/` |
+   | `@hope-ui/primitives` | the family folder — `dialog/__tests__/`, `internal/__tests__/`, … |
+   | `@hope-ui/theming` / `@hope-ui/i18n` | the `src` level — `theming/src/__tests__/`, `i18n/src/__tests__/` |
+   | kept sub-folders | their own — `calendar/utils/__tests__/`, `i18n/locales/__tests__/`, `theming/src/recipes/__tests__/` |
+
+2. **`@hope-ui/primitives` and `@hope-ui/i18n` only:** a matching `Foo.md` usage doc (API, keyboard
+   interaction table, ARIA pattern reference) at `__internal__/<pkg>/<relative-src-path>/Foo.md`
+   (`__internal__/primitives/…` / `__internal__/i18n/…`) — out of the source tree entirely,
+   mirroring the src path.
+
+   **Exception:** files under `packages/primitives/src/internal/` — the advanced/unstable behavior
+   kernel — require a test but **not** a `.md`, and `check:coverage-parity` no longer asks for one.
+   The composed families (`dialog`, `calendar`, `listbox`, `modal-backdrop`) and the `utils/` helpers
+   still carry one, since those are the surface an advanced consumer actually composes.
+
+   `@hope-ui/theming` and `@hope-ui/components` carry **no** repo usage doc; their public API is
+   documented in the doc website (`apps/docs/`), so a duplicate here was redundant.
 3. **`@hope-ui/components` only:** a `*.stories.tsx`, colocated in the `src/` leaf directory (one per
    folder). Components are what a human has to look at; pure primitives aren't. Stories (and tests)
    never reach `dist/` — tsdown only builds the `package.json` `hope.entries` files — and are excluded
@@ -36,7 +52,33 @@ The set:
 
 `pnpm check:coverage-parity` (`scripts/check-coverage-parity.mjs`) enforces this in CI
 and fails the build if any is missing. Its purpose is to guarantee that test, doc, and
-story coverage never drifts behind the source — see `__internal__/plan.md` for the specifics.
+story coverage never drifts behind the source.
+
+## Leaf source folders stay flat-free
+
+Also enforced by `check:coverage-parity`, and the reason item 1 puts tests in `__tests__/`.
+
+A `src/<name>/` folder holds only its implementation file(s), `index.ts`, and — for
+`@hope-ui/components` — its `*.stories.tsx`. A compound component **splits its parts across files**
+here (`<name>-root.tsx`, `<name>-icon.tsx`, a shared `<name>-context.ts`, …), with the namespace
+object assembled in the barrel `index.ts` — **no subfolders**. That split is encouraged, not sprawl:
+keeping a single 600-line file is worse, and by the per-folder granularity above it adds no
+test/story burden.
+
+The `@hope-ui/primitives` / `@hope-ui/theming` / `@hope-ui/i18n` families follow the same discipline
+one level up: every part file sits **flat** in its top-level folder (`dialog/dialog-content.ts`,
+`internal/create-focus-trap.ts`, `theming/src/preset.ts`, `i18n/src/translate.ts`), with the whole
+family's tests consolidated in that folder's single `__tests__/`. The only nested source sub-folders
+are a handful of deliberately-kept data/util groupings — `calendar/utils/`, `i18n/locales/`,
+`theming/src/recipes/` — each with its **own** `__tests__/` for its files. Never a per-part folder.
+
+Everything non-source still has a home: tests, `__fixtures__/` and `__screenshots__/` live in a
+`__tests__/` subfolder; each primitives or i18n usage `.md` lives under `__internal__/<pkg>/<path>/`.
+**Never drop test, fixture, or doc files flat beside source** — a flat `*.test.*`, a flat
+`<name>.md`, or a flat `__fixtures__/` in any leaf under `primitives`, `components`, `theming`,
+`i18n`, or `internal-test-utils` fails the build.
+
+## The rules layered on top of the file set
 
 Stories are also where known-but-unfixed behavior gets pinned somewhere a human can see
 it. Don't "fix" a story by deleting it; fix the component and rename the story. Dialog's
@@ -61,6 +103,13 @@ call site with a reason; never silence the category. See `__internal__/internal-
 documented in prose here and emitted 170 times a run, so the next real one was invisible.
 A deliberate untracked read is spelled `untrack(...)`; anything still warning is
 unreviewed. See `__internal__/internal-test-utils/mount/mount.md`.
+
+**Recipe purity** (`pnpm check:recipe-purity`, `scripts/check-recipe-purity.mjs`): a preset recipe
+under `packages/presets/**/recipes/` references *finished* `--hope-*` tokens only — never
+`color-mix`, an alpha modifier (`bg-x/50`), or a magic opacity (`opacity-90`). A recipe that computes
+a color applies a fixed rule to a base it doesn't own, so a consumer redefining that token gets a
+broken result. Derived colors (`focus-halo`, `scrim`) are authored as tokens in the preset's
+`theme.css`, where it owns the raw scale. See `__internal__/theming.md`.
 
 Every component (not needed for pure internal primitives with no DOM output) also
 needs an SSR **and** a hydration round-trip test, and `check:coverage-parity` enforces
@@ -90,25 +139,25 @@ A slot read **exactly once — inside a `<Show>` or not — needs nothing** (a s
 memo and shifts `_hk`. Full decision procedure: `__internal__/solid-2.0-notes.md` (search "`children()`
 decision procedure").
 
+## The three test projects, and the SSR round trip
+
 **Read `__internal__/testing.md` before writing any test.** Three Vitest projects, one job and
 one module resolution each: `unit` (node, no DOM, client builds, pure logic), `ssr`
 (node, **server** builds of `solid-js` *and* `@solidjs/web`, the HTML a server sends),
 `browser` (real Chromium, client builds, DOM/focus/pointer/axe/hydration). The file
 suffix picks the project: `Foo.test.tsx`, `Foo.ssr.test.tsx`, `Foo.browser.test.tsx`.
 
-Hydration is two environments by definition, and the two halves are decoupled so neither needs
-a committed file. Each subject has a **render entry**,
-`src/<component>/__tests__/<component>.ssr-entry.tsx`, exporting the `Tree` it renders. The `ssr`
-test `toMatchInlineSnapshot()`s that render (byte-exact regression, living inside the `.tsx`), and
-the `browser` test hydrates the *same* `Tree` against genuine server HTML served fresh by the
-hydration-fixture bridge — `import ssr from "virtual:hydration-fixture?id=<component>"`, rendered
-in-process by a nested SSR server (see `vitest-hydration-bridge.ts` and `__internal__/testing.md`). Sharing
-one `Tree` keeps the two halves structurally identical by construction, and there are **zero
-committed fixture files at any component count**. The browser half (via `hydrateFixture` from
-`@hope-ui/internal-test-utils`) asserts no `console.error`/`console.warn`, no element added or
-dropped, and that every server node **is the same object** as before — a silent fallback to a
-client render otherwise looks identical to success.
+Hydration is two environments by definition, and the two halves are decoupled so neither needs a
+committed file. Each subject has a **render entry**,
+`src/<component>/__tests__/<component>.ssr-entry.tsx`, exporting the `Tree` it renders; the `ssr`
+test inline-snapshots that render and the `browser` test hydrates the *same* `Tree` against genuine
+server HTML rendered fresh in-process by the hydration-fixture bridge. Sharing one `Tree` keeps the
+two halves structurally identical by construction, and there are **zero committed fixture files at
+any component count**.
 
-Hydration keys (`_hk`) are a path through the component tree, so a component inserted before
-`Dialog.Trigger` — even one that renders nothing — shifts the trigger's key. The shared `Tree` is
-what makes the server render and the client hydrate impossible to drift apart.
+That matters because **hydration keys (`_hk`) are a path through the component tree**: a component
+inserted before `Dialog.Trigger` — even one that renders nothing — shifts the trigger's key. The
+shared `Tree` is what makes the server render and the client hydrate impossible to drift apart.
+
+Mechanics — the bridge, everything `hydrateFixture` asserts, and the step-by-step for adding a
+round-trip to a new component — are in `__internal__/testing.md` § *Writing a hydration test*.

@@ -211,6 +211,12 @@ That is the whole reason tsdown is safe here where a *compiling* toolchain would
 
 ## 6. Fragile-by-graph tooling to re-check
 
+Only two pipelines in this repo compile JSX — the test runs (`vitest.config.ts`) and Storybook
+(`.storybook/main.ts`); the published build ships source (§3). They must agree, because a mismatch
+surfaces as a runtime error deep inside `@solidjs/web`, not as a config error, so both import
+`solidPluginOptions()` from the root `solid-babel-options.ts` rather than respelling the options.
+The two graph hazards that config guards against:
+
 - [ ] `vitest.setup.jest-dom-optout.ts` exists solely because `vite-plugin-solid` injects
       `@testing-library/jest-dom/vitest` as a **bare** setup-file specifier into any
       non-browser Vitest project whenever it can `require.resolve` that optional peer — and
@@ -224,4 +230,6 @@ That is the whole reason tsdown is safe here where a *compiling* toolchain would
       `viteFinal` runs *before* ours. `.storybook/main.ts` therefore filters it out and
       substitutes ours. Re-check on every Storybook major: if they change the plugin name or
       the ordering, we'd silently double-compile, or lose `refresh: { disabled: true }` and
-      reintroduce the `solid-refresh` prop-forwarding bug.
+      reintroduce the `solid-refresh` prop-forwarding bug. `Button.stories.tsx`'s **"Children reach
+      the DOM (solid-refresh canary)"** story exists to catch exactly that regression — don't delete
+      it as redundant.

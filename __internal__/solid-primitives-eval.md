@@ -66,10 +66,9 @@ no a11y violations).
 **Lesson (revised).** The hazard is real but **cheap to neutralise**: any adopted dep that creates a
 render-body compute-form signal/memo must be **inlined** in the SSR harness *and* proven against the
 hydration round-trip — it is not "un-reconcilable" and does not disqualify adoption. Effect-only
-deps (no render-body signal/memo, e.g. `a11y/createAnnounce`) never hit it, which is why the calendar
-adopted a11y without issue while `controlled-signal` looked broken: same root cause, opposite
-outcome. **Do not repeat the original mistake of measuring an externalized dep and blaming the
-primitive.**
+deps (e.g. `a11y/createAnnounce`) never hit it, which is why the calendar adopted a11y without issue
+while `controlled-signal` looked broken: same root cause, opposite outcome. **Never measure an
+externalized dep and blame the primitive.**
 
 > A guard worth adding: cross-check the bridge's server render against a pristine-subprocess render
 > so a mis-configured inline fails as a hard error instead of a silent asymmetric `_hk`.
@@ -86,8 +85,7 @@ round-trip first:**
 `state-machine`, `list-state`, `selection`, `pagination`, `range` (Select/Combobox/Menu/Slider);
 `intersection-observer` / `resize-observer` / `mutation-observer`, `media`, `keyboard`,
 `event-listener`, `scroll` (position), `storage`, `i18n`, `refs`, `props`; `a11y`
-(`createFormControl`, `createAnnounce`, `createReducedMotion`). Effect-only primitives (no
-render-body memo) are the safest bet.
+(`createFormControl`, `createAnnounce`, `createReducedMotion`).
 
 ### Tier A — evaluated, adopt-candidate
 - **`Field`/`Fieldset` ← `a11y/createFormControl`: ADOPT (hydration-gated), not the `form` package.**

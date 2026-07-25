@@ -72,7 +72,7 @@ export interface SelectOptions {
  * range mode paints exactly **one** band — tentative while anchored, committed when idle — so a
  * consumer derives the middle as `isSelected && !isSelectionStart && !isSelectionEnd`. This is React
  * Aria's model (`react-aria-components`' `data-selected`/`data-selection-start`/`data-selection-end`,
- * with the middle derived in CSS); see `__internal__/calendar-react-aria-parity.md`.
+ * with the middle derived in CSS); see `__internal__/primitives/calendar/utils/range-selection.md`.
  */
 export interface SelectionStrategy {
   readonly mode: CalendarSelectionMode;

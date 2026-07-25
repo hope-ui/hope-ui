@@ -75,6 +75,20 @@ actual installed package):
   does, and it hit the broken case every time. Use `withDefaults(props, { ... })` from
   `@hope-ui/primitives`, which resolves each defaulted key with `??`. See
   `__internal__/primitives/utils/defaults.md`.
+- **Merged props are the source of truth — never touch raw `props` again after merging.** Once you
+  `withDefaults(props, …)` (or any `useDefault`-style merge), the returned object is the *only* props
+  object for the rest of the body. Merge once at the top, then feed **that** result to every
+  downstream op — `omit`/`splitProps`, `{...spread}`, destructure, computed props, event compose.
+  Reaching back to the original `props` for a defaulted key silently reads `undefined`, because
+  `withDefaults` **copies nothing**: it exposes the defaults as *getters over a new object*
+  (`props[key] ?? defaults[key]`), so the default lives nowhere but that merged object and the raw
+  `props` is untouched. `omit(props, …)` drops the default; `omit(merged, …)` carries it.
+
+  This is the same presence-vs-value trap `withDefaults` exists to close, re-created one layer up,
+  and it is **silent** — no type error, and no test failure unless a test exercises the
+  prop-omitted path (the case a consumer hits by forwarding an optional prop, exactly as with
+  `merge` above). See `dialog-trigger.ts` (`omit(merged, …)`, `merged.onClick`) for the correct
+  shape.
 - **Internal computed props must fall back to the consumer's, not overwrite them.** Same
   root cause: `merge(props, { get "aria-labelledby"() { return context.titleId(); } })`
   puts the internal object last, so a getter returning `undefined` *erases* a

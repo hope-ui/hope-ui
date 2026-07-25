@@ -1,74 +1,37 @@
 # hope-ui: architecture plan and roadmap
 
-## Status (as of Phase 1 in progress — Dialog's shared primitives complete)
-
-**Phase 0 is complete and merged to `develop`.** In place: pnpm + Turborepo workspace,
-`@hope-ui/primitives` (behavior kernel — at the time, just `renderElement`),
-`@hope-ui/components/button` (first real component), `@hope-ui/internal-test-utils`
-(shared `mount` + `expectNoA11yViolations` harness), GitHub Actions CI (lint → build →
-typecheck → Vitest unit + Playwright browser tests → Storybook build → coverage/doc/story
-parity check), Changesets. Full pipeline verified green locally, including the
-coverage-parity script's fail/pass behavior.
-
-> Phase 0 shipped as `@hope-ui/core` + `@hope-ui/button`; both were later renamed and
-> absorbed (see "Publishing strategy"). Names above are the current ones.
+## Status
 
 **Nothing is published until SolidJS 2.0 ships stable.** The release model is: build on the
 pinned beta → wait for stable → fix the beta→stable breakage → publish 1.0. Everything that
 must happen at that boundary is tracked in `__internal__/migration-2.0-stable.md`, not in comments.
 
-**Phase 1, step 2 (Dialog) is complete**, and `@hope-ui/primitives` gained
-`createComponentContext`, `createFocusTrap`, `createDismissable`, `createScrollLock`,
-`createPresence`, and `withDefaults` — all built fresh (Base UI/React Aria as behavior
-reference, per the reference policy below), all with tests + docs. Building these forced a
-significant, unplanned but necessary detour: the build pipeline moved from
-`tsup`/`esbuild-plugin-solid` to Vite library mode/`vite-plugin-solid@3.0.0-next.5`,
-because the old pipeline could not compile a JSX `ref` attribute at all under solid-js 2.0
-(see "SolidJS 2.0 (beta) — API differences" in `CLAUDE.md` for the full root-cause
-writeup). A second restructure followed: `@hope-ui/core` was renamed to
-`@hope-ui/primitives`, and `@hope-ui/button` was absorbed into a new
-`@hope-ui/components` package (one subpath export per component). See "Publishing
-strategy" for the full rationale.
+Current component/primitive status is **not** tracked here — see
+[`__internal__/roadmap.md`](roadmap.md), which supersedes the phase ordering below.
 
-**An audit then reshaped the public API before Popover could copy its mistakes.** The
-`render` prop is function-only (a JSX element could only ever *drop* the computed props);
-`renderElement` owns ref merging; defaults go through `withDefaults` rather than `merge`;
-and a component's internal ARIA values fall back to the consumer's rather than overwriting
-them. Storybook is now the visual harness, with a story required per component.
+**Decisions this project reversed under measurement** — the part of the history that still binds,
+because each was a recorded "fact" that was actively instructing the next person:
 
-**The kernel has since been reshaped, and Popover is unblocked.** Focus *restore* is its own
-primitive (Popover and Tooltip are non-modal and need restore without a trap); modal dialogs
-are genuinely inert (`createHideOutside` applies `aria-hidden` + `inert`, `ModalBackdrop`
-blocks the pointer); `createScrollLock`'s ref count moved off module scope; and
-`composeEventHandlers` / `createControllableState` / `createRegisteredId` /
-`createRegisteredElement` were lifted out of `dialog.tsx`, which now owns no helper a second
-component would want. `Dialog.Trigger` emits `aria-controls` only while open, and respects
-`event.preventDefault()` as a cancel channel.
+- **The single pre-compiled `generate: 'dom'` build, and the "no literal host JSX element" rule it
+  spawned.** Both retired; the library ships source under the `"solid"` condition. See "SSR &
+  hydration requirements" below and `__internal__/migration-2.0-stable.md` §3.
+- **Dialog's hydration root cause.** Neither "separate Vite projects → different module instances"
+  nor "the `_$HY.r` registry is empty". It was a half-complete alias rendering "server" HTML with the
+  *browser* `createUniqueId`. Full diagnosis: `__internal__/migration-2.0-stable.md` §4; the test
+  bench that resulted: `__internal__/testing.md`.
+- **"Sibling effect cleanups are never reversed."** They are — LIFO on owner disposal, creation
+  order on re-run. `createFocusRestore` depends on both halves; pinned in `solid-contract.test.ts`.
+- **`@solid-primitives/controlled-signal` "breaks hydration".** A harness-config artifact (an
+  externalized dep escaping the server-build alias), not a defect. See
+  `__internal__/solid-primitives-eval.md`.
+- **`Dialog.Trigger` should emit `aria-controls` unconditionally**, on the grounds that Base UI does.
+  Wrong — verified against axe-core 4.12; it emits it only while open. See the ARIA IDREF rule below.
 
-**The migration insurance is now in place.** The `solid-contract.*` tests pin every
-undocumented `solid-js`/`@solidjs/web` behavior this codebase leans on, each naming the code
-that depends on it. The browser suite emitted 170 `STRICT_READ_UNTRACKED` warnings; it now
-emits zero, and `mount()` fails any test that produces one (or a
-`REACTIVE_WRITE_IN_OWNED_SCOPE`). `expectNoA11yViolations` no longer drops axe's `incomplete`
-results, `check:coverage-parity` no longer accepts a `renderToStringAsync` mention in a comment
-or an `it.skip`, and `passWithNoTests` is gone.
-
-**The test bench was then restructured, and the hydration gap closed.** There are now three
-Vitest projects with one job and one module resolution each — `unit` (node, no DOM, client
-builds), `ssr` (node, **server** builds of both `solid-js` and `@solidjs/web`), `browser` (real
-Chromium). The old two-project layout had SSR tests squatting in the `unit` project behind a
-half-complete alias, which rendered "server" HTML using the *browser* `createUniqueId`. That
-hybrid — not module instances, not the `_$HY` bootstrap — is what made Dialog's hydration test
-impossible. Both `Button` and `Dialog` now have real SSR → hydrate round-trips (inline SSR
-snapshots + an always-fresh generation bridge, no committed fixtures); nothing is `it.skip`'d.
-See `__internal__/testing.md`, and `__internal__/migration-2.0-stable.md` §4 for the two disproved theories.
-
-Three recorded "facts" were corrected against measurement rather than inherited: the SSR
-rationale below, Dialog's hydration root cause, and the claim that sibling effect cleanups are
-never reversed (they are, on owner disposal).
-
-Remaining before SolidJS 2.0 stable lands: Popover + Tooltip (Phase 1, step 3), then the
-migration itself.
+**Two structural detours worth knowing about**, since their reasoning still constrains the build:
+the pipeline left `tsup`/`esbuild-plugin-solid` because it could not compile a JSX `ref` at all under
+solid-js 2.0 (root cause under "SolidJS 2.0" in `CLAUDE.md`, §5 of the migration doc); and the
+original `@hope-ui/core` + `@hope-ui/button` packages were renamed/absorbed into
+`@hope-ui/primitives` + `@hope-ui/components` (see "Publishing strategy").
 
 **Key implementation findings from Phase 0** (verified against the actual installed
 `2.0.0-beta.16` packages, not from docs/memory — see `CLAUDE.md` for the concise
@@ -263,6 +226,16 @@ becomes an actual goal.
    welding the two together is precisely how a non-modal Dialog came to strand focus on
    `<body>`.
 
+   **Worked example — where a primitive's state belongs, and why the test environment follows.**
+   Dialog's overlay presence must be created *eagerly* and shared by Content + Positioner, so it
+   lives in `createDialog` — the **root state hook** — not in `Dialog.Root`. A lazily-mounted part
+   that owns its own `createPresence` latches on first run and skips the enter animation. The
+   consequence to internalize is the second-order one: `createDialog`'s test had to move from the
+   `unit` project to `browser` as a result, and that is the correct direction. **A test running in
+   node is never a reason to keep logic in the component layer** — convert the test, don't relocate
+   the behavior. (A per-part, eagerly-mounted presence like the backdrop's stays in its own part
+   hook, `createDialogBackdrop`.)
+
 2. **Component wiring kernel** — thinner than under 1.x, because 2.0's `createContext`
    already returns the Provider component directly and `useContext` already throws by
    default when no provider is found. Only needs a thin `createComponentContext(name)`
@@ -368,46 +341,16 @@ DoD below) — this doesn't depend on SolidStart at all.
 
 ## How to build, in order
 
-> **Superseded.** The phase/step ordering below (Button → Dialog → Popover/Tooltip → Listbox) was
-> set at repo creation and is no longer the plan. The current, complexity-ordered build roadmap —
-> a comprehensive surface aggregated from Mantine/MUI/Ant/shadcn/Nuxt plus the kernel primitives still needed — lives in
-> [`__internal__/roadmap.md`](roadmap.md). This section is kept only for the Phase 0/1 history it records.
+> **Superseded** by [`__internal__/roadmap.md`](roadmap.md), which defines the current
+> complexity-ordered build order (a surface aggregated from Mantine/MUI/Ant/shadcn/Nuxt plus the
+> kernel primitives still needed). The original repo-creation ordering was Button → Dialog →
+> Popover/Tooltip → Listbox, each step chosen to force the next shared primitive into existence
+> before scaling to 50+ components — that *sequencing principle* still holds even though the list
+> doesn't.
 
-**Phase 0 (done):**
-1. ~~Repo scaffolding~~ ✅
-2. ~~pnpm workspace + Turborepo, `solid-js`/`@solidjs/signals`/`@solidjs/web` pinned via
-   catalog~~ ✅
-3. ~~`packages/core` (behavior kernel, `renderElement`) + `packages/button`~~ ✅
-4. ~~Vitest: `unit` (node) + `browser` (Playwright, headless-shell) projects~~ ✅
-5. ~~GitHub Actions CI~~ ✅
-6. ~~Changesets~~ ✅
-7. ~~`check:coverage-parity` script, verified fail/pass~~ ✅
-
-**Phase 1 — build in this order (each step forces the next shared primitive into
-existence before scaling to 50+ components):**
-1. ~~`Button`~~ ✅ — established the `as`/render composition pattern.
-2. **`Dialog` (in progress)** — forces focus-trap, dismissable, scroll-lock, presence,
-   portal, id-linking (`aria-labelledby`/`describedby`), and the context kernel.
-   ~~`createComponentContext`, `createFocusTrap`, `createDismissable`,
-   `createScrollLock`, `createPresence`~~ ✅ — all in `@hope-ui/primitives`, tested,
-   documented. `@hope-ui/core` was renamed to `@hope-ui/primitives` and
-   `@hope-ui/button` was absorbed into `@hope-ui/components/button` along the way
-   — see "Publishing strategy". The Dialog component itself (as
-   `@hope-ui/components/dialog`) is next. Also the first real stress-test of the SSR
-   requirements above: portal-on-the-server (now known to throw, not degrade —
-   see above), effect-gated focus-trap/scroll-lock, and `createUniqueId`-based
-   id-linking all need to hold up in an actual `renderToStringAsync` + `hydrate` round
-   trip, not just in the browser.
-3. `Popover` + `Tooltip` — forces `createFloating` as independent of Dialog, proving
-   the "compose, don't inherit" rule in practice (Popover's source must have no import
-   from Dialog's package/module).
-4. `Listbox`/`Select` (or `Menu`) — forces collection/selection state + keyboard
-   navigation/typeahead.
-
-Each of these must ship meeting the full Definition of Done (tests in both Vitest
-projects as applicable, `.md` doc, `check:coverage-parity` passing) before moving to
-the next — don't let "we'll add tests/docs later" creep in, since that's exactly the
-drift that produces the coverage gaps this project is designed to avoid.
+The one rule from this section that is not superseded: **each component ships meeting the full
+Definition of Done before the next one starts.** Don't let "we'll add tests/docs later" creep in —
+that is exactly the drift that produces the coverage gaps this project is designed to avoid.
 
 ## Publishing strategy
 
@@ -508,57 +451,27 @@ classes, and the multi-theme recipe layer is unaffected.
 > with Tailwind utilities). None of the `/jsx`-vs-`/patterns` reasoning applies anymore; it is kept
 > only as a record of the earlier decision. Current styling model: [`__internal__/theming.md`](theming.md).
 
-## Testing/a11y strategy + Definition of Done (locked-in, non-negotiable)
+## Testing/a11y strategy + Definition of Done
 
-Stack: **GitHub Actions**, **Vitest**, **Vitest browser mode with Playwright**
-(headless-shell in CI: `playwright install --with-deps --only-shell`) for
-real-browser testing — all from day one.
+Stack: **GitHub Actions**, **Vitest** (three projects), **Vitest browser mode with Playwright**
+(headless-shell in CI: `playwright install --with-deps --only-shell`) — all from day one.
 
-**Definition of Done for every component and every primitive:**
-1. Full test coverage (unit-level via Vitest's `unit` project for pure state
-   primitives; real-browser via the `browser` project for anything involving actual
-   focus, keyboard events, or pointer interaction — jsdom cannot be trusted for
-   focus/selection/IME behavior).
-2. A matching `.md` doc file (API, keyboard interaction table, ARIA pattern reference),
-   colocated in `src/`.
-3. **An SSR/hydration smoke test** for every component (not needed for pure internal
-   primitives with no DOM output): call `renderToStringAsync` (from `@solidjs/web`,
-   runs fine in the `unit`/node project — no browser needed for this half) and confirm
-   it resolves without throwing; then, in the `browser` project, inject that server
-   HTML into a container and call `hydrate()` against it, asserting no hydration
-   mismatch warnings are logged and that basic interactivity (e.g. a click handler)
-   still works post-hydrate. This is what actually catches SSR-only crashes (portal
-   access to `document.body`, non-deterministic IDs) instead of assuming the "one
-   build, `@solidjs/web` resolves the environment" theory holds.
-
-Items 1 and 2 are already CI-enforced via `pnpm check:coverage-parity`
-(`scripts/check-coverage-parity.mjs`), which fails the pipeline if any
-primitive/component under `packages/*/src/*` lacks a matching test file or `.md` doc.
-Item 3 (the SSR/hydration smoke test) is **not yet mechanically enforced** — it's a
-new requirement being added at Dialog, and `check:coverage-parity` should be extended
-alongside Dialog's work to also fail if a component's test file has no SSR-round-trip
-test (e.g. checking for a `renderToStringAsync`/`hydrate` reference), the same way it
-already enforces test/doc presence. Until that script update lands, treat item 3 as a
-manual review requirement, not a false sense of "CI already covers this."
-
-`expectNoA11yViolations` (axe-core, in `@hope-ui/internal-test-utils`) should run at
-least once per component's browser test so a baseline a11y check happens by default.
+The DoD itself moved out of this file once it became mechanically enforced. **Authoritative:
+[`__internal__/definition-of-done.md`](definition-of-done.md)**, with the test-bench mechanics in
+[`__internal__/testing.md`](testing.md). (The version that used to sit here predated enforcement —
+it described the `.md` doc as colocated in `src/` and the SSR/hydration round-trip as "not yet
+mechanically enforced, treat as a manual review requirement". Both are false now:
+`check:coverage-parity` enforces the round-trip, and docs live under `__internal__/<pkg>/`.)
 
 ## Verification checklist for each new phase
 
-- Build the component(s), confirm the "compose, don't inherit" rule holds where
-  applicable (e.g. Popover's source has no import from Dialog's package/module).
-- Confirm the Playwright-backed Vitest browser tests actually exercise real focus
-  behavior where relevant (Dialog: focus trap, restore-on-close; Listbox/Select:
-  arrow-key navigation, typeahead) — these are exactly the interactions jsdom can't
-  validate.
-- Run `pnpm check:coverage-parity` and confirm it's green.
-- Confirm each component actually survives an SSR round trip: `renderToStringAsync`
-  doesn't throw, and `hydrate()` against the resulting HTML produces no console
-  hydration-mismatch warnings. Don't skip this because "it's just Button-like" —
-  Dialog's portal/focus-trap/id-linking are exactly the parts most likely to break here.
-- Once there's more than one component package, confirm `pnpm changeset` +
-  `pnpm changeset version` produces per-package-family changelogs as expected.
-- Once package grouping exists, wire up a throwaway consumer app (Vite + solid-js)
-  importing via subpath exports and confirm via bundle analysis that importing one
-  component doesn't pull in unrelated component code.
+Beyond the DoD gate (`pnpm check:coverage-parity` + the three test projects), each phase confirms:
+
+- The "compose, don't inherit" rule holds where applicable — e.g. Popover's source has no import
+  from Dialog's package/module.
+- The browser tests exercise real focus behavior where relevant (Dialog: focus trap,
+  restore-on-close; Listbox/Select: arrow-key navigation, typeahead) — exactly the interactions
+  jsdom can't validate.
+- Once package grouping exists: a throwaway consumer app (Vite + solid-js) importing via subpath
+  exports, with bundle analysis confirming that importing one component doesn't pull in another's
+  code.

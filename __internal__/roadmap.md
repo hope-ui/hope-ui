@@ -144,9 +144,19 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| Calendar ⚠️ | Date & Time | 4/5 | `createDateState`* + `createGridNavigation` | behavior complete (month grid, min/max, ranges, i18n); **recipe styling pending** — the only unstyled component |
+| Calendar ⚠️ | Date & Time | 4/5 | `createDateState`* + `createGridNavigation` | behavior complete (month grid, min/max, ranges, i18n, React Aria one-band selection + keyboard auto-advance); **recipe styling pending** — the only unstyled component |
 | DatePicker | Date & Time | 4/5 | Calendar + `createFloating`* + `createTextInput`* | |
 | TimePicker | Date & Time | 3/5 | `createTextInput`* + segments | |
+
+**Calendar — known React Aria gaps, deliberately deferred** (the one-band selection model and the
+keyboard auto-advance have shipped; these have not):
+- **Drag-select.** RA's `usePress` `shouldCancelOnPointerExit: !!state.anchorDate`
+  (`useCalendarCell.ts:205`) plus stately's `isDragging`, touch-drag timer, and
+  `isRangeBoundaryPressed` (press an existing range's endpoint to re-anchor and drag it).
+  `createPress` has no `shouldCancelOnPointerExit`, so by the porting rule this starts by **extending
+  `createPress`** — it is a real feature, not a rewiring.
+- **`data-outside-visible-range` and `data-invalid`.** RAC emits both, we emit neither. `data-invalid`
+  needs a validation-state concept the calendar doesn't have yet.
 
 ⛔ **Excluded — not building:** Carousel, Watermark, Masonry, Affix, Clipboard, FloatingPanel, Portal (SolidJS `Portal` is used directly), and all layout components (Box/Flex/Grid/Stack/Container/…).
 

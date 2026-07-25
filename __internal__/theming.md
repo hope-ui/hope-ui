@@ -153,21 +153,20 @@ the same CSS. Both are the token analog of the recipe axis's `checkSlotRecipeCon
 
 The recipe contract above imposes no *token* vocabulary. This is the other half: the **semantic
 (alias) color contract** — one design-system-agnostic set of role names every preset implements, so a
-preset is a different set of values behind the same tokens. It is the token analog of the recipe
-contract's "same slots and variant values, only the CSS differs": raw scales come from Tailwind
-itself; each `@hope-ui/presets/*` supplies the semantic values as `--hope-<token>` variables in its
-own `theme.css` (hope's live in `hope/theme.css`); components and recipes reference the names as
-Tailwind utilities (`bg-primary`, `text-on-primary`).
+preset is a different set of values behind the same tokens. Raw scales come from Tailwind itself;
+each `@hope-ui/presets/*` supplies the semantic values as `--hope-<token>` variables in its own
+`theme.css`; components and recipes reference the names as Tailwind utilities (`bg-primary`,
+`text-on-primary`).
 
 The runtime source of truth is `SEMANTIC_COLOR_TOKENS` in `@hope-ui/theming`
 ([`semantic-tokens.ts`](../packages/theming/src/semantic-tokens/semantic-tokens.ts)); its
-`SemanticColorContract` type (`Record<SemanticColorToken, string>`) is the canonical description of
-the vocabulary. Because a theme ships CSS variables rather than a typed object, completeness is
-enforced at the CSS level by `checkSemanticTokenConformance` (see "Adding a theme" above) rather than
-by a `tsc` `satisfies` check. The **authoritative, current token list** — each token with the utility
-it reads as — is
-the semantic-tokens reference in the doc website (`apps/docs/`);
-this section is the design rationale and cross-system provenance behind it.
+`SemanticColorContract` type is the canonical description of the vocabulary. Because a theme ships
+CSS variables rather than a typed object, completeness is enforced at the CSS level by
+`checkSemanticTokenConformance` (see "Adding a preset" above), not by a `tsc` `satisfies` check. The
+**authoritative, current token list** — each token with the utility it reads as — is the
+semantic-tokens reference in the doc website (`apps/docs/`); this section is the design rationale and
+cross-system provenance behind it, and the origin story is
+[`semantic-color-token-redesign.md`](semantic-color-token-redesign.md).
 
 **Name by identity, not context (the 5 rules).** A token carries `role + variant + state` and nothing
 about *where* it sits. (1) The Tailwind prefix is the layer, so no token is ever a bare CSS property

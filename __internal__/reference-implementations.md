@@ -22,9 +22,8 @@ that happens to satisfy the case you were looking at. If a port needs `useLongPr
 `createLongPress`; don't approximate it with a `setTimeout` in the consumer. And before building
 anything, **check `internal/` first** — the hook may already be here.
 
-The rule exists because the calendar/React Aria parity work
-(`__internal__/calendar-react-aria-parity.md`) nearly shipped without it. RA's range-calendar
-auto-advance is gated on `e.pointerType === 'keyboard'` (`useCalendarCell.ts:300`), a value produced
+The rule exists because the calendar/React Aria parity work nearly shipped without it. RA's
+range-calendar auto-advance is gated on `e.pointerType === 'keyboard'` (`useCalendarCell.ts:300`), a value produced
 by `usePress`. Two substitutes were proposed and rejected: an ad-hoc `onKeyDown` handler, and
 `event.detail === 0`. The latter is the instructive one — `detail === 0` is also true of a screen
 reader's virtual click, and RA routes *that* down a deliberately different branch: select the date,
