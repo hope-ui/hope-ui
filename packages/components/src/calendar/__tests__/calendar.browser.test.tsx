@@ -362,6 +362,50 @@ describe("Calendar", () => {
     await expectNoA11yViolations(container);
     dispose();
   });
+
+  it("emits an explicit dir prop onto the group element, not only as primitive config", async () => {
+    // `dir` is the one `createCalendar` option that is also a real HTML attribute. The primitive reads
+    // it to pick the arrow-key mapping; if it stopped there, the grid would still lay out
+    // left-to-right — Sunday on the left — while the arrows moved right-to-left. Same contract as
+    // `Listbox.Root`, and the reason both write it explicitly.
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            dir="rtl"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.getAttribute("dir")).toBe("rtl");
+    expect(window.getComputedStyle(group).direction).toBe("rtl");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("emits NO dir attribute when the prop is unset, so an ancestor's direction still governs", async () => {
+    // The direction the primitive uses falls back to `useLocale()`, but only the explicit prop may
+    // reach the DOM. A locale-derived `dir="ltr"` written here would override the ancestor below, and
+    // `I18nProvider` renders no DOM precisely so it never fights the document.
+    const { container, dispose } = mount(() => (
+      <div dir="rtl">
+        <Tree />
+      </div>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.hasAttribute("dir")).toBe(false);
+    expect(window.getComputedStyle(group).direction).toBe("rtl"); // inherited, not written
+
+    dispose();
+  });
 });
 
 describe("Calendar navigation glyphs", () => {

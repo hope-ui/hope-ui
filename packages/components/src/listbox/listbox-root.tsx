@@ -132,15 +132,9 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // The passthrough native attributes: everything not consumed as a `createListbox` option, a recipe
   // variant/override, or the explicitly-rendered `class`/`children`. `aria-label`/`style`/`data-*`
   // survive here; `state.rootProps` (spread after) owns `role`/`aria-*`/`tabindex`/`onKeyDown`/`id`.
-  //
-  // `dir` is deliberately NOT omitted, unlike every other `createListbox` option. It is the one option
-  // that is also a real HTML attribute, and the primitive only reads it to flip the arrow keys — so
-  // omitting it would leave `<Listbox.Root dir="rtl">` navigating right-to-left inside a container the
-  // browser still lays out left-to-right. Letting it reach the DOM keeps the layout and the keyboard
-  // agreeing. The cost is that the native `dir` narrows to `"ltr" | "rtl"` here (no `"auto"`), which is
-  // the honest surface: the primitive has to resolve a concrete direction to pick an arrow mapping.
   const rest = omit(
     merged,
+    "dir",
     "size",
     "checkIcon",
     "slotClasses",
@@ -218,6 +212,20 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
       return slots.root();
     },
     "data-slot": "listbox",
+    // `dir` is config for the primitive (it picks the arrow-key mapping) *and* a real HTML attribute,
+    // so unlike every other `createListbox` option it has to reach the DOM — otherwise
+    // `<Listbox.Root dir="rtl" orientation="horizontal">` navigates right-to-left inside a container
+    // the browser still lays out left-to-right. Written explicitly rather than left in `rest`: relying
+    // on an absence from the `omit` list above meant that making that list exhaustive over the option
+    // keys — a natural tidy-up — would silently split the layout from the keyboard again.
+    //
+    // `merged.dir`, deliberately — NOT the resolved `state.direction()`, which falls back to the
+    // locale. A locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor,
+    // and `I18nProvider` renders no DOM precisely so it never fights the document. Unset stays
+    // `undefined`, so no attribute is emitted. Same shape as `Calendar.Root`.
+    get dir(): "ltr" | "rtl" | undefined {
+      return merged.dir;
+    },
     get children(): JSX.Element {
       return virtualized ? <VirtualSizer /> : (merged.children as JSX.Element);
     },

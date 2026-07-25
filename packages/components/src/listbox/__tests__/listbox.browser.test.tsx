@@ -652,4 +652,55 @@ describe("Listbox — RTL", () => {
     await expectNoA11yViolations(container);
     dispose();
   });
+
+  it("emits an explicit dir prop onto the list element, not only as primitive config", async () => {
+    // `dir` is the one `createListbox` option that is also a real HTML attribute. The primitive reads
+    // it to pick the arrow-key mapping; if it stopped there, the browser would lay a horizontal list
+    // out left-to-right while the arrows moved right-to-left.
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Listbox.Root
+          aria-label="fruits"
+          dir="rtl"
+          orientation="horizontal"
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+        >
+          <For each={FRUITS}>
+            {(fruit) => (
+              <Listbox.Item value={fruit} data-value={fruit.name}>
+                {fruit.name}
+              </Listbox.Item>
+            )}
+          </For>
+        </Listbox.Root>
+      </Themed>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const list = listbox(container);
+    expect(list.getAttribute("dir")).toBe("rtl");
+    expect(window.getComputedStyle(list).direction).toBe("rtl");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("emits NO dir attribute when the prop is unset, so an ancestor's direction still governs", async () => {
+    // The direction the primitive uses falls back to `useLocale()`, but only the explicit prop may
+    // reach the DOM. Writing a locale-derived `dir="ltr"` here would override the ancestor below —
+    // and `I18nProvider` renders no DOM precisely so it never fights the document.
+    const { container, dispose } = mount(() => (
+      <div dir="rtl">
+        <FruitListbox selectionMode="single" />
+      </div>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const list = listbox(container);
+    expect(list.hasAttribute("dir")).toBe(false);
+    expect(window.getComputedStyle(list).direction).toBe("rtl"); // inherited, not written
+
+    dispose();
+  });
 });
