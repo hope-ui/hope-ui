@@ -196,6 +196,48 @@ value equality → `compareByIdOrReference`.
 
 ---
 
+## 3. Cross-cutting engineering tasks
+
+Not components and not primitives — repo-wide seams that get more expensive per component built.
+
+### Splitting a styled Root's props: replace the hand-kept `omit` list
+
+Every styled Root that forwards native attributes onto its element has to separate "an option the
+primitive consumes" from "an attribute the consumer wants on the DOM node". Today that separation is
+a literal key list passed to `omit(merged, …)`, hand-copied from the primitive's `CreateXOptions`
+interface — `Calendar.Root` (28 keys) and `Listbox.Root` (26) carry one each, and every future
+compound root (Select, Combobox, Menu, Popover, Tabs, Accordion, …) will need its own.
+
+**It drifts in both directions, silently.**
+- A key **missing** from the list leaks into the DOM as a junk attribute (`commitbehavior="reset"`).
+  No type error, no failing test — `omit`'s parameters are strings with no relationship to the
+  interface. Pinned today only by a test naming the string-valued options one by one
+  (`calendar.browser.test.tsx` § "does not leak createCalendar options onto the element"), which a
+  new boolean- or object-valued option walks straight past.
+- A key **wrongly present** silently drops an attribute the consumer passed. c64bc5d caught this one
+  live: `dir` reached Listbox's element only by being *absent* from its list, so making that list
+  exhaustive over the option keys — a natural tidy-up — would have split the layout from the keyboard
+  for every RTL reader, with every test still green.
+
+**Constraints on any fix.** It must not copy props (`omit`/`withDefaults` return getter proxies, and
+the controllable-state getters have to stay live — [`CLAUDE.md`](../CLAUDE.md) § "Merged props are
+the source of truth"), must not resolve anything eagerly in the component body, and must survive the
+JSX-preserved build.
+
+**Candidate directions, none chosen:**
+1. Each primitive exports the key list as a `const` tuple beside its options interface, with a
+   type-level exhaustiveness assertion (`satisfies readonly (keyof CreateCalendarOptions)[]` plus a
+   "no key missed" mapped type). Drift becomes a compile error, and the two edits land in one file.
+2. A shared `splitThemeableProps(merged, keys)` helper so the split is written once rather than
+   per root, orthogonal to where the keys come from.
+3. Invert it: the part hook takes the whole merged object and drops what it recognizes, so no
+   consumer of the kernel maintains a list at all.
+
+Whatever lands should be enforced by the type system or a `scripts/check-*.mjs`, not by a comment —
+the current defense is two comments telling the next reader not to tidy.
+
+---
+
 ## Suggested first moves
 
 Not prescriptive, but the natural sequence given what's now landed:
