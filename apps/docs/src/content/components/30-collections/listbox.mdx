@@ -8,6 +8,7 @@ import { ListboxDisabledDemo } from "~/components/demos/listbox/ListboxDisabledD
 import { ListboxVirtualDemo } from "~/components/demos/listbox/ListboxVirtualDemo";
 import { ListboxFormDemo } from "~/components/demos/listbox/ListboxFormDemo";
 import { ListboxFocusModesDemo } from "~/components/demos/listbox/ListboxFocusModesDemo";
+import { ListboxRtlDemo } from "~/components/demos/listbox/ListboxRtlDemo";
 import { Anatomy } from "~/components/Anatomy";
 import { PropsTable } from "~/components/PropsTable";
 import { DataTable } from "~/components/DataTable";
@@ -338,10 +339,31 @@ arrows drive the list. Tab into each below and arrow through it.
 <Listbox.Root focusMode="activedescendant">…</Listbox.Root>
 ```
 
+## Reading direction (LTR & RTL)
+
+An RTL direction mirrors the list — the check gutter moves to the left edge — and reverses a
+**horizontal** listbox's arrow keys, where `←` moves to the *next* option. A vertical listbox is
+unaffected: RTL mirrors the inline axis only.
+
+<Preview>
+  <ListboxRtlDemo />
+</Preview>
+
+Set `dir` on your document root (see [i18n](/get-started/i18n)) and every listbox follows. The wrapper
+below is only needed because this page shows two directions at once:
+
+```tsx
+<div dir="rtl">
+  <I18nProvider locale="ar-EG">
+    <Listbox.Root aria-label="اختر فاكهة">…</Listbox.Root>
+  </I18nProvider>
+</div>
+```
+
 ## Keyboard interactions
 
 Listbox implements the WAI-ARIA listbox keyboard pattern. Navigation follows `orientation` (the
-vertical arrows are shown; a horizontal listbox uses `←` / `→`).
+vertical arrows are shown; a horizontal listbox uses `←` / `→`, reversed under RTL).
 
 <DataTable
   columns={[
@@ -503,6 +525,13 @@ export const myPreset = definePreset(hope, {
       type: '"vertical" | "horizontal"',
       default: '"vertical"',
       description: "The arrow-key axis and aria-orientation.",
+    },
+    {
+      prop: "dir",
+      type: '"ltr" | "rtl"',
+      default: "useLocale()",
+      description:
+        "Mirrors this listbox on its own, overriding the page's direction. Unset, it follows the page.",
     },
     {
       prop: "disabled",

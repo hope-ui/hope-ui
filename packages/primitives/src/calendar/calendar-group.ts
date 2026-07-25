@@ -8,7 +8,8 @@ export interface CreateCalendarGroupReturn {
    * `data-*`, and the focus-out half of the abandonment policy. */
   props: JSX.HTMLAttributes<HTMLElement>;
   /** Hand to the container element's `ref`. It is what "outside" is measured against, so without it
-   * the outside-pointer half of the abandonment policy stays dormant. */
+   * the outside-pointer half of the abandonment policy stays dormant — and what the dev direction
+   * warning measures the layout against, so without it that warning stays silent. */
   setRef: (element: HTMLElement) => void;
 }
 
@@ -137,5 +138,12 @@ export function createCalendarGroup(
     },
   });
 
-  return { props: elementProps, setRef: setContainer };
+  // Two consumers of the same element, so `setRef` feeds both: the abandonment policy measures
+  // "outside" against it, and the root state's dev direction warning measures its applied layout.
+  const setRef = (element: HTMLElement) => {
+    setContainer(element);
+    state.setGroupElement(element);
+  };
+
+  return { props: elementProps, setRef };
 }

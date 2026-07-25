@@ -13,6 +13,7 @@ import {
   createListNavigation,
   createListSelection,
   createListTypeahead,
+  createTextDirectionWarning,
   createVirtualCollection,
   type FocusMode,
   type ItemSource,
@@ -99,6 +100,11 @@ export interface CreateListboxOptions<V = unknown> {
    * Reading direction. Defaults to `useLocale()` (the `I18nProvider` / browser locale). Feeds the
    * horizontal arrow flip: under `"rtl"`, ArrowLeft moves toward the *next* item. Inert for a
    * vertical listbox.
+   *
+   * A consumer that renders the element itself should also put this on it — it is the one option that
+   * is a real HTML attribute, and the layout mirrors from the DOM, not from here (`Listbox.Root`
+   * does exactly that). A locale-derived direction is deliberately **not** written for you; see
+   * `create-text-direction-warning.ts` for why, and for the dev warning that catches the mismatch.
    */
   dir?: TextDirection;
   /** Whether the whole list is disabled (nothing tabbable, `aria-disabled`). Default `false`. */
@@ -163,7 +169,9 @@ export interface CreateListboxReturn<V = unknown> {
   focusMode: Accessor<FocusMode>;
   /** The current orientation. */
   orientation: Accessor<Orientation>;
-  /** The resolved reading direction (consumer's `dir`, else the locale's). */
+  /** The reading direction the horizontal keymap mirrors against: the consumer's `dir`, else
+   *  `useLocale().direction()`. Drives behavior only — it is never written to the DOM, so the layout
+   *  still follows the cascade. See `create-text-direction-warning.ts`. */
   direction: Accessor<TextDirection>;
   /** Whether the whole list is disabled. */
   disabled: Accessor<boolean>;
@@ -224,6 +232,16 @@ export function createListbox<V = unknown>(
 
   const i18n = useLocale();
   const direction = () => merged.dir ?? i18n.direction();
+
+  // Dev-only, and only for a horizontal list — a vertical one maps Up/Down, where direction cannot
+  // change anything. `direction()` drives the keys; the DOM drives the layout; nothing joins them
+  // (see `create-text-direction-warning.ts`), so this is what stops them disagreeing in silence.
+  createTextDirectionWarning({
+    name: "Listbox",
+    direction,
+    element: listboxElement,
+    active: () => orientation() === "horizontal",
+  });
 
   // The source is decided **once**: a listbox is either fully mounted (collection) or windowed
   // (virtual) for its lifetime, never switching. Virtual when both `items` and `estimateSize` exist.

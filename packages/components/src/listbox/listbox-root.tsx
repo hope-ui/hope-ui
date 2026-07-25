@@ -132,6 +132,8 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // The passthrough native attributes: everything not consumed as a `createListbox` option, a recipe
   // variant/override, or the explicitly-rendered `class`/`children`. `aria-label`/`style`/`data-*`
   // survive here; `state.rootProps` (spread after) owns `role`/`aria-*`/`tabindex`/`onKeyDown`/`id`.
+  // `dir` is omitted here and written explicitly below, so that making this list exhaustive over the
+  // option keys — a natural tidy-up — can't silently split the layout from the keyboard.
   const rest = omit(
     merged,
     "dir",
@@ -206,30 +208,27 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // both. `rest` (consumer passthrough) is merged first, then `state.rootProps` so the primitive's
   // a11y-owned attrs (incl. `role="listbox"`) win, then the recipe `class` / `data-slot` / children.
   // `setListboxElement` wires the element to the primitive as its scroll container (`rootProps` omits
-  // `ref`; `renderElement` also merges any consumer `ref`).
+  // `ref`; `renderElement` also merges any consumer `ref`) — and is also what the dev direction
+  // warning measures the applied layout against.
   const elementProps = merge(rest, state.rootProps, {
     get class(): string {
       return slots.root();
     },
     "data-slot": "listbox",
-    // The DOM direction comes from the primitive's RESOLVED direction, not the raw prop: `dir` is an
-    // input to `createListbox`, which resolves it against the surrounding `I18nProvider`
-    // (`merged.dir ?? i18n.direction()`), and the component's job is to put that answer where the
-    // browser can see it. Otherwise `<I18nProvider locale="ar-EG">` would flip a horizontal list's
-    // arrow keys while the browser still laid the row out left-to-right, forcing callers to pass BOTH
-    // a locale and a `dir` to describe one thing.
+    // `dir` is the one `createListbox` option that is also a real HTML attribute, and the two halves
+    // of RTL travel down different channels: the recipe's logical utilities (`ps-`/`pe-`/`end-`) mirror
+    // from the DOM, the arrow keys from `state.direction()`. So the consumer's `dir` must reach the
+    // element, or `<Listbox.Root dir="rtl">` navigates right-to-left across a row the browser still
+    // lays out left-to-right.
     //
-    // The consequence to know: this always writes, so a listbox inside an ancestor `dir="rtl"` that
-    // was never told its locale reports the detected one (`ltr` for an en-US browser) and overrides
-    // that ancestor. That is the documented contract working as intended — an app sets `dir` on its
-    // document root *from* `useLocale().direction`, so the two agree by construction; if they
-    // disagree, the locale hope-ui was actually given is the more specific signal.
-    //
-    // Written here rather than left to ride along in `rest`: relying on an absence from the `omit`
-    // list above meant that making that list exhaustive over the option keys — a natural tidy-up —
-    // would silently split the layout from the keyboard again. Same shape as `Calendar.Root`.
+    // `merged.dir`, never `state.direction()`: the latter falls back to the locale, and a
+    // locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor. Base UI and
+    // React Aria both draw the line here too — neither writes a locale-derived `dir` on a
+    // non-portaled component (React Aria writes one only on Popover/Toast, which portal out of the
+    // cascade's reach). An app declares direction where the browser can see it; the provider only
+    // tells the keymap. `createTextDirectionWarning` says so out loud in dev when the two disagree.
     get dir() {
-      return state.direction();
+      return merged.dir;
     },
     get children(): JSX.Element {
       return virtualized ? <VirtualSizer /> : (merged.children as JSX.Element);

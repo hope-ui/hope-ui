@@ -367,7 +367,8 @@ describe("Calendar", () => {
     // `dir` is the one `createCalendar` option that is also a real HTML attribute. The primitive reads
     // it to pick the arrow-key mapping; if it stopped there, the grid would still lay out
     // left-to-right — Sunday on the left — while the arrows moved right-to-left. Same contract as
-    // `Listbox.Root`, and the reason both write it explicitly.
+    // `Listbox.Root`: the prop is a per-instance instruction, so it reaches the element. A
+    // locale-derived direction never does — see `createTextDirectionWarning`.
     const { container, dispose } = mount(() => (
       <ThemeProvider preset={hope}>
         <I18nProvider locale="en-US">
@@ -389,17 +390,18 @@ describe("Calendar", () => {
     dispose();
   });
 
-  it("mirrors the DOM from an I18nProvider locale alone, with no dir prop", async () => {
-    // The point of resolving the DOM attribute from `state.direction()` rather than the raw prop: a
-    // consumer configures the locale once and gets a correct calendar, instead of having to pass a
-    // locale to the provider AND a `dir` to the component to describe one thing. Without this the
-    // arrow keys and the Arabic-Indic numerals would flip while the grid stayed left-to-right.
+  it("mirrors from an ancestor's dir, which it does not itself write", async () => {
+    // The app declares direction where the browser can see it; hope-ui reads it from there. Same line
+    // Base UI and React Aria draw — React Aria's `useCalendarGrid` puts no `dir` in `gridProps` at
+    // all, and a locale-derived `dir` would override this ancestor.
     const { container, dispose } = mount(() => (
-      <ThemeProvider preset={hope}>
-        <I18nProvider locale="ar-EG">
-          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
-        </I18nProvider>
-      </ThemeProvider>
+      <div dir="rtl">
+        <ThemeProvider preset={hope}>
+          <I18nProvider locale="ar-EG">
+            <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
+          </I18nProvider>
+        </ThemeProvider>
+      </div>
     ));
 
     const group = await vi.waitFor(() => {
@@ -408,8 +410,8 @@ describe("Calendar", () => {
       return found as HTMLElement;
     });
 
-    expect(group.getAttribute("dir")).toBe("rtl");
-    expect(window.getComputedStyle(group).direction).toBe("rtl");
+    expect(group.hasAttribute("dir")).toBe(false);
+    expect(window.getComputedStyle(group).direction).toBe("rtl"); // inherited, not written
 
     // And the layout actually mirrors: the first weekday column sits on the right.
     const headers = [...group.querySelectorAll("th")];
@@ -417,6 +419,73 @@ describe("Calendar", () => {
     const last = headers.at(-1) as HTMLTableCellElement;
     expect(first.getBoundingClientRect().x).toBeGreaterThan(last.getBoundingClientRect().x);
 
+    dispose();
+  });
+
+  it("warns in dev when the grid's keymap and layout disagree", async () => {
+    // A calendar grid is 2D, so Left/Right always matter — this always warns, unlike a vertical
+    // listbox. The split is real and both references accept it, so make it loud instead of silent:
+    // `<I18nProvider locale="ar-EG">` with no `dir` anywhere gives Arabic-Indic numerals and reversed
+    // arrows over a grid still laid out left-to-right.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="ar-EG">
+          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(container.querySelectorAll("th").length).toBeGreaterThan(0));
+
+    await vi.waitFor(() =>
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("[hope-ui] Calendar")),
+    );
+    expect(warn.mock.calls.flat().join(" ")).toContain("document.documentElement.dir");
+
+    warn.mockRestore();
+    dispose();
+  });
+
+  it("stays quiet once the app declares the direction the locale implies", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { container, dispose } = mount(() => (
+      <div dir="rtl">
+        <ThemeProvider preset={hope}>
+          <I18nProvider locale="ar-EG">
+            <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
+          </I18nProvider>
+        </ThemeProvider>
+      </div>
+    ));
+    await vi.waitFor(() => expect(container.querySelectorAll("th").length).toBeGreaterThan(0));
+
+    expect(warn.mock.calls.flat().join(" ")).not.toContain("[hope-ui] Calendar");
+
+    warn.mockRestore();
+    dispose();
+  });
+
+  it("stays quiet when a dir prop supplies the direction, since it reaches the DOM", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            dir="rtl"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(container.querySelectorAll("th").length).toBeGreaterThan(0));
+
+    expect(warn.mock.calls.flat().join(" ")).not.toContain("[hope-ui] Calendar");
+
+    warn.mockRestore();
     dispose();
   });
 });

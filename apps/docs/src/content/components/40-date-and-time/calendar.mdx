@@ -290,9 +290,9 @@ only once the range is complete.
 ## Localization & i18n
 
 Calendar localizes through [`@hope-ui/i18n`](/get-started/i18n): wrap a subtree in an `I18nProvider`
-and pass a `locale`, and the heading, weekday names, day numbers, reading direction, and screen-reader
+and pass a `locale`, and the heading, weekday names, day numbers, keyboard direction, and screen-reader
 announcements all follow — no per-component flags. Everything below changes **only** the provider's
-`locale` (and, for RTL, a `dir` on the layout).
+`locale` (plus, for RTL, a `dir` on the layout).
 
 ### Reading direction (LTR & RTL)
 
@@ -305,26 +305,15 @@ digits here, for free.
 </Preview>
 
 ```tsx
-<I18nProvider locale="ar-EG">
-  <Calendar.Root />
-</I18nProvider>
+<div dir="rtl">
+  <I18nProvider locale="ar-EG">
+    <Calendar.Root />
+  </I18nProvider>
+</div>
 ```
 
-<Alert.Root
-  variant="soft"
-  colorScheme="neutral"
-  class="not-prose"
-  description={
-    <div>
-      The locale is the only thing you configure. <code>Calendar.Root</code> writes its resolved
-      reading direction onto its own element, so the layout mirrors without a <code>dir</code> prop or
-      a wrapper — which is what lets the two calendars above sit side by side in one page. Pass{" "}
-      <code>dir</code> explicitly only to override the locale. For the app as a whole, still set{" "}
-      <code>dir</code> on your document root — see <a href="#">Reading direction</a> in the i18n
-      guide — so that everything outside hope-ui mirrors too.
-    </div>
-  }
-/>
+Set `dir` on your document root (see [i18n](/get-started/i18n)) and every calendar follows. The wrapper
+above is only needed because this page shows two directions at once.
 
 ### First day of week
 
@@ -573,7 +562,8 @@ Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, 
       prop: "dir",
       type: '"ltr" | "rtl"',
       default: "useLocale()",
-      description: "Reading direction. Defaults to the locale's. Drives the arrow-key flip.",
+      description:
+        "Mirrors this calendar on its own, overriding the page's direction. Unset, it follows the page.",
     },
     {
       prop: "timeZone",

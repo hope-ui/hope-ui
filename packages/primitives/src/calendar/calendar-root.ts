@@ -24,6 +24,7 @@ import {
   createCollection,
   createControllableState,
   createListFocus,
+  createTextDirectionWarning,
   type TextDirection,
 } from "../internal";
 import { withDefaults } from "../utils";
@@ -84,7 +85,14 @@ export interface CreateCalendarOptions {
   label?: string;
   /** Locale for date formatting. Defaults to `useLocale()` (the `I18nProvider` / browser locale). */
   locale?: string;
-  /** Reading direction. Defaults to `useLocale()`. Feeds the grid's RTL arrow flip. */
+  /**
+   * Reading direction. Defaults to `useLocale()`. Feeds the grid's RTL arrow flip.
+   *
+   * A consumer that renders the group element itself should also put this on it — it is the one option
+   * that is a real HTML attribute, and the grid mirrors from the DOM, not from here (`Calendar.Root`
+   * does exactly that). A locale-derived direction is deliberately **not** written for you; see
+   * `create-text-direction-warning.ts` for why, and for the dev warning that catches the mismatch.
+   */
   dir?: TextDirection;
   /** IANA time zone for "today" + formatting. Default: the system zone. */
   timeZone?: string;
@@ -142,7 +150,13 @@ export interface CreateCalendarOptions {
 export interface CreateCalendarReturn {
   // --- config (resolved, reactive) ---
   locale: Accessor<string>;
+  /** The reading direction the grid's keymap mirrors against: the consumer's `dir`, else
+   *  `useLocale().direction()`. Drives behavior only — it is never written to the DOM, so the layout
+   *  still follows the cascade. See `create-text-direction-warning.ts`. */
   direction: Accessor<TextDirection>;
+  /** Registers the `role="group"` element, the one the browser lays out — so the dev direction
+   *  warning can compare it against `direction()`. Fed by `createCalendarGroup`'s `setRef`. */
+  setGroupElement: (element: HTMLElement | null) => void;
   timeZone: Accessor<string>;
   firstDayOfWeek: Accessor<FirstDayOfWeek | undefined>;
   /** The **effective** lower bound: the `min` option, raised to the anchored range's available run
@@ -311,7 +325,19 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   const i18n = useLocale();
   const t = i18n.t;
   const locale = () => merged.locale ?? i18n.locale();
+
   const direction = () => merged.dir ?? i18n.direction();
+
+  // The group element lives on the root state rather than in `createCalendarGroup` alone: the dev
+  // warning below compares the keymap's direction against the element the browser actually lays out,
+  // and that is the group — which this hook has no other handle on.
+  const [groupElement, setGroupElement] = createSignal<HTMLElement | null>();
+
+  // Dev-only, and unconditional here: a calendar grid is 2D, so Left/Right always matter. `direction()`
+  // drives the keys, the DOM drives the layout, and nothing joins them (see
+  // `create-text-direction-warning.ts`) — this is what stops them disagreeing in silence.
+  createTextDirectionWarning({ name: "Calendar", direction, element: groupElement });
+
   const timeZone = () => merged.timeZone;
   const firstDayOfWeek = () => merged.firstDayOfWeek;
   const configuredMin = () => merged.min;
@@ -858,6 +884,7 @@ export function createCalendar(options: CreateCalendarOptions = {}): CreateCalen
   return {
     locale,
     direction,
+    setGroupElement,
     timeZone,
     firstDayOfWeek,
     min,

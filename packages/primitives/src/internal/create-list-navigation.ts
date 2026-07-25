@@ -2,9 +2,9 @@ import type { JSX } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 import { createKeyboardHandler } from "../utils/keymap";
 import type { CreateListFocusReturn } from "./create-list-focus";
+import type { TextDirection } from "./create-text-direction-warning";
 
 export type Orientation = "vertical" | "horizontal";
-export type TextDirection = "ltr" | "rtl";
 
 export interface CreateListNavigationOptions<V = unknown> {
   /** The shared focus instance this navigation drives. */

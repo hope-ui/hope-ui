@@ -179,9 +179,8 @@ Which form to use:
 
 ## Reading direction
 
-The provider derives reading direction from the locale, and every component consumes it — so RTL
-locales lay out correctly with no per-component flag. Read it yourself with `useLocale().direction`,
-and set it once on your document root so native layout follows:
+Set `dir` on your document root from the locale. That one line mirrors your whole app — your own
+layout and hope-ui's alike, since `dir` cascades:
 
 ```tsx
 import { getReadingDirection } from "@hope-ui/i18n";
@@ -189,6 +188,25 @@ import { getReadingDirection } from "@hope-ui/i18n";
 // e.g. getReadingDirection("ar-EG") -> "rtl"
 document.documentElement.dir = getReadingDirection(locale());
 ```
+
+The locale handles the rest: RTL locales get reversed arrow keys in a calendar grid or a horizontal
+listbox, plus localized names and numerals. Read the direction yourself with `useLocale().direction`.
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <span>
+      Components never write <code>dir</code> for you — so hope-ui can't fight a direction your page
+      already set. Set the locale but forget the <code>dir</code> and the layout won't mirror while
+      the arrow keys do; hope-ui warns in the dev console when it spots that.
+    </span>
+  }
+/>
+
+To mirror one section only — two locales on one page — put `dir` on that subtree, or pass `dir` to a
+single component.
 
 ## Override or add messages
 
@@ -271,7 +289,7 @@ anything you don't provide falls through to the guaranteed English floor.
       prop: "useLocale()",
       type: "{ locale, direction, t }",
       description:
-        "Read the current locale + direction accessors and the reactive t(key, …params) message resolver. Works with no provider mounted — it falls back to the detected browser locale and the built-in catalog.",
+        "Read the current locale + direction accessors and the reactive t(key, …params) message resolver. Works with no provider mounted — it falls back to the detected browser locale and the built-in catalog. direction drives keyboard navigation; it is never written to the DOM (set dir on your document root for that).",
     },
   ]}
 />

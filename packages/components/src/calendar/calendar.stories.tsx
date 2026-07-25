@@ -101,11 +101,29 @@ export const WeekStartsMonday: Story = {
   render: () => <CalendarDemo defaultFocusedValue={june} firstDayOfWeek="mon" />,
 };
 
+// Both channels declared, which is the contract: `dir="rtl"` mirrors the LAYOUT (the grid's columns,
+// the chevrons' `rtl:` rotation), the provider locale mirrors the ARROW KEYS and supplies the Arabic
+// month name and Arabic-Indic numerals. hope-ui never joins the two for you — the same split Base UI
+// declares in every RTL test and React Aria's `useCalendarGrid` leaves to the app.
+//
+// Note the provider rather than a `locale` prop: `createCalendar` reads the provider for direction, so
+// a `locale` prop alone changes formatting only.
 export const RightToLeft: Story = {
-  // The locale is the ONLY thing configured — no `dir` prop, no `dir` wrapper. `Calendar.Root` writes
-  // its resolved direction onto its own element, so this story fails loudly if that ever stops
-  // happening. Note the provider rather than a `locale` prop: `createCalendar` resolves direction as
-  // `merged.dir ?? i18n.direction()`, so a `locale` prop changes formatting only.
+  render: () => (
+    <div dir="rtl">
+      <I18nProvider locale="ar-EG">
+        <CalendarDemo defaultFocusedValue={june} />
+      </I18nProvider>
+    </div>
+  ),
+};
+
+// The half only a story can show: declare the LOCALE and forget the `dir`, and you get Arabic numerals
+// and reversed arrows over a grid still laid out left-to-right, Sunday on the left. hope-ui doesn't
+// silently paper over it (writing `dir` here would override any ancestor the app did set) — it warns
+// in dev instead. Open the console on this story: `[hope-ui] Calendar: its arrow keys mirror "rtl"…`.
+export const RightToLeftMissingDir: Story = {
+  name: "locale without dir (arrows disagree — warns in dev)",
   render: () => (
     <I18nProvider locale="ar-EG">
       <CalendarDemo defaultFocusedValue={june} />

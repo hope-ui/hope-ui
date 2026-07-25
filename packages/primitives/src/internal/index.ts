@@ -80,7 +80,6 @@ export {
   type CreateListNavigationReturn,
   createListNavigation,
   type Orientation,
-  type TextDirection,
 } from "./create-list-navigation";
 export {
   type CreateListSelectionOptions,
@@ -124,6 +123,11 @@ export {
   type CreateScrollLockOptions,
   createScrollLock,
 } from "./create-scroll-lock";
+export {
+  type CreateTextDirectionWarningOptions,
+  createTextDirectionWarning,
+  type TextDirection,
+} from "./create-text-direction-warning";
 export {
   type CreateVirtualCollectionOptions,
   type CreateVirtualCollectionReturn,

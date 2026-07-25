@@ -122,8 +122,8 @@ export function Root(props: CalendarRootProps): JSX.Element {
   }
 
   // The `role="group"` container — its ARIA and state `data-*` come from `createCalendarGroup`, which
-  // also wires the abandonment policy and takes the element's ref. The recipe `root` slot is applied
-  // last, and the chrome renders inside.
+  // also wires the abandonment policy and takes the element's ref (also what the dev direction warning
+  // measures). The recipe `root` slot is applied last, and the chrome renders inside.
   //
   // Through `renderElement`, not a literal `<div>`: it now spreads a getter-laden props object from a
   // primitive hook, and such a spread on a literal host element allocates its subtree's `_hk`
@@ -138,21 +138,21 @@ export function Root(props: CalendarRootProps): JSX.Element {
           get class(): string {
             return slots.root();
           },
-          /* The DOM direction comes from the primitive's RESOLVED direction, not the raw prop: `dir`
-          is an input to `createCalendar`, which resolves it against the surrounding `I18nProvider`
-          (`merged.dir ?? i18n.direction()`), and the component's job is to put that answer where the
-          browser can see it. Otherwise `<I18nProvider locale="ar-EG">` would flip the arrow keys and
-          the numerals while the grid still laid out left-to-right, forcing callers to pass BOTH a
-          locale and a `dir` to describe one thing.
+          /* `dir` is the one `createCalendar` option that is also a real HTML attribute, and the two
+          halves of RTL travel down different channels: the grid's column order and the recipe's
+          logical utilities (`rounded-s-`, `rtl:[&_svg]:rotate-180`) mirror from the DOM, the arrow
+          keys from `state.direction()`. So the consumer's `dir` must reach the element, or
+          `<Calendar.Root dir="rtl">` navigates right-to-left across a grid still laid out
+          left-to-right, with Sunday on the left.
 
-          The consequence to know: this always writes, so a calendar inside an ancestor `dir="rtl"`
-          that was never told its locale reports the detected one (`ltr` for an en-US browser) and
-          overrides that ancestor. That is the documented contract working as intended — an app sets
-          `dir` on its document root *from* `useLocale().direction`, so the two agree by construction;
-          if they disagree, the locale hope-ui was actually given is the more specific signal. Same
-          shape as `Listbox.Root`. */
+          `merged.dir`, never `state.direction()`: the latter falls back to the locale, and a
+          locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor. Base UI
+          and React Aria both draw the line here too — React Aria's `useCalendarGrid` reads
+          `useLocale().direction` for the arrow flip and puts no `dir` in `gridProps` at all. An app
+          declares direction where the browser can see it; the provider only tells the keymap.
+          `createTextDirectionWarning` says so out loud in dev when the two disagree. */
           get dir() {
-            return state.direction();
+            return merged.dir;
           },
           /* Compound (consumer children) vs convenience (auto-chrome): a **single** read of
           `merged.children`, in a getter so it stays evaluated under the provider, with a nullish

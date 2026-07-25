@@ -1,3 +1,4 @@
+import { I18nProvider } from "@hope-ui/i18n";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, For } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
@@ -349,6 +350,57 @@ export const VirtualMultiple: Story = {
             </Listbox.Item>
           )}
         </Listbox.Root>
+      </div>
+    );
+  },
+};
+
+/**
+ * Reading direction, and the two channels it arrives on. **Left:** a `dir` prop, the per-instance
+ * instruction — it reaches the element, so the check gutter mirrors to the left edge. **Right:** an
+ * ancestor `dir="rtl"` box with the listbox told nothing at all — it writes no `dir` and inherits,
+ * which is the case only a story makes visible, and the one a locale-derived DOM write would break.
+ *
+ * Neither list warns: both are vertical, where Up/Down means direction cannot change navigation. Make
+ * one `orientation="horizontal"` with a locale but no `dir` and the dev console names the split.
+ */
+export const ReadingDirection: Story = {
+  name: "reading direction (prop vs inherited)",
+  render: () => {
+    const [declared, setDeclared] = createSignal<Fruit[]>([FRUITS[2] as Fruit]);
+    const [inherited, setInherited] = createSignal<Fruit[]>([FRUITS[2] as Fruit]);
+    return (
+      <div style={{ display: "flex", gap: "2rem", padding: "2rem", "align-items": "flex-start" }}>
+        <div style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
+          <span style={{ "font-size": "0.75rem" }}>dir="rtl" on Listbox.Root</span>
+          <I18nProvider locale="ar-EG">
+            <Listbox.Root
+              aria-label="اختر فاكهة"
+              class={PANEL}
+              dir="rtl"
+              itemToValue={itemToValue}
+              itemToLabel={itemToLabel}
+              value={declared()}
+              onChange={setDeclared}
+            >
+              <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+            </Listbox.Root>
+          </I18nProvider>
+        </div>
+
+        <div dir="rtl" style={{ display: "flex", "flex-direction": "column", gap: "0.5rem" }}>
+          <span style={{ "font-size": "0.75rem" }}>inherited from a dir="rtl" ancestor</span>
+          <Listbox.Root
+            aria-label="Choose a fruit"
+            class={PANEL}
+            itemToValue={itemToValue}
+            itemToLabel={itemToLabel}
+            value={inherited()}
+            onChange={setInherited}
+          >
+            <For each={FRUITS}>{(fruit) => <FruitItem fruit={fruit} />}</For>
+          </Listbox.Root>
+        </div>
       </div>
     );
   },

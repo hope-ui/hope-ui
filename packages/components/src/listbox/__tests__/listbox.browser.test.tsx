@@ -694,10 +694,68 @@ describe("Listbox — RTL", () => {
     dispose();
   });
 
-  it("mirrors the DOM from an I18nProvider locale alone, with no dir prop", async () => {
-    // The point of resolving the DOM attribute from `state.direction()` rather than the raw prop: a
-    // consumer configures the locale once and gets a correct listbox, instead of having to pass a
-    // locale to the provider AND a `dir` to the component to describe one thing.
+  it("does NOT write a locale-derived dir, so an ancestor's direction still governs", async () => {
+    // The contract, and the reason it is this way: `useLocale().direction` never returns "nothing" —
+    // with no provider it reports the DETECTED browser direction — so writing it would stamp
+    // `dir="ltr"` here and override the ancestor. Only the consumer's own `dir` prop reaches the DOM.
+    // Same line Base UI and React Aria draw: neither writes a locale-derived `dir` on a non-portaled
+    // component. An app declares direction where the browser can see it.
+    const { container, dispose } = mount(() => (
+      <div dir="rtl">
+        <I18nProvider locale="ar-EG">
+          <FruitListbox selectionMode="single" />
+        </I18nProvider>
+      </div>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    const list = listbox(container);
+    expect(list.hasAttribute("dir")).toBe(false);
+    expect(window.getComputedStyle(list).direction).toBe("rtl"); // inherited, not written
+
+    dispose();
+  });
+
+  it("warns in dev when a horizontal list's keymap and layout disagree", async () => {
+    // The split is real and both references accept it — so make it loud instead of silent. Only a
+    // HORIZONTAL list warns: a vertical one maps Up/Down, where direction changes nothing.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { container, dispose } = mount(() => (
+      // ltr layout (no ancestor `dir`), rtl keymap (the provider locale) — the disagreement.
+      <I18nProvider locale="ar-EG">
+        <Themed>
+          <Listbox.Root
+            aria-label="fruits"
+            orientation="horizontal"
+            itemToValue={itemToValue}
+            itemToLabel={itemToLabel}
+          >
+            <For each={FRUITS}>
+              {(fruit) => (
+                <Listbox.Item value={fruit} data-value={fruit.name}>
+                  {fruit.name}
+                </Listbox.Item>
+              )}
+            </For>
+          </Listbox.Root>
+        </Themed>
+      </I18nProvider>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    await vi.waitFor(() =>
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("[hope-ui] Listbox")),
+    );
+    expect(warn.mock.calls.flat().join(" ")).toContain("document.documentElement.dir");
+
+    warn.mockRestore();
+    dispose();
+  });
+
+  it("stays quiet for a vertical list, where direction cannot change navigation", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
     const { container, dispose } = mount(() => (
       <I18nProvider locale="ar-EG">
         <FruitListbox selectionMode="single" />
@@ -705,10 +763,42 @@ describe("Listbox — RTL", () => {
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
-    const list = listbox(container);
-    expect(list.getAttribute("dir")).toBe("rtl");
-    expect(window.getComputedStyle(list).direction).toBe("rtl");
+    expect(warn.mock.calls.flat().join(" ")).not.toContain("[hope-ui] Listbox");
 
+    warn.mockRestore();
+    dispose();
+  });
+
+  it("stays quiet once the app declares the direction the locale implies", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { container, dispose } = mount(() => (
+      <div dir="rtl">
+        <I18nProvider locale="ar-EG">
+          <Themed>
+            <Listbox.Root
+              aria-label="fruits"
+              orientation="horizontal"
+              itemToValue={itemToValue}
+              itemToLabel={itemToLabel}
+            >
+              <For each={FRUITS}>
+                {(fruit) => (
+                  <Listbox.Item value={fruit} data-value={fruit.name}>
+                    {fruit.name}
+                  </Listbox.Item>
+                )}
+              </For>
+            </Listbox.Root>
+          </Themed>
+        </I18nProvider>
+      </div>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    expect(warn.mock.calls.flat().join(" ")).not.toContain("[hope-ui] Listbox");
+
+    warn.mockRestore();
     dispose();
   });
 });

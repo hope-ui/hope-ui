@@ -2,7 +2,7 @@ import type { JSX } from "@solidjs/web";
 import { type Accessor, createMemo } from "solid-js";
 import type { CollectionItem } from "./create-collection";
 import type { CreateListFocusReturn } from "./create-list-focus";
-import type { TextDirection } from "./create-list-navigation";
+import type { TextDirection } from "./create-text-direction-warning";
 
 /**
  * How movement behaves at an axis edge.

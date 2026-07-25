@@ -19,7 +19,8 @@ function createCalendarGroup(
 `props` is optional — the styled `Calendar.Root` forwards no native attributes, so it calls
 `createCalendarGroup(state)` with nothing. Spread the returned `props` onto the container and hand it
 `setRef`: **without the ref the outside-pointer half stays dormant** (the focus half still works, since
-it reads the event's own `currentTarget`).
+it reads the event's own `currentTarget`) **and the dev direction warning stays silent** (`setRef` also
+feeds `state.setGroupElement`, the element `createTextDirectionWarning` measures the layout against).
 
 | Prop | Source |
 | --- | --- |

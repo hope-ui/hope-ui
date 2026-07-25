@@ -38,9 +38,31 @@ messages>`; there is no per-instance `messages` prop.
   `isSelectionEnd`
 - the shared `collection` / `listFocus` / `announce`, plus the deferred-cursor-focus flag
   `pendingCursorFocus` / `setPendingCursorFocus`
+- `direction` and `setGroupElement` (see below)
 
 Range naming mirrors React Aria's `RangeCalendarState` (`anchorDate`, `highlightedRange`,
 `highlightDate`).
+
+## Reading direction
+
+`direction()` resolves the consumer's `dir` prop, else `useLocale().direction()`. It is read by
+`calendar-grid.ts` for its `arrowDelta` flip and threaded into `createGridNavigation` as
+`textDirection`.
+
+**It drives behavior only and is never written to the DOM.** The grid's column order and the recipe's
+logical utilities (`rounded-s-*`, `rtl:[&_svg]:rotate-180`) mirror from the cascade instead, so a `dir`
+on an ancestor (or the document root) reaches the calendar on its own. `Calendar.Root` writes the
+consumer's `dir` *prop* onto the group element — that one is a real HTML attribute and a per-instance
+instruction, and before it did, `<Calendar.Root dir="rtl">` navigated right-to-left across a grid still
+laid out left-to-right with Sunday on the left — but never the locale-derived value. React Aria's
+`useCalendarGrid` draws the identical line: `useLocale().direction` for the arrow flip, no `dir` in
+`gridProps`. Full comparison in
+`__internal__/primitives/internal/create-text-direction-warning.md`.
+
+`setGroupElement` (fed by `createCalendarGroup`'s `setRef`) exists for the dev direction warning: it
+compares `direction()` against the direction the browser applies to the group, and the root hook has
+no other handle on that element. A calendar always checks — a 2D grid means Left/Right always matter,
+unlike a vertical listbox. Pinned by `calendar.browser.test.tsx` § "Calendar — RTL".
 
 ## The roving cursor never leaves `[min, max]`
 

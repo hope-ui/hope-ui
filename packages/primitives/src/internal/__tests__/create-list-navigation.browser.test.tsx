@@ -12,8 +12,8 @@ import {
   type CreateListNavigationReturn,
   createListNavigation,
   type Orientation,
-  type TextDirection,
 } from "../create-list-navigation";
+import type { TextDirection } from "../create-text-direction-warning";
 
 /** Array access that asserts presence — under `noUncheckedIndexedAccess`, `list[i]` is `T | undefined`. */
 function nth<T>(list: ArrayLike<T>, index: number): T {

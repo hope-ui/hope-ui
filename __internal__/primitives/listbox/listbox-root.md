@@ -132,11 +132,20 @@ Returned surface: `id`, `labelId`/`setLabelId`; `source`, `collection?`, `virtua
 threaded into `createListNavigation` as `textDirection`, which is what flips ArrowLeft/ArrowRight for
 a **horizontal** listbox. A vertical listbox is unaffected: RTL mirrors the inline axis only.
 
-This was un-threaded until it was noticed on a sweep, and the failure mode is the reason the kernel
+**It drives behavior only and is never written to the DOM.** The layout mirrors from the cascade
+instead, so a `dir` on an ancestor (or the document root) reaches the list on its own. `Listbox.Root`
+writes the consumer's `dir` *prop* onto the element — that one is a real HTML attribute and a
+per-instance instruction — but never the locale-derived value, which would stamp `dir="ltr"` on an
+en-US browser and override the `<div dir="rtl">` around it. Same line Base UI and React Aria draw; the
+full comparison, and the dev warning that catches the resulting split, are in
+`__internal__/primitives/internal/create-text-direction-warning.md`.
+
+The keyboard half was un-threaded until a sweep caught it, and the failure mode is why the kernel
 prefers a locale default over an opt-in flag: `createListNavigation` defaults `textDirection` to
 `"ltr"`, so a horizontal listbox silently walked backwards for every Arabic/Hebrew/Farsi reader while
 every test stayed green. Pinned by `listbox-root.browser.test.tsx` § "horizontal orientation and RTL",
-which drives both the `dir` prop and a bare `<I18nProvider locale="ar-EG">`.
+which drives both the `dir` prop and a bare `<I18nProvider locale="ar-EG">`, and by
+`listbox.browser.test.tsx` § "Listbox — RTL" for the no-write contract and the dev warning.
 
 ## Keyboard (as wired by `rootProps`, or by a Select's focus owner)
 
