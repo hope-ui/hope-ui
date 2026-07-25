@@ -212,19 +212,24 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
       return slots.root();
     },
     "data-slot": "listbox",
-    // `dir` is config for the primitive (it picks the arrow-key mapping) *and* a real HTML attribute,
-    // so unlike every other `createListbox` option it has to reach the DOM — otherwise
-    // `<Listbox.Root dir="rtl" orientation="horizontal">` navigates right-to-left inside a container
-    // the browser still lays out left-to-right. Written explicitly rather than left in `rest`: relying
-    // on an absence from the `omit` list above meant that making that list exhaustive over the option
-    // keys — a natural tidy-up — would silently split the layout from the keyboard again.
+    // The DOM direction comes from the primitive's RESOLVED direction, not the raw prop: `dir` is an
+    // input to `createListbox`, which resolves it against the surrounding `I18nProvider`
+    // (`merged.dir ?? i18n.direction()`), and the component's job is to put that answer where the
+    // browser can see it. Otherwise `<I18nProvider locale="ar-EG">` would flip a horizontal list's
+    // arrow keys while the browser still laid the row out left-to-right, forcing callers to pass BOTH
+    // a locale and a `dir` to describe one thing.
     //
-    // `merged.dir`, deliberately — NOT the resolved `state.direction()`, which falls back to the
-    // locale. A locale-derived `dir="ltr"` would override an inherited `dir="rtl"` from an ancestor,
-    // and `I18nProvider` renders no DOM precisely so it never fights the document. Unset stays
-    // `undefined`, so no attribute is emitted. Same shape as `Calendar.Root`.
-    get dir(): "ltr" | "rtl" | undefined {
-      return merged.dir;
+    // The consequence to know: this always writes, so a listbox inside an ancestor `dir="rtl"` that
+    // was never told its locale reports the detected one (`ltr` for an en-US browser) and overrides
+    // that ancestor. That is the documented contract working as intended — an app sets `dir` on its
+    // document root *from* `useLocale().direction`, so the two agree by construction; if they
+    // disagree, the locale hope-ui was actually given is the more specific signal.
+    //
+    // Written here rather than left to ride along in `rest`: relying on an absence from the `omit`
+    // list above meant that making that list exhaustive over the option keys — a natural tidy-up —
+    // would silently split the layout from the keyboard again. Same shape as `Calendar.Root`.
+    get dir() {
+      return state.direction();
     },
     get children(): JSX.Element {
       return virtualized ? <VirtualSizer /> : (merged.children as JSX.Element);

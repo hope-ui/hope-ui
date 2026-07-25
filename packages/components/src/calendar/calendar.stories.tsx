@@ -1,3 +1,4 @@
+import { I18nProvider } from "@hope-ui/i18n";
 import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
@@ -101,10 +102,15 @@ export const WeekStartsMonday: Story = {
 };
 
 export const RightToLeft: Story = {
-  // No `dir` wrapper: `Calendar.Root` emits its own `dir` prop onto the group element, so the prop
-  // alone mirrors the CSS layout as well as flipping the arrow keys. A wrapper here would hide a
-  // regression in exactly that.
-  render: () => <CalendarDemo defaultFocusedValue={june} dir="rtl" locale="ar-EG" />,
+  // The locale is the ONLY thing configured — no `dir` prop, no `dir` wrapper. `Calendar.Root` writes
+  // its resolved direction onto its own element, so this story fails loudly if that ever stops
+  // happening. Note the provider rather than a `locale` prop: `createCalendar` resolves direction as
+  // `merged.dir ?? i18n.direction()`, so a `locale` prop changes formatting only.
+  render: () => (
+    <I18nProvider locale="ar-EG">
+      <CalendarDemo defaultFocusedValue={june} />
+    </I18nProvider>
+  ),
 };
 
 export const Today: Story = {

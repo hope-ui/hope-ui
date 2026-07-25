@@ -1,4 +1,5 @@
 import ssrFixture from "virtual:hydration-fixture?id=listbox";
+import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, hydrateFixture, mount } from "@hope-ui/internal-test-utils";
 import { hope } from "@hope-ui/presets/hope";
 import { definePreset, ThemeProvider } from "@hope-ui/theming";
@@ -83,6 +84,7 @@ interface FruitListboxProps {
   focusMode?: "roving" | "activedescendant";
   disabledOf?: (fruit: Fruit) => boolean;
   name?: string;
+  dir?: "ltr" | "rtl";
   onChange?: (value: Fruit[]) => void;
 }
 
@@ -96,6 +98,7 @@ function FruitListbox(props: FruitListboxProps): JSX.Element {
         selectionMode={props.selectionMode}
         focusMode={props.focusMode}
         name={props.name}
+        dir={props.dir}
         onChange={props.onChange}
       >
         <For each={FRUITS}>
@@ -589,10 +592,15 @@ function injectLogicalUtilities(): () => void {
   return () => style.remove();
 }
 
+/**
+ * `dir` goes to `Listbox.Root`, not to the wrapper: the component writes its resolved direction onto
+ * its own element, so a wrapper would be testing the wrapper rather than the component. The wrapper
+ * only fixes the width the gutter measurements depend on.
+ */
 function DirectionalListbox(props: { dir: "ltr" | "rtl" }): JSX.Element {
   return (
-    <div dir={props.dir} style={{ width: "320px" }}>
-      <FruitListbox selectionMode="single" />
+    <div style={{ width: "320px" }}>
+      <FruitListbox selectionMode="single" dir={props.dir} />
     </div>
   );
 }
@@ -686,20 +694,20 @@ describe("Listbox — RTL", () => {
     dispose();
   });
 
-  it("emits NO dir attribute when the prop is unset, so an ancestor's direction still governs", async () => {
-    // The direction the primitive uses falls back to `useLocale()`, but only the explicit prop may
-    // reach the DOM. Writing a locale-derived `dir="ltr"` here would override the ancestor below —
-    // and `I18nProvider` renders no DOM precisely so it never fights the document.
+  it("mirrors the DOM from an I18nProvider locale alone, with no dir prop", async () => {
+    // The point of resolving the DOM attribute from `state.direction()` rather than the raw prop: a
+    // consumer configures the locale once and gets a correct listbox, instead of having to pass a
+    // locale to the provider AND a `dir` to the component to describe one thing.
     const { container, dispose } = mount(() => (
-      <div dir="rtl">
+      <I18nProvider locale="ar-EG">
         <FruitListbox selectionMode="single" />
-      </div>
+      </I18nProvider>
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
 
     const list = listbox(container);
-    expect(list.hasAttribute("dir")).toBe(false);
-    expect(window.getComputedStyle(list).direction).toBe("rtl"); // inherited, not written
+    expect(list.getAttribute("dir")).toBe("rtl");
+    expect(window.getComputedStyle(list).direction).toBe("rtl");
 
     dispose();
   });

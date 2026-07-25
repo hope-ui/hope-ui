@@ -389,20 +389,33 @@ describe("Calendar", () => {
     dispose();
   });
 
-  it("emits NO dir attribute when the prop is unset, so an ancestor's direction still governs", async () => {
-    // The direction the primitive uses falls back to `useLocale()`, but only the explicit prop may
-    // reach the DOM. A locale-derived `dir="ltr"` written here would override the ancestor below, and
-    // `I18nProvider` renders no DOM precisely so it never fights the document.
+  it("mirrors the DOM from an I18nProvider locale alone, with no dir prop", async () => {
+    // The point of resolving the DOM attribute from `state.direction()` rather than the raw prop: a
+    // consumer configures the locale once and gets a correct calendar, instead of having to pass a
+    // locale to the provider AND a `dir` to the component to describe one thing. Without this the
+    // arrow keys and the Arabic-Indic numerals would flip while the grid stayed left-to-right.
     const { container, dispose } = mount(() => (
-      <div dir="rtl">
-        <Tree />
-      </div>
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="ar-EG">
+          <Calendar.Root defaultFocusedValue={new CalendarDate(2020, 1, 15)} timeZone="UTC" />
+        </I18nProvider>
+      </ThemeProvider>
     ));
-    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
 
-    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
-    expect(group.hasAttribute("dir")).toBe(false);
-    expect(window.getComputedStyle(group).direction).toBe("rtl"); // inherited, not written
+    const group = await vi.waitFor(() => {
+      const found = container.querySelector<HTMLElement>('[data-slot="calendar"]');
+      expect(found?.querySelectorAll("th").length).toBeGreaterThan(0);
+      return found as HTMLElement;
+    });
+
+    expect(group.getAttribute("dir")).toBe("rtl");
+    expect(window.getComputedStyle(group).direction).toBe("rtl");
+
+    // And the layout actually mirrors: the first weekday column sits on the right.
+    const headers = [...group.querySelectorAll("th")];
+    const first = headers.at(0) as HTMLTableCellElement;
+    const last = headers.at(-1) as HTMLTableCellElement;
+    expect(first.getBoundingClientRect().x).toBeGreaterThan(last.getBoundingClientRect().x);
 
     dispose();
   });

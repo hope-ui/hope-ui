@@ -306,7 +306,7 @@ digits here, for free.
 
 ```tsx
 <I18nProvider locale="ar-EG">
-  <Calendar.Root dir="rtl" />
+  <Calendar.Root />
 </I18nProvider>
 ```
 
@@ -316,12 +316,12 @@ digits here, for free.
   class="not-prose"
   description={
     <div>
-      The provider supplies the reading direction (so arrow keys and the day numbers flip), but it
-      renders no DOM — so something still has to tell the <em>browser</em> to mirror the layout.
-      Normally that is <code>dir</code> on your document root, set once — see{" "}
-      <a href="#">Reading direction</a> in the i18n guide — and the whole app follows.{" "}
-      <code>dir</code> on <code>Calendar.Root</code>, as above, is the escape hatch for mirroring a
-      single calendar inside an otherwise LTR page.
+      The locale is the only thing you configure. <code>Calendar.Root</code> writes its resolved
+      reading direction onto its own element, so the layout mirrors without a <code>dir</code> prop or
+      a wrapper — which is what lets the two calendars above sit side by side in one page. Pass{" "}
+      <code>dir</code> explicitly only to override the locale. For the app as a whole, still set{" "}
+      <code>dir</code> on your document root — see <a href="#">Reading direction</a> in the i18n
+      guide — so that everything outside hope-ui mirrors too.
     </div>
   }
 />

@@ -24,6 +24,7 @@ import {
   createCollection,
   createControllableState,
   createListFocus,
+  type TextDirection,
 } from "../internal";
 import { withDefaults } from "../utils";
 import {
@@ -84,7 +85,7 @@ export interface CreateCalendarOptions {
   /** Locale for date formatting. Defaults to `useLocale()` (the `I18nProvider` / browser locale). */
   locale?: string;
   /** Reading direction. Defaults to `useLocale()`. Feeds the grid's RTL arrow flip. */
-  dir?: "ltr" | "rtl";
+  dir?: TextDirection;
   /** IANA time zone for "today" + formatting. Default: the system zone. */
   timeZone?: string;
   /** Week-start override. Default: locale-derived. */
@@ -141,7 +142,7 @@ export interface CreateCalendarOptions {
 export interface CreateCalendarReturn {
   // --- config (resolved, reactive) ---
   locale: Accessor<string>;
-  direction: Accessor<"ltr" | "rtl">;
+  direction: Accessor<TextDirection>;
   timeZone: Accessor<string>;
   firstDayOfWeek: Accessor<FirstDayOfWeek | undefined>;
   /** The **effective** lower bound: the `min` option, raised to the anchored range's available run

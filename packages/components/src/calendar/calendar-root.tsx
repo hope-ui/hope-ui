@@ -138,16 +138,21 @@ export function Root(props: CalendarRootProps): JSX.Element {
           get class(): string {
             return slots.root();
           },
-          /* `dir` is config for the primitive (it picks the arrow-key mapping) *and* a real HTML
-          attribute, so it has to reach the DOM: otherwise `<Calendar.Root dir="rtl">` navigates
-          right-to-left across a grid the browser still lays out left-to-right, and Sunday stays on
-          the left. `merged.dir`, deliberately — NOT the resolved `state.direction()`, which falls back
-          to the locale. Writing a locale-derived `dir="ltr"` here would override an inherited
-          `dir="rtl"` from an ancestor, and `I18nProvider` renders no DOM precisely so it never fights
-          the document. Unset stays `undefined`, so no attribute is emitted. Same shape as
-          `Listbox.Root`. */
-          get dir(): "ltr" | "rtl" | undefined {
-            return merged.dir;
+          /* The DOM direction comes from the primitive's RESOLVED direction, not the raw prop: `dir`
+          is an input to `createCalendar`, which resolves it against the surrounding `I18nProvider`
+          (`merged.dir ?? i18n.direction()`), and the component's job is to put that answer where the
+          browser can see it. Otherwise `<I18nProvider locale="ar-EG">` would flip the arrow keys and
+          the numerals while the grid still laid out left-to-right, forcing callers to pass BOTH a
+          locale and a `dir` to describe one thing.
+
+          The consequence to know: this always writes, so a calendar inside an ancestor `dir="rtl"`
+          that was never told its locale reports the detected one (`ltr` for an en-US browser) and
+          overrides that ancestor. That is the documented contract working as intended — an app sets
+          `dir` on its document root *from* `useLocale().direction`, so the two agree by construction;
+          if they disagree, the locale hope-ui was actually given is the more specific signal. Same
+          shape as `Listbox.Root`. */
+          get dir() {
+            return state.direction();
           },
           /* Compound (consumer children) vs convenience (auto-chrome): a **single** read of
           `merged.children`, in a getter so it stays evaluated under the provider, with a nullish
