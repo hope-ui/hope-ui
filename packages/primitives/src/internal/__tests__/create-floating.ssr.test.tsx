@@ -1,7 +1,7 @@
 import { renderToStringAsync } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { createFloating } from "../create-floating";
+import { createFloating, type SideOrLogical } from "../create-floating";
 
 // `internal/` primitives are exempt from the SSR Definition-of-Done item — that one is
 // components-only. This file exists anyway because `createFloating` is the first `internal/`
@@ -9,7 +9,7 @@ import { createFloating } from "../create-floating";
 // `document`/`window` touch anywhere in `@floating-ui/dom` throws at *import* time under a
 // SolidStart server, and nothing else in the suite would notice until production.
 
-function Tip() {
+function Tip(props: { side?: SideOrLogical } = {}) {
   // No ref effect runs on the server, so both accessors stay `undefined` — which is exactly the
   // state a client's *first* render is in, before any measurement lands.
   const [anchor] = createSignal<HTMLElement>();
@@ -18,7 +18,9 @@ function Tip() {
     active: () => true,
     anchor,
     floating,
-    side: "left",
+    get side() {
+      return props.side ?? "left";
+    },
   });
 
   return (
@@ -45,5 +47,18 @@ describe("createFloating on the server", () => {
   it("seeds the resolved side from the option, so data-side is right on the first paint", async () => {
     const html = await renderToStringAsync(() => <Tip />);
     expect(html).toContain('data-side="left"');
+  });
+
+  it("seeds a logical side as if ltr, since there is no element to measure direction on", async () => {
+    // `getComputedStyle` does not exist here, and the floating element does not either. The seed has
+    // to pick something, and picking the `ltr` resolution keeps the server's bytes identical to the
+    // client's *first* render — which is what hydration compares. The first real measurement then
+    // replaces it with the direction-resolved side, exactly as it already does for a side that
+    // `flip` overrides. Nothing is visible in between: `data-positioned` is false and the layer is
+    // `visibility: hidden` until a measurement lands.
+    const html = await renderToStringAsync(() => <Tip side="inline-start" />);
+    expect(html).toContain('data-side="left"');
+    expect(html).toContain('data-positioned="false"');
+    expect(html).toContain("visibility:hidden");
   });
 });

@@ -41,6 +41,23 @@ export type {
 /** Alignment along the side's cross axis. floating-ui spells the centred case as an absent suffix. */
 export type FloatingAlign = "start" | "center" | "end";
 
+/**
+ * The two inline-relative sides, mirroring `inset-inline-start`/`-end`. Resolved to a physical `Side`
+ * before floating-ui ever sees it — floating-ui's placement vocabulary is physical by design.
+ */
+export type LogicalSide = "inline-start" | "inline-end";
+
+/**
+ * What `side` accepts: floating-ui's four physical sides plus the two inline-relative ones.
+ *
+ * Kept distinct from `Side`, which stays the **output** vocabulary — `side()` always reports a
+ * physical side, because it reports where the layer actually landed after `flip`. Base UI mirrors the
+ * input vocabulary back out instead; hope-ui deliberately does not, because a recipe (including a
+ * third-party preset's) selects on `data-placement` and cannot know which vocabulary the consumer
+ * happened to ask in. See `__internal__/reference-implementations.md` § createFloating.
+ */
+export type SideOrLogical = Side | LogicalSide;
+
 export interface FloatingArrowState {
   x: number | undefined;
   y: number | undefined;
@@ -71,8 +88,18 @@ export interface CreateFloatingOptions {
   floating: Accessor<HTMLElement | null | undefined>;
   /** Supplying this is what enables the `arrow` middleware, and so populates `arrow()`. */
   arrowElement?: Accessor<HTMLElement | null | undefined>;
-  /** Preferred side. Default `"bottom"`. `side()` reports the side actually used after `flip`. */
-  side?: Side;
+  /**
+   * Preferred side. Default `"bottom"`. `side()` reports the **physical** side actually used after
+   * `flip`, so a logical `"inline-start"`/`"inline-end"` here comes back as `"left"`/`"right"`.
+   *
+   * A logical side resolves against `getComputedStyle(floating).direction` — deliberately the floating
+   * element and deliberately the DOM, because that is exactly what floating-ui's own
+   * `platform.isRTL(elements.floating)` reads for its alignment handling. Same element, same call: the
+   * side and the alignment cannot disagree, and no `@hope-ui/i18n` import enters the positioning layer.
+   * The practical consequence is that a portaled positioner inherits `dir` from wherever it is
+   * portaled to, not from the anchor's subtree — floating-ui already behaves that way for alignment.
+   */
+  side?: SideOrLogical;
   /** Alignment along the cross axis. Default `"center"`. */
   align?: FloatingAlign;
   /** Distance from the anchor, in px. Default `0`. */
@@ -129,7 +156,9 @@ export interface CreateFloatingReturn {
 
 /** Everything that shapes a `computePosition` call, resolved from the options in one place. */
 interface FloatingConfig {
-  placement: Placement;
+  /** The *requested* side, still possibly logical — `placementFor` resolves it per measurement. */
+  side: SideOrLogical;
+  align: FloatingAlign;
   strategy: Strategy;
   sideOffset: number;
   alignOffset: number;
@@ -171,6 +200,31 @@ const OPPOSITE_SIDE: Record<Side, Side> = {
 
 function toPlacement(side: Side, align: FloatingAlign): Placement {
   return align === "center" ? side : `${side}-${align}`;
+}
+
+/** Collapses a possibly-logical side onto floating-ui's physical vocabulary. */
+function toPhysicalSide(side: SideOrLogical, isRtl: boolean): Side {
+  if (side === "inline-start") {
+    return isRtl ? "right" : "left";
+  }
+  if (side === "inline-end") {
+    return isRtl ? "left" : "right";
+  }
+  return side;
+}
+
+function placementFor(config: FloatingConfig, isRtl: boolean): Placement {
+  return toPlacement(toPhysicalSide(config.side, isRtl), config.align);
+}
+
+/**
+ * The reading direction floating-ui itself would see. `platform.isRTL` in `@floating-ui/dom` is
+ * `getComputedStyle(element).direction === "rtl"`, and core always hands it `elements.floating` — so
+ * calling it the same way on the same element is what keeps a logical side and floating-ui's own
+ * alignment handling from ever disagreeing.
+ */
+function isFloatingRtl(floating: HTMLElement): boolean {
+  return getComputedStyle(floating).direction === "rtl";
 }
 
 /** Device pixel ratio of the element's own window. Ported from `@floating-ui/vue`'s utils. */
@@ -276,7 +330,8 @@ function buildMiddleware(config: FloatingConfig, sink: SizeSink): Middleware[] {
  */
 export function createFloating(options: CreateFloatingOptions): CreateFloatingReturn {
   const config = createMemo<FloatingConfig>(() => ({
-    placement: toPlacement(options.side ?? "bottom", options.align ?? "center"),
+    side: options.side ?? "bottom",
+    align: options.align ?? "center",
     strategy: options.strategy ?? "absolute",
     sideOffset: options.sideOffset ?? 0,
     alignOffset: options.alignOffset ?? 0,
@@ -297,11 +352,18 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
   // `[STRICT_READ_UNTRACKED]` labelled with the *caller's* component name, which `mount()` fails on.
   // Seeding placement/strategy from the config rather than from hard-coded defaults is what makes
   // `data-side` correct on the first paint and identical on the server.
+  //
+  // A logical side is seeded as if `ltr`: there is no element to measure yet, and on the server there
+  // is no `getComputedStyle` at all. That costs nothing visible — `isPositioned` is false until the
+  // first measurement lands, and `floatingStyles()` is `visibility: hidden` until then — and it keeps
+  // the server and the client's first render byte-identical, which is what hydration needs. The first
+  // real measurement replaces it with the direction-resolved side, exactly as it already does for a
+  // side that `flip` overrides.
   const seed = untrack(config);
   const [position, setPosition] = createSignal<FloatingPosition>({
     x: 0,
     y: 0,
-    placement: seed.placement,
+    placement: placementFor(seed, false),
     strategy: seed.strategy,
     middlewareData: {},
     size: undefined,
@@ -333,7 +395,7 @@ export function createFloating(options: CreateFloatingOptions): CreateFloatingRe
     const sink: SizeSink = { value: undefined };
 
     computePosition(anchor, floating, {
-      placement: current.placement,
+      placement: placementFor(current, isFloatingRtl(floating)),
       strategy: current.strategy,
       middleware: buildMiddleware(current, sink),
     }).then((result) => {

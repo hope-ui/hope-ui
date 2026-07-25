@@ -144,9 +144,48 @@ above:
   unblocks a pointer-anchored ContextMenu.
 - **RTL is delegated to floating-ui's DOM platform** (`isRTL` = `getComputedStyle(el).direction`),
   with **no** `@hope-ui/i18n` import: threading `useLocale()` in would create a second, divergent
-  source of truth. The consequence is that logical *sides* (`inline-start`/`inline-end`) are
-  deliberately not offered — floating-ui's placements are strictly physical, and supporting them
-  would reintroduce exactly that coupling. Alignment is logical for free.
+  source of truth. Alignment is logical for free.
+
+  **Logical sides: revisited 2026-07-25, and now offered.** The original record concluded that
+  logical *sides* (`inline-start`/`inline-end`) could not be supported without reintroducing that
+  coupling. That turned out to be avoidable rather than inherent, and both named references had
+  already gone the other way:
+
+  - **React Aria** accepts logical `'start'`/`'end'` on input and resolves them with
+    `translateRTL(placement, direction)` off `useLocale()`, reporting a strictly physical
+    `PlacementAxis` back out (`useOverlayPosition.ts`). It has no floating-ui underneath, so it has
+    only ever had one direction authority.
+  - **Base UI** — the directly analogous case, since it *is* built on floating-ui — has
+    `Side = 'top' | 'bottom' | 'left' | 'right' | 'inline-end' | 'inline-start'`, maps logical→physical
+    at the input boundary, and re-derives the resolved side back into the **input's own** vocabulary
+    (`getLogicalSide`, `internals/useAnchorPositioning.ts`). Its direction comes from its own
+    `DirectionContext` — i.e. it simply accepted the two-sources-of-truth cost.
+
+  hope-ui takes the input half and declines the output half:
+
+  - **Input is logical, resolved from the DOM — specifically from the *floating* element.**
+    `@floating-ui/core` always calls `platform.isRTL(elements.floating)`, and `@floating-ui/dom`
+    implements that as `getComputedStyle(element).direction === "rtl"`. `createFloating` calls the
+    same function on the same element, so a logical side and floating-ui's own alignment handling
+    **cannot** disagree. That is strictly better than Base UI on the exact axis this record cared
+    about, and `@hope-ui/i18n` still never enters the positioning layer. The consequence to know: a
+    portaled positioner inherits `dir` from where it is portaled to, not from the anchor's subtree —
+    which is already how floating-ui treats alignment.
+  - **Output stays physical, always.** `side()` and `data-placement` report where the layer actually
+    landed after `flip`, which is a physical fact. Mirroring the input vocabulary the way Base UI does
+    is a footgun *here specifically*: hope-ui has a closed `RecipeRegistry` and a third-party preset
+    conformance kit, so a recipe author selecting on `data-placement` cannot know which vocabulary the
+    consumer happened to ask in. Recipes get the inline-relative hook from CSS instead —
+    `data-placement-inline-start`/`-end` are `@custom-variant`s derived from the physical attribute
+    plus `:dir()` (`_base/_variants.css`), so there is no second attribute and no JS bookkeeping.
+  - **Timing.** Nothing emitted `data-placement` yet when this was settled (Tooltip/Popover are T2,
+    Select T3), so the change cost nothing; doing it after those shipped would have been a breaking
+    change to public data attributes and to third-party recipes.
+
+  The one seam that cannot be direction-resolved is the SSR seed: there is no floating element and no
+  `getComputedStyle`, so a logical side seeds as if `ltr`. Invisible by construction —
+  `isPositioned()` is false and the layer is `visibility: hidden` until the first measurement — and it
+  keeps the server's bytes identical to the client's first render, which is what hydration compares.
 
 `hide()` needed no kernel support at all: unlike `size` (whose numbers arrive through an `apply`
 callback with nowhere to land), it writes straight to `middlewareData`, which the `middleware` +

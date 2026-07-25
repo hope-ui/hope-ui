@@ -41,7 +41,7 @@ function createFloating(options: {
   floating: Accessor<HTMLElement | null | undefined>;        // the POSITIONER, not the content card
   arrowElement?: Accessor<HTMLElement | null | undefined>;   // supplying it is what enables the arrow middleware
 
-  side?: Side;                    // default "bottom"
+  side?: Side | LogicalSide;      // default "bottom"; logical → resolved per measurement
   align?: FloatingAlign;          // default "center"
   sideOffset?: number;            // default 0
   alignOffset?: number;           // default 0
@@ -59,7 +59,7 @@ function createFloating(options: {
 }): {
   floatingStyles: Accessor<JSX.CSSProperties>;  // the primary product — spread onto the positioner
   placement: Accessor<Placement>;               // RESOLVED, after flip/shift
-  side: Accessor<Side>;                         // drives data-side
+  side: Accessor<Side>;                         // drives data-side; ALWAYS physical, even for a logical option
   align: Accessor<FloatingAlign>;               // floating-ui's absent suffix normalized to "center"
   isPositioned: Accessor<boolean>;
   x: Accessor<number>;
@@ -223,22 +223,36 @@ That leaves two obligations on the consumer, both easy to miss:
    only will get an LTR-positioned popover.
 
 The **alignment** axis is logical for free (`align: "start"` follows the reading direction), because
-floating-ui's `isRTL` already handles it. The **side** is not: floating-ui has no logical
-placements, so `side: "inline-start"` is deliberately not offered. The one case it matters for — an
-RTL submenu opening left — is a one-liner with the getter idiom:
+floating-ui's `isRTL` already handles it.
+
+### Logical sides
+
+`side` also accepts `"inline-start"` / `"inline-end"` — so an RTL submenu opening toward the page's
+inline start is a constant, not a branch:
 
 ```ts
-const { direction } = useLocale();
-
-createFloating({
-  active: state.open,
-  anchor,
-  floating,
-  get side() {
-    return direction() === "rtl" ? "left" : "right";
-  },
-});
+createFloating({ active: state.open, anchor, floating, side: "inline-end" });
 ```
+
+Three things to know about them:
+
+- **They resolve off the same element floating-ui reads.** `@floating-ui/core` always calls
+  `platform.isRTL(elements.floating)`; `createFloating` calls the same `getComputedStyle(floating)
+  .direction` on that same element. So a logical side and the alignment axis can never disagree, and
+  the two consumer obligations above (set `dir` on `<html>`; mind the portal) apply **unchanged** —
+  they are not extra caveats introduced by logical sides.
+- **The output stays physical.** `side()` reports `"left"` / `"right"`, never `"inline-start"`,
+  because it reports where the layer *landed* after `flip`. A recipe wanting the inline-relative hook
+  uses the `data-placement-inline-start` / `-end` custom variants, which `_base/_variants.css` derives
+  from the physical attribute plus `:dir()`. Rationale (and why hope-ui declines Base UI's
+  mirror-the-input-vocabulary output): `__internal__/reference-implementations.md` § createFloating.
+- **On the server a logical side seeds as if `ltr`**, because there is no element and no
+  `getComputedStyle`. Nothing is visible in that window — `isPositioned()` is false and the layer is
+  `visibility: hidden` — and the server's bytes stay identical to the client's first render, which is
+  what hydration compares. The first measurement then resolves it for real.
+
+A physical `side: "left"` still means left in every locale; that is the point of keeping both
+vocabularies.
 
 ## Virtual elements
 

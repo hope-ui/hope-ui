@@ -10,6 +10,7 @@ import {
   type FloatingSizeState,
   type Middleware,
   type Side,
+  type SideOrLogical,
   type VirtualElement,
 } from "../create-floating";
 
@@ -54,8 +55,12 @@ const INSIDE_THE_SCROLL_BOX: JSX.CSSProperties = {
 interface HarnessProps {
   onReady: (api: CreateFloatingReturn) => void;
   active?: () => boolean;
-  side?: Side;
+  side?: SideOrLogical;
   align?: FloatingAlign;
+  /** `dir` on the floating element — the direction floating-ui itself reads. */
+  floatingDir?: "ltr" | "rtl";
+  /** `dir` on the anchor, set independently so a test can prove which of the two actually decides. */
+  anchorDir?: "ltr" | "rtl";
   sideOffset?: number;
   alignOffset?: number;
   flip?: boolean;
@@ -135,6 +140,7 @@ function FloatingHarness(props: HarnessProps) {
       data-testid="anchor"
       aria-describedby={FLOATING_ID}
       ref={setAnchorElement}
+      dir={props.anchorDir}
       style={props.anchorStyle ?? CLEAR_OF_EDGES}
     >
       anchor
@@ -158,6 +164,7 @@ function FloatingHarness(props: HarnessProps) {
         id={FLOATING_ID}
         role="tooltip"
         ref={setFloatingElement}
+        dir={props.floatingDir}
         data-side={api.side()}
         style={{
           width: `${props.floatingWidth ?? FLOATING_WIDTH}px`,
@@ -260,6 +267,89 @@ describe("createFloating", () => {
     expect(aligned.side()).toBe("bottom");
     expect(aligned.align()).toBe("start");
     alignedMount.dispose();
+  });
+
+  // ─── Logical sides ────────────────────────────────────────────────────────────────────────────
+  //
+  // `flip`/`shift` are off throughout: these assert which *physical* side a logical one resolves to,
+  // and the test viewport is narrow enough (~414px) that a collision would decide the side instead.
+
+  /** Resolves a logical side and reports back the physical side it landed on, plus the rect gap. */
+  async function mountLogical(props: Partial<HarnessProps>) {
+    let api!: CreateFloatingReturn;
+    const mounted = mount(() => (
+      <FloatingHarness onReady={(ready) => (api = ready)} flip={false} shift={false} {...props} />
+    ));
+    await vi.waitFor(() => expect(api.isPositioned()).toBe(true));
+    return { ...mounted, api };
+  }
+
+  it("resolves inline-start to the physical left under LTR", async () => {
+    const { container, api, dispose } = await mountLogical({
+      side: "inline-start",
+      floatingDir: "ltr",
+    });
+
+    // The OUTPUT vocabulary stays physical, deliberately: `side()` reports where the layer actually
+    // is, which is what an arrow's static side and a recipe's `data-placement` variant need.
+    expect(api.side()).toBe("left");
+    expect(api.placement()).toBe("left");
+    expect(elementOf(container, "floating").getAttribute("data-side")).toBe("left");
+    expectWithinOnePixel(floatingRectOf(container).right, anchorRectOf(container).left);
+
+    dispose();
+  });
+
+  it("resolves inline-start to the physical right under RTL", async () => {
+    const { container, api, dispose } = await mountLogical({
+      side: "inline-start",
+      floatingDir: "rtl",
+    });
+
+    expect(api.side()).toBe("right");
+    expect(elementOf(container, "floating").getAttribute("data-side")).toBe("right");
+    expectWithinOnePixel(floatingRectOf(container).left, anchorRectOf(container).right);
+
+    dispose();
+  });
+
+  it("resolves inline-end to the physical left under RTL", async () => {
+    const { container, api, dispose } = await mountLogical({
+      side: "inline-end",
+      floatingDir: "rtl",
+    });
+
+    expect(api.side()).toBe("left");
+    expectWithinOnePixel(floatingRectOf(container).right, anchorRectOf(container).left);
+
+    dispose();
+  });
+
+  it("leaves an explicitly physical side alone under RTL", async () => {
+    // The whole point of keeping both vocabularies: `side="left"` means left in every locale. A
+    // consumer who wants the mirrored behavior asks for it by name.
+    const { container, api, dispose } = await mountLogical({ side: "left", floatingDir: "rtl" });
+
+    expect(api.side()).toBe("left");
+    expectWithinOnePixel(floatingRectOf(container).right, anchorRectOf(container).left);
+
+    dispose();
+  });
+
+  it("takes the direction from the FLOATING element, not the anchor", async () => {
+    // Which element decides is the load-bearing detail. floating-ui's core always calls
+    // `platform.isRTL(elements.floating)` for its alignment handling, so resolving a logical side
+    // off the anchor instead would let the side and the alignment disagree — the exact divergence
+    // that kept logical sides out of this kernel. Same element, one source of truth.
+    const { api, dispose } = await mountLogical({
+      side: "inline-start",
+      anchorDir: "rtl",
+      floatingDir: "ltr",
+    });
+
+    expect(api.side()).toBe("left");
+
+    dispose();
   });
 
   it("flips to the opposite side when the requested one has no room", async () => {

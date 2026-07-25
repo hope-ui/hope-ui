@@ -178,10 +178,26 @@ the label and the reserved gutter sat on the empty side.)
 
 **Correctly physical, and deliberately out of scope.** `origin-left`/`origin-right` —
 `transform-origin` has no portable logical keyword, so there is no replacement to point at.
-`_base/_variants.css`'s `data-placement-left`/`data-placement-right` — floating-ui's placement
-vocabulary is *physical by design* (`__internal__/reference-implementations.md` § createFloating),
-so the variant name matches the attribute value it selects. And `createFloating` writes its computed
-coordinates to `left`/`top`: `inset-inline-start` there would double-flip under RTL.
+`_base/_variants.css`'s `data-placement-left`/`data-placement-right` — `data-placement` reports the
+side a floating layer *landed on* after `flip`, which is a physical fact, so the variant name matches
+the attribute value it selects. And `createFloating` writes its computed coordinates to `left`/`top`:
+`inset-inline-start` there would double-flip under RTL.
+
+**The inline-relative placement pair.** For a recipe that does need "the side nearest where the text
+starts" — a Select listbox's corner radius, a submenu's enter-slide — `_base/_variants.css` also
+registers `data-placement-inline-start` / `data-placement-inline-end`. They are **derived**, not a
+second attribute: each selects the physical value paired with `:dir()`, e.g.
+
+```css
+@custom-variant data-placement-inline-start (&:where([data-placement="left"]:dir(ltr), [data-placement="right"]:dir(rtl)));
+```
+
+so no component emits anything new and no JS tracks direction. `:dir()` is already this stack's
+baseline — Tailwind v4 implements its own `rtl:`/`ltr:` as `&:where(:dir(rtl))`. The matching kernel
+half is `createFloating`'s `side: "inline-start" | "inline-end"` option, which resolves against the
+*floating* element's computed direction — the same call floating-ui's own `platform.isRTL` makes, so
+there is one source of truth rather than two. Full decision:
+`__internal__/reference-implementations.md` § createFloating.
 
 **Enforced on both halves**, because neither alone is enough:
 

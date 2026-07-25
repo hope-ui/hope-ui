@@ -104,10 +104,21 @@
 @custom-variant data-single (&:where([data-selection-mode="single"]));
 @custom-variant data-multiple (&:where([data-selection-mode="multiple"]));
 
+/* `data-placement` always carries a PHYSICAL side: it reports where the layer actually landed after
+   `flip`, which is a physical fact. So these four stay physical and are NOT an RTL bug —
+   `__internal__/theming.md` § "Correctly physical". */
 @custom-variant data-placement-top (&:where([data-placement="top"]));
 @custom-variant data-placement-bottom (&:where([data-placement="bottom"]));
 @custom-variant data-placement-left (&:where([data-placement="left"]));
 @custom-variant data-placement-right (&:where([data-placement="right"]));
+
+/* The inline-relative pair, for a recipe styling "the side nearest where the text starts" (a Select
+   listbox's corner radius, a submenu's enter-slide). Derived in CSS from the physical attribute plus
+   `:dir()`, so there is no second attribute to emit and no direction bookkeeping in JS — the same
+   single-source-of-truth rule `createFloating` follows for a logical `side` option. `:dir()` is
+   already this stack's baseline: Tailwind v4's own `rtl:`/`ltr:` variants are `&:where(:dir(rtl))`. */
+@custom-variant data-placement-inline-start (&:where([data-placement="left"]:dir(ltr), [data-placement="right"]:dir(rtl)));
+@custom-variant data-placement-inline-end (&:where([data-placement="right"]:dir(ltr), [data-placement="left"]:dir(rtl)));
 
 @custom-variant data-grid (&:where([data-layout="grid"]));
 @custom-variant data-stack (&:where([data-layout="stack"]));
