@@ -1,3 +1,4 @@
+import { useLocale } from "@hope-ui/i18n";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, createUniqueId, untrack } from "solid-js";
 import {
@@ -17,6 +18,7 @@ import {
   type ItemSource,
   type Orientation,
   type SelectionMode,
+  type TextDirection,
   type VirtualItemData,
 } from "../internal";
 import { composeEventHandlers, createKeyboardHandler, withDefaults } from "../utils";
@@ -93,6 +95,12 @@ export interface CreateListboxOptions<V = unknown> {
   focusMode?: FocusMode;
   /** Arrow-key axis + `aria-orientation`. Default `"vertical"`. */
   orientation?: Orientation;
+  /**
+   * Reading direction. Defaults to `useLocale()` (the `I18nProvider` / browser locale). Feeds the
+   * horizontal arrow flip: under `"rtl"`, ArrowLeft moves toward the *next* item. Inert for a
+   * vertical listbox.
+   */
+  dir?: TextDirection;
   /** Whether the whole list is disabled (nothing tabbable, `aria-disabled`). Default `false`. */
   disabled?: boolean;
   /** Whether disabled items are skipped by focus/navigation. Default `true`. */
@@ -155,6 +163,8 @@ export interface CreateListboxReturn<V = unknown> {
   focusMode: Accessor<FocusMode>;
   /** The current orientation. */
   orientation: Accessor<Orientation>;
+  /** The resolved reading direction (consumer's `dir`, else the locale's). */
+  direction: Accessor<TextDirection>;
   /** Whether the whole list is disabled. */
   disabled: Accessor<boolean>;
   /** The current selection (`selection.value`, re-exposed). */
@@ -211,6 +221,9 @@ export function createListbox<V = unknown>(
   const focusMode = () => merged.focusMode;
   const orientation = () => merged.orientation;
   const disabled = () => merged.disabled;
+
+  const i18n = useLocale();
+  const direction = () => merged.dir ?? i18n.direction();
 
   // The source is decided **once**: a listbox is either fully mounted (collection) or windowed
   // (virtual) for its lifetime, never switching. Virtual when both `items` and `estimateSize` exist.
@@ -275,6 +288,7 @@ export function createListbox<V = unknown>(
     focus,
     orientation,
     wrap: () => merged.wrap,
+    textDirection: direction,
   });
 
   const typeahead = createListTypeahead<V>({ focus });
@@ -414,6 +428,7 @@ export function createListbox<V = unknown>(
     selectionMode,
     focusMode,
     orientation,
+    direction,
     disabled,
     value: selection.value,
     setListboxElement: (element) => setListboxElement(element),

@@ -107,6 +107,7 @@ function createListbox<V = unknown>(options?: {
   selectionMode?: "single" | "multiple" | "none"; // default "single"
   focusMode?: "roving" | "activedescendant";      // default "roving"
   orientation?: "vertical" | "horizontal";        // default "vertical"
+  dir?: "ltr" | "rtl";                      // default: useLocale().direction()
   disabled?: boolean;                       // default false
   skipDisabled?: boolean;                   // default true
   wrap?: boolean;                           // default false
@@ -121,15 +122,28 @@ function createListbox<V = unknown>(options?: {
 
 Returned surface: `id`, `labelId`/`setLabelId`; `source`, `collection?`, `virtual?`; the sub-instances
 `focus`, `selection`, `navigation`, `typeahead`; `itemToValue`, `itemToLabel`, `selectionMode`,
-`focusMode`, `orientation`, `disabled`, `value`; `setListboxElement`, `pointerMoved`; `formValues`,
-`name`, `form`, `required`; and `rootProps`.
+`focusMode`, `orientation`, `direction`, `disabled`, `value`; `setListboxElement`, `pointerMoved`;
+`formValues`, `name`, `form`, `required`; and `rootProps`.
+
+## Reading direction
+
+`direction()` resolves the consumer's `dir` prop, else `useLocale().direction()` — the same shape
+`createCalendar` uses, and the reason `@hope-ui/primitives` depends on `@hope-ui/i18n` at all. It is
+threaded into `createListNavigation` as `textDirection`, which is what flips ArrowLeft/ArrowRight for
+a **horizontal** listbox. A vertical listbox is unaffected: RTL mirrors the inline axis only.
+
+This was un-threaded until it was noticed on a sweep, and the failure mode is the reason the kernel
+prefers a locale default over an opt-in flag: `createListNavigation` defaults `textDirection` to
+`"ltr"`, so a horizontal listbox silently walked backwards for every Arabic/Hebrew/Farsi reader while
+every test stayed green. Pinned by `listbox-root.browser.test.tsx` § "horizontal orientation and RTL",
+which drives both the `dir` prop and a bare `<I18nProvider locale="ar-EG">`.
 
 ## Keyboard (as wired by `rootProps`, or by a Select's focus owner)
 
 | Key | Action |
 |---|---|
 | ArrowDown / ArrowUp (vertical) | move active item (`createListNavigation`, skips disabled) |
-| ArrowLeft / ArrowRight (horizontal) | move active item (RTL-aware) |
+| ArrowLeft / ArrowRight (horizontal) | move active item; swapped under `direction() === "rtl"` |
 | Home / End | first / last focusable item |
 | type a character | typeahead to the first match (`createListTypeahead`) |
 | Space | `selection.toggleActive()` |

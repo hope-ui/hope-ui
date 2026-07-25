@@ -132,6 +132,13 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // The passthrough native attributes: everything not consumed as a `createListbox` option, a recipe
   // variant/override, or the explicitly-rendered `class`/`children`. `aria-label`/`style`/`data-*`
   // survive here; `state.rootProps` (spread after) owns `role`/`aria-*`/`tabindex`/`onKeyDown`/`id`.
+  //
+  // `dir` is deliberately NOT omitted, unlike every other `createListbox` option. It is the one option
+  // that is also a real HTML attribute, and the primitive only reads it to flip the arrow keys — so
+  // omitting it would leave `<Listbox.Root dir="rtl">` navigating right-to-left inside a container the
+  // browser still lays out left-to-right. Letting it reach the DOM keeps the layout and the keyboard
+  // agreeing. The cost is that the native `dir` narrows to `"ltr" | "rtl"` here (no `"auto"`), which is
+  // the honest surface: the primitive has to resolve a concrete direction to pick an arrow mapping.
   const rest = omit(
     merged,
     "size",

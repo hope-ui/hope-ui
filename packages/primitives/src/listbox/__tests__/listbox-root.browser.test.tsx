@@ -1,7 +1,8 @@
+import { I18nProvider } from "@hope-ui/i18n";
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import type { CreateListboxReturn } from "../index";
+import type { CreateListboxOptions, CreateListboxReturn } from "../index";
 import {
   activeValues,
   CollectionListbox,
@@ -117,6 +118,105 @@ describe("createListbox — roving focus mode", () => {
     ));
     await vi.waitFor(() => expect(options(container)).toHaveLength(4));
     await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+// ─── Horizontal orientation and RTL ─────────────────────────────────────────────────────────────
+
+describe("createListbox — horizontal orientation and RTL", () => {
+  const horizontal = (extra: CreateListboxOptions<Fruit> = {}): CreateListboxOptions<Fruit> => ({
+    ...fruitOptions(),
+    orientation: "horizontal",
+    ...extra,
+  });
+
+  /** Mounts a horizontal listbox with item 1 (Banana) focused, ready for one arrow press. */
+  async function mountHorizontalAtBanana(options_: CreateListboxOptions<Fruit>) {
+    let state!: CreateListboxReturn<Fruit>;
+    const mounted = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={options_}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(mounted.container)).toHaveLength(4));
+    state.focus.focusIndex(1);
+    await expect.element(nth(options(mounted.container), 1)).toHaveFocus();
+    return { ...mounted, state };
+  }
+
+  it("moves ArrowRight to the next item under LTR", async () => {
+    const { container, dispose } = await mountHorizontalAtBanana(horizontal({ dir: "ltr" }));
+
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.element(nth(options(container), 2)).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("swaps ArrowLeft and ArrowRight under dir=rtl", async () => {
+    // The visual order is mirrored, so the key that points at the *screen* edge nearest the list's
+    // start must move toward the list's start. Untreaded, this walked the list backwards for every
+    // Arabic/Hebrew/Farsi reader with no test noticing.
+    const { container, dispose } = await mountHorizontalAtBanana(horizontal({ dir: "rtl" }));
+
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.element(nth(options(container), 0)).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+
+    dispose();
+  });
+
+  it("resolves the direction from the locale when no dir prop is given", async () => {
+    // The `dir` prop is only the escape hatch; the default source of truth is `useLocale()`, so an
+    // `I18nProvider` alone has to flip the arrows.
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <I18nProvider locale="ar-EG">
+        <CollectionListbox
+          values={FRUITS}
+          labelOf={label}
+          options={horizontal()}
+          onReady={(s) => (state = s)}
+        />
+      </I18nProvider>
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    expect(state.direction()).toBe("rtl");
+
+    state.focus.focusIndex(1);
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.element(nth(options(container), 0)).toHaveFocus();
+
+    dispose();
+  });
+
+  it("leaves a vertical listbox's ArrowDown alone under rtl", async () => {
+    // RTL mirrors the inline axis only. A vertical list still reads top-to-bottom.
+    let state!: CreateListboxReturn<Fruit>;
+    const { container, dispose } = mount(() => (
+      <CollectionListbox
+        values={FRUITS}
+        labelOf={label}
+        options={{ ...fruitOptions(), dir: "rtl" }}
+        onReady={(s) => (state = s)}
+      />
+    ));
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+
+    state.focus.focusIndex(1);
+    await expect.element(nth(options(container), 1)).toHaveFocus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect.element(nth(options(container), 2)).toHaveFocus();
+
     dispose();
   });
 });
