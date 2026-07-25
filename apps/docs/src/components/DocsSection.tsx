@@ -11,15 +11,15 @@ import { SectionNav } from "~/components/SectionNav";
 export function DocsSection(props: { kind: string; children: JSX.Element }) {
   return (
     <div class="mx-auto flex w-full max-w-360 px-6">
-      <aside class="hidden w-60 shrink-0 border-subtle md:block md:border-r">
+      <aside class="hidden w-60 shrink-0 border-subtle md:block md:border-e">
         <nav
-          class="sticky top-14 max-h-[calc(100vh-3.5rem)] space-y-6 overflow-y-auto py-8 pr-4"
+          class="sticky top-14 max-h-[calc(100vh-3.5rem)] space-y-6 overflow-y-auto py-8 pe-4"
           aria-label={`${props.kind} pages`}
         >
           <SectionNav kind={props.kind} />
         </nav>
       </aside>
-      <div class="min-w-0 flex-1 py-10 md:pl-8">{props.children}</div>
+      <div class="min-w-0 flex-1 py-10 md:ps-8">{props.children}</div>
     </div>
   );
 }

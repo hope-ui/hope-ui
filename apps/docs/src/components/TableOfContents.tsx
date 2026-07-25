@@ -101,7 +101,7 @@ export function TableOfContents(props: { entries: TocEntry[]; class?: string }) 
           class="sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto py-8 text-sm"
         >
           <p class="mb-3 font-semibold text-foreground">On this page</p>
-          <ul class="border-l border-subtle">
+          <ul class="border-s border-subtle">
             <For each={items}>
               {(item) => (
                 <li>
@@ -114,7 +114,9 @@ export function TableOfContents(props: { entries: TocEntry[]; class?: string }) 
                         ? "text-primary font-medium"
                         : "text-foreground-muted hover:text-foreground"
                     }`}
-                    style={{ "padding-left": `${(item.depth - 2) * 0.75 + 0.75}rem` }}
+                    // Logical, so the depth indent stays on the same side as the `border-s` rule it
+                    // hangs off — physical `padding-left` would indent away from the rule under RTL.
+                    style={{ "padding-inline-start": `${(item.depth - 2) * 0.75 + 0.75}rem` }}
                   >
                     {item.value}
                   </a>

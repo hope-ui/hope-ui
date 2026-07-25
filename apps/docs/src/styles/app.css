@@ -111,6 +111,12 @@
   overflow: hidden;
   border-radius: 0.5rem;
   border: 1px solid var(--hope-subtle);
+  /* Source code reads left-to-right in every locale, so the figure opts OUT of an inherited RTL
+     direction. Without this, an RTL page renders `import { Badge } from "…";` with its semicolon on
+     the left and each line's indentation mirrored. This is also what makes the line-number gutter
+     below correct: the gutter is authored with physical properties precisely because it can rely on
+     the code's own direction never flipping. */
+  direction: ltr;
 }
 
 /* Optional filename/title bar: ```tsx title="App.tsx" */
@@ -166,7 +172,11 @@
   content: counter(line);
   display: inline-block;
   width: 1rem;
+  /* Physical on purpose: source code reads left-to-right in every locale, so the line-number gutter
+     stays on the left and its digits stay right-aligned against the code even on an RTL page.
+     rtl-ok: the gutter belongs to the code, not to the page's reading direction. */
   margin-right: 1.25rem;
+  /* rtl-ok: same gutter — the digits align toward the code they number. */
   text-align: right;
   color: var(--hope-foreground-subtle);
 }
@@ -297,7 +307,7 @@
     transform: rotate(360deg);
   }
 }
-/* Mobile-nav drawer entrance: scrim fades in, panel slides from the left edge. */
+/* Mobile-nav drawer entrance: scrim fades in, panel slides in from the inline-start edge. */
 @keyframes hope-scrim-in {
   from {
     opacity: 0;
@@ -306,10 +316,13 @@
     opacity: 1;
   }
 }
+/* `transform` has no logical axis, so the offset's SIGN is what has to flip — see the direction
+   override on `.hope-drawer-in` below. The panel is pinned with `start-0`, so the two must agree:
+   flipping one without the other slides the drawer in from the edge it is not attached to. */
 @keyframes hope-drawer-in {
   from {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(var(--hope-drawer-from));
   }
   to {
     opacity: 1;
@@ -337,7 +350,14 @@
   animation: hope-scrim-in 0.2s ease-out both;
 }
 .hope-drawer-in {
+  --hope-drawer-from: -100%;
   animation: hope-drawer-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* The drawer is pinned to the inline-start edge, which is the RIGHT edge under RTL — so it has to
+   travel in from the right, i.e. a positive offset. `:dir()` rather than `[dir="rtl"]` so an inherited
+   direction counts; it is the same primitive Tailwind v4's own `rtl:` variant is built on. */
+.hope-drawer-in:dir(rtl) {
+  --hope-drawer-from: 100%;
 }
 
 /* Animated gradient text: pair with `bg-clip-text text-transparent` and a

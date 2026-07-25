@@ -75,7 +75,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav class="ml-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
+        <nav class="ms-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
           <For each={PRIMARY_NAV}>
             {(item) => (
               <Link to={item.to} class={TAB}>
@@ -85,7 +85,7 @@ export function SiteHeader() {
           </For>
         </nav>
 
-        <div class="ml-auto flex items-center gap-1.5">
+        <div class="ms-auto flex items-center gap-1.5">
           <button
             type="button"
             title="Search is coming soon"
@@ -94,7 +94,7 @@ export function SiteHeader() {
           >
             <SearchIcon class="size-4 shrink-0" />
             <span>Search…</span>
-            <kbd class="ml-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-subtle">
+            <kbd class="ms-auto rounded border border-subtle bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium text-foreground-subtle">
               ⌘K
             </kbd>
           </button>

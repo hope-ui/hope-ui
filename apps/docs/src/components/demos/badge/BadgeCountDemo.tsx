@@ -43,7 +43,7 @@ export function BadgeCountDemo() {
           colorScheme="danger"
           shape="circle"
           size="xs"
-          class="absolute -top-1.5 -right-2 ring-2 ring-surface-raised"
+          class="absolute -top-1.5 -end-2 ring-2 ring-surface-raised"
           aria-label="5 unread notifications"
         >
           5

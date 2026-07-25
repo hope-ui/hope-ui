@@ -144,7 +144,7 @@ export function MobileNav() {
             aria-modal="true"
             aria-label="Site navigation"
             tabindex={-1}
-            class="hope-drawer-in fixed inset-y-0 left-0 z-50 flex w-80 max-w-[85vw] flex-col bg-surface shadow-xl"
+            class="hope-drawer-in fixed inset-y-0 start-0 z-50 flex w-80 max-w-[85vw] flex-col bg-surface shadow-xl"
           >
             <div class="flex h-14 shrink-0 items-center gap-2.5 border-b border-subtle px-4">
               <BrandLogoIcon class="size-8" />
@@ -155,7 +155,7 @@ export function MobileNav() {
                 type="button"
                 onClick={close}
                 aria-label="Close navigation menu"
-                class="ml-auto grid size-9 place-items-center rounded-md text-foreground-muted transition-colors hover:bg-surface-raised-hovered hover:text-foreground"
+                class="ms-auto grid size-9 place-items-center rounded-md text-foreground-muted transition-colors hover:bg-surface-raised-hovered hover:text-foreground"
               >
                 <CloseIcon class="size-5" />
               </button>

@@ -213,11 +213,30 @@ there is one source of truth rather than two. Full decision:
 The rule table is canonical in `PHYSICAL_UTILITIES` (`packages/theming/src/conformance.ts`); a drift
 guard in that package's `conformance.test.ts` fails if the script's copy diverges.
 
-**Not covered.** The scan reads `.ts`/`.tsx` under `packages/{presets,components,primitives}/src`
-only — the three packages that author classes or write style properties. Directional CSS in a
-preset's `theme.css` is on review, and `apps/docs` is outside the scan roots. `packages/theming` is
-excluded on purpose: it authors no classes, and it holds the rule table itself, whose entries name
-every forbidden utility as a string literal.
+**What the scan reads.** `.ts`/`.tsx` under `packages/{presets,components,primitives}/src` — the
+three packages that author classes or write style properties — plus `.ts`/`.tsx`/`.mdx`/`.css` under
+`apps/docs/src`. The docs site is the highest-leverage surface of the four: a `border-l-4` in a
+component doc is a snippet consumers paste into their own apps, so the defect propagates rather than
+merely shipping. `packages/theming` is excluded on purpose — it authors no classes, and it holds the
+rule table itself, whose entries name every forbidden utility as a string literal.
+
+Four passes, because the three languages need three projections. Beyond the class-token pass and the
+CSSOM-write pass, two are worth knowing about:
+
+- **A `style={{ … }}` object key** (`{ "padding-left": … }`) is caught, and needed its own rule: it
+  sits at a code position but *is* a string, so neither existing projection could see it. The docs'
+  `TableOfContents` indented its headings with exactly that, hanging off a `border-s` rule.
+- **`.mdx` is read through class-bearing attributes only** — `class="…"` and `slotClasses={{ … }}` —
+  never prose. Prose staying out is the point: a page *explaining* that `pr-8` is wrong must not fail
+  the check, and `i18n.mdx` legitimately says "right-to-left" while `dialog.mdx` says "right-aligns".
+- **The `.css` pass matches at a property position only** (`^\s*padding-left:`), never inside a value.
+  That anchoring is what earns it its place: it cannot see `linear-gradient(to right, …)` or a mask's
+  `to right` (direction-invariant), and it cannot see `border-bottom-left-radius`, since a corner is
+  always authored as a symmetric pair and flagging one half would be pure noise.
+
+**Not covered.** A physical value inside a shorthand (`box-shadow: inset 2px 0 0`, `margin: 0 0 0
+1rem`) — the property name carries no side, so there is nothing to anchor on. The docs' code-block
+highlight marker is exactly that shape, and is correctly physical anyway.
 
 ## Semantic token vocabulary
 

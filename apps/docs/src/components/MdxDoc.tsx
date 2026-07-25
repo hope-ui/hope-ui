@@ -37,7 +37,7 @@ function Pager(props: { prev?: DocMeta; next?: DocMeta }) {
           {(next) => (
             <PathLink
               to={next().path}
-              class="group flex flex-col items-end rounded-lg border border-subtle bg-surface-raised p-4 text-right transition-colors hover:border-primary/60"
+              class="group flex flex-col items-end rounded-lg border border-subtle bg-surface-raised p-4 text-end transition-colors hover:border-primary/60"
             >
               <span class="text-xs font-medium uppercase tracking-wide text-foreground-muted">
                 Next

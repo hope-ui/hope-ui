@@ -55,7 +55,7 @@ function CopyCommand(props: { command: string; class?: string }) {
       <span class="text-xs sm:text-sm">{props.command}</span>
       {/* Icon swap wrapped in host <span>s so the first child of the <Show>
           boundary is a host element, not a component (hydration-safe walk). */}
-      <span class="ml-1 grid size-5 shrink-0 place-items-center text-foreground-subtle transition-colors group-hover:text-foreground">
+      <span class="ms-1 grid size-5 shrink-0 place-items-center text-foreground-subtle transition-colors group-hover:text-foreground">
         <Show
           when={copied()}
           fallback={
@@ -146,7 +146,7 @@ function HeroPanel() {
               <div class="truncate text-sm font-semibold text-foreground">Fabien MARIE-LOUISE</div>
               <div class="truncate text-xs text-foreground-muted">@verstaple</div>
             </div>
-            <span class="ml-auto rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success-emphasis">
+            <span class="ms-auto rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success-emphasis">
               Active
             </span>
           </div>
@@ -172,13 +172,15 @@ function HeroPanel() {
       </div>
 
       {/* Floating satellite chips — pinned to the OUTER corners so they read as
-          floating beside the panel without covering its content. */}
+          floating beside the panel without covering its content.
+          rtl-ok: a decorative pair positioned as a composition, not in reading order. */}
       <div class="hope-float-slow absolute -left-6 -top-5 z-10 hidden rounded-xl border border-subtle bg-surface-overlay/90 px-3 py-2 shadow-xl backdrop-blur-md sm:flex sm:items-center sm:gap-2">
         <span class="grid size-6 place-items-center rounded-md bg-info-soft text-info-emphasis">
           <AccessibilityIcon class="size-3.5" />
         </span>
         <span class="text-xs font-medium text-foreground">a11y built in</span>
       </div>
+      {/* rtl-ok: the opposite corner of the same decorative pair. */}
       <div class="hope-float absolute -right-5 -bottom-5 z-10 hidden rounded-xl border border-subtle bg-surface-overlay/90 px-3 py-2 shadow-xl backdrop-blur-md sm:flex sm:items-center sm:gap-2">
         <span class="grid size-6 place-items-center rounded-md bg-primary-soft text-primary-emphasis">
           <SparklesIcon class="size-3.5" />
@@ -195,13 +197,18 @@ function Hero() {
       {/* Layered decorative background: faint grid + two drifting glow blobs. */}
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
         <div class="hope-grid absolute inset-0" />
+        {/* `left-1/4` anchors the `-translate-x-1/2` centering idiom, which has no logical spelling:
+            `start-1/4` resolves to `right` under RTL and the negative translate then pulls the blob
+            off its own centre instead of onto it.
+            rtl-ok: half of a direction-invariant centering idiom. */}
         <div class="hope-glow absolute -top-24 left-1/4 size-128 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+        {/* rtl-ok: aria-hidden, pointer-events-none decoration — no reading order to follow. */}
         <div class="hope-glow absolute -top-10 right-0 size-104 rounded-full bg-info/15 blur-3xl [animation-delay:2s]" />
       </div>
 
       <div class="mx-auto grid max-w-7xl items-center gap-14 px-6 py-20 lg:grid-cols-2 lg:gap-10 lg:py-28">
         {/* Left column: copy + CTAs. Staggered fade-up on load. */}
-        <div class="text-center lg:text-left">
+        <div class="text-center lg:text-start">
           <span class="hope-fade-up inline-flex items-center gap-2 rounded-full border border-primary-line bg-primary-soft/60 px-3 py-1 text-xs font-medium text-primary-emphasis backdrop-blur-sm">
             <SparklesIcon class="size-3.5" />
             Now in {SITE.version.replace(/-/g, " ")}
@@ -394,6 +401,8 @@ function ComponentShowcase() {
     <section class="relative overflow-x-clip border-y border-subtle bg-surface-sunken/60 py-20 sm:py-28">
       <div
         aria-hidden="true"
+        // `left-1/2` + `-translate-x-1/2` is the horizontal-centering idiom — direction-invariant,
+        // rtl-ok: no logical spelling exists for it.
         class="hope-glow pointer-events-none absolute left-1/2 top-0 -z-10 size-144 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
       />
       <div class="mx-auto max-w-7xl px-6">
@@ -494,7 +503,7 @@ function UsageSnippet() {
     <div class="overflow-hidden rounded-2xl border border-subtle bg-surface-sunken shadow-sm">
       <div class="flex items-center gap-2 border-b border-subtle bg-surface-raised px-4 py-2.5">
         <WindowDots />
-        <span class="ml-1 font-mono text-xs text-foreground-subtle">App.tsx</span>
+        <span class="ms-1 font-mono text-xs text-foreground-subtle">App.tsx</span>
       </div>
       <pre class="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed">
         <code>
@@ -622,7 +631,10 @@ function FinalCta() {
       <div class="hope-reveal relative isolate overflow-hidden rounded-3xl border border-subtle bg-surface-raised px-6 py-16 text-center shadow-xl sm:px-16">
         {/* Rich glow backdrop. */}
         <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10">
+          {/* aria-hidden, pointer-events-none decoration on opposite corners.
+              rtl-ok: a composition, not reading order, so the pair stays put in both directions. */}
           <div class="hope-glow absolute -left-20 -top-24 size-96 rounded-full bg-primary/25 blur-3xl" />
+          {/* rtl-ok: the opposite corner of the same decorative pair. */}
           <div class="hope-glow absolute -bottom-24 -right-16 size-96 rounded-full bg-info/20 blur-3xl [animation-delay:3s]" />
           <div class="hope-grid absolute inset-0 opacity-60" />
         </div>

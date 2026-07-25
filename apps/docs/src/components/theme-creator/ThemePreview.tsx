@@ -258,7 +258,7 @@ export function ThemePreview(props: { config: ThemeConfig }) {
                   <div class="truncate text-sm font-semibold text-foreground">Project theme</div>
                   <div class="truncate text-xs text-foreground-muted">Preview across surfaces</div>
                 </div>
-                <Badge class="ml-auto" variant="soft" colorScheme="success">
+                <Badge class="ms-auto" variant="soft" colorScheme="success">
                   Ready
                 </Badge>
               </div>

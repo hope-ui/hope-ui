@@ -38,7 +38,7 @@ function renderCell(value: string | JSX.Element | undefined, code: boolean): JSX
 export function DataTable(props: { columns: Column[]; rows: Row[] }): JSX.Element {
   return (
     <div class="not-prose my-6 overflow-x-auto rounded-lg border border-subtle">
-      <table class="w-full border-collapse text-left text-sm">
+      <table class="w-full border-collapse text-start text-sm">
         <thead>
           <tr class="border-b border-subtle bg-surface-raised">
             {props.columns.map((col) => (

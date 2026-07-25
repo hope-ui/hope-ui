@@ -52,7 +52,7 @@ pnpm storybook            # visual harness on :6006 (the only non-test feedback 
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
-pnpm check:rtl-safety     # fails on a physical directional class (pl-/pr-/left-/text-right/…) or CSSOM write
+pnpm check:rtl-safety     # fails on a physical directional class (pl-/pr-/left-/text-right/…), CSSOM write or CSS declaration — packages + apps/docs
 pnpm changeset            # NOT needed while the repo is at v0.0.0 — see "Changesets"
 ```
 

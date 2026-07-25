@@ -36,7 +36,7 @@ export function BadgeMatrixDemo() {
               variant === "inverted" ? "bg-surface-inverse py-2" : ""
             }`}
           >
-            <span class="w-16 shrink-0 text-right font-mono text-xs text-foreground-muted">
+            <span class="w-16 shrink-0 text-end font-mono text-xs text-foreground-muted">
               {variant}
             </span>
             <For each={COLORS}>
