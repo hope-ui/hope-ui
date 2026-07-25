@@ -12,6 +12,11 @@ import { type Accessor, For, merge, omit, Show } from "solid-js";
 import { CheckIcon } from "../icons";
 import { ListboxContext, type ListboxContextValue } from "./listbox-context";
 
+// The list element is a generic `<div role="listbox">`, not a `<ul>` — the valid-HTML decision
+// explained on `Root` below — so its attribute surface is the generic one, with no `<ul>`-specific
+// keys to inherit.
+type ListboxRootElementProps = JSX.HTMLAttributes<HTMLDivElement>;
+
 /**
  * `ListboxRootProps` = the primitive's `CreateListboxOptions<V>` (value/selection/focus/orientation +
  * the native-form fields) **plus** the themeable `size` axis (`ListboxThemeableProps`, owned by
@@ -28,10 +33,7 @@ import { ListboxContext, type ListboxContextValue } from "./listbox-context";
 export interface ListboxRootProps<V = unknown>
   extends CreateListboxOptions<V>,
     ListboxThemeableProps,
-    Omit<
-      JSX.HTMLAttributes<HTMLDivElement>,
-      keyof CreateListboxOptions<V> | "onChange" | "children"
-    > {
+    Omit<ListboxRootElementProps, keyof CreateListboxOptions<V> | "onChange" | "children"> {
   /**
    * Per-instance class overrides, keyed by slot (`root`/`item`/`itemIndicator`/`group`/`groupLabel`/
    * `separator`). Folded in after the recipe base and the preset's global `slotClasses`. Set once here

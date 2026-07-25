@@ -8,7 +8,7 @@ import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { CalendarSize, CalendarThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { For, merge, Show } from "solid-js";
+import { For, merge, omit, Show } from "solid-js";
 import { ChevronLeftIcon, ChevronRightIcon } from "../icons";
 import { CalendarContext, type CalendarContextValue } from "./calendar-context";
 import { Grid } from "./calendar-grid";
@@ -17,13 +17,25 @@ import { Heading } from "./calendar-heading";
 import { NextButton } from "./calendar-next-button";
 import { PrevButton } from "./calendar-prev-button";
 
+// The `role="group"` container is a generic `<div>` — a calendar is an ARIA *group*, deliberately not
+// a `<fieldset>` (see `createCalendarGroup`), so there is no element-specific attribute surface.
+type CalendarRootElementProps = JSX.HTMLAttributes<HTMLDivElement>;
+
 /**
  * `CalendarRootProps` = the primitive's `CreateCalendarOptions` (locale/selection/boundaries/focus +
  * the native-form fields) **plus** the themeable `size` axis (`CalendarThemeableProps`, owned by
- * `@hope-ui/theming`) **plus** the per-instance props below. Extending `CalendarThemeableProps` keeps
- * the recipe variants and this surface in lockstep by construction.
+ * `@hope-ui/theming`) **plus** the remaining native `<div>` attributes (so the group can be given an
+ * `id`, named with `aria-label`/`aria-labelledby`, styled with `style`, hooked with `data-*`, …) and
+ * the per-instance props below.
+ *
+ * `CreateCalendarOptions` keys are `Omit`-ted from the native attributes so a native `dir`/`title` can
+ * never clash with the primitive's own option of the same name. Extending `CalendarThemeableProps`
+ * keeps the recipe variants and this surface in lockstep by construction.
  */
-export interface CalendarRootProps extends CreateCalendarOptions, CalendarThemeableProps {
+export interface CalendarRootProps
+  extends CreateCalendarOptions,
+    CalendarThemeableProps,
+    Omit<CalendarRootElementProps, keyof CreateCalendarOptions | "children"> {
   /**
    * Per-instance class overrides, keyed by slot (`root`/`header`/`heading`/`prevButton`/`nextButton`/
    * `grid`/`weekday`/`cell`/`cellTrigger`). Folded in after the recipe base and the preset's global
@@ -49,6 +61,12 @@ export interface CalendarRootProps extends CreateCalendarOptions, CalendarThemea
  * `role="group"` container over either the consumer's compound parts or — when Root is given no
  * children — the built-in default chrome, followed by (when `name` is set) one hidden native field per
  * submitted ISO value.
+ *
+ * Native `<div>` attributes that aren't a `createCalendar` option or a recipe input (`id`, `style`,
+ * `data-*`, `aria-labelledby`, event handlers, `ref`, …) reach the container element. The primitive's
+ * own attributes win over a consumer's, with two deliberate exceptions the part hook owns: an
+ * `aria-label` overrides the built-in group label (as does the `label` option, of which it is the raw
+ * spelling), and an `onFocusOut` is composed with — not replaced by — the abandonment policy's.
  *
  * Because it reads a recipe, a `Calendar.Root` **requires a `<ThemeProvider>`** ancestor (fed a
  * preset), like every other styled component.
@@ -85,10 +103,58 @@ export function Root(props: CalendarRootProps): JSX.Element {
   // stays just as lazy and reactive (the controllable-state getters stay live) while being the single
   // source of truth.
   const state = createCalendar(merged);
+
+  // The passthrough native attributes: everything not consumed as a `createCalendar` option, a recipe
+  // variant/override, or the explicitly-rendered `class`/`children`. `id`/`aria-label`/`style`/`data-*`
+  // survive here and are handed to the part hook, which merges them *under* its own `role`/`aria-*`/
+  // `data-*` and composes the consumer's `onFocusOut` with the abandonment policy. `dir` is omitted
+  // here and written explicitly below, so that making this list exhaustive over the option keys — a
+  // natural tidy-up — can't silently split the layout from the keyboard. Mirrors `Listbox.Root`.
+  //
+  // Hand-kept, and a key missing from it lands in the DOM as a junk attribute with nothing else
+  // failing — pinned by "does not leak createCalendar options onto the element as attributes".
+  const rest = omit(
+    merged,
+    "dir",
+    "size",
+    "prevIcon",
+    "nextIcon",
+    "slotClasses",
+    "class",
+    "children",
+    "label",
+    "locale",
+    "timeZone",
+    "firstDayOfWeek",
+    "min",
+    "max",
+    "isDateDisabled",
+    "allowsNonContiguousRanges",
+    "commitBehavior",
+    "disabled",
+    "readOnly",
+    "selectionMode",
+    "value",
+    "defaultValue",
+    "onValueChange",
+    "focusedValue",
+    "defaultFocusedValue",
+    "onFocusedValueChange",
+    "name",
+    "form",
+    "required",
+  );
+
   // The container part: the group's ARIA + state `data-*`, and the abandonment policy
-  // (`commitBehavior`) for a range the user walks away from. It takes no consumer props — `Root` does
-  // not forward native `<div>` attributes — so its whole surface is the primitive's.
-  const group = createCalendarGroup(state);
+  // (`commitBehavior`) for a range the user walks away from. `rest` goes through the hook rather than
+  // being merged onto the element here, because the hook owns the precedence: its `role`/`data-*` win
+  // over a consumer's, its `aria-label` *defers* to one (`props["aria-label"] ?? state.groupLabel()`),
+  // and its `focusout` listener must run alongside — not instead of — the consumer's.
+  //
+  // The cast is `ref` variance only: `rest` is typed against `HTMLDivElement` (what `Root` renders),
+  // the hook's props against `HTMLElement`. A consumer `ref` rides through untouched and is merged
+  // with `group.setRef` by `renderElement`, not by the hook. Same cast as `Listbox.Root`.
+  const group = createCalendarGroup(state, rest as unknown as JSX.HTMLAttributes<HTMLElement>);
   // The parts read behavior off `state`, classes off `slots`, and — when given no `children` — their
   // default glyph off `prevIcon`/`nextIcon`. Accessors (via `runIfFunction`), so each read builds a
   // fresh glyph element from the resolved factory (instance ?? preset ?? built-in chevron).

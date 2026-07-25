@@ -16,11 +16,20 @@ function createCalendarGroup(
 };
 ```
 
-`props` is optional — the styled `Calendar.Root` forwards no native attributes, so it calls
-`createCalendarGroup(state)` with nothing. Spread the returned `props` onto the container and hand it
-`setRef`: **without the ref the outside-pointer half stays dormant** (the focus half still works, since
-it reads the event's own `currentTarget`) **and the dev direction warning stays silent** (`setRef` also
-feeds `state.setGroupElement`, the element `createTextDirectionWarning` measures the layout against).
+`props` is optional. The styled `Calendar.Root` passes its consumer's leftover native attributes here
+(everything that isn't a `createCalendar` option or a recipe input — `id`, `style`, `data-*`,
+`aria-labelledby`, event handlers, `ref`) rather than merging them onto the element itself, because
+this hook is what owns the precedence: its own `role`/`data-*` win, its `aria-label` *defers* to a
+consumer's, and its `focusout` is composed with — not replaced by — one.
+
+`dir` is **not** among them: it is a `createCalendar` option, and the component writes it onto the
+element itself. `direction()` drives the keymap and is never written to the DOM — see
+`calendar-root.md` § Reading direction.
+
+Spread the returned `props` onto the container and hand it `setRef`: **without the ref the
+outside-pointer half stays dormant** (the focus half still works, since it reads the event's own
+`currentTarget`) **and the dev direction warning stays silent** (`setRef` also feeds
+`state.setGroupElement`, the element `createTextDirectionWarning` measures the layout against).
 
 | Prop | Source |
 | --- | --- |

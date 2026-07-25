@@ -469,8 +469,9 @@ export const myPreset = definePreset(hope, {
 
 ### Calendar.Root
 
-Accepts the props below plus every native `<div>` attribute (`style`, `data-*`, …). Dates are
-`CalendarDate` values from `@internationalized/date`.
+Accepts the props below plus every native `<div>` attribute (`id`, `style`, `data-*`, `ref`, event
+handlers, …), which land on the `role="group"` container. Dates are `CalendarDate` values from
+`@internationalized/date`.
 
 <PropsTable
   rows={[

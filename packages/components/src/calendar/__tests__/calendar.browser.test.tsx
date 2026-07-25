@@ -10,7 +10,7 @@ import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import { Calendar } from "../index";
+import { Calendar, type CalendarRootProps } from "../index";
 // `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
 // inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
 // committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
@@ -486,6 +486,216 @@ describe("Calendar", () => {
     expect(warn.mock.calls.flat().join(" ")).not.toContain("[hope-ui] Calendar");
 
     warn.mockRestore();
+    dispose();
+  });
+});
+
+describe("Calendar native attributes", () => {
+  // `Calendar.Root` forwards the native `<div>` attributes it doesn't consume itself onto the group
+  // element, through `createCalendarGroup` (which owns the precedence). Before it did, there was no
+  // way to give the container an `id`, a `style`, a `data-*` hook or a second event handler — a gap
+  // the docs already promised was closed, and one no other Calendar part had.
+  // The spread is typed as `CalendarRootProps`, which pins the passthrough at the type level too:
+  // before the fix these were not assignable to the prop surface at all. (`data-*` is exempt from
+  // that check in JSX position — TS lets any hyphenated attribute through — so the tests below assert
+  // it reaches the DOM rather than relying on the type.)
+  const nativeProps: CalendarRootProps = {
+    id: "birthday-calendar",
+    style: { "max-width": "480px" },
+    "aria-describedby": "hint",
+  };
+
+  it("forwards unconsumed native attributes to the group element", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            data-testid="calendar"
+            {...nativeProps}
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.id).toBe("birthday-calendar");
+    expect(group.getAttribute("data-testid")).toBe("calendar");
+    expect(group.style.maxWidth).toBe("480px");
+    expect(group.getAttribute("aria-describedby")).toBe("hint");
+    // The recipe's own class survives the merge rather than being replaced by the passthrough.
+    expect(group.className).toContain("inline-flex");
+    dispose();
+  });
+
+  it("does not leak createCalendar options onto the element as attributes", async () => {
+    // The cost of forwarding: the `omit` list in `Root` is what separates "a native attribute the
+    // consumer wants on the element" from "an option the primitive consumes", and it is hand-kept.
+    // A key missing from it lands in the DOM as a junk attribute — invisible, since nothing else
+    // fails. Options with a string value are the ones that would actually show up.
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            locale="en-US"
+            label="Departure date"
+            selectionMode="range"
+            commitBehavior="reset"
+            size="lg"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    for (const option of [
+      "timezone",
+      "locale",
+      "label",
+      "selectionmode",
+      "commitbehavior",
+      "size",
+    ]) {
+      expect(group.hasAttribute(option), `${option} leaked onto the group element`).toBe(false);
+    }
+    // `label` reaches the DOM only as the accessible name it is.
+    expect(group.getAttribute("aria-label")).toBe("Departure date");
+    dispose();
+  });
+
+  it("keeps the primitive's own attributes winning over a consumer's", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            role="region"
+            data-slot="nope"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.getAttribute("role")).toBe("group");
+    expect(group.getAttribute("data-slot")).toBe("calendar");
+    dispose();
+  });
+
+  it("lets a consumer aria-label name the group, like the label option does", async () => {
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            aria-label="Departure date"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    // The part hook defers here (`props["aria-label"] ?? state.groupLabel()`) — the one attribute it
+    // deliberately does not win. Unreachable until `Root` forwarded anything at all.
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.getAttribute("aria-label")).toBe("Departure date");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
+  it("merges a consumer ref with the primitive's own, keeping the abandonment policy wired", async () => {
+    // `renderElement` collapses the consumer `ref` and `group.setRef` into one function ref. If the
+    // passthrough had shadowed the internal one, the range below would never commit — that is what
+    // proves both halves ran, not just that the consumer's fired.
+    let consumerRef: HTMLElement | undefined;
+    let value: unknown = null;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            selectionMode="range"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            ref={(element: HTMLElement) => {
+              consumerRef = element;
+            }}
+            onValueChange={(v) => {
+              value = v;
+            }}
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+          <button type="button" data-testid="outside">
+            Outside
+          </button>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    expect(consumerRef).toBe(container.querySelector('[data-slot="calendar"]'));
+
+    const anchor = dayButton(container, "Friday, January 10, 2020");
+    anchor.focus();
+    anchor.click();
+    await vi.waitFor(() =>
+      expect(container.querySelector('td[aria-selected="true"]')).not.toBeNull(),
+    );
+    (container.querySelector('[data-testid="outside"]') as HTMLElement).focus();
+    await vi.waitFor(() =>
+      expect((value as { start: CalendarDate } | null)?.start.toString()).toBe("2020-01-10"),
+    );
+    dispose();
+  });
+
+  it("composes a consumer onFocusOut with the abandonment policy, rather than replacing it", async () => {
+    // The other attribute the part hook does not simply win: `composeEventHandlers` runs the
+    // consumer's first, then the policy's. Both must observe the same focus-out.
+    let sawFocusOut = false;
+    let value: unknown = null;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            selectionMode="range"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            onFocusOut={() => {
+              sawFocusOut = true;
+            }}
+            onValueChange={(v) => {
+              value = v;
+            }}
+          >
+            <Calendar.Grid />
+          </Calendar.Root>
+          <button type="button" data-testid="outside">
+            Outside
+          </button>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+
+    const anchor = dayButton(container, "Friday, January 10, 2020");
+    anchor.focus();
+    anchor.click();
+    await vi.waitFor(() =>
+      expect(container.querySelector('td[aria-selected="true"]')).not.toBeNull(),
+    );
+    (container.querySelector('[data-testid="outside"]') as HTMLElement).focus();
+
+    await vi.waitFor(() => expect(sawFocusOut).toBe(true));
+    await vi.waitFor(() =>
+      expect((value as { start: CalendarDate } | null)?.start.toString()).toBe("2020-01-10"),
+    );
     dispose();
   });
 });

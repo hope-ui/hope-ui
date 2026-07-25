@@ -1,5 +1,10 @@
+import { I18nProvider } from "@hope-ui/i18n";
+import { hope } from "@hope-ui/presets/hope";
+import { ThemeProvider } from "@hope-ui/theming";
+import { CalendarDate } from "@internationalized/date";
 import { renderToStringAsync } from "@solidjs/web";
 import { describe, expect, it } from "vitest";
+import { Calendar } from "../index";
 import { Tree } from "./calendar.ssr-entry";
 
 // `Tree` (from `calendar.ssr-entry.tsx`) is the single source of truth for the round-trip tree:
@@ -41,6 +46,29 @@ describe("Calendar SSR", () => {
     expect(html).toContain('type="hidden"');
     expect(html).toContain('name="date"');
     expect(html).toContain('value="2020-01-10"');
+  });
+
+  it("forwards native attributes onto the group in the server markup", async () => {
+    // Rendered outside the shared `Tree` on purpose: `Tree` is the hydration contract, and adding an
+    // attribute to it would shift the inline snapshot below for a reason unrelated to hydration. The
+    // point here is that the passthrough is not a client-only effect — the `id` an app labels or
+    // scrolls to must be in the server bytes, not appear on hydration.
+    const html = await renderToStringAsync(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            id="birthday-calendar"
+            aria-describedby="hint"
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+          />
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    const group = html.slice(0, html.indexOf(">") + 1);
+    expect(group).toContain('id="birthday-calendar"');
+    expect(group).toContain('aria-describedby="hint"');
+    expect(group).toContain('role="group"');
   });
 
   it("matches its server output byte for byte", async () => {
