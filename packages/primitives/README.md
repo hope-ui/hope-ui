@@ -24,10 +24,18 @@ kernel is *not* trying to provide.
 pnpm add @hope-ui/primitives
 ```
 
-Peer dependencies: `solid-js` and `@solidjs/web` (`2.0.0-beta.x`), plus `@tanstack/virtual-core` as
-an **optional** peer (only `createVirtualCollection` needs it, so the kernel stays zero-cost for
-consumers who never virtualize). Bundled dependencies: `@internationalized/date` (the calendar
-substrate) and `@solid-primitives/a11y` (the live-region announcer).
+Peer dependencies: `solid-js` and `@solidjs/web` (`2.0.0-beta.x`), plus two **optional** peers —
+`@tanstack/virtual-core` (only `createVirtualCollection` needs it) and `@floating-ui/dom` (only
+`createFloating` needs it), so the kernel stays zero-cost for consumers who never virtualize a list
+or open a floating layer. Bundled dependencies: `@internationalized/date` (the calendar substrate)
+and `@solid-primitives/a11y` (the live-region announcer).
+
+> **"Optional" is an npm/type-level claim, not a module-graph one.** `internal/index.ts` re-exports
+> `createVirtualCollection` and `createFloating`, both of which statically import their peer, and the
+> package ships unbundled — so `dist/internal/index.jsx` carries top-level imports for both. A
+> consumer who skips the install fails at *resolve* time unless their bundler tree-shakes the unused
+> branch, which Vite/Rollup will, given `sideEffects: false`. If you import from
+> `@hope-ui/primitives/internal` under a bundler that doesn't, install both peers.
 
 ## Subpath exports
 
@@ -37,7 +45,7 @@ Only top-level `src/` folders carry a barrel and a subpath — nothing deeper.
 | ------ | -------- |
 | `@hope-ui/primitives/render` | `renderElement` — the `render`/`as` polymorphism primitive (+ ref merging) every public component routes its parts through. |
 | `@hope-ui/primitives/utils` | The remaining non-`createX` composition helpers: `withDefaults` (the correct way to apply defaults under 2.0), `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`. |
-| `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
+| `@hope-ui/primitives/internal` | The `createX` behavior primitives: `createComponentContext`, `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`, `createHideOutside`, `createDismissable`, `createScrollLock`, `createFloating` (overlay positioning, over `@floating-ui/dom`), `createRegisteredId`, `createRegisteredElement`, plus the list/grid/collection navigation family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`, `createListSelection`, `createListTypeahead`, `createListExpansion`, `createGridNavigation`). |
 | `@hope-ui/primitives/dialog` | The `createDialog` hook family (root state + one hook per part). |
 | `@hope-ui/primitives/listbox` | The `createListbox` hook family (root state + item/group/group-label/separator hooks) — composes the `internal/` list kernel; collection + virtual source modes, roving + activedescendant focus. |
 | `@hope-ui/primitives/calendar` | The `createCalendar` hook family (headless month/year/decade calendar, built on `@internationalized/date`). |

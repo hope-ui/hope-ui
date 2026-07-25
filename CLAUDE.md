@@ -216,9 +216,9 @@ pnpm workspace, Turborepo pipeline.
     `composeEventHandlers`, `createKeyboardHandler`, `runIfFunction`, `compareByIdOrReference`.
   - `internal/` — the `createX` behavior primitives: `createComponentContext`,
     `createControllableState`, `createPresence`, `createFocusTrap`, `createFocusRestore`,
-    `createHideOutside`, `createDismissable`, `createScrollLock`, `createPress`, `createButton`,
-    `createRegisteredId`, `createRegisteredElement`, plus the collection/navigation family
-    (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`,
+    `createHideOutside`, `createDismissable`, `createScrollLock`, `createFloating`, `createPress`,
+    `createButton`, `createRegisteredId`, `createRegisteredElement`, plus the collection/navigation
+    family (`createCollection`, `createVirtualCollection`, `createListFocus`, `createListNavigation`,
     `createListTypeahead`, `createListSelection`, `createListExpansion`, `createGridNavigation`).
     Docs under `__internal__/primitives/internal/`; read the ref/`createEffect` timing gotcha in
     `__internal__/solid-2.0-notes.md` before writing another one.

@@ -1,9 +1,9 @@
 # Reference implementations
 
 Where to look when building or debugging a kernel primitive. This captures the sources evaluated
-while porting the signal-based navigation kernel — and the sources chosen for the overlay
-primitives still to build (`createFloating`, `createHoverIntent`) — so future work doesn't
-re-derive the map.
+while porting the signal-based navigation kernel and `createFloating` — and the sources chosen for
+the overlay primitives still to build (`createHoverIntent`) — so future work doesn't re-derive the
+map.
 
 **References policy** (see also `CLAUDE.md`): Angular Aria, Astryx, react-aria, floating-ui (both
 the `@floating-ui/react` and `@floating-ui/vue` ports) and Base UI are **adapt-and-credit**
@@ -96,7 +96,7 @@ map is recorded up front so the build doesn't re-derive it.
 
 - **Angular Aria** `private/behaviors/event-manager` — the declarative, modifier-aware keymap idea.
 
-### `createFloating` (planned) — overlay positioning
+### `createFloating` — overlay positioning
 
 Wraps `@floating-ui/dom` (placement, flip/shift, offset, arrow, autoUpdate); adopted as an optional
 peer dependency, same pattern as `@tanstack/virtual-core`. Positioning only — interaction concerns
@@ -121,6 +121,34 @@ Two Solid-2.0 hazards the Vue port won't flag (see `__internal__/solid-2.0-notes
 reference/floating **elements** are conditionally rendered, so back them with `createSignal` and
 track them in the `compute` callback (never read a plain ref accessor there); and `autoUpdate`/
 `computePosition` are client-only — effect-gate them (nothing runs under `renderToStringAsync`).
+
+**As built** (`packages/primitives/src/internal/create-floating.ts`; usage doc
+`__internal__/primitives/internal/create-floating.md`). Four deliberate divergences from the map
+above:
+
+- **Reactive options are object getters, not accessor-or-value via `runIfFunction`.** The
+  `toValue` → `runIfFunction` line was a Vue→Solid mapping note written before the getter idiom
+  settled across eight primitives. Following it literally would fork the kernel's convention in its
+  most-consumed primitive *and* collide with floating-ui itself: `runIfFunction` is only sound when
+  `T` is not callable, and floating-ui's option surface is full of callables (`Derivable<T> =
+  (state) => T` on `offset`/`flip`/`shift`/`size`, plus `Middleware.fn`), so
+  `sideOffset?: number | (() => number)` would be ambiguous against `offset(state => …)`.
+- **The `size` middleware is in, opt-in and measurement-only** (`trackSize` → `size()`), a scope
+  addition beyond the recorded line: ~20 LOC now versus a Select/Combobox retrofit later. The kernel
+  records `{anchorWidth, anchorHeight, availableWidth, availableHeight}` and never writes
+  width/max-height onto the element — the same line this record already draws for the arrow, which
+  also sidesteps `size`'s ResizeObserver feedback loop.
+- **`VirtualElement` anchors are supported in v1** — a type widening at roughly zero cost, which
+  unblocks a pointer-anchored ContextMenu.
+- **RTL is delegated to floating-ui's DOM platform** (`isRTL` = `getComputedStyle(el).direction`),
+  with **no** `@hope-ui/i18n` import: threading `useLocale()` in would create a second, divergent
+  source of truth. The consequence is that logical *sides* (`inline-start`/`inline-end`) are
+  deliberately not offered — floating-ui's placements are strictly physical, and supporting them
+  would reintroduce exactly that coupling. Alignment is logical for free.
+
+`hide()` needed no kernel support at all: unlike `size` (whose numbers arrive through an `apply`
+callback with nowhere to land), it writes straight to `middlewareData`, which the `middleware` +
+`middlewareData()` escape hatch already exposes. Documented as the worked example instead.
 
 ### `createHoverIntent` (planned) — hover open/close intent + safe triangle
 
@@ -166,7 +194,7 @@ Consolidated verdicts from the evaluation.
 |---|---|
 | list-focus / navigation / selection / typeahead / expansion / grid | **Ported** (this work) — Angular Aria signal behaviors |
 | `announce` (live-region) | **Future port** — Astryx `useAnnounce` |
-| overlay positioning (placement/flip/shift/arrow/autoUpdate) | **Wrap** `@floating-ui/dom`; port `@floating-ui/vue` `useFloating`/`arrow` + Base UI `useAnchorPositioning` (API vocab) — see §1 `createFloating` |
+| overlay positioning (placement/flip/shift/arrow/autoUpdate) | **Wrapped** — `internal/create-floating.ts`, over `@floating-ui/dom` (optional peer); ported from `@floating-ui/vue` `useFloating`/`arrow` with Base UI `useAnchorPositioning`'s API vocab — see §1 `createFloating` |
 | menu-hover intent / safe triangle | **Future port** — Astryx `useMenuHover` (wiring) + floating-ui `safePolygon.ts` (geometry) — see §1 `createHoverIntent` |
 | input-container (combobox text sync) | **Future port** — Astryx `useInputContainer` |
 | media-query / hotkeys / overflow observers | **Adopt** `@solid-primitives/*` (see `solid-primitives-eval.md`) |

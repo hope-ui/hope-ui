@@ -178,7 +178,7 @@ tables.
 | 4 | `createElementSize` | ResizeObserver-backed element measurement | ScrollArea, Splitter, positioning | T1 |
 | 5 | `createFormControl` — **adopt `@solid-primitives/a11y`** (hydration-gated; *not* the `form` pkg's `createForm`) | label / description / error id linking + `data-invalid`/`required`/`disabled`/`readonly` | Field, Fieldset, **all form inputs** | T1–T2 |
 | 6 | `createStepsState` · `createPaginationState` | small state machines | Steps, Pagination | T1 |
-| 7 | `createFloating` | `@floating-ui/dom` wrapper: placement, flip/shift, arrow, autoUpdate | Tooltip, Popover, HoverCard, Menu, Select, Combobox, NavigationMenu, DatePicker | T2 |
+| 7 | `createFloating` ✅ | `@floating-ui/dom` wrapper: placement, flip/shift, arrow, autoUpdate, opt-in `size` | Tooltip, Popover, HoverCard, Menu, Select, Combobox, NavigationMenu, DatePicker | T2 |
 | 8 | `createHoverIntent` | hover open/close intent + submenu safe-triangle | Menu, HoverCard, Tooltip *(port Astryx `useMenuHover`)* | T2 |
 | 9 | `createTextInput` | controlled value + composition/selection handling | Input, Textarea, Combobox, TagsInput, NumberInput | T2 |
 | 10 | `createNumberState` | parse / format / clamp / step (Intl) | NumberInput, Slider | T2 |
@@ -201,9 +201,10 @@ value equality → `compareByIdOrReference`.
 Not prescriptive, but the natural sequence given what's now landed:
 1. **Listbox** — cashes in the navigation kernel; the first component to force the *component*-level
    SSR + hydration DoD onto `createCollection`.
-2. **`createFloating`** — unblocks the entire overlay/popup column (Tooltip, Popover, Menu, Select,
-   Combobox, …). Adopt `@floating-ui/dom` as an optional peerDependency, same pattern as
-   `@tanstack/virtual-core`.
+2. ~~**`createFloating`**~~ — **done.** `@floating-ui/dom` went in as an optional peerDependency, same
+   pattern as `@tanstack/virtual-core`; the entire overlay/popup column (Tooltip, Popover, Menu,
+   Select, Combobox, …) is now unblocked. Usage:
+   [`create-floating.md`](primitives/internal/create-floating.md).
 3. **`createFormControl`** — unblocks every form input; **adopt `@solid-primitives/a11y`** rather
    than build (verdict in [`solid-primitives-eval.md`](solid-primitives-eval.md)), gated on the
    `Field` hydration round-trip.
