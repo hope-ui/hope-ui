@@ -100,6 +100,27 @@ two independent counts and un-hide each other's elements. `Symbol.for` resolves 
 cross-realm global symbol registry, so every copy reads the same slot. `createScrollLock`
 stores its lock state the same way, for the same reason.
 
+### What ref-counting does *not* cover: a portaled child layer
+
+Ref-counting composes two layers that were both known when each ran. It does not help when a
+**new** layer mounts into a page an existing one is already observing. Once a Popover opens from
+inside a Dialog, the popup portals onto `document.body` *after* the Dialog's `createHideOutside`
+started observing, and it isn't in that layer's static `spare` array — so the Dialog's own
+`MutationObserver` marks the popup `aria-hidden` + `inert`. The popup is unreadable to assistive
+technology and transparent to hit testing, while every test stays green.
+
+`spare` cannot express the fix, because it is static and per-layer: there is no way to say "spare
+this in whichever layer is currently on top". The port that can is recorded — react-aria
+`ariaHideOutside`'s `observerStack` (a new call disconnects the previous observer, cleanup restarts
+it, so only the innermost layer observes), `keepVisible(element)` (dynamic registration into the
+current topmost layer, returning an undo) and `isAlwaysVisibleNode`'s declarative `data-*`
+top-layer opt-out. See `__internal__/reference-implementations.md:307` and its § *Nested overlay
+ordering*.
+
+This is the sibling half of [`createDismissable`](./create-dismissable.md) § *Scope*, and the two
+registries stay **separate**: they answer different questions, and a Dialog with
+`dismissOnEscape: false` still participates in hide-outside ordering but must never win Escape.
+
 ## Late-arriving content
 
 A `MutationObserver` on `document.body` hides elements added while the layer is active — a
