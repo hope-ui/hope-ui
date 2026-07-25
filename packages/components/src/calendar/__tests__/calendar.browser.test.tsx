@@ -10,7 +10,7 @@ import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
-import { Calendar, type CalendarRootProps } from "../index";
+import { Calendar, type CalendarHeaderProps, type CalendarRootProps } from "../index";
 // `Tree` is the single source of truth for the calendar round-trip render: `calendar.ssr.test.tsx`
 // inline-snapshots it and the hydration-fixture bridge renders it fresh into this project (no
 // committed `.html`). It doubles as the plain full-calendar the interaction tests below mount, so
@@ -27,6 +27,15 @@ const dayButton = (root: ParentNode, labelPrefix: string) =>
 const heading = (root: ParentNode) => root.querySelector<HTMLElement>("button[id]") as HTMLElement;
 const chromeButton = (root: ParentNode, label: string) =>
   root.querySelector<HTMLElement>(`button[aria-label="${label}"]`) as HTMLElement;
+
+// Cross-tag `render` targets. `render` is typed over the part's *own* element props, so re-targeting
+// a different tag casts at the call site — the same shape as `renderAsAnchor` in the Button tests.
+const renderAsSection: NonNullable<CalendarRootProps["render"]> = (p) => (
+  <section {...(p as unknown as JSX.HTMLAttributes<HTMLElement>)} />
+);
+const renderAsHeader: NonNullable<CalendarHeaderProps["render"]> = (p) => (
+  <header {...(p as unknown as JSX.HTMLAttributes<HTMLElement>)} />
+);
 
 // A recognizable custom nav glyph for the override tests, tagged so it's distinguishable from hope's
 // built-in chevron and from its sibling (`mark` = "prev"/"next").
@@ -696,6 +705,62 @@ describe("Calendar native attributes", () => {
     await vi.waitFor(() =>
       expect((value as { start: CalendarDate } | null)?.start.toString()).toBe("2020-01-10"),
     );
+    dispose();
+  });
+
+  it("re-targets Root, Header and Grid through a consumer render prop", async () => {
+    // `render` is the only polymorphism mechanism (there is no `as`), and these three were the parts
+    // that lacked it while every sibling had it. The computed props must survive the swap — the ARIA
+    // and the keymap live on them, so a render target that only got `class` would be decoration.
+    let groupRef: HTMLElement | undefined;
+    const { container, dispose } = mount(() => (
+      <ThemeProvider preset={hope}>
+        <I18nProvider locale="en-US">
+          <Calendar.Root
+            defaultFocusedValue={new CalendarDate(2020, 1, 15)}
+            timeZone="UTC"
+            ref={(element: HTMLElement) => {
+              groupRef = element;
+            }}
+            render={renderAsSection}
+          >
+            <Calendar.Header render={renderAsHeader}>
+              <Calendar.PrevButton />
+              <Calendar.Heading />
+              <Calendar.NextButton />
+            </Calendar.Header>
+            <Calendar.Grid render={(renderProps) => <table {...renderProps} />} />
+            {/* Grid keeps its own tag: `render` there is for wrapping/instrumenting a table, not for
+            escaping table semantics its `<thead>`/`<tbody>` children still require. */}
+          </Calendar.Root>
+        </I18nProvider>
+      </ThemeProvider>
+    ));
+    await vi.waitFor(() => expect(heading(container).textContent).toBe("January 2020"));
+
+    const group = container.querySelector<HTMLElement>('[data-slot="calendar"]') as HTMLElement;
+    expect(group.tagName).toBe("SECTION");
+    expect(group.getAttribute("role")).toBe("group");
+    // The internal ref survives the swap into a consumer element — without it the abandonment policy
+    // and the dev direction warning both go dormant, silently.
+    expect(groupRef).toBe(group);
+
+    expect((container.querySelector('[data-slot="calendar-header"]') as HTMLElement).tagName).toBe(
+      "HEADER",
+    );
+
+    const grid = container.querySelector<HTMLElement>('[data-slot="calendar-grid"]') as HTMLElement;
+    expect(grid.getAttribute("role")).toBe("grid");
+    expect(grid.getAttribute("aria-labelledby")).toBe(heading(container).id);
+
+    // Still a working calendar, not just the right tags: the roving cursor answers the keyboard.
+    dayButton(container, "Wednesday, January 15, 2020").focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await vi.waitFor(() =>
+      expect(document.activeElement).toBe(dayButton(container, "Thursday, January 16, 2020")),
+    );
+
+    await expectNoA11yViolations(container);
     dispose();
   });
 });

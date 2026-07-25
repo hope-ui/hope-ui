@@ -181,11 +181,36 @@ Write literal host elements where they read best. `renderElement` (`@hope-ui/pri
 the `as`/render-prop polymorphism helper and the owner of ref merging — reach for it when a component
 exposes `as`/`render`, not per element.
 
-## Every public part forwards the DOM props it doesn't consume
+## Every public part forwards its DOM props and takes `render`
 
-A part a consumer writes in JSX and that renders a host element **must** let them reach that element:
-`id`, `style`, `data-*`, `aria-*`, `ref`, and event handlers. No exceptions beyond parts that render
-no element of their own (`Dialog.Root`, `Dialog.Portal`).
+A part a consumer writes in JSX and that renders a host element owes them **two** things: the native
+attributes it doesn't consume (`id`, `style`, `data-*`, `aria-*`, `ref`, event handlers), and a
+`render` prop to re-target the element. The **only** exemption is a part that renders no element of
+its own (`Dialog.Root`, `Dialog.Portal`) — "the element is structural", "the tag matters here", and
+"nobody will need it" are not exemptions; `Calendar.Grid`'s `<table>` takes one.
+
+### `render` — the polymorphism mechanism (there is no `as` prop)
+
+`render?: RenderProp<<Name>ElementProps>`, omitted from what's forwarded, and passed to
+`renderElement` as `render: merged.render` (or `props.render` where the part doesn't merge defaults).
+Type it over the part's **own** element props and give `renderElement` the matching generics
+(`renderElement<CalendarRootElementProps, HTMLDivElement>`), so `render={(p) => <div {...p} />}`
+compiles with no cast. Re-targeting a *different* tag is the case that casts, at the call site —
+`renderAsAnchor` in the Button tests is the shape to copy.
+
+Part hooks type their props over `HTMLElement` while the public surface names the real element, and
+`ref` is the one key that won't line up between them. Cast the **props** at the `renderElement` call
+(`as unknown as <Name>ElementProps`) rather than widening the public `render` type — a `render` typed
+over `HTMLElement` pushes a cast onto every consumer instead.
+
+Two things a `render` test must cover, because both fail silently: the **computed props survive** the
+swap (the ARIA and the keymap ride on them — assert behavior, not just the tag), and the **internal
+ref survives** it. `renderElement` collapses internal + consumer refs into one function ref, so a
+target that drops it disables whatever the ref powers — Calendar's abandonment policy and direction
+warning, Listbox's scroll container — with no error. Pick the render target for validity too:
+`role="listbox"` on a `<section>` is an axe `aria-allowed-role` violation.
+
+### Forwarding the rest
 
 - **Declare it** with a private `type <Name>ElementProps = JSX.HTMLAttributes<HTMLXElement>` alias
   above the interface, and extend it — `Omit`-ting the primitive's option keys when the part has any

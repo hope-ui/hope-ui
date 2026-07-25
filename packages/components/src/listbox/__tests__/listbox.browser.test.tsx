@@ -438,6 +438,50 @@ describe("Listbox selection glyph", () => {
     await expectNoA11yViolations(container);
     dispose();
   });
+
+  it("re-targets the list container through a consumer render prop", async () => {
+    // `Root` was the last Listbox part without `render`. Its internal ref is the scroll container in
+    // virtual mode and the navigation element in both, so it has to survive the swap.
+    let listRef: HTMLElement | undefined;
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Listbox.Root
+          aria-label="fruits"
+          itemToValue={itemToValue}
+          itemToLabel={itemToLabel}
+          ref={(element: HTMLElement) => {
+            listRef = element;
+          }}
+          render={(renderProps) => <div {...renderProps} data-custom-shell="" />}
+        >
+          <For each={FRUITS}>
+            {(fruit) => (
+              <Listbox.Item value={fruit} data-value={fruit.name}>
+                {fruit.name}
+              </Listbox.Item>
+            )}
+          </For>
+        </Listbox.Root>
+      </Themed>
+    ));
+
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    const list = container.querySelector<HTMLElement>('[data-slot="listbox"]') as HTMLElement;
+    // A `<div>` target, not a `<section>`: `role="listbox"` is not an allowed role on `<section>`
+    // (axe's `aria-allowed-role`), and the part's own valid-HTML rationale is why it is a div to
+    // begin with. The marker attribute is what proves the consumer's element is the one rendered.
+    expect(list.hasAttribute("data-custom-shell")).toBe(true);
+    expect(list.getAttribute("role")).toBe("listbox");
+    expect(listRef).toBe(list);
+
+    // Still navigable — the keymap rides on the computed props, not on the element being a `<div>`.
+    nth(options(container), 0).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await vi.waitFor(() => expect(nth(options(container), 1)).toHaveAttribute("data-active"));
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
 });
 
 // ─── Typeahead & disabled skip ──────────────────────────────────────────────────────────────────

@@ -1,12 +1,19 @@
 import { createCalendarGrid } from "@hope-ui/primitives/calendar";
-import { renderElement } from "@hope-ui/primitives/render";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
-import { For, merge, Show } from "solid-js";
+import { For, merge, omit, Show } from "solid-js";
 import { CalendarCell } from "./calendar-cell";
 import { useCalendarContext } from "./calendar-context";
 
 export interface CalendarGridProps extends JSX.HTMLAttributes<HTMLTableElement> {
+  /**
+   * Renders as a different element/component while keeping Grid's computed props (`role="grid"`, the
+   * `aria-labelledby` to the heading, the roving `tabindex` and the whole keymap). The children stay
+   * `<thead>`/`<tbody>`/`<tr>`, so a target that isn't table-shaped produces invalid HTML — that is
+   * the consumer's call to make, as it is in Base UI.
+   */
+  render?: RenderProp<JSX.HTMLAttributes<HTMLTableElement>>;
   /** Merged over the recipe's `grid` slot (applied last), so the consumer's utilities win. */
   class?: string;
 }
@@ -27,7 +34,7 @@ export interface CalendarGridProps extends JSX.HTMLAttributes<HTMLTableElement> 
  */
 export function Grid(props: CalendarGridProps): JSX.Element {
   const ctx = useCalendarContext();
-  const grid = createCalendarGrid(ctx.state, props);
+  const grid = createCalendarGrid(ctx.state, omit(props, "render"));
 
   /** The weekday `<thead>`. Its own component so `grid.headerProps` reaches it through
    * `renderElement`: a spread on a *literal* `<thead>` makes the client compile allocate its subtree's
@@ -81,5 +88,9 @@ export function Grid(props: CalendarGridProps): JSX.Element {
     },
     children,
   });
-  return renderElement<JSX.HTMLAttributes<HTMLTableElement>>({ as: "table", props: elementProps });
+  return renderElement<JSX.HTMLAttributes<HTMLTableElement>>({
+    as: "table",
+    render: props.render,
+    props: elementProps,
+  });
 }

@@ -3,7 +3,7 @@ import {
   type CreateListboxReturn,
   createListbox,
 } from "@hope-ui/primitives/listbox";
-import { renderElement } from "@hope-ui/primitives/render";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { ListboxSize, ListboxThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
@@ -40,6 +40,14 @@ export interface ListboxRootProps<V = unknown>
    * to reach every part. Use literal class strings so the consumer's Tailwind scanner can see them.
    */
   slotClasses?: SlotClasses<"listbox">;
+  /**
+   * Renders the list container as a different element/component while keeping Root's computed props
+   * (`role="listbox"`, the ARIA, the roving `tabindex`, the keymap). **Not** the same thing as the
+   * virtual-mode render-prop `children` below — this re-targets the container, that one builds a row.
+   * The internal ref is merged into the single function ref `renderElement` passes down; in virtual
+   * mode that ref *is* the scroll container, so a target ignoring function refs breaks windowing.
+   */
+  render?: RenderProp<ListboxRootElementProps>;
   /** Merged over the recipe's `root` slot (applied last), so the consumer's utilities win. */
   class?: string;
   /**
@@ -142,6 +150,7 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
     "size",
     "checkIcon",
     "slotClasses",
+    "render",
     "class",
     "children",
     "itemToValue",
@@ -239,9 +248,13 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
 
   return (
     <ListboxContext value={context}>
-      {renderElement<JSX.HTMLAttributes<HTMLElement>, HTMLElement>({
+      {/* Generics on the element's own type, so a consumer's `render` callback receives div-shaped
+      props and `render={(p) => <div {...p} />}` compiles without a cast — the surface Button/Badge/
+      Alert expose. `setListboxElement` takes the wider `HTMLElement` and stays assignable. */}
+      {renderElement<ListboxRootElementProps, HTMLDivElement>({
         as: "div",
-        props: elementProps as unknown as JSX.HTMLAttributes<HTMLElement>,
+        render: merged.render,
+        props: elementProps as unknown as ListboxRootElementProps,
         ref: state.setListboxElement,
       })}
       {/* Native form submission, opt-in via `name`: one hidden field per selected value, valued

@@ -633,6 +633,12 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
       description: "Per-slot class overrides, keyed by root/header/heading/prevButton/nextButton/grid/weekday/cell/cellTrigger.",
     },
     {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render the group container as another element or component. Receives Root's computed props; honour the ref it passes.",
+    },
+    {
       prop: "class",
       type: "string",
       default: "",
@@ -652,8 +658,12 @@ handlers, …), which land on the `role="group"` container. Dates are `CalendarD
 `Calendar.PrevButton`, `Calendar.NextButton`, and `Calendar.Heading` each accept their native
 `<button>` attributes, a `render` prop, a `class`, and `children` (which overrides the built-in
 glyph / period label). `Calendar.Header` and `Calendar.Grid` accept their native element attributes
-plus `class`. All host elements are rendered through the `render` prop where offered — the single
-polymorphism API, as elsewhere in hope-ui.
+plus a `render` prop and a `class`. Every part that renders a host element takes `render` — the
+single polymorphism API, as elsewhere in hope-ui.
+
+`Calendar.Grid`'s children are `<thead>`/`<tbody>`/`<tr>`, so `render`-ing it as something that isn't
+table-shaped produces invalid HTML. The computed props (`role="grid"`, the `aria-labelledby`, the
+keymap) come with you either way.
 
 ## Accessibility
 

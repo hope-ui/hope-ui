@@ -606,6 +606,12 @@ export const myPreset = definePreset(hope, {
       description: "Per-slot class overrides, keyed by root, item, itemIndicator, group, groupLabel, separator.",
     },
     {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render the list container as another element or component. Receives Root's computed props; honour the ref it passes (it is the scroll container in virtual mode).",
+    },
+    {
       prop: "class",
       type: "string",
       default: "",

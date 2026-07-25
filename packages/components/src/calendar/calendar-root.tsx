@@ -3,7 +3,7 @@ import {
   createCalendar,
   createCalendarGroup,
 } from "@hope-ui/primitives/calendar";
-import { renderElement } from "@hope-ui/primitives/render";
+import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { runIfFunction } from "@hope-ui/primitives/utils";
 import type { CalendarSize, CalendarThemeableProps, SlotClasses } from "@hope-ui/theming";
 import { useDefaults, useSlots } from "@hope-ui/theming";
@@ -43,6 +43,14 @@ export interface CalendarRootProps
    * Tailwind scanner can see them.
    */
   slotClasses?: SlotClasses<"calendar">;
+  /**
+   * Renders the group container as a different element/component while keeping Root's computed props
+   * (`role="group"`, the state `data-*`, `dir`). The internal ref — what the abandonment policy
+   * measures "outside" against and what the dev direction warning reads the applied layout from — is
+   * merged into the single function ref `renderElement` passes down, so a render target that ignores
+   * function refs silently disables both.
+   */
+  render?: RenderProp<CalendarRootElementProps>;
   /** Merged over the recipe's `root` slot (applied last), so the consumer's utilities win. */
   class?: string;
   /**
@@ -120,6 +128,7 @@ export function Root(props: CalendarRootProps): JSX.Element {
     "prevIcon",
     "nextIcon",
     "slotClasses",
+    "render",
     "class",
     "children",
     "label",
@@ -197,8 +206,15 @@ export function Root(props: CalendarRootProps): JSX.Element {
   // documented on `Calendar.Grid`'s `<table>`/`<thead>` and `CalendarCell`.
   return (
     <CalendarContext value={context}>
-      {renderElement<JSX.HTMLAttributes<HTMLElement>, HTMLElement>({
+      {/* Generics on the element's own type (`HTMLDivElement`), not the group hook's `HTMLElement`, so
+      a consumer's `render` callback receives div-shaped props and `render={(p) => <div {...p} />}`
+      compiles without a cast — the same surface Button/Badge/Alert expose. Only `ref`'s parameter
+      type differs between the two, hence the props cast; `group.setRef` takes the wider `HTMLElement`
+      and stays assignable. Re-targeting a *different* tag casts at the call site, as
+      `renderAsAnchor` does in the Button tests. */}
+      {renderElement<CalendarRootElementProps, HTMLDivElement>({
         as: "div",
+        render: merged.render,
         props: merge(group.props, {
           "data-slot": "calendar",
           get class(): string {
@@ -228,7 +244,7 @@ export function Root(props: CalendarRootProps): JSX.Element {
           get children(): JSX.Element {
             return merged.children ?? <DefaultCalendar />;
           },
-        }),
+        }) as unknown as CalendarRootElementProps,
         ref: group.setRef,
       })}
       {/* Native form submission, opt-in via `name`: one hidden field per submitted ISO value, keyed by
