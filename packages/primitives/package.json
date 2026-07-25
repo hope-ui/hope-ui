@@ -53,11 +53,15 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
+    "@floating-ui/dom": "catalog:",
     "@solidjs/web": "catalog:",
     "@tanstack/virtual-core": "catalog:",
     "solid-js": "catalog:"
   },
   "peerDependenciesMeta": {
+    "@floating-ui/dom": {
+      "optional": true
+    },
     "@tanstack/virtual-core": {
       "optional": true
     }
@@ -68,6 +72,7 @@
     "@solid-primitives/a11y": "catalog:"
   },
   "devDependencies": {
+    "@floating-ui/dom": "catalog:",
     "@hope-ui/internal-test-utils": "workspace:*",
     "@solidjs/web": "catalog:",
     "@tanstack/virtual-core": "catalog:",
