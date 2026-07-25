@@ -3,6 +3,10 @@
 // top-level `src/` folders do.
 
 export {
+  type CreateAutoFocusOptions,
+  createAutoFocus,
+} from "./create-auto-focus";
+export {
   type ButtonBehaviorProps,
   type ButtonType,
   type CreateButtonOptions,

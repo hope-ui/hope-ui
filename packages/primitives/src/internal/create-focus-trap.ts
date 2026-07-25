@@ -1,4 +1,5 @@
 import { type Accessor, createEffect } from "solid-js";
+import { createAutoFocus, getFocusableElements } from "./create-auto-focus";
 
 export interface CreateFocusTrapOptions {
   /** Whether the trap is currently active. */
@@ -9,31 +10,14 @@ export interface CreateFocusTrapOptions {
   initialFocus?: Accessor<HTMLElement | null | undefined>;
 }
 
-const FOCUSABLE_SELECTOR = [
-  "a[href]",
-  "button:not([disabled])",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])",
-  "[contenteditable='true']",
-  "audio[controls]",
-  "video[controls]",
-].join(",");
-
-function isVisible(element: HTMLElement): boolean {
-  return element.offsetParent !== null || element.getClientRects().length > 0;
-}
-
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(isVisible);
-}
-
 /**
  * Traps Tab/Shift+Tab focus cycling within a container while `active`, and refocuses the
  * container if focus is moved outside it programmatically. Gated entirely inside
  * `createEffect`, so it naturally never runs during SSR (no DOM access happens outside the
  * effect).
+ *
+ * **Moving focus in on activation is `createAutoFocus`**, composed below rather than
+ * reimplemented — a non-modal overlay (Popover, Tooltip) wants that half without the cage.
  *
  * **Restoring focus on deactivation is not this primitive's job** — that's
  * `createFocusRestore`, which is a separate concern precisely because a non-modal overlay
@@ -42,28 +26,19 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
  * ordering constraints that depend on it.
  */
 export function createFocusTrap(options: CreateFocusTrapOptions): void {
+  // Created BEFORE `createAutoFocus`, and that order is load-bearing. Sibling effects run
+  // their previous cleanup in *creation* order on a re-run, so listeners-first reproduces
+  // what the single welded effect used to do: remove the listeners, and only then let
+  // autofocus remove the `tabindex` it added. It also puts the `focusin` handler in place
+  // before autofocus fires, which is what makes an out-of-container `initialFocus` get
+  // pulled back inside — the observable half of the decision. See `create-focus-trap.md`.
   createEffect(
-    // Track both `active()` and `ref()` in the compute function. `ref` must be a real
-    // signal accessor (not a closure over a plain `let`): when the container is only
-    // created as a reactive consequence of the same `active`/`present` signal flipping
-    // (e.g. gated behind a `<Show>`), a *sibling* effect elsewhere may create/assign it
-    // *after* this effect's first run for that change — a plain untracked `ref()` read
-    // would permanently miss it, since `active` (its only dependency) won't change
-    // again. Tracking `ref()` too means this effect reruns once the signal-backed ref
-    // actually updates, regardless of firing order relative to that sibling effect.
+    // Same compute as `createAutoFocus`'s, for the same reason — see the comment there.
     () => [options.active(), options.ref()] as const,
     ([active, container]) => {
       if (!active || !container) {
         return;
       }
-
-      const initial = options.initialFocus?.() ?? getFocusableElements(container)[0] ?? container;
-      let addedTabIndex = false;
-      if (initial === container && !container.hasAttribute("tabindex")) {
-        container.setAttribute("tabindex", "-1");
-        addedTabIndex = true;
-      }
-      initial.focus();
 
       const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key !== "Tab") {
@@ -105,10 +80,9 @@ export function createFocusTrap(options: CreateFocusTrapOptions): void {
       return () => {
         document.removeEventListener("keydown", handleKeyDown);
         document.removeEventListener("focusin", handleFocusIn);
-        if (addedTabIndex) {
-          container.removeAttribute("tabindex");
-        }
       };
     },
   );
+
+  createAutoFocus(options);
 }
