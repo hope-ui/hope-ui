@@ -390,6 +390,54 @@ describe("Listbox selection glyph", () => {
     await expectNoA11yViolations(container);
     dispose();
   });
+
+  it("forwards native attributes onto the indicator element", async () => {
+    // The indicator was the one public part whose props were `children` and nothing else, so it
+    // rendered a `<span>` no consumer could reach: no `id`, `data-*`, `style` or `ref`. Its `class`
+    // is merged over the recipe's `itemIndicator` slot, like every other part's.
+    let indicatorRef: HTMLElement | undefined;
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Listbox.Root aria-label="fruits" itemToValue={itemToValue} itemToLabel={itemToLabel}>
+          <For each={FRUITS}>
+            {(fruit) => (
+              <Listbox.Item value={fruit} data-value={fruit.name}>
+                <Listbox.ItemIndicator
+                  id="chosen"
+                  class="ring-2"
+                  data-testid="indicator"
+                  ref={(element: HTMLElement) => {
+                    indicatorRef = element;
+                  }}
+                />
+                {fruit.name}
+              </Listbox.Item>
+            )}
+          </For>
+        </Listbox.Root>
+      </Themed>
+    ));
+
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    await userEvent.click(nth(options(container), 2));
+
+    const indicator = await vi.waitFor(() => {
+      const element = container.querySelector<HTMLElement>('[data-slot="listbox-item-indicator"]');
+      expect(element).not.toBeNull();
+      return element as HTMLElement;
+    });
+    expect(indicator.id).toBe("chosen");
+    expect(indicator.getAttribute("data-testid")).toBe("indicator");
+    expect(indicatorRef).toBe(indicator);
+    // The consumer's class is folded in alongside the recipe slot, not instead of it.
+    expect(indicator.className).toContain("ring-2");
+    expect(indicator.className).toContain("absolute");
+    // `aria-hidden` stays component-owned — the option's `aria-selected` already conveys selection.
+    expect(indicator.getAttribute("aria-hidden")).toBe("true");
+
+    await expectNoA11yViolations(container);
+    dispose();
+  });
 });
 
 // ─── Typeahead & disabled skip ──────────────────────────────────────────────────────────────────

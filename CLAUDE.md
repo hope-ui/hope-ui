@@ -181,6 +181,32 @@ Write literal host elements where they read best. `renderElement` (`@hope-ui/pri
 the `as`/render-prop polymorphism helper and the owner of ref merging — reach for it when a component
 exposes `as`/`render`, not per element.
 
+## Every public part forwards the DOM props it doesn't consume
+
+A part a consumer writes in JSX and that renders a host element **must** let them reach that element:
+`id`, `style`, `data-*`, `aria-*`, `ref`, and event handlers. No exceptions beyond parts that render
+no element of their own (`Dialog.Root`, `Dialog.Portal`).
+
+- **Declare it** with a private `type <Name>ElementProps = JSX.HTMLAttributes<HTMLXElement>` alias
+  above the interface, and extend it — `Omit`-ting the primitive's option keys when the part has any
+  (`Omit<CalendarRootElementProps, keyof CreateCalendarOptions | "children">`). Button, Badge, Alert,
+  CloseButton, Calendar.Root and Listbox.Root all spell it this way.
+- **Route it through the part hook** when one exists — `createXPart(state, omit(props, "render",
+  "class"))` — never merged onto the element behind the hook's back. The hook owns the precedence:
+  its `role`/ARIA/`data-*` win, the fallbacks it writes as `props.foo ?? …` defer to a consumer's,
+  and its handlers compose via `composeEventHandlers` (consumer first, `preventDefault()` cancels).
+  With no hook, `const rest = omit(props, …)` then `merge(rest, { … })` in the component.
+- **An attribute the component must own** (`aria-hidden` on `Listbox.ItemIndicator`, `data-slot`
+  everywhere) goes in the object merged *after* `rest`, with a comment saying why it isn't forwardable.
+
+**Extending the native attributes is not forwarding, and nothing fails when they diverge.** Both
+shipped bugs were silent: `Calendar.Root` declared no native attributes *and* called
+`createCalendarGroup(state)` with none, `Listbox.ItemIndicator` declared only `children` and rendered
+a hard-coded `<span>` — in both, every consumer attribute vanished with green tests, a passing
+typecheck, and docs promising the opposite. So **pin it with a test that asserts the attributes are on
+the element**, not on the props type. The hand-kept `omit` list this creates is a known cost with its
+own roadmap entry (§3) — mirror the existing lists until that lands.
+
 ## The Solid internals this codebase leans on are pinned
 
 `packages/primitives/src/__tests__/solid-contract.test.ts` (unit, client build),

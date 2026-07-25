@@ -668,6 +668,9 @@ Provide **exactly one** of `value` (collection mode) or `index` (virtual mode). 
 
 ### Listbox.ItemIndicator
 
+Plus every native `<span>` attribute. `aria-hidden` is not one of them — the glyph stays hidden from
+assistive tech, since the option's own `aria-selected` already conveys the selection.
+
 <PropsTable
   rows={[
     {
@@ -675,6 +678,18 @@ Provide **exactly one** of `value` (collection mode) or `index` (virtual mode). 
       type: "JSX.Element",
       default: "built-in check",
       description: "A custom selection glyph. Shown only while the row is selected.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description: "Render the indicator as another element or component. Receives its computed props.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the itemIndicator slot (your utilities win conflicts).",
     },
   ]}
 />
