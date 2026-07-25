@@ -1,6 +1,5 @@
 import { CloseButton, type CloseButtonProps } from "@hope-ui/components/close-button";
 import { createDialogCloseTrigger } from "@hope-ui/primitives/dialog";
-import { cx } from "@hope-ui/theming";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
 
@@ -20,7 +19,7 @@ export const CloseTrigger: Component<DialogCloseTriggerProps> = (props) => {
     get class(): string {
       // Placement from the dialog recipe's `closeTrigger` slot, merged with any consumer `class`
       // (which wins via tailwind-merge inside CloseButton's own `class` seam), over CloseButton's chrome.
-      return cx(ctx.slots.closeTrigger(), props.class) ?? "";
+      return ctx.slots.closeTrigger(props.class);
     },
     // Re-scope CloseButton's root marker to this part (overrides its `close-button` default).
     "data-slot": "dialog-close-trigger",

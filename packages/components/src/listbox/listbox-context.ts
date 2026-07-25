@@ -1,6 +1,6 @@
 import { createComponentContext } from "@hope-ui/primitives/internal";
 import type { CreateListboxGroupReturn, CreateListboxReturn } from "@hope-ui/primitives/listbox";
-import type { ListboxSlot } from "@hope-ui/theming";
+import type { ListboxSlot, SlotClassAccessor } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import type { Accessor } from "solid-js";
 
@@ -24,8 +24,9 @@ export interface ListboxContextValue {
   /** The primitive listbox state — item source, focus/selection/navigation/typeahead, ids, the
    * pointer fight-guard, `rootProps`, and the form accessors. Passed straight into each part's hook. */
   state: CreateListboxReturn<unknown>;
-  /** One ready-to-call class fn per Listbox slot, resolved once on `Root` and shared here. */
-  slots: Record<ListboxSlot, () => string>;
+  /** One ready-to-call class fn per Listbox slot, resolved once on `Root` and shared here. Each takes
+   * the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  slots: Record<ListboxSlot, SlotClassAccessor>;
   /**
    * The resolved default selection-check glyph (instance `checkIcon` ?? preset `defaultProps.listbox.checkIcon`
    * ?? hope's built-in check), resolved once on `Root` (the multi-part component keeps its themeable

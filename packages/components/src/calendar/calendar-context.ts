@@ -1,6 +1,6 @@
 import type { CreateCalendarReturn } from "@hope-ui/primitives/calendar";
 import { createComponentContext } from "@hope-ui/primitives/internal";
-import type { CalendarSlot } from "@hope-ui/theming";
+import type { CalendarSlot, SlotClassAccessor } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 
 /**
@@ -15,8 +15,9 @@ export interface CalendarContextValue {
   /** The primitive calendar state — view/cursor/selection/date-math, the shared navigation kernel, the
    * heading id, and the form accessors. Passed straight into each part's `createCalendarX(state, …)`. */
   state: CreateCalendarReturn;
-  /** One ready-to-call class fn per Calendar slot, resolved once on `Root` and shared here. */
-  slots: Record<CalendarSlot, () => string>;
+  /** One ready-to-call class fn per Calendar slot, resolved once on `Root` and shared here. Each takes
+   * the part's own `class`, folded in last through the recipe's tailwind-merge seam. */
+  slots: Record<CalendarSlot, SlotClassAccessor>;
   /**
    * The resolved default navigation glyphs (instance `prevIcon`/`nextIcon` ?? preset `defaultProps` ??
    * hope's built-in chevrons), resolved once on `Root` (the multi-part component keeps its themeable

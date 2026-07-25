@@ -1,5 +1,4 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit, Show } from "solid-js";
 import { useListboxContext, useListboxItemContext } from "./listbox-context";
@@ -52,7 +51,7 @@ export function ItemIndicator(props: ListboxItemIndicatorProps): JSX.Element {
     // selection the option's own `aria-selected` already conveys.
     "aria-hidden": "true" as const,
     get class(): string {
-      return cx(ctx.slots.itemIndicator(), props.class) ?? "";
+      return ctx.slots.itemIndicator(props.class);
     },
     get children(): JSX.Element {
       return props.children ?? ctx.checkIcon();

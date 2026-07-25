@@ -15,13 +15,13 @@ export const Description: Component<AlertDescriptionProps> = (props) => {
 
   createRegisteredId({ id, register: ctx.registerDescriptionId });
 
-  const rest = omit(props, "render");
+  const rest = omit(props, "render", "class");
   const elementProps = merge(rest, {
     get id(): string {
       return id();
     },
     get class(): string {
-      return ctx.slots.description();
+      return ctx.slots.description(props.class);
     },
     "data-slot": "alert-description",
   });

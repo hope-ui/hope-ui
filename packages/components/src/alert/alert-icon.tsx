@@ -9,11 +9,11 @@ export interface AlertIconProps extends JSX.HTMLAttributes<HTMLSpanElement> {
 
 export const Icon: Component<AlertIconProps> = (props) => {
   const ctx = useAlertContext();
-  const rest = omit(props, "render");
+  const rest = omit(props, "render", "class");
 
   const elementProps = merge(rest, {
     get class(): string {
-      return ctx.slots.icon();
+      return ctx.slots.icon(props.class);
     },
     "data-slot": "alert-icon",
     get "aria-hidden"() {

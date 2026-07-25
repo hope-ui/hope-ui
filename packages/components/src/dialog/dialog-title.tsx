@@ -1,6 +1,5 @@
 import { createDialogTitle } from "@hope-ui/primitives/dialog";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -15,7 +14,7 @@ export const Title: Component<DialogTitleProps> = (props) => {
 
   const elementProps = merge(title.props, {
     get class(): string {
-      return cx(ctx.slots.title(), props.class) ?? "";
+      return ctx.slots.title(props.class);
     },
     "data-slot": "dialog-title",
   });

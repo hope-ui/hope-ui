@@ -1,6 +1,5 @@
 import { createListboxSeparator } from "@hope-ui/primitives/listbox";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
 import { useListboxContext } from "./listbox-context";
@@ -23,7 +22,7 @@ export function Separator(props: ListboxSeparatorProps): JSX.Element {
 
   const elementProps = merge(separator.props, {
     get class(): string {
-      return cx(ctx.slots.separator(), props.class) ?? "";
+      return ctx.slots.separator(props.class);
     },
     "data-slot": "listbox-separator",
   });

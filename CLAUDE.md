@@ -51,6 +51,7 @@ pnpm test:browser         # vitest run --project=browser (real Chromium, DOM + h
 pnpm storybook            # visual harness on :6006 (the only non-test feedback loop)
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
+pnpm check:class-forwarding # fails if a part's `get class()` drops the consumer's class (or omits it and never reads it)
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
 pnpm check:rtl-safety     # fails on a physical directional class (pl-/pr-/left-/text-right/…), CSSOM write or CSS declaration — packages + apps/docs
 pnpm changeset            # NOT needed while the repo is at v0.0.0 — see "Changesets"
@@ -223,6 +224,18 @@ warning, Listbox's scroll container — with no error. Pick the render target fo
   With no hook, `const rest = omit(props, …)` then `merge(rest, { … })` in the component.
 - **An attribute the component must own** (`aria-hidden` on `Listbox.ItemIndicator`, `data-slot`
   everywhere) goes in the object merged *after* `rest`, with a comment saying why it isn't forwardable.
+- **`class` is the one attribute the part computes rather than forwards, and it goes through the slot
+  fn**: `class={ctx.slots.item(props.class)}` (root: `slots.root(merged.class)`). Never
+  `cx(ctx.slots.item(), props.class)` — a second concat *outside* the recipe's `{ class }` seam, so
+  tailwind-merge never sees the consumer's utility and both conflicting classes ship. `useSlots` has
+  no root-only `class` option; the argument is the whole mechanism. Dropping it (`merge(rest, { get
+  class() { return ctx.slots.icon(); } })`, five Alert parts) type-checks fine, so it is **enforced**:
+  `pnpm check:class-forwarding` fails a `get class()` whose slot fn takes no consumer class, and an
+  `omit(props, …, "class")` with no matching read. An element with no consumer to forward from
+  (`CalendarCell`, built from a model) is exempted with a `class-forwarding-ok: <reason>` comment on
+  the getter. The runtime counterpart —
+  `packages/components/src/__tests__/part-class-forwarding.browser.test.tsx` — asserts the class on
+  the element for every part it lists; **add each new part to it**, the script cannot see the DOM.
 
 **Extending the native attributes is not forwarding, and nothing fails when they diverge.** Both
 shipped bugs were silent: `Calendar.Root` declared no native attributes *and* called

@@ -1,6 +1,5 @@
 import { createDialogBackdrop } from "@hope-ui/primitives/dialog";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit, Show } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -17,7 +16,7 @@ export const Backdrop: Component<DialogBackdropProps> = (props) => {
 
   const elementProps = merge(backdrop.props, {
     get class(): string {
-      return cx(ctx.slots.backdrop(), props.class) ?? "";
+      return ctx.slots.backdrop(props.class);
     },
     "data-slot": "dialog-backdrop",
   });

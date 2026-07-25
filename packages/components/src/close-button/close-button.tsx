@@ -88,7 +88,6 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
     recipe: "closeButton",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // `createButton` owns the element-aware a11y props, disabled-gating, and the press engine. `type` is
@@ -146,7 +145,7 @@ export const CloseButton: Component<CloseButtonProps> = (props) => {
       // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
       // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
       // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
-      return slots.root();
+      return slots.root(merged.class);
     },
     get "aria-label"() {
       // The consumer's `aria-label` (or `aria-labelledby`, which wins at the ARIA level) takes

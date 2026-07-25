@@ -1,6 +1,5 @@
 import { createCalendarGrid } from "@hope-ui/primitives/calendar";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { For, merge, omit, Show } from "solid-js";
 import { CalendarCell } from "./calendar-cell";
@@ -84,7 +83,7 @@ export function Grid(props: CalendarGridProps): JSX.Element {
   const elementProps = merge(grid.props, {
     "data-slot": "calendar-grid",
     get class(): string {
-      return cx(ctx.slots.grid(), props.class) ?? "";
+      return ctx.slots.grid(props.class);
     },
     children,
   });

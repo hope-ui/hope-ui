@@ -26,6 +26,7 @@ export {
 } from "./semantic-tokens";
 export { cn, cx, tv } from "./styling";
 export {
+  type SlotClassAccessor,
   ThemeProvider,
   type ThemeProviderProps,
   type UseDefaultsOptions,

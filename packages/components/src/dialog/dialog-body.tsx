@@ -1,5 +1,4 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -16,7 +15,7 @@ export const Body: Component<DialogBodyProps> = (props) => {
 
   const elementProps = merge(rest, {
     get class(): string {
-      return cx(ctx.slots.body(), props.class) ?? "";
+      return ctx.slots.body(props.class);
     },
     "data-slot": "dialog-body",
   });

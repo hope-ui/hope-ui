@@ -122,6 +122,24 @@ or exempted by an `rtl-ok: <reason>` comment on the line. Preset recipes additio
 is what reaches a third-party preset and a `compoundVariant`-assembled class. See
 `__internal__/theming.md` ("RTL-aware recipes").
 
+**Class forwarding** (`pnpm check:class-forwarding`, `scripts/check-class-forwarding.mjs`): a part's
+`get class()` folds the consumer's `class` into its slot fn — `ctx.slots.item(props.class)`, root
+`slots.root(merged.class)`. Two source shapes fail it: a slot call with an empty argument list inside
+that getter, and an `omit(props, …, "class")` with no matching `props.class`/`merged.class` read
+(the part that renders no slot class at all, like `Dialog.Trigger`). Both drop the consumer's class
+while type-checking, passing the component's suite, and leaving the docs promising the merge — which
+is how it shipped in five `Alert` parts, after the same family hit `Calendar.Root` and
+`Listbox.ItemIndicator`. A slot call in a JSX attribute (`class={slots.label()}`) is **not** flagged:
+that is a component's internal chrome — Button's label/decorators, Badge's dot — which no consumer
+can address. An element with no consumer at all (`CalendarCell`, built by `Calendar.Grid` from a
+model) is exempted by a `class-forwarding-ok: <reason>` comment on the getter or its comment block.
+
+The script is static, so it is paired with a runtime pin,
+`packages/components/src/__tests__/part-class-forwarding.browser.test.tsx`, which renders every
+public part with a probe class and asserts it **on the element**. Neither subsumes the other: the
+script sees every file but no DOM, the test sees the DOM but only the parts it lists by hand — so
+**a new part is added to that test**, and the script covers whoever forgets.
+
 Every component (not pure internal primitives with no DOM output) also needs an SSR **and** a
 hydration round-trip test, and `check:coverage-parity` enforces both: a `Foo.ssr.test.tsx` that
 *calls* `renderToStringAsync`, and a `Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means

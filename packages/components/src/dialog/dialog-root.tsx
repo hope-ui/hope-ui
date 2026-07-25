@@ -35,8 +35,6 @@ export interface DialogRootProps extends CreateDialogOptions, DialogThemeablePro
    * Tailwind scanner can see them.
    */
   slotClasses?: SlotClasses<"dialog">;
-  /** Forwarded to `useSlots`. Dialog has no `root` slot, so per-part styling goes through `slotClasses`. */
-  class?: string;
   children?: JSX.Element;
 }
 
@@ -72,7 +70,6 @@ export const Root: Component<DialogRootProps> = (props) => {
       scrollBehavior: merged.scrollBehavior,
     }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // `createDialog` reads only its own option keys off `merged` (open/defaultOpen/onOpenChange/modal/

@@ -1,5 +1,5 @@
 import { createComponentContext } from "@hope-ui/primitives/internal";
-import type { AlertSlot } from "@hope-ui/theming";
+import type { AlertSlot, SlotClassAccessor } from "@hope-ui/theming";
 
 /**
  * The shared state every Alert part reads. `slots` is the ready-to-call class fn per slot; `setOpen`
@@ -8,7 +8,7 @@ import type { AlertSlot } from "@hope-ui/theming";
  * it (SSR-linked directly in the auto-compose path, registered post-hydration in the compound path).
  */
 export interface AlertContextValue {
-  slots: Record<AlertSlot, () => string>;
+  slots: Record<AlertSlot, SlotClassAccessor>;
   setOpen: (open: boolean) => void;
   registerTitleId: (id: string | undefined) => void;
   registerDescriptionId: (id: string | undefined) => void;

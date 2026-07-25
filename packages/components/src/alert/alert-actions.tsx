@@ -9,11 +9,11 @@ export interface AlertActionsProps extends JSX.HTMLAttributes<HTMLDivElement> {
 
 export const Actions: Component<AlertActionsProps> = (props) => {
   const ctx = useAlertContext();
-  const rest = omit(props, "render");
+  const rest = omit(props, "render", "class");
 
   const elementProps = merge(rest, {
     get class(): string {
-      return ctx.slots.actions();
+      return ctx.slots.actions(props.class);
     },
     "data-slot": "alert-actions",
   });

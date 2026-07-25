@@ -148,7 +148,6 @@ export const Button: Component<ButtonProps> = (props) => {
       loaderPlacement: isLoading() ? loaderEffectivePlacement() : undefined,
     }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // `createButton` owns the element-aware a11y props, disabled-gating, and the press engine. The
@@ -229,7 +228,7 @@ export const Button: Component<ButtonProps> = (props) => {
 
   const elementProps = merge(rest, button.buttonProps, {
     get class(): string {
-      return slots.root();
+      return slots.root(merged.class);
     },
     // The accessible loading signal. Byte-stable: `loading` is the same on the server and initial
     // client, so a non-loading button emits no `aria-busy` on either.

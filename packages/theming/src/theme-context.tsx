@@ -147,23 +147,40 @@ export interface UseSlotsOptions<K extends keyof RecipeRegistry> {
   variantsProps: Accessor<CompleteVariantsOf<K>>;
   /** Per-instance slot overrides, folded in after the preset's global `slotClasses`. */
   slotClasses?: Accessor<SlotClasses<K> | undefined>;
-  /** The consumer's root `class`, applied **last** and to the `root` slot only. */
-  class?: Accessor<string | undefined>;
 }
 
 /**
- * Returns one ready-to-call class function per slot, each folding the full override chain in order:
- * **recipe base → preset `slotClasses` → instance `slotClasses` → `class` (root slot only)**. `cx`
- * orders the overrides (later wins); the final tailwind-merge happens inside the recipe's own
+ * One slot's ready-to-call class function. The argument is **that element's consumer `class`** — the
+ * one a part receives as `props.class` — folded in last, inside the recipe's own `{ class }` seam, so
+ * it wins conflicting utilities through tailwind-merge (`class="p-8"` replaces the recipe's `p-4`
+ * rather than sitting beside it).
+ *
+ * Every part passes its own `class` here: `class={ctx.slots.item(props.class)}`. Re-appending it
+ * outside the seam — `cx(ctx.slots.item(), props.class)` — is what this argument exists to replace:
+ * it costs a second concat, returns `string | undefined`, and leaves both conflicting utilities on the
+ * element with the winner decided by stylesheet order.
+ *
+ * Typed `JSX.ClassValue` (not `string`) because that is exactly what a part holds: Solid's `class`
+ * attribute is the clsx-style union (`string | number | boolean | Record<string, boolean> | …`), and
+ * `cx` accepts all of it. Narrowing to `string` would push a cast onto every part that forwards a
+ * native `class`.
+ */
+export type SlotClassAccessor = (consumerClass?: JSX.ClassValue) => string;
+
+/**
+ * Returns one {@link SlotClassAccessor} per slot, each folding the full override chain in order:
+ * **recipe base → preset `slotClasses` → instance `slotClasses` → the slot's own `class` argument**.
+ * `cx` orders the overrides (later wins); the final tailwind-merge happens inside the recipe's own
  * `{ class }` seam, so a later utility beats an earlier conflicting one. The preset's global
  * `slotClasses` is resolved per call — its function form is invoked with the current `variantsProps()`.
  *
- * Each returned fn reads `variantsProps()`/`slotClasses()`/`class()` when called, so calling it
- * inside a `class={slots.root()}` binding tracks exactly those inputs.
+ * Each returned fn reads `variantsProps()`/`slotClasses()` when called, so calling it inside a
+ * `class={slots.root(props.class)}` binding tracks exactly those inputs plus the `class` read at the
+ * call site.
  */
 export function useSlots<K extends keyof RecipeRegistry>(
   options: UseSlotsOptions<K>,
-): Record<RecipeSlotsOf<K>, () => string> {
+): Record<RecipeSlotsOf<K>, SlotClassAccessor> {
   const preset = useTheme();
   // Cast to the concrete callable shape: `RecipeRegistry[K]` for a generic `K` is an indexed-access
   // type TS won't treat as callable, but every registry entry is exactly a `SlotRecipeFn`. A recipe
@@ -187,18 +204,17 @@ export function useSlots<K extends keyof RecipeRegistry>(
     return typeof input === "function" ? input(options.variantsProps()) : input;
   };
 
-  const slots = {} as Record<RecipeSlotsOf<K>, () => string>;
+  const slots = {} as Record<RecipeSlotsOf<K>, SlotClassAccessor>;
   for (const slot of slotNames) {
-    slots[slot] = () => {
+    slots[slot] = (consumerClass) => {
       const presetSlot = resolvePresetSlotClasses()?.[slot];
       const instanceSlot = options.slotClasses?.()?.[slot];
-      const rootClass = slot === "root" ? options.class?.() : undefined;
       // `CompleteVariantsOf<K>` is `RecipeVariantsOf<K>` with every key required-*present* (values may
       // be `undefined`), so it is always a valid recipe argument. The cast only bridges the generic
       // indexed access: across a multi-recipe registry TS can't prove the per-`K` variant unions line
       // up (a single-entry registry collapsed them, hiding this) — the runtime call is unaffected.
       return recipe(options.variantsProps() as RecipeVariantsOf<K>)[slot]({
-        class: cx(presetSlot, instanceSlot, rootClass),
+        class: cx(presetSlot, instanceSlot, consumerClass),
       });
     };
   }

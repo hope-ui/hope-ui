@@ -1,6 +1,5 @@
 import { createCalendarHeading } from "@hope-ui/primitives/calendar";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
 import { useCalendarContext } from "./calendar-context";
@@ -24,7 +23,7 @@ export function Heading(props: CalendarHeadingProps): JSX.Element {
   const elementProps = merge(heading.props, {
     "data-slot": "calendar-heading",
     get class(): string {
-      return cx(ctx.slots.heading(), props.class) ?? "";
+      return ctx.slots.heading(props.class);
     },
     get children(): JSX.Element {
       return props.children ?? ctx.state.headingLabel();

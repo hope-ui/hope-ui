@@ -1,5 +1,4 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -16,7 +15,7 @@ export const Footer: Component<DialogFooterProps> = (props) => {
 
   const elementProps = merge(rest, {
     get class(): string {
-      return cx(ctx.slots.footer(), props.class) ?? "";
+      return ctx.slots.footer(props.class);
     },
     "data-slot": "dialog-footer",
   });

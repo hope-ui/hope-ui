@@ -1,8 +1,15 @@
 import { createRoot } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { type CompleteVariantsOf, definePreset, type Preset, type PresetConfig } from "../preset";
+import {
+  type CompleteVariantsOf,
+  definePreset,
+  type Preset,
+  type PresetConfig,
+  type SlotClasses,
+} from "../preset";
 import type { RecipeRegistry } from "../recipe-registry";
 import type { SlotRecipeFn } from "../slot-recipe";
+import { tv } from "../styling";
 import { ThemeProvider, useDefaults, useRecipe, useSlots, useTheme } from "../theme-context";
 
 // Unit (node, client build): the pure-logic half of the provider — the `use*` hooks reading a
@@ -203,7 +210,7 @@ describe("useDefaults — precedence instance ?? preset ?? builtin", () => {
 });
 
 describe("useSlots — precedence recipe base → preset → instance → class", () => {
-  it("composes preset, instance, and (root-only) class in order over the recipe base", () => {
+  it("composes preset, instance, and the slot's own class argument in order over the recipe base", () => {
     const preset = demoPreset({
       components: { demo: { slotClasses: { root: "preset-root", label: "preset-label" } } },
     });
@@ -212,14 +219,54 @@ describe("useSlots — precedence recipe base → preset → instance → class"
         recipe,
         variantsProps: () => ({ ...fullVariants, size: "sm" }),
         slotClasses: () => ({ root: "instance-root" }),
-        class: () => "consumer-class",
       });
-      return { root: slots.root(), label: slots.label() };
+      return { root: slots.root("consumer-class"), label: slots.label(), bare: slots.root() };
     });
-    // root folds in every layer, in order; the consumer `class` lands last and only on root.
+    // Every layer, in order; the `class` argument lands last, inside the recipe's own `{ class }` seam.
     expect(out.root).toBe("base-root preset-root instance-root consumer-class");
-    // label gets the preset layer but no instance override and never the root-only `class`.
+    // label gets the preset layer but no instance override, and no `class` was passed to it.
     expect(out.label).toBe("base-label preset-label");
+    // Omitting the argument is exactly the pre-`class` chain — no stray separator, no `undefined`.
+    expect(out.bare).toBe("base-root preset-root instance-root");
+  });
+
+  // The point of the argument over a second `cx(slots.x(), props.class)` at the call site: the class
+  // goes *through* the recipe's `{ class }` seam, so `tv`'s tailwind-merge resolves the conflict and
+  // the consumer's utility replaces the recipe's. Appending outside that seam leaves both on the
+  // element, with the winner decided by stylesheet order. Uses the real `tv`, not the synthetic
+  // `join` recipe above, since the merge is what's under test.
+  it("routes the class argument through the recipe's tailwind-merge seam", () => {
+    const merging = tv({ slots: { root: "p-4 text-sm" } }) as unknown as RecipeRegistry["button"];
+    const preset = definePreset({ demo: merging } as unknown as RecipeRegistry);
+    const root = inProvider(preset, () =>
+      useSlots({ recipe, variantsProps: () => fullVariants }).root("p-8"),
+    );
+    expect(root).toBe("text-sm p-8");
+  });
+
+  // …and the merge spans the *whole* chain, not just base-vs-argument. `useSlots` hands the recipe a
+  // single `cx(preset, instance, consumer)` string — `cx` is a plain concat (`"p-5 p-6 p-8"`), so it
+  // is `tv` that collapses the four conflicting paddings to the last one. Worth pinning separately:
+  // the precedence the docs promise is only real because tailwind-merge reaches inside that argument.
+  it("collapses conflicting utilities across the whole override chain, last layer winning", () => {
+    const merging = tv({
+      slots: { root: "p-4 rounded-xl text-sm" },
+    }) as unknown as RecipeRegistry["button"];
+    const preset = definePreset(
+      { demo: merging } as unknown as RecipeRegistry,
+      {
+        components: { demo: { slotClasses: { root: "p-5" } } },
+      } as unknown as PresetConfig,
+    );
+    const root = inProvider(preset, () =>
+      useSlots({
+        recipe,
+        variantsProps: () => fullVariants,
+        slotClasses: () => ({ root: "p-6" }) as SlotClasses<"button">,
+      }).root("p-8"),
+    );
+    // One padding survives — the consumer's — while the non-conflicting base classes are untouched.
+    expect(root).toBe("rounded-xl text-sm p-8");
   });
 
   it("resolves the preset slotClasses function form with the current variantsProps", () => {

@@ -330,6 +330,41 @@ describe("Alert", () => {
     dispose();
   });
 
+  // Each compound part declares the native `<div>`/`<span>` attributes, `class` among them, but until
+  // every part routed its own `class` through its slot fn (`ctx.slots.icon(props.class)`) the computed
+  // class getter simply won the `merge` and the consumer's string vanished — silently, with green tests
+  // and a passing typecheck. Assert it on the element, never on the props type.
+  it("merges each part's own class onto that part's slot", async () => {
+    const { container, dispose } = mount(() => (
+      <Themed>
+        <Alert.Root colorScheme="info">
+          <Alert.Icon class="icon-class" />
+          <Alert.Content class="content-class">
+            <Alert.Title class="title-class">Custom</Alert.Title>
+            <Alert.Description class="description-class">Explicit parts.</Alert.Description>
+          </Alert.Content>
+          <Alert.Actions class="actions-class">
+            <button type="button">Undo</button>
+          </Alert.Actions>
+        </Alert.Root>
+      </Themed>
+    ));
+
+    for (const [slot, consumerClass] of [
+      ["alert-icon", "icon-class"],
+      ["alert-content", "content-class"],
+      ["alert-title", "title-class"],
+      ["alert-description", "description-class"],
+      ["alert-actions", "actions-class"],
+    ]) {
+      expect(container.querySelector(`[data-slot="${slot}"]`)?.className).toContain(consumerClass);
+    }
+    // The recipe's own classes survive the merge — the consumer's `class` is folded in, not swapped in.
+    expect(container.querySelector('[data-slot="alert-content"]')?.className).toContain("flex");
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+
   it("folds instance slotClasses in per slot", async () => {
     const { container, dispose } = mount(() => (
       <Themed>

@@ -30,6 +30,8 @@ export function CalendarCell(props: { model: CalendarCellModel }): JSX.Element {
     as: "button",
     props: merge(cell.triggerProps, {
       "data-slot": "calendar-cell-trigger",
+      // class-forwarding-ok: not a public part — `Calendar.Grid` builds every cell from a model, so
+      // there is no consumer `class` to fold in. Style it through `slotClasses.cellTrigger`.
       get class(): string {
         return ctx.slots.cellTrigger();
       },
@@ -43,6 +45,7 @@ export function CalendarCell(props: { model: CalendarCellModel }): JSX.Element {
     as: "td",
     props: merge(cell.props, {
       "data-slot": "calendar-cell",
+      // class-forwarding-ok: same as the trigger above — internal, model-driven, no consumer props.
       get class(): string {
         return ctx.slots.cell();
       },

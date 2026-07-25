@@ -17,13 +17,13 @@ export const Title: Component<AlertTitleProps> = (props) => {
   // write past the synchronous render body (`onSettled`) so it never trips `REACTIVE_WRITE_IN_OWNED_SCOPE`.
   createRegisteredId({ id, register: ctx.registerTitleId });
 
-  const rest = omit(props, "render");
+  const rest = omit(props, "render", "class");
   const elementProps = merge(rest, {
     get id(): string {
       return id();
     },
     get class(): string {
-      return ctx.slots.title();
+      return ctx.slots.title(props.class);
     },
     "data-slot": "alert-title",
   });

@@ -16,6 +16,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
+    "check:class-forwarding": "node scripts/check-class-forwarding.mjs",
     "check:coverage-parity": "node scripts/check-coverage-parity.mjs",
     "check:recipe-purity": "node scripts/check-recipe-purity.mjs",
     "check:rtl-safety": "node scripts/check-rtl-safety.mjs",

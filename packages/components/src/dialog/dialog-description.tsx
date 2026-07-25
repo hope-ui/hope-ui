@@ -1,6 +1,5 @@
 import { createDialogDescription } from "@hope-ui/primitives/dialog";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -15,7 +14,7 @@ export const Description: Component<DialogDescriptionProps> = (props) => {
 
   const elementProps = merge(description.props, {
     get class(): string {
-      return cx(ctx.slots.description(), props.class) ?? "";
+      return ctx.slots.description(props.class);
     },
     "data-slot": "dialog-description",
   });

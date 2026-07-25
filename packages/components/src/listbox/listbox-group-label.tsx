@@ -1,6 +1,5 @@
 import { createListboxGroupLabel } from "@hope-ui/primitives/listbox";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
 import { useListboxContext, useListboxGroupContext } from "./listbox-context";
@@ -24,7 +23,7 @@ export function GroupLabel(props: ListboxGroupLabelProps): JSX.Element {
 
   const elementProps = merge(label.props, {
     get class(): string {
-      return cx(ctx.slots.groupLabel(), props.class) ?? "";
+      return ctx.slots.groupLabel(props.class);
     },
     "data-slot": "listbox-group-label",
   });

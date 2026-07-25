@@ -1,5 +1,4 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit, Show } from "solid-js";
 import { useDialogContext } from "./dialog-context";
@@ -20,7 +19,7 @@ export const Positioner: Component<DialogPositionerProps> = (props) => {
 
   const elementProps = merge(omit(props, "render", "class"), {
     get class(): string {
-      return cx(ctx.slots.positioner(), props.class) ?? "";
+      return ctx.slots.positioner(props.class);
     },
     "data-slot": "dialog-positioner",
     get "data-presence"(): string {

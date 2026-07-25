@@ -80,3 +80,9 @@ jobs:
       # while the whole suite stays green. See __internal__/theming.md ("RTL-aware recipes").
       - name: RTL safety check
         run: pnpm check:rtl-safety
+
+      # A part's `get class()` folds the consumer's `class` into its slot fn. Overwriting it instead
+      # type-checks, passes the component's own suite, and keeps the docs promising the merge — it
+      # shipped that way in five Alert parts. See CLAUDE.md ("Every public part forwards its DOM props").
+      - name: Class forwarding check
+        run: pnpm check:class-forwarding

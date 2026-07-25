@@ -1,6 +1,5 @@
 import { createListboxGroup } from "@hope-ui/primitives/listbox";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
 import {
@@ -27,7 +26,7 @@ export function Group(props: ListboxGroupProps): JSX.Element {
 
   const elementProps = merge(group.props, {
     get class(): string {
-      return cx(ctx.slots.group(), props.class) ?? "";
+      return ctx.slots.group(props.class);
     },
     "data-slot": "listbox-group",
   });

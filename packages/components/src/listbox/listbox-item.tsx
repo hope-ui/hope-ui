@@ -1,6 +1,5 @@
 import { type CreateListboxReturn, createListboxItem } from "@hope-ui/primitives/listbox";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createSignal, merge, omit } from "solid-js";
 import {
@@ -87,7 +86,7 @@ export function Item<V = unknown>(props: ListboxItemProps<V>): JSX.Element {
     item.props,
     {
       get class(): string {
-        return cx(ctx.slots.item(), props.class) ?? "";
+        return ctx.slots.item(props.class);
       },
       "data-slot": "listbox-item",
     },

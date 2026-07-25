@@ -78,7 +78,6 @@ export const Badge: Component<BadgeProps> = (props) => {
       fullWidth: merged.fullWidth,
     }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   const rest = omit(
@@ -143,7 +142,7 @@ export const Badge: Component<BadgeProps> = (props) => {
       // `useSlots` already folded the override chain into the root slot fn — recipe base → preset
       // `slotClasses` → instance `slotClasses` → `class` — with the final tailwind-merge inside the
       // recipe's `{ class }` seam, so a later utility wins a conflict without a separate `cn`.
-      return slots.root();
+      return slots.root(merged.class);
     },
     // The root's own slot marker; parts use the `badge-<part>` convention (a component-prefixed slot).
     "data-slot": "badge",

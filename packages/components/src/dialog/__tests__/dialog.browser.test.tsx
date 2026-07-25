@@ -821,6 +821,39 @@ describe("Dialog", () => {
     dispose();
   });
 
+  // A part's `class` goes *through* its slot fn (`ctx.slots.content(props.class)`), so it lands inside
+  // the recipe's own `{ class }` seam and `tv`'s tailwind-merge drops the conflicting recipe utility.
+  // Concatenating it after the fact (`cx(slots.content(), props.class)`) leaves both `rounded-xl` and
+  // `rounded-none` on the element, with the winner decided by stylesheet order — the docs promise the
+  // consumer's utility wins, so pin that here and not just on the root slot.
+  it("lets a non-root part's class win the conflict with its recipe slot", async () => {
+    const { dispose } = mount(() => (
+      <Themed>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content
+                class="rounded-none"
+                style={{ position: "fixed", top: "0", left: "0" }}
+              >
+                <Dialog.Title>Delete project</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </Themed>
+    ));
+    await expect.element(page.getByRole("dialog")).toBeInTheDocument();
+
+    const content = document.querySelector('[data-slot="dialog-content"]')?.className ?? "";
+    expect(content).toContain("rounded-none");
+    expect(content).not.toMatch(/(?:^|\s)rounded-xl(?:\s|$)/);
+    // Non-conflicting recipe classes are untouched.
+    expect(content).toContain("bg-surface-overlay");
+    await expectNoA11yViolations(document.body);
+    dispose();
+  });
+
   it("auto-renders a corner CloseTrigger by default, which closes the dialog", async () => {
     const { dispose } = mount(() => <StyledDialog />);
     const close = page.getByRole("button", { name: "Close" });

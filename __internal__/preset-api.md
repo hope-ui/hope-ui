@@ -65,8 +65,9 @@ hope's — is again the answer, and is why `theme.css` is a separate opt-out imp
 
 ### D4 — `slotClasses`, composed by a `useSlots` utility
 
-- **Name is `slotClasses`** for both the preset (global) and the per-instance component prop. The
-  root-only `class` prop stays as a shorthand, applied last.
+- **Name is `slotClasses`** for both the preset (global) and the per-instance component prop. A
+  part's own `class` prop stays as the shorthand for that one slot, applied last (see D6 — it is an
+  argument to the slot fn, so every part gets it, not just the root).
 - **Per-slot record**, each slot a `ClassValue`, typed to the component's slot union. Static literals
   are the common case and are **fully Tailwind-scannable** in consumer source.
 - **Function form (preset only):** `(props) => Partial<Record<Slot, ClassValue>>`. Loud doc warning:
@@ -119,9 +120,14 @@ hence the `use*` prefix:
   defaults in one call (precedence: instance ?? preset ?? builtin). Returns the merged props (lazy
   getters) the component uses **everywhere**, not just for styling — see the merged-props rule in
   `__internal__/solid-2.0-notes.md`.
-- **`useSlots({ recipe, variants, slotClasses?, class? })`** — returns ready-to-call per-slot class
-  functions that already fold in the recipe base, preset `slotClasses`, instance `slotClasses`, and
-  (root only) `class`.
+- **`useSlots({ recipe, variants, slotClasses? })`** — returns ready-to-call per-slot class functions
+  that already fold in the recipe base, preset `slotClasses`, and instance `slotClasses`. **Each takes
+  that part's own `class` as its argument** (`class={ctx.slots.item(props.class)}`), folded in last.
+  There is no root-only `class` option: a per-part argument covers the root (`slots.root(merged.class)`)
+  and every other slot with one mechanism, and — because the class rides the recipe's own `{ class }`
+  seam — the consumer's utility wins conflicts on *every* slot, not just the root. The alternative,
+  `cx(ctx.slots.item(), props.class) ?? ""` at each call site, was a second concat that skipped that
+  seam.
 
 `useRecipe` stays as the low-level seam; `useDefaults`/`useSlots` are the standard pattern for all
 components.
@@ -184,8 +190,10 @@ export function useSlots<K extends keyof RecipeRegistry>(options: {
   recipe: K;
   variants: Accessor<RecipeVariantsOf<K>>;
   slotClasses?: Accessor<SlotClasses<K> | undefined>; // instance overrides
-  class?: Accessor<string | undefined>;               // root slot only, applied last
-}): Record<RecipeSlotsOf<K>, () => string>;
+}): Record<RecipeSlotsOf<K>, SlotClassAccessor>;
+
+// One slot's class fn: the argument is that part's own `class`, applied last.
+export type SlotClassAccessor = (consumerClass?: JSX.ClassValue) => string;
 ```
 
 A component body then reduces to two utility calls (`Button` is the reference); add `"slotClasses"`
@@ -200,12 +208,14 @@ nests `withDefaults(withDefaults(props, presetDefaultProps(key)), builtins)`. `w
 each key with `??`, yielding `instance ?? preset ?? builtin`, with lazy getters (Solid 2.0-correct;
 **never `merge`**, which resolves by presence — see `__internal__/solid-2.0-notes.md`).
 
-**Slot classes** — `recipe base → preset slotClasses → instance slotClasses → class (root only)`, via
-`useSlots`, which builds each slot as
-`recipe(variants())[slot]({ class: cx(presetSlot, instanceSlot, slot === "root" ? rootClass : undefined) })`.
+**Slot classes** — `recipe base → preset slotClasses → instance slotClasses → the part's own class`,
+via `useSlots`, which builds each slot as
+`recipe(variants())[slot]({ class: cx(presetSlot, instanceSlot, consumerClass) })`.
 `cx` orders the overrides (later wins); the **final tailwind-merge happens inside the recipe's
 `SlotClassFn({ class })`** via `tv` (base first, later override classes win conflicts). This reuses
-the existing `{ class }` seam — no new merge machinery.
+the existing `{ class }` seam — no new merge machinery. The part's `class` is the slot fn's argument
+precisely so it enters *that* seam: appended after the fact it would skip tailwind-merge, leaving both
+conflicting utilities on the element.
 
 ---
 

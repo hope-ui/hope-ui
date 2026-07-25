@@ -1,5 +1,4 @@
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { merge, omit } from "solid-js";
 import { useCalendarContext } from "./calendar-context";
@@ -27,7 +26,7 @@ export function Header(props: CalendarHeaderProps): JSX.Element {
   const elementProps = merge(rest, {
     "data-slot": "calendar-header",
     get class(): string {
-      return cx(ctx.slots.header(), props.class) ?? "";
+      return ctx.slots.header(props.class);
     },
   });
   return renderElement<CalendarHeaderProps>({

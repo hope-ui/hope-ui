@@ -102,7 +102,6 @@ export function Root(props: CalendarRootProps): JSX.Element {
     recipe: "calendar",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // `createCalendar` reads only its own option keys off `merged` (locale/selection/boundaries/focus/
@@ -218,7 +217,7 @@ export function Root(props: CalendarRootProps): JSX.Element {
         props: merge(group.props, {
           "data-slot": "calendar",
           get class(): string {
-            return slots.root();
+            return slots.root(merged.class);
           },
           /* `dir` is the one `createCalendar` option that is also a real HTML attribute, and the two
           halves of RTL travel down different channels: the grid's column order and the recipe's

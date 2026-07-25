@@ -121,7 +121,6 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
     recipe: "listbox",
     variantsProps: () => ({ size: merged.size }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // `createListbox` reads only its own option keys off `merged` (value/selection/focus/orientation/
@@ -223,7 +222,7 @@ export function Root<V = unknown>(props: ListboxRootProps<V>): JSX.Element {
   // warning measures the applied layout against.
   const elementProps = merge(rest, state.rootProps, {
     get class(): string {
-      return slots.root();
+      return slots.root(merged.class);
     },
     "data-slot": "listbox",
     // `dir` is the one `createListbox` option that is also a real HTML attribute, and the two halves

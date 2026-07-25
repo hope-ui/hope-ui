@@ -152,7 +152,6 @@ export const Root: Component<AlertProps> = (props) => {
       size: merged.size,
     }),
     slotClasses: () => merged.slotClasses,
-    class: () => merged.class,
   });
 
   // Controlled/uncontrolled open state → presence-driven mount. `defaultOpen` defaults to `true`, so a
@@ -286,7 +285,7 @@ export const Root: Component<AlertProps> = (props) => {
 
     const elementProps = merge(rest, {
       get class(): string {
-        return slots.root();
+        return slots.root(merged.class);
       },
       "data-slot": "alert",
       get "data-presence"(): string {

@@ -1,7 +1,6 @@
 import { type CreateDialogContentProps, createDialogContent } from "@hope-ui/primitives/dialog";
 import { type RenderProp, renderElement } from "@hope-ui/primitives/render";
 import { withDefaults } from "@hope-ui/primitives/utils";
-import { cx } from "@hope-ui/theming";
 import type { JSX } from "@solidjs/web";
 import { type Component, merge, omit, Show } from "solid-js";
 import { CloseTrigger } from "./dialog-close-trigger";
@@ -39,7 +38,7 @@ export const Content: Component<DialogContentProps> = (props) => {
   // the recipe `class` + the auto CloseTrigger.
   const elementProps = merge(content.props, {
     get class(): string {
-      return cx(ctx.slots.content(), merged.class) ?? "";
+      return ctx.slots.content(merged.class);
     },
     "data-slot": "dialog-content",
     get children(): JSX.Element {
