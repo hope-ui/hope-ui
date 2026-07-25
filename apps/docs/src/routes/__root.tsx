@@ -33,43 +33,56 @@ export const Route = createRootRoute({
     ],
   }),
   errorComponent: (props) => (
-    <RootLayout>
-      <DefaultCatchBoundary {...props} />
-    </RootLayout>
+    <AppProviders>
+      <RootLayout>
+        <DefaultCatchBoundary {...props} />
+      </RootLayout>
+    </AppProviders>
   ),
   notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
 
-function RootComponent() {
-  // ThemeProvider must DIRECTLY wrap <Outlet/> in the same component that writes
-  // the Outlet. Placing it in a separate layout component that receives the
-  // Outlet as `children` puts the Outlet in the parent's owner scope, above the
-  // provider — so useTheme() in a routed component can't see the context and
-  // throws "must be rendered inside a ThemeProvider root". Context flows through
-  // Solid's owner graph, not the DOM tree. I18nProvider is subject to the same
-  // rule, hence both here rather than in RootLayout.
-  //
-  // The explicit `locale` is this site following its own advice (get-started/i18n,
-  // "Server side rendering"): every page is prerendered, and pinning the locale is
-  // the deterministic form — no detection, so nothing re-renders after hydration and a
-  // demo's readout never disagrees with the prose around it. `en-US` matches the
-  // site's English copy and `<html lang>`; demos showcasing other locales nest
-  // their own provider.
+// Theme and locale for the whole app — above <html>, so the site chrome (SiteHeader's hope-ui
+// Buttons), the routed page, and the error/not-found boundaries all resolve the same context.
+// Both providers are zero-DOM, so wrapping the document costs no markup.
+//
+// `props.children` is read INSIDE the JSX and never destructured in the signature. Context flows
+// through Solid's owner graph, not the DOM tree: a destructured `children` is evaluated when this
+// component is called, in the caller's owner scope — above these providers — so every useTheme()
+// below would throw "must be rendered inside a ThemeProvider root".
+//
+// The explicit `locale` is this site following its own advice (get-started/i18n, "Server side
+// rendering"): every page is prerendered, and pinning the locale is the deterministic form — no
+// detection, so nothing re-renders after hydration and a demo's readout never disagrees with the
+// prose around it. `en-US` matches the site's English copy and `<html lang>`/`<html dir>`; demos
+// showcasing other locales nest their own provider.
+function AppProviders(props: { children: JSX.Element }) {
   return (
-    <RootLayout>
-      <ThemeProvider preset={hope}>
-        <I18nProvider locale="en-US">
-          <Outlet />
-        </I18nProvider>
-      </ThemeProvider>
-    </RootLayout>
+    <ThemeProvider preset={hope}>
+      <I18nProvider locale="en-US">{props.children}</I18nProvider>
+    </ThemeProvider>
+  );
+}
+
+function RootComponent() {
+  return (
+    <AppProviders>
+      <RootLayout>
+        <Outlet />
+      </RootLayout>
+    </AppProviders>
   );
 }
 
 function RootLayout({ children }: { children: JSX.Element }) {
   return (
-    <html lang="en">
+    // `dir` is the other half of the locale AppProviders pins: hope-ui takes arrow-key direction
+    // from the locale and layout direction from the cascade, so declaring only one leaves the two
+    // free to disagree (get-started/i18n, "Reading direction"). Written statically rather than from
+    // an effect because every page is prerendered English — the form that guide gives for a locale
+    // the server already knows. An RTL demo still overrides it on its own subtree.
+    <html lang="en" dir="ltr">
       <head>
         <HeadContent />
       </head>

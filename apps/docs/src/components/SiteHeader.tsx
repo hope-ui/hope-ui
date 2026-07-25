@@ -1,15 +1,19 @@
+import { Button } from "@hope-ui/components/button";
+import type { JSX } from "@solidjs/web";
 import { Link } from "@tanstack/solid-router";
-import { createSignal, For, onSettled, Show } from "solid-js";
-import { BrandLogoIcon, MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
+import { createSignal, For, omit, onSettled, Show } from "solid-js";
+import { BrandLogoIcon, GitHubIcon, MoonIcon, SearchIcon, SunIcon } from "~/components/Icons";
 import { MobileNav } from "~/components/MobileNav";
 import { SITE } from "~/config";
 import { PRIMARY_NAV } from "~/lib/nav";
 
 // The primary top navigation bar: brand + version badge on the left, the section
-// tabs (active tab rendered as a filled pill), and a search field + theme toggle
-// on the right. Sticky and full-bleed, matching the docs-site shell. Lives outside
-// the ThemeProvider (it uses only Tailwind utilities, never useTheme()), so it also
-// renders on the error/not-found boundaries.
+// tabs (active tab rendered as a filled pill), and a search field, repo link and
+// theme toggle on the right. Sticky and full-bleed, matching the docs-site shell.
+// The two icon affordances are real hope-ui Buttons, so the site's own chrome is
+// dogfooding the library; that needs a ThemeProvider above the header, which is why
+// `__root.tsx` mounts the providers around <html> — on the error and not-found
+// boundaries too, where this header also renders.
 //
 // The section tabs collapse below `md`; on small viewports MobileNav (the hamburger
 // + drawer, rendered in the right cluster) is the sole navigation. Both read the
@@ -25,6 +29,19 @@ const TAB = [
   "not-data-[status=active]:hover:bg-surface-raised-hovered not-data-[status=active]:hover:text-foreground",
   "data-[status=active]:bg-primary data-[status=active]:text-on-primary",
 ].join(" ");
+
+// `md` is the 32px icon-only square. `ghost`/`neutral` is the recipe's quietest chrome, and the
+// label slot carries the header's own muted foreground so the icons sit at the weight of the nav
+// text rather than the recipe's `neutral-emphasis`.
+const ICON_BUTTON = {
+  iconOnly: true,
+  variant: "ghost",
+  colorScheme: "neutral",
+  size: "md",
+  slotClasses: {
+    label: "text-foreground-muted",
+  },
+} as const;
 
 // Client-only light/dark switch. It toggles `.dark` on <html>, which is what the
 // hope preset's `dark` variant keys on. The initial state is read after mount
@@ -50,16 +67,41 @@ function ThemeToggle() {
   };
 
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      class="grid size-9 place-items-center rounded-md text-foreground-muted transition-colors hover:bg-surface-raised-hovered hover:text-foreground"
-      aria-label="Toggle dark mode"
-    >
-      <Show when={dark()} fallback={<MoonIcon class="size-4.5" />}>
-        <SunIcon class="size-4.5" />
+    <Button {...ICON_BUTTON} onClick={toggle} aria-label="Toggle dark mode">
+      <Show when={dark()} fallback={<MoonIcon />}>
+        <SunIcon />
       </Show>
-    </button>
+    </Button>
+  );
+}
+
+// The repo link. `nativeButton={false}` switches Button to the non-native a11y model
+// (role/tabIndex + keyboard synthesis) for the swapped-in <a>, the same boundary the
+// homepage CTAs cross — see `__internal__/primitives/render/render.md`.
+function RepositoryLink() {
+  return (
+    <Button
+      {...ICON_BUTTON}
+      nativeButton={false}
+      aria-label={`${SITE.name} on GitHub`}
+      render={(buttonProps) => (
+        // Button types `render`'s props against its own <button>; the cast is the documented
+        // cost of crossing to an anchor (render.md, "cross-element `render` typing").
+        //
+        // `role` is omitted rather than overwritten: this navigates, and an <a href> already
+        // announces as a link, so the non-native model's `role="button"` would misname it.
+        // Everything else that model brings is still wanted — the press engine adds Space
+        // activation on top of the anchor's native Enter.
+        <a
+          {...(omit(buttonProps, "role") as unknown as JSX.AnchorHTMLAttributes<HTMLAnchorElement>)}
+          href={SITE.repository}
+          target="_blank"
+          rel="noreferrer"
+        />
+      )}
+    >
+      <GitHubIcon />
+    </Button>
   );
 }
 
@@ -98,6 +140,7 @@ export function SiteHeader() {
               ⌘K
             </kbd>
           </button>
+          <RepositoryLink />
           <ThemeToggle />
           <MobileNav />
         </div>

@@ -14,4 +14,6 @@ export const SITE = {
   description: "Elegant, themeable, accessible components for SolidJS.",
   /** Product version shown in the header badge. */
   version: "early-preview",
+  /** Public source repository — the header's GitHub link. */
+  repository: "https://github.com/hope-ui/hope-ui",
 } as const;
