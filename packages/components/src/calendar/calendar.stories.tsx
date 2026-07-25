@@ -21,14 +21,7 @@ type Story = StoryObj<typeof meta>;
 function CalendarDemo(props: CalendarRootProps): JSX.Element {
   return (
     <ThemeProvider preset={hope}>
-      <Calendar.Root {...props}>
-        <Calendar.Header>
-          <Calendar.PrevButton aria-label="Previous">‹</Calendar.PrevButton>
-          <Calendar.Heading />
-          <Calendar.NextButton aria-label="Next">›</Calendar.NextButton>
-        </Calendar.Header>
-        <Calendar.Grid />
-      </Calendar.Root>
+      <Calendar.Root {...props} />
     </ThemeProvider>
   );
 }
@@ -108,11 +101,10 @@ export const WeekStartsMonday: Story = {
 };
 
 export const RightToLeft: Story = {
-  render: () => (
-    <div dir="rtl">
-      <CalendarDemo defaultFocusedValue={june} dir="rtl" locale="ar-EG" />
-    </div>
-  ),
+  // No `dir` wrapper: `Calendar.Root` emits its own `dir` prop onto the group element, so the prop
+  // alone mirrors the CSS layout as well as flipping the arrow keys. A wrapper here would hide a
+  // regression in exactly that.
+  render: () => <CalendarDemo defaultFocusedValue={june} dir="rtl" locale="ar-EG" />,
 };
 
 export const Today: Story = {

@@ -305,11 +305,9 @@ digits here, for free.
 </Preview>
 
 ```tsx
-<div dir="rtl">
-  <I18nProvider locale="ar-EG">
-    <Calendar.Root />
-  </I18nProvider>
-</div>
+<I18nProvider locale="ar-EG">
+  <Calendar.Root dir="rtl" />
+</I18nProvider>
 ```
 
 <Alert.Root
@@ -318,10 +316,12 @@ digits here, for free.
   class="not-prose"
   description={
     <div>
-      The provider supplies the reading direction (so arrow keys and the day numbers flip); the{" "}
-      <code>dir="rtl"</code> on an ancestor is what mirrors the CSS layout. Set{" "}
-      <code>dir</code> once on your document root — see{" "}
-      <a href="#">Reading direction</a> in the i18n guide — and the whole app follows.
+      The provider supplies the reading direction (so arrow keys and the day numbers flip), but it
+      renders no DOM — so something still has to tell the <em>browser</em> to mirror the layout.
+      Normally that is <code>dir</code> on your document root, set once — see{" "}
+      <a href="#">Reading direction</a> in the i18n guide — and the whole app follows.{" "}
+      <code>dir</code> on <code>Calendar.Root</code>, as above, is the escape hatch for mirroring a
+      single calendar inside an otherwise LTR page.
     </div>
   }
 />
