@@ -34,6 +34,7 @@
 // and utils/ still need one. See `isDocExemptSource` below.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, sep } from "node:path";
+import { blankNonCode } from "./lib/source-projection.mjs";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
 const packagesDir = join(repoRoot, "packages");
@@ -119,104 +120,6 @@ function isSsrTestFile(path) {
 
 function isBrowserTestFile(path) {
   return /\.browser\.test\.tsx?$/.test(path);
-}
-
-/**
- * Blanks the *contents* of comments, string/template literals and regex literals, preserving
- * every character offset. Lets the two checks below reason about code positions only: an
- * `it.skip("hydrates (x)")` stays paren-balanced, and a `renderToStringAsync` mentioned in a
- * comment or inside a string is no longer mistaken for a call.
- *
- * This exists because the SSR requirement used to be `source.includes("renderToStringAsync")`,
- * which `Dialog.browser.test.tsx` satisfied three ways at once — a prose comment, a bare
- * import, and a call inside an `it.skip`. None of them ran.
- *
- * @param {string} source
- */
-function blankNonCode(source) {
-  const out = source.split("");
-  /** The last significant code character, used to tell a regex literal from a division. */
-  let previous = "";
-  let index = 0;
-
-  /** @param {number} from @param {number} to */
-  const blank = (from, to) => {
-    for (let i = from; i < to; i++) {
-      if (out[i] !== "\n") {
-        out[i] = " ";
-      }
-    }
-  };
-
-  while (index < source.length) {
-    const char = source[index];
-    const next = source[index + 1];
-
-    if (char === "/" && next === "/") {
-      const end = source.indexOf("\n", index);
-      const stop = end === -1 ? source.length : end;
-      blank(index, stop);
-      index = stop;
-      continue;
-    }
-
-    if (char === "/" && next === "*") {
-      const end = source.indexOf("*/", index + 2);
-      const stop = end === -1 ? source.length : end + 2;
-      blank(index, stop);
-      index = stop;
-      continue;
-    }
-
-    if (char === '"' || char === "'" || char === "`") {
-      let i = index + 1;
-      while (i < source.length) {
-        if (source[i] === "\\") {
-          i += 2;
-        } else if (source[i] === char) {
-          break;
-        } else {
-          i++;
-        }
-      }
-      blank(index + 1, Math.min(i, source.length));
-      index = Math.min(i + 1, source.length);
-      previous = char;
-      continue;
-    }
-
-    // A `/` starting an expression is a regex literal; after a value it is division.
-    if (char === "/" && (previous === "" || "(,=:[!&|?{};+-*%~^".includes(previous))) {
-      let i = index + 1;
-      let inClass = false;
-      while (i < source.length) {
-        if (source[i] === "\\") {
-          i += 2;
-        } else if (source[i] === "[") {
-          inClass = true;
-          i++;
-        } else if (source[i] === "]") {
-          inClass = false;
-          i++;
-        } else if (source[i] === "\n" || (source[i] === "/" && !inClass)) {
-          break;
-        } else {
-          i++;
-        }
-      }
-      blank(index + 1, Math.min(i, source.length));
-      index = Math.min(i + 1, source.length);
-      previous = "/";
-      continue;
-    }
-
-    if (!/\s/.test(/** @type {string} */ (char))) {
-      previous = /** @type {string} */ (char);
-    }
-    index++;
-  }
-
-  return out.join("");
 }
 
 /**

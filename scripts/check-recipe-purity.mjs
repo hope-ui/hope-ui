@@ -16,9 +16,11 @@
 // strings/comments are noise to blank away; here, the flagged patterns are exactly the ones that
 // appear inside a class **string literal**. So this scans string-literal interiors only — code,
 // comments (incl. this file's own doc examples and a recipe's header comment mentioning `color-mix`),
-// and regex literals are blanked first, leaving offsets intact for line-accurate reporting.
+// and regex literals are blanked first, leaving offsets intact for line-accurate reporting. Both
+// projections live in `scripts/lib/source-projection.mjs`.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { lineAt, stringInteriors } from "./lib/source-projection.mjs";
 
 const repoRoot = new URL("..", import.meta.url).pathname;
 // Per the redesign spec, purity is a rule about the concrete preset recipes only.
@@ -58,95 +60,6 @@ function isRecipeSourceFile(path) {
   return SOURCE_EXTENSIONS.has(ext);
 }
 
-/**
- * Projects `source` onto its string-literal interiors: every character that is code, a comment, or
- * a regex literal becomes a space (newlines preserved, so character offsets — and therefore line
- * numbers — are unchanged), and only the contents of `"`/`'`/`` ` `` literals survive. The patterns
- * below then match *only* what a recipe actually emits as a class, never a comment or the tokenizer's
- * own regexes. Adapted (inverted) from check-coverage-parity's `blankNonCode`.
- *
- * @param {string} source
- */
-function stringInteriors(source) {
-  const out = source.split("").map((c) => (c === "\n" ? "\n" : " "));
-  /** Last significant code char — tells a regex literal from a division. */
-  let previous = "";
-  let index = 0;
-
-  /** @param {number} from @param {number} to */
-  const keep = (from, to) => {
-    for (let i = from; i < to && i < source.length; i++) {
-      out[i] = source[i];
-    }
-  };
-
-  while (index < source.length) {
-    const char = source[index];
-    const next = source[index + 1];
-
-    if (char === "/" && next === "/") {
-      const end = source.indexOf("\n", index);
-      index = end === -1 ? source.length : end;
-      continue;
-    }
-
-    if (char === "/" && next === "*") {
-      const end = source.indexOf("*/", index + 2);
-      index = end === -1 ? source.length : end + 2;
-      continue;
-    }
-
-    if (char === '"' || char === "'" || char === "`") {
-      let i = index + 1;
-      while (i < source.length) {
-        if (source[i] === "\\") {
-          i += 2;
-        } else if (source[i] === char) {
-          break;
-        } else {
-          i++;
-        }
-      }
-      keep(index + 1, Math.min(i, source.length));
-      index = Math.min(i + 1, source.length);
-      previous = char;
-      continue;
-    }
-
-    // A `/` starting an expression is a regex literal; after a value it is division. Either way it
-    // is code, so it stays blanked — we only skip past it correctly.
-    if (char === "/" && (previous === "" || "(,=:[!&|?{};+-*%~^".includes(previous))) {
-      let i = index + 1;
-      let inClass = false;
-      while (i < source.length) {
-        if (source[i] === "\\") {
-          i += 2;
-        } else if (source[i] === "[") {
-          inClass = true;
-          i++;
-        } else if (source[i] === "]") {
-          inClass = false;
-          i++;
-        } else if (source[i] === "\n" || (source[i] === "/" && !inClass)) {
-          break;
-        } else {
-          i++;
-        }
-      }
-      index = Math.min(i + 1, source.length);
-      previous = "/";
-      continue;
-    }
-
-    if (!/\s/.test(/** @type {string} */ (char))) {
-      previous = /** @type {string} */ (char);
-    }
-    index++;
-  }
-
-  return out.join("");
-}
-
 // The forbidden shapes, each a global regex over the string-literal projection. `opacity-0` and
 // `opacity-100` (full transparent / opaque) are legitimate layout, so the magic-opacity pattern only
 // matches 1–99; the `opacity-*` *tokens* (`opacity-disabled`) never match — they have no digits.
@@ -172,17 +85,6 @@ const PATTERNS = [
     hint: "use an opacity-* token (opacity-disabled / opacity-loading); opacity-0 and opacity-100 are allowed",
   },
 ];
-
-/** @param {string} text @param {number} offset */
-function lineAt(text, offset) {
-  let line = 1;
-  for (let i = 0; i < offset && i < text.length; i++) {
-    if (text[i] === "\n") {
-      line++;
-    }
-  }
-  return line;
-}
 
 let recipeFiles;
 try {

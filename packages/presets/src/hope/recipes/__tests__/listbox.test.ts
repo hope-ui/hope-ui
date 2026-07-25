@@ -1,18 +1,25 @@
 import type { ListboxRecipeVariants, ListboxSize } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { listboxRecipe } from "../listbox";
 
 const SIZES: ListboxSize[] = ["sm", "md", "lg"];
 const SLOTS = ["root", "item", "itemIndicator", "group", "groupLabel", "separator"] as const;
+const CASES: ListboxRecipeVariants[] = [
+  undefined as unknown as ListboxRecipeVariants,
+  ...SIZES.map((size) => ({ size })),
+];
 
 describe("hope listbox recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
-    const cases: ListboxRecipeVariants[] = [
-      undefined as unknown as ListboxRecipeVariants,
-      ...SIZES.map((size) => ({ size })),
-    ];
-    assertSlotRecipeConformance(listboxRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(listboxRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(listboxRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("renders a plain in-flow list with no popup chrome by default (standalone-first)", () => {
@@ -43,7 +50,8 @@ describe("hope listbox recipe", () => {
     // `relative` anchors the absolute indicator; the row is non-selectable text.
     expect(item).toContain("relative");
     expect(item).toContain("select-none");
-    expect(item).toContain("pr-8");
+    // Logical, so the gutter mirrors with the locale instead of stranding the glyph on the label.
+    expect(item).toContain("pe-8");
   });
 
   it("dims and de-activates a disabled row through the opacity-disabled token", () => {
@@ -55,7 +63,7 @@ describe("hope listbox recipe", () => {
   it("pins the item indicator in the trailing gutter", () => {
     const indicator = listboxRecipe({}).itemIndicator();
     expect(indicator).toContain("absolute");
-    expect(indicator).toContain("right-2");
+    expect(indicator).toContain("end-2");
     expect(indicator).toContain("[&_svg]:size-4");
   });
 

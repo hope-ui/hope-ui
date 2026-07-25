@@ -4,7 +4,10 @@ import type {
   AlertSize,
   AlertVariant,
 } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { alertRecipe } from "../alert";
 
@@ -33,17 +36,24 @@ const SLOTS = [
 const STYLED_SLOTS = SLOTS.filter((slot) => slot !== "description");
 const UNSTYLED_SLOTS = ["description"] as const;
 
+const CASES: AlertRecipeVariants[] = [
+  undefined as unknown as AlertRecipeVariants,
+  ...VARIANTS.flatMap((variant) => COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme }))),
+  ...SIZES.map((size) => ({ size })),
+];
+
 describe("hope alert recipe", () => {
   it("produces a class for every styled slot (description stays a present, unstyled slot)", () => {
-    const cases: AlertRecipeVariants[] = [
-      undefined as unknown as AlertRecipeVariants,
-      ...VARIANTS.flatMap((variant) =>
-        COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme })),
-      ),
-      ...SIZES.map((size) => ({ size })),
-    ];
     assertSlotRecipeConformance(alertRecipe, {
-      cases,
+      cases: CASES,
+      slots: STYLED_SLOTS,
+      unstyledSlots: UNSTYLED_SLOTS,
+    });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(alertRecipe, {
+      cases: CASES,
       slots: STYLED_SLOTS,
       unstyledSlots: UNSTYLED_SLOTS,
     });

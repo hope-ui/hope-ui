@@ -80,7 +80,8 @@ default path is one theme per build.
    so their utilities win.
 4. Add the matching `tailwind-variants` slot recipe (authored with the shared `tv` from
    `@hope-ui/theming`; internal state authored as conditions **nested inside** consumer-facing
-   variants — never a top-level `state` axis) to each preset under `@hope-ui/presets/*`.
+   variants — never a top-level `state` axis) to each preset under `@hope-ui/presets/*`. Every
+   directional utility in it is **logical** — see [RTL-aware recipes](#rtl-aware-recipes).
 
 ## Adding a preset
 
@@ -136,6 +137,71 @@ token CSS — for hope, its `theme.css` read as a string in `hope.test.ts`. The 
 axis** (`SEMANTIC_OPACITY_TOKENS`) has the same requirement and its own mirror check,
 `checkOpacityTokenConformance` / `assertOpacityTokenConformance`, over the same CSS. Both are the
 token analog of the recipe axis's `checkSlotRecipeConformance`.
+
+## RTL-aware recipes
+
+hope-ui supports RTL from day one. For the styling layer that is a property of the **classes a
+recipe emits**, not a per-component flag: `pr-8` reserves a gutter on the right in every locale,
+while `pe-8` reserves it on the side the text *ends* — the same edge in `ltr`, the mirrored one in
+`rtl`. A physical utility never fails loudly. It mis-paints for every Arabic/Hebrew/Farsi reader
+while the variant matrix, the snapshots and axe all stay green. (The real case: hope's Listbox pinned
+its check glyph with `absolute right-2` inside a `pr-8` gutter, so in RTL the glyph landed on top of
+the label and the reserved gutter sat on the empty side.)
+
+**The rule: a recipe uses logical directional utilities only.**
+
+| Physical — never | Logical — always |
+|---|---|
+| `pl-*` / `pr-*` | `ps-*` / `pe-*` |
+| `ml-*` / `mr-*` | `ms-*` / `me-*` |
+| `left-*` / `right-*` | `start-*` / `end-*` |
+| `border-l*` / `border-r*` | `border-s*` / `border-e*` |
+| `rounded-l*` `rounded-r*` `rounded-tl*` `rounded-tr*` `rounded-bl*` `rounded-br*` | `rounded-s*` `rounded-e*` `rounded-ss*` `rounded-se*` `rounded-es*` `rounded-ee*` |
+| `text-left` / `text-right` | `text-start` / `text-end` |
+| `float-left` / `float-right`, `clear-left` / `clear-right` | `float-start`/`-end`, `clear-start`/`-end` |
+| `scroll-pl-*` `scroll-pr-*` `scroll-ml-*` `scroll-mr-*` | `scroll-ps-*` `scroll-pe-*` `scroll-ms-*` `scroll-me-*` |
+
+**Already logical in Tailwind v4 — leave them alone.** `px-*` (`padding-inline`), `mx-*`,
+`inset-x-*`, `border-x-*`, `space-x-*` and `divide-x-*` are all flow-relative; `space-x-*` and
+`divide-x-*` changed from physical in v3, so v3 habits mislead here. Block-axis utilities
+(`rounded-t-*`, `border-b`, `py-*`, `mt-*`) and flex/grid alignment (`justify-end`, `items-start`,
+`order-first`) are direction-invariant or already flow-relative.
+
+**Two sanctioned exemptions.**
+1. **An `rtl:`/`ltr:`-scoped utility** is a deliberate manual flip and is correct — it is the escape
+   hatch for a rule no logical property can express. hope's calendar mirrors its chevrons with
+   `rtl:[&_svg]:rotate-180`.
+2. **An `rtl-ok: <reason>` comment** on the offending line (or the one above it), for a case neither
+   a logical property nor an `rtl:` variant covers. Same philosophy as `expectNoA11yViolations`'
+   `allowIncomplete` — name the specific case with a reason, never silence the category. A bare
+   `rtl-ok:` with no reason does not count.
+
+**Correctly physical, and deliberately out of scope.** `origin-left`/`origin-right` —
+`transform-origin` has no portable logical keyword, so there is no replacement to point at.
+`_base/_variants.css`'s `data-placement-left`/`data-placement-right` — floating-ui's placement
+vocabulary is *physical by design* (`__internal__/reference-implementations.md` § createFloating),
+so the variant name matches the attribute value it selects. And `createFloating` writes its computed
+coordinates to `left`/`top`: `inset-inline-start` there would double-flip under RTL.
+
+**Enforced on both halves**, because neither alone is enough:
+
+- `pnpm check:rtl-safety` (`scripts/check-rtl-safety.mjs`) scans this repo's source. Pass 1 reads
+  string-literal interiors and matches whole tokens, so a comment naming `pr-8` cannot trip it;
+  pass 2 reads the code projection for CSSOM writes (`.style.paddingRight = …`), which is how
+  `createScrollLock` was compensating the scrollbar on the wrong edge in every RTL locale.
+- `checkLogicalPropertyConformance` / `assertLogicalPropertyConformance`
+  (`@hope-ui/theming/conformance`) run against a *resolved* recipe across its variant matrix, so
+  they reach a **third-party preset** and a class only a `compoundVariant` assembles at call time.
+  Each preset recipe test calls it beside `assertSlotRecipeConformance`.
+
+The rule table is canonical in `PHYSICAL_UTILITIES` (`packages/theming/src/conformance.ts`); a drift
+guard in that package's `conformance.test.ts` fails if the script's copy diverges.
+
+**Not covered.** The scan reads `.ts`/`.tsx` under `packages/{presets,components,primitives}/src`
+only — the three packages that author classes or write style properties. Directional CSS in a
+preset's `theme.css` is on review, and `apps/docs` is outside the scan roots. `packages/theming` is
+excluded on purpose: it authors no classes, and it holds the rule table itself, whose entries name
+every forbidden utility as a string literal.
 
 ## Semantic token vocabulary
 
@@ -342,6 +408,7 @@ only that theme's recipes reference them); the conformance check polices only th
 | 10 | Reference preset | shadcn-flavored baseline shipped as the default `@hope-ui/presets/hope` |
 | 11 | Recipe purity | recipes reference *finished* tokens only — no `color-mix`, alpha modifier (`bg-x/50`), or magic opacity (`opacity-90`); derived colors (`focus-halo`, `scrim`) are authored in the preset's `theme.css`. Enforced by `pnpm check:recipe-purity` |
 | 12 | Opacity axis | `opacity-disabled` (0.4) / `opacity-loading` (1 in hope — the loader arc conveys the state) — a separate contract (`SEMANTIC_OPACITY_TOKENS`) so recipes never hardcode a magic opacity; adapts Atlassian's opacity tokens |
+| 13 | RTL-aware recipes | a recipe emits **logical** directional utilities only — `ps-`/`pe-`/`ms-`/`me-`/`start-`/`end-`/`border-s`/`rounded-s`/`text-start`, never their `l`/`r` physical twins. An `rtl:`/`ltr:` variant is the sanctioned manual flip; `rtl-ok: <reason>` the named escape hatch. Enforced by `pnpm check:rtl-safety` **and** `assertLogicalPropertyConformance` |
 | — | Naming source | Atlassian `property.role.modifier`, re-spelled flat + Tailwind-first: `surface-*` (elevation), `foreground*` + `{role}-emphasis`/`on-*`, `scrim` |
 
 ## SSR / hydration

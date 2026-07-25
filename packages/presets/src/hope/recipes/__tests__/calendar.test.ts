@@ -1,5 +1,8 @@
 import type { CalendarRecipeVariants, CalendarSize } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { calendarRecipe } from "../calendar";
 
@@ -16,13 +19,18 @@ const SLOTS = [
   "cellTrigger",
 ] as const;
 
+const CASES: CalendarRecipeVariants[] = [
+  undefined as unknown as CalendarRecipeVariants,
+  ...SIZES.map((size) => ({ size })),
+];
+
 describe("hope calendar recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
-    const cases: CalendarRecipeVariants[] = [
-      undefined as unknown as CalendarRecipeVariants,
-      ...SIZES.map((size) => ({ size })),
-    ];
-    assertSlotRecipeConformance(calendarRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(calendarRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(calendarRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("renders a plain in-flow calendar with no popup chrome by default (standalone-first)", () => {

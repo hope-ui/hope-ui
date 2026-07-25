@@ -562,3 +562,94 @@ describe("Listbox hydration", () => {
     dispose();
   });
 });
+
+// ─── RTL ────────────────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The `browser` project ships **no Tailwind stylesheet** — only Storybook and `apps/docs` run
+ * `@tailwindcss/vite` — so the recipe's classes resolve to nothing here and every box would measure
+ * identically in both directions.
+ *
+ * These are Tailwind v4's own declarations for the utilities under test, plus the two positioning
+ * ones the indicator's placement depends on (without them the glyph is a static inline element and
+ * `end-2` means nothing). Asserting **both** directions is what keeps this honest: a regression to
+ * `pr-8`/`pl-1.5`/`right-2` finds no matching rule at all, both directions collapse onto the same
+ * geometry, and the assertions fail rather than quietly passing.
+ */
+function injectLogicalUtilities(): () => void {
+  const style = document.createElement("style");
+  style.textContent = `
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .pe-8 { padding-inline-end: 2rem; }
+    .ps-1\\.5 { padding-inline-start: 0.375rem; }
+    .end-2 { inset-inline-end: 0.5rem; }
+  `;
+  document.head.appendChild(style);
+  return () => style.remove();
+}
+
+function DirectionalListbox(props: { dir: "ltr" | "rtl" }): JSX.Element {
+  return (
+    <div dir={props.dir} style={{ width: "320px" }}>
+      <FruitListbox selectionMode="single" />
+    </div>
+  );
+}
+
+/** Selects the first row so `Listbox.ItemIndicator` renders, and returns its box next to the row's. */
+async function selectAndMeasure(container: HTMLElement) {
+  await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+  await userEvent.click(nth(options(container), 0));
+
+  const row = nth(options(container), 0);
+  const indicator = row.querySelector<HTMLElement>('[data-slot="listbox-item-indicator"]');
+  if (indicator == null) {
+    throw new Error("no item indicator rendered — the row was not selected");
+  }
+  return { row, style: window.getComputedStyle(row), rows: row.getBoundingClientRect(), indicator };
+}
+
+describe("Listbox — RTL", () => {
+  it("mirrors the indicator gutter to the LEFT edge under dir=rtl", async () => {
+    const removeStyle = injectLogicalUtilities();
+    const { container, dispose } = mount(() => <DirectionalListbox dir="rtl" />);
+
+    const { style, rows, indicator } = await selectAndMeasure(container);
+
+    // `pe-8` reserves the glyph gutter on the side the text ENDS — the LEFT edge in an RTL row —
+    // while `ps-1.5` insets the label from the right, where the row now starts. Both flipped.
+    expect(style.paddingLeft).toBe("32px");
+    expect(style.paddingRight).toBe("6px");
+
+    // `end-2` puts the check glyph inside that gutter, i.e. against the row's visual left edge.
+    const glyph = indicator.getBoundingClientRect();
+    expect(glyph.left - rows.left).toBeLessThan(rows.right - glyph.right);
+
+    removeStyle();
+    dispose();
+  });
+
+  it("keeps the same gutter on the RIGHT edge under dir=ltr", async () => {
+    const removeStyle = injectLogicalUtilities();
+    const { container, dispose } = mount(() => <DirectionalListbox dir="ltr" />);
+
+    const { style, rows, indicator } = await selectAndMeasure(container);
+
+    expect(style.paddingRight).toBe("32px");
+    expect(style.paddingLeft).toBe("6px"); // ps-1.5, the md density's leading inset
+
+    const glyph = indicator.getBoundingClientRect();
+    expect(rows.right - glyph.right).toBeLessThan(glyph.left - rows.left);
+
+    removeStyle();
+    dispose();
+  });
+
+  it("has no accessibility violations under dir=rtl", async () => {
+    const { container, dispose } = mount(() => <DirectionalListbox dir="rtl" />);
+    await vi.waitFor(() => expect(options(container)).toHaveLength(4));
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});

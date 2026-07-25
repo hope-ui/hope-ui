@@ -74,3 +74,9 @@ jobs:
       # consumer that redefines that base silently breaks. See __internal__/theming.md ("recipe purity").
       - name: Recipe purity check
         run: pnpm check:recipe-purity
+
+      # Layout is pinned to a logical side, never a physical one. A `pr-8` reserves its gutter on
+      # the right in every locale, so it does not fail loudly — it mis-paints for every RTL reader
+      # while the whole suite stays green. See __internal__/theming.md ("RTL-aware recipes").
+      - name: RTL safety check
+        run: pnpm check:rtl-safety

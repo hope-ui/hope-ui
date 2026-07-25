@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertLogicalPropertyConformance,
   assertOpacityTokenConformance,
   assertSemanticTokenConformance,
   assertSlotRecipeConformance,
+  checkLogicalPropertyConformance,
   checkOpacityTokenConformance,
   checkSemanticTokenConformance,
   checkSlotRecipeConformance,
@@ -112,5 +114,87 @@ describe("opacity token conformance", () => {
     expect(() => assertOpacityTokenConformance("--hope-opacity-disabled: 0.4;")).toThrow(
       /Opacity token conformance failed/,
     );
+  });
+});
+
+describe("logical-property (RTL) conformance", () => {
+  /** A one-slot recipe whose classes the test controls directly. */
+  const recipeEmitting = (classes: string): SlotRecipeFn<DemoVariants, "root"> => {
+    return () => ({ root: () => classes });
+  };
+  const rootOnly = { cases: [{}] as DemoVariants[], slots: ["root"] as const };
+
+  it("passes a recipe built entirely from logical utilities", () => {
+    const recipe = recipeEmitting("flex ps-2 pe-8 ms-auto -me-1 end-2 rounded-s-md text-end");
+    expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
+    expect(() => assertLogicalPropertyConformance(recipe, rootOnly)).not.toThrow();
+  });
+
+  it("reports a physical utility and names the logical replacement", () => {
+    const result = checkLogicalPropertyConformance(recipeEmitting("relative pr-8"), rootOnly);
+    expect(result.ok).toBe(false);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0]).toContain('"pr-8"');
+    expect(result.errors[0]).toContain("pe-*");
+    expect(() => assertLogicalPropertyConformance(recipeEmitting("pr-8"), rootOnly)).toThrow(
+      /Logical-property \(RTL\) conformance failed/,
+    );
+  });
+
+  it("leaves Tailwind v4's already-logical axis shorthands alone", () => {
+    // These compile to `padding-inline` / `margin-inline` / `inset-inline` / `border-inline-*`, so
+    // flagging them would fire on nearly every recipe in the repo while fixing nothing.
+    const recipe = recipeEmitting("px-4 mx-2 -mx-4 inset-x-0 border-x space-x-2 divide-x");
+    expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
+  });
+
+  it("does not mistake a longer utility for a physical one", () => {
+    const recipe = recipeEmitting(
+      "border-blue-500 rounded-t-xl border-t pre-wrap origin-center order-first",
+    );
+    expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
+  });
+
+  it("allows a physical utility that an rtl:/ltr: variant deliberately flips", () => {
+    // The one shape where physical is correct — an explicit manual flip, or a rule no logical
+    // property can express (hope's calendar mirrors its chevrons with `rtl:[&_svg]:rotate-180`).
+    const recipe = recipeEmitting("ltr:pr-8 rtl:pl-8 rtl:[&_svg]:rotate-180");
+    expect(checkLogicalPropertyConformance(recipe, rootOnly).ok).toBe(true);
+  });
+
+  it("strips a variant chain before matching, including arbitrary variants", () => {
+    const result = checkLogicalPropertyConformance(
+      recipeEmitting("hover:md:data-[slot=x]:[&_svg]:pl-2"),
+      rootOnly,
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]).toContain("ps-*");
+  });
+
+  it("catches a violation only a compound variant introduces", () => {
+    // The reason this runtime half exists alongside the source scan: a class assembled at call time
+    // never appears as a literal the static scan could read.
+    const recipe: SlotRecipeFn<DemoVariants, "root"> = (props) => ({
+      root: () => (props?.variant === "b" ? "flex text-right" : "flex text-end"),
+    });
+    const expectation = {
+      cases: [{}, { variant: "b" }] as DemoVariants[],
+      slots: ["root"] as const,
+    };
+    expect(checkLogicalPropertyConformance(recipe, expectation).ok).toBe(false);
+  });
+
+  it("checks unstyled slots too, and tolerates a slot resolving to no class", () => {
+    const recipe: SlotRecipeFn<DemoVariants, "root" | "hint"> = () => ({
+      root: () => "flex",
+      hint: () => undefined as unknown as string,
+    });
+    expect(
+      checkLogicalPropertyConformance(recipe, {
+        cases: [{}] as DemoVariants[],
+        slots: ["root"],
+        unstyledSlots: ["hint"],
+      }).ok,
+    ).toBe(true);
   });
 });

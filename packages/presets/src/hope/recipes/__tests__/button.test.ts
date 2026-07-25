@@ -4,7 +4,10 @@ import type {
   ButtonSize,
   ButtonVariant,
 } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { buttonRecipe } from "../button";
 
@@ -28,20 +31,23 @@ const COLOR_SCHEMES: ButtonColorScheme[] = [
 const SIZES: ButtonSize[] = ["xs", "sm", "md", "lg", "xl"];
 const SLOTS = ["root", "label", "startDecorator", "endDecorator", "loader"] as const;
 
+const CASES: ButtonRecipeVariants[] = [
+  undefined as unknown as ButtonRecipeVariants,
+  ...VARIANTS.flatMap((variant) => COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme }))),
+  ...SIZES.map((size) => ({ size })),
+  ...SIZES.map((size) => ({ iconOnly: true, size })),
+  { fullWidth: true },
+  { loaderPlacement: "center" as const },
+  { loaderPlacement: "start" as const },
+];
+
 describe("hope button recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
-    const cases: ButtonRecipeVariants[] = [
-      undefined as unknown as ButtonRecipeVariants,
-      ...VARIANTS.flatMap((variant) =>
-        COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme })),
-      ),
-      ...SIZES.map((size) => ({ size })),
-      ...SIZES.map((size) => ({ iconOnly: true, size })),
-      { fullWidth: true },
-      { loaderPlacement: "center" as const },
-      { loaderPlacement: "start" as const },
-    ];
-    assertSlotRecipeConformance(buttonRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(buttonRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(buttonRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("wires each colored variant to its semantic token fill (rest → hovered → pressed)", () => {

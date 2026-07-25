@@ -1,18 +1,26 @@
 import type { CloseButtonRecipeVariants, CloseButtonSize } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { closeButtonRecipe } from "../close-button";
 
 const SIZES: CloseButtonSize[] = ["sm", "md", "lg"];
 const SLOTS = ["root", "icon"] as const;
 
+const CASES: CloseButtonRecipeVariants[] = [
+  undefined as unknown as CloseButtonRecipeVariants,
+  ...SIZES.map((size) => ({ size })),
+];
+
 describe("hope closeButton recipe", () => {
   it("produces a class for every slot across the size axis", () => {
-    const cases: CloseButtonRecipeVariants[] = [
-      undefined as unknown as CloseButtonRecipeVariants,
-      ...SIZES.map((size) => ({ size })),
-    ];
-    assertSlotRecipeConformance(closeButtonRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(closeButtonRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(closeButtonRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("defaults to sm", () => {

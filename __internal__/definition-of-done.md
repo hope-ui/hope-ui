@@ -110,6 +110,18 @@ a color applies a fixed rule to a base it doesn't own, so a consumer redefining 
 broken result. Derived colors (`focus-halo`, `scrim`) are authored as tokens in the preset's
 `theme.css`, where it owns the raw scale. See `__internal__/theming.md`.
 
+**RTL safety** (`pnpm check:rtl-safety`, `scripts/check-rtl-safety.mjs`): every class a recipe,
+component or story emits is direction-relative — `ps-`/`pe-`/`ms-`/`me-`/`start-`/`end-`/`border-s`/
+`rounded-s`/`text-start`, never their `l`/`r` physical twins — and no CSSOM write reaches for
+`.style.paddingRight` and friends. A physical utility never fails loudly: it mis-paints for every
+RTL reader while the variant matrix, the snapshots and axe all stay green. Tailwind v4's axis
+shorthands (`px-*`, `mx-*`, `inset-x-*`, `border-x-*`, `space-x-*`, `divide-x-*`) are already
+logical and are not flagged. A deliberate physical class is spelled with an `rtl:`/`ltr:` variant,
+or exempted by an `rtl-ok: <reason>` comment on the line. Preset recipes additionally run
+`assertLogicalPropertyConformance` (`@hope-ui/theming/conformance`) over their variant matrix, which
+is what reaches a third-party preset and a `compoundVariant`-assembled class. See
+`__internal__/theming.md` ("RTL-aware recipes").
+
 Every component (not pure internal primitives with no DOM output) also needs an SSR **and** a
 hydration round-trip test, and `check:coverage-parity` enforces both: a `Foo.ssr.test.tsx` that
 *calls* `renderToStringAsync`, and a `Foo.browser.test.tsx` that *calls* `hydrate`. "Calls" means

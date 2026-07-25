@@ -19,8 +19,14 @@ interface ScrollLockState {
   count: number;
   /** The body's own `overflow` before the first lock took hold. */
   overflow: string;
-  /** The body's own `padding-right` before the first lock took hold. */
-  paddingRight: string;
+  /**
+   * The body's own `padding-inline-end` before the first lock took hold.
+   *
+   * Logical, not `padding-right`: an RTL engine puts the viewport scrollbar on the **left**, so
+   * physical compensation would move the page by exactly the width this exists to absorb — the
+   * layout shift, doubled, in every RTL locale.
+   */
+  paddingInlineEnd: string;
 }
 
 type ScrollLockHost = HTMLElement & { [LOCK_STATE]?: ScrollLockState };
@@ -31,7 +37,7 @@ function getState(body: ScrollLockHost): ScrollLockState {
     return existing;
   }
 
-  const created: ScrollLockState = { count: 0, overflow: "", paddingRight: "" };
+  const created: ScrollLockState = { count: 0, overflow: "", paddingInlineEnd: "" };
   body[LOCK_STATE] = created;
   return created;
 }
@@ -42,15 +48,15 @@ function lockScroll(): void {
 
   if (state.count === 0) {
     state.overflow = body.style.overflow;
-    state.paddingRight = body.style.paddingRight;
+    state.paddingInlineEnd = body.style.paddingInlineEnd;
 
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     body.style.overflow = "hidden";
     if (scrollbarWidth > 0) {
-      const currentPaddingRight = Number.parseFloat(
-        window.getComputedStyle(body).paddingRight || "0",
+      const currentPaddingInlineEnd = Number.parseFloat(
+        window.getComputedStyle(body).paddingInlineEnd || "0",
       );
-      body.style.paddingRight = `${currentPaddingRight + scrollbarWidth}px`;
+      body.style.paddingInlineEnd = `${currentPaddingInlineEnd + scrollbarWidth}px`;
     }
   }
 
@@ -67,7 +73,7 @@ function unlockScroll(): void {
   }
 
   body.style.overflow = state.overflow;
-  body.style.paddingRight = state.paddingRight;
+  body.style.paddingInlineEnd = state.paddingInlineEnd;
   delete body[LOCK_STATE];
 }
 
@@ -78,7 +84,7 @@ export interface CreateScrollLockOptions {
 
 /**
  * Locks `document.body` scrolling while active, compensating for scrollbar-width layout
- * shift with a matching `padding-right`. Ref-counted on `document.body` so multiple
+ * shift with a matching `padding-inline-end`. Ref-counted on `document.body` so multiple
  * simultaneously active locks (e.g. two overlays open at once) don't restore the body's
  * styles until the last one deactivates — including locks created by a *different installed
  * copy* of this package. See the note on `LOCK_STATE` above.

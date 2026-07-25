@@ -100,7 +100,7 @@ export function Item<V = unknown>(props: ListboxItemProps<V>): JSX.Element {
             const base: JSX.CSSProperties = {
               position: "absolute",
               top: `${virtualItem()?.start ?? 0}px`,
-              left: "0",
+              "inset-inline-start": "0",
               width: "100%",
             };
             const consumer = props.style;

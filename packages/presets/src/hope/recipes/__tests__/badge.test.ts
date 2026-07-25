@@ -5,7 +5,10 @@ import type {
   BadgeSize,
   BadgeVariant,
 } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { badgeRecipe } from "../badge";
 
@@ -22,18 +25,21 @@ const SIZES: BadgeSize[] = ["xs", "sm", "md", "lg"];
 const SHAPES: BadgeShape[] = ["sharp", "rounded", "pill", "circle"];
 const SLOTS = ["root", "label", "startDecorator", "endDecorator", "dot"] as const;
 
+const CASES: BadgeRecipeVariants[] = [
+  undefined as unknown as BadgeRecipeVariants,
+  ...VARIANTS.flatMap((variant) => COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme }))),
+  ...SIZES.map((size) => ({ size })),
+  ...SHAPES.map((shape) => ({ shape })),
+  { fullWidth: true },
+];
+
 describe("hope badge recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
-    const cases: BadgeRecipeVariants[] = [
-      undefined as unknown as BadgeRecipeVariants,
-      ...VARIANTS.flatMap((variant) =>
-        COLOR_SCHEMES.map((colorScheme) => ({ variant, colorScheme })),
-      ),
-      ...SIZES.map((size) => ({ size })),
-      ...SHAPES.map((shape) => ({ shape })),
-      { fullWidth: true },
-    ];
-    assertSlotRecipeConformance(badgeRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(badgeRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(badgeRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("wires solid to the role fill + on-color text + a fill-matched border", () => {

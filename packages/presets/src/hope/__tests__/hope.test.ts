@@ -3,6 +3,7 @@ import { isPreset } from "@hope-ui/theming";
 import {
   assertOpacityTokenConformance,
   assertSemanticTokenConformance,
+  PHYSICAL_UTILITIES,
 } from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { hope } from "..";
@@ -26,5 +27,30 @@ describe("@hope-ui/presets/hope", () => {
 
   it("is a valid, zero-DOM preset (token values live in CSS)", () => {
     expect(isPreset(hope)).toBe(true);
+  });
+
+  it("keeps the RTL rule table in sync between the conformance kit and check-rtl-safety.mjs", () => {
+    // The RTL rule is enforced on two halves that can only diverge silently: the kit runs against a
+    // *resolved* recipe (reaching third-party presets and compound variants), the script scans
+    // source (reaching component class literals, stories and CSSOM writes). Same "read the other
+    // artifact as a string" move as the token checks above.
+    //
+    // Asserted per field rather than as one literal so a reformat can't fail this for a reason that
+    // has nothing to do with the rule set.
+    const script = readFileSync(
+      new URL("../../../../../scripts/check-rtl-safety.mjs", import.meta.url),
+      "utf8",
+    );
+    for (const { test, physical, logical } of PHYSICAL_UTILITIES) {
+      expect(script, `check-rtl-safety.mjs is missing the ${physical} pattern`).toContain(
+        test.source,
+      );
+      expect(script, `check-rtl-safety.mjs is missing the ${physical} rule`).toContain(
+        `physical: "${physical}"`,
+      );
+      expect(script, `check-rtl-safety.mjs is missing the ${logical} replacement`).toContain(
+        `logical: "${logical}"`,
+      );
+    }
   });
 });

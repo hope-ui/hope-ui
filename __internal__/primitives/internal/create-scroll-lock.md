@@ -1,7 +1,7 @@
 # `createScrollLock`
 
 Locks `document.body` scrolling while active, compensating for the scrollbar-width
-layout shift with a matching `padding-right`. Built fresh for hope-ui.
+layout shift with a matching `padding-inline-end`. Built fresh for hope-ui.
 
 ## API
 
@@ -14,10 +14,25 @@ function createScrollLock(options: { active: Accessor<boolean> }): void;
 ## Behavior
 
 Ref-counted: if two locks are active at once (e.g. two overlays open simultaneously), the
-body's original `overflow`/`padding-right` are only snapshotted on the *first* lock and only
+body's original `overflow`/`padding-inline-end` are only snapshotted on the *first* lock and only
 restored once the *last* active lock releases. This makes it safe for multiple independent
 components (a Dialog and a Popover, or two Dialogs) to each call `createScrollLock` without
 one's deactivation prematurely unlocking scroll for the other.
+
+## Why `padding-inline-end`, not `padding-right`
+
+An RTL engine puts the viewport scrollbar on the **left**. Physical compensation would pad the edge
+that did *not* lose the scrollbar, so opening any overlay shifts the page by exactly the width this
+code exists to absorb — silently, and in every RTL locale. The logical property tracks whichever
+edge the scrollbar actually occupied. This is the same rule the recipes follow
+(`__internal__/theming.md`, "RTL-aware recipes", enforced by `pnpm check:rtl-safety`).
+
+**Test coverage note.** The compensation *arithmetic* has no browser coverage: it only runs when
+`window.innerWidth - document.documentElement.clientWidth` is positive, and that is structurally 0
+in the `browser` project — Chromium's headless shell uses overlay scrollbars, and
+`documentElement.clientWidth` reports the viewport rather than the element box, so it cannot be
+faked either. What the tests pin is the property the lock snapshots and restores through, which is
+the part that regressed.
 
 ## Where the ref count lives, and why it matters
 

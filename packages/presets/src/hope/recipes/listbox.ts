@@ -31,12 +31,17 @@
  * Tailwind utility (unpoliced). Every class is a literal string so the consumer's `@source` scan can
  * see it.
  *
+ * ── RTL ─────────────────────────────────────────────────────────────────────────────────────────
+ * Every inset here is logical (`pe-8`, `end-2`, `ps-*`), never physical (`pr-8`, `right-2`, `pl-*`):
+ * the indicator gutter is reserved on the side the text *ends*, so it mirrors with the locale
+ * instead of leaving the glyph on top of the label in `rtl`. Enforced by `pnpm check:rtl-safety`.
+ *
  * ── Single axis: `size` (density) ───────────────────────────────────────────────────────────────
  * Every density value (the row's text / vertical padding / leading padding / gap, and the panel's
  * min width) lives *only* in the `size` variants — `sm`, `md`, and `lg` each carry their full,
  * self-contained set. The base slots carry **no** density class, so a size is applied additively and
- * nothing depends on tailwind-merge stripping a competing base class. The trailing `pr-8` (indicator
- * clearance) and `right-2` indicator placement are size-independent chrome and stay in the base — the
+ * nothing depends on tailwind-merge stripping a competing base class. The trailing `pe-8` (indicator
+ * clearance) and `end-2` indicator placement are size-independent chrome and stay in the base — the
  * glyph box does not change — so only density moves.
  */
 
@@ -58,15 +63,15 @@ export const listboxRecipe = tv({
     // activedescendant mode the container holds focus), not a ring around the whole list. The
     // `min-w-*` floor is a density value and lives per `size`, not here.
     root: "text-foreground overflow-y-auto outline-none",
-    // An `role="option"` row. `relative` anchors the absolute `itemIndicator`; `pr-8` reserves the
+    // An `role="option"` row. `relative` anchors the absolute `itemIndicator`; `pe-8` reserves the
     // trailing glyph gutter. Highlight is `data-active:` ONLY (see the header note) — no `hover:` /
     // bare `:focus` background. `data-disabled:` dims and drops pointer events. `[&_svg]:size-4`
     // sizes a leading icon a consumer drops in. Text / vertical + leading padding / gap are density
     // values and live per `size`, not here.
-    item: "relative flex cursor-default items-center rounded-md pr-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:size-4",
-    // The chosen-row check glyph's placement — pinned in the reserved `pr-8` gutter. Rendered by the
+    item: "relative flex cursor-default items-center rounded-md pe-8 outline-none select-none data-active:bg-active data-active:text-on-active data-disabled:pointer-events-none data-disabled:opacity-disabled [&_svg]:size-4",
+    // The chosen-row check glyph's placement — pinned in the reserved `pe-8` gutter. Rendered by the
     // component only when the row is selected; its color inherits the row's text color.
-    itemIndicator: "absolute right-2 flex items-center justify-center [&_svg]:size-4",
+    itemIndicator: "absolute end-2 flex items-center justify-center [&_svg]:size-4",
     // A `role="group"` section wrapper — a little vertical rhythm around each labelled section; no
     // horizontal inset, so grouped rows stay aligned with ungrouped ones.
     group: "not-last:pb-1",
@@ -78,20 +83,20 @@ export const listboxRecipe = tv({
   variants: {
     // `size` owns the full density set — row text / vertical + leading padding / gap, and the panel's
     // min width. Each size is self-contained (the base carries no competing density class), so a size
-    // applies additively and nothing relies on tailwind-merge resolution. The `pr-8` indicator gutter
-    // and the `right-2` glyph placement are size-independent chrome (in the base) — only density moves.
+    // applies additively and nothing relies on tailwind-merge resolution. The `pe-8` indicator gutter
+    // and the `end-2` glyph placement are size-independent chrome (in the base) — only density moves.
     size: {
       sm: {
         root: "min-w-32",
-        item: "gap-1 py-0.5 pl-1 text-xs",
+        item: "gap-1 py-0.5 ps-1 text-xs",
       },
       md: {
         root: "min-w-36",
-        item: "gap-1.5 py-1 pl-1.5 text-sm",
+        item: "gap-1.5 py-1 ps-1.5 text-sm",
       },
       lg: {
         root: "min-w-40",
-        item: "gap-2 py-1.5 pl-2 text-base",
+        item: "gap-2 py-1.5 ps-2 text-base",
       },
     },
   },

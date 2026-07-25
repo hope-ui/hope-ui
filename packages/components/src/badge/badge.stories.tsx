@@ -89,7 +89,7 @@ export const VariantColorMatrix: Story = {
           <div
             class={`flex items-center gap-3 rounded-md ${variant === "inverted" ? "bg-surface-inverse py-2" : ""}`}
           >
-            <span class="w-16 text-right font-mono text-xs text-foreground-muted">{variant}</span>
+            <span class="w-16 text-end font-mono text-xs text-foreground-muted">{variant}</span>
             <For each={COLORS}>
               {(color) => (
                 <div class="flex w-20 justify-center">

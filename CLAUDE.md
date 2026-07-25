@@ -52,6 +52,7 @@ pnpm storybook            # visual harness on :6006 (the only non-test feedback 
 pnpm build:storybook      # static build, also the CI smoke test for the Storybook config
 pnpm check:coverage-parity  # DoD: per-file test+doc (primitives/theming); per-folder test+doc+story+ssr+hydration (components); no flat sprawl
 pnpm check:recipe-purity  # fails if a preset recipe computes a color (color-mix / alpha modifier / magic opacity)
+pnpm check:rtl-safety     # fails on a physical directional class (pl-/pr-/left-/text-right/…) or CSSOM write
 pnpm changeset            # NOT needed while the repo is at v0.0.0 — see "Changesets"
 ```
 
@@ -138,6 +139,15 @@ Also required:
   `--hope-*` tokens only — never `color-mix`, an alpha modifier (`bg-x/50`), or a magic opacity
   (`opacity-90`). Derived colors (focus halo, scrim) are authored as tokens in the preset's
   `theme.css`. Enforced by `pnpm check:recipe-purity`. See `__internal__/theming.md`.
+- **RTL-aware recipes:** every directional class a recipe/component/story emits is **logical** —
+  `ps-`/`pe-`/`ms-`/`me-`/`start-`/`end-`/`border-s`/`rounded-s`/`text-start`, never the `l`/`r`
+  physical twin — and no CSSOM write reaches for `.style.paddingRight`. A physical utility never
+  fails loudly; it mis-paints for every RTL reader while every test stays green. Tailwind v4's
+  `px-`/`mx-`/`inset-x-`/`border-x-`/`space-x-`/`divide-x-` are **already logical** — don't "fix"
+  them. A deliberate flip is spelled `rtl:`/`ltr:`; the named escape hatch is an `rtl-ok: <reason>`
+  comment. Enforced by `pnpm check:rtl-safety` **and**, per preset recipe,
+  `assertLogicalPropertyConformance` (`@hope-ui/theming/conformance`) — the latter is what reaches a
+  third-party preset and a `compoundVariant`-assembled class. See `__internal__/theming.md`.
 - Stories pin known-but-unfixed behavior where a human can see it. **Don't "fix" a story by deleting
   it** — fix the component and rename the story. Current example: Dialog's `Modal with an
   unpositioned Popup (content is unclickable — by design)`.

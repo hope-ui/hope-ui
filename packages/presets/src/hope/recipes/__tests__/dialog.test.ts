@@ -4,7 +4,10 @@ import type {
   DialogScrollBehavior,
   DialogSize,
 } from "@hope-ui/theming";
-import { assertSlotRecipeConformance } from "@hope-ui/theming/conformance";
+import {
+  assertLogicalPropertyConformance,
+  assertSlotRecipeConformance,
+} from "@hope-ui/theming/conformance";
 import { describe, expect, it } from "vitest";
 import { dialogRecipe } from "../dialog";
 
@@ -23,15 +26,20 @@ const SLOTS = [
   "closeTrigger",
 ] as const;
 
+const CASES: DialogRecipeVariants[] = [
+  undefined as unknown as DialogRecipeVariants,
+  ...SIZES.map((size) => ({ size })),
+  ...PLACEMENTS.map((placement) => ({ placement })),
+  ...SCROLL_BEHAVIORS.map((scrollBehavior) => ({ scrollBehavior })),
+];
+
 describe("hope dialog recipe", () => {
   it("produces a class for every slot across the full variant matrix", () => {
-    const cases: DialogRecipeVariants[] = [
-      undefined as unknown as DialogRecipeVariants,
-      ...SIZES.map((size) => ({ size })),
-      ...PLACEMENTS.map((placement) => ({ placement })),
-      ...SCROLL_BEHAVIORS.map((scrollBehavior) => ({ scrollBehavior })),
-    ];
-    assertSlotRecipeConformance(dialogRecipe, { cases, slots: SLOTS });
+    assertSlotRecipeConformance(dialogRecipe, { cases: CASES, slots: SLOTS });
+  });
+
+  it("emits only logical, RTL-safe utilities", () => {
+    assertLogicalPropertyConformance(dialogRecipe, { cases: CASES, slots: SLOTS });
   });
 
   it("dims the backdrop with the finished scrim token and fades it in and out", () => {
