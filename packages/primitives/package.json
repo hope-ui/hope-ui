@@ -12,6 +12,7 @@
       "dialog": "src/dialog/index.ts",
       "listbox": "src/listbox/index.ts",
       "modal-backdrop": "src/modal-backdrop/index.ts",
+      "popover": "src/popover/index.ts",
       "internal": "src/internal/index.ts",
       "render": "src/render/index.ts",
       "utils": "src/utils/index.ts"
@@ -33,6 +34,10 @@
     "./modal-backdrop": {
       "types": "./dist/modal-backdrop/index.d.ts",
       "solid": "./dist/modal-backdrop/index.jsx"
+    },
+    "./popover": {
+      "types": "./dist/popover/index.d.ts",
+      "solid": "./dist/popover/index.jsx"
     },
     "./internal": {
       "types": "./dist/internal/index.d.ts",
