@@ -34,11 +34,13 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.3",
     "@changesets/cli": "2.31.0",
+    "@floating-ui/dom": "catalog:",
     "@playwright/test": "1.61.1",
     "@solidjs/web": "catalog:",
     "@storybook/addon-a11y": "^10.5.0",
     "@storybook/addon-docs": "^10.5.0",
     "@tailwindcss/vite": "^4.0.0",
+    "@tanstack/virtual-core": "catalog:",
     "@vitest/browser": "4.1.10",
     "@vitest/browser-playwright": "4.1.10",
     "playwright": "1.61.1",

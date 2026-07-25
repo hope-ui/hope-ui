@@ -99,6 +99,14 @@ export default defineConfig({
         // unexpectedly reloaded a test" — which is flaky on a cold CI cache. These two are the
         // kernel's only external deps: the virtualizer core (`createVirtualCollection`) and the
         // positioning core (`createFloating`).
+        //
+        // Both are ALSO root devDependencies (`catalog:`), and that is what makes this field do
+        // anything. Vite resolves `optimizeDeps.include` from the Vite root — here, the repo root —
+        // and pnpm does not hoist, so while they existed only under `packages/primitives/`, every
+        // cold-cache run printed `Failed to resolve dependency: … present in client
+        // 'optimizeDeps.include'` and silently pre-bundled neither. The nested `pkg > dep` spelling
+        // is not an option: `@hope-ui/primitives` is aliased to src and isn't linked at the root
+        // either. Keep the root devDependency and the entry below in sync.
         optimizeDeps: { include: ["@tanstack/virtual-core", "@floating-ui/dom"] },
         test: {
           name: "browser",

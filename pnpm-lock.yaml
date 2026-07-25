@@ -234,6 +234,9 @@ importers:
       '@changesets/cli':
         specifier: 2.31.0
         version: 2.31.0(@types/node@22.20.1)
+      '@floating-ui/dom':
+        specifier: 'catalog:'
+        version: 1.8.0
       '@playwright/test':
         specifier: 1.61.1
         version: 1.61.1
@@ -249,6 +252,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.3.2(vite@8.1.4(@types/node@22.20.1)(esbuild@0.27.7)(jiti@2.7.0))
+      '@tanstack/virtual-core':
+        specifier: 'catalog:'
+        version: 3.17.4
       '@vitest/browser':
         specifier: 4.1.10
         version: 4.1.10(vite@8.1.4(@types/node@22.20.1)(esbuild@0.27.7)(jiti@2.7.0))(vitest@4.1.10)
