@@ -185,12 +185,15 @@ layout and hope-ui's alike, since `dir` cascades:
 ```tsx
 import { getReadingDirection } from "@hope-ui/i18n";
 
-// e.g. getReadingDirection("ar-EG") -> "rtl"
+const [locale, setLocale] = createSignal("ar-EG");
+
+// getReadingDirection("ar-EG") -> "rtl"
 document.documentElement.dir = getReadingDirection(locale());
 ```
 
 The locale handles the rest: RTL locales get reversed arrow keys in a calendar grid or a horizontal
-listbox, plus localized names and numerals. Read the direction yourself with `useLocale().direction`.
+listbox, plus localized names and numerals. Inside the provider you can read the direction directly
+with `useLocale().direction` instead.
 
 <Alert.Root
   variant="soft"
