@@ -1,6 +1,6 @@
 # `createDialogBackdrop`
 
-The optional visible-backdrop part of the [dialog hook family](../root/dialog-root.md).
+The optional visible-backdrop part of the [dialog hook family](dialog-root.md).
 
 ```ts
 function createDialogBackdrop(

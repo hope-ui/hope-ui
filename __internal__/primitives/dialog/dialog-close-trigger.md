@@ -1,6 +1,6 @@
 # `createDialogCloseTrigger`
 
-The close-trigger part of the [dialog hook family](../root/dialog-root.md). Injects the dialog's
+The close-trigger part of the [dialog hook family](dialog-root.md). Injects the dialog's
 close-on-click behavior onto a button — and nothing else.
 
 ```ts
@@ -18,10 +18,11 @@ the mirror of `createDialogTrigger`. Every other prop passes through unchanged.
 
 This hook is deliberately **minimal**: it owns only the close `onClick`. It sets **no**
 `aria-label` and **no** `type="button"` of its own. Those defaults live one layer up, in the
-[`CloseButton`](../../../components/close-button/close-button.md) component (over the
-[`createButton`](../../internal/create-button.md) primitive) that
-`@hope-ui/components`' `Dialog.CloseTrigger` renders — so each default has a single owner and there is
-no double-ownership between the hook and the component.
+[`CloseButton`](../../../apps/docs/src/content/components/10-buttons/close-button.mdx) component
+(over the `createButton` primitive, `packages/primitives/src/internal/create-button.ts` — an
+`internal/` primitive, so it carries a test but no usage doc) that `@hope-ui/components`'
+`Dialog.CloseTrigger` renders — so each default has a single owner and there is no double-ownership
+between the hook and the component.
 
 The accessible name is therefore still the localized `common.close` message ("Close" / "Fermer"), but
 it is `CloseButton` that provides it, not this hook. A **headless** consumer wiring

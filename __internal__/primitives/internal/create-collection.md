@@ -8,7 +8,7 @@ from its own scope. Navigation, selection, typeahead and focus all read `collect
 
 ## Why this is a primitive
 
-[`createRegisteredElement`](../create-registered-element/create-registered-element.md) publishes a descendant's
+[`createRegisteredElement`](create-registered-element.md) publishes a descendant's
 element to an ancestor, but it is a **one-directional publisher**: it returns no collection and
 gives **no ordering guarantee** — registration order is `createEffect`-creation order, which is not
 the order a screen reader or an `ArrowDown` press should follow.

@@ -1,6 +1,6 @@
 # `createListSelection`
 
-Selection state layered on a [`createListFocus`](../create-list-focus/create-list-focus.md) instance: single or
+Selection state layered on a [`createListFocus`](create-list-focus.md) instance: single or
 multiple, explicit or follow-focus, with Shift range extension from an anchor. Modeled on Angular
 Aria's `list-selection`; the behavior checklist (select-on-focus, Ctrl+A, Shift-extend from an
 anchor) is cross-checked against react-aria's `useSelectableCollection`/`useSelectableItem`.
@@ -49,7 +49,7 @@ function selectionRange(fromIndex: number, toIndex: number): number[];
 Equality precedence: an explicit `isItemEqualToValue` wins outright; otherwise the default compares
 `itemToValue(a) === itemToValue(b)`; with neither, `itemToValue` is identity so it collapses to plain
 `===`. (The older `compareByIdOrReference` / `ValueComparator<V>` in
-[`@hope-ui/primitives/utils`](../../utils/equality.md) is retained only for `createListExpansion`.)
+[`@hope-ui/primitives/utils`](../utils/equality.md) is retained only for `createListExpansion`.)
 
 ## Modes and behaviors
 
@@ -57,7 +57,7 @@ Equality precedence: an explicit `isItemEqualToValue` wins outright; otherwise t
   `"multiple"` accumulates a set; `"none"` disables all mutations.
 - **`selectionBehavior`** — `"explicit"` changes selection only on an action (Space/Enter, click);
   `"follow"` makes the active item become the selection as focus moves (single-select listbox, Tabs).
-  When combining follow with [typeahead](../create-list-typeahead/create-list-typeahead.md), pass
+  When combining follow with [typeahead](create-list-typeahead.md), pass
   `shouldFollowFocus: () => !typeahead.isTyping()` so browsing by type doesn't select.
 
 ## Range extension (Shift)

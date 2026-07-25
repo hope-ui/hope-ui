@@ -6,7 +6,7 @@ hand-roll. It produces a single `onKeyDown` handler from a set of key bindings p
 typeahead fallback.
 
 Modeled on Angular Aria's `private/behaviors/event-manager` (its idea, not its code). It lives in
-`utils/` beside [`composeEventHandlers`](../events/events.md) because the two are meant to be used
+`utils/` beside [`composeEventHandlers`](events.md) because the two are meant to be used
 together.
 
 ## API

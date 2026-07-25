@@ -1,6 +1,6 @@
 # `createListNavigation`
 
-Arrow-key navigation layered on a [`createListFocus`](../create-list-focus/create-list-focus.md) instance:
+Arrow-key navigation layered on a [`createListFocus`](create-list-focus.md) instance:
 `next`/`prev`/`first`/`last`, wrap, orientation, RTL, and skip-disabled. It holds **no state** — it
 reads `focus.items()`/`focus.activeIndex()`, skips items `focus.isFocusable` rejects, and moves the
 active item through `focus.focusIndex`. Because focus defers real `.focus()` until the element
@@ -49,8 +49,8 @@ function createListNavigation<V = unknown>(options: {
 a horizontal list) still scrolls the page. Page keys act in **both** orientations (they page through
 list order, not an axis) and always `preventDefault` — which is also what stops the native scroll that
 would otherwise push a roving-focused row out of a virtualized window and drop DOM focus (see
-[`createListFocus`](../create-list-focus/create-list-focus.md)'s focus-recovery note). It's built with
-[`createKeyboardHandler`](../../utils/keymap.md); compose it with the consumer's handler (and
+[`createListFocus`](create-list-focus.md)'s focus-recovery note). It's built with
+[`createKeyboardHandler`](../utils/keymap.md); compose it with the consumer's handler (and
 with typeahead/selection handlers) via `composeEventHandlers`.
 
 ## Behavior

@@ -1,6 +1,6 @@
 # `createDialogTrigger`
 
-The trigger part of the [dialog hook family](../root/dialog-root.md). Opens the dialog and
+The trigger part of the [dialog hook family](dialog-root.md). Opens the dialog and
 advertises it to assistive technology.
 
 ```ts

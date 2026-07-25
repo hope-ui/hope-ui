@@ -25,7 +25,7 @@ function createRegisteredElement<T extends Element>(options: {
 
 ## Why this is a primitive
 
-The element counterpart of [`createRegisteredId`](../create-registered-id/create-registered-id.md), for the
+The element counterpart of [`createRegisteredId`](create-registered-id.md), for the
 same reason: a descendant may not write to a signal owned by an **ancestor's** reactive scope
 directly from its own synchronous render body — SolidJS 2.0 throws
 `[REACTIVE_WRITE_IN_OWNED_SCOPE]`.

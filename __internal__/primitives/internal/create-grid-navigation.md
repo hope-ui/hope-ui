@@ -1,6 +1,6 @@
 # `createGridNavigation`
 
-2D navigation over a row/cell collection, layered on **one** [`createListFocus`](../create-list-focus/create-list-focus.md).
+2D navigation over a row/cell collection, layered on **one** [`createListFocus`](create-list-focus.md).
 Up/Down/Left/Right with per-axis wrap, `firstInRow`/`lastInRow`, grid `first`/`last`, RTL,
 skip-disabled, and cell spans. The vertical edges fire `onNavigateBefore`/`onNavigateAfter`, which a
 calendar uses to flip months while the parent re-renders. Modeled on Angular Aria's `private/grid`,

@@ -1,6 +1,6 @@
 # `createDialogContent`
 
-The content part of the [dialog hook family](../root/dialog-root.md) — the dialog surface, and the
+The content part of the [dialog hook family](dialog-root.md) — the dialog surface, and the
 behavior hub.
 
 ```ts
@@ -26,7 +26,7 @@ break the enter animation: this part is mounted lazily on open, so a presence cr
 `present` already `true` on its first run and latch straight to `entered` (never `entering`), so the
 CSS enter transition never fires. The Positioner consumes the same `state.contentPresence`;
 `createDialogBackdrop` (eagerly mounted) keeps its own. Mirrors Ark. See
-[`create-presence.md`](../../internal/create-presence.md) and [`dialog-root.md`](./dialog-root.md).
+[`create-presence.md`](../internal/create-presence.md) and [`dialog-root.md`](./dialog-root.md).
 
 Owns the full effect stack, all created in this hook's (the content's) scope so each tears down when
 the content unmounts:
@@ -35,7 +35,7 @@ the content unmounts:
   `isModal()`) → `createDismissable` (Escape / outside pointerdown) → `createScrollLock`. **Creation
   order is load-bearing**: focus-restore must precede the trap and hide-outside so its
   `activeElement` snapshot lands before focus moves and before `inert` blurs the trigger (see
-  [`create-focus-restore.md`](../../internal/create-focus-restore.md)).
+  [`create-focus-restore.md`](../internal/create-focus-restore.md)).
 
 The two dismissal toggles come from the root state, not this part's props: `createDismissable`'s
 `dismissOnEscape` / `dismissOnOutsidePointerDown` are forwarded from `state.closeOnEscape()` /
@@ -43,7 +43,7 @@ The two dismissal toggles come from the root state, not this part's props: `crea
 **once** on `createDialog` / `Dialog.Root`. They are forwarded as getters, not a one-time read:
 `createDismissable` reads them live inside its keydown/pointerdown handlers, so a getter keeps them
 reactive (and avoids a `STRICT_READ_UNTRACKED` read in this hook body). See
-[`dialog-root.md`](../root/dialog-root.md).
+[`dialog-root.md`](dialog-root.md).
 
 `initialFocus` (when set) is what `createFocusTrap` focuses on open, instead of the first focusable
 descendant; it's read lazily at focus time (after mount), so the target may live inside the content.

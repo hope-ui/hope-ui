@@ -1,6 +1,6 @@
 # `createDialogTitle`
 
-The title part of the [dialog hook family](../root/dialog-root.md). Labels the dialog.
+The title part of the [dialog hook family](dialog-root.md). Labels the dialog.
 
 ```ts
 function createDialogTitle(

@@ -22,7 +22,7 @@ where focus must not leave the textbox).
 
 ## The item-source seam and deferred focus
 
-`createListFocus` reads an abstract [`ItemSource`](../create-collection/create-collection.md) — it never depends
+`createListFocus` reads an abstract [`ItemSource`](create-collection.md) — it never depends
 on `createCollection` directly, so it works identically over a fully-mounted `createCollection` and
 a windowed `createVirtualCollection`.
 

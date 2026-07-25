@@ -73,7 +73,7 @@ an element inserted into the page before the `MutationObserver` sees it is brief
 | Assistive technology | `createHideOutside` (`aria-hidden`) |
 | Focus order | `createHideOutside` (`inert`) |
 | Tab cycling within the popup | `createFocusTrap` |
-| Pointer, unconditionally | [`ModalBackdrop`](../../modal-backdrop/modal-backdrop.md) |
+| Pointer, unconditionally | [`ModalBackdrop`](../modal-backdrop/modal-backdrop.md) |
 
 `Dialog` composes all four, and spares its `ModalBackdrop` — an `inert` backdrop is
 transparent to hit testing and would silently stop doing its job.

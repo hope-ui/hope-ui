@@ -2,7 +2,7 @@
 
 The **virtualized item source**: a thin SolidJS reactive binding over
 [`@tanstack/virtual-core`](https://tanstack.com/virtual) that satisfies the same
-[`ItemSource`](../create-collection/create-collection.md) seam as `createCollection`. Swap one for the other and
+[`ItemSource`](create-collection.md) seam as `createCollection`. Swap one for the other and
 the whole navigation kernel — `createListFocus`, `createListNavigation`, `createListTypeahead`,
 `createListSelection` — works unchanged over a 10 000-row list.
 
@@ -60,7 +60,7 @@ function createVirtualCollection<V = unknown>(options: {
 ## Rendering rows
 
 Render only `virtualItems()`, absolutely positioned inside a `totalSize()`-tall spacer. Each row
-publishes its element (via [`createRegisteredElement`](../create-registered-element/create-registered-element.md))
+publishes its element (via [`createRegisteredElement`](create-registered-element.md))
 and hands it to `measureElement`, and carries `data-index` so the measurer can identify it:
 
 ```tsx

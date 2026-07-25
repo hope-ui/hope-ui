@@ -1,6 +1,6 @@
 # `createDialogPortal`
 
-The portal part of the [dialog hook family](../root/dialog-root.md). Owns the pointer-blocking modal
+The portal part of the [dialog hook family](dialog-root.md). Owns the pointer-blocking modal
 backdrop's registration.
 
 ```ts
@@ -16,4 +16,4 @@ would stop blocking the pointer, its one job. `showModalBackdrop` gates the back
 `open() && modal()`. This hook returns no element props: the consumer renders the portal container
 and the `ModalBackdrop` element themselves (and, in the component, guards the portal against SSR),
 wiring `setModalBackdropRef` as the backdrop's `ref`. A modal popup must be positioned or it paints
-beneath the backdrop — see [`modal-backdrop.md`](../../modal-backdrop/modal-backdrop.md).
+beneath the backdrop — see [`modal-backdrop.md`](../modal-backdrop/modal-backdrop.md).

@@ -34,7 +34,7 @@ function createFocusTrap(options: {
 ## Restoring focus is a separate primitive
 
 Deactivating the trap does **not** return focus to whatever had it before. That's
-[`createFocusRestore`](../create-focus-restore/create-focus-restore.md).
+[`createFocusRestore`](create-focus-restore.md).
 
 They're split because restore and trap are independent concerns: Popover, Tooltip, and a
 non-modal `Dialog` all want focus returned *without* being trapped. While the two were

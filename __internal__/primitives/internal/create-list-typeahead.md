@@ -1,6 +1,6 @@
 # `createListTypeahead`
 
-Type-to-focus over a list's items, layered on a [`createListFocus`](../create-list-focus/create-list-focus.md)
+Type-to-focus over a list's items, layered on a [`createListFocus`](create-list-focus.md)
 instance. It buffers typed characters, resets the buffer after a delay, matches item `textValue`s
 case-insensitively, and moves the active item through `focus.focusIndex` — so a match in an unmounted
 virtualized row scrolls in and focuses exactly like arrow navigation.
@@ -25,7 +25,7 @@ function createListTypeahead<V = unknown>(options: {
 - `isTyping()` — `true` while a buffer is active. A single-select listbox that follows focus reads
   this to **suppress selection while the user is typing** (so typeahead browses without selecting).
 - `onKeyDown` — routes printable characters to `search` via
-  [`createKeyboardHandler`](../../utils/keymap.md)'s `onText` channel. Compose it alongside
+  [`createKeyboardHandler`](../utils/keymap.md)'s `onText` channel. Compose it alongside
   navigation/selection handlers with `composeEventHandlers`.
 
 ## Matching rules

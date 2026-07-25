@@ -7,7 +7,7 @@ node moves focus with the arrow keys (navigation) and opens/closes with Right/Le
 
 Object values are supported: by default two values are equal when both are objects sharing an `id`,
 falling back to `===` — override with `compareWith` (a `ValueComparator<V>` from
-[`utils/equality`](../../utils/equality.md)), the same escape hatch as Angular Material's
+[`utils/equality`](../utils/equality.md)), the same escape hatch as Angular Material's
 `compareWith`.
 
 ## API
