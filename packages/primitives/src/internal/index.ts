@@ -26,6 +26,23 @@ export {
   createDismissable,
 } from "./create-dismissable";
 export {
+  type Boundary,
+  type CreateFloatingOptions,
+  type CreateFloatingReturn,
+  createFloating,
+  type FloatingAlign,
+  type FloatingArrowState,
+  type FloatingSizeState,
+  type Middleware,
+  type MiddlewareData,
+  type Padding,
+  type Placement,
+  type ReferenceElement,
+  type Side,
+  type Strategy,
+  type VirtualElement,
+} from "./create-floating";
+export {
   type CreateFocusRestoreOptions,
   createFocusRestore,
 } from "./create-focus-restore";
