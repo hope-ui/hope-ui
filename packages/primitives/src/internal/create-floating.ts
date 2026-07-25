@@ -53,7 +53,7 @@ export type LogicalSide = "inline-start" | "inline-end";
  * Kept distinct from `Side`, which stays the **output** vocabulary — `side()` always reports a
  * physical side, because it reports where the layer actually landed after `flip`. Base UI mirrors the
  * input vocabulary back out instead; hope-ui deliberately does not, because a recipe (including a
- * third-party preset's) selects on `data-placement` and cannot know which vocabulary the consumer
+ * third-party preset's) selects on `data-side` and cannot know which vocabulary the consumer
  * happened to ask in. See `__internal__/reference-implementations.md` § createFloating.
  */
 export type SideOrLogical = Side | LogicalSide;

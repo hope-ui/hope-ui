@@ -291,7 +291,7 @@ describe("createFloating", () => {
     });
 
     // The OUTPUT vocabulary stays physical, deliberately: `side()` reports where the layer actually
-    // is, which is what an arrow's static side and a recipe's `data-placement` variant need.
+    // is, which is what an arrow's static side and a recipe's `data-side` variant need.
     expect(api.side()).toBe("left");
     expect(api.placement()).toBe("left");
     expect(elementOf(container, "floating").getAttribute("data-side")).toBe("left");

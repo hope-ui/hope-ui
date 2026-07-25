@@ -187,17 +187,30 @@ const px = (value: number | undefined) => (value == null ? undefined : `${value}
 
 <div
   ref={setArrowElement}
-  data-side={floating.arrow()?.side}
+  data-side={floating.side()}
+  data-uncentered={floating.arrow()?.centerOffset === 0 ? undefined : ""}
   style={{
     position: "absolute",
     left: px(floating.arrow()?.x),
     top: px(floating.arrow()?.y),
     [floating.arrow()?.side ?? "top"]: `${-ARROW_SIZE / 2}px`,
     transform: "rotate(45deg)",
-    visibility: floating.arrow()?.centerOffset === 0 ? undefined : "hidden",
   }}
 />;
 ```
+
+Two things that example is deliberate about:
+
+- **The arrow's `data-side` is the *popup's* side** — `floating.side()`, the same value the positioner
+  carries — not the arrow's own pin edge. That is Base UI's semantics
+  (`PopoverArrowDataAttributes.side`: which side the popup is positioned relative to the trigger), and
+  it lets one variant style the card and its arrow coherently. The pin edge stays where it belongs, in
+  the inline style, computed from `arrow().side`.
+- **A clamped arrow is reported, not hidden** — `data-uncentered` (Base UI's
+  `PopoverArrowDataAttributes.uncentered`) leaves it to the *recipe* to decide how it disappears,
+  where a hard-coded `visibility: hidden` would not. Note it is *present* until the first measurement
+  resolves `centerOffset` to `0` — an unmeasured arrow reads as clamped, so it starts out hidden
+  rather than flashing in a centred position it will not keep.
 
 **Never gate the arrow element's existence on `arrow()`.** It is the same deadlock as gating the
 floating element on `isPositioned()`: no element → no `arrow` middleware → `arrow()` stays
@@ -242,10 +255,12 @@ Three things to know about them:
   the two consumer obligations above (set `dir` on `<html>`; mind the portal) apply **unchanged** —
   they are not extra caveats introduced by logical sides.
 - **The output stays physical.** `side()` reports `"left"` / `"right"`, never `"inline-start"`,
-  because it reports where the layer *landed* after `flip`. A recipe wanting the inline-relative hook
-  uses the `data-placement-inline-start` / `-end` custom variants, which `_base/_variants.css` derives
-  from the physical attribute plus `:dir()`. Rationale (and why hope-ui declines Base UI's
-  mirror-the-input-vocabulary output): `__internal__/reference-implementations.md` § createFloating.
+  because it reports where the layer *landed* after `flip`. There is deliberately no inline-relative
+  `data-side-*` variant to pair with it: a recipe wanting that hook writes `ltr:`/`rtl:`-scoped rules
+  over `data-side-left` / `-right`, the sanctioned RTL escape hatch, which passes both
+  `check:rtl-safety` and `assertLogicalPropertyConformance`. Rationale (and why hope-ui declines Base
+  UI's mirror-the-input-vocabulary output): `__internal__/reference-implementations.md` §
+  createFloating.
 - **On the server a logical side seeds as if `ltr`**, because there is no element and no
   `getComputedStyle`. Nothing is visible in that window — `isPositioned()` is false and the layer is
   `visibility: hidden` — and the server's bytes stay identical to the client's first render, which is

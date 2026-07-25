@@ -171,14 +171,14 @@ above:
     about, and `@hope-ui/i18n` still never enters the positioning layer. The consequence to know: a
     portaled positioner inherits `dir` from where it is portaled to, not from the anchor's subtree —
     which is already how floating-ui treats alignment.
-  - **Output stays physical, always.** `side()` and `data-placement` report where the layer actually
+  - **Output stays physical, always.** `side()` and `data-side` report where the layer actually
     landed after `flip`, which is a physical fact. Mirroring the input vocabulary the way Base UI does
     is a footgun *here specifically*: hope-ui has a closed `RecipeRegistry` and a third-party preset
-    conformance kit, so a recipe author selecting on `data-placement` cannot know which vocabulary the
-    consumer happened to ask in. Recipes get the inline-relative hook from CSS instead —
-    `data-placement-inline-start`/`-end` are `@custom-variant`s derived from the physical attribute
-    plus `:dir()` (`_base/_variants.css`), so there is no second attribute and no JS bookkeeping.
-  - **Timing.** Nothing emitted `data-placement` yet when this was settled (Tooltip/Popover are T2,
+    conformance kit, so a recipe author selecting on `data-side` cannot know which vocabulary the
+    consumer happened to ask in. A recipe needing the inline-relative hook writes `ltr:`/`rtl:`-scoped
+    rules over `data-side-left`/`-right` — the sanctioned RTL escape hatch, so there is no second
+    attribute and no JS bookkeeping.
+  - **Timing.** Nothing emitted `data-side` yet when this was settled (Tooltip/Popover are T2,
     Select T3), so the change cost nothing; doing it after those shipped would have been a breaking
     change to public data attributes and to third-party recipes.
 

@@ -60,6 +60,30 @@
 @custom-variant data-exiting (&:where([data-presence="exiting"]));
 @custom-variant data-exited (&:where([data-presence="exited"]));
 
+/* Floating layers (Popover/Tooltip/Select/Combobox/Menu/HoverCard) — `data-side` + `data-align`,
+   emitted by the positioner, the content and the arrow from `createFloating`'s RESOLVED output.
+   `data-side` is ALWAYS physical, even where the consumer asked for a logical `side: "inline-start"`:
+   it reports where the layer LANDED after `flip`, which is measured geometry, and the properties a
+   floating recipe drives — `translate`, `transform-origin`, `inset` — have no logical form to pair a
+   logical value with. Distinct from the authored `data-placement` further down.
+   There is deliberately NO `data-side-inline-*` pair: a recipe needing an inline-relative hook writes
+   `ltr:`/`rtl:`-scoped rules over `data-side-left`/`-right`, the sanctioned escape hatch that passes
+   both `check:rtl-safety` and `assertLogicalPropertyConformance`. `__internal__/theming.md`
+   § "Correctly physical". */
+@custom-variant data-side-top (&:where([data-side="top"]));
+@custom-variant data-side-bottom (&:where([data-side="bottom"]));
+@custom-variant data-side-left (&:where([data-side="left"]));
+@custom-variant data-side-right (&:where([data-side="right"]));
+
+@custom-variant data-align-start (&:where([data-align="start"]));
+@custom-variant data-align-center (&:where([data-align="center"]));
+@custom-variant data-align-end (&:where([data-align="end"]));
+
+/* The arrow had to be clamped away from the anchor's centre (`centerOffset !== 0`) — the anchor is too
+   narrow to point at honestly. Emitted rather than hidden in an inline style, so the RECIPE decides how
+   a clamped arrow disappears. */
+@custom-variant data-uncentered (&:where([data-uncentered]:not([data-uncentered="false"]), [data-state="uncentered"]));
+
 /* Form controls */
 @custom-variant data-checked (&:where([data-checked]:not([data-checked="false"]), [data-state="checked"]));
 @custom-variant data-unchecked (&:where([data-unchecked]:not([data-unchecked="false"]), [data-state="unchecked"]));
@@ -104,21 +128,14 @@
 @custom-variant data-single (&:where([data-selection-mode="single"]));
 @custom-variant data-multiple (&:where([data-selection-mode="multiple"]));
 
-/* `data-placement` always carries a PHYSICAL side: it reports where the layer actually landed after
-   `flip`, which is a physical fact. So these four stay physical and are NOT an RTL bug —
-   `__internal__/theming.md` § "Correctly physical". */
+/* `data-placement` is the AUTHORED placement of an absolutely-positioned overlay — Dialog, Sheet,
+   Drawer — which never flips and never shifts. Not to be confused with `data-side` above, which
+   reports a floating layer's measured, post-`flip` landing. Physical values, so these four are NOT an
+   RTL bug — `__internal__/theming.md` § "Correctly physical". */
 @custom-variant data-placement-top (&:where([data-placement="top"]));
 @custom-variant data-placement-bottom (&:where([data-placement="bottom"]));
 @custom-variant data-placement-left (&:where([data-placement="left"]));
 @custom-variant data-placement-right (&:where([data-placement="right"]));
-
-/* The inline-relative pair, for a recipe styling "the side nearest where the text starts" (a Select
-   listbox's corner radius, a submenu's enter-slide). Derived in CSS from the physical attribute plus
-   `:dir()`, so there is no second attribute to emit and no direction bookkeeping in JS — the same
-   single-source-of-truth rule `createFloating` follows for a logical `side` option. `:dir()` is
-   already this stack's baseline: Tailwind v4's own `rtl:`/`ltr:` variants are `&:where(:dir(rtl))`. */
-@custom-variant data-placement-inline-start (&:where([data-placement="left"]:dir(ltr), [data-placement="right"]:dir(rtl)));
-@custom-variant data-placement-inline-end (&:where([data-placement="right"]:dir(ltr), [data-placement="left"]:dir(rtl)));
 
 @custom-variant data-grid (&:where([data-layout="grid"]));
 @custom-variant data-stack (&:where([data-layout="stack"]));
