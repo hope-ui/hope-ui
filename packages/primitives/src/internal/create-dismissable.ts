@@ -1,4 +1,4 @@
-import { type Accessor, createEffect } from "solid-js";
+import { type Accessor, createEffect, untrack } from "solid-js";
 
 export interface CreateDismissableOptions {
   /** Whether the dismissable layer is currently active. */
@@ -52,13 +52,20 @@ export function createDismissable(options: CreateDismissableOptions): void {
       // The single definition of "outside", shared by both handlers so the two can't drift apart.
       // `exclude` is read here rather than tracked in the compute above: the elements it names
       // register from their own effects, so tracking it would tear down and reattach these
-      // document listeners on every ref change. Handlers run outside any tracking scope, so this
-      // is a plain read, not a `STRICT_READ_UNTRACKED` one.
+      // document listeners on every ref change.
+      //
+      // `untrack`, and not because a handler is usually reached from a real DOM dispatch — it
+      // isn't always. A layer above a modal makes the whole chain synchronous: `createAutoFocus`
+      // calls `.focus()` from inside its effect callback, that dispatches `focusin`, the modal's
+      // focus trap refocuses its own container, and *that* dispatch lands here — still inside the
+      // effect. Left implicit the read trips `STRICT_READ_UNTRACKED`; it is deliberate, so it is
+      // spelled, exactly as `createAutoFocus` spells its `initialFocus` sample.
       const isOutside = (target: Node | null) => {
         if (target === null || container.contains(target)) {
           return false;
         }
-        return !options.exclude?.().some((element) => element.contains(target));
+        const excluded = untrack(() => options.exclude?.());
+        return !excluded?.some((element) => element.contains(target));
       };
 
       const handleKeyDown = (event: KeyboardEvent) => {

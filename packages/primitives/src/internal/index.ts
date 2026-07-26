@@ -65,7 +65,11 @@ export {
 } from "./create-grid-navigation";
 export {
   type CreateHideOutsideOptions,
+  type CreateKeepVisibleOptions,
   createHideOutside,
+  createKeepVisible,
+  keepVisible,
+  TOP_LAYER_ATTRIBUTE,
 } from "./create-hide-outside";
 export {
   type CreateListExpansionOptions,

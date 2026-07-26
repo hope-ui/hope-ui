@@ -1,7 +1,7 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
 import { type Accessor, createSignal, Show } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
-import { createHideOutside } from "../create-hide-outside";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
+import { createHideOutside, keepVisible, TOP_LAYER_ATTRIBUTE } from "../create-hide-outside";
 
 /**
  * The target carries `role="dialog"`/`aria-modal` because that's how the primitive is
@@ -28,6 +28,10 @@ function TestHarness(props: {
       </span>
       <div data-testid="pre-inert" inert>
         already inert
+      </div>
+      {/* Already in the page when the layer opens, so only the initial walk can spare it. */}
+      <div data-testid="pre-marked" {...{ [TOP_LAYER_ATTRIBUTE]: "" }}>
+        third-party top layer
       </div>
       <Show when={props.renderTarget ?? true}>
         <div data-testid="target" ref={setRef} role="dialog" aria-modal="true" aria-label="Layer">
@@ -68,12 +72,32 @@ function get(container: HTMLElement, testId: string): HTMLElement {
   return element;
 }
 
-function marks(container: HTMLElement, testId: string) {
-  const element = get(container, testId);
+function attributesOf(element: Element) {
   return {
     ariaHidden: element.getAttribute("aria-hidden"),
     inert: element.hasAttribute("inert"),
   };
+}
+
+function marks(container: HTMLElement, testId: string) {
+  return attributesOf(get(container, testId));
+}
+
+const VISIBLE = { ariaHidden: null, inert: false };
+const HIDDEN = { ariaHidden: "true", inert: true };
+
+/**
+ * A detached `<body>`-child-to-be, as a portaled layer is. Not appended here: the tests below
+ * append a spared element and a control **in the same task**, so both land in one
+ * `MutationObserver` batch and waiting for the control to be hidden proves the observer has
+ * already decided about the other one. Otherwise a "still visible" assertion could pass simply
+ * by running before the observer did.
+ */
+function bodyChild(testId: string): HTMLElement {
+  const element = document.createElement("div");
+  element.dataset.testid = testId;
+  onTestFinished(() => element.remove());
+  return element;
 }
 
 /** What a real mouse click at the centre of `element` would hit. `inert` retargets it. */
@@ -267,6 +291,176 @@ describe("createHideOutside", () => {
         inert: false,
       }),
     );
+
+    dispose();
+  });
+
+  it("lets only the innermost layer observe, so keepVisible into the top spares from all of them", async () => {
+    // The Popover-in-Dialog case in miniature. `keepVisible` only ever touches the topmost
+    // layer's spared set, so a still-observing outer layer would hide the element anyway — which
+    // makes "the spared element survived" the assertion that proves the outer one disconnected.
+    const [outer, setOuter] = createSignal(false);
+    const [inner, setInner] = createSignal(false);
+    const { container, dispose } = mount(() => <NestedHarness outer={outer} inner={inner} />);
+
+    setOuter(true);
+    await vi.waitFor(() => expect(marks(container, "background").inert).toBe(true));
+    setInner(true);
+    await vi.waitFor(() => expect(marks(container, "outer").inert).toBe(true));
+
+    const spared = bodyChild("spared");
+    const control = bodyChild("control");
+    const undo = keepVisible(spared);
+    expect(undo, "keepVisible found no open layer to spare into").toBeTypeOf("function");
+
+    document.body.append(spared, control);
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(spared)).toEqual(VISIBLE);
+
+    // Sparing an element spares its subtree, which is the whole reason `Popover` registers its
+    // positioner rather than its card.
+    const late = document.createElement("div");
+    spared.append(late);
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(late)).toEqual(VISIBLE);
+
+    dispose();
+  });
+
+  it("stops sparing once keepVisible's undo runs", async () => {
+    const [active, setActive] = createSignal(false);
+    const { container, dispose } = mount(() => <TestHarness active={active} />);
+
+    setActive(true);
+    await vi.waitFor(() => expect(marks(container, "sibling").inert).toBe(true));
+
+    const spared = bodyChild("spared");
+    const control = bodyChild("control");
+    const undo = keepVisible(spared);
+    document.body.append(spared, control);
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(spared)).toEqual(VISIBLE);
+
+    // Re-added *after* the undo — the same element the layer spared a moment ago, now an
+    // ordinary new `<body>` child. Nothing re-walks on undo, so re-adding is what makes the
+    // observer decide about it again.
+    undo?.();
+    spared.remove();
+    document.body.append(spared);
+    await vi.waitFor(() => expect(attributesOf(spared)).toEqual(HIDDEN));
+
+    dispose();
+  });
+
+  it("returns no undo from keepVisible when there is no layer, or the element is already spared", async () => {
+    const orphan = bodyChild("orphan");
+    expect(keepVisible(orphan), "an empty stack has nothing to spare into").toBeUndefined();
+
+    const [active, setActive] = createSignal(false);
+    const { container, dispose } = mount(() => <TestHarness active={active} />);
+    setActive(true);
+    await vi.waitFor(() => expect(marks(container, "sibling").inert).toBe(true));
+
+    expect(keepVisible(orphan)).toBeTypeOf("function");
+    // Idempotent: a second registration must not hand out an undo that revokes the first one's.
+    expect(keepVisible(orphan)).toBeUndefined();
+
+    dispose();
+  });
+
+  it("spares a marked element that was already in the page when the layer opened", async () => {
+    // The initial walk's half of `data-hope-ui-top-layer`, and the ordering `keepVisible` cannot
+    // reach: a modal opening *above* a layer that is already up.
+    const [active, setActive] = createSignal(false);
+    const { container, dispose } = mount(() => <TestHarness active={active} />);
+
+    setActive(true);
+    await vi.waitFor(() => expect(marks(container, "sibling").inert).toBe(true));
+    expect(marks(container, "pre-marked")).toEqual(VISIBLE);
+
+    dispose();
+  });
+
+  it("spares a marked element added while the layer is open, with no registration", async () => {
+    const [active, setActive] = createSignal(false);
+    const { container, dispose } = mount(() => <TestHarness active={active} />);
+
+    setActive(true);
+    await vi.waitFor(() => expect(marks(container, "sibling").inert).toBe(true));
+
+    const marked = bodyChild("marked");
+    marked.setAttribute(TOP_LAYER_ATTRIBUTE, "");
+    const control = bodyChild("control");
+    document.body.append(marked, control);
+
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(marked)).toEqual(VISIBLE);
+
+    // The observer folds a marked node into its spared set, so its subtree keeps being spared —
+    // a toast root stays usable, not just present.
+    const toast = document.createElement("div");
+    marked.append(toast);
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(toast)).toEqual(VISIBLE);
+
+    dispose();
+  });
+
+  it("keeps the still-open layer observing when layers close out of order", async () => {
+    // React Aria's splice branch: the layer that leaves is not the one on top, so nothing is
+    // popped and nothing is restarted — whoever is topmost is already observing.
+    const [outer, setOuter] = createSignal(false);
+    const [inner, setInner] = createSignal(false);
+    const { container, dispose } = mount(() => <NestedHarness outer={outer} inner={inner} />);
+
+    setOuter(true);
+    await vi.waitFor(() => expect(marks(container, "background").inert).toBe(true));
+    setInner(true);
+    await vi.waitFor(() => expect(marks(container, "outer").inert).toBe(true));
+
+    setOuter(false);
+    await vi.waitFor(() => expect(marks(container, "inner")).toEqual(VISIBLE));
+    // The inner layer still needs the background hidden, and still has to notice new content.
+    expect(marks(container, "background")).toEqual(HIDDEN);
+    const late = bodyChild("late");
+    document.body.append(late);
+    await vi.waitFor(() => expect(attributesOf(late)).toEqual(HIDDEN));
+
+    setInner(false);
+    await vi.waitFor(() => expect(marks(container, "background")).toEqual(VISIBLE));
+    expect(attributesOf(late)).toEqual(VISIBLE);
+
+    dispose();
+  });
+
+  it("shares its layer stack with a separate module instance of itself", async () => {
+    // The reason the stack lives on `document` rather than at module scope, and the same
+    // argument `create-scroll-lock.browser.test.tsx` makes for its ref count: nothing guarantees
+    // a consumer has one installed copy of `@hope-ui/primitives`. Two module-scope stacks and a
+    // `Popover` from copy B could never spare itself from a `Dialog` from copy A — it would
+    // register into an empty stack and be marked inert anyway.
+    const copy: typeof import("../create-hide-outside") = await import(
+      // @ts-expect-error — Vite serves `?instance=2` as a distinct module instance, which is
+      // the whole point here; TypeScript only sees an unresolvable specifier.
+      "../create-hide-outside?instance=2"
+    );
+    expect(copy.createHideOutside).not.toBe(createHideOutside);
+    expect(copy.keepVisible).not.toBe(keepVisible);
+
+    const [active, setActive] = createSignal(false);
+    const { container, dispose } = mount(() => <TestHarness active={active} />);
+
+    setActive(true);
+    await vi.waitFor(() => expect(marks(container, "sibling").inert).toBe(true));
+
+    const spared = bodyChild("spared");
+    const control = bodyChild("control");
+    const undo = copy.keepVisible(spared);
+    expect(undo, "the other copy saw an empty stack").toBeTypeOf("function");
+
+    document.body.append(spared, control);
+    await vi.waitFor(() => expect(attributesOf(control)).toEqual(HIDDEN));
+    expect(attributesOf(spared)).toEqual(VISIBLE);
 
     dispose();
   });

@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { type Accessor, createEffect, merge } from "solid-js";
-import type { FloatingAlign, PresenceStatus, Side } from "../internal";
+import { createKeepVisible, type FloatingAlign, type PresenceStatus, type Side } from "../internal";
 import type { CreatePopoverReturn } from "./popover-root";
 
 export interface CreatePopoverPositionerReturn {
@@ -36,6 +36,16 @@ export function createPopoverPositioner(
   props: JSX.HTMLAttributes<HTMLDivElement>,
 ): CreatePopoverPositionerReturn {
   warnOnStringStyle(props);
+
+  // The positioner is the direct `<body>` child a modal ancestor's `createHideOutside` observer
+  // sees appear, and it would hide it — leaving a card that paints on top, undimmed and legible,
+  // yet `inert`: out of the accessibility tree and transparent to hit testing. Sparing the
+  // positioner spares its whole subtree, `isSpared` testing containment both ways.
+  //
+  // Keyed on `mounted()`, not `open()`, so the layer stays spared through its exit transition —
+  // the same reason `createFloating` is. A popover with no modal above it registers into an empty
+  // stack and `keepVisible` no-ops.
+  createKeepVisible({ active: state.contentPresence.mounted, ref: state.positionerElement });
 
   const elementProps = merge(props, {
     // Kernel first, consumer last — deliberately, and it is the documented escape valve for

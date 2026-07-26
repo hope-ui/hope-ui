@@ -1,3 +1,23 @@
+/**
+ * @license
+ * Portions of this file are derived from Adobe React Spectrum (`@react-aria/overlays`,
+ * `src/ariaHideOutside.ts`).
+ * Copyright 2020 Adobe. All rights reserved.
+ * https://github.com/adobe/react-spectrum
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. A copy of the License is distributed with this
+ * package as LICENSE-APACHE-2.0.txt, and is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * This file has been modified from the original.
+ */
+
 import { type Accessor, createEffect } from "solid-js";
 
 export interface CreateHideOutsideOptions {
@@ -22,6 +42,19 @@ export interface CreateHideOutsideOptions {
    */
   spare?: Accessor<ReadonlyArray<Element | null | undefined>>;
 }
+
+/**
+ * Declarative always-visible marker: an element carrying this attribute is spared by **every**
+ * layer, whether it was already in the page when the layer opened or appeared while it was open.
+ *
+ * It covers the ordering `keepVisible` cannot reach — a modal opening *after* the layer it must
+ * spare — and the code that never sees this kernel at all: a third-party toast root, a live
+ * region, a portal owned by another library. It ships wired to nothing on purpose; `Popover` uses
+ * `createKeepVisible` instead, because that is scoped to one layer and undone on close, which an
+ * always-on attribute is not. React Aria ships the same pair (`data-react-aria-top-layer`, and no
+ * first-party overlay of theirs sets it either).
+ */
+export const TOP_LAYER_ATTRIBUTE = "data-hope-ui-top-layer";
 
 /**
  * Per-element bookkeeping, stored on the element itself under a cross-realm shared symbol
@@ -102,10 +135,13 @@ function hasHiddenAncestor(element: Element, hidden: Set<Element>): boolean {
 }
 
 /** Whether `node` is a target, contains one, or lives inside one. Such nodes are never hidden. */
-function isSpared(node: Element, targets: readonly Element[]): boolean {
-  return targets.some(
-    (target) => node === target || node.contains(target) || target.contains(node),
-  );
+function isSpared(node: Element, targets: ReadonlySet<Element>): boolean {
+  for (const target of targets) {
+    if (node === target || node.contains(target) || target.contains(node)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -116,7 +152,7 @@ function isSpared(node: Element, targets: readonly Element[]): boolean {
  * we just hid — and every reason not to, since clearing the attributes from a descendant
  * later wouldn't un-hide it anyway.
  */
-function hideOutside(targets: readonly Element[], root: Element, hidden: Set<Element>): void {
+function hideOutside(targets: ReadonlySet<Element>, root: Element, hidden: Set<Element>): void {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
     acceptNode(node) {
       const element = node as Element;
@@ -129,13 +165,15 @@ function hideOutside(targets: readonly Element[], root: Element, hidden: Set<Ele
       }
 
       // A target: skip it and everything inside it.
-      if (targets.includes(element)) {
+      if (targets.has(element)) {
         return NodeFilter.FILTER_REJECT;
       }
 
       // An ancestor of a target: don't hide it, but descend to reach its other children.
-      if (targets.some((target) => element.contains(target))) {
-        return NodeFilter.FILTER_SKIP;
+      for (const target of targets) {
+        if (element.contains(target)) {
+          return NodeFilter.FILTER_SKIP;
+        }
       }
 
       return NodeFilter.FILTER_ACCEPT;
@@ -149,6 +187,43 @@ function hideOutside(targets: readonly Element[], root: Element, hidden: Set<Ele
     hide(node as Element, hidden);
     node = walker.nextNode();
   }
+}
+
+/**
+ * The stack of live layers, innermost last, stored on `document` under a cross-realm shared
+ * symbol for the same reason {@link HIDDEN_STATE} is stored on the element: two installed copies
+ * of `@hope-ui/primitives` would keep two module-scope stacks, each believing it owns the
+ * innermost layer.
+ *
+ * It answers a different question from the per-element ref count. That one is "how many layers
+ * still need this element hidden"; this one is "which layer is innermost" — which decides who
+ * observes, and which layer `keepVisible` spares into.
+ */
+const OBSERVER_STACK = Symbol.for("hope-ui.hide-outside-stack");
+
+interface HideOutsideLayer {
+  /** What this layer spares. Mutable — {@link keepVisible} adds to the topmost layer's set. */
+  targets: Set<Element>;
+  /** What this layer hid, and what its cleanup must un-hide. */
+  hidden: Set<Element>;
+  /** Re-attach this layer's `MutationObserver` — called when it becomes topmost again. */
+  observe: () => void;
+  /** Detach it, without discarding anything the layer hid. */
+  disconnect: () => void;
+}
+
+type ObserverStackHost = Document & { [OBSERVER_STACK]?: HideOutsideLayer[] };
+
+function getObserverStack(): HideOutsideLayer[] {
+  const host = document as ObserverStackHost;
+  const existing = host[OBSERVER_STACK];
+  if (existing !== undefined) {
+    return existing;
+  }
+
+  const created: HideOutsideLayer[] = [];
+  host[OBSERVER_STACK] = created;
+  return created;
 }
 
 /**
@@ -168,9 +243,9 @@ function hideOutside(targets: readonly Element[], root: Element, hidden: Set<Ele
  * as a replacement for it.
  *
  * The TreeWalker accept/skip/reject strategy, the per-element ref count so nested layers
- * compose, and the `MutationObserver` for content that appears while a layer is open are
- * adapted from React Aria's `ariaHideOutside` (Adobe, Apache-2.0). The code is written fresh
- * for Solid.
+ * compose, the `MutationObserver` for content that appears while a layer is open, the layer
+ * stack so only the innermost one observes, and `keepVisible` are adapted from React Aria's
+ * `ariaHideOutside` (Adobe, Apache-2.0), re-expressed for Solid.
  *
  * ## One target, and a list of things to spare beside it
  *
@@ -186,6 +261,33 @@ function hideOutside(targets: readonly Element[], root: Element, hidden: Set<Ele
  * the popup missing from the list hides the popup, `inert` blurs whatever the focus trap just
  * focused inside it, and focus lands on `<body>` for good — the trap has no reason to fire
  * again. Hence: nothing happens until `target` resolves.
+ *
+ * ## Nested layers: only the innermost one observes
+ *
+ * Every activation pushes onto a `document`-keyed stack and disconnects the layer it covers, so
+ * exactly one `MutationObserver` is live at a time. That is load-bearing, not an optimization:
+ * {@link keepVisible} registers into the **topmost** layer only, so a still-observing outer layer
+ * would hide the very element the inner one just agreed to spare, and no registration could ever
+ * work under a nesting. (A Dialog inside a Dialog also stops marking every new element twice.)
+ *
+ * Cleanup un-hides this layer's own set, then either pops and restarts the layer underneath (the
+ * normal, innermost-closes-first case) or splices itself out of the middle without restarting
+ * anything, because whoever is on top is already observing. That out-of-order branch is React
+ * Aria's, and it is not hypothetical here: two overlays can close in either order.
+ *
+ * **Stack position is activation order, not mount order.** The push happens inside the effect
+ * body, after the `active`/`target` guard, so a mounted-but-closed layer is simply absent and
+ * reopening it puts it on top. One consequence worth knowing, which React Aria shares: the effect
+ * is keyed on `[active(), target(), spare()]`, so swapping the target element *while active*
+ * re-runs it and moves that layer to the top of the stack.
+ *
+ * ## Sparing a layer that opens later
+ *
+ * A layer added above an open modal — a `Popover` inside a `Dialog` — is a new `<body>` child the
+ * modal's observer would otherwise hide, and being `inert` is what makes it unclickable while it
+ * still paints perfectly. {@link createKeepVisible} is how such a layer registers itself into the
+ * modal's spared set for as long as it is mounted; {@link TOP_LAYER_ATTRIBUTE} is the declarative
+ * form, for the opposite ordering and for code that cannot call in.
  *
  * ## Consequences worth knowing
  *
@@ -211,12 +313,20 @@ export function createHideOutside(options: CreateHideOutsideOptions): void {
         return;
       }
 
+      const targets = new Set<Element>([target]);
       // A `ref` signal is never reset to `undefined` on unmount, so stale detached elements
       // can linger in `spare`. They're harmless, but filtering keeps `contains` checks cheap.
-      const spare = (rawSpare ?? []).filter(
-        (element): element is Element => element != null && root.contains(element),
-      );
-      const targets = spare.includes(target) ? spare : [target, ...spare];
+      for (const element of rawSpare ?? []) {
+        if (element != null && root.contains(element)) {
+          targets.add(element);
+        }
+      }
+      for (const marked of root.querySelectorAll(`[${TOP_LAYER_ATTRIBUTE}]`)) {
+        targets.add(marked);
+      }
+
+      const stack = getObserverStack();
+      stack.at(-1)?.disconnect();
 
       const hidden = new Set<Element>();
       hideOutside(targets, root, hidden);
@@ -230,6 +340,11 @@ export function createHideOutside(options: CreateHideOutsideOptions): void {
             if (!(node instanceof Element)) {
               continue;
             }
+            // Marked as always-visible: spare it, and keep sparing whatever lands inside it.
+            if (node.hasAttribute(TOP_LAYER_ATTRIBUTE)) {
+              targets.add(node);
+              continue;
+            }
             if (isSpared(node, targets)) {
               continue;
             }
@@ -241,15 +356,96 @@ export function createHideOutside(options: CreateHideOutsideOptions): void {
           }
         }
       });
-      observer.observe(root, { childList: true, subtree: true });
+
+      const layer: HideOutsideLayer = {
+        targets,
+        hidden,
+        observe: () => observer.observe(root, { childList: true, subtree: true }),
+        disconnect: () => observer.disconnect(),
+      };
+      layer.observe();
+      stack.push(layer);
 
       return () => {
-        observer.disconnect();
+        layer.disconnect();
         for (const element of hidden) {
           unhide(element);
         }
         hidden.clear();
+
+        // Innermost-closes-first is the normal case: pop, and hand observation back to the layer
+        // this one covered. Closing out of order, there is nothing to hand back — whoever is on
+        // top never stopped observing — so this layer just splices itself out of the middle.
+        if (stack.at(-1) === layer) {
+          stack.pop();
+          stack.at(-1)?.observe();
+        } else {
+          stack.splice(stack.indexOf(layer), 1);
+        }
       };
+    },
+  );
+}
+
+/**
+ * Spares `element` from the **innermost currently-open layer**, and returns the undo — or
+ * `undefined` when there is no open layer, or when that layer already spares it.
+ *
+ * This is what lets a layer opened *above* a modal stay reachable: sparing an element spares its
+ * whole subtree, because {@link isSpared} tests containment in both directions. It only affects
+ * what the layer hides *from now on*, so it has to run before the layer's `MutationObserver` sees
+ * the element — which is why {@link createKeepVisible} registers from an effect body rather than
+ * from a cleanup or a deferred callback.
+ *
+ * Sparing is per-layer, not global: a modal that opens *later* walks the page fresh and knows
+ * nothing about this registration. {@link TOP_LAYER_ATTRIBUTE} is the mechanism for that case.
+ */
+export function keepVisible(element: Element): (() => void) | undefined {
+  const layer = getObserverStack().at(-1);
+  if (layer === undefined || layer.targets.has(element)) {
+    return undefined;
+  }
+
+  layer.targets.add(element);
+  return () => {
+    layer.targets.delete(element);
+  };
+}
+
+export interface CreateKeepVisibleOptions {
+  /**
+   * Whether the element should currently be spared. Key it on whatever keeps the layer
+   * *mounted* rather than on `open` — a layer animating out is still in the page, and still
+   * needs to not be `inert` while it is.
+   */
+  active: Accessor<boolean>;
+  /**
+   * The element to spare, with its subtree. Must be a real signal accessor, for the reason
+   * `createHideOutside`'s `target` is: it is created as a reactive consequence of the same
+   * signal `active` derives from.
+   */
+  ref: Accessor<Element | null | undefined>;
+}
+
+/**
+ * The reactive form of {@link keepVisible}: registers the element with the innermost open layer
+ * while `active`, and undoes it on deactivation, on an element swap, or on disposal.
+ *
+ * Shaped like `createRegisteredElement`, and for the same reason — the element is only populated
+ * after render, and may be replaced when the layer remounts.
+ *
+ * ## SSR
+ *
+ * `createEffect` bodies never run during SSR, and there is no layer stack on a server anyway.
+ */
+export function createKeepVisible(options: CreateKeepVisibleOptions): void {
+  createEffect(
+    () => [options.active(), options.ref()] as const,
+    ([active, element]) => {
+      if (!active || element == null) {
+        return;
+      }
+      return keepVisible(element);
     },
   );
 }
