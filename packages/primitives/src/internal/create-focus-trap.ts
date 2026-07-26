@@ -1,5 +1,6 @@
 import { type Accessor, createEffect } from "solid-js";
 import { createAutoFocus, getFocusableElements } from "./create-auto-focus";
+import { createFocusScope } from "./create-focus-scope";
 
 export interface CreateFocusTrapOptions {
   /** Whether the trap is currently active. */
@@ -24,8 +25,18 @@ export interface CreateFocusTrapOptions {
  * (Popover, Tooltip, a non-modal Dialog) wants focus returned *without* being trapped.
  * Compose both, and create `createFocusRestore` first; see `create-focus-restore.md` for the two
  * ordering constraints that depend on it.
+ *
+ * **A trap is not the outermost thing in the page.** It registers itself as a focus scope
+ * (`createFocusScope`, composed below) and leaves alone any focus that landed in a layer opened
+ * *above* it — a Popover portaled out of the Dialog it was opened in is not focus escaping, even
+ * though it is outside this container by every DOM measure. See `create-focus-scope.md`.
  */
 export function createFocusTrap(options: CreateFocusTrapOptions): void {
+  // Created first of the three, so the scope is on the stack before the listeners below can
+  // consult it and before `createAutoFocus` moves focus anywhere. Same `options`, so registration
+  // and the listeners activate on exactly the same edge.
+  const scope = createFocusScope(options);
+
   // Created BEFORE `createAutoFocus`, and that order is load-bearing. Sibling effects run
   // their previous cleanup in *creation* order on a re-run, so listeners-first reproduces
   // what the single welded effect used to do: remove the listeners, and only then let
@@ -67,7 +78,10 @@ export function createFocusTrap(options: CreateFocusTrapOptions): void {
       };
 
       const handleFocusIn = (event: FocusEvent) => {
-        if (container.contains(event.target as Node)) {
+        // Not a bare `container.contains`: focus that landed inside a layer opened *above* this
+        // trap belongs to that layer. Pulling it back would blur what the layer just focused and,
+        // through its `closeOnFocusOutside`, close it outright.
+        if (scope.containsSelfOrAbove(event.target as Node | null)) {
           return;
         }
         const focusable = getFocusableElements(container);

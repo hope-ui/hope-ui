@@ -54,6 +54,11 @@ export {
   createFocusRestore,
 } from "./create-focus-restore";
 export {
+  type CreateFocusScopeOptions,
+  type CreateFocusScopeReturn,
+  createFocusScope,
+} from "./create-focus-scope";
+export {
   type CreateFocusTrapOptions,
   createFocusTrap,
 } from "./create-focus-trap";

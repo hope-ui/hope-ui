@@ -1,7 +1,8 @@
 import { expectNoA11yViolations, mount } from "@hope-ui/internal-test-utils";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
+import { createFocusScope } from "../create-focus-scope";
 import { createFocusTrap } from "../create-focus-trap";
 
 function TestHarness() {
@@ -88,6 +89,104 @@ describe("createFocusTrap", () => {
 
   it("has no baseline accessibility violations", async () => {
     const { container, dispose } = mount(() => <TestHarness />);
+    await expectNoA11yViolations(container);
+    dispose();
+  });
+});
+
+/**
+ * A second harness rather than props on the first: the five tests above are the gate proving the
+ * focus-scope registry changed nothing for a lone trap, so the tree they run against stays
+ * byte-identical.
+ *
+ * The layer above is a **sibling** container, not a descendant — that is the shape the registry
+ * exists for, a `Popover` portaled out of the `Dialog` it was opened in. A nested one would be
+ * covered by `container.contains` and prove nothing. The trap is always active and the scope above
+ * is what toggles, so the two answers can be compared against one unchanging trap.
+ */
+function TrapUnderALayer(props: { aboveActive?: boolean }) {
+  const [containerRef, setContainerRef] = createSignal<HTMLDivElement>();
+  const [aboveRef, setAboveRef] = createSignal<HTMLDivElement>();
+
+  createFocusTrap({ active: () => true, ref: containerRef });
+  createFocusScope({ active: () => props.aboveActive === true, ref: aboveRef });
+
+  return (
+    <div>
+      <button type="button" data-testid="outside">
+        Outside
+      </button>
+      <div data-testid="container" ref={setContainerRef}>
+        <button type="button" data-testid="trapped-first">
+          Trapped first
+        </button>
+      </div>
+      <div data-testid="above" ref={setAboveRef}>
+        <button type="button" data-testid="above-first">
+          Above
+        </button>
+      </div>
+    </div>
+  );
+}
+
+describe("createFocusTrap — a layer above", () => {
+  it("leaves alone focus that landed inside a scope registered above it", async () => {
+    const { dispose } = mount(() => <TrapUnderALayer aboveActive />);
+
+    // Waiting on the trap's own autofocus is what proves every effect in this tree has flushed —
+    // the scope above registers in the same flush, one effect later.
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+
+    page.getByTestId("above-first").element().focus();
+    await expect.element(page.getByTestId("above-first")).toHaveFocus();
+
+    // The control, in the same test and against the same live trap: focus that landed outside
+    // *every* scope is still pulled back in.
+    page.getByTestId("outside").element().focus();
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+
+    dispose();
+  });
+
+  it("still yanks focus into a layer that registered no scope", async () => {
+    const { dispose } = mount(() => <TrapUnderALayer />);
+
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+
+    // Same container, same sibling markup — the registration is the only difference, so this is
+    // what says the trap consults the registry rather than the DOM shape.
+    page.getByTestId("above-first").element().focus();
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+
+    dispose();
+  });
+
+  it("resumes yanking once the scope above deactivates", async () => {
+    const [aboveActive, setAboveActive] = createSignal(true);
+    const { dispose } = mount(() => <TrapUnderALayer aboveActive={aboveActive()} />);
+
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+    page.getByTestId("above-first").element().focus();
+    await expect.element(page.getByTestId("above-first")).toHaveFocus();
+
+    // A Popover closing hands authority back to the Dialog underneath it. Without the splice in
+    // the scope's cleanup, the trap would stay permanently disarmed for that region of the page.
+    flush(() => setAboveActive(false));
+
+    // Deactivating does not itself move focus — nothing in this primitive touches it — and
+    // `.focus()` on the already-focused element dispatches no `focusin`, so the trap has had no
+    // event to react to yet. Focus has to genuinely leave and come back for this to measure
+    // anything.
+    page.getByTestId("trapped-first").element().focus();
+    page.getByTestId("above-first").element().focus();
+    await expect.element(page.getByTestId("trapped-first")).toHaveFocus();
+
+    dispose();
+  });
+
+  it("has no baseline accessibility violations", async () => {
+    const { container, dispose } = mount(() => <TrapUnderALayer aboveActive />);
     await expectNoA11yViolations(container);
     dispose();
   });

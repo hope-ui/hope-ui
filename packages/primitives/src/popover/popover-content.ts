@@ -4,6 +4,7 @@ import {
   createAutoFocus,
   createDismissable,
   createFocusRestore,
+  createFocusScope,
   createRegisteredId,
   type FloatingAlign,
   type PresenceStatus,
@@ -64,17 +65,27 @@ export function createPopoverContent(
   // rendered by the very signal they key on. See `create-auto-focus.ts`.
   const ref = state.contentElement;
 
-  // THE CREATION ORDER OF THESE THREE IS LOAD-BEARING, NOT STYLISTIC.
+  // THE CREATION ORDER OF THESE FOUR IS LOAD-BEARING, NOT STYLISTIC.
   //
   // 1. `createFocusRestore` first, so its `document.activeElement` snapshot is taken before anything
   //    below moves focus (`create-focus-restore.md`; the same constraint `dialog-content.ts` states).
-  // 2. `createAutoFocus` before `createDismissable`, because focus-out now dismisses: `.focus()`
+  // 2. `createFocusScope` before `createAutoFocus`, so this layer is on the focus-scope stack —
+  //    above whatever it was opened inside — *before* anything moves focus into it. Registered
+  //    after, the `focusin` that autofocus dispatches reaches an enclosing modal's focus trap while
+  //    the trap still knows nothing about this layer, and it yanks focus straight back out; the
+  //    dismissal below then reads that as focus leaving and closes the popover in ~3ms. This is a
+  //    registration, not a trap: Tab still leaves freely. See `create-focus-scope.md`.
+  // 3. `createAutoFocus` before `createDismissable`, because focus-out now dismisses: `.focus()`
   //    dispatches `focusin` **synchronously**, and sibling effects run in creation order, so on a
   //    reopen that finds the layer already positioned the focus lands before the dismissable effect
   //    attaches its document listener. On a *cold* open the autofocus gate below delays it past that
   //    attach instead, and the listener's own `container.contains(target)` early return is what
   //    keeps the layer from dismissing itself. Two independent guards, one per path.
   createFocusRestore({ active: state.open });
+  // Keyed on `open`, not on `isPositioned`: the scope costs nothing while the layer is still
+  // measuring, and being registered early is the entire point. The predicate it returns is for a
+  // trap to consult — this layer has none, so it is deliberately unused here.
+  createFocusScope({ active: state.open, ref });
   // Gated on `isPositioned`, not on `open` alone. Until the first measurement lands,
   // `floating.floatingStyles()` is the pre-positioned `visibility: hidden` branch — and an element
   // inside a `visibility: hidden` subtree is not focusable, so `.focus()` is a **silent no-op** and
