@@ -61,6 +61,18 @@ const CLAMPED_TRIGGER_STYLE: JSX.CSSProperties = {
 const POSITIONER_STYLE: JSX.CSSProperties = { width: "200px" };
 const ARROW_STYLE: JSX.CSSProperties = { width: "8px", height: "8px" };
 
+/**
+ * The exit transition, for the same reason and by the same means as the two above.
+ *
+ * hope's `content` slot authors `transition-[opacity,scale,translate] duration-150`, and **that is
+ * the only thing that gives a closing popover an exit at all**: `createPresence` reads the computed
+ * duration off this element and unmounts immediately when it is `0`. With no compiled Tailwind here
+ * that class computes to exactly that — measured, the layer is gone by the first frame after the
+ * close and `data-presence="exiting"` is never observable. So the R9 exit assertion below would hold
+ * over an empty set. This is the recipe's duration, spelled where `getComputedStyle` can read it.
+ */
+const TRANSITIONED_CONTENT_STYLE: JSX.CSSProperties = { transition: "opacity 150ms ease-out" };
+
 interface PopoverDemoProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -68,6 +80,8 @@ interface PopoverDemoProps {
   side?: PopoverRootProps["side"];
   align?: PopoverRootProps["align"];
   triggerStyle?: JSX.CSSProperties;
+  /** Give the card a real exit duration — see {@link TRANSITIONED_CONTENT_STYLE}. */
+  contentStyle?: JSX.CSSProperties;
   /** Mount a `Popover.Anchor`, which outranks the trigger as the positioning reference. */
   withAnchor?: boolean;
   /** A focusable control inside the popup, before the CloseTrigger. */
@@ -96,7 +110,7 @@ const PopoverDemo: Component<PopoverDemoProps> = (props) => (
       <Popover.Trigger style={props.triggerStyle ?? TRIGGER_STYLE}>Open popover</Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner style={POSITIONER_STYLE}>
-          <Popover.Content>
+          <Popover.Content style={props.contentStyle}>
             <Popover.Arrow style={ARROW_STYLE} />
             <Popover.Title>Popover title</Popover.Title>
             <Popover.Description>Popover description</Popover.Description>
@@ -574,6 +588,142 @@ describe("Popover — render re-targets every part without dropping props or ref
   });
 });
 
+/** One animation frame's worth of the positioner's painted state. */
+interface PresenceFrame {
+  /** `data-presence`, or `null` once the positioner has left the document. */
+  presence: string | null;
+  /** `"unmounted"` stands in for the frames where there is no element to read. */
+  visibility: string;
+  transform: string;
+}
+
+function readPositionerFrame(): PresenceFrame {
+  const positioner = partOf("positioner");
+  if (positioner === null) {
+    return { presence: null, visibility: "unmounted", transform: "none" };
+  }
+  const computed = window.getComputedStyle(positioner);
+  return {
+    presence: positioner.getAttribute("data-presence"),
+    visibility: computed.visibility,
+    transform: computed.transform,
+  };
+}
+
+/** Enough to outlast both the double-rAF `entering → entered` flip and a 150ms exit. */
+const SAMPLED_FRAMES = 15;
+
+/**
+ * Runs `act()` and records the positioner's **computed** style once per animation frame from there.
+ *
+ * `act` is a synchronous `.click()` and the loop is registered in the same task on purpose:
+ * `userEvent.click()` costs a CDP round-trip of its own, so the frames this is here to inspect —
+ * the ones between the state change and the layer settling — would already be behind us by the time
+ * it resolved. Reading the *computed* style rather than `element.style` is the other half: it is
+ * what the recipe's classes would show up in if the `positioner` slot ever grew a positional one.
+ */
+function sampleFrames(act: () => void, frameCount = SAMPLED_FRAMES): Promise<PresenceFrame[]> {
+  const samples: PresenceFrame[] = [];
+  return new Promise<PresenceFrame[]>((resolve) => {
+    const tick = () => {
+      samples.push(readPositionerFrame());
+      if (samples.length >= frameCount) {
+        resolve(samples);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    act();
+    requestAnimationFrame(tick);
+  });
+}
+
+/**
+ * **R9** — `createPresence`'s clock meeting the kernel's pre-positioned `visibility: hidden`, the
+ * pair `create-floating.md` reasons about and nothing had ever observed. Both run over the same
+ * element: `floatingStyles()` parks an unmeasured layer at `{ left: 0, top: 0, visibility: "hidden" }`
+ * and lifts that in the same memo read that writes the `translate()`, while presence walks
+ * `entering → entered → exiting → exited` on its own rAF schedule. So these sample the frames instead
+ * of arguing about them.
+ *
+ * R9's third half — hydrate closed, then open, and it still positions (`create-floating.md`'s
+ * consumer anti-pattern #2, "no tree branch on `side()`") — is *"leaves the hydrated trigger
+ * interactive, and mounts the portal client-side"* below, which hydrates closed, opens and waits for
+ * a real measurement. It is not repeated here.
+ */
+describe("Popover — R9: presence over the kernel's pre-positioned visibility", () => {
+  it("never paints an unmeasured layer, and is positioned before presence reports `entered`", async () => {
+    const { dispose } = mount(() => <PopoverDemo contentStyle={TRANSITIONED_CONTENT_STYLE} />);
+    const trigger = triggerLocator().query() as HTMLElement;
+
+    const frames = await sampleFrames(() => trigger.click());
+
+    // R9's enter half. `visibility` and the `translate()` are lifted by one memo read, so a frame
+    // that is visible with no transform is the layer painted at 0,0 — on top of the document's
+    // top-left corner, for as long as the measurement takes.
+    const paintedUnmeasured = frames.find(
+      (frame) => frame.visibility === "visible" && frame.transform === "none",
+    );
+    expect(
+      paintedUnmeasured,
+      `painted before measuring: ${JSON.stringify(frames)}`,
+    ).toBeUndefined();
+
+    // The race R9a names, settled by measurement rather than by argument: `computePosition` resolves
+    // on the microtask queue *inside* the task that mounted the layer, while `entering → entered`
+    // costs two rAFs (`create-presence.ts:112-115`). So positioning is already in by the first
+    // sampled frame, and there is an `entering` frame that is genuinely visible for a transition to
+    // animate from.
+    const enteringVisible = frames.filter(
+      (frame) => frame.presence === "entering" && frame.visibility === "visible",
+    );
+    expect(enteringVisible.length, JSON.stringify(frames)).toBeGreaterThan(0);
+
+    // Consumer anti-pattern #4: the `positioner` slot carries `z-50 w-max` and nothing positional, so
+    // the only `transform` on this element is the kernel's — a real translation, not the identity
+    // matrix a layer stuck at 0,0 would compute to.
+    const settled = frames[frames.length - 1];
+    expect(settled?.presence).toBe("entered");
+    expect(settled?.transform).toMatch(/^matrix\(/);
+    expect(settled?.transform).not.toBe("matrix(1, 0, 0, 1, 0, 0)");
+
+    dispose();
+  });
+
+  it("keeps a closing layer positioned for every frame of its exit", async () => {
+    const { dispose } = mount(() => <PopoverDemo contentStyle={TRANSITIONED_CONTENT_STYLE} />);
+    const trigger = triggerLocator().query() as HTMLElement;
+
+    trigger.click();
+    await waitForPositioned();
+
+    const frames = await sampleFrames(() => trigger.click());
+    const exiting = frames.filter((frame) => frame.presence === "exiting");
+
+    // Not a smoke check — the assertion below quantifies over this set, and an empty one passes it
+    // while proving nothing. It is empty whenever the card has no authored exit duration, which is
+    // the default in this project. See `TRANSITIONED_CONTENT_STYLE`.
+    expect(
+      exiting.length,
+      `no exiting frame to inspect: ${JSON.stringify(frames)}`,
+    ).toBeGreaterThan(0);
+
+    // Correction #2, and the sharper half of R9: `createPopover` passes `createFloating` an
+    // `active: () => contentPresence.mounted()`. Keyed on `open` instead, effect (2) would
+    // `setIsPositioned(false)` the instant the popover closed — `floatingStyles()` reverting to the
+    // hidden 0,0 branch while presence still holds the card mounted, so it would vanish rather than
+    // animate out. Every exiting frame staying visible *and* translated is what says it didn't.
+    for (const frame of exiting) {
+      expect(frame.visibility, `exit frame went hidden: ${JSON.stringify(frames)}`).toBe("visible");
+      expect(frame.transform, `exit frame lost its position: ${JSON.stringify(frames)}`).toMatch(
+        /^matrix\(/,
+      );
+    }
+
+    dispose();
+  });
+});
+
 // `Tree` is the same tree `popover.ssr.test.tsx` inline-snapshots and the bridge renders server-side,
 // so the hydration input and the client tree cannot structurally diverge — which matters because
 // `_hk` keys are a path through the component tree: a component inserted before `Popover.Trigger`,
@@ -593,8 +743,10 @@ describe("Popover — hydration", () => {
 
     await userEvent.click(page.getByRole("button", { name: "Open popover" }));
     await expect.element(page.getByRole("dialog")).toBeInTheDocument();
-    // Hydrated closed, then opened — and it still positions. The tree never branches on `side()`, so
-    // there is no server/client structural difference for the measurement to land on.
+    // Hydrated closed, then opened — and it still positions. **This is R9's hydration half** (and
+    // `create-floating.md`'s consumer anti-pattern #2): the tree never branches on `side()`/`align()`,
+    // only CSS keyed on `data-side` does, so there is no server/client structural difference for the
+    // client's first measurement to land on. Deliberately not repeated in the R9 sampler block above.
     await waitForPositioned();
 
     dispose();

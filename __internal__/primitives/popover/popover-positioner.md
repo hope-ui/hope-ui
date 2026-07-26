@@ -56,7 +56,30 @@ utilities that would be overwritten on the first measurement anyway.
 
 Concretely, the pre-positioned branch of `floatingStyles()` is
 `{ position, left: 0, top: 0, visibility: "hidden" }`. A consumer who wants the layer laid out
-differently before it is measured overrides `visibility` here rather than patching the kernel.
+differently before it is measured overrides `visibility` here rather than patching the kernel:
+
+```tsx
+// Lay the layer out unmeasured — e.g. to measure its own content first — instead of hiding it.
+<Popover.Positioner style={{ visibility: "visible" }} />
+```
+
+### What that overrides, measured
+
+The kernel's `visibility` is doing two jobs, and spreading over it opts out of both. Both are pinned
+by the R9 cases in `popover.browser.test.tsx`, which sample the positioner's *computed* style once per
+animation frame across an open and a close:
+
+- **No frame is ever visible-but-unmeasured.** `visibility` and the `translate()` are lifted by the
+  same memo read, so the layer never paints at 0,0 — measured, it is already translated on the first
+  sampled frame, because `computePosition` resolves on the microtask queue inside the mounting task
+  while `createPresence` spends two rAFs going `entering → entered`.
+- **A closing layer stays positioned for its whole exit.** That is `active: () =>
+  contentPresence.mounted()` in `createPopover`, not `active: open` — see
+  [`popover-root.md`](popover-root.md).
+
+Override `visibility` and the first point becomes the consumer's problem: the layer paints wherever
+it was laid out until the first measurement lands. That is the trade the escape valve exists to make
+available, not a bug.
 
 ### A string `style` is unsupported
 
