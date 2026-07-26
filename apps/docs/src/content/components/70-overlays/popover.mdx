@@ -1,0 +1,929 @@
+import { Alert } from "@hope-ui/components/alert";
+import { PopoverAnchorDemo } from "~/components/demos/popover/PopoverAnchorDemo";
+import { PopoverArrowDemo } from "~/components/demos/popover/PopoverArrowDemo";
+import { PopoverBasicDemo } from "~/components/demos/popover/PopoverBasicDemo";
+import { PopoverControlledDemo } from "~/components/demos/popover/PopoverControlledDemo";
+import { PopoverDismissalDemo } from "~/components/demos/popover/PopoverDismissalDemo";
+import { PopoverFormDemo } from "~/components/demos/popover/PopoverFormDemo";
+import { PopoverInDialogDemo } from "~/components/demos/popover/PopoverInDialogDemo";
+import { PopoverLogicalSideDemo } from "~/components/demos/popover/PopoverLogicalSideDemo";
+import { PopoverNestedDemo } from "~/components/demos/popover/PopoverNestedDemo";
+import { PopoverPositionMatrixDemo } from "~/components/demos/popover/PopoverPositionMatrixDemo";
+import { PopoverScrollContainerDemo } from "~/components/demos/popover/PopoverScrollContainerDemo";
+import { PopoverSizesDemo } from "~/components/demos/popover/PopoverSizesDemo";
+import { Anatomy } from "~/components/Anatomy";
+import { PropsTable } from "~/components/PropsTable";
+import { DataTable } from "~/components/DataTable";
+
+export const summary = "Non-modal card anchored to the control that opened it.";
+
+export const description =
+  "A small surface anchored to a trigger — measured against it, flipped and shifted to stay in view, and dismissed by Escape, an outside click, or Tab-ing away. It is non-modal: the page behind stays live, scrollable, and clickable, and popovers nest inside each other and inside a Dialog.";
+
+# Popover
+
+{description}
+
+## Import
+
+```tsx
+import { Popover } from "@hope-ui/components/popover";
+```
+
+`Popover` is a **compound** component — a namespace object whose parts you arrange yourself; there is
+no auto-composed shortcut. See the [Anatomy](#anatomy) below for every part and how they nest.
+
+## Usage
+
+`Popover.Root` owns the state (open/close, positioning, ARIA) and renders **no element** of its own.
+`Popover.Trigger` toggles the card and doubles as the thing it is positioned against; everything
+inside `Popover.Portal` renders into a portal at the end of `<body>`, so no ancestor's `overflow` can
+clip it.
+
+<Preview>
+  <PopoverBasicDemo />
+</Preview>
+
+```tsx
+<Popover.Root>
+  <Popover.Trigger render={(p) => <Button {...p}>Share</Button>} />
+  <Popover.Portal>
+    <Popover.Positioner>
+      <Popover.Content>
+        <Popover.Arrow />
+        <Popover.Title>Share this page</Popover.Title>
+        <Popover.Description>
+          Anyone with the link can view it. Change who has access in <a href="#">project settings</a>.
+        </Popover.Description>
+      </Popover.Content>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Because Popover reads a recipe (and <code>Popover.CloseTrigger</code> renders a
+      themed <code>CloseButton</code>), a Popover needs a{" "}
+      <code>&lt;ThemeProvider&gt;</code> ancestor fed a preset — as every styled hope-ui
+      component does.
+    </div>
+  }
+/>
+
+## Anatomy
+
+The nesting is fixed: `Portal` lifts the layer out of the page's stacking and overflow contexts,
+`Positioner` is the element the positioning engine measures and moves, and `Content` is the card
+itself. The split between the last two is load-bearing — the card's enter/exit `translate` would
+otherwise fight the `translate()` written onto the positioner.
+
+<Anatomy
+  root={{
+    name: "Popover.Root",
+    children: [
+      { name: "Popover.Anchor", note: "optional · outranks the trigger" },
+      { name: "Popover.Trigger" },
+      {
+        name: "Popover.Portal",
+        children: [
+          {
+            name: "Popover.Positioner",
+            children: [
+              {
+                name: "Popover.Content",
+                children: [
+                  { name: "Popover.Arrow", note: "optional" },
+                  { name: "Popover.Title" },
+                  { name: "Popover.Description" },
+                  { name: "Popover.CloseTrigger", note: "optional · opt-in" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }}
+/>
+
+<DataTable
+  columns={[
+    { key: "part", label: "Part", code: true },
+    { key: "element", label: "Element", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      part: "Popover.Root",
+      element: "—",
+      description:
+        "State owner: open/close, positioning, ids, role, and the resolved recipe. Renders no host element — just a context provider.",
+    },
+    {
+      part: "Popover.Trigger",
+      element: "button",
+      description:
+        "Toggles the popover and is the default anchor. Wires aria-haspopup / aria-expanded / aria-controls, and is the one element an outside click is never measured against. Usually rendered as your own Button via render.",
+    },
+    {
+      part: "Popover.Anchor",
+      element: "div",
+      description:
+        "Optional. Positions the layer against something other than the trigger — a card, a row, a whole section. Carries no ARIA: a positioning reference is not a control.",
+    },
+    {
+      part: "Popover.Portal",
+      element: "—",
+      description:
+        "Portals the Positioner to document.body (client-only), so no ancestor's overflow or transform can clip the layer.",
+    },
+    {
+      part: "Popover.Positioner",
+      element: "div",
+      description:
+        "The measured layer. Its position/left/top/transform are written inline by the positioning engine; it reports the resolved side and alignment as data-side / data-align.",
+    },
+    {
+      part: "Popover.Content",
+      element: "div",
+      description:
+        "The card, and the behavior hub: focus restore, autofocus, dismissal, the ARIA role, and the id linking. Nothing is auto-rendered inside it.",
+    },
+    {
+      part: "Popover.Arrow",
+      element: "div",
+      description:
+        "Optional. The little square that points back at the anchor, pinned by measurement. Goes inside Content, whose relative is what its pin resolves against.",
+    },
+    {
+      part: "Popover.Title",
+      element: "h2",
+      description: "The heading. Self-registers its id as the card's aria-labelledby.",
+    },
+    {
+      part: "Popover.Description",
+      element: "p",
+      description: "The supporting prose. Self-registers its id as the card's aria-describedby.",
+    },
+    {
+      part: "Popover.CloseTrigger",
+      element: "button",
+      description:
+        "Opt-in. A CloseButton wired to close the popover, placed in the card's trailing-top corner.",
+    },
+  ]}
+/>
+
+## Open state
+
+Left uncontrolled, a Popover manages its own open state: the trigger toggles it, and Escape, an
+outside click, or Tab-ing away close it. Set `defaultOpen` to have it start open.
+
+```tsx title="Uncontrolled"
+<Popover.Root defaultOpen>
+  <Popover.Trigger render={(p) => <Button {...p}>Open</Button>} />
+  {/* … */}
+</Popover.Root>
+```
+
+Drive `open` as a controlled signal and handle `onOpenChange` to react to every path in and out —
+the trigger, Escape, an outside click, focus leaving, and your own buttons all route through it.
+
+<Preview>
+  <PopoverControlledDemo />
+</Preview>
+
+```tsx
+const [open, setOpen] = createSignal(false);
+
+<Popover.Root open={open()} onOpenChange={setOpen}>
+  {/* … */}
+</Popover.Root>;
+```
+
+## Sizes
+
+The `size` prop scales the card: its max width, its padding, and the rhythm between the title and the
+description. The default is `md`. The scale stops at `lg` on purpose — a popover is anchored to a
+control, and a viewport-filling surface is a [Dialog](/components/dialog).
+
+<Preview>
+  <PopoverSizesDemo />
+</Preview>
+
+```tsx
+<Popover.Root size="sm">…</Popover.Root>
+<Popover.Root size="lg">…</Popover.Root>
+```
+
+## Positioning
+
+`side` picks which side of the anchor the card prefers, and `align` skids it along that side's cross
+axis — twelve combinations in all. Open any cell below to see where it lands.
+
+<Preview>
+  <PopoverPositionMatrixDemo />
+</Preview>
+
+```tsx
+<Popover.Root side="top" align="start">…</Popover.Root>
+<Popover.Root side="right" align="center">…</Popover.Root>
+<Popover.Root side="bottom" align="end">…</Popover.Root>
+```
+
+`side` and `align` are a **preference**, not a promise: near a viewport edge the card flips to the
+opposite side and slides along its alignment axis to stay in view. What the parts report as
+`data-side` / `data-align` is where the card actually **landed** — which is what the enter animation,
+the scale origin, and the arrow's pin all key on.
+
+### Offsets and collisions
+
+<PropsTable
+  rows={[
+    {
+      prop: "sideOffset",
+      type: "number",
+      default: "8",
+      description: "Distance from the anchor, in px. The default clears the arrow.",
+    },
+    {
+      prop: "alignOffset",
+      type: "number",
+      default: "0",
+      description: "Skid along the alignment axis, in px.",
+    },
+    {
+      prop: "flip",
+      type: "boolean",
+      default: "true",
+      description: "Flip to the opposite side when the preferred one would overflow.",
+    },
+    {
+      prop: "shift",
+      type: "boolean",
+      default: "true",
+      description: "Slide along the alignment axis to stay in view.",
+    },
+    {
+      prop: "collisionPadding",
+      type: "number | Partial<Record<Side, number>>",
+      default: "8",
+      description: "Gutter kept between the card and the collision boundary.",
+    },
+    {
+      prop: "collisionBoundary",
+      type: "Element | Element[] | Rect | 'clippingAncestors'",
+      default: '"clippingAncestors"',
+      description: "What the card must stay inside. Defaults to every clipping ancestor.",
+    },
+    {
+      prop: "arrowPadding",
+      type: "number",
+      default: "8",
+      description:
+        "Gutter kept between the arrow and the card's corners, so it never points at the radius.",
+    },
+  ]}
+/>
+
+```tsx title="A card that never flips, kept 16px clear of the viewport"
+<Popover.Root side="top" flip={false} collisionPadding={16} sideOffset={12}>
+  {/* … */}
+</Popover.Root>
+```
+
+### Logical sides
+
+`side` also takes `inline-start` and `inline-end`, resolved against the **reading direction of the
+layer** — so one value serves both directions. `data-side` still reports the physical side, because
+where a box landed is geometry.
+
+<Preview>
+  <PopoverLogicalSideDemo />
+</Preview>
+
+```tsx
+<Popover.Root side="inline-start">…</Popover.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Popover writes no <code>dir</code> of its own — a portaled layer inherits direction
+      from <code>&lt;body&gt;</code>, and stamping one from the locale would override the{" "}
+      <code>dir</code> your app declared. If a popover is anchored inside a subtree whose
+      direction differs from the document's, put that <code>dir</code> on{" "}
+      <code>Popover.Positioner</code>; it is forwarded like any native attribute, and it is
+      what a logical <code>side</code> resolves against.
+    </div>
+  }
+/>
+
+### Staying glued
+
+The position is kept current as the page scrolls or resizes (`autoUpdate`, on by default). For an
+anchor that moves under a CSS transform or an animation, opt into per-frame re-measurement with
+`trackAnchorMotion`.
+
+```tsx
+<Popover.Root autoUpdate={false}>…</Popover.Root>
+<Popover.Root trackAnchorMotion>…</Popover.Root>
+```
+
+## The arrow
+
+`Popover.Arrow` is opt-in and goes **inside** `Popover.Content`. It is measured, not guessed: it
+re-pins itself whenever the card flips or shifts. When the anchor is too narrow — or the card has been
+pushed so far by `shift` that the arrow can no longer honestly point at the anchor's centre — the part
+says so with `data-uncentered`, and hope's preset answers by hiding it rather than leaving a square
+pointing at nothing.
+
+<Preview>
+  <PopoverArrowDemo />
+</Preview>
+
+```tsx
+<Popover.Content>
+  <Popover.Arrow />
+  {/* … */}
+</Popover.Content>
+```
+
+## Portal
+
+`Popover.Portal` renders the layer at the end of `<body>`, so a popover inside a scroll container, an
+`overflow: hidden` card, or a `transform`ed ancestor is never clipped by it — while the position stays
+glued to the trigger as the container scrolls.
+
+<Preview>
+  <PopoverScrollContainerDemo />
+</Preview>
+
+```tsx
+<Popover.Portal mount={someElement}>
+  <Popover.Positioner>…</Popover.Positioner>
+</Popover.Portal>
+```
+
+Pass `mount` to portal somewhere other than `document.body`.
+
+## Anchoring to something else
+
+By default the card is positioned against its trigger. Wrap a `Popover.Anchor` around something
+larger — a row, a card, a whole section — and the layer measures against **that** instead, while the
+trigger keeps owning the toggle and the ARIA. Unmounting the anchor hands positioning back to the
+trigger.
+
+<Preview>
+  <PopoverAnchorDemo />
+</Preview>
+
+```tsx
+<Popover.Root side="right" align="start">
+  <Popover.Anchor class="flex w-72 items-center justify-between rounded-lg border p-3">
+    <span>Acme Marketing Site</span>
+    <Popover.Trigger render={(p) => <Button {...p}>Details</Button>} />
+  </Popover.Anchor>
+  {/* … */}
+</Popover.Root>
+```
+
+`Popover.Anchor` renders a bare `<div>` with no styling of its own — usually you want it *worn* by an
+element that already exists, via `render`:
+
+```tsx title="Anchor an element you already have"
+<Popover.Anchor render={(p) => <tr {...p}>{/* … */}</tr>} />
+```
+
+## Dismissal
+
+A popover light-dismisses three ways, each independently switchable: **Escape**, a **pointer-down
+outside** the card, and **focus landing outside** it. All three are on by default. The last one is
+what makes a popover feel non-modal — Tab out of the card and it closes behind you — and it is the one
+worth turning off for a card the reader is meant to keep referring to while working elsewhere.
+
+<Preview>
+  <PopoverDismissalDemo />
+</Preview>
+
+```tsx
+<Popover.Root closeOnFocusOutside={false}>…</Popover.Root>
+<Popover.Root closeOnEscape={false} closeOnInteractOutside={false}>…</Popover.Root>
+```
+
+## The close button
+
+`Popover.CloseTrigger` is **opt-in** — unlike `Dialog.Content`, `Popover.Content` never renders one
+for you. A popover already closes on Escape, on an outside click, on Tab-out, and on a second press
+of its trigger; a permanent ✕ on a small anchored surface is chrome most popovers don't want. Add one
+where it earns its place, typically on a card holding a form.
+
+```tsx
+<Popover.Content>
+  <Popover.CloseTrigger size="sm" />
+  {/* … */}
+</Popover.Content>
+```
+
+It is a [`CloseButton`](/components/close-button) with the popover's close wiring pre-attached, so it
+inherits every `CloseButton` prop (`size`, `icon`, `class`, `render`). Its close handler runs in front
+of your own `onClick`, so calling `event.preventDefault()` cancels the close.
+
+## With a form
+
+A popover is a fine home for a small form. On open, focus moves to the first focusable element inside
+the card — which, with a `CloseTrigger` present, is the ✕ rather than the field. Point `initialFocus`
+at the element that should get the caret instead; it is read after the card mounts, so it can name
+something inside it. Closing returns focus to the trigger either way.
+
+<Preview>
+  <PopoverFormDemo />
+</Preview>
+
+```tsx
+const [nameInput, setNameInput] = createSignal<HTMLInputElement>();
+
+<Popover.Content initialFocus={nameInput}>
+  <Popover.Title>Rename project</Popover.Title>
+  <Popover.CloseTrigger size="sm" />
+  <form onSubmit={save}>
+    <input ref={setNameInput} value={draft()} onInput={/* … */} />
+    <Button type="submit">Save</Button>
+  </form>
+</Popover.Content>;
+```
+
+## Nested popovers
+
+A `Popover.Root` can live inside another popover's content. Both layers portal to `<body>` as
+siblings, so by every DOM measure the inner card sits *outside* the outer one — a shared layer stack
+is what makes it a layer **above** instead:
+
+- **A click inside the inner card is not an outside press for the outer one**, so the outer stays
+  open.
+- **Focus moving into the inner card is not focus leaving the outer one**, so `closeOnFocusOutside`
+  doesn't fire.
+- **Escape peels one layer at a time** — the first closes the inner popover, the second the outer —
+  and focus follows the chain back down to whichever trigger opened each.
+
+<Preview>
+  <PopoverNestedDemo />
+</Preview>
+
+```tsx
+<Popover.Root>
+  <Popover.Trigger render={(p) => <Button {...p}>Filters</Button>} />
+  <Popover.Portal>
+    <Popover.Positioner>
+      <Popover.Content>
+        <Popover.Title>Filters</Popover.Title>
+
+        <Popover.Root side="right" align="start">
+          <Popover.Trigger render={(p) => <Button {...p}>{status()}</Button>} />
+          <Popover.Portal>
+            <Popover.Positioner>
+              <Popover.Content>{/* … */}</Popover.Content>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
+      </Popover.Content>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+Set `bubbles` if you'd rather one keystroke took the whole chain — per event channel, so Escape and
+outside clicks can differ.
+
+```tsx title="One Escape closes this layer and everything under it"
+<Popover.Root bubbles={{ escapeKey: true }}>…</Popover.Root>
+```
+
+## Inside a Dialog
+
+The same stack is what lets a popover open from inside a **modal** — on default props, with nothing to
+configure. A modal `Dialog` marks everything outside its card `inert` and `aria-hidden`, cages focus
+inside it, and listens for Escape on the document; the popover's layer portals out as a sibling of the
+dialog's, and is nonetheless treated as sitting above it: the card stays hit-testable, keeps the focus
+it is given, and takes the first Escape on its own.
+
+<Preview>
+  <PopoverInDialogDemo />
+</Preview>
+
+```tsx
+<Dialog.Root>
+  <Dialog.Trigger render={(p) => <Button {...p}>Project settings</Button>} />
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Positioner>
+      <Dialog.Content>
+        <Dialog.Body>
+          <Popover.Root>{/* … opens above the modal */}</Popover.Root>
+        </Dialog.Body>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="info"
+  class="not-prose"
+  description={
+    <div>
+      Pressing the dialog's backdrop while the popover is open closes the{" "}
+      <strong>popover</strong> and leaves the dialog standing — an outside press is consumed by
+      the topmost layer, exactly as Escape is. A second press then closes the dialog.
+    </div>
+  }
+/>
+
+## Non-modal by design
+
+A Popover traps nothing: no focus trap, no scroll lock, no backdrop, no `aria-modal`, and no
+pointer-blocking layer. The page behind stays live, scrollable, and clickable, which is what a
+popover is *for* — it annotates the page rather than interrupting it.
+
+When you need the interruption — a decision that must be made before anything else, a form that must
+not be abandoned by a stray Tab — reach for [`Dialog`](/components/dialog) instead. `role="alertdialog"`
+is available on a Popover for a small anchored confirmation, and stays legal here precisely because a
+non-modal layer never claims `aria-modal`.
+
+```tsx
+<Popover.Root role="alertdialog">…</Popover.Root>
+```
+
+## Polymorphism
+
+Render a part as a different element or component with the `render` prop — a function that receives
+the computed props and spreads them onto your element. This is how `Popover.Trigger` becomes your own
+`Button`. There is **no `as` prop**; `render` is the single polymorphism API.
+
+```tsx title="Trigger as a Button"
+<Popover.Trigger render={(props) => <Button {...props}>Open</Button>} />
+```
+
+```tsx title="Title as an h3"
+<Popover.Title render={(props) => <h3 {...props}>Share this page</h3>} />
+```
+
+<Alert.Root
+  variant="soft"
+  colorScheme="warning"
+  class="not-prose"
+  description={
+    <div>
+      A <code>render</code> target must spread <strong>every</strong> prop it is handed,{" "}
+      <code>ref</code> included. The internal ref on <code>Positioner</code>,{" "}
+      <code>Content</code> and <code>Arrow</code> is what the positioning, the dismissal and
+      the arrow's measurement all ride on — a target that drops it breaks them silently, with
+      no error.
+    </div>
+  }
+/>
+
+## Theming
+
+Popover's look comes from the active preset's recipe. It is a **neutral surface** — no color axis;
+role accents belong on whatever you put inside the card. Override styling at three levels, applied in
+order (later wins a Tailwind conflict): **recipe base → preset `slotClasses` → instance `slotClasses`
+/ part `class`**.
+
+### Parts
+
+Every styled part carries a `data-slot` attribute you can target, and each is addressable by name
+through `slotClasses`. There is no `root` slot (`Popover.Root` renders no element), and none for
+`Trigger`/`Anchor` — those render *your* element, and forward `class` untouched.
+
+<DataTable
+  columns={[
+    { key: "slot", label: "Slot", code: true },
+    { key: "attr", label: "data-slot", code: true },
+    { key: "description", label: "Description" },
+  ]}
+  rows={[
+    {
+      slot: "positioner",
+      attr: "popover-positioner",
+      description: "The measured layer. Stacking and sizing only — never anything positional.",
+    },
+    { slot: "content", attr: "popover-content", description: "The card surface." },
+    { slot: "arrow", attr: "popover-arrow", description: "The pointing square." },
+    { slot: "title", attr: "popover-title", description: "The heading line." },
+    { slot: "description", attr: "popover-description", description: "The supporting prose." },
+    {
+      slot: "closeTrigger",
+      attr: "popover-close-trigger",
+      description: "Placement of the corner ✕ (its chrome comes from CloseButton).",
+    },
+  ]}
+/>
+
+The positioner, the content and the arrow also report the resolved geometry as `data-side` and
+`data-align`, and their transition state as `data-presence` — which is how the preset animates the
+card in from the trigger's direction.
+
+```css title="Targeting the resolved side"
+[data-slot="popover-content"][data-side="top"] { /* … */ }
+```
+
+### Overriding one popover
+
+Set `slotClasses` on `Popover.Root` to reach any slot from one place, or put `class` on an individual
+part. Use literal class strings so your Tailwind build can see them.
+
+```tsx
+<Popover.Root slotClasses={{ content: "max-w-xs rounded-none", title: "text-base" }}>
+  {/* … */}
+</Popover.Root>
+
+// …or per part:
+<Popover.Content class="max-w-xs rounded-none">…</Popover.Content>
+```
+
+### App-wide defaults & overrides
+
+Set the default size and global part classes for **every** Popover through the theme with
+`definePreset`, then pass the derived preset to `ThemeProvider`. `defaultProps` resolve at **instance
+?? preset ?? builtin** precedence, so an explicit prop on a single popover always wins.
+
+```tsx title="theme.ts"
+import { definePreset } from "@hope-ui/theming";
+import { hope } from "@hope-ui/presets/hope";
+
+export const myPreset = definePreset(hope, {
+  components: {
+    popover: {
+      defaultProps: { size: "sm" },
+      slotClasses: { content: "rounded-none" },
+    },
+  },
+});
+```
+
+`size` is the recipe's only variant, so it is the only prop defaultable app-wide. Positioning
+(`side`, `align`, the offsets), `role`, and the open/dismissal props are per-usage decisions and stay
+on the instance.
+
+## API
+
+### Popover.Root
+
+`Popover.Root` renders no host element, so it takes no native attributes — only the props below.
+
+<PropsTable
+  rows={[
+    {
+      prop: "size",
+      type: "PopoverSize",
+      default: '"md"',
+      description: "Card width + padding scale: sm, md, lg.",
+    },
+    {
+      prop: "role",
+      type: '"dialog" | "alertdialog"',
+      default: '"dialog"',
+      description:
+        "ARIA role for the card, threaded to Content. alertdialog for a small anchored confirmation.",
+    },
+    {
+      prop: "open",
+      type: "boolean",
+      default: "",
+      description: "Controlled open state. Leave unset for uncontrolled (defaults to defaultOpen).",
+    },
+    {
+      prop: "defaultOpen",
+      type: "boolean",
+      default: "false",
+      description: "Initial open state when uncontrolled.",
+    },
+    {
+      prop: "onOpenChange",
+      type: "(open: boolean) => void",
+      default: "",
+      description:
+        "Called on every open/close request (trigger, Escape, outside click, focus out).",
+    },
+    {
+      prop: "side",
+      type: '"top" | "right" | "bottom" | "left" | "inline-start" | "inline-end"',
+      default: '"bottom"',
+      description:
+        "Preferred side of the anchor. The two inline values resolve against the layer's reading direction.",
+    },
+    {
+      prop: "align",
+      type: '"start" | "center" | "end"',
+      default: '"center"',
+      description: "Alignment along the side's cross axis.",
+    },
+    {
+      prop: "sideOffset",
+      type: "number",
+      default: "8",
+      description: "Distance from the anchor, in px. The default clears the arrow.",
+    },
+    {
+      prop: "alignOffset",
+      type: "number",
+      default: "0",
+      description: "Skid along the alignment axis, in px.",
+    },
+    {
+      prop: "flip",
+      type: "boolean",
+      default: "true",
+      description: "Flip to the opposite side when the preferred one would overflow.",
+    },
+    {
+      prop: "shift",
+      type: "boolean",
+      default: "true",
+      description: "Slide along the alignment axis to stay in view.",
+    },
+    {
+      prop: "collisionPadding",
+      type: "number | Partial<Record<Side, number>>",
+      default: "8",
+      description: "Gutter kept between the card and the collision boundary.",
+    },
+    {
+      prop: "collisionBoundary",
+      type: "Element | Element[] | Rect | 'clippingAncestors'",
+      default: '"clippingAncestors"',
+      description: "What the card must stay inside.",
+    },
+    {
+      prop: "arrowPadding",
+      type: "number",
+      default: "8",
+      description: "Gutter kept between the arrow and the card's corners.",
+    },
+    {
+      prop: "strategy",
+      type: '"absolute" | "fixed"',
+      default: '"absolute"',
+      description: "CSS position used for the positioner.",
+    },
+    {
+      prop: "autoUpdate",
+      type: "boolean",
+      default: "true",
+      description: "Keep the position current through scroll and resize.",
+    },
+    {
+      prop: "trackAnchorMotion",
+      type: "boolean",
+      default: "false",
+      description: "Re-measure every animation frame — for an anchor that moves under a transform.",
+    },
+    {
+      prop: "closeOnEscape",
+      type: "boolean",
+      default: "true",
+      description: "Whether Escape closes the popover.",
+    },
+    {
+      prop: "closeOnInteractOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether a pointer-down outside the card closes the popover.",
+    },
+    {
+      prop: "closeOnFocusOutside",
+      type: "boolean",
+      default: "true",
+      description: "Whether focus landing outside the card closes the popover.",
+    },
+    {
+      prop: "bubbles",
+      type: "boolean | { escapeKey?: boolean; outsidePress?: boolean }",
+      default: "false",
+      description:
+        "Whether an Escape or outside pointer-down consumed by a layer opened above this popover also closes it. Off for both channels: the topmost layer alone dismisses.",
+    },
+    {
+      prop: "slotClasses",
+      type: 'SlotClasses<"popover">',
+      default: "",
+      description:
+        "Per-slot class overrides, keyed by positioner, content, arrow, title, description, closeTrigger.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The popover anatomy (Trigger + Portal > …).",
+    },
+  ]}
+/>
+
+### Popover.Content
+
+<PropsTable
+  rows={[
+    {
+      prop: "initialFocus",
+      type: "() => HTMLElement | null | undefined",
+      default: "",
+      description:
+        "Element to focus on open, instead of the first focusable descendant. Read after the card mounts, so it can name an element inside it.",
+    },
+    {
+      prop: "render",
+      type: "(props) => JSX.Element",
+      default: "",
+      description:
+        "Render Content as another element or component. Receives Content's computed props, ref included.",
+    },
+    {
+      prop: "class",
+      type: "string",
+      default: "",
+      description: "Extra classes merged onto the content slot (your utilities win conflicts).",
+    },
+  ]}
+/>
+
+Plus every native `<div>` attribute.
+
+### Popover.Portal
+
+<PropsTable
+  rows={[
+    {
+      prop: "mount",
+      type: "Element",
+      default: "document.body",
+      description: "Where to portal the Positioner.",
+    },
+    {
+      prop: "children",
+      type: "JSX.Element",
+      default: "",
+      description: "The Positioner subtree.",
+    },
+  ]}
+/>
+
+### Parts
+
+`Popover.Trigger`, `Popover.Anchor`, `Popover.Positioner`, `Popover.Arrow`, `Popover.Title`, and
+`Popover.Description` each accept their native element attributes plus a `render` prop and a `class`.
+`Popover.CloseTrigger` accepts every [`CloseButton`](/components/close-button) prop; its close handler
+is pre-wired (call `event.preventDefault()` in your own `onClick` to cancel the close).
+
+## Accessibility
+
+Popover implements the WAI-ARIA [dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+pattern in its non-modal form; `role="alertdialog"` switches to the alert-dialog variant.
+
+<DataTable
+  columns={[
+    { key: "key", label: "Key", code: true },
+    { key: "description", label: "Behavior" },
+  ]}
+  rows={[
+    {
+      key: "Enter / Space",
+      description: "On the trigger: toggles the popover. Pressing it again while open closes it.",
+    },
+    {
+      key: "Escape",
+      description:
+        "Closes the popover and returns focus to the trigger. With layers stacked, it closes the topmost one only.",
+    },
+    {
+      key: "Tab / Shift+Tab",
+      description:
+        "Moves through the card's focusable content and then out of it — leaving closes the popover, unless closeOnFocusOutside is off. Focus is never trapped.",
+    },
+  ]}
+/>
+
+- **Focus moves in and comes back.** On open, focus moves to the first focusable element inside the
+  card — or wherever `initialFocus` points, or the card itself when it holds nothing focusable. On
+  close, it returns to the trigger, including when the popover is closed by Escape or from a layer
+  opened above it.
+- **The card has an accessible name.** `Popover.Title` self-registers as `aria-labelledby`;
+  `Popover.Description` as `aria-describedby`. A `role="dialog"` surface with no name is an axe
+  violation, so give every popover a `Popover.Title` — or an `aria-label` on `Popover.Content` when a
+  visible heading would be noise.
+- **The trigger announces the relationship.** `aria-haspopup="dialog"`, `aria-expanded`, and an
+  `aria-controls` present only while the popover is open — an IDREF naming an element that isn't in
+  the DOM is invalid, so it is omitted rather than left dangling.
+- **Nothing is hidden from assistive tech.** A popover is non-modal, so the page behind it is neither
+  `inert` nor `aria-hidden` — a screen-reader user can navigate straight past the card and back.
+- **Motion is reduced-motion aware.** The directional slide-and-fade drops to an instant open/close
+  when the user has `prefers-reduced-motion` enabled.
