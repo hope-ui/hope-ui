@@ -256,6 +256,25 @@ share the result: `Popover.Root` puts it on context; a headless consumer holds i
 whichever part hooks it needs. The id- and element-registering part hooks must be called from the
 part that owns the id/element, so each registration's cleanup is scoped to that part's unmount.
 
+## The component-layer `Popover.Root` renders no element — and that is what keeps it `omit`-free
+
+`@hope-ui/components`' `Popover.Root` is the JSX layer over this hook, and it renders **only a
+provider**: no host element, no `class` prop, no `render` prop, no native-attribute passthrough. It is
+one of the two exemptions to CLAUDE.md's *every public part forwards its DOM props and takes `render`*
+rule (`Popover.Portal` is the other), exactly as `Dialog.Root`/`Dialog.Portal` are.
+
+The consequence worth stating out loud: **it is therefore the one Root in the catalog with no
+hand-kept `omit` list.** `Calendar.Root` and `Listbox.Root` each carry a long literal key list — every
+option of their primitive plus every themeable prop — because they *do* render an element and must
+subtract their own props from what gets forwarded onto it. `Popover.Root` has nothing to forward, so
+the list would be dead weight that silently rots as `CreatePopoverOptions` grows.
+
+That absence looks like an oversight to anyone auditing the family against its siblings. It is not.
+**Do not "fix" it by adding one** — the fix would be adding a host element, which is the thing being
+avoided. Every positioning option on this hook is consumed *here* and shared through context; the
+escape hatch for a native attribute on the DOM is `Popover.Positioner` — which is where a portaled
+layer's `dir` goes, per the section above.
+
 ## SSR
 
 Host-element-free and effect-gated. `createFloating` reaches `computePosition`/`autoUpdate` from

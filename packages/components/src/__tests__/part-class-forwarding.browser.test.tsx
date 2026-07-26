@@ -3,7 +3,7 @@ import { hope } from "@hope-ui/presets/hope";
 import { ThemeProvider } from "@hope-ui/theming";
 import { CalendarDate } from "@internationalized/date";
 import type { JSX } from "@solidjs/web";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Alert } from "../alert";
 import { Badge } from "../badge";
 import { Button } from "../button";
@@ -11,6 +11,7 @@ import { Calendar } from "../calendar";
 import { CloseButton } from "../close-button";
 import { Dialog } from "../dialog";
 import { Listbox } from "../listbox";
+import { Popover } from "../popover";
 
 /**
  * The cross-component pin for **one** invariant: every public part that renders a host element puts
@@ -180,6 +181,64 @@ describe("every public part forwards its class to the element it renders", () =>
     // prop passthrough instead of a slot fn, which is exactly why it needs pinning here too.
     expect(document.querySelector("button.probe-trigger")).not.toBeNull();
     await expectNoA11yViolations(document.body);
+    dispose();
+  });
+
+  // Popover's parts portal to `document.body` too. `Popover.Root`/`Popover.Portal` render no element
+  // of their own and are exempt by design; `Trigger` and `Anchor` render one but carry no recipe slot
+  // (so no `data-slot`) — their `class` rides the primitive's prop passthrough, which is exactly why
+  // they need pinning here.
+  it("Popover", async () => {
+    const { dispose } = mount(() => (
+      <Themed>
+        <Popover.Root defaultOpen>
+          <Popover.Anchor
+            class="probe-anchor"
+            style={{ position: "fixed", top: "300px", left: "40px", width: "120px" }}
+          />
+          <Popover.Trigger
+            class="probe-trigger"
+            style={{ position: "fixed", top: "200px", left: "120px" }}
+          >
+            Open
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner class="probe-positioner" style={{ width: "200px" }}>
+              <Popover.Content class="probe-content">
+                <Popover.Arrow class="probe-arrow" style={{ width: "8px", height: "8px" }} />
+                <Popover.Title class="probe-title">Title</Popover.Title>
+                <Popover.Description class="probe-description">Description</Popover.Description>
+                <Popover.CloseTrigger class="probe-close-trigger" />
+              </Popover.Content>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
+      </Themed>
+    ));
+
+    // The layer is `visibility: hidden` until the first measurement lands; axe would otherwise
+    // inspect that pre-positioned intermediate and return an `incomplete` nobody can act on.
+    await vi.waitFor(() => {
+      const positioner = document.querySelector<HTMLElement>('[data-slot="popover-positioner"]');
+      expect(positioner?.style.visibility).not.toBe("hidden");
+    });
+
+    expectProbedClasses(document, {
+      "popover-positioner": "probe-positioner",
+      "popover-content": "probe-content",
+      "popover-arrow": "probe-arrow",
+      "popover-title": "probe-title",
+      "popover-description": "probe-description",
+      "popover-close-trigger": "probe-close-trigger",
+    });
+    expect(document.querySelector("button.probe-trigger")).not.toBeNull();
+    expect(document.querySelector("div.probe-anchor")).not.toBeNull();
+    await expectNoA11yViolations(document.body, {
+      // Axe returns `aria-valid-attr-value` as *incomplete* for any element carrying both
+      // `aria-haspopup` and `aria-controls`, without ever resolving the IDREF — undecidable by
+      // construction. The IDREF itself is pinned in `popover.browser.test.tsx`.
+      allowIncomplete: ["aria-valid-attr-value"],
+    });
     dispose();
   });
 

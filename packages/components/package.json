@@ -14,7 +14,8 @@
       "calendar": "src/calendar/index.ts",
       "close-button": "src/close-button/index.ts",
       "dialog": "src/dialog/index.ts",
-      "listbox": "src/listbox/index.ts"
+      "listbox": "src/listbox/index.ts",
+      "popover": "src/popover/index.ts"
     }
   },
   "exports": {
@@ -45,6 +46,10 @@
     "./listbox": {
       "types": "./dist/listbox/index.d.ts",
       "solid": "./dist/listbox/index.jsx"
+    },
+    "./popover": {
+      "types": "./dist/popover/index.d.ts",
+      "solid": "./dist/popover/index.jsx"
     },
     "./package.json": "./package.json"
   },
