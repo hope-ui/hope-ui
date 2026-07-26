@@ -52,8 +52,15 @@ export interface PopoverThemeableProps extends PopoverRecipeVariants {}
  * The Popover recipe's slots. `positioner` is the layer `createFloating` measures and moves (chrome
  * only — stacking and sizing; **never** `position`/`left`/`top`/`transform`, which would fight the
  * inline style the kernel writes); `content` is the card itself; `arrow` the little square that points
- * at the anchor; `title`/`description` the labelled text; `closeTrigger` the corner dismiss button's
- * placement (its chrome comes from `CloseButton`'s own recipe, merged under this).
+ * at the anchor; `header` the optional column grouping the labelled text; `title`/`description` that
+ * text; `closeTrigger` the corner dismiss button's placement (its chrome comes from `CloseButton`'s
+ * own recipe, merged under this).
+ *
+ * `header` is the only *structural* slot, and it earns one for the same reason Dialog's does: on a card
+ * that holds more than a title and a description — a form, a list, an action row — the labelled text
+ * needs to read as one block with its own tighter rhythm, against the region gap `content` sets. There
+ * is no `body`/`footer` twin: those exist on Dialog to drive its inside-scroll mechanics, and a popover
+ * is a small anchored surface that never scrolls itself.
  *
  * **No `root` slot, and none for `trigger`/`anchor`** — by omission, not oversight. `Popover.Root`
  * renders no element at all (so it accepts no `class`, the reason `Dialog.Root`'s was removed), and
@@ -65,6 +72,7 @@ export type PopoverSlot =
   | "positioner"
   | "content"
   | "arrow"
+  | "header"
   | "title"
   | "description"
   | "closeTrigger";

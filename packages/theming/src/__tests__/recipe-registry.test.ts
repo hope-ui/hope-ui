@@ -76,6 +76,7 @@ const _theme = {
     positioner: () => "popover__positioner",
     content: () => `popover__content popover__content--${props?.size ?? "md"}`,
     arrow: () => "popover__arrow",
+    header: () => "popover__header",
     title: () => "popover__title",
     description: () => "popover__description",
     closeTrigger: () => "popover__close-trigger",

@@ -7,7 +7,15 @@ import { describe, expect, it } from "vitest";
 import { popoverRecipe } from "../popover";
 
 const SIZES: PopoverSize[] = ["sm", "md", "lg"];
-const SLOTS = ["positioner", "content", "arrow", "title", "description", "closeTrigger"] as const;
+const SLOTS = [
+  "positioner",
+  "content",
+  "arrow",
+  "header",
+  "title",
+  "description",
+  "closeTrigger",
+] as const;
 
 const CASES: PopoverRecipeVariants[] = [
   undefined as unknown as PopoverRecipeVariants,
@@ -141,6 +149,21 @@ describe("hope popover recipe", () => {
     expect(arrow).not.toContain("absolute");
   });
 
+  it("groups the labelled text tighter than the card's own region gap, at every size", () => {
+    expect(popoverRecipe({}).header()).toContain("flex-col");
+
+    // The header's rhythm must read tighter than the gap the SAME size puts between the card's
+    // regions, or wrapping the title and description in one changes nothing visible.
+    const gapOf = (cls: string) => Number(cls.match(/(?<![\w-])gap-([\d.]+)/)?.[1]);
+    for (const size of SIZES) {
+      const header = popoverRecipe({ size }).header();
+      expect(gapOf(header)).toBeLessThan(gapOf(popoverRecipe({ size }).content()));
+      // One gap, never two: the density lives in the size variants and the base carries none, the same
+      // rule (and the same tailwind-merge hazard) as the `content` slot below.
+      expect(header.match(/(?<![\w-])gap-[\w.]+/g)).toHaveLength(1);
+    }
+  });
+
   it("mutes the description and underlines links inside it", () => {
     const description = popoverRecipe({}).description();
     expect(description).toContain("text-foreground-muted");
@@ -156,14 +179,14 @@ describe("hope popover recipe", () => {
 
   it("scales the card's width, padding and region gap per size", () => {
     expect(popoverRecipe({ size: "sm" }).content()).toContain("max-w-56");
-    expect(popoverRecipe({ size: "sm" }).content()).toContain("p-2.5");
+    expect(popoverRecipe({ size: "sm" }).content()).toContain("p-2");
     expect(popoverRecipe({ size: "md" }).content()).toContain("max-w-72");
-    expect(popoverRecipe({ size: "md" }).content()).toContain("p-3");
+    expect(popoverRecipe({ size: "md" }).content()).toContain("p-2.5");
     expect(popoverRecipe({ size: "lg" }).content()).toContain("max-w-96");
-    expect(popoverRecipe({ size: "lg" }).content()).toContain("p-4");
+    expect(popoverRecipe({ size: "lg" }).content()).toContain("p-3");
 
-    expect(popoverRecipe({ size: "sm" }).content()).toContain("gap-1");
-    expect(popoverRecipe({ size: "lg" }).content()).toContain("gap-2");
+    expect(popoverRecipe({ size: "sm" }).content()).toContain("gap-2");
+    expect(popoverRecipe({ size: "lg" }).content()).toContain("gap-3");
   });
 
   it("keeps every density value in the size variants, none in the base", () => {
@@ -181,8 +204,8 @@ describe("hope popover recipe", () => {
   it("defaults to md", () => {
     const content = popoverRecipe({}).content();
     expect(content).toContain("max-w-72");
-    expect(content).toContain("p-3");
-    expect(content).toContain("gap-1.5");
+    expect(content).toContain("p-2.5");
+    expect(content).toContain("gap-2.5");
   });
 
   it("computes no color — no color-mix, alpha modifier, or magic opacity (recipe purity)", () => {

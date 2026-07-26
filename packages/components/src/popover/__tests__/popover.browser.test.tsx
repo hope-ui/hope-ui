@@ -92,7 +92,9 @@ interface PopoverDemoProps {
 
 // The canonical consumer tree — the same shape as the ssr-entry's, plus the knobs the behavior tests
 // need. `Popover.Title` is not decoration: a `role="dialog"` surface with no accessible name is an
-// axe `aria-dialog-name` violation.
+// axe `aria-dialog-name` violation. The Title/Description sit inside a `Popover.Header`, which is how
+// the labelling assertions below double as the pin that a title registers its id with the content
+// wherever it is nested — the header is layout, not a link in the ARIA chain.
 const PopoverDemo: Component<PopoverDemoProps> = (props) => (
   <Themed>
     <Popover.Root
@@ -112,8 +114,10 @@ const PopoverDemo: Component<PopoverDemoProps> = (props) => (
         <Popover.Positioner style={POSITIONER_STYLE}>
           <Popover.Content style={props.contentStyle}>
             <Popover.Arrow style={ARROW_STYLE} />
-            <Popover.Title>Popover title</Popover.Title>
-            <Popover.Description>Popover description</Popover.Description>
+            <Popover.Header>
+              <Popover.Title>Popover title</Popover.Title>
+              <Popover.Description>Popover description</Popover.Description>
+            </Popover.Header>
             <Show when={props.withInnerButton}>
               <button type="button" data-testid="inner">
                 inner
@@ -424,12 +428,20 @@ describe("Popover — every part forwards its DOM props to the element", () => {
                     refs.arrow = element;
                   }}
                 />
-                <Popover.Title id="probe-title" data-probe="title">
-                  Popover title
-                </Popover.Title>
-                <Popover.Description id="probe-description" data-probe="description">
-                  Popover description
-                </Popover.Description>
+                <Popover.Header
+                  id="probe-header"
+                  data-probe="header"
+                  ref={(element: HTMLDivElement) => {
+                    refs.header = element;
+                  }}
+                >
+                  <Popover.Title id="probe-title" data-probe="title">
+                    Popover title
+                  </Popover.Title>
+                  <Popover.Description id="probe-description" data-probe="description">
+                    Popover description
+                  </Popover.Description>
+                </Popover.Header>
                 <Popover.CloseTrigger
                   id="probe-close-trigger"
                   data-probe="close-trigger"
@@ -453,6 +465,7 @@ describe("Popover — every part forwards its DOM props to the element", () => {
       "positioner",
       "content",
       "arrow",
+      "header",
       "title",
       "description",
       "close-trigger",
@@ -467,6 +480,7 @@ describe("Popover — every part forwards its DOM props to the element", () => {
     expect(refs.positioner?.id).toBe("probe-positioner");
     expect(refs.content?.id).toBe("probe-content");
     expect(refs.arrow?.id).toBe("probe-arrow");
+    expect(refs.header?.id).toBe("probe-header");
 
     expect(refs.trigger?.getAttribute("lang")).toBe("fr");
     expect(refs.positioner?.getAttribute("dir")).toBe("ltr");
@@ -502,6 +516,9 @@ const renderContentAsDiv: NonNullable<Parameters<typeof Popover.Content>[0]["ren
 const renderArrowAsSpan: NonNullable<Parameters<typeof Popover.Arrow>[0]["render"]> = (p) => (
   <span {...(p as unknown as JSX.HTMLAttributes<HTMLSpanElement>)} data-testid="custom-arrow" />
 );
+const renderHeaderAsHgroup: NonNullable<Parameters<typeof Popover.Header>[0]["render"]> = (p) => (
+  <hgroup {...(p as unknown as JSX.HTMLAttributes<HTMLElement>)} data-testid="custom-header" />
+);
 const renderTitleAsH3: NonNullable<Parameters<typeof Popover.Title>[0]["render"]> = (p) => (
   <h3 {...p} data-testid="custom-title" />
 );
@@ -532,10 +549,12 @@ describe("Popover — render re-targets every part without dropping props or ref
             <Popover.Positioner render={renderPositionerAsDiv} style={POSITIONER_STYLE}>
               <Popover.Content render={renderContentAsDiv}>
                 <Popover.Arrow render={renderArrowAsSpan} style={ARROW_STYLE} />
-                <Popover.Title render={renderTitleAsH3}>Popover title</Popover.Title>
-                <Popover.Description render={renderDescriptionAsSpan}>
-                  Popover description
-                </Popover.Description>
+                <Popover.Header render={renderHeaderAsHgroup}>
+                  <Popover.Title render={renderTitleAsH3}>Popover title</Popover.Title>
+                  <Popover.Description render={renderDescriptionAsSpan}>
+                    Popover description
+                  </Popover.Description>
+                </Popover.Header>
               </Popover.Content>
             </Popover.Positioner>
           </Popover.Portal>
@@ -562,6 +581,13 @@ describe("Popover — render re-targets every part without dropping props or ref
     );
     expect(content.getAttribute("aria-describedby")).toBe(
       (page.getByTestId("custom-description").query() as HTMLElement).id,
+    );
+    // Header carries no behavior of its own, so what a swap must not break is the labelling *through*
+    // it: both ids above belong to elements nested inside the re-targeted wrapper.
+    const header = page.getByTestId("custom-header").query() as HTMLElement;
+    expect(header.contains(page.getByTestId("custom-title").query() as HTMLElement)).toBe(true);
+    expect(header.contains(page.getByTestId("custom-description").query() as HTMLElement)).toBe(
+      true,
     );
     await expect
       .element(page.getByTestId("custom-trigger"))

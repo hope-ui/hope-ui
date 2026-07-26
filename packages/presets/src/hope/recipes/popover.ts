@@ -84,6 +84,12 @@ export const popoverRecipe = tv({
       "[--popover-arrow-size:0.5rem] size-(--popover-arrow-size)",
       "rotate-45 bg-surface-overlay data-uncentered:invisible",
     ],
+    // The optional column grouping the title and the description. Layout only — its `gap` is a density
+    // value and lives per `size`, tighter there than the same size's region gap on `content`: that is
+    // the whole point, since wrapped, the two lines must read as one block set apart from whatever else
+    // the card holds. Nothing `shrink-0` like Dialog's twin — that exists to keep a header pinned while
+    // the body scrolls, and a popover never scrolls itself.
+    header: "flex flex-col",
     title: "font-medium leading-none text-foreground",
     // Prose, muted; a link inside gets the shadcn underline treatment and brightens on hover.
     description: [
@@ -95,15 +101,15 @@ export const popoverRecipe = tv({
     closeTrigger: "absolute end-2 top-2",
   },
   variants: {
-    // The single axis. `size` owns the full density set — the card's max width, its padding, and the
-    // gap between its regions — and each value is self-contained, so a size applies additively and
-    // nothing depends on tailwind-merge stripping a competing base class (the base `content` carries no
-    // width, padding or gap). Anchored to a trigger, so the scale stays narrow: a viewport-filling
-    // popover would be a Dialog.
+    // The single axis. `size` owns the full density set — the card's max width, its padding, the gap
+    // between its regions and the tighter one inside the header — and each value is self-contained, so
+    // a size applies additively and nothing depends on tailwind-merge stripping a competing base class
+    // (neither base `content` nor base `header` carries width, padding or gap). Anchored to a trigger,
+    // so the scale stays narrow: a viewport-filling popover would be a Dialog.
     size: {
-      sm: { content: "max-w-56 gap-2 p-2" },
-      md: { content: "max-w-72 gap-2.5 p-2.5" },
-      lg: { content: "max-w-96 gap-3 p-3" },
+      sm: { content: "max-w-56 gap-2 p-2", header: "gap-0.5" },
+      md: { content: "max-w-72 gap-2.5 p-2.5", header: "gap-0.5" },
+      lg: { content: "max-w-96 gap-3 p-3", header: "gap-1" },
     },
   },
   defaultVariants: {

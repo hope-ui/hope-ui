@@ -73,6 +73,7 @@ const stubPopoverRecipe: PopoverRecipe = () => ({
   positioner: () => "",
   content: () => "",
   arrow: () => "",
+  header: () => "",
   title: () => "",
   description: () => "",
   closeTrigger: () => "",

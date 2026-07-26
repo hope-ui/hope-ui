@@ -12,6 +12,7 @@ import { Arrow } from "./popover-arrow";
 import { CloseTrigger } from "./popover-close-trigger";
 import { Content } from "./popover-content";
 import { Description } from "./popover-description";
+import { Header } from "./popover-header";
 import { Portal } from "./popover-portal";
 import { Positioner } from "./popover-positioner";
 import { Root } from "./popover-root";
@@ -26,6 +27,7 @@ export const Popover = {
   Positioner,
   Content,
   Arrow,
+  Header,
   Title,
   Description,
   CloseTrigger,
@@ -36,6 +38,7 @@ export type { PopoverArrowProps } from "./popover-arrow";
 export type { PopoverCloseTriggerProps } from "./popover-close-trigger";
 export type { PopoverContentProps } from "./popover-content";
 export type { PopoverDescriptionProps } from "./popover-description";
+export type { PopoverHeaderProps } from "./popover-header";
 export type { PopoverPortalProps } from "./popover-portal";
 export type { PopoverPositionerProps } from "./popover-positioner";
 export type { PopoverRole, PopoverRootProps, PopoverSize } from "./popover-root";

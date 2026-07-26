@@ -35,8 +35,10 @@ export function Tree(props?: { defaultOpen?: boolean }): JSX.Element {
           <Popover.Positioner>
             <Popover.Content>
               <Popover.Arrow />
-              <Popover.Title>Popover title</Popover.Title>
-              <Popover.Description>Popover description</Popover.Description>
+              <Popover.Header>
+                <Popover.Title>Popover title</Popover.Title>
+                <Popover.Description>Popover description</Popover.Description>
+              </Popover.Header>
               <Popover.CloseTrigger />
             </Popover.Content>
           </Popover.Positioner>

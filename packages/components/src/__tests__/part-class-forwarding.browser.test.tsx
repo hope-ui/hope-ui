@@ -206,8 +206,10 @@ describe("every public part forwards its class to the element it renders", () =>
             <Popover.Positioner class="probe-positioner" style={{ width: "200px" }}>
               <Popover.Content class="probe-content">
                 <Popover.Arrow class="probe-arrow" style={{ width: "8px", height: "8px" }} />
-                <Popover.Title class="probe-title">Title</Popover.Title>
-                <Popover.Description class="probe-description">Description</Popover.Description>
+                <Popover.Header class="probe-header">
+                  <Popover.Title class="probe-title">Title</Popover.Title>
+                  <Popover.Description class="probe-description">Description</Popover.Description>
+                </Popover.Header>
                 <Popover.CloseTrigger class="probe-close-trigger" />
               </Popover.Content>
             </Popover.Positioner>
@@ -227,6 +229,7 @@ describe("every public part forwards its class to the element it renders", () =>
       "popover-positioner": "probe-positioner",
       "popover-content": "probe-content",
       "popover-arrow": "probe-arrow",
+      "popover-header": "probe-header",
       "popover-title": "probe-title",
       "popover-description": "probe-description",
       "popover-close-trigger": "probe-close-trigger",

@@ -5,6 +5,7 @@ import { PopoverBasicDemo } from "~/components/demos/popover/PopoverBasicDemo";
 import { PopoverControlledDemo } from "~/components/demos/popover/PopoverControlledDemo";
 import { PopoverDismissalDemo } from "~/components/demos/popover/PopoverDismissalDemo";
 import { PopoverFormDemo } from "~/components/demos/popover/PopoverFormDemo";
+import { PopoverHeaderDemo } from "~/components/demos/popover/PopoverHeaderDemo";
 import { PopoverInDialogDemo } from "~/components/demos/popover/PopoverInDialogDemo";
 import { PopoverLogicalSideDemo } from "~/components/demos/popover/PopoverLogicalSideDemo";
 import { PopoverNestedDemo } from "~/components/demos/popover/PopoverNestedDemo";
@@ -98,8 +99,11 @@ otherwise fight the `translate()` written onto the positioner.
                 name: "Popover.Content",
                 children: [
                   { name: "Popover.Arrow", note: "optional" },
-                  { name: "Popover.Title" },
-                  { name: "Popover.Description" },
+                  {
+                    name: "Popover.Header",
+                    note: "optional",
+                    children: [{ name: "Popover.Title" }, { name: "Popover.Description" }],
+                  },
                   { name: "Popover.CloseTrigger", note: "optional · opt-in" },
                 ],
               },
@@ -161,6 +165,12 @@ otherwise fight the `translate()` written onto the positioner.
         "Optional. The little square that points back at the anchor, pinned by measurement. Goes inside Content, whose relative is what its pin resolves against.",
     },
     {
+      part: "Popover.Header",
+      element: "div",
+      description:
+        "Optional. A layout column grouping the title and the description, spaced tighter than the card's own regions. No behavior and no ARIA — the labelling stays on Title and Description.",
+    },
+    {
       part: "Popover.Title",
       element: "h2",
       description: "The heading. Self-registers its id as the card's aria-labelledby.",
@@ -208,9 +218,10 @@ const [open, setOpen] = createSignal(false);
 
 ## Sizes
 
-The `size` prop scales the card: its max width, its padding, and the rhythm between the title and the
-description. The default is `md`. The scale stops at `lg` on purpose — a popover is anchored to a
-control, and a viewport-filling surface is a [Dialog](/components/dialog).
+The `size` prop scales the card: its max width, its padding, and both of its rhythms — the gap between
+the card's regions, and the tighter one inside a `Popover.Header`. The default is `md`. The scale stops
+at `lg` on purpose — a popover is anchored to a control, and a viewport-filling surface is a
+[Dialog](/components/dialog).
 
 <Preview>
   <PopoverSizesDemo />
@@ -220,6 +231,36 @@ control, and a viewport-filling surface is a [Dialog](/components/dialog).
 <Popover.Root size="sm">…</Popover.Root>
 <Popover.Root size="lg">…</Popover.Root>
 ```
+
+## Grouping the header
+
+`Popover.Header` is an optional column around the title and the description. It is pure layout — no
+behavior, no ARIA, and no id of its own: `Popover.Title` and `Popover.Description` register themselves
+with the card wherever they are nested, so wrapping them changes nothing but the spacing.
+
+That spacing is the point. The header's own gap is tighter than the one `size` puts between the card's
+regions, so on a card holding a **second region** — a copy row, a form, a list — the labelled text
+reads as one block set apart from it, rather than as siblings evenly spaced down the card.
+
+<Preview>
+  <PopoverHeaderDemo />
+</Preview>
+
+```tsx
+<Popover.Content>
+  <Popover.Arrow />
+  <Popover.Header>
+    <Popover.Title>Share this page</Popover.Title>
+    <Popover.Description>Anyone with the link can view it.</Popover.Description>
+  </Popover.Header>
+  <div class="flex gap-2">{/* … */}</div>
+</Popover.Content>
+```
+
+A card that is *only* a title and a description needs no header — that is the shape in
+[Usage](#usage) above. There is no `Popover.Body` or `Popover.Footer` to go with it, either: those
+exist on [Dialog](/components/dialog) to drive its inside-scroll mechanics, and a popover is a small
+anchored surface that never scrolls itself. Lay the rest of the card out with your own elements.
 
 ## Positioning
 
@@ -619,6 +660,11 @@ through `slotClasses`. There is no `root` slot (`Popover.Root` renders no elemen
     },
     { slot: "content", attr: "popover-content", description: "The card surface." },
     { slot: "arrow", attr: "popover-arrow", description: "The pointing square." },
+    {
+      slot: "header",
+      attr: "popover-header",
+      description: "The title/description column, spaced tighter than the card's regions.",
+    },
     { slot: "title", attr: "popover-title", description: "The heading line." },
     { slot: "description", attr: "popover-description", description: "The supporting prose." },
     {
@@ -818,7 +864,7 @@ on the instance.
       type: 'SlotClasses<"popover">',
       default: "",
       description:
-        "Per-slot class overrides, keyed by positioner, content, arrow, title, description, closeTrigger.",
+        "Per-slot class overrides, keyed by positioner, content, arrow, header, title, description, closeTrigger.",
     },
     {
       prop: "children",
@@ -879,8 +925,9 @@ Plus every native `<div>` attribute.
 
 ### Parts
 
-`Popover.Trigger`, `Popover.Anchor`, `Popover.Positioner`, `Popover.Arrow`, `Popover.Title`, and
-`Popover.Description` each accept their native element attributes plus a `render` prop and a `class`.
+`Popover.Trigger`, `Popover.Anchor`, `Popover.Positioner`, `Popover.Arrow`, `Popover.Header`,
+`Popover.Title`, and `Popover.Description` each accept their native element attributes plus a `render`
+prop and a `class`.
 `Popover.CloseTrigger` accepts every [`CloseButton`](/components/close-button) prop; its close handler
 is pre-wired (call `event.preventDefault()` in your own `onClick` to cancel the close).
 

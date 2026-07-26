@@ -82,9 +82,47 @@ export const Default: Story = {
   render: () => <PopoverDemo />,
 };
 
+/**
+ * `Popover.Header` — the optional column that groups the title and the description. It earns its place
+ * once the card holds a *second* region: the header's own gap is tighter than the one `size` puts
+ * between regions, so the labelled text reads as one block set apart from the row below it instead of
+ * as three evenly spaced siblings. Compare with `Default`, which is title + description alone and
+ * wants no header at all.
+ *
+ * Pure layout — the labelling still rides on Title and Description, which register their ids with the
+ * content hook wherever they are nested.
+ */
+export const WithAHeader: Story = {
+  render: () => (
+    <Popover.Root>
+      <Popover.Trigger render={buttonTrigger("Share this page")} />
+      <Popover.Portal>
+        <Popover.Positioner>
+          <Popover.Content>
+            <Popover.Arrow />
+            <Popover.Header>
+              <Popover.Title>Share this page</Popover.Title>
+              <Popover.Description>Anyone with the link can view it.</Popover.Description>
+            </Popover.Header>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                readonly
+                value="hope-ui.dev/s/8fk2"
+                aria-label="Share link"
+                class="w-full rounded-md border border-subtle bg-surface px-2 py-1 text-sm text-foreground"
+              />
+              <Button size="sm">Copy</Button>
+            </div>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  ),
+};
+
 const SIZES: PopoverSize[] = ["sm", "md", "lg"];
 
-/** The `size` scale — the card's max width, its padding, and the gap between title and description. */
+/** The `size` scale — the card's max width, its padding, and both of its gaps (regions, and header). */
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: "flex", gap: "0.75rem" }}>

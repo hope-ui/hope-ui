@@ -29,14 +29,15 @@ describe("popover recipe contract", () => {
       "positioner",
       "content",
       "arrow",
+      "header",
       "title",
       "description",
       "closeTrigger",
     ];
 
     expect(sizes).toHaveLength(3);
-    // Six, not eight: `Popover.Root` renders no element and `Trigger`/`Anchor` render the consumer's,
+    // Seven, not ten: `Popover.Root` renders no element and `Trigger`/`Anchor` render the consumer's,
     // so none of the three carries a slot — see the contract's `PopoverSlot` doc comment.
-    expect(slots).toHaveLength(6);
+    expect(slots).toHaveLength(7);
   });
 });
