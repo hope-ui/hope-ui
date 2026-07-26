@@ -2,7 +2,7 @@
 
 The message **contract**: the closed set of user-facing strings hope-ui's components emit (screen-reader
 labels, live-region announcements) that the consuming app does **not** author, plus the `{{param}}`
-interpolator. Ported from the maintainer's Angular predecessor. The built-in catalogs themselves live
+interpolator. The built-in catalogs themselves live
 one file per locale in [`./locales/`](./locales) (`en.ts`, `fr.ts`, …) — this file only defines their
 shape.
 

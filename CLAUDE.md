@@ -79,6 +79,29 @@ pnpm --filter @hope-ui/components typecheck
 **Never add a `Co-Authored-By: Claude`, any `Co-authored-by`, or "Generated with Claude Code" trailer
 to a commit message.** Commit messages carry the change rationale only.
 
+## Third-party attribution
+
+hope-ui is MIT. The references it ports from are not all MIT, so **adapting code and crediting a
+reference are two different obligations** — `__internal__/reference-implementations.md` covers where to
+look; this covers what you owe when you actually copy.
+
+- **Designing against a reference's public API, ARIA pattern, or reasoning owes nothing.** Most files
+  naming React Aria / Base UI / Angular Aria mid-body are in this bucket — leave them alone.
+- **Reproducing its expression** (a data table, a function's structure and sequence, its comments)
+  makes the file a derivative and triggers the upstream license. Adobe React Spectrum is
+  **Apache-2.0**; Base UI and Angular Components are **MIT**.
+- A derived file gets a **JSDoc header tagged `@license`** naming the upstream file, its copyright line,
+  its license, and — Apache-2.0 §4(b) — *"This file has been modified from the original."* Copy the
+  shape from `packages/i18n/src/direction.ts`.
+- **The `@license` tag is load-bearing, not decoration.** hope-ui ships JSX-preserved source, and
+  rolldown strips every unmarked block comment — an unmarked header vanishes from `dist/` and the
+  published package becomes an unattributed derivative. `comments.legal` is pinned in
+  `tsdown.config.base.ts` for the same reason.
+- Add the file to the root [`NOTICE.md`](NOTICE.md) table **and** its package's `NOTICE.md`. A package
+  that gains its first Apache-2.0 derivative also needs `LICENSE-APACHE-2.0.txt` copied in from
+  `licenses/`, plus both added to its `package.json#files`.
+- Never relicense: the MIT grant in `LICENSE.md` covers hope-ui's own code only.
+
 ## Code style
 
 Names carry the meaning; comments are the exception.

@@ -72,8 +72,19 @@ export function createTsdownConfig(packageDir: string): UserConfig {
     // No `.jsx.map`: a source map of shipped source would point at the unshipped `.tsx`.
     // (Declaration maps are disabled via `declarationMap: false` in each package's tsconfig,
     // for the same tarball reason — `files: ["dist"]` wouldn't contain the mapped sources.)
+    //
+    // `comments.legal` is pinned rather than left to rolldown's default because it carries a
+    // license obligation: hope-ui ships JSX-preserved **source**, and the Apache-2.0 files it
+    // derives from React Spectrum require their attribution notices to survive into that source
+    // (Apache-2.0 §4(c)). Rolldown strips every unmarked block comment, so those headers are
+    // written as `/** @license … */` and preserved here. Dropping this — or the `@license` tag on
+    // a header — silently ships an unattributed derivative. See `NOTICE.md`.
     outputOptions(options) {
       options.sourcemap = false;
+      options.comments = {
+        ...(typeof options.comments === "object" ? options.comments : {}),
+        legal: true,
+      };
       return options;
     },
     outExtensions: () => ({ js: ".jsx" }),

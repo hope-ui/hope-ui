@@ -16,10 +16,9 @@
  * (keyed off the calendar's `locale`); the interpolated calendar keys receive those **already-formatted
  * strings** as params — i18n never formats a date itself.
  *
- * Ported from the maintainer's Angular predecessor (`__origins__`), scoped to the components hope-ui
- * ships today. Adding a component's strings = add a group/key to the map + every locale catalog in
- * `./locales/`. This file is the **contract only** — the built-in catalogs live one per locale in
- * `./locales/` (`en.ts`, `fr.ts`, …).
+ * Scoped to the components hope-ui ships today. Adding a component's strings = add a group/key to the
+ * map + every locale catalog in `./locales/`. This file is the **contract only** — the built-in
+ * catalogs live one per locale in `./locales/` (`en.ts`, `fr.ts`, …).
  */
 interface I18nMessageMap {
   common: {

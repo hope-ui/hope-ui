@@ -139,6 +139,30 @@ and [`CLAUDE.md`](CLAUDE.md). Deeper background lives in [`__internal__/plan.md`
 Commit messages carry the change rationale only — no tool/assistant attribution trailers. Don't add
 changesets or bump published-package versions until SolidJS 2.0 ships stable.
 
+## Credits
+
+hope-ui stands on the accessibility research of several projects that got there first. Its behavior
+kernel was designed against their public APIs and reasoning, and in a few places adapts their code
+directly:
+
+- **[Adobe React Spectrum](https://github.com/adobe/react-spectrum)** (React Aria / React Stately) —
+  the ARIA patterns, interaction edge cases, and the press model. Four files are derived from it.
+- **[Base UI](https://github.com/mui/base-ui)** — the compound-component anatomy and the
+  anchor-positioning option vocabulary (`side`/`align`/`sideOffset`).
+- **[Angular Components](https://github.com/angular/components)** (Angular CDK / Angular Aria) — the
+  signal-based decomposition of the list-behavior kernel.
+- **[Floating UI](https://github.com/floating-ui/floating-ui)** — overlay positioning, consumed
+  directly as `@floating-ui/dom` and structured after the Vue binding.
+
+hope-ui is an independent project and is not affiliated with, sponsored by, or endorsed by any of
+them.
+
 ## License
 
-MIT.
+MIT — see [`LICENSE.md`](LICENSE.md).
+
+Portions are derived from Apache-2.0 and MIT works and remain under their original licenses;
+[`NOTICE.md`](NOTICE.md) lists every one, file by file, and
+[`licenses/LICENSE-APACHE-2.0.txt`](licenses/LICENSE-APACHE-2.0.txt) carries the full Apache text.
+Published packages ship their own `LICENSE.md`, and `@hope-ui/i18n` and `@hope-ui/primitives` ship a
+scoped `NOTICE.md` alongside it.

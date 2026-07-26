@@ -116,8 +116,7 @@ round-trip first:**
   Originally the i18n module re-exported the `@solid-primitives/i18n` `translator`/`flatten`/
   `resolveTemplate` seam. It has been dropped as a dependency in favour of hope-ui's own centralized
   message API — a built-in en/fr catalog (`messages.ts`) plus a `t()` resolver (`translate.ts`)
-  exposed on the `I18nProvider` context — ported from the maintainer's Angular predecessor's
-  `I18nService`. Two reasons: (1) remove the runtime dependency, and (2) `@solid-primitives/i18n`'s
+  exposed on the `I18nProvider` context. Two reasons: (1) remove the runtime dependency, and (2) `@solid-primitives/i18n`'s
   `translator` **memoizes** (a compute-form signal), and a memoized translator in a render path is
   exactly the transform-boundary hydration hazard this doc catalogs. The in-house `t()` is a plain
   function that reads the locale accessor on each call — never a `createMemo` — so it is hydration-safe

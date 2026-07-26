@@ -1,5 +1,5 @@
 /**
- * The message resolver — hope-ui's headless equivalent of the Angular predecessor's `I18nService.t()`.
+ * The message resolver — how a component looks up a user-facing string for the current locale.
  *
  * The built-in catalogs (`./locales/`, selected by {@link resolveCatalog}) are the guaranteed
  * floor; the app's own pipeline (via {@link I18nTranslateOverride}) is an **overlay** consulted first,

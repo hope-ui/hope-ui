@@ -5,7 +5,12 @@
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "LICENSE.md",
+    "LICENSE-APACHE-2.0.txt",
+    "NOTICE.md"
+  ],
   "hope": {
     "entries": {
       "calendar": "src/calendar/index.ts",

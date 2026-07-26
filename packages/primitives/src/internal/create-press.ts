@@ -1,7 +1,27 @@
 /**
+ * @license
+ * Portions of this file are derived from Adobe React Spectrum (`@react-aria/interactions`,
+ * `src/usePress.ts`).
+ * Copyright 2020 Adobe. All rights reserved.
+ * https://github.com/adobe/react-spectrum
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. A copy of the License is distributed with this
+ * package as LICENSE-APACHE-2.0.txt, and is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * This file has been modified from the original.
+ */
+
+/**
  * Provenance: this press engine is **derived from React Spectrum's `@react-aria/interactions`
- * `usePress`** (Apache-2.0, https://github.com/adobe/react-spectrum) — its interaction model
- * and reasoning, re-expressed for SolidJS 2.0, not a line-for-line port. The behaviors adapted
+ * `usePress`** — its interaction model and reasoning, re-expressed for SolidJS 2.0, not a
+ * line-for-line port. The behaviors adapted
  * from it: unifying pointer/touch/mouse/keyboard/virtual-click into a single press,
  * cancel-on-drag-out with re-arm, scroll cancellation, focus-on-press normalization, and touch
  * text-selection suppression. What differs here is deliberate and documented on `createPress`:

@@ -54,6 +54,6 @@ directly (the calendar accepts `locale`/`dir`).
 
 The locale/direction context is derived from React Spectrum
 (`@react-aria/i18n`, Apache-2.0, © 2020 Adobe); see the CLAUDE.md i18n provenance
-note. The message resolver (`t`, catalog, `translate`/`messages` overlay) is ported from the
-maintainer's Angular predecessor — see `messages.md` and `translate.md`. There is **no**
+note. The message resolver (`t`, catalog, `translate`/`messages` overlay) is hope-ui's own — see
+`messages.md` and `translate.md`. There is **no**
 `@solid-primitives/i18n` dependency; the catalog + resolver are in-house.

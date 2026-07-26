@@ -1,7 +1,6 @@
 # i18n message resolver (`translate.ts`)
 
-hope-ui's headless equivalent of the Angular predecessor's `I18nService.t()`: build a reactive
-message resolver bound to a locale, with the built-in catalogs (`./locales/`) as the guaranteed floor and the
+Build a reactive message resolver bound to a locale, with the built-in catalogs (`./locales/`) as the guaranteed floor and the
 app's own pipeline as an overlay. There is **no** `@solid-primitives/i18n` dependency.
 
 ## Exports

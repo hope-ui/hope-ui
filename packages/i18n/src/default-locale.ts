@@ -1,6 +1,25 @@
+/**
+ * @license
+ * Portions of this file are derived from Adobe React Spectrum (`@react-aria/i18n`,
+ * `src/i18n/useDefaultLocale.ts`).
+ * Copyright 2020 Adobe. All rights reserved.
+ * https://github.com/adobe/react-spectrum
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. A copy of the License is distributed with this
+ * package as LICENSE-APACHE-2.0.txt, and is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ *
+ * This file has been modified from the original.
+ */
+
 /*
- * Browser/system default locale. Derived from React Spectrum (`@react-aria/i18n`, Apache-2.0,
- * © 2020 Adobe). Two hope-ui improvements over the source are called out inline:
+ * Browser/system default locale. Two hope-ui improvements over the source are called out inline:
  *   1. Hydration-gated detection — the detected locale is reported immediately *except* while a
  *      hydration pass is in flight, where `en-US`/`ltr` (what the server rendered) is reported
  *      until the pass ends. The original source reads the real locale at module load, which a

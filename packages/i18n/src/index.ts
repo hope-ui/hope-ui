@@ -1,6 +1,6 @@
-// Locale + reading-direction context (derived from React Spectrum's `@react-aria/i18n`), plus
-// the in-house message catalog + resolver (`t`) — hope-ui's headless port of the Angular predecessor's
-// `I18nService`. No external i18n runtime dependency.
+// Locale + reading-direction context (derived from React Spectrum's `@react-aria/i18n` — see
+// NOTICE.md), plus the in-house message catalog + resolver (`t`). No external i18n runtime
+// dependency.
 
 export {
   createDefaultLocale,
