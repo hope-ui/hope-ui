@@ -1,7 +1,8 @@
 # `createListbox` (listbox hook family)
 
-The headless behavior core of a listbox — the collection widget Select, Combobox and MultiSelect
-later wrap. It **composes** the already-built `internal/` list kernel (`createCollection` /
+The headless behavior core of a listbox — the collection widget Select, Combobox and Autocomplete
+later wrap, through the combobox kernel (`roadmap.md` #21). It **composes** the already-built
+`internal/` list kernel (`createCollection` /
 `createVirtualCollection`, `createListFocus`, `createListSelection`, `createListNavigation`,
 `createListTypeahead`) into one root state hook plus one hook per part, the shape
 `@hope-ui/components`' `Listbox` is a thin JSX layer over. No new behavior primitive — Listbox is

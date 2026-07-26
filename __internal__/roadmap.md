@@ -50,6 +50,8 @@ infrastructure, deliberately *not* a growing component tracker):
   `createRegisteredElement`; utils `renderElement`, `withDefaults`, `composeEventHandlers`,
   `createKeyboardHandler`, `compareByIdOrReference`. Plus `ModalBackdrop`, the kernel's only
   DOM-rendering component.
+- **Adopted, not in-repo:** `createAnnounce` (`@solid-primitives/a11y`) — the polite/assertive live-region
+  announcer, in use by `createCalendar`. Call it directly rather than wrapping it; it is why #2 is retired.
 - Styling / theming: **Tailwind v4 + `tailwind-variants`** via `@hope-ui/theming` (`tv`/`cn`/`cx` +
   `useRecipe` + the semantic-token contract); the default visual identity is **`@hope-ui/presets/hope`**.
   Dark mode via a `.dark` class. The recipe pattern is proven end-to-end — Button, Badge, Alert,
@@ -129,15 +131,15 @@ marked `infra`/`a11y`/`core`). Rows are ordered by hope's implementation complex
 
 | Component | Category | In | Kernel deps | Notes |
 |---|---|---|---|---|
-| **Listbox** | Collections | core | `createCollection` + `list-focus/navigation/selection/typeahead` | underlies Select/Combobox; **kernel ready — first to cash in** |
-| Select | Collections | 5/5 | Listbox + `createFloating`* + `createFormControl`* | trigger + popover + Listbox |
-| Combobox / Autocomplete | Collections | 5/5 | Listbox + `createFloating`* + `createTextInput`* | filter + typeahead |
-| MultiSelect | Collections | 3/5 | Combobox (multiple) | |
+| Listbox ✅ | Collections | core | `createCollection` + `list-focus/navigation/selection/typeahead` | styled API landed (compound parts + `listbox` recipe), collection **and** virtual modes, native-form hidden inputs. Underlies Select/Combobox via the combobox kernel (#21) |
+| Select | Collections | 5/5 | **combobox kernel** (#21) + `createFormControl`* | button focus owner; adds trigger typeahead + hidden select |
+| Combobox | Collections | 5/5 | **combobox kernel** (#21) + `createTextInput`* + `createAnnounce` | input focus owner; adds the filter seam + the announcer |
+| Autocomplete | Collections | 2/5 | Combobox, minus selection state | **not a rename of Combobox** — free-text value, list is suggestions. See #21 |
 | Menu / DropdownMenu | Overlays | 5/5 | `createCollection` + `createFloating`* + `createHoverIntent`* + submenus | |
 | ContextMenu | Overlays | 2/5 | Menu variant (pointer-anchored) | |
 | NavigationMenu | Navigation | 3/5 | `createCollection` + `createFloating`* | mega-menu nav |
 | CommandPalette | Navigation | 2/5 | Combobox-based | ⌘K launcher |
-| Toast ★ | Feedback | 5/5 | `createTimer`*, `createDragState`*, `createLiveRegion`* | Sonner port (stacking, swipe, pause-on-hover) |
+| Toast ★ | Feedback | 5/5 | `createTimer`*, `createDragState`*, `createAnnounce` | Sonner port (stacking, swipe, pause-on-hover) |
 | FileUpload | Forms | 4/5 | `createFileUploadState`* | drag-drop + validation |
 | OverlayManager | Overlays | infra | the three shipped layer registries (#18/#19/#20) | z-index only — nesting and dismiss order are already in the kernel |
 | TreeView | Collections | 4/5 | `createTreeCollection`* (+ nav + expansion) | hierarchical |
@@ -176,7 +178,7 @@ stable reference and the ordering claim holds within the original survey.
 | # | Primitive (proposed) | Purpose | Consumers | Tier |
 |---|---|---|---|---|
 | 1 | `createEnvironmentContext` | `document`/`window` for portals in shadow DOM / iframe | EnvironmentProvider, every portal/floating layer | T1 |
-| 2 | `createLiveRegion` | polite/assertive `aria-live` announcer | Toast, Combobox status, form errors *(port Astryx `useAnnounce`)* | T1 |
+| 2 | ~~`createLiveRegion`~~ | **Retired in place — already solved, don't build it.** `@solid-primitives/a11y`'s `createAnnounce` was **adopted** (verdict in [`solid-primitives-eval.md`](solid-primitives-eval.md)) and ships in `createCalendar` for period/view/selection announcements — effect-only, `isServer`-guarded, live regions appended outside the component tree, hydration round-trip cleared. It exports `AnnouncePoliteness` (polite/assertive), which is the whole of what this row asked for. A new caller calls it directly, as `calendar-root.ts` does; the `typeof document` guard there is for the Node `unit` project (client build, no DOM) and every caller repeats it. The number is kept so cross-references stay valid | Toast, Combobox status, form errors — all via `createAnnounce` | — |
 | 3 | `createTimer` | pausable timeout (pause-on-hover, restart) | Toast auto-dismiss, Tooltip/HoverCard delays | T1 |
 | 4 | `createElementSize` | ResizeObserver-backed element measurement | ScrollArea, Splitter, positioning | T1 |
 | 5 | `createFormControl` — **adopt `@solid-primitives/a11y`** (hydration-gated; *not* the `form` pkg's `createForm`) | label / description / error id linking + `data-invalid`/`required`/`disabled`/`readonly` | Field, Fieldset, **all form inputs** | T1–T2 |
@@ -195,6 +197,7 @@ stable reference and the ordering claim holds within the original survey.
 | 18 | `createDismissable` — **nested layer ordering** ✅ ✳︎ | An activation-order stack on `document`, so only the **topmost** open layer consumes Escape or an outside pointerdown, plus a layers-above clause that stops a press inside an upper layer counting as "outside" for the one below. Ported from react-aria `useOverlay`'s `visibleOverlays`, with Base UI `useDismiss`'s `bubbles` for the opt-back-in vocabulary (defaults deviate: neither channel bubbles). Two deliberate divergences from upstream — document-level Escape, and a single-phase pointer guard — are recorded in [`reference-implementations.md`](reference-implementations.md) §1. Now an attributed Apache-2.0 derivative | nested Popover-in-Dialog (pinned by `popover-in-dialog.browser.test.tsx` and Popover's `InsideADialog` story), Menu, Select, ContextMenu | T2 |
 | 19 | `createHideOutside` — **nested `aria-hidden`/`inert`** ✅ ✳︎ | `observerStack` (only the innermost layer observes, out-of-order closes included) + a dynamic `keepVisible`/`createKeepVisible` + `TOP_LAYER_ATTRIBUTE`, the declarative always-visible marker. The two cover opposite orderings: registration reaches a layer opening *after* the modal, the marker reaches a modal opening *after* the layer — which no registration can. `Popover.Positioner` calls `createKeepVisible`; the marker ships wired to nothing, as the third-party/toast escape hatch. Now an attributed Apache-2.0 derivative | same as #18 | T2 |
 | 20 | `createFocusScope` ✅ | The third registry: a container stack answering **"did focus land in me, or in a layer opened above me?"** (`containsSelfOrAbove`). `createFocusTrap` composes it and consults it instead of `container.contains`, so a Dialog stops yanking focus out of a Popover portaled above it — which, with `closeOnFocusOutside`, used to close that Popover ~3ms after it opened. Moves no focus and cages nothing; Tab still leaves a non-modal layer freely. The *idea* is react-aria's `focusScopeTree`/`isElementInChildOfActiveScope`, but the implementation shares no expression with it: **not derivative, prose credit only** | same as #18 | T2 |
+| 21 | `primitives/src/combobox/` — the **combobox kernel** | The shared half of Select and Combobox, named after the **ARIA pattern** (APG 1.2 gives both `role="combobox"` on the focus owner, `aria-expanded`/`aria-controls` → a `role="listbox"` popup, `aria-activedescendant` on the active option). Owns: open state + `focusStrategy` (open onto first/last/selected), the trigger's `role`/`aria-*`, the keymap (ArrowDown/Up, Alt+Arrow, Enter, Escape), the `isFocused` paint-gate plumbing between focus owner and list, `allowsEmptyCollection`, `shouldCloseOnSelect`. **Input-agnostic by construction — it never owns a text value.** See § "The combobox kernel" below for why that constraint is the whole point | Select, Combobox, Autocomplete, CommandPalette | T3 |
 
 ✳︎ Extensions to a **shipped** primitive, not new ones — and deliberately three registries rather
 than one (see #14).
@@ -202,7 +205,40 @@ than one (see #14).
 **Covered by existing primitives (no new work):** open/close state → `createControllableState`
 (+ `createPresence`); roving focus / typeahead / arrow nav / 2D grid → the list-\* + grid kernel;
 dismiss / focus-trap / scroll-lock / focus-restore / modal-hide → the overlay kernel;
-value equality → `compareByIdOrReference`.
+value equality → `compareByIdOrReference`; live-region announcements → `createAnnounce` (see #2).
+
+### The combobox kernel (#21) — three public components, one ARIA pattern
+
+**Select, Combobox and Autocomplete are three components, not two and not one.** Both references we
+track ship all three under those names, and `Autocomplete` means something *different* from
+`Combobox` in each — so renaming Combobox to Autocomplete would collide, not clarify:
+
+- **React Aria:** four hooks — `useSelect`, `useComboBox`, `useAutocomplete`, `useSearchAutocomplete`.
+  Its `useAutocomplete` is a generic *filter wrapper over any collection* (command palettes,
+  filterable menus), not the input-plus-listbox widget.
+- **Base UI:** `Autocomplete` has `clear`/`input-group`/`value` and **no `item-indicator`** — no
+  selection state at all. Its value is free text; the list is suggestions. Combobox commits to an item.
+
+**The kernel is named for the pattern, and stays input-agnostic — this is the load-bearing
+constraint.** Base UI built the same shared kernel (`combobox/root/AriaCombobox.tsx`, 1782 lines);
+`ComboboxRoot` (176 lines) and `AutocompleteRoot` (289) are thin wrappers over it. But
+`SelectRoot` — 757 lines — **does not import it**, and shares only `internals/`. The reason is that
+`AriaCombobox` is built around an input value, and Select has none: no `inputValue`, no
+filtered-vs-original collection, no `commit`/`revert`/`allowsCustomValue`. Routing Select through it
+would be exactly what [`CLAUDE.md`](../CLAUDE.md) forbids — *"never couple a component's behavior to
+a heavier sibling."*
+
+So hope-ui's kernel is scoped **below** Base UI's: open state + ARIA + keymap + activedescendant
+wiring, and nothing that presumes a text value. That is small enough for Select to compose it, which
+is the one thing Base UI's split gives up — two independent keyboard/ARIA implementations that can
+drift. The trade is that the name overpromises: someone opening `primitives/src/combobox/` will
+expect filtering and find none. **That absence is the design, not an omission** — the filter seam
+belongs to Combobox, and must be pulled by a real input value rather than guessed at from Select's
+side. State it in the folder's usage doc so it isn't "fixed".
+
+Consequences already applied above: `MultiSelect` is gone from T3 (it is
+`selectionMode="multiple"`, a prop `createListbox` already takes, not a component), and Select's
+kernel deps are the kernel + `createFormControl`, not Listbox + `createFloating` assembled by hand.
 
 ---
 
@@ -257,7 +293,7 @@ the current defense is two comments telling the next reader not to tidy.
 ## Suggested first moves
 
 Not prescriptive, but the natural sequence given what's now landed:
-1. **Listbox** — cashes in the navigation kernel; the first component to force the *component*-level
+1. ~~**Listbox**~~ — **done.** Cashed in the navigation kernel and forced the *component*-level
    SSR + hydration DoD onto `createCollection`.
 2. ~~**`createFloating`**~~ — **done.** `@floating-ui/dom` went in as an optional peerDependency, same
    pattern as `@tanstack/virtual-core`; the entire overlay/popup column (Tooltip, Popover, Menu,
@@ -265,6 +301,16 @@ Not prescriptive, but the natural sequence given what's now landed:
    [`create-floating.md`](primitives/internal/create-floating.md).
 3. **`createFormControl`** — unblocks every form input; **adopt `@solid-primitives/a11y`** rather
    than build (verdict in [`solid-primitives-eval.md`](solid-primitives-eval.md)), gated on the
-   `Field` hydration round-trip.
+   `Field` hydration round-trip. Same package as the already-adopted `createAnnounce`, so no new
+   dependency.
+4. **`scrollIndexIntoView` on `createCollection`** — small, and Select cannot ship without it.
+   `createListFocus` calls it only when a row's `element()` is `null` (a virtualized row outside the
+   window), and `createCollection` never implements it at all — so a **mounted** list scrolls nothing.
+   Roving mode has been hiding this: a native `.focus()` scrolls on its own. Activedescendant mode —
+   which is what Select and Combobox use — moves no DOM focus, so an offscreen highlighted option
+   stays offscreen, with every test green.
+5. **The combobox kernel (#21)**, then **Select**, then **Combobox**. Steps 3–4 are the only hard
+   blockers for Select; 5 is what stops Select and Combobox growing two keyboard/ARIA
+   implementations that drift.
 
 From there the T1/T2 backlog can be parallelized.
