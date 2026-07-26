@@ -19,6 +19,7 @@ import type { CalendarRecipe } from "./recipes/calendar";
 import type { CloseButtonRecipe } from "./recipes/close-button";
 import type { DialogRecipe } from "./recipes/dialog";
 import type { ListboxRecipe } from "./recipes/listbox";
+import type { PopoverRecipe } from "./recipes/popover";
 
 /**
  * The theming contract version. A theme asserts against it (e.g. in its conformance test) so a
@@ -40,4 +41,5 @@ export interface RecipeRegistry {
   closeButton: CloseButtonRecipe;
   dialog: DialogRecipe;
   listbox: ListboxRecipe;
+  popover: PopoverRecipe;
 }

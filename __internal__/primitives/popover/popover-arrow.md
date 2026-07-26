@@ -57,23 +57,30 @@ attribute reports; it never hides anything itself — that stays with the recipe
 ## The pin offset is a CSS string, never a measured number
 
 ```
-calc(var(--hope-popover-arrow-size, 8px) / -2)
+calc(var(--popover-arrow-size, 8px) / -2)
 ```
 
 Half the arrow pulled back over the popup's edge. The **size stays owned by the recipe** — the `arrow`
-slot sets `--hope-popover-arrow-size`, and the `8px` fallback covers a headless consumer who sets
+slot sets `--popover-arrow-size`, and the `8px` fallback covers a headless consumer who sets
 nothing — and the primitive stays out of the CSSOM. Reading the size back would cost an effect, a
 resize observer and a re-render, to arrive at a number CSS already has.
 
-A custom property named `--hope-popover-*` in an otherwise theme-agnostic primitive is the one place
-this kernel reaches into the theming vocabulary. The alternative — a `size` option on the hook —
-moves a value the recipe already owns into JS and makes it a second source of truth.
+The alternative — a `size` option on the hook — moves a value the recipe already owns into JS and
+makes it a second source of truth.
+
+**The name is unprefixed on purpose.** `--hope-*` is `@hope-ui/theming`'s *semantic token* vocabulary,
+authored by a preset in its `theme.css`; this property is a component-local geometry channel between a
+recipe and this hook — the role calendar's `--cell-size` plays. The distinction is enforced rather than
+stylistic: `check:recipe-purity` rejects any bracketed arbitrary value naming `--hope-`, so under the
+original `--hope-popover-arrow-size` spelling the `arrow` slot could not have set the property at all
+(`[--hope-popover-arrow-size:0.5rem]` is a purity violation), and "the size stays owned by the recipe"
+would have meant "every preset hard-codes a box size that must happen to match the `8px` fallback".
 
 ## The `style` merge order
 
 Kernel first, consumer last, the same order and for the same reason as
 [`popover-positioner.md`](popover-positioner.md) § *The `style` merge order*: a `z-index`, or the
-`--hope-popover-arrow-size` the pin reads, has to survive. A **string** `style` has no merge seam and
+`--popover-arrow-size` the pin reads, has to survive. A **string** `style` has no merge seam and
 is dropped in favour of the pin. Unlike the Positioner, this part does not warn about it: dropping
 the Positioner's style paints the whole layer at 0,0, while dropping the arrow's leaves a correctly
 pinned arrow missing a decoration.

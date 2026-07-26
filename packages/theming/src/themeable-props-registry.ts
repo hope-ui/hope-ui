@@ -19,6 +19,7 @@ import type { CalendarThemeableProps } from "./recipes/calendar";
 import type { CloseButtonThemeableProps } from "./recipes/close-button";
 import type { DialogThemeableProps } from "./recipes/dialog";
 import type { ListboxThemeableProps } from "./recipes/listbox";
+import type { PopoverThemeableProps } from "./recipes/popover";
 
 /** One entry per component that opts into behavioral/chrome (non-variant) app-wide defaults. */
 export interface ThemeablePropsRegistry {
@@ -29,4 +30,5 @@ export interface ThemeablePropsRegistry {
   closeButton: CloseButtonThemeableProps;
   dialog: DialogThemeableProps;
   listbox: ListboxThemeableProps;
+  popover: PopoverThemeableProps;
 }

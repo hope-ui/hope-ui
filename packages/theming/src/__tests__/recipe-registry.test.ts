@@ -7,12 +7,13 @@ import type { CalendarRecipeVariants, CalendarSlot } from "../recipes/calendar";
 import type { CloseButtonRecipeVariants, CloseButtonSlot } from "../recipes/close-button";
 import type { DialogRecipeVariants, DialogSlot } from "../recipes/dialog";
 import type { ListboxRecipeVariants, ListboxSlot } from "../recipes/listbox";
+import type { PopoverRecipeVariants, PopoverSlot } from "../recipes/popover";
 import type { SlotClassFn } from "../slot-recipe";
 
 // The registry declares each hope-authored component's recipe contract directly (no module
 // augmentation), so a conforming theme provides every recipe named in it — here, `alert`, `badge`,
-// `button`, `calendar`, `closeButton`, `dialog`, and `listbox`. This is a compile-time assignability
-// check (verified by `pnpm typecheck`).
+// `button`, `calendar`, `closeButton`, `dialog`, `listbox`, and `popover`. This is a compile-time
+// assignability check (verified by `pnpm typecheck`).
 const _theme = {
   alert: (props?: AlertRecipeVariants): Record<AlertSlot, SlotClassFn> => ({
     root: () => `alert alert--${props?.variant ?? "default"}`,
@@ -70,6 +71,14 @@ const _theme = {
     group: () => "listbox__group",
     groupLabel: () => "listbox__group-label",
     separator: () => "listbox__separator",
+  }),
+  popover: (props?: PopoverRecipeVariants): Record<PopoverSlot, SlotClassFn> => ({
+    positioner: () => "popover__positioner",
+    content: () => `popover__content popover__content--${props?.size ?? "md"}`,
+    arrow: () => "popover__arrow",
+    title: () => "popover__title",
+    description: () => "popover__description",
+    closeTrigger: () => "popover__close-trigger",
   }),
 } satisfies RecipeRegistry;
 void _theme;

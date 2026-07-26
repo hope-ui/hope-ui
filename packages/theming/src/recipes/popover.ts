@@ -1,0 +1,73 @@
+/**
+ * The **Popover** recipe contract — its variant vocabulary, slots, and the resulting `PopoverRecipe`
+ * type.
+ *
+ * Owned by `@hope-ui/theming` (the look-&-feel authority), not the component or a preset: the
+ * `@hope-ui/components` `Popover` consumes it via `useRecipe("popover")`, and each preset
+ * (`@hope-ui/presets/*`) implements a `tailwind-variants` recipe against it. One file per component
+ * keeps the registry (`../recipe-registry`) a flat list of named recipe types with no shape logic of
+ * its own.
+ *
+ * Popover is a **measured floating surface** — a card `createFloating` positions against a trigger or
+ * an anchor — so, unlike Dialog, *where it sits* is runtime geometry the kernel writes as an inline
+ * `style`, never a recipe axis. What is left for the recipe is the card's chrome and its density, so
+ * the single axis is `size`. It carries **no** color axis: v1 is a neutral overlay, and role accents
+ * belong on whatever the consumer puts inside it.
+ *
+ * `role` (`dialog` vs. `alertdialog`) is **not** a recipe variant — it changes ARIA, not styling, so
+ * it is a component-layer prop on `Popover.Root` threaded to the content hook through context. The
+ * same argument the Dialog contract makes for its own `role`.
+ *
+ * Enter/exit is expressed on the preset's `data-entering:`/`data-exiting:` custom variants (→
+ * `[data-presence="…"]`, the status the positioner and content write to `data-presence`), and the
+ * *direction* of that motion on the `data-side-*`/`data-align-*` variants (→ `[data-side="…"]`, the
+ * resolved post-`flip` side the positioner, content and arrow all report). Every color is a finished
+ * `--hope-*` token (recipe purity). See `theming.md`.
+ */
+import type { SlotRecipeFn } from "../slot-recipe";
+
+/**
+ * The density scale — the card's max width and padding (and the rhythm between its title and
+ * description). `md` is the default. Deliberately narrower than Dialog's `xs…full`: a popover is
+ * anchored to a trigger, so a viewport-filling size would be a Dialog.
+ */
+export type PopoverSize = "sm" | "md" | "lg";
+
+/** The Popover recipe's variant props — also the density axis a preset may default app-wide. */
+export interface PopoverRecipeVariants {
+  /** Card width + padding scale. Default `md`. */
+  size?: PopoverSize;
+}
+
+/**
+ * The curated Popover props a preset may default app-wide via `ComponentOverride.defaultProps`.
+ * Popover carries no non-variant chrome content (no status glyph like Alert, no check icon like
+ * Listbox), so this is exactly the recipe variants — a strict superset of
+ * {@link PopoverRecipeVariants} by construction (`extends`), so it registers in
+ * `ThemeablePropsRegistry` and `ThemeablePropsOf<"popover">` widens nothing away.
+ */
+export interface PopoverThemeableProps extends PopoverRecipeVariants {}
+
+/**
+ * The Popover recipe's slots. `positioner` is the layer `createFloating` measures and moves (chrome
+ * only — stacking and sizing; **never** `position`/`left`/`top`/`transform`, which would fight the
+ * inline style the kernel writes); `content` is the card itself; `arrow` the little square that points
+ * at the anchor; `title`/`description` the labelled text; `closeTrigger` the corner dismiss button's
+ * placement (its chrome comes from `CloseButton`'s own recipe, merged under this).
+ *
+ * **No `root` slot, and none for `trigger`/`anchor`** — by omission, not oversight. `Popover.Root`
+ * renders no element at all (so it accepts no `class`, the reason `Dialog.Root`'s was removed), and
+ * `Popover.Trigger`/`Popover.Anchor` render the *consumer's* element: a preset that styled them would
+ * be styling someone else's button. Both parts forward `class` untouched instead, the shape
+ * `dialog-trigger.tsx` already ships.
+ */
+export type PopoverSlot =
+  | "positioner"
+  | "content"
+  | "arrow"
+  | "title"
+  | "description"
+  | "closeTrigger";
+
+/** The Popover recipe: variant props → one class function per slot. The registry entry for `popover`. */
+export type PopoverRecipe = SlotRecipeFn<PopoverRecipeVariants, PopoverSlot>;

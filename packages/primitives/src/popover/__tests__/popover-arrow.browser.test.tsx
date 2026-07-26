@@ -23,7 +23,7 @@ const CONTENT_HEIGHT = 60;
 /**
  * The arrow's size reaches the element the way it will in production — through the `arrow` slot, here
  * stood in for by a consumer `style` object, which also exercises the kernel-first/consumer-last
- * merge. `--hope-popover-arrow-size` is what the pin offset reads; setting it here proves the custom
+ * merge. `--popover-arrow-size` is what the pin offset reads; setting it here proves the custom
  * property is a real seam and not decoration.
  */
 const ARROW_PROPS: JSX.HTMLAttributes<HTMLDivElement> = {
@@ -31,7 +31,7 @@ const ARROW_PROPS: JSX.HTMLAttributes<HTMLDivElement> = {
     width: `${ARROW_SIZE}px`,
     height: `${ARROW_SIZE}px`,
     background: "black",
-    "--hope-popover-arrow-size": `${ARROW_SIZE}px`,
+    "--popover-arrow-size": `${ARROW_SIZE}px`,
   },
 };
 
@@ -186,7 +186,7 @@ describe("createPopoverArrow", () => {
     // coherently. The pin edge is the opposite of it and lives only in the style.
     expect(belowArrow.getAttribute("data-side")).toBe("bottom");
     expect(belowArrow.getAttribute("data-align")).toBe("center");
-    expect(belowArrow.style.top).toBe("calc(var(--hope-popover-arrow-size, 8px) / -2)");
+    expect(belowArrow.style.top).toBe("calc(var(--popover-arrow-size, 8px) / -2)");
     expect(belowArrow.style.left).toMatch(/^\d+(\.\d+)?px$/);
     // The pin is a CSS string, never a measured number: the size stays the recipe's, and the
     // primitive stays out of the CSSOM. Resolved, it is half the arrow back over the popup's edge.
@@ -201,7 +201,7 @@ describe("createPopoverArrow", () => {
     const aboveArrow = elementOf(above.container, "arrow");
 
     expect(aboveArrow.getAttribute("data-side")).toBe("top");
-    expect(aboveArrow.style.bottom).toBe("calc(var(--hope-popover-arrow-size, 8px) / -2)");
+    expect(aboveArrow.style.bottom).toBe("calc(var(--popover-arrow-size, 8px) / -2)");
     expect(aboveArrow.style.top).toBe("");
     above.dispose();
   });
@@ -245,10 +245,10 @@ describe("createPopoverArrow", () => {
 
     // Kernel first, consumer last — the Positioner's order, for the same reason: the size custom
     // property the pin above reads has to survive, and so does a `z-index`.
-    expect(arrow.style.getPropertyValue("--hope-popover-arrow-size")).toBe(`${ARROW_SIZE}px`);
+    expect(arrow.style.getPropertyValue("--popover-arrow-size")).toBe(`${ARROW_SIZE}px`);
     expect(arrow.style.width).toBe(`${ARROW_SIZE}px`);
     expect(arrow.style.position).toBe("absolute");
-    expect(arrow.style.top).toBe("calc(var(--hope-popover-arrow-size, 8px) / -2)");
+    expect(arrow.style.top).toBe("calc(var(--popover-arrow-size, 8px) / -2)");
 
     expect(arrow.id).toBe("custom-arrow");
     expect(arrow.getAttribute("title")).toBe("kept");

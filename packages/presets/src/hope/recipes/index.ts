@@ -19,6 +19,7 @@ import { calendarRecipe } from "./calendar";
 import { closeButtonRecipe } from "./close-button";
 import { dialogRecipe } from "./dialog";
 import { listboxRecipe } from "./listbox";
+import { popoverRecipe } from "./popover";
 
 /** The hope preset's recipe map — every component recipe hope implements, keyed by component name. */
 export const hopeRecipes = {
@@ -29,4 +30,5 @@ export const hopeRecipes = {
   closeButton: closeButtonRecipe,
   dialog: dialogRecipe,
   listbox: listboxRecipe,
+  popover: popoverRecipe,
 } satisfies RecipeRegistry;

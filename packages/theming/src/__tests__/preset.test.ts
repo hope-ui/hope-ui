@@ -8,6 +8,7 @@ import type { CalendarRecipe } from "../recipes/calendar";
 import type { CloseButtonRecipe } from "../recipes/close-button";
 import type { DialogRecipe } from "../recipes/dialog";
 import type { ListboxRecipe } from "../recipes/listbox";
+import type { PopoverRecipe } from "../recipes/popover";
 
 // A minimal, self-contained recipe map — the theming package must not depend on `@hope-ui/presets`.
 // The class functions are stubs; these tests exercise the *machinery* (merge + brand), not styling.
@@ -68,6 +69,14 @@ const stubListboxRecipe: ListboxRecipe = () => ({
   groupLabel: () => "",
   separator: () => "",
 });
+const stubPopoverRecipe: PopoverRecipe = () => ({
+  positioner: () => "",
+  content: () => "",
+  arrow: () => "",
+  title: () => "",
+  description: () => "",
+  closeTrigger: () => "",
+});
 const registry: RecipeRegistry = {
   alert: stubAlertRecipe,
   badge: stubBadgeRecipe,
@@ -76,6 +85,7 @@ const registry: RecipeRegistry = {
   closeButton: stubCloseButtonRecipe,
   dialog: stubDialogRecipe,
   listbox: stubListboxRecipe,
+  popover: stubPopoverRecipe,
 };
 
 describe("definePreset — bootstrap from a raw registry", () => {

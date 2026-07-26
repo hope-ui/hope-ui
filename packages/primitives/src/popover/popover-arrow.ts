@@ -9,8 +9,18 @@ import type { CreatePopoverReturn } from "./popover-root";
  * property; `8px` is the fallback for a headless consumer who sets nothing), and the primitive stays
  * out of the CSSOM. Reading the size back would cost an effect, a resize observer and a re-render,
  * to arrive at the number CSS already has.
+ *
+ * **Unprefixed on purpose.** `--hope-*` is the theming package's *semantic token* vocabulary, authored
+ * by a preset in `theme.css`; this is a component-local geometry channel between a recipe and this
+ * hook, the same role calendar's `--cell-size` plays. The distinction is enforced, not stylistic:
+ * `check:recipe-purity` rejects any bracketed arbitrary value naming `--hope-`, so a `--hope-`-named
+ * property here would be one no preset recipe could ever set.
+ *
+ * The other half of the agreement is the `arrow` slot, which sets this property *and* sizes its box
+ * from it (`packages/presets/src/hope/recipes/popover.ts`, pinned by that recipe's test). Renaming it
+ * here means renaming it there.
  */
-const PIN_OFFSET = "calc(var(--hope-popover-arrow-size, 8px) / -2)";
+const PIN_OFFSET = "calc(var(--popover-arrow-size, 8px) / -2)";
 
 const px = (value: number | undefined) => (value == null ? undefined : `${value}px`);
 
@@ -59,7 +69,7 @@ export function createPopoverArrow(
 ): CreatePopoverArrowReturn {
   const elementProps = merge(props, {
     // Kernel first, consumer last, the same order and for the same reason as the Positioner's: a
-    // consumer's `z-index`, or the `--hope-popover-arrow-size` the pin above reads, must survive.
+    // consumer's `z-index`, or the `--popover-arrow-size` the pin above reads, must survive.
     // A string `style` has no merge seam, so it is dropped in favour of the pin — see
     // `popover-arrow.md`.
     get style(): JSX.CSSProperties {
